@@ -1,0 +1,61 @@
+List of known vlc bugs
+$Id: BUGS,v 1.1 2002/01/04 14:01:33 sam Exp $
+
+   Please try to keep this file up to date. Also, grep for FIXME in the
+source files for more and more bugs to fix.
+
+   For information on how to post a useful bug report, please read
+doc/bugreport-howto.txt.
+
+
+Core:
+
+  * vlc_cond_broadcast unimplemented on most plaforms.
+
+  * --<moduletype> <module>:<args> doesn't work anymore.
+
+
+Input:
+
+  * There is a memory leak in the input because the input thread is
+  never joined for termination.
+
+  * vlc:foo targets don't work anymore.
+
+
+Video output:
+
+  * We don't render subtitles on RGB surfaces.
+
+  * The DirectX video output plugin is broken because of vout4.
+
+  * The GGI video output plugin is broken because of vout4.
+
+  * The BeOS video output plugin is broken because of vout4.
+
+  * The QNX video output plugin is broken because of vout4.
+
+
+Chroma transformations:
+
+  * The only working YUV2RGB transformation function is the MMX version
+  of the 4:2:0 to RGB16 function.
+
+  * Most chroma transformation modules completely ignore margins.
+
+  * Most chroma transformation modules restrict the width of a picture
+  to multiples of 8 or even 16. We can achieve better than that.
+
+
+Filters:
+
+  * Most filters completely ignore margins.
+
+
+Gtk interface:
+
+  * Playing like a madman with the `Playlist' button makes the interface
+  crash.
+
+  * Saving preferences does not work at all.
+

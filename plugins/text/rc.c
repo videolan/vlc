@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.7 2001/12/30 07:09:56 sam Exp $
+ * $Id: rc.c,v 1.8 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -180,7 +180,7 @@ static void intf_Run( intf_thread_t *p_intf )
                                           S.p_selected_area->i_size ) );
                 }
             }
-	}
+        }
 #undef S
 
         b_complete = 0;

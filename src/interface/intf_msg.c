@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.41 2001/12/30 07:09:56 sam Exp $
+ * $Id: intf_msg.c,v 1.42 2002/01/04 14:01:35 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -706,7 +706,9 @@ static char *ConvertPrintfFormatString( char *psz_format )
   for( i=0; i <= (strlen(psz_format) - 4); i++ )
   {
       if( !strncmp( (char *)(psz_format + i), "%ll", 3 ) )
-	  i_counter++;
+      {
+          i_counter++;
+      }
   }
 
   /* malloc the destination string */
@@ -727,7 +729,7 @@ static char *ConvertPrintfFormatString( char *psz_format )
           *(psz_dest+i+i_counter+1)='I';
           *(psz_dest+i+i_counter+2)='6';
           *(psz_dest+i+i_counter+3)='4';
-	  i_pos = i+3;
+          i_pos = i+3;
           i_counter++;
       }
   }

@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.22 2001/12/30 07:09:56 sam Exp $
+ * $Id: aout_sdl.c,v 1.23 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -143,6 +143,11 @@ static int aout_Open( aout_thread_t *p_aout )
 {
     SDL_AudioSpec desired;
     int i_channels = p_aout->b_stereo ? 2 : 1;
+
+    if( SDL_WasInit( SDL_INIT_AUDIO ) != 0 )
+    {
+        return( 0 );
+    }
 
     /* Allocate structure */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );

@@ -55,8 +55,12 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		alsa/alsa \
 		arts/arts \
 		beos/beos \
-		chroma/chroma_yv12_rgb8 \
-		chroma/chroma_yv12_rgb16 \
+		chroma/chroma_i420_rgb \
+		chroma/chroma_i420_rgb_mmx \
+		chroma/chroma_i420_yuy2 \
+		chroma/chroma_i420_yuy2_mmx \
+		chroma/chroma_i422_yuy2 \
+		chroma/chroma_i422_yuy2_mmx \
 		directx/directx \
 		dsp/dsp \
 		dummy/dummy \
@@ -111,9 +115,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		text/rc \
 		vcd/vcd \
 		x11/x11 \
-		x11/xvideo \
-		yuv/yuv \
-		yuv/yuvmmx
+		x11/xvideo
 
 #
 # C Objects
@@ -156,6 +158,24 @@ VLC_OBJ := $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ)
 # Generated header
 #
 H_OBJ :=	src/misc/modules_builtin.h
+
+#
+# Included headers which don't get noticed by Makefile.dep
+#
+H_DEP :=	videolan/vlc.h \
+		defs.h \
+		config.h \
+		int_types.h \
+		modules_inner.h \
+		common.h \
+		beos_specific.h \
+		darwin_specific.h \
+		win32_specific.h \
+		intf_msg.h \
+		threads.h \
+		mtime.h \
+		modules.h \
+		main.h
 
 #
 # Other lists of files
@@ -526,12 +546,14 @@ $(C_DEP): %.d: FORCE
 $(CPP_DEP): %.dpp: FORCE
 	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
 
-$(C_OBJ): %.o: Makefile.opts Makefile.dep Makefile $(H_OBJ)
+$(C_OBJ): %.o: Makefile.opts Makefile.dep Makefile
+$(C_OBJ): %.o: $(H_OBJ) $(H_DEP:%=include/%)
 $(C_OBJ): %.o: .dep/%.d
 $(C_OBJ): %.o: %.c
 	$(CC) $(CFLAGS) $(CFLAGS_VLC) -c -o $@ $<
 
 $(CPP_OBJ): %.o: Makefile.opts Makefile.dep Makefile
+$(CPP_OBJ): %.o: $(H_OBJ) $(H_DEP:%=include/%)
 $(CPP_OBJ): %.o: .dep/%.dpp
 $(CPP_OBJ): %.o: %.cpp
 	$(CC) $(CFLAGS) $(CFLAGS_VLC) -c -o $@ $<

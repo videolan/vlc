@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ncurses.c,v 1.9 2001/12/30 07:09:56 sam Exp $
+ * $Id: ncurses.c,v 1.10 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -161,7 +161,7 @@ static void intf_Run( intf_thread_t *p_intf )
         //mvaddstr( 5, 2, "No other keys are active yet." );
 
         while( (i_key = getch()) != -1 )
-	{
+        {
             switch( i_key )
             {
                 case 'q':

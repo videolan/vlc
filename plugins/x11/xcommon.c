@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.4 2002/01/02 14:37:42 sam Exp $
+ * $Id: xcommon.c,v 1.5 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -67,8 +67,8 @@
 
 #ifdef MODULE_NAME_IS_xvideo
 #   define IMAGE_TYPE     XvImage
-#   define EXTRA_ARGS     int i_xvport, int i_format
-#   define EXTRA_ARGS_SHM int i_xvport, int i_format, XShmSegmentInfo *p_shm
+#   define EXTRA_ARGS     int i_xvport, int i_chroma
+#   define EXTRA_ARGS_SHM int i_xvport, int i_chroma, XShmSegmentInfo *p_shm
 #   define DATA_SIZE(p)   (p)->data_size
 #   define IMAGE_FREE     XFree      /* There is nothing like XvDestroyImage */
 #else
@@ -85,6 +85,7 @@
 static int  vout_Probe     ( probedata_t * );
 static int  vout_Create    ( vout_thread_t * );
 static void vout_Destroy   ( vout_thread_t * );
+static void vout_Render    ( vout_thread_t *, picture_t * );
 static void vout_Display   ( vout_thread_t *, picture_t * );
 static int  vout_Manage    ( vout_thread_t * );
 static int  vout_Init      ( vout_thread_t * );
@@ -137,6 +138,7 @@ typedef struct vout_sys_s
     Window              yuv_window;   /* sub-window for displaying yuv video
                                                                         data */
     int                 i_xvport;
+    u32                 i_chroma;               /* the chroma we will select */
 #else
     Colormap            colormap;               /* colormap used (8bpp only) */
 
@@ -211,7 +213,6 @@ typedef struct mwmhints_s
  * Chroma defines
  *****************************************************************************/
 #ifdef MODULE_NAME_IS_xvideo
-#   define GUID_YUV12_PLANAR 0x32315659
 #   define MAX_DIRECTBUFFERS 5
 #else
 #   define MAX_DIRECTBUFFERS 2
@@ -236,6 +237,41 @@ static __inline__ void vout_Seek( off_t i_seek )
 }
 
 /*****************************************************************************
+ * Return the best suited FourCC value for a given chroma. We use this
+ * because a decoder may output FOURCC_IYUV, which is exactly the same as
+ * FOURCC_I420, but X servers usually know FOURCC_I420 and not FOURCC_IYUV.
+ *****************************************************************************/
+static __inline__ u32 BestChroma( u32 i_chroma )
+{
+    /* XXX: don't forget to update vout_Init if you change this */
+    switch( i_chroma )
+    {
+        /* These ones are all the same */
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        case FOURCC_YV12:
+            return FOURCC_I420;
+
+        /* These ones are all the same */
+        case FOURCC_YUY2:
+        case FOURCC_YUNV:
+            return FOURCC_YUY2;
+
+        /* We know this one */
+        case FOURCC_Y211:
+            return FOURCC_Y211;
+
+        /* This is seldom supported, but we know how to convert */
+        case FOURCC_I422:
+            return FOURCC_YUY2;
+
+        default:
+            return i_chroma;
+            break;
+    }
+}
+
+/*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
@@ -247,6 +283,7 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_end        = vout_End;
     p_function_list->functions.vout.pf_destroy    = vout_Destroy;
     p_function_list->functions.vout.pf_manage     = vout_Manage;
+    p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
     p_function_list->functions.vout.pf_setpalette = NULL;
 }
@@ -274,14 +311,19 @@ static int vout_Probe( probedata_t *p_data )
         return( 0 );
     }
 
-#ifdef MODULE_NAME_IS_xvideo 
+#ifdef MODULE_NAME_IS_xvideo
     /* Check that there is an available XVideo port */
-    i_xvport = XVideoGetPort( p_display, GUID_YUV12_PLANAR );
+    i_xvport = XVideoGetPort( p_display, BestChroma( p_data->vout.i_chroma ) );
     if( i_xvport < 0 )
     {
-        intf_WarnMsg( 3, "vout: no XVideo port available" );
-        XCloseDisplay( p_display );
-        return( 0 );
+        /* It failed, but it's not completely lost ! We try to open an
+         * XVideo port for a simple 16bpp RGB picture */
+        i_xvport = XVideoGetPort( p_display, FOURCC_RV16 );
+        if( i_xvport < 0 )
+        {
+            XCloseDisplay( p_display );
+            return( 0 );
+        }
     }
     XVideoReleasePort( p_display, i_xvport );
 #endif
@@ -328,15 +370,27 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
 #ifdef MODULE_NAME_IS_xvideo
-    /* Check that we have access to an XVideo port */
+    /* Try to guess the chroma format we will be using */
+    p_vout->p_sys->i_chroma = BestChroma( p_vout->render.i_chroma );
+
+    /* Check that we have access to an XVideo port providing this chroma */
     p_vout->p_sys->i_xvport = XVideoGetPort( p_vout->p_sys->p_display,
-                                             GUID_YUV12_PLANAR );
+                                             p_vout->p_sys->i_chroma );
     if( p_vout->p_sys->i_xvport < 0 )
     {
-        intf_ErrMsg( "vout error: cannot get XVideo port" );
-        XCloseDisplay( p_vout->p_sys->p_display );
-        free( p_vout->p_sys );
-        return 1;
+        /* It failed, but it's not completely lost ! We try to open an
+         * XVideo port for a simple 16bpp RGB picture */
+        p_vout->p_sys->i_xvport = XVideoGetPort( p_vout->p_sys->p_display,
+                                                 FOURCC_RV16 );
+        if( p_vout->p_sys->i_xvport < 0 )
+        {
+            XCloseDisplay( p_vout->p_sys->p_display );
+            free( p_vout->p_sys );
+            return 1;
+        }
+
+        /* This one worked ! That's better than nothing, it has HW scaling. */
+        p_vout->p_sys->i_chroma = FOURCC_RV16;
     }
 #endif
 
@@ -421,36 +475,65 @@ static int vout_Init( vout_thread_t *p_vout )
     I_OUTPUTPICTURES = 0;
 
 #ifdef MODULE_NAME_IS_xvideo
-    /* Initialize the output structure */
+    /* Initialize the output structure ; we already found an XVideo port,
+     * which either suits p_vout->render.i_chroma or p_vout->p_sys->i_chroma
+     * if nothing was found at the first attempt. */
     switch( p_vout->render.i_chroma )
     {
+        /* These ones are equivalent to what we chose instead, for instance
+         * we tell the video output we can do FOURCC_IYUV even though we
+         * actually do FOURCC_I420. */
         case FOURCC_I420:
         case FOURCC_IYUV:
         case FOURCC_YV12:
+
+        case FOURCC_YUY2:
+        case FOURCC_YUNV:
+
+        case FOURCC_Y211:
             p_vout->output.i_chroma = p_vout->render.i_chroma;
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;
             p_vout->output.i_aspect = p_vout->render.i_aspect;
             break;
 
+        /* These ones aren't equivalent to what we chose, so we need to
+         * warn the decoder that we chose another chroma and that it has
+         * conversion to do. */
+
+        /* At least for this one we can have the aspect ratio */
+        case FOURCC_I422:
+            p_vout->output.i_chroma = p_vout->p_sys->i_chroma;
+            p_vout->output.i_width  = p_vout->render.i_width;
+            p_vout->output.i_height = p_vout->render.i_height;
+            p_vout->output.i_aspect = p_vout->render.i_aspect;
+            break;
+
+        /* Here we don't even control the aspect ratio */
         default:
-            return( 0 );
+            p_vout->output.i_chroma = p_vout->p_sys->i_chroma;
+            p_vout->output.i_width  = p_vout->render.i_width;
+            p_vout->output.i_height = p_vout->render.i_height;
+            p_vout->output.i_aspect = p_vout->p_sys->i_width
+                               * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
+            break;
     }
+
 #else
     /* Initialize the output structure: RGB with square pixels, whatever
      * the input format is, since it's the only format we know */
     switch( p_vout->p_sys->i_screen_depth )
     {
         case 8: /* FIXME: set the palette */
-            p_vout->output.i_chroma = FOURCC_BI_RGB | DEPTH_8BPP; break;
+            p_vout->output.i_chroma = FOURCC_BI_RGB; break;
         case 15:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS | DEPTH_15BPP; break;
+            p_vout->output.i_chroma = FOURCC_RV15; break;
         case 16:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS | DEPTH_16BPP; break;
+            p_vout->output.i_chroma = FOURCC_RV16; break;
         case 24:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS | DEPTH_24BPP; break;
+            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS; break;
         case 32:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS | DEPTH_32BPP; break;
+            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS; break;
         default:
             intf_ErrMsg( "vout error: unknown screen depth" );
             return( 0 );
@@ -485,13 +568,8 @@ static int vout_Init( vout_thread_t *p_vout )
             break;
         }
 
-        p_pic->i_status        = DESTROYED_PICTURE;
-        p_pic->i_type          = DIRECT_PICTURE;
-
-        p_pic->i_left_margin   =
-        p_pic->i_right_margin  =
-        p_pic->i_top_margin    = 
-        p_pic->i_bottom_margin = 0;
+        p_pic->i_status = DESTROYED_PICTURE;
+        p_pic->i_type   = DIRECT_PICTURE;
 
         PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
 
@@ -502,6 +580,14 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
+ * vout_Render: render previously calculated output
+ *****************************************************************************/
+static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    ;
+}
+
+ /*****************************************************************************
  * vout_Display: displays previously rendered output
  *****************************************************************************
  * This function sends the currently rendered image to X11 server.
@@ -1134,126 +1220,172 @@ static void DestroyWindow( vout_thread_t *p_vout )
  *****************************************************************************/
 static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#define P p_pic->planes
-    int i_width  = p_vout->output.i_width;
-    int i_height = p_vout->output.i_height;
-    
-    switch( ONLY_FOURCC( p_vout->output.i_chroma ) )
+    /* We know the chroma, allocate a buffer which will be used
+     * directly by the decoder */
+    p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
+
+    if( p_pic->p_sys == NULL )
     {
+        return -1;
+    }
+
+    if( p_vout->p_sys->b_shm )
+    {
+        /* Create image using XShm extension */
+        p_pic->p_sys->p_image =
+            CreateShmImage( p_vout->p_sys->p_display,
 #ifdef MODULE_NAME_IS_xvideo
+                            p_vout->p_sys->i_xvport,
+                            p_vout->p_sys->i_chroma,
+#else
+                            p_vout->p_sys->p_visual,
+                            p_vout->p_sys->i_screen_depth,
+#endif
+                            &p_pic->p_sys->shminfo,
+                            p_vout->output.i_width, p_vout->output.i_height );
+    }
+    else
+    {
+        /* Create image without XShm extension */
+        p_pic->p_sys->p_image =
+            CreateImage( p_vout->p_sys->p_display,
+#ifdef MODULE_NAME_IS_xvideo
+                         p_vout->p_sys->i_xvport,
+                         p_vout->p_sys->i_chroma,
+#else
+                         p_vout->p_sys->p_visual,
+                         p_vout->p_sys->i_screen_depth, 
+                         p_vout->p_sys->i_bytes_per_pixel,
+#endif
+                         p_vout->output.i_width, p_vout->output.i_height );
+    }
+
+    if( p_pic->p_sys->p_image == NULL )
+    {
+        free( p_pic->p_sys );
+        return -1;
+    }
+
+#ifdef MODULE_NAME_IS_xvideo
+    switch( p_vout->p_sys->i_chroma )
+    {
         case FOURCC_I420:
-            /* We know this chroma, allocate a buffer which will be used
-             * directly by the decoder */
-            p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
 
-            if( p_pic->p_sys == NULL )
-            {
-                return -1;
-            }
+            p_pic->Y_PIXELS = p_pic->p_sys->p_image->data
+                               + p_pic->p_sys->p_image->offsets[0];
+            p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
+            p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[0];
+            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
+            p_pic->p[Y_PLANE].b_margin = 0;
 
-            if( p_vout->p_sys->b_shm )
-            {
-                /* Create XvImage using XShm extension */
-                p_pic->p_sys->p_image =
-                    CreateShmImage( p_vout->p_sys->p_display,
-                                    p_vout->p_sys->i_xvport,
-                                    GUID_YUV12_PLANAR,
-                                    &p_pic->p_sys->shminfo,
-                                    p_vout->output.i_width,
-                                    p_vout->output.i_height );
-            }
-            else
-            {
-                /* Create XvImage using XShm extension */
-                p_pic->p_sys->p_image =
-                    CreateImage( p_vout->p_sys->p_display,
-                                 p_vout->p_sys->i_xvport,
-                                 GUID_YUV12_PLANAR,
-                                 p_vout->output.i_width,
-                                 p_vout->output.i_height );
-            }
+            p_pic->U_PIXELS = p_pic->p_sys->p_image->data
+                               + p_pic->p_sys->p_image->offsets[1];
+            p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[1];
+            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
+            p_pic->p[Y_PLANE].b_margin = 0;
 
-            if( p_pic->p_sys->p_image == NULL )
-            {
-                free( p_pic->p_sys );
-                return -1;
-            }
-
-            /* FIXME: try to get the right i_bytes value from p_image */
-            P[Y_PLANE].p_data = p_pic->p_sys->p_image->data;
-            P[Y_PLANE].i_bytes = i_width * i_height;
-            P[Y_PLANE].i_line_bytes = i_width;
-
-            P[U_PLANE].p_data = P[Y_PLANE].p_data + i_width * i_height * 5 / 4;
-            P[U_PLANE].i_bytes = i_width * i_height / 4;
-            P[U_PLANE].i_line_bytes = i_width / 2;
-
-            P[V_PLANE].p_data = P[Y_PLANE].p_data + i_width * i_height;
-            P[V_PLANE].i_bytes = i_width * i_height / 4;
-            P[V_PLANE].i_line_bytes = i_width / 2;
+            p_pic->V_PIXELS = p_pic->p_sys->p_image->data
+                               + p_pic->p_sys->p_image->offsets[2];
+            p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[2];
+            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
+            p_pic->p[Y_PLANE].b_margin = 0;
 
             p_pic->i_planes = 3;
+            break;
 
-            return 0;
-#endif
+        case FOURCC_Y211:
 
-#ifdef MODULE_NAME_IS_x11
-        case FOURCC_BI_BITFIELDS:
-            p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
-
-            if( p_pic->p_sys == NULL )
-            {
-                return -1;
-            }
-
-            if( p_vout->p_sys->b_shm )
-            {
-                p_pic->p_sys->p_image =
-                    CreateShmImage( p_vout->p_sys->p_display,
-                                    p_vout->p_sys->p_visual,
-                                    p_vout->p_sys->i_screen_depth,
-                                    &p_pic->p_sys->shminfo,
-                                    i_width, i_height );
-            }
-            else
-            {
-                p_pic->p_sys->p_image =
-                    CreateImage( p_vout->p_sys->p_display,
-                                 p_vout->p_sys->p_visual,
-                                 p_vout->p_sys->i_screen_depth, 
-                                 p_vout->p_sys->i_bytes_per_pixel,
-                                 i_width, i_height );
-            }
-
-            if( p_pic->p_sys->p_image == NULL )
-            {
-                free( p_pic->p_sys );
-                return -1;
-            }
-
-            /* FIXME: try to get the right i_bytes value from p_image */
-            P[ MAIN_PLANE ].p_data = p_pic->p_sys->p_image->data;
-            P[ MAIN_PLANE ].i_bytes = p_vout->p_sys->i_bytes_per_pixel
-                                       * i_width * i_height;
-            P[ MAIN_PLANE ].i_line_bytes = p_vout->p_sys->i_bytes_per_pixel
-                                            * i_width;
-
-            P[ MAIN_PLANE ].i_red_mask = p_vout->p_sys->i_red_mask;
-            P[ MAIN_PLANE ].i_green_mask = p_vout->p_sys->i_green_mask;
-            P[ MAIN_PLANE ].i_blue_mask = p_vout->p_sys->i_blue_mask;
+            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
+                                  + p_pic->p_sys->p_image->offsets[0];
+            p_pic->p->i_lines = p_vout->output.i_height;
+            p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
+            p_pic->p->i_pixel_bytes = 1;
+            p_pic->p->b_margin = 0;
 
             p_pic->i_planes = 1;
+            break;
 
-            return 0;
-#endif
+        case FOURCC_YUY2:
+
+            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
+                                  + p_pic->p_sys->p_image->offsets[0];
+            p_pic->p->i_lines = p_vout->output.i_height;
+            p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
+            p_pic->p->i_pixel_bytes = 2;
+            p_pic->p->b_margin = 0;
+
+            p_pic->i_planes = 1;
+            break;
+
+        case FOURCC_RV16:
+
+            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
+                                  + p_pic->p_sys->p_image->offsets[0];
+            p_pic->p->i_lines = p_vout->output.i_height;
+            p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
+            p_pic->p->i_pixel_bytes = 2;
+            p_pic->p->b_margin = 0;
+
+            p_pic->p->i_red_mask   = 0x001f;
+            p_pic->p->i_green_mask = 0x03e0;
+            p_pic->p->i_blue_mask  = 0x7c00;
+
+            p_pic->i_planes = 1;
+            break;
 
         default:
             /* Unknown chroma, tell the guy to get lost */
+            IMAGE_FREE( p_pic->p_sys->p_image );
+            free( p_pic->p_sys );
+            intf_ErrMsg( "vout error: never heard of chroma 0x%.8x",
+                         p_vout->p_sys->i_chroma );
             p_pic->i_planes = 0;
-
             return -1;
     }
-#undef P
+#else
+    switch( p_vout->output.i_chroma )
+    {
+        case FOURCC_RV16:
+
+            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
+                                  + p_pic->p_sys->p_image->xoffset;
+            p_pic->p->i_lines = p_pic->p_sys->p_image->height;
+            p_pic->p->i_pitch = p_pic->p_sys->p_image->bytes_per_line;
+            p_pic->p->i_pixel_bytes = p_pic->p_sys->p_image->depth;
+
+            if( p_pic->p->i_pitch == 2 * p_pic->p_sys->p_image->width )
+            {
+                p_pic->p->b_margin = 0;
+            }
+            else
+            {
+                p_pic->p->b_margin = 1;
+                p_pic->p->b_hidden = 1;
+                p_pic->p->i_visible_bytes = 2 * p_pic->p_sys->p_image->width;
+            }
+
+            p_pic->p->i_red_mask   = p_pic->p_sys->p_image->red_mask;
+            p_pic->p->i_green_mask = p_pic->p_sys->p_image->green_mask;
+            p_pic->p->i_blue_mask  = p_pic->p_sys->p_image->blue_mask;
+
+            p_pic->i_planes = 1;
+
+            break;
+
+        default:
+            /* Unknown chroma, tell the guy to get lost */
+            IMAGE_FREE( p_pic->p_sys->p_image );
+            free( p_pic->p_sys );
+            intf_ErrMsg( "vout error: never heard of chroma 0x%.8x",
+                         p_vout->output.i_chroma );
+            p_pic->i_planes = 0;
+            return -1;
+    }
+#endif
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -1707,12 +1839,14 @@ static int XVideoGetPort( Display *dpy, int i_id )
     {
         if( i_requested_adaptor == -1 )
         {
-            intf_WarnMsg( 3, "vout: no free XVideo port found for %i", i_id );
+            intf_WarnMsg( 3, "vout: no free XVideo port found for format "
+                             "0x%.8x", i_id );
         }
         else
         {
             intf_WarnMsg( 3, "vout: XVideo adaptor %i does not have a free "
-                             "XVideo port for %i", i_requested_adaptor, i_id );
+                             "XVideo port for format 0x%.8x",
+                             i_requested_adaptor, i_id );
         }
     }
 
@@ -1854,7 +1988,7 @@ static IMAGE_TYPE * CreateShmImage( Display* p_display, EXTRA_ARGS_SHM,
 
     /* Create XImage / XvImage */
 #ifdef MODULE_NAME_IS_xvideo
-    p_image = XvShmCreateImage( p_display, i_xvport, i_format, 0,
+    p_image = XvShmCreateImage( p_display, i_xvport, i_chroma, 0,
                                 i_width, i_height, p_shm );
 #else
     p_image = XShmCreateImage( p_display, p_visual, i_depth, ZPixmap, 0,
@@ -1961,7 +2095,7 @@ static IMAGE_TYPE * CreateImage( Display *p_display, EXTRA_ARGS,
 
     /* Create XImage. p_data will be automatically freed */
 #ifdef MODULE_NAME_IS_xvideo
-    p_image = XvCreateImage( p_display, i_xvport, i_format,
+    p_image = XvCreateImage( p_display, i_xvport, i_chroma,
                              p_data, i_width, i_height );
 #else
     p_image = XCreateImage( p_display, p_visual, i_depth, ZPixmap, 0,

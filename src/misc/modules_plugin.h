@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.1 2001/12/30 07:09:56 sam Exp $
+ * $Id: modules_plugin.h,v 1.2 2002/01/04 14:01:35 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -82,10 +82,8 @@ module_unload( module_handle_t handle )
  * module_getsymbol: get a symbol from a dynamic library
  *****************************************************************************
  * This function queries a loaded library for a symbol specified in a
- * string, and returns a pointer to it.
- * FIXME: under Unix we should maybe check for dlerror() instead of the
- * return value of dlsym, since we could have loaded a symbol really set
- * to NULL (quite unlikely, though).
+ * string, and returns a pointer to it. We don't check for dlerror() or
+ * similar functions, since we want a non-NULL symbol anyway.
  *****************************************************************************/
 static __inline__ void *
 module_getsymbol( module_handle_t handle, char * psz_function )

@@ -20,29 +20,30 @@
 #include <qvgroupbox.h>
 #include <qwidget.h>
 
-KNetDialog::KNetDialog( QWidget *parent, const char *name ) :
-		KDialogBase( parent, name, true, QString::null, Ok|Cancel, Ok, true )
+KNetDialog::KNetDialog( QWidget *parent, const char *name )
+           :KDialogBase( parent, name, true,
+                         QString::null, Ok|Cancel, Ok, true )
 {
-	QVBox *pageVBox = makeVBoxMainWidget();
+    QVBox *pageVBox = makeVBoxMainWidget();
 
-	QHBox *layout = new QHBox( pageVBox );
-	layout->setSpacing( 5 );
-	fButtonGroup = new QVButtonGroup( "Protocol", layout );
-	fTSButton = new QRadioButton( "TS", fButtonGroup);
-	fTSButton->setChecked( true );
-	fRTPButton = new QRadioButton( "RTP", fButtonGroup);
-	fRTPButton->setEnabled( false );
-	fHTTPButton = new QRadioButton( "HTTP", fButtonGroup);
-	fHTTPButton->setEnabled( false );
+    QHBox *layout = new QHBox( pageVBox );
+    layout->setSpacing( 5 );
+    fButtonGroup = new QVButtonGroup( "Protocol", layout );
+    fTSButton = new QRadioButton( "TS", fButtonGroup);
+    fTSButton->setChecked( true );
+    fRTPButton = new QRadioButton( "RTP", fButtonGroup);
+    fRTPButton->setEnabled( false );
+    fHTTPButton = new QRadioButton( "HTTP", fButtonGroup);
+    fHTTPButton->setEnabled( false );
 
-	QVGroupBox *serverVBox = new QVGroupBox( "Starting position", layout );
+    QVGroupBox *serverVBox = new QVGroupBox( "Starting position", layout );
 
-	QHBox *titleHBox = new QHBox( serverVBox );
-	QLabel *titleLabel = new QLabel( "Address ", titleHBox );
-	fAddress = new KLineEdit( "vls", titleHBox );
-	QHBox *portHBox = new QHBox( serverVBox );
-	QLabel *portLabel = new QLabel( "Port ", portHBox );
-	fPort = new QSpinBox( 0, 65535, 1, portHBox );
+    QHBox *titleHBox = new QHBox( serverVBox );
+    QLabel *titleLabel = new QLabel( "Address ", titleHBox );
+    fAddress = new KLineEdit( "vls", titleHBox );
+    QHBox *portHBox = new QHBox( serverVBox );
+    QLabel *portLabel = new QLabel( "Port ", portHBox );
+    fPort = new QSpinBox( 0, 65535, 1, portHBox );
 }
 
 KNetDialog::~KNetDialog()
@@ -51,26 +52,26 @@ KNetDialog::~KNetDialog()
 
 QString KNetDialog::protocol() const
 {
-	if ( fTSButton->isChecked() )
-	{
-		return ( QString( "ts" ) );
-	}
-	else if ( fRTPButton->isChecked() )
-	{
-		return ( QString( "rtp" ) );
-	}
-	else
-	{
-		return ( QString( "http" ) );
-	}
+    if ( fTSButton->isChecked() )
+    {
+        return ( QString( "ts" ) );
+    }
+    else if ( fRTPButton->isChecked() )
+    {
+        return ( QString( "rtp" ) );
+    }
+    else
+    {
+        return ( QString( "http" ) );
+    }
 }
 
 QString KNetDialog::server() const
 {
-	return ( fAddress->text() );
+    return ( fAddress->text() );
 }
 
 int KNetDialog::port() const
 {
-	return ( fPort->value() );
+    return ( fPort->value() );
 }

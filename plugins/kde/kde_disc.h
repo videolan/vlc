@@ -21,25 +21,26 @@ class KLineEdit;
   *@author andres
   */
 
-class KDiskDialog : public KDialogBase  {
-   Q_OBJECT
-public: 
-	KDiskDialog( QWidget *parent=0, const char *name=0 );
-	~KDiskDialog();
+class KDiskDialog : public KDialogBase
+{
+    Q_OBJECT
+    public: 
+        KDiskDialog( QWidget *parent=0, const char *name=0 );
+        ~KDiskDialog();
 
-	QString	type() const;
-	QString	device() const;
-	int			title() const;
-	int			chapter() const;
+        QString    type() const;
+        QString    device() const;
+        int        title() const;
+        int        chapter() const;
 
-private:
+    private:
 
-	QVButtonGroup	*fButtonGroup;
-	QRadioButton		*fDVDButton;
-	QRadioButton		*fVCDButton;
-	QSpinBox			*fTitle;
-	QSpinBox         *fChapter;
-	KLineEdit			*fLineEdit;
+        QVButtonGroup    *fButtonGroup;
+        QRadioButton     *fDVDButton;
+        QRadioButton     *fVCDButton;
+        QSpinBox         *fTitle;
+        QSpinBox         *fChapter;
+        KLineEdit        *fLineEdit;
 
 };
 

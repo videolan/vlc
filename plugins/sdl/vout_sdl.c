@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.75 2002/01/02 14:37:42 sam Exp $
+ * $Id: vout_sdl.c,v 1.76 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -66,7 +66,14 @@ typedef struct vout_sys_s
     int i_width;
     int i_height;
 
+    /* For YUV output */
+    u32 i_chroma;                          /* The internally selected chroma */
+
+    /* For RGB output */
     int i_surfaces;
+    int i_red_mask;
+    int i_green_mask;
+    int i_blue_mask;
 
     boolean_t   b_cursor;
     boolean_t   b_cursor_autohidden;
@@ -87,6 +94,65 @@ typedef struct picture_sys_s
 } picture_sys_t;
 
 /*****************************************************************************
+ * Seeking function TODO: put this in a generic location !
+ *****************************************************************************/
+static __inline__ void vout_Seek( off_t i_seek )
+{
+#define area p_main->p_intf->p_input->stream.p_selected_area
+    off_t i_tell = area->i_tell;
+
+    i_tell += i_seek * (off_t)50 * p_main->p_intf->p_input->stream.i_mux_rate;
+
+    i_tell = ( i_tell <= area->i_start ) ? area->i_start
+           : ( i_tell >= area->i_size ) ? area->i_size
+           : i_tell;
+
+    input_Seek( p_main->p_intf->p_input, i_tell );
+#undef area
+}
+
+/*****************************************************************************
+ * Return the best suited FourCC value for a given chroma. We use this
+ * because a decoder may output FOURCC_IYUV, which is exactly the same as
+ * FOURCC_I420, but X servers usually know FOURCC_I420 and not FOURCC_IYUV.
+ *****************************************************************************/
+static __inline__ u32 BestChroma( u32 i_chroma )
+{
+    /* XXX: don't forget to update vout_Init if you change this */
+    switch( i_chroma )
+    {
+        /* These ones are almost the same */
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        case FOURCC_YV12:
+            return SDL_YV12_OVERLAY;
+
+        /* These ones are all the same */
+        case FOURCC_UYVY:
+        case FOURCC_UYNV:
+        case FOURCC_Y422:
+            return SDL_UYVY_OVERLAY;
+
+        /* These ones are all the same */
+        case FOURCC_YUY2:
+        case FOURCC_YUNV:
+            return SDL_YUY2_OVERLAY;
+
+        /* We know this one */
+        case FOURCC_YVYU:
+            return SDL_YVYU_OVERLAY;
+
+        /* This is seldom supported, but we know how to convert it */
+        case FOURCC_I422:
+            return SDL_YUY2_OVERLAY;
+
+        /* We don't know this chroma, but maybe SDL does */
+        default:
+            return i_chroma;
+    }
+}
+
+/*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
 static int  vout_Probe      ( probedata_t *p_data );
@@ -95,6 +161,7 @@ static int  vout_Init       ( struct vout_thread_s * );
 static void vout_End        ( struct vout_thread_s * );
 static void vout_Destroy    ( struct vout_thread_s * );
 static int  vout_Manage     ( struct vout_thread_s * );
+static void vout_Render     ( struct vout_thread_s *, struct picture_s * );
 static void vout_Display    ( struct vout_thread_s *, struct picture_s * );
 
 static int  SDLOpenDisplay      ( vout_thread_t *p_vout );
@@ -113,6 +180,7 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_end        = vout_End;
     p_function_list->functions.vout.pf_destroy    = vout_Destroy;
     p_function_list->functions.vout.pf_manage     = vout_Manage;
+    p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
     p_function_list->functions.vout.pf_setpalette = NULL;
 }
@@ -142,6 +210,11 @@ static int vout_Probe( probedata_t *p_data )
  *****************************************************************************/
 static int vout_Create( vout_thread_t *p_vout )
 {
+    if( SDL_WasInit( SDL_INIT_VIDEO ) != 0 )
+    {
+        return( 1 );
+    }
+
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -168,7 +241,7 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    p_vout->p_sys->b_cursor = 1; /* TODO should be done with a main_GetInt.. */
+    p_vout->p_sys->b_cursor = 1;
     p_vout->p_sys->b_cursor_autohidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
 
@@ -225,26 +298,58 @@ static int vout_Init( vout_thread_t *p_vout )
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure */
-    switch( p_vout->render.i_chroma )
+    if( p_vout->p_sys->p_overlay == NULL )
     {
+        /* All we have is an RGB image with square pixels */
+        p_vout->output.i_chroma = p_vout->p_sys->i_chroma;
+        p_vout->output.i_width  = p_vout->p_sys->i_width;
+        p_vout->output.i_height = p_vout->p_sys->i_height;
+        p_vout->output.i_aspect = p_vout->p_sys->i_width
+                                   * VOUT_ASPECT_FACTOR
+                                   / p_vout->p_sys->i_height;
+    }
+    else
+    {
+        switch( p_vout->render.i_chroma )
+        {
         case FOURCC_I420:
         case FOURCC_IYUV:
         case FOURCC_YV12:
+
+        case FOURCC_UYVY:
+        case FOURCC_UYNV:
+        case FOURCC_Y422:
+
+        case FOURCC_YUY2:
+        case FOURCC_YUNV:
+
+        case FOURCC_YVYU:
+            /* We can directly handle all these chromas */
             p_vout->output.i_chroma = p_vout->render.i_chroma;
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;
             p_vout->output.i_aspect = p_vout->render.i_aspect;
             break;
 
+        case FOURCC_I422:
+            /* We need to convert this one, but at least we keep the
+             * aspect ratio */
+            p_vout->output.i_chroma = p_vout->p_sys->i_chroma;
+            p_vout->output.i_width  = p_vout->render.i_width;
+            p_vout->output.i_height = p_vout->render.i_height;
+            p_vout->output.i_aspect = p_vout->render.i_aspect;
+            break;
+
         default:
-            /* All we have is a 16bpp image with square pixels */
-            /* FIXME: and if screen depth != 16 ?! */
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS | DEPTH_16BPP;
-            p_vout->output.i_width = p_vout->p_sys->i_width;
+            /* All we have is an RGB image with square pixels */
+            p_vout->output.i_chroma = p_vout->p_sys->i_chroma;
+            p_vout->output.i_width  = p_vout->p_sys->i_width;
             p_vout->output.i_height = p_vout->p_sys->i_height;
             p_vout->output.i_aspect = p_vout->p_sys->i_width
-                             * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
+                                       * VOUT_ASPECT_FACTOR
+                                       / p_vout->p_sys->i_height;
             break;
+        }
     }
 
     /* Try to initialize SDL_MAX_DIRECTBUFFERS direct buffers */
@@ -268,13 +373,8 @@ static int vout_Init( vout_thread_t *p_vout )
             break;
         }
 
-        p_pic->i_status        = DESTROYED_PICTURE;
-        p_pic->i_type          = DIRECT_PICTURE;
-
-        p_pic->i_left_margin   =
-        p_pic->i_right_margin  =
-        p_pic->i_top_margin    =
-        p_pic->i_bottom_margin = 0;
+        p_pic->i_status = DESTROYED_PICTURE;
+        p_pic->i_type   = DIRECT_PICTURE;
 
         PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
 
@@ -297,20 +397,16 @@ static void vout_End( vout_thread_t *p_vout )
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
-        switch( p_vout->output.i_chroma )
+        if( p_vout->p_sys->p_overlay == NULL )
         {
-            case FOURCC_I420:
-            case FOURCC_IYUV:
-            case FOURCC_YV12:
-                SDL_UnlockYUVOverlay(
-                        PP_OUTPUTPICTURE[ i_index ]->p_sys->p_overlay );
-                SDL_FreeYUVOverlay(
-                        PP_OUTPUTPICTURE[ i_index ]->p_sys->p_overlay );
-                break;
-
-            default:
-                /* RGB picture */
-                break;
+            /* RGB picture */
+        }
+        else
+        {
+            SDL_UnlockYUVOverlay(
+                    PP_OUTPUTPICTURE[ i_index ]->p_sys->p_overlay );
+            SDL_FreeYUVOverlay(
+                    PP_OUTPUTPICTURE[ i_index ]->p_sys->p_overlay );
         }
         free( PP_OUTPUTPICTURE[ i_index ]->p_sys );
     }
@@ -328,21 +424,6 @@ static void vout_Destroy( vout_thread_t *p_vout )
     SDL_QuitSubSystem( SDL_INIT_VIDEO );
 
     free( p_vout->p_sys );
-}
-
-static __inline__ void vout_Seek( off_t i_seek )
-{
-#define area p_main->p_intf->p_input->stream.p_selected_area
-    off_t i_tell = area->i_tell;
-
-    i_tell += i_seek * (off_t)50 * p_main->p_intf->p_input->stream.i_mux_rate;
-
-    i_tell = ( i_tell <= area->i_start ) ? area->i_start
-           : ( i_tell >= area->i_size ) ? area->i_size
-           : i_tell;
-
-    input_Seek( p_main->p_intf->p_input, i_tell );
-#undef area
 }
 
 /*****************************************************************************
@@ -421,7 +502,7 @@ static int vout_Manage( vout_thread_t *p_vout )
             switch( event.key.keysym.sym )
             {
             case SDLK_q:                                             /* quit */
-	    case SDLK_ESCAPE:
+            case SDLK_ESCAPE:
                 p_main->p_intf->b_die = 1;
                 break;
 
@@ -518,6 +599,14 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
+ * vout_Render: render previously calculated output
+ *****************************************************************************/
+static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    ;
+}
+
+/*****************************************************************************
  * vout_Display: displays previously rendered output
  *****************************************************************************
  * This function sends the currently rendered image to the display.
@@ -534,20 +623,17 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     disp.w = w;
     disp.h = h;
 
-    switch( p_vout->output.i_chroma )
+    if( p_vout->p_sys->p_overlay == NULL )
     {
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-        case FOURCC_YV12:
-            SDL_UnlockYUVOverlay( p_pic->p_sys->p_overlay);
-            SDL_DisplayYUVOverlay( p_pic->p_sys->p_overlay , &disp );
-            SDL_LockYUVOverlay( p_pic->p_sys->p_overlay);
-            break;
-
-        default:
-            /* RGB picture */
-            SDL_Flip(p_vout->p_sys->p_display);
-            break;
+        /* RGB picture */
+        SDL_Flip( p_vout->p_sys->p_display );
+    }
+    else
+    {
+        /* Overlay picture */
+        SDL_UnlockYUVOverlay( p_pic->p_sys->p_overlay);
+        SDL_DisplayYUVOverlay( p_pic->p_sys->p_overlay , &disp );
+        SDL_LockYUVOverlay( p_pic->p_sys->p_overlay);
     }
 }
 
@@ -588,27 +674,62 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 
     SDL_LockSurface( p_vout->p_sys->p_display );
 
+    /* Ask BestChroma what we should use as a chroma */
+    p_vout->p_sys->i_chroma = BestChroma( p_vout->render.i_chroma );
+
     p_vout->p_sys->p_overlay =
-        SDL_CreateYUVOverlay( 32, 32, SDL_YV12_OVERLAY,
+        SDL_CreateYUVOverlay( 32, 32, p_vout->p_sys->i_chroma,
                               p_vout->p_sys->p_display );
 
+    /* See if BestChroma's guess was valid */
     if( p_vout->p_sys->p_overlay == NULL )
     {
-        intf_ErrMsg( "vout error: cannot set overlay" );
-        SDL_UnlockSurface( p_vout->p_sys->p_display );
-        SDL_FreeSurface( p_vout->p_sys->p_display );
-        return( 1 );
-    }
+        intf_WarnMsg( 3, "vout warning: cannot set SDL overlay 0x%.8llx",
+                         p_vout->p_sys->i_chroma );
 
-    if( p_vout->p_sys->p_overlay->hw_overlay )
-    {
-        SDL_WM_SetCaption( VOUT_TITLE " (hardware SDL output)",
-                           VOUT_TITLE " (hardware SDL output)" );
+        switch( p_vout->p_sys->p_display->format->BitsPerPixel )
+        {
+            case 8:
+                p_vout->p_sys->i_chroma = FOURCC_BI_RGB;
+                break;
+            case 15:
+                p_vout->p_sys->i_chroma = FOURCC_RV15;
+                break;
+            case 16:
+                p_vout->p_sys->i_chroma = FOURCC_RV16;
+                break;
+            case 24:
+                p_vout->p_sys->i_chroma = FOURCC_BI_BITFIELDS;
+                break;
+            case 32:
+                p_vout->p_sys->i_chroma = FOURCC_BI_BITFIELDS;
+                break;
+            default:
+                intf_ErrMsg( "vout error: unknown screen depth" );
+                SDL_UnlockSurface( p_vout->p_sys->p_display );
+                SDL_FreeSurface( p_vout->p_sys->p_display );
+                return( -1 );
+        }
+
+        p_vout->p_sys->i_red_mask = p_vout->p_sys->p_display->format->Rmask;
+        p_vout->p_sys->i_green_mask = p_vout->p_sys->p_display->format->Gmask;
+        p_vout->p_sys->i_blue_mask = p_vout->p_sys->p_display->format->Bmask;
+
+        SDL_WM_SetCaption( VOUT_TITLE " (software RGB SDL output)",
+                           VOUT_TITLE " (software RGB SDL output)" );
     }
     else
     {
-        SDL_WM_SetCaption( VOUT_TITLE " (software SDL output)",
-                           VOUT_TITLE " (software SDL output)" );
+        if( p_vout->p_sys->p_overlay->hw_overlay )
+        {
+            SDL_WM_SetCaption( VOUT_TITLE " (hardware YUV SDL output)",
+                               VOUT_TITLE " (hardware YUV SDL output)" );
+        }
+        else
+        {
+            SDL_WM_SetCaption( VOUT_TITLE " (software YUV SDL output)",
+                               VOUT_TITLE " (software YUV SDL output)" );
+        }
     }
 
     SDL_EventState( SDL_KEYUP, SDL_IGNORE );               /* ignore keys up */
@@ -636,15 +757,16 @@ static void SDLCloseDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#define P p_pic->planes
     int i_width  = p_vout->output.i_width;
     int i_height = p_vout->output.i_height;
 
-    switch( p_vout->output.i_chroma )
+    switch( p_vout->p_sys->i_chroma )
     {
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-        case FOURCC_YV12:
+        case SDL_YV12_OVERLAY:
+        case SDL_IYUV_OVERLAY:
+        case SDL_YUY2_OVERLAY:
+        case SDL_UYVY_OVERLAY:
+        case SDL_YVYU_OVERLAY:
             p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
 
             if( p_pic->p_sys == NULL )
@@ -654,7 +776,7 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
             p_pic->p_sys->p_overlay =
                 SDL_CreateYUVOverlay( i_width, i_height,
-                                      SDL_YV12_OVERLAY,
+                                      p_vout->p_sys->i_chroma,
                                       p_vout->p_sys->p_display );
 
             if( p_pic->p_sys->p_overlay == NULL )
@@ -665,24 +787,62 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
             SDL_LockYUVOverlay( p_pic->p_sys->p_overlay );
 
-            /* FIXME: try to get the right i_bytes value from p_overlay */
-            P[ Y_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[ 0 ];
-            P[ Y_PLANE ].i_bytes = i_width * i_height;
-            P[ Y_PLANE ].i_line_bytes = i_width;
+            p_pic->Y_PIXELS = p_pic->p_sys->p_overlay->pixels[0];
+            p_pic->p[Y_PLANE].i_lines = p_pic->p_sys->p_overlay->h;
+            p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[0];
 
-            P[ U_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[ 2 ];
-            P[ U_PLANE ].i_bytes = i_width * i_height / 4;
-            P[ U_PLANE ].i_line_bytes = i_width / 2;
+            switch( p_vout->p_sys->i_chroma )
+            {
+            case SDL_YV12_OVERLAY:
+                p_pic->p[Y_PLANE].i_pixel_bytes = 1;
+                p_pic->p[Y_PLANE].b_margin = 0;
 
-            P[ V_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[ 1 ];
-            P[ V_PLANE ].i_bytes = i_width * i_height / 4;
-            P[ V_PLANE ].i_line_bytes = i_width / 2;
+                p_pic->U_PIXELS = p_pic->p_sys->p_overlay->pixels[2];
+                p_pic->p[U_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
+                p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[2];
+                p_pic->p[U_PLANE].i_pixel_bytes = 1;
+                p_pic->p[U_PLANE].b_margin = 0;
 
-            p_pic->i_planes = 3;
+                p_pic->V_PIXELS = p_pic->p_sys->p_overlay->pixels[1];
+                p_pic->p[V_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
+                p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[1];
+                p_pic->p[V_PLANE].i_pixel_bytes = 1;
+                p_pic->p[V_PLANE].b_margin = 0;
+
+                p_pic->i_planes = 3;
+                break;
+
+            case SDL_IYUV_OVERLAY:
+                p_pic->p[Y_PLANE].i_pixel_bytes = 1;
+                p_pic->p[Y_PLANE].b_margin = 0;
+
+                p_pic->U_PIXELS = p_pic->p_sys->p_overlay->pixels[1];
+                p_pic->p[U_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
+                p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[1];
+                p_pic->p[U_PLANE].i_pixel_bytes = 1;
+                p_pic->p[U_PLANE].b_margin = 0;
+
+                p_pic->V_PIXELS = p_pic->p_sys->p_overlay->pixels[2];
+                p_pic->p[V_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
+                p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[2];
+                p_pic->p[V_PLANE].i_pixel_bytes = 1;
+                p_pic->p[V_PLANE].b_margin = 0;
+
+                p_pic->i_planes = 3;
+                break;
+
+            default:
+                p_pic->p[Y_PLANE].i_pixel_bytes = 2;
+                p_pic->p[Y_PLANE].b_margin = 0;
+
+                p_pic->i_planes = 1;
+                break;
+            }
 
             return 0;
 
-        case FOURCC_BI_BITFIELDS | DEPTH_16BPP:
+        default:
+            /* RGB picture */
             if( p_vout->p_sys->i_surfaces )
             {
                 /* We already allocated this surface, return */
@@ -696,22 +856,27 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                 return -1;
             }
 
-            P[ MAIN_PLANE ].p_data = p_vout->p_sys->p_display->pixels;
-            P[ MAIN_PLANE ].i_bytes = 2 * i_width * i_height;
-            P[ MAIN_PLANE ].i_line_bytes = 2 * i_width;
+            p_pic->p->p_pixels = p_vout->p_sys->p_display->pixels;
+            p_pic->p->i_lines = p_vout->p_sys->p_display->h;
+            p_pic->p->i_pitch = p_vout->p_sys->p_display->pitch;
+
+            p_pic->p->i_pixel_bytes = 2;
+            if( p_pic->p->i_pitch != 2 * p_vout->p_sys->p_display->w )
+            {
+              intf_ErrMsg("OOO XXX OOO --- Wooooooohoooo !! --- OOO XXX OOO");
+              intf_ErrMsg("%i != 2 * %i", p_pic->p->i_pitch, p_vout->p_sys->p_display->w );
+            }
+            p_pic->p->b_margin = 0;
+
+            p_pic->p->i_red_mask = p_vout->p_sys->p_display->format->Rmask;
+            p_pic->p->i_green_mask = p_vout->p_sys->p_display->format->Gmask;
+            p_pic->p->i_blue_mask = p_vout->p_sys->p_display->format->Bmask;
 
             p_vout->p_sys->i_surfaces++;
 
             p_pic->i_planes = 1;
 
             return 0;
-
-        default:
-            /* Unknown chroma, tell the guy to get lost */
-            p_pic->i_planes = 0;
-
-            return -1;
     }
-#undef P
 }
 

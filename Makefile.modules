@@ -57,6 +57,7 @@ clean:
 FORCE:
 
 $(OBJ_ALL): ../../Makefile.modules ../../Makefile.dep ../../Makefile Makefile
+$(OBJ_ALL): $(H_DEP:%=../../include/%)
 
 $(C_DEP): %.d: FORCE
 	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@ CFLAGS="$(CFLAGS) $(CFLAGS_EXTRA)"

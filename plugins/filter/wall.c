@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.5 2002/01/02 14:37:42 sam Exp $
+ * $Id: wall.c,v 1.6 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -90,6 +90,7 @@ static int  vout_Init      ( vout_thread_t * );
 static void vout_End       ( vout_thread_t * );
 static void vout_Destroy   ( vout_thread_t * );
 static int  vout_Manage    ( vout_thread_t * );
+static void vout_Render    ( vout_thread_t *, struct picture_s * );
 static void vout_Display   ( vout_thread_t *, struct picture_s * );
 
 static void RemoveAllVout  ( vout_thread_t *p_vout );
@@ -106,6 +107,7 @@ static void vout_getfunctions( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_end        = vout_End;
     p_function_list->functions.vout.pf_destroy    = vout_Destroy;
     p_function_list->functions.vout.pf_manage     = vout_Manage;
+    p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
     p_function_list->functions.vout.pf_setpalette = NULL;
 }
@@ -134,7 +136,7 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     p_vout->p_sys->i_col = 3;
-    p_vout->p_sys->i_row = 2;
+    p_vout->p_sys->i_row = 3;
 
     p_vout->p_sys->pp_vout = malloc( p_vout->p_sys->i_row *
                                      p_vout->p_sys->i_col *
@@ -162,23 +164,10 @@ static int vout_Init( vout_thread_t *p_vout )
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure */
-    switch( p_vout->render.i_chroma )
-    {
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-        case FOURCC_YV12:
-        case FOURCC_I422:
-        case FOURCC_I444:
-            p_vout->output.i_chroma = p_vout->render.i_chroma;
-            p_vout->output.i_width  = p_vout->render.i_width;
-            p_vout->output.i_height = p_vout->render.i_height;
-            p_vout->output.i_aspect = p_vout->render.i_aspect;
-            break;
-
-        default:
-            return( 0 ); /* unknown chroma */
-            break;
-    }
+    p_vout->output.i_chroma = p_vout->render.i_chroma;
+    p_vout->output.i_width  = p_vout->render.i_width;
+    p_vout->output.i_height = p_vout->render.i_height;
+    p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to open the real video output */
     psz_filter = main_GetPszVariable( VOUT_FILTER_VAR, NULL );
@@ -188,6 +177,7 @@ static int vout_Init( vout_thread_t *p_vout )
 
     p_vout->p_sys->i_vout = 0;
 
+    /* FIXME: use bresenham instead of those ugly divisions */
     for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
     {
         for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
@@ -195,24 +185,25 @@ static int vout_Init( vout_thread_t *p_vout )
             if( i_col + 1 < p_vout->p_sys->i_col )
             {
                 i_width = ( p_vout->render.i_width
-                             / p_vout->p_sys->i_col ) & ~0xf;
+                             / p_vout->p_sys->i_col ) & ~0x1;
             }
             else
             {
                 i_width = p_vout->render.i_width
                            - ( ( p_vout->render.i_width
-                                  / p_vout->p_sys->i_col ) & ~0xf ) * i_col;
+                                  / p_vout->p_sys->i_col ) & ~0x1 ) * i_col;
             }
 
             if( i_row + 1 < p_vout->p_sys->i_row )
             {
-                i_height = p_vout->render.i_height / p_vout->p_sys->i_row;
+                i_height = ( p_vout->render.i_height
+                              / p_vout->p_sys->i_row ) & ~0x3;
             }
             else
             {
                 i_height = p_vout->render.i_height
-                            - p_vout->render.i_height
-                               / p_vout->p_sys->i_row * i_row;
+                            - ( ( p_vout->render.i_height
+                                   / p_vout->p_sys->i_row ) & ~0x3 ) * i_row;
             }
 
             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout =
@@ -251,7 +242,7 @@ static void vout_End( vout_thread_t *p_vout )
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->planes[ 0 ].p_data );
+        free( PP_OUTPUTPICTURE[ i_index ]->p_data );
     }
 }
 
@@ -280,22 +271,32 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Display: displays previously rendered output
+ * vout_Render: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to Wall image, waits
  * until it is displayed and switch the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    picture_t *p_outpic;
-    int i_col, i_row, i_vout, i_index;
-    mtime_t i_date = mdate() + 50000;
+    picture_t *p_outpic = NULL;
+    int i_col, i_row, i_vout, i_plane;
+    int pi_left_skip[VOUT_MAX_PLANES], pi_top_skip[VOUT_MAX_PLANES];
 
     i_vout = 0;
 
+    for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
+    {
+        pi_top_skip[i_plane] = 0;
+    }
+
     for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
     {
+        for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
+        {
+            pi_left_skip[i_plane] = 0;
+        }
+
         for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
         {
             while( ( p_outpic =
@@ -314,54 +315,32 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
             }
 
             vout_DatePicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
-                              p_outpic, i_date );
+                              p_outpic, p_pic->date );
             vout_LinkPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
                               p_outpic );
 
-            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
             {
-                yuv_data_t *p_in, *p_in_end, *p_out;
-                int i_out_bytes, i_offset;
+                u8 *p_in, *p_in_end, *p_out;
+                int i_in_pitch = p_pic->p[i_plane].i_pitch;
+                int i_out_pitch = p_outpic->p[i_plane].i_pitch;
 
-                /* XXX: beware, it's p_outpic ! */
-                i_out_bytes = p_outpic->planes[ i_index ].i_line_bytes;
+                p_in = p_pic->p[i_plane].p_pixels
+                        + pi_top_skip[i_plane] + pi_left_skip[i_plane];
 
-                if( i_col + 1 < p_vout->p_sys->i_col )
-                {
-                    i_offset = i_out_bytes * i_col;
-                }
-                else
-                {
-                    i_offset = p_pic->planes[ i_index ].i_line_bytes
-                                - i_out_bytes;
-                }
+                p_in_end = p_in + p_outpic->p[i_plane].i_lines
+                                   * p_pic->p[i_plane].i_pitch;
 
-                p_in = p_pic->planes[ i_index ].p_data
-                        + p_pic->planes[ i_index ].i_bytes
-                           / p_vout->p_sys->i_row * i_row
-                        + i_offset;
-
-                if( i_row + 1 < p_vout->p_sys->i_row )
-                {
-                    p_in_end = p_in
-                                + p_pic->planes[ i_index ].i_bytes
-                                   / p_vout->p_sys->i_row;
-                }
-                else
-                {
-                    p_in_end = p_pic->planes[ i_index ].p_data
-                                + p_pic->planes[ i_index ].i_bytes
-                                + i_offset;
-                }
-
-                p_out = p_outpic->planes[ i_index ].p_data;
+                p_out = p_outpic->p[i_plane].p_pixels;
 
                 while( p_in < p_in_end )
                 {
-                    FAST_MEMCPY( p_out, p_in, i_out_bytes );
-                    p_in += p_pic->planes[ i_index ].i_line_bytes;
-                    p_out += i_out_bytes;
+                    FAST_MEMCPY( p_out, p_in, i_out_pitch );
+                    p_in += i_in_pitch;
+                    p_out += i_out_pitch;
                 }
+
+                pi_left_skip[i_plane] += p_outpic->p[i_plane].i_pitch;
             }
 
             vout_UnlinkPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
@@ -371,7 +350,25 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
             i_vout++;
         }
+
+        for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
+        {
+            pi_top_skip[i_plane] += p_outpic->p[i_plane].i_lines
+                                     * p_pic->p[i_plane].i_pitch;
+        }
     }
+}
+
+/*****************************************************************************
+ * vout_Display: displays previously rendered output
+ *****************************************************************************
+ * This function send the currently rendered image to Invert image, waits
+ * until it is displayed and switch the two rendering buffers, preparing next
+ * frame.
+ *****************************************************************************/
+static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    ;
 }
 
 static void RemoveAllVout( vout_thread_t *p_vout )

@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.2 2002/01/02 14:37:42 sam Exp $
+ * $Id: deinterlace.c,v 1.3 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -76,6 +76,7 @@ typedef struct vout_sys_s
 {
     int i_mode;
     struct vout_thread_s *p_vout;
+    mtime_t last_date;
 
 } vout_sys_t;
 
@@ -88,6 +89,7 @@ static int  vout_Init      ( struct vout_thread_s * );
 static void vout_End       ( struct vout_thread_s * );
 static void vout_Destroy   ( struct vout_thread_s * );
 static int  vout_Manage    ( struct vout_thread_s * );
+static void vout_Render    ( struct vout_thread_s *, struct picture_s * );
 static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
 
 /*****************************************************************************
@@ -102,6 +104,7 @@ static void vout_getfunctions( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_end        = vout_End;
     p_function_list->functions.vout.pf_destroy    = vout_Destroy;
     p_function_list->functions.vout.pf_manage     = vout_Manage;
+    p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
     p_function_list->functions.vout.pf_setpalette = NULL;
 }
@@ -235,6 +238,8 @@ static int vout_Init( vout_thread_t *p_vout )
         return( 0 );
     }
  
+    p_vout->p_sys->last_date = 0;
+
     main_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
@@ -253,7 +258,7 @@ static void vout_End( vout_thread_t *p_vout )
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->planes[ 0 ].p_data );
+        free( PP_OUTPUTPICTURE[ i_index ]->p_data );
     }
 }
 
@@ -281,16 +286,22 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Display: displays previously rendered output
+ * vout_Render: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to Deinterlace image,
  * waits until it is displayed and switch the two rendering buffers, preparing
  * next frame.
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void vout_Render ( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *p_outpic;
-    int i_index, i_field;
+    int i_plane, i_field;
+    /* 20ms is a bit arbitrary, but it's only for the first image we get */
+    mtime_t new_date = p_vout->p_sys->last_date
+                       ? ( 3 * p_pic->date - p_vout->p_sys->last_date ) / 2
+                       : p_pic->date + 20000;
+
+    p_vout->p_sys->last_date = p_pic->date;
 
     for( i_field = 0 ; i_field < 2 ; i_field++ )
     {
@@ -306,21 +317,21 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
             msleep( VOUT_OUTMEM_SLEEP );
         }   
 
-        /* XXX: completely arbitrary values ! */
         vout_DatePicture( p_vout->p_sys->p_vout, p_outpic,
-                          mdate() + (mtime_t)(50000 + i_field * 20000) );
+                          p_pic->date + i_field ? new_date : p_pic->date );
 
         /* Copy image and skip lines */
-        for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+        for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
         {
-            pixel_data_t *p_in, *p_out_end, *p_out;
+            u8 *p_in, *p_out_end, *p_out;
             int i_increment;
 
-            p_in = p_pic->planes[ i_index ].p_data
-                       + i_field * p_pic->planes[ i_index ].i_line_bytes;
+            p_in = p_pic->p[i_plane].p_pixels
+                       + i_field * p_pic->p[i_plane].i_pitch;
 
-            p_out = p_outpic->planes[ i_index ].p_data;
-            p_out_end = p_out + p_outpic->planes[ i_index ].i_bytes;
+            p_out = p_outpic->p[i_plane].p_pixels;
+            p_out_end = p_out + p_outpic->p[i_plane].i_pitch
+                                 * p_outpic->p[i_plane].i_lines;
 
             switch( p_vout->render.i_chroma )
             {
@@ -333,52 +344,51 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
                 case DEINTERLACE_MODE_BOB:
                     for( ; p_out < p_out_end ; )
                     {
-                        FAST_MEMCPY( p_out, p_in,
-                                     p_pic->planes[ i_index ].i_line_bytes );
+                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
 
-                        p_out += p_pic->planes[ i_index ].i_line_bytes;
-                        p_in += 2 * p_pic->planes[ i_index ].i_line_bytes;
+                        p_out += p_pic->p[i_plane].i_pitch;
+                        p_in += 2 * p_pic->p[i_plane].i_pitch;
                     }
                     break;
 
                 case DEINTERLACE_MODE_BLEND:
-                    if( i_index != Y_PLANE )
+                    if( i_plane != Y_PLANE )
                     {
                         for( ; p_out < p_out_end ; )
                         {
                             FAST_MEMCPY( p_out, p_in,
-                                     p_pic->planes[ i_index ].i_line_bytes );
+                                         p_pic->p[i_plane].i_pitch );
 
-                            p_out += p_pic->planes[ i_index ].i_line_bytes;
+                            p_out += p_pic->p[i_plane].i_pitch;
 
                             FAST_MEMCPY( p_out, p_in,
-                                     p_pic->planes[ i_index ].i_line_bytes );
+                                         p_pic->p[i_plane].i_pitch );
 
-                            p_out += p_pic->planes[ i_index ].i_line_bytes;
-                            p_in += 2 * p_pic->planes[ i_index ].i_line_bytes;
+                            p_out += p_pic->p[i_plane].i_pitch;
+                            p_in += 2 * p_pic->p[i_plane].i_pitch;
                         }
                         break;
                     }
 
                     if( i_field == 0 )
                     {
-                        FAST_MEMCPY( p_out, p_in,
-                                     p_pic->planes[ i_index ].i_line_bytes );
-                        p_in += 2 * p_pic->planes[ i_index ].i_line_bytes;
-                        p_out += p_pic->planes[ i_index ].i_line_bytes;
+                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                        p_in += 2 * p_pic->p[i_plane].i_pitch;
+                        p_out += p_pic->p[i_plane].i_pitch;
                     }
 
                     for( ; p_out < p_out_end ; )
                     {
-                        FAST_MEMCPY( p_out, p_in,
-                                     p_pic->planes[ i_index ].i_line_bytes );
+                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
 
-                        p_out += p_pic->planes[ i_index ].i_line_bytes;
+                        p_out += p_pic->p[i_plane].i_pitch;
 
-                        memblend( p_out, p_in, p_in + 2 * p_pic->planes[ i_index ].i_line_bytes, p_pic->planes[ i_index ].i_line_bytes );
+                        memblend( p_out, p_in,
+                                  p_in + 2 * p_pic->p[i_plane].i_pitch,
+                                  p_pic->p[i_plane].i_pitch );
 
-                        p_in += 2 * p_pic->planes[ i_index ].i_line_bytes;
-                        p_out += p_pic->planes[ i_index ].i_line_bytes;
+                        p_in += 2 * p_pic->p[i_plane].i_pitch;
+                        p_out += p_pic->p[i_plane].i_pitch;
                     }
                     break;
                 }
@@ -386,18 +396,16 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
             case FOURCC_I422:
 
-                i_increment = 2 * p_pic->planes[ i_index ].i_line_bytes;
+                i_increment = 2 * p_pic->p[i_plane].i_pitch;
 
-                if( i_index == Y_PLANE )
+                if( i_plane == Y_PLANE )
                 {
                     for( ; p_out < p_out_end ; )
                     {
-                        FAST_MEMCPY( p_out, p_in,
-                                 p_pic->planes[ i_index ].i_line_bytes );
-                        p_out += p_pic->planes[ i_index ].i_line_bytes;
-                        FAST_MEMCPY( p_out, p_in,
-                                 p_pic->planes[ i_index ].i_line_bytes );
-                        p_out += p_pic->planes[ i_index ].i_line_bytes;
+                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                        p_out += p_pic->p[i_plane].i_pitch;
+                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                        p_out += p_pic->p[i_plane].i_pitch;
                         p_in += i_increment;
                     }
                 }
@@ -405,9 +413,8 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
                 {
                     for( ; p_out < p_out_end ; )
                     {
-                        FAST_MEMCPY( p_out, p_in,
-                                 p_pic->planes[ i_index ].i_line_bytes );
-                        p_out += p_pic->planes[ i_index ].i_line_bytes;
+                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                        p_out += p_pic->p[i_plane].i_pitch;
                         p_in += i_increment;
                     }
                 }
@@ -420,6 +427,18 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
         vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
     }
+}
+
+/*****************************************************************************
+ * vout_Display: displays previously rendered output
+ *****************************************************************************
+ * This function send the currently rendered image to Invert image, waits
+ * until it is displayed and switch the two rendering buffers, preparing next
+ * frame.
+ *****************************************************************************/
+static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    ;
 }
 
 static void *memblend( void *p_dest, const void *p_s1,

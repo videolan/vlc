@@ -2,7 +2,7 @@
  * filter_common.h: Common filter functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: filter_common.h,v 1.1 2001/12/19 03:50:22 sam Exp $
+ * $Id: filter_common.h,v 1.2 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,7 +45,7 @@
         /* Allocate the picture */                                            \
         vout_AllocatePicture( p_pic,                                          \
                               p_vout->output.i_width,                         \
-                               p_vout->output.i_height,                       \
+                              p_vout->output.i_height,                        \
                               p_vout->output.i_chroma );                      \
                                                                               \
         if( !p_pic->i_planes )                                                \
@@ -53,13 +53,8 @@
             break;                                                            \
         }                                                                     \
                                                                               \
-        p_pic->i_status        = DESTROYED_PICTURE;                           \
-        p_pic->i_type          = DIRECT_PICTURE;                              \
-                                                                              \
-        p_pic->i_left_margin   =                                              \
-        p_pic->i_right_margin  =                                              \
-        p_pic->i_top_margin    =                                              \
-        p_pic->i_bottom_margin = 0;                                           \
+        p_pic->i_status = DESTROYED_PICTURE;                                  \
+        p_pic->i_type   = DIRECT_PICTURE;                                     \
                                                                               \
         PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;                         \
                                                                               \

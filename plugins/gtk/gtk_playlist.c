@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.24 2001/12/30 07:09:55 sam Exp $
+ * $Id: gtk_playlist.c,v 1.25 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -431,12 +431,12 @@ void GtkDropDataReceived( intf_thread_t * p_intf,
         {
             char i_save;
 
-	    i_save = p_temp[0];
-	    p_temp[0] = '\0';
-	    p_protocol = strdup( p_string );
-	    p_temp[0] = i_save;
-	    p_temp++;
-	    
+            i_save = p_temp[0];
+            p_temp[0] = '\0';
+            p_protocol = strdup( p_string );
+            p_temp[0] = i_save;
+            p_temp++;
+
             /* Allowed things are proto: or proto:// */
             if( p_temp[0] == '/' && p_temp[1] == '/')
             {
@@ -460,11 +460,11 @@ void GtkDropDataReceived( intf_thread_t * p_intf,
         {
             p_files = g_list_concat( p_files, GtkReadFiles( p_string ) ); 
         }
-	else
-	{
+        else
+        {
             p_files = g_list_concat( p_files,
                       g_list_append( NULL, g_strdup( p_string ) ) );
-	}
+        }
        
         /* free the malloc and go on... */
         free( p_protocol );

@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dummy.c,v 1.11 2001/12/30 07:09:55 sam Exp $
+ * $Id: input_dummy.c,v 1.12 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -117,6 +117,13 @@ static void DummyOpen( input_thread_t * p_input )
     /* We don't need the "vlc:" stuff any more */
     psz_name += 4;
     i_len -= 4;
+
+    /* Check for a "vlc:nop" command */
+    if( i_len == 3 && !strncasecmp( psz_name, "nop", 3 ) )
+    {
+        intf_WarnMsg( 2, "input: command `nop'" );
+        return;
+    }
 
     /* Check for a "vlc:quit" command */
     if( i_len == 4 && !strncasecmp( psz_name, "quit", 4 ) )

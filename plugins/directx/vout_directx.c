@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.17 2001/12/30 07:09:54 sam Exp $
+ * $Id: vout_directx.c,v 1.18 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -163,7 +163,7 @@ static int vout_Create( vout_thread_t *p_vout )
                                                 VOUT_FULLSCREEN_DEFAULT );
 #if 0
     p_vout->b_need_render = !main_GetIntVariable( VOUT_OVERLAY_VAR,
-				 		  VOUT_OVERLAY_DEFAULT );
+                                                  VOUT_OVERLAY_DEFAULT );
 #else
     p_vout->b_need_render = 0;                          /* default = overlay */
 #endif
@@ -325,7 +325,7 @@ static int vout_Manage( vout_thread_t *p_vout )
     {
         intf_WarnMsg( 3, "vout: vout_Manage Scale Change" );
         if( p_vout->b_need_render )
-	    InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
+            InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
         if( DirectXUpdateOverlay( p_vout ) )
             /* failed so try again next time */
             PostMessage( p_vout->p_sys->hwnd, WM_CHAR, (WPARAM)'S', 0);

@@ -2,10 +2,10 @@
  * video_output.h : video output thread
  * This module describes the programming interface for video output threads.
  * It includes functions allowing to open a new thread, send pictures to a
- * thread, and destroy a previously oppenned video output thread.
+ * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.69 2002/01/02 14:37:42 sam Exp $
+ * $Id: video_output.h,v 1.70 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -128,6 +128,8 @@ typedef struct vout_thread_s
     void             ( *pf_end )        ( struct vout_thread_s * );
     void             ( *pf_destroy )    ( struct vout_thread_s * );
     int              ( *pf_manage )     ( struct vout_thread_s * );
+    void             ( *pf_render )     ( struct vout_thread_s *,
+                                          struct picture_s * );
     void             ( *pf_display )    ( struct vout_thread_s *,
                                           struct picture_s * );
     void             ( *pf_setpalette ) ( struct vout_thread_s *,
@@ -191,7 +193,7 @@ typedef struct vout_thread_s
 void            vout_InitBank       ( void );
 void            vout_EndBank        ( void );
 
-vout_thread_t * vout_CreateThread   ( int *pi_status, int, int, u64, int );
+vout_thread_t * vout_CreateThread   ( int *pi_status, int, int, u32, int );
 void            vout_DestroyThread  ( vout_thread_t *, int *pi_status );
 
 vout_fifo_t *   vout_CreateFifo     ( void );
@@ -200,7 +202,7 @@ void            vout_FreeFifo       ( vout_fifo_t * );
 
 picture_t *     vout_CreatePicture  ( vout_thread_t *,
                                       boolean_t, boolean_t, boolean_t );
-void            vout_AllocatePicture( picture_t *, int, int, int );
+void            vout_AllocatePicture( picture_t *, int, int, u32 );
 void            vout_DestroyPicture ( vout_thread_t *, picture_t * );
 void            vout_DisplayPicture ( vout_thread_t *, picture_t * );
 void            vout_DatePicture    ( vout_thread_t *, picture_t *, mtime_t );

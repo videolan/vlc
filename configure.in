@@ -252,7 +252,7 @@ dnl Checks for __attribute__(aligned()) directive
 AC_CACHE_CHECK([__attribute__ ((aligned ())) support],
     [ac_cv_c_attribute_aligned],
     [ac_cv_c_attribute_aligned=0
-	CFLAGS="${save_CFLAGS} -Werror"
+        CFLAGS="${save_CFLAGS} -Werror"
     for ac_cv_c_attr_align_try in 2 4 8 16 32 64; do
         AC_TRY_COMPILE([],
         [static char c __attribute__ ((aligned($ac_cv_c_attr_align_try))) = 0; return c;],
@@ -297,13 +297,13 @@ ARCH=${target_cpu}
 dnl
 dnl  default modules
 dnl
-BUILTINS="${BUILTINS} mpeg_es mpeg_ps mpeg_ts memcpy idct idctclassic motion imdct downmix mpeg_adec lpcm_adec ac3_adec mpeg_vdec"
-PLUGINS="${PLUGINS} ac3_spdif spudec chroma_yv12_rgb16 filter_deinterlace filter_invert filter_wall filter_transform filter_distort"
+BUILTINS="${BUILTINS} mpeg_es mpeg_ps mpeg_ts memcpy idct idctclassic motion imdct downmix chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 mpeg_adec lpcm_adec ac3_adec mpeg_vdec"
+PLUGINS="${PLUGINS} ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort"
 
 dnl
 dnl  Accelerated modules
 dnl
-MMX_MODULES="memcpymmx idctmmx motionmmx"
+MMX_MODULES="memcpymmx idctmmx motionmmx chroma_i420_rgb_mmx chroma_i420_yuy2_mmx chroma_i422_yuy2_mmx"
 MMXEXT_MODULES="memcpymmxext idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn imdct3dn downmix3dn"
 SSE_MODULES="imdctsse downmixsse"
@@ -576,14 +576,13 @@ AC_ARG_ENABLE(release,
   LIBDVDCSS_VERSION="${LIBDVDCSS_VERSION}_`date +%Y-%m-%d`"; ])
 
 dnl
-dnl  MMX acceleration
+dnl  x86 accelerations
 dnl
-AC_ARG_ENABLE(mmx,
-[  --disable-mmx           Disable MMX optimizations (default enabled for x86)],
-[ if test x$enableval = xyes; then ARCH="${ARCH} mmx";
-    BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi ],
-[ if test x${target_cpu} = xi686 -o x${target_cpu} = xi586 -o x${target_cpu} = xx86 -o x${target_cpu} = xi386; then ARCH="${ARCH} mmx";
-    BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi ])
+if test x${target_cpu} = xi686 -o x${target_cpu} = xi586 -o x${target_cpu} = xx86 -o x${target_cpu} = xi386
+then
+    ARCH="${ARCH} mmx"
+    BUILTINS="${BUILTINS} ${ACCEL_MODULES}"
+fi
 
 dnl
 dnl  AltiVec acceleration
@@ -808,7 +807,7 @@ AC_ARG_WITH(mad,
   [  --with-mad[=PATH]       libmad module (default disabled)],
   [ if test "x$with_val" != "xno"; then
       if test -n $with_val; then
-	    CFLAGS_MAD="-I$with_val/include"
+        CFLAGS_MAD="-I$with_val/include"
         LIB_MAD="-L$with_val/lib -lmad"
       else
         LIB_MAD="-lmad"

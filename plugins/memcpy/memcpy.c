@@ -2,7 +2,7 @@
  * memcpy.c : classic memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpy.c,v 1.3 2001/12/30 07:09:55 sam Exp $
+ * $Id: memcpy.c,v 1.4 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,11 +29,31 @@
 
 #include <videolan/vlc.h>
 
+#undef HAVE_MMX
+#undef HAVE_MMX2
+#undef HAVE_SSE
+#undef HAVE_SSE2
+#undef HAVE_3DNOW
+
+#if defined( MODULE_NAME_IS_memcpy3dn )
+#   define HAVE_3DNOW
+#   include "fastmemcpy.h"
+#elif defined( MODULE_NAME_IS_memcpymmx )
+#   define HAVE_MMX
+#   include "fastmemcpy.h"
+#elif defined( MODULE_NAME_IS_memcpymmxext )
+#   define HAVE_MMX2
+#   include "fastmemcpy.h"
+#endif
+
 /*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
 static void memcpy_getfunctions( function_list_t * p_function_list );
 static int  memcpy_Probe       ( probedata_t *p_data );
+#ifndef MODULE_NAME_IS_memcpy
+void *      _M( fast_memcpy )  ( void * to, const void * from, size_t len );
+#endif
 
 /*****************************************************************************
  * Build configuration tree.
@@ -42,11 +62,33 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
+#ifdef MODULE_NAME_IS_memcpy
     SET_DESCRIPTION( "libc memcpy module" )
     ADD_CAPABILITY( MEMCPY, 50 )
     ADD_SHORTCUT( "c" )
     ADD_SHORTCUT( "libc" )
     ADD_SHORTCUT( "memcpy" )
+#elif defined( MODULE_NAME_IS_memcpy3dn )
+    SET_DESCRIPTION( "3D Now! memcpy module" )
+    ADD_CAPABILITY( MEMCPY, 100 )
+    ADD_REQUIREMENT( 3DNOW )
+    ADD_SHORTCUT( "3dn" )
+    ADD_SHORTCUT( "3dnow" )
+    ADD_SHORTCUT( "memcpy3dn" )
+    ADD_SHORTCUT( "memcpy3dnow" )
+#elif defined( MODULE_NAME_IS_memcpymmx )
+    SET_DESCRIPTION( "MMX memcpy module" )
+    ADD_CAPABILITY( MEMCPY, 100 )
+    ADD_REQUIREMENT( MMX )
+    ADD_SHORTCUT( "mmx" )
+    ADD_SHORTCUT( "memcpymmx" )
+#elif defined( MODULE_NAME_IS_memcpymmxext )
+    SET_DESCRIPTION( "MMX EXT memcpy module" )
+    ADD_CAPABILITY( MEMCPY, 200 )
+    ADD_REQUIREMENT( MMXEXT )
+    ADD_SHORTCUT( "mmxext" )
+    ADD_SHORTCUT( "memcpymmxext" )
+#endif
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -65,9 +107,11 @@ MODULE_DEACTIVATE_STOP
 static void memcpy_getfunctions( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = memcpy_Probe;
-#define F p_function_list->functions.memcpy
-    F.fast_memcpy = memcpy;
-#undef F
+#ifdef MODULE_NAME_IS_memcpy
+    p_function_list->functions.memcpy.fast_memcpy = memcpy;
+#else
+    p_function_list->functions.memcpy.fast_memcpy = _M( fast_memcpy );
+#endif
 }
 
 /*****************************************************************************
@@ -75,6 +119,6 @@ static void memcpy_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int memcpy_Probe( probedata_t *p_data )
 {
-    return( 50 );
+    return( 1 );
 }
 

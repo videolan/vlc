@@ -75,7 +75,7 @@
 
 /* When a thread waits on a condition in debug mode, delay to wait before
  * outputting an error message (in second) */
-#define THREAD_COND_TIMEOUT				5
+#define THREAD_COND_TIMEOUT             5
 
 /* Environment variable containing the memcpy method */
 #define MEMCPY_METHOD_VAR               "vlc_memcpy"
@@ -286,7 +286,7 @@
  *****************************************************************************/
 
 /* Maximum number of video output threads */
-#define VOUT_MAX_THREADS                10
+#define VOUT_MAX_THREADS                256
 
 /*
  * Default settings for video output threads

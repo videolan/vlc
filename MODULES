@@ -1,0 +1,137 @@
+List of vlc plugins
+$Id: MODULES,v 1.1 2002/01/04 14:01:34 sam Exp $
+
+ * ac3_adec: software AC3 decoder.
+
+ * ac3_spdif: AC3 decoder using SPDIF pass-through.
+
+ * alsa: audio output module using the ALSA API.
+
+ * arts: audio output module using the aRts sound daemon.
+
+ * beos: audio output, video output, and interface module for BeOS.
+
+ * chroma_i420_rgb: planar YUV to packed RGB conversion functions.
+
+ * chroma_i420_rgb_mmx: MMX accelerated version of chroma_i420_rgb.
+
+ * chroma_i420_yuy2: planar 4:2:0 YUV to packed YUV conversion functions.
+
+ * chroma_i420_yuy2_mmx: MMX accelerated version of chroma_i420_yuy2.
+
+ * chroma_i422_yuy2: planar 4:2:2 YUV to packed YUV conversion functions.
+
+ * chroma_i422_yuy2_mmx: MMX accelerated version of chroma_i422_yuy2.
+
+ * directx: audio output and video output module using the DirectX API.
+
+ * dsp: audio output module using the OSS /dev/dsp interface.
+
+ * dummy: dummy audio output, video output, interface and input modules.
+
+ * null: a module with no capabilities.
+
+ * dvd: input module for accessing DVDs.
+
+ * dvdread: input module for accessing DVDs, uses libdvdread.
+
+ * esd: audio output module using the Esound sound daemon.
+
+ * fb: video output module for the Linux framebuffer.
+
+ * filter_deinterlace: naive deinterlacing filter.
+
+ * filter_transform: filter for horizontal and vertical image flips and
+                     90° rotations.
+
+ * filter_invert: inverse video filter.
+
+ * filter_distort: miscellaneous image effects filter.
+
+ * filter_wall: image wall filter.
+
+ * ggi: video output module using the GGI API.
+
+ * glide: video output module using the Glide API.
+
+ * gnome: interface using the GNOME widget set.
+
+ * gtk: interface using the Gtk+ widget set.
+
+ * downmix: downmix module, used by the AC3 decoder.
+
+ * downmixsse: SSE accelerated version of downmix.
+
+ * downmix3dn: 3D Now! accelerated version of downmix.
+
+ * idct: inverse DCT module, used by the video decoder.
+
+ * idctclassic: another version of idct.
+
+ * idctmmx: MMX accelerated version of idct.
+
+ * idctmmxext: MMX EXT accelerated version of idct.
+
+ * idctaltivec: AltiVec accelerated version of idct.
+
+ * imdct: iMDCT module, used by the AC3 decoder.
+
+ * imdct3dn: 3D Now! accelerated version of imdct.
+
+ * imdctsse: SSE accelerated version of imdct.
+
+ * kde: interface module using the KDE widget set.
+
+ * lpcm_adec: LPCM audio decoder.
+
+ * macosx: audio output, video output and interface module for Mac OS X.
+
+ * mad: MPEG and MPEG2 audio decoder using the libmad library.
+
+ * memcpy: memory chunk copying module.
+
+ * memcpymmx: MMX accelerated version of memcpy.
+
+ * memcpymmxext: MMX EXT accelerated version of memcpy.
+
+ * memcpy3dn: 3D Now! accelerated version of memcpy.
+
+ * mga: video output module for Matrox cards using the Linux mga kernel
+        driver.
+
+ * motion: motion compensation module, used by the video decoder.
+
+ * motionmmx: MMX accelerated version of motion.
+
+ * motionmmxext: MMX EXT accelerated version of motion.
+
+ * motion3dnow: 3D Now! accelerated version of motion.
+
+ * motionaltivec: AltiVec accelerated version of motion.
+
+ * mpeg_es: input module for MPEG ES decapsulation.
+
+ * mpeg_ps: input module for MPEG PS decapsulation.
+
+ * mpeg_ts: input module for MPEG TS decapsulation.
+
+ * mpeg_adec: MPEG and MPEG2 audio decoder.
+
+ * mpeg_vdec: MPEG and MPEG2 video decoder.
+
+ * qt: interface module using the Qt widget set.
+
+ * sdl: audio output and video output module using the SDL library.
+
+ * spudec: DVD subtitles decoder.
+
+ * ncurses: interface module using the ncurses library.
+
+ * rc: interface module using stdio.
+
+ * vcd: input module for accessing Video CDs.
+
+ * x11: video output module using the X11 API.
+
+ * xvideo: video output module using the XVideo API.
+

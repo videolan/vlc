@@ -5,7 +5,7 @@
  * case by optimized functions.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: chroma_common.h,v 1.1 2001/12/16 16:18:36 sam Exp $
+ * $Id: i420_rgb_c.h,v 1.1 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -52,12 +52,4 @@
 #define U_BLUE_COEF     ((int)(2.018 * (1<<SHIFT) / 1.164))
 #define V_RED_COEF      ((int)(1.596 * (1<<SHIFT) / 1.164))
 #define V_GREEN_COEF    ((int)(-0.813 * (1<<SHIFT) / 1.164))
-
-/*****************************************************************************
- * Extern prototypes
- *****************************************************************************/
-
-void _M( SetOffset )( int i_width, int i_height, int i_pic_width,
-                      int i_pic_height, boolean_t *pb_h_scaling,
-                      int *pi_v_scaling, int *p_offset, boolean_t b_double );
 

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.38 2002/01/02 14:37:42 sam Exp $
+ * $Id: video.h,v 1.39 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -26,15 +26,23 @@
 /*****************************************************************************
  * plane_t: description of a planar graphic field
  *****************************************************************************/
-typedef u8 pixel_data_t;
-
 typedef struct plane_s
 {
-    pixel_data_t *p_data;                       /* Start of the plane's data */
+    u8 *p_pixels;                               /* Start of the plane's data */
 
     /* Variables used for fast memcpy operations */
-    int i_bytes;                       /* Total number of bytes in the plane */
-    int i_line_bytes;                     /* Total number of bytes in a line */
+    int i_lines;                                          /* Number of lines */
+    int i_pitch;             /* Number of bytes in a line, including margins */
+
+    /* Size of a macropixel, defaults to 1 */
+    int i_pixel_bytes;
+
+    /* Is there a margin ? defaults to no */
+    boolean_t b_margin;
+
+    /* Variables used for pictures with margins */
+    int i_visible_bytes;                 /* How many real pixels are there ? */
+    boolean_t b_hidden;           /* Are we allowed to write to the margin ? */
 
     /* Variables used for RGB planes */
     int i_red_mask;
@@ -53,11 +61,11 @@ typedef struct plane_s
  *****************************************************************************/
 typedef struct picture_s
 {
-    /* Picture data - data can always be freely modified, but no pointer
-     * may EVER be modified. A direct buffer can be handled as the plugin
-     * wishes, but for internal video output pictures the allocated pointer
-     * MUST be planes[0].p_data */
-    plane_t         planes[ VOUT_MAX_PLANES ];  /* description of the planes */
+    /* Picture data - data can always be freely modified, but p_data may
+     * NEVER be modified. A direct buffer can be handled as the plugin
+     * wishes, it can even swap p_pixels buffers. */
+    u8             *p_data;
+    plane_t         p[ VOUT_MAX_PLANES ];       /* description of the planes */
     int             i_planes;                  /* number of allocated planes */
 
     /* Type and flags - should NOT be modified except by the vout thread */
@@ -69,12 +77,6 @@ typedef struct picture_s
      * the video output thread API, but should never be written directly */
     int             i_refcount;                    /* link reference counter */
     mtime_t         date;                                    /* display date */
-
-    /* Picture margins - needed because of possible padding issues */
-    int             i_left_margin;
-    int             i_right_margin;
-    int             i_top_margin;
-    int             i_bottom_margin;
 
     /* Picture dynamic properties - those properties can be changed by the
      * decoder */
@@ -105,7 +107,7 @@ typedef struct picture_heap_s
      * and should NOT be modified */
     int             i_width;                                /* picture width */
     int             i_height;                              /* picture height */
-    u64             i_chroma;                              /* picture chroma */
+    u32             i_chroma;                              /* picture chroma */
     int             i_aspect;                                /* aspect ratio */
 
     /* Real pictures */
@@ -132,47 +134,103 @@ typedef struct picture_heap_s
 #define DESTROYED_PICTURE       6              /* allocated but no more used */
 
 /*****************************************************************************
- * Flags used to describe the format of a picture
+ * Flags used to describe picture format - see http://www.webartz.com/fourcc/
  *****************************************************************************/
 
-#define ONLY_FOURCC(i_chroma)   ((i_chroma)&0x00000000ffffffff)
-#define ONLY_EXTRA(i_chroma)    ((i_chroma)&0xffffffff00000000)
+/* Packed RGB formats */
+#define FOURCC_BI_RGB        0x00000000                      /* RGB for 8bpp */
+#define FOURCC_RGB           0x32424752                  /* alias for BI_RGB */
+#define FOURCC_BI_BITFIELDS  0x00000003            /* RGB, for 16, 24, 32bpp */
+#define FOURCC_RV15          0x35315652    /* RGB 15bpp, 0x1f, 0x7e0, 0xf800 */
+#define FOURCC_RV16          0x36315652    /* RGB 16bpp, 0x1f, 0x3e0, 0x7c00 */
 
-/* Picture chroma - see http://www.webartz.com/fourcc/ */
-#define FOURCC_BI_RGB           0x00000000           /* Planar RGB, for 8bpp */
-#define FOURCC_RGB              0x32424752               /* alias for BI_RGB */
-#define FOURCC_BI_BITFIELDS     0x00000003  /* Planar RGB, for 16, 24, 32bpp */
-#define FOURCC_I420             0x30323449            /* Planar 4:2:0, Y:U:V */
-#define FOURCC_IYUV             0x56555949                 /* alias for I420 */
-#define FOURCC_YV12             0x32315659            /* Planar 4:2:0, Y:V:U */
+/* Planar YUV formats */
+#define FOURCC_I420          0x30323449               /* Planar 4:2:0, Y:U:V */
+#define FOURCC_IYUV          0x56555949                    /* alias for I420 */
+#define FOURCC_YV12          0x32315659               /* Planar 4:2:0, Y:V:U */
+
+/* Packed YUV formats */
+#define FOURCC_IUYV          0x56595549 /* Packed 4:2:2, U:Y:V:Y, interlaced */
+#define FOURCC_UYVY          0x59565955             /* Packed 4:2:2, U:Y:V:Y */
+#define FOURCC_UYNV          0x564e5955                    /* alias for UYVY */
+#define FOURCC_Y422          0x32323459                    /* alias for UYVY */
+#define FOURCC_cyuv          0x76757963   /* Packed 4:2:2, U:Y:V:Y, reverted */
+#define FOURCC_YUY2          0x32595559             /* Packed 4:2:2, Y:U:Y:V */
+#define FOURCC_YUNV          0x564e5559                    /* alias for YUY2 */
+#define FOURCC_YVYU          0x55585659             /* Packed 4:2:2, Y:V:Y:U */
+#define FOURCC_Y211          0x31313259             /* Packed 2:1:1, Y:U:Y:V */
 
 /* Custom formats which we use but which don't exist in the fourcc database */
-#define FOURCC_I422             0x32323449
-#define FOURCC_I444             0x34343449
-
-/* Picture format - gives more precise information than the chroma */
-#define DEPTH_8BPP              ((u64)0x00000008<<32)
-#define DEPTH_15BPP             ((u64)0x00000015<<32)
-#define DEPTH_16BPP             ((u64)0x00000016<<32)
-#define DEPTH_24BPP             ((u64)0x00000024<<32)
-#define DEPTH_32BPP             ((u64)0x00000032<<32)
+#define FOURCC_I422          0x32323449               /* Planar 4:2:2, Y:U:V */
+#define FOURCC_I444          0x34343449               /* Planar 4:4:4, Y:U:V */
 
 /* Plane indices */
-#define MAIN_PLANE              0
-#define Y_PLANE                 0
-#define U_PLANE                 1
-#define V_PLANE                 2
-#define Cb_PLANE                1
-#define Cr_PLANE                2
-#define R_PLANE                 0
-#define G_PLANE                 1
-#define B_PLANE                 2
+#define Y_PLANE      0
+#define U_PLANE      1
+#define V_PLANE      2
 
 /* Shortcuts */
-#define P_MAIN planes[ MAIN_PLANE ].p_data
-#define P_Y planes[ Y_PLANE ].p_data
-#define P_U planes[ U_PLANE ].p_data
-#define P_V planes[ V_PLANE ].p_data
+#define Y_PIXELS     p[Y_PLANE].p_pixels
+#define U_PIXELS     p[U_PLANE].p_pixels
+#define V_PIXELS     p[V_PLANE].p_pixels
+
+/*****************************************************************************
+ * vout_CopyPicture: copy a picture to another one
+ *****************************************************************************
+ * This function takes advantage of the image format, and reduces the
+ * number of calls to memcpy() to the minimum. Source and destination
+ * images must have same width, height, and chroma.
+ *****************************************************************************/
+static __inline__ void vout_CopyPicture( picture_t *p_src, picture_t *p_dest )
+{
+    int i;
+
+    for( i = 0; i < p_src->i_planes ; i++ )
+    {
+        if( p_src->p[i].i_pitch == p_dest->p[i].i_pitch )
+        {
+            if( p_src->p[i].b_margin )
+            {
+                /* If p_src->b_margin is set, p_dest->b_margin must be set */
+                if( p_dest->p[i].b_hidden )
+                {
+                    /* There are margins, but they are hidden : perfect ! */
+                    FAST_MEMCPY( p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
+                                 p_src->p[i].i_pitch * p_src->p[i].i_lines );
+                    continue;
+                }
+                else
+                {
+                    /* We can't directly copy the margin. Too bad. */
+                }
+            }
+            else
+            {
+                /* Same pitch, no margins : perfect ! */
+                FAST_MEMCPY( p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
+                             p_src->p[i].i_pitch * p_src->p[i].i_lines );
+                continue;
+            }
+        }
+        else
+        {
+            /* Pitch values are different */
+        }
+
+        /* We need to proceed line by line */
+        {
+            u8 *p_in = p_src->p[i].p_pixels, *p_out = p_dest->p[i].p_pixels;
+            int i_line;
+
+            for( i_line = p_src->p[i].i_lines; i_line--; )
+            {
+                FAST_MEMCPY( p_out, p_in, p_src->p[i].i_visible_bytes );
+                p_in += p_src->p[i].i_pitch;
+                p_out += p_dest->p[i].i_pitch;
+            }
+        }
+    }
+}
 
 /*****************************************************************************
  * subpicture_t: video subtitle

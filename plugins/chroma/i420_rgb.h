@@ -1,27 +1,48 @@
 /*****************************************************************************
- * transforms_common.h: Chroma transformation macros
+ * i420_rgb.h : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: transforms.h,v 1.1 2001/12/16 16:18:36 sam Exp $
+ * Copyright (C) 2000 VideoLAN
+ * $Id: i420_rgb.h,v 1.1 2002/01/04 14:01:34 sam Exp $
  *
- * Authors: Vincent Seguin <seguin@via.ecp.fr>
- *          Samuel Hocevar <sam@zoy.org>
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
- * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/*****************************************************************************
+ * chroma_sys_t: chroma method descriptor
+ *****************************************************************************
+ * This structure is part of the chroma transformation descriptor, it
+ * describes the yuv2rgb specific properties.
+ *****************************************************************************/
+typedef struct chroma_sys_s
+{
+    u8  *p_buffer;
+    int *p_offset;
+
+} chroma_sys_t;
+
+/*****************************************************************************
+ * Prototypes
+ *****************************************************************************/
+#ifdef MODULE_NAME_IS_chroma_i420_rgb
+void _M( I420_RGB8 ) ( vout_thread_t *, picture_t *, picture_t * );
+#endif
+void _M( I420_RGB16 )( vout_thread_t *, picture_t *, picture_t * );
+void _M( I420_RGB24 )( vout_thread_t *, picture_t *, picture_t * );
+void _M( I420_RGB32 )( vout_thread_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
  * CONVERT_*_PIXEL: pixel conversion macros
@@ -47,7 +68,7 @@
     i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;                              \
     CONVERT_Y_PIXEL( BPP )                                                    \
 
-#define CONVERT_4YUV_PIXEL( CHROMA )                                         \
+#define CONVERT_4YUV_PIXEL( CHROMA )                                          \
     *p_pic++ = p_lookup[                                                      \
         (((*p_y++ + dither10[i_real_y]) >> 4) << 7)                           \
       + ((*p_u + dither20[i_real_y]) >> 5) * 9                                \
@@ -65,7 +86,7 @@
       + ((*p_u++ + dither23[i_real_y]) >> 5) * 9                              \
       + ((*p_v++ + dither23[i_real_y]) >> 5) ];                               \
 
-#define CONVERT_4YUV_PIXEL_SCALE( CHROMA )                                   \
+#define CONVERT_4YUV_PIXEL_SCALE( CHROMA )                                    \
     *p_pic++ = p_lookup[                                                      \
         ( ((*p_y + dither10[i_real_y]) >> 4) << 7)                            \
         + ((*p_u + dither20[i_real_y]) >> 5) * 9                              \
@@ -102,13 +123,13 @@
  * for 1, 2 and 4 Bpp.
  *****************************************************************************/
 #define SCALE_WIDTH                                                           \
-    if( b_horizontal_scaling )                                                \
+    if( b_hscale )                                                            \
     {                                                                         \
         /* Horizontal scaling, conversion has been done to buffer.            \
          * Rewind buffer and offset, then copy and scale line */              \
         p_buffer = p_buffer_start;                                            \
         p_offset = p_offset_start;                                            \
-        for( i_x = i_pic_width / 16; i_x--; )                                 \
+        for( i_x = p_vout->output.i_width / 16; i_x--; )                      \
         {                                                                     \
             *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
             *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
@@ -127,13 +148,17 @@
             *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
             *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
         }                                                                     \
-        p_pic += i_pic_line_width;                                            \
+        for( i_x = p_vout->output.i_width & 15; i_x--; )                      \
+        {                                                                     \
+            *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
+        }                                                                     \
+        p_pic += i_right_margin;                                              \
     }                                                                         \
     else                                                                      \
     {                                                                         \
         /* No scaling, conversion has been done directly in picture memory.   \
          * Increment of picture pointer to end of line is still needed */     \
-        p_pic += i_pic_width + i_pic_line_width;                              \
+        (u8*)p_pic += p_dest->p->i_pitch;                                     \
     }                                                                         \
 
 /*****************************************************************************
@@ -142,30 +167,30 @@
  * This macro scales a line using an offset array.
  *****************************************************************************/
 #define SCALE_WIDTH_DITHER( CHROMA )                                          \
-    if( b_horizontal_scaling )                                                \
+    if( b_hscale )                                                            \
     {                                                                         \
         /* Horizontal scaling - we can't use a buffer due to dithering */     \
         p_offset = p_offset_start;                                            \
-        for( i_x = i_pic_width / 16; i_x--; )                                 \
+        for( i_x = p_vout->output.i_width / 16; i_x--; )                      \
         {                                                                     \
-            CONVERT_4YUV_PIXEL_SCALE( CHROMA )                               \
-            CONVERT_4YUV_PIXEL_SCALE( CHROMA )                               \
-            CONVERT_4YUV_PIXEL_SCALE( CHROMA )                               \
-            CONVERT_4YUV_PIXEL_SCALE( CHROMA )                               \
+            CONVERT_4YUV_PIXEL_SCALE( CHROMA )                                \
+            CONVERT_4YUV_PIXEL_SCALE( CHROMA )                                \
+            CONVERT_4YUV_PIXEL_SCALE( CHROMA )                                \
+            CONVERT_4YUV_PIXEL_SCALE( CHROMA )                                \
         }                                                                     \
     }                                                                         \
     else                                                                      \
     {                                                                         \
-        for( i_x = i_width / 16; i_x--;  )                                    \
+        for( i_x = p_vout->render.i_width / 16; i_x--;  )                     \
         {                                                                     \
-            CONVERT_4YUV_PIXEL( CHROMA )                                     \
-            CONVERT_4YUV_PIXEL( CHROMA )                                     \
-            CONVERT_4YUV_PIXEL( CHROMA )                                     \
-            CONVERT_4YUV_PIXEL( CHROMA )                                     \
+            CONVERT_4YUV_PIXEL( CHROMA )                                      \
+            CONVERT_4YUV_PIXEL( CHROMA )                                      \
+            CONVERT_4YUV_PIXEL( CHROMA )                                      \
+            CONVERT_4YUV_PIXEL( CHROMA )                                      \
         }                                                                     \
     }                                                                         \
     /* Increment of picture pointer to end of line is still needed */         \
-    p_pic += i_pic_line_width;                                                \
+    p_pic += i_right_margin;                                                  \
                                                                               \
     /* Increment the Y coordinate in the matrix, modulo 4 */                  \
     i_real_y = (i_real_y + 1) & 0x3;                                          \
@@ -189,13 +214,13 @@
      * Handle vertical scaling. The current line can be copied or next one    \
      * can be ignored.                                                        \
      */                                                                       \
-    switch( i_vertical_scaling )                                              \
+    switch( i_vscale )                                                        \
     {                                                                         \
     case -1:                             /* vertical scaling factor is < 1 */ \
-        while( (i_scale_count -= i_pic_height) > 0 )                          \
+        while( (i_scale_count -= p_vout->output.i_height) > 0 )               \
         {                                                                     \
             /* Height reduction: skip next source line */                     \
-            p_y += i_width;                                                   \
+            p_y += p_vout->render.i_width;                                    \
             i_y++;                                                            \
             if( (CHROMA == 420) || (CHROMA == 422) )                          \
             {                                                                 \
@@ -207,40 +232,20 @@
             }                                                                 \
             else if( CHROMA == 444 )                                          \
             {                                                                 \
-                p_u += i_width;                                               \
-                p_v += i_width;                                               \
+                p_u += p_vout->render.i_width;                                \
+                p_v += p_vout->render.i_width;                                \
             }                                                                 \
         }                                                                     \
-        i_scale_count += i_height;                                            \
+        i_scale_count += p_vout->render.i_height;                             \
         break;                                                                \
     case 1:                              /* vertical scaling factor is > 1 */ \
-        while( (i_scale_count -= i_height) > 0 )                              \
+        while( (i_scale_count -= p_vout->render.i_height) > 0 )               \
         {                                                                     \
             /* Height increment: copy previous picture line */                \
-            for( i_x = i_pic_width / 16; i_x--; )                             \
-            {                                                                 \
-                *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );           \
-                *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );           \
-                if( BPP > 1 )                               /* 2, 3, 4 Bpp */ \
-                {                                                             \
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );       \
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );       \
-                }                                                             \
-                if( BPP > 2 )                                  /* 3, 4 Bpp */ \
-                {                                                             \
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );       \
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );       \
-                }                                                             \
-                if( BPP > 3 )                                     /* 4 Bpp */ \
-                {                                                             \
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );       \
-                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );       \
-                }                                                             \
-            }                                                                 \
-            p_pic +=        i_pic_line_width;                                 \
-            p_pic_start +=  i_pic_line_width;                                 \
+            FAST_MEMCPY( p_pic, p_pic_start, p_vout->output.i_width * BPP );  \
+            (u8*)p_pic += p_dest->p->i_pitch;                                 \
         }                                                                     \
-        i_scale_count += i_pic_height;                                        \
+        i_scale_count += p_vout->output.i_height;                             \
         break;                                                                \
     }                                                                         \
 
@@ -264,13 +269,13 @@
      * can be ignored.                                                        \
      */                                                                       \
                                                                               \
-    switch( i_vertical_scaling )                                              \
+    switch( i_vscale )                                                        \
     {                                                                         \
     case -1:                             /* vertical scaling factor is < 1 */ \
-        while( (i_scale_count -= i_pic_height) > 0 )                          \
+        while( (i_scale_count -= p_vout->output.i_height) > 0 )               \
         {                                                                     \
             /* Height reduction: skip next source line */                     \
-            p_y += i_width;                                                   \
+            p_y += p_vout->render.i_width;                                    \
             i_y++;                                                            \
             if( (CHROMA == 420) || (CHROMA == 422) )                          \
             {                                                                 \
@@ -282,21 +287,21 @@
             }                                                                 \
             else if( CHROMA == 444 )                                          \
             {                                                                 \
-                p_u += i_width;                                               \
-                p_v += i_width;                                               \
+                p_u += p_vout->render.i_width;                                \
+                p_v += p_vout->render.i_width;                                \
             }                                                                 \
         }                                                                     \
-        i_scale_count += i_height;                                            \
+        i_scale_count += p_vout->render.i_height;                             \
         break;                                                                \
     case 1:                              /* vertical scaling factor is > 1 */ \
-        while( (i_scale_count -= i_height) > 0 )                              \
+        while( (i_scale_count -= p_vout->render.i_height) > 0 )               \
         {                                                                     \
-            p_y -= i_width;                                                   \
+            p_y -= p_vout->render.i_width;                                    \
             p_u -= i_chroma_width;                                            \
             p_v -= i_chroma_width;                                            \
             SCALE_WIDTH_DITHER( CHROMA );                                     \
         }                                                                     \
-        i_scale_count += i_pic_height;                                        \
+        i_scale_count += p_vout->output.i_height;                             \
         break;                                                                \
     }                                                                         \
 

@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.38 2001/12/30 07:09:54 sam Exp $
+ * $Id: modules.h,v 1.39 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -169,14 +169,19 @@ typedef struct memcpy_module_s
 
 } memcpy_module_t;
 
-/* FIXME: not yet used */
 typedef struct probedata_s
 {
     u8  i_type;
+
     struct
     {
         char * psz_data;
     } aout;
+
+    struct
+    {
+        u32 i_chroma;
+    } vout;
 
     struct
     {
@@ -251,6 +256,8 @@ typedef struct function_list_s
             void ( * pf_end )        ( struct vout_thread_s * );
             void ( * pf_destroy )    ( struct vout_thread_s * );
             int  ( * pf_manage )     ( struct vout_thread_s * );
+            void ( * pf_render )     ( struct vout_thread_s *,
+                                       struct picture_s * );
             void ( * pf_display )    ( struct vout_thread_s *,
                                        struct picture_s * );
             void ( * pf_setpalette ) ( struct vout_thread_s *,

@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.18 2001/12/30 07:09:54 sam Exp $
+ * $Id: css.c,v 1.19 2002/01/04 14:01:34 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Håkan Hjort <d95hjort@dtek.chalmers.se>
@@ -325,7 +325,7 @@ int CSSGetDiscKey( dvdcss_handle dvdcss )
             } while( ( playerkeys[i].i_offset != -1 ) &&
                      ( memcmp( test_key, disc_key, KEY_SIZE ) ) );
 
-	    /* The decrypted disk key will replace the disk key hash */
+            /* The decrypted disk key will replace the disk key hash */
             memcpy( dvdcss->css.disc.p_disc_key, disc_key, KEY_SIZE );
             break;
 #else

@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.77 2001/12/30 07:09:56 sam Exp $
+ * $Id: mpeg_system.c,v 1.78 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -765,7 +765,6 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_type = LPCM_AUDIO_ES;
                         p_es->b_audio = 1;
                         p_es->i_cat = AUDIO_ES;
-                        /* FIXME : write the decoder */
                     }
                     else
                     {

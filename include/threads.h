@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.33 2001/12/30 07:09:54 sam Exp $
+ * $Id: threads.h,v 1.34 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -484,9 +484,9 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
 
     /* Create an auto-reset event. */
     p_condvar->signal = CreateEvent( NULL, /* no security */
-				     FALSE,  /* auto-reset event */
-				     FALSE,  /* non-signaled initially */
-				     NULL ); /* unnamed */
+                                     FALSE,  /* auto-reset event */
+                                     FALSE,  /* non-signaled initially */
+                                     NULL ); /* unnamed */
 
     return( !p_condvar->signal );
     

@@ -2,7 +2,7 @@
  * transform.c : transform image plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: transform.c,v 1.3 2002/01/02 14:37:42 sam Exp $
+ * $Id: transform.c,v 1.4 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -90,6 +90,7 @@ static int  vout_Init      ( struct vout_thread_s * );
 static void vout_End       ( struct vout_thread_s * );
 static void vout_Destroy   ( struct vout_thread_s * );
 static int  vout_Manage    ( struct vout_thread_s * );
+static void vout_Render    ( struct vout_thread_s *, struct picture_s * );
 static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
 
 /*****************************************************************************
@@ -104,6 +105,7 @@ static void vout_getfunctions( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_end        = vout_End;
     p_function_list->functions.vout.pf_destroy    = vout_Destroy;
     p_function_list->functions.vout.pf_manage     = vout_Manage;
+    p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
     p_function_list->functions.vout.pf_setpalette = NULL;
 }
@@ -189,23 +191,10 @@ static int vout_Init( vout_thread_t *p_vout )
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure */
-    switch( p_vout->render.i_chroma )
-    {
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-        case FOURCC_YV12:
-        case FOURCC_I422:
-        case FOURCC_I444:
-            p_vout->output.i_chroma = p_vout->render.i_chroma;
-            p_vout->output.i_width  = p_vout->render.i_width;
-            p_vout->output.i_height = p_vout->render.i_height;
-            p_vout->output.i_aspect = p_vout->render.i_aspect;
-            break;
-
-        default:
-            return( 0 ); /* unknown chroma */
-            break;
-    }
+    p_vout->output.i_chroma = p_vout->render.i_chroma;
+    p_vout->output.i_width  = p_vout->render.i_width;
+    p_vout->output.i_height = p_vout->render.i_height;
+    p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to open the real video output */
     psz_filter = main_GetPszVariable( VOUT_FILTER_VAR, "" );
@@ -255,7 +244,7 @@ static void vout_End( vout_thread_t *p_vout )
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->planes[ 0 ].p_data );
+        free( PP_OUTPUTPICTURE[ i_index ]->p_data );
     }
 }
 
@@ -283,13 +272,13 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Display: displays previously rendered output
+ * vout_Render: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to Transform image, waits
  * until it is displayed and switch the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *p_outpic;
     int i_index;
@@ -305,7 +294,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         msleep( VOUT_OUTMEM_SLEEP );
     }   
 
-    vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, mdate() + 50000 );
+    vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
     vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
     switch( p_vout->p_sys->i_mode )
@@ -313,23 +302,24 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         case TRANSFORM_MODE_90:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
-                int i_line_bytes = p_pic->planes[ i_index ].i_line_bytes;
+                int i_pitch = p_pic->p[i_index].i_pitch;
 
-                pixel_data_t *p_in = p_pic->planes[ i_index ].p_data;
+                u8 *p_in = p_pic->p[i_index].p_pixels;
 
-                pixel_data_t *p_out = p_outpic->planes[ i_index ].p_data;
-                pixel_data_t *p_out_end = p_out
-                                       + p_outpic->planes[ i_index ].i_bytes;
+                u8 *p_out = p_outpic->p[i_index].p_pixels;
+                u8 *p_out_end = p_out + p_outpic->p[i_index].i_lines
+                                         * p_outpic->p[i_index].i_pitch;
 
                 for( ; p_out < p_out_end ; )
                 {
-                    pixel_data_t *p_line_end;
+                    u8 *p_line_end;
 
-                    p_line_end = p_in + p_pic->planes[ i_index ].i_bytes;
+                    p_line_end = p_in + p_pic->p[i_index].i_lines
+                                         * p_pic->p[i_index].i_pitch;
 
                     for( ; p_in < p_line_end ; )
                     {
-                        p_line_end -= i_line_bytes;
+                        p_line_end -= i_pitch;
                         *(--p_out_end) = *p_line_end;
                     }
 
@@ -341,10 +331,11 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         case TRANSFORM_MODE_180:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
-                pixel_data_t *p_in = p_pic->planes[ i_index ].p_data;
-                pixel_data_t *p_in_end = p_in + p_pic->planes[ i_index ].i_bytes;
+                u8 *p_in = p_pic->p[i_index].p_pixels;
+                u8 *p_in_end = p_in + p_pic->p[i_index].i_lines
+                                       * p_pic->p[i_index].i_pitch;
 
-                pixel_data_t *p_out = p_outpic->planes[ i_index ].p_data;
+                u8 *p_out = p_outpic->p[i_index].p_pixels;
 
                 for( ; p_in < p_in_end ; )
                 {
@@ -356,23 +347,24 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         case TRANSFORM_MODE_270:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
-                int i_line_bytes = p_pic->planes[ i_index ].i_line_bytes;
+                int i_pitch = p_pic->p[i_index].i_pitch;
 
-                pixel_data_t *p_in = p_pic->planes[ i_index ].p_data;
+                u8 *p_in = p_pic->p[i_index].p_pixels;
 
-                pixel_data_t *p_out = p_outpic->planes[ i_index ].p_data;
-                pixel_data_t *p_out_end = p_out
-                                       + p_outpic->planes[ i_index ].i_bytes;
+                u8 *p_out = p_outpic->p[i_index].p_pixels;
+                u8 *p_out_end = p_out + p_outpic->p[i_index].i_lines
+                                         * p_outpic->p[i_index].i_pitch;
 
                 for( ; p_out < p_out_end ; )
                 {
-                    pixel_data_t *p_in_end;
+                    u8 *p_in_end;
 
-                    p_in_end = p_in + p_pic->planes[ i_index ].i_bytes;
+                    p_in_end = p_in + p_pic->p[i_index].i_lines
+                                       * p_pic->p[i_index].i_pitch;
 
                     for( ; p_in < p_in_end ; )
                     {
-                        p_in_end -= i_line_bytes;
+                        p_in_end -= i_pitch;
                         *p_out++ = *p_in_end;
                     }
 
@@ -384,17 +376,17 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         case TRANSFORM_MODE_VFLIP:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
-                pixel_data_t *p_in = p_pic->planes[ i_index ].p_data;
-                pixel_data_t *p_in_end = p_in + p_pic->planes[ i_index ].i_bytes;
+                u8 *p_in = p_pic->p[i_index].p_pixels;
+                u8 *p_in_end = p_in + p_pic->p[i_index].i_lines
+                                       * p_pic->p[i_index].i_pitch;
 
-                pixel_data_t *p_out = p_outpic->planes[ i_index ].p_data;
+                u8 *p_out = p_outpic->p[i_index].p_pixels;
 
                 for( ; p_in < p_in_end ; )
                 {
-                    p_in_end -= p_pic->planes[ i_index ].i_line_bytes;
-                    FAST_MEMCPY( p_out, p_in_end,
-                                 p_pic->planes[ i_index ].i_line_bytes );
-                    p_out += p_pic->planes[ i_index ].i_line_bytes;
+                    p_in_end -= p_pic->p[i_index].i_pitch;
+                    FAST_MEMCPY( p_out, p_in_end, p_pic->p[i_index].i_pitch );
+                    p_out += p_pic->p[i_index].i_pitch;
                 }
             }
             break;
@@ -402,22 +394,22 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         case TRANSFORM_MODE_HFLIP:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
-                pixel_data_t *p_in = p_pic->planes[ i_index ].p_data;
-                pixel_data_t *p_in_end = p_in + p_pic->planes[ i_index ].i_bytes;
+                u8 *p_in = p_pic->p[i_index].p_pixels;
+                u8 *p_in_end = p_in + p_pic->p[i_index].i_lines
+                                       * p_pic->p[i_index].i_pitch;
 
-                pixel_data_t *p_out = p_outpic->planes[ i_index ].p_data;
+                u8 *p_out = p_outpic->p[i_index].p_pixels;
 
                 for( ; p_in < p_in_end ; )
                 {
-                    pixel_data_t *p_line_end = p_in
-                            + p_pic->planes[ i_index ].i_line_bytes;
+                    u8 *p_line_end = p_in + p_pic->p[i_index].i_pitch;
 
                     for( ; p_in < p_line_end ; )
                     {
                         *p_out++ = *(--p_line_end);
                     }
 
-                    p_in += p_pic->planes[ i_index ].i_line_bytes;
+                    p_in += p_pic->p[i_index].i_pitch;
                 }
             }
             break;
@@ -429,5 +421,17 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
+}
+
+/*****************************************************************************
+ * vout_Display: displays previously rendered output
+ *****************************************************************************
+ * This function send the currently rendered image to Invert image, waits
+ * until it is displayed and switch the two rendering buffers, preparing next
+ * frame.
+ *****************************************************************************/
+static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    ;
 }
 

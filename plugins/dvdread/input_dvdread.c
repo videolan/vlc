@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.15 2002/01/02 14:37:42 sam Exp $
+ * $Id: input_dvdread.c,v 1.16 2002/01/04 14:01:34 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -841,7 +841,7 @@ static int DvdReadRead( input_thread_t * p_input,
         {
             b_eot = 1;
             p_dvd->i_pack_len = 0;
-	    return 1;
+            return 1;
         }
     }
 
@@ -953,7 +953,7 @@ static int DvdReadRead( input_thread_t * p_input,
             >= p_input->stream.p_selected_area->i_size || b_eot )
     {
         if( ( p_input->stream.p_selected_area->i_id + 1 ) >= 
-			p_input->stream.i_area_nb )
+                        p_input->stream.i_area_nb )
         {
             /* EOF */
             vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -963,7 +963,7 @@ static int DvdReadRead( input_thread_t * p_input,
         /* EOT */
         intf_WarnMsg( 4, "dvd info: new title" );
         DvdReadSetArea( p_input, p_input->stream.pp_areas[
-			p_input->stream.p_selected_area->i_id+1] );
+                        p_input->stream.p_selected_area->i_id+1] );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         return 0;
     }

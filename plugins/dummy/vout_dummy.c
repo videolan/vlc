@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.14 2002/01/02 14:37:42 sam Exp $
+ * $Id: vout_dummy.c,v 1.15 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -58,6 +58,7 @@ static int  vout_Init      ( struct vout_thread_s * );
 static void vout_End       ( struct vout_thread_s * );
 static void vout_Destroy   ( struct vout_thread_s * );
 static int  vout_Manage    ( struct vout_thread_s * );
+static void vout_Render    ( struct vout_thread_s *, struct picture_s * );
 static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
 
 static int  DummyNewPicture( struct vout_thread_s *, struct picture_s * );
@@ -74,6 +75,7 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_end        = vout_End;
     p_function_list->functions.vout.pf_destroy    = vout_Destroy;
     p_function_list->functions.vout.pf_manage     = vout_Manage;
+    p_function_list->functions.vout.pf_render     = vout_Render;
     p_function_list->functions.vout.pf_display    = vout_Display;
     p_function_list->functions.vout.pf_setpalette = NULL;
 }
@@ -127,7 +129,7 @@ static int vout_Init( vout_thread_t *p_vout )
             break;
 
         default:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS | DEPTH_16BPP;
+            p_vout->output.i_chroma = FOURCC_RV16;
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;
             p_vout->output.i_aspect = p_vout->render.i_aspect;
@@ -155,13 +157,8 @@ static int vout_Init( vout_thread_t *p_vout )
             break;
         }
 
-        p_pic->i_status        = DESTROYED_PICTURE;
-        p_pic->i_type          = DIRECT_PICTURE;
-
-        p_pic->i_left_margin   =
-        p_pic->i_right_margin  =
-        p_pic->i_top_margin    =
-        p_pic->i_bottom_margin = 0;
+        p_pic->i_status = DESTROYED_PICTURE;
+        p_pic->i_type   = DIRECT_PICTURE;
 
         PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
 
@@ -182,7 +179,7 @@ static void vout_End( vout_thread_t *p_vout )
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->planes[ 0 ].p_data );
+        free( PP_OUTPUTPICTURE[ i_index ]->p_data );
     }
 }
 
@@ -208,16 +205,20 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
+ * vout_Render: render previously calculated output
+ *****************************************************************************/
+static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    /* No need to do anything, the fake direct buffers stay as they are */
+}
+
+/*****************************************************************************
  * vout_Display: displays previously rendered output
- *****************************************************************************
- * This function send the currently rendered image to dummy image, waits until
- * it is displayed and switch the two rendering buffers, preparing next frame.
  *****************************************************************************/
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /* No need to do anything, the fake direct buffers stay as they are */
 }
-
 
 /*****************************************************************************
  * DummyNewPicture: allocate a picture
@@ -226,8 +227,6 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    int i_luma_bytes, i_chroma_bytes;
-
     int i_width  = p_vout->output.i_width;
     int i_height = p_vout->output.i_height;
 
@@ -240,23 +239,28 @@ static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     case FOURCC_YV12:
 
         /* Allocate the memory buffer */
-        i_luma_bytes = i_width * i_height * sizeof(pixel_data_t);
-        i_chroma_bytes = i_width * ( i_height / 2 ) * sizeof(pixel_data_t);
+        p_pic->p_data = memalign( 16, i_width * i_height * 3 / 2 );
 
         /* Y buffer */
-        p_pic->P_Y = malloc( i_luma_bytes + 2 * i_chroma_bytes );
-        p_pic->planes[ Y_PLANE ].i_bytes = i_luma_bytes;
-        p_pic->planes[ Y_PLANE ].i_line_bytes = i_width * sizeof(pixel_data_t);
+        p_pic->Y_PIXELS = p_pic->p_data;
+        p_pic->p[Y_PLANE].i_lines = i_height;
+        p_pic->p[Y_PLANE].i_pitch = i_width;
+        p_pic->p[Y_PLANE].i_pixel_bytes = 1;
+        p_pic->p[Y_PLANE].b_margin = 0;
 
         /* U buffer */
-        p_pic->P_U = p_pic->P_Y + i_height * i_width;
-        p_pic->planes[ U_PLANE ].i_bytes = i_chroma_bytes / 2;
-        p_pic->planes[ U_PLANE ].i_line_bytes = i_width / 2 * sizeof(pixel_data_t);
+        p_pic->U_PIXELS = p_pic->Y_PIXELS + i_height * i_width;
+        p_pic->p[U_PLANE].i_lines = i_height / 2;
+        p_pic->p[U_PLANE].i_pitch = i_width / 2;
+        p_pic->p[U_PLANE].i_pixel_bytes = 1;
+        p_pic->p[U_PLANE].b_margin = 0;
 
         /* V buffer */
-        p_pic->P_V = p_pic->P_U + i_height * i_width / 2;
-        p_pic->planes[ V_PLANE ].i_bytes = i_chroma_bytes / 2;
-        p_pic->planes[ V_PLANE ].i_line_bytes = i_width / 2 * sizeof(pixel_data_t);
+        p_pic->V_PIXELS = p_pic->U_PIXELS + i_height * i_width / 4;
+        p_pic->p[V_PLANE].i_lines = i_height / 2;
+        p_pic->p[V_PLANE].i_pitch = i_width / 2;
+        p_pic->p[V_PLANE].i_pixel_bytes = 1;
+        p_pic->p[V_PLANE].b_margin = 0;
 
         /* We allocated 3 planes */
         p_pic->i_planes = 3;
@@ -266,19 +270,20 @@ static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Unknown chroma, allocate an RGB buffer, the video output's job
      * will be to do the chroma->RGB conversion */
-    case FOURCC_BI_BITFIELDS | DEPTH_16BPP:
-
-        /* Precalculate some values */
-        i_luma_bytes = sizeof(u16) * i_width * i_height;
+    case FOURCC_RV16:
 
         /* Allocate the memory buffer */
-        p_pic->P_MAIN = malloc( i_luma_bytes );
-        p_pic->planes[ MAIN_PLANE ].i_bytes = i_luma_bytes;
+        p_pic->p_data = memalign( 16, i_width * i_height * 2 );
 
         /* Fill important structures */
-        p_pic->planes[ MAIN_PLANE ].i_red_mask   = 0xf800;
-        p_pic->planes[ MAIN_PLANE ].i_green_mask = 0x07e0;
-        p_pic->planes[ MAIN_PLANE ].i_blue_mask  = 0x001f;
+        p_pic->p->p_pixels = p_pic->p_data;
+        p_pic->p->i_lines = i_height;
+        p_pic->p->i_pitch = i_width;
+        p_pic->p->i_pixel_bytes = 2;
+        p_pic->p->b_margin = 0;
+        p_pic->p->i_red_mask   = 0xf800;
+        p_pic->p->i_green_mask = 0x07e0;
+        p_pic->p->i_blue_mask  = 0x001f;
 
         /* We allocated 1 plane */
         p_pic->i_planes = 1;

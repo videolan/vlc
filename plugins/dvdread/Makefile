@@ -3,7 +3,7 @@ dvdread_SOURCES = dvdread.c input_dvdread.c $(SRC_DVDREAD_EXTRA)
 ifeq (1,$(NEED_LIBDVDCSS))
 LIBDVDCSS_OBJ = ../../lib/libdvdcss.a ../../lib/libdvdcss.so
 endif
-LIBDVDREAD_OBJ = ../../lib/libdvdread.a ../../lib/libdvdread.so
+LIBDVDREAD_OBJ = ../../lib/libdvdread.a
 
 EXTRA_DEP = $(LIBDVDCSS_OBJ) $(LIBDVDREAD_OBJ)
 

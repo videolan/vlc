@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.141 2001/12/30 07:09:56 sam Exp $
+ * $Id: main.c,v 1.142 2002/01/04 14:01:35 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -132,6 +132,12 @@
 
 #define OPT_MPEG_ADEC           200
 
+#define OPT_NOMMX               201
+#define OPT_NO3DNOW             202
+#define OPT_NOMMXEXT            203
+#define OPT_NOSSE               204
+#define OPT_NOALTIVEC           205
+
 /* Usage fashion */
 #define USAGE                     0
 #define SHORT_HELP                1
@@ -203,6 +209,13 @@ static const struct option longopts[] =
     /* Decoder options */
     {   "mpeg_adec",        1,          0,      OPT_MPEG_ADEC },
 
+    /* CPU options */
+    {   "nommx",            0,          0,      OPT_NOMMX },
+    {   "no3dnow",          0,          0,      OPT_NO3DNOW },
+    {   "nommxext",         0,          0,      OPT_NOMMXEXT },
+    {   "nosse",            0,          0,      OPT_NOSSE },
+    {   "noaltivec",        0,          0,      OPT_NOALTIVEC },
+
     {   0,                  0,          0,      0 }
 };
 
@@ -229,14 +242,15 @@ static void Version                 ( void );
 static void InitSignalHandler       ( void );
 static void SimpleSignalHandler     ( int i_signal );
 static void FatalSignalHandler      ( int i_signal );
-static void InstructionSignalHandler( int i_signal );
+static void IllegalSignalHandler    ( int i_signal );
 static u32  CPUCapabilities         ( void );
 
 static int  RedirectSTDOUT          ( void );
 static void ShowConsole             ( void );
 
 static jmp_buf env;
-static int  i_illegal;
+static int     i_illegal;
+static char   *psz_capability;
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads
@@ -352,7 +366,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         PRINT_CAPABILITY( CPU_CAPABILITY_MMXEXT, "MMXEXT" );
         PRINT_CAPABILITY( CPU_CAPABILITY_SSE, "SSE" );
         PRINT_CAPABILITY( CPU_CAPABILITY_ALTIVEC, "Altivec" );
-	PRINT_CAPABILITY( CPU_CAPABILITY_FPU, "FPU" );
+        PRINT_CAPABILITY( CPU_CAPABILITY_FPU, "FPU" );
         intf_StatMsg( "info: CPU has capabilities : %s", p_capabilities );
     }
 
@@ -439,6 +453,17 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 
     /*
+     * Free aout and vout banks
+     */
+    vout_EndBank();
+    aout_EndBank();
+
+    /*
+     * Free playlist
+     */
+    intf_PlaylistDestroy( p_main->p_playlist );
+
+    /*
      * Free memcpy module if it was allocated
      */
     if( p_main->memcpy.p_module != NULL )
@@ -447,16 +472,9 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 
     /*
-     * Free module, aout and vout banks
+     * Free module bank
      */
-    vout_EndBank();
-    aout_EndBank();
     module_EndBank();
-
-    /*
-     * Free playlist
-     */
-    intf_PlaylistDestroy( p_main->p_playlist );
 
     /*
      * System specific cleaning code
@@ -469,7 +487,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Terminate messages interface and program
      */
-    intf_Msg( "intf: program terminated" );
+    intf_WarnMsg( 1, "intf: program terminated" );
     intf_MsgDestroy();
 
     /*
@@ -833,6 +851,27 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutPszVariable( ADEC_MPEG_VAR, optarg );
             break;
 
+        /* CPU options */
+        case OPT_NOMMX:
+            p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_MMX;
+            break;
+
+        case OPT_NO3DNOW:
+            p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_3DNOW;
+            break;
+
+        case OPT_NOMMXEXT:
+            p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_MMXEXT;
+            break;
+
+        case OPT_NOSSE:
+            p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_SSE;
+            break;
+
+        case OPT_NOALTIVEC:
+            p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_ALTIVEC;
+            break;
+
         /* Internal error: unknown option */
         case '?':
         default:
@@ -947,6 +986,12 @@ static void Usage( int i_fashion )
           "\n"
           "\n      --mpeg_adec <builtin|mad>  \tchoose audio decoder"
           "\n"
+          "\n      --nommx                    \tdisable CPU's MMX support"
+          "\n      --no3dnow                  \tdisable CPU's 3D Now! support"
+          "\n      --nommxext                 \tdisable CPU's MMX EXT support"
+          "\n      --nosse                    \tdisable CPU's SSE support"
+          "\n      --noaltivec                \tdisable CPU's AltiVec support"
+          "\n"
           "\n  -h, --help                     \tprint help and exit"
           "\n  -H, --longhelp                 \tprint long help and exit"
           "\n      --version                  \toutput version information and exit"
@@ -1056,7 +1101,6 @@ static void InitSignalHandler( void )
 #endif
 }
 
-
 /*****************************************************************************
  * SimpleSignalHandler: system signal handler
  *****************************************************************************
@@ -1067,7 +1111,6 @@ static void SimpleSignalHandler( int i_signal )
     /* Acknowledge the signal received */
     intf_WarnMsg( 0, "intf: ignoring signal %d", i_signal );
 }
-
 
 /*****************************************************************************
  * FatalSignalHandler: system signal handler
@@ -1095,24 +1138,28 @@ static void FatalSignalHandler( int i_signal )
 }
 
 /*****************************************************************************
- * InstructionSignalHandler: system signal handler
+ * IllegalSignalHandler: system signal handler
  *****************************************************************************
  * This function is called when a illegal instruction signal is received by
- * the program.
- * We use this function to test OS and CPU_Capabilities
+ * the program. We use this function to test OS and CPU capabilities
  *****************************************************************************/
-static void InstructionSignalHandler( int i_signal )
+static void IllegalSignalHandler( int i_signal )
 {
-    /* Once a signal has been trapped, the termination sequence will be
-     * armed and following signals will be ignored to avoid sending messages
-     * to an interface having been destroyed */
-
     /* Acknowledge the signal received */
     i_illegal = 1;
 
 #ifdef HAVE_SIGRELSE
     sigrelse( i_signal );
 #endif
+
+    fprintf( stderr, "warning: your CPU has %s instructions, but not your "
+                     "operating system.\n", psz_capability );
+    fprintf( stderr, "         some optimizations will be disabled unless "
+                     "you upgrade your OS\n" );
+#ifdef SYS_LINUX
+    fprintf( stderr, "         (for instance Linux kernel 2.4.x or later)" );
+#endif
+
     longjmp( env, 1 );
 }
 
@@ -1176,7 +1223,9 @@ static u32 CPUCapabilities( void )
 
     i_capabilities |= CPU_CAPABILITY_FPU;
 
-    signal( SIGILL, InstructionSignalHandler );
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
+    signal( SIGILL, IllegalSignalHandler );
+#   endif
 
     /* test for a 486 CPU */
     asm volatile ( "pushl %%ebx\n\t"
@@ -1197,7 +1246,9 @@ static u32 CPUCapabilities( void )
 
     if( i_eax == i_ebx )
     {
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
         signal( SIGILL, NULL );
+#   endif
         return( i_capabilities );
     }
 
@@ -1208,7 +1259,9 @@ static u32 CPUCapabilities( void )
 
     if( !i_eax )
     {
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
         signal( SIGILL, NULL );
+#   endif
         return( i_capabilities );
     }
 
@@ -1224,7 +1277,9 @@ static u32 CPUCapabilities( void )
 
     if( ! (i_edx & 0x00800000) )
     {
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
         signal( SIGILL, NULL );
+#   endif
         return( i_capabilities );
     }
 
@@ -1234,8 +1289,9 @@ static u32 CPUCapabilities( void )
     {
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
 
-#ifdef CAN_COMPILE_SSE
+#   ifdef CAN_COMPILE_SSE
         /* We test if OS support the SSE instructions */
+        psz_capability = "SSE";
         i_illegal = 0;
         if( setjmp( env ) == 0 )
         {
@@ -1250,13 +1306,14 @@ static u32 CPUCapabilities( void )
         else
         {
             fprintf( stderr, "warning: your OS doesn't have support for "
-                             "SSE instructions, "
-                             "some optimizations\nwill be disabled\n" );
-#ifdef SYS_LINUX
-            fprintf( stderr, "(you will need Linux kernel 2.4.x or later)\n" );
-#endif
+                             "SSE instructions, some optimizations\n"
+                             "will be disabled"
+#      ifdef SYS_LINUX
+                             " (you will need Linux kernel 2.4.x or later)"
+#      endif
+                             "\n" );
         }
-#endif
+#   endif
     }
 
     /* test for additional capabilities */
@@ -1264,16 +1321,19 @@ static u32 CPUCapabilities( void )
 
     if( i_eax < 0x80000001 )
     {
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
         signal( SIGILL, NULL );
+#   endif
         return( i_capabilities );
     }
 
     /* list these additional capabilities */
     cpuid( 0x80000001 );
 
-#ifdef CAN_COMPILE_3DNOW
+#   ifdef CAN_COMPILE_3DNOW
     if( i_edx & 0x80000000 )
     {
+        psz_capability = "3D Now!";
         i_illegal = 0;
         if( setjmp( env ) == 0 )
         {
@@ -1286,24 +1346,26 @@ static u32 CPUCapabilities( void )
             i_capabilities |= CPU_CAPABILITY_3DNOW;
         }
     }
-#endif
+#   endif
 
     if( b_amd && ( i_edx & 0x00400000 ) )
     {
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
     }
 
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
     signal( SIGILL, NULL );
+#   endif
     return( i_capabilities );
 
 #elif defined( __powerpc__ )
 
     i_capabilities |= CPU_CAPABILITY_FPU;
 
-    /* Test for Altivec */
-    signal( SIGILL, InstructionSignalHandler );
+#   ifdef CAN_COMPILE_ALTIVEC
+    signal( SIGILL, IllegalSignalHandler );
 
-#ifdef CAN_COMPILE_ALTIVEC
+    psz_capability = "AltiVec";
     i_illegal = 0;
     if( setjmp( env ) == 0 )
     {
@@ -1317,9 +1379,10 @@ static u32 CPUCapabilities( void )
     {
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
     }
-#endif
 
     signal( SIGILL, NULL );
+#   endif
+
     return( i_capabilities );
 
 #else

@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.6 2001/12/30 07:09:56 sam Exp $
+ * $Id: spu_decoder.c,v 1.7 2002/01/04 14:01:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -682,10 +682,10 @@ static int ParseRLE( spudec_thread_t *p_spudec,
 
         /* Skip them just in case */
         while( i_y < i_height )
-	{
+        {
             *p_dest++ = i_width << 2;
             i_y++;
-	}
+        }
 
         return( 1 );
     }

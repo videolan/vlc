@@ -1048,7 +1048,7 @@ Mon,  5 Mar 2001 00:41:16 +0100
     It will allow to watch some DVD that went through menus by default.
   * Beginning of menus in gnome interface.
   * Fix bug in ac3dec for mono streams
-  * BeOS: bew video output method, the vlc now uses BBitmap instead of
+  * BeOS: new video output method, the vlc now uses BBitmap instead of
     BDirectWindow (better performances)
   * BeOS: added resizing
   * BeOS: added beta support for overlay

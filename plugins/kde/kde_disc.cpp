@@ -20,31 +20,32 @@
 #include <kdialogbase.h>
 #include <klineedit.h>
 
-KDiskDialog::KDiskDialog( QWidget *parent, const char *name ) :
-		KDialogBase( parent, name, true, QString::null, Ok|Cancel, Ok, true )
+KDiskDialog::KDiskDialog( QWidget *parent, const char *name )
+            :KDialogBase( parent, name, true, QString::null,
+                          Ok|Cancel, Ok, true )
 {
-	QVBox *pageVBox = makeVBoxMainWidget();
+    QVBox *pageVBox = makeVBoxMainWidget();
 
-	QHBox *deviceSelectHBox = new QHBox( pageVBox );
-	deviceSelectHBox->setSpacing( 5 );
-	fButtonGroup = new QVButtonGroup( "Disk type", deviceSelectHBox );
-	fDVDButton = new QRadioButton( "DVD", fButtonGroup);
-	fDVDButton->setChecked( true );
-	fVCDButton = new QRadioButton( "VCD", fButtonGroup);
-	fVCDButton->setEnabled( false );
+    QHBox *deviceSelectHBox = new QHBox( pageVBox );
+    deviceSelectHBox->setSpacing( 5 );
+    fButtonGroup = new QVButtonGroup( "Disk type", deviceSelectHBox );
+    fDVDButton = new QRadioButton( "DVD", fButtonGroup);
+    fDVDButton->setChecked( true );
+    fVCDButton = new QRadioButton( "VCD", fButtonGroup);
+    fVCDButton->setEnabled( false );
 
-	QVGroupBox *startVBox = new QVGroupBox( "Starting position", deviceSelectHBox );
+    QVGroupBox *startVBox = new QVGroupBox( "Starting position", deviceSelectHBox );
 
-	QHBox *titleHBox = new QHBox( startVBox );
-	QLabel *titleLabel = new QLabel( "Title ", titleHBox );
-	fTitle = new QSpinBox( titleHBox );
-	QHBox *chapterHBox = new QHBox( startVBox );
-	QLabel *chapterLabel = new QLabel( "Chapter ", chapterHBox );
-	fChapter = new QSpinBox( chapterHBox );
+    QHBox *titleHBox = new QHBox( startVBox );
+    QLabel *titleLabel = new QLabel( "Title ", titleHBox );
+    fTitle = new QSpinBox( titleHBox );
+    QHBox *chapterHBox = new QHBox( startVBox );
+    QLabel *chapterLabel = new QLabel( "Chapter ", chapterHBox );
+    fChapter = new QSpinBox( chapterHBox );
 
-	QHBox *deviceNameHBox = new QHBox( pageVBox );
-	QLabel *deviceNameLabel = new QLabel( "Device name ", deviceNameHBox );
-	fLineEdit = new KLineEdit( "/dev/dvd", deviceNameHBox );
+    QHBox *deviceNameHBox = new QHBox( pageVBox );
+    QLabel *deviceNameLabel = new QLabel( "Device name ", deviceNameHBox );
+    fLineEdit = new KLineEdit( "/dev/dvd", deviceNameHBox );
 }
 
 KDiskDialog::~KDiskDialog()
@@ -53,27 +54,27 @@ KDiskDialog::~KDiskDialog()
 
 QString KDiskDialog::type() const
 {
-	if ( fDVDButton->isChecked() )
-	{
-		return ( QString("dvd") );
-	}
-	else
-	{
-		return ( QString("vcd") );
-	}
+    if ( fDVDButton->isChecked() )
+    {
+        return ( QString("dvd") );
+    }
+    else
+    {
+        return ( QString("vcd") );
+    }
 }
 
 QString KDiskDialog::device() const
 {
-	return ( fLineEdit->text() );
+    return ( fLineEdit->text() );
 }
 
 int KDiskDialog::title() const
 {
-	return ( fTitle->value() );
+    return ( fTitle->value() );
 }
 
 int KDiskDialog::chapter() const
 {
-	return ( fChapter->value() );
+    return ( fChapter->value() );
 }

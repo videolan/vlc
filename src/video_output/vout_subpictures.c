@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.4 2002/01/02 14:37:42 sam Exp $
+ * $Id: vout_subpictures.c,v 1.5 2002/01/04 14:01:35 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -530,7 +530,7 @@ static void vout_RenderYUVSPU( const vout_thread_t *p_vout, picture_t *p_pic,
 
     int i_x, i_y;
 
-    u8 *p_dest = p_pic->P_Y + p_spu->i_x + p_spu->i_width
+    u8 *p_dest = p_pic->p->p_pixels + p_spu->i_x + p_spu->i_width
                    + p_vout->output.i_width * ( p_spu->i_y + p_spu->i_height );
 
     /* Draw until we reach the bottom of the subtitle */
