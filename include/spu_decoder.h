@@ -37,3 +37,4 @@ typedef struct spudec_thread_s
  ******************************************************************************/
 spudec_thread_t *       spudec_CreateThread( input_thread_t * p_input );
 void                    spudec_DestroyThread( spudec_thread_t * p_spudec );
+

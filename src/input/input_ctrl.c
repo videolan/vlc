@@ -117,7 +117,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                         if ( ((spudec_thread_t *)(p_input->p_es[i_es_loop].p_dec) =
                             spudec_CreateThread(p_input)) == NULL )
                         {
-                            intf_ErrMsg( "Could not start subtitle decoder\n" );
+                            intf_ErrMsg( "Could not start spu decoder\n" );
                             vlc_mutex_unlock( &p_input->es_lock );
                             return( -1 );
                         }
