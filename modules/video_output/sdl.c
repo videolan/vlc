@@ -2,7 +2,7 @@
  * sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: sdl.c,v 1.7 2003/01/13 13:28:55 sam Exp $
+ * $Id: sdl.c,v 1.8 2003/02/10 23:16:37 marcari Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -33,6 +33,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
+#include <vlc/aout.h>
 
 #include <sys/types.h>
 #ifndef WIN32
@@ -41,6 +42,7 @@
 
 #include SDL_INCLUDE_FILE
 
+#include "aout_internal.h"
 #include "netutils.h"
 
 #define SDL_MAX_DIRECTBUFFERS 10
