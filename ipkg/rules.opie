@@ -3,6 +3,8 @@
 # based on Joey Hess's one.
 # Kludged for ipkg
 
+VERSION=0.7.0
+
 # export PATH="$PATH:/usr/local/arm/2.95.3/bin"
 # Compilation options
 export CC=arm-linux-gcc
@@ -33,7 +35,6 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--enable-sdl \
 	--enable-oss \
 	--disable-alsa \
-	--disable-xvideo \
 	--disable-dvd \
 	--disable-dvdread \
 	--disable-vcd \
@@ -65,7 +66,7 @@ export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 #export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/opie-vlc-0.6.1
+export PKGDIR=/home/jpsaman/iPaq/packages/opie-vlc-$(VERSION)
 export QTDIR=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop
 
 build: build-stamp

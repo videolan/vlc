@@ -4,16 +4,21 @@ EXTRA_DIST = \
 	control \
 	control.gpe \
 	control.opie \
+	control.zaurus \
 	rules \
 	rules.gpe \
 	rules.opie \
+	rules.zaurus \
 	postinst \
 	postinst.gpe \
 	postinst.opie \
+	postinst.zaurus \
 	postrm \
 	postrm.gpe \
 	postrm.opie \
+	postrm.zaurus \
 	vlc.desktop \
 	vlc.gpe \
-	vlc.opie
+	vlc.opie \
+	vlc.zaurus
 

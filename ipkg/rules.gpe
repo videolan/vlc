@@ -3,6 +3,8 @@
 # based on Joey Hess's one.
 # Kludged for ipkg
 
+VERSION=0.7.0
+
 # export PATH="$PATH:/usr/local/arm/2.95.3/bin"
 # Compilation options
 export CC=arm-linux-gcc
@@ -67,7 +69,7 @@ export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 #export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/gpe-vlc-0.6.1
+export PKGDIR=/home/jpsaman/iPaq/packages/gpe-vlc-$(VERSION)
 
 config:
 	./configure --mandir=$${prefix}/share/man \
