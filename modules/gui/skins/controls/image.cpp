@@ -2,7 +2,7 @@
  * image.cpp: Image control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: image.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: image.cpp,v 1.2 2003/04/11 21:19:49 videolan Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -95,7 +95,8 @@ bool ControlImage::MouseDown( int x, int y, int button )
 {
     if( !Enabled || !Img[0]->Hit( x - Left, y - Top ) || button != 1 ||
         !MouseDownAction->SendEvent() )
-        return false;
+            return false;
+
     return true;
 }
 //---------------------------------------------------------------------------

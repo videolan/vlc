@@ -2,7 +2,7 @@
  * checkbox.cpp: Checkbox control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: checkbox.cpp,v 1.2 2003/03/19 17:14:50 karibu Exp $
+ * $Id: checkbox.cpp,v 1.3 2003/04/11 21:19:49 videolan Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -199,8 +199,9 @@ void ControlCheckBox::Draw( int x, int y, int w, int h, Graphics *dest )
 bool ControlCheckBox::MouseUp( int x, int y, int button )
 {
     // Test enabled
-    if( ( !Enabled1 && Act == 1 ) || ( !Enabled2 && Act == 2 ) )
-        return false;
+    if( ( !Enabled1 && Act == 1 && Img[1]->Hit( x - Left, y - Top ) ) ||
+        ( !Enabled2 && Act == 2 && Img[3]->Hit( x - Left, y - Top ) ) )
+            return true;
 
     if( button == 1 && Selected )
     {
@@ -229,10 +230,11 @@ bool ControlCheckBox::MouseUp( int x, int y, int button )
 //---------------------------------------------------------------------------
 bool ControlCheckBox::MouseDown( int x, int y, int button )
 {
-    // Test enabled
-    if( ( !Enabled1 && Act == 1 ) || ( !Enabled2 && Act == 2 ) )
-        return false;
 
+    // Test enabled
+    if( ( !Enabled1 && Act == 1 && Img[1]->Hit( x - Left, y - Top ) ) ||
+        ( !Enabled2 && Act == 2 && Img[3]->Hit( x - Left, y - Top ) ) )
+            return true;
     if( button == 1 )
     {
         if( Act == 1 && Img[0]->Hit( x - Left, y - Top ) )

@@ -2,7 +2,7 @@
  * button.cpp: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.cpp,v 1.4 2003/03/20 09:29:07 karibu Exp $
+ * $Id: button.cpp,v 1.5 2003/04/11 21:19:49 videolan Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -134,16 +134,20 @@ void ControlButton::Draw( int x, int y, int w, int h, Graphics *dest )
 //---------------------------------------------------------------------------
 bool ControlButton::MouseUp( int x, int y, int button )
 {
-    if( !Enabled )
-        return false;
-
-    if( Img[1]->Hit( x - Left, y - Top ) && button == 1 && Selected )
+    // If hit in the button
+    if( Img[1]->Hit( x - Left, y - Top ) )
     {
-        State = 1;
-        Selected = false;
-        ClickAction->SendEvent();
-        ParentWindow->Refresh( Left, Top, Width, Height );
-        return true;
+        if( !Enabled )
+            return true;
+
+        if( button == 1 && Selected )
+        {
+            State = 1;
+            Selected = false;
+            ClickAction->SendEvent();
+            ParentWindow->Refresh( Left, Top, Width, Height );
+            return true;
+        }
     }
 
     if( button == 1 )
@@ -154,16 +158,20 @@ bool ControlButton::MouseUp( int x, int y, int button )
 //---------------------------------------------------------------------------
 bool ControlButton::MouseDown( int x, int y, int button )
 {
-    if( !Enabled )
-        return false;
-
-    if( Img[0]->Hit( x - Left, y - Top ) && button == 1 )
+    if( Img[0]->Hit( x - Left, y - Top ) )
     {
-        State = 0;
-        Selected = true;
-        ParentWindow->Refresh( Left, Top, Width, Height );
-        return true;
+        if( !Enabled )
+            return true;
+
+        if( button == 1 )
+        {
+            State = 0;
+            Selected = true;
+            ParentWindow->Refresh( Left, Top, Width, Height );
+            return true;
+        }
     }
+
     return false;
 }
 //---------------------------------------------------------------------------
