@@ -36,6 +36,12 @@
 #include <sys/stat.h>
 #include <sys/poll.h>
 
+/* DVB Card Drivers */
+#include <linux/dvb/version.h>
+#include <linux/dvb/dmx.h>
+#include <linux/dvb/frontend.h>
+#include <linux/dvb/ca.h>
+
 #include "dvb.h"
 
 #undef DEBUG_TPDU
@@ -907,60 +913,60 @@ static void MMIOpen( access_t * p_access, int i_session_id )
 
 
 /*
- * External entry points
+ * Hardware handling
  */
 
 /*****************************************************************************
- * en50221_Init : Open the transport layer
+ * InitSlot: Open the transport layer
  *****************************************************************************/
 #define MAX_TC_RETRIES 20
 
-int E_(en50221_Init)( access_t * p_access )
+static int InitSlot( access_t * p_access, int i_slot )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int i_slot, i_active_slots = 0;
+    int i;
 
-    for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
+    if ( TPDUSend( p_access, i_slot, T_CREATE_TC, NULL, 0 )
+            != VLC_SUCCESS )
     {
-        int i;
-        if ( !p_sys->pb_active_slot[i_slot] )
-            continue;
-        p_sys->pb_active_slot[i_slot] = VLC_FALSE;
+        msg_Err( p_access, "en50221_Init: couldn't send TPDU on slot %d",
+                 i_slot );
+        return VLC_EGENERIC;
+    }
+
+    /* This is out of the spec */
+    for ( i = 0; i < MAX_TC_RETRIES; i++ )
+    {
+        uint8_t i_tag;
+        if ( TPDURecv( p_access, i_slot, &i_tag, NULL, NULL ) == VLC_SUCCESS
+              && i_tag == T_CTC_REPLY )
+        {
+            p_sys->pb_active_slot[i_slot] = VLC_TRUE;
+            break;
+        }
 
         if ( TPDUSend( p_access, i_slot, T_CREATE_TC, NULL, 0 )
                 != VLC_SUCCESS )
         {
-            msg_Err( p_access, "en50221_Init: couldn't send TPDU on slot %d",
+            msg_Err( p_access,
+                     "en50221_Init: couldn't send TPDU on slot %d",
                      i_slot );
             continue;
         }
-
-        /* This is out of the spec */
-        for ( i = 0; i < MAX_TC_RETRIES; i++ )
-        {
-            uint8_t i_tag;
-            if ( TPDURecv( p_access, i_slot, &i_tag, NULL, NULL ) == VLC_SUCCESS
-                  && i_tag == T_CTC_REPLY )
-            {
-                p_sys->pb_active_slot[i_slot] = VLC_TRUE;
-                i_active_slots++;
-                break;
-            }
-
-            if ( TPDUSend( p_access, i_slot, T_CREATE_TC, NULL, 0 )
-                    != VLC_SUCCESS )
-            {
-                msg_Err( p_access,
-                         "en50221_Init: couldn't send TPDU on slot %d",
-                         i_slot );
-                continue;
-            }
-        }
     }
-    p_sys->i_ca_timeout = 1000;
+    if ( p_sys->pb_active_slot[i_slot] )
+    {
+        p_sys->i_ca_timeout = 1000;
+        return VLC_SUCCESS;
+    }
 
-    return i_active_slots;
+    return VLC_EGENERIC;
 }
+
+
+/*
+ * External entry points
+ */
 
 /*****************************************************************************
  * en50221_Poll : Poll the CAM for TPDUs
@@ -976,7 +982,27 @@ int E_(en50221_Poll)( access_t * p_access )
         uint8_t i_tag;
 
         if ( !p_sys->pb_active_slot[i_slot] )
-            continue;
+        {
+            ca_slot_info_t sinfo;
+            sinfo.num = i_slot;
+            if ( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &sinfo ) != 0 )
+            {
+                msg_Err( p_access, "en50221_Poll: couldn't get info on slot %d",
+                         i_slot );
+                continue;
+            }
+
+            if ( sinfo.flags & CA_CI_MODULE_READY )
+            {
+                msg_Dbg( p_access, "en50221_Poll: slot %d is active",
+                         i_slot );
+                p_sys->pb_active_slot[i_slot] = VLC_TRUE;
+            }
+            else
+                continue;
+
+            InitSlot( p_access, i_slot );
+        }
 
         if ( !p_sys->pb_tc_has_data[i_slot] )
         {
@@ -1061,7 +1087,7 @@ int E_(en50221_SetCAPMT)( access_t * p_access, uint8_t **pp_capmts,
     access_sys_t *p_sys = p_access->p_sys;
     int i_session_id;
 
-    for ( i_session_id = 0; i_session_id < MAX_SESSIONS; i_session_id++ )
+    for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
     {
         int i;
 

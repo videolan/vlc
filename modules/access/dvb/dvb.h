@@ -102,7 +102,6 @@ int  E_(CAMPoll)( access_t * );
 int  E_(CAMSet)( access_t *, uint8_t **, int );
 void E_(CAMClose)( access_t * );
 
-int E_(en50221_Init)( access_t * );
 int E_(en50221_Poll)( access_t * );
 int E_(en50221_SetCAPMT)( access_t *, uint8_t **, int );
 void E_(en50221_End)( access_t * );

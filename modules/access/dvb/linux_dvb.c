@@ -47,7 +47,6 @@
 #include "dvb.h"
 
 #define DMX_BUFFER_SIZE (1024 * 1024)
-#define CA_MAX_STATE_RETRY 5
 
 /*
  * Frontends
@@ -1116,7 +1115,7 @@ int E_(CAMOpen)( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     char ca[128];
-    int i_adapter, i_device, i_slot, i_active_slots = 0;
+    int i_adapter, i_device, i_slot;
     ca_caps_t caps;
 
     i_adapter = var_GetInteger( p_access, "dvb-adapter" );
@@ -1133,6 +1132,7 @@ int E_(CAMOpen)( access_t *p_access )
     {
         msg_Err( p_access, "CAMInit: opening device failed (%s)",
                  strerror(errno) );
+        p_sys->i_ca_handle = 0;
         return VLC_EGENERIC;
     }
 
@@ -1150,45 +1150,18 @@ int E_(CAMOpen)( access_t *p_access )
 
     for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
     {
-        ca_slot_info_t sinfo;
-        int i;
-
         if ( ioctl( p_sys->i_ca_handle, CA_RESET, 1 << i_slot) != 0 )
         {
             msg_Err( p_access, "CAMInit: couldn't reset slot %d", i_slot );
-            continue;
-        }
-
-        for ( i = 0; i < CA_MAX_STATE_RETRY; i++ )
-        {
-            msleep(100000);
-
-            sinfo.num = i_slot;
-            if ( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &sinfo ) != 0 )
-            {
-                msg_Err( p_access, "CAMInit: couldn't get info on slot %d",
-                         i_slot );
-                continue;
-            }
-
-            if ( sinfo.flags & CA_CI_MODULE_READY )
-            {
-                p_sys->pb_active_slot[i_slot] = VLC_TRUE;
-            }
         }
     }
 
-    i_active_slots = E_(en50221_Init)( p_access );
+    msg_Dbg( p_access, "CAMInit: found a CI handler with %d slots",
+             p_sys->i_nb_slots );
 
-    msg_Dbg( p_access, "CAMInit: found a CI handler with %d slots, %d active",
-             p_sys->i_nb_slots, i_active_slots );
-
-    if ( !i_active_slots )
-    {
-        close( p_sys->i_ca_handle );
-        p_sys->i_ca_handle = 0;
-        return VLC_EGENERIC;
-    }
+    p_sys->i_ca_timeout = 100000;
+    /* Wait a bit otherwise it doesn't initialize properly... */
+    msleep( 1000000 );
 
     return VLC_SUCCESS;
 }
