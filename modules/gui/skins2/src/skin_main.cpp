@@ -165,20 +165,24 @@ static void Run( intf_thread_t *p_intf )
 
     if( skin_last == NULL || !pLoader->load( skin_last ) )
     {
-        // Too bad, it failed. Let's try with the default theme
-#ifdef WIN32_SKINS
-        string default_dir = (string)p_intf->p_libvlc->psz_vlcpath +
-                             "\\skins2\\default\\theme.xml";
-        if( !pLoader->load( default_dir ) )
-#else
-        string user_skin = (string)p_intf->p_vlc->psz_homedir +
-                           "/" + CONFIG_DIR + "/skins2/default/theme.xml";
+        // Get the resource path and try to load the default skin
+        OSFactory *pOSFactory = OSFactory::instance( p_intf );
+        const list<string> &resPath = pOSFactory->getResourcePath();
+        const string &sep = pOSFactory->getDirSeparator();
 
-        string default_skin = (string)DATA_PATH + "/skins2/default/theme.xml";
-        if( !pLoader->load( user_skin ) && !pLoader->load( default_skin ) )
-#endif
+        list<string>::const_iterator it;
+        for( it = resPath.begin(); it != resPath.end(); it++ )
         {
-            // Last chance: the user can select a new theme file (blocking call)
+            string path = (*it) + sep + "default" + sep + "theme.xml";
+            if( pLoader->load( path ) )
+            {
+                // Theme loaded successfully
+                break;
+            }
+        }
+        if( it == resPath.end() )
+        {
+            // Last chance: the user can select a new theme file
             Dialogs *pDialogs = Dialogs::instance( p_intf );
             if( pDialogs )
             {

@@ -80,7 +80,7 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 Win32Factory::Win32Factory( intf_thread_t *pIntf ):
     OSFactory( pIntf ), TransparentBlt( NULL ), AlphaBlend( NULL ),
-    SetLayeredWindowAttributes( NULL )
+    SetLayeredWindowAttributes( NULL ), m_dirSep( "\\" )
 {
     // see init()
 }
@@ -176,6 +176,10 @@ bool Win32Factory::init()
         SetLayeredWindowAttributes = NULL;
         msg_Dbg( getIntf(), "Couldn't find SetLayeredWindowAttributes()" );
     }
+
+    // Initialize the resource path
+    m_resourcePath.push_back( (string)getIntf()->p_libvlc->psz_vlcpath +
+                              "\\skins2" );
 
     // All went well
     return true;

@@ -39,7 +39,7 @@
 
 
 X11Factory::X11Factory( intf_thread_t *pIntf ): OSFactory( pIntf ),
-    m_pDisplay( NULL ), m_pTimerLoop( NULL )
+    m_pDisplay( NULL ), m_pTimerLoop( NULL ), m_dirSep( "/" )
 {
     // see init()
 }
@@ -68,6 +68,11 @@ bool X11Factory::init()
     // Create the timer loop
     m_pTimerLoop = new X11TimerLoop( getIntf(),
                                      ConnectionNumber( pDisplay ) );
+
+    // Initialize the resource path
+    m_resourcePath.push_back( (string)getIntf()->p_vlc->psz_homedir +
+        m_dirSep + CONFIG_DIR + "/skins2" );
+    m_resourcePath.push_back( (string)DATA_PATH + "/skins2" );
 
     return true;
 }
@@ -108,12 +113,6 @@ OSWindow *X11Factory::createOSWindow( GenericWindow &rWindow, bool dragDrop,
 OSTooltip *X11Factory::createOSTooltip()
 {
     return new X11Tooltip( getIntf(), *m_pDisplay );
-}
-
-
-const string X11Factory::getDirSeparator() const
-{
-    return "/";
 }
 
 

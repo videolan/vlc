@@ -65,7 +65,11 @@ class Win32Factory: public OSFactory
         virtual OSTooltip *createOSTooltip();
 
         /// Get the directory separator
-        virtual const string getDirSeparator() const;
+        virtual const string &getDirSeparator() const { return m_dirSep; }
+
+        /// Get the resource path
+        virtual const list<string> &getResourcePath() const
+            { return m_resourcePath; }
 
         /// Get the screen size
         virtual int getScreenWidth() const;
@@ -108,6 +112,10 @@ class Win32Factory: public OSFactory
         HINSTANCE m_hMsimg32;
         /// Handle on user32.dll (for SetLayeredWindowAttributes)
         HINSTANCE m_hUser32;
+        /// Directory separator
+        const string m_dirSep;
+        /// Resource path
+        list<string> m_resourcePath;
 };
 
 

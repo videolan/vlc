@@ -28,6 +28,7 @@
 #include "skin_common.hpp"
 #include "../utils/position.hpp"
 #include <string>
+#include <list>
 
 class GenericWindow;
 class OSBitmap;
@@ -83,7 +84,10 @@ class OSFactory: public SkinObject
         virtual OSTooltip *createOSTooltip() = 0;
 
         /// Get the directory separator
-        virtual const string getDirSeparator() const = 0;
+        virtual const string &getDirSeparator() const = 0;
+
+        /// Get the resource path
+        virtual const list<string> &getResourcePath() const = 0;
 
         /// Get the screen size
         virtual int getScreenWidth() const = 0;

@@ -68,9 +68,13 @@ bool FT2Font::init()
 
     // Open the font
     FILE *file = fopen( m_name.c_str(), "rb" );
-    if( !file )
+    if( file )
     {
-        msg_Err( getIntf(), "Unable to open the font %s", m_name.c_str() );
+        msg_Dbg( getIntf(), "Loading font %s", m_name.c_str() );
+    }
+    else
+    {
+        msg_Dbg( getIntf(), "Unable to open the font %s", m_name.c_str() );
         return false;
     }
     // Get the file size

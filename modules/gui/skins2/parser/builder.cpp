@@ -714,21 +714,31 @@ GenericFont *Builder::getFont( const string &fontId )
     GenericFont *pFont = m_pTheme->getFontById(fontId);
     if( !pFont && fontId == "defaultfont" )
     {
-#ifdef WIN32_SKINS
-        string defaultFont = (string)getIntf()->p_libvlc->psz_vlcpath +
-                             "\\skins2\\fonts\\FreeSans.ttf";
-#else
-        string defaultFont = (string)DATA_PATH + "/skins2/fonts/FreeSans.ttf";
-#endif
-        pFont = new FT2Font( getIntf(), defaultFont, 12 );
-        if( pFont->init() )
+        // Get the resource path and try to load the default font
+        OSFactory *pOSFactory = OSFactory::instance( getIntf() );
+        const list<string> &resPath = pOSFactory->getResourcePath();
+        const string &sep = pOSFactory->getDirSeparator();
+
+        list<string>::const_iterator it;
+        for( it = resPath.begin(); it != resPath.end(); it++ )
         {
-            m_pTheme->m_fonts["defaultfont"] = GenericFontPtr( pFont );
+            string path = (*it) + sep + "fonts" + sep + "FreeSans.ttf";
+            pFont = new FT2Font( getIntf(), path, 12 );
+            if( pFont->init() )
+            {
+                // Font loaded successfully
+                m_pTheme->m_fonts["defaultfont"] = GenericFontPtr( pFont );
+                break;
+            }
+            else
+            {
+                delete pFont;
+                pFont = NULL;
+            }
         }
-        else
+        if( !pFont )
         {
-            delete pFont;
-            pFont = NULL;
+            msg_Err( getIntf(), "Failed to open the default font" );
         }
     }
     return pFont;

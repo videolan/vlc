@@ -71,7 +71,11 @@ class X11Factory: public OSFactory
         virtual OSTooltip *createOSTooltip();
 
         /// Get the directory separator
-        virtual const string getDirSeparator() const;
+        virtual const string &getDirSeparator() const { return m_dirSep; }
+
+        /// Get the resource path
+        virtual const list<string> &getResourcePath() const
+            { return m_resourcePath; }
 
         /// Get the screen size
         virtual int getScreenWidth() const;
@@ -97,6 +101,10 @@ class X11Factory: public OSFactory
         X11Display *m_pDisplay;
         /// Timer loop
         X11TimerLoop *m_pTimerLoop;
+        /// Directory separator
+        const string m_dirSep;
+        /// Resource path
+        list<string> m_resourcePath;
 };
 
 #endif
