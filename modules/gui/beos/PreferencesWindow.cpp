@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.18 2003/05/07 17:27:30 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.19 2003/05/08 10:45:50 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -429,6 +429,7 @@ void PreferencesWindow::UpdateScrollBar()
     if( max < 0 ) max = 0;
     scrollBar->SetRange( 0, max );
     scrollBar->SetProportion( visible.Height() / total.Height() );
+    scrollBar->SetSteps( 10, 100 );
 }
 
 /*****************************************************************************
