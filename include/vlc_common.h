@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.31 2002/10/16 19:39:42 sam Exp $
+ * $Id: vlc_common.h,v 1.32 2002/10/25 09:21:09 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -55,39 +55,28 @@
 /*****************************************************************************
  * Basic types definitions
  *****************************************************************************/
-#ifdef HAVE_STDINT_H
+#if defined( HAVE_STDINT_H )
 #   include <stdint.h>
-    typedef uint8_t             u8;
-    typedef int8_t              s8;
-
-    typedef uint16_t            u16;
-    typedef int16_t             s16;
-
-    typedef uint32_t            u32;
-    typedef int32_t             s32;
-
-    typedef uint64_t            u64;
-    typedef int64_t             s64;
+#elif defined( HAVE_INTTYPES_H )
+#   include <inttypes.h>
 #else
-    typedef unsigned char       u8;
-    typedef signed char         s8;
-
-    typedef unsigned short      u16;
-    typedef signed short        s16;
-
-    typedef unsigned int        u32;
-    typedef signed int          s32;
-
+    /* Fallback types (very x86-centric, sorry) */
+    typedef unsigned char       uint8_t;
+    typedef signed char         int8_t;
+    typedef unsigned short      uint16_t;
+    typedef signed short        int16_t;
+    typedef unsigned int        uint32_t;
+    typedef signed int          int32_t;
 #   if defined( _MSC_VER ) || ( defined( WIN32 ) && !defined( __MINGW32__ ) )
-    typedef unsigned __int64    u64;
-    typedef signed __int64      s64;
+    typedef unsigned __int64    uint64_t;
+    typedef signed __int64      int64_t;
 #   else
-    typedef unsigned long long  u64;
-    typedef signed long long    s64;
+    typedef unsigned long long  uint64_t;
+    typedef signed long long    int64_t;
 #   endif
 #endif
 
-typedef u8                      byte_t;
+typedef uint8_t                 byte_t;
 
 /* ptrdiff_t definition */
 #ifdef HAVE_STDDEF_H
@@ -109,44 +98,62 @@ typedef int                 ssize_t;
 typedef unsigned long       count_t;
 
 /* DCT elements types */
-typedef s16                 dctelem_t;
+typedef int16_t             dctelem_t;
 
 /* Video buffer types */
-typedef u8                  yuv_data_t;
+typedef uint8_t             yuv_data_t;
 
 /* Audio volume */
-typedef u16                 audio_volume_t;
+typedef uint16_t            audio_volume_t;
+
+/*****************************************************************************
+ * Old types definitions
+ *****************************************************************************
+ * We still provide these types because most of the VLC code uses them
+ * instead of the C9x types. They should be removed when the transition is
+ * complete (probably in 10 years).
+ *****************************************************************************/
+typedef uint8_t    u8;
+typedef int8_t     s8;
+typedef uint16_t   u16;
+typedef int16_t    s16;
+typedef uint32_t   u32;
+typedef int32_t    s32;
+typedef uint64_t   u64;
+typedef int64_t    s64;
 
 /*****************************************************************************
  * mtime_t: high precision date or time interval
  *****************************************************************************
- * Store an high precision date or time interval. The maximum precision is the
- * micro-second, and a 64 bits integer is used to avoid any overflow (maximum
+ * Store a high precision date or time interval. The maximum precision is the
+ * microsecond, and a 64 bits integer is used to avoid overflows (maximum
  * time interval is then 292271 years, which should be long enough for any
- * video). Date are stored as a time interval since a common date.
- * Note that date and time intervals can be manipulated using regular
+ * video). Dates are stored as microseconds since a common date (usually the
+ * epoch). Note that date and time intervals can be manipulated using regular
  * arithmetic operators, and that no special functions are required.
  *****************************************************************************/
-typedef s64 mtime_t;
+typedef int64_t mtime_t;
 
 /*****************************************************************************
  * The vlc_fourcc_t type.
  *****************************************************************************
  * See http://www.webartz.com/fourcc/ for a very detailed list.
  *****************************************************************************/
-typedef u32 vlc_fourcc_t;
+typedef uint32_t vlc_fourcc_t;
 
 #ifdef WORDS_BIGENDIAN
 #   define VLC_FOURCC( a, b, c, d ) \
-        ( ((u32)d) | ( ((u32)c) << 8 ) | ( ((u32)b) << 16 ) | ( ((u32)a) << 24 ) )
+        ( ((uint32_t)d) | ( ((uint32_t)c) << 8 ) \
+           | ( ((uint32_t)b) << 16 ) | ( ((uint32_t)a) << 24 ) )
 #   define VLC_TWOCC( a, b ) \
-        ( (u16)(b) | ( (u16)(a) << 8 ) )
+        ( (uint16_t)(b) | ( (uint16_t)(a) << 8 ) )
 
 #else
 #   define VLC_FOURCC( a, b, c, d ) \
-        ( ((u32)a) | ( ((u32)b) << 8 ) | ( ((u32)c) << 16 ) | ( ((u32)d) << 24 ) )
+        ( ((uint32_t)a) | ( ((uint32_t)b) << 8 ) \
+           | ( ((uint32_t)c) << 16 ) | ( ((uint32_t)d) << 24 ) )
 #   define VLC_TWOCC( a, b ) \
-        ( (u16)(a) | ( (u16)(b) << 8 ) )
+        ( (uint16_t)(a) | ( (uint16_t)(b) << 8 ) )
 
 #endif
 
@@ -343,22 +350,24 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
  * MSB, and should be used for both network communications and files. Note that
  * byte orders other than little and big endians are not supported, but only
  * the VAX seems to have such exotic properties. */
-static inline u16 U16_AT( void * _p )
+static inline uint16_t U16_AT( void * _p )
 {
-    u8 * p = (u8 *)_p;
-    return ( ((u16)p[0] << 8) | p[1] );
+    uint8_t * p = (uint8_t *)_p;
+    return ( ((uint16_t)p[0] << 8) | p[1] );
 }
-static inline u32 U32_AT( void * _p )
+static inline uint32_t U32_AT( void * _p )
 {
-    u8 * p = (u8 *)_p;
-    return ( ((u32)p[0] << 24) | ((u32)p[1] << 16) | ((u32)p[2] << 8) | p[3] );
+    uint8_t * p = (uint8_t *)_p;
+    return ( ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16)
+              | ((uint32_t)p[2] << 8) | p[3] );
 }
-static inline u64 U64_AT( void * _p )
+static inline uint64_t U64_AT( void * _p )
 {
-    u8 * p = (u8 *)_p;
-    return ( ((u64)p[0] << 56) | ((u64)p[1] << 48) | ((u64)p[2] << 40) 
-              | ((u64)p[3] << 32) | ((u64)p[4] << 24) | ((u64)p[5] << 16)
-              | ((u64)p[6] << 8) | p[7] );
+    uint8_t * p = (uint8_t *)_p;
+    return ( ((uint64_t)p[0] << 56) | ((uint64_t)p[1] << 48)
+              | ((uint64_t)p[2] << 40) | ((uint64_t)p[3] << 32)
+              | ((uint64_t)p[4] << 24) | ((uint64_t)p[5] << 16)
+              | ((uint64_t)p[6] << 8) | p[7] );
 }
 #if WORDS_BIGENDIAN
 #   define hton16(i)   ( i )
