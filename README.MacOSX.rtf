@@ -2,7 +2,7 @@
 {\fonttbl\f0\fswiss\fcharset77 Helvetica;\f1\fswiss\fcharset77 Helvetica-Bold;\f2\fmodern\fcharset77 Courier;
 }
 {\colortbl;\red255\green255\blue255;}
-\vieww14280\viewh13680\viewkind0
+\vieww15300\viewh14120\viewkind0
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\qc
 
 \f0\fs48 \cf0 VLC media player, version 0.5\
@@ -12,10 +12,10 @@ Mac OS X-specific information
 \cf0 \
 \
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\qj
-\cf0 Welcome to the VideoLAN Client! VLC media player is a multi-purpose multimedia tool. It can play DVDs, VCDs or read a stream from the network. It plays DivX/MPEG-4 files (and many other files) and is unaffected by the dreaded .avi bug which can cause choppy sound when playing DivX in QuickTime Player. You can also stream content to the network or a file.\
+\cf0 Welcome to the VideoLAN Client! VLC media player is a multi-purpose multimedia tool. It can play DVDs, VCDs or read a stream from the network. It plays DivX/MPEG-4 files (and many other files) and is unaffected by the dreaded .avi bug which can cause choppy sound when playing DivX in QuickTime Player. You can also stream content to the network or a file. But above all it is the ONLY media player on Mac OS X, which has support for multi-channel sound-output.\
 For a full list of features visit: \ul http://www.videolan.org/vlc/features.html\ulnone \
 \
-VLC media player was originally developed for GNU/Linux systems, but has been ported to numerous operating systems, including Mac OS X and Win32. The Mac OS X port is a bit young, but slowly maturing. There are probably still bugs remaining that we have missed during our testing period. We are working hard to improve VLC media player and if you think you can help us in any way, please drop us a line.\
+VLC media player was originally developed for GNU/Linux systems, but has been ported to numerous operating systems, including Mac OS X and Win32. The Mac OS X port is still young, but quickly maturing. There are probably still bugs remaining that we have missed during our testing period. We are working hard to improve VLC media player and if you think you can help us in any way, please drop us a line: \ul http://www.videolan.org/support/lists.html\ulnone \
 \
 The following frequently asked questions are answered below :\
 
@@ -56,8 +56,16 @@ VLC media player is currently unable to read SVCD directly from the drive. SVCDs
 
 \f1\b \ul 4. The video is choppy! It's like we're dropping frames.\
 
-\f0\b0 \ulnone That's the normal behavior when the CPU isn't fast enough to decode all frames. Though there is some room for improvement, don't ever expect VLC to be able to decode MPEG-2 streams on a low-end G3 machine. Apple DVD player uses specific hardware accelerations from the video board of those systems, and we currently lack documentation to do the same. If you think you have information which might help us, please contact us, otherwise please don't complain about this.\
+\f0\b0 \ulnone That's the normal behavior when the CPU isn't fast enough to decode all frames. Though there is some room for improvement, don't ever expect VLC to be able to decode MPEG-2 streams or high resolution DivX on a low-end G3 machine. Apple DVD player uses specific hardware accelerations from the video board of those systems, and we currently lack documentation to do the same. If you think you have information which might help us, please contact us, otherwise please don't complain about this.\
 \
+If you experience problems playing DivX/Xvid then you can try the following:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 - Preferences -> Interface -> show advanced options -> click Apply\
+- Now go to the Decoders part of the preferences.\
+- From the dropdown list choose 'ffmpeg' and click 'configure'\
+- Enable 'hurry up' -> click OK -> click OK (never click the 'select' button)\
+\pard\tx1440\tx2880\tx4320\tx5760\tx7200\qj
+\cf0 \
 If VLC media player is slow on your G4 system, try to quit or hide all running applications. See with 
 \f2 top -u
 \f0  in a terminal window which applications take the CPU. Be aware of bouncing icons in the dock. Bounces seriously effect the performance of VLC. The same goes for any time interval process (Checking mail every 2 minutes).\
@@ -84,7 +92,7 @@ Simply drag VLC from the place where you have installed it, to the Trash.\
 
 \f1\b \ul 8. I think I found a bug. What should I do ?\
 
-\f0\b0 \ulnone Report the exact conditions under which the bug/crash occurred back to the VLC team. For more information on bugreporting please read http://www.videolan.org/support/bug-reporting.html\
+\f0\b0 \ulnone Report the exact conditions under which the bug/crash occurred back to the VLC team. For more information on bugreporting please read \ul http://www.videolan.org/support/bug-reporting.html\ulnone \
 \
 \
 
@@ -95,15 +103,15 @@ Simply drag VLC from the place where you have installed it, to the Trash.\
 - As of yet it is not yet possible to adapt the font, size and/or position of the subtitles.\
 - You need to specify the subtitle when you open the file.\
 - A subtitle is global instead of bound to a playlist-item.  This will be fixed in a future version.\
-- Only MicroDVD, SubRIP and SSA1-4 subtitle files are supported at the moment.\
-- Subs can only be added to .avi movie files at the moment.\
-- Don't bug is asking for the features mentioned above.\
+- Only MicroDVD, SubRIP, SSA1-4 and vplayer subtitle files are supported at the moment.\
+- Subs can only be added to .avi and .ogm movie files at the moment.\
+- Don't bug us asking for the features mentioned above.\
 \
 \
 
 \f1\b \ul 10. What do all the options in the preferences do ?
 \f0\b0 \ulnone \
-Hold your mouse still on top of an option for just over a second and a ToolTip will come up explaining what the option does. Be very careful with the Advanced options. Changing the an option in the wrong value  (usually selecting a module by hand instead of letting it be selected automatically) can cause VLC to no longer start. In this case you will need to remove the preference file located in your HOME -> Library -> Preferences -> VLC.\
+Hold your mouse still on top of an option for just over a second and a ToolTip will come up explaining what the option does. Be very careful with the Advanced options. Changing an option in the wrong value (usually selecting a module by hand instead of letting it be selected automatically) can cause VLC to no longer start. In this case you will need to remove the preference file located in your HOME -> Library -> Preferences -> VLC.\
 \
 \
 
@@ -115,13 +123,13 @@ Hold your mouse still on top of an option for just over a second and a ToolTip w
 
 \f1\b \ul 12. How do i get fullscreen video on my other monitor ? 
 \f0\b0 \ulnone \
-If you want to use your second screen for fullscreen playback, then look at the Video->Screen menuitem. You can set this option permanently by going into the Preferences and choosing Interface->Interface module: Mac OXx->Configure->Video (Choose "Show Advanced options first").\
+If you want to use your second screen for fullscreen playback, then look at the Video->Screen menuitem. You can set this option permanently by going into the Preferences and choosing Interface->Interface module: Mac OXx->Configure->Video (You will need to choose "Show Advanced options" first).\
 \
 \
 
 \f1\b \ul 13. Multiple sound-devices and multi-channel sound? \
 
-\f0\b0 \ulnone Look at the Audio->Device menuitem. You can set this option permanently by going into the Preferences and choosing Interface->Interface module: Mac OXx->Configure->Audio (Choose "Show Advanced options first").\
+\f0\b0 \ulnone Look at the Audio->Device menuitem. You can set this option permanently by going into the Preferences and choosing Interface -> Interface module: macosx -> Configure -> Audio (You will need to choose "Show Advanced options" first).\
 - AC3 over SPDIF with M-Audio Sonica Theater does not work. This is most likely a driver bug which has been reported to M-Audio.\
 - Many problems might still exist. Multiple channel audio support is pretty new on Mac OS X and there are many bugs in the system software, the device drivers and probably in VLC media player as well.\
 \
@@ -130,4 +138,4 @@ Thanks for reading this file. For additional information, subscribe to the VLC m
 -- \
 Christophe Massiot <massiot@via.ecp.fr> and\
 Derk-Jan Hartman <thedj@users.sourceforge.net> for the VideoLAN team.\
-$Id: README.MacOSX.rtf,v 1.14 2003/03/06 22:17:11 hartman Exp $}
+$Id: README.MacOSX.rtf,v 1.15 2003/03/19 15:44:44 hartman Exp $}

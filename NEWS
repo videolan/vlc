@@ -1,4 +1,25 @@
-$Id: NEWS,v 1.32 2003/03/10 00:04:14 massiot Exp $
+$Id: NEWS,v 1.33 2003/03/19 15:44:44 hartman Exp $
+
+Changes between 0.5.2 and 0.5.3:
+---------------------------------
+
+Core Support:
+
+Codecs:
+ * support for 3ivx D4 (not previous versions)
+ * support for '3ivd' files.
+
+Mac OS X port:
+ * reorderable playlist
+ * fixed the hiding of the mouse on multiple monitors
+ * fixed a big issue with USB speakers
+ * fixed several cosmetic issues
+ * you can drag the controller window by its background (as it should be)
+ * the messages window remembers more lines
+
+Miscellaneous:
+ * support for oldstyle id3 genres
+ * improved subtitle files support (SAMI, ssa4, vplayer)
 
 Changes between 0.5.1a and 0.5.2:
 ---------------------------------

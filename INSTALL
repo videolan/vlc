@@ -1,7 +1,9 @@
-$Id: INSTALL,v 1.24 2003/02/02 04:01:29 sam Exp $
+$Id: INSTALL,v 1.25 2003/03/19 15:44:44 hartman Exp $
 
 INSTALL file for the VLC media player
 
+Mac OS X and BeOS users should read the documentation available at: 
+http://developers.videolan.org/vlc/
 
 Configuring VLC
 ===============

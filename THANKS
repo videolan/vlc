@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.2 2003/02/27 12:44:01 marcari Exp $
+$Id: THANKS,v 1.3 2003/03/19 15:44:44 hartman Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -41,6 +41,7 @@ Matthieu Lochegnies <lochegm1@cti.ecp.fr> - MPEG audio emphasis fix
 Michael Mondragon <mammon@lokmail.net> - ncurses compilation fix
 Michel Lanners <mlan@cpu.lu> - fixed typos and AltiVec detection
 Nilmoni Deb <ndeb@ece.cmu.edu> - autoconf and Makefile fixes
+Olivier Aubert <oaubert@bat710.univ-lyon1.fr> - clone list patch
 Olivier Pomel <pomel@via.ecp.fr> - original VLC code
 Øyvind Kolbu <oyvindk@world-online.no> - FreeBSD patches
 Paul Mackerras <paulus@linuxcare.com.au> - AltiVec IDCT and motion
