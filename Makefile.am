@@ -357,7 +357,7 @@ vlc_CFLAGS = $(CPPFLAGS_default) $(CFLAGS_default)
 
 # We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
 # old automake-1.5 bug (automake/279).
-DEPENDENCIES_vlc = lib/libvlc.a $(L_builtin)
+DEPENDENCIES_vlc = lib/libvlc.a $(L_builtin) $(DATA_win32_rc)
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	@rm -f vlc$(EXEEXT)
