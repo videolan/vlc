@@ -29,6 +29,8 @@
 
 #include "vlc_playlist.h"
 
+#undef PLAYLIST_DEBUG
+
 /************************************************************************
  * Local prototypes
  ************************************************************************/
@@ -68,7 +70,7 @@ playlist_view_t * playlist_ViewCreate( playlist_t *p_playlist, int i_id,
 {
     playlist_view_t * p_view;
 
-    msg_Dbg( p_playlist, "Creating view %i",i_id );
+    msg_Dbg( p_playlist, "creating view %i",i_id );
 
     p_view = malloc( sizeof( playlist_view_t ) );
 
@@ -130,7 +132,7 @@ void playlist_ViewDelete( playlist_t *p_playlist,playlist_view_t *p_view )
  */
 void playlist_ViewDump( playlist_t *p_playlist, playlist_view_t *p_view )
 {
-    msg_Dbg( p_playlist, "Dumping view %i",p_view->i_id );
+    msg_Dbg( p_playlist, "dumping view %i",p_view->i_id );
     playlist_NodeDump( p_playlist,p_view->p_root, 1 );
 }
 
@@ -539,17 +541,19 @@ playlist_item_t *playlist_FindNextFromParent( playlist_t *p_playlist,
 {
     playlist_item_t *p_search, *p_next;
 
+#ifdef PLAYLIST_DEBUG
     if( p_item != NULL )
     {
-        msg_Dbg( p_playlist, "Finding next of %s within %s",
+        msg_Dbg( p_playlist, "finding next of %s within %s",
                         p_item->input.psz_name, p_node->input.psz_name );
     }
     else
     {
-        msg_Dbg( p_playlist, "Finding something to play within %s",
+        msg_Dbg( p_playlist, "finding something to play within %s",
                                  p_node->input.psz_name );
 
     }
+#endif
 
     if( !p_node  || p_node->i_children == -1 )
     {
@@ -616,6 +620,7 @@ playlist_item_t *playlist_FindPrevFromParent( playlist_t *p_playlist,
 {
     playlist_item_t *p_search, *p_next;
 
+#ifdef PLAYLIST_DEBUG
     if( p_item != NULL )
     {
         msg_Dbg( p_playlist, "Finding prev of %s within %s",
@@ -624,8 +629,8 @@ playlist_item_t *playlist_FindPrevFromParent( playlist_t *p_playlist,
     else
     {
         msg_Dbg( p_playlist, "Finding prev from %s",p_node->input.psz_name );
-
     }
+#endif
 
     if( !p_node  || p_node->i_children == -1 )
     {
@@ -696,14 +701,18 @@ playlist_item_t *playlist_RecursiveFindNext( playlist_t *p_playlist,
             {
                 i = -1;
             }
+#ifdef PLAYLIST_DEBUG
             msg_Dbg( p_playlist,"Current item found, child %i of %s",
                                 i , p_parent->input.psz_name );
+#endif
             /* We found our item */
             if( i+1 >= p_parent->i_children )
             {
                 /* Too far... */
+#ifdef PLAYLIST_DEBUG
                 msg_Dbg( p_playlist, "Going up the tree,at parent of %s",
                                 p_parent->input.psz_name );
+#endif
                 if( p_parent == p_root )
                 {
                     /* Hmm, seems it's the end for you, guy ! */
@@ -726,16 +735,20 @@ playlist_item_t *playlist_RecursiveFindNext( playlist_t *p_playlist,
                 if( p_parent->pp_children[i+1]->i_children == -1 )
                 {
                     /* Cool, we have found a real item to play */
+#ifdef PLAYLIST_DEBUG
                     msg_Dbg( p_playlist, "Playing child %i of %s",
                                      i+1 , p_parent->input.psz_name );
+#endif
                     return p_parent->pp_children[i+1];
                 }
                 else if( p_parent->pp_children[i+1]->i_children > 0 )
                 {
                     /* Select the first child of this node */
+#ifdef PLAYLIST_DEBUG
                     msg_Dbg( p_playlist, "%s is a node with children, "
                                  "playing the first",
                                   p_parent->pp_children[i+1]->input.psz_name);
+#endif
                     if( p_parent->pp_children[i+1]->pp_children[0]
                                     ->i_children >= 0 )
                     {
@@ -749,8 +762,10 @@ playlist_item_t *playlist_RecursiveFindNext( playlist_t *p_playlist,
                 else
                 {
                     /* This node has no child... We must continue */
+#ifdef PLAYLIST_DEBUG
                     msg_Dbg( p_playlist, "%s is a node with no children",
                                  p_parent->pp_children[i+1]->input.psz_name);
+#endif
                     p_item = p_parent->pp_children[i+1];
                 }
             }
@@ -778,14 +793,18 @@ playlist_item_t *playlist_RecursiveFindPrev( playlist_t *p_playlist,
             {
                 i = -1;
             }
+#ifdef PLAYLIST_DEBUG
             msg_Dbg( p_playlist,"Current item found, child %i of %s",
                              i , p_parent->input.psz_name );
+#endif
             /* We found our item */
             if( i < 1 )
             {
                 /* Too far... */
+#ifdef PLAYLIST_DEBUG
                 msg_Dbg( p_playlist, "Going up the tree,at parent of %s",
                                      p_parent->input.psz_name );
+#endif
                 if( p_parent == p_root )
                 {
                     /* Hmm, seems it's the end for you, guy ! */
@@ -802,16 +821,20 @@ playlist_item_t *playlist_RecursiveFindPrev( playlist_t *p_playlist,
                 if( p_parent->pp_children[i-1]->i_children == -1 )
                 {
                     /* Cool, we have found a real item to play */
+#ifdef PLAYLIST_DEBUG
                     msg_Dbg( p_playlist, "Playing child %i of %s",
                                      i-1, p_parent->input.psz_name );
+#endif
                     return p_parent->pp_children[i-1];
                 }
                 else if( p_parent->pp_children[i-1]->i_children > 0 )
                 {
                     /* Select the last child of this node */
+#ifdef PLAYLIST_DEBUG
                     msg_Dbg( p_playlist, "%s is a node with children,"
                                    " playing the last",
                                    p_parent->pp_children[i-1]->input.psz_name);
+#endif
                     if( p_parent->pp_children[i-1]->pp_children[p_parent->
                             pp_children[i-1]->i_children-1]->i_children >= 0 )
                     {
@@ -827,8 +850,10 @@ playlist_item_t *playlist_RecursiveFindPrev( playlist_t *p_playlist,
                 else
                 {
                     /* This node has no child... We must continue */
+#ifdef PLAYLIST_DEBUG
                     msg_Dbg( p_playlist, "%s is a node with no children",
                                 p_parent->pp_children[i-1]->input.psz_name);
+#endif
                     p_item = p_parent->pp_children[i-1];
                 }
             }

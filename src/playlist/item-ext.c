@@ -118,7 +118,7 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
 {
     vlc_value_t val;
     vlc_bool_t b_end = VLC_FALSE;
-    playlist_view_t *p_view;
+    playlist_view_t *p_view = NULL;
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
@@ -231,7 +231,7 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
         msg_Err( p_playlist, "Insert mode not implemented" );
     }
 
-    if( i_mode & PLAYLIST_GO )
+    if( (i_mode & PLAYLIST_GO ) && p_view )
     {
         p_playlist->request.b_request = VLC_TRUE;
         /* FIXME ... */
@@ -543,8 +543,6 @@ int playlist_Clear( playlist_t * p_playlist )
  */
 int playlist_Disable( playlist_t * p_playlist, playlist_item_t *p_item )
 {
-    vlc_value_t     val;
-
     if( !p_item ) return VLC_EGENERIC;
 
     msg_Dbg( p_playlist, "disabling playlist item `%s'",
@@ -569,8 +567,6 @@ int playlist_Disable( playlist_t * p_playlist, playlist_item_t *p_item )
  */
 int playlist_Enable( playlist_t * p_playlist, playlist_item_t *p_item )
 {
-    vlc_value_t     val;
-
     if( !p_item ) return VLC_EGENERIC;
 
     msg_Dbg( p_playlist, "enabling playlist item `%s'",

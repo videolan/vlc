@@ -831,7 +831,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
     }
 
 #ifdef PLAYLIST_PROFILE
-    msg_Dbg(p_playlist,"next item found in "I64Fi " us\n",mdate()-start );
+    msg_Dbg(p_playlist,"next item found in "I64Fi " us", mdate()-start );
 #endif
 
     if( p_new == NULL ) { msg_Info( p_playlist, "Nothing to play" ); }
