@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.12 2002/06/08 14:08:46 sam Exp $
+ * $Id: win32_specific.c,v 1.13 2002/07/29 19:05:47 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -40,9 +40,16 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     HINSTANCE hInstLib;
 
     /* dynamically get the address of SignalObjectAndWait */
-    hInstLib = LoadLibrary( "kernel32" );
-    p_this->p_vlc->SignalObjectAndWait =
-        (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib, "SignalObjectAndWait" );
+    if( (GetVersion() < 0x80000000) )
+    {
+        /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
+        hInstLib = LoadLibrary( "kernel32" );
+        if( hInstLib)
+            p_this->p_vlc->SignalObjectAndWait =
+                (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib,
+                                                     "SignalObjectAndWait" );
+    }
+    else p_this->p_vlc->SignalObjectAndWait = NULL;
 
     /* WinSock Library Init. */
     i_err = WSAStartup( MAKEWORD( 1, 1 ), &Data );
@@ -60,7 +67,8 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
  *****************************************************************************/
 void system_Configure( vlc_t *p_this )
 {
-    p_this->p_vlc->b_fast_pthread = config_GetInt( p_this, "fast-pthread" );
+    p_this->p_vlc->b_fast_mutex = config_GetInt( p_this, "fast-mutex" );
+    p_this->p_vlc->i_win9x_cv = config_GetInt( p_this, "win9x-cv-method" );
 }
 
 /*****************************************************************************

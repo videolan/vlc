@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.40 2002/07/20 18:01:41 sam Exp $
+ * $Id: main.h,v 1.41 2002/07/29 19:05:47 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -83,7 +83,8 @@ struct vlc_t
     vlc_object_t *         p_appthread;
 #elif defined( WIN32 )
     SIGNALOBJECTANDWAIT    SignalObjectAndWait;
-    vlc_bool_t             b_fast_pthread;
+    vlc_bool_t             b_fast_mutex;
+    int                    i_win9x_cv;
 #endif
 };
 

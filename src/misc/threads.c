@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.10 2002/07/20 18:01:43 sam Exp $
+ * $Id: threads.c,v 1.11 2002/07/29 19:05:47 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -230,7 +230,7 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
      * function and have a 100% correct vlc_cond_wait() implementation.
      * As this function is not available on Win9x, we can use the faster
      * CriticalSections */
-    if( (GetVersion() < 0x80000000) && !p_this->p_vlc->b_fast_pthread )
+    if( p_this->p_vlc->SignalObjectAndWait && !p_this->p_vlc->b_fast_mutex )
     {
         /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
         p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
@@ -348,28 +348,38 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     /* Initialize counter */
     p_condvar->i_waiting_threads = 0;
 
-    if( (GetVersion() < 0x80000000) && !p_this->p_vlc->b_fast_pthread )
+    /* Misc init */
+    p_condvar->i_win9x_cv = p_this->p_vlc->i_win9x_cv;
+    p_condvar->SignalObjectAndWait = p_this->p_vlc->SignalObjectAndWait;
+
+    if( p_this->p_vlc->i_win9x_cv == 0 )
     {
-        /* Create an auto-reset event and a semaphore. */
-        p_condvar->signal = CreateEvent( NULL, FALSE, FALSE, NULL );
-        p_condvar->semaphore = CreateSemaphore( NULL, 0, 0x7fffffff, NULL );
+        /* Create an auto-reset event. */
+        p_condvar->event = CreateEvent( NULL,   /* no security */
+                                        FALSE,  /* auto-reset event */
+                                        FALSE,  /* start non-signaled */
+                                        NULL ); /* unnamed */
 
-        p_condvar->b_broadcast = 0;
-
-        /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
-        p_condvar->SignalObjectAndWait = p_this->p_vlc->SignalObjectAndWait;
-
-        return !p_condvar->signal || !p_condvar->semaphore;
+        p_condvar->semaphore = NULL;
+        return !p_condvar->event;
     }
     else
     {
-        p_condvar->signal = NULL;
+        p_condvar->semaphore = CreateSemaphore( NULL,       /* no security */
+                                                0,          /* initial count */
+                                                0x7fffffff, /* max count */
+                                                NULL );     /* unnamed */
 
-        /* Create an auto-reset event and a manual-reset event. */
-        p_condvar->p_events[0] = CreateEvent( NULL, FALSE, FALSE, NULL );
-        p_condvar->p_events[1] = CreateEvent( NULL, TRUE, FALSE, NULL );
+        if( p_this->p_vlc->i_win9x_cv == 1 )
+            /* Create a manual-reset event initially signaled. */
+            p_condvar->event = CreateEvent( NULL, TRUE, TRUE, NULL );
+        else
+            /* Create a auto-reset event. */
+            p_condvar->event = CreateEvent( NULL, FALSE, FALSE, NULL );
 
-        return !p_condvar->p_events[0] || !p_condvar->p_events[1];
+        InitializeCriticalSection( &p_condvar->csection );
+
+        return !p_condvar->semaphore || !p_condvar->event;
     }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
@@ -414,16 +424,11 @@ int __vlc_cond_destroy( char * psz_file, int i_line, vlc_cond_t *p_condvar )
     return st_cond_destroy( *p_condvar );
 
 #elif defined( WIN32 )
-    if( p_condvar->signal )
-    {
-        return !CloseHandle( p_condvar->signal )
-                 || !CloseHandle( p_condvar->semaphore );
-    }
+    if( !p_condvar->semaphore )
+        return !CloseHandle( p_condvar->event );
     else
-    {
-        return !CloseHandle( p_condvar->p_events[0] )
-                 || !CloseHandle( p_condvar->p_events[1] );
-    }
+        return !CloseHandle( p_condvar->event )
+          || !CloseHandle( p_condvar->semaphore );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     int i_result = pthread_cond_destroy( p_condvar );

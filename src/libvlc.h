@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.7 2002/07/23 00:39:17 sam Exp $
+ * $Id: libvlc.h,v 1.8 2002/07/29 19:05:47 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -280,11 +280,23 @@
 #define DEMUX_LONGTEXT N_( \
     "This is a legacy entry to let you configure demux modules")
 
-#define FAST_PTHREAD_TEXT N_("fast pthread on NT/2K/XP (developpers only)")
-#define FAST_PTHREAD_LONGTEXT N_( \
-    "On Windows NT/2K/XP we use a slow but correct pthread implementation, " \
-    "you can also use this faster implementation but you might experience " \
-    "problems with it.")
+#define FAST_MUTEX_TEXT N_("fast mutex on NT/2K/XP (developpers only)")
+#define FAST_MUTEX_LONGTEXT N_( \
+    "On Windows NT/2K/XP we use a slow mutex implementation but which " \
+    "allows us to correctely implement condition variables. " \
+    "You can also use the faster Win9x implementation but you might " \
+    "experience problems with it.")
+
+#define WIN9X_CV_TEXT N_("Condition variables implementation for Win9x " \
+    "(developpers only)")
+#define WIN9X_CV_LONGTEXT N_( \
+    "On Windows 9x/Me we use a fast but not correct condition variables " \
+    "implementation (more precisely there is a possibility for a race " \
+    "condition to happen). " \
+    "However it is possible to use slower alternatives which should be more " \
+    "robust. " \
+    "Currently you can choose between implementation 0 (which is the " \
+    "default and the fastest), 1 and 2.")
 
 #define PLAYLIST_USAGE N_("\nPlaylist items:" \
     "\n  *.mpg, *.vob                   plain MPEG-1/2 files" \
@@ -396,7 +408,8 @@ ADD_MODULE  ( "access", MODULE_CAPABILITY_ACCESS, NULL, NULL, ACCESS_TEXT, ACCES
 ADD_MODULE  ( "demux", MODULE_CAPABILITY_DEMUX, NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT )
 
 #if defined(WIN32)
-ADD_BOOL ( "fast-pthread", 0, NULL, FAST_PTHREAD_TEXT, FAST_PTHREAD_LONGTEXT )
+ADD_BOOL ( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT )
+ADD_INTEGER ( "win9x-cv-method", 0, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT )
 #endif
 
 /* Usage (mainly useful for cmd line stuff) */
