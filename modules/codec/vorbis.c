@@ -136,6 +136,9 @@ static block_t *Encode   ( encoder_t *, aout_buffer_t * );
 #define ENC_MINBR_LONGTEXT N_( \
   "Allows you to specify a minimum bitrate in kbps. " \
   "Useful for encoding for a fixed-size channel." )
+#define ENC_CBR_TEXT N_("CBR encoding")
+#define ENC_CBR_LONGTEXT N_( \
+  "Allows you to force a constant bitrate encoding (CBR)." )
 
 vlc_module_begin();
 
@@ -159,19 +162,21 @@ vlc_module_begin();
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
 
-    add_integer( ENC_CFG_PREFIX "quality", 0, NULL, ENC_QUALITY_TEXT,
+    add_integer( ENC_CFG_PREFIX "quality", 3, NULL, ENC_QUALITY_TEXT,
                  ENC_QUALITY_LONGTEXT, VLC_FALSE );
     add_integer( ENC_CFG_PREFIX "max-bitrate", 0, NULL, ENC_MAXBR_TEXT,
                  ENC_MAXBR_LONGTEXT, VLC_FALSE );
     add_integer( ENC_CFG_PREFIX "min-bitrate", 0, NULL, ENC_MINBR_TEXT,
                  ENC_MINBR_LONGTEXT, VLC_FALSE );
+    add_bool( ENC_CFG_PREFIX "cbr", 0, NULL, ENC_CBR_TEXT,
+                 ENC_CBR_LONGTEXT, VLC_FALSE );
 #endif
 
 vlc_module_end();
 
 #ifndef MODULE_NAME_IS_tremor
 static const char *ppsz_enc_options[] = {
-    "quality", "max-bitrate", "min-bitrate", NULL
+    "quality", "max-bitrate", "min-bitrate", "cbr", NULL
 };
 #endif
 
@@ -683,6 +688,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     i_quality = val.i_int;
     if( i_quality > 10 ) i_quality = 10;
     if( i_quality < 0 ) i_quality = 0;
+    var_Get( p_enc, ENC_CFG_PREFIX "cbr", &val );
+    if( val.b_bool ) i_quality = 0;
     var_Get( p_enc, ENC_CFG_PREFIX "max-bitrate", &val );
     i_max_bitrate = val.i_int;
     var_Get( p_enc, ENC_CFG_PREFIX "min-bitrate", &val );
