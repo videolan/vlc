@@ -48,10 +48,14 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define VENC_TEXT N_("Video encoder")
+#define VENC_LONGTEXT N_( \
+    "Allows you to specify the video encoder to use and its associated " \
+    "options." )
 #define VCODEC_TEXT N_("Destination video codec")
 #define VCODEC_LONGTEXT N_( \
-    "Allows you to pecify the destination video codec used for the streaming "\
-    "output." )
+    "Allows you to specify the destination video codec used for the " \
+    "streaming output." )
 #define VB_TEXT N_("Video bitrate")
 #define VB_LONGTEXT N_( \
     "Allows you to specify the video bitrate used for the streaming " \
@@ -82,6 +86,10 @@
 #define CROPRIGHT_LONGTEXT N_( \
     "Allows you to specify the right coordinate for the video cropping." )
 
+#define AENC_TEXT N_("Audio encoder")
+#define AENC_LONGTEXT N_( \
+    "Allows you to specify the audio encoder to use and its associated " \
+    "options." )
 #define ACODEC_TEXT N_("Destination audio codec")
 #define ACODEC_LONGTEXT N_( \
     "Allows you to specify the destination audio codec used for the " \
@@ -114,6 +122,8 @@ vlc_module_begin();
     add_shortcut( "transcode" );
     set_callbacks( Open, Close );
 
+    add_string( SOUT_CFG_PREFIX "venc", NULL, NULL, VENC_TEXT,
+                VENC_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "vcodec", NULL, NULL, VCODEC_TEXT,
                 VCODEC_LONGTEXT, VLC_FALSE );
     add_integer( SOUT_CFG_PREFIX "vb", 800 * 1000, NULL, VB_TEXT,
@@ -136,6 +146,8 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "cropright", 0, NULL, CROPRIGHT_TEXT,
                  CROPRIGHT_LONGTEXT, VLC_TRUE );
 
+    add_string( SOUT_CFG_PREFIX "aenc", NULL, NULL, AENC_TEXT,
+                AENC_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "acodec", NULL, NULL, ACODEC_TEXT,
                 ACODEC_LONGTEXT, VLC_FALSE );
     add_integer( SOUT_CFG_PREFIX "ab", 64000, NULL, AB_TEXT,
@@ -148,6 +160,12 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "threads", 0, NULL, THREADS_TEXT,
                  THREADS_LONGTEXT, VLC_TRUE );
 vlc_module_end();
+
+static const char *ppsz_sout_options[] = {
+    "venc", "vcodec", "vb", "croptop", "cropbottom", "cropleft", "cropright",
+    "scale", "width", "height", "deinterlace", "threads",
+    "aenc", "acodec", "ab", "samplerate", "channels", NULL
+};
 
 /*****************************************************************************
  * Exported prototypes
@@ -179,12 +197,6 @@ static int pi_channels_maps[6] =
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
 };
 
-static const char *ppsz_sout_options[] = {
-    "vcodec", "vb", "croptop", "cropbottom", "cropleft", "cropright",
-    "scale", "width", "height", "deinterlace", "threads",
-    "acodec", "ab", "samplerate", "channels", NULL
-};
-
 #define PICTURE_RING_SIZE 64
 
 struct sout_stream_sys_t
@@ -200,12 +212,14 @@ struct sout_stream_sys_t
     int             i_first_pic, i_last_pic;
 
     vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
+    char            *psz_aenc;
     sout_cfg_t      *p_audio_cfg;
     int             i_sample_rate;
     int             i_channels;
     int             i_abitrate;
 
     vlc_fourcc_t    i_vcodec;   /*    "   video  " "   "      " */
+    char            *psz_venc;
     sout_cfg_t      *p_video_cfg;
     int             i_vbitrate;
     double          f_scale;
@@ -234,7 +248,6 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
     vlc_value_t       val;
-    char              *psz_opts;
 
     p_sys = vlc_object_create( p_this, sizeof( sout_stream_sys_t ) );
 
@@ -249,32 +262,22 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_input_has_b_frames = VLC_FALSE;
     p_sys->i_output_pts = 0;
 
-    psz_opts = sout_cfg_find_value( p_stream->p_cfg, "aopts" );
-    p_sys->p_audio_cfg = NULL;
-    if( psz_opts && *psz_opts )
-    {
-        char *psz_name, *psz_next, *psz_tmp;
-        asprintf( &psz_tmp, "aopts%s", psz_opts );
-        psz_next = sout_cfg_parser( &psz_name, &p_sys->p_audio_cfg, psz_tmp );
-        if( psz_next ) free( psz_next );
-        free( psz_tmp );
-    }
-
-    psz_opts = sout_cfg_find_value( p_stream->p_cfg, "vopts" );
-    p_sys->p_video_cfg = NULL;
-    if( psz_opts && *psz_opts )
-    {
-        char *psz_name, *psz_next, *psz_tmp;
-        asprintf( &psz_tmp, "vopts%s", psz_opts );
-        psz_next = sout_cfg_parser( &psz_name, &p_sys->p_video_cfg, psz_tmp );
-        if( psz_next ) free( psz_next );
-        free( psz_tmp );
-    }
-
     sout_ParseCfg( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                    p_stream->p_cfg );
 
     /* Audio transcoding parameters */
+    var_Get( p_stream, SOUT_CFG_PREFIX "aenc", &val );
+    p_sys->psz_aenc = NULL;
+    p_sys->p_audio_cfg = NULL;
+    if( val.psz_string && *val.psz_string )
+    {
+        char *psz_next;
+        psz_next = sout_cfg_parser( &p_sys->psz_aenc, &p_sys->p_audio_cfg,
+				    val.psz_string );
+        if( psz_next ) free( psz_next );
+    }
+    if( val.psz_string ) free( val.psz_string );
+
     var_Get( p_stream, SOUT_CFG_PREFIX "acodec", &val );
     p_sys->i_acodec = 0;
     if( val.psz_string && *val.psz_string )
@@ -303,6 +306,18 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Video transcoding parameters */
+    var_Get( p_stream, SOUT_CFG_PREFIX "venc", &val );
+    p_sys->psz_venc = NULL;
+    p_sys->p_video_cfg = NULL;
+    if( val.psz_string && *val.psz_string )
+    {
+        char *psz_next;
+        psz_next = sout_cfg_parser( &p_sys->psz_venc, &p_sys->p_video_cfg,
+				    val.psz_string );
+        if( psz_next ) free( psz_next );
+    }
+    if( val.psz_string ) free( val.psz_string );
+
     var_Get( p_stream, SOUT_CFG_PREFIX "vcodec", &val );
     p_sys->i_vcodec = 0;
     if( val.psz_string && *val.psz_string )
@@ -381,6 +396,7 @@ static void Close( vlc_object_t * p_this )
 
         p_sys->p_audio_cfg = p_next;
     }
+    if( p_sys->psz_aenc ) free( p_sys->psz_aenc );
 
     while( p_sys->p_video_cfg != NULL )
     {
@@ -394,6 +410,7 @@ static void Close( vlc_object_t * p_this )
 
         p_sys->p_video_cfg = p_next;
     }
+    if( p_sys->psz_venc ) free( p_sys->psz_venc );
 
     vlc_object_destroy( p_sys );
 }
@@ -520,7 +537,8 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     }
     else
     {
-        msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')", (char*)&p_fmt->i_codec );
+        msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')",
+                 (char*)&p_fmt->i_codec );
         id->id = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
         id->b_transcode = VLC_FALSE;
 
@@ -799,7 +817,8 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     id->p_buffer     = malloc( id->i_buffer );
 
     /* Sanity check for audio channels */
-    id->f_dst.audio.i_channels = __MIN( id->f_dst.audio.i_channels, id->f_src.audio.i_channels );
+    id->f_dst.audio.i_channels =
+        __MIN( id->f_dst.audio.i_channels, id->f_src.audio.i_channels );
 
     /* find encoder */
     id->p_encoder = vlc_object_create( p_stream, VLC_OBJECT_ENCODER );
@@ -823,9 +842,11 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     vlc_object_attach( id->p_encoder, p_stream );
 
     id->p_encoder->p_module =
-        module_Need( id->p_encoder, "encoder", NULL, 0 );
+        module_Need( id->p_encoder, "encoder",
+                     p_stream->p_sys->psz_aenc, VLC_TRUE );
     if( !id->p_encoder->p_module )
     {
+        vlc_object_detach( id->p_encoder );
         vlc_object_destroy( id->p_encoder );
         msg_Err( p_stream, "cannot open encoder" );
         return VLC_EGENERIC;
@@ -1292,10 +1313,11 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     vlc_object_attach( id->p_encoder, p_stream );
 
     id->p_encoder->p_module =
-        module_Need( id->p_encoder, "encoder", NULL, 0 );
+        module_Need( id->p_encoder, "encoder", p_sys->psz_venc, VLC_TRUE );
 
     if( !id->p_encoder->p_module )
     {
+        vlc_object_detach( id->p_encoder );
         vlc_object_destroy( id->p_encoder );
         msg_Err( p_stream, "cannot find encoder" );
         return VLC_EGENERIC;
@@ -1496,7 +1518,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             id->p_encoder->fmt_out.p_extra = NULL;
 
             id->p_encoder->p_module =
-                module_Need( id->p_encoder, "encoder", NULL, 0 );
+                module_Need( id->p_encoder, "encoder",
+                             p_sys->psz_venc, VLC_TRUE );
             if( !id->p_encoder->p_module )
             {
                 vlc_object_destroy( id->p_encoder );
