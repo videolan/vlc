@@ -151,21 +151,26 @@ Section "Media player (required)" SEC01
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayDVDMovieOnArrival" "VLCPlayDVDMovieOnArrival" ""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Action" "Play DVD movie"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Invoke.ProgID" "VLC.MediaFile"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "InvokeProgID" "VLC.DVDMovie"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "InvokeVerb" "play"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Provider" "VideoLAN VLC media player"
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayCDAudioOnArrival" "VLCPlayCDAudioOnArrival" ""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "Action" "Play CD audio"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "DefaultIcon" '"$INSTDIR\vlc.exe",0'
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "Invoke.ProgID" "VLC.MediaFile"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "InvokeProgID" "VLC.CDAudio"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "InvokeVerb" "play"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "Provider" "VideoLAN VLC media player"
-  WriteRegStr HKCR "VLC.MediaFile" "" "VLC media file"
-  WriteRegStr HKCR "VLC.MediaFile\shell" "" "Play"
-  WriteRegStr HKCR "VLC.MediaFile\shell\Play\command" "" \
-    '$INSTDIR\vlc.exe "%1"'
-  WriteRegStr HKCR "VLC.MediaFile\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
+  WriteRegStr HKCR "VLC.DVDMovie" "" "VLC DVD Movie"
+  WriteRegStr HKCR "VLC.DVDMovie\shell" "" "Play"
+  WriteRegStr HKCR "VLC.DVDMovie\shell\Play\command" "" \
+    '$INSTDIR\vlc.exe dvd:%1@1:0'
+  WriteRegStr HKCR "VLC.DVDMovie\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
+  WriteRegStr HKCR "VLC.CDAudio" "" "VLC CD Audio"
+  WriteRegStr HKCR "VLC.CDAudio\shell" "" "Play"
+  WriteRegStr HKCR "VLC.CDAudio\shell\Play\command" "" \
+    '$INSTDIR\vlc.exe cdda:%1'
+  WriteRegStr HKCR "VLC.CDAudio\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
 SectionEnd
 
@@ -329,6 +334,9 @@ Section Uninstall
   !insertmacro UnRegisterExtensionSection ".wav"
   !insertmacro UnRegisterExtensionSection ".wma"
   !insertmacro UnRegisterExtensionSection ".wmv"
+
+  UnRegDLL $SYSDIR\axvlc.dll
+  Delete /REBOOTOK $SYSDIR\axvlc.dll
 
   RMDir "$SMPROGRAMS\VideoLAN"
   RMDir /r $SMPROGRAMS\VideoLAN
