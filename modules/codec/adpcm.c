@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.8 2003/02/16 11:18:11 fenrir Exp $
+ * $Id: adpcm.c,v 1.9 2003/03/11 06:58:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -78,10 +78,11 @@ static void DecodeThread   ( adec_thread_t * );
 static void EndThread      ( adec_thread_t * );
 
 
-static void DecodeAdpcmMs( adec_thread_t *, aout_buffer_t * );
-static void DecodeAdpcmImaWav( adec_thread_t *, aout_buffer_t * );
-static void DecodeAdpcmDk4( adec_thread_t *, aout_buffer_t * );
-static void DecodeAdpcmDk3( adec_thread_t *, aout_buffer_t * );
+static void DecodeAdpcmMs       ( adec_thread_t *, aout_buffer_t * );
+static void DecodeAdpcmImaWav   ( adec_thread_t *, aout_buffer_t * );
+static void DecodeAdpcmImaQT    ( adec_thread_t *, aout_buffer_t * );
+static void DecodeAdpcmDk4      ( adec_thread_t *, aout_buffer_t * );
+static void DecodeAdpcmDk3      ( adec_thread_t *, aout_buffer_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -154,7 +155,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     switch( p_fifo->i_fourcc )
     {
-//        case VLC_FOURCC('i','m','a', '4'): /* IMA ADPCM */
+        case VLC_FOURCC('i','m','a', '4'): /* IMA ADPCM */
         case VLC_FOURCC('m','s',0x00,0x02): /* MS ADPCM */
         case VLC_FOURCC('m','s',0x00,0x11): /* IMA ADPCM */
         case VLC_FOURCC('m','s',0x00,0x61): /* Duck DK4 ADPCM */
@@ -263,13 +264,13 @@ static int InitThread( adec_thread_t * p_adec )
     {
         if( p_adec->i_codec == ADPCM_IMA_QT )
         {
-            p_adec->i_block = 34;
+            p_adec->i_block = 34 * p_adec->p_wf->nChannels;
         }
         else
         {
             p_adec->i_block = 1024; // XXX FIXME
         }
-        msg_Err( p_adec->p_fifo,
+        msg_Warn( p_adec->p_fifo,
                  "block size undefined, using %d default",
                  p_adec->i_block );
     }
@@ -451,6 +452,7 @@ static void DecodeThread( adec_thread_t *p_adec )
         switch( p_adec->i_codec )
         {
             case ADPCM_IMA_QT:
+                DecodeAdpcmImaQT( p_adec, p_aout_buffer );
                 break;
             case ADPCM_IMA_WAV:
                 DecodeAdpcmImaWav( p_adec, p_aout_buffer );
@@ -716,6 +718,45 @@ static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
 }
 
 /*
+ * Ima4 in QT file
+ */
+static void DecodeAdpcmImaQT( adec_thread_t *p_adec,
+                              aout_buffer_t *p_aout_buffer )
+{
+    uint8_t                 *p_buffer;
+    adpcm_ima_wav_channel_t channel[2];
+    int                     i_nibbles;
+    uint16_t                *p_sample;
+    int                     i_ch;
+    int                     i_step;
+
+    p_buffer = p_adec->p_block;
+    i_step   = p_adec->p_wf->nChannels;
+
+    for( i_ch = 0; i_ch < p_adec->p_wf->nChannels; i_ch++ )
+    {
+        p_sample = ((int16_t*)p_aout_buffer->p_buffer) + i_ch;
+        /* load preambule */
+        channel[i_ch].i_predictor  = ( p_buffer[0] << 1 ) ||(  p_buffer[1] >> 7 );
+        channel[i_ch].i_step_index = p_buffer[1]&0x7f;
+
+        CLAMP( channel[i_ch].i_step_index, 0, 88 );
+        p_buffer += 2;
+
+        for( i_nibbles = 0; i_nibbles < 64; i_nibbles +=2 )
+        {
+            *p_sample = AdpcmImaWavExpandNibble( &channel[i_ch], (*p_buffer)&0x0f);
+            p_sample += i_step;
+
+            *p_sample = AdpcmImaWavExpandNibble( &channel[i_ch], (*p_buffer >> 4)&0x0f);
+            p_sample += i_step;
+
+            p_buffer++;
+        }
+    }
+}
+
+/*
  * Dk4
  */
 
@@ -839,6 +880,5 @@ static void DecodeAdpcmDk3( adec_thread_t *p_adec,
     }
 
 }
-
 
 
