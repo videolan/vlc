@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.1 2002/08/13 11:59:36 sam Exp $
+ * $Id: fb.c,v 1.2 2003/02/15 04:43:19 ipkiss Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -616,7 +616,7 @@ static void CloseDisplay( vout_thread_t *p_vout )
     memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size );
 
     /* Restore palette */
-    if( p_vout->p_sys->var_info.bits_per_pixel == 8 );
+    if( p_vout->p_sys->var_info.bits_per_pixel == 8 )
     {
         ioctl( p_vout->p_sys->i_fd,
                FBIOPUTCMAP, &p_vout->p_sys->fb_cmap );
