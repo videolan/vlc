@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.11 2004/01/05 16:22:40 hartman Exp $
+# $Id: Makefile,v 1.12 2004/01/12 20:54:24 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -299,20 +299,20 @@ DISTCLEAN_PKG += libid3tag-$(LIBID3TAG_VERSION).tar.gz
 # libmad
 # ***************************************************************************
 
-libmad-$(LIBMAD_VERSION).tar.gz:
+mad-$(LIBMAD_VERSION).tar.gz:
 	$(WGET) $(LIBMAD_URL)
 
-libmad: libmad-$(LIBMAD_VERSION).tar.gz
+mad: mad-$(LIBMAD_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.mad: libmad
+.mad: mad
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .mad
-CLEAN_PKG += libmad
-DISTCLEAN_PKG += libmad-$(LIBMAD_VERSION).tar.gz
+CLEAN_PKG += mad
+DISTCLEAN_PKG += mad-$(LIBMAD_VERSION).tar.gz
 
 # ***************************************************************************
 # ogg
@@ -677,7 +677,6 @@ libcaca-$(LIBCACA_VERSION).tar.gz:
 
 libcaca: libcaca-$(LIBCACA_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/caca.patch
 
 .caca: libcaca
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-imlib2 && make && make install)

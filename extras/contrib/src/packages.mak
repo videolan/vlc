@@ -2,7 +2,7 @@
 # src/packages.mak : Archives locations
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN   
-# $Id: packages.mak,v 1.8 2004/01/05 16:22:40 hartman Exp $
+# $Id: packages.mak,v 1.9 2004/01/12 20:54:24 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -41,13 +41,13 @@ FRIBIDI_VERSION=0.10.4
 FRIBIDI_URL=$(SF)/fribidi/fribidi-$(FRIBIDI_VERSION).tar.gz
 A52DEC_VERSION=0.7.4
 A52DEC_URL=http://liba52.sourceforge.net/files/a52dec-$(A52DEC_VERSION).tar.gz
-MPEG2DEC_VERSION=0.4.0
+MPEG2DEC_VERSION=0.4.1-cvs
 MPEG2DEC_CVSROOT=:pserver:anonymous@cvs.libmpeg2.sourceforge.net:/cvsroot/libmpeg2
 MPEG2DEC_SNAPSHOT=http://libmpeg2.sourceforge.net/files/mpeg2dec-snapshot.tar.gz
 LIBID3TAG_VERSION=0.15.0b
 LIBID3TAG_URL=ftp://ftp.mars.org/pub/mpeg/libid3tag-$(LIBID3TAG_VERSION).tar.gz
-LIBMAD_VERSION=0.15.0b
-LIBMAD_URL=ftp://ftp.mars.org/pub/mpeg/libmad-$(LIBMAD_VERSION).tar.gz
+LIBMAD_VERSION=0.14.2b
+LIBMAD_URL=ftp://ftp.mars.org/pub/mpeg/mad-$(LIBMAD_VERSION).tar.gz
 OGG_VERSION=1.1
 OGG_URL=http://www.vorbis.com/files/1.0.1/unix/libogg-$(OGG_VERSION).tar.gz
 OGG_CVSROOT=:pserver:anoncvs@xiph.org:/usr/local/cvsroot
@@ -85,7 +85,7 @@ LIBDVBPSI_URL=http://download.videolan.org/pub/libdvbpsi/$(LIBDVBPSI_VERSION)/li
 LIVEDOTCOM_VERSION=2003.11.06
 LIVEDOTCOM_URL=http://download.videolan.org/pub/testing/contrib/live.$(LIVEDOTCOM_VERSION).tar.gz
 GOOMDJ_URL=http://sidekick.student.utwente.nl/videolan/goom-dj.tar.gz
-LIBCACA_VERSION=0.6
+LIBCACA_VERSION=0.7
 LIBCACA_URL=http://sam.zoy.org/projects/libcaca/libcaca-$(LIBCACA_VERSION).tar.gz
 
 
