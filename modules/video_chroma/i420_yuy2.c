@@ -30,6 +30,10 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 
+#ifdef HAVE_ALTIVEC_H
+#   include <altivec.h>
+#endif
+
 #include "i420_yuy2.h"
 
 #define SRC_FOURCC  "I420,IYUV,YV12"

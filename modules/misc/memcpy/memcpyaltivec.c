@@ -2,7 +2,7 @@
  * memcpyaltivec.c : AltiVec memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpyaltivec.c,v 1.4 2003/12/22 14:32:56 sam Exp $
+ * $Id$
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -30,6 +30,10 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
+
+#ifdef HAVE_ALTIVEC_H
+#   include <altivec.h>
+#endif
 
 /*****************************************************************************
  * Local prototypes.
