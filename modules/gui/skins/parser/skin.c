@@ -28,7 +28,7 @@
 #line 31 "skin.act"
 
         
-            #include "../parser/wrappers.h"
+            #include "wrappers.h"
         
     
 void STag_Bitmap(void)

@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.58 2003/06/27 13:38:54 sam Exp $
+ * $Id: configuration.c,v 1.59 2003/07/18 20:06:00 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1294,7 +1294,6 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
 
             free( p_longopts );
             free( psz_shortopts );
-            if( b_ignore_errors ) free( ppsz_argv );
             return -1;
         }
     }
