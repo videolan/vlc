@@ -221,6 +221,7 @@ struct sout_mux_sys_t
     mtime_t             i_pcr;  /* last PCR emited */
 
     csa_t               *csa;
+    vlc_bool_t          b_crypt_audio;
 };
 
 
@@ -374,10 +375,10 @@ static int Open( vlc_object_t *p_this )
             p_sys->i_pcr_delay = 30000;
         }
     }
-    p_sys->b_use_key_frames = 0;
+    p_sys->b_use_key_frames = VLC_FALSE;
     if( sout_cfg_find( p_mux->p_cfg, "use-key-frames" ) )
     {
-        p_sys->b_use_key_frames = 1;
+        p_sys->b_use_key_frames = VLC_TRUE;
     }
 
     p_sys->i_dts_delay = 200000;
@@ -406,16 +407,10 @@ static int Open( vlc_object_t *p_this )
         }
         else
         {
-            /* Avoid using strtoll */
-            uint64_t i_ck;
+            uint64_t i_ck = strtoll( val, NULL, 16 );
             uint8_t  ck[8];
             int      i;
 
-            ck[0] = val[8];
-            val[8] = 0;
-            i_ck = ((int64_t)strtol( val, NULL, 16 )) << 32;
-            val[8] = ck[0];
-            i_ck += (uint64_t)strtol( &val[8], NULL, 16 );
             for( i = 0; i < 8; i++ )
             {
                 ck[i] = ( i_ck >> ( 56 - 8*i) )&0xff;
@@ -428,6 +423,12 @@ static int Open( vlc_object_t *p_this )
             csa_SetCW( p_sys->csa, ck, ck );
         }
     }
+    p_sys->b_crypt_audio = VLC_TRUE;
+    if( sout_cfg_find( p_mux->p_cfg, "no-crypt-audio" ) )
+    {
+        p_sys->b_crypt_audio = VLC_FALSE;
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -921,12 +922,14 @@ static int Mux( sout_mux_t *p_mux )
             int         i_stream;
             mtime_t     i_dts;
             ts_stream_t *p_stream;
+            sout_input_t *p_input;
             block_t *p_ts;
             vlc_bool_t   b_pcr;
 
             /* Select stream (lowest dts) */
             for( i = 0, i_stream = -1, i_dts = 0; i < p_mux->i_nb_inputs; i++ )
             {
+                p_input = p_mux->pp_inputs[i];
                 p_stream = (ts_stream_t*)p_mux->pp_inputs[i]->p_sys;
 
                 if( p_stream->i_pes_dts == 0 )
@@ -958,7 +961,8 @@ static int Mux( sout_mux_t *p_mux )
 
             /* Build the TS packet */
             p_ts = TSNew( p_mux, p_stream, b_pcr );
-            if( p_sys->csa )
+            if( p_sys->csa != NULL &&
+                 (p_input->p_fmt->i_cat != AUDIO_ES || p_sys->b_crypt_audio) )
             {
                 p_ts->i_flags |= SOUT_BUFFER_FLAGS_PRIVATE_CSA;
             }
