@@ -25,6 +25,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
 OutFile ..\vlc-${VERSION}-win32.exe
+SetCompressor bzip2
 
 Name "VLC media player"
 Caption "VLC '${VERSION}' for Win32 Setup"
@@ -33,6 +34,7 @@ Caption "VLC '${VERSION}' for Win32 Setup"
 CRCCheck on
 
 InstallDir "$PROGRAMFILES\VideoLAN\VLC"
+
 ; check if the program has already been installed, if so, take this dir
 ; as install dir
 InstallDirRegKey HKLM SOFTWARE\VideoLAN\VLC "Install_Dir"
@@ -46,7 +48,7 @@ SetDatablockOptimize on
 SetDateSave off
 SetCompress auto
 
-UninstallText "This will uninstall the VLC media player. Hit next to continue."
+UninstallText "This will uninstall the VLC media player."
 
 ;;;;;;;;;;;;;;;;;;;;
 ; Install settings ;
@@ -65,8 +67,18 @@ Section "Install"
 
 	CreateDirectory "$SMPROGRAMS\VideoLAN"
 	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc.lnk" "$INSTDIR\vlc.exe" 
+	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc (wxwindows).lnk" \
+                       "$INSTDIR\vlc.exe" "--intf wxwin"
+	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc (skins).lnk" \
+                       "$INSTDIR\vlc.exe" "--intf skins"
 	CreateShortCut "$SMPROGRAMS\VideoLAN\FAQ.lnk" "$INSTDIR\FAQ.htm"
-	CreateShortCut "$SMPROGRAMS\VideoLAN\Uninstall VLC.lnk" "$INSTDIR\uninstall.exe"
+
+        WriteRegStr HKLM \
+            SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\VideoLAN \
+            "DisplayName" "VideoLAN VLC media player"
+        WriteRegStr HKLM \
+            SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\VideoLAN \
+            "UninstallString" '"$INSTDIR\uninstall.exe"'
 	WriteUninstaller "uninstall.exe"
 
 	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "Install_Dir" $INSTDIR
@@ -80,16 +92,9 @@ SectionEnd
 ;;;;;;;;;;;;;;;;;;;;;;
 
 Section "Uninstall"
-	Delete $SMPROGRAMS\VideoLAN\*
-	RMDir $SMPROGRAMS\VideoLAN
-	Delete $INSTDIR\share\*
-	RMDir $INSTDIR\share
-	Delete $INSTDIR\plugins\*
-	RMDir $INSTDIR\plugins
-	Delete $INSTDIR\locale\*
-	RMDir $INSTDIR\locale
-	Delete $INSTDIR\*
-	RMDir $INSTDIR
+	RMDir /r $SMPROGRAMS\VideoLAN
+	RMDir /r $INSTDIR
 	DeleteRegKey HKLM SOFTWARE\VideoLAN
+        DeleteRegKey HKLM \
+            Software\Microsoft\Windows\CurrentVersion\Uninstall\VideoLAN
 SectionEnd
-

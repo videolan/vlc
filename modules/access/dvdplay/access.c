@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.15 2003/03/24 17:15:29 gbazin Exp $
+ * $Id: access.c,v 1.16 2003/04/05 12:32:19 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -524,8 +524,12 @@ static int dvdNewArea( input_thread_t * p_input, input_area_t * p_area )
         input_AddProgram( p_input, i+1, 0 );
     }
 
-    dvdplay_SetProgram( p_input,
-                        p_input->stream.pp_programs[i_angle-1] );
+    if( i_angle )
+        dvdplay_SetProgram( p_input,
+                            p_input->stream.pp_programs[i_angle-1] );
+    else
+        dvdplay_SetProgram( p_input,
+                            p_input->stream.pp_programs[0] );
 
     /* No PSM to read in DVD mode, we already have all information */
     p_input->stream.p_selected_program->b_is_ok = 1;
