@@ -2,7 +2,7 @@
  * file.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.9 2003/09/07 20:08:31 fenrir Exp $
+ * $Id: file.c,v 1.10 2003/12/04 12:33:43 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -48,6 +48,9 @@
 #endif
 #ifndef S_IROTH
 #   define S_IROTH 0
+#endif
+#ifndef STDOUT_FILENO
+#   define STDOUT_FILENO 1
 #endif
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_rgb.c,v 1.4 2003/08/29 18:58:05 fenrir Exp $
+ * $Id: i420_rgb.c,v 1.5 2003/12/04 12:33:43 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -122,7 +122,9 @@ static int Activate( vlc_object_t *p_this )
                     p_vout->chroma.pf_convert = E_(I420_RGB16);
                     break;
 
-                case VLC_FOURCC('R','V','2','4'):
+#ifndef WIN32 /* Hmmm, is there only X11 using 32bits per pixel for RV24 ? */
+		case VLC_FOURCC('R','V','2','4'):
+#endif
                 case VLC_FOURCC('R','V','3','2'):
 #if defined (MODULE_NAME_IS_i420_rgb_mmx)
                     /* If we don't have support for the bitmasks, bail out */

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.50 2003/11/27 00:05:51 sam Exp $
+##  $Id: toolbox,v 1.51 2003/12/04 12:33:42 gbazin Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -158,7 +158,7 @@ then
   LIBVLC_PKG_HEADERS=`getfiles dist_pkginclude_HEADERS`
 
   # Clean up
-  rm -f evc/*.vcp msvc/*.dsp
+  rm -f evc/*.vcp msvc/*.dsp msvc/*.vcproj msvc/*.sln msvc/*.ncb
 
   # config files
   for target in evc/config.h msvc/config.h
@@ -193,6 +193,7 @@ EOF
 EOF
       for file in `for i in ${LIBVLC_SOURCES} ; do echo $i ; done | grep "/${subdir}/"`
       do
+      subdir="`echo ${file} | sed -e 's%/[^/]*$%/%' | sed -e 's%/%\\\\%g'`"
       if test "${target}" = "evc/libvlc.vcp"
       then
         cat >> ${target} << EOF
@@ -304,6 +305,12 @@ EOF
 # Begin Source File${M}
 SOURCE="..\\modules\\`echo ${dir}/${cfile} | sed 's,/,\\\\,g'`"${M}
 # ADD CPP /D "__VLC__" /D "__PLUGIN__"  /D "MODULE_NAME=${mod}" /D "MODULE_NAME_IS_${mod}" ${M}
+!IF "\$(CFG)" == "plugin_${mod} - Win32 Release"${M}
+# PROP Output_Dir "Release\\modules\\`echo ${dir} | sed 's,/,\\\\,g'`"${M}
+# PROP Intermediate_Dir "Release\\modules\\`echo ${dir} | sed 's,/,\\\\,g'`"${M}
+!ELSEIF "\$(CFG)" == "plugin_${mod} - Win32 Debug"${M}
+# PROP Output_Dir "Debug\\modules\\`echo ${dir} | sed 's,/,\\\\,g'`"${M}
+# PROP Intermediate_Dir "Debug\\modules\\`echo ${dir} | sed 's,/,\\\\,g'`"${M}
 # End Source File${M}
 EOF
         done
