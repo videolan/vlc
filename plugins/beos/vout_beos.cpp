@@ -5,6 +5,7 @@
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
+ *          Tony Castley <tcastley@mail.powerup.com.au>
  *          Richard Shepherd <richard@rshepherd.demon.co.uk>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -219,9 +220,11 @@ VideoWindow::~VideoWindow()
     Hide();
     Sync();
     wait_for_thread(fDrawThreadID, &result);
-    delete bitmap[0];
     if(!fUsingOverlay)
+    	{
+    	delete bitmap[0];
     	delete bitmap[1];
+    	}
  }
 
 
@@ -424,6 +427,7 @@ int vout_Init( vout_thread_t *p_vout )
     	{
 	    vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
     	                 (byte_t *)p_win->bitmap[0]->Bits());
+    	delete p_win->bitmap[0];
     	}
     else
    		{

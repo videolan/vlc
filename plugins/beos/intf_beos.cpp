@@ -2,10 +2,12 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.13 2001/03/05 01:29:25 sam Exp $
+ * $Id: intf_beos.cpp,v 1.14 2001/03/05 13:28:47 richards Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
+ *          Tony Castley <tcastley@mail.powerup.com.au>
+ *          Richard Shepherd <richard@rshepherd.demon.co.uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

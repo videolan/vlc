@@ -4,6 +4,8 @@
  * Copyright (C) 1999, 2000, 2001 VideoLAN
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
+ *          Tony Castley <tcastley@mail.powerup.com.au>
+ *          Richard Shepherd <richard@rshepherd.demon.co.uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
