@@ -4,6 +4,7 @@
 
 HEAD
 
+  * ./vlc.spec: imported MandrakeSoft's enhancements.
   * ./doc/developer/decoders.xml: fixed a typo preventing compilation.
   * ./plugins/aa/aa.c: we now parse the AAOPTS environment variable.
   * ./plugins/aa/aa.c: a few simplifications in the code.
