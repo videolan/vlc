@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.8 2003/03/15 00:09:31 fenrir Exp $
+ * $Id: httpd.c,v 1.9 2003/03/17 23:42:12 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -734,7 +734,7 @@ static httpd_stream_t  *_RegisterStream( httpd_sys_t *p_httpt,
     p_stream->pf_get          = NULL;
     p_stream->pf_post         = NULL;
 
-    p_stream->i_buffer_size   = 1024*1024*10;
+    p_stream->i_buffer_size   = 1024*1024;
     p_stream->i_buffer_pos      = 0;
     p_stream->i_buffer_last_pos = 0;
     p_stream->p_buffer        = malloc( p_stream->i_buffer_size );
@@ -863,7 +863,7 @@ static int             _SendStream( httpd_sys_t *p_httpt, httpd_stream_t *p_stre
     {
         int i_copy;
 
-        i_copy = __MIN( i_data, p_stream->i_buffer_size - i_pos );
+        i_copy = __MIN( i_count, p_stream->i_buffer_size - i_pos );
 
         memcpy( &p_stream->p_buffer[i_pos],
                 p_data,

@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.21 2003/03/15 19:26:13 fenrir Exp $
+ * $Id: stream_output.c,v 1.22 2003/03/17 23:42:12 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -243,9 +243,13 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
     /* *** remove all muxer *** */
     for( i = 0; i < p_sout->i_nb_mux; i++ )
     {
+        sout_access_out_t *p_access;
 #define p_mux p_sout->pp_mux[i]
+
+        p_access = p_mux->p_access;
+
         MuxDelete( p_mux );
-        sout_AccessOutDelete( p_mux->p_access );
+        sout_AccessOutDelete( p_access );
 #undef  p_mux
     }
     FREE( p_sout->pp_mux );
