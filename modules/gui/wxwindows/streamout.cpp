@@ -495,7 +495,7 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
                                    wxString::Format(wxT("%d"), val),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
-                                   0, 16000, val );
+                                   0, 65535, val );
 
         subpanel_sizer->Add( label, 0,
                              wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );

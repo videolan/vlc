@@ -720,7 +720,7 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
                                    wxString::Format(wxT("%d"), i_net_ports[0]),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
-                                   0, 16000, i_net_ports[0] );
+                                   0, 65535, i_net_ports[0] );
 
     subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subpanel_sizer->Add( net_ports[0], 1,
@@ -748,7 +748,7 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
                                    wxString::Format(wxT("%d"), i_net_ports[1]),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
-                                   0, 16000, i_net_ports[1] );
+                                   0, 65535, i_net_ports[1] );
 
     subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subpanel_sizer->Add( net_ports[1], 1,
