@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.70 2003/11/08 18:23:40 titer Exp $
+ * $Id: configuration.c,v 1.71 2003/11/11 21:23:56 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1120,6 +1120,8 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 if( p_item->psz_text )
                     fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              _("key") );
+                if( p_item->i_value == p_item->i_value_orig )
+                    fprintf( file, "#" );
                 psz_key = ConfigKeyToString( p_item->i_value );
                 fprintf( file, "%s=%s\n", p_item->psz_name,
                          psz_key ? psz_key : "" );
