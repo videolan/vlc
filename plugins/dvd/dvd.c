@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: dvd.c,v 1.7 2001/04/15 04:19:57 sam Exp $
+ * $Id: dvd.c,v 1.8 2001/04/16 13:00:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -116,4 +116,24 @@ MODULE_DEACTIVATE
 
     return( 0 );
 }
+
+#ifdef HAVE_CSS
+#else /* HAVE_CSS */
+#ifdef BUILTIN
+int module_dvd_InitModule( module_t *p_module )
+{
+    module_dvdnocss_InitModule( p_module );
+}
+
+int module_dvd_ActivateModule( module_t *p_module )
+{
+    module_dvdnocss_ActivateModule( p_module );
+}
+
+int module_dvd_DeactivateModule( module_t *p_module )
+{
+    module_dvdnocss_DeactivateModule( p_module );
+}
+#endif /* BUILTIN */
+#endif /* HAVE_CSS */
 

@@ -3,8 +3,6 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
--include ../../Makefile.modules
-
 #
 # Objects
 #
@@ -28,7 +26,7 @@ ALL_OBJ = $(PLUGIN_C) $(BUILTIN_MOTION) $(BUILTIN_MOTIONMMX) $(BUILTIN_MOTIONMMX
 # Virtual targets
 #
 
-include ../../Makefile.common
+include ../../Makefile.modules
 
 $(BUILTIN_MOTION): BUILTIN_MOTION_%.o: .dep/%.d
 $(BUILTIN_MOTION): BUILTIN_MOTION_%.o: %.c

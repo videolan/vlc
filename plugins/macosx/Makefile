@@ -3,8 +3,6 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
--include ../../Makefile.modules
-
 #
 # Objects
 #
@@ -18,7 +16,7 @@ ALL_OBJ = $(PLUGIN_MACOSX) $(BUILTIN_MACOSX)
 # Virtual targets
 #
 
-include ../../Makefile.common
+include ../../Makefile.modules
 
 $(PLUGIN_MACOSX): %.o: .dep/%.d
 $(PLUGIN_MACOSX): %.o: %.c

@@ -3,8 +3,6 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
--include ../../Makefile.modules
-
 #
 # Objects
 #
@@ -34,7 +32,7 @@ ALL_OBJ = $(PLUGIN_C) $(PLUGIN_IDCTALTIVEC) $(BUILTIN_IDCT) $(BUILTIN_IDCTCLASSI
 # Virtual targets
 #
 
-include ../../Makefile.common
+include ../../Makefile.modules
 
 $(PLUGIN_IDCTALTIVEC): %.o: .dep/%.d
 $(PLUGIN_IDCTALTIVEC): %.o: %.c

@@ -160,7 +160,8 @@ export
 all: vlc ${ALIASES} plugins vlc.app
 
 clean:
-	for d in $(PLUGINS_DIR) ; do ( cd plugins/$${d} && $(MAKE) clean ) ; done
+	for dir in $(PLUGINS_DIR) ; do \
+		( cd plugins/$${dir} && $(MAKE) clean ) ; done
 	rm -f plugins/*/*.o plugins/*/*.moc plugins/*/*.bak
 	rm -f $(C_OBJ) $(CPP_OBJ)
 	rm -f src/*/*.o extras/*/*.o
@@ -169,7 +170,7 @@ clean:
 
 distclean: clean
 	rm -f **/*.o **/*~ *.log
-	rm -f Makefile.opts Makefile.modules
+	rm -f Makefile.opts
 	rm -f include/defs.h include/config.h include/modules_builtin.h
 	rm -f config.status config.cache config.log
 	rm -f gmon.out core build-stamp
@@ -226,12 +227,12 @@ snapshot:
 		done
 	# copy misc files
 	cp vlc.spec AUTHORS COPYING ChangeLog INSTALL README TODO todo.pl \
-		Makefile.opts.in Makefile.dep Makefile.modules.in \
+		Makefile.opts.in Makefile.dep Makefile.modules \
 		configure configure.in install-sh config.sub config.guess \
 			/tmp/vlc-${PROGRAM_VERSION}/
 	for file in control control-css vlc-gtk.menu vlc.copyright vlc.docs \
-		changelog changelog-css rules rules-css vlc.dirs \
-		vlc.menu ; do \
+		changelog changelog-css rules rules-css vlc.dirs vlc.desktop \
+		gvlc.desktop gnome-vlc.desktop vlc.menu ; do \
 			cp debian/$$file /tmp/vlc-${PROGRAM_VERSION}/debian/ ; \
 		done
 	for file in default8x16.psf default8x9.psf vlc_beos.rsrc vlc.icns ; do \

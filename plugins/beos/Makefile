@@ -3,8 +3,6 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
--include ../../Makefile.modules
-
 #
 # Objects
 #
@@ -18,7 +16,7 @@ ALL_OBJ = $(PLUGIN_CPP) $(BUILTIN_CPP)
 # Virtual targets
 #
 
-include ../../Makefile.common
+include ../../Makefile.modules
 
 #
 # Real targets

@@ -3,8 +3,6 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
--include ../../Makefile.modules
-
 #
 # Objects
 #
@@ -18,7 +16,7 @@ ALL_OBJ = $(PLUGIN_QT) $(BUILTIN_QT)
 # Virtual targets
 #
 
-include ../../Makefile.common
+include ../../Makefile.modules
 
 $(PLUGIN_QT): %.o: .dep/%.dpp
 $(PLUGIN_QT): %.o: %.moc

@@ -4,8 +4,15 @@
 
 HEAD
 
+  * Nothing yet.
+
+0.2.72
+Mon, 16 Apr 2001 14:33:53 +0200
+
+  * New improved packet allocator.
   * Additional Makefile cleaning for built-in modules.
   * Fixed Makefile for Solaris target.
+  * Fixed the 0.2.71 IFO parsing bug.
   * All Debian packages are now lintian-clean.
   * Fixed XVideo plugin linking.
   * Updated TODO list.

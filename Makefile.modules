@@ -5,6 +5,32 @@
 # This file should be included by all module Makefiles
 ###############################################################################
 
+#
+# C headers directories
+#
+CFLAGS := -I../../include -I../../extras $(CFLAGS)
+
+#
+# C compiler flags: plugin compilation
+#
+PCFLAGS += -fPIC
+
+#
+# C compiler flags: plugin linking
+#
+ifneq (,$(findstring darwin,$(SYS)))
+PLCFLAGS += -bundle -undefined suppress
+else
+ifeq ($(SYS),beos)
+PLCFLAGS += -nostart ../../lib/_APP_
+else
+PLCFLAGS += -shared
+endif
+endif
+
+# 
+# Standard dependencies
+#
 C_DEP := $(ALL_OBJ:%.o=.dep/%.d)
 
 CPP_DEP := $(ALL_OBJ:%.o=.dep/%.dpp)

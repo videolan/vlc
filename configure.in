@@ -4,7 +4,7 @@ AC_CONFIG_HEADER(include/defs.h)
 
 AC_CANONICAL_HOST
 
-VLC_VERSION=0.2.71
+VLC_VERSION=0.2.72
 AC_SUBST(VLC_VERSION)
 VLC_CODENAME=Ourumov
 AC_SUBST(VLC_CODENAME)
@@ -443,7 +443,7 @@ AC_SUBST(LIB_X11)
 AC_SUBST(LIB_XVIDEO)
 AC_SUBST(LIB_YUV)
 
-AC_OUTPUT([Makefile.opts Makefile.modules include/config.h])
+AC_OUTPUT([Makefile.opts include/config.h])
 
 echo "
 vlc configuration
