@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.52 2004/01/13 01:54:54 fenrir Exp $
+ * $Id: mp4.c,v 1.53 2004/01/18 06:33:21 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -112,6 +112,7 @@ static int Open( vlc_object_t * p_this )
         case FOURCC_free:
         case FOURCC_skip:
         case FOURCC_wide:
+        case VLC_FOURCC( 'p', 'n', 'o', 't' ):
             break;
          default:
             msg_Warn( p_input, "MP4 plugin discarded (not a valid file)" );
