@@ -61,6 +61,7 @@
   <Bitmap id="previous_disabled" file="previous_disabled.png" alphacolor="#FF0000"/>
   <Bitmap id="previous_onclick" file="previous_onclick.png" alphacolor="#FF0000"/>
   <Bitmap id="reduce" file="reduce.png" alphacolor="#FF0000"/>
+  <Bitmap id="reduce_mouseover" file="reduce_mouseover.png" alphacolor="#FF0000"/>
   <Bitmap id="reduce_onclick" file="reduce_onclick.png" alphacolor="#FF0000"/>
   <Bitmap id="reduce_disabled" file="reduce_disabled.png" alphacolor="#FF0000"/>
   <Bitmap id="slider" file="slider.png" alphacolor="#FF0000"/>
@@ -95,7 +96,7 @@
       <Button x="196" y="46" up="previous" down="previous_onclick" over="previous" action="playlist.previous()" tooltiptext="Previous Item"/>
       <Button x="196" y="79" up="next" down="next_onclick" over="next" action="playlist.next()" tooltiptext="Next Item"/>
       <Button x="8" y="5" up="close" down="close_onclick" over="close_mouseover" action="vlc.quit()" tooltiptext="Quit VLC" help="quit"/>
-      <Image x="29" y="5" image="reduce_disabled"/>
+      <Button x="29" y="5" up="reduce" down="reduce_onclick" over="reduce_mouseover" action="vlc.minimize()" tooltiptext="Minimize VLC" help="quit"/>
       <Slider id="time_slider" x="24" y="130" up="slider" down="slider_onclick" points="(0,0),(366,0)" value="time" visible="vlc.isSeekable and not vlc.isStopped" tooltiptext="Time: $T"/>
       <Slider id="volume_slider" x="391" y="53" up="slider_volume" down="slider_volume_onclick" points="(0,47),(0,0)" value="volume" tooltiptext="Volume: $V%"/>
     </Group>
