@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.70 2003/11/18 22:08:07 gbazin Exp $
+ * $Id: input_dec.c,v 1.71 2003/11/18 22:48:46 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -554,7 +554,7 @@ static int DecoderThread( decoder_t * p_dec )
                               p_dec->p_owner->p_aout_input, p_aout_buf );
             }
         }
-        else
+        else if( p_dec->fmt_in.i_cat == VIDEO_ES )
         {
             picture_t *p_pic;
 
@@ -564,8 +564,24 @@ static int DecoderThread( decoder_t * p_dec )
                 vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
             }
         }
+        else if( p_dec->fmt_in.i_cat == SPU_ES )
+        {
+            p_dec->pf_decode_sub( p_dec, &p_block );
+        }
+        else
+        {
+            msg_Err( p_dec, "unknown ES format !!" );
+            p_dec->p_fifo->b_error = 1;
+            break;
+        }
 
         input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
+    }
+
+    while( !p_dec->p_fifo->b_die )
+    {
+        /* Trash all received PES packets */
+        input_ExtractPES( p_dec->p_fifo, NULL );
     }
 
     return 0;
