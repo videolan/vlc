@@ -5,7 +5,7 @@
 noinst_LIBRARIES = $(noinst_LIBRARIES_mozilla)
 	                                     
 MOSTLYCLEANFILES = $(LIBRARIES_mozilla)
-EXTRA_DIST = $(SOURCES_mozilla) vlcintf.idl
+EXTRA_DIST = $(SOURCES_mozilla) $(DIST_rsrc) vlcintf.idl
 BUILT_SOURCES = $(BUILT_SOURCES_mozilla)
 
 SOURCES_mozilla = \
@@ -18,6 +18,10 @@ SOURCES_mozilla = \
 	$(SOURCES_win32) \
 	$(SOURCES_macosx) \
 	$(SOURCES_unix) \
+	$(NULL)
+
+DIST_rsrc = \
+	npvlc_rc.rc \
 	$(NULL)
 
 # Under Win32, Mozilla plugins need to be named NP******.DLL, but under Unix
