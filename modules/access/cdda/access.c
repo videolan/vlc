@@ -449,7 +449,10 @@ int E_(CDDAOpen)( vlc_object_t *p_this )
     free( p_cdda );
  error2:
     free( psz_source );
-    vlc_object_release( p_cdda->p_input );
+    if( p_cdda && p_cdda->p_input )
+    {
+        vlc_object_release( p_cdda->p_input );
+    }
     return i_rc;
 
 }
