@@ -1585,6 +1585,7 @@ static int UpdateFromAccess( input_thread_t *p_input )
             }
 
             UpdateMeta( p_input );
+            var_SetBool( p_input, "item-change", p_input->input.p_item->i_id );
         }
         p_access->info.i_update &= ~INPUT_UPDATE_META;
     }

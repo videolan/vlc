@@ -157,6 +157,10 @@ void Timer::Notify()
             /* New input or stream map change */
             p_intf->p_sys->b_playing = 1;
 
+            /* Update the item name */
+            p_main_interface->statusbar->SetStatusText(
+                wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
+
             /* Manage the slider */
             /* FIXME --fenrir */
             /* Change the name of b_old_seekable into b_show_bar or something like that */
