@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.9 2003/04/21 16:22:43 gbazin Exp $
+ * $Id: ipv6.c,v 1.10 2003/06/06 11:09:24 gbazin Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -132,7 +132,9 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
     else if( psz_address[0] == '['
               && psz_address[strlen(psz_address) - 1] == ']' )
     {
+        psz_address[strlen(psz_address) - 1] = '\0';
         psz_address++;
+
         /* see if there is an interface name in there... */
         if( (psz_multicast_interface = strchr(psz_address, '%')) != NULL )
         {
@@ -142,17 +144,14 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
                              psz_multicast_interface );
 
             /* now convert that interface name to an index */
-#if __GLIBC__ > 2 || __GLIBC__ == 2 && __GLIBC_MINOR__ >= 2
-#   if !defined( WIN32 )
+#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2)
             p_socket->sin6_scope_id = if_nametoindex(psz_multicast_interface);
-#   else
-            /* FIXME: for now we always use the default interface */
-            p_socket->sin6_scope_id = 0;
-#   endif
-            msg_Warn( p_this, " = #%i", p_socket->sin6_scope_id );
+#elif defined( WIN32 )
+            /* FIXME ?? */
+            p_socket->sin6_scope_id = atol(psz_multicast_interface);
 #endif
+            msg_Dbg( p_this, " = #%i", p_socket->sin6_scope_id );
         }
-        psz_address[strlen(psz_address) - 1] = '\0' ;
 
 #if !defined( WIN32 )
         inet_pton(AF_INET6, psz_address, &p_socket->sin6_addr.s6_addr); 
@@ -272,7 +271,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         msg_Warn( p_this, "cannot configure socket (SO_RCVBUF: %s)",
                           strerror(errno) );
     }
- 
+
     /* Check if we really got what we have asked for, because Linux, etc.
      * will silently limit the max buffer size to net.core.rmem_max which
      * is typically only 65535 bytes */
@@ -289,7 +288,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         msg_Warn( p_this, "socket buffer size is 0x%x instead of 0x%x",
                           i_opt, 0x80000 );
     }
-    
+
     /* Build the local socket */
     if ( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )        
     {
@@ -316,9 +315,9 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
                               "(SO_BROADCAST: %s)", strerror(errno) );
         }
     }
- 
+
     /* Join the multicast group if the socket is a multicast address */
-#if __GLIBC__ > 2 || __GLIBC__ == 2 && __GLIBC_MINOR__ >= 2
+#if defined(WIN32) || __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2)
     if( IN6_IS_ADDR_MULTICAST(&sock.sin6_addr) )
     {
         struct ipv6_mreq     imr;
@@ -348,7 +347,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
             close( i_handle );
             return( -1 );
         }
- 
+
         /* Connect the socket */
         if( connect( i_handle, (struct sockaddr *) &sock,
                      sizeof( sock ) ) == (-1) )
