@@ -2,7 +2,7 @@
  * intf_playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_playlist.c,v 1.7 2001/05/30 17:03:12 sam Exp $
+ * $Id: intf_playlist.c,v 1.8 2001/08/09 08:20:26 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -164,11 +164,11 @@ void intf_PlaylistNext( playlist_t * p_playlist )
 void intf_PlaylistPrev( playlist_t * p_playlist )
 {
     vlc_mutex_lock( &p_playlist->change_lock );
-    p_playlist->i_mode = -p_playlist->i_mode;
     
-    NextItem( p_playlist );
-
     p_playlist->i_mode = -p_playlist->i_mode;
+    NextItem( p_playlist );
+    p_playlist->i_mode = -p_playlist->i_mode;
+
     vlc_mutex_unlock( &p_playlist->change_lock );
 }
 

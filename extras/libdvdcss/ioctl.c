@@ -2,11 +2,12 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.8 2001/08/08 02:48:44 sam Exp $
+ * $Id: ioctl.c,v 1.9 2001/08/09 08:20:26 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
+ *          Håkan Hjort <d95hjort@dtek.chalmers.se>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

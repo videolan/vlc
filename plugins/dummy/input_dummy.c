@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dummy.c,v 1.4 2001/07/26 03:13:30 sam Exp $
+ * $Id: input_dummy.c,v 1.5 2001/08/09 08:20:26 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,6 +45,7 @@
 
 #include "interface.h"
 #include "intf_msg.h"
+#include "intf_playlist.h"
 
 #include "main.h"
 
@@ -139,8 +140,16 @@ static void DummyOpen( input_thread_t * p_input )
     /* Check for a "vlc:quit" command */
     if( i_len == 4 && !strncasecmp( psz_name, "quit", 4 ) )
     {
-        intf_WarnMsg( 1, "input: playlist command `quit'" );
+        intf_WarnMsg( 2, "input: command `quit'" );
         p_main->p_intf->b_die = 1;
+        return;
+    }
+
+    /* Check for a "vlc:loop" command */
+    if( i_len == 4 && !strncasecmp( psz_name, "loop", 4 ) )
+    {
+        intf_WarnMsg( 2, "input: command `loop'" );
+        intf_PlaylistJumpto( p_main->p_playlist, -1 );
         return;
     }
 
@@ -149,13 +158,13 @@ static void DummyOpen( input_thread_t * p_input )
     {
         i_arg = atoi( psz_name + 6 );
 
-        intf_WarnMsgImm( 1, "input: playlist command `pause %i'", i_arg );
+        intf_WarnMsgImm( 2, "input: command `pause %i'", i_arg );
 
         msleep( i_arg * 1000000 );
         return;
     }
 
-    intf_ErrMsg( "input error: unknown playlist command `%s'", psz_name );
+    intf_ErrMsg( "input error: unknown command `%s'", psz_name );
 
 }
 

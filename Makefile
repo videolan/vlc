@@ -90,8 +90,8 @@ endif
 #
 # Misc variables
 #
-VLC_QUICKVERSION := $(shell grep 'VLC_VERSION=' configure.in | cut -f2 -d=)
-LIBDVDCSS_QUICKVERSION := $(shell grep 'LIBDVDCSS_VERSION=' configure.in | cut -f2 -d=)
+VLC_QUICKVERSION := $(shell grep '^ *VLC_VERSION=' configure.in | cut -f2 -d=)
+LIBDVDCSS_QUICKVERSION := $(shell grep '^ *LIBDVDCSS_VERSION=' configure.in | cut -f2 -d=)
 
 
 # All symbols must be exported
@@ -200,87 +200,94 @@ libdvdcss-uninstall:
 #
 # Package generation rules
 #
-snapshot-common: clean
-	rm -Rf /tmp/vlc
-	# Copy directory structure in /tmp
-	find -type d | grep -v CVS | grep -v '\.dep' | while read i ; \
-		do mkdir -p /tmp/vlc/$$i ; \
+snapshot-common:
+	# Check that tmp isn't in the way
+	@if test -e tmp; then \
+		echo "Error: please remove ./tmp, it is in the way"; false; \
+	else \
+		echo "OK."; mkdir tmp; \
+	fi
+	# Copy directory structure in tmp
+	find -type d | grep -v '\(\.dep\|snapshot\|CVS\)' | while read i ; \
+		do mkdir -p tmp/vlc/$$i ; \
 	done
 	find debian -mindepth 1 -maxdepth 1 -type d | \
-		while read i ; do rm -Rf /tmp/vlc/$$i ; done
+		while read i ; do rm -Rf tmp/vlc/$$i ; done
 	# Copy .c .h .in .cpp and .glade files
 	find include src plugins -type f -name '*.[chig]*' | while read i ; \
-		do cp $$i /tmp/vlc/$$i ; done
+		do cp $$i tmp/vlc/$$i ; done
 	# Copy plugin Makefiles
 	find plugins -type f -name Makefile | while read i ; \
-		do cp $$i /tmp/vlc/$$i ; done
+		do cp $$i tmp/vlc/$$i ; done
 	# Copy extra programs and documentation
-	cp -a extras/* /tmp/vlc/extras
-	cp -a doc/* /tmp/vlc/doc
-	find /tmp/vlc/extras /tmp/vlc/doc \
-		-type d -name CVS -o -type f -name '.*' | while read i ; \
-			do rm -Rf $$i ; done
+	cp -a extras/* tmp/vlc/extras
+	cp -a doc/* tmp/vlc/doc
+	find tmp/vlc/extras tmp/vlc/doc \
+		-type d -name CVS -o -name '.*' -o -name '*.[o]' | \
+			while read i ; do rm -Rf $$i ; done
 	# Copy misc files
 	cp vlc.spec AUTHORS COPYING TODO todo.pl ChangeLog README* INSTALL* \
 		Makefile Makefile.opts.in Makefile.dep Makefile.modules \
 		configure configure.in install-sh config.sub config.guess \
-			/tmp/vlc/
+			tmp/vlc/
 	# Copy Debian control files
 	for file in debian/*dirs debian/*docs debian/*menu debian/*desktop \
-		debian/*copyright ; do cp $$file /tmp/vlc/debian ; done
+		debian/*copyright ; do cp $$file tmp/vlc/debian ; done
 	for file in control changelog rules ; do \
-		cp debian/$$file /tmp/vlc/debian/ ; done
+		cp debian/$$file tmp/vlc/debian/ ; done
 	# Copy fonts and icons
 	for file in share/*png share/*xpm share/*psf ; do \
-		cp $$file /tmp/vlc/share ; done
+		cp $$file tmp/vlc/share ; done
 	for file in vlc_beos.rsrc vlc.icns gvlc_win32.ico vlc_win32_rc.rc ; do \
-			cp share/$$file /tmp/vlc/share/ ; done
+			cp share/$$file tmp/vlc/share/ ; done
 
 snapshot: snapshot-common
-	# Build archives and clean up
+	# Build archives
 	F=vlc-${VLC_QUICKVERSION}; \
-	rm -Rf /tmp/$$F ; mv /tmp/vlc /tmp/$$F; \
-	(cd /tmp ; tar cf $$F.tar $$F ; bzip2 -f -9 < $$F.tar > $$F.tar.bz2; \
-		gzip -f -9 $$F.tar ); mv /tmp/$$F.tar.gz /tmp/$$F.tar.bz2 ..; \
-	rm -Rf /tmp/$$F
+	mv tmp/vlc tmp/$$F; (cd tmp ; tar cf $$F.tar $$F); \
+	bzip2 -f -9 < tmp/$$F.tar > $$F.tar.bz2; \
+	gzip -f -9 tmp/$$F.tar ; mv tmp/$$F.tar.gz .
+	# Clean up
+	rm -Rf tmp
 
 snapshot-nocss: snapshot-common
 	# Remove libdvdcss
-	rm -Rf /tmp/vlc/extras/libdvdcss
-	rm -f /tmp/vlc/*.libdvdcss
+	rm -Rf tmp/vlc/extras/libdvdcss
+	rm -f tmp/vlc/*.libdvdcss
 	# Fix debian information
-	rm -f /tmp/vlc/debian/libdvdcss*
-	rm -f /tmp/vlc/debian/control
+	rm -f tmp/vlc/debian/libdvdcss*
+	rm -f tmp/vlc/debian/control
 	sed -e 's#^ DVDs# unencrypted DVDs#' < debian/control \
 		| awk '{if(gsub("Package: libdvdcss",$$0))a=1;if(a==0)print $$0;if(a==1&&$$0=="")a=0}' \
-		> /tmp/vlc/debian/control
-	rm -f /tmp/vlc/debian/rules
+		> tmp/vlc/debian/control
+	rm -f tmp/vlc/debian/rules
 	sed -e 's#^\(export LIBDVDCSS_FLAGS=\).*#\1"--without-dvdcss"#' < debian/rules \
 		| awk '{if($$0=="# libdvdcss start")a=1;if(a==0)print $$0;if($$0=="# libdvdcss stop")a=0}' \
-		> /tmp/vlc/debian/rules
-	chmod +x /tmp/vlc/debian/rules
-	# Build css-disabled archives and clean up
+		> tmp/vlc/debian/rules
+	chmod +x tmp/vlc/debian/rules
+	# Build css-disabled archives
 	F=vlc-${VLC_QUICKVERSION}; G=vlc-${VLC_QUICKVERSION}-nocss; \
-	rm -Rf /tmp/$$F ; mv /tmp/vlc /tmp/$$F; \
-	(cd /tmp ; tar cf $$G.tar $$F ; bzip2 -f -9 < $$G.tar > $$G.tar.bz2; \
-		gzip -f -9 $$G.tar ); mv /tmp/$$G.tar.gz /tmp/$$G.tar.bz2 ..; \
-	rm -Rf /tmp/$$F
+	mv tmp/vlc tmp/$$F; (cd tmp ; tar cf $$G.tar $$F); \
+	bzip2 -f -9 < tmp/$$G.tar > $$G.tar.bz2; \
+	gzip -f -9 tmp/$$G.tar ; mv tmp/$$G.tar.gz .
+	# Clean up
+	rm -Rf tmp
 
 libdvdcss-snapshot: snapshot-common
 	# Remove vlc sources and icons, doc, debian directory...
-	rm -Rf /tmp/vlc/src /tmp/vlc/share /tmp/vlc/plugins /tmp/vlc/doc
-	rm -Rf /tmp/vlc/extras/GNUgetopt /tmp/vlc/extras/MacOSX_app
-	rm -Rf /tmp/vlc/debian
+	rm -Rf tmp/vlc/src tmp/vlc/share tmp/vlc/plugins tmp/vlc/doc
+	rm -Rf tmp/vlc/extras/GNUgetopt tmp/vlc/extras/MacOSX_app
+	rm -Rf tmp/vlc/debian
 	# Remove useless headers
-	rm -f /tmp/vlc/include/*
+	rm -f tmp/vlc/include/*
 	for file in defs.h.in config.h.in common.h int_types.h ; \
-		do cp include/$$file /tmp/vlc/include/ ; done
+		do cp include/$$file tmp/vlc/include/ ; done
 	# Remove misc files (??? - maybe not really needed)
-	rm -f /tmp/vlc/vlc.spec /tmp/vlc/INSTALL-win32.txt
-	mv /tmp/vlc/INSTALL.libdvdcss /tmp/vlc/INSTALL
-	mv /tmp/vlc/README.libdvdcss /tmp/vlc/README
+	rm -f tmp/vlc/vlc.spec tmp/vlc/INSTALL-win32.txt
+	mv tmp/vlc/INSTALL.libdvdcss tmp/vlc/INSTALL
+	mv tmp/vlc/README.libdvdcss tmp/vlc/README
 	# Fix Makefile
-	rm -f /tmp/vlc/Makefile
+	rm -f tmp/vlc/Makefile
 	sed -e 's#^install:#install-unused:#' \
 		-e 's#^uninstall:#uninstall-unused:#' \
 		-e 's#^clean:#clean-unused:#' \
@@ -288,13 +295,14 @@ libdvdcss-snapshot: snapshot-common
 		-e 's#^libdvdcss-install:#install:#' \
 		-e 's#^libdvdcss-uninstall:#uninstall:#' \
 		-e 's#^libdvdcss-clean:#clean:#' \
-		< Makefile > /tmp/vlc/Makefile
-	# Build archives and clean up
+		< Makefile > tmp/vlc/Makefile
+	# Build archives
 	F=libdvdcss-${LIBDVDCSS_QUICKVERSION}; \
-	rm -Rf /tmp/$$F ; mv /tmp/vlc /tmp/$$F; \
-	(cd /tmp ; tar cf $$F.tar $$F ; bzip2 -f -9 < $$F.tar > $$F.tar.bz2; \
-		gzip -f -9 $$F.tar ); mv /tmp/$$F.tar.gz /tmp/$$F.tar.bz2 ..; \
-	rm -Rf /tmp/$$F
+	mv tmp/vlc tmp/$$F; (cd tmp ; tar cf $$F.tar $$F); \
+	bzip2 -f -9 < tmp/$$F.tar > $$F.tar.bz2; \
+	gzip -f -9 tmp/$$F.tar ; mv tmp/$$F.tar.gz .
+	# Clean up
+	rm -Rf tmp
 
 deb:
 	dpkg-buildpackage -rfakeroot -us -uc

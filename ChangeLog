@@ -4,7 +4,12 @@
 
 HEAD
 
-  * Solaris DVD decryption support by H}kan Hjort <d95hjort@dtek.chalmers.se>.
+  * Added vlc:loop playlist command to go back at the beginning.
+    Usage: vlc file1.mpeg file2.mpeg ... fileN.mpeg vlc:loop
+  * Fixed a bug in the gtk interface which caused vlc to go amok after
+    having met a zero-sized area.
+  * 'snapshot*' rules do not depend on 'clean', and don't use /tmp anymore.
+  * Solaris DVD decryption support by Håkan Hjort <d95hjort@dtek.chalmers.se>.
 
 0.2.82
 Tue,  7 Aug 2001 12:39:16 +0200

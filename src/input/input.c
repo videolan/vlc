@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.128 2001/08/05 15:32:46 gbazin Exp $
+ * $Id: input.c,v 1.129 2001/08/09 08:20:26 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -168,6 +168,8 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->pf_network_close = NetworkClose;
 #endif
 
+    intf_WarnMsg( 1, "input: playlist item `%s'", p_input->p_source );
+
     /* Create thread. */
     if( vlc_thread_create( &p_input->thread_id, "input", (void *) RunThread,
                            (void *) p_input ) )
@@ -238,13 +240,11 @@ static void RunThread( input_thread_t *p_input )
 
     if( InitThread( p_input ) )
     {
-
         /* If we failed, wait before we are killed, and exit */
         *p_input->pi_status = THREAD_ERROR;
         p_input->b_error = 1;
         ErrorThread( p_input );
         DestroyThread( p_input );
-        free( p_input );
         return;
     }
 
@@ -492,8 +492,8 @@ static void EndThread( input_thread_t * p_input )
         struct tms cpu_usage;
         times( &cpu_usage );
 
-        intf_Msg("input stats: cpu usage (user: %d, system: %d)",
-                 cpu_usage.tms_utime, cpu_usage.tms_stime);
+        intf_Msg( "input stats: cpu usage (user: %d, system: %d)",
+                  cpu_usage.tms_utime, cpu_usage.tms_stime );
     }
 #endif
 
@@ -604,7 +604,7 @@ static void FileOpen( input_thread_t * p_input )
     p_input->stream.p_selected_area->i_tell = 0;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    intf_WarnMsg( 1, "input: opening file `%s'", p_input->p_source );
+    intf_WarnMsg( 2, "input: opening file `%s'", p_input->p_source );
     if( (p_input->i_handle = open( psz_name,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
     {
@@ -620,7 +620,7 @@ static void FileOpen( input_thread_t * p_input )
  *****************************************************************************/
 static void FileClose( input_thread_t * p_input )
 {
-    intf_WarnMsg( 1, "input: closing file `%s'", p_input->p_source );
+    intf_WarnMsg( 2, "input: closing file `%s'", p_input->p_source );
 
     close( p_input->i_handle );
 
@@ -750,7 +750,7 @@ static void NetworkOpen( input_thread_t * p_input )
         }
     }
 
-    intf_WarnMsg( 2, "input: server: %s port: %d broadcast: %s",
+    intf_WarnMsg( 2, "input: server=%s port=%d broadcast=%s",
                      psz_server, i_port, psz_broadcast );
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
@@ -758,7 +758,7 @@ static void NetworkOpen( input_thread_t * p_input )
     p_input->i_handle = socket( AF_INET, SOCK_DGRAM, 0 );
     if( p_input->i_handle == -1 )
     {
-        intf_ErrMsg("input error: can't create socket : %s", strerror(errno));
+        intf_ErrMsg( "input error: can't create socket (%s)", strerror(errno) );
         p_input->b_error = 1;
         return;
     }
@@ -808,7 +808,7 @@ static void NetworkOpen( input_thread_t * p_input )
     if( bind( p_input->i_handle, (struct sockaddr *)&sock, 
               sizeof( sock ) ) < 0 )
     {
-        intf_ErrMsg("input error: can't bind socket (%s)", strerror(errno));
+        intf_ErrMsg( "input error: can't bind socket (%s)", strerror(errno) );
         close( p_input->i_handle );
         p_input->b_error = 1;
         return;
@@ -827,7 +827,7 @@ static void NetworkOpen( input_thread_t * p_input )
     if( connect( p_input->i_handle, (struct sockaddr *) &sock,
                  sizeof( sock ) ) == (-1) )
     {
-        intf_ErrMsg( "input error: can't connect socket, %s", 
+        intf_ErrMsg( "input error: can't connect socket (%s)", 
                      strerror(errno) );
         close( p_input->i_handle );
         p_input->b_error = 1;

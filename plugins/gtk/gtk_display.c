@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.5 2001/07/25 03:12:33 sam Exp $
+ * $Id: gtk_display.c,v 1.6 2001/08/09 08:20:26 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -179,9 +179,12 @@ gint GtkModeManage( intf_thread_t * p_intf )
                 break;
         }
     
-        /* slider for seekable streams */
+        /* initialize and show slider for seekable streams */
         if( p_intf->p_input->stream.b_seekable )
         {
+            p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue = 0;
+            gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
+                                     "value_changed" );
             gtk_widget_show( GTK_WIDGET( p_slider ) );
         }
     
@@ -197,8 +200,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
         p_intf->p_sys->i_part = 0;
     
         p_intf->p_input->stream.b_changed = 0;
-        intf_WarnMsg( 3, 
-                      "intf info: menus refreshed as stream has changed" );
+        intf_WarnMsg( 3, "intf: stream has changed, refreshing interface" );
     }
     else
     {

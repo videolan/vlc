@@ -89,6 +89,11 @@ typedef struct module_symbols_s
     void ( * input_DelArea )        ( struct input_thread_s *,
                                       struct input_area_s * );
 
+    void ( * InitBitstream )        ( struct bit_stream_s *,
+                                      struct decoder_fifo_s *,
+                                      void ( * ) ( struct bit_stream_s *,
+                                                   boolean_t ),
+                                      void * );
     int  ( * input_InitStream )     ( struct input_thread_s *, size_t );
     void ( * input_EndStream )      ( struct input_thread_s * );
 
@@ -98,6 +103,8 @@ typedef struct module_symbols_s
                                       struct data_packet_s *,
                                       struct es_descriptor_s *,
                                       boolean_t, boolean_t );
+    void ( * input_DecodePES )      ( struct decoder_fifo_s *,
+                                      struct pes_packet_s * );
     struct es_descriptor_s * ( * input_ParsePS ) ( struct input_thread_s *,
                                                    struct data_packet_s * );
     void ( * input_DemuxPS )        ( struct input_thread_s *,
@@ -108,6 +115,10 @@ typedef struct module_symbols_s
                                       struct data_packet_s *,
                                       struct es_descriptor_s *, 
                                       boolean_t, boolean_t );
+
+    int ( * input_ClockManageControl )   ( struct input_thread_s *,
+                                           struct pgrm_descriptor_s *,
+                                           mtime_t );
 
     int ( * input_NetlistInit )          ( struct input_thread_s *,
                                            int, int, size_t, int );
@@ -166,14 +177,17 @@ typedef struct module_symbols_s
     (p_symbols)->input_DelProgram = input_DelProgram; \
     (p_symbols)->input_AddArea = input_AddArea; \
     (p_symbols)->input_DelArea = input_DelArea; \
+    (p_symbols)->InitBitstream = InitBitstream; \
     (p_symbols)->input_InitStream = input_InitStream; \
     (p_symbols)->input_EndStream = input_EndStream; \
     (p_symbols)->input_ParsePES = input_ParsePES; \
     (p_symbols)->input_GatherPES = input_GatherPES; \
+    (p_symbols)->input_DecodePES = input_DecodePES; \
     (p_symbols)->input_ParsePS = input_ParsePS; \
     (p_symbols)->input_DemuxPS = input_DemuxPS; \
     (p_symbols)->input_DemuxTS = input_DemuxTS; \
     (p_symbols)->input_DemuxPSI = input_DemuxPSI; \
+    (p_symbols)->input_ClockManageControl = input_ClockManageControl; \
     (p_symbols)->input_NetlistInit = input_NetlistInit; \
     (p_symbols)->input_NetlistGetiovec = input_NetlistGetiovec; \
     (p_symbols)->input_NetlistMviovec = input_NetlistMviovec; \
@@ -252,15 +266,19 @@ extern module_symbols_t* p_symbols;
 #   define input_AddArea p_symbols->input_AddArea
 #   define input_DelArea p_symbols->input_DelArea
 
+#   define InitBitstream p_symbols->InitBitstream
 #   define input_InitStream p_symbols->input_InitStream
 #   define input_EndStream p_symbols->input_EndStream
 
 #   define input_ParsePES p_symbols->input_ParsePES
 #   define input_GatherPES p_symbols->input_GatherPES
+#   define input_DecodePES p_symbols->input_DecodePES
 #   define input_ParsePS p_symbols->input_ParsePS
 #   define input_DemuxPS p_symbols->input_DemuxPS
 #   define input_DemuxTS p_symbols->input_DemuxTS
 #   define input_DemuxPSI p_symbols->input_DemuxPSI
+
+#   define input_ClockManageControl p_symbols->input_ClockManageControl
 
 #   define input_NetlistInit p_symbols->input_NetlistInit
 #   define input_NetlistGetiovec p_symbols->input_NetlistGetiovec
