@@ -153,7 +153,7 @@ case "x${target_os}" in
     CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"; CXXFLAGS="${CXXFLAGS_save}"
     LDFLAGS_vlc="${LDFLAGS_vlc} -lbe"
     LDFLAGS_plugins="${LDFLAGS_plugins} -nostart"
-    LDFLAGS_beos="${LDFLAGS_beos} -lbe -lmedia -lroot -ltracker -lstdc++.r4 -ltranslation"
+    LDFLAGS_beos="${LDFLAGS_beos} -lbe -lmedia -lroot -ltracker -lstdc++.r4 -ltranslation -lgame"
     dnl BONE or not BONE ? only BONE has libbind.so
     AC_CHECK_LIB( bind, inet_ntoa,
         [ LDFLAGS_access_mms="${LDFLAGS_access_mms} -lsocket -lbind"

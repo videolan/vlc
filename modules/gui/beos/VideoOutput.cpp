@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.14 2003/04/18 16:10:28 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.15 2003/04/18 16:38:58 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,6 +43,7 @@
 #include <NodeInfo.h>
 #include <String.h>
 #include <TranslatorRoster.h>
+#include <WindowScreen.h>
 
 /* VLC headers */
 #include <vlc/vlc.h>
@@ -1224,6 +1225,7 @@ VLCView::Pulse()
 	// We are getting the pulse messages no matter if the mouse is over
 	// this view. If we are in full screen mode, we want to hide the cursor
 	// even if it is not.
+	VideoWindow *videoWindow = dynamic_cast<VideoWindow*>(Window());
 	if (!fCursorHidden)
 	{
 		if (fCursorInside
@@ -1231,11 +1233,23 @@ VLCView::Pulse()
 		{
 			be_app->ObscureCursor();
 			fCursorHidden = true;
-			VideoWindow *videoWindow = dynamic_cast<VideoWindow*>(Window());
+			
 			// hide the interface window as well if full screen
 			if (videoWindow && videoWindow->IsFullScreen())
 				videoWindow->SetInterfaceShowing(false);
 		}
+	}
+
+    // Workaround to disable the screensaver in full screen:
+    // we simulate an activity every 29 seconds	
+	if( videoWindow && videoWindow->IsFullScreen() &&
+	    system_time() - fLastMouseMovedTime > 29000000 )
+	{
+	    BPoint where;
+		uint32 buttons;
+		GetMouse(&where, &buttons, false);
+		ConvertToScreen(&where);
+		set_mouse_position((int32) where.x, (int32) where.y);
 	}
 }
 
