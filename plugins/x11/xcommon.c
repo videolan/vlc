@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.27 2002/04/04 05:08:05 sam Exp $
+ * $Id: xcommon.c,v 1.28 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -299,11 +299,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     /* Open display, unsing the "display" config variable or the DISPLAY
      * environment variable */
-#ifdef MODULE_NAME_IS_xvideo
-    psz_display = config_GetPszVariable( "xvideo_display" );
-#else
-    psz_display = config_GetPszVariable( "x11_display" );
-#endif
+    psz_display = config_GetPszVariable( MODULE_STRING "-display" );
 
     p_vout->p_sys->p_display = XOpenDisplay( psz_display );
 
@@ -1441,11 +1437,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
          * because to go back to window mode we need to know in which
          * fullscreen mode we where */
         p_vout->p_sys->b_altfullscreen =
-#ifdef MODULE_NAME_IS_xvideo
-            config_GetIntVariable( "xvideo_altfullscreen" );
-#else
-            config_GetIntVariable( "x11_altfullscreen" );
-#endif
+            config_GetIntVariable( MODULE_STRING "-altfullscreen" );
 
         /* Save current window coordinates so they can be restored when
          * we exit from fullscreen mode. This is the tricky part because
@@ -1845,7 +1837,7 @@ static int XVideoGetPort( Display *dpy, u32 i_chroma, u32 *pi_newchroma )
     }
 
     i_selected_port = -1;
-    i_requested_adaptor = config_GetIntVariable( "xvideo_adaptor" );
+    i_requested_adaptor = config_GetIntVariable( "xvideo-adaptor" );
 
     for( i_adaptor = 0; i_adaptor < i_num_adaptors; ++i_adaptor )
     {

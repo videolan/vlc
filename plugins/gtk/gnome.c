@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.17 2002/04/19 13:56:11 sam Exp $
+ * $Id: gnome.c,v 1.18 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -71,9 +71,9 @@ static gint GnomeManage      ( gpointer p_data );
 
 MODULE_CONFIG_START
     ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-    ADD_BOOL    ( "gnome_hide_tooltips", NULL, TOOLTIPS_TEXT,
+    ADD_BOOL    ( "gnome-notooltips", NULL, TOOLTIPS_TEXT,
                   TOOLTIPS_LONGTEXT )
-    ADD_INTEGER ( "gnome_prefs_maxh", 480, NULL, PREFS_MAXH_TEXT,
+    ADD_INTEGER ( "gnome-prefs-maxh", 480, NULL, PREFS_MAXH_TEXT,
                   PREFS_MAXH_LONGTEXT )
 MODULE_CONFIG_STOP
 
@@ -266,7 +266,7 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_tooltips = gtk_tooltips_new();
 
     /* Hide tooltips if the option is set */
-    if( config_GetIntVariable( "gnome_hide_tooltips" ) )
+    if( config_GetIntVariable( "gnome-notooltips" ) )
         gtk_tooltips_disable( p_intf->p_sys->p_tooltips );
 
     /* Store p_intf to keep an eye on it */

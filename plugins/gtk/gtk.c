@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.19 2002/04/19 13:56:11 sam Exp $
+ * $Id: gtk.c,v 1.20 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -72,8 +72,8 @@ static gint GtkManage         ( gpointer p_data );
 
 MODULE_CONFIG_START
     ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-    ADD_BOOL    ( "gtk_hide_tooltips", NULL, TOOLTIPS_TEXT, TOOLTIPS_LONGTEXT )
-    ADD_INTEGER ( "gtk_prefs_maxh", 480, NULL, PREFS_MAXH_TEXT,
+    ADD_BOOL    ( "gtk-notooltips", NULL, TOOLTIPS_TEXT, TOOLTIPS_LONGTEXT )
+    ADD_INTEGER ( "gtk-prefs-maxh", 480, NULL, PREFS_MAXH_TEXT,
                   PREFS_MAXH_LONGTEXT )
 MODULE_CONFIG_STOP
 
@@ -268,7 +268,7 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_jump = NULL;
 
     /* Hide tooltips if the option is set */
-    if( config_GetIntVariable( "gtk_hide_tooltips" ) )
+    if( config_GetIntVariable( "gtk-notooltips" ) )
         gtk_tooltips_disable( p_intf->p_sys->p_tooltips );
 
     /* Store p_intf to keep an eye on it */

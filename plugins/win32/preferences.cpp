@@ -135,7 +135,7 @@ void __fastcall TGroupBoxPref::UpdateChanges()
 
 
 /****************************************************************************
- * GroupBox for plugin management
+ * GroupBox for module management
  ****************************************************************************/
 __fastcall TGroupBoxPlugin::TGroupBoxPlugin( TComponent* Owner,
             module_config_t *p_config ) : TGroupBoxPref( Owner, p_config )
@@ -185,7 +185,7 @@ void __fastcall TGroupBoxPlugin::ListViewSelectItem( TObject *Sender,
     Name = Item->Caption;
     if( Name != "" )
     {
-        /* look for plugin 'Name' */
+        /* look for module 'Name' */
         for( p_module = p_module_bank->first ;
              p_module != NULL ;
              p_module = p_module->next )
@@ -407,7 +407,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 
             break;
 
-        case MODULE_CONFIG_ITEM_PLUGIN:
+        case MODULE_CONFIG_ITEM_MODULE:
 
             /* add new groupbox for the config option */
             GroupBoxPlugin = new TGroupBoxPlugin( this, &p_module->p_config[i] );
@@ -534,7 +534,7 @@ void __fastcall TPreferencesDlg::SaveValue( module_config_t *p_config )
     {
         case MODULE_CONFIG_ITEM_STRING:
         case MODULE_CONFIG_ITEM_FILE:
-        case MODULE_CONFIG_ITEM_PLUGIN:
+        case MODULE_CONFIG_ITEM_MODULE:
             config_PutPszVariable( p_config->psz_name,
                         *p_config->psz_value ? p_config->psz_value : NULL );
             break;

@@ -711,8 +711,7 @@ AC_ARG_ENABLE(satellite,
   [  --enable-satellite      satellite card support (default disabled)],
   [ if test x$enable_satellite = xyes
     then
-      BUILTINS="${BUILTINS} satellite"
-      AC_DEFINE(HAVE_SATELLITE, 1, define if compiling with satellite card support)
+      PLUGINS="${PLUGINS} satellite"
     fi])
 
 dnl
@@ -785,7 +784,8 @@ AC_ARG_ENABLE(vorbis,
 if test "x$enableval" != "xno"
 then
   AC_CHECK_HEADERS(ogg/ogg.h, [
-    PLUGINS="${PLUGINS} vorbis"
+    dnl disabled for the moment
+    #PLUGINS="${PLUGINS} vorbis"
     vorbis_LDFLAGS="${vorbis_LDFLAGS} -lvorbis"
    ],[])
 fi

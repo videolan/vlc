@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc-cvs\n"
-"POT-Creation-Date: 2002-04-22 09:46+0200\n"
+"POT-Creation-Date: 2002-04-22 16:42+0200\n"
 "PO-Revision-Date: 2002-28-02 23.35+0100\n"
 "Last-Translator: Sigmund Augdal <sigmunau@idi.ntnu.no>.\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -282,105 +282,73 @@ msgid "VCD device"
 msgstr ""
 
 #: src/interface/main.c:245
-msgid "satellite transponder frequency"
-msgstr ""
-
-#: src/interface/main.c:248
-msgid "satellite transponder polarization"
-msgstr ""
-
-#: src/interface/main.c:251
-msgid "satellite transponder FEC"
-msgstr ""
-
-#: src/interface/main.c:254
-msgid "satellite transponder symbol rate"
-msgstr ""
-
-#: src/interface/main.c:257
-msgid "use diseqc with antenna"
-msgstr ""
-
-#: src/interface/main.c:260
-msgid "antenna lnb_lof1 (kHz)"
-msgstr ""
-
-#: src/interface/main.c:263
-msgid "antenna lnb_lof2 (kHz)"
-msgstr ""
-
-#: src/interface/main.c:266
-msgid "antenna lnb_slof (kHz)"
-msgstr ""
-
-#: src/interface/main.c:269
 msgid "force IPv6"
 msgstr ""
 
-#: src/interface/main.c:272
+#: src/interface/main.c:248
 msgid "force IPv4"
 msgstr ""
 
-#: src/interface/main.c:275
+#: src/interface/main.c:251
 msgid "choose MPEG audio decoder"
 msgstr ""
 
-#: src/interface/main.c:278
+#: src/interface/main.c:254
 msgid "choose AC3 audio decoder"
 msgstr ""
 
-#: src/interface/main.c:281
+#: src/interface/main.c:257
 msgid "use additional processors"
 msgstr ""
 
-#: src/interface/main.c:284
+#: src/interface/main.c:260
 msgid "force synchro algorithm {I|I+|IP|IP+|IPB}"
 msgstr ""
 
-#: src/interface/main.c:287
+#: src/interface/main.c:263
 msgid "disable CPU's MMX support"
 msgstr ""
 
-#: src/interface/main.c:290
+#: src/interface/main.c:266
 msgid "disable CPU's 3D Now! support"
 msgstr ""
 
-#: src/interface/main.c:293
+#: src/interface/main.c:269
 msgid "disable CPU's MMX EXT support"
 msgstr ""
 
-#: src/interface/main.c:296
+#: src/interface/main.c:272
 msgid "disable CPU's SSE support"
 msgstr ""
 
-#: src/interface/main.c:299
+#: src/interface/main.c:275
 msgid "disable CPU's AltiVec support"
 msgstr ""
 
-#: src/interface/main.c:302
+#: src/interface/main.c:278
 #, fuzzy
 msgid "launch playlist on startup"
 msgstr "Kjør ved oppstart"
 
-#: src/interface/main.c:305
+#: src/interface/main.c:281
 #, fuzzy
 msgid "enqueue playlist as default"
 msgstr "Legg til i kø som standard"
 
-#: src/interface/main.c:308
+#: src/interface/main.c:284
 #, fuzzy
 msgid "loop playlist on end"
 msgstr "Gå tilbake til start ved slutten av Spillelisten"
 
-#: src/interface/main.c:311
+#: src/interface/main.c:287
 msgid "memory copy module"
 msgstr ""
 
-#: src/interface/main.c:314
+#: src/interface/main.c:290
 msgid "fast pthread on NT/2K/XP (developpers only)"
 msgstr ""
 
-#: src/interface/main.c:316
+#: src/interface/main.c:292
 msgid ""
 "On Windows NT/2K/XP we use a slow but correct pthread implementation, you "
 "can also use this faster implementation but you might experience problems "
@@ -388,39 +356,39 @@ msgid ""
 msgstr ""
 
 #. Interface options
-#: src/interface/main.c:338
+#: src/interface/main.c:314
 msgid "Interface"
 msgstr "Grensesnitt"
 
 #. Audio options
-#: src/interface/main.c:345
+#: src/interface/main.c:321
 msgid "Audio"
 msgstr "Lyd"
 
 #. Video options
-#: src/interface/main.c:356
+#: src/interface/main.c:332
 msgid "Video"
 msgstr "Video"
 
 #. Input options
-#: src/interface/main.c:369
+#: src/interface/main.c:345
 msgid "Input"
 msgstr ""
 
 #. Decoder options
-#: src/interface/main.c:403
+#: src/interface/main.c:364
 msgid "Decoders"
 msgstr ""
 
 #. CPU options
-#: src/interface/main.c:410
+#: src/interface/main.c:371
 msgid "CPU"
 msgstr ""
 
 #. Playlist options
 #: plugins/gtk/gnome_interface.c:506 plugins/gtk/gnome_interface.c:1806
 #: plugins/gtk/gnome_interface.c:1830 plugins/gtk/gtk_interface.c:611
-#: plugins/gtk/gtk_interface.c:2084 src/interface/main.c:418
+#: plugins/gtk/gtk_interface.c:2084 src/interface/main.c:379
 msgid "Playlist"
 msgstr "Spilleliste"
 
@@ -428,60 +396,66 @@ msgstr "Spilleliste"
 #: plugins/ac3_adec/ac3_adec.c:77 plugins/dsp/dsp.c:42 plugins/fb/fb.c:72
 #: plugins/ggi/ggi.c:68 plugins/gtk/gnome.c:73 plugins/gtk/gtk.c:74
 #: plugins/mga/xmga.c:111 plugins/mpeg_vdec/video_parser.c:80
-#: plugins/x11/x11.c:55 plugins/x11/xvideo.c:60 src/interface/main.c:424
+#: plugins/x11/x11.c:55 plugins/x11/xvideo.c:60 src/interface/main.c:385
 msgid "Miscellaneous"
 msgstr ""
 
-#: src/interface/main.c:434
+#: src/interface/main.c:395
 #, fuzzy
 msgid "main program"
 msgstr "Avslutt programmet"
 
-#: src/interface/main.c:448
+#: src/interface/main.c:409
 msgid "print help"
 msgstr ""
 
-#: src/interface/main.c:450
+#: src/interface/main.c:411
 msgid "print detailed help"
 msgstr ""
 
-#: src/interface/main.c:452
-msgid "print a list of available plugins"
+#: src/interface/main.c:413
+msgid "print a list of available modules"
 msgstr ""
 
-#: src/interface/main.c:454
-msgid "print help on plugin <string>"
+#: src/interface/main.c:415
+msgid "print help on module <string>"
 msgstr ""
 
-#: src/interface/main.c:457
+#: src/interface/main.c:418
 msgid "print version information"
 msgstr ""
 
+#: src/interface/main.c:560
+#, fuzzy
+msgid "help module"
+msgstr "Standard grensesnitt: "
+
 #. Usage
-#: src/interface/main.c:622 src/interface/main.c:1071
+#: src/interface/main.c:584 src/interface/main.c:1045
 #, c-format
 msgid "Usage: %s [options] [parameters] [file]...\n"
 msgstr ""
 
 #. print module name
-#: src/interface/main.c:948
+#: src/interface/main.c:924
 #, c-format
 msgid "%s module options:\n"
 msgstr ""
 
-#: src/interface/main.c:981 src/interface/main.c:985
-msgid " <string>"
+#. We could also have "=<" here
+#: src/interface/main.c:956 src/misc/configuration.c:696
+msgid "string"
 msgstr ""
 
-#: src/interface/main.c:992 src/interface/main.c:996
-msgid " <integer>"
+#: src/interface/main.c:961 src/misc/configuration.c:680
+msgid "integer"
 msgstr ""
 
-#: src/interface/main.c:1003 src/interface/main.c:1007
-msgid " <float>"
+#: src/interface/main.c:966 src/misc/configuration.c:688
+msgid "float"
 msgstr ""
 
-#: src/interface/main.c:1028
+#: src/interface/main.c:1002
 msgid ""
 "\n"
 "Playlist items:\n"
@@ -497,18 +471,18 @@ msgid ""
 "  vlc:quit                       quit VLC"
 msgstr ""
 
-#: src/interface/main.c:1048 src/interface/main.c:1097
-#: src/interface/main.c:1121
+#: src/interface/main.c:1022 src/interface/main.c:1071
+#: src/interface/main.c:1095
 msgid ""
 "\n"
 "Press the RETURN key to continue..."
 msgstr ""
 
-#: src/interface/main.c:1074
-msgid "[plugin]              [description]"
+#: src/interface/main.c:1048
+msgid "[module]              [description]"
 msgstr ""
 
-#: src/interface/main.c:1115
+#: src/interface/main.c:1089
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -517,21 +491,7 @@ msgid ""
 msgstr ""
 
 #: src/misc/configuration.c:680
-msgid "<boolean>"
-msgstr ""
-
-#: src/misc/configuration.c:680
-msgid "<integer>"
-msgstr ""
-
-#: src/misc/configuration.c:687
-#, c-format
-msgid "# %s <float>\n"
-msgstr ""
-
-#: src/misc/configuration.c:694
-#, c-format
-msgid "# %s <string>\n"
+msgid "boolean"
 msgstr ""
 
 #: plugins/a52/a52.c:76
@@ -946,7 +906,8 @@ msgid "Back"
 msgstr "Tilbake"
 
 #: plugins/gtk/gnome_interface.c:417 plugins/gtk/gtk_interface.c:529
-msgid "Go Backwards"
+#, fuzzy
+msgid "Go Backward"
 msgstr "Gå tilbake"
 
 #: plugins/gtk/gnome_interface.c:429 plugins/gtk/gnome_interface.c:843
@@ -1677,7 +1638,42 @@ msgstr ""
 msgid "Qt interface module"
 msgstr "Standard grensesnitt: "
 
-#: plugins/satellite/satellite.c:48
+#. ****************************************************************************
+#. * Build configuration tree.
+#. ****************************************************************************
+#: plugins/satellite/satellite.c:41
+msgid "satellite transponder frequency"
+msgstr ""
+
+#: plugins/satellite/satellite.c:44
+msgid "satellite transponder polarization"
+msgstr ""
+
+#: plugins/satellite/satellite.c:47
+msgid "satellite transponder FEC"
+msgstr ""
+
+#: plugins/satellite/satellite.c:50
+msgid "satellite transponder symbol rate"
+msgstr ""
+
+#: plugins/satellite/satellite.c:53
+msgid "use diseqc with antenna"
+msgstr ""
+
+#: plugins/satellite/satellite.c:56
+msgid "antenna lnb_lof1 (kHz)"
+msgstr ""
+
+#: plugins/satellite/satellite.c:59
+msgid "antenna lnb_lof2 (kHz)"
+msgstr ""
+
+#: plugins/satellite/satellite.c:62
+msgid "antenna lnb_slof (kHz)"
+msgstr ""
+
+#: plugins/satellite/satellite.c:77
 msgid "satellite input module"
 msgstr ""
 

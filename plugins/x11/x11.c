@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.15 2002/04/19 13:56:11 sam Exp $
+ * $Id: x11.c,v 1.16 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -53,8 +53,8 @@
 
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( "x11_display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
-ADD_BOOL    ( "x11_altfullscreen", NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
+ADD_STRING  ( "x11-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
+ADD_BOOL    ( "x11-altfullscreen", NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

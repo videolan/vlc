@@ -49,22 +49,22 @@ __fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
         char *psz_channel_server;
 
         /* server port */
-        UpDownPort->Position = config_GetIntVariable( "server_port" );
+        UpDownPort->Position = config_GetIntVariable( "server-port" );
 
         /* channel server */
-        if( config_GetIntVariable( "network_channel" ) )
+        if( config_GetIntVariable( "network-channel" ) )
         {
             CheckBoxChannel->Checked = true;
         }
 
-        psz_channel_server = config_GetPszVariable( "channel_server" );
+        psz_channel_server = config_GetPszVariable( "channel-server" );
         if( psz_channel_server )
         {
             ComboBoxChannel->Text = psz_channel_server;
             free( psz_channel_server );
         }
 
-        UpDownPortCS->Position = config_GetIntVariable( "channel_port" );
+        UpDownPortCS->Position = config_GetIntVariable( "channel-port" );
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::FormShow( TObject *Sender )
@@ -138,7 +138,7 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
 
     /* Manage channel server */
     b_channel = CheckBoxChannel->Checked ? TRUE : FALSE;
-    config_PutIntVariable( "network_channel", b_channel );
+    config_PutIntVariable( "network-channel", b_channel );
     if( b_channel )
     {
         AnsiString      Channel = ComboBoxChannel->Text;
@@ -149,10 +149,10 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
             network_ChannelCreate();
         }
 
-        config_PutPszVariable( "channel_server", Channel.c_str() );
+        config_PutPszVariable( "channel-server", Channel.c_str() );
         if( i_channel_port < 65536 )
         {
-            config_PutIntVariable( "channel_port", i_channel_port );
+            config_PutIntVariable( "channel-port", i_channel_port );
         }
 
         p_intfGlobal->p_sys->b_playing = 1;

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.185 2002/04/22 08:20:26 sam Exp $
+ * $Id: main.c,v 1.186 2002/04/23 14:16:21 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -14,7 +14,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -60,7 +60,7 @@
 #endif
 
 #ifdef HAVE_LOCALE_H
-#    include <locale.h>
+#   include <locale.h>
 #endif
 
 #include <errno.h>                                                 /* ENOMEM */
@@ -83,7 +83,7 @@
 #include "debug.h"
 
 /*****************************************************************************
- * Configuration options for the main program. Each plugin will also separatly
+ * Configuration options for the main program. Each module will also separatly
  * define its own configuration options.
  * Look into configuration.h if you need to know more about the following
  * macros.
@@ -242,30 +242,6 @@
 #define VCD_DEV_TEXT N_("VCD device")
 #define VCD_DEV_LONGTEXT ""
 
-#define SAT_FREQ_TEXT N_("satellite transponder frequency")
-#define SAT_FREQ_LONGTEXT ""
-
-#define SAT_POL_TEXT N_("satellite transponder polarization")
-#define SAT_POL_LONGTEXT ""
-
-#define SAT_FEC_TEXT N_("satellite transponder FEC")
-#define SAT_FEC_LONGTEXT ""
-
-#define SAT_SRATE_TEXT N_("satellite transponder symbol rate")
-#define SAT_SRATE_LONGTEXT ""
-
-#define SAT_DISEQC_TEXT N_("use diseqc with antenna")
-#define SAT_DISEQC_LONGTEXT ""
-
-#define SAT_LNB_LOF1_TEXT N_("antenna lnb_lof1 (kHz)")
-#define SAT_LNB_LOF1_LONGTEXT ""
-
-#define SAT_LNB_LOF2_TEXT N_("antenna lnb_lof2 (kHz)")
-#define SAT_LNB_LOF2_LONGTEXT ""
-
-#define SAT_LNB_SLOF_TEXT N_("antenna lnb_slof (kHz)")
-#define SAT_LNB_SLOF_LONGTEXT ""
-
 #define IPV6_TEXT N_("force IPv6")
 #define IPV6_LONGTEXT ""
 
@@ -326,7 +302,7 @@
  * ADD_SUBCATEGORY_HINT( N_(text), longtext )
  * ADD_STRING( option_name, value, p_callback, N_(text), N_(longtext) )
  * ADD_FILE( option_name, psz_value, p_callback, N_(text), N_(longtext) )
- * ADD_PLUGIN( option_name, psz_value, i_capability, p_callback,
+ * ADD_MODULE( option_name, psz_value, i_capability, p_callback,
  *             N_(text), N_(longtext) )
  * ADD_INTEGER( option_name, i_value, p_callback, N_(text), N_(longtext) )
  * ADD_BOOL( option_name, p_callback, N_(text), N_(longtext) )
@@ -336,25 +312,25 @@ MODULE_CONFIG_START
 
 /* Interface options */
 ADD_CATEGORY_HINT( N_("Interface"), NULL)
-ADD_PLUGIN_WITH_SHORT  ( "intf", 'I', MODULE_CAPABILITY_INTF, NULL, NULL, INTF_TEXT, INTF_LONGTEXT )
+ADD_MODULE_WITH_SHORT  ( "intf", 'I', MODULE_CAPABILITY_INTF, NULL, NULL, INTF_TEXT, INTF_LONGTEXT )
 ADD_INTEGER ( "warning", 0, NULL, WARNING_TEXT, WARNING_LONGTEXT )
 ADD_BOOL    ( "stats", NULL, STATS_TEXT, STATS_LONGTEXT )
-ADD_STRING  ( "search_path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT )
+ADD_STRING  ( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT )
 
 /* Audio options */
 ADD_CATEGORY_HINT( N_("Audio"), NULL)
-ADD_PLUGIN_WITH_SHORT  ( "aout", 'A', MODULE_CAPABILITY_AOUT, NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT )
+ADD_MODULE_WITH_SHORT  ( "aout", 'A', MODULE_CAPABILITY_AOUT, NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT )
 ADD_BOOL    ( "noaudio", NULL, NOAUDIO_TEXT, NOAUDIO_LONGTEXT )
 ADD_BOOL    ( "mono", NULL, MONO_TEXT, MONO_LONGTEXT )
 ADD_INTEGER ( "volume", VOLUME_DEFAULT, NULL, VOLUME_TEXT, VOLUME_LONGTEXT )
 ADD_INTEGER ( "rate", 44100, NULL, RATE_TEXT, RATE_LONGTEXT )
 ADD_INTEGER ( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT )
-ADD_INTEGER ( "aout_format", 0, NULL, FORMAT_TEXT,
+ADD_INTEGER ( "audio-format", 0, NULL, FORMAT_TEXT,
               FORMAT_LONGTEXT )
 
 /* Video options */
 ADD_CATEGORY_HINT( N_("Video"), NULL )
-ADD_PLUGIN_WITH_SHORT  ( "vout", 'V', MODULE_CAPABILITY_VOUT, NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT )
+ADD_MODULE_WITH_SHORT  ( "vout", 'V', MODULE_CAPABILITY_VOUT, NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT )
 ADD_BOOL    ( "novideo", NULL, NOVIDEO_TEXT, NOVIDEO_LONGTEXT )
 ADD_INTEGER ( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT )
 ADD_INTEGER ( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT )
@@ -363,48 +339,33 @@ ADD_BOOL    ( "grayscale", NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT )
 ADD_BOOL    ( "fullscreen", NULL, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT )
 ADD_BOOL    ( "nooverlay", NULL, NOOVERLAY_TEXT, NOOVERLAY_LONGTEXT )
 ADD_INTEGER ( "spumargin", -1, NULL, SPUMARGIN_TEXT, SPUMARGIN_LONGTEXT )
-ADD_PLUGIN  ( "filter", MODULE_CAPABILITY_VOUT, NULL, NULL, FILTER_TEXT, FILTER_LONGTEXT )
+ADD_MODULE  ( "filter", MODULE_CAPABILITY_VOUT, NULL, NULL, FILTER_TEXT, FILTER_LONGTEXT )
 
 /* Input options */
 ADD_CATEGORY_HINT( N_("Input"), NULL )
-ADD_INTEGER ( "server_port", 1234, NULL, SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT )
-ADD_BOOL    ( "network_channel", NULL, NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT )
-ADD_STRING  ( "channel_server", "localhost", NULL, CHAN_SERV_TEXT, CHAN_SERV_LONGTEXT )
-ADD_INTEGER ( "channel_port", 6010, NULL, CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT )
+ADD_INTEGER ( "server-port", 1234, NULL, SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT )
+ADD_BOOL    ( "network-channel", NULL, NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT )
+ADD_STRING  ( "channel-server", "localhost", NULL, CHAN_SERV_TEXT, CHAN_SERV_LONGTEXT )
+ADD_INTEGER ( "channel-port", 6010, NULL, CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT )
 ADD_STRING  ( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT )
 
-ADD_INTEGER ( "input_program", 0, NULL, INPUT_PROGRAM_TEXT,
-        INPUT_PROGRAM_LONGTEXT )
-ADD_INTEGER ( "input_audio", -1, NULL, INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT )
-ADD_INTEGER ( "input_channel", -1, NULL, INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT )
-ADD_INTEGER ( "input_subtitle", -1, NULL, INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT )
+ADD_INTEGER ( "program", 0, NULL, INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT )
+ADD_INTEGER ( "audio-type", -1, NULL, INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT )
+ADD_INTEGER ( "audio-channel", -1, NULL, INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT )
+ADD_INTEGER ( "spu-channel", -1, NULL, INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT )
 
-ADD_STRING  ( "dvd_device", "/dev/dvd", NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT )
-ADD_STRING  ( "vcd_device", "/dev/cdrom", NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT )
-#ifdef HAVE_SATELLITE
-ADD_INTEGER ( "sat_frequency", 11954, NULL, SAT_FREQ_TEXT, SAT_FREQ_LONGTEXT )
-ADD_INTEGER ( "sat_polarization", 0, NULL, SAT_POL_TEXT, SAT_POL_LONGTEXT )
-ADD_INTEGER ( "sat_fec", 3, NULL, SAT_FEC_TEXT, SAT_FEC_LONGTEXT )
-ADD_INTEGER ( "sat_symbol_rate", 27500, NULL, SAT_SRATE_TEXT,
-            SAT_SRATE_LONGTEXT )
-ADD_BOOL    ( "sat_diseqc", 0, SAT_DISEQC_TEXT, SAT_DISEQC_LONGTEXT )
-ADD_INTEGER ( "sat_lnb_lof1", 10000, NULL, SAT_LNB_LOF1_TEXT, 
-            SAT_LNB_LOF1_LONGTEXT )
-ADD_INTEGER ( "sat_lnb_lof2", 10000, NULL, SAT_LNB_LOF2_TEXT, 
-            SAT_LNB_LOF2_LONGTEXT )
-ADD_INTEGER ( "sat_lnb_slof", 11700, NULL, SAT_LNB_SLOF_TEXT, 
-            SAT_LNB_SLOF_LONGTEXT )
-#endif
+ADD_STRING  ( "dvd", "/dev/dvd", NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT )
+ADD_STRING  ( "vcd", "/dev/cdrom", NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT )
 
 ADD_BOOL_WITH_SHORT    ( "ipv6", '6', NULL, IPV6_TEXT, IPV6_LONGTEXT )
 ADD_BOOL_WITH_SHORT    ( "ipv4", '4', NULL, IPV4_TEXT, IPV4_LONGTEXT )
 
 /* Decoder options */
 ADD_CATEGORY_HINT( N_("Decoders"), NULL )
-ADD_PLUGIN  ( "mpeg_adec", MODULE_CAPABILITY_DECODER, NULL, NULL, ADEC_MPEG_TEXT, ADEC_MPEG_LONGTEXT )
-ADD_PLUGIN  ( "ac3_adec", MODULE_CAPABILITY_DECODER, NULL, NULL, ADEC_AC3_TEXT, ADEC_AC3_LONGTEXT )
-ADD_INTEGER ( "vdec_smp", 0, NULL, VDEC_SMP_TEXT, VDEC_SMP_LONGTEXT )
-ADD_STRING  ( "vpar_synchro", NULL, NULL, VPAR_SYNCHRO_TEXT, VPAR_SYNCHRO_LONGTEXT )
+ADD_MODULE  ( "mpeg-adec", MODULE_CAPABILITY_DECODER, NULL, NULL, ADEC_MPEG_TEXT, ADEC_MPEG_LONGTEXT )
+ADD_MODULE  ( "ac3-adec", MODULE_CAPABILITY_DECODER, NULL, NULL, ADEC_AC3_TEXT, ADEC_AC3_LONGTEXT )
+ADD_INTEGER ( "vdec-smp", 0, NULL, VDEC_SMP_TEXT, VDEC_SMP_LONGTEXT )
+ADD_STRING  ( "vpar-synchro", NULL, NULL, VPAR_SYNCHRO_TEXT, VPAR_SYNCHRO_LONGTEXT )
 
 /* CPU options */
 ADD_CATEGORY_HINT( N_("CPU"), NULL )
@@ -416,13 +377,15 @@ ADD_BOOL    ( "noaltivec", NULL, NOALTIVEC_TEXT, NOALTIVEC_LONGTEXT )
 
 /* Playlist options */
 ADD_CATEGORY_HINT( N_("Playlist"), NULL )
-ADD_BOOL    ( "playlist_launch", NULL, PLAYLIST_LAUNCH_TEXT, PLAYLIST_LAUNCH_LONGTEXT )
-ADD_BOOL    ( "playlist_enqueue", NULL, PLAYLIST_ENQUEUE_TEXT, PLAYLIST_ENQUEUE_LONGTEXT )
-ADD_BOOL    ( "playlist_loop", NULL, PLAYLIST_LOOP_TEXT, PLAYLIST_LOOP_LONGTEXT )
+ADD_BOOL    ( "launch-playlist", NULL, PLAYLIST_LAUNCH_TEXT, PLAYLIST_LAUNCH_LONGTEXT )
+ADD_BOOL    ( "enqueue-playlist", NULL, PLAYLIST_ENQUEUE_TEXT, PLAYLIST_ENQUEUE_LONGTEXT )
+ADD_BOOL    ( "loop-playlist", NULL, PLAYLIST_LOOP_TEXT, PLAYLIST_LOOP_LONGTEXT )
 
 /* Misc options */
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_PLUGIN  ( "memcpy", MODULE_CAPABILITY_MEMCPY, NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT )
+ADD_MODULE  ( "memcpy", MODULE_CAPABILITY_MEMCPY, NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT )
+ADD_MODULE  ( "access", MODULE_CAPABILITY_ACCESS, NULL, NULL, "access module", "This is a legacy entry to let you configure access modules" )
+ADD_MODULE  ( "demux", MODULE_CAPABILITY_DEMUX, NULL, NULL, "demux module", "This is a legacy entry to let you configure demux modules" )
 
 #if defined(WIN32)
 ADD_BOOL    ( "fast_pthread", NULL, FAST_PTHREAD_TEXT, FAST_PTHREAD_LONGTEXT )
@@ -450,8 +413,8 @@ static module_config_t p_help_config[] =
     { MODULE_CONFIG_ITEM_BOOL, "longhelp", 'H', N_("print detailed help"),
       NULL, NULL, 0, 0, NULL, NULL, 0 },
     { MODULE_CONFIG_ITEM_BOOL, "list", 'l', N_("print a list of available "
-      "plugins"), NULL, NULL, 0, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_STRING, "plugin", 'p', N_("print help on plugin "
+      "modules"), NULL, NULL, 0, 0, NULL, NULL, 0 },
+    { MODULE_CONFIG_ITEM_STRING, "module", 'p', N_("print help on module "
       "<string>"), NULL, NULL, 0, 0, NULL, &help_module.config_lock, 0 },
     { MODULE_CONFIG_ITEM_BOOL, "version", '\0',
       N_("print version information"), NULL, NULL, 0, 0, NULL, NULL, 0 },
@@ -512,7 +475,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     input_bank_t  input_bank;
     aout_bank_t   aout_bank;
     vout_bank_t   vout_bank;
-    char *psz_plugin;
+    char *psz_module;
     char *p_tmp;
     struct module_config_s *p_item;
 
@@ -596,6 +559,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     /* Hack: insert the help module here */
     help_module.psz_name = "help";
+    help_module.psz_longname = _( "help module" );
     help_module.i_config_items =
                     sizeof(p_help_config) / sizeof(module_config_t) - 1;
     vlc_mutex_init( &help_module.config_lock );
@@ -641,7 +605,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Load the builtins and plugins into the module_bank.
      * We have to do it before config_Load*() because this also gets the
-     * list of configuration options exported by each plugin and loads their
+     * list of configuration options exported by each module and loads their
      * default values.
      */
     module_LoadBuiltins();
@@ -654,8 +618,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_module_bank->first = &help_module;
     /* end hack */
 
-    /* Check for help on plugins */
-    if( (p_tmp = config_GetPszVariable( "plugin" )) )
+    /* Check for help on modules */
+    if( (p_tmp = config_GetPszVariable( "module" )) )
     {
         Usage( p_tmp );
         free( p_tmp );
@@ -669,7 +633,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         return( -1 );
     }
 
-    /* Check for plugin list option */
+    /* Check for module list option */
     if( config_GetIntVariable( "list" ) )
     {
         ListModules();
@@ -783,10 +747,10 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Choose the best memcpy module
      */
-    psz_plugin = config_GetPszVariable( "memcpy" );
+    psz_module = config_GetPszVariable( "memcpy" );
     p_main->p_memcpy_module = module_Need( MODULE_CAPABILITY_MEMCPY,
-                                           psz_plugin, NULL );
-    if( psz_plugin ) free( psz_plugin );
+                                           psz_module, NULL );
+    if( psz_module ) free( psz_module );
     if( p_main->p_memcpy_module == NULL )
     {
         intf_ErrMsg( "intf error: no suitable memcpy module, "
@@ -802,13 +766,13 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Initialize shared resources and libraries
      */
-    if( config_GetIntVariable( "network_channel" ) &&
+    if( config_GetIntVariable( "network-channel" ) &&
         network_ChannelCreate() )
     {
         /* On error during Channels initialization, switch off channels */
         intf_ErrMsg( "intf error: channels initialization failed, "
                                  "deactivating channels" );
-        config_PutIntVariable( "network_channel", 0 );
+        config_PutIntVariable( "network-channel", 0 );
     }
 
     /*
@@ -839,7 +803,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         /*
          * Go back into channel 0 which is the network
          */
-        if( config_GetIntVariable( "network_channel" ) && p_main->p_channel )
+        if( config_GetIntVariable( "network-channel" ) && p_main->p_channel )
         {
             network_ChannelJoin( COMMON_CHANNEL );
         }
@@ -921,13 +885,27 @@ static int GetFilenames( int i_argc, char *ppsz_argv[] )
  *****************************************************************************/
 static void Usage( const char *psz_module_name )
 {
+#define FORMAT_STRING "      --%s%s%s%s%s %s"
+    /* option name ---------------' | | | |  |
+     * <bra ------------------------' | | |  |
+     * option type or "" -------------' | |  |
+     * ket> ----------------------------' |  |
+     * padding spaces --------------------'  |
+     * comment ------------------------------'
+     *
+     * The purpose of having bra and ket is that we might i18n them as well.
+     */
+#define LINE_START 8
+#define PADDING_SPACES 25
     module_t *p_module;
     module_config_t *p_item;
-    char psz_spaces[30];
-    char psz_format[sizeof("      --%s%s%s %s")];
+    char psz_spaces[PADDING_SPACES+LINE_START+1];
+    char psz_format[sizeof(FORMAT_STRING)];
 
-    memset( psz_spaces, ' ', 30 );
-    memcpy( psz_format, "      --%s%s%s %s", sizeof(psz_format) );
+    memset( psz_spaces, ' ', PADDING_SPACES+LINE_START );
+    psz_spaces[PADDING_SPACES+LINE_START] = '\0';
+
+    strcpy( psz_format, FORMAT_STRING );
 
 #ifdef WIN32
     ShowConsole();
@@ -941,7 +919,7 @@ static void Usage( const char *psz_module_name )
         if( psz_module_name && strcmp( psz_module_name, p_module->psz_name ) )
             continue;
 
-        /* ignore plugins without config options */
+        /* ignore modules without config options */
         if( !p_module->i_config_items ) continue;
 
         /* print module name */
@@ -951,6 +929,7 @@ static void Usage( const char *psz_module_name )
              p_item->i_type != MODULE_CONFIG_HINT_END;
              p_item++ )
         {
+            char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
             int i;
 
             if( p_item->i_short )
@@ -974,49 +953,38 @@ static void Usage( const char *psz_module_name )
 
             case MODULE_CONFIG_ITEM_STRING:
             case MODULE_CONFIG_ITEM_FILE:
-            case MODULE_CONFIG_ITEM_PLUGIN:
-                /* Nasty hack, but right now I'm too tired to think about
-                 * a nice solution */
-                i = 25 - strlen( p_item->psz_name )
-                    - strlen(_(" <string>")) - 1;
-                if( i < 0 ) i = 0; psz_spaces[i] = 0;
-
-                intf_Msg( psz_format, p_item->psz_name,
-                          _(" <string>"), psz_spaces, p_item->psz_text );
-                psz_spaces[i] = ' ';
+            case MODULE_CONFIG_ITEM_MODULE: /* We could also have "=<" here */
+                psz_bra = " <"; psz_type = _("string"); psz_ket = ">";
                 break;
             case MODULE_CONFIG_ITEM_INTEGER:
-                /* Nasty hack, but right now I'm too tired to think about
-                 * a nice solution */
-                i = 25 - strlen( p_item->psz_name )
-                    - strlen(_(" <integer>")) - 1;
-                if( i < 0 ) i = 0; psz_spaces[i] = 0;
-
-                intf_Msg( psz_format, p_item->psz_name,
-                          _(" <integer>"), psz_spaces, p_item->psz_text );
-                psz_spaces[i] = ' ';
+                psz_bra = " <"; psz_type = _("integer"); psz_ket = ">";
                 break;
             case MODULE_CONFIG_ITEM_FLOAT:
-                /* Nasty hack, but right now I'm too tired to think about
-                 * a nice solution */
-                i = 25 - strlen( p_item->psz_name )
-                    - strlen(_(" <float>")) - 1;
-                if( i < 0 ) i = 0; psz_spaces[i] = 0;
-
-                intf_Msg( psz_format, p_item->psz_name,
-                          _(" <float>"), psz_spaces, p_item->psz_text );
-                psz_spaces[i] = ' ';
+                psz_bra = " <"; psz_type = _("float"); psz_ket = ">";
                 break;
             case MODULE_CONFIG_ITEM_BOOL:
-                /* Nasty hack, but right now I'm too tired to think about
-                 * a nice solution */
-                i = 25 - strlen( p_item->psz_name ) - 1;
-                if( i < 0 ) i = 0; psz_spaces[i] = 0;
-
-                intf_Msg( psz_format,
-                          p_item->psz_name, "", psz_spaces, p_item->psz_text );
-                psz_spaces[i] = ' ';
+                psz_bra = ""; psz_type = ""; psz_ket = "";
                 break;
+            }
+
+            if( psz_type )
+            {
+                i = PADDING_SPACES - strlen( p_item->psz_name )
+                     - strlen( psz_bra ) - strlen( psz_type )
+                     - strlen( psz_ket ) - 1;
+                if( i < 0 )
+                {
+                    i = 0;
+                    psz_spaces[i] = '\n';
+                }
+                else
+                {
+                    psz_spaces[i] = '\0';
+                }
+
+                intf_Msg( psz_format, p_item->psz_name, psz_bra, psz_type,
+                          psz_ket, psz_spaces, p_item->psz_text );
+                psz_spaces[i] = ' ';
             }
         }
 
@@ -1059,9 +1027,9 @@ static void Usage( const char *psz_module_name )
 static void ListModules( void )
 {
     module_t *p_module;
-    char psz_spaces[20];
+    char psz_spaces[22];
 
-    memset( psz_spaces, 32, 20 );
+    memset( psz_spaces, ' ', 22 );
 
 #ifdef WIN32
     ShowConsole();
@@ -1071,7 +1039,7 @@ static void ListModules( void )
     intf_Msg( _("Usage: %s [options] [parameters] [file]...\n"),
               p_main->psz_arg0 );
 
-    intf_Msg( _("[plugin]              [description]") );
+    intf_Msg( _("[module]              [description]") );
 
     /* Enumerate each module */
     for( p_module = p_module_bank->first ;
@@ -1082,14 +1050,14 @@ static void ListModules( void )
 
         /* Nasty hack, but right now I'm too tired to think about a nice
          * solution */
-        i = 20 - strlen( p_module->psz_name ) - 1;
+        i = 22 - strlen( p_module->psz_name ) - 1;
         if( i < 0 ) i = 0;
         psz_spaces[i] = 0;
 
         intf_Msg( "  %s%s %s", p_module->psz_name, psz_spaces,
                   p_module->psz_longname );
 
-        psz_spaces[i] = 32;
+        psz_spaces[i] = ' ';
 
     }
 

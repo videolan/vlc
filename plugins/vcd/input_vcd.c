@@ -164,7 +164,7 @@ static int VCDOpen( struct input_thread_s *p_input )
             free( psz_orig );
             return -1;
         }
-        psz_source = config_GetPszVariable( "vcd_device" );
+        psz_source = config_GetPszVariable( "vcd" );
     }
 
     /* test the type of file given */

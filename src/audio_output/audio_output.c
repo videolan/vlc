@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.83 2002/03/12 18:37:46 stef Exp $
+ * $Id: audio_output.c,v 1.84 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -100,7 +100,7 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
     p_aout->i_rate = config_GetIntVariable( "rate" );
     p_aout->i_channels = config_GetIntVariable( "mono" ) ? 1 : 2;
 
-    i_format = config_GetIntVariable( "aout_format" );
+    i_format = config_GetIntVariable( "audio-format" );
     if( ( !i_format ) || ( i_format > 8 ) )
     {
         p_aout->i_format = AOUT_FMT_S16_NE;

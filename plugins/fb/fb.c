@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.17 2002/04/19 13:56:11 sam Exp $
+ * $Id: fb.c,v 1.18 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -66,7 +66,7 @@ static void GfxMode        ( int i_tty );
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
-#define FB_DEV_VAR "fb_dev"
+#define FB_DEV_VAR "fbdev"
 
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )

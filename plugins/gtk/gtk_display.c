@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.19 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: gtk_display.c,v 1.20 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -147,7 +147,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
                                     p_input_bank->pp_input[0]->psz_source );
                 p_channel = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
                            p_intf->p_sys->p_window ), "network_channel_box" ) );
-                if( config_GetIntVariable( "network_channel" ) )
+                if( config_GetIntVariable( "network-channel" ) )
                 {
                     gtk_widget_show( GTK_WIDGET( p_channel ) );
                 }
@@ -193,7 +193,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
     }
     else
     {
-        if( config_GetIntVariable( "network_channel" ) )
+        if( config_GetIntVariable( "network-channel" ) )
         {
             gtk_widget_show( GTK_WIDGET( p_network_box ) );
 

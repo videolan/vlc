@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.13 2002/04/03 06:23:08 sam Exp $
+ * $Id: dvd_access.c,v 1.14 2002/04/23 14:16:20 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -781,7 +781,7 @@ static char * DVDParse( input_thread_t * p_input )
             /* no device and no access specified: we probably don't want DVD */
             return NULL;
         }
-        psz_device = config_GetPszVariable( "dvd_device" );
+        psz_device = config_GetPszVariable( "dvd" );
     }
 
 #ifndef WIN32    

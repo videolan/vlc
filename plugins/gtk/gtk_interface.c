@@ -354,7 +354,7 @@ create_intf_window (void)
   gtk_widget_show (menubar_modules);
   gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_modules);
   gtk_widget_set_sensitive (menubar_modules, FALSE);
-  gtk_tooltips_set_tip (tooltips, menubar_modules, _("Open the plugin manager"), NULL);
+  gtk_tooltips_set_tip (tooltips, menubar_modules, _("Open the module manager"), NULL);
 
   menubar_messages = gtk_menu_item_new_with_label (_("Messages..."));
   gtk_widget_ref (menubar_messages);
@@ -526,7 +526,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Back"),
-                                _("Go Backwards"), NULL,
+                                _("Go Backward"), NULL,
                                 NULL, NULL, NULL);
   gtk_widget_ref (toolbar_back);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_back", toolbar_back,
@@ -788,7 +788,7 @@ create_intf_window (void)
 
   channel_label = gtk_label_new (_("Channel:"));
   gtk_widget_ref (channel_label);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "channel_label", channel_label,
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "channel-label", channel_label,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (channel_label);
   gtk_box_pack_start (GTK_BOX (network_channel_box), channel_label, FALSE, FALSE, 5);
@@ -1593,7 +1593,7 @@ create_intf_disc (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (disc_name);
   gtk_box_pack_start (GTK_BOX (hbox2), disc_name, TRUE, TRUE, 0);
-  gtk_entry_set_text (GTK_ENTRY (disc_name), config_GetPszVariable( "dvd_device" ));
+  gtk_entry_set_text (GTK_ENTRY (disc_name), config_GetPszVariable( "dvd" ));
 
   dialog_action_area1 = GTK_DIALOG (intf_disc)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_disc), "dialog_action_area1", dialog_action_area1);

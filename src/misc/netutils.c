@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.61 2002/03/19 00:30:44 sam Exp $
+ * $Id: netutils.c,v 1.62 2002/04/23 14:16:21 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -157,7 +157,7 @@ int network_ChannelJoin( int i_channel )
     struct timeval delay;
     fd_set fds;
 
-    if( !config_GetIntVariable( "network_channel" ) )
+    if( !config_GetIntVariable( "network-channel" ) )
     {
         intf_ErrMsg( "network: channels disabled, to enable them, use the"
                      "--channels option" );
@@ -184,13 +184,13 @@ int network_ChannelJoin( int i_channel )
     }
 
     /* Getting information about the channel server */
-    if( !(psz_vlcs = config_GetPszVariable( "channel_server" )) )
+    if( !(psz_vlcs = config_GetPszVariable( "channel-server" )) )
     {
         intf_ErrMsg( "network: configuration variable channel_server empty" );
         return -1;
     }
 
-    i_port = config_GetIntVariable( "channel_port" );
+    i_port = config_GetIntVariable( "channel-port" );
 
     intf_WarnMsg( 5, "channel: connecting to %s:%d",
                      psz_vlcs, i_port );

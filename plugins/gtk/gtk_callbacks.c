@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.37 2002/04/06 04:22:27 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.38 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -501,7 +501,7 @@ gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
             {
             case '\0':
             case '@':
-                psz_device = config_GetPszVariable( "dvd_device" );
+                psz_device = config_GetPszVariable( "dvd" );
                 break;
             default:
                 /* Omit the first 4 characters */
@@ -515,7 +515,7 @@ gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
             {
             case '\0':
             case '@':
-                psz_device = config_GetPszVariable( "vcd_device" );
+                psz_device = config_GetPszVariable( "vcd" );
                 break;
             default:
                 /* Omit the first 4 characters */

@@ -110,11 +110,11 @@ void __fastcall TDiscDlg::RadioGroupTypeClick( TObject *Sender )
 
     if( RadioGroupType->ItemIndex == 0 )
     {
-        psz_device = config_GetPszVariable( "dvd_device" );
+        psz_device = config_GetPszVariable( "dvd" );
     }
     else
     {
-        psz_device = config_GetPszVariable( "vcd_device" );
+        psz_device = config_GetPszVariable( "vcd" );
     }
 
     if( psz_device )

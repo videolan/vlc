@@ -4,6 +4,14 @@
 
 HEAD
 
+  * ./src/interface/main.c: tidied the help output code.
+  * ALL: removed underscores from option names and made a few options more
+    self-explanatory, for instance --input_channel becomes --audio-channel;
+    run vlc -H to see what has changed.
+  * ALL: replaced many occurences of "plugin" with the word "module".
+  * ./src/interface/main.c: moved all satellite-specific configuration options
+    to the satellite plugin.
+  * ./po/*: updated translations.
   * ./plugins/chroma/i420_yuy2.h: optimized the 420 planar-to-packed chroma
     transformations. They're now PIC-friendly as well.
   * ./plugins/macosx/intf_open.c: added Open disc and network panels.

@@ -380,9 +380,6 @@
 /* Define if your compiler groks C altivec extensions. */
 #undef CAN_COMPILE_C_ALTIVEC
 
-/* define if compiling with satellite card support */
-#undef HAVE_SATELLITE
-
 /* Indicate whether we should use SDL/SDL.h or SDL11/SDL.h */
 #undef SDL_INCLUDE_FILE
 

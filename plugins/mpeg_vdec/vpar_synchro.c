@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_synchro.c,v 1.8 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: vpar_synchro.c,v 1.9 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -534,7 +534,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
 static int SynchroType( void )
 {
     char psz_synchro_tmp[5];
-    char * psz_synchro = config_GetPszVariable( "vpar_synchro" );
+    char * psz_synchro = config_GetPszVariable( "vpar-synchro" );
 
     if( psz_synchro == NULL )
     {

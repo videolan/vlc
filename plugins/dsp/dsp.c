@@ -2,7 +2,7 @@
  * dsp.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dsp.c,v 1.15 2002/04/19 13:56:10 sam Exp $
+ * $Id: dsp.c,v 1.16 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -40,7 +40,7 @@ void _M( aout_getfunctions )( function_list_t * p_function_list );
  *****************************************************************************/
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_FILE  ( "dsp_dev", "/dev/dsp", NULL, N_("OSS dsp device"), NULL )
+ADD_FILE  ( "dspdev", "/dev/dsp", NULL, N_("OSS dsp device"), NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

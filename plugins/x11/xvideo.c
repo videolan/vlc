@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.10 2002/04/19 13:56:11 sam Exp $
+ * $Id: xvideo.c,v 1.11 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -58,9 +58,9 @@
 
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( "xvideo_display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
-ADD_INTEGER ( "xvideo_adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT )
-ADD_BOOL    ( "xvideo_altfullscreen", NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
+ADD_STRING  ( "xvideo-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
+ADD_INTEGER ( "xvideo-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT )
+ADD_BOOL    ( "xvideo-altfullscreen", NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

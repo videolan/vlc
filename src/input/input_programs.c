@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.80 2002/04/17 17:00:58 jobi Exp $
+ * $Id: input_programs.c,v 1.81 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -317,7 +317,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
     if( p_main->b_audio )
     {
         /* Default is the first one */
-        i_required_audio_es = config_GetIntVariable( "input_channel" );
+        i_required_audio_es = config_GetIntVariable( "audio-channel" );
         if( i_required_audio_es < 0 )
         {
             i_required_audio_es = 1;
@@ -332,7 +332,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
     if( p_main->b_video )
     {
         /* for spu, default is none */
-        i_required_spu_es = config_GetIntVariable( "input_subtitle" );
+        i_required_spu_es = config_GetIntVariable( "spu-channel" );
         if( i_required_spu_es < 0 )
         {
             i_required_spu_es = 0;
@@ -480,9 +480,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     p_es->p_decoder_fifo = NULL;
     p_es->b_audio = 0;
     p_es->i_cat = UNKNOWN_ES;
-#ifdef HAVE_SATELLITE
-    p_es->i_dmx_fd = 0;
-#endif
+    p_es->i_demux_fd = 0;
 
     if( i_data_len )
     {

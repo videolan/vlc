@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.5 2002/04/19 13:56:11 sam Exp $
+ * $Id: ipv6.c,v 1.6 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -164,7 +164,7 @@ static int OpenUDP( network_socket_t * p_socket )
 
     if( i_bind_port == 0 )
     {
-        i_bind_port = config_GetIntVariable( "server_port" );
+        i_bind_port = config_GetIntVariable( "server-port" );
     }
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET6 domain, automatic (0)

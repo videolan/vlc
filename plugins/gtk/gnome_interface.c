@@ -97,7 +97,7 @@ static GnomeUIInfo menubar_view_menu_uiinfo[] =
   },
   {
     GNOME_APP_UI_ITEM, N_("_Modules..."),
-    N_("Open the plugin manager"),
+    N_("Open the module manager"),
     (gpointer) GnomeMenubarModulesActivate, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ATTACH,
     0, (GdkModifierType) 0, NULL
@@ -414,7 +414,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Back"),
-                                _("Go Backwards"), NULL,
+                                _("Go Backward"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_back);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_back", toolbar_back,
@@ -1366,7 +1366,7 @@ create_intf_disc (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (disc_name);
   gtk_box_pack_start (GTK_BOX (hbox1), disc_name, TRUE, TRUE, 0);
-  gtk_entry_set_text (GTK_ENTRY (disc_name), config_GetPszVariable( "dvd_device" ));
+  gtk_entry_set_text (GTK_ENTRY (disc_name), config_GetPszVariable( "dvd" ));
 
   dialog_action_area4 = GNOME_DIALOG (intf_disc)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_disc), "dialog_action_area4", dialog_action_area4);
@@ -2298,7 +2298,7 @@ create_intf_open (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (entry1);
   gtk_box_pack_start (GTK_BOX (hbox6), entry1, TRUE, TRUE, 0);
-  gtk_entry_set_text (GTK_ENTRY (entry1), config_GetPszVariable( "dvd_device" ));
+  gtk_entry_set_text (GTK_ENTRY (entry1), config_GetPszVariable( "dvd" ));
 
   tab_disc = gtk_label_new (_("Disc"));
   gtk_widget_ref (tab_disc);

@@ -274,7 +274,7 @@
 	      <class>GtkMenuItem</class>
 	      <name>menubar_modules</name>
 	      <sensitive>False</sensitive>
-	      <tooltip>Open the plugin manager</tooltip>
+	      <tooltip>Open the module manager</tooltip>
 	      <signal>
 		<name>activate</name>
 		<handler>GtkModulesActivate</handler>
@@ -463,7 +463,7 @@
 	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_back</name>
 	  <sensitive>False</sensitive>
-	  <tooltip>Go Backwards</tooltip>
+	  <tooltip>Go Backward</tooltip>
 	  <signal>
 	    <name>button_press_event</name>
 	    <handler>GtkControlBack</handler>

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.193 2002/04/08 14:53:05 jobi Exp $
+ * $Id: input.c,v 1.194 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -187,7 +187,7 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.control.i_rate = DEFAULT_RATE;
     p_input->stream.control.b_mute = 0;
     p_input->stream.control.b_grayscale = config_GetIntVariable( "grayscale" );
-    p_input->stream.control.i_smp = config_GetIntVariable( "vdec_smp" );
+    p_input->stream.control.i_smp = config_GetIntVariable( "vdec-smp" );
 
     intf_WarnMsg( 1, "input: playlist item `%s'", p_input->psz_source );
 

@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_dsp.c,v 1.26 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: aout_dsp.c,v 1.27 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -111,7 +111,7 @@ static int aout_Open( aout_thread_t *p_aout )
     }
 
     /* Initialize some variables */
-    if( !(p_aout->p_sys->psz_device = config_GetPszVariable( "dsp_dev" )) )
+    if( !(p_aout->p_sys->psz_device = config_GetPszVariable( "dspdev" )) )
     {
         intf_ErrMsg( "aout error: don't know which audio device to open" );
         free( p_aout->p_sys );

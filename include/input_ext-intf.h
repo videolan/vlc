@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.63 2002/03/21 02:27:04 jobi Exp $
+ * $Id: input_ext-intf.h,v 1.64 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -71,10 +71,8 @@ typedef struct es_descriptor_s
                                            * fast forward and slow motion ?  */
     u8                      i_cat;        /* stream category: video, audio,
                                            * spu, other */
-#ifdef HAVE_SATELLITE
-    int                     i_dmx_fd;     /* used to store demux device
+    int                     i_demux_fd;   /* used to store demux device
                                              file handle */
-#endif
     char                    psz_desc[20]; /* description of ES: audio language
                                            * for instance ; NULL if not
                                            *  available */

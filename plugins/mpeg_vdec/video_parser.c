@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.17 2002/04/21 10:32:20 sam Exp $
+ * $Id: video_parser.c,v 1.18 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -72,15 +72,15 @@ void _M( vdec_getfunctions )( function_list_t * p_function_list )
  * Build configuration tree.
  *****************************************************************************/
 /* Variable containing the motion compensation method */
-#define MOTION_METHOD_VAR               "mpeg_vdec_motion"
+#define MOTION_METHOD_VAR               "mpeg-motion"
 /* Variable containing the IDCT method */
-#define IDCT_METHOD_VAR                 "mpeg_vdec_idct"
+#define IDCT_METHOD_VAR                 "mpeg-idct"
 
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL)
-ADD_PLUGIN( IDCT_METHOD_VAR, MODULE_CAPABILITY_IDCT, NULL, NULL,
+ADD_MODULE( IDCT_METHOD_VAR, MODULE_CAPABILITY_IDCT, NULL, NULL,
 	    N_("IDCT module"), NULL )
-ADD_PLUGIN( MOTION_METHOD_VAR, MODULE_CAPABILITY_MOTION, NULL, NULL,
+ADD_MODULE( MOTION_METHOD_VAR, MODULE_CAPABILITY_MOTION, NULL, NULL,
 	    N_("motion compensation module"), NULL )
 MODULE_CONFIG_STOP
 

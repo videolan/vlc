@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.35 2002/04/03 16:22:23 sam Exp $
+ * $Id: input_dvdread.c,v 1.36 2002/04/23 14:16:20 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -295,7 +295,7 @@ static int DvdReadOpen( struct input_thread_s *p_input )
             free( psz_orig );
             return -1;
         }
-        psz_source = config_GetPszVariable( "dvd_device" );
+        psz_source = config_GetPszVariable( "dvd" );
     }
 
     if( stat( psz_source, &stat_info ) == -1 )
@@ -1219,15 +1219,15 @@ static void DvdReadLauchDecoders( input_thread_t * p_input )
     if( p_main->b_audio )
     {
         /* For audio: first one if none or a not existing one specified */
-        int i_audio = config_GetIntVariable( "input_channel" );
+        int i_audio = config_GetIntVariable( "audio-channel" );
         if( i_audio < 0 /*|| i_audio > i_audio_nb*/ )
         {
-            config_PutIntVariable( "input_channel", 1 );
+            config_PutIntVariable( "audio-channel", 1 );
             i_audio = 1;
         }
         if( i_audio > 0/* && i_audio_nb > 0*/ )
         {
-            if( config_GetIntVariable( "input_audio" ) == REQUESTED_AC3 )
+            if( config_GetIntVariable( "audio-type" ) == REQUESTED_AC3 )
             {
                 int     i_ac3 = i_audio;
                 while( ( p_input->stream.pp_es[i_ac3]->i_type !=
@@ -1253,10 +1253,10 @@ static void DvdReadLauchDecoders( input_thread_t * p_input )
     if( p_main->b_video )
     {
         /* for spu, default is none */
-        int i_spu = config_GetIntVariable( "input_subtitle" );
+        int i_spu = config_GetIntVariable( "spu-channel" );
         if( i_spu < 0 /*|| i_spu > i_spu_nb*/ )
         {
-            config_PutIntVariable( "input_subtitle", 0 );
+            config_PutIntVariable( "spu-channel", 0 );
             i_spu = 0;
         }
         if( i_spu > 0 /*&& i_spu_nb > 0*/ )

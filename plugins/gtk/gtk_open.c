@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.22 2002/04/15 04:36:45 jobi Exp $
+ * $Id: gtk_open.c,v 1.23 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -72,7 +72,7 @@ gboolean GtkFileOpenShow( GtkWidget       *widget,
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
                              "p_intf", p_intf );
 
-        if( (psz_path = config_GetPszVariable( "search_path" )) )
+        if( (psz_path = config_GetPszVariable( "search-path" )) )
             gtk_file_selection_set_filename( GTK_FILE_SELECTION(
                 p_intf->p_sys->p_fileopen ), psz_path );
         if( psz_path ) free( psz_path );
@@ -153,7 +153,7 @@ void GtkDiscOpenDvd( GtkToggleButton * togglebutton, gpointer user_data )
     {
         char *psz_dvd_device;
 
-        if( (psz_dvd_device = config_GetPszVariable( "dvd_device" )) )
+        if( (psz_dvd_device = config_GetPszVariable( "dvd" )) )
             gtk_entry_set_text(
                 GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
                                           "disc_name" ) ), psz_dvd_device );
@@ -167,7 +167,7 @@ void GtkDiscOpenVcd( GtkToggleButton * togglebutton, gpointer user_data )
     {
         char *psz_vcd_device;
 
-        if( (psz_vcd_device = config_GetPszVariable( "vcd_device" )) )
+        if( (psz_vcd_device = config_GetPszVariable( "vcd" )) )
             gtk_entry_set_text(
                 GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
                                           "disc_name" ) ), psz_vcd_device );
@@ -272,9 +272,9 @@ gboolean GtkNetworkOpenShow( GtkWidget       *widget,
 
         gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(
             GTK_OBJECT( p_intf->p_sys->p_network ), "network_port" ) ),
-            config_GetIntVariable( "server_port" ) );
+            config_GetIntVariable( "server-port" ) );
 
-        psz_channel_server = config_GetPszVariable( "channel_server" );
+        psz_channel_server = config_GetPszVariable( "channel-server" );
         if( psz_channel_server )
             gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
                 GTK_OBJECT( p_intf->p_sys->p_network ), "network_channel" ) ),
@@ -283,11 +283,11 @@ gboolean GtkNetworkOpenShow( GtkWidget       *widget,
 
         gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(
             GTK_OBJECT( p_intf->p_sys->p_network ), "network_channel_port" ) ),
-            config_GetIntVariable( "channel_port" ) );
+            config_GetIntVariable( "channel-port" ) );
 
         gtk_toggle_button_set_active( gtk_object_get_data( GTK_OBJECT(
             p_intf->p_sys->p_network ), "network_channel_check" ),
-            config_GetIntVariable( "network_channel" ) );
+            config_GetIntVariable( "network-channel" ) );
     }
 
     gtk_widget_show( p_intf->p_sys->p_network );
@@ -337,7 +337,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
     /* Manage channel server */
     b_channel = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(
         lookup_widget( GTK_WIDGET(button), "network_channel_check" ) ) );
-    config_PutIntVariable( "network_channel", b_channel );
+    config_PutIntVariable( "network-channel", b_channel );
     if( b_channel )
     {
         char *          psz_channel;
@@ -353,10 +353,10 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         i_channel_port = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON(
             lookup_widget( GTK_WIDGET(button), "network_channel_port" ) ) );
 
-        config_PutPszVariable( "channel_server", psz_channel );
+        config_PutPszVariable( "channel-server", psz_channel );
         if( i_channel_port < 65536 )
         {
-            config_PutIntVariable( "channel_port", i_channel_port );
+            config_PutIntVariable( "channel-port", i_channel_port );
         }
 
         p_intf->p_sys->b_playing = 1;

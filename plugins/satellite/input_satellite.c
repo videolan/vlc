@@ -148,27 +148,27 @@ static int SatelliteOpen( input_thread_t * p_input )
     {
         intf_WarnMsg( 1, "input: satellite: invalid frequency, using"\
                 "default one" );
-        i_srate = config_GetIntVariable( "sat_frequency" );
+        i_srate = config_GetIntVariable( "frequency" );
     }
 
     if( i_srate > 30000 || i_srate < 1000 )
     {
         intf_WarnMsg( 1, "input: satellite: invalid symbol rate, using"\
                 "default one" );
-        i_srate = config_GetIntVariable( "sat_symbol_rate" );
+        i_srate = config_GetIntVariable( "symbol-rate" );
     }
 
     if( !b_pol && b_pol != 1 )
     {
         intf_WarnMsg( 1, "input: satellite: invalid polarization, using"\
                 "default one" );
-        b_pol = config_GetIntVariable( "sat_polarization" );
+        b_pol = config_GetIntVariable( "polarization" );
     }
 
     if( i_fec > 7 || i_fec < 1 )
     {
         intf_WarnMsg( 1, "input: satellite: invalid FEC, using default one" );
-        i_fec = config_GetIntVariable( "sat_fec" );
+        i_fec = config_GetIntVariable( "fec" );
     }
 
     switch( i_fec )
@@ -224,10 +224,10 @@ static int SatelliteOpen( input_thread_t * p_input )
 
 
     /* Get antenna configuration options */
-    b_diseqc = config_GetIntVariable( "sat_diseqc" );
-    i_lnb_lof1 = config_GetIntVariable( "sat_lnb_lof1" );
-    i_lnb_lof2 = config_GetIntVariable( "sat_lnb_lof2" );
-    i_lnb_slof = config_GetIntVariable( "sat_lnb_slof" );
+    b_diseqc = config_GetIntVariable( "diseqc" );
+    i_lnb_lof1 = config_GetIntVariable( "lnb-lof1" );
+    i_lnb_lof2 = config_GetIntVariable( "lnb-lof2" );
+    i_lnb_slof = config_GetIntVariable( "lnb-slof" );
 
     /* Initialize the Satellite Card */
 
@@ -340,7 +340,7 @@ static void SatelliteClose( input_thread_t * p_input )
 #define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
             if ( p_es->p_decoder_fifo )
             {
-                ioctl_UnsetDMXFilter( p_es->i_dmx_fd );
+                ioctl_UnsetDMXFilter( p_es->i_demux_fd );
             }
 #undef p_es
         }
@@ -380,10 +380,10 @@ int SatelliteSetProgram( input_thread_t    * p_input,
             {
                 input_UnselectES( p_input , p_es );
             }
-            if ( p_es->i_dmx_fd )
+            if ( p_es->i_demux_fd )
             {
-                ioctl_UnsetDMXFilter( p_es->i_dmx_fd );
-                p_es->i_dmx_fd = 0;
+                ioctl_UnsetDMXFilter( p_es->i_demux_fd );
+                p_es->i_demux_fd = 0;
             }
 #undef p_es
         }
@@ -398,7 +398,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
             case MPEG2_VIDEO_ES:
                 if ( p_main->b_video )
                 {
-                    ioctl_SetDMXFilter( p_es->i_id, &p_es->i_dmx_fd, 1);
+                    ioctl_SetDMXFilter( p_es->i_id, &p_es->i_demux_fd, 1);
                     input_SelectES( p_input , p_es );
                 }
                 break;
@@ -406,12 +406,12 @@ int SatelliteSetProgram( input_thread_t    * p_input,
             case MPEG2_AUDIO_ES:
                 if ( p_main->b_audio )
                 {
-                    ioctl_SetDMXFilter( p_es->i_id, &p_es->i_dmx_fd, 2);
+                    ioctl_SetDMXFilter( p_es->i_id, &p_es->i_demux_fd, 2);
                     input_SelectES( p_input , p_es );
                 }
                 break;
             default:
-                ioctl_SetDMXFilter( p_es->i_id, &p_es->i_dmx_fd, 3);
+                ioctl_SetDMXFilter( p_es->i_id, &p_es->i_demux_fd, 3);
                 input_SelectES( p_input , p_es );
                 break;
 #undef p_es
@@ -484,12 +484,12 @@ static int SatelliteDemux( input_thread_t * p_input )
 
     for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
     {
-        if ( p_input->stream.pp_programs[i]->pp_es[0]->i_dmx_fd == 0 )
+        if ( p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd == 0 )
         {
             intf_WarnMsg( 2, "input: satellite: setting filter on pmt pid %d",
                         p_input->stream.pp_programs[i]->pp_es[0]->i_id);
             ioctl_SetDMXFilter( p_input->stream.pp_programs[i]->pp_es[0]->i_id,
-                       &p_input->stream.pp_programs[i]->pp_es[0]->i_dmx_fd,
+                       &p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd,
                        3 );
         }
     }

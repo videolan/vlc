@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.18 2002/04/21 21:29:20 gbazin Exp $
+ * $Id: configuration.c,v 1.19 2002/04/23 14:16:21 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -110,7 +110,7 @@ float config_GetFloatVariable( const char *psz_name )
  *****************************************************************************
  * This function is used to get the value of variables which are internally
  * represented by a string (MODULE_CONFIG_ITEM_STRING, MODULE_CONFIG_ITEM_FILE,
- * and MODULE_CONFIG_ITEM_PLUGIN).
+ * and MODULE_CONFIG_ITEM_MODULE).
  *
  * Important note: remember to free() the returned char* because it a duplicate
  *   of the actual value. It isn't safe to return a pointer to the actual value
@@ -131,7 +131,7 @@ char * config_GetPszVariable( const char *psz_name )
     }
     if( (p_config->i_type!=MODULE_CONFIG_ITEM_STRING) &&
         (p_config->i_type!=MODULE_CONFIG_ITEM_FILE) &&
-        (p_config->i_type!=MODULE_CONFIG_ITEM_PLUGIN) )
+        (p_config->i_type!=MODULE_CONFIG_ITEM_MODULE) )
     {
         intf_ErrMsg( "config error: option %s doesn't refer to a string",
                      psz_name );
@@ -151,7 +151,7 @@ char * config_GetPszVariable( const char *psz_name )
  *****************************************************************************
  * This function is used to set the value of variables which are internally
  * represented by a string (MODULE_CONFIG_ITEM_STRING, MODULE_CONFIG_ITEM_FILE,
- * and MODULE_CONFIG_ITEM_PLUGIN).
+ * and MODULE_CONFIG_ITEM_MODULE).
  *****************************************************************************/
 void config_PutPszVariable( const char *psz_name, char *psz_value )
 {
@@ -167,7 +167,7 @@ void config_PutPszVariable( const char *psz_name, char *psz_value )
     }
     if( (p_config->i_type!=MODULE_CONFIG_ITEM_STRING) &&
         (p_config->i_type!=MODULE_CONFIG_ITEM_FILE) &&
-        (p_config->i_type!=MODULE_CONFIG_ITEM_PLUGIN) )
+        (p_config->i_type!=MODULE_CONFIG_ITEM_MODULE) )
     {
         intf_ErrMsg( "config error: option %s doesn't refer to a string",
                      psz_name );
@@ -494,7 +494,7 @@ int config_LoadConfigFile( const char *psz_module_name )
  * It's no use to save the config options that kept their default values, so
  * we'll try to be a bit clever here.
  *
- * When we save we mustn't delete the config options of the plugins that
+ * When we save we mustn't delete the config options of the modules that
  * haven't been loaded. So we cannot just create a new config file with the
  * config structures we've got in memory. 
  * I don't really know how to deal with this nicely, so I will use a completly
@@ -675,23 +675,25 @@ int config_SaveConfigFile( const char *psz_module_name )
             case MODULE_CONFIG_ITEM_BOOL:
             case MODULE_CONFIG_ITEM_INTEGER:
                 if( p_item->psz_text )
-                    fprintf( file, "# %s %s\n", p_item->psz_text,
+                    fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              (p_item->i_type == MODULE_CONFIG_ITEM_BOOL) ?
-                             _("<boolean>") : _("<integer>") );
+                             _("boolean") : _("integer") );
                 fprintf( file, "%s=%i\n", p_item->psz_name,
                          p_item->i_value );
                 break;
 
             case MODULE_CONFIG_ITEM_FLOAT:
                 if( p_item->psz_text )
-                    fprintf( file, _("# %s <float>\n"), p_item->psz_text );
+                    fprintf( file, "# %s (%s)\n", p_item->psz_text,
+                             _("float") );
                 fprintf( file, "%s=%f\n", p_item->psz_name,
                          (double)p_item->f_value );
                 break;
 
             default:
                 if( p_item->psz_text )
-                    fprintf( file, _("# %s <string>\n"), p_item->psz_text );
+                    fprintf( file, "# %s (%s)\n", p_item->psz_text,
+                             _("string") );
                 fprintf( file, "%s=%s\n", p_item->psz_name,
                          p_item->psz_value ? p_item->psz_value : "" );
             }
@@ -858,7 +860,7 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
             {
             case MODULE_CONFIG_ITEM_STRING:
             case MODULE_CONFIG_ITEM_FILE:
-            case MODULE_CONFIG_ITEM_PLUGIN:
+            case MODULE_CONFIG_ITEM_MODULE:
                 config_PutPszVariable( p_longopts[i_index].name, optarg );
                 break;
             case MODULE_CONFIG_ITEM_INTEGER:
@@ -883,7 +885,7 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
             {
             case MODULE_CONFIG_ITEM_STRING:
             case MODULE_CONFIG_ITEM_FILE:
-            case MODULE_CONFIG_ITEM_PLUGIN:
+            case MODULE_CONFIG_ITEM_MODULE:
                 config_PutPszVariable( pp_shortopts[i_cmd]->psz_name, optarg );
                 break;
             case MODULE_CONFIG_ITEM_INTEGER:

@@ -14,7 +14,7 @@ do
 #include <videolan/vlc.h>
 EOF
                 tail +8 $file \
-                        | sed 's#_("/dev/dvd")#config_GetPszVariable( "dvd_device" )#' \
+                        | sed 's#_("/dev/dvd")#config_GetPszVariable( "dvd" )#' \
                         >> /tmp/$$.$file.bak
                 mv -f /tmp/$$.$file.bak $file
         fi

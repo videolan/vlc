@@ -605,7 +605,7 @@ void __fastcall TMainFrameDlg::ModeManage()
                 GroupBoxNetwork->Visible = true;
                 ActiveGB = GroupBoxNetwork;
                 LabelServer->Caption = p_input_bank->pp_input[0]->psz_source;
-                if( config_GetIntVariable( "network_channel" ) )
+                if( config_GetIntVariable( "network-channel" ) )
                 {
                     LabelChannel->Visible = true;
                 }
@@ -650,7 +650,7 @@ void __fastcall TMainFrameDlg::ModeManage()
     {
         i_Height = StatusBar->Height + ToolBar->Height + 47;
 
-        if( config_GetIntVariable( "network_channel" ) )
+        if( config_GetIntVariable( "network-channel" ) )
         {
             GroupBoxNetwork->Visible = true;
             LabelChannel->Visible = true;

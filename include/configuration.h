@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.7 2002/04/21 18:32:12 sam Exp $
+ * $Id: configuration.h,v 1.8 2002/04/23 14:16:19 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -38,7 +38,7 @@
 /* Configuration item types */
 #define MODULE_CONFIG_ITEM_STRING           0x0010  /* String option */
 #define MODULE_CONFIG_ITEM_FILE             0x0020  /* File option */
-#define MODULE_CONFIG_ITEM_PLUGIN           0x0030  /* Plugin option */
+#define MODULE_CONFIG_ITEM_MODULE           0x0030  /* Module option */
 #define MODULE_CONFIG_ITEM_INTEGER          0x0040  /* Integer option */
 #define MODULE_CONFIG_ITEM_BOOL             0x0050  /* Bool option */
 #define MODULE_CONFIG_ITEM_FLOAT            0x0060  /* Float option */
@@ -127,8 +127,8 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
 #define ADD_FILE( name, psz_value, p_callback, text, longtext ) \
     { MODULE_CONFIG_ITEM_FILE, name, '\0', text, longtext, psz_value, 0, 0, \
       p_callback, NULL, 0 },
-#define ADD_PLUGIN( name, i_capability, psz_value, p_callback, text, longtext)\
-    { MODULE_CONFIG_ITEM_PLUGIN, name, '\0', text, longtext, psz_value, \
+#define ADD_MODULE( name, i_capability, psz_value, p_callback, text, longtext)\
+    { MODULE_CONFIG_ITEM_MODULE, name, '\0', text, longtext, psz_value, \
       i_capability, 0, p_callback, NULL, 0 },
 #define ADD_INTEGER( name, i_value, p_callback, text, longtext ) \
     { MODULE_CONFIG_ITEM_INTEGER, name, '\0', text, longtext, NULL, i_value, \
@@ -145,9 +145,9 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
 #define ADD_FILE_WITH_SHORT( name, ch, psz_value, p_callback, text, longtext ) \
     { MODULE_CONFIG_ITEM_FILE, name, ch, text, longtext, psz_value, 0, 0, \
       p_callback, NULL, 0 },
-#define ADD_PLUGIN_WITH_SHORT( name, ch, i_capability, psz_value, p_callback, \
+#define ADD_MODULE_WITH_SHORT( name, ch, i_capability, psz_value, p_callback, \
   text, longtext) \
-    { MODULE_CONFIG_ITEM_PLUGIN, name, ch, text, longtext, psz_value, \
+    { MODULE_CONFIG_ITEM_MODULE, name, ch, text, longtext, psz_value, \
       i_capability, 0, p_callback, NULL, 0 },
 #define ADD_INTEGER_WITH_SHORT( name, ch, i_value, p_callback, text, \
   longtext ) \

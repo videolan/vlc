@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.92 2002/03/11 07:23:10 gbazin Exp $
+ * $Id: interface.c,v 1.93 2002/04/23 14:16:21 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -165,7 +165,7 @@ static void intf_Manage( intf_thread_t *p_intf )
 
                 p_main->p_playlist->b_stopped = 0;
                 p_main->p_playlist->i_mode = PLAYLIST_FORWARD + 
-                    config_GetIntVariable( "playlist_loop" );
+                    config_GetIntVariable( "loop-playlist" );
                 intf_WarnMsg( 3, "intf: creating new input thread" );
                 p_input = input_CreateThread( &p_main->p_playlist->current,
                                               NULL );

@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.25 2002/04/21 11:23:03 gbazin Exp $
+ * $Id: gtk_preferences.c,v 1.26 2002/04/23 14:16:20 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -69,9 +69,9 @@ static void GtkFreeHashTable     ( gpointer );
 static void GtkFreeHashValue     ( gpointer, gpointer, gpointer );
 static void GtkSaveHashValue     ( gpointer, gpointer, gpointer );
 
-static void GtkPluginConfigure   ( GtkButton *, gpointer );
-static void GtkPluginSelected    ( GtkButton *, gpointer );
-static void GtkPluginHighlighted ( GtkCList *, int, int, GdkEventButton *,
+static void GtkModuleConfigure   ( GtkButton *, gpointer );
+static void GtkModuleSelected    ( GtkButton *, gpointer );
+static void GtkModuleHighlighted ( GtkCList *, int, int, GdkEventButton *,
                                    gpointer );
 
 /****************************************************************************
@@ -153,9 +153,9 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     GtkWidget *float_spinbutton;
     GtkObject *item_adj;
     GtkWidget *bool_checkbutton;
-    GtkWidget *plugin_clist;
-    GtkWidget *plugin_config_button;
-    GtkWidget *plugin_select_button;
+    GtkWidget *module_clist;
+    GtkWidget *module_config_button;
+    GtkWidget *module_select_button;
 
     gint category_max_height;
 
@@ -192,13 +192,13 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 #ifdef MODULE_NAME_IS_gnome
     config_dialog = gnome_dialog_new( p_module->psz_longname, NULL );
     config_dialog_vbox = GNOME_DIALOG(config_dialog)->vbox;
-    category_max_height = config_GetIntVariable( "gnome_prefs_maxh" );
 #else
     config_dialog = gtk_dialog_new();
     gtk_window_set_title( GTK_WINDOW(config_dialog), p_module->psz_longname );
     config_dialog_vbox = GTK_DIALOG(config_dialog)->vbox;
-    category_max_height = config_GetIntVariable( "gtk_prefs_maxh" );
 #endif
+
+    category_max_height = config_GetIntVariable( MODULE_STRING "-prefs-maxh" );
 
     gtk_window_set_policy( GTK_WINDOW(config_dialog), TRUE, TRUE, FALSE );
     gtk_container_set_border_width( GTK_CONTAINER(config_dialog_vbox), 0 );
@@ -290,7 +290,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
             break;
 
-        case MODULE_CONFIG_ITEM_PLUGIN:
+        case MODULE_CONFIG_ITEM_MODULE:
 
             item_frame = gtk_frame_new( p_item->psz_text );
 
@@ -305,15 +305,15 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             {
                 gchar * titles[] = { _("Name"), _("Description") };
 
-                plugin_clist =
+                module_clist =
                     gtk_clist_new_with_titles( 2, titles );
             }
-            gtk_clist_column_titles_passive( GTK_CLIST(plugin_clist) );
-            gtk_clist_set_selection_mode( GTK_CLIST(plugin_clist),
+            gtk_clist_column_titles_passive( GTK_CLIST(module_clist) );
+            gtk_clist_set_selection_mode( GTK_CLIST(module_clist),
                                           GTK_SELECTION_SINGLE);
-            gtk_container_add( GTK_CONTAINER(item_vbox), plugin_clist );
+            gtk_container_add( GTK_CONTAINER(item_vbox), module_clist );
 
-            /* build a list of available plugins */
+            /* build a list of available modules */
             {
                 gchar * entry[2];
 
@@ -325,19 +325,19 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                     {
                         entry[0] = p_module_bis->psz_name;
                         entry[1] = p_module_bis->psz_longname;
-                        gtk_clist_append( GTK_CLIST(plugin_clist), entry );
+                        gtk_clist_append( GTK_CLIST(module_clist), entry );
                     }
                 }
             }
 
-            gtk_clist_set_column_auto_resize( GTK_CLIST(plugin_clist),
+            gtk_clist_set_column_auto_resize( GTK_CLIST(module_clist),
                                               0, TRUE );
-            gtk_clist_set_column_auto_resize( GTK_CLIST(plugin_clist),
+            gtk_clist_set_column_auto_resize( GTK_CLIST(module_clist),
                                               1, TRUE );
 
-            /* connect signals to the plugins list */
-            gtk_signal_connect( GTK_OBJECT(plugin_clist), "select_row",
-                                GTK_SIGNAL_FUNC(GtkPluginHighlighted),
+            /* connect signals to the modules list */
+            gtk_signal_connect( GTK_OBJECT(module_clist), "select_row",
+                                GTK_SIGNAL_FUNC(GtkModuleHighlighted),
                                 NULL );
 
             /* hbox holding the "select" and "configure" buttons */
@@ -345,24 +345,24 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             gtk_container_add( GTK_CONTAINER(item_vbox), item_hbox);
 
             /* add configure button */
-            plugin_config_button =
+            module_config_button =
                 gtk_button_new_with_label( _("Configure") );
-            gtk_widget_set_sensitive( plugin_config_button, FALSE );
+            gtk_widget_set_sensitive( module_config_button, FALSE );
             gtk_container_add( GTK_CONTAINER(item_hbox),
-                               plugin_config_button );
-            gtk_object_set_data( GTK_OBJECT(plugin_config_button),
+                               module_config_button );
+            gtk_object_set_data( GTK_OBJECT(module_config_button),
                                  "p_intf", p_intf );
-            gtk_object_set_data( GTK_OBJECT(plugin_clist),
-                                 "config_button", plugin_config_button );
+            gtk_object_set_data( GTK_OBJECT(module_clist),
+                                 "config_button", module_config_button );
 
             /* add select button */
-            plugin_select_button =
+            module_select_button =
                 gtk_button_new_with_label( _("Select") );
             gtk_container_add( GTK_CONTAINER(item_hbox),
-                               plugin_select_button );
+                               module_select_button );
             /* add a tooltip on mouseover */
             gtk_tooltips_set_tip( p_intf->p_sys->p_tooltips,
-                                  plugin_select_button,
+                                  module_select_button,
                                   p_item->psz_longtext, "" );
 
             /* hbox holding the "selected" label and text input */
@@ -374,8 +374,8 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
             /* add input box with default value */
             string_entry = gtk_entry_new();
-            gtk_object_set_data( GTK_OBJECT(plugin_clist),
-                                 "plugin_entry", string_entry );
+            gtk_object_set_data( GTK_OBJECT(module_clist),
+                                 "module_entry", string_entry );
             gtk_container_add( GTK_CONTAINER(item_hbox), string_entry );
             vlc_mutex_lock( p_item->p_lock );
             gtk_entry_set_text( GTK_ENTRY(string_entry),
@@ -386,12 +386,12 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                                   string_entry, p_item->psz_longtext, "" );
 
             /* connect signals to the buttons */
-            gtk_signal_connect( GTK_OBJECT(plugin_config_button), "clicked",
-                                GTK_SIGNAL_FUNC(GtkPluginConfigure),
-                                (gpointer)plugin_clist );
-            gtk_signal_connect( GTK_OBJECT(plugin_select_button), "clicked",
-                                GTK_SIGNAL_FUNC(GtkPluginSelected),
-                                (gpointer)plugin_clist );
+            gtk_signal_connect( GTK_OBJECT(module_config_button), "clicked",
+                                GTK_SIGNAL_FUNC(GtkModuleConfigure),
+                                (gpointer)module_clist );
+            gtk_signal_connect( GTK_OBJECT(module_select_button), "clicked",
+                                GTK_SIGNAL_FUNC(GtkModuleSelected),
+                                (gpointer)module_clist );
 
             /* connect signal to track changes in the text box */
             gtk_object_set_data( GTK_OBJECT(string_entry), "config_option",
@@ -600,28 +600,28 @@ void GtkConfigSave( GtkButton * button, gpointer user_data )
 }
 
 /****************************************************************************
- * GtkPluginHighlighted: display plugin description when an entry is selected
+ * GtkModuleHighlighted: display module description when an entry is selected
  *   in the clist, and activate the configure button if necessary.
  ****************************************************************************/
-void GtkPluginHighlighted( GtkCList *plugin_clist, int row, int column,
+void GtkModuleHighlighted( GtkCList *module_clist, int row, int column,
                            GdkEventButton *event, gpointer user_data )
 {
     GtkWidget *config_button;
     module_t *p_module;
     char *psz_name;
 
-    if( gtk_clist_get_text( GTK_CLIST(plugin_clist), row, 0, &psz_name ) )
+    if( gtk_clist_get_text( GTK_CLIST(module_clist), row, 0, &psz_name ) )
     {
-        /* look for plugin 'psz_name' */
+        /* look for module 'psz_name' */
         for( p_module = p_module_bank->first ;
              p_module != NULL ;
              p_module = p_module->next )
         {
           if( !strcmp( p_module->psz_name, psz_name ) )
           {
-              gtk_object_set_data( GTK_OBJECT(plugin_clist),
-                                   "plugin_highlighted", p_module );
-              config_button = gtk_object_get_data( GTK_OBJECT(plugin_clist),
+              gtk_object_set_data( GTK_OBJECT(module_clist),
+                                   "module_highlighted", p_module );
+              config_button = gtk_object_get_data( GTK_OBJECT(module_clist),
                                                    "config_button" );
               if( p_module->i_config_items )
                   gtk_widget_set_sensitive( config_button, TRUE );
@@ -636,15 +636,15 @@ void GtkPluginHighlighted( GtkCList *plugin_clist, int row, int column,
 }
 
 /****************************************************************************
- * GtkPluginConfigure: display plugin configuration dialog box.
+ * GtkModuleConfigure: display module configuration dialog box.
  ****************************************************************************/
-void GtkPluginConfigure( GtkButton *button, gpointer user_data )
+void GtkModuleConfigure( GtkButton *button, gpointer user_data )
 {
     module_t *p_module;
     intf_thread_t *p_intf;
 
     p_module = (module_t *)gtk_object_get_data( GTK_OBJECT(user_data),
-                                                "plugin_highlighted" );
+                                                "module_highlighted" );
 
     if( !p_module ) return;
     p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(button),
@@ -654,17 +654,17 @@ void GtkPluginConfigure( GtkButton *button, gpointer user_data )
 }
 
 /****************************************************************************
- * GtkPluginSelected: select plugin.
+ * GtkModuleSelected: select module.
  ****************************************************************************/
-void GtkPluginSelected( GtkButton *button, gpointer user_data )
+void GtkModuleSelected( GtkButton *button, gpointer user_data )
 {
     module_t *p_module;
     GtkWidget *widget;
 
     p_module = (module_t *)gtk_object_get_data( GTK_OBJECT(user_data),
-                                                "plugin_highlighted" );
+                                                "module_highlighted" );
     widget = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
-                                               "plugin_entry" );
+                                               "module_entry" );
     if( !p_module ) return;
 
     gtk_entry_set_text( GTK_ENTRY(widget), p_module->psz_name );
@@ -817,7 +817,7 @@ static void GtkSaveHashValue( gpointer key, gpointer value, gpointer user_data)
 
     case MODULE_CONFIG_ITEM_STRING:
     case MODULE_CONFIG_ITEM_FILE:
-    case MODULE_CONFIG_ITEM_PLUGIN:
+    case MODULE_CONFIG_ITEM_MODULE:
         config_PutPszVariable( p_config->psz_name,
             *p_config->psz_value? p_config->psz_value : NULL );
         break;
