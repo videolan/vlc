@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.36.2.2 2002/10/03 16:44:41 gbazin Exp $
+ * $Id: vout_directx.c,v 1.36.2.3 2002/10/28 20:03:07 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1218,7 +1218,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[V_PLANE].i_pixel_bytes = 1;
-            p_pic->p[V_PLANE].i_visible_bytes = p_vout->output.i_width *
+            p_pic->p[V_PLANE].i_visible_bytes = p_vout->output.i_width / 2 *
               p_pic->p[V_PLANE].i_pixel_bytes;
             p_pic->p[V_PLANE].b_margin = 0;
 
@@ -1227,7 +1227,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[U_PLANE].i_pixel_bytes = 1;
-            p_pic->p[U_PLANE].i_visible_bytes = p_vout->output.i_width *
+            p_pic->p[U_PLANE].i_visible_bytes = p_vout->output.i_width / 2 *
               p_pic->p[U_PLANE].i_pixel_bytes;
             p_pic->p[U_PLANE].b_margin = 0;
 
@@ -1249,7 +1249,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[U_PLANE].i_pixel_bytes = 1;
-            p_pic->p[U_PLANE].i_visible_bytes = p_vout->output.i_width *
+            p_pic->p[U_PLANE].i_visible_bytes = p_vout->output.i_width / 2 *
               p_pic->p[U_PLANE].i_pixel_bytes;
             p_pic->p[U_PLANE].b_margin = 0;
 
@@ -1258,7 +1258,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[V_PLANE].i_pixel_bytes = 1;
-            p_pic->p[V_PLANE].i_visible_bytes = p_vout->output.i_width *
+            p_pic->p[V_PLANE].i_visible_bytes = p_vout->output.i_width / 2 *
               p_pic->p[V_PLANE].i_pixel_bytes;
             p_pic->p[V_PLANE].b_margin = 0;
 
