@@ -635,7 +635,7 @@ echo "$ac_t""$host" 1>&6
 HAVE_VLC=0
 if test -r src/interface/main.c; then
   HAVE_VLC=1
-  VLC_VERSION=0.2.81
+  VLC_VERSION=0.2.82
   
   VLC_CODENAME=Ourumov
   

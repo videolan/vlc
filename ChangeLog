@@ -3,6 +3,58 @@
 #===================#
 
 HEAD
+
+  * Nothing yet.
+
+0.2.82
+Tue,  7 Aug 2001 12:39:16 +0200
+
+  * Got Makefile to launch ./configure almost properly. $(MAKECMDGOALS) rules !
+  * Various debian scripts fixes.
+  * Added -lmsvcrt40 to the win32 flags for proper execution under Wine.
+  * Fixed broken soname setting under Solaris (and OS X, sort of).
+  * Made the illegal instruction report more explicit.
+  * BSD/OS 4.3beta1 fixes by Steven M. Schultz <sms@TO.GD-ES.COM>.
+  * Fixed the sdl video output plugin that was broken 2 days ago.
+  * libdvdcss* packages are now a bit more policy-compliant.
+  * Tidied the snapshot-* Makefile rules.
+  * Tidied the modules Makefiles.
+  * Removed useless stuff in the debian/ directory.
+  * Removed the "make all" kludge in the Makefile.opts rule. I hope this
+    patch is harmless on all systems.
+  * Added a dummy libdvdcss so that the DVD plugin can be used without
+    libdvdcss. It will try to dlopen() libdvdcss at runtime, though,
+    and will use the dummy functions only if it couldn't find a valid
+    libdvdcss. This is probably only useful to package maintainers.
+  * Made the remote command plugin usable even with no stream.
+  * Fixed a deadlock in the remote command plugin.  
+  * Fixed a deadlock in the SPU decoder.
+  * Minor bug fix to aout_directx.c.
+  * Big rewrite of the DirectX audio plugin. The audio output is now (almost)
+    perfect on Win32.
+  * Fixed a bug in ac3dec_CreateThread() in ac3_decoder_thread.
+  * On Win32, open() will now open files in binary mode by default.
+  * A few minor changes to vout_xvideo.c.
+  * Fixed a segfault in yuv_End() in video_yuvmmx.c.
+  * Fixed the "Gdk-ERROR **: BadCursor" bug in the x11 and xvideo plugins.
+  * Fixed a segfault in SetBufferPicture() in video_output.c.
+  * Fixed a segfault in PSEnd in input_ps.c.
+  * The video decoder thread is now also reniced to a lower priority on
+    Win32 (like in the Linux version). This slightly increases the
+    responsiveness of vlc.
+  * Fixed a Win32 bug in libdvdcss. This bug was appearing on title change.
+  * Modified input_dvd so you can now go directly to the selected chapter
+    when you change the title.
+  * Implemented the Probe function in the Xvideo plugin. Xvideo is now the
+    default video output plugin when it is supported. 
+  * Now use SDL_CFLAGS for searching SDL/SDL.h.
+  * Don't miserably die in `make` when ./configure hasn't be run.
+  * Fixed a bug when compiling KDE plug-in without Qt plug-in.
+  * Now taking into account $KDEDIR.
+  * Made SDL configure error messages more explicit.
+  * --disable-sdl is now correctly taken into account.
+  * Changed the order of evaluation of sdl-config and sdl11-config.
+  * Finally fixed SDL*/SDL.h check.
   * VC++/Intel compiler fixes by Jon Lech Johansen <jon-vl@nanocrew.net>.
   * Better gtk-config detection.
   * Removed duplicate checks in configure.in.

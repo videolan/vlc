@@ -1,3 +1,10 @@
+vlc (0.2.82-1) unstable; urgency=low
+
+  * New upstream release.
+  * Fixed broken manpage symlinks (Closes: #99561).
+
+ -- Samuel Hocevar <sam@zoy.org>  Tue,  7 Aug 2001 12:39:16 +0200
+
 vlc (0.2.81-1) unstable; urgency=low
 
   * New upstream release.
