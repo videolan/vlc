@@ -123,7 +123,6 @@ struct demux_sys_t
 {
     mtime_t i_time;
     mtime_t i_length;
-    mtime_t i_pcr;
 
     vlc_bool_t  b_seekable;
     avi_chunk_t ck_root;
@@ -223,7 +222,6 @@ static int Open( vlc_object_t * p_this )
     memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->i_time   = 0;
     p_sys->i_length = 0;
-    p_sys->i_pcr    = 0;
     p_sys->i_movi_lastchunk_pos = 0;
     p_sys->b_odml   = VLC_FALSE;
     p_sys->i_track  = 0;
@@ -630,13 +628,7 @@ static int Demux_Seekable( input_thread_t *p_input )
     }
 
     /* wait for the good time */
-    p_sys->i_pcr = p_sys->i_time * 9 / 100;
-
-    input_ClockManageRef( p_input,
-                          p_input->stream.p_selected_program,
-                          p_sys->i_pcr );
-
-
+    es_out_Control( p_input->p_es_out, ES_OUT_SET_PCR, p_sys->i_time );
     p_sys->i_time += 25*1000;  /* read 25ms */
 
     /* init toread */
@@ -897,11 +889,6 @@ static int Demux_Seekable( input_thread_t *p_input )
 
         b_stream = VLC_TRUE; /* at least one read succeed */
 
-        p_frame->i_pts =
-            input_ClockGetTS( p_input,
-                              p_input->stream.p_selected_program,
-                              p_frame->i_pts * 9/100);
-
         if( tk->i_cat != VIDEO_ES )
             p_frame->i_dts = p_frame->i_pts;
         else
@@ -932,9 +919,7 @@ static int Demux_UnSeekable( input_thread_t *p_input )
     /* Check if we need to send the audio data to decoder */
     b_audio = !p_input->stream.control.b_mute;
 
-    input_ClockManageRef( p_input,
-                          p_input->stream.p_selected_program,
-                          p_sys->i_pcr );
+    es_out_Control( p_input->p_es_out, ES_OUT_SET_PCR, p_sys->i_time );
 
     /* *** find master stream for data packet skipping algo *** */
     /* *** -> first video, if any, or first audio ES *** */
@@ -961,7 +946,7 @@ static int Demux_UnSeekable( input_thread_t *p_input )
         return( 0 );
     }
 
-    p_sys->i_pcr = AVI_GetPTS( p_stream_master ) * 9 / 100;
+    p_sys->i_time = AVI_GetPTS( p_stream_master ) * 9 / 100;
 
     for( i_packet = 0; i_packet < 10; i_packet++)
     {
@@ -1025,10 +1010,7 @@ static int Demux_UnSeekable( input_thread_t *p_input )
                     {
                         return( -1 );
                     }
-                    p_frame->i_pts =
-                        input_ClockGetTS( p_input,
-                                          p_input->stream.p_selected_program,
-                                          AVI_GetPTS( p_stream ) * 9/100);
+                    p_frame->i_pts = AVI_GetPTS( p_stream );
 
                     if( avi_pk.i_cat != VIDEO_ES )
                         p_frame->i_dts = p_frame->i_pts;

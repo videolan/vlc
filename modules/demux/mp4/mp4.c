@@ -32,7 +32,6 @@
 #include "vlc_meta.h"
 
 #include "libmp4.h"
-#include "mp4.h"
 #include "drms.h"
 
 /*****************************************************************************
@@ -57,6 +56,93 @@ static int    DemuxRef( input_thread_t *p_input )
 }
 static int   Seek     ( input_thread_t *, mtime_t );
 static int   Control  ( input_thread_t *, int, va_list );
+
+/* Contain all information about a chunk */
+typedef struct
+{
+    uint64_t     i_offset; /* absolute position of this chunk in the file */
+    uint32_t     i_sample_description_index; /* index for SampleEntry to use */
+    uint32_t     i_sample_count; /* how many samples in this chunk */
+    uint32_t     i_sample_first; /* index of the first sample in this chunk */
+
+    /* now provide way to calculate pts, dts, and offset without to
+        much memory and with fast acces */
+
+    /* with this we can calculate dts/pts without waste memory */
+    uint64_t     i_first_dts;
+    uint32_t     *p_sample_count_dts;
+    uint32_t     *p_sample_delta_dts; /* dts delta */
+
+    /* TODO if needed add pts
+        but quickly *add* support for edts and seeking */
+
+} mp4_chunk_t;
+
+
+ /* Contain all needed information for read all track with vlc */
+typedef struct
+{
+    int i_track_ID;     /* this should be unique */
+
+    int b_ok;           /* The track is usable */
+    int b_enable;       /* is the trak enable by default */
+    vlc_bool_t b_selected;     /* is the trak being played */
+
+    es_format_t fmt;
+    es_out_id_t *p_es;
+
+    /* display size only ! */
+    int i_width;
+    int i_height;
+
+    /* more internal data */
+    uint64_t        i_timescale;    /* time scale for this track only */
+
+    /* elst */
+    int             i_elst;         /* current elst */
+    int64_t         i_elst_time;    /* current elst start time (in movie time scale)*/
+    MP4_Box_t       *p_elst;        /* elst (could be NULL) */
+
+    /* give the next sample to read, i_chunk is to find quickly where
+      the sample is located */
+    uint32_t         i_sample;       /* next sample to read */
+    uint32_t         i_chunk;        /* chunk where next sample is stored */
+    /* total count of chunk and sample */
+    uint32_t         i_chunk_count;
+    uint32_t         i_sample_count;
+
+    mp4_chunk_t    *chunk; /* always defined  for each chunk */
+
+    /* sample size, p_sample_size defined only if i_sample_size == 0
+        else i_sample_size is size for all sample */
+    uint32_t         i_sample_size;
+    uint32_t         *p_sample_size; /* XXX perhaps add file offset if take
+                                    too much time to do sumations each time*/
+
+    MP4_Box_t *p_stbl;  /* will contain all timing information */
+    MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
+    MP4_Box_t *p_sample;/* point on actual sdsd */
+
+    vlc_bool_t b_drms;
+    void      *p_drms;
+
+} mp4_track_t;
+
+
+struct demux_sys_t
+{
+    MP4_Box_t    *p_root;      /* container for the whole file */
+
+    mtime_t      i_pcr;
+
+    uint64_t     i_time;        /* time position of the presentation
+                                 * in movie timescale */
+    uint64_t     i_timescale;   /* movie time scale */
+    uint64_t     i_duration;    /* movie duration */
+    unsigned int i_tracks;      /* number of tracks */
+    mp4_track_t *track;    /* array of track */
+};
+
 
 /*****************************************************************************
  * Declaration of local function
@@ -465,12 +551,10 @@ static int Demux( input_thread_t *p_input )
     }
 
     /* first wait for the good time to read a packet */
-    input_ClockManageRef( p_input,
-                          p_input->stream.p_selected_program,
-                          p_sys->i_pcr );
+    es_out_Control( p_input->p_es_out, ES_OUT_SET_PCR, p_sys->i_pcr );
 
     /* update pcr XXX in mpeg scale so in 90000 unit/s */
-    p_sys->i_pcr = MP4_GetMoviePTS( p_sys ) * 9 / 100;
+    p_sys->i_pcr = MP4_GetMoviePTS( p_sys );
 
     /* we will read 100ms for each stream so ...*/
     p_sys->i_time += __MAX( p_sys->i_timescale / 10 , 1 );
@@ -523,10 +607,7 @@ static int Demux( input_thread_t *p_input )
                                   (uint32_t*)p_block->p_buffer,
                                   p_block->i_buffer );
                 }
-                p_block->i_dts =
-                    input_ClockGetTS( p_input,
-                                      p_input->stream.p_selected_program,
-                                      MP4_TrackGetPTS( p_input, tk ) * 9/100 );
+                p_block->i_dts = MP4_TrackGetPTS( p_input, tk );
 
                 p_block->i_pts = tk->fmt.i_cat == VIDEO_ES ? 0 : p_block->i_dts;
 

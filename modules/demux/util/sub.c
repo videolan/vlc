@@ -558,18 +558,12 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
                 continue;
             }
 
-            p_block->i_pts =
-                input_ClockGetTS( p_sub->p_input,
-                                  p_sub->p_input->stream.p_selected_program,
-                                  p_sub->subtitle[p_sub->i_subtitle].i_start*9/100);
+            p_block->i_pts = p_sub->subtitle[p_sub->i_subtitle].i_start;
             p_block->i_dts = 0;
             if( p_sub->subtitle[p_sub->i_subtitle].i_stop > 0 )
             {
                 /* FIXME kludge i_dts means end of display... */
-                p_block->i_dts =
-                    input_ClockGetTS( p_sub->p_input,
-                                  p_sub->p_input->stream.p_selected_program,
-                                  p_sub->subtitle[p_sub->i_subtitle].i_stop *9/100);
+                p_block->i_dts = p_sub->subtitle[p_sub->i_subtitle].i_stop;
             }
 
             memcpy( p_block->p_buffer, p_sub->subtitle[p_sub->i_subtitle].psz_text, i_len );
@@ -625,10 +619,7 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
             }
 
             /* pts */
-            p_block->i_pts =
-                input_ClockGetTS( p_sub->p_input,
-                                  p_sub->p_input->stream.p_selected_program,
-                                  p_sub->subtitle[p_sub->i_subtitle].i_start*9/100);
+            p_block->i_pts = p_sub->subtitle[p_sub->i_subtitle].i_start;
 
             /* demux this block */
             DemuxVobSub( p_sub, p_block );
