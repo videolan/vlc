@@ -61,6 +61,11 @@
 #   include <dirent.h>
 #endif
 
+/* stat() support for large files on win32 */
+#if defined( WIN32 ) && !defined( UNDER_CE )
+#   define stat _stati64
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -1045,7 +1050,8 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
     }
 
     /* remove traling / or \ */
-    for( p = &psz_dir[strlen( psz_dir) - 1]; p >= psz_dir && ( *p =='/' || *p =='\\' ); p-- )
+    for( p = &psz_dir[strlen( psz_dir) - 1];
+         p >= psz_dir && ( *p =='/' || *p =='\\' ); p-- )
     {
         *p = '\0';
     }
@@ -1064,11 +1070,7 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
             continue;
         }
 
-#if defined( WIN32 )
-        sprintf( tmp, "%s\\%s", psz_dir, p_dir_content->d_name );
-#else
         sprintf( tmp, "%s/%s", psz_dir, p_dir_content->d_name );
-#endif
 
 #ifdef HAVE_SYS_STAT_H
         if( stat( tmp, &stat_info ) == -1 )
@@ -1078,6 +1080,7 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
 #endif
         f = mvar_New( name, "set" );
         mvar_AppendNewVar( f, "name", tmp );
+
 #ifdef HAVE_SYS_STAT_H
         if( S_ISDIR( stat_info.st_mode ) )
         {
@@ -1092,7 +1095,7 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
             mvar_AppendNewVar( f, "type", "unknown" );
         }
 
-        sprintf( tmp, "%lld", stat_info.st_size );
+        sprintf( tmp, I64Fd, (int64_t)stat_info.st_size );
         mvar_AppendNewVar( f, "size", tmp );
 
         /* FIXME memory leak FIXME */
