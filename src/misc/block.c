@@ -47,19 +47,20 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
     /* We do only one malloc
      * TODO bench if doing 2 malloc but keeping a pool of buffer is better
      * 16 -> align on 16
-     * 2*BLOCK_PADDING_SIZE -> pre + post padding
+     * 2 * BLOCK_PADDING_SIZE -> pre + post padding
      */
-    const int    i_alloc = i_size + 2*BLOCK_PADDING_SIZE + 16;
-    block_t     *p_block = malloc( sizeof( block_t ) + sizeof( block_sys_t ) + i_alloc );
     block_sys_t *p_sys;
+    const int i_alloc = i_size + 2 * BLOCK_PADDING_SIZE + 16;
+    block_t *p_block =
+        malloc( sizeof( block_t ) + sizeof( block_sys_t ) + i_alloc );
 
-    if( p_block == NULL )
-        return NULL;
+    if( p_block == NULL ) return NULL;
 
     /* Fill opaque data */
     p_sys = (block_sys_t*)( (uint8_t*)p_block + sizeof( block_t ) );
     p_sys->i_allocated_buffer = i_alloc;
-    p_sys->p_allocated_buffer = (uint8_t*)p_block + sizeof( block_t ) + sizeof( block_sys_t );
+    p_sys->p_allocated_buffer = (uint8_t*)p_block + sizeof( block_t ) +
+        sizeof( block_sys_t );
 
     /* Fill all fields */
     p_block->p_next         = NULL;
@@ -69,9 +70,13 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
     p_block->i_length       = 0;
     p_block->i_rate         = 0;
     p_block->i_buffer       = i_size;
-    p_block->p_buffer       = &p_sys->p_allocated_buffer[32+15-((long)p_sys->p_allocated_buffer % 16 )];
+    p_block->p_buffer       =
+        &p_sys->p_allocated_buffer[BLOCK_PADDING_SIZE +
+            16 - ((uintptr_t)p_sys->p_allocated_buffer % 16 )];
     p_block->pf_release     = BlockRelease;
-    p_block->p_manager      = VLC_OBJECT( p_obj->p_vlc );   /* Is ok, as no comunication between p_vlc */
+
+    /* Is ok, as no comunication between p_vlc */
+    p_block->p_manager      = VLC_OBJECT( p_obj->p_vlc );
     p_block->p_sys          = p_sys;
 
     return p_block;
