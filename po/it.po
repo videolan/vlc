@@ -934,7 +934,7 @@ msgid ""
 "resampling algorithm will be used instead."
 msgstr ""
 "Il ricampionamento audio ad alta qualità può essere pesante per il "
-"processore, per cui è possibile disabilitarla. Un algoritmo di "
+"processore, per cui è possibile disabilitarlo. Un algoritmo di "
 "ricampionamento più leggero verrà utilizzato in alternativa."
 
 #: src/libvlc.h:141
@@ -1360,7 +1360,7 @@ msgstr "Selezione automatica file di sottotitoli"
 
 #: src/libvlc.h:332
 msgid "Subtitle autodection fuzziness"
-msgstr "Selezione \"fuzzy\" file di sottotitoli"
+msgstr "Sensibilità della selezione automatica file di sottotitoli"
 
 #: src/libvlc.h:342
 msgid "Use subtitle file"
@@ -3464,7 +3464,7 @@ msgstr "filtro audio per la conversione float32->u8"
 
 #: modules/audio_filter/converter/mpgatofixed32.c:60
 msgid "MPEG audio decoder"
-msgstr "decodifica audio MPEG"
+msgstr "Decodifica audio MPEG"
 
 #: modules/audio_filter/converter/s16tofixed32.c:46
 msgid "audio filter for s16->fixed32 conversion"
@@ -3504,7 +3504,7 @@ msgstr "filtro audio per il ricampionamento ad interpolazione lineare"
 
 #: modules/audio_filter/resampler/trivial.c:46
 msgid "audio filter for trivial resampling"
-msgstr "filtro audio per ricampionapentp semplice"
+msgstr "filtro audio per ricampionamento semplice"
 
 #: modules/audio_filter/resampler/ugly.c:46
 msgid "audio filter for ugly resampling"
@@ -3723,7 +3723,7 @@ msgstr "errore interno del decoder DvbSub"
 
 #: modules/codec/faad.c:38
 msgid "AAC audio decoder (using libfaad2)"
-msgstr "decodifica audio AAC (usa libfaad2)"
+msgstr "Decodifica audio AAC (usa libfaad2)"
 
 #: modules/codec/ffmpeg/ffmpeg.c:79
 msgid "ffmpeg audio/video decoder((MS)MPEG4,SVQ1,H263,WMV,WMA)"
