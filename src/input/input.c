@@ -326,12 +326,6 @@ static void EndThread( input_thread_t *p_input )
                     adec_DestroyThread( (adec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) );
                     break;
                 default:
-#ifdef DEBUG
-                    /* This should never happen. */ 
-                    intf_DbgMsg("input debug: unknown stream type ! (%d, %d)\n",
-                             p_input->pp_selected_es[i_es_loop]->i_id,
-                             p_input->pp_selected_es[i_es_loop]->i_type);
-#endif
                     break;
             }
         }
