@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.3 2002/10/11 21:17:29 sam Exp $
+ * $Id: deinterlace.c,v 1.4 2002/10/16 11:35:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,6 +49,7 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
 
+static void RenderDiscard( vout_thread_t *, picture_t *, picture_t *, int );
 static void RenderBob    ( vout_thread_t *, picture_t *, picture_t *, int );
 static void RenderMean   ( vout_thread_t *, picture_t *, picture_t * );
 static void RenderBlend  ( vout_thread_t *, picture_t *, picture_t * );
@@ -206,7 +207,6 @@ static int Init( vout_thread_t *p_vout )
     case VLC_FOURCC('Y','V','1','2'):
         switch( p_vout->p_sys->i_mode )
         {
-        case DEINTERLACE_BOB:
         case DEINTERLACE_MEAN:
         case DEINTERLACE_DISCARD:
             p_vout->p_sys->p_vout =
@@ -215,6 +215,7 @@ static int Init( vout_thread_t *p_vout )
                        p_vout->output.i_chroma, p_vout->output.i_aspect );
             break;
 
+        case DEINTERLACE_BOB:
         case DEINTERLACE_BLEND:
         case DEINTERLACE_LINEAR:
             p_vout->p_sys->p_vout =
@@ -335,7 +336,7 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
     switch( p_vout->p_sys->i_mode )
     {
         case DEINTERLACE_DISCARD:
-            RenderBob( p_vout, pp_outpic[0], p_pic, 0 );
+            RenderDiscard( p_vout, pp_outpic[0], p_pic, 0 );
             vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
             break;
 
@@ -366,10 +367,10 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
- * RenderBob: renders a bob picture
+ * RenderDiscard: only keep TOP or BOTTOM field, discard the other.
  *****************************************************************************/
-static void RenderBob( vout_thread_t *p_vout,
-                       picture_t *p_outpic, picture_t *p_pic, int i_field )
+static void RenderDiscard( vout_thread_t *p_vout,
+                           picture_t *p_outpic, picture_t *p_pic, int i_field )
 {
     int i_plane;
 
@@ -438,7 +439,59 @@ static void RenderBob( vout_thread_t *p_vout,
 }
 
 /*****************************************************************************
- * RenderLinear: displays previously rendered output
+ * RenderBob: renders a BOB picture - simple copy
+ *****************************************************************************/
+static void RenderBob( vout_thread_t *p_vout,
+                       picture_t *p_outpic, picture_t *p_pic, int i_field )
+{
+    int i_plane;  
+
+    /* Copy image and skip lines */
+    for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
+    {
+        u8 *p_in, *p_out_end, *p_out;
+
+        p_in = p_pic->p[i_plane].p_pixels;
+        p_out = p_outpic->p[i_plane].p_pixels;
+        p_out_end = p_out + p_outpic->p[i_plane].i_pitch
+                             * p_outpic->p[i_plane].i_lines;
+
+        /* For BOTTOM field we need to add the first line */
+        if( i_field == 1 )
+        {
+            p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
+            p_in += p_pic->p[i_plane].i_pitch;   
+            p_out += p_pic->p[i_plane].i_pitch;
+        }
+                  
+        p_out_end -= 2 * p_outpic->p[i_plane].i_pitch;
+    
+        for( ; p_out < p_out_end ; )
+        {
+            p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
+     
+            p_out += p_pic->p[i_plane].i_pitch;
+
+            p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
+        
+            p_in += 2 * p_pic->p[i_plane].i_pitch;
+            p_out += p_pic->p[i_plane].i_pitch;
+        }
+ 
+        p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
+         
+        /* For TOP field we need to add the last line */
+        if( i_field == 0 )
+        {
+            p_in += p_pic->p[i_plane].i_pitch;   
+            p_out += p_pic->p[i_plane].i_pitch;
+            p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
+        }         
+    }
+}
+
+/*****************************************************************************
+ * RenderLinear: BOB with linear interpolation
  *****************************************************************************/
 static void RenderLinear( vout_thread_t *p_vout,
                           picture_t *p_outpic, picture_t *p_pic, int i_field )
