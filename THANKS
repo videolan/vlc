@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.14 2003/12/04 16:49:43 sam Exp $
+$Id: THANKS,v 1.15 2003/12/30 21:55:48 zorglub Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -19,6 +19,7 @@ Benoit Steiner <benny@via.ecp.fr> - MPEG system input, network input
 Bill Eldridge <bill@rfa.org> - documentation
 Brieuc Jeunhomme <bbp@via.ecp.fr> - bug fixes
 Bruno Vella <allevb@tin.it> - Italian localization
+Carlo Calabrò <murray@via.ecp.fr> - Italian localization
 Christopher Johnson <cjohnson@mint.net> - Qt fix in vlc.spec
 Colin Simmonds <colin_simmonds@Mac.lover.org> - compile fix for Mac OS X
 Damian Ivereigh <damian@cisco.com> - ac3dec uninitialized data structure fix
