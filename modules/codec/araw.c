@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.19 2003/11/01 06:27:45 fenrir Exp $
+ * $Id: araw.c,v 1.20 2003/11/01 06:56:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -607,7 +607,7 @@ static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     }
     else if( p_enc->i_fourcc == VLC_FOURCC( 'u', '8', ' ', ' ' ) )
     {
-        if( ( p_block = block_New( p_enc, p_aout_buf->i_nb_samples ) ) )
+        if( ( p_block = block_New( p_enc, p_aout_buf->i_nb_bytes / 2 ) ) )
         {
             uint8_t *p_dst = (uint8_t*)p_block->p_buffer;
             int8_t  *p_src = (int8_t*) p_aout_buf->p_buffer;
@@ -617,7 +617,7 @@ static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
                 p_src++;
             }
 
-            for( i = 0; i < p_aout_buf->i_nb_samples; i++ )
+            for( i = 0; i < p_aout_buf->i_nb_bytes / 2; i++ )
             {
                 *p_dst++ = *p_src + 128; p_src += 2;
             }
@@ -625,7 +625,7 @@ static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     }
     else if( p_enc->i_fourcc == VLC_FOURCC( 's', '8', ' ', ' ' ) )
     {
-        if( ( p_block = block_New( p_enc, p_aout_buf->i_nb_samples ) ) )
+        if( ( p_block = block_New( p_enc, p_aout_buf->i_nb_bytes / 2 ) ) )
         {
             int8_t *p_dst = (int8_t*)p_block->p_buffer;
             int8_t *p_src = (int8_t*)p_aout_buf->p_buffer;
@@ -635,7 +635,7 @@ static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
                 p_src++;
             }
 
-            for( i = 0; i < p_aout_buf->i_nb_samples; i++ )
+            for( i = 0; i < p_aout_buf->i_nb_bytes / 2; i++ )
             {
                 *p_dst++ = *p_src; p_src += 2;
             }
@@ -649,7 +649,7 @@ static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
             uint8_t *p_dst = (uint8_t*)p_block->p_buffer;
             uint8_t *p_src = (uint8_t*)p_aout_buf->p_buffer;
 
-            for( i = 0; i < p_aout_buf->i_nb_samples; i++ )
+            for( i = 0; i < p_aout_buf->i_nb_bytes / 2; i++ )
             {
                 p_dst[0] = p_src[1];
                 p_dst[1] = p_src[0];
@@ -664,8 +664,7 @@ static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     {
         p_block->i_dts = p_block->i_pts = p_aout_buf->start_date;
         p_block->i_length = (int64_t)p_aout_buf->i_nb_samples * (int64_t)1000000 /
-                            p_enc->format.audio.i_rate /
-                            aout_FormatNbChannels( &p_enc->format.audio );
+                            p_enc->format.audio.i_rate;
     }
 
     return p_block;
