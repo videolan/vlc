@@ -427,7 +427,6 @@ static int OpenDemux( vlc_object_t *p_this )
     p_demux->pf_demux = Demux;
 
     free( psz_sdp );
-    if( p_sdp ) FreeSDP( p_sdp );
     return VLC_SUCCESS;
 
 error:
@@ -591,6 +590,7 @@ static int Demux( demux_t *p_demux )
                  PLAYLIST_APPEND, PLAYLIST_END );
 
    vlc_object_release( p_playlist );
+    if( p_sdp ) FreeSDP( p_sdp );
 
    return VLC_SUCCESS;
 }
