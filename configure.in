@@ -2,7 +2,7 @@ dnl Autoconf settings for vlc and libdvdcss
 AC_INIT(include/common.h)
 AC_CONFIG_HEADER(include/defs.h)
 
-AC_CANONICAL_HOST
+AC_CANONICAL_SYSTEM
 
 HAVE_VLC=0
 if test -r src/interface/main.c; then
@@ -203,7 +203,7 @@ fi
 
 
 
-ARCH=${host_cpu}
+ARCH=${target_cpu}
 
 dnl
 dnl  default modules
@@ -220,30 +220,45 @@ THREEDNOW_MODULES="imdct3dn downmix3dn"
 SSE_MODULES="imdctsse downmixsse"
 ALTIVEC_MODULES="idctaltivec motionaltivec"
 
-AC_MSG_CHECKING([if \$CC groks MMX inline assembly])
-AC_TRY_COMPILE([void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],,
+AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
+    [ac_cv_mmx_inline],
+    [AC_TRY_COMPILE([void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],,
+	ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
+if test x"$ac_cv_mmx_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
-  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+fi
 
-AC_MSG_CHECKING([if \$CC groks MMX EXT inline assembly])
-AC_TRY_COMPILE([void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],,
+AC_CACHE_CHECK([if \$CC groks MMX EXT inline assembly],
+    [ac_cv_mmxext_inline],
+    [AC_TRY_COMPILE([void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],,
+	ac_cv_mmxext_inline=yes, ac_cv_mmxext_inline=no)])
+if test x"$ac_cv_mmxext_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMXEXT_MODULES}"
-  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+fi
 
-AC_MSG_CHECKING([if \$CC groks 3D Now! inline assembly])
-AC_TRY_COMPILE([void quux(){void *p;asm("pfadd %%mm1,%%mm2"::"r"(p));}],,
+AC_CACHE_CHECK([if \$CC groks 3D Now! inline assembly],
+    [ac_cv_3dnow_inline],
+    [AC_TRY_COMPILE([void quux(){void *p;asm("pfadd %%mm1,%%mm2"::"r"(p));}],,
+	ac_cv_3dnow_inline=yes, ac_cv_3dnow_inline=no)])
+if test x"$ac_cv_3dnow_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${THREEDNOW_MODULES}"
-  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+fi
 
-AC_MSG_CHECKING([if \$CC groks SSE inline assembly])
-AC_TRY_COMPILE([void quux(){void *p;asm("xorps %%xmm1,%%xmm2"::"r"(p));}],,
+AC_CACHE_CHECK([if \$CC groks SSE inline assembly],
+    [ac_cv_sse_inline],
+    [AC_TRY_COMPILE([void quux(){void *p;asm("xorps %%xmm1,%%xmm2"::"r"(p));}],,
+	ac_cv_sse_inline=yes, ac_cv_sse_inline=no)])
+if test x"$ac_cv_sse_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
-  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+fi
 
-AC_MSG_CHECKING([if \$CC groks Altivec code])
-AC_TRY_COMPILE([void quux(){vec_mtvscr( (vector unsigned int)(0) );}],,
+AC_CACHE_CHECK([if \$CC groks Altivec inline assembly],
+    [ac_cv_altivec_inline],
+    [AC_TRY_COMPILE([void quux(){asm("mtspr 256,%0"::"r"(-1));}],,
+	ac_cv_altivec_inline=yes, ac_cv_altivec_inline=no)])
+if test x"$ac_cv_altivec_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
-  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+fi
 
 dnl
 dnl  libdvdcss: check for DVD ioctls
@@ -334,7 +349,7 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
 dnl
 dnl  Check the operating system
 dnl
-case ${host_os} in
+case ${_os} in
   bsdi*)
     SYS=bsdi
     ;;
@@ -342,7 +357,7 @@ case ${host_os} in
     SYS=darwin
     ;;
   *)
-    SYS=${host_os}
+    SYS=${target_os}
     ;;
 esac
 
@@ -352,7 +367,7 @@ dnl
 AC_ARG_ENABLE(ppro,
   [  --disable-ppro          Disable PentiumPro optimizations (default enabled for x86)],
 [ if test x$enableval = xyes; then ARCH="${ARCH} ppro"; fi ],
-[ if test x${host_cpu} = xi686; then ARCH="${ARCH} ppro"; fi ])
+[ if test x$ARCH = xi686; then ARCH="${ARCH} ppro"; fi ])
 
 dnl
 dnl  MMX acceleration
@@ -361,7 +376,7 @@ AC_ARG_ENABLE(mmx,
 [  --disable-mmx           Disable MMX optimizations (default enabled for x86)],
 [ if test x$enableval = xyes; then ARCH="${ARCH} mmx";
     BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi ],
-[ if test x${host_cpu} = xi686 -o x${host_cpu} = xi586 -o x${host_cpu} = xx86 -o x${host_cpu} = xi386; then ARCH="${ARCH} mmx";
+[ if test x${target_cpu} = xi686 -o x${target_cpu} = xi586 -o x${target_cpu} = xx86 -o x${target_cpu} = xi386; then ARCH="${ARCH} mmx";
     BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi ])
 
 dnl
@@ -371,7 +386,7 @@ AC_ARG_ENABLE(altivec,
 [  --disable-altivec       Disable altivec optimizations (default enabled on PPC)],
 [ if test x$enableval = xyes; then ARCH="${ARCH} altivec";
     BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi ],
-[ if test x${host_cpu} = xpowerpc; then ARCH="${ARCH} altivec";
+[ if test x${target_cpu} = xpowerpc; then ARCH="${ARCH} altivec";
     BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi ])
 
 dnl
