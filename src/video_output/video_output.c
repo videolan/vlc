@@ -930,14 +930,11 @@ static int InitThread( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    if( p_vout->b_need_render )
+    /* Initialize convertion tables and functions */
+    if( vout_InitYUV( p_vout ) )
     {
-        /* Initialize convertion tables and functions */
-        if( vout_InitYUV( p_vout ) )
-        {
-            intf_ErrMsg("vout error: can't allocate YUV translation tables");
-            return( 1 );
-        }
+        intf_ErrMsg("vout error: can't allocate YUV translation tables");
+        return( 1 );
     }
 
     /* Mark thread as running and return */

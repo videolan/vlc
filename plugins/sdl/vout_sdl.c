@@ -154,12 +154,6 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    /* Force the software yuv even if it is not used */
-    /* If we don't do this, p_vout is not correctly initialized
-       and it's impossible to switch between soft/hard yuv */
-    /* FIXME: this is a broken way to do !! fix this !! */
-    p_vout->b_need_render = 1;
-
     p_vout->p_sys->b_cursor = 1; /* TODO should be done with a main_GetInt.. */
     p_vout->p_sys->b_fullscreen = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
                                 VOUT_FULLSCREEN_DEFAULT );
@@ -216,6 +210,19 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
+    /* This hack is hugly, but hey, you are, too. */
+
+    SDL_Overlay *   p_overlay;
+
+    p_overlay = SDL_CreateYUVOverlay( VOUT_WIDTH_DEFAULT, VOUT_HEIGHT_DEFAULT,
+                                      SDL_YV12_OVERLAY, 
+                                      p_vout->p_sys->p_display );
+    intf_Msg( "vout: YUV acceleration %s",
+              p_overlay->hw_overlay ? "activated" : "unavailable !" ); 
+    p_vout->b_need_render = !p_overlay->hw_overlay;
+
+    SDL_FreeYUVOverlay( p_overlay );
+
     return( 0 );
 }
 
