@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.73 2003/11/18 18:45:33 gbazin Exp $
+$Id: NEWS,v 1.74 2003/11/23 11:02:39 zorglub Exp $
 
 Changes between 0.6.2 and 0.6.3:
 ---------------------------------
@@ -11,9 +11,13 @@ Core support:
    This removes any 'flicker' between two similiar video files.
  * Fixed the video filters. Video should no longer go black when using filters.
  * New input core. Advantages are: better seeking, more responsive, support for subtitle files at the core, and much much more.
+
+Playlist:
  * Added a repeat mode to repeat a single file over and over.
+ * Playlist sorting 
 
 Input:
+ * RTP/RTSP support.
  * Fixed annoying seeking problem with Ogg files (seeking would take ages).
  * Support for FLAC in Ogg files.
  * MPEG TS demuxer also handles A52 and AAC audio in DVB streams.
@@ -21,7 +25,6 @@ Input:
  * cddax and vcdx plugins using libcdio, libvcd and libvcdinfo. (Linux only)
  * Reworked DVB tuning.
  * Better Icecast support.
- * rtp/rtsp support.
 
 Codecs:
  * Support for Theora video encoding.
@@ -30,14 +33,45 @@ Codecs:
  * MPEG 2.5 support.
  * Removed deprecated decoders (a52_old, mpeg_video and mpeg_audio).
 
+Stream output:
+ * Improvements to the MPEG TS muxer.
+ * New transrating module for MPEG2 video.
+ * Added packetization for MPEG AAC ADTS streams.
+ * Improved mp4 muxing and added AAC/MP4V support when transcoding.
+ * Improved Ogg muxing and added theora, speex and subtitles support.
+ * MPEG TS muxer follows the ATSC/DVB specs for embedded A52 audio.
+ * --sout-keep option to keep the stream open while changing input.
+ * Preliminary RTP support.
+ * Fixes to SAP announces.
+
 Interface:
- * Bug fixes / improvements in the skins (eg. "stay on top" option).
- * Improvements to the wxwindows playlist (Sort, Search, mode buttons).
- * Help in the wxwindows preferences window.
+ * Skins:
+    - Bugfixes
+    - misc improvements (eg, "stay on top" option).
  * New standardized and customizable hotkeys.
+ * wxWindows
+    - Playlist improvements (Sort, Search, mode buttons).
+    - Improvements and help in preferences
+    - New streaming wizard
+ * HTTP
+    - Improvements of the standard pages
+    - Support for new commands
  * OSD ( OS X and hotkeys only atm ).
- * Improvements to the Web interface.
- * Fixes for the SAP interface.
+
+Service discovery:
+ * Many fixes to the SAP module
+ * SAP now supports HTTP streams
+
+Subtitles:
+ * Text subtitles now have a black outline.
+ * Text subtitles autodetection.
+ * Text subtitles charset autodetection.
+ * Text subtitles for all videofiles. Results may vary.
+ * Text subtitles in Hebrew are supported. Arabic partially.
+ * Automatic fontsize selection for text subtitles.
+ * Fixed SAMI text subtitles support.
+ * Support for subtitles in Matroska files.
+ * Support for subtitles in DVB streams.
 
 Mac OS X port:
  * New controller designed by Max Rudberg from www.maxthemes.com
@@ -59,33 +93,10 @@ Linux port:
  * Improved Video4Linux input. Also added support for an audio only input.
  * Support for real-time priority when running with root privileges.
 
-Stream output:
- * Improvments to the MPEG TS muxer.
- * New transrating module for MPEG2 video.
- * Added packetization for MPEG AAC ADTS streams.
- * Improved mp4 muxing and added AAC/MP4V support when transcoding.
- * Improved Ogg muxing and added theora, speex and subtitles support.
- * MPEG TS muxer follows the ATSC/DVB specs for embedded A52 audio.
- * --sout-keep option to keep the stream open while changing input.
- * Preliminary rtp support.
- * Fixes to SAP announces.
-
-Subtitles:
- * Text subtitles now have a black outline.
- * Text subtitles autodetection.
- * Text subtitles charset autodetection.
- * Text subtitles for all videofiles. Results may vary.
- * Text subtitles in Hebrew are supported. Arabic partially.
- * Automatic fontsize selection for text subtitles.
- * Fixed SAMI text subtitles support.
- * Support for subtitles in Matroska files.
- * Support for subtitles in DVB streams.
-
 Miscellaneous:
  * Audio visual effects filters (spectrum, scope and random).
  * Audio visual effects filter using goom.
  * Spanish, Portuguese Brazilian and Hungarian translations.
- * SAP now supports HTTP streams.
  * libcaca video output (colored ascii)
 
 Changes between 0.6.1 and 0.6.2:
