@@ -1,7 +1,7 @@
 # British translation for VLC.
 # Copyright (C) 2002-2003 VideoLAN <videolan@videolan.org>
 #
-# Samuel Hocevar <sam@zoy.org>, 2002, 2003.
+# Sam Hocevar <sam@zoy.org>, 2002, 2003, 2004.
 #
 # Hints for this translation file:
 #  - or$ -> our$ (behavior, color)
@@ -20,10 +20,10 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-10-02 17:36+0200\n"
 "PO-Revision-Date: 2002-04-22 09:56+0200\n"
-"Last-Translator: Samuel Hocevar <sam@zoy.org>\n"
+"Last-Translator: Sam Hocevar <sam@zoy.org>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: include/vlc_help.h:32
@@ -249,16 +249,16 @@ msgid ""
 "DVDs, VCDs, CD audio, and various streaming protocols.\n"
 "\n"
 "VLC is also a streaming server with transcoding capabilities (UDP unicast "
-"and multicast, HTTP, ...) mainly designed for high-bandwidth networks.\n"
+"and multicast, HTTP, …) mainly designed for high-bandwidth networks.\n"
 "\n"
 "For more information, have a look at the web site."
 msgstr ""
 "VLC is an open-source and cross-platform multimedia player for various audio "
-"and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, Ogg, ...) as well as "
+"and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, Ogg, …) as well as "
 "DVDs, VCDs, CD audio, and various streaming protocols.\n"
 "\n"
 "VLC is also a streaming server with transcoding capabilities (UDP unicast "
-"and multicast, HTTP, ...) mainly designed for high-bandwidth networks.\n"
+"and multicast, HTTP, …) mainly designed for high-bandwidth networks.\n"
 "\n"
 "For more information, have a look at the web site."
 
@@ -745,7 +745,7 @@ msgstr "Help options"
 #: src/libvlc.c:321
 #, c-format
 msgid "Usage: %s [options] [items]...\n"
-msgstr ""
+msgstr "Usage: %s [options] [items]…\n"
 
 #: src/libvlc.c:1934 src/misc/configuration.c:1192
 msgid "string"
@@ -774,7 +774,7 @@ msgid ""
 "Press the RETURN key to continue...\n"
 msgstr ""
 "\n"
-"Press the RETURN key to continue...\n"
+"Press the RETURN key to continue…\n"
 
 #: src/libvlc.c:2103
 #, c-format
@@ -782,7 +782,7 @@ msgid ""
 "Usage: %s [options] [items]...\n"
 "\n"
 msgstr ""
-"Usage: %s [options] [items]...\n"
+"Usage: %s [options] [items]…\n"
 "\n"
 
 #: src/libvlc.c:2106
@@ -965,7 +965,7 @@ msgid ""
 msgstr ""
 "These options allow you to modify the behaviour of the audio subsystem, and "
 "to add audio filters which can be used for post processing or visual effects "
-"(spectrum analyser, ...).\n"
+"(spectrum analyser, …).\n"
 "Enable these filters here, and configure them in the \"audio filters\" "
 "modules section."
 
@@ -1091,7 +1091,7 @@ msgid ""
 "or audio visualization modules (spectrum analyzer, ...)."
 msgstr ""
 "This allows you to add audio post processing filters, to modify the sound, "
-"or audio visualisation modules (spectrum analyser, ...)."
+"or audio visualisation modules (spectrum analyser, …)."
 
 #: src/libvlc.h:154
 msgid "Channel mixer"
@@ -1114,7 +1114,7 @@ msgid ""
 msgstr ""
 "These options allow you to modify the behaviour of the video output "
 "subsystem. You can for example enable video filters (deinterlacing, image "
-"adjusting, ...). Enable these filters here and configure them in the \"video "
+"adjusting, …). Enable these filters here and configure them in the \"video "
 "filters\" modules section. You can also set many miscellaneous video options."
 
 #: src/libvlc.h:167
@@ -1459,20 +1459,19 @@ msgid ""
 msgstr ""
 "You can specify a list of bookmarks for a stream in the form "
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
-"{etc...}\""
+"{etc.}\""
 
 #: src/libvlc.h:317
-#, fuzzy
 msgid ""
 "These options allow you to modify the behavior of the subpictures subsystem. "
 "You can for example enable subpictures filters (logo, ...). Enable these "
 "filters here and configure them in the \"subpictures filters\" modules "
 "section. You can also set many miscellaneous subpictures options."
 msgstr ""
-"These options allow you to modify the behaviour of the video output "
-"subsystem. You can for example enable video filters (deinterlacing, image "
-"adjusting, ...). Enable these filters here and configure them in the \"video "
-"filters\" modules section. You can also set many miscellaneous video options."
+"These options allow you to modify the behaviour of the subpictures subsystem. "
+"You can for example enable subpictures filters (logo, …). Enable these "
+"filters here and configure them in the \"subpictures filters\" modules "
+"section. You can also set many miscellaneous subpictures options."
 
 #: src/libvlc.h:323
 msgid "Force SPU position"
@@ -4660,7 +4659,7 @@ msgstr ""
 "   %c : The VCD volume num - the number of the CD in the collection.\n"
 "   %F : The VCD Format, e.g. VCD 1.0, VCD 1.1, VCD 2.0, or SVCD\n"
 "   %I : The current entry/segment/playback type, e.g. ENTRY, TRACK, "
-"SEGMENT...\n"
+"SEGMENT…\n"
 "   %L : The playlist ID prefixed with \" LID\" if it exists\n"
 "   %N : The current number of the %I - a decimal number\n"
 "   %P : The publisher ID\n"
@@ -4934,7 +4933,7 @@ msgstr ""
 
 #: modules/audio_filter/equalizer.c:56
 msgid "Override preset bands gain in dB (-20 ... 20)"
-msgstr ""
+msgstr "Override preset bands gain in dB (-20 … 20)"
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Two pass"
@@ -4950,7 +4949,7 @@ msgstr ""
 
 #: modules/audio_filter/equalizer.c:62
 msgid "Set the global gain in dB (-20 ... 20)"
-msgstr ""
+msgstr "Set the global gain in dB (-20 … 20)"
 
 #: modules/audio_filter/equalizer.c:65
 #, fuzzy
@@ -6610,7 +6609,7 @@ msgstr "Telnet remote control interface"
 
 #: modules/control/telnet.c:137
 msgid "Using the VLM interface plugin..."
-msgstr ""
+msgstr "Using the VLM interface plugin…"
 
 #: modules/control/telnet.c:148
 #, c-format
@@ -6907,7 +6906,7 @@ msgstr ""
 
 #: modules/demux/ts.c:68
 msgid "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])"
-msgstr ""
+msgstr "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,…])"
 
 #: modules/demux/ts.c:70
 msgid "Set id of ES to PID"
@@ -7594,9 +7593,8 @@ msgstr "XOSD interface"
 
 #: modules/gui/gtk/gnome_interface.c:19 modules/gui/gtk/gnome_interface.c:985
 #: modules/gui/gtk/gtk_interface.c:165 modules/gui/gtk/gtk_interface.c:1391
-#, fuzzy
 msgid "_Open File..."
-msgstr "Open subtitles file"
+msgstr "_Open File…"
 
 #: modules/gui/gtk/gnome_interface.c:20 modules/gui/gtk/gnome_interface.c:504
 #: modules/gui/gtk/gnome_interface.c:986 modules/gui/gtk/gtk_interface.c:173
@@ -7609,7 +7607,7 @@ msgstr "Append to file"
 #: modules/gui/gtk/gtk_interface.c:180 modules/gui/gtk/gtk_interface.c:1403
 #, fuzzy
 msgid "Open _Disc..."
-msgstr "Open subtitles file"
+msgstr "Open _Disc…"
 
 #: modules/gui/gtk/gnome_interface.c:27 modules/gui/gtk/gnome_interface.c:993
 #: modules/gui/gtk/gtk_interface.c:188 modules/gui/gtk/gtk_interface.c:1411
@@ -7618,7 +7616,7 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:33
 msgid "_Network stream..."
-msgstr ""
+msgstr "_Network stream…"
 
 #: modules/gui/gtk/gnome_interface.c:34 modules/gui/gtk/gnome_interface.c:528
 #: modules/gui/gtk/gnome_interface.c:1000 modules/gui/gtk/gtk_interface.c:203
@@ -7669,7 +7667,7 @@ msgstr "Choose file"
 
 #: modules/gui/gtk/gnome_interface.c:86 modules/gui/gtk/gtk_interface.c:352
 msgid "_Playlist..."
-msgstr ""
+msgstr "_Playlist…"
 
 #: modules/gui/gtk/gnome_interface.c:87 modules/gui/gtk/gtk_interface.c:360
 msgid "Open the playlist window"
@@ -7677,7 +7675,7 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:93 modules/gui/gtk/gtk_interface.c:364
 msgid "_Modules..."
-msgstr ""
+msgstr "_Modules…"
 
 #: modules/gui/gtk/gnome_interface.c:94 modules/gui/gtk/gtk_interface.c:373
 msgid "Open the module manager"
@@ -7686,7 +7684,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:100 modules/gui/gtk/gtk_interface.c:375
 #: modules/gui/kde/interface.cpp:133
 msgid "Messages..."
-msgstr ""
+msgstr "Messages…"
 
 #: modules/gui/gtk/gnome_interface.c:101 modules/gui/gtk/gtk_interface.c:381
 msgid "Open the messages window"
@@ -7875,11 +7873,11 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:999 modules/gui/gtk/gtk_interface.c:195
 #: modules/gui/gtk/gtk_interface.c:1415
 msgid "_Network Stream..."
-msgstr ""
+msgstr "_Network Stream…"
 
 #: modules/gui/gtk/gnome_interface.c:1070 modules/gui/gtk/gtk_interface.c:1182
 msgid "_Jump..."
-msgstr ""
+msgstr "_Jump…"
 
 #: modules/gui/gtk/gnome_interface.c:1071
 msgid "Got directly so specified point"
@@ -7905,12 +7903,12 @@ msgstr "Skinnable Interface"
 
 #: modules/gui/gtk/gnome_interface.c:1115 modules/gui/gtk/gtk_interface.c:1455
 msgid "Playlist..."
-msgstr ""
+msgstr "Playlist…"
 
 #: modules/gui/gtk/gnome_interface.c:1361 modules/gui/gtk/gtk_interface.c:1603
 #: modules/gui/kde/kde.cpp:110 modules/gui/pda/pda_interface.c:1350
 msgid "(c) 1996-2004 the VideoLAN team"
-msgstr "� 1996-2004 the VideoLAN team"
+msgstr "© 1996-2004 the VideoLAN team"
 
 #: modules/gui/gtk/gnome_interface.c:1363 modules/gui/gtk/gtk_interface.c:1646
 #: modules/gui/kde/kde.cpp:107
@@ -7945,7 +7943,7 @@ msgstr ""
 #: modules/gui/wxwindows/streamout.cpp:454
 #: modules/gui/wxwindows/subtitles.cpp:91
 msgid "Browse..."
-msgstr ""
+msgstr "Browse…"
 
 #: modules/gui/gtk/gnome_interface.c:1587 modules/gui/gtk/gtk_interface.c:1902
 #: modules/gui/wxwindows/open.cpp:638
@@ -8056,9 +8054,8 @@ msgstr "UDP stream output"
 #: modules/gui/gtk/gnome_interface.c:2058 modules/gui/gtk/gtk_interface.c:2378
 #: modules/gui/macosx/open.m:222 modules/gui/macosx/output.m:137
 #: modules/gui/wxwindows/open.cpp:423 modules/gui/wxwindows/open.cpp:601
-#, fuzzy
 msgid "Settings..."
-msgstr "Setting"
+msgstr "Settings…"
 
 #: modules/gui/gtk/gnome_interface.c:2236
 msgid ""
@@ -8211,9 +8208,8 @@ msgid "_Settings"
 msgstr "Setting"
 
 #: modules/gui/gtk/gtk_interface.c:403 modules/gui/gtk/gtk_interface.c:1464
-#, fuzzy
 msgid "_Preferences..."
-msgstr "VLC preferences"
+msgstr "_Preferences…"
 
 #: modules/gui/gtk/gtk_interface.c:411
 msgid "Configure the application"
@@ -8225,7 +8221,7 @@ msgstr ""
 
 #: modules/gui/gtk/gtk_interface.c:587 modules/gui/gtk/gtk_interface.c:1435
 msgid "_About..."
-msgstr ""
+msgstr "_About…"
 
 #: modules/gui/gtk/gtk_interface.c:595
 #, fuzzy
@@ -8470,9 +8466,8 @@ msgid "Fas&t"
 msgstr ""
 
 #: modules/gui/kde/interface.cpp:137
-#, fuzzy
 msgid "Stream info..."
-msgstr "Codec setting"
+msgstr "Stream info…"
 
 #: modules/gui/kde/interface.cpp:148
 msgid "Opens an existing document"
@@ -8526,26 +8521,24 @@ msgid "Ready."
 msgstr ""
 
 #: modules/gui/kde/interface.cpp:200 modules/gui/kde/interface.cpp:222
-#, fuzzy
 msgid "Opening file..."
-msgstr "Open subtitles file"
+msgstr "Opening file…"
 
 #: modules/gui/kde/interface.cpp:202 modules/gui/macosx/intf.m:405
-#, fuzzy
 msgid "Open File..."
-msgstr "Open subtitles file"
+msgstr "Open File…"
 
 #: modules/gui/kde/interface.cpp:228
 msgid "Exiting..."
-msgstr ""
+msgstr "Exiting…"
 
 #: modules/gui/kde/interface.cpp:235
 msgid "Toggling toolbar..."
-msgstr ""
+msgstr "Toggling toolbar…"
 
 #: modules/gui/kde/interface.cpp:252
 msgid "Toggle the status bar..."
-msgstr ""
+msgstr "Toggle the status bar…"
 
 #: modules/gui/kde/interface.cpp:438
 msgid "Off"
@@ -8700,9 +8693,8 @@ msgid "Open CrashLog"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:395
-#, fuzzy
 msgid "Preferences..."
-msgstr "VLC preferences"
+msgstr "Preferences…"
 
 #: modules/gui/macosx/intf.m:398
 msgid "Services"
@@ -8730,19 +8722,16 @@ msgid "1:File"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:406
-#, fuzzy
 msgid "Quick Open File..."
-msgstr "Open subtitles file"
+msgstr "Quick Open File…"
 
 #: modules/gui/macosx/intf.m:407
-#, fuzzy
 msgid "Open Disc..."
-msgstr "Open subtitles file"
+msgstr "Open Disc…"
 
 #: modules/gui/macosx/intf.m:408
-#, fuzzy
 msgid "Open Network..."
-msgstr "Open subtitles file"
+msgstr "Open Network…"
 
 #: modules/gui/macosx/intf.m:409
 msgid "Open Recent"
@@ -8807,7 +8796,7 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:482
 msgid "ReadMe..."
-msgstr ""
+msgstr "ReadMe…"
 
 #: modules/gui/macosx/intf.m:483
 msgid "Online Documentation"
@@ -8952,9 +8941,8 @@ msgid "Open VIDEO_TS Directory"
 msgstr ""
 
 #: modules/gui/macosx/output.m:136
-#, fuzzy
 msgid "Advanced output:"
-msgstr "Advanced options..."
+msgstr ""
 
 #: modules/gui/macosx/output.m:140
 #, fuzzy
@@ -9031,9 +9019,8 @@ msgid "Save File"
 msgstr ""
 
 #: modules/gui/macosx/playlist.m:171
-#, fuzzy
 msgid "Save Playlist..."
-msgstr "&Shuffle Playlist"
+msgstr "Save Playlist…"
 
 #: modules/gui/macosx/playlist.m:175 modules/gui/wxwindows/iteminfo.cpp:210
 msgid "Item Enabled"
@@ -9360,11 +9347,11 @@ msgstr "Author"
 
 #: modules/gui/pda/pda_interface.c:760
 msgid "240x192"
-msgstr "240�192"
+msgstr "240×192"
 
 #: modules/gui/pda/pda_interface.c:761
 msgid "320x240"
-msgstr "320�240"
+msgstr "320×240"
 
 #: modules/gui/pda/pda_interface.c:762
 msgid "qsif"
@@ -9690,9 +9677,8 @@ msgid "Select skin"
 msgstr ""
 
 #: modules/gui/skins2/src/theme_repository.cpp:84
-#, fuzzy
 msgid "Open skin..."
-msgstr "Open subtitles file"
+msgstr "Open skin…"
 
 #: modules/gui/wxwindows/bookmarks.cpp:137
 msgid "Edit bookmark"
@@ -9866,27 +9852,27 @@ msgstr ""
 
 #: modules/gui/wxwindows/interface.cpp:320
 msgid "Quick &Open File...\tCtrl-O"
-msgstr ""
+msgstr "Quick &Open File…\tCtrl-O"
 
 #: modules/gui/wxwindows/interface.cpp:323
 msgid "Open &File...\tCtrl-F"
-msgstr ""
+msgstr "Open &File…\tCtrl-F"
 
 #: modules/gui/wxwindows/interface.cpp:324
 msgid "Open &Disc...\tCtrl-D"
-msgstr ""
+msgstr "Open &Disc…\tCtrl-D"
 
 #: modules/gui/wxwindows/interface.cpp:326
 msgid "Open &Network Stream...\tCtrl-N"
-msgstr ""
+msgstr "Open &Network Stream…\tCtrl-N"
 
 #: modules/gui/wxwindows/interface.cpp:328
 msgid "Open &Capture Device...\tCtrl-C"
-msgstr ""
+msgstr "Open &Capture Device…\tCtrl-C"
 
 #: modules/gui/wxwindows/interface.cpp:331
 msgid "&Wizard...\tCtrl-W"
-msgstr ""
+msgstr "&Wizard…\tCtrl-W"
 
 #: modules/gui/wxwindows/interface.cpp:333
 msgid "E&xit\tCtrl-X"
@@ -9894,15 +9880,15 @@ msgstr ""
 
 #: modules/gui/wxwindows/interface.cpp:337
 msgid "&Playlist...\tCtrl-P"
-msgstr ""
+msgstr "&Playlist…\tCtrl-P"
 
 #: modules/gui/wxwindows/interface.cpp:338
 msgid "&Messages...\tCtrl-M"
-msgstr ""
+msgstr "&Messages…\tCtrl-M"
 
 #: modules/gui/wxwindows/interface.cpp:340
 msgid "Stream and Media &info...\tCtrl-I"
-msgstr ""
+msgstr "Stream and Media &info…\tCtrl-I"
 
 #: modules/gui/wxwindows/interface.cpp:354
 #, fuzzy
@@ -9955,14 +9941,12 @@ msgid "&Undock Ext. GUI"
 msgstr ""
 
 #: modules/gui/wxwindows/interface.cpp:622
-#, fuzzy
 msgid "&Bookmarks..."
-msgstr "Bookmark %i"
+msgstr "&Bookmarks…"
 
 #: modules/gui/wxwindows/interface.cpp:623 modules/gui/wxwindows/menus.cpp:142
-#, fuzzy
 msgid "&Preferences..."
-msgstr "VLC preferences"
+msgstr "&Preferences…"
 
 #: modules/gui/wxwindows/interface.cpp:676
 #, fuzzy
@@ -9976,7 +9960,7 @@ msgid ""
 "(c) 1996-2004 - the VideoLAN Team\n"
 "\n"
 msgstr ""
-"� 1996-2004 - the VideoLAN Team\n"
+"© 1996-2004 - the VideoLAN Team\n"
 "\n"
 
 #: modules/gui/wxwindows/interface.cpp:679
@@ -10010,33 +9994,31 @@ msgstr ""
 
 #: modules/gui/wxwindows/menus.cpp:129
 msgid "Quick &Open File..."
-msgstr ""
+msgstr "Quick &Open File…"
 
 #: modules/gui/wxwindows/menus.cpp:130
-#, fuzzy
 msgid "Open &File..."
-msgstr "Open subtitles file"
+msgstr "Open &File…"
 
 #: modules/gui/wxwindows/menus.cpp:131
-#, fuzzy
 msgid "Open &Disc..."
-msgstr "Open subtitles file"
+msgstr "Open &Disc…"
 
 #: modules/gui/wxwindows/menus.cpp:132
 msgid "Open &Network Stream..."
-msgstr ""
+msgstr "Open &Network Stream…"
 
 #: modules/gui/wxwindows/menus.cpp:133
 msgid "Open &Capture Device..."
-msgstr ""
+msgstr "Open &Capture Device…"
 
 #: modules/gui/wxwindows/menus.cpp:140
 msgid "Media &Info..."
-msgstr ""
+msgstr "Media &Info…"
 
 #: modules/gui/wxwindows/menus.cpp:141
 msgid "&Messages..."
-msgstr ""
+msgstr "&Messages…"
 
 #: modules/gui/wxwindows/menus.cpp:545 modules/gui/wxwindows/menus.cpp:572
 msgid "Empty"
@@ -10044,30 +10026,28 @@ msgstr ""
 
 #: modules/gui/wxwindows/messages.cpp:99
 msgid "Save As..."
-msgstr ""
+msgstr "Save As…"
 
 #: modules/gui/wxwindows/messages.cpp:208
 msgid "Save Messages As..."
-msgstr ""
+msgstr "Save Messages As…"
 
 #: modules/gui/wxwindows/open.cpp:229
 msgid "Advanced options..."
-msgstr "Advanced options..."
+msgstr "Advanced options…"
 
 #: modules/gui/wxwindows/open.cpp:234 modules/gui/wxwindows/open.cpp:245
 #: modules/gui/wxwindows/preferences.cpp:204
-#, fuzzy
 msgid "Advanced options"
-msgstr "Advanced options..."
+msgstr "Advanced options"
 
 #: modules/gui/wxwindows/open.cpp:249
 msgid "Options:"
 msgstr "Options:"
 
 #: modules/gui/wxwindows/open.cpp:358 modules/gui/wxwindows/open.cpp:366
-#, fuzzy
 msgid "Open..."
-msgstr "Open subtitles file"
+msgstr "Open…"
 
 #: modules/gui/wxwindows/open.cpp:393
 #, fuzzy
@@ -10129,21 +10109,19 @@ msgstr ""
 
 #: modules/gui/wxwindows/playlist.cpp:206
 msgid "&Simple Add..."
-msgstr ""
+msgstr "&Simple Add…"
 
 #: modules/gui/wxwindows/playlist.cpp:207
 msgid "&Add MRL..."
-msgstr ""
+msgstr "&Add MRL…"
 
 #: modules/gui/wxwindows/playlist.cpp:209
-#, fuzzy
 msgid "&Open Playlist..."
-msgstr "&Shuffle Playlist"
+msgstr "&Open Playlist…"
 
 #: modules/gui/wxwindows/playlist.cpp:210
-#, fuzzy
 msgid "&Save Playlist..."
-msgstr "&Shuffle Playlist"
+msgstr "&Save Playlist…"
 
 #: modules/gui/wxwindows/playlist.cpp:212
 msgid "&Close"
@@ -10691,9 +10669,8 @@ msgid "More Info"
 msgstr ""
 
 #: modules/gui/wxwindows/wizard.cpp:555
-#, fuzzy
 msgid "Choose..."
-msgstr "Choose file"
+msgstr "Choose…"
 
 #: modules/gui/wxwindows/wizard.cpp:611
 msgid "Partial Extract"
@@ -12615,7 +12592,7 @@ msgstr "XOSD interface"
 #~ msgstr "Show the program logs"
 
 #~ msgid "(c) 1996-2003 the VideoLAN team"
-#~ msgstr "� 1996-2003 the VideoLAN team"
+#~ msgstr "© 1996-2003 the VideoLAN team"
 
 #~ msgid "VLC plugins preferences"
 #~ msgstr "VLC plugins preferences"
@@ -12624,19 +12601,19 @@ msgstr "XOSD interface"
 #~ msgstr "No dithering"
 
 #~ msgid "2x2 ordered dithering"
-#~ msgstr "2�2 ordered dithering"
+#~ msgstr "2×2 ordered dithering"
 
 #~ msgid "4x4 ordered dithering"
-#~ msgstr "4�4 ordered dithering"
+#~ msgstr "4×4 ordered dithering"
 
 #~ msgid "8x8 ordered dithering"
-#~ msgstr "8�8 ordered dithering"
+#~ msgstr "8×8 ordered dithering"
 
 #~ msgid "Random dithering"
 #~ msgstr "Random dithering"
 
 #~ msgid "(C) 1996-2003 the VideoLAN team"
-#~ msgstr "� 1996-2003 the VideoLAN team"
+#~ msgstr "© 1996-2003 the VideoLAN team"
 
 #~ msgid ""
 #~ "This option allows you to select the IDCT module used by this video "
