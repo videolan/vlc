@@ -495,7 +495,7 @@ snapshot:
 		do cp $$i /tmp/vlc-@VLC_VERSION@/$$i ; \
 	done
 	# copy misc files
-	cp vlc.spec AUTHORS COPYING ChangeLog INSTALL README TODO \
+	cp vlc.spec AUTHORS COPYING ChangeLog CONTRIBUTORS INSTALL README TODO \
 		Makefile.in Makefile.dep configure configure.in install-sh \
 		config.sub config.guess todo.pl \
 			/tmp/vlc-@VLC_VERSION@/

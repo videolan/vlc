@@ -503,6 +503,7 @@ create_intf_about (void)
     "Christophe Massiot <massiot@via.ecp.fr>",
     "Vincent Seguin <seguin@via.ecp.fr>",
     "Benoit Steiner <benny@via.ecp.fr>",
+    "Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>",
     "Jean-Marc Dressler <polux@via.ecp.fr>",
     "Gaël Hendryckx <jimmy@via.ecp.fr>",
     "Samuel Hocevar <sam@zoy.org>",
