@@ -29,8 +29,22 @@
 enum
 {
     VOD_TYPE = 0,
-    BROADCAST_TYPE = 1,
+    BROADCAST_TYPE,
+    SCHEDULE_TYPE,
 };
+
+typedef struct
+{
+    /* instance name */
+    char *psz_name;
+
+    /* "playlist" index */
+    int i_index;
+
+    input_item_t   item;
+    input_thread_t *p_input;
+
+} vlm_media_instance_t;
 
 typedef struct
 {
@@ -39,9 +53,16 @@ typedef struct
 
     /* name "media" is reserved */
     char    *psz_name;
+    input_item_t item;
 
+    /* "playlist" */
     int     i_input;
     char    **input;
+
+    int     i_option;
+    char    **option;
+
+    char    *psz_output;
 
     /* only for broadcast */
     vlc_bool_t b_loop;
@@ -49,17 +70,9 @@ typedef struct
     /* only for vod */
     vod_media_t *vod_media;
 
-    /* "playlist" index */
-    int     i_index;
-
-    char    *psz_output;
-
-    int     i_option;
-    char    **option;
-
-    /* global options for all inputs */
-    input_item_t    item;
-    input_thread_t  *p_input;
+    /* actual input instances */
+    int                  i_instance;
+    vlm_media_instance_t **instance;
 
 } vlm_media_t;
 
