@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: vout_subpictures.c,v 1.24 2004/01/06 12:02:06 zorglub Exp $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -272,7 +272,8 @@ subpicture_t *vout_SortSubPictures( vout_thread_t *p_vout,
                 p_vout->p_subpicture[i_index].p_next = p_subpic;
                 p_subpic = &p_vout->p_subpicture[i_index];
 
-                /* If it's the 2nd youngest subpicture, register its date */                    if( !ephemer_date || ephemer_date > p_subpic->i_start )
+                /* If it's the 2nd youngest subpicture, register its date */
+                if( !ephemer_date || ephemer_date > p_subpic->i_start )
                 {
                     ephemer_date = p_subpic->i_start;
                 }

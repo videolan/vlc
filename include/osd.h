@@ -56,3 +56,4 @@ VLC_EXPORT( void,  __vout_OSDMessage, ( vlc_object_t *, char *, ... ) );
 #else
 #    define vout_OSDMessage __vout_OSDMessage
 #endif
+VLC_EXPORT( void, vout_OSDSlider, ( vlc_object_t *, int , short ) );

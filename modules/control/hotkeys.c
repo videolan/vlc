@@ -65,6 +65,7 @@ static int  ActionKeyCB( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 static void PlayBookmark( intf_thread_t *, int );
 static void SetBookmark ( intf_thread_t *, int );
+static int  GetPosition ( intf_thread_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -238,13 +239,32 @@ static void Run( intf_thread_t *p_intf )
         {
             audio_volume_t i_newvol;
             aout_VolumeUp( p_intf, 1, &i_newvol );
-            vout_OSDMessage( p_intf, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
+            if( p_vout->b_fullscreen )
+            {
+                vout_OSDSlider( VLC_OBJECT( p_intf ),
+                                i_newvol*100/AOUT_VOLUME_MAX, 1 );
+            }
+            else
+            {
+                vout_OSDMessage( p_intf, "Vol %d%%",
+                                 2*i_newvol*100/AOUT_VOLUME_MAX );
+            }
         }
         else if( i_action == ACTIONID_VOL_DOWN )
         {
             audio_volume_t i_newvol;
             aout_VolumeDown( p_intf, 1, &i_newvol );
-            vout_OSDMessage( p_intf, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX);
+            if( p_vout->b_fullscreen )
+            {
+                vout_OSDSlider( VLC_OBJECT( p_intf ),
+                                i_newvol*100/AOUT_VOLUME_MAX, 1 );
+            }
+            else
+            {
+                vout_OSDMessage( p_intf, "Vol %d%%",
+                                 2*i_newvol*100/AOUT_VOLUME_MAX );
+            }
+
         }
         else if( i_action == ACTIONID_SUBDELAY_DOWN )
         {
@@ -324,47 +344,98 @@ static void Run( intf_thread_t *p_intf )
         }
         else if( p_input )
         {
+            vlc_bool_t b_seekable = p_input->stream.b_seekable;
+
             if( i_action == ACTIONID_PAUSE )
             {
                 vout_OSDMessage( p_intf, _( "Pause" ) );
                 val.i_int = PAUSE_S;
                 var_Set( p_input, "state", val );
             }
-            else if( i_action == ACTIONID_JUMP_BACKWARD_10SEC )
+            else if( i_action == ACTIONID_JUMP_BACKWARD_10SEC && b_seekable )
             {
-                vout_OSDMessage( p_intf, _( "Jump -10 seconds" ) );
                 val.i_time = -10000000;
                 var_Set( p_input, "time-offset", val );
+                if( p_vout->b_fullscreen )
+                {
+                    vout_OSDSlider( VLC_OBJECT( p_intf ),
+                                    GetPosition( p_intf ), 0 );
+                }
+                else
+                {
+                    vout_OSDMessage( p_intf, _( "Jump -10 seconds" ) );
+                }
             }
-            else if( i_action == ACTIONID_JUMP_FORWARD_10SEC )
+            else if( i_action == ACTIONID_JUMP_FORWARD_10SEC && b_seekable )
             {
-                vout_OSDMessage( p_intf, _( "Jump +10 seconds" ) );
                 val.i_time = 10000000;
                 var_Set( p_input, "time-offset", val );
+                if( p_vout->b_fullscreen )
+                {
+                    vout_OSDSlider( VLC_OBJECT( p_intf ),
+                                    GetPosition( p_intf ), 0 );
+                }
+                else
+                {
+                    vout_OSDMessage( p_intf, _( "Jump +10 seconds" ) );
+                }
             }
-            else if( i_action == ACTIONID_JUMP_BACKWARD_1MIN )
+            else if( i_action == ACTIONID_JUMP_BACKWARD_1MIN && b_seekable )
             {
-                vout_OSDMessage( p_intf, _( "Jump -1 minute" ) );
                 val.i_time = -60000000;
                 var_Set( p_input, "time-offset", val );
+                if( p_vout->b_fullscreen )
+                {
+                    vout_OSDSlider( VLC_OBJECT( p_intf ),
+                                    GetPosition( p_intf ), 0 );
+                }
+                else
+                {
+                    vout_OSDMessage( p_intf, _( "Jump -1 minute" ) );
+                }
             }
-            else if( i_action == ACTIONID_JUMP_FORWARD_1MIN )
+            else if( i_action == ACTIONID_JUMP_FORWARD_1MIN && b_seekable )
             {
-                vout_OSDMessage( p_intf, _( "Jump +1 minute" ) );
                 val.i_time = 60000000;
                 var_Set( p_input, "time-offset", val );
+                if( p_vout->b_fullscreen )
+                {
+                    vout_OSDSlider( VLC_OBJECT( p_intf ),
+                                    GetPosition( p_intf ), 0 );
+                }
+                else
+                {
+                    vout_OSDMessage( p_intf, _( "Jump +1 minute" ) );
+                }
             }
-            else if( i_action == ACTIONID_JUMP_BACKWARD_5MIN )
+            else if( i_action == ACTIONID_JUMP_BACKWARD_5MIN && b_seekable )
             {
                 vout_OSDMessage( p_intf, _( "Jump -5 minutes" ) );
                 val.i_time = -300000000;
                 var_Set( p_input, "time-offset", val );
+                if( p_vout->b_fullscreen )
+                {
+                    vout_OSDSlider( VLC_OBJECT( p_intf ),
+                                    GetPosition( p_intf ), 0 );
+                }
+                else
+                {
+                    vout_OSDMessage( p_intf, _( "Jump -5 minutes" ) );
+                }
             }
-            else if( i_action == ACTIONID_JUMP_FORWARD_5MIN )
+            else if( i_action == ACTIONID_JUMP_FORWARD_5MIN && b_seekable )
             {
-                vout_OSDMessage( p_intf, _( "Jump +5 minutes" ) );
                 val.i_time = 300000000;
                 var_Set( p_input, "time-offset", val );
+                if( p_vout->b_fullscreen )
+                {
+                    vout_OSDSlider( VLC_OBJECT( p_intf ),
+                                    GetPosition( p_intf ), 0 );
+                }
+                else
+                {
+                    vout_OSDMessage( p_intf, _( "Jump +5 minutes" ) );
+                }
             }
             else if( i_action == ACTIONID_NEXT )
             {
@@ -552,4 +623,19 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
                   val.psz_string );
         vlc_object_release( p_playlist );
     }
+}
+
+static int GetPosition( intf_thread_t *p_intf )
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                               FIND_ANYWHERE );
+    if( p_input )
+    {
+        vlc_value_t pos;
+        var_Get( p_input, "position", &pos );
+        vlc_object_release( p_input );
+        return pos.f_float * 100;
+    }
+    return -1;
 }
