@@ -41,6 +41,10 @@ struct screen_data_t
     HDC hdc_dst;
     BITMAPINFO bmi;
     HGDIOBJ hgdi_backup;
+
+    int i_fragment_size;
+    int i_fragment;
+    block_t *p_block;
 };
 
 int screen_InitCapture( demux_t *p_demux )
@@ -48,6 +52,7 @@ int screen_InitCapture( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     screen_data_t *p_data;
     int i_chroma, i_bits_per_pixel;
+    vlc_value_t val;
 
     p_sys->p_data = p_data = malloc( sizeof( screen_data_t ) );
 
@@ -111,6 +116,19 @@ int screen_InitCapture( demux_t *p_demux )
     p_data->bmi.bmiHeader.biClrUsed = 0;
     p_data->bmi.bmiHeader.biClrImportant = 0;
 
+    var_Create( p_demux, "screen-fragment-size",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "screen-fragment-size", &val );
+    p_data->i_fragment_size =
+        val.i_int > 0 ? val.i_int : p_sys->fmt.video.i_height;
+    p_data->i_fragment_size =
+        val.i_int > p_sys->fmt.video.i_height ? p_sys->fmt.video.i_height :
+        p_data->i_fragment_size;
+    p_sys->f_fps *= (p_sys->fmt.video.i_height/p_data->i_fragment_size);
+    p_sys->i_incr = 1000000 / p_sys->f_fps;
+    p_data->i_fragment = 0;
+    p_data->p_block = 0;
+
     return VLC_SUCCESS;
 }
 
@@ -118,6 +136,8 @@ int screen_CloseCapture( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     screen_data_t *p_data = p_sys->p_data;
+
+    if( p_data->p_block ) block_Release( p_data->p_block );
 
     if( p_data->hgdi_backup)
         SelectObject( p_data->hdc_dst, p_data->hgdi_backup );
@@ -172,16 +192,6 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
         return NULL;
     }
 
-    if( !BitBlt( p_data->hdc_dst, 0, 0,
-                 p_sys->fmt.video.i_width, p_sys->fmt.video.i_height,
-                 p_data->hdc_src, 0, 0,
-                 IS_WINNT ? SRCCOPY | CAPTUREBLT : SRCCOPY ) )
-    {
-        msg_Err( p_demux, "error during BitBlt()" );
-        DeleteObject( hbmp );
-        return NULL;
-    }
-
     /* Build block */
     if( !(p_block = malloc( sizeof( block_t ) + sizeof( block_sys_t ) )) )
     {
@@ -206,13 +216,39 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
 
 block_t *screen_Capture( demux_t *p_demux )
 {
-    block_t *p_block;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    screen_data_t *p_data = p_sys->p_data;
 
-    if( !( p_block = CaptureBlockNew( p_demux ) ) )
+    if( !p_data->i_fragment )
     {
-        msg_Warn( p_demux, "cannot get block" );
-        return 0;
+        if( !( p_data->p_block = CaptureBlockNew( p_demux ) ) )
+        {
+            msg_Warn( p_demux, "cannot get block" );
+            return 0;
+        }
     }
 
-    return p_block;
+    if( !BitBlt( p_data->hdc_dst, 0, p_data->i_fragment *
+                 p_data->i_fragment_size,
+                 p_sys->fmt.video.i_width, p_data->i_fragment_size,
+                 p_data->hdc_src, 0, p_data->i_fragment *
+                 p_data->i_fragment_size,
+                 IS_WINNT ? SRCCOPY | CAPTUREBLT : SRCCOPY ) )
+    {
+        msg_Err( p_demux, "error during BitBlt()" );
+        return NULL;
+    }
+
+    p_data->i_fragment++;
+
+    if( !( p_data->i_fragment %
+           (p_sys->fmt.video.i_height/p_data->i_fragment_size) ) )
+    {
+        block_t *p_block = p_data->p_block;
+        p_data->i_fragment = 0;
+        p_data->p_block = 0;
+        return p_block;
+    }
+
+    return NULL;
 }

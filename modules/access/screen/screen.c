@@ -42,6 +42,13 @@
 #define FPS_LONGTEXT N_( \
     "Allows you to set the desired frame rate for the capture." )
 
+#ifdef WIN32
+#define FRAGS_TEXT N_("Capture fragement size")
+#define FRAGS_LONGTEXT N_( \
+    "Allows you optimize the capture by fragmenting the screen in chunks " \
+    "of predefined height (16 might be a good value, and 0 means disabled)." )
+#endif
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -57,6 +64,11 @@ vlc_module_begin();
     add_integer( "screen-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     add_float( "screen-fps", SCREEN_FPS, 0, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+
+#ifdef WIN32
+    add_integer( "screen-fragment-size", 0, NULL, FRAGS_TEXT,
+        FRAGS_LONGTEXT, VLC_TRUE );
+#endif
 
     set_capability( "access_demux", 0 );
     add_shortcut( "screen" );
@@ -84,6 +96,15 @@ static int Open( vlc_object_t *p_this )
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     memset( p_sys, 0, sizeof( demux_sys_t ) );
 
+    /* Update default_pts to a suitable value for screen access */
+    var_Create( p_demux, "screen-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+
+    var_Create( p_demux, "screen-fps", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "screen-fps", &val );
+    p_sys->f_fps = val.f_float;
+    p_sys->i_incr = 1000000 / val.f_float;
+    p_sys->i_next_date = 0;
+
     if( screen_InitCapture( p_demux ) != VLC_SUCCESS )
     {
         free( p_sys );
@@ -95,15 +116,6 @@ static int Open( vlc_object_t *p_this )
              p_sys->fmt.video.i_bits_per_pixel );
 
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
-
-    /* Update default_pts to a suitable value for screen access */
-    var_Create( p_demux, "screen-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-
-    var_Create( p_demux, "screen-fps", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "screen-fps", &val );
-    p_sys->f_fps = val.f_float;
-    p_sys->i_incr = 1000000 / val.f_float;
-    p_sys->i_next_date = 0;
 
     return VLC_SUCCESS;
 }
@@ -136,7 +148,11 @@ static int Demux( demux_t *p_demux )
 
     mwait( p_sys->i_next_date );
     p_block = screen_Capture( p_demux );
-    if( !p_block ) return 0;
+    if( !p_block )
+    {
+        p_sys->i_next_date += p_sys->i_incr;
+        return 1;
+    }
 
     p_block->i_dts = p_block->i_pts = p_sys->i_next_date;
 
