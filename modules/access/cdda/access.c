@@ -344,7 +344,8 @@ int E_(CDDAOpen)( vlc_object_t *p_this )
     if( !(p_cdio = cdio_open( psz_source, DRIVER_UNKNOWN )) )
     {
         msg_Warn( p_access, "could not open %s", psz_source );
-        goto error2;
+	if (psz_source) free( psz_source );
+	return VLC_EGENERIC;
     }
 
     p_cdda = malloc( sizeof(cdda_data_t) );
@@ -446,13 +447,13 @@ int E_(CDDAOpen)( vlc_object_t *p_this )
 
  error:
     cdio_destroy( p_cdda->p_cdio );
-    free( p_cdda );
- error2:
-    free( psz_source );
-    if( p_cdda && p_cdda->p_input )
-    {
-        vlc_object_release( p_cdda->p_input );
+    if( psz_source) free( psz_source );
+    if( p_cdda ) {
+      if ( p_cdda->p_input )
+	vlc_object_release( p_cdda->p_input );
+      free(p_cdda);
     }
+    
     return i_rc;
 
 }
@@ -479,7 +480,7 @@ void E_(CDDAClose)( vlc_object_t *p_this )
     cdio_log_set_handler (uninit_log_handler);
 
 #ifdef HAVE_LIBCDDB
-    cddb_log_set_handler (uninit_log_handler);
+    cddb_log_set_handler ((cddb_log_handler_t) uninit_log_handler);
     if (p_cdda->b_cddb_enabled)
       cddb_disc_destroy(p_cdda->cddb.disc);
 #endif
