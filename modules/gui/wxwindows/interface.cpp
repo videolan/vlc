@@ -702,6 +702,55 @@ void Interface::CreateOurExtendedPanel()
     extra_frame->Hide();
 }
 
+static int ConvertHotkeyModifiers( int i_hotkey )
+{
+    int i_accel_flags = 0;
+    if( i_hotkey & KEY_MODIFIER_ALT ) i_accel_flags |= wxACCEL_ALT;
+    if( i_hotkey & KEY_MODIFIER_CTRL ) i_accel_flags |= wxACCEL_CTRL;
+    if( i_hotkey & KEY_MODIFIER_SHIFT ) i_accel_flags |= wxACCEL_SHIFT;
+    if( !i_accel_flags ) i_accel_flags = wxACCEL_NORMAL;
+    return i_accel_flags;
+}
+
+static int ConvertHotkey( int i_hotkey )
+{
+    int i_key = i_hotkey & ~KEY_MODIFIER;
+    if( i_key & KEY_ASCII ) return i_key & KEY_ASCII;
+    else if( i_key & KEY_SPECIAL )
+    {
+        switch ( i_key )
+        {
+        case KEY_LEFT: return WXK_LEFT;
+        case KEY_RIGHT: return WXK_RIGHT;
+        case KEY_UP: return WXK_UP;
+        case KEY_DOWN: return WXK_DOWN;
+        case KEY_SPACE: return WXK_SPACE;
+        case KEY_ENTER: return WXK_RETURN;
+        case KEY_F1: return WXK_F1;
+        case KEY_F2: return WXK_F2;
+        case KEY_F3: return WXK_F3;
+        case KEY_F4: return WXK_F4;
+        case KEY_F5: return WXK_F5;
+        case KEY_F6: return WXK_F6;
+        case KEY_F7: return WXK_F7;
+        case KEY_F8: return WXK_F8;
+        case KEY_F9: return WXK_F9;
+        case KEY_F10: return WXK_F10;
+        case KEY_F11: return WXK_F11;
+        case KEY_F12: return WXK_F12;
+        case KEY_HOME: return WXK_HOME;
+        case KEY_END: return WXK_HOME;
+        case KEY_MENU: return WXK_MENU;
+        case KEY_ESC: return WXK_ESCAPE;
+        case KEY_PAGEUP: return WXK_PRIOR;
+        case KEY_PAGEDOWN: return WXK_NEXT;
+        case KEY_TAB: return WXK_TAB;
+        case KEY_BACKSPACE: return WXK_BACK;
+        }
+    }
+    return WXK_F24;
+}
+
 void Interface::SetupHotkeys()
 {
     struct vlc_t::hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
@@ -716,7 +765,7 @@ void Interface::SetupHotkeys()
     wxAcceleratorEntry p_entries[i_hotkeys];
 
     /* Setup the hotkeys as accelerators */
-    for( int i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+    for( int i = 0; i < i_hotkeys; i++ )
     {
         p_entries[i].Set( ConvertHotkeyModifiers( p_hotkeys[i].i_key ),
                           ConvertHotkey( p_hotkeys[i].i_key ),
