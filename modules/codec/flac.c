@@ -230,11 +230,12 @@ static int OpenPacketizer( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
+    /* Hmmm, mem leak ?*/
+    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
+
     int i_ret = OpenDecoder( p_this );
 
     if( i_ret != VLC_SUCCESS ) return i_ret;
-
-    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
     return i_ret;
 }
@@ -257,6 +258,11 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
         /* We've just started the stream, wait for the first PTS. */
         block_Release( *pp_block );
         return NULL;
+    }
+    else if( !aout_DateGet( &p_sys->end_date ) )
+    {
+        /* The first PTS is as good as anything else. */
+        aout_DateSet( &p_sys->end_date, (*pp_block)->i_pts );
     }
 
     if( (*pp_block)->i_flags&BLOCK_FLAG_DISCONTINUITY )
@@ -325,7 +331,6 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 p_dec->fmt_out.audio.i_rate = p_sys->i_rate;
                 aout_DateInit( &p_sys->end_date, p_sys->i_rate );
-                p_dec->fmt_out.audio.i_rate = p_sys->i_rate;
             }
             p_sys->i_state = STATE_NEXT_SYNC;
             p_sys->i_frame_size = 1;
@@ -364,7 +369,6 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 /* Need more data */
                 return NULL;
             }
-            break;
 
         case STATE_SEND_DATA:
             p_sout_block = block_New( p_dec, p_sys->i_frame_size );
