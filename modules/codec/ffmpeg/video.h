@@ -2,7 +2,7 @@
  * video.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.h,v 1.8 2003/04/26 21:45:26 fenrir Exp $
+ * $Id: video.h,v 1.9 2003/06/17 21:07:50 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -34,9 +34,6 @@ typedef struct vdec_thread_s
 #ifdef LIBAVCODEC_PP
     pp_context_t        *pp_context;
     pp_mode_t           *pp_mode;
-#else
-    uint32_t            i_pp_mode; /* valid only with I420 and YV12 */
-    postprocessing_t    *p_pp;
 #endif
 
     /* for frame skipping algo */
