@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.18 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: copy.c,v 1.19 2003/11/20 18:27:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -30,47 +30,32 @@
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
 #include <vlc/input.h>
-#include <vlc/sout.h>
-
-#include "codecs.h"
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open    ( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Copy packetizer") );
     set_capability( "packetizer", 1 );
-    set_callbacks( Open, NULL );
+    set_callbacks( Open, Close );
 vlc_module_end();
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Run         ( decoder_fifo_t * );
-
-typedef struct packetizer_thread_s
+struct decoder_sys_t
 {
-    /* Input properties */
-    decoder_fifo_t          *p_fifo;
+    int i_spu_size;
+    int i_spu;
 
-    /* Output properties */
-    sout_packetizer_input_t *p_sout_input;
-    sout_format_t           output_format;
+    block_t *p_block;
+};
 
-    void                    (*pf_packetize)( struct packetizer_thread_s * );
-
-} packetizer_thread_t;
-
-static int  Init        ( packetizer_thread_t * );
-static void PacketizeStd( packetizer_thread_t * );
-static void PacketizeSPU( packetizer_thread_t * );
-static void End         ( packetizer_thread_t * );
-
-
-static void AppendPEStoSoutBuffer( sout_instance_t *,sout_buffer_t **,pes_packet_t *);
-static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes );
+static block_t *PacketizeAV ( decoder_t *, block_t ** );
+static block_t *PacketizeSPU( decoder_t *, block_t ** );
 
 /*****************************************************************************
  * Open: probe the packetizer and return score
@@ -80,67 +65,48 @@ static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes );
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_t     *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys;
 
-    p_dec->pf_run = Run;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Run: this function is called just after the thread is created
- *****************************************************************************/
-static int Run( decoder_fifo_t *p_fifo )
-{
-    packetizer_thread_t *p_pack;
-    int i_ret;
-
-    msg_Dbg( p_fifo, "Running copy packetizer (fcc=%4.4s)",
-             (char*)&p_fifo->i_fourcc );
-
-    p_pack = malloc( sizeof( packetizer_thread_t ) );
-    memset( p_pack, 0, sizeof( packetizer_thread_t ) );
-
-    p_pack->p_fifo = p_fifo;
-
-    if( Init( p_pack ) )
+    if( p_dec->fmt_in.i_cat == AUDIO_ES || p_dec->fmt_in.i_cat == VIDEO_ES )
     {
-        DecoderError( p_fifo );
+        p_dec->pf_packetize = PacketizeAV;
+    }
+    else if( p_dec->fmt_in.i_cat == SPU_ES )
+    {
+        if( p_dec->fmt_in.i_codec == VLC_FOURCC( 's', 'p', 'u', ' ' ) ||
+            p_dec->fmt_in.i_codec == VLC_FOURCC( 's', 'p', 'u', 'b' ) )
+        {
+            p_dec->pf_packetize = PacketizeSPU;
+        }
+        else
+        {
+            p_dec->pf_packetize = PacketizeAV;
+        }
+    }
+    else
+    {
+        msg_Err( p_dec, "invalid ES type" );
         return VLC_EGENERIC;
     }
 
-    while( !p_pack->p_fifo->b_die && !p_pack->p_fifo->b_error )
+    /* Create the output format */
+    memcpy( &p_dec->fmt_out, &p_dec->fmt_in, sizeof( es_format_t ) );
+    if( p_dec->fmt_in.i_extra > 0 )
     {
-        p_pack->pf_packetize( p_pack );
+        p_dec->fmt_out.p_extra = malloc( p_dec->fmt_in.i_extra );
+        memcpy( p_dec->fmt_out.p_extra, p_dec->fmt_in.p_extra,
+                p_dec->fmt_in.i_extra );
     }
 
-    if( p_pack->p_fifo->b_error )
-    {
-        DecoderError( p_pack->p_fifo );
-    }
-
-    i_ret = p_pack->p_fifo->b_error ? VLC_EGENERIC : VLC_SUCCESS;
-    End( p_pack );
-
-    return( i_ret );
-}
-
-/*****************************************************************************
- * Init: initialize data before entering main loop
- *****************************************************************************/
-static int Init( packetizer_thread_t *p_pack )
-{
-
-    p_pack->pf_packetize = PacketizeStd;
-
-    switch( p_pack->p_fifo->i_fourcc )
+    /* Fix the value of the fourcc */
+    switch( p_dec->fmt_in.i_codec )
     {
         /* video */
         case VLC_FOURCC( 'm', '4', 's', '2'):
         case VLC_FOURCC( 'M', '4', 'S', '2'):
         case VLC_FOURCC( 'm', 'p', '4', 's'):
         case VLC_FOURCC( 'M', 'P', '4', 'S'):
-        case VLC_FOURCC( 'm', 'p', '4', 'v'):
         case VLC_FOURCC( 'D', 'I', 'V', 'X'):
         case VLC_FOURCC( 'd', 'i', 'v', 'x'):
         case VLC_FOURCC( 'X', 'V', 'I', 'D'):
@@ -149,34 +115,29 @@ static int Init( packetizer_thread_t *p_pack )
         case VLC_FOURCC( 'D', 'X', '5', '0'):
         case VLC_FOURCC( 0x04, 0,   0,   0):
         case VLC_FOURCC( '3', 'I', 'V', '2'):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'v');
-            p_pack->output_format.i_cat = VIDEO_ES;
+            p_dec->fmt_out.i_codec = VLC_FOURCC( 'm', 'p', '4', 'v');
             break;
-        case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
+
         case VLC_FOURCC( 'm', 'p', 'g', '1' ):
         case VLC_FOURCC( 'm', 'p', 'g', '2' ):
         case VLC_FOURCC( 'm', 'p', '1', 'v' ):
         case VLC_FOURCC( 'm', 'p', '2', 'v' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'v' );
-            p_pack->output_format.i_cat = VIDEO_ES;
+            p_dec->fmt_out.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'v' );
             break;
 
         case VLC_FOURCC( 'd', 'i', 'v', '1' ):
-        case VLC_FOURCC( 'D', 'I', 'V', '1' ):
         case VLC_FOURCC( 'M', 'P', 'G', '4' ):
         case VLC_FOURCC( 'm', 'p', 'g', '4' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'D', 'I', 'V', '1' );
-            p_pack->output_format.i_cat = VIDEO_ES;
+            p_dec->fmt_out.i_codec = VLC_FOURCC( 'D', 'I', 'V', '1' );
             break;
+
         case VLC_FOURCC( 'd', 'i', 'v', '2' ):
-        case VLC_FOURCC( 'D', 'I', 'V', '2' ):
         case VLC_FOURCC( 'M', 'P', '4', '2' ):
         case VLC_FOURCC( 'm', 'p', '4', '2' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'D', 'I', 'V', '2' );
-            p_pack->output_format.i_cat = VIDEO_ES;
+            p_dec->fmt_out.i_codec = VLC_FOURCC( 'D', 'I', 'V', '2' );
             break;
+
         case VLC_FOURCC( 'd', 'i', 'v', '3' ):
-        case VLC_FOURCC( 'D', 'I', 'V', '3' ):
         case VLC_FOURCC( 'd', 'i', 'v', '4' ):
         case VLC_FOURCC( 'D', 'I', 'V', '4' ):
         case VLC_FOURCC( 'd', 'i', 'v', '5' ):
@@ -188,464 +149,215 @@ static int Init( packetizer_thread_t *p_pack )
         case VLC_FOURCC( 'm', 'p', 'g', '3' ):
         case VLC_FOURCC( 'M', 'P', 'G', '3' ):
         case VLC_FOURCC( 'A', 'P', '4', '1' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'D', 'I', 'V', '3' );
-            p_pack->output_format.i_cat = VIDEO_ES;
+            p_dec->fmt_out.i_codec = VLC_FOURCC( 'D', 'I', 'V', '3' );
             break;
-        case VLC_FOURCC( 'H', '2', '6', '3' ):
+
         case VLC_FOURCC( 'h', '2', '6', '3' ):
         case VLC_FOURCC( 'U', '2', '6', '3' ):
         case VLC_FOURCC( 'u', '2', '6', '3' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'H', '2', '6', '3' );
-            p_pack->output_format.i_cat = VIDEO_ES;
+            p_dec->fmt_out.i_codec = VLC_FOURCC( 'H', '2', '6', '3' );
             break;
-        case VLC_FOURCC( 'I', '2', '6', '3' ):
+
         case VLC_FOURCC( 'i', '2', '6', '3' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'I', '2', '6', '3' );
-            p_pack->output_format.i_cat = VIDEO_ES;
+            p_dec->fmt_out.i_codec = VLC_FOURCC( 'I', '2', '6', '3' );
             break;
-        case VLC_FOURCC( 'W', 'M', 'V', '1' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'W', 'M', 'V', '1' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'W', 'M', 'V', '2' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'W', 'M', 'V', '2' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
+
         case VLC_FOURCC( 'm', 'j', 'p', 'g' ):
         case VLC_FOURCC( 'm', 'j', 'p', 'a' ):
         case VLC_FOURCC( 'j', 'p', 'e', 'g' ):
         case VLC_FOURCC( 'J', 'P', 'E', 'G' ):
         case VLC_FOURCC( 'J', 'F', 'I', 'F' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'M', 'J', 'P', 'G' );
-            p_pack->output_format.i_cat = VIDEO_ES;
+            p_dec->fmt_out.i_codec = VLC_FOURCC( 'M', 'J', 'P', 'G' );
             break;
-        case VLC_FOURCC( 'm', 'j', 'p', 'b' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'j', 'p', 'b' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'd', 'v', 's', 'l' ):
+
         case VLC_FOURCC( 'd', 'v', 's', 'd' ):
         case VLC_FOURCC( 'D', 'V', 'S', 'D' ):
         case VLC_FOURCC( 'd', 'v', 'h', 'd' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'd', 'v', 's', 'l' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'S', 'V', 'Q', '1' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'S', 'V', 'Q', '1' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'S', 'V', 'Q', '3' );
-            p_pack->output_format.i_cat = VIDEO_ES;
+            p_dec->fmt_out.i_codec = VLC_FOURCC( 'd', 'v', 's', 'l' );
             break;
 
         /* audio */
-        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'a' );
-            p_pack->output_format.i_cat = AUDIO_ES;
-            break;
-        case VLC_FOURCC( 'w', 'm', 'a', '1' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'w', 'm', 'a', '1' );
-            p_pack->output_format.i_cat = AUDIO_ES;
-            break;
-        case VLC_FOURCC( 'w', 'm', 'a', '2' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'w', 'm', 'a', '2' );
-            p_pack->output_format.i_cat = AUDIO_ES;
-            break;
         case VLC_FOURCC( 'a', 'r', 'a', 'w' ):
-        {
-            WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_pack->p_fifo->p_waveformatex;
-            if( p_wf )
+            switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
             {
-                switch( ( p_wf->wBitsPerSample + 7 ) / 8 )
-                {
-                    case 1:
-                        p_pack->output_format.i_fourcc = VLC_FOURCC('u','8',' ',' ');
-                        break;
-                    case 2:
-                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','1','6','l');
-                        break;
-                    case 3:
-                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','2','4','l');
-                        break;
-                    case 4:
-                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','3','2','l');
-                        break;
-                    default:
-                        msg_Err( p_pack->p_fifo, "unknown raw audio sample size !!" );
-                        return VLC_EGENERIC;
-                }
+                case 1:
+                    p_dec->fmt_out.i_codec = VLC_FOURCC('u','8',' ',' ');
+                    break;
+                case 2:
+                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','l');
+                    break;
+                case 3:
+                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','l');
+                    break;
+                case 4:
+                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','3','2','l');
+                    break;
+                default:
+                    msg_Err( p_dec, "unknown raw audio sample size !!" );
+                    return VLC_EGENERIC;
             }
-            else
-            {
-                msg_Err( p_pack->p_fifo, "unknown raw audio sample size !!" );
-                return VLC_EGENERIC;
-            }
-            p_pack->output_format.i_cat = AUDIO_ES;
             break;
-        }
+
         case VLC_FOURCC( 't', 'w', 'o', 's' ):
-        {
-            WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_pack->p_fifo->p_waveformatex;
-            if( p_wf )
+            switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
             {
-                switch( ( p_wf->wBitsPerSample + 7 ) / 8 )
-                {
-                    case 1:
-                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','8',' ',' ');
-                        break;
-                    case 2:
-                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','1','6','b');
-                        break;
-                    case 3:
-                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','2','4','b');
-                        break;
-                    case 4:
-                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','3','2','b');
-                        break;
-                    default:
-                        msg_Err( p_pack->p_fifo, "unknown raw audio sample size !!" );
-                        return VLC_EGENERIC;
-                }
+                case 1:
+                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','8',' ',' ');
+                    break;
+                case 2:
+                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','b');
+                    break;
+                case 3:
+                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','b');
+                    break;
+                case 4:
+                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','3','2','b');
+                    break;
+                default:
+                    msg_Err( p_dec, "unknown raw audio sample size !!" );
+                    return VLC_EGENERIC;
             }
-            else
-            {
-                msg_Err( p_pack->p_fifo, "unknown raw audio sample size !!" );
-                return VLC_EGENERIC;
-            }
-            p_pack->output_format.i_cat = AUDIO_ES;
             break;
-        }
+
         case VLC_FOURCC( 's', 'o', 'w', 't' ):
-        {
-            WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_pack->p_fifo->p_waveformatex;
-            if( p_wf )
+            switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
             {
-                switch( ( p_wf->wBitsPerSample + 7 ) / 8 )
-                {
-                    case 1:
-                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','8',' ',' ');
-                        break;
-                    case 2:
-                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','1','6','l');
-                        break;
-                    case 3:
-                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','2','4','l');
-                        break;
-                    case 4:
-                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','3','2','l');
-                        break;
-                    default:
-                        msg_Err( p_pack->p_fifo, "unknown raw audio sample size !!" );
-                        return VLC_EGENERIC;
-                }
+                case 1:
+                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','8',' ',' ');
+                    break;
+                case 2:
+                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','l');
+                    break;
+                case 3:
+                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','l');
+                    break;
+                case 4:
+                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','3','2','l');
+                    break;
+                default:
+                    msg_Err( p_dec, "unknown raw audio sample size !!" );
+                    return VLC_EGENERIC;
             }
-            else
-            {
-                msg_Err( p_pack->p_fifo, "unknown raw audio sample size !!" );
-                return VLC_EGENERIC;
-            }
-            p_pack->output_format.i_cat = AUDIO_ES;
             break;
-        }
 
         /* subtitles */
-        case VLC_FOURCC( 's', 'p', 'u', ' ' ):  /* DVD */
         case VLC_FOURCC( 's', 'p', 'u', 'b' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 's', 'p', 'u', ' ' );
-            p_pack->output_format.i_cat = SPU_ES;
-            p_pack->pf_packetize = PacketizeSPU;
+            p_dec->fmt_out.i_codec = VLC_FOURCC( 's', 'p', 'u', ' ' );
             break;
-
-        case VLC_FOURCC( 's', 'u', 'b', 't' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 's', 'u', 'b', 't' );
-            p_pack->output_format.i_cat = SPU_ES;
-            break;
-
-        default:
-            msg_Err( p_pack->p_fifo, "unknown es type !!" );
-            return VLC_EGENERIC;
     }
 
-    switch( p_pack->output_format.i_cat )
-    {
-        case AUDIO_ES:
-            {
-                WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_pack->p_fifo->p_waveformatex;
-                if( p_wf )
-                {
-                    p_pack->output_format.i_sample_rate = p_wf->nSamplesPerSec;
-                    p_pack->output_format.i_channels    = p_wf->nChannels;
-                    p_pack->output_format.i_block_align = p_wf->nBlockAlign;
-                    p_pack->output_format.i_bitrate     = p_wf->nAvgBytesPerSec * 8;
-                    p_pack->output_format.i_extra_data  = p_wf->cbSize;
-                    if( p_wf->cbSize  > 0 )
-                    {
-                        p_pack->output_format.p_extra_data =
-                            malloc( p_pack->output_format.i_extra_data );
-                        memcpy( p_pack->output_format.p_extra_data,
-                                &p_wf[1],
-                                p_pack->output_format.i_extra_data );
-                    }
-                    else
-                    {
-                        p_pack->output_format.p_extra_data = NULL;
-                    }
-                }
-                else
-                {
-                    p_pack->output_format.i_sample_rate = 0;
-                    p_pack->output_format.i_channels    = 0;
-                    p_pack->output_format.i_block_align = 0;
-                    p_pack->output_format.i_bitrate     = 0;
-                    p_pack->output_format.i_extra_data  = 0;
-                    p_pack->output_format.p_extra_data  = NULL;
-                }
-            }
-            break;
+    p_dec->p_sys = p_sys = malloc( sizeof( block_t ) );
+    p_sys->i_spu_size = 0;
+    p_sys->i_spu      = 0;
+    p_sys->p_block    = NULL;
 
-        case VIDEO_ES:
-            {
-                BITMAPINFOHEADER *p_bih = (BITMAPINFOHEADER*)p_pack->p_fifo->p_bitmapinfoheader;
-
-                p_pack->output_format.i_bitrate = 0;
-                if( p_bih )
-                {
-                    p_pack->output_format.i_width  = p_bih->biWidth;
-                    p_pack->output_format.i_height = p_bih->biHeight;
-                    p_pack->output_format.i_extra_data  = p_bih->biSize - sizeof( BITMAPINFOHEADER );
-                    if( p_pack->output_format.i_extra_data > 0 )
-                    {
-                        p_pack->output_format.p_extra_data =
-                            malloc( p_pack->output_format.i_extra_data );
-                        memcpy( p_pack->output_format.p_extra_data,
-                                &p_bih[1],
-                                p_pack->output_format.i_extra_data );
-                    }
-                }
-                else
-                {
-                    p_pack->output_format.i_width  = 0;
-                    p_pack->output_format.i_height = 0;
-                    p_pack->output_format.i_extra_data  = 0;
-                    p_pack->output_format.p_extra_data  = NULL;
-                }
-            }
-            break;
-
-        case SPU_ES:
-            p_pack->output_format.i_extra_data  = 0;
-            p_pack->output_format.p_extra_data  = NULL;
-            break;
-
-        default:
-            return VLC_EGENERIC;
-    }
-
-    p_pack->p_sout_input =
-        sout_InputNew( p_pack->p_fifo,
-                       &p_pack->output_format );
-
-    if( !p_pack->p_sout_input )
-    {
-        msg_Err( p_pack->p_fifo, "cannot add a new stream" );
-        return VLC_EGENERIC;
-    }
-
-    return( VLC_SUCCESS );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * PacketizeStd: packetize an unit (here copy a complete pes)
+ * Close:
  *****************************************************************************/
-static void PacketizeStd( packetizer_thread_t *p_pack )
+static void Close( vlc_object_t *p_this )
 {
-    sout_buffer_t   *p_out = NULL;
-    pes_packet_t    *p_pes;
+    decoder_t     *p_dec = (decoder_t*)p_this;
 
-    input_ExtractPES( p_pack->p_fifo, &p_pes );
-    if( !p_pes )
+    if( p_dec->p_sys->p_block )
     {
-        p_pack->p_fifo->b_error = 1;
-        return;
-    }
-#if 0
-    msg_Dbg( p_pack->p_fifo, "pes size:%d dts="I64Fd" pts="I64Fd,
-             p_pes->i_pes_size, p_pes->i_dts, p_pes->i_pts );
-#endif
-
-    if( p_pes->i_pts <= 0 )
-    {
-        msg_Dbg( p_pack->p_fifo, "need pts != 0" );
-        input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
-        return;
+        block_ChainRelease( p_dec->p_sys->p_block );
     }
 
-    if( p_pes->i_pes_size > 0 )
+    free( p_dec->p_sys );
+}
+
+/*****************************************************************************
+ * PacketizeStd: packetize an unit (here copy a complete block )
+ *****************************************************************************/
+static block_t *PacketizeAV ( decoder_t *p_dec, block_t **pp_block )
+{
+    block_t *p_block;
+    block_t *p_ret = p_dec->p_sys->p_block;
+
+    if( pp_block == NULL || *pp_block == NULL )
     {
-        pes_packet_t    *p_next;
+        return NULL;
+    }
+    p_block = *pp_block;
+    *pp_block = NULL;
 
-        AppendPEStoSoutBuffer( p_pack->p_sout_input->p_sout, &p_out, p_pes );
-
-        input_ShowPES( p_pack->p_fifo, &p_next );
-        if( p_next && p_next->i_pts > 0 )
-        {
-            p_out->i_length = p_next->i_pts - p_pes->i_pts;
-        }
-
-        sout_InputSendBuffer( p_pack->p_sout_input,
-                               p_out );
+    if( p_block->i_pts <= 0 )
+    {
+        msg_Dbg( p_dec, "need pts > 0" );
+        block_Release( p_block );
+        return NULL;
     }
 
-    input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
+    if( p_ret != NULL && p_block->i_pts > p_ret->i_pts )
+    {
+        p_ret->i_length = p_block->i_pts - p_ret->i_pts;
+    }
+    p_dec->p_sys->p_block = p_block;
+
+    return p_ret;
 }
 
 /*****************************************************************************
  * PacketizeSPU: packetize an SPU unit (so gather all PES of one subtitle)
  *****************************************************************************/
-static void PacketizeSPU( packetizer_thread_t *p_pack )
+static block_t *PacketizeSPU( decoder_t *p_dec, block_t **pp_block )
 {
-    sout_buffer_t   *p_out = NULL;
-    pes_packet_t    *p_pes;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block;
 
-    int     i_spu_size = 0;
-
-    for( ;; )
+    if( pp_block == NULL || *pp_block == NULL )
     {
-        input_ExtractPES( p_pack->p_fifo, &p_pes );
-        if( !p_pes )
+        return NULL;
+    }
+    p_block = *pp_block;
+    *pp_block = NULL;
+
+    if( p_sys->i_spu_size <= 0 &&
+        ( p_block->i_pts <= 0 || p_block->i_buffer < 4 ) )
+    {
+        msg_Dbg( p_dec, "invalid starting packet (size < 4 or pts <=0)" );
+        block_Release( p_block );
+        return NULL;
+    }
+
+    block_ChainAppend( &p_sys->p_block, p_block );
+    p_sys->i_spu += p_block->i_buffer;
+
+    if( p_sys->i_spu_size <= 0 )
+    {
+        int i_rle = ( ( p_block->p_buffer[2] << 8 )| p_block->p_buffer[3] ) - 4;
+
+        p_sys->i_spu_size = ( p_block->p_buffer[0] << 8 )| p_block->p_buffer[1];
+
+        msg_Dbg( p_dec, "i_spu_size=%d i_rle=%d", p_sys->i_spu_size, i_rle );
+
+        if( p_sys->i_spu_size <= 0 || i_rle >= p_sys->i_spu_size )
         {
-            p_pack->p_fifo->b_error = 1;
-            return;
-        }
-#if 0
-        msg_Dbg( p_pack->p_fifo, "pes size:%d dts="I64Fd" pts="I64Fd,
-                 p_pes->i_pes_size, p_pes->i_dts, p_pes->i_pts );
-#endif
+            p_sys->i_spu_size = 0;
+            p_sys->i_spu      = 0;
+            p_sys->p_block    = NULL;
 
-        if( p_out == NULL &&
-            ( p_pes->i_pts <= 0 || p_pes->i_pes_size < 4 ) )
-        {
-            msg_Dbg( p_pack->p_fifo, "invalid starting packet (size < 4 or pts <=0)" );
-            input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
-            return;
-        }
-
-        if( p_pes->i_pes_size > 0 )
-        {
-            AppendPEStoSoutBuffer( p_pack->p_sout_input->p_sout, &p_out, p_pes );
-
-            if( i_spu_size <= 0 )
-            {
-                int i_rle;
-                i_spu_size = ( p_out->p_buffer[0] << 8 )| p_out->p_buffer[1];
-                i_rle      = ( ( p_out->p_buffer[2] << 8 )| p_out->p_buffer[3] ) - 4;
-
-                msg_Dbg( p_pack->p_fifo, "i_spu_size=%d i_rle=%d", i_spu_size, i_rle );
-                if( i_spu_size == 0 || i_rle >= i_spu_size )
-                {
-                    sout_BufferDelete( p_pack->p_sout_input->p_sout, p_out );
-                    input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
-                    return;
-                }
-            }
-        }
-
-        input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
-
-        if( (int)p_out->i_size >= i_spu_size )
-        {
-            break;
+            block_Release( p_block );
+            return NULL;
         }
     }
-    msg_Dbg( p_pack->p_fifo,
-             "SPU packets size=%d should be %d",
-             p_out->i_size, i_spu_size );
 
-    sout_InputSendBuffer( p_pack->p_sout_input, p_out );
+    if( p_sys->i_spu >= p_sys->i_spu_size )
+    {
+        /* We have a complete sub */
+        block_t *p_ret = p_sys->p_block;
+
+        msg_Dbg( p_dec, "SPU packets size=%d should be %d",
+                 p_sys->i_spu, p_sys->i_spu_size );
+
+        p_sys->i_spu_size = 0;
+        p_sys->i_spu      = 0;
+        p_sys->p_block    = NULL;
+        return p_ret;
+    }
+    return NULL;
 }
 
-
-/*****************************************************************************
- * End : packetizer thread destruction
- *****************************************************************************/
-static void End ( packetizer_thread_t *p_pack)
-{
-    if( p_pack->p_sout_input )
-    {
-        sout_InputDelete( p_pack->p_sout_input );
-    }
-    free( p_pack );
-}
-
-/*****************************************************************************
- * AppendPEStoSoutBuffer: copy/cat one pes into a sout_buffer_t.
- *****************************************************************************/
-static void AppendPEStoSoutBuffer( sout_instance_t *p_sout,
-                                   sout_buffer_t **pp_out,
-                                   pes_packet_t *p_pes )
-{
-    sout_buffer_t *p_out = *pp_out;
-    unsigned int  i_out;
-
-    data_packet_t   *p_data;
-
-    if( p_out == NULL )
-    {
-        i_out = 0;
-        p_out = *pp_out = sout_BufferNew( p_sout, p_pes->i_pes_size );
-        p_out->i_dts = p_pes->i_pts;
-        p_out->i_pts = p_pes->i_pts;
-    }
-    else
-    {
-        i_out = p_out->i_size;
-        sout_BufferRealloc( p_sout, p_out, i_out + p_pes->i_pes_size );
-    }
-    p_out->i_size = i_out + p_pes->i_pes_size;
-
-    for( p_data = p_pes->p_first; p_data != NULL; p_data = p_data->p_next)
-    {
-        int i_copy;
-
-        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start,
-                        p_out->i_size - i_out );
-        if( i_copy > 0 )
-        {
-            memcpy( &p_out->p_buffer[i_out],
-                    p_data->p_payload_start,
-                    i_copy );
-        }
-        i_out += i_copy;
-    }
-    p_out->i_size = i_out;
-}
-
-/*****************************************************************************
- * input_ShowPES: Show the next PES in the fifo
- *****************************************************************************/
-static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
-{
-    vlc_mutex_lock( &p_fifo->data_lock );
-
-    if( p_fifo->p_first == NULL )
-    {
-        if( p_fifo->b_die )
-        {
-            vlc_mutex_unlock( &p_fifo->data_lock );
-            *pp_pes = NULL;
-            return;
-        }
-
-        /* Signal the input thread we're waiting. This is only
-         * needed in case of slave clock (ES plug-in) but it won't
-         * harm. */
-        vlc_cond_signal( &p_fifo->data_wait );
-
-        /* Wait for the input to tell us when we received a packet. */
-        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-    }
-    *pp_pes = p_fifo->p_first;
-    vlc_mutex_unlock( &p_fifo->data_lock );
-}
