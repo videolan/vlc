@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.36 2002/12/12 15:10:58 gbazin Exp $
+ * $Id: input_clock.c,v 1.37 2003/05/22 16:01:02 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -319,9 +319,7 @@ mtime_t input_ClockGetTS( input_thread_t * p_input,
     if( p_pgrm->i_synchro_state == SYNCHRO_OK )
     {
         return( ClockToSysdate( p_input, p_pgrm, i_ts + p_pgrm->delta_cr )
-                 + p_input->i_pts_delay
-                 + (p_input->p_vlc->i_desync > 0
-                       ? p_input->p_vlc->i_desync : 0) );
+                 + p_input->i_pts_delay );
     }
     else
     {

@@ -2,7 +2,7 @@
  * dec.c : audio output API towards decoders
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dec.c,v 1.9 2003/03/06 23:10:11 gbazin Exp $
+ * $Id: dec.c,v 1.10 2003/05/22 16:01:02 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -136,11 +136,13 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     if( p_input_thread )
     {
         p_aout->i_pts_delay = p_input_thread->i_pts_delay;
+        p_aout->i_pts_delay += p_aout->p_vlc->i_desync;
         vlc_object_release( p_input_thread );
     }
     else
     {
         p_aout->i_pts_delay = DEFAULT_PTS_DELAY;
+        p_aout->i_pts_delay += p_aout->p_vlc->i_desync;
     }
 
     return p_input;
@@ -298,6 +300,10 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         aout_BufferFree( p_buffer );
         return -1;
     }
+
+    /* Apply the desynchronisation requested by the user */
+    p_buffer->start_date += p_aout->p_vlc->i_desync;
+    p_buffer->end_date += p_aout->p_vlc->i_desync;
 
     if ( p_buffer->start_date > mdate() + p_aout->i_pts_delay +
          AOUT_MAX_ADVANCE_TIME )
