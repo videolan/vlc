@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.22 2003/07/16 17:19:06 gbazin Exp $
+ * $Id: spudec.c,v 1.23 2003/07/21 18:24:51 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -104,7 +104,9 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     spudec_thread_t *     p_spudec;
     subtitler_font_t *    p_font = NULL;
     char *                psz_font;
+#if 0
     vout_thread_t *       p_vout_backup = NULL;
+#endif
 
     /* Allocate the memory needed to store the thread's structure */
     p_spudec = (spudec_thread_t *)malloc( sizeof(spudec_thread_t) );
@@ -176,6 +178,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
 
             if( p_spudec->p_vout )
             {
+#if 0
                 if( p_spudec->p_vout != p_vout_backup )
                 {
                     /* The vout has changed, we need to reload the fonts */
@@ -192,6 +195,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
                         break;
                     }
                 }
+#endif
 
                 E_(ParseText)( p_spudec, p_font );
 
