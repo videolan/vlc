@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 # debian/rules for the VideoLAN Client - uses debhelper.
-# $Id: rules,v 1.102 2003/07/17 13:01:59 sam Exp $
+# $Id: rules,v 1.103 2003/08/01 08:24:53 sam Exp $
 # based on Joey Hess's one.
 
 # Uncomment this to turn on verbose mode.
@@ -41,7 +41,7 @@ CONFIG_FLAGS += \
 	--enable-flac \
 	--enable-skins \
 	--disable-basic-skins \
-	--disable-freetype \
+	--enable-freetype \
 	--enable-mkv \
 	--enable-v4l \
 	$(NULL)

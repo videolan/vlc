@@ -1,3 +1,17 @@
+vlc (0.6.1+cvs-20030731-1) unstable; urgency=low
+
+  * New CVS snapshot, based on the 0.6.1 release.
+  * debian/control:
+    + Added a build-dependency on freetype6-dev.
+    + Added a build-dependency on libdvbpsi2-dev.
+    + We now recommend gnome-vlc | wxvlc.
+    + We now suggest fortune-mod.
+  * This release now uses libfreetype to render subtitles, and we recommend
+    ttf-freefont | ttf-thryomanes, so that the old .rle font is no longer
+    needed (Closes: #203013).
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Thu, 31 Jul 2003 13:57:14 +0200
+
 vlc (0.6.0+cvs-20030716-2) unstable; urgency=low
 
   * debian/control:
