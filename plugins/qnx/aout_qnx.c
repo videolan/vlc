@@ -118,13 +118,6 @@ static int aout_Open( aout_thread_t *p_aout )
         return( 1 );
     }
 
-    /* initialize  */
-    p_aout->i_format   = AOUT_FORMAT_DEFAULT;
-    p_aout->i_channels = main_GetIntVariable( AOUT_STEREO_VAR,
-                                              AOUT_STEREO_DEFAULT ) + 1;
-    p_aout->l_rate     = main_GetIntVariable( AOUT_RATE_VAR,
-                                              AOUT_RATE_DEFAULT );
-
     /* open audio device */
     if( ( i_ret = snd_pcm_open_preferred( &p_aout->p_sys->p_pcm_handle,
                                           &p_aout->p_sys->i_card,
@@ -221,8 +214,6 @@ static int aout_SetFormat( aout_thread_t *p_aout )
                      snd_strerror( i_ret ) );
         return( 1 );
     }
-
-    p_aout->i_latency = 0;
 
     return( 0 );
 }

@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_directx.c,v 1.15 2002/01/17 23:02:45 gbazin Exp $
+ * $Id: aout_directx.c,v 1.16 2002/01/28 23:08:31 stef Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -164,11 +164,6 @@ static int aout_Open( aout_thread_t *p_aout )
 
 
     p_aout->psz_device = 0;
-    p_aout->i_format   = AOUT_FORMAT_DEFAULT;
-    p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR,
-                                                  AOUT_STEREO_DEFAULT );
-    p_aout->l_rate     = main_GetIntVariable( AOUT_RATE_VAR,
-                                              AOUT_RATE_DEFAULT );
 
     /* Initialise DirectSound */
     if( DirectxInitDSound( p_aout ) )
@@ -286,8 +281,6 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 
     vlc_mutex_unlock( &p_aout->p_sys->buffer_lock );
 
-    p_aout->i_latency = 0;
-  
     return( 0 );
 }
 

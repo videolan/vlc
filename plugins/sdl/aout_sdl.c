@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.23 2002/01/04 14:01:34 sam Exp $
+ * $Id: aout_sdl.c,v 1.24 2002/01/28 23:08:31 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -181,12 +181,6 @@ static int aout_Open( aout_thread_t *p_aout )
 
     /* Initialize some variables */
     p_aout->psz_device = 0;
-    p_aout->i_format   = AOUT_FORMAT_DEFAULT;
-    p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR,
-                                                  AOUT_STEREO_DEFAULT );
-    p_aout->l_rate     = main_GetIntVariable( AOUT_RATE_VAR,
-                                              AOUT_RATE_DEFAULT );
-
     desired.freq =     p_aout->l_rate;
 
     /* TODO: write conversion beetween AOUT_FORMAT_DEFAULT
@@ -251,8 +245,6 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     p_aout->p_sys->b_active = 1;
     SDL_PauseAudio( 0 );
 
-    p_aout->i_latency = 0;
-    
     return( 0 );
 }
 

@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.11 2002/01/21 23:57:46 massiot Exp $
+ * $Id: ac3_spdif.c,v 1.12 2002/01/28 23:08:31 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -232,18 +232,6 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
     InitBitstream( &p_spdif->bit_stream, p_spdif->p_config->p_decoder_fifo,
                    BitstreamCallback, (void*)p_spdif );
 
-    /* Creating the audio output fifo */
-    p_spdif->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_SPDIF_FIFO, 1, 48000, 0,
-                                            SPDIF_FRAME_SIZE, NULL );
-
-    if( p_spdif->p_aout_fifo == NULL )
-    {
-        return( -1 );
-    }
-
-    intf_WarnMsg( 3, "spdif: aout fifo #%d created",
-                     p_spdif->p_aout_fifo->i_fifo );
-
     /* Sync word */
     p_spdif->p_ac3[0] = 0x0b;
     p_spdif->p_ac3[1] = 0x77;
@@ -272,12 +260,26 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
      * but all rates should be supported by the decoder (32, 44.1, 48) */
     if( p_spdif->ac3_info.i_sample_rate != 48000 )
     {
-        intf_ErrMsg( "spdif error: Only 48000 Hz streams supported");
+        intf_ErrMsg( "spdif error: Only 48000 Hz streams tested"
+                     "expect weird things !" );
+        //intf_ErrMsg( "spdif error: Only 48000 Hz streams supported");
 
-        aout_DestroyFifo( p_spdif->p_aout_fifo );
-        return -1;
+        //aout_DestroyFifo( p_spdif->p_aout_fifo );
+        //return -1;
     }
-    p_spdif->p_aout_fifo->l_rate = p_spdif->ac3_info.i_sample_rate;
+    
+    /* Creating the audio output fifo */
+    p_spdif->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_SPDIF_FIFO, 1,
+                                            p_spdif->ac3_info.i_sample_rate,
+                                            0, SPDIF_FRAME_SIZE, NULL );
+
+    if( p_spdif->p_aout_fifo == NULL )
+    {
+        return( -1 );
+    }
+
+    intf_WarnMsg( 3, "spdif: aout fifo #%d created",
+                     p_spdif->p_aout_fifo->i_fifo );
 
     GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3 + sizeof(sync_frame_t),
         p_spdif->ac3_info.i_frame_size - sizeof(sync_frame_t) );

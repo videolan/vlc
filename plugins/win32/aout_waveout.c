@@ -2,7 +2,7 @@
  * aout_waveout.c: Windows waveOut audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_waveout.c,v 1.1 2002/01/25 06:43:34 gbazin Exp $
+ * $Id: aout_waveout.c,v 1.2 2002/01/28 23:08:31 stef Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -147,9 +147,7 @@ static int aout_Open( aout_thread_t *p_aout )
     for( i=0; i<NUMBUF; i++)
         p_aout->p_sys->waveheader[i].lpData = malloc( 1 );
 
-    p_aout->i_latency = 0;
     p_aout->psz_device = 0;
-    p_aout->i_format   = AOUT_FORMAT_DEFAULT;
 
     return OpenWaveOutDevice( p_aout );
 

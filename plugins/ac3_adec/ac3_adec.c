@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.17 2002/01/23 23:14:59 massiot Exp $
+ * $Id: ac3_adec.c,v 1.18 2002/01/28 23:08:31 stef Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -277,6 +277,19 @@ static int decoder_Run ( decoder_config_t * p_config )
         {
             b_sync = 0;
             continue;
+        }
+
+        if( ( p_ac3thread->p_aout_fifo != NULL ) &&
+            ( p_ac3thread->p_aout_fifo->l_rate != sync_info.sample_rate ) )
+        {
+            aout_DestroyFifo (p_ac3thread->p_aout_fifo);
+
+            /* Make sure the output thread leaves the NextFrame() function */
+            vlc_mutex_lock (&(p_ac3thread->p_aout_fifo->data_lock));
+            vlc_cond_signal (&(p_ac3thread->p_aout_fifo->data_wait));
+            vlc_mutex_unlock (&(p_ac3thread->p_aout_fifo->data_lock));
+
+            p_ac3thread->p_aout_fifo = NULL;
         }
         
         /* Creating the audio output fifo if not created yet */

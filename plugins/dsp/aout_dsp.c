@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_dsp.c,v 1.19 2002/01/09 00:33:37 asmax Exp $
+ * $Id: aout_dsp.c,v 1.20 2002/01/28 23:08:31 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -132,14 +132,6 @@ static int aout_Open( aout_thread_t *p_aout )
 
     /* Initialize some variables */
     p_aout->psz_device = main_GetPszVariable( AOUT_DSP_VAR, AOUT_DSP_DEFAULT );
-    p_aout->i_format   = AOUT_FORMAT_DEFAULT;
-
- /* All that is drawn directly from the audio stream.
-    p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR,
-                                                  AOUT_STEREO_DEFAULT );
-    p_aout->l_rate     = main_GetIntVariable( AOUT_RATE_VAR,
-                                              AOUT_RATE_DEFAULT );
-  */                                            
 
     /* Open the sound device */
     if( (p_aout->i_fd = open( p_aout->psz_device, O_WRONLY )) < 0 )
@@ -222,8 +214,6 @@ static int aout_SetFormat( aout_thread_t *p_aout )
         p_aout->l_rate = l_rate;
     }
 
-    p_aout->i_latency = 0;
-    
     return( 0 );
 }
 

@@ -2,7 +2,7 @@
  * aout_beos.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_beos.cpp,v 1.18 2001/12/30 07:09:54 sam Exp $
+ * $Id: aout_beos.cpp,v 1.19 2002/01/28 23:08:31 stef Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -121,11 +121,6 @@ static int aout_Open( aout_thread_t *p_aout )
     }
 
     /* Initialize some variables */
-    p_aout->i_format = AOUT_FORMAT_DEFAULT;
-    p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR,
-                                                  AOUT_STEREO_DEFAULT );
-    p_aout->l_rate = main_GetIntVariable( AOUT_RATE_VAR, AOUT_RATE_DEFAULT );
-
     p_aout->p_sys->p_format->frame_rate = 44100.0;
     p_aout->p_sys->p_format->channel_count = p_aout->i_channels;
     p_aout->p_sys->p_format->format = gs_audio_format::B_GS_S16;
@@ -166,8 +161,6 @@ static int aout_Open( aout_thread_t *p_aout )
  *****************************************************************************/
 static int aout_SetFormat( aout_thread_t *p_aout )
 {
-    p_aout->i_latency = 0;
-
     return( 0 );
 }
 

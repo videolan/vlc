@@ -2,7 +2,7 @@
  * aout_esd.c : Esound functions library
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: aout_esd.c,v 1.17 2001/12/30 07:09:55 sam Exp $
+ * $Id: aout_esd.c,v 1.18 2002/01/28 23:08:31 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -112,8 +112,6 @@ static int aout_Open( aout_thread_t *p_aout )
     }
 
     /* Initialize some variables */
-    p_aout->i_format = AOUT_FORMAT_DEFAULT;
-    p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR, AOUT_STEREO_DEFAULT );
     p_aout->l_rate = esd_audio_rate; /* We use actual esd rate value, not AOUT_RATE_DEFAULT */
 
     i_bits = ESD_BITS16;

@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: aout_alsa.c,v 1.24 2001/12/30 07:09:54 sam Exp $
+ * $Id: aout_alsa.c,v 1.25 2002/01/28 23:08:31 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -115,12 +115,6 @@ static int aout_Open( aout_thread_t *p_aout )
                      strerror(ENOMEM) );
         return( 1 );
     }
-
-    p_aout->i_format   = AOUT_FORMAT_DEFAULT;
-    p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR,
-                                                  AOUT_STEREO_DEFAULT );
-    p_aout->l_rate     = main_GetIntVariable( AOUT_RATE_VAR,
-                                              AOUT_RATE_DEFAULT );
 
     /* Open device */
     if( ( i_open_returns = snd_pcm_open(&(p_aout->p_sys->p_alsa_handle),
@@ -263,8 +257,6 @@ static int aout_SetFormat( aout_thread_t *p_aout )
         return( -1 );
     }
 
-    p_aout->i_latency = 0;
-    
     return( 0 );
 }
 

@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: aout_dummy.c,v 1.17 2001/12/30 07:09:55 sam Exp $
+ * $Id: aout_dummy.c,v 1.18 2002/01/28 23:08:31 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -81,13 +81,6 @@ static int aout_Probe( probedata_t *p_data )
  *****************************************************************************/
 static int aout_Open( aout_thread_t *p_aout )
 {
-    /* Initialize some variables */
-    p_aout->i_format = AOUT_FORMAT_DEFAULT;
-    p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR,
-                                                  AOUT_STEREO_DEFAULT );
-    p_aout->l_rate     =     main_GetIntVariable( AOUT_RATE_VAR,
-                                                  AOUT_RATE_DEFAULT );
-
     return( 0 );
 }
 
@@ -96,8 +89,6 @@ static int aout_Open( aout_thread_t *p_aout )
  *****************************************************************************/
 static int aout_SetFormat( aout_thread_t *p_aout )
 {
-    p_aout->i_latency = 0;
-
     return( 0 );
 }
 
