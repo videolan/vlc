@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.36 2003/01/22 10:44:50 fenrir Exp $
+ * $Id: libvlc.h,v 1.37 2003/01/22 22:19:29 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -39,6 +39,12 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
     "This option allows you to select the interface used by vlc. " \
     "The default behavior is to automatically select the best module " \
     "available.")
+
+#define EXTRAINTF_TEXT N_("extra interface modules")
+#define EXTRAINTF_LONGTEXT N_( \
+    "This option allows you to select additional interfaces used by vlc. " \
+    "These will be launch in the background in addition to the default " \
+    "interface. Use a comma separated list of interface modules.")
 
 #define VERBOSE_TEXT N_("verbosity (0,1,2)")
 #define VERBOSE_LONGTEXT N_( \
@@ -398,9 +404,6 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
     "\n  vlc:quit                       quit VLC" \
     "\n")
 
-#define SAP_TEXT N_( "Session Announcement Protocol support" )
-#define SAP_LONGTEXT N_( "Session Announcement Protocol support" )
-
 
 /*
  * Quick usage guide for the configuration options:
@@ -421,6 +424,7 @@ vlc_module_begin();
     add_category_hint( N_("Interface"), NULL);
     add_module_with_short( "intf", 'I', "interface", NULL, NULL,
                            INTF_TEXT, INTF_LONGTEXT );
+    add_string( "extraintf", NULL, NULL, EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT );
     add_integer_with_short( "verbose", 'v', -1, NULL,
                             VERBOSE_TEXT, VERBOSE_LONGTEXT );
     add_bool_with_short( "quiet", 'q', 0, NULL, QUIET_TEXT, QUIET_LONGTEXT );
@@ -536,7 +540,6 @@ vlc_module_begin();
 
     /* Misc options */
     add_category_hint( N_("Miscellaneous"), NULL );
-    add_bool( "sap", 0, NULL, SAP_TEXT, SAP_LONGTEXT );
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT );
     add_module( "access", "access", NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT );
     add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT );

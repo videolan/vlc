@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.57 2003/01/19 03:16:24 sam Exp $
+ * $Id: libvlc.c,v 1.58 2003/01/22 22:19:29 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -213,6 +213,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 {
     char         p_capabilities[200];
     char *       p_tmp;
+    char *       psz_modules;
+    char *       psz_parser;
     vlc_bool_t   b_exit;
     vlc_t *      p_vlc;
     module_t    *p_help_module;
@@ -486,6 +488,28 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         return VLC_EGENERIC;
     }
 
+    /*
+     * Load background interfaces
+     */
+    psz_modules = config_GetPsz( p_vlc, "extraintf" );
+    psz_parser = psz_modules;
+    while ( psz_parser && *psz_parser )
+    {
+        char *psz_module;
+        psz_module = psz_parser;
+        psz_parser = strchr( psz_module, ',' );
+        if ( psz_parser )
+        {
+            *psz_parser = '\0';
+            psz_parser++;
+        }
+        VLC_AddIntf( 0, psz_module, VLC_FALSE );
+    }
+    if ( psz_modules )
+    {
+        free( psz_modules );
+    }
+        
     /*
      * Get input filenames given as commandline arguments
      */
@@ -782,13 +806,6 @@ int VLC_Play( int i_object )
         return VLC_ENOOBJ;
     }
     
-    /* add pseudo sap interface; non blocking */
-    if( config_GetInt( p_vlc, "sap" ) )
-    {
-        msg_Dbg( p_vlc, "adding sap interface" );
-        VLC_AddIntf( 0, "sap", VLC_FALSE );
-    }
-
     vlc_thread_set_priority( p_vlc, VLC_THREAD_PRIORITY_LOW );
 
     p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
