@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.53 2004/01/09 15:26:58 hartman Exp $
+ * $Id: http.c,v 1.54 2004/01/14 15:40:57 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -467,10 +467,15 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable, off_t *pi_
     }
     else
     {
+        char *psz_path = p_sys->url.psz_path;
+        if( !psz_path || !*psz_path )
+        {
+            psz_path = "/";
+        }
         net_Printf( VLC_OBJECT(p_input), p_sys->fd,
                     "GET %s HTTP/1.%d\r\n"
                     "Host: %s\r\n",
-                    p_sys->url.psz_path, p_sys->i_version, p_sys->url.psz_host );
+                    psz_path, p_sys->i_version, p_sys->url.psz_host );
     }
     /* User Agent */
     net_Printf( VLC_OBJECT(p_input), p_sys->fd, "User-Agent: %s\r\n", p_sys->psz_user_agent );
