@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.m,v 1.6 2002/12/07 23:50:30 massiot Exp $
+ * $Id: vout.m,v 1.7 2002/12/08 05:30:47 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -60,7 +60,7 @@ static void vout_End       ( vout_thread_t * );
 static int  vout_Manage    ( vout_thread_t * );
 static void vout_Display   ( vout_thread_t *, picture_t * );
 
-static int  CoSendRequest      ( vout_thread_t *, long );
+static int  CoSendRequest      ( vout_thread_t *, SEL );
 static int  CoCreateWindow     ( vout_thread_t * );
 static int  CoDestroyWindow    ( vout_thread_t * );
 static int  CoToggleFullscreen ( vout_thread_t * );
@@ -94,34 +94,37 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     /* Wait for a MacOS X interface to appear. Timeout is 2 seconds. */
     for( i_timeout = 20 ; i_timeout-- ; )
     {
-        vlc_list_t * p_list = vlc_list_find( p_vout, VLC_OBJECT_INTF,
-                                                     FIND_ANYWHERE );
-        intf_thread_t ** pp_intf = (intf_thread_t **)p_list->pp_objects;
-
-        /* Parse the list of interfaces to see if one suits us */
-        for( ; *pp_intf ; pp_intf++ )
-        {
-            if( (*pp_intf)->p_module &&
-              !strcmp( (*pp_intf)->p_module->psz_object_name, MODULE_STRING ) )
-            {
-                vlc_object_yield( *pp_intf );
-                p_vout->p_sys->p_intf = *pp_intf;
-                break;
-            }
-        }
-        vlc_list_release( p_list );
-
-        if( p_vout->p_sys->p_intf == NULL )
+        if( NSApp == NULL )
         {
             msleep( INTF_IDLE_SLEEP );
         }
     }
 
-    if( p_vout->p_sys->p_intf == NULL )
+    if( NSApp == NULL )
     {
         msg_Err( p_vout, "no MacOS X interface present" );
         free( p_vout->p_sys );
         return( 1 );
+    }
+
+    if( [NSApp respondsToSelector: @selector(getIntf)] )
+    {
+        intf_thread_t * p_intf;
+
+        for( i_timeout = 10 ; i_timeout-- ; )
+        {
+            if( ( p_intf = [NSApp getIntf] ) == NULL )
+            {
+                msleep( INTF_IDLE_SLEEP );
+            }
+        }
+
+        if( p_intf == NULL )
+        {
+            msg_Err( p_vout, "MacOS X intf has getIntf, but is NULL" );
+            free( p_vout->p_sys );
+            return( 1 );
+        }
     }
 
     p_vout->p_sys->h_img_descr = 
@@ -139,7 +142,6 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         msg_Err( p_vout, "EnterMovies failed: %d", err );
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
-        vlc_object_release( p_vout->p_sys->p_intf );
         free( p_vout->p_sys );
         return( 1 );
     } 
@@ -168,44 +170,52 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     {
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
-        vlc_object_release( p_vout->p_sys->p_intf );
         free( p_vout->p_sys );
         return( 1 );        
     }
 
-    NSArray * p_screens = [NSScreen screens];
-    if ( [p_screens count] > 0 )
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+    NSArray * o_screens = [NSScreen screens];
+    if ( [o_screens count] > 0 )
     {
-        vlc_value_t val;
-        var_Destroy( p_vout, "video-device" );
-        var_Create( p_vout, "video-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
-        NSEnumerator * p_enumerator = [p_screens objectEnumerator];
-        NSScreen * p_screen;
         int i = 1;
-        while ( (p_screen = [p_enumerator nextObject]) != NULL )
+        vlc_value_t val;
+        NSScreen * o_screen;
+
+        var_Destroy( p_vout, "video-device" );
+        var_Create( p_vout, "video-device", 
+                    VLC_VAR_STRING | VLC_VAR_HASCHOICE );
+
+        NSEnumerator * o_enumerator = [o_screens objectEnumerator];
+
+        while ( (o_screen = [o_enumerator nextObject]) != NULL )
         {
-            NSRect p_rect = [p_screen frame];
             char psz_temp[255];
-            snprintf(psz_temp, sizeof(psz_temp), "%s %d (%dx%d)",
-                     _("Screen"), i, (int)p_rect.size.width,
-                     (int)p_rect.size.height);
+            NSRect s_rect = [o_screen frame];
+
+            snprintf( psz_temp, sizeof(psz_temp)/sizeof(psz_temp[0])-1, 
+                      "%s %d (%dx%d)", _("Screen"), i,
+                      (int)s_rect.size.width, (int)s_rect.size.height ); 
+
             val.psz_string = psz_temp;
             var_Change( p_vout, "video-device", VLC_VAR_ADDCHOICE, &val );
+
             i++;
         }
+
         var_AddCallback( p_vout, "video-device", vout_VarCallback,
                          NULL );
 
         val.b_bool = VLC_TRUE;
         var_Set( p_vout, "intf-change", val );
     }
+    [o_pool release];
 
     if( CoCreateWindow( p_vout ) )
     {
         msg_Err( p_vout, "unable to create window" );
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
-        vlc_object_release( p_vout->p_sys->p_intf );
         free( p_vout->p_sys ); 
         return( 1 );
     }
@@ -311,8 +321,6 @@ void E_(CloseVideo) ( vlc_object_t *p_this )
     free( p_vout->p_sys->p_matrix );
     DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
 
-    vlc_object_release( p_vout->p_sys->p_intf );
-
     free( p_vout->p_sys );
 }
 
@@ -405,39 +413,67 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************
  * Returns 0 on success, 1 otherwise
  *****************************************************************************/
-static int CoSendRequest( vout_thread_t *p_vout, long i_request )
+static int CoSendRequest( vout_thread_t *p_vout, SEL sel )
 {
-    NSArray *o_array;
-    NSPortMessage *o_msg;
-    struct vout_req_t req;
-    struct vout_req_t *p_req = &req;
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    NSPort *recvPort = [[NSPort port] retain];
+    int i_ret = 0;
 
-    memset( &req, 0, sizeof(req) );
-    req.i_type = i_request;
-    req.p_vout = p_vout;
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+    VLCVout * o_vlv = [[[VLCVout alloc] init] autorelease];
 
-    req.o_lock = [[NSConditionLock alloc] initWithCondition: 0];
+    if( [o_vlv respondsToSelector: @selector(performSelectorOnMainThread:
+                                             withObject:waitUntilDone:)] )
+    {
+        [o_vlv performSelectorOnMainThread: sel
+            withObject: [NSValue valueWithPointer: p_vout]
+            waitUntilDone: YES];
+    }
+    else if( [NSApp respondsToSelector: @selector(getIntf)] )
+    {
+        NSArray * o_array;
+        NSValue * o_value;
+        NSPort * o_recv_port;
+        NSInvocation * o_inv;
+        NSPortMessage * o_msg;
+        intf_thread_t * p_intf;
+        NSMethodSignature * o_sig;
 
-    o_array = [NSArray arrayWithObject:
-        [NSData dataWithBytes: &p_req length: sizeof(void *)]];
-    o_msg = [[NSPortMessage alloc]
-        initWithSendPort: p_vout->p_sys->p_intf->p_sys->o_sendport
-        receivePort: recvPort components: o_array]; 
+        p_intf = (intf_thread_t *)[NSApp getIntf];
 
-    [o_msg sendBeforeDate: [NSDate distantPast]];
+        o_recv_port = [[NSPort port] retain];
+        o_value = [NSValue valueWithPointer: p_vout];
 
-    [req.o_lock lockWhenCondition: 1];
-    [req.o_lock unlock];
+        o_sig = [VLCVout instanceMethodSignatureForSelector: sel];
+        o_inv = [NSInvocation invocationWithMethodSignature: o_sig];
+        [o_inv setArgument: &o_value atIndex: 2];
+        [o_inv setTarget: o_vlv];
+        [o_inv setSelector: sel];
 
-    [o_msg release];
-    [req.o_lock release];
+        o_array = [NSArray arrayWithObject:
+            [NSData dataWithBytes: &o_inv length: sizeof(o_inv)]];
+        o_msg = [[NSPortMessage alloc]
+            initWithSendPort: p_intf->p_sys->o_sendport
+            receivePort: o_recv_port components: o_array];
 
-    [recvPort release];
+        p_vout->p_sys->o_lock =
+            [[NSConditionLock alloc] initWithCondition: 0];
+        [o_msg sendBeforeDate: [NSDate distantPast]];
+        [p_vout->p_sys->o_lock lockWhenCondition: 1];
+        [p_vout->p_sys->o_lock unlock];
+        [p_vout->p_sys->o_lock release];
+        p_vout->p_sys->o_lock = nil;
+
+        [o_msg release];
+        [o_recv_port release];
+    }
+    else
+    {
+        msg_Err( p_vout, "SendRequest: no way to communicate with mt" );
+        i_ret = 1;
+    }
+
     [o_pool release];
 
-    return( !req.i_result );
+    return( i_ret );
 }
 
 /*****************************************************************************
@@ -447,9 +483,9 @@ static int CoSendRequest( vout_thread_t *p_vout, long i_request )
  *****************************************************************************/
 static int CoCreateWindow( vout_thread_t *p_vout )
 {
-    if( CoSendRequest( p_vout, VOUT_REQ_CREATE_WINDOW ) )
+    if( CoSendRequest( p_vout, @selector(createWindow:) ) )
     {
-        msg_Err( p_vout, "CoSendRequest (CREATE_WINDOW) failed" );
+        msg_Err( p_vout, "CoSendRequest (createWindow) failed" );
         return( 1 );
     }
 
@@ -469,9 +505,9 @@ static int CoDestroyWindow( vout_thread_t *p_vout )
         p_vout->p_sys->b_mouse_pointer_visible = 1;
     }
 
-    if( CoSendRequest( p_vout, VOUT_REQ_DESTROY_WINDOW ) )
+    if( CoSendRequest( p_vout, @selector(destroyWindow:) ) )
     {
-        msg_Err( p_vout, "CoSendRequest (DESTROY_WINDOW) failed" );
+        msg_Err( p_vout, "CoSendRequest (destroyWindow) failed" );
         return( 1 );
     }
 
@@ -737,6 +773,11 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_vout = _p_vout;
 }
 
+- (vout_thread_t *)getVout
+{
+    return( p_vout );
+}
+
 - (void)toggleFullscreen
 {
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
@@ -819,13 +860,12 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 @implementation VLCView
 
-- (void)setVout:(vout_thread_t *)_p_vout
-{
-    p_vout = _p_vout;
-}
-
 - (void)drawRect:(NSRect)rect
 {
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
+
     [[NSColor blackColor] set];
     NSRectFill( rect );
     [super drawRect: rect];
@@ -852,6 +892,10 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void)mouseUp:(NSEvent *)o_event
 {
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
+
     switch( [o_event type] )
     {
         case NSLeftMouseUp:
@@ -873,6 +917,10 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     NSPoint ml;
     NSRect s_rect;
     BOOL b_inside;
+
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
 
     s_rect = [self bounds];
     ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
@@ -902,6 +950,114 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
         [super mouseMoved: o_event];
     }
+}
+
+@end
+
+/*****************************************************************************
+ * VLCVout implementation
+ *****************************************************************************/
+@implementation VLCVout
+
+- (void)createWindow:(NSValue *)o_value
+{
+    vlc_value_t val;
+    VLCView * o_view;
+    NSScreen * o_screen;
+    vout_thread_t * p_vout;
+
+    p_vout = (vout_thread_t *)[o_value pointerValue];
+
+    p_vout->p_sys->o_window = [VLCWindow alloc];
+    [p_vout->p_sys->o_window setVout: p_vout];
+    [p_vout->p_sys->o_window setReleasedWhenClosed: YES];
+
+    if( var_Get( p_vout, "video-device", &val ) < 0 )
+    {
+        o_screen = [NSScreen mainScreen];
+    }
+    else
+    {
+        int i_index = 0;
+        NSArray *o_screens = [NSScreen screens];
+
+        if( !sscanf( val.psz_string, "Screen %d", &i_index ) ||
+            [o_screens count] < i_index )
+        {
+            o_screen = [NSScreen mainScreen];
+        }
+        else
+        {
+            o_screen = [o_screens objectAtIndex: i_index - 1];
+        } 
+
+        free( val.psz_string );
+    } 
+
+    if( p_vout->b_fullscreen )
+    {
+        [p_vout->p_sys->o_window 
+            initWithContentRect: [o_screen frame]
+            styleMask: NSBorderlessWindowMask
+            backing: NSBackingStoreBuffered
+            defer: NO screen: o_screen];
+
+        [p_vout->p_sys->o_window setLevel: NSModalPanelWindowLevel];
+    }
+    else
+    {
+        unsigned int i_stylemask = NSTitledWindowMask |
+                                   NSMiniaturizableWindowMask |
+                                   NSResizableWindowMask;
+
+        [p_vout->p_sys->o_window 
+            initWithContentRect: p_vout->p_sys->s_rect
+            styleMask: i_stylemask
+            backing: NSBackingStoreBuffered
+            defer: NO screen: o_screen];
+
+        if( !p_vout->p_sys->b_pos_saved )   
+        {
+            [p_vout->p_sys->o_window center];
+        }
+    }
+
+    o_view = [[VLCView alloc] init];
+    /* FIXME: [o_view setMenu:] */
+    [p_vout->p_sys->o_window setContentView: o_view];
+    [o_view autorelease];
+
+    [o_view lockFocus];
+    p_vout->p_sys->p_qdport = [o_view qdPort];
+    [o_view unlockFocus];
+
+    [p_vout->p_sys->o_window setTitle:
+        [NSString stringWithCString: VOUT_TITLE " (QuickTime)"]];
+    [p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
+}
+
+- (void)destroyWindow:(NSValue *)o_value
+{
+    vout_thread_t * p_vout;
+
+    p_vout = (vout_thread_t *)[o_value pointerValue];
+
+    if( !p_vout->b_fullscreen )
+    {
+        NSRect s_rect;
+
+        s_rect = [[p_vout->p_sys->o_window contentView] frame];
+        p_vout->p_sys->s_rect.size = s_rect.size;
+
+        s_rect = [p_vout->p_sys->o_window frame];
+        p_vout->p_sys->s_rect.origin = s_rect.origin;
+
+        p_vout->p_sys->b_pos_saved = 1;
+    }
+
+    p_vout->p_sys->p_qdport = nil;
+    [p_vout->p_sys->o_window close];
+    p_vout->p_sys->o_window = nil;
 }
 
 @end

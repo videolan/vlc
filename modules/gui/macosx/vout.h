@@ -2,7 +2,7 @@
  * vout.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: vout.h,v 1.2 2002/12/08 05:30:47 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -32,6 +32,7 @@
 }
 
 - (void)setVout:(vout_thread_t *)_p_vout;
+- (vout_thread_t *)getVout;
 
 - (void)toggleFullscreen;
 - (BOOL)isFullscreen;
@@ -43,10 +44,19 @@
  *****************************************************************************/
 @interface VLCView : NSQuickDrawView
 {
-    vout_thread_t * p_vout;
 }
 
-- (void)setVout:(vout_thread_t *)_p_vout;
+@end
+
+/*****************************************************************************
+ * VLCVout interface
+ *****************************************************************************/
+@interface VLCVout : NSObject
+{
+}
+
+- (void)createWindow:(NSValue *)o_value;
+- (void)destroyWindow:(NSValue *)o_value;
 
 @end
 
@@ -55,11 +65,11 @@
  *****************************************************************************/
 struct vout_sys_t
 {
-    intf_thread_t * p_intf;
-    VLCWindow * o_window;
+    NSConditionLock * o_lock;
 
     NSRect s_rect;
     int b_pos_saved;
+    VLCWindow * o_window;
 
     vlc_bool_t b_mouse_moved;
     vlc_bool_t b_mouse_pointer_visible;
@@ -74,19 +84,3 @@ struct vout_sys_t
     ImageDescriptionHandle h_img_descr;
 #endif
 };
-
-/*****************************************************************************
- * vout_req_t: MacOS X video output request
- *****************************************************************************/
-#define VOUT_REQ_CREATE_WINDOW  0x00000001
-#define VOUT_REQ_DESTROY_WINDOW 0x00000002
-
-typedef struct vout_req_t
-{
-    int i_type;
-    int i_result;
-
-    NSConditionLock * o_lock;
-
-    vout_thread_t * p_vout;
-} vout_req_t;

@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.7 2002/12/07 23:50:30 massiot Exp $
+ * $Id: intf.m,v 1.8 2002/12/08 05:30:47 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -986,111 +986,19 @@ static void Run( intf_thread_t *p_intf )
 
 - (void)handlePortMessage:(NSPortMessage *)o_msg
 {
-    NSData * o_req;
-    vout_req_t * p_req;
+    NSData * o_data;
+    NSValue * o_value;
+    NSInvocation * o_inv;
+    vout_thread_t * p_vout;
+ 
+    o_data = [[o_msg components] lastObject];
+    o_inv = *((NSInvocation **)[o_data bytes]); 
+    [o_inv getArgument: &o_value atIndex: 2];
+    p_vout = (vout_thread_t *)[o_value pointerValue];
 
-    o_req = [[o_msg components] lastObject];
-    p_req = *((vout_req_t **)[o_req bytes]);
-
-    [p_req->o_lock lock];
-
-    if( p_req->i_type == VOUT_REQ_CREATE_WINDOW )
-    {
-        VLCView * o_view;
-        NSScreen * p_screen;
-
-        NSMenu * o_menu = [o_mi_screen submenu];
-
-        int i, i_nb_items = [o_menu numberOfItems];
-        for( i = 0; i < i_nb_items; i++ )
-        {
-             if ( [[o_menu itemAtIndex:i] state] ) break;
-        }
-
-        NSArray * p_screens = [NSScreen screens];
-        if ( i == i_nb_items || [p_screens count] < i )
-        {
-            /* This shouldn't happen. */
-            p_screen = [NSScreen mainScreen];
-        }
-        else
-        {
-            p_screen = [p_screens objectAtIndex: i];
-        }
-
-        p_req->p_vout->p_sys->o_window = [VLCWindow alloc];
-        [p_req->p_vout->p_sys->o_window setVout: p_req->p_vout];
-        [p_req->p_vout->p_sys->o_window setReleasedWhenClosed: YES];
-
-        if( p_req->p_vout->b_fullscreen )
-        {
-            [p_req->p_vout->p_sys->o_window 
-                initWithContentRect: [p_screen frame] 
-                styleMask: NSBorderlessWindowMask 
-                backing: NSBackingStoreBuffered
-                defer: NO screen: p_screen];
-
-            [p_req->p_vout->p_sys->o_window 
-                setLevel: NSModalPanelWindowLevel];
-        }
-        else
-        {
-            unsigned int i_stylemask = NSTitledWindowMask |
-                                       NSMiniaturizableWindowMask |
-                                       NSResizableWindowMask;
-
-            [p_req->p_vout->p_sys->o_window 
-                initWithContentRect: p_req->p_vout->p_sys->s_rect 
-                styleMask: i_stylemask
-                backing: NSBackingStoreBuffered
-                defer: NO screen: p_screen];
-
-            if( !p_req->p_vout->p_sys->b_pos_saved )
-            {
-                [p_req->p_vout->p_sys->o_window center];
-            }
-        }
-
-        o_view = [[VLCView alloc] init];
-        [o_view setVout: p_req->p_vout];
-        [o_view setMenu: o_mu_controls];
-        [p_req->p_vout->p_sys->o_window setContentView: o_view];
-        [o_view autorelease];
-
-        [o_view lockFocus];
-        p_req->p_vout->p_sys->p_qdport = [o_view qdPort];
-        [o_view unlockFocus];
-
-        [p_req->p_vout->p_sys->o_window setTitle: [NSString 
-            stringWithCString: VOUT_TITLE " (QuickTime)"]];
-        [p_req->p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
-
-        p_req->i_result = 1;
-    }
-    else if( p_req->i_type == VOUT_REQ_DESTROY_WINDOW )
-    {
-        if( !p_req->p_vout->b_fullscreen )
-        {
-            NSRect s_rect;
-
-            s_rect = [[p_req->p_vout->p_sys->o_window contentView] frame];
-            p_req->p_vout->p_sys->s_rect.size = s_rect.size;
-
-            s_rect = [p_req->p_vout->p_sys->o_window frame];
-            p_req->p_vout->p_sys->s_rect.origin = s_rect.origin;
-
-            p_req->p_vout->p_sys->b_pos_saved = 1;
-        }
-
-        p_req->p_vout->p_sys->p_qdport = nil;
-        [p_req->p_vout->p_sys->o_window close];
-        p_req->p_vout->p_sys->o_window = nil;
-
-        p_req->i_result = 1;
-    }
-
-    [p_req->o_lock unlockWithCondition: 1];
+    [p_vout->p_sys->o_lock lock];
+    [o_inv invoke];
+    [p_vout->p_sys->o_lock unlockWithCondition: 1];
 }
 
 @end
-
