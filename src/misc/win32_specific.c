@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.10 2002/06/01 16:45:35 sam Exp $
+ * $Id: win32_specific.c,v 1.11 2002/06/02 14:26:16 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -33,7 +33,7 @@
 /*****************************************************************************
  * system_Init: initialize winsock and misc other things.
  *****************************************************************************/
-void system_Init( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[] )
+void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
     WSADATA Data;
     int i_err;
@@ -58,7 +58,7 @@ void system_Init( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-void system_Configure( vlc_object_t *p_this )
+void system_Configure( vlc_t *p_this )
 {
     p_this->p_vlc->b_fast_pthread = config_GetInt( p_this, "fast_pthread" );
 }
@@ -66,7 +66,7 @@ void system_Configure( vlc_object_t *p_this )
 /*****************************************************************************
  * system_End: terminate winsock.
  *****************************************************************************/
-void system_End( vlc_object_t *p_this )
+void system_End( vlc_t *p_this )
 {
     WSACleanup();
 }

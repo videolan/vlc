@@ -2,7 +2,7 @@
  * darwin_specific.c: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.c,v 1.11 2002/06/02 01:20:52 massiot Exp $
+ * $Id: darwin_specific.c,v 1.12 2002/06/02 14:26:16 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -33,7 +33,7 @@ static char * psz_program_path;
 /*****************************************************************************
  * system_Init: fill in program path.
  *****************************************************************************/
-void system_Init( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[] )
+void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
     char i_dummy;
     char *p_char, *p_oldchar = &i_dummy;
@@ -68,7 +68,7 @@ void system_Init( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-void system_Configure( vlc_object_t *p_this )
+void system_Configure( vlc_t *p_this )
 {
 
 }

@@ -2,7 +2,7 @@
  * os_specific.h: OS specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: os_specific.h,v 1.8 2002/06/01 12:31:57 sam Exp $
+ * $Id: os_specific.h,v 1.9 2002/06/02 14:26:15 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -44,9 +44,9 @@ extern "C" {
  * Prototypes
  *****************************************************************************/
 #ifdef _NEED_OS_SPECIFIC_H
-    void system_Init       ( vlc_object_t *, int *, char *[] );
-    void system_Configure  ( vlc_object_t * );
-    void system_End        ( vlc_object_t * );
+    void system_Init       ( vlc_t *, int *, char *[] );
+    void system_Configure  ( vlc_t * );
+    void system_End        ( vlc_t * );
 #else
 #   define system_Init( a, b, c ) {}
 #   define system_Configure( a ) {}
@@ -56,4 +56,3 @@ extern "C" {
 #   ifdef __cplusplus
 }
 #   endif
-

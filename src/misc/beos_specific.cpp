@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.22 2002/06/02 09:03:54 sam Exp $
+ * $Id: beos_specific.cpp,v 1.23 2002/06/02 14:26:15 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -64,7 +64,7 @@ static void AppThread( vlc_object_t *p_appthread );
 /*****************************************************************************
  * system_Init: create a BApplication object and fill in program path.
  *****************************************************************************/
-void system_Init( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[] )
+void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
     p_this->p_vlc->p_appthread =
             (vlc_object_t *)vlc_object_create( p_this, sizeof(vlc_object_t) );
@@ -76,7 +76,7 @@ void system_Init( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-void system_Configure( vlc_object_t * )
+void system_Configure( vlc_t * )
 {
 
 }
@@ -84,7 +84,7 @@ void system_Configure( vlc_object_t * )
 /*****************************************************************************
  * system_End: destroy the BApplication object.
  *****************************************************************************/
-void system_End( vlc_object_t *p_this )
+void system_End( vlc_t *p_this )
 {
     /* Tell the BApplication to die */
     be_app->PostMessage( B_QUIT_REQUESTED );
@@ -167,4 +167,3 @@ void VlcApplication::ReadyToRun( )
     /* Tell the main thread we are finished initializing the BApplication */
     vlc_thread_ready( p_this );
 }
-
