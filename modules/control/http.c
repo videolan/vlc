@@ -146,8 +146,7 @@ static int uri_test_param( char *psz_uri, const char *psz_name );
 static void uri_decode_url_encoded( char *psz );
 
 static char *Find_end_MRL( char *psz );
-
-static playlist_item_t * parse_MRL( intf_thread_t * , char *psz );
+static playlist_item_t *parse_MRL( intf_thread_t * , char *psz );
 
 /*****************************************************************************
  *
@@ -3291,7 +3290,7 @@ static char *Find_end_MRL( char *psz )
  * create an item with all information in it, and return the item.
  * return NULL if there is an error.
  **********************************************************************/
-playlist_item_t * parse_MRL( intf_thread_t *p_intf, char *psz )
+static playlist_item_t *parse_MRL( intf_thread_t *p_intf, char *psz )
 {
     char **ppsz_options = NULL;
     char *mrl;
@@ -3395,11 +3394,8 @@ playlist_item_t * parse_MRL( intf_thread_t *p_intf, char *psz )
         }
     }
 
-    for( i = 0 ; i < i_options ; i++ )
-    {
-        free( ppsz_options[i] );
-    }
-    free( ppsz_options );
+    for( i = 0; i < i_options; i++ ) free( ppsz_options[i] );
+    if( i_options ) free( ppsz_options );
 
     return p_item;
 }

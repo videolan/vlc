@@ -163,8 +163,9 @@ int intf_RunThread( intf_thread_t *p_intf )
         [VLCApplication sharedApplication];
     }
 
-    if( p_intf->b_block && ( !strncmp( p_intf->p_module->psz_object_name, "macosx" , 6 ) ||
-                             !strncmp( p_intf->p_vlc->psz_object_name, "clivlc", 6 ) ) )
+    if( p_intf->b_block &&
+        ( !strncmp( p_intf->p_module->psz_object_name, "macosx" , 6 ) ||
+          !strncmp( p_intf->p_vlc->psz_object_name, "clivlc", 6 ) ) )
     {
         /* VLC in normal primary interface mode */
         RunInterface( p_intf );

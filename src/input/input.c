@@ -620,7 +620,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
             p_input->p_sout = sout_NewInstance( p_input, psz );
             if( p_input->p_sout == NULL )
             {
-                msg_Err( p_input, "cannot start stream output instance," \
+                msg_Err( p_input, "cannot start stream output instance, " \
                                   "aborting" );
                 free( psz );
                 return VLC_EGENERIC;

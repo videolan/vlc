@@ -734,6 +734,10 @@ static int Demux( demux_t *p_demux )
 
     case DVDNAV_STOP:   /* EOF */
         msg_Dbg( p_demux, "DVDNAV_STOP" );
+
+#if DVD_READ_CACHE
+        dvdnav_free_cache_block( p_sys->dvdnav, packet );
+#endif
         return 0;
 
     case DVDNAV_HIGHLIGHT:
