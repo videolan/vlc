@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.4 2003/04/13 22:55:15 asmax Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.5 2003/04/14 17:03:41 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -109,6 +109,9 @@ GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
      //   Bmp = gdk_pixbuf_new( GDK_COLORSPACE_RGB, TRUE, 8, 1, 1);
         Bmp = NULL;
     }
+
+    Width = gdk_pixbuf_get_width( Bmp );
+    Height = gdk_pixbuf_get_height( Bmp );
 }
 //---------------------------------------------------------------------------
 GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, Graphics *from, int x, int y,
@@ -165,7 +168,8 @@ void GTK2Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
     GdkGC *gc = gdk_gc_new( destImg );
     /*gdk_pixbuf_render_to_drawable( Bmp, destImg, gc, 0, 0, x, y, w, h,  
             GDK_RGB_DITHER_NONE, 0, 0);*/
-    gdk_pixbuf_render_to_drawable( Bmp, destImg, gc, 0, 0, x, y, 50, 50,  
+fprintf(stderr, "draw %d %d %d %d\n", x, y, w, h);
+    gdk_pixbuf_render_to_drawable( Bmp, destImg, gc, 0, 0, x, y, w, h,
             GDK_RGB_DITHER_NONE, 0, 0);
 }
 //---------------------------------------------------------------------------

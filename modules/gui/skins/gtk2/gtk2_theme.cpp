@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.5 2003/04/13 22:55:15 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.6 2003/04/14 17:03:42 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -320,15 +320,15 @@ void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
         
     GdkWindowAttr attr;
     attr.event_mask = GDK_ALL_EVENTS_MASK;
-    attr.width = 400;
-    attr.height = 150;
+    attr.width = 0;
+    attr.height = 0;
     attr.window_type = GDK_WINDOW_CHILD;
     attr.wclass = GDK_INPUT_OUTPUT;
     
     gint mask =0;
     
-    // Create the parent window
-    GdkWindow *gwnd = gdk_window_new( ParentWindow, &attr, mask);
+    // Create the window
+    GdkWindow *gwnd = gdk_window_new( ParentWindow, &attr, mask );
     if( !gwnd )
     {
         msg_Err( p_intf, "CreateWindow failed" );
