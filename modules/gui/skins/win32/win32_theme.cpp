@@ -2,7 +2,7 @@
  * win32_theme.cpp: Win32 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.cpp,v 1.6 2003/04/21 21:51:16 asmax Exp $
+ * $Id: win32_theme.cpp,v 1.7 2003/04/29 12:54:57 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -225,10 +225,13 @@ void Win32Theme::OnLoadTheme()
     }
 
     // Create Window
-    ParentWindow = CreateWindowEx( WS_EX_LAYERED|WS_EX_TOOLWINDOW,
-        "ParentWindow", "VLC Media Player",
-        WS_SYSMENU,
-        0, 0, 0, 0, 0, 0, hinst, NULL );
+    ParentWindow = CreateWindowEx( WS_EX_TOOLWINDOW, "ParentWindow",
+        "VLC Media Player", WS_SYSMENU, 0, 0, 0, 0, 0, 0, hinst, NULL );
+
+    // We do it this way otherwise CreateWindowEx will fail
+    // if WS_EX_LAYERED is not supported
+    SetWindowLongPtr( ParentWindow, GWL_EXSTYLE, GetWindowLong( ParentWindow,
+                      GWL_EXSTYLE ) | WS_EX_LAYERED );
 
     // Store with it a pointer to the interface thread
     SetWindowLongPtr( ParentWindow, GWLP_USERDATA, (LONG_PTR)p_intf );
@@ -281,7 +284,7 @@ void Win32Theme::AddWindow( string name, int x, int y, bool visible,
 {
     HWND hwnd;
 
-    hwnd = CreateWindowEx( WS_EX_LAYERED|WS_EX_TOOLWINDOW,
+    hwnd = CreateWindowEx( WS_EX_TOOLWINDOW,
         "SkinWindow", name.c_str(), WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
         0, 0, ParentWindow, 0, hinst, NULL );
 
@@ -291,10 +294,15 @@ void Win32Theme::AddWindow( string name, int x, int y, bool visible,
         return;
     }
 
+    // We do it this way otherwise CreateWindowEx will fail
+    // if WS_EX_LAYERED is not supported
+    SetWindowLongPtr( hwnd, GWL_EXSTYLE,
+                      GetWindowLong( hwnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
+
     SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)p_intf );
 
-    WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, hwnd, x, y, visible,
-        fadetime, alpha, movealpha, dragdrop ) ) ;
+    WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, hwnd, x, y,
+        visible, fadetime, alpha, movealpha, dragdrop ) ) ;
 }
 //---------------------------------------------------------------------------
 void Win32Theme::ChangeTray()

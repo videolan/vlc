@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.21 2003/04/28 14:12:33 asmax Exp $
+ * $Id: skin_main.cpp,v 1.22 2003/04/29 12:54:57 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -115,9 +115,37 @@ static int Open ( vlc_object_t *p_this )
     char **pp_args  = p_args;
 
     gdk_init( &i_args, &pp_args );
+
 #elif defined X11_SKINS
     // Initialize X11
     p_intf->p_sys->display = XOpenDisplay( NULL );
+
+#elif defined WIN32
+    // We dynamically load msimg32.dll to get a pointer to TransparentBlt()
+    p_intf->p_sys->h_msimg32_dll = LoadLibrary("msimg32.dll");
+    if( !p_intf->p_sys->h_msimg32_dll ||
+        !( p_intf->p_sys->TransparentBlt =
+           (BOOL (WINAPI*)(HDC,int,int,int,int,HDC,
+                           int,int,int,int,unsigned int))
+           GetProcAddress( p_intf->p_sys->h_msimg32_dll, "TransparentBlt" ) ) )
+    {
+        p_intf->p_sys->TransparentBlt = NULL;
+        msg_Dbg( p_intf, "Couldn't find TransparentBlt(), "
+                 "falling back to BitBlt()" );
+    }
+
+    // idem for user32.dll and SetLayeredWindowAttributes()
+    p_intf->p_sys->h_user32_dll = LoadLibrary("user32.dll");
+    if( !p_intf->p_sys->h_user32_dll ||
+        !( p_intf->p_sys->SetLayeredWindowAttributes =
+           (BOOL (WINAPI *)(HWND,COLORREF,BYTE,DWORD))
+           GetProcAddress( p_intf->p_sys->h_user32_dll,
+                           "SetLayeredWindowAttributes" ) ) )
+    {
+        p_intf->p_sys->SetLayeredWindowAttributes = NULL;
+        msg_Dbg( p_intf, "Couldn't find SetLayeredWindowAttributes()" );
+    }
+
 #endif
 
     // Initialize conditions and mutexes
@@ -156,6 +184,14 @@ static void Close ( vlc_object_t *p_this )
     // Destroy conditions and mutexes
     vlc_cond_destroy( &p_intf->p_sys->init_cond );
     vlc_mutex_destroy( &p_intf->p_sys->init_lock );
+
+#ifdef WIN32
+    // Unload msimg32.dll and user32.dll
+    if( p_intf->p_sys->h_msimg32_dll )
+        FreeLibrary( p_intf->p_sys->h_msimg32_dll );
+    if( p_intf->p_sys->h_user32_dll )
+        FreeLibrary( p_intf->p_sys->h_user32_dll );
+#endif
 
     // Destroy structure
     free( p_intf->p_sys );

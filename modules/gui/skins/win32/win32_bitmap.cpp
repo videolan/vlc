@@ -2,7 +2,7 @@
  * win32_bitmap.cpp: Win32 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_bitmap.cpp,v 1.5 2003/04/28 00:18:27 ipkiss Exp $
+ * $Id: win32_bitmap.cpp,v 1.6 2003/04/29 12:54:57 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -91,11 +91,11 @@ Win32Bitmap::Win32Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
         DeleteObject( Brush );
         delete r;
 
-        if( IS_WINNT )
+        if( p_intf->p_sys->TransparentBlt && IS_WINNT )
         {
             // This function contains a memory leak on win95/win98
-            TransparentBlt( bufDC, 0, 0, Width, Height, bmpDC, 0, 0,
-                            Width, Height, 0 );
+            p_intf->p_sys->TransparentBlt( bufDC, 0, 0, Width, Height,
+                                           bmpDC, 0, 0, Width, Height, 0 );
         }
         else
         {
@@ -157,11 +157,11 @@ void Win32Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
 {
     HDC destDC = ( (Win32Graphics *)dest )->GetImageHandle();
 
-    if( IS_WINNT )
+    if( p_intf->p_sys->TransparentBlt && IS_WINNT )
     {
         // This function contains a memory leak on win95/win98
-        TransparentBlt( destDC, xRef, yRef, w, h, bmpDC, x, y, w, h,
-                        AlphaColor );
+        p_intf->p_sys->TransparentBlt( destDC, xRef, yRef, w, h,
+                                       bmpDC, x, y, w, h, AlphaColor );
     }
     else
     {

@@ -2,7 +2,7 @@
  * win32_window.cpp: Win32 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.cpp,v 1.10 2003/04/21 21:51:16 asmax Exp $
+ * $Id: win32_window.cpp,v 1.11 2003/04/29 12:54:57 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -54,11 +54,6 @@
 //---------------------------------------------------------------------------
 #define LWA_COLORKEY  0x00000001
 #define LWA_ALPHA     0x00000002
-typedef BOOL (WINAPI *SLWA)(HWND, COLORREF, BYTE, DWORD);
-HMODULE hModule = LoadLibrary( "user32.dll" );
-SLWA SetLayeredWindowAttributes =
-    (SLWA)GetProcAddress( hModule, "SetLayeredWindowAttributes" );
-
 
 //---------------------------------------------------------------------------
 // Skinable Window
@@ -219,7 +214,11 @@ void Win32Window::SetTransparency( int Value )
 {
     if( Value > -1 )
         Alpha = Value;
-    SetLayeredWindowAttributes( hWnd, 0, Alpha, LWA_ALPHA | LWA_COLORKEY );
+
+    if( p_intf->p_sys->SetLayeredWindowAttributes )
+        p_intf->p_sys->SetLayeredWindowAttributes( hWnd, 0, Alpha,
+                                                   LWA_ALPHA | LWA_COLORKEY );
+
     UpdateWindow( hWnd );
 }
 //---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.7 2003/04/28 22:44:26 ipkiss Exp $
+ * $Id: skin_common.h,v 1.8 2003/04/29 12:54:57 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -92,6 +92,14 @@ struct intf_sys_t
 #ifdef WIN32
     bool b_wx_die;
     ExitTimer *p_kludgy_timer;
+
+    // We dynamically load msimg32.dll to get a pointer to TransparentBlt()
+    HINSTANCE h_msimg32_dll;
+    BOOL (WINAPI *TransparentBlt)( HDC,int,int,int,int,HDC,int,
+                                   int,int,int,UINT );
+    // idem for user32.dll and SetLayeredWindowAttributes()
+    HINSTANCE h_user32_dll;
+    BOOL (WINAPI *SetLayeredWindowAttributes)( HWND,COLORREF,BYTE,DWORD );
 #endif
 
 };

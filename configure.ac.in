@@ -2391,7 +2391,7 @@ if test "x${enable_skins}" != "xno"; then
   if test "x${SYS}" = "xmingw32" -o "x${SYS}" = "xcygwin"; then
     PLUGINS="${PLUGINS} skins"
     CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -U_OFF_T_ -U_off_t -fno-rtti -Imodules/gui/skins"
-    LDFLAGS_skins="${LDFLAGS_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lstdc++ -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32 -lmsimg32"
+    LDFLAGS_skins="${LDFLAGS_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lstdc++ -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32"
   else
     if test "x${enable_skins}" = "xyes"; then
       PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])

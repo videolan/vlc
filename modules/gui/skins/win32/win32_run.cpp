@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.11 2003/04/28 22:44:26 ipkiss Exp $
+ * $Id: win32_run.cpp,v 1.12 2003/04/29 12:54:57 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -217,7 +217,8 @@ void OSRun( intf_thread_t *p_intf )
 
     // Create a new thread for wxWindows
     if( vlc_thread_create( p_intf, "Skins Dialogs Thread", SkinsDialogsThread,
-                           0, 0 ) )                                                 {
+                           0, 0 ) )
+    {
         msg_Err( p_intf, "cannot create SkinsDialogsThread" );
         // Don't even enter the main loop
         return;
