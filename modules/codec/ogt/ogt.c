@@ -72,10 +72,9 @@ vlc_module_end();
  * Local prototypes
  *****************************************************************************/
 
-static block_t *Reassemble( decoder_t *, block_t ** );
-static void     Decode   ( decoder_t *, block_t ** );
-static block_t *Packetize( decoder_t *, block_t ** );
-
+static block_t *Reassemble ( decoder_t *, block_t ** );
+static subpicture_t *Decode( decoder_t *, block_t ** );
+static block_t *Packetize  ( decoder_t *, block_t ** );
 
 /*****************************************************************************
  * VCDSubOpen
@@ -138,7 +137,7 @@ static int PacketizerOpen( vlc_object_t *p_this )
 /*****************************************************************************
  * Decode:
  *****************************************************************************/
-static void
+static subpicture_t *
 Decode ( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -170,6 +169,7 @@ Decode ( decoder_t *p_dec, block_t **pp_block )
         VCDSubInitSubtitleBlock ( p_sys );
     }
 
+    return NULL;
 }
 
 /*****************************************************************************
