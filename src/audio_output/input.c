@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.35 2003/08/18 13:16:43 zorglub Exp $
+ * $Id: input.c,v 1.36 2003/08/19 21:20:00 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -272,6 +272,16 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         }
     }
 
+   /* Free the list */
+    p_current_filter = p_first_filter;
+    while (p_current_filter)
+    {
+        user_filter_t * p_old_filter = p_current_filter;
+        p_current_filter = p_current_filter->p_next;
+        free(p_old_filter);
+    }
+           
+    
 #if 0
      /* Headphone filter add-ons. */
     if ( b_use_headphone_filter == VLC_TRUE )

@@ -1,0 +1,2 @@
+SOURCES_visual = visual.c \
+		 effects.c

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.62 2003/08/17 20:58:44 alexis Exp $
+dnl $Id: configure.ac,v 1.63 2003/08/19 21:20:00 zorglub Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -2821,6 +2821,16 @@ then
 fi
 
 dnl
+dnl Visualisation plugin
+dnl
+AC_ARG_ENABLE(visual,
+  [  --enable-visual		visualisation plugin (default enabled)])
+if test "${enable_visual}" != "no"
+then
+    AX_ADD_PLUGINS([visual])
+fi
+
+dnl
 dnl  SLP access plugin
 dnl
 AC_ARG_ENABLE(slp,
@@ -3272,6 +3282,7 @@ AC_OUTPUT([
   modules/visualization/Makefile
   modules/visualization/scope/Makefile
   modules/visualization/xosd/Makefile
+  modules/visualization/visual/Makefile
 ],[
   chmod 0755 vlc-config
 ])
