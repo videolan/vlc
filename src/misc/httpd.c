@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <vlc/vlc.h>
 
+#ifdef ENABLE_HTTPD
+
 #include "vlc_httpd.h"
 #include "network.h"
 
@@ -376,6 +378,7 @@ static struct
     { ".jpg",   "image/jpeg" },
     { ".jpeg",  "image/jpeg" },
     { ".png",   "image/png" },
+    { ".mpjpeg","multipart/x-mixed-replace; boundary=This Random String" },
 
     /* media mime */
     { ".avi",   "video/avi" },
@@ -2471,3 +2474,45 @@ static int GetAddrPort( const struct sockaddr_storage *p_ss )
     
     return ntohs( i_port );
 }
+
+#else /* ENABLE_HTTPD */
+
+/* We just define an empty wrapper */
+httpd_host_t *httpd_HostNew( vlc_object_t *a, char *b, int c )
+{
+    msg_Err( a, "HTTP daemon support is disabled" );
+    return 0;
+}
+void httpd_HostDelete( httpd_host_t *a ){}
+httpd_url_t *httpd_UrlNew( httpd_host_t *a, char *b ){ return 0; }
+httpd_url_t *httpd_UrlNewUnique( httpd_host_t *a, char *b, char *c,
+                                 char *d ){ return 0; }
+int httpd_UrlCatch( httpd_url_t *a, int b, httpd_callback_t c,
+                    httpd_callback_sys_t *d ){ return 0; }
+void httpd_UrlDelete( httpd_url_t *a ){}
+
+char *httpd_ClientIP( httpd_client_t *a ){ return 0; }
+void httpd_ClientModeStream( httpd_client_t *a ){}
+void httpd_ClientModeBidir( httpd_client_t *a ){}
+
+void httpd_FileDelete( httpd_file_t *a ){}
+httpd_file_t *httpd_FileNew( httpd_host_t *a, char *b, char *c, char *d,
+                             char *e, httpd_file_callback_t f,
+                             httpd_file_sys_t *g ){ return 0; }
+
+void httpd_RedirectDelete( httpd_redirect_t *a ){}
+httpd_redirect_t *httpd_RedirectNew( httpd_host_t *a,
+                                     char *b, char *c ){ return 0; }
+
+void httpd_StreamDelete( httpd_stream_t *a ){}
+int  httpd_StreamHeader( httpd_stream_t *a, uint8_t *b, int c ){ return 0; }
+int  httpd_StreamSend  ( httpd_stream_t *a, uint8_t *b, int c ){ return 0; }
+httpd_stream_t *httpd_StreamNew( httpd_host_t *a, char *b, char *c,
+                                 char *d, char *e ){ return 0; }
+
+void httpd_MsgInit ( httpd_message_t *a ){}
+void httpd_MsgAdd  ( httpd_message_t *a, char *b, char *c, ... ){}
+char *httpd_MsgGet ( httpd_message_t *a, char *b ){ return 0; }
+void httpd_MsgClean( httpd_message_t *a ){}
+
+#endif /* ENABLE_HTTPD */

@@ -29,6 +29,9 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
+
+#ifdef ENABLE_VLM
+
 #include <vlc/intf.h>
 #include <vlc/input.h>
 
@@ -2133,3 +2136,17 @@ static int Manage( vlc_object_t* p_object )
 
     return VLC_SUCCESS;
 }
+
+#else /* ENABLE_VLM */
+
+/* We just define an empty wrapper */
+vlm_t *__vlm_New( vlc_object_t *a )
+{
+    msg_Err( a, "VideoLAN manager support is disabled" );
+    return 0;
+}
+void vlm_Delete( vlm_t *a ){}
+int vlm_ExecuteCommand( vlm_t *a, char *b, vlm_message_t **c ){ return -1; }
+void vlm_MessageDelete( vlm_message_t *a ){}
+
+#endif /* ENABLE_VLM */

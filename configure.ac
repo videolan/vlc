@@ -1185,9 +1185,28 @@ then
   VLC_ADD_PLUGINS([stream_out_duplicate stream_out_gather stream_out_display stream_out_transcode])
 #  VLC_ADD_PLUGINS([stream_out_transrate])
 
-  dnl Ogg and vorbis are handled in their respective section
+  AC_DEFINE(ENABLE_SOUT, 1, Define if you want the stream output support)
 fi
 
+dnl
+dnl HTTP daemon
+dnl
+AC_ARG_ENABLE(httpd,
+  [  --enable-httpd          HTTP daemon (default enabled)])
+if test "${enable_httpd}" != "no"
+then
+  AC_DEFINE(ENABLE_HTTPD, 1, Define if you want the HTTP dameon support)
+fi
+
+dnl
+dnl VideoLAN manager
+dnl
+AC_ARG_ENABLE(vlm,
+  [  --enable-vlm            VideoLAN manager (default enabled)])
+if test "${enable_vlm}" != "no"
+then
+  AC_DEFINE(ENABLE_VLM, 1, Define if you want the VideoLAN manager support)
+fi
 
 dnl
 dnl  Input plugins
@@ -1630,7 +1649,7 @@ dnl
 dnl  Screen capture module
 dnl
 AC_ARG_ENABLE(screen,
-  [  --enable-screen            Screen capture support (default enabled)])
+  [  --enable-screen         Screen capture support (default enabled)])
 if test "${enable_screen}" != "no"; then
   if test "${SYS}" = "darwin"; then
     AC_CHECK_HEADERS(ApplicationServices/ApplicationServices.h, [
@@ -2000,7 +2019,7 @@ dnl
 dnl toolame encoder plugin
 dnl
 AC_ARG_ENABLE(toolame,
-[  --enable-toolame         toolame codec (default disabled)])
+[  --enable-toolame        toolame codec (default disabled)])
 if test "${enable_toolame}" = "yes"
 then
   AC_ARG_WITH(toolame-tree,
@@ -2661,7 +2680,7 @@ dnl  OpenGL module
 dnl  (enabled by default except on beos)
 dnl
 AC_ARG_ENABLE(opengl,
-  [  --enable-opengl            OpenGL support (default enabled)])
+  [  --enable-opengl         OpenGL support (default enabled)])
 if test "${enable_opengl}" != "no" && test "${SYS}" != "beos"; then
   if test "${SYS}" != "darwin"; then
     AC_CHECK_HEADERS(GL/gl.h, [

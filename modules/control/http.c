@@ -1124,8 +1124,8 @@ static mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
     int    i;
 
     /* fprintf( stderr," mvar_VlmSetNew: name=`%s'\n", name ); */
-    if( vlm == NULL )
-        return s;
+    if( vlm == NULL ) return s;
+
     if( vlm_ExecuteCommand( vlm, "show", &msg ) )
     {
         return s;
@@ -1974,6 +1974,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     if( p_intf->p_sys->p_vlm == NULL )
                         p_intf->p_sys->p_vlm = vlm_New( p_intf );
 
+                    if( p_intf->p_sys->p_vlm == NULL ) break;
+
                     uri_extract_value( p_request, "name", name, 512 );
                     if( StrToMacroType( control ) == MVLC_VLM_NEW )
                     {
@@ -2031,6 +2033,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     if( p_intf->p_sys->p_vlm == NULL )
                         p_intf->p_sys->p_vlm = vlm_New( p_intf );
 
+                    if( p_intf->p_sys->p_vlm == NULL ) break;
+
                     uri_extract_value( p_request, "name", name, 512 );
                     sprintf( psz, "del %s", name );
 
@@ -2050,6 +2054,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     char psz[512+10];
                     if( p_intf->p_sys->p_vlm == NULL )
                         p_intf->p_sys->p_vlm = vlm_New( p_intf );
+
+                    if( p_intf->p_sys->p_vlm == NULL ) break;
 
                     uri_extract_value( p_request, "name", name, 512 );
                     if( StrToMacroType( control ) == MVLC_VLM_PLAY )
@@ -2079,6 +2085,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                     if( p_intf->p_sys->p_vlm == NULL )
                         p_intf->p_sys->p_vlm = vlm_New( p_intf );
+
+                    if( p_intf->p_sys->p_vlm == NULL ) break;
 
                     uri_extract_value( p_request, "file", file, 512 );
                     uri_decode_url_encoded( file );
@@ -2370,9 +2378,7 @@ static void Execute( httpd_file_sys_t *p_args,
                         else if( !strcmp( m.param2, "vlm" ) )
                         {
                             if( p_intf->p_sys->p_vlm == NULL )
-                            {
                                 p_intf->p_sys->p_vlm = vlm_New( p_intf );
-                            }
                             index = mvar_VlmSetNew( m.param1, p_intf->p_sys->p_vlm );
                         }
 #if 0

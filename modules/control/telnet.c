@@ -116,7 +116,7 @@ struct intf_sys_t
    telnet_client_t **clients;
    int             i_clients;
    int             fd;
-   vlm_t          *mediatheque;
+   vlm_t           *mediatheque;
 };
 
 /*****************************************************************************
@@ -125,20 +125,18 @@ struct intf_sys_t
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
+    vlm_t *mediatheque;
     int i_telnetport;
 
-    i_telnetport = config_GetInt( p_intf, "telnet-port" );
-
-#ifdef WIN32
-    vlc_bool_t b_quiet;
-    b_quiet = config_GetInt( p_intf, "dummy-quiet" );
-    if( !b_quiet )
-        CONSOLE_INTRO_MSG;
-#endif
+    if( !(mediatheque = vlm_New( p_intf )) )
+    {
+        msg_Err( p_intf, "cannot start VLM" );
+        return VLC_EGENERIC;
+    }
 
     msg_Info( p_intf, _("Using the VLM interface plugin...") );
 
-    p_intf->pf_run = Run;
+    i_telnetport = config_GetInt( p_intf, "telnet-port" );
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( ( p_intf->p_sys->fd = net_ListenTCP( p_intf , "", i_telnetport ) ) < 0 )
@@ -151,7 +149,8 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->p_sys->i_clients   = 0;
     p_intf->p_sys->clients     = NULL;
-    p_intf->p_sys->mediatheque = vlm_New( p_intf );
+    p_intf->p_sys->mediatheque = mediatheque;
+    p_intf->pf_run = Run;
 
     return VLC_SUCCESS;
 }
