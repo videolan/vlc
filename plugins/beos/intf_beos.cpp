@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.39 2002/06/01 12:31:58 sam Exp $
+ * $Id: intf_beos.cpp,v 1.40 2002/06/01 17:09:25 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -124,12 +124,8 @@ static void intf_Close( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Run( intf_thread_t *p_intf )
 {
-
     while( !p_intf->p_vlc->b_die )
     {
-        /* Manage core vlc functions through the callback */
-        p_intf->pf_manage( p_intf );
-
         /* Manage the slider */
         if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL
              && p_intf->p_sys->p_window != NULL)

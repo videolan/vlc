@@ -4,6 +4,9 @@
 
 HEAD
 
+  * ./include/main.h, ./plugins/beos/intf_beos.cpp: BeOS compilation fixes.
+  * ./bootstrap.sh, ./src/libvlc.h, ./po/*: fixed bootstrap.sh so that it does
+    not include CVS Id lines in automatically created files.
   * ./plugins/dummy/intf_dummy.c, ./plugins/chroma/i420_yuy2.c,
     src/interface/intf_eject.c, src/misc/threads.c: win32 compilation fix.
   * ./plugins/directx/aout_directx.c, plugins/directx/vout_directx.c,

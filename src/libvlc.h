@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.1 2002/06/01 12:32:01 sam Exp $
+ * $Id: libvlc.h,v 1.2 2002/06/01 17:09:25 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -22,6 +22,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#define Nothing here, this is just to prevent update-po from being stupid
 
 /*****************************************************************************
  * Configuration options for the main program. Each module will also separatly

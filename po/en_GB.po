@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-06-01 18:43+0200\n"
+"POT-Creation-Date: 2002-06-01 19:02+0200\n"
 "PO-Revision-Date: 2002-04-22 09:56+0200\n"
 "Last-Translator: Samuel Hocevar <sam@zoy.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,40 +94,16 @@ msgstr ""
 "Written by the VideoLAN team at École Centrale, Paris.\n"
 
 #. ****************************************************************************
-#. * libvlc.h: main libvlc header
-#. *****************************************************************************
-#. * Copyright (C) 1998-2002 VideoLAN
-#. * $Id: en_GB.po,v 1.7 2002/06/01 16:45:34 sam Exp $
-#. *
-#. * Authors: Vincent Seguin <seguin@via.ecp.fr>
-#. *          Samuel Hocevar <sam@zoy.org>
-#. *          Gildas Bazin <gbazin@netcourrier.com>
-#. *
-#. * This program is free software; you can redistribute it and/or modify
-#. * it under the terms of the GNU General Public License as published by
-#. * the Free Software Foundation; either version 2 of the License, or
-#. * (at your option) any later version.
-#. *
-#. * This program is distributed in the hope that it will be useful,
-#. * but WITHOUT ANY WARRANTY; without even the implied warranty of
-#. * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#. * GNU General Public License for more details.
-#. *
-#. * You should have received a copy of the GNU General Public License
-#. * along with this program; if not, write to the Free Software
-#. * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
-#. ****************************************************************************
-#. ****************************************************************************
 #. * Configuration options for the main program. Each module will also separatly
 #. * define its own configuration options.
 #. * Look into configuration.h if you need to know more about the following
 #. * macros.
 #. ****************************************************************************
-#: src/libvlc.h:32
+#: src/libvlc.h:34
 msgid "interface module"
 msgstr ""
 
-#: src/libvlc.h:34
+#: src/libvlc.h:36
 msgid ""
 "This option allows you to select the interface used by vlc. The default "
 "behavior is to automatically select the best module available."
@@ -135,47 +111,47 @@ msgstr ""
 "This option allows you to select the interface used by vlc. The default "
 "behaviour is to automatically select the best module available."
 
-#: src/libvlc.h:38
+#: src/libvlc.h:40
 msgid "be verbose"
 msgstr ""
 
-#: src/libvlc.h:40
+#: src/libvlc.h:42
 msgid "This options activates the output of information messages."
 msgstr ""
 
-#: src/libvlc.h:42
+#: src/libvlc.h:44
 msgid "be quiet"
 msgstr ""
 
-#: src/libvlc.h:44
+#: src/libvlc.h:46
 msgid "This options turns off all warning and information messages."
 msgstr ""
 
-#: src/libvlc.h:46
+#: src/libvlc.h:48
 msgid "color messages"
 msgstr ""
 
-#: src/libvlc.h:48
+#: src/libvlc.h:50
 msgid ""
 "When this option is turned on, the messages sent to the console will be "
 "colorized. Your terminal needs Linux color support for this to work."
 msgstr ""
 
-#: src/libvlc.h:51
+#: src/libvlc.h:53
 msgid "interface default search path"
 msgstr ""
 
-#: src/libvlc.h:53
+#: src/libvlc.h:55
 msgid ""
 "This option allows you to set the default path that the interface will open "
 "when looking for a file."
 msgstr ""
 
-#: src/libvlc.h:56
+#: src/libvlc.h:58
 msgid "audio output module"
 msgstr ""
 
-#: src/libvlc.h:58
+#: src/libvlc.h:60
 msgid ""
 "This option allows you to select the audio audio output method used by vlc. "
 "The default behavior is to automatically select the best method available."
@@ -183,38 +159,38 @@ msgstr ""
 "This option allows you to select the audio audio output method used by vlc. "
 "The default behaviour is to automatically select the best method available."
 
-#: src/libvlc.h:62
+#: src/libvlc.h:64
 msgid "enable audio"
 msgstr ""
 
-#: src/libvlc.h:64
+#: src/libvlc.h:66
 msgid ""
 "You can completely disable the audio output. In this case the audio decoding "
 "stage won't be done, and it will save some processing power."
 msgstr ""
 
-#: src/libvlc.h:67
+#: src/libvlc.h:69
 msgid "force mono audio"
 msgstr ""
 
-#: src/libvlc.h:68
+#: src/libvlc.h:70
 msgid "This will force a mono audio output"
 msgstr ""
 
-#: src/libvlc.h:70
+#: src/libvlc.h:72
 msgid "audio output volume"
 msgstr ""
 
-#: src/libvlc.h:72
+#: src/libvlc.h:74
 msgid ""
 "You can set the default audio output volume here, in a range from 0 to 1024."
 msgstr ""
 
-#: src/libvlc.h:75
+#: src/libvlc.h:77
 msgid "audio output format"
 msgstr ""
 
-#: src/libvlc.h:77
+#: src/libvlc.h:79
 msgid ""
 "You can force the audio output format here.\n"
 "0 -> 16 bits signed native endian (default)\n"
@@ -228,31 +204,31 @@ msgid ""
 "8 -> ac3 pass-through"
 msgstr ""
 
-#: src/libvlc.h:88
+#: src/libvlc.h:90
 msgid "audio output frequency (Hz)"
 msgstr ""
 
-#: src/libvlc.h:90
+#: src/libvlc.h:92
 msgid ""
 "You can force the audio output frequency here. Common values are 48000, "
 "44100, 32000, 22050, 16000, 11025, 8000."
 msgstr ""
 
-#: src/libvlc.h:93
+#: src/libvlc.h:95
 msgid "compensate desynchronization of audio (in ms)"
 msgstr ""
 
-#: src/libvlc.h:95
+#: src/libvlc.h:97
 msgid ""
 "This option allows you to delay the audio output. This can be handy if you "
 "notice a lag between the video and the audio."
 msgstr ""
 
-#: src/libvlc.h:98
+#: src/libvlc.h:100
 msgid "video output module"
 msgstr ""
 
-#: src/libvlc.h:100
+#: src/libvlc.h:102
 msgid ""
 "This option allows you to select the video output method used by vlc. The "
 "default behavior is to automatically select the best method available."
@@ -260,59 +236,59 @@ msgstr ""
 "This option allows you to select the video output method used by vlc. The "
 "default behaviour is to automatically select the best method available."
 
-#: src/libvlc.h:104
+#: src/libvlc.h:106
 msgid "enable video"
 msgstr ""
 
-#: src/libvlc.h:106
+#: src/libvlc.h:108
 msgid ""
 "You can completely disable the video output. In this case the video decoding "
 "stage won't be done, which will save some processing power."
 msgstr ""
 
-#: src/libvlc.h:109
+#: src/libvlc.h:111
 msgid "display identifier"
 msgstr ""
 
-#: src/libvlc.h:111
+#: src/libvlc.h:113
 msgid ""
 "This is the local display port that will be used for X11 drawing. For "
 "instance :0.1."
 msgstr ""
 
-#: src/libvlc.h:114
+#: src/libvlc.h:116
 msgid "video width"
 msgstr ""
 
-#: src/libvlc.h:116
+#: src/libvlc.h:118
 msgid ""
 "You can enforce the video width here. By default vlc will adapt to the video "
 "characteristics."
 msgstr ""
 
-#: src/libvlc.h:119
+#: src/libvlc.h:121
 msgid "video height"
 msgstr ""
 
-#: src/libvlc.h:121
+#: src/libvlc.h:123
 msgid ""
 "You can enforce the video height here. By default vlc will adapt to the "
 "video characteristics."
 msgstr ""
 
-#: src/libvlc.h:124
+#: src/libvlc.h:126
 msgid "zoom video"
 msgstr ""
 
-#: src/libvlc.h:126
+#: src/libvlc.h:128
 msgid "You can zoom the video by the specified factor."
 msgstr ""
 
-#: src/libvlc.h:128
+#: src/libvlc.h:130
 msgid "grayscale video output"
 msgstr "greyscale video output"
 
-#: src/libvlc.h:130
+#: src/libvlc.h:132
 #, fuzzy
 msgid ""
 "When enabled, the color information from the video won't be decoded (this "
@@ -321,289 +297,289 @@ msgstr ""
 "Using this option, vlc will not decode the colour information from the video "
 "(this can also allow you to save some processing power)."
 
-#: src/libvlc.h:133
+#: src/libvlc.h:135
 msgid "fullscreen video output"
 msgstr ""
 
-#: src/libvlc.h:135
+#: src/libvlc.h:137
 msgid ""
 "If this option is enabled, vlc will always start a video in fullscreen mode."
 msgstr ""
 
-#: src/libvlc.h:138
+#: src/libvlc.h:140
 #, fuzzy
 msgid "overlay video output"
 msgstr "greyscale video output"
 
-#: src/libvlc.h:140
+#: src/libvlc.h:142
 msgid ""
 "If enabled, vlc will try to take advantage of the overlay capabilities of "
 "you graphics card."
 msgstr ""
 
-#: src/libvlc.h:143
+#: src/libvlc.h:145
 msgid "force SPU position"
 msgstr ""
 
-#: src/libvlc.h:145
+#: src/libvlc.h:147
 msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
 msgstr ""
 
-#: src/libvlc.h:148
+#: src/libvlc.h:150
 msgid "video filter module"
 msgstr ""
 
-#: src/libvlc.h:150
+#: src/libvlc.h:152
 msgid ""
 "This will allow you to add a post-processing filter to enhance the picture "
 "quality, for instance deinterlacing, or to clone or distort the video window."
 msgstr ""
 
-#: src/libvlc.h:154
+#: src/libvlc.h:156
 msgid "server port"
 msgstr ""
 
-#: src/libvlc.h:156
+#: src/libvlc.h:158
 msgid "This is the port used for UDP streams. By default, we chose 1234."
 msgstr ""
 
-#: src/libvlc.h:158
+#: src/libvlc.h:160
 msgid "enable network channel mode"
 msgstr ""
 
-#: src/libvlc.h:160
+#: src/libvlc.h:162
 msgid "Activate this option if you want to use the VideoLAN Channel Server."
 msgstr ""
 
-#: src/libvlc.h:162
+#: src/libvlc.h:164
 msgid "channel server address"
 msgstr ""
 
-#: src/libvlc.h:164
+#: src/libvlc.h:166
 msgid "Indicate here the address of the VideoLAN Channel Server."
 msgstr ""
 
-#: src/libvlc.h:166
+#: src/libvlc.h:168
 msgid "channel server port"
 msgstr ""
 
-#: src/libvlc.h:168
+#: src/libvlc.h:170
 msgid "Indicate here the port on which the VideoLAN Channel Server runs."
 msgstr ""
 
-#: src/libvlc.h:170
+#: src/libvlc.h:172
 msgid "network interface"
 msgstr ""
 
-#: src/libvlc.h:172
+#: src/libvlc.h:174
 msgid ""
 "If you have several interfaces on your Linux machine and use the VLAN "
 "solution, you may indicate here which interface to use."
 msgstr ""
 
-#: src/libvlc.h:175
+#: src/libvlc.h:177
 msgid "choose program (SID)"
 msgstr "choose programme (SID)"
 
-#: src/libvlc.h:177
+#: src/libvlc.h:179
 msgid "Choose the program to select by giving its Service ID."
 msgstr "Choose the programme to select by giving its Service ID."
 
-#: src/libvlc.h:179
+#: src/libvlc.h:181
 msgid "choose audio"
 msgstr ""
 
-#: src/libvlc.h:181
+#: src/libvlc.h:183
 msgid "Give the default type of audio you want to use in a DVD."
 msgstr ""
 
-#: src/libvlc.h:183
+#: src/libvlc.h:185
 msgid "choose channel"
 msgstr ""
 
-#: src/libvlc.h:185
+#: src/libvlc.h:187
 msgid ""
 "Give the stream number of the audio channel you want to use in a DVD (from 1 "
 "to n)."
 msgstr ""
 
-#: src/libvlc.h:188
+#: src/libvlc.h:190
 msgid "choose subtitles"
 msgstr ""
 
-#: src/libvlc.h:190
+#: src/libvlc.h:192
 msgid ""
 "Give the stream number of the subtitle channel you want to use in a DVD "
 "(from 1 to n)."
 msgstr ""
 
-#: src/libvlc.h:193
+#: src/libvlc.h:195
 msgid "DVD device"
 msgstr ""
 
-#: src/libvlc.h:195
+#: src/libvlc.h:197
 msgid "This is the default DVD device to use."
 msgstr ""
 
-#: src/libvlc.h:197
+#: src/libvlc.h:199
 msgid "VCD device"
 msgstr ""
 
-#: src/libvlc.h:199
+#: src/libvlc.h:201
 msgid "This is the default VCD device to use."
 msgstr ""
 
-#: src/libvlc.h:201
+#: src/libvlc.h:203
 msgid "force IPv6"
 msgstr ""
 
-#: src/libvlc.h:203
+#: src/libvlc.h:205
 msgid ""
 "If you check this box, IPv6 will be used by default for all UDP and HTTP "
 "connections."
 msgstr ""
 
-#: src/libvlc.h:206
+#: src/libvlc.h:208
 msgid "force IPv4"
 msgstr ""
 
-#: src/libvlc.h:208
+#: src/libvlc.h:210
 msgid ""
 "If you check this box, IPv4 will be used by default for all UDP and HTTP "
 "connections."
 msgstr ""
 
-#: src/libvlc.h:211
+#: src/libvlc.h:213
 msgid "choose MPEG audio decoder"
 msgstr ""
 
-#: src/libvlc.h:213
+#: src/libvlc.h:215
 msgid ""
 "This allows you to select the MPEG audio decoder you want to use. Common "
 "choices are builtin and mad."
 msgstr ""
 
-#: src/libvlc.h:216
+#: src/libvlc.h:218
 msgid "choose AC3 audio decoder"
 msgstr ""
 
-#: src/libvlc.h:218
+#: src/libvlc.h:220
 msgid ""
 "This allows you to select the AC3/A52 audio decoder you want to use. Common "
 "choices are builtin and a52."
 msgstr ""
 
-#: src/libvlc.h:221
+#: src/libvlc.h:223
 msgid "enable CPU MMX support"
 msgstr ""
 
-#: src/libvlc.h:223
+#: src/libvlc.h:225
 msgid ""
 "If your processor supports the MMX instructions set, vlc can take advantage "
 "of them."
 msgstr ""
 
-#: src/libvlc.h:226
+#: src/libvlc.h:228
 msgid "enable CPU 3D Now! support"
 msgstr ""
 
-#: src/libvlc.h:228
+#: src/libvlc.h:230
 msgid ""
 "If your processor supports the 3D Now! instructions set, vlc can take "
 "advantage of them."
 msgstr ""
 
-#: src/libvlc.h:231
+#: src/libvlc.h:233
 msgid "enable CPU MMX EXT support"
 msgstr ""
 
-#: src/libvlc.h:233
+#: src/libvlc.h:235
 msgid ""
 "If your processor supports the MMX EXT instructions set, vlc can take "
 "advantage of them."
 msgstr ""
 
-#: src/libvlc.h:236
+#: src/libvlc.h:238
 msgid "enable CPU SSE support"
 msgstr ""
 
-#: src/libvlc.h:238
+#: src/libvlc.h:240
 msgid ""
 "If your processor supports the SSE instructions set, vlc can take can take "
 "advantage of them."
 msgstr ""
 
-#: src/libvlc.h:241
+#: src/libvlc.h:243
 msgid "enable CPU AltiVec support"
 msgstr ""
 
-#: src/libvlc.h:243
+#: src/libvlc.h:245
 msgid ""
 "If your processor supports the AltiVec instructions set, vlc can take "
 "advantage of them."
 msgstr ""
 
-#: src/libvlc.h:246
+#: src/libvlc.h:248
 msgid "launch playlist on startup"
 msgstr ""
 
-#: src/libvlc.h:248
+#: src/libvlc.h:250
 msgid "If you want vlc to start playing on startup, then enable this option."
 msgstr ""
 
-#: src/libvlc.h:250
+#: src/libvlc.h:252
 msgid "enqueue items in playlist"
 msgstr ""
 
-#: src/libvlc.h:252
+#: src/libvlc.h:254
 msgid ""
 "If you want vlc to add items to the playlist as you open them, then enable "
 "this option."
 msgstr ""
 
-#: src/libvlc.h:255
+#: src/libvlc.h:257
 msgid "loop playlist on end"
 msgstr ""
 
-#: src/libvlc.h:257
+#: src/libvlc.h:259
 msgid ""
 "If you want vlc to keep playing the playlist indefinitely then enable this "
 "option."
 msgstr ""
 
-#: src/libvlc.h:260
+#: src/libvlc.h:262
 msgid "memory copy module"
 msgstr ""
 
-#: src/libvlc.h:262
+#: src/libvlc.h:264
 msgid ""
 "You can select wich memory copy module you want to use. By default vlc will "
 "select the fastest one supported by your hardware."
 msgstr ""
 
-#: src/libvlc.h:265
+#: src/libvlc.h:267
 msgid "access module"
 msgstr ""
 
-#: src/libvlc.h:267
+#: src/libvlc.h:269
 msgid "This is a legacy entry to let you configure access modules"
 msgstr ""
 
-#: src/libvlc.h:269
+#: src/libvlc.h:271
 msgid "demux module"
 msgstr ""
 
-#: src/libvlc.h:271
+#: src/libvlc.h:273
 msgid "This is a legacy entry to let you configure demux modules"
 msgstr ""
 
-#: src/libvlc.h:273
+#: src/libvlc.h:275
 msgid "fast pthread on NT/2K/XP (developpers only)"
 msgstr ""
 
-#: src/libvlc.h:275
+#: src/libvlc.h:277
 msgid ""
 "On Windows NT/2K/XP we use a slow but correct pthread implementation, you "
 "can also use this faster implementation but you might experience problems "
@@ -611,39 +587,39 @@ msgid ""
 msgstr ""
 
 #. Interface options
-#: src/libvlc.h:297
+#: src/libvlc.h:299
 msgid "Interface"
 msgstr ""
 
 #. Audio options
-#: src/libvlc.h:305
+#: src/libvlc.h:307
 msgid "Audio"
 msgstr ""
 
 #. Video options
-#: plugins/directx/directx.c:53 src/libvlc.h:315
+#: plugins/directx/directx.c:53 src/libvlc.h:317
 msgid "Video"
 msgstr ""
 
 #. Input options
-#: plugins/satellite/satellite.c:66 src/libvlc.h:328
+#: plugins/satellite/satellite.c:66 src/libvlc.h:330
 msgid "Input"
 msgstr ""
 
 #. Decoder options
-#: src/libvlc.h:347
+#: src/libvlc.h:349
 msgid "Decoders"
 msgstr ""
 
 #. CPU options
-#: src/libvlc.h:352
+#: src/libvlc.h:354
 msgid "CPU"
 msgstr ""
 
 #. Playlist options
 #: plugins/gtk/gnome_interface.c:506 plugins/gtk/gnome_interface.c:1824
 #: plugins/gtk/gnome_interface.c:1848 plugins/gtk/gtk_interface.c:611
-#: plugins/gtk/gtk_interface.c:2105 src/libvlc.h:360
+#: plugins/gtk/gtk_interface.c:2105 src/libvlc.h:362
 msgid "Playlist"
 msgstr ""
 
@@ -655,35 +631,35 @@ msgstr ""
 #: plugins/gtk/gtk.c:71 plugins/mad/mad_adec.c:66 plugins/mga/xmga.c:106
 #: plugins/mpeg_vdec/video_parser.c:96 plugins/text/logger.c:86
 #: plugins/win32/win32.cpp:48 plugins/x11/x11.c:55 plugins/x11/xvideo.c:65
-#: src/libvlc.h:366
+#: src/libvlc.h:368
 msgid "Miscellaneous"
 msgstr ""
 
-#: src/libvlc.h:378
+#: src/libvlc.h:380
 msgid "main program"
 msgstr "main programme"
 
-#: src/libvlc.h:390
+#: src/libvlc.h:392
 msgid "print help"
 msgstr ""
 
-#: src/libvlc.h:392
+#: src/libvlc.h:394
 msgid "print detailed help"
 msgstr ""
 
-#: src/libvlc.h:394
+#: src/libvlc.h:396
 msgid "print a list of available modules"
 msgstr ""
 
-#: src/libvlc.h:396
+#: src/libvlc.h:398
 msgid "print help on module"
 msgstr ""
 
-#: src/libvlc.h:399
+#: src/libvlc.h:401
 msgid "print version information"
 msgstr ""
 
-#: src/libvlc.h:401
+#: src/libvlc.h:403
 msgid "print build information"
 msgstr ""
 
