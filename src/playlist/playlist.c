@@ -1071,7 +1071,7 @@ static int ItemChange( vlc_object_t *p_obj, const char *psz_var,
 
     /* Update view */
     /* FIXME: Make that automatic */
-    playlist_ViewUpdate( p_playlist, VIEW_S_AUTHOR );
+//    playlist_ViewUpdate( p_playlist, VIEW_S_AUTHOR );
 
     return VLC_SUCCESS;
 }
