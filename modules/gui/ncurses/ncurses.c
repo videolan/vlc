@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: ncurses.c,v 1.4 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: ncurses.c,v 1.5 2003/12/12 03:06:51 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -35,6 +35,18 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
+
+#ifdef HAVE_CDDAX
+#define CDDA_MRL "cddax://"
+#else 
+#define CDDA_MRL "cdda://"
+#endif
+
+#ifdef HAVE_VCDX
+#define VCD_MRL "vcdx://"
+#else
+#define VCD_MRL "vcdx://"
+#endif
 
 /*****************************************************************************
  * Local prototypes.
@@ -364,8 +376,8 @@ static void Eject ( intf_thread_t *p_intf )
 
     /*
      * Get the active input
-     * Determine whether we can eject a media, ie it's a VCD or DVD
-     * If it's neither a VCD nor a DVD, then return
+     * Determine whether we can eject a media, ie it's a DVD, VCD or CD-DA
+     * If it's neither of these, then return
      */
 
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -389,31 +401,45 @@ static void Eject ( intf_thread_t *p_intf )
 
     if( psz_name )
     {
-        if( !strncmp(psz_name, "dvd:", 4) )
+        if( !strncmp(psz_name, "dvd://", 4) )
         {
-            switch( psz_name[4] )
+	    switch( psz_name[strlen("dvd://")] )
             {
             case '\0':
             case '@':
-                psz_device = config_GetPsz( p_intf, "dvd_device" );
+                psz_device = config_GetPsz( p_intf, "dvd" );
                 break;
             default:
-                /* Omit the first 4 characters */
-                psz_device = strdup( psz_name + 4 );
+                /* Omit the first MRL-selector characters */
+	        psz_device = strdup( psz_name + strlen("dvd://" ) );
                 break;
             }
         }
-        else if( !strncmp(psz_name, "vcd:", 4) )
+        else if( !strncmp(psz_name, VCD_MRL, strlen(VCD_MRL)) )
         {
-            switch( psz_name[4] )
+	    switch( psz_name[strlen(VCD_MRL)] )
             {
             case '\0':
             case '@':
-                psz_device = config_GetPsz( p_intf, "vcd_device" );
+                psz_device = config_GetPsz( p_intf, VCD_MRL );
                 break;
             default:
-                /* Omit the first 4 characters */
-                psz_device = strdup( psz_name + 4 );
+                /* Omit the beginning MRL-selector characters */
+	        psz_device = strdup( psz_name + strlen(VCD_MRL) );
+                break;
+            }
+        }
+	else if( !strncmp(psz_name, CDDA_MRL, strlen(CDDA_MRL) ) )
+        {
+	    switch( psz_name[strlen(CDDA_MRL)] )
+            {
+            case '\0':
+            case '@':
+                psz_device = config_GetPsz( p_intf, "cd-audio" );
+                break;
+            default:
+                /* Omit the beginning MRL-selector characters */
+	        psz_device = strdup( psz_name + strlen(CDDA_MRL) );
                 break;
             }
         }
