@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.32 2001/11/28 15:08:05 massiot Exp $
+ * $Id: vout_beos.cpp,v 1.33 2001/12/01 06:38:53 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -36,14 +36,10 @@
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>
 #include <string.h>                                            /* strerror() */
-#include <kernel/OS.h>
-#include <View.h>
+#include <InterfaceKit.h>
+#include <DirectWindow.h>
 #include <Application.h>
-#include <Window.h>
-#include <Locker.h>
-#include <Screen.h>
-#include <malloc.h>
-#include <string.h>
+#include <Bitmap.h>
 
 extern "C"
 {
@@ -66,12 +62,9 @@ extern "C"
 }
 
 #include "VideoWindow.h"
-#include <Screen.h>
 
-#define WIDTH 128
-#define HEIGHT 64
-#define BITS_PER_PLANE 16
-#define BYTES_PER_PIXEL 2
+#define BITS_PER_PLANE  32
+#define BYTES_PER_PIXEL 4
 
 /*****************************************************************************
  * vout_sys_t: BeOS video output method descriptor
@@ -79,10 +72,9 @@ extern "C"
  * This structure is part of the video output thread descriptor.
  * It describes the BeOS specific properties of an output thread.
  *****************************************************************************/
- 
 typedef struct vout_sys_s
 {
-    VideoWindow *         p_window;
+    VideoWindow *      p_window;
 
     byte_t *              pp_buffer[2];
     s32                   i_width;
@@ -93,7 +85,6 @@ typedef struct vout_sys_s
 /*****************************************************************************
  * beos_GetAppWindow : retrieve a BWindow pointer from the window name
  *****************************************************************************/
-
 BWindow *beos_GetAppWindow(char *name)
 {
     int32       index;
@@ -120,74 +111,38 @@ BWindow *beos_GetAppWindow(char *name)
 /*****************************************************************************
  * DrawingThread : thread that really does the drawing
  *****************************************************************************/
-
 int32 Draw(void *data)
 {
-  VideoWindow *p_win;
-  p_win = (VideoWindow*) data;
-	  if (p_win->LockLooper())
-      {
-        p_win->view->DrawBitmap( p_win->bitmap[p_win->i_buffer_index],
-                              p_win->bitmap[p_win->i_buffer_index]->Bounds(),
-                              p_win->Bounds());  
-        p_win->UnlockLooper();
-      }
-  return B_OK;
+    VideoWindow* p_win;
+    p_win = (VideoWindow *) data;
+    if ( p_win->voutWindow->LockLooper() )
+    {
+        p_win->view->DrawBitmap( p_win->bitmap[p_win->i_buffer],
+                                 p_win->bitmap[p_win->i_buffer]->Bounds(),
+                                 p_win->voutWindow->Bounds() );  
+        p_win->voutWindow->UnlockLooper();
+    }
+    return B_OK;
 }
 
 /*****************************************************************************
- * VideoWindow constructor and destructor
+ * bitmapWindow : This is the bitmap window output
  *****************************************************************************/
-
-VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_output )
-        : BWindow(frame, name, B_TITLED_WINDOW, B_OUTLINE_RESIZE)
+bitmapWindow::bitmapWindow(BRect frame, VideoWindow *theOwner)
+        : BWindow( frame, NULL, B_TITLED_WINDOW, 
+                   B_OUTLINE_RESIZE | B_NOT_CLOSABLE | B_NOT_MINIMIZABLE )
 {
-
-	/* set the VideoWindow variables */
-    teardownwindow = false;
     is_zoomed = false;
-	p_video_output->b_YCbr = false;
-	
-	/* create the view to do the display */
-    view = new VLCView(Bounds());
-    AddChild(view);
-    
-    /* Bitmap mode overlay not available */
-	bitmap[0] = new BBitmap(Bounds(), B_RGB32);
-	bitmap[1] = new BBitmap(Bounds(), B_RGB32);
-
-	i_screen_depth = 32;
- 	SetTitle(VOUT_TITLE " (BBitmap output)");
-
-	memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
- 	memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
-
-	i_width = bitmap[0]->Bounds().IntegerWidth();
-	i_height = bitmap[0]->Bounds().IntegerHeight();
-	i_bytes_per_pixel = bitmap[0]->BytesPerRow()/i_width;
-    fRowBytes = bitmap[0]->BytesPerRow();
-	i_screen_depth = 8 * i_bytes_per_pixel;
-
-    Show();
+    origRect = frame;
+    owner = theOwner;
+    SetTitle(VOUT_TITLE " (BBitmap output)");
 }
 
-VideoWindow::~VideoWindow()
+bitmapWindow::~bitmapWindow()
 {
-    int32 result;
+}
 
-    Hide();
-    Sync();
-    teardownwindow = true;
-    wait_for_thread(fDrawThreadID, &result);
-   	delete bitmap[0];
-   	delete bitmap[1];
- }
-
-
-/*****************************************************************************
- * VideoWindow::FrameResized
- *****************************************************************************/
-void VideoWindow::FrameResized( float width, float height )
+void bitmapWindow::FrameResized( float width, float height )
 {
 	if (is_zoomed)
 	{
@@ -195,38 +150,31 @@ void VideoWindow::FrameResized( float width, float height )
 	}
 	float width_scale;
 	float height_scale;
-	float orig_width = bitmap[0]->Bounds().Width();
-	float orig_height = bitmap[0]->Bounds().Height();
 
-	width_scale = width / orig_width;
-	height_scale = height / orig_height;
+	width_scale = width / origRect.Width();
+	height_scale = height / origRect.Height();
 	
     /* if the width is proportionally smaller */
     if (width_scale <= height_scale)
     {
-        ResizeTo(width, orig_height * width_scale);
+        ResizeTo(width, origRect.Height() * width_scale);
     }
     else /* if the height is proportionally smaller */
     {
-        ResizeTo(orig_width * height_scale, height);
+        ResizeTo(origRect.Width() * height_scale, height);
     }
 }
 
-/*****************************************************************************
- * VideoWindow::Zoom
- *****************************************************************************/
-
-void VideoWindow::Zoom(BPoint origin, float width, float height )
+void bitmapWindow::Zoom(BPoint origin, float width, float height )
 {
 	if(is_zoomed)
 	{
-		MoveTo(rect.left, rect.top);
-		ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
+		MoveTo(origRect.left, origRect.top);
+		ResizeTo(origRect.IntegerWidth(), origRect.IntegerHeight());
 		be_app->ShowCursor();
 	}
 	else
 	{
-		rect = Frame();
 		BScreen *screen;
 		screen = new BScreen(this);
 		BRect rect = screen->Frame();
@@ -239,41 +187,148 @@ void VideoWindow::Zoom(BPoint origin, float width, float height )
 }
 
 /*****************************************************************************
- * VideoWindow::MessageReceived
+ * directWindow : This is the bitmap window output
  *****************************************************************************/
-
-void VideoWindow::MessageReceived( BMessage * p_message )
+directWindow::directWindow(BRect frame, VideoWindow *theOwner)
+        : BDirectWindow( frame, NULL, B_TITLED_WINDOW, 
+                   B_OUTLINE_RESIZE | B_NOT_CLOSABLE | B_NOT_MINIMIZABLE )
 {
-    BWindow * p_win;
-    
-    switch( p_message->what )
+    is_zoomed = false;
+    origRect = frame;
+    owner = theOwner;
+    SetTitle(VOUT_TITLE " (DirectWindow output)");
+}
+
+directWindow::~directWindow()
+{
+}
+
+void directWindow::DirectConnected(direct_buffer_info *info)
+{
+}
+
+void directWindow::FrameResized( float width, float height )
+{
+	if (is_zoomed)
+	{
+	    return;
+	}
+	float width_scale;
+	float height_scale;
+
+	width_scale = width / origRect.Width();
+	height_scale = height / origRect.Height();
+	
+    /* if the width is proportionally smaller */
+    if (width_scale <= height_scale)
     {
-    case B_KEY_DOWN:
-    case B_SIMPLE_DATA:
-        // post the message to the interface window which will handle it
-        p_win = beos_GetAppWindow( "interface" );
-        if( p_win != NULL )
-        {
-            p_win->PostMessage( p_message );
-        }
-        break;
-    
-    default:
-        BWindow::MessageReceived( p_message );
-        break;
+        ResizeTo(width, origRect.Height() * width_scale);
+    }
+    else /* if the height is proportionally smaller */
+    {
+        ResizeTo(origRect.Width() * height_scale, height);
     }
 }
 
-/*****************************************************************************
- * VideoWindow::QuitRequested
- *****************************************************************************/
-
-bool VideoWindow::QuitRequested()
+void directWindow::Zoom(BPoint origin, float width, float height )
 {
-    /* FIXME: send a message ! */
-    p_main->p_intf->b_die = 1;
+	if(is_zoomed)
+	{
+	    SetFullScreen(false);
+		MoveTo(origRect.left, origRect.top);
+		ResizeTo(origRect.IntegerWidth(), origRect.IntegerHeight());
+		be_app->ShowCursor();
+	}
+	else
+	{
+		SetFullScreen(true);
+		BScreen *screen;
+		screen = new BScreen(this);
+		BRect rect = screen->Frame();
+		delete screen;
+		MoveTo(0,0);
+		ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
+		be_app->HideCursor();
+	}
+	is_zoomed = !is_zoomed;
+}
+
+/*****************************************************************************
+ * VideoWindow constructor and destructor
+ *****************************************************************************/
+VideoWindow::VideoWindow( int width, int height, 
+                          vout_thread_t *p_video_output )
+{
+    if ( BDirectWindow::SupportsWindowMode() )
+    { 
+        voutWindow = new directWindow( BRect( 80, 50, 
+	                                      80 + width, 50 + height ), this );
+    }
+    else
+    {
+	    voutWindow = new bitmapWindow( BRect( 80, 50, 
+	                                      80 + width, 50 + height ), this );
+	}
+
+	/* set the VideoWindow variables */
+    teardownwindow = false;
+	
+	/* create the view to do the display */
+    view = new VLCView( voutWindow->Bounds() );
+    voutWindow->AddChild(view);
+    
+    /* Bitmap mode overlay not available */
+	bitmap[0] = new BBitmap( voutWindow->Bounds(), B_RGB32);
+	bitmap[1] = new BBitmap( voutWindow->Bounds(), B_RGB32);
+	memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
+ 	memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
+
+	i_width = bitmap[0]->Bounds().IntegerWidth();
+	i_height = bitmap[0]->Bounds().IntegerHeight();
+
+    voutWindow->Show();
+}
+
+VideoWindow::~VideoWindow()
+{
+    int32 result;
+
+    voutWindow->Hide();
+    voutWindow->Sync();
+    voutWindow->Lock();
+    voutWindow->Quit();
     teardownwindow = true;
-    return( false );
+    wait_for_thread(fDrawThreadID, &result);
+   	delete bitmap[0];
+   	delete bitmap[1];
+}
+
+void VideoWindow::resizeIfRequired( int newWidth, int newHeight )
+{
+    if (( newWidth != i_width + 1) &&
+        ( newHeight != i_height + 1) &&
+        ( newWidth != 0 ))
+    {
+        if ( voutWindow->Lock() )
+        {
+            view->ClearViewBitmap();
+            i_width = newWidth - 1;
+            i_height = newHeight -1;
+            voutWindow->ResizeTo((float) i_width, (float) i_height); 
+            voutWindow->Unlock();
+        }
+    }
+}
+
+void VideoWindow::drawBuffer(int bufferIndex)
+{
+	status_t status;
+	
+	i_buffer = bufferIndex; 
+	
+    fDrawThreadID = spawn_thread(Draw, "drawing_thread",
+                    B_DISPLAY_PRIORITY, (void*) this);
+    wait_for_thread(fDrawThreadID, &status);
 }
 
 /*****************************************************************************
@@ -289,7 +344,6 @@ VLCView::VLCView(BRect bounds) : BView(bounds, "", B_FOLLOW_ALL, B_WILL_DRAW)
  *****************************************************************************/
 VLCView::~VLCView()
 {
-
 }
 
 /*****************************************************************************
@@ -297,12 +351,8 @@ VLCView::~VLCView()
  *****************************************************************************/
 void VLCView::MouseDown(BPoint point)
 {
-	VideoWindow *w = (VideoWindow *) Window();
-	if(w->is_zoomed)
-	{
-		BWindow *win = Window();
-		win->Zoom();
-	}
+	BWindow *win = Window();
+	win->Zoom();
 }
 
 extern "C"
@@ -368,6 +418,7 @@ int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
     
+    /* force scaling off */
 	p_vout->b_scale = false;
 
     /* Open and initialize device */
@@ -387,8 +438,7 @@ int vout_Create( vout_thread_t *p_vout )
 int vout_Init( vout_thread_t *p_vout )
 {
     VideoWindow * p_win = p_vout->p_sys->p_window;
-    u32 i_page_size;
-    i_page_size =   p_vout->i_width * p_vout->i_height * p_vout->i_bytes_per_pixel;
+
     if((p_win->bitmap[0] != NULL) && (p_win->bitmap[1] != NULL))
    	{
     	p_vout->pf_setbuffers( p_vout,
@@ -403,6 +453,7 @@ int vout_Init( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_End( vout_thread_t *p_vout )
 {
+	/* place code here to end the video */
 }
 
 /*****************************************************************************
@@ -426,24 +477,9 @@ int vout_Manage( vout_thread_t *p_vout )
 {
     VideoWindow * p_win = p_vout->p_sys->p_window;
     
-    if ((p_vout->p_buffer[p_vout->i_buffer_index].i_pic_width != p_win->i_width + 1) &&
-        (p_vout->p_buffer[p_vout->i_buffer_index].i_pic_height != p_win->i_height + 1) &&
-        (p_vout->p_buffer[p_vout->i_buffer_index].i_pic_width != 0 ))
-    {
-        if (p_win->Lock())
-        {
-            p_win->view->ClearViewBitmap();
-            intf_Msg("Starting Change");
-            intf_Msg("New width: %d Height: %d", 
-                p_vout->p_buffer[p_vout->i_buffer_index ].i_pic_width,
-                p_vout->p_buffer[p_vout->i_buffer_index ].i_pic_height);
-
-            p_win->i_width = p_vout->p_buffer[p_vout->i_buffer_index].i_pic_width - 1;
-            p_win->i_height = p_vout->p_buffer[p_vout->i_buffer_index].i_pic_height -1;
-            p_win->ResizeTo((float) p_win->i_width, (float) p_win->i_height); 
-            p_win->Unlock();
-        }
-    }
+    p_win->resizeIfRequired(p_vout->p_buffer[p_vout->i_buffer_index].i_pic_width,
+                            p_vout->p_buffer[p_vout->i_buffer_index].i_pic_height);
+                            
 	return( 0 );
 }
 
@@ -455,53 +491,50 @@ int vout_Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_Display( vout_thread_t *p_vout )
 {
-	status_t status;
 
     VideoWindow * p_win = p_vout->p_sys->p_window;
-    
-   	p_win->i_buffer_index = p_vout->i_buffer_index;
-	p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
+    /* draw buffer if required */    
 	if (!p_win->teardownwindow)
 	{
-   	   p_win->fDrawThreadID = spawn_thread(Draw, "drawing_thread",
-              B_DISPLAY_PRIORITY, (void*) p_win);
-       wait_for_thread(p_win->fDrawThreadID, &status);
+       p_win->drawBuffer(p_vout->i_buffer_index);
     }
+    /* change buffer */
+	p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
 }
 
 /* following functions are local */
 
 /*****************************************************************************
  * BeosOpenDisplay: open and initialize BeOS device
- *****************************************************************************
- * XXX?? The framebuffer mode is only provided as a fast and efficient way to
- * display video, providing the card is configured and the mode ok. It is
- * not portable, and is not supposed to work with many cards. Use at your
- * own risk !
  *****************************************************************************/
-
 static int BeosOpenDisplay( vout_thread_t *p_vout )
 { 
     
-    p_vout->p_sys->p_window =
-        new VideoWindow(  BRect( 80, 50, 80+p_vout->i_width-1, 50+p_vout->i_height-1 ), NULL, p_vout );
-    if( p_vout->p_sys->p_window == 0 )
+    VideoWindow * p_win = new VideoWindow( p_vout->i_width - 1, 
+                                           p_vout->i_height - 1, 
+                                           p_vout );
+
+    if( p_win == 0 )
     {
         free( p_vout->p_sys );
         intf_ErrMsg( "error: cannot allocate memory for VideoWindow" );
         return( 1 );
     }   
-    VideoWindow * p_win = p_vout->p_sys->p_window;
     
-    p_vout->i_screen_depth =         p_win->i_screen_depth;
-    p_vout->i_bytes_per_pixel =      p_win->i_bytes_per_pixel;
-    p_vout->i_width =				 p_win->i_width + 1;
-    p_vout->i_height = 				 p_win->i_height + 1;
-    p_vout->i_bytes_per_line =       p_vout->i_width*p_win->i_bytes_per_pixel;
+    p_vout->p_sys->p_window = p_win;
+    /* set the system to 32bits always
+       let BeOS do all the work */
+	p_vout->b_YCbr            = false;
+    p_vout->i_screen_depth    = BITS_PER_PLANE;
+    p_vout->i_bytes_per_pixel = BYTES_PER_PIXEL;
+    p_vout->i_width           = p_win->i_width + 1;
+    p_vout->i_height          = p_win->i_height + 1;
+    p_vout->i_bytes_per_line  = p_vout->i_width * BYTES_PER_PIXEL;
 
     p_vout->i_red_mask =        0xff0000;
     p_vout->i_green_mask =      0x00ff00;
     p_vout->i_blue_mask =       0x0000ff;
+
     return( 0 );
 }
 
@@ -514,8 +547,7 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
 static void BeosCloseDisplay( vout_thread_t *p_vout )
 {    
     /* Destroy the video window */
-    p_vout->p_sys->p_window->Lock();
-    p_vout->p_sys->p_window->Quit();
+    delete p_vout->p_sys->p_window;
 }
 
 } /* extern "C" */
