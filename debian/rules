@@ -39,8 +39,9 @@ CONFIG_FLAGS += \
 	--enable-wxwindows \
 	--enable-slp \
 	--enable-flac \
-	--enable-skins \
+	--disable-skins \
 	--disable-basic-skins \
+	--enable-skins2 \
 	--enable-freetype \
 	--enable-mkv \
 	--enable-v4l \
@@ -50,6 +51,9 @@ CONFIG_FLAGS += \
 	--enable-livedotcom \
 	--enable-libmpeg2 \
 	--enable-dts \
+	--enable-fribidi \
+	--enable-cdio \
+	--enable-mod \
 	$(NULL)
 
 # These ones are currently shipped with VLC
@@ -331,7 +335,7 @@ endif
 	ln -s vlc debian/wxvlc/usr/share/doc/wxvlc
 	mv debian/vlc/usr/lib/vlc/gui/libwxwindows_plugin.so \
 	  debian/wxvlc/usr/lib/vlc/gui/
-	mv debian/vlc/usr/lib/vlc/gui/libskins_plugin.so \
+	mv debian/vlc/usr/lib/vlc/gui/libskins2_plugin.so \
 	  debian/wxvlc/usr/lib/vlc/gui/
 	mv debian/vlc/usr/share/vlc/skins \
 	  debian/wxvlc/usr/share/vlc/

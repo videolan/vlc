@@ -1,3 +1,22 @@
+vlc (0.7.1+cvs20040426-1) unstable; urgency=low
+
+  * New SVN snapshot.
+  * debian/control:
+    + Removed the libdv2-dev build-dependency.
+    + Set the liblivemedia-dev build-dependency to (>= 2004.04.23-1).
+    + Set the libmatroska-dev build-dependency to (>= 0.7.0).
+    + Build-depend on libfribidi-dev.
+    + Build-depend on libcdio-dev.
+    + Build-depend on libmodplug-dev.
+  * debian/rules:
+    + Activated fribidi support.
+    + Activated CDDA support via libcdio.
+    + Activated MOD support.
+  * configure.ac:
+    + Re-enabled i420_yuy2_altivec.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Mon, 26 Apr 2004 16:30:25 +0200
+
 vlc (0.7.1-7) unstable; urgency=high
 
   * debian/control:
