@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.22 2003/04/22 08:51:28 fenrir Exp $
+ * $Id: mp4.c,v 1.23 2003/04/22 11:38:25 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc_playlist.h>
 #include "codecs.h"
 #include "libmp4.h"
 #include "mp4.h"
@@ -105,6 +106,7 @@ static int MP4Init( vlc_object_t * p_this )
 
     MP4_Box_t       *p_ftyp;
 
+    MP4_Box_t       *p_rmra;
 
     MP4_Box_t       *p_mvhd;
     MP4_Box_t       *p_trak;
@@ -201,9 +203,89 @@ static int MP4Init( vlc_object_t * p_this )
 //        return( -1 );
     }
 
+    if( ( p_rmra = MP4_BoxGet( &p_demux->box_root,  "/moov/rmra" ) ) )
+    {
+        playlist_t *p_playlist;
+        int        i_count = MP4_BoxCount( p_rmra, "rmda" );
+        int        i;
+
+        msg_Dbg( p_input, "detected playlist mov file (%d ref)", i_count );
+
+        p_playlist =
+            (playlist_t *)vlc_object_find( p_input,
+                                           VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+        if( p_playlist )
+        {
+            for( i = 0; i < i_count; i++ )
+            {
+                MP4_Box_t *p_rdrf = MP4_BoxGet( p_rmra, "rmda[%d]/rdrf", i );
+                char      *psz_ref;
+                uint32_t  i_ref_type;
+
+                if( !p_rdrf || !( psz_ref = p_rdrf->data.p_rdrf->psz_ref ) )
+                {
+                    continue;
+                }
+                i_ref_type = p_rdrf->data.p_rdrf->i_ref_type;
+
+                msg_Dbg( p_input, "new ref=`%s' type=%4.4s",
+                         psz_ref, (char*)&i_ref_type );
+
+                if( i_ref_type == VLC_FOURCC( 'u', 'r', 'l', ' ' ) )
+                {
+                    if( strstr( psz_ref, "qt5gateQT" ) )
+                    {
+                        msg_Dbg( p_input, "ignoring pseudo ref =`%s'", psz_ref );
+                        continue;
+                    }
+                    if( !strncmp( psz_ref, "http://", 7 ) )
+                    {
+                        msg_Dbg( p_input, "adding ref = `%s'", psz_ref );
+                        playlist_Add( p_playlist, psz_ref, PLAYLIST_APPEND, PLAYLIST_END );
+                    }
+                    else
+                    {
+                        /* msg dbg relative ? */
+                        char *psz_absolute = alloca( strlen( p_input->psz_name ) + strlen( psz_ref ) + 1);
+                        char *end = strrchr( p_input->psz_name, '/' );
+
+                        if( end )
+                        {
+                            strncpy( psz_absolute, p_input->psz_name, end - p_input->psz_name + 1 );
+                        }
+                        else
+                        {
+                            strcpy( psz_absolute, "" );
+                        }
+                        strcat( psz_absolute, psz_ref );
+                        msg_Dbg( p_input, "adding ref = `%s'", psz_absolute );
+                        playlist_Add( p_playlist, psz_absolute, PLAYLIST_APPEND, PLAYLIST_END );
+                    }
+                }
+                else
+                {
+                    msg_Err( p_input, "unknown ref type=%4.4s FIXME (send a bug report)", (char*)&p_rdrf->data.p_rdrf->i_ref_type );
+                }
+            }
+            vlc_object_release( p_playlist );
+        }
+        else
+        {
+            msg_Err( p_input, "can't find playlist" );
+        }
+    }
+
     if( !(p_mvhd = MP4_BoxGet( &p_demux->box_root, "/moov/mvhd" ) ) )
     {
-        msg_Err( p_input, "cannot find /moov/mvhd" );
+        if( !p_rmra )
+        {
+            msg_Err( p_input, "cannot find /moov/mvhd" );
+        }
+        else
+        {
+            msg_Warn( p_input, "cannot find /moov/mvhd (pure ref file)" );
+        }
         MP4End( p_input );
         return( -1 );
     }
