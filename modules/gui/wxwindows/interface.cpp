@@ -1389,6 +1389,13 @@ wxVolCtrl::wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id,
   : wxGauge( parent, id, 200, point, size, wxGA_HORIZONTAL | wxGA_SMOOTH )
 {
     p_intf = _p_intf;
+
+    audio_volume_t i_volume;
+    aout_VolumeGet( p_intf, &i_volume );
+    i_volume = i_volume * 200 * 2 / AOUT_VOLUME_MAX;
+    SetValue( i_volume );
+    SetToolTip( wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
+                i_volume ) );
 }
 
 void wxVolCtrl::OnChange( wxMouseEvent& event )
