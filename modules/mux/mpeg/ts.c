@@ -412,7 +412,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->i_shaping_delay <= 0 )
     {
         msg_Err( p_mux,
-                 "invalid shaping ("I64Fd"ms) reseting to 200ms",
+                 "invalid shaping ("I64Fd"ms) resetting to 200ms",
                  p_sys->i_shaping_delay / 1000 );
         p_sys->i_shaping_delay = 200000;
     }
@@ -423,7 +423,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_pcr_delay >= p_sys->i_shaping_delay )
     {
         msg_Err( p_mux,
-                 "invalid pcr delay ("I64Fd"ms) reseting to 30ms",
+                 "invalid pcr delay ("I64Fd"ms) resetting to 30ms",
                  p_sys->i_pcr_delay / 1000 );
         p_sys->i_pcr_delay = 30000;
     }

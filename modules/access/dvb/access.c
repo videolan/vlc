@@ -71,6 +71,11 @@ static void    CloseProgram( input_thread_t * p_input );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define CACHING_TEXT N_("Caching value in ms")
+#define CACHING_LONGTEXT N_( \
+    "Allows you to modify the default caching value for dvb streams. This " \
+    "value should be set in millisecond units." )
+
 #define PROGRAM_TEXT N_("Program to decode")
 #define PROGRAM_LONGTEXT N_("This is a workaround for a bug in the input")
 
@@ -143,6 +148,8 @@ static void    CloseProgram( input_thread_t * p_input );
 vlc_module_begin();
     set_description( N_("DVB input with v4l2 support") );
 
+    add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
+                 CACHING_LONGTEXT, VLC_TRUE );
     add_integer( "dvb-adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
                  VLC_FALSE );
     add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
@@ -250,6 +257,10 @@ static int Open( vlc_object_t *p_this )
         free( p_dvb );
         return( -1 );
     }
+
+    var_Create( p_input, "dvb-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_input, "dvb-caching", &val );
+    p_input->i_pts_delay = val.i_int * 1000;
 
     var_Create( p_input, "dvb-adapter", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-device", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
