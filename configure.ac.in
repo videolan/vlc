@@ -1288,6 +1288,16 @@ then
 fi
 
 dnl
+dnl  raw dv demux plugin
+dnl
+AC_ARG_ENABLE(rawdv,
+  [  --enable-rawdv          raw dv demux module (default enabled)])
+if test "x${enable_rawdv}" != "xno"
+then
+  PLUGINS="${PLUGINS} rawdv"
+fi
+
+dnl
 dnl  Codec plugins
 dnl
 
@@ -2264,7 +2274,7 @@ then
     then
       AC_MSG_ERROR([Your development package for wxWindows is too old, you need at least version 2.3.0. Please upgrade and try again. Alternatively you can also configure with --disable-wxwindows.])
     fi
-    CXXFLAGS_wxwindows="${CXXFLAGS_wxwindows} `${WX_CONFIG} --cflags`"
+    CXXFLAGS_wxwindows="${CXXFLAGS_wxwindows} `${WX_CONFIG} --cxxflags`"
     LDFLAGS_wxwindows="${LDFLAGS_wxwindows} `${WX_CONFIG} --libs`"
     # now look for the wxprec.h header
     CPPFLAGS="${save_CPPFLAGS} ${CXXFLAGS_wxwindows}"
