@@ -786,7 +786,7 @@ vlc_module_begin();
     /* Interface options */
     add_category_hint( N_("Interface"), INTF_CAT_LONGTEXT , VLC_FALSE );
     add_module( "intf", "interface", NULL, NULL, INTF_TEXT,
-                INTF_LONGTEXT, VLC_TRUE );
+                INTF_LONGTEXT, VLC_FALSE );
         change_short('I');
     add_string( "extraintf", NULL, NULL, EXTRAINTF_TEXT,
                      EXTRAINTF_LONGTEXT, VLC_FALSE );

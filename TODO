@@ -13,15 +13,6 @@ Status: Todo
 
 Task
 Difficulty: Medium
-Urgency: Critical
-Platform: any
-Description: pointers in int
- We have been very persistent in storing pointers in int's. We knew this was gonna hunt us one day.
-The time is near. See this forum <a href="http://forum.videolan.org/viewtopic.php?p=14378">post</a>.
-Status: Todo
-
-Task
-Difficulty: Medium
 Platform: any
 Urgency: Wishlist
 Description: RAR/ZIP/... access
@@ -66,7 +57,8 @@ Difficulty: Hard
 Platform: WinCE
 Urgency: Wishlist
 Description: WinCE port finalizing
-Sources need to be imported into the VLC source tree.
+The WinCE port is already quite functional but we still miss a GAPI video output (GDI works but is slow) and an interface.
+Some code already exists for that (http://sourceforge.net/projects/vlcpocketpc/) and would need to be imported into the VLC source tree.
 Downloads should be added to the main vlc download page. We need an icon for this. 
 Status: Assigned to MixerAnderson
 
@@ -136,7 +128,7 @@ Difficulty: Medium
 Urgency: Normal
 Platform: any
 Description: fix current muxers.
-Our avi and mov muxer don't produce valid files
+Our avi muxer doesn't produce valid files
 Status: Todo
 
 Task
@@ -266,18 +258,8 @@ Difficulty: Medium
 Urgency: Normal
 Platform: any
 Description: RTSP server
-Full implementation of a RTSP server.
+Full implementation of a RTSP server. We already have a very basic implementation working but it does need a lot more work. See the following <a href="http://via.ecp.fr/via/ml/streaming/200408/msg00068.html">mail</a> and <a href="http://via.ecp.fr/via/ml/streaming/200410/msg00002.html">mail</a>.
 Status: 90%
-
-Task
-Difficulty: Medium
-Urgency: Normal
-Platform: any
-Description: Add VoD module for VLM
-Add a VoD module for VLM, so that we can create a RTSP server that can
-provide unicast RTSP sessions upon contacting the VoD module. See the following
-<a href="http://via.ecp.fr/via/ml/streaming/200408/msg00082.html">mail</a>.
-Status: 85% done
 
 Task
 Difficulty: Easy
