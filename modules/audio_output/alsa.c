@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.34 2003/08/03 23:11:21 gbazin Exp $
+ * $Id: alsa.c,v 1.35 2003/10/23 21:55:50 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -726,15 +726,20 @@ static void ALSAFill( aout_instance_t * p_aout )
                 msleep( p_sys->i_period_time >> 1 );
                 return;
             }
+
+            /* Underrun, try to recover as quickly as possible */
+            next_date = mdate();
         }
+        else
+        {
+            /* Here the device should be either in the RUNNING state.
+             * p_status is valid. */
 
-        /* Here the device should be either in the RUNNING state either in
-           the PREPARE state. p_status is valid. */
-
-        snd_pcm_status_get_tstamp( p_status, &ts_next );
-        next_date = (mtime_t)ts_next.tv_sec * 1000000 + ts_next.tv_usec;
-        next_date += (mtime_t)snd_pcm_status_get_delay(p_status)
-                     * 1000000 / p_aout->output.output.i_rate;
+            snd_pcm_status_get_tstamp( p_status, &ts_next );
+            next_date = (mtime_t)ts_next.tv_sec * 1000000 + ts_next.tv_usec;
+            next_date += (mtime_t)snd_pcm_status_get_delay(p_status)
+                * 1000000 / p_aout->output.output.i_rate;
+        }
 
         p_buffer = aout_OutputNextBuffer( p_aout, next_date,
                         (p_aout->output.output.i_format ==
