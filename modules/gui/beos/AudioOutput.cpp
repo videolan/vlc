@@ -2,7 +2,7 @@
  * aout.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.14 2002/10/30 06:12:27 titer Exp $
+ * $Id: AudioOutput.cpp,v 1.15 2002/10/30 06:37:20 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -136,6 +136,7 @@ static void Play( void *aout, void *buffer, size_t size,
        memcpy( p_buffer,
                p_aout_buffer->p_buffer,
                MIN( size, p_aout_buffer->i_nb_bytes ) );
+       aout_BufferFree( p_aout_buffer );
     }
 }
 
