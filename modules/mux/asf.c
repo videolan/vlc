@@ -2,7 +2,7 @@
  * asf.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: asf.c,v 1.5 2003/08/26 23:14:11 fenrir Exp $
+ * $Id: asf.c,v 1.6 2003/08/29 01:11:43 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -64,12 +64,18 @@ typedef struct
 
 typedef struct
 {
-    int     i_id;
-    int     i_cat;
-    int     i_sequence;
+    int          i_id;
+    int          i_cat;
 
-    int     i_extra;
-    uint8_t *p_extra;
+    /* codec informations */
+    uint16_t     i_tag;     /* for audio */
+    vlc_fourcc_t i_fourcc;  /* for video */
+    char         *psz_name; /* codec name */
+
+    int          i_sequence;
+
+    int          i_extra;
+    uint8_t     *p_extra;
 } asf_track_t;
 
 struct sout_mux_sys_t
@@ -116,6 +122,7 @@ static void bo_addle_u32( bo_t *, uint32_t );
 static void bo_addle_u64( bo_t *, uint64_t );
 static void bo_add_mem  ( bo_t *, uint8_t *, int );
 
+static void bo_addle_str16( bo_t *, char * );
 
 /*****************************************************************************
  * Open:
@@ -237,7 +244,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         case AUDIO_ES:
         {
-            uint16_t i_tag;
             int      i_blockalign = p_input->p_fmt->i_block_align;
             int      i_bitspersample = 0;
             int      i_extra = 0;
@@ -245,47 +251,57 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             switch( p_input->p_fmt->i_fourcc )
             {
                 case VLC_FOURCC( 'a', '5', '2', ' ' ):
-                    i_tag = WAVE_FORMAT_A52;
+                    tk->i_tag = WAVE_FORMAT_A52;
+                    tk->psz_name = "A/52";
                     break;
                 case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
 #if 1
-                    i_tag = WAVE_FORMAT_MPEGLAYER3;
+                    tk->psz_name = "MPEG Audio Layer 3";
+                    tk->i_tag = WAVE_FORMAT_MPEGLAYER3;
                     i_blockalign = 1;
                     i_extra = 12;
                     break;
 #else
-                    i_tag = WAVE_FORMAT_MPEG;
+                    tk->psz_name = "MPEG Audio Layer 1/2";
+                    tk->i_tag = WAVE_FORMAT_MPEG;
                     i_blockalign = 1;
                     i_extra = 22;
                     break;
 #endif
                 case VLC_FOURCC( 'w', 'm', 'a', '1' ):
-                    i_tag = WAVE_FORMAT_WMA1;
+                    tk->psz_name = "Windows Media Audio 1";
+                    tk->i_tag = WAVE_FORMAT_WMA1;
                     break;
                 case VLC_FOURCC( 'w', 'm', 'a', '2' ):
-                    i_tag = WAVE_FORMAT_WMA2;
+                    tk->psz_name = "Windows Media Audio 2";
+                    tk->i_tag = WAVE_FORMAT_WMA2;
                     break;
                 case VLC_FOURCC( 'w', 'm', 'a', '3' ):
-                    i_tag = WAVE_FORMAT_WMA3;
+                    tk->psz_name = "Windows Media Audio 3";
+                    tk->i_tag = WAVE_FORMAT_WMA3;
                     break;
                     /* raw codec */
                 case VLC_FOURCC( 'u', '8', ' ', ' ' ):
-                    i_tag = WAVE_FORMAT_PCM;
+                    tk->psz_name = "Raw audio 8bits";
+                    tk->i_tag = WAVE_FORMAT_PCM;
                     i_blockalign= p_input->p_fmt->i_channels;
                     i_bitspersample = 8;
                     break;
                 case VLC_FOURCC( 's', '1', '6', 'l' ):
-                    i_tag = WAVE_FORMAT_PCM;
+                    tk->psz_name = "Raw audio 16bits";
+                    tk->i_tag = WAVE_FORMAT_PCM;
                     i_blockalign= 2 * p_input->p_fmt->i_channels;
                     i_bitspersample = 16;
                     break;
                 case VLC_FOURCC( 's', '2', '4', 'l' ):
-                    i_tag = WAVE_FORMAT_PCM;
+                    tk->psz_name = "Raw audio 24bits";
+                    tk->i_tag = WAVE_FORMAT_PCM;
                     i_blockalign= 3 * p_input->p_fmt->i_channels;
                     i_bitspersample = 24;
                     break;
                 case VLC_FOURCC( 's', '3', '2', 'l' ):
-                    i_tag = WAVE_FORMAT_PCM;
+                    tk->psz_name = "Raw audio 32bits";
+                    tk->i_tag = WAVE_FORMAT_PCM;
                     i_blockalign= 4 * p_input->p_fmt->i_channels;
                     i_bitspersample = 32;
                     break;
@@ -293,11 +309,12 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     return VLC_EGENERIC;
             }
 
+
             tk->i_extra = sizeof( WAVEFORMATEX ) +
                           p_input->p_fmt->i_extra_data + i_extra;
             tk->p_extra = malloc( tk->i_extra );
             bo_init( &bo, tk->p_extra, tk->i_extra );
-            bo_addle_u16( &bo, i_tag );
+            bo_addle_u16( &bo, tk->i_tag );
             bo_addle_u16( &bo, p_input->p_fmt->i_channels );
             bo_addle_u32( &bo, p_input->p_fmt->i_sample_rate );
             bo_addle_u32( &bo, p_input->p_fmt->i_bitrate / 8 );
@@ -312,7 +329,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             else
             {
                 bo_addle_u16( &bo, i_extra );
-                if( i_tag == WAVE_FORMAT_MPEGLAYER3 )
+                if( tk->i_tag == WAVE_FORMAT_MPEGLAYER3 )
                 {
                     msg_Dbg( p_mux, "adding mp3 header" );
                     bo_addle_u16( &bo, 1 );     /* wId */
@@ -321,7 +338,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     bo_addle_u16( &bo, 1 );     /* nFramesPerBlock */
                     bo_addle_u16( &bo, 1393 );  /* nCodecDelay */
                 }
-                else if( i_tag == WAVE_FORMAT_MPEG )
+                else if( tk->i_tag == WAVE_FORMAT_MPEG )
                 {
                     msg_Dbg( p_mux, "adding mp2 header" );
                     bo_addle_u16( &bo, 2 );     /* fwHeadLayer */
@@ -364,24 +381,40 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             bo_addle_u16( &bo, 24 );
             if( p_input->p_fmt->i_fourcc == VLC_FOURCC('m','p','4','v') )
             {
-                bo_add_mem( &bo, "MP4S", 4 );
+                tk->psz_name = "MPEG-4 Video";
+                tk->i_fourcc = VLC_FOURCC( 'M', 'P', '4', 'S' );
             }
             else if( p_input->p_fmt->i_fourcc == VLC_FOURCC('D','I','V','3') )
             {
-                bo_add_mem( &bo, "MP43", 4 );
+                tk->psz_name = "MSMPEG-4 V3 Video";
+                tk->i_fourcc = VLC_FOURCC( 'M', 'P', '4', '3' );
             }
             else if( p_input->p_fmt->i_fourcc == VLC_FOURCC('D','I','V','2') )
             {
-                bo_add_mem( &bo, "MP42", 4 );
+                tk->psz_name = "MSMPEG-4 V2 Video";
+                tk->i_fourcc = VLC_FOURCC( 'M', 'P', '4', '2' );
             }
             else if( p_input->p_fmt->i_fourcc == VLC_FOURCC('D','I','V','1') )
             {
-                bo_add_mem( &bo, "MPG4", 4 );
+                tk->psz_name = "MSMPEG-4 V1 Video";
+                tk->i_fourcc = VLC_FOURCC( 'M', 'P', 'G', '4' );
+            }
+            else if( p_input->p_fmt->i_fourcc == VLC_FOURCC('W','M','V','1') )
+            {
+                tk->psz_name = "Windows Media Video 1";
+                tk->i_fourcc = VLC_FOURCC( 'W', 'M', 'V', '1' );
+            }
+            else if( p_input->p_fmt->i_fourcc == VLC_FOURCC('W','M','V','2') )
+            {
+                tk->psz_name = "Windows Media Video 2";
+                tk->i_fourcc = VLC_FOURCC( 'W', 'M', 'V', '2' );
             }
             else
             {
-                bo_add_mem( &bo, (uint8_t*)&p_input->p_fmt->i_fourcc, 4 );
+                tk->psz_name = "Unknow Video";
+                tk->i_fourcc = p_input->p_fmt->i_fourcc;
             }
+            bo_add_mem( &bo, (uint8_t*)&tk->i_fourcc, 4 );
             bo_addle_u32( &bo, 0 );
             bo_addle_u32( &bo, 0 );
             bo_addle_u32( &bo, 0 );
@@ -567,6 +600,22 @@ static void bo_add_mem( bo_t *p_bo, uint8_t *p_mem, int i_size )
     p_bo->i_buffer += i_size;
 }
 
+static void bo_addle_str16( bo_t *bo, char *str )
+{
+    bo_addle_u16( bo, strlen( str ) + 1 );
+    for( ;; )
+    {
+        uint16_t c;
+
+        c = (uint8_t)*str++;
+        bo_addle_u16( bo, c );
+        if( c == '\0' )
+        {
+            break;
+        }
+    }
+}
+
 /****************************************************************************
  * guid
  ****************************************************************************/
@@ -658,6 +707,20 @@ static const guid_t asf_guid_reserved_1 =
     0x11cf,
     { 0x8E, 0xE6,0x00, 0xC0, 0x0C ,0x20, 0x53, 0x65 }
 };
+static const guid_t asf_object_comment_guid =
+{
+    0x86D15240,
+    0x311D,
+    0x11D0,
+    { 0xA3, 0xA4, 0x00, 0xA0, 0xC9, 0x03, 0x48, 0xF6 }
+};
+static const guid_t asf_object_comment_reserved_guid =
+{
+    0x86D15241,
+    0x311D,
+    0x11D0,
+    { 0xA3, 0xA4, 0x00, 0xA0, 0xC9, 0x03, 0x48, 0xF6 }
+};
 
 static void asf_chunk_add( bo_t *bo,
                            int i_type, int i_len, int i_flags, int i_seq )
@@ -677,6 +740,7 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
 
     mtime_t        i_duration = 0;
     int i_size;
+    int i_ci_size;
     sout_buffer_t *out;
     bo_t          bo;
     int           i;
@@ -692,10 +756,22 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
 
     /* calculate header size */
     i_size = 30 + 104 + 46;
+    i_ci_size = 44;
     for( i = 1; i < p_sys->i_track; i++ )
     {
         i_size += 78 + p_sys->track[i].i_extra;
+        i_ci_size += 8 + 2 * strlen( p_sys->track[i].psz_name );
+        if( p_sys->track[i].i_cat == AUDIO_ES )
+        {
+            i_ci_size += 4;
+        }
+        else if( p_sys->track[i].i_cat == VIDEO_ES )
+        {
+            i_ci_size += 6;
+        }
     }
+
+    i_size += i_ci_size;
 
     if( p_sys->b_asf_http )
     {
@@ -765,6 +841,31 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
         bo_add_mem  ( &bo, tk->p_extra, tk->i_extra );
     }
 
+    /* Codec Infos */
+    bo_add_guid ( &bo, &asf_object_comment_guid );
+    bo_addle_u64( &bo, i_ci_size );
+    bo_add_guid ( &bo, &asf_object_comment_reserved_guid );
+    bo_addle_u32( &bo, p_sys->i_track - 1 );
+    for( i = 1; i < p_sys->i_track; i++ )
+    {
+        tk = &p_sys->track[i];
+
+        bo_addle_u16( &bo, tk->i_id );
+        bo_addle_str16( &bo, tk->psz_name );
+        bo_addle_u16( &bo, 0 );
+        if( tk->i_cat == AUDIO_ES )
+        {
+            bo_addle_u16( &bo, 2 );
+            bo_addle_u16( &bo, tk->i_tag );
+        }
+        else if( tk->i_cat == VIDEO_ES )
+        {
+            bo_addle_u16( &bo, 4 );
+            bo_add_mem  ( &bo, (uint8_t*)&tk->i_fourcc, 4 );
+
+        }
+    }
+
     /* data object */
     bo_add_guid ( &bo, &asf_object_data_guid );
     bo_addle_u64( &bo, 50 + p_sys->i_packet_count * p_sys->i_packet_size );
@@ -824,7 +925,7 @@ static sout_buffer_t *asf_packet_create( sout_mux_t *p_mux,
 
         p_sys->i_pk_frame++;
 
-        if( p_sys->i_pk_used + 14 >= p_sys->i_packet_size )
+        if( p_sys->i_pk_used + 17 >= p_sys->i_packet_size )
         {
             /* not enough data for another payload, flush the packet */
             int i_pad = p_sys->i_packet_size - p_sys->i_pk_used;
