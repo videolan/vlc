@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input_ext-intf.c,v 1.55 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: input_ext-intf.c,v 1.56 2004/01/25 17:16:05 zorglub Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -164,7 +164,6 @@ void __input_SetRate( vlc_object_t * p_this, int i_rate )
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         return;
     }
-   
     p_input->stream.i_new_status = FORWARD_S;
     p_input->stream.i_new_rate = i_rate;
 

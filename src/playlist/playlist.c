@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: playlist.c,v 1.75 2004/01/23 10:48:08 zorglub Exp $
+ * $Id: playlist.c,v 1.76 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -103,7 +103,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->i_sort = SORT_ID;
     p_playlist->i_order = ORDER_NORMAL;
 
-    playlist_CreateGroup( p_playlist, "Normal" );
+    playlist_CreateGroup( p_playlist, _("Normal") );
 
     if( vlc_thread_create( p_playlist, "playlist", RunThread,
                            VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )

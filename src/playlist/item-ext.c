@@ -2,7 +2,7 @@
  * item-ext.c : Exported playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item-ext.c,v 1.11 2004/01/23 10:48:08 zorglub Exp $
+ * $Id: item-ext.c,v 1.12 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -488,7 +488,7 @@ int playlist_DisableGroup( playlist_t * p_playlist, int i_group)
     int i;
     vlc_mutex_lock( &p_playlist->object_lock );
 
-    msg_Dbg(p_playlist,"Disabling group %i",i_group);
+    msg_Dbg(p_playlist,"disabling group %i",i_group);
     for( i = 0 ; i< p_playlist->i_size; i++ )
     {
         if( p_playlist->pp_items[i]->i_group == i_group )

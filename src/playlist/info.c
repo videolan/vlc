@@ -2,7 +2,7 @@
  * info.c : Playlist info management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: info.c,v 1.6 2004/01/23 10:48:08 zorglub Exp $
+ * $Id: info.c,v 1.7 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -384,7 +384,7 @@ int playlist_AddOption( playlist_t *p_playlist, int i_item,
         return VLC_EGENERIC;
     }
 
-    p_cat = playlist_GetCategory( p_playlist, i_item , "Options" );
+    p_cat = playlist_GetCategory( p_playlist, i_item , _("Options") );
 
     if( p_cat == NULL)
     {
@@ -422,7 +422,7 @@ int playlist_AddItemOption( playlist_item_t *p_item,
     item_info_t *p_info = NULL;
     item_info_category_t *p_cat;
 
-    p_cat = playlist_GetItemCategory( p_item, "Options" );
+    p_cat = playlist_GetItemCategory( p_item, _("Options") );
     if( p_cat == NULL)
     {
         return VLC_EGENERIC;

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.276 2004/01/15 23:40:44 gbazin Exp $
+ * $Id: input.c,v 1.277 2004/01/25 17:16:05 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -99,7 +99,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     /* Parse input options */
     for( i = 0 ; i < p_item->i_categories ; i++ )
     {
-        if( !strncmp( p_item->pp_categories[i]->psz_name, "Options", 7 ) )
+        if( !strncmp( p_item->pp_categories[i]->psz_name, _("Options"), 7 ) )
         {
             msg_Dbg(p_input,"Parsing %i options for item",
                              p_item->pp_categories[i]->i_infos );
@@ -739,9 +739,9 @@ static int InitThread( input_thread_t * p_input )
     p_input->s = stream_OpenInput( p_input );
     if( p_input->s == NULL )
     {
-        /* should nver occur yet */
+        /* should never occur yet */
 
-        msg_Err( p_input, "cannot create stream_t !" );
+        msg_Err( p_input, "cannot create stream_t" );
 
         module_Unneed( p_input, p_input->p_access );
         if ( p_input->stream.p_sout != NULL )
@@ -819,7 +819,8 @@ static int InitThread( input_thread_t * p_input )
     if( val.psz_string && *val.psz_string )
     {
         subtitle_demux_t *p_sub;
-        if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string), i_microsecondperframe, 0 ) ) )
+        if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string),
+                                    i_microsecondperframe, 0 ) ) )
         {
             p_sub_toselect = p_sub;
             TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
@@ -836,7 +837,8 @@ static int InitThread( input_thread_t * p_input )
         char **tmp2 = tmp;
         for( i = 0; *tmp2 != NULL; i++ )
         {
-            if( ( p_sub = subtitle_New( p_input, strdup(*tmp2++), i_microsecondperframe, i ) ) )
+            if( ( p_sub = subtitle_New( p_input, strdup(*tmp2++),
+                                        i_microsecondperframe, i ) ) )
             {
                 TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
             }
@@ -854,7 +856,8 @@ static int InitThread( input_thread_t * p_input )
                     val.b_bool ? ES_OUT_MODE_ALL : ES_OUT_MODE_AUTO );
     if( p_sub_toselect )
     {
-        es_out_Control( p_input->p_es_out, ES_OUT_SET_ES, p_sub_toselect->p_es, VLC_TRUE );
+        es_out_Control( p_input->p_es_out, ES_OUT_SET_ES,
+                        p_sub_toselect->p_es, VLC_TRUE );
     }
 
     return VLC_SUCCESS;

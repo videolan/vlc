@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: objects.c,v 1.44 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: objects.c,v 1.45 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -84,7 +84,7 @@ static vlc_mutex_t    structure_lock;
  * so on, vlc_object_create will use its value for the object size.
  *****************************************************************************/
 
-/** 
+/**
  * Initialize a vlc object
  *
  * This function allocates memory for a vlc object and initializes it. If
@@ -263,7 +263,7 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 /**
  ****************************************************************************
  * Destroy a vlc object
- * 
+ *
  * This function destroys an object that has been previously allocated with
  * vlc_object_create. The object's refcount must be zero and it must not be
  * attached to other objects in any way.

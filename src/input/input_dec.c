@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_dec.c,v 1.87 2004/01/19 18:15:29 fenrir Exp $
+ * $Id: input_dec.c,v 1.88 2004/01/25 17:16:05 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -82,9 +82,13 @@ struct decoder_owner_sys_t
 };
 
 
-/*****************************************************************************
- * input_RunDecoder: spawns a new decoder thread
- *****************************************************************************/
+/**
+ * Spawns a new decoder thread
+ *
+ * \param p_input the input thread
+ * \param p_es the es descriptor
+ * \return the spawned decoder object
+ */
 decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 {
     decoder_t      *p_dec = NULL;
@@ -180,9 +184,13 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
     return p_dec;
 }
 
-/*****************************************************************************
- * input_EndDecoder: kills a decoder thread and waits until it's finished
- *****************************************************************************/
+/**
+ * Kills a decoder thread and waits until it's finished
+ *
+ * \param p_input the input thread
+ * \param p_es the es descriptor
+ * \return nothing
+ */
 void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 {
     decoder_t *p_dec = p_es->p_dec;
@@ -234,11 +242,13 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
     p_input->stream.b_changed = 1;
 }
 
-/*****************************************************************************
- * input_DecodePES
- *****************************************************************************
+/**
  * Put a PES in the decoder's fifo.
- *****************************************************************************/
+ *
+ * \param p_dec the decoder object
+ * \param p_pes the pes packet
+ * \return nothing
+ */
 void input_DecodePES( decoder_t * p_dec, pes_packet_t * p_pes )
 {
     data_packet_t *p_data;
@@ -274,11 +284,13 @@ void input_DecodePES( decoder_t * p_dec, pes_packet_t * p_pes )
 
     input_DeletePES( p_dec->p_owner->p_method_data, p_pes );
 }
-/*****************************************************************************
- * input_DecodeBlock
- *****************************************************************************
+
+/**
  * Put a block_t in the decoder's fifo.
- *****************************************************************************/
+ *
+ * \param p_dec the decoder object
+ * \param p_block the data block
+ */
 void input_DecodeBlock( decoder_t * p_dec, block_t *p_block )
 {
     if( p_dec->p_owner->b_own_thread )
@@ -298,14 +310,17 @@ void input_DecodeBlock( decoder_t * p_dec, block_t *p_block )
     }
 }
 
-/*****************************************************************************
+/**
  * Create a NULL packet for padding in case of a data loss
- *****************************************************************************/
+ *
+ * \param p_input the input thread
+ * \param p_es es descriptor
+ * \return nothing
+ */
 static void input_NullPacket( input_thread_t * p_input,
                               es_descriptor_t * p_es )
 {
     block_t *p_block = block_New( p_input, PADDING_PACKET_SIZE );
-
     if( p_block )
     {
         memset( p_block->p_buffer, 0, PADDING_PACKET_SIZE );
@@ -315,9 +330,12 @@ static void input_NullPacket( input_thread_t * p_input,
     }
 }
 
-/*****************************************************************************
- * input_EscapeDiscontinuity: send a NULL packet to the decoders
- *****************************************************************************/
+/**
+ * Send a NULL packet to the decoders
+ *
+ * \param p_input the input thread
+ * \return nothing
+ */
 void input_EscapeDiscontinuity( input_thread_t * p_input )
 {
     unsigned int i_es, i;
@@ -336,9 +354,12 @@ void input_EscapeDiscontinuity( input_thread_t * p_input )
     }
 }
 
-/*****************************************************************************
- * input_EscapeAudioDiscontinuity: send a NULL packet to the audio decoders
- *****************************************************************************/
+/**
+ * Send a NULL packet to the audio decoders
+ *
+ * \param p_input the input thread
+ * \return nothing
+ */
 void input_EscapeAudioDiscontinuity( input_thread_t * p_input )
 {
     unsigned int i_es, i;
@@ -357,9 +378,14 @@ void input_EscapeAudioDiscontinuity( input_thread_t * p_input )
     }
 }
 
-/*****************************************************************************
- * CreateDecoder: create a decoder object
- *****************************************************************************/
+/**
+ * Create a decoder object
+ *
+ * \param p_input the input thread
+ * \param p_es the es descriptor
+ * \param i_object_type Object type as define in include/vlc_objects.h
+ * \return the decoder object
+ */
 static decoder_t * CreateDecoder( input_thread_t * p_input,
                                   es_descriptor_t * p_es, int i_object_type )
 {
@@ -479,9 +505,12 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
     return p_dec;
 }
 
-/*****************************************************************************
- * DecoderThread: the decoding main loop
- *****************************************************************************/
+/**
+ * The decoding main loop
+ *
+ * \param p_dec the decoder
+ * \return 0
+ */
 static int DecoderThread( decoder_t * p_dec )
 {
     block_t       *p_block;
@@ -523,9 +552,13 @@ static int DecoderThread( decoder_t * p_dec )
     return 0;
 }
 
-/*****************************************************************************
- * DecoderDecode: decode a block
- *****************************************************************************/
+/**
+ * Decode a block
+ *
+ * \param p_dec the decoder object
+ * \param p_block the block to decode
+ * \return VLC_SUCCESS or an error code
+ */
 static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 {
     if( p_block->i_buffer <= 0 )
@@ -623,16 +656,19 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
     }
     else
     {
-        msg_Err( p_dec, "unknown ES format !!" );
+        msg_Err( p_dec, "unknown ES format" );
         p_dec->b_error = 1;
     }
 
     return p_dec->b_error ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * DeleteDecoder: destroys a decoder object
- *****************************************************************************/
+/**
+ * Destroys a decoder object
+ *
+ * \param p_dec the decoder object
+ * \return nothing
+ */
 static void DeleteDecoder( decoder_t * p_dec )
 {
     vlc_object_detach( p_dec );
@@ -790,7 +826,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         }
         if( i_pic == p_dec->p_owner->p_vout->render.i_pictures )
         {
-            msg_Err( p_dec, "decoder is leaking pictures, reseting the heap" );
+            msg_Err( p_dec, "decoder is leaking pictures, resetting the heap" );
 
             /* Just free all the pictures */
             for( i_pic = 0; i_pic < p_dec->p_owner->p_vout->render.i_pictures;

@@ -2,7 +2,7 @@
  * demux.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: demux.c,v 1.9 2004/01/20 14:48:37 fenrir Exp $
+ * $Id: demux.c,v 1.10 2004/01/25 17:16:05 zorglub Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -142,7 +142,7 @@ int demux_vaControlDefault( input_thread_t *p_input, int i_query,
             break;
 
         default:
-            msg_Err( p_input, "unknown query in demux_vaControlDefault !!!" );
+            msg_Err( p_input, "unknown query in demux_vaControlDefault" );
             i_ret = VLC_EGENERIC;
             break;
     }

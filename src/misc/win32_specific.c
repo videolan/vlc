@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: win32_specific.c,v 1.31 2004/01/09 12:23:46 gbazin Exp $
+ * $Id: win32_specific.c,v 1.32 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -109,7 +109,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 
     fprintf( stderr, "error: can't initialize WinSocks\n" );
 
-    return; 
+    return;
 
 #endif
 }
@@ -147,14 +147,14 @@ void system_Configure( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     {
         HANDLE hmutex;
 
-        msg_Info( p_this, "One instance mode ENABLED");
+        msg_Info( p_this, "one instance mode ENABLED");
 
         /* Use a named mutex to check if another instance is already running */
         if( ( hmutex = CreateMutex( NULL, TRUE, "VLC ipc "VERSION ) ) == NULL )
         {
             /* Failed for some reason. Just ignore the option and go on as
              * normal. */
-            msg_Err( p_this, "One instance mode DISABLED "
+            msg_Err( p_this, "one instance mode DISABLED "
                      "(mutex couldn't be created)" );
             return;
         }
@@ -169,7 +169,7 @@ void system_Configure( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
             if( vlc_thread_create( p_helper, "IPC helper", IPCHelperThread,
                                    VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
             {
-                msg_Err( p_this, "One instance mode DISABLED "
+                msg_Err( p_this, "one instance mode DISABLED "
                          "(IPC helper thread couldn't be created)" );
 
             }
@@ -192,7 +192,7 @@ void system_Configure( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
             if( ( ipcwindow = FindWindow( NULL, "VLC ipc "VERSION ) )
                 == NULL )
             {
-                msg_Err( p_this, "One instance mode DISABLED "
+                msg_Err( p_this, "one instance mode DISABLED "
                          "(couldn't find 1st instance of program)" );
                 ReleaseMutex( hmutex );
                 return;

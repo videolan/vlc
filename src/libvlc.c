@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: libvlc.c,v 1.112 2004/01/25 11:48:17 gbazin Exp $
+ * $Id: libvlc.c,v 1.113 2004/01/25 17:16:05 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -510,7 +510,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
     var_AddCallback( p_vlc, "verbose", VerboseCallback, NULL );
     var_Change( p_vlc, "verbose", VLC_VAR_TRIGGER_CALLBACKS, NULL, NULL );
-    
+
     libvlc.b_color = libvlc.b_color && config_GetInt( p_vlc, "color" );
 
     /*
@@ -1056,7 +1056,7 @@ int VLC_Stop( int i_object )
     /*
      * Free playlists
      */
-    
+
     msg_Dbg( p_vlc, "removing all playlists" );
     while( (p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST,
                                           FIND_CHILD )) )
@@ -1065,7 +1065,7 @@ int VLC_Stop( int i_object )
         vlc_object_release( p_playlist );
         playlist_Destroy( p_playlist );
     }
-    
+
     /*
      * Free video outputs
      */

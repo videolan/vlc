@@ -2,7 +2,7 @@
  * error.c: error handling routine
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: error.c,v 1.3 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: error.c,v 1.4 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -64,7 +64,7 @@ char const * vlc_error ( int i_err )
         case VLC_EGENERIC:
             return "generic error";
         default:
-            return "unkown error";
+            return "unknown error";
     }
 }
 

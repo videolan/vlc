@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: mtime.c,v 1.42 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: mtime.c,v 1.43 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -69,7 +69,7 @@ int nanosleep(struct timespec *, struct timespec *);
  *
  * This function converts a mtime date into a string.
  * psz_buffer should be a buffer long enough to store the formatted
- * date. 
+ * date.
  * \param date to be converted
  * \param psz_buffer should be a buffer at least MSTRTIME_MAX_SIZE characters
  * \return psz_buffer is returned so this can be used as printf parameter.
@@ -100,8 +100,8 @@ char *mstrtime( char *psz_buffer, mtime_t date )
 char *secstotimestr( char *psz_buffer, int i_seconds )
 {
     snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%d:%2.2d:%2.2d",
-              (int) (i_seconds / (60 *60)), 
-              (int) ((i_seconds / 60) % 60), 
+              (int) (i_seconds / (60 *60)),
+              (int) ((i_seconds / 60) % 60),
               (int) (i_seconds % 60) );
     return( psz_buffer );
 }
@@ -212,7 +212,7 @@ void mwait( mtime_t date )
 {
 #if defined( HAVE_KERNEL_OS_H )
     mtime_t delay;
-    
+
     delay = date - real_time_clock_usecs();
     if( delay <= 0 )
     {

@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: stream.c,v 1.12 2004/01/21 17:01:54 fenrir Exp $
+ * $Id: stream.c,v 1.13 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -138,7 +138,8 @@ int stream_vaControl( stream_t *s, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
 
-            if( i_skip > 0 && i_skip < s->p_input->p_last_data - s->p_input->p_current_data - 1 )
+            if( i_skip > 0 && i_skip < s->p_input->p_last_data -
+                            s->p_input->p_current_data - 1 )
             {
                 /* We can skip without reading/seeking */
                 s->p_input->p_current_data += i_skip;
@@ -150,7 +151,8 @@ int stream_vaControl( stream_t *s, int i_query, va_list args )
 
             if( s->p_input->stream.b_seekable &&
                 ( s->p_input->stream.i_method == INPUT_METHOD_FILE ||
-                  i_skip < 0 || i_skip >= ( s->p_input->i_mtu > 0 ? s->p_input->i_mtu : 4096 ) ) )
+                  i_skip < 0 || i_skip >= ( s->p_input->i_mtu > 0 ?
+                                            s->p_input->i_mtu : 4096 ) ) )
             {
                 input_AccessReinit( s->p_input );
                 s->p_input->pf_seek( s->p_input, i64 );
@@ -336,7 +338,7 @@ char *stream_ReadLine( stream_t *s )
         p_line = malloc( i + 1 );
         if( p_line == NULL )
         {
-            msg_Err( s->p_input, "Out of memory" );
+            msg_Err( s->p_input, "out of memory" );
             return NULL;
         }
         i = stream_Read( s, p_line, i + 1 );
@@ -345,4 +347,3 @@ char *stream_ReadLine( stream_t *s )
         return p_line;
     }
 }
-

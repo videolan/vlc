@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: video_output.c,v 1.244 2004/01/10 13:59:25 rocky Exp $
+ * $Id: video_output.c,v 1.245 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -70,10 +70,10 @@ static int FilterCallback( vlc_object_t *, char const *,
  *
  * Set the i_aspect_x and i_aspect_y from i_aspect.
  */
-void vout_AspectRatio( unsigned int i_aspect, 
-		       /*out*/ unsigned int *i_aspect_x, 
-		       /*out*/ unsigned int *i_aspect_y )
-{ 
+void vout_AspectRatio( unsigned int i_aspect,
+                       /*out*/ unsigned int *i_aspect_x,
+                       /*out*/ unsigned int *i_aspect_y )
+{
   unsigned int i_pgcd = ReduceHeight( i_aspect );
   *i_aspect_x = i_aspect / i_pgcd;
   *i_aspect_y = VOUT_ASPECT_FACTOR / i_pgcd;
@@ -108,7 +108,7 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
             }
             else
             {
-                msg_Dbg( p_this, "cannot find playlist destroying vout" );
+                msg_Dbg( p_this, "cannot find playlist, destroying vout" );
                 vlc_object_detach( p_vout );
                 vout_Destroy( p_vout );
             }
@@ -348,9 +348,9 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
 
             if( i_new_aspect && i_new_aspect != i_aspect )
             {
-	        unsigned int i_aspect_x, i_aspect_y;
-		
-		vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
+                unsigned int i_aspect_x, i_aspect_y;
+
+                vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
 
                 msg_Dbg( p_vout, "overriding source aspect ratio to %i:%i",
                          i_aspect_x, i_aspect_y );
@@ -504,16 +504,16 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
  * update using one of the THREAD_* constants.
  *****************************************************************************/
 void vout_Destroy( vout_thread_t *p_vout )
-{ 
+{
     vlc_object_t *p_playlist;
-    
+
     /* Request thread destruction */
     p_vout->b_die = VLC_TRUE;
     vlc_thread_join( p_vout );
 
     var_Destroy( p_vout, "intf-change" );
 
-    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST, 
+    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
                                   FIND_ANYWHERE );
 
     if( p_vout->psz_filter_chain ) free( p_vout->psz_filter_chain );
@@ -524,7 +524,7 @@ void vout_Destroy( vout_thread_t *p_vout )
     /* If it was the last vout, tell the interface to show up */
     if( p_playlist != NULL )
     {
-        vout_thread_t *p_another_vout = vlc_object_find( p_playlist, 
+        vout_thread_t *p_another_vout = vlc_object_find( p_playlist,
                                             VLC_OBJECT_VOUT, FIND_ANYWHERE );
         if( p_another_vout == NULL )
         {
@@ -599,7 +599,7 @@ static int InitThread( vout_thread_t *p_vout )
 
             if( i_new_aspect && i_new_aspect != p_vout->output.i_aspect )
             {
-		vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
+                vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
 
                 msg_Dbg( p_vout, "output ratio forced to %i:%i\n",
                          i_aspect_x, i_aspect_y );
@@ -1109,7 +1109,7 @@ static void EndThread( vout_thread_t *p_vout )
     {
         module_Unneed( p_vout, p_vout->chroma.p_module );
     }
-    
+
     /* Destroy all remaining pictures */
     for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES; i_index++ )
     {
@@ -1131,7 +1131,7 @@ static void EndThread( vout_thread_t *p_vout )
 
     if( p_vout->p_text_renderer_module )
         module_Unneed( p_vout, p_vout->p_text_renderer_module );
-    
+
     /* Destroy translation tables */
     p_vout->pf_end( p_vout );
 
@@ -1162,7 +1162,7 @@ static int ReduceHeight( int i_ratio )
 {
     int i_dummy = VOUT_ASPECT_FACTOR;
     int i_pgcd  = 1;
- 
+
     if( !i_ratio )
     {
         return i_pgcd;

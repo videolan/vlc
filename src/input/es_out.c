@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: es_out.c,v 1.20 2004/01/22 00:00:34 fenrir Exp $
+ * $Id: es_out.c,v 1.21 2004/01/25 17:16:05 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -78,9 +78,12 @@ static void         EsOutDel    ( es_out_t *, es_out_id_t * );
 static int          EsOutControl( es_out_t *, int i_query, va_list );
 
 
-/*****************************************************************************
- * input_EsOutNew:
- *****************************************************************************/
+/**
+ * Create a new es_out structure
+ *
+ * \param p_input The related input thread
+ * \return the new es_out_t
+ */
 es_out_t *input_EsOutNew( input_thread_t *p_input )
 {
     es_out_t     *out = malloc( sizeof( es_out_t ) );
@@ -121,9 +124,12 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     return out;
 }
 
-/*****************************************************************************
- * input_EsOutDelete:
- *****************************************************************************/
+/**
+ * Deletes an es_out structure
+ *
+ * \param out  the es_out structure to destroy
+ * \return nothing
+ */
 void input_EsOutDelete( es_out_t *out )
 {
     es_out_sys_t *p_sys = out->p_sys;
@@ -140,9 +146,14 @@ void input_EsOutDelete( es_out_t *out )
     free( p_sys );
     free( out );
 }
-/*****************************************************************************
- * EsOutAddProgram:
- *****************************************************************************/
+
+/**
+ * Add a program
+ *
+ * \param out the es_out
+ * \param i_group ...
+ * \return a program descriptor for the new program
+ */
 static pgrm_descriptor_t *EsOutAddProgram( es_out_t *out, int i_group )
 {
     input_thread_t    *p_input = out->p_sys->p_input;
@@ -158,7 +169,7 @@ static pgrm_descriptor_t *EsOutAddProgram( es_out_t *out, int i_group )
 
     /* XXX welcome to kludge, add a dummy es, if you want to understand
      * why have a look at input_SetProgram. Basicaly, it assume the first
-     * es to be the PMT, how that is stupide, nevertheless it is needed for
+     * es to be the PMT, how that is stupid, nevertheless it is needed for
      * the old ts demuxer */
     p_pmt = input_AddES( p_input, p_prgm, 0, UNKNOWN_ES, NULL, 0 );
     p_pmt->i_fourcc = VLC_FOURCC( 'n', 'u', 'l', 'l' );
@@ -173,10 +184,15 @@ static pgrm_descriptor_t *EsOutAddProgram( es_out_t *out, int i_group )
     return p_prgm;
 }
 
-/*****************************************************************************
- * EsOutSelect: Select an ES given the current mode
+/**
+ * Select an ES given the current mode
  * XXX: you need to take a the lock before (stream.stream_lock)
- *****************************************************************************/
+ *
+ * \param out The es_out structure
+ * \param es es_out_id structure
+ * \param b_force ...
+ * \return nothing
+ */
 static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
 {
     es_out_sys_t      *p_sys = out->p_sys;
@@ -267,9 +283,13 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
     }
 }
 
-/*****************************************************************************
- * EsOutAdd:
- *****************************************************************************/
+/**
+ * Add an es_out
+ *
+ * \param out the es_out to add
+ * \param fmt the es_format of the es_out
+ * \return an es_out id
+ */
 static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 {
     es_out_sys_t      *p_sys = out->p_sys;
@@ -277,7 +297,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     input_thread_t    *p_input = p_sys->p_input;
     es_out_id_t       *es = malloc( sizeof( es_out_id_t ) );
     pgrm_descriptor_t *p_prgm = NULL;
-    char              psz_cat[sizeof( "Stream " ) + 10];
+    char              psz_cat[sizeof( _("Stream ") ) + 10];
     input_info_category_t *p_cat;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -529,9 +549,13 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     return es;
 }
 
-/*****************************************************************************
- * EsOutSend:
- *****************************************************************************/
+/**
+ * Send a block for the given es_out
+ *
+ * \param out the es_out to send from
+ * \param es the es_out_id
+ * \param p_block the data block to send
+ */
 static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 {
     es_out_sys_t *p_sys = out->p_sys;
@@ -624,9 +648,14 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     free( es );
 }
 
-/*****************************************************************************
- * EsOutControl:
- *****************************************************************************/
+/**
+ * Control query handler
+ *
+ * \param out the es_out to control
+ * \param i_query A es_out query as defined in include/ninput.h
+ * \param args a variable list of arguments for the query
+ * \return VLC_SUCCESS or an error code
+ */
 static int EsOutControl( es_out_t *out, int i_query, va_list args )
 {
     es_out_sys_t *p_sys = out->p_sys;

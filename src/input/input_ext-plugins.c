@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: input_ext-plugins.c,v 1.39 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: input_ext-plugins.c,v 1.40 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -141,7 +141,7 @@ void input_BuffersEnd( input_thread_t * p_input, input_buffers_t * p_buffers )
                 free( p_buf );
                 p_buf = p_next;
             }
-        } 
+        }
 
         if( p_buffers->i_allocated )
         {
@@ -598,7 +598,7 @@ ssize_t input_SplitBuffer( input_thread_t * p_input,
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.p_selected_area->i_tell += i_size;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
- 
+
     return i_size;
 }
 

@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: configuration.c,v 1.74 2004/01/12 23:41:59 gbazin Exp $
+ * $Id: configuration.c,v 1.75 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1133,7 +1133,7 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                          psz_key ? psz_key : "" );
                 if ( psz_key ) free( psz_key );
                 break;
-                
+
             case CONFIG_ITEM_FLOAT:
                 if( p_item->psz_text )
                     fprintf( file, "# %s (%s)\n", p_item->psz_text,

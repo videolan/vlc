@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: interface.c,v 1.111 2004/01/13 18:45:06 gbazin Exp $
+ * $Id: interface.c,v 1.112 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -67,7 +67,7 @@ static int AddIntfCallback( vlc_object_t *, char const *,
  *****************************************************************************/
 /**
  * Create the interface, and prepare it for main loop.
- * 
+ *
  * \param p_this the calling vlc_object_t
  * \param psz_module a prefered interface module
  * \return a pointer to the created interface thread, NULL on error
@@ -131,7 +131,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
 /**
  * Run the interface thread.
  *
- * If b_block is not set, runs the interface in the thread, else, 
+ * If b_block is not set, runs the interface in the thread, else,
  * creates a new thread and runs the interface.
  * \param p_intf the interface thread
  * \return VLC_SUCCESS on success, an error number else
@@ -168,11 +168,6 @@ int intf_RunThread( intf_thread_t *p_intf )
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * intf_StopThread: end the interface thread
- *****************************************************************************
- * This function asks the interface thread to stop.
- *****************************************************************************/
 /**
  * Stops the interface thread
  *
@@ -192,15 +187,10 @@ void intf_StopThread( intf_thread_t *p_intf )
     vlc_thread_join( p_intf );
 }
 
-/*****************************************************************************
- * intf_Destroy: clean interface after main loop
- *****************************************************************************
- * This function destroys specific interfaces and close output devices.
- *****************************************************************************/
 /**
  * \brief Destroy the interface after the main loop endeed.
- * 
- * Destroys interfaces and output devices
+ *
+ * Destroys interfaces and closes output devices
  * \param p_intf the interface thread
  * \return nothing
  */

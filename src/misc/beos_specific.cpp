@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: beos_specific.cpp,v 1.36 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: beos_specific.cpp,v 1.37 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -223,7 +223,7 @@ void VlcApplication::MessageReceived(BMessage* message)
             fReadyToQuit = true;
             PostMessage( B_QUIT_REQUESTED );
             break;
-        
+
         default:
             BApplication::MessageReceived(message);
     }

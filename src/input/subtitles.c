@@ -2,7 +2,7 @@
  * subtitles.c
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: subtitles.c,v 1.7 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: subtitles.c,v 1.8 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
  * This is adapted code from the GPL'ed MPlayer (http://mplayerhq.hu)
@@ -265,7 +265,8 @@ char** subtitles_Detect( input_thread_t *p_this, char *psz_path, char *psz_fname
                         }
                         else
                         {
-                            /* chars after (and possibly in front of) the movie name */
+                            /* chars after (and possibly in front of)
+                             * the movie name */
                             i_prio = 3;
                         }
                     }

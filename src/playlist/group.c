@@ -2,7 +2,7 @@
  * playlist.c : Playlist groups management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: group.c,v 1.8 2004/01/23 10:48:08 zorglub Exp $
+ * $Id: group.c,v 1.9 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -63,7 +63,7 @@ playlist_group_t * playlist_CreateGroup(playlist_t * p_playlist, char *psz_name)
     p_group->psz_name = strdup( psz_name );
     p_group->i_id = ++p_playlist->i_last_group;
 
-    msg_Dbg(p_playlist,"Creating group %s with id %i at position %i",
+    msg_Dbg(p_playlist,"creating group %s with id %i at position %i",
                      p_group->psz_name,
                      p_group->i_id,
                      p_playlist->i_groups);

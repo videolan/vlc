@@ -2,7 +2,7 @@
  * net.c:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: net.c,v 1.8 2004/01/22 17:03:44 gbazin Exp $
+ * $Id: net.c,v 1.9 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -232,7 +232,7 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
             /* On win32 recv() will fail if the datagram doesn't fit inside
              * the passed buffer, even though the buffer will be filled with
              * the first part of the datagram. */
-            if( WSAGetLastError() == WSAEMSGSIZE ) 
+            if( WSAGetLastError() == WSAEMSGSIZE )
             {
                 msg_Err( p_this, "recv() failed. "
                          "Increase the mtu size (--mtu option)" );

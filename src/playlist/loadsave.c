@@ -2,7 +2,7 @@
  * loadsave.c : Playlist loading / saving functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: loadsave.c,v 1.8 2004/01/23 23:06:25 rocky Exp $
+ * $Id: loadsave.c,v 1.9 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -99,10 +99,10 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     if( !p_export->p_file )
     {
 #ifdef HAVE_ERRNO_H
-        msg_Err( p_playlist , "Could not create playlist file %s"
+        msg_Err( p_playlist , "could not create playlist file %s"
                  " (%s)", psz_filename, strerror(errno) );
 #else
-        msg_Err( p_playlist , "Could not create playlist file %s"
+        msg_Err( p_playlist , "could not create playlist file %s"
                  , psz_filename );
 #endif
         return VLC_EGENERIC;
@@ -116,7 +116,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     p_module = module_Need( p_playlist, "playlist export",  psz_type);
     if( !p_module )
     {
-        msg_Warn( p_playlist, "Failed to export playlist" );
+        msg_Warn( p_playlist, "failed to export playlist" );
         vlc_mutex_unlock( &p_playlist->object_lock );
         return VLC_ENOOBJ;
     }

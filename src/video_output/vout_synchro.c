@@ -2,7 +2,7 @@
  * vout_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: vout_synchro.c,v 1.6 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: vout_synchro.c,v 1.7 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -64,7 +64,7 @@
  *    ========================
  * On fast machines, we decode all I's.
  * Otherwise :
- * We can decode an I picture if we simply have enough time to decode it 
+ * We can decode an I picture if we simply have enough time to decode it
  * before displaying :
  *      t0 - t > tau´I + DELTA
  *
@@ -139,7 +139,7 @@ vout_synchro_t * __vout_SynchroInit( vlc_object_t * p_object,
     p_synchro->current_pts = mdate() + DEFAULT_PTS_DELAY;
     p_synchro->backward_pts = 0;
     p_synchro->i_current_period = p_synchro->i_backward_period = 0;
-    p_synchro->i_trashed_pic = p_synchro->i_not_chosen_pic = 
+    p_synchro->i_trashed_pic = p_synchro->i_not_chosen_pic =
         p_synchro->i_pic = 0;
 
     p_synchro->i_frame_rate = i_frame_rate;
@@ -352,7 +352,7 @@ void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
     mtime_t         period = 1000000 * 1001 / p_synchro->i_frame_rate
                               * i_current_rate / DEFAULT_RATE;
 #if 0
-    mtime_t         now = mdate(); 
+    mtime_t         now = mdate();
 #endif
     p_synchro->i_current_rate = i_current_rate;
 
@@ -426,7 +426,7 @@ void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
 
     p_synchro->current_pts += p_synchro->i_current_period
                                         * (period >> 1);
- 
+
 #define PTS_THRESHOLD   (period >> 2)
     if( i_coding_type == B_CODING_TYPE )
     {
@@ -457,7 +457,7 @@ void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
 
         if( p_synchro->backward_pts )
         {
-            if( next_dts && 
+            if( next_dts &&
                 (next_dts - p_synchro->backward_pts
                     > PTS_THRESHOLD
               || p_synchro->backward_pts - next_dts

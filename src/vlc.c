@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: vlc.c,v 1.20 2004/01/06 12:02:05 zorglub Exp $
+ * $Id: vlc.c,v 1.21 2004/01/25 17:16:05 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -51,7 +51,7 @@ int main( int i_argc, char *ppsz_argv[] )
 {
     int i_ret;
 
-    fprintf( stderr, "VideoLAN Client %s\n", VLC_Version() );
+    fprintf( stderr, "VLC media player %s\n", VLC_Version() );
 
 #ifdef HAVE_PUTENV
 #   ifdef DEBUG

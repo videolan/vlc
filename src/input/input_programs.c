@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_programs.c,v 1.128 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: input_programs.c,v 1.129 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -126,7 +126,7 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     var_AddCallback( p_input, "audio-es", ESCallback, NULL );
     var_AddCallback( p_input, "spu-es", ESCallback, NULL );
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

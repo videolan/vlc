@@ -2,7 +2,7 @@
  * input_info.c: Convenient functions to handle the input info structures
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input_info.c,v 1.13 2004/01/15 23:40:44 gbazin Exp $
+ * $Id: input_info.c,v 1.14 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -63,7 +63,7 @@ input_info_category_t * input_InfoCategory( input_thread_t * p_input,
         p_category = malloc( sizeof( input_info_category_t ) );
         if ( !p_category )
         {
-            msg_Err( p_input, "No mem" );
+            msg_Err( p_input, "out of memory" );
             return NULL;
         }
         p_category->psz_name = strdup( psz_name );
@@ -94,9 +94,9 @@ int input_AddInfo( input_info_category_t * p_category, char * psz_name,
     {
         return -1;
     }
-    
+
     va_start( args, psz_format );
-    
+
     /*
      * Convert message to string
      */
@@ -143,13 +143,13 @@ int input_AddInfo( input_info_category_t * p_category, char * psz_name,
  * \internal
  *
  * \param p_input The input thread to be cleaned for info
- * \returns for the moment 0
+ * \returns for the moment VLC_SUCCESS
  */
 int input_DelInfo( input_thread_t * p_input )
 {
     input_info_category_t * p_category, * p_prev_category;
     input_info_t * p_info, * p_prev_info;
-    
+
     p_category = p_input->stream.p_info;
     while ( p_category )
     {
@@ -176,5 +176,5 @@ int input_DelInfo( input_thread_t * p_input )
         p_category = p_category->p_next;
         free( p_prev_category );
     }
-    return 0;
+    return VLC_SUCCESS;
 }

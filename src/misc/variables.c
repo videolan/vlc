@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: variables.c,v 1.36 2004/01/09 20:36:21 hartman Exp $
+ * $Id: variables.c,v 1.37 2004/01/25 17:16:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -76,7 +76,7 @@ static void DupList( vlc_value_t *p_val )
         switch( p_val->p_list->pi_types[i] & VLC_VAR_TYPE )
         {
         case VLC_VAR_STRING:
-            
+
             DupString( &p_list->p_values[i] );
             break;
         default:
