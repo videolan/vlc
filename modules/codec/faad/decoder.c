@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.8 2002/10/27 16:58:13 gbazin Exp $
+ * $Id: decoder.c,v 1.9 2002/10/27 17:23:17 titer Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -172,7 +172,7 @@ static inline void __GetFrame( adec_thread_t *p_adec )
         input_ExtractPES( p_adec->p_fifo, &p_pes );
         if( !p_pes )
         {
-            p_vdec->p_framedata = NULL;
+            p_adec->p_framedata = NULL;
             return;
         }
     }
@@ -212,7 +212,7 @@ static inline void __GetFrame( adec_thread_t *p_adec )
 
 static inline void __NextFrame( adec_thread_t *p_adec )
 {
-    input_ExtractPES( p_vdec->p_fifo, NULL );
+    input_ExtractPES( p_adec->p_fifo, NULL );
 }
 
 

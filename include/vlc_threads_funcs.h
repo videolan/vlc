@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.6 2002/10/15 08:35:24 sam Exp $
+ * $Id: vlc_threads_funcs.h,v 1.7 2002/10/27 17:23:17 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -315,6 +315,7 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
                 return 0;
             }
         }
+        i_result = 0;
     }
 #endif
 
@@ -450,6 +451,7 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
                 return 0;
             }
         }
+        i_result = 0;
     }
 #endif
 
