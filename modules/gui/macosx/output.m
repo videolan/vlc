@@ -2,7 +2,7 @@
  * output.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.m,v 1.17 2003/12/11 16:00:09 hartman Exp $
+ * $Id: output.m,v 1.18 2004/01/25 17:01:57 murray Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -135,11 +135,11 @@
     [o_btn_browse setTitle: _NS("Browse...")]; 
     [o_stream_address_lbl setStringValue: _NS("Address")];
     [o_stream_port_lbl setStringValue: _NS("Port")];
-    [o_stream_ttl_lbl setStringValue: _NS("TTL")];
-    [[o_stream_type itemAtIndex: 0] setTitle: _NS("HTTP")];
-    [[o_stream_type itemAtIndex: 1] setTitle: _NS("MMSH")];
-    [[o_stream_type itemAtIndex: 2] setTitle: _NS("UDP")];
-    [[o_stream_type itemAtIndex: 3] setTitle: _NS("RTP")];
+    [o_stream_ttl_lbl setStringValue: @"TTL"];
+    [[o_stream_type itemAtIndex: 0] setTitle: @"HTTP"];
+    [[o_stream_type itemAtIndex: 1] setTitle: @"MMSH"];
+    [[o_stream_type itemAtIndex: 2] setTitle: @"UDP"];
+    [[o_stream_type itemAtIndex: 3] setTitle: @"RTP"];
     [o_stream_type_lbl setStringValue: _NS("Type")];
     
     [o_mux_lbl setStringValue: _NS("Encapsulation Method")];
@@ -238,7 +238,7 @@
         
         o_mode = [o_stream_type titleOfSelectedItem];
         
-        if( [o_mode isEqualToString: _NS("HTTP")] )
+        if( [o_mode isEqualToString: @"HTTP"] )
         {
             [o_stream_address setEnabled: YES];
             [o_stream_ttl setEnabled: NO];
@@ -251,7 +251,7 @@
             [[o_mux_selector itemAtIndex: 6] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 7] setEnabled: NO];
         }
-        else if( [o_mode isEqualToString: _NS("MMSH")] )
+        else if( [o_mode isEqualToString: @"MMSH"] )
         {
             [o_stream_address setEnabled: YES];
             [o_stream_ttl setEnabled: NO];
@@ -265,7 +265,7 @@
             [[o_mux_selector itemAtIndex: 6] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 7] setEnabled: NO];
         }
-        else if( [o_mode isEqualToString: _NS("UDP")] )
+        else if( [o_mode isEqualToString: @"UDP"] )
         {
             [o_stream_address setEnabled: YES];
             [o_stream_ttl setEnabled: YES];
@@ -281,7 +281,7 @@
             [o_slp_chkbox setEnabled: YES];
             [o_channel_name setEnabled: YES];
         }
-        else if( [o_mode isEqualToString: _NS("RTP")] )
+        else if( [o_mode isEqualToString: @"RTP"] )
         {
             [o_stream_address setEnabled: YES];
             [o_stream_ttl setEnabled: YES];
@@ -316,13 +316,13 @@
     o_mode = [[o_method selectedCell] title];
     o_mux = [o_mux_selector titleOfSelectedItem];
 
-    if ( [o_mux isEqualToString: _NS("AVI")] ) o_mux_string = @"avi";
-    else if ( [o_mux isEqualToString: _NS("Ogg")] ) o_mux_string = @"ogg";
-    else if ( [o_mux isEqualToString: _NS("MPEG PS")] ) o_mux_string = @"ps";
-    else if ( [o_mux isEqualToString: _NS("MPEG 4")] ) o_mux_string = @"mp4";
-    else if ( [o_mux isEqualToString: _NS("MPEG 1")] ) o_mux_string = @"mpeg1";
-    else if ( [o_mux isEqualToString: _NS("Quicktime")] ) o_mux_string = @"mov";
-    else if ( [o_mux isEqualToString: _NS("ASF")] ) o_mux_string = @"asf";
+    if ( [o_mux isEqualToString: @"AVI"] ) o_mux_string = @"avi";
+    else if ( [o_mux isEqualToString: @"Ogg"] ) o_mux_string = @"ogg";
+    else if ( [o_mux isEqualToString: @"MPEG PS"] ) o_mux_string = @"ps";
+    else if ( [o_mux isEqualToString: @"MPEG 4"] ) o_mux_string = @"mp4";
+    else if ( [o_mux isEqualToString: @"MPEG 1"] ) o_mux_string = @"mpeg1";
+    else if ( [o_mux isEqualToString: @"Quicktime"] ) o_mux_string = @"mov";
+    else if ( [o_mux isEqualToString: @"ASF"] ) o_mux_string = @"asf";
     else o_mux_string = @"ts";
 
     if( [o_mode isEqualToString: _NS("File")] )
@@ -347,14 +347,14 @@
         o_mode = [o_stream_type titleOfSelectedItem];
         o_announce = @"";
         
-        if ( [o_mode isEqualToString: _NS("HTTP")] )
+        if ( [o_mode isEqualToString: @"HTTP"] )
             o_mode = @"http";
-        else if ( [o_mode isEqualToString: _NS("MMSH")] )
+        else if ( [o_mode isEqualToString: @"MMSH"] )
         {
-            if ( [o_mux isEqualToString: _NS("ASF")] ) o_mux_string = @"asfh";
+            if ( [o_mux isEqualToString: @"ASF"] ) o_mux_string = @"asfh";
             o_mode = @"mmsh";
         }
-        else if ( [o_mode isEqualToString: _NS("UDP")] )
+        else if ( [o_mode isEqualToString: @"UDP"] )
         {
             o_mode = @"udp";
             if( [o_sap_chkbox state] == NSOnState )
@@ -373,7 +373,7 @@
                     o_announce = [o_announce stringByAppendingString: @",slp"];
             }
         }
-        else if ( [o_mode isEqualToString: _NS("RTP")] )
+        else if ( [o_mode isEqualToString: @"RTP"] )
             o_mode = @"rtp";
             
         [o_mrl_string appendFormat:
@@ -398,19 +398,19 @@
 {
     NSSavePanel *o_save_panel = [NSSavePanel savePanel];
     NSString *o_mux_string;
-    if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("MPEG PS")] )
+    if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"MPEG PS"] )
         o_mux_string = @"vob";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("MPEG 1")] )
+    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"MPEG 1"] )
         o_mux_string = @"mpg";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("AVI")] )
+    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"AVI"] )
         o_mux_string = @"avi";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("ASF")] )
+    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"ASF"] )
         o_mux_string = @"asf";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("Ogg")] )
+    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"Ogg"] )
         o_mux_string = @"ogm";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("MPEG 4")] )
+    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"MPEG 4"] )
         o_mux_string = @"mp4";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("Quicktime")] )
+    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: @"Quicktime"] )
         o_mux_string = @"mov";
     else
         o_mux_string = @"ts";

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vout.h: MacOS X interface plugin
+ * vout.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.h,v 1.16 2003/11/15 22:42:16 hartman Exp $
+ * $Id: vout.h,v 1.17 2004/01/25 17:01:57 murray Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * intf.h: MacOS X interface plugin
+ * intf.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: intf.h,v 1.55 2004/01/09 22:11:04 hartman Exp $
+ * $Id: intf.h,v 1.56 2004/01/25 17:01:57 murray Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>

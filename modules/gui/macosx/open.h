@@ -1,8 +1,8 @@
 /*****************************************************************************
- * open.h: MacOS X plugin for vlc
+ * open.h: MacOS X module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.h,v 1.16 2003/10/19 23:12:16 hartman Exp $
+ * $Id: open.h,v 1.17 2004/01/25 17:01:57 murray Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>

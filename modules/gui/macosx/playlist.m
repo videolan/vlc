@@ -1,8 +1,8 @@
 /*****************************************************************************
- * playlist.m: MacOS X interface plugin
+ * playlist.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlist.m,v 1.54 2004/01/20 15:34:43 hartman Exp $
+ * $Id: playlist.m,v 1.55 2004/01/25 17:01:57 murray Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -169,9 +169,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
-    [o_random_ckb setTitle: _NS("Shuffle")];
-    [o_loop_ckb setTitle: _NS("Repeat Playlist")];
-    [o_repeat_ckb setTitle: _NS("Repeat Item")];
+    [o_random_ckb setTitle: _NS("Random")];
+    [o_loop_ckb setTitle: _NS("Repeat All")];
+    [o_repeat_ckb setTitle: _NS("Repeat One")];
     [o_search_button setTitle: _NS("Search")];
     [o_btn_playlist setToolTip: _NS("Playlist")];
 }

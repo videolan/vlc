@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vout.m: MacOS X video output plugin
+ * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.68 2003/12/22 17:08:22 bigben Exp $
+ * $Id: vout.m,v 1.69 2004/01/25 17:01:57 murray Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * prefs.m: MacOS X plugin for vlc
+ * prefs.m: MacOS X module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.36 2003/12/22 14:32:56 sam Exp $
+ * $Id: prefs.m,v 1.37 2004/01/25 17:01:57 murray Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -204,7 +204,7 @@
 {
     NSBeginInformationalAlertSheet(_NS("Reset Preferences"), _NS("Cancel"), _NS("Continue"), 
         nil, o_prefs_window, self, @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil,
-        _NS("Beware this will reset your VLC Media Player config file.\n"
+        _NS("Beware this will reset your VLC media player preferences.\n"
             "Are you sure you want to continue?") );
 }
 
@@ -892,7 +892,7 @@ static VLCTreeItem *o_root_item = nil;
         module_config_t *p_item;
         int i_index,j;
 
-        /* List the plugins */
+        /* List the modules */
         p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
         if( !p_list ) return nil;
 
@@ -909,7 +909,7 @@ static VLCTreeItem *o_root_item = nil;
             }
             if( p_module == NULL )
             {
-                msg_Err( p_intf, "Could not find the main module in our prefs" );
+                msg_Err( p_intf, "could not find the main module in our preferences" );
                 return nil;
             }
             if( i_index < p_list->i_count )
@@ -936,7 +936,7 @@ static VLCTreeItem *o_root_item = nil;
                 }
                 while( p_item->i_type != CONFIG_HINT_END && p_item++ );
                 
-                /* Add the plugins item */
+                /* Add the modules item */
                 [o_children addObject:[[VLCTreeItem alloc] initWithName: _NS("Modules")
                     ID: 0 parent:self]];
             }
@@ -957,7 +957,7 @@ static VLCTreeItem *o_root_item = nil;
                 if( !strcmp( p_module->psz_object_name, "main" ) )
                     continue;
         
-                /* Exclude empty plugins */
+                /* Exclude empty modules */
                 p_item = p_module->p_config;
                 if( !p_item ) continue;
                 do
@@ -1027,7 +1027,7 @@ static VLCTreeItem *o_root_item = nil;
                 if( !strcmp( p_module->psz_object_name, "main" ) )
                     continue;
         
-                /* Exclude empty plugins */
+                /* Exclude empty modules */
                 p_item = p_module->p_config;
                 if( !p_item ) continue;
                 do

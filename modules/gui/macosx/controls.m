@@ -1,8 +1,8 @@
 /*****************************************************************************
- * controls.m: MacOS X interface plugin
+ * controls.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.59 2003/12/15 19:25:56 bigben Exp $
+ * $Id: controls.m,v 1.60 2004/01/25 17:01:57 murray Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -170,11 +170,11 @@
     var_Set( p_playlist, "random", val );
     if( val.b_bool )
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Shuffle On" ) );
+        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Random On" ) );
     }
     else
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Shuffle Off" ) );
+        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Random Off" ) );
     }    
 
     p_intf->p_sys->b_playlist_update = VLC_TRUE;
@@ -198,7 +198,7 @@
     var_Set( p_playlist, "repeat", val );
     if( val.b_bool )
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Repeat On" ) );
+        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Repeat All" ) );
     }
     else
     {
@@ -226,11 +226,11 @@
     var_Set( p_playlist, "loop", val );
     if( val.b_bool )
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Loop On" ) );
+        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Repeat One" ) );
     }
     else
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Loop Off" ) );
+        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Repeat Off" ) );
     }    
 
     p_intf->p_sys->b_playlist_update = VLC_TRUE;
@@ -348,9 +348,9 @@
                     [o_window scaleWindowWithFactor: 1.0];
                 else if( [o_title isEqualToString: _NS("Double Size") ] )
                     [o_window scaleWindowWithFactor: 2.0];
-                else if( [o_title isEqualToString: _NS("Float On Top") ] )
+                else if( [o_title isEqualToString: _NS("Float on Top") ] )
                     [o_window toggleFloatOnTop];
-                else if( [o_title isEqualToString: _NS("Fit To Screen") ] )
+                else if( [o_title isEqualToString: _NS("Fit to Screen") ] )
                 {
                     if( ![o_window isZoomed] )
                         [o_window performZoom:self];
@@ -662,21 +662,21 @@
             }
         }
     }
-    else if( [[o_mi title] isEqualToString: _NS("Shuffle")] )
+    else if( [[o_mi title] isEqualToString: _NS("Random")] )
     {
         int i_state;
         var_Get( p_playlist, "random", &val );
         i_state = val.b_bool ? NSOnState : NSOffState;
         [o_mi setState: i_state];
     }
-    else if( [[o_mi title] isEqualToString: _NS("Repeat Item")] )
+    else if( [[o_mi title] isEqualToString: _NS("Repeat One")] )
     {
         int i_state;
         var_Get( p_playlist, "repeat", &val );
         i_state = val.b_bool ? NSOnState : NSOffState;
         [o_mi setState: i_state];
     }
-    else if( [[o_mi title] isEqualToString: _NS("Repeat Playlist")] )
+    else if( [[o_mi title] isEqualToString: _NS("Repeat All")] )
     {
         int i_state;
         var_Get( p_playlist, "loop", &val );
@@ -705,15 +705,15 @@
                 [[o_mi title] isEqualToString: _NS("Half Size")] ||
                 [[o_mi title] isEqualToString: _NS("Normal Size")] ||
                 [[o_mi title] isEqualToString: _NS("Double Size")] ||
-                [[o_mi title] isEqualToString: _NS("Fit To Screen")] ||
-                [[o_mi title] isEqualToString: _NS("Float On Top")] )
+                [[o_mi title] isEqualToString: _NS("Fit to Screen")] ||
+                [[o_mi title] isEqualToString: _NS("Float on Top")] )
     {
         id o_window;
         NSArray *o_windows = [NSApp orderedWindows];
         NSEnumerator *o_enumerator = [o_windows objectEnumerator];
         bEnabled = FALSE;
         
-        if ( [[o_mi title] isEqualToString: _NS("Float On Top")] )
+        if ( [[o_mi title] isEqualToString: _NS("Float on Top")] )
         {
             int i_state = config_GetInt( p_playlist, "video-on-top" ) ?
                       NSOnState : NSOffState;

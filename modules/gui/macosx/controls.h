@@ -1,8 +1,8 @@
 /*****************************************************************************
- * controls.h: MacOS X interface plugin
+ * controls.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.h,v 1.8 2003/12/11 19:34:47 hartman Exp $
+ * $Id: controls.h,v 1.9 2004/01/25 17:01:57 murray Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>

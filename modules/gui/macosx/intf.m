@@ -1,8 +1,8 @@
 /*****************************************************************************
- * intf.m: MacOS X interface plugin
+ * intf.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: intf.m,v 1.113 2004/01/09 22:11:04 hartman Exp $
+ * $Id: intf.m,v 1.114 2004/01/25 17:01:57 murray Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -438,7 +438,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     - (void)initStrings
 {
     [o_window setTitle: _NS("VLC - Controller")];
-    [o_scrollfield setStringValue: _NS("VLC Media Player")];
+    [o_scrollfield setStringValue: _NS("VLC media player")];
 
     /* button controls */
     [o_btn_prev setToolTip: _NS("Previous")];
@@ -485,9 +485,9 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     [o_mi_slower setTitle: _NS("Slower")];
     [o_mi_previous setTitle: _NS("Previous")];
     [o_mi_next setTitle: _NS("Next")];
-    [o_mi_random setTitle: _NS("Shuffle")];
-    [o_mi_repeat setTitle: _NS("Repeat Item")];
-    [o_mi_loop setTitle: _NS("Repeat Playlist")];
+    [o_mi_random setTitle: _NS("Random")];
+    [o_mi_repeat setTitle: _NS("Repeat One")];
+    [o_mi_loop setTitle: _NS("Repeat All")];
     [o_mi_fwd setTitle: _NS("Step Forward")];
     [o_mi_bwd setTitle: _NS("Step Backward")];
     [o_mi_program setTitle: _NS("Program")];
@@ -501,12 +501,12 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     [o_mi_vol_up setTitle: _NS("Volume Up")];
     [o_mi_vol_down setTitle: _NS("Volume Down")];
     [o_mi_mute setTitle: _NS("Mute")];
-    [o_mi_audiotrack setTitle: _NS("Audio track")];
-    [o_mu_audiotrack setTitle: _NS("Audio track")];
-    [o_mi_channels setTitle: _NS("Audio channels")];
-    [o_mu_channels setTitle: _NS("Audio channels")];
-    [o_mi_device setTitle: _NS("Audio device")];
-    [o_mu_device setTitle: _NS("Audio device")];
+    [o_mi_audiotrack setTitle: _NS("Audio Track")];
+    [o_mu_audiotrack setTitle: _NS("Audio Track")];
+    [o_mi_channels setTitle: _NS("Audio Channels")];
+    [o_mu_channels setTitle: _NS("Audio Channels")];
+    [o_mi_device setTitle: _NS("Audio Device")];
+    [o_mu_device setTitle: _NS("Audio Device")];
     [o_mi_visual setTitle: _NS("Visualizations")];
     [o_mu_visual setTitle: _NS("Visualizations")];
     
@@ -514,15 +514,15 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     [o_mi_half_window setTitle: _NS("Half Size")];
     [o_mi_normal_window setTitle: _NS("Normal Size")];
     [o_mi_double_window setTitle: _NS("Double Size")];
-    [o_mi_fittoscreen setTitle: _NS("Fit To Screen")];
+    [o_mi_fittoscreen setTitle: _NS("Fit to Screen")];
     [o_mi_fullscreen setTitle: _NS("Fullscreen")];
-    [o_mi_floatontop setTitle: _NS("Float On Top")];
-    [o_mi_videotrack setTitle: _NS("Video track")];
-    [o_mu_videotrack setTitle: _NS("Video track")];
-    [o_mi_screen setTitle: _NS("Video device")];
-    [o_mu_screen setTitle: _NS("Video device")];
-    [o_mi_subtitle setTitle: _NS("Subtitles track")];
-    [o_mu_subtitle setTitle: _NS("Subtitles track")];
+    [o_mi_floatontop setTitle: _NS("Float on Top")];
+    [o_mi_videotrack setTitle: _NS("Video Track")];
+    [o_mu_videotrack setTitle: _NS("Video Track")];
+    [o_mi_screen setTitle: _NS("Video Device")];
+    [o_mu_screen setTitle: _NS("Video Device")];
+    [o_mi_subtitle setTitle: _NS("Subtitles Track")];
+    [o_mu_subtitle setTitle: _NS("Subtitles Track")];
     [o_mi_deinterlace setTitle: _NS("Deinterlace")];
     [o_mu_deinterlace setTitle: _NS("Deinterlace")];
 
