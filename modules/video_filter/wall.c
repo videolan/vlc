@@ -355,7 +355,8 @@ static int Init( vout_thread_t *p_vout )
             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout =
                 vout_Create( p_vout, i_width, i_height,
                              p_vout->render.i_chroma,
-                             VOUT_ASPECT_FACTOR * i_width / i_height );
+                             i_aspect * i_target_height / i_height *
+                             i_width / i_target_width );
             if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout == NULL )
             {
                 msg_Err( p_vout, "failed to get %ix%i vout threads",
