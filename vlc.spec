@@ -767,6 +767,7 @@ rm -fr %buildroot
 %dir %_libdir/vlc/packetizer
 %_libdir/vlc/packetizer/libpacketizer_a52_plugin.so
 %_libdir/vlc/packetizer/libpacketizer_copy_plugin.so
+%_libdir/vlc/packetizer/libpacketizer_mpeg4audio_plugin.so
 %_libdir/vlc/packetizer/libpacketizer_mpeg4video_plugin.so
 %_libdir/vlc/packetizer/libpacketizer_mpegaudio_plugin.so
 %_libdir/vlc/packetizer/libpacketizer_mpegvideo_plugin.so
