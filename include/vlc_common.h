@@ -726,42 +726,42 @@ static inline void _SetQWLE( uint8_t *p, uint64_t i_qw )
 #endif
 
 #ifndef HAVE_STRCASECMP
-#   ifdef HAVE_STRICMP
+#   ifndef HAVE_STRICMP
+#       define strcasecmp vlc_strcasecmp
+        VLC_EXPORT( int, vlc_strcasecmp, ( const char *s1, const char *s2 ) );
+#   else
 #       define strcasecmp stricmp
 #       if !defined(__PLUGIN__)
 #           define vlc_strcasecmp NULL
 #       endif
-#   elif !defined(__PLUGIN__)
-#       define strcasecmp vlc_strcasecmp
-        VLC_EXPORT( int, vlc_strcasecmp, ( const char *s1, const char *s2 ) );
 #   endif
 #elif !defined(__PLUGIN__)
 #   define vlc_strcasecmp NULL
 #endif
 
 #ifndef HAVE_STRNCASECMP
-#   ifdef HAVE_STRNICMP
+#   ifndef HAVE_STRNICMP
+#       define strncasecmp vlc_strncasecmp
+        VLC_EXPORT( int, vlc_strncasecmp, ( const char *s1, const char *s2, size_t n ) );
+#   else
 #       define strncasecmp strnicmp
 #       if !defined(__PLUGIN__)
 #           define vlc_strncasecmp NULL
 #       endif
-#   elif !defined(__PLUGIN__)
-#       define strncasecmp vlc_strncasecmp
-        VLC_EXPORT( int, vlc_strncasecmp, ( const char *s1, const char *s2, size_t n ) );
 #   endif
 #elif !defined(__PLUGIN__)
 #   define vlc_strncasecmp NULL
 #endif
 
 #ifndef HAVE_STRCASESTR
-#   ifdef HAVE_STRISTR
+#   ifndef HAVE_STRISTR
+#       define strcasestr vlc_strcasestr
+        VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
+#   else
 #       define strcasestr stristr
 #       if !defined(__PLUGIN__)
 #           define vlc_strcasestr NULL
 #       endif
-#   elif !defined(__PLUGIN__)
-#       define strcasestr vlc_strcasestr
-        VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) );
 #   endif
 #elif !defined(__PLUGIN__)
 #   define vlc_strcasestr NULL
