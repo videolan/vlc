@@ -3,6 +3,7 @@ Makefile
 Makefile.in
 compile
 config.guess
+config.rpath
 config.sub
 depcomp
 install-sh

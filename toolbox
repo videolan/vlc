@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.20 2003/04/06 23:21:13 massiot Exp $
+##  $Id: toolbox,v 1.21 2003/04/09 16:05:58 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -27,6 +27,7 @@ recognized flags are:
   --update-glade                generate and fix Glade code
   --update-glade2               generate and fix Glade 2 code
   --update-flexml               generate and fix flexml and flex code
+  --distclean                   "make distclean"
 EOF
   exit 1
 }
@@ -71,6 +72,9 @@ case "$1" in
     ;;
   --update-glade2|--update-glade-2|--fix-glade2)
     action=glade2
+    ;;
+  --distclean)
+    action=distclean
     ;;
   --help)
     help
@@ -487,5 +491,28 @@ then
   sed 's@int main@//int main@' < $file > $file.$$.bak
   mv -f $file.$$.bak $file
   flex -oflex.c -BLs skin.l
+fi
+
+##
+##  Make distclean
+##
+if test "${action}" = "distclean"
+then
+  set -x
+  # a naive sanity check to make sure we are in a VLC tree
+  test -f vlc.spec -a -f debian/rules || exit 1
+  # let's rock!
+  find . -type f '(' -name '*.[oa]' -o -name '*.so' -o -name '*.sl' -o -name '*.dylib' -o -name '*.dll' -o -name .dirstamp -o -name Makefile.in -o -name 'stamp-h*' -o -name '*~' -o -name '*.bak' -o -name '*.moc.cpp' ')' -exec rm -f '{}' ';'
+  (cd autotools && find . -name '[a-z]*' -exec rm -f '{}' ';')
+  (cd debian && find . -type d -name '[a-z]*' -maxdepth 1 -exec rm -Rf '{}' ';')
+  find msvc -type f -name '*.dsp' -exec rm -f '{}' ';'
+  find evc -type f -name '*.vcp' -exec rm -f '{}' ';'
+  #find . -type d -name '.deps' -exec rm -Rf '{}' ';'
+  # there's some more cruft all around
+  rm -f configure.ac config.h config.log config.status
+  rm -f vlc vlc-config Makefile Modules.am
+  rm -Rf autom4te.cache
+  rm -f mozilla/vlcintf.h mozilla/vlcintf.xpt
+  # FIXME: a lot of Makefiles are still there
 fi
 
