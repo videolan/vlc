@@ -20,6 +20,7 @@ PLUGINS_DIR :=	a52 \
 		access \
 		alsa \
 		arts \
+		avi \
 		beos \
 		chroma \
 		directx \
@@ -30,6 +31,7 @@ PLUGINS_DIR :=	a52 \
 		dvdread \
 		esd \
 		fb \
+		ffmpeg \
 		filter \
 		fx \
 		ggi \
@@ -69,6 +71,7 @@ PLUGINS_TARGETS := a52/a52 \
 		access/http \
 		alsa/alsa \
 		arts/arts \
+		avi/avi \
 		beos/beos \
 		chroma/chroma_i420_rgb \
 		chroma/chroma_i420_rgb_mmx \
@@ -89,6 +92,7 @@ PLUGINS_TARGETS := a52/a52 \
 		dvdread/dvdread \
 		esd/esd \
 		fb/fb \
+		ffmpeg/ffmpeg \
 		filter/filter_deinterlace \
 		filter/filter_transform \
 		filter/filter_invert \
