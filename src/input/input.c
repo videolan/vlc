@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.145 2001/10/23 03:06:50 jobi Exp $
+ * $Id: input.c,v 1.146 2001/10/30 10:48:14 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -592,8 +592,8 @@ static void FileOpen( input_thread_t * p_input )
             psz_name += 4;
             i_stat = stat( psz_name, &stat_info );
         }
-	else if( ( i_size > 4 )
-            && !strncasecmp( psz_name, "vcd:", 4 ) )
+        else if( ( i_size > 4 )
+                 && !strncasecmp( psz_name, "vcd:", 4 ) )
         {
             /* get rid of the 'vcd:' stuff and try again */
             psz_name += 4;

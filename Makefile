@@ -133,6 +133,7 @@ clean: libdvdcss-clean plugins-clean vlc-clean
 	rm -f src/*/*.o extras/*/*.o
 	rm -f lib/*.so* lib/*.a
 	rm -f plugins/*.so plugins/*.a
+	rm -rf extras/MacOSX/build
 
 libdvdcss-clean:
 	-cd extras/libdvdcss && $(MAKE) clean
@@ -279,7 +280,7 @@ snapshot-nocss: snapshot-common
 libdvdcss-snapshot: snapshot-common
 	# Remove vlc sources and icons, doc, debian directory...
 	rm -Rf tmp/vlc/src tmp/vlc/share tmp/vlc/plugins tmp/vlc/doc
-	rm -Rf tmp/vlc/extras/GNUgetopt tmp/vlc/extras/MacOSX_app
+	rm -Rf tmp/vlc/extras/GNUgetopt tmp/vlc/extras/MacOSX
 	rm -Rf tmp/vlc/debian
 	# Remove useless headers
 	rm -f tmp/vlc/include/*
@@ -321,13 +322,11 @@ gnome-vlc gvlc kvlc qvlc: vlc
 vlc.app: Makefile.opts
 ifneq (,$(findstring darwin,$(SYS)))
 	rm -Rf vlc.app
-	mkdir -p vlc.app/Contents/Resources
-	mkdir -p vlc.app/Contents/MacOS/lib
-	mkdir -p vlc.app/Contents/MacOS/share
-	$(INSTALL) -m 644 extras/MacOSX_app/Contents/Info.plist vlc.app/Contents/
-	$(INSTALL) -m 644 extras/MacOSX_app/Contents/PkgInfo vlc.app/Contents/
+	cd extras/MacOSX ; pbxbuild | grep -v '^ ' | grep -v '^\t'
+	cp -r extras/MacOSX/build/vlc.bundle ./vlc.app
+	$(INSTALL) -d vlc vlc.app/Contents/MacOS/share
+	$(INSTALL) -d vlc vlc.app/Contents/MacOS/plugins
 	$(INSTALL) vlc vlc.app/Contents/MacOS/
-	$(INSTALL) share/vlc.icns vlc.app/Contents/Resources/
 ifneq (,$(PLUGINS))
 	$(INSTALL) $(PLUGINS:%=plugins/%.so) vlc.app/Contents/MacOS/plugins
 endif

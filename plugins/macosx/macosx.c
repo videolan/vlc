@@ -2,10 +2,11 @@
  * macosx.c : MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.c,v 1.6 2001/10/08 16:20:25 massiot Exp $
+ * $Id: macosx.c,v 1.7 2001/10/30 10:48:14 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
+ *	    Florian G. Pflug <fgp@phlo.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME macosx
 #include "modules_inner.h"
 
 /*****************************************************************************

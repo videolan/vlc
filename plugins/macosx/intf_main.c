@@ -1,9 +1,10 @@
 /*****************************************************************************
- * intf_macosx.c: MacOS X interface plugin
+ * intf_main.c: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
  *
- * Authors: Colin Delacroix <colin@zoy.org>
+ * Authors: 	Colin Delacroix <colin@zoy.org>
+ *		Florian G. Pflug <fgp@phlo.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME macosx
 #include "modules_inner.h"
 
 /*****************************************************************************
@@ -38,14 +40,21 @@
 
 #include "interface.h"
 #include "intf_msg.h"
-#include "intf_playlist.h"
-
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"
 
-#include "macosx_qt_common.h"
+/* OS specific */
+#import <Cocoa/Cocoa.h>
+
+
+/*****************************************************************************
+ * intf_sys_t: description and status of the interface
+ *****************************************************************************/
+typedef struct intf_sys_s
+{
+    NSAutoreleasePool *o_pool ;
+} intf_sys_t;
 
 
 /*****************************************************************************
@@ -55,12 +64,6 @@ static int  intf_Probe     ( probedata_t *p_data );
 static int  intf_Open      ( intf_thread_t *p_intf );
 static void intf_Close     ( intf_thread_t *p_intf );
 static void intf_Run       ( intf_thread_t *p_intf );
-
-/* OS specific */
-#define kMainLoopFrequency  (kEventDurationSecond)		//45 for good measure
-
-static pascal OSStatus FS_suspend_resume_handler(EventHandlerCallRef ref, EventRef event, void *dummy) ;
-static pascal void APP_timer_handler(EventLoopTimerRef timer, void *dummy) ;
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -82,13 +85,13 @@ void _M( intf_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int intf_Probe( probedata_t *p_data )
 {
-    if( TestMethod( INTF_METHOD_VAR, "macosx_qt" ) )
+    if( TestMethod( INTF_METHOD_VAR, "macosx" ) )
     {
         return( 999 );
     }
 
     /* Under MacOS X, this plugin always works */
-    return( 90 );
+    return( 100 );
 }
 
 /*****************************************************************************
@@ -102,6 +105,11 @@ static int intf_Open( intf_thread_t *p_intf )
         return( 1 );
     };
 
+    p_intf->p_sys->o_pool =[[NSAutoreleasePool alloc] init];
+
+    [NSApplication sharedApplication];
+    [NSBundle loadNibNamed:@"MainMenu" owner:NSApp];
+
     return( 0 );
 }
 
@@ -111,6 +119,8 @@ static int intf_Open( intf_thread_t *p_intf )
 static void intf_Close( intf_thread_t *p_intf )
 {
     /* Destroy structure */
+    [NSApp terminate:NSApp] ;
+    [p_intf->p_sys->o_pool release] ;
     free( p_intf->p_sys );
 }
 
@@ -119,41 +129,5 @@ static void intf_Close( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Run( intf_thread_t *p_intf )
 {
-    static EventTypeSpec suspendResumeEvent[2] = {{kEventClassApplication,kEventAppActivated}, {kEventClassApplication,kEventAppDeactivated}} ;
-
-    BeginFullScreen(&p_intf->p_sys->before_fullscreen, nil, 0, 0, &p_intf->p_sys->p_window, 0, fullScreenAllowEvents) ;
-    InstallStandardEventHandler(GetApplicationEventTarget()) ;
-    InstallApplicationEventHandler(NewEventHandlerUPP(FS_suspend_resume_handler), 2, suspendResumeEvent, &p_intf->p_sys->p_window, NULL) ;
-    InstallEventLoopTimer(GetMainEventLoop(), 0, kMainLoopFrequency, NewEventLoopTimerUPP(APP_timer_handler), NULL, &p_intf->p_sys->r_timer) ;
-    ShowWindow(p_intf->p_sys->p_window );
-    p_intf->p_sys->b_active = 1 ;
-
-    RunApplicationEventLoop() ;
-
-    p_intf->p_sys->b_active = 0 ;
-    EndFullScreen(p_intf->p_sys->before_fullscreen, nil) ;
+    [NSApp run] ;
 }
-
-static pascal void APP_timer_handler(EventLoopTimerRef timer, void *dummy)
-{
-	p_main->p_intf->pf_manage(p_main->p_intf) ;
-	
-	if (p_main->p_intf->b_die) QuitApplicationEventLoop() ;
-}
-
-static pascal OSStatus FS_suspend_resume_handler(EventHandlerCallRef ref, EventRef event, void *dummy)
-{
-	switch (GetEventKind(event))
-	{
-		case kEventAppActivated:	ShowWindow(p_main->p_intf->p_sys->p_window) ;
-						SetPortWindowPort(p_main->p_intf->p_sys->p_window) ;
-						intf_WarnMsg(1, "Application is on foreground") ;
-						break ;
-		case kEventAppDeactivated:	HideWindow(p_main->p_intf->p_sys->p_window) ;
-						intf_WarnMsg(1, "Application sent to background") ;
-						break ;
-	}
-
-	return noErr ;
-}
-

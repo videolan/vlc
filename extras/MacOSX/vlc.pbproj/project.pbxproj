@@ -1,0 +1,347 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 34;
+	objects = {
+		F510A6CC01738ED001A80A1F = {
+			isa = PBXFileReference;
+			name = intf_vlc_wrapper.h;
+			path = plugins/macosx/intf_vlc_wrapper.h;
+			refType = 4;
+		};
+		F510A6CD01738ED001A80A1F = {
+			isa = PBXFileReference;
+			name = intf_vlc_wrapper.c;
+			path = plugins/macosx/intf_vlc_wrapper.c;
+			refType = 4;
+		};
+		F511306E0170620B01A80A1F = {
+			buildStyles = (
+				F51130710170620B01A80A1F,
+			);
+			isa = PBXProject;
+			mainGroup = F511306F0170620B01A80A1F;
+			productRefGroup = F511306F0170620B01A80A1F;
+			projectDirPath = "";
+			targets = (
+				F52EEB23017E3F0701A80A1F,
+			);
+		};
+		F511306F0170620B01A80A1F = {
+			children = (
+				F5121224017062C501A80A1F,
+				F5121225017062C501A80A1F,
+				F52EEB22017E3F0701A80A1F,
+			);
+			isa = PBXGroup;
+			refType = 4;
+		};
+		F51130710170620B01A80A1F = {
+			buildRules = (
+			);
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			isa = PBXBuildStyle;
+			name = Deployment;
+		};
+		F51212220170627901A80A1F = {
+			children = (
+				F51212230170627901A80A1F,
+			);
+			isa = PBXVariantGroup;
+			name = MainMenu.nib;
+			path = "";
+			refType = 4;
+		};
+		F51212230170627901A80A1F = {
+			isa = PBXFileReference;
+			name = English;
+			path = English.lproj/MainMenu.nib;
+			refType = 4;
+		};
+		F5121224017062C501A80A1F = {
+			children = (
+				F512122B0170635601A80A1F,
+				F512122C0170635601A80A1F,
+				F512122D0170635601A80A1F,
+				F512122F0170635601A80A1F,
+				F51212300170635601A80A1F,
+				F51212310170635601A80A1F,
+				F51212320170635601A80A1F,
+				F510A6CC01738ED001A80A1F,
+				F510A6CD01738ED001A80A1F,
+				F53A3B49018DECF201A80A1F,
+				F53A3B4A018DECF201A80A1F,
+			);
+			isa = PBXGroup;
+			name = Files;
+			path = ../..;
+			refType = 2;
+		};
+		F5121225017062C501A80A1F = {
+			children = (
+				F51212220170627901A80A1F,
+				F51352740170655D01A80A1F,
+				F513527F0170659801A80A1F,
+				F51352800170659801A80A1F,
+				F51352810170659801A80A1F,
+				F51352820170659801A80A1F,
+				F52EEB2F017E3F8C01A80A1F,
+			);
+			isa = PBXGroup;
+			path = Resources;
+			refType = 2;
+		};
+		F512122B0170635601A80A1F = {
+			isa = PBXFileReference;
+			name = aout_macosx.c;
+			path = plugins/macosx/aout_macosx.c;
+			refType = 4;
+		};
+		F512122C0170635601A80A1F = {
+			isa = PBXFileReference;
+			name = intf_controller.c;
+			path = plugins/macosx/intf_controller.c;
+			refType = 4;
+		};
+		F512122D0170635601A80A1F = {
+			isa = PBXFileReference;
+			name = intf_controller.h;
+			path = plugins/macosx/intf_controller.h;
+			refType = 4;
+		};
+		F512122F0170635601A80A1F = {
+			isa = PBXFileReference;
+			name = intf_main.c;
+			path = plugins/macosx/intf_main.c;
+			refType = 4;
+		};
+		F51212300170635601A80A1F = {
+			isa = PBXFileReference;
+			name = macosx.c;
+			path = plugins/macosx/macosx.c;
+			refType = 4;
+		};
+		F51212310170635601A80A1F = {
+			isa = PBXFileReference;
+			name = macosx.h;
+			path = plugins/macosx/macosx.h;
+			refType = 4;
+		};
+		F51212320170635601A80A1F = {
+			isa = PBXFileReference;
+			name = vout_macosx.c;
+			path = plugins/macosx/vout_macosx.c;
+			refType = 4;
+		};
+		F51352740170655D01A80A1F = {
+			isa = PBXFileReference;
+			path = pause.png;
+			refType = 4;
+		};
+		F513527F0170659801A80A1F = {
+			isa = PBXFileReference;
+			path = play.png;
+			refType = 4;
+		};
+		F51352800170659801A80A1F = {
+			isa = PBXFileReference;
+			path = stepf.png;
+			refType = 4;
+		};
+		F51352810170659801A80A1F = {
+			isa = PBXFileReference;
+			path = stepr.png;
+			refType = 4;
+		};
+		F51352820170659801A80A1F = {
+			isa = PBXFileReference;
+			path = stop.png;
+			refType = 4;
+		};
+		F52EEB22017E3F0701A80A1F = {
+			isa = PBXBundleReference;
+			path = vlc.bundle;
+			refType = 3;
+		};
+		F52EEB23017E3F0701A80A1F = {
+			buildPhases = (
+				F52EEB24017E3F0701A80A1F,
+				F52EEB25017E3F0701A80A1F,
+				F52EEB2C017E3F0701A80A1F,
+				F52EEB2D017E3F0701A80A1F,
+				F52EEB2E017E3F0701A80A1F,
+			);
+			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
+				OPTIMIZATION_CFLAGS = "-O3";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bundle -undefined suppress";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = vlc;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = bundle;
+			};
+			dependencies = (
+			);
+			isa = PBXBundleTarget;
+			name = vlc;
+			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
+			productName = vlc.app;
+			productReference = F52EEB22017E3F0701A80A1F;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>VOB</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>vlc.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>VOB File (DVD)</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>vlc</string>
+	<key>CFBundleGetInfoString</key>
+	<string>VideoLan Client</string>
+	<key>CFBundleIconFile</key>
+	<string>vlc.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.videolan.vlc</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>vlc</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>vlc 0.2.90</string>
+	<key>CFBundleVersion</key>
+	<string>0.2.90</string>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+</dict>
+</plist>
+";
+			shouldUseHeadermap = 0;
+		};
+		F52EEB24017E3F0701A80A1F = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXHeadersBuildPhase;
+			name = Headers;
+		};
+		F52EEB25017E3F0701A80A1F = {
+			buildActionMask = 2147483647;
+			files = (
+				F52EEB26017E3F0701A80A1F,
+				F52EEB27017E3F0701A80A1F,
+				F52EEB28017E3F0701A80A1F,
+				F52EEB29017E3F0701A80A1F,
+				F52EEB2A017E3F0701A80A1F,
+				F52EEB2B017E3F0701A80A1F,
+				F52EEB30017E3F8C01A80A1F,
+			);
+			isa = PBXResourcesBuildPhase;
+			name = "Bundle Resources";
+		};
+		F52EEB26017E3F0701A80A1F = {
+			fileRef = F51212220170627901A80A1F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52EEB27017E3F0701A80A1F = {
+			fileRef = F51352740170655D01A80A1F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52EEB28017E3F0701A80A1F = {
+			fileRef = F513527F0170659801A80A1F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52EEB29017E3F0701A80A1F = {
+			fileRef = F51352800170659801A80A1F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52EEB2A017E3F0701A80A1F = {
+			fileRef = F51352810170659801A80A1F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52EEB2B017E3F0701A80A1F = {
+			fileRef = F51352820170659801A80A1F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52EEB2C017E3F0701A80A1F = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXSourcesBuildPhase;
+			name = Sources;
+		};
+		F52EEB2D017E3F0701A80A1F = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXFrameworksBuildPhase;
+			name = "Frameworks & Libraries";
+		};
+		F52EEB2E017E3F0701A80A1F = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			name = "ResourceManager Resources";
+		};
+		F52EEB2F017E3F8C01A80A1F = {
+			isa = PBXFileReference;
+			path = vlc.icns;
+			refType = 4;
+		};
+		F52EEB30017E3F8C01A80A1F = {
+			fileRef = F52EEB2F017E3F8C01A80A1F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53A3B49018DECF201A80A1F = {
+			isa = PBXFileReference;
+			name = intf_qdview.h;
+			path = plugins/macosx/intf_qdview.h;
+			refType = 4;
+		};
+		F53A3B4A018DECF201A80A1F = {
+			isa = PBXFileReference;
+			name = intf_qdview.c;
+			path = plugins/macosx/intf_qdview.c;
+			refType = 4;
+		};
+	};
+	rootObject = F511306E0170620B01A80A1F;
+}
