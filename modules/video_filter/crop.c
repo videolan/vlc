@@ -2,7 +2,7 @@
  * crop.c : Crop video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: crop.c,v 1.11 2003/05/15 22:27:37 massiot Exp $
+ * $Id: crop.c,v 1.12 2003/05/26 02:03:10 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,7 +52,7 @@ static int  SendEvents( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define GEOMETRY_TEXT N_("Crop geometry")
-#define GEOMETRY_LONGTEXT N_("Set the geometry of the zone to crop")
+#define GEOMETRY_LONGTEXT N_("Set the geometry of the zone to crop. This is set as width x heigth + left offset + top offset.")
 
 #define AUTOCROP_TEXT N_("Automatic cropping")
 #define AUTOCROP_LONGTEXT N_("Activate automatic black border cropping")

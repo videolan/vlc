@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.28 2003/05/26 01:25:12 hartman Exp $
+ * $Id: prefs.m,v 1.29 2003/05/26 02:03:10 hartman Exp $
  *
  * Authors:	Jon Lech Johansen <jon-vl@nanocrew.net>
  *		Derk-Jan Hartman <thedj at users.sf.net>
@@ -362,7 +362,7 @@
                                 localizedString: p_a_module->psz_longname];
                             [o_modules addItemWithTitle: o_description];
                             [[o_modules lastItem] setTag: p_a_module->i_object_id];
-NSLog(@"%@", [[o_modules lastItem] title]);
+
                             if( p_item->psz_value &&
                                 !strcmp( p_item->psz_value, p_a_module->psz_object_name ) )
                             {
@@ -370,18 +370,6 @@ NSLog(@"%@", [[o_modules lastItem] title]);
                             }
                         }
                     }
-                }
-    
-                if( p_item->psz_value != NULL )
-                {
-                    NSString *o_value =
-                        [NSApp localizedString: p_item->psz_value];
-    
-                    [o_modules selectItemWithTitle: o_value];
-                }
-                else
-                {
-                    [o_modules selectItemWithTitle: _NS("None")];
                 }
 
                 CONTROL_LABEL( p_item->psz_text );
