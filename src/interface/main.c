@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.190 2002/05/09 21:24:22 sam Exp $
+ * $Id: main.c,v 1.191 2002/05/19 09:37:02 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -204,7 +204,9 @@
 #define SPUMARGIN_LONGTEXT ""
 
 #define FILTER_TEXT N_("video filter module")
-#define FILTER_LONGTEXT ""
+#define FILTER_LONGTEXT N_( \
+    "This option allows you to select the video filter module that vlc " \
+    "will use.\nNote that by default no video filter is used.")
 
 #define SERVER_PORT_TEXT N_("server port")
 #define SERVER_PORT_LONGTEXT ""
@@ -235,10 +237,14 @@
 #define INPUT_SUBT_LONGTEXT ""
 
 #define DVD_DEV_TEXT N_("DVD device")
-#define DVD_DEV_LONGTEXT ""
+#define DVD_DEV_LONGTEXT N_( \
+    "This option allows you to set the DVD device that vlc will try to use " \
+    "by default.")
 
 #define VCD_DEV_TEXT N_("VCD device")
-#define VCD_DEV_LONGTEXT ""
+#define VCD_DEV_LONGTEXT N_( \
+    "This option allows you to set the VCD device that vlc will try to use " \
+    "by default.")
 
 #define IPV6_TEXT N_("force IPv6")
 #define IPV6_LONGTEXT ""
@@ -247,43 +253,58 @@
 #define IPV4_LONGTEXT ""
 
 #define ADEC_MPEG_TEXT N_("choose MPEG audio decoder")
-#define ADEC_MPEG_LONGTEXT ""
+#define ADEC_MPEG_LONGTEXT N_( \
+    "This option allows you to select the MPEG audio decoder you want to use."\
+    "\nBy default vlc will use mpeg_adec.")
 
 #define ADEC_AC3_TEXT N_("choose AC3 audio decoder")
-#define ADEC_AC3_LONGTEXT ""
-
-#define VDEC_SMP_TEXT N_("use additional processors")
-#define VDEC_SMP_LONGTEXT ""
-
-#define VPAR_SYNCHRO_TEXT N_("force synchro algorithm {I|I+|IP|IP+|IPB}")
-#define VPAR_SYNCHRO_LONGTEXT ""
+#define ADEC_AC3_LONGTEXT N_( \
+    "This option allows you to select the AC3 audio decoder you want to use." \
+    "\nBy default vlc will use ac3_adec.")
 
 #define NOMMX_TEXT N_("disable CPU's MMX support")
-#define NOMMX_LONGTEXT ""
+#define NOMMX_LONGTEXT N_( \
+    "If your processor supports the MMX instructions set but you don't want " \
+    "vlc to use them, you can use this option.")
 
 #define NO3DN_TEXT N_("disable CPU's 3D Now! support")
-#define NO3DN_LONGTEXT ""
+#define NO3DN_LONGTEXT N_( \
+    "If your processor supports the 3D Now! instructions set but you don't " \
+    "want vlc to use them, you can use this option.")
 
 #define NOMMXEXT_TEXT N_("disable CPU's MMX EXT support")
-#define NOMMXEXT_LONGTEXT ""
+#define NOMMXEXT_LONGTEXT N_( \
+    "If your processor supports the MMX EXT instructions set but you don't " \
+    "want vlc to use them, you can use this option.")
 
 #define NOSSE_TEXT N_("disable CPU's SSE support")
-#define NOSSE_LONGTEXT ""
+#define NOSSE_LONGTEXT N_( \
+    "If your processor supports the SSE instructions set but you don't want " \
+    "vlc to use them, you can use this option.")
 
 #define NOALTIVEC_TEXT N_("disable CPU's AltiVec support")
-#define NOALTIVEC_LONGTEXT ""
+#define NOALTIVEC_LONGTEXT N_( \
+    "If your processor supports the AltiVec instructions set but you don't " \
+    "want vlc to use them, you can use this option.")
 
 #define PLAYLIST_LAUNCH_TEXT N_("launch playlist on startup")
-#define PLAYLIST_LAUNCH_LONGTEXT ""
+#define PLAYLIST_LAUNCH_LONGTEXT N_( \
+    "If you want vlc to start playing on startup, then enable this option.")
 
 #define PLAYLIST_ENQUEUE_TEXT N_("enqueue playlist as default")
-#define PLAYLIST_ENQUEUE_LONGTEXT ""
+#define PLAYLIST_ENQUEUE_LONGTEXT N_( \
+    "If you want vlc to add items to the playlist as you open them, then " \
+    "enable this option.")
 
 #define PLAYLIST_LOOP_TEXT N_("loop playlist on end")
-#define PLAYLIST_LOOP_LONGTEXT ""
+#define PLAYLIST_LOOP_LONGTEXT N_( \
+    "If you want vlc to keep playing the playlist indefinitely then enable " \
+    "this option.")
 
 #define MEMCPY_TEXT N_("memory copy module")
-#define MEMCPY_LONGTEXT ""
+#define MEMCPY_LONGTEXT N_( \
+    "You can select wich memory copy module you want to use. By default vlc " \
+    "will select the fastest one supported by your hardware.")
 
 #define FAST_PTHREAD_TEXT N_("fast pthread on NT/2K/XP (developpers only)")
 #define FAST_PTHREAD_LONGTEXT N_( \
@@ -352,8 +373,8 @@ ADD_INTEGER ( "audio-type", -1, NULL, INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT )
 ADD_INTEGER ( "audio-channel", -1, NULL, INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT )
 ADD_INTEGER ( "spu-channel", -1, NULL, INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT )
 
-ADD_STRING  ( "dvd", "/dev/dvd", NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT )
-ADD_STRING  ( "vcd", "/dev/cdrom", NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT )
+ADD_STRING  ( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT )
+ADD_STRING  ( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT )
 
 ADD_BOOL_WITH_SHORT    ( "ipv6", '6', NULL, IPV6_TEXT, IPV6_LONGTEXT )
 ADD_BOOL_WITH_SHORT    ( "ipv4", '4', NULL, IPV4_TEXT, IPV4_LONGTEXT )
@@ -362,8 +383,6 @@ ADD_BOOL_WITH_SHORT    ( "ipv4", '4', NULL, IPV4_TEXT, IPV4_LONGTEXT )
 ADD_CATEGORY_HINT( N_("Decoders"), NULL )
 ADD_MODULE  ( "mpeg-adec", MODULE_CAPABILITY_DECODER, NULL, NULL, ADEC_MPEG_TEXT, ADEC_MPEG_LONGTEXT )
 ADD_MODULE  ( "ac3-adec", MODULE_CAPABILITY_DECODER, NULL, NULL, ADEC_AC3_TEXT, ADEC_AC3_LONGTEXT )
-ADD_INTEGER ( "vdec-smp", 0, NULL, VDEC_SMP_TEXT, VDEC_SMP_LONGTEXT )
-ADD_STRING  ( "vpar-synchro", NULL, NULL, VPAR_SYNCHRO_TEXT, VPAR_SYNCHRO_LONGTEXT )
 
 /* CPU options */
 ADD_CATEGORY_HINT( N_("CPU"), NULL )

@@ -107,6 +107,15 @@
  * mark it to be presented */
 #define DEFAULT_PTS_DELAY               (mtime_t)(.45*CLOCK_FREQ)
 
+/* DVD and VCD devices */
+#ifndef WIN32
+#  define DVD_DEVICE "/dev/dvd"
+#  define VCD_DEVICE "/dev/cdrom"
+#else
+#  define DVD_DEVICE "D"
+#  define VCD_DEVICE "D"
+#endif
+
 /*****************************************************************************
  * Audio configuration
  *****************************************************************************/

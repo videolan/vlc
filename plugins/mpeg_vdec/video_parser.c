@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.18 2002/04/23 14:16:20 sam Exp $
+ * $Id: video_parser.c,v 1.19 2002/05/19 09:37:02 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -71,17 +71,39 @@ void _M( vdec_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
-/* Variable containing the motion compensation method */
-#define MOTION_METHOD_VAR               "mpeg-motion"
-/* Variable containing the IDCT method */
-#define IDCT_METHOD_VAR                 "mpeg-idct"
+#define VDEC_IDCT_TEXT N_("IDCT module")
+#define VDEC_IDCT_LONGTEXT N_( \
+    "This option allows you to select the IDCT module used by this video " \
+    "decoder.\n" \
+    "Note that the default behavior is to automatically select the best " \
+    "module available.")
+
+#define VDEC_MOTION_TEXT N_("motion compensation module")
+#define VDEC_MOTION_LONGTEXT N_( \
+    "This option allows you to select the motion compensation module used by "\
+    "this video decoder.\n" \
+    "Note that the default behavior is to automatically select the best " \
+    "module available.")
+
+#define VDEC_SMP_TEXT N_("use additional processors")
+#define VDEC_SMP_LONGTEXT N_( \
+    "This video decoder can benefit from a multiprocessor computer. If you " \
+    "have one, you can specify the number of processors here.")
+
+#define VPAR_SYNCHRO_TEXT N_("force synchro algorithm {I|I+|IP|IP+|IPB}")
+#define VPAR_SYNCHRO_LONGTEXT N_( \
+    "If you don't want this video decoder to decode all frames of the video, "\
+    "you can specify which synchro algorithm you want to use.")
 
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL)
-ADD_MODULE( IDCT_METHOD_VAR, MODULE_CAPABILITY_IDCT, NULL, NULL,
-	    N_("IDCT module"), NULL )
-ADD_MODULE( MOTION_METHOD_VAR, MODULE_CAPABILITY_MOTION, NULL, NULL,
-	    N_("motion compensation module"), NULL )
+ADD_MODULE  ( "mpeg-idct", MODULE_CAPABILITY_IDCT, NULL, NULL,
+	      VDEC_IDCT_TEXT, VDEC_IDCT_LONGTEXT )
+ADD_MODULE  ( "mpeg-motion", MODULE_CAPABILITY_MOTION, NULL, NULL,
+	      VDEC_MOTION_TEXT, VDEC_IDCT_LONGTEXT )
+ADD_INTEGER ( "vdec-smp", 0, NULL, VDEC_SMP_TEXT, VDEC_SMP_LONGTEXT )
+ADD_STRING  ( "vpar-synchro", NULL, NULL, VPAR_SYNCHRO_TEXT,
+              VPAR_SYNCHRO_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -194,7 +216,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Choose the best motion compensation module
      */
-    psz_name = config_GetPszVariable( MOTION_METHOD_VAR );
+    psz_name = config_GetPszVariable( "mpeg-motion" );
     p_vpar->p_motion_module = module_Need( MODULE_CAPABILITY_MOTION, psz_name,
                                            NULL );
     if( psz_name ) free( psz_name );
@@ -213,7 +235,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Choose the best IDCT module
      */
-    psz_name = config_GetPszVariable( IDCT_METHOD_VAR );
+    psz_name = config_GetPszVariable( "mpeg-idct" );
     p_vpar->p_idct_module = module_Need( MODULE_CAPABILITY_IDCT, psz_name,
                                          NULL );
     if( psz_name ) free( psz_name );
