@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.17 2002/07/20 18:01:42 sam Exp $
+ * $Id: distort.c,v 1.18 2002/07/23 20:16:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -158,10 +158,10 @@ static int vout_Create( vout_thread_t *p_vout )
         /* No method given in commandline. Look what method was
          requested in configuration system */
         if( !(psz_method = psz_method_tmp
-              = config_GetPsz( p_vout, "distort_mode" )) )
+              = config_GetPsz( p_vout, "distort-mode" )) )
         {
             msg_Err( p_vout, "configuration variable %s empty, using 'wave'",
-                             "distort_mode" );
+                             "distort-mode" );
             p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
         }
         else {
