@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.25 2003/11/08 18:23:40 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.26 2003/11/09 16:00:54 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -112,8 +112,32 @@ static int ConvertKey( int key )
 {
     switch( key )
     {
+        case B_LEFT_ARROW:
+            return KEY_LEFT;
+        case B_RIGHT_ARROW:
+            return KEY_RIGHT;
+        case B_UP_ARROW:
+            return KEY_UP;
+        case B_DOWN_ARROW:
+            return KEY_DOWN;
         case B_SPACE:
             return KEY_SPACE;
+        case B_ENTER:
+            return KEY_ENTER;
+        case B_HOME:
+            return KEY_HOME;
+        case B_END:
+            return KEY_END;
+        case B_ESCAPE:
+            return KEY_ESC;
+        case B_PAGE_UP:
+            return KEY_PAGEUP;
+        case B_PAGE_DOWN:
+            return KEY_PAGEDOWN;
+        case B_TAB:
+            return KEY_TAB;
+        case B_BACKSPACE:
+            return KEY_BACKSPACE;
     }
     return key;
 }
@@ -184,8 +208,6 @@ VideoSettings::VideoSettings()
 	}
 	else
 	{
-		fprintf( stderr, "error loading video settings: %s\n", strerror( ret ) );
-		
 		// figure out if we should use vertical sync by default
 		BScreen screen(B_MAIN_SCREEN_ID);
 		if (screen.IsValid())
@@ -219,9 +241,7 @@ VideoSettings::~VideoSettings()
 		if (fSettings->ReplaceInt32( "flags", Flags() ) != B_OK)
 			fSettings->AddInt32( "flags", Flags() );
 
-		status_t ret = save_settings( fSettings, "video_settings", "VideoLAN Client" );
-		if ( ret != B_OK )
-			fprintf( stderr, "error saving video settings: %s\n", strerror( ret ) );
+		save_settings( fSettings, "video_settings", "VideoLAN Client" );
 		delete fSettings;
 	}
 	else
@@ -616,7 +636,7 @@ VideoWindow::SetFullScreen(bool doIt)
 	if (doIt)
 	{
 	    SetLook( B_NO_BORDER_WINDOW_LOOK );
-		BScreen screen(this);
+		BScreen screen( this );
 		BRect rect = screen.Frame();
 		Activate();
 		MoveTo(0.0, 0.0);
@@ -1297,25 +1317,28 @@ VLCView::Pulse()
  *****************************************************************************/
 void VLCView::KeyDown( const char *bytes, int32 numBytes )
 {
-    VideoWindow * videoWindow = (VideoWindow *) Window();
-
-    if( !videoWindow || numBytes < 1 )
+    if( numBytes < 1 )
     {
         return;
     }
 
-    uint32_t    mods = modifiers();
+    uint32_t mods = modifiers();
     vlc_value_t val;
 
-    val.i_int = 0;
-
-    switch( *bytes )
+    val.i_int = ConvertKey( *bytes );
+    if( mods & B_SHIFT_KEY )
     {
-        default:
-            val.i_int |= ConvertKey( *bytes );
-            var_Set( p_vout->p_vlc, "key-pressed", val );
-            break;
+        val.i_int |= KEY_MODIFIER_SHIFT;
     }
+    if( mods & B_CONTROL_KEY )
+    {
+        val.i_int |= KEY_MODIFIER_CTRL;
+    }
+    if( mods & B_COMMAND_KEY )
+    {
+        val.i_int |= KEY_MODIFIER_ALT;
+    }
+    var_Set( p_vout->p_vlc, "key-pressed", val );
 }
 
 /*****************************************************************************
@@ -1334,7 +1357,7 @@ VLCView::Draw(BRect updateRect)
  *****************************************************************************/
 static int  Init       ( vout_thread_t * );
 static void End        ( vout_thread_t * );
-// static int  Manage     ( vout_thread_t * );
+static int  Manage     ( vout_thread_t * );
 static void Display    ( vout_thread_t *, picture_t * );
 
 static int  BeosOpenDisplay ( vout_thread_t *p_vout );
@@ -1362,7 +1385,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
 
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
-    p_vout->pf_manage = NULL;
+    p_vout->pf_manage = Manage;
     p_vout->pf_render = NULL;
     p_vout->pf_display = Display;
 
@@ -1443,6 +1466,20 @@ int Init( vout_thread_t *p_vout )
 void End( vout_thread_t *p_vout )
 {
     BeosCloseDisplay( p_vout );
+}
+
+/*****************************************************************************
+ * Manage
+ *****************************************************************************/
+static int Manage( vout_thread_t * p_vout )
+{
+    if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
+    {
+        p_vout->p_sys->p_window->PostMessage( TOGGLE_FULL_SCREEN );
+        p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
+    }
+
+    return 0;
 }
 
 /*****************************************************************************

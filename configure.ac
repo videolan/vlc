@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.110 2003/11/08 18:23:40 titer Exp $
+dnl $Id: configure.ac,v 1.111 2003/11/09 16:00:54 titer Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -285,7 +285,7 @@ AC_CHECK_FUNCS(gethostbyname,,[
     AX_ADD_LDFLAGS([ipv4 httpd vlc],[-lnsl])
   ],[
     AC_CHECK_LIB(bind,gethostbyname,[
-      AX_ADD_LDFLAGS([ipv4 httpd],[-lbind])
+      AX_ADD_LDFLAGS([ipv4 access_mms httpd],[-lbind])
     ])
   ])
 ])

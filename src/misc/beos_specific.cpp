@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.33 2003/10/25 00:49:14 sam Exp $
+ * $Id: beos_specific.cpp,v 1.34 2003/11/09 16:00:54 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -226,10 +226,9 @@ bool VlcApplication::QuitRequested()
 {
     if( CurrentMessage() && CurrentMessage()->FindBool( "shortcut" ) )
     {
-        /* The user hit Alt+Q, don't let the be_app exit without cleaning.
-           Let the interface do the job */
-        if( fInterfaceWindow )
-            fInterfaceWindow->PostMessage( B_QUIT_REQUESTED );
+        /* The user hit Alt+Q, don't let the be_app exit without
+           cleaning */
+        p_this->p_vlc->b_die = 1;
         return false;
     }
 
