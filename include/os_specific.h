@@ -2,7 +2,7 @@
  * os_specific.h: OS specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: os_specific.h,v 1.4 2002/04/27 22:11:22 gbazin Exp $
+ * $Id: os_specific.h,v 1.5 2002/04/28 02:27:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -53,9 +53,9 @@ struct main_sys_s;
     void system_Configure  ( void );
     void system_End  ( void );
 #else
-#   define system_Init(...) {}
-#   define system_Configure(...) {}
-#   define system_End(...) {}
+#   define system_Init ( dummy, dummy, dummy ) {}
+#   define system_Configure ( ) {}
+#   define system_End ( ) {}
 #endif
 
 #   ifdef __cplusplus
