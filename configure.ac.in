@@ -206,13 +206,19 @@ then
         [CFLAGS="${CFLAGS_save} -mms-bitfields"
          AC_TRY_COMPILE([],,ac_cv_c_mms_bitfields=yes, ac_cv_c_mms_bitfields=no)])
     if test x"$ac_cv_c_mms_bitfields" != x"no"; then
-        CFLAGS_mingw32_special="-mms-bitfields"
+        CFLAGS_save="${CFLAGS_save} -mms-bitfields";
+        CXXFLAGS_save="${CXXFLAGS_save} -mms-bitfields";
     else
-        CFLAGS_mingw32_special="-fnative-struct"
+        AC_CACHE_CHECK([if \$CC accepts -fnative-struct],
+            [ac_cv_c_fnative_struct],
+            [CFLAGS="${CFLAGS_save} -fnative-struct"
+             AC_TRY_COMPILE([],,ac_cv_c_fnative_struct=yes, ac_cv_c_fnative_struct=no)])
+        if test x"$ac_cv_c_fnative_struct" != x"no"; then
+            CFLAGS_save="${CFLAGS_save} -fnative-struct";
+            CXXFLAGS_save="${CXXFLAGS_save} -fnative-struct";
+        fi
     fi
 
-    CFLAGS_save="${CFLAGS_save} ${CFLAGS_mingw32_special}";
-    CXXFLAGS_save="${CXXFLAGS_save} ${CFLAGS_mingw32_special}";
     CFLAGS="${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
 fi
 
