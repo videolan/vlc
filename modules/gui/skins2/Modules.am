@@ -201,7 +201,6 @@ EXTRA_DIST += \
 	theme/playlist_body2.png \
 	theme/playlist_body3.png \
 	theme/playlist_body4.png \
-	theme/playlist_body5.png \
 	theme/playlist_body6.png \
 	theme/playlist_body7.png \
 	theme/playlist_body8.png \
