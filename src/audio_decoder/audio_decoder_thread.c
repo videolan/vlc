@@ -39,6 +39,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                            /* "input.h" */
+#include <netinet/in.h>                                             /* ntohl */
 
 #include "threads.h"
 #include "common.h"
@@ -206,7 +207,7 @@ static void RunThread (adec_thread_t * p_adec)
             do 
             {
                 adec_byte_stream_next ( p_byte_stream );
-            } while ( !((*((u32 *)p_adec->p_data->p_payload_start) & 0xFFFFFF00) == 0x100) && (!p_adec->b_die)
+            } while ( !((U32_AT((u32 *)p_adec->p_data->p_payload_start) & 0xFFFFFF00) == 0x100) && (!p_adec->b_die)
                         && (!p_adec->b_error) );
 
             if( p_adec->b_die || p_adec->b_error )
