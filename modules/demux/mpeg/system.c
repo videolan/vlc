@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.12 2003/03/18 23:59:07 massiot Exp $
+ * $Id: system.c,v 1.13 2003/04/01 10:46:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -487,7 +487,11 @@ static void GatherPES( input_thread_t * p_input, data_packet_t * p_data,
                     >= PES_HEADER_SIZE )
             {
                 p_es->i_pes_real_size = ((u16)p_data->p_payload_start[4] << 8)
-                                         + p_data->p_payload_start[5] + 6;
+                                         + p_data->p_payload_start[5];
+                if ( p_es->i_pes_real_size )
+                {
+                    p_es->i_pes_real_size += 6;
+                }
             }
             else
             {
@@ -508,8 +512,14 @@ static void GatherPES( input_thread_t * p_input, data_packet_t * p_data,
                                  - p_data->p_payload_start);
 
         /* We can check if the packet is finished */
-        if( p_pes->i_pes_size == p_es->i_pes_real_size )
+        if( p_es->i_pes_real_size  && p_pes->i_pes_size >= p_es->i_pes_real_size )
         {
+            if( p_pes->i_pes_size > p_es->i_pes_real_size )
+            {
+                msg_Warn( p_input,
+                          "Oversized PES packet for PID %d: expected %d, actual %d",
+                          p_es->i_id, p_es->i_pes_real_size, p_pes->i_pes_size );
+            }
             /* The packet is finished, parse it */
             ParsePES( p_input, p_es );
         }
@@ -1183,6 +1193,12 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
     b_adaptation = (p[3] & 0x20);
     b_payload = (p[3] & 0x10);
 
+    /* Was there a transport error ? */
+    if ( p[1] & 0x80 )
+    {
+        msg_Warn( p_input, "transport_error_indicator set for PID %d counter %x", i_pid, p[3] & 0x0f );
+    }
+
     /* Find out the elementary stream. */
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -1260,10 +1276,17 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                  * 183 bytes. */
                 if( b_payload ? (p[4] > 182) : (p[4] != 183) )
                 {
-                    msg_Warn( p_input, "invalid TS adaptation field (%p)",
-                              p_data );
+                    msg_Warn( p_input, "invalid TS adaptation field for PID %d (%2x)",
+                              i_pid, p[4] );
                     p_data->b_discard_payload = 1;
                     p_es->c_invalid_packets++;
+
+                    /* The length was invalid so we shouldn't have added it to
+                     * p_payload_start above.  Ensure p_payload_start has a
+                     * valid value by setting it equal to p_payload_end.  This
+                     * also stops any data being processed from the packet.
+                     */
+                    p_data->p_payload_start = p_data->p_payload_end;
                 }
 
                 /* Now we are sure that the byte containing flags is present:
@@ -1275,18 +1298,20 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                     {
                         msg_Warn( p_input,
                             "discontinuity_indicator encountered by TS demux "
-                            "(position read: %d, saved: %d)",
-                            p[5] & 0x80, p_es_demux->i_continuity_counter );
+                            "(PID %d: current %d, packet %d)",
+                            i_pid,
+                            ( p_es_demux->i_continuity_counter ) & 0x0f,
+                            p[3] & 0x0f );
 
                         /* If the PID carries the PCR, there will be a system
                          * time-based discontinuity. We let the PCR decoder
                          * handle that. */
                         p_es->p_pgrm->i_synchro_state = SYNCHRO_REINIT;
 
-                        /* There also may be a continuity_counter
-                         * discontinuity: resynchronize our counter with
-                         * the one of the stream. */
-                        p_es_demux->i_continuity_counter = (p[3] & 0x0f) - 1;
+                        /* Don't resynchronise the counter here - it will
+                         * be checked later and b_lost will then be set if
+                         * necessary.
+                         */
                     }
 
                 } /* valid TS adaptation field ? */
@@ -1294,7 +1319,8 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
         } /* has adaptation field */
         /* Check the continuity of the stream. */
         i_dummy = ((p[3] & 0x0f) - p_es_demux->i_continuity_counter) & 0x0f;
-        if( i_dummy == 1 || (b_psi && p_stream_demux->b_buggy_psi) )
+        if( b_payload &&
+                ( i_dummy == 1 || (b_psi && p_stream_demux->b_buggy_psi ) ) )
         {
             /* Everything is ok, just increase our counter */
             (p_es_demux->i_continuity_counter)++;
@@ -1309,12 +1335,19 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                  * the packet. */
                 b_trash = 1;
             }
+            else if( !b_payload )
+            {
+                /* If there is no payload, the counter should be unchanged */
+                msg_Warn( p_input, "packet rxd for PID %d with no payload but "
+                        "wrong counter: current %d, packet %d", i_pid,
+                        p_es_demux->i_continuity_counter & 0x0f, p[3] & 0x0f );
+            }
             else if( i_dummy <= 0 )
             {
                 /* Duplicate packet: mark it as being to be trashed. */
                 msg_Warn( p_input,
-                          "duplicate packet received by TS demux (%d)",
-                          i_dummy );
+                          "duplicate packet received for PID %d (counter %d)",
+                          p_es->i_id, p[3] & 0x0f );
                 b_trash = 1;
             }
             else if( p_es_demux->i_continuity_counter == 0xFF )
@@ -1334,7 +1367,8 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                  * as we don't know, do as if we missed a packet to be sure
                  * to recover from this situation */
                 msg_Warn( p_input,
-                          "packet lost by TS demux: current %d, packet %d",
+                          "packet lost by TS demux for PID %d: current %d, packet %d",
+                          i_pid,
                           p_es_demux->i_continuity_counter & 0x0f,
                           p[3] & 0x0f );
                 b_lost = 1;
