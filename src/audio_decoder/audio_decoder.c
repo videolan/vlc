@@ -816,6 +816,7 @@ static void RunThread( adec_thread_t * p_adec )
                 }
                 else
                 {
+                    /* adec_Layer2_Stereo() produces 6 output frames (2*1152/384) */
 //                    i_header = p_adec->bit_stream.fifo.buffer;
 //                    i_framesize = pi_framesize[ 128*((i_header & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT) +
 //                        64*((i_header & ADEC_HEADER_PADDING_BIT_MASK) >> ADEC_HEADER_PADDING_BIT_SHIFT) +
@@ -834,7 +835,8 @@ static void RunThread( adec_thread_t * p_adec )
 //                    }
 
                     pthread_mutex_lock( &p_adec->p_aout_fifo->data_lock );
-                    while ( (((p_adec->p_aout_fifo->l_end_frame + 6) - p_adec->p_aout_fifo->l_start_frame) & AOUT_FIFO_SIZE) < 6 ) /* !! */
+                    /* (((end + 6) - start) & AOUT_FIFO_SIZE) < 6 */
+                    while ( ((p_adec->p_aout_fifo->l_start_frame - p_adec->p_aout_fifo->l_end_frame) & AOUT_FIFO_SIZE) < 6 ) /* !! */
                     {
                         pthread_cond_wait( &p_adec->p_aout_fifo->data_wait, &p_adec->p_aout_fifo->data_lock );
                     }
@@ -845,29 +847,24 @@ static void RunThread( adec_thread_t * p_adec )
                         pthread_mutex_lock( &p_adec->p_aout_fifo->data_lock );
                         /* Frame 1 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = adec_date;
-                        p_adec->p_aout_fifo->l_end_frame += 1;
-                        p_adec->p_aout_fifo->l_end_frame &= AOUT_FIFO_SIZE;
+                        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         /* Frame 2 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-                        p_adec->p_aout_fifo->l_end_frame += 1;
-                        p_adec->p_aout_fifo->l_end_frame &= AOUT_FIFO_SIZE;
+                        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         /* Frame 3 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-                        p_adec->p_aout_fifo->l_end_frame += 1;
-                        p_adec->p_aout_fifo->l_end_frame &= AOUT_FIFO_SIZE;
+                        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         /* Frame 4 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-                        p_adec->p_aout_fifo->l_end_frame += 1;
-                        p_adec->p_aout_fifo->l_end_frame &= AOUT_FIFO_SIZE;
+                        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         /* Frame 5 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-                        p_adec->p_aout_fifo->l_end_frame += 1;
-                        p_adec->p_aout_fifo->l_end_frame &= AOUT_FIFO_SIZE;
+                        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         /* Frame 6 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-                        p_adec->p_aout_fifo->l_end_frame += 1;
-                        p_adec->p_aout_fifo->l_end_frame &= AOUT_FIFO_SIZE;
+                        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         pthread_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
+                        /* 24000 == 6*384/2/48000*1000000 */
                         adec_date += 24000; /* !! */
                     }
                 }
