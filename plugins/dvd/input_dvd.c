@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.56 2001/05/07 03:14:09 stef Exp $
+ * $Id: input_dvd.c,v 1.57 2001/05/07 04:42:42 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -667,14 +667,13 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         {
             p_dvd->i_cell = vts.cell_inf.i_cell_nb - 1;
         }
-	
-			
+
         p_dvd->i_sector = 0;
         p_dvd->i_size = DVD_LB_SIZE *
           (off_t)( vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector );
         intf_WarnMsg( 2, "dvd info: stream size 1: %lld @ %d", p_dvd->i_size,
                       vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector );
-	
+
         if( DVDChapterSelect( p_dvd, 1 ) < 0 )
         {
             intf_ErrMsg( "dvd error: can't find first chapter" );
@@ -1222,7 +1221,7 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     /* Find first title cell which is inside program cell */
     if( DVDFindCell( p_dvd ) < 0 )
     {
-	/* no following cell : we're at eof */
+        /* no following cell : we're at eof */
         intf_ErrMsg( "dvd error: cell seeking failed" );
         p_input->b_error = 1;
         return;
@@ -1285,7 +1284,7 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
 }
 
 #define cell  p_dvd->p_ifo->vts.cell_inf
-		
+
 /*****************************************************************************
  * DVDFindCell: adjust the title cell index with the program cell
  *****************************************************************************/
@@ -1403,7 +1402,7 @@ static int DVDChapterSelect( thread_dvd_data_t * p_dvd, int i_chapter )
 
     /* start is : beginning of vts vobs + offset to vob x */
     p_dvd->i_start = p_dvd->i_title_start +
-	             DVD_LB_SIZE * (off_t)( p_dvd->i_sector );
+                         DVD_LB_SIZE * (off_t)( p_dvd->i_sector );
 
     /* Position the fd pointer on the right address */
     p_dvd->i_start = lseek( p_dvd->i_fd, p_dvd->i_start, SEEK_SET );

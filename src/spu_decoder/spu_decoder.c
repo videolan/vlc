@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.41 2001/05/07 03:14:09 stef Exp $
+ * $Id: spu_decoder.c,v 1.42 2001/05/07 04:42:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,8 +49,6 @@
 
 #include "spu_decoder.h"
 
-#include "main.h" /* XXX: remove this later */
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -88,14 +86,12 @@ vlc_thread_t spudec_CreateThread( vdec_config_t * p_config )
 
     p_spudec->p_fifo = p_config->decoder_config.p_decoder_fifo;
 
-    /* XXX: The vout request and fifo opening will eventually be here */
-
-    /* Spawn an audio output if there is none */
+    /* Spawn a video output if there is none */
     vlc_mutex_lock( &p_vout_bank->lock );
 
     if( p_vout_bank->i_count == 0 )
     {
-        intf_Msg( "spudec: no vout present, spawning one" );
+        intf_WarnMsg( 1, "spudec: no vout present, spawning one" );
 
         p_spudec->p_vout = vout_CreateThread( NULL );
 
@@ -275,9 +271,13 @@ static void ParsePacket( spudec_thread_t *p_spudec )
     subpicture_t * p_spu;
     u8           * p_src;
 
+    intf_WarnMsg( 3, "spudec: trying to gather a 0x%.2x long subtitle",
+                  p_spudec->i_spu_size );
+
     /* We cannot display a subpicture with no date */
     if( DECODER_FIFO_START(*p_spudec->p_fifo)->i_pts == 0 )
     {
+        intf_WarnMsg( 3, "spudec error: subtitle without a date" );
         return;
     }
 
@@ -294,9 +294,8 @@ static void ParsePacket( spudec_thread_t *p_spudec )
         return;
     }
 
-    /* Get display time now. If we do it later, we may miss a PTS. */
-    p_spu->begin_date = p_spu->end_date
-                    = DECODER_FIFO_START(*p_spudec->p_fifo)->i_pts;
+    /* Get display time now. If we do it later, we may miss the PTS. */
+    p_spudec->i_pts = DECODER_FIFO_START(*p_spudec->p_fifo)->i_pts;
 
     /* Allocate the temporary buffer we will parse */
     p_src = malloc( p_spudec->i_rle_size );
@@ -313,7 +312,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
 
 #if 0
     /* Dump the subtitle info */
-    intf_WarnHexDump( 0, p_spu->p_data, p_spudec->i_rle_size );
+    intf_WarnHexDump( 5, p_spu->p_data, p_spudec->i_rle_size );
 #endif
 
     /* Getting the control part */
@@ -333,9 +332,11 @@ static void ParsePacket( spudec_thread_t *p_spudec )
         return;
     }
 
-    intf_WarnMsg( 3, "spudec: got a valid %ix%i subtitle at (%i,%i), "
-                     "RLE offsets: 0x%x 0x%x",
-                  p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y,
+    intf_WarnMsg( 3, "spudec: valid subtitle, size: %ix%i, position: %i,%i",
+                  p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
+                     
+    intf_WarnMsg( 3, "spudec: total size: 0x%x, RLE offsets: 0x%x 0x%x",
+                  p_spudec->i_spu_size,
                   p_spu->type.spu.i_offset[0], p_spu->type.spu.i_offset[1] );
 
     /* SPU is finished - we can ask the video output to display it */
@@ -359,11 +360,15 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
     int i_index = p_spudec->i_rle_size + 4;
 
     /* The next start-of-control-sequence index and the previous one */
-    int i_next_index = 0, i_prev_index;
+    int i_next_seq, i_cur_seq;
 
     /* Command time and date */
     u8  i_command;
     int i_date;
+
+    /* Initialize the structure */
+    p_spu->i_start = p_spu->i_stop = 0;
+    p_spu->b_ephemer = 0;
 
     do
     {
@@ -371,8 +376,8 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
         i_date = GetBits( &p_spudec->bit_stream, 16 );
  
         /* Next offset */
-        i_prev_index = i_next_index;
-        i_next_index = GetBits( &p_spudec->bit_stream, 16 );
+        i_cur_seq = i_index;
+        i_next_seq = GetBits( &p_spudec->bit_stream, 16 );
  
         /* Skip what we just read */
         i_index += 4;
@@ -385,22 +390,26 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
             switch( i_command )
             {
                 case SPU_CMD_FORCE_DISPLAY:
- 
+
                     /* 00 (force displaying) */
+                    intf_ErrMsg( "spudec: \"force display\" command" );
+                    intf_ErrMsg( "spudec: send mail to <sam@zoy.org> if you "
+                                         "want to help debugging this" );
+ 
                     break;
  
                 /* Convert the dates in seconds to PTS values */
                 case SPU_CMD_START_DISPLAY:
  
                     /* 01 (start displaying) */
-                    p_spu->begin_date += ( i_date * 11000 );
+                    p_spu->i_start = p_spudec->i_pts + ( i_date * 11000 );
  
                     break;
  
                 case SPU_CMD_STOP_DISPLAY:
  
                     /* 02 (stop displaying) */
-                    p_spu->end_date += ( i_date * 11000 );
+                    p_spu->i_stop = p_spudec->i_pts + ( i_date * 11000 );
  
                     break;
  
@@ -463,13 +472,13 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
 
         } while( i_command != SPU_CMD_END );
 
-    } while( i_index == i_next_index );
+    } while( i_index == i_next_seq );
 
-    /* Check that the last index matches the previous one */
-    if( i_next_index != i_prev_index )
+    /* Check that the next sequence index matches the current one */
+    if( i_next_seq != i_cur_seq )
     {
         intf_ErrMsg( "spudec error: index mismatch (0x%.4x != 0x%.4x)",
-                     i_next_index, i_prev_index );
+                     i_next_seq, i_cur_seq );
         return( 1 );
     }
 
@@ -480,18 +489,26 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
         return( 1 );
     }
 
+    if( !p_spu->i_start )
+    {
+        intf_ErrMsg( "spudec error: no `start display' command" );
+    }
+
+    if( !p_spu->i_stop )
+    {
+        /* This subtitle will live for 5 seconds or until the next subtitle */
+        p_spu->i_stop = p_spu->i_start + 500 * 11000;
+        p_spu->b_ephemer = 1;
+    }
+
     /* Get rid of padding bytes */
     switch( p_spudec->i_spu_size - i_index )
     {
         case 1:
-
             RemoveBits( &p_spudec->bit_stream, 8 );
             i_index++;
-
         case 0:
-
             /* Zero or one padding byte, quite usual */
-
             break;
 
         default:

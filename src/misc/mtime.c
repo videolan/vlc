@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mtime.c,v 1.17 2001/04/28 03:36:25 sam Exp $
+ * $Id: mtime.c,v 1.18 2001/05/07 04:42:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -94,7 +94,7 @@ mtime_t mdate( void )
     {
         /* Microsecond resolution */
         QueryPerformanceCounter((LARGE_INTEGER *)&usec_time);
-   	usec_time /= (freq/1000000);
+        usec_time /= (freq/1000000);
     }
     return( usec_time );
 

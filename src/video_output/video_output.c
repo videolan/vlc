@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.125 2001/05/07 03:14:10 stef Exp $
+ * $Id: video_output.c,v 1.126 2001/05/07 04:42:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -214,14 +214,16 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
      * will be initialized later in InitThread */
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
     {
-        p_vout->p_picture[i_index].i_type   =   EMPTY_PICTURE;
-        p_vout->p_picture[i_index].i_status =   FREE_PICTURE;
+        p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
+        p_vout->p_picture[i_index].i_status = FREE_PICTURE;
     }
+
     for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++)
     {
-        p_vout->p_subpicture[i_index].i_type  = EMPTY_SUBPICTURE;
-        p_vout->p_subpicture[i_index].i_status= FREE_SUBPICTURE;
+        p_vout->p_subpicture[i_index].i_type   = EMPTY_SUBPICTURE;
+        p_vout->p_subpicture[i_index].i_status = FREE_SUBPICTURE;
     }
+
     p_vout->i_pictures = 0;
 
     /* Create and initialize system-dependant method - this function issues its
@@ -232,6 +234,7 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
         free( p_vout );
         return( NULL );
     }
+
     intf_WarnMsg( 3, "actual configuration: %dx%d, %d/%d bpp (%d Bpl), "
                   "masks: 0x%x/0x%x/0x%x",
                   p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
@@ -337,15 +340,15 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
 /*****************************************************************************
  * vout_DisplaySubPicture: display a subpicture unit
  *****************************************************************************
- * Remove the reservation flag of an subpicture, which will cause it to be ready
+ * Remove the reservation flag of a subpicture, which will cause it to be ready
  * for display. The picture does not need to be locked, since it is ignored by
  * the output thread if is reserved.
  *****************************************************************************/
 void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
 #ifdef TRACE_VOUT
-    char        psz_begin_date[MSTRTIME_MAX_SIZE]; /* buffer for date string */
-    char        psz_end_date[MSTRTIME_MAX_SIZE];   /* buffer for date string */
+    char        psz_start[ MSTRTIME_MAX_SIZE ];    /* buffer for date string */
+    char        psz_stop[ MSTRTIME_MAX_SIZE ];     /* buffer for date string */
 #endif
 
 #ifdef DEBUG
@@ -364,8 +367,8 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     /* Send subpicture information */
     intf_DbgMsg("subpicture %p: type=%d, begin date=%s, end date=%s",
                 p_subpic, p_subpic->i_type,
-                mstrtime( psz_begin_date, p_subpic->begin_date ),
-                mstrtime( psz_end_date, p_subpic->end_date ) );
+                mstrtime( psz_start, p_subpic->i_start ),
+                mstrtime( psz_stop, p_subpic->i_stop ) );
 #endif
 }
 
@@ -1065,6 +1068,7 @@ static void RunThread( vout_thread_t *p_vout)
                 display_date =  0;
             }
         }
+
         /*
          * Find the subpictures to display - this operation does not need
          * lock, since only READY_SUBPICTURE are handled. If no picture
@@ -1089,9 +1093,6 @@ static void RunThread( vout_thread_t *p_vout)
             b_display = p_vout->b_active;
             p_vout->last_display_date = display_date;
             p_vout->p_rendered_pic = p_pic;
-
-
-
 
             /* Set picture dimensions and clear buffer */
             SetBufferPicture( p_vout, p_pic );
@@ -1951,6 +1952,43 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
     p_vout_font_t       p_font;                                 /* text font */
     int                 i_width, i_height;          /* subpicture dimensions */
+    mtime_t             i_date = mdate();
+
+    subpicture_t       *p_ephemer = NULL;
+    subpicture_t       *p_tmp = p_subpic;
+
+    /* Look for the youngest ephemer */
+    while( p_tmp != NULL )
+    {
+        if( p_tmp->i_type == DVD_SUBPICTURE && p_tmp->b_ephemer
+             && i_date >= p_tmp->i_start && i_date <= p_tmp->i_stop )
+	{
+            if( p_ephemer == NULL || p_tmp->i_start < p_ephemer->i_start )
+	    {
+                p_ephemer = p_tmp;
+	    }
+        }
+
+        p_tmp = p_tmp->p_next;
+    }
+
+    /* If we found an ephemer, kill it if we find a more recent one */
+    if( p_ephemer != NULL )
+    {
+        p_tmp = p_subpic;
+
+        while( p_tmp != NULL )
+        {
+            if( p_tmp->i_type == DVD_SUBPICTURE
+                 && i_date >= p_tmp->i_start && i_date >= p_tmp->i_start
+                 && p_tmp != p_ephemer && p_tmp->i_start > p_ephemer->i_start )
+            {
+                p_ephemer->i_stop = 0;
+            }
+
+            p_tmp = p_tmp->p_next;
+        }
+    }
 
     while( p_subpic != NULL )
     {
@@ -1958,12 +1996,12 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
         {
         case DVD_SUBPICTURE:                          /* DVD subpicture unit */
             /* test if the picture really has to be displayed */
-            if( mdate() < p_subpic->begin_date )
+            if( i_date < p_subpic->i_start )
             {
                 /* not yet, see you later */
                 break;
             }
-            if( mdate() > p_subpic->end_date )
+            if( i_date > p_subpic->i_stop )
             {
                 /* too late, destroying the subpic */
                 vout_DestroySubPicture( p_vout, p_subpic );
@@ -1973,6 +2011,7 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
                             p_subpic, p_vout->i_bytes_per_pixel,
                             p_vout->i_bytes_per_line );
             break;
+
         case TEXT_SUBPICTURE:                            /* single line text */
             /* Select default font if not specified */
             p_font = p_subpic->type.text.p_font;
@@ -2003,11 +2042,12 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
             }
             break;
 
-#ifdef DEBUG
         default:
+#ifdef DEBUG
             intf_ErrMsg( "error: unknown subpicture %p type %d",
                          p_subpic, p_subpic->i_type );
 #endif
+            break;
         }
 
         p_subpic = p_subpic->p_next;

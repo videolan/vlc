@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.28 2001/04/28 03:36:25 sam Exp $
+ * $Id: netutils.c,v 1.29 2001/05/07 04:42:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -245,7 +245,7 @@ int network_ChannelJoin( int i_channel_id )
     int                 i_nbanswer;
     char                i_answer;
     fd_set              s_rfds;
-    unsigned int 	i_rc;
+    unsigned int        i_rc;
  
     if( ! p_main->b_channels )
     {

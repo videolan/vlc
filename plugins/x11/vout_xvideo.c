@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.15 2001/05/07 03:14:09 stef Exp $
+ * $Id: vout_xvideo.c,v 1.16 2001/05/07 04:42:42 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -1060,7 +1060,7 @@ static void XVideoOutputCoords( const picture_t *p_pic, const boolean_t scale,
                 *h = win_w * 9 / 16;
                 break;
 
-	    case AR_221_1_PICTURE:
+            case AR_221_1_PICTURE:
                 *h = win_w * 100 / 221;
                 break;
 

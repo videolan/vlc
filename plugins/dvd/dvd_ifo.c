@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.25 2001/05/07 03:14:09 stef Exp $
+ * $Id: dvd_ifo.c,v 1.26 2001/05/07 04:42:42 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -111,7 +111,7 @@ static __inline__ u32 ReadDouble( ifo_t * p_ifo, u8* pi_buffer,
     if( *pp_current > pi_buffer + DVD_LB_SIZE - 4 )
     {
         *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos + DVD_LB_SIZE);
-//	intf_WarnMsg( 1, "new buffer in double @ %lld", p_ifo->i_pos );
+//        intf_WarnMsg( 1, "new buffer in double @ %lld", p_ifo->i_pos );
     }
 
     i_ret = U32_AT(*pp_current);
@@ -1343,7 +1343,7 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, off_t i_pos )
         p_cell_inf->p_cell_map[i].i_cell_id = ReadByte( p_ifo, pi_buffer, &p_current );
         DumpBits( p_ifo, pi_buffer, &p_current, 1 );
         p_cell_inf->p_cell_map[i].i_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
-//	fprintf(stderr, "sector[%d] %d (%lld)\n", i,ntohl(*(u32*)(p_current)), p_ifo->i_pos);
+//        fprintf(stderr, "sector[%d] %d (%lld)\n", i,ntohl(*(u32*)(p_current)), p_ifo->i_pos);
         p_cell_inf->p_cell_map[i].i_end_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
     }
     

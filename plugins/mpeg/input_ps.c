@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.21 2001/05/07 03:14:09 stef Exp $
+ * $Id: input_ps.c,v 1.22 2001/05/07 04:42:42 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -146,7 +146,7 @@ static int PSProbe( probedata_t *p_data )
 static void PSInit( input_thread_t * p_input )
 {
     thread_ps_data_t *  p_method;
-    packet_cache_t * 	p_packet_cache;
+    packet_cache_t *    p_packet_cache;
 
     if( (p_method =
          (thread_ps_data_t *)malloc( sizeof(thread_ps_data_t) )) == NULL )
@@ -173,8 +173,8 @@ static void PSInit( input_thread_t * p_input )
     if ( p_packet_cache->data.p_stack == NULL )
     {
         intf_ErrMsg( "Out of memory" );
-    	p_input->b_error = 1;
-    	return;
+        p_input->b_error = 1;
+        return;
     }
     p_packet_cache->data.l_index = 0;
     
@@ -602,7 +602,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
         /* Checks whether the buffer cache is empty */
         if( p_cache->small.l_index == 0 )
         {
-    	    /* Allocates a new packet */
+            /* Allocates a new packet */
             if ( (p_data->p_buffer = malloc( l_size )) == NULL )
             {
                 intf_DbgMsg( "Out of memory" );
@@ -625,7 +625,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
                 free( p_data );
                 return NULL;
             }
-	        /* Reallocates the packet if it is too small or too large */
+            /* Reallocates the packet if it is too small or too large */
             if( p_cache->small.p_stack[l_index].l_size < l_size ||
                 p_cache->small.p_stack[l_index].l_size > 2*l_size )
             {
@@ -645,7 +645,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
         /* Checks whether the buffer cache is empty */
         if( p_cache->large.l_index == 0 )
         {
-    	    /* Allocates a new packet */
+            /* Allocates a new packet */
             if ( (p_data->p_buffer = malloc( l_size )) == NULL )
             {
                 intf_ErrMsg( "Out of memory" );
@@ -668,7 +668,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
                 free( p_data );
                 return NULL;
             }
-	        /* Reallocates the packet if it is too small or too large */
+            /* Reallocates the packet if it is too small or too large */
             if( p_cache->large.p_stack[l_index].l_size < l_size ||
                 p_cache->large.p_stack[l_index].l_size > 2*l_size )
             {
@@ -679,7 +679,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
             {
                 p_data->l_size = p_cache->large.p_stack[l_index].l_size;
             }
-	    }
+        }
     }
 
     /* Initialize data */
@@ -689,7 +689,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
     p_data->p_payload_end = p_data->p_buffer + l_size;
 
     return( p_data );
-	
+
 }
 
 
@@ -734,7 +734,7 @@ static pes_packet_t * NewPES( void * p_packet_cache )
             return NULL;
         }
     }
-	
+
     p_pes->b_data_alignment = p_pes->b_discontinuity =
         p_pes->i_pts = p_pes->i_dts = 0;
     p_pes->i_pes_size = 0;
@@ -762,7 +762,7 @@ static void DeletePacket( void * p_packet_cache,
     }
 #endif
 
-	ASSERT( p_data );
+    ASSERT( p_data );
 
     /* Checks whether the data cache is full */
     if ( p_cache->data.l_index < DATA_CACHE_SIZE )
@@ -789,7 +789,7 @@ static void DeletePacket( void * p_packet_cache,
 #endif
             }
         }
-    	else
+        else
         {
             /* Checks whether the large buffer cache is full */
             if ( p_cache->large.l_index < LARGE_CACHE_SIZE )
@@ -813,7 +813,7 @@ static void DeletePacket( void * p_packet_cache,
     {
         /* Cache full: the packet must be freed */
         free( p_data->p_buffer );
-    	free( p_data );
+        free( p_data );
 #ifdef TRACE_INPUT
         intf_DbgMsg( "PS input: data packet freed" );
 #endif
@@ -854,7 +854,7 @@ static void DeletePES( void * p_packet_cache, pes_packet_t * p_pes )
     /* Checks whether the PES cache is full */
     if ( p_cache->pes.l_index < PES_CACHE_SIZE )
     {
-    	/* Cache not full: store the packet in it */
+        /* Cache not full: store the packet in it */
         p_cache->pes.p_stack[ p_cache->pes.l_index ++ ] = p_pes;
     }
     else

@@ -2,7 +2,7 @@
  * ac3_parse.c: ac3 parsing procedures
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_parse.c,v 1.20 2001/05/06 04:32:02 sam Exp $
+ * $Id: ac3_parse.c,v 1.21 2001/05/07 04:42:42 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -810,7 +810,7 @@ void parse_bsi_stats (ac3dec_t * p_ac3dec) /*Some stats */
 {  
     struct mixlev_s
     {
-   	    float clev;
+        float clev;
         char *desc;
     };
     static const char *service_ids[8] = 
@@ -835,10 +835,10 @@ void parse_bsi_stats (ac3dec_t * p_ac3dec) /*Some stats */
     
     if ( !i )
     {
-/*     	if ((p_ac3dec->bsi.acmod & 0x1) && (p_ac3dec->bsi.acmod != 0x1))
-       		printf("CentreMixLevel %s ",cmixlev_tbl[p_ac3dec->bsi.cmixlev].desc);
-       	if (p_ac3dec->bsi.acmod & 0x4)
-       		printf("SurMixLevel %s",smixlev_tbl[p_ac3dec->bsi.cmixlev].desc);
+/*      if ((p_ac3dec->bsi.acmod & 0x1) && (p_ac3dec->bsi.acmod != 0x1))
+               printf("CentreMixLevel %s ",cmixlev_tbl[p_ac3dec->bsi.cmixlev].desc);
+        if (p_ac3dec->bsi.acmod & 0x4)
+               printf("SurMixLevel %s",smixlev_tbl[p_ac3dec->bsi.cmixlev].desc);
  */
         intf_Msg ( "(ac3dec_parsebsi) %s %d.%d Mode",
                 service_ids[p_ac3dec->bsi.bsmod],
@@ -855,19 +855,19 @@ void parse_audblk_stats (ac3dec_t * p_ac3dec)
     char *exp_strat_tbl[4] = {"R   ","D15 ","D25 ","D45 "};
     u32 i;
 
-	intf_ErrMsg ("(ac3dec_parseaudblk) ");
-	intf_ErrMsg ("%s ",p_ac3dec->audblk.cplinu ? "cpl on" : "cpl off");
-	intf_ErrMsg ("%s ",p_ac3dec->audblk.baie? "bai" : " ");
-	intf_ErrMsg ("%s ",p_ac3dec->audblk.snroffste? "snroffst" : " ");
-	intf_ErrMsg ("%s ",p_ac3dec->audblk.deltbaie? "deltba" : " ");
-	intf_ErrMsg ("%s ",p_ac3dec->audblk.phsflginu? "phsflg" : " ");
-	intf_ErrMsg ("(%s %s %s %s %s) ",exp_strat_tbl[p_ac3dec->audblk.chexpstr[0]],
-		exp_strat_tbl[p_ac3dec->audblk.chexpstr[1]],exp_strat_tbl[p_ac3dec->audblk.chexpstr[2]],
-		exp_strat_tbl[p_ac3dec->audblk.chexpstr[3]],exp_strat_tbl[p_ac3dec->audblk.chexpstr[4]]);
-	intf_ErrMsg ("[");
-	for(i=0;i<p_ac3dec->bsi.nfchans;i++)
-		intf_ErrMsg ("%1d",p_ac3dec->audblk.blksw[i]);
-	intf_ErrMsg ("]");
+    intf_ErrMsg ("(ac3dec_parseaudblk) ");
+        intf_ErrMsg ("%s ",p_ac3dec->audblk.cplinu ? "cpl on" : "cpl off");
+        intf_ErrMsg ("%s ",p_ac3dec->audblk.baie? "bai" : " ");
+        intf_ErrMsg ("%s ",p_ac3dec->audblk.snroffste? "snroffst" : " ");
+        intf_ErrMsg ("%s ",p_ac3dec->audblk.deltbaie? "deltba" : " ");
+        intf_ErrMsg ("%s ",p_ac3dec->audblk.phsflginu? "phsflg" : " ");
+        intf_ErrMsg ("(%s %s %s %s %s) ",exp_strat_tbl[p_ac3dec->audblk.chexpstr[0]],
+                exp_strat_tbl[p_ac3dec->audblk.chexpstr[1]],exp_strat_tbl[p_ac3dec->audblk.chexpstr[2]],
+                exp_strat_tbl[p_ac3dec->audblk.chexpstr[3]],exp_strat_tbl[p_ac3dec->audblk.chexpstr[4]]);
+        intf_ErrMsg ("[");
+        for(i=0;i<p_ac3dec->bsi.nfchans;i++)
+                intf_ErrMsg ("%1d",p_ac3dec->audblk.blksw[i]);
+        intf_ErrMsg ("]");
 
-	intf_ErrMsg ("\n");
+        intf_ErrMsg ("\n");
 }

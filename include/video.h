@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.29 2001/03/21 13:42:33 sam Exp $
+ * $Id: video.h,v 1.30 2001/05/07 04:42:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -123,9 +123,10 @@ typedef struct subpicture_s
     int             i_size;                                     /* data size */
     struct subpicture_s *   p_next;         /* next subtitle to be displayed */
 
-    /* Other properties */
-    mtime_t         begin_date;                 /* beginning of display date */
-    mtime_t         end_date;                         /* end of display date */
+    /* Date properties */
+    mtime_t         i_start;                    /* beginning of display date */
+    mtime_t         i_stop;                           /* end of display date */
+    boolean_t       b_ephemer;             /* does the subtitle have a TTL ? */
 
     /* Display properties - these properties are only indicative and may be
      * changed by the video output thread, or simply ignored depending of the
