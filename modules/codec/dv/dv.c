@@ -2,7 +2,7 @@
  * dv.c: a decoder for DV video
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dv.c,v 1.3 2002/10/27 16:58:13 gbazin Exp $
+ * $Id: dv.c,v 1.4 2002/11/02 17:31:37 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -28,6 +28,8 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
+#undef vlc_error /*vlc_error is defined in the libdv headers, but not
+                  * used in thes file */
 #include <libdv/dv_types.h>
 #include <libdv/dv.h>
 
@@ -267,7 +269,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
     }
 
     free( p_buffer );
-    CloseBitstream( bit_stream );
+    CloseBitstream( &bit_stream );
 
     if( p_fifo->b_error )
     {

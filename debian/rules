@@ -93,7 +93,7 @@ install: build
 	# Package: gnome-vlc
 	mv debian/vlc/usr/bin/gnome-vlc debian/gnome-vlc/usr/bin/
 	ln -s vlc debian/gnome-vlc/usr/share/doc/gnome-vlc
-	mv debian/vlc/usr/lib/vlc/gui/libgnome_main_plugin.so \
+	mv debian/vlc/usr/lib/vlc/misc/libgnome_main_plugin.so \
 		debian/gnome-vlc/usr/lib/vlc/gui/
 	mv debian/vlc/usr/lib/vlc/gui/libgnome_plugin.so \
 		debian/gnome-vlc/usr/lib/vlc/gui/
@@ -104,7 +104,7 @@ install: build
 	# Package: gvlc
 	mv debian/vlc/usr/bin/gvlc debian/gvlc/usr/bin/
 	ln -s vlc debian/gvlc/usr/share/doc/gvlc
-	mv debian/vlc/usr/lib/vlc/gui/libgtk_main_plugin.so \
+	mv debian/vlc/usr/lib/vlc/misc/libgtk_main_plugin.so \
 		debian/gvlc/usr/lib/vlc/gui/
 	mv debian/vlc/usr/lib/vlc/gui/libgtk_plugin.so \
 		debian/gvlc/usr/lib/vlc/gui/
@@ -186,6 +186,8 @@ endif
 	ln -s vlc debian/kvlc/usr/share/doc/kvlc
 	mv debian/vlc/usr/lib/vlc/gui/libkde_plugin.so \
 		debian/kvlc/usr/lib/vlc/gui/
+	mv debian/vlc/usr/share/vlc/ui.rc \
+		debian/kvlc/usr/share/vlc
 	ln -s vlc.1.gz debian/kvlc/usr/share/man/man1/kvlc.1.gz
 	mv debian/vlc/$(VIDDIR)/kvlc32x32.xpm debian/kvlc/$(VIDDIR)/kvlc.xpm
 	mv debian/vlc/$(VIDDIR)/kvlc48x48.png debian/kvlc/$(PIXDIR)/kvlc.png
