@@ -103,6 +103,15 @@ int input_NetlistOpen( input_thread_t *p_input )
                               = p_input->netlist.p_pes_packets + i_packets;
     }
 
+    /* the p_pes_header_save buffer is allocated on the fly by the PES
+       demux if needed, and freed with the PES packet when the netlist
+       is destroyed. We initialise the field to NULL so that the demux
+       can determine if it has already allocated this buffer or not. */
+    for( i_packets = 0; i_packets < INPUT_MAX_PES + 1; i_packets++ )
+    {
+      p_input->netlist.p_pes_packets[i_packets].p_pes_header_save = NULL;
+    }
+
     return( 0 );
 }
 
@@ -111,7 +120,21 @@ int input_NetlistOpen( input_thread_t *p_input )
  ******************************************************************************/
 void input_NetlistClean( input_thread_t *p_input )
 {
-    free( p_input->netlist.p_ts_packets );                 /* free TS netlist */
-    free( p_input->netlist.p_pes_packets );               /* free PES netlist */
+    int i;
+
+    /* free TS netlist */
+    free( p_input->netlist.p_ts_packets );
+
+    /* free the pes_buffer_save buffers of the PES packets if they have
+       been allocated */
+    for( i = 0; i < INPUT_MAX_PES + 1; i++ )
+    {
+      byte_t* p_buffer = p_input->netlist.p_pes_packets[i].p_pes_header_save;
+      if(p_buffer)
+	free(p_buffer);
+    }
+
+    /* free PES netlist */
+    free( p_input->netlist.p_pes_packets );
 }
 

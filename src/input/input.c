@@ -632,8 +632,8 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
         if( p[4] )
         {
             /* If the packet has both adaptation_field and payload, adaptation_field
-               cannot be more than 182 bytes long; if there is only an adaptation_field,
-               it must fill the next 183 bytes. */
+               cannot be more than 182 bytes long; if there is only an
+	       adaptation_field, it must fill the next 183 bytes. */
             if( b_payload ? (p[4] > 182) : (p[4] != 183) )
             {
                 intf_DbgMsg("input debug: invalid TS adaptation field (%p)\n",
@@ -658,20 +658,20 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
                        discontinuity. We let the PCR decoder handle that. */
                     p_es_descriptor->b_discontinuity = 1;
                     
-                    /* There also may be a continuity_counter discontinuity: resynchronise
-                       our counter with the one of the stream */
+                    /* There also may be a continuity_counter discontinuity:
+		       resynchronise our counter with the one of the stream */
                     p_es_descriptor->i_continuity_counter = (p[3] & 0x0f) - 1;
                 }
 
                 /* random_access_indicator */
                 p_es_descriptor->b_random |= p[5] & 0x40;
 
-                /* If this is a PCR_PID, and this TS packet contains a PCR, we pass it
-                   along to the PCR decoder. */
+                /* If this is a PCR_PID, and this TS packet contains a PCR,
+		   we pass it along to the PCR decoder. */
                 if( (p_es_descriptor->b_pcr) && (p[5] & 0x10) )
                 {
-                    /* There should be a PCR field in the packet, check if the adaption
-                       field is long enough to carry it */
+                    /* There should be a PCR field in the packet, check if the
+		       adaption field is long enough to carry it */
                     if( p[4] >= 7 )
                     {
                         /* Call the PCR decoder */
@@ -810,8 +810,13 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
         {
             /* This part of the header does not fit in the current TS packet:
                copy the part of the header we are interested in to the
-               p_pes_header_save buffer */
-            intf_DbgMsg("Code never tested encourtered, WARNING ! (benny)\n");
+               p_pes_header_save buffer. The buffer is dynamicly allocated if
+	       needed so it's time expensive but this situation almost never
+	       occur. */
+            intf_DbgMsg("Code never tested encountered, WARNING ! (benny)\n");
+	    if( !p_pes->p_pes_header_save )
+	        p_pes->p_pes_header_save = malloc(PES_HEADER_SIZE); 
+
             do
             {
                 memcpy(p_pes->p_pes_header_save + i_dummy,
