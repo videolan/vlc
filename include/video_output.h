@@ -2,7 +2,7 @@
  * video_output.h : video output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.105 2003/12/08 17:48:13 yoann Exp $
+ * $Id: video_output.h,v 1.106 2003/12/09 19:15:03 yoann Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -122,7 +122,7 @@ struct vout_thread_t
     picture_t           p_picture[2*VOUT_MAX_PICTURES];        /**< pictures */
     subpicture_t        p_subpicture[VOUT_MAX_PICTURES];    /**< subpictures */
 
-    subpicture_t *      last_osd_message;
+    subpicture_t *      p_last_osd_message;
 
     /* Statistics */
     count_t          c_loops;

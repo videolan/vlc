@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.47 2003/12/08 17:48:13 yoann Exp $
+ * $Id: video_text.c,v 1.48 2003/12/09 19:15:03 yoann Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -100,13 +100,18 @@ void vout_OSDMessage( vlc_object_t *p_caller, char *psz_string )
 
     if( p_vout )
     {
-        if( p_vout->last_osd_message )
+        vlc_mutex_lock( &p_vout->change_lock );
+
+        if( p_vout->p_last_osd_message )
         {
-            vout_DestroySubPicture( p_vout, p_vout->last_osd_message );
-            p_vout->last_osd_message = NULL;
+            vout_DestroySubPicture( p_vout, p_vout->p_last_osd_message );
         }
-        p_vout->last_osd_message = vout_ShowTextRelative( p_vout, psz_string, 
+
+        p_vout->p_last_osd_message = vout_ShowTextRelative( p_vout, psz_string,
                         NULL, OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,1000000 );
+
+        vlc_mutex_unlock( &p_vout->change_lock );
+
         vlc_object_release( p_vout );
     }
 }

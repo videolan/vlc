@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.46 2003/12/09 00:46:03 yoann Exp $
+ * $Id: open.cpp,v 1.47 2003/12/09 19:15:03 yoann Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -955,7 +955,7 @@ void OpenDialog::OnDiscDeviceChange( wxCommandEvent& event )
             break;
     }
 
-    if( strcmp( psz_device, disc_device->GetValue().c_str() ) )
+    if( disc_device->GetValue().Cmp( wxU( psz_device ) ) )
     {
         b_disc_device_changed = true;
     }
