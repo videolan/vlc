@@ -37,6 +37,7 @@
 #define TITLE_ALL      N_( "All items, unsorted" )
 
 #define PLAYLIST_PROFILE 1
+#undef PLAYLIST_DEBUG
 
 /*****************************************************************************
  * Local prototypes
@@ -729,6 +730,9 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
         /* We are not playing from a view */
         if(  p_playlist->request.i_view == -1  )
         {
+#ifdef PLAYLIST_DEBUG
+            msg_Dbg( p_playlist, "non-view mode request");
+#endif
             /* Directly select the item, just like now */
             i_skip = p_playlist->request.i_skip;
             i_goto = p_playlist->request.i_goto;
@@ -755,6 +759,9 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
         }
         else
         {
+#ifdef PLAYLIST_DEBUG
+            msg_Dbg( p_playlist, "view mode request" );
+#endif
             p_new = p_playlist->request.p_item;
             i_skip = p_playlist->request.i_skip;
 

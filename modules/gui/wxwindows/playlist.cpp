@@ -1183,7 +1183,8 @@ void Playlist::OnActivateItem( wxTreeEvent& event )
     else
     {
         p_node = p_wxitem->p_item;
-        if( p_wxitem->p_item->i_children > 0 )
+        if( p_wxitem->p_item->i_children > 0 &&
+            p_wxitem->p_item->pp_children[0]->i_children == -1)
         {
             p_item = p_wxitem->p_item->pp_children[0];
         }
