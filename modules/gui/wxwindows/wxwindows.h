@@ -629,7 +629,7 @@ public:
 
     wxComboBox *file_combo;
     wxComboBox *encoding_combo;
-    wxSpinCtrl *delay_spinctrl;
+    wxComboBox *size_combo;
     wxSpinCtrl *fps_spinctrl;
 
 private:

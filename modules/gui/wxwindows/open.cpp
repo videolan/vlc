@@ -1280,8 +1280,9 @@ void OpenDialog::OnSubsFileSettings( wxCommandEvent& WXUNUSED(event) )
         if( subsfile_dialog->encoding_combo )
             subsfile_mrl.Add( wxString(wxT("subsdec-encoding=")) +
                               subsfile_dialog->encoding_combo->GetValue() );
-        subsfile_mrl.Add( wxString::Format( wxT("sub-delay=%i"),
-                          subsfile_dialog->delay_spinctrl->GetValue() ) );
+        subsfile_mrl.Add( wxString::Format( wxT("freetype-rel-fontsize=%i"),
+                          (int)subsfile_dialog->size_combo->GetClientData(
+                          subsfile_dialog->size_combo->GetSelection()) ) );
         subsfile_mrl.Add( wxString::Format( wxT("sub-fps=%i"),
                           subsfile_dialog->fps_spinctrl->GetValue() ) );
     }
