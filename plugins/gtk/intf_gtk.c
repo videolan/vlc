@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.23 2001/05/30 23:02:04 stef Exp $
+ * $Id: intf_gtk.c,v 1.24 2001/05/31 03:23:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -35,6 +35,7 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
+#include <glib/glib.h>
 #include <gtk/gtk.h>
 
 #include "config.h"

@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.53 2001/05/30 17:03:12 sam Exp $
+ * $Id: vout_sdl.c,v 1.54 2001/05/31 03:23:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -262,7 +262,7 @@ static int vout_Init( vout_thread_t *p_vout )
 static void vout_End( vout_thread_t *p_vout )
 {
     SDLCloseDisplay( p_vout );
-    SDL_Quit();
+    SDL_QuitSubSystem( SDL_INIT_VIDEO );
 }
 
 /*****************************************************************************

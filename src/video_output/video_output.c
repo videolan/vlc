@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.129 2001/05/30 17:03:13 sam Exp $
+ * $Id: video_output.c,v 1.130 2001/05/31 03:23:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -227,50 +227,6 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
     }
 
     p_vout->i_pictures = 0;
-
-    /* Create and initialize system-dependant method - this function issues its
-     * own error messages */
-    if( p_vout->pf_create( p_vout ) )
-    {
-        module_Unneed( p_vout->p_module );
-        free( p_vout );
-        return( NULL );
-    }
-
-    intf_WarnMsg( 3, "actual configuration: %dx%d, %d/%d bpp (%d Bpl), "
-                  "masks: 0x%x/0x%x/0x%x",
-                  p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
-                  p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line,
-                  p_vout->i_red_mask, p_vout->i_green_mask,
-                  p_vout->i_blue_mask );
-
-    /* Calculate shifts from system-updated masks */
-    MaskToShift( &p_vout->i_red_lshift, &p_vout->i_red_rshift,
-                 p_vout->i_red_mask );
-    MaskToShift( &p_vout->i_green_lshift, &p_vout->i_green_rshift,
-                 p_vout->i_green_mask );
-    MaskToShift( &p_vout->i_blue_lshift, &p_vout->i_blue_rshift,
-                 p_vout->i_blue_mask );
-
-    /* Set some useful colors */
-    p_vout->i_white_pixel = RGB2PIXEL( p_vout, 255, 255, 255 );
-    p_vout->i_black_pixel = RGB2PIXEL( p_vout, 0, 0, 0 );
-    p_vout->i_gray_pixel  = RGB2PIXEL( p_vout, 128, 128, 128 );
-    p_vout->i_blue_pixel  = RGB2PIXEL( p_vout, 0, 0, 50 );
-
-    /* Load fonts - fonts must be initialized after the system method since
-     * they may be dependant on screen depth and other thread properties */
-    p_vout->p_default_font = vout_LoadFont( VOUT_DEFAULT_FONT );
-    if( p_vout->p_default_font == NULL )
-    {
-        intf_ErrMsg( "vout error: could not load default font" );
-    }
-
-    p_vout->p_large_font = vout_LoadFont( VOUT_LARGE_FONT );
-    if( p_vout->p_large_font == NULL )
-    {
-        intf_ErrMsg( "vout error: could not load large font" );
-    }
 
     /* Create thread and set locks */
     vlc_mutex_init( &p_vout->picture_lock );
@@ -920,7 +876,51 @@ static int InitThread( vout_thread_t *p_vout )
     p_vout->c_loops = 0;
 #endif
 
-   /* Initialize output method - this function issues its own error messages */
+    /* Create and initialize system-dependant method - this function issues its
+     * own error messages */
+    if( p_vout->pf_create( p_vout ) )
+    {
+        module_Unneed( p_vout->p_module );
+        free( p_vout );
+        return( NULL );
+    }
+
+    intf_WarnMsg( 3, "actual configuration: %dx%d, %d/%d bpp (%d Bpl), "
+                  "masks: 0x%x/0x%x/0x%x",
+                  p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
+                  p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line,
+                  p_vout->i_red_mask, p_vout->i_green_mask,
+                  p_vout->i_blue_mask );
+
+    /* Calculate shifts from system-updated masks */
+    MaskToShift( &p_vout->i_red_lshift, &p_vout->i_red_rshift,
+                 p_vout->i_red_mask );
+    MaskToShift( &p_vout->i_green_lshift, &p_vout->i_green_rshift,
+                 p_vout->i_green_mask );
+    MaskToShift( &p_vout->i_blue_lshift, &p_vout->i_blue_rshift,
+                 p_vout->i_blue_mask );
+
+    /* Set some useful colors */
+    p_vout->i_white_pixel = RGB2PIXEL( p_vout, 255, 255, 255 );
+    p_vout->i_black_pixel = RGB2PIXEL( p_vout, 0, 0, 0 );
+    p_vout->i_gray_pixel  = RGB2PIXEL( p_vout, 128, 128, 128 );
+    p_vout->i_blue_pixel  = RGB2PIXEL( p_vout, 0, 0, 50 );
+
+    /* Load fonts - fonts must be initialized after the system method since
+     * they may be dependant on screen depth and other thread properties */
+    p_vout->p_default_font = vout_LoadFont( VOUT_DEFAULT_FONT );
+    if( p_vout->p_default_font == NULL )
+    {
+        intf_ErrMsg( "vout error: could not load default font" );
+    }
+
+    p_vout->p_large_font = vout_LoadFont( VOUT_LARGE_FONT );
+    if( p_vout->p_large_font == NULL )
+    {
+        intf_ErrMsg( "vout error: could not load large font" );
+    }
+
+    /* Initialize output method - this function issues its own error messages */
     if( p_vout->pf_init( p_vout ) )
     {
         return( 1 );

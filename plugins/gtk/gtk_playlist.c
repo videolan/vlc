@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.16 2001/05/30 23:02:04 stef Exp $
+ * $Id: gtk_playlist.c,v 1.17 2001/05/31 03:23:24 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -28,15 +28,18 @@
 #include "defs.h"
 
 #include <stdlib.h>
-
-#include <gtk/gtk.h>
-
 #include <string.h>
 
 #include <sys/types.h>          /* for readdir  and stat stuff */
-#include <dirent.h>
+
+#ifndef WIN32
+#   include <dirent.h>
+#endif
+
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include <gtk/gtk.h>
 
 #include "config.h"
 #include "common.h"

@@ -2,7 +2,7 @@
  * gtk_playlist.h : Playlist functions for the Gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_playlist.h,v 1.4 2001/05/19 00:39:30 stef Exp $
+ * $Id: gtk_playlist.h,v 1.5 2001/05/31 03:23:24 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -39,7 +39,7 @@ gboolean GtkPlaylistShow      ( GtkWidget *, GdkEventButton *, gpointer );
 gboolean GtkPlaylistPrev      ( GtkWidget *, GdkEventButton *, gpointer );
 gboolean GtkPlaylistNext      ( GtkWidget *, GdkEventButton *, gpointer );
 gboolean GtkPlaylistDragMotion( GtkWidget *, GdkDragContext *,
-                                gint, gint, uint, gpointer );
+                                gint, gint, guint, gpointer );
 gboolean GtkPlaylistEvent     ( GtkWidget *, GdkEvent *, gpointer );
 void     GtkPlaylistDragData  ( GtkWidget *, GdkDragContext *,
                                 gint, gint, GtkSelectionData *,
