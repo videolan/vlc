@@ -280,7 +280,7 @@ typedef struct
     char         *psz_codec_download_url;
     
     /* encryption/compression */
-    vlc_bool_t   b_compression_zlib;
+    int           i_compression_type;
 
 } mkv_track_t;
 
@@ -1118,16 +1118,18 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         DataBuffer &data = block->GetBuffer(i);
 
         p_block = MemToBlock( p_demux, data.Buffer(), data.Size() );
-#if defined(HAVE_ZLIB_H)
-        if( p_block != NULL && tk.b_compression_zlib )
-        {
-            p_block = block_zlib_decompress( VLC_OBJECT(p_demux), p_block );
-        }
-#endif
+
         if( p_block == NULL )
         {
             break;
         }
+
+#if defined(HAVE_ZLIB_H)
+        if( tk.i_compression_type )
+        {
+            p_block = block_zlib_decompress( VLC_OBJECT(p_demux), p_block );
+        }
+#endif
 
         if( tk.fmt.i_cat != VIDEO_ES )
             p_block->i_dts = p_block->i_pts = i_pts;
@@ -1884,7 +1886,7 @@ static void ParseTrackEntry( demux_t *p_demux, EbmlMaster *m )
     tk->psz_codec_info_url = NULL;
     tk->psz_codec_download_url = NULL;
     
-    tk->b_compression_zlib = VLC_FALSE;
+    tk->i_compression_type = MATROSKA_COMPRESSION_NONE;
 
     for( i = 0; i < m->ListSize(); i++ )
     {
@@ -2060,7 +2062,7 @@ static void ParseTrackEntry( demux_t *p_demux, EbmlMaster *m )
                                     MkvTree( p_demux, 6, "Compression Algorithm: %i", uint32(compalg) );
                                     if( uint32( compalg ) == 0 )
                                     {
-                                        tk->b_compression_zlib = VLC_TRUE;
+                                        tk->i_compression_type = MATROSKA_COMPRESSION_ZLIB;
                                     }
                                 }
                                 else
