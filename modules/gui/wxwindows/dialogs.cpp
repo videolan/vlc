@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dialogs.cpp,v 1.1 2003/07/17 17:30:40 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.2 2003/07/17 18:58:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -72,7 +72,8 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
                 DialogsProvider::OnPreferences)
     EVT_COMMAND(INTF_DIALOG_FILEINFO, wxEVT_DIALOG,
                 DialogsProvider::OnFileInfo)
-  //EVT_COMMAND(ShowPopup_Event, wxEVT_DIALOG, DialogsProvider::OnShowPopup)
+    EVT_COMMAND(INTF_DIALOG_POPUPMENU, wxEVT_DIALOG,
+                DialogsProvider::OnPopupMenu)
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -95,6 +96,9 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
 
     /* Create the messages dialog so it can begin storing logs */
     p_messages_dialog = new Messages( p_intf, p_parent ? p_parent : this );
+
+    /* Intercept all menu events in our custom event handler */
+    PushEventHandler( new MenuEvtHandler( p_intf, NULL ) );
 }
 
 DialogsProvider::~DialogsProvider()
@@ -236,4 +240,18 @@ void DialogsProvider::Open( int i_access_method, int i_arg )
     {
         p_open_dialog->Show( i_access_method, i_arg );
     }
+}
+
+void DialogsProvider::OnPopupMenu( wxCommandEvent& event )
+{
+    wxPoint mousepos = wxGetMousePosition();
+
+#if 0
+    wxMouseEvent event = wxMouseEvent( wxEVT_RIGHT_UP );
+    event.m_x = p_main_interface->ScreenToClient(mousepos).x;
+    event.m_y = p_main_interface->ScreenToClient(mousepos).y;
+#endif
+
+    ::PopupMenu( p_intf, this, mousepos );
+
 }

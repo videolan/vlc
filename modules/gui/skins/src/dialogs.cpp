@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.10 2003/07/17 17:30:40 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.11 2003/07/17 18:58:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -74,6 +74,17 @@ Dialogs::Dialogs( intf_thread_t *_p_intf )
     /* Initialize dialogs provider
      * (returns as soon as initialization is done) */
     if( p_provider->pf_run ) p_provider->pf_run( p_provider );
+
+    /* Register callback for the intf-popupmenu variable */
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist != NULL )
+    {
+        var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB,
+                         p_intf->p_sys->p_dialogs );
+        vlc_object_release( p_playlist );
+    }
 }
 
 Dialogs::~Dialogs()
@@ -122,6 +133,8 @@ void Dialogs::ShowFileInfo()
 
 void Dialogs::ShowPopup()
 {
+    if( p_provider && p_provider->pf_show_dialog )
+        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_POPUPMENU, 0 );
 }
 
 /*****************************************************************************

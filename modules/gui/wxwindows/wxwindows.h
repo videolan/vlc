@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.43 2003/07/17 17:30:40 gbazin Exp $
+ * $Id: wxwindows.h,v 1.44 2003/07/17 18:58:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -202,6 +202,8 @@ private:
     void OnOpenDisc( wxCommandEvent& event );
     void OnOpenNet( wxCommandEvent& event );
     void OnOpenSat( wxCommandEvent& event );
+
+    void OnPopupMenu( wxCommandEvent& event );
 
     void OnIdle( wxIdleEvent& event );
 
