@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.28 2003/10/20 17:18:54 gbazin Exp $
+ * $Id: libavi.c,v 1.29 2003/10/24 12:22:51 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -118,7 +118,7 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
     uint8_t *p_peek;
     vlc_bool_t b_seekable;
 
-    if( p_container->common.i_chunk_size < 8 )
+    if( p_container->common.i_chunk_size > 0 && p_container->common.i_chunk_size < 8 )
     {
         /* empty box */
         msg_Warn( (vlc_object_t*)s, "empty list chunk" );
@@ -171,16 +171,22 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
         }
         p_container->common.p_last = p_chk;
 
-        if( AVI_ChunkRead( s, p_chk, p_container ) ||
+        if( AVI_ChunkRead( s, p_chk, p_container ) )
+        {
+            break;
+        }
+        if( p_chk->common.p_father->common.i_chunk_size > 0 &&
            ( stream_Tell( s ) >=
               (off_t)p_chk->common.p_father->common.i_chunk_pos +
                (off_t)__EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
         {
             break;
         }
+
         /* If we can't seek then stop when we 've found LIST-movi */
         if( p_chk->common.i_chunk_fourcc == AVIFOURCC_LIST &&
-            p_chk->list.i_type == AVIFOURCC_movi && !b_seekable )
+            p_chk->list.i_type == AVIFOURCC_movi &&
+            ( !b_seekable || p_chk->common.i_chunk_size == 0 ) )
         {
             break;
         }
