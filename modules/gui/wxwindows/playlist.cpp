@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.37 2004/01/15 21:49:07 sigmunau Exp $
+ * $Id: playlist.cpp,v 1.38 2004/01/16 00:01:19 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -590,9 +590,9 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
     wxString filter = wxT("");
     for( unsigned int i = 0; i < sizeof(formats)/sizeof(formats[0]); i++)
     {
-        filter.Append( wxT(formats[i].psz_desc) );
+        filter.Append( wxU(formats[i].psz_desc) );
         filter.Append( wxT("|") );
-        filter.Append( wxT(formats[i].psz_filter) );
+        filter.Append( wxU(formats[i].psz_filter) );
         filter.Append( wxT("|") );
     }
     wxFileDialog dialog( this, wxU(_("Save playlist")),
