@@ -7,6 +7,24 @@
 #
 # Urgency values: Wishlist, Normal, Important, Critical
 
+Task: 0x38
+Difficulty: Medium
+Urgency: Important
+Description: Make aout eat less CPU
+ When the vlc is launched without a stream, the audio_output thread
+ eats all memory, probably because there is no msleep() when no data
+ is available in the audio_output queue.
+Status: Todo
+
+Task: 0x37
+Difficulty: Guru
+Urgency: Important
+Description: Fix motion compensation bug
+ The motion compensation still has a small bug which can be well
+ noticed when there is a sudden color change, a few blocks remain
+ visible on the screen.
+Status: Todo
+
 Task: 0x36
 Difficulty: Medium
 Urgency: Normal
@@ -57,7 +75,7 @@ Description: Optimize SPU rendering
  There is an if() in the SPU display routine to double lines when needed,
  whiwh is rather inefficient. It should be removed and put outside
  the main loop.
-Status: Todo.
+Status: Done 26 Aug 2000 (henri)
 
 Task: 0x30
 Difficulty: Hard
@@ -144,7 +162,7 @@ Description: SDL video output support
  The Simple DirectMedia Layer library is a generic API that provides
  YUV acceleration on some platforms. More information can be found
  on http://www.devolution.com/~slouken/SDL/
-Status: Todo
+Status: Done 21 Aug 2000 (octplane)
 
 Task: 0x21
 Difficulty: Medium
@@ -197,7 +215,7 @@ Description: Fix field pictures support
  Some MPEG2 streams are interleaved, and the vlc does not support
  this very well. Adding support for them requires an excellent
  knowledge of the MPEG2 papers.
-Status: Todo
+Status: Done 23 Aug 2000 (Meuuh)
 
 Task: 0x1b
 Difficulty: Hard
