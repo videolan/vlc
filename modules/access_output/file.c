@@ -2,7 +2,7 @@
  * file.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.7 2003/06/12 15:56:27 gbazin Exp $
+ * $Id: file.c,v 1.8 2003/06/21 14:24:30 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -100,7 +100,7 @@ static int Open( vlc_object_t *p_this )
     }
     else if( ( p_access->p_sys->i_handle =
                open( p_access->psz_name, O_WRONLY|O_CREAT|O_TRUNC,
-                     S_IREAD | S_IRGRP | S_IROTH ) ) == -1 )
+                     S_IWRITE | S_IREAD | S_IRGRP | S_IROTH ) ) == -1 )
     {
         msg_Err( p_access, "cannot open `%s'", p_access->psz_name );
         free( p_access->p_sys );
