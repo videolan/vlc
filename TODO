@@ -1,0 +1,107 @@
+# VLC Todo
+# Difficulty values: Easy, Medium, Hard, Guru
+#
+# Urgency values: Wishlist, Normal, Important, Critical
+
+Task
+Difficulty: Easy
+Urgency: Critical
+Platform: any
+Description: World domination
+ We need to dominate the world
+Status: Todo
+
+Task
+Difficulty: Medium
+Platform: any
+Urgency: Wishlist
+Description: RAR/ZIP/... access
+ An access module that would be able to uncompress compressed files
+Status: Todo
+
+Task
+Difficulty: easy
+Platform: Linux, Win32
+Urgency: Normal
+Description: Streaming wizard
+ Finish the streaming wizard
+Status: Assigned to zorglub
+
+Task
+Difficulty: Hard
+Urgency: Normal
+Platform: any
+Description: Embedded video outputs
+ Embedded video outputs support
+Status: Assigned to gibalou
+
+Task
+Difficulty: Guru
+Platform: any
+Urgency: Normal
+Description: Demux2 transition
+ Complete the transition to demux2, changing what is needed in dvd and dvb
+Status: Assigned to fenrir
+
+Task
+Difficulty: Guru
+Urgency: Normal
+Platform: any
+Description: Multi-acccess
+ Allow several access from an input thread to allow for multi-input
+Status: Assigned to fenrir
+
+Task
+Difficulty: Medium
+Urgency: Wishlist
+Platform: any
+Description: OSD Icons
+ Make OSD Icons for Play/Pause/Stop
+Status: Assigned to yoann
+
+Task
+Difficulty: Medium
+Urgency: Normal
+Platform: any
+Description: Rewrite the SAP parser
+ The SAP parser is very dirty at the moment, and needs a complete rewrite.
+Status: Todo
+
+Task
+Difficulty: Medium
+Urgency: Normal
+Platform: any
+Description: Tree playlist
+ A hierarchized playlist structure, eventually using a media library.
+Status: Todo
+
+Task
+Difficulty: Hard
+Urgency: Normal
+Platform: OSX
+Description: New OS X preferences
+ New preferences for Mac OS X
+Status: Assigned to thedj
+
+Task
+Difficulty: Hard
+Urgency: Normal
+Platform: OSX
+Description: CoreAudio multichannel audio output
+Status: Assigned to thedj
+
+Task
+Difficulty: Hard
+Urgency: Normal
+Platform: any
+Description: Stream text subtitles
+ Find a a way to stream text subtitles, in TS and in RTP.
+  - Find an existing norm
+  - Implement it
+Status: todo
+
+# Do not remove me
+Task
+
+
+
