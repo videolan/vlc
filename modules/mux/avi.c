@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.14 2003/08/10 14:21:16 gbazin Exp $
+ * $Id: avi.c,v 1.15 2003/08/17 18:44:26 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -27,69 +27,19 @@
 /* TODO: add OpenDML write support */
 
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <errno.h>
-#include <fcntl.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc/sout.h>
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
-
 #include "codecs.h"
-
-
-#define AVIF_HASINDEX       0x00000010  // Index at end of file?
-#define AVIF_MUSTUSEINDEX   0x00000020
-#define AVIF_ISINTERLEAVED  0x00000100
-#define AVIF_TRUSTCKTYPE    0x00000800  // Use CKType to find key frames?
-#define AVIF_WASCAPTUREFILE 0x00010000
-#define AVIF_COPYRIGHTED    0x00020000
-
-/* Flags for index */
-#define AVIIF_LIST          0x00000001L /* chunk is a 'LIST' */
-#define AVIIF_KEYFRAME      0x00000010L /* this frame is a key frame.*/
-#define AVIIF_NOTIME        0x00000100L /* this frame doesn't take any time */
-#define AVIIF_COMPUSE       0x0FFF0000L /* these bits are for compressor use */
-
-/*****************************************************************************
- * Exported prototypes
- *****************************************************************************/
-static int     Open   ( vlc_object_t * );
-static void    Close  ( vlc_object_t * );
-
-static int Capability(sout_mux_t *, int , void *, void * );
-static int AddStream( sout_mux_t *, sout_input_t * );
-static int DelStream( sout_mux_t *, sout_input_t * );
-static int Mux      ( sout_mux_t * );
-
-static sout_buffer_t *avi_HeaderCreateRIFF( sout_mux_t * );
-static sout_buffer_t *avi_HeaderCreateidx1( sout_mux_t * );
-
-static void SetFCC( uint8_t *p, char *fcc )
-{
-    p[0] = fcc[0];
-    p[1] = fcc[1];
-    p[2] = fcc[2];
-    p[3] = fcc[3];
-}
-
-static void SetDWLE( uint8_t *p, uint32_t i_dw )
-{
-    p[3] = ( i_dw >> 24 )&0xff;
-    p[2] = ( i_dw >> 16 )&0xff;
-    p[1] = ( i_dw >>  8 )&0xff;
-    p[0] = ( i_dw       )&0xff;
-}
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open   ( vlc_object_t * );
+static void Close  ( vlc_object_t * );
+
 vlc_module_begin();
     set_description( _("Avi muxer") );
     set_capability( "sout mux", 5 );
@@ -97,8 +47,14 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 vlc_module_end();
 
-// FIXME FIXME
-#define HDR_SIZE 10240
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static int  Capability(sout_mux_t *, int , void *, void * );
+static int  AddStream( sout_mux_t *, sout_input_t * );
+static int  DelStream( sout_mux_t *, sout_input_t * );
+static int  Mux      ( sout_mux_t * );
 
 typedef struct avi_stream_s
 {
@@ -106,7 +62,6 @@ typedef struct avi_stream_s
 
     char fcc[4];
 
-    //mtime_t i_first_pts;
     mtime_t i_duration;       // in µs
 
     int     i_frames;        // total frame count
@@ -152,6 +107,35 @@ struct sout_mux_sys_t
 
 };
 
+// FIXME FIXME
+#define HDR_SIZE 10240
+
+/* Flags in avih */
+#define AVIF_HASINDEX       0x00000010  // Index at end of file?
+#define AVIF_ISINTERLEAVED  0x00000100
+#define AVIF_TRUSTCKTYPE    0x00000800  // Use CKType to find key frames?
+
+/* Flags for index */
+#define AVIIF_KEYFRAME      0x00000010L /* this frame is a key frame.*/
+
+
+static sout_buffer_t *avi_HeaderCreateRIFF( sout_mux_t * );
+static sout_buffer_t *avi_HeaderCreateidx1( sout_mux_t * );
+
+static void SetFCC( uint8_t *p, char *fcc )
+{
+    memcpy( p, fcc, 4 );
+}
+
+static void SetDWLE( uint8_t *p, uint32_t i_dw )
+{
+    p[3] = ( i_dw >> 24 )&0xff;
+    p[2] = ( i_dw >> 16 )&0xff;
+    p[1] = ( i_dw >>  8 )&0xff;
+    p[0] = ( i_dw       )&0xff;
+}
+
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -159,7 +143,8 @@ static int Open( vlc_object_t *p_this )
 {
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
-    //sout_buffer_t   *p_hdr;
+
+    msg_Dbg( p_mux, "AVI muxer opened" );
 
     p_sys = malloc( sizeof( sout_mux_sys_t ) );
     p_sys->i_streams = 0;
@@ -168,24 +153,17 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->idx1.i_entry_count = 0;
     p_sys->idx1.i_entry_max = 10000;
-    p_sys->idx1.entry = calloc( p_sys->idx1.i_entry_max, sizeof( avi_idx1_entry_t ) );
+    p_sys->idx1.entry = calloc( p_sys->idx1.i_entry_max,
+                                sizeof( avi_idx1_entry_t ) );
     p_sys->b_write_header = VLC_TRUE;
 
-    msg_Info( p_mux, "Open" );
 
     p_mux->pf_capacity  = Capability;
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
     p_mux->p_sys        = p_sys;
-    p_mux->i_preheader  = 8; // (fourcc,length) header
-
-#if 0
-    /* room to add header at the end */
-    p_hdr = sout_BufferNew( p_mux->p_sout, HDR_SIZE );
-    memset( p_hdr->p_buffer, 0, HDR_SIZE );
-    sout_AccessOutWrite( p_mux->p_access, p_hdr );
-#endif
+    p_mux->i_preheader  = 8;    /* (fourcc,length) header */
 
     return VLC_SUCCESS;
 }
@@ -193,7 +171,6 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-
 static void Close( vlc_object_t * p_this )
 {
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
@@ -202,7 +179,7 @@ static void Close( vlc_object_t * p_this )
     sout_buffer_t       *p_hdr, *p_idx1;
     int                 i_stream;
 
-    msg_Info( p_mux, "Close" );
+    msg_Dbg( p_mux, "AVI muxer closed" );
 
     /* first create idx1 chunk (write at the end of the stream */
     p_idx1 = avi_HeaderCreateidx1( p_mux );
@@ -245,7 +222,8 @@ static void Close( vlc_object_t * p_this )
     sout_AccessOutWrite( p_mux->p_access, p_hdr );
 }
 
-static int Capability( sout_mux_t *p_mux, int i_query, void *p_args, void *p_answer )
+static int Capability( sout_mux_t *p_mux, int i_query,
+                       void *p_args, void *p_answer )
 {
    switch( i_query )
    {
@@ -285,7 +263,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
             p_stream->p_bih = NULL;
 
-            p_stream->p_wf  = malloc( sizeof( WAVEFORMATEX ) + p_input->p_fmt->i_extra_data );
+            p_stream->p_wf  = malloc( sizeof( WAVEFORMATEX ) +
+                                      p_input->p_fmt->i_extra_data );
 #define p_wf p_stream->p_wf
             p_wf->cbSize = p_input->p_fmt->i_extra_data;
             if( p_wf->cbSize > 0 )
@@ -354,9 +333,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 p_sys->i_stream_video = p_sys->i_streams;
             }
             p_stream->p_wf  = NULL;
-            p_stream->p_bih = malloc( sizeof( BITMAPINFOHEADER ) + p_input->p_fmt->i_extra_data );
+            p_stream->p_bih = malloc( sizeof( BITMAPINFOHEADER ) +
+                                      p_input->p_fmt->i_extra_data );
 #define p_bih p_stream->p_bih
-            p_bih->biSize  = sizeof( BITMAPINFOHEADER ) + p_input->p_fmt->i_extra_data;
+            p_bih->biSize  = sizeof( BITMAPINFOHEADER ) +
+                             p_input->p_fmt->i_extra_data;
             if( p_input->p_fmt->i_extra_data > 0 )
             {
                 memcpy( &p_bih[1],
@@ -389,12 +370,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_stream->i_totalsize = 0;
     p_stream->i_frames    = 0;
     p_stream->i_duration  = 0;
-    //p_stream->i_first_pts = 0;
 
     /* fixed later */
     p_stream->f_fps = 25;
     p_stream->i_bitrate = 128 * 1024;
-
 
     p_sys->i_streams++;
     return( VLC_SUCCESS );
@@ -405,8 +384,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     msg_Dbg( p_mux, "removing input" );
 
-    free( p_input->p_sys ); p_input->p_sys = NULL;
-
+    free( p_input->p_sys );
     return( 0 );
 }
 
@@ -872,5 +850,4 @@ static sout_buffer_t * avi_HeaderCreateidx1( sout_mux_t *p_mux )
 
     return( p_idx1 );
 }
-
 

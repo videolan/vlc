@@ -2,7 +2,7 @@
  * dummy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: dummy.c,v 1.7 2003/03/11 19:02:30 fenrir Exp $
+ * $Id: dummy.c,v 1.8 2003/08/17 18:44:26 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -26,43 +26,35 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <errno.h>
-#include <fcntl.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc/sout.h>
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
-
 #include "codecs.h"
-
-/*****************************************************************************
- * Exported prototypes
- *****************************************************************************/
-static int     Open   ( vlc_object_t * );
-static void    Close  ( vlc_object_t * );
-
-static int Capability(sout_mux_t *, int, void *, void * );
-static int AddStream( sout_mux_t *, sout_input_t * );
-static int DelStream( sout_mux_t *, sout_input_t * );
-static int Mux      ( sout_mux_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open   ( vlc_object_t * );
+static void Close  ( vlc_object_t * );
+
 vlc_module_begin();
-    set_description( _("Dummy muxer") );
+    set_description( _("Dummy/Raw muxer") );
     set_capability( "sout mux", 5 );
     add_shortcut( "dummy" );
     add_shortcut( "es" );
     set_callbacks( Open, Close );
 vlc_module_end();
+
+
+/*****************************************************************************
+ * Exported prototypes
+ *****************************************************************************/
+static int  Capability(sout_mux_t *, int, void *, void * );
+static int  AddStream( sout_mux_t *, sout_input_t * );
+static int  DelStream( sout_mux_t *, sout_input_t * );
+static int  Mux      ( sout_mux_t * );
 
 /*****************************************************************************
  * Open:
@@ -71,6 +63,7 @@ static int Open( vlc_object_t *p_this )
 {
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
 
+    msg_Dbg( p_mux, "Dummy/Raw muxer opened" );
     msg_Info( p_mux, "Open" );
 
     p_mux->pf_capacity  = Capability;
@@ -89,10 +82,11 @@ static void Close( vlc_object_t * p_this )
 {
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
 
-    msg_Info( p_mux, "Close" );
+    msg_Dbg( p_mux, "Dummy/Raw muxer closed" );
 }
 
-static int Capability( sout_mux_t *p_mux, int i_query, void *p_args, void *p_answer )
+static int Capability( sout_mux_t *p_mux, int i_query,
+                       void *p_args, void *p_answer )
 {
    switch( i_query )
    {
