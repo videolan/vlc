@@ -58,7 +58,7 @@ struct filter_t
                                                 int, int, int );
 
     subpicture_t *      ( *pf_sub_filter ) ( filter_t *, mtime_t );
-    subpicture_t *      ( *pf_render_string ) ( filter_t *, block_t * );
+    subpicture_t *      ( *pf_render_string ) ( filter_t *, block_t *, int, int );
 
     /*
      * Buffers allocation
