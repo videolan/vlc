@@ -387,7 +387,7 @@ static int ioctl_CheckFrontend( input_thread_t * p_input, fe_type_t type )
     int          fd_front = p_dvb->i_frontend;
     int          i_ret;
 
-    while( 1 )
+    while( !p_input->b_die )
     {
         int32_t value;
         fe_status_t status;
