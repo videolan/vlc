@@ -291,7 +291,8 @@ PLUGIN_BEOS =	plugins/beos/beos.o \
 		plugins/beos/vout_beos.o
 
 PLUGIN_DSP =	plugins/dsp/dsp.o \
-		plugins/dsp/aout_dsp.o \
+		plugins/dsp/aout_dsp.o
+
 
 PLUGIN_DUMMY =	plugins/dummy/dummy.o \
 		plugins/dummy/aout_dummy.o \
@@ -311,9 +312,8 @@ PLUGIN_GGI =	plugins/ggi/ggi.o \
 
 PLUGIN_SDL =	plugins/sdl/sdl.o \
 		plugins/sdl/intf_sdl.o \
-		plugins/sdl/vout_sdl.o 
-#		plugins/sdl/video_yuv.o \
-#		plugins/sdl/video_yuvall.o
+		plugins/sdl/vout_sdl.o \
+		plugins/sdl/aout_sdl.o 
 
 PLUGIN_NULL =	plugins/null/null.o
 

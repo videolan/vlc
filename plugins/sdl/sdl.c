@@ -22,6 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME sdl
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -41,15 +43,27 @@
 #include "video.h"
 #include "video_output.h"
 
+/* audio includes */
+#include "modules.h"
+#include "modules_inner.h"
+
+/*****************************************************************************
+ * Building configuration tree
+ *****************************************************************************/
+
+MODULE_CONFIG_START
+ADD_WINDOW( "Configuration for sdl module" )
+ ADD_COMMENT( "For now, the sdl module cannot be configured" )
+MODULE_CONFIG_END
+
+
+
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
 static void vout_GetPlugin( p_vout_thread_t p_vout );
 static void intf_GetPlugin( p_intf_thread_t p_intf );
 
-#if 0
-static void yuv_GetPlugin( p_vout_thread_t p_vout );
-#endif
 
 /* Video output */
 int     vout_SDLCreate       ( vout_thread_t *p_vout, char *psz_display,
@@ -61,18 +75,16 @@ int     vout_SDLManage       ( p_vout_thread_t p_vout );
 void    vout_SDLDisplay      ( p_vout_thread_t p_vout );
 void    vout_SDLSetPalette   ( p_vout_thread_t p_vout,
                                u16 *red, u16 *green, u16 *blue, u16 *transp );
-
-#if 0
-/* YUV transformations */
-int     yuv_CInit          ( p_vout_thread_t p_vout );
-int     yuv_CReset         ( p_vout_thread_t p_vout );
-void    yuv_CEnd           ( p_vout_thread_t p_vout );
-#endif
-
 /* Interface */
 int     intf_SDLCreate       ( p_intf_thread_t p_intf );
 void    intf_SDLDestroy      ( p_intf_thread_t p_intf );
 void    intf_SDLManage       ( p_intf_thread_t p_intf );
+
+
+/*****************************************************************************
+ *  * Capabilities defined in the other files.
+ ******************************************************************************/
+extern void aout_getfunctions( function_list_t * p_function_list );
 
 /*****************************************************************************
  * GetConfig: get the plugin structure and configuration
@@ -88,17 +100,7 @@ plugin_info_t * GetConfig( void )
     p_info->aout_GetPlugin = NULL;
     p_info->vout_GetPlugin = vout_GetPlugin;
     p_info->intf_GetPlugin = intf_GetPlugin;
-    
-    
-    /* TODO: before doing this, we have to know if the videoCard is capable of 
-     * hardware YUV -> display acceleration....
-     */
-
-#if 0
-    p_info->yuv_GetPlugin  = (void *) yuv_GetPlugin;
-#else
     p_info->yuv_GetPlugin = NULL;
-#endif
   
     
     /* if the SDL libraries are there, assume we can enter the
@@ -138,12 +140,64 @@ static void intf_GetPlugin( p_intf_thread_t p_intf )
     p_intf->p_sys_manage  = intf_SDLManage;
 }
 
-#if 0
-static void yuv_GetPlugin( p_vout_thread_t p_vout )
+/*****************************************************************************
+ * Audio stuff:  All the new modules things
+ *****************************************************************************/
+
+/*****************************************************************************
+ * InitModule: get the module structure and configuration.
+ *****************************************************************************
+ * We have to fill psz_name, psz_longname and psz_version. These variables
+ * will be strdup()ed later by the main application because the module can
+ * be unloaded later to save memory, and we want to be able to access this
+ * data even after the module has been unloaded.
+ *****************************************************************************/
+int InitModule( module_t * p_module )
 {
-    p_vout->p_yuv_init   = yuv_CInit;
-    p_vout->p_yuv_reset  = yuv_CReset;
-    p_vout->p_yuv_end    = yuv_CEnd;
+    p_module->psz_name = MODULE_STRING;
+    p_module->psz_longname = "Linux SDL audio module";
+    p_module->psz_version = VERSION;
+
+    p_module->i_capabilities = MODULE_CAPABILITY_NULL
+                                | MODULE_CAPABILITY_AOUT;
+
+    return( 0 );
 }
-#endif
+
+/*****************************************************************************
+ * ActivateModule: set the module to an usable state.
+ *****************************************************************************
+ * This function fills the capability functions and the configuration
+ * structure. Once ActivateModule() has been called, the i_usage can
+ * be set to 0 and calls to NeedModule() be made to increment it. To unload
+ * the module, one has to wait until i_usage == 0 and call DeactivateModule().
+ *****************************************************************************/
+int ActivateModule( module_t * p_module )
+{
+    p_module->p_functions = malloc( sizeof( module_functions_t ) );
+    if( p_module->p_functions == NULL )
+    {
+        return( -1 );
+    }
+
+    aout_getfunctions( &p_module->p_functions->aout );
+
+    p_module->p_config = p_config;
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * DeactivateModule: make sure the module can be unloaded.
+ *****************************************************************************
+ * This function must only be called when i_usage == 0. If it successfully
+ * returns, i_usage can be set to -1 and the module unloaded. Be careful to
+ * lock usage_lock during the whole process.
+ *****************************************************************************/
+int DeactivateModule( module_t * p_module )
+{
+    free( p_module->p_functions );
+
+    return( 0 );
+}
 
