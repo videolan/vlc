@@ -47,7 +47,6 @@ object DiscDlg: TDiscDlg
       Width = 23
       Height = 13
       Caption = '&Title:'
-      Enabled = False
     end
     object LabelChapter: TLabel
       Tag = 3
@@ -56,7 +55,6 @@ object DiscDlg: TDiscDlg
       Width = 40
       Height = 13
       Caption = '&Chapter:'
-      Enabled = False
     end
     object SpinEditTitle: TCSpinEdit
       Left = 56
@@ -64,8 +62,6 @@ object DiscDlg: TDiscDlg
       Width = 73
       Height = 22
       TabStop = True
-      Color = clBtnFace
-      Enabled = False
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -11
@@ -84,8 +80,6 @@ object DiscDlg: TDiscDlg
       Width = 73
       Height = 22
       TabStop = True
-      Color = clBtnFace
-      Enabled = False
       MaxValue = 65535
       MinValue = 1
       ParentColor = False
@@ -98,8 +92,6 @@ object DiscDlg: TDiscDlg
       Width = 97
       Height = 17
       Caption = '&Menus'
-      Checked = True
-      State = cbChecked
       TabOrder = 0
       OnClick = CheckBoxMenusClick
     end

@@ -62,21 +62,11 @@ void __fastcall TDiscDlg::ButtonCancelClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TDiscDlg::ButtonOkClick( TObject *Sender )
 {
-    AnsiString  Device, Source, Method, Title, Chapter;
+    AnsiString  Device, Source;
 
     Hide();
 
     Device = EditDevice->Text;
-
-    /* Check which method was activated */
-    if( RadioGroupType->ItemIndex == 0 )
-        Method = "dvdold";
-    else
-        Method = "vcd";
-
-    /* Select title and chapter */
-    Title.sprintf( "%d", SpinEditTitle->Value );
-    Chapter.sprintf( "%d", SpinEditChapter->Value );
 
     /* Build source name and add it to playlist */
     if ( CheckBoxMenus->Checked && RadioGroupType->ItemIndex == 0 )
@@ -85,8 +75,21 @@ void __fastcall TDiscDlg::ButtonOkClick( TObject *Sender )
     }
     else
     {
+        AnsiString Method, Title, Chapter;
+        /* Select title and chapter */
+        Title.sprintf( "%d", SpinEditTitle->Value );
+        Chapter.sprintf( "%d", SpinEditChapter->Value );
+
+        /* Select access method */
+        if( RadioGroupType->ItemIndex == 0 )
+            Method = "dvdold";
+        else
+            Method = "vcd";
+
+        /* build the MRL */
         Source = Method + "://" + Device + "@" + Title + "," + Chapter;
     }
+    msg_Dbg (p_intf , Source.c_str());
 
     p_intf->p_sys->p_playwin->Add( Source, PLAYLIST_APPEND
             | ( p_intf->p_sys->b_play_when_adding ? PLAYLIST_GO : 0 ),
