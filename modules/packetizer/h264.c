@@ -67,10 +67,6 @@ struct decoder_sys_t
     vlc_bool_t b_slice;
     block_t    *p_frame;
 
-    int64_t      i_dts;
-    int64_t      i_pts;
-    unsigned int i_flags;
-
     vlc_bool_t   b_sps;
 
     /* avcC data */
@@ -103,7 +99,8 @@ enum nal_unit_type_e
     NAL_SLICE_IDR   = 5,    /* ref_idc != 0 */
     NAL_SEI         = 6,    /* ref_idc == 0 */
     NAL_SPS         = 7,
-    NAL_PPS         = 8
+    NAL_PPS         = 8,
+    NAL_AU_DELIMITER= 9
     /* ref_idc == 0 for 6,9,10,11,12 */
 };
 
@@ -152,9 +149,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->bytestream = block_BytestreamInit( p_dec );
     p_sys->b_slice = VLC_FALSE;
     p_sys->p_frame = NULL;
-    p_sys->i_dts   = 0;
-    p_sys->i_pts   = 0;
-    p_sys->i_flags = 0;
     p_sys->b_sps   = VLC_FALSE;
 
     p_sys->i_nal_type = -1;
@@ -294,6 +288,10 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                     p_sys->i_state = STATE_NOSYNC;
                     break;
                 }
+#if 0
+                msg_Dbg( p_dec, "pts="I64Fd" dts="I64Fd,
+                         p_pic->i_pts, p_pic->i_dts );
+#endif
 
                 /* So p_block doesn't get re-added several times */
                 *pp_block = block_BytestreamPop( &p_sys->bytestream );
@@ -419,6 +417,16 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     const int i_nal_ref_idc = (p_frag->p_buffer[3] >> 5)&0x03;
     const int i_nal_type = p_frag->p_buffer[3]&0x1f;
 
+#define OUTPUT \
+    do {                                                \
+        p_pic = block_ChainGather( p_sys->p_frame );    \
+        p_pic->i_length = 0;    /* FIXME */             \
+                                                        \
+        p_sys->p_frame = NULL;                          \
+        p_sys->b_slice = VLC_FALSE;                     \
+    } while(0)
+
+
     if( p_sys->b_slice && !p_sys->b_sps )
     {
         block_ChainRelease( p_sys->p_frame );
@@ -507,22 +515,9 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->i_nal_type = i_nal_type;
 
         if( b_pic && p_sys->b_slice )
-        {
-            p_pic = block_ChainGather( p_sys->p_frame );
-            p_pic->i_dts = p_sys->i_dts;
-            p_pic->i_pts = p_sys->i_pts;
-            p_pic->i_length = 0;    /* FIXME */
-            p_pic->i_flags = p_sys->i_flags;
-
-            /* Reset context */
-            p_sys->p_frame = NULL;
-            p_sys->b_slice = VLC_FALSE;
-        }
+            OUTPUT;
 
         p_sys->b_slice = VLC_TRUE;
-        p_sys->i_flags = i_pic_flags;
-        p_sys->i_dts   = p_frag->i_dts;
-        p_sys->i_pts   = p_frag->i_pts;
 
         free( dec );
     }
@@ -639,6 +634,10 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         }
 
         free( dec );
+
+
+        if( p_sys->b_slice )
+            OUTPUT;
     }
     else if( i_nal_type == NAL_PPS )
     {
@@ -647,7 +646,19 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 
         /* TODO */
         msg_Dbg( p_dec, "found NAL_PPS" );
+
+        if( p_sys->b_slice )
+            OUTPUT;
     }
+    else if( i_nal_type == NAL_AU_DELIMITER ||
+             i_nal_type == NAL_SEI ||
+             ( i_nal_type >= 13 && i_nal_type <= 18 ) )
+    {
+        if( p_sys->b_slice )
+            OUTPUT;
+    }
+
+#undef OUTPUT
 
     /* Append the block */
     block_ChainAppend( &p_sys->p_frame, p_frag );
