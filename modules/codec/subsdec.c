@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.8 2003/11/18 23:25:38 sigmunau Exp $
+ * $Id: subsdec.c,v 1.9 2003/11/18 23:58:10 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -191,6 +191,11 @@ static void DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     vout_thread_t *p_vout;
 
+    if( !pp_block || *pp_block == NULL )
+    {
+        return;
+    }
+
     /* Here we are dealing with text subtitles */
     p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( !p_vout )
@@ -200,6 +205,9 @@ static void DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     ParseText( p_dec, *pp_block, p_vout );
     vlc_object_release( p_vout );
+
+    block_Release( *pp_block );
+    *pp_block = NULL;
 }
 
 /*****************************************************************************
@@ -276,7 +284,7 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
     {
         char *psz_new_subtitle;
         char *psz_convert_buffer_out;
-        const char *psz_convert_buffer_in;
+        char *psz_convert_buffer_in;
         size_t ret, inbytes_left, outbytes_left;
 
         psz_new_subtitle = malloc( 6 * strlen( psz_subtitle ) );
