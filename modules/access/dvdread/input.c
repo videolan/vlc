@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input.c,v 1.13 2003/01/23 10:25:40 gbazin Exp $
+ * $Id: input.c,v 1.14 2003/01/23 15:50:15 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -204,7 +204,7 @@ static int DvdReadDemux( input_thread_t * p_input )
         /* In MPEG-2 pack headers we still have to read stuffing bytes. */
         if( (p_data->p_demux_start[3] == 0xBA) && (i_packet_size == 8) )
         {
-            size_t i_stuffing = (p_data->p_demux_start[13] & 0x7);
+            ssize_t i_stuffing = (p_data->p_demux_start[13] & 0x7);
             /* Force refill of the input buffer - though we don't care
              * about p_peek. Please note that this is unoptimized. */
             PEEK( i_stuffing );
@@ -243,10 +243,10 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     thread_dvd_data_t *     p_dvd;
     dvd_reader_t *          p_dvdread;
     input_area_t *          p_area;
-    int                     i_title = 1;
-    int                     i_chapter = 1;
-    int                     i_angle = 1;
-    int                     i;
+    unsigned int            i_title = 1;
+    unsigned int            i_chapter = 1;
+    unsigned int            i_angle = 1;
+    unsigned int            i;
 
     psz_parser = psz_source = strdup( p_input->psz_name );
     if( !psz_source )
@@ -501,10 +501,10 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
     if( p_area != p_input->stream.p_selected_area )
     {
         es_descriptor_t *    p_es;
-        int                  i_cell = 0;
-        int                  i_audio_nb = 0;
-        int                  i_spu_nb = 0;
-        int                  i;
+        unsigned int         i_cell = 0;
+        unsigned int         i_audio_nb = 0;
+        unsigned int         i_spu_nb = 0;
+        unsigned int         i;
 
 #define p_vmg         p_dvd->p_vmg_file
 #define p_vts         p_dvd->p_vts_file
@@ -851,8 +851,8 @@ static int DvdReadRead( input_thread_t * p_input,
 {
     thread_dvd_data_t *     p_dvd;
     byte_t *                p_buf;
-    int                     i_blocks_once;
-    int                     i_blocks;
+    unsigned int            i_blocks_once;
+    unsigned int            i_blocks;
     int                     i_read;
     int                     i_read_total;
     vlc_bool_t              b_eot = VLC_FALSE;
@@ -915,14 +915,13 @@ static int DvdReadRead( input_thread_t * p_input,
         /*
          * Compute the number of blocks to read
          */
-        i_blocks_once = p_dvd->i_pack_len >= i_blocks
-                 ? i_blocks : p_dvd->i_pack_len;
+        i_blocks_once = __MIN( p_dvd->i_pack_len, i_blocks );
         p_dvd->i_pack_len -= i_blocks_once;
 
         /* Reads from DVD */
         i_read = DVDReadBlocks( p_dvd->p_title, p_dvd->i_cur_block,
                                 i_blocks_once, p_buf );
-        if( i_read != i_blocks_once )
+        if( (unsigned int)i_read != i_blocks_once )
         {
             msg_Err( p_input, "read failed for %d/%d blocks at 0x%02x",
                               i_read, i_blocks_once, p_dvd->i_cur_block );
@@ -985,12 +984,12 @@ static int DvdReadRead( input_thread_t * p_input,
 static void DvdReadSeek( input_thread_t * p_input, off_t i_off )
 {
     thread_dvd_data_t *     p_dvd;
-    int                     i_lb;
-    int                     i_tmp;
-    int                     i_chapter = 0;
-    int                     i_cell = 0;
-    int                     i_vobu = 0;
-    int                     i_sub_cell = 0;
+    unsigned int            i_lb;
+    unsigned int            i_tmp;
+    unsigned int            i_chapter = 0;
+    unsigned int            i_cell = 0;
+    unsigned int            i_vobu = 0;
+    unsigned int            i_sub_cell = 0;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     i_off += p_input->stream.p_selected_area->i_start;
@@ -1088,7 +1087,7 @@ static void DvdReadHandleDSI( thread_dvd_data_t * p_dvd, uint8_t * p_data )
         {
             case 0x4:
                 /* interleaved unit with no angle */
-                if( p_dvd->dsi_pack.sml_pbi.ilvu_sa != -1 )
+                if( p_dvd->dsi_pack.sml_pbi.ilvu_sa != 0 )
                 {
                     p_dvd->i_next_vobu = p_dvd->i_cur_block +
                         p_dvd->dsi_pack.sml_pbi.ilvu_sa;
