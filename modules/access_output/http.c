@@ -49,15 +49,17 @@ static void Close( vlc_object_t * );
 #define PASS_TEXT N_("Password")
 #define PASS_LONGTEXT N_("Allows you to give a password that will be " \
                          "requested to access the stream." )
-
+#define MIME_TEXT N_("Mime")
+#define MIME_LONGTEXT N_("Allows you to give the mime returned by the server." )
 
 vlc_module_begin();
     set_description( _("HTTP stream output") );
     set_capability( "sout access", 0 );
     add_shortcut( "http" );
     add_shortcut( "mmsh" );
-    add_string( SOUT_CFG_PREFIX "user", "", NULL, "User", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "pwd", "", NULL, "Password", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "user", "", NULL, USER_TEXT, USER_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "pwd", "", NULL, PASS_TEXT, PASS_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "mime", "", NULL, MIME_TEXT, MIME_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -66,7 +68,7 @@ vlc_module_end();
  * Exported prototypes
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "user", "pwd", NULL
+    "user", "pwd", "mime", NULL
 };
 
 static int Write( sout_access_out_t *, block_t * );
@@ -180,19 +182,27 @@ static int Open( vlc_object_t *p_this )
 
     if( p_access->psz_access && !strcmp( p_access->psz_access, "mmsh" ) )
     {
-        psz_mime = "video/x-ms-asf-stream";
+        psz_mime = strdup( "video/x-ms-asf-stream" );
+    }
+    else
+    {
+        var_Get( p_access, SOUT_CFG_PREFIX "mime", &val );
+        if( *val.psz_string )
+            psz_mime = val.psz_string;
+        else
+            free( val.psz_string );
     }
 
     var_Get( p_access, SOUT_CFG_PREFIX "user", &val );
-    if( val.psz_string && *val.psz_string )
+    if( *val.psz_string )
         psz_user = val.psz_string;
-    else if( val.psz_string )
+    else
         free( val.psz_string );
 
     var_Get( p_access, SOUT_CFG_PREFIX "pwd", &val );
-    if( val.psz_string && *val.psz_string )
+    if( *val.psz_string )
         psz_pwd = val.psz_string;
-    else if( val.psz_string )
+    else
         free( val.psz_string );
 
     p_sys->p_httpd_stream =
@@ -200,6 +210,7 @@ static int Open( vlc_object_t *p_this )
                          psz_user, psz_pwd );
     if( psz_user ) free( psz_user );
     if( psz_pwd ) free( psz_pwd );
+    if( psz_mime ) free( psz_mime );
 
     if( p_sys->p_httpd_stream == NULL )
     {
