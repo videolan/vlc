@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.cpp,v 1.4 2002/10/04 18:07:21 sam Exp $
+ * $Id: qte.cpp,v 1.5 2002/12/08 21:05:42 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -34,6 +34,8 @@
  * - etc.
  *****************************************************************************/
 
+extern "C"
+{
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                                /* strerror() */
@@ -56,6 +58,7 @@
 #ifdef HAVE_SYS_SHM_H
 #   include <sys/shm.h>                                /* shmget(), shmctl() */
 #endif
+} /* extern "C" */
 
 #include <qapplication.h>
 #include <qpainter.h>
@@ -66,6 +69,8 @@
 # include <qgfxraster_qws.h>
 #endif
 
+extern "C"
+{
 #include "netutils.h"                                 /* network_ChannelJoin */
 #include "qte.h"
 
@@ -100,6 +105,7 @@ static void Display   ( vout_thread_t *, picture_t * );
 static int  Manage    ( vout_thread_t * );
 static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
+} /* extern "C" */
 
 static int  CreateQtWindow ( vout_thread_t * );
 static void DestroyQtWindow( vout_thread_t * );
@@ -114,6 +120,8 @@ static void RunQtThread( event_thread_t *p_event );
 /*****************************************************************************
 * Exported prototypes
 *****************************************************************************/
+extern "C"
+{
 
 vlc_module_begin();
     add_category_hint( N_("QT Embedded"), NULL );
@@ -121,10 +129,11 @@ vlc_module_begin();
     add_bool( "qte-altfullscreen", 0, NULL, NULL, NULL); //ALT_FS_TEXT, ALT_FS_LONGTEXT );
     add_integer( "qte-drawable", -1, NULL, NULL, NULL); //DRAWABLE_TEXT, DRAWABLE_LONGTEXT );
     set_description( _("QT Embedded module") );
-    set_capability( "video output", 20 );
+    set_capability( "video output", 30 );
     set_callbacks( Open, Close);
 vlc_module_end();
 
+} /* extern "C" */
 
 /*****************************************************************************
  * Seeking function TODO: put this in a generic location !
@@ -138,8 +147,9 @@ static inline void vout_Seek( off_t i_seek )
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    //msg_Err(p_vout, "+vout_Create::qte" );
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
+
+    msg_Err(p_vout, "+vout_Create::qte" );
 
     /* Allocate structure */
     p_vout->p_sys = (struct vout_sys_t*) malloc( sizeof( struct vout_sys_t ) );
@@ -151,7 +161,6 @@ static int Open( vlc_object_t *p_this )
     }
 
 //    memset(p_vout->p_sys, 0, sizeof( struct vout_sys_t ));
-
     p_vout->pf_init    = Init;
     p_vout->pf_end     = End;
     p_vout->pf_manage  = NULL; //Manage;
@@ -160,7 +169,7 @@ static int Open( vlc_object_t *p_this )
 
     CreateQtWindow(p_vout);
 
-    //msg_Err(p_vout, "-vout_Create::qte" );
+    msg_Err(p_vout, "-vout_Create::qte" );
     return( 0 );
 }
 
@@ -173,7 +182,7 @@ static void Close ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-    //msg_Err( p_vout, "+vout_Destroy::qte" );
+    msg_Err( p_vout, "+vout_Destroy::qte" );
     DestroyQtWindow(p_vout);
     free(p_vout->p_sys);
 }
@@ -191,7 +200,7 @@ static int Init( vout_thread_t *p_vout )
 
     int         dd = QPixmap::defaultDepth();
 
-    //msg_Err( p_vout,"+vout_Init::qte" );
+    msg_Err( p_vout,"+vout_Init::qte" );
 
     I_OUTPUTPICTURES = 0;
 
@@ -234,7 +243,7 @@ static int Init( vout_thread_t *p_vout )
         I_OUTPUTPICTURES++;
     }
 
-    //msg_Err(p_vout, "-vout_Init::qte %d output pictures", I_OUTPUTPICTURES);
+    msg_Err(p_vout, "-vout_Init::qte %d output pictures", I_OUTPUTPICTURES);
 
     return( 0 );
 }
@@ -256,7 +265,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    int x, y, w, h;
+    unsigned int x, y, w, h;
 
     vout_PlacePicture( p_vout, p_vout->p_sys->i_width, p_vout->p_sys->i_height,
                        &x, &y, &w, &h );
@@ -333,7 +342,7 @@ static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
-    //msg_Err(p_vout, "+vout_End::qte" );
+    msg_Err(p_vout, "+vout_End::qte" );
 
     /* Free the direct buffers we allocated */
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
@@ -353,7 +362,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int dd = QPixmap::defaultDepth();
 
-    //msg_Err(p_vout, "+NewPicture::dd = %d",dd );
+    msg_Err(p_vout, "+NewPicture::dd = %d",dd );
 
     p_pic->p_sys = (picture_sys_t*) malloc( sizeof( picture_sys_t ) );
 
@@ -427,11 +436,11 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         break;
     }
 
-/*
+
     msg_Err(p_vout, "NewPicture: %d %d %d",p_vout->output.i_width,
                                  p_vout->output.i_height,
                                  p_vout->output.i_chroma );
-*/
+
     return 0;
 }
 
@@ -462,12 +471,9 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
  *****************************************************************************/
 static int CreateQtWindow( vout_thread_t *p_vout )
 {
-    //msg_Err(p_vout, "vout_qt: +init qt window");
+    msg_Err(p_vout, "vout_qt: +init qt window");
 
     /* for displaying the vout in a qt window we need the QtApplication */
-//    vlc_thread_t    thread_id;
-    //msg_Err( "vout_qt: +init qt window, creating qpe application");
-
     p_vout->p_sys->pcVoutWidget = NULL;
 
     /* create thread to exec the qpe application */
@@ -480,6 +486,7 @@ static int CreateQtWindow( vout_thread_t *p_vout )
         msg_Err( p_vout, "input error: can't spawn video output thread");
         return( -1 );
     }
+    msg_Err( p_vout, "input error: QT video window spawned in video output thread");
 
     p_vout->p_sys->i_width  = 320;
     p_vout->p_sys->i_height = 240;
@@ -490,7 +497,7 @@ static int CreateQtWindow( vout_thread_t *p_vout )
         msleep(1);
     }
 
-    //msg_Err( "vout_qt: -init qt window");
+    msg_Err( p_vout, "vout_qt: -init qt window");
 
     return( 0 );
 }

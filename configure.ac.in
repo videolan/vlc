@@ -1815,24 +1815,16 @@ then
   if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
   then
     LDFLAGS_qte="${LDFLAGS_qte} -L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'` -ljpeg -lqte"
-    CFLAGS_qte="${CFLAGS_qte} -I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
+    CPPFLAGS_qte="${CPPFLAGS_qte} -I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
   else
     LDFLAGS_qte="${LDFLAGS_qte} -L${QTDIR}/lib `echo -L${QTDIR}/lib | sed 's,opt/QtPalmtop,usr,'` -ljpeg -lqte"
-    CFLAGS_qte="${CFLAGS_qte} -I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
+    CPPFLAGS_qte="${CPPFLAGS_qte} -I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
   fi
   PLUGINS="${PLUGINS} qte"
-  CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_qte}"
-#  ac_cv_qte_headers=yes
+  CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_qte}"
   AC_CHECK_HEADERS(qt.h jpeglib.h, ,[
-#    ac_cv_qte_headers=no
     AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."])
   ] )
-  if test "x${ac_cv_qte_headers}" = "xyes"
-  then
-#    CFLAGS_qte="${CFLAGS_qte} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
-#    LDFLAGS_qte="${LDFLAGS_qte} -ljpeg -lqte"
-#    PLUGINS="${PLUGINS} qte"
-  fi
   CPPFLAGS="${CPPFLAGS_save}"
 fi
 
@@ -2175,9 +2167,6 @@ then
       AC_CHECK_HEADERS(gpe/init.h, ,
         [ ac_cv_gpe_headers=no
           AC_MSG_ERROR([Cannot find development headers for libgpewidget...]) ])
-#      AC_CHECK_LIB(gpewidget, gpe_application_init,
-#        [ LDFLAGS_gpe="${LDFLAGS_gpe} -lgpewidget" ],
-#        [ AC_MSG_ERROR([Cannot find libgpewidget library...]) ])
       CFLAGS=$CFLAGS_save
       LDFLAGS=$LDFLAG_save
       if test "x${ac_cv_gpe_headers}" = "xyes"
@@ -2309,33 +2298,26 @@ AC_ARG_ENABLE(opie,
      [    --with-qte=PATH       Qt Embedded headers and libraries])
      if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
      then
-       LDFLAGS_test="-L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'`"
-       CFLAGS_test="-I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'`"
+       LDFLAGS_qte="-L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'` -ljpeg -lqte"
+       CPPFLAGS_qte="-I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
      else
-       LDFLAGS_test="-L${QTDIR}/lib `echo -L${QTDIR}/lib | sed 's,opt/QtPalmtop,usr,'`"
-       CFLAGS_test="-I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'`"
+       LDFLAGS_qte="-L${QTDIR}/lib `echo -L${QTDIR}/lib | sed 's,opt/QtPalmtop,usr,'`"
+       CPPFLAGS_qte="-I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'`"
      fi
-     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_test}"
-     ac_cv_qte_headers=yes
+     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_qte}"
      AC_CHECK_HEADERS(qt.h jpeglib.h, ,[
-       ac_cv_qte_headers=no
        AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."])
      ] )
-     if test "x${ac_cv_qte_headers}" = "xyes"
-     then
-       CFLAGS_qte="${CFLAGS_qte} ${CFLAGS_test} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
-       LDFLAGS_qte="${LDFLAGS_qte} ${LDFLAGS_test} -ljpeg -lqte"
-     fi
      CPPFLAGS="${CPPFLAGS_save}"
 
      PLUGINS="${PLUGINS} opie"
      LDFLAGS_opie="${LDFLAGS_opie} -lqpe ${LDFLAGS_qte}"
      CPPFLAGS_opie="${CPPFLAGS_opie} ${CPPFLAGS_qte}"
-     if test -x ${QTEDIR}/bin/moc
+     if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
      then
-       MOC=${QTEDIR}/bin/moc
+       MOC=${with_qte}/bin/moc
      else
-       MOC=moc
+       MOC=${QTDIR}/bin/moc
      fi
    fi])
 
