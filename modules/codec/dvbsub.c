@@ -785,9 +785,9 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
 
 static void dvbsub_render_pdata( decoder_t *, dvbsub_region_t *, int, int,
                                  uint8_t *, int );
-static void dvbsub_pdata2bpp( bs_t *, uint8_t *, int * );
-static void dvbsub_pdata4bpp( bs_t *, uint8_t *, int * );
-static void dvbsub_pdata8bpp( bs_t *, uint8_t *, int * );
+static void dvbsub_pdata2bpp( bs_t *, uint8_t *, int, int * );
+static void dvbsub_pdata4bpp( bs_t *, uint8_t *, int, int * );
+static void dvbsub_pdata8bpp( bs_t *, uint8_t *, int, int * );
 
 static void decode_object( decoder_t *p_dec, bs_t *s )
 {
@@ -896,50 +896,73 @@ static void dvbsub_render_pdata( decoder_t *p_dec, dvbsub_region_t *p_region,
                                  int i_x, int i_y,
                                  uint8_t *p_field, int i_field )
 {
-    uint8_t *p_pixbuf = p_region->p_pixbuf + i_y * p_region->i_width;
-    bs_t bs;
+    uint8_t *p_pixbuf;
     int i_offset = 0;
+    bs_t bs;
 
+    /* Sanity check */
+    if( !p_region->p_pixbuf )
+    {
+        msg_Err( p_dec, "region %i has no pixel buffer!", p_region->i_id );
+        return;
+    }
+    if( i_y < 0 || i_x < 0 || i_y >= p_region->i_height ||
+        i_x >= p_region->i_width )
+    {
+        msg_Dbg( p_dec, "invalid offset (%i,%i)", i_x, i_y );
+        return;
+    }
+
+    p_pixbuf = p_region->p_pixbuf + i_y * p_region->i_width;
     bs_init( &bs, p_field, i_field );
 
     while( !bs_eof( &bs ) )
     {
+        /* Sanity check */
+        if( i_y >= p_region->i_height ) return;
+
         switch( bs_read( &bs, 8 ) )
         {
         case 0x10:
-            dvbsub_pdata2bpp( &bs, p_pixbuf + i_x, &i_offset );
+            dvbsub_pdata2bpp( &bs, p_pixbuf + i_x, p_region->i_width - i_x,
+                              &i_offset );
             break;
+
         case 0x11:
-            dvbsub_pdata4bpp( &bs, p_pixbuf + i_x, &i_offset );
+            dvbsub_pdata4bpp( &bs, p_pixbuf + i_x, p_region->i_width - i_x,
+                              &i_offset );
             break;
+
         case 0x12:
-            dvbsub_pdata8bpp( &bs, p_pixbuf + i_x, &i_offset );
+            dvbsub_pdata8bpp( &bs, p_pixbuf + i_x, p_region->i_width - i_x,
+                              &i_offset );
             break;
+
         case 0x20:
         case 0x21:
         case 0x22:
             /* We don't use map tables */
             break;
-        case 0xf0:
-            p_pixbuf += 2*p_region->i_width; /* End of line code */
-            i_offset = 0;
+
+        case 0xf0: /* End of line code */
+            p_pixbuf += 2*p_region->i_width;
+            i_offset = 0; i_y += 2;
             break;
         }
     }
 }
 
-static void dvbsub_pdata2bpp( bs_t *s, uint8_t *p, int *pi_off )
+static void dvbsub_pdata2bpp( bs_t *s, uint8_t *p, int i_width, int *pi_off )
 {
     vlc_bool_t b_stop = 0;
-    uint16_t i_count = 0;
-    uint8_t i_color = 0;
 
     while( !b_stop && !bs_eof( s ) )
     {
+        int i_count = 0, i_color = 0;
+
         if( (i_color = bs_read( s, 2 )) != 0x00 )
         {
-            p[*pi_off] = i_color;
-            (*pi_off)++;
+            i_count = 1;
         }
         else
         {
@@ -947,8 +970,6 @@ static void dvbsub_pdata2bpp( bs_t *s, uint8_t *p, int *pi_off )
             {
                 i_count = 3 + bs_read( s, 3 );
                 i_color = bs_read( s, 2 );
-                memset( p + *pi_off, i_color, i_count );
-                (*pi_off) += i_count;
             }
             else
             {
@@ -957,23 +978,18 @@ static void dvbsub_pdata2bpp( bs_t *s, uint8_t *p, int *pi_off )
                     switch( bs_read( s, 2 ) )     //Switch3
                     {
                     case 0x00:
-                        b_stop=1;
+                        b_stop = 1;
                         break;
                     case 0x01:
-                        memset( p + *pi_off, 0, 2 );
-                        (*pi_off) += 2;
+                        i_count = 2;
                         break;
                     case 0x02:
                         i_count =  12 + bs_read( s, 4 );
                         i_color = bs_read( s, 2 );
-                        memset( p + *pi_off, i_color, i_count );
-                        (*pi_off) += i_count;
                         break;
                     case 0x03:
                         i_count =  29 + bs_read( s, 8 );
                         i_color = bs_read( s, 2 );
-                        memset( p + *pi_off, i_color, i_count );
-                        (*pi_off) += i_count;
                         break;
                     default:
                         break;
@@ -982,29 +998,37 @@ static void dvbsub_pdata2bpp( bs_t *s, uint8_t *p, int *pi_off )
                 else
                 {
                     /* 1 pixel color 0 */
-                    p[*pi_off] = 0;
-                    (*pi_off)++;
+                    i_count = 0;
                 }
             }
         }
+
+        if( !i_count ) continue;
+
+        /* Sanity check */
+        if( i_count + *pi_off > i_width ) break;
+
+        if( i_count == 1 ) p[*pi_off] = i_color;
+        else memset( p + *pi_off, i_color, i_count );
+
+        (*pi_off) += i_count;
     }
 
     bs_align( s );
 }
 
-static void dvbsub_pdata4bpp( bs_t *s, uint8_t* p, int *pi_off )
+static void dvbsub_pdata4bpp( bs_t *s, uint8_t *p, int i_width, int *pi_off )
 {
     vlc_bool_t b_stop = 0;
-    uint16_t i_count = 0;
-    uint8_t i_color = 0;
 
     while( !b_stop && !bs_eof( s ) )
     {
+        int i_count = 0, i_color = 0;
+
         if( (i_color = bs_read( s, 4 )) != 0x00 )
         {
             /* Add 1 pixel */
-            p[*pi_off] = i_color;
-            (*pi_off)++;
+            i_count = 1;
         }
         else
         {
@@ -1013,13 +1037,11 @@ static void dvbsub_pdata4bpp( bs_t *s, uint8_t* p, int *pi_off )
                 if( bs_show( s, 3 ) != 0x00 )
                 {
                     i_count = 2 + bs_read( s, 3 );
-                    memset( p + *pi_off, 0, i_count );
-                    (*pi_off) += i_count;
                 }
                 else
                 {
                     bs_skip( s, 3 );
-                    b_stop=1;
+                    b_stop = 1;
                 }
             }
             else
@@ -1028,55 +1050,56 @@ static void dvbsub_pdata4bpp( bs_t *s, uint8_t* p, int *pi_off )
                 {
                     i_count =  4 + bs_read( s, 2 );
                     i_color = bs_read( s, 4 );
-                    memset( p + *pi_off, i_color, i_count );
-                    (*pi_off) += i_count;
                 }
                 else
                 {
                     switch ( bs_read( s, 2 ) )     //Switch3
                     {
-                        case 0x0:
-                            memset( p + *pi_off, 0, 1 );
-                            (*pi_off) += 1;
-                            break;
-                        case 0x1:
-                            memset( p + *pi_off, 0, 2 );
-                            (*pi_off) += 2;
-                            break;
-                        case 0x2:
-                             i_count = 9 + bs_read( s, 4 );
-                             i_color = bs_read( s, 4 );
-                             memset( p + *pi_off, i_color, i_count );
-                             (*pi_off) += i_count;
-                             break;
-                        case 0x3:
-                             i_count= 25 + bs_read( s, 8 );
-                             i_color = bs_read( s, 4 );
-                             memset( p + *pi_off, i_color, i_count );
-                             (*pi_off) += i_count;
-                             break;
+                    case 0x0:
+                        i_count = 1;
+                        break;
+                    case 0x1:
+                        i_count = 2;
+                        break;
+                    case 0x2:
+                        i_count = 9 + bs_read( s, 4 );
+                        i_color = bs_read( s, 4 );
+                        break;
+                    case 0x3:
+                        i_count= 25 + bs_read( s, 8 );
+                        i_color = bs_read( s, 4 );
+                        break;
                     }
                 }
             }
         }
+
+        if( !i_count ) continue;
+
+        /* Sanity check */
+        if( i_count + *pi_off > i_width ) break;
+
+        if( i_count == 1 ) p[*pi_off] = i_color;
+        else memset( p + *pi_off, i_color, i_count );
+
+        (*pi_off) += i_count;
     }
 
     bs_align( s );
 }
 
-static void dvbsub_pdata8bpp( bs_t *s, uint8_t* p, int *pi_off )
+static void dvbsub_pdata8bpp( bs_t *s, uint8_t *p, int i_width, int *pi_off )
 {
     vlc_bool_t b_stop = 0;
-    uint16_t i_count = 0;
-    uint8_t i_color = 0;
 
     while( !b_stop && !bs_eof( s ) )
     {
+        int i_count = 0, i_color = 0;
+
         if( (i_color = bs_read( s, 8 )) != 0x00 )
         {
             /* Add 1 pixel */
-            p[*pi_off] = i_color;
-            (*pi_off)++;
+            i_count = 1;
         }
         else
         {
@@ -1085,8 +1108,6 @@ static void dvbsub_pdata8bpp( bs_t *s, uint8_t* p, int *pi_off )
                 if( bs_show( s, 7 ) != 0x00 )
                 {
                     i_count = bs_read( s, 7 );
-                    memset( p + *pi_off, 0, i_count );
-                    (*pi_off) += i_count;
                 }
                 else
                 {
@@ -1098,10 +1119,18 @@ static void dvbsub_pdata8bpp( bs_t *s, uint8_t* p, int *pi_off )
             {
                 i_count = bs_read( s, 7 );
                 i_color = bs_read( s, 8 );
-                memset( p + *pi_off, i_color, i_count );
-                (*pi_off) += i_count;
             }
         }
+
+        if( !i_count ) continue;
+
+        /* Sanity check */
+        if( i_count + *pi_off > i_width ) break;
+
+        if( i_count == 1 ) p[*pi_off] = i_color;
+        else memset( p + *pi_off, i_color, i_count );
+
+        (*pi_off) += i_count;
     }
 
     bs_align( s );
