@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.c,v 1.20 2003/12/13 00:00:45 rocky Exp $
+ * $Id: open.c,v 1.21 2003/12/13 00:53:50 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -582,7 +582,7 @@ static void GtkOpenShow( intf_thread_t *p_intf, int i_page )
         GTK_OBJECT( p_intf->p_sys->p_open ), "network_http_url" ) ),
         "http://" );
 
-#if SATELLITE_OPTIONS_FIXED
+#ifdef HAVE_SATELLITE
     /* Satellite stuff */
     psz_var = config_GetPsz( p_intf, "frequency" );
     if( psz_var )
@@ -601,7 +601,7 @@ static void GtkOpenShow( intf_thread_t *p_intf, int i_page )
             psz_var );
         free( psz_var );
     }
-#endif /*SATELITE_OPTIONS_FIXED*/
+#endif /*HAVE_SATELITE*/
 
     /* subtitle stuff */
     /* hide hbox_subtitle */

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.131 2003/12/11 05:49:20 rocky Exp $
+dnl $Id: configure.ac,v 1.132 2003/12/13 00:53:50 rocky Exp $
 
 AC_INIT(vlc,0.7.0-test1)
 
@@ -1584,6 +1584,8 @@ AC_ARG_ENABLE(satellite,
   [  --enable-satellite      satellite card support (default disabled)],
   [ if test "${enable_satellite}" = "yes"
     then
+      AC_DEFINE(HAVE_SATELLITE, [], 
+      [Define for the VCD plugin using libcdio/libvcdinfo])
       AX_ADD_PLUGINS([satellite])
     fi])
 
