@@ -31,7 +31,7 @@ dnl Check for tools
 AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_CPP
-AC_PROG_RANLIB
+AC_CHECK_TOOL(RANLIB, ranlib, :)
 
 dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL
@@ -389,6 +389,31 @@ if test x"$ac_cv_ld_altivec" != x"no"; then
 fi
 
 dnl
+dnl  Check the operating system
+dnl
+case ${target_os} in
+  bsdi*)
+    SYS=bsdi
+    ;;
+  darwin*)
+    SYS=darwin
+    ;;
+  *mingw32*)
+    SYS=mingw32
+    ;;
+  *)
+    SYS=${target_os}
+    ;;
+esac
+
+dnl
+dnl Windoze specific section
+dnl
+if test $SYS = mingw32; then
+AC_CHECK_TOOL(WINDRES, windres, :)
+fi
+
+dnl
 dnl  libdvdcss: check for DVD ioctls
 dnl
 
@@ -479,21 +504,6 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
     fi
   fi
 ])
-
-dnl
-dnl  Check the operating system
-dnl
-case ${target_os} in
-  bsdi*)
-    SYS=bsdi
-    ;;
-  darwin*)
-    SYS=darwin
-    ;;
-  *)
-    SYS=${target_os}
-    ;;
-esac
 
 dnl
 dnl  Special arch tuning
@@ -736,11 +746,13 @@ else
 
 dnl
 dnl  OSS /dev/dsp module
+dnl  (enabled by default except on win32)
 dnl
 AC_ARG_ENABLE(dsp,
   [  --disable-dsp           Linux /dev/dsp support (default enabled)])
 
-if test x$enable_dsp != xno
+if test x$enable_dsp != xno &&
+  (test $SYS != mingw32 || test x$enable_dsp = xyes)
 then
   if test -c /dev/dsp
   then
@@ -888,28 +900,35 @@ fi
 dnl
 dnl  Windows DirectX module
 dnl
-AC_ARG_WITH(directx,
-  [  --with-directx[=name]   Windows DirectX support (default enabled)],
-  [ if test "x$withval" != "xno"
+AC_ARG_ENABLE(directx,
+  [  --disable-directx       Windows DirectX support (default enabled on WIN32)],
+  [ if test "x$enableval" != "xno"
     then
       PLUGINS="${PLUGINS} directx"
-      if test "x$withval" != "xyes"
+      if test "x$enableval" = "xyes"
       then
-        LIB_DIRECTX="${LIB_DIRECTX} -L"$withval"/lib -lgdi32 -ldxguid"
-        INCLUDE="${INCLUDE} -I"$withval"/include"
+        AC_CHECK_HEADERS(directx.h, [LIB_DIRECTX="-lgdi32 -ldxguid"], 
+          AC_MSG_ERROR([Cannot find DirectX headers !]))
       else
-        AC_CHECK_HEADERS(directx.h, , 
-          AC_MSG_ERROR([Cannot find DirectX headers !])
-        )
-        LIB_DIRECTX="${LIB_DIRECTX} -L/usr/lib -lgdi32 -ldxguid"
+        AC_MSG_CHECKING(for directX headers in ${enableval})
+        if test -f ${enableval}/include/directx.h
+        then
+          LIB_DIRECTX="-L${enableval}/lib -lgdi32 -ldxguid"
+          INCLUDE="${INCLUDE} -I${enableval}/include"
+          AC_MSG_RESULT(yes)
+        else
+          AC_MSG_RESULT(no)
+          AC_MSG_ERROR([Cannot find ${enableval}/include/directx.h!])
+        fi
       fi
-    fi ])
-    if test "x$withval" = "x"
+    fi ],
+  [ if test $SYS = mingw32
     then
       AC_CHECK_HEADERS(directx.h,
-      [PLUGINS="${PLUGINS} directx"
-       LIB_DIRECTX="${LIB_DIRECTX} -L/usr/lib -lgdi32 -ldxguid"])
-    fi
+      [ PLUGINS="${PLUGINS} directx"
+        LIB_DIRECTX="-lgdi32 -ldxguid" ],
+      [ echo "Cannot find DirectX headers !" ])
+    fi ])
 
 dnl
 dnl  Glide module
@@ -1005,8 +1024,15 @@ AC_ARG_ENABLE(gtk,
   [  --disable-gtk           Gtk+ support (default enabled)])
 if test x$enable_gtk != xno
 then
+  GTK_PATH=$PATH
+  AC_ARG_WITH(gtk-config-path,
+    [  --with-gtk-config-path=path gtk-config path (default search in \$PATH)],
+    [ if test "x$withval" != "xno"
+      then
+        GTK_PATH=$withval:$PATH
+      fi ])
   # look for gtk-config
-  AC_PATH_PROG(GTK_CONFIG, gtk-config, no)
+  AC_PATH_PROG(GTK_CONFIG, gtk-config, no, $GTK_PATH)
   if test -x ${GTK_CONFIG}
   then
     CFLAGS_GTK="`${GTK_CONFIG} --cflags gtk`"
@@ -1024,10 +1050,12 @@ fi
 
 dnl
 dnl  X11 module
+dnl  (enabled by default except on win32)
 dnl
 AC_ARG_ENABLE(x11,
   [  --disable-x11           X11 support (default enabled)])
-if test x$enable_x11 != xno; then
+if test x$enable_x11 != xno &&
+  (test $SYS != mingw32 || test x$enable_x11 = xyes); then
   if test x$x_includes = xNONE; then
     x_includes=/usr/X11R6/include
   fi
@@ -1046,10 +1074,12 @@ fi
 
 dnl
 dnl  XVideo module
+dnl  (enabled by default except on win32)
 dnl
 AC_ARG_ENABLE(xvideo,
   [  --disable-xvideo        XVideo support (default enabled)])
-if test x$enable_xvideo != xno; then
+if test x$enable_xvideo != xno &&
+  (test $SYS != mingw32 || test x$enable_xvideo = xyes); then
   if test x$x_includes = xNONE; then
     x_includes=/usr/X11R6/include
   fi
