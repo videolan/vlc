@@ -1,12 +1,12 @@
-$Id: NEWS,v 1.74 2003/11/23 11:02:39 zorglub Exp $
+$Id: NEWS,v 1.75 2003/11/23 14:28:15 gbazin Exp $
 
-Changes between 0.6.2 and 0.6.3:
+Changes between 0.6.2 and 0.7.0:
 ---------------------------------
 
 Core support:
  * Brand new decoder/packetizer api.
    Adds a lot more flexibility while also simplifying the decoder plugins.
- * New encoder api (ffmpeg, vorbis and theora encoders available).
+ * New encoder api (Ffmpeg, Vorbis, Theora, Flac and Speex encoders available).
  * Video outputs are recycled if possible.
    This removes any 'flicker' between two similiar video files.
  * Fixed the video filters. Video should no longer go black when using filters.
@@ -19,26 +19,30 @@ Playlist:
 Input:
  * RTP/RTSP support.
  * Fixed annoying seeking problem with Ogg files (seeking would take ages).
- * Support for FLAC in Ogg files.
+ * Support for Flac in Ogg files.
  * MPEG TS demuxer also handles A52 and AAC audio in DVB streams.
- * Fixed seeking support in FLAC files.
+ * Rewrite of the Flac demuxer.
  * cddax and vcdx plugins using libcdio, libvcd and libvcdinfo. (Linux only)
  * Reworked DVB tuning.
  * Better Icecast support.
+ * New MPEG video elementary streams demuxer.
 
 Codecs:
  * Support for Theora video encoding.
- * Support for Speex audio.
+ * Support for Speex audio decoding/encoding.
+ * Rewrite of the Flac decoder + encoding support.
+ * Support for MPEG2 422 decoding which was recently added to libmpeg2 (cvs).
  * Support for AAC + SBR.
- * MPEG 2.5 support.
+ * MPEG 2.5 audio support.
  * Removed deprecated decoders (a52_old, mpeg_video and mpeg_audio).
 
 Stream output:
  * Improvements to the MPEG TS muxer.
  * New transrating module for MPEG2 video.
  * Added packetization for MPEG AAC ADTS streams.
+ * Added packetizers for Flac, Speex, Theora, LPCM, DTS and SPU streams.
  * Improved mp4 muxing and added AAC/MP4V support when transcoding.
- * Improved Ogg muxing and added theora, speex and subtitles support.
+ * Improved Ogg muxing and added Theora, Speex, Flac and subtitles support.
  * MPEG TS muxer follows the ATSC/DVB specs for embedded A52 audio.
  * --sout-keep option to keep the stream open while changing input.
  * Preliminary RTP support.
@@ -92,6 +96,7 @@ Win32 port:
 Linux port:
  * Improved Video4Linux input. Also added support for an audio only input.
  * Support for real-time priority when running with root privileges.
+ * Allow on the fly switching of the main interface.
 
 Miscellaneous:
  * Audio visual effects filters (spectrum, scope and random).
