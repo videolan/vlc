@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.cpp,v 1.56 2003/12/16 03:21:47 rocky Exp $
+ * $Id: open.cpp,v 1.57 2003/12/16 09:14:22 courmisch Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -77,9 +77,9 @@ enum
     DiscChapter_Event,
 
     NetType_Event,
-    NetRadio1_Event, NetRadio2_Event, NetRadio3_Event,
+    NetRadio1_Event, NetRadio2_Event, NetRadio3_Event, NetRadio4_Event,
     NetPort1_Event, NetPort2_Event, NetPort3_Event,
-    NetAddr1_Event, NetAddr2_Event, NetAddr3_Event,
+    NetAddr1_Event, NetAddr2_Event, NetAddr3_Event, NetAddr4_Event,
     NetForceIPv6_Event,
 
 #ifndef WIN32
@@ -122,6 +122,7 @@ BEGIN_EVENT_TABLE(OpenDialog, wxFrame)
     EVT_RADIOBUTTON(NetRadio1_Event, OpenDialog::OnNetTypeChange)
     EVT_RADIOBUTTON(NetRadio2_Event, OpenDialog::OnNetTypeChange)
     EVT_RADIOBUTTON(NetRadio3_Event, OpenDialog::OnNetTypeChange)
+    EVT_RADIOBUTTON(NetRadio4_Event, OpenDialog::OnNetTypeChange)
     EVT_TEXT(NetPort1_Event, OpenDialog::OnNetPanelChange)
     EVT_SPINCTRL(NetPort1_Event, OpenDialog::OnNetPanelChange)
     EVT_TEXT(NetPort2_Event, OpenDialog::OnNetPanelChange)
@@ -130,6 +131,7 @@ BEGIN_EVENT_TABLE(OpenDialog, wxFrame)
     EVT_SPINCTRL(NetPort3_Event, OpenDialog::OnNetPanelChange)
     EVT_TEXT(NetAddr2_Event, OpenDialog::OnNetPanelChange)
     EVT_TEXT(NetAddr3_Event, OpenDialog::OnNetPanelChange)
+    EVT_TEXT(NetAddr4_Event, OpenDialog::OnNetPanelChange)
     EVT_CHECKBOX(NetForceIPv6_Event, OpenDialog::OnNetPanelChange)
 
 #ifndef WIN32
@@ -513,16 +515,17 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
                                   wxSize(200, 200) );
 
     wxBoxSizer *sizer_row = new wxBoxSizer( wxVERTICAL );
-    wxFlexGridSizer *sizer = new wxFlexGridSizer( 2, 3, 20 );
+    wxFlexGridSizer *sizer = new wxFlexGridSizer( 2, 4, 20 );
 
     static const wxString net_type_array[] =
     {
         wxU(_("UDP/RTP")),
         wxU(_("UDP/RTP Multicast")),
-        wxU(_("HTTP/FTP/MMS"))
+        wxU(_("HTTP/FTP/MMS")),
+        wxU(_("RTSP"))
     };
 
-    for( i=0; i<3; i++ )
+    for( i=0; i<4; i++ )
     {
         net_radios[i] = new wxRadioButton( panel, NetRadio1_Event + i,
                                            net_type_array[i],
@@ -578,19 +581,23 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     net_subpanels[1]->SetSizerAndFit( subpanel_sizer );
 
-    /* HTTP row */
-    subpanel_sizer = new wxFlexGridSizer( 2, 1, 20 );
-    label = new wxStaticText( net_subpanels[2], -1, wxU(_("URL")) );
-    net_addrs[2] = new wxTextCtrl( net_subpanels[2], NetAddr3_Event, wxT(""),
-                                   wxDefaultPosition, wxSize( 200, -1 ),
-                                   wxTE_PROCESS_ENTER);
-    subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
-    subpanel_sizer->Add( net_addrs[2], 1,
-                         wxEXPAND | wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
-    net_subpanels[2]->SetSizerAndFit( subpanel_sizer );
+    /* HTTP and RTSP rows */
+    for( i=2; i<4; i++ )
+    {
+        subpanel_sizer = new wxFlexGridSizer( 2, 1, 20 );
+        label = new wxStaticText( net_subpanels[i], -1, wxU(_("URL")) );
+        net_addrs[i] = new wxTextCtrl( net_subpanels[i], NetAddr1_Event + i,
+                                       wxT((i == 2) ? "" : "rtsp://"),
+                                       wxDefaultPosition, wxSize( 200, -1 ),
+                                       wxTE_PROCESS_ENTER);
+        subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
+        subpanel_sizer->Add( net_addrs[i], 1,
+                             wxEXPAND | wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
+        net_subpanels[i]->SetSizerAndFit( subpanel_sizer );
+    }
 
     /* Stuff everything into the main panel */
-    for( i=0; i<3; i++ )
+    for( i=0; i<4; i++ )
     {
         sizer->Add( net_radios[i], 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL |
                     wxALL, 5 );
@@ -683,12 +690,12 @@ void OpenDialog::UpdateMRL( int i_access_method )
     case DISC_ACCESS:
       i_disc_type_selection = disc_type->GetSelection();
 
-      switch ( i_disc_type_selection ) 
+      switch ( i_disc_type_selection )
 	{
 	case 0:
 	  disc_chapter->Enable();
 	  disc_chapter_label->Enable();
-	  mrltemp = wxT("dvd://") 
+          mrltemp = wxT("dvd://")
                   + disc_device->GetValue()
                   + wxString::Format( wxT("@%d:%d"),
                                       disc_title->GetValue(),
@@ -697,7 +704,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
 	case 1:
 	  disc_chapter->Enable();
 	  disc_chapter_label->Enable();
-	  mrltemp = wxT("dvdsimple://") 
+	  mrltemp = wxT("dvdsimple://")
                   + disc_device->GetValue()
                   + wxString::Format( wxT("@%d:%d"),
                                       disc_title->GetValue(),
@@ -708,18 +715,18 @@ void OpenDialog::UpdateMRL( int i_access_method )
 	  disc_chapter_label->Disable();
 #ifdef HAVE_VCDX
 	  if ( disc_title->GetValue() )
-	    mrltemp = wxT("vcdx://") 
+	    mrltemp = wxT("vcdx://")
 	      + disc_device->GetValue()
-	      + wxString::Format( wxT("@%c%d"), 
+	      + wxString::Format( wxT("@%c%d"),
 				  config_GetInt( p_intf, "vcdx-PBC"  )
 				  ? 'P' : 'E',
 				  disc_title->GetValue()
 				  );
-	  else 
+	  else
 	    mrltemp = wxT("vcdx://")
                   + disc_device->GetValue();
 #else
-	  mrltemp = wxT("vcd://") 
+	  mrltemp = wxT("vcd://")
                   + disc_device->GetValue()
                   + wxString::Format( wxT("@%d"),
                                       disc_title->GetValue() );
@@ -730,26 +737,26 @@ void OpenDialog::UpdateMRL( int i_access_method )
 	  disc_chapter_label->Disable();
 #ifdef HAVE_CDDAX
 	  if ( disc_title->GetValue() )
-	    mrltemp =  wxT("cddax://") 
+	    mrltemp =  wxT("cddax://")
 	          + disc_device->GetValue()
                   + wxString::Format( wxT("@T%d"),
                                       disc_title->GetValue() );
-	  else 
+	  else
 	    mrltemp = wxT("cddax://")
 	          + disc_device->GetValue();
-	  
+
 #else
-	  mrltemp =  wxT("cdda://") 
+	  mrltemp =  wxT("cdda://")
                   + disc_device->GetValue()
                   + wxString::Format( wxT("@%d"),
                                       disc_title->GetValue() );
 #endif
 	  break;
 	default: ;
-	  msg_Err( p_intf, "invalid selection (%d)", 
+	  msg_Err( p_intf, "invalid selection (%d)",
 		   disc_type->GetSelection() );
 	}
-      
+
         break;
     case NET_ACCESS:
         switch( i_net_type )
@@ -792,7 +799,16 @@ void OpenDialog::UpdateMRL( int i_access_method )
             {
                 mrltemp = wxT("http") + demux + wxT("://");
             }
-            mrltemp = mrltemp + net_addrs[2]->GetLineText(0);
+            mrltemp += net_addrs[2]->GetLineText(0);
+            break;
+
+        case 3:
+            /* RTSP access */
+            if( net_addrs[3]->GetLineText(0).Find("rtsp://") != 0 )
+            {
+                mrltemp = wxT("rtsp") + demux + wxT("://");
+            }
+            mrltemp += net_addrs[3]->GetLineText(0);
             break;
         }
         break;
@@ -1143,7 +1159,7 @@ void OpenDialog::OnNetTypeChange( wxCommandEvent& event )
 
     i_net_type = event.GetId() - NetRadio1_Event;
 
-    for(i=0; i<3; i++)
+    for(i=0; i<4; i++)
     {
         net_radios[i]->SetValue( event.GetId() == (NetRadio1_Event+i) );
         net_subpanels[i]->Enable( event.GetId() == (NetRadio1_Event+i) );
