@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.77 2004/01/15 19:46:32 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.78 2004/01/24 00:47:42 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -661,10 +661,11 @@ static struct
       AUDIO_ES, "A52 Audio (aka AC3)" },
     { VLC_FOURCC('a','5','2','b'), CODEC_ID_AC3, /* VLC specific hack */
       AUDIO_ES, "A52 Audio (aka AC3)" },
-
+#if 0
     /* AAC audio */
     { VLC_FOURCC('m','p','4','a'), CODEC_ID_AAC,
       AUDIO_ES, "MPEG AAC Audio" },
+#endif
 
     /* 4X Technologies */
     { VLC_FOURCC('4','x','m','a'), CODEC_ID_ADPCM_4XM,
