@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.48 2003/11/04 15:26:04 sam Exp $
+##  $Id: toolbox,v 1.49 2003/11/26 23:32:07 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -119,7 +119,7 @@ then
   cvs2cl --help >/dev/null 2>&1 || exit 1
   rm -f ChangeLog ChangeLog.tmp
   cvs2cl --utc --hide-filenames --no-wrap -w --stdout -g -z9 | \
-    sed -e 's/^[^0-9]/ /' -e 's/^  *$//' | \
+    sed -e 's/^[^0-9]/ /' -e 's/^  *$//' -e 's/\* .  /  /g' | \
     uniq > ChangeLog.tmp
   YEAR=`sed -e 's/\(....\)-..-.*/\1/;q' ChangeLog.tmp`
   LASTYEAR="$((${YEAR} - 1))"
