@@ -683,5 +683,16 @@ Multi-line subtitles are not aligned correctly. Text subtitles don't work
 with 32bpp rgb. Investigate behaviour of subpictures when pausing.
 Status: Todo
 
+Task
+Difficulty: Easy to Difficult
+Platform: Any
+Urgency: Important
+Description: Write some developer documentation
+Perhaps a skeletal driver in each of the categories, what they need to
+do, the design decisions, possibilities, or options that drivers in
+a category might implement. If there is a canonical module for each 
+category or modules that show the range of options that might be mentioned 
+too.
+
 # Do not remove me
 Task
