@@ -991,7 +991,7 @@ int VLC_VariableSet( int i_object, char const *psz_var, vlc_value_t value )
 /*****************************************************************************
  * VLC_VariableGet: get a vlc variable
  *****************************************************************************/
-int VLC_Get( int i_object, char const *psz_var, vlc_value_t *p_value )
+int VLC_VariableGet( int i_object, char const *psz_var, vlc_value_t *p_value )
 {
     vlc_t *p_vlc = vlc_current_object( i_object );
     int i_ret;
@@ -1001,7 +1001,7 @@ int VLC_Get( int i_object, char const *psz_var, vlc_value_t *p_value )
         return VLC_ENOOBJ;
     }
 
-    i_ret = var_Get( p_vlc, psz_var, p_value );
+    i_ret = var_Get( p_vlc , psz_var, p_value );
 
     if( i_object ) vlc_object_release( p_vlc );
     return i_ret;

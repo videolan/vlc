@@ -16,6 +16,15 @@ interface VlcIntf : nsISupports
     PRInt64 get_volume();
     void mute();
 
+    /* Get/Set variable */
+    void set_int_variable( in string psz_var, in PRInt64 i_value );
+    void set_bool_variable( in string psz_var, in PRBool b_value );
+    void set_str_variable( in string psz_var, in string psz_value );
+     
+    PRInt64 get_int_variable( in string psz_var );
+    PRBool get_bool_variable( in string psz_var );
+    string get_str_variable( in string psz_var );
+
     /* Playlist management */
     void clear_playlist();
     void add_item( in string psz_name);

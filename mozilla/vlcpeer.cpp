@@ -128,6 +128,82 @@ NS_IMETHODIMP VlcPeer::Fullscreen()
     return NS_OK;
 }
 
+/* Set/Get vlc variables */
+NS_IMETHODIMP VlcPeer::Set_int_variable(const char *psz_var, PRInt64 value )
+{
+    vlc_value_t val;
+    val.i_int = value;
+    if( p_plugin )
+    {
+        VLC_VariableSet( p_plugin->i_vlc, psz_var, val );
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Set_str_variable(const char *psz_var, const char *value )
+{
+    vlc_value_t val;
+    val.psz_string = strdup( value );
+    if( p_plugin )
+    {
+        VLC_VariableSet( p_plugin->i_vlc, psz_var, val );
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Set_bool_variable(const char *psz_var, PRBool value )
+{
+    vlc_value_t val;
+    val.b_bool = value >= 1 ? VLC_TRUE : VLC_FALSE;
+    if( p_plugin )
+    {
+        VLC_VariableSet( p_plugin->i_vlc, psz_var, val );
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Get_int_variable( const char *psz_var, PRInt64 *result )
+{
+    vlc_value_t val;
+    if( p_plugin )
+    {
+        fprintf(stderr, "Choppage de %s\n", psz_var );
+        VLC_VariableGet( p_plugin->i_vlc, psz_var, &val );
+        fprintf(stderr, "Valeur %i\n", val.i_int );
+        *result = (PRInt64)val.i_int;
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Get_bool_variable(  const char *psz_var,PRBool *result )
+{
+    vlc_value_t val;
+    if( p_plugin )
+    {
+        VLC_VariableGet( p_plugin->i_vlc, psz_var, &val );
+        *result = (PRBool)val.b_bool;
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Get_str_variable( const char *psz_var, char **result )
+{
+    vlc_value_t val;
+    if( p_plugin )
+    {
+        fprintf(stderr, "Choppage de %s\n", psz_var );
+        VLC_VariableGet( p_plugin->i_vlc, psz_var, &val );
+        if( val.psz_string )
+        {
+            *result = strdup( val.psz_string );
+        }
+        else
+        {
+            *result = strdup( "" );
+        }
+    }
+    return NS_OK;
+}
 
 /* Playlist control */
 NS_IMETHODIMP VlcPeer::Clear_playlist()
