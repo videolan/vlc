@@ -27,8 +27,6 @@
 
 Theme::~Theme()
 {
-    saveConfig();
-
     // Be sure things are destroyed in the right order (XXX check)
     m_layouts.clear();
     m_controls.clear();

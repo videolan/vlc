@@ -2,7 +2,7 @@
  * skin_main.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.10 2004/03/01 19:58:16 gbazin Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -207,9 +207,10 @@ static void Run( intf_thread_t *p_intf )
     // Enter the main event loop
     loop->run();
 
-    // Delete the theme
+    // Delete the theme and save the configuration of the windows
     if( p_intf->p_sys->p_theme )
     {
+        p_intf->p_sys->p_theme->saveConfig();
         delete p_intf->p_sys->p_theme;
         p_intf->p_sys->p_theme = NULL;
     }
