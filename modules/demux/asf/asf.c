@@ -647,23 +647,29 @@ static int DemuxInit( demux_t *p_demux )
         if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) &&
             p_sp->i_type_specific_data_length >= sizeof( WAVEFORMATEX ) - 2 )
         {
-            es_format_t  fmt;
-            uint8_t      *p_data = p_sp->p_type_specific_data;
+            es_format_t fmt;
+            uint8_t *p_data = p_sp->p_type_specific_data;
+            int i_format;
 
             es_format_Init( &fmt, AUDIO_ES, 0 );
-            wf_tag_to_fourcc( GetWLE( &p_data[0] ), &fmt.i_codec, NULL );
+            i_format = GetWLE( &p_data[0] );
+            wf_tag_to_fourcc( i_format, &fmt.i_codec, NULL );
             fmt.audio.i_channels        = GetWLE(  &p_data[2] );
             fmt.audio.i_rate      = GetDWLE( &p_data[4] );
             fmt.i_bitrate         = GetDWLE( &p_data[8] ) * 8;
             fmt.audio.i_blockalign      = GetWLE(  &p_data[12] );
             fmt.audio.i_bitspersample   = GetWLE(  &p_data[14] );
 
-            if( p_sp->i_type_specific_data_length > sizeof( WAVEFORMATEX ) )
+            if( p_sp->i_type_specific_data_length > sizeof( WAVEFORMATEX ) &&
+                i_format != WAVE_FORMAT_MPEGLAYER3 &&
+                i_format != WAVE_FORMAT_MPEG )
             {
                 fmt.i_extra = __MIN( GetWLE( &p_data[16] ),
-                                     p_sp->i_type_specific_data_length - sizeof( WAVEFORMATEX ) );
+                                     p_sp->i_type_specific_data_length -
+                                     sizeof( WAVEFORMATEX ) );
                 fmt.p_extra = malloc( fmt.i_extra );
-                memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )], fmt.i_extra );
+                memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )],
+                        fmt.i_extra );
             }
 
             tk->i_cat = AUDIO_ES;

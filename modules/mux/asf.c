@@ -33,6 +33,8 @@
 #include "codecs.h"
 typedef GUID guid_t;
 
+#define MAX_ASF_TRACKS 128
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -116,7 +118,7 @@ struct sout_mux_sys_t
     int64_t         i_bitrate;
 
     int             i_track;
-    asf_track_t     track[128];
+    asf_track_t     track[MAX_ASF_TRACKS];
 
     vlc_bool_t      b_write_header;
 
@@ -194,7 +196,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_seq        = 0;
 
     p_sys->b_write_header = VLC_TRUE;
-    p_sys->i_track = 1;
+    p_sys->i_track = 0;
     p_sys->i_packet_size = 4096;
     p_sys->i_packet_count= 0;
 
@@ -262,7 +264,7 @@ static void Close( vlc_object_t * p_this )
         sout_AccessOutWrite( p_mux->p_access, out );
     }
 
-    for( i = 1; i < p_sys->i_track; i++ )
+    for( i = 0; i < p_sys->i_track; i++ )
     {
         free( p_sys->track[i].p_extra );
     }
@@ -314,7 +316,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     bo_t             bo;
 
     msg_Dbg( p_mux, "adding input" );
-    if( p_sys->i_track > 127 )
+    if( p_sys->i_track >= MAX_ASF_TRACKS )
     {
         msg_Dbg( p_mux, "cannot add this track (too much track)" );
         return VLC_EGENERIC;
@@ -785,7 +787,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     /* calculate header size */
     i_size = 30 + 104 + 46;
     i_ci_size = 44;
-    for( i = 1; i < p_sys->i_track; i++ )
+    for( i = 0; i < p_sys->i_track; i++ )
     {
         i_size += 78 + p_sys->track[i].i_extra;
         i_ci_size += 8 + 2 * strlen( p_sys->track[i].psz_name );
@@ -826,7 +828,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     /* header object */
     bo_add_guid ( &bo, &asf_object_header_guid );
     bo_addle_u64( &bo, i_size );
-    bo_addle_u32( &bo, 2 + p_sys->i_track - 1 );
+    bo_addle_u32( &bo, 2 + p_sys->i_track );
     bo_add_u8   ( &bo, 1 );
     bo_add_u8   ( &bo, 2 );
 
@@ -874,7 +876,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     }
 
     /* stream properties */
-    for( i = 1; i < p_sys->i_track; i++ )
+    for( i = 0; i < p_sys->i_track; i++ )
     {
         tk = &p_sys->track[i];
 
@@ -902,8 +904,8 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     bo_add_guid ( &bo, &asf_object_codec_comment_guid );
     bo_addle_u64( &bo, i_ci_size );
     bo_add_guid ( &bo, &asf_object_codec_comment_reserved_guid );
-    bo_addle_u32( &bo, p_sys->i_track - 1 );
-    for( i = 1; i < p_sys->i_track; i++ )
+    bo_addle_u32( &bo, p_sys->i_track );
+    for( i = 0; i < p_sys->i_track; i++ )
     {
         tk = &p_sys->track[i];
 
