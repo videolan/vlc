@@ -1215,20 +1215,6 @@ static void EndThread( input_thread_t * p_input )
 #define S   p_input->stream
     msg_Dbg( p_input, "dumping stream ID 0x%x [OK:%ld/D:%ld]", S.i_stream_id,
              S.c_packets_read, S.c_packets_trashed );
-    if( S.b_seekable )
-    {
-        char psz_time1[MSTRTIME_MAX_SIZE];
-        char psz_time2[MSTRTIME_MAX_SIZE];
-
-        msg_Dbg( p_input, "seekable stream, position: "I64Fd"/"I64Fd" (%s/%s)",
-                 S.p_selected_area->i_tell, S.p_selected_area->i_size,
-                 input_OffsetToTime( p_input, psz_time1,
-                                     S.p_selected_area->i_tell ),
-                 input_OffsetToTime( p_input, psz_time2,
-                                     S.p_selected_area->i_size ) );
-    }
-    else
-        msg_Dbg( p_input, "pace %scontrolled", S.b_pace_control ? "" : "un-" );
 #undef S
     for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
     {
@@ -1547,18 +1533,8 @@ static void input_SetStatus( input_thread_t *p_input, int i_mode )
 /*****************************************************************************
  * input_SetRate:
  *****************************************************************************/
-static void input_SetRate( vlc_object_t * p_this, int i_rate )
+static void input_SetRate( input_thread_t *p_input, int i_rate )
 {
-    input_thread_t *p_input;
-
-    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
-
-    if( p_input == NULL )
-    {
-        msg_Err( p_this, "no input found" );
-        return;
-    }
-
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     if( i_rate * 8 < DEFAULT_RATE )
@@ -1594,8 +1570,6 @@ static void input_SetRate( vlc_object_t * p_this, int i_rate )
 
     vlc_cond_signal( &p_input->stream.stream_wait );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    vlc_object_release( p_input );
 }
 
 /*****************************************************************************
