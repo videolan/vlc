@@ -146,6 +146,7 @@ static void    CloseProgram( input_thread_t * p_input );
 #define HIERARCHY_LONGTEXT ""
 
 vlc_module_begin();
+    set_shortname( _("DVB") );
     set_description( N_("DVB input with v4l2 support") );
 
     add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
@@ -153,33 +154,33 @@ vlc_module_begin();
     add_integer( "dvb-adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
                  VLC_FALSE );
     add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
-                 VLC_FALSE );
+                 VLC_TRUE );
     add_integer( "dvb-frequency", 11954000, NULL, FREQ_TEXT, FREQ_LONGTEXT,
                  VLC_FALSE );
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT, INVERSION_LONGTEXT,
                  VLC_TRUE );
     add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, VLC_TRUE );
-    add_integer( "dvb-lnb-lof1", 9750000, NULL, LNB_LOF1_TEXT, LNB_LOF1_LONGTEXT,
-                 VLC_TRUE );
-    add_integer( "dvb-lnb-lof2", 10600000, NULL, LNB_LOF2_TEXT, LNB_LOF2_LONGTEXT,
-                 VLC_TRUE );
+    add_integer( "dvb-lnb-lof1", 9750000, NULL, LNB_LOF1_TEXT,
+                 LNB_LOF1_LONGTEXT, VLC_TRUE );
+    add_integer( "dvb-lnb-lof2", 10600000, NULL, LNB_LOF2_TEXT,
+                 LNB_LOF2_LONGTEXT, VLC_TRUE );
     add_integer( "dvb-lnb-slof", 11700000, NULL, LNB_SLOF_TEXT,
                  LNB_SLOF_LONGTEXT, VLC_TRUE );
     /* DVB-S (satellite) */
     add_bool( "dvb-budget-mode", 0, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
-              VLC_FALSE );
+              VLC_TRUE );
     add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
                  VLC_TRUE );
     add_integer( "dvb-voltage", 13, NULL, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
-                 VLC_FALSE );
+                 VLC_TRUE );
     add_integer( "dvb-tone", -1, NULL, TONE_TEXT, TONE_LONGTEXT,
-                 VLC_FALSE );
+                 VLC_TRUE );
     add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, VLC_TRUE );
     add_integer( "dvb-srate", 27500000, NULL, SRATE_TEXT, SRATE_LONGTEXT,
                  VLC_FALSE );
     /* DVB-T (terrestrial) */
-    add_integer( "dvb-modulation", 0, NULL, MODULATION_TEXT, MODULATION_LONGTEXT,
-                 VLC_TRUE );
+    add_integer( "dvb-modulation", 0, NULL, MODULATION_TEXT,
+                 MODULATION_LONGTEXT, VLC_TRUE );
     /* DVB-T (terrestrial) */
     add_integer( "dvb-code-rate-hp", 9, NULL, CODE_RATE_HP_TEXT,
                  CODE_RATE_HP_LONGTEXT, VLC_TRUE );

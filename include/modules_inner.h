@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.43 2004/01/09 12:23:47 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -99,6 +99,7 @@
         p_module->b_unloadable = VLC_TRUE;                                    \
         p_module->b_reentrant = VLC_TRUE;                                     \
         p_module->psz_object_name = MODULE_STRING;                            \
+        p_module->psz_shortname = MODULE_STRING;                              \
         p_module->psz_longname = MODULE_STRING;                               \
         p_module->pp_shortcuts[ 0 ] = MODULE_STRING;                          \
         p_module->i_cpu = 0;                                                  \
@@ -142,6 +143,7 @@
                                 p_module->pp_shortcuts[ i_shortcut ];         \
     }                                                                         \
     p_submodule->psz_object_name = p_module->psz_object_name;                 \
+    p_submodule->psz_shortname = p_module->psz_shortname;                     \
     p_submodule->psz_longname = p_module->psz_longname;                       \
     p_submodule->psz_program = p_module->psz_program;                         \
     p_submodule->psz_capability = p_module->psz_capability;                   \
@@ -156,6 +158,9 @@
 #define add_shortcut( shortcut )                                              \
     p_submodule->pp_shortcuts[ i_shortcut ] = shortcut;                       \
     i_shortcut++
+
+#define set_shortname( desc )                                                 \
+    p_submodule->psz_shortname = desc
 
 #define set_description( desc )                                               \
     p_submodule->psz_longname = desc

@@ -74,6 +74,7 @@ static ssize_t Read   ( input_thread_t *, byte_t *, size_t );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    set_shortname( _("PVR") );
     set_description( _("MPEG Encoding cards input (with ivtv drivers)") );
     set_capability( "access", 0 );
     add_shortcut( "pvr" );

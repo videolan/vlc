@@ -140,6 +140,7 @@ static int  DemuxOpen  ( vlc_object_t * );
 static void DemuxClose ( vlc_object_t * );
 
 vlc_module_begin();
+    set_shortname( _("DirectShow") );
     set_description( _("DirectShow input") );
     add_integer( "dshow-caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );

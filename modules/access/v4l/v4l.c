@@ -90,6 +90,7 @@ static void DemuxClose ( vlc_object_t * );
     "(eg. I420 (default), RV24, etc.)")
 
 vlc_module_begin();
+    set_shortname( _("Video4Linux") );
     set_description( _("Video4Linux input") );
 
     add_integer( "v4l-caching", DEFAULT_PTS_DELAY / 1000, NULL,
