@@ -33,6 +33,23 @@ AC_PROG_CPP
 dnl Find the right ranlib, even when cross-compiling
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 
+dnl Check for GNU make
+AC_PATH_PROG(GMAKE, gmake, no)
+if test "x$GMAKE" = "xno"; then
+  AC_CACHE_CHECK([whether GNU make is installed],
+      [ac_cv_gmake],
+      [if make --version | grep -q -i gnu; then
+         ac_cv_gmake="yes"
+       else
+         echo "This software needs you to install GNU make to compile properly."
+         echo "You can get it from http://www.gnu.org/."
+         exit
+       fi])
+  VLC_MAKE="make"
+else
+  VLC_MAKE="gmake"
+fi
+
 dnl Gettext stuff
 ALL_LINGUAS="de fr no ru"
 
@@ -1702,11 +1719,11 @@ which modules get compiled as plugins.
 "
 if test x${HAVE_VLC} = x1
 then
-  echo "To build vlc and its plugins, type \`make'."
+  echo "To build vlc and its plugins, type \`$VLC_MAKE'."
 fi
 if test x${NEED_LIBDVDCSS} = x1
 then
-  echo "To build libdvdcss only, type \`make libdvdcss'."
+  echo "To build libdvdcss only, type \`$VLC_MAKE libdvdcss'."
 fi
 echo ""
 

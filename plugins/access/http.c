@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.5 2002/03/19 05:49:30 sam Exp $
+ * $Id: http.c,v 1.6 2002/03/26 23:39:43 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -51,6 +51,7 @@
  *****************************************************************************/
 static void input_getfunctions( function_list_t * );
 static int  HTTPOpen       ( struct input_thread_s * );
+static void HTTPClose      ( struct input_thread_s * );
 static int  HTTPSetProgram ( struct input_thread_s * , pgrm_descriptor_t * );  
 static void HTTPSeek       ( struct input_thread_s *, off_t );
 
@@ -84,7 +85,7 @@ static void input_getfunctions( function_list_t * p_function_list )
 #define input p_function_list->functions.access
     input.pf_open             = HTTPOpen;
     input.pf_read             = input_FDNetworkRead;
-    input.pf_close            = input_FDClose;
+    input.pf_close            = HTTPClose;
     input.pf_set_program      = HTTPSetProgram;
     input.pf_set_area         = NULL;
     input.pf_seek             = HTTPSeek;
@@ -102,6 +103,7 @@ typedef struct _input_socket_s
     char *              psz_network;
     network_socket_t    socket_desc;
     char                psz_buffer[256];
+    char *              psz_name;
 } _input_socket_t;
 
 /*****************************************************************************
@@ -215,7 +217,8 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 static int HTTPOpen( input_thread_t * p_input )
 {
     _input_socket_t *   p_access_data;
-    char *              psz_parser = p_input->psz_name;
+    char *              psz_name = strdup(p_input->psz_name);
+    char *              psz_parser = psz_name;
     char *              psz_server_addr = "";
     char *              psz_server_port = "";
     char *              psz_path = "";
@@ -226,9 +229,11 @@ static int HTTPOpen( input_thread_t * p_input )
     if( p_access_data == NULL )
     {
         intf_ErrMsg( "http error: Out of memory" );
+        free(psz_name);
         return( -1 );
     }
 
+    p_access_data->psz_name = psz_name;
     p_access_data->psz_network = "";
     if( config_GetIntVariable( "ipv4" ) )
     {
@@ -292,6 +297,7 @@ static int HTTPOpen( input_thread_t * p_input )
             intf_ErrMsg( "input error: cannot parse server port near %s",
                          psz_parser );
             free( p_input->p_access_data );
+            free( psz_name );
             return( -1 );
         }
     }
@@ -305,6 +311,7 @@ static int HTTPOpen( input_thread_t * p_input )
     {
         intf_ErrMsg( "input error: no server given" );
         free( p_input->p_access_data );
+        free( psz_name );
         return( -1 );
     }
 
@@ -367,6 +374,7 @@ static int HTTPOpen( input_thread_t * p_input )
         {
             intf_ErrMsg( "input error: http_proxy environment variable is invalid !" );
             free( p_input->p_access_data );
+            free( psz_name );
             return( -1 );
         }
 
@@ -404,6 +412,15 @@ static int HTTPOpen( input_thread_t * p_input )
     p_input->i_mtu = 0;
  
     return( HTTPConnect( p_input, 0 ) );
+}
+
+/*****************************************************************************
+ * HTTPClose: free unused data structures
+ *****************************************************************************/
+static void HTTPClose( input_thread_t * p_input )
+{
+    free( p_input->psz_name );
+    input_FDClose( p_input );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.4 2002/03/15 04:41:54 sam Exp $
+ * $Id: udp.c,v 1.5 2002/03/26 23:39:43 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -99,7 +99,8 @@ static int UDPOpen( input_thread_t * p_input )
     input_socket_t *    p_access_data;
     struct module_s *   p_network;
     char *              psz_network = "";
-    char *              psz_parser = p_input->psz_name;
+    char *              psz_name = strdup(p_input->psz_name);
+    char *              psz_parser = psz_name;
     char *              psz_server_addr = "";
     char *              psz_server_port = "";
     char *              psz_bind_addr = "";
@@ -207,6 +208,7 @@ static int UDPOpen( input_thread_t * p_input )
         {
             intf_ErrMsg( "input error: cannot parse server port near %s",
                          psz_parser );
+            free(psz_name);
             return( -1 );
         }
     }
@@ -218,6 +220,7 @@ static int UDPOpen( input_thread_t * p_input )
         {
             intf_ErrMsg( "input error: cannot parse bind port near %s",
                          psz_parser );
+            free(psz_name);
             return( -1 );
         }
     }
@@ -242,12 +245,12 @@ static int UDPOpen( input_thread_t * p_input )
     /* Find an appropriate network module */
     p_network = module_Need( MODULE_CAPABILITY_NETWORK, psz_network,
                              &socket_desc );
+    free(psz_name);
     if( p_network == NULL )
     {
         return( -1 );
     }
     module_Unneed( p_network );
-
     
     p_access_data = p_input->p_access_data = malloc( sizeof(input_socket_t) );
     if( p_access_data == NULL )
