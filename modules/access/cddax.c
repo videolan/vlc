@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: cddax.c,v 1.5 2003/11/24 00:39:01 fenrir Exp $
+ * $Id: cddax.c,v 1.6 2003/11/24 00:41:19 rocky Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -274,6 +274,8 @@ static int CDDAOpen( vlc_object_t *p_this )
     }
 
     /* Open CDDA */
+    cdio_log_set_handler ( cdio_log_handler );
+
     if( !(p_cddev = ioctl_Open( p_this, psz_source )) )
     {
         msg_Warn( p_input, "could not open %s", psz_source );
