@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.15 2003/05/05 22:23:37 gbazin Exp $
+ * $Id: wav.c,v 1.16 2003/05/21 10:02:55 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -242,7 +242,7 @@ static int FindTag( input_thread_t *p_input, uint32_t i_tag )
             /* Yes, we have found the good tag */
             return( 1 );
         }
-        if( !SkipBytes( p_input, __EVEN( i_size ) + 8 ) )
+        if( SkipBytes( p_input, __EVEN( i_size ) + 8 ) )
         {
             return( 0 );
         }
