@@ -2,7 +2,7 @@
  * memcpy.c : classic memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpy.c,v 1.11 2002/08/01 11:04:46 tcastley Exp $
+ * $Id: memcpy.c,v 1.12 2002/08/04 08:28:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -39,15 +39,12 @@
 #if defined( MODULE_NAME_IS_memcpy3dn )
 #   define PRIORITY 100
 #   define HAVE_3DNOW
-#   include "fastmemcpy.h"
 #elif defined( MODULE_NAME_IS_memcpymmx )
 #   define PRIORITY 100
 #   define HAVE_MMX
-#   include "fastmemcpy.h"
 #elif defined( MODULE_NAME_IS_memcpymmxext )
 #   define PRIORITY 200
 #   define HAVE_MMX2
-#   include "fastmemcpy.h"
 #else
 #   define PRIORITY 50
 #endif
@@ -57,7 +54,7 @@
  *****************************************************************************/
 #ifndef MODULE_NAME_IS_memcpy
 #   define fast_memcpy E_(fast_memcpy)
-    void *fast_memcpy( void * to, const void * from, size_t len );
+#   include "fastmemcpy.h"
 #endif
 
 /*****************************************************************************
