@@ -148,7 +148,7 @@ void intf_SDLManage( intf_thread_t *p_intf )
                 }
                 break;
             case SDL_QUIT:
-                intf_ProcessKey( p_intf, VLC_QUIT ); 
+                intf_ProcessKey( p_intf, INTF_KEY_QUIT ); 
                 break;
             default:
                 break;
@@ -161,29 +161,29 @@ void intf_SDLManage( intf_thread_t *p_intf )
 void intf_SDL_Keymap(intf_thread_t * p_intf )
 {
     p_intf->p_intf_getKey = intf_getKey; 
-    intf_AssignSKey(p_intf, SDLK_q,      VLC_QUIT);
-    intf_AssignSKey(p_intf, SDLK_ESCAPE, VLC_QUIT);
+    intf_AssignKey(p_intf, SDLK_q,      INTF_KEY_QUIT, NULL);
+    intf_AssignKey(p_intf, SDLK_ESCAPE, INTF_KEY_QUIT, NULL);
     /* intf_AssignKey(p_intf,3,'Q'); */
-    intf_AssignKey(p_intf, SDLK_0,      VLC_CHANNEL,0);
-    intf_AssignKey(p_intf, SDLK_1,      VLC_CHANNEL,1);
-    intf_AssignKey(p_intf, SDLK_2,      VLC_CHANNEL,2);
-    intf_AssignKey(p_intf, SDLK_3,      VLC_CHANNEL,3);
-    intf_AssignKey(p_intf, SDLK_4,      VLC_CHANNEL,4);
-    intf_AssignKey(p_intf, SDLK_5,      VLC_CHANNEL,5);
-    intf_AssignKey(p_intf, SDLK_6,      VLC_CHANNEL,6);
-    intf_AssignKey(p_intf, SDLK_7,      VLC_CHANNEL,7);
-    intf_AssignKey(p_intf, SDLK_8,      VLC_CHANNEL,8);
-    intf_AssignKey(p_intf, SDLK_9,      VLC_CHANNEL,9);
-    intf_AssignSKey(p_intf, SDLK_PLUS,   VLC_LOUDER);
-    intf_AssignSKey(p_intf, SDLK_MINUS,  VLC_QUIETER);
-    intf_AssignSKey(p_intf, SDLK_m,      VLC_MUTE);
+    intf_AssignKey(p_intf, SDLK_0,      INTF_KEY_SET_CHANNEL,0);
+    intf_AssignKey(p_intf, SDLK_1,      INTF_KEY_SET_CHANNEL,1);
+    intf_AssignKey(p_intf, SDLK_2,      INTF_KEY_SET_CHANNEL,2);
+    intf_AssignKey(p_intf, SDLK_3,      INTF_KEY_SET_CHANNEL,3);
+    intf_AssignKey(p_intf, SDLK_4,      INTF_KEY_SET_CHANNEL,4);
+    intf_AssignKey(p_intf, SDLK_5,      INTF_KEY_SET_CHANNEL,5);
+    intf_AssignKey(p_intf, SDLK_6,      INTF_KEY_SET_CHANNEL,6);
+    intf_AssignKey(p_intf, SDLK_7,      INTF_KEY_SET_CHANNEL,7);
+    intf_AssignKey(p_intf, SDLK_8,      INTF_KEY_SET_CHANNEL,8);
+    intf_AssignKey(p_intf, SDLK_9,      INTF_KEY_SET_CHANNEL,9);
+    intf_AssignKey(p_intf, SDLK_PLUS,   INTF_KEY_INC_VOLUME, NULL);
+    intf_AssignKey(p_intf, SDLK_MINUS,  INTF_KEY_DEC_VOLUME, NULL);
+    intf_AssignKey(p_intf, SDLK_m,      INTF_KEY_TOGGLE_VOLUME, NULL);
     /* intf_AssignKey(p_intf,'M','M'); */
-    intf_AssignSKey(p_intf, SDLK_g,      VLC_LESS_GAMMA);
+    intf_AssignSKey(p_intf, SDLK_g,      INTF_KEY_DEC_GAMMA, NULL);
     /* intf_AssignKey(p_intf,'G','G'); */
-    intf_AssignSKey(p_intf, SDLK_c,      VLC_GRAYSCALE);
-    intf_AssignSKey(p_intf, SDLK_SPACE,  VLC_INTERFACE);
-    intf_AssignSKey(p_intf, 'i',         VLC_INFO);
-    intf_AssignSKey(p_intf, SDLK_s,      VLC_SCALING);
+    intf_AssignSKey(p_intf, SDLK_c,      INTF_KEY_TOGGLE_GRAYSCALE, NULL);
+    intf_AssignSKey(p_intf, SDLK_SPACE,  INTF_KEY_TOGGLE_INTERFACE, NULL);
+    intf_AssignSKey(p_intf, 'i',         INTF_KEY_TOGGLE_INFO, NULL);
+    intf_AssignSKey(p_intf, SDLK_s,      INTF_KEY_TOGGLE_SCALING, NULL);
 
 }
 
