@@ -61,6 +61,7 @@ struct vout_sys_t
     VLCQTView * o_qtview;
 
     vlc_bool_t  b_saved_frame;
+    vlc_bool_t  b_altivec;
     NSRect      s_frame;
 
     CodecType i_codec;
@@ -75,6 +76,9 @@ struct picture_sys_t
 {
     void *p_data;
     unsigned int i_size;
+    
+    /* When using I420 output */
+    PlanarPixmapInfoYUV420 pixmap_i420;
 };
 
 /*****************************************************************************
@@ -146,6 +150,9 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
     var_Create( p_vout, "macosx-stretch", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-opaqueness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     
+    p_vout->p_sys->b_altivec = p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC;
+    msg_Dbg( p_vout, "We do%s have Altivec", p_vout->p_sys->b_altivec ? "" : "n't" );
+    
     /* Initialize QuickTime */
     p_vout->p_sys->h_img_descr = 
         (ImageDescriptionHandle)NewHandleClear( sizeof(ImageDescription) );
@@ -165,15 +172,30 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
     vlc_mutex_lock( &p_vout->p_vlc->quicktime_lock );
 
     /* Can we find the right chroma ? */
-    err = FindCodec( kComponentVideoUnsigned, bestSpeedCodec,
+    if( p_vout->p_sys->b_altivec )
+    {
+        err = FindCodec( kComponentVideoUnsigned, bestSpeedCodec,
                         nil, &p_vout->p_sys->img_dc );
-    
+    }
+    else
+    {
+        err = FindCodec( kYUV420CodecType, bestSpeedCodec,
+                        nil, &p_vout->p_sys->img_dc );
+    }
     vlc_mutex_unlock( &p_vout->p_vlc->quicktime_lock );
     
     if( err == noErr && p_vout->p_sys->img_dc != 0 )
     {
-        p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
-        p_vout->p_sys->i_codec = kComponentVideoUnsigned;
+        if( p_vout->p_sys->b_altivec )
+        {
+            p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+            p_vout->p_sys->i_codec = kComponentVideoUnsigned;
+        }
+        else
+        {
+            p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
+            p_vout->p_sys->i_codec = kYUV420CodecType;
+        }
     }
     else
     {
@@ -613,7 +635,7 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
         return( -1 );
     }
-    
+
     vout_InitPicture( VLC_OBJECT( p_vout), p_pic, p_vout->output.i_chroma,
                       p_vout->output.i_width, p_vout->output.i_height,
                       p_vout->output.i_aspect );
@@ -638,14 +660,63 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p_sys->p_data = (void *)p_pic->p[0].p_pixels;
 
             break;
+            
+        case VLC_FOURCC('I','4','2','0'):
+            p_pic->p_sys->p_data = (void *)&p_pic->p_sys->pixmap_i420;
+            p_pic->p_sys->i_size = sizeof(PlanarPixmapInfoYUV420);
+            
+            /* Allocate the memory buffer */
+            p_pic->p_data = vlc_memalign( &p_pic->p_data_orig,
+                                          16, p_vout->output.i_width * p_vout->output.i_height * 3 / 2 );
 
-    default:
-        /* Unknown chroma, tell the guy to get lost */
-        free( p_pic->p_sys );
-        msg_Err( p_vout, "never heard of chroma 0x%.8x (%4.4s)",
-                 p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma );
-        p_pic->i_planes = 0;
-        return( -1 );
+            /* Y buffer */
+            p_pic->Y_PIXELS = p_pic->p_data; 
+            p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
+            p_pic->p[Y_PLANE].i_visible_lines = p_vout->output.i_height;
+            p_pic->p[Y_PLANE].i_pitch = p_vout->output.i_width;
+            p_pic->p[Y_PLANE].i_pixel_pitch = 1;
+            p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width;
+
+            /* U buffer */
+            p_pic->U_PIXELS = p_pic->Y_PIXELS + p_vout->output.i_height * p_vout->output.i_width;
+            p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[U_PLANE].i_visible_lines = p_vout->output.i_height / 2;
+            p_pic->p[U_PLANE].i_pitch = p_vout->output.i_width / 2;
+            p_pic->p[U_PLANE].i_pixel_pitch = 1;
+            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width / 2;
+
+            /* V buffer */
+            p_pic->V_PIXELS = p_pic->U_PIXELS + p_vout->output.i_height * p_vout->output.i_width / 4;
+            p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[V_PLANE].i_visible_lines = p_vout->output.i_height / 2;
+            p_pic->p[V_PLANE].i_pitch = p_vout->output.i_width / 2;
+            p_pic->p[V_PLANE].i_pixel_pitch = 1;
+            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width / 2;
+
+            /* We allocated 3 planes */
+            p_pic->i_planes = 3;
+
+#define P p_pic->p_sys->pixmap_i420
+            P.componentInfoY.offset = (void *)p_pic->Y_PIXELS
+                                       - p_pic->p_sys->p_data;
+            P.componentInfoCb.offset = (void *)p_pic->U_PIXELS
+                                        - p_pic->p_sys->p_data;
+            P.componentInfoCr.offset = (void *)p_pic->V_PIXELS
+                                        - p_pic->p_sys->p_data;
+
+            P.componentInfoY.rowBytes = p_vout->output.i_width;
+            P.componentInfoCb.rowBytes = p_vout->output.i_width / 2;
+            P.componentInfoCr.rowBytes = p_vout->output.i_width / 2;
+#undef P
+            break;
+        
+        default:
+            /* Unknown chroma, tell the guy to get lost */
+            free( p_pic->p_sys );
+            msg_Err( p_vout, "never heard of chroma 0x%.8x (%4.4s)",
+                     p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma );
+            p_pic->i_planes = 0;
+            return( -1 );
     }
 
     return( 0 );
