@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.3 2002/08/12 09:34:15 sam Exp $
+ * $Id: cinepak.c,v 1.4 2002/10/15 01:50:24 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -526,6 +526,9 @@ int cinepak_decode_frame( cinepak_context_t *p_context,
         {
             p_context->p_pix[i] = malloc( p_context->i_stride[i] * 
                                           p_context->i_lines[i] );
+            /* Set it to all black */
+            memset( p_context->p_pix[i], ( i == 0 ) ? 0 : 128 ,
+                    p_context->i_stride[i] * p_context->i_lines[i] );
         }
     }
 
