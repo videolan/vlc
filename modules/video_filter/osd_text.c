@@ -2,7 +2,7 @@
  * osd_text.c : Filter to put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: osd_text.c,v 1.2 2003/04/08 07:22:10 sigmunau Exp $
+ * $Id: osd_text.c,v 1.3 2003/05/11 08:42:59 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -472,11 +472,13 @@ static int  SetMargin ( vlc_object_t *p_this, char const *psz_command,
     }
     else if( !strcmp( psz_command, "start-date" ) )
     {
-        p_vout->p_sys->i_start_date = newval.i_int;
+        p_vout->p_sys->i_start_date = ( (mtime_t) newval.time.i_high << 32 )
+            + newval.time.i_low;
     }
     else if( !strcmp( psz_command, "end-date" ) )
     {
-        p_vout->p_sys->i_end_date = newval.i_int;
+        p_vout->p_sys->i_end_date = ( (mtime_t) newval.time.i_high << 32 )
+            + newval.time.i_low;
     }
     else if( !strcmp( psz_command, "flags" ) )
     {
@@ -596,50 +598,56 @@ static int  AddText ( vlc_object_t *p_this, char const *psz_command,
 
 static void ComputeBoundingBox( string_info_t *p_string )
 {
-    unsigned int i, i2;
-    int pen_y = 0;
+    unsigned int i;
+    int i_pen_y = 0;
+    int i_firstline_height = 0;
     FT_Vector result;
-    FT_Vector line;
+    FT_BBox line;
     FT_BBox glyph_size;
-    
+
     result.x = 0;
     result.y = 0;
-    line.x = 0;
-    line.y = 0;
+    line.xMin = 0;
+    line.xMax = 0;
+    line.yMin = 0;
+    line.yMax = 0;
     for ( i = 0; i < strlen( p_string->psz_text ); i++ )
     {
         if ( p_string->psz_text[i] == '\n' )
         {
-            i2 = i - 1;
-            while ( i2 >= 0 && p_string->psz_text[i2] )
+            result.x = __MAX( result.x, line.xMax );
+            result.y += line.yMax - line.yMin;
+            if ( !i_firstline_height )
             {
-                p_string->p_glyph_pos[i2].y += line.y;
-                i2--;
+                i_firstline_height = result.y;
             }
-            result.x = __MAX( result.x, line.x );
-            result.y += line.y;
-            line.y = 0;
-            line.x = 0;
-            pen_y = result.y;
+            line.xMin = 0;
+            line.xMax = 0;
+            line.yMin = 0;
+            line.yMax = 0;
+            i_pen_y = result.y + 1;
             continue;
         }
-        p_string->p_glyph_pos[ i ].y = pen_y;
+        p_string->p_glyph_pos[ i ].y = i_pen_y;
         FT_Glyph_Get_CBox( p_string->pp_glyphs[i],
                            ft_glyph_bbox_pixels, &glyph_size );
         /* Do rest */
-        line.x = p_string->p_glyph_pos[i].x + glyph_size.xMax - glyph_size.xMin;
-        line.y = __MAX( line.y, glyph_size.yMax - glyph_size.yMin );
+        line.xMax = p_string->p_glyph_pos[i].x + glyph_size.xMax - glyph_size.xMin;
+        line.yMax = __MAX( line.yMax, glyph_size.yMax );
+        line.yMin = __MIN( line.yMin, glyph_size.yMin );
     }
-    result.x = __MAX( result.x, line.x );
-    result.y += line.y;
-    i2 = i - 1;
-    while ( i2 >= 0 && p_string->psz_text[i2] )
-    {
-        p_string->p_glyph_pos[i2].y += line.y;
-        i2--;
-    }
+    result.x = __MAX( result.x, line.xMax );
+    result.y += line.yMax - line.yMin;
     p_string->i_height = result.y;
     p_string->i_width = result.x;
+    if ( !i_firstline_height )
+    {
+        i_firstline_height = result.y;
+    }
+    for ( i = 0; i < strlen( p_string->psz_text ); i++ )
+    {
+        p_string->p_glyph_pos[ i ].y += i_firstline_height;
+    }
     return;    
 }
 
