@@ -1,8 +1,8 @@
 /*****************************************************************************
- * video_widgets.c : widgets manipulation functions
+ * video_widgets.c : OSD widgets manipulation functions
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id:$
+ * $Id$
  *
  * Author: Yoann Peronneau <yoann@videolan.org>
  *
@@ -34,8 +34,10 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void DrawRect  ( vout_thread_t *, subpicture_t *, int, int, int, int,
-                        short );
+static void DrawRect( vout_thread_t *, subpicture_t *, int, int, int, int,
+                      short );
+static void DrawTriangle( vout_thread_t *, subpicture_t *, int, int, int, int,
+                          short );
 static void Render    ( vout_thread_t *, picture_t *, const subpicture_t * );
 static void RenderI420( vout_thread_t *, picture_t *, const subpicture_t *,
                         int );
@@ -43,6 +45,7 @@ static void RenderYUY2( vout_thread_t *, picture_t *, const subpicture_t *,
                         int );
 static void RenderRV32( vout_thread_t *, picture_t *, const subpicture_t *,
                         int );
+static subpicture_t *vout_CreateWidget( vout_thread_t * );
 static void FreeWidget( subpicture_t * );
 
 /**
@@ -88,6 +91,43 @@ static void DrawRect( vout_thread_t *p_vout, subpicture_t *p_subpic,
         {
             p_widget->p_pic[ x + p_widget->i_width * i_y1 ] = 1;
             p_widget->p_pic[ x + p_widget->i_width * i_y2 ] = 1;
+        }
+    }
+}
+
+/*****************************************************************************
+ * Draws a triangle at the given position in the subpic.
+ * It may be filled (fill == RECT_FILLED) or empty (fill == RECT_EMPTY).
+ *****************************************************************************/
+static void DrawTriangle( vout_thread_t *p_vout, subpicture_t *p_subpic,
+                          int i_x1, int i_y1, int i_x2, int i_y2, short fill )
+{
+    int x, y, i_mid, h;
+    subpicture_sys_t *p_widget = p_subpic->p_sys;
+
+    i_mid = i_y1 + ( ( i_y2 - i_y1 ) >> 1 );
+
+    if( fill == RECT_FILLED )
+    {
+        for( y = i_y1; y <= i_mid; y++ )
+        {
+            h = y - i_y1;
+            for( x = i_x1; x <= i_x1 + h && x <= i_x2; x++ )
+            {
+                p_widget->p_pic[ x + p_widget->i_width * y ] = 1;
+                p_widget->p_pic[ x + p_widget->i_width * ( i_y2 - h ) ] = 1;
+            }
+        }
+    }
+    else
+    {
+        for( y = i_y1; y <= i_mid; y++ )
+        {
+            h = y - i_y1;
+            p_widget->p_pic[ i_x1 + p_widget->i_width * y ] = 1;
+            p_widget->p_pic[ i_x1 + h + p_widget->i_width * y ] = 1;
+            p_widget->p_pic[ i_x1 + p_widget->i_width * ( i_y2 - h ) ] = 1;
+            p_widget->p_pic[ i_x1 + h + p_widget->i_width * ( i_y2 - h ) ] = 1;
         }
     }
 }
@@ -158,6 +198,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
             {
                 for( x = 0; x < p_widget->i_width; x++ )
                 {
+                    if( alpha == 0 ) continue;
                     pen_y--;
                     pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
                     pen_y++; pen_x--;
@@ -190,6 +231,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
             {
                 for( x = 0; x < p_widget->i_width; x+=2 )
                 {
+                    if( alpha == 0 ) continue;
                     pixel = ( ( pixel * ( 0xFF - alpha ) ) >> 8 ) +
                         ( 0x80 * alpha >> 8 );
                 }
@@ -299,113 +341,203 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
 }
 
 /*****************************************************************************
+ * Creates and initializes an OSD widget.
+ *****************************************************************************/
+subpicture_t *vout_CreateWidget( vout_thread_t *p_vout )
+{
+    subpicture_t *p_subpic;
+    subpicture_sys_t *p_widget;
+    mtime_t i_now = mdate();
+
+    p_subpic = 0;
+    p_widget = 0;
+
+    /* Create and initialize a subpicture */
+    p_subpic = vout_CreateSubPicture( p_vout, MEMORY_SUBPICTURE );
+    if( p_subpic == NULL )
+    {
+        return NULL;
+    }
+    p_subpic->pf_render = Render;
+    p_subpic->pf_destroy = FreeWidget;
+    p_subpic->i_start = i_now;
+    p_subpic->i_stop = i_now + 1200000;
+    p_subpic->b_ephemer = VLC_FALSE;
+
+    p_widget = malloc( sizeof(subpicture_sys_t) );
+    if( p_widget == NULL )
+    {
+        FreeWidget( p_subpic );
+        vout_DestroySubPicture( p_vout, p_subpic );
+        return NULL;
+    }
+    p_subpic->p_sys = p_widget;
+
+    return p_subpic;
+}
+
+/*****************************************************************************
  * Displays an OSD slider.
  * Type 0 is position slider-like, and type 1 is volume slider-like.
  *****************************************************************************/
 void vout_OSDSlider( vlc_object_t *p_caller, int i_position, short i_type )
 {
-    vout_thread_t *p_vout;
+    vout_thread_t *p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT,
+                                             FIND_ANYWHERE );
     subpicture_t *p_subpic;
     subpicture_sys_t *p_widget;
-    mtime_t i_now = mdate();
     int i_x_margin, i_y_margin;
 
-    if( !config_GetInt( p_caller, "osd" ) || i_position < 0 ) return;
-
-    p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-
-    if( p_vout )
+    if( p_vout == NULL || !config_GetInt( p_caller, "osd" ) || i_position < 0 )
     {
-        p_subpic = 0;
-        p_widget = 0;
-
-        /* Create and initialize a subpicture */
-        p_subpic = vout_CreateSubPicture( p_vout, MEMORY_SUBPICTURE );
-        if( p_subpic == NULL )
-        {
-            return;
-        }
-        p_subpic->pf_render = Render;
-        p_subpic->pf_destroy = FreeWidget;
-        p_subpic->i_start = i_now;
-        p_subpic->i_stop = i_now + 1200000;
-        p_subpic->b_ephemer = VLC_FALSE;
-
-        p_widget = malloc( sizeof(subpicture_sys_t) );
-        if( p_widget == NULL )
-        {
-            FreeWidget( p_subpic );
-            vout_DestroySubPicture( p_vout, p_subpic );
-            return;
-        }
-        p_subpic->p_sys = p_widget;
-
-        i_y_margin = p_vout->render.i_height / 10;
-        i_x_margin = i_y_margin;
-        if( i_type == 0 )
-        {
-            p_widget->i_width = p_vout->render.i_width - 2 * i_x_margin;
-            p_widget->i_height = p_vout->render.i_height / 20;
-            p_widget->i_x = i_x_margin;
-            p_widget->i_y = p_vout->render.i_height - i_y_margin -
-                            p_widget->i_height;
-        }
-        else
-        {
-            p_widget->i_width = p_vout->render.i_width / 40;
-            p_widget->i_height = p_vout->render.i_height - 2 * i_y_margin;
-            p_widget->i_height = ( ( p_widget->i_height - 2 ) >> 2 ) * 4 + 2;
-            p_widget->i_x = p_vout->render.i_width - i_x_margin -
-                            p_widget->i_width;
-            p_widget->i_y = i_y_margin;
-        }
-
-        p_widget->p_pic = (uint8_t *)malloc( p_widget->i_width *
-                                             p_widget->i_height );
-        if( p_widget->p_pic == NULL )
-        {
-            FreeWidget( p_subpic );
-            vout_DestroySubPicture( p_vout, p_subpic );
-            return;
-        }
-        memset( p_widget->p_pic, 0, p_widget->i_width * p_widget->i_height );
-
-        if( i_type == 0 )
-        {
-            int i_x_pos = ( p_widget->i_width - 2 ) * i_position / 100;
-            int i_y_pos = p_widget->i_height / 2;
-            DrawRect( p_vout, p_subpic, i_x_pos - 1, 2, i_x_pos + 1,
-                      p_widget->i_height - 3, RECT_FILLED );
-            DrawRect( p_vout, p_subpic, 0, 0, p_widget->i_width - 1,
-                      p_widget->i_height - 1, RECT_EMPTY );
-        }
-        else if( i_type == 1 )
-        {
-            int i_y_pos = p_widget->i_height / 2;
-            DrawRect( p_vout, p_subpic, 2, p_widget->i_height -
-                      ( p_widget->i_height - 2 ) * i_position / 100,
-                      p_widget->i_width - 3, p_widget->i_height - 3,
-                      RECT_FILLED );
-            DrawRect( p_vout, p_subpic, 1, i_y_pos, 1, i_y_pos, RECT_FILLED );
-            DrawRect( p_vout, p_subpic, p_widget->i_width - 2, i_y_pos,
-                      p_widget->i_width - 2, i_y_pos, RECT_FILLED );
-            DrawRect( p_vout, p_subpic, 0, 0, p_widget->i_width - 1,
-                      p_widget->i_height - 1, RECT_EMPTY );
-        }
-
-        vlc_mutex_lock( &p_vout->change_lock );
-
-        if( p_vout->p_last_osd_message )
-        {
-            vout_DestroySubPicture( p_vout, p_vout->p_last_osd_message );
-        }
-        p_vout->p_last_osd_message = p_subpic;
-        vout_DisplaySubPicture( p_vout, p_subpic );
-
-        vlc_mutex_unlock( &p_vout->change_lock );
-
-        vlc_object_release( p_vout );
+        return;
     }
+
+    p_subpic = vout_CreateWidget( p_vout );
+    if( p_subpic == NULL )
+    {
+        return;
+    }
+    p_widget = p_subpic->p_sys;
+
+    i_y_margin = p_vout->render.i_height / 10;
+    i_x_margin = i_y_margin;
+    if( i_type == 0 )
+    {
+        p_widget->i_width = p_vout->render.i_width - 2 * i_x_margin;
+        p_widget->i_height = p_vout->render.i_height / 20;
+        p_widget->i_x = i_x_margin;
+        p_widget->i_y = p_vout->render.i_height - i_y_margin -
+                        p_widget->i_height;
+    }
+    else
+    {
+        p_widget->i_width = p_vout->render.i_width / 40;
+        p_widget->i_height = p_vout->render.i_height - 2 * i_y_margin;
+        p_widget->i_x = p_vout->render.i_width - i_x_margin -
+                        p_widget->i_width;
+        p_widget->i_y = i_y_margin;
+    }
+
+    p_widget->p_pic = (uint8_t *)malloc( p_widget->i_width *
+                                         p_widget->i_height );
+    if( p_widget->p_pic == NULL )
+    {
+        FreeWidget( p_subpic );
+        vout_DestroySubPicture( p_vout, p_subpic );
+        return;
+    }
+    memset( p_widget->p_pic, 0, p_widget->i_width * p_widget->i_height );
+
+    if( i_type == 0 )
+    {
+        int i_x_pos = ( p_widget->i_width - 2 ) * i_position / 100;
+        int i_y_pos = p_widget->i_height / 2;
+        DrawRect( p_vout, p_subpic, i_x_pos - 1, 2, i_x_pos + 1,
+                  p_widget->i_height - 3, RECT_FILLED );
+        DrawRect( p_vout, p_subpic, 0, 0, p_widget->i_width - 1,
+                  p_widget->i_height - 1, RECT_EMPTY );
+    }
+    else if( i_type == 1 )
+    {
+        int i_y_pos = p_widget->i_height / 2;
+        DrawRect( p_vout, p_subpic, 2, p_widget->i_height -
+                  ( p_widget->i_height - 2 ) * i_position / 100,
+                  p_widget->i_width - 3, p_widget->i_height - 3,
+                  RECT_FILLED );
+        DrawRect( p_vout, p_subpic, 1, i_y_pos, 1, i_y_pos, RECT_FILLED );
+        DrawRect( p_vout, p_subpic, p_widget->i_width - 2, i_y_pos,
+                  p_widget->i_width - 2, i_y_pos, RECT_FILLED );
+        DrawRect( p_vout, p_subpic, 0, 0, p_widget->i_width - 1,
+                  p_widget->i_height - 1, RECT_EMPTY );
+    }
+
+    vlc_mutex_lock( &p_vout->change_lock );
+
+    if( p_vout->p_last_osd_message )
+    {
+        vout_DestroySubPicture( p_vout, p_vout->p_last_osd_message );
+    }
+    p_vout->p_last_osd_message = p_subpic;
+    vout_DisplaySubPicture( p_vout, p_subpic );
+
+    vlc_mutex_unlock( &p_vout->change_lock );
+
+    vlc_object_release( p_vout );
+    return;
+}
+
+/*****************************************************************************
+ * Displays an OSD icon.
+ * Types are: OSD_PLAY_ICON, OSD_PAUSE_ICON
+ *****************************************************************************/
+void vout_OSDIcon( vlc_object_t *p_caller, short i_type )
+{
+    vout_thread_t *p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT,
+                                             FIND_ANYWHERE );
+    subpicture_t *p_subpic;
+    subpicture_sys_t *p_widget;
+    int i_x_margin, i_y_margin;
+
+    if( p_vout == NULL || !config_GetInt( p_caller, "osd" ) )
+    {
+        return;
+    }
+
+    p_subpic = vout_CreateWidget( p_vout );
+    if( p_subpic == NULL )
+    {
+        return;
+    }
+    p_widget = p_subpic->p_sys;
+
+    i_y_margin = p_vout->render.i_height / 15;
+    i_x_margin = i_y_margin;
+    p_widget->i_width = p_vout->render.i_width / 22;
+    p_widget->i_height = p_widget->i_width;
+    p_widget->i_x = p_vout->render.i_width - i_x_margin -
+                    p_widget->i_width;
+    p_widget->i_y = i_y_margin;
+
+    p_widget->p_pic = (uint8_t *)malloc( p_widget->i_width *
+                                         p_widget->i_height );
+    if( p_widget->p_pic == NULL )
+    {
+        FreeWidget( p_subpic );
+        vout_DestroySubPicture( p_vout, p_subpic );
+        return;
+    }
+    memset( p_widget->p_pic, 0, p_widget->i_width * p_widget->i_height );
+
+    if( i_type == OSD_PAUSE_ICON )
+    {
+        int i_bar_width = p_widget->i_width / 3;
+        DrawRect( p_vout, p_subpic, 0, 0, i_bar_width - 1,
+                  p_widget->i_height - 1, RECT_FILLED );
+        DrawRect( p_vout, p_subpic, p_widget->i_width - i_bar_width, 0,
+                  p_widget->i_width - 1, p_widget->i_height - 1, RECT_FILLED );
+    }
+    else if( i_type == OSD_PLAY_ICON )
+    {
+        int i_mid = p_widget->i_height >> 1;
+        int i_delta = ( p_widget->i_width - i_mid ) >> 1;
+        int i_y2 = ( ( p_widget->i_height - 1 ) >> 1 ) * 2;
+        DrawTriangle( p_vout, p_subpic, i_delta, 0,
+                      p_widget->i_width - i_delta, i_y2, RECT_FILLED );
+    }
+
+    vlc_mutex_lock( &p_vout->change_lock );
+
+    if( p_vout->p_last_osd_message )
+    {
+        vout_DestroySubPicture( p_vout, p_vout->p_last_osd_message );
+    }
+    p_vout->p_last_osd_message = p_subpic;
+    vout_DisplaySubPicture( p_vout, p_subpic );
+
+    vlc_mutex_unlock( &p_vout->change_lock );
+
+    vlc_object_release( p_vout );
     return;
 }
 

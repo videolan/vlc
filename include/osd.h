@@ -31,6 +31,9 @@
 #define OSD_ALIGN_TOP 0x4
 #define OSD_ALIGN_BOTTOM 0x8
 
+#define OSD_PLAY_ICON 1
+#define OSD_PAUSE_ICON 2
+
 /**
  * Text style information.
  * This struct is currently ignored
@@ -57,3 +60,4 @@ VLC_EXPORT( void,  __vout_OSDMessage, ( vlc_object_t *, char *, ... ) );
 #    define vout_OSDMessage __vout_OSDMessage
 #endif
 VLC_EXPORT( void, vout_OSDSlider, ( vlc_object_t *, int , short ) );
+VLC_EXPORT( void, vout_OSDIcon, ( vlc_object_t *, short ) );

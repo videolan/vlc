@@ -332,7 +332,7 @@ static void Run( intf_thread_t *p_intf )
             }
             if( p_input && val.i_int != PAUSE_S )
             {
-                vout_OSDMessage( p_intf, _( "Pause" ) );
+                vout_OSDIcon( VLC_OBJECT( p_intf ), OSD_PAUSE_ICON );
                 val.i_int = PAUSE_S;
                 var_Set( p_input, "state", val );
             }
@@ -342,7 +342,7 @@ static void Run( intf_thread_t *p_intf )
                                               FIND_ANYWHERE );
                 if( p_playlist )
                 {
-                    vout_OSDMessage( p_intf, _( "Play" ) );
+                    vout_OSDIcon( VLC_OBJECT( p_intf ), OSD_PLAY_ICON );
                     playlist_Play( p_playlist );
                     vlc_object_release( p_playlist );
                 }
