@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.71 2004/01/26 20:00:33 titer Exp $
+ * $Id: vout.m,v 1.72 2004/01/27 12:11:48 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -1284,9 +1284,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
     glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-    glClearColor( 1.0, 1.0, 1.0, 1.0 );
-    glColor4f( 1.0, 1.0, 1.0, 1.0 );
-    glClearColor( 0.5, 0.5, 0.5, 0.5 );
+    glClearColor( 0.0, 0.0, 0.0, 0.0 );
 
     i_init_done       = 0;
     i_textures_loaded = 0;
@@ -1296,12 +1294,9 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void) reshape
 {
-   NSRect bounds;
-
-   [[self openGLContext] update];
-   bounds = [self bounds];
-   glViewport( 0, 0, (GLsizei) bounds.size.width,
-               (GLsizei) bounds.size.height );
+    [[self openGLContext] update];
+    NSRect bounds = [self bounds];
+    glViewport( 0, 0, (GLint) bounds.size.width, (GLint) bounds.size.height );
 }
 
 - (void)drawRect:(NSRect)rect
@@ -1314,10 +1309,11 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     /* Make this current context */
     [[self openGLContext] makeCurrentContext];
 
+    /* Black background */
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
     if( !i_init_done )
     {
-        /* Nothing to display, blank the view */
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         return;
     }
 
@@ -1333,7 +1329,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         glBindTexture(GL_TEXTURE_RECTANGLE_EXT, pi_textures[i_index]);
 
         /* Map our buffer to the texture */
-        glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGB8,
+        glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGBA,
                 p_vout->output.i_width, p_vout->output.i_height, 0,
                 GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
                 PP_OUTPUTPICTURE[i_index]->p_data );
@@ -1370,20 +1366,36 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 
     /* Draw a quad with our texture on it */
+    NSRect bounds = [self bounds];
+    float  f_x, f_y;
+    if( bounds.size.height * p_vout->i_window_width <
+        bounds.size.width * p_vout->i_window_height )
+    {
+        f_x = bounds.size.height * p_vout->i_window_width /
+              bounds.size.width / p_vout->i_window_height;
+        f_y = 1.0;
+    }
+    else
+    {
+        f_x = 1.0;
+        f_y = bounds.size.width * p_vout->i_window_height /
+              bounds.size.height / p_vout->i_window_width;
+    }
+
     glBegin( GL_QUADS );
         /* Top left */
         glTexCoord2f( 0.0f, 0.0f );
-        glVertex2f( -1.0f, 1.0f );
+        glVertex2f( - f_x, f_y );
         /* Bottom left */
         glTexCoord2f( 0.0f, (float) p_vout->output.i_height );
-        glVertex2f( -1.0f, -1.0f );
+        glVertex2f( - f_x, - f_y );
         /* Bottom right */
         glTexCoord2f( (float) p_vout->output.i_width,
-                (float) p_vout->output.i_height );
-        glVertex2f( 1.0f, -1.0f );
+                      (float) p_vout->output.i_height );
+        glVertex2f( f_x, - f_y );
         /* Top right */
         glTexCoord2f( (float) p_vout->output.i_width, 0.0f );
-        glVertex2f( 1.0f, 1.0f );
+        glVertex2f( f_x, f_y );
     glEnd();
 
     /* Wait for the job to be done */
