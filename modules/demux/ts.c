@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.1 2004/01/16 01:47:41 fenrir Exp $
+ * $Id: ts.c,v 1.2 2004/01/16 02:01:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -737,7 +737,15 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
         {
             p_pes->i_pts = i_pts * 100 / 9;
         }
-        es_out_Send( p_demux->out, pid->es->id, p_pes );
+        if( pid->es->p_mpeg4desc )
+        {
+            /* For mpeg4 we first gather the packet -> will make ffmpeg happier */
+            es_out_Send( p_demux->out, pid->es->id, block_ChainGather( p_pes ) );
+        }
+        else
+        {
+            es_out_Send( p_demux->out, pid->es->id, p_pes );
+        }
     }
     else
     {
@@ -1464,6 +1472,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
                         default:
                             pid->es->fmt.i_cat = UNKNOWN_ES;
+                            break;
                     }
                 }
                 else if( dcd->i_streamType == 0x05 )    /* AudioStream */
@@ -1487,6 +1496,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                             break;
                         default:
                             pid->es->fmt.i_cat = UNKNOWN_ES;
+                            break;
                     }
                 }
                 else
