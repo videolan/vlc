@@ -1,9 +1,0 @@
-.deps
-.dirstamp
-Makefile
-Makefile.am
-Makefile.in
-*.dll
-*.dylib
-*.sl
-*.so
