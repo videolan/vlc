@@ -159,7 +159,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
         var_Change( p_vout, "zoom", VLC_VAR_DELCHOICE, &old_val, NULL );
     }
 
-    val.f_float = 0.25; text.psz_string = _("1:4 Quater");
+    val.f_float = 0.25; text.psz_string = _("1:4 Quarter");
     var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
     val.f_float = 0.5; text.psz_string = _("1:2 Half");
     var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
