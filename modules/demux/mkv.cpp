@@ -388,7 +388,7 @@ public:
         ,psz_current_chapter(NULL)
         ,p_sys(p_demuxer)
         ,ep(NULL)
-		,b_preloaded(false)
+        ,b_preloaded(false)
     {}
 
     ~matroska_segment_t()
@@ -477,7 +477,7 @@ public:
     
     demux_sys_t                      *p_sys;
     EbmlParser                       *ep;
-	bool                             b_preloaded;
+    bool                             b_preloaded;
 
     inline chapter_edition_t *Edition()
     {
@@ -486,7 +486,8 @@ public:
         return NULL;
     }
 
-	bool Preload( demux_t *p_demux );
+    bool Preload( demux_t *p_demux );
+    bool PreloadFamily( demux_t *p_demux, const matroska_segment_t & segment );
 };
 
 class matroska_stream_t
@@ -524,7 +525,7 @@ public:
     
     matroska_segment_t *FindSegment( KaxSegmentUID & i_uid ) const;
 
-	void PreloadFamily( demux_t *p_demux );
+    void PreloadFamily( demux_t *p_demux, const matroska_segment_t & segment );
 };
 
 class demux_sys_t
@@ -677,7 +678,7 @@ static int Open( vlc_object_t * p_this )
 
     p_segment->ep = new EbmlParser( p_stream->es, el );
 
-	p_segment->Preload( p_demux );
+    p_segment->Preload( p_demux );
 
     /* get the files from the same dir from the same family (based on p_demux->psz_path) */
     /* _todo_ handle multi-segment files */
@@ -3283,16 +3284,53 @@ const chapter_item_t *chapter_edition_t::FindTimecode( mtime_t i_user_timecode )
 
 void demux_sys_t::PreloadFamily( demux_t *p_demux )
 {
+    matroska_stream_t *p_stream = Stream();
+    if ( p_stream )
+    {
+        matroska_segment_t *p_segment = p_stream->Segment();
+        if ( p_segment )
+        {
+            for (size_t i=0; i<streams.size(); i++)
+            {
+                streams[i]->PreloadFamily( p_demux, *p_segment );
+            }
+        }
+    }
+}
+
+void matroska_stream_t::PreloadFamily( demux_t *p_demux, const matroska_segment_t & of_segment )
+{
+    for (size_t i=0; i<segments.size(); i++)
+    {
+        segments[i]->PreloadFamily( p_demux, of_segment );
+    }
 }
 
 void demux_sys_t::PreloadLinked( demux_t *p_demux )
 {
 }
 
+bool matroska_segment_t::PreloadFamily( demux_t *p_demux, const matroska_segment_t & of_segment )
+{
+    if ( b_preloaded )
+        return false;
+
+    for (size_t i=0; i<families.size(); i++)
+    {
+        for (size_t j=0; j<of_segment.families.size(); j++)
+        {
+            if ( families[i] == of_segment.families[j] )
+                return Preload( p_demux );
+        }
+    }
+
+    return false;
+}
+
 bool matroska_segment_t::Preload( demux_t *p_demux )
 {
-	if ( b_preloaded )
-		return false;
+    if ( b_preloaded )
+        return false;
 
     EbmlElement *el = NULL;
 
@@ -3343,7 +3381,7 @@ bool matroska_segment_t::Preload( demux_t *p_demux )
         }
     }
 
-	b_preloaded = true;
+    b_preloaded = true;
 
-	return true;
+    return true;
 }
