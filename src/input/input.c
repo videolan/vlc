@@ -914,8 +914,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                 /* The PES header contains at least 3 more bytes: parse them */
                 p_pes->b_data_alignment = p_pes->p_pes_header[6] & 0x04;
                 p_pes->b_has_pts = p_pes->p_pes_header[7] & 0x80;
-                i_pes_header_size = p_pes->p_pes_header[8]
-                        + (p_es_descriptor->i_type == AC3_AUDIO_ES) ? 13 : 9;
+                i_pes_header_size = p_pes->p_pes_header[8] + 9;
 
                 /* Now parse the optional header extensions (in the limit of
                    the 14 bytes */
@@ -996,6 +995,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                     break;
 
                 case AC3_AUDIO_ES:
+                    p_ts->i_payload_start += 4;
                     p_fifo = &(((ac3dec_thread_t *)(p_es_descriptor->p_dec))->fifo);
                     break;
 
