@@ -2,10 +2,11 @@
  * aout.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.9 2002/10/09 01:14:18 titer Exp $
+ * $Id: AudioOutput.cpp,v 1.10 2002/10/12 12:24:52 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
+ *          Eric Petit <titer@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,15 +28,10 @@
  *****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <kernel/OS.h>
-#include <View.h>
-#include <Application.h>
-#include <Message.h>
-#include <Locker.h>
-#include <media/MediaDefs.h>
-#include <game/PushGameSound.h>
 #include <malloc.h>
 #include <string.h>
+
+#include <SoundPlayer.h>
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
@@ -43,225 +39,117 @@
 
 /*****************************************************************************
  * aout_sys_t: BeOS audio output method descriptor
- *****************************************************************************
- * This structure is part of the audio output thread descriptor.
- * It describes some BeOS specific variables.
  *****************************************************************************/
-struct aout_sys_t
+
+typedef struct aout_sys_t
 {
-    BPushGameSound   * p_sound;
-    gs_audio_format  * p_format;
-    void             * p_buffer;
-    int 	         i_buffer_size;
-    uint             i_buffer_pos;
-    mtime_t          clock_diff;
-};
+    BSoundPlayer *p_player;
+    float *p_buffer;
+    size_t i_buffer_size;
+} aout_sys_t;
 
 #define FRAME_SIZE 2048
 
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  SetFormat    ( aout_instance_t * );
-static void Play         ( aout_instance_t * );
-static int  BeOSThread   ( aout_instance_t * );
+static void Play         ( void *p_aout, void *p_buffer, size_t size,
+                           const media_raw_audio_format &format );
+static void DoNothing    ( aout_instance_t *p_aout );
 
 /*****************************************************************************
- * OpenAudio: opens a BPushGameSound
+ * OpenAudio
  *****************************************************************************/
 int E_(OpenAudio) ( vlc_object_t * p_this )
-{       
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
-    struct aout_sys_t * p_sys;
+{
+	aout_instance_t *p_aout = (aout_instance_t*) p_this;
+	p_aout->output.p_sys = (aout_sys_t *) malloc( sizeof( aout_sys_t ) );
+	
+	aout_sys_t *p_sys = p_aout->output.p_sys;
+    p_sys->i_buffer_size = 0;
+    p_sys->p_buffer = NULL;
 
-    /* Allocate structure */
-    p_aout->output.p_sys = p_sys = (aout_sys_t *)malloc( sizeof( struct aout_sys_t ) );
-    memset( p_sys, 0, sizeof( struct aout_sys_t ) );
-    if( p_sys == NULL )
-    {
-        msg_Err( p_aout, "out of memory" );
-        return -1;
-    }
-    
-    /* Initialize format */
-    p_sys->p_format = (gs_audio_format *)malloc( sizeof( struct gs_audio_format));
-    SetFormat(p_aout);
-
-    /* Allocate BPushGameSound */
-    p_sys->p_sound = new BPushGameSound( 8192,
-                                         p_sys->p_format,
-                                         2, NULL );
-    if( p_sys->p_sound->InitCheck() != B_OK )
-    {
-        free( p_sys->p_format );
-        free( p_sys );
-        msg_Err( p_aout, "cannot initialize BPushGameSound" );
-        return -1;
-    }
-
-    if( vlc_thread_create( p_aout, "aout", BeOSThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
-    {
-        msg_Err( p_aout, "cannot create aout thread" );
-        delete p_sys->p_sound;
-        free( p_sys->p_format );
-        free( p_sys );
-        return -1;
-    }
-    
-    p_aout->output.pf_play = Play;
     aout_VolumeSoftInit( p_aout );
+    
+    p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
+    p_aout->output.i_nb_samples = FRAME_SIZE;
+    p_aout->output.pf_play = DoNothing;
+    p_aout->output.output.i_rate = 44100;
+    p_aout->output.output.i_channels = 2;
 
+    p_sys->p_player = new BSoundPlayer( "player", Play, NULL, p_this );
+    p_sys->p_player->Start();
+    p_sys->p_player->SetHasData( true );
+        
     return 0;
 }
 
 /*****************************************************************************
- * SetFormat: sets the dsp output format
- *****************************************************************************/
-static int SetFormat( aout_instance_t *p_aout )
-{
-    /* Initialize some variables */
-    p_aout->output.p_sys->p_format->frame_rate = p_aout->output.output.i_rate;
-    p_aout->output.p_sys->p_format->channel_count = p_aout->output.output.i_channels;
-    
-    switch (p_aout->output.output.i_format)
-    {
-    case VLC_FOURCC('s','1','6','l'):
-        p_aout->output.p_sys->p_format->format = gs_audio_format::B_GS_S16;
-        p_aout->output.p_sys->p_format->byte_order = B_MEDIA_LITTLE_ENDIAN;
-        break;
-    case VLC_FOURCC('s','1','6','b'):
-        p_aout->output.p_sys->p_format->format = gs_audio_format::B_GS_S16;
-        p_aout->output.p_sys->p_format->byte_order = B_MEDIA_BIG_ENDIAN;
-        break;
-    case VLC_FOURCC('s','8',0,0):
-        p_aout->output.p_sys->p_format->format = gs_audio_format::B_GS_U8;
-        p_aout->output.p_sys->p_format->byte_order = B_MEDIA_LITTLE_ENDIAN;
-        break;
-    case VLC_FOURCC('f','1','3','2'):
-        p_aout->output.p_sys->p_format->format = gs_audio_format::B_GS_F;
-        p_aout->output.p_sys->p_format->byte_order = B_MEDIA_LITTLE_ENDIAN;
-        break;
-    default:
-        msg_Err( p_aout, "cannot set audio format (%i)",
-                          p_aout->output.output.i_format );
-        return -1;
-    }
-
-    p_aout->output.p_sys->p_format->buffer_size = 4*8192;
-
-    return( 0 );
-}
-
-/*****************************************************************************
- * Play: nothing to do
- *****************************************************************************/
-static void Play( aout_instance_t *p_aout )
-{
-}
-
-/*****************************************************************************
- * CloseAudio: closes the dsp audio device
+ * CloseAudio
  *****************************************************************************/
 void E_(CloseAudio) ( vlc_object_t *p_this )
-{       
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
-
-    p_aout->output.p_sys->p_sound->UnlockCyclic();
-    p_aout->output.p_sys->p_sound->StopPlaying( );
-    delete p_aout->output.p_sys->p_sound;
+{
+    aout_instance_t * p_aout = (aout_instance_t *) p_this;
+    aout_sys_t * p_sys = (aout_sys_t *) p_aout->output.p_sys;
     
+    p_sys->p_player->Stop();
     p_aout->b_die = 1;
-    free( p_aout->output.p_sys->p_format );
-    free( p_aout->output.p_sys );
+    delete p_sys->p_player;
+    free( p_sys );
 }
 
 /*****************************************************************************
- * GetBufInfo: buffer status query
- *****************************************************************************
- * This function fills in the audio_buf_info structure :
- * - returns : number of available fragments (not partially used ones)
- * - int fragstotal : total number of fragments allocated
- * - int fragsize : size of a fragment in bytes
- * - int bytes : available space in bytes (includes partially used fragments)
- * Note! 'bytes' could be more than fragments*fragsize
+ * Play
  *****************************************************************************/
-static int GetBufInfo( aout_instance_t * p_aout )
+static void Play( void *aout, void *buffer, size_t size,
+                  const media_raw_audio_format &format )
 {
-    /* returns the allocated space in bytes */
-    return ( p_aout->output.p_sys->p_format->buffer_size );
-}
+    aout_buffer_t * p_aout_buffer;
+    aout_instance_t *p_aout = (aout_instance_t*) aout;
+    aout_sys_t *p_sys = p_aout->output.p_sys;
 
-/*****************************************************************************
- * BeOSThread: asynchronous thread used to DMA the data to the device
- *****************************************************************************/
-static int BeOSThread( aout_instance_t * p_aout )
-{
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-
-    static uint i_buffer_pos;
-
-    p_sys->p_sound->StartPlaying( );
-    p_sys->p_sound->LockForCyclic( &p_sys->p_buffer,
-                                   (size_t *)&p_sys->i_buffer_size );
-
-    while ( !p_aout->b_die )
+    float *p_buffer = (float*) buffer;
+    
+    if( format.format != media_raw_audio_format::B_AUDIO_FLOAT )
     {
-        aout_buffer_t * p_buffer;
-        int i_tmp, i_size;
-        byte_t * p_bytes;
+        msg_Err( p_aout, "Bad audio format" );
+        return;
+    }
 
-        mtime_t next_date = 0;
-        /* Get the presentation date of the next write() operation. It
-         * is equal to the current date + duration of buffered samples.
-         * Order is important here, since GetBufInfo is believed to take
-         * more time than mdate(). */
-        next_date = (mtime_t)GetBufInfo( p_aout ) * 1000000
-                  / p_aout->output.output.i_bytes_per_frame
-                  / p_aout->output.output.i_rate
-                  * p_aout->output.output.i_frame_length;
-        next_date += mdate();
-
-        p_buffer = aout_OutputNextBuffer( p_aout, next_date, VLC_FALSE );
- 
-        int i_newbuf_pos;
-        if ( p_buffer != NULL )
+    if( p_sys->i_buffer_size < size )
+    {
+        p_aout_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
+        if( p_aout_buffer != NULL )
         {
-            p_bytes = p_buffer->p_buffer;
-            i_size = p_buffer->i_nb_bytes;
-        }
-        else
-        {
-            i_size = FRAME_SIZE / p_aout->output.output.i_frame_length
-                      * p_aout->output.output.i_bytes_per_frame;
-            p_bytes = (byte_t *)malloc( i_size );
-            memset( p_bytes, 0, i_size );
-        }
-   
-        if( (i_newbuf_pos = i_buffer_pos + p_buffer->i_size)
-                            > p_aout->output.p_sys->i_buffer_size )
-        {
-            p_aout->p_vlc->pf_memcpy( (void *)((int)p_aout->output.p_sys->p_buffer
-                            + i_buffer_pos),
-                              p_buffer->p_buffer,
-                              p_aout->output.p_sys->i_buffer_size - i_buffer_pos );
-
-            p_aout->p_vlc->pf_memcpy( (void *)((int)p_aout->output.p_sys->p_buffer),
-                            p_buffer->p_buffer + p_aout->output.p_sys->i_buffer_size - i_buffer_pos,
-                            p_buffer->i_size - ( p_aout->output.p_sys->i_buffer_size - i_buffer_pos ) );
-        
-            i_buffer_pos = i_newbuf_pos - i_buffer_pos;
-        }
-        else
-        {
-           p_aout->p_vlc->pf_memcpy( (void *)((int)p_aout->output.p_sys->p_buffer + i_buffer_pos),
-                    p_buffer->p_buffer, p_buffer->i_size );
-
-           i_buffer_pos = i_newbuf_pos;
+            if( p_sys->p_buffer == NULL )
+            {
+                p_sys->p_buffer = (float*)malloc( p_aout_buffer->i_nb_bytes );
+                p_sys->i_buffer_size = p_aout_buffer->i_nb_bytes;
+            }
+            else
+            {
+                realloc( p_sys->p_buffer,
+                         p_sys->i_buffer_size + p_aout_buffer->i_nb_bytes );
+                memcpy( p_sys->p_buffer + p_sys->i_buffer_size,
+                        p_aout_buffer->p_buffer,
+                        p_aout_buffer->i_nb_bytes );
+                p_sys->i_buffer_size += p_aout_buffer->i_nb_bytes;
+            }
         }
     }
-    
-    return 0;
 
+    if( p_sys->i_buffer_size >= size )
+    {
+        memcpy( p_buffer, p_sys->p_buffer,
+                MIN( size, p_sys->i_buffer_size ) );
+        p_sys->i_buffer_size -=  MIN( size, p_sys->i_buffer_size );
+    }
 }
 
+/*****************************************************************************
+ * DoNothing 
+ *****************************************************************************/
+static void DoNothing( aout_instance_t *p_aout)
+{
+    return;
+}
