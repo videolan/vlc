@@ -174,7 +174,6 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->ppsz_order = NULL;
     psz_order = var_CreateGetString( p_filter->p_libvlc, "mosaic-order" );
 
-    fprintf( stderr, "psz_order : %s (%p)\n", psz_order, psz_order );
     if( psz_order[0] != 0 )
     {
         i_index = 0;
@@ -190,11 +189,6 @@ static int CreateFilter( vlc_object_t *p_this )
             psz_order = psz_end+1;
         } while( NULL !=  psz_end );
         p_sys->i_order_length = i_index;
-    }
-
-    for( i_index = 0; i_index < p_sys->i_order_length; i_index ++ )
-    {
-        fprintf( stderr, "%d/%d : %s\n", i_index, p_sys->i_order_length, p_sys->ppsz_order[i_index] );
     }
 
     var_AddCallback( p_filter->p_libvlc, "mosaic-alpha",
@@ -231,9 +225,19 @@ static void DestroyFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
+    int i_index;
 
     image_HandlerDelete( p_sys->p_image );
     image_HandlerDelete( p_sys->p_image2 );
+
+    if( p_sys->i_order_length )
+    {
+        for( i_index = 0; i_index < p_sys->i_order_length; i_index++ )
+        {
+            free( p_sys->ppsz_order[i_index] );
+        }
+        free( p_sys->ppsz_order );
+    }
 
     var_Destroy( p_filter->p_libvlc, "mosaic-alpha" );
     var_Destroy( p_filter->p_libvlc, "mosaic-height" );
@@ -295,7 +299,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     if( p_sys->i_pos == 0 ) /* use automatic positioning */
     {
-        int i_numpics = 0;
+        int i_numpics = p_sys->i_order_length; /* keep slots and all */
         for( i_index = 0 ;
              i_index < p_picture_vout->i_picture_num ;
              i_index ++ )
@@ -303,6 +307,22 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             if( p_picture_vout->p_pic[i_index].i_status
                            == PICTURE_VOUT_E_OCCUPIED ) {
                 i_numpics ++;
+                if( p_sys->i_order_length
+                    && p_picture_vout->p_pic[i_index].psz_id != 0 ){
+                /* we also want to leave slots for images given in mosaic-order
+                that are not available in p_vout_picture */
+                    int i;
+                    for( i = 0; i < p_sys->i_order_length ; i++ )
+                    {
+                        if( ! strcmp( p_sys->ppsz_order[i],
+                                    p_picture_vout->p_pic[i_index].psz_id ) )
+                        {
+                            i_numpics --;
+                            break;
+                        }
+                    }
+
+                }
             }
         }
         p_sys->i_rows = ((int)ceil(sqrt( (float)i_numpics )));
@@ -351,8 +371,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         }
         i_row = ( i_real_index / p_sys->i_cols ) % p_sys->i_rows ;
         i_col = i_real_index % p_sys->i_cols ;
-
-
 
         /* Convert the images */
 /*        fprintf (stderr, "Input image %ix%i %4.4s\n",
@@ -479,7 +497,6 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
                             void *p_data )
 {
     filter_sys_t *p_sys = (filter_sys_t *) p_data;
-    fprintf( stderr, "Callback" );
     if( !strcmp( psz_var, "mosaic-alpha" ) )
     {
         msg_Dbg( p_this, "Changing alpha from %d/255 to %d/255",
