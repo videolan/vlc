@@ -272,14 +272,23 @@ void DirectXEventThread( event_thread_t *p_event )
             break;
 
         case WM_VLC_CHANGE_TEXT:
-            if( p_event->p_vout->p_sys->b_using_overlay )
-                SetWindowText( p_event->p_vout->p_sys->hwnd,
-                    VOUT_TITLE " (hardware YUV overlay DirectX output)" );
-            else if( p_event->p_vout->p_sys->b_hw_yuv )
-                SetWindowText( p_event->p_vout->p_sys->hwnd,
-                    VOUT_TITLE " (hardware YUV DirectX output)" );
-            else SetWindowText( p_event->p_vout->p_sys->hwnd,
-                    VOUT_TITLE " (software RGB DirectX output)" );
+            var_Get( p_event->p_vout, "video-title", &val );
+
+            if( !val.psz_string || !*val.psz_string ) /* Default video title */
+            {
+                if( p_event->p_vout->p_sys->b_using_overlay )
+                    SetWindowText( p_event->p_vout->p_sys->hwnd,
+                        VOUT_TITLE " (hardware YUV overlay DirectX output)" );
+                else if( p_event->p_vout->p_sys->b_hw_yuv )
+                    SetWindowText( p_event->p_vout->p_sys->hwnd,
+                        VOUT_TITLE " (hardware YUV DirectX output)" );
+                else SetWindowText( p_event->p_vout->p_sys->hwnd,
+                        VOUT_TITLE " (software RGB DirectX output)" );
+            }
+            else
+            {
+                SetWindowText( p_event->p_vout->p_sys->hwnd, val.psz_string );
+            }
             break;
 
         default:

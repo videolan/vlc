@@ -205,6 +205,10 @@ static char *ppsz_language_text[] =
     "You can enforce the position of the top left corner of the video window "\
     "here (y coordinate).")
 
+#define VIDEO_TITLE_TEXT N_("Video title")
+#define VIDEO_TITLE_LONGTEXT N_( \
+    "You can specify a custom video window title here.")
+
 #define ALIGN_TEXT N_("Video alignment")
 #define ALIGN_LONGTEXT N_( \
     "You can enforce the video alignement in its window. By default (0) it " \
@@ -778,6 +782,8 @@ vlc_module_begin();
     add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
     add_integer( "video-x", -1, NULL, VIDEOX_TEXT, VIDEOX_LONGTEXT, VLC_TRUE );
     add_integer( "video-y", -1, NULL, VIDEOY_TEXT, VIDEOY_LONGTEXT, VLC_TRUE );
+    add_string( "video-title", NULL, NULL, VIDEO_TITLE_TEXT,
+                 VIDEO_TITLE_LONGTEXT, VLC_TRUE );
     add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_align_values, ppsz_align_descriptions, 0 );
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, VLC_TRUE );

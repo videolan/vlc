@@ -208,6 +208,7 @@ static int OpenVideo( vlc_object_t *p_this )
     var_Create( p_vout, "directx-hw-yuv", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "directx-3buffering", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
     var_Create( p_vout, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     p_vout->p_sys->b_cursor_hidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
@@ -457,6 +458,8 @@ static int Manage( vout_thread_t *p_vout )
      */
     if( p_vout->p_sys->i_changes & DX_POSITION_CHANGE )
     {
+        p_vout->p_sys->i_changes &= ~DX_POSITION_CHANGE;
+
         if( p_vout->p_sys->b_using_overlay )
             DirectXUpdateOverlay( p_vout );
 
@@ -469,8 +472,6 @@ static int Manage( vout_thread_t *p_vout )
             /* This will force the vout core to recreate the picture buffers */
             p_vout->i_changes |= VOUT_PICTURE_BUFFERS_CHANGE;
         }
-
-        p_vout->p_sys->i_changes &= ~DX_POSITION_CHANGE;
     }
 
     /* We used to call the Win32 PeekMessage function here to read the window
@@ -1087,6 +1088,8 @@ int DirectXUpdateOverlay( vout_thread_t *p_vout )
     DDOVERLAYFX     ddofx;
     DWORD           dwFlags;
     HRESULT         dxresult;
+    RECT            rect_src = p_vout->p_sys->rect_src_clipped;
+    RECT            rect_dest = p_vout->p_sys->rect_dest_clipped;
 
     if( p_vout->p_sys->p_current_surface == NULL ||
         !p_vout->p_sys->b_using_overlay )
@@ -1104,15 +1107,12 @@ int DirectXUpdateOverlay( vout_thread_t *p_vout )
     dwFlags = DDOVER_SHOW | DDOVER_KEYDESTOVERRIDE;
 
     dxresult = IDirectDrawSurface2_UpdateOverlay(
-                                         p_vout->p_sys->p_current_surface,
-                                         &p_vout->p_sys->rect_src_clipped,
-                                         p_vout->p_sys->p_display,
-                                         &p_vout->p_sys->rect_dest_clipped,
-                                         dwFlags, &ddofx );
+                   p_vout->p_sys->p_current_surface,
+                   &rect_src, p_vout->p_sys->p_display, &rect_dest,
+                   dwFlags, &ddofx );
     if(dxresult != DD_OK)
     {
-        msg_Warn( p_vout,
-                  "DirectXUpdateOverlay cannot move or resize overlay" );
+        msg_Warn( p_vout, "DirectXUpdateOverlay cannot move/resize overlay" );
         return VLC_EGENERIC;
     }
 
