@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.20 2003/05/15 22:27:36 massiot Exp $
+ * $Id: file.c,v 1.21 2003/06/09 09:29:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -31,6 +31,9 @@
 #include <string.h>
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_TIME_H
+#   include <sys/time.h>
 #endif
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
