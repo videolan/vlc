@@ -2,7 +2,7 @@
  * parse.c: SPU parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: parse.c,v 1.6 2002/12/06 16:34:05 sam Exp $
+ * $Id: parse.c,v 1.7 2002/12/16 23:25:23 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -316,15 +316,9 @@ static int ParseControlSeq( spudec_thread_t *p_spudec,
                                   GetBits(&p_spudec->bit_stream, 4) ];
 
                     /* FIXME: this job should be done sooner */
-#ifndef WORDS_BIGENDIAN
                     p_spu->p_sys->pi_yuv[3-i][0] = (i_color>>16) & 0xff;
                     p_spu->p_sys->pi_yuv[3-i][1] = (i_color>>0) & 0xff;
                     p_spu->p_sys->pi_yuv[3-i][2] = (i_color>>8) & 0xff;
-#else
-                    p_spu->p_sys->pi_yuv[3-i][0] = (i_color>>8) & 0xff;
-                    p_spu->p_sys->pi_yuv[3-i][1] = (i_color>>24) & 0xff;
-                    p_spu->p_sys->pi_yuv[3-i][2] = (i_color>>16) & 0xff;
-#endif
                 }
             }
             else
