@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.118 2001/05/31 12:45:39 sam Exp $
+ * $Id: input.c,v 1.119 2001/06/07 01:10:33 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -397,6 +397,8 @@ static int InitThread( input_thread_t * p_input )
     p_input->pf_rewind        = f.pf_rewind;
     p_input->pf_seek          = f.pf_seek;
 #undef f
+
+    /* We found the appropriate plugin, open the target */
     p_input->pf_open( p_input );
 
     if( p_input->b_error )

@@ -16,21 +16,21 @@ PLUGINS_DIR :=	alsa beos darwin directx dsp dummy \
 		downmix idct imdct \
 		macosx mga \
 		motion \
-		mpeg null qt sdl \
+		mpeg qt sdl \
 		text x11 yuv
 
 #
 # All possible plugin objects
 #
 PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin directx/directx \
-		dsp/dsp dummy/dummy dvd/dvd esd/esd fb/fb ggi/ggi \
-		glide/glide gtk/gnome gtk/gtk \
+		dsp/dsp dummy/dummy dummy/null dvd/dvd esd/esd fb/fb \
+		ggi/ggi glide/glide gtk/gnome gtk/gtk \
 		downmix/downmix downmix/downmixsse downmix/downmix3dn \
 		idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext \
 		imdct/imdct imdct/imdct3dn imdct/imdctsse \
 		macosx/macosx mga/mga \
 		motion/motion motion/motionmmx motion/motionmmxext \
-		mpeg/es mpeg/ps mpeg/ts null/null qt/qt sdl/sdl \
+		mpeg/es mpeg/ps mpeg/ts qt/qt sdl/sdl \
 		text/ncurses text/rc x11/x11 x11/xvideo yuv/yuv yuv/yuvmmx
 
 #

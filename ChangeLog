@@ -4,7 +4,9 @@
 
 HEAD
 
-  * Nothing yet.
+  * Put most builtins in plugins again due to performances issues.
+  * Fixed the painfully slow build process (at last!).
+  * Added new dummy input plugin.
 
 0.2.80
 Tue,  5 Jun 2001 04:41:06 +0200

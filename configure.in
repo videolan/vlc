@@ -148,7 +148,8 @@ ARCH=${host_cpu}
 dnl
 dnl  default modules
 dnl
-BUILTINS="${BUILTINS} es ps ts yuv idct idctclassic motion imdct downmix"
+BUILTINS="${BUILTINS} es ps ts"
+PLUGINS="${PLUGINS} yuv idct idctclassic motion imdct downmix"
 
 dnl
 dnl  Accelerated modules
@@ -248,9 +249,9 @@ dnl
 AC_ARG_ENABLE(mmx,
 [  --disable-mmx           Disable MMX optimizations (default enabled for x86)],
 [ if test x$enableval = xyes; then ARCH="${ARCH} mmx";
-  BUILTINS="${BUILTINS} ${ACCEL_PLUGINS}"; fi ],
+  PLUGINS="${PLUGINS} ${ACCEL_PLUGINS}"; fi ],
 [ if test x${host_cpu} = xi686 -o x${host_cpu} = xi586 -o x${host_cpu} = xx86 -o x${host_cpu} = xi386; then ARCH="${ARCH} mmx";
-  BUILTINS="${BUILTINS} ${ACCEL_PLUGINS}"; fi ])
+  PLUGINS="${PLUGINS} ${ACCEL_PLUGINS}"; fi ])
 
 dnl
 dnl  AltiVec acceleration
@@ -258,7 +259,7 @@ dnl
 AC_ARG_ENABLE(altivec,
 [  --enable-altivec        Enable altivec optimizations (default disabled since it is broken)],
 [ if test x$enableval = xyes; then ARCH="${ARCH} altivec";
-    BUILTINS="${BUILTINS} idctaltivec"
+    PLUGINS="${PLUGINS} idctaltivec"
     LIB_IDCTALTIVEC="-framework vecLib"
   fi ])
 #[ if test -d /System/Library/Frameworks/vecLib.framework; then ARCH="${ARCH} altivec"; PLUGINS="${PLUGINS} idctaltivec"; fi ])

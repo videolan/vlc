@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.9 2001/05/30 17:03:12 sam Exp $
+ * $Id: dummy.c,v 1.10 2001/06/07 01:10:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,9 +42,10 @@
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list );
-void _M( vout_getfunctions )( function_list_t * p_function_list );
-void _M( intf_getfunctions )( function_list_t * p_function_list );
+void _M( input_getfunctions ) ( function_list_t * p_function_list );
+void _M( aout_getfunctions )  ( function_list_t * p_function_list );
+void _M( vout_getfunctions )  ( function_list_t * p_function_list );
+void _M( intf_getfunctions )  ( function_list_t * p_function_list );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -56,6 +57,7 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
+                                | MODULE_CAPABILITY_INPUT
                                 | MODULE_CAPABILITY_AOUT
                                 | MODULE_CAPABILITY_VOUT
                                 | MODULE_CAPABILITY_INTF;
@@ -63,6 +65,7 @@ MODULE_INIT_START
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
+    _M( input_getfunctions )( &p_module->p_functions->input );
     _M( aout_getfunctions )( &p_module->p_functions->aout );
     _M( vout_getfunctions )( &p_module->p_functions->vout );
     _M( intf_getfunctions )( &p_module->p_functions->intf );
