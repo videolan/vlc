@@ -2,7 +2,7 @@
 .\" First parameter, NAME, should be all caps
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
-.TH VLC 1 "Dec 11, 2003"
+.TH VLC 1 "Feb 14, 2005"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -16,7 +16,7 @@
 .\" .sp <n>    insert n+1 empty lines
 .\" for manpage-specific macros, see man(7)
 .SH NAME
-vlc, wxvlc, svlc, gvlc, kvlc, qvlc \- the VLC media player
+vlc, wxvlc, svlc \- the VLC media player
 .SH SYNOPSIS
 .B vlc
 .RI [ OPTIONS ]
@@ -35,8 +35,8 @@ For a precise description of options, please use "vlc --help".
 The complete list of
 .B VLC
 options depends on what plugins are installed because they automatically
-add their own options. Please use "vlc --longhelp" for a complete list of
-available options.
+add their own options. Please use "vlc --longhelp --advanced" for a
+complete list of available options.
 
 .SH ITEMS
 .B VLC
@@ -45,17 +45,22 @@ recognizes several URL-style items:
 .B *.mpg, *.vob, *.avi, *.mp3, *.ogg
 Various multimedia file formats
 .TP
-.B dvd:[<device>][@<raw device>][@[<title>][,[<chapter>][,<angle>]]]
-DVD device (for instance dvd:/dev/dvd). The raw device is optional and
+.B dvd://[<device>][@<raw device>][@[<title>][,[<chapter>][,<angle>]]]
+DVD device (for instance dvd:///dev/dvd). The raw device is optional and
 must have been prepared beforehands.
 .TP
-.B vcd:<device>
-VCD device (for instance vcd:/dev/cdrom).
+.B vcd://[<device>][@{E|P|E|T|S}[<number>]]
+VCD device (for instance vcd:///dev/cdrom).
 .TP
 .B udp:[@[<multicast address>][:<local port>]]
 UDP stream, such as one sent by VLS or another VLC.
 Usually "udp:" is enough.
 .TP
+.B http://<server address>[:<server port>]/[<file>]
+HTTP stream
+.TP
+.B rtsp://<server address>[:<server port>]/<stream name>
+RTSP Video On Demand stream
 .B vlc:<command>
 Execute a playlist command. Commands are :
 .B pause
