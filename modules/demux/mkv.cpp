@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.28 2003/10/11 21:08:40 hartman Exp $
+ * $Id: mkv.cpp,v 1.29 2003/10/22 00:00:54 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1244,7 +1244,9 @@ static int Open( vlc_object_t * p_this )
         {
             tk.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
         }
-        else if( !strcmp( tk.psz_codec, "S_TEXT/SSA" ) )
+        else if( !strcmp( tk.psz_codec, "S_TEXT/SSA" ) ||
+                 !strcmp( tk.psz_codec, "S_SSA" ) ||
+                 !strcmp( tk.psz_codec, "S_ASS" ))
         {
             tk.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
         }
@@ -1632,10 +1634,13 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
             {
                 p_pes->p_first->p_payload_end[-1] = '\0';
             }
-            if( !strcmp( tk.psz_codec, "S_TEXT/SSA" ) )
+            if( !strcmp( tk.psz_codec, "S_TEXT/SSA" ) ||
+                !strcmp( tk.psz_codec, "S_SSA" ) ||
+                !strcmp( tk.psz_codec, "S_ASS" ))
             {
                 /* remove all fields before text for now */
                 char *start = (char*)p_pes->p_first->p_payload_start;
+                char *src, *dst;
                 int  i_comma = 0;
 
                 while( *start && i_comma < 8 )
@@ -1647,6 +1652,29 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
                 }
                 memmove( p_pes->p_first->p_payload_start, start,
                          strlen( start) + 1 );
+                /* remove all {\... } stuff */
+                src = dst = (char*)p_pes->p_first->p_payload_start;
+                for( ;; )
+                {
+                    if( src[0] == '{' && src[1] == '\\' )
+                    {
+                        while( *src )
+                        {
+                            if( *src == '}' )
+                            {
+                                src++;
+                                break;
+                            }
+                            src++;
+                        }
+                    }
+                    if( *src == '\0' )
+                    {
+                        break;
+                    }
+                    *dst++ = *src++;
+                }
+                *dst++ = '\0';
             }
         }
 
