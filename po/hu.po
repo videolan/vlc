@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLAN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-29 10:52+0200\n"
+"POT-Creation-Date: 2004-09-29 19:27+0200\n"
 "PO-Revision-Date: 2003-10-26 02:54+0100\n"
 "Last-Translator: DirektX <DirektX @ freemail.hu>\n"
 "Language-Team: DirektX <DirektX @ freemail.hu>\n"
@@ -227,7 +227,7 @@ msgid ""
 "For more information, have a look at the web site."
 msgstr ""
 
-#: include/vlc_meta.h:28 src/input/var.c:135 modules/access/cdda/access.c:466
+#: include/vlc_meta.h:28 src/input/var.c:135 modules/access/cdda/access.c:470
 #: modules/gui/beos/MediaControlView.cpp:1234
 #: modules/gui/gtk/gnome_interface.c:1659 modules/gui/gtk/gtk_interface.c:1965
 #: modules/gui/gtk/menu.c:1369 modules/gui/gtk/menu.c:1390
@@ -240,7 +240,7 @@ msgid "Title"
 msgstr "Cím"
 
 #: include/vlc_meta.h:29 src/input/input.c:809 src/playlist/sort.c:119
-#: src/playlist/sort.c:121 modules/access/cdda/access.c:698
+#: src/playlist/sort.c:121 modules/access/cdda/access.c:702
 #: modules/access/vcdx/access.c:1326 modules/gui/macosx/playlist.m:181
 #: modules/gui/macosx/playlist.m:505 modules/gui/macosx/playlistinfo.m:63
 #: modules/gui/macosx/playlistinfo.m:140 modules/gui/macosx/playlistinfo.m:179
@@ -252,12 +252,12 @@ msgstr "Cím"
 msgid "Author"
 msgstr ""
 
-#: include/vlc_meta.h:30 modules/access/cdda/access.c:462
+#: include/vlc_meta.h:30 modules/access/cdda/access.c:466
 #: modules/gui/macosx/playlist.m:883
 msgid "Artist"
 msgstr ""
 
-#: include/vlc_meta.h:31 modules/access/cdda/access.c:711
+#: include/vlc_meta.h:31 modules/access/cdda/access.c:715
 #, fuzzy
 msgid "Genre"
 msgstr "Általános"
@@ -306,7 +306,7 @@ msgstr ""
 msgid "CDDB Category"
 msgstr ""
 
-#: include/vlc_meta.h:42 modules/access/cdda/access.c:714
+#: include/vlc_meta.h:42 modules/access/cdda/access.c:718
 msgid "CDDB Disc ID"
 msgstr ""
 
@@ -528,7 +528,7 @@ msgid "Bookmark %i"
 msgstr ""
 
 #: src/input/es_out.c:309 src/input/es_out.c:310 modules/access/cdda.c:161
-#: modules/access/cdda/access.c:789
+#: modules/access/cdda/access.c:793
 #, c-format
 msgid "Track %i"
 msgstr ""
@@ -606,8 +606,8 @@ msgstr ""
 
 #: src/input/input.c:808 src/input/input.c:1499 src/playlist/item-ext.c:302
 #: src/playlist/item.c:62 src/playlist/sort.c:119 src/playlist/sort.c:121
-#: modules/access/cdda/access.c:443 modules/access/cdda/access.c:698
-#: modules/access/cdda/access.c:702 modules/access/vcdx/access.c:1051
+#: modules/access/cdda/access.c:447 modules/access/cdda/access.c:702
+#: modules/access/cdda/access.c:706 modules/access/vcdx/access.c:1051
 #: modules/access/vcdx/access.c:1326 modules/gui/macosx/playlist.m:505
 #: modules/gui/macosx/playlistinfo.m:140 modules/gui/macosx/playlistinfo.m:179
 #: modules/gui/wxwindows/iteminfo.cpp:171
@@ -627,7 +627,7 @@ msgid "Stream"
 msgstr ""
 
 #: src/input/input.c:1499 src/playlist/item-ext.c:302
-#: modules/access/cdda/access.c:443 modules/access/cdda/access.c:452
+#: modules/access/cdda/access.c:447 modules/access/cdda/access.c:456
 #: modules/gui/gtk/gnome_interface.c:2448 modules/gui/gtk/gtk_interface.c:2869
 #: modules/gui/macosx/playlist.m:182 modules/gui/wxwindows/playlist.cpp:321
 msgid "Duration"
@@ -3261,7 +3261,7 @@ msgstr "Hang menü"
 msgid "[cdda:][device][@[track]]"
 msgstr ""
 
-#: modules/access/cdda/access.c:451 modules/access/vcdx/access.c:340
+#: modules/access/cdda/access.c:455 modules/access/vcdx/access.c:340
 #: modules/access/vcdx/access.c:693 modules/access/vcdx/access.c:1193
 #: modules/access/vcdx/access.c:1194 modules/gui/gtk/open.c:287
 #: modules/gui/gtk/open.c:301 modules/gui/wxwindows/open.cpp:1199
@@ -3270,33 +3270,33 @@ msgstr ""
 msgid "Track"
 msgstr "Vissza"
 
-#: modules/access/cdda/access.c:470
+#: modules/access/cdda/access.c:474
 msgid "Extended Data"
 msgstr ""
 
-#: modules/access/cdda/access.c:704 modules/access/vcdx/access.c:1054
+#: modules/access/cdda/access.c:708 modules/access/vcdx/access.c:1054
 #, fuzzy
 msgid "Album"
 msgstr "Névjegy"
 
-#: modules/access/cdda/access.c:706
+#: modules/access/cdda/access.c:710
 msgid "Disc Artist(s)"
 msgstr ""
 
-#: modules/access/cdda/access.c:709
+#: modules/access/cdda/access.c:713
 msgid "CDDB Disc Category"
 msgstr ""
 
-#: modules/access/cdda/access.c:719
+#: modules/access/cdda/access.c:723
 #, fuzzy
 msgid "Year"
 msgstr "Törlés"
 
-#: modules/access/cdda/access.c:727
+#: modules/access/cdda/access.c:731
 msgid "Track Artist"
 msgstr ""
 
-#: modules/access/cdda/access.c:729
+#: modules/access/cdda/access.c:733
 #, fuzzy
 msgid "Track Title"
 msgstr "Elõzõ cím"
@@ -5980,276 +5980,276 @@ msgstr ""
 msgid "Windows Service interface"
 msgstr "Kezelõfelület"
 
-#: modules/control/rc.c:118
+#: modules/control/rc.c:120
 msgid "Show stream position"
 msgstr ""
 
-#: modules/control/rc.c:119
+#: modules/control/rc.c:121
 msgid ""
 "Show the current position in seconds within the stream from time to time."
 msgstr ""
 
-#: modules/control/rc.c:122
+#: modules/control/rc.c:124
 msgid "Fake TTY"
 msgstr ""
 
-#: modules/control/rc.c:123
+#: modules/control/rc.c:125
 msgid "Force the rc module to use stdin as if it was a TTY."
 msgstr ""
 
-#: modules/control/rc.c:125
+#: modules/control/rc.c:127
 msgid "UNIX socket command input"
 msgstr ""
 
-#: modules/control/rc.c:126
+#: modules/control/rc.c:128
 msgid "Accept commands over a Unix socket rather than stdin."
 msgstr ""
 
-#: modules/control/rc.c:129
+#: modules/control/rc.c:131
 msgid "TCP command input"
 msgstr ""
 
-#: modules/control/rc.c:130
+#: modules/control/rc.c:132
 msgid ""
 "Accept commands over a socket rather than stdin. You can set the address and "
 "port the interface will bind to."
 msgstr ""
 
-#: modules/control/rc.c:132
+#: modules/control/rc.c:134
 msgid "Extended help"
 msgstr ""
 
-#: modules/control/rc.c:133
+#: modules/control/rc.c:135
 msgid "List additional commands."
 msgstr ""
 
-#: modules/control/rc.c:137 modules/misc/dummy/dummy.c:49
+#: modules/control/rc.c:139 modules/misc/dummy/dummy.c:49
 msgid "Do not open a DOS command box interface"
 msgstr ""
 
-#: modules/control/rc.c:139
+#: modules/control/rc.c:141
 msgid ""
 "By default the rc interface plugin will start a DOS command box. Enabling "
 "the quiet mode will not bring this command box but can also be pretty "
 "annoying when you want to stop VLC and no video window is open."
 msgstr ""
 
-#: modules/control/rc.c:146
+#: modules/control/rc.c:148
 #, fuzzy
 msgid "Remote control interface"
 msgstr "A hálózati csatoló MTU-ja"
 
-#: modules/control/rc.c:271
+#: modules/control/rc.c:273
 #, fuzzy, c-format
 msgid "Remote control interface initialized, `h' for help\n"
 msgstr "A hálózati csatoló MTU-ja"
 
-#: modules/control/rc.c:469 modules/control/rc.c:484
+#: modules/control/rc.c:471 modules/control/rc.c:486
 #, c-format
 msgid "%s: returned %i (%s)\n"
 msgstr ""
 
-#: modules/control/rc.c:518
+#: modules/control/rc.c:520
 #, c-format
 msgid "+----[ end of stream info ]\n"
 msgstr ""
 
-#: modules/control/rc.c:523
+#: modules/control/rc.c:525
 #, fuzzy, c-format
 msgid "no input\n"
 msgstr "Hang menü"
 
-#: modules/control/rc.c:600
+#: modules/control/rc.c:602
 #, c-format
 msgid "+----[ Remote control commands ]\n"
 msgstr ""
 
-#: modules/control/rc.c:602
+#: modules/control/rc.c:604
 #, c-format
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist\n"
 msgstr ""
 
-#: modules/control/rc.c:603
+#: modules/control/rc.c:605
 #, c-format
 msgid "| playlist . . .  show items currently in playlist\n"
 msgstr ""
 
-#: modules/control/rc.c:604
+#: modules/control/rc.c:606
 #, c-format
 msgid "| play . . . . . . . . . . . . . . . . play stream\n"
 msgstr ""
 
-#: modules/control/rc.c:605
+#: modules/control/rc.c:607
 #, c-format
 msgid "| stop . . . . . . . . . . . . . . . . stop stream\n"
 msgstr ""
 
-#: modules/control/rc.c:606
+#: modules/control/rc.c:608
 #, c-format
 msgid "| next . . . . . . . . . . . .  next playlist item\n"
 msgstr ""
 
-#: modules/control/rc.c:607
+#: modules/control/rc.c:609
 #, c-format
 msgid "| prev . . . . . . . . . .  previous playlist item\n"
 msgstr ""
 
-#: modules/control/rc.c:608
+#: modules/control/rc.c:610
 #, c-format
 msgid "| title [X]  . . . . set/get title in current item\n"
 msgstr ""
 
-#: modules/control/rc.c:609
+#: modules/control/rc.c:611
 #, c-format
 msgid "| title_n  . . . . . .  next title in current item\n"
 msgstr ""
 
-#: modules/control/rc.c:610
+#: modules/control/rc.c:612
 #, c-format
 msgid "| title_p  . . . .  previous title in current item\n"
 msgstr ""
 
-#: modules/control/rc.c:611
+#: modules/control/rc.c:613
 #, c-format
 msgid "| chapter [X]  . . set/get chapter in current item\n"
 msgstr ""
 
-#: modules/control/rc.c:612
+#: modules/control/rc.c:614
 #, c-format
 msgid "| chapter_n  . . . .  next chapter in current item\n"
 msgstr ""
 
-#: modules/control/rc.c:613
+#: modules/control/rc.c:615
 #, c-format
 msgid "| chapter_p  . .  previous chapter in current item\n"
 msgstr ""
 
-#: modules/control/rc.c:615
+#: modules/control/rc.c:617
 #, c-format
 msgid "| seek X . seek in seconds, for instance `seek 12'\n"
 msgstr ""
 
-#: modules/control/rc.c:616
+#: modules/control/rc.c:618
 #, c-format
 msgid "| pause  . . . . . . . . . . . . . .  toggle pause\n"
 msgstr ""
 
-#: modules/control/rc.c:617
+#: modules/control/rc.c:619
 #, c-format
 msgid "| f  . . . . . . . . . . . . . . toggle fullscreen\n"
 msgstr ""
 
-#: modules/control/rc.c:618
+#: modules/control/rc.c:620
 #, c-format
 msgid "| info . . .  information about the current stream\n"
 msgstr ""
 
-#: modules/control/rc.c:620
+#: modules/control/rc.c:622
 #, c-format
 msgid "| volume [X] . . . . . . . .  set/get audio volume\n"
 msgstr ""
 
-#: modules/control/rc.c:621
+#: modules/control/rc.c:623
 #, c-format
 msgid "| volup [X]  . . . . .  raise audio volume X steps\n"
 msgstr ""
 
-#: modules/control/rc.c:622
+#: modules/control/rc.c:624
 #, c-format
 msgid "| voldown [X]  . . . .  lower audio volume X steps\n"
 msgstr ""
 
-#: modules/control/rc.c:623
+#: modules/control/rc.c:625
 #, c-format
 msgid "| adev [X] . . . . . . . . .  set/get audio device\n"
 msgstr ""
 
-#: modules/control/rc.c:624
+#: modules/control/rc.c:626
 #, c-format
 msgid "| achan [X]. . . . . . . .  set/get audio channels\n"
 msgstr ""
 
-#: modules/control/rc.c:628
-#, c-format
-msgid "| marquee STRING . . . . . overlay STRING in video\n"
-msgstr ""
-
-#: modules/control/rc.c:629
-#, c-format
-msgid "| marq-x X . . . . . .offset of marquee, from left\n"
-msgstr ""
-
 #: modules/control/rc.c:630
 #, c-format
-msgid "| marq-y Y . . . . . . offset of marquee, from top\n"
+msgid "| marq-marquee STRING  . . overlay STRING in video\n"
 msgstr ""
 
 #: modules/control/rc.c:631
 #, c-format
+msgid "| marq-x X . . . . . .offset of marquee, from left\n"
+msgstr ""
+
+#: modules/control/rc.c:632
+#, c-format
+msgid "| marq-y Y . . . . . . offset of marquee, from top\n"
+msgstr ""
+
+#: modules/control/rc.c:633
+#, c-format
 msgid "| marq-timeout T. . . . .timeout of marquee, in ms\n"
-msgstr ""
-
-#: modules/control/rc.c:634
-#, c-format
-msgid "| help . . . . . . . . . . . . . this help message\n"
-msgstr ""
-
-#: modules/control/rc.c:635
-#, c-format
-msgid "| logout . . . . . .exit (if in socket connection)\n"
 msgstr ""
 
 #: modules/control/rc.c:636
 #, c-format
-msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc\n"
+msgid "| help . . . . . . . . . . . . . this help message\n"
+msgstr ""
+
+#: modules/control/rc.c:637
+#, c-format
+msgid "| logout . . . . . .exit (if in socket connection)\n"
 msgstr ""
 
 #: modules/control/rc.c:638
 #, c-format
+msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc\n"
+msgstr ""
+
+#: modules/control/rc.c:640
+#, c-format
 msgid "+----[ end of help ]\n"
 msgstr ""
 
-#: modules/control/rc.c:646
+#: modules/control/rc.c:648
 #, c-format
 msgid "unknown command `%s', type `help' for help\n"
 msgstr ""
 
-#: modules/control/rc.c:723
+#: modules/control/rc.c:725
 #, c-format
 msgid "Currently playing chapter %d/%d\n"
 msgstr ""
 
-#: modules/control/rc.c:763
+#: modules/control/rc.c:765
 #, c-format
 msgid "Currently playing title %d/%d\n"
 msgstr ""
 
-#: modules/control/rc.c:821
+#: modules/control/rc.c:823
 #, c-format
 msgid "trying to add %s to playlist\n"
 msgstr ""
 
-#: modules/control/rc.c:836
+#: modules/control/rc.c:838
 #, c-format
 msgid "| no entries\n"
 msgstr ""
 
-#: modules/control/rc.c:882
+#: modules/control/rc.c:847 modules/control/rc.c:912
 #, c-format
 msgid "unknown command!\n"
 msgstr ""
 
-#: modules/control/rc.c:928
+#: modules/control/rc.c:958
 #, c-format
 msgid "Volume must be in the range %d-%d\n"
 msgstr ""
 
-#: modules/control/rc.c:944 modules/control/rc.c:976
+#: modules/control/rc.c:974 modules/control/rc.c:1006
 #, c-format
 msgid "Volume is %d\n"
 msgstr ""
 
-#: modules/control/rc.c:1038
+#: modules/control/rc.c:1068
 #, c-format
 msgid "+----[ end of %s ]\n"
 msgstr ""
@@ -9683,7 +9683,7 @@ msgid "Caching"
 msgstr ""
 
 #: modules/gui/wxwindows/open.cpp:445
-msgid "Change the default caching value (in miliseconds)"
+msgid "Change the default caching value (in milliseconds)"
 msgstr ""
 
 #: modules/gui/wxwindows/open.cpp:596 modules/gui/wxwindows/subtitles.cpp:65
@@ -11165,7 +11165,7 @@ msgstr ""
 #: modules/video_filter/marq.c:71
 msgid ""
 "Defines the time the marquee must remain displayed, in milliseconds. Default "
-"value is 0 (remain forever)"
+"value is 0 (remain forever)."
 msgstr ""
 
 #: modules/video_filter/marq.c:86
@@ -11195,7 +11195,7 @@ msgid "Scaling mode"
 msgstr "Fájlnév"
 
 #: modules/video_filter/swscale/filter.c:64
-msgid "You can choose the default scaling mode"
+msgid "You can choose the default scaling mode."
 msgstr ""
 
 #: modules/video_filter/swscale/filter.c:68

@@ -2,15 +2,15 @@ $Id$
 
 Changes between 0.7.2 and 0.8.0:
 This version is in development and not yet released.
---------------------------------
+-----------------------------------------------------
 
 Core support:
  * Major work on libvlc. Changed/renamed/added functions
- * Complete switch to the new access2 and demux2 systems
+ * Complete switch to the new input core (better seeking, multi-input, ...)
  * New plugins cache to speed up launch time
  * Fix crash with deinterlace switching
  * New --play-and-stop feature which stops the playlist after each played item
- * Daemon mode
+ * Daemon mode (to run vlc in the background)
  * Technical improvements to the subtitle/OSD subsystem
 
 Input:
@@ -25,7 +25,7 @@ Input:
     (selection of titles/chapters).
 
 Demuxers:
- * Support iTunes Music Store previews
+ * Support for iTunes Music Store previews
  * Support for MJPEG webcams (i.e. AXIS cams)
  * Added initial mp4 and mpeg-ts text track support
  * Windows Media Server RTSP support
@@ -48,6 +48,7 @@ Stream Output:
   * Re-use audio/video/spu decoders in transcoder module. From now on,
      everything that is playable by VLC should be transcodable as well
   * Subtitles overlaying in transcoder
+  * Subpictures overlaying in transcoder (see video output)
   * Frame rate selection in the transcoder
   * DVB subtitles encoder
   * MPEG 1 layer 2 audio encoder using libtoolame
@@ -68,10 +69,22 @@ Audio Output:
  * New audio equalizer filter
  * Very trivial volume normalizer
 
+Video Output:
+ * Roku HD1000 Video output
+ * Experimental generic OpenGL video output (X11, Win32, MacOS X)
+   with support for effects.
+ * Improved filter and subpictures support :
+	- New filters can be streamed.
+	- "Subpicture filters" to overlay subpictures on video 
+	- Centralized scaling and blending
+ * New filters : 
+	- "time", to display current time 
+	- "marq", to display a marquee
+
 Interfaces:
  * OSD sliders for volume and postition information
  * OSD icons for Play and Pause
- * New Streaming Wizard for Windows and Linux default interfaces
+ * New Streaming Wizard for Windows and Linux default interfaces (wxWindows)
  * A few skins2 improvements
  * Added search, volume, loop and random functions to the ncurses interface
  * Added a filesystem browser to the ncurses interface
@@ -99,12 +112,9 @@ Mozilla plugin:
  * Volume, position, length, seek etc etc etc.
 
 Misc:
- * Roku HD1000 Video output
  * Server/client network synchronization module
  * VBrick streams fully supported
  * Cisco IP/TV streams supported
- * Experimental OpenGL video output for X11 and win32
- * a Time filter that displays the current time over the video
 
 Changes between 0.7.1 and 0.7.2:
 --------------------------------

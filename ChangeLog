@@ -23878,3 +23878,1738 @@ Changed paths:
 
 * modules/visualization/galaktos/Modules.am: a whole lot of files were forgotten.
 ------------------------------------------------------------------------
+r8628 | gbazin | 2004-09-02 01:17:43 +0200 (Thu, 02 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/ChangeLog
+
+* ChangeLog: update.
+------------------------------------------------------------------------
+r8629 | hartman | 2004-09-02 09:47:01 +0200 (Thu, 02 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/README
+
+* Don't say make bin works in the contrib system
+
+------------------------------------------------------------------------
+r8630 | gbazin | 2004-09-02 16:27:57 +0200 (Thu, 02 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/input/demux.c
+
+* src/input/demux.c: ignore STREAM_CONTROL_ACCESS control query + coding style changes.
+------------------------------------------------------------------------
+r8631 | gbazin | 2004-09-02 17:20:34 +0200 (Thu, 02 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/video_output/video_output.c
+
+* src/video_output/video_output.c: re-enabled on-the-fly switching of video filters.
+------------------------------------------------------------------------
+r8632 | zorglub | 2004-09-02 17:31:00 +0200 (Thu, 02 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwindows/extrapanel.cpp
+
+Switch video-filters on the fly
+
+------------------------------------------------------------------------
+r8633 | gbazin | 2004-09-02 18:00:44 +0200 (Thu, 02 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/video.cpp
+
+* modules/gui/wxwindows/video.cpp: before resizing the interface when a video stops, wait a bit just to make sure a new video outut is not being spawned.
+------------------------------------------------------------------------
+r8634 | gbazin | 2004-09-02 19:51:02 +0200 (Thu, 02 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/extras/contrib/src/packages.mak
+
+* extras/contrib/src/packages.mak: fixed the faad2 package
+------------------------------------------------------------------------
+r8635 | gbazin | 2004-09-02 21:40:28 +0200 (Thu, 02 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/video_output/vout_intf.c
+
+* src/video_output/vout_intf.c: fixed mouse events forwarding in opengl provider.
+------------------------------------------------------------------------
+r8636 | gbazin | 2004-09-02 23:19:35 +0200 (Thu, 02 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/NEWS
+
+* NEWS: next version is going to be 0.8.0.
+------------------------------------------------------------------------
+r8637 | gbazin | 2004-09-02 23:42:14 +0200 (Thu, 02 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/libvlc.h
+
+* src/libvlc.h: plugins-cache is now enabled by default.
+------------------------------------------------------------------------
+r8638 | zorglub | 2004-09-03 02:11:25 +0200 (Fri, 03 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/audio_filter/converter/mpgatofixed32.c
+
+msg_Err -> msg_Dbg
+
+------------------------------------------------------------------------
+r8639 | massiot | 2004-09-03 20:37:21 +0200 (Fri, 03 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/access/pvr/pvr.c
+
+* modules/access/pvr/pvr.c: Added a --pvr-caching option.
+
+------------------------------------------------------------------------
+r8640 | massiot | 2004-09-03 20:38:33 +0200 (Fri, 03 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/demuxdump.c
+
+* modules/demux/demuxdump.c: Added a --demuxdump-append boolean option.
+
+------------------------------------------------------------------------
+r8641 | massiot | 2004-09-03 20:42:25 +0200 (Fri, 03 Sep 2004) | 4 lines
+Changed paths:
+   M /trunk/include/vlc_access.h
+   M /trunk/modules/access/dvb/access.c
+   M /trunk/modules/access/dvb/dvb.h
+   M /trunk/modules/access/dvb/linux_dvb.c
+   M /trunk/modules/demux/ts.c
+   M /trunk/src/input/stream.c
+
+* modules/demux/ts.c, modules/access/dvb: Added support for the CAM device
+  of linuxtv drivers. We currently only descramble one channel (this will
+  change in the near future). Also fixed a few demux-related bugs.
+
+------------------------------------------------------------------------
+r8642 | bigben | 2004-09-04 12:39:44 +0200 (Sat, 04 Sep 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/open.m
+
+* syntax to specify the dvd title/chapter to open has changed...
+
+
+
+------------------------------------------------------------------------
+r8643 | rocky | 2004-09-04 16:51:04 +0200 (Sat, 04 Sep 2004) | 10 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/include/vlc_meta.h
+   M /trunk/modules/access/cdda/access.c
+   M /trunk/modules/access/cdda/cdda.c
+   M /trunk/modules/access/cdda/cdda.h
+
+First attempt to reinstate a libcdio cdda. 
+
+vlc_meta.h: added CD-Text, ISO 9660, and CDDB fields. Separate email
+will be sent about this.
+
+Note: sound may be off by 2 seconds (150 sectors or pregap
+amount). The sound for both this and the other cdda plugin don't work
+for me. Before the last SVN update though that's what it sounded like.
+
+
+------------------------------------------------------------------------
+r8644 | fkuehne | 2004-09-05 18:53:04 +0200 (Sun, 05 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/pvr/pvr.c
+   M /trunk/modules/audio_filter/normvol.c
+   M /trunk/modules/gui/macosx/equalizer.m
+   M /trunk/modules/gui/ncurses.c
+   M /trunk/modules/gui/wxwindows/bookmarks.cpp
+   M /trunk/modules/gui/wxwindows/extrapanel.cpp
+   M /trunk/modules/video_output/snapshot.c
+   M /trunk/src/audio_output/input.c
+
+* string review
+------------------------------------------------------------------------
+r8645 | fkuehne | 2004-09-05 18:53:39 +0200 (Sun, 05 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/po/de.po
+
+* first update of the German translation
+------------------------------------------------------------------------
+r8646 | fkuehne | 2004-09-05 20:38:53 +0200 (Sun, 05 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/THANKS
+   M /trunk/modules/gui/wxwindows/extrapanel.cpp
+   M /trunk/po/de.po
+   M /trunk/po/en_GB.po
+   M /trunk/po/es.po
+   M /trunk/po/fr.po
+   M /trunk/po/hu.po
+   M /trunk/po/it.po
+   M /trunk/po/ja.po
+   M /trunk/po/nl.po
+   M /trunk/po/no.po
+   M /trunk/po/pl.po
+   M /trunk/po/pt_BR.po
+   M /trunk/po/ru.po
+   M /trunk/po/sv.po
+   M /trunk/po/vlc.pot
+
+modules/gui/wxwindows/extrapanel.cpp: minor string fix
+po/*: updated the po-files
+THANKS: updated my mail-address
+------------------------------------------------------------------------
+r8647 | rocky | 2004-09-06 06:38:46 +0200 (Mon, 06 Sep 2004) | 5 lines
+Changed paths:
+   M /trunk/include/mtime.h
+   M /trunk/modules/access/cdda/Modules.am
+   M /trunk/modules/access/cdda/access.c
+   M /trunk/modules/access/cdda/cdda.h
+
+2nd attempt to get libcdio cdda working.
+
+mtime.h: define constant for second-to-millisecond conversions.
+
+
+------------------------------------------------------------------------
+r8648 | courmisch | 2004-09-06 13:45:44 +0200 (Mon, 06 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/src/misc/httpd.c
+
+0 is a legal socket descriptor
+
+------------------------------------------------------------------------
+r8649 | rocky | 2004-09-06 14:49:29 +0200 (Mon, 06 Sep 2004) | 5 lines
+Changed paths:
+   M /trunk/modules/access/cdda/Modules.am
+   M /trunk/modules/access/cdda/access.c
+   A /trunk/modules/access/cdda/access.h
+   A /trunk/modules/access/cdda/callback.c
+   A /trunk/modules/access/cdda/callback.h
+   M /trunk/modules/access/cdda/cdda.c
+   M /trunk/modules/access/cdda/cdda.h
+
+Allow size of blocks reads to be specified/adjusted
+Split out callback routines. 
+Some cleanup. Still largely broken though. 
+
+
+------------------------------------------------------------------------
+r8650 | courmisch | 2004-09-06 17:09:37 +0200 (Mon, 06 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/src/input/input.c
+
+debug message accessed free'd structure causing a segmentation fault
+
+------------------------------------------------------------------------
+r8651 | sigmunau | 2004-09-06 18:10:34 +0200 (Mon, 06 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/TODO
+
+Added matroska-related items to todo-list
+
+------------------------------------------------------------------------
+r8652 | titer | 2004-09-06 18:46:25 +0200 (Mon, 06 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/beos/InterfaceWindow.cpp
+   M /trunk/modules/gui/beos/MsgVals.h
+
+ beos/*: fixed title/chapter navigation
+
+------------------------------------------------------------------------
+r8653 | sigmunau | 2004-09-06 21:01:34 +0200 (Mon, 06 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/TODO
+   M /trunk/modules/demux/mkv.cpp
+
+some timecode and chapter-related fixes from Mosu(thanks a lot).
+
+------------------------------------------------------------------------
+r8654 | titer | 2004-09-06 23:07:43 +0200 (Mon, 06 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/src/input/var.c
+
+ + src/input/var.c: when starting a title, don't recreate next/prev-chapter
+     and add callbacks if they already exist
+
+------------------------------------------------------------------------
+r8655 | titer | 2004-09-06 23:28:07 +0200 (Mon, 06 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/video_output/opengl.c
+   M /trunk/src/video_output/vout_intf.c
+
+ Fixed OpenGL mouse events
+
+------------------------------------------------------------------------
+r8656 | sigmunau | 2004-09-07 10:11:49 +0200 (Tue, 07 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/TODO
+   M /trunk/modules/demux/mkv.cpp
+
+fixed track selection for mkv-files with default flag set on tracks.
+
+------------------------------------------------------------------------
+r8657 | gbazin | 2004-09-07 11:34:03 +0200 (Tue, 07 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/faad.c
+   M /trunk/src/input/decoder.c
+
+* src/input/decoder.c, modules/codec/faad.c: work around another bug in libfaad with ADTS streams.
+------------------------------------------------------------------------
+r8658 | sigmunau | 2004-09-07 12:34:47 +0200 (Tue, 07 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/misc/freetype.c
+
+freetype.c: don't hang if user specify negative fontsize
+
+------------------------------------------------------------------------
+r8659 | gbazin | 2004-09-07 23:16:49 +0200 (Tue, 07 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/modules/codec/subsdec.c
+   M /trunk/modules/gui/skins2/vars/playlist.cpp
+   M /trunk/modules/gui/skins2/vars/playlist.hpp
+   M /trunk/modules/misc/freetype.c
+   M /trunk/src/extras/libc.c
+
+* src/extras/libc.c: provide iconv facility in the core (vlc_iconv_open(), vlc_iconv(), vlc_iconv_close()).
+* modules/misc/freetype.c, modules/codec/subsdec.c, modules/gui/skins2: use iconv from the core.
+
+------------------------------------------------------------------------
+r8660 | gbazin | 2004-09-07 23:28:52 +0200 (Tue, 07 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/configure.ac
+
+* configure.ac: small iconv fix.
+------------------------------------------------------------------------
+r8661 | gbazin | 2004-09-07 23:46:16 +0200 (Tue, 07 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/include/vlc_common.h
+
+* include/vlc_common.h: forgot this file in my last commit.
+------------------------------------------------------------------------
+r8662 | gbazin | 2004-09-08 00:08:36 +0200 (Wed, 08 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/video.cpp
+
+* modules/gui/wxwindows/video.cpp: reverted change to re-use the video window as it doesn't work well on wxGTK.
+------------------------------------------------------------------------
+r8663 | gbazin | 2004-09-08 00:55:26 +0200 (Wed, 08 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/interface.cpp
+
+* modules/gui/wxwindows/interface.cpp: fix for the interface resizing when video is stopped.
+------------------------------------------------------------------------
+r8664 | gbazin | 2004-09-08 12:07:05 +0200 (Wed, 08 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/include/vlc_help.h
+   M /trunk/modules/gui/wxwindows/iteminfo.cpp
+
+* include/vlc_help.h: update.
+------------------------------------------------------------------------
+r8665 | gbazin | 2004-09-08 14:48:57 +0200 (Wed, 08 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/stream_out/transcode.c
+
+* modules/stream_out/transcode.c: use picture ring buffers to avoid leaks due to decoders not releasing pictures properly and to avoid uncessary mallocs.
+------------------------------------------------------------------------
+r8666 | gbazin | 2004-09-08 16:10:20 +0200 (Wed, 08 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/audio_filter/converter/a52tofloat32.c
+   M /trunk/modules/audio_filter/converter/dtstofloat32.c
+   M /trunk/modules/audio_filter/converter/mpgatofixed32.c
+
+* modules/audio_filter/converter/*: a couple of fixes for transcoding.
+------------------------------------------------------------------------
+r8667 | gbazin | 2004-09-08 17:25:56 +0200 (Wed, 08 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/ts.c
+
+* modules/demux/ts.c: small video artefacts are usually better than dropping whole frames.
+------------------------------------------------------------------------
+r8668 | gbazin | 2004-09-08 23:01:11 +0200 (Wed, 08 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/include/video_output.h
+   M /trunk/src/video_output/video_output.c
+   M /trunk/src/video_output/vout_subpictures.c
+
+* src/video_output/*: fixed race condition in spu initialization which affected DVD menus.
+------------------------------------------------------------------------
+r8669 | gbazin | 2004-09-08 23:11:31 +0200 (Wed, 08 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_output/opengl.c
+   M /trunk/src/video_output/vout_intf.c
+
+* src/video_output/vout_intf.c, modules/video_output/opengl.c: we do really need these, so please don't remove them again.
+------------------------------------------------------------------------
+r8670 | gbazin | 2004-09-09 00:02:48 +0200 (Thu, 09 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dvdnav.c
+
+* modules/access/dvdnav.c: call buttonUpdate() again when the video ES is started.
+------------------------------------------------------------------------
+r8671 | gbazin | 2004-09-09 15:04:12 +0200 (Thu, 09 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/include/vlc_common.h
+   M /trunk/src/extras/libc.c
+
+* include/vlc_common.h, src/extras/libc.c: added GCD() and vlc_reduce().
+------------------------------------------------------------------------
+r8672 | gbazin | 2004-09-09 16:02:24 +0200 (Thu, 09 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/control/gestures.c
+
+* modules/control/gestures.c: compilation fix.
+------------------------------------------------------------------------
+r8673 | gbazin | 2004-09-09 16:23:44 +0200 (Thu, 09 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/mux/asf.c
+
+* modules/mux/asf.c: include a metadata header to store the video pixel aspect ratio info.
+------------------------------------------------------------------------
+r8674 | gbazin | 2004-09-09 16:25:07 +0200 (Thu, 09 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/theora.c
+
+* modules/codec/theora.c: use vlc_reduce() to before storing the aspect-ratio.
+------------------------------------------------------------------------
+r8675 | gbazin | 2004-09-09 16:33:33 +0200 (Thu, 09 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/extras/libc.c
+
+* src/extras/libc.c: forgot a small modification.
+------------------------------------------------------------------------
+r8676 | gbazin | 2004-09-09 16:47:33 +0200 (Thu, 09 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/input/input.c
+
+* src/input/input.c: hack to allow for the udp:@:port syntax again... not really pretty though.
+------------------------------------------------------------------------
+r8677 | gbazin | 2004-09-09 23:45:38 +0200 (Thu, 09 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/audio_filter/format.c
+   M /trunk/modules/audio_filter/normvol.c
+   M /trunk/modules/codec/ffmpeg/video_filter.c
+
+ modules/codec/ffmpeg/video_filter.c, modules/audio_filter/format.c, normvol.c: added Id svn keyword.
+------------------------------------------------------------------------
+r8678 | gbazin | 2004-09-10 00:18:51 +0200 (Fri, 10 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/misc/httpd.c
+
+* src/misc/httpd.c: spelling mistake.
+------------------------------------------------------------------------
+r8679 | gbazin | 2004-09-10 11:19:59 +0200 (Fri, 10 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/cmml/intf.c
+
+* modules/codec/cmml/intf.c: compilation fix.
+------------------------------------------------------------------------
+r8680 | gbazin | 2004-09-10 11:49:01 +0200 (Fri, 10 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/stream_out/standard.c
+
+* modules/stream_out/standard.c: compilation fix.
+------------------------------------------------------------------------
+r8681 | gbazin | 2004-09-10 13:35:42 +0200 (Fri, 10 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/asf/libasf.c
+   M /trunk/modules/demux/asf/libasf.h
+
+* commit modules/demux/asf/*: load and parse the metadata object + coding style changes.
+------------------------------------------------------------------------
+r8682 | gbazin | 2004-09-10 14:43:08 +0200 (Fri, 10 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/asf/asf.c
+   M /trunk/modules/demux/asf/libasf.c
+   M /trunk/modules/demux/asf/libasf.h
+
+* modules/demux/asf/*: get video aspect ratio from metadata object.
+------------------------------------------------------------------------
+r8683 | gbazin | 2004-09-10 15:15:59 +0200 (Fri, 10 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/rawvideo.c
+
+* modules/codec/rawvideo.c: packetizer will also invert the pictures if needed.
+------------------------------------------------------------------------
+r8684 | gbazin | 2004-09-10 15:53:43 +0200 (Fri, 10 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_output/directx/directx.c
+   M /trunk/modules/video_output/x11/xcommon.c
+
+* modules/video_output/x11/xcommon.c, modules/video_output/directx/directx.c: when we invert the YV12 picture buffer chroma planes, we need to report a I420 chroma.
+------------------------------------------------------------------------
+r8685 | gbazin | 2004-09-10 19:22:03 +0200 (Fri, 10 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/include/video_output.h
+   M /trunk/include/vlc_video.h
+   M /trunk/src/video_output/vout_pictures.c
+
+* include/vlc_video.h, src/video_output/vout_pictures.c: export vout_CopyPicture().
+
+------------------------------------------------------------------------
+r8686 | gbazin | 2004-09-10 20:03:25 +0200 (Fri, 10 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_video.h
+   M /trunk/modules/codec/ogt/common.c
+   M /trunk/modules/codec/ogt/render.c
+   M /trunk/src/video_output/video_output.c
+
+* src/video_output/video_output.c, modules/codec/ogt: got rid of vout_AspectRatio().
+
+------------------------------------------------------------------------
+r8687 | gbazin | 2004-09-10 21:47:16 +0200 (Fri, 10 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/video_output/video_output.c
+
+* src/video_output/video_output.c: oops.
+------------------------------------------------------------------------
+r8688 | gbazin | 2004-09-10 23:08:41 +0200 (Fri, 10 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/logo.c
+
+* modules/video_filter/logo.c: complete rewrite using the alpha-blending module.
+------------------------------------------------------------------------
+r8689 | gbazin | 2004-09-11 15:15:18 +0200 (Sat, 11 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile.am
+   M /trunk/include/network.h
+   M /trunk/include/vlc_common.h
+   A /trunk/include/vlc_vod.h
+   M /trunk/modules/misc/Modules.am
+   A /trunk/modules/misc/rtsp.c
+
+* include/vlc_vod.h, modules/misc/rtsp.c: skeleton for a "vod server" RTSP module.
+
+------------------------------------------------------------------------
+r8690 | gbazin | 2004-09-12 11:10:33 +0200 (Sun, 12 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_output/directx/events.c
+
+* modules/video_output/directx/events.c: use a different window class for the video sub-window so the background color doesn't get messed-up with.
+------------------------------------------------------------------------
+r8691 | gbazin | 2004-09-12 11:16:55 +0200 (Sun, 12 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_output/directx/directx.c
+
+* modules/video_output/directx/directx.c: small fix.
+------------------------------------------------------------------------
+r8692 | gbazin | 2004-09-12 11:31:47 +0200 (Sun, 12 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dshow/dshow.cpp
+   M /trunk/modules/access/dshow/filter.cpp
+
+* modules/access/dshow: simplification (video inversion is now handled in the rawvideo codec/packetizer).
+------------------------------------------------------------------------
+r8693 | gbazin | 2004-09-12 12:30:24 +0200 (Sun, 12 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/screen/win32.c
+
+* modules/access/screen/win32.c: proper rgb mask for RV24.
+------------------------------------------------------------------------
+r8694 | gbazin | 2004-09-12 20:00:02 +0200 (Sun, 12 Sep 2004) | 5 lines
+Changed paths:
+   M /trunk/modules/access/dshow/Modules.am
+   A /trunk/modules/access/dshow/common.h
+   A /trunk/modules/access/dshow/crossbar.cpp
+   M /trunk/modules/access/dshow/dshow.cpp
+   M /trunk/modules/access/dshow/filter.cpp
+   M /trunk/modules/access/dshow/filter.h
+
+* modules/access/dshow/*:
+  - switch to access_demux module for raw video/audio streams.
+  - massive cleanup and simplifications.
+  - a bunch of fixes.
+
+------------------------------------------------------------------------
+r8695 | gbazin | 2004-09-12 22:31:00 +0200 (Sun, 12 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/video_output/video_output.c
+   M /trunk/src/video_output/vout_pictures.c
+
+* src/video_output: fixed a CPU heating loop in pause mode (fixes the problem with fast user switching on win32).
+------------------------------------------------------------------------
+r8696 | gbazin | 2004-09-12 22:32:08 +0200 (Sun, 12 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_output/directx/directx.c
+
+* modules/video_output/directx/directx.c: removed debug message.
+------------------------------------------------------------------------
+r8697 | titer | 2004-09-13 10:27:58 +0200 (Mon, 13 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/mux/asf.c
+
+ + mux/asf.c: gcc < 3 compile fix
+
+------------------------------------------------------------------------
+r8698 | titer | 2004-09-13 12:57:03 +0200 (Mon, 13 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+
+ + configure.ac: explicitly link to -lnet the modules which need it
+   (cause latest BeOS gcc doesn't do it by default anymore)
+
+------------------------------------------------------------------------
+r8699 | gbazin | 2004-09-13 15:28:10 +0200 (Mon, 13 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/include/vlc_block.h
+   M /trunk/src/misc/block.c
+
+* include/vlc_block.h: block_Duplicate() needs to duplicate all the fields of block_t.
+------------------------------------------------------------------------
+r8700 | titer | 2004-09-13 17:46:00 +0200 (Mon, 13 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+ contrib/src/Makefile: quick BeOS compile fix (-lnet bla bla)
+
+------------------------------------------------------------------------
+r8701 | gbazin | 2004-09-13 21:43:30 +0200 (Mon, 13 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+   A /trunk/modules/video_filter/swscale
+   A /trunk/modules/video_filter/swscale/Modules.am
+   A /trunk/modules/video_filter/swscale/common.h
+   A /trunk/modules/video_filter/swscale/filter.c
+   A /trunk/modules/video_filter/swscale/rgb2rgb.c
+   A /trunk/modules/video_filter/swscale/rgb2rgb.h
+   A /trunk/modules/video_filter/swscale/rgb2rgb_template.c
+   A /trunk/modules/video_filter/swscale/swscale.c
+   A /trunk/modules/video_filter/swscale/swscale.h
+   A /trunk/modules/video_filter/swscale/swscale_altivec_template.c
+   A /trunk/modules/video_filter/swscale/swscale_internal.h
+   A /trunk/modules/video_filter/swscale/swscale_template.c
+   A /trunk/modules/video_filter/swscale/yuv2rgb.c
+   A /trunk/modules/video_filter/swscale/yuv2rgb_altivec.c
+   A /trunk/modules/video_filter/swscale/yuv2rgb_mlib.c
+   A /trunk/modules/video_filter/swscale/yuv2rgb_template.c
+
+* modules/video_filter/swscale/*: new resizing/chroma conversion video filter based on MPlayer's swscale module.
+  (not enabled in configure.ac yet as it may have problems building on some platforms)
+
+------------------------------------------------------------------------
+r8702 | gbazin | 2004-09-13 21:46:38 +0200 (Mon, 13 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dshow/crossbar.cpp
+
+* modules/access/dshow/crossbar.cpp: compilation fix.
+------------------------------------------------------------------------
+r8703 | gbazin | 2004-09-13 22:29:58 +0200 (Mon, 13 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dshow/crossbar.cpp
+
+* modules/access/dshow/crossbar.cpp: real compilation fix.
+------------------------------------------------------------------------
+r8704 | fkuehne | 2004-09-13 22:30:12 +0200 (Mon, 13 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/extras/contrib/src/packages.mak
+
+* updated used libcdio-version from 0.69 to 0.70
+------------------------------------------------------------------------
+r8705 | gbazin | 2004-09-14 13:38:50 +0200 (Tue, 14 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/asf/asf.c
+
+* modules/demux/asf/asf.c: fixed overflow in aspect ratio calculation.
+------------------------------------------------------------------------
+r8706 | gbazin | 2004-09-14 13:45:44 +0200 (Tue, 14 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/INSTALL.win32
+   M /trunk/configure.ac
+
+* configure.ac: fixed --with-ffmpeg-dts.
+* INSTALL.win32: update with new contrib package.
+
+------------------------------------------------------------------------
+r8707 | bigben | 2004-09-14 19:27:52 +0200 (Tue, 14 Sep 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/demux/avi/avi.c
+
+
+msg_Err -> msg_Dbg
+
+
+------------------------------------------------------------------------
+r8708 | gbazin | 2004-09-14 22:30:12 +0200 (Tue, 14 Sep 2004) | 4 lines
+Changed paths:
+   M /trunk/include/vlc_common.h
+   M /trunk/include/vlc_input.h
+   M /trunk/include/vlc_vlm.h
+   M /trunk/include/vlc_vod.h
+   M /trunk/modules/misc/rtsp.c
+   M /trunk/src/misc/vlm.c
+
+* src/misc/vlm.c: started "vod server" integration (not much done yet).
+* modules/misc/rtsp.c, include/vlc_vod.h: vod server api update.
+* include/vlc_input.h: extended input_item_t a bit for the vod server.
+
+------------------------------------------------------------------------
+r8709 | gbazin | 2004-09-15 17:50:54 +0200 (Wed, 15 Sep 2004) | 4 lines
+Changed paths:
+   M /trunk/Makefile.am
+   M /trunk/include/video_output.h
+   M /trunk/include/vlc/vout.h
+   M /trunk/include/vlc_common.h
+   M /trunk/include/vlc_filter.h
+   M /trunk/include/vlc_objects.h
+   A /trunk/include/vlc_spu.h
+   M /trunk/include/vlc_video.h
+   M /trunk/modules/codec/cmml/intf.c
+   M /trunk/modules/codec/ogt/common.c
+   M /trunk/modules/codec/ogt/cvd.c
+   M /trunk/modules/codec/ogt/cvd_parse.c
+   M /trunk/modules/codec/ogt/ogt.c
+   M /trunk/modules/codec/ogt/ogt_parse.c
+   M /trunk/modules/control/hotkeys.c
+   M /trunk/modules/stream_out/transcode.c
+   M /trunk/src/input/decoder.c
+   M /trunk/src/misc/modules.c
+   M /trunk/src/misc/objects.c
+   M /trunk/src/video_output/video_output.c
+   M /trunk/src/video_output/video_text.c
+   M /trunk/src/video_output/video_widgets.c
+   M /trunk/src/video_output/vout_pictures.c
+   M /trunk/src/video_output/vout_subpictures.c
+
+* ALL: separation of the SPU engine from the VOUT.
+* modules/stream_out/transcode.c: re-use the SPU engine.
+* src/video_output/vout_subpictures.c: support for resizing subpictures.
+
+------------------------------------------------------------------------
+r8710 | gbazin | 2004-09-15 17:52:13 +0200 (Wed, 15 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/swscale/filter.c
+
+* modules/video_filter/swscale/filter.c: uninitialised variable fix.
+------------------------------------------------------------------------
+r8711 | gbazin | 2004-09-15 17:55:25 +0200 (Wed, 15 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/video_filter.c
+
+* modules/codec/ffmpeg/video_filter.c: improvements.
+------------------------------------------------------------------------
+r8712 | gbazin | 2004-09-15 18:02:45 +0200 (Wed, 15 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/modules/video_filter/Modules.am
+   A /trunk/modules/video_filter/scale.c
+
+* modules/video_filter/scale.c: simple nearest neighbour rescaling module for YUVP/A (subpictures).
+------------------------------------------------------------------------
+r8713 | gbazin | 2004-09-15 18:59:25 +0200 (Wed, 15 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/Modules.am
+
+* modules/video_filter/Modules.am: oops
+------------------------------------------------------------------------
+r8714 | gbazin | 2004-09-15 22:21:09 +0200 (Wed, 15 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/modules/misc/rtsp.c
+   M /trunk/modules/stream_out/Modules.am
+   A /trunk/modules/stream_out/description.c
+   M /trunk/src/misc/vlm.c
+
+* modules/stream_out/description.c: new "description" stream output module which gathers information on elementary streams (pre-parsing).
+* src/misc/vlm.c: pre-parse vod media items.
+
+------------------------------------------------------------------------
+r8715 | gbazin | 2004-09-16 16:31:14 +0200 (Thu, 16 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/menus.cpp
+
+* modules/gui/wxwindows/menus.cpp: re-organized right-click menu + play/pause/stop/next/previous entries.
+------------------------------------------------------------------------
+r8716 | gbazin | 2004-09-17 00:04:36 +0200 (Fri, 17 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/misc/rtsp.c
+   M /trunk/modules/stream_out/description.c
+
+* modules/misc/rtsp.c: getting closer to a basic but functional rtsp server.
+* modules/stream_out/description.c: bug fix.
+
+------------------------------------------------------------------------
+r8717 | gbazin | 2004-09-17 11:11:50 +0200 (Fri, 17 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/include/vlc_filter.h
+   M /trunk/include/vlc_spu.h
+   M /trunk/modules/misc/freetype.c
+   M /trunk/modules/stream_out/transcode.c
+   M /trunk/src/libvlc.h
+   M /trunk/src/video_output/video_output.c
+   M /trunk/src/video_output/vout_subpictures.c
+
+* src/video_output/vout_subpictures.c: support for subpictures filters.
+* src/libvlc.h: new --sub-filter config option + added a new subpictures category that regroups all the subpictures options.
+
+------------------------------------------------------------------------
+r8718 | gbazin | 2004-09-17 11:13:05 +0200 (Fri, 17 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/scale.c
+
+* modules/video_filter/scale.c: add a bias when calculating the nearest neighbour.
+------------------------------------------------------------------------
+r8719 | gbazin | 2004-09-17 11:30:19 +0200 (Fri, 17 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/video_filter/logo.c
+   M /trunk/src/libvlc.h
+   M /trunk/src/video_output/vout_subpictures.c
+
+* modules/video_filter/logo.c: implemented a logo subpictures filter.
+
+------------------------------------------------------------------------
+r8720 | gbazin | 2004-09-17 12:13:21 +0200 (Fri, 17 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/stream_out/transcode.c
+
+* modules/stream_out/transcode.c: new sfilter option for using subpictures filters during the transcoding.
+------------------------------------------------------------------------
+r8721 | gbazin | 2004-09-17 12:21:00 +0200 (Fri, 17 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/logo.c
+
+* modules/video_filter/logo.c: small fix.
+------------------------------------------------------------------------
+r8722 | gbazin | 2004-09-17 16:47:01 +0200 (Fri, 17 Sep 2004) | 4 lines
+Changed paths:
+   M /trunk/src/video_output/video_text.c
+   M /trunk/src/video_output/video_widgets.c
+   M /trunk/src/video_output/vout_subpictures.c
+
+* video_output/vout_subpictures.c:
+  + improved spu_SortSubpictures() to deal with SPU channels.
+  + ephemer subpictures can also have a stop date now (allows more flexibility).
+
+------------------------------------------------------------------------
+r8723 | hartman | 2004-09-18 02:05:11 +0200 (Sat, 18 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/modules/demux/Modules.am
+   M /trunk/modules/demux/subtitle.c
+   A /trunk/modules/demux/vobsub.c (from /trunk/modules/demux/subtitle.c:8722)
+
+* split vobsub and textual demuxers.
+
+
+------------------------------------------------------------------------
+r8724 | gbazin | 2004-09-18 11:21:03 +0200 (Sat, 18 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/misc/vlm.c
+
+* src/misc/vlm.c: we probably have enough bugs already :p
+------------------------------------------------------------------------
+r8725 | gbazin | 2004-09-18 11:34:03 +0200 (Sat, 18 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/subtitle.c
+
+* modules/demux/subtitle.c: compilation fix.
+------------------------------------------------------------------------
+r8726 | hartman | 2004-09-18 11:36:26 +0200 (Sat, 18 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/livedotcom.cpp
+
+* added SVQ3 ID to livedotcom. don't remember if it worked, but won't hurt either i guess..
+
+------------------------------------------------------------------------
+r8727 | hartman | 2004-09-18 11:52:20 +0200 (Sat, 18 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_es.h
+
+* added origin (position) and 'original frame size' params to SPU es
+
+------------------------------------------------------------------------
+r8728 | sigmunau | 2004-09-18 18:38:58 +0200 (Sat, 18 Sep 2004) | 2 lines
+Changed paths:
+   A /trunk/modules/video_filter/time.c
+
+time.c: a small module to place current time on top of video
+
+------------------------------------------------------------------------
+r8729 | sigmunau | 2004-09-18 19:46:15 +0200 (Sat, 18 Sep 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/video_filter/Modules.am
+   M /trunk/modules/video_filter/time.c
+
+modules/video_filter/Modules.am: added time, for those that don't know the
+fen-trick
+time.c: fixed a few copy/paste bugs and some warnings
+
+------------------------------------------------------------------------
+r8730 | hartman | 2004-09-18 23:13:45 +0200 (Sat, 18 Sep 2004) | 6 lines
+Changed paths:
+   M /trunk/modules/demux/mkv.cpp
+   M /trunk/modules/demux/vobsub.c
+
+* mkv.cpp: retrieve the original framesize from the vobsub idx and store in es_format_t
+* vobsub.c: rewrite of the vobsub module. Now has track support. This is UNFINISHED.
+  TODO, repair the 'Control' commands store the timestamp/location combo's in the arrays of subtitle_t structs
+
+  and find a way to pass the info from the decoder to the core of course....
+
+------------------------------------------------------------------------
+r8731 | sigmunau | 2004-09-19 14:29:16 +0200 (Sun, 19 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/video_filter/time.c
+
+time.c: customizable position and string prefix, mainly done by markfm
+
+------------------------------------------------------------------------
+r8732 | gbazin | 2004-09-19 16:46:01 +0200 (Sun, 19 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/logo.c
+
+* modules/video_filter/logo.c: convert all pngs to RGBA.
+------------------------------------------------------------------------
+r8733 | gbazin | 2004-09-19 16:58:43 +0200 (Sun, 19 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/logo.c
+
+* modules/video_filter/logo.c: remove the comment about the need for RGBA PNG files.
+------------------------------------------------------------------------
+r8734 | gbazin | 2004-09-19 17:11:36 +0200 (Sun, 19 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/video_output/vout_subpictures.c
+
+* src/video_output/vout_subpictures.c: support for stacking subpictures filters (eg. --sub-filter=foo,bar).
+------------------------------------------------------------------------
+r8735 | gbazin | 2004-09-19 17:23:38 +0200 (Sun, 19 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/logo.c
+
+* modules/video_filter/logo.c: fixed case when no transparent color is set.
+------------------------------------------------------------------------
+r8736 | gbazin | 2004-09-19 17:36:08 +0200 (Sun, 19 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/logo.c
+
+* modules/video_filter/logo.c: transparency fix by markfm.
+------------------------------------------------------------------------
+r8737 | gbazin | 2004-09-19 17:46:14 +0200 (Sun, 19 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/logo.c
+
+* modules/video_filter/logo.c: couple of sanity check.
+------------------------------------------------------------------------
+r8738 | gbazin | 2004-09-19 18:26:54 +0200 (Sun, 19 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/logo.c
+
+* modules/video_filter/logo.c: oops, broke something.
+------------------------------------------------------------------------
+r8739 | gbazin | 2004-09-19 20:50:54 +0200 (Sun, 19 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/vobsub.c
+
+* modules/demux/vobsub.c: fixed bug pointed to by gcc warnings.
+------------------------------------------------------------------------
+r8740 | gbazin | 2004-09-19 21:22:04 +0200 (Sun, 19 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/include/vlc/intf.h
+   M /trunk/include/vlc_input.h
+   M /trunk/src/playlist/item.c
+
+* include/vlc_input.h, src/playlist/item.c: added vlc_input_item_Init()/Clean() facility.
+------------------------------------------------------------------------
+r8741 | gbazin | 2004-09-19 23:38:12 +0200 (Sun, 19 Sep 2004) | 5 lines
+Changed paths:
+   M /trunk/include/vlc_vlm.h
+   M /trunk/src/misc/vlm.c
+
+* src/misc/vlm.c:
+   + major cleanup and bug fixing.
+   + added support for spawning and controlling several media instances.
+
+
+------------------------------------------------------------------------
+r8742 | gbazin | 2004-09-20 10:53:58 +0200 (Mon, 20 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/time.c
+
+* modules/video_filter/time.c: stick to our config options naming convention + fixed a couple of mem-leaks.
+------------------------------------------------------------------------
+r8743 | gbazin | 2004-09-20 11:18:11 +0200 (Mon, 20 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/logo.c
+
+* modules/video_filter/logo.c: fixed memleak.
+------------------------------------------------------------------------
+r8744 | gbazin | 2004-09-20 12:06:53 +0200 (Mon, 20 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/misc/freetype.c
+
+* modules/misc/freetype.c: fixed memory leak.
+------------------------------------------------------------------------
+r8745 | gbazin | 2004-09-20 12:09:28 +0200 (Mon, 20 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/time.c
+
+* modules/video_filter/time.c: optimized a bit.
+------------------------------------------------------------------------
+r8746 | gbazin | 2004-09-20 12:23:59 +0200 (Mon, 20 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/x264.c
+
+* modules/codec/x264.c: fixed aspect ratio.
+------------------------------------------------------------------------
+r8747 | sigmunau | 2004-09-20 14:17:51 +0200 (Mon, 20 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/video_filter/time.c
+
+time.c: configureable time format patch by markfm + some cleanup
+
+------------------------------------------------------------------------
+r8748 | hartman | 2004-09-20 17:03:17 +0200 (Mon, 20 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+* disabled the libdts making for the nightlies
+
+------------------------------------------------------------------------
+r8749 | hartman | 2004-09-20 17:47:08 +0200 (Mon, 20 Sep 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/demux/vobsub.c
+
+* some fixes to vobsub
+  TODO: create the index
+        position control
+
+------------------------------------------------------------------------
+r8750 | gbazin | 2004-09-20 23:50:18 +0200 (Mon, 20 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/include/vlc_vlm.h
+   M /trunk/include/vlc_vod.h
+   M /trunk/modules/misc/rtsp.c
+   M /trunk/src/misc/vlm.c
+
+* modules/misc/rtsp.c, src/misc/vlm.c: VOD RTSP support is beginning to work.
+------------------------------------------------------------------------
+r8751 | gbazin | 2004-09-20 23:51:41 +0200 (Mon, 20 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/time.c
+
+* modules/video_filter/time.c: added Id svn keyword
+------------------------------------------------------------------------
+r8752 | fkuehne | 2004-09-21 16:44:38 +0200 (Tue, 21 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/po/de.po
+
+* hopefully fixed the wrong behaviour of the strg/ctrl-key in the G. translation
+------------------------------------------------------------------------
+r8753 | sam | 2004-09-21 17:55:45 +0200 (Tue, 21 Sep 2004) | 6 lines
+Changed paths:
+   M /trunk/debian/changelog
+   M /trunk/debian/control
+   M /trunk/debian/rules
+
+  * debian/rules:
+    + Fixed previously broken DVD support.
+    + Removed currently broken Speex support.
+  * debian/control:
+    + Build-depend on libdvdnav.
+
+------------------------------------------------------------------------
+r8754 | sam | 2004-09-21 18:07:41 +0200 (Tue, 21 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/toolbox
+
+  * toolbox: fixed mixup in the changelog generation example.
+
+------------------------------------------------------------------------
+r8755 | sam | 2004-09-21 18:22:16 +0200 (Tue, 21 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/THANKS
+   M /trunk/modules/video_filter/swscale/Modules.am
+
+  * Added missing \n to misc files.
+
+------------------------------------------------------------------------
+r8756 | hartman | 2004-09-21 21:26:10 +0200 (Tue, 21 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_video.h
+   M /trunk/modules/codec/spudec/parse.c
+
+* pass the orignal movie size from es_format_t to subpicture_t
+
+------------------------------------------------------------------------
+r8757 | gbazin | 2004-09-21 22:19:04 +0200 (Tue, 21 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/video_output/vout_subpictures.c
+
+* src/video_output/vout_subpictures.c: modify the scaling factor based on the original video size info.
+------------------------------------------------------------------------
+r8758 | gbazin | 2004-09-21 22:33:59 +0200 (Tue, 21 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/spudec/parse.c
+   M /trunk/modules/codec/spudec/spudec.c
+
+* modules/codec/spudec/spudec.c: packetizer needs to duplicate the input es_format_t.
+------------------------------------------------------------------------
+r8759 | gbazin | 2004-09-21 22:40:09 +0200 (Tue, 21 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/doc/vlm.txt
+
+* doc/vlm.txt: small update to reflect the latest changes.
+------------------------------------------------------------------------
+r8760 | hartman | 2004-09-21 23:52:52 +0200 (Tue, 21 Sep 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/demux/vobsub.c
+
+ * scaled external vobsubs with multiple tracks are now working
+   - searching is a mess
+   - autodetect not yet activated, force by opening the idx as subfile
+
+------------------------------------------------------------------------
+r8761 | hartman | 2004-09-22 00:16:35 +0200 (Wed, 22 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/demux/vobsub.c
+
+* Fix the vobsub length.
+  fen: any suggestions for the other Control() stuff?
+
+------------------------------------------------------------------------
+r8762 | hartman | 2004-09-22 00:24:31 +0200 (Wed, 22 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/vobsub.c
+
+Thou shalt compile before thou commits
+
+------------------------------------------------------------------------
+r8763 | gbazin | 2004-09-22 11:20:12 +0200 (Wed, 22 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/playlist/item.c
+
+* src/playlist/item.c: fixed recent playlist item initialization bug which was screwing up things like doing random autodeletions, etc...
+------------------------------------------------------------------------
+r8764 | gbazin | 2004-09-22 11:44:44 +0200 (Wed, 22 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/mux/mpeg/ps.c
+
+* modules/mux/mpeg/ps.c: make sure the data blocks containing the pack and system headers are timestamped correctly. Added an --sout-ps-dts-delay option.
+------------------------------------------------------------------------
+r8765 | gbazin | 2004-09-22 12:17:41 +0200 (Wed, 22 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/ps.c
+
+* modules/demux/ps.c: small cleanup.
+------------------------------------------------------------------------
+r8766 | sigmunau | 2004-09-22 14:09:30 +0200 (Wed, 22 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+configure.ac: enabled time plugin
+
+------------------------------------------------------------------------
+r8767 | gbazin | 2004-09-22 15:37:55 +0200 (Wed, 22 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/stream_out/transcode.c
+
+* modules/stream_out/transcode.c: a bit more useful debug message.
+------------------------------------------------------------------------
+r8768 | gbazin | 2004-09-22 15:43:03 +0200 (Wed, 22 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dvdnav.c
+   M /trunk/modules/access/dvdread.c
+   M /trunk/modules/demux/ps.c
+   M /trunk/modules/demux/ps.h
+
+* modules/demux/ps.c,ps.h: PSM parsing remotely based on a patch by Pascal Claes.
+------------------------------------------------------------------------
+r8769 | gbazin | 2004-09-22 17:25:11 +0200 (Wed, 22 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access_output/udp.c
+
+* modules/access_output/udp.c: if a packet is bigger than the mtu size, we emit a warning and try to split it.
+------------------------------------------------------------------------
+r8770 | gbazin | 2004-09-22 20:42:52 +0200 (Wed, 22 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/misc/rtsp.c
+
+* modules/misc/rtsp.c: misc improvements + respect ports given by client.
+------------------------------------------------------------------------
+r8771 | gbazin | 2004-09-22 21:29:32 +0200 (Wed, 22 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/libvlc.h
+
+* src/libvlc.h: -f shortcut for fullscreen option.
+------------------------------------------------------------------------
+r8772 | gbazin | 2004-09-22 21:32:21 +0200 (Wed, 22 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/misc/rtsp.c
+
+* modules/misc/rtsp.c: fixed segfault.
+------------------------------------------------------------------------
+r8773 | gbazin | 2004-09-23 11:08:08 +0200 (Thu, 23 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/misc/rtsp.c
+
+* modules/misc/rtsp.c: fixed pause.
+------------------------------------------------------------------------
+r8774 | gbazin | 2004-09-23 13:20:24 +0200 (Thu, 23 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/configure.ac
+
+* configure.ac: should fix libpng detection on win32.
+------------------------------------------------------------------------
+r8775 | gbazin | 2004-09-23 14:09:53 +0200 (Thu, 23 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/configure.ac
+
+* configure.ac: fixed typo.
+------------------------------------------------------------------------
+r8776 | hartman | 2004-09-23 14:42:42 +0200 (Thu, 23 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/HACKING
+
+* HACKING: CVS -> SVN, added remark about developers.videolan.org site
+
+------------------------------------------------------------------------
+r8777 | hartman | 2004-09-23 16:08:11 +0200 (Thu, 23 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/faad.c
+
+* unknow -> unknown
+
+------------------------------------------------------------------------
+r8778 | oaubert | 2004-09-23 18:53:51 +0200 (Thu, 23 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/control/corba/Modules.am
+
+Modules.am: fixed typelib generation
+
+------------------------------------------------------------------------
+r8779 | oaubert | 2004-09-23 18:55:37 +0200 (Thu, 23 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/control/corba/mediacontrol-core.c
+
+mediacontrol-core.c: updated the used API to the new demux2
+  API. ByteCount positions are not supported anymore.
+
+------------------------------------------------------------------------
+r8780 | oaubert | 2004-09-23 18:56:07 +0200 (Thu, 23 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/control/corba/mediacontrol-plugin.c
+
+mediacontrol-plugin.c: removed superfluous vlc_release()
+
+------------------------------------------------------------------------
+r8781 | hartman | 2004-09-23 22:52:20 +0200 (Thu, 23 Sep 2004) | 8 lines
+Changed paths:
+   M /trunk/modules/access/http.c
+
+* if http:// and mime == asf, and name doesn't contain asx (cause they have mime == asf too) then bail http access and let the mms access try.
+  ( VLC now plays http:// urls which are actually mms:// streams and no longer handles asx files when the path doesn't contain "asx" )
+
+* added the aacp (aacPlus) mime type and force the aac demux in that case. aacPlus still doesn't work. (decoder issue?)
+
+* don't PLAYLIST_GO on a redirect. gave weird effects because the current item was still in the 'open' fase. The playlist is already playing, so there is no use in this option.
+
+
+------------------------------------------------------------------------
+r8782 | hartman | 2004-09-23 22:56:46 +0200 (Thu, 23 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/HACKING
+   M /trunk/TODO
+
+* added asx todo item to list
+* added some clarifications on use of bootstrap to HACKING file
+
+------------------------------------------------------------------------
+r8783 | gbazin | 2004-09-23 23:11:43 +0200 (Thu, 23 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/video_output/vout_subpictures.c
+
+* src/video_output/vout_subpictures.c: fixed recent dvd menu breakage.
+------------------------------------------------------------------------
+r8784 | hartman | 2004-09-24 00:08:39 +0200 (Fri, 24 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/modules/demux/mkv.cpp
+
+* zlib decompressor for mkv. not working. (i don't get c++ :) )
+
+------------------------------------------------------------------------
+r8785 | gbazin | 2004-09-24 08:59:28 +0200 (Fri, 24 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/control/corba/Modules.am
+
+modules/control/corba/Modules.am: attempt to fix build.
+------------------------------------------------------------------------
+r8786 | gbazin | 2004-09-24 10:35:23 +0200 (Fri, 24 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/Makefile.am
+
+* Makefile.am: use the new wine cmdl syntax for make package-win32.
+------------------------------------------------------------------------
+r8787 | gbazin | 2004-09-24 13:29:25 +0200 (Fri, 24 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/time.c
+
+* modules/video_filter/time.c: the subpicture doesn't need a timeout.
+------------------------------------------------------------------------
+r8788 | sigmunau | 2004-09-25 14:25:42 +0200 (Sat, 25 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/mkv.cpp
+
+mkv.cpp: Parse tags related to compression (unused yet)
+
+------------------------------------------------------------------------
+r8789 | sigmunau | 2004-09-25 14:45:04 +0200 (Sat, 25 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/demux/mkv.cpp
+
+mkv.cpp: turned do_zlib_decompress into block_zlib_decompress, and use it
+when needed. Zlib-compressed vobsubs work for me now.
+
+------------------------------------------------------------------------
+r8790 | sigmunau | 2004-09-25 15:04:12 +0200 (Sat, 25 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/mkv.cpp
+
+mkv.cpp: protect the call to block_zlib_decompress
+
+------------------------------------------------------------------------
+r8791 | sigmunau | 2004-09-25 16:01:05 +0200 (Sat, 25 Sep 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/demux/mkv.cpp
+
+mkv.cpp: helper function for printing of the mkv parse tree. Moves all the
+nastyness to a central location. Improves the general readability in my
+opinion.
+
+------------------------------------------------------------------------
+r8792 | gbazin | 2004-09-25 17:13:01 +0200 (Sat, 25 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_output/directx/directx.c
+   M /trunk/modules/video_output/directx/events.c
+
+* modules/video_output/directx/*: fix for spurious taskbar item after switching to fullscreen.
+------------------------------------------------------------------------
+r8793 | sigmunau | 2004-09-25 19:51:24 +0200 (Sat, 25 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/video_filter/time.c
+
+time.c: remove unused function parameter
+
+------------------------------------------------------------------------
+r8794 | hartman | 2004-09-25 22:05:02 +0200 (Sat, 25 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/NEWS
+   M /trunk/TODO
+
+* update of NEWS and todo
+
+------------------------------------------------------------------------
+r8795 | sigmunau | 2004-09-26 01:36:55 +0200 (Sun, 26 Sep 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/demux/Modules.am
+   M /trunk/modules/demux/mkv.cpp
+   M /trunk/modules/demux/mp4/libmp4.c
+   M /trunk/modules/demux/mp4/libmp4.h
+
+mkv.cpp: added support for quicktime video codecs in mkv (tested with svq3)
+Modules.am: link mkv demux with mp4 demux
+mp4/*: export some functions needed by mkv demux
+
+------------------------------------------------------------------------
+r8796 | markfm | 2004-09-26 13:41:32 +0200 (Sun, 26 Sep 2004) | 2 lines
+Changed paths:
+   A /trunk/modules/video_filter/marq.c
+
+Add marq.c, marquee video filter.
+
+------------------------------------------------------------------------
+r8797 | sigmunau | 2004-09-26 13:43:19 +0200 (Sun, 26 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/video.c
+
+ffmpeg/video.c: fixed recent breakage of avc1 in mp4 due to a recent ffmpeg
+change
+
+------------------------------------------------------------------------
+r8798 | markfm | 2004-09-26 13:47:12 +0200 (Sun, 26 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/control/rc.c
+
+rc.c -- Add hooks to control marquee string and offsets
+
+------------------------------------------------------------------------
+r8799 | gbazin | 2004-09-26 14:06:50 +0200 (Sun, 26 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/demux/ps.c
+   M /trunk/modules/demux/ps.h
+
+* modules/demux/ps.h: fixed PSM parsing.
+* modules/demux/ps.c: improved MPEG PS autodetection a bit.
+
+------------------------------------------------------------------------
+r8800 | gbazin | 2004-09-26 14:40:05 +0200 (Sun, 26 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/control/rc.c
+
+* modules/control/rc.c: added an --rc-quiet option for win32.
+------------------------------------------------------------------------
+r8801 | markfm | 2004-09-26 14:45:33 +0200 (Sun, 26 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+configure.ac -- Add marquee subfilter
+
+------------------------------------------------------------------------
+r8802 | markfm | 2004-09-26 14:55:29 +0200 (Sun, 26 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/video_filter/Modules.am
+
+modules/video_milter/Modules.am -- added marquee filter
+
+------------------------------------------------------------------------
+r8803 | gbazin | 2004-09-26 14:59:50 +0200 (Sun, 26 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/include/configuration.h
+
+* include/configuration.h: added change_float/integer_range( min, max ) macro.
+------------------------------------------------------------------------
+r8804 | zorglub | 2004-09-26 15:03:52 +0200 (Sun, 26 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/control/rc.c
+
+Add timeout hook for marquee
+
+------------------------------------------------------------------------
+r8805 | zorglub | 2004-09-26 15:06:45 +0200 (Sun, 26 Sep 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/video_filter/marq.c
+
+* Use callbacks for live update
+* Add timeout support (marq-timeout, in milliseconds, 0 for no timeout)
+* A few minor coding style fixes
+
+------------------------------------------------------------------------
+r8806 | gbazin | 2004-09-26 15:39:00 +0200 (Sun, 26 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/demux.c
+   M /trunk/modules/codec/ffmpeg/encoder.c
+   M /trunk/modules/codec/ffmpeg/ffmpeg.c
+   M /trunk/modules/codec/ffmpeg/ffmpeg.h
+   M /trunk/modules/codec/ffmpeg/video.c
+
+* modules/codec/ffmpeg/*: new --ffmpeg-lowres option to force video decoding at a lower resolution.
+------------------------------------------------------------------------
+r8807 | gbazin | 2004-09-26 16:19:43 +0200 (Sun, 26 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/audio.c
+
+* modules/codec/ffmpeg/audio.c: fixed 5.1 audio decoding.
+------------------------------------------------------------------------
+r8808 | zorglub | 2004-09-26 17:31:41 +0200 (Sun, 26 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/control/rc.c
+
+Add logout function to RC interface
+
+------------------------------------------------------------------------
+r8809 | markfm | 2004-09-26 17:49:41 +0200 (Sun, 26 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/control/rc.c
+
+Add --rc-extend switch, for extra commands.
+
+------------------------------------------------------------------------
+r8810 | gbazin | 2004-09-26 19:54:56 +0200 (Sun, 26 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/libvlc.c
+   M /trunk/src/libvlc.h
+   M /trunk/src/vlc.c
+
+* src/libvlc.c: use dameon() instead of fork() when available. It does some more things like reopening stdin/out/err to /dev/null which avoids screwing up the first sockets we open.
+------------------------------------------------------------------------
+r8811 | gbazin | 2004-09-26 19:55:50 +0200 (Sun, 26 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/configure.ac
+
+* configure.ac: added check for daemon().
+------------------------------------------------------------------------
+r8812 | gbazin | 2004-09-26 21:59:49 +0200 (Sun, 26 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/packetizer/mpegvideo.c
+
+* modules/packetizer/mpegvideo.c: set fmt_out.video.i_frame_rate.
+------------------------------------------------------------------------
+r8813 | gbazin | 2004-09-26 22:17:50 +0200 (Sun, 26 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/video.c
+   M /trunk/modules/codec/libmpeg2.c
+   M /trunk/modules/codec/theora.c
+
+* modules/codec/libmpeg2.c, ffmpeg/video.c, theora.c: decoder sets fmt_out.video.i_frame_rate.
+
+------------------------------------------------------------------------
+r8814 | markfm | 2004-09-26 22:31:06 +0200 (Sun, 26 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/control/rc.c
+
+Moved marquee to Playlist area, "marquee  " blanks out the marquee
+
+------------------------------------------------------------------------
+r8815 | sigmunau | 2004-09-26 22:37:41 +0200 (Sun, 26 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/TODO
+
+TODO: added some items, removed subtitle scaling, use "Mac OS X" everywhere
+in Platform:
+
+------------------------------------------------------------------------
+r8816 | gbazin | 2004-09-27 01:23:09 +0200 (Mon, 27 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/mux/wav.c
+
+"* modules/mux/wav.c: support for s16l as well as fl32 + multichannel audio (up to 5.1) + proper channels ordering."
+
+------------------------------------------------------------------------
+r8817 | gbazin | 2004-09-27 01:31:48 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/mux/wav.c
+
+* modules/mux/wav.c: small cleanup.
+------------------------------------------------------------------------
+r8818 | gbazin | 2004-09-27 09:21:53 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/video.c
+
+* modules/codec/ffmpeg/video.c: don't need to modify width/height anymore with lowres.
+------------------------------------------------------------------------
+r8819 | gbazin | 2004-09-27 11:02:26 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/include/vlc_video.h
+   M /trunk/modules/video_filter/logo.c
+
+* modules/video_filter/logo.c: new --logo-position option (by default the logo is displayed on the top right)
+------------------------------------------------------------------------
+r8820 | gbazin | 2004-09-27 11:13:49 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_filter/logo.c
+
+* modules/video_filter/logo.c: implemented --logo-position for old filter as well.
+------------------------------------------------------------------------
+r8821 | gbazin | 2004-09-27 12:27:14 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/video_output/vout_subpictures.c
+
+* src/video_output/vout_subpictures.c: a few fixes for subpictures positionning when scaling is active.
+------------------------------------------------------------------------
+r8822 | gbazin | 2004-09-27 16:46:39 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/stream_out/transcode.c
+
+* modules/stream_out/transcode.c: fixed subpictures overlaying when the audio-sync or fps options are used.
+------------------------------------------------------------------------
+r8823 | gbazin | 2004-09-27 17:16:13 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/interface.cpp
+   M /trunk/modules/gui/wxwindows/timer.cpp
+   M /trunk/modules/gui/wxwindows/wxwindows.h
+
+* modules/gui/wxwindows/*: work-around a wxwindows bug with accelerators registration on win32.
+------------------------------------------------------------------------
+r8824 | gbazin | 2004-09-27 17:43:43 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/misc/modules.c
+
+* src/misc/modules.c: allow negative priorities.
+------------------------------------------------------------------------
+r8825 | gbazin | 2004-09-27 17:44:42 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/http.c
+
+* modules/access/http.c: keep this plugin at priority 0.
+------------------------------------------------------------------------
+r8826 | gbazin | 2004-09-27 19:41:49 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/mms/mms.c
+
+* modules/access/mms/mms.c: set the priority to -1 and added an http shortcut.
+------------------------------------------------------------------------
+r8827 | gbazin | 2004-09-27 21:19:32 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/src/audio_output/input.c
+
+* src/audio_output/input.c: corrective audio resampling should be a lot more gradual now.
+------------------------------------------------------------------------
+r8828 | gbazin | 2004-09-27 21:47:30 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/wav.c
+
+* modules/demux/wav.c: misc improvements.
+------------------------------------------------------------------------
+r8829 | gbazin | 2004-09-27 21:57:26 +0200 (Mon, 27 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/modules/demux/mpeg/Modules.am
+   A /trunk/modules/demux/mpeg/m4a.c
+
+* modules/demux/mpeg/m4a.c: MPEG 4 audio demuxer using the MPEG 4 audio packetizer (obsoletes the aac demuxer).
+
+------------------------------------------------------------------------
+r8830 | gbazin | 2004-09-27 23:04:51 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/mpeg/m4a.c
+
+* modules/demux/mpeg/m4a.c: bug fix.
+------------------------------------------------------------------------
+r8831 | hartman | 2004-09-27 23:08:57 +0200 (Mon, 27 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+   M /trunk/extras/contrib/src/packages.mak
+
+* Hacky workaround for the vcdimager compile problem
+* upgraded liveMedia
+
+------------------------------------------------------------------------
+r8832 | gbazin | 2004-09-27 23:46:54 +0200 (Mon, 27 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/mpeg/mpga.c
+
+* modules/demux/mpeg/mpga.c: use the date_*() api for more precision.
+------------------------------------------------------------------------
+r8833 | gbazin | 2004-09-28 12:05:53 +0200 (Tue, 28 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/vobsub.c
+
+* modules/demux/vobsub.c: compilation fix + fixed a few memleaks + priority back to 0.
+------------------------------------------------------------------------
+r8834 | hartman | 2004-09-28 12:46:20 +0200 (Tue, 28 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/video_filter/marq.c
+
+* marq.c: compilation fixes for non c++ compilers
+
+------------------------------------------------------------------------
+r8835 | hartman | 2004-09-28 13:45:48 +0200 (Tue, 28 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/access/http.c
+
+* recognize audio/aac as well
+
+------------------------------------------------------------------------
+r8836 | gbazin | 2004-09-28 15:24:29 +0200 (Tue, 28 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/open.cpp
+   M /trunk/modules/gui/wxwindows/wxwindows.h
+
+* modules/gui/wxwindows/open.cpp: added a caching option.
+------------------------------------------------------------------------
+r8837 | gbazin | 2004-09-28 15:35:50 +0200 (Tue, 28 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/open.cpp
+
+* modules/gui/wxwindows/open.cpp: compilation fix.
+------------------------------------------------------------------------
+r8838 | zorglub | 2004-09-28 15:49:57 +0200 (Tue, 28 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwindows/wizard.cpp
+
+Misc Fixes
+
+------------------------------------------------------------------------
+r8839 | zorglub | 2004-09-28 15:55:00 +0200 (Tue, 28 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/mozilla/vlcintf.idl
+   M /trunk/mozilla/vlcpeer.cpp
+   M /trunk/mozilla/vlcpeer.h
+   M /trunk/mozilla/vlcplugin.cpp
+   M /trunk/mozilla/vlcplugin.h
+   M /trunk/src/libvlc.c
+
+* Add hooks for getting/setting variables (not working yet)
+* Really change VLC_Get to VLC_VariableGet
+
+------------------------------------------------------------------------
+r8840 | gbazin | 2004-09-28 17:23:43 +0200 (Tue, 28 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/http.c
+
+* modules/access/http.c: set ACCESS_CAN_CONTROL_PACE to false when dealing with ICY servers.
+------------------------------------------------------------------------
+r8841 | gbazin | 2004-09-28 17:26:32 +0200 (Tue, 28 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/http.c
+
+* modules/access/http.c: set ACCESS_CAN_CONTROL_PACE to false when dealing with Icecast servers.
+------------------------------------------------------------------------
+r8842 | gbazin | 2004-09-28 17:31:32 +0200 (Tue, 28 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/http.c
+
+* modules/access/http.c: reversed a commit by accident.
+------------------------------------------------------------------------
+r8843 | hartman | 2004-09-28 17:48:43 +0200 (Tue, 28 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/access/cdda/access.c
+
+* Fix the cddax probing crash
+
+------------------------------------------------------------------------
+r8844 | hartman | 2004-09-29 03:21:16 +0200 (Wed, 29 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/packages.mak
+
+* Use a proper faad2 snapshot, cause the default .tar.gz ones suck big time
+
+------------------------------------------------------------------------
+r8845 | zorglub | 2004-09-29 11:00:41 +0200 (Wed, 29 Sep 2004) | 6 lines
+Changed paths:
+   M /trunk/modules/access/cdda/access.c
+   M /trunk/modules/audio_filter/channel_mixer/headphone.c
+   M /trunk/po/POTFILES.in
+   M /trunk/po/de.po
+   M /trunk/po/en_GB.po
+   M /trunk/po/es.po
+   M /trunk/po/fr.po
+   M /trunk/po/hu.po
+   M /trunk/po/it.po
+   M /trunk/po/ja.po
+   M /trunk/po/nl.po
+   M /trunk/po/no.po
+   M /trunk/po/pl.po
+   M /trunk/po/pt_BR.po
+   M /trunk/po/ru.po
+   M /trunk/po/sv.po
+   M /trunk/po/vlc.pot
+
+A few string fixes
+
+Update PO files
+
+Update and proofread of the french translation
+
+------------------------------------------------------------------------
+r8846 | markfm | 2004-09-29 13:31:49 +0200 (Wed, 29 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/video_filter/marq.c
+
+Destroy marq-timeout on exit, rename switch to "marq-marquee"
+
+------------------------------------------------------------------------
+r8847 | markfm | 2004-09-29 13:36:37 +0200 (Wed, 29 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/control/rc.c
+
+Move marquee processing from Playlist to Other, change marquee switch to "marq-marquee".
+
+------------------------------------------------------------------------
+r8848 | fkuehne | 2004-09-29 16:21:31 +0200 (Wed, 29 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/open.cpp
+   M /trunk/modules/video_filter/marq.c
+   M /trunk/modules/video_filter/swscale/filter.c
+
+* fixed typos in some l10n-messages
+------------------------------------------------------------------------
+r8849 | fkuehne | 2004-09-29 16:22:00 +0200 (Wed, 29 Sep 2004) | 1 line
+Changed paths:
+   M /trunk/po/de.po
+
+* updated German translation
+------------------------------------------------------------------------
+r8850 | bigben | 2004-09-29 17:24:03 +0200 (Wed, 29 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+   A /trunk/extras/contrib/src/Patches/libpng.patch
+   M /trunk/extras/contrib/src/packages.mak
+
+Adds libpng to OSX contribs (for the logo filters)
+
+
+------------------------------------------------------------------------
+r8851 | hartman | 2004-09-29 17:26:25 +0200 (Wed, 29 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/NEWS
+
+* NEWS: AACplus webcasts are supported
+
+------------------------------------------------------------------------
