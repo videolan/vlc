@@ -2,7 +2,7 @@
  * ac3_srfft_sse.c: accelerated SSE ac3 fft functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_srfft_sse.c,v 1.6 2001/10/30 19:34:53 reno Exp $
+ * $Id: ac3_srfft_sse.c,v 1.7 2001/10/31 11:55:53 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -200,7 +200,6 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
 {
     __asm__ __volatile__ (
     ".align 16\n"
-    "pushl %%esp\n"
     "pushl %%ebp\n"
     "movl %%esp, %%ebp\n"
 
@@ -345,7 +344,6 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "addl $4, %%esp\n"
 
     "leave\n"
-    "popl %%esp\n"
     : "=c" (k), "=a" (x), "=D" (wTB)
     : "c" (k), "a" (x), "D" (wTB), "d" (d), "S" (d_3), "b" (C_1_sse) );
 }

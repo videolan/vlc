@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.38 2001/10/30 19:34:53 reno Exp $
+ * $Id: ac3_decoder_thread.c,v 1.39 2001/10/31 11:55:53 reno Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -151,7 +151,12 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
 #undef IMDCT
 
     /* Initialize the ac3 decoder structures */
+#if defined( __MINGW32__ )
+    p_ac3thread->ac3_decoder->samples_back = memalign(16, 6 * 256 * sizeof(float) + 15);
+    p_ac3thread->ac3_decoder->samples = (float *) (((unsigned long) p_ac3thread->ac3_decoder->samples_back+15) & ~0xFUL);
+#else
     p_ac3thread->ac3_decoder->samples = memalign(16, 6 * 256 * sizeof(float));
+#endif
     p_ac3thread->ac3_decoder->imdct->buf = memalign(16, N/4 * sizeof(complex_t));
     p_ac3thread->ac3_decoder->imdct->delay = memalign(16, 6 * 256 * sizeof(float));
     p_ac3thread->ac3_decoder->imdct->delay1 = memalign(16, 6 * 256 * sizeof(float));
@@ -197,7 +202,11 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
         free( p_ac3thread->ac3_decoder->imdct->delay1 );
         free( p_ac3thread->ac3_decoder->imdct->delay );
         free( p_ac3thread->ac3_decoder->imdct->buf );
+#if defined( __MINGW32__ )
+        free( p_ac3thread->ac3_decoder->samples_back );
+#else
         free( p_ac3thread->ac3_decoder->samples );
+#endif
         free( p_ac3thread->ac3_decoder->imdct );
         free( p_ac3thread->ac3_decoder );
         free( p_ac3thread );
@@ -392,7 +401,11 @@ static void EndThread (ac3dec_thread_t * p_ac3thread)
     free( p_ac3thread->ac3_decoder->imdct->delay1 );
     free( p_ac3thread->ac3_decoder->imdct->delay );
     free( p_ac3thread->ac3_decoder->imdct->buf );
+#if defined( __MINGW32__ )
+    free( p_ac3thread->ac3_decoder->samples_back );
+#else
     free( p_ac3thread->ac3_decoder->samples );
+#endif
     free( p_ac3thread->ac3_decoder->imdct );
     free( p_ac3thread->ac3_decoder );
     free( p_ac3thread->p_config );
