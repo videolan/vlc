@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.30 2003/12/23 02:11:27 gbazin Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: directx.c,v 1.31 2004/01/02 22:17:57 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1662,10 +1662,7 @@ static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t i_color )
     case 16:
         *(uint16_t *)ddsd.lpSurface = 0x01;
         break;
-    case 24:
-        *(uint32_t *)ddsd.lpSurface = 0x0100;
-        break;
-    case 32:
+    default:
         *(uint32_t *)ddsd.lpSurface = 0x01;
         break;
     }

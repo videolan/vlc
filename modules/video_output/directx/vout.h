@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vout.h: Windows DirectX video output header file
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout.h,v 1.11 2003/12/23 02:11:27 gbazin Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: vout.h,v 1.12 2004/01/02 22:17:57 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
