@@ -379,21 +379,6 @@
 				A064F9F303CB9EE000B21232,
 				8E88833D03DD6E870059A3A7,
 				8E68B0BF03E2EA230059A3A7,
-				8ED6C28903E2EB1D0059A3A7,
-				8ED6C28A03E2EB1D0059A3A7,
-				8ED6C28B03E2EB1D0059A3A7,
-				8ED6C28C03E2EB1D0059A3A7,
-				8ED6C28D03E2EB1D0059A3A7,
-				8ED6C28E03E2EB1D0059A3A7,
-				8ED6C28F03E2EB1D0059A3A7,
-				8ED6C29003E2EB1D0059A3A7,
-				8ED6C29103E2EB1D0059A3A7,
-				8ED6C29203E2EB1D0059A3A7,
-				8ED6C29303E2EB1D0059A3A7,
-				8ED6C29403E2EB1D0059A3A7,
-				8ED6C29503E2EB1D0059A3A7,
-				8ED6C29603E2EB1D0059A3A7,
-				8ED6C29703E2EB1D0059A3A7,
 				8ED6C29F03E2F32E0059A3A7,
 				8ED6C2A003E2F32E0059A3A7,
 			);
@@ -668,96 +653,6 @@
 			name = vout.m;
 			path = ../../modules/gui/macosx/vout.m;
 			refType = 2;
-		};
-		8ED6C28903E2EB1D0059A3A7 = {
-			fileRef = 8ED6C27A03E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C28A03E2EB1D0059A3A7 = {
-			fileRef = 8ED6C27B03E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C28B03E2EB1D0059A3A7 = {
-			fileRef = 8ED6C27C03E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C28C03E2EB1D0059A3A7 = {
-			fileRef = 8ED6C27D03E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C28D03E2EB1D0059A3A7 = {
-			fileRef = 8ED6C27E03E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C28E03E2EB1D0059A3A7 = {
-			fileRef = 8ED6C27F03E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C28F03E2EB1D0059A3A7 = {
-			fileRef = 8ED6C28003E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C29003E2EB1D0059A3A7 = {
-			fileRef = 8ED6C28103E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C29103E2EB1D0059A3A7 = {
-			fileRef = 8ED6C28203E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C29203E2EB1D0059A3A7 = {
-			fileRef = 8ED6C28303E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C29303E2EB1D0059A3A7 = {
-			fileRef = 8ED6C28403E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C29403E2EB1D0059A3A7 = {
-			fileRef = 8ED6C28503E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C29503E2EB1D0059A3A7 = {
-			fileRef = 8ED6C28603E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C29603E2EB1D0059A3A7 = {
-			fileRef = 8ED6C28703E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		8ED6C29703E2EB1D0059A3A7 = {
-			fileRef = 8ED6C28803E2EB1C0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		8ED6C29D03E2F32E0059A3A7 = {
 			fileEncoding = 30;
