@@ -893,7 +893,7 @@ dnl
 dnl  default modules
 dnl
 AX_ADD_PLUGINS([dummy rc telnet logger gestures memcpy hotkeys netsync])
-AX_ADD_PLUGINS([mpgv mpga m4v h264 mpeg_system ps ps2 pva avi asf aac mp4 rawdv demux2 nsv real aiff mjpeg])
+AX_ADD_PLUGINS([mpgv mpga m4v h264 ps ps2 pva avi asf aac mp4 rawdv nsv real aiff mjpeg])
 AX_ADD_PLUGINS([cvdsub svcdsub spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 AX_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])
@@ -904,8 +904,8 @@ AX_ADD_PLUGINS([aout_file])
 AX_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
 AX_ADD_PLUGINS([id3 m3u playlist export sgimb])
 AX_ADD_PLUGINS([rawvideo])
-AX_ADD_PLUGINS([wav araw demuxdump demuxsub adpcm a52sys dtssys au])
-AX_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms access2])
+AX_ADD_PLUGINS([wav araw demuxsub adpcm a52sys dtssys au])
+AX_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms])
 AX_ADD_PLUGINS([access_ftp access_directory sap http])
 
 dnl
