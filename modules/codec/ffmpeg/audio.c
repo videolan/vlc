@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: audio.c,v 1.20 2003/10/27 01:04:38 gbazin Exp $
+ * $Id: audio.c,v 1.21 2003/10/27 10:00:40 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -53,7 +53,6 @@
 #endif
 
 #include "ffmpeg.h"
-#include "audio.h"
 
 static unsigned int pi_channels_maps[6] =
 {
