@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.10 2003/05/02 17:35:48 fenrir Exp $
+ * $Id: v4l.c,v 1.11 2003/05/03 01:52:43 fenrir Exp $
  *
  * Author: Samuel Hocevar <sam@zoy.org>
  *
@@ -612,7 +612,7 @@ static int AccessOpen( vlc_object_t *p_this )
                          p_sys->i_sample_rate );
 
                 p_sys->i_audio_frame_size = 0;
-                p_sys->i_audio_frame_size_allocated = 10*1024;
+                p_sys->i_audio_frame_size_allocated = 6*1024;
                 p_sys->p_audio_frame =
                     malloc( p_sys->i_audio_frame_size_allocated );
             }
@@ -1306,6 +1306,7 @@ static int Demux( input_thread_t *p_input )
     }
 //    input_SplitBuffer( p_input, &p_pk, i_size + 8 );
     p_pes->p_first->p_payload_start += 8;
+    p_pes->i_pes_size               -= 8;
     if( p_es && p_es->p_decoder_fifo )
     {
         vlc_mutex_lock( &p_es->p_decoder_fifo->data_lock );
