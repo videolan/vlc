@@ -632,12 +632,12 @@ $(LIBRARIES_mozilla): $(mozilla_libplugin_a_OBJECTS) \
 mozilla_vlcintf_xpt_DATA = mozilla/vlcintf.xpt
 mozilla_vlcintf_xptdir = $(libdir)/mozilla/components
 mozilla/vlcintf.xpt: mozilla/vlcintf.idl
-	$(XPIDL) -I/usr/share/idl/mozilla -m typelib \
-	  -o mozilla/vlcintf $(srcdir)/mozilla/vlcintf.idl
+	$(XPIDL) -I/usr/share/idl/mozilla -I/usr/lib/mozilla/include/idl \
+	  -m typelib -o mozilla/vlcintf $(srcdir)/mozilla/vlcintf.idl
 
 mozilla/vlcintf.h: mozilla/vlcintf.idl
-	$(XPIDL) -I/usr/share/idl/mozilla -m header \
-	  -o mozilla/vlcintf $(srcdir)/mozilla/vlcintf.idl
+	$(XPIDL) -I/usr/share/idl/mozilla -I/usr/lib/mozilla/include/idl \
+	  -m header -o mozilla/vlcintf $(srcdir)/mozilla/vlcintf.idl
 
 if HAVE_WIN32
 DATA_npvlc_rc = $(noinst_mozilla_npvlc_rc_DATA)
