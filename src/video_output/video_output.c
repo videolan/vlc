@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.200 2002/11/20 13:37:36 sam Exp $
+ * $Id: video_output.c,v 1.201 2002/11/28 14:34:39 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -84,7 +84,41 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
      * the video output pipe */
     if( p_parent->i_object_type != VLC_OBJECT_VOUT )
     {
-        /* look for the default filter configuration */
+        char *psz_aspect = config_GetPsz( p_parent, "aspect-ratio" );
+
+        /* Check whether the user tried to override aspect ratio */
+        if( psz_aspect )
+        {
+            unsigned int i_new_aspect = i_aspect;
+            char *psz_parser = strchr( psz_aspect, ':' );
+
+            if( psz_parser )
+            {
+                *psz_parser++ = '\0';
+                i_new_aspect = atoi( psz_aspect ) * VOUT_ASPECT_FACTOR
+                                                  / atoi( psz_parser );
+            }
+            else
+            {
+                i_new_aspect = i_width * VOUT_ASPECT_FACTOR
+                                       * atof( psz_aspect )
+                                       / i_height;
+            }
+
+            free( psz_aspect );
+
+            if( i_new_aspect && i_new_aspect != i_aspect )
+            {
+                int i_pgcd = ReduceHeight( i_new_aspect );
+
+                msg_Dbg( p_vout, "overriding source aspect ratio to %i:%i",
+                         i_new_aspect / i_pgcd, VOUT_ASPECT_FACTOR / i_pgcd );
+
+                i_aspect = i_new_aspect;
+            }
+        }
+
+        /* Look for the default filter configuration */
         p_vout->psz_filter_chain = config_GetPsz( p_parent, "filter" );
     }
     else
@@ -280,6 +314,27 @@ static int InitThread( vout_thread_t *p_vout )
 
     msg_Dbg( p_vout, "got %i direct buffer(s)", I_OUTPUTPICTURES );
 
+    if( !p_vout->psz_filter_chain )
+    {
+        char *psz_aspect = config_GetPsz( p_vout, "pixel-ratio" );
+
+        if( psz_aspect )
+        {
+            int i_new_aspect = p_vout->output.i_width * VOUT_ASPECT_FACTOR
+                                                      * atof( psz_aspect )
+                                                      / p_vout->output.i_height;
+            free( psz_aspect );
+
+            if( i_new_aspect && i_new_aspect != p_vout->output.i_aspect )
+            {
+                int i_pgcd = ReduceHeight( i_new_aspect );
+                msg_Dbg( p_vout, "output ratio forced to %i:%i\n",
+                         i_new_aspect / i_pgcd, VOUT_ASPECT_FACTOR / i_pgcd );
+                p_vout->output.i_aspect = i_new_aspect;
+            }
+        }
+    }
+
     i_pgcd = ReduceHeight( p_vout->render.i_aspect );
     msg_Dbg( p_vout,
              "picture in %ix%i, chroma 0x%.8x (%4.4s), aspect ratio %i:%i",
@@ -303,11 +358,10 @@ static int InitThread( vout_thread_t *p_vout )
                  p_vout->output.i_bmask );
 
     /* Check whether we managed to create direct buffers similar to
-     * the render buffers, ie same size, chroma and aspect ratio */
+     * the render buffers, ie same size and chroma */
     if( ( p_vout->output.i_width == p_vout->render.i_width )
      && ( p_vout->output.i_height == p_vout->render.i_height )
-     && ( vout_ChromaCmp( p_vout->output.i_chroma, p_vout->render.i_chroma ) )
-     && ( p_vout->output.i_aspect == p_vout->render.i_aspect ) )
+     && ( vout_ChromaCmp( p_vout->output.i_chroma, p_vout->render.i_chroma ) ) )
     {
         /* Cool ! We have direct buffers, we can ask the decoder to
          * directly decode into them ! Map the first render buffers to

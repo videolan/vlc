@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.21 2002/11/07 19:31:08 gbazin Exp $
+ * $Id: libvlc.h,v 1.22 2002/11/28 14:34:39 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -164,6 +164,25 @@
     "picture quality, for instance deinterlacing, or to clone or distort " \
     "the video window.")
 
+#define ASPECT_RATIO_TEXT N_("source aspect ratio")
+#define ASPECT_RATIO_LONGTEXT N_( \
+    "This will force the source aspect ratio. For instance, some DVDs claim " \
+    "to be 16:9 while they are actually 4:3. This can also be used as a " \
+    "hint for VLC when a movie does not have aspect ratio information. " \
+    "Accepted formats are x:y (4:3, 16:9, etc.) expressing the global image " \
+    "aspect, or a float value (1.25, 1.3333, etc.) expressing pixel " \
+    "squareness.")
+
+#if 0
+#define PIXEL_RATIO_TEXT N_("destination aspect ratio")
+#define PIXEL_RATIO_LONGTEXT N_( \
+    "This will force the destination pixel size. By default VLC assumes " \
+    "your pixels are square, unless your hardware has a way to tell it " \
+    "otherwise. This may be used when you output VLC's signal to another " \
+    "device such as a TV set. Accepted format is a float value (1, 1.25, " \
+    "1.3333, etc.) expressing pixel squareness.")
+#endif
+
 #define SERVER_PORT_TEXT N_("server port")
 #define SERVER_PORT_LONGTEXT N_( \
     "This is the port used for UDP streams. By default, we chose 1234.")
@@ -194,7 +213,7 @@
 #define IFACE_ADDR_LONGTEXT N_( \
     "If you have several interfaces on your machine and use the " \
     "multicast solution, you will probably have to indicate the IP address " \
-    "of your multicasting interface here.")    
+    "of your multicasting interface here.")
 
 #define INPUT_PROGRAM_TEXT N_("choose program (SID)")
 #define INPUT_PROGRAM_LONGTEXT N_( \
@@ -392,6 +411,11 @@ vlc_module_begin();
     add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT, SPUMARGIN_LONGTEXT );
     add_module( "filter", "video filter", NULL, NULL,
                 FILTER_TEXT, FILTER_LONGTEXT );
+    add_string( "aspect-ratio", "1", NULL,
+                ASPECT_RATIO_TEXT, ASPECT_RATIO_TEXT );
+#if 0
+    add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
+#endif
 
     /* Input options */
     add_category_hint( N_("Input"), NULL );
