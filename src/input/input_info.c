@@ -2,7 +2,7 @@
  * input_info.c: Convenient functions to handle the input info structures
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_info.c,v 1.1 2002/07/21 18:57:02 sigmunau Exp $
+ * $Id: input_info.c,v 1.2 2002/07/22 21:14:30 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -93,31 +93,14 @@ int input_AddInfo( input_info_category_t * p_category, char * psz_name,
     vasprintf( &psz_str, psz_format, args );
 #else
     psz_str = (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
-#endif
-
     if( psz_str == NULL )
     {
-//        fprintf( stderr, "main warning: can't store message (%s): ",
-//                 strerror(errno) );
-//        vfprintf( stderr, psz_format, args );
-//        fprintf( stderr, "\n" );
         return -1;
     }
 
-#ifndef HAVE_VASPRINTF
-#   ifdef WIN32
-    psz_temp = ConvertPrintfFormatString( psz_format );
-    if( !psz_temp )
-    {
-        //fprintf( stderr, "main warning: couldn't print message\n" );
-        return -1;
-    }
-    vsprintf( psz_str, psz_temp, args );
-    free( psz_temp );
-#   else
     vsprintf( psz_str, psz_format, args );
-#   endif
 #endif
+
     va_end( args );
     p_info = p_category->p_info;
     while ( p_info )
