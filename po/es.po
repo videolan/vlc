@@ -94,9 +94,8 @@ msgstr ""
 "subtítulos."
 
 #: include/vlc_help.h:69
-#, fuzzy, what the hell is a demuxer??? can someone explain it to me????
 msgid "Demuxers settings"
-msgstr "Configuraciones de demuxers"
+msgstr "Configuraciones de demuxores"
 
 #: include/vlc_help.h:72
 msgid "Interface plugins settings"
@@ -124,14 +123,14 @@ msgstr ""
 
 #: include/vlc_help.h:82
 msgid "Subtitle demuxer settings"
-msgstr "Configuraciones de demuxer de subtítulos"
+msgstr "Configuraciones de demuxor de subtítulos"
 
 #: include/vlc_help.h:84
 msgid ""
 "In this section you can force the behaviour of the subtitle demuxer, for "
 "example by setting the subtitles type or file name."
 msgstr ""
-"Enesta sección puedes forzar el comportamiento del demuxer de subtítulos, por "
+"Enesta sección puedes forzar el comportamiento del demuxor de subtítulos, por "
 "ejemplo poniendo el tipo de subtítulos o su nombre de archivo."
 
 #: include/vlc_help.h:87
@@ -383,7 +382,7 @@ msgstr "Pista %i"
 
 #: src/libvlc.c:262 src/libvlc.c:352
 msgid "C"
-msgstr "sp"
+msgstr "es"
 
 #: src/libvlc.c:305 src/libvlc.c:1420
 #, c-format
@@ -1099,18 +1098,17 @@ msgid "Enable audio stream output"
 msgstr "Habilitar volcado de salida de audio"
 
 #: src/libvlc.h:369
-#, fuzzy, what is a sout?? 
 msgid "Keep sout open"
-msgstr "Mantener abiert@ sout"
+msgstr "Mantener abierta sout"
 
 #: src/libvlc.h:371
 msgid ""
 "This allows you to keep an unique sout instance across multiple playlist "
 "item (automatically insert gather stream_out if not specified)"
 msgstr ""
-"Esto te permite mantener una única instancia sout a través de un objeto en "
-"múltiples listas de reprodución (automárticamente insertar gather stream_out si "
-"no se especifica)"
+"Esto te permite mantener una única instancia sout (stream output - salida de "
+"fuente) a través de un objeto en múltiples listas de reprodución "
+"(automárticamente insertar gather stream_out si no se especifica)"
 
 #: src/libvlc.h:375
 msgid "Choose preferred packetizer list"
@@ -1328,7 +1326,6 @@ msgid "Fast mutex on NT/2K/XP (developers only)"
 msgstr "Mutex rápido en NT/2K/XP (sólo desarrolladores)"
 
 #: src/libvlc.h:472
-#, fuzzy, mutex???
 msgid ""
 "On Windows NT/2K/XP we use a slow mutex implementation but which allows us "
 "to correctely implement condition variables. You can also use the faster "
@@ -1678,9 +1675,8 @@ msgid "Blend"
 msgstr "Mezclar"
 
 #: src/video_output/video_output.c:433
-#, fuzzy, what does it 'means'?
 msgid "Mean"
-msgstr "Significar"
+msgstr "Promedio"
 
 #: src/video_output/video_output.c:435
 msgid "Bob"
@@ -1772,7 +1768,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:73
 msgid "DirectShow demuxer"
-msgstr "Demuxer DirectShow"
+msgstr "Demuxor DirectShow"
 
 #: modules/access/dvb/qpsk.c:44
 msgid "adapter card to tune"
@@ -1839,7 +1835,7 @@ msgid "modulation type"
 msgstr "tipo de modulación"
 
 #: modules/access/dvb/qpsk.c:79
-#, fuzzy, frontend=final?
+#, fuzzy, frontend=final frontal?
 msgid "modulation type for frontend device "
 msgstr "tipo de modulación para aparato final "
 
@@ -1943,7 +1939,6 @@ msgid "Angle"
 msgstr "Ángulo"
 
 #: modules/access/dvdplay/access.c:217
-#, fuzzy, resume= continuar, quitar?
 msgid "Resume"
 msgstr "Continuar"
 
@@ -2115,7 +2110,7 @@ msgstr ""
 
 #: modules/access/v4l/v4l.c:80
 msgid "Video4Linux demuxer"
-msgstr "demuxer Video4Linux"
+msgstr "demuxor Video4Linux"
 
 #: modules/access/vcd/vcd.c:79
 msgid "VCD input"
@@ -2456,7 +2451,7 @@ msgstr "Salida de extensión waveOut Win32"
 
 #: modules/codec/a52.c:117
 msgid "A/52 parser"
-msgstr ""
+msgstr "Analizador A/52"
 
 #: modules/codec/a52.c:122
 msgid "A/52 audio packetizer"
@@ -2475,9 +2470,8 @@ msgid "Cinepak video decoder"
 msgstr "Decodificador de vídeo Cinepak"
 
 #: modules/codec/dts.c:122
-#, fuzzy, dunno what is parser...
 msgid "DTS parser"
-msgstr ""
+msgstr "Analizador DTS"
 
 #: modules/codec/dts.c:127
 msgid "DTS audio packetizer"
@@ -2512,7 +2506,6 @@ msgstr ""
 "El rango válido va de -1 a 99 (-1 deshabilita todos los saltos de errores)."
 
 #: modules/codec/ffmpeg/ffmpeg.c:94
-#, fuzzy, maybe this is the right transaltion for workaround (very colloquial)
 msgid "Workaround bugs"
 msgstr "Arreglo de errores"
 
@@ -2613,14 +2606,12 @@ msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "decodificador de vídeo MPEG I/II (usando libmpeg2)"
 
 #: modules/codec/lpcm.c:95
-#, fuzzy, parser again
 msgid "linear PCM audio parser"
-msgstr "parser de audio PCM lineal"
+msgstr "analizador de audio PCM lineal"
 
 #: modules/codec/mpeg_audio.c:131
-#, fuzzy, parser again
 msgid "MPEG audio layer I/II/III parser"
-msgstr "parser de capa de audio MPEG I/II/III"
+msgstr "analizador de capa de audio MPEG I/II/III"
 
 #: modules/codec/mpeg_audio.c:136
 msgid "MPEG audio layer I/II/III packetizer"
@@ -2903,7 +2894,7 @@ msgstr "interfaz de control remoto"
 
 #: modules/demux/a52sys.c:39
 msgid "A52 demuxer"
-msgstr "Demuxer A52"
+msgstr "Demuxor A52"
 
 #: modules/demux/a52sys.c:153
 msgid "A52"
@@ -2934,7 +2925,7 @@ msgstr "Tasa de Muestra"
 
 #: modules/demux/aac.c:39
 msgid "AAC demuxer"
-msgstr "Demuxer AAC"
+msgstr "Demuxor AAC"
 
 #: modules/demux/aac.c:165
 msgid "Aac"
@@ -2942,7 +2933,7 @@ msgstr ""
 
 #: modules/demux/asf/asf.c:42
 msgid "ASF v1.0 demuxer"
-msgstr "Demuxer ASF v1.0"
+msgstr "Demuxor ASF v1.0"
 
 #: modules/demux/asf/asf.c:360
 msgid "Length"
@@ -3041,11 +3032,11 @@ msgstr "Y píxels por metro"
 
 #: modules/demux/au.c:41
 msgid "AU demuxer"
-msgstr "demuxer AU"
+msgstr "demuxor AU"
 
 #: modules/demux/avi/avi.c:42
 msgid "avi-demuxer"
-msgstr ""
+msgstr "demuxor-avi"
 
 #: modules/demux/avi/avi.c:44 modules/demux/avi/avi.c:45
 msgid "force interleaved method"
@@ -3057,7 +3048,7 @@ msgstr "forzar creación de índice"
 
 #: modules/demux/avi/avi.c:50
 msgid "AVI demuxer"
-msgstr "Demuxer AVI"
+msgstr "Demuxor AVI"
 
 #: modules/demux/avi/avi.c:245
 msgid "Avi"
@@ -3098,11 +3089,11 @@ msgstr "Especifica un nombre de archivo al que el flujo en bruto se volcará"
 
 #: modules/demux/demuxdump.c:53
 msgid "file dump demuxer"
-msgstr "archivo de volcado demuxer"
+msgstr "demuxor de archivo de volcado"
 
 #: modules/demux/flac.c:52
 msgid "flac demuxer"
-msgstr "demuxer flac"
+msgstr "demuxor flac"
 
 #: modules/demux/m3u.c:63
 msgid "playlist metademux"
@@ -3110,7 +3101,7 @@ msgstr "lista de metademux"
 
 #: modules/demux/mkv.cpp:94
 msgid "mkv-demuxer"
-msgstr ""
+msgstr "demuxor-mkv"
 
 #: modules/demux/mkv.cpp:96 modules/demux/mkv.cpp:97
 msgid "Seek based on percent not time"
@@ -3118,7 +3109,7 @@ msgstr "Búsqueda basada en porcentaje, no en tiempo"
 
 #: modules/demux/mkv.cpp:99
 msgid "mka/mkv stream demuxer"
-msgstr "demuxer fuente mka/mkv"
+msgstr "demuxor de fuente mka/mkv"
 
 #: modules/demux/mkv.cpp:2322 modules/gui/gtk/gnome_interface.c:2436
 #: modules/gui/gtk/gtk_interface.c:2857 modules/gui/wxwindows/playlist.cpp:180
@@ -3172,9 +3163,8 @@ msgid "Frame Per Second"
 msgstr "Fotogramas Por Segundo"
 
 #: modules/demux/mp4/mp4.c:42
-#, fuzzy
 msgid "MP4 demuxer"
-msgstr "Demuxer MP4"
+msgstr "Demuxor MP4"
 
 #: modules/demux/mpeg/es.c:48
 msgid "ISO 13818-1 MPEG Elementary Stream input"
@@ -3182,7 +3172,7 @@ msgstr "entrada de Volcado Elemental MPEG ISO 13818-1"
 
 #: modules/demux/mpeg/m4v.c:42
 msgid "MPEG-4 video elementary stream demuxer"
-msgstr "demuxer de volcado elemental de vídeo MPEG-4"
+msgstr "demuxor de volcado elemental de vídeo MPEG-4"
 
 #: modules/demux/mpeg/m4v.c:149
 msgid "mpeg"
@@ -3194,7 +3184,7 @@ msgstr "Vídeo MPEG-4 (raw ES)"
 
 #: modules/demux/mpeg/mpga.c:39
 msgid "MPEG-I/II Audio demuxer"
-msgstr "demuxer de audio MPEG-I/II"
+msgstr "demuxor de Audio MPEG-I/II"
 
 #: modules/demux/mpeg/mpga.c:320
 msgid "MPEG"
@@ -3256,7 +3246,7 @@ msgstr "entrada de Volcado de Transporte MPEG ISO 13818-1 (libdvbpsi)"
 
 #: modules/demux/ogg.c:175
 msgid "ogg stream demuxer"
-msgstr "demuxer de volcado ogg"
+msgstr "demuxor de volcado ogg"
 
 #: modules/demux/ogg.c:596
 msgid "Vorbis"
@@ -3293,20 +3283,19 @@ msgstr "Bits por Muestra"
 
 #: modules/demux/rawdv.c:109
 msgid "raw dv demuxer"
-msgstr ""
+msgstr "demuxor raw dv"
 
 #: modules/demux/sdp.c:46
 msgid "SDP demuxer/reader"
-msgstr "Demuxer/lector SDP"
+msgstr "Demuxor/lector SDP"
 
 #: modules/demux/sdp.c:56
 msgid "RTSP/RTP describe"
 msgstr ""
 
 #: modules/demux/util/id3.c:44
-#, fuzzy, skipper, how I translate it???
 msgid "Simple id3 tag skipper"
-msgstr "Skipper de etiqueta id3 simple"
+msgstr "Anulador de etiqueta id3 simple"
 
 #: modules/demux/util/id3genres.h:8
 msgid "Blues"
@@ -3630,7 +3619,7 @@ msgstr "Rock Duro"
 
 #: modules/demux/util/id3tag.c:47
 msgid "id3 tag parser using libid3tag"
-msgstr "parser de etiqueta id3 usando libid3tag"
+msgstr "analizador de etiqueta id3 usando libid3tag"
 
 #: modules/demux/util/sub.c:69
 msgid "Text subtitles demux"
@@ -3638,7 +3627,7 @@ msgstr "demux de subtítulos de texto"
 
 #: modules/demux/wav.c:42
 msgid "WAV demuxer"
-msgstr ""
+msgstr "Demuxor WAV"
 
 #: modules/gui/beos/BeOS.cpp:55
 msgid "BeOS standard API interface"
@@ -6085,9 +6074,8 @@ msgid "Audio Device"
 msgstr "Aparato de Audio"
 
 #: modules/gui/wxwindows/v4l.cpp:384
-#, fuzzy
 msgid "Bitrate Options"
-msgstr "Opciones de Salida"
+msgstr "Opciones de Tasa de Bits"
 
 #: modules/gui/wxwindows/v4l.cpp:396
 msgid "Bitrate"
@@ -6326,35 +6314,35 @@ msgstr "Pruebas varias de tensión"
 
 #: modules/mux/asf.c:42
 msgid "Asf muxer"
-msgstr ""
+msgstr "Muxor Asf"
 
 #: modules/mux/avi.c:44
 msgid "Avi muxer"
-msgstr ""
+msgstr "Muxor Avi"
 
 #: modules/mux/dummy.c:43
 msgid "Dummy/Raw muxer"
-msgstr ""
+msgstr "Muxor Dummy/Raw"
 
 #: modules/mux/mp4.c:56
 msgid "MP4/MOV muxer"
-msgstr ""
+msgstr "Muxor MP4/MOV"
 
 #: modules/mux/mpeg/ps.c:53
 msgid "PS muxer"
-msgstr ""
+msgstr "Muxor PS"
 
 #: modules/mux/mpeg/ts.c:80
 msgid "TS muxer"
-msgstr ""
+msgstr "Muxor TS"
 
 #: modules/mux/mpeg/ts.c:85
 msgid "TS muxer (libdvbpsi)"
-msgstr ""
+msgstr "Muxor TS (libdvbpsi)"
 
 #: modules/mux/ogg.c:58
 msgid "Ogg/ogm muxer"
-msgstr ""
+msgstr "Muxor Ogg/ogm"
 
 #: modules/packetizer/copy.c:43
 msgid "Copy packetizer"
@@ -7106,7 +7094,7 @@ msgstr "interfaz xosd"
 #~ msgstr "Esperar antes del tiempo de repetición"
 
 #~ msgid "AAC stream demuxer"
-#~ msgstr "Demuxer de volcado AAC"
+#~ msgstr "Demuxor de volcado AAC"
 
 #~ msgid "ffmpeg video encoder"
 #~ msgstr "codificador de vídeo ffmpeg"
