@@ -502,12 +502,8 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     [o_mi_random setTitle: _NS("Random")];
     [o_mi_repeat setTitle: _NS("Repeat One")];
     [o_mi_loop setTitle: _NS("Repeat All")];
-    [o_mi_fwd setTitle: _NS("Forward 10 Seconds")];
-    [o_mi_bwd setTitle: _NS("Backward 10 Seconds")];
-    [o_mi_fwd1m setTitle: _NS("Forward 1 Minute")];
-    [o_mi_bwd1m setTitle: _NS("Backward 1 Minute")];
-    [o_mi_fwd5m setTitle: _NS("Forward 5 Minutes")];
-    [o_mi_bwd5m setTitle: _NS("Backward 5 Minutes")];
+    [o_mi_fwd setTitle: _NS("Step Forward")];
+    [o_mi_bwd setTitle: _NS("Step Backward")];
 
     [o_mi_program setTitle: _NS("Program")];
     [o_mu_program setTitle: _NS("Program")];

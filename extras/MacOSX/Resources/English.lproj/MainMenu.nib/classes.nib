@@ -22,12 +22,8 @@
         {
             ACTIONS = {
                 backward = id; 
-                backward1Min = id; 
-                backward5Min = id; 
                 faster = id; 
                 forward = id; 
-                forward1Min = id; 
-                forward5Min = id; 
                 loop = id; 
                 mute = id; 
                 next = id; 

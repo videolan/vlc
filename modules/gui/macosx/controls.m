@@ -261,36 +261,6 @@
     }
 }
 
-- (IBAction)forward1Min:(id)sender
-{
-    intf_thread_t * p_intf = [NSApp getIntf];
-    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                       FIND_ANYWHERE );
-    if( p_input != NULL )
-    {
-        vlc_value_t time;
-        time.i_time = 60 * 1000000;
-        var_Set( p_input, "time-offset", time );
-        vout_OSDMessage( p_intf, _( "Jump +1 Minute" ) );
-        vlc_object_release( p_input );
-    }
-}
-
-- (IBAction)forward5Min:(id)sender
-{
-    intf_thread_t * p_intf = [NSApp getIntf];
-    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                       FIND_ANYWHERE );
-    if( p_input != NULL )
-    {
-        vlc_value_t time;
-        time.i_time = 300 * 1000000;
-        var_Set( p_input, "time-offset", time );
-        vout_OSDMessage( p_intf, _( "Jump +5 Minutes" ) );
-        vlc_object_release( p_input );
-    }
-}
-
 - (IBAction)backward:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
@@ -302,36 +272,6 @@
         time.i_time = -10 * 1000000;
         var_Set( p_input, "time-offset", time );
         vout_OSDMessage( p_intf, _( "Jump -10 Seconds" ) );
-        vlc_object_release( p_input );
-    }
-}
-
-- (IBAction)backward1Min:(id)sender
-{
-    intf_thread_t * p_intf = [NSApp getIntf];
-    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                       FIND_ANYWHERE );
-    if( p_input != NULL )
-    {
-        vlc_value_t time;
-        time.i_time = -60 * 1000000;
-        var_Set( p_input, "time-offset", time );
-        vout_OSDMessage( p_intf, _( "Jump -1 Minute" ) );
-        vlc_object_release( p_input );
-    }
-}
-
-- (IBAction)backward5Min:(id)sender
-{
-    intf_thread_t * p_intf = [NSApp getIntf];
-    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                       FIND_ANYWHERE );
-    if( p_input != NULL )
-    {
-        vlc_value_t time;
-        time.i_time = -300 * 1000000;
-        var_Set( p_input, "time-offset", time );
-        vout_OSDMessage( p_intf, _( "Jump -5 Minutes" ) );
         vlc_object_release( p_input );
     }
 }
