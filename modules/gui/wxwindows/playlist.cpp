@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.47 2004/02/28 19:31:54 zorglub Exp $
+ * $Id: playlist.cpp,v 1.48 2004/02/28 19:40:06 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -867,6 +867,14 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
             b_ok = true;
             break;
         }
+        listitem.SetColumn( 1 );
+        listview->GetItem( listitem );
+        if( listitem.m_text.Lower().Contains( search_string.Lower() ) )
+        {
+            i_item = i_current;
+            b_ok = true;
+            break;
+        }
     }
     if( !b_ok )
     {
@@ -875,6 +883,14 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
         {
             wxListItem listitem;
             listitem.SetId( i_current );
+            listview->GetItem( listitem );
+            if( listitem.m_text.Lower().Contains( search_string.Lower() ) )
+            {
+                i_item = i_current;
+                b_ok = true;
+                break;
+            }
+            listitem.SetColumn( 1 );
             listview->GetItem( listitem );
             if( listitem.m_text.Lower().Contains( search_string.Lower() ) )
             {
