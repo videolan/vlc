@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.51 2003/07/20 20:33:17 gbazin Exp $
+ * $Id: interface.cpp,v 1.52 2003/07/22 15:59:06 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -113,6 +113,7 @@ private:
 BEGIN_EVENT_TABLE(wxVolCtrl, wxWindow)
     /* Mouse events */
     EVT_LEFT_DOWN(wxVolCtrl::OnChange)
+    EVT_MOTION(wxVolCtrl::OnChange)
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -853,7 +854,10 @@ wxVolCtrl::wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id )
 
 void wxVolCtrl::OnChange( wxMouseEvent& event )
 {
-    int i_volume = (GetRect().height - event.GetY()) * 200 / GetRect().height;
+    if( !event.LeftDown() && !event.LeftIsDown() ) return;
+
+    int i_volume = (GetClientSize().GetHeight() - event.GetY()) * 200 /
+                    GetClientSize().GetHeight();
     Change( i_volume );
 }
 
