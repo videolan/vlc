@@ -13,7 +13,7 @@ Summary: VideoLAN Client.
 Summary(fr): Client VideoLAN.
 
 %changelog
-* Fri, Jul 27 2001 Samuel Hocevar <sam@zoy.org>
+* Sat, Jul 28 2001 Samuel Hocevar <sam@zoy.org>
 New upstream release (0.2.81)
 
 * Tue Jun 5 2001 Samuel Hocevar <sam@zoy.org>

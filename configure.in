@@ -530,9 +530,6 @@ AC_ARG_ENABLE(sdl,
   [  --disable-sdl           SDL support (default enabled)])
 if test "x$withval" != "xno"
 then
-  AC_DEFINE(HAVE_SDL_SDL_H, 0, Define if you have SDL/SDL.h)
-  AC_DEFINE(HAVE_SDL11_SDL_H, 0, Define if you have SDL/SDL11.h)
-  AC_DEFINE(HAVE_SDL12_SDL_H, 0, Define if you have SDL/SDL12.h)
   AC_PATH_PROG(SDL_CONFIG, sdl-config, no)
   SDL_HEADER="SDL/SDL.h"
   if test x${SDL_CONFIG} = xno; then

@@ -6,8 +6,11 @@ HEAD
   * Nothing yet.
 
 0.2.81
-Fri, 27 Jul 2001 03:30:44 +0200
+Sat, 28 Jul 2001 04:13:57 +0200
 
+  * Fix in libdvdcss in the key caching code.
+  * Removed useless variables in configure.in which caused all subsequent
+    compilation tests to fail.
   * Additional fixes to the sdl-config detection.
   * Added a make uninstall rule.
   * Changed libdvdcss API to force binary incompatibility. Yeah, this is

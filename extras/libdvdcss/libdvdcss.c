@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.10 2001/07/27 01:05:17 sam Exp $
+ * $Id: libdvdcss.c,v 1.11 2001/07/28 02:17:37 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -163,6 +163,8 @@ extern int dvdcss_title ( dvdcss_handle dvdcss, int i_block )
         return 0;
     }
 
+    //fprintf( stderr, "looking for a key for offset %i\n", i_block );
+
     /* Check if we've already cracked this key */
     p_title = dvdcss->p_titles;
     while( p_title != NULL
@@ -192,6 +194,9 @@ extern int dvdcss_title ( dvdcss_handle dvdcss, int i_block )
         _dvdcss_error( dvdcss, "decryption unavailable" );
         return -1;
     }
+
+    //fprintf( stderr, "cracked key is %.2x %.2x %.2x %.2x %.2x\n",
+    //         p_key[0], p_key[1], p_key[2], p_key[3], p_key[4] );
 
     /* Add key to keytable if it isn't empty */
     if( p_key[0] | p_key[1] | p_key[2] | p_key[3] | p_key[4] )
@@ -255,7 +260,7 @@ extern int dvdcss_read ( dvdcss_handle dvdcss, void *p_buffer,
     p_title = dvdcss->p_titles;
     while( p_title != NULL
             && p_title->p_next
-            && p_title->p_next->i_startlb < dvdcss->i_seekpos )
+            && p_title->p_next->i_startlb <= dvdcss->i_seekpos )
     {
         p_title = p_title->p_next;
     }
@@ -303,7 +308,7 @@ extern int dvdcss_readv ( dvdcss_handle dvdcss, void *p_iovec,
     p_title = dvdcss->p_titles;
     while( p_title != NULL
             && p_title->p_next != NULL
-            && p_title->p_next->i_startlb < dvdcss->i_seekpos )
+            && p_title->p_next->i_startlb <= dvdcss->i_seekpos )
     {
         p_title = p_title->p_next;
     }
