@@ -691,7 +691,7 @@ void OpenDialog::OnFileBrowse()
     ofn.lCustData = 0L;
     ofn.lpfnHook = NULL;
     ofn.lpTemplateName = NULL;
-    if( GetOpenFileName((LPOPENFILENAME) &ofn) )
+    if( GetOpenFile( &ofn ) )
     {
         if( _tcschr( ofn.lpstrFile, _T(' ') ) )
         {

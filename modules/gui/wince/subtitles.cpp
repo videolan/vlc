@@ -305,7 +305,7 @@ void SubsFileDialog::OnFileBrowse()
     ofn.lCustData = 0L;
     ofn.lpfnHook = NULL;
     ofn.lpTemplateName = NULL;
-    if( GetOpenFileName((LPOPENFILENAME) &ofn) )
+    if( GetOpenFile( &ofn ) )
     {
         SetWindowText( file_combo, ofn.lpstrFile );
         ComboBox_AddString( file_combo, ofn.lpstrFile );

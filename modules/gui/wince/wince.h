@@ -82,7 +82,13 @@ struct intf_sys_t
     vector<MenuItemExt*> *p_settings_menu;
 
     VideoWindow          *p_video_window;
+
+    /* GetOpenFileName replacement */
+    BOOL (WINAPI *GetOpenFile)(void *);
+    HMODULE h_gsgetfile_dll;
 };
+
+#define GetOpenFile(a) p_intf->p_sys->GetOpenFile(a)
 
 /*****************************************************************************
  * Prototypes
@@ -91,21 +97,23 @@ struct intf_sys_t
 class CBaseWindow
 {
 public:
-   CBaseWindow(){ hInst = 0; }
-   virtual ~CBaseWindow() {};
+    CBaseWindow(){ hInst = 0; }
+    virtual ~CBaseWindow() {};
 
-   HWND hWnd;                // The main window handle
+    HWND hWnd;                // The main window handle
 
-   static LRESULT CALLBACK BaseWndProc( HWND, UINT, WPARAM, LPARAM );
-   static int CreateDialogBox( HWND, CBaseWindow * );
+    static LRESULT CALLBACK BaseWndProc( HWND, UINT, WPARAM, LPARAM );
+    static int CreateDialogBox( HWND, CBaseWindow * );
 
 protected:
 
-   HINSTANCE       hInst;               // The current instance
-   HWND            hwndCB;              // The command bar handle
+    HINSTANCE       hInst;               // The current instance
+    HWND            hwndCB;              // The command bar handle
 
-   HINSTANCE       GetInstance () const { return hInst; }
-   virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM ) {};
+    HINSTANCE       GetInstance () const { return hInst; }
+    virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM ) { return 0; };
+
+    intf_thread_t *p_intf;
 };
 
 class FileInfo;
@@ -125,7 +133,7 @@ public:
     Interface(){}
     ~Interface(){}
 
-    BOOL InitInstance( HINSTANCE hInstance, intf_thread_t *_pIntf );
+    BOOL InitInstance( HINSTANCE, intf_thread_t * );
 
     void TogglePlayButton( int i_playing_status );
 
@@ -165,8 +173,6 @@ protected:
     void OnSlowStream( void );
     void OnFastStream( void );
 
-    intf_thread_t *pIntf;
-
     int i_old_playing_status;
 };
 
@@ -182,7 +188,6 @@ protected:
 
     HWND hwnd_fileinfo;                 // handle to fileinfo window
     HWND hwndTV;                                // handle to tree-view control 
-    intf_thread_t *p_intf;
 
     TCHAR szFileInfoClassName[100];     // Main window class name
     TCHAR szFileInfoTitle[100];         // Main window name
@@ -201,8 +206,6 @@ public:
     virtual ~Messages(){};
 
 protected:
-
-    intf_thread_t *p_intf;
 
     virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 
@@ -260,8 +263,6 @@ public:
     void UpdateMRL( int i_access_method );
 
 protected:
-
-    intf_thread_t *p_intf;
 
     virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 
@@ -328,8 +329,6 @@ public:
 protected:
     friend class OpenDialog;
 
-    intf_thread_t *p_intf;
-
     HWND file_box;
     HWND file_combo;
     HWND browse_button;
@@ -368,7 +367,6 @@ protected:
     int i_title_sorted;
     int i_author_sorted;
 
-    intf_thread_t *p_intf;
     HWND hwndCB;        // Handle to the command bar (contains menu)
     HWND hwndTB;        // Handle to the toolbar.
     HWND hListView;
@@ -479,8 +477,6 @@ public:
     virtual ~PrefsDialog(){};
 
 protected:
-
-    intf_thread_t *p_intf;
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnOk( void );

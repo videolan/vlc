@@ -108,7 +108,7 @@ TCHAR * szToolTips[] =
 BOOL Interface::InitInstance( HINSTANCE hInstance, intf_thread_t *_p_intf )
 {
     /* Initializations */
-    pIntf = _p_intf;
+    p_intf = _p_intf;
     hwndMain = hwndCB = hwndTB = hwndSlider = hwndLabel = hwndVol = hwndSB = 0;
     i_old_playing_status = PAUSE_S;
 
@@ -525,10 +525,10 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
 #endif
 
         /* Video window */
-        if( config_GetInt( pIntf, "wince-embed" ) )
-            video = CreateVideoWindow( pIntf, hwnd );
+        if( config_GetInt( p_intf, "wince-embed" ) )
+            video = CreateVideoWindow( p_intf, hwnd );
 
-        ti = new Timer(pIntf, hwnd, this);
+        ti = new Timer(p_intf, hwnd, this);
 
         // Hide the SIP button (WINCE only)
         SetForegroundWindow( hwnd );
@@ -543,14 +543,14 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
 	    break;
 
         case ID_FILE_OPENFILE: 
-	    open = new OpenDialog( pIntf, hInst, FILE_ACCESS,
+	    open = new OpenDialog( p_intf, hInst, FILE_ACCESS,
 				   ID_FILE_OPENFILE, OPEN_NORMAL );
 	    CreateDialogBox( hwnd, open );
 	    delete open;
 	    break;
 
         case ID_FILE_OPENNET:
-            open = new OpenDialog( pIntf, hInst, NET_ACCESS, ID_FILE_OPENNET,
+            open = new OpenDialog( p_intf, hInst, NET_ACCESS, ID_FILE_OPENNET,
                                    OPEN_NORMAL );
 	    CreateDialogBox( hwnd, open );
             delete open;
@@ -598,31 +598,31 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
 	    break;
 
         case ID_VIEW_STREAMINFO:
-            fi = new FileInfo( pIntf, hInst );
+            fi = new FileInfo( p_intf, hInst );
 	    CreateDialogBox( hwnd, fi );
             delete fi;
 	    break;
 
         case ID_VIEW_MESSAGES:
-            hmsg = new Messages( pIntf, hInst );
+            hmsg = new Messages( p_intf, hInst );
 	    CreateDialogBox( hwnd, hmsg );
             delete hmsg;
 	    break;
 
         case ID_VIEW_PLAYLIST:
-            pl = new Playlist( pIntf, hInst );
+            pl = new Playlist( p_intf, hInst );
 	    CreateDialogBox( hwnd, pl );
             delete pl;
 	    break;
 
         case ID_SETTINGS_PREF:
-            pref = new PrefsDialog( pIntf, hInst );
+            pref = new PrefsDialog( p_intf, hInst );
 	    CreateDialogBox( hwnd, pref );
             delete pref;
 	    break;
                   
         default:
-            OnMenuEvent( pIntf, GET_WM_COMMAND_ID(wp,lp) );
+            OnMenuEvent( p_intf, GET_WM_COMMAND_ID(wp,lp) );
             // we should test if it is a menu command
         }
         break;
@@ -652,16 +652,16 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         break;
 
     case WM_INITMENUPOPUP:
-        RefreshSettingsMenu( pIntf,
+        RefreshSettingsMenu( p_intf,
             (HMENU)SendMessage( hwndCB, SHCMBM_GETSUBMENU, (WPARAM)0,
                                 (LPARAM)IDM_SETTINGS ) );
-        RefreshAudioMenu( pIntf,
+        RefreshAudioMenu( p_intf,
             (HMENU)SendMessage( hwndCB, SHCMBM_GETSUBMENU, (WPARAM)0,
                                 (LPARAM)IDM_AUDIO ) );
-        RefreshVideoMenu( pIntf,
+        RefreshVideoMenu( p_intf,
             (HMENU)SendMessage( hwndCB, SHCMBM_GETSUBMENU, (WPARAM)0,
                                 (LPARAM)IDM_VIDEO ) );
-        RefreshNavigMenu( pIntf,
+        RefreshNavigMenu( p_intf,
             (HMENU)SendMessage( hwndCB, SHCMBM_GETSUBMENU, (WPARAM)0,
                                 (LPARAM)IDM_NAVIGATION ) );
 
@@ -669,7 +669,7 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         // Undo the video display because menu is opened
         // due to GAPI, menu top display is not assumed
         // FIXME verify if p_child_window exits
-        SendMessage( pIntf->p_sys->p_video_window->p_child_window,
+        SendMessage( p_intf->p_sys->p_video_window->p_child_window,
                      WM_INITMENUPOPUP, wp, lp );
 #endif
 
@@ -683,7 +683,7 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         // Redo the video display because menu can be closed
         // FIXME verify if p_child_window exits
         if( (((NMHDR *)lp)->code) == NM_CUSTOMDRAW )
-            SendMessage( pIntf->p_sys->p_video_window->p_child_window,
+            SendMessage( p_intf->p_sys->p_video_window->p_child_window,
                          WM_NOTIFY, wp, lp );
         return lResult;
 #endif
@@ -713,7 +713,7 @@ void Interface::OnOpenFileSimple( void )
     static TCHAR szFilter[] = _T("All (*.*)\0*.*\0");
 
     playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( pIntf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL ) return;
 
     memset( &ofn, 0, sizeof(OPENFILENAME) );
@@ -740,7 +740,7 @@ void Interface::OnOpenFileSimple( void )
 
     SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
 
-    if( GetOpenFileName( (LPOPENFILENAME)&ofn ) )
+    if( GetOpenFile( &ofn ) )
     {
         char *psz_filename = _TOMB(ofn.lpstrFile);
         playlist_Add( p_playlist, psz_filename, psz_filename,
@@ -753,7 +753,7 @@ void Interface::OnOpenFileSimple( void )
 void Interface::OnPlayStream( void )
 {
     playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( pIntf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL ) return;
 
     if( p_playlist->i_size && p_playlist->i_enabled )
@@ -761,7 +761,7 @@ void Interface::OnPlayStream( void )
         vlc_value_t state;
 
         input_thread_t *p_input = (input_thread_t *)
-            vlc_object_find( pIntf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+            vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
 
         if( p_input == NULL )
         {
@@ -833,7 +833,7 @@ void Interface::OnVideoOnTop( void )
     vlc_value_t val;
 
     vout_thread_t *p_vout = (vout_thread_t *)
-        vlc_object_find( pIntf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
 
     if( p_vout == NULL ) return;
 
@@ -848,26 +848,26 @@ void Interface::OnVideoOnTop( void )
 
 void Interface::OnSliderUpdate( int wp )
 {
-    vlc_mutex_lock( &pIntf->change_lock );
-    input_thread_t *p_input = pIntf->p_sys->p_input;
+    vlc_mutex_lock( &p_intf->change_lock );
+    input_thread_t *p_input = p_intf->p_sys->p_input;
 
     int dwPos = SendMessage( hwndSlider, TBM_GETPOS, 0, 0 ); 
 
     if( (int)LOWORD(wp) == SB_THUMBPOSITION ||
         (int)LOWORD(wp) == SB_ENDSCROLL )
     {
-        if( pIntf->p_sys->i_slider_pos != dwPos && p_input )
+        if( p_intf->p_sys->i_slider_pos != dwPos && p_input )
         {
             vlc_value_t pos;
             pos.f_float = (float)dwPos / (float)SLIDER_MAX_POS;
             var_Set( p_input, "position", pos );
         }
 
-        pIntf->p_sys->b_slider_free = VLC_TRUE;
+        p_intf->p_sys->b_slider_free = VLC_TRUE;
     }
     else
     {
-        pIntf->p_sys->b_slider_free = VLC_FALSE;
+        p_intf->p_sys->b_slider_free = VLC_FALSE;
 
         if( p_input )
         {
@@ -886,7 +886,7 @@ void Interface::OnSliderUpdate( int wp )
         }
     }
 
-    vlc_mutex_unlock( &pIntf->change_lock );
+    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 void Interface::OnChange( int wp )
@@ -901,7 +901,7 @@ void Interface::OnChange( int wp )
 
 void Interface::Change( int i_volume )
 {
-    aout_VolumeSet( pIntf, i_volume * AOUT_VOLUME_MAX / 200 / 2 );
+    aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_MAX / 200 / 2 );
 #if 0
     SetToolTip( wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
                 i_volume ) );
@@ -911,7 +911,7 @@ void Interface::Change( int i_volume )
 void Interface::OnStopStream( void )
 {
     playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( pIntf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL ) return;
 
     playlist_Stop( p_playlist );
@@ -922,7 +922,7 @@ void Interface::OnStopStream( void )
 void Interface::OnPrevStream( void )
 {
     playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( pIntf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL ) return;
 
     playlist_Prev( p_playlist );
@@ -932,7 +932,7 @@ void Interface::OnPrevStream( void )
 void Interface::OnNextStream( void )
 {
     playlist_t * p_playlist = (playlist_t *)
-        vlc_object_find( pIntf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL ) return;
 
     playlist_Next( p_playlist );
@@ -942,7 +942,7 @@ void Interface::OnNextStream( void )
 void Interface::OnSlowStream( void )
 {
     input_thread_t *p_input = (input_thread_t *)
-        vlc_object_find( pIntf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
 
     if( p_input == NULL ) return;
 
@@ -954,7 +954,7 @@ void Interface::OnSlowStream( void )
 void Interface::OnFastStream( void )
 {
     input_thread_t *p_input = (input_thread_t *)
-        vlc_object_find( pIntf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+        vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
 
     if( p_input == NULL ) return;
 

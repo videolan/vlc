@@ -35,6 +35,9 @@
 
 #include "wince.h"
 
+#include <commctrl.h>
+#include <commdlg.h>
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -112,6 +115,18 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->b_slider_free = 1;
     p_intf->p_sys->i_slider_pos = p_intf->p_sys->i_slider_oldpos = 0;
 
+    p_intf->p_sys->GetOpenFile = 0;
+    p_intf->p_sys->h_gsgetfile_dll = LoadLibrary( _T("gsgetfile") );
+    if( p_intf->p_sys->h_gsgetfile_dll )
+    {
+        p_intf->p_sys->GetOpenFile = (BOOL (WINAPI *)(void *))
+            GetProcAddress( p_intf->p_sys->h_gsgetfile_dll,
+                            _T("gsGetOpenFileName") );
+    }
+
+    if( !p_intf->p_sys->GetOpenFile )
+        p_intf->p_sys->GetOpenFile = (BOOL (WINAPI *)(void *))GetOpenFileName;
+
     return VLC_SUCCESS;
 }
 
@@ -129,6 +144,9 @@ static void Close( vlc_object_t *p_this )
 
     // Unsuscribe to messages bank
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+
+    if( p_intf->p_sys->h_gsgetfile_dll )
+        FreeLibrary( p_intf->p_sys->h_gsgetfile_dll );
 
     // Destroy structure
     free( p_intf->p_sys );

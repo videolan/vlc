@@ -279,7 +279,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
                                   BUTTONWIDTH, BUTTONHEIGHT,
                                   IMAGEWIDTH, IMAGEHEIGHT, sizeof(TBBUTTON) );
         if( !hwndTB ) break;
-  
+
         // Add ToolTips to the toolbar.
         SendMessage( hwndTB, TB_SETTOOLTIPS, (WPARAM) NUMIMAGES,
                      (LPARAM)szToolTips2 );
@@ -735,7 +735,7 @@ void Playlist::OnOpen()
     ofn.lpfnHook = NULL;
     ofn.lpTemplateName = NULL;
 
-    if( GetOpenFileName((LPOPENFILENAME)&ofn) )
+    if( GetOpenFile( &ofn ) )
     {
         playlist_Import( p_playlist, _TOMB(ofn.lpstrFile) );
     }
@@ -826,13 +826,9 @@ void Playlist::OnAddFile( vlc_bool_t b_directory )
     ofn.lpfnHook = NULL;
     ofn.lpTemplateName = NULL;
 
-#if 0//def UNDER_CE
-    if( b_directory ) ofn.Flags |= OFN_PROJECT;
-#endif
-
     SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
 
-    if( GetOpenFileName( (LPOPENFILENAME)&ofn ) )
+    if( GetOpenFile( &ofn ) )
     {
         playlist_t *p_playlist = (playlist_t *)
 	    vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
