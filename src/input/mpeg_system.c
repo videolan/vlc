@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.86 2002/03/19 23:02:29 jobi Exp $
+ * $Id: mpeg_system.c,v 1.87 2002/03/20 17:44:15 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -455,9 +455,8 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
             if( p_data->p_payload_end - p_data->p_payload_start
                     >= PES_HEADER_SIZE )
             {
-                p_es->i_pes_real_size =
-                                U16_AT(p_data->p_payload_start + 4) + 6;
-                
+                p_es->i_pes_real_size = ((u16)p_data->p_payload_start[4] << 8)
+                                         + p_data->p_payload_start[5] + 6;
             }
             else
             { 
