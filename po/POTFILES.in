@@ -21,6 +21,7 @@ include/modules.h
 include/modules_inner.h
 include/mtime.h
 include/network.h
+include/ninput.h
 include/os_specific.h
 include/osd.h
 include/stream_control.h
@@ -60,6 +61,7 @@ src/extras/getopt.c
 src/extras/getopt.h
 src/extras/getopt1.c
 src/extras/libc.c
+src/input/demux.c
 src/input/input.c
 src/input/input_clock.c
 src/input/input_dec.c
@@ -68,6 +70,7 @@ src/input/input_ext-intf.c
 src/input/input_ext-plugins.c
 src/input/input_info.c
 src/input/input_programs.c
+src/input/stream.c
 src/interface/interface.c
 src/interface/intf_eject.c
 src/libvlc.c
@@ -101,6 +104,10 @@ src/vlc.c
 # modules
 modules/access/cdda.c
 modules/access/directory.c
+modules/access/dvb/access.c
+modules/access/dvb/dvb.c
+modules/access/dvb/dvb.h
+modules/access/dvb/qpsk.c
 modules/access/dvd/access.c
 modules/access/dvd/demux.c
 modules/access/dvd/dvd.c
@@ -146,6 +153,7 @@ modules/access/mms/mmstu.c
 modules/access/mms/mmstu.h
 modules/access/pvr/pvr.c
 modules/access/pvr/videodev2.h
+modules/access/rtsp.c
 modules/access/satellite/access.c
 modules/access/satellite/dvb.c
 modules/access/satellite/dvb.h
@@ -311,7 +319,7 @@ modules/control/joystick.c
 modules/control/lirc/lirc.c
 modules/control/rc/rc.c
 modules/demux/a52sys.c
-modules/demux/aac/demux.c
+modules/demux/aac.c
 modules/demux/asf/asf.c
 modules/demux/asf/asf.h
 modules/demux/asf/libasf.c
@@ -329,22 +337,22 @@ modules/demux/mp4/libmp4.c
 modules/demux/mp4/libmp4.h
 modules/demux/mp4/mp4.c
 modules/demux/mp4/mp4.h
-modules/demux/mpeg/audio.c
 modules/demux/mpeg/es.c
 modules/demux/mpeg/m4v.c
+modules/demux/mpeg/mpga.c
 modules/demux/mpeg/ps.c
 modules/demux/mpeg/system.c
 modules/demux/mpeg/system.h
 modules/demux/mpeg/ts.c
 modules/demux/ogg.c
 modules/demux/rawdv.c
+modules/demux/sdp.c
 modules/demux/util/id3.c
 modules/demux/util/id3genres.h
 modules/demux/util/id3tag.c
 modules/demux/util/sub.c
 modules/demux/util/sub.h
-modules/demux/wav/wav.c
-modules/demux/wav/wav.h
+modules/demux/wav.c
 modules/encoder/ffmpeg/audio.c
 modules/encoder/ffmpeg/encoder.c
 modules/encoder/ffmpeg/video.c
@@ -374,18 +382,6 @@ modules/gui/beos/VideoOutput.cpp
 modules/gui/beos/VideoWindow.h
 modules/gui/beos/VlcWrapper.cpp
 modules/gui/beos/VlcWrapper.h
-modules/gui/familiar/callbacks.c
-modules/gui/familiar/callbacks.h
-modules/gui/familiar/familiar.c
-modules/gui/familiar/familiar.h
-modules/gui/familiar/interface.c
-modules/gui/familiar/interface.h
-modules/gui/familiar/network.c
-modules/gui/familiar/network.h
-modules/gui/familiar/playlist.c
-modules/gui/familiar/playlist.h
-modules/gui/familiar/support.c
-modules/gui/familiar/support.h
 modules/gui/gtk/common.h
 modules/gui/gtk/control.c
 modules/gui/gtk/control.h
@@ -585,6 +581,7 @@ modules/gui/skins/x11/x11_timer.cpp
 modules/gui/skins/x11/x11_timer.h
 modules/gui/skins/x11/x11_window.cpp
 modules/gui/skins/x11/x11_window.h
+modules/gui/wxwindows/control.cpp
 modules/gui/wxwindows/dialogs.cpp
 modules/gui/wxwindows/fileinfo.cpp
 modules/gui/wxwindows/interface.cpp
