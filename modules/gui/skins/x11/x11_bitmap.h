@@ -2,7 +2,7 @@
  * x11_bitmap.h: X11 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_bitmap.h,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_bitmap.h,v 1.2 2003/05/18 11:25:00 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -42,15 +42,16 @@ class Graphics;
 class X11Bitmap : public Bitmap
 {
     private:
+        intf_thread_t *p_intf;
         Display *display;
-        Pixmap Bmp;
+        XImage *Bmp;
 
     public:
         // Constructors
-        X11Bitmap( intf_thread_t *p_intf, string FileName, int AColor );
-        X11Bitmap( intf_thread_t *p_intf, Graphics *from, int x, int y,
+        X11Bitmap( intf_thread_t *_p_intf, string FileName, int AColor );
+        X11Bitmap( intf_thread_t *_p_intf, Graphics *from, int x, int y,
                      int w, int h, int AColor );
-        X11Bitmap( intf_thread_t *p_intf, Bitmap *c );
+        X11Bitmap( intf_thread_t *_p_intf, Bitmap *c );
 
         // Destructor
         virtual ~X11Bitmap();
@@ -61,6 +62,9 @@ class X11Bitmap : public Bitmap
 
         virtual int  GetBmpPixel( int x, int y );
         virtual void SetBmpPixel( int x, int y, int color );
+
+    protected:
+        char *LoadFromFile( string fileName, int depth, int &width, int &height);
 };
 //---------------------------------------------------------------------------
 

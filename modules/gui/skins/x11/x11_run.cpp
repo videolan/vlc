@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.3 2003/05/13 20:36:29 asmax Exp $
+ * $Id: x11_run.cpp,v 1.4 2003/05/18 11:25:00 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -28,7 +28,9 @@
 #include <X11/Xlib.h>
 
 //--- WWWINDOWS -------------------------------------------------------------
+#ifndef BASIC_SKINS
 #include <wx/wx.h>
+#endif
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -44,7 +46,9 @@
 #include "../os_theme.h"
 #include "../src/skin_common.h"
 #include "../src/vlcproc.h"
+#ifndef BASIC_SKINS
 #include "../../wxwindows/wxwindows.h"
+#endif
 
 // include the icon graphic
 #include "share/vlc32x32.xpm"
@@ -60,6 +64,7 @@ int  SkinManage( intf_thread_t *p_intf );
 //---------------------------------------------------------------------------
 // Local classes declarations.
 //---------------------------------------------------------------------------
+#ifndef BASIC_SKINS
 class Instance: public wxApp
 {
 public:
@@ -72,6 +77,7 @@ public:
 private:
     intf_thread_t *p_intf;
 };
+#endif
 
 
 //---------------------------------------------------------------------------
@@ -200,6 +206,7 @@ private:
 //---------------------------------------------------------------------------
 // Implementation of Instance class
 //---------------------------------------------------------------------------
+#ifndef BASIC_SKINS
 Instance::Instance( )
 {
 }
@@ -229,7 +236,7 @@ bool Instance::OnInit()
 
     return TRUE;
 }
-
+#endif
 
 
 //---------------------------------------------------------------------------
@@ -244,7 +251,7 @@ void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
 
     Window wnd = ((XAnyEvent *)event)->window;
     
-    fprintf(stderr,"event %d %x\n", event->type, wnd);
+//    fprintf(stderr,"event %d %x\n", event->type, wnd);
 
     // Create event to dispatch in windows
     // Skin event
@@ -359,6 +366,9 @@ void OSRun( intf_thread_t *p_intf )
         XNextEvent( display, event );
         
         ProcessEvent( p_intf, proc, event );
+
+// kludge: add timer
+        SkinManage( p_intf );
     }
     
 }

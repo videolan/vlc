@@ -2,7 +2,7 @@
  * x11_bitmap.cpp: X11 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_bitmap.cpp,v 1.2 2003/04/30 21:16:24 asmax Exp $
+ * $Id: x11_bitmap.cpp,v 1.3 2003/05/18 11:25:00 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -42,31 +42,50 @@
 #include "../os_theme.h"
 #include "../src/skin_common.h"
 
+#include <stdio.h>
+
+// macros to read little endian numbers
+#define U16( p ) ( ((uint8_t*)(p))[0] | ((uint8_t*)(p))[1] << 8 )
+#define U32( p ) ( U16( p ) | ((uint8_t*)(p))[2] << 16 | ((uint8_t*)(p))[3] << 24 )
 
 //---------------------------------------------------------------------------
 //   X11Bitmap
 //---------------------------------------------------------------------------
-X11Bitmap::X11Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
+X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, string FileName, int AColor )
     : Bitmap( p_intf, FileName, AColor )
 {
+    p_intf = _p_intf;
+    
     // Find the display
     display = p_intf->p_sys->display;
-    Window root = DefaultRootWindow( display );
+    int screen = DefaultScreen( display );
+    int depth = DefaultDepth( display, screen );
+    Screen *screenptr = DefaultScreenOfDisplay( display );
+    Visual *visual = DefaultVisualOfScreen( screenptr );
+    char *data = NULL;
+    Width = 0;
+    Height = 0;
 
     AlphaColor = AColor;
 
+    if( FileName != "" )
+    {
+        data = LoadFromFile( FileName, depth, Width, Height );
+    }
+
+    // Create the image
+    Bmp = XCreateImage( display, visual, depth, ZPixmap, 0, data, Width, 
+                        Height, 32, 4 * Width );
+    XInitImage( Bmp );
+    
     // Load the bitmap image
-    int hotspotX, hotspotY;
-    int rc = XReadBitmapFile( display, root, FileName.c_str(),
-                              (unsigned int*)&Width, (unsigned int*)&Height, 
-                              &Bmp, &hotspotX, &hotspotY );
-    if( rc != BitmapSuccess )
+/*    if( rc != BitmapSuccess )
     {
         if( FileName != "" )
             msg_Warn( p_intf, "Couldn't load bitmap: %s", FileName.c_str() );
         Width = 0;
         Height = 0;
-    }
+    }*/
 /*    else
     {    
         Width = gdk_pixbuf_get_width( Bmp );
@@ -100,9 +119,10 @@ X11Bitmap::X11Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
     }*/
 }
 //---------------------------------------------------------------------------
-X11Bitmap::X11Bitmap( intf_thread_t *p_intf, Graphics *from, int x, int y,
+X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, Graphics *from, int x, int y,
     int w, int h, int AColor ) : Bitmap( p_intf, from, x, y, w, h, AColor )
 {
+    p_intf = _p_intf;
 /*    Width  = w;
     Height = h;
     AlphaColor = AColor;
@@ -117,9 +137,10 @@ X11Bitmap::X11Bitmap( intf_thread_t *p_intf, Graphics *from, int x, int y,
     BitBlt( bmpDC, 0, 0, Width, Height, fromDC, x, y, SRCCOPY );*/
 }
 //---------------------------------------------------------------------------
-X11Bitmap::X11Bitmap( intf_thread_t *p_intf, Bitmap *c )
+X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, Bitmap *c )
     : Bitmap( p_intf, c )
 {
+    p_intf = _p_intf;
 /*    HBITMAP HBuf;
 
     // Copy attibutes
@@ -138,19 +159,15 @@ X11Bitmap::X11Bitmap( intf_thread_t *p_intf, Bitmap *c )
 //---------------------------------------------------------------------------
 X11Bitmap::~X11Bitmap()
 {
-    XFreePixmap( display, Bmp );
+    XDestroyImage( Bmp );
 }
 //---------------------------------------------------------------------------
 void X11Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
                               Graphics *dest )
 {
-    if( Bmp )
-    {
-        Drawable destImg = ( (X11Graphics *)dest )->GetImage();
-        GC destGC = ( (X11Graphics *)dest )->GetGC();
-
-        XCopyArea( display, Bmp, destImg, destGC, x, y, w, h, xRef, yRef );
-    }
+    Drawable destImg = ( (X11Graphics *)dest )->GetImage();
+    GC destGC = ( (X11Graphics *)dest )->GetGC();
+    XPutImage( display, destImg, destGC, Bmp, x, y, xRef, yRef, w, h );
 }
 //---------------------------------------------------------------------------
 bool X11Bitmap::Hit( int x, int y)
@@ -188,6 +205,72 @@ int X11Bitmap::GetBmpPixel( int x, int y )
 void X11Bitmap::SetBmpPixel( int x, int y, int color )
 {
 //    SetPixelV( bmpDC, x, y, color );
+}
+//---------------------------------------------------------------------------
+char *X11Bitmap::LoadFromFile( string fileName, int depth, int &width, int &height )
+{
+    // BMP header fields
+    uint32_t fileSize;
+    uint32_t dataOffset;
+    uint32_t headerSize;
+   	uint16_t planes;
+   	uint16_t bpp;
+   	uint32_t compression;
+   	uint32_t dataSize;
+   	uint32_t nColors;
+    
+    FILE *file = fopen( fileName.c_str(), "ro" );
+    if( !file )
+    {
+        msg_Warn( p_intf, "Cannot open %s", fileName.c_str() );
+        return NULL;
+    }
+
+    // Read the headers
+    char headers[54];
+    fread( headers, 54, 1, file );
+    
+    fileSize = U32( headers + 2 );
+    dataOffset = U32( headers + 10 );
+    headerSize = U32( headers + 14 );
+    width = (int32_t) U32( headers + 18 );
+    height = (int32_t) U32( headers + 22 ); 
+    planes = U32( headers + 26 );
+    bpp = U32( headers + 28 );
+    compression = U32( headers + 30 );
+    dataSize = U32( headers + 34 );
+    nColors = U32( headers + 50 );
+
+//    fprintf(stderr,"image %d %d\n", width, height);
+    switch( bpp )
+    {
+        case 24:
+        // 24 bits per pixel
+        {
+            // Pad to a 32bit boundary
+            int pad = ((3 * width - 1) / 4) * 4 + 4 - 3 * width;
+            uint32_t *data = new uint32_t[height * width];
+            uint32_t *ptr;
+            for( int j = 0; j < height; j++ )
+            {
+                ptr = data +  width * (height - j - 1);
+                for( int i = 0; i < width; i++ )
+                {
+                    // Read a pixel
+                    uint32_t pixel = 0;
+                    fread( &pixel, 3, 1, file );
+                    *(ptr++) = U32( &pixel );
+                }
+                fseek( file, pad, SEEK_CUR );
+            }
+            return (char*)data;
+        }
+        default:
+            msg_Warn( p_intf, "%s : %d bbp not supported !", fileName.c_str(), 
+                      bpp );
+            return NULL;
+    }
+    
 }
 //---------------------------------------------------------------------------
 

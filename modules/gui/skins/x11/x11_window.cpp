@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.2 2003/05/13 20:36:29 asmax Exp $
+ * $Id: x11_window.cpp,v 1.3 2003/05/18 11:25:00 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -289,7 +289,6 @@ void X11Window::RefreshFromImage( int x, int y, int w, int h )
 */ 
     Drawable drawable = (( X11Graphics* )Image )->GetImage();
     
-    fprintf(stderr, "prout\n");
     XCopyArea( display, drawable, Wnd, Gc, x, y, w, h, x, y );
     XSync( display, 0);
 /*
