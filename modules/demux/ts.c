@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.5 2004/01/19 18:16:32 fenrir Exp $
+ * $Id: ts.c,v 1.6 2004/01/22 00:02:18 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -30,6 +30,7 @@
 #include <vlc/input.h>
 
 #include "iso_lang.h"
+#include "network.h"
 
 /* Include dvbpsi headers */
 #ifdef HAVE_DVBPSI_DR_H
@@ -65,6 +66,8 @@ vlc_module_begin();
     add_category_hint( "TS demuxer", NULL, VLC_TRUE );
         add_string( "ts-extra-pmt", NULL, NULL, "extra PMT", "allow user to specify an extra pmt (pmt_pid=pid:stream_type[,...])", VLC_TRUE );
         add_bool( "ts-es-id-pid", 0, NULL, "set id of es to pid", "set id of es to pid", VLC_TRUE );
+        add_string( "ts-out", NULL, NULL, "fast udp streaming", "send TS to specific ip:port by udp (you must know what you are doing)", VLC_TRUE );
+        add_integer( "ts-out-mtu", 1500, NULL, "MTU for out mode", "MTU for out mode", VLC_TRUE );
     set_capability( "demux2", 10 );
     set_callbacks( Open, Close );
     add_shortcut( "ts2" );
@@ -193,6 +196,9 @@ typedef struct
 
 struct demux_sys_t
 {
+    /* how many TS packet we read at once */
+    int         i_ts_read;
+
     /* All pid */
     ts_pid_t    pid[8192];
 
@@ -202,6 +208,10 @@ struct demux_sys_t
 
     /* */
     vlc_bool_t  b_es_id_pid;
+
+    vlc_bool_t  b_udp_out;
+    int         fd; /* udp socket */
+    uint8_t     *buffer;
 };
 
 static int Demux  ( demux_t *p_demux );
@@ -273,6 +283,8 @@ static int Open( vlc_object_t *p_this )
         pid->b_seen     = VLC_FALSE;
         pid->b_valid    = VLC_FALSE;
     }
+    p_sys->b_udp_out = VLC_FALSE;
+    p_sys->i_ts_read = 50;
 
     /* Init PAT handler */
     pat = &p_sys->pid[0];
@@ -283,9 +295,51 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pmt = 0;
     p_sys->pmt   = NULL;
 
+    /* Read config */
     var_Create( p_demux, "ts-es-id-pid", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "ts-es-id-pid", &val );
     p_sys->b_es_id_pid = val.b_bool,
+
+    var_Create( p_demux, "ts-out", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "ts-out", &val );
+    if( val.psz_string && *val.psz_string )
+    {
+        vlc_value_t mtu;
+        char *psz = strchr( val.psz_string, ':' );
+        int   i_port = 0;
+
+        p_sys->b_udp_out = VLC_TRUE;
+
+        if( psz )
+        {
+            *psz++ = '\0';
+            i_port = atoi( psz );
+        }
+        if( i_port <= 0 ) i_port  = 1234;
+        msg_Dbg( p_demux, "resend ts to '%s:%d'", val.psz_string, i_port );
+
+        p_sys->fd = net_OpenUDP( p_demux, "", 0, val.psz_string, i_port );
+        if( p_sys->fd < 0 )
+        {
+            msg_Err( p_demux, "failed to open udp socket, send disabled" );
+            p_sys->b_udp_out = VLC_FALSE;
+        }
+        else
+        {
+            var_Create( p_demux, "ts-out-mtu", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+            var_Get( p_demux, "ts-out-mtu", &mtu );
+            p_sys->i_ts_read = mtu.i_int / 188;
+            if( p_sys->i_ts_read <= 0 )
+            {
+                p_sys->i_ts_read = 1500 / 188;
+            }
+            p_sys->buffer = malloc( 188 * p_sys->i_ts_read );
+        }
+    }
+    if( val.psz_string )
+    {
+        free( val.psz_string );
+    }
 
 
     /* We handle description of an extra PMT */
@@ -402,6 +456,12 @@ static void Close( vlc_object_t *p_this )
         }
     }
 
+    if( p_sys->b_udp_out )
+    {
+        net_Close( p_sys->fd );
+        free( p_sys->buffer );
+    }
+
     free( p_sys );
 }
 
@@ -415,7 +475,7 @@ static int Demux( demux_t *p_demux )
     int          i_pkt;
 
     /* We read at most 100 TS packet or until a frame is completed */
-    for( i_pkt = 0; i_pkt < 100; i_pkt++ )
+    for( i_pkt = 0; i_pkt < p_sys->i_ts_read; i_pkt++ )
     {
         vlc_bool_t  b_frame = VLC_FALSE;
         block_t     *p_pkt;
@@ -433,7 +493,7 @@ static int Demux( demux_t *p_demux )
             block_Release( p_pkt );
 
             /* Resynch */
-            for( ;; )
+            while( !p_demux->b_die )
             {
                 uint8_t    *p_peek;
                 int         i_peek = stream_Peek( p_demux->s, &p_peek, 1880 );
@@ -469,6 +529,11 @@ static int Demux( demux_t *p_demux )
             }
         }
 
+        if( p_sys->b_udp_out )
+        {
+            memcpy( &p_sys->buffer[i_pkt*188], p_pkt->p_buffer, 188 );
+        }
+
         /* Parse the TS packet */
         p_pid = &p_sys->pid[PIDGet( p_pkt )];
 
@@ -479,9 +544,13 @@ static int Demux( demux_t *p_demux )
                 dvbpsi_PushPacket( p_pid->psi->handle, p_pkt->p_buffer );
                 block_Release( p_pkt );
             }
-            else
+            else if( !p_sys->b_udp_out )
             {
                 b_frame = GatherPES( p_demux, p_pid, p_pkt );
+            }
+            else
+            {
+                block_Release( p_pkt );
             }
         }
         else
@@ -500,6 +569,12 @@ static int Demux( demux_t *p_demux )
         }
     }
 
+    if( p_sys->b_udp_out )
+    {
+        /* Send the complete block */
+        net_Write( p_demux, p_sys->fd, p_sys->buffer, p_sys->i_ts_read * 188 );
+    }
+
     return 1;
 }
 
@@ -508,9 +583,9 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
+    /* demux_sys_t *p_sys = p_demux->p_sys; */
     double f, *pf;
-    int64_t i64, *pi64;
+    int64_t i64;
 
     switch( i_query )
     {
@@ -878,7 +953,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     }
 
 
-    if( i_skip >= 188 || pid->es->id == NULL )
+    if( i_skip >= 188 || pid->es->id == NULL || p_demux->p_sys->b_udp_out )
     {
         block_Release( p_bk );
     }
@@ -1612,7 +1687,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         {
             msg_Dbg( p_demux, "  * es pid=0x%x type=0x%x *unknown*", p_es->i_pid, p_es->i_type );
         }
-        else
+        else if( !p_sys->b_udp_out )
         {
             msg_Dbg( p_demux, "  * es pid=0x%x type=0x%x fcc=%4.4s", p_es->i_pid, p_es->i_type, (char*)&pid->es->fmt.i_codec );
             if( p_sys->b_es_id_pid )
