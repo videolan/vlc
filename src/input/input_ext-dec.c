@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.21.2.2 2001/12/31 01:21:45 massiot Exp $
+ * $Id: input_ext-dec.c,v 1.21.2.3 2001/12/31 03:23:44 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -101,6 +101,8 @@ void DecoderError( decoder_fifo_t * p_fifo )
     {
         /* Trash all received PES packets */
         p_fifo->pf_delete_pes( p_fifo->p_packets_mgt, p_fifo->p_first );
+        p_fifo->p_first = NULL;
+        p_fifo->pp_last = &p_fifo->p_first;
 
         /* Waiting for the input thread to put new PES packets in the fifo */
         vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
