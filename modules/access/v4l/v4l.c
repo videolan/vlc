@@ -227,6 +227,10 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
+    /* Only when selected */
+    if( *p_demux->psz_access == '\0' )
+        return VLC_EGENERIC;
+
     /* Set up p_demux */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
@@ -449,7 +453,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     es_out_id_t  *p_es = p_sys->p_es_audio;
-    block_t *p_block;
+    block_t *p_block = NULL;
 
     /* Try grabbing audio frames first */
     if( p_sys->fd_audio < 0 || !( p_block = GrabAudio( p_demux ) ) )
