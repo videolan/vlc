@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.79 2003/05/11 18:40:11 hartman Exp $
+ * $Id: intf.m,v 1.80 2003/05/11 19:09:51 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -391,6 +391,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
     [o_info_window setTitle: _NS("Info")];
 
+    [self setSubmenusEnabled: FALSE];
     [self manageVolumeSlider];
 }
 
@@ -687,7 +688,8 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         else
         {
             /* play status */
-            p_intf->p_sys->b_play_status = VLC_FALSE;
+            p_intf->p_sys->b_play_status = FALSE;
+            [self setSubmenusEnabled: FALSE];
         }
 
         [self playStatusUpdated: p_intf->p_sys->b_play_status];
@@ -880,6 +882,19 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         [o_mi_play setTitle: _NS("Play")];
         [o_dmi_play setTitle: _NS("Play")];
     }
+}
+
+- (void)setSubmenusEnabled:(BOOL)b_enabled
+{
+    [o_mi_program setEnabled: b_enabled];
+    [o_mi_title setEnabled: b_enabled];
+    [o_mi_chapter setEnabled: b_enabled];
+    [o_mi_audiotrack setEnabled: b_enabled];
+    [o_mi_videotrack setEnabled: b_enabled];
+    [o_mi_subtitle setEnabled: b_enabled];
+    [o_mi_channels setEnabled: b_enabled];
+    [o_mi_device setEnabled: b_enabled];
+    [o_mi_screen setEnabled: b_enabled];
 }
 
 - (void)manageVolumeSlider
@@ -1081,7 +1096,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     {
         NSMenuItem * o_lmi;
         NSString * o_title;
-NSLog(@"%d, %s", i_value, psz_variable);
 
         if ( text.p_list->p_values[i].psz_string )
         {
