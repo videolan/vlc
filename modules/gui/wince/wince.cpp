@@ -36,8 +36,6 @@
 #include "wince.h"
 
 #include <objbase.h>
-#include <commctrl.h>
-#include <commdlg.h>
 
 /*****************************************************************************
  * Local prototypes.
@@ -45,6 +43,11 @@
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 static void Run    ( intf_thread_t * );
+
+static int  OpenDialogs( vlc_object_t * );
+
+static void MainLoop  ( intf_thread_t * );
+static void ShowDialog( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -62,6 +65,11 @@ vlc_module_begin();
 
     add_bool( "wince-embed", 1, NULL,
               EMBED_TEXT, EMBED_LONGTEXT, VLC_FALSE );
+
+    add_submodule();
+    set_description( _("WinCE dialogs provider") );
+    set_capability( "dialogs provider", 10 );
+    set_callbacks( OpenDialogs, Close );
 vlc_module_end();
 
 HINSTANCE hInstance = 0;
@@ -113,6 +121,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_settings_menu = NULL;
 
     p_intf->pf_run = Run;
+    p_intf->pf_show_dialog = NULL;
 
     p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->b_playing = 0;
@@ -120,19 +129,17 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->b_slider_free = 1;
     p_intf->p_sys->i_slider_pos = p_intf->p_sys->i_slider_oldpos = 0;
 
-    p_intf->p_sys->GetOpenFile = 0;
-    p_intf->p_sys->h_gsgetfile_dll = LoadLibrary( _T("gsgetfile") );
-    if( p_intf->p_sys->h_gsgetfile_dll )
-    {
-        p_intf->p_sys->GetOpenFile = (BOOL (WINAPI *)(void *))
-            GetProcAddress( p_intf->p_sys->h_gsgetfile_dll,
-                            _T("gsGetOpenFileName") );
-    }
-
-    if( !p_intf->p_sys->GetOpenFile )
-        p_intf->p_sys->GetOpenFile = (BOOL (WINAPI *)(void *))GetOpenFileName;
-
     return VLC_SUCCESS;
+}
+
+static int OpenDialogs( vlc_object_t *p_this )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    int i_ret = Open( p_this );
+
+    p_intf->pf_show_dialog = ShowDialog;
+
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -156,11 +163,18 @@ static void Close( vlc_object_t *p_this )
     MenuItemExt::ClearList( p_intf->p_sys->p_navig_menu );
     delete p_intf->p_sys->p_navig_menu;
 
+    if( p_intf->pf_show_dialog )
+    {
+        /* We must destroy the dialogs thread */
+#if 0
+        wxCommandEvent event( wxEVT_DIALOG, INTF_DIALOG_EXIT );
+        p_intf->p_sys->p_wxwindow->AddPendingEvent( event );
+#endif
+        vlc_thread_join( p_intf );
+    }
+
     // Unsuscribe to messages bank
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-
-    if( p_intf->p_sys->h_gsgetfile_dll )
-        FreeLibrary( p_intf->p_sys->h_gsgetfile_dll );
 
     // Destroy structure
     free( p_intf->p_sys );
@@ -171,18 +185,90 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
+    if( p_intf->pf_show_dialog )
+    {
+        /* The module is used in dialog provider mode */
+
+        /* Create a new thread for the dialogs provider */
+        if( vlc_thread_create( p_intf, "Skins Dialogs Thread",
+                               MainLoop, 0, VLC_TRUE ) )
+        {
+            msg_Err( p_intf, "cannot create Skins Dialogs Thread" );
+            p_intf->pf_show_dialog = NULL;
+        }
+    }
+    else
+    {
+        /* The module is used in interface mode */
+        MainLoop( p_intf );
+    }
+}
+
+static void MainLoop( intf_thread_t *p_intf )
+{
     MSG msg;
     Interface intf;
 
     p_intf->p_sys->p_main_window = &intf;
     if( !hInstance ) hInstance = GetModuleHandle(NULL);
 
+    // Register window class
+    WNDCLASS wc;
+    wc.style = CS_HREDRAW | CS_VREDRAW ;
+    wc.lpfnWndProc = (WNDPROC)CBaseWindow::BaseWndProc;
+    wc.cbClsExtra = 0;
+    wc.cbWndExtra = 0;
+    wc.hIcon = NULL;
+    wc.hInstance = hInstance;
+    wc.hCursor = NULL;
+    wc.hbrBackground = (HBRUSH)(COLOR_MENU+1);
+    wc.lpszMenuName = NULL;
+    wc.lpszClassName = _T("VLC WinCE");
+    RegisterClass( &wc );
+
 #ifndef UNDER_CE
     /* Initialize OLE/COM */
     CoInitialize( 0 );
 #endif
 
-    if( !intf.InitInstance( hInstance, p_intf ) ) return;
+    if( !p_intf->pf_show_dialog )
+    {
+        /* The module is used in interface mode */
+        p_intf->p_sys->p_window = &intf;
+
+        /* Create/Show the interface */
+        if( !intf.InitInstance( hInstance, p_intf ) )
+        {
+#ifndef UNDER_CE
+            /* Uninitialize OLE/COM */
+            CoUninitialize();
+#endif
+            return;
+        }
+    }
+
+    /* Creates the dialogs provider */
+    p_intf->p_sys->p_window =
+        CreateDialogsProvider( p_intf, p_intf->pf_show_dialog ?
+                               NULL : p_intf->p_sys->p_window, hInstance );
+
+    p_intf->p_sys->pf_show_dialog = ShowDialog;
+
+    /* OK, initialization is over */
+    vlc_thread_ready( p_intf );
+
+    /* Check if we need to start playing */
+    if( !p_intf->pf_show_dialog && p_intf->b_play )
+    {
+        playlist_t *p_playlist =
+            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+        if( p_playlist )
+        {
+            playlist_Play( p_playlist );
+            vlc_object_release( p_playlist );
+        }
+    }
 
     // Main message loop
     while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
@@ -195,4 +281,75 @@ static void Run( intf_thread_t *p_intf )
     /* Uninitialize OLE/COM */
     CoUninitialize();
 #endif
+}
+
+/*****************************************************************************
+ * CBaseWindow Implementation
+ *****************************************************************************/
+LRESULT CALLBACK CBaseWindow::BaseWndProc( HWND hwnd, UINT msg, WPARAM wParam,
+                                           LPARAM lParam )
+{
+    CBaseWindow *p_obj;
+
+    // check to see if a copy of the 'this' pointer needs to be saved
+    if( msg == WM_CREATE )
+    {
+        p_obj = (CBaseWindow *)(((LPCREATESTRUCT)lParam)->lpCreateParams);
+        SetWindowLong( hwnd, GWL_USERDATA,
+                       (LONG)((LPCREATESTRUCT)lParam)->lpCreateParams );
+
+        p_obj->hWnd = hwnd;
+    }
+
+    if( msg == WM_INITDIALOG )
+    {
+        p_obj = (CBaseWindow *)lParam;
+        SetWindowLong( hwnd, GWL_USERDATA, lParam );
+        p_obj->hWnd = hwnd;
+    }
+
+    // Retrieve the pointer
+    p_obj = (CBaseWindow *)GetWindowLong( hwnd, GWL_USERDATA );
+
+    if( !p_obj ) return DefWindowProc( hwnd, msg, wParam, lParam );
+
+    // Filter message through child classes
+    return p_obj->WndProc( hwnd, msg, wParam, lParam );
+}
+
+int CBaseWindow::CreateDialogBox( HWND hwnd, CBaseWindow *p_obj )
+{
+    uint8_t p_buffer[sizeof(DLGTEMPLATE) + sizeof(WORD) * 4];
+    DLGTEMPLATE *p_dlg_template = (DLGTEMPLATE *)p_buffer;
+    memset( p_dlg_template, 0, sizeof(DLGTEMPLATE) + sizeof(WORD) * 4 );
+
+    // these values are arbitrary, they won't be used normally anyhow
+    p_dlg_template->x  = 0; p_dlg_template->y  = 0;
+    p_dlg_template->cx = 300; p_dlg_template->cy = 300;
+    p_dlg_template->style =
+        DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|WS_SIZEBOX;
+
+    return DialogBoxIndirectParam( GetModuleHandle(0), p_dlg_template, hwnd,
+                                   (DLGPROC)p_obj->BaseWndProc, (LPARAM)p_obj);
+}
+
+/*****************************************************************************
+ * ShowDialog
+ *****************************************************************************/
+static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
+                        intf_dialog_args_t *p_arg )
+{
+    SendMessage( p_intf->p_sys->p_window->GetHandle(), WM_CANCELMODE, 0, 0 );
+    if( i_dialog_event == INTF_DIALOG_POPUPMENU && i_arg == 0 ) return;
+
+    /* Hack to prevent popup events to be enqueued when
+     * one is already active */
+#if 0
+    if( i_dialog_event != INTF_DIALOG_POPUPMENU ||
+        !p_intf->p_sys->p_popup_menu )
+#endif
+    {
+        SendMessage( p_intf->p_sys->p_window->GetHandle(),
+                     WM_APP + i_dialog_event, (WPARAM)i_arg, (LPARAM)p_arg );
+    }
 }

@@ -142,11 +142,11 @@ public:
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, HINSTANCE _hInst )
+PrefsDialog::PrefsDialog( intf_thread_t *p_intf, CBaseWindow *p_parent,
+                          HINSTANCE h_inst )
+  :  CBaseWindow( p_intf, p_parent, h_inst )
 {
     /* Initializations */
-    p_intf = _p_intf;
-    hInst = _hInst;
     prefs_tree = NULL;
 }
 
@@ -224,6 +224,10 @@ LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
     case WM_CLOSE:
         EndDialog( hwnd, LOWORD( wp ) );
+        break;
+
+    case WM_SETFOCUS:
+        SHFullScreen( hwnd, SHFS_SHOWSIPBUTTON );
         break;
 
     case WM_COMMAND:

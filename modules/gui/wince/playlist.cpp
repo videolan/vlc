@@ -36,10 +36,6 @@
 #include <commctrl.h>
 #include <commdlg.h>
 
-#ifndef NMAXFILE
-#define NMAXFILE 512 // at least 256
-#endif
-
 #ifndef TEXTMAXBUF
 #define TEXTMAXBUF 512 // at least 500
 #endif
@@ -123,13 +119,12 @@ TCHAR * szToolTips2[] =
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-Playlist::Playlist( intf_thread_t *_p_intf, HINSTANCE _hInst )
+Playlist::Playlist( intf_thread_t *p_intf, CBaseWindow *p_parent,
+                    HINSTANCE h_inst )
+  :  CBaseWindow( p_intf, p_parent, h_inst )
 {
     /* Initializations */
-    p_intf = _p_intf;
-        hInst = _hInst;
-        hListView = NULL;
-
+    hListView = NULL;
     i_title_sorted = 1;
     i_author_sorted = 1;
 
@@ -336,8 +331,6 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         ListView_InsertColumn( hListView, 2, &lv);
 
         SetTimer( hwnd, 1, 500 /*milliseconds*/, NULL );
-
-        SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
         break;
 
     case WM_TIMER:
@@ -346,6 +339,11 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
     case WM_CLOSE:
         EndDialog( hwnd, LOWORD( wp ) );
+        break;
+
+    case WM_SETFOCUS:
+        SHSipPreference( hwnd, SIP_DOWN ); 
+        SHFullScreen( hwnd, SHFS_HIDESIPBUTTON );
         break;
 
     case WM_COMMAND:    
@@ -361,29 +359,23 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             break;
 
         case ID_MANAGE_SAVEPL:
-            SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
             OnSave();
-            SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
             break;
 
         case ID_MANAGE_ADDFILE:
-            SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
-            OnAddFile();
-            SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
+            p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE_SIMPLE,
+                                           0, 0 );
             b_need_update = VLC_TRUE;
             break;
 
         case ID_MANAGE_ADDDIRECTORY:
-            SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
-            OnAddFile();
-            SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
+            p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_DIRECTORY,
+                                           0, 0 );
             b_need_update = VLC_TRUE;
             break;
 
         case ID_MANAGE_ADDMRL:
-            SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
-            OnAddMRL();
-            SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
+            p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE, 0, 0 );
             b_need_update = VLC_TRUE;
             break;
 
@@ -393,9 +385,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             break;
 
         case Infos_Event:
-            SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
             OnPopupInfo( hwnd );
-            SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
             b_need_update = VLC_TRUE;
             break;
 
@@ -474,7 +464,6 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
         case PopupInfo_Event:
             OnPopupInfo( hwnd );
-            SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
             b_need_update = VLC_TRUE;
             break;
 
@@ -577,6 +566,15 @@ void Playlist::HandlePopupMenu( HWND hwnd, POINT point )
 
     /* Destroy the menu since were are done with it. */
     DestroyMenu( hMenuTrackPopup );
+}
+
+/**********************************************************************
+ * Show the playlist
+ **********************************************************************/
+void Playlist::ShowPlaylist( bool b_show )
+{
+    if( b_show ) Rebuild();
+    Show( b_show );
 }
 
 /**********************************************************************
@@ -703,146 +701,81 @@ void Playlist::DeleteItem( int item )
 /**********************************************************************
  * I/O functions
  **********************************************************************/
-void Playlist::OnOpen()
+static void OnOpenCB( intf_dialog_args_t *p_arg )
 {
-    OPENFILENAME ofn;
-    TCHAR DateiName[80+1] = _T("\0");
-    static TCHAR szFilter[] = _T("All playlists (*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u)\0*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u\0");
+    intf_thread_t *p_intf = (intf_thread_t *)p_arg->p_arg;
 
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_playlist == NULL ) return;
-
-    memset( &ofn, 0, sizeof(OPENFILENAME) );
-    ofn.lStructSize = sizeof (OPENFILENAME);
-    ofn.hwndOwner = NULL;
-    ofn.hInstance = hInst;
-    ofn.lpstrFilter = szFilter;
-    ofn.lpstrCustomFilter = NULL;
-    ofn.nMaxCustFilter = 0;
-    ofn.nFilterIndex = 1;     
-    ofn.lpstrFile = (LPTSTR) DateiName; 
-    ofn.nMaxFile = 80;
-    ofn.lpstrFileTitle = NULL; 
-    ofn.nMaxFileTitle = 40;
-    ofn.lpstrInitialDir = NULL;
-    ofn.lpstrTitle = _T("Open playlist");
-    ofn.Flags = 0; 
-    ofn.nFileOffset = 0;
-    ofn.nFileExtension = 0;
-    ofn.lpstrDefExt = NULL;
-    ofn.lCustData = 0L;
-    ofn.lpfnHook = NULL;
-    ofn.lpTemplateName = NULL;
-
-    if( GetOpenFileName((LPOPENFILENAME)&ofn) )
-    {
-        playlist_Import( p_playlist, _TOMB(ofn.lpstrFile) );
-    }
-
-    vlc_object_release( p_playlist );
-}
-
-void Playlist::OnSave()
-{
-    TCHAR szFile[NMAXFILE] = _T("\0");
-    OPENFILENAME ofn;
-    TCHAR psz_filters[1000];
-
-    struct
-    {
-        char *psz_desc;
-        char *psz_filter;
-        char *psz_module;
-
-    } formats[] =
-    { { "M3U file", "*.m3u", "export-m3u" },       
-      { "PLS file", "*.pls", "export-pls" }
-    };
-
-    for( int i_len = 0, i = 0; i < sizeof(formats)/sizeof(formats[0]); i++ )
-    {
-        _tcscpy( psz_filters + i_len, _FROMMB(formats[i].psz_desc) );
-        i_len = i_len + _tcslen( psz_filters + i_len );
-        psz_filters[i_len++] = '\0';
-        _tcscpy( psz_filters + i_len, _FROMMB(formats[i].psz_filter) );
-        i_len = i_len + _tcslen( psz_filters + i_len );
-        psz_filters[i_len++] = '\0';
-        if( i == sizeof(formats)/sizeof(formats[0]) -1 )
-            psz_filters[i_len] = '\0';
-    }
-
-    memset( &(ofn), 0, sizeof(ofn));
-    ofn.lStructSize     = sizeof(ofn);
-    ofn.hwndOwner = NULL;
-    ofn.lpstrFile = szFile;
-    ofn.nMaxFile = NMAXFILE;    
-    ofn.lpstrFilter = psz_filters;
-    ofn.lpstrTitle = _T("Save playlist");
-    ofn.Flags = OFN_HIDEREADONLY; 
-
-    if( GetSaveFileName( (LPOPENFILENAME)&ofn ) )
+    if( p_arg->i_results && p_arg->psz_results[0] )
     {
         playlist_t * p_playlist = (playlist_t *)
             vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
-        if( p_playlist && ofn.lpstrFile )
+        if( p_playlist )
         {
-            playlist_Export( p_playlist, _TOMB(ofn.lpstrFile),
-                             formats[ofn.nFilterIndex ?
-                                     ofn.nFilterIndex - 1 : 0].psz_module );
+            playlist_Import( p_playlist, p_arg->psz_results[0] );
         }
 
         if( p_playlist ) vlc_object_release( p_playlist );
     }
 }
 
-void Playlist::OnAddFile()
+void Playlist::OnOpen()
 {
-    // Same code as in Interface
-    OPENFILENAME ofn;
-    TCHAR DateiName[80+1] = _T("\0");
-    static TCHAR szFilter[] = _T("All (*.*)\0*.*\0");
+    char *psz_filters ="All playlists|*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u";
 
-    memset( &ofn, 0, sizeof(OPENFILENAME) );
-    ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = NULL;
-    ofn.hInstance = hInst;
-    ofn.lpstrFilter = szFilter;
-    ofn.lpstrCustomFilter = NULL;
-    ofn.nMaxCustFilter = 0;
-    ofn.nFilterIndex = 1;     
-    ofn.lpstrFile = (LPTSTR)DateiName; 
-    ofn.nMaxFile = 80;
-    ofn.lpstrFileTitle = NULL; 
-    ofn.nMaxFileTitle = 40;
-    ofn.lpstrInitialDir = NULL;
-    ofn.lpstrTitle = _T("Add File");
-    ofn.Flags = 0; 
-    ofn.nFileOffset = 0;
-    ofn.nFileExtension = 0;
-    ofn.lpstrDefExt = NULL;
-    ofn.lCustData = 0L;
-    ofn.lpfnHook = NULL;
-    ofn.lpTemplateName = NULL;
+    intf_dialog_args_t *p_arg =
+        (intf_dialog_args_t *)malloc( sizeof(intf_dialog_args_t) );
+    memset( p_arg, 0, sizeof(intf_dialog_args_t) );
 
-    SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
+    p_arg->psz_title = strdup( "Open playlist" );
+    p_arg->psz_extensions = strdup( psz_filters );
+    p_arg->p_arg = p_intf;
+    p_arg->pf_callback = OnOpenCB;
 
-    if( GetOpenFileName( (LPOPENFILENAME)&ofn ) )
+    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE_GENERIC, 0, p_arg);
+}
+
+static void OnSaveCB( intf_dialog_args_t *p_arg )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_arg->p_arg;
+
+    if( p_arg->i_results && p_arg->psz_results[0] )
     {
-        playlist_t *p_playlist = (playlist_t *)
-	    vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-	if( p_playlist == NULL ) return;
+        playlist_t * p_playlist = (playlist_t *)
+            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
-        char *psz_filename = _TOMB(ofn.lpstrFile);
-        playlist_Add( p_playlist, psz_filename, psz_filename,
-                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-	vlc_object_release( p_playlist );
+        if( p_playlist )
+        {
+            char *psz_export;
+            char *psz_ext = strrchr( p_arg->psz_results[0], '.' );
+
+            if( psz_ext && !strcmp( psz_ext, ".pls") )
+                psz_export = "export-pls";
+            else psz_export = "export-m3u";
+
+            playlist_Export( p_playlist, p_arg->psz_results[0], psz_export );
+        }
+
+        if( p_playlist ) vlc_object_release( p_playlist );
     }
 }
 
-void Playlist::OnAddMRL()
+void Playlist::OnSave()
 {
+    char *psz_filters ="M3U file|*.m3u|PLS file|*.pls";
+
+    intf_dialog_args_t *p_arg =
+        (intf_dialog_args_t *)malloc( sizeof(intf_dialog_args_t) );
+    memset( p_arg, 0, sizeof(intf_dialog_args_t) );
+
+    p_arg->psz_title = strdup( "Save playlist" );
+    p_arg->psz_extensions = strdup( psz_filters );
+    p_arg->b_save = VLC_TRUE;
+    p_arg->p_arg = p_intf;
+    p_arg->pf_callback = OnSaveCB;
+
+    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE_GENERIC,
+                                   0, p_arg );
 }
 
 /**********************************************************************
@@ -947,7 +880,7 @@ void Playlist::ShowInfos( HWND hwnd, int i_item )
     if( p_item )
     {
         ItemInfoDialog *iteminfo_dialog =
-            new ItemInfoDialog( p_intf, hInst, p_item );
+            new ItemInfoDialog( p_intf, this, hInst, p_item );
         CreateDialogBox( hwnd, iteminfo_dialog );                
         UpdateItem( i_item );
         delete iteminfo_dialog;

@@ -197,13 +197,11 @@ LRESULT VideoWindow::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
     switch( msg )
     {
     case WM_KILLFOCUS:
-        msg_Err( p_intf, "WM_KILLFOCUS1" );
         if( p_vout )
             vout_Control( p_vout, VOUT_SET_FOCUS, (vlc_bool_t)VLC_FALSE );
         return TRUE;
 
     case WM_SETFOCUS:
-        msg_Err( p_intf, "WM_SETFOCUS1" );
         if( p_vout )
             vout_Control( p_vout, VOUT_SET_FOCUS, (vlc_bool_t)VLC_TRUE );
         return TRUE;

@@ -42,11 +42,11 @@
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-FileInfo::FileInfo( intf_thread_t *_p_intf, HINSTANCE _hInst )
+FileInfo::FileInfo( intf_thread_t *p_intf, CBaseWindow *p_parent,
+                    HINSTANCE h_inst )
+  :  CBaseWindow( p_intf, p_parent, h_inst )
 {
     /* Initializations */
-    p_intf = _p_intf;
-    hInst = _hInst;
     hwnd_fileinfo = hwndTV = NULL;
 }
 
@@ -87,7 +87,7 @@ BOOL FileInfo::CreateTreeView(HWND hwnd)
     // Be sure that the tree view actually was created.
     if( !hwndTV ) return FALSE;
 
-    UpdateFileInfo( hwndTV );
+    UpdateFileInfo();
 
     return TRUE;
 }
@@ -101,7 +101,7 @@ PURPOSE:
   Update the TreeView with file information.
 
 ***********************************************************************/
-void FileInfo::UpdateFileInfo(HWND hwnd)
+void FileInfo::UpdateFileInfo()
 {
     TVITEM tvi = {0}; 
     TVINSERTSTRUCT tvins = {0}; 
@@ -130,7 +130,7 @@ void FileInfo::UpdateFileInfo(HWND hwnd)
     tvins.hParent = TVI_ROOT; 
 
     // Add the item to the tree-view control. 
-    hPrev = (HTREEITEM)TreeView_InsertItem( hwnd, &tvins );
+    hPrev = (HTREEITEM)TreeView_InsertItem( hwndTV, &tvins );
 
     hPrevRootItem = hPrev; 
 
@@ -150,7 +150,7 @@ void FileInfo::UpdateFileInfo(HWND hwnd)
         tvins.hParent = hPrevRootItem;
 
         // Add the item to the tree-view control. 
-        hPrev = (HTREEITEM)TreeView_InsertItem( hwnd, &tvins );
+        hPrev = (HTREEITEM)TreeView_InsertItem( hwndTV, &tvins );
 
         hPrevLev2Item = hPrev;
 
@@ -170,14 +170,14 @@ void FileInfo::UpdateFileInfo(HWND hwnd)
             tvins.hParent = hPrevLev2Item;
     
             // Add the item to the tree-view control. 
-            hPrev = (HTREEITEM)TreeView_InsertItem( hwnd, &tvins );
+            hPrev = (HTREEITEM)TreeView_InsertItem( hwndTV, &tvins );
         }
 
-        TreeView_Expand( hwnd, hPrevLev2Item, TVE_EXPANDPARTIAL |TVE_EXPAND );
+        TreeView_Expand( hwndTV, hPrevLev2Item, TVE_EXPANDPARTIAL|TVE_EXPAND );
     }
     vlc_mutex_unlock( &p_input->input.p_item->lock );
 
-    TreeView_Expand( hwnd, hPrevRootItem, TVE_EXPANDPARTIAL |TVE_EXPAND );
+    TreeView_Expand( hwndTV, hPrevRootItem, TVE_EXPANDPARTIAL|TVE_EXPAND );
 
     return;
 }
@@ -210,6 +210,11 @@ LRESULT FileInfo::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
     case WM_CLOSE:
         EndDialog( hwnd, LOWORD( wp ) );
+        break;
+
+    case WM_SETFOCUS:
+        SHSipPreference( hwnd, SIP_DOWN ); 
+        SHFullScreen( hwnd, SHFS_HIDESIPBUTTON );
         break;
 
     case WM_COMMAND:

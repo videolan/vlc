@@ -6,6 +6,7 @@ SOURCES_wince = \
 	wince.cpp \
 	wince.h \
 	interface.cpp \
+	dialogs.cpp \
 	menus.cpp \
 	open.cpp \
 	playlist.cpp \

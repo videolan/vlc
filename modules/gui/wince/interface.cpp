@@ -33,12 +33,9 @@
 
 #include "wince.h"
 
-#include <winuser.h>
-#include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
 #include <commdlg.h>
-#include <shlobj.h>
 
 #define NUMIMAGES     9   // Number of buttons in the toolbar           
 #define IMAGEWIDTH    17   // Width of the buttons in the toolbar  
@@ -107,9 +104,7 @@ TCHAR * szToolTips[] =
  *****************************************************************************/
 Interface::Interface()
   : hwndMain(0), hwndCB(0), hwndTB(0), hwndSlider(0), hwndLabel(0),
-    hwndVol(0), hwndSB(0),
-    fileinfo(0), messages(0), preferences(0), playlist(0),
-    timer(0), open(0), video(0), b_volume_hold(0)
+    hwndVol(0), hwndSB(0), timer(0), video(0), b_volume_hold(0)
 {
 }
 
@@ -126,20 +121,6 @@ BOOL Interface::InitInstance( HINSTANCE hInstance, intf_thread_t *_p_intf )
     i_old_playing_status = PAUSE_S;
 
     hInst = hInstance; // Store instance handle in our global variable
-
-    // Register window class
-    WNDCLASS wc;
-    wc.style = CS_HREDRAW | CS_VREDRAW ;
-    wc.lpfnWndProc = (WNDPROC)BaseWndProc;
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hIcon = NULL;
-    wc.hInstance = hInstance;
-    wc.hCursor = NULL;
-    wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-    wc.lpszMenuName = NULL;
-    wc.lpszClassName = _T("VLC WinCE");
-    if( !RegisterClass( &wc ) ) return FALSE;
 
     int i_style = WS_VISIBLE;
 
@@ -462,67 +443,6 @@ HWND CreateStatusBar( HWND hwnd, HINSTANCE hInst )
 }
 
 /***********************************************************************
-FUNCTION:
-  CreateDialogBox
-
-PURPOSE:
-  Creates a Dialog Box.
-***********************************************************************/
-int CBaseWindow::CreateDialogBox( HWND hwnd, CBaseWindow *p_obj )
-{
-    uint8_t p_buffer[sizeof(DLGTEMPLATE) + sizeof(WORD) * 4];
-    DLGTEMPLATE *p_dlg_template = (DLGTEMPLATE *)p_buffer;
-    memset( p_dlg_template, 0, sizeof(DLGTEMPLATE) + sizeof(WORD) * 4 );
-
-    // these values are arbitrary, they won't be used normally anyhow
-    p_dlg_template->x  = 0; p_dlg_template->y  = 0;
-    p_dlg_template->cx = 300; p_dlg_template->cy = 300;
-    p_dlg_template->style =
-        DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|WS_SIZEBOX;
-
-    return DialogBoxIndirectParam( GetModuleHandle(0), p_dlg_template, hwnd,
-                                   (DLGPROC)p_obj->BaseWndProc, (LPARAM)p_obj );
-}
-
-/***********************************************************************
-FUNCTION: 
-  BaseWndProc
-
-PURPOSE: 
-  Processes messages sent to the main window.
-***********************************************************************/
-LRESULT CALLBACK CBaseWindow::BaseWndProc( HWND hwnd, UINT msg, WPARAM wParam,
-                                           LPARAM lParam )
-{
-    CBaseWindow *p_obj;
-
-    // check to see if a copy of the 'this' pointer needs to be saved
-    if( msg == WM_CREATE )
-    {
-        p_obj = (CBaseWindow *)(((LPCREATESTRUCT)lParam)->lpCreateParams);
-        SetWindowLong( hwnd, GWL_USERDATA,
-                       (LONG)((LPCREATESTRUCT)lParam)->lpCreateParams );
-
-        p_obj->hWnd = hwnd;
-    }
-
-    if( msg == WM_INITDIALOG )
-    {
-        p_obj = (CBaseWindow *)lParam;
-        SetWindowLong( hwnd, GWL_USERDATA, lParam );
-        p_obj->hWnd = hwnd;
-    }
-
-    // Retrieve the pointer
-    p_obj = (CBaseWindow *)GetWindowLong( hwnd, GWL_USERDATA );
-
-    if( !p_obj ) return DefWindowProc( hwnd, msg, wParam, lParam );
-
-    // Filter message through child classes
-    return p_obj->WndProc( hwnd, msg, wParam, lParam );
-}
-
-/***********************************************************************
 FUNCTION: 
   WndProc
 
@@ -548,60 +468,28 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             video = CreateVideoWindow( p_intf, hwnd );
 
         timer = new Timer( p_intf, hwnd, this );
-
-        // Hide the SIP button (WINCE only)
-        SetForegroundWindow( hwnd );
-        SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
         break;
 
     case WM_COMMAND:
         switch( GET_WM_COMMAND_ID(wp,lp) )
         {
         case ID_FILE_QUICKOPEN: 
-            OnOpenFileSimple();
-            break;
-
         case ID_FILE_OPENFILE: 
-            open = new OpenDialog( p_intf, hInst, FILE_ACCESS,
-                                   ID_FILE_OPENFILE, OPEN_NORMAL );
-            CreateDialogBox( hwnd, open );
-            delete open;
-            break;
-
         case ID_FILE_OPENDIR:
-            OnOpenDirectory();
-            break;
-
         case ID_FILE_OPENNET:
-            open = new OpenDialog( p_intf, hInst, NET_ACCESS, ID_FILE_OPENNET,
-                                   OPEN_NORMAL );
-            CreateDialogBox( hwnd, open );
-            delete open;
+        case ID_VIEW_STREAMINFO:
+        case ID_VIEW_MESSAGES:
+        case ID_VIEW_PLAYLIST:
+        case ID_PREFERENCES:
+            OnShowDialog( GET_WM_COMMAND_ID(wp,lp) );
             break;
 
-        case PlayStream_Event: 
-            OnPlayStream();
-            break;
-
-        case StopStream_Event: 
-            OnStopStream();
-            break;
-
-        case PrevStream_Event: 
-            OnPrevStream();
-            break;
-
-        case NextStream_Event: 
-            OnNextStream();
-            break;
-
-        case SlowStream_Event: 
-            OnSlowStream();
-            break;
-
-        case FastStream_Event: 
-            OnFastStream();
-            break;
+        case PlayStream_Event: OnPlayStream(); break;
+        case StopStream_Event: OnStopStream(); break;
+        case PrevStream_Event: OnPrevStream(); break;
+        case NextStream_Event: OnNextStream(); break;
+        case SlowStream_Event: OnSlowStream(); break;
+        case FastStream_Event: OnFastStream(); break;
 
         case ID_FILE_ABOUT: 
         {
@@ -620,30 +508,6 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             SendMessage( hwnd, WM_CLOSE, 0, 0 );
             break;
 
-        case ID_VIEW_STREAMINFO:
-            fileinfo = new FileInfo( p_intf, hInst );
-            CreateDialogBox( hwnd, fileinfo );
-            delete fileinfo;
-            break;
-
-        case ID_VIEW_MESSAGES:
-            messages = new Messages( p_intf, hInst );
-            CreateDialogBox( hwnd, messages );
-            delete messages;
-            break;
-
-        case ID_VIEW_PLAYLIST:
-            playlist = new Playlist( p_intf, hInst );
-            CreateDialogBox( hwnd, playlist );
-            delete playlist;
-            break;
-
-        case ID_PREFERENCES:
-            preferences = new PrefsDialog( p_intf, hInst );
-            CreateDialogBox( hwnd, preferences );
-            delete preferences;
-            break;
-                  
         default:
             OnMenuEvent( p_intf, GET_WM_COMMAND_ID(wp,lp) );
             // we should test if it is a menu command
@@ -685,14 +549,17 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             RefreshNavigMenu( p_intf, menu_navigation );
         /* Fall through */
 
-    case WM_ENTERMENULOOP:
     case WM_KILLFOCUS:
+        SHFullScreen( hwnd, SHFS_SHOWSIPBUTTON );
+    case WM_ENTERMENULOOP:
         if( video && video->hWnd )
             SendMessage( video->hWnd, WM_KILLFOCUS, 0, 0 );
         break;
 
-    case WM_EXITMENULOOP:
     case WM_SETFOCUS:
+        SHSipPreference( hwnd, SIP_DOWN ); 
+        SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
+    case WM_EXITMENULOOP:
         if( video && video->hWnd )
             SendMessage( video->hWnd, WM_SETFOCUS, 0, 0 );
         break;
@@ -737,117 +604,25 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
     return DefWindowProc( hwnd, msg, wp, lp );
 }
 
-void Interface::OnOpenFileSimple( void )
+void Interface::OnShowDialog( int i_dialog_event )
 {
-    OPENFILENAME ofn;
-    TCHAR DateiName[80+1] = _T("\0");
-    static TCHAR szFilter[] = _T("All (*.*)\0*.*\0");
+    int i_id;
 
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_playlist == NULL ) return;
-
-    memset( &ofn, 0, sizeof(OPENFILENAME) );
-    ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = hwndMain;
-    ofn.hInstance = hInst;
-    ofn.lpstrFilter = szFilter;
-    ofn.lpstrCustomFilter = NULL;
-    ofn.nMaxCustFilter = 0;
-    ofn.nFilterIndex = 1;     
-    ofn.lpstrFile = (LPTSTR)DateiName; 
-    ofn.nMaxFile = 80;
-    ofn.lpstrFileTitle = NULL; 
-    ofn.nMaxFileTitle = 40;
-    ofn.lpstrInitialDir = NULL;
-    ofn.lpstrTitle = _T("Quick Open File");
-    ofn.Flags = 0; 
-    ofn.nFileOffset = 0;
-    ofn.nFileExtension = 0;
-    ofn.lpstrDefExt = NULL;
-    ofn.lCustData = 0L;
-    ofn.lpfnHook = NULL;
-    ofn.lpTemplateName = NULL;
-
-    SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
-
-    if( GetOpenFile( &ofn ) )
+    switch( i_dialog_event )
     {
-        char *psz_filename = _TOMB(ofn.lpstrFile);
-        playlist_Add( p_playlist, psz_filename, psz_filename,
-                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+    case ID_FILE_QUICKOPEN: i_id = INTF_DIALOG_FILE_SIMPLE; break;
+    case ID_FILE_OPENFILE: i_id = INTF_DIALOG_FILE; break;
+    case ID_FILE_OPENDIR: i_id = INTF_DIALOG_DIRECTORY; break;
+    case ID_FILE_OPENNET: i_id = INTF_DIALOG_NET; break;
+    case ID_VIEW_PLAYLIST: i_id = INTF_DIALOG_PLAYLIST; break;
+    case ID_VIEW_MESSAGES: i_id = INTF_DIALOG_MESSAGES; break;
+    case ID_VIEW_STREAMINFO: i_id = INTF_DIALOG_FILEINFO; break;
+    case ID_PREFERENCES: i_id = INTF_DIALOG_PREFS; break;
+    default: i_id = INTF_DIALOG_FILE; break;
     }
 
-    vlc_object_release( p_playlist );
-}
-
-void Interface::OnOpenDirectory( void )
-{
-    TCHAR psz_result[MAX_PATH];
-    LPMALLOC p_malloc = 0;
-    LPITEMIDLIST pidl;
-    BROWSEINFO bi;
-    playlist_t *p_playlist = 0;
-
-#ifdef UNDER_CE
-#   define SHGetMalloc MySHGetMalloc
-#   define SHBrowseForFolder MySHBrowseForFolder
-#   define SHGetPathFromIDList MySHGetPathFromIDList
-
-    HMODULE ceshell_dll = LoadLibrary( _T("ceshell") );
-    if( !ceshell_dll ) return;
-
-    HRESULT WINAPI (*SHGetMalloc)(LPMALLOC *) =
-        (HRESULT WINAPI (*)(LPMALLOC *))
-        GetProcAddress( ceshell_dll, _T("SHGetMalloc") );
-    LPITEMIDLIST WINAPI (*SHBrowseForFolder)(LPBROWSEINFO) =
-        (LPITEMIDLIST WINAPI (*)(LPBROWSEINFO))
-        GetProcAddress( ceshell_dll, _T("SHBrowseForFolder") );
-    BOOL WINAPI (*SHGetPathFromIDList)(LPCITEMIDLIST, LPTSTR) =
-        (BOOL WINAPI (*)(LPCITEMIDLIST, LPTSTR))
-        GetProcAddress( ceshell_dll, _T("SHGetPathFromIDList") );
-
-    if( !SHGetMalloc || !SHBrowseForFolder || !SHGetPathFromIDList )
-    {
-        msg_Err( p_intf, "couldn't load SHBrowseForFolder API" );
-        FreeLibrary( ceshell_dll );
-        return;
-    }
-#endif
-
-    if( !SUCCEEDED( SHGetMalloc(&p_malloc) ) ) goto error;
-
-    p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( !p_playlist ) goto error;
-
-    memset( &bi, 0, sizeof(BROWSEINFO) );
-    bi.hwndOwner = hwndMain;
-    bi.pszDisplayName = psz_result;
-    bi.ulFlags = BIF_EDITBOX;
-#ifndef UNDER_CE
-    bi.ulFlags |= BIF_USENEWUI;
-#endif
-
-    if( (pidl = SHBrowseForFolder( &bi ) ) )
-    {
-        if( SHGetPathFromIDList( pidl, psz_result ) )
-        {
-            char *psz_filename = _TOMB(psz_result);
-            playlist_Add( p_playlist, psz_filename, psz_filename,
-                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-        }
-        p_malloc->Free( pidl );
-    }
-
- error:
-
-    if( p_malloc) p_malloc->Release();
-    if( p_playlist ) vlc_object_release( p_playlist );
-
-#ifdef UNDER_CE
-    FreeLibrary( ceshell_dll );
-#endif
+    if( p_intf->p_sys->pf_show_dialog )
+        p_intf->p_sys->pf_show_dialog( p_intf, i_id, 1, 0 );
 }
 
 void Interface::OnPlayStream( void )
@@ -894,7 +669,7 @@ void Interface::OnPlayStream( void )
     {
         /* If the playlist is empty, open a file requester instead */
         vlc_object_release( p_playlist );
-        OnOpenFileSimple();
+        OnShowDialog( ID_FILE_QUICKOPEN );
     }
 }
 

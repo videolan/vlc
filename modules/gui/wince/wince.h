@@ -55,6 +55,9 @@ class VideoWindow;
  *****************************************************************************/
 struct intf_sys_t
 {
+    /* the parent window */
+    CBaseWindow         *p_window;
+
     /* special actions */
     vlc_bool_t          b_playing;
 
@@ -85,13 +88,7 @@ struct intf_sys_t
     vector<MenuItemExt*> *p_settings_menu;
 
     VideoWindow          *p_video_window;
-
-    /* GetOpenFileName replacement */
-    BOOL (WINAPI *GetOpenFile)(void *);
-    HMODULE h_gsgetfile_dll;
 };
-
-#define GetOpenFile(a) p_intf->p_sys->GetOpenFile(a)
 
 /*****************************************************************************
  * Prototypes
@@ -100,13 +97,19 @@ struct intf_sys_t
 class CBaseWindow
 {
 public:
-    CBaseWindow() : hWnd(0), hInst(0) {};
+    CBaseWindow( intf_thread_t *_p_intf = 0, CBaseWindow *_p_parent = 0,
+                 HINSTANCE _hInst = 0 )
+      : hWnd(0), hInst(_hInst), p_parent(_p_parent), p_intf(_p_intf) {};
     virtual ~CBaseWindow() {};
 
     HWND hWnd;                // The main window handle
 
     static LRESULT CALLBACK BaseWndProc( HWND, UINT, WPARAM, LPARAM );
     static int CreateDialogBox( HWND, CBaseWindow * );
+
+    HWND GetHandle() { return hWnd; }
+    BOOL Show( BOOL b_show ) { return (hWnd && ShowWindow(hWnd, b_show)); }
+    BOOL IsShown( void ) { return (hWnd && IsWindowVisible(hWnd)); }
 
 protected:
 
@@ -116,7 +119,8 @@ protected:
     HINSTANCE       GetInstance () const { return hInst; }
     virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM ) { return 0; };
 
-    intf_thread_t *p_intf;
+    CBaseWindow     *p_parent;
+    intf_thread_t   *p_intf;
 };
 
 class FileInfo;
@@ -126,6 +130,7 @@ class Timer;
 class OpenDialog;
 class PrefsDialog;
 
+CBaseWindow *CreateDialogsProvider( intf_thread_t *, CBaseWindow *, HINSTANCE);
 CBaseWindow *CreateVideoWindow( intf_thread_t *, HWND );
 void PopupMenu( intf_thread_t *, HWND, POINT );
 
@@ -154,32 +159,27 @@ public:
     HMENU hPopUpMenu;
     HMENU hMenu;
 
-    FileInfo *fileinfo;
-    Messages *messages;
-    PrefsDialog *preferences;
-    Playlist *playlist;
     Timer *timer;
-    OpenDialog *open;
     CBaseWindow *video;
 
 protected:
 
     virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 
-    void OnOpenFileSimple( void );
-    void OnOpenDirectory( void );
-    void OnPlayStream( void );
-    void OnVideoOnTop( void );
+    void OnShowDialog( int );
 
-    void OnSliderUpdate( int wp );
-    void OnChange( int wp );
-    void VolumeChange( int i_volume );
-    void VolumeUpdate( void );
+    void OnPlayStream( void );
     void OnStopStream( void );
     void OnPrevStream( void );
     void OnNextStream( void );
     void OnSlowStream( void );
     void OnFastStream( void );
+
+    void OnVideoOnTop( void );
+    void OnSliderUpdate( int wp );
+    void OnChange( int wp );
+    void VolumeChange( int i_volume );
+    void VolumeUpdate( void );
 
     int i_old_playing_status;
 
@@ -197,8 +197,10 @@ class FileInfo : public CBaseWindow
 {
 public:
     /* Constructor */
-    FileInfo( intf_thread_t *_p_intf, HINSTANCE _hInst );
+    FileInfo( intf_thread_t *, CBaseWindow *, HINSTANCE );
     virtual ~FileInfo(){};
+
+    void UpdateFileInfo(void);
 
 protected:
 
@@ -209,7 +211,6 @@ protected:
     TCHAR szFileInfoTitle[100];         // Main window name
 
     virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
-    void UpdateFileInfo( HWND );
     BOOL CreateTreeView( HWND );
 };
 
@@ -218,16 +219,16 @@ class Messages : public CBaseWindow
 {
 public:
     /* Constructor */
-    Messages( intf_thread_t *_p_intf, HINSTANCE _hInst );
+    Messages( intf_thread_t *, CBaseWindow *, HINSTANCE );
     virtual ~Messages(){};
+
+    void UpdateLog(void);
 
 protected:
 
     virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 
     HWND hListView;
-    void UpdateLog(void);
-
     vlc_bool_t b_verbose;
 };
 
@@ -236,7 +237,8 @@ class ItemInfoDialog : public CBaseWindow
 {
 public:
     /* Constructor */
-    ItemInfoDialog( intf_thread_t *, HINSTANCE, playlist_item_t * );
+    ItemInfoDialog( intf_thread_t *, CBaseWindow *,
+                    HINSTANCE, playlist_item_t * );
     virtual ~ItemInfoDialog(){};
 
 protected:
@@ -271,12 +273,13 @@ class OpenDialog : public CBaseWindow
 {
 public:
     /* Constructor */
-    OpenDialog( intf_thread_t *_p_intf, HINSTANCE _hInst,
-                int _i_access_method, int _i_arg, int _i_method );
+    OpenDialog( intf_thread_t *, CBaseWindow *, HINSTANCE, int, int );
     virtual ~OpenDialog(){};
 
     void UpdateMRL();
     void UpdateMRL( int i_access_method );
+
+    HWND file_combo;
 
 protected:
 
@@ -289,7 +292,6 @@ protected:
 
     HWND notebook;
 
-    HWND file_combo;
     HWND browse_button;
     HWND subsfile_checkbox;
     HWND subsfile_label;
@@ -306,12 +308,11 @@ protected:
 
     HWND net_addrs_label[4];
     HWND net_addrs[4];
-        
-    int i_current_access_method;
-    int i_method; /* Normal or for the stream dialog ? */
+
     int i_open_arg;
+    int i_access;
     int i_net_type;
-        
+
     void FilePanel( HWND hwnd );
     void NetPanel( HWND hwnd );
 
@@ -337,16 +338,16 @@ class SubsFileDialog: public CBaseWindow
 {
 public:
     /* Constructor */
-    SubsFileDialog( intf_thread_t *_p_intf, HINSTANCE _hInst );
+    SubsFileDialog( intf_thread_t *, CBaseWindow *, HINSTANCE );
     virtual ~SubsFileDialog(){};
 
     vector<string> subsfile_mrl;
+    HWND file_combo;
 
 protected:
     friend class OpenDialog;
 
     HWND file_box;
-    HWND file_combo;
     HWND browse_button;
 
     HWND enc_box;
@@ -372,8 +373,11 @@ class Playlist : public CBaseWindow
 {
 public:
     /* Constructor */
-    Playlist( intf_thread_t *_p_intf, HINSTANCE _hInst );
+    Playlist( intf_thread_t *, CBaseWindow *, HINSTANCE );
     virtual ~Playlist(){};
+
+    void UpdatePlaylist();
+    void ShowPlaylist( bool );
 
 protected:
 
@@ -387,7 +391,6 @@ protected:
     HWND hwndTB;        // Handle to the toolbar.
     HWND hListView;
 
-    void UpdatePlaylist();
     void Rebuild();
     void UpdateItem( int );
     LRESULT ProcessCustomDraw( LPARAM lParam );
@@ -397,8 +400,6 @@ protected:
 
     void OnOpen();
     void OnSave();
-    void OnAddFile();
-    void OnAddMRL();
 
     void OnDeleteSelection();
     void OnInvertSelection();
@@ -431,7 +432,7 @@ class Timer
 {
 public:
     /* Constructor */
-    Timer( intf_thread_t *p_intf, HWND hwnd, Interface *_p_main_interface);
+    Timer( intf_thread_t *p_intf, HWND hwnd, Interface *_p_main_interface );
     virtual ~Timer();
     void Notify( void ); 
 
@@ -491,7 +492,7 @@ class PrefsDialog: public CBaseWindow
 {
 public:
     /* Constructor */
-    PrefsDialog( intf_thread_t *_p_intf, HINSTANCE _hInst );
+    PrefsDialog( intf_thread_t *, CBaseWindow *, HINSTANCE );
     virtual ~PrefsDialog(){};
 
 protected:
@@ -547,6 +548,7 @@ protected:
  *****************************************************************************/
 #define _WIN32_IE 0x0500
 
+#define SHFS_SHOWSIPBUTTON          0x0004
 #define SHFS_HIDESIPBUTTON          0x0008
 #define SHIDIM_FLAGS                0x0001
 #define SHIDIF_DONEBUTTON           0x0001
@@ -554,7 +556,6 @@ protected:
 #define SHIDIF_FULLSCREENNOMENUBAR  0x0010
 #define SHCMBF_HMENU                0x0010
 #define SHCMBF_EMPTYBAR             0x0001
-#define SHFS_SHOWSIPBUTTON          0x0004
 #define GN_CONTEXTMENU              1000
 #define SHRG_RETURNCMD              0x0001
 #define SHRG_NOTIFYPARENT           0x0002
@@ -613,6 +614,29 @@ extern "C" {
     } SHRGINFO, *PSHRGINFO;
 
     DWORD SHRecognizeGesture(SHRGINFO *shrg);
+
+    typedef enum tagSIPSTATE
+    {
+        SIP_UP = 0,
+        SIP_DOWN,
+        SIP_FORCEDOWN,
+        SIP_UNCHANGED,
+        SIP_INPUTDIALOG,
+    } SIPSTATE;
+
+    BOOL SHSipPreference(HWND, SIPSTATE);
+
+    BOOL SHSipInfo(UINT, UINT, PVOID, UINT);
+
+    typedef struct
+    {
+        DWORD cbSize;
+        DWORD fdwFlags;
+        RECT rcVisibleDesktop;
+        RECT rcSipRect;
+        DWORD dwImDataSize;
+        VOID *pvImData;
+    } SIPINFO;
 }
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
@@ -620,6 +644,9 @@ extern "C" {
 #   define SHInitDialog(a)
 #   define SHCreateMenuBar(a) 1
 #   define SHRecognizeGesture(a) 0
+#   define SHSipPreference(a,b)
+
+#   define SHSipInfo(a,b,c,d) 0
 #endif
 
 #endif //WINCE_RESOURCE

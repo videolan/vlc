@@ -51,23 +51,25 @@
  * Constructor.
  *****************************************************************************/
 
-Messages::Messages( intf_thread_t *_p_intf, HINSTANCE _hInst )
+Messages::Messages( intf_thread_t *p_intf, CBaseWindow *p_parent,
+                    HINSTANCE h_inst )
+  :  CBaseWindow( p_intf, p_parent, h_inst )
 {
     /* Initializations */
-    p_intf = _p_intf;
-    hInst = _hInst;
     hListView = NULL;
-    b_verbose = VLC_FALSE;
+
+    hWnd = CreateWindow( _T("VLC WinCE"), _T("Messages"),
+                         WS_POPUP|WS_CAPTION|WS_SYSMENU|WS_SIZEBOX,
+                         0, 0, /*CW_USEDEFAULT*/300, /*CW_USEDEFAULT*/300,
+                         p_parent->GetHandle(), NULL, h_inst, (void *)this );
 }
 
 /***********************************************************************
-
 FUNCTION: 
   WndProc
 
 PURPOSE: 
   Processes messages sent to the main window.
-
 ***********************************************************************/
 LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
@@ -80,37 +82,45 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
     switch( msg )
     {
-    case WM_INITDIALOG: 
+    case WM_CREATE:
         shidi.dwMask = SHIDIM_FLAGS;
         shidi.dwFlags = SHIDIF_DONEBUTTON | SHIDIF_SIPDOWN |
             SHIDIF_FULLSCREENNOMENUBAR;//SHIDIF_SIZEDLGFULLSCREEN;
         shidi.hDlg = hwnd;
         SHInitDialog( &shidi );
 
-        RECT rect; 
-        GetClientRect( hwnd, &rect );
         hListView = CreateWindow( WC_LISTVIEW, NULL,
                                   WS_VISIBLE | WS_CHILD | LVS_REPORT |
                                   LVS_SHOWSELALWAYS | WS_VSCROLL | WS_HSCROLL |
-                                  WS_BORDER /*| LVS_NOCOLUMNHEADER */,
-                                  rect.left + 20, rect.top + 50, 
-                                  rect.right - rect.left - ( 2 * 20 ), 
-                                  rect.bottom - rect.top - 50 - 20, 
+                                  WS_BORDER | LVS_NOCOLUMNHEADER, 0, 0, 0, 0,
                                   hwnd, NULL, hInst, NULL );            
         ListView_SetExtendedListViewStyle( hListView, LVS_EX_FULLROWSELECT );
 
         LVCOLUMN lv;
-        lv.mask = LVCF_WIDTH | LVCF_FMT | LVCF_TEXT;
+        lv.mask = LVCF_FMT;
         lv.fmt = LVCFMT_LEFT ;
-        GetClientRect( hwnd, &rect );
-        lv.cx = rect.right - rect.left;
-        lv.pszText = _T("Messages");
-        lv.cchTextMax = 9;
-        ListView_InsertColumn( hListView, 0, &lv);
+        ListView_InsertColumn( hListView, 0, &lv );
 
         SetTimer( hwnd, 1, 500 /*milliseconds*/, NULL );
+        break;
 
-        SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
+    case WM_WINDOWPOSCHANGED:
+        {
+            RECT rect;
+            if( !GetClientRect( hwnd, &rect ) ) break;
+            SetWindowPos( hListView, 0, 0, 0,
+                          rect.right - rect.left, rect.bottom - rect.top, 0 );
+
+            LVCOLUMN lv;
+            lv.cx = rect.right - rect.left;
+            lv.mask = LVCF_WIDTH;
+            ListView_SetColumn( hListView, 0, &lv );
+        }
+        break;
+
+    case WM_SETFOCUS:
+        SHSipPreference( hwnd, SIP_DOWN ); 
+        SHFullScreen( hwnd, SHFS_HIDESIPBUTTON );
         break;
 
     case WM_TIMER:
@@ -118,14 +128,14 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         break;
 
     case WM_CLOSE:
-        EndDialog( hwnd, LOWORD( wp ) );
-        break;
+        Show( FALSE );
+        return TRUE;
 
     case WM_COMMAND:
         switch( LOWORD(wp) )
         {
         case IDOK:
-            EndDialog( hwnd, LOWORD( wp ) );
+            Show( FALSE );
             break;
 
         case IDCLEAR:
@@ -167,8 +177,6 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
                     CloseHandle(fichier);
                 }
             }
-
-            SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
             break;
 
         default:
@@ -179,7 +187,7 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         break;
     }
 
-    return FALSE;
+    return DefWindowProc( hwnd, msg, wp, lp );
 }
 
 void Messages::UpdateLog()
@@ -197,27 +205,29 @@ void Messages::UpdateLog()
         for( i_start = p_sub->i_start; i_start != i_stop;
              i_start = (i_start+1) % VLC_MSG_QSIZE )
         {
-            if( !b_verbose && VLC_MSG_ERR != p_sub->p_msg[i_start].i_type )
-                continue;
+            switch( p_sub->p_msg[i_start].i_type )
+            {
+            case VLC_MSG_ERR:
+            case VLC_MSG_INFO:
+                if( p_intf->p_libvlc->i_verbose < 0 ) continue;
+                break;
+            case VLC_MSG_WARN:
+                if( p_intf->p_libvlc->i_verbose < 1 ) continue;
+                break;
+            case VLC_MSG_DBG:
+                if( p_intf->p_libvlc->i_verbose < 2 ) continue;
+                break;
+            }
 
             /* Append all messages to log window */
             debug = p_sub->p_msg[i_start].psz_module;
         
             switch( p_sub->p_msg[i_start].i_type )
             {
-            case VLC_MSG_INFO:
-                debug += ": ";
-                break;
-            case VLC_MSG_ERR:
-                debug += " error: ";
-                break;
-            case VLC_MSG_WARN:
-                debug += " warning: ";
-                break;
-            case VLC_MSG_DBG:
-            default:
-                debug += " debug: ";
-                break;
+            case VLC_MSG_INFO: debug += ": "; break;
+            case VLC_MSG_ERR: debug += " error: "; break;
+            case VLC_MSG_WARN: debug += " warning: "; break;
+            default: debug += " debug: "; break;
             }
 
             /* Add message */

@@ -46,13 +46,12 @@
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-ItemInfoDialog::ItemInfoDialog( intf_thread_t *_p_intf,
-                                HINSTANCE _hInst,
+ItemInfoDialog::ItemInfoDialog( intf_thread_t *p_intf, CBaseWindow *p_parent,
+                                HINSTANCE h_inst,
                                 playlist_item_t *_p_item )
+  :  CBaseWindow( p_intf, p_parent, h_inst )
 {
     /* Initializations */
-    p_intf = _p_intf;
-    hInst = _hInst;
     p_item = _p_item;
 }
 
@@ -152,6 +151,11 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
     case WM_CLOSE:
         EndDialog( hwnd, LOWORD( wp ) );
+        break;
+
+    case WM_SETFOCUS:
+        SHSipPreference( hwnd, SIP_DOWN ); 
+        SHFullScreen( hwnd, SHFS_HIDESIPBUTTON );
         break;
 
     case WM_COMMAND:

@@ -46,11 +46,10 @@
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, HINSTANCE _hInst )
+SubsFileDialog::SubsFileDialog( intf_thread_t *p_intf, CBaseWindow *p_parent,
+                                HINSTANCE h_inst )
+  :  CBaseWindow( p_intf, p_parent, h_inst )
 {
-    /* Initializations */
-    p_intf = _p_intf;
-    hInst = _hInst;
 }
 
 /***********************************************************************
@@ -223,6 +222,10 @@ LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         EndDialog( hwnd, LOWORD( wp ) );
         break;
 
+    case WM_SETFOCUS:
+        SHFullScreen( hwnd, SHFS_SHOWSIPBUTTON );
+        break;
+
     case WM_COMMAND:
         if ( LOWORD(wp) == IDOK )
         {
@@ -278,38 +281,30 @@ LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 /*****************************************************************************
  * Events methods.
  *****************************************************************************/
+static void OnOpenCB( intf_dialog_args_t *p_arg )
+{
+    SubsFileDialog *p_this = (SubsFileDialog *)p_arg->p_arg;
+
+    if( p_arg->i_results && p_arg->psz_results[0] )
+    {
+        SetWindowText( p_this->file_combo, _FROMMB(p_arg->psz_results[0]) );
+        ComboBox_AddString( p_this->file_combo,
+                            _FROMMB(p_arg->psz_results[0]) );
+        if( ComboBox_GetCount( p_this->file_combo ) > 10 )
+            ComboBox_DeleteString( p_this->file_combo, 0 );
+    }
+}
+
 void SubsFileDialog::OnFileBrowse()
 {
-    OPENFILENAME ofn;
-    TCHAR DateiName[80+1] = _T("\0");
-    static TCHAR szFilter[] = _T("All (*.*)\0*.*\0");
+    intf_dialog_args_t *p_arg =
+        (intf_dialog_args_t *)malloc( sizeof(intf_dialog_args_t) );
+    memset( p_arg, 0, sizeof(intf_dialog_args_t) );
 
-    memset(&ofn, 0, sizeof(OPENFILENAME));
-    ofn.lStructSize = sizeof (OPENFILENAME);
-    ofn.hwndOwner = NULL;
-    ofn.hInstance = hInst;
-    ofn.lpstrFilter = szFilter;
-    ofn.lpstrCustomFilter = NULL;
-    ofn.nMaxCustFilter = 0;
-    ofn.nFilterIndex = 1;
-    ofn.lpstrFile = (LPTSTR) DateiName;
-    ofn.nMaxFile = 80;
-    ofn.lpstrFileTitle = NULL;
-    ofn.nMaxFileTitle = 40;
-    ofn.lpstrInitialDir = NULL;
-    ofn.lpstrTitle = _T("Open File");
-    ofn.Flags = 0;
-    ofn.nFileOffset = 0;
-    ofn.nFileExtension = 0;
-    ofn.lpstrDefExt = NULL;
-    ofn.lCustData = 0L;
-    ofn.lpfnHook = NULL;
-    ofn.lpTemplateName = NULL;
-    if( GetOpenFile( &ofn ) )
-    {
-        SetWindowText( file_combo, ofn.lpstrFile );
-        ComboBox_AddString( file_combo, ofn.lpstrFile );
-        if( ComboBox_GetCount( file_combo ) > 10 )
-            ComboBox_DeleteString( file_combo, 0 );
-    }
+    p_arg->psz_title = strdup( "Open file" );
+    p_arg->psz_extensions = strdup( "All|*.*" );
+    p_arg->p_arg = this;
+    p_arg->pf_callback = OnOpenCB;
+
+    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE_GENERIC, 0, p_arg);
 }

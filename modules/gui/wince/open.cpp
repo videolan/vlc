@@ -33,11 +33,10 @@
 
 #include "wince.h"
 
-#include <winuser.h>
-#include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include <shlobj.h>
 
 /*****************************************************************************
  * Event Table.
@@ -73,15 +72,13 @@ enum
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-OpenDialog::OpenDialog( intf_thread_t *_p_intf, HINSTANCE _hInst,
-                        int _i_access_method, int _i_arg, int _i_method )
+OpenDialog::OpenDialog( intf_thread_t *p_intf, CBaseWindow *p_parent,
+                        HINSTANCE h_inst, int _i_access, int _i_arg )
+  :  CBaseWindow( p_intf, p_parent, h_inst )
 {
     /* Initializations */
-    p_intf = _p_intf;
-    hInst = _hInst;
-    i_current_access_method = _i_access_method;
+    i_access = _i_access;
     i_open_arg = _i_arg;
-    i_method = _i_method;
 
     for( int i = 0; i < 4; i++ )
     {
@@ -94,6 +91,11 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, HINSTANCE _hInst,
         net_addrs_label[i] = 0;
         net_addrs[i] = 0;
     }
+
+    CreateWindow( _T("VLC WinCE"), _T("Messages"),
+                  WS_POPUP|WS_CAPTION|WS_SYSMENU|WS_SIZEBOX,
+                  0, 0, /*CW_USEDEFAULT*/300, /*CW_USEDEFAULT*/300,
+                  p_parent->GetHandle(), NULL, h_inst, (void *)this );
 }
 
 /***********************************************************************
@@ -108,35 +110,17 @@ PURPOSE:
 LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
     SHINITDLGINFO shidi;
-    SHMENUBARINFO mbi;
     INITCOMMONCONTROLSEX  iccex;  // INITCOMMONCONTROLSEX structure    
     RECT rcClient;
     TC_ITEM tcItem;
 
     switch( msg )
     {
-    case WM_INITDIALOG: 
+    case WM_CREATE:
         shidi.dwMask = SHIDIM_FLAGS;
-        shidi.dwFlags = SHIDIF_DONEBUTTON | SHIDIF_SIPDOWN |
-            SHIDIF_FULLSCREENNOMENUBAR;//SHIDIF_SIZEDLGFULLSCREEN;
+        shidi.dwFlags = SHIDIF_DONEBUTTON | SHIDIF_FULLSCREENNOMENUBAR;
         shidi.hDlg = hwnd;
         SHInitDialog( &shidi );
-
-        //Create the menubar.
-        memset( &mbi, 0, sizeof(SHMENUBARINFO) );
-        mbi.cbSize     = sizeof(SHMENUBARINFO);
-        mbi.hwndParent = hwnd;
-        mbi.dwFlags    = SHCMBF_EMPTYBAR;
-        mbi.hInstRes   = hInst;
-
-        if( !SHCreateMenuBar( &mbi ) )
-        {
-            MessageBox( hwnd, _T("SHCreateMenuBar failed"),
-                        _T("Error"), MB_OK );
-            //return -1;
-        }
-
-        hwndCB = mbi.hwndMB;
 
         // Get the client area rect to put the panels in
         GetClientRect( hwnd, &rcClient );
@@ -183,7 +167,7 @@ LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         tcItem.pszText = _T("Network");
         TabCtrl_InsertItem( notebook, 1, &tcItem );
 
-        switch( i_current_access_method )
+        switch( i_access )
         {
         case FILE_ACCESS:
             TabCtrl_SetCurSel( notebook, 0 );
@@ -200,14 +184,19 @@ LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         break;
 
     case WM_CLOSE:
-        EndDialog( hwnd, LOWORD( wp ) );
+        Show( FALSE );
+        return TRUE;
+
+    case WM_SETFOCUS:
+        SHFullScreen( hwnd, SHFS_SHOWSIPBUTTON );
+        SHSipPreference( hwnd, SIP_DOWN ); 
         break;
 
     case WM_COMMAND:
         if( LOWORD(wp) == IDOK )
         {
             OnOk();
-            EndDialog( hwnd, LOWORD( wp ) );
+            Show( FALSE );
             break;
         }
         if( HIWORD(wp) == BN_CLICKED )
@@ -232,7 +221,6 @@ LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
                 OnSubsFileSettings( hwnd );
             } else if( (HWND)lp == browse_button )
             {
-                SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
                 OnFileBrowse();
             } 
             break;
@@ -273,7 +261,7 @@ LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         break;
     }
 
-    return FALSE;
+    return DefWindowProc( hwnd, msg, wp, lp );
 }
 
 /*****************************************************************************
@@ -281,8 +269,8 @@ LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
  *****************************************************************************/
 void OpenDialog::FilePanel( HWND hwnd )
 {
-    RECT rc;    
-    GetWindowRect( notebook, &rc);
+    RECT rc;
+    GetWindowRect( notebook, &rc );
 
     /* Create browse file line */
     file_combo = CreateWindow( _T("COMBOBOX"), _T(""),
@@ -325,7 +313,7 @@ void OpenDialog::FilePanel( HWND hwnd )
 }
 
 void OpenDialog::NetPanel( HWND hwnd )
-{  
+{
     INITCOMMONCONTROLSEX ic;
     TCHAR psz_text[256];
 
@@ -343,7 +331,7 @@ void OpenDialog::NetPanel( HWND hwnd )
         { _T("RTSP"), 30 }
     };
 
-    RECT rc;    
+    RECT rc;
     GetWindowRect( notebook, &rc);
 
     /* UDP/RTP row */
@@ -474,7 +462,7 @@ void OpenDialog::NetPanel( HWND hwnd )
 
 void OpenDialog::UpdateMRL()
 {
-    UpdateMRL( i_current_access_method );
+    UpdateMRL( i_access );
 }
 
 void OpenDialog::UpdateMRL( int i_access_method )
@@ -483,7 +471,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
     TCHAR psz_text[2048];
     char psz_tmp[256];
 
-    i_current_access_method = i_access_method;
+    i_access = i_access_method;
 
     switch( i_access_method )
     {
@@ -567,7 +555,7 @@ void OpenDialog::OnPageChange()
         SetWindowPos( subsfile_button, HWND_TOP, 0, 0, 0, 0,
                       SWP_NOMOVE | SWP_NOSIZE );
 
-        i_current_access_method = FILE_ACCESS;
+        i_access = FILE_ACCESS;
     }
     else if ( TabCtrl_GetCurSel( notebook ) == 1 )
     {
@@ -599,7 +587,7 @@ void OpenDialog::OnPageChange()
 
         SendMessage( net_radios[0], BM_SETCHECK, BST_CHECKED, 0 );
 
-        i_current_access_method = NET_ACCESS;
+        i_access = NET_ACCESS;
     }
 
     UpdateMRL();
@@ -675,51 +663,42 @@ void OpenDialog::OnFilePanelChange()
     UpdateMRL( FILE_ACCESS );
 }
 
-void OpenDialog::OnFileBrowse()
-{       
-    OPENFILENAME ofn;
-    static TCHAR szFilter[] = _T("All (*.*)\0*.*\0");
-    TCHAR psz_file[PATH_MAX] = _T("\0");
-    TCHAR psz_tmp[PATH_MAX+2] = _T("\0");
+static void OnOpenCB( intf_dialog_args_t *p_arg )
+{
+    OpenDialog *p_this = (OpenDialog *)p_arg->p_arg;
+    char psz_tmp[PATH_MAX+2] = "\0";
 
-    memset(&ofn, 0, sizeof(OPENFILENAME));
-    ofn.lStructSize = sizeof (OPENFILENAME);
-    ofn.hwndOwner = NULL;
-    ofn.hInstance = hInst;
-    ofn.lpstrFilter = szFilter;
-    ofn.lpstrCustomFilter = NULL;
-    ofn.nMaxCustFilter = 0;
-    ofn.nFilterIndex = 1;     
-    ofn.lpstrFile = psz_file; 
-    ofn.nMaxFile = PATH_MAX;
-    ofn.lpstrFileTitle = NULL; 
-    ofn.nMaxFileTitle = 40;
-    ofn.lpstrInitialDir = NULL;
-    ofn.lpstrTitle = _T("Open File");
-    ofn.Flags = 0;
-    ofn.nFileOffset = 0;
-    ofn.nFileExtension = 0;
-    ofn.lpstrDefExt = NULL;
-    ofn.lCustData = 0L;
-    ofn.lpfnHook = NULL;
-    ofn.lpTemplateName = NULL;
-    if( GetOpenFile( &ofn ) )
+    if( p_arg->i_results && p_arg->psz_results[0] )
     {
-        if( _tcschr( ofn.lpstrFile, _T(' ') ) )
+        if( strchr( p_arg->psz_results[0], ' ' ) )
         {
-            _tcscat( psz_tmp, _T("\"") );
-            _tcscat( psz_tmp, ofn.lpstrFile );
-            _tcscat( psz_tmp, _T("\"") );
+            strcat( psz_tmp, "\"" );
+            strcat( psz_tmp, p_arg->psz_results[0] );
+            strcat( psz_tmp, "\"" );
         }
-        else _tcscat( psz_tmp, ofn.lpstrFile );
+        else strcat( psz_tmp, p_arg->psz_results[0] );
 
-        SetWindowText( file_combo, psz_tmp );
-        ComboBox_AddString( file_combo, psz_tmp );
-        if( ComboBox_GetCount( file_combo ) > 10 ) 
-            ComboBox_DeleteString( file_combo, 0 );
+        SetWindowText( p_this->file_combo, _FROMMB(psz_tmp) );
+        ComboBox_AddString( p_this->file_combo, _FROMMB(psz_tmp) );
+        if( ComboBox_GetCount( p_this->file_combo ) > 10 ) 
+            ComboBox_DeleteString( p_this->file_combo, 0 );
 
-        UpdateMRL( FILE_ACCESS );
+        p_this->UpdateMRL( FILE_ACCESS );
     }
+}
+
+void OpenDialog::OnFileBrowse()
+{
+    intf_dialog_args_t *p_arg =
+        (intf_dialog_args_t *)malloc( sizeof(intf_dialog_args_t) );
+    memset( p_arg, 0, sizeof(intf_dialog_args_t) );
+
+    p_arg->psz_title = strdup( "Open file" );
+    p_arg->psz_extensions = strdup( "All (*.*)|*.*" );
+    p_arg->p_arg = this;
+    p_arg->pf_callback = OnOpenCB;
+
+    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE_GENERIC, 0, p_arg);
 }
 
 /*****************************************************************************
@@ -818,7 +797,7 @@ void OpenDialog::OnSubsFileSettings( HWND hwnd )
 {
 
     /* Show/hide the open dialog */
-    SubsFileDialog *subsfile_dialog = new SubsFileDialog( p_intf, hInst );
+    SubsFileDialog *subsfile_dialog = new SubsFileDialog( p_intf, this, hInst);
     CreateDialogBox(  hwnd, subsfile_dialog );
 
     subsfile_mrl.clear();
