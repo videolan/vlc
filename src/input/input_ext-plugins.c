@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.25 2002/12/06 10:10:39 sam Exp $
+ * $Id: input_ext-plugins.c,v 1.26 2002/12/12 11:29:58 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -479,6 +479,7 @@ ssize_t input_FillBuffer( input_thread_t * p_input )
                        i_remains + p_input->i_bufsize );
     if( p_buf == NULL )
     {
+        vlc_mutex_unlock( &p_input->p_method_data->lock );
         msg_Err( p_input, "failed allocating a new buffer (decoder stuck?)" );
         return -1;
     }
