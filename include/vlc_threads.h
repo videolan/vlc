@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_threads.h,v 1.6 2002/07/29 19:05:47 gbazin Exp $
+ * $Id: vlc_threads.h,v 1.7 2002/07/30 07:56:40 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -580,7 +580,7 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
         /* Increase our wait count */
         p_condvar->i_waiting_threads++;
 
-        if( p_condvar->SignalObjectAndWait )
+        if( p_condvar->SignalObjectAndWait && p_mutex->mutex )
         /* It is only possible to atomically release the mutex and initiate the
          * waiting on WinNT/2K/XP. Win9x doesn't have SignalObjectAndWait(). */
             p_condvar->SignalObjectAndWait( p_mutex->mutex,
@@ -591,6 +591,8 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
             LeaveCriticalSection( &p_mutex->csection );
             WaitForSingleObject( p_condvar->event, INFINITE );
         }
+
+        p_condvar->i_waiting_threads--;
     }
     else if( p_condvar->i_win9x_cv == 1 )
     {
