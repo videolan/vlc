@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.2 2002/08/04 18:39:41 sam Exp $
+ * $Id: ffmpeg.c,v 1.3 2002/08/04 22:13:05 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -43,6 +43,9 @@
 #endif
 
 #include "avcodec.h"                                            /* ffmpeg */
+
+#include "postprocessing/postprocessing.h"
+
 #include "ffmpeg.h"
 
 /*
@@ -71,7 +74,17 @@ static int      b_ffmpeginit = 0;
     "Allow the decoder to partially decode or skip frame(s) " \
     "when there not enough time.\n It's usefull with low CPU power " \
     "but it could produce broken pictures."
+
+#define POSTPROCESSING_Q_LONGTEXT \
+    "Quality of post processing\n"\
+    "Valid range is 0 to 6\n" \
+    "( Overridden by others setting)"
     
+#define POSTPROCESSING_AQ_LONGTEXT \
+    "Post processing quality is selected upon time left" \
+    "but no more than requested quality\n" \
+    "Not yet implemented !"
+
 vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL );
 #if LIBAVCODEC_BUILD >= 4611
@@ -81,6 +94,33 @@ vlc_module_begin();
                   "workaround bugs", "0-99, seems to be for msmpeg v3\n"  );
 #endif
     add_bool( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT );
+    
+    add_category_hint( N_("Post processing"), NULL );
+    add_module( "ffmpeg-pp", "postprocessing",NULL, NULL,
+                N_( "ffmpeg postprocessing module" ), NULL ); 
+    add_integer( "ffmpeg-pp-q", 0, NULL,
+                 "Post processing quality", POSTPROCESSING_Q_LONGTEXT );
+    add_bool( "ffmpeg-pp-auto", 0, NULL,
+              "Auto-level Post processing quality", POSTPROCESSING_AQ_LONGTEXT );
+    add_bool( "ffmpeg-db-yv", 0, NULL, 
+              "force vertical luminance deblocking", 
+              "force vertical luminance deblocking (override other settings)" );
+    add_bool( "ffmpeg-db-yh", 0, NULL, 
+              "force horizontal luminance deblocking",
+              "force horizontal luminance deblocking (override other settings)" );
+    add_bool( "ffmpeg-db-cv", 0, NULL, 
+              "force vertical chrominance deblocking",
+              "force vertical chrominance deblocking (override other settings)" );
+    add_bool( "ffmpeg-db-ch", 0, NULL, 
+              "force horizontal chrominance deblocking",
+              "force horizontal chrominance deblocking (override other settings) " );
+    add_bool( "ffmpeg-dr-y", 0, NULL,
+              "force luminance deringing",
+              "force luminance deringing (override other settings)" );
+    add_bool( "ffmpeg-dr-c", 0, NULL,
+              "force chrominance deringing",
+              "force chrominance deringing (override other settings)" );
+      
     set_description( _("ffmpeg video decoder((MS)MPEG4,SVQ1,H263)") );
     set_capability( "decoder", 70 );
     set_callbacks( OpenDecoder, NULL );
@@ -161,6 +201,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     (  *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) + \
       ( *((u8*)(p)+2) << 16 ) + ( *((u8*)(p)+3) << 24 ) )
 
+#define FREE( p ) if( p ) free( p ); p = NULL
+    
 static void ffmpeg_ParseBitMapInfoHeader( bitmapinfoheader_t *p_bh, 
                                           u8 *p_data )
 {
@@ -179,8 +221,14 @@ static void ffmpeg_ParseBitMapInfoHeader( bitmapinfoheader_t *p_bh,
     if( p_bh->i_size > 40 )
     {
         p_bh->i_data = p_bh->i_size - 40;
-        p_bh->p_data = malloc( p_bh->i_data ); 
-        memcpy( p_bh->p_data, p_data + 40, p_bh->i_data );
+        if( ( p_bh->p_data = malloc( p_bh->i_data ) ) )
+        {
+            memcpy( p_bh->p_data, p_data + 40, p_bh->i_data );
+        }
+        else
+        {
+            p_bh->i_data = 0;
+        }
     }
     else
     {
@@ -261,7 +309,21 @@ static inline void __GetFrame( videodec_thread_t *p_vdec )
         return;    
     }
     /* get a buffer and gather all data packet */
-    p_vdec->p_framedata = p_buffer = malloc( p_pes->i_pes_size );
+    if( p_vdec->i_buffer_size < p_pes->i_pes_size )
+    {
+        if( p_vdec->p_buffer )
+        {
+            p_vdec->p_buffer = realloc( p_vdec->p_buffer,
+                                        p_pes->i_pes_size );
+        }
+        else
+        {
+            p_vdec->p_buffer = malloc( p_pes->i_pes_size );
+        }
+        p_vdec->i_buffer_size = p_pes->i_pes_size;
+    }
+    
+    p_buffer = p_vdec->p_framedata = p_vdec->p_buffer;
     p_data = p_pes->p_first;
     do
     {
@@ -274,56 +336,11 @@ static inline void __GetFrame( videodec_thread_t *p_vdec )
 
 static inline void __NextFrame( videodec_thread_t *p_vdec )
 {
-    pes_packet_t  *p_pes;
-
-    p_pes = __PES_GET( p_vdec->p_fifo );
-    if( p_pes->i_nb_data != 1 )
-    {
-        free( p_vdec->p_framedata ); /* FIXME keep this buffer */
-    }
     __PES_NEXT( p_vdec->p_fifo );
 }
 
-/* FIXME FIXME some of them are wrong */
-static int i_ffmpeg_PixFmtToChroma[] = 
-{
-/* PIX_FMT_ANY = -1,PIX_FMT_YUV420P, PIX_FMT_YUV422,
-   PIX_FMT_RGB24, PIX_FMT_BGR24, PIX_FMT_YUV422P, 
-   PIX_FMT_YUV444P, PIX_FMT_YUV410P */
 
-    0, VLC_FOURCC('I','4','2','0'), VLC_FOURCC('I','4','2','0'), 
-    VLC_FOURCC('R','V','2','4'), 0, VLC_FOURCC('Y','4','2','2'), 
-    VLC_FOURCC('I','4','4','4'), 0 
-};
-
-static inline u32 ffmpeg_PixFmtToChroma( int i_ffmpegchroma )
-{
-    if( ++i_ffmpegchroma > 7 )
-    {
-        return( 0 );
-    }
-    else
-    {
-        return( i_ffmpeg_PixFmtToChroma[i_ffmpegchroma] );
-    }
-}
-
-static inline int ffmpeg_FfAspect( int i_width, int i_height, int i_ffaspect )
-{
-    switch( i_ffaspect )
-    {
-        case( FF_ASPECT_4_3_625 ):
-        case( FF_ASPECT_4_3_525 ):
-            return( VOUT_ASPECT_FACTOR * 4 / 3);
-        case( FF_ASPECT_16_9_625 ):
-        case( FF_ASPECT_16_9_525 ):
-            return( VOUT_ASPECT_FACTOR * 16 / 9 );
-        case( FF_ASPECT_SQUARE ):
-        default:
-            return( VOUT_ASPECT_FACTOR * i_width / i_height );
-    }
-}
-
+/* Check if we have a Vout with good parameters */
 static int ffmpeg_CheckVout( vout_thread_t *p_vout,
                              int i_width,
                              int i_height,
@@ -414,13 +431,17 @@ static vout_thread_t *ffmpeg_CreateVout( videodec_thread_t *p_vdec,
     {
         msg_Dbg( p_vdec->p_fifo, "no vout present, spawning one" );
     
-        p_vout = vout_CreateThread( p_vdec->p_fifo,
-                                    i_width,
-                                    i_height,
-                                    i_chroma,
-                                    i_aspect );
+        if( !( p_vout = vout_CreateThread( p_vdec->p_fifo,
+                                         i_width,
+                                         i_height,
+                                         i_chroma,
+                                         i_aspect ) ) )
+        {
+            return( NULL ); /* everythings have failed */
+        }
     }
-
+    /* up to now, all this stuff is used for post-processing */
+    
     return( p_vout );
 }
 
@@ -429,7 +450,6 @@ static vout_thread_t *ffmpeg_CreateVout( videodec_thread_t *p_vdec,
    or said to me how write a better thing
    FIXME FIXME FIXME
 */
-
 static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
                                              AVPicture *p_avpicture,
                                              videodec_thread_t   *p_vdec )
@@ -527,9 +547,9 @@ static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
 
 }
 
-static void ffmpeg_ConvertPicture( picture_t *p_pic,
-                                   AVPicture *p_avpicture,
-                                   videodec_thread_t   *p_vdec )
+static void ffmpeg_GetPicture( picture_t *p_pic,
+                               AVPicture *p_avpicture,
+                               videodec_thread_t   *p_vdec )
 {
     int i_plane; 
     int i_size;
@@ -539,10 +559,9 @@ static void ffmpeg_ConvertPicture( picture_t *p_pic,
     u8  *p_src;
     int i_src_stride;
     int i_dst_stride;
-    
+
     if( ffmpeg_PixFmtToChroma( p_vdec->p_context->pix_fmt ) )
     {
-        /* convert ffmpeg picture to our format */
         for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
             p_src  = p_avpicture->data[i_plane];
@@ -558,22 +577,40 @@ static void ffmpeg_ConvertPicture( picture_t *p_pic,
                 p_dst += i_dst_stride;
             }
         }
-        return;
+        if( ( p_vdec->i_pp_mode )&&
+            ( ( p_vdec->p_vout->render.i_chroma == 
+                    VLC_FOURCC( 'I','4','2','0' ) )||
+              ( p_vdec->p_vout->render.i_chroma == 
+                    VLC_FOURCC( 'Y','V','1','2' ) ) ) )
+        {
+            /* Make postproc */
+#if LIBAVCODEC_BUILD > 4313
+            p_vdec->p_pp->pf_postprocess( p_pic,
+                                          p_vdec->p_context->quant_store, 
+                                          p_vdec->p_context->qstride,
+                                          p_vdec->i_pp_mode );
+#endif
+        }
     }
-
-    /* we need to convert to I420 */
-    switch( p_vdec->p_context->pix_fmt )
+    else
     {
+        /* we need to convert to I420 */
+        switch( p_vdec->p_context->pix_fmt )
+        {
 #if LIBAVCODEC_BUILD >= 4615
-        case( PIX_FMT_YUV410P ):
-            ffmpeg_ConvertPictureI410toI420( p_pic, p_avpicture, p_vdec );
-            break;
+            case( PIX_FMT_YUV410P ):
+                ffmpeg_ConvertPictureI410toI420( p_pic, p_avpicture, p_vdec );
+                break;
 #endif            
-        default:
-            p_vdec->p_fifo->b_error =1;
-            break;
+            default:
+                p_vdec->p_fifo->b_error = 1;
+                break;
+        }
+
     }
+  
 }
+
 
 
 /*****************************************************************************
@@ -585,15 +622,19 @@ static void ffmpeg_ConvertPicture( picture_t *p_pic,
 /*****************************************************************************
  * InitThread: initialize vdec output thread
  *****************************************************************************
- * This function is called from RunDecoderoder and performs the second step 
+ * This function is called from decoder_Run and performs the second step 
  * of the initialization. It returns 0 on success. Note that the thread's 
  * flag are not modified inside this function.
+ *
+ * ffmpeg codec will be open, some memory allocated. But Vout is not yet
+ *   open (done after the first decoded frame)
  *****************************************************************************/
-
 static int InitThread( videodec_thread_t *p_vdec )
 {
     int i_ffmpeg_codec; 
     int i_tmp;
+    int i_use_pp;
+    
     
     if( p_vdec->p_fifo->p_demux_data )
     {
@@ -605,7 +646,7 @@ static int InitThread( videodec_thread_t *p_vdec )
         msg_Warn( p_vdec->p_fifo, "display informations missing" );
     }
 
-    /*init ffmpeg */
+    /* **** init ffmpeg library (libavcodec) ***** */
     if( !b_ffmpeginit )
     {
         avcodec_init();
@@ -617,6 +658,8 @@ static int InitThread( videodec_thread_t *p_vdec )
     {
         msg_Dbg( p_vdec->p_fifo, "library ffmpeg already initialized" );
     }
+
+    /* ***** Search for codec ***** */
     ffmpeg_GetFfmpegCodec( p_vdec->p_fifo->i_fourcc,
                            &i_ffmpeg_codec,
                            &p_vdec->psz_namecodec );
@@ -630,24 +673,14 @@ static int InitThread( videodec_thread_t *p_vdec )
         return( -1 );
     }
 
+    /* ***** Fill p_context with init values ***** */
     p_vdec->p_context = &p_vdec->context;
     memset( p_vdec->p_context, 0, sizeof( AVCodecContext ) );
 
     p_vdec->p_context->width  = p_vdec->format.i_width;
     p_vdec->p_context->height = p_vdec->format.i_height;
     
-/*  XXX
-    p_vdec->p_context->workaround_bugs 
-      --> seems to be for msmpeg 3 but can't know what is supposed to do
-
-    p_vdec->p_context->strict_std_compliance
-      --> strictly follow mpeg4 standard for decoder or encoder ??
-      
-    p_vdec->p_context->error_resilience
-      --> don't make error resilience, because of some ms encoder witch 
-      use some wrong VLC code.
-*/
-
+    /*  ***** Get configuration of ffmpeg plugin ***** */
 #if LIBAVCODEC_BUILD >= 4611
     i_tmp = config_GetInt( p_vdec->p_fifo, "ffmpeg-workaround-bugs" );
     p_vdec->p_context->workaround_bugs  = __MAX( __MIN( i_tmp, 99 ), 0 );
@@ -661,7 +694,105 @@ static int InitThread( videodec_thread_t *p_vdec )
         p_vdec->p_context->flags|= CODEC_FLAG_GRAY;
     }
 #endif
+    p_vdec->b_hurry_up = config_GetInt(p_vdec->p_fifo, "ffmpeg-hurry-up");
     
+    /* ***** Load for post processing ***** */
+
+    /* get overridden settings */
+    p_vdec->i_pp_mode = 0;
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-yv" ) )
+        p_vdec->i_pp_mode |= PP_DEBLOCK_Y_V;
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-yh" ) )
+        p_vdec->i_pp_mode |= PP_DEBLOCK_Y_H;
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-cv" ) )
+        p_vdec->i_pp_mode |= PP_DEBLOCK_C_V;
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-ch" ) )
+        p_vdec->i_pp_mode |= PP_DEBLOCK_C_H;
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-dr-y" ) )
+        p_vdec->i_pp_mode |= PP_DERING_Y;
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-dr-c" ) )
+        p_vdec->i_pp_mode |= PP_DERING_C;
+    
+    if( ( config_GetInt( p_vdec->p_fifo, "ffmpeg-pp-q" ) > 0 )||
+        ( p_vdec->i_pp_mode != 0 ) )
+    {
+        i_use_pp = 1;
+    }
+    else
+    {
+        i_use_pp = 0;
+    }
+
+    if( i_use_pp )
+    {
+        switch( i_ffmpeg_codec )
+        {
+#if LIBAVCODEC_BUILD > 4608
+            case( CODEC_ID_MSMPEG4V1 ):
+            case( CODEC_ID_MSMPEG4V2 ):
+            case( CODEC_ID_MSMPEG4V3 ):
+#else
+            case( CODEC_ID_MSMPEG4 ):
+#endif
+            case( CODEC_ID_MPEG4 ):
+            case( CODEC_ID_H263 ):
+//            case( CODEC_ID_H263P ): I don't use it up to now
+            case( CODEC_ID_H263I ):
+                /* Ok we can make postprocessing :)) */
+                break;
+            default:
+                p_vdec->i_pp_mode = 0;
+                i_use_pp = 0;
+                msg_Warn( p_vdec->p_fifo, 
+                          "Post processing unsupported for this codec" );
+                break;
+
+        }
+    }
+        
+    if( i_use_pp )
+    {
+#if LIBAVCODEC_BUILD > 4613
+        char *psz_name;
+
+        /* first try to get a postprocess module */
+        p_vdec->p_pp = vlc_object_create( p_vdec->p_fifo,
+                                          sizeof( postprocessing_t ) );
+        p_vdec->p_pp->psz_object_name = "postprocessing";
+
+        psz_name = config_GetPsz( p_vdec->p_pp, "ffmpeg-pp" );
+        p_vdec->p_pp->p_module = 
+            module_Need( p_vdec->p_pp, "postprocessing", psz_name );
+        FREE( psz_name );
+        if( !p_vdec->p_pp->p_module )
+        {
+            msg_Warn( p_vdec->p_fifo, "no suitable postprocessing module" );
+            vlc_object_destroy( p_vdec->p_pp );
+            p_vdec->p_pp = NULL;
+            p_vdec->i_pp_mode = 0;
+        }
+        else
+        {
+            /* get mode upon quality */
+            p_vdec->i_pp_mode |= 
+                p_vdec->p_pp->pf_getmode( config_GetInt( p_vdec->p_fifo, 
+                                                         "ffmpeg-pp-q" ),
+                                          config_GetInt( p_vdec->p_fifo,
+                                                         "ffmpeg-pp-auto" ) );
+                    
+            /* allocate table for postprocess */
+            p_vdec->p_context->quant_store = 
+                malloc( sizeof( int ) * ( MBR + 1 ) * ( MBC + 1 ) );
+            p_vdec->p_context->qstride = MBC + 1;
+        }
+#else
+        msg_Warn( p_vdec->p_fifo, 
+                  "post-processing not supported, upgrade ffmpeg" );
+        p_vdec->i_pp_mode = 0;
+#endif
+    }
+    
+    /* ***** Open the codec ***** */ 
     if (avcodec_open(p_vdec->p_context, p_vdec->p_codec) < 0)
     {
         msg_Err( p_vdec->p_fifo, "cannot open codec (%s)",
@@ -674,7 +805,7 @@ static int InitThread( videodec_thread_t *p_vdec )
                                  p_vdec->psz_namecodec );
     }
     
-    /* first give init data */
+    /* ***** init this codec with special data(up to now MPEG4 only) ***** */
     if( p_vdec->format.i_data )
     {
         AVPicture avpicture;
@@ -692,9 +823,6 @@ static int InitThread( videodec_thread_t *p_vdec )
                 break;
         }
     }
-    
-    /* This will be created after the first decoded frame */
-    p_vdec->p_vout = NULL;
     
     return( 0 );
 }
@@ -714,8 +842,8 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
        and send the image to the output */ 
 
     /* TODO implement it in a better way */
-
-    if( ( config_GetInt(p_vdec->p_fifo, "ffmpeg-hurry-up") )&&
+    /* A good idea could be to decode all I pictures and see for the other */
+    if( ( p_vdec->b_hurry_up )&&
         ( p_vdec->i_frame_late > 4 ) )
     {
 #if LIBAVCODEC_BUILD > 4603
@@ -735,7 +863,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
 #else
         if( p_vdec->i_frame_late < 8 )
         {
-            b_drawpicture = 0; /* not really good but .. */
+            b_drawpicture = 0; /* not really good but .. UPGRADE FFMPEG !! */
         }
         else
         {
@@ -809,7 +937,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
         }
     }
 
-    /* Send decoded frame to vout */
+    /* Get a new picture */
     while( !(p_pic = vout_CreatePicture( p_vdec->p_vout, 0, 0, 0 ) ) )
     {
         if( p_vdec->p_fifo->b_die || p_vdec->p_fifo->b_error )
@@ -818,13 +946,13 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
         }
         msleep( VOUT_OUTMEM_SLEEP );
     }
-    
-    ffmpeg_ConvertPicture( p_pic, 
-                           &avpicture, 
-                           p_vdec );
-    
+    /* fill p_picture_t from avpicture, do I410->I420 if needed
+       and do post-processing if requested */    
+    ffmpeg_GetPicture( p_pic, &avpicture, p_vdec );
 
     /* FIXME correct avi and use i_dts */
+
+    /* Send decoded frame to vout */
     vout_DatePicture( p_vdec->p_vout, p_pic, p_vdec->i_pts);
     vout_DisplayPicture( p_vdec->p_vout, p_pic );
     
@@ -840,13 +968,22 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
  *****************************************************************************/
 static void EndThread( videodec_thread_t *p_vdec )
 {
+    
     if( !p_vdec )
     {
         return;
     }
+    if( p_vdec->p_pp )
+    {
+        /* release postprocessing module */
+        module_Unneed( p_vdec->p_pp, p_vdec->p_pp->p_module );
+        vlc_object_destroy( p_vdec->p_pp );
+        p_vdec->p_pp = NULL;
+    }
 
     if( p_vdec->p_context != NULL)
     {
+        FREE( p_vdec->p_context->quant_store );
         avcodec_close( p_vdec->p_context );
         msg_Dbg( p_vdec->p_fifo, "ffmpeg codec (%s) stopped",
                                  p_vdec->psz_namecodec );
@@ -859,10 +996,9 @@ static void EndThread( videodec_thread_t *p_vdec )
         vlc_object_attach( p_vdec->p_vout, p_vdec->p_fifo->p_vlc );
     }
 
-    if( p_vdec->format.p_data != NULL)
-    {
-        free( p_vdec->format.p_data );
-    }
-    
+    FREE( p_vdec->format.p_data );
+    FREE( p_vdec->p_buffer );
+
     free( p_vdec );
 }
+
