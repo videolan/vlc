@@ -2,7 +2,7 @@
  * dv.c: a decoder for DV video
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dv.c,v 1.1 2002/11/05 14:52:28 sam Exp $
+ * $Id: dv.c,v 1.2 2002/11/06 09:26:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -267,6 +267,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
 
         if( p_vout )
         {
+            vlc_object_detach( p_vout );
             vout_DestroyThread( p_vout );
         }
     }

@@ -2,7 +2,7 @@
  * extras.c: Extra libc functions for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: extras.c,v 1.1 2002/07/05 11:18:56 sam Exp $
+ * $Id: extras.c,v 1.2 2002/11/06 09:26:25 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -33,9 +33,9 @@
 char *strndup( const char *string, size_t n )
 {
     char *psz;
-    size_t len;
+    size_t len = strlen( string );
 
-    len = __MIN( strlen( string ), n ); 
+    len = __MIN( len, n ); 
     psz = (char*)malloc( len + 1 );
 
     if( psz != NULL )

@@ -2,7 +2,7 @@
  * xvid.c: a decoder for libxvidcore, the Xvid video codec
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: xvid.c,v 1.1 2002/11/05 22:53:21 sam Exp $
+ * $Id: xvid.c,v 1.2 2002/11/06 09:26:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -48,12 +48,14 @@ vlc_module_begin();
     set_description( _("Xvid video decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );
+    add_bool( "xvid-direct-render", 0, NULL, "direct rendering", 
+              "Use libxvidcore's direct rendering feature." );
 vlc_module_end();
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
  *****************************************************************************
- * The fourcc format for DV is "dvsd"
+ * FIXME: find fourcc formats supported by xvid
  *****************************************************************************/
 static int OpenDecoder ( vlc_object_t *p_this )
 {
@@ -87,7 +89,9 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
     uint8_t *  p_buffer, * p_image;
     int        i_ret;
     int        i_width, i_height, i_chroma, i_aspect;
-    int        i_size, i_offset;
+    int        i_size, i_offset, i_image_size;
+
+    vlc_bool_t b_direct = config_GetInt( p_fifo, "xvid-direct-render" );
 
     if( InitBitstream( &bit_stream, p_fifo, NULL, NULL ) != VLC_SUCCESS )
     {
@@ -107,9 +111,11 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
 
     /* XXX: Completely arbitrary buffer size */
     i_size = i_width * i_height / 4;
+    i_image_size = b_direct ? 0 : i_width * i_height * 4;
     i_offset = 0;
-    p_buffer = malloc( i_size + 4 * i_width * i_height );
-    p_image = p_buffer + 4 * i_width * i_height;
+
+    p_buffer = malloc( i_size + i_image_size );
+    p_image = p_buffer + i_size;
 
     if( !p_buffer )
     {
@@ -192,7 +198,9 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
     while( !p_fifo->b_die && !p_fifo->b_error )
     {
         XVID_DEC_FRAME xframe;
+        XVID_DEC_PICTURE xpic;
         mtime_t i_pts = 0;
+        picture_t *p_pic;
 
         GetChunk( &bit_stream, p_buffer + i_offset, i_size - i_offset );
 
@@ -214,33 +222,41 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
             break;
         }
 
+        while( !(p_pic = vout_CreatePicture( p_vout, 0, 0, 0 ) ) )
+        {
+            if( p_fifo->b_die || p_fifo->b_error )
+            {
+                break;
+            } 
+            msleep( VOUT_OUTMEM_SLEEP );
+        }
+
+        if( !p_pic )
+        {
+            break;
+        }
+
+        if( b_direct )
+        {
+            xpic.y = p_pic->p[0].p_pixels;
+            xpic.u = p_pic->p[1].p_pixels;
+            xpic.v = p_pic->p[2].p_pixels;
+            xpic.stride_y = p_pic->p[0].i_pitch;
+            xpic.stride_u = p_pic->p[1].i_pitch;
+            xpic.stride_v = p_pic->p[2].i_pitch;
+        }
+
         /* Decode the stuff */
         xframe.bitstream = p_buffer;
         xframe.length = i_size;
-        xframe.image = p_image;
+        xframe.image = b_direct ? (void*)&xpic : p_image;
         xframe.stride = i_width;
-        xframe.colorspace = XVID_CSP_YV12;
+        xframe.colorspace = b_direct ? XVID_CSP_EXTERN : XVID_CSP_YV12;
         i_ret = xvid_decore( p_xvid, XVID_DEC_DECODE, &xframe, NULL );
         /* FIXME: check i_ret */
 
-        if( p_vout )
+        if( !b_direct )
         {
-            picture_t *p_pic;
-
-            while( !(p_pic = vout_CreatePicture( p_vout, 0, 0, 0 ) ) )
-            {
-                if( p_fifo->b_die || p_fifo->b_error )
-                {
-                    break;
-                } 
-                msleep( VOUT_OUTMEM_SLEEP );
-            }
-
-            if( !p_pic )
-            {
-                break;
-            }
-
             /* TODO: use pf_memcpy when this is stable. */
             memcpy( p_pic->p[0].p_pixels,
                     p_image,
@@ -251,10 +267,10 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
             memcpy( p_pic->p[1].p_pixels,
                     p_image + i_width * i_height + i_width * i_height / 4,
                     i_width * i_height / 4 );
-
-            vout_DatePicture( p_vout, p_pic, i_pts );
-            vout_DisplayPicture( p_vout, p_pic );
         }
+
+        vout_DatePicture( p_vout, p_pic, i_pts );
+        vout_DisplayPicture( p_vout, p_pic );
 
         /* Move the remaining data. TODO: only do this when necessary. */
         memmove( p_buffer, p_buffer + xframe.length, i_size - xframe.length );

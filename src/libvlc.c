@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.42 2002/10/16 15:10:39 sam Exp $
+ * $Id: libvlc.c,v 1.43 2002/11/06 09:26:25 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -956,12 +956,19 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     int i_opt;
 
     /* We assume that the remaining parameters are filenames */
-    for( i_opt = optind; i_opt < i_argc; i_opt++ )
+    for( i_opt = i_argc - 1; i_opt > optind; i_opt-- )
     {
         /* TODO: write an internal function of this one, to avoid
          *       unnecessary lookups. */
         VLC_AddTarget( p_vlc->i_object_id, ppsz_argv[ i_opt ],
-                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+                       PLAYLIST_INSERT, 0 );
+    }
+
+    /* If there is at least one target, play it */
+    if( i_argc > optind )
+    {
+        VLC_AddTarget( p_vlc->i_object_id, ppsz_argv[ optind ],
+                       PLAYLIST_INSERT | PLAYLIST_GO, 0 );
     }
 
     return VLC_SUCCESS;
