@@ -213,7 +213,7 @@ Status: Done 27 Aug 2000 (Meuuh)
 Task: 0x36
 Difficulty: Medium
 Urgency: Normal
- Description: 
+Description: Enhance the interface
  . Finish the new keyboard input interface to support 
    interfaces that allow modifiers. This will allow the SDL to run 
    properly.

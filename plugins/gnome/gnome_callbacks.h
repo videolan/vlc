@@ -159,3 +159,31 @@ gboolean
 on_hscale_button_press_event           (GtkWidget       *widget,
                                         GdkEventButton  *event,
                                         gpointer         user_data);
+
+void
+on_intf_modules_destroy                (GtkObject       *object,
+                                        gpointer         user_data);
+
+void
+on_modules_ok_clicked                  (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_modules_apply_clicked               (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_modules_cancel_clicked              (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_intf_playlist_destroy               (GtkObject       *object,
+                                        gpointer         user_data);
+
+void
+on_playlist_ok_clicked                 (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_menubar_modules_activate            (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);

@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.10 2001/02/13 04:29:46 sam Exp $
+ * $Id: intf_gnome.c,v 1.11 2001/02/14 07:48:18 sam Exp $
  *
  * Authors:
  *
@@ -179,6 +179,7 @@ static void intf_Run( intf_thread_t *p_intf )
     /* we don't create these ones yet because we perhaps won't need them */
     p_intf->p_sys->p_about = NULL;
     p_intf->p_sys->p_playlist = NULL;
+    p_intf->p_sys->p_modules = NULL;
     p_intf->p_sys->p_fileopen = NULL;
 
     /* store p_sys to keep an eye on it */
@@ -265,7 +266,7 @@ static gint GnomeManage( gpointer p_data )
 
         vlc_mutex_unlock( &p_intf->p_sys->change_lock );
 
-        /* prepare to die, young man */
+        /* Prepare to die, young Skywalker */
         gtk_main_quit();
         return( FALSE );
     }

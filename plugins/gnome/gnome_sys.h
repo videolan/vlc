@@ -2,7 +2,7 @@
  * gnome_sys.h: private Gnome interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gnome_sys.h,v 1.3 2001/02/13 04:29:46 sam Exp $
+ * $Id: gnome_sys.h,v 1.4 2001/02/14 07:48:18 sam Exp $
  *
  * Authors:
  *
@@ -41,6 +41,7 @@ typedef struct intf_sys_s
     GtkWidget *         p_window;                             /* main window */
     GtkWidget *         p_popup;                               /* popup menu */
     GtkWidget *         p_playlist;                              /* playlist */
+    GtkWidget *         p_modules;                         /* module manager */
     GtkWidget *         p_about;                             /* about window */
     GtkWidget *         p_fileopen;                      /* file open window */
 

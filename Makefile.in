@@ -332,7 +332,6 @@ PLUGIN_MGA =	plugins/mga/mga.o \
 		plugins/mga/vout_mga.o
 
 PLUGIN_X11=	plugins/x11/x11.o \
-		plugins/x11/intf_x11.o \
 		plugins/x11/vout_x11.o
 
 PLUGIN_YUV =	plugins/yuv/yuv.o \

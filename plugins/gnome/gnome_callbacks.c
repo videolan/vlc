@@ -99,14 +99,7 @@ on_menubar_playlist_activate           (GtkMenuItem     *menuitem,
                              "p_intf", p_intf );
     }
     gtk_widget_show( p_intf->p_sys->p_playlist );
-}
-
-
-void
-on_menubar_plugins_activate            (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-
+    gdk_window_raise( p_intf->p_sys->p_playlist->window );
 }
 
 
@@ -131,6 +124,7 @@ on_menubar_about_activate              (GtkMenuItem     *menuitem,
                              "p_intf", p_intf );
     }
     gtk_widget_show( p_intf->p_sys->p_about );
+    gdk_window_raise( p_intf->p_sys->p_about->window );
 }
 
 
@@ -208,6 +202,7 @@ on_toolbar_playlist_clicked            (GtkButton       *button,
                              "p_intf", p_intf );
     }
     gtk_widget_show( p_intf->p_sys->p_playlist );
+    gdk_window_raise( p_intf->p_sys->p_playlist->window );
 }
 
 
@@ -354,6 +349,7 @@ on_popup_about_activate                (GtkMenuItem     *menuitem,
                              "p_intf", p_intf );
     }
     gtk_widget_show( p_intf->p_sys->p_about );
+    gdk_window_raise( p_intf->p_sys->p_about->window );
 }
 
 
@@ -465,4 +461,68 @@ on_hscale_button_press_event           (GtkWidget       *widget,
     return FALSE;
 }
 
+
+
+void
+on_intf_modules_destroy                (GtkObject       *object,
+                                        gpointer         user_data)
+{
+
+}
+
+
+void
+on_modules_ok_clicked                  (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_modules" );
+
+    gtk_widget_hide( p_intf->p_sys->p_modules );
+
+}
+
+
+void
+on_modules_apply_clicked               (GtkButton       *button,
+                                        gpointer         user_data)
+{
+
+}
+
+
+void
+on_modules_cancel_clicked              (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_modules" );
+
+    gtk_widget_hide( p_intf->p_sys->p_modules );
+}
+
+
+void
+on_playlist_ok_clicked                 (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_playlist" );
+
+    gtk_widget_hide( p_intf->p_sys->p_playlist );
+}
+
+
+void
+on_menubar_modules_activate            (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_modules ) )
+    {
+        p_intf->p_sys->p_modules = create_intf_modules();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_modules ),
+                             "p_intf", p_intf );
+    }
+    gtk_widget_show( p_intf->p_sys->p_modules );
+    gdk_window_raise( p_intf->p_sys->p_modules->window );
+}
 

@@ -1,3 +1,6 @@
+
+### THIS CHANGELOG HASN'T BEEN UPDATED FOR UNSTABLE ###
+
 0.1.99j:
 
   * Added hardware YUV overlay support (SDL). Huge performance

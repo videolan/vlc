@@ -1,3 +1,9 @@
+vlc (0.2.60-1) unstable; urgency=low
+
+  * New release. The package build is most presumably FUBAR.
+
+ -- Samuel Hocevar <sam@zoy.org>  Wed, 14 Feb 2001 08:33:46 +0100
+
 vlc (0.2.50-1) unstable; urgency=low
 
   * Only build vlc-glide under x86 (Closes: #84046).
