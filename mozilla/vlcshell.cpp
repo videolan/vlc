@@ -403,6 +403,13 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
                 VLC_VariableSet( p_plugin->i_vlc, "conf::fullscreen", value );
             }
         }
+        else if( !strcmp( argn[i], "mute" ) )
+        {
+            if( !strcmp( argv[i], "yes" ) )
+            {
+                VLC_VolumeMute( p_plugin->i_vlc );
+            }
+        }
 #endif
     }
 
