@@ -2,7 +2,7 @@
  * sub.c: subtitle demux for external subtitle files
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sub.c,v 1.51 2004/01/27 23:09:25 hartman Exp $
+ * $Id: sub.c,v 1.52 2004/02/22 15:59:53 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -1207,6 +1207,7 @@ static int  DemuxVobSub( subtitle_demux_t *p_demux, block_t *p_bk )
         if( p_demux->p_es && i_spu == 0 )
         {
             p_pkt->i_pts = p_bk->i_pts;
+            p_pkt->i_dts = 0;
             es_out_Send( p_demux->p_input->p_es_out, p_demux->p_es, p_pkt );
 
             p_bk->i_pts = 0;    /* only first packet has a pts */
