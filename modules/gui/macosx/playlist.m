@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlist.m,v 1.51 2004/01/09 22:11:04 hartman Exp $
+ * $Id: playlist.m,v 1.52 2004/01/12 21:22:22 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -207,7 +207,7 @@
     if( [o_save_panel runModalForDirectory: nil
             file: o_name] == NSOKButton )
     {
-        playlist_SaveFile( p_playlist, [[o_save_panel filename] fileSystemRepresentation] );
+        playlist_Export( p_playlist, [[o_save_panel filename] fileSystemRepresentation], "m3u" );
     }
 
 }

@@ -2,7 +2,7 @@
  * loadsave.c : Playlist loading / saving functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: loadsave.c,v 1.4 2004/01/11 00:45:06 zorglub Exp $
+ * $Id: loadsave.c,v 1.5 2004/01/12 21:22:23 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -36,9 +36,14 @@
 #define PLAYLIST_FILE_HEADER  "# vlc playlist file version 0.5"
 
 
-/*****************************************************************************
- * playlist_Import: load a playlist file.
- ****************************************************************************/
+/**
+ * Import a playlist file
+ *
+ * Import a certain playlist file into the playlist
+ * \param p_playlist the playlist to which the new items will be added
+ * \param psz_filename the name of the playlistfile to import
+ * \return 0 on succes
+ */
 int playlist_Import( playlist_t * p_playlist, const char *psz_filename )
 {
     playlist_item_t *p_item;
@@ -72,9 +77,15 @@ int playlist_Import( playlist_t * p_playlist, const char *psz_filename )
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * playlist_SaveFile: Save a playlist in a file.
- *****************************************************************************/
+/**
+ * Export a playlist to a file
+ *
+ * Export a playlist to a certain type of playlistfile
+ * \param p_playlist the playlist to export
+ * \param psz_filename the location where the exported file will be saved
+ * \param psz_type the type of playlist file to create.
+ * \return 0 on succes
+ */
 int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
                      const char *psz_type)
 {
