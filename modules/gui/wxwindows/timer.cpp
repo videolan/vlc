@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.3 2002/11/23 01:32:40 ipkiss Exp $
+ * $Id: timer.cpp,v 1.4 2002/11/23 14:28:51 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -29,10 +29,11 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <wx/wxprec.h>
+#include <wx/wx.h>
+#include <wx/timer.h>
 
-/* Let wxWindows take care of the i18n stuff */
+/* Let vlc take care of the i18n stuff */
 #undef _
 
 #ifdef WIN32                                                 /* mingw32 hack */
@@ -40,11 +41,12 @@
 #undef CreateDialog
 #endif
 
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-#include <wx/timer.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "wxwindows.h"
+
+void DisplayStreamDate( wxControl *, intf_thread_t *, int );
 
 /*****************************************************************************
  * Constructor.
@@ -94,7 +96,7 @@ static int wxSetupMenus( intf_thread_t * p_intf )
  *****************************************************************************/
 void Timer::Notify()
 {
-    int i_start, i_stop;
+    int i_stop;
 
     vlc_mutex_lock( &p_intf->change_lock );
 
@@ -111,6 +113,7 @@ void Timer::Notify()
 
     if( p_intf->p_sys->p_sub->i_start != i_stop )
     {
+        /* Append all messages to log window */
     }
 
     /* Update the playlist */
@@ -125,7 +128,11 @@ void Timer::Notify()
         /* Show slider */
         if(p_intf->p_sys->p_input)
         {
-            p_main_interface->slider->Show();
+            p_main_interface->frame_sizer->Add(
+                p_main_interface->slider_frame, 1, wxGROW, 0 );
+            p_main_interface->slider_frame->Show();
+            p_main_interface->frame_sizer->Layout();
+            p_main_interface->frame_sizer->Fit( p_main_interface );
             p_main_interface->statusbar->SetStatusText(
                 p_intf->p_sys->p_input->psz_source, 1 );
         }
@@ -134,7 +141,13 @@ void Timer::Notify()
     {
         /* Hide slider */
         if(p_intf->p_sys->p_input)
-            p_main_interface->slider->Hide();
+        {
+            p_main_interface->slider_frame->Hide();
+            p_main_interface->frame_sizer->Remove(
+                p_main_interface->slider_frame );
+            p_main_interface->frame_sizer->Layout();
+            p_main_interface->frame_sizer->Fit( p_main_interface );
+        }
 
         p_main_interface->statusbar->SetStatusText( "", 1 );
 
@@ -174,7 +187,7 @@ void Timer::Notify()
                     input_Tell( p_input, &position );
                     vlc_mutex_lock( &p_input->stream.stream_lock );
                     p_intf->p_sys->i_slider_oldpos =
-                        ( 100 * position.i_tell ) / position.i_size;
+                        ( SLIDER_MAX_POS * position.i_tell ) / position.i_size;
 
                     if( p_intf->p_sys->i_slider_pos !=
                         p_intf->p_sys->i_slider_oldpos )
@@ -184,6 +197,10 @@ void Timer::Notify()
 
                         p_main_interface->slider->SetValue(
                             p_intf->p_sys->i_slider_pos );
+
+                        DisplayStreamDate( p_main_interface->slider_box,
+                                           p_intf,
+                                           p_intf->p_sys->i_slider_pos );
                     }
                 }
 
@@ -193,7 +210,8 @@ void Timer::Notify()
                 {
                     /* release the lock to be able to seek */
                     vlc_mutex_unlock( &p_input->stream.stream_lock );
-                    input_Seek( p_input, p_intf->p_sys->i_slider_pos,
+                    input_Seek( p_input, p_intf->p_sys->i_slider_pos *
+                                100 / SLIDER_MAX_POS,
                                 INPUT_SEEK_PERCENT | INPUT_SEEK_SET );
                     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -229,4 +247,27 @@ void Timer::Notify()
     }
 
     vlc_mutex_unlock( &p_intf->change_lock );
+}
+
+/*****************************************************************************
+ * DisplayStreamDate: display stream date
+ *****************************************************************************
+ * This function displays the current date related to the position in
+ * the stream. It is called whenever the slider changes its value.
+ * The lock has to be taken before you call the function.
+ *****************************************************************************/
+void DisplayStreamDate( wxControl *p_slider_frame, intf_thread_t * p_intf ,
+                        int i_pos )
+{
+    if( p_intf->p_sys->p_input )
+    {
+#define p_area p_intf->p_sys->p_input->stream.p_selected_area
+        char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+
+        p_slider_frame->SetLabel(
+            input_OffsetToTime( p_intf->p_sys->p_input,
+                                psz_time,
+                                p_area->i_size * i_pos / SLIDER_MAX_POS ) );
+#undef p_area
+     }
 }

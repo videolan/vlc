@@ -29,20 +29,20 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-
-/* Let wxWindows take care of the i18n stuff */
-#undef _
-
-#ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield()
-#undef CreateDialog()
-#endif
-
 #include <wx/wxprec.h>
 #include <wx/wx.h>
 #include <wx/listctrl.h>
+
+/* Let vlc take care of the i18n stuff */
+#undef _
+
+#ifdef WIN32                                                 /* mingw32 hack */
+#undef Yield
+#undef CreateDialog
+#endif
+
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "wxwindows.h"
 
@@ -143,6 +143,13 @@ Playlist::Playlist( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     main_sizer->Add( ok_button_sizer, 0, wxALIGN_CENTRE );
 
     SetSizerAndFit( main_sizer );
+
+    /* Associate drop targets with the playlist */
+    SetDropTarget( new DragAndDrop( p_intf ) );
+
+    /* Update the playlist */
+    Rebuild();
+
 }
 
 Playlist::~Playlist()

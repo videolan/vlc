@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.2 2002/11/23 01:32:40 ipkiss Exp $
+ * $Id: wxwindows.h,v 1.3 2002/11/23 14:28:51 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -22,8 +22,11 @@
  *****************************************************************************/
 
 #include <wx/listctrl.h>
+#include <wx/dnd.h>
 
 class Playlist;
+
+#define SLIDER_MAX_POS 10000
 
 /*****************************************************************************
  * intf_sys_t: description and status of Gtk+ interface
@@ -102,10 +105,19 @@ public:
     /* Constructor */
     Interface( intf_thread_t *p_intf );
     virtual ~Interface();
-    wxSlider *slider;
+
+    wxBoxSizer  *frame_sizer;
     wxStatusBar *statusbar;
 
+    wxSlider    *slider;
+    wxWindow    *slider_frame;
+    wxStaticBox *slider_box;
+
 private:
+    void CreateOurMenuBar();
+    void CreateOurToolBar();
+    void CreateOurSlider();
+
     /* Event handlers (these functions should _not_ be virtual) */
     void OnExit( wxCommandEvent& event );
     void OnAbout( wxCommandEvent& event );
@@ -152,4 +164,17 @@ private:
     Interface *p_main_interface;
     wxListView *listview;
     wxButton *ok_button;
+};
+
+/* Drag and Drop class */
+class DragAndDrop: public wxFileDropTarget
+{
+public:
+    DragAndDrop( intf_thread_t *_p_intf );
+
+    virtual bool OnDropFiles( wxCoord x, wxCoord y,
+                              const wxArrayString& filenames );
+
+private:
+    intf_thread_t *p_intf;
 };

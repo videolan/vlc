@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.4 2002/11/23 01:32:40 ipkiss Exp $
+ * $Id: wxwindows.cpp,v 1.5 2002/11/23 14:28:51 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -29,10 +29,10 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <wx/wxprec.h>
+#include <wx/wx.h>
 
-/* Let wxWindows take care of the i18n stuff */
+/* Let vlc take care of the i18n stuff */
 #undef _
 
 #ifdef WIN32                                                 /* mingw32 hack */
@@ -40,9 +40,8 @@
 #undef CreateDialog
 #endif
 
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-#include <wx/imagpng.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "wxwindows.h"
 
@@ -67,6 +66,7 @@ public:
 
 private:
     intf_thread_t *p_intf;
+    wxLocale locale;                                /* locale we'll be using */
 };
 
 /*****************************************************************************
@@ -175,6 +175,11 @@ IMPLEMENT_APP_NO_MAIN(Instance)
  *****************************************************************************/
 bool Instance::OnInit()
 {
+    /* Initialization of i18n stuff.
+     * Usefull for things we don't have any control over, like wxWindows
+     * provided facilities (eg. open file dialog) */
+    locale.Init( wxLANGUAGE_DEFAULT );
+
     /* Make an instance of your derived frame. Passing NULL (the default value
      * of Frame's constructor is NULL) as the frame doesn't have a frame
      * since it is the first window */

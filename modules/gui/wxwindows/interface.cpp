@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.6 2002/11/23 01:32:40 ipkiss Exp $
+ * $Id: interface.cpp,v 1.7 2002/11/23 14:28:51 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -29,10 +29,10 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
+#include <wx/wxprec.h>
+#include <wx/wx.h>
 
-/* Let wxWindows take care of the i18n stuff */
+/* Let vlc take care of the i18n stuff */
 #undef _
 
 #ifdef WIN32                                                 /* mingw32 hack */
@@ -40,8 +40,8 @@
 #undef CreateDialog
 #endif
 
-#include <wx/wxprec.h>
-#include <wx/wx.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "wxwindows.h"
 
@@ -58,6 +58,13 @@
 #include "bitmaps/previous.xpm"
 #include "bitmaps/next.xpm"
 #include "bitmaps/playlist.xpm"
+
+/* include the icon graphic */
+#include "share/vlc32x32.xpm"
+
+/*****************************************************************************
+ * Local class declarations.
+ *****************************************************************************/
 
 /*****************************************************************************
  * Event Table.
@@ -118,20 +125,69 @@ Interface::Interface( intf_thread_t *_p_intf ):
     wxFrame( NULL, -1, "title", wxDefaultPosition, wxDefaultSize,
              wxDEFAULT_FRAME_STYLE )
 {
-
     /* Initializations */
     p_intf = _p_intf;
 
-    /* Give our interface a nice icon */
-    //SetIcon( wxICON(vlcicon) );
+    /* Give our interface a nice little icon */
+    SetIcon( *new wxIcon( vlc_xpm ) );
 
-    /* Create our "File" menu */
+    /* Create a sizer for the main frame */
+    frame_sizer = new wxBoxSizer( wxHORIZONTAL );
+    SetSizer( frame_sizer );
+
+    /* Creation of the menu bar */
+    CreateOurMenuBar();
+
+    /* Creation of the tool bar */
+    CreateOurToolBar();
+
+    /* Creation of the slider sub-window */
+    CreateOurSlider();
+
+    /* Creation of the status bar 
+     * Helptext for menu items and toolbar tools will automatically get
+     * displayed here. */
+    int i_status_width[2] = {-2,-3};
+    statusbar = CreateStatusBar( 2 );                            /* 2 fields */
+    statusbar->SetStatusWidths( 2, i_status_width );
+
+    SetTitle( COPYRIGHT_MESSAGE );
+
+    /* Layout everything */
+    SetAutoLayout( TRUE );
+    frame_sizer->Layout();
+    frame_sizer->SetSizeHints(this);
+
+    /* Associate drop targets with the main interface */
+    SetDropTarget( new DragAndDrop( p_intf ) );
+}
+
+Interface::~Interface()
+{
+}
+
+/*****************************************************************************
+ * Private methods.
+ *****************************************************************************/
+void Interface::CreateOurMenuBar()
+{
 #define HELP_FILE  N_("Open a file")
 #define HELP_DISC  N_("Open a DVD or (S)VCD")
 #define HELP_NET   N_("Open a network stream")
 #define HELP_SAT   N_("Open a satellite stream")
 #define HELP_EJECT N_("Eject the DVD/CD")
 #define HELP_EXIT  N_("Exit this program")
+
+#define HELP_PLAYLIST   N_("Open the playlist")
+#define HELP_LOGS       N_("Show the program logs")
+
+#define HELP_AUDIO N_("Change the current audio track")
+#define HELP_SUBS  N_("Change the current subtitles stream")
+#define HELP_PREFS N_("Go to the preferences menu")
+
+#define HELP_ABOUT N_("About this program")
+
+    /* Create the "File" menu */
     wxMenu *file_menu = new wxMenu;
     file_menu->Append( OpenFile_Event, _("&Open File..."), HELP_FILE );
     file_menu->Append( OpenDisc_Event, _("Open &Disc..."), HELP_DISC );
@@ -144,25 +200,19 @@ Interface::Interface( intf_thread_t *_p_intf ):
     file_menu->AppendSeparator();
     file_menu->Append( Exit_Event, _("E&xit"), HELP_EXIT );
 
-    /* Create our "View" menu */
-#define HELP_PLAYLIST   N_("Open the playlist")
-#define HELP_LOGS       N_("Show the program logs")
+    /* Create the "View" menu */
     wxMenu *view_menu = new wxMenu;
     view_menu->Append( Playlist_Event, _("&Playlist..."), HELP_PLAYLIST );
     view_menu->Append( Logs_Event, _("&Logs..."), HELP_LOGS );
 
-    /* Create our "Settings" menu */
-#define HELP_AUDIO N_("Change the current audio track")
-#define HELP_SUBS  N_("Change the current subtitles stream")
-#define HELP_PREFS N_("Go to the preferences menu")
+    /* Create the "Settings" menu */
     wxMenu *settings_menu = new wxMenu;
     settings_menu->Append( Audio_Event, _("&Audio"), HELP_AUDIO );
     settings_menu->Append( Subtitles_Event, _("&Subtitles"), HELP_SUBS );
     settings_menu->AppendSeparator();
     settings_menu->Append( Prefs_Event, _("&Preferences..."), HELP_PREFS );
 
-    /* Create our "Help" menu */
-#define HELP_ABOUT N_("About this program")
+    /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
     help_menu->Append( About_Event, _("&About..."), HELP_ABOUT );
 
@@ -176,13 +226,19 @@ Interface::Interface( intf_thread_t *_p_intf ):
     /* Attach the menu bar to the frame */
     SetMenuBar( menubar );
 
-    /* Create toolbar */
+    /* Associate drop targets with the menubar */
+    menubar->SetDropTarget( new DragAndDrop( p_intf ) );
+}
+
+void Interface::CreateOurToolBar()
+{
 #define HELP_STOP N_("Stop current playlist item")
 #define HELP_PLAY N_("Play current playlist item")
 #define HELP_PAUSE N_("Pause current playlist item")
 #define HELP_PLO N_("Open playlist")
 #define HELP_PLP N_("Previous playlist item")
 #define HELP_PLN N_("Next playlist item")
+
     wxBitmap *p_bmp_file     = new wxBitmap( file_xpm );
     wxBitmap *p_bmp_disc     = new wxBitmap( disc_xpm );
     wxBitmap *p_bmp_net      = new wxBitmap( net_xpm );
@@ -214,44 +270,41 @@ Interface::Interface( intf_thread_t *_p_intf ):
 
     toolbar->Realize();
 
-    /* Place the toolbar in a sizer, so that the window will stretch
-     * to get its size */
-    wxBoxSizer *toolbar_sizer = new wxBoxSizer( wxVERTICAL );
-    toolbar_sizer->Add( toolbar, 0 );
-    toolbar_sizer->SetSizeHints( this );
+    /* Place the toolbar in a sizer, so we can calculate the width of the
+     * toolbar and set this as the minimum for the main frame size. */
+    wxBoxSizer *toolbar_sizer = new wxBoxSizer( wxHORIZONTAL );
+    toolbar_sizer->Add( toolbar, 0, 0, 0 );
+    toolbar_sizer->Layout();
+    frame_sizer->SetMinSize( toolbar_sizer->GetMinSize().GetWidth(), -1 );
 
-    /* Create slider */
-    wxBoxSizer *slider_sizer = new wxBoxSizer( wxVERTICAL );
-    slider = new wxSlider( this, SliderScroll_Event, 0, 0, 100,
-                           wxDefaultPosition, wxSize( 450, 50 ),
-                           wxSL_HORIZONTAL | wxSL_TOP );
-    slider_sizer->Add( slider, 0, wxGROW | wxALL | wxALIGN_CENTER, 5 );
-
-    /* use the sizer for layout */
-    slider->Hide();
-    slider_sizer->Layout();
-    SetSizerAndFit( slider_sizer );
-
-    /* Give the frame an optional statusbar. The '1' just means one field.
-     * A gripsizer will automatically get put on into the corner, if that
-     * is the normal OS behaviour for frames on that platform. Helptext
-     * for menu items and toolbar tools will automatically get displayed
-     * here. */
-    statusbar = CreateStatusBar(2);
-    int i_status_width[2] = {-2,-3};
-    statusbar->SetStatusWidths( 2, i_status_width );
-
-    SetTitle( COPYRIGHT_MESSAGE );
-    SetAutoLayout( TRUE );
-    Layout();
+    /* Associate drop targets with the toolbar */
+    toolbar->SetDropTarget( new DragAndDrop( p_intf ) );
 }
 
-Interface::~Interface()
+void Interface::CreateOurSlider()
 {
+    /* Create a new frame containing the slider */
+    slider_frame = new wxPanel( this, -1, wxDefaultPosition, wxSize(-1,50) );
+    slider_frame->SetAutoLayout( TRUE );
+    slider_frame->Hide();
+
+    /* Create static box to surround the slider */
+    slider_box = new wxStaticBox( slider_frame, -1, "" );
+
+    /* Create sizer for slider frame */
+    wxStaticBoxSizer *slider_sizer =
+        new wxStaticBoxSizer( slider_box, wxHORIZONTAL );
+    slider_frame->SetSizer( slider_sizer );
+
+    /* Create slider */
+    slider = new wxSlider( slider_frame, SliderScroll_Event, 0, 0,
+                           SLIDER_MAX_POS, wxDefaultPosition, wxDefaultSize );
+    slider_sizer->Add( slider, 1, wxGROW | wxALL, 5 );
+    slider_sizer->Layout();
 }
 
 /*****************************************************************************
- * Private methods.
+ * Event Handlers.
  *****************************************************************************/
 void Interface::OnExit( wxCommandEvent& WXUNUSED(event) )
 {
@@ -386,4 +439,39 @@ void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
 
     playlist_Next( p_playlist );
     vlc_object_release( p_playlist );
+}
+
+/*****************************************************************************
+ * Definition of DragAndDrop class.
+ *****************************************************************************/
+DragAndDrop::DragAndDrop( intf_thread_t *_p_intf )
+{
+    p_intf = _p_intf;
+}
+
+bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
+                               const wxArrayString& filenames )
+{
+    unsigned int i;
+
+    /* Add dropped files to the playlist */
+
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return FALSE;
+    }
+
+    for( i = 0; i < filenames.GetCount(); i++ )
+        playlist_Add( p_playlist, (char *)filenames[i].c_str(),
+                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+
+    /* Rebuild the playlist */
+    p_intf->p_sys->p_playlist_window->Rebuild();
+
+    vlc_object_release( p_playlist );
+
+    return TRUE;
 }
