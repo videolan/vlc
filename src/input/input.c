@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.207 2002/07/24 23:11:55 massiot Exp $
+ * $Id: input.c,v 1.208 2002/07/25 21:53:53 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -158,13 +158,6 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->stream.p_info->psz_name = strdup("General") ;
     p_input->stream.p_info->p_info = NULL;
     p_input->stream.p_info->p_next = NULL;
-
-    /* test code */
-    msg_Dbg( p_input, "finding category \"hepp\"");
-    p_info = input_InfoCategory( p_input, "hepp" );
-    msg_Dbg( p_input, "adding testkey/testval");    
-    input_AddInfo( p_info, "testkey", "testval");
-    /* end test code */
 
     msg_Info( p_input, "playlist item `%s'", p_input->psz_source );
 

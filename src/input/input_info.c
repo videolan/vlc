@@ -2,7 +2,7 @@
  * input_info.c: Convenient functions to handle the input info structures
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_info.c,v 1.3 2002/07/23 00:30:22 sam Exp $
+ * $Id: input_info.c,v 1.4 2002/07/25 21:53:53 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -41,7 +41,6 @@ input_info_category_t * input_InfoCategory( input_thread_t * p_this,
 {
     input_info_category_t * p_category, * p_prev;
     p_prev = NULL;
-    msg_Dbg( p_this, "searching for category");
     for ( p_category = p_this->stream.p_info;
           (p_category != NULL) && strcmp( p_category->psz_name, psz_name ); 
           p_category = p_category->p_next)
@@ -50,13 +49,10 @@ input_info_category_t * input_InfoCategory( input_thread_t * p_this,
     }
     if ( p_category )
     {
-        msg_Dbg(p_this, "found category at %p, with name %s", p_category
-            ,p_category->psz_name);
         return p_category;
     }
     else
     {
-        msg_Dbg( p_this, "creating new input category");
         p_category = malloc( sizeof( input_info_category_t ) );
         if ( !p_category )
         {

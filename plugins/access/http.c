@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.17 2002/07/24 18:31:24 sigmunau Exp $
+ * $Id: http.c,v 1.18 2002/07/25 21:53:53 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -206,7 +206,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     }
     else
     {
-        msg_Err( p_input, "http error: invalid http reply" );
+        msg_Err( p_input, "invalid http reply" );
         return -1;
     }
     
@@ -216,6 +216,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
                  psz_return_alpha );
         return -1;
     }
+    
     for( ; ; ) 
     {
         if( input_Peek( p_input, &psz_parser, MAX_LINE ) <= 0 )
