@@ -107,9 +107,9 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     /* Request an interface plugin */
     psz_method = main_GetPszVariable( VOUT_METHOD_VAR, VOUT_DEFAULT_METHOD );
 
-    if( RequestPlugin( &p_vout->vout_plugin, "vout", psz_method ) < 0 )
+    if( RequestPlugin( &p_vout->vout_plugin, psz_method ) < 0 )
     {
-        intf_ErrMsg( "error: could not open video plugin vout_%s.so\n", psz_method );
+        intf_ErrMsg( "error: could not open video plugin %s.so\n", psz_method );
         free( p_vout );
         return( NULL );
     }

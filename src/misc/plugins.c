@@ -40,20 +40,20 @@
 
 #include "plugins.h"
 
-#define PLUGIN_PATH_COUNT 5
+#define PLUGIN_PATH_COUNT 3
 
-int RequestPlugin ( plugin_id_t * p_plugin, char * psz_mask, char * psz_name )
+int RequestPlugin ( plugin_id_t * p_plugin, char * psz_name )
 {
     int i_count, i_length;
     char * psz_plugin;
     char * psz_plugin_path[ PLUGIN_PATH_COUNT ] =
     {
         ".",
-        "plugins/aout", "plugins/vout", "plugins/intf", /* these ones should disappear */
+        "lib", /* this one should disappear */
         PLUGIN_PATH
     };
 
-    i_length = strlen( psz_mask ) + strlen( psz_name );
+    i_length = strlen( psz_name );
 
     for ( i_count = 0 ; i_count < PLUGIN_PATH_COUNT ; i_count++ )
     {
@@ -61,17 +61,17 @@ int RequestPlugin ( plugin_id_t * p_plugin, char * psz_mask, char * psz_name )
         char * psz_program_path;
         
         psz_program_path = beos_GetProgramPath();
-        psz_plugin = malloc( strlen(psz_plugin_path[i_count]) + strlen(psz_program_path) + i_length + 6 );
-        sprintf( psz_plugin, "%s/%s/%s_%s.so", psz_program_path, psz_plugin_path[i_count], psz_mask, psz_name );        
-#else
-        psz_plugin = malloc( strlen(psz_plugin_path[i_count]) + i_length + 6 );
-        sprintf( psz_plugin, "%s/%s_%s.so", psz_plugin_path[i_count], psz_mask, psz_name );
-#endif
+        psz_plugin = malloc( strlen(psz_plugin_path[i_count]) +
+                             strlen(psz_program_path) + i_length + 5 );
+        sprintf( psz_plugin, "%s/%s/%s.so", psz_program_path,
+                 psz_plugin_path[i_count], psz_name );        
 
-#if defined(HAVE_DLFCN_H)
-        *p_plugin = dlopen( psz_plugin, RTLD_NOW | RTLD_GLOBAL );
-#elif defined(HAVE_IMAGE_H)
         *p_plugin = load_add_on( psz_plugin );
+#else
+        psz_plugin = malloc( strlen(psz_plugin_path[i_count]) + i_length + 5 );
+        sprintf( psz_plugin, "%s/%s.so", psz_plugin_path[i_count], psz_name );
+
+        *p_plugin = dlopen( psz_plugin, RTLD_NOW | RTLD_GLOBAL );
 #endif
 
         free( psz_plugin );

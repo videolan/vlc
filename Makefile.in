@@ -13,10 +13,7 @@
 DEBUG=0
 
 SYS=@SYS@
-ARCH=@ARCH@
-AOUT=@AOUT@
-VOUT=@VOUT@
-INTF=@VOUT@
+PLUGINS=@PLUGINS@
 SNAPSHOTDIR=vlc-@VLC_VERSION@
 INSTALL=@INSTALL@
 prefix=@prefix@
@@ -249,12 +246,44 @@ endif
 #
 # Plugins
 #
-intf_plugin =           $(INTF:%=plugins/intf/intf_%.so)
-aout_plugin =           $(AOUT:%=plugins/aout/aout_%.so)
-vout_plugin =           $(VOUT:%=plugins/vout/vout_%.so)
+PLUGINS := $(PLUGINS:%=lib/%.so)
 
-PLUGIN_OBJ = $(intf_plugin) $(aout_plugin) $(vout_plugin)
+PLUGIN_BEOS   = plugins/beos/aout_beos.o \
+		plugins/beos/intf_beos.o \
+		plugins/beos/vout_beos.o
 
+PLUGIN_DSP    = plugins/dsp/aout_dsp.o
+
+PLUGIN_DUMMY  = plugins/dummy/aout_dummy.o \
+		plugins/dummy/intf_dummy.o \
+		plugins/dummy/vout_dummy.o
+
+PLUGIN_ESD    = plugins/esd/aout_esd.o
+
+PLUGIN_FB     = plugins/fb/intf_fb.o \
+		plugins/fb/vout_fb.o
+
+PLUGIN_GGI    = plugins/ggi/intf_ggi.o \
+		plugins/ggi/vout_ggi.o
+
+PLUGIN_GLIDE  = plugins/glide/intf_glide.o \
+		plugins/glide/vout_glide.o
+
+PLUGIN_GNOME  = plugins/gnome/intf_gnome.o \
+		plugins/gnome/intf_gnome_callbacks.o \
+		plugins/gnome/intf_gnome_interface.o \
+		plugins/gnome/intf_gnome_support.o \
+		plugins/gnome/vout_gnome.o
+
+PLUGIN_MGA    = plugins/mga/intf_mga.o \
+		plugins/fb/vout_mga.o
+
+PLUGIN_X11    = plugins/x11/intf_x11.o \
+		plugins/x11/vout_x11.o
+
+PLUGIN_OBJ = $(PLUGIN_BEOS) $(PLUGIN_DSP) $(PLUGIN_DUMMY) $(PLUGIN_ESD) \
+		$(PLUGIN_FB) $(PLUGIN_GGI) $(PLUGIN_GLIDE) $(PLUGIN_GNOME) \
+		$(PLUGIN_MGA) $(PLUGIN_X11)
 #
 # Other lists of files
 #
@@ -280,7 +309,7 @@ clean:
 	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(PLUGIN_OBJ)
 
 distclean: clean
-	rm -f */*/*.o plugins/*/*.so **/*~ *.log
+	rm -f src/*/*.o plugins/*/*.o lib/*.so **/*~ *.log
 	rm -f Makefile include/defs.h include/config.h
 	rm -f config.status config.cache config.log
 	rm -f vlc gmon.out core build-stamp
@@ -290,9 +319,9 @@ install:
 	$(INSTALL) vlc $(prefix)/bin
 	mkdir -p $(prefix)/lib/videolan/vlc
 	mkdir -p $(prefix)/share/videolan/vlc
-	$(INSTALL) $(PLUGIN_OBJ) $(prefix)/lib/videolan/vlc
-	$(INSTALL) share/*.psf $(prefix)/share/videolan/vlc
-	$(INSTALL) share/*.png $(prefix)/share/videolan/vlc
+	$(INSTALL) -m 644 $(PLUGINS) $(prefix)/lib/videolan/vlc
+	$(INSTALL) -m 644 share/*.psf $(prefix)/share/videolan/vlc
+	$(INSTALL) -m 644 share/*.png $(prefix)/share/videolan/vlc
 
 show:
 	@echo "Command line for C objects:"
@@ -316,12 +345,6 @@ snapshot:
 	mv /tmp/${SNAPSHOTDIR}.tar.gz ..
 	@echo "Sources are in ../${SNAPSHOTDIR}.tar.gz"
 
-deb:
-	dpkg-buildpackage -rfakeroot -us -uc
-
-rpm:
-	rpm -ba vlc.spec
-
 FORCE:
 
 #
@@ -336,7 +359,7 @@ else
 	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
 endif
 
-plugins: $(PLUGIN_OBJ)
+plugins: $(PLUGINS)
 
 #
 # Generic rules (see below)
@@ -359,57 +382,56 @@ $(ASM_OBJ): %.o: %.S
 #$(PLUGIN_OBJ): %.so: Makefile.dep
 #$(PLUGIN_OBJ): %.so: .dep/%.d
 
-# audio plugins
-plugins/aout/aout_dummy.so plugins/aout/aout_dsp.so: %.so: %.c
-ifeq ($(SYS),beos)
-	$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
-else
-	$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
-endif
+#$(CC) $(LCFLAGS) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
+		
+lib/beos.so: $(PLUGIN_BEOS)
+	ld -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+$(PLUGIN_BEOS): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
-plugins/aout/aout_esd.so: %.so: %.c
+lib/esd.so: $(PLUGIN_ESD)
 ifneq (,$(findstring bsd,$(SYS)))
-	$(CC) $(CCFLAGS) $(CFLAGS) -lesd -shared -o $@ $<
+	ld -shared -lesd -o $@ $^
 else
-	$(CC) $(CCFLAGS) $(CFLAGS) -laudiofile -lesd -shared -o $@ $<
+	ld -shared -laudiofile -lesd -o $@ $^
 endif
+$(PLUGIN_ESD): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
-plugins/aout/aout_beos.so: %.so: %.cpp
-	$(CC) $(LCFLAGS) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
-		
-# video plugins
-plugins/intf/intf_dummy.so plugins/vout/vout_dummy.so \
-	plugins/intf/intf_fb.so plugins/vout/vout_fb.so: %.so: %.c
-ifeq ($(SYS),beos)
-	$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
-else
-	$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
-endif
+lib/dummy.so: $(PLUGIN_DUMMY)
+	ld -shared -o $@ $^
+$(PLUGIN_DUMMY): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
-plugins/intf/intf_x11.so plugins/vout/vout_x11.so: %.so: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
+lib/fb.so: $(PLUGIN_FB)
+	ld -shared -o $@ $^
+$(PLUGIN_FB): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
-plugins/intf/intf_mga.so plugins/vout/vout_mga.so: %.so: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
+lib/x11.so: $(PLUGIN_X11)
+	ld -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
+$(PLUGIN_X11): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
-plugins/intf/intf_gnome.so: %.so: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) $(LCFLAGS) `gnome-config --libs --cflags gnomeui` -shared -o $@ $< plugins/intf/intf_gnome_callbacks.c plugins/intf/intf_gnome_interface.c plugins/intf/intf_gnome_support.c
+lib/mga.so: $(PLUGIN_MGA)
+	ld -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
+$(PLUGIN_MGA): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
-plugins/vout/vout_gnome.so: %.so: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
+lib/gnome.so: $(PLUGIN_GNOME)
+	ld -shared `gnome-config --libs gnomeui | sed 's,-rdynamic,,'` -o $@ $^
+$(PLUGIN_GNOME): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) `gnome-config --cflags gnomeui`-c -o $@ $<
 
-plugins/intf/intf_glide.so plugins/vout/vout_glide.so: %.so: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/include/glide -lglide2x -shared -o $@ $<
+lib/glide.so: $(PLUGIN_GLIDE)
+	ld -shared -lglide2x -o $@ $^
+$(PLUGIN_GLIDE): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/include/glide -c -o $@ $<
 
-plugins/intf/intf_ggi.so plugins/vout/vout_ggi.so: %.so: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -lggi -shared -o $@ $<
-
-plugins/intf/intf_beos.so: %.so: %.cpp
-	$(CC) $(LCFLAGS) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
-
-plugins/vout/vout_beos.so: %.so: %.cpp
-	$(CC) $(LCFLAGS) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
-		
+lib/ggi.so: $(PLUGIN_GGI)
+	ld -shared -lggi -o $@ $^
+$(PLUGIN_GGI): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
 ################################################################################
 # Note on generic rules and dependancies

@@ -1,10 +1,10 @@
 Name: vlc
-Version: 0.1.99c
+Version: 0.1.99d
 Release: 1
 Copyright: GPL
 Url: http://www.videolan.org/
 Group: X11/Applications/Graphics
-Source0: http://www.videolan.org/packages/vlc-0.1.99c.tar.gz
+Source0: http://www.videolan.org/packages/0.1.99c/vlc-0.1.99c.tar.gz
 Packager: Eric Doutreleau <Eric.doutreleau@int-evry.fr>
 
 Buildroot: /tmp/vlc-build
@@ -33,10 +33,10 @@ mkdir -p $RPM_BUILD_ROOT/usr/bin
 make install prefix=$RPM_BUILD_ROOT/usr
 
 %files
-/usr/bin/vlc
-/usr/share/videolan/vlc
-/usr/lib/videolan
-%doc AUTHORS COPYING INSTALL NEWS README doc
+%attr(-, root, root) /usr/bin/vlc
+%attr(-, root, root) /usr/share/videolan/vlc
+%attr(-, root, root) /usr/lib/videolan
+%attr(-, root, root) %doc AUTHORS COPYING INSTALL NEWS README doc
 %clean
 rm -rf $RPM_BUILD_ROOT
 

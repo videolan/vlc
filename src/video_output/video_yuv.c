@@ -73,6 +73,8 @@
 #define V_RED_COEF      ((int)(1.596 * (1<<SHIFT) / 1.164))
 #define V_GREEN_COEF    ((int)(-0.813 * (1<<SHIFT) / 1.164))
 
+//#define NODITHER
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -1093,6 +1095,17 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
 
+#ifdef NODITHER
+    int dither10[4] = {  0x7,  0x8,  0x7,  0x8 };
+    int dither11[4] = {  0x8,  0x7,  0x8,  0x7 };
+    int dither12[4] = {  0x7,  0x8,  0x7,  0x8 };
+    int dither13[4] = {  0x8,  0x7,  0x8,  0x7 };
+
+    int dither20[4] = {  0xf, 0x10,  0xf, 0x10 };
+    int dither21[4] = { 0x10,  0xf, 0x10,  0xf };
+    int dither22[4] = {  0xf, 0x10,  0xf, 0x10 };
+    int dither23[4] = { 0x10,  0xf, 0x10,  0xf };
+#else
     int dither10[4] = {  0x0,  0x8,  0x2,  0xa };
     int dither11[4] = {  0xc,  0x4,  0xe,  0x6 };
     int dither12[4] = {  0x3,  0xb,  0x1,  0x9 };
@@ -1102,16 +1115,18 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     int dither21[4] = { 0x18,  0x8, 0x1c,  0xc };
     int dither22[4] = {  0x6, 0x16,  0x2, 0x12 };
     int dither23[4] = { 0x1e,  0xe, 0x1a,  0xa };
-
-    /* other matrices that can be interesting, either for debugging or for effects */
-#if 0
-    int dither[4][4] = { { 0, 8, 2, 10 }, { 12, 4, 14, 16 }, { 3, 11, 1, 9}, {15, 7, 13, 5} };
-    int dither[4][4] = { { 7, 8, 0, 15 }, { 0, 15, 8, 7 }, { 7, 0, 15, 8 }, { 15, 7, 8, 0 } };
-    int dither[4][4] = { { 0, 15, 0, 15 }, { 15, 0, 15, 0 }, { 0, 15, 0, 15 }, { 15, 0, 15, 0 } };
-    int dither[4][4] = { { 15, 15, 0, 0 }, { 15, 15, 0, 0 }, { 0, 0, 15, 15 }, { 0, 0, 15, 15 } };
-    int dither[4][4] = { { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 } };
-    int dither[4][4] = { { 0, 1, 2, 3 }, { 4, 5, 6, 7 }, { 8, 9, 10, 11 }, { 12, 13, 14, 15 } };
 #endif
+
+    /* some other matrices that can be interesting, either for debugging
+     *  or for effects :
+     *  
+     * { { 0, 8, 2, 10 }, { 12, 4, 14, 16 }, { 3, 11, 1, 9}, {15, 7, 13, 5} }
+     * { { 7, 8, 0, 15 }, { 0, 15, 8, 7 }, { 7, 0, 15, 8 }, { 15, 7, 8, 0 } }
+     * { { 0, 15, 0, 15 }, { 15, 0, 15, 0 }, { 0, 15, 0, 15 }, { 15, 0, 15, 0 } }
+     * { { 15, 15, 0, 0 }, { 15, 15, 0, 0 }, { 0, 0, 15, 15 }, { 0, 0, 15, 15 } }
+     * { { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 } }
+     * { { 0, 1, 2, 3 }, { 4, 5, 6, 7 }, { 8, 9, 10, 11 }, { 12, 13, 14, 15 } }
+     */
 
     /*
      * Initialize some values  - i_pic_line_width will store the line skip

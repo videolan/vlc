@@ -1,0 +1,37 @@
+INSTALL file for vlc, the VideoLAN Client
+
+
+Building VideoLAN
+=================
+
+A typical way to configure the vlc is :
+
+   ./configure --prefix=/usr --enable-ppro --enable-mmx --enable-gnome
+
+See `./configure --help' for more information.
+
+Then, run `make', and `make install' to install it.
+
+
+To build a Debian package, you may use :
+
+   dpkg-buildpackage -rfakeroot -us -uc
+
+
+To build RedHat packages, use :
+
+   rpm -ba vlc.spec
+
+
+Installing and running VideoLAN
+===============================
+
+You can install the vlc and its plugins by typing :
+
+   make install
+
+But you don't need to do it if you don't want ; vlc can be launched
+from the current directory as well :
+
+   ./vlc
+

@@ -103,9 +103,9 @@ intf_thread_t* intf_Create( void )
     /* Request an interface plugin */
     psz_method = main_GetPszVariable( VOUT_METHOD_VAR, VOUT_DEFAULT_METHOD );
 
-    if( RequestPlugin( &p_intf->intf_plugin, "intf", psz_method ) < 0 )
+    if( RequestPlugin( &p_intf->intf_plugin, psz_method ) < 0 )
     {
-        intf_ErrMsg( "error: could not open interface plugin intf_%s.so\n", psz_method );
+        intf_ErrMsg( "error: could not open interface plugin %s.so\n", psz_method );
         free( p_intf );
         return( NULL );
     }

@@ -1,3 +1,9 @@
+vlc (0.1.99d) unstable; urgency=low
+
+  * .deb is now more lintian-friendly
+
+ -- Samuel Hocevar <sam@via.ecp.fr>  Tue, 20 Jun 2000 14:17:33 +0200
+
 vlc (0.1.99c) unstable; urgency=low
 
   * Caught Delete Window event in Gnome and X11 modes

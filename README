@@ -1,44 +1,48 @@
-
-               README for vlc, the VideoLAN Client
-
+README for vlc, the VideoLAN Client
 
 
-... Introduction
-
-[ nothing appropriate yet ]
-
-
-
-... Building VideoLAN
-
-A typical way to configure the vlc is :
-
-   ./configure --prefix=/usr --enable-ppro --enable-mmx --enable-gnome
-
-See `./configure --help' for more information.
-
-Then, run `make'.
-
-
-... Running VideoLAN
+Introduction
+============
 
 [ nothing appropriate yet ]
 
 
+Building, Installing and Running VideoLAN
+=========================================
 
-... Troubleshooting
+See the INSTALL file for this.
+
+
+Troubleshooting
+===============
+
+A mailing-list has been set up for support and discussion about the
+vlc. Its address is :
+
+   <vlc@videolan.org>
+
+To subscribe, send a mail to <listar@videolan.org> with the following
+words in the mail body :
+
+   subscribe vlc
+
+To unsubscribe, do the same with the words :
+
+   unsubscribe vlc
+
+
+When reporting bugs, try to be as precise as possible (which OS, which
+distribution, what plugins you were trying, and so on).
+
+
+Resources
+=========
 
 [ nothing appropriate yet ]
 
 
-
-... Resources
-
-[ nothing appropriate yet ]
-
-
-
-... The team
+The team
+========
 
 The following teachers were involved in the VideoLAN project :
 
@@ -52,6 +56,7 @@ The following students were members of the VideoLAN team :
   Antoine Brenner <brenner@via.ecp.fr>
   Régis Duchesne <regis@via.ecp.fr>
   Alexandre Francois <francois@via.ecp.fr>
+  Christian Gross <gross@via.ecp.fr>
   Hugo Haas <hugo@via.ecp.fr>
   Mikael Journo <mj32@cornell.edu>
   Michel Lespinasse <walken@wrs.com>
@@ -61,7 +66,6 @@ The following students were members of the VideoLAN team :
 
   Olivier Baxa <oli@via.ecp.fr>
   Patrice Bazerque <patrice.bazerque@via.ecp.fr>
-  Etienne Bernard <eb@via.ecp.fr>
   Arnaud Bienvenu <arnaud.bienvenu@via.ecp.fr>
   Régis Clément <clement@via.ecp.fr>
   Alexandre Duret <alex@via.ecp.fr>
