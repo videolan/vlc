@@ -110,9 +110,12 @@
 {
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
+    vlc_list_t *p_list = vlc_list_find( p_playlist, VLC_OBJECT_MODULE,
+                                        FIND_ANYWHERE );
+
+    int i_index;
     i_current_view = VIEW_CATEGORY;
     playlist_ViewUpdate( p_playlist, i_current_view );
-    vlc_object_release( p_playlist );
 
     [o_outline_view setTarget: self];
     [o_outline_view setDelegate: self];
@@ -147,6 +150,31 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     o_tc_sortColumn = nil;
 
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    {
+        NSMenuItem * o_lmi;
+        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+
+        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
+        {
+            o_lmi = [[o_mi_services submenu] addItemWithTitle:
+                     [NSString stringWithCString:
+                     p_parser->psz_longname ? p_parser->psz_longname :
+                     ( p_parser->psz_shortname ? p_parser->psz_shortname:
+                     p_parser->psz_object_name)]
+                                             action: @selector(servicesChange:)
+                                             keyEquivalent: @""];
+            [o_lmi setTarget: self];
+            [o_lmi setRepresentedObject:
+                   [NSString stringWithCString: p_parser->psz_object_name]];
+            if( playlist_IsServicesDiscoveryLoaded( p_playlist,
+                    p_parser->psz_object_name ) )
+                [o_lmi setState: NSOnState];
+        }
+    }
+    vlc_list_release( p_list );
+    vlc_object_release( p_playlist );
+
     [self initStrings];
     //[self playlistUpdated];
 }
@@ -160,6 +188,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_info setTitle: _NS("Properties")];
     [o_mi_sort_name setTitle: _NS("Sort Node by Name")];
     [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
+    [o_mi_services setTitle: _NS("Services discovery")];
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
@@ -399,6 +428,23 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         }
         vlc_object_release( p_playlist );
     }
+}
+
+- (IBAction)servicesChange:(id)sender
+{
+    NSMenuItem *o_mi = (NSMenuItem *)sender;
+    NSString *o_string = [o_mi representedObject];
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    if( !playlist_IsServicesDiscoveryLoaded( p_playlist, [o_string cString] ) )
+        playlist_ServicesDiscoveryAdd( p_playlist, [o_string cString] );
+    else
+        playlist_ServicesDiscoveryRemove( p_playlist, [o_string cString] );
+
+    [o_mi setState: playlist_IsServicesDiscoveryLoaded( p_playlist,
+                                          [o_string cString] ) ? YES : NO];
+    [self playlistUpdated];
+    return;
 }
 
 - (IBAction)selectAll:(id)sender

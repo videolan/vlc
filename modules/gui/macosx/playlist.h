@@ -56,6 +56,9 @@
     IBOutlet id o_mi_selectall;
     IBOutlet id o_mi_sort_name;
     IBOutlet id o_mi_sort_author;
+    IBOutlet id o_mi_services;
+
+    IBOutlet id o_mu_services;
 
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
@@ -80,6 +83,7 @@
 - (void)sortNode:(int)i_mode;
 - (void)updateRowSelection;
 
+- (IBAction)servicesChange:(id)sender;
 - (IBAction)playItem:(id)sender;
 - (IBAction)deleteItem:(id)sender;
 - (IBAction)selectAll:(id)sender;
