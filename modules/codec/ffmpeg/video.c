@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.28 2003/05/10 18:16:44 fenrir Exp $
+ * $Id: video.c,v 1.29 2003/06/14 15:43:39 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -266,7 +266,8 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 
     if( config_GetInt( p_vdec->p_fifo, "ffmpeg-dr" ) &&
         p_vdec->p_codec->capabilities & CODEC_CAP_DR1 &&
-        ffmpeg_PixFmtToChroma( p_vdec->p_context->pix_fmt ) )
+        ffmpeg_PixFmtToChroma( p_vdec->p_context->pix_fmt ) &&
+        !(p_vdec->p_context->width % 16) && !(p_vdec->p_context->height % 16) )
     {
         /* FIXME: some codecs set pix_fmt only after a frame
          * has been decoded. */

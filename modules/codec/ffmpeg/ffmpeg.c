@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.41 2003/06/06 02:23:30 hartman Exp $
+ * $Id: ffmpeg.c,v 1.42 2003/06/14 15:43:39 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -187,7 +187,7 @@ vlc_module_begin();
     set_callbacks( OpenDecoder, NULL );
     set_description( _("ffmpeg audio/video decoder((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
 
-    add_bool( "ffmpeg-dr", 0, NULL, DR_TEXT, DR_TEXT, VLC_TRUE );
+    add_bool( "ffmpeg-dr", 1, NULL, DR_TEXT, DR_TEXT, VLC_TRUE );
     add_integer ( "ffmpeg-error-resilience", -1, NULL, ERROR_TEXT, ERROR_LONGTEXT, VLC_TRUE );
     add_integer ( "ffmpeg-workaround-bugs", 1, NULL, BUGS_TEXT, BUGS_LONGTEXT, VLC_FALSE );
     add_bool( "ffmpeg-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT, VLC_FALSE );
