@@ -250,7 +250,13 @@ void input_ClockManageRef( input_thread_t * p_input,
             p_pgrm->last_cr = i_clock;
             if( !p_input->b_out_pace_control )
             {
-                mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
+                mtime_t i_wakeup = ClockToSysdate( p_input, p_pgrm, i_clock );
+                while( (i_wakeup - mdate()) / CLOCK_FREQ > 1 )
+                {
+                    msleep( CLOCK_FREQ );
+                    if( p_input->b_die ) i_wakeup = mdate();
+                }
+                mwait( i_wakeup );
             }
         }
         else
@@ -285,7 +291,13 @@ void input_ClockManageRef( input_thread_t * p_input,
              * clock of the selected program. */
             if( !p_input->b_out_pace_control )
             {
-                mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
+                mtime_t i_wakeup = ClockToSysdate( p_input, p_pgrm, i_clock );
+                while( (i_wakeup - mdate()) / CLOCK_FREQ > 1 )
+                {
+                    msleep( CLOCK_FREQ );
+                    if( p_input->b_die ) i_wakeup = mdate();
+                }
+                mwait( i_wakeup );
             }
 
             /* Now take into account interface changes. */
