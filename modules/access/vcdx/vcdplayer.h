@@ -1,6 +1,6 @@
 /*****************************************************************************
  * Copyright (C) 2003 Rocky Bernstein (for VideoLAN)
- * $Id: vcdplayer.h,v 1.2 2003/11/09 00:52:32 rocky Exp $
+ * $Id: vcdplayer.h,v 1.3 2003/12/04 05:14:39 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -42,7 +42,7 @@
 #define INPUT_DEBUG 1
 #if INPUT_DEBUG
 #define dbg_print(mask, s, args...) \
-   if (p_vcd->i_debug & mask) \
+   if (p_vcd && p_vcd->i_debug & mask) \
      msg_Dbg(p_input, "%s: "s, __func__ , ##args)
 #else
 #define dbg_print(mask, s, args...) 
