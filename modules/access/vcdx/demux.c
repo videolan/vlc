@@ -2,7 +2,7 @@
  * demux.c: demux functions for dvdplay.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: demux.c,v 1.1 2003/10/04 18:55:13 gbazin Exp $
+ * $Id: demux.c,v 1.2 2003/11/09 00:52:32 rocky Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -90,7 +90,7 @@ int E_(InitVCD) ( vlc_object_t *p_this )
     p_demux = p_input->p_demux_data = malloc( sizeof(demux_sys_t ) );
     if( p_demux == NULL )
     {
-        return VLC_ENOMEM;
+        return VLC_ENOMOD;
     }
 
     p_input->p_private = (void*)&p_demux->mpeg;
@@ -104,6 +104,7 @@ int E_(InitVCD) ( vlc_object_t *p_this )
     p_input->p_demux_data->p_vcd = p_vcd;
 
     p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
     p_input->pf_rewind = NULL;
 
     p_vcd->p_intf = NULL;

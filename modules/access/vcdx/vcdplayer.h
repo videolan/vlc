@@ -1,6 +1,6 @@
 /*****************************************************************************
  * Copyright (C) 2003 Rocky Bernstein (for VideoLAN)
- * $Id: vcdplayer.h,v 1.1 2003/10/04 18:55:13 gbazin Exp $
+ * $Id: vcdplayer.h,v 1.2 2003/11/09 00:52:32 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -26,15 +26,18 @@
 
 #include <libvcd/info.h>
 
-#define INPUT_DBG_MRL         1 
-#define INPUT_DBG_EXT         2 /* Calls from external routines */
-#define INPUT_DBG_CALL        4 /* all calls */
-#define INPUT_DBG_LSN         8 /* LSN changes */
-#define INPUT_DBG_PBC        16 /* Playback control */
-#define INPUT_DBG_CDIO       32 /* Debugging from CDIO */
-#define INPUT_DBG_SEEK       64 /* Seeks to set location */
-#define INPUT_DBG_STILL     128 /* Still-frame */
-#define INPUT_DBG_VCDINFO   256 /* Debugging from VCDINFO */
+#define INPUT_DBG_META        1 /* Meta information */
+#define INPUT_DBG_EVENT       2 /* input (keyboard/mouse) events */
+#define INPUT_DBG_MRL         4 /* MRL parsing */
+#define INPUT_DBG_EXT         8 /* Calls from external routines */
+#define INPUT_DBG_CALL       16 /* all calls */
+#define INPUT_DBG_LSN        32 /* LSN changes */
+#define INPUT_DBG_PBC        64 /* Playback control */
+#define INPUT_DBG_CDIO      128 /* Debugging from CDIO */
+#define INPUT_DBG_SEEK      256 /* Seeks to set location */
+#define INPUT_DBG_SEEK_CUR  512 /* Seeks to find current location */
+#define INPUT_DBG_STILL    1024 /* Still-frame */
+#define INPUT_DBG_VCDINFO  2048 /* Debugging from VCDINFO */
 
 #define INPUT_DEBUG 1
 #if INPUT_DEBUG
@@ -45,7 +48,8 @@
 #define dbg_print(mask, s, args...) 
 #endif
 
-#define LOG_ERR(args...) msg_Err( p_input, args )
+#define LOG_ERR(args...)  msg_Err( p_input, args )
+#define LOG_WARN(args...) msg_Warn( p_input, args )
 
 /* vcdplayer_read return status */
 typedef enum {
@@ -97,11 +101,56 @@ typedef struct thread_vcd_data_s
   bool         b_valid_ep;              /* Valid entry points flag */
   vlc_bool_t   b_end_of_track;          /* If the end of track was reached */
   int          i_debug;                 /* Debugging mask */
+
+  /* Probably gets moved into another structure...*/
+  intf_thread_t *         p_intf;
+  int                     i_audio_nb;
+  int                     i_still_time;
+  vlc_bool_t              b_end_of_cell;
   
 } thread_vcd_data_t;
 
-bool  vcdplayer_inc_play_item( input_thread_t *p_input );
-bool  vcdplayer_pbc_is_on(const thread_vcd_data_t *p_this);
+/*!
+  Get the next play-item in the list given in the LIDs. Note play-item
+  here refers to list of play-items for a single LID It shouldn't be
+  confused with a user's list of favorite things to play or the 
+  "next" field of a LID which moves us to a different LID.
+ */
+bool vcdplayer_inc_play_item( input_thread_t *p_input );
+
+/*!
+  Return true if playback control (PBC) is on
+*/
+bool vcdplayer_pbc_is_on(const thread_vcd_data_t *p_this);
+
+/*!
+  Play item assocated with the "default" selection.
+
+  Return false if there was some problem.
+*/
+bool vcdplayer_play_default( input_thread_t * p_input );
+
+/*!
+  Play item assocated with the "next" selection.
+
+  Return false if there was some problem.
+*/
+bool vcdplayer_play_next( input_thread_t * p_input );
+
+/*!
+  Play item assocated with the "prev" selection.
+
+  Return false if there was some problem.
+*/
+bool vcdplayer_play_prev( input_thread_t * p_input );
+
+/*!
+  Play item assocated with the "return" selection.
+
+  Return false if there was some problem.
+*/
+bool
+vcdplayer_play_return( input_thread_t * p_input );
 
 vcdplayer_read_status_t vcdplayer_pbc_nav ( input_thread_t * p_input );
 vcdplayer_read_status_t vcdplayer_non_pbc_nav ( input_thread_t * p_input );

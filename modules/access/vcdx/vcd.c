@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.2 2003/11/07 10:33:41 rocky Exp $
+ * $Id: vcd.c,v 1.3 2003/11/09 00:52:32 rocky Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Rocky Bernstein <rocky@panix.com> 
@@ -30,6 +30,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc_interface.h>
 
 #include "../../demux/mpeg/system.h"
 #include "vcd.h"
@@ -345,6 +346,10 @@ VCDOpen( vlc_object_t *p_this )
 #endif
     }
 
+    p_vcd->p_intf = intf_Create( p_input, "vcdx" );
+    p_vcd->p_intf->b_block = VLC_FALSE;
+    intf_RunThread( p_vcd->p_intf );
+
     return VLC_SUCCESS;
 }
 
@@ -362,8 +367,22 @@ VCDClose( vlc_object_t *p_this )
 
     free( p_vcd->p_entries );
     free( p_vcd->p_segments );
+
+
+    /* The following if block get moved elsewhere... */
+    if( p_vcd->p_intf != NULL )
+    {
+        intf_StopThread( p_vcd->p_intf );
+        vlc_object_detach( p_vcd->p_intf );
+        vlc_object_release( p_vcd->p_intf );
+        intf_Destroy( p_vcd->p_intf );
+	p_vcd->p_intf = NULL;
+    }
+
     free( p_vcd );
     p_vcd_input = NULL;
+
+
 }
 
 /*****************************************************************************

@@ -2,10 +2,10 @@
  * intf.c: Video CD interface to handle user interaction and still time
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.1 2003/10/04 18:55:13 gbazin Exp $
+ * $Id: intf.c,v 1.2 2003/11/09 00:52:32 rocky Exp $
  *
- * Authors: Stéphane Borel <stef@via.ecp.fr>
- *          Current modification and breakage for VCD by rocky.
+ * Authors: Rocky Bernstein <rocky@panix.com>
+ *   from DVD code by Stéphane Borel <stef@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,16 +35,18 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
+#include "vlc_keys.h"
 
 #include "vcd.h"
+#include "vcdplayer.h"
 
 /*****************************************************************************
  * intf_sys_t: description and status of interface
  *****************************************************************************/
 struct intf_sys_t
 {
-    input_thread_t *    p_input;
-    vcd_data_t *        p_vcd;
+    input_thread_t    * p_input;
+    thread_vcd_data_t * p_vcd;
 
     vlc_bool_t          b_still;
     vlc_bool_t          b_inf_still;
@@ -77,7 +79,8 @@ int E_(VCDOpenIntf) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    printf("+++++Called VCDOpenIntf\n");
+    msg_Dbg( p_intf, "VCDOpenIntf" );
+
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
@@ -87,6 +90,7 @@ int E_(VCDOpenIntf) ( vlc_object_t *p_this )
 
     p_intf->pf_run = RunIntf;
 
+    var_AddCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
     p_intf->p_sys->m_still_time = 0;
     p_intf->p_sys->b_inf_still = 0;
     p_intf->p_sys->b_still = 0;
@@ -111,48 +115,167 @@ void E_(VCDCloseIntf) ( vlc_object_t *p_this )
  *****************************************************************************/
 static void RunIntf( intf_thread_t *p_intf )
 {
-    vlc_object_t *      p_vout = NULL;
-    printf("+++++Called RunIntf\n");
-
+    vlc_object_t      * p_vout = NULL;
+    thread_vcd_data_t * p_vcd;
+    input_thread_t    * p_input;
+    
+    /* What you add to the last input number entry. It accumulates all of
+       the 10_ADD keypresses */
+    int number_addend = 0; 
+    
     if( InitThread( p_intf ) < 0 )
     {
         msg_Err( p_intf, "can't initialize intf" );
         return;
     }
-    msg_Dbg( p_intf, "intf initialized" );
+
+    p_input = p_intf->p_sys->p_input;
+    p_vcd   = p_intf->p_sys->p_vcd = 
+      (thread_vcd_data_t *) p_input->p_access_data;
+
+    dbg_print( INPUT_DBG_CALL, "intf initialized" );
 
     /* Main loop */
     while( !p_intf->b_die )
     {
       vlc_mutex_lock( &p_intf->change_lock );
 
-        /*
-         * keyboard event
-         */
-        if( p_vout && p_intf->p_sys->b_key_pressed )
+      /*
+       * keyboard event
+       */
+      if( p_vout && p_intf->p_sys->b_key_pressed )
         {
-            p_intf->p_sys->b_key_pressed = VLC_FALSE;
-            
-            printf("++++key pressed...\n");
-        }
-                
-        vlc_mutex_unlock( &p_intf->change_lock );
+	  vlc_value_t val;
+	  int i, i_action = -1;
+	  struct hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
 
-        if( p_vout == NULL )
-        {
-            p_vout = vlc_object_find( p_intf->p_sys->p_input,
-                                      VLC_OBJECT_VOUT, FIND_CHILD );
-            if( p_vout )
+	  p_intf->p_sys->b_key_pressed = VLC_FALSE;
+          
+	  /* Find action triggered by hotkey (if any) */
+	  var_Get( p_intf->p_vlc, "key-pressed", &val );
+
+	  dbg_print( INPUT_DBG_EVENT, "Key pressed %d", val.i_int );
+
+	  for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
             {
-                var_AddCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
-                var_AddCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
-                var_AddCallback( p_vout, "key-pressed", KeyEvent, p_intf );
+	      if( p_hotkeys[i].i_key == val.i_int )
+                {
+		  i_action = p_hotkeys[i].i_action;
+                }
+            }
+	  
+	  if( i_action != -1) {
+	    switch (i_action) {
+	      
+	    case ACTIONID_NAV_LEFT: 
+	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_LEFT - prev (%d)", 
+			 number_addend );
+	      do {
+		vcdplayer_play_prev( p_input );
+	      }	while (number_addend-- > 0);
+	      break;
+
+	    case ACTIONID_NAV_RIGHT:
+	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_RIGHT - next (%d)",
+			 number_addend );
+	      do {
+		vcdplayer_play_next( p_input );
+	      } while (number_addend-- > 0);
+	      break;
+
+	    case ACTIONID_NAV_UP:
+	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_UP - return" );
+	      vcdplayer_play_return( p_input );
+	      break;
+
+	    case ACTIONID_NAV_DOWN:
+	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_DOWN - default"  );
+	      vcdplayer_play_default( p_input );
+	      break;
+
+	    case ACTIONID_NAV_ACTIVATE: 
+	      {
+		vcdinfo_itemid_t itemid;
+		itemid.type=p_vcd->play_item.type;
+
+		dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_ACTIVATE" );
+
+		if ( vcdplayer_pbc_is_on( p_vcd ) && number_addend != 0 ) {
+		  lid_t next_num=vcdplayer_selection2lid(p_input, 
+							 number_addend);
+		  if (VCDINFO_INVALID_LID != next_num) {
+		    itemid.num  = next_num;
+		    itemid.type = VCDINFO_ITEM_TYPE_LID;
+		    VCDPlay( p_input, itemid );
+		  }
+		} else {
+		  itemid.num = number_addend;
+		  VCDPlay( p_input, itemid );
+		}
+		break;
+	      }
+	    }
+	    number_addend = 0;
+	  } else {
+	    unsigned int digit_entered=0;
+
+	    switch (val.i_int) {
+	    case '9':
+	      digit_entered++;
+	    case '8':
+	      digit_entered++;
+	    case '7':
+	      digit_entered++;
+	    case '6':
+	      digit_entered++;
+	    case '5':
+	      digit_entered++;
+	    case '4':
+	      digit_entered++;
+	    case '3':
+	      digit_entered++;
+	    case '2':
+	      digit_entered++;
+	    case '1':
+	      digit_entered++;
+	    case '0':
+	      {
+		number_addend *= 10;
+		number_addend += digit_entered;
+		dbg_print( INPUT_DBG_EVENT, 
+			   "Added %d. Number is now: %d\n", 
+			   digit_entered, number_addend);
+		break;
+	      }
+	    }
+	  }
+        }
+
+      
+      vlc_mutex_unlock( &p_intf->change_lock );
+      
+      if( p_vout == NULL )
+        {
+	  p_vout = vlc_object_find( p_intf->p_sys->p_input,
+				    VLC_OBJECT_VOUT, FIND_CHILD );
+	  if( p_vout )
+            {
+	      var_AddCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
+	      var_AddCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+	      var_AddCallback( p_vout, "key-pressed", KeyEvent, p_intf );
             }
         }
+      
+      
+      /* Wait a bit */
+      msleep( INTF_IDLE_SLEEP );
+    }
 
-
-        /* Wait a bit */
-        msleep( INTF_IDLE_SLEEP );
+    if( p_vout )
+    {
+        var_DelCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
+        var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+        vlc_object_release( p_vout );
     }
 
     vlc_object_release( p_intf->p_sys->p_input );
@@ -167,7 +290,6 @@ static int InitThread( intf_thread_t * p_intf )
     if( !p_intf->b_die )
     {
         input_thread_t * p_input;
-        vcd_data_t * p_vcd;
 
         p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_PARENT );
 
@@ -177,13 +299,9 @@ static int InitThread( intf_thread_t * p_intf )
             return VLC_EGENERIC;
         }
 
-        p_vcd = (vcd_data_t*)p_input->p_access_data;
-        p_vcd->p_intf = p_intf;
-
         vlc_mutex_lock( &p_intf->change_lock );
 
         p_intf->p_sys->p_input = p_input;
-        p_intf->p_sys->p_vcd = p_vcd;
 
         p_intf->p_sys->b_move = VLC_FALSE;
         p_intf->p_sys->b_click = VLC_FALSE;
