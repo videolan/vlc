@@ -23,19 +23,24 @@ SOURCES_wxwindows = \
 	$(NULL)
 
 EXTRA_DIST += \
-	bitmaps/stop.xpm \
-	bitmaps/play.xpm \
-	bitmaps/pause.xpm \
+	bitmaps/advanced.xpm \
+	bitmaps/audio.xpm \
+	bitmaps/codec.xpm \
 	bitmaps/eject.xpm \
-	bitmaps/prev.xpm \
-	bitmaps/next.xpm \
-	bitmaps/slow.xpm \
 	bitmaps/fast.xpm \
-	bitmaps/playlist.xpm \
-	bitmaps/speaker.xpm \
-	bitmaps/shuffle.xpm \
-	bitmaps/repeat.xpm \
+	bitmaps/intf.xpm \
 	bitmaps/loop.xpm \
+	bitmaps/next.xpm \
+	bitmaps/pause.xpm \
+	bitmaps/playlist.xpm \
+	bitmaps/play.xpm \
+	bitmaps/prev.xpm \
+	bitmaps/repeat.xpm \
+	bitmaps/shuffle.xpm \
+	bitmaps/slow.xpm \
+	bitmaps/speaker_mute.xpm \
+	bitmaps/speaker.xpm \
+	bitmaps/stop.xpm \
 	bitmaps/type_afile.xpm \
 	bitmaps/type_card.xpm \
 	bitmaps/type_cdda.xpm \
@@ -45,4 +50,5 @@ EXTRA_DIST += \
 	bitmaps/type_node.xpm \
 	bitmaps/type_playlist.xpm \
 	bitmaps/type_unknown.xpm \
-	bitmaps/type_vfile.xpm
+	bitmaps/type_vfile.xpm \
+	bitmaps/video.xpm
