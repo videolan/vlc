@@ -2,7 +2,7 @@
  * asf.c : ASF demux module
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.49 2004/01/25 20:05:28 hartman Exp $
+ * $Id: asf.c,v 1.50 2004/01/29 18:02:58 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -102,6 +102,7 @@ static int Open( vlc_object_t * p_this )
     vlc_bool_t      b_seekable;
 
     input_info_category_t *p_cat;
+    playlist_item_t *p_item = NULL;
 
     /* a little test to see if it could be a asf stream */
     if( input_Peek( p_input, &p_peek, 16 ) < 16 )
@@ -288,6 +289,17 @@ static int Open( vlc_object_t * p_this )
     p_cat = input_InfoCategory( p_input, _("Asf") );
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_input,
                                      VLC_OBJECT_PLAYLIST,  FIND_PARENT);
+    if( p_playlist )
+    {
+        vlc_mutex_lock( &p_playlist->object_lock );
+        p_item = playlist_ItemGetByPos( p_playlist, -1 );
+        vlc_mutex_unlock( &p_playlist->object_lock );
+    }
+    if( p_item )
+    {
+        vlc_mutex_lock( &p_item->lock );
+    }
+
     if( p_sys->i_length > 0 )
     {
         int64_t i_second = p_sys->i_length / (int64_t)1000000;
@@ -296,9 +308,9 @@ static int Open( vlc_object_t * p_this )
                        (int)(i_second / 36000),
                        (int)(( i_second / 60 ) % 60),
                        (int)(i_second % 60) );
-        if( p_playlist )
+        if( p_item )
         {
-            playlist_AddInfo( p_playlist, -1, _("Asf"), _("Length"),
+            playlist_ItemAddInfo( p_item, _("Asf"), _("Length"),
                                "%d:%d:%d",
                                (int)(i_second / 36000),
                                (int)(( i_second / 60 ) % 60),
@@ -306,9 +318,9 @@ static int Open( vlc_object_t * p_this )
         }
     }
     input_AddInfo( p_cat, _("Number of streams"), "%d" , p_sys->i_streams );
-    if( p_playlist )
+    if( p_item )
     {
-        playlist_AddInfo( p_playlist, -1, _("Asf"),_("Number of streams"),"%d",
+        playlist_ItemAddInfo( p_item, _("Asf"),_("Number of streams"),"%d",
                          p_sys->i_streams );
     }
 
@@ -318,35 +330,50 @@ static int Open( vlc_object_t * p_this )
         if( *p_cd->psz_title )
         {
             input_AddInfo( p_cat, _("Title"), p_cd->psz_title );
-            playlist_AddInfo( p_playlist, -1, _("Asf"),_("Title"),
-                              p_cd->psz_title );
-            playlist_SetName( p_playlist, -1, p_cd->psz_title );
+            if( p_item )
+            {
+                playlist_ItemAddInfo( p_item, _("Asf"),_("Title"),
+                                  p_cd->psz_title );
+                playlist_ItemSetName( p_item, p_cd->psz_title );
+            }
         }
         if( p_cd->psz_author )
         {
             input_AddInfo( p_cat, _("Author"), p_cd->psz_author );
-            playlist_AddInfo( p_playlist, -1, _("Asf"),_("Author"),
-                              p_cd->psz_author );
-            playlist_AddInfo( p_playlist, -1, _("General"),_("Author"),
-                              p_cd->psz_author );
+            if( p_item )
+            {
+                playlist_ItemAddInfo( p_item, _("Asf"),_("Author"),
+                                  p_cd->psz_author );
+                playlist_ItemAddInfo( p_item, _("General"),_("Author"),
+                                  p_cd->psz_author );
+            }
         }
         if( p_cd->psz_copyright )
         {
             input_AddInfo( p_cat, _("Copyright"), p_cd->psz_copyright );
-            playlist_AddInfo( p_playlist, -1, _("Asf"),  _("Copyright"),
-                               p_cd->psz_copyright );
+            if( p_item )
+            {
+                playlist_ItemAddInfo( p_item, _("Asf"),  _("Copyright"),
+                                      p_cd->psz_copyright );
+            }
         }
         if( *p_cd->psz_description )
         {
             input_AddInfo( p_cat, _("Description"), p_cd->psz_description );
-            playlist_AddInfo( p_playlist, -1, _("Asf"),  _("Description"),
-                               p_cd->psz_description );
+            if( p_item )
+            {
+                playlist_ItemAddInfo( p_item, _("Asf"),  _("Description"),
+                                      p_cd->psz_description );
+            }
         }
         if( *p_cd->psz_rating )
         {
             input_AddInfo( p_cat, _("Rating"), p_cd->psz_rating );
-            playlist_AddInfo( p_playlist, -1, _("Asf"),  _("Rating"),
-                              p_cd->psz_rating );
+            if( p_item )
+            {
+                playlist_ItemAddInfo( p_item, _("Asf"),  _("Rating"),
+                                      p_cd->psz_rating );
+            }
         }
     }
 
@@ -367,17 +394,24 @@ static int Open( vlc_object_t * p_this )
             {
                 input_AddInfo( p_cat, _("Codec name"),
                                p_cl->codec[i_stream].psz_name );
-                playlist_AddInfo( p_playlist, -1, psz_cat, _("Codec name"),
-                                  p_cl->codec[i_stream].psz_name );
                 input_AddInfo( p_cat, _("Codec description"),
                                p_cl->codec[i_stream].psz_description );
-                playlist_AddInfo( p_playlist, -1, psz_cat,
-                                _("Codec description"),
-                                 p_cl->codec[i_stream].psz_description );
+                if( p_item )
+                {
+                    playlist_ItemAddInfo( p_item, psz_cat, _("Codec name"),
+                                      p_cl->codec[i_stream].psz_name );
+                    playlist_ItemAddInfo( p_item, psz_cat,
+                                    _("Codec description"),
+                                     p_cl->codec[i_stream].psz_description );
+                }
             }
             free( psz_cat );
             i_stream++;
         }
+    }
+    if( p_item )
+    {
+        vlc_mutex_unlock( &p_item->lock );
     }
 
     if( p_playlist ) vlc_object_release( p_playlist );
