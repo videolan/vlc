@@ -17,7 +17,7 @@
 #include <qdragobject.h>
 #include <qstring.h>
 #include <qwidget.h>
-
+#include "messages.h"
 class KThread;
 
 class KDiskDialog;
@@ -67,6 +67,7 @@ class KInterface : public KMainWindow
          * @param text the text that is displayed in the statusbar
          */
         void slotStatusMsg( const QString &text );
+        void slotShowMessages();
 
     protected:
         /** initializes the KActions of the application */
@@ -103,6 +104,7 @@ class KInterface : public KMainWindow
   private:
 
         intf_thread_t    *p_intf;
+        KMessagesWindow *p_messagesWindow;
 
         /** to call p_intf->pf_manage every now and then */
         QTimer            *fTimer;
@@ -135,6 +137,7 @@ class KInterface : public KMainWindow
         KAction             *fast;
         KAction             *prev;
         KAction             *next;
+        KAction             *messages;
         KAction             *preferences;
 };
 
@@ -148,6 +151,7 @@ struct intf_sys_t
     KAboutData   *p_about;
 
     input_thread_t *p_input;
+    msg_subscription_t *p_msg;
 };
 
 #endif /* _KDE_INTERFACE_H_ */

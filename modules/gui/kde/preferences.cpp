@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.4 2002/08/15 12:11:15 sam Exp $
+ * $Id: preferences.cpp,v 1.5 2002/10/03 10:15:01 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -44,7 +44,7 @@
 #include "preferences.h"
 
 /*
- construkt a new configuration window for the given module
+ construct a new configuration window for the given module
 */
 KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                            QWidget *parent, const QString &caption) :

@@ -2,7 +2,7 @@
  * kde.cpp : KDE plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: kde.cpp,v 1.2 2002/08/18 13:14:39 sigmunau Exp $
+ * $Id: kde.cpp,v 1.3 2002/10/03 10:15:01 sigmunau Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -94,6 +94,7 @@ static void close(vlc_object_t *p_this)
     
     delete p_intf->p_sys->p_app;
     delete p_intf->p_sys->p_about;
+    msg_Unsubscribe(p_intf, p_intf->p_sys->p_msg);
     free( p_intf->p_sys );
 }
 
@@ -113,18 +114,15 @@ void run(intf_thread_t *p_intf)
          _("(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"),
          0, 0, "");
  
-    char *authors[][2] = {
-        { "the VideoLAN Team", "<videolan@videolan.org>" },
-        { NULL, NULL },
-    };
-
-    for ( int i = 0; NULL != authors[i][0]; i++ ) {
-        p_intf->p_sys->p_about->addAuthor( authors[i][0], 0, authors[i][1] );
-    }
+    p_intf->p_sys->p_about->addAuthor( "the VideoLAN Team", 0,
+                                       "<videolan@videolan.org>" );
 
     int argc = 1;
     char *argv[] = { p_intf->p_vlc->psz_object_name, NULL };
     KCmdLineArgs::init( argc, argv, p_intf->p_sys->p_about );
+
+    /* Subscribe to message queue */
+    p_intf->p_sys->p_msg = msg_Subscribe( p_intf );
 
     p_intf->p_sys->p_app = new KApplication();
     p_intf->p_sys->p_window = new KInterface(p_intf);

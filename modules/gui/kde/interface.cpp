@@ -37,7 +37,8 @@ KInterface::KInterface( intf_thread_t *p_intf, QWidget *parent,
     setAcceptDrops(true);
 
     this->p_intf = p_intf;
-
+    p_messagesWindow = new KMessagesWindow( p_intf, p_intf->p_sys->p_msg );
+    p_messagesWindow->show();
     fDiskDialog = new KDiskDialog( this );
     fNetDialog = new KNetDialog( this );
     fTitleMenu = new KTitleMenu( p_intf, this );
@@ -98,6 +99,7 @@ void KInterface::initActions()
     fast = new KAction( i18n( "Fas&t" ), 0, 0, this, SLOT( slotFast() ), actionCollection(), "fast" );
     prev = new KAction( i18n( "Prev" ), 0, 0, this, SLOT( slotPrev() ), actionCollection(), "prev" );
     next = new KAction( i18n( "Next" ), 0, 0, this, SLOT( slotNext() ), actionCollection(), "next" );
+    messages = new KAction( _( "Messages..." ), 0, 0, this, SLOT( slotShowMessages() ), actionCollection(), "view_messages");
     
     fileOpen->setStatusText(i18n("Opens an existing document"));
     fileOpenRecent->setStatusText(i18n("Opens a recently used file"));
@@ -118,7 +120,8 @@ void KInterface::initActions()
     next->setStatusText( i18n( "Next" ) );
     // use the absolute path to your ktestui.rc file for testing purpose in createGUI();
 
-    createGUI( DATA_PATH "/vlc_kde_ui.rc" );
+    createGUI( DATA_PATH "/ui.rc" );
+//    createGUI( "./modules/gui/kde/ui.rc" );
 }
 
 void KInterface::initStatusBar()
@@ -134,6 +137,10 @@ void KInterface::initStatusBar()
 /////////////////////////////////////////////////////////////////////
 // SLOT IMPLEMENTATION
 /////////////////////////////////////////////////////////////////////
+void KInterface::slotShowMessages()
+{
+    p_messagesWindow->show();
+}
 
 void KInterface::slotFileOpen()
 {
@@ -231,6 +238,8 @@ void KInterface::slotStatusMsg(const QString &text)
 
 void KInterface::slotManage()
 {
+    p_messagesWindow->update();
+    p_intf->p_sys->p_app->processEvents();
     vlc_mutex_lock( &p_intf->change_lock );
 
     /* Update the input */
@@ -275,6 +284,7 @@ void KInterface::slotManage()
     }
 
     vlc_mutex_unlock( &p_intf->change_lock );
+
 }
 
 void KInterface::slotSliderMoved( int position )

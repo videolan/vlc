@@ -24,6 +24,10 @@
     <Separator lineSeparator="true"/>
     <Action name="file_quit"/>
   </Menu>
+  <Menu name="view" noMerge="1">
+    <text>&amp;View</text>
+    <Action name="view_messages"/>
+  </Menu>
 </MenuBar>
 
 <ToolBar name="mainToolBar" iconText="icononly" iconSize="16" noMerge="1">
