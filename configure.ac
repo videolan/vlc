@@ -589,44 +589,16 @@ AC_CACHE_CHECK([if \$CC accepts -Wsign-compare],
     [CFLAGS="-Wsign-compare ${CFLAGS_save}"
      AC_TRY_COMPILE([],,ac_cv_c_Wsign_compare=yes, ac_cv_c_Wsign_compare=no)])
 
-AC_CACHE_CHECK([if \$CC accepts -Winline],
-    [ac_cv_c_Winline],
-    [CFLAGS="-Winline ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Winline=yes, ac_cv_c_Winline=no)])
-
 if test "${ac_cv_c_Wall}" != "no"; then
     CFLAGS_save="-Wall ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wall ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wall ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
-if test "${ac_cv_c_Wunreachable_code}" != "no"; then
-#    CFLAGS_save="-Wunreachable-code ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-#    CXXFLAGS_save="-Wunreachable-code ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-#    OBJCFLAGS_save="-Wunreachable-code ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
-
-    dnl -Wunreachable-code means gcc-3.x, we can use -Wconversion and we can
-    dnl activate -Winline for C++, it won't choke on system headers.
-#    if test "${ac_cv_c_Wconversion}" != "no"; then
-#        CFLAGS_save="-Wconversion ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-#        CXXFLAGS_save="-Wconversion ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-#        OBJCFLAGS_save="-Wconversion ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
-#    fi
-    if test "${ac_cv_c_Winline}" != "no"; then
-        CXXFLAGS_save="-Winline ${CXXFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-    fi
-
-fi
-
 if test "${ac_cv_c_Wsign_compare}" != "no"; then
     CFLAGS_save="-Wsign-compare ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wsign-compare ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wsign-compare ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
-fi
-
-if test "${ac_cv_c_Winline}" != "no"; then
-    CFLAGS_save="-Winline ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-    OBJCFLAGS_save="-Winline ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
 dnl Check for -pipe

@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.40 2003/06/14 18:49:02 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.41 2003/06/22 17:52:12 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -149,7 +149,7 @@ static int Open ( vlc_object_t *p_this )
     imlib_context_set_colormap( DefaultColormap( display, screen ) );
     imlib_context_set_dither( 1 );
     imlib_context_set_blend( 1 );
-    Imlib_Image img = imlib_load_image_immediately( DATA_PATH "vlc32x32.png" );
+    Imlib_Image img = imlib_load_image_immediately( DATA_PATH"/vlc32x32.png" );
     if( img == NULL )
     {
         // for developers ;)
