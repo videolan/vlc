@@ -2950,7 +2950,9 @@ from http://www.freetype.org/, or configure with --disable-freetype. Have a nice
     if test "${FRIBIDI_CONFIG}" != "no"
     then
       VLC_ADD_CFLAGS([freetype], [`${FRIBIDI_CONFIG} --cflags` -DHAVE_FRIBIDI])
+      VLC_ADD_CPPFLAGS([skins2], [`${FRIBIDI_CONFIG} --cflags` -DHAVE_FRIBIDI])
       VLC_ADD_LDFLAGS([freetype], [`${FRIBIDI_CONFIG} --libs`])
+      VLC_ADD_LDFLAGS([skins2], [`${FRIBIDI_CONFIG} --libs`])
     fi
   fi
 fi

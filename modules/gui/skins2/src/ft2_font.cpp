@@ -26,6 +26,10 @@
 #include "ft2_bitmap.hpp"
 #include "../utils/ustring.hpp"
 
+#ifdef HAVE_FRIBIDI
+#include <fribidi/fribidi.h>
+#endif
+
 
 FT2Font::FT2Font( intf_thread_t *pIntf, const string &rName, int size ):
     GenericFont( pIntf ), m_name( rName ), m_buffer( NULL ), m_size( size ),
@@ -160,6 +164,19 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
     // Get the length of the string
     int len = rString.length();
 
+    // Use fribidi if available
+#ifdef HAVE_FRIBIDI
+    uint32_t *pFribidiString = NULL;
+    if( len > 0 )
+    {
+        pFribidiString = new uint32_t[len+1];
+        FriBidiCharType baseDir = FRIBIDI_TYPE_ON;
+        fribidi_log2vis( (FriBidiChar*)pString, len, &baseDir,
+                         (FriBidiChar*)pFribidiString, 0, 0, 0 );
+        pString = pFribidiString;
+    }
+#endif
+
     // Array of glyph bitmaps and position
     FT_Glyph *glyphs = new FT_Glyph[len];
     int *pos = new int[len];
@@ -240,6 +257,13 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
             break;
         }
     }
+
+#ifdef HAVE_FRIBIDI
+    if( len > 0 )
+    {
+        delete[] pFribidiString;
+    }
+#endif
 
     // Adjust the size for vertical padding
     yMax = __MAX( yMax, m_ascender );
