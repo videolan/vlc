@@ -39,8 +39,6 @@
 {
 
     [o_info_window setExcludedFromWindowsMenu: TRUE];
-    [o_tbv_info setOutlineTableColumn:0];
-    [o_tbv_info setDataSource: self];
 
     [o_info_window setTitle: _NS("Properties")];
     [o_uri_lbl setStringValue: _NS("URI")];
@@ -72,9 +70,9 @@
             [o_title_txt setStringValue:[NSString stringWithUTF8String: p_playlist->pp_items[i_item]->psz_name]];
             [o_author_txt setStringValue:[NSString stringWithUTF8String: playlist_GetInfo(p_playlist, i_item ,_("General"),_("Author") )]];
 
-            /*fill info outline*/
-//            [o_tbv_info 
-            vlc_object_release ( p_playlist );
+            [[VLCInfoTreeItem rootItem] refresh];
+            [o_outline_view reloadData];
+            vlc_object_release( p_playlist );
         }
         [o_info_window makeKeyAndOrderFront: sender];
     }
@@ -104,12 +102,173 @@
  
         vlc_mutex_unlock(&p_playlist->pp_items[i_item]->lock);
         val.b_bool = VLC_TRUE;
-        var_Set( p_playlist,"int-change",val );
+        var_Set( p_playlist,"intf-change",val );
         vlc_object_release ( p_playlist );
     } 
     [self togglePlaylistInfoPanel:self];
-    
-}   
+}
+
+
+@end
+
+@implementation VLCPlaylistInfo (NSTableDataSource)
+
+- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item  
+{
+    return (item == nil) ? [[VLCInfoTreeItem rootItem] numberOfChildren] : [item numberOfChildren];
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item {
+    return ([item numberOfChildren] > 0);
+}
+
+- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item  
+{
+    return (item == nil) ? [[VLCInfoTreeItem rootItem] childAtIndex:index] : [item childAtIndex:index];
+}
+
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+{
+    if ([[tableColumn identifier] isEqualToString:@"0"])
+    {
+        return (item == nil) ? @"" : (id)[item getName];
+    }
+    else
+    {
+        return (item == nil) ? @"" : (id)[item getValue];
+    }
+}
+
+@end
+
+@implementation VLCInfoTreeItem
+
+static VLCInfoTreeItem *o_root_item = nil;
+
+#define IsALeafNode ((id)-1)
+
+- (id)initWithName: (NSString *)o_item_name value: (NSString *)o_item_value ID: (int)i_id parent:(VLCInfoTreeItem *)o_parent_item
+{
+    self = [super init];
+ 
+    if( self != nil )
+    {
+
+        i_item = [[[NSApp delegate] getPlaylist] selectedPlaylistItem];
+        o_name = [o_item_name copy];
+        o_value = [o_item_value copy];
+        i_object_id = i_id;
+        o_parent = o_parent_item;
+    }
+    return( self );
+}
+
++ (VLCInfoTreeItem *)rootItem {
+    if (o_root_item == nil) o_root_item = [[VLCInfoTreeItem alloc] initWithName:@"main" value: @"" ID: 0 parent:nil];
+    return o_root_item;
+}
+
+- (void)dealloc
+{
+    if (o_children != IsALeafNode) [o_children release];
+    [o_name release];
+    [super dealloc];
+}
+
+/* Creates and returns the array of children
+ * Loads children incrementally */
+- (NSArray *)children
+{
+    if (o_children == NULL)
+    {
+        intf_thread_t * p_intf = [NSApp getIntf];
+        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+        int i;
+
+        if (p_playlist)
+        {
+            if (i_item > -1)
+            {
+                if (self == o_root_item)
+                {
+                    o_children = [[NSMutableArray alloc] initWithCapacity:p_playlist->pp_items[i_item]->i_categories];
+                    for (i = 0 ; i<p_playlist->pp_items[i_item]->i_categories ; i++)
+                    {
+                        [o_children addObject:[[VLCInfoTreeItem alloc] 
+                            initWithName: [NSString stringWithUTF8String:
+                                p_playlist->pp_items[i_item]->pp_categories[i]
+                                ->psz_name]
+                            value: @""
+                            ID: i 
+                            parent: self]];
+                    }
+                }
+                else if (o_parent == o_root_item)
+                {
+                    o_children = [[NSMutableArray alloc] initWithCapacity:
+                        p_playlist->pp_items[i_item]->
+                        pp_categories[i_object_id]->i_infos];
+                    for (i = 0 ; i<p_playlist->pp_items[i_item]->
+                           pp_categories[i_object_id]->i_infos ; i++)
+                    {
+                        [o_children addObject:[[VLCInfoTreeItem alloc]
+                        initWithName: [NSString stringWithUTF8String:
+                                p_playlist->pp_items[i_item]->
+                                pp_categories[i_object_id]->
+                                pp_infos[i]->psz_name]
+                            value: [NSString stringWithUTF8String:
+                                p_playlist->pp_items[i_item]->
+                                pp_categories[i_object_id]->
+                                pp_infos[i]->psz_value]
+                            ID: i
+                            parent: self]];
+                    }
+                }
+                else
+                {
+                    o_children = IsALeafNode;
+                }
+            }
+            vlc_object_release(p_playlist);
+        }
+    }
+    return o_children;
+}
+
+- (NSString *)getName
+{
+    return o_name;
+}
+
+- (NSString *)getValue
+{
+    return o_value;
+}
+
+- (VLCInfoTreeItem *)childAtIndex:(int)i_index {
+    return [[self children] objectAtIndex:i_index];
+}
+
+- (int)numberOfChildren {
+    id i_tmp = [self children];
+    return (i_tmp == IsALeafNode) ? (-1) : (int)[i_tmp count];
+}
+
+- (int)selectedPlaylistItem
+{
+    return i_item; 
+}
+
+- (void)refresh
+{
+    if (o_children != NULL)
+    {
+        [o_children release];
+        o_children = NULL;
+    }
+    i_item = [[[NSApp delegate] getPlaylist] selectedPlaylistItem];
+}
 
 @end
 

@@ -37,9 +37,8 @@
     IBOutlet id o_author_txt;
     IBOutlet id o_btn_info_ok;
     IBOutlet id o_btn_info_cancel;
-    IBOutlet id o_tbv_info;
+    IBOutlet id o_outline_view;
     IBOutlet id o_vlc_playlist;
-    id o_otl_data;
 }
 
 - (IBAction)togglePlaylistInfoPanel:(id)sender;
@@ -47,3 +46,23 @@
 - (IBAction)infoOk:(id)sender;
 
 @end
+
+@interface VLCInfoTreeItem : NSObject
+{
+    NSString *o_name;
+    NSString *o_value;
+    int i_object_id;
+    int i_item;
+    VLCInfoTreeItem *o_parent;
+    NSMutableArray *o_children;
+}
+
++ (VLCInfoTreeItem *)rootItem;
+- (int)numberOfChildren;
+- (VLCInfoTreeItem *)childAtIndex:(int)i_index;
+- (NSString *)getName;
+- (NSString *)getValue;
+- (void)refresh;
+
+@end
+
