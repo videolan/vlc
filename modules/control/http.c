@@ -117,9 +117,9 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
                           uint8_t *p_request,
                           uint8_t **pp_data, int *pi_data );
 
-static char *uri_extract_value( char *psz_uri, char *psz_name,
+static char *uri_extract_value( char *psz_uri, const char *psz_name,
                                 char *psz_value, int i_value_max );
-static int uri_test_param( char *psz_uri, char *psz_name );
+static int uri_test_param( char *psz_uri, const char *psz_name );
 
 static void uri_decode_url_encoded( char *psz );
 
@@ -2576,7 +2576,7 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
 /****************************************************************************
  * uri parser
  ****************************************************************************/
-static int uri_test_param( char *psz_uri, char *psz_name )
+static int uri_test_param( char *psz_uri, const char *psz_name )
 {
     char *p = psz_uri;
 
@@ -2592,7 +2592,7 @@ static int uri_test_param( char *psz_uri, char *psz_name )
 
     return VLC_FALSE;
 }
-static char *uri_extract_value( char *psz_uri, char *psz_name,
+static char *uri_extract_value( char *psz_uri, const char *psz_name,
                                 char *psz_value, int i_value_max )
 {
     char *p = psz_uri;
