@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.78 2003/04/09 19:58:25 gbazin Exp $
+ * $Id: libvlc.c,v 1.79 2003/04/18 15:25:51 titer Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1007,7 +1007,7 @@ static void SetLanguage ( char const *psz_lang )
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 
     char *          psz_path;
-#if defined( SYS_DARWIN ) || defined ( WIN32 )
+#if defined( SYS_DARWIN ) || defined ( WIN32 ) || defined( SYS_BEOS )
     char            psz_tmp[1024];
 #endif
 
@@ -1043,7 +1043,7 @@ static void SetLanguage ( char const *psz_lang )
     }
 
     /* Specify where to find the locales for current domain */
-#if !defined( SYS_DARWIN ) && !defined( WIN32 )
+#if !defined( SYS_DARWIN ) && !defined( WIN32 ) && !defined( SYS_BEOS )
     psz_path = LOCALEDIR;
 #else
     snprintf( psz_tmp, sizeof(psz_tmp), "%s/%s", libvlc.psz_vlcpath,

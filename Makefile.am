@@ -443,9 +443,15 @@ DEPENDENCIES_vlc = lib/libvlc.a $(L_builtin) $(DATA_win32_rc) $(LIB_intl)
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	@rm -f vlc$(EXEEXT)
 	$(LINK) $(vlc_LDFLAGS) $(vlc_OBJECTS) $(vlc_LDADD) $(LIBS)
+
 if HAVE_BEOS
 	xres -o $@ ./share/vlc_beos.rsrc
 	mimeset -f $@
+	$(INSTALL) -d locale
+	for i in $(ALL_LINGUAS); do \
+		mkdir -p locale/$${i}/LC_MESSAGES ; \
+		cp po/$${i}.gmo locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+	done
 endif
 
 # Install the symlinks

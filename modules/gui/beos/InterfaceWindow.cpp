@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.31 2003/03/12 23:15:03 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.32 2003/04/18 15:25:50 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -242,7 +242,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     AddChild( p_mediaControl );
 
     // Add the file Menu
-    BMenu* fileMenu = new BMenu( "File" );
+    BMenu* fileMenu = new BMenu( _("File") );
     fMenuBar->AddItem( fileMenu );
     fileMenu->AddItem( new BMenuItem( "Open File" B_UTF8_ELLIPSIS,
                                       new BMessage( OPEN_FILE ), 'O') );
@@ -263,7 +263,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     fSubtitlesMenu = new LanguageMenu("Subtitles", SPU_ES, p_wrapper);
 
     /* Add the Audio menu */
-    fAudioMenu = new BMenu( "Audio" );
+    fAudioMenu = new BMenu( _("Audio") );
     fMenuBar->AddItem ( fAudioMenu );
     fAudioMenu->AddItem( fLanguageMenu );
     fAudioMenu->AddItem( fSubtitlesMenu );
@@ -275,7 +275,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     fGotoMenuMI = new BMenuItem( "Goto Menu", new BMessage( NAVIGATE_MENU ) );
 
     /* Add the Navigation menu */
-    fNavigationMenu = new BMenu( "Navigation" );
+    fNavigationMenu = new BMenu( _("Navigation") );
     fMenuBar->AddItem( fNavigationMenu );
     fNavigationMenu->AddItem( fGotoMenuMI );
     fNavigationMenu->AddSeparatorItem();
@@ -288,7 +288,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     fNavigationMenu->AddItem( fChapterMenu = new ChapterMenu( "Go to Chapter", p_intf ) );
 
     /* Add the Speed menu */
-    fSpeedMenu = new BMenu( "Speed" );
+    fSpeedMenu = new BMenu( _("Speed") );
     fSpeedMenu->SetRadioMode( true );
     fSpeedMenu->AddItem( fSlowerMI = new BMenuItem( "Slower", new BMessage( SLOWER_PLAY ) ) );
     fNormalMI = new BMenuItem( "Normal", new BMessage( NORMAL_PLAY ) );
@@ -299,7 +299,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     fMenuBar->AddItem( fSpeedMenu );
 
     /* Add the Show menu */
-    fShowMenu = new BMenu( "Window" );
+    fShowMenu = new BMenu( _("Window") );
     fShowMenu->AddItem( new BMenuItem( "Play List" B_UTF8_ELLIPSIS,
                                        new BMessage( OPEN_PLAYLIST ), 'P') );
     fShowMenu->AddItem( new BMenuItem( "Messages" B_UTF8_ELLIPSIS,
