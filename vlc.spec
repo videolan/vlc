@@ -219,7 +219,7 @@ select the `alsa' aout plugin from the preferences menu.
             --enable-gtk --enable-gnome --disable-qt --disable-kde --enable-ncurses --enable-lirc \
             --enable-x11 --enable-xvideo --enable-ggi --enable-sdl --enable-fb --enable-mga --enable-aa \
             --enable-esd --enable-alsa --enable-arts \
-	    --enable-mad --enable-ffmpeg --with-ffmpeg=%_libdir
+	    --enable-mad --enable-ffmpeg --with-ffmpeg=/usr
 export QTDIR=%{_libdir}/qt2 
 %make
 
