@@ -184,7 +184,7 @@ u32 UnalignedGetBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
 
     i_result = p_bit_stream->fifo.buffer
                     >> (8 * sizeof(WORD_TYPE) - i_bits);
-    i_bits -= p_bit_stream->fifo.i_available;
+    i_bits = -p_bit_stream->fifo.i_available;
 
     /* Gather missing bytes. */
     while( i_bits >= 8 )

@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.18 2001/01/21 01:36:25 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.19 2001/01/22 18:04:10 massiot Exp $
  *
  * Authors:
  *
@@ -312,9 +312,10 @@ static __inline__ u32 GetBits( bit_stream_t * p_bit_stream,
 {
     u32             i_result;
 
-    if( p_bit_stream->fifo.i_available >= i_bits )
+    p_bit_stream->fifo.i_available -= i_bits;
+
+    if( p_bit_stream->fifo.i_available >= 0 )
     {
-        p_bit_stream->fifo.i_available -= i_bits;
         i_result = p_bit_stream->fifo.buffer
                         >> (8 * sizeof(WORD_TYPE) - i_bits);
         p_bit_stream->fifo.buffer <<= i_bits;
@@ -323,7 +324,6 @@ static __inline__ u32 GetBits( bit_stream_t * p_bit_stream,
 
     if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
     {
-        p_bit_stream->fifo.i_available -= i_bits;
         i_result = p_bit_stream->fifo.buffer
                         >> (8 * sizeof(WORD_TYPE) - i_bits);
         p_bit_stream->fifo.buffer = WORD_AT( p_bit_stream->p_byte );
@@ -373,6 +373,7 @@ static __inline__ u32 GetBits32( bit_stream_t * p_bit_stream )
         return( i_result );
     }
 
+    p_bit_stream->fifo.i_available -= 32;
     return UnalignedGetBits( p_bit_stream, 32 );
 }
 #else
