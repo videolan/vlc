@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.19 2002/08/15 12:11:15 sam Exp $
+ * $Id: objects.c,v 1.20 2002/08/24 17:04:36 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -226,14 +226,16 @@ void __vlc_object_destroy( vlc_object_t *p_this )
         msleep( 100000 );
     }
 
-    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
-
     /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
      * useless to try and recover anything if pp_objects gets smashed. */
-    if( p_this->p_vlc->i_objects > 1 )
+    if( p_this->i_object_type != VLC_OBJECT_ROOT )
     {
-        int i_index = FindIndex( p_this, p_this->p_vlc->pp_objects,
-                                         p_this->p_vlc->i_objects );
+        int i_index;
+
+        vlc_mutex_lock( &p_this->p_vlc->structure_lock );
+
+        i_index = FindIndex( p_this, p_this->p_vlc->pp_objects,
+                             p_this->p_vlc->i_objects );
         memmove( p_this->p_vlc->pp_objects + i_index,
                  p_this->p_vlc->pp_objects + i_index + 1,
                  (p_this->p_vlc->i_objects - i_index - 1)
@@ -242,16 +244,17 @@ void __vlc_object_destroy( vlc_object_t *p_this )
         p_this->p_vlc->pp_objects =
             realloc( p_this->p_vlc->pp_objects,
                      (p_this->p_vlc->i_objects - 1) * sizeof(vlc_object_t *) );
+
+        vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
     }
     else
     {
+        /* We are the root object ... no need to lock. */
         free( p_this->p_vlc->pp_objects );
         p_this->p_vlc->pp_objects = NULL;
     }
 
     p_this->p_vlc->i_objects--;
-
-    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
 
     vlc_mutex_destroy( &p_this->object_lock );
     vlc_cond_destroy( &p_this->object_wait );
