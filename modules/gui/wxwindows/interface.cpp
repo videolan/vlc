@@ -375,7 +375,7 @@ void Interface::CreateOurMenuBar()
 #if (wxMAJOR_VERSION <= 2) && (wxMINOR_VERSION <= 5) && (wxRELEASE_NUMBER < 3)
             4 /* approximate margin */;
 #else
-            15 /* approximate margin */;
+            18 /* approximate margin */;
 #endif
 #endif
     }
