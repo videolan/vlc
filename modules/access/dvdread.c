@@ -118,9 +118,7 @@ struct demux_sys_t
 
     tt_srpt_t    *p_tt_srpt;
     pgc_t        *p_cur_pgc;
-
     dsi_t        dsi_pack;
-
     int          i_ttn;
 
     int i_pack_len;
@@ -138,21 +136,17 @@ struct demux_sys_t
     int i_cur_cell;
     int i_next_cell;
 
-    /* track */
-    ps_track_t  tk[PS_TK_COUNT];
-
-    /* for spu variables */
-    input_thread_t *p_input;
-
-    /* FIXME */
-    uint8_t     alpha[4];
-    uint32_t    clut[16];
-
-    /* */
-    int i_aspect;
+    /* Track */
+    ps_track_t    tk[PS_TK_COUNT];
 
     int           i_titles;
     input_title_t **titles;
+
+    /* Video */
+    int i_aspect;
+
+    /* SPU */
+    uint32_t clut[16];
 };
 
 static char *ParseCL( vlc_object_t *, char *, vlc_bool_t, int *, int *, int *);
@@ -160,14 +154,6 @@ static char *ParseCL( vlc_object_t *, char *, vlc_bool_t, int *, int *, int *);
 static int Control   ( demux_t *, int, va_list );
 static int Demux     ( demux_t * );
 static int DemuxBlock( demux_t *, uint8_t *, int );
-
-enum
-{
-    AR_SQUARE_PICTURE = 1,                          /* square pixels */
-    AR_3_4_PICTURE    = 2,                       /* 3:4 picture (TV) */
-    AR_16_9_PICTURE   = 3,             /* 16:9 picture (wide screen) */
-    AR_221_1_PICTURE  = 4,                 /* 2.21:1 picture (movie) */
-};
 
 static void DemuxTitles( demux_t *, int *, int *, int * );
 static void ESNew( demux_t *, int, int );
@@ -830,6 +816,11 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
         }
 #undef audio_control
 
+#define spu_palette \
+    p_sys->p_vts_file->vts_pgcit->pgci_srp[pgc_id-1].pgc->palette
+
+        memcpy( p_sys->clut, spu_palette, 16 * sizeof( uint32_t ) );
+
 #define spu_control \
     p_sys->p_vts_file->vts_pgcit->pgci_srp[pgc_id-1].pgc->subp_control[i-1]
 
@@ -1100,20 +1091,20 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
     }
 
 #if 0
-    msg_Dbg( p_input, 12, "scr %d lbn 0x%02x vobu_ea %d vob_id %d c_id %d",
+    msg_Dbg( p_demux, 12, "scr %d lbn 0x%02x vobu_ea %d vob_id %d c_id %d",
              p_sys->dsi_pack.dsi_gi.nv_pck_scr,
              p_sys->dsi_pack.dsi_gi.nv_pck_lbn,
              p_sys->dsi_pack.dsi_gi.vobu_ea,
              p_sys->dsi_pack.dsi_gi.vobu_vob_idn,
              p_sys->dsi_pack.dsi_gi.vobu_c_idn );
 
-    msg_Dbg( p_input, 12, "cat 0x%02x ilvu_ea %d ilvu_sa %d size %d",
+    msg_Dbg( p_demux, 12, "cat 0x%02x ilvu_ea %d ilvu_sa %d size %d",
              p_sys->dsi_pack.sml_pbi.category,
              p_sys->dsi_pack.sml_pbi.ilvu_ea,
              p_sys->dsi_pack.sml_pbi.ilvu_sa,
              p_sys->dsi_pack.sml_pbi.size );
 
-    msg_Dbg( p_input, 12, "next_vobu %d next_ilvu1 %d next_ilvu2 %d",
+    msg_Dbg( p_demux, 12, "next_vobu %d next_ilvu1 %d next_ilvu2 %d",
              p_sys->dsi_pack.vobu_sri.next_vobu & 0x7fffffff,
              p_sys->dsi_pack.sml_agli.data[ p_sys->i_angle - 1 ].address,
              p_sys->dsi_pack.sml_agli.data[ p_sys->i_angle ].address);
