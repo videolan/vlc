@@ -148,7 +148,7 @@ static int    LoadModule       ( vlc_object_t *, char *, module_handle_t * );
 static void   CloseModule      ( module_handle_t );
 static void * GetSymbol        ( module_handle_t, const char * );
 static void   CacheLoad        ( vlc_object_t * );
-static void   CacheLoadConfig  ( module_t *, FILE * );
+static int    CacheLoadConfig  ( module_t *, FILE * );
 static void   CacheSave        ( vlc_object_t * );
 static void   CacheSaveConfig  ( module_t *, FILE * );
 static void   CacheMerge       ( vlc_object_t *, module_t *, module_t * );
@@ -1508,8 +1508,9 @@ static void CacheLoad( vlc_object_t *p_this )
     FILE *file;
     int i, j, i_size, i_read;
     char p_cachestring[sizeof(PLUGINSCACHE_FILE COPYRIGHT_MESSAGE)];
-    int *pi_cache;
+    int i_cache;
     module_cache_t **pp_cache = 0;
+    int32_t i_file_size;
 
     psz_homedir = p_this->p_vlc->psz_homedir;
     if( !psz_homedir )
@@ -1550,6 +1551,26 @@ static void CacheLoad( vlc_object_t *p_this )
     }
     free( psz_filename );
 
+    /* Check the file size */
+    i_read = fread( &i_file_size, sizeof(char), sizeof(i_file_size), file );
+    if( i_read != sizeof(i_file_size) )
+    {
+        msg_Warn( p_this, "This doesn't look like a valid plugins cache "
+                  "(too short)" );
+        fclose( file );
+        return;
+    }
+
+    fseek( file, 0, SEEK_END );
+    if( ftell( file ) != i_file_size )
+    {
+        msg_Warn( p_this, "This doesn't look like a valid plugins cache "
+                  "(corrupted size)" );
+        fclose( file );
+        return;
+    }
+    fseek( file, sizeof(i_file_size), SEEK_SET );
+
     /* Check the file is a plugins cache */
     i_size = sizeof(PLUGINSCACHE_FILE COPYRIGHT_MESSAGE) - 1;
     i_read = fread( p_cachestring, sizeof(char), i_size, file );
@@ -1557,29 +1578,35 @@ static void CacheLoad( vlc_object_t *p_this )
         memcmp( p_cachestring, PLUGINSCACHE_FILE COPYRIGHT_MESSAGE, i_size ) )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
+        fclose( file );
+        return;
     }
 
-    pi_cache = &p_this->p_libvlc->p_module_bank->i_loaded_cache;
-    fread( pi_cache, sizeof(char), sizeof(*pi_cache), file );
+    p_this->p_libvlc->p_module_bank->i_loaded_cache = 0;
+    fread( &i_cache, sizeof(char), sizeof(i_cache), file );
     pp_cache = p_this->p_libvlc->p_module_bank->pp_loaded_cache =
-        malloc( *pi_cache * sizeof(void *) );
-
-    for( i = 0; i < *pi_cache; i++ )
-    {
-        int32_t i_size;
-        int i_submodules;
+        malloc( i_cache * sizeof(void *) );
 
 #define LOAD_IMMEDIATE(a) \
-        fread( &a, sizeof(char), sizeof(a), file )
+    if( fread( &a, sizeof(char), sizeof(a), file ) != sizeof(a) ) goto error
 #define LOAD_STRING(a) \
-        { fread( &i_size, sizeof(char), sizeof(int32_t), file ); \
-          if( i_size ) { \
-            a = malloc( i_size ); \
-            fread( a, sizeof(char), i_size, file ); \
-          } else a = 0; \
-        } while(0)
+    { if( fread( &i_size, sizeof(char), sizeof(i_size), file ) \
+          != sizeof(i_size) ) goto error; \
+      if( i_size ) { \
+          a = malloc( i_size ); \
+          if( fread( a, sizeof(char), i_size, file ) != (size_t)i_size ) \
+              goto error; \
+      } else a = 0; \
+    } while(0)
+
+
+    for( i = 0; i < i_cache; i++ )
+    {
+        int16_t i_size;
+        int i_submodules;
 
         pp_cache[i] = malloc( sizeof(module_cache_t) );
+        p_this->p_libvlc->p_module_bank->i_loaded_cache++;
 
         /* Save common info */
         LOAD_STRING( pp_cache[i]->psz_file );
@@ -1608,7 +1635,8 @@ static void CacheLoad( vlc_object_t *p_this )
         LOAD_IMMEDIATE( pp_cache[i]->p_module->b_submodule );
 
         /* Config stuff */
-        CacheLoadConfig( pp_cache[i]->p_module, file );
+        if( CacheLoadConfig( pp_cache[i]->p_module, file ) != VLC_SUCCESS )
+            goto error;
 
         LOAD_STRING( pp_cache[i]->p_module->psz_filename );
 
@@ -1637,14 +1665,23 @@ static void CacheLoad( vlc_object_t *p_this )
     }
 
     fclose( file );
+    return;
 
+ error:
+
+    msg_Warn( p_this, "plugins cache not loaded (corrupted)" );
+
+    /* TODO: cleanup */
+    p_this->p_libvlc->p_module_bank->i_loaded_cache = 0;
+
+    fclose( file );
     return;
 }
 
-void CacheLoadConfig( module_t *p_module, FILE *file )
+int CacheLoadConfig( module_t *p_module, FILE *file )
 {
     int i, j, i_lines;
-    int32_t i_size;
+    int16_t i_size;
 
     /* Calculate the structure length */
     LOAD_IMMEDIATE( p_module->i_config_items );
@@ -1658,7 +1695,7 @@ void CacheLoadConfig( module_t *p_module, FILE *file )
     if( p_module->p_config == NULL )
     {
         msg_Err( p_module, "config error: can't duplicate p_config" );
-        return;
+        return VLC_ENOMEM;
     }
 
     /* Do the duplication job */
@@ -1734,6 +1771,12 @@ void CacheLoadConfig( module_t *p_module, FILE *file )
     }
 
     p_module->p_config[i].i_type = CONFIG_HINT_END;
+
+    return VLC_SUCCESS;
+
+ error:
+
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -1745,6 +1788,7 @@ static void CacheSave( vlc_object_t *p_this )
     FILE *file;
     int i, j, i_cache;
     module_cache_t **pp_cache;
+    int32_t i_file_size = 0;
 
     psz_homedir = p_this->p_vlc->psz_homedir;
     if( !psz_homedir )
@@ -1781,6 +1825,9 @@ static void CacheSave( vlc_object_t *p_this )
     }
     free( psz_filename );
 
+    /* Empty space for file size */
+    fwrite( &i_file_size, sizeof(char), sizeof(i_file_size), file );
+
     /* Contains version number */
     fprintf( file, PLUGINSCACHE_FILE COPYRIGHT_MESSAGE );
 
@@ -1789,18 +1836,18 @@ static void CacheSave( vlc_object_t *p_this )
 
     fwrite( &i_cache, sizeof(char), sizeof(i_cache), file );
 
+#define SAVE_IMMEDIATE(a) \
+    fwrite( &a, sizeof(char), sizeof(a), file )
+#define SAVE_STRING(a) \
+    { i_size = a ? strlen( a ) + 1 : 0; \
+      fwrite( &i_size, sizeof(char), sizeof(i_size), file ); \
+      if( a ) fwrite( a, sizeof(char), i_size, file ); \
+    } while(0)
+
     for( i = 0; i < i_cache; i++ )
     {
-        int32_t i_size;
+        int16_t i_size;
         int32_t i_submodule;
-
-#define SAVE_IMMEDIATE(a) \
-        fwrite( &a, sizeof(char), sizeof(a), file )
-#define SAVE_STRING(a) \
-        { i_size = a ? strlen( a ) + 1 : 0; \
-          fwrite( &i_size, sizeof(char), sizeof(int32_t), file ); \
-          if( a ) fwrite( a, sizeof(char), i_size, file ); \
-        } while(0)
 
         /* Save common info */
         SAVE_STRING( pp_cache[i]->psz_file );
@@ -1855,6 +1902,11 @@ static void CacheSave( vlc_object_t *p_this )
         }
     }
 
+    /* Fill-up file size */
+    i_file_size = ftell( file );
+    fseek( file, 0, SEEK_SET );
+    fwrite( &i_file_size, sizeof(char), sizeof(i_file_size), file );
+
     fclose( file );
 
     return;
@@ -1864,7 +1916,7 @@ void CacheSaveConfig( module_t *p_module, FILE *file )
 {
     int i, j, i_lines = 0;
     module_config_t *p_item;
-    int32_t i_size;
+    int16_t i_size;
 
     SAVE_IMMEDIATE( p_module->i_config_items );
     SAVE_IMMEDIATE( p_module->i_bool_items );
