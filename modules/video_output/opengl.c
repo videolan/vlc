@@ -32,7 +32,12 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 
+#ifndef SYS_DARWIN
 #include <GL/gl.h>
+#else
+/* Mac OS X < 10.3 does not have GL/gl.h */
+#include <OpenGL/gl.h>
+#endif
 
 /* RV16 */
 #ifndef GL_UNSIGNED_SHORT_5_6_5

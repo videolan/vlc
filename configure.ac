@@ -2564,20 +2564,26 @@ if test "${enable_xvideo}" != "no" &&
 fi
 
 dnl
-dnl  GLX module
-dnl  (enabled by default except on win32)
+dnl  OpenGL module
+dnl  (enabled by default except on beos)
 dnl
 AC_ARG_ENABLE(opengl,
   [  --enable-opengl            OpenGL support (default enabled)])
 if test "${enable_opengl}" != "no" && test "${SYS}" != "beos"; then
-  AC_CHECK_HEADERS(GL/gl.h, [
+  if test "${SYS}" != "darwin"; then
+    AC_CHECK_HEADERS(GL/gl.h, [
+      VLC_ADD_PLUGINS([opengl])
+      if test "${SYS}" != "mingw32"; then
+        VLC_ADD_LDFLAGS([opengl],[-L${x_libraries} -lGL -lGLU])
+      else
+        VLC_ADD_LDFLAGS([opengl],[-lopengl32])
+      fi
+    ])
+  else
+    dnl OS X special case (no GL/gl.h but OpenGL/gl.h)
     VLC_ADD_PLUGINS([opengl])
-    if test "${SYS}" != "mingw32"; then
-      VLC_ADD_LDFLAGS([opengl],[-L${x_libraries} -lGL -lGLU])
-    else
-      VLC_ADD_LDFLAGS([opengl],[-lopengl32])
-    fi
-  ])
+    VLC_ADD_LDFLAGS([opengl],[-framework OpenGL])
+  fi
 fi
 
 dnl
