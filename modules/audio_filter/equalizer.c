@@ -652,7 +652,7 @@ static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
     /* Same thing for bands */
     if( *psz_bands )
     {
-        char *p = psz_bands, p_next;
+        char *p = psz_bands, *p_next;
         int i;
 
         for( i = 0; i < p_sys->i_band; i++ )
