@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.35 2003/08/22 20:32:27 fenrir Exp $
+ * $Id: asf.c,v 1.36 2003/08/25 23:36:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -334,7 +334,7 @@ static int Open( vlc_object_t * p_this )
     if( p_sys->p_fp->i_data_packets_count > 0 )
     {
         int64_t i_count;
-        int64_t i_size = stream_Tell( p_sys->s );
+        int64_t i_size = stream_Size( p_sys->s );
 
         if( p_sys->i_data_end > 0 && i_size > p_sys->i_data_end )
         {
