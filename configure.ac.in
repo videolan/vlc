@@ -1506,30 +1506,8 @@ AC_ARG_ENABLE(ffmpeg,
 [  --enable-ffmpeg         ffmpeg codec (default disabled)])
 if test "x${enable_ffmpeg}" = "xyes"
 then
-  AC_ARG_WITH(ffmpeg,
-    [    --with-ffmpeg=PATH    path to ffmpeg installation])
   AC_ARG_WITH(ffmpeg-tree,
     [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
-
-  dnl
-  dnl test for --with-ffmpeg
-  dnl
-  if test "x${with_ffmpeg}" != "xno" -a "x${with_ffmpeg}" != "x"; then
-    CPPFLAGS_ffmpeg="${CPPFLAGS_ffmpeg} -I${with_ffmpeg}/include/ffmpeg"
-    LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -L${with_ffmpeg}/lib"
-
-    CPPFLAGS_stream_out_transcode="${CPPFLAGS_stream_out_transcode} -I${with_ffmpeg}/include/ffmpeg"
-    LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode} -L${with_ffmpeg}/lib"
-  fi
-
-  dnl
-  dnl test for !(--with-ffmpeg) && !(--with-ffmpeg-tree)
-  dnl
-  if test "x${with_ffmpeg_tree}" == "xno" -o "x${with_ffmpeg_tree}" == "x";then
-    if test "x${with_ffmpeg}" == "xno" -o "x${with_ffmpeg}" == "x"; then
-      AC_CHECK_HEADERS(ffmpeg/avcodec.h postproc/postprocess.h)
-    fi
-  fi
 
   dnl
   dnl test for !(--with-ffmpeg-tree)
@@ -1537,6 +1515,7 @@ then
   if test "x${with_ffmpeg_tree}" == "xno" -o "x${with_ffmpeg_tree}" == "x";then
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
+    AC_CHECK_HEADERS(ffmpeg/avcodec.h postproc/postprocess.h)
     AC_CHECK_LIB(avcodec, avcodec_init, [
       BUILTINS="${BUILTINS} ffmpeg stream_out_transcode"
       LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -lavcodec"
