@@ -284,6 +284,8 @@ struct intf_sys_t
 - (IBAction)reportABug:(id)sender;
 - (IBAction)openWebsite:(id)sender;
 - (IBAction)openLicense:(id)sender;
+- (IBAction)openForum:(id)sender;
+- (IBAction)openDonate:(id)sender;
 - (IBAction)openCrashLog:(id)sender;
 
 - (IBAction)togglePlaylist:(id)sender;

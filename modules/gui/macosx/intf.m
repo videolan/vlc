@@ -1452,6 +1452,20 @@ static VLCMain *_o_sharedMainInstance = nil;
                                    withApplication: @"TextEdit"];
 }
 
+- (IBAction)openForum:(id)sender
+{
+    NSURL * o_url = [NSURL URLWithString: @"http://forum.videolan.org/"];
+
+    [[NSWorkspace sharedWorkspace] openURL: o_url];
+}
+
+- (IBAction)openDonate:(id)sender
+{
+    NSURL * o_url = [NSURL URLWithString: @"http://www.videolan.org/contribute.html#paypal"];
+
+    [[NSWorkspace sharedWorkspace] openURL: o_url];
+}
+
 - (IBAction)openCrashLog:(id)sender
 {
     NSString * o_path = [@"~/Library/Logs/CrashReporter/VLC.crash.log"

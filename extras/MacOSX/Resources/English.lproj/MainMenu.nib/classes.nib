@@ -106,6 +106,8 @@
                 intfOpenNet = id; 
                 openCrashLog = id; 
                 openDocumentation = id; 
+                openDonate = id; 
+                openForum = id; 
                 openLicense = id; 
                 openReadMe = id; 
                 openRecentItem = id; 
