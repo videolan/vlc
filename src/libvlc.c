@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.97 2003/09/29 17:36:34 gbazin Exp $
+ * $Id: libvlc.c,v 1.98 2003/10/23 16:43:37 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -98,6 +98,23 @@ static void Version       ( void );
 static void ShowConsole   ( void );
 #endif
 static int  ConsoleWidth  ( void );
+
+
+/*****************************************************************************
+ * vlc_current_object: return the current object.
+ *****************************************************************************
+ * If i_object is non-zero, return the corresponding object. Otherwise,
+ * return the statically allocated p_vlc object.
+ *****************************************************************************/
+vlc_t * vlc_current_object( int i_object )
+{
+    if( i_object )
+    {
+         return vlc_object_get( p_libvlc, i_object );
+    }
+
+    return p_static_vlc;
+}
 
 /*****************************************************************************
  * VLC_Version: return the libvlc version.
@@ -221,12 +238,10 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     char *       psz_parser;
     char *       psz_language;
     vlc_bool_t   b_exit = VLC_FALSE;
-    vlc_t *      p_vlc;
+    vlc_t *      p_vlc = vlc_current_object( i_object );
     module_t    *p_help_module;
     playlist_t  *p_playlist;
     vlc_value_t  lockval;
-
-    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
@@ -608,7 +623,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     var_Create( p_vlc, "drawableh", VLC_VAR_INTEGER );
     var_Create( p_vlc, "drawableportx", VLC_VAR_INTEGER );
     var_Create( p_vlc, "drawableporty", VLC_VAR_INTEGER );
-    
+
     /*
      * Get input filenames given as commandline arguments
      */
@@ -630,9 +645,7 @@ int VLC_AddIntf( int i_object, char const *psz_module, vlc_bool_t b_block )
 {
     int i_err;
     intf_thread_t *p_intf;
-    vlc_t *p_vlc;
-
-    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
+    vlc_t *p_vlc = vlc_current_object( i_object );
 
     if( !p_vlc )
     {
@@ -672,9 +685,7 @@ int VLC_AddIntf( int i_object, char const *psz_module, vlc_bool_t b_block )
  *****************************************************************************/
 int VLC_Destroy( int i_object )
 {
-    vlc_t *p_vlc;
-
-    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
+    vlc_t *p_vlc = vlc_current_object( i_object );
 
     if( !p_vlc )
     {
@@ -739,9 +750,7 @@ int VLC_Destroy( int i_object )
  *****************************************************************************/
 int VLC_Die( int i_object )
 {
-    vlc_t *p_vlc;
-
-    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
+    vlc_t *p_vlc = vlc_current_object( i_object );
 
     if( !p_vlc )
     {
@@ -766,9 +775,7 @@ int VLC_AddTarget( int i_object, char const *psz_target,
 {
     int i_err;
     playlist_t *p_playlist;
-    vlc_t *p_vlc;
-
-    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
+    vlc_t *p_vlc = vlc_current_object( i_object );
 
     if( !p_vlc )
     {
@@ -807,10 +814,8 @@ int VLC_AddTarget( int i_object, char const *psz_target,
  *****************************************************************************/
 int VLC_Set( int i_object, char const *psz_var, vlc_value_t value )
 {
-    vlc_t *p_vlc;
+    vlc_t *p_vlc = vlc_current_object( i_object );
     int i_ret;
-
-    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
@@ -861,10 +866,8 @@ int VLC_Set( int i_object, char const *psz_var, vlc_value_t value )
  *****************************************************************************/
 int VLC_Get( int i_object, char const *psz_var, vlc_value_t *p_value )
 {
-    vlc_t *p_vlc;
+    vlc_t *p_vlc = vlc_current_object( i_object );
     int i_ret;
-
-    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
@@ -885,9 +888,7 @@ int VLC_Get( int i_object, char const *psz_var, vlc_value_t *p_value )
 int VLC_Play( int i_object )
 {
     playlist_t * p_playlist;
-    vlc_t *p_vlc;
-
-    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
+    vlc_t *p_vlc = vlc_current_object( i_object );
 
     /* Check that the handle is valid */
     if( !p_vlc )
@@ -929,9 +930,7 @@ int VLC_Stop( int i_object )
     playlist_t    *   p_playlist;
     vout_thread_t *   p_vout;
     aout_instance_t * p_aout;
-    vlc_t *p_vlc;
-
-    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
+    vlc_t *p_vlc = vlc_current_object( i_object );
 
     /* Check that the handle is valid */
     if( !p_vlc )
@@ -997,9 +996,7 @@ int VLC_Stop( int i_object )
 int VLC_Pause( int i_object )
 {
     input_thread_t *p_input;
-    vlc_t *p_vlc;
-
-    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
+    vlc_t *p_vlc = vlc_current_object( i_object );
 
     if( !p_vlc )
     {
@@ -1027,9 +1024,7 @@ int VLC_Pause( int i_object )
 int VLC_FullScreen( int i_object )
 {
     vout_thread_t *p_vout;
-    vlc_t *p_vlc;
-
-    p_vlc = i_object ? vlc_object_get( p_libvlc, i_object ) : p_static_vlc;
+    vlc_t *p_vlc = vlc_current_object( i_object );
 
     if( !p_vlc )
     {
