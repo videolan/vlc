@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.2 2003/01/08 10:26:49 fenrir Exp $
+ * $Id: copy.c,v 1.3 2003/01/19 08:27:28 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -34,6 +34,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
+#include "codecs.h"
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -66,7 +67,7 @@ static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes );
 
 vlc_module_begin();
     set_description( _("Copy packetizer") );
-    set_capability( "packetizer", 0 );
+    set_capability( "packetizer", 1 );
     set_callbacks( Open, NULL );
 vlc_module_end();
 
@@ -84,11 +85,6 @@ static int Open( vlc_object_t *p_this )
     p_fifo->pf_run = Run;
 
     return VLC_SUCCESS;
-
-#if 0
-    if( p_fifo->i_fourcc == VLC_FOURCC( 'm', 'p', 'g', 'a') )
-        ....
-#endif
 }
 
 /*****************************************************************************
@@ -148,6 +144,10 @@ static int InitThread( packetizer_thread_t *p_pack )
 
     switch( p_pack->p_fifo->i_fourcc )
     {
+        case VLC_FOURCC( 'm', '4', 's', '2'):
+        case VLC_FOURCC( 'M', '4', 'S', '2'):
+        case VLC_FOURCC( 'm', 'p', '4', 's'):
+        case VLC_FOURCC( 'M', 'P', '4', 'S'):
         case VLC_FOURCC( 'm', 'p', '4', 'v'):
         case VLC_FOURCC( 'D', 'I', 'V', 'X'):
         case VLC_FOURCC( 'd', 'i', 'v', 'x'):
@@ -155,12 +155,16 @@ static int InitThread( packetizer_thread_t *p_pack )
         case VLC_FOURCC( 'X', 'v', 'i', 'D'):
         case VLC_FOURCC( 'x', 'v', 'i', 'd'):
         case VLC_FOURCC( 'D', 'X', '5', '0'):
+        case VLC_FOURCC( 0x04, 0,   0,   0):
+        case VLC_FOURCC( '3', 'I', 'V', '2'):
             p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'v');
             p_pack->output_format.i_cat = VIDEO_ES;
             break;
         case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
         case VLC_FOURCC( 'm', 'p', 'g', '1' ):
         case VLC_FOURCC( 'm', 'p', 'g', '2' ):
+        case VLC_FOURCC( 'm', 'p', '1', 'v' ):
+        case VLC_FOURCC( 'm', 'p', '2', 'v' ):
             p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'v' );
             p_pack->output_format.i_cat = VIDEO_ES;
             break;
@@ -168,9 +172,126 @@ static int InitThread( packetizer_thread_t *p_pack )
             p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'a' );
             p_pack->output_format.i_cat = AUDIO_ES;
             break;
+
+        case VLC_FOURCC( 'd', 'i', 'v', '1' ):
+        case VLC_FOURCC( 'D', 'I', 'V', '1' ):
+        case VLC_FOURCC( 'M', 'P', 'G', '4' ):
+        case VLC_FOURCC( 'm', 'p', 'g', '4' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'D', 'I', 'V', '1' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'd', 'i', 'v', '2' ):
+        case VLC_FOURCC( 'D', 'I', 'V', '2' ):
+        case VLC_FOURCC( 'M', 'P', '4', '2' ):
+        case VLC_FOURCC( 'm', 'p', '4', '2' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'D', 'I', 'V', '2' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'd', 'i', 'v', '3' ):
+        case VLC_FOURCC( 'D', 'I', 'V', '3' ):
+        case VLC_FOURCC( 'd', 'i', 'v', '4' ):
+        case VLC_FOURCC( 'D', 'I', 'V', '4' ):
+        case VLC_FOURCC( 'd', 'i', 'v', '5' ):
+        case VLC_FOURCC( 'D', 'I', 'V', '5' ):
+        case VLC_FOURCC( 'd', 'i', 'v', '6' ):
+        case VLC_FOURCC( 'D', 'I', 'V', '6' ):
+        case VLC_FOURCC( 'M', 'P', '4', '3' ):
+        case VLC_FOURCC( 'm', 'p', '4', '3' ):
+        case VLC_FOURCC( 'm', 'p', 'g', '3' ):
+        case VLC_FOURCC( 'M', 'P', 'G', '3' ):
+        case VLC_FOURCC( 'A', 'P', '4', '1' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'D', 'I', 'V', '3' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'H', '2', '6', '3' ):
+        case VLC_FOURCC( 'h', '2', '6', '3' ):
+        case VLC_FOURCC( 'U', '2', '6', '3' ):
+        case VLC_FOURCC( 'u', '2', '6', '3' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'H', '2', '6', '3' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'I', '2', '6', '3' ):
+        case VLC_FOURCC( 'i', '2', '6', '3' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'I', '2', '6', '3' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'W', 'M', 'V', '1' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'W', 'M', 'V', '1' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'W', 'M', 'V', '2' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'W', 'M', 'V', '2' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
+        case VLC_FOURCC( 'm', 'j', 'p', 'g' ):
+        case VLC_FOURCC( 'm', 'j', 'p', 'a' ):
+        case VLC_FOURCC( 'j', 'p', 'e', 'g' ):
+        case VLC_FOURCC( 'J', 'P', 'E', 'G' ):
+        case VLC_FOURCC( 'J', 'F', 'I', 'F' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'M', 'J', 'P', 'G' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'm', 'j', 'p', 'b' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'j', 'p', 'b' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'd', 'v', 's', 'l' ):
+        case VLC_FOURCC( 'd', 'v', 's', 'd' ):
+        case VLC_FOURCC( 'D', 'V', 'S', 'D' ):
+        case VLC_FOURCC( 'd', 'v', 'h', 'd' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'd', 'v', 's', 'l' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+
         default:
             p_pack->output_format.i_fourcc = p_pack->p_fifo->i_fourcc;
             p_pack->output_format.i_cat = UNKNOWN_ES;
+            break;
+    }
+
+    switch( p_pack->output_format.i_cat )
+    {
+        case AUDIO_ES:
+            {
+                WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_pack->p_fifo->p_waveformatex;
+                if( p_wf )
+                {
+                    p_pack->output_format.p_format = malloc( sizeof( WAVEFORMATEX ) + p_wf->cbSize );
+                    memcpy( p_pack->output_format.p_format, p_wf, sizeof( WAVEFORMATEX ) + p_wf->cbSize );
+                }
+                else
+                {
+                    p_pack->output_format.p_format = NULL;
+                }
+            }
+            break;
+
+        case VIDEO_ES:
+            {
+                BITMAPINFOHEADER *p_bih = (BITMAPINFOHEADER*)p_pack->p_fifo->p_bitmapinfoheader;
+                if( p_bih )
+                {
+                    p_pack->output_format.p_format = malloc( p_bih->biSize );
+                    memcpy( p_pack->output_format.p_format, p_bih, p_bih->biSize );
+                    if( p_pack->output_format.i_fourcc == VLC_FOURCC( 'm', 'p', '4', 'v' ) )
+                    {
+                        p_bih->biCompression = VLC_FOURCC( 'd', 'i', 'v', 'x' );
+                    }
+                    else
+                    {
+                        p_bih->biCompression = p_pack->output_format.i_fourcc;
+                    }
+
+                }
+                else
+                {
+                    p_pack->output_format.p_format = NULL;
+                }
+            }
+            break;
+        default:
+            p_pack->output_format.p_format = NULL;
             break;
     }
 

@@ -2,7 +2,7 @@
  * mpeg4video.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.5 2003/01/17 15:26:24 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.6 2003/01/19 08:27:28 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -110,6 +110,10 @@ static int Open( vlc_object_t *p_this )
 
     switch(  p_fifo->i_fourcc )
     {
+        case VLC_FOURCC( 'm', '4', 's', '2'):
+        case VLC_FOURCC( 'M', '4', 'S', '2'):
+        case VLC_FOURCC( 'm', 'p', '4', 's'):
+        case VLC_FOURCC( 'M', 'P', '4', 'S'):
         case VLC_FOURCC( 'm', 'p', '4', 'v'):
         case VLC_FOURCC( 'D', 'I', 'V', 'X'):
         case VLC_FOURCC( 'd', 'i', 'v', 'x'):
@@ -117,6 +121,9 @@ static int Open( vlc_object_t *p_this )
         case VLC_FOURCC( 'X', 'v', 'i', 'D'):
         case VLC_FOURCC( 'x', 'v', 'i', 'd'):
         case VLC_FOURCC( 'D', 'X', '5', '0'):
+        case VLC_FOURCC( 0x04, 0,   0,   0):
+        case VLC_FOURCC( '3', 'I', 'V', '2'):
+
             return VLC_SUCCESS;
         default:
             return VLC_EGENERIC;
@@ -359,7 +366,7 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
                     p_bih->biHeight = 0;
                     p_bih->biPlanes = 1;
                     p_bih->biBitCount = 24;
-                    p_bih->biCompression = 0x64697678; /* "divx" */
+                    p_bih->biCompression = VLC_FOURCC( 'd', 'i', 'v', 'x' );
                     p_bih->biSizeImage = 0;
                     p_bih->biXPelsPerMeter = 0;
                     p_bih->biYPelsPerMeter = 0;

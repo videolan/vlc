@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.3 2003/01/13 02:33:13 fenrir Exp $
+ * $Id: mpegvideo.c,v 1.4 2003/01/19 08:27:28 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -246,7 +246,7 @@ static void PacketizeThread( packetizer_t *p_pack )
         i_frame_rate_code = ShowBits( &p_pack->bit_stream, 32 ) & 0xF;
         p_bih->biPlanes = 1;
         p_bih->biBitCount = 0;
-        p_bih->biCompression = 0x6D706732; /* mpg2 */
+        p_bih->biCompression = VLC_FOURCC( 'm', 'p', 'g', '2' );
         p_bih->biSizeImage = 0;
         p_bih->biXPelsPerMeter = 0;
         p_bih->biYPelsPerMeter = 0;
