@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: es_out.c,v 1.12 2004/01/04 15:32:13 fenrir Exp $
+ * $Id: es_out.c,v 1.13 2004/01/05 13:00:20 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -30,6 +30,7 @@
 #include <vlc/input.h>
 #include <vlc/decoder.h>
 
+#include "vlc_playlist.h"
 #include "codecs.h"
 
 /*****************************************************************************
@@ -230,6 +231,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
 static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 {
     es_out_sys_t      *p_sys = out->p_sys;
+    playlist_t        *p_playlist = NULL;
     input_thread_t    *p_input = p_sys->p_input;
     es_out_id_t       *es = malloc( sizeof( es_out_id_t ) );
     pgrm_descriptor_t *p_prgm = NULL;
@@ -336,7 +338,10 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     }
 
     sprintf( psz_cat, _("Stream %d"), out->p_sys->i_id - 1 );
-    if( ( p_cat = input_InfoCategory( p_input, psz_cat ) ) )
+    /* Get a category and the playlist */
+    if( ( p_cat = input_InfoCategory( p_input, psz_cat ) ) &&
+        ( p_playlist = (playlist_t *)vlc_object_find( p_input,
+                       VLC_OBJECT_PLAYLIST, FIND_ANYWHERE ) ) )
     {
         /* Add information */
         switch( fmt->i_cat )
@@ -346,34 +351,57 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
                 {
                     input_AddInfo( p_cat, _("Description"), "%s",
                                    fmt->psz_description );
+                    playlist_AddInfo( p_playlist, -1, psz_cat,
+                                     _("Description"), "%s",
+                                     fmt->psz_description );
                 }
                 input_AddInfo( p_cat, _("Codec"), "%.4s",
                                (char*)&fmt->i_codec );
+                playlist_AddInfo( p_playlist, -1, psz_cat,
+                                  _("Codec"),"%.4s",(char*)&fmt->i_codec );
+
                 input_AddInfo( p_cat, _("Type"), _("Audio") );
+                playlist_AddInfo( p_playlist, -1, psz_cat,
+                                 _("Type"), _("Audio") );
+
                 if( fmt->audio.i_channels > 0 )
                 {
                     input_AddInfo( p_cat, _("Channels"), "%d",
                                    fmt->audio.i_channels );
+                    playlist_AddInfo( p_playlist, -1, psz_cat,
+                                      _("Channels"), "%d",                                                            fmt->audio.i_channels );
                 }
                 if( fmt->psz_language )
                 {
                     input_AddInfo( p_cat, _("Language"), "%s",
                                    fmt->psz_language );
+                    playlist_AddInfo( p_playlist, -1, psz_cat,
+                                     _("Language"), "%s",
+                                     fmt->psz_language );
                 }
                 if( fmt->audio.i_rate > 0 )
                 {
-                  input_AddInfo( p_cat, _("Sample rate"), _("%d Hz"),
+                    input_AddInfo( p_cat, _("Sample rate"), _("%d Hz"),
                                    fmt->audio.i_rate );
+                    playlist_AddInfo( p_playlist, -1, psz_cat,
+                                     _("Sample rate"), _("%d Hz"),
+                                      fmt->audio.i_rate );
                 }
                 if( fmt->i_bitrate > 0 )
                 {
-                  input_AddInfo( p_cat, _("Bitrate"), _("%d bps"),
+                    input_AddInfo( p_cat, _("Bitrate"), _("%d bps"),
                                    fmt->i_bitrate );
+                    playlist_AddInfo( p_playlist, -1, psz_cat,
+                                    _("Bitrate"), _("%d bps"),
+                                     fmt->i_bitrate );
                 }
                 if( fmt->audio.i_bitspersample )
                 {
                     input_AddInfo( p_cat, _("Bits per sample"), "%d",
                                    fmt->audio.i_bitspersample );
+                    playlist_AddInfo( p_playlist, -1, psz_cat,
+                                     _("Bits per sample"), "%d",
+                                     fmt->audio.i_bitspersample );
                 }
                 break;
             case VIDEO_ES:
@@ -381,14 +409,27 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
                 {
                     input_AddInfo( p_cat, _("Description"), "%s",
                                    fmt->psz_description );
+                    playlist_AddInfo( p_playlist, -1, psz_cat,
+                                     _("Description"), "%s",
+                                     fmt->psz_description );
                 }
                 input_AddInfo( p_cat, _("Type"), _("Video") );
+                playlist_AddInfo( p_playlist, -1, psz_cat,
+                                _("Type"), _("Video") );
+
                 input_AddInfo( p_cat, _("Codec"), "%.4s",
                                (char*)&fmt->i_codec );
+                playlist_AddInfo( p_playlist, -1, psz_cat,
+                                 _("Codec"), "%.4s",
+                                 (char*)&fmt->i_codec );
+
                 if( fmt->video.i_width > 0 && fmt->video.i_height > 0 )
                 {
                     input_AddInfo( p_cat, _("Resolution"), "%dx%d",
                                    fmt->video.i_width, fmt->video.i_height );
+                    playlist_AddInfo( p_playlist, -1, psz_cat,
+                                    _("Resolution"), "%dx%d",
+                                    fmt->video.i_width, fmt->video.i_height );
                 }
                 if( fmt->video.i_visible_width > 0 &&
                     fmt->video.i_visible_height > 0 )
@@ -396,19 +437,28 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
                     input_AddInfo( p_cat, _("Display resolution"), "%dx%d",
                                    fmt->video.i_visible_width,
                                    fmt->video.i_visible_height);
+                     playlist_AddInfo( p_playlist, -1, psz_cat,
+                                       _("Display resolution"), "%dx%d",
+                                       fmt->video.i_visible_width,
+                                       fmt->video.i_visible_height);
                 }
                 break;
             case SPU_ES:
                 input_AddInfo( p_cat, _("Type"), _("Subtitle") );
+                playlist_AddInfo( p_playlist, -1, psz_cat,
+                                   _("Type"), _("Subtitle") );
                 input_AddInfo( p_cat, _("Codec"), "%.4s",
                                (char*)&fmt->i_codec );
+                playlist_AddInfo( p_playlist, -1, psz_cat,
+                                 _("Codec"), "%.4s",
+                                 (char*)&fmt->i_codec );
                 break;
             default:
 
                 break;
         }
+        if( p_playlist ) vlc_object_release( p_playlist );
     }
-
 
     /* Apply mode
      * XXX change that when we do group too */

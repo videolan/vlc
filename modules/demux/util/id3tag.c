@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.17 2003/12/22 22:37:01 hartman Exp $
+ * $Id: id3tag.c,v 1.18 2004/01/05 13:00:20 zorglub Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -86,6 +86,7 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
     while ( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
     {
         playlist_item_t *p_item = p_playlist ? p_playlist->pp_items[p_playlist->i_index] : NULL;
+
         int i_strings = id3_field_getnstrings( &p_frame->fields[1] );
 
         while ( i_strings > 0 )
@@ -100,11 +101,17 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
                 {
                     input_AddInfo( p_category, (char *)p_frame->description,
                                    ppsz_genres[atoi(psz_temp)]);
+                    playlist_AddItemInfo( p_item, "ID3",
+                                    (char *)p_frame->description,
+                                    ppsz_genres[atoi(psz_temp)]);
                 }
                 else
                 {
                     input_AddInfo( p_category, (char *)p_frame->description,
                                                 psz_temp );
+                    playlist_AddItemInfo( p_item, "ID3",
+                                    (char *)p_frame->description,
+                                    psz_temp);
                 }
             }
             else if ( !strcmp(p_frame->id, ID3_FRAME_TITLE ) )
@@ -121,26 +128,31 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
                 }
                 input_AddInfo( p_category, (char *)p_frame->description,
                                             psz_temp );
+                playlist_AddItemInfo( p_item, "ID3",
+                                        (char *)p_frame->description,
+                                    psz_temp);
             }
             else if ( !strcmp(p_frame->id, ID3_FRAME_ARTIST ) )
             {
                 if( p_item )
                 {
-                    if( p_item->psz_author )
-                    {
-                        free( p_item->psz_author );
-                    }
-                    p_item->psz_author = strdup( psz_temp );
-
+                    playlist_AddItemInfo( p_item,
+                                          _("General"), _("Author"), psz_temp);
                     val.b_bool = VLC_TRUE;
                 }
                 input_AddInfo( p_category, (char *)p_frame->description,
                                             psz_temp );
+                playlist_AddItemInfo( p_item, "ID3",
+                                           (char *)p_frame->description,
+                                           psz_temp);
             }
             else
             {
                 input_AddInfo( p_category, (char *)p_frame->description,
                                             psz_temp );
+                playlist_AddItemInfo( p_item, "ID3",
+                                           (char *)p_frame->description,
+                                           psz_temp);
             }
             free( psz_temp );
         }
@@ -151,8 +163,8 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
     {
         if( p_playlist )
         {
-            val.b_bool = VLC_TRUE;
-            var_Set( p_playlist, "intf-change", val );
+            val.b_bool = p_playlist->i_index;
+            var_Set( p_playlist, "item-change", val );
         }
     }
     val.b_bool = VLC_TRUE;

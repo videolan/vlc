@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.83 2004/01/04 17:35:01 fenrir Exp $
+ * $Id: avi.c,v 1.84 2004/01/05 13:00:20 zorglub Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include "vlc_playlist.h"
 #include "codecs.h"
 
 #include "libavi.h"
@@ -234,13 +235,28 @@ static int Open( vlc_object_t * p_this )
              p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
              p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
     {
-        input_info_category_t *p_cat = input_InfoCategory( p_input, _("AVI") );
+        playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_input,
+                        VLC_OBJECT_PLAYLIST,  FIND_PARENT);
+        input_info_category_t *p_cat = input_InfoCategory( p_input, _("Avi") );
+
         input_AddInfo( p_cat, _("Number of streams"), "%d", i_track );
         input_AddInfo( p_cat, _("Flags"), "%s%s%s%s",
                        p_avih->i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
                        p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
                        p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
                        p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
+        if( p_playlist )
+        {
+            playlist_AddInfo( p_playlist, -1 , _("Avi"),
+                          _("Number of streams"), "%d", i_track );
+            playlist_AddInfo( p_playlist, -1 , _("Avi"),
+                       _("Flags"), "%s%s%s%s",
+                       p_avih->i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
+                       p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
+                       p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
+                       p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
+            vlc_object_release( p_playlist );
+        }
     }
 
     /* now read info on each stream and create ES */

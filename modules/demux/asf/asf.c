@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.47 2003/12/22 00:26:01 sam Exp $
+ * $Id: asf.c,v 1.48 2004/01/05 13:00:20 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -28,6 +28,8 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+
+#include "vlc_playlist.h"
 
 #include "codecs.h"                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "libasf.h"
@@ -284,6 +286,8 @@ static int Open( vlc_object_t * p_this )
 
     /* We add all info about this stream */
     p_cat = input_InfoCategory( p_input, "Asf" );
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_input,
+                                     VLC_OBJECT_PLAYLIST,  FIND_PARENT);
     if( p_sys->i_length > 0 )
     {
         int64_t i_second = p_sys->i_length / (int64_t)1000000;
@@ -292,22 +296,58 @@ static int Open( vlc_object_t * p_this )
                        (int)(i_second / 36000),
                        (int)(( i_second / 60 ) % 60),
                        (int)(i_second % 60) );
+        if( p_playlist )
+        {
+            playlist_AddInfo( p_playlist, -1, _("Asf"), _("Length"),
+                               "%d:%d:%d",
+                               (int)(i_second / 36000),
+                               (int)(( i_second / 60 ) % 60),
+                               (int)(i_second % 60) );
+        }
     }
     input_AddInfo( p_cat, _("Number of streams"), "%d" , p_sys->i_streams );
+    if( p_playlist )
+    {
+        playlist_AddInfo( p_playlist, -1, _("Asf"),_("Number of streams"),"%d",
+                         p_sys->i_streams );
+    }
 
     if( ( p_cd = ASF_FindObject( p_sys->p_root->p_hdr,
                                  &asf_object_content_description_guid, 0 ) ) )
     {
         if( *p_cd->psz_title )
+        {
             input_AddInfo( p_cat, _("Title"), p_cd->psz_title );
+            playlist_AddInfo( p_playlist, -1, _("Asf"),_("Title"),
+                              p_cd->psz_title );
+            playlist_SetName( p_playlist, -1, p_cd->psz_title );
+        }
         if( p_cd->psz_author )
+        {
             input_AddInfo( p_cat, _("Author"), p_cd->psz_author );
+            playlist_AddInfo( p_playlist, -1, _("Asf"),_("Author"),
+                              p_cd->psz_author );
+            playlist_AddInfo( p_playlist, -1, _("General"),_("Author"),
+                              p_cd->psz_author );
+        }
         if( p_cd->psz_copyright )
+        {
             input_AddInfo( p_cat, _("Copyright"), p_cd->psz_copyright );
+            playlist_AddInfo( p_playlist, -1, _("Asf"),  _("Copyright"),
+                               p_cd->psz_copyright );
+        }
         if( *p_cd->psz_description )
+        {
             input_AddInfo( p_cat, _("Description"), p_cd->psz_description );
+            playlist_AddInfo( p_playlist, -1, _("Asf"),  _("Description"),
+                               p_cd->psz_description );
+        }
         if( *p_cd->psz_rating )
+        {
             input_AddInfo( p_cat, _("Rating"), p_cd->psz_rating );
+            playlist_AddInfo( p_playlist, -1, _("Asf"),  _("Rating"),
+                              p_cd->psz_rating );
+        }
     }
 
     /* FIXME to port to new way */
@@ -322,19 +362,25 @@ static int Open( vlc_object_t * p_this )
             char *psz_cat = malloc( strlen(_("Stream")) + 10 );
             sprintf( psz_cat, "%s %d", _("Stream"), i_stream );
             p_cat = input_InfoCategory( p_input, psz_cat);
-            free( psz_cat );
 
             if( p_cl && i_stream < p_cl->i_codec_entries_count )
             {
                 input_AddInfo( p_cat, _("Codec name"),
                                p_cl->codec[i_stream].psz_name );
+                playlist_AddInfo( p_playlist, -1, psz_cat, _("Codec name"),
+                                  p_cl->codec[i_stream].psz_name );
                 input_AddInfo( p_cat, _("Codec description"),
                                p_cl->codec[i_stream].psz_description );
+                playlist_AddInfo( p_playlist, -1, psz_cat,
+                                _("Codec description"),
+                                 p_cl->codec[i_stream].psz_description );
             }
+            free( psz_cat );
             i_stream++;
         }
     }
 
+    if( p_playlist ) vlc_object_release( p_playlist );
     return VLC_SUCCESS;
 
 error:
