@@ -2,7 +2,7 @@
  * info.m: MacOS X info panel
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: info.m,v 1.1 2003/02/17 10:52:07 hartman Exp $
+ * $Id: info.m,v 1.2 2003/02/18 20:54:02 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -73,6 +73,11 @@
 
 - (void)updateInfo
 {
+    if ( ![o_info_window isVisible] )
+    {
+        return;
+    }
+    
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     
