@@ -1525,9 +1525,22 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             {
                 access_t *p_access = p_input->input.p_access;
                 int i_seekpoint;
+                mtime_t i_input_time;
+                mtime_t i_seekpoint_time; 
 
                 if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
-                    i_seekpoint = p_access->info.i_seekpoint - 1;
+                {
+                    i_seekpoint = p_access->info.i_seekpoint;
+                    i_seekpoint_time = p_input->input.title[p_access->info.i_title]->seekpoint[i_seekpoint]->i_time_offset;
+                    if ( i_seekpoint_time != -1 )
+                    {
+                        access2_Control( p_access, INPUT_GET_TIME, &i_input_time );
+                        if ( i_input_time < i_seekpoint_time + 3000000 )
+                            i_seekpoint--;
+                    }
+                    else
+                        i_seekpoint--;
+                }
                 else if( i_type == INPUT_CONTROL_SET_SEEKPOINT_NEXT ) 
                     i_seekpoint = p_access->info.i_seekpoint + 1;
                 else
