@@ -627,45 +627,38 @@ package-beos:
 # Check that tmp isn't in the way
 	@if test -e $(srcdir)/tmp; then \
 	  echo "Error: please remove $(srcdir)/tmp, it is in the way"; \
-	  false; \
+	  false ; \
 	else \
-	  echo "OK."; mkdir $(srcdir)/tmp; \
+	  echo "OK." ; mkdir $(srcdir)/tmp ; \
 	fi
 
 # Copy relevant files
-	mkdir -p $(srcdir)/tmp/vlc
+	mkdir -p $(srcdir)/tmp/vlc ;
 	cd $(srcdir) && \
-	  cp vlc AUTHORS COPYING ChangeLog README THANKS NEWS tmp/vlc/
+	  cp vlc AUTHORS COPYING ChangeLog README THANKS NEWS tmp/vlc/ ;
 # We cannot use ${PLUGIN_FILES} as it looks like it is too "long" for the BeOS shell...
 	if [ `find $(srcdir)/modules -name "lib*_plugin.so" | wc -l` -gt 0 ]; then \
-	  mkdir -p $(srcdir)/tmp/vlc/plugins; \
-	  find $(srcdir)/modules -name "lib*_plugin.so" | xargs -i{} cp {} $(srcdir)/tmp/vlc/plugins/; \
+	  mkdir -p $(srcdir)/tmp/vlc/plugins ; \
+	  find $(srcdir)/modules -name "lib*_plugin.so" -exec cp {} $(srcdir)/tmp/vlc/plugins/ \; ; \
 	fi
 	for i in $(ALL_LINGUAS); do \
 	  mkdir -p $(srcdir)/tmp/vlc/locale/$${i}/LC_MESSAGES ; \
 	  cp $(srcdir)/po/$${i}.gmo $(srcdir)/tmp/vlc/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	done
 
-# Create package with debug symbols
-	mimeset -f $(srcdir)/tmp/vlc/* $(srcdir)/tmp/vlc/*/*
-	mv $(srcdir)/tmp/vlc $(srcdir)/tmp/vlc-${VERSION}
-	(cd $(srcdir)/tmp ; zip -9 -r vlc-${VERSION}-BeOS-debug.zip vlc-${VERSION} )
-	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS-debug.zip $(srcdir)/
-
-# Create package without debug symbols
-	mv $(srcdir)/tmp/vlc-${VERSION} $(srcdir)/tmp/vlc
-	strip $(srcdir)/tmp/vlc/vlc
+# Strip files and create package
+	strip --strip-debug --strip-unneeded $(srcdir)/tmp/vlc/vlc ;
 	if [ -d $(srcdir)/tmp/vlc/plugins ]; then \
-	  strip $(srcdir)/tmp/vlc/plugins/lib*_plugin.so; \
+	  strip --strip-debug --strip-unneeded $(srcdir)/tmp/vlc/plugins/lib*_plugin.so ; \
 	fi
-	xres -o $(srcdir)/tmp/vlc/vlc $(srcdir)/share/vlc_beos.rsrc
-	mimeset -f $(srcdir)/tmp/vlc/* $(srcdir)/tmp/vlc/*/*
-	mv $(srcdir)/tmp/vlc $(srcdir)/tmp/vlc-${VERSION}
+	xres -o $(srcdir)/tmp/vlc/vlc $(srcdir)/share/vlc_beos.rsrc ;
+	find $(srcdir)/tmp/vlc -exec mimeset -f {} \; ;
+	mv $(srcdir)/tmp/vlc $(srcdir)/tmp/vlc-${VERSION} ;
 	(cd $(srcdir)/tmp ; zip -9 -r vlc-${VERSION}-BeOS.zip vlc-${VERSION} )
-	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS.zip $(srcdir)/
+	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS.zip $(srcdir)/ ;
 
 # Clean up
-	rm -Rf $(srcdir)/tmp
+	rm -Rf $(srcdir)/tmp ;
 
 package-macosx:
 # Check that tmp isn't in the way
