@@ -181,7 +181,7 @@ Description: Support SDL Overlay
  conversion, scaling and displaying. Using them will require a
  partial rewrite of the video_output way of handling rendering
  and displaying.
-Status: Todo
+Status: Done 18 Dec 2000 (bozo and oct)
 
 Task: 0x39
 Difficulty: Medium
@@ -199,7 +199,7 @@ Description: Make aout eat less CPU
  When the vlc is launched without a stream, the audio_output thread
  eats all memory, probably because there is no msleep() when no data
  is available in the audio_output queue.
-Status: Todo
+Status: Done one doesn't know when by some unknown stranger
 
 Task: 0x37
 Difficulty: Guru
@@ -233,7 +233,7 @@ Description: Fix plugins namespace problem
  When compiling a plugin, all symbols seem to be exported, while we
  actually just need GetConfig and a few other things: the other
  functions are accessed through function pointers.
-Status: Todo
+Status: Done 10 Jan 2001 (sam)
 
 Task: 0x34
 Difficulty: Medium
@@ -242,7 +242,7 @@ Description: Fix plugin autoloading
  At the moment, plugins to be detected are hardcoded in the code. We
  need a better method to get all available plugins, by listing all the
  files in selected directories.
-Status: Todo
+Status: Done 7 Jan 2001 (sam)
 
 Task: 0x33
 Difficulty: Hard
@@ -251,7 +251,7 @@ Description: Real plugin API
  We need some functions to register plugins, automatically detect which
  ones are the most appropriate, as well as ways to express that plugin
  A won't work unless plugin B is activated as well.
-Status: Todo
+Status: Done 7 Jan 2001 (sam)
 
 Task: 0x32
 Difficulty: Medium
@@ -290,16 +290,6 @@ Description: Shoot the TODO list on the web site
 Status: Todo
 
 Task: 0x2a
-Difficulty: Guru
-Urgency: Critical
-Description: Buy a new brain for Sam
- Sam likes to show that he is a good developer, and for a good developer
- hexadecimal notation really rules, though nobody really needs it. In this
- TODO list, Sam has forgotten that 0x29 + 1 != 0x30, but 0x2a ! So, please
- do something, and send your donations to sam@via.ecp.fr. Thanks for him.
-Status: Todo
-
-Task: 0x29
 Difficulty: Medium
 Urgency: Normal
 Description: ALSA audio output support
@@ -307,7 +297,7 @@ Description: ALSA audio output support
  technically superior to the usual OSS support found in the Linux kernel.
 Status: Done ( henri )
 
-Task: 0x28
+Task: 0x29
 Difficulty: Guru
 Urgency: Wishlist
 Description: Support for RTP
@@ -316,7 +306,7 @@ Description: Support for RTP
  and 2508 (compressed RTP) can be interesting as well.
 Status: Todo
 
-Task: 0x27
+Task: 0x28
 Difficulty: Medium
 Urgency: Wishlist
 Description: Draw a font / support color fonts
@@ -325,22 +315,22 @@ Description: Draw a font / support color fonts
  font, or adding support for color fonts, would make us gain some time.
 Status: Todo
 
-Task: 0x26
+Task: 0x27
 Difficulty: Medium
 Urgency: Important
 Description: Layer 2 mono support
  The vlc doesn't play layer 2 mono yet. We need it since a few of our
  streams are in this audio format.
-Status: Todo
+Status: Done 18 Dec 2000 (sam)
 
-Task: 0x25
+Task: 0x26
 Difficulty: Hard
 Urgency: Wishlist
 Description: MP3 support
  The vlc cannot play MPEG1/2 layer 3 yet. It might be nice to fix that.
 Status: Todo
 
-Task: 0x24
+Task: 0x25
 Difficulty: Hard
 Urgency: Normal
 Description: Support for unencapsulated streams
@@ -394,7 +384,7 @@ Description: Rewrite input for Program Stream files
  Currently when we read a PS file, it is first translated to TS
  because we first had only PS support. Now time has come to get
  rid of this ugly kludge and integrate a proper PS input.
-Status: Todo
+Status: Done because of Input II on 5 Dec 2000 (Meuuh)
 
 Task: 0x1f
 Difficulty: Hard
@@ -403,7 +393,7 @@ Description: DeCSS and DVD ioctls
  The vlc needs the DVD ioctls support as well as the integration
  of DeCSS to play DVDs properly. The person doing this should
  probably not live in a country where DeCSS has been ruled illegal.
-Status: Todo
+Status: Done 20 Jan 2001 (stef)
 
 Task: 0x1e
 Difficulty: Hard
@@ -436,7 +426,7 @@ Urgency: Wishlist
 Description: Modularize decoder
  Make the decoder a plugin, so that two versions can coexist
  without recompilation (MMX and non-MMX).
-Status: Todo
+Status: Done 16 Jan 2001 (sam)
 
 Task: 0x1a
 Difficulty: Easy
@@ -446,7 +436,7 @@ Status: Todo
  When in "waiting for stream" mode, the interface is refreshed
  every 5 seconds. This is too long, and can be confusing for
  the user. Make it refresh at least after a keyboard/mouse event.
-Status: Todo
+Status: Done 28 Aug 2000 (oct)
 
 Task: 0x19
 Difficulty: Hard
@@ -454,6 +444,7 @@ Urgency: Normal
 Description: Support MP1 and MP3
  The vlc does not support all MPEG1 audio formats yet, nor
  does it support MPEG1/2 layer 3.
+Status: Done 18 Dec 2000 (sam) but see 0x25
 
 Task: 0x18
 Difficulty: Guru
@@ -503,7 +494,7 @@ Urgency: Wishlist
 Description: Support MPEG1 timecodes
  The vlc can parse an MPEG1 system stream, but the parsed
  PCR values do not seem to be correct. Check what's wrong.
-Status: Todo
+Status: Done because of Input II on 5 Dec 2000 (Meuuh)
 
 Task: 0x12
 Difficulty: Medium
@@ -535,7 +526,7 @@ Description: Better black&white support
  When in B&W mode, the chroma part of pictures is decoded,
  but it would be more efficient not to decode at all when
  the video decoder knows it does not need to.
-Status: Todo
+Status: Done 25 Oct 2000 (reno)
 
 Task: 0x0e
 Difficulty: Easy
@@ -606,7 +597,7 @@ Description: Get rid of floating instructions
  it might be interesting to remove all floating instructions
  in a single thread. The audio decoders are of course not
  concerned by this task.
-Status: Todo
+Status: Done (sam)
 
 Task: 0x07
 Difficulty: Hard
@@ -623,7 +614,7 @@ Description: Optimize video parser
  The video parser has some speed issues currently unexplained:
  even though most functions are inlined, it keeps eating more
  CPU than it should. This has to be investigated.
-Status: Todo
+Status: Done because of Input II on 5 Dec 2000 (Meuuh)
 
 Task: 0x05
 Difficulty: Easy
@@ -632,7 +623,7 @@ Description: Backport vlms input
  The vlc uses the same file input code as the vlms (VideoLAN
  Mini Server) which has been much improved. Someone should
  port modifications done to the vlms back to the vlc.
-Status: Todo
+Status: Done because of Input II on 5 Dec 2000 (Meuuh)
 
 Task: 0x04
 Difficulty: Medium

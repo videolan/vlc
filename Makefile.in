@@ -185,7 +185,7 @@ INTERFACE =	src/interface/main.o \
 INPUT =		src/input/input_ps.o \
 		src/input/input_ts.o \
 		src/input/dvd_ifo.o \
-        src/input/dvd_css.o \
+		src/input/dvd_css.o \
 		src/input/input_dvd.o \
 		src/input/mpeg_system.o \
 		src/input/input_ext-dec.o \
@@ -441,21 +441,48 @@ show:
 
 # ugliest of all, but I have no time to do it -- sam
 snapshot:
-	rm -rf /tmp/${SNAPSHOTDIR}
-	mkdir /tmp/${SNAPSHOTDIR}
-	cp -a * /tmp/${SNAPSHOTDIR}
-		(cd /tmp/${SNAPSHOTDIR} ; \
-		make distclean ; \
-		find . -type d -name CVS | xargs rm -rf ; \
-		find . -type f -name '.*.swp' | xargs rm -f ; \
-		find . -type f -name '.cvsignore' | xargs rm -f ; \
-		cd .. ; \
-		tar czvf ${SNAPSHOTDIR}.tar.gz ${SNAPSHOTDIR} ; \
-		tar cIvf ${SNAPSHOTDIR}.tar.bz2 ${SNAPSHOTDIR} )
-	rm -rf /tmp/${SNAPSHOTDIR}
-	mv /tmp/${SNAPSHOTDIR}.tar.gz ..
-	mv /tmp/${SNAPSHOTDIR}.tar.bz2 ..
-	@echo "Sources are in ../${SNAPSHOTDIR}.tar.[gz,bz2]"
+	rm -rf /tmp/vlc-@VLC_VERSION@ /tmp/vlc-@VLC_VERSION@-nocss
+	# copy archive in /tmp
+	find include src plugins -type d | while read i ; \
+		do mkdir -p /tmp/vlc-@VLC_VERSION@/$$i ; \
+	done
+	find /tmp/vlc-@VLC_VERSION@ -type d -name CVS | xargs rmdir
+	for i in debian doc lib share ; \
+		do mkdir /tmp/vlc-@VLC_VERSION@/$$i ; \
+	done
+	# .c .h .in .cpp
+	find include src plugins -type f -name '*.[chi]*' | while read i ; \
+		do cp $$i /tmp/vlc-@VLC_VERSION@/$$i ; \
+	done
+	cp vlc.spec AUTHORS COPYING ChangeLog INSTALL README TODO \
+		Makefile.in Makefile.dep configure configure.in install-sh \
+		config.sub config.guess todo.pl \
+			/tmp/vlc-@VLC_VERSION@/
+	(cd /tmp ; tar cf vlc-@VLC_VERSION@.tar vlc-@VLC_VERSION@ ; \
+		bzip2 -f -9 < vlc-@VLC_VERSION@.tar \
+			> vlc-@VLC_VERSION@.tar.bz2 ; \
+		gzip -f -9 vlc-@VLC_VERSION@.tar )
+	mv /tmp/vlc-@VLC_VERSION@.tar.gz /tmp/vlc-@VLC_VERSION@.tar.bz2 ..
+
+	# removing CSS stuff
+	find /tmp/vlc-@VLC_VERSION@ -type f -name '*css*' | xargs rm -f
+	for x in Makefile.in src/input/input_dvd.c src/input/input_dvd.h ; do \
+	rm -f /tmp/vlc-@VLC_VERSION@/$$x ; \
+	perl -ne 'if (/^#e(lse|ndif)/) { $$i=0; } \
+			if (/^#if.*DVD/) { $$i=1; print "#if 0\n"; } \
+			elsif (!$$i || /^#/) { print $$_; }' \
+		< $$x | grep -vi css >| /tmp/vlc-@VLC_VERSION@/$$x ; \
+	done
+	(cd /tmp ; mv vlc-@VLC_VERSION@ vlc-@VLC_VERSION@-nocss ; \
+		tar cf vlc-@VLC_VERSION@-nocss.tar vlc-@VLC_VERSION@-nocss ; \
+		bzip2 -f -9 < vlc-@VLC_VERSION@-nocss.tar \
+			> vlc-@VLC_VERSION@-nocss.tar.bz2 ; \
+		gzip -f -9 vlc-@VLC_VERSION@-nocss.tar )
+	mv /tmp/vlc-@VLC_VERSION@-nocss.tar.gz \
+		/tmp/vlc-@VLC_VERSION@-nocss.tar.bz2 ..
+
+	# clean up
+	rm -rf /tmp/vlc-@VLC_VERSION@-nocss
 
 plugins: $(PLUGINS:%=lib/%.so)
 
