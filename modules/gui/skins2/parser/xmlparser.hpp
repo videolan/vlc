@@ -2,7 +2,7 @@
  * xmlparser.hpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: xmlparser.hpp,v 1.5 2004/02/27 15:07:04 gbazin Exp $
+ * $Id: xmlparser.hpp,v 1.6 2004/03/01 19:36:43 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -50,6 +50,9 @@ class XMLParser: public SkinObject
         /// Type for attribute lists
         typedef map<const char*, const char*, ltstr> AttrList_t;
 
+        /// Flag for validation errors
+        bool m_errors;
+
         /// Callbacks
         virtual void handleBeginElement( const string &rName, AttrList_t &attr ) {}
         virtual void handleEndElement( const string &rName ) {}
@@ -57,8 +60,6 @@ class XMLParser: public SkinObject
     private:
         /// Reader context
         xmlTextReaderPtr m_pReader;
-        /// Flag for validation errors
-        bool m_errors;
 
         /// Callback for validation errors
         static void handleError( void *pArg,  const char *pMsg,

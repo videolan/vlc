@@ -2,7 +2,7 @@
  * skin_parser.cpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: skin_parser.cpp,v 1.3 2004/03/01 18:33:31 asmax Exp $
+ * $Id: skin_parser.cpp,v 1.4 2004/03/01 19:36:43 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -25,7 +25,7 @@
 #include <math.h>
 
 // Current DTD version
-#define SKINS_DTD_VERSION "2.0"
+#define SKINS_DTD_VERSION "1.99"
 
 
 SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName ):
@@ -177,6 +177,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         {
             msg_Err( getIntf(), "Bad theme version : %s (you need version %s)",
                      attr["version"], SKINS_DTD_VERSION );
+            m_errors = true;
+            return;
         }
         const BuilderData::Theme theme( atoi( attr["magnet"] ),
                 atoi( attr["alpha"] ), atoi( attr["movealpha"] ),
