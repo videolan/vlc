@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.5 2002/11/28 17:35:01 sam Exp $
+ * $Id: intf.m,v 1.6 2002/12/04 20:51:23 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -902,7 +902,6 @@ static void Run( intf_thread_t *p_intf )
 
         [p_req->p_vout->p_sys->o_window setTitle: [NSString 
             stringWithCString: VOUT_TITLE " (QuickTime)"]];
-        [p_req->p_vout->p_sys->o_window setAcceptsMouseMovedEvents: YES];
         [p_req->p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
 
         p_req->i_result = 1;

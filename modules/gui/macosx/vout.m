@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.m,v 1.4 2002/11/18 23:00:41 massiot Exp $
+ * $Id: vout.m,v 1.5 2002/12/04 20:51:23 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -814,6 +814,77 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     [super drawRect: rect];
 
     p_vout->i_changes |= VOUT_SIZE_CHANGE;
+}
+
+- (BOOL)acceptsFirstResponder
+{
+    return( YES );
+}
+
+- (BOOL)becomeFirstResponder
+{
+    [[self window] setAcceptsMouseMovedEvents: YES];
+    return( YES );
+}
+
+- (BOOL)resignFirstResponder
+{
+    [[self window] setAcceptsMouseMovedEvents: NO];
+    return( YES );
+}
+
+- (void)mouseUp:(NSEvent *)o_event
+{
+    switch( [o_event type] )
+    {
+        case NSLeftMouseUp:
+        {
+            vlc_value_t val;
+            val.b_bool = VLC_TRUE;
+            var_Set( p_vout, "mouse-clicked", val );        
+        }
+        break;
+
+        default:
+            [super mouseUp: o_event];
+        break;
+    }
+}
+
+- (void)mouseMoved:(NSEvent *)o_event
+{
+    NSPoint ml;
+    NSRect s_rect;
+    BOOL b_inside;
+
+    s_rect = [self bounds];
+    ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
+    b_inside = [self mouse: ml inRect: s_rect];
+
+    if( b_inside )
+    {
+        vlc_value_t val;
+        int i_width, i_height, i_x, i_y;
+
+        vout_PlacePicture( p_vout, (unsigned int)s_rect.size.width,
+                                   (unsigned int)s_rect.size.height,
+                                   &i_x, &i_y, &i_width, &i_height );
+
+        val.i_int = ( ((int)ml.x) - i_x ) * 
+                    p_vout->render.i_width / i_width;
+        var_Set( p_vout, "mouse-x", val );
+
+        val.i_int = ( ((int)ml.y) - i_y ) * 
+                    p_vout->render.i_height / i_height;
+        var_Set( p_vout, "mouse-y", val );
+
+        val.b_bool = VLC_TRUE;
+        var_Set( p_vout, "mouse-moved", val );
+    }
+    else
+    {
+        [super mouseMoved: o_event];
+    }
 }
 
 @end
