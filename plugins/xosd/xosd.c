@@ -2,7 +2,7 @@
  * xosd.c : X On Screen Display interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: xosd.c,v 1.1 2002/06/07 22:41:50 lool Exp $
+ * $Id: xosd.c,v 1.2 2002/06/08 01:41:22 lool Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -58,7 +58,22 @@ static void intf_Run          ( intf_thread_t *p_intf );
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
+#define POSITION_TEXT N_("flip vertical position")
+#define POSITION_LONGTEXT N_("Display xosd output on the bottom of the " \
+                             "screen instead of the top")
+
+#define OFFSET_TEXT N_("vertical offset")
+#define OFFSET_LONGTEXT N_("Vertical position offset of the text " \
+                           "displayed in pixels")
+
+#define FONT_TEXT N_("font")
+#define FONT_LONGTEXT N_("Font used to display text in the xosd output")
+
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+ADD_BOOL( "xosd-position", 0, NULL, POSITION_TEXT, POSITION_LONGTEXT )
+ADD_INTEGER( "xosd-text-offset", 0, NULL, OFFSET_TEXT, OFFSET_LONGTEXT )
+ADD_STRING( "xosd-font", "fixed", NULL, FONT_TEXT, FONT_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -87,7 +102,7 @@ static void intf_getfunctions( function_list_t * p_function_list )
 /*****************************************************************************
  * intf_Open: initialize and create stuff
  *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
+static int intf_Open( intf_thread_t * p_intf )
 {
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
@@ -99,14 +114,15 @@ static int intf_Open( intf_thread_t *p_intf )
 
     /* Initialize library */
     p_intf->p_sys->p_osd =
-        xosd_init( "-*-lucidatypewriter-medium-r-normal-*-*-250-*-*-*-*-*-*",
-                   "LawnGreen", 3, XOSD_top, 0, 1 );
+        xosd_init( "fixed", "LawnGreen", 3, XOSD_top, 0, 1 );
 
     /* Initialize to NULL */
     p_intf->p_sys->psz_source = NULL;
 
     xosd_display( p_intf->p_sys->p_osd,
-                  0, XOSD_string, "xosd interface initialized" );
+                  0,
+                  XOSD_string,
+                  "xosd interface initialized" );
     return( 0 );
 }
 
@@ -160,9 +176,18 @@ static void intf_Run( intf_thread_t *p_intf )
                 p_intf->p_sys->psz_source =
                     strdup( p_intf->p_sys->p_input->psz_source );
 
-                xosd_display( p_intf->p_sys->p_osd, 0, XOSD_string,
+                /* Set user preferences */
+                xosd_set_font( p_intf->p_sys->p_osd,
+                               config_GetPsz( p_intf, "xosd-font" ) );
+                xosd_set_offset( p_intf->p_sys->p_osd,
+                    config_GetInt( p_intf, "xosd-text-offset" ) );
+                xosd_set_pos( p_intf->p_sys->p_osd, config_GetInt( p_intf, "xosd-position" ) ? XOSD_bottom : XOSD_top );
+
+                /* Display */
+                xosd_display( p_intf->p_sys->p_osd,
+                              0,                               /* first line */
+                              XOSD_string,
                               p_intf->p_sys->psz_source );
-                printf("douze %s\n", p_intf->p_sys->psz_source);
             }
         }
 
