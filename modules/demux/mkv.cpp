@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.42 2003/11/20 22:10:55 fenrir Exp $
+ * $Id: mkv.cpp,v 1.43 2003/11/21 00:38:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1369,27 +1369,13 @@ static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_r
     }
 }
 
-static pes_packet_t *MemToPES( input_thread_t *p_input, uint8_t *p_mem, int i_mem )
+static block_t *MemToBlock( input_thread_t *p_input, uint8_t *p_mem, int i_mem)
 {
-    pes_packet_t *p_pes;
-    data_packet_t *p_data;
-
-    if( ( p_pes = input_NewPES( p_input->p_method_data ) ) == NULL )
-    {
-        return NULL;
-    }
-
-    p_data = input_NewPacket( p_input->p_method_data, i_mem);
-
-    memcpy( p_data->p_payload_start, p_mem, i_mem );
-    p_data->p_payload_end = p_data->p_payload_start + i_mem;
-
-    p_pes->p_first = p_pes->p_last = p_data;
-    p_pes->i_nb_data = 1;
-    p_pes->i_pes_size = i_mem;
-    p_pes->i_rate = p_input->stream.control.i_rate;
-    
-    return p_pes;
+    block_t *p_block;
+    if( !(p_block = block_New( p_input, i_mem ) ) ) return NULL;
+    memcpy( p_block->p_buffer, p_mem, i_mem );
+    //p_block->i_rate = p_input->stream.control.i_rate;
+    return p_block;
 }
 
 static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts, mtime_t i_duration )
@@ -1430,7 +1416,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
     /* First send init data */
     if( !tk.b_inited && tk.i_data_init > 0 )
     {
-        pes_packet_t *p_init;
+        block_t *p_init;
 
         msg_Dbg( p_input, "sending header (%d bytes)", tk.i_data_init );
 
@@ -1462,17 +1448,17 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
             i_size[1] = __MIN( i_size[1], tk.i_data_init - i_offset - i_size[0] );
             i_size[2] = tk.i_data_init - i_offset - i_size[0] - i_size[1];
 
-            p_init = MemToPES( p_input, &tk.p_data_init[i_offset], i_size[0] );
+            p_init = MemToBlock( p_input, &tk.p_data_init[i_offset], i_size[0] );
             if( p_init )
             {
                 es_out_Send( p_input->p_es_out, tk.p_es, p_init );
             }
-            p_init = MemToPES( p_input, &tk.p_data_init[i_offset+i_size[0]], i_size[1] );
+            p_init = MemToBlock( p_input, &tk.p_data_init[i_offset+i_size[0]], i_size[1] );
             if( p_init )
             {
                 es_out_Send( p_input->p_es_out, tk.p_es, p_init );
             }
-            p_init = MemToPES( p_input, &tk.p_data_init[i_offset+i_size[0]+i_size[1]], i_size[2] );
+            p_init = MemToBlock( p_input, &tk.p_data_init[i_offset+i_size[0]+i_size[1]], i_size[2] );
             if( p_init )
             {
                 es_out_Send( p_input->p_es_out, tk.p_es, p_init );
@@ -1480,7 +1466,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
         }
         else
         {
-            p_init = MemToPES( p_input, tk.p_data_init, tk.i_data_init );
+            p_init = MemToBlock( p_input, tk.p_data_init, tk.i_data_init );
             if( p_init )
             {
                 es_out_Send( p_input->p_es_out, tk.p_es, p_init );
@@ -1492,35 +1478,35 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
 
     for( i = 0; i < block->NumberFrames(); i++ )
     {
-        pes_packet_t *p_pes;
+        block_t *p_block;
         DataBuffer &data = block->GetBuffer(i);
 
-        p_pes = MemToPES( p_input, data.Buffer(), data.Size() );
-        if( p_pes == NULL )
+        p_block = MemToBlock( p_input, data.Buffer(), data.Size() );
+        if( p_block == NULL )
         {
             break;
         }
 
-        p_pes->i_pts = i_pts;
-        p_pes->i_dts = i_pts;
+        p_block->i_pts = i_pts;
+        p_block->i_dts = i_pts;
 
         if( tk.fmt.i_cat == SPU_ES && strcmp( tk.psz_codec, "S_VOBSUB" ) )
         {
             if( i_duration > 0 )
             {
-                p_pes->i_dts += i_duration * 1000;
+                p_block->i_dts += i_duration * 1000;
             }
             else
             {
-                p_pes->i_dts = 0;
+                p_block->i_dts = 0;
             }
 
-            if( p_pes->p_first && p_pes->i_pes_size > 0 )
+            if( p_block->i_buffer > 0 )
             {
-                p_pes->p_first->p_payload_end[0] = '\0';
+                p_block->p_buffer[p_block->i_buffer-1] = '\0';
             }
         }
-        es_out_Send( p_input->p_es_out, tk.p_es, p_pes );
+        es_out_Send( p_input->p_es_out, tk.p_es, p_block );
 
         /* use time stamp only for first block */
         i_pts = 0;

@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: wav.c,v 1.10 2003/11/16 22:54:12 gbazin Exp $
+ * $Id: wav.c,v 1.11 2003/11/21 00:38:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -230,7 +230,7 @@ static int Demux( input_thread_t *p_input )
 {
     demux_sys_t  *p_sys = p_input->p_demux_data;
     int64_t      i_pos;
-    pes_packet_t *p_pes;
+    block_t      *p_block;
 
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
@@ -258,17 +258,17 @@ static int Demux( input_thread_t *p_input )
         return 0;
     }
 
-    if( ( p_pes = stream_PesPacket( p_input->s, p_sys->i_frame_size ) )==NULL )
+    if( ( p_block = stream_Block( p_input->s, p_sys->i_frame_size ) ) == NULL )
     {
         msg_Warn( p_input, "cannot read data" );
         return 0;
     }
-    p_pes->i_dts =
-    p_pes->i_pts = input_ClockGetTS( p_input,
+    p_block->i_dts =
+    p_block->i_pts = input_ClockGetTS( p_input,
                                      p_input->stream.p_selected_program,
                                      p_sys->i_time * 9 / 100 );
 
-    es_out_Send( p_input->p_es_out, p_sys->p_es, p_pes );
+    es_out_Send( p_input->p_es_out, p_sys->p_es, p_block );
 
     p_sys->i_time += p_sys->i_frame_length;
 

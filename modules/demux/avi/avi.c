@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.71 2003/11/20 22:10:56 fenrir Exp $
+ * $Id: avi.c,v 1.72 2003/11/21 00:38:01 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -776,7 +776,7 @@ static int Demux_Seekable( input_thread_t *p_input )
         p_pes->i_rate = p_input->stream.control.i_rate;
         if( b_play_audio || tk->i_cat != AUDIO_ES )
         {
-            es_out_Send( p_input->p_es_out, tk->p_es, p_pes );
+            es_out_SendPES( p_input->p_es_out, tk->p_es, p_pes );
         }
         else
         {
@@ -902,7 +902,7 @@ static int Demux_UnSeekable( input_thread_t *p_input )
                                           AVI_GetPTS( p_stream ) * 9/100);
 
                     p_pes->i_rate = p_input->stream.control.i_rate;
-                    es_out_Send( p_input->p_es_out, p_stream->p_es, p_pes );
+                    es_out_SendPES( p_input->p_es_out, p_stream->p_es, p_pes );
                 }
                 else
                 {

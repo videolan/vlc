@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.43 2003/11/20 22:10:56 fenrir Exp $
+ * $Id: asf.c,v 1.44 2003/11/21 00:38:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -716,7 +716,7 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
                 /* send complete packet to decoder */
                 if( p_stream->p_pes->i_pes_size > 0 )
                 {
-                    es_out_Send( p_input->p_es_out, p_stream->p_es, p_stream->p_pes );
+                    es_out_SendPES( p_input->p_es_out, p_stream->p_es, p_stream->p_pes );
                     p_stream->p_pes = NULL;
                 }
             }

@@ -2,7 +2,7 @@
  * aac.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aac.c,v 1.7 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: aac.c,v 1.8 2003/11/21 00:38:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -194,7 +194,7 @@ error:
 static int Demux( input_thread_t * p_input )
 {
     demux_sys_t  *p_sys = p_input->p_demux_data;
-    pes_packet_t *p_pes;
+    block_t *p_block;
 
     uint8_t      h[8];
     uint8_t      *p_peek;
@@ -243,18 +243,18 @@ static int Demux( input_thread_t * p_input )
                           p_input->stream.p_selected_program,
                           p_sys->i_time * 9 / 100 );
 
-    if( ( p_pes = stream_PesPacket( p_input->s, AAC_FRAME_SIZE( h ) ) )==NULL )
+    if( ( p_block = stream_Block( p_input->s, AAC_FRAME_SIZE( h ) ) ) == NULL )
     {
         msg_Warn( p_input, "cannot read data" );
         return 0;
     }
 
-    p_pes->i_dts =
-    p_pes->i_pts = input_ClockGetTS( p_input,
+    p_block->i_dts =
+    p_block->i_pts = input_ClockGetTS( p_input,
                                      p_input->stream.p_selected_program,
                                      p_sys->i_time * 9 / 100 );
 
-    es_out_Send( p_input->p_es_out, p_sys->p_es, p_pes );
+    es_out_Send( p_input->p_es_out, p_sys->p_es, p_block );
 
     p_sys->i_time += (mtime_t)1000000 *
                      (mtime_t)AAC_FRAME_SAMPLES( h ) /

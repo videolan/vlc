@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.17 2003/11/20 22:10:55 fenrir Exp $
+ * $Id: ninput.h,v 1.18 2003/11/21 00:38:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -35,7 +35,8 @@ enum es_out_query_e
 struct es_out_t
 {
     es_out_id_t *(*pf_add)    ( es_out_t *, es_format_t * );
-    int          (*pf_send)   ( es_out_t *, es_out_id_t *, pes_packet_t * );
+    int          (*pf_send)   ( es_out_t *, es_out_id_t *, block_t * );
+    int          (*pf_send_pes)( es_out_t *, es_out_id_t *, pes_packet_t * );
     void         (*pf_del)    ( es_out_t *, es_out_id_t * );
     int          (*pf_control)( es_out_t *, int i_query, va_list );
 
@@ -50,9 +51,15 @@ static inline void es_out_Del( es_out_t *out, es_out_id_t *id )
 {
     out->pf_del( out, id );
 }
-static inline int es_out_Send( es_out_t *out, es_out_id_t *id, pes_packet_t *p_pes )
+static inline int es_out_Send( es_out_t *out, es_out_id_t *id,
+			       block_t *p_block )
 {
-    return out->pf_send( out, id, p_pes );
+    return out->pf_send( out, id, p_block );
+}
+static inline int es_out_SendPES( es_out_t *out, es_out_id_t *id,
+                                  pes_packet_t *p_pes )
+{
+    return out->pf_send_pes( out, id, p_pes );
 }
 static inline int es_out_vaControl( es_out_t *out, int i_query, va_list args )
 {
@@ -101,6 +108,7 @@ VLC_EXPORT( int,            stream_Read,            ( stream_t *, void *p_read, 
 VLC_EXPORT( int,            stream_Peek,            ( stream_t *, uint8_t **pp_peek, int i_peek ) );
 VLC_EXPORT( data_packet_t *,stream_DataPacket,      ( stream_t *, int i_size, vlc_bool_t b_force ) );
 VLC_EXPORT( pes_packet_t *, stream_PesPacket,       ( stream_t *, int i_size ) );
+VLC_EXPORT( block_t *,      stream_Block,           ( stream_t *, int i_size ) );
 
 static int64_t inline stream_Tell( stream_t *s )
 {

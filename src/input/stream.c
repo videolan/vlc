@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: stream.c,v 1.6 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: stream.c,v 1.7 2003/11/21 00:38:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -263,6 +263,28 @@ int stream_Read( stream_t *s, void *p_data, int i_data )
 int stream_Peek( stream_t *s, uint8_t **pp_peek, int i_data )
 {
     return input_Peek( s->p_input, pp_peek, i_data );
+}
+
+/**
+ * Read "i_size" bytes and store them in a block_t. If less than "i_size"
+ * bytes are available then return what is left and if nothing is availble,
+ * return NULL.
+ */
+block_t *stream_Block( stream_t *s, int i_size )
+{
+    block_t *p_block;
+
+    if( i_size <= 0 ) return NULL;
+    if( !(p_block = block_New( s->p_input, i_size ) ) ) return NULL;
+
+    p_block->i_buffer = stream_Read( s, p_block->p_buffer, i_size );
+    if( !p_block->i_buffer )
+    {
+        block_Release( p_block );
+        p_block = NULL;
+    }
+
+    return p_block;
 }
 
 /**

@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.9 2003/11/20 23:13:28 sigmunau Exp $
+ * $Id: livedotcom.cpp,v 1.10 2003/11/21 00:38:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -854,10 +854,9 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     live_track_t   *tk = (live_track_t*)p_private;
     input_thread_t *p_input = tk->p_input;
     demux_sys_t    *p_sys = p_input->p_demux_data;
-    pes_packet_t   *p_pes;
-    data_packet_t  *p_data;
+    block_t        *p_block;
 
-    mtime_t        i_pts = (mtime_t)pts.tv_sec * 1000000LL + (mtime_t)pts.tv_usec;
+    mtime_t i_pts = (mtime_t)pts.tv_sec * 1000000LL + (mtime_t)pts.tv_usec;
 
     if( tk->b_quicktime && tk->p_es == NULL )
     {
@@ -888,41 +887,31 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
              i_size,
              pts.tv_sec * 1000000LL + pts.tv_usec );
 #endif
-    /* Create a PES */
-    if( ( p_pes = input_NewPES( p_input->p_method_data ) ) == NULL )
-    {
-        return;
-    }
     if( i_size > 65536 )
     {
         msg_Warn( p_input, "buffer overflow" );
     }
     /* FIXME could i_size be > buffer size ? */
-    p_data = input_NewPacket( p_input->p_method_data, i_size );
+    p_block = block_New( p_input, i_size );
 
-    memcpy( p_data->p_payload_start, tk->buffer, i_size );
-    p_data->p_payload_end = p_data->p_payload_start + i_size;
-
-    p_pes->p_first = p_pes->p_last = p_data;
-    p_pes->i_nb_data = 1;
-    p_pes->i_pes_size = i_size;
-    p_pes->i_rate = p_input->stream.control.i_rate;
+    memcpy( p_block->p_buffer, tk->buffer, i_size );
+    //p_block->i_rate = p_input->stream.control.i_rate;
 
     if( i_pts != tk->i_pts )
     {
-        p_pes->i_dts =
-        p_pes->i_pts = input_ClockGetTS( p_input,
+        p_block->i_dts =
+        p_block->i_pts = input_ClockGetTS( p_input,
                                          p_input->stream.p_selected_program,
                                          i_pts * 9 / 100 );
     }
     else
     {
-        p_pes->i_dts = 0;
-        p_pes->i_pts = 0;
+        p_block->i_dts = 0;
+        p_block->i_pts = 0;
     }
     //fprintf( stderr, "tk -> dpts=%lld\n", i_pts - tk->i_pts );
 
-    es_out_Send( p_input->p_es_out, tk->p_es, p_pes );
+    es_out_Send( p_input->p_es_out, tk->p_es, p_block );
 
     /* warm that's ok */
     p_sys->event = 0xff;

@@ -2,7 +2,7 @@
  * a52.c : Raw a52 Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52sys.c,v 1.9 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: a52sys.c,v 1.10 2003/11/21 00:38:00 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -177,7 +177,7 @@ error:
 static int Demux( input_thread_t * p_input )
 {
     demux_sys_t  *p_sys = p_input->p_demux_data;
-    pes_packet_t *p_pes;
+    block_t *p_block;
 
     int i_channels, i_sample_rate, i_frame_size;
 
@@ -227,18 +227,18 @@ static int Demux( input_thread_t * p_input )
                           p_input->stream.p_selected_program,
                           p_sys->i_time * 9 / 100 );
 
-    if( ( p_pes = stream_PesPacket( p_input->s, i_frame_size ) ) == NULL )
+    if( ( p_block = stream_Block( p_input->s, i_frame_size ) ) == NULL )
     {
         msg_Warn( p_input, "cannot read data" );
         return 0;
     }
 
-    p_pes->i_dts =
-    p_pes->i_pts = input_ClockGetTS( p_input,
+    p_block->i_dts =
+    p_block->i_pts = input_ClockGetTS( p_input,
                                      p_input->stream.p_selected_program,
                                      p_sys->i_time * 9 / 100 );
 
-    es_out_Send( p_input->p_es_out, p_sys->p_es, p_pes );
+    es_out_Send( p_input->p_es_out, p_sys->p_es, p_block );
 
     p_sys->i_time += (mtime_t)1000000 *
                      (mtime_t)1536 /

@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.37 2003/11/20 22:10:56 fenrir Exp $
+ * $Id: sub.c,v 1.38 2003/11/21 00:38:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -518,9 +518,7 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
     while( p_sub->i_subtitle < p_sub->i_subtitles &&
            p_sub->subtitle[p_sub->i_subtitle].i_start < i_maxdate )
     {
-        pes_packet_t    *p_pes;
-        data_packet_t   *p_data;
-
+        block_t *p_block;
         int i_len;
 
         i_len = strlen( p_sub->subtitle[p_sub->i_subtitle].psz_text ) + 1;
@@ -531,22 +529,14 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
             p_sub->i_subtitle++;
             continue;
         }
-        if( !( p_pes = input_NewPES( p_sub->p_input->p_method_data ) ) )
+
+        if( !( p_block = block_New( p_sub->p_input, i_len ) ) )
         {
             p_sub->i_subtitle++;
             continue;
         }
 
-        if( !( p_data = input_NewPacket( p_sub->p_input->p_method_data,
-                                         i_len ) ) )
-        {
-            input_DeletePES( p_sub->p_input->p_method_data, p_pes );
-            p_sub->i_subtitle++;
-            continue;
-        }
-        p_data->p_payload_end = p_data->p_payload_start + i_len;
-
-        p_pes->i_pts =
+        p_block->i_pts =
             input_ClockGetTS( p_sub->p_input,
                               p_sub->p_input->stream.p_selected_program,
                               p_sub->subtitle[p_sub->i_subtitle].i_start*9/100);
@@ -555,32 +545,26 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
             /* FIXME kludge ...
              * i_dts means end of display...
              */
-            p_pes->i_dts =
+            p_block->i_dts =
                 input_ClockGetTS( p_sub->p_input,
                               p_sub->p_input->stream.p_selected_program,
                               p_sub->subtitle[p_sub->i_subtitle].i_stop *9/100);
         }
         else
         {
-            p_pes->i_dts = 0;
+            p_block->i_dts = 0;
         }
 
-        p_pes->i_nb_data = 1;
-        p_pes->p_first =
-        p_pes->p_last = p_data;
-        p_pes->i_pes_size = i_len;
+        memcpy( p_block->p_buffer,
+                p_sub->subtitle[p_sub->i_subtitle].psz_text, i_len );
 
-        memcpy( p_data->p_payload_start,
-                p_sub->subtitle[p_sub->i_subtitle].psz_text,
-                i_len );
-
-        if( p_pes->i_pts > 0 )
+        if( p_block->i_pts > 0 )
         {
-            es_out_Send( p_input->p_es_out, p_sub->p_es, p_pes );
+            es_out_Send( p_input->p_es_out, p_sub->p_es, p_block );
         }
         else
         {
-            input_DeletePES( p_sub->p_input->p_method_data, p_pes );
+            block_Release( p_block );
         }
 
         p_sub->i_subtitle++;

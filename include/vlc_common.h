@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.86 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: vlc_common.h,v 1.87 2003/11/21 00:38:01 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -51,6 +51,7 @@
 /*****************************************************************************
  * Required system headers
  *****************************************************************************/
+#include <stdlib.h>
 #include <stdarg.h>
 
 #ifdef HAVE_STRING_H

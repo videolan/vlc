@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.257 2003/11/20 22:10:56 fenrir Exp $
+ * $Id: input.c,v 1.258 2003/11/21 00:38:01 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -988,7 +988,8 @@ struct es_out_id_t
 };
 
 static es_out_id_t *EsOutAdd    ( es_out_t *, es_format_t * );
-static int          EsOutSend   ( es_out_t *, es_out_id_t *, pes_packet_t * );
+static int          EsOutSend   ( es_out_t *, es_out_id_t *, block_t * );
+static int          EsOutSendPES( es_out_t *, es_out_id_t *, pes_packet_t * );
 static void         EsOutDel    ( es_out_t *, es_out_id_t * );
 static int          EsOutControl( es_out_t *, int i_query, va_list );
 
@@ -998,6 +999,7 @@ static es_out_t *EsOutCreate( input_thread_t *p_input )
 
     out->pf_add     = EsOutAdd;
     out->pf_send    = EsOutSend;
+    out->pf_send_pes= EsOutSendPES;
     out->pf_del     = EsOutDel;
     out->pf_control = EsOutControl;
 
@@ -1216,7 +1218,42 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     return id;
 }
 
-static int EsOutSend( es_out_t *out, es_out_id_t *id, pes_packet_t *p_pes )
+static int EsOutSend( es_out_t *out, es_out_id_t *id, block_t *p_block )
+{
+    if( id->p_es->p_decoder_fifo )
+    {
+        pes_packet_t *p_pes;
+
+        if( !(p_pes = input_NewPES( out->p_sys->p_input->p_method_data ) ) )
+        {
+            return VLC_SUCCESS;
+        }
+
+        p_pes->p_first = p_pes->p_last =
+            input_NewPacket( out->p_sys->p_input->p_method_data,
+                             p_block->i_buffer );
+
+        p_pes->i_nb_data = 1;
+        p_pes->i_pts = p_block->i_pts;
+        p_pes->i_dts = p_block->i_dts;
+
+        p_pes->p_first->p_payload_end =
+            p_pes->p_first->p_payload_start + p_block->i_buffer;
+        memcpy( p_pes->p_first->p_payload_start,
+                p_block->p_buffer, p_block->i_buffer );
+
+        block_Release( p_block );
+
+        input_DecodePES( id->p_es->p_decoder_fifo, p_pes );
+    }
+    else
+    {
+        block_Release( p_block );
+    }
+    return VLC_SUCCESS;
+}
+
+static int EsOutSendPES( es_out_t *out, es_out_id_t *id, pes_packet_t *p_pes )
 {
     if( id->p_es->p_decoder_fifo )
     {
