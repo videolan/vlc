@@ -2,7 +2,7 @@
  * macosx.h : MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $$
+ * $Id: macosx.h,v 1.3 2001/11/29 10:20:56 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *

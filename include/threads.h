@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.29 2001/11/29 01:01:47 fgp Exp $
+ * $Id: threads.h,v 1.30 2001/11/29 10:20:56 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -24,7 +24,6 @@
  *****************************************************************************/
 
 #include <stdio.h>
-#include <string.h>
 
 #if defined(GPROF) || defined(DEBUG)
 #   include <sys/time.h>

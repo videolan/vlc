@@ -2,7 +2,7 @@
  * aout_darwin.c : Darwin audio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.6 2001/11/29 01:01:48 fgp Exp $
+ * $Id: aout_macosx.c,v 1.7 2001/11/29 10:20:56 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *
@@ -41,6 +41,8 @@
  * Preamble
  *****************************************************************************/
 #include "defs.h"
+
+#include <string.h>
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */

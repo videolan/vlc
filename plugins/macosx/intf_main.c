@@ -3,8 +3,8 @@
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
  *
- * Authors: 	Colin Delacroix <colin@zoy.org>
- *		Florian G. Pflug <fgp@phlo.org>
+ * Authors: Colin Delacroix <colin@zoy.org>
+ *	        Florian G. Pflug <fgp@phlo.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <sys/param.h>                                    /* for MAXPATHLEN */
+#include <string.h>
 
 #include "config.h"
 #include "common.h"
