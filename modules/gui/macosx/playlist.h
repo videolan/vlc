@@ -2,7 +2,7 @@
  * playlist.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlist.h,v 1.20 2004/01/25 17:01:57 murray Exp $
+ * $Id: playlist.h,v 1.21 2004/02/06 04:51:02 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -44,6 +44,7 @@
     IBOutlet id o_table_view;
     
     IBOutlet id o_status_field;
+    IBOutlet id o_tc_id;
     IBOutlet id o_tc_name;
     IBOutlet id o_tc_author;
     IBOutlet id o_tc_duration;

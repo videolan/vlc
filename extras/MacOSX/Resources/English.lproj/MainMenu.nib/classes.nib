@@ -351,6 +351,7 @@
                 "o_table_view" = id; 
                 "o_tc_author" = id; 
                 "o_tc_duration" = id; 
+                "o_tc_id" = id; 
                 "o_tc_name" = id; 
                 "o_window" = id; 
             }; 

@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlist.m,v 1.55 2004/01/25 17:01:57 murray Exp $
+ * $Id: playlist.m,v 1.56 2004/02/06 04:51:02 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -138,16 +138,16 @@
 /* We need to check whether _defaultTableHeaderSortImage exists, since it 
 belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
-    if ([[NSTableView class] respondsToSelector:@selector(_defaultTableHeaderSortImage)])
+    if( [[NSTableView class] respondsToSelector:@selector(_defaultTableHeaderSortImage)] )
     {
-    o_ascendingSortingImage = [[NSTableView class] _defaultTableHeaderSortImage];
+        o_ascendingSortingImage = [[NSTableView class] _defaultTableHeaderSortImage];
     }
     else
     {
-    o_ascendingSortingImage = nil;
+        o_ascendingSortingImage = nil;
     }
 
-    if ([[NSTableView class] respondsToSelector:@selector(_defaultTableHeaderReverseSortImage)])
+    if( [[NSTableView class] respondsToSelector:@selector(_defaultTableHeaderReverseSortImage)] )
     {
         o_descendingSortingImage = [[NSTableView class] _defaultTableHeaderReverseSortImage];
     }
@@ -192,39 +192,50 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         return;
     }
 
-    if (o_tc_sortColumn == o_tc )
+    if( o_tc_sortColumn == o_tc )
     { 
         b_isSortDescending = !b_isSortDescending;
     }
-    else if (o_tc == o_tc_name || o_tc == o_tc_author)
+    else if( o_tc == o_tc_name || o_tc == o_tc_author || 
+        o_tc == o_tc_id )
     {
         b_isSortDescending = VLC_FALSE;
         [o_table_view setHighlightedTableColumn:o_tc];
         o_tc_sortColumn = o_tc;
-        for (i=0;i<max;i++)
+        for( i=0 ; i<max ; i++ )
         {
             [o_table_view setIndicatorImage:nil inTableColumn:[[o_table_view tableColumns] objectAtIndex:i]];
         }
     }
 
-    if (o_tc_name == o_tc && !b_isSortDescending)
+    if( o_tc_id == o_tc && !b_isSortDescending )
     {    
-        playlist_SortTitle( p_playlist , 0 );
+        playlist_SortID( p_playlist , ORDER_NORMAL );
         [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];    
     }
-    else if (o_tc_author == o_tc && !b_isSortDescending)
+    else if( o_tc_name == o_tc && !b_isSortDescending )
+    {    
+        playlist_SortTitle( p_playlist , ORDER_NORMAL );
+        [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];    
+    }
+    else if( o_tc_author == o_tc && !b_isSortDescending )
     {
-        playlist_SortAuthor( p_playlist , 0 );
+        playlist_SortAuthor( p_playlist , ORDER_NORMAL );
         [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];
     }
-    else if (o_tc_name == o_tc && b_isSortDescending)
+    else if( o_tc_id == o_tc && b_isSortDescending )
     {    
-        playlist_SortTitle( p_playlist , 1 );
+        playlist_SortID( p_playlist , ORDER_REVERSE );
+        [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];    
+    }
+    else if( o_tc_name == o_tc && b_isSortDescending )
+    {    
+        playlist_SortTitle( p_playlist , ORDER_REVERSE );
         [o_table_view setIndicatorImage:o_descendingSortingImage inTableColumn:o_tc];
     }
-    else if (o_tc_author == o_tc && b_isSortDescending)
+    else if( o_tc_author == o_tc && b_isSortDescending )
     {
-        playlist_SortAuthor( p_playlist , 1 );
+        playlist_SortAuthor( p_playlist , ORDER_REVERSE );
         [o_table_view setIndicatorImage:o_descendingSortingImage inTableColumn:o_tc];
     } 
     vlc_object_release( p_playlist );
@@ -423,12 +434,13 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         /* One item */
         NSDictionary *o_one_item;
-        int j, i_new_id = -1;
+        int j, i_total_options = 0, i_new_id = -1;
         int i_mode = PLAYLIST_INSERT;
         BOOL b_rem = FALSE, b_dir = FALSE;
         NSString *o_uri, *o_name;
         NSArray *o_options;
         NSURL *o_true_file;
+        char **ppsz_options = NULL;
     
         /* Get the item */
         o_one_item = [o_array objectAtIndex: i_item];
@@ -455,34 +467,45 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             psz_dev[temp - psz_dev] = '\0';
             o_uri = [NSString stringWithCString: psz_dev ];
         }
-        
-        /* Add the item */
-        i_new_id = playlist_Add( p_playlist, [o_uri fileSystemRepresentation], 
-                      [o_name UTF8String], i_mode, 
-                      i_position == -1 ? PLAYLIST_END : i_position + i_item);
-        
-        /* Add the options, when there are any */
-        if( o_options )
+
+        if( o_options && [o_options count] > 0 )
         {
-            for( j = 0; j < [o_options count]; j++ )
+            /* Count the input options */
+            i_total_options = [o_options count];
+    
+            /* Allocate ppsz_options */
+            for( j = 0; j < i_total_options; j++ )
             {
-                playlist_AddOption( p_playlist, i_new_id,
-                 strdup( [[o_options objectAtIndex:j] UTF8String] ) );
+                if( !ppsz_options )
+                    ppsz_options = (char **)malloc( sizeof(char *) * i_total_options );
+    
+                ppsz_options[j] = strdup([[o_options objectAtIndex:j] UTF8String]);
             }
         }
-        
-        if( i_item == 0 && !b_enqueue )
-        {
-            playlist_Goto( p_playlist, playlist_GetPositionById( p_playlist, i_new_id ) );
-            playlist_Play( p_playlist );
-        }
-    
+
+        /* Add the item */
+        i_new_id = playlist_AddExt( p_playlist, [o_uri fileSystemRepresentation], 
+                      [o_name UTF8String], i_mode, 
+                      i_position == -1 ? PLAYLIST_END : i_position + i_item,
+                      0, (ppsz_options != NULL ) ? (const char **)ppsz_options : 0, i_total_options );
+
+        /* clean up 
+        for( j = 0; j < i_total_options; j++ )
+            free( ppsz_options[j] );
+        if( ppsz_options ) free( ppsz_options ); */
+
         /* Recent documents menu */
         o_true_file = [NSURL fileURLWithPath: o_uri];
         if( o_true_file != nil )
         { 
             [[NSDocumentController sharedDocumentController]
                 noteNewRecentDocumentURL: o_true_file]; 
+        }
+        
+        if( i_item == 0 && !b_enqueue )
+        {
+            playlist_Goto( p_playlist, playlist_GetPositionById( p_playlist, i_new_id ) );
+            playlist_Play( p_playlist );
         }
     }
 
