@@ -2,7 +2,7 @@
  * audio_decoder.h : audio decoder interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: mpeg_adec_generic.h,v 1.1 2001/11/13 12:09:18 henri Exp $
+ * $Id: mpeg_adec_generic.h,v 1.2 2002/01/09 00:33:37 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -29,6 +29,7 @@ typedef struct adec_sync_info_s {
     int sample_rate;    /* sample rate in Hz */
     int frame_size;     /* frame size in bytes */
     int bit_rate;       /* nominal bit rate in kbps */
+    int b_stereo;       /* mono/stereo */
 } adec_sync_info_t;
 
 typedef struct adec_bank_s

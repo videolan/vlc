@@ -2,11 +2,12 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.10 2001/12/30 07:09:55 sam Exp $
+ * $Id: mpeg_adec.c,v 1.11 2002/01/09 00:33:37 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
+ *          Cyril Deguet <asmax@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -125,14 +126,9 @@ static int decoder_Run ( decoder_config_t * p_config )
     p_adec->p_config->pf_init_bit_stream( &p_adec->bit_stream,
         p_adec->p_config->p_decoder_fifo, NULL, NULL );
 
-    /* Create the audio output fifo */
-    p_adec->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_STEREO_FIFO, 2, 0, 0,
-                                           ADEC_FRAME_SIZE, NULL );
-    if ( p_adec->p_aout_fifo == NULL )
-    {
-        intf_ErrMsg("mpeg_adec error: cannot create audio output fifo");
-        return -1;
-    }
+    /* We do not create the audio output fifo now, but
+       it will be created when the first frame is received */
+    p_adec->p_aout_fifo = NULL;
 
     intf_DbgMsg("mpeg_adec debug: thread initialized, decoding begins.");
 
@@ -170,6 +166,35 @@ static void DecodeThread( adec_thread_t * p_adec )
 
     if( ! adec_SyncFrame (p_adec, &sync_info) )
     {
+        
+        /* TODO: check if audio type has changed */
+        
+        /* Create the output fifo if it doesn't exist yet */
+        if( p_adec->p_aout_fifo == NULL )
+        {
+            int fifo_type;
+            int channels;
+            
+            if( sync_info.b_stereo )
+            {
+                fifo_type = AOUT_ADEC_STEREO_FIFO;
+                channels = 2;
+            }
+            else
+            {
+                fifo_type = AOUT_ADEC_MONO_FIFO;
+                channels = 1;
+            }
+            p_adec->p_aout_fifo = aout_CreateFifo( fifo_type, channels,
+                    sync_info.sample_rate, 0, ADEC_FRAME_SIZE, NULL );
+            if( p_adec->p_aout_fifo == NULL)
+            {
+                intf_ErrMsg( "adec error: failed to create Audio Output "
+                        "Fifo." );
+                DecoderError( p_adec->p_fifo );
+            }
+        }
+
         p_adec->i_sync = 1;
 
         p_adec->p_aout_fifo->l_rate = sync_info.sample_rate;

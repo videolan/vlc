@@ -2,10 +2,11 @@
  * adec_generic.c: MPEG audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec_generic.c,v 1.5 2001/12/30 07:09:55 sam Exp $
+ * $Id: mpeg_adec_generic.c,v 1.6 2002/01/09 00:33:37 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
+ *          Cyril Deguet <asmax@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -167,6 +168,14 @@ int adec_SyncFrame( adec_thread_t * p_adec, adec_sync_info_t * p_sync_info )
     RemoveBits( &p_adec->bit_stream, 24 );
     p_adec->i_read_bits = 32;
 
+    if( ! (p_adec->header & 0x10000) )
+    {
+        /* Error check, skip it */
+        RemoveBits( &p_adec->bit_stream, 16 );
+        p_adec->i_read_bits += 16;
+    }
+
+    p_sync_info->b_stereo = ((p_adec->header & 0xc0) != 0xc0);
     p_sync_info->sample_rate = sample_rate;
     p_sync_info->bit_rate = bit_rate;
     p_sync_info->frame_size = frame_size;
@@ -178,13 +187,6 @@ int adec_SyncFrame( adec_thread_t * p_adec, adec_sync_info_t * p_sync_info )
 int adec_DecodeFrame( adec_thread_t * p_adec, s16 * buffer )
 {
     int i_total_bytes_read;
-
-    if( ! (p_adec->header & 0x10000) )
-    {
-        /* Error check, skip it */
-        RemoveBits( &p_adec->bit_stream, 16 );
-        p_adec->i_read_bits += 16;
-    }
 
     /* parse audio data */
 

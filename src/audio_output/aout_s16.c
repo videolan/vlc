@@ -35,14 +35,70 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void S16StereoPlay( aout_thread_t * p_aout, aout_fifo_t * p_fifo );
+static void S16Play( aout_thread_t * p_aout, aout_fifo_t * p_fifo );
 
 /*****************************************************************************
  * Functions
  *****************************************************************************/
 void aout_S16MonoThread( aout_thread_t * p_aout )
 {
-    intf_ErrMsg( "aout error: 16 bit signed mono thread unsupported" );
+    int  i_fifo;
+    long l_buffer, l_buffer_limit, l_bytes;
+
+    /* As the s32_buffer was created with calloc(), we don't have to set this
+     * memory to zero and we can immediately jump into the thread's loop */
+    while ( ! p_aout->b_die )
+    {
+        vlc_mutex_lock( &p_aout->fifos_lock );
+
+        for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
+        {
+            if( p_aout->fifo[i_fifo].b_die )
+            {
+                aout_FreeFifo( &p_aout->fifo[i_fifo] );
+            }
+            else
+            {
+                S16Play( p_aout, &p_aout->fifo[i_fifo] );
+            }
+        }
+
+        vlc_mutex_unlock( &p_aout->fifos_lock );
+
+        l_buffer_limit = p_aout->l_units; /* p_aout->b_stereo == 0 */
+
+        for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )
+        {
+            ((s16 *)p_aout->buffer)[l_buffer] =
+                     (s16)( ( p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS )
+                            * p_aout->i_volume / 256 ) ;
+            p_aout->s32_buffer[l_buffer] = 0;
+        }
+
+        l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
+
+        /* sizeof(s16) << (p_aout->b_stereo) == 2 */
+        p_aout->date = mdate() + ((((mtime_t)((l_bytes + 2 * p_aout->i_latency) / 2)) * 1000000)
+                                   / ((mtime_t)p_aout->l_rate))
+                        + p_main->i_desync;
+        p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer,
+                         l_buffer_limit * sizeof(s16) );
+
+        if ( l_bytes > (l_buffer_limit * sizeof(s16)) )
+        {
+            msleep( p_aout->l_msleep );
+        }
+    }
+
+    vlc_mutex_lock( &p_aout->fifos_lock );
+
+    for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
+    {
+        aout_FreeFifo( &p_aout->fifo[i_fifo] );
+    }
+
+    vlc_mutex_unlock( &p_aout->fifos_lock );
+
 }
 
 void aout_S16StereoThread( aout_thread_t * p_aout )
@@ -64,7 +120,7 @@ void aout_S16StereoThread( aout_thread_t * p_aout )
             }
             else
             {
-                S16StereoPlay( p_aout, &p_aout->fifo[i_fifo] );
+                S16Play( p_aout, &p_aout->fifo[i_fifo] );
             }
         }
 
@@ -107,7 +163,7 @@ void aout_S16StereoThread( aout_thread_t * p_aout )
 
 /* Following functions are local */
 
-static void S16StereoPlay( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
+static void S16Play( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
 {
     long l_buffer = 0;
     long l_buffer_limit, l_units;

@@ -2,9 +2,10 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.69 2001/12/30 07:09:56 sam Exp $
+ * $Id: audio_output.c,v 1.70 2002/01/09 00:33:37 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Cyril Deguet <asmax@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +78,7 @@ void aout_EndBank ( void )
 /*****************************************************************************
  * aout_CreateThread: initialize audio thread
  *****************************************************************************/
-aout_thread_t *aout_CreateThread( int *pi_status )
+aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
 {
     aout_thread_t * p_aout;                             /* thread descriptor */
 #if 0
@@ -121,6 +122,18 @@ aout_thread_t *aout_CreateThread( int *pi_status )
         return( NULL );
     }
 
+    p_aout->l_rate = l_rate;
+    p_aout->i_channels = i_channels;
+
+    /* special setting for ac3 pass-through mode */
+    /* FIXME is it necessary ? (cf ac3_adec.c) */
+    if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) && p_main->b_ac3 )
+    {
+        intf_WarnMsg( 4, "aout info: setting ac3 spdif" );
+        p_aout->i_format = AOUT_FMT_AC3;
+        p_aout->l_rate = 48000;
+    }
+
     if( p_aout->l_rate == 0 )
     {
         intf_ErrMsg( "aout error: null sample rate" );
@@ -128,14 +141,6 @@ aout_thread_t *aout_CreateThread( int *pi_status )
         module_Unneed( p_aout->p_module );
         free( p_aout );
         return( NULL );
-    }
-
-    /* special setting for ac3 pass-through mode */
-    if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) && p_main->b_ac3 )
-    {
-        intf_WarnMsg( 4, "aout info: setting ac3 spdif" );
-        p_aout->i_format = AOUT_FMT_AC3;
-        p_aout->l_rate = 48000;
     }
 
     /* FIXME: only works for i_channels == 1 or 2 ?? */

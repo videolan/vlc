@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.12 2001/12/31 04:53:33 sam Exp $
+ * $Id: ac3_adec.c,v 1.13 2002/01/09 00:33:37 asmax Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -93,121 +93,6 @@ MODULE_DEACTIVATE_STOP
 static int decoder_Probe( probedata_t *p_data )
 {
     return ( p_data->i_type == AC3_AUDIO_ES ) ? 50 : 0;
-}
-
-/*****************************************************************************
- * decoder_Run: this function is called just after the thread is created
- *****************************************************************************/
-static int decoder_Run ( decoder_config_t * p_config )
-{
-    ac3dec_thread_t *   p_ac3thread;
-    int sync;
-
-    intf_DbgMsg( "ac3_adec debug: ac3_adec thread launched, initializing" );
-
-    /* Allocate the memory needed to store the thread's structure */
-    p_ac3thread = (ac3dec_thread_t *)memalign(16, sizeof(ac3dec_thread_t));
-
-    if( p_ac3thread == NULL )
-    {
-        intf_ErrMsg ( "ac3_adec error: not enough memory "
-                      "for decoder_Run() to allocate p_ac3thread" );
-        DecoderError( p_config->p_decoder_fifo );
-        return( -1 );
-    }
-   
-    /*
-     * Initialize the thread properties
-     */
-    p_ac3thread->p_config = p_config;
-    if( InitThread( p_ac3thread ) )
-    {
-        intf_ErrMsg( "ac3_adec error: could not initialize thread" );
-        DecoderError( p_config->p_decoder_fifo );
-        free( p_ac3thread );
-        return( -1 );
-    }
-
-    sync = 0;
-    p_ac3thread->sync_ptr = 0;
-
-    /* ac3 decoder thread's main loop */
-    /* FIXME : do we have enough room to store the decoded frames ?? */
-    while ((!p_ac3thread->p_fifo->b_die) && (!p_ac3thread->p_fifo->b_error))
-    {
-        s16 * buffer;
-        ac3_sync_info_t sync_info;
-        int ptr;
-
-        if (!sync) {
-            do {
-                GetBits(&p_ac3thread->ac3_decoder->bit_stream,8);
-            } while ((!p_ac3thread->sync_ptr) && (!p_ac3thread->p_fifo->b_die)
-                    && (!p_ac3thread->p_fifo->b_error));
-            
-            ptr = p_ac3thread->sync_ptr;
-
-            while(ptr-- && (!p_ac3thread->p_fifo->b_die)
-                && (!p_ac3thread->p_fifo->b_error))
-            {
-                p_ac3thread->ac3_decoder->bit_stream.p_byte++;
-            }
-                        
-            /* we are in sync now */
-            sync = 1;
-        }
-
-        if (p_ac3thread->p_fifo->p_first->i_pts)
-        {
-            p_ac3thread->p_aout_fifo->date[
-                p_ac3thread->p_aout_fifo->l_end_frame] =
-                p_ac3thread->p_fifo->p_first->i_pts;
-            p_ac3thread->p_fifo->p_first->i_pts = 0;
-        } else {
-            p_ac3thread->p_aout_fifo->date[
-                p_ac3thread->p_aout_fifo->l_end_frame] =
-                LAST_MDATE;
-        }
-    
-        if (ac3_sync_frame (p_ac3thread->ac3_decoder, &sync_info))
-        {
-            sync = 0;
-            goto bad_frame;
-        }
-
-        p_ac3thread->p_aout_fifo->l_rate = sync_info.sample_rate;
-
-        buffer = ((s16 *)p_ac3thread->p_aout_fifo->buffer) + 
-            (p_ac3thread->p_aout_fifo->l_end_frame * AC3DEC_FRAME_SIZE);
-
-        if (ac3_decode_frame (p_ac3thread->ac3_decoder, buffer))
-        {
-            sync = 0;
-            goto bad_frame;
-        }
-        
-        vlc_mutex_lock (&p_ac3thread->p_aout_fifo->data_lock);
-        p_ac3thread->p_aout_fifo->l_end_frame = 
-            (p_ac3thread->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-        vlc_cond_signal (&p_ac3thread->p_aout_fifo->data_wait);
-        vlc_mutex_unlock (&p_ac3thread->p_aout_fifo->data_lock);
-
-        bad_frame:
-            RealignBits(&p_ac3thread->ac3_decoder->bit_stream);
-    }
-
-    /* If b_error is set, the ac3 decoder thread enters the error loop */
-    if (p_ac3thread->p_fifo->b_error)
-    {
-        DecoderError( p_ac3thread->p_fifo );
-    }
-
-    /* End of the ac3 decoder thread */
-    EndThread (p_ac3thread);
-
-    free( p_ac3thread );
-
-    return( 0 );
 }
 
 
@@ -312,43 +197,6 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
     intf_DbgMsg ( "ac3_adec debug: ac3_adec thread (%p) initialized", 
                   p_ac3thread );
 
-    /* Creating the audio output fifo */
-    p_ac3thread->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_STEREO_FIFO, 2, 0, 0,
-                                                AC3DEC_FRAME_SIZE, NULL  );
-    if ( p_ac3thread->p_aout_fifo == NULL )
-    {
-        free( IMDCT->w_1 );
-        free( IMDCT->w_64 );
-        free( IMDCT->w_32 );
-        free( IMDCT->w_16 );
-        free( IMDCT->w_8 );
-        free( IMDCT->w_4 );
-        free( IMDCT->w_2 );
-        free( IMDCT->xcos_sin_sse );
-        free( IMDCT->xsin2 );
-        free( IMDCT->xcos2 );
-        free( IMDCT->xsin1 );
-        free( IMDCT->xcos1 );
-        free( IMDCT->delay1 );
-        free( IMDCT->delay );
-        free( IMDCT->buf );
-#undef IMDCT
-
-#if defined( __MINGW32__ )
-        free( p_ac3thread->ac3_decoder->samples_back );
-#else
-        free( p_ac3thread->ac3_decoder->samples );
-#endif
-
-        module_Unneed( p_ac3thread->ac3_decoder->imdct->p_module );
-        module_Unneed( p_ac3thread->ac3_decoder->downmix.p_module );
-
-        free( p_ac3thread->ac3_decoder->imdct );
-        free( p_ac3thread->ac3_decoder );
-
-        return( -1 );
-    }
-
     /*
      * Bit stream
      */
@@ -359,6 +207,158 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
     
     intf_DbgMsg("ac3dec debug: ac3 decoder thread %p initialized", p_ac3thread);
     
+    return( 0 );
+}
+
+/*****************************************************************************
+ * decoder_Run: this function is called just after the thread is created
+ *****************************************************************************/
+static int decoder_Run ( decoder_config_t * p_config )
+{
+    ac3dec_thread_t *   p_ac3thread;
+    int sync;
+
+    intf_DbgMsg( "ac3_adec debug: ac3_adec thread launched, initializing" );
+
+    /* Allocate the memory needed to store the thread's structure */
+    p_ac3thread = (ac3dec_thread_t *)memalign(16, sizeof(ac3dec_thread_t));
+
+    if( p_ac3thread == NULL )
+    {
+        intf_ErrMsg ( "ac3_adec error: not enough memory "
+                      "for decoder_Run() to allocate p_ac3thread" );
+        DecoderError( p_config->p_decoder_fifo );
+        return( -1 );
+    }
+   
+    /*
+     * Initialize the thread properties
+     */
+    p_ac3thread->p_config = p_config;
+    if( InitThread( p_ac3thread ) )
+    {
+        intf_ErrMsg( "ac3_adec error: could not initialize thread" );
+        DecoderError( p_config->p_decoder_fifo );
+        free( p_ac3thread );
+        return( -1 );
+    }
+
+    sync = 0;
+    p_ac3thread->sync_ptr = 0;
+
+    /* ac3 decoder thread's main loop */
+    /* FIXME : do we have enough room to store the decoded frames ?? */
+    while ((!p_ac3thread->p_fifo->b_die) && (!p_ac3thread->p_fifo->b_error))
+    {
+        s16 * buffer;
+        ac3_sync_info_t sync_info;
+        int ptr;
+
+        if (!sync) {
+            do {
+                GetBits(&p_ac3thread->ac3_decoder->bit_stream,8);
+            } while ((!p_ac3thread->sync_ptr) && (!p_ac3thread->p_fifo->b_die)
+                    && (!p_ac3thread->p_fifo->b_error));
+            
+            ptr = p_ac3thread->sync_ptr;
+
+            while(ptr-- && (!p_ac3thread->p_fifo->b_die)
+                && (!p_ac3thread->p_fifo->b_error))
+            {
+                p_ac3thread->ac3_decoder->bit_stream.p_byte++;
+            }
+                        
+            /* we are in sync now */
+            sync = 1;
+        }
+
+        if (ac3_sync_frame (p_ac3thread->ac3_decoder, &sync_info))
+        {
+            sync = 0;
+            goto bad_frame;
+        }
+        
+        /* Creating the audio output fifo if not created yet */
+        if (p_ac3thread->p_aout_fifo == NULL ) {
+            p_ac3thread->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_STEREO_FIFO, 
+                    2, sync_info.sample_rate, 0, AC3DEC_FRAME_SIZE, NULL  );
+            if ( p_ac3thread->p_aout_fifo == NULL )
+            {
+                free( IMDCT->w_1 );
+                free( IMDCT->w_64 );
+                free( IMDCT->w_32 );
+                free( IMDCT->w_16 );
+                free( IMDCT->w_8 );
+                free( IMDCT->w_4 );
+                free( IMDCT->w_2 );
+                free( IMDCT->xcos_sin_sse );
+                free( IMDCT->xsin2 );
+                free( IMDCT->xcos2 );
+                free( IMDCT->xsin1 );
+                free( IMDCT->xcos1 );
+                free( IMDCT->delay1 );
+                free( IMDCT->delay );
+                free( IMDCT->buf );
+        #undef IMDCT
+        
+        #if defined( __MINGW32__ )
+                free( p_ac3thread->ac3_decoder->samples_back );
+        #else
+                free( p_ac3thread->ac3_decoder->samples );
+        #endif
+        
+                module_Unneed( p_ac3thread->ac3_decoder->imdct->p_module );
+                module_Unneed( p_ac3thread->ac3_decoder->downmix.p_module );
+        
+                free( p_ac3thread->ac3_decoder->imdct );
+                free( p_ac3thread->ac3_decoder );
+        
+                return( -1 );
+            }
+        }
+        
+        if (p_ac3thread->p_fifo->p_first->i_pts)
+        {
+            p_ac3thread->p_aout_fifo->date[
+                p_ac3thread->p_aout_fifo->l_end_frame] =
+                p_ac3thread->p_fifo->p_first->i_pts;
+            p_ac3thread->p_fifo->p_first->i_pts = 0;
+        } else {
+            p_ac3thread->p_aout_fifo->date[
+                p_ac3thread->p_aout_fifo->l_end_frame] =
+                LAST_MDATE;
+        }
+    
+        buffer = ((s16 *)p_ac3thread->p_aout_fifo->buffer) + 
+            (p_ac3thread->p_aout_fifo->l_end_frame * AC3DEC_FRAME_SIZE);
+
+        if (ac3_decode_frame (p_ac3thread->ac3_decoder, buffer))
+        {
+            sync = 0;
+            goto bad_frame;
+        }
+        
+        vlc_mutex_lock (&p_ac3thread->p_aout_fifo->data_lock);
+        p_ac3thread->p_aout_fifo->l_end_frame = 
+            (p_ac3thread->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+        vlc_cond_signal (&p_ac3thread->p_aout_fifo->data_wait);
+        vlc_mutex_unlock (&p_ac3thread->p_aout_fifo->data_lock);
+
+        bad_frame:
+            RealignBits(&p_ac3thread->ac3_decoder->bit_stream);
+    }
+
+    /* If b_error is set, the ac3 decoder thread enters the error loop */
+    if (p_ac3thread->p_fifo->b_error)
+    {
+        DecoderError( p_ac3thread->p_fifo );
+    }
+
+    /* End of the ac3 decoder thread */
+    EndThread (p_ac3thread);
+
+    free( p_ac3thread );
+
     return( 0 );
 }
 

@@ -2,9 +2,10 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.39 2001/12/30 07:09:54 sam Exp $
+ * $Id: audio_output.h,v 1.40 2002/01/09 00:33:37 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Cyril Deguet <asmax@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -212,7 +213,8 @@ typedef struct aout_thread_s
 void            aout_InitBank           ( void );
 void            aout_EndBank            ( void );
 
-aout_thread_t * aout_CreateThread       ( int *pi_status );
+aout_thread_t * aout_CreateThread       ( int *pi_status, int i_channels, 
+    long l_rate );
 void            aout_DestroyThread      ( aout_thread_t *, int * );
 
 aout_fifo_t *   aout_CreateFifo         ( int, int, long, long, long, void * );
