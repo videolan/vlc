@@ -56,6 +56,9 @@ vlc_module_begin();
     add_shortcut( "rtp" );
     add_shortcut( "rtp4" );
     add_shortcut( "rtp6" );
+
+    add_shortcut( "cdda" );
+    add_shortcut( "cddasimple" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -123,6 +126,11 @@ static int Access2Open( vlc_object_t * p_this )
     p_input->pf_set_area       = Access2SetArea;
     p_input->pf_access_control = Access2Control;
     p_input->p_access_data = (access_sys_t*)p_sys;
+
+    p_sys->p_access = p_access;
+    p_sys->p_block = NULL;
+    p_sys->b_first_read = VLC_TRUE;
+
     /* mtu */
     access2_Control( p_access, ACCESS_GET_MTU, &i_int );
     p_input->i_mtu = i_int;
@@ -151,8 +159,11 @@ static int Access2Open( vlc_object_t * p_this )
         int64_t i_start = 0;
         int i;
 
+        /* Initialize ES structures */
+        input_InitStream( p_input, 0 );
+
 #define area p_input->stream.pp_areas
-        for( i = 0 ; i <= p_sys->i_title ; i++ )
+        for( i = 0 ; i < p_sys->i_title ; i++ )
         {
             input_title_t *t = p_sys->title[i];
 
@@ -168,7 +179,7 @@ static int Access2Open( vlc_object_t * p_this )
 #undef area
 
         /* Set the area */
-        Access2SetArea( p_input, p_input->stream.pp_areas[1] );
+        Access2SetArea( p_input, p_input->stream.pp_areas[1+p_access->info.i_title] );
     }
 
     /* size */
@@ -187,11 +198,6 @@ static int Access2Open( vlc_object_t * p_this )
         p_input->stream.i_method = INPUT_METHOD_NETWORK;/* FIXME */
     p_input->stream.p_selected_area->i_tell = p_access->info.i_pos;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-
-    p_sys->p_access = p_access;
-    p_sys->p_block = NULL;
-    p_sys->b_first_read = VLC_TRUE;
 
     return VLC_SUCCESS;
 }
@@ -288,6 +294,23 @@ update:
         }
         p_sys->b_first_read = VLC_FALSE;
     }
+    /* Title change */
+    if( p_access->info.i_update & INPUT_UPDATE_TITLE )
+    {
+        vlc_value_t val;
+        msg_Dbg( p_input, "INPUT_UPDATE_TITLE" );
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        p_input->stream.p_selected_area = p_input->stream.pp_areas[p_access->info.i_title+1];
+        p_input->stream.b_changed = VLC_TRUE;
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        val.i_int = p_access->info.i_title+1;
+        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
+
+        p_access->info.i_update &= ~INPUT_UPDATE_TITLE;
+    }
+    /* Size change */
     if( p_access->info.i_update & INPUT_UPDATE_SIZE )
     {
         vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -298,11 +321,6 @@ update:
         p_access->info.i_update &= ~INPUT_UPDATE_SIZE;
     }
 
-    if( p_access->info.i_update & INPUT_UPDATE_TITLE )
-    {
-        /* TODO */
-        msg_Err( p_input, "INPUT_UPDATE_TITLE to do" );
-    }
     if( p_access->info.i_update & INPUT_UPDATE_SEEKPOINT )
     {
         /* TODO */
@@ -318,36 +336,34 @@ update:
  ****************************************************************************/
 static int Access2SetArea( input_thread_t * p_input, input_area_t * p_area )
 {
-#if 0
-    access_sys_t *p_sys = p_input->p_access_data;
+    access2_sys_t *p_sys = (access2_sys_t*)p_input->p_access_data;
+    access_t      *p_access = p_sys->p_access;
     vlc_value_t  val;
+
     /* we can't use the interface slider until initilization is complete */
     p_input->stream.b_seekable = 0;
 
     if( p_area != p_input->stream.p_selected_area )
     {
-        /* Change the default area */
-        p_input->stream.p_selected_area = p_area;
+        /* Call access2 control */
+        if( access2_Control( p_access, ACCESS_SET_TITLE, (int)(p_area->i_id - 1) ) )
+            return VLC_EGENERIC;
 
-        /* Change the current track */
-        p_sys->i_track = p_area->i_id - 1;
-        p_sys->i_sector = p_sys->p_sectors[p_sys->i_track];
+        /* Change the default area */
+        p_input->stream.p_selected_area = p_input->stream.pp_areas[p_access->info.i_title+1];
+        p_input->stream.p_selected_area->i_tell = p_access->info.i_pos;
 
         /* Update the navigation variables without triggering a callback */
-        val.i_int = p_area->i_id;
+        val.i_int = p_access->info.i_title+1;;
         var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
+
+        /* Clear the flag */
+        p_access->info.i_update &= ~INPUT_UPDATE_TITLE;
     }
 
-    p_sys->i_sector = p_sys->p_sectors[p_sys->i_track];
-
-    p_input->stream.p_selected_area->i_tell =
-        (off_t)p_sys->i_sector * (off_t)CDDA_DATA_SIZE
-         - p_input->stream.p_selected_area->i_start;
-
     /* warn interface that something has changed */
-    p_input->stream.b_seekable = 1;
-    p_input->stream.b_changed = 1;
-#endif
+    p_input->stream.b_seekable = VLC_TRUE;
+    p_input->stream.b_changed = VLC_TRUE;
     return VLC_EGENERIC;
 }
 
