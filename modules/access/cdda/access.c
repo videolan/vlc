@@ -100,6 +100,10 @@ static void
 cdio_log_handler (cdio_log_level_t level, const char message[])
 {
   cdda_data_t *p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
+
+  if( p_cdda == NULL )
+      return;
+
   switch (level) {
   case CDIO_LOG_DEBUG:
   case CDIO_LOG_INFO:
@@ -818,6 +822,8 @@ E_(CDDAOpen)( vlc_object_t *p_this )
     track_t     i_track = 1;
     vlc_bool_t  b_single_track = false;
     int         i_rc = VLC_EGENERIC;
+
+    p_access->p_sys = NULL;
 
     /* Set where to log errors messages from libcdio. */
     p_cdda_input = p_access;
