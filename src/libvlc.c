@@ -570,6 +570,34 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     {
         p_vlc->pf_memset = memset;
     }
+    
+    /* Check for daemon mode */
+    if( config_GetInt( p_vlc, "daemon" ) )
+    {
+        pid_t i_pid = 0;
+        if( ( i_pid = fork() ) < 0 )
+        {
+            msg_Err( p_vlc, "Unable to fork vlc to daemon mode" );
+            exit(1);
+        }
+        else if( i_pid )
+        {
+            /* This is the parent, exit right now */
+            msg_Dbg( p_vlc, "closing parent process" );
+            exit(0);
+        }
+	else
+	{
+            /* we are the child */
+	    msg_Dbg( p_vlc, "we are the child !!!" );
+            close( 0 );
+            close( 1 );
+            close( 2 );
+
+            p_vlc->p_libvlc->b_daemon = VLC_TRUE;
+    	    //VLC_AddIntf( 0, "logger,none", VLC_FALSE, VLC_FALSE );
+	}
+    }
 
     /*
      * Initialize hotkey handling

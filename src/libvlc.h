@@ -593,6 +593,10 @@ static char *ppsz_align_descriptions[] =
     "This option allows you to use a plugins cache which will greatly " \
     "improve the start time of VLC.")
 
+#define DAEMON_TEXT N_("Run as daemon proces")
+#define DAEMON_LONGTEXT N_( \
+     "Runs VLC as a background daemon proces.")
+
 #define ONEINSTANCE_TEXT N_("Allow only one running instance")
 #define ONEINSTANCE_LONGTEXT N_( \
     "Allowing only one running instance of VLC can sometimes be useful, " \
@@ -966,10 +970,16 @@ vlc_module_begin();
                 DEMUX_LONGTEXT, VLC_TRUE );
     add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
               MINIMIZE_THREADS_LONGTEXT, VLC_TRUE );
-    add_directory( "plugin-path", NULL, NULL, PLUGIN_PATH_TEXT,
-                   PLUGIN_PATH_LONGTEXT, VLC_TRUE );
     add_bool( "plugins-cache", 0, NULL, PLUGINS_CACHE_TEXT,
               PLUGINS_CACHE_LONGTEXT, VLC_TRUE );
+    add_directory( "plugin-path", NULL, NULL, PLUGIN_PATH_TEXT,
+                   PLUGIN_PATH_LONGTEXT, VLC_TRUE );
+
+#if !defined(WIN32)
+    add_bool( "daemon", 0, NULL, DAEMON_TEXT,
+              DAEMON_LONGTEXT, VLC_TRUE );
+        change_short('d');
+#endif
 
 #if !defined(SYS_DARWIN) && !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
     add_bool( "rt-priority", 0, NULL, RT_PRIORITY_TEXT,
