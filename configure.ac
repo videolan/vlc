@@ -1621,8 +1621,13 @@ dnl  Screen capture module
 dnl
 AC_ARG_ENABLE(screen,
   [  --enable-screen            Screen capture support (default enabled)])
-if test "${enable_screen}" != "no" && test "${SYS}" != "darwin"; then
-  if test "${SYS}" = "mingw32"; then
+if test "${enable_screen}" != "no"; then
+  if test "${SYS}" == "darwin"; then
+    AC_CHECK_HEADERS(ApplicationServices/ApplicationServices.h, [
+      VLC_ADD_PLUGINS([screen])
+      VLC_ADD_LDFLAGS([screen],[-framework ApplicationServices])
+    ])
+  elif test "${SYS}" != "mingw32"; then
     VLC_ADD_PLUGINS([screen])
     VLC_ADD_LDFLAGS([screen],[-lgdi32])
   elif test "${SYS}" = "beos"; then
