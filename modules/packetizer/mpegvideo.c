@@ -2,7 +2,7 @@
  * mpegvideo.c: parse and packetize an MPEG1/2 video stream
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.27 2004/01/25 17:58:30 murray Exp $
+ * $Id: mpegvideo.c,v 1.28 2004/01/27 14:05:33 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -293,6 +293,10 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 block_Release( p_pic );
                 break;
             }
+
+            /* When starting the stream we can have the first frame with
+             * a null DTS (i_interpolated_pts is initialized to 0) */
+            if( !p_pic->i_dts ) p_pic->i_dts = p_pic->i_pts;
 
             /* So p_block doesn't get re-added several times */
             *pp_block = block_BytestreamPop( &p_sys->bytestream );

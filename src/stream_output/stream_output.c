@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: stream_output.c,v 1.38 2004/01/23 17:56:14 gbazin Exp $
+ * $Id: stream_output.c,v 1.39 2004/01/27 14:05:33 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -237,7 +237,6 @@ int sout_InputDelete( sout_packetizer_input_t *p_input )
     return( VLC_SUCCESS);
 }
 
-
 int sout_InputSendBuffer( sout_packetizer_input_t *p_input,
                           sout_buffer_t *p_buffer )
 {
@@ -250,8 +249,16 @@ int sout_InputSendBuffer( sout_packetizer_input_t *p_input,
         return VLC_SUCCESS;
     }
 
+    if( !p_buffer->i_dts )
+    {
+        msg_Warn( p_sout, "trying to send non-dated packet to stream output!");
+        sout_BufferDelete( p_input->p_sout, p_buffer );
+        return VLC_SUCCESS;
+    }
+
     vlc_mutex_lock( &p_sout->lock );
-    i_ret = p_sout->p_stream->pf_send( p_sout->p_stream, p_input->id, p_buffer );
+    i_ret = p_sout->p_stream->pf_send( p_sout->p_stream,
+                                       p_input->id, p_buffer );
     vlc_mutex_unlock( &p_sout->lock );
 
     return i_ret;
