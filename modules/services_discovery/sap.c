@@ -54,8 +54,7 @@
 
 /* SAP is always on that port */
 #define SAP_PORT 9875
-//#define SAP_V4_ADDRESS "224.2.127.254"
-#define SAP_V4_ADDRESS "0.0.0.0"
+#define SAP_V4_ADDRESS "224.2.127.254"
 #define ADD_SESSION 1
 
 #define IPV6_ADDR_1 "FF0"  /* Scope is inserted between them */
