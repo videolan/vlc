@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.16 2002/09/17 14:56:13 sam Exp $
+ * $Id: threads.c,v 1.17 2002/09/29 18:16:04 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -244,7 +244,7 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
 
 #elif defined( ST_INIT_IN_ST_H )
     p_mutex->mutex = st_mutex_new();
-    return ( p_mutex == NULL ) ? errno : 0;
+    return ( p_mutex->mutex == NULL ) ? errno : 0;
 
 #elif defined( WIN32 )
     /* We use mutexes on WinNT/2K/XP because we can use the SignalObjectAndWait
