@@ -29,18 +29,20 @@
  */
 typedef struct block_sys_t block_sys_t;
 
-/* BLOCK_FLAG_DISCONTINUITY: the content doesn't follow the last block, or is probably broken */
+/** The content doesn't follow the last block, or is probably broken */
 #define BLOCK_FLAG_DISCONTINUITY 0x0001
-/* BLOCK_FLAG_TYPE_I: Intra frame */
+/** Intra frame */
 #define BLOCK_FLAG_TYPE_I        0x0002
-/* BLOCK_FLAG_TYPE_P: inter frame with backward reference only */
+/** Inter frame with backward reference only */
 #define BLOCK_FLAG_TYPE_P        0x0004
-/* BLOCK_FLAG_TYPE_B: inter frame with backward and forward reference */
+/** Inter frame with backward and forward reference */
 #define BLOCK_FLAG_TYPE_B        0x0008
-/* BLOCK_FLAG_TYPE_PB: for inter frame when you don't know the real type */
+/** For inter frame when you don't know the real type */
 #define BLOCK_FLAG_TYPE_PB       0x0010
-/* BLOCK_FLAG_HEADER: warm that this block is a header one */
+/** Warm that this block is a header one */
 #define BLOCK_FLAG_HEADER        0x0020
+/** This is the last block of the frame */
+#define BLOCK_FLAG_END_OF_FRAME  0x0040
 
 #define BLOCK_FLAG_PRIVATE_MASK  0xffff0000
 #define BLOCK_FLAG_PRIVATE_SHIFT 16

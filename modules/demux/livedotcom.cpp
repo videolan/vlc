@@ -958,9 +958,10 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     {
         memcpy( p_block->p_buffer, tk->buffer, i_size );
     }
-    if( tk->rtpSource->curPacketMarkerBit() )
+    if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') &&
+        tk->rtpSource->curPacketMarkerBit() )
     {        
-        p_block->i_flags |= BLOCK_FLAG_HEADER;
+        p_block->i_flags |= BLOCK_FLAG_END_OF_FRAME;
     }
     //p_block->i_rate = p_input->stream.control.i_rate;
 

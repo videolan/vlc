@@ -17,3 +17,4 @@ SOURCES_quicktime = quicktime.c
 SOURCES_subsdec = subsdec.c
 SOURCES_faad = faad.c
 SOURCES_dvbsub = dvbsub.c
+SOURCES_mash = mash.cpp
