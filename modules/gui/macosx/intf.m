@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.110 2003/12/22 17:08:22 bigben Exp $
+ * $Id: intf.m,v 1.111 2004/01/04 21:44:44 kuehne Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -435,7 +435,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
 }
 
-- (void)initStrings
+    - (void)initStrings
 {
     [o_window setTitle: _NS("VLC - Controller")];
     [o_scrollfield setStringValue: _NS("VLC Media Player")];
@@ -548,6 +548,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     [o_dmi_stop setTitle: _NS("Stop")];
     [o_dmi_next setTitle: _NS("Next")];
     [o_dmi_previous setTitle: _NS("Previous")];
+    [o_dmi_mute setTitle: _NS("Mute")];
 
     /* error panel */
     [o_error setTitle: _NS("Error")];

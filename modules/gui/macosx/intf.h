@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.53 2003/12/22 14:32:56 sam Exp $
+ * $Id: intf.h,v 1.54 2004/01/04 21:44:44 kuehne Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -226,6 +226,7 @@ struct intf_sys_t
     IBOutlet id o_dmi_stop;
     IBOutlet id o_dmi_next;
     IBOutlet id o_dmi_previous;
+    IBOutlet id o_dmi_mute;
 }
 
 - (id)getControls;
