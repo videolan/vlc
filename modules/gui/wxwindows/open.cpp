@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.44 2003/11/23 17:51:54 gbazin Exp $
+ * $Id: open.cpp,v 1.45 2003/11/27 06:37:10 adn Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -624,13 +624,15 @@ wxPanel *OpenDialog::V4LPanel( wxWindow* parent )
     video_device = new wxTextCtrl( panel, VideoDevice_Event, wxT(""),
                                   wxDefaultPosition, wxDefaultSize,
                                   wxTE_PROCESS_ENTER);
-
+    video_device->SetToolTip( wxU(_("Device corresponding to your acquisition "
+                                    "card or your webcam")) );
     video_sizer->Add( label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     video_sizer->Add( video_device, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
     label = new wxStaticText( panel, -1, wxU(_("Channel")) );
-    video_channel = new wxSpinCtrl( panel, VideoChannel_Event );
-
+    video_channel = new wxSpinCtrl( panel, VideoChannel_Event, wxT("0") );
+    video_channel->SetToolTip( wxU(_("Usually 0 is for tuner, 1 for composite "
+                                     "and 2 for svideo")) );
     video_sizer->Add( label, 0, wxALIGN_LEFT | wxALIGN_CENTER_HORIZONTAL );
     video_sizer->Add( video_channel, 1, wxALIGN_LEFT | wxALIGN_CENTER_HORIZONTAL );
     sizer->Add( video_sizer, 0, wxEXPAND | wxALL, 5 );
@@ -1018,7 +1020,6 @@ void OpenDialog::OnV4LTypeChange( wxCommandEvent& WXUNUSED(event) )
         case 1:
             video_channel->Enable();
             video_channel->SetRange( 0, 255 );
-            video_channel->SetValue( 0 );
            break;
         case 3:
             v4l_button->Disable();

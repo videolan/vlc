@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.73 2003/11/23 17:51:54 gbazin Exp $
+ * $Id: wxwindows.h,v 1.74 2003/11/27 06:37:11 adn Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -439,6 +439,7 @@ private:
     void OnCancel( wxCommandEvent& event );
     void OnMRLChange( wxCommandEvent& event );
     void OnAudioEnable( wxCommandEvent& event );
+    void OnAudioChange( wxCommandEvent& event );
     void OnAudioChannel( wxCommandEvent& event );
     void OnSizeEnable( wxCommandEvent& event );
     void OnSize( wxCommandEvent& event );
