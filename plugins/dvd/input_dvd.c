@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.105 2001/12/07 18:33:07 sam Exp $
+ * $Id: input_dvd.c,v 1.106 2001/12/10 04:53:10 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -77,9 +77,6 @@
 #   include "input_iovec.h"
 #endif
 
-#include "modules.h"
-#include "modules_export.h"
-
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
@@ -90,6 +87,9 @@
 #include "dvd_summary.h"
 
 #include "debug.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /* how many blocks DVDRead will read in each loop */
 #define DVD_BLOCK_READ_ONCE 64

@@ -32,28 +32,28 @@ include ../../Makefile.modules
 #
 
 ../memcpy.so: $(PLUGIN_MEMCPY)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../memcpy.a: $(BUILTIN_MEMCPY)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../memcpymmx.so: $(PLUGIN_MEMCPYMMX)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../memcpymmx.a: $(BUILTIN_MEMCPYMMX)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../memcpymmxext.so: $(PLUGIN_MEMCPYMMXEXT)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../memcpymmxext.a: $(BUILTIN_MEMCPYMMXEXT)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../memcpy3dn.so: $(PLUGIN_MEMCPY3DN)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../memcpy3dn.a: $(BUILTIN_MEMCPY3DN)
 	ar r $@ $^

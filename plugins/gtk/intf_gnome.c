@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: intf_gnome.c,v 1.7 2001/12/07 18:33:07 sam Exp $
+ * $Id: intf_gnome.c,v 1.8 2001/12/10 04:53:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -192,7 +192,7 @@ static void intf_Run( intf_thread_t *p_intf )
     int i_timeout;
 
     /* Initialize Gnome */
-    gnome_init( p_main->psz_arg0, VERSION, i_args, p_args );
+    gnome_init( p_main->psz_arg0, VLC_VERSION, i_args, p_args );
 
     /* Create some useful widgets that will certainly be used */
     p_intf->p_sys->p_window = create_intf_window( );

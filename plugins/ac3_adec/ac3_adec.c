@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.6 2001/12/09 17:01:36 sam Exp $
+ * $Id: ac3_adec.c,v 1.7 2001/12/10 04:53:10 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -43,12 +43,12 @@
 
 #include "audio_output.h"
 
-#include "modules.h"
-#include "modules_export.h"
-
 #include "stream_control.h"
 #include "input_ext-dec.h"
 #include "input_ext-intf.h"                                /* MPEG?_AUDIO_ES */
+
+#include "modules.h"
+#include "modules_export.h"
 
 #include "ac3_imdct.h"
 #include "ac3_downmix.h"

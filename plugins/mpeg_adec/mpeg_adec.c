@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.6 2001/12/09 17:01:36 sam Exp $
+ * $Id: mpeg_adec.c,v 1.7 2001/12/10 04:53:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -42,14 +42,14 @@
 
 #include "audio_output.h"               /* aout_fifo_t (for audio_decoder.h) */
 
-#include "modules.h"
-#include "modules_export.h"
-
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
 #include "mpeg_adec_generic.h"
 #include "mpeg_adec.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 #define ADEC_FRAME_SIZE (2*1152)
 

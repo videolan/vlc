@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.1 2001/12/09 17:01:36 sam Exp $
+ * $Id: input_es.c,v 1.2 2001/12/10 04:53:11 sam Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -58,9 +58,6 @@
 #   include "input_iovec.h"
 #endif
 
-#include "modules.h"
-#include "modules_export.h"
-
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
@@ -69,6 +66,9 @@
 #include "input_es.h"
 
 #include "debug.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes

@@ -33,6 +33,14 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 
+dnl Gettext stuff
+PACKAGE="vlc"
+VERSION="$VLC_VERSION"
+AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE")
+AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
+AM_GNU_GETTEXT
+ALL_LINGUAS="de"
+
 dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 
@@ -1234,6 +1242,8 @@ AC_SUBST(RELEASE)
 AC_SUBST(NEED_GETOPT)
 AC_SUBST(MOC)
 AC_SUBST(WINDRES)
+AC_SUBST(PACKAGE)
+AC_SUBST(VERSION)
 
 AC_SUBST(LCFLAGS)
 AC_SUBST(PLCFLAGS)
@@ -1286,7 +1296,8 @@ AC_SUBST(OBJ_LIBDVDCSS)
 
 AC_SUBST(NEED_LIBDVDCSS)
 
-AC_OUTPUT([Makefile.opts include/config.h])
+AC_OUTPUT([Makefile.opts include/config.h po/Makefile.in])
+#AC_OUTPUT([Makefile.opts include/config.h intl/Makefile po/Makefile.in])
 
 echo "
 global configuration

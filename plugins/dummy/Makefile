@@ -27,14 +27,14 @@ include ../../Makefile.modules
 #
 
 ../null.so: $(PLUGIN_NULL)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../null.a: $(BUILTIN_NULL)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../dummy.so: $(PLUGIN_DUMMY)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../dummy.a: $(BUILTIN_DUMMY)
 	ar r $@ $^

@@ -34,7 +34,7 @@ include ../../Makefile.modules
 	$(RANLIB) $@
 
 ../rc.so: $(PLUGIN_RC)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_RC)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_RC)
 
 ../rc.a: $(BUILTIN_RC)
 	ar r $@ $^

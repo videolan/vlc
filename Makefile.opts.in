@@ -164,7 +164,10 @@ DEFINE_CONSTANTS := -DSYS_$(shell echo $(SYS) | sed -e 's/-.*//' | tr '[a-z].' '
 DEFINE += $(DEFINE_CONSTANTS)
 
 # On Linux and Solaris, activate 64-bit off_t (by default under BSD)
-DEFINE += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98
+DEFINE += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 
+
+# Gettext support
+DEFINE += -DLOCALEDIR=\"$(datadir)/locale\"
 
 ###############################################################################
 # Tuning and other variables - do not change anything except if you know

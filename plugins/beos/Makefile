@@ -23,7 +23,7 @@ include ../../Makefile.modules
 #
 
 ../beos.so: $(PLUGIN_CPP)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_BEOS)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_BEOS)
 
 ../beos.a: $(BUILTIN_CPP)
 	ar r $@ $^

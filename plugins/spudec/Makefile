@@ -21,7 +21,7 @@ include ../../Makefile.modules
 #
 
 ../spudec.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../spudec.a: $(BUILTIN_C)
 	ar r $@ $^

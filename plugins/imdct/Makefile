@@ -45,21 +45,21 @@ $(BUILTIN_IMDCT3DN): BUILTIN_IMDCT3DN_%.o: %.c
 #
 
 ../imdct.so: $(PLUGIN_IMDCT) $(PLUGIN_IMDCTCOMMON)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../imdct.a: $(BUILTIN_IMDCT)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../imdctsse.so: $(PLUGIN_IMDCTSSE) $(PLUGIN_IMDCTCOMMON)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../imdctsse.a: $(BUILTIN_IMDCTSSE)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../imdct3dn.so: $(PLUGIN_IMDCT3DN) $(PLUGIN_IMDCTCOMMON)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../imdct3dn.a: $(BUILTIN_IMDCT3DN)
 	ar r $@ $^

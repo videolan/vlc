@@ -51,7 +51,7 @@
 #define COPYRIGHT_MESSAGE   "VideoLAN Client - version @VLC_VERSION@" \
                             " @VLC_CODENAME@ - (C)1996-2001 VideoLAN"
 
-#define VERSION             "@VLC_VERSION@"
+#define VLC_VERSION         "@VLC_VERSION@"
 
 /*****************************************************************************
  * Debugging options - define or undefine symbols

@@ -23,7 +23,7 @@ include ../../Makefile.modules
 #
 
 ../mga.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../mga.a: $(BUILTIN_C)
 	ar r $@ $^

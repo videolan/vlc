@@ -55,7 +55,7 @@ $(BUILTIN_GNOME): BUILTIN_GNOME_%.o: %.c
 #
 
 ../gtk.so: $(PLUGIN_GTK) $(PLUGIN_GTK_SPECIFIC)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GTK)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_GTK)
 
 ../gtk.a: $(BUILTIN_GTK)
 	ar r $@ $^
@@ -63,7 +63,7 @@ $(BUILTIN_GNOME): BUILTIN_GNOME_%.o: %.c
 
 
 ../gnome.so: $(PLUGIN_GNOME) $(PLUGIN_GNOME_SPECIFIC)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GNOME)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_GNOME)
 
 ../gnome.a: $(BUILTIN_GNOME)
 	ar r $@ $^

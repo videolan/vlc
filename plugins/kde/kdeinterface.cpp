@@ -45,7 +45,7 @@ void _M( intf_getfunctions )( function_list_t * p_function_list )
 KDEInterface::KDEInterface(intf_thread_t *p_intf)
 {
 	fAboutData = new KAboutData("VideoLAN Client", I18N_NOOP("Kvlc"),
-			VERSION,
+			VLC_VERSION,
 			"This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and MPEG 2 files from a file or from a network source.", KAboutData::License_GPL,
 			"(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team", 0, 0, "dae@chez.com");
 

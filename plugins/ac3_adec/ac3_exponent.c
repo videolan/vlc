@@ -2,7 +2,7 @@
  * ac3_exponent.c: ac3 exponent calculations
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_exponent.c,v 1.4 2001/12/09 17:01:36 sam Exp $
+ * $Id: ac3_exponent.c,v 1.5 2001/12/10 04:53:10 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -37,12 +37,11 @@
 
 #include "audio_output.h"
 
-#include "modules.h"
-#include "modules_export.h"
-
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
+#include "modules.h"
+#include "modules_export.h"
 
 #include "ac3_imdct.h"
 #include "ac3_downmix.h"

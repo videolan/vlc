@@ -31,7 +31,7 @@ $(BUILTIN_MACOSX): BUILTIN_%.o: %.c
 #
 
 ../macosx.so: $(PLUGIN_MACOSX)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_MACOSX) -lobjc
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_MACOSX) -lobjc
 
 ../macosx.a: $(BUILTIN_MACOSX)
 	ar r $@ $^

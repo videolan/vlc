@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.133 2001/12/09 17:01:37 sam Exp $
+ * $Id: main.c,v 1.134 2001/12/10 04:53:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -282,6 +282,25 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_aout_bank   = &aout_bank;
     p_vout_bank   = &vout_bank;
 
+#ifdef ENABLE_NLS
+    /* 
+     * Support for getext
+     */
+    if( ! setlocale(LC_MESSAGES, "") )
+    {
+        fprintf( stderr, "warning: unsupported locale.\n" );
+    }
+
+    if( ! bindtextdomain(PACKAGE, LOCALEDIR) )
+    {
+        fprintf( stderr, "warning: no domain %s in directory %s\n",
+                 PACKAGE, LOCALEDIR );
+    }
+
+    textdomain( PACKAGE );
+    printf("main: %s\n", gettext("Net"));
+#endif
+        
     /*
      * Initialize threads system
      */
@@ -386,17 +405,17 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
      */
     p_main->p_memcpy_module = module_Need( MODULE_CAPABILITY_MEMCPY, NULL );
 
-    if( p_main->p_memcpy_module == NULL )
-    {
-        intf_ErrMsg( "intf error: no suitable memcpy module, "
-                     "using libc default" );
-        p_main->fast_memcpy = memcpy;
-    }
-    else
+    if( p_main->p_memcpy_module != NULL )
     {
 #define f p_main->p_memcpy_module->p_functions->memcpy.functions.memcpy
         p_main->fast_memcpy = f.fast_memcpy;
 #undef f
+    }
+    else
+    {
+        intf_ErrMsg( "intf error: no suitable memcpy module, "
+                     "using libc default" );
+        p_main->fast_memcpy = memcpy;
     }
 
     /*
@@ -450,7 +469,10 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Free memcpy module
      */
-    module_Unneed( p_main->p_memcpy_module );
+    if( p_main->p_memcpy_module != NULL )
+    {
+        module_Unneed( p_main->p_memcpy_module );
+    }
 
     /*
      * Free module, aout and vout banks

@@ -23,7 +23,7 @@ include ../../Makefile.modules
 #
 
 ../fb.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../fb.a: $(BUILTIN_C)
 	ar r $@ $^

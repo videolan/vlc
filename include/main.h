@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: main.h,v 1.25 2001/12/07 18:33:07 sam Exp $
+ * $Id: main.h,v 1.26 2001/12/10 04:53:10 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -65,7 +65,11 @@ typedef struct main_s
     p_input_channel_t      p_channel;                /* channel library data */
 } main_t;
 
+#ifndef PLUGIN
 extern main_t *p_main;
+#else
+#   define p_main (p_symbols->p_main)
+#endif
 
 /*****************************************************************************
  * Prototypes - these methods are used to get default values for some threads

@@ -23,7 +23,7 @@ include ../../Makefile.modules
 #
 
 ../qnx.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_QNX) 
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_QNX) 
 
 ../qnx.a: $(BUILTIN_C)
 	ar r $@ $^

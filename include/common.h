@@ -3,10 +3,11 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.54 2001/12/09 17:01:35 sam Exp $
+ * $Id: common.h,v 1.55 2001/12/10 04:53:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
+ *          Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +25,13 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Required headers
+ * Required system headers
  *****************************************************************************/
+#include <string.h>                                            /* strerror() */
 
+/*****************************************************************************
+ * Required vlc headers
+ *****************************************************************************/
 #include "config.h"
 #include "int_types.h"
 
@@ -76,10 +81,10 @@ typedef u8                  yuv_data_t;
  *****************************************************************************
  * Store an high precision date or time interval. The maximum precision is the
  * micro-second, and a 64 bits integer is used to avoid any overflow (maximum
- * time interval is then 292271 years, which should be length enough for any
+ * time interval is then 292271 years, which should be long enough for any
  * video). Date are stored as a time interval since a common date.
- * Note that date and time intervals can be manipulated using regular arithmetic
- * operators, and that no special functions are required.
+ * Note that date and time intervals can be manipulated using regular
+ * arithmetic operators, and that no special functions are required.
  *****************************************************************************/
 typedef s64 mtime_t;
 
@@ -172,11 +177,98 @@ struct decoder_fifo_s;
  *****************************************************************************/
 #ifdef NTOHL_IN_SYS_PARAM_H
 #   include <sys/param.h>
+
 #elif defined(WIN32)
-#   include "bytes_swap.h"
-#else
+/* Swap bytes in 16 bit value.  */
+#   define __bswap_constant_16(x) \
+     ((((x) >> 8) & 0xff) | (((x) & 0xff) << 8))
+
+#   if defined __GNUC__ && __GNUC__ >= 2
+#       define __bswap_16(x) \
+            (__extension__                                                    \
+             ({ register unsigned short int __v;                              \
+                if (__builtin_constant_p (x))                                 \
+                  __v = __bswap_constant_16 (x);                              \
+                else                                                          \
+                  __asm__ __volatile__ ("rorw $8, %w0"                        \
+                                        : "=r" (__v)                          \
+                                        : "0" ((unsigned short int) (x))      \
+                                        : "cc");                              \
+                __v; }))
+#   else
+/* This is better than nothing.  */
+#       define __bswap_16(x) __bswap_constant_16 (x)
+#   endif
+
+/* Swap bytes in 32 bit value.  */
+#   define __bswap_constant_32(x) \
+        ((((x) & 0xff000000) >> 24) | (((x) & 0x00ff0000) >>  8) |            \
+         (((x) & 0x0000ff00) <<  8) | (((x) & 0x000000ff) << 24))
+
+#   if defined __GNUC__ && __GNUC__ >= 2
+/* To swap the bytes in a word the i486 processors and up provide the
+   `bswap' opcode.  On i386 we have to use three instructions.  */
+#       if !defined __i486__ && !defined __pentium__ && !defined __pentiumpro__
+#           define __bswap_32(x) \
+                (__extension__                                                \
+                 ({ register unsigned int __v;                                \
+                    if (__builtin_constant_p (x))                             \
+                      __v = __bswap_constant_32 (x);                          \
+                    else                                                      \
+                      __asm__ __volatile__ ("rorw $8, %w0;"                   \
+                                            "rorl $16, %0;"                   \
+                                            "rorw $8, %w0"                    \
+                                            : "=r" (__v)                      \
+                                            : "0" ((unsigned int) (x))        \
+                                            : "cc");                          \
+                    __v; }))
+#       else
+#           define __bswap_32(x) \
+                (__extension__                                                \
+                 ({ register unsigned int __v;                                \
+                    if (__builtin_constant_p (x))                             \
+                      __v = __bswap_constant_32 (x);                          \
+                    else                                                      \
+                      __asm__ __volatile__ ("bswap %0"                        \
+                                            : "=r" (__v)                      \
+                                            : "0" ((unsigned int) (x)));      \
+                    __v; }))
+#       endif
+#   else
+#       define __bswap_32(x) __bswap_constant_32 (x)
+#   endif
+
+#   if defined __GNUC__ && __GNUC__ >= 2
+/* Swap bytes in 64 bit value.  */
+#       define __bswap_constant_64(x) \
+            ((((x) & 0xff00000000000000ull) >> 56)                            \
+             | (((x) & 0x00ff000000000000ull) >> 40)                          \
+             | (((x) & 0x0000ff0000000000ull) >> 24)                          \
+             | (((x) & 0x000000ff00000000ull) >> 8)                           \
+             | (((x) & 0x00000000ff000000ull) << 8)                           \
+             | (((x) & 0x0000000000ff0000ull) << 24)                          \
+             | (((x) & 0x000000000000ff00ull) << 40)                          \
+             | (((x) & 0x00000000000000ffull) << 56))
+
+#       define __bswap_64(x) \
+            (__extension__                                                    \
+             ({ union { __extension__ unsigned long long int __ll;            \
+                        unsigned long int __l[2]; } __w, __r;                 \
+                if (__builtin_constant_p (x))                                 \
+                  __r.__ll = __bswap_constant_64 (x);                         \
+                else                                                          \
+                  {                                                           \
+                    __w.__ll = (x);                                           \
+                    __r.__l[0] = __bswap_32 (__w.__l[1]);                     \
+                    __r.__l[1] = __bswap_32 (__w.__l[0]);                     \
+                  }                                                           \
+                __r.__ll; }))
+#   endif
+
+#else /* NTOHL_IN_SYS_PARAM_H || WIN32 */
 #   include <netinet/in.h>
-#endif
+
+#endif /* NTOHL_IN_SYS_PARAM_H || WIN32 */
 
 /* CEIL: division with round to nearest greater integer */
 #define CEIL(n, d)  ( ((n) / (d)) + ( ((n) % (d)) ? 1 : 0) )
@@ -242,12 +334,89 @@ struct decoder_fifo_s;
 #   endif    
 #endif
 
-
 #define I64C(x)         x##LL
 
-/* The win32 specific stuff was getting really big so it has been moved */
+
 #if defined( WIN32 )
-#   include "common_win32.h"
+/* The ntoh* and hton* bytes swapping functions are provided by winsock
+ * but for conveniency and speed reasons it is better to implement them
+ * ourselves. ( several plugins use them and it is too much hassle to link
+ * winsock with each of them ;-)
+ */
+#   undef ntoh32(x)
+#   undef ntoh16(x)
+#   undef ntoh64(x)
+#   undef hton32(x)
+#   undef hton16(x)
+#   undef hton64(x)
+
+#   ifdef WORDS_BIGENDIAN
+#       define ntoh32(x)       (x)
+#       define ntoh16(x)       (x)
+#       define ntoh64(x)       (x)
+#       define hton32(x)       (x)
+#       define hton16(x)       (x)
+#       define hton64(x)       (x)
+#   else
+#       define ntoh32(x)     __bswap_32 (x)
+#       define ntoh16(x)     __bswap_16 (x)
+#       define ntoh64(x)     __bswap_32 (x)
+#       define hton32(x)     __bswap_32 (x)
+#       define hton16(x)     __bswap_16 (x)
+#       define hton64(x)     __bswap_32 (x)
+#   endif
+
+/* win32, cl and icl support */
+#   if defined( _MSC_VER )
+#       define __attribute__(x)
+#       define __inline__      __inline
+#       define strncasecmp     strnicmp
+#       define strcasecmp      stricmp
+#       define S_ISBLK(m)      (0)
+#       define S_ISCHR(m)      (0)
+#       define S_ISFIFO(m)     (((m)&_S_IFMT) == _S_IFIFO)
+#       define S_ISREG(m)      (((m)&_S_IFMT) == _S_IFREG)
+#       undef I64C(x)
+#       define I64C(x)         x##i64
+#   endif
+
+/* several type definitions */
+#   if defined( __MINGW32__ )
+#       if !defined( _OFF_T_ )
+typedef long long _off_t;
+typedef _off_t off_t;
+#           define _OFF_T_
+#       else
+#           define off_t long long
+#       endif
+#   endif
+
+#   if defined( _MSC_VER )
+#       if !defined( _OFF_T_DEFINED )
+typedef __int64 off_t;
+#           define _OFF_T_DEFINED
+#       else
+#           define off_t __int64
+#       endif
+#       define stat _stati64
+#   endif
+
+#   ifndef snprintf
+#       define snprintf _snprintf  /* snprintf not defined in mingw32 (bug?) */
+#   endif
+
+#endif
+
+/*****************************************************************************
+ * I18n stuff
+ *****************************************************************************/
+#ifdef ENABLE_NLS
+#   include <libintl.h>
+#else
+#   define _(String) (String)
+#   define N_(String) (String)
+#   define textdomain(Domain)
+#   define bindtextdomain(Package, Directory)
 #endif
 
 /*****************************************************************************
@@ -295,6 +464,8 @@ typedef struct module_symbols_s
     int  ( * network_ChannelCreate )( void );
     int  ( * network_ChannelJoin )  ( int );
 
+    int  ( * input_SetProgram )     ( struct input_thread_s *,
+                                      struct pgrm_descriptor_s * );
     void ( * input_SetStatus )      ( struct input_thread_s *, int );
     void ( * input_Seek )           ( struct input_thread_s *, off_t );
     void ( * input_DumpStream )     ( struct input_thread_s * );
@@ -406,8 +577,7 @@ extern module_symbols_t* p_symbols;
 #endif
 
 /*****************************************************************************
- * Global headers
+ * Required vlc headers
  *****************************************************************************/
-
 #include "main.h"
 

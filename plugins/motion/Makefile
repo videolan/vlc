@@ -57,42 +57,42 @@ $(BUILTIN_MOTIONALTIVEC): BUILTIN_MOTIONALTIVEC_%.o: %.c
 #
 
 ../motion.so: $(PLUGIN_MOTION)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../motion.a: $(BUILTIN_MOTION)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../motionclassic.so: $(PLUGIN_MOTIONCLASSIC)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../motionclassic.a: $(BUILTIN_MOTIONCLASSIC)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../motionmmx.so: $(PLUGIN_MOTIONMMX)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../motionmmx.a: $(BUILTIN_MOTIONMMX)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../motionmmxext.so: $(PLUGIN_MOTIONMMXEXT)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../motionmmxext.a: $(BUILTIN_MOTIONMMXEXT)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../motion3dnow.so: $(PLUGIN_MOTION3DNOW)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../motion3dnow.a: $(BUILTIN_MOTION3DNOW)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../motionaltivec.so: $(PLUGIN_MOTIONALTIVEC)
-	$(CC) $(PCFLAGS) -o $@ $^ $(LIB_ALTIVEC) $(PLCFLAGS)
+	$(CC) -o $@ $^ $(LIB_ALTIVEC) $(PLCFLAGS)
 
 ../motionaltivec.a: $(BUILTIN_MOTIONALTIVEC)
 	ar r $@ $^

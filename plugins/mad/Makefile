@@ -29,7 +29,7 @@ $(BUILTIN_MAD): BUILTIN_%.o: %.c
 #
 
 ../mad.so: $(PLUGIN_MAD)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_MAD)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_MAD)
 
 ../mad.a: $(BUILTIN_MAD)
 	ar r $@ $^

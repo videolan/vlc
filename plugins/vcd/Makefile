@@ -31,7 +31,7 @@ $(BUILTIN_VCD): BUILTIN_%.o: %.c
 #
 
 ../vcd.so: $(PLUGIN_VCD)
-	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_VCD) $(PLCFLAGS)
+	$(CC) -o $@ $(PLUGIN_VCD) $(PLCFLAGS)
 
 ../vcd.a: $(BUILTIN_VCD)
 	ar r $@ $(BUILTIN_VCD)

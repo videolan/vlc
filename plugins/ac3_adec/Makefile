@@ -21,7 +21,7 @@ include ../../Makefile.modules
 #
 
 ../ac3_adec.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../ac3_adec.a: $(BUILTIN_C)
 	ar r $@ $^

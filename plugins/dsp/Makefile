@@ -23,7 +23,7 @@ include ../../Makefile.modules
 #
 
 ../dsp.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../dsp.a: $(BUILTIN_C)
 	ar r $@ $^

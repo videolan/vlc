@@ -41,21 +41,21 @@ $(BUILTIN_DOWNMIX3DN): BUILTIN_DOWNMIX3DN_%.o: %.c
 #
 
 ../downmix.so: $(PLUGIN_DOWNMIX)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../downmix.a: $(BUILTIN_DOWNMIX)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../downmixsse.so: $(PLUGIN_DOWNMIXSSE)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../downmixsse.a: $(BUILTIN_DOWNMIXSSE)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../downmix3dn.so: $(PLUGIN_DOWNMIX3DN)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../downmix3dn.a: $(BUILTIN_DOWNMIX3DN)
 	ar r $@ $^

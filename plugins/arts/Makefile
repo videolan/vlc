@@ -29,7 +29,7 @@ include ../../Makefile.modules
 #
 
 ../arts.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_ARTS)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_ARTS)
 
 ../arts.a: $(BUILTIN_C)
 	ar r $@ $^

@@ -1,0 +1,939 @@
+# German locale definition for vlc
+# Copyright (C) 1999, 2000 VideoLAN
+#
+# Thomas Graf <tgraf@europe.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: vlc 0.73.3\n"
+"POT-Creation-Date: 2001-05-29 21:07+0200\n"
+"PO-Revision-Date: 2001-05-19 01:42+0200\n"
+"Last-Translator: Thomas Graf <tgraf@europe.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8-bit\n"
+
+#: plugins/gtk/gnome_interface.c:23 plugins/gtk/gnome_interface.c:733
+#: plugins/gtk/gtk_interface.c:151 plugins/gtk/gtk_interface.c:1083
+msgid "_Open File..."
+msgstr "Datei _öffnen..."
+
+#: plugins/gtk/gnome_interface.c:24 plugins/gtk/gnome_interface.c:338
+#: plugins/gtk/gnome_interface.c:734 plugins/gtk/gtk_interface.c:159
+#: plugins/gtk/gtk_interface.c:452 plugins/gtk/gtk_interface.c:1091
+msgid "Open a File"
+msgstr "Datei öffnen"
+
+#: plugins/gtk/gnome_interface.c:30 plugins/gtk/gnome_interface.c:740
+#: plugins/gtk/gtk_interface.c:166 plugins/gtk/gtk_interface.c:1095
+msgid "Open _Disc..."
+msgstr "_DVD/VCD laden..."
+
+#: plugins/gtk/gnome_interface.c:31 plugins/gtk/gnome_interface.c:350
+#: plugins/gtk/gnome_interface.c:741 plugins/gtk/gtk_interface.c:174
+#: plugins/gtk/gtk_interface.c:463 plugins/gtk/gtk_interface.c:1103
+msgid "Open a DVD or VCD"
+msgstr "DVD/VCD laden"
+
+#: plugins/gtk/gnome_interface.c:37 plugins/gtk/gnome_interface.c:747
+#: plugins/gtk/gtk_interface.c:181 plugins/gtk/gtk_interface.c:1107
+msgid "_Network Stream..."
+msgstr "_Netzwerk Stream..."
+
+#: plugins/gtk/gnome_interface.c:38 plugins/gtk/gnome_interface.c:362
+#: plugins/gtk/gnome_interface.c:748 plugins/gtk/gtk_interface.c:189
+#: plugins/gtk/gtk_interface.c:474 plugins/gtk/gtk_interface.c:1115
+msgid "Select a Network Stream"
+msgstr "Netzwerk Stream laden"
+
+#: plugins/gtk/gnome_interface.c:51 plugins/gtk/gtk_interface.c:237
+msgid "_Hide interface"
+msgstr "Oberfläche _verstecken"
+
+#: plugins/gtk/gnome_interface.c:58 plugins/gtk/gnome_interface.c:811
+#: plugins/gtk/gtk_interface.c:249 plugins/gtk/gtk_interface.c:973
+msgid "_Fullscreen"
+msgstr "_Vollbild"
+
+#: plugins/gtk/gnome_interface.c:66 plugins/gtk/gtk_interface.c:268
+msgid "_Title"
+msgstr "_Titel"
+
+#: plugins/gtk/gnome_interface.c:67
+msgid "Choose title"
+msgstr "Titel festlegen"
+
+#: plugins/gtk/gnome_interface.c:73 plugins/gtk/gtk_interface.c:281
+msgid "_Chapter"
+msgstr "_Kapitel"
+
+#: plugins/gtk/gnome_interface.c:74
+msgid "Choose chapter"
+msgstr "Kapitel festlegen"
+
+#: plugins/gtk/gnome_interface.c:80 plugins/gtk/gnome_interface.c:847
+#: plugins/gtk/gtk_interface.c:293 plugins/gtk/gtk_interface.c:1029
+msgid "An_gle"
+msgstr "Wi_nkel"
+
+#: plugins/gtk/gnome_interface.c:81
+msgid "Choose angle"
+msgstr "Winkel festlegen"
+
+#: plugins/gtk/gnome_interface.c:88 plugins/gtk/gtk_interface.c:313
+msgid "_Playlist..."
+msgstr "_Playlist..."
+
+#: plugins/gtk/gnome_interface.c:89 plugins/gtk/gtk_interface.c:321
+msgid "Open the playlist window"
+msgstr "Playlist Fenster öffnen"
+
+#: plugins/gtk/gnome_interface.c:95 plugins/gtk/gtk_interface.c:325
+msgid "_Modules..."
+msgstr "_Module"
+
+#: plugins/gtk/gnome_interface.c:96 plugins/gtk/gtk_interface.c:334
+msgid "Open the plugin manager"
+msgstr "Plugin Manager öffnen"
+
+#: plugins/gtk/gnome_interface.c:107 plugins/gtk/gnome_interface.c:854
+#: plugins/gtk/gtk_interface.c:1041
+msgid "_Audio"
+msgstr "_Audio"
+
+#: plugins/gtk/gnome_interface.c:108 plugins/gtk/gnome_interface.c:855
+msgid "Select audio channel"
+msgstr "Audio Kanal festlegen"
+
+#: plugins/gtk/gnome_interface.c:114 plugins/gtk/gnome_interface.c:861
+#: plugins/gtk/gtk_interface.c:369 plugins/gtk/gtk_interface.c:1053
+msgid "_Subtitles"
+msgstr "_Untertitel"
+
+#: plugins/gtk/gnome_interface.c:115
+msgid "Select subtitle unit"
+msgstr "Untertitel festlegen"
+
+#: plugins/gtk/gnome_interface.c:188 plugins/gtk/gtk_interface.c:107
+#: plugins/gtk/gtk_interface.c:1265
+msgid "VideoLAN Client"
+msgstr "VideoLAN Client"
+
+#: plugins/gtk/gnome_interface.c:337 plugins/gtk/gnome_interface.c:1580
+#: plugins/gtk/gnome_interface.c:2152 plugins/gtk/gtk_interface.c:451
+#: plugins/gtk/gtk_interface.c:1985 plugins/gtk/gtk_interface.c:2102
+#: plugins/gtk/gtk_interface.c:2362
+msgid "File"
+msgstr "Datei"
+
+#: plugins/gtk/gnome_interface.c:349 plugins/gtk/gnome_interface.c:1573
+#: plugins/gtk/gnome_interface.c:2219 plugins/gtk/gtk_interface.c:462
+#: plugins/gtk/gtk_interface.c:1978 plugins/gtk/gtk_interface.c:2455
+msgid "Disc"
+msgstr "DVD/VCD"
+
+#: plugins/gtk/gnome_interface.c:361 plugins/gtk/gtk_interface.c:473
+msgid "Net"
+msgstr "Netzwerk"
+
+#: plugins/gtk/gnome_interface.c:375 plugins/gtk/gnome_interface.c:782
+#: plugins/gtk/gtk_interface.c:486 plugins/gtk/gtk_interface.c:928
+msgid "Back"
+msgstr "Zurück"
+
+#: plugins/gtk/gnome_interface.c:376 plugins/gtk/gtk_interface.c:487
+msgid "Go Backwards"
+msgstr "Zurück gehen"
+
+#: plugins/gtk/gnome_interface.c:388 plugins/gtk/gnome_interface.c:775
+#: plugins/gtk/gtk_interface.c:498 plugins/gtk/gtk_interface.c:920
+msgid "Stop"
+msgstr "Stop"
+
+#: plugins/gtk/gnome_interface.c:389 plugins/gtk/gtk_interface.c:499
+msgid "Stop Stream"
+msgstr "Stream stoppen"
+
+#: plugins/gtk/gnome_interface.c:401 plugins/gtk/gnome_interface.c:761
+#: plugins/gtk/gtk_interface.c:510
+msgid "Play"
+msgstr "Abspielen"
+
+#: plugins/gtk/gnome_interface.c:402 plugins/gtk/gtk_interface.c:511
+msgid "Play Stream"
+msgstr "Stream abspielen"
+
+#: plugins/gtk/gnome_interface.c:413 plugins/gtk/gnome_interface.c:768
+#: plugins/gtk/gtk_interface.c:521 plugins/gtk/gtk_interface.c:912
+msgid "Pause"
+msgstr "Pause"
+
+#: plugins/gtk/gnome_interface.c:414 plugins/gtk/gtk_interface.c:522
+msgid "Pause Stream"
+msgstr "Stream pausieren"
+
+#: plugins/gtk/gnome_interface.c:426 plugins/gtk/gnome_interface.c:789
+#: plugins/gtk/gtk_interface.c:533 plugins/gtk/gtk_interface.c:936
+msgid "Slow"
+msgstr "Langsam"
+
+#: plugins/gtk/gnome_interface.c:427 plugins/gtk/gtk_interface.c:534
+msgid "Play Slower"
+msgstr "Langsamer abspielen"
+
+#: plugins/gtk/gnome_interface.c:439 plugins/gtk/gnome_interface.c:796
+#: plugins/gtk/gtk_interface.c:545 plugins/gtk/gtk_interface.c:944
+msgid "Fast"
+msgstr "Schnell"
+
+#: plugins/gtk/gnome_interface.c:440 plugins/gtk/gtk_interface.c:546
+msgid "Play Faster"
+msgstr "Schneller abspielen"
+
+#: plugins/gtk/gnome_interface.c:454 plugins/gtk/gnome_interface.c:1690
+#: plugins/gtk/gnome_interface.c:1714 plugins/gtk/gnome_interface.c:2788
+#: plugins/gtk/gtk_interface.c:559 plugins/gtk/gtk_interface.c:1949
+#: plugins/gtk/gtk_interface.c:3039
+msgid "Playlist"
+msgstr "Playlist"
+
+#: plugins/gtk/gnome_interface.c:455 plugins/gtk/gtk_interface.c:560
+msgid "Open Playlist"
+msgstr "Playliste öffnen"
+
+#: plugins/gtk/gnome_interface.c:466 plugins/gtk/gnome_interface.c:826
+#: plugins/gtk/gtk_interface.c:570 plugins/gtk/gtk_interface.c:656
+#: plugins/gtk/gtk_interface.c:700 plugins/gtk/gtk_interface.c:997
+msgid "Prev"
+msgstr "Vorheriges"
+
+#: plugins/gtk/gnome_interface.c:467 plugins/gtk/gtk_interface.c:571
+msgid "Previous File"
+msgstr "Vorherige Datei"
+
+#: plugins/gtk/gnome_interface.c:478 plugins/gtk/gnome_interface.c:819
+#: plugins/gtk/gtk_interface.c:581 plugins/gtk/gtk_interface.c:664
+#: plugins/gtk/gtk_interface.c:708 plugins/gtk/gtk_interface.c:990
+msgid "Next"
+msgstr "Nächstes"
+
+#: plugins/gtk/gnome_interface.c:479 plugins/gtk/gtk_interface.c:582
+msgid "Next File"
+msgstr "Nächste Datei"
+
+#: plugins/gtk/gnome_interface.c:493 plugins/gtk/gtk_interface.c:589
+msgid "-:--:--"
+msgstr "-:--:--"
+
+#: plugins/gtk/gnome_interface.c:529
+msgid "DVD  "
+msgstr "DVD"
+
+#: plugins/gtk/gnome_interface.c:543
+msgid "Title:"
+msgstr "Titel:"
+
+#: plugins/gtk/gnome_interface.c:550 plugins/gtk/gtk_interface.c:649
+msgid "--"
+msgstr "--"
+
+#: plugins/gtk/gnome_interface.c:563
+msgid "Select previous title"
+msgstr "Vorheriger Titel festlegen"
+
+#: plugins/gtk/gnome_interface.c:588
+msgid "Chapter:"
+msgstr "Kapitel:"
+
+#: plugins/gtk/gnome_interface.c:595 plugins/gtk/gtk_interface.c:693
+msgid "---"
+msgstr "---"
+
+#: plugins/gtk/gnome_interface.c:608
+msgid "Select previous chapter"
+msgstr "Vorheriges Kapitel festlegen"
+
+#: plugins/gtk/gnome_interface.c:617
+msgid "Select next chapter"
+msgstr "Nächstes Kapitel festlegen"
+
+#: plugins/gtk/gnome_interface.c:626
+msgid "No server"
+msgstr "Kein Server"
+
+#: plugins/gtk/gnome_interface.c:639
+msgid "Network Channel:"
+msgstr "Netzwerk Kanal"
+
+#: plugins/gtk/gnome_interface.c:804 plugins/gtk/gtk_interface.c:962
+msgid "Toggle _Interface"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:812
+msgid "Toggle fullscreen mode"
+msgstr "In Vollbildmodus wechseln"
+
+#: plugins/gtk/gnome_interface.c:833 plugins/gtk/gtk_interface.c:1006
+msgid "_Jump..."
+msgstr "_Springen"
+
+#: plugins/gtk/gnome_interface.c:834
+msgid "Got directly so specified point"
+msgstr "Geh direkt zum "
+
+#: plugins/gtk/gnome_interface.c:840 plugins/gtk/gtk_interface.c:1017
+msgid "_Navigation"
+msgstr "_Navigation"
+
+#: plugins/gtk/gnome_interface.c:841
+msgid "Navigate through titles and chapters"
+msgstr "Durch Titel und Kapitel navigieren"
+
+#: plugins/gtk/gnome_interface.c:862
+msgid "Select subtitle channel"
+msgstr "Untertitel festlegen"
+
+#: plugins/gtk/gnome_interface.c:870 plugins/gtk/gtk_interface.c:1136
+msgid "Playlist..."
+msgstr "Playlist..."
+
+#: plugins/gtk/gnome_interface.c:1067 plugins/gtk/gtk_interface.c:1273
+msgid "(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team"
+msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team"
+
+#: plugins/gtk/gnome_interface.c:1069 plugins/gtk/gtk_interface.c:1299
+msgid ""
+"This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and "
+"MPEG 2 files from a file or from a network source."
+msgstr ""
+"VideoLAN ist ein DVD und MPEG player, der MPEG und MPEG 2 Dateien lokal oder "
+"von einer Quelle im Netzwerk abspielen kann."
+
+#: plugins/gtk/gnome_interface.c:1083
+msgid "Open File"
+msgstr "Datei öffnen"
+
+#: plugins/gtk/gnome_interface.c:1120
+msgid "Modules"
+msgstr "Module"
+
+#: plugins/gtk/gnome_interface.c:1128
+msgid ""
+"Sorry, the module manager isn't functional yet. Please retry in a later "
+"version."
+msgstr ""
+"Der Module Manager ist noch nicht implementiert. Versuch es in einer "
+"späteren Version nochmals."
+
+#: plugins/gtk/gnome_interface.c:1194 plugins/gtk/gtk_interface.c:1392
+msgid "Open Disc"
+msgstr "DVD/VCD öffnen"
+
+#: plugins/gtk/gnome_interface.c:1210 plugins/gtk/gtk_interface.c:1416
+msgid "Disc type"
+msgstr "DVD/VCD Typ"
+
+#: plugins/gtk/gnome_interface.c:1224 plugins/gtk/gtk_interface.c:628
+#: plugins/gtk/gtk_interface.c:1430
+msgid "DVD"
+msgstr "DVD"
+
+#: plugins/gtk/gnome_interface.c:1232 plugins/gtk/gtk_interface.c:1438
+msgid "VCD"
+msgstr "VCD"
+
+#: plugins/gtk/gnome_interface.c:1241 plugins/gtk/gtk_interface.c:1447
+msgid "Starting position"
+msgstr "Startposition"
+
+#: plugins/gtk/gnome_interface.c:1258 plugins/gtk/gtk_interface.c:1494
+msgid "Title"
+msgstr "Titel"
+
+#: plugins/gtk/gnome_interface.c:1268 plugins/gtk/gtk_interface.c:1484
+msgid "Chapter"
+msgstr "Kapitel"
+
+#: plugins/gtk/gnome_interface.c:1305
+msgid "Device name:"
+msgstr "Gerätename:"
+
+#: plugins/gtk/gnome_interface.c:1318 plugins/gtk/gtk_interface.c:1524
+#: plugins/gtk/gtk_interface.c:2407 plugins/gtk/gtk_interface.c:2416
+msgid "/dev/dvd"
+msgstr "/dev/dvd"
+
+#: plugins/gtk/gnome_interface.c:1388
+msgid "Network Stream"
+msgstr "Netzwerk Stream"
+
+#: plugins/gtk/gnome_interface.c:1404 plugins/gtk/gtk_interface.c:1624
+msgid "Protocol"
+msgstr "Protokoll"
+
+#: plugins/gtk/gnome_interface.c:1418 plugins/gtk/gnome_interface.c:2316
+#: plugins/gtk/gtk_interface.c:1638 plugins/gtk/gtk_interface.c:2562
+msgid "TS"
+msgstr "TS"
+
+#: plugins/gtk/gnome_interface.c:1426 plugins/gtk/gnome_interface.c:2326
+#: plugins/gtk/gtk_interface.c:1646 plugins/gtk/gtk_interface.c:2572
+msgid "RTP"
+msgstr "RTP"
+
+#: plugins/gtk/gnome_interface.c:1435 plugins/gtk/gnome_interface.c:2336
+#: plugins/gtk/gtk_interface.c:1655 plugins/gtk/gtk_interface.c:2582
+msgid "HTTP"
+msgstr "HTTP"
+
+#: plugins/gtk/gnome_interface.c:1444 plugins/gtk/gtk_interface.c:1664
+msgid "Server"
+msgstr "Server"
+
+#: plugins/gtk/gnome_interface.c:1461 plugins/gtk/gtk_interface.c:1701
+msgid "Address"
+msgstr "Adresse"
+
+#: plugins/gtk/gnome_interface.c:1471 plugins/gtk/gtk_interface.c:1691
+msgid "Port"
+msgstr "Port"
+
+#: plugins/gtk/gnome_interface.c:1490
+msgid "Port of the stream server"
+msgstr "Port vom Stream-Server"
+
+#: plugins/gtk/gnome_interface.c:1492 plugins/gtk/gtk_interface.c:1711
+msgid "Broadcast"
+msgstr "Broadcast"
+
+#: plugins/gtk/gnome_interface.c:1531 plugins/gtk/gnome_interface.c:2290
+#: plugins/gtk/gtk_interface.c:1745 plugins/gtk/gtk_interface.c:1754
+msgid "vls"
+msgstr "vls"
+
+#: plugins/gtk/gnome_interface.c:1587 plugins/gtk/gnome_interface.c:2356
+#: plugins/gtk/gtk_interface.c:1992 plugins/gtk/gtk_interface.c:2592
+msgid "Network"
+msgstr "Netzwerk"
+
+#: plugins/gtk/gnome_interface.c:1594 plugins/gtk/gnome_interface.c:1733
+#: plugins/gtk/gtk_interface.c:1999
+msgid "Url"
+msgstr "URL"
+
+#: plugins/gtk/gnome_interface.c:1606 plugins/gtk/gtk_interface.c:2020
+msgid "All"
+msgstr "Alle"
+
+#: plugins/gtk/gnome_interface.c:1613
+msgid "Item"
+msgstr "Element"
+
+#: plugins/gtk/gnome_interface.c:1625
+msgid "Crop"
+msgstr "Kürzen"
+
+#: plugins/gtk/gnome_interface.c:1632
+msgid "Invert"
+msgstr "Umkehren"
+
+#: plugins/gtk/gnome_interface.c:1639
+msgid "Select"
+msgstr "Auswählen"
+
+#: plugins/gtk/gnome_interface.c:1651 plugins/gtk/gtk_interface.c:1964
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: plugins/gtk/gnome_interface.c:1658 plugins/gtk/gtk_interface.c:2006
+msgid "Delete"
+msgstr "Löschen"
+
+#: plugins/gtk/gnome_interface.c:1665 plugins/gtk/gtk_interface.c:2034
+msgid "Selection"
+msgstr "Selektion"
+
+#: plugins/gtk/gnome_interface.c:1740 plugins/gtk/gtk_interface.c:2109
+msgid "Duration"
+msgstr "Dauer"
+
+#: plugins/gtk/gnome_interface.c:1892
+msgid "Jump to: "
+msgstr "Spring zu:"
+
+#: plugins/gtk/gnome_interface.c:1909 plugins/gtk/gtk_interface.c:1840
+msgid "s."
+msgstr "s."
+
+#: plugins/gtk/gnome_interface.c:1924 plugins/gtk/gtk_interface.c:1855
+msgid "m:"
+msgstr "m:"
+
+#: plugins/gtk/gnome_interface.c:1939 plugins/gtk/gtk_interface.c:1870
+msgid "h:"
+msgstr "h:"
+
+#: plugins/gtk/gnome_interface.c:2092 plugins/gtk/gnome_interface.c:2102
+#: plugins/gtk/gtk_interface.c:2303
+msgid "Preferences"
+msgstr "Einstellungen"
+
+#: plugins/gtk/gnome_interface.c:2142
+msgid "Default path: "
+msgstr "Standard Pfad:"
+
+#: plugins/gtk/gnome_interface.c:2199
+msgid "Default DVD path: "
+msgstr "Standard DVD Pfad:"
+
+#: plugins/gtk/gnome_interface.c:2209
+msgid "Default VCD path: "
+msgstr "Standard VCD Pfad:"
+
+#: plugins/gtk/gnome_interface.c:2236
+msgid "Default server: "
+msgstr "Standard Server:"
+
+#: plugins/gtk/gnome_interface.c:2256
+msgid "Broadcast address: "
+msgstr "Broadcast Adresse:"
+
+#: plugins/gtk/gnome_interface.c:2266
+msgid "Default port: "
+msgstr "Standard Port: "
+
+#: plugins/gtk/gnome_interface.c:2307 plugins/gtk/gtk_interface.c:2543
+msgid "Broadcast mode"
+msgstr "Broadcast Modus"
+
+#: plugins/gtk/gnome_interface.c:2346
+msgid "Default protocol: "
+msgstr "Standard Protokoll: "
+
+#: plugins/gtk/gnome_interface.c:2373
+msgid "Default interface: "
+msgstr "Standard Oberfläche: "
+
+#: plugins/gtk/gnome_interface.c:2398 plugins/gtk/gtk_interface.c:2639
+msgid "Interface"
+msgstr "Oberfläche"
+
+#: plugins/gtk/gnome_interface.c:2415 plugins/gtk/gnome_interface.c:2606
+msgid "Default output: "
+msgstr "Standard Ausgabe: "
+
+#: plugins/gtk/gnome_interface.c:2425
+msgid "Default height: "
+msgstr "Standard Höhe: "
+
+#: plugins/gtk/gnome_interface.c:2455
+msgid "Default width: "
+msgstr "Standard Breite: "
+
+#: plugins/gtk/gnome_interface.c:2480 plugins/gtk/gtk_interface.c:2748
+msgid "Default depth:"
+msgstr "Standard Farbtiefe: "
+
+#: plugins/gtk/gnome_interface.c:2499 plugins/gtk/gnome_interface.c:2530
+#: plugins/gtk/gtk_interface.c:2736 plugins/gtk/gtk_interface.c:2777
+msgid "15 bits"
+msgstr "15 bits"
+
+#: plugins/gtk/gnome_interface.c:2502 plugins/gtk/gnome_interface.c:2533
+#: plugins/gtk/gnome_interface.c:2683 plugins/gtk/gtk_interface.c:2739
+#: plugins/gtk/gtk_interface.c:2780 plugins/gtk/gtk_interface.c:2856
+msgid "16 bits"
+msgstr "16 bits"
+
+#: plugins/gtk/gnome_interface.c:2505 plugins/gtk/gnome_interface.c:2536
+#: plugins/gtk/gtk_interface.c:2742 plugins/gtk/gtk_interface.c:2783
+msgid "32 bits"
+msgstr "32 bits"
+
+#: plugins/gtk/gnome_interface.c:2511 plugins/gtk/gtk_interface.c:2758
+msgid "Fullscreen depth:"
+msgstr "Vollbild Farbtiefe"
+
+#: plugins/gtk/gnome_interface.c:2542 plugins/gtk/gtk_interface.c:2809
+msgid "Fullscreen on play"
+msgstr "Vollbild beim Abspielen"
+
+#: plugins/gtk/gnome_interface.c:2551 plugins/gtk/gtk_interface.c:2818
+msgid "Grayscale"
+msgstr "Graustufen"
+
+#: plugins/gtk/gnome_interface.c:2560 plugins/gtk/gtk_interface.c:2799
+msgid "Gamma:"
+msgstr "Gamma:"
+
+#: plugins/gtk/gnome_interface.c:2580 plugins/gtk/gtk_interface.c:2827
+msgid "Video"
+msgstr "Video"
+
+#: plugins/gtk/gnome_interface.c:2597 plugins/gtk/gtk_interface.c:2947
+msgid "Spdif output"
+msgstr "Spdif Ausgabe"
+
+#: plugins/gtk/gnome_interface.c:2631
+msgid "Frequency: "
+msgstr "Frequenz: "
+
+#: plugins/gtk/gnome_interface.c:2650 plugins/gtk/gtk_interface.c:2871
+msgid "48000 Hz"
+msgstr "48000 Hz"
+
+#: plugins/gtk/gnome_interface.c:2653 plugins/gtk/gtk_interface.c:2874
+msgid "44100 Hz"
+msgstr "44100 Hz"
+
+#: plugins/gtk/gnome_interface.c:2656
+msgid "32000 Hz"
+msgstr "32000 Hz"
+
+#: plugins/gtk/gnome_interface.c:2659
+msgid "22050 Hz"
+msgstr "22050 Hz"
+
+#: plugins/gtk/gnome_interface.c:2664
+msgid "Quality: "
+msgstr "Qualität: "
+
+#: plugins/gtk/gnome_interface.c:2686 plugins/gtk/gtk_interface.c:2853
+msgid "8 bits"
+msgstr "8 bits"
+
+#: plugins/gtk/gnome_interface.c:2691
+msgid "Channels: "
+msgstr "Kanäle: "
+
+#: plugins/gtk/gnome_interface.c:2710 plugins/gtk/gtk_interface.c:2888
+msgid "Mono"
+msgstr "Mono"
+
+#: plugins/gtk/gnome_interface.c:2713 plugins/gtk/gtk_interface.c:2891
+msgid "Stereo"
+msgstr "Stereo"
+
+#: plugins/gtk/gnome_interface.c:2719 plugins/gtk/gtk_interface.c:2907
+msgid "Default device:"
+msgstr "Standard Adapter:"
+
+#: plugins/gtk/gnome_interface.c:2744 plugins/gtk/gtk_interface.c:2995
+msgid "Audio"
+msgstr "Audio"
+
+#: plugins/gtk/gnome_interface.c:2761 plugins/gtk/gtk_interface.c:3012
+msgid "Launch on startup"
+msgstr "Aufrufen beim Starten"
+
+#: plugins/gtk/gnome_interface.c:2770 plugins/gtk/gtk_interface.c:3030
+msgid "Loop on playlist end"
+msgstr "Playlist endlos abspielen"
+
+#: plugins/gtk/gnome_interface.c:2779 plugins/gtk/gtk_interface.c:3021
+msgid "Enqueue as default"
+msgstr "Als Standard einreihen"
+
+#: plugins/gtk/gnome_interface.c:2805
+msgid "Files associated with vlc"
+msgstr "Zu vlc zugeordnete Dateien"
+
+#: plugins/gtk/gnome_interface.c:2823 plugins/gtk/gtk_interface.c:3099
+msgid "ts"
+msgstr "ts"
+
+#: plugins/gtk/gnome_interface.c:2832 plugins/gtk/gtk_interface.c:3090
+msgid "vob"
+msgstr "vob"
+
+#: plugins/gtk/gnome_interface.c:2841 plugins/gtk/gtk_interface.c:3081
+msgid "mp2"
+msgstr "mp2"
+
+#: plugins/gtk/gnome_interface.c:2850 plugins/gtk/gtk_interface.c:3072
+msgid "mpeg"
+msgstr "mpeg"
+
+#: plugins/gtk/gnome_interface.c:2859 plugins/gtk/gtk_interface.c:3108
+msgid "Messages"
+msgstr "Meldungen"
+
+#: plugins/gtk/gnome_interface.c:2876 plugins/gtk/gtk_interface.c:3124
+msgid "Warning level: "
+msgstr "Warnlevel: "
+
+#: plugins/gtk/gnome_interface.c:2895 plugins/gtk/gtk_interface.c:3144
+msgid "Misc"
+msgstr "Anders"
+
+#: plugins/gtk/gtk_interface.c:133 plugins/gtk/gtk_interface.c:1065
+msgid "_File"
+msgstr "_Datei"
+
+#: plugins/gtk/gtk_interface.c:204 plugins/gtk/gtk_interface.c:1164
+msgid "E_xit"
+msgstr "B_eenden"
+
+#: plugins/gtk/gtk_interface.c:212
+msgid "Exit the program"
+msgstr "Programm beenden"
+
+#: plugins/gtk/gtk_interface.c:219
+msgid "_View"
+msgstr "_Ansicht"
+
+#: plugins/gtk/gtk_interface.c:245
+msgid "Hide the main interface window"
+msgstr "Hauptfenster verstecken"
+
+#: plugins/gtk/gtk_interface.c:277
+msgid "Navigate through the stream"
+msgstr "Durch Stream navigieren"
+
+#: plugins/gtk/gtk_interface.c:338
+msgid "_Settings"
+msgstr "_Einstellungen"
+
+#: plugins/gtk/gtk_interface.c:356
+msgid "A_udio"
+msgstr "A_udio"
+
+#: plugins/gtk/gtk_interface.c:365
+msgid "Select audio language"
+msgstr "Sprache festlegen"
+
+#: plugins/gtk/gtk_interface.c:378
+msgid "Select sub-title"
+msgstr "Untertitel festlegen"
+
+#: plugins/gtk/gtk_interface.c:390 plugins/gtk/gtk_interface.c:1145
+msgid "_Preferences..."
+msgstr "_Einstellungen"
+
+#: plugins/gtk/gtk_interface.c:398
+msgid "Configure the application"
+msgstr "Applikation konfigurieren"
+
+#: plugins/gtk/gtk_interface.c:402
+msgid "_Help"
+msgstr "_Hilfe"
+
+#: plugins/gtk/gtk_interface.c:420 plugins/gtk/gtk_interface.c:1127
+msgid "_About..."
+msgstr "_Über..."
+
+#: plugins/gtk/gtk_interface.c:428
+msgid "About this application"
+msgstr "_Über diese Applikation"
+
+#: plugins/gtk/gtk_interface.c:642
+msgid "Title:  "
+msgstr "Titel:  "
+
+#: plugins/gtk/gtk_interface.c:686
+msgid "Chapter:  "
+msgstr "Kapitel: "
+
+#: plugins/gtk/gtk_interface.c:723
+msgid "No server !"
+msgstr "Kein Server !"
+
+#: plugins/gtk/gtk_interface.c:737
+msgid "Channel:  "
+msgstr "Kanal:  "
+
+#: plugins/gtk/gtk_interface.c:903
+msgid "_Play"
+msgstr "_Play"
+
+#: plugins/gtk/gtk_interface.c:1250
+msgid "About"
+msgstr "Über uns"
+
+#: plugins/gtk/gtk_interface.c:1282
+msgid "Authors"
+msgstr "Autoren"
+
+#: plugins/gtk/gtk_interface.c:1289
+msgid ""
+"Régis Duchesne <regis@via.ecp.fr>\n"
+"Michel Lespinasse <walken@zoy.org>\n"
+"Olivier Pomel <pomel@via.ecp.fr>\n"
+"Pierre Baillet <oct@zoy.org>\n"
+"Jean-Philippe Grimaldi <jeanphi@via.ecp.fr>\n"
+"Andres Krapf <dae@via.ecp.fr>\n"
+"Christophe Massiot <massiot@via.ecp.fr>\n"
+"Vincent Seguin <seguin@via.ecp.fr>\n"
+"Benoit Steiner <benny@via.ecp.fr>\n"
+"Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>\n"
+"Jean-Marc Dressler <polux@via.ecp.fr>\n"
+"Gaël Hendryckx <jimmy@via.ecp.fr>\n"
+"Samuel Hocevar <sam@zoy.org>\n"
+"Brieuc Jeunhomme <bbp@via.ecp.fr>\n"
+"Michel Kaempf <maxx@via.ecp.fr>\n"
+"Stéphane Borel <stef@via.ecp.fr>\n"
+"Renaud Dartus <reno@via.ecp.fr>\n"
+"Henri Fallon <henri@via.ecp.fr>"
+msgstr ""
+
+#: plugins/gtk/gtk_interface.c:1314 plugins/gtk/gtk_interface.c:1538
+#: plugins/gtk/gtk_interface.c:1768
+msgid "OK"
+msgstr "OK"
+
+#: plugins/gtk/gtk_interface.c:1337
+msgid "Select File"
+msgstr "Datei festlegen"
+
+#: plugins/gtk/gtk_interface.c:1511
+msgid "Device name"
+msgstr "Gerätename"
+
+#: plugins/gtk/gtk_interface.c:1545 plugins/gtk/gtk_interface.c:1775
+#: plugins/gtk/gtk_interface.c:1897 plugins/gtk/gtk_interface.c:2128
+#: plugins/gtk/gtk_interface.c:3170
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: plugins/gtk/gtk_interface.c:1600
+msgid "Open Network"
+msgstr "Netzwerk öffnen"
+
+#: plugins/gtk/gtk_interface.c:1817
+msgid "Jump"
+msgstr "Springen"
+
+#: plugins/gtk/gtk_interface.c:1824
+msgid "Go to:"
+msgstr "Gehe zu:"
+
+#: plugins/gtk/gtk_interface.c:1890 plugins/gtk/gtk_interface.c:2121
+#: plugins/gtk/gtk_interface.c:3156
+msgid "Ok"
+msgstr "Ok"
+
+#: plugins/gtk/gtk_interface.c:2027
+msgid "Selected"
+msgstr "Festgelegt"
+
+#: plugins/gtk/gtk_interface.c:2050
+msgid "_Crop"
+msgstr "_Kürzen"
+
+#: plugins/gtk/gtk_interface.c:2061
+msgid "_Invert"
+msgstr "_Umkehren"
+
+#: plugins/gtk/gtk_interface.c:2072
+msgid "_Select"
+msgstr "_Festlegen"
+
+#: plugins/gtk/gtk_interface.c:2328
+msgid "Default path:"
+msgstr "Standard Pfad:"
+
+#: plugins/gtk/gtk_interface.c:2353 plugins/gtk/gtk_interface.c:2437
+#: plugins/gtk/gtk_interface.c:2446
+msgid "Browse"
+msgstr "Durchsuchen"
+
+#: plugins/gtk/gtk_interface.c:2379
+msgid "Default VCD path"
+msgstr "Standard VCD Pfad"
+
+#: plugins/gtk/gtk_interface.c:2389
+msgid "Default DVD path:"
+msgstr "Standard DVD Pfad"
+
+#: plugins/gtk/gtk_interface.c:2426 plugins/gtk/gtk_interface.c:2435
+msgid "/dev/cdrom"
+msgstr "/dev/cdrom"
+
+#: plugins/gtk/gtk_interface.c:2486
+msgid "vls "
+msgstr "vls"
+
+#: plugins/gtk/gtk_interface.c:2503
+msgid "Default server:"
+msgstr "Standard server:"
+
+#: plugins/gtk/gtk_interface.c:2513
+msgid "Default port:"
+msgstr "Standard Port:"
+
+#: plugins/gtk/gtk_interface.c:2533
+msgid "Broadcast address:"
+msgstr "Broadcast Adresse:"
+
+#: plugins/gtk/gtk_interface.c:2552
+msgid "Default protocol:"
+msgstr "Standard Protokoll:"
+
+#: plugins/gtk/gtk_interface.c:2617 plugins/gtk/gtk_interface.c:2627
+msgid "Gtk+"
+msgstr "Gtk+"
+
+#: plugins/gtk/gtk_interface.c:2618
+msgid "Gnome"
+msgstr "Gnome"
+
+#: plugins/gtk/gtk_interface.c:2629
+msgid "Default interface:"
+msgstr "Standard Oberfläche:"
+
+#: plugins/gtk/gtk_interface.c:2664 plugins/gtk/gtk_interface.c:2675
+msgid "sdl"
+msgstr "sdl"
+
+#: plugins/gtk/gtk_interface.c:2665
+msgid "xvideo"
+msgstr "xvideo"
+
+#: plugins/gtk/gtk_interface.c:2666
+msgid "x11"
+msgstr "x11"
+
+#: plugins/gtk/gtk_interface.c:2677 plugins/gtk/gtk_interface.c:2897
+msgid "Default output:"
+msgstr "Standard Ausgabe:"
+
+#: plugins/gtk/gtk_interface.c:2687
+msgid "Default width:"
+msgstr "Standard Breite:"
+
+#: plugins/gtk/gtk_interface.c:2717
+msgid "Default height:"
+msgstr "Stanradrd Höhe:"
+
+#: plugins/gtk/gtk_interface.c:2917
+msgid "Quality:"
+msgstr "Qualität:"
+
+#: plugins/gtk/gtk_interface.c:2927
+msgid "Frequency:"
+msgstr "Frequenz:"
+
+#: plugins/gtk/gtk_interface.c:2937
+msgid "Channels:"
+msgstr "Kanäle:"
+
+#: plugins/gtk/gtk_interface.c:2964 plugins/gtk/gtk_interface.c:2974
+msgid "dsp"
+msgstr "dsp"
+
+#: plugins/gtk/gtk_interface.c:2965
+msgid "alsa"
+msgstr "alsa"
+
+#: plugins/gtk/gtk_interface.c:2984 plugins/gtk/gtk_interface.c:2993
+msgid "/dev/dsp"
+msgstr "/dev/dsp"
+
+#: plugins/gtk/gtk_interface.c:3056
+msgid "Types associated with vlc"
+msgstr "Zu vlc zugeordnete Dateien"
+
+#: plugins/gtk/gtk_interface.c:3163
+msgid "Apply"
+msgstr "Anwenden"

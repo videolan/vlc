@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.44 2001/12/07 18:33:08 sam Exp $
+ * $Id: modules.c,v 1.45 2001/12/10 04:53:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -474,7 +474,7 @@ static int AllocatePluginModule( char * psz_filename )
     }
 
     /* Check that version numbers match */
-    if( strcmp( VERSION, p_module->psz_version ) )
+    if( strcmp( VLC_VERSION, p_module->psz_version ) )
     {
         free( p_module );
         module_unload( handle );
@@ -599,7 +599,7 @@ static int AllocateBuiltinModule( int ( *pf_init ) ( module_t * ),
     }
 
     /* Check that version numbers match */
-    if( strcmp( VERSION, p_module->psz_version ) )
+    if( strcmp( VLC_VERSION, p_module->psz_version ) )
     {
         free( p_module );
         return( -1 );

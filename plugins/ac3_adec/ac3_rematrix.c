@@ -2,7 +2,7 @@
  * ac3_rematrix.c: ac3 audio rematrixing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_rematrix.c,v 1.4 2001/12/09 17:01:36 sam Exp $
+ * $Id: ac3_rematrix.c,v 1.5 2001/12/10 04:53:10 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -34,11 +34,11 @@
 #include "threads.h"
 #include "mtime.h"
 
-#include "modules.h"
-#include "modules_export.h"
-
 #include "stream_control.h"
 #include "input_ext-dec.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 #include "ac3_imdct.h"
 #include "ac3_downmix.h"

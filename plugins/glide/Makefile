@@ -31,7 +31,7 @@ $(BUILTIN_GLIDE): BUILTIN_%.o: %.c
 #
 
 ../glide.so: $(PLUGIN_GLIDE)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GLIDE)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_GLIDE)
 
 ../glide.a: $(BUILTIN_GLIDE)
 	ar r $@ $^

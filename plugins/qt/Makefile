@@ -35,7 +35,7 @@ $(BUILTIN_QT:%.o=%.moc): BUILTIN_%.moc: %.cpp
 #
 
 ../qt.so: $(PLUGIN_QT)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_QT)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_QT)
 
 ../qt.a: $(BUILTIN_QT)
 	ar r $@ $^

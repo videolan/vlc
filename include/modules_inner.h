@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.7 2001/05/30 17:03:11 sam Exp $
+ * $Id: modules_inner.h,v 1.8 2001/12/10 04:53:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -63,7 +63,7 @@
         int CONCATENATE( MODULE_NAME, InitModule ) ( module_t *p_module ) \
         { \
             p_module->psz_name = MODULE_STRING; \
-            p_module->psz_version = VERSION;
+            p_module->psz_version = VLC_VERSION;
 
 #   define MODULE_INIT_STOP \
             return( 0 ); \
@@ -101,7 +101,7 @@
         int InitModule      ( module_t *p_module ) \
         { \
             p_module->psz_name = MODULE_STRING; \
-            p_module->psz_version = VERSION;
+            p_module->psz_version = VLC_VERSION;
 
 #   define MODULE_INIT_STOP \
             return( 0 ); \

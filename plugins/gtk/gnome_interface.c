@@ -1077,7 +1077,7 @@ create_intf_about (void)
   };
   GtkWidget *intf_about;
 
-  intf_about = gnome_about_new ("VideoLAN Client", VERSION,
+  intf_about = gnome_about_new ("VideoLAN Client", VLC_VERSION,
                         _("(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team"),
                         authors,
                         _("This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and MPEG 2 files from a file or from a network source."),

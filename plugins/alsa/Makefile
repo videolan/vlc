@@ -23,7 +23,7 @@ include ../../Makefile.modules
 #
 
 ../alsa.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_ALSA) -lasound -lm -ldl
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_ALSA) -lasound -lm -ldl
 
 ../alsa.a: $(BUILTIN_C)
 	ar r $@ $^

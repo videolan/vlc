@@ -21,7 +21,7 @@ include ../../Makefile.modules
 #
 
 ../ac3_spdif.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../ac3_spdif.a: $(BUILTIN_C)
 	ar r $@ $^

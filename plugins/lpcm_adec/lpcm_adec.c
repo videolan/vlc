@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.4 2001/12/09 17:01:36 sam Exp $
+ * $Id: lpcm_adec.c,v 1.5 2001/12/10 04:53:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -45,13 +45,13 @@
 
 #include "audio_output.h"
 
-#include "modules.h"
-#include "modules_export.h"
-
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
 #include "lpcm_adec.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes

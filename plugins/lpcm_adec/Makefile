@@ -21,7 +21,7 @@ include ../../Makefile.modules
 #
 
 ../lpcm_adec.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../lpcm_adec.a: $(BUILTIN_C)
 	ar r $@ $^

@@ -2,7 +2,7 @@
  * ac3_iec958.c: ac3 to spdif converter
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_iec958.c,v 1.3 2001/12/09 17:01:36 sam Exp $
+ * $Id: ac3_iec958.c,v 1.4 2001/12/10 04:53:10 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -44,14 +44,13 @@
 
 #include "audio_output.h"
 
-#include "modules_export.h"
-
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
-
 #include "ac3_spdif.h"
 #include "ac3_iec958.h"
+
+#include "modules_export.h"
 
 /****************************************************************************
  * Local structures and tables

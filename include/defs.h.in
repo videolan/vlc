@@ -1,16 +1,44 @@
 /* include/defs.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
 
+/* Define if using alloca.c.  */
+#undef C_ALLOCA
+
 /* Define to empty if the keyword does not work.  */
 #undef const
 
+/* Define to one of _getb67, GETB67, getb67 for Cray-2 and Cray-YMP systems.
+   This function is required for alloca.c support on those systems.  */
+#undef CRAY_STACKSEG_END
+
+/* Define if you have alloca, as a function or macro.  */
+#undef HAVE_ALLOCA
+
+/* Define if you have <alloca.h> and it should be used (not on Ultrix).  */
+#undef HAVE_ALLOCA_H
+
 /* Define if you have a working `mmap' system call.  */
 #undef HAVE_MMAP
+
+/* Define as __inline if that's what the C compiler calls it.  */
+#undef inline
+
+/* Define to `long' if <sys/types.h> doesn't define.  */
+#undef off_t
 
 /* Define as the return type of signal handlers (int or void).  */
 #undef RETSIGTYPE
 
 /* Define to `unsigned' if <sys/types.h> doesn't define.  */
 #undef size_t
+
+/* If using the C implementation of alloca, define if you know the
+   direction of stack growth for your system; otherwise it will be
+   automatically deduced at run-time.
+ STACK_DIRECTION > 0 => grows toward higher addresses
+ STACK_DIRECTION < 0 => grows toward lower addresses
+ STACK_DIRECTION = 0 => direction of growth unknown
+ */
+#undef STACK_DIRECTION
 
 /* Define if you have the ANSI C header files.  */
 #undef STDC_HEADERS
@@ -22,14 +50,61 @@
    byte first (like Motorola and SPARC, unlike Intel and VAX).  */
 #undef WORDS_BIGENDIAN
 
+#undef ENABLE_NLS
+#undef HAVE_LC_MESSAGES
+#undef HAVE_CATGETS
+#undef HAVE_GETTEXT
+#undef HAVE_STPCPY
+#undef PACKAGE
+#undef VERSION
+
+/* Define if you have the __argz_count function.  */
+#undef HAVE___ARGZ_COUNT
+
+/* Define if you have the __argz_next function.  */
+#undef HAVE___ARGZ_NEXT
+
+/* Define if you have the __argz_stringify function.  */
+#undef HAVE___ARGZ_STRINGIFY
+
+/* Define if you have the dcgettext function.  */
+#undef HAVE_DCGETTEXT
+
+/* Define if you have the feof_unlocked function.  */
+#undef HAVE_FEOF_UNLOCKED
+
+/* Define if you have the fgets_unlocked function.  */
+#undef HAVE_FGETS_UNLOCKED
+
+/* Define if you have the getcwd function.  */
+#undef HAVE_GETCWD
+
+/* Define if you have the getegid function.  */
+#undef HAVE_GETEGID
+
+/* Define if you have the geteuid function.  */
+#undef HAVE_GETEUID
+
+/* Define if you have the getgid function.  */
+#undef HAVE_GETGID
+
 /* Define if you have the getpagesize function.  */
 #undef HAVE_GETPAGESIZE
 
 /* Define if you have the gettimeofday function.  */
 #undef HAVE_GETTIMEOFDAY
 
+/* Define if you have the getuid function.  */
+#undef HAVE_GETUID
+
 /* Define if you have the memalign function.  */
 #undef HAVE_MEMALIGN
+
+/* Define if you have the mempcpy function.  */
+#undef HAVE_MEMPCPY
+
+/* Define if you have the munmap function.  */
+#undef HAVE_MUNMAP
 
 /* Define if you have the putenv function.  */
 #undef HAVE_PUTENV
@@ -40,8 +115,23 @@
 /* Define if you have the setenv function.  */
 #undef HAVE_SETENV
 
+/* Define if you have the setlocale function.  */
+#undef HAVE_SETLOCALE
+
 /* Define if you have the sigrelse function.  */
 #undef HAVE_SIGRELSE
+
+/* Define if you have the stpcpy function.  */
+#undef HAVE_STPCPY
+
+/* Define if you have the strcasecmp function.  */
+#undef HAVE_STRCASECMP
+
+/* Define if you have the strchr function.  */
+#undef HAVE_STRCHR
+
+/* Define if you have the strdup function.  */
+#undef HAVE_STRDUP
 
 /* Define if you have the strerror function.  */
 #undef HAVE_STRERROR
@@ -52,8 +142,14 @@
 /* Define if you have the strtol function.  */
 #undef HAVE_STRTOL
 
+/* Define if you have the strtoul function.  */
+#undef HAVE_STRTOUL
+
 /* Define if you have the swab function.  */
 #undef HAVE_SWAB
+
+/* Define if you have the tsearch function.  */
+#undef HAVE_TSEARCH
 
 /* Define if you have the usleep function.  */
 #undef HAVE_USLEEP
@@ -73,8 +169,14 @@
 /* Define if you have the <Ph.h> header file.  */
 #undef HAVE_PH_H
 
+/* Define if you have the <X11/Xlib.h> header file.  */
+#undef HAVE_X11_XLIB_H
+
 /* Define if you have the <X11/extensions/Xv.h> header file.  */
 #undef HAVE_X11_EXTENSIONS_XV_H
+
+/* Define if you have the <argz.h> header file.  */
+#undef HAVE_ARGZ_H
 
 /* Define if you have the <arpa/inet.h> header file.  */
 #undef HAVE_ARPA_INET_H
@@ -118,8 +220,14 @@
 /* Define if you have the <kernel/scheduler.h> header file.  */
 #undef HAVE_KERNEL_SCHEDULER_H
 
+/* Define if you have the <limits.h> header file.  */
+#undef HAVE_LIMITS_H
+
 /* Define if you have the <linux/cdrom.h> header file.  */
 #undef HAVE_LINUX_CDROM_H
+
+/* Define if you have the <locale.h> header file.  */
+#undef HAVE_LOCALE_H
 
 /* Define if you have the <machine/param.h> header file.  */
 #undef HAVE_MACHINE_PARAM_H
@@ -127,17 +235,32 @@
 /* Define if you have the <machine/soundcard.h> header file.  */
 #undef HAVE_MACHINE_SOUNDCARD_H
 
+/* Define if you have the <mad.h> header file.  */
+#undef HAVE_MAD_H
+
+/* Define if you have the <malloc.h> header file.  */
+#undef HAVE_MALLOC_H
+
 /* Define if you have the <net/if.h> header file.  */
 #undef HAVE_NET_IF_H
 
 /* Define if you have the <netinet/in.h> header file.  */
 #undef HAVE_NETINET_IN_H
 
+/* Define if you have the <nl_types.h> header file.  */
+#undef HAVE_NL_TYPES_H
+
 /* Define if you have the <pthread.h> header file.  */
 #undef HAVE_PTHREAD_H
 
 /* Define if you have the <stddef.h> header file.  */
 #undef HAVE_STDDEF_H
+
+/* Define if you have the <stdlib.h> header file.  */
+#undef HAVE_STDLIB_H
+
+/* Define if you have the <string.h> header file.  */
+#undef HAVE_STRING_H
 
 /* Define if you have the <strings.h> header file.  */
 #undef HAVE_STRINGS_H
@@ -150,6 +273,9 @@
 
 /* Define if you have the <sys/ioctl.h> header file.  */
 #undef HAVE_SYS_IOCTL_H
+
+/* Define if you have the <sys/param.h> header file.  */
+#undef HAVE_SYS_PARAM_H
 
 /* Define if you have the <sys/socket.h> header file.  */
 #undef HAVE_SYS_SOCKET_H
@@ -172,11 +298,33 @@
 /* Define if you have the <winioctl.h> header file.  */
 #undef HAVE_WINIOCTL_H
 
+/* Define if you have the mad library (-lmad).  */
+#undef HAVE_LIBMAD
+
 /* Define if you have the pth library (-lpth).  */
 #undef HAVE_LIBPTH
 
 /* css decryption with player keys */
 #undef HAVE_CSSKEYS
+
+/* Define if you have the iconv() function. */
+#undef HAVE_ICONV
+
+/* Define as const if the declaration of iconv() needs const. */
+#undef ICONV_CONST
+
+/* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
+#undef HAVE_LANGINFO_CODESET
+
+/* Define if your <locale.h> file defines LC_MESSAGES. */
+#undef HAVE_LC_MESSAGES
+
+/* Define to 1 if translation of program messages to the user's native language
+   is requested. */
+#undef ENABLE_NLS
+
+/* Define if the GNU gettext() function is already present or preinstalled. */
+#undef HAVE_GETTEXT
 
 /* long getopt support */
 #undef HAVE_GETOPT_LONG

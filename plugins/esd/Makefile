@@ -29,7 +29,7 @@ include ../../Makefile.modules
 #
 
 ../esd.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_ESD)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_ESD)
 
 ../esd.a: $(BUILTIN_C)
 	ar r $@ $^

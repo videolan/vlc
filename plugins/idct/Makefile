@@ -57,35 +57,35 @@ $(BUILTIN_IDCTALTIVEC): BUILTIN_IDCTALTIVEC_%.o: %.c
 #
 
 ../idct.so: $(PLUGIN_IDCT)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../idct.a: $(BUILTIN_IDCT)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../idctclassic.so: $(PLUGIN_IDCTCLASSIC)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../idctclassic.a: $(BUILTIN_IDCTCLASSIC)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../idctmmx.so: $(PLUGIN_IDCTMMX)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../idctmmx.a: $(BUILTIN_IDCTMMX)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../idctmmxext.so: $(PLUGIN_IDCTMMXEXT)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../idctmmxext.a: $(BUILTIN_IDCTMMXEXT)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../idctaltivec.so: $(PLUGIN_IDCTALTIVEC)
-	$(CC) $(PCFLAGS) -o $@ $^ $(LIB_ALTIVEC) $(PLCFLAGS)
+	$(CC) -o $@ $^ $(LIB_ALTIVEC) $(PLCFLAGS)
 
 ../idctaltivec.a: $(BUILTIN_IDCTALTIVEC)
 	ar r $@ $^

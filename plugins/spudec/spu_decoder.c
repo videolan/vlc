@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.1 2001/12/09 17:01:37 sam Exp $
+ * $Id: spu_decoder.c,v 1.2 2001/12/10 04:53:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -48,12 +48,13 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "modules.h"
-#include "modules_export.h"
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
 #include "spu_decoder.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes

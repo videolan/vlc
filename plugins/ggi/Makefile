@@ -23,7 +23,7 @@ include ../../Makefile.modules
 #
 
 ../ggi.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GGI)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_GGI)
 
 ../ggi.a: $(BUILTIN_C)
 	ar r $@ $^

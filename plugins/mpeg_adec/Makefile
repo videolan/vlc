@@ -21,7 +21,7 @@ include ../../Makefile.modules
 #
 
 ../mpeg_adec.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../mpeg_adec.a: $(BUILTIN_C)
 	ar r $@ $^

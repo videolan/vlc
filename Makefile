@@ -111,7 +111,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 #
 # C Objects
 # 
-INTERFACE := main interface intf_msg intf_playlist intf_channels
+INTERFACE := main interface intf_msg intf_playlist
 INPUT := input input_ext-dec input_ext-intf input_dec input_programs input_netlist input_clock mpeg_system
 VIDEO_OUTPUT := video_output video_text vout_pictures vout_subpictures
 AUDIO_OUTPUT := audio_output aout_ext-dec aout_u8 aout_s8 aout_u16 aout_s16 aout_spdif
@@ -183,7 +183,7 @@ export
 #
 # Virtual targets
 #
-all: Makefile.opts vlc ${ALIASES} vlc.app
+all: Makefile.opts vlc ${ALIASES} vlc.app plugins po
 
 Makefile.opts:
 	@echo "**** No configuration found, running ./configure..."
@@ -206,7 +206,7 @@ show:
 #
 # Cleaning rules
 #
-clean: libdvdcss-clean libdvdread-clean plugins-clean vlc-clean
+clean: libdvdcss-clean libdvdread-clean plugins-clean po-clean vlc-clean
 	rm -f src/*/*.o extras/*/*.o
 	rm -f lib/*.so* lib/*.a
 	rm -f plugins/*.so plugins/*.a
@@ -214,6 +214,9 @@ clean: libdvdcss-clean libdvdread-clean plugins-clean vlc-clean
 
 libdvdcss-clean:
 	-cd extras/libdvdcss && $(MAKE) clean
+
+po-clean:
+	-cd po && $(MAKE) clean
 
 libdvdread-clean:
 	-cd extras/libdvdread && $(MAKE) clean
@@ -229,6 +232,7 @@ vlc-clean:
 	rm -Rf vlc.app
 
 distclean: clean
+	-cd po && $(MAKE) distclean
 	rm -f **/*.o **/*~ *.log
 	rm -f Makefile.opts
 	rm -f include/defs.h include/config.h include/modules_builtin.h
@@ -241,9 +245,9 @@ distclean: clean
 #
 # Install/uninstall rules
 #
-install: libdvdcss-install vlc-install plugins-install
+install: libdvdcss-install vlc-install plugins-install po-install
 
-uninstall: libdvdcss-uninstall vlc-uninstall plugins-uninstall
+uninstall: libdvdcss-uninstall vlc-uninstall plugins-uninstall po-uninstall
 
 vlc-install:
 	mkdir -p $(DESTDIR)$(bindir)
@@ -280,6 +284,12 @@ libdvdcss-install:
 libdvdcss-uninstall:
 	-cd extras/libdvdcss && $(MAKE) uninstall
 
+po-install:
+	-cd po && $(MAKE) install
+
+po-uninstall:
+	-cd po && $(MAKE) uninstall
+
 #
 # Package generation rules
 #
@@ -309,11 +319,15 @@ snapshot-common:
 	find tmp/vlc/extras tmp/vlc/doc \
 		-type d -name CVS -o -name '.*' -o -name '*.[o]' | \
 			while read i ; do rm -Rf $$i ; done
+	# Copy gettext stuff
+	mkdir tmp/vlc/po
+	cp po/*.po tmp/vlc/po
+	for i in Makefile.in.in POTFILES.in ; do cp po/$$i tmp/vlc/po ; done
 	# Copy misc files
 	cp FAQ AUTHORS COPYING TODO todo.pl ChangeLog* README* INSTALL* \
 		Makefile Makefile.opts.in Makefile.dep Makefile.modules \
 		configure configure.in install-sh install-win32 vlc.spec \
-		config.sub config.guess \
+		config.sub config.guess acconfig.h aclocal.m4 mkinstalldirs \
 			tmp/vlc/
 	# Copy Debian control files
 	for file in debian/*dirs debian/*docs debian/*menu debian/*desktop \
@@ -518,7 +532,7 @@ endif
 #
 # Main application target
 #
-vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(VLC_OBJ) $(BUILTIN_OBJ) plugins
+vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(VLC_OBJ) $(BUILTIN_OBJ)
 	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) $(BUILTIN_OBJ) $(LCFLAGS)
 ifeq ($(SYS),beos)
 	xres -o $@ ./share/vlc_beos.rsrc
@@ -530,24 +544,30 @@ endif
 #
 plugins: Makefile.modules Makefile.opts Makefile.dep Makefile $(PLUGIN_OBJ)
 $(PLUGIN_OBJ): FORCE
-	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.so=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:plugins/%=../%)
+	@cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.so=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:plugins/%=../%)
 
 #
 # Built-in modules target
 #
 builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
 $(BUILTIN_OBJ): FORCE
-	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:plugins/%=../%)
+	@cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:plugins/%=../%)
 
 #
 # libdvdcss target
 #
 libdvdcss: Makefile.opts
-	cd extras/libdvdcss && $(MAKE)
+	@cd extras/libdvdcss && $(MAKE)
 
 #
 # libdvdread target
 #
 libdvdread: Makefile.opts
-	cd extras/libdvdread && $(MAKE)
+	@cd extras/libdvdread && $(MAKE)
+
+#
+# gettext target
+#
+po: FORCE
+	@cd po && $(MAKE)
 

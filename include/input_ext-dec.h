@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.41 2001/12/07 18:33:07 sam Exp $
+ * $Id: input_ext-dec.h,v 1.42 2001/12/10 04:53:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -218,6 +218,10 @@ typedef struct bit_stream_s
 u32  UnalignedShowBits( struct bit_stream_s *, unsigned int );
 void UnalignedRemoveBits( struct bit_stream_s * );
 u32  UnalignedGetBits( struct bit_stream_s *, unsigned int );
+#else
+#   define UnalignedShowBits p_symbols->UnalignedShowBits
+#   define UnalignedRemoveBits p_symbols->UnalignedRemoveBits
+#   define UnalignedGetBits p_symbols->UnalignedGetBits
 #endif
 
 /*****************************************************************************

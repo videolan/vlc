@@ -99,6 +99,10 @@ N: Arnaud Gomes-do-Vale
 E: arnaud@carrosse.frmug.org
 D: autoconf patches
 
+N: Thomas Graf
+E: reeler@reeler.org
+D: gettext support, german translation
+
 N: Jean-Philippe Grimaldi
 E: jeanphi@via.ecp.fr
 C: jeanphi

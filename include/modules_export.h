@@ -47,6 +47,7 @@
     (p_symbols)->mdate = mdate; \
     (p_symbols)->network_ChannelCreate = network_ChannelCreate; \
     (p_symbols)->network_ChannelJoin = network_ChannelJoin; \
+    (p_symbols)->input_SetProgram = input_SetProgram; \
     (p_symbols)->input_SetStatus = input_SetStatus; \
     (p_symbols)->input_Seek = input_Seek; \
     (p_symbols)->input_DumpStream = input_DumpStream; \
@@ -107,7 +108,6 @@
     (p_symbols)->intf_DbgMsgImm = _intf_DbgMsgImm;
 
 #ifdef PLUGIN
-#   define p_main (p_symbols->p_main)
 #   define p_aout_bank (p_symbols->p_aout_bank)
 #   define p_vout_bank (p_symbols->p_vout_bank)
 
@@ -147,11 +147,12 @@
 #   define msleep(a) p_symbols->msleep(a)
 #   define mdate() p_symbols->mdate()
 
-#   define network_ChannelCreate() p_symbols->network_ChannelCreate()
-#   define network_ChannelJoin(a) p_symbols->network_ChannelJoin(a)
+#   define network_ChannelCreate p_symbols->network_ChannelCreate
+#   define network_ChannelJoin p_symbols->network_ChannelJoin
 
-#   define input_SetStatus(a,b) p_symbols->input_SetStatus(a,b)
-#   define input_Seek(a,b) p_symbols->input_Seek(a,b)
+#   define input_SetProgram p_symbols->input_SetProgram
+#   define input_SetStatus p_symbols->input_SetStatus
+#   define input_Seek p_symbols->input_Seek
 #   define input_DumpStream(a) p_symbols->input_DumpStream(a)
 #   define input_OffsetToTime(a,b,c) p_symbols->input_OffsetToTime(a,b,c)
 #   define input_ChangeES(a,b,c) p_symbols->input_ChangeES(a,b,c)
@@ -205,10 +206,6 @@
 #   define vout_LinkPicture p_symbols->vout_LinkPicture
 #   define vout_UnlinkPicture p_symbols->vout_UnlinkPicture
     
-#   define UnalignedShowBits p_symbols->UnalignedShowBits
-#   define UnalignedRemoveBits p_symbols->UnalignedRemoveBits
-#   define UnalignedGetBits p_symbols->UnalignedGetBits
-
 #   define DecodeLanguage p_symbols->DecodeLanguage
 
 #   define module_Need p_symbols->module_Need

@@ -29,21 +29,21 @@ include ../../Makefile.modules
 #
 
 ../mpeg_es.so: $(PLUGIN_ES)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../mpeg_es.a: $(BUILTIN_ES)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../mpeg_ps.so: $(PLUGIN_PS)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../mpeg_ps.a: $(BUILTIN_PS)
 	ar r $@ $^
 	$(RANLIB) $@
 
 ../mpeg_ts.so: $(PLUGIN_TS)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_TS)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_TS)
 
 ../mpeg_ts.a: $(BUILTIN_TS)
 	ar r $@ $^

@@ -23,7 +23,7 @@ include ../../Makefile.modules
 #
 
 ../directx.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_DIRECTX)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_DIRECTX)
 
 ../directx.a: $(BUILTIN_C)
 	ar r $@ $^

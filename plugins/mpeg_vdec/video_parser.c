@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.6 2001/12/07 18:33:08 sam Exp $
+ * $Id: video_parser.c,v 1.7 2001/12/10 04:53:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -47,12 +47,10 @@
 #include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
-#include "modules.h"
 
 #include "video.h"
 #include "video_output.h"
 
-#include "modules_export.h"
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
@@ -60,6 +58,8 @@
 #include "vpar_pool.h"
 #include "video_parser.h"
 
+#include "modules.h"
+#include "modules_export.h"
 
 /*
  * Local prototypes

@@ -31,7 +31,7 @@ $(BUILTIN_SDL): BUILTIN_%.o: %.c
 #
 
 ../sdl.so: $(PLUGIN_SDL)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_SDL)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_SDL)
 
 ../sdl.a: $(BUILTIN_SDL)
 	ar r $@ $^

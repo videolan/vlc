@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.6 2001/12/09 17:01:36 sam Exp $
+ * $Id: ac3_spdif.c,v 1.7 2001/12/10 04:53:10 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -47,14 +47,14 @@
 
 #include "audio_output.h"
 
-#include "modules.h"
-#include "modules_export.h"
-
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
 #include "ac3_spdif.h"
 #include "ac3_iec958.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 #define FRAME_NB 8
 

@@ -63,7 +63,7 @@ $(BUILTIN_KDE_MOC): BUILTIN_%.o: %.cpp
 #
 
 ../kde.so: $(PLUGIN_KDE) $(PLUGIN_KDE_MOC)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_KDE)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_KDE)
 
 ../kde.a: $(BUILTIN_KDE) $(BUILTIN_KDE_MOC)
 	ar r $@ $^

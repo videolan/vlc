@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.83 2001/12/09 17:01:37 sam Exp $
+ * $Id: interface.c,v 1.84 2001/12/10 04:53:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -47,8 +47,6 @@
 
 #include "interface.h"
 #include "intf_playlist.h"
-#include "intf_channels.h"
-#include "keystrokes.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -113,12 +111,6 @@ intf_thread_t* intf_Create( void )
 
     /* Initialize mutexes */
     vlc_mutex_init( &p_intf->change_lock );
-
-    /* Load channels - the pointer will be set to NULL on failure. The
-     * return value is ignored since the program can work without
-     * channels */
-    intf_LoadChannels( p_intf, main_GetPszVariable( INTF_CHANNELS_VAR,
-                                                    INTF_CHANNELS_DEFAULT ));
 
     intf_WarnMsg( 1, "intf: interface initialized");
     return( p_intf );
@@ -199,9 +191,6 @@ static void intf_Manage( intf_thread_t *p_intf )
  *****************************************************************************/
 void intf_Destroy( intf_thread_t *p_intf )
 {
-    /* Unload channels */
-    intf_UnloadChannels( p_intf );
-
     /* Destroy interfaces */
     p_intf->pf_close( p_intf );
 

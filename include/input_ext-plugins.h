@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: input_ext-plugins.h,v 1.7 2001/12/07 16:47:47 jobi Exp $
+ * $Id: input_ext-plugins.h,v 1.8 2001/12/10 04:53:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -40,18 +40,15 @@
 /*****************************************************************************
  * Prototypes from input_ext-dec.c
  *****************************************************************************/
-#ifndef PLUGIN
 void InitBitstream  ( struct bit_stream_s *, struct decoder_fifo_s *,
                       void (* pf_bitstream_callback)( struct bit_stream_s *,
                                                       boolean_t ),
                       void * p_callback_arg );
 void NextDataPacket ( struct bit_stream_s * );
-#endif
 
 /*****************************************************************************
  * Prototypes from input_programs.c
  *****************************************************************************/
-#ifndef PLUGIN
 int  input_InitStream( struct input_thread_s *, size_t );
 void input_EndStream ( struct input_thread_s * );
 struct pgrm_descriptor_s * input_FindProgram( struct input_thread_s *, u16 );
@@ -68,12 +65,10 @@ struct es_descriptor_s * input_AddES ( struct input_thread_s *,
 void input_DelES     ( struct input_thread_s *, struct es_descriptor_s * );
 int  input_SelectES  ( struct input_thread_s *, struct es_descriptor_s * );
 int  input_UnselectES( struct input_thread_s *, struct es_descriptor_s * );
-#endif
 
 /*****************************************************************************
  * Prototypes from input_dec.c
  *****************************************************************************/
-#ifndef PLUGIN
 //decoder_capabilities_s * input_ProbeDecoder( void );
 vlc_thread_t input_RunDecoder( struct input_thread_s *,
                                struct es_descriptor_s * );
@@ -82,12 +77,10 @@ void input_DecodePES ( struct decoder_fifo_s *, struct pes_packet_s * );
 void input_EscapeDiscontinuity( struct input_thread_s *,
                                 struct pgrm_descriptor_s * );
 void input_EscapeAudioDiscontinuity( struct input_thread_s * );
-#endif
 
 /*****************************************************************************
  * Prototypes from input_clock.c
  *****************************************************************************/
-#ifndef PLUGIN
 void input_ClockInit( struct pgrm_descriptor_s * );
 int  input_ClockManageControl( struct input_thread_s *,
                                struct pgrm_descriptor_s *, mtime_t );
@@ -95,7 +88,6 @@ void input_ClockManageRef( struct input_thread_s *,
                            struct pgrm_descriptor_s *, mtime_t );
 mtime_t input_ClockGetTS( struct input_thread_s *,
                           struct pgrm_descriptor_s *, mtime_t );
-#endif
 
 /*****************************************************************************
  * Create a NULL packet for padding in case of a data loss
@@ -185,7 +177,6 @@ typedef struct netlist_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef PLUGIN
 int                     input_NetlistInit( struct input_thread_s *,
                                            int i_nb_iovec,
                                            int i_nb_data,
@@ -204,7 +195,6 @@ void                    input_NetlistDeletePacket( void *,
 void                    input_NetlistDeletePES( void *,
                                                 struct pes_packet_s * );
 void                    input_NetlistEnd( struct input_thread_s * );
-#endif
 
 
 /*
@@ -304,7 +294,6 @@ typedef struct stream_ps_data_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef PLUGIN
 void input_ParsePES  ( struct input_thread_s *, struct es_descriptor_s * );
 void input_GatherPES ( struct input_thread_s *, struct data_packet_s *,
                        struct es_descriptor_s *, boolean_t, boolean_t );
@@ -314,4 +303,4 @@ void input_DemuxPS   ( struct input_thread_s *, struct data_packet_s * );
 void input_DemuxTS   ( struct input_thread_s *, struct data_packet_s * );
 void input_DemuxPSI  ( struct input_thread_s *, struct data_packet_s *,
                        struct es_descriptor_s *, boolean_t, boolean_t );
-#endif
+

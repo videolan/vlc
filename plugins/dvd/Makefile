@@ -32,14 +32,14 @@ $(BUILTIN_DVD): BUILTIN_%.o: %.c
 
 ifeq (1,$(NEED_LIBDVDCSS))
 ../dvd.so: libdvdcss $(PLUGIN_DVD)
-	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
+	$(CC) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
 
 ../dvd.a: libdvdcss $(BUILTIN_DVD)
 	ar r $@ $(BUILTIN_DVD)
 	$(RANLIB) $@
 else
 ../dvd.so: $(PLUGIN_DVD)
-	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
+	$(CC) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
 
 ../dvd.a: $(BUILTIN_DVD)
 	ar r $@ $(BUILTIN_DVD)

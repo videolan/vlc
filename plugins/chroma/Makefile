@@ -26,7 +26,7 @@ include ../../Makefile.modules
 #
 
 ../yuv2rgb8.so: $(PLUGIN_YUV2RGB8)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../yuv2rgb8.a: $(BUILTIN_YUV2RGB8)
 	ar r $@ $^
