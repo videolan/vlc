@@ -2,7 +2,7 @@
  * subtitles.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subtitles.cpp,v 1.1 2003/05/13 22:59:16 gbazin Exp $
+ * $Id: subtitles.cpp,v 1.2 2003/05/20 23:17:59 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -194,7 +194,7 @@ void SubsFileDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
 void SubsFileDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
 {
     wxFileDialog dialog( this, wxU(_("Open file")),
-                         wxT(""), wxT(""), wxT("*.*"), wxOPEN );
+                         wxT(""), wxT(""), wxT("*"), wxOPEN );
 
     if( dialog.ShowModal() == wxID_OK )
     {

@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.30 2003/05/18 19:46:35 gbazin Exp $
+ * $Id: interface.cpp,v 1.31 2003/05/20 23:17:59 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -423,8 +423,12 @@ void Interface::Open( int i_access_method )
             return;
         }
 
-        playlist_Add( p_playlist, (const char *)p_open_dialog->mrl.mb_str(),
-                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+        for( size_t i = 0; i < p_open_dialog->mrl.GetCount(); i++ )
+        {
+            playlist_Add( p_playlist,
+                (const char *)p_open_dialog->mrl[i].mb_str(),
+                PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
+        }
 
         TogglePlayButton( PLAYING_S );
 
@@ -829,8 +833,6 @@ DragAndDrop::DragAndDrop( intf_thread_t *_p_intf )
 bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
                                const wxArrayString& filenames )
 {
-    unsigned int i;
-
     /* Add dropped files to the playlist */
 
     playlist_t *p_playlist =
@@ -841,9 +843,9 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
         return FALSE;
     }
 
-    for( i = 0; i < filenames.GetCount(); i++ )
+    for( size_t i = 0; i < filenames.GetCount(); i++ )
         playlist_Add( p_playlist, (const char *)filenames[i].mb_str(),
-                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+                      PLAYLIST_APPEND | i ? 0 : PLAYLIST_GO, PLAYLIST_END );
 
     vlc_object_release( p_playlist );
 

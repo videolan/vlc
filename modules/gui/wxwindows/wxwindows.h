@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.29 2003/05/18 19:46:35 gbazin Exp $
+ * $Id: wxwindows.h,v 1.30 2003/05/20 23:17:59 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -141,8 +141,6 @@ public:
 
     wxMenu      *p_popup_menu;
 
-    wxArrayString mrl_history;
-
 private:
     void CreateOurMenuBar();
     void CreateOurToolBar();
@@ -208,7 +206,7 @@ public:
                 int i_access_method );
     virtual ~OpenDialog();
 
-    wxString mrl;
+    wxArrayString mrl;
 
 private:
     wxPanel *FilePanel( wxWindow* parent );
@@ -217,6 +215,7 @@ private:
     wxPanel *SatPanel( wxWindow* parent );
 
     void UpdateMRL( int i_access_method );
+    wxArrayString SeparateEntries( wxString );
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnOk( wxCommandEvent& event );

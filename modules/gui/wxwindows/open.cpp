@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.24 2003/05/18 12:18:46 gbazin Exp $
+ * $Id: open.cpp,v 1.25 2003/05/20 23:17:59 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -46,6 +46,7 @@
 #include <wx/combobox.h>
 #include <wx/spinctrl.h>
 #include <wx/statline.h>
+#include <wx/tokenzr.h>
 
 #include <vlc/intf.h>
 
@@ -171,7 +172,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
                                                         wxHORIZONTAL );
     wxStaticText *mrl_label = new wxStaticText( panel, -1,
                                                 wxU(_("Open Target:")) );
-    mrl_combo = new wxComboBox( panel, MRL_Event, mrl,
+    mrl_combo = new wxComboBox( panel, MRL_Event, wxT(""),
                                 wxPoint(20,25), wxSize(120, -1),
                                 0, NULL );
     mrl_combo->SetToolTip( wxU(_("You can use this field directly by typing "
@@ -496,7 +497,7 @@ wxPanel *OpenDialog::SatPanel( wxWindow* parent )
 
 void OpenDialog::UpdateMRL( int i_access_method )
 {
-    wxString demux;
+    wxString demux, mrltemp;
 
     i_current_access_method = i_access_method;
 
@@ -509,13 +510,14 @@ void OpenDialog::UpdateMRL( int i_access_method )
     switch( i_access_method )
     {
     case FILE_ACCESS:
-        mrl = wxT("file") + demux + wxT("://") + file_combo->GetValue();
+        //mrltemp = wxT("file") + demux + wxT(":") + file_combo->GetValue();
+        mrltemp = file_combo->GetValue();
         break;
     case DISC_ACCESS:
-        mrl = ( disc_type->GetSelection() == 0 ? wxT("dvd") :
+        mrltemp = ( disc_type->GetSelection() == 0 ? wxT("dvd") :
                 disc_type->GetSelection() == 1 ? wxT("dvdsimple") :
                 disc_type->GetSelection() == 2 ? wxT("vcd") : wxT("cdda") )
-                  + demux + wxT("://")
+                  + demux + wxT(":")
                   + disc_device->GetLineText(0)
                   + wxString::Format( wxT("@%d:%d"),
                                       disc_title->GetValue(),
@@ -528,42 +530,87 @@ void OpenDialog::UpdateMRL( int i_access_method )
             if( net_ports[0]->GetValue() !=
                 config_GetInt( p_intf, "server-port" ) )
             {
-                mrl = wxT("udp") + demux +
-                       wxString::Format( wxT("://@:%d"),
-                                         net_ports[0]->GetValue() );
+                mrltemp = wxT("udp") + demux +
+                          wxString::Format( wxT("://@:%d"),
+                                            net_ports[0]->GetValue() );
             }
             else
             {
-                mrl = wxT("udp") + demux + wxT("://");
+                mrltemp = wxT("udp") + demux + wxT("://");
             }
             break;
 
         case 1:
-            mrl = wxT("udp") + demux + wxT("://@") +
-                  net_addrs[1]->GetLineText(0);
+            mrltemp = wxT("udp") + demux + wxT("://@") +
+                      net_addrs[1]->GetLineText(0);
             if( net_ports[1]->GetValue() !=
                 config_GetInt( p_intf, "server-port" ) )
             {
-                mrl = mrl + wxString::Format( wxT(":%d"),
+                mrltemp = mrltemp + wxString::Format( wxT(":%d"),
                                               net_ports[1]->GetValue() );
             }
             break;
 
         case 2:
             /* http access */     
-            mrl = wxT("http") + demux + wxT("://") +
-                  net_addrs[2]->GetLineText(0);
+            mrltemp = wxT("http") + demux + wxT("://") +
+                      net_addrs[2]->GetLineText(0);
             break;
         }
         break;
     case SAT_ACCESS:
-        mrl = wxT("satellite") + demux + wxT("://");
+        mrltemp = wxT("satellite") + demux + wxT("://");
         break;
     default:
         break;
     }
 
-    mrl_combo->SetValue( mrl );
+    mrl_combo->SetValue( mrltemp );
+}
+
+wxArrayString OpenDialog::SeparateEntries( wxString entries )
+{
+    vlc_bool_t b_quotes_mode = VLC_FALSE;
+
+    wxArrayString entries_array;
+    wxString entry;
+
+    wxStringTokenizer token( entries, wxT(" \t\r\n\""), wxTOKEN_RET_DELIMS );
+
+    while( token.HasMoreTokens() )
+    {
+        entry += token.GetNextToken();
+
+        if( entry.IsEmpty() ) continue;
+
+        if( !b_quotes_mode && entry.Last() == wxT('\"') )
+        {
+            /* Enters quotes mode */
+            entry.RemoveLast();
+            b_quotes_mode = VLC_TRUE;
+        }
+        else if( b_quotes_mode && entry.Last() == wxT('\"') )
+        {
+            /* Finished the quotes mode */
+            entry.RemoveLast();
+            if( !entry.IsEmpty() ) entries_array.Add( entry );
+            entry.Empty();
+            b_quotes_mode = VLC_FALSE;
+        }
+        else if( !b_quotes_mode && entry.Last() != wxT('\"') )
+        {
+            /* we found a non-quoted standalone string */
+            entry.RemoveLast();
+            if( !entry.IsEmpty() ) entries_array.Add( entry );
+            entry.Empty();
+        } 
+        else
+        {;}
+    }
+
+    if( !entry.IsEmpty() ) entries_array.Add( entry );
+
+    return entries_array;
 }
 
 /*****************************************************************************
@@ -571,6 +618,8 @@ void OpenDialog::UpdateMRL( int i_access_method )
  *****************************************************************************/
 void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
+    mrl_combo->Append( mrl_combo->GetValue() );
+    mrl = SeparateEntries( mrl_combo->GetValue() );
     EndModal( wxID_OK );
 }
 
@@ -586,7 +635,7 @@ void OpenDialog::OnPageChange( wxNotebookEvent& event )
 
 void OpenDialog::OnMRLChange( wxCommandEvent& event )
 {
-    mrl = event.GetString();
+    //mrl = SeparateEntries( event.GetString() );
 }
 
 /*****************************************************************************
@@ -601,11 +650,25 @@ void OpenDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
 {
     if( file_dialog == NULL )
         file_dialog = new wxFileDialog( this, wxU(_("Open file")),
-                                        wxT(""), wxT(""), wxT("*.*"), wxOPEN );
+            wxT(""), wxT(""), wxT("*"), wxOPEN | wxMULTIPLE );
 
     if( file_dialog && file_dialog->ShowModal() == wxID_OK )
     {
-        file_combo->SetValue( file_dialog->GetPath() );      
+        wxArrayString paths;
+        wxString path;
+
+        file_dialog->GetPaths( paths );
+
+        for( size_t i = 0; i < paths.GetCount(); i++ )
+        {
+            if( paths[i].Find( wxT(' ') ) >= 0 )
+                path += wxT("\"") + paths[i] + wxT("\" ");
+            else
+                path += paths[i] + wxT(" ");
+        }
+
+        file_combo->SetValue( path );
+        file_combo->Append( path );
         UpdateMRL( FILE_ACCESS );
     }
 }
@@ -772,7 +835,7 @@ void OpenDialog::OnDemuxDumpBrowse( wxCommandEvent& WXUNUSED(event) )
 {
     if( demuxdump_dialog == NULL )
         demuxdump_dialog = new wxFileDialog( this, wxU(_("Save file")),
-                               wxT(""), wxT(""), wxT("*.*"), wxSAVE );
+                               wxT(""), wxT(""), wxT("*"), wxSAVE );
 
     if( demuxdump_dialog && demuxdump_dialog->ShowModal() == wxID_OK )
     {

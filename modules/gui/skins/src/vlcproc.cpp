@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.22 2003/05/12 17:33:19 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.23 2003/05/20 23:17:59 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -342,10 +342,10 @@ void VlcProc::LoadSkin()
         if( dialog.ShowModal() == wxID_OK )
         {
             p_intf->p_sys->p_new_theme_file =
-                new char[dialog.GetPath().Length()];
+                new char[strlen(dialog.GetPath().mb_str()) + 1];
 
             strcpy( p_intf->p_sys->p_new_theme_file,
-                    dialog.GetPath().c_str() );
+                    dialog.GetPath().mb_str() );
 
             // Tell vlc to change skin after hiding interface
             OSAPI_PostMessage( NULL, VLC_HIDE, VLC_LOAD_SKIN, 0 );
@@ -408,18 +408,24 @@ void VlcProc::OpenFile( bool play )
     if( play )
     {
         // Append and play
-        playlist_Add( p_playlist,
-                      (char *)p_intf->p_sys->OpenDlg->mrl.c_str(),
-                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+        for( size_t i = 0; i < p_open_dialog->mrl.GetCount(); i++ )
+        {
+            playlist_Add( p_playlist,
+                (const char *)p_intf->p_sys->OpenDlg->mrl[i].mb_str(),
+                PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
+        }
 
         p_intf->p_sys->p_theme->EvtBank->Get( "play" )->SendEvent();
     }
     else
     {
         // Append only
-        playlist_Add( p_playlist,
-                        (char *)p_intf->p_sys->OpenDlg->mrl.c_str(),
-                        PLAYLIST_APPEND, PLAYLIST_END );
+        for( size_t i = 0; i < p_open_dialog->mrl.GetCount(); i++ )
+        {
+            playlist_Add( p_playlist,
+                (const char *)p_intf->p_sys->OpenDlg->mrl[i].mb_str(),
+                PLAYLIST_APPEND, PLAYLIST_END );
+        }
     }
 
     // Refresh interface !

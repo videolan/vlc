@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.10 2003/05/18 16:27:18 gbazin Exp $
+ * $Id: playlist.cpp,v 1.11 2003/05/20 23:17:59 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -328,7 +328,7 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
     }
 
     wxFileDialog dialog( this, wxU(_("Save playlist")),
-                         wxT(""), wxT(""), wxT("*.*"), wxSAVE );
+                         wxT(""), wxT(""), wxT("*"), wxSAVE );
 
     if( dialog.ShowModal() == wxID_OK )
     {
@@ -349,7 +349,7 @@ void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
     }
 
     wxFileDialog dialog( this, wxU(_("Open playlist")),
-                         wxT(""), wxT(""), wxT("*.*"), wxOPEN );
+                         wxT(""), wxT(""), wxT("*"), wxOPEN );
 
     if( dialog.ShowModal() == wxID_OK )
     {
@@ -377,9 +377,13 @@ void Playlist::OnAddMRL( wxCommandEvent& WXUNUSED(event) )
     if( p_main_interface->p_open_dialog &&
         p_main_interface->p_open_dialog->ShowModal() == wxID_OK )
     {
-        playlist_Add( p_playlist,
-            (const char *)p_main_interface->p_open_dialog->mrl.mb_str(),
-            PLAYLIST_APPEND, PLAYLIST_END );
+        for( size_t i = 0;
+             i < p_main_interface->p_open_dialog->mrl.GetCount(); i++ )
+        {
+            playlist_Add( p_playlist,
+                (const char *)p_main_interface->p_open_dialog->mrl[i].mb_str(),
+                PLAYLIST_APPEND, PLAYLIST_END );
+        }
     }
 
     vlc_object_release( p_playlist );
