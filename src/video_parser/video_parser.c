@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.83 2001/05/01 12:22:18 sam Exp $
+ * $Id: video_parser.c,v 1.84 2001/05/01 15:12:22 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -94,6 +94,7 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
      */
     p_vpar->p_fifo = p_config->decoder_config.p_decoder_fifo;
     p_vpar->p_config = p_config;
+    p_vpar->p_vout = NULL;
 
     /*
      * Choose the best motion compensation module

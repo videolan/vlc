@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.14 2001/04/27 16:08:26 sam Exp $
+ * $Id: intf_gtk.c,v 1.15 2001/05/01 15:12:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -603,7 +603,7 @@ static gint GtkChapterMenu( gpointer p_data, GtkWidget * p_chapter,
                         void(*pf_activate )( GtkMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
-    char                psz_name[10];
+    char                psz_name[ GTK_MENU_LABEL_SIZE ];
     GtkWidget *         p_chapter_menu;
     GtkWidget *         p_item;
     GSList *            p_chapter_button_group;
@@ -624,7 +624,9 @@ static gint GtkChapterMenu( gpointer p_data, GtkWidget * p_chapter,
         b_active = ( p_intf->p_input->stream.pp_areas[i_title]->i_part
                      == i_chapter + 1 ) ? 1 : 0;
         
-        sprintf( psz_name, "Chapter %d", i_chapter + 1 );
+        snprintf( psz_name, GTK_MENU_LABEL_SIZE,
+                  "Chapter %d", i_chapter + 1 );
+        psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
 
         p_item = GtkMenuRadioItem( p_chapter_menu, &p_chapter_button_group,
                                    b_active, psz_name );
@@ -657,7 +659,7 @@ static gint GtkTitleMenu( gpointer       p_data,
                           void(*pf_activate )( GtkMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
-    char                psz_name[10];
+    char                psz_name[ GTK_MENU_LABEL_SIZE ];
     GtkWidget *         p_title_menu;
     GtkWidget *         p_title_item;
     GtkWidget *         p_chapter_menu;
@@ -682,7 +684,8 @@ static gint GtkTitleMenu( gpointer       p_data,
     {
         b_active = ( p_intf->p_input->stream.pp_areas[i_title] ==
                      p_intf->p_input->stream.p_selected_area ) ? 1 : 0;
-        sprintf( psz_name, "Title %d", i_title );
+        snprintf( psz_name, GTK_MENU_LABEL_SIZE, "Title %d", i_title );
+        psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
 
         p_title_item = GtkMenuRadioItem( p_title_menu, &p_title_button_group,
                                          b_active, psz_name );
@@ -707,7 +710,9 @@ static gint GtkTitleMenu( gpointer       p_data,
                 b_active = ( p_intf->p_input->stream.pp_areas[i_title]->i_part
                              == i_chapter + 1 ) ? 1 : 0;
                 
-                sprintf( psz_name, "Chapter %d", i_chapter + 1 );
+                snprintf( psz_name, GTK_MENU_LABEL_SIZE,
+                          "Chapter %d", i_chapter + 1 );
+                psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
     
                 p_item = GtkMenuRadioItem( p_chapter_menu,
                                            &p_chapter_button_group,

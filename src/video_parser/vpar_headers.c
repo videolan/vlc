@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.84 2001/05/01 12:22:18 sam Exp $
+ * $Id: vpar_headers.c,v 1.85 2001/05/01 15:12:22 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -458,6 +458,9 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         {
             intf_Msg( "vpar: no vout present, spawning one" );
             p_main->p_vout = vout_CreateThread( NULL );
+
+            /* Spawning another one for fun */
+            //vout_CreateThread( NULL );
         }
 
         p_vpar->p_vout = p_main->p_vout;

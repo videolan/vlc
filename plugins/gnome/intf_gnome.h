@@ -2,7 +2,7 @@
  * intf_gnome.h: private Gnome interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.h,v 1.8 2001/04/22 00:08:26 stef Exp $
+ * $Id: intf_gnome.h,v 1.9 2001/05/01 15:12:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -22,18 +22,23 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * drag'n'drop stuff
+ * Drag'n'drop stuff
  *****************************************************************************/
 #define DROP_ACCEPT_TEXT_URI_LIST  0
 #define DROP_ACCEPT_TEXT_PLAIN     1
 
 /*****************************************************************************
- * interface modes
+ * Interface modes
  *****************************************************************************/
 #define FILE_MODE   0
 #define NET_MODE    1
 #define DVD_MODE    2
 #define VCD_MODE    3
+
+/*****************************************************************************
+ * String sizes
+ *****************************************************************************/
+#define GNOME_MENU_LABEL_SIZE 64
 
 /*****************************************************************************
  * intf_sys_t: description and status of Gnome interface
@@ -83,3 +88,4 @@ typedef struct intf_sys_s
     void             ( *pf_gdk_callback ) ( void );
 
 } intf_sys_t;
+

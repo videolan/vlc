@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.34 2001/05/01 04:18:18 sam Exp $
+ * $Id: intf_gnome.c,v 1.35 2001/05/01 15:12:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -438,14 +438,13 @@ static gint GnomeLanguageMenus( gpointer          p_data,
                                 gint              i_cat,
                           void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
-#define GNOME_LANGUAGE_MENU_SIZE 64
     intf_thread_t *     p_intf;
     GtkWidget *         p_menu;
     GtkWidget *         p_separator;
     GtkWidget *         p_item;
     GtkWidget *         p_item_active;
     GSList *            p_group;
-    char                psz_name[ GNOME_LANGUAGE_MENU_SIZE ];
+    char                psz_name[ GNOME_MENU_LABEL_SIZE ];
     gint                i_item;
     gint                i;
 
@@ -464,8 +463,8 @@ static gint GnomeLanguageMenus( gpointer          p_data,
     p_menu = gtk_menu_new();
 
     /* special case for "off" item */
-    snprintf( psz_name, GNOME_LANGUAGE_MENU_SIZE, "Off" );
-    psz_name[ GNOME_LANGUAGE_MENU_SIZE - 1 ] = '\0';
+    snprintf( psz_name, GNOME_MENU_LABEL_SIZE, "Off" );
+    psz_name[ GNOME_MENU_LABEL_SIZE - 1 ] = '\0';
 
     p_item = gtk_radio_menu_item_new_with_label( p_group, psz_name );
     p_group = gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
@@ -496,9 +495,9 @@ static gint GnomeLanguageMenus( gpointer          p_data,
             strcpy( psz_name, p_intf->p_input->stream.pp_es[i]->psz_desc );
             if( psz_name[0] == '\0' )
             {
-                snprintf( psz_name, GNOME_LANGUAGE_MENU_SIZE,
+                snprintf( psz_name, GNOME_MENU_LABEL_SIZE,
                           "Language %d", i_item );
-                psz_name[ GNOME_LANGUAGE_MENU_SIZE - 1 ] = '\0';
+                psz_name[ GNOME_MENU_LABEL_SIZE - 1 ] = '\0';
             }
 
             p_item = gtk_radio_menu_item_new_with_label( p_group, psz_name );
@@ -550,9 +549,8 @@ static gint GnomeLanguageMenus( gpointer          p_data,
 static gint GnomeAngleMenu( gpointer p_data, GtkWidget * p_angle,
                         void(*pf_toggle)( GtkCheckMenuItem *, gpointer ) )
 {
-#define GNOME_ANGLE_MENU_SIZE 64
     intf_thread_t *     p_intf;
-    char                psz_name[ GNOME_ANGLE_MENU_SIZE ];
+    char                psz_name[ GNOME_MENU_LABEL_SIZE ];
     GtkWidget *         p_angle_menu;
     GSList *            p_angle_group;
     GtkWidget *         p_item;
@@ -575,8 +573,8 @@ static gint GnomeAngleMenu( gpointer p_data, GtkWidget * p_angle,
          i_angle < p_intf->p_input->stream.p_selected_area->i_angle_nb ;
          i_angle++ )
     {
-        snprintf( psz_name, GNOME_ANGLE_MENU_SIZE, "Angle %d", i_angle + 1 );
-        psz_name[ GNOME_ANGLE_MENU_SIZE - 1 ] = '\0';
+        snprintf( psz_name, GNOME_MENU_LABEL_SIZE, "Angle %d", i_angle + 1 );
+        psz_name[ GNOME_MENU_LABEL_SIZE - 1 ] = '\0';
 
         p_item = gtk_radio_menu_item_new_with_label( p_angle_group,
                                                      psz_name );
@@ -624,7 +622,7 @@ static gint GnomeChapterMenu( gpointer p_data, GtkWidget * p_chapter,
                         void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
-    char                psz_name[12];
+    char                psz_name[ GNOME_MENU_LABEL_SIZE ];
     GtkWidget *         p_chapter_menu;
     GtkWidget *         p_chapter_submenu;
     GtkWidget *         p_menu_item;
@@ -635,10 +633,10 @@ static gint GnomeChapterMenu( gpointer p_data, GtkWidget * p_chapter,
     gint                i_chapter;
     gint                i_nb;
 
-    /* cast */
+    /* Cast */
     p_intf = (intf_thread_t*)p_data;
 
-    /* removes previous menu */
+    /* Removes previous menu */
     gtk_menu_item_remove_submenu( GTK_MENU_ITEM( p_chapter ) );
     gtk_widget_set_sensitive( p_chapter, FALSE );
 
@@ -663,17 +661,17 @@ static gint GnomeChapterMenu( gpointer p_data, GtkWidget * p_chapter,
                 gtk_menu_append( GTK_MENU( p_chapter_menu ), p_menu_item );
             }
 
-            snprintf( psz_name, GNOME_ANGLE_MENU_SIZE,
+            snprintf( psz_name, GNOME_MENU_LABEL_SIZE,
                       "%d - %d", i_chapter + 1, i_chapter + 10);
-            psz_name[ GNOME_ANGLE_MENU_SIZE - 1 ] = '\0';
+            psz_name[ GNOME_MENU_LABEL_SIZE - 1 ] = '\0';
             p_menu_item = gtk_menu_item_new_with_label( psz_name );
             gtk_widget_show( p_menu_item );
             p_chapter_submenu = gtk_menu_new();
         }
 
-        snprintf( psz_name, GNOME_ANGLE_MENU_SIZE,
+        snprintf( psz_name, GNOME_MENU_LABEL_SIZE,
                   "Chapter %d", i_chapter + 1 );
-        psz_name[ GNOME_ANGLE_MENU_SIZE - 1 ] = '\0';
+        psz_name[ GNOME_MENU_LABEL_SIZE - 1 ] = '\0';
 
         p_item = gtk_radio_menu_item_new_with_label( p_chapter_group,
                                                      psz_name );
@@ -742,9 +740,8 @@ static gint GnomeTitleMenu( gpointer       p_data,
                             GtkWidget *    p_navigation, 
                             void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
-#define GNOME_TITLE_MENU_SIZE 64
     intf_thread_t *     p_intf;
-    char                psz_name[ GNOME_TITLE_MENU_SIZE ];
+    char                psz_name[ GNOME_MENU_LABEL_SIZE ];
     GtkWidget *         p_title_menu;
     GtkWidget *         p_title_submenu;
     GtkWidget *         p_title_item;
@@ -791,17 +788,17 @@ static gint GnomeTitleMenu( gpointer       p_data,
                 gtk_menu_append( GTK_MENU( p_title_menu ), p_title_menu_item );
             }
 
-            snprintf( psz_name, GNOME_TITLE_MENU_SIZE,
+            snprintf( psz_name, GNOME_MENU_LABEL_SIZE,
                       "%d - %d", i_title, i_title + 9 );
-            psz_name[ GNOME_TITLE_MENU_SIZE - 1 ] = '\0';
+            psz_name[ GNOME_MENU_LABEL_SIZE - 1 ] = '\0';
             p_title_menu_item = gtk_menu_item_new_with_label( psz_name );
             gtk_widget_show( p_title_menu_item );
             p_title_submenu = gtk_menu_new();
         }
 
-        snprintf( psz_name, GNOME_TITLE_MENU_SIZE, "Title %d (%d)", i_title,
+        snprintf( psz_name, GNOME_MENU_LABEL_SIZE, "Title %d (%d)", i_title,
                   p_intf->p_input->stream.pp_areas[i_title]->i_part_nb );
-        psz_name[ GNOME_TITLE_MENU_SIZE - 1 ] = '\0';
+        psz_name[ GNOME_MENU_LABEL_SIZE - 1 ] = '\0';
 
         if( pf_toggle == on_menubar_title_toggle )
         {
@@ -850,18 +847,18 @@ static gint GnomeTitleMenu( gpointer       p_data,
                                          p_chapter_menu_item );
                     }
 
-                    snprintf( psz_name, GNOME_TITLE_MENU_SIZE,
+                    snprintf( psz_name, GNOME_MENU_LABEL_SIZE,
                               "%d - %d", i_chapter + 1, i_chapter + 10 );
-                    psz_name[ GNOME_TITLE_MENU_SIZE - 1 ] = '\0';
+                    psz_name[ GNOME_MENU_LABEL_SIZE - 1 ] = '\0';
                     p_chapter_menu_item =
                             gtk_menu_item_new_with_label( psz_name );
                     gtk_widget_show( p_chapter_menu_item );
                     p_chapter_submenu = gtk_menu_new();
                 }
 
-                snprintf( psz_name, GNOME_TITLE_MENU_SIZE,
+                snprintf( psz_name, GNOME_MENU_LABEL_SIZE,
                           "Chapter %d", i_chapter + 1 );
-                psz_name[ GNOME_TITLE_MENU_SIZE - 1 ] = '\0';
+                psz_name[ GNOME_MENU_LABEL_SIZE - 1 ] = '\0';
     
                 p_item = gtk_radio_menu_item_new_with_label(
                                                 p_chapter_group, psz_name );
@@ -970,7 +967,7 @@ static gint GnomeSetupMenu( intf_thread_t * p_intf )
                             p_intf->p_sys->p_window ), "menubar_title" ) );
         GnomeTitleMenu( p_intf, p_menubar_menu, on_menubar_title_toggle );
 
-        snprintf( psz_title, 5, "%d",
+        snprintf( psz_title, 4, "%d",
                   p_intf->p_input->stream.p_selected_area->i_id );
         psz_title[ 4 ] = '\0';
         gtk_label_set_text( p_intf->p_sys->p_label_title, psz_title );
@@ -990,7 +987,7 @@ static gint GnomeSetupMenu( intf_thread_t * p_intf )
                              p_intf->p_sys->p_window ), "menubar_chapter" ) );
         GnomeChapterMenu( p_intf, p_menubar_menu, on_menubar_chapter_toggle );
 
-        snprintf( psz_chapter, 5, "%d", 
+        snprintf( psz_chapter, 4, "%d", 
                   p_intf->p_input->stream.p_selected_area->i_part );
         psz_chapter[ 4 ] = '\0';
         gtk_label_set_text( p_intf->p_sys->p_label_chapter, psz_chapter );
