@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.79 2004/01/25 20:40:59 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.80 2004/01/26 18:57:18 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -133,6 +133,14 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( !E_(GetFfmpegCodec)( p_dec->fmt_in.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
     {
+        return VLC_EGENERIC;
+    }
+
+    /* Bail out if buggy decoder */
+    if( i_codec_id == CODEC_ID_AAC )
+    {
+        msg_Dbg( p_dec, "refusing to use ffmpeg's (%s) decoder which is buggy",
+                 psz_namecodec );
         return VLC_EGENERIC;
     }
 
@@ -660,11 +668,10 @@ static struct
       AUDIO_ES, "A52 Audio (aka AC3)" },
     { VLC_FOURCC('a','5','2','b'), CODEC_ID_AC3, /* VLC specific hack */
       AUDIO_ES, "A52 Audio (aka AC3)" },
-#if 0
+
     /* AAC audio */
     { VLC_FOURCC('m','p','4','a'), CODEC_ID_AAC,
       AUDIO_ES, "MPEG AAC Audio" },
-#endif
 
     /* 4X Technologies */
     { VLC_FOURCC('4','x','m','a'), CODEC_ID_ADPCM_4XM,
