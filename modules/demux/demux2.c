@@ -70,6 +70,7 @@ vlc_module_begin();
     add_shortcut( "mjpeg" );
     add_shortcut( "directory" );
     add_shortcut( "wav" );
+    add_shortcut( "v4l" );
 vlc_module_end();
 
 /*****************************************************************************
