@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001, 2003 VideoLAN
- * $Id: mtime.c,v 1.39 2003/12/03 21:50:50 sigmunau Exp $
+ * $Id: mtime.c,v 1.40 2003/12/09 19:18:48 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -154,9 +154,39 @@ mtime_t mdate( void )
         QueryPerformanceCounter( (LARGE_INTEGER *)&usec_time );
         return ( usec_time * 1000000 ) / freq;
     }
+    else
+    {
+        /* Fallback on GetTickCount() which has a milisecond resolution
+         * (actually, best case is about 10 ms resolution)
+         * GetTickCount() only returns a DWORD thus will wrap after
+         * about 49.7 days so we try to detect the wrapping. */
 
-    /* Milisecond resolution (actually, best case is about 10 ms resolution) */
-    return 1000 * GetTickCount();
+        static CRITICAL_SECTION date_lock;
+        static mtime_t i_previous_time = I64C(-1);
+        static int i_wrap_counts = -1;
+
+        if( i_wrap_counts == -1 )
+        {
+            /* Initialization */
+            i_previous_time = usec_time;
+            InitializeCriticalSection( &date_lock );
+            i_wrap_counts = 0;
+        }
+
+        EnterCriticalSection( &date_lock );
+        usec_time = I64C(1000) *
+            (i_wrap_counts * I64C(0x100000000) + GetTickCount());
+        if( i_previous_time > usec_time )
+        {
+            /* Counter wrapped */
+            i_wrap_counts++;
+            usec_time += I64C(0x100000000000);
+        }
+        i_previous_time = usec_time;
+        LeaveCriticalSection( &date_lock );
+
+        return usec_time;
+    }
 
 #else
     struct timeval tv_date;
