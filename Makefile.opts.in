@@ -202,7 +202,7 @@ CFLAGS += -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual
 endif
 
 ifneq (,$(findstring darwin,$(SYS)))
-CFLAGS += -traditional-cpp
+CFLAGS += -no-cpp-precomp
 endif
 
 ifneq (,$(findstring mingw32,$(SYS)))
