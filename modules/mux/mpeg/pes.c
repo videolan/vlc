@@ -2,7 +2,7 @@
  * pes.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.c,v 1.6 2003/06/09 07:16:41 gbazin Exp $
+ * $Id: pes.c,v 1.7 2003/06/10 22:42:59 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -46,7 +46,8 @@
 
 #define PES_PAYLOAD_SIZE_MAX 65500
 
-static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts, int i_es_size, int i_stream_id, int i_private_id )
+static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
+                             int i_es_size, int i_stream_id, int i_private_id )
 {
     bits_buffer_t bits;
 
@@ -196,8 +197,8 @@ int E_( EStoPES )( sout_instance_t *p_sout,
         i_stream_id  = PES_PRIVATE_STREAM_1;
     }
 
-    i_pts = p_es->i_pts * 9 / 100; // 90000 units clock
-    i_dts = p_es->i_dts * 9 / 100; // 90000 units clock
+    i_pts = p_es->i_pts < 0 ? -1 : p_es->i_pts * 9 / 100; // 90000 units clock
+    i_dts = p_es->i_dts < 0 ? -1 : p_es->i_dts * 9 / 100; // 90000 units clock
 
     i_size = p_es->i_size;
     p_data = p_es->p_buffer;
@@ -208,14 +209,17 @@ int E_( EStoPES )( sout_instance_t *p_sout,
     do
     {
         i_pes_payload = __MIN( i_size, PES_PAYLOAD_SIZE_MAX );
-        i_pes_header  = PESHeader( header, i_pts, i_dts, i_pes_payload, i_stream_id, i_private_id );
-        i_dts = -1; // only first PES has a dts
+        i_pes_header  = PESHeader( header, i_pts, i_dts, i_pes_payload,
+                                   i_stream_id, i_private_id );
+        i_dts = -1; // only first PES has a dts/pts
+        i_pts = -1;
 
         if( p_es  )
         {
             if( sout_BufferReallocFromPreHeader( p_sout, p_es, i_pes_header ) )
             {
-                msg_Err( p_sout, "cannot realloc prehader (should never happen)" );
+                msg_Err( p_sout,
+                         "cannot realloc preheader (should never happen)" );
                 return( -1 );
             }
             /* reuse p_es for first frame */
@@ -225,7 +229,8 @@ int E_( EStoPES )( sout_instance_t *p_sout,
         }
         else
         {
-            p_pes->p_next = sout_BufferNew( p_sout, i_pes_header + i_pes_payload );
+            p_pes->p_next = sout_BufferNew( p_sout,
+                                            i_pes_header + i_pes_payload );
             p_pes = p_pes->p_next;
 
             p_pes->i_dts    = 0;
@@ -233,7 +238,8 @@ int E_( EStoPES )( sout_instance_t *p_sout,
             p_pes->i_length = 0;
             if( i_pes_payload > 0 )
             {
-                p_sout->p_vlc->pf_memcpy( p_pes->p_buffer + i_pes_header, p_data, i_pes_payload );
+                p_sout->p_vlc->pf_memcpy( p_pes->p_buffer + i_pes_header,
+                                          p_data, i_pes_payload );
             }
         }
 
@@ -254,7 +260,3 @@ int E_( EStoPES )( sout_instance_t *p_sout,
 
     return( 0 );
 }
-
-
-
-

@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.14 2003/06/06 13:34:21 gbazin Exp $
+ * $Id: mpegvideo.c,v 1.15 2003/06/10 22:42:59 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -20,6 +20,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Problem with this implementation:
+ *
+ * Although we should time-stamp each picture with a PTS, this isn't possible
+ * with the current implementation.
+ * The problem comes from the fact that for non-low-delay streams we can't
+ * calculate the PTS of pictures used as backward reference. Even the temporal
+ * reference number doesn't help here because all the pictures don't
+ * necessarily have the same duration (eg. 3:2 pulldown).
+ *
+ * However this doesn't really matter as far as the MPEG muxers are concerned
+ * because they allow having empty PTS fields. --gibalou
  *****************************************************************************/
 
 /*****************************************************************************
@@ -47,15 +61,16 @@ typedef struct packetizer_s
     sout_packetizer_input_t *p_sout_input;
     sout_format_t           output_format;
 
-    mtime_t                 i_last_dts;
+    mtime_t                 i_interpolated_dts;
+    mtime_t                 i_old_duration;
     mtime_t                 i_last_ref_pts;
     double                  d_frame_rate;
     int                     i_progressive_sequence;
+    int                     i_low_delay;
     uint8_t                 p_sequence_header[150];
     int                     i_sequence_header_length;
     int                     i_last_sequence_header;
 
-    int                     i_last_picture_structure;
 } packetizer_t;
 
 static int  Open    ( vlc_object_t * );
@@ -172,7 +187,6 @@ static int InitThread( packetizer_t *p_pack )
         return -1;
     }
 
-    p_pack->i_last_picture_structure = 0x03; /* frame picture */
     return( 0 );
 }
 
@@ -180,7 +194,7 @@ static int InitThread( packetizer_t *p_pack )
 /* converting frame_rate_code to frame_rate */
 static const double pd_frame_rates[16] =
 {
-    0, 24000/1001, 24, 25, 30000/1001, 30, 50, 60000/1001, 60,
+    0, 24000.0/1001, 24, 25, 30000.0/1001, 30, 50, 60000.0/1001, 60,
     0, 0, 0, 0, 0, 0, 0
 };
 
@@ -220,11 +234,12 @@ static void PacketizeThread( packetizer_t *p_pack )
     int           i_skipped;
     mtime_t       i_duration; /* of the parsed picture */
 
-    mtime_t       i_pts;
-    mtime_t       i_dts;
+    mtime_t       i_pts = 0;
+    mtime_t       i_dts = 0;
 
     /* needed to calculate pts/dts */
     int i_temporal_ref = 0;
+    int i_picture_coding_type = 0;
     int i_picture_structure = 0x03; /* frame picture */
     int i_top_field_first = 0;
     int i_repeat_first_field = 0;
@@ -291,12 +306,13 @@ static void PacketizeThread( packetizer_t *p_pack )
         {
             msg_Dbg( p_pack->p_fifo, "ARRGG no extension_start_code" );
             p_pack->i_progressive_sequence = 1;
+            p_pack->i_low_delay = 1;
         }
         else
         {
             GetChunk( &p_pack->bit_stream, p_temp + i_pos, 10 );
             p_pack->i_progressive_sequence = ( p_temp[i_pos+5]&0x08 ) ? 1 : 0;
-
+            p_pack->i_low_delay = ( p_temp[i_pos+9]&0x80 ) ? 1 : 0;
             i_pos += 10;
         }
 
@@ -332,7 +348,7 @@ static void PacketizeThread( packetizer_t *p_pack )
     else
     {
         p_sout_buffer =
-                sout_BufferNew( p_pack->p_sout_input->p_sout, 100 * 1024 );
+            sout_BufferNew( p_pack->p_sout_input->p_sout, 100 * 1024 );
         i_pos = 0;
     }
 
@@ -365,11 +381,6 @@ static void PacketizeThread( packetizer_t *p_pack )
                i_pos += p_pack->i_sequence_header_length;
                p_pack->i_last_sequence_header = 0;
             }
-#if 1
-            p_pack->i_last_ref_pts =
-                   p_pack->i_last_dts +
-                        (mtime_t)( 1000000 / p_pack->d_frame_rate); /* FIXME */
-#endif
             CopyUntilNextStartCode( p_pack, p_sout_buffer, &i_pos );
         }
         else if( i_code == 0x100 ) /* Picture */
@@ -380,6 +391,7 @@ static void PacketizeThread( packetizer_t *p_pack )
 
             NextPTS( &p_pack->bit_stream, &i_pts, &i_dts );
             i_temporal_ref = ShowBits( &p_pack->bit_stream, 10 );
+            i_picture_coding_type = ShowBits( &p_pack->bit_stream, 13 ) & 0x3;
 
             CopyUntilNextStartCode( p_pack, p_sout_buffer, &i_pos );
         }
@@ -428,11 +440,18 @@ static void PacketizeThread( packetizer_t *p_pack )
         }
     }
 
+    if( i_pts <= 0 && i_dts <= 0 && p_pack->i_interpolated_dts <= 0 )
+    {
+        msg_Dbg( p_pack->p_fifo, "need a starting pts/dts" );
+        sout_BufferDelete( p_pack->p_sout_input->p_sout, p_sout_buffer );
+        return;
+    }
+
     sout_BufferRealloc( p_pack->p_sout_input->p_sout,
                         p_sout_buffer, i_pos );
     p_sout_buffer->i_size = i_pos;
 
-    /* calculate dts/pts */
+    /* calculate frame duration */
     if( p_pack->i_progressive_sequence || i_picture_structure == 0x03)
     {
         i_duration = (mtime_t)( 1000000 / p_pack->d_frame_rate );
@@ -442,75 +461,66 @@ static void PacketizeThread( packetizer_t *p_pack )
         i_duration = (mtime_t)( 1000000 / p_pack->d_frame_rate / 2);
     }
 
-    /* fix i_last_dts and i_last_ref_pts with i_dts and i_pts from stream */
-    if( i_dts <= 0 && p_pack->i_last_dts <= 0 )
-    {
-        msg_Dbg( p_pack->p_fifo, "need a starting pts" );
-        sout_BufferDelete( p_pack->p_sout_input->p_sout,
-                           p_sout_buffer );
-        return;
-    }
-
-#if 1
-    if( i_dts > 0 )
-    {
-        //if( i_dts - p_pack->i_last_dts > 200000 ||
-        //    i_dts - p_pack->i_last_dts < 200000 )
-        {
-            p_pack->i_last_dts = i_dts;
-            if( i_pts > 0 )
-            {
-                p_pack->i_last_ref_pts = i_pts -
-                    i_temporal_ref * (mtime_t)( 1000000 / p_pack->d_frame_rate );
-            }
-        }
-    }
-#endif
-
-    p_sout_buffer->i_dts = p_pack->i_last_dts;
-    p_sout_buffer->i_pts = p_pack->i_last_ref_pts + 
-        i_temporal_ref * (mtime_t)( 1000000 / p_pack->d_frame_rate );
-    p_sout_buffer->i_length = i_duration;
-    p_sout_buffer->i_bitrate = (int)( 8 * i_pos * p_pack->d_frame_rate );
-    sout_InputSendBuffer( p_pack->p_sout_input, p_sout_buffer );
-
     if( p_pack->i_progressive_sequence )
     {
-        if( i_top_field_first == 0 && i_repeat_first_field == 0 )
+        if( i_top_field_first == 0 && i_repeat_first_field == 1 )
         {
-            p_pack->i_last_dts += i_duration;
-        }
-        else if( i_top_field_first == 0 && i_repeat_first_field == 1 )
-        {
-            p_pack->i_last_dts += 2 * i_duration;
+            i_duration = 2 * i_duration;
         }
         else if( i_top_field_first == 1 && i_repeat_first_field == 1 )
         {
-            p_pack->i_last_dts += 3 * i_duration;
+            i_duration = 3 * i_duration;
         }
     }
     else
     {
         if( i_picture_structure == 0x03 )
         {
-            p_pack->i_last_dts += i_duration;
-
             if( i_progressive_frame && i_repeat_first_field )
             {
-                p_pack->i_last_dts += i_duration / 2;
+                i_duration += i_duration / 2;
             }
         }
-        else if( i_picture_structure == p_pack->i_last_picture_structure )
-        {
-            p_pack->i_last_dts += 2 * i_duration;
-        }
-        else if( ( !i_top_field_first && i_picture_structure == 0x01 ) ||
-                 (  i_top_field_first && i_picture_structure == 0x02 ) )
-        {
-            p_pack->i_last_dts += 2 * i_duration;
-        }
     }
-    p_pack->i_last_picture_structure = i_picture_structure;
+
+    if( p_pack->i_low_delay || i_picture_coding_type == 0x03 )
+    {
+        /* Trivial case (DTS == PTS) */
+        /* Correct interpolated dts when we receive a new pts/dts */
+        if( i_pts > 0 ) p_pack->i_interpolated_dts = i_pts;
+        if( i_dts > 0 ) p_pack->i_interpolated_dts = i_dts;
+    }
+    else
+    {
+        /* Correct interpolated dts when we receive a new pts/dts */
+        if( p_pack->i_last_ref_pts )
+            p_pack->i_interpolated_dts = p_pack->i_last_ref_pts;
+        if( i_dts > 0 ) p_pack->i_interpolated_dts = i_dts;
+
+        p_pack->i_last_ref_pts = i_pts;
+    }
+
+    /* Don't even try to calculate the PTS unless it is given in the
+     * original stream */
+    p_sout_buffer->i_pts = i_pts ? i_pts : -1;
+
+    p_sout_buffer->i_dts = p_pack->i_interpolated_dts;
+
+    if( p_pack->i_low_delay || i_picture_coding_type == 0x03 )
+    {
+        /* Trivial case (DTS == PTS) */
+        p_pack->i_interpolated_dts += i_duration;
+    }
+    else
+    {
+        p_pack->i_interpolated_dts += p_pack->i_old_duration;
+        p_pack->i_old_duration = i_duration;
+    }
+
+    p_sout_buffer->i_bitrate = (int)( 8 * i_pos * p_pack->d_frame_rate );
+    p_sout_buffer->i_length = i_duration;
+
+    sout_InputSendBuffer( p_pack->p_sout_input, p_sout_buffer );
 }
 
 

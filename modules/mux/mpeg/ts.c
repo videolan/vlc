@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.21 2003/06/01 00:26:41 fenrir Exp $
+ * $Id: ts.c,v 1.22 2003/06/10 22:42:59 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -614,6 +614,7 @@ static int Mux( sout_mux_t *p_mux )
 }
 
 
+#if defined MODULE_NAME_IS_mux_ts
 static uint32_t CalculateCRC( uint8_t *p_begin, int i_count )
 {
     static uint32_t CRC32[256] =
@@ -697,7 +698,6 @@ static uint32_t CalculateCRC( uint8_t *p_begin, int i_count )
     return( i_crc );
 }
 
-#if defined MODULE_NAME_IS_mux_ts
 static int GetPAT( sout_mux_t *p_mux,
                    sout_buffer_t **pp_ts )
 {
@@ -762,7 +762,7 @@ static int GetPMT( sout_mux_t *p_mux,
     bits_write( &bits, 16, 1 );     // FIXME program number
     bits_write( &bits, 2,  0 );     //  FIXME
     bits_write( &bits, 5,  p_sys->i_pmt_version_number );
-    bits_write( &bits, 1,  0 );     // current_next_indicator
+    bits_write( &bits, 1,  1 );     // current_next_indicator
     bits_write( &bits, 8,  0 );     // section number
     bits_write( &bits, 8,  0 );     // last section number
 
