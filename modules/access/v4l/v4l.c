@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.14 2003/05/08 19:21:39 fenrir Exp $
+ * $Id: v4l.c,v 1.15 2003/05/08 19:26:59 fenrir Exp $
  *
  * Author: Samuel Hocevar <sam@zoy.org>
  *
@@ -1262,13 +1262,7 @@ static int Demux( input_thread_t *p_input )
     {
         msg_Err( p_input, "cannot find ES" );
     }
-#if 0
-    if( p_es == NULL || p_es->p_decoder_fifo == NULL )
-    {
-        msg_Err( p_input, "cannot find decoder" );
-        return 1;
-    }
-#endif
+
     p_pes = input_NewPES( p_input->p_method_data );
     if( p_pes == NULL )
     {
