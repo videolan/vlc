@@ -6,6 +6,8 @@
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
+ *          Yoann Peronneau <yoann@videolan.org>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +38,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
+#include <vlc/aout.h>
 
 #ifdef HAVE_CDDAX
 #define CDDA_MRL "cddax://"
@@ -307,10 +310,25 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
         switch( i_key )
         {
-            /* Playlist sort */
+            vlc_value_t val;
+            /* Playlist Settings */
             case 'r':
-                playlist_Sort( p_sys->p_playlist, SORT_RANDOM, ORDER_NORMAL );
+                var_Get( p_sys->p_playlist, "random", &val );
+                val.b_bool = !val.b_bool;
+                var_Set( p_sys->p_playlist, "random", val );
                 return 1;
+            case 'l':
+                var_Get( p_sys->p_playlist, "loop", &val );
+                val.b_bool = !val.b_bool;
+                var_Set( p_sys->p_playlist, "loop", val );
+                return 1;
+            case 'R':
+                var_Get( p_sys->p_playlist, "repeat", &val );
+                val.b_bool = !val.b_bool;
+                var_Set( p_sys->p_playlist, "repeat", val );
+                return 1;
+
+            /* Playlist sort */
             case 'o':
                 playlist_Sort( p_sys->p_playlist, SORT_TITLE, ORDER_NORMAL );
                 return 1;
@@ -337,6 +355,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             case KEY_NPAGE:
                 p_sys->i_box_plidx += p_sys->i_box_lines;
                 break;
+            case 'D':
             case KEY_BACKSPACE:
             case KEY_DC:
             {
@@ -527,7 +546,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         case 'q':
         case 'Q':
         case 0x1b:  /* Esc */
-            p_intf->b_die = 1;
+            p_intf->p_vlc->b_die = VLC_TRUE;
             return 0;
 
         /* Box switching */
@@ -571,7 +590,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 p_sys->i_box_type = BOX_SEARCH;
             }
             return 1;
-        case 0x0f:      /* '^o': open */
+        case 'A': /* Open */
             if( p_sys->i_box_type != BOX_OPEN )
             {
                 if( p_sys->psz_open_chain == NULL )
@@ -667,11 +686,22 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             }
             clear();
             return 1;
+
         case 'n':
             if( p_intf->p_sys->p_playlist )
             {
                 playlist_Next( p_intf->p_sys->p_playlist );
             }
+            clear();
+            return 1;
+
+        case 'a':
+            aout_VolumeUp( p_intf, 1, NULL );
+            clear();
+            return 1;
+
+        case 'z':
+            aout_VolumeDown( p_intf, 1, NULL );
             clear();
             return 1;
 
@@ -849,7 +879,7 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
 
     /* Title */
     attrset ( A_REVERSE );
-    mvnprintw( y, 0, COLS, VOUT_TITLE " (ncurses interface) [ h for help ]" );
+    mvnprintw( y, 0, COLS, "VLC media player" " (ncurses interface) [ h for help ]" );
     attroff ( A_REVERSE );
     y += 2;
 
@@ -880,6 +910,8 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
         }
         if( val.i_int != INIT_S && val.i_int != END_S )
         {
+            audio_volume_t i_volume;
+
             /* Position */
             var_Get( p_input, "time", &val );
             msecstotimestr( buf1, val.i_time / 1000 );
@@ -888,6 +920,10 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
             msecstotimestr( buf2, val.i_time / 1000 );
 
             mvnprintw( y++, 0, COLS, " Position : %s/%s (%.2f%%)", buf1, buf2, p_sys->f_slider );
+
+            /* Volume */
+            aout_VolumeGet( p_intf, &i_volume );
+            mvnprintw( y++, 0, COLS, " Volume   : %i%%", i_volume*200/AOUT_VOLUME_MAX );
 
             /* Title */
             if( !var_Get( p_input, "title", &val ) )
@@ -942,43 +978,48 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
 
         MainBoxWrite( p_intf, l++, 1, "[Display]" );
         MainBoxWrite( p_intf, l++, 1, "     h,H         Show/Hide help box" );
-        MainBoxWrite( p_intf, l++, 1, "     i           Show/Hide informations box" );
-        MainBoxWrite( p_intf, l++, 1, "     l           Show/Hide logs box" );
+        MainBoxWrite( p_intf, l++, 1, "     i           Show/Hide info box" );
+        MainBoxWrite( p_intf, l++, 1, "     l           Show/Hide messages box" );
         MainBoxWrite( p_intf, l++, 1, "     P           Show/Hide playlist box" );
         MainBoxWrite( p_intf, l++, 1, "" );
 
         MainBoxWrite( p_intf, l++, 1, "[Global]" );
         MainBoxWrite( p_intf, l++, 1, "     q, Q        Quit" );
         MainBoxWrite( p_intf, l++, 1, "     s           Stop" );
-        MainBoxWrite( p_intf, l++, 1, "   <space>       Pause/Play" );
-        MainBoxWrite( p_intf, l++, 1, "     n, p        Next/Previous item" );
+        MainBoxWrite( p_intf, l++, 1, "     <space>     Pause/Play" );
+        MainBoxWrite( p_intf, l++, 1, "     f           Toggle Fullscreen" );
+        MainBoxWrite( p_intf, l++, 1, "     n, p        Next/Previous playlist item" );
         MainBoxWrite( p_intf, l++, 1, "     [, ]        Next/Previous title" );
-        MainBoxWrite( p_intf, l++, 1, "     <, >        Next/Previous title" );
+        MainBoxWrite( p_intf, l++, 1, "     <, >        Next/Previous chapter" );
         MainBoxWrite( p_intf, l++, 1, "     <right>     Seek +1%%" );
         MainBoxWrite( p_intf, l++, 1, "     <left>      Seek -1%%" );
+        MainBoxWrite( p_intf, l++, 1, "     a           Volume Up" );
+        MainBoxWrite( p_intf, l++, 1, "     z           Volume Down" );
         MainBoxWrite( p_intf, l++, 1, "" );
 
         MainBoxWrite( p_intf, l++, 1, "[Playlist]" );
-        MainBoxWrite( p_intf, l++, 1, "     r           Randomize playlist" );
-        MainBoxWrite( p_intf, l++, 1, "     o           Order Playlist" );
-        MainBoxWrite( p_intf, l++, 1, "     O           Reverse order Playlist" );
+        MainBoxWrite( p_intf, l++, 1, "     r           Random" );
+        MainBoxWrite( p_intf, l++, 1, "     l           Loop Playlist" );
+        MainBoxWrite( p_intf, l++, 1, "     R           Repeat item" );
+        MainBoxWrite( p_intf, l++, 1, "     o           Order Playlist by title" );
+        MainBoxWrite( p_intf, l++, 1, "     O           Reverse order Playlist by title" );
         MainBoxWrite( p_intf, l++, 1, "     /           Look for an item" );
-        MainBoxWrite( p_intf, l++, 1, "   Ctrl-o        Add an entry" );
-        MainBoxWrite( p_intf, l++, 1, "   <del>         Delete an entry" );
-        MainBoxWrite( p_intf, l++, 1, "  <backspace>    Delete an entry" );
+        MainBoxWrite( p_intf, l++, 1, "     A           Add an entry" );
+        MainBoxWrite( p_intf, l++, 1, "     D, <del>    Delete an entry" );
+        MainBoxWrite( p_intf, l++, 1, "     <backspace> Delete an entry" );
         MainBoxWrite( p_intf, l++, 1, "" );
 
         MainBoxWrite( p_intf, l++, 1, "[Boxes]" );
-        MainBoxWrite( p_intf, l++, 1, "  <up>,<down>    Navigate through the box line by line" );
-        MainBoxWrite( p_intf, l++, 1, " <pgup>,<pgdown> Navigate through the box page by page" );
+        MainBoxWrite( p_intf, l++, 1, "     <up>,<down>     Navigate through the box line by line" );
+        MainBoxWrite( p_intf, l++, 1, "     <pgup>,<pgdown> Navigate through the box page by page" );
         MainBoxWrite( p_intf, l++, 1, "" );
 
         MainBoxWrite( p_intf, l++, 1, "[Player]" );
-        MainBoxWrite( p_intf, l++, 1, "  <up>,<down>    Seek +/-5%%" );
+        MainBoxWrite( p_intf, l++, 1, "     <up>,<down>     Seek +/-5%%" );
         MainBoxWrite( p_intf, l++, 1, "" );
 
         MainBoxWrite( p_intf, l++, 1, "[Miscellaneous]" );
-        MainBoxWrite( p_intf, l++, 1, "   Ctrl-l        Refresh the screen" );
+        MainBoxWrite( p_intf, l++, 1, "     Ctrl-l          Refresh the screen" );
 
         p_sys->i_box_lines_total = l;
         if( p_sys->i_box_start >= p_sys->i_box_lines_total )
@@ -1004,8 +1045,7 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
         if( p_input )
         {
             int i,j;
-
-            vlc_mutex_lock( &p_input->stream.stream_lock );
+            vlc_mutex_lock( &p_input->p_item->lock );
             for ( i = 0; i < p_input->p_item->i_categories; i++ )
             {
                 info_category_t *p_category = p_input->p_item->pp_categories[i];
