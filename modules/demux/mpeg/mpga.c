@@ -2,7 +2,7 @@
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpga.c,v 1.12 2003/12/22 02:24:52 sam Exp $
+ * $Id: mpga.c,v 1.13 2003/12/27 14:47:10 asmax Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -252,6 +252,7 @@ static int Open( vlc_object_t * p_this )
         char psz_description[50];
 
         p_sys->i_bitrate_avg = MPGA_BITRATE( header ) * 1000;
+    fprintf(stderr,"rate1 %d\n", p_sys->i_bitrate_avg);
         if( ( i_xing = stream_Peek( p_input->s, &p_xing, 1024 ) ) >= 21 )
         {
             int i_skip;
@@ -288,12 +289,17 @@ static int Open( vlc_object_t * p_this )
                 {
                     i_skip += 100;
                 }
+#if 0
+// FIXME: doesn't return the right bitrage average, at least with some MP3's
                 if( i_flags&0x08 && i_skip + 4 <= i_xing )   /* XING_VBR */
                 {
                     p_sys->i_bitrate_avg = GetDWBE( &p_xing[i_skip] );
+    fprintf(stderr,"rate2 %d\n", p_sys->i_bitrate_avg);
                     msg_Dbg( p_input, "xing vbr value present (%d)", p_sys->i_bitrate_avg );
                 }
-                else if( i_frames > 0 && i_bytes > 0 )
+                else
+#endif
+                if( i_frames > 0 && i_bytes > 0 )
                 {
                     p_sys->i_bitrate_avg = (int64_t)i_bytes *
                                            (int64_t)8 *
