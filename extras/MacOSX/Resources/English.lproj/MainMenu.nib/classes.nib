@@ -42,7 +42,12 @@
             }; 
             CLASS = VLCControls; 
             LANGUAGE = ObjC; 
-            OUTLETS = {"o_main" = id; "o_open" = id; "o_volumeslider" = id; }; 
+            OUTLETS = {
+                "o_btn_fullscreen" = id; 
+                "o_main" = id; 
+                "o_open" = id; 
+                "o_volumeslider" = id; 
+            }; 
             SUPERCLASS = NSObject; 
         }, 
         {
@@ -73,7 +78,6 @@
                 "o_btn_fullscreen" = id; 
                 "o_btn_next" = id; 
                 "o_btn_play" = id; 
-                "o_btn_playlist" = id; 
                 "o_btn_prev" = id; 
                 "o_btn_rewind" = id; 
                 "o_btn_stop" = id; 
@@ -331,6 +335,7 @@
             CLASS = VLCPlaylist; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                "o_btn_playlist" = id; 
                 "o_ctx_menu" = id; 
                 "o_loop_ckb" = id; 
                 "o_mi_delete" = id; 

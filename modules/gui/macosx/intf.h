@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.50 2003/12/11 16:00:09 hartman Exp $
+ * $Id: intf.h,v 1.51 2003/12/11 19:34:47 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -100,7 +100,6 @@ struct intf_sys_t
     float f_slider_old;         /* old slider val */ 
     IBOutlet id o_volumeslider; /* volume slider  */
 
-    IBOutlet id o_btn_playlist; /* btn playlist   */
     IBOutlet id o_btn_prev;     /* btn previous   */
     IBOutlet id o_btn_rewind;   /* btn rewind     */
     IBOutlet id o_btn_play;     /* btn play       */

@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.47 2003/12/10 12:57:12 bigben Exp $
+ * $Id: playlist.m,v 1.48 2003/12/11 19:34:46 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -133,7 +133,11 @@
         [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
 
     [o_window setExcludedFromWindowsMenu: TRUE];
+    [self initStrings];
+}
 
+- (void)initStrings
+{
     [o_window setTitle: _NS("Playlist")];
     [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
     [o_mi_play setTitle: _NS("Play")];
@@ -145,6 +149,7 @@
     [o_loop_ckb setTitle: _NS("Repeat Playlist")];
     [o_repeat_ckb setTitle: _NS("Repeat Item")];
     [o_search_button setTitle: _NS("Search")];
+    [o_btn_playlist setToolTip: _NS("Playlist")];
 }
 
 - (BOOL)tableView:(NSTableView *)o_tv 
@@ -178,10 +183,12 @@
     if( [o_window isVisible] )
     {
         [o_window orderOut:sender];
+        [o_btn_playlist setState:NSOffState];
     }
     else
     {
         [o_window makeKeyAndOrderFront:sender];
+        [o_btn_playlist setState:NSOnState];
     }
 }
 
@@ -597,6 +604,12 @@
         return NO;
     }
     [self updateRowSelection];
+}
+
+/* Delegate method of NSWindow */
+- (void)windowWillClose:(NSNotification *)aNotification
+{
+    [o_btn_playlist setState: NSOffState];
 }
 
 @end

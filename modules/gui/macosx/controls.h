@@ -2,7 +2,7 @@
  * controls.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.h,v 1.7 2003/09/20 19:37:53 hartman Exp $
+ * $Id: controls.h,v 1.8 2003/12/11 19:34:47 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -31,6 +31,7 @@
     IBOutlet id o_open;
     IBOutlet id o_main;
 
+    IBOutlet id o_btn_fullscreen;
     IBOutlet id o_volumeslider;
 }
 

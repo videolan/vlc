@@ -2,7 +2,7 @@
  * playlist.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.h,v 1.15 2003/11/17 23:36:12 bigben Exp $
+ * $Id: playlist.h,v 1.16 2003/12/11 19:34:46 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -39,6 +39,7 @@
     int i_moveRow;
     
     IBOutlet id o_window;
+    IBOutlet id o_btn_playlist;
     IBOutlet id o_table_view;
     
     IBOutlet id o_status_field;
@@ -60,6 +61,7 @@
 
 }
 
+- (void)initStrings;
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
 
 - (IBAction)toggleWindow:(id)sender;

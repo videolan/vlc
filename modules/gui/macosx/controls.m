@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.57 2003/12/08 19:50:22 gbazin Exp $
+ * $Id: controls.m,v 1.58 2003/12/11 19:34:47 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -356,7 +356,10 @@
                         [o_window performZoom:self];
                 }
                 else
+                {
+                    [o_btn_fullscreen setState: ![o_window isFullscreen]];
                     [o_window toggleFullscreen];
+                }
                 break;
             }
         }
