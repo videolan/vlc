@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.21 2003/04/20 11:57:13 gbazin Exp $
+ * $Id: video.c,v 1.22 2003/04/26 21:45:26 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -439,9 +439,26 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
         p_vdec->p_context->hurry_up = 0;
     }
 
+    if( p_vdec->i_frame_late > 0 && mdate() - p_vdec->i_frame_late_start > (mtime_t)5000000 )
+    {
+        msg_Err( p_vdec->p_fifo, "more than 5 second of late video -> dropping (to slow computer ?)" );
+        do
+        {
+            input_ExtractPES( p_vdec->p_fifo, &p_pes );
+            if( !p_pes )
+            {
+                p_vdec->p_fifo->b_error = 1;
+                return;
+            }
+            i_pts = p_pes->i_pts;
+            input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
+
+        } while( i_pts <= 0 || i_pts < mdate() + DEFAULT_PTS_DELAY );
+    }
+
     if( !p_vdec->p_context->width || !p_vdec->p_context->height )
     {
-        p_vdec->p_context->hurry_up = 5; 
+        p_vdec->p_context->hurry_up = 5;
     }
 
     do
@@ -554,6 +571,10 @@ usenextdata:
     if( p_vdec->pts <= mdate() )
     {
         p_vdec->i_frame_late++;
+        if( p_vdec->i_frame_late == 1 )
+        {
+            p_vdec->i_frame_late_start = mdate();
+        }
     }
     else
     {
