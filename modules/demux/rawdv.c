@@ -2,7 +2,7 @@
  * rawdv.c : raw dv input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rawdv.c,v 1.3 2003/01/23 09:00:36 fenrir Exp $
+ * $Id: rawdv.c,v 1.4 2003/02/18 19:42:57 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -86,6 +86,7 @@ struct demux_sys_t
 
     /* codec specific stuff */
     BITMAPINFOHEADER *p_bih;
+    WAVEFORMATEX *p_wf;
 
     double f_rate;
     int    i_bitrate;
@@ -123,7 +124,7 @@ vlc_module_end();
 static int Activate( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    byte_t         *p_peek;
+    byte_t         *p_peek, *p_peek_backup;
     uint32_t       i_dword;
     demux_sys_t    *p_rawdv;
     dv_header_t    dv_header;
@@ -152,6 +153,7 @@ static int Activate( vlc_object_t * p_this )
         msg_Err( p_input, "cannot peek()" );
         return -1;
     }
+    p_peek_backup = p_peek;
 
     /* fill in the dv_id_t structure */
     i_dword = GetDWBE( p_peek ); p_peek += 4;
@@ -206,6 +208,7 @@ static int Activate( vlc_object_t * p_this )
     }
     memset( p_rawdv, 0, sizeof( demux_sys_t ) );
     p_rawdv->p_bih = NULL;
+    p_rawdv->p_wf = NULL;
     p_input->p_demux_data = p_rawdv;
 
     p_rawdv->p_bih = (BITMAPINFOHEADER *) malloc( sizeof(BITMAPINFOHEADER) );
@@ -236,6 +239,32 @@ static int Activate( vlc_object_t * p_this )
         p_rawdv->frame_size = 10 * 150 * 80;
         p_rawdv->f_rate = 29.97;
     }
+
+    /* Audio stuff */
+#if 0
+    p_peek = p_peek_backup + 80*6+80*16*3 + 3; /* beginning of AAUX pack */
+
+    if( *p_peek != 0x50 || *p_peek != 0x51 )
+    {
+        msg_Err( p_input, "AAUX should begin with 0x50" );
+    }
+#endif
+
+    p_rawdv->p_wf = (WAVEFORMATEX *)malloc( sizeof(WAVEFORMATEX) );
+    if( !p_rawdv->p_wf )
+    {
+        msg_Err( p_input, "out of memory" );
+        goto error;
+    }
+
+    p_rawdv->p_wf->wFormatTag = 0;
+    p_rawdv->p_wf->nChannels = 2;
+    p_rawdv->p_wf->nSamplesPerSec = 44100; /* FIXME */
+    p_rawdv->p_wf->nAvgBytesPerSec = p_rawdv->f_rate * p_rawdv->frame_size;
+    p_rawdv->p_wf->nBlockAlign = p_rawdv->frame_size;
+    p_rawdv->p_wf->wBitsPerSample = 16;
+    p_rawdv->p_wf->cbSize = 0;
+
 
     /* necessary because input_SplitBuffer() will only get
      * INPUT_DEFAULT_BUFSIZE bytes at a time. */
@@ -271,6 +300,18 @@ static int Activate( vlc_object_t * p_this )
     input_SelectES( p_input, p_rawdv->p_video_es );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
+    /* Add audio stream */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_rawdv->p_audio_es = input_AddES( p_input,
+                                       p_input->stream.p_selected_program,
+                                       2, 0 );
+    p_rawdv->p_audio_es->i_stream_id = 1;
+    p_rawdv->p_audio_es->i_fourcc = VLC_FOURCC( 'd','v','a','u' );
+    p_rawdv->p_audio_es->i_cat = AUDIO_ES;
+    p_rawdv->p_audio_es->p_waveformatex = (void *)p_rawdv->p_wf;
+    input_SelectES( p_input, p_rawdv->p_audio_es );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
     /* Init pcr */
     p_rawdv->i_pcr = 0;
 
@@ -278,6 +319,7 @@ static int Activate( vlc_object_t * p_this )
 
  error:
     if( p_rawdv->p_bih ) free( p_rawdv->p_bih );
+    if( p_rawdv->p_wf ) free( p_rawdv->p_wf );
     Deactivate( (vlc_object_t *)p_input );
     return -1;
 }
@@ -301,16 +343,10 @@ static void Deactivate( vlc_object_t *p_this )
 static int Demux( input_thread_t * p_input )
 {
     demux_sys_t    *p_rawdv = (demux_sys_t *)p_input->p_demux_data;
-    decoder_fifo_t *p_fifo =
-        p_input->stream.p_selected_program->pp_es[0]->p_decoder_fifo;
     pes_packet_t   *p_pes;
+    pes_packet_t   *p_audio_pes;
     data_packet_t  *p_data;
     ssize_t        i_read;
-
-    if( p_fifo == NULL )
-    {
-        return -1;
-    }
 
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
@@ -344,6 +380,7 @@ static int Demux( input_thread_t * p_input )
         return i_read;
     }
 
+    /* Build video PES packet */
     p_pes = input_NewPES( p_input->p_method_data );
     if( p_pes == NULL )
     {
@@ -360,7 +397,27 @@ static int Demux( input_thread_t * p_input )
         input_ClockGetTS( p_input, p_input->stream.p_selected_program,
                           p_rawdv->i_pcr );
 
-    input_DecodePES( p_fifo, p_pes );
+    /* Do the same for audio */
+    p_audio_pes = input_NewPES( p_input->p_method_data );
+    if( p_pes == NULL )
+    {
+        msg_Err( p_input, "out of memory" );
+        input_DeletePacket( p_input->p_method_data, p_data );
+        return -1;
+    }
+    p_audio_pes->i_rate = p_input->stream.control.i_rate;
+    p_audio_pes->p_first = p_audio_pes->p_last =
+        input_ShareBuffer( p_input->p_method_data, p_data->p_buffer );
+    p_audio_pes->p_first->p_next = p_data->p_next;
+    p_audio_pes->p_first->p_payload_start = p_data->p_payload_start;
+    p_audio_pes->p_first->p_payload_end = p_data->p_payload_end;
+    p_audio_pes->i_pes_size = i_read;
+    p_audio_pes->i_nb_data = 1;
+    p_audio_pes->i_pts = p_pes->i_pts;
+
+    /* Decode PES packets */
+    input_DecodePES( p_rawdv->p_video_es->p_decoder_fifo, p_pes );
+    input_DecodePES( p_rawdv->p_audio_es->p_decoder_fifo, p_audio_pes );
 
     p_rawdv->i_pcr += ( 90000 / p_rawdv->f_rate );
 
