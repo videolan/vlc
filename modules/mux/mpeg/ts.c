@@ -651,7 +651,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 case VLC_FOURCC('d','v','b','s'):
                     p_stream->i_stream_type = 0x06;
                     p_stream->i_es_id = p_input->p_fmt->subs.dvb.i_id;
-                    p_stream->i_stream_id = 0xa0;
+                    p_stream->i_stream_id = 0xbd;
                     break;
                 default:
                     free( p_stream );
@@ -1895,7 +1895,7 @@ static void GetPMT( sout_mux_t *p_mux,
             dvbpsi_descriptor_t *p_descr;
 
             memcpy( sub.i_iso6392_language_code, p_stream->lang, 3 );
-            sub.i_subtitling_type = 0;
+            sub.i_subtitling_type = 0x10; /* no aspect-ratio criticality */
             sub.i_composition_page_id = p_stream->i_es_id & 0xFF;
             sub.i_ancillary_page_id = p_stream->i_es_id >> 16;
 
