@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.48 2002/04/05 01:05:22 gbazin Exp $
+ * $Id: video.h,v 1.49 2002/04/15 23:04:08 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -182,8 +182,11 @@ typedef struct picture_heap_s
 
 /* Shortcuts */
 #define Y_PIXELS     p[Y_PLANE].p_pixels
+#define Y_PITCH      p[Y_PLANE].i_pitch
 #define U_PIXELS     p[U_PLANE].p_pixels
+#define U_PITCH      p[U_PLANE].i_pitch
 #define V_PIXELS     p[V_PLANE].p_pixels
+#define V_PITCH      p[V_PLANE].i_pitch
 
 static __inline__ int vout_ChromaCmp( u32 i_chroma, u32 i_amorhc )
 {

@@ -2,7 +2,7 @@
  * vdec_ext-plugins.h : structures from the video decoder exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_ext-plugins.h,v 1.10 2002/04/05 01:05:22 gbazin Exp $
+ * $Id: vdec_ext-plugins.h,v 1.11 2002/04/15 23:04:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -60,7 +60,6 @@ typedef struct macroblock_s
     yuv_data_t *            p_v_data;
                                                     /* pointers to the position
                                                      * in the final picture  */
-
     /* Motion compensation information */
     motion_inner_t          p_motions[8];
     int                     i_nb_motions;

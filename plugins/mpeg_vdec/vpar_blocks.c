@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_blocks.c,v 1.7 2002/03/17 17:00:38 sam Exp $
+ * $Id: vpar_blocks.c,v 1.8 2002/04/15 23:04:08 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -1160,8 +1160,8 @@ static void MotionMPEG1( vpar_thread_t * p_vpar,
 {
     int i_motion_x, i_motion_y;
     int i_offset = p_vpar->mb.i_offset;
-    int i_width = p_vpar->picture.i_field_width;
-    
+    int i_width = p_vpar->picture.i_lum_stride;
+
     i_motion_x = p_motion->ppi_pmv[0][0]
                         + MotionDelta( p_vpar, p_motion->pi_f_code[0] );
     i_motion_x = BoundMotionVector( i_motion_x, p_motion->pi_f_code[0] );
@@ -1189,7 +1189,7 @@ static void MotionMPEG1Reuse( vpar_thread_t * p_vpar,
 {
     int i_motion_x, i_motion_y;
     int i_offset = p_vpar->mb.i_offset;
-    int i_width = p_vpar->picture.i_field_width;
+    int i_width = p_vpar->picture.i_lum_stride;
 
     i_motion_x = p_motion->ppi_pmv[0][0];
     i_motion_y = p_motion->ppi_pmv[0][1];
@@ -1213,7 +1213,7 @@ static void MotionFrameFrame( vpar_thread_t * p_vpar,
 {
     int i_motion_x, i_motion_y;
     int i_offset = p_vpar->mb.i_offset;
-    int i_width = p_vpar->picture.i_field_width;
+    int i_width = p_vpar->picture.i_lum_stride;
 
     i_motion_x = p_motion->ppi_pmv[0][0]
                         + MotionDelta( p_vpar, p_motion->pi_f_code[0] );
@@ -1236,7 +1236,7 @@ static void MotionFrameField( vpar_thread_t * p_vpar,
 {
     int i_motion_x, i_motion_y, i_field_select;
     int i_offset = p_vpar->mb.i_offset;
-    int i_width = p_vpar->picture.i_field_width;
+    int i_width = p_vpar->picture.i_lum_stride;
 
     i_field_select = GetSignedBits( &p_vpar->bit_stream, 1 );
 
@@ -1284,7 +1284,7 @@ static void MotionFrameDMV( vpar_thread_t * p_vpar,
     int i_tmp_x, i_tmp_y;
 
     int i_offset = p_vpar->mb.i_offset;
-    int i_width = p_vpar->picture.i_field_width;
+    int i_width = p_vpar->picture.i_lum_stride;
     int m;
 
     i_motion_x = p_motion->ppi_pmv[0][0]
@@ -1326,7 +1326,7 @@ static void MotionFrameZero( vpar_thread_t * p_vpar,
                                         boolean_t b_average )
 {
     int i_offset = p_vpar->mb.i_offset;
-    int i_width = p_vpar->picture.i_field_width;
+    int i_width = p_vpar->picture.i_lum_stride;
 
     MOTION_BLOCK( b_average, 0, 0, i_offset, p_motion->pppi_ref[0],
                   i_offset, i_width, 16, 0 );
@@ -1338,7 +1338,7 @@ static void MotionFrameReuse( vpar_thread_t * p_vpar,
                                          boolean_t b_average )
 {
     int i_offset = p_vpar->mb.i_offset;
-    int i_width = p_vpar->picture.i_field_width;
+    int i_width = p_vpar->picture.i_lum_stride;
 
     MOTION_BLOCK( b_average, p_motion->ppi_pmv[0][0], p_motion->ppi_pmv[0][1],
                   i_offset, p_motion->pppi_ref[0], i_offset, i_width, 16, 0 );
@@ -1354,7 +1354,7 @@ static void MotionFieldField( vpar_thread_t * p_vpar,
     int i_motion_x, i_motion_y;
     boolean_t b_field_select;
     int i_offset = p_vpar->mb.i_offset;
-    int i_width = p_vpar->picture.i_field_width;
+    int i_width = p_vpar->picture.i_lum_stride;
 
     b_field_select = GetBits( &p_vpar->bit_stream, 1 );
 
@@ -1380,7 +1380,7 @@ static void MotionField16x8( vpar_thread_t * p_vpar,
     int i_motion_x, i_motion_y;
     boolean_t b_field_select;
     int i_offset = p_vpar->mb.i_offset;
-    int i_width = p_vpar->picture.i_field_width;
+    int i_width = p_vpar->picture.i_lum_stride;
 
     /* First half. */
     b_field_select = GetBits( &p_vpar->bit_stream, 1 );
@@ -1423,7 +1423,7 @@ static void MotionFieldDMV( vpar_thread_t * p_vpar,
     int i_motion_x, i_motion_y;
     int i_dmv_x, i_dmv_y;
     int i_offset = p_vpar->mb.i_offset;
-    int i_width = p_vpar->picture.i_field_width;
+    int i_width = p_vpar->picture.i_lum_stride;
     boolean_t b_current_field = p_vpar->picture.b_current_field;
 
     i_motion_x = p_motion->ppi_pmv[0][0]
@@ -1458,7 +1458,7 @@ static void MotionFieldZero( vpar_thread_t * p_vpar,
                                         boolean_t b_average )
 {
     int i_offset = p_vpar->mb.i_offset;
-    int i_width = p_vpar->picture.i_field_width;
+    int i_width = p_vpar->picture.i_lum_stride;
     boolean_t b_current_field = p_vpar->picture.b_current_field;
 
     MOTION_BLOCK( b_average, 0, 0, i_offset, p_motion->pppi_ref[b_current_field],
@@ -1471,7 +1471,7 @@ static void MotionFieldReuse( vpar_thread_t * p_vpar,
                                          boolean_t b_average )
 {
     int i_offset = p_vpar->mb.i_offset;
-    int i_width = p_vpar->picture.i_field_width;
+    int i_width = p_vpar->picture.i_lum_stride;
     boolean_t b_current_field = p_vpar->picture.b_current_field;
 
     MOTION_BLOCK( b_average, p_motion->ppi_pmv[0][0], p_motion->ppi_pmv[0][1],
@@ -1735,24 +1735,24 @@ mb_intra:
 
 #define CHECK_BOUNDARIES                                                    \
     i_offset = p_vpar->mb.i_offset;                                         \
-    if( i_offset == i_width )                                               \
+    if( i_offset == p_vpar->picture.i_field_width )                         \
     {                                                                       \
         if( i_coding_type != I_CODING_TYPE ||                               \
             p_vpar->picture.b_concealment_mv )                              \
         {                                                                   \
-            p_f_motion->pppi_ref[0][0] += 16 * i_offset;                    \
-            p_f_motion->pppi_ref[0][1] += i_chroma_tmp;                  \
-            p_f_motion->pppi_ref[0][2] += i_chroma_tmp;                  \
+            p_f_motion->pppi_ref[0][0] += i_lum_vsize;                      \
+            p_f_motion->pppi_ref[0][1] += i_chrom_vsize;                    \
+            p_f_motion->pppi_ref[0][2] += i_chrom_vsize;                    \
         }                                                                   \
         if( i_coding_type == B_CODING_TYPE )                                \
         {                                                                   \
-            p_b_motion->pppi_ref[0][0] += 16 * i_offset;                    \
-            p_b_motion->pppi_ref[0][1] += i_chroma_tmp;                  \
-            p_b_motion->pppi_ref[0][2] += i_chroma_tmp;                  \
+            p_b_motion->pppi_ref[0][0] += i_lum_vsize;                      \
+            p_b_motion->pppi_ref[0][1] += i_chrom_vsize;                    \
+            p_b_motion->pppi_ref[0][2] += i_chrom_vsize;                    \
         }                                                                   \
-        p_dest[0] += 16 * i_offset;                                         \
-        p_dest[1] += 4 * i_offset;                                       \
-        p_dest[2] += 4 * i_offset;                                       \
+        p_dest[0] += i_lum_vsize;                                           \
+        p_dest[1] += i_chrom_vsize;                                         \
+        p_dest[2] += i_chrom_vsize;                                         \
         i_offset = 0;                                                       \
     }                                                                       \
     p_vpar->mb.i_offset = i_offset;
@@ -1769,7 +1769,7 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
                                    u32 i_vert_code, boolean_t b_mpeg2,
                                    int i_coding_type, int i_structure )
 {
-    int             i_offset, i_width, i_chroma_tmp;
+    int             i_lum_offset, i_chrom_offset, i_offset, i_lum_vsize, i_chrom_vsize;
     picture_t *     pp_forward_ref[2];
     yuv_data_t *    p_dest[3];
 
@@ -1791,19 +1791,23 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
     }
 
     /* Calculate the position of the macroblock. */
-    i_width = p_vpar->sequence.i_width;
-    i_offset = (i_vert_code - 1) * i_width * 4;
+    i_lum_offset = (i_vert_code - 1) * p_vpar->picture.p_picture->Y_PITCH * 16;
+    i_chrom_offset = (i_vert_code - 1) * p_vpar->picture.p_picture->U_PITCH
+                       * 8 * (2 - p_vpar->sequence.b_chroma_v_subsampled);
+    i_lum_vsize = 16 * p_vpar->picture.p_picture->Y_PITCH;
+    i_chrom_vsize = 8 * (2 - p_vpar->sequence.b_chroma_v_subsampled)
+                      * p_vpar->picture.p_picture->U_PITCH;
 
     /* Initialize motion context. */
     pp_forward_ref[0] = p_vpar->sequence.p_forward;
 
     if( i_structure != FRAME_STRUCTURE )
     {
-        i_offset <<= 1;
-        i_chroma_tmp =
-            i_offset * (2 - p_vpar->sequence.b_chroma_v_subsampled)
-             * (2 - p_vpar->sequence.b_chroma_h_subsampled)
-              + (i_width >> p_vpar->sequence.b_chroma_h_subsampled);
+        i_lum_offset <<= 1;
+        i_chrom_offset <<= 1;
+        i_lum_vsize <<= 1;
+        i_chrom_vsize <<= 1;
+
         pp_forward_ref[1] = p_vpar->sequence.p_forward;
 
         if( i_coding_type != B_CODING_TYPE && p_vpar->picture.b_second_field )
@@ -1813,32 +1817,34 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
         }
         if( i_coding_type != I_CODING_TYPE || p_vpar->picture.b_concealment_mv )
         {
-            p_f_motion->pppi_ref[1][0] =
-                pp_forward_ref[1]->Y_PIXELS + i_offset * 4 + i_width;
-            p_f_motion->pppi_ref[1][1] =
-                pp_forward_ref[1]->U_PIXELS + i_chroma_tmp;
-            p_f_motion->pppi_ref[1][2] =
-                pp_forward_ref[1]->V_PIXELS + i_chroma_tmp;
+            int i_tmp;
+            p_f_motion->pppi_ref[1][0] = pp_forward_ref[1]->Y_PIXELS +
+	        i_lum_offset + pp_forward_ref[1]->Y_PITCH;
+            p_f_motion->pppi_ref[1][1] = pp_forward_ref[1]->U_PIXELS +
+	        (i_tmp = i_chrom_offset + pp_forward_ref[1]->U_PITCH);
+            p_f_motion->pppi_ref[1][2] = pp_forward_ref[1]->V_PIXELS +
+	        i_tmp;
         }
         if( i_coding_type == B_CODING_TYPE )
         {
-            p_b_motion->pppi_ref[1][0] =
-                p_vpar->sequence.p_backward->Y_PIXELS + i_offset * 4 + i_width;
-            p_b_motion->pppi_ref[1][1] =
-                p_vpar->sequence.p_backward->U_PIXELS + i_chroma_tmp;
-            p_b_motion->pppi_ref[1][2] =
-                p_vpar->sequence.p_backward->V_PIXELS + i_chroma_tmp;
+            int i_tmp;
+            p_b_motion->pppi_ref[1][0] = p_vpar->sequence.p_backward->Y_PIXELS
+	        + i_lum_offset + p_vpar->sequence.p_backward->Y_PITCH;
+            p_b_motion->pppi_ref[1][1] = p_vpar->sequence.p_backward->U_PIXELS
+	        + (i_tmp = i_chrom_offset + p_vpar->sequence.p_backward->U_PITCH);
+            p_b_motion->pppi_ref[1][2] = p_vpar->sequence.p_backward->V_PIXELS
+	        + i_tmp;
         }
     }
 
-    i_chroma_tmp = i_offset
-                        * (2 - p_vpar->sequence.b_chroma_v_subsampled)
-                        * (2 - p_vpar->sequence.b_chroma_h_subsampled);
     if( i_coding_type != I_CODING_TYPE || p_vpar->picture.b_concealment_mv )
     {
-        p_f_motion->pppi_ref[0][0] = pp_forward_ref[0]->Y_PIXELS + i_offset * 4;
-        p_f_motion->pppi_ref[0][1] = pp_forward_ref[0]->U_PIXELS + i_chroma_tmp;
-        p_f_motion->pppi_ref[0][2] = pp_forward_ref[0]->V_PIXELS + i_chroma_tmp;
+        p_f_motion->pppi_ref[0][0] = pp_forward_ref[0]->Y_PIXELS +
+            i_lum_offset;
+        p_f_motion->pppi_ref[0][1] = pp_forward_ref[0]->U_PIXELS +
+            i_chrom_offset;
+        p_f_motion->pppi_ref[0][2] = pp_forward_ref[0]->V_PIXELS +
+            i_chrom_offset;
         p_f_motion->pi_f_code[0] = p_vpar->picture.ppi_f_code[0][0];
         p_f_motion->pi_f_code[1] = p_vpar->picture.ppi_f_code[0][1];
         p_f_motion->ppi_pmv[0][0] = p_f_motion->ppi_pmv[0][1] = 0;
@@ -1847,12 +1853,12 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
 
     if( i_coding_type == B_CODING_TYPE )
     {
-        p_b_motion->pppi_ref[0][0] = p_vpar->sequence.p_backward->Y_PIXELS
-                                        + i_offset * 4;
-        p_b_motion->pppi_ref[0][1] = p_vpar->sequence.p_backward->U_PIXELS
-                                        + i_chroma_tmp;
-        p_b_motion->pppi_ref[0][2] = p_vpar->sequence.p_backward->V_PIXELS
-                                        + i_chroma_tmp;
+        p_b_motion->pppi_ref[0][0] = p_vpar->sequence.p_backward->Y_PIXELS +
+            i_lum_offset;
+        p_b_motion->pppi_ref[0][1] = p_vpar->sequence.p_backward->U_PIXELS +
+            i_chrom_offset;
+        p_b_motion->pppi_ref[0][2] = p_vpar->sequence.p_backward->V_PIXELS +
+            i_chrom_offset;
         p_b_motion->pi_f_code[0] = p_vpar->picture.ppi_f_code[1][0];
         p_b_motion->pi_f_code[1] = p_vpar->picture.ppi_f_code[1][1];
         p_b_motion->ppi_pmv[0][0] = p_b_motion->ppi_pmv[0][1] = 0;
@@ -1860,17 +1866,19 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
     }
 
     /* Initialize destination pointers. */
-    p_dest[0] = p_vpar->picture.p_picture->Y_PIXELS + i_offset * 4;
-    p_dest[1] = p_vpar->picture.p_picture->U_PIXELS + i_chroma_tmp;
-    p_dest[2] = p_vpar->picture.p_picture->V_PIXELS + i_chroma_tmp;
+    p_dest[0] = p_vpar->picture.p_picture->Y_PIXELS +
+        i_lum_offset;
+    p_dest[1] = p_vpar->picture.p_picture->U_PIXELS +
+        i_chrom_offset;
+    p_dest[2] = p_vpar->picture.p_picture->V_PIXELS +
+        i_chrom_offset;
 
     if( i_structure == BOTTOM_FIELD )
     {
-        p_dest[0] += i_width;
-        p_dest[1] += i_width >> p_vpar->sequence.b_chroma_h_subsampled;
-        p_dest[2] += i_width >> p_vpar->sequence.b_chroma_h_subsampled;
+        p_dest[0] += p_vpar->picture.p_picture->Y_PITCH;
+        p_dest[1] += p_vpar->picture.p_picture->U_PITCH;
+        p_dest[2] += p_vpar->picture.p_picture->U_PITCH;
     }
-    i_width = p_vpar->picture.i_field_width;
 
     /* Reset intra DC coefficients predictors (ISO/IEC 13818-2 7.2.1). */
     p_vpar->mb.pi_dc_dct_pred[0] = p_vpar->mb.pi_dc_dct_pred[1]
@@ -1879,22 +1887,22 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
 
     p_vpar->mb.i_offset = MacroblockAddressIncrement( p_vpar ) << 4;
 
-    i_chroma_tmp = i_width * 4
-                        * (2 - p_vpar->sequence.b_chroma_v_subsampled)
-                        * (2 - p_vpar->sequence.b_chroma_h_subsampled);
     while( (int)(p_vpar->mb.i_offset - p_vpar->sequence.i_width) >= 0 )
     {
         /* Unusual construct at the start of some slices. Jump one line. */
         p_vpar->mb.i_offset -= p_vpar->sequence.i_width;
-        p_dest[0] += i_width * 16;
-        p_dest[1] += i_chroma_tmp;
-        p_dest[2] += i_chroma_tmp;
-        p_f_motion->pppi_ref[0][0] += i_width * 16;
-        p_f_motion->pppi_ref[0][1] += i_chroma_tmp;
-        p_f_motion->pppi_ref[0][2] += i_chroma_tmp;
-        p_f_motion->pppi_ref[1][0] += i_width * 16;
-        p_f_motion->pppi_ref[1][1] += i_chroma_tmp;
-        p_f_motion->pppi_ref[1][2] += i_chroma_tmp;
+
+        p_dest[0] += i_lum_vsize;
+        p_dest[1] += i_chrom_vsize;
+        p_dest[2] += i_chrom_vsize;
+
+        p_f_motion->pppi_ref[0][0] += i_lum_vsize;
+        p_f_motion->pppi_ref[0][1] += i_chrom_vsize;
+        p_f_motion->pppi_ref[0][2] += i_chrom_vsize;
+
+        p_f_motion->pppi_ref[1][0] += i_lum_vsize;
+        p_f_motion->pppi_ref[1][1] += i_chrom_vsize;
+        p_f_motion->pppi_ref[1][2] += i_chrom_vsize;
     }
 
     for( ; ; )
@@ -1906,9 +1914,9 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
         /* Get a macroblock structure. */
         p_mb = p_vpar->pool.pf_new_mb( &p_vpar->pool );
         p_mb->i_nb_motions = 0;
-        p_mb->pp_dest[0] = p_dest[0]; 
-        p_mb->pp_dest[1] = p_dest[1]; 
-        p_mb->pp_dest[2] = p_dest[2]; 
+        p_mb->pp_dest[0] = p_dest[0];
+        p_mb->pp_dest[1] = p_dest[1];
+        p_mb->pp_dest[2] = p_dest[2];
 
         /* Parse off macroblock_modes structure. */
         p_mb->i_mb_modes = i_mb_modes =

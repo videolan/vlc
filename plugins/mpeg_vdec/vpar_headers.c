@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.17 2002/03/17 17:00:38 sam Exp $
+ * $Id: vpar_headers.c,v 1.18 2002/04/15 23:04:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -843,8 +843,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         /* Initialize values. */
         vpar_SynchroDecode( p_vpar, p_vpar->picture.i_coding_type, i_structure );
         P_picture->i_matrix_coefficients = p_vpar->sequence.i_matrix_coefficients;
-        p_vpar->picture.i_field_width = ( p_vpar->sequence.i_width
-                    << ( 1 - p_vpar->picture.b_frame_structure ) );
 
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, P_picture );
@@ -857,6 +855,13 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         (i_structure != p_vpar->picture.i_current_structure);
     p_vpar->picture.b_current_field =
         (i_structure == BOTTOM_FIELD );
+    p_vpar->picture.i_lum_stride = p_vpar->picture.p_picture->Y_PITCH
+        << ( 1 - p_vpar->picture.b_frame_structure );
+    p_vpar->picture.i_chrom_stride = p_vpar->picture.p_picture->U_PITCH
+        << ( 1 - p_vpar->picture.b_frame_structure );
+    /* We suppose the pitch is the same for U and V planes. */
+    p_vpar->picture.i_field_width = p_vpar->sequence.i_width
+        << ( 1 - p_vpar->picture.b_frame_structure );
 
     if( !p_vpar->p_config->p_stream_ctrl->b_grayscale )
     {

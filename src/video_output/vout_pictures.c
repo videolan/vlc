@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.20 2002/04/05 01:05:22 gbazin Exp $
+ * $Id: vout_pictures.c,v 1.21 2002/04/15 23:04:08 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -427,36 +427,46 @@ void vout_AllocatePicture( picture_t *p_pic,
         case FOURCC_IYUV:
             p_pic->p[ Y_PLANE ].i_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width;
+            p_pic->p[ Y_PLANE ].i_visible_bytes = p_pic->p[ Y_PLANE ].i_pitch;
             p_pic->p[ U_PLANE ].i_lines = i_height / 2;
             p_pic->p[ U_PLANE ].i_pitch = i_width / 2;
+            p_pic->p[ U_PLANE ].i_visible_bytes = p_pic->p[ U_PLANE ].i_pitch;
             p_pic->p[ V_PLANE ].i_lines = i_height / 2;
             p_pic->p[ V_PLANE ].i_pitch = i_width / 2;
+            p_pic->p[ V_PLANE ].i_visible_bytes = p_pic->p[ V_PLANE ].i_pitch;
             p_pic->i_planes = 3;
             break;
 
         case FOURCC_I422:
             p_pic->p[ Y_PLANE ].i_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width;
+            p_pic->p[ Y_PLANE ].i_visible_bytes = p_pic->p[ Y_PLANE ].i_pitch;
             p_pic->p[ U_PLANE ].i_lines = i_height;
             p_pic->p[ U_PLANE ].i_pitch = i_width / 2;
+            p_pic->p[ U_PLANE ].i_visible_bytes = p_pic->p[ U_PLANE ].i_pitch;
             p_pic->p[ V_PLANE ].i_lines = i_height;
             p_pic->p[ V_PLANE ].i_pitch = i_width / 2;
+            p_pic->p[ V_PLANE ].i_visible_bytes = p_pic->p[ V_PLANE ].i_pitch;
             p_pic->i_planes = 3;
             break;
 
         case FOURCC_I444:
             p_pic->p[ Y_PLANE ].i_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width;
+            p_pic->p[ Y_PLANE ].i_visible_bytes = p_pic->p[ Y_PLANE ].i_pitch;
             p_pic->p[ U_PLANE ].i_lines = i_height;
             p_pic->p[ U_PLANE ].i_pitch = i_width;
+            p_pic->p[ U_PLANE ].i_visible_bytes = p_pic->p[ U_PLANE ].i_pitch;
             p_pic->p[ V_PLANE ].i_lines = i_height;
             p_pic->p[ V_PLANE ].i_pitch = i_width;
+            p_pic->p[ V_PLANE ].i_visible_bytes = p_pic->p[ V_PLANE ].i_pitch;
             p_pic->i_planes = 3;
             break;
 
         case FOURCC_Y211:
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width;
+            p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
             p_pic->p->i_pixel_bytes = 4;
             p_pic->i_planes = 1;
             break;
@@ -464,6 +474,7 @@ void vout_AllocatePicture( picture_t *p_pic,
         case FOURCC_RV15:
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width * 2;
+            p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
             p_pic->p->i_pixel_bytes = 2;
             p_pic->p_heap->i_rmask = 0x001f;
             p_pic->p_heap->i_gmask = 0x03e0;
@@ -474,6 +485,7 @@ void vout_AllocatePicture( picture_t *p_pic,
         case FOURCC_RV16:
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width * 2;
+            p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
             p_pic->p->i_pixel_bytes = 2;
             p_pic->p_heap->i_rmask = 0x001f;
             p_pic->p_heap->i_gmask = 0x07e0;
@@ -484,6 +496,7 @@ void vout_AllocatePicture( picture_t *p_pic,
         case FOURCC_RV32:
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width * 4;
+            p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
             p_pic->p->i_pixel_bytes = 4;
             p_pic->p_heap->i_rmask = 0xff0000;
             p_pic->p_heap->i_gmask = 0x00ff00;

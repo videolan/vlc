@@ -2,7 +2,7 @@
  * mpeg_ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ps.c,v 1.10 2002/04/10 17:47:58 jobi Exp $
+ * $Id: mpeg_ps.c,v 1.11 2002/04/15 23:04:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -114,8 +114,7 @@ static int PSInit( input_thread_t * p_input )
         }
         else
         {
-            intf_WarnMsg( 2, "input: PS plug-in discarded (no startcode)" );
-            return( -1 );
+            intf_WarnMsg( 2, "input error: this doesn't look like an MPEG PS stream, but continuing anyway" );
         }
     }
     else if( *(p_peek + 3) <= 0xb9 )
@@ -128,8 +127,8 @@ static int PSInit( input_thread_t * p_input )
         }
         else
         {
-            intf_WarnMsg( 2, "input: PS plug-in discarded (ES startcode)" );
-            return( -1 );
+            intf_WarnMsg( 2, "input error: this seems to be an elementary stream (ES plug-in ?),");
+            intf_WarnMsg( 2, "but continuing" );
         }
     }
 

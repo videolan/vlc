@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.3 2002/01/02 14:37:42 sam Exp $
+ * $Id: video_parser.h,v 1.4 2002/04/15 23:04:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -160,7 +160,7 @@ typedef struct picture_parsing_s
     boolean_t           b_top_field_first, b_concealment_mv;
     boolean_t           b_repeat_first_field;
     /* Relative to the current field */
-    int                 i_coding_type, i_structure;
+    int                 i_coding_type, i_structure, i_field_width;
     boolean_t           b_frame_structure; /* i_structure == FRAME_STRUCTURE */
     boolean_t           b_current_field;         /* i_structure == TOP_FIELD */
     boolean_t           b_second_field;
@@ -168,8 +168,10 @@ typedef struct picture_parsing_s
     picture_t *         p_picture;               /* picture buffer from vout */
     int                 i_current_structure;   /* current parsed structure of
                                                 * p_picture (second field ?) */
-    int                 i_field_width;
     boolean_t           b_error;            /* parsing error, try to recover */
+
+    /* Given by the video output */
+    int                 i_lum_stride, i_chrom_stride;
 } picture_parsing_t;
 
 /*****************************************************************************
