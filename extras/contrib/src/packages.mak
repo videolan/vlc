@@ -2,7 +2,7 @@
 # src/packages.mak : Archive locations
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: packages.mak,v 1.15 2004/02/29 13:03:19 gbazin Exp $
+# $Id: packages.mak,v 1.16 2004/03/02 00:59:16 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -85,10 +85,10 @@ LIBDVDNAV_VERSION=0.1.9
 LIBDVDNAV_URL=http://ftp.snt.utwente.nl/pub/linux/gentoo/distfiles/libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
 LIBDVBPSI_VERSION=0.1.4
 LIBDVBPSI_URL=http://download.videolan.org/pub/libdvbpsi/$(LIBDVBPSI_VERSION)/libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz
-LIVEDOTCOM_VERSION=2004.01.21
+LIVEDOTCOM_VERSION=2004.02.26
 LIVEDOTCOM_URL=http://download.videolan.org/pub/testing/contrib/live.$(LIVEDOTCOM_VERSION).tar.gz
 GOOMDJ_URL=http://sidekick.student.utwente.nl/videolan/goom-dj.tar.gz
-LIBCACA_VERSION=0.8
+LIBCACA_VERSION=0.9
 LIBCACA_URL=http://sam.zoy.org/projects/libcaca/libcaca-$(LIBCACA_VERSION).tar.gz
 LIBDTS_VERSION=0.0.2
 DTSDEC_URL=http://download.videolan.org/pub/videolan/libdts/$(LIBDTS_VERSION)/libdts-$(LIBDTS_VERSION).tar.gz
