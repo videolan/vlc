@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.8 2003/01/28 23:38:24 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.9 2003/01/28 23:55:57 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -57,7 +57,7 @@ typedef struct dec_thread_t
     audio_sample_format_t output_format;
 } dec_thread_t;
 
-#define MAX_FRAME_SIZE (511 + 4032)
+#define MAX_FRAME_SIZE 10000
 /* This isn't the place to put mad-specific stuff. However, it makes the
  * mad plug-in's life much easier if we put 8 extra bytes at the end of the
  * buffer, because that way it doesn't have to copy the aout_buffer_t to a
