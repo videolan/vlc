@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.186 2004/02/29 19:28:10 gbazin Exp $
+dnl $Id: configure.ac,v 1.187 2004/03/03 12:21:57 sam Exp $
 
 AC_INIT(vlc,0.7.1)
 
@@ -1891,7 +1891,7 @@ then
     AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
     AX_ADD_BUILTINS([ffmpeg stream_out_transcode])
     AX_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec -lavcodec])
-    AX_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec])
+    AX_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
 
     if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
       AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
@@ -1902,7 +1902,7 @@ then
     dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
     dnl       linker would miserably barf on multiple definitions.
     AX_ADD_LDFLAGS([stream_out_transcode],[-L${real_ffmpeg_tree}/libavcodec])
-    AX_ADD_CPPFLAGS([stream_out_transcode],[-I${real_ffmpeg_tree}/libavcodec])
+    AX_ADD_CPPFLAGS([stream_out_transcode],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
   fi
 fi
 
