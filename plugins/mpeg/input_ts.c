@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ts.c,v 1.42 2001/12/07 18:33:07 sam Exp $
+ * $Id: input_ts.c,v 1.42.2.1 2001/12/31 01:21:45 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -89,7 +89,21 @@ static int  TSProbe     ( probedata_t * );
 static void TSInit      ( struct input_thread_s * );
 static void TSEnd       ( struct input_thread_s * );
 static int  TSRead      ( struct input_thread_s *,
-                          data_packet_t * p_packets[INPUT_READ_ONCE] );
+                          data_packet_t ** );
+
+/*****************************************************************************
+ * Declare a buffer manager
+ *****************************************************************************/
+#define FLAGS           BUFFERS_UNIQUE_SIZE
+#define NB_LIFO         1
+DECLARE_BUFFERS_EMBEDDED( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_INIT( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_END( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, 1000 );
+DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150 );
+DECLARE_BUFFERS_TOIO( FLAGS, TS_PACKET_SIZE );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -108,10 +122,10 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_set_program      = input_SetProgram;
     input.pf_read             = TSRead;
     input.pf_demux            = input_DemuxTS;
-    input.pf_new_packet       = input_NetlistNewPacket;
-    input.pf_new_pes          = input_NetlistNewPES;
-    input.pf_delete_packet    = input_NetlistDeletePacket;
-    input.pf_delete_pes       = input_NetlistDeletePES;
+    input.pf_new_packet       = input_NewPacket;
+    input.pf_new_pes          = input_NewPES;
+    input.pf_delete_packet    = input_DeletePacket;
+    input.pf_delete_pes       = input_DeletePES;
     input.pf_rewind           = NULL;
     input.pf_seek             = NULL;
 #undef input
@@ -160,7 +174,6 @@ static int TSProbe( probedata_t * p_data )
  *****************************************************************************/
 static void TSInit( input_thread_t * p_input )
 {
-    /* Initialize netlist and TS structures */
     thread_ts_data_t    * p_method;
     es_descriptor_t     * p_pat_es;
     es_ts_data_t        * p_demux_data;
@@ -184,11 +197,9 @@ static void TSInit( input_thread_t * p_input )
     p_input->p_method_data = NULL;
 
 
-    /* Initialize netlist */
-    if( input_NetlistInit( p_input, NB_DATA, NB_DATA, NB_PES, TS_PACKET_SIZE,
-                INPUT_READ_ONCE ) )
+    if( (p_input->p_method_data = input_BuffersInit()) == NULL )
     {
-        intf_ErrMsg( "TS input : Could not initialize netlist" );
+        p_input->b_error = 1;
         return;
     }
 
@@ -227,23 +238,23 @@ static void TSEnd( input_thread_t * p_input )
         input_DelES( p_input, p_pat_es );
 
     free(p_input->p_plugin_data);
-    input_NetlistEnd( p_input );
+    input_BuffersEnd( p_input->p_method_data );
 }
 
 /*****************************************************************************
  * TSRead: reads data packets
  *****************************************************************************
- * Returns -1 in case of error, 0 if everything went well, and 1 in case of
- * EOF.
+ * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
+ * packets.
  *****************************************************************************/
 static int TSRead( input_thread_t * p_input,
-                   data_packet_t * pp_packets[INPUT_READ_ONCE] )
+                   data_packet_t ** pp_data )
 {
     thread_ts_data_t    * p_method;
-    unsigned int    i_loop;
-    int             i_read;
+    int             i_read = 0, i_loop;
     int             i_data = 1;
-    struct iovec  * p_iovec;
+    struct iovec    p_iovec[TS_READ_ONCE];
+    data_packet_t * p_data;
     struct timeval  timeout;
 
     /* Init */
@@ -256,9 +267,6 @@ static int TSRead( input_thread_t * p_input,
     /* We'll wait 0.5 second if nothing happens */
     timeout.tv_sec = 0;
     timeout.tv_usec = 500000;
-
-    /* Reset pointer table */
-    memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
 
     /* Fill if some data is available */
 #if defined( WIN32 )
@@ -278,25 +286,26 @@ static int TSRead( input_thread_t * p_input,
     if( i_data )
     {
         /* Get iovecs */
-        p_iovec = input_NetlistGetiovec( p_input->p_method_data );
+        *pp_data = p_data = input_BuffersToIO( p_input->p_method_data, p_iovec,
+                                               TS_READ_ONCE );
 
-        if ( p_iovec == NULL )
+        if ( p_data == NULL )
         {
-            return( -1 ); /* empty netlist */
+            return( -1 );
         }
 
 #if defined( WIN32 )
         if( p_input->stream.b_pace_control )
         {
-            i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
+            i_read = readv( p_input->i_handle, p_iovec, TS_READ_ONCE );
         }
         else
         {
             i_read = readv_network( p_input->i_handle, p_iovec,
-                                    INPUT_READ_ONCE, p_method );
+                                    TS_READ_ONCE, p_method );
         }
 #else
-        i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
+        i_read = readv( p_input->i_handle, p_iovec, TS_READ_ONCE );
 
         /* Shouldn't happen, but it does - at least under Linux */
         if( (i_read == -1) && ( (errno == EAGAIN) || (errno = EWOULDBLOCK) ) )
@@ -306,36 +315,35 @@ static int TSRead( input_thread_t * p_input,
             i_read = 0;
         }
 #endif
+        /* Error */
         if( i_read == -1 )
         {
             intf_ErrMsg( "input error: TS readv error" );
+            p_input->pf_delete_packet( p_input->p_method_data, p_data );
             return( -1 );
         }
+        p_input->stream.p_selected_area->i_tell += i_read;
+        i_read /= TS_PACKET_SIZE;
 
-        /* EOF */
-        if( i_read == 0 && p_input->stream.b_seekable )
+        /* Check correct TS header */
+        for( i_loop = 0; i_loop < i_read; i_loop++ )
         {
-            return( 1 );
-        }
-
-        input_NetlistMviovec( p_input->p_method_data,
-                (int)(((i_read-1)/TS_PACKET_SIZE)+1) , pp_packets );
-
-        /* check correct TS header */
-        for( i_loop=0; i_loop * TS_PACKET_SIZE < i_read; i_loop++ )
-        {
-            if( pp_packets[i_loop]->p_buffer[0] != 0x47 )
+            if( (*pp_data)->p_demux_start[0] != 0x47 )
+            {
                 intf_ErrMsg( "input error: bad TS packet (starts with "
                              "0x%.2x, should be 0x47)",
-                             pp_packets[i_loop]->p_buffer[0] );
-        }
-        for( ; i_loop < INPUT_READ_ONCE ; i_loop++ )
-        {
-            pp_packets[i_loop] = NULL;
+                             p_data->p_demux_start[0] );
+            }
+            pp_data = &(*pp_data)->p_next;
         }
 
-        p_input->stream.p_selected_area->i_tell += i_read;
+        if( i_read != TS_READ_ONCE )
+        {
+            /* Delete remaining packets */
+            p_input->pf_delete_packet( p_input->p_method_data, *pp_data );
+            *pp_data = NULL;
+        }
     }
-    return 0;
+    return( i_read );
 }
 

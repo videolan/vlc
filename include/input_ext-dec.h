@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.41.2.1 2001/12/30 06:06:00 sam Exp $
+ * $Id: input_ext-dec.h,v 1.41.2.2 2001/12/31 01:21:44 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -40,22 +40,25 @@
  *****************************************************************************
  * Describe a data packet.
  *****************************************************************************/
+#define DATA_PACKET                                                         \
+    /* start of the PS or TS packet */                                      \
+    byte_t *                p_demux_start;                                  \
+    /* start of the PES payload in this packet */                           \
+    byte_t *                p_payload_start;                                \
+    byte_t *                p_payload_end; /* guess ? :-) */                \
+    /* is the packet messed up ? */                                         \
+    boolean_t               b_discard_payload;
+
 typedef struct data_packet_s
 {
-    /* Nothing before this line, the code relies on that */
-    byte_t *                p_buffer;                     /* raw data packet */
-    long                    l_size;                           /* buffer size */
-
-    /* Decoders information */
-    byte_t *                p_payload_start;
-                                  /* start of the PES payload in this packet */
-    byte_t *                p_payload_end;                    /* guess ? :-) */
-    boolean_t               b_discard_payload;  /* is the packet messed up ? */
-
-    int *                   pi_refcount;
-
-    /* Used to chain the TS packets that carry data for a same PES or PSI */
+    /* Used to chain the packets that carry data for a same PES or PSI */
     struct data_packet_s *  p_next;
+
+    DATA_PACKET
+
+    /* Please note that at least one buffer allocator (in particular, the
+     * Next Generation Buffer Allocator) extends this structure with
+     * private data after DATA_PACKET. */
 } data_packet_t;
 
 /*****************************************************************************
@@ -66,6 +69,9 @@ typedef struct data_packet_s
  *****************************************************************************/
 typedef struct pes_packet_s
 {
+    /* Chained list to the next PES packet (depending on the context) */
+    struct pes_packet_s *   p_next;
+
     /* PES properties */
     boolean_t               b_data_alignment;  /* used to find the beginning of
                                                 * a video or audio unit      */
@@ -77,12 +83,15 @@ typedef struct pes_packet_s
     int                     i_rate;                /* current pace of reading
                                                     * (see stream_control.h) */
 
-    int                     i_pes_size;    /* size of the current PES packet */
+    unsigned int            i_pes_size;    /* size of the current PES packet */
 
-    /* Pointers to packets (packets are then linked by the p_prev and
-       p_next fields of the data_packet_t struct) */
+    /* Chained list to packets */
     data_packet_t *         p_first;      /* The first packet contained by this
                                            * PES (used by decoders). */
+    data_packet_t *         p_last;    /* The last packet contained by this
+                                          PES (used by the buffer allocator) */
+    unsigned int            i_nb_data; /* Number of data packets in the chained
+                                                                        list */
 } pes_packet_t;
 
 /*****************************************************************************
@@ -97,9 +106,9 @@ typedef struct decoder_fifo_s
     vlc_cond_t              data_wait;     /* fifo data conditional variable */
 
     /* Data */
-    pes_packet_t *          buffer[FIFO_SIZE + 1];
-    int                     i_start;
-    int                     i_end;
+    pes_packet_t *          p_first;
+    pes_packet_t **         pp_last;
+    int                     i_depth;   /* number of PES packets in the stack */
 
     /* Communication interface between input and decoders */
     boolean_t               b_die;          /* the decoder should return now */
@@ -109,18 +118,6 @@ typedef struct decoder_fifo_s
     void                 (* pf_delete_pes)( void *, pes_packet_t * );
                                      /* function to use when releasing a PES */
 } decoder_fifo_t;
-
-/* Macros to manage a decoder_fifo_t structure. Please remember to take
- * data_lock before using them. */
-#define DECODER_FIFO_ISEMPTY( fifo )  ( (fifo).i_start == (fifo).i_end )
-#define DECODER_FIFO_ISFULL( fifo )   ( ( ((fifo).i_end + 1 - (fifo).i_start)\
-                                          & FIFO_SIZE ) == 0 )
-#define DECODER_FIFO_START( fifo )    ( (fifo).buffer[ (fifo).i_start ] )
-#define DECODER_FIFO_INCSTART( fifo ) ( (fifo).i_start = ((fifo).i_start + 1)\
-                                                         & FIFO_SIZE )
-#define DECODER_FIFO_END( fifo )      ( (fifo).buffer[ (fifo).i_end ] )
-#define DECODER_FIFO_INCEND( fifo )   ( (fifo).i_end = ((fifo).i_end + 1) \
-                                                       & FIFO_SIZE )
 
 /*****************************************************************************
  * bit_fifo_t : bit fifo descriptor

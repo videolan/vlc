@@ -2,7 +2,7 @@
  * input_ts.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ts.h,v 1.12.2.1 2001/12/09 21:14:19 sam Exp $
+ * $Id: input_ts.h,v 1.12.2.2 2001/12/31 01:21:45 massiot Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Boris Dorès <babal@via.ecp.fr>
@@ -22,10 +22,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define NB_DATA 16384 
-#define NB_PES  8192
+/* UDP packets contain 1500 bytes, that is 7 TS packets */
+#define TS_READ_ONCE 7
 
-#define BUFFER_SIZE (7 * TS_PACKET_SIZE)
+#ifdef WIN32
+#   define BUFFER_SIZE (7 * TS_PACKET_SIZE)
+#endif
 
 /*****************************************************************************
  * thread_ts_data_t: private input data

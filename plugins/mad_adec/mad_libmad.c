@@ -62,9 +62,9 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
     byte_t buffer[ADEC_FRAME_SIZE];
 
     /* Store time stamp of current frame */
-    if ( DECODER_FIFO_START(*p_mad_adec->p_fifo)->i_pts ) {
-         p_mad_adec->i_pts_save = DECODER_FIFO_START(*p_mad_adec->p_fifo)->i_pts;
-         DECODER_FIFO_START(*p_mad_adec->p_fifo)->i_pts = 0;
+    if ( p_mad_adec->p_fifo->p_first->i_pts ) {
+         p_mad_adec->i_pts_save = p_mad_adec->p_fifo->p_first->i_pts;
+         p_mad_adec->p_fifo->p_first->i_pts = 0;
     }
     else {
          p_mad_adec->i_pts_save = LAST_MDATE;

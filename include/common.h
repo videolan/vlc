@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.53.2.1 2001/12/30 06:06:00 sam Exp $
+ * $Id: common.h,v 1.53.2.2 2001/12/31 01:21:44 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -346,18 +346,6 @@ typedef struct module_symbols_s
     int ( * input_ClockManageControl )   ( struct input_thread_s *,
                                            struct pgrm_descriptor_s *,
                                            mtime_t );
-
-    int ( * input_NetlistInit )          ( struct input_thread_s *,
-                                           int, int, int, size_t, int );
-    struct iovec * ( * input_NetlistGetiovec ) ( void * p_method_data );
-    void ( * input_NetlistMviovec )      ( void * , int,
-                                           struct data_packet_s **);
-    struct data_packet_s * ( * input_NetlistNewPacket ) ( void *, size_t );
-    struct data_packet_s * ( * input_NetlistNewPtr ) ( void * );
-    struct pes_packet_s * ( * input_NetlistNewPES ) ( void * );
-    void ( * input_NetlistDeletePacket ) ( void *, struct data_packet_s * );
-    void ( * input_NetlistDeletePES )    ( void *, struct pes_packet_s * );
-    void ( * input_NetlistEnd )          ( struct input_thread_s * );
 
     struct aout_fifo_s * ( * aout_CreateFifo ) 
                                        ( int, int, long, long, long, void * );

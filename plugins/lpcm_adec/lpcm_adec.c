@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.3.2.1 2001/12/30 06:06:00 sam Exp $
+ * $Id: lpcm_adec.c,v 1.3.2.2 2001/12/31 01:21:44 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -187,11 +187,11 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
     int i_loop;
     byte_t byte1, byte2;
 
-    if( DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts )
+    if( p_lpcmdec->p_fifo->p_first->i_pts )
     {
         p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->l_end_frame] =
-            DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts;
-        DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts = 0;
+            p_lpcmdec->p_fifo->p_first->i_pts;
+        p_lpcmdec->p_fifo->p_first->i_pts = 0;
     }
     else
     { 

@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.16.2.1 2001/12/10 15:56:57 massiot Exp $
+ * $Id: input_es.c,v 1.16.2.2 2001/12/31 01:21:45 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -75,7 +75,7 @@
  *****************************************************************************/
 static int  ESProbe     ( probedata_t * );
 static int  ESRead      ( struct input_thread_s *,
-                          data_packet_t * p_packets[INPUT_READ_ONCE] );
+                          data_packet_t ** );
 static void ESInit          ( struct input_thread_s * );
 static void ESEnd           ( struct input_thread_s * );
 static void ESSeek          ( struct input_thread_s *, off_t );
@@ -88,6 +88,20 @@ static void ESInitBitstream( struct bit_stream_s *, struct decoder_fifo_s *,
                                                         boolean_t ),
                         void * );
 
+
+/*****************************************************************************
+ * Declare a buffer manager
+ *****************************************************************************/
+#define FLAGS           BUFFERS_UNIQUE_SIZE
+#define NB_LIFO         1
+DECLARE_BUFFERS_EMBEDDED( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_INIT( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_END( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, 150 );
+DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150 );
+DECLARE_BUFFERS_TOIO( FLAGS, ES_PACKET_SIZE );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -106,10 +120,10 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_set_program      = ESSetProgram;
     input.pf_read             = ESRead;
     input.pf_demux            = ESDemux;
-    input.pf_new_packet       = input_NetlistNewPacket;
-    input.pf_new_pes          = input_NetlistNewPES;
-    input.pf_delete_packet    = input_NetlistDeletePacket;
-    input.pf_delete_pes       = input_NetlistDeletePES;
+    input.pf_new_packet       = input_NewPacket;
+    input.pf_new_pes          = input_NewPES;
+    input.pf_delete_packet    = input_DeletePacket;
+    input.pf_delete_pes       = input_DeletePES;
     input.pf_rewind           = NULL;
     input.pf_seek             = ESSeek;
 #undef input
@@ -141,27 +155,24 @@ static void ESInit( input_thread_t * p_input )
 {
     es_descriptor_t *   p_es;
 
-    p_input->p_method_data = NULL;
-
-    /* Initialize netlist */
-    if( input_NetlistInit( p_input, NB_DATA, NB_DATA, NB_PES, ES_PACKET_SIZE,
-                           INPUT_READ_ONCE ) )
+    if( (p_input->p_method_data = input_BuffersInit()) == NULL )
     {
-        intf_ErrMsg( "ES input : Could not initialize netlist" );
+        p_input->b_error = 1;
         return;
     }
 
     /* FIXME : detect if InitStream failed */
     input_InitStream( p_input, 0 );
     input_AddProgram( p_input, 0, 0 );
+    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_es = input_AddES( p_input, p_input->stream.pp_programs[0], 0xE0, 0 );
+    p_es = input_AddES( p_input, p_input->stream.p_selected_program, 0xE0, 0 );
     p_es->i_stream_id = 0xE0;
     p_es->i_type = MPEG1_VIDEO_ES;
     p_es->i_cat = VIDEO_ES;
     input_SelectES( p_input, p_es );
     p_input->stream.p_selected_area->i_tell = 0;
-    p_input->stream.pp_programs[0]->b_is_ok = 1;
+    p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
@@ -170,49 +181,57 @@ static void ESInit( input_thread_t * p_input )
  *****************************************************************************/
 static void ESEnd( input_thread_t * p_input )
 {
+    input_BuffersEnd( p_input->p_method_data );
 }
 
 /*****************************************************************************
  * ESRead: reads data packets
  *****************************************************************************
- * Returns -1 in case of error, 0 if everything went well, and 1 in case of
- * EOF.
+ * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
+ * packets.
  *****************************************************************************/
 static int ESRead( input_thread_t * p_input,
-                   data_packet_t * pp_packets[INPUT_READ_ONCE] )
+                   data_packet_t ** pp_data )
 {
     int             i_read;
-    struct iovec  * p_iovec;
+    struct iovec    p_iovec[ES_READ_ONCE];
+    data_packet_t * p_data;
 
     /* Get iovecs */
-    p_iovec = input_NetlistGetiovec( p_input->p_method_data );
+    *pp_data = p_data = input_BuffersToIO( p_input->p_method_data, p_iovec,
+                                           ES_READ_ONCE );
 
-    if ( p_iovec == NULL )
+    if ( p_data == NULL )
     {
-        return( -1 ); /* empty netlist */
-    }
-
-    memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
-
-    i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
-    if( i_read == -1 )
-    {
-        intf_ErrMsg( "input error: ES readv error" );
         return( -1 );
     }
 
-    /* EOF */
-    if( i_read == 0 && p_input->stream.b_seekable )
+    i_read = readv( p_input->i_handle, p_iovec, ES_READ_ONCE );
+    if( i_read == -1 )
     {
-        return( 1 );
+        intf_ErrMsg( "input error: ES readv error" );
+        p_input->pf_delete_packet( p_input->p_method_data, p_data );
+        return( -1 );
+    }
+    p_input->stream.p_selected_area->i_tell += i_read;
+    i_read /= ES_PACKET_SIZE;
+
+    if( i_read != ES_READ_ONCE )
+    {
+        /* We got fewer packets than wanted. Give remaining packets
+         * back to the buffer allocator. */
+        int i_loop;
+
+        for( i_loop = 0; i_loop < i_read; i_loop++ )
+        {
+            pp_data = &(*pp_data)->p_next;
+        }
+
+        p_input->pf_delete_packet( p_input->p_method_data, *pp_data );
+        *pp_data = NULL;
     }
 
-    input_NetlistMviovec( p_input->p_method_data,
-             (int)(i_read/ES_PACKET_SIZE), pp_packets );
-
-    p_input->stream.p_selected_area->i_tell += i_read;
-
-    return( 0 );
+    return( i_read );
 }
 
 /*****************************************************************************
@@ -241,7 +260,7 @@ static void ESDemux( input_thread_t * p_input, data_packet_t * p_data )
 {
     pes_packet_t *  p_pes = p_input->pf_new_pes( p_input->p_method_data );
     decoder_fifo_t * p_fifo =
-        p_input->stream.pp_programs[0]->pp_es[0]->p_decoder_fifo;
+        p_input->stream.p_selected_program->pp_es[0]->p_decoder_fifo;
 
     if( p_pes == NULL )
     {
@@ -251,22 +270,23 @@ static void ESDemux( input_thread_t * p_input, data_packet_t * p_data )
     }
 
     p_pes->i_rate = p_input->stream.control.i_rate;
-    p_pes->p_first = p_data;
+    p_pes->p_first = p_pes->p_last = p_data;
+    p_pes->i_nb_data = 1;
 
-    if( (p_input->stream.pp_programs[0]->i_synchro_state == SYNCHRO_REINIT)
-         | (input_ClockManageControl( p_input, p_input->stream.pp_programs[0],
-                                  (mtime_t)0 ) == PAUSE_S) )
+    if( (p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT)
+         | (input_ClockManageControl( p_input, 
+                          p_input->stream.p_selected_program,
+                         (mtime_t)0 ) == PAUSE_S) )
     {
         intf_WarnMsg( 2, "synchro reinit" );
         p_pes->i_pts = mdate() + DEFAULT_PTS_DELAY;
-        p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_OK;
+        p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_OK;
     }
 
     input_DecodePES( p_fifo, p_pes );
 
     vlc_mutex_lock( &p_fifo->data_lock );
-    if( ( (DECODER_FIFO_END( *p_fifo ) - DECODER_FIFO_START( *p_fifo ))
-            & FIFO_SIZE ) >= MAX_PACKETS_IN_FIFO )
+    if( p_fifo->i_depth >= MAX_PACKETS_IN_FIFO )
     {
         vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
     }
@@ -290,18 +310,23 @@ static void ESNextDataPacket( bit_stream_t * p_bit_stream )
          * time to jump to the next PES packet */
         if( p_bit_stream->p_data->p_next == NULL )
         {
-            /* We are going to read/write the start and end indexes of the
-             * decoder fifo and to use the fifo's conditional variable,
-             * that's why we need to take the lock before. */
+            pes_packet_t * p_next;
+
             vlc_mutex_lock( &p_fifo->data_lock );
 
             /* Free the previous PES packet. */
+            p_next = p_fifo->p_first->p_next;
+            p_fifo->p_first->p_next = NULL;
             p_fifo->pf_delete_pes( p_fifo->p_packets_mgt,
-                                   DECODER_FIFO_START( *p_fifo ) );
-            DECODER_FIFO_INCSTART( *p_fifo );
+                                   p_fifo->p_first );
+            p_fifo->p_first = p_next;
+            p_fifo->i_depth--;
 
-            if( DECODER_FIFO_ISEMPTY( *p_fifo ) )
+            if( p_fifo->p_first == NULL )
             {
+                /* No PES in the FIFO. p_last is no longer valid. */
+                p_fifo->pp_last = &p_fifo->p_first;
+
                 /* Signal the input thread we're waiting. */
                 vlc_cond_signal( &p_fifo->data_wait );
 
@@ -310,7 +335,7 @@ static void ESNextDataPacket( bit_stream_t * p_bit_stream )
             }
 
             /* The next byte could be found in the next PES packet */
-            p_bit_stream->p_data = DECODER_FIFO_START( *p_fifo )->p_first;
+            p_bit_stream->p_data = p_fifo->p_first->p_first;
 
             vlc_mutex_unlock( &p_fifo->data_lock );
 

@@ -36,7 +36,6 @@
 /******************************************************************************
 * Prototypes                                                                  *
 ******************************************************************************/
-
-int read_toc ( struct thread_vcd_data_s *);
-int VCD_sector_read ( struct thread_vcd_data_s *, byte_t *) ;
-struct cdrom_msf0 lba2msf ( int ) ;
+int ioctl_GetTrackCount ( int );
+int * ioctl_GetSectors  ( int );
+int ioctl_ReadSector    ( int, int, byte_t * );

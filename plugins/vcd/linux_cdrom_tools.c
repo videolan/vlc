@@ -71,129 +71,97 @@
 #include "modules.h"
 #include "modules_export.h"
 
-
-#include "input_vcd.h"
 #include "linux_cdrom_tools.h"
+
 /*****************************************************************************
-* read_toc : Reads the Table of Content of a CD-ROM and fills p_vcd with     *
-*            the read information                                            *
-*****************************************************************************/
-int read_toc ( thread_vcd_data_t * p_vcd )
-{ 
-    int i ;
-    struct cdrom_tochdr tochdr ;
-    struct cdrom_tocentry tocent ;
-    int fd = p_vcd->vcdhandle ;
- 
-    /* first we read the TOC header */
-    if (ioctl(fd, CDROMREADTOCHDR, &tochdr) == -1)
+ * ioctl_ReadTocHeader: Read the TOC header and return the track number.
+ *****************************************************************************/
+int ioctl_GetTrackCount( int i_fd )
+{
+    struct cdrom_tochdr   tochdr;
+
+    /* First we read the TOC header */
+    if( ioctl( i_fd, CDROMREADTOCHDR, &tochdr ) == -1 )
     {
-        intf_ErrMsg("problem occured when reading CD's TOCHDR\n") ;
-        return -1 ;
-    }
-  
-    p_vcd->nb_tracks = tochdr.cdth_trk1;
-    /* nb_tracks + 1 because we put the lead_out tracks for computing last
-     track's size */
-    p_vcd->tracks_sector = malloc( ( p_vcd->nb_tracks + 1 ) 
-                                            * sizeof( int ) );
-    if ( p_vcd->tracks_sector == NULL ) 
-    {
-        intf_ErrMsg("could not malloc tracks_sector");
+        intf_ErrMsg( "vcd error: could not read TOCHDR" );
         return -1;
     }
 
-    /* then for each track we read its TOC entry */
-
-    for( i=tochdr.cdth_trk0 ; i <= tochdr.cdth_trk1 ; i++ )
-    {
-        tocent.cdte_track = i;
-        tocent.cdte_format = CDROM_LBA;
-        if (ioctl( fd, CDROMREADTOCENTRY, &tocent) == -1 )
-        {
-          intf_ErrMsg( "problem occured when reading CD's TOCENTRY\n" );
-          free ( p_vcd->tracks_sector );
-          return -1;
-        }
-    
-        p_vcd->tracks_sector[i-1] = tocent.cdte_addr.lba ;
-
-    }
-  
-    /* finally we read the lead-out track toc entry */
-
-    tocent.cdte_track = CDROM_LEADOUT ;
-    tocent.cdte_format = CDROM_LBA ;
-    if (ioctl(fd, CDROMREADTOCENTRY, &tocent) == -1)
-    {
-        intf_ErrMsg("problem occured when readind CD's 
-                   lead-out track TOC entry") ;
-        free (p_vcd->tracks_sector) ;
-        return -1 ;
-    }
-
-    p_vcd->tracks_sector[p_vcd->nb_tracks] = tocent.cdte_addr.lba ;
-  
-    return 1 ;
-
+    return tochdr.cdth_trk1 - tochdr.cdth_trk0 + 1;
 }
-   
-/****************************************************************************
- * VCD_sector_read : Function that reads a sector (2324 bytes) from VCD   
- ****************************************************************************/
-int VCD_sector_read ( struct thread_vcd_data_s * p_vcd, byte_t * p_buffer )
-{
-    byte_t                        p_read_block[VCD_SECTOR_SIZE] ;
-    struct cdrom_msf0             msf_cursor ;
-    
-    msf_cursor = lba2msf( p_vcd->current_sector ) ;
-   
-#ifdef DEBUG
-    intf_DbgMsg("Playing frame %d:%d-%d\n", msf_cursor.minute, 
-                msf_cursor.second, msf_cursor.frame) ;
-#endif
-   
-    memcpy(p_read_block, &msf_cursor, sizeof(struct cdrom_msf0)) ;
-        
-    if (ioctl(p_vcd->vcdhandle, CDROMREADRAW, p_read_block) == -1)
-    {
-        intf_ErrMsg("problem occured when reading CD") ;
-        free (p_read_block) ;
-        return -1 ;
-    }
-        
-    /* we don't want to keep the header of the read sector */
-    memcpy( p_buffer, &p_read_block[VCD_DATA_START], 
-            VCD_DATA_SIZE );
-    
-    
-    p_vcd->current_sector ++;
-    
-    if ( p_vcd->current_sector == 
-            p_vcd->tracks_sector[p_vcd->current_track + 1] )
-    {
-        p_vcd->b_end_of_track = 1;
-    }
-    
-    return 1;
-}
-
 
 /*****************************************************************************
- * lba2msf : converts a logical block address into a minute/second/frame
- *           address.
+ * ioctl_GetSectors: Read the Table of Contents and fill p_vcd.
  *****************************************************************************/
-
-struct cdrom_msf0 lba2msf( int lba)
+int * ioctl_GetSectors( int i_fd )
 {
-    struct cdrom_msf0                      msf_result ;
+    int  i, i_tracks;
+    int *p_sectors;
+    struct cdrom_tochdr   tochdr;
+    struct cdrom_tocentry tocent;
 
-    /* we add 2*CD_FRAMES since the 2 first seconds are not played*/
-    
-    msf_result.minute = (lba+2*CD_FRAMES) / ( CD_FRAMES * CD_SECS ) ;
-    msf_result.second = ( (lba+2*CD_FRAMES) % ( CD_FRAMES * CD_SECS ) ) 
-        / CD_FRAMES ;
-    msf_result.frame = ( (lba+2*CD_FRAMES) % ( CD_FRAMES * CD_SECS ) ) 
-        % CD_FRAMES ;
-    return msf_result ;
+    /* First we read the TOC header */
+    if( ioctl( i_fd, CDROMREADTOCHDR, &tochdr ) == -1 )
+    {
+        intf_ErrMsg( "vcd error: could not read TOCHDR" );
+        return NULL;
+    }
+
+    i_tracks = tochdr.cdth_trk1 - tochdr.cdth_trk0 + 1;
+
+    p_sectors = malloc( (i_tracks + 1) * sizeof(int) );
+    if( p_sectors == NULL )
+    {
+        intf_ErrMsg( "vcd error: could not allocate p_sectors" );
+        return NULL;
+    }
+
+    /* Fill the p_sectors structure with the track/sector matches */
+    for( i = 0 ; i <= i_tracks ; i++ )
+    {
+        tocent.cdte_format = CDROM_LBA;
+        tocent.cdte_track =
+            ( i == i_tracks ) ? CDROM_LEADOUT : tochdr.cdth_trk0 + i;
+
+        if( ioctl( i_fd, CDROMREADTOCENTRY, &tocent ) == -1 )
+        {
+            intf_ErrMsg( "vcd error: could not read TOCENTRY" );
+            free( p_sectors );
+            return NULL;
+        }
+
+        p_sectors[ i ] = tocent.cdte_addr.lba;
+    }
+
+    return p_sectors;
+}
+
+/****************************************************************************
+ * ioctl_ReadSector: Read a sector (2324 bytes)
+ ****************************************************************************/
+int ioctl_ReadSector( int i_fd, int i_sector, byte_t * p_buffer )
+{
+    byte_t p_block[ VCD_SECTOR_SIZE ];
+    int    i_dummy = i_sector + 2 * CD_FRAMES;
+
+#define p_msf ((struct cdrom_msf0 *)p_block)
+    p_msf->minute =   i_dummy / (CD_FRAMES * CD_SECS);
+    p_msf->second = ( i_dummy % (CD_FRAMES * CD_SECS) ) / CD_FRAMES;
+    p_msf->frame =  ( i_dummy % (CD_FRAMES * CD_SECS) ) % CD_FRAMES;
+
+    intf_DbgMsg( "vcd debug: playing frame %d:%d-%d",
+                 p_msf->minute, p_msf->second, p_msf->frame);
+#undef p_msf
+
+    if( ioctl(i_fd, CDROMREADRAW, p_block) == -1 )
+    {
+        intf_ErrMsg( "vcd error: could not read block %i from disc",
+                     i_sector );
+        return -1;
+    }
+
+    /* We don't want to keep the header of the read sector */
+    p_main->fast_memcpy( p_buffer, p_block + VCD_DATA_START, VCD_DATA_SIZE );
+
+    return 0;
 }

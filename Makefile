@@ -110,7 +110,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 # C Objects
 # 
 INTERFACE := main interface intf_msg intf_playlist intf_channels
-INPUT := input input_ext-dec input_ext-intf input_dec input_programs input_netlist input_clock mpeg_system
+INPUT := input input_ext-dec input_ext-intf input_dec input_programs input_clock mpeg_system
 VIDEO_OUTPUT := video_output video_text video_spu video_yuv
 AUDIO_OUTPUT := audio_output aout_ext-dec aout_u8 aout_s8 aout_u16 aout_s16 aout_spdif
 MISC := mtime tests modules netutils iso_lang

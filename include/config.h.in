@@ -98,13 +98,6 @@
 #define MEMCPY_METHOD_VAR               "vlc_memcpy"
 
 /*
- * Decoders FIFO configuration
- */
-
-/* Size of the FIFO. FIFO_SIZE+1 must be a power of 2 */
-#define FIFO_SIZE                       1023
-
-/*
  * Paths
  */
 
@@ -174,6 +167,9 @@
 
 /* Maximum length of a hostname or source name */
 #define INPUT_MAX_SOURCE_LENGTH         100
+
+/* Maximum memory the input is allowed to use (20 MB) */
+#define INPUT_MAX_ALLOCATION            20971520
 
 /* Default network protocol */
 #define INPUT_NETWORK_PROTOCOL_VAR      "vlc_network_protocol"

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.163.2.2 2001/12/12 02:13:20 sam Exp $
+ * $Id: input.c,v 1.163.2.3 2001/12/31 01:21:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -120,9 +120,6 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
         return( NULL );
     }
 
-    /* Packets read once */
-    p_input->i_read_once = INPUT_READ_ONCE;
-
     /* Initialize thread properties */
     p_input->b_die              = 0;
     p_input->b_error            = 0;
@@ -206,7 +203,7 @@ void input_DestroyThread( input_thread_t *p_input, int *pi_status )
     /* Request thread destruction */
     p_input->b_die = 1;
 
-    /* Make the thread exit of an eventual vlc_cond_wait() */
+    /* Make the thread exit from an eventual vlc_cond_wait() */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     vlc_cond_signal( &p_input->stream.stream_wait );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -229,9 +226,6 @@ void input_DestroyThread( input_thread_t *p_input, int *pi_status )
  *****************************************************************************/
 static void RunThread( input_thread_t *p_input )
 {
-    int                     i_error, i;
-    data_packet_t **        pp_packets;
-
     if( InitThread( p_input ) )
     {
         /* If we failed, wait before we are killed, and exit */
@@ -242,22 +236,16 @@ static void RunThread( input_thread_t *p_input )
         return;
     }
 
-    /* initialization is completed */
+    /* initialization is complete */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.b_changed = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    pp_packets = (data_packet_t **) malloc( p_input->i_read_once *
-                                        sizeof( data_packet_t * ) );
-    if( pp_packets == NULL )
-    {
-        intf_ErrMsg( "input error: out of memory" );
-        free( pp_packets );
-        p_input->b_error = 1;
-    }
-
     while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
     {
+        data_packet_t * p_data;
+        int i_count, i;
+
         p_input->c_loops++;
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -357,32 +345,32 @@ static void RunThread( input_thread_t *p_input )
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-        i_error = p_input->pf_read( p_input, pp_packets );
+        i_count = p_input->pf_read( p_input, &p_data );
 
         /* Demultiplex read packets. */
-        for( i = 0; i < p_input->i_read_once && pp_packets[i] != NULL; i++ )
+        while( p_data != NULL )
         {
+            data_packet_t * p_next = p_data->p_next;
+            p_data->p_next = NULL;
+
             p_input->stream.c_packets_read++;
-            p_input->pf_demux( p_input, pp_packets[i] );
+            p_input->pf_demux( p_input, p_data );
+
+            p_data = p_next;
         }
 
-        if( i_error )
+        if( i_count == 0 && p_input->stream.b_seekable )
         {
-            if( i_error == 1 )
-            {
-                /* End of file - we do not set b_die because only the
-                 * interface is allowed to do so. */
-                intf_WarnMsg( 3, "input: EOF reached" );
-                p_input->b_eof = 1;
-            }
-            else
-            {
-                p_input->b_error = 1;
-            }
+            /* End of file - we do not set b_die because only the
+             * interface is allowed to do so. */
+            intf_WarnMsg( 3, "input: EOF reached" );
+            p_input->b_eof = 1;
+        }
+        else if( i_count < 0 )
+        {
+            p_input->b_error = 1;
         }
     }
-
-    free( pp_packets );
 
     if( p_input->b_error || p_input->b_eof )
     {
@@ -401,7 +389,6 @@ static void RunThread( input_thread_t *p_input )
  *****************************************************************************/
 static int InitThread( input_thread_t * p_input )
 {
-
     /* Initialize statistics */
     p_input->c_loops                    = 0;
     p_input->stream.c_packets_read      = 0;

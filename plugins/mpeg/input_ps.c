@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ps.c,v 1.44 2001/12/07 18:33:07 sam Exp $
+ * $Id: input_ps.c,v 1.44.2.1 2001/12/31 01:21:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -86,15 +86,25 @@ static __inline__ off_t fseeko( FILE *p_file, off_t i_offset, int i_pos )
  *****************************************************************************/
 static int  PSProbe         ( probedata_t * );
 static int  PSRead          ( struct input_thread_s *,
-                             data_packet_t * p_packets[INPUT_READ_ONCE] );
+                             data_packet_t ** );
 static void PSInit          ( struct input_thread_s * );
 static void PSEnd           ( struct input_thread_s * );
 static int  PSSetProgram    ( struct input_thread_s * , pgrm_descriptor_t * );
 static void PSSeek          ( struct input_thread_s *, off_t );
-static struct pes_packet_s *  NewPES    ( void * );
-static struct data_packet_s * NewPacket ( void *, size_t );
-static void DeletePacket    ( void *, struct data_packet_s * );
-static void DeletePES       ( void *, struct pes_packet_s * );
+
+/*****************************************************************************
+ * Declare a buffer manager
+ *****************************************************************************/
+#define FLAGS           BUFFERS_NOFLAGS
+#define NB_LIFO         2
+DECLARE_BUFFERS_EMBEDDED( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_INIT( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_END( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, 300 );
+DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 300 );
+
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -113,10 +123,10 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_set_program      = PSSetProgram;
     input.pf_read             = PSRead;
     input.pf_demux            = input_DemuxPS;
-    input.pf_new_packet       = NewPacket;
-    input.pf_new_pes          = NewPES;
-    input.pf_delete_packet    = DeletePacket;
-    input.pf_delete_pes       = DeletePES;
+    input.pf_new_packet       = input_NewPacket;
+    input.pf_new_pes          = input_NewPES;
+    input.pf_delete_packet    = input_DeletePacket;
+    input.pf_delete_pes       = input_DeletePES;
     input.pf_rewind           = NULL;
     input.pf_seek             = PSSeek;
 #undef input
@@ -158,65 +168,12 @@ static int PSProbe( probedata_t *p_data )
  *****************************************************************************/
 static void PSInit( input_thread_t * p_input )
 {
-    packet_cache_t *    p_packet_cache;
+    if( (p_input->p_method_data = input_BuffersInit()) == NULL )
+    {
+        p_input->b_error = 1;
+        return;
+    }
 
-    /* creates the packet cache structure */
-    p_packet_cache = malloc( sizeof(packet_cache_t) );
-    if ( p_packet_cache == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_input->b_error = 1;
-        return;
-    }
-    p_input->p_method_data = (void *)p_packet_cache;
-
-    /* Initialize packet cache mutex */
-    vlc_mutex_init( &p_packet_cache->lock );
-    
-    /* allocates the data cache */
-    p_packet_cache->data.p_stack = malloc( DATA_CACHE_SIZE * 
-        sizeof(data_packet_t*) );
-    if ( p_packet_cache->data.p_stack == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_input->b_error = 1;
-        return;
-    }
-    p_packet_cache->data.l_index = 0;
-    
-    /* allocates the PES cache */
-    p_packet_cache->pes.p_stack = malloc( PES_CACHE_SIZE * 
-        sizeof(pes_packet_t*) );
-    if ( p_packet_cache->pes.p_stack == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_input->b_error = 1;
-        return;
-    }
-    p_packet_cache->pes.l_index = 0;
-    
-    /* allocates the small buffer cache */
-    p_packet_cache->smallbuffer.p_stack = malloc( SMALL_CACHE_SIZE * 
-        sizeof(packet_buffer_t) );
-    if ( p_packet_cache->smallbuffer.p_stack == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_input->b_error = 1;
-        return;
-    }
-    p_packet_cache->smallbuffer.l_index = 0;
-    
-    /* allocates the large buffer cache */
-    p_packet_cache->largebuffer.p_stack = malloc( LARGE_CACHE_SIZE * 
-        sizeof(packet_buffer_t) );
-    if ( p_packet_cache->largebuffer.p_stack == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_input->b_error = 1;
-        return;
-    }
-    p_packet_cache->largebuffer.l_index = 0;
-    
     if( p_input->p_stream == NULL )
     {
         /* Re-open the socket as a buffered FILE stream */
@@ -225,6 +182,7 @@ static void PSInit( input_thread_t * p_input )
         if( p_input->p_stream == NULL )
         {
             intf_ErrMsg( "Cannot open file (%s)", strerror(errno) );
+            input_BuffersEnd( p_input->p_method_data );
             p_input->b_error = 1;
             return;
         }
@@ -253,11 +211,22 @@ static void PSInit( input_thread_t * p_input )
         while( !p_input->b_die && !p_input->b_error
                 && !p_demux_data->b_has_PSM )
         {
-            int                 i_result, i;
-            data_packet_t *     pp_packets[INPUT_READ_ONCE];
+            int                 i_result;
+            data_packet_t *     p_data;
+            data_packet_t *     p_saved_data;
 
-            i_result = PSRead( p_input, pp_packets );
-            if( i_result == 1 )
+            i_result = PSRead( p_input, &p_data );
+            p_saved_data = p_data;
+
+            while( p_data != NULL )
+            {
+                input_ParsePS( p_input, p_data );
+                p_data = p_data->p_next;
+            }
+
+            p_input->pf_delete_packet( p_input->p_method_data, p_saved_data );
+
+            if( i_result == 0 )
             {
                 /* EOF */
                 vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -265,17 +234,10 @@ static void PSInit( input_thread_t * p_input )
                 vlc_mutex_unlock( &p_input->stream.stream_lock );
                 break;
             }
-            if( i_result == -1 )
+            else if( i_result == -1 )
             {
                 p_input->b_error = 1;
                 break;
-            }
-
-            for( i = 0; i < INPUT_READ_ONCE && pp_packets[i] != NULL; i++ )
-            {
-                /* FIXME: use i_p_config_t */
-                input_ParsePS( p_input, pp_packets[i] );
-                DeletePacket( p_input->p_method_data, pp_packets[i] );
             }
 
             /* File too big. */
@@ -388,22 +350,7 @@ static void PSInit( input_thread_t * p_input )
  *****************************************************************************/
 static void PSEnd( input_thread_t * p_input )
 {
-#define p_packet_cache ((packet_cache_t *)p_input->p_method_data)
-
-    vlc_mutex_destroy( &p_packet_cache->lock );
-
-    if( p_packet_cache->data.p_stack )
-        free( p_packet_cache->data.p_stack );
-    if( p_packet_cache->pes.p_stack )
-        free( p_packet_cache->pes.p_stack );
-    if( p_packet_cache->smallbuffer.p_stack )
-        free( p_packet_cache->smallbuffer.p_stack );
-    if( p_packet_cache->largebuffer.p_stack )
-        free( p_packet_cache->largebuffer.p_stack );
-
-#undef p_packet_cache
-
-    free( p_input->p_method_data );
+    input_BuffersEnd( p_input->p_method_data );
 }
 
 /*****************************************************************************
@@ -418,7 +365,7 @@ static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
     {
         if( feof( p_input->p_stream ) )
         {
-            return( 1 );
+            return( 0 );
         }
 
         if( (i_error = ferror( p_input->p_stream )) )
@@ -430,28 +377,29 @@ static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.p_selected_area->i_tell += i_len;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-    return( 0 );
+    return( i_len );
 }
 
 /*****************************************************************************
  * PSRead: reads data packets
  *****************************************************************************
- * Returns -1 in case of error, 0 if everything went well, and 1 in case of
- * EOF.
+ * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
+ * packets.
  *****************************************************************************/
 static int PSRead( input_thread_t * p_input,
-                   data_packet_t * pp_packets[INPUT_READ_ONCE] )
+                   data_packet_t ** pp_data )
 {
     byte_t              p_header[6];
     data_packet_t *     p_data;
     size_t              i_packet_size;
     int                 i_packet, i_error;
 
-    memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
-    for( i_packet = 0; i_packet < INPUT_READ_ONCE; i_packet++ )
+    *pp_data = NULL;
+
+    for( i_packet = 0; i_packet < PS_READ_ONCE; i_packet++ )
     {
         /* Read what we believe to be a packet header. */
-        if( (i_error = SafeRead( p_input, p_header, 4 )) )
+        if( (i_error = SafeRead( p_input, p_header, 4 )) <= 0 )
         {
             return( i_error );
         }
@@ -480,7 +428,7 @@ static int PSRead( input_thread_t * p_input,
                 }
                 else
                 {
-                    return( 1 );
+                    return( 0 );
                 }
             }
             /* Packet found. */
@@ -491,7 +439,7 @@ static int PSRead( input_thread_t * p_input,
         if( U32_AT(p_header) != 0x1B9 )
         {
             /* The packet is at least 6 bytes long. */
-            if( (i_error = SafeRead( p_input, p_header + 4, 2 )) )
+            if( (i_error = SafeRead( p_input, p_header + 4, 2 )) <= 0 )
             {
                 return( i_error );
             }
@@ -528,7 +476,8 @@ static int PSRead( input_thread_t * p_input,
         }
 
         /* Fetch a packet of the appropriate size. */
-        p_data = NewPacket( p_input->p_method_data, i_packet_size + 6 );
+        p_data = p_input->pf_new_packet( p_input->p_method_data,
+                                         i_packet_size + 6 );
         if( p_data == NULL )
         {
             intf_ErrMsg( "Out of memory" );
@@ -538,25 +487,29 @@ static int PSRead( input_thread_t * p_input,
         if( U32_AT(p_header) != 0x1B9 )
         {
             /* Copy the header we already read. */
-            memcpy( p_data->p_buffer, p_header, 6 );
+            memcpy( p_data->p_demux_start, p_header, 6 );
 
             /* Read the remaining of the packet. */
             if( i_packet_size && (i_error =
-                    SafeRead( p_input, p_data->p_buffer + 6, i_packet_size )) )
+                    SafeRead( p_input, p_data->p_demux_start + 6,
+                              i_packet_size )) <= 0 )
             {
+                p_input->pf_delete_packet( p_input->p_method_data, p_data );
                 return( i_error );
             }
 
             /* In MPEG-2 pack headers we still have to read stuffing bytes. */
             if( U32_AT(p_header) == 0x1BA )
             {
-                if( i_packet_size == 8 && (p_data->p_buffer[13] & 0x7) != 0 )
+                if( i_packet_size == 8 && (p_data->p_demux_start[13] & 0x7) != 0 )
                 {
                     /* MPEG-2 stuffing bytes */
                     byte_t      p_garbage[8];
                     if( (i_error = SafeRead( p_input, p_garbage,
-                                             p_data->p_buffer[13] & 0x7)) )
+                                     p_data->p_demux_start[13] & 0x7)) <= 0 )
                     {
+                        p_input->pf_delete_packet( p_input->p_method_data,
+                                                   p_data );
                         return( i_error );
                     }
                 }
@@ -565,14 +518,15 @@ static int PSRead( input_thread_t * p_input,
         else
         {
             /* Copy the small header. */
-            memcpy( p_data->p_buffer, p_header, 4 );
+            memcpy( p_data->p_demux_start, p_header, 4 );
         }
 
         /* Give the packet to the other input stages. */
-        pp_packets[i_packet] = p_data;
+        *pp_data = p_data;
+        pp_data = &p_data->p_next;
     }
 
-    return( 0 );
+    return( i_packet + 1 );
 }
 
 /*****************************************************************************
@@ -596,360 +550,5 @@ static void PSSeek( input_thread_t * p_input, off_t i_position )
 #endif
 
     p_input->stream.p_selected_area->i_tell = i_position;
-}
-
-/*
- * Packet management utilities
- */
-
-
-/*****************************************************************************
- * NewPacket: allocates a data packet
- *****************************************************************************/
-static struct data_packet_s * NewPacket( void * p_packet_cache,
-                                         size_t l_size )
-{ 
-    packet_cache_t *   p_cache;
-    data_packet_t *    p_data;
-    long               l_index;
-
-    p_cache = (packet_cache_t *)p_packet_cache;
-
-#ifdef DEBUG
-    if ( p_cache == NULL )
-    {
-        intf_ErrMsg( "PPacket cache not initialized" );
-        return NULL;
-    }
-#endif
-
-    /* Safety check */
-    if( l_size > INPUT_MAX_PACKET_SIZE )
-    {
-        intf_ErrMsg( "Packet too big (%d)", l_size );
-        return NULL;
-    }
-
-    vlc_mutex_lock( &p_cache->lock );
-
-    /* Checks whether the data cache is empty */
-    if( p_cache->data.l_index == 0 )
-    {
-        /* Allocates a new packet */
-        p_data = malloc( sizeof(data_packet_t) );
-        if( p_data == NULL )
-        {
-            intf_ErrMsg( "Out of memory" );
-            vlc_mutex_unlock( &p_cache->lock );
-            return NULL;
-        }
-#ifdef TRACE_INPUT
-        intf_DbgMsg( "PS input: data packet allocated" );
-#endif
-    }
-    else
-    {
-        /* Takes the packet out from the cache */
-        if( (p_data = p_cache->data.p_stack[ -- p_cache->data.l_index ]) 
-            == NULL )
-        {
-            intf_ErrMsg( "NULL packet in the data cache" );
-            vlc_mutex_unlock( &p_cache->lock );
-            return NULL;
-        }
-    }
-    
-    if( l_size < MAX_SMALL_SIZE )
-    {
-        /* Small buffer */  
-   
-        /* Checks whether the buffer cache is empty */
-        if( p_cache->smallbuffer.l_index == 0 )
-        {
-            /* Allocates a new packet */
-            p_data->p_buffer = malloc( l_size );
-            if( p_data->p_buffer == NULL )
-            {
-                intf_DbgMsg( "Out of memory" );
-                free( p_data );
-                vlc_mutex_unlock( &p_cache->lock );
-                return NULL;
-            }
-#ifdef TRACE_INPUT
-            intf_DbgMsg( "PS input: small buffer allocated" );
-#endif
-            p_data->l_size = l_size;
-        }
-        else
-        {
-            /* Takes the packet out from the cache */
-            l_index = -- p_cache->smallbuffer.l_index;    
-            if( (p_data->p_buffer = p_cache->smallbuffer.p_stack[l_index].p_data)
-                == NULL )
-            {
-                intf_ErrMsg( "NULL packet in the small buffer cache" );
-                free( p_data );
-                vlc_mutex_unlock( &p_cache->lock );
-                return NULL;
-            }
-            /* Reallocates the packet if it is too small or too large */
-            if( p_cache->smallbuffer.p_stack[l_index].l_size < l_size ||
-                p_cache->smallbuffer.p_stack[l_index].l_size > 2*l_size )
-            {
-                p_data->p_buffer = realloc( p_data->p_buffer, l_size );
-                p_data->l_size = l_size;
-            }
-            else
-            {
-                p_data->l_size = p_cache->smallbuffer.p_stack[l_index].l_size;
-            }
-        }
-    }
-    else
-    {
-        /* Large buffer */  
-   
-        /* Checks whether the buffer cache is empty */
-        if( p_cache->largebuffer.l_index == 0 )
-        {
-            /* Allocates a new packet */
-            p_data->p_buffer = malloc( l_size );
-            if ( p_data->p_buffer == NULL )
-            {
-                intf_ErrMsg( "Out of memory" );
-                free( p_data );
-                vlc_mutex_unlock( &p_cache->lock );
-                return NULL;
-            }
-#ifdef TRACE_INPUT
-            intf_DbgMsg( "PS input: large buffer allocated" );
-#endif
-            p_data->l_size = l_size;
-        }
-        else
-        {
-            /* Takes the packet out from the cache */
-            l_index = -- p_cache->largebuffer.l_index;    
-            p_data->p_buffer = p_cache->largebuffer.p_stack[l_index].p_data;
-            if( p_data->p_buffer == NULL )
-            {
-                intf_ErrMsg( "NULL packet in the small buffer cache" );
-                free( p_data );
-                vlc_mutex_unlock( &p_cache->lock );
-                return NULL;
-            }
-            /* Reallocates the packet if it is too small or too large */
-            if( p_cache->largebuffer.p_stack[l_index].l_size < l_size ||
-                p_cache->largebuffer.p_stack[l_index].l_size > 2*l_size )
-            {
-                p_data->p_buffer = realloc( p_data->p_buffer, l_size );
-                p_data->l_size = l_size;
-            }
-            else
-            {
-                p_data->l_size = p_cache->largebuffer.p_stack[l_index].l_size;
-            }
-        }
-    }
-
-    vlc_mutex_unlock( &p_cache->lock );
-
-    /* Initialize data */
-    p_data->p_next = NULL;
-    p_data->b_discard_payload = 0;
-    p_data->p_payload_start = p_data->p_buffer;
-    p_data->p_payload_end = p_data->p_buffer + l_size;
-
-    return( p_data );
-
-}
-
-
-/*****************************************************************************
- * NewPES: allocates a pes packet
- *****************************************************************************/
-static pes_packet_t * NewPES( void * p_packet_cache )
-{
-    packet_cache_t *   p_cache;
-    pes_packet_t *     p_pes;
-
-    p_cache = (packet_cache_t *)p_packet_cache;
-
-#ifdef DEBUG
-    if ( p_cache == NULL )
-    {
-        intf_ErrMsg( "Packet cache not initialized" );
-        return NULL;
-    }
-#endif
-
-    vlc_mutex_lock( &p_cache->lock );
-
-    /* Checks whether the PES cache is empty */
-    if( p_cache->pes.l_index == 0 )
-    {
-        /* Allocates a new packet */
-        p_pes = malloc( sizeof(pes_packet_t) );
-        if( p_pes == NULL )
-        {
-            intf_DbgMsg( "Out of memory" );
-            vlc_mutex_unlock( &p_cache->lock );
-            return NULL;
-        }
-#ifdef TRACE_INPUT
-        intf_DbgMsg( "PS input: PES packet allocated" );
-#endif
-    }
-    else
-    {
-        /* Takes the packet out from the cache */
-        p_pes = p_cache->pes.p_stack[ -- p_cache->pes.l_index ];
-        if( p_pes == NULL )
-        {
-            intf_ErrMsg( "NULL packet in the data cache" );
-            vlc_mutex_unlock( &p_cache->lock );
-            return NULL;
-        }
-    }
-
-    vlc_mutex_unlock( &p_cache->lock );
-
-    p_pes->b_data_alignment = p_pes->b_discontinuity =
-        p_pes->i_pts = p_pes->i_dts = 0;
-    p_pes->i_pes_size = 0;
-    p_pes->p_first = NULL;
-
-    return( p_pes );
-    
-}
-
-/*****************************************************************************
- * DeletePacket: deletes a data packet
- *****************************************************************************/
-static void DeletePacket( void * p_packet_cache,
-                          data_packet_t * p_data )
-{
-    packet_cache_t *   p_cache;
-
-    p_cache = (packet_cache_t *)p_packet_cache;
-
-#ifdef DEBUG
-    if ( p_cache == NULL )
-    {
-        intf_ErrMsg( "Packet cache not initialized" );
-        return;
-    }
-#endif
-
-    ASSERT( p_data );
-
-    vlc_mutex_lock( &p_cache->lock );
-
-    /* Checks whether the data cache is full */
-    if ( p_cache->data.l_index < DATA_CACHE_SIZE )
-    {
-        /* Cache not full: store the packet in it */
-        p_cache->data.p_stack[ p_cache->data.l_index ++ ] = p_data;
-        /* Small buffer or large buffer? */
-        if ( p_data->l_size < MAX_SMALL_SIZE )
-        {
-            /* Checks whether the small buffer cache is full */
-            if ( p_cache->smallbuffer.l_index < SMALL_CACHE_SIZE )
-            {
-                p_cache->smallbuffer.p_stack[
-                    p_cache->smallbuffer.l_index ].l_size = p_data->l_size;
-                p_cache->smallbuffer.p_stack[
-                    p_cache->smallbuffer.l_index++ ].p_data = p_data->p_buffer;
-            }
-            else
-            {
-                ASSERT( p_data->p_buffer );
-                free( p_data->p_buffer );
-#ifdef TRACE_INPUT
-                intf_DbgMsg( "PS input: small buffer freed" );
-#endif
-            }
-        }
-        else
-        {
-            /* Checks whether the large buffer cache is full */
-            if ( p_cache->largebuffer.l_index < LARGE_CACHE_SIZE )
-            {
-                p_cache->largebuffer.p_stack[
-                    p_cache->largebuffer.l_index ].l_size = p_data->l_size;
-                p_cache->largebuffer.p_stack[
-                    p_cache->largebuffer.l_index++ ].p_data = p_data->p_buffer;
-            }
-            else
-            {
-                ASSERT( p_data->p_buffer );
-                free( p_data->p_buffer );
-#ifdef TRACE_INPUT
-                intf_DbgMsg( "PS input: large buffer freed" );
-#endif
-            }
-        }
-    }
-    else
-    {
-        /* Cache full: the packet must be freed */
-        free( p_data->p_buffer );
-        free( p_data );
-#ifdef TRACE_INPUT
-        intf_DbgMsg( "PS input: data packet freed" );
-#endif
-    }
-
-    vlc_mutex_unlock( &p_cache->lock );
-}
-
-/*****************************************************************************
- * DeletePES: deletes a PES packet and associated data packets
- *****************************************************************************/
-static void DeletePES( void * p_packet_cache, pes_packet_t * p_pes )
-{
-    packet_cache_t *    p_cache;
-    data_packet_t *     p_data;
-    data_packet_t *     p_next;
-
-    p_cache = (packet_cache_t *)p_packet_cache;
-
-#ifdef DEBUG
-    if ( p_cache == NULL )
-    {
-        intf_ErrMsg( "Packet cache not initialized" );
-        return;
-    }
-#endif
-
-    ASSERT( p_pes);
-
-    p_data = p_pes->p_first;
-
-    while( p_data != NULL )
-    {
-        p_next = p_data->p_next;
-        DeletePacket( p_cache, p_data );
-        p_data = p_next;
-    }
-
-    vlc_mutex_lock( &p_cache->lock );
-
-    /* Checks whether the PES cache is full */
-    if ( p_cache->pes.l_index < PES_CACHE_SIZE )
-    {
-        /* Cache not full: store the packet in it */
-        p_cache->pes.p_stack[ p_cache->pes.l_index ++ ] = p_pes;
-    }
-    else
-    {
-        /* Cache full: the packet must be freed */
-        free( p_pes );
-#ifdef TRACE_INPUT
-        intf_DbgMsg( "PS input: PES packet freed" );
-#endif
-    }
-
-    vlc_mutex_unlock( &p_cache->lock );
 }
 

@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.5.2.2 2001/12/30 06:06:00 sam Exp $
+ * $Id: spu_decoder.c,v 1.5.2.3 2001/12/31 01:21:45 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -275,7 +275,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
                   p_spudec->i_spu_size );
 
     /* We cannot display a subpicture with no date */
-    if( DECODER_FIFO_START(*p_spudec->p_fifo)->i_pts == 0 )
+    if( p_spudec->p_fifo->p_first->i_pts == 0 )
     {
         intf_WarnMsg( 3, "spudec error: subtitle without a date" );
         return;
@@ -295,7 +295,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
     }
 
     /* Get display time now. If we do it later, we may miss the PTS. */
-    p_spudec->i_pts = DECODER_FIFO_START(*p_spudec->p_fifo)->i_pts;
+    p_spudec->i_pts = p_spudec->p_fifo->p_first->i_pts;
 
     /* Allocate the temporary buffer we will parse */
     p_src = malloc( p_spudec->i_rle_size );
