@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2004 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -39,6 +39,7 @@
     IBOutlet id o_controller;
 
     IBOutlet id o_btn_playlist;
+    IBOutlet id o_playlist_view;
     IBOutlet id o_outline_view;
     IBOutlet id o_tc_name;
     IBOutlet id o_tc_author;
@@ -73,12 +74,11 @@
 
 - (void)initStrings;
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
-- (NSOutlineView *)playlistView;
+- (NSOutlineView *)outlineView;
 
 - (IBAction)handlePopUp:(id)sender;
 - (IBAction)searchItem:(id)sender;
 
-- (void)updateTogglePlaylistState;
 - (void)playlistUpdated;
 - (void)sortNode:(int)i_mode;
 - (void)updateRowSelection;

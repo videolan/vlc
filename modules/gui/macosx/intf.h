@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2004 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -87,7 +87,7 @@ struct intf_sys_t
     BOOL nib_open_loaded;       /* reference to the open-nib */
 
     IBOutlet id o_window;       /* main window    */
-    IBOutlet id o_clip_view;    /* playlist clipview    */
+    IBOutlet id o_playlist_view;/* playlist view  */
     IBOutlet id o_scrollfield;  /* info field     */
     IBOutlet id o_timefield;    /* time field     */
     IBOutlet id o_timeslider;   /* time slider    */
@@ -102,6 +102,7 @@ struct intf_sys_t
     IBOutlet id o_btn_ff;       /* btn fast forward     */
     IBOutlet id o_btn_next;     /* btn next       */
     IBOutlet id o_btn_fullscreen;/* btn fullscreen      */
+    IBOutlet id o_btn_playlist; /* btn playlist   */
 
     NSImage * o_img_play;       /* btn play img   */
     NSImage * o_img_pause;      /* btn pause img  */
@@ -234,9 +235,8 @@ struct intf_sys_t
     IBOutlet id o_dmi_previous;
     IBOutlet id o_dmi_mute;
     
-    /* stupid outline views .... */
-    NSRect rect_remember;
-    NSView *o_document_view;
+    bool b_small_window;
+    
 }
 
 + (VLCMain *)sharedInstance;
@@ -282,6 +282,9 @@ struct intf_sys_t
 - (IBAction)openWebsite:(id)sender;
 - (IBAction)openLicense:(id)sender;
 - (IBAction)openCrashLog:(id)sender;
+
+- (IBAction)togglePlaylist:(id)sender;
+- (void)updateTogglePlaylistState;
 
 - (void)windowDidBecomeKey:(NSNotification *)o_notification;
 

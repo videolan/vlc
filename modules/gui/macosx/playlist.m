@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2004 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -25,7 +25,6 @@
 
 /* TODO
  * add 'icons' for different types of nodes? (http://www.cocoadev.com/index.pl?IconAndTextInTableCell)
- * create a new 'playlist toggle' that hides the playlist and in effect give you the old controller
  * create a new search field build with pictures from the 'regular' search field, so it can be emulated on 10.2
  * create toggle buttons for the shuffle, repeat one, repeat all functions.
  * implement drag and drop and item reordering.
@@ -50,9 +49,6 @@
 #include "controls.h"
 #include "osd.h"
 #include "misc.h"
-
-#define REF_HEIGHT 500
-#define REF_WIDTH 500
 
 /*****************************************************************************
  * VLCPlaylistView implementation 
@@ -199,73 +195,14 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 #if 0
     [o_search_button setTitle: _NS("Search")];
 #endif
-    [o_btn_playlist setToolTip: _NS("Playlist")];
     [[o_loop_popup itemAtIndex:0] setTitle: _NS("Standard Play")];
     [[o_loop_popup itemAtIndex:1] setTitle: _NS("Repeat One")];
     [[o_loop_popup itemAtIndex:2] setTitle: _NS("Repeat All")];
 }
 
-- (NSOutlineView *)playlistView
+- (NSOutlineView *)outlineView
 {
     return o_outline_view;
-}
-
-- (IBAction)toggleWindow:(id)sender
-{
-    NSRect o_rect;
-    /*First, check if the playlist is visible*/
-    if ( [o_controller frame].size.height == [o_controller minSize].height )
-    {
-        /*Check if the stored heigth of the controller is usable (!= minSize)*/
-        if ([o_controller getSizeWithPlaylist].height !=
-                                        [o_controller minSize].height)
-        {
-            o_rect.size.height = [o_controller getSizeWithPlaylist].height;
-        }
-        else
-        {
-            /*If the stored height is not usable, use a reference one*/
-            o_rect.size.height = REF_HEIGHT;
-        }
-
-        /*Check if the controller width is the minimum one*/
-        if ( [o_controller frame].size.width == [o_controller minSize].width)
-        {
-            /*If the controller width is minimum, check if the stored height
-              of the playlist makes it visible*/
-            if ([o_controller getSizeWithPlaylist].height !=
-                                               [o_controller minSize].height)
-            {
-                o_rect.size.width = [o_controller getSizeWithPlaylist].width;
-            }
-            else
-            {
-                /*If not, use a reference width*/
-                o_rect.size.width = REF_WIDTH;
-            }
-        }
-        else
-        {
-            o_rect.size.width = [o_controller frame].size.width;
-        }
-        o_rect.origin.x = [o_controller frame].origin.x;
-        o_rect.origin.y = [o_controller frame].origin.y - o_rect.size.height +
-                                                [o_controller minSize].height;
-
-        [o_btn_playlist setState: YES];
-    }
-    else
-    {
-        o_rect.size = [o_controller minSize];
-        o_rect.origin.x = [o_controller frame].origin.x;
-        /*Calculate the position of the lower right corner after resize*/
-        o_rect.origin.y = [o_controller frame].origin.y +
-            [o_controller frame].size.height - [o_controller minSize].height;
-
-        [o_btn_playlist setState: NO];
-    }
-
-    [o_controller setFrame: o_rect display:YES animate: YES];
 }
 
 - (void)playlistUpdated
@@ -284,20 +221,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     // TODO Find a way to keep the dict size to a minimum
     //[o_outline_dict removeAllObjects];
     [o_outline_view reloadData];
-}
-
-
-- (void)updateTogglePlaylistState
-{
-    if( [o_controller getSizeWithPlaylist].height ==
-                                    [o_controller minSize].height )
-    {
-        [o_btn_playlist setState: NO];
-    }
-    else
-    {
-        [o_btn_playlist setState: YES];
-    }
 }
 
 - (void)updateRowSelection

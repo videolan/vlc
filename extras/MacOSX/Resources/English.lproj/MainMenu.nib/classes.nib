@@ -112,6 +112,7 @@
                 openWebsite = id; 
                 reportABug = id; 
                 timesliderUpdate = id; 
+                togglePlaylist = id; 
                 viewAbout = id; 
                 viewPreferences = id; 
             }; 
@@ -122,10 +123,10 @@
                 "o_btn_fullscreen" = id; 
                 "o_btn_next" = id; 
                 "o_btn_play" = id; 
+                "o_btn_playlist" = id; 
                 "o_btn_prev" = id; 
                 "o_btn_rewind" = id; 
                 "o_btn_stop" = id; 
-                "o_clip_view" = id; 
                 "o_controls" = id; 
                 "o_dmi_mute" = id; 
                 "o_dmi_next" = id; 
@@ -229,6 +230,7 @@
                 "o_mu_visual" = id; 
                 "o_mu_window" = id; 
                 "o_playlist" = id; 
+                "o_playlist_view" = id; 
                 "o_scrollfield" = id; 
                 "o_timefield" = id; 
                 "o_timeslider" = id; 
@@ -248,12 +250,10 @@
                 selectAll = id; 
                 sortNodeByAuthor = id; 
                 sortNodeByName = id; 
-                toggleWindow = id; 
             }; 
             CLASS = VLCPlaylist; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                "o_btn_playlist" = id; 
                 "o_controller" = id; 
                 "o_ctx_menu" = id; 
                 "o_loop_popup" = id; 
@@ -267,6 +267,7 @@
                 "o_mi_sort_name" = id; 
                 "o_mu_services" = id; 
                 "o_outline_view" = id; 
+                "o_playlist_view" = id; 
                 "o_random_ckb" = id; 
                 "o_search_field" = id; 
                 "o_status_field" = id; 

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * misc.m: code not specific to vlc
  *****************************************************************************
- * Copyright (C) 2003-2004 VideoLAN
+ * Copyright (C) 2003-2005 VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -41,7 +41,7 @@
 
     o_size_with_playlist = [self frame].size;
 
-    [[[VLCMain sharedInstance] getPlaylist] updateTogglePlaylistState];
+    [[VLCMain sharedInstance] updateTogglePlaylistState];
 
     return( self );
 }
@@ -59,7 +59,7 @@
     o_size_with_playlist = proposedFrameSize;
 
     /*Callback to update the state of Playlist Toggle Button*/
-    [[[VLCMain sharedInstance] getPlaylist] updateTogglePlaylistState];
+    [[VLCMain sharedInstance] updateTogglePlaylistState];
 
     return proposedFrameSize;
 }

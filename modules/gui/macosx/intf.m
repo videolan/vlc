@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2004 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -378,6 +378,22 @@ static VLCMain *_o_sharedMainInstance = nil;
     [self setSubmenusEnabled: FALSE];
     [self manageVolumeSlider];
     [o_window setDelegate: self];
+    
+    if( [o_window frame].size.height <= 200 )
+    {
+        b_small_window = YES;
+        [o_window setFrame: NSMakeRect( [o_window frame].origin.x, [o_window frame].origin.y, [o_window frame].size.width, 95 ) display: YES animate:YES];
+        [o_playlist_view setAutoresizesSubviews: NO];
+    }
+    else
+    {
+        b_small_window = NO;
+        [o_playlist_view setFrame: NSMakeRect( 10, 10, [o_window frame].size.width - 20, [o_window frame].size.height - 105 )];
+        [o_playlist_view setNeedsDisplay:YES];
+        [o_playlist_view setAutoresizesSubviews: YES];
+        [[o_window contentView] addSubview: o_playlist_view];
+    }
+    [self updateTogglePlaylistState];
 
     p_playlist = (playlist_t *) vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
@@ -413,6 +429,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_btn_fullscreen setToolTip: _NS("Fullscreen")];
     [o_volumeslider setToolTip: _NS("Volume")];
     [o_timeslider setToolTip: _NS("Position")];
+    [o_btn_playlist setToolTip: _NS("Playlist")];
 
     /* messages panel */
     [o_msgs_panel setTitle: _NS("Messages")];
@@ -1438,31 +1455,80 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
 }
 
-- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)proposedFrameSize
+- (IBAction)togglePlaylist:(id)sender
 {
-    if( proposedFrameSize.height <= 200 )
+    NSRect o_rect = [o_window frame];
+    /*First, check if the playlist is visible*/
+    if( o_rect.size.height <= 200 )
     {
-        if( [sender frame].size.height > 200 )
-        {
-            //rect_remember = [[o_playlist playlistView] frame];
-            o_document_view = [o_clip_view documentView];
-            [o_document_view retain];
-            [o_clip_view setDocumentView: NULL];
-        }
-        return NSMakeSize( proposedFrameSize.width, 95 );
+        b_small_window = YES; /* we know we are small, make sure this is actually set (see case below) */
+        /* make large */
+        o_rect.size.height = 500;
+        
+        o_rect.origin.x = [o_window frame].origin.x;
+        o_rect.origin.y = [o_window frame].origin.y - o_rect.size.height +
+                                                [o_window minSize].height;
+        [o_btn_playlist setState: YES];
     }
     else
     {
-        if( [sender frame].size.height <= 200 )
+        /* make small */
+        o_rect.size.height = 95;
+        o_rect.origin.x = [o_window frame].origin.x;
+        /* Calculate the position of the lower right corner after resize */
+        o_rect.origin.y = [o_window frame].origin.y +
+            [o_window frame].size.height - [o_window minSize].height;
+        
+        [o_playlist_view setAutoresizesSubviews: NO];
+        [o_playlist_view removeFromSuperview];
+        [o_btn_playlist setState: NO];
+        b_small_window = NO; /* we aren't small here just yet. we are doing an animated resize after this */
+    }
+
+    [o_window setFrame: o_rect display:YES animate: YES];
+}
+
+- (void)updateTogglePlaylistState
+{
+    if( [o_window frame].size.height <= 200 )
+    {
+        [o_btn_playlist setState: NO];
+    }
+    else
+    {
+        [o_btn_playlist setState: YES];
+    }
+}
+
+- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)proposedFrameSize
+{
+    /* Not triggered on a window resize or maxification of the window. only by window mouse dragging resize */
+    if( proposedFrameSize.height <= 200 )
+    {
+        if( b_small_window == NO )
         {
-            [o_clip_view setDocumentView: o_document_view];
-            [o_document_view release];
-            [o_document_view setFrameSize: NSMakeSize( proposedFrameSize.width - 22, proposedFrameSize.height - 120 )];
-            //[[o_playlist playlistView] setFrame: rect_remember];
+            /* if large and going to small then hide */
+            b_small_window = YES;
+            [o_playlist_view setAutoresizesSubviews: NO];
+            [o_playlist_view removeFromSuperview];
         }
-        return proposedFrameSize;
+        return NSMakeSize( proposedFrameSize.width, 95 );
     }
     return proposedFrameSize;
+}
+
+- (void)windowDidResize:(NSNotification *)notif
+{
+    if( [o_window frame].size.height > 200 && b_small_window )
+    {
+        /* If large and coming from small then show */
+        [o_playlist_view setAutoresizesSubviews: YES];
+        [o_playlist_view setFrame: NSMakeRect( 10, 10, [o_window frame].size.width - 20, [o_window frame].size.height - 95 - 10 )];
+        [o_playlist_view setNeedsDisplay:YES];
+        [[o_window contentView] addSubview: o_playlist_view];
+        b_small_window = NO;
+    }
+    [self updateTogglePlaylistState];
 }
 
 @end
