@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.80 2001/03/21 13:42:34 sam Exp $
+ * $Id: main.c,v 1.81 2001/04/05 03:50:38 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -32,8 +32,12 @@
 #include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
 #include <stdio.h>                                              /* sprintf() */
 
-#ifdef HAVE_GETOPT_H
-#include <getopt.h>                                              /* getopt() */
+#ifdef HAVE_GETOPT_LONG
+#   ifdef HAVE_GETOPT_H
+#       include <getopt.h>                                       /* getopt() */
+#   endif
+#else
+#   include "GNUgetopt/getopt.h"
 #endif
 
 #ifdef SYS_DARWIN1_3
@@ -105,6 +109,7 @@
 
 #define OPT_SYNCHRO             190
 #define OPT_WARNING             191
+#define OPT_VERSION             192
 
 /* Usage fashion */
 #define USAGE                     0
@@ -112,7 +117,6 @@
 #define LONG_HELP                 2
 
 /* Long options */
-#ifdef HAVE_GETOPT_H
 static const struct option longopts[] =
 {
     /*  name,               has_arg,    flag,   val */
@@ -120,7 +124,7 @@ static const struct option longopts[] =
     /* General/common options */
     {   "help",             0,          0,      'h' },
     {   "longhelp",         0,          0,      'H' },
-    {   "version",          0,          0,      'v' },
+    {   "version",          0,          0,      OPT_VERSION },
 
     /* Interface options */
     {   "intf",             1,          0,      'I' },
@@ -167,8 +171,6 @@ static const struct option longopts[] =
 
 /* Short options */
 static const char *psz_shortopts = "hHvgt:T:a:s:c:I:A:V:";
-#endif
-
 
 /*****************************************************************************
  * Global variable program_data - this is the one and only, see main.h
@@ -178,7 +180,6 @@ main_t *p_main;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void SetDefaultConfiguration ( void );
 static int  GetConfiguration        ( int i_argc, char *ppsz_argv[],
                                       char *ppsz_env[] );
 static int  GetFilenames            ( int i_argc, char *ppsz_argv[] );
@@ -258,9 +259,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         intf_MsgDestroy();
         return( errno );
     }
-
-    p_main->i_warning_level = main_GetIntVariable( INTF_WARNING_VAR,
-                                                   INTF_WARNING_DEFAULT );
 
     /*
      * Initialize playlist and get commandline files
@@ -502,24 +500,6 @@ void main_PutIntVariable( char *psz_name, int i_value )
 /* following functions are local */
 
 /*****************************************************************************
- * SetDefaultConfiguration: set default options
- *****************************************************************************
- * This function is called by GetConfiguration before command line is parsed.
- * It sets all the default values required later by the program. At this stage,
- * most structure are not yet allocated, so initialization must be done using
- * environment.
- *****************************************************************************/
-static void SetDefaultConfiguration( void )
-{
-    /*
-     * All features are activated by default except vlans
-     */
-    p_main->b_audio  = 1;
-    p_main->b_video  = 1;
-    p_main->b_vlans  = 0;
-}
-
-/*****************************************************************************
  * GetConfiguration: parse command line
  *****************************************************************************
  * Parse command line and configuration file for configuration. If the inline
@@ -530,35 +510,40 @@ static void SetDefaultConfiguration( void )
  *****************************************************************************/
 static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
-    int c;
-    char * p_pointer;
+    int   i_cmd;
+    char *p_tmp;
 
     /* Set default configuration and copy arguments */
     p_main->i_argc    = i_argc;
     p_main->ppsz_argv = ppsz_argv;
     p_main->ppsz_env  = ppsz_env;
-    SetDefaultConfiguration();
+
+    p_main->b_audio  = 1;
+    p_main->b_video  = 1;
+    p_main->b_vlans  = 0;
+
+    p_main->i_warning_level = 4;
 
     /* Get the executable name (similar to the basename command) */
-    p_main->psz_arg0 = p_pointer = ppsz_argv[ 0 ];
-    while( *p_pointer )
+    p_main->psz_arg0 = p_tmp = ppsz_argv[ 0 ];
+    while( *p_tmp )
     {
-        if( *p_pointer == '/' )
+        if( *p_tmp == '/' )
         {
-            p_main->psz_arg0 = ++p_pointer;
+            p_main->psz_arg0 = ++p_tmp;
         }
         else
         {
-            ++p_pointer;
+            ++p_tmp;
         }
     }
 
     /* Parse command line options */
-#ifdef HAVE_GETOPT_H
     opterr = 0;
-    while( ( c = getopt_long( i_argc, ppsz_argv, psz_shortopts, longopts, 0 ) ) != EOF )
+    while( ( i_cmd = getopt_long( i_argc, ppsz_argv,
+                                  psz_shortopts, longopts, 0 ) ) != EOF )
     {
-        switch( c )
+        switch( i_cmd )
         {
         /* General/common options */
         case 'h':                                              /* -h, --help */
@@ -569,17 +554,21 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             Usage( LONG_HELP );
             return( -1 );
             break;
-        case 'v':                                           /* -v, --version */
+        case OPT_VERSION:                                       /* --version */
             Version();
             return( -1 );
             break;
+	case 'v':                                           /* -v, --verbose */
+            p_main->i_warning_level--;
+	    break;
 
         /* Interface warning messages level */
 	case 'I':                                              /* -I, --intf */
             main_PutPszVariable( INTF_METHOD_VAR, optarg );
             break;
         case OPT_WARNING:                                       /* --warning */
-            main_PutIntVariable( INTF_WARNING_VAR, atoi(optarg) );
+            intf_ErrMsg( "intf error: `--warning' is deprecated, use `-v'" );
+            p_main->i_warning_level = atoi(optarg);
             break;
 
         /* Audio options */
@@ -683,13 +672,19 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         /* Internal error: unknown option */
         case '?':
         default:
-            intf_ErrMsg( "intf error: unknown option `%s'", ppsz_argv[optind - 1] );
+            intf_ErrMsg( "intf error: unknown option `%s'",
+                         ppsz_argv[optind - 1] );
             Usage( USAGE );
             return( EINVAL );
             break;
         }
     }
-#endif
+
+    if( p_main->i_warning_level < 0 )
+    {
+        p_main->i_warning_level = 0;
+    }
+
     return( 0 );
 }
 
@@ -733,7 +728,7 @@ static void Usage( int i_fashion )
     /* Options */
     intf_MsgImm( "\nOptions:"
           "\n  -I, --intf <module>            \tinterface method"
-          "\n      --warning <level>          \tdisplay warning messages"
+          "\n  -v, --verbose                  \tverbose mode (cumulative)"
           "\n"
           "\n      --noaudio                  \tdisable audio"
           "\n  -A, --aout <module>            \taudio output method"
@@ -766,7 +761,7 @@ static void Usage( int i_fashion )
           "\n"
           "\n  -h, --help                     \tprint help and exit"
           "\n  -H, --longhelp                 \tprint long help and exit"
-          "\n  -v, --version                  \toutput version information and exit" );
+          "\n      --version                  \toutput version information and exit" );
 
     if( i_fashion == SHORT_HELP )
         return;
@@ -775,8 +770,7 @@ static void Usage( int i_fashion )
     intf_MsgImm( "\nInterface parameters:"
         "\n  " INTF_METHOD_VAR "=<method name>          \tinterface method"
         "\n  " INTF_INIT_SCRIPT_VAR "=<filename>               \tinitialization script"
-        "\n  " INTF_CHANNELS_VAR "=<filename>            \tchannels list"
-        "\n  " INTF_WARNING_VAR "=<level>                \twarning level" );
+        "\n  " INTF_CHANNELS_VAR "=<filename>            \tchannels list" );
 
     /* Audio parameters */
     intf_MsgImm( "\nAudio parameters:"

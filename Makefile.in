@@ -75,26 +75,7 @@ INCLUDE += -Iinclude -Iextras -I/usr/local/include
 #
 # Libraries
 #
-ifeq ($(SYS),gnu)
-LIB += -lthreads -ldl
-endif
-
-ifneq (,$(findstring bsd,$(SYS)))
-LIB += -pthread -lgnugetopt
-LIB += -L/usr/local/lib
-endif
-
-ifneq (,$(findstring linux,$(SYS)))
-LIB += -lpthread -ldl
-endif
-
-ifneq (,$(findstring solaris,$(SYS)))
-LIB += -ldl -lsocket -lnsl -lpthread
-endif
-
-ifneq (,$(findstring darwin,$(SYS)))
-LIB += -ldl
-endif
+LIB = @LIB@ -L/usr/local/lib
 
 ifeq ($(SYS),beos)
 LIB += -lbe -lroot -lgame
@@ -180,7 +161,7 @@ DCFLAGS += -MM
 #
 # C compiler flags: linking
 #
-LCFLAGS += $(LIB)
+LCFLAGS += @LCFLAGS@ $(LIB)
 LCFLAGS += -Wall
 #LCFLAGS += -s
 
@@ -193,7 +174,7 @@ else
 ifneq (,$(findstring darwin,$(SYS)))
 LCFLAGS += -dyn
 else
-LCFLAGS += --export-dynamic @DYNAMIC_FLAG@
+LCFLAGS += --export-dynamic
 endif
 endif
 endif
@@ -281,7 +262,6 @@ MISC =		src/misc/mtime.o \
 		src/misc/modules.o \
 		src/misc/netutils.o
 
-
 C_OBJ =		$(INTERFACE) \
 		$(INPUT) \
 		$(VIDEO_OUTPUT) \
@@ -293,7 +273,8 @@ C_OBJ =		$(INTERFACE) \
 		$(GEN_DECODER) \
 		$(VIDEO_PARSER) \
 		$(VIDEO_DECODER) \
-		$(MISC)
+		$(MISC) \
+		@GETOPT@
 
 
 #
@@ -497,11 +478,11 @@ all: vlc @ALIASES@ plugins
 
 clean:
 	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ)
-	rm -f plugins/*/*.o src/*/*.o lib/*.so
+	rm -f plugins/*/*.o src/*/*.o lib/*.so extras/*/*.o
 	rm -f vlc gvlc kvlc qvlc
 
 distclean: clean
-	rm -f src/*/*.o plugins/*/*.o **/*~ *.log
+	rm -f **/*.o **/*~ *.log
 	rm -f Makefile include/defs.h include/config.h
 	rm -f config.status config.cache config.log
 	rm -f gmon.out core build-stamp

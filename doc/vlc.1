@@ -35,8 +35,10 @@ A summary of options is included below.
 .B \-I, \-\-intf <module>
 Specify an interface module: "gnome", "curses", "qt", for instance.
 .TP
-.B \-\-warning <level>
-Select the warning level. 0 is the most verbose, 3 is almost mute.
+.B \-v, \-\-verbose
+Set
+.B vlc
+verbosity. This command is cumulative, you can use "-vv" or "-vvvv" for increased verbosity.
 .TP
 .B \-\-noaudio
 Disable audio output.
@@ -138,7 +140,6 @@ also accepts a lot of parameters to customize its behaviour.
  vlc_intf=<method name>   interface method
  vlc_init=<filename>      initialization script
  vlc_channels=<filename>  channels list
- warning_level=<level>    warning level
 .TP
 .B Audio parameters:
  vlc_aout=<method name>   audio method

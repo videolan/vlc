@@ -2,7 +2,7 @@
  * aout_darwin.c : Darwin audio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_darwin.c,v 1.3 2001/03/21 13:42:33 sam Exp $
+ * $Id: aout_darwin.c,v 1.4 2001/04/05 03:50:38 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *
@@ -220,7 +220,7 @@ static int aout_Open( aout_thread_t *p_aout )
 
 #if WRITE_AUDIO_OUTPUT_TO_FILE
     p_aout->p_sys->fd = open( "/Users/bofh/audio-darwin.pcm", O_RDWR|O_CREAT );
-    intf_WarnMsg( "open(...) -> %d", p_aout->p_sys->fd );
+    intf_WarnMsg( 1, "open(...) -> %d", p_aout->p_sys->fd );
 #endif
 
     vlc_cond_init( &p_aout->p_sys->cond_sync );

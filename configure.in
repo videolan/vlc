@@ -28,26 +28,26 @@ AC_C_BIGENDIAN
 dnl Check for system libs needed
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol)
 AC_CHECK_FUNCS(setenv putenv)
-AC_CHECK_FUNC(connect,,[AC_CHECK_LIB(socket,connect)])
-AC_CHECK_FUNC(gethostbyname,,[AC_CHECK_LIB(nsl,gethostbyname)])
-AC_CHECK_FUNC(nanosleep,,[AC_CHECK_LIB(rt,nanosleep,,[AC_CHECK_LIB(posix4,nanosleep)])])
+AC_CHECK_FUNC(connect,,[AC_CHECK_LIB(socket,connect,LIB=${LIB}" -lsocket")])
+AC_CHECK_FUNC(gethostbyname,,[AC_CHECK_LIB(nsl,gethostbyname,LIB=${LIB}" -lnsl")])
+AC_CHECK_FUNC(nanosleep,,[AC_CHECK_LIB(rt,nanosleep,LIB=${LIB}" -lrt",[AC_CHECK_LIB(posix4,nanosleep,LIB=${LIB}" -lposix4")])])
 AC_CHECK_FUNCS(usleep)
-AC_CHECK_FUNC(inet_aton,,[AC_CHECK_LIB(resolv,inet_aton)])
+AC_CHECK_FUNC(inet_aton,,[AC_CHECK_LIB(resolv,inet_aton,LIB=${LIB}" -lresolv")])
 AC_CHECK_FUNCS(vasprintf)
+
+AC_CHECK_FUNC(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
+[ # FreeBSD has a gnugetopt library for this:
+  AC_CHECK_LIB([gnugetopt],[getopt_long],
+    [AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support) LIB=${LIB}" -lgnugetopt"],
+    [GETOPT="extras/GNUgetopt/getopt.o extras/GNUgetopt/getopt1.o"])])
+AC_SUBST(GETOPT)
+
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
-AC_CHECK_LIB(dl, dlopen)
-AC_CHECK_LIB(gnugetopt, optarg)
-AC_CHECK_LIB(be, _)
-AC_CHECK_LIB(game, _)
-AC_CHECK_LIB(root, _)
-AC_CHECK_LIB(m, powl)
-AC_CHECK_LIB(pthread, pthread_create)
-AC_CHECK_LIB(threads, thread_create)
-
-dnl check for getopt_long, substitute the distributed versions if not
-AC_CHECK_FUNC(getopt_long,,[LIBOBJS="$LIBOBJS getopt.o getopt1.o"])
-AC_SUBST(LIBOBJS)
+AC_CHECK_LIB(dl,dlopen,LIB=${LIB}" -ldl")
+AC_CHECK_LIB(m,powl,LIB=${LIB}" -lm")
+AC_CHECK_LIB(pthread,pthread_create,LIB=${LIB}" -lpthread")
+AC_CHECK_LIB(threads,thread_create,LIB=${LIB}" -lthreads")
 
 CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
 AC_CHECK_HEADERS(stddef.h)
@@ -77,7 +77,7 @@ dnl Check for -rdynamic flag
 CFLAGS="${CFLAGS} -rdynamic -Wall -Werror"
 AC_MSG_CHECKING([if \$CC accepts -rdynamic])
 AC_TRY_COMPILE([],,
- DYNAMIC_FLAG="-rdynamic"
+ LCFLAGS=${LCFLAGS}" -rdynamic"
  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl End of the bizarre compilation tests
@@ -150,9 +150,10 @@ AC_ARG_ENABLE(optimizations,
 
 SYS=${host_os}
 
-# special cases
+dnl special cases
 if test x$host_os = xbeos; then
     PLUGINS=${PLUGINS}"beos "
+    LIB=${LIB}" -lbe -lgame -lroot"
 
 dnl default case
 else
@@ -267,7 +268,10 @@ AC_SUBST(DEBUG)
 AC_SUBST(STATS)
 AC_SUBST(OPTIMS)
 AC_SUBST(CSS)
-AC_SUBST(DYNAMIC_FLAG)
+
+AC_SUBST(LCFLAGS)
+AC_SUBST(LIB)
+
 AC_SUBST(LIB_SDL)
 AC_SUBST(LIB_GLIDE)
 AC_SUBST(LIB_GGI)

@@ -121,41 +121,11 @@
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H
 
-/* Define if you have the be library (-lbe).  */
-#undef HAVE_LIBBE
+/* long getopt support */
+#undef HAVE_GETOPT_LONG
 
-/* Define if you have the dl library (-ldl).  */
-#undef HAVE_LIBDL
-
-/* Define if you have the game library (-lgame).  */
-#undef HAVE_LIBGAME
-
-/* Define if you have the gnugetopt library (-lgnugetopt).  */
-#undef HAVE_LIBGNUGETOPT
-
-/* Define if you have the m library (-lm).  */
-#undef HAVE_LIBM
-
-/* Define if you have the nsl library (-lnsl).  */
-#undef HAVE_LIBNSL
-
-/* Define if you have the pthread library (-lpthread).  */
-#undef HAVE_LIBPTHREAD
-
-/* Define if you have the resolv library (-lresolv).  */
-#undef HAVE_LIBRESOLV
-
-/* Define if you have the root library (-lroot).  */
-#undef HAVE_LIBROOT
-
-/* Define if you have the rt library (-lrt).  */
-#undef HAVE_LIBRT
-
-/* Define if you have the socket library (-lsocket).  */
-#undef HAVE_LIBSOCKET
-
-/* Define if you have the threads library (-lthreads).  */
-#undef HAVE_LIBTHREADS
+/* getopt support */
+#undef HAVE_GETOPT_LONG
 
 /* Define if ntohl is in <sys/param.h>. */
 #undef NTOHL_IN_SYS_PARAM_H
