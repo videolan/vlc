@@ -261,8 +261,9 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
     dnl
     AC_CHECK_HEADERS(/sys/dev/scsi/scsi_ioctl.h,[
       NEED_BSDI_LIBDVD=1
+      AC_DEFINE(DVD_STRUCT_IN_BSDI_DVDIOCTL_DVD_H, 1,
+                Define if <extras/BSDI_dvdioctl/dvd.h> defines DVD_STRUCT.)
       OBJ_LIBDVDCSS="${OBJ_LIBDVDCSS} bsdi_dvdioctl.o"
-      CFLAGS_LIBDVDCSS="${CFLAGS_LIBDVDCSS} -I../BSDI_ioctl"
       LINUX_DVD_STRUCT=1
     ])
   ])

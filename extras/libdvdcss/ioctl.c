@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.10 2001/08/09 23:12:36 sam Exp $
+ * $Id: ioctl.c,v 1.11 2001/08/10 17:43:50 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -51,6 +51,9 @@
 #endif
 #ifdef DVD_STRUCT_IN_DVD_H
 #   include <dvd.h>
+#endif
+#ifdef DVD_STRUCT_IN_BSDI_DVDIOCTL_DVD_H
+#   include <BSDI_dvdioctl/dvd.h>
 #endif
 #ifdef SYS_BEOS
 #   include <malloc.h>

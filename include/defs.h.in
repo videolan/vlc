@@ -58,6 +58,9 @@
 /* Define if you have the vasprintf function.  */
 #undef HAVE_VASPRINTF
 
+/* Define if you have the </sys/dev/scsi/scsi_ioctl.h> header file.  */
+#undef HAVE__SYS_DEV_SCSI_SCSI_IOCTL_H
+
 /* Define if you have the <Carbon/Carbon.h> header file.  */
 #undef HAVE_CARBON_CARBON_H
 
@@ -189,6 +192,9 @@
 
 /* Define if <dvd.h> defines DVD_STRUCT. */
 #undef DVD_STRUCT_IN_DVD_H
+
+/* Define if <extras/BSDI_dvdioctl/dvd.h> defines DVD_STRUCT. */
+#undef DVD_STRUCT_IN_BSDI_DVDIOCTL_DVD_H
 
 /* Have userspace SCSI headers. */
 #undef SOLARIS_USCSI
