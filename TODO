@@ -175,6 +175,14 @@ Need I say more? <a href="http://www.monkeysaudio.com/">Monkeys Audio (APE)</a> 
 Status: Todo
 
 Task
+Difficulty: Easy
+Urgency: Wishlist
+Platform: any
+Description: flash video muxer
+A flash video muxer. FFMPEG can already output flash video. a wast not to make use of that capability.
+Status: Todo
+
+Task
 Task
 Difficulty: Medium
 Urgency: Wishlist
@@ -238,7 +246,7 @@ Difficulty: Easy
 Urgency: Normal
 Platform: any
 Description: Fix up text subtitles
-Currently the subtitle dialog boxes are out of date and not really useable. Also we need more files to test and verify the current support, and the rendering of the subs should be sped up quite a bit (issue with outlining?) Other issues should mostly be dealt with after the vout systems are improved.
+Currently the subtitle dialog boxes are out of date and not really useable. Also we need more files to test and verify the current support. Other issues should mostly be dealt with after the vout systems are improved. For SSA support positioning and color needs to be added for instance.
 Status: Todo
 
 Task
