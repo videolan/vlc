@@ -271,6 +271,9 @@
 #define VOLUME_STEP                     128
 #define VOLUME_MAX                      1024
 
+/* Environment variable for volume */
+#define AOUT_VOLUME_VAR                 "vlc_volume"
+
 /* Environment variable for output rate, and default value */
 #define AOUT_RATE_VAR                   "vlc_audio_rate"
 #define AOUT_RATE_DEFAULT               44100

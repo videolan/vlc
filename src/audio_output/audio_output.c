@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: audio_output.c,v 1.64 2001/06/12 18:16:49 stef Exp $
+ * $Id: audio_output.c,v 1.65 2001/11/05 15:22:44 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -169,7 +169,7 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     }
 
     /* Initialize the volume level */
-    p_aout->i_volume = VOLUME_DEFAULT;
+    p_aout->i_volume = main_GetIntVariable( AOUT_VOLUME_VAR, VOLUME_DEFAULT );
     p_aout->i_savedvolume = 0;
     
     /* FIXME: maybe it would be cleaner to change SpawnThread prototype

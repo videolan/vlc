@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.120 2001/10/22 12:02:17 sam Exp $
+ * $Id: main.c,v 1.121 2001/11/05 15:22:44 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -107,6 +107,7 @@
 #define OPT_STEREO              151
 #define OPT_MONO                152
 #define OPT_SPDIF               153
+#define OPT_VOLUME              154
 
 #define OPT_NOVIDEO             160
 #define OPT_DISPLAY             161
@@ -176,6 +177,7 @@ static const struct option longopts[] =
     {   "spdif",            0,          0,      OPT_SPDIF },
     {   "downmix",          1,          0,      OPT_DOWNMIX },
     {   "imdct",            1,          0,      OPT_IMDCT },
+    {   "volume",           1,          0,      OPT_VOLUME },
 
     /* Video options */
     {   "novideo",          0,          0,      OPT_NOVIDEO },
@@ -694,6 +696,9 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_IMDCT:                                           /* --imdct */
             main_PutPszVariable( IMDCT_METHOD_VAR, optarg );
             break;
+        case OPT_VOLUME:                                         /* --volume */
+            main_PutIntVariable( AOUT_VOLUME_VAR, atoi(optarg) );
+            break;
 
         /* Video options */
         case OPT_NOVIDEO:                                       /* --novideo */
@@ -871,6 +876,7 @@ static void Usage( int i_fashion )
           "\n      --spdif                    \tAC3 pass-through mode"
           "\n      --downmix <module>         \tAC3 downmix method"
           "\n      --imdct <module>           \tAC3 IMDCT method"
+          "\n      --volume [0..1024]         \tVLC output volume"
           "\n"
           "\n      --novideo                  \tdisable video"
           "\n  -V, --vout <module>            \tvideo output method"
@@ -923,6 +929,7 @@ static void Usage( int i_fashion )
         "\n  " AOUT_SPDIF_VAR "={1|0}                 \tAC3 pass-through mode"
         "\n  " DOWNMIX_METHOD_VAR "=<method name>     \tAC3 downmix method"
         "\n  " IMDCT_METHOD_VAR "=<method name>       \tAC3 IMDCT method"
+        "\n  " AOUT_VOLUME_VAR "=[0..1024]            \tVLC output volume"
         "\n  " AOUT_RATE_VAR "=<rate>                 \toutput rate" );
 
     /* Video parameters */
