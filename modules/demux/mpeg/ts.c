@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.30 2003/08/01 18:02:06 fenrir Exp $
+ * $Id: ts.c,v 1.31 2003/08/01 18:49:51 fenrir Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -1278,16 +1278,16 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
 
         /* Delete all ES in this program  except the PSI. We start from the
          * end because i_es_number gets decremented after each deletion. */
-        for( i_loop = p_es->p_pgrm->i_es_number ; i_loop > 0 ; )
+        for( i_loop = p_pgrm->i_es_number ; i_loop > 0 ; )
         {
             es_ts_data_t *              p_es_demux;
 
             i_loop--;
             p_es_demux = (es_ts_data_t *)
-                         p_es->p_pgrm->pp_es[i_loop]->p_demux_data;
+                         p_pgrm->pp_es[i_loop]->p_demux_data;
             if ( !p_es_demux->b_psi )
             {
-                input_DelES( p_input, p_es->p_pgrm->pp_es[i_loop] );
+                input_DelES( p_input, p_pgrm->pp_es[i_loop] );
             }
         }
 
