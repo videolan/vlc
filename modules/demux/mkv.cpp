@@ -786,8 +786,8 @@ static void Close( vlc_object_t *p_this )
     matroska_segment_t *p_segment = p_stream->Segment();
 
     /* TODO close everything ? */
-    
-    delete p_segment->segment;
+    if ( p_segment )
+        delete p_segment->segment;
 
     delete p_sys;
 }
@@ -815,7 +815,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_segment->f_duration > 0.0 )
+            if( p_segment && p_segment->f_duration > 0.0 )
             {
                 *pi64 = (int64_t)(p_segment->f_duration * 1000);
                 return VLC_SUCCESS;
@@ -824,7 +824,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_POSITION:
             pf = (double*)va_arg( args, double * );
-            *pf = (double)p_sys->i_pts / (1000.0 * p_segment->f_duration);
+            if ( p_segment && p_segment->f_duration > 0.0 )
+                *pf = (double)p_sys->i_pts / (1000.0 * p_segment->f_duration);
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
@@ -1520,9 +1521,13 @@ bool matroska_segment_t::Select( )
         }
 
         tk->p_es = es_out_Add( sys.demuxer.out, &tk->fmt );
+
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tk->p_es, 0 );
 #undef tk
     }
     
+    ep->Reset();
+
     return true;
 }
 
@@ -1821,8 +1826,17 @@ static int Demux( demux_t *p_demux)
                 return 0;
             }
             msg_Warn( p_demux, "cannot get block EOF?" );
+            p_segment->UnSelect( );
+            
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
-            return 0;
+            /* switch to the next segment (TODO update the duration) */
+            p_stream->i_current_segment++;
+            p_segment = p_stream->Segment();
+            if ( !p_segment || !p_segment->Select( ) )
+                return 0;
+
+            continue;
         }
 
         p_sys->i_pts = p_sys->i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
@@ -1973,6 +1987,7 @@ void EbmlParser::Reset( void )
 {
     delete m_el[mi_level];
     m_el[mi_level] = NULL;
+    mi_level = 1;
 #if LIBEBML_VERSION >= 0x000704
     // a little faster and cleaner
     m_es->I_O().setFilePointer( static_cast<EbmlMaster*>(m_el[0])->GetDataStart() );
