@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.13 2003/01/23 15:53:10 sam Exp $
+ * $Id: ipv4.c,v 1.14 2003/02/18 18:33:44 titer Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -371,6 +371,35 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
             close( i_handle );
 #endif
             return( -1 );
+        }
+
+#ifndef WIN32
+        if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
+#else
+        if( IN_MULTICAST( ntohl(inet_addr(psz_server_addr) ) ) )
+#endif
+        {
+            /* set the time-to-live */
+            int ttl = config_GetInt( p_this, "ttl" );
+            if( ttl < 1 )
+                ttl = 1;
+
+            if( setsockopt( i_handle, IPPROTO_IP, IP_MULTICAST_TTL,
+                            &ttl, sizeof( ttl ) ) < 0 )
+            {
+#ifdef HAVE_ERRNO_H
+                msg_Warn( p_this, "failed to set ttl (%s)",
+                          strerror(errno) );
+#else
+                msg_Warn( p_this, "failed to set ttl" );
+#endif
+#if defined( WIN32 ) || defined( UNDER_CE )
+                closesocket( i_handle );
+#else
+                close( i_handle );
+#endif
+                return( -1 );
+            }
         }
     }
 

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.42 2003/02/09 01:13:43 massiot Exp $
+ * $Id: libvlc.h,v 1.43 2003/02/18 18:33:44 titer Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -223,6 +223,11 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
     "If you have several interfaces on your machine and use the " \
     "multicast solution, you will probably have to indicate the IP address " \
     "of your multicasting interface here.")
+
+#define TTL_TEXT N_("time to live")
+#define TTL_LONGTEXT N_( \
+    "Indicate here the Time To Live of the multicast packets sent by " \
+    "the stream output.")
 
 #define INPUT_PROGRAM_TEXT N_("choose program (SID)")
 #define INPUT_PROGRAM_LONGTEXT N_( \
@@ -491,6 +496,7 @@ vlc_module_begin();
     add_string( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT );
 #endif
     add_string( "iface-addr", "", NULL, IFACE_ADDR_TEXT, IFACE_ADDR_LONGTEXT );
+    add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT );
 
     add_integer( "program", 0, NULL,
                  INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT );
