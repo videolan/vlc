@@ -26,6 +26,7 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
+#include <ctype.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
@@ -1530,12 +1531,6 @@ static int InputSourceInit( input_thread_t *p_input,
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
 
-    if( !psz_access ||
-        ( strcmp( psz_access, "udp" ) && strcmp( psz_access, "udpstream" ) &&
-          strcmp( psz_access, "udp4" ) && strcmp( psz_access, "udp6" ) &&
-          strcmp( psz_access, "rtp" ) && strcmp( psz_access, "rtp4" ) &&
-          strcmp( psz_access, "rtp6" ) ) ) // FIXME
-
     /* Find optional titles and seekpoints */
     MRLSections( p_input, psz_path, &in->i_title_start, &in->i_title_end,
                  &in->i_seekpoint_start, &in->i_seekpoint_end );
@@ -1971,15 +1966,18 @@ static void MRLSplit( input_thread_t *p_input, char *psz_dup,
     char *psz_access = NULL;
     char *psz_demux  = NULL;
     char *psz_path   = NULL;
-    char *psz;
+    char *psz, *psz_check;
 
     psz = strchr( psz_dup, ':' );
+
+    /* '@' not allowed in access/demux part */
+    psz_check = strchr( psz_dup, '@' );
+    if( psz_check && psz_check < psz ) psz = 0;
 
 #if defined( WIN32 ) || defined( UNDER_CE )
     if( psz - psz_dup == 1 )
     {
-        msg_Warn( p_input, "drive letter %c: found in source string",
-                  psz_dup[0] );
+        msg_Warn( p_input, "drive letter %c: found in source", *psz_dup );
         psz_path = psz_dup;
     }
     else
@@ -1988,8 +1986,7 @@ static void MRLSplit( input_thread_t *p_input, char *psz_dup,
     if( psz )
     {
         *psz++ = '\0';
-        if( psz[0] == '/' && psz[1] == '/' )
-            psz += 2;
+        if( psz[0] == '/' && psz[1] == '/' ) psz += 2;
 
         psz_path = psz;
 
@@ -2007,33 +2004,27 @@ static void MRLSplit( input_thread_t *p_input, char *psz_dup,
         psz_path = psz_dup;
     }
 
-    if( psz_access == NULL )
-        *ppsz_access = "";
-    else
-        *ppsz_access = psz_access;
+    if( !psz_access ) *ppsz_access = "";
+    else *ppsz_access = psz_access;
 
-    if( psz_demux == NULL )
-        *ppsz_demux = "";
-    else
-        *ppsz_demux = psz_demux;
+    if( !psz_demux ) *ppsz_demux = "";
+    else *ppsz_demux = psz_demux;
 
-    if( psz_path == NULL )
-        *ppsz_path = "";
-    else
-        *ppsz_path = psz_path;
+    if( !psz_path ) *ppsz_path = "";
+    else *ppsz_path = psz_path;
 }
 
 /*****************************************************************************
  * MRLSections: parse title and seekpoint info from the Media Resource Locator.
  *
  * Syntax:
- * [url][@[title-start][,chapter-start][-[title-end][,chapter-end]]]
+ * [url][@[title-start][:chapter-start][-[title-end][:chapter-end]]]
  *****************************************************************************/
 static void MRLSections( input_thread_t *p_input, char *psz_source,
                          int *pi_title_start, int *pi_title_end,
                          int *pi_chapter_start, int *pi_chapter_end )
 {
-    char *psz, *psz_end, *psz_next;
+    char *psz, *psz_end, *psz_next, *psz_check;
 
     *pi_title_start = *pi_title_end = -1;
     *pi_chapter_start = *pi_chapter_end = -1;
@@ -2041,9 +2032,23 @@ static void MRLSections( input_thread_t *p_input, char *psz_source,
     /* Start by parsing titles and chapters */
     if( !psz_source || !( psz = strrchr( psz_source, '@' ) ) ) return;
 
-    *psz++ = 0;
+    /* Check we are really dealing with a title/chapter section */
+    psz_check = psz + 1;
+    if( !*psz_check ) return;
+    if( isdigit(*psz_check) ) strtol( psz_check, &psz_check, 0 );
+    if( *psz_check != ':' && *psz_check != '-' && *psz_check ) return;
+    if( *psz_check == ':' && ++psz_check )
+        if( isdigit(*psz_check) ) strtol( psz_check, &psz_check, 0 );
+    if( *psz_check != '-' && *psz_check ) return;
+    if( *psz_check == '-' && ++psz_check )
+        if( isdigit(*psz_check) ) strtol( psz_check, &psz_check, 0 );
+    if( *psz_check != ':' && *psz_check ) return;
+    if( *psz_check == ':' && ++psz_check )
+        if( isdigit(*psz_check) ) strtol( psz_check, &psz_check, 0 );
+    if( *psz_check ) return;
 
     /* Separate start and end */
+    *psz++ = 0;
     if( ( psz_end = strchr( psz, '-' ) ) ) *psz_end++ = 0;
 
     /* Look for the start title */

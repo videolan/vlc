@@ -728,13 +728,14 @@ static char *ppsz_align_descriptions[] =
 #define SUBTITLE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks")
 
 #define PLAYLIST_USAGE N_( \
-    "\nPlaylist item syntax:" \
-    "\n  MRL [:option=value]" \
-    "\nMRL syntax:" \
-    "\n  URL[@[title-start][,chapter-start][-[title-end][,chapter-end]]]" \
+    "\nPlaylist MRL syntax:" \
+    "\n  URL[@[title][:chapter][-[title][:chapter]]] [:option=value]" \
     "\nURL syntax:" \
     "\n  [file://]filename              plain media file" \
-    "\n  http://ip:port/file            HTTP url" \
+    "\n  http://ip:port/file            HTTP URL" \
+    "\n  ftp://ip:port/file             FTP URL" \
+    "\n  mms://ip:port/file             MMS URL" \
+    "\n  screen://                      Screen capture" \
     "\n  [dvd://][device][@raw_device]  DVD device" \
     "\n  [vcd://][device]               VCD device" \
     "\n  [cdda://][device]              Audio CD device" \
