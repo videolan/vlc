@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.8 2001/02/12 09:58:06 stef Exp $
+ * $Id: input_dvd.c,v 1.9 2001/02/13 10:08:51 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -80,8 +80,6 @@ static int  DVDProbe    ( probedata_t *p_data );
 static int  DVDCheckCSS ( struct input_thread_s * );
 static int  DVDRead     ( struct input_thread_s *, data_packet_t ** );
 static void DVDInit     ( struct input_thread_s * );
-static void DVDOpen     ( struct input_thread_s * );
-static void DVDClose    ( struct input_thread_s * );
 static void DVDEnd      ( struct input_thread_s * );
 static void DVDSeek     ( struct input_thread_s *, off_t );
 static int  DVDRewind   ( struct input_thread_s * );
@@ -95,8 +93,8 @@ void input_getfunctions( function_list_t * p_function_list )
 #define input p_function_list->functions.input
     p_function_list->pf_probe = DVDProbe;
     input.pf_init             = DVDInit;
-    input.pf_open             = DVDOpen;
-    input.pf_close            = DVDClose;
+    input.pf_open             = input_FileOpen;
+    input.pf_close            = input_FileClose;
     input.pf_end              = DVDEnd;
     input.pf_read             = DVDRead;
     input.pf_demux            = input_DemuxPS;
@@ -163,7 +161,7 @@ static void DVDInit( input_thread_t * p_input )
     /* FIXME: read several packets once */
     p_method->i_read_once = 1; 
     p_method->i_title = 0;
-
+    p_method->b_encrypted = DVDCheckCSS( p_input );
 
     lseek( p_input->i_handle, 0, SEEK_SET );
 
@@ -173,23 +171,39 @@ static void DVDInit( input_thread_t * p_input )
 
     /* Ifo initialisation */
     p_method->ifo = IfoInit( p_input->i_handle );
-    IfoRead( &(p_method->ifo) );
-    intf_Msg( "Ifo: Initialized" );
 
-    /* CSS authentication and keys */
-    if( ( p_method->b_encrypted = DVDCheckCSS( p_input ) ) )
+    /* CSS initialisation */
+    if( p_method->b_encrypted )
     {
+
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+        p_method->css = CSSInit( p_input->i_handle );
+
+        if( ( p_input->b_error = p_method->css.b_error ) )
+        {
+            intf_ErrMsg( "CSS fatal error" );
+            return;
+        }
+#else
+        intf_ErrMsg( "Unscrambling not supported" );
+        p_input->b_error = 1;
+        return;
+#endif
+    }
+
+    /* Ifo structures reading */
+    IfoRead( &(p_method->ifo) );
+    intf_WarnMsg( 3, "Ifo: Initialized" );
+
+    /* CSS title keys */
+    if( p_method->b_encrypted )
+    {
+
 #if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
         int   i;
 
-        p_method->css = CSSInit( p_input->i_handle );
-        if( ( p_input->b_error = p_method->css.b_error ) )
-        {
-            fprintf( stderr, " boaruf \n" );
-            return;
-        }
-
         p_method->css.i_title_nb = p_method->ifo.vmg.mat.i_tts_nb;
+
         if( (p_method->css.p_title_key =
             malloc( p_method->css.i_title_nb *sizeof(title_key_t) ) ) == NULL )
         {
@@ -197,16 +211,21 @@ static void DVDInit( input_thread_t * p_input )
             p_input->b_error = 1;
             return;
         }
+
         for( i=0 ; i<p_method->css.i_title_nb ; i++ )
         {
             p_method->css.p_title_key[i].i =
-                    p_method->ifo.p_vts[i].i_pos +
-                    p_method->ifo.p_vts[i].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
+                p_method->ifo.p_vts[i].i_pos +
+                p_method->ifo.p_vts[i].mat.i_tt_vobs_ssector * DVD_LB_SIZE;
         }
+
         CSSGetKeys( &(p_method->css) );
-        intf_Msg( "CSS: Initialized" );
+
+        intf_WarnMsg( 3, "CSS: initialized" );
 #else
         intf_ErrMsg( "Unscrambling not supported" );
+        p_input->b_error = 1;
+        return;
 #endif
     }
 
@@ -215,7 +234,7 @@ static void DVDInit( input_thread_t * p_input )
               p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
 
     i_start = lseek( p_input->i_handle, i_start, SEEK_SET );
-    intf_Msg( "VOB start at : %lld", (long long)i_start );
+    intf_WarnMsg( 3, "DVD: VOB start at : %lld", i_start );
 
     /* Initialize ES structures */
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
@@ -267,7 +286,7 @@ static void DVDInit( input_thread_t * p_input )
         }
         lseek( p_input->i_handle, i_start, SEEK_SET );
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.i_tell = 0;
+        p_input->stream.i_tell = i_start;
         if( p_demux_data->b_has_PSM )
         {
             /* (The PSM decoder will care about spawning the decoders) */
@@ -339,6 +358,14 @@ static void DVDInit( input_thread_t * p_input )
 #ifdef STATS
         input_DumpStream( p_input );
 #endif
+
+        /* FIXME: kludge to implement file size */
+        p_input->stream.i_size = 
+         (off_t)( p_method->ifo.vmg.ptt_srpt.p_tts[1].i_ssector -
+                  p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector ) *DVD_LB_SIZE;
+        intf_WarnMsg( 3, "DVD: stream size: %lld", p_input->stream.i_size );
+
+
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     else
@@ -346,45 +373,16 @@ static void DVDInit( input_thread_t * p_input )
         /* The programs will be added when we read them. */
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.pp_programs[0]->b_is_ok = 0;
+
+        /* FIXME: kludge to implement file size */
+        p_input->stream.i_size = 
+            ( p_method->ifo.vmg.ptt_srpt.p_tts[1].i_ssector -
+              p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector ) *DVD_LB_SIZE;
+        intf_WarnMsg( 3, "DVD: stream size: %lld", p_input->stream.i_size );
+
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
 
-}
-
-/*****************************************************************************
- * DVDOpen : open the dvd device
- *****************************************************************************/
-static void DVDOpen( input_thread_t * p_input )
-{
-    intf_Msg( "input: opening DVD %s", p_input->p_source );
-
-    p_input->i_handle = open( p_input->p_source, O_RDONLY | O_NONBLOCK );
-
-    if( p_input->i_handle == -1 )
-    {
-        intf_ErrMsg( "input error: cannot open device (%s)", strerror(errno) );
-        p_input->b_error = 1;
-        return;
-    }
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-
-    p_input->stream.b_pace_control = 1;
-    p_input->stream.b_seekable = 1;
-    p_input->stream.i_size = 0;
-    p_input->stream.i_tell = 0;
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-}
-
-/*****************************************************************************
- * DVDClose : close a file descriptor
- *****************************************************************************/
-static void DVDClose( input_thread_t * p_input )
-{
-    close( p_input->i_handle );
-
-    return;
 }
 
 /*****************************************************************************
@@ -527,5 +525,21 @@ static int DVDRewind( input_thread_t * p_input )
  *****************************************************************************/
 static void DVDSeek( input_thread_t * p_input, off_t i_off )
 {
+    thread_dvd_data_t *     p_method;
+    off_t                   i_pos;
+    
+    p_method = ( thread_dvd_data_t * )p_input->p_plugin_data;
+
+    /* We have to take care of offset of beginning of title */
+    i_pos = i_off - ( p_method->ifo.p_vts[0].i_pos +
+              p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector *DVD_LB_SIZE );
+
+    /* With DVD, we have to be on a sector boundary */
+    i_pos = i_pos & (~0x7ff);
+
+    i_pos = lseek( p_input->i_handle, i_pos, SEEK_SET );
+
+    p_input->stream.i_tell = i_pos;
+
     return;
 }

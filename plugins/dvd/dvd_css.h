@@ -2,7 +2,7 @@
  * dvd_css.h: Structures for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.h,v 1.1 2001/02/08 04:43:27 sam Exp $
+ * $Id: dvd_css.h,v 1.2 2001/02/13 10:08:51 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -35,10 +35,10 @@ typedef struct disc_s
 
 typedef struct title_key_s
 {
-    u32             i;          /* This signification of this parameter
+    off_t           i;          /* This signification of this parameter
                                    depends on the function it is called from :
-                                    *from DVDInit    -> i == i_lba
-                                    *from CSSGetKeys -> i == i_occ */
+                                    *from DVDInit    -> i == position
+                                    *from CSSGetKeys -> i ==  nb occurence */
     DVD_key_t       key;
 } title_key_t;
 

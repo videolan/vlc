@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.3 2001/02/09 03:51:42 stef Exp $
+ * $Id: dvd_ifo.h,v 1.4 2001/02/13 10:08:51 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -451,7 +451,7 @@ typedef struct vts_tmap_ti_s
  */
 typedef struct vts_s
 {
-    u32             i_pos;
+    off_t           i_pos;
     vtsi_mat_t      mat;
     /* Part Of Title Search Pointer Table Info */
     vts_ptt_srpt_t  ptt_srpt;

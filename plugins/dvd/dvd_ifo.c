@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.5 2001/02/12 09:58:06 stef Exp $
+ * $Id: dvd_ifo.c,v 1.6 2001/02/13 10:08:51 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -1096,7 +1096,7 @@ void IfoRead( ifo_t* p_ifo )
     off_t   i_off;
 
     /* Video Manager Initialization */
-    intf_WarnMsg( 2, "Ifo: Initializing VMG" );
+    intf_WarnMsg( 2, "ifo: initializing VMG" );
     p_ifo->vmg = ReadVMG( p_ifo );
 
     /* Video Title Sets initialization */
@@ -1107,13 +1107,14 @@ void IfoRead( ifo_t* p_ifo )
         p_ifo->b_error = 1;
         return;
     }
-    for( i=0 ; i<1/*p_ifo->vmg.mat.i_tts_nb*/ ; i++ )
+    for( i=0 ; i<p_ifo->vmg.mat.i_tts_nb ; i++ )
     {
 
-        intf_WarnMsg( 2, "Ifo: Initializing VTS %d", i+1 );
+        intf_WarnMsg( 2, "ifo: initializing VTS %d", i+1 );
 
-        i_off = p_ifo->vmg.ptt_srpt.p_tts[i].i_ssector *DVD_LB_SIZE;
+        i_off = (off_t)(p_ifo->vmg.ptt_srpt.p_tts[i].i_ssector) *DVD_LB_SIZE;
         p_ifo->i_pos = lseek( p_ifo->i_fd, i_off, SEEK_SET );
+//fprintf( stderr, "%lld\n" , p_ifo->i_pos );
 
         /* FIXME : use udf filesystem to avoid this */
         IfoFindVTS( p_ifo );
