@@ -47,6 +47,9 @@
 #include "intf_msg.h"
 #include "main.h"
 
+#include "vdec_idct.h"
+#include "video_decoder.h"
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -69,7 +72,7 @@ static void     RenderSubPicture  ( vout_thread_t *p_vout,
                                     subpicture_t *p_subpic );
 static void     RenderInterface   ( vout_thread_t *p_vout );
 static int      RenderIdle        ( vout_thread_t *p_vout );
-static int      RenderSplash( vout_thread_t *p_vout );
+static int      RenderSplash      ( vout_thread_t *p_vout );
 static void     RenderInfo        ( vout_thread_t *p_vout );
 static void     Synchronize       ( vout_thread_t *p_vout, s64 i_delay );
 static int      Manage            ( vout_thread_t *p_vout );
@@ -149,19 +152,20 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     /* Initialize some fields used by the system-dependant method - these
      * fields will probably be modified by the method, and are only
      * preferences */
-    p_vout->i_changes           = 0;
-    p_vout->i_width             = i_width;
-    p_vout->i_height            = i_height;
-    p_vout->i_bytes_per_line    = i_width * 2;
-    p_vout->i_screen_depth      = 15;
-    p_vout->i_bytes_per_pixel   = 2;
-    p_vout->f_gamma             = VOUT_GAMMA;
+    p_vout->i_changes             = 0;
+    p_vout->i_width               = i_width;
+    p_vout->i_height              = i_height;
+    p_vout->i_bytes_per_line      = i_width * 2;
+    p_vout->i_screen_depth        = 15;
+    p_vout->i_bytes_per_pixel     = 2;
+    p_vout->f_gamma               = VOUT_GAMMA;
 
-    p_vout->b_grayscale         = main_GetIntVariable( VOUT_GRAYSCALE_VAR,
+    p_vout->b_grayscale           = main_GetIntVariable( VOUT_GRAYSCALE_VAR,
                                                        VOUT_GRAYSCALE_DEFAULT );
-    p_vout->b_info              = 0;
-    p_vout->b_interface         = 0;
-    p_vout->b_scale             = 1;
+    p_vout->vdec_DecodeMacroblock = vdec_DecodeMacroblockC;
+    p_vout->b_info                = 0;
+    p_vout->b_interface           = 0;
+    p_vout->b_scale               = 1;
 
     intf_DbgMsg( "wished configuration: %dx%d, %d/%d bpp (%d Bpl)\n",
                  p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
@@ -2107,6 +2111,17 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & (VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE |
                              VOUT_YUV_CHANGE) )
     {
+        /* Change vdec_DecodeMacroblock when switching between BW and C */
+        if( (!p_vout->b_grayscale) 
+                && (VOUT_GRAYSCALE_CHANGE) )            
+        {
+            p_vout->vdec_DecodeMacroblock = vdec_DecodeMacroblockC;
+        }
+        else if( (p_vout->b_grayscale)
+                && (VOUT_GRAYSCALE_CHANGE) )
+        {
+            p_vout->vdec_DecodeMacroblock = vdec_DecodeMacroblockBW;
+        }  
         if( vout_ResetYUV( p_vout ) )
         {
             intf_ErrMsg("error: can't rebuild convertion tables\n");

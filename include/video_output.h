@@ -117,6 +117,10 @@ typedef int  (yuv_sys_init_t)       ( p_vout_thread_t p_vout );
 typedef int  (yuv_sys_reset_t)      ( p_vout_thread_t p_vout );
 typedef void (yuv_sys_end_t)        ( p_vout_thread_t p_vout );
 
+struct macroblock_s;
+typedef void (vdec_DecodeMacroblock_t) ( struct vdec_thread_s *p_vdec,
+                                         struct macroblock_s *p_mb );
+
 typedef struct vout_thread_s
 {
     /* Thread properties and lock */
@@ -129,6 +133,8 @@ typedef struct vout_thread_s
     vlc_mutex_t         change_lock;                   /* thread change lock */
     int *               pi_status;                  /* temporary status flag */
     p_vout_sys_t        p_sys;                       /* system output method */
+    vdec_DecodeMacroblock_t *
+                        vdec_DecodeMacroblock;    /* decoder function to use */
 
     /* Current display properties */
     u16                 i_changes;             /* changes made to the thread */

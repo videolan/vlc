@@ -70,6 +70,9 @@ typedef struct vdec_thread_s
     count_t         c_decoded_i_pictures;    /* number of I pictures decoded */
     count_t         c_decoded_p_pictures;    /* number of P pictures decoded */
     count_t         c_decoded_b_pictures;    /* number of B pictures decoded */
+
+/*    void            (*vdec_DecodeMacroblock)  ( struct vdec_thread_s *p_vdec,
+                                                struct macroblock_s *p_mb );*/
 #endif
 } vdec_thread_t;
 
@@ -83,6 +86,10 @@ struct macroblock_s;
 #ifndef VDEC_SMP
 int             vdec_InitThread         ( struct vdec_thread_s *p_vdec );
 void            vdec_DecodeMacroblock   ( struct vdec_thread_s *p_vdec,
+                                          struct macroblock_s *p_mb );
+void            vdec_DecodeMacroblockC  ( struct vdec_thread_s *p_vdec,
+                                          struct macroblock_s *p_mb );
+void            vdec_DecodeMacroblockBW ( struct vdec_thread_s *p_vdec,
                                           struct macroblock_s *p_mb );
 #endif
 vdec_thread_t * vdec_CreateThread       ( struct vpar_thread_s *p_vpar /*,

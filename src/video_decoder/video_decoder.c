@@ -59,8 +59,10 @@
  */
 #ifdef VDEC_SMP
 static int      vdec_InitThread     ( vdec_thread_t *p_vdec );
-static void     vdec_DecodeMacroblock( vdec_thread_t *p_vdec,
-                                       macroblock_t * p_mb );
+static void     vdec_DecodeMacroblockC  ( vdec_thread_t *p_vdec,
+                                          macroblock_t * p_mb );
+static void     vdec_DecodeMacroblockBW ( vdec_thread_t *p_vdec,
+                                          macroblock_t * p_mb );
 #endif
 static void     RunThread           ( vdec_thread_t *p_vdec );
 static void     ErrorThread         ( vdec_thread_t *p_vdec );
@@ -397,7 +399,7 @@ static  __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
 /*****************************************************************************
  * vdec_DecodeMacroblock : decode a macroblock of a picture
  *****************************************************************************/
-#define DECODEBLOCKS( OPBLOCK )                                         \
+#define DECODEBLOCKSC( OPBLOCK )                                        \
 {                                                                       \
     int             i_b, i_mask;                                        \
                                                                         \
@@ -445,10 +447,37 @@ static  __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
     }                                                                   \
 }
 
+#define DECODEBLOCKSBW( OPBLOCK )                                       \
+{                                                                       \
+    int             i_b, i_mask;                                        \
+                                                                        \
+    i_mask = 1 << (3 + p_mb->i_chroma_nb_blocks);                       \
+                                                                        \
+    /* luminance */                                                     \
+    for( i_b = 0; i_b < 4; i_b++, i_mask >>= 1 )                        \
+    {                                                                   \
+        if( p_mb->i_coded_block_pattern & i_mask )                      \
+        {                                                               \
+            /*                                                          \
+             * Inverse DCT (ISO/IEC 13818-2 section Annex A)            \
+             */                                                         \
+            (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],        \
+                                  p_mb->pi_sparse_pos[i_b] );           \
+                                                                        \
+            /*                                                          \
+             * Adding prediction and coefficient data (ISO/IEC 13818-2  \
+             * section 7.6.8)                                           \
+             */                                                         \
+            OPBLOCK( p_vdec, p_mb->ppi_blocks[i_b],                     \
+                     p_mb->p_data[i_b], p_mb->i_addb_l_stride );        \
+        }                                                               \
+    }                                                                   \
+}
+
 #ifdef VDEC_SMP
-static __inline__ void vdec_DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
+static __inline__ void vdec_DecodeMacroblockC ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
 #else
-void vdec_DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
+void vdec_DecodeMacroblockC ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
 #endif
 {
     if( !(p_mb->i_mb_type & MB_INTRA) )
@@ -465,11 +494,11 @@ void vdec_DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
             p_mb->pf_motion( p_mb );
         }
 
-        DECODEBLOCKS( AddBlock )
+        DECODEBLOCKSC( AddBlock )
     }
     else
     {
-        DECODEBLOCKS( CopyBlock )
+        DECODEBLOCKSC( CopyBlock )
     }
 
     /*
@@ -478,6 +507,41 @@ void vdec_DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
      */
     vpar_ReleaseMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
 }
+
+#ifdef VDEC_SMP
+static __inline__ void vdec_DecodeMacroblockBW ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
+#else
+void vdec_DecodeMacroblockBW ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
+#endif
+{
+    if( !(p_mb->i_mb_type & MB_INTRA) )
+    {
+        /*
+         * Motion Compensation (ISO/IEC 13818-2 section 7.6)
+         */
+        if( p_mb->pf_motion == 0 )
+        {
+            intf_ErrMsg( "vdec error: pf_motion set to NULL\n" );
+        }
+        else
+        {
+            p_mb->pf_motion( p_mb );
+        }
+
+        DECODEBLOCKSBW( AddBlock )
+    }
+    else
+    {
+        DECODEBLOCKSBW( CopyBlock )
+    }
+
+    /*
+     * Decoding is finished, release the macroblock and free
+     * unneeded memory.
+     */
+    vpar_ReleaseMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
+}
+
 
 
 /*****************************************************************************
@@ -511,7 +575,7 @@ static void RunThread( vdec_thread_t *p_vdec )
 
         if( (p_mb = vpar_GetMacroblock( &p_vdec->p_vpar->vfifo )) != NULL )
         {
-            vdec_DecodeMacroblock( p_vdec, p_mb );
+            p_vdec->p_vpar->p_vout->vdec_DecodeMacroblock ( p_vdec, p_mb );
         }
     }
 

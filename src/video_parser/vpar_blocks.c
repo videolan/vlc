@@ -1631,7 +1631,7 @@ static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
 
 #ifndef VDEC_SMP
     /* Decode the macroblock NOW ! */
-    vdec_DecodeMacroblock( p_vpar->pp_vdec[0], p_mb );
+    p_vpar->p_vout->vdec_DecodeMacroblock ( p_vpar->pp_vdec[0], p_mb );
 #endif
 }
 
@@ -2005,7 +2005,7 @@ static __inline__ void ParseMacroblock(
         UpdateContext( p_vpar, i_structure );
 #ifndef VDEC_SMP
         /* Decode the macroblock NOW ! */
-        vdec_DecodeMacroblock( p_vpar->pp_vdec[0], p_mb );
+        p_vpar->p_vout->vdec_DecodeMacroblock ( p_vpar->pp_vdec[0], p_mb );
 #endif
     }
     else
