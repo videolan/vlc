@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.73 2003/06/06 02:23:30 hartman Exp $
+ * $Id: libvlc.h,v 1.74 2003/06/17 21:52:19 asmax Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -501,7 +501,6 @@ vlc_module_begin();
                  SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, VLC_FALSE );
     add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT, VLC_TRUE );
     add_string( "iface-addr", "", NULL, IFACE_ADDR_TEXT, IFACE_ADDR_LONGTEXT, VLC_TRUE );
-    add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
 
     add_integer( "program", 0, NULL,
                  INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT, VLC_TRUE );
@@ -544,6 +543,7 @@ vlc_module_begin();
     add_module( "mux", "sout mux", NULL, NULL, MUX_TEXT, MUX_LONGTEXT, VLC_TRUE );
     add_module( "access_output", "sout access", NULL, NULL,
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
+    add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
 
     /* CPU options */
     add_category_hint( N_("CPU"), NULL, VLC_TRUE );
