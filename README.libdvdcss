@@ -9,10 +9,34 @@ solution. The VideoLAN Client can also be used as a standalone program
 to play MPEG2 streams from a hard disk or a DVD.
 
 
-Building, Installing and Running libdvdcss
-==========================================
+Building and Installing libdvdcss
+=================================
 
 See the INSTALL or INSTALL.libdvdcss file for this.
+
+Running lidvdcss
+================
+
+The behaviourof the library can be affected by changing two environment
+variables:
+  DVDCSS_METHOD={title|disc|key}: method for key decryption
+    title: decrypted title key is guessed from the encrypted sectors of
+           the stream. Thus it should work with a file as well as the
+           DVD device. But it sometimes takes much time to decrypt a title
+           key and may even fail. With this method, the key is only checked
+           at the beginning of each title, so it won't work if the key
+           changes in the middle of a title.
+           This is the default method,
+    disc: the disc key is first cracked ; then all title keys can be
+           decrypted instantly, which allows us to check them often,
+    key: the same as "disc" if you don't have a file with player keys at
+           compilation time. If you do, the decryption of the disc key
+           will be faster with this method. It is the one that was used by
+           libcss.
+  DVDCSS_VERBOSE={0|1|2}: libdvdcss verbosity
+    0: no error messages, no debug messages,
+    1: only error messages (this is the default)
+    2: error and debug messages
 
 
 Troubleshooting

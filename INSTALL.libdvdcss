@@ -22,6 +22,9 @@ Building libdvdcss
 
 Once configured, run `make' to build libdvdcss.
 
+If you have player keys, you need to put them in the file csskeys.h, before
+configuring libdvdcss to enable the "key" method (the one from libcss).
+
 
 Installing libdvdcss
 ====================
