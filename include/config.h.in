@@ -211,11 +211,11 @@
 
 /* Delay between vlan changes - this is required to avoid flooding the VLAN
  * server */
-#define INPUT_VLAN_CHANGE_DELAY         (5*CLOCK_FREQ)
+#define INPUT_VLAN_CHANGE_DELAY         (mtime_t)(5*CLOCK_FREQ)
 
 /* Duration between the time we receive the data packet, and the time we will
  * mark it to be presented */
-#define DEFAULT_PTS_DELAY               (.2*CLOCK_FREQ)
+#define DEFAULT_PTS_DELAY               (mtime_t)(.2*CLOCK_FREQ)
 
 #define INPUT_DVD_DEVICE_VAR            "vlc_dvd_device"
 #define INPUT_DVD_DEVICE_DEFAULT        "/dev/dvd"

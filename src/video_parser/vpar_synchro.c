@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.82 2001/02/12 10:46:26 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.83 2001/02/12 11:22:31 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -233,8 +233,9 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         vlc_mutex_lock( &p_vpar->p_vout->change_lock );
         tau_yuv = p_vpar->p_vout->render_time;
         vlc_mutex_unlock( &p_vpar->p_vout->change_lock );
-
+#ifdef VDEC_SMP
         vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
+#endif
 
         switch( i_coding_type )
         {
@@ -315,7 +316,9 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             }
         }
 
+#ifdef VDEC_SMP
         vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
+#endif
 #ifdef DEBUG_VPAR
         intf_DbgMsg("vpar synchro debug: %s picture scheduled for %s, %s (%lld)",
                     i_coding_type == B_CODING_TYPE ? "B" :
@@ -352,7 +355,9 @@ void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
 void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
                          int i_structure )
 {
+#ifdef VDEC_SMP
     vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
+#endif
 
     if( ((p_vpar->synchro.i_end + 1 - p_vpar->synchro.i_start)
             % MAX_DECODING_PIC) )
@@ -367,7 +372,9 @@ void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
         /* FIFO full, panic() */
         intf_ErrMsg("vpar error: synchro fifo full, estimations will be biased");
     }
+#ifdef VDEC_SMP
     vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
+#endif
 }
 
 /*****************************************************************************
@@ -378,7 +385,9 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_garbage )
     mtime_t     tau;
     int         i_coding_type;
 
+#ifdef VDEC_SMP
     vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
+#endif
 
     if( !i_garbage )
     {
@@ -410,7 +419,9 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_garbage )
 
     FIFO_INCREMENT( i_start );
 
+#ifdef VDEC_SMP
     vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
+#endif
 }
 
 /*****************************************************************************
@@ -430,6 +441,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
 {
     mtime_t         period = 1000000 * 1001 / p_vpar->sequence.i_frame_rate
                               * p_vpar->sequence.i_current_rate / DEFAULT_RATE;
+    mtime_t         now = mdate(); 
 
     switch( i_coding_type )
     {
@@ -479,7 +491,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
 
     p_vpar->synchro.current_pts += p_vpar->synchro.i_current_period
                                         * (period >> 1);
-
+ 
 #define PTS_THRESHOLD   (period >> 2)
     if( i_coding_type == B_CODING_TYPE )
     {
@@ -559,6 +571,20 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
         }
     }
 #undef PTS_THRESHOLD
+
+    if( p_vpar->synchro.current_pts + DEFAULT_PTS_DELAY < now )
+    {
+        /* We cannot be _that_ late, something must have happened, reinit
+         * the dates. */
+        intf_WarnMsg( 2, "PTS << now (%lld), resetting",
+                      now - p_vpar->synchro.current_pts - DEFAULT_PTS_DELAY );
+        p_vpar->synchro.current_pts = now + DEFAULT_PTS_DELAY;
+    }
+    if( p_vpar->synchro.backward_pts + DEFAULT_PTS_DELAY < now )
+    {
+        /* The same. */
+        p_vpar->synchro.current_pts = 0;
+    }
 
 #ifdef STATS
     p_vpar->synchro.i_pic++;
