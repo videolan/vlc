@@ -333,12 +333,12 @@ void vout_TextSize( vout_font_t *p_font, int i_style, const char *psz_text, int 
     }
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * vout_Print: low level printing function
-  *******************************************************************************
- * This function prints a text, without clipping, in a buffer using a previously
- * loaded bitmap font.
- *******************************************************************************/
+ *****************************************************************************
+ * This function prints a text, without clipping, in a buffer using a
+ * previously loaded bitmap font.
+ *****************************************************************************/
 void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int i_bytes_per_line, 
                  u32 i_char_color, u32 i_border_color, u32 i_bg_color, int i_style, const char *psz_text )
 {

@@ -54,6 +54,8 @@ static int      Manage            ( vout_thread_t *p_vout );
 static int      Align             ( vout_thread_t *p_vout, int *pi_x,
                                     int *pi_y, int i_width, int i_height,
                                     int i_h_align, int i_v_align );
+static void     SetPalette        ( p_vout_thread_t p_vout, u16 *red,
+                                    u16 *green, u16 *blue, u16 *transp );
 
 /******************************************************************************
  * vout_CreateThread: creates a new video output thread
@@ -101,6 +103,8 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     p_vout->b_info              = 0;    
     p_vout->b_interface         = 0;
     p_vout->b_scale             = 0;
+
+    p_vout->p_set_palette       = SetPalette;
     
     intf_DbgMsg("wished configuration: %dx%d, %d/%d bpp (%d Bpl)\n",
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
@@ -146,12 +150,12 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     MaskToShift( &p_vout->i_green_lshift, &p_vout->i_green_rshift, p_vout->i_green_mask );
     MaskToShift( &p_vout->i_blue_lshift,  &p_vout->i_blue_rshift,  p_vout->i_blue_mask );
 
-    /* Set some usefull colors */
-    p_vout->i_white_pixel = RGB2PIXEL( p_vout, 255, 255, 255 );
+    /* Set some useful colors */
+/*    p_vout->i_white_pixel = RGB2PIXEL( p_vout, 255, 255, 255 );
     p_vout->i_black_pixel = RGB2PIXEL( p_vout, 0, 0, 0 );
     p_vout->i_gray_pixel  = RGB2PIXEL( p_vout, 128, 128, 128 );
     p_vout->i_blue_pixel  = RGB2PIXEL( p_vout, 0, 0, 50 );    
-
+*/
     /* Load fonts - fonts must be initialized after the systme method since
      * they may be dependant of screen depth and other thread properties */
     p_vout->p_default_font      = vout_LoadFont( VOUT_DEFAULT_FONT );    
@@ -1878,5 +1882,17 @@ static int Align( vout_thread_t *p_vout, int *pi_x, int *pi_y,
     /* Return non 0 if clipping failed */
     return( (*pi_x < 0) || (*pi_y < 0) || 
             (*pi_x + i_width > p_vout->i_width) || (*pi_y + i_height > p_vout->i_height) );    
+}
+
+/******************************************************************************
+ * SetPalette: sets an 8 bpp palette
+ ******************************************************************************
+ * This function is just a prototype that does nothing. Architectures that
+ * support palette allocation should override it.
+ ******************************************************************************/
+static void     SetPalette        ( p_vout_thread_t p_vout, u16 *red,
+                                    u16 *green, u16 *blue, u16 *transp )
+{
+    intf_ErrMsg( "SetPalette: method does not support palette changing\n" );
 }
 

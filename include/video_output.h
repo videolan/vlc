@@ -41,7 +41,7 @@ typedef struct vout_yuv_s
     vout_yuv_convert_t *        p_Convert444;          /* YUV 4:4:4 converter */
 
     /* Pre-calculated convertion tables */
-    void *              p_base;             /* base for all convertion tables */    
+    void *              p_base;             /* base for all conversion tables */
     union
     {
         u8 *            p_gray8;                         /* gray 8 bits table */
@@ -54,7 +54,7 @@ typedef struct vout_yuv_s
 
     /* Temporary convertion buffer and offset array */
     void *              p_buffer;                        /* convertion buffer */
-    int *               p_offset;                             /* offset array */    
+    int *               p_offset;                             /* offset array */
 } vout_yuv_t;
 
 /*******************************************************************************
@@ -85,6 +85,9 @@ typedef struct vout_buffer_s
  * is represented by a video output thread, and described using following 
  * structure.
  *******************************************************************************/
+typedef void (vout_set_palette_t)( p_vout_thread_t p_vout,
+                                   u16 *red, u16 *green, u16 *blue, u16 *transp );
+
 typedef struct vout_thread_s
 {
     /* Thread properties and lock */
@@ -123,15 +126,13 @@ typedef struct vout_thread_s
     u32                 i_black_pixel;                               /* black */
     u32                 i_gray_pixel;                                 /* gray */
     u32                 i_blue_pixel;                                 /* blue */
-    
-    /* Palette */
-    u8                  lookup[2176];       /* lookup table for 8 bpp palette */
 
     /* Pictures and rendering properties */
     boolean_t           b_grayscale;            /* color or grayscale display */
     boolean_t           b_info;             /* print additionnal informations */
     boolean_t           b_interface;                      /* render interface */
     boolean_t           b_scale;                     /* allow picture scaling */
+    vout_set_palette_t *p_set_palette;                   /* sets 8bpp palette */
 
     /* Idle screens management */
     mtime_t             last_display_date;      /* last non idle display date */

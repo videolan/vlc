@@ -210,22 +210,23 @@ int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
     return( 1 );    
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * intf_ProcessKey: process standard keys
- *******************************************************************************
+ *****************************************************************************
  * This function will process standard keys and return non 0 if the key was
  * unknown.
- *******************************************************************************/
+ *****************************************************************************/
 int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
 {
     switch( i_key )
     {
-    case 'Q':                                                    /* quit order */
+    case 'Q':                                                  /* quit order */
     case 'q':
-    case 27: /* escape key */
+    case 27:                                                   /* escape key */
+    case 3:                                                            /* ^C */
         p_intf->b_die = 1;
         break;  
-    case '0':                                                 /* source change */
+    case '0':                                               /* source change */
     case '1':
     case '2':
     case '3':
@@ -239,17 +240,17 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
          * its own error messages */
         intf_SelectChannel( p_intf, i_key - '0' );        
         break;
-    case '+':                                                      /* volume + */
+    case '+':                                                    /* volume + */
         // ??
         break;
-    case '-':                                                      /* volume - */
+    case '-':                                                    /* volume - */
         // ??
         break;
-    case 'M':                                                   /* toggle mute */
+    case 'M':                                                 /* toggle mute */
     case 'm':                    
         // ??
         break;	    
-    case 'g':                                                       /* gamma - */
+    case 'g':                                                     /* gamma - */
         if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma > -INTF_GAMMA_LIMIT) )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
@@ -258,7 +259,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }                    
         break;                                        
-    case 'G':                                                       /* gamma + */
+    case 'G':                                                     /* gamma + */
         if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma < INTF_GAMMA_LIMIT) )
         {       
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
@@ -267,7 +268,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }                    
         break;  
-    case 'c':                                              /* toggle grayscale */
+    case 'c':                                            /* toggle grayscale */
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );                        
@@ -276,7 +277,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );      
         }
         break;  
-    case ' ':                                              /* toggle interface */
+    case ' ':                                            /* toggle interface */
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );                        
@@ -285,7 +286,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );      
         }
         break;                                
-    case 'i':                                                   /* toggle info */
+    case 'i':                                                 /* toggle info */
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );                        
@@ -294,7 +295,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );      
         }
         break;                                
-    case 's':                                                 /* toggle scaling */
+    case 's':                                              /* toggle scaling */
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );                        
@@ -303,7 +304,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );      
         }
         break;                                
-   default:                                                    /* unknown key */
+   default:                                                   /* unknown key */
         return( 1 );        
     }
 

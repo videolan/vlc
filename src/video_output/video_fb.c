@@ -67,8 +67,8 @@ typedef struct vout_sys_s
  ******************************************************************************/
 static int     FBOpenDisplay   ( vout_thread_t *p_vout );
 static void    FBCloseDisplay  ( vout_thread_t *p_vout );
-static void    FBInitBWPalette ( vout_thread_t *p_vout );
-static void    FBInitRGBPalette( vout_thread_t *p_vout );
+static void    FBSetPalette    ( p_vout_thread_t p_vout,
+                                 u16 *red, u16 *green, u16 *blue, u16 *transp );
 
 /******************************************************************************
  * vout_SysCreate: allocates FB video thread output method
@@ -101,6 +101,7 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, int i_root_window 
  ******************************************************************************/
 int vout_SysInit( vout_thread_t *p_vout )
 {
+    p_vout->p_set_palette       = FBSetPalette;
     return( 0 );
 }
 
@@ -230,8 +231,8 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
         ioctl( p_vout->p_sys->i_fb_dev, FBIOGETCMAP, &p_vout->p_sys->fb_cmap );
 
         /* initializes black & white palette */
+        //FBInitRGBPalette( p_vout );
 	//FBInitBWPalette( p_vout );
-        FBInitRGBPalette( p_vout );
 
         p_vout->i_bytes_per_pixel = 1;
         p_vout->i_bytes_per_line = p_vout->i_width;
@@ -301,116 +302,16 @@ static void FBCloseDisplay( vout_thread_t *p_vout )
     close( p_vout->p_sys->i_fb_dev );    
 }
 
-/*****************************************************************************
- * FBInitRGBPalette: initialize color palette for 8 bpp
- *****************************************************************************/
-static void FBInitRGBPalette( vout_thread_t *p_vout )
+/******************************************************************************
+ * FBSetPalette: sets an 8 bpp palette
+ ******************************************************************************
+ * This function is just a prototype that does nothing. Architectures that
+ * support palette allocation should override it.
+ ******************************************************************************/
+static void    FBSetPalette   ( p_vout_thread_t p_vout,
+                                u16 *red, u16 *green, u16 *blue, u16 *transp )
 {
-    #define SATURATE( x )    \
-    x = x + ( x >> 3 ) - 16; \
-    if( x < 0 ) x = 0;       \
-    if( x > 255 ) x = 255;
-
-    int y,u,v;
-    int r,g,b;
-    int uvRed, uvGreen, uvBlue;
-    unsigned int counter = 0;
-    unsigned int allocated = 0;
-    unsigned short red[256], green[256], blue[256], transp[256];
-    unsigned char extralookup[2176];
     struct fb_cmap cmap = { 0, 256, red, green, blue, transp };
-
-    for ( y = 0; y <= 256; y += 16 )
-    {
-        for ( u = 0; u <= 256; u += 32 )
-        for ( v = 0; v <= 256; v += 32 )
-        {
-            uvRed = (V_RED_COEF*(v-128)) >> SHIFT;
-            uvGreen = (U_GREEN_COEF*(u-128) + V_GREEN_COEF*(v-128)) >> SHIFT;
-            uvBlue = (U_BLUE_COEF*(u-128)) >> SHIFT;
-            r = y + uvRed;
-            g = y + uvGreen;
-            b = y + uvBlue;
-    
-            if( r >= RGB_MIN && g >= RGB_MIN && b >= RGB_MIN
-                && r <= RGB_MAX && g <= RGB_MAX && b <= RGB_MAX )
-            {
-                if(allocated == 256) { fprintf(stderr, "sorry, no colors left\n"); exit(1); }
- 
-                /* saturate the colors */
-                SATURATE( r );
-                SATURATE( g );
-                SATURATE( b );
-
-                red[allocated] = r << 8;
-                green[allocated] = g << 8;
-                blue[allocated] = b << 8;
-                transp[allocated] = 0;
-
-                /* allocate color */
-                extralookup[counter] = 1;
-                p_vout->lookup[counter++] = allocated;
-                allocated++;
-            }
-            else
-            {
-                extralookup[counter] = 0;
-                p_vout->lookup[counter++] = 0;
-            }
-        }
-        counter += 128-81;
-    }
-
-    counter = 0;
-    for ( y = 0; y <= 256; y += 16 )
-    {
-        for ( u = 0; u <= 256; u += 32 )
-        for ( v = 0; v <= 256; v += 32 )
-        {
-            int y2, u2, v2;
-            int dist = 100000000;
-
-            if( p_vout->lookup[counter] || y==0)
-            {
-                counter++;
-                continue;
-            }
-
-	    for( y2 = y-16; y2 <= y; y2+= 16 )
-            for( u2 = 0; u2 <= 256; u2 += 32 )
-            for( v2 = 0; v2 <= 256; v2 += 32 )
-            {
-                if( extralookup[((y2>>4)<<7) + (u2>>5)*9 + (v2>>5)])
-                    /* find the nearest color */
-                    if( 128*(y-y2) + (u-u2)*(u-u2) + (v-v2)*(v-v2) < dist )
-                    {
-                        p_vout->lookup[counter] = p_vout->lookup[((y2>>4)<<7) + (u2>>5)*9 + (v2>>5)];
-                        dist = 128*(y-y2) + (u-u2)*(u-u2) + (v-v2)*(v-v2);
-                    }
-            }
-            counter++;
-        }
-        counter += 128-81;
-    }
-
-    ioctl( p_vout->p_sys->i_fb_dev, FBIOPUTCMAP, &cmap );
-}
-
-/*****************************************************************************
- * FBInitBWPalette: initialize grayscale palette for 8 bpp
- *****************************************************************************/
-static void FBInitBWPalette( vout_thread_t *p_vout )
-{
-    unsigned int i;
-    unsigned short gamma[256], transp[256];
-    struct fb_cmap cmap = { 0, 256, gamma, gamma, gamma, transp };
-
-    for( i=0; i<256; i++ )
-    {
-        gamma[i] = i << 8;
-        transp[i] = 0;
-    }
-
     ioctl( p_vout->p_sys->i_fb_dev, FBIOPUTCMAP, &cmap );
 }
 

@@ -68,13 +68,15 @@ const int MATRIX_COEFFICIENTS_TABLE[8][4] =
 #define RED_MARGIN      178
 #define GREEN_MARGIN    135
 #define BLUE_MARGIN     224
-#define RED_OFFSET      1501                                   /* 1323 to 1935 */
-#define GREEN_OFFSET    135                                        /* 0 to 526 */
-#define BLUE_OFFSET     818                                     /* 594 to 1298 */
-#define RGB_TABLE_SIZE  1935                               /* total table size */
+#define RED_OFFSET      1501                                 /* 1323 to 1935 */
+#define GREEN_OFFSET    135                                      /* 0 to 526 */
+#define BLUE_OFFSET     818                                   /* 594 to 1298 */
+#define RGB_TABLE_SIZE  1935                             /* total table size */
 
 #define GRAY_MARGIN     384
-#define GRAY_TABLE_SIZE 1024                               /* total table size */
+#define GRAY_TABLE_SIZE 1024                             /* total table size */
+
+#define PALETTE_TABLE_SIZE 2176          /* YUV -> 8bpp palette lookup table */
 
 //??
 #define SHIFT 20
@@ -83,9 +85,9 @@ const int MATRIX_COEFFICIENTS_TABLE[8][4] =
 #define V_RED_COEF      ((int)(1.596 * (1<<SHIFT) / 1.164))
 #define V_GREEN_COEF    ((int)(-0.813 * (1<<SHIFT) / 1.164))
 
-/*******************************************************************************
+/*****************************************************************************
  * Local prototypes
- *******************************************************************************/
+ *****************************************************************************/
 static void     SetGammaTable     ( int *pi_table, double f_gamma );
 static void     SetYUV            ( vout_thread_t *p_vout );
 static void     SetOffset         ( int i_width, int i_height, int i_pic_width, int i_pic_height, 
@@ -169,56 +171,56 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
  * These macros dither 4 pixels in 8 bpp, with or without horiz. scaling
  *****************************************************************************/
 #define CONVERT_4YUV_PIXELS( CHROMA )                                         \
-    *p_pic++ = p_vout->lookup[                                                \
+    *p_pic++ = p_lookup[                                                      \
         (((*p_y++ + dither10[i_real_y]) >> 4) << 7)                           \
       + ((*p_u + dither20[i_real_y]) >> 5) * 9                                \
       + ((*p_v + dither20[i_real_y]) >> 5) ];                                 \
-    *p_pic++ = p_vout->lookup[                                                \
+    *p_pic++ = p_lookup[                                                      \
         (((*p_y++ + dither11[i_real_y]) >> 4) << 7)                           \
       + ((*p_u++ + dither21[i_real_y]) >> 5) * 9                              \
       + ((*p_v++ + dither21[i_real_y]) >> 5) ];                               \
-    *p_pic++ = p_vout->lookup[                                                \
+    *p_pic++ = p_lookup[                                                      \
         (((*p_y++ + dither12[i_real_y]) >> 4) << 7)                           \
       + ((*p_u + dither22[i_real_y]) >> 5) * 9                                \
       + ((*p_v + dither22[i_real_y]) >> 5) ];                                 \
-    *p_pic++ = p_vout->lookup[                                                \
+    *p_pic++ = p_lookup[                                                      \
         (((*p_y++ + dither13[i_real_y]) >> 4) << 7)                           \
       + ((*p_u++ + dither23[i_real_y]) >> 5) * 9                              \
       + ((*p_v++ + dither23[i_real_y]) >> 5) ];                               \
  
 #define CONVERT_4YUV_PIXELS_SCALE( CHROMA )                                   \
-    *p_pic++ = p_vout->lookup[                                                \
+    *p_pic++ = p_lookup[                                                      \
         (((*p_y + dither10[i_real_y]) >> 4) << 7)                             \
         + ((*p_u + dither20[i_real_y])   >> 5) * 9                            \
         + ((*p_v + dither20[i_real_y])   >> 5) ];                             \
-    i_jump_uv = (i_jump_uv + *p_offset) & 0x1;                                \
+    b_jump_uv = (b_jump_uv + *p_offset) & 0x1;                                \
     p_y += *p_offset;                                                         \
-    p_u += *p_offset   & i_jump_uv;                                           \
-    p_v += *p_offset++ & i_jump_uv;                                           \
-    *p_pic++ = p_vout->lookup[                                                \
+    p_u += *p_offset   & b_jump_uv;                                           \
+    p_v += *p_offset++ & b_jump_uv;                                           \
+    *p_pic++ = p_lookup[                                                      \
         (((*p_y + dither11[i_real_y]) >> 4) << 7)                             \
         + ((*p_u + dither21[i_real_y])   >> 5) * 9                            \
         + ((*p_v + dither21[i_real_y])   >> 5) ];                             \
-    i_jump_uv = (i_jump_uv + *p_offset) & 0x1;                                \
+    b_jump_uv = (b_jump_uv + *p_offset) & 0x1;                                \
     p_y += *p_offset;                                                         \
-    p_u += *p_offset   & i_jump_uv;                                           \
-    p_v += *p_offset++ & i_jump_uv;                                           \
-    *p_pic++ = p_vout->lookup[                                                \
+    p_u += *p_offset   & b_jump_uv;                                           \
+    p_v += *p_offset++ & b_jump_uv;                                           \
+    *p_pic++ = p_lookup[                                                      \
         (((*p_y + dither12[i_real_y]) >> 4) << 7)                             \
         + ((*p_u + dither22[i_real_y])   >> 5) * 9                            \
         + ((*p_v + dither22[i_real_y])   >> 5) ];                             \
-    i_jump_uv = (i_jump_uv + *p_offset) & 0x1;                                \
+    b_jump_uv = (b_jump_uv + *p_offset) & 0x1;                                \
     p_y += *p_offset;                                                         \
-    p_u += *p_offset   & i_jump_uv;                                           \
-    p_v += *p_offset++ & i_jump_uv;                                           \
-    *p_pic++ = p_vout->lookup[                                                \
+    p_u += *p_offset   & b_jump_uv;                                           \
+    p_v += *p_offset++ & b_jump_uv;                                           \
+    *p_pic++ = p_lookup[                                                      \
         (((*p_y + dither13[i_real_y]) >> 4) << 7)                             \
         + ((*p_u + dither23[i_real_y])   >> 5) * 9                            \
         + ((*p_v + dither23[i_real_y])   >> 5) ];                             \
-    i_jump_uv = (i_jump_uv + *p_offset) & 0x1;                                \
+    b_jump_uv = (b_jump_uv + *p_offset) & 0x1;                                \
     p_y += *p_offset;                                                         \
-    p_u += *p_offset   & i_jump_uv;                                           \
-    p_v += *p_offset++ & i_jump_uv;                                           \
+    p_u += *p_offset   & b_jump_uv;                                           \
+    p_v += *p_offset++ & b_jump_uv;                                           \
 
 /*****************************************************************************
  * SCALE_WIDTH: scale a line horizontally
@@ -272,7 +274,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
     {                                                                         \
         /* Horizontal scaling, but we can't use a buffer due to dither */     \
         p_offset = p_offset_start;                                            \
-	i_jump_uv = 0;                                                        \
+	b_jump_uv = 0;                                                        \
         for( i_x = i_pic_width / 16; i_x--; )                                 \
         {                                                                     \
             CONVERT_4YUV_PIXELS_SCALE( CHROMA )                               \
@@ -440,8 +442,7 @@ int vout_InitYUV( vout_thread_t *p_vout )
     switch( p_vout->i_bytes_per_pixel )
     {
     case 1:
-        /* nothing to allocate - will put the palette here afterwards */
-        tables_size = 1;
+        tables_size = sizeof( u8 ) * (p_vout->b_grayscale ? GRAY_TABLE_SIZE : PALETTE_TABLE_SIZE);
         break;        
     case 2:
         tables_size = sizeof( u16 ) * (p_vout->b_grayscale ? GRAY_TABLE_SIZE : RGB_TABLE_SIZE);
@@ -519,7 +520,7 @@ static void SetGammaTable( int *pi_table, double f_gamma )
     int         i_y;                                       /* base intensity */
 
     /* Use exp(gamma) instead of gamma */
-    f_gamma = exp(f_gamma );
+    f_gamma = exp( f_gamma );
 
     /* Build gamma table */
     for( i_y = 0; i_y < 256; i_y++ )
@@ -548,7 +549,30 @@ static void SetYUV( vout_thread_t *p_vout )
         switch( p_vout->i_bytes_per_pixel )
         {
         case 1:
-            break;        
+            {
+                u16 bright[256], transp[256];
+
+                p_vout->yuv.yuv.p_gray8 =  (u8 *)p_vout->yuv.p_base + GRAY_MARGIN;
+                for( i_index = 0; i_index < GRAY_MARGIN; i_index++ )
+                {
+                    p_vout->yuv.yuv.p_gray8[ -i_index ] =      RGB2PIXEL( p_vout, pi_gamma[0], pi_gamma[0], pi_gamma[0] );
+                    p_vout->yuv.yuv.p_gray8[ 256 + i_index ] = RGB2PIXEL( p_vout, pi_gamma[255], pi_gamma[255], pi_gamma[255] );
+                }            
+                for( i_index = 0; i_index < 256; i_index++) 
+                {
+                    p_vout->yuv.yuv.p_gray8[ i_index ] = pi_gamma[ i_index ];
+                    bright[ i_index ] = i_index << 8;
+                    transp[ i_index ] = 0;
+                }
+                /* the colors have been allocated, we can set the palette */
+                p_vout->p_set_palette( p_vout, bright, bright, bright, transp );
+                p_vout->i_white_pixel = 0xff;
+                p_vout->i_black_pixel = 0x00;
+                p_vout->i_gray_pixel = 0x44;
+                p_vout->i_blue_pixel = 0x3b;
+
+                break;        
+            }
         case 2:
             p_vout->yuv.yuv.p_gray16 =  (u16 *)p_vout->yuv.p_base + GRAY_MARGIN;
             for( i_index = 0; i_index < GRAY_MARGIN; i_index++ )
@@ -582,7 +606,123 @@ static void SetYUV( vout_thread_t *p_vout )
         switch( p_vout->i_bytes_per_pixel )
         {
         case 1:
-            break;        
+            {
+                #define RGB_MIN 0
+                #define RGB_MAX 255
+                #define SATURATE( x )    \
+                x = x + ( x >> 3 ) - 16; \
+                if( x < 0 ) x = 0;       \
+                if( x > 255 ) x = 255;
+    
+                int y,u,v;
+                int r,g,b;
+                int uvr, uvg, uvb;
+                int i = 0, j = 0;
+                u16 red[256], green[256], blue[256], transp[256];
+                unsigned char lookup[PALETTE_TABLE_SIZE];
+    
+                p_vout->yuv.yuv.p_rgb8 = (u8 *)p_vout->yuv.p_base;
+    
+                /* this loop calculates the intersection of an YUV box
+                 * and the RGB cube. */
+                for ( y = 0; y <= 256; y += 16 )
+                {
+                    for ( u = 0; u <= 256; u += 32 )
+                    for ( v = 0; v <= 256; v += 32 )
+                    {
+                        uvr = (V_RED_COEF*(v-128)) >> SHIFT;
+                        uvg = (U_GREEN_COEF*(u-128) + V_GREEN_COEF*(v-128)) >> SHIFT;
+                        uvb = (U_BLUE_COEF*(u-128)) >> SHIFT;
+                        r = y + uvr;
+                        g = y + uvg;
+                        b = y + uvb;
+    
+                        if( r >= RGB_MIN && g >= RGB_MIN && b >= RGB_MIN
+                                && r <= RGB_MAX && g <= RGB_MAX && b <= RGB_MAX )
+                        {
+                            /* this one should never happen unless someone fscked up my code */
+                            if(j == 256) { intf_DbgMsg( "sorry, no colors left\n" ); exit( 1 ); }
+    
+                            /* saturate the colors */
+                            SATURATE( r );
+                            SATURATE( g );
+                            SATURATE( b );
+    
+                            red[j] = r << 8;
+                            green[j] = g << 8;
+                            blue[j] = b << 8;
+                            transp[j] = 0;
+    
+                            /* allocate color */
+                            lookup[i] = 1;
+                            p_vout->yuv.yuv.p_rgb8[i++] = j;
+                            j++;
+                        }
+                        else
+                        {
+                            lookup[i] = 0;
+                            p_vout->yuv.yuv.p_rgb8[i++] = 0;
+                        }
+                    }
+                    i += 128-81;
+                }
+
+                /* the colors have been allocated, we can set the palette */
+                /* there will eventually be a way to know which colors
+                 * couldn't be allocated and try to find a replacement */
+                p_vout->p_set_palette( p_vout, red, green, blue, transp );
+
+                p_vout->i_white_pixel = 0xff;
+                p_vout->i_black_pixel = 0x00;
+                p_vout->i_gray_pixel = 0x44;
+                p_vout->i_blue_pixel = 0x3b;
+
+                i = 0;
+                /* this loop allocates colors that got outside
+                 * the RGB cube */
+                for ( y = 0; y <= 256; y += 16 )
+                {
+                    for ( u = 0; u <= 256; u += 32 )
+                    for ( v = 0; v <= 256; v += 32 )
+                    {
+                        int u2, v2;
+                        int dist, mindist = 100000000;
+    
+                        if( lookup[i] || y==0)
+                        {
+                            i++;
+                            continue;
+                        }
+    														    
+                        /* heavy. yeah. */
+                        for( u2 = 0; u2 <= 256; u2 += 32 )
+                        for( v2 = 0; v2 <= 256; v2 += 32 )
+                        {
+                            j = ((y>>4)<<7) + (u2>>5)*9 + (v2>>5);
+                            dist = (u-u2)*(u-u2) + (v-v2)*(v-v2);
+                            if( lookup[j] )
+                            /* find the nearest color */
+                            if( dist < mindist )
+                            {
+                                p_vout->yuv.yuv.p_rgb8[i] = p_vout->yuv.yuv.p_rgb8[j];
+                                mindist = dist;
+                            }
+                            j -= 128;
+                            if( lookup[j] )
+                            /* find the nearest color */
+                            if( dist + 128 < mindist )
+                            {
+                                p_vout->yuv.yuv.p_rgb8[i] = p_vout->yuv.yuv.p_rgb8[j];
+                                mindist = dist + 128;
+                            }
+                        }
+                        i++;
+                    }
+                    i += 128-81;
+                }
+
+                break;        
+            }
         case 2:
             p_vout->yuv.yuv.p_rgb16 = (u16 *)p_vout->yuv.p_base;
             for( i_index = 0; i_index < RED_MARGIN; i_index++ )
@@ -808,14 +948,14 @@ static void ConvertY4Gray8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_y,
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
-            *p_buffer++ = *p_y++; *p_buffer++ = *p_y++;
-            *p_buffer++ = *p_y++; *p_buffer++ = *p_y++;
-            *p_buffer++ = *p_y++; *p_buffer++ = *p_y++;
-            *p_buffer++ = *p_y++; *p_buffer++ = *p_y++;
-            *p_buffer++ = *p_y++; *p_buffer++ = *p_y++;
-            *p_buffer++ = *p_y++; *p_buffer++ = *p_y++;
-            *p_buffer++ = *p_y++; *p_buffer++ = *p_y++;
-            *p_buffer++ = *p_y++; *p_buffer++ = *p_y++;
+            *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = p_gray[ *p_y++ ]; *p_buffer++ = p_gray[ *p_y++ ];
         }             
 
         /* Do horizontal and vertical scaling */
@@ -965,8 +1105,9 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     int         i_vertical_scaling;                 /* vertical scaling type */
     int         i_x, i_y;                 /* horizontal and vertical indexes */
     int         i_scale_count;                       /* scale modulo counter */
-    int         i_jump_uv;
-    int         i_real_y;
+    int         b_jump_uv;                       /* should we jump u and v ? */
+    int         i_real_y;                                           /* y % 4 */
+    u8 *        p_lookup;                                    /* lookup table */
     int         i_chroma_width;                              /* chroma width */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
@@ -980,6 +1121,7 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     int dither22[4] = { 0x06, 0x16, 0x02, 0x12 };
     int dither23[4] = { 0x1e, 0x0e, 0x1a, 0x0a };
 
+    /* other matrices that can be interesting, either for debugging or for effects */
     //int dither[4][4] = { { 0, 8, 2, 10 }, { 12, 4, 14, 16 }, { 3, 11, 1, 9}, {15, 7, 13, 5} };
     //int dither[4][4] = { { 7, 8, 0, 15 }, { 0, 15, 8, 7 }, { 7, 0, 15, 8 }, { 15, 7, 8, 0 } };
     //int dither[4][4] = { { 0, 15, 0, 15 }, { 15, 0, 15, 0 }, { 0, 15, 0, 15 }, { 15, 0, 15, 0 } };
@@ -991,7 +1133,8 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
      */
     i_pic_line_width -= i_pic_width;
     i_chroma_width =    i_width / 2;
-    p_offset_start =    p_vout->yuv.p_offset;                    
+    p_offset_start =    p_vout->yuv.p_offset;
+    p_lookup =          p_vout->yuv.p_base;
     SetOffset( i_width, i_height, i_pic_width, i_pic_height, 
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
