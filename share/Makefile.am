@@ -194,6 +194,19 @@ DIST_skins2 = \
 	skins2/default/stop_onclick.png \
 	skins2/default/theme.xml \
 	skins2/default/volume.png \
+	skins2/default/vout2.png \
+	skins2/default/vout_body1.png \
+	skins2/default/vout_body.png \
+	skins2/default/vout_bottom_left.png \
+	skins2/default/vout_bottom.png \
+	skins2/default/vout_bottom_right.png \
+	skins2/default/vout_left.png \
+	skins2/default/vout_onclick.png \
+	skins2/default/vout.png \
+	skins2/default/vout_right.png \
+	skins2/default/vout_top_left.png \
+	skins2/default/vout_top.png \
+	skins2/default/vout_top_right.png \
 	\
 	skins2/fonts/FreeSans.ttf \
 	$(NULL)
