@@ -221,6 +221,9 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         /* VPAR_SYNCHRO_DEFAULT */
         mtime_t         now, pts, period, tau_yuv;
         boolean_t       b_decode = 0;
+#ifdef DEBUG_VPAR
+        char            p_date[MSTRTIME_MAX_SIZE];
+#endif
 
         now = mdate();
         period = 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
@@ -244,7 +247,12 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             }
             else
             {
-                pts = S.current_pts + period * S.i_n_b;
+                /* displaying order : B B P B B I
+                 *                      ^       ^
+                 *                      |       +- current picture
+                 *                      +- current PTS
+                 */
+                pts = S.current_pts + period * (S.i_n_b + 2);
             }
 
             if( (1 + S.i_n_p * (S.i_n_b + 1)) * period >
@@ -273,7 +281,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             }
             else
             {
-                pts = S.current_pts + period * S.i_n_b;
+                pts = S.current_pts + period * (S.i_n_b + 2);
             }
 
             if( (1 + S.i_n_p * (S.i_n_b + 1)) * period >
@@ -306,7 +314,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             if( S.i_eta_b + 1 > S.i_n_b )
                 S.i_n_b++;
 
-            pts = S.current_pts;
+            pts = S.current_pts + period;
 
             if( (S.i_n_b + 1) * period > S.p_tau[P_CODING_TYPE] )
             {
@@ -326,6 +334,13 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         }
 
         vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
+#ifdef DEBUG_VPAR
+        intf_DbgMsg("vpar synchro debug: %s picture scheduled for %s, %s (%lld)\n",
+                    i_coding_type == B_CODING_TYPE ? "B" :
+                    (i_coding_type == P_CODING_TYPE ? "P" : "I"),
+                    mstrtime(p_date, pts), b_decode ? "decoding" : "trashed",
+                    S.p_tau[i_coding_type]);
+#endif
         return( b_decode );
 #undef S
 #undef TAU_PRIME
@@ -394,6 +409,11 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_garbage )
         {
             p_vpar->synchro.pi_meaningful[i_coding_type]++;
         }
+#ifdef DEBUG_VPAR
+        intf_DbgMsg("vpar synchro debug: finished decoding %s (%lld)\n",
+                    i_coding_type == B_CODING_TYPE ? "B" :
+                    (i_coding_type == P_CODING_TYPE ? "P" : "I"), tau);
+#endif
     }
 
     FIFO_INCREMENT( i_start );

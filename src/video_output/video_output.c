@@ -328,7 +328,7 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
  *****************************************************************************/
 void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     char        psz_begin_date[MSTRTIME_MAX_SIZE]; /* buffer for date string */
     char        psz_end_date[MSTRTIME_MAX_SIZE];   /* buffer for date string */
 #endif
@@ -345,7 +345,7 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     /* Remove reservation flag */
     p_subpic->i_status = READY_SUBPICTURE;
 
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     /* Send subpicture information */
     intf_DbgMsg("subpicture %p: type=%d, begin date=%s, end date=%s\n",
                 p_subpic, p_subpic->i_type,
@@ -388,7 +388,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
                  * the best possible case, since no memory allocation needs
                  * to be done */
                 p_vout->p_subpicture[i_subpic].i_status = RESERVED_SUBPICTURE;
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
                 intf_DbgMsg("subpicture %p (in destroyed subpicture slot)\n",
                             &p_vout->p_subpicture[i_subpic] );
 #endif
@@ -463,7 +463,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
             intf_ErrMsg("spu warning: %s\n", strerror( ENOMEM ) );
         }
 
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
         intf_DbgMsg("subpicture %p (in free subpicture slot)\n", p_free_subpic );
 #endif
         vlc_mutex_unlock( &p_vout->subpicture_lock );
@@ -497,7 +497,7 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 
     p_subpic->i_status = DESTROYED_SUBPICTURE;
 
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     intf_DbgMsg("subpicture %p\n", p_subpic);
 #endif
 }
@@ -527,7 +527,7 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
     }
 
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     intf_DbgMsg("picture %p\n", p_pic);
 #endif
     vlc_mutex_unlock( &p_vout->picture_lock );
@@ -542,7 +542,7 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
 {
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     char        psz_date[MSTRTIME_MAX_SIZE];                         /* date */
 #endif
 
@@ -563,7 +563,7 @@ void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
 #endif
     }
 
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     intf_DbgMsg("picture %p, display date: %s\n", p_pic, mstrtime( psz_date, p_pic->date) );
 #endif
     vlc_mutex_unlock( &p_vout->picture_lock );
@@ -607,7 +607,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
                  * memory allocation needs to be done */
                 p_vout->p_picture[i_picture].i_status = RESERVED_PICTURE;
                 p_vout->i_pictures++;
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
                 intf_DbgMsg("picture %p (in destroyed picture slot)\n",
                             &p_vout->p_picture[i_picture] );
 #endif
@@ -701,7 +701,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
             intf_ErrMsg( "vout warning: %s\n", strerror( ENOMEM ) );
         }
 
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
         intf_DbgMsg("picture %p (in free picture slot)\n", p_free_picture );
 #endif
         vlc_mutex_unlock( &p_vout->picture_lock );
@@ -738,7 +738,7 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
    p_pic->i_status = DESTROYED_PICTURE;
    p_vout->i_pictures--;
 
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
    intf_DbgMsg("picture %p\n", p_pic);
 #endif
    vlc_mutex_unlock( &p_vout->picture_lock );
@@ -755,7 +755,7 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_lock( &p_vout->picture_lock );
     p_pic->i_refcount++;
 
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     intf_DbgMsg("picture %p refcount=%d\n", p_pic, p_pic->i_refcount );
 #endif
 
@@ -772,7 +772,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_lock( &p_vout->picture_lock );
     p_pic->i_refcount--;
 
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     if( p_pic->i_refcount < 0 )
     {
         intf_DbgMsg("error: refcount < 0\n");
@@ -786,7 +786,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_vout->i_pictures--;
     }
 
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     intf_DbgMsg("picture %p refcount=%d\n", p_pic, p_pic->i_refcount );
 #endif
 
@@ -1006,7 +1006,7 @@ static void RunThread( vout_thread_t *p_vout)
             /* Computes FPS rate */
             p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ] = display_date;
 
-            if( display_date < current_date )
+            if( display_date < current_date - p_vout->render_time )
             {
                 /* Picture is late: it will be destroyed and the thread
                  * will sleep and go to next picture */
@@ -1164,7 +1164,7 @@ static void RunThread( vout_thread_t *p_vout)
         /* On awakening, take back lock and send immediately picture to display,
          * then swap buffers */
         vlc_mutex_lock( &p_vout->change_lock );
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
         intf_DbgMsg( "picture %p, subpicture %p in buffer %d, display=%d\n", p_pic, p_subpic,
                      p_vout->i_buffer_index, b_display /* && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) */ );
 #endif
@@ -1388,7 +1388,7 @@ static void SetBufferArea( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int
         }
         else
         {
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
             intf_DbgMsg("area overflow\n");
 #endif
             p_buffer->pi_area_end[VOUT_MAX_AREAS - 1] = i_h;
@@ -1412,7 +1412,7 @@ static void SetBufferArea( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int
                  * move all old areas down */
                 if( p_buffer->i_areas == VOUT_MAX_AREAS )
                 {
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
                     intf_DbgMsg("areas overflow\n");
 #endif
                     p_buffer->pi_area_end[VOUT_MAX_AREAS - 2] = p_buffer->pi_area_end[VOUT_MAX_AREAS - 1];
@@ -1586,7 +1586,7 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
      */
     for( i_area = 0; i_area < p_buffer->i_areas; i_area++ )
     {
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
         intf_DbgMsg("clearing picture %p area in buffer %d: %d-%d\n", p_pic,
                     p_vout->i_buffer_index, p_buffer->pi_area_begin[i_area], p_buffer->pi_area_end[i_area] );
 #endif
@@ -1633,7 +1633,7 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     char                psz_date[MSTRTIME_MAX_SIZE];         /* picture date */
     mtime_t             render_time;               /* picture rendering time */
 #endif
@@ -1645,7 +1645,7 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_pic_data =        p_buffer->p_data +
                         p_buffer->i_pic_x * p_vout->i_bytes_per_pixel +
                         p_buffer->i_pic_y * p_vout->i_bytes_per_line;
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     render_time = mdate();
 #endif
 
@@ -1685,7 +1685,7 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
     }
 
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     /* Print picture date and rendering time */
     intf_DbgMsg("picture %p rendered in buffer %d (%ld us), display date: %s\n", p_pic,
                 p_vout->i_buffer_index, (long) (mdate() - render_time),
@@ -2007,7 +2007,7 @@ static void RenderInterface( vout_thread_t *p_vout )
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG_VOUT
     if( p_vout->i_changes )
     {
         intf_DbgMsg("changes: 0x%x (no display: 0x%x)\n", p_vout->i_changes,
