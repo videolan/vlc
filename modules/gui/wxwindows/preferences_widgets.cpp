@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.8 2003/10/29 23:31:57 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.9 2003/11/02 22:16:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -493,7 +493,8 @@ RangedIntConfigControl::RangedIntConfigControl( module_config_t *p_item,
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     slider = new wxSlider( this, -1, p_item->i_value, p_item->i_min,
-                           p_item->i_max );
+                           p_item->i_max, wxDefaultPosition, wxDefaultSize,
+                           wxSL_LABELS | wxSL_HORIZONTAL );
     slider->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     sizer->Add( slider, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );    
