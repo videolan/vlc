@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.6 2002/10/28 13:25:56 sam Exp $
+ * $Id: variables.h,v 1.7 2002/10/28 20:57:01 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,16 +37,22 @@ struct variable_t
     u32          i_hash;
     int          i_type;
 
+    /* A pointer to a comparison function, a duplication function, and
+     * a deallocation function */
+    int      ( * pf_cmp ) ( vlc_value_t, vlc_value_t );
+    void     ( * pf_dup ) ( vlc_value_t * );
+    void     ( * pf_free ) ( vlc_value_t * );
+
     /* Creation count: we only destroy the variable if it reaches 0 */
     int          i_usage;
 
-    /* Set to TRUE if the variable has min/max/step values */
-    vlc_bool_t   b_min, b_max, b_step;
+    /* If the variable has min/max/step values */
     vlc_value_t  min, max, step;
 
-    /* Set to TRUE if the variable is a choice variable */
-    vlc_bool_t   b_select;
-    vlc_value_t *p_choice;
+    /* If the variable is to be chosen in a list */
+    int          i_default;
+    int          i_choices;
+    vlc_value_t *pp_choices;
 
     /* Set to TRUE if the variable is in a callback */
     vlc_bool_t   b_incallback;
@@ -59,16 +65,26 @@ struct variable_t
 /*****************************************************************************
  * Variable types - probably very incomplete
  *****************************************************************************/
-#define VLC_VAR_BOOL      0x0100
-#define VLC_VAR_INTEGER   0x0200
-#define VLC_VAR_STRING    0x0300
-#define VLC_VAR_MODULE    0x0301
-#define VLC_VAR_FILE      0x0302
-#define VLC_VAR_FLOAT     0x0400
-#define VLC_VAR_TIME      0x0500
-#define VLC_VAR_ADDRESS   0x0600
-#define VLC_VAR_COMMAND   0x0700
-#define VLC_VAR_MUTEX     0x0800
+#define VLC_VAR_TYPE      0x00ff
+#define VLC_VAR_FLAGS     0xff00
+
+/* Different types */
+#define VLC_VAR_BOOL      0x0010
+#define VLC_VAR_INTEGER   0x0020
+#define VLC_VAR_STRING    0x0030
+#define VLC_VAR_MODULE    0x0031
+#define VLC_VAR_FILE      0x0032
+#define VLC_VAR_FLOAT     0x0040
+#define VLC_VAR_TIME      0x0050
+#define VLC_VAR_ADDRESS   0x0060
+#define VLC_VAR_COMMAND   0x0070
+#define VLC_VAR_MUTEX     0x0080
+
+/* Additive flags */
+#define VLC_VAR_ISLIST    0x0100
+#define VLC_VAR_HASMIN    0x0200
+#define VLC_VAR_HASMAX    0x0400
+#define VLC_VAR_HASSTEP   0x0800
 
 /*****************************************************************************
  * Variable actions
@@ -77,9 +93,11 @@ struct variable_t
 #define VLC_VAR_SETMAX        0x0011
 #define VLC_VAR_SETSTEP       0x0012
 
-#define VLC_VAR_SETCHOICE     0x0020
-#define VLC_VAR_ADDCHOICE     0x0021
-#define VLC_VAR_DELCHOICE     0x0022
+#define VLC_VAR_ADDCHOICE     0x0020
+#define VLC_VAR_DELCHOICE     0x0021
+#define VLC_VAR_SETDEFAULT    0x0022
+#define VLC_VAR_GETLIST       0x0023
+#define VLC_VAR_FREELIST      0x0024
 
 /*****************************************************************************
  * Prototypes
