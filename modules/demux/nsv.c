@@ -2,7 +2,7 @@
  * nsv.c: NullSoft Video demuxer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: nsv.c,v 1.5 2004/01/25 20:05:28 hartman Exp $
+ * $Id: nsv.c,v 1.6 2004/02/02 10:34:22 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -444,25 +444,32 @@ static int ReadNSVs( demux_t *p_demux )
 
     if( header[16]&0x80 )
     {
-        switch( header[16]&0x7f )
+        /* Fractional frame rate */
+        switch( header[16]&0x03 )
         {
+            case 0: /* 30 fps */
+                p_sys->i_pcr_inc = 33333; /* 300000/9 */
+                break;
             case 1: /* 29.97 fps */
-                p_sys->i_pcr_inc = 33367;
+                p_sys->i_pcr_inc = 33367; /* 300300/9 */
                 break;
-            case 3: /* 23.976 fps */
-                p_sys->i_pcr_inc = 41708;
+            case 2: /* 25 fps */
+                p_sys->i_pcr_inc = 40000; /* 360000/9 */
                 break;
-            case 5: /* 14.98 fps */
-                p_sys->i_pcr_inc = 66755;
+            case 3: /* 23.98 fps */
+                p_sys->i_pcr_inc = 41700; /* 375300/9 */
                 break;
-            default:
-                msg_Dbg( p_demux, "unknown fps (0x%x)", header[16] );
-                p_sys->i_pcr_inc = 40000;
-                break;
+        }
+
+        if( header[16] < 0xc0 )
+            p_sys->i_pcr_inc = p_sys->i_pcr_inc * (((header[16] ^ 0x80) >> 2 ) +1 );
+        else
+            p_sys->i_pcr_inc = p_sys->i_pcr_inc / (((header[16] ^ 0xc0) >> 2 ) +1 );
         }
     }
     else if( header[16] != 0 )
     {
+        /* Integer frame rate */
         p_sys->i_pcr_inc = 1000000 / header[16];
     }
     else
