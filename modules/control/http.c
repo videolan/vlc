@@ -2,7 +2,7 @@
  * http.c :  http remote control plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.6 2003/05/15 22:27:37 massiot Exp $
+ * $Id: http.c,v 1.7 2003/05/22 15:34:02 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -80,8 +80,8 @@ struct intf_sys_t
 
 vlc_module_begin();
     add_category_hint( N_("HTTP remote control"), NULL, VLC_TRUE );
-    add_string( "http-addr", NULL, NULL, PORT_TEXT, PORT_LONGTEXT, VLC_TRUE );
-    add_integer( "http-port", 8080, NULL, ADDR_TEXT, ADDR_LONGTEXT, VLC_TRUE );
+    add_string( "http-addr", NULL, NULL, ADDR_TEXT, ADDR_LONGTEXT, VLC_TRUE );
+    add_integer( "http-port", 8080, NULL, PORT_TEXT, PORT_LONGTEXT, VLC_TRUE );
     set_description( _("HTTP remote control interface") );
     set_capability( "interface", 10 );
     set_callbacks( Activate, Close );
