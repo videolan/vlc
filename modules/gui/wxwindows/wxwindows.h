@@ -471,10 +471,10 @@ private:
     wxStaticText *disc_title_label;
     wxStaticText *disc_chapter_label;
     wxStaticText *disc_sub_label;
-    
+
     /* Indicates if the disc device control was modified */
     bool b_disc_device_changed;
-    
+
     /* Controls for the net panel */
     wxRadioBox *net_type;
     int i_net_type;

@@ -809,6 +809,8 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
         video_combo->Append( wxU( vcodecs_array[i].psz_display ) ,
                             (void *)&vcodecs_array[i] );
     }
+    i_video_codec = 0;
+
     video_sizer1->Add( video_combo, 0 , wxALIGN_LEFT , 0 );
 
     video_sizer1->Add( new wxStaticText(this, -1, wxU(_("Bitrate (kb/s)"))),0,
@@ -845,6 +847,8 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
         audio_combo->Append( wxU( acodecs_array[i].psz_display ) ,
                             (void *)&acodecs_array[i] );
     }
+    i_audio_codec = 0;
+
     audio_sizer1->Add( audio_combo, 0 , wxALIGN_LEFT, 0 );
 
     audio_sizer1->Add( new wxStaticText(this, -1, wxU(_("Bitrate (kb/s)"))),0,

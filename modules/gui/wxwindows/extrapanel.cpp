@@ -368,6 +368,8 @@ wxPanel *ExtraPanel::VideoPanel( wxWindow *parent )
     if( f_value > 0 && f_value < 10 )
         gamma_slider->SetValue( (int)(10 * f_value) );
 
+    b_update = VLC_FALSE;
+
     return panel;
 }
 
@@ -473,7 +475,7 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
 
     top_sizer->Add( new wxButton( panel, EqRestore_Event,
                                   wxU( _("Restore Defaults") ) ),
-		    0, wxALL, 2 );
+                                  0, wxALL, 2 );
     top_sizer->Add( 0, 0, 1, wxALL, 2 );
 
     wxStaticText *smooth_text = new wxStaticText( panel, -1, wxU( "Smooth :" ));

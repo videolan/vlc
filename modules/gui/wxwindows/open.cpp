@@ -372,6 +372,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     SetIcon( *p_intf->p_sys->p_icon );
     file_dialog = NULL;
     i_disc_type_selection = 0;
+    i_disc_title = 0;
     i_open_arg = i_arg;
 
     sout_dialog = NULL;
