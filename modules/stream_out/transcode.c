@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.26 2003/07/20 23:30:07 gbazin Exp $
+ * $Id: transcode.c,v 1.27 2003/07/28 20:25:30 jpsaman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -490,6 +490,7 @@ static struct
     { VLC_FOURCC( 'w', 'm', 'a', '1' ), CODEC_ID_WMAV1 },
     { VLC_FOURCC( 'w', 'm', 'a', '2' ), CODEC_ID_WMAV2 },
     { VLC_FOURCC( 'v', 'o', 'r', 'b' ), CODEC_ID_VORBIS },
+    { VLC_FOURCC( 'a', 'l', 'a', 'w' ), CODEC_ID_PCM_ALAW },
 
     /* video */
     { VLC_FOURCC( 'm', 'p', '4', 'v'),  CODEC_ID_MPEG4 },
@@ -499,6 +500,7 @@ static struct
     { VLC_FOURCC( 'D', 'I', 'V', '3' ), CODEC_ID_MSMPEG4V3 },
     { VLC_FOURCC( 'H', '2', '6', '3' ), CODEC_ID_H263 },
     { VLC_FOURCC( 'I', '2', '6', '3' ), CODEC_ID_H263I },
+    { VLC_FOURCC( 'h', 'u', 'f', 'f' ), CODEC_ID_HUFFYUV },
     { VLC_FOURCC( 'W', 'M', 'V', '1' ), CODEC_ID_WMV1 },
     { VLC_FOURCC( 'W', 'M', 'V', '2' ), CODEC_ID_WMV2 },
     { VLC_FOURCC( 'M', 'J', 'P', 'G' ), CODEC_ID_MJPEG },

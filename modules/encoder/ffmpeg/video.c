@@ -2,7 +2,7 @@
  * video.c : video encoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: video.c,v 1.4 2003/04/27 23:16:35 gbazin Exp $
+ * $Id: video.c,v 1.5 2003/07/28 20:25:30 jpsaman Exp $
  *
  * Authors: Laurent Aimar
  *
@@ -81,6 +81,7 @@ int E_( OpenEncoderVideo ) ( vlc_object_t *p_this )
         case VLC_FOURCC( 'm', 'p', '1', 'v' ):
         case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
+        case VLC_FOURCC( 'h', 'u', 'f', 'f' ):
             break;
         default:
             return VLC_EGENERIC;
@@ -166,6 +167,10 @@ static int  Init     ( video_encoder_t *p_encoder )
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
             p_encoder->p_sys->psz_codec = "MPEG-4";
             i_codec = CODEC_ID_MPEG4;
+            break;
+        case VLC_FOURCC( 'h', 'u', 'f', 'f' ):
+            p_encoder->p_sys->psz_codec = "Huff YUV";
+            i_codec = CODEC_ID_HUFFYUV;
             break;
         default:
             return VLC_EGENERIC;
