@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: araw.c,v 1.28 2004/01/25 20:40:59 gbazin Exp $
+ * $Id: araw.c,v 1.29 2004/02/14 17:03:32 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -62,15 +62,18 @@ struct decoder_sys_t
     audio_date_t end_date;
 };
 
-static int pi_channels_maps[6] =
+static int pi_channels_maps[7] =
 {
     0,
     AOUT_CHAN_CENTER,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARLEFT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
+     | AOUT_CHAN_REARRIGHT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARLEFT
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE
 };
 
 static int16_t ulawtos16[256] =
@@ -157,6 +160,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     {
     /* from wav/avi/asf file */
     case VLC_FOURCC('a','r','a','w'):
+    case VLC_FOURCC('f','l','3','2'):
     /* _signed_ big endian samples (mov)*/
     case VLC_FOURCC('t','w','o','s'):
     /* _signed_ little endian samples (mov)*/
@@ -180,9 +184,9 @@ static int DecoderOpen( vlc_object_t *p_this )
     }
 
     if( p_dec->fmt_in.audio.i_channels <= 0 ||
-        p_dec->fmt_in.audio.i_channels > 5 )
+        p_dec->fmt_in.audio.i_channels > 6 )
     {
-        msg_Err( p_dec, "bad channels count(1-5)" );
+        msg_Err( p_dec, "bad channels count(1-6)" );
         return VLC_EGENERIC;
     }
 
@@ -198,15 +202,12 @@ static int DecoderOpen( vlc_object_t *p_this )
              p_dec->fmt_in.audio.i_rate, p_dec->fmt_in.audio.i_channels,
              p_dec->fmt_in.audio.i_bitspersample );
 
-    if( 0 /* p_wf->wFormatTag == WAVE_FORMAT_IEEE_FLOAT */ )
+    if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'f', 'l', '3', '2' ) )
     {
         switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
         {
         case 4:
             p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
-            break;
-        case 8:
-            p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','6','4');
             break;
         default:
             msg_Err( p_dec, "bad parameters(bits/sample)" );

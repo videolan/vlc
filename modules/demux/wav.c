@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: wav.c,v 1.12 2004/02/05 22:56:11 gbazin Exp $
+ * $Id: wav.c,v 1.13 2004/02/14 17:03:32 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -81,9 +81,11 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t    *p_sys;
 
     uint8_t        *p_peek;
-    WAVEFORMATEX   *p_wf;
-    unsigned int   i_size;
+    unsigned int   i_size, i_extended;
     char *psz_name;
+
+    WAVEFORMATEXTENSIBLE *p_wf_ext;
+    WAVEFORMATEX         *p_wf;
 
     /* Is it a wav file ? */
     if( input_Peek( p_input, &p_peek, 12 ) < 12 )
@@ -93,7 +95,6 @@ static int Open( vlc_object_t * p_this )
     }
     if( strncmp( p_peek, "RIFF", 4 ) || strncmp( &p_peek[8], "WAVE", 4 ) )
     {
-        msg_Warn( p_input, "WAV module discarded (not a valid file)" );
         return VLC_EGENERIC;
     }
 
@@ -120,7 +121,7 @@ static int Open( vlc_object_t * p_this )
     stream_Read( p_input->s, NULL, 8 );   /* cannot fail */
 
     /* load waveformatex */
-    p_wf = malloc( __EVEN( i_size ) + 2 ); /* +2, for raw audio -> no cbSize */
+    p_wf = (WAVEFORMATEX *)p_wf_ext = malloc( __EVEN( i_size ) + 2 );
     p_wf->cbSize = 0;
     if( stream_Read( p_input->s,
                      p_wf, __EVEN( i_size ) ) < (int)__EVEN( i_size ) )
@@ -134,29 +135,43 @@ static int Open( vlc_object_t * p_this )
                       &psz_name );
     p_sys->fmt.audio.i_channels = GetWLE ( &p_wf->nChannels );
     p_sys->fmt.audio.i_rate = GetDWLE( &p_wf->nSamplesPerSec );
-    p_sys->fmt.audio.i_blockalign = GetWLE ( &p_wf->nBlockAlign );
+    p_sys->fmt.audio.i_blockalign = GetWLE( &p_wf->nBlockAlign );
     p_sys->fmt.i_bitrate = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
-    p_sys->fmt.audio.i_bitspersample = GetWLE ( &p_wf->wBitsPerSample );;
+    p_sys->fmt.audio.i_bitspersample = GetWLE( &p_wf->wBitsPerSample );
+    p_sys->fmt.i_extra = GetWLE( &p_wf->cbSize );
+    i_extended = 0;
 
-    p_sys->fmt.i_extra = GetWLE ( &p_wf->cbSize );
+    /* Handle new WAVE_FORMAT_EXTENSIBLE wav files */
+    if( GetWLE( &p_wf->wFormatTag ) == WAVE_FORMAT_EXTENSIBLE &&
+        i_size >= sizeof( WAVEFORMATEXTENSIBLE ) - 2 )
+    {
+        wf_tag_to_fourcc( GetWLE( &p_wf_ext->SubFormat ),
+                          &p_sys->fmt.i_codec, &psz_name );
+        i_extended = sizeof( WAVEFORMATEXTENSIBLE ) - sizeof( WAVEFORMATEX );
+        p_sys->fmt.i_extra -= i_extended;
+    }
+
     if( p_sys->fmt.i_extra > 0 )
     {
         p_sys->fmt.p_extra = malloc( p_sys->fmt.i_extra );
-        memcpy( p_sys->fmt.p_extra, &p_wf[1], p_sys->fmt.i_extra );
+        memcpy( p_sys->fmt.p_extra, ((uint8_t *)p_wf) + i_extended,
+                p_sys->fmt.i_extra );
     }
 
-    msg_Dbg( p_input, "format:0x%4.4x channels:%d %dHz %dKo/s "
-             "blockalign:%d bits/samples:%d extra size:%d",
-             GetWLE( &p_wf->wFormatTag ), p_sys->fmt.audio.i_channels,
-             p_sys->fmt.audio.i_rate, p_sys->fmt.i_bitrate / 8 / 1024,
-             p_sys->fmt.audio.i_blockalign, p_sys->fmt.audio.i_bitspersample,
-             p_sys->fmt.i_extra );
+    msg_Dbg( p_input, "format: 0x%4.4x fourcc: %4.4s channels: %d "
+             "freq: %d Hz bitrate: %dKo/s blockalign: %d bits/samples: %d "
+             "extra size: %d",
+             GetWLE( &p_wf->wFormatTag ), (char *)&p_sys->fmt.i_codec,
+             p_sys->fmt.audio.i_channels, p_sys->fmt.audio.i_rate,
+             p_sys->fmt.i_bitrate / 8 / 1024, p_sys->fmt.audio.i_blockalign,
+             p_sys->fmt.audio.i_bitspersample, p_sys->fmt.i_extra );
 
     free( p_wf );
 
     switch( p_sys->fmt.i_codec )
     {
     case VLC_FOURCC( 'a', 'r', 'a', 'w' ):
+    case VLC_FOURCC( 'f', 'l', '3', '2' ):
     case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
     case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
         FrameInfo_PCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
@@ -241,24 +256,25 @@ static int Demux( input_thread_t *p_input )
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
         i_pos = stream_Tell( p_input->s );
-        if( p_sys->fmt.audio.i_blockalign != 0 &&
-            i_pos % p_sys->fmt.audio.i_blockalign )
-        {
-            i_pos = p_sys->fmt.audio.i_blockalign -
-                i_pos % p_sys->fmt.audio.i_blockalign;
-
-            /* Skip some data to realign the stream */
-            if( stream_Read( p_input->s, NULL, i_pos ) != i_pos )
-            {
-                msg_Err( p_input, "stream_Sekk failed (cannot resync)" );
-            }
-        }
     }
 
     input_ClockManageRef( p_input, p_input->stream.p_selected_program,
                           p_sys->i_time * 9 / 100 );
 
     i_pos = stream_Tell( p_input->s );
+
+    /* Check alignment */
+    if( p_sys->fmt.audio.i_blockalign != 0 &&
+        i_pos % p_sys->fmt.audio.i_blockalign )
+    {
+        int i_skip = p_sys->fmt.audio.i_blockalign -
+            i_pos % p_sys->fmt.audio.i_blockalign;
+
+        if( stream_Read( p_input->s, NULL, i_skip ) != i_skip )
+        {
+            msg_Err( p_input, "failed to re-align stream" );
+        }
+    }
 
     if( p_sys->i_data_size > 0 &&
         i_pos >= p_sys->i_data_pos + p_sys->i_data_size )

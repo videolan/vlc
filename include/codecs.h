@@ -2,7 +2,7 @@
  * codecs.h: codec related structures needed by the demuxers and decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: codecs.h,v 1.10 2004/01/25 18:17:08 zorglub Exp $
+ * $Id: codecs.h,v 1.11 2004/02/14 17:03:33 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -26,6 +26,17 @@
 
 /* Structures exported to the demuxers and decoders */
 
+#if !(defined _GUID_DEFINED || defined GUID_DEFINED)
+#define GUID_DEFINED
+typedef struct _GUID
+{
+    uint32_t Data1;
+    uint16_t Data2;
+    uint16_t Data3;
+    uint8_t  Data4[8];
+} GUID, *REFGUID, *LPGUID;
+#endif /* GUID_DEFINED */
+
 #ifndef _WAVEFORMATEX_
 #define _WAVEFORMATEX_
 typedef struct
@@ -42,6 +53,47 @@ _WAVEFORMATEX {
     uint16_t   cbSize;
 } WAVEFORMATEX, *PWAVEFORMATEX, *NPWAVEFORMATEX, *LPWAVEFORMATEX;
 #endif /* _WAVEFORMATEX_ */
+
+#ifndef _WAVEFORMATEXTENSIBLE_
+#define _WAVEFORMATEXTENSIBLE_
+typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
+_WAVEFORMATEXTENSIBLE {
+    WAVEFORMATEX Format;
+    union {
+        uint16_t wValidBitsPerSample;
+        uint16_t wSamplesPerBlock;
+        uint16_t wReserved;
+    } Samples;
+    uint32_t     dwChannelMask;
+    GUID SubFormat;
+} WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
+#endif /* _WAVEFORMATEXTENSIBLE_ */
+
+#ifndef _WAVEHEADER_
+#define _WAVEHEADER_
+typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
+_WAVEHEADER {
+    uint32_t MainChunkID;
+    uint32_t Length;
+    uint32_t ChunkTypeID;
+    uint32_t SubChunkID;
+    uint32_t SubChunkLength;
+    uint16_t Format;
+    uint16_t Modus;
+    uint32_t SampleFreq;
+    uint32_t BytesPerSec;
+    uint16_t BytesPerSample;
+    uint16_t BitsPerSample;
+    uint32_t DataChunkID;
+    uint32_t DataLength;
+} WAVEHEADER;
+#endif /* _WAVEHEADER_ */
 
 #if !defined(_BITMAPINFOHEADER_) && !defined(WIN32)
 #define _BITMAPINFOHEADER_
@@ -100,7 +152,7 @@ typedef struct
 #define WAVE_FORMAT_DK4                 0x0062
 
 #if !defined(WAVE_FORMAT_EXTENSIBLE)
-#define  WAVE_FORMAT_EXTENSIBLE         0xFFFE /* Microsoft */
+#define WAVE_FORMAT_EXTENSIBLE          0xFFFE /* Microsoft */
 #endif
 
 static struct
@@ -113,6 +165,7 @@ wave_format_tag_to_fourcc[] =
 {
     { WAVE_FORMAT_PCM,      VLC_FOURCC( 'a', 'r', 'a', 'w' ), "Raw audio" },
     { WAVE_FORMAT_ADPCM,    VLC_FOURCC( 'm', 's', 0x00,0x02), "Adpcm" },
+    { WAVE_FORMAT_IEEE_FLOAT, VLC_FOURCC( 'f', 'l', '3', '2' ), "IEEE Float audio" },
     { WAVE_FORMAT_ALAW,     VLC_FOURCC( 'a', 'l', 'a', 'w' ), "A-Law" },
     { WAVE_FORMAT_MULAW,    VLC_FOURCC( 'm', 'l', 'a', 'w' ), "Mu-Law" },
     { WAVE_FORMAT_IMA_ADPCM,VLC_FOURCC( 'm', 's', 0x00,0x11), "Ima-Adpcm" },
@@ -175,4 +228,3 @@ typedef struct es_sys_t
 } subtitle_data_t;
 
 #endif /* "codecs.h" */
-

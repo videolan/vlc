@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.29 2004/02/06 18:15:44 gbazin Exp $
+ * $Id: file.c,v 1.30 2004/02/14 17:03:33 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -37,23 +37,6 @@
 
 #define FRAME_SIZE 2048
 #define A52_FRAME_NB 1536
-
-typedef struct WAVEHEADER
-{
-    uint32_t MainChunkID;                      // it will be 'RIFF'
-    uint32_t Length;
-    uint32_t ChunkTypeID;                      // it will be 'WAVE'
-    uint32_t SubChunkID;                       // it will be 'fmt '
-    uint32_t SubChunkLength;
-    uint16_t Format;
-    uint16_t Modus;
-    uint32_t SampleFreq;
-    uint32_t BytesPerSec;
-    uint16_t BytesPerSample;
-    uint16_t BitsPerSample;
-    uint32_t DataChunkID;                      // it will be 'data'
-    uint32_t DataLength;
-} WAVEHEADER;
 
 /*****************************************************************************
  * aout_sys_t: audio output method descriptor
