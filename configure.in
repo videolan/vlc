@@ -331,6 +331,20 @@ if test x"$ac_cv_ld_plugins" != x"no"; then
     plugins_LDFLAGS="${plugins_LDFLAGS} -shared"
 fi
         
+dnl Check for variadic macros
+AC_CACHE_CHECK([for variadic cpp macros],
+    [ac_cv_cpp_variadic_macros],
+    [CFLAGS="${save_CFLAGS}"
+     AC_TRY_COMPILE(
+         [#include <stdio.h>
+          #define a(b,c...) printf(b,##c)],
+         [a("foo");a("%s","bar");a("%s%s","baz","quux");],
+         ac_cv_cpp_variadic_macros=yes,
+         ac_cv_cpp_variadic_macros=no)])
+if test x"$ac_cv_cpp_variadic_macros" != x"no"; then
+    AC_DEFINE(HAVE_VARIADIC_MACROS, 1, Support for variadic macros)
+fi
+
 dnl Checks for __attribute__(aligned()) directive
 AC_CACHE_CHECK([__attribute__ ((aligned ())) support],
     [ac_cv_c_attribute_aligned],
@@ -891,7 +905,7 @@ then
       AC_MSG_ERROR([the specified tree doesn't have a52.h])
     fi
   else dnl  no with args
-    AC_CHECK_HEADER(a52dec/a52.h, [
+    AC_CHECK_HEADERS(a52dec/a52.h, [
       AC_CHECK_LIB(a52, a52_free, [
         BUILTINS="${BUILTINS} a52"
         a52_LDFLAGS="${a52_LDFLAGS} -la52 -lm"

@@ -356,6 +356,9 @@
 /* Define if <sys/param.h> defines ntohl. */
 #undef NTOHL_IN_SYS_PARAM_H
 
+/* Support for variadic macros */
+#undef HAVE_VARIADIC_MACROS
+
 /* Maximum supported data alignment */
 #undef ATTRIBUTE_ALIGNED_MAX
 
