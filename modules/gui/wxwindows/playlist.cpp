@@ -1,8 +1,8 @@
 /*****************************************************************************
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.27 2003/11/26 10:45:21 zorglub Exp $
+ * Copyright (C) 2000-2001, 2003 VideoLAN
+ * $Id: playlist.cpp,v 1.28 2003/12/03 13:35:19 rocky Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -24,11 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
-
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
@@ -265,11 +260,9 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
                                wxDefaultPosition, wxSize( 500, 300 ),
                                wxLC_REPORT | wxSUNKEN_BORDER );
     listview->InsertColumn( 0, wxU(_("Name")) );
-    #if 0
-        listview->InsertColumn( 1, wxU(_("Duration")) );
-    #endif
     listview->InsertColumn( 1, wxU(_("Author")) );
     listview->InsertColumn( 2, wxU(_("Group")) );
+    listview->InsertColumn( 3, wxU(_("Duration")) );
     listview->SetColumnWidth( 0, 270 );
     listview->SetColumnWidth( 1, 150 );
     listview->SetColumnWidth( 2, 80 );
@@ -405,11 +398,20 @@ void Playlist::Rebuild()
             listitem.SetTextColour( *wxLIGHT_GREY);
             listview->SetItem(listitem);
         }
-        /* FIXME: we should try to find the actual duration... */
-        /* While we don't use it, hide it, it's ugly */
-        #if 0
-            listview->SetItem( i, 1, wxU(_("no info")) );
-        #endif
+	{
+	  char psz_duration[MSTRTIME_MAX_SIZE];
+	  mtime_t dur = p_playlist->pp_items[i]->i_duration;
+	  if ( dur != -1 )
+	    {
+	      secstotimestr( psz_duration, dur );
+	    }
+	  else
+	    {
+	      memcpy( psz_duration ,"-:--:--", sizeof("-:--:--"));
+	    }
+            listview->SetItem( i, 3, psz_duration );
+	}
+	
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 
