@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.12 2002/10/03 18:56:09 sam Exp $
+ * $Id: messages.c,v 1.13 2002/10/08 18:10:10 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -438,16 +438,16 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     switch( i_type )
     {
         case VLC_MSG_ERR:
-            if( p_this->p_libvlc->i_verbose < 1 ) return;
+            if( p_this->p_libvlc->i_verbose < 0 ) return;
             break;
         case VLC_MSG_INFO:
-            if( p_this->p_libvlc->i_verbose < 2 ) return;
+            if( p_this->p_libvlc->i_verbose < 0 ) return;
             break;
         case VLC_MSG_WARN:
-            if( p_this->p_libvlc->i_verbose < 3 ) return;
+            if( p_this->p_libvlc->i_verbose < 1 ) return;
             break;
         case VLC_MSG_DBG:
-            if( p_this->p_libvlc->i_verbose < 4 ) return;
+            if( p_this->p_libvlc->i_verbose < 2 ) return;
             break;
     }
 

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.95 2002/10/03 18:56:10 sam Exp $
+ * $Id: modules.c,v 1.96 2002/10/08 18:10:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -466,8 +466,8 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
 
     if( p_module != NULL )
     {
-        msg_Info( p_module, "using %s module \"%s\"",
-                  psz_capability, p_module->psz_object_name );
+        msg_Dbg( p_module, "using %s module \"%s\"",
+                 psz_capability, p_module->psz_object_name );
     }
     else if( p_first == NULL )
     {
@@ -508,7 +508,7 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
         p_module->pf_deactivate( p_this );
     }
 
-    msg_Info( p_module, "unlocking module \"%s\"", p_module->psz_object_name );
+    msg_Dbg( p_module, "unlocking module \"%s\"", p_module->psz_object_name );
 
     vlc_object_release( p_module );
 

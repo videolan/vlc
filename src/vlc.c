@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.12 2002/10/03 18:56:09 sam Exp $
+ * $Id: vlc.c,v 1.13 2002/10/08 18:10:09 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,10 +59,10 @@ int main( int i_argc, char *ppsz_argv[] )
     putenv( "GNOME_DISABLE_CRASH_DIALOG=1" );
 #   endif
 
-    /* If the user isn't using VLC_VERBOSE, set it to 1 by default */
+    /* If the user isn't using VLC_VERBOSE, set it to 0 by default */
     if( getenv( "VLC_VERBOSE" ) == NULL )
     {
-        putenv( "VLC_VERBOSE=1" );
+        putenv( "VLC_VERBOSE=0" );
     }
 #endif
 

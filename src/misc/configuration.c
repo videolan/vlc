@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.40 2002/10/03 18:56:09 sam Exp $
+ * $Id: configuration.c,v 1.41 2002/10/08 18:10:10 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -883,7 +883,7 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                           vlc_bool_t b_ignore_errors )
 {
-    int i_cmd, i_index, i_opts, i_shortopts, flag;
+    int i_cmd, i_index, i_opts, i_shortopts, flag, i_verbose = 0;
     module_t **pp_parser;
     vlc_list_t *p_list;
     module_config_t *p_item;
@@ -1115,11 +1115,9 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
             case CONFIG_ITEM_INTEGER:
                 if( i_cmd == 'v' )
                 {
-                    int i_verbose = 0;
-
                     if( optarg )
                     {
-                        if( *optarg == 'v' ) /* eg. -vvvvv */
+                        if( *optarg == 'v' ) /* eg. -vvv */
                         {
                             i_verbose++;
                             while( *optarg == 'v' )
@@ -1135,7 +1133,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                     }
                     else
                     {
-                        i_verbose = 1; /* -v */
+                        i_verbose++; /* -v */
                     }
                     config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name,
                                            i_verbose );

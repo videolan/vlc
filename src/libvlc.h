@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.18 2002/10/05 19:26:23 jlj Exp $
+ * $Id: libvlc.h,v 1.19 2002/10/08 18:10:09 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -37,10 +37,10 @@
     "The default behavior is to automatically select the best module " \
     "available.")
 
-#define VERBOSE_TEXT N_("verbosity (0-4)")
+#define VERBOSE_TEXT N_("verbosity (0,1,2)")
 #define VERBOSE_LONGTEXT N_( \
-    "This options sets the verbosity level (0=no messages, 1=only errors, " \
-    "4=max.")
+    "This options sets the verbosity level (0=only errors and " \
+    "standard messages, 1=warnings, 2=debug.")
 
 #define QUIET_TEXT N_("be quiet")
 #define QUIET_LONGTEXT N_( \

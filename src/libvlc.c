@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.36 2002/10/04 18:07:22 sam Exp $
+ * $Id: libvlc.c,v 1.37 2002/10/08 18:10:09 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -165,7 +165,7 @@ vlc_t * vlc_create_r( void )
 
         /* Find verbosity from VLC_VERBOSE environment variable */
         psz_env = getenv( "VLC_VERBOSE" );
-        libvlc.i_verbose = psz_env ? atoi( psz_env ) : 0;
+        libvlc.i_verbose = psz_env ? atoi( psz_env ) : -1;
 
 #ifdef HAVE_ISATTY
         libvlc.b_color = isatty( 2 ); /* 2 is for stderr */
@@ -412,14 +412,14 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
      */
     if( config_GetInt( p_vlc, "quiet" ) )
     {
-        libvlc.i_verbose = 0;
+        libvlc.i_verbose = -1;
     }
     else
     {
         int i_tmp = config_GetInt( p_vlc, "verbose" );
         if( i_tmp >= 0 )
         {
-            libvlc.i_verbose = __MIN( i_tmp, 4 );
+            libvlc.i_verbose = __MIN( i_tmp, 2 );
         }
     }
     libvlc.b_color = libvlc.b_color || config_GetInt( p_vlc, "color" );
