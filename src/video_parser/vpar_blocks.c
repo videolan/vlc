@@ -955,7 +955,12 @@ if( 0 )
     {
         p_mb->i_mb_type |= MB_MOTION_FORWARD;
     }
-    
+/*
+if(  p_vpar->picture.i_coding_type != I_CODING_TYPE )//!(p_mb->b_P_coding_type & MB_INTRA) )
+{
+    p_mb->i_mb_type |= MB_MOTION_FORWARD;
+}
+*/    
  if( 0 )        
     //i_count == 249)
     // i_count != *pi_mb_address)

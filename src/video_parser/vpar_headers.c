@@ -198,8 +198,9 @@ static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
 {
     if( i_coding_type != B_CODING_TYPE )
     {
-        if( p_vpar->sequence.p_backward != NULL )
-            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+        if( p_vpar->sequence.p_forward != NULL )
+            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+        p_vpar->sequence.p_forward = p_vpar->sequence.p_backward;
         p_vpar->sequence.p_backward = p_newref;
         if( p_newref != NULL )
             vout_LinkPicture( p_vpar->p_vout, p_newref );

@@ -249,6 +249,7 @@ void vdec_MotionDummy( macroblock_t * p_mb )
  *****************************************************************************/
 void vdec_MotionFieldField( macroblock_t * p_mb )
 {
+#if 0
     motion_arg_t    args;
 
     args.i_height = 16;
@@ -282,6 +283,7 @@ void vdec_MotionFieldField( macroblock_t * p_mb )
         args.i_mv_y = p_mb->pppi_motion_vectors[0][1][1];
         p_mb->pf_chroma_motion( p_mb, &args );
     }
+#endif
 }
 
 /*****************************************************************************
@@ -289,6 +291,7 @@ void vdec_MotionFieldField( macroblock_t * p_mb )
  *****************************************************************************/
 void vdec_MotionField16x8( macroblock_t * p_mb )
 {
+#if 0
     motion_arg_t    args;
 
     args.i_height = 8;
@@ -342,6 +345,7 @@ void vdec_MotionField16x8( macroblock_t * p_mb )
         args.i_offset = 8;
         p_mb->pf_chroma_motion( p_mb, &args );
     }
+#endif
 }
 
 /*****************************************************************************
@@ -358,6 +362,7 @@ void vdec_MotionFieldDMV( macroblock_t * p_mb )
  *****************************************************************************/
 void vdec_MotionFrameFrame( macroblock_t * p_mb )
 {
+#if 1
     motion_arg_t    args;
 
     args.b_source_field = args.b_dest_field = 0;
@@ -377,12 +382,12 @@ void vdec_MotionFrameFrame( macroblock_t * p_mb )
 
     if( p_mb->i_mb_type & MB_MOTION_BACKWARD ) 
     {
-        /* Necessarily MB_MOTION_BACKWARD */
         args.p_source = p_mb->p_backward;
         args.i_mv_x = p_mb->pppi_motion_vectors[0][1][0];
         args.i_mv_y = p_mb->pppi_motion_vectors[0][1][1];
         p_mb->pf_chroma_motion( p_mb, &args );
     }
+#endif
 }
 
 /*****************************************************************************
@@ -390,24 +395,29 @@ void vdec_MotionFrameFrame( macroblock_t * p_mb )
  *****************************************************************************/
 void vdec_MotionFrameField( macroblock_t * p_mb )
 {
+#if 1
     motion_arg_t    args;
 
     args.i_height = 8;
     args.b_average = 0;
     args.i_offset = 0;
+    p_mb->i_l_stride <<= 1;
+    p_mb->i_c_stride <<= 1;
 
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )
     {
         args.p_source = p_mb->p_forward;
-
+#
         args.b_source_field = p_mb->ppi_field_select[0][0];
         args.b_dest_field = 0;
         args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
         args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1] >> 1;
-        p_mb->pf_chroma_motion( p_mb, &args );
+//        p_mb->pf_chroma_motion( p_mb, &args );
 
-        args.b_source_field = p_mb->ppi_field_select[1][0];
-        args.b_dest_field = 1;
+p_mb->i_l_y ++;
+p_mb->i_c_y ++;
+        args.b_source_field = p_mb->ppi_field_select[1][0]-1;
+        //args.b_dest_field = 1;
         args.i_mv_x = p_mb->pppi_motion_vectors[1][0][0];
         args.i_mv_y = p_mb->pppi_motion_vectors[1][0][1] >> 1;
         p_mb->pf_chroma_motion( p_mb, &args );
@@ -431,6 +441,7 @@ void vdec_MotionFrameField( macroblock_t * p_mb )
         args.i_mv_y = p_mb->pppi_motion_vectors[1][1][1] >> 1;
         p_mb->pf_chroma_motion( p_mb, &args );
     }
+#endif
 }
 
 /*****************************************************************************
