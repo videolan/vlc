@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<qandaset><title>VLC FAQ</title>
+
+<qandadiv><title>Using VLC</title>
+
+<qandaentry>
+
+<question><para>How do I read a DVD?</para></question>
+
+<answer><para>Just launch VLC and use the "open disc" command from the graphical
+interface. In case of trouble, you may want to use the command line.
+For instance, provided your DVD device is <filename>/dev/dvd</filename> :</para>
+
+<screen><prompt>% </prompt><userinput>vlc dvd:/dev/dvd</userinput></screen>
+
+</answer></qandaentry>
+
+<qandaentry>
+
+<question><para>How do I read an encrypted DVD?</para></question>
+
+<answer><para>It is exactly the same as for a normal DVD. You will
+need write access to <filename>/dev/dvd</filename>, because of the key
+negociation process.
+
+If you compiled your VLC by hand, please bear in mind that you also need
+to install libdvdcss. It can be downloaded from the VideoLAN website. It
+used to be distributed in the same package as VLC, but now you must install
+them seperately.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>How do I switch to full screen display?</para></question>
+
+<answer><para>Press <keycap>f</keycap> to toggle fullscreen mode. Note
+that not all video output devices support full screen.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>How do I hide the mouse cursor?</para></question>
+
+<answer><para>It should disappear after a few seconds if you stop moving
+the mouse.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>How do I use VLC if I do not want to install Gnome and
+all this #@!%*$@§% !@# bloat?</para></question>
+
+<answer><para>You can run:</para>
+
+<screen><prompt>% </prompt><userinput>vlc --intf dummy myfile.mpg</userinput>
+</screen>
+
+<para>Most commands are available from the command line, see
+<command>vlc --help</command> for more information.</para>
+
+</answer></qandaentry>
+
+<qandaentry>
+
+<question><para>VLC eats my buffer cache, how can I use raw device?</para></question>
+
+<answer><para>If you do not know what is a raw device, do not even read
+this answer :-).</para>
+
+<para>There is an experimental support for raw devices in libdvdcss. It
+needs that you set up a raw device pointing to your DVD device (under
+Linux, use the "raw" utility). Then pass the raw device as second
+argument, for instance:</para>
+
+<screen><prompt>% </prompt><userinput>vlc dvd:/dev/dvd@/dev/raw0</userinput></screen>
+
+</answer></qandaentry>
+
+<qandaentry>
+
+<question><para>How do I use VLC as a client for VLS
+streaming?</para></question>
+
+<answer><para>First you must set up a VLS stream. Please refer to the
+documentation of the program. Then start VLC:</para>
+
+<screen><prompt>% </prompt><userinput>vlc udp:</userinput></screen>
+
+<para>You should not need any option. If you are paranoid and want to control
+everything, here is the exact syntax:</para>
+
+<screen><prompt>% </prompt><userinput>vlc udp:[&lt;server&gt;[:&lt;server port&gt;]][@[&lt;bind address&gt;][:&lt;bind port&gt;]]</userinput></screen>
+
+</answer></qandaentry>
+
+<qandaentry>
+
+<question><para>How do I uninstall / reinstall VLC?</para></question>
+
+<answer><para>Why would you want to? ;)</para>
+
+<para>If you are using a source distribution of VLC, for example
+a tarball or the CVS, then you have probably used <command>make
+install</command> to install the compiled VLC. To remove it just
+<command>make uninstall</command>. If you want to install a newer
+version than the currently installed one, you should first uninstall
+the first one. If you deleted the original source tree, a <command>make
+uninstall</command> in the newer tree should still work.</para>
+
+<para>For binary packages, remove old packages first and install the new
+ones (normally this should be handled automagically by your sytem).
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>Debian: what should I put in my sources.list for
+videolan?</para></question>
+
+<answer>
+
+<para><programlisting>
+deb     http://www.videolan.org/pub/videolan/debian $(ARCH)/
+deb-src http://www.videolan.org/pub/videolan/debian sources/
+</programlisting></para>
+
+</answer></qandaentry>
+
+<qandaentry>
+
+<question><para>How can I save my VLC configuration?</para></question>
+
+<answer><para>In the graphical interface, go to <emphasis>Settings /
+Preferences</emphasis> and click on <emphasis>Save</emphasis>.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>Where does VLC store its config file?</para></question>
+
+<answer><para>Currently, a config file is created on a per user basis
+(there is no global configuration file). If you modify the available
+options in VLC and save the new configuration, then a configuration file
+will be created in your user directory. The precise location of this
+file depends on the Operating System you are running: </para>
+
+<itemizedlist>
+
+<listitem><para>Unices (Linux, etc.):
+<filename>$(HOME)/.vlc/vlcrc</filename></para></listitem>
+
+<listitem><para>Mac OS X: <filename>/Library/Preferences/VLC</filename>
+</para></listitem>
+
+<listitem><para>Windows: <filename>Application Data\vlc\vlcrc</filename>
+(Application Data is usually in <filename>C:\Documents and
+Settings\your_name</filename></para></listitem>
+
+<listitem><para>BeOS:
+<filename>config/settings/vlcrc</filename></para></listitem>
+
+</itemizedlist>
+
+</answer></qandaentry>
+
+<qandaentry>
+
+<question><para>How do I join an IPv6 multicast stream?</para></question>
+
+<answer><para>You often have to indicate the interface name on your system, for instance :
+ udp:@[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210%eth0]:1234
+</para></answer></qandaentry>
+
+</qandadiv>
+
+<qandadiv><title>Troubleshooting</title>
+
+<qandaentry>
+
+<question><para>VLC has a strange behavior...</para></question>
+
+<answer><para>The first thing to do is to delete VLC's configuration
+file :</para>
+
+<itemizedlist>
+
+<listitem><para>under unices, remove the file
+<filename>~/.vlc/vlcrc</filename>;</para></listitem>
+
+<listitem><para>under Windows, remove the file
+<filename>vlcrc</filename> in the <filename>vlc</filename> subfolder of
+your <filename>Application Data</filename> directory.</para></listitem>
+
+</itemizedlist>
+
+<para>Then restart VLC ; if it doesn't get any better, read the
+following questions !</para>
+
+</answer></qandaentry>
+
+<qandaentry>
+
+<question><para>When I start VLC, I do not see any interface
+coming</para></question>
+
+<answer><para>If you installed a binary package, make sure you also
+installed an interface package such as <emphasis>vlc-gtk</emphasis>
+or <emphasis>vlc-qt</emphasis>. If you installed from source, make
+sure the development package for gtk 1.2 or qt is correctly installed
+(often <emphasis>gtk-dev</emphasis>, <emphasis>gtk-devel</emphasis> or
+<emphasis>libgtk1.2-dev</emphasis>) and recompile.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>Clicking on "<emphasis>disc</emphasis>" in the interface
+does not do anything</para></question>
+
+<answer><para>Wait a few seconds. Key discovering can take much time on
+some discs. If it still does not work, you can have a more verbose
+output using <command>vlc -vvvvv</command>. Here are a few things to
+check for:</para>
+
+<itemizedlist>
+
+<listitem><para>Did you install the libdvdcss package?</para></listitem>
+
+<listitem><para>Do you have write access to your DVD device?
+For instance, under Unix, <command>chmod 666 /dev/hdc</command>
+</para></listitem>
+
+<listitem><para>Under Unix, does your kernel log contain line about your
+DVD device?</para></listitem>
+
+<listitem><para>Under Unix, do you have a link from <filename>/dev/dvd</filename> to your real DVD device? For instance:</para>
+<screen><prompt># </prompt><userinput>cd /dev &amp;&amp; ln -s hdc dvd</userinput></screen></listitem>
+
+</itemizedlist>
+
+</answer></qandaentry>
+
+<qandaentry>
+
+<question><para>The video runs but the picture is distorted</para></question>
+
+<answer><para>There is probably a problem with the output layer. There
+are several ways of troubleshooting it. First, try with another output
+plugin, for instance:</para>
+
+<screen>
+<prompt>% </prompt><userinput>vlc --vout sdl</userinput>
+<prompt>% </prompt><userinput>vlc --vout x11</userinput>
+</screen>
+
+<para>Second, change your screen depth and/or definition. It quite
+often helps. Lastly, if running Unix, have a look at your XFree86 video
+driver (nVidia for instance releases optimized drivers for its boards).
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>Video is choppy</para></question>
+
+<answer><para>Your system is too slow to decode all pictures. It might
+be that your CPU basically is not fast enough. It can also be that the
+subsystem is misconfigured/misdriven, this happens for example under
+Redhat Linux. Here are some elements to improve speed: </para>
+
+<itemizedlist>
+  <listitem>
+    <para>Turn on DMA on your DVD device, for instance:</para>
+    <itemizedlist>
+      <listitem>
+        <para>Under Linux:</para>
+        <screen><prompt>% </prompt><userinput>hdparm -d1 /dev/dvd</userinput></screen>
+      </listitem>
+
+      <listitem><para>Under Windows, go to the <emphasis>System</emphasis>
+      section of the control panel, and go to the <emphasis>Hardware
+      manager</emphasis> (it is sometimes in a separate tab, and sometimes,
+      you have to go to the <emphasis>Advanced</emphasis> tab. Then,
+      righ-click on your DVD player, and check the <emphasis>DMA</emphasis>
+      checkbox</para></listitem>
+    </itemizedlist>
+  </listitem>
+  <listitem>
+    <para>Upgrade to the latest driver for your video board</para>
+    <para>If you are running Linux, you can additionnaly upgrade to the
+    latest XFree86 version ; if supported, check that the xvideo plug-in is
+    effectively used with</para>
+    <screen><prompt>% </prompt><userinput>vlc -vvvv</userinput></screen>
+  </listitem>
+  <listitem><para>Kill other applications running...</para></listitem>
+</itemizedlist>
+
+</answer></qandaentry>
+
+<qandaentry>
+
+<question><para>Audio is choppy</para></question>
+
+<answer><para>This is not normal; it is a known problem and is being
+investigated.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>Audio and video are out of sync</para></question>
+
+<answer><para>This is not normal. Try using another output plugin (for
+instance <command>--aout dsp</command>), kill <emphasis>esd</emphasis>
+or <emphasis>artsd</emphasis> if they are running. This is a known
+problem and is being investigated.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>Sound volume is too low</para></question>
+
+<answer><para>You can raise it with <command>--volume</command> command
+line switch or in the preferences window of your graphical interface.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>I have no image under DirectX</para></question>
+
+<answer><para>Check that your video card drivers are in their latest
+version and that your DirectX is up-to-date.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>VLC crashes</para></question>
+
+<answer><para>Increase the verbosity level (either in the preferences
+or with a <emphasis>-vvvv</emphasis> command line option) and look at the
+debug messages (in the terminal or in the Messages window).</para>
+
+<para>If you are convinced that it's a bug in VLC, have a look at the
+<ulink url="http://www.videolan.org/support/bug-reporting.html">bug
+reporting page</ulink>.
+
+</para></answer></qandaentry>
+
+
+
+<qandaentry>
+
+<question><para>Under Unices, i can only play a DVD as root</para></question>
+
+<answer><para>Check that as user you have write access to your DVD drive
+/ device.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>I do not have access to the GUI anymore</para></question>
+
+<answer><para>If you change the default interface module in the
+preferences menu to a non GUI module (ie. to a command line interface)
+and then save the configuration, the only way to get VLC to show a GUI
+again is to run it directly from the command line.</para>
+
+<para>For instance on Windows, you need to open a Command Line
+console, go to the directory where you installed VLC (usually
+<filename>C:\Program Files\VideoLAN\VideoLAN Client</filename>) and then
+type <command>vlc --intf win32</command> You will then be able to modify
+the configuration again and save it.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>I have just upgraded to VLC 0.4.5, and now I do not have
+any sound with the streams coming from the VLS!</para></question>
+
+<answer><para>This is a known problem. VLC 0.4.5 and later are now
+compliant to general usage regarding A/52 sound, and the new behavior
+is incompatible with the previous one. VLS version 0.4.0 and later now
+fixes this problem. If, for any reason, you wish to keep VLS 0.3.3, you
+can still read those streams by launching VLC (0.4.5 or later) with
+<command>--vls-backwards-compat</command>.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>NO VIDEO!! or NO AUDIO!!</para></question>
+
+<answer><para>DON'T PANIC! Use the verbose mode of VLC to search the
+problem, you may either set the verbosity option in the interface
+preferences or use the <command>-vvvv</command> command line switch to
+increase the number of report/error messages given by VLC. If you are
+not using a terminal, use the Messages window in the View menu.
+
+</para></answer></qandaentry>
+
+</qandadiv>
+<qandadiv><title>Ports and features</title>
+
+<qandadiv><title>MacOS X port</title>
+
+<qandaentry>
+
+<question><para>Does VLC support the ATI DVD hardware acceleration
+cards?</para></question>
+
+<answer><para>Currently it does not. We would be glad to support them,
+but we lack technical information on them.
+
+</para></answer></qandaentry>
+
+</qandadiv>
+
+<qandadiv><title>Win32 port</title>
+
+<qandaentry>
+
+<question><para>When moving the focus to another window, VLC network
+input stops working properly!</para></question>
+
+<answer><para>This is a known problem with Win 95-class systems (ie,
+Windows 95/98/Me). Upgrade to an NT-class system (ie, Windows NT/2000 or
+XP).
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>I have selected a subtitle file, but nothing
+happens!</para></question>
+
+<answer><para>This is a known problem. To correct it, open the
+preferences panel (in the View menu), and in the
+<emphasis>Decoders</emphasis> tab click on <emphasis>subtitles decoder
+module (spudec)</emphasis>, without checking the box. Then, click on
+<emphasis>Configure</emphasis>, and replace the given path with the
+correct path to the font file. It should be something like this:
+<command>C:\vlc\share\font-eutopiabold36.rle</command>. Then save the
+preferences.
+
+</para></answer></qandaentry>
+
+</qandadiv>
+
+<qandadiv><title>Planned ports</title>
+
+<qandaentry>
+
+<question><para>Do you have plans for a MacOS 9 / OS/2 / &amp;{#!@}~
+port?</para></question>
+
+<answer><para>No, nobody reported to be actually working on a MacOS 9
+or OS/2 port. If you feel like you could write it, we would of course
+welcome it. Currently, the developers are more interested in supporting
+the latest Operating Systems and completing the functionalities.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>Does VLC have dxr2 / dxr3 cards support?</para></question>
+
+<answer><para>This support is currently being developed.
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>Does VLC support RTP?</para></question>
+
+<answer><para>Yes. Just use vlc rtp:@&lt;mcast addr&gt;:&lt;local port&gt;.
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>Does VLC support DVD from all regions?</para></question>
+
+<answer><para>VLC uses <emphasis>libdvdcss</emphasis> to read all
+DVD, disregarding their zone. All regions are supported without any
+constraint. However, <emphasis>libdvdcss</emphasis> might not be legal
+in your country.
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>How can I take screenshots?</para></question>
+
+<answer><para>This is currently unsupported, but will be in a
+near future. The latest developments concern recording the video
+and the audio to a file. However, under XFree, you may use the
+<emphasis>x11</emphasis> video output to take normal screen capture of
+the video displayed by VLC.
+
+</para></answer></qandaentry>
+
+</qandadiv>
+
+</qandadiv>
+
+<qandadiv><title>Legal concerns</title>
+
+<qandaentry>
+<question><para>May I use the VideoLAN logo?</para></question>
+
+<answer><para>You may freely use the VideoLAN logo using the following
+copyright:</para>
+
+<para>
+<emphasis>
+  Copyright (c) 1996-2002 VideoLAN. This logo or a modified version
+  may be used or modified by anyone to refer to the VideoLAN project
+  or any product developed by the VideoLAN team, but does not indicate
+  endorsement by the project.
+</emphasis>
+
+</para></answer></qandaentry>
+
+<qandaentry>
+
+<question><para>May I redistribute VLC?</para></question>
+
+<answer><para>You may distribute an original or modified version of a
+VideoLAN software as long as you comply with its license terms. It is
+the GNU General Public License Version 2 (referred herein as GPL), and
+it is in the file named COPYING in our products. The easiest way to
+conform to the GPL is to accompany the product you want to distribute
+with its sources. For example, if you plan to distribute the 0.4.6
+binary version you should include: </para>
+
+<programlisting>
+   http://www.videolan.org/pub/videolan/vlc/0.4.6/vlc-0.4.6.tar.gz
+   http://www.videolan.org/pub/videolan/vlc/0.4.6/contrib/
+</programlisting>
+
+<para>You do not need to bother explaining where the sources are, but
+the sources have to share the same media as the products.</para>
+
+<para>They are other ways to comply with the GPL, but this should be the
+simplest because it does not rely on a contract.</para>
+
+<para>There is one additional issue you need to take care of. The VLC
+binary from our website can also read encrypted DVDs with the help of
+the <emphasis>libdvdcss</emphasis> library. Its use is controversial in
+a few countries such as the United States because of a law called the
+DMCA. If you are unsure about the legality of using and distributing
+this library in your country, please consult your lawyer.
+
+</para></answer></qandaentry>
+</qandadiv>
+
+<qandadiv><title>Miscellaneous</title>
+
+<qandaentry>
+
+<question><para>How may I help your project?</para></question>
+
+<answer><para>You might either contribute time, material,
+or money. We are also always needing some translators.
+You will find all information you need on the <ulink
+url="http://www.videolan.org/contribute.html">contribute page</ulink>.
+
+</para></answer></qandaentry>
+
+
+<qandaentry>
+
+<question><para>Why are your mailing-lists and your website in
+english?</para></question>
+
+<answer><para>VideoLAN's developers come from all around the world and
+english is the only language they can use to communicate together.
+Although great care is given to the translation of VLC in various
+languages, maintaining translations of our documentation and website
+costs too much more time than we can afford.
+
+</para></answer></qandaentry>
+
+</qandadiv>
+</qandaset>

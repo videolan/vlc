@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE article
+          PUBLIC "-//Norman Walsh//DTD Simplified DocBook XML V4.1.2.4//EN"
+                 "http://nwalsh.com/docbook/simple/4.1.2.4/sdocbook.dtd" [
+  <!ENTITY faq SYSTEM "faq.xml">
+]>
+
+<article>
+  <articleinfo>
+    <title>VLC FAQ</title>
+    <copyright>
+      <year>2002, 2003</year>
+      <holder>the VideoLAN project</holder>
+    </copyright>
+    <abstract>
+      <para>This document is the VideoLAN Client (VLC) Frequently
+      Asked Questions. For a complete user guide, please have
+      a look at the VLC User Guide, available on the <ulink
+      url="http://www.videolan.org/doc/">VideoLAN website</ulink></para>
+    </abstract>
+  </articleinfo>
+  &faq;
+</article>
