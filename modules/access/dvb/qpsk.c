@@ -41,10 +41,10 @@ void E_(Close)   ( vlc_object_t * );
  *****************************************************************************/
 
 #define ADAPTER_TEXT N_("adapter card to tune")
-#define ADAPTER_LONGTEXT N_("")
+#define ADAPTER_LONGTEXT ""
 
 #define DEVICE_TEXT N_("device nummer to use on adapter")
-#define DEVICE_LONGTEXT N_("")
+#define DEVICE_LONGTEXT ""
 
 #define FREQ_TEXT N_("satellite default transponder frequency")
 #define FREQ_LONGTEXT ""

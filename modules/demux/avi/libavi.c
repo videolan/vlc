@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.20 2003/05/03 01:12:13 fenrir Exp $
+ * $Id: libavi.c,v 1.21 2003/08/01 00:05:07 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -129,17 +129,14 @@ int AVI_SeekAbsolute( input_thread_t *p_input,
 
             i_read = input_SplitBuffer( p_input, &p_data, 
                                         __MIN( 4096, i_skip ) );
-            if( i_read < 0 )
+            if( i_read <= 0 )
             {
+                /* Error or eof */
                 return VLC_EGENERIC;
             }
             i_skip -= i_read;
 
             input_DeletePacket( p_input->p_method_data, p_data );
-            if( i_read == 0 && i_skip > 0 )
-            {
-                return VLC_EGENERIC;
-            }
         }
         return VLC_SUCCESS;
     }

@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.28 2003/07/19 15:12:10 fenrir Exp $
+ * $Id: libmp4.c,v 1.29 2003/08/01 00:05:07 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -273,7 +273,7 @@ int MP4_SeekAbsolute( input_thread_t *p_input,
 
             i_read = input_SplitBuffer( p_input, &p_data, 
                                         __MIN( 4096, i_skip ) );
-            if( i_read < 0 )
+            if( i_read <= 0 )
             {
                 msg_Warn( p_input, "seek:cannot read" );
                 return VLC_EGENERIC;

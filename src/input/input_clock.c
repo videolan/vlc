@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.39 2003/07/28 13:19:37 massiot Exp $
+ * $Id: input_clock.c,v 1.40 2003/08/01 00:05:07 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -75,7 +75,7 @@ static void ClockNewRef( pgrm_descriptor_t * p_pgrm,
 #define CR_MAX_AVERAGE_COUNTER 40
 
 /* Maximum gap allowed between two CRs. */
-#define CR_MAX_GAP 1000000
+#define CR_MAX_GAP 2000000
 
 /* Latency introduced on DVDs with CR == 0 on chapter change - this is from
  * my dice --Meuuh */
@@ -239,6 +239,7 @@ void input_ClockManageRef( input_thread_t * p_input,
     {
         /* Feed synchro with a new reference point. */
         ClockNewRef( p_pgrm, i_clock,
+                     i_clock == 0 ? mdate() :
                      p_pgrm->last_pts + CR_MEAN_PTS_GAP > mdate() ?
                      p_pgrm->last_pts + CR_MEAN_PTS_GAP : mdate() );
         p_pgrm->i_synchro_state = SYNCHRO_OK;

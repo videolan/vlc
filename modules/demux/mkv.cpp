@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.17 2003/07/04 16:35:20 sam Exp $
+ * $Id: mkv.cpp,v 1.18 2003/08/01 00:05:07 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1973,7 +1973,7 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
 
             i_read = input_SplitBuffer( p_input, &p_data,
                                         __MIN( 4096, i_skip ) );
-            if( i_read < 0 )
+            if( i_read <= 0 )
             {
                 msg_Err( p_input, "seek failed" );
                 mb_eof = VLC_TRUE;

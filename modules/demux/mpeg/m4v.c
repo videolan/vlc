@@ -2,7 +2,7 @@
  * m4v.c : MPEG-4 video Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: m4v.c,v 1.5 2003/05/05 22:23:36 gbazin Exp $
+ * $Id: m4v.c,v 1.6 2003/08/01 00:05:07 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -230,7 +230,7 @@ static int Demux( input_thread_t * p_input )
 
         if( ( i_read = input_SplitBuffer( p_input,
                                           &p_data,
-                                          i_size ) ) < 0 )
+                                          i_size ) ) <= 0 )
         {
             msg_Warn( p_input, "error while reading data" );
             break;
@@ -262,7 +262,7 @@ static int Demux( input_thread_t * p_input )
 
         if( ( i_read = input_SplitBuffer( p_input,
                                           &p_data,
-                                          i_size ) ) < 0 )
+                                          i_size ) ) <= 0 )
         {
             msg_Warn( p_input, "error while reading data" );
             break;
