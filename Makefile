@@ -26,6 +26,7 @@ PLUGINS_DIR :=	ac3_adec \
 		dvdread \
 		esd \
 		fb \
+		filter \
 		ggi \
 		glide \
 		gtk \
@@ -54,7 +55,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		alsa/alsa \
 		arts/arts \
 		beos/beos \
-		chroma/yuv2rgb8 \
+		chroma/chroma_yv12_rgb8 \
 		directx/directx \
 		dsp/dsp \
 		dummy/dummy \
@@ -63,6 +64,8 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		dvdread/dvdread \
 		esd/esd \
 		fb/fb \
+		filter/filter_bob \
+		filter/filter_invert \
 		ggi/ggi \
 		glide/glide \
 		gtk/gnome \
@@ -320,7 +323,6 @@ snapshot-common:
 		-type d -name CVS -o -name '.*' -o -name '*.[o]' | \
 			while read i ; do rm -Rf $$i ; done
 	# Copy gettext stuff
-	mkdir tmp/vlc/po
 	cp po/*.po tmp/vlc/po
 	for i in Makefile.in.in POTFILES.in ; do cp po/$$i tmp/vlc/po ; done
 	# Copy misc files

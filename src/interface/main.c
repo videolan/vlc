@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.137 2001/12/12 15:20:16 sam Exp $
+ * $Id: main.c,v 1.138 2001/12/16 16:18:36 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -124,6 +124,7 @@
 #define OPT_OVERLAY             166
 #define OPT_XVADAPTOR           167
 #define OPT_SMP                 168
+#define OPT_FILTER              169
 
 #define OPT_CHANNELS            170
 #define OPT_SERVER              171
@@ -206,6 +207,7 @@ static const struct option longopts[] =
     {   "overlay",          0,          0,      OPT_OVERLAY },
     {   "xvadaptor",        1,          0,      OPT_XVADAPTOR },
     {   "smp",              1,          0,      OPT_SMP },
+    {   "filter",           1,          0,      OPT_FILTER },
 
     /* DVD options */
     {   "dvdtitle",         1,          0,      't' },
@@ -805,6 +807,9 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_SMP:                                               /* --smp */
             main_PutIntVariable( VDEC_SMP_VAR, atoi(optarg) );
             break;
+        case OPT_FILTER:                                         /* --filter */
+            main_PutPszVariable( VOUT_FILTER_VAR, optarg );
+            break;
 
         /* DVD options */
         case 't':                                              /* --dvdtitle */
@@ -960,6 +965,7 @@ static void Usage( int i_fashion )
           "\n      --yuv <module>             \tYUV method"
           "\n      --synchro <type>           \tforce synchro algorithm"
           "\n      --smp <number of threads>  \tuse several processors"
+          "\n      --filter <module>          \tvideo filter module"
           "\n"
           "\n  -t, --dvdtitle <num>           \tchoose DVD title"
           "\n  -T, --dvdchapter <num>         \tchoose DVD chapter"
@@ -1026,7 +1032,8 @@ static void Usage( int i_fashion )
         "\n  " IDCT_METHOD_VAR "=<method name>        \tIDCT method"
         "\n  " YUV_METHOD_VAR "=<method name>         \tYUV method"
         "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm"
-        "\n  " VDEC_SMP_VAR "=<number of threads>     \tuse several processors" );
+        "\n  " VDEC_SMP_VAR "=<number of threads>     \tuse several processors"
+        "\n  " VOUT_FILTER_VAR "=<method name>        \tvideo filter method" );
 
     /* DVD parameters */
     intf_MsgImm( "\nDVD parameters:"

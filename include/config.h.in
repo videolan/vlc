@@ -325,6 +325,10 @@
 #define VOUT_METHOD_VAR                 "vlc_vout"
 #define VOUT_METHOD_DEFAULT             "x11"
 
+/* Environment variable containing the display method */
+#define VOUT_FILTER_VAR                 "vlc_filter"
+#define VOUT_FILTER_DEFAULT             "x11"
+
 /* Environment variable containing the motion compensation method */
 #define MOTION_METHOD_VAR               "vlc_motion"
 
@@ -345,6 +349,9 @@
 #define VOUT_HEIGHT_DEFAULT             576
 #define VOUT_DEPTH_VAR                  "vlc_depth"
 #define VOUT_DEPTH_DEFAULT              15
+
+/* Multiplier value for aspect ratio calculation */
+#define VOUT_ASPECT_FACTOR              (2*2*2*2*2*2*2*3*3*3*5*5*5)
 
 /* Maximum width of a scaled source picture - this should be relatively high,
  * since higher stream values will result in no display at all. */
@@ -414,6 +421,12 @@
 /* Better be in advance when awakening than late... */
 #define VOUT_MWAIT_TOLERANCE            ((int)(0.020*CLOCK_FREQ))
 
+/* Time to sleep when waiting for a buffer (from vout or the video fifo).
+ * It should be approximately the time needed to perform a complete picture
+ * loop. Since it only happens when the video heap is full, it does not need
+ * to be too low, even if it blocks the decoder. */
+#define VOUT_OUTMEM_SLEEP               ((int)(0.020*CLOCK_FREQ))
+
 /* The default video output window title */
 #define VOUT_TITLE                      "VideoLAN Client @VLC_VERSION@"
 
@@ -429,12 +442,6 @@
  *****************************************************************************/
 
 #define VPAR_IDLE_SLEEP                 ((int)(0.010*CLOCK_FREQ))
-
-/* Time to sleep when waiting for a buffer (from vout or the video fifo).
- * It should be approximately the time needed to perform a complete picture
- * loop. Since it only happens when the video heap is full, it does not need
- * to be too low, even if it blocks the decoder. */
-#define VPAR_OUTMEM_SLEEP               ((int)(0.020*CLOCK_FREQ))
 
 /* Optimization level, from 0 to 2 - 1 is generally a good compromise. Remember
  * that raising this level dramatically lengthens the compilation time. */

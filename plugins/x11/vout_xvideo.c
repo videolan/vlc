@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.38 2001/12/13 12:47:17 sam Exp $
+ * $Id: vout_xvideo.c,v 1.39 2001/12/16 16:18:36 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -463,12 +463,20 @@ static int XVideoNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             /* FIXME: try to get the right i_bytes value from p_xvimage */
             p_pic->planes[Y_PLANE].p_data  = p_pic->p_sys->p_xvimage->data;
             p_pic->planes[Y_PLANE].i_bytes = p_pic->i_size * sizeof(u8);
+            p_pic->planes[Y_PLANE].i_line_bytes = i_width * sizeof(u8);
+
             p_pic->planes[U_PLANE].p_data  = (u8*)p_pic->p_sys->p_xvimage->data
                                                + p_pic->i_size * 5 / 4;
             p_pic->planes[U_PLANE].i_bytes = p_pic->i_size * sizeof(u8) / 4;
+            p_pic->planes[U_PLANE].i_line_bytes = p_pic->i_chroma_width
+                                                   * sizeof(u8);
+
             p_pic->planes[V_PLANE].p_data  = (u8*)p_pic->p_sys->p_xvimage->data
                                                + p_pic->i_size;
             p_pic->planes[V_PLANE].i_bytes = p_pic->i_size * sizeof(u8) / 4;
+            p_pic->planes[V_PLANE].i_line_bytes = p_pic->i_chroma_width
+                                                   * sizeof(u8);
+
             p_pic->i_planes = 3;
 
             return 0;

@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.69 2001/12/13 12:47:17 sam Exp $
+ * $Id: vout_sdl.c,v 1.70 2001/12/16 16:18:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -176,8 +176,25 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->b_cursor_autohidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
 
-    p_vout->p_sys->i_width = p_vout->render.i_width;
-    p_vout->p_sys->i_height = p_vout->render.i_height;
+    if( p_vout->render.i_height * p_vout->render.i_aspect
+         >= p_vout->render.i_width * VOUT_ASPECT_FACTOR )
+    {
+        p_vout->p_sys->i_width = p_vout->render.i_height
+            * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
+        p_vout->p_sys->i_height = p_vout->render.i_height;
+    }
+    else
+    {
+        p_vout->p_sys->i_width = p_vout->render.i_width;
+        p_vout->p_sys->i_height = p_vout->render.i_width
+            * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
+    }
+
+    if( p_vout->p_sys->i_width <= 400 && p_vout->p_sys->i_height <= 300 )
+    {
+        p_vout->p_sys->i_width *= 2;
+        p_vout->p_sys->i_height *= 2;
+    }
 
     if( SDLOpenDisplay( p_vout ) )
     {
@@ -549,12 +566,17 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->i_chroma_size  = i_height * ( i_width / 2 );
 
             /* FIXME: try to get the right i_bytes value from p_overlay */
-            p_pic->planes[ Y_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[0];
+            p_pic->planes[ Y_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[ 0 ];
             p_pic->planes[ Y_PLANE ].i_bytes = p_pic->i_size * sizeof( u8 );
-            p_pic->planes[ U_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[2];
+            p_pic->planes[ Y_PLANE ].i_line_bytes = i_width * sizeof( u8 );
+
+            p_pic->planes[ U_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[ 2 ];
             p_pic->planes[ U_PLANE ].i_bytes = p_pic->i_size * sizeof( u8 ) / 4;
-            p_pic->planes[ V_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[1];
+            p_pic->planes[ U_PLANE ].i_line_bytes = p_pic->i_chroma_width * sizeof( u8 );
+
+            p_pic->planes[ V_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[ 1 ];
             p_pic->planes[ V_PLANE ].i_bytes = p_pic->i_size * sizeof( u8 ) / 4;
+            p_pic->planes[ V_PLANE ].i_line_bytes = p_pic->i_chroma_width * sizeof( u8 );
 
             p_pic->i_planes = 3;
 

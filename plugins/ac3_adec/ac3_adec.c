@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.7 2001/12/10 04:53:10 sam Exp $
+ * $Id: ac3_adec.c,v 1.8 2001/12/16 16:18:36 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -81,13 +81,13 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for ac3 decoder module" )
+ADD_WINDOW( "Configuration for AC3 decoder module" )
     ADD_COMMENT( "Nothing to configure" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     p_module->i_capabilities = MODULE_CAPABILITY_DEC;
-    p_module->psz_longname = "Ac3 sofware decoder";
+    p_module->psz_longname = "AC3 sofware decoder";
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

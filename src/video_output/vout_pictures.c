@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.3 2001/12/13 20:47:46 sam Exp $
+ * $Id: vout_pictures.c,v 1.4 2001/12/16 16:18:36 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -121,7 +121,10 @@ void vout_DatePicture( vout_thread_t *p_vout,
  * already allocated zone of memory in the picture data fields. It needs locking
  * since several pictures can be created by several producers threads.
  *****************************************************************************/
-picture_t *vout_CreatePicture( vout_thread_t *p_vout )
+picture_t *vout_CreatePicture( vout_thread_t *p_vout,
+                               boolean_t b_progressive,
+                               boolean_t b_top_field_first,
+                               boolean_t b_repeat_first_field )
 {
     int         i_picture;                                  /* picture index */
     picture_t * p_picture;
@@ -131,7 +134,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout )
     vlc_mutex_lock( &p_vout->picture_lock );
 
     /*
-     * Look for an empty place. XXX: we start at 1 because the first
+     * Look for an empty place. We start at 1 because the first
      * directbuffer is reserved for memcpy()ed pictures.
      */
     for( i_picture = 0;
@@ -156,6 +159,12 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout )
                  * immediately - this is the best possible case, since no
                  * memory allocation needs to be done */
                 p_picture->i_status = RESERVED_PICTURE;
+                p_picture->i_refcount = 0;
+
+                p_picture->b_progressive = b_progressive;
+                p_picture->b_repeat_first_field = b_repeat_first_field;
+                p_picture->b_top_field_first = b_top_field_first;
+
                 p_vout->i_heap_size++;
 
                 vlc_mutex_unlock( &p_vout->picture_lock );
@@ -182,8 +191,14 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout )
         {
             /* Copy picture information, set some default values */
             p_free_picture->i_status = RESERVED_PICTURE;
-            p_free_picture->i_matrix_coefficients = 1;
             p_free_picture->i_refcount = 0;
+
+            p_free_picture->b_progressive = b_progressive;
+            p_free_picture->b_repeat_first_field = b_repeat_first_field;
+            p_free_picture->b_top_field_first = b_top_field_first;
+
+            p_free_picture->i_matrix_coefficients = 1;
+
             p_vout->i_heap_size++;
         }
         else
@@ -319,6 +334,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
              * displaying it if there are subtitles. */
             if( p_subpic != NULL )
             {
+                    //printf("memcpy (refcount != 0)\n");
                 /* We have subtitles. First copy the picture to
                  * the spare direct buffer, then render the
                  * subtitles. */
@@ -338,12 +354,14 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
             /* No subtitles, picture is in a directbuffer so
              * we can display it directly even if it is still
              * in use. */
+                    //printf("direct (refcount == 0)\n");
             return p_picture;
         }
 
         /* Picture is in a direct buffer but isn't used by the
          * decoder. We can safely render subtitles on it and
          * display it. */
+                    //printf("direct (refcount == 0)\n");
         vout_RenderSubPictures( p_vout, p_picture, p_subpic );
 
         return p_picture;
@@ -356,6 +374,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
         /* Picture is not in a direct buffer, but is exactly the
          * same size as the direct buffers. A memcpy() is enough,
          * then render the subtitles. */
+                    //printf("memcpy (not a direct buffer)\n");
         for( i_index = 0; i_index < p_picture->i_planes; i_index++ )
         {
             p_main->fast_memcpy( PP_OUTPUTPICTURE[0]->planes[ i_index ].p_data,
@@ -375,6 +394,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
     /* This usually means software YUV, or hardware YUV with a
      * different chroma. */
 
+                    //printf("render (not a direct buffer)\n");
     /* XXX: render to direct buffer */
 
     vout_RenderSubPictures( p_vout, p_picture, p_subpic );
@@ -391,8 +411,6 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_picture,
 void vout_PlacePicture( vout_thread_t *p_vout, int i_width, int i_height,
                         int *pi_x, int *pi_y, int *pi_width, int *pi_height )
 {
-    int i_ratio;
-
     if( p_vout->b_scale )
     {
         *pi_width = i_width;
@@ -404,46 +422,25 @@ void vout_PlacePicture( vout_thread_t *p_vout, int i_width, int i_height,
         *pi_height = MIN( i_height, p_vout->render.i_height );
     }
 
-    switch( p_vout->render.i_aspect )
+    if( VOUT_ASPECT_FACTOR * *pi_width / *pi_height < p_vout->render.i_aspect )
     {
-        case AR_3_4_PICTURE:
-            i_ratio = 900 * 4 / 3;
-            break;
-
-        case AR_16_9_PICTURE:
-            i_ratio = 900 * 16 / 9;
-            break;
-
-        case AR_221_1_PICTURE:
-            i_ratio = 900 * 221 / 100;
-            break;
-
-        case AR_SQUARE_PICTURE:
-        default:
-            i_ratio = 900 * p_vout->render.i_width
-                          / p_vout->render.i_height;
-            break;
-    }
-
-    if( 900 * *pi_width / *pi_height < i_ratio )
-    {
-        *pi_width = *pi_height * i_ratio / 900;
+        *pi_width = *pi_height * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
     }
     else
     {
-        *pi_height = *pi_width * 900 / i_ratio;
+        *pi_height = *pi_width * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
     }
 
     if( *pi_width > i_width )
     {
         *pi_width = i_width;
-        *pi_height = 900 * *pi_width / i_ratio;
+        *pi_height = VOUT_ASPECT_FACTOR * *pi_width / p_vout->render.i_aspect;
     }
 
     if( *pi_height > i_height )
     {
         *pi_height = i_height;
-        *pi_width = *pi_height * i_ratio / 900;
+        *pi_width = *pi_height * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
     }
 
     *pi_x = ( i_width - *pi_width ) / 2;
@@ -505,16 +502,22 @@ static void NewPicture( vout_thread_t *p_vout, picture_t *p_picture )
             /* The Y plane */
             p_picture->planes[ Y_PLANE ].i_bytes =
                  p_picture->i_size * sizeof(pixel_data_t);
+            p_picture->planes[ Y_PLANE ].i_line_bytes =
+                 p_vout->render.i_width * sizeof(pixel_data_t);
             p_picture->planes[ Y_PLANE ].p_data =
                  memalign( 16, i_data_size * sizeof(pixel_data_t) * 4 );
             /* The U plane */
             p_picture->planes[ U_PLANE ].i_bytes =
                  p_picture->i_chroma_size * sizeof(pixel_data_t);
+            p_picture->planes[ U_PLANE ].i_line_bytes =
+                 p_picture->i_chroma_width * sizeof(pixel_data_t);
             p_picture->planes[ U_PLANE ].p_data =
                  p_picture->planes[ Y_PLANE ].p_data + p_picture->i_size;
             /* The V plane */
             p_picture->planes[ V_PLANE ].i_bytes =
                  p_picture->i_chroma_size * sizeof(pixel_data_t);
+            p_picture->planes[ V_PLANE ].i_line_bytes =
+                 p_picture->i_chroma_width * sizeof(pixel_data_t);
             p_picture->planes[ V_PLANE ].p_data =
                  p_picture->planes[ U_PLANE ].p_data + p_picture->i_chroma_size;
 

@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.6 2001/12/13 12:47:17 sam Exp $
+ * $Id: vpar_headers.c,v 1.7 2001/12/16 16:18:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -303,14 +303,14 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     };
 #undef RESERVED
 
-    int i_height_save, i_width_save;
+    int i_height_save, i_width_save, i_aspect;
 
     i_height_save = p_vpar->sequence.i_height;
     i_width_save = p_vpar->sequence.i_width;
 
     p_vpar->sequence.i_width = GetBits( &p_vpar->bit_stream, 12 );
     p_vpar->sequence.i_height = GetBits( &p_vpar->bit_stream, 12 );
-    p_vpar->sequence.i_aspect = GetBits( &p_vpar->bit_stream, 4 );
+    i_aspect = GetBits( &p_vpar->bit_stream, 4 );
     p_vpar->sequence.i_frame_rate =
             i_frame_rate_table[ GetBits( &p_vpar->bit_stream, 4 ) ];
 
@@ -383,45 +383,53 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         /* It's an MPEG-1 stream. Put adequate parameters. */
         int i_xyratio;
         static int pi_mpeg1ratio[15] = {
-            10000,
-            10000,
-             6735,
-             7031,
-             7615,
-             8055,
-             8437,
-             8935,
-             9157,
-             9815,
-            10255,
-            10695,
-            10950,
-            11575,
-            12015
+            10000, 10000,  6735,  7031,  7615,  8055,  8437, 8935,
+             9157,  9815, 10255, 10695, 10950, 11575, 12015
         };
 
-        if( p_vpar->sequence.i_aspect > 1 )
+        if( i_aspect > 1 )
         {
                 i_xyratio = p_vpar->sequence.i_height *
-                        pi_mpeg1ratio[p_vpar->sequence.i_aspect] /
-                        p_vpar->sequence.i_width;
+                        pi_mpeg1ratio[i_aspect] / p_vpar->sequence.i_width;
                 if( 7450 < i_xyratio && i_xyratio < 7550 )
                 {
-                        p_vpar->sequence.i_aspect = 2;
+                        i_aspect = 2;
                 }
                 else if( 5575 < i_xyratio && i_xyratio < 5675 )
                 {
-                        p_vpar->sequence.i_aspect = 3;
+                        i_aspect = 3;
                 }
                 else if( 4475 < i_xyratio && i_xyratio < 4575 )
                 {
-                        p_vpar->sequence.i_aspect = 4;
+                        i_aspect = 4;
                 }
         }
 
         p_vpar->sequence.b_mpeg2 = 0;
         p_vpar->sequence.b_progressive = 1;
         p_vpar->sequence.i_chroma_format = CHROMA_420;
+    }
+
+    /* Store calculated aspect ratio */
+    switch( i_aspect )
+    {
+        case AR_3_4_PICTURE:
+            p_vpar->sequence.i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
+            break;
+
+        case AR_16_9_PICTURE:
+            p_vpar->sequence.i_aspect = VOUT_ASPECT_FACTOR * 16 / 9;
+            break;
+
+        case AR_221_1_PICTURE:
+            p_vpar->sequence.i_aspect = VOUT_ASPECT_FACTOR * 221 / 100;
+            break;
+
+        case AR_SQUARE_PICTURE:
+        default:
+            p_vpar->sequence.i_aspect = VOUT_ASPECT_FACTOR
+                    * p_vpar->sequence.i_width / p_vpar->sequence.i_height;
+            break;
     }
 
     /* Update sizes */
@@ -774,14 +782,18 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     if( !p_vpar->picture.i_current_structure )
     {
         /* This is a new frame. Get a structure from the video_output. */
-        while( ( P_picture = vout_CreatePicture( p_vpar->p_vout ) ) == NULL )
+        while( ( P_picture = vout_CreatePicture( p_vpar->p_vout,
+                                 p_vpar->picture.b_progressive,
+                                 p_vpar->picture.b_top_field_first,
+                                 p_vpar->picture.b_repeat_first_field ) )
+                 == NULL )
         {
             intf_DbgMsg("vpar debug: vout_CreatePicture failed, delaying");
             if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
             {
                 return;
             }
-            msleep( VPAR_OUTMEM_SLEEP );
+            msleep( VOUT_OUTMEM_SLEEP );
         }
 
         /* Initialize values. */

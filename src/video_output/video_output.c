@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.147 2001/12/13 12:47:17 sam Exp $
+ * $Id: video_output.c,v 1.148 2001/12/16 16:18:36 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -264,6 +264,7 @@ static int InitThread( vout_thread_t *p_vout )
     {
         intf_ErrMsg( "vout error: plugin was unable to allocate at least "
                      "one direct buffer" );
+        p_vout->pf_end( p_vout );
         vlc_mutex_unlock( &p_vout->change_lock );
         return( 1 );
     }
@@ -291,12 +292,17 @@ static int InitThread( vout_thread_t *p_vout )
 
     for( ; i_index < VOUT_MAX_PICTURES; i_index++ )
     {
-        PP_RENDERPICTURE[ I_RENDERPICTURES ]
-            = &p_vout->p_picture[ i_index ];
+        PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i_index ];
         I_RENDERPICTURES++;
     }
 
     intf_WarnMsg( 1, "vout info: got %i direct buffer(s)", I_OUTPUTPICTURES );
+    intf_WarnMsg( 1, "vout info: picture in %ix%i chroma %i aspect ratio %i",
+                  p_vout->render.i_width, p_vout->render.i_height,
+                  p_vout->render.i_chroma, p_vout->render.i_aspect );
+    intf_WarnMsg( 1, "vout info: picture out %ix%i chroma %i aspect ratio %i",
+                  p_vout->output.i_width, p_vout->output.i_height,
+                  p_vout->output.i_chroma, p_vout->output.i_aspect );
 
     /* Mark thread as running and return */
     p_vout->b_active = 1;

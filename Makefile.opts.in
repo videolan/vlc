@@ -95,7 +95,6 @@ LIB_RC = @LIB_RC@
 LIB_SDL = @LIB_SDL@
 LIB_X11 = @LIB_X11@
 LIB_XVIDEO = @LIB_XVIDEO@
-LIB_YUV = @LIB_YUV@
 
 #
 # CFLAGS for special cases

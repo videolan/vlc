@@ -87,6 +87,7 @@
     (p_symbols)->aout_CreateFifo = aout_CreateFifo; \
     (p_symbols)->aout_DestroyFifo = aout_DestroyFifo; \
     (p_symbols)->vout_CreateThread = vout_CreateThread; \
+    (p_symbols)->vout_DestroyThread = vout_DestroyThread; \
     (p_symbols)->vout_CreateSubPicture = vout_CreateSubPicture; \
     (p_symbols)->vout_DestroySubPicture = vout_DestroySubPicture; \
     (p_symbols)->vout_DisplaySubPicture = vout_DisplaySubPicture; \
@@ -197,6 +198,7 @@
 #   define aout_DestroyFifo p_symbols->aout_DestroyFifo
 
 #   define vout_CreateThread p_symbols->vout_CreateThread
+#   define vout_DestroyThread p_symbols->vout_DestroyThread
 #   define vout_CreateSubPicture p_symbols->vout_CreateSubPicture
 #   define vout_DestroySubPicture p_symbols->vout_DestroySubPicture
 #   define vout_DisplaySubPicture p_symbols->vout_DisplaySubPicture

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vout_dummy.c: Dummy video output display method for testing purposes
+ * invert.c : Invert video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.12 2001/12/16 16:18:36 sam Exp $
+ * $Id: invert.c,v 1.1 2001/12/16 16:18:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dummy
+#define MODULE_NAME filter_invert
 #include "modules_inner.h"
 
 /*****************************************************************************
@@ -29,11 +29,11 @@
  *****************************************************************************/
 #include "defs.h"
 
-#include <errno.h>                                                 /* ENOMEM */
-#include <stdlib.h>                                                /* free() */
-#include <string.h>                                            /* strerror() */
+#include <errno.h>
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
 
-#include "common.h"
+#include "common.h"                                     /* boolean_t, byte_t */
 #include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
@@ -45,19 +45,43 @@
 #include "modules.h"
 #include "modules_export.h"
 
-#define DUMMY_WIDTH 16
-#define DUMMY_HEIGHT 16
-#define DUMMY_MAX_DIRECTBUFFERS 5
+#define INVERT_MAX_DIRECTBUFFERS 8
 
 /*****************************************************************************
- * vout_sys_t: dummy video output method descriptor
+ * Capabilities defined in the other files.
+ *****************************************************************************/
+static void vout_getfunctions( function_list_t * p_function_list );
+
+/*****************************************************************************
+ * Build configuration tree.
+ *****************************************************************************/
+MODULE_CONFIG_START
+ADD_WINDOW( "Configuration for Invert module" )
+    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
+MODULE_CONFIG_STOP
+
+MODULE_INIT_START
+    p_module->i_capabilities = MODULE_CAPABILITY_NULL
+                                | MODULE_CAPABILITY_VOUT;
+    p_module->psz_longname = "invert video module";
+MODULE_INIT_STOP
+
+MODULE_ACTIVATE_START
+    vout_getfunctions( &p_module->p_functions->vout );
+MODULE_ACTIVATE_STOP
+
+MODULE_DEACTIVATE_START
+MODULE_DEACTIVATE_STOP
+
+/*****************************************************************************
+ * vout_sys_t: Invert video output method descriptor
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
- * It describes the dummy specific properties of an output thread.
+ * It describes the Invert specific properties of an output thread.
  *****************************************************************************/
 typedef struct vout_sys_s
 {
-    /* Nothing needed here. Maybe stats ? */
+    struct vout_thread_s *p_vout;
 
 } vout_sys_t;
 
@@ -72,13 +96,13 @@ static void vout_Destroy   ( struct vout_thread_s * );
 static int  vout_Manage    ( struct vout_thread_s * );
 static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
 
-static int  DummyNewPicture( struct vout_thread_s *, struct picture_s * );
+static int  InvertNewPicture( struct vout_thread_s *, struct picture_s * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void _M( vout_getfunctions )( function_list_t * p_function_list )
+static void vout_getfunctions( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;
@@ -95,18 +119,19 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( VOUT_METHOD_VAR, "dummy" ) )
+    if( TestMethod( VOUT_FILTER_VAR, "invert" ) )
     {
         return( 999 );
     }
 
-    return( 1 );
+    /* If we weren't asked to filter, don't filter. */
+    return( 0 );
 }
 
 /*****************************************************************************
- * vout_Create: allocates dummy video thread output method
+ * vout_Create: allocates Invert video thread output method
  *****************************************************************************
- * This function allocates and initializes a dummy vout method.
+ * This function allocates and initializes a Invert vout method.
  *****************************************************************************/
 static int vout_Create( vout_thread_t *p_vout )
 {
@@ -122,14 +147,36 @@ static int vout_Create( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Init: initialize dummy video thread output method
+ * vout_Init: initialize Invert video thread output method
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
     int i_index;
+    char *psz_filter;
     picture_t *p_pic;
     
     I_OUTPUTPICTURES = 0;
+
+    /* Try to open the real video output */
+    psz_filter = main_GetPszVariable( VOUT_FILTER_VAR, "" );
+    main_PutPszVariable( VOUT_FILTER_VAR, "" );
+
+    intf_WarnMsg( 1, "filter: spawning the real video output" );
+        
+    p_vout->p_sys->p_vout =
+        vout_CreateThread( NULL,
+                           p_vout->render.i_width, p_vout->render.i_height,
+                           p_vout->render.i_chroma, p_vout->render.i_aspect );
+
+    /* Everything failed */
+    if( p_vout->p_sys->p_vout == NULL )
+    {
+        intf_ErrMsg( "filter error: can't open vout, aborting" );
+
+        return( 0 );
+    }
+ 
+    main_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
 
     /* Initialize the output structure */
     switch( p_vout->render.i_chroma )
@@ -142,15 +189,12 @@ static int vout_Init( vout_thread_t *p_vout )
             break;
 
         default:
-            p_vout->output.i_chroma = RGB_16BPP_PICTURE;
-            p_vout->output.i_width  = p_vout->render.i_width;
-            p_vout->output.i_height = p_vout->render.i_height;
-            p_vout->output.i_aspect = p_vout->render.i_aspect;
+            p_vout->output.i_chroma = EMPTY_PICTURE; /* unknown chroma */
             break;
     }
 
-    /* Try to initialize DUMMY_MAX_DIRECTBUFFERS direct buffers */
-    while( I_OUTPUTPICTURES < DUMMY_MAX_DIRECTBUFFERS )
+    /* Try to initialize INVERT_MAX_DIRECTBUFFERS direct buffers */
+    while( I_OUTPUTPICTURES < INVERT_MAX_DIRECTBUFFERS )
     {
         p_pic = NULL;
 
@@ -165,7 +209,7 @@ static int vout_Init( vout_thread_t *p_vout )
         }
 
         /* Allocate the picture */
-        if( DummyNewPicture( p_vout, p_pic ) )
+        if( InvertNewPicture( p_vout, p_pic ) )
         {
             break;
         }
@@ -187,7 +231,7 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate dummy video thread output method
+ * vout_End: terminate Invert video thread output method
  *****************************************************************************/
 static void vout_End( vout_thread_t *p_vout )
 {
@@ -202,17 +246,19 @@ static void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy dummy video thread output method
+ * vout_Destroy: destroy Invert video thread output method
  *****************************************************************************
- * Terminate an output method created by DummyCreateOutputMethod
+ * Terminate an output method created by InvertCreateOutputMethod
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
+    vout_DestroyThread( p_vout->p_sys->p_vout, NULL );
+
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_Manage: handle dummy events
+ * vout_Manage: handle Invert events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
@@ -225,21 +271,54 @@ static int vout_Manage( vout_thread_t *p_vout )
 /*****************************************************************************
  * vout_Display: displays previously rendered output
  *****************************************************************************
- * This function send the currently rendered image to dummy image, waits until
- * it is displayed and switch the two rendering buffers, preparing next frame.
+ * This function send the currently rendered image to Invert image, waits
+ * until it is displayed and switch the two rendering buffers, preparing next
+ * frame.
  *****************************************************************************/
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    /* No need to do anything, the fake direct buffers stay as they are */
+    picture_t *p_outpic;
+    int i_index;
+
+    /* This is a new frame. Get a structure from the video_output. */
+    while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
+              == NULL )
+    {
+        if( p_vout->b_die || p_vout->b_error )
+        {
+            return;
+        }
+        msleep( VOUT_OUTMEM_SLEEP );
+    }   
+
+    vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, mdate() + 50000 );
+    vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
+
+    for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+    {
+        pixel_data_t *p_in = p_pic->planes[ i_index ].p_data;
+        pixel_data_t *p_end = p_in + p_pic->planes[ i_index ].i_bytes;
+
+        pixel_data_t *p_out = p_outpic->planes[ i_index ].p_data;
+
+        for( ; p_in < p_end ; )
+        {
+            *p_out++ = ~( *p_in++ );
+        }
+    }
+
+    vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
+
+    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
 }
 
 
 /*****************************************************************************
- * DummyNewPicture: allocate a picture
+ * InvertNewPicture: allocate a picture
  *****************************************************************************
  * Returns 0 on success, -1 otherwise
  *****************************************************************************/
-static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
+static int InvertNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int i_luma_bytes, i_chroma_bytes;
 
@@ -255,7 +334,7 @@ static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         /* Precalculate some values */
         p_pic->i_size         = i_width * i_height;
         p_pic->i_chroma_width = i_width / 2;
-        p_pic->i_chroma_size  = i_width * ( i_height / 2 );
+        p_pic->i_chroma_size  = i_height * ( i_width / 2 );
 
         /* Allocate the memory buffer */
         i_luma_bytes = p_pic->i_size * sizeof(pixel_data_t);
@@ -282,19 +361,8 @@ static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         return( 0 );
         break;
 
-    /* Unknown chroma, allocate an RGB buffer, the video output's job
-     * will be to do the chroma->RGB conversion */
+    /* Unknown chroma, do nothing */
     default:
-
-        /* Precalculate some values */
-        i_luma_bytes = sizeof(u16) * i_width * i_height;
-
-        /* Allocate the memory buffer */
-        p_pic->planes[ RGB_PLANE ].p_data = malloc( i_luma_bytes );
-        p_pic->planes[ RGB_PLANE ].i_bytes = i_luma_bytes;
-
-        /* We allocated 1 plane */
-        p_pic->i_planes = 1;
 
         return( 0 );
         break;

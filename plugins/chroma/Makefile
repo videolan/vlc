@@ -7,12 +7,12 @@
 # Objects
 #
 
-PLUGIN_YUV2RGB8 = yuv2rgb8.o #common.o
+PLUGIN_YV12_RGB8 = yv12_rgb8.o
 
-BUILTIN_YUV2RGB8 = $(PLUGIN_YUV2RGB8:%.o=BUILTIN_%.o)
+BUILTIN_YV12_RGB8 = $(PLUGIN_YV12_RGB8:%.o=BUILTIN_%.o)
 
-PLUGIN_C = $(PLUGIN_YUV2RGB8)
-BUILTIN_C = $(BUILTIN_YUV2RGB8)
+PLUGIN_C = $(PLUGIN_YV12_RGB8)
+BUILTIN_C = $(BUILTIN_YV12_RGB8)
 ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)
 
 #
@@ -25,10 +25,10 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../yuv2rgb8.so: $(PLUGIN_YUV2RGB8)
+../chroma_yv12_rgb8.so: $(PLUGIN_YV12_RGB8)
 	$(CC) -o $@ $^ $(PLCFLAGS) 
 
-../yuv2rgb8.a: $(BUILTIN_YUV2RGB8)
+../chroma_yv12_rgb8.a: $(BUILTIN_YV12_RGB8)
 	ar r $@ $^
 	$(RANLIB) $@
 

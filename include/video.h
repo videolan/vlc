@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.34 2001/12/13 12:47:17 sam Exp $
+ * $Id: video.h,v 1.35 2001/12/16 16:18:36 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -39,6 +39,7 @@ typedef struct plane_s
 {
     pixel_data_t *p_data;
     int           i_bytes;
+    int           i_line_bytes;
 } plane_t;
 
 /*****************************************************************************
@@ -82,7 +83,7 @@ typedef struct picture_s
 
     /* Picture dynamic properties - those properties can be changed by the
      * decoder */
-    boolean_t       b_progressive_frame;      /* is it a progressive frame ? */
+    boolean_t       b_progressive;            /* is it a progressive frame ? */
     boolean_t       b_repeat_first_field;                         /* RFF bit */
     boolean_t       b_top_field_first;               /* which field is first */
 
