@@ -1,5 +1,5 @@
 List of vlc plugins
-$Id: LIST,v 1.7 2003/07/23 22:02:56 jpsaman Exp $
+$Id: LIST,v 1.8 2003/07/31 15:31:58 jpsaman Exp $
 
  * a52_system: input module for A52 decapsulation.
 
@@ -36,6 +36,8 @@ $Id: LIST,v 1.7 2003/07/23 22:02:56 jpsaman Exp $
  * dsp: audio output module using the OSS /dev/dsp interface.
 
  * dummy: dummy audio output, video output, interface and input modules.
+
+ * dvb: input module for DVB streaming using v4l2 API
 
  * dvd: input module for accessing DVDs.
 
@@ -129,7 +131,7 @@ $Id: LIST,v 1.7 2003/07/23 22:02:56 jpsaman Exp $
 
  * ogg: input module for OGG decapsulation.
 
- * pda-gtk2: interface for iPaq using the Gtk2+ widget set.
+ * pda: interface for iPaq using the Gtk2+ widget set.
 
  * qt: interface module using the Qt widget set.
 

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.48 2003/07/29 23:50:39 gbazin Exp $
+dnl $Id: configure.ac,v 1.49 2003/07/31 15:31:58 jpsaman Exp $
 
 AC_INIT(vlc,0.6.1)
 
@@ -1357,6 +1357,28 @@ AC_ARG_ENABLE(satellite,
     then
       AX_ADD_PLUGINS([satellite])
     fi])
+
+dnl
+dnl  DVB-S/DVB-T/DVB-C satellite/teresterial/cable input using v4l2
+dnl
+AC_ARG_ENABLE(dvb,
+  [  --enable-dvb            DVB-S/T/C card support (default disabled)])
+
+if test "${enable_dvb}" = "yes"
+then
+  AC_ARG_WITH(dvb,
+  [    --with-dvb=PATH       path to a dvb- and v4l2-enabled kernel tree],[],[])
+  if test "${with_dvb}" != "no" -a -n "${with_dvb}"
+  then
+    AX_ADD_CFLAGS([dvb],[-I${with_dvb}/include])
+  fi
+
+  CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_dvb}"
+  AC_CHECK_HEADERS(linux/dvb/version.h linux/dvb/frontend.h, [
+    AX_ADD_PLUGINS([dvb])
+  ],[])
+  CPPFLAGS="${CPPFLAGS_save}"
+fi
 
 dnl
 dnl  ipv6 plugin - not for QNX yet
@@ -3248,6 +3270,7 @@ AC_OUTPUT([
   src/Makefile
 
   modules/access/Makefile
+  modules/access/dvb/Makefile
   modules/access/dvd/Makefile
   modules/access/dvdplay/Makefile
   modules/access/dvdread/Makefile
