@@ -1,0 +1,196 @@
+Before reading this document, you should first take a look at skins-howto.txt
+to understand general purpose about VLC skins.
+
+What is an event ?
+==================
+
+Events are the dynamic part of the skins. It means that beyond visual aspect,
+the interface must react with the user actions. An event describes a simple
+interaction, in fact one simple action such as playing a file, hiding a
+window...
+So when designing a skin you will have to specify what those interactions are.
+For this you will use simple actions that are described in event tags and you
+would be able to add them and associate them to controls.
+
+How to create an event ?
+========================
+
+An event describes a simple action as seen above.
+All attibutes are explained in the 'skins-howto.txt' file except the 'event'
+attribute wich is a bit special.
+In the 'event' attribute you will enter a simple script with the following
+syntax :
+  "EVENT(parameter1,parameter2,...)"
+
+The number of parameters depends on EVENT.
+All this is case sensitive.
+Don't add spaces.
+EVENT is the action to execute, it can be one of the followings
+
+ - VLC_NOTHING:
+   Action    : none, it executes nothing so don't use it !
+   Parameters: none.
+
+ - VLC_SHOW:
+   Action    : Open all windows of the interface with a fading effect if
+               selected.
+   Parameters: none.
+
+ - VLC_HIDE:
+   Action    : Close all windows of the interface with a fading effect if
+               selected.
+   Parameters:
+     - First 1 is an EVENT to execute when all windows have been closed.
+
+ - VLC_QUIT:
+   Action    : Quit the interface
+   Parameters: none.
+
+ - VLC_OPEN:
+   Action    : Open an "open file dialog box" to open a file to play.
+   Parameters: none.
+
+ - VLC_LOAD_SKIN:
+   Action    : Open an "open file dialog box" to change the current skin.
+   Parameters: none.
+
+ - VLC_LOG_SHOW:
+   Not supported yet
+
+ - VLC_LOG_CLEAR:
+   Not supported yet.
+
+ - VLC_INTF_REFRESH:
+   Action    : Force refreshing of the interface.
+   Parameters: none.
+
+ - VLC_CHANGE_TRAY:
+   Action    : if VLC is not visible in system tray, show it, else, hide it.
+   Parameters: none.
+
+ - VLC_CHANGE_TASKBAR:
+   Action    : if VLC is not visible in taskbar, show it, else, hide it.
+   Parameters: none.
+
+ - VLC_FULLSCREEN:
+   Action    : switch current playing file to fullscreen mode.
+   Parameters: none.
+
+ - VLC_PLAY:
+   Action    : play stream.
+   Parameters: none.
+
+ - VLC_STOP:
+   Action    : stop playing stream.
+   Parameters: none.
+
+ - VLC_PAUSE:
+   Action    : pause the stream.
+   Parameters: none.
+
+ - VLC_NEXT:
+   Action    : go to next file in playlist.
+   Parameters: none.
+
+ - VLC_PREV:
+   Action    : go to previous file in playlist.
+   Parameters: none.
+
+ - VLC_STREAMPOS:
+   Not supported yet.
+
+ - VLC_VOLUME_CHANGE:
+   Action    : change sound volume.
+   Parameters:
+     1: - VLC_VOLUME_MUTE: switch to mute mode.
+        - VLC_VOLUME_UP: raise sounds volume.
+        - VLC_VOLUME_DOWN:
+        - VLC_VOLUME_SET: set sound volume to second parameter
+     2: if first parameter is VLC_VOLUME_SET only, an integer between 0 and 100.
+
+ - VLC_PLAYLIST_ADD_FILE:
+   Action    : Open an "open file dialog box" to add files to playlist.
+   Parameters: none.
+
+ - VLC_WINDOW_MOVE:
+   Action    : initiate manual window movement.
+   Parameters: only one which must match the ID of a window. It should be
+               used with image controls.
+
+ - VLC_WINDOW_OPEN:
+   Action    : open a window with a fading effect if selected.
+   Parameters: only one which must match the ID of a window.
+
+ - VLC_WINDOW_CLOSE:
+   Action    : close a window with a fading effect if selected.
+   Parameters: only one who must match the ID of a window.
+
+ - CTRL_SET_SLIDER:
+   Not supported yet.
+
+ - CTRL_SET_TEXT:
+   Not supported yet.
+
+ - CTRL_ID_VISIBLE:
+   Action    : hide/show a control.
+   Parameters:
+     1: ID of the control to hide/show.
+     2: Describe what to do. Nothing is showing control. TRUE is the same. FALSE
+        is hiding control. CHANGE is switching between this to state.
+
+ - CTRL_ID_ENABLED:
+   Not supported yet.
+
+ - CTRL_ID_MOVE:
+   Action    : moves a control.
+   Parameters:
+     1: ID of the control to move.
+     2: horizontal offset of movement.
+     3: vertical offset of movement.
+
+ - PLAYLIST_ID_DEL:
+   Action    : remove items from playlist.
+   Parameters:
+     1: ID of the playlist.
+
+
+What to do with event ?
+=======================
+
+When creating your event, you must assign an ID to each of them.
+Now you have to associate events with controls.
+Some attributes of some controls are supposed to be filled with those IDs. That
+is to say that when the action correspounding to the attribute will be done,
+the event associated will be executed. The best exemple is assigning an event
+to the 'onclick' attribute of a button control. The event will be executed when
+clicking on the button.
+You can execute several events. To do this you just have to separate them with
+semicolon.
+Exemple:
+  <ButtonControl [...] onclick="event1;event2;event3"/>
+
+
+Do I have to create every event for each skin ?
+===============================================
+
+No, a set of predefined events are present. Here they are with their ID and
+shortcut.
+
+  ID           Shortcut     Description
+
+  tray         CTRL+T       Hide or show in the system tray.
+  taskbar      CTRL+B       Hide or show in the taskbar.
+  play         X            Play.
+  pause        C            Pause.
+  stop         V            Stop.
+  next         B            Next file.
+  prev         Z            Previous file.
+  fullscreen   F            Switch to fullscreen mode.
+  mute                      Mute the sound.
+  volume_up
+  volume_down
+  quit         CTRL+C       Quit VLC.
+  open         CTRL+O       Open a file.
+  add_file     CTRL+A       Add a file.
+  load_skin    CTRL+S       Change skin.
+

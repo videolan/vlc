@@ -1,0 +1,337 @@
+Note: This document is short and highly incomplete. If you want to write a new,
+decent one, it will be more than welcome!
+
+
+
+Basic principles
+================
+
+A skin (or theme, the two words have almost the same meaning) for VLC is made
+of many BMP files (Windows Bitmap format) containing all the images needed, and
+of an XML file describing how these images should be displayed, what happens
+when the user clicks on a button, etc.
+
+Those of you who have already done skins for other softwares shouldn't have too
+many difficulties to understand how all this works.
+
+
+
+Bezier curves
+=============
+
+One cool thing with VLC sliders is that they are not necessarily rectilinear,
+but they can follow any Bezier curve. So if you want to have a slider moving
+on a half-circle, or even doing a loop, you can !
+
+This is not the place to explain how these curves work, the only thing to know
+is that a Bezier curve can be caracterised by a set of points. Once you have
+them (thanks to the graphical utility presented at the end of this file, for
+example), you just need to enter the list of abscissas in the 'abs' attribute
+and the list of ordinates (in the same order...) in the 'ord' attribute. The
+separator is the coma. Example: abs="2,45,88" ord="50,120,50"
+
+Bezier curves are used for the SliderControl and the PlaylistControl tags.
+
+
+
+The bitmaps
+===========
+
+Basically, you need one bitmap file by state of control. For example, with a
+image control you'll need 1 image, with a button 2 images (or 3 if you provide
+the disabled state). A slider will also need 2, one for the static part and
+another for the mobile part. Of course, the same bitmap file can be used for
+many controls, provided you want to display the same image!
+
+The bitmap format doesn't allow a transparent color, but in the XML file you
+can specify a color that will be considered as transparent wherever it appears
+in the bitmap file.
+
+
+
+The XML file
+============
+
+XML is a markup language, like HTML. It won't be explained here any further,
+please use Google if you don't know what is XML. You'll see, it's rather easy
+to understand.
+
+The XML file used for the VLC skins follows a predefined DTD. You can find this
+DTD in VLC CVS, and its reading is strongly advised, since it contains most of
+the default values used for the parameters. A skin that doesn't follow the DTD
+with which VLC was compiled won't be loaded by VLC (and it might even crash
+it...).
+
+For a better comprehension of what follows, you should have a look at the DTD
+(in modules/gui/skin/parser/dkin.dtd) and/or at an example of valid xml skin
+(such as modules/gui/skin/skins/default/theme.xml).
+
+OK, let's go for an enumeration of the different tags and theor attributes :
+
+ - Theme: The main tag.
+   Attributes:
+     - magnet: allows to select the range of action (in pixels) of magnetism
+       with border of screen : that is to say when the distance between the
+       border of the screen and a window is less than this value, the window
+       will stick to the border. 0 means no magnetism.
+       Default is "9".
+     - log: not yet supported.
+
+ - ThemeInfo: You can enter here some information about you (but this
+   information is currently unused by VLC...)
+   Attributes :
+     - name: not yet supported.
+     - author: not yet supported.
+     - email: not yet supported.
+     - webpage: not yet supported.
+
+ - Bitmap: Associates a bitmap file with a name (=identifiant) that will be
+   used by the various controls. Obviously, you need one Bitmap tag for each
+   bitmap file you have.
+   Attributes:
+     - id: this is the name of the bitmap that will be used with controls
+       ( 2 bitmaps shouldn't have the same name).
+     - alphacolor: this is the transparency color of the bitmap. It must be
+       indicated with the following format: "#RRGGBB" (where RR stands for the
+       hexadecimal value of the red component, GG for the green one, and BB for
+       the blue one).
+     - file: this attribute is used to indicate the path and name of the bitmap
+       file used. This path can be absolute (but you should avoid it as often as
+       possible), else it will be relative to the path of the xml file.
+
+ - Event: An action that will be associated to a control later.
+   Attributes :
+     - id: this is the name of the event that will be used with controls.
+       (2 events shouldn't have the same name).
+     - event: see event.howto.
+     - key: this is the shortcut key associated with the event. This means that
+       the event will be executed when hitting the correspounding key. It must
+       be indicated with following format : "MOD+L" where MOD is "CTRL" or "ALT"
+       if control or alt keys or associated the key and "L" is the letter and
+       must be in uppercase format ("MOD+" is optionnal).
+       Default is "none".
+
+ - Font: Declares a font to be used in a TextControl or PlaylistControl.
+   Attributes :
+      - id: this is the name of the event that will be used with controls
+        Default is "default". (2 fonts shouldn't have the same name).
+      - font: this is the name of the font
+        Default is "arial".
+      - size: this is the size of the police in point
+        Default is "12".
+      - color: this is the color of the font with the following format,
+        "#RRGGBB" (see bitmap).
+        Default is "#000000" (black).
+      - weight: this is the weight of the font. It must be between 0 and 1000
+        Default is "400" (normal weight). Fewer is thinner...
+      - italic: sets if the font must be in italic format.
+        Default is "false".
+      - underline: sets if the font must be underlined.
+        Default is "false".
+
+ - Window: A window that will appear on screen.
+      - id: this is the name of the window (it will be only used for events
+        but it is important : 2 windows shouldn't have the same name).
+      - visible: sets if the window should appear or not at the launch of VLC.
+        Default is "true".
+      - x: sets the left position of the window.
+        Default is "0".
+      - y: sets the top position of the window.
+        Default is "0".
+      - fadetime: sets the time in milliseconds of the hide/show fading
+        transition.
+        Default is "500".
+      - alpha: sets the transparency of the window. It must be between 1 and
+        255. 1 is nearly total transaprency and should be avoid. 255 is total
+        opacity.
+        Default is "255". You should use high values.
+      - movealpha: sets the transparency of the window when the window is
+        moving. Same range as alpha.
+        Default is "255".
+      - dragdrop: sets if drag and drop of media files is allowed in this
+        window.
+        Default is "true".
+
+ - ControlGroup: Adds an offset to the elements it contains. A ControlGroup is
+   only supposed to ease the job of the skin designer, who can adjust the
+   position of a group of controls without modifying all the coordinates, but
+   you can ignore it if you want (only one ControlGroup is necessary, just
+   inside Window). ControlGroup tags can be nested.
+   Attributes :
+     - x: try and guess.
+       Default is "0".
+     - y: what do you think ?
+       Default is "0".
+
+ - Anchor: Creates a "magnetic point" in the current Window. If an anchor of
+   another Window enters in the range of action of this anchor, the 2 anchors
+   will automatically be on the same place, and the windows are "sticked". Each
+   anchor has a priority ('priority' attribute), and the anchor with the
+   highest priority is the winner, which means that when moving its Window all
+   the other anchored Windows will move too. To break the effect of 2 linked
+   anchors, you need to move the Window whose anchor has the lower priority.
+   Attributes :
+     - x: is it really necessary to explain ?
+       Default is "0".
+     - y: ...
+       Default is "0".
+     - priority: priority of anchor (see the previous description).
+       No default, must de defined !!!
+     - range: Range of action in pixel of the anchor.
+       Default is "10".
+
+ - ImageControl, ButtonControl, CheckBoxControl, TextControl, SliderControl,
+   PlaylistControl: The various visual controls that constitute a Window. They
+   share some properties: 'x' and 'y' for the position, 'visible' for the
+   initial state, 'id' for identifying them (only needed if you want to create
+   an event acting on this particular control) and 'help' for a short
+   description of the control that could be displayed in a special TextControl
+   (see below). All the controls can also accept events, and you have the
+   possibility to associate many events to a control at once, separing them
+   with semicolons.
+
+ - ImageControl: Creates a simple image. Usefull for backgrounds.
+     - image: this attribute must be set to an identifiant of a Bitmap tag.
+     - onclick: the 'event' attribute can be used to associate an event to the
+       image (the event is triggered by a click on the image).
+       Typical use: an Event made with 'WINDOW_MOVE(window)' (where 'window' is
+       the name of a Window) can be associated to an ImageControl of this
+       Window. Hence the Window can be moved via the image...
+
+ - ButtonControl: Creates a button.
+     - up: identifiants of a bitmap. Used for drawing the up state of the
+       button.
+     - down: identifiants of a bitmap. Used for drawinf the down state of the
+       button.
+     - disabled : identifiants of a bitmap. Used for drawing the disabled state
+       of the button.
+     - onclick: event executed when clicking on the button.
+       Default is "none".
+     - tooltiptext : used to display a tooltip.
+       Default is "none". (no tooltip).
+
+ - CheckBoxControl: Creates a checkbox, i.e. a button with 2 states
+   (checked/unchecked). So you need 6 images for a full-featured checkbox: each
+   state has a basic image, an image corresponding to a click not yet released,
+   and an image for the disabled control. If you supply only the basic images,
+   the other ones will be identical.
+   Attributes:
+     - img1: identifiants of a bitmap. Used for drawing control in state 1.
+     - clickimg1: identifiants of a bitmap. Used for drawing control when
+       clicking on it in state 1.
+       Default is the value of 'img1' attribute.
+     - img2: identifiants of a bitmap. Used for drawing control in state 2.
+     - clickimg2: identifiants of a bitmap. Used for drawing control when
+       clicking on it in state 2.
+       Default is the value of 'img2' attribute.
+     - disabled1: identifiants of a bitmap. Used for drawing control in state 1
+       when disabling.
+       Default is the value of 'img1' attribute.
+     - disabled2: identifiants of a bitmap. Used for drawing control in state 1
+       when disabling.
+       Default is the value of 'img2' attribute.
+     - onclick1: event executed when clicking on the control in state 1.
+       Default is "none".
+     - onclick2: event executed when clicking on the control in state 2.
+       Default is "none".
+
+ - TextControl: Creates a text.
+   Attributes:
+     - font: the font to use, which must be one of the Font identifiants.
+     - text: the text to display.
+     - align: either 'left' or 'center' or 'right'.
+       Default is "left".
+     - scroll: if set to 'true', the text will scroll if it does not fit into
+       the 'scrollspace'.
+       Default is "true".
+     - scrollspace: size in pixel between two occurences of the text when
+       scrolling.
+       Default is "20".
+     - display: this value is a bit special, it allows to have a text
+       auto-updated by VLC. Possible values are 'time', 'left_time',
+       'total_time', 'file_name' (for the current file name) and 'help'
+       (for a help about the controls that defined their 'help' attribute).
+       You can specify several type by separating them with semicolons. TO
+       switch between then, just double click on the text.
+       Usefull to switch betxeen 'time' and 'left_time'.
+     - width: Width of the text in pixel. If set to "0", the width is
+       automatically calculated to fit with the current text.
+       Default is "0".
+
+ - SliderControl: Creates a slider. The 'abs' and 'ord' attributes are needed
+   for the Bezier curve that the slider will follow. 'up' and 'down' are the
+   images of the slider. The 'tooltiptext' attribute works, and the slider will
+   automatically append the percentage of the position.
+   Attributes:
+     - type: two 'types' of sliders are predefined: 'time' for a slider
+       allowing to seek in the stream, and 'volume' for a volume slider.
+       Default is "time".
+     - up: identifiants of a bitmap.
+     - down: identifiants of a bitmap.
+     - abs: see SliderControl description and bezier curve description.
+     - ord: see SliderControl description and bezier curve description..
+     - tooltiptext: see button.
+       Default is "none". Disable tooltip.
+
+ - PlaylistControl: Creates a playlist. This tag must contain a SliderControl
+   tag (to allow scrolling in the playlist). If the playlist contains entries
+   wider than the list width, an automatic tooltip will appear with
+   the full name of the entry. The other attributes are rather easy to
+   understand...
+   Attributes:
+     - width: width in pixel of the list. This is the whole width for file
+       name, number of file in the playlist and info text.
+       Default is "200".
+     - infowidth: width in pixel of the info text.
+       Default is "50".
+     - font: the font to use, which must be one of the Font identifiants.
+     - playfont: the font to use for current playing file, which must be one of
+       the Font identifiants.
+       Default is "none".
+     - selcolor: color in "#RRGGBB" format of the selected files.
+       Default is "#0000FF" (blue).
+     - abs: see PlaylistControl description and bezier curve description.
+     - ord: see PlaylistControl description and bezier curve description.
+
+
+
+Compression
+===========
+
+Once your skin is finished, instead of keeping many bitmap files and the XML
+file, you can compress them in a .tar.gz archive (Winzip and UmtimateZip can do
+it perfectly, for example). Before doing so, don't forget to rename your XML
+file into "theme.xml", or VLC won't be able to read it...  Then rename your
+compressed file with the .vlt extension and... that's all! VLC can load
+directly skins with the .vlt extension.
+
+
+
+Tools and advice
+================
+
+ - To generate easily Bezier curves, you can use the curve-maker. Basically,
+   you add and remove points at will, and you can move them to see how the
+   curve evolves. When you have reached the perfect curve, you just have to
+   copy-paste the list ob abscissas and ordinates in the 'abs' and 'ord'
+   attributes of your SliderControl or PlaylistControl. The curve-maker also
+   allows to load a bitmap, this could be useful if you want to follow a
+   specific pattern of a slider, for example.
+
+ - When you are creating your skin, you may want to see the VLC messages where
+   some errors are logged. For this, open a dos window, go to the directory
+   where VLC is installed, and type "vlc -I skin -v --extraintf logger". This
+   should open VLC and a log window (what's more, the logs should be saved in a
+   file called vlc-log.txt). The interesting lines are those with "skin
+   interface"...
+
+ - For the Bitmap tags, don't use absolute paths but relative paths (they are
+   relative to the XML file directory), so that your skin can be reused by
+   anybody without a particular file structure.
+
+ - To fully use the possibilities given, you should look at how other skins are
+   made, it's often very useful.
+
+
+Good luck!
+
