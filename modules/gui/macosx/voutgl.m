@@ -14,7 +14,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -76,12 +76,6 @@ static void Swap   ( vout_thread_t * p_vout );
 int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
-    int i_timeout;
-
-/* OpenGL interface disabled until
- * - the green line is gone
- * - other problems?????
- */
 
     if( !CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay ) )
     {
@@ -99,35 +93,17 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
-    /* Wait for a MacOS X interface to appear. Timeout is 2 seconds. */
-    for( i_timeout = 20 ; i_timeout-- ; )
-    {
-        if( NSApp == NULL )     
-        {
-            msleep( INTF_IDLE_SLEEP );
-        }
-    }
-
-    if( NSApp == NULL )
-    {
-        /* No MacOS X intf, unable to communicate with MT */
-        msg_Err( p_vout, "no MacOS X interface present" );
-        return VLC_EGENERIC;
-    }
-
-    p_vout->pf_init   = Init;
-    p_vout->pf_end    = End;
-    p_vout->pf_manage = Manage;
-    p_vout->pf_control= Control;
-    p_vout->pf_swap   = Swap;
-
     p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
 
     /* Spawn window */
     p_vout->p_sys->b_got_frame = VLC_FALSE;
     p_vout->p_sys->o_window = [[VLCWindow alloc] initWithVout: p_vout
                                                  frame: nil];
-    
+    if( !p_vout->p_sys->o_window )
+    {
+        return VLC_EGENERIC;
+    }
+
     /* Add OpenGL view */
 #define o_glview p_vout->p_sys->o_glview
     o_glview = [[VLCGLView alloc] initWithFrame:
@@ -136,13 +112,19 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     [o_glview autorelease];
 #undef o_glview
 
+    p_vout->pf_init   = Init;
+    p_vout->pf_end    = End;
+    p_vout->pf_manage = Manage;
+    p_vout->pf_control= Control;
+    p_vout->pf_swap   = Swap;
+
     return VLC_SUCCESS;
 }
 
 int E_(CloseVideoGL) ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init]; 
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
     [p_vout->p_sys->o_window close];
 
@@ -166,7 +148,7 @@ static int Manage( vout_thread_t * p_vout )
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
         NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-        
+
         if( !p_vout->b_fullscreen )
         {
             /* Save window size and position */
@@ -245,7 +227,7 @@ static void Swap( vout_thread_t * p_vout )
 - (id) initWithFrame: (NSRect) frame vout: (vout_thread_t*) _p_vout
 {
     p_vout = _p_vout;
-    
+
     NSOpenGLPixelFormatAttribute attribs[] =
     {
         NSOpenGLPFAAccelerated,

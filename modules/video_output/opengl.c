@@ -162,6 +162,7 @@ static int CreateVout( vlc_object_t *p_this )
 
     var_Create( p_vout, "opengl-effect", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
+    p_sys->i_index = 0;
 #ifdef SYS_DARWIN
     p_sys->i_tex_width  = p_vout->render.i_width;
     p_sys->i_tex_height = p_vout->render.i_height;

@@ -107,7 +107,6 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
 {   
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     OSErr err;
-    int i_timeout;
 
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -118,22 +117,7 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
-    /* Wait for a MacOS X interface to appear. Timeout is 2 seconds. */
-    for( i_timeout = 20 ; i_timeout-- ; )
-    {
-        if( NSApp == NULL )
-        {
-            msleep( INTF_IDLE_SLEEP );
-        }
-    }
-
-    if( NSApp == NULL )
-    {
-        /* no MacOS X intf, unable to communicate with MT */
-        msg_Err( p_vout, "no MacOS X interface present" );
-        free( p_vout->p_sys );
-        return( 1 );
-    }
+    p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
 
     p_vout->pf_init = InitVideo;
     p_vout->pf_end = EndVideo;
@@ -142,7 +126,13 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
     p_vout->pf_display = DisplayVideo;
     p_vout->pf_control = ControlVideo;
 
-    p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
+    /* Spawn window */
+    p_vout->p_sys->o_window =
+        [[VLCWindow alloc] initWithVout: p_vout frame: nil];
+    if( !p_vout->p_sys->o_window )
+    {
+        return VLC_EGENERIC;
+    }
 
     p_vout->p_sys->b_altivec = p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC;
     msg_Dbg( p_vout, "We do%s have Altivec", p_vout->p_sys->b_altivec ? "" : "n't" );
@@ -203,10 +193,6 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
         free( p_vout->p_sys );
         return VLC_EGENERIC;        
     }
-
-    /* Spawn window */
-    p_vout->p_sys->o_window =
-        [[VLCWindow alloc] initWithVout: p_vout frame: nil];
 
 #define o_qtview p_vout->p_sys->o_qtview
     o_qtview = [[VLCQTView alloc] initWithVout: p_vout];
