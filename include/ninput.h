@@ -146,7 +146,7 @@ struct access_t
     access_sys_t *p_sys;
 };
 
-#define access2_New( a, b ) __acess2_New(VLC_OBJECT(a), b )
+#define access2_New( a, b ) __access2_New(VLC_OBJECT(a), b )
 VLC_EXPORT( access_t *, __access2_New,  ( vlc_object_t *p_obj, char *psz_mrl ) );
 VLC_EXPORT( void,      access2_Delete, ( access_t * ) );
 
