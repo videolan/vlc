@@ -322,6 +322,9 @@ static void Run( intf_thread_t *p_intf )
                                           FIND_ANYWHERE );
             if( p_playlist )
             {
+                ClearChannels( p_intf, p_vout );
+                vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                              OSD_PAUSE_ICON );
                 playlist_Play( p_playlist );
                 vlc_object_release( p_playlist );
             }
@@ -493,6 +496,7 @@ static void Run( intf_thread_t *p_intf )
                                               FIND_ANYWHERE );
                 if( p_playlist )
                 {
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, _("Next") );
                     playlist_Next( p_playlist );
                     vlc_object_release( p_playlist );
                 }
@@ -503,6 +507,7 @@ static void Run( intf_thread_t *p_intf )
                                               FIND_ANYWHERE );
                 if( p_playlist )
                 {
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, _("Previous") );
                     playlist_Prev( p_playlist );
                     vlc_object_release( p_playlist );
                 }
@@ -521,11 +526,13 @@ static void Run( intf_thread_t *p_intf )
             {
                 vlc_value_t val; val.b_bool = VLC_TRUE;
                 var_Set( p_input, "rate-faster", val );
+                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, _("Faster") );
             }
             else if( i_action == ACTIONID_SLOWER )
             {
                 vlc_value_t val; val.b_bool = VLC_TRUE;
                 var_Set( p_input, "rate-slower", val );
+                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, _("Slower") );
             }
             else if( i_action == ACTIONID_POSITION && b_seekable )
             {
