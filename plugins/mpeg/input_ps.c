@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.23 2001/05/08 00:43:57 sam Exp $
+ * $Id: input_ps.c,v 1.24 2001/05/23 17:47:34 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -338,7 +338,16 @@ static void PSInit( input_thread_t * p_input )
                         break;
 
                     case LPCM_AUDIO_ES:
-                        /* FIXME ! */
+                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
+                                == ((p_es->i_id & 0x1F00) >> 8) )
+                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
+                        {
+                        case 0:
+                            main_PutIntVariable( INPUT_AUDIO_VAR,
+                                                 REQUESTED_LPCM );
+                        case REQUESTED_LPCM:
+                            input_SelectES( p_input, p_es );
+                        }
                         break;
                 }
             }

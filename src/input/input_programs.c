@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.56 2001/05/19 00:39:30 stef Exp $
+ * $Id: input_programs.c,v 1.57 2001/05/23 17:47:34 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -599,6 +599,7 @@ vlc_thread_t ac3spdif_CreateThread( void * );
 vlc_thread_t spdif_CreateThread( void * );
 vlc_thread_t vpar_CreateThread( void * );
 vlc_thread_t spudec_CreateThread( void * );
+vlc_thread_t lpcmdec_CreateThread( void * );
 
 int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
@@ -678,9 +679,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case LPCM_AUDIO_ES:
         if( p_main->b_audio )
         {
-            intf_ErrMsg( "input error: LPCM audio not handled yet" );
-            break;
-
+            decoder.pf_create_thread = lpcmdec_CreateThread;
             p_config = (void *)GetAdecConfig( p_input, p_es );
 
             /* Release the lock, not to block the input thread during
