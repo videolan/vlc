@@ -28,6 +28,10 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-dvdread \
 	--disable-vcd \
 	--disable-maxosx \
+	--disable-xosd \
+	--disable-freetype \
+	--enable-libmpeg2 \
+	--with-libmpeg2-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 	--enable-mad \
 	--enable-ffmpeg \
 	--disable-familiar \
@@ -42,7 +46,7 @@ export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 #export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/zaurus-vlc-0.5.3
+export PKGDIR=/home/jpsaman/iPaq/packages/zaurus-vlc-0.5.4
 export QTDIR=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop
 
 build: build-stamp
