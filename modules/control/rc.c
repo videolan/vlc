@@ -474,7 +474,7 @@ static void Run( intf_thread_t *p_intf )
 
             val.psz_string = psz_arg;
             i_ret = var_Set( p_intf, psz_cmd, val );
-            msg_rc( _("%s: returned %i (%s)\n"),
+            msg_rc( "%s: returned %i (%s)\n",
                     psz_cmd, i_ret, vlc_error( i_ret ) );
         }
         /* Or maybe it's a global command */
@@ -489,7 +489,7 @@ static void Run( intf_thread_t *p_intf )
             i_ret = var_Set( p_intf->p_libvlc, psz_cmd, val );
             if( i_ret != 0 )
             {
-                msg_rc( _("%s: returned %i (%s)\n"),
+                msg_rc( "%s: returned %i (%s)\n",
                          psz_cmd, i_ret, vlc_error( i_ret ) );
             }
         }
@@ -523,12 +523,12 @@ static void Run( intf_thread_t *p_intf )
                     }
                     msg_rc( "| \n" );
                 }
-                msg_rc( _("+----[ end of stream info ]\n") );
+                msg_rc( "+----[ end of stream info ]\n" );
                 vlc_mutex_unlock( &p_input->input.p_item->lock );
             }
             else
             {
-                msg_rc( _("no input\n") );
+                msg_rc( "no input\n" );
             }
         }
         else if( !strcmp( psz_cmd, "is_playing" ) )
@@ -728,7 +728,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
                 var_Get( p_input, "chapter", &val );
                 var_Change( p_input, "chapter", VLC_VAR_GETCHOICES,
                             &val_list, NULL );
-                msg_rc( _("Currently playing chapter %d/%d\n"),
+                msg_rc( "Currently playing chapter %d/%d\n",
                         val.i_int, val_list.p_list->i_count );
                 var_Change( p_this, "chapter", VLC_VAR_FREELIST,
                             &val_list, NULL );
@@ -768,7 +768,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
                 var_Get( p_input, "title", &val );
                 var_Change( p_input, "title", VLC_VAR_GETCHOICES,
                             &val_list, NULL );
-                msg_rc( _("Currently playing title %d/%d\n"),
+                msg_rc( "Currently playing title %d/%d\n",
                         val.i_int, val_list.p_list->i_count );
                 var_Change( p_this, "title", VLC_VAR_FREELIST,
                             &val_list, NULL );
@@ -830,7 +830,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
 
         if( p_item )
         {
-            msg_rc( _("trying to add %s to playlist\n"), newval.psz_string );
+            msg_rc( "trying to add %s to playlist\n", newval.psz_string );
             playlist_AddItem( p_playlist, p_item,
                               PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
         }
@@ -846,7 +846,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         }
         if ( i == 0 )
         {
-            msg_rc( _("| no entries\n") );
+            msg_rc( "| no entries\n" );
         }
     }
  
@@ -855,7 +855,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
      */
     else
     {
-        msg_rc( _("unknown command!\n") );
+        msg_rc( "unknown command!\n" );
     }
 
     vlc_object_release( p_playlist );
@@ -928,7 +928,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
      */
     else
     {
-        msg_rc( _("unknown command!\n") );
+        msg_rc( "unknown command!\n" );
     }
 
     vlc_object_release( p_pl );
@@ -975,7 +975,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
         audio_volume_t i_volume = atoi( newval.psz_string );
         if ( i_volume > AOUT_VOLUME_MAX )
         {
-            msg_rc( _("Volume must be in the range %d-%d\n"), AOUT_VOLUME_MIN,
+            msg_rc( "Volume must be in the range %d-%d\n", AOUT_VOLUME_MIN,
                     AOUT_VOLUME_MAX );
             i_error = VLC_EBADVAR;
         }
@@ -991,7 +991,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            msg_rc( _("Volume is %d\n"), i_volume );
+            msg_rc( "Volume is %d\n", i_volume );
             i_error = VLC_SUCCESS;
         }
     }
@@ -1023,7 +1023,7 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
             i_error = VLC_EGENERIC;
     }
 
-    if ( !i_error ) msg_rc( _("Volume is %d\n"), i_volume );
+    if ( !i_error ) msg_rc( "Volume is %d\n", i_volume );
     return i_error;
 }
 
@@ -1085,7 +1085,7 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
         }
         var_Change( (vlc_object_t *)p_aout, psz_variable, VLC_VAR_FREELIST,
                     &val, &text );
-        msg_rc( _("+----[ end of %s ]\n"), val_name.psz_string );
+        msg_rc( "+----[ end of %s ]\n", val_name.psz_string );
 
         if( val_name.psz_string ) free( val_name.psz_string );
         i_error = VLC_SUCCESS;
