@@ -14684,3 +14684,1087 @@ Changed paths:
 * modules/gui/wxwindows/*: hotkeys support.
 
 ------------------------------------------------------------------------
+r7572 | gbazin | 2004-05-01 12:36:25 +0200 (Sat, 01 May 2004) | 2 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/configure.ac
+   M /trunk/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /trunk/extras/MacOSX/vlc.pbproj/project.pbxproj
+   M /trunk/po/POTFILES.in
+
+* ALL: update for 0.7.2-test2.
+
+------------------------------------------------------------------------
+r7573 | gbazin | 2004-05-01 12:51:24 +0200 (Sat, 01 May 2004) | 2 lines
+Changed paths:
+   M /trunk/NEWS
+
+* NEWS: support for theora alpha3 and hotkeys in the wxwin interface.
+
+------------------------------------------------------------------------
+r7574 | asmax | 2004-05-01 16:23:40 +0200 (Sat, 01 May 2004) | 7 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/parser/expr_evaluator.cpp
+   M /trunk/modules/gui/skins2/src/vlcproc.cpp
+   M /trunk/modules/gui/skins2/src/vlcproc.hpp
+   M /trunk/modules/gui/skins2/vars/time.cpp
+   M /trunk/modules/gui/skins2/vars/time.hpp
+   M /trunk/modules/gui/skins2/win32/win32_factory.hpp
+   M /trunk/modules/gui/skins2/win32/win32_window.cpp
+   M /trunk/modules/gui/skins2/x11/x11_window.cpp
+
+  * src/vlcproc.*: added the callbacks for vout requests. The vout window
+    handle is now stored in VlcProc.
+  * x11/x11_window.cpp, win32/win32_window.cpp: set the vout window in 
+    VlcProc instead of the old "drawable" trick
+  * all: renamed "Time" into "StreamTime" because of a name conflict with 
+   X11 (did i hear "namespace" ? ;)
+
+------------------------------------------------------------------------
+r7575 | fkuehne | 2004-05-01 18:01:41 +0200 (Sat, 01 May 2004) | 1 line
+Changed paths:
+   M /trunk/po/de.po
+
+=* Updated German translation
+------------------------------------------------------------------------
+r7576 | gbazin | 2004-05-01 19:56:14 +0200 (Sat, 01 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/dvdnav.c
+
+* modules/demux/dvdnav.c: a bit less debug and fixed seeking.
+------------------------------------------------------------------------
+r7577 | gbazin | 2004-05-01 20:00:36 +0200 (Sat, 01 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/dvdnav.c
+
+* modules/demux/dvdnav.c: a few coding style changes.
+------------------------------------------------------------------------
+r7578 | fkuehne | 2004-05-02 14:36:52 +0200 (Sun, 02 May 2004) | 1 line
+Changed paths:
+   M /trunk/po/de.po
+
+* Fixed some  translations
+------------------------------------------------------------------------
+r7579 | ipkiss | 2004-05-02 16:03:20 +0200 (Sun, 02 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/parser/expr_evaluator.cpp
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+
+ * skins2/parser/interpreter.cpp: parse the "or" operator
+ * skins2/parser/expr_evaluator.cpp: small fix for enhanced flexibility
+
+------------------------------------------------------------------------
+r7580 | fkuehne | 2004-05-02 18:15:17 +0200 (Sun, 02 May 2004) | 2 lines
+Changed paths:
+   M /trunk/po/de.po
+   M /trunk/po/it.po
+
+* po/de.po: corrected a misunderstanding
+* po/it.po: layout fixes to the rc-help-message
+------------------------------------------------------------------------
+r7581 | ipkiss | 2004-05-02 20:41:52 +0200 (Sun, 02 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/wxwindows/playlist.cpp
+
+ * modules/gui/wxwindows/playlist.cpp: fixed a refcount problem + minor coding
+   style fixes
+
+------------------------------------------------------------------------
+r7582 | ipkiss | 2004-05-02 21:00:54 +0200 (Sun, 02 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/control/hotkeys.c
+   M /trunk/modules/control/lirc.c
+
+ * modules/control/hotkeys.c and lirc.c: fixed a refcount problem + small
+   coding style changes
+
+------------------------------------------------------------------------
+r7583 | sigmunau | 2004-05-02 22:25:11 +0200 (Sun, 02 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/access/cdda.c
+
+modules/access/cdda.c: write proper bitrate in the wav header.
+
+------------------------------------------------------------------------
+r7584 | sam | 2004-05-03 14:06:10 +0200 (Mon, 03 May 2004) | 4 lines
+Changed paths:
+   M /trunk/po/en_GB.po
+   M /trunk/po/es.po
+
+  * po/:
+    + Updated the British translation.
+    + Merged Javier Varela's Spanish translation. There's more to come.
+
+------------------------------------------------------------------------
+r7585 | gbazin | 2004-05-03 15:55:39 +0200 (Mon, 03 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/video.c
+
+* modules/codec/ffmpeg/video.c: compilation fixes for ffmpeg 0.4.8.
+------------------------------------------------------------------------
+r7586 | fkuehne | 2004-05-03 21:52:32 +0200 (Mon, 03 May 2004) | 1 line
+Changed paths:
+   M /trunk/configure.ac
+
+* Updated '(c) 1996-2003' to '(c) 1996-2004'
+------------------------------------------------------------------------
+r7587 | rocky | 2004-05-04 07:14:15 +0200 (Tue, 04 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/access/cdda/access.c
+
+Correct bitrate in the WAV header.
+
+
+------------------------------------------------------------------------
+r7588 | titer | 2004-05-04 13:35:18 +0200 (Tue, 04 May 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/vout.m
+
+ + macosx/vout.m : catch mouse events in OpenGL mode (still, only works
+                   in window mode. I'm not sure how we can catch
+                   mouseDown events in fullscreen GL mode)
+
+------------------------------------------------------------------------
+r7589 | titer | 2004-05-04 15:57:48 +0200 (Tue, 04 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/video_chroma/i420_yuy2.c
+
+ + video_chroma/i420_yuy2.c : fixed conversion for non-multiple-of-8
+                              widths (MMX untested)
+
+------------------------------------------------------------------------
+r7590 | titer | 2004-05-04 16:09:45 +0200 (Tue, 04 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/video_chroma/i420_yuy2.h
+
+ + video_chroma/i420_yuy2.h : grmbl, x86 compile fix
+
+------------------------------------------------------------------------
+r7591 | gbazin | 2004-05-04 21:46:03 +0200 (Tue, 04 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/ts.c
+
+* modules/demux/ts.c: coding style changes.
+------------------------------------------------------------------------
+r7592 | ipkiss | 2004-05-04 21:50:43 +0200 (Tue, 04 May 2004) | 2 lines
+Changed paths:
+   M /trunk/share/skins2/skin.dtd
+
+ * share/skins2/skin.dtd: removed a useless attribute
+
+------------------------------------------------------------------------
+r7593 | hartman | 2004-05-04 22:03:10 +0200 (Tue, 04 May 2004) | 2 lines
+Changed paths:
+   M /trunk/vlc.ebuild
+
+* updates to ebuild for 0.7.2
+
+------------------------------------------------------------------------
+r7594 | ipkiss | 2004-05-04 22:42:08 +0200 (Tue, 04 May 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/parser/skin_parser.cpp
+
+ * skins2/parser/skin_parser.cpp: Fixed my last commit.
+   I didn't remove all the code handling the removed attribute (Playlist.var),
+   because it can still be useful if we decide to have other List controls.
+
+------------------------------------------------------------------------
+r7595 | fkuehne | 2004-05-04 23:25:48 +0200 (Tue, 04 May 2004) | 1 line
+Changed paths:
+   M /trunk/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+* Added the WAVE-file-type
+------------------------------------------------------------------------
+r7596 | jlj | 2004-05-05 13:13:33 +0200 (Wed, 05 May 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/drms.c
+
+  * drms.c: DRMS v2 support. Thanks to sam for cleaning and breaking up
+            DoExtShuffle into smaller functions.
+
+
+------------------------------------------------------------------------
+r7597 | gbazin | 2004-05-05 13:18:18 +0200 (Wed, 05 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/preferences_widgets.cpp
+
+* modules/gui/wxwindows/preferences_widgets.cpp: compilation fix.
+------------------------------------------------------------------------
+r7598 | gbazin | 2004-05-05 22:29:14 +0200 (Wed, 05 May 2004) | 1 line
+Changed paths:
+   M /trunk/src/libvlc.h
+
+* src/libvlc.h: moved a few hotkeys to the advanced options.
+------------------------------------------------------------------------
+r7599 | ipkiss | 2004-05-05 23:15:04 +0200 (Wed, 05 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/parser/skin_parser.cpp
+
+ * skins2/parser/skin_parser.cpp: Make sure that IDs are unique
+
+------------------------------------------------------------------------
+r7600 | gbazin | 2004-05-05 23:50:49 +0200 (Wed, 05 May 2004) | 1 line
+Changed paths:
+   M /trunk/src/input/es_out.c
+
+* src/input/es_out.c: remove deprecated hack.
+------------------------------------------------------------------------
+r7601 | gbazin | 2004-05-05 23:52:07 +0200 (Wed, 05 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/ts.c
+
+* modules/demux/ts.c: support for DVB subtitles and memory leak fixes.
+------------------------------------------------------------------------
+r7602 | hartman | 2004-05-05 23:53:07 +0200 (Wed, 05 May 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile.am
+
+* .access for http intf added to OSX build.
+
+------------------------------------------------------------------------
+r7603 | jlj | 2004-05-06 00:25:12 +0200 (Thu, 06 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/drms.c
+
+  * drms.c: DRMS v2 uses filename iSCInfo2 instead of iSCInfo.
+
+
+------------------------------------------------------------------------
+r7604 | gbazin | 2004-05-06 10:14:03 +0200 (Thu, 06 May 2004) | 1 line
+Changed paths:
+   M /trunk/Makefile.am
+
+* Makefile.am: include the vlm html files in the win32 package.
+------------------------------------------------------------------------
+r7605 | gbazin | 2004-05-06 12:58:57 +0200 (Thu, 06 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/mkv.cpp
+
+* modules/demux/mkv.cpp: wchar_t is defined in stddef.h so no need to include wchar.h
+------------------------------------------------------------------------
+r7606 | gbazin | 2004-05-06 19:35:26 +0200 (Thu, 06 May 2004) | 1 line
+Changed paths:
+   M /trunk/src/input/input_dec.c
+
+* src/input/input_dec.c: fixed DVB subtitles support in old MPEG TS demuxer.
+------------------------------------------------------------------------
+r7607 | hartman | 2004-05-06 21:34:41 +0200 (Thu, 06 May 2004) | 6 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/intf.m
+
+* don't autorelease the application
+* make sure the terminate of the super is called
+
+This might fix the CodeTek VirtualDesktop appl. (untested)
+
+
+------------------------------------------------------------------------
+r7608 | gbazin | 2004-05-06 22:51:47 +0200 (Thu, 06 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/mp4/mp4.c
+
+* modules/demux/mp4/mp4.c: fixed memory leak.
+------------------------------------------------------------------------
+r7609 | hartman | 2004-05-06 23:14:02 +0200 (Thu, 06 May 2004) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+* set -O3 on faad
+
+------------------------------------------------------------------------
+r7610 | gbazin | 2004-05-06 23:14:13 +0200 (Thu, 06 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/mux/mp4.c
+
+* modules/mux/mp4.c:fixed a minor mem leak.
+------------------------------------------------------------------------
+r7611 | hartman | 2004-05-07 01:14:23 +0200 (Fri, 07 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/access/directory.c
+   M /trunk/modules/gui/macosx/controls.m
+   M /trunk/modules/gui/macosx/playlist.m
+   M /trunk/modules/gui/macosx/playlistinfo.m
+   M /trunk/src/input/input.c
+
+* fixed a number of memleaks
+
+------------------------------------------------------------------------
+r7612 | hartman | 2004-05-07 02:46:20 +0200 (Fri, 07 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/controls.m
+
+* introduced a bug with my latest patch in the autogenerated menus.
+
+------------------------------------------------------------------------
+r7613 | rocky | 2004-05-07 04:03:56 +0200 (Fri, 07 May 2004) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/modules/access/vcdx/vcdplayer.c
+
+Tolerate compilation with vcdimager 0.7.20. Sigh.
+
+
+------------------------------------------------------------------------
+r7614 | jpsaman | 2004-05-07 10:12:34 +0200 (Fri, 07 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dvb/access.c
+   M /trunk/modules/access/dvb/dvb.c
+   M /trunk/modules/access/dvb/dvb.h
+   M /trunk/modules/access/dvb/qpsk.c
+
+Refactoring of dvb.c and access.c. Coding style and messages cleanup.
+------------------------------------------------------------------------
+r7615 | jpsaman | 2004-05-07 10:31:16 +0200 (Fri, 07 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dvb/access.c
+   M /trunk/modules/access/dvb/dvb.c
+
+compilation fixes
+------------------------------------------------------------------------
+r7616 | jpsaman | 2004-05-07 10:51:56 +0200 (Fri, 07 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dvb/dvb.c
+
+Gracefully interrupt the tuning process.
+------------------------------------------------------------------------
+r7617 | jpsaman | 2004-05-07 13:17:40 +0200 (Fri, 07 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dvb/access.c
+   M /trunk/modules/access/dvb/dvb.c
+
+Tuning to DVB-C works. Added code to listen to FE_REINIT from the frontend.
+------------------------------------------------------------------------
+r7618 | gbazin | 2004-05-07 13:25:42 +0200 (Fri, 07 May 2004) | 1 line
+Changed paths:
+   M /trunk/src/video_output/video_output.c
+
+* src/video_output/video_output.c: make sure vout_Create() returns NULL when the pf_init() of the vout plugin failed.
+------------------------------------------------------------------------
+r7619 | gbazin | 2004-05-07 15:03:43 +0200 (Fri, 07 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_output/directx/directx.c
+   M /trunk/modules/video_output/directx/events.c
+
+* modules/video_output/directx/*: embedded vout plays nicer with multi-monitor setups.
+------------------------------------------------------------------------
+r7620 | gbazin | 2004-05-07 16:36:51 +0200 (Fri, 07 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/interface.cpp
+   M /trunk/modules/gui/wxwindows/wxwindows.h
+
+* modules/gui/wxwindows/*: move a few things out of wxwindows.h
+------------------------------------------------------------------------
+r7621 | gbazin | 2004-05-07 17:36:01 +0200 (Fri, 07 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/demux/asf/asf.c
+   M /trunk/modules/demux/mp4/libmp4.c
+
+* modules/demux/asf/*: fixed mem leak.
+* modules/demux/mp4/*: fixed segfault on close with some files.
+
+------------------------------------------------------------------------
+r7622 | fenrir | 2004-05-07 23:10:48 +0200 (Fri, 07 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/video.c
+
+ * video: set avtcx->codec_tag
+
+------------------------------------------------------------------------
+r7623 | fenrir | 2004-05-07 23:12:26 +0200 (Fri, 07 May 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/demux/avi/avi.c
+
+ * avi: hack to let few xvid files working.
+ (set codec to xvid if the hanlder is xvid).
+
+
+------------------------------------------------------------------------
+r7624 | gbazin | 2004-05-08 13:59:28 +0200 (Sat, 08 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/demux/dvdnav.c
+
+* modules/demux/dvdnav.c: a few fixes.
+------------------------------------------------------------------------
+r7625 | gbazin | 2004-05-08 18:58:05 +0200 (Sat, 08 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_output/x11/xcommon.c
+
+* modules/video_output/x11/xcommon.c: fixed bug with uninitialized variable.
+------------------------------------------------------------------------
+r7626 | ipkiss | 2004-05-08 20:10:38 +0200 (Sat, 08 May 2004) | 5 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/parser/builder.cpp
+   M /trunk/modules/gui/skins2/src/skin_main.cpp
+   M /trunk/share/skins2/default/theme.xml
+
+ * skins2/src/skin_main.cpp: Transparency is default disabled
+ * skins2/parser/builder.cpp: s/resize/resizeSE/ (SE as in South-East)
+   because in the future resizing will be allowed in all directions
+ * share/skins2/default/theme.xml: Updated the skin accordingly
+
+------------------------------------------------------------------------
+r7627 | jlj | 2004-05-08 22:48:37 +0200 (Sat, 08 May 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/drms.c
+
+  * drms.c: fopen in binary mode. Convenience fix for those that use the DRMS
+            code outside of VLC and don't set _fmode to _O_BINARY.
+
+
+------------------------------------------------------------------------
+r7628 | sam | 2004-05-08 23:00:47 +0200 (Sat, 08 May 2004) | 5 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/drms.c
+
+  * modules/demux/mp4/drms.c:
+    + Removed unreachable code here and there.
+    + Refactored some shuffling functions and got rid of the ext structure.
+    + More code cleanup.
+
+------------------------------------------------------------------------
+r7629 | jlj | 2004-05-09 00:58:46 +0200 (Sun, 09 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/drms.c
+
+  * drms.c: DRMS v2 endian fix.
+
+
+------------------------------------------------------------------------
+r7630 | gbazin | 2004-05-09 11:20:34 +0200 (Sun, 09 May 2004) | 1 line
+Changed paths:
+   M /trunk/Makefile.am
+
+Makefile.am: email address obfuscation for text files included in the win32 package (Patch courtesy of Johan Bilien)
+------------------------------------------------------------------------
+r7631 | gbazin | 2004-05-09 11:35:12 +0200 (Sun, 09 May 2004) | 1 line
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/modules/visualization/goom.c
+
+configure.ac, modules/visualization/goom.c: updated for libgoom2 (goom 2k4). You can find it here: http://www.ios-software.com/index.php3?page=projet&quoi=1
+------------------------------------------------------------------------
+r7632 | gbazin | 2004-05-10 14:21:29 +0200 (Mon, 10 May 2004) | 1 line
+Changed paths:
+   M /trunk/src/audio_output/common.c
+   M /trunk/src/audio_output/input.c
+   M /trunk/src/audio_output/mixer.c
+
+* src/audio_ouput/input.c: better on-the-fly switching of audio filters.
+------------------------------------------------------------------------
+r7633 | massiot | 2004-05-10 16:57:00 +0200 (Mon, 10 May 2004) | 28 lines
+Changed paths:
+   M /trunk/modules/access/dvb/Modules.am
+   M /trunk/modules/access/dvb/access.c
+   D /trunk/modules/access/dvb/dvb.c
+   M /trunk/modules/access/dvb/dvb.h
+   A /trunk/modules/access/dvb/linux_dvb.c (from /trunk/modules/access/dvb/dvb.c:7632)
+   D /trunk/modules/access/dvb/qpsk.c
+
+* modules/access/dvb: Major rewrite of the code.
+  - new options (now prepended with --dvb) :
+     --dvb-program : to work around the non-working --program
+     --dvb-inversion : to (optionally) specify the inversion, which is not
+                       the same as polarization
+     --dvb-budget-mode : if you have a budget card this will set a filter
+                         on 0x2000, meaning all PIDs will be returned by
+                         the driver. The budget-mode is compatible with demux2.
+     --dvb-satno : to specify a sat number in the diseqc system
+     --dvb-voltage : to specify the voltage of the LNB (0 is a permitted
+                     value in special configurations)
+     --dvb-tone : to enable/disable the 22kHz tone (by default it is sent
+                  if frequency >= lnb-slof)
+  - fixed a handful of QPSK tuning bugs, especially the diseqc was not
+    working and frequencies above 11700 couldn't be tuned to.
+  - the modules now uses the inherited object variables for its
+    configuration.
+  - symbol-rate= url option is now srate= for consistency with the
+    configuration variable.
+  - all linux-dvb specific code is now in linux_dvb.c. access.c contains
+    only code which could be reused on other platforms.
+  - better keep track of demux file descriptors (especially useful on
+    limited boards).
+  - do not block in read() when no data is available.
+  - fixed msleep() calls (reminder : mtime_t is in _microseconds_).
+
+I didn't test the QAM and OFDM variants, so please report.
+
+------------------------------------------------------------------------
+r7634 | massiot | 2004-05-10 17:07:15 +0200 (Mon, 10 May 2004) | 6 lines
+Changed paths:
+   M /trunk/modules/access/dvb/access.c
+   M /trunk/modules/demux/ts.c
+   M /trunk/src/input/input_programs.c
+
+* src/input/input_programs.c: Fixed the --program option (thanks gibalou)
+* modules/access/dvb/access.c: Removed the temporary --dvb-program hack
+* modules/demux/ts.c: New --ts-silent option to avoid complaints about
+  encrypted packets (especially useful with --sout-all for streaming a part
+  of a transponder).
+
+------------------------------------------------------------------------
+r7635 | massiot | 2004-05-10 17:08:34 +0200 (Mon, 10 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/access/dvb/access.c
+
+1l
+
+------------------------------------------------------------------------
+r7636 | bigben | 2004-05-10 19:19:59 +0200 (Mon, 10 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/output.m
+
+use new syntax for sap/slp announces
+
+
+------------------------------------------------------------------------
+r7637 | jpsaman | 2004-05-10 21:57:38 +0200 (Mon, 10 May 2004) | 13 lines
+Changed paths:
+   M /trunk/modules/access/dvb/access.c
+   M /trunk/modules/access/dvb/linux_dvb.c
+
+dvb/access.c - properly cast memory returned by malloc()
+             - fix small memory leak on closing of dvb plugin.
+dvb/linux-dvb.c - remove astray spaces
+                - always empty the event queue before FE_SET_FRONTEND and FrontendCheck(). 
+                  dvbstream does the same for OFDM and QAM. 
+
+Summary: 
+   DVB-C is working (did a few tests) 
+   DVB-T not tested. 
+   Using polarization=A doesn't work anymore INVERSION_AUTO is not honered for tuning. 
+   SEC_VOLTAGE_OFF is missing when using latest code DVB-1.1.7 from http://www.metzlerbros.org/dvb/index.html. While include/linux/dvb/version.h is not updated and still reflects this API version: #define DVB_API_VERSION 3
+
+
+------------------------------------------------------------------------
+r7638 | gbazin | 2004-05-10 22:05:08 +0200 (Mon, 10 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/open.cpp
+
+* modules/gui/wxwindows/open.cpp: fixed the update of the advanced MRLs. Added a dvdnav option.
+------------------------------------------------------------------------
+r7639 | bigben | 2004-05-10 22:50:36 +0200 (Mon, 10 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/output.m
+
+oups
+
+
+------------------------------------------------------------------------
+r7640 | fenrir | 2004-05-11 01:39:48 +0200 (Tue, 11 May 2004) | 6 lines
+Changed paths:
+   M /trunk/modules/demux/demux2.c
+   M /trunk/modules/demux/ts.c
+
+ * ts: added support pf multiples PMT on the same PID (broken idea for
+broken people but it's used and it seems spec compliant)
+
+ * demux2: append a :// to allow correct parsing of /volume/filename:.avi
+
+
+------------------------------------------------------------------------
+r7641 | fenrir | 2004-05-11 02:51:43 +0200 (Tue, 11 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/ts.c
+
+ * ts.c: this time it should work (create one dvbpsi handle per pmt).
+
+------------------------------------------------------------------------
+r7642 | massiot | 2004-05-11 16:03:50 +0200 (Tue, 11 May 2004) | 5 lines
+Changed paths:
+   M /trunk/modules/access/dvb/access.c
+   M /trunk/modules/mux/mpeg/ts.c
+   M /trunk/src/stream_output/stream_output.c
+
+* src/stream_output/stream_output.c: Use strtol for option parsing instead
+  of atoi, because atoi assumes base 10.
+* modules/access/dvb/access.c: New --dvb-caching option.
+* modules/mux/mpeg/ts.c: Cosmetics.
+
+------------------------------------------------------------------------
+r7643 | gbazin | 2004-05-12 19:45:18 +0200 (Wed, 12 May 2004) | 1 line
+Changed paths:
+   M /trunk/src/stream_output/stream_output.c
+
+* src/stream_output/stream_output.c: allows spaces in the options of the sout mrl. Heading and trailing spaces in options will be removed.
+------------------------------------------------------------------------
+r7644 | gbazin | 2004-05-12 19:46:48 +0200 (Wed, 12 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/open.cpp
+
+* modules/gui/wxwindows/open.cpp: mrl parsing fix.
+------------------------------------------------------------------------
+r7645 | massiot | 2004-05-12 20:48:25 +0200 (Wed, 12 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/mux/mpeg/ts.c
+
+* modules/mux/mpeg/ts.c: Fixed a possible segfault in the shaping code.
+
+------------------------------------------------------------------------
+r7646 | ipkiss | 2004-05-12 20:56:51 +0200 (Wed, 12 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/parser/builder_data.def
+   M /trunk/modules/gui/skins2/parser/builder_data.hpp
+   M /trunk/modules/gui/skins2/parser/skin_parser.cpp
+   M /trunk/share/skins2/default/theme.xml
+   M /trunk/share/skins2/skin.dtd
+
+ * skins2: Removed the Theme.fadetime attribute (unused)
+
+------------------------------------------------------------------------
+r7647 | jlj | 2004-05-12 23:44:59 +0200 (Wed, 12 May 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/drms.c
+
+  * drms.c: Check that key store is at least 4 bytes (fixes segfault
+            on empty key store).
+
+
+------------------------------------------------------------------------
+r7648 | hartman | 2004-05-13 17:38:15 +0200 (Thu, 13 May 2004) | 3 lines
+Changed paths:
+   M /trunk/THANKS
+   M /trunk/modules/audio_output/coreaudio.c
+
+* Fix for stream selection on HAL devices.
+  by Jean Alexis Montignies <ja at sente.ch>
+
+------------------------------------------------------------------------
+r7649 | titer | 2004-05-13 19:45:22 +0200 (Thu, 13 May 2004) | 6 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/vout.h
+   M /trunk/modules/gui/macosx/vout.m
+
+ macosx/vout* : in GL mode, create a fullscreen window just like with QT
+                instead of switching to OpenGL fullscreen mode (fixes
+                unreachable mouse events with DVD menus, fixes the issues
+                with people using multiple desktops, etc).
+                Fillscreen is temporarily broken, I'll clean this up later.
+
+------------------------------------------------------------------------
+r7650 | gbazin | 2004-05-13 20:22:18 +0200 (Thu, 13 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/stream_out/standard.c
+
+* modules/stream_out/standard.c: fixed a few small mem leaks.
+------------------------------------------------------------------------
+r7651 | titer | 2004-05-13 20:29:44 +0200 (Thu, 13 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/vout.m
+
+ macosx/vout.m : fixed --macosx-fillscreen
+
+------------------------------------------------------------------------
+r7652 | gbazin | 2004-05-13 23:13:38 +0200 (Thu, 13 May 2004) | 1 line
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/modules/visualization/goom.c
+
+* configure.ac, modules/visualization/goom.c: in case --with-goom-tree is specified and we don't find libgoom2, try to find and use libgoom.
+------------------------------------------------------------------------
+r7653 | titer | 2004-05-14 13:29:21 +0200 (Fri, 14 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/vout.m
+
+ macosx/vout.m: don't forget to EndFullScreen() on GL mode too
+
+------------------------------------------------------------------------
+r7654 | jpsaman | 2004-05-14 15:24:07 +0200 (Fri, 14 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dvb/access.c
+
+Close DVR device
+------------------------------------------------------------------------
+r7655 | gbazin | 2004-05-14 19:07:50 +0200 (Fri, 14 May 2004) | 3 lines
+Changed paths:
+   M /trunk/Makefile.am
+   D /trunk/install-win32
+   A /trunk/vlc.win32.nsi (from /trunk/install-win32:7649)
+
+* vlc.win32.nsi: brand new NSIS auto-installer script.
+* Makefile.am: use vlc icon in the NSIS installer.
+
+------------------------------------------------------------------------
+r7656 | fenrir | 2004-05-14 22:46:33 +0200 (Fri, 14 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/access/mms/mmstu.c
+
+ * mmstu: added a couple of uint64_t casts to avoid overflow.
+
+------------------------------------------------------------------------
+r7657 | hartman | 2004-05-14 23:57:14 +0200 (Fri, 14 May 2004) | 3 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+   A /trunk/extras/contrib/src/Patches/faac.patch
+   M /trunk/extras/contrib/src/packages.mak
+
+* added faac support to Mac OSX build
+* ffmpeg cvs no longer asks you for a passwd. (this is for nightly's :)
+
+------------------------------------------------------------------------
+r7658 | hartman | 2004-05-15 00:27:37 +0200 (Sat, 15 May 2004) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+* small fix for faac build
+
+------------------------------------------------------------------------
+r7659 | gbazin | 2004-05-15 02:31:38 +0200 (Sat, 15 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/mms/mmstu.c
+
+* modules/access/mms/mmstu.c: fixed a few corner cases (like an infinite loop when input is stopped).
+------------------------------------------------------------------------
+r7660 | gbazin | 2004-05-15 02:37:09 +0200 (Sat, 15 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/v4l/v4l.c
+
+* modules/access/v4l/v4l.c: removed useless warning messages.
+------------------------------------------------------------------------
+r7661 | gbazin | 2004-05-15 03:11:57 +0200 (Sat, 15 May 2004) | 1 line
+Changed paths:
+   M /trunk/vlc.win32.nsi
+
+* vlc.win32.nsi: compressor needs to be defined at the top.
+------------------------------------------------------------------------
+r7662 | hartman | 2004-05-15 04:36:05 +0200 (Sat, 15 May 2004) | 7 lines
+Changed paths:
+   M /trunk/Makefile.am
+   M /trunk/extras/MacOSX/macosx-dmg
+
+* extras/MacOSX/macosx-dmg: rewrote the package script.
+  - will now determine desired image size by itself
+  - the hdid mount command mounted the image as root if no user is logged in via GUI.
+    this is very undesirable for nightly builds.
+    now uses the mount command and a local mountpoint.
+
+
+------------------------------------------------------------------------
+r7663 | hartman | 2004-05-15 06:05:01 +0200 (Sat, 15 May 2004) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+* no shared libs for faac when linking with ffmpeg
+
+------------------------------------------------------------------------
+r7664 | fenrir | 2004-05-15 12:51:59 +0200 (Sat, 15 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/mpeg/mpga.c
+
+ * mpga: use 1 as starting time (allow to have a valid date for the first frame).
+
+------------------------------------------------------------------------
+r7665 | fenrir | 2004-05-15 12:52:56 +0200 (Sat, 15 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/aac.c
+   M /trunk/modules/demux/au.c
+   M /trunk/modules/demux/mkv.cpp
+   M /trunk/modules/demux/rawdv.c
+   M /trunk/modules/demux/wav.c
+
+* all:  use 1 as starting time (allow to have a valid date for the first frame).
+
+------------------------------------------------------------------------
+r7666 | fenrir | 2004-05-15 12:53:17 +0200 (Sat, 15 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/real.c
+
+ * real:  use 1 as starting time (allow to have a valid date for the first frame).
+
+------------------------------------------------------------------------
+r7667 | fenrir | 2004-05-15 12:54:10 +0200 (Sat, 15 May 2004) | 2 lines
+Changed paths:
+   M /trunk/src/input/es_out.c
+
+ * es_out; round up PCR (avoid non null PCR -> null).
+
+------------------------------------------------------------------------
+r7668 | fenrir | 2004-05-15 12:58:22 +0200 (Sat, 15 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/avi/avi.c
+
+ * avi: add +1 to PCR/DTS/PTS.
+
+------------------------------------------------------------------------
+r7669 | gbazin | 2004-05-15 12:59:09 +0200 (Sat, 15 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_output/directx/directx.c
+
+* modules/video_output/directx/directx.c: fixed 'refresh list' for directx-device.
+------------------------------------------------------------------------
+r7670 | fenrir | 2004-05-15 13:03:48 +0200 (Sat, 15 May 2004) | 5 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/libmp4.c
+   M /trunk/modules/demux/mp4/libmp4.h
+   M /trunk/modules/demux/mp4/mp4.c
+
+ * mp4: - add +1 to PCR/DTS/PTS.
+        - preliminary support of avc (using a draft+google without
+samples to test, so don't expect it to work ;)
+ * libmp4: parse the avcC atom.
+
+------------------------------------------------------------------------
+r7671 | fenrir | 2004-05-15 13:06:28 +0200 (Sat, 15 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/packetizer/h264.c
+
+ * h264: added avc1 -> h264 annexe B stream.
+
+------------------------------------------------------------------------
+r7672 | fenrir | 2004-05-15 13:08:46 +0200 (Sat, 15 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/x264.c
+
+ * x264: updated to latest PAI.
+
+------------------------------------------------------------------------
+r7673 | fenrir | 2004-05-15 13:10:42 +0200 (Sat, 15 May 2004) | 5 lines
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/ffmpeg.c
+   M /trunk/modules/codec/ffmpeg/video.c
+
+ * all: added avc1 support. Well there is a hack because we need to
+first go through the h264 packetizer that will convert avc1 into a
+proper annexe B stream (untested).
+
+
+------------------------------------------------------------------------
+r7674 | fenrir | 2004-05-15 13:28:03 +0200 (Sat, 15 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/mp4.c
+
+ * mp4: mmh removed a fprintf.
+
+------------------------------------------------------------------------
+r7675 | gbazin | 2004-05-15 14:22:03 +0200 (Sat, 15 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/access/dvdplay/tools.c
+   M /trunk/modules/demux/dvdnav.c
+   M /trunk/vlc.win32.nsi
+
+* modules/demux/dvdnav.c, modules/access/dvdplay/tools.c: on win32, remove trailing '\' if passed a drive letter.
+* vlc.win32.nsi: DVD and AudioCD handlers.
+
+------------------------------------------------------------------------
+r7676 | fenrir | 2004-05-15 14:46:21 +0200 (Sat, 15 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/mux/mp4.c
+
+ * mp4: added support for h264. I have no idea if it's compliant but at
+least vlc is able to play it.
+
+------------------------------------------------------------------------
+r7677 | gbazin | 2004-05-15 14:58:07 +0200 (Sat, 15 May 2004) | 1 line
+Changed paths:
+   M /trunk/INSTALL.win32
+
+* INSTALL.win32: update
+------------------------------------------------------------------------
+r7678 | fenrir | 2004-05-15 16:42:16 +0200 (Sat, 15 May 2004) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_block.h
+   M /trunk/modules/demux/ts.c
+   M /trunk/modules/packetizer/mpegvideo.c
+   M /trunk/src/misc/block.c
+
+ * all: improved perfs (using block_ChainLastAppend).
+
+------------------------------------------------------------------------
+r7679 | hartman | 2004-05-16 01:05:57 +0200 (Sun, 16 May 2004) | 3 lines
+Changed paths:
+   M /trunk/po/nl.po
+
+* partially updated NL translation. You have to do _something_ 
+  during the Eurovision Songfestival.
+
+------------------------------------------------------------------------
+r7680 | gbazin | 2004-05-16 02:25:17 +0200 (Sun, 16 May 2004) | 1 line
+Changed paths:
+   M /trunk/vlc.win32.nsi
+
+* vlc.win32.nsi: more autorun stuff.
+------------------------------------------------------------------------
+r7681 | zorglub | 2004-05-16 12:46:54 +0200 (Sun, 16 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/wxwindows/streamout.cpp
+
+Use the new SAP/SLP syntax (sap,slp,name=)
+
+
+------------------------------------------------------------------------
+r7682 | gbazin | 2004-05-16 14:52:05 +0200 (Sun, 16 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_output/x11/xcommon.c
+
+* modules/video_output/x11/xcommon.c: before using an Xv port, make sure XV_AUTOPAINT_COLORKEY is switched on.
+------------------------------------------------------------------------
+r7683 | zorglub | 2004-05-16 15:46:58 +0200 (Sun, 16 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwindows/timer.cpp
+
+Update timer
+
+------------------------------------------------------------------------
+r7684 | hartman | 2004-05-16 17:29:24 +0200 (Sun, 16 May 2004) | 2 lines
+Changed paths:
+   M /trunk/NEWS
+
+* NEWS: Updated a bit more
+
+------------------------------------------------------------------------
+r7685 | zorglub | 2004-05-16 19:03:31 +0200 (Sun, 16 May 2004) | 2 lines
+Changed paths:
+   M /trunk/NEWS
+
+Details on DVB
+
+------------------------------------------------------------------------
+r7686 | gbazin | 2004-05-16 19:25:10 +0200 (Sun, 16 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/interface.cpp
+   M /trunk/modules/gui/wxwindows/timer.cpp
+   M /trunk/modules/gui/wxwindows/wxwindows.h
+
+* modules/gui/wxwindows/*: some cleanup + disable seekbar if stream is not seekable.
+------------------------------------------------------------------------
+r7687 | gbazin | 2004-05-16 19:44:44 +0200 (Sun, 16 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/misc/network/ipv4.c
+
+* modules/misc/network/ipv4.c: new --ipv4-timeout config option that lets you specify a timeout for TCP connections (default 5sec).
+------------------------------------------------------------------------
+r7688 | gbazin | 2004-05-16 19:54:18 +0200 (Sun, 16 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/interface.cpp
+
+* modules/gui/wxwindows/interface.cpp: forgot a debug message.
+------------------------------------------------------------------------
+r7689 | anil | 2004-05-16 20:08:41 +0200 (Sun, 16 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/misc/sap.c
+
+msleep() a bit before filling the playlist.
+
+------------------------------------------------------------------------
+r7690 | gbazin | 2004-05-16 21:17:56 +0200 (Sun, 16 May 2004) | 3 lines
+Changed paths:
+   M /trunk/include/modules.h
+   M /trunk/include/modules_inner.h
+   M /trunk/modules/access/dshow/dshow.cpp
+   M /trunk/modules/access/dvb/access.c
+   M /trunk/modules/access/pvr/pvr.c
+   M /trunk/modules/access/v4l/v4l.c
+
+* include/modules_inner.h, include/modules.h: added a shortname field to the module declaration section.
+* modules/access/*: added a shortname to a few modules.
+
+------------------------------------------------------------------------
+r7691 | gbazin | 2004-05-16 21:20:23 +0200 (Sun, 16 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/open.cpp
+
+* modules/gui/wxwindows/open.cpp: added a DVB tab and display module shortnames instead of their descriptions.
+------------------------------------------------------------------------
+r7692 | gbazin | 2004-05-16 21:33:58 +0200 (Sun, 16 May 2004) | 1 line
+Changed paths:
+   M /trunk/include/vlc_help.h
+   M /trunk/modules/gui/wxwindows/preferences_widgets.cpp
+
+* modules/gui/wxwindows/preferences_widgets.cpp: increased max int in IntegerConfigControl.
+------------------------------------------------------------------------
+r7693 | hartman | 2004-05-16 22:27:47 +0200 (Sun, 16 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/controls.m
+   M /trunk/modules/gui/macosx/output.m
+
+* modules/gui/macosx/output.m: added mp4a.
+* modules/gui/macosx/controls.m: fix the autogenerated menu.
+
+------------------------------------------------------------------------
+r7694 | gbazin | 2004-05-17 00:06:34 +0200 (Mon, 17 May 2004) | 14 lines
+Changed paths:
+   M /trunk/include/video_output.h
+   M /trunk/modules/gui/wxwindows/wxwindows.cpp
+   M /trunk/modules/video_output/directx/events.c
+   M /trunk/modules/video_output/x11/xcommon.c
+   M /trunk/src/video_output/video_output.c
+   M /trunk/src/video_output/vout_intf.c
+
+* src/video_output/vout_intf.c, include/video_output.h:
+  + vout_RequestWindow() will now cycle through all the available interfaces until 
+it finds one with embedded vout support.
+    This fixes the issue where embedded vout would stop working when additional 
+interfaces are spawned after the main interface is started.
+  + vout_RequestWindow() now stores the parent interface pointer into the vout 
+object for later use by vout_ControlWindow() and vout_ReleaseWindow().
+  + added a vout_vaControlDefault() called by the vouts pf_control() when they 
+don't handle something.
+* modules/video_output/directx/events.c, modules/video_output/x11/xcommon.c:
+  + call vout_vaControlDefault().
+* modules/gui/wxwindows/wxwindows.cpp: sets p_intf->b_dead when the interface is 
+about to be destroyed.
+
+------------------------------------------------------------------------
+r7695 | gbazin | 2004-05-17 00:42:48 +0200 (Mon, 17 May 2004) | 3 lines
+Changed paths:
+   M /trunk/src/interface/interface.c
+   M /trunk/src/video_output/vout_intf.c
+
+* interface/interface.c: fixed a bug with embedded vouts and interface switching.
+* video_output/vout_intf.c: small fix.
+
+------------------------------------------------------------------------
+r7696 | hartman | 2004-05-17 03:54:32 +0200 (Mon, 17 May 2004) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+
+* add old goom module if libgoom.a is detected
+  (When you fix stuff you should commit them as well)
+
+------------------------------------------------------------------------
+r7697 | gbazin | 2004-05-17 12:39:14 +0200 (Mon, 17 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/timer.cpp
+
+* modules/gui/wxwindows/timer.cpp: don't show the slider when the stream is not seekable.
+------------------------------------------------------------------------
+r7698 | anil | 2004-05-17 13:38:01 +0200 (Mon, 17 May 2004) | 2 lines
+Changed paths:
+   M /trunk/po/POTFILES.in
+
+* po/POTFILES.in: updated 
+
+------------------------------------------------------------------------
+r7699 | yoann | 2004-05-17 13:49:35 +0200 (Mon, 17 May 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/control/hotkeys.c
+
+* modules/control/hotkeys.c: Fixed a bug with hotkey 't': length was
+sometimes not display, although it was known.
+
+
+------------------------------------------------------------------------
+r7700 | gbazin | 2004-05-17 14:02:43 +0200 (Mon, 17 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/timer.cpp
+   M /trunk/modules/gui/wxwindows/wxwindows.h
+
+* fixed race condition with b_seekable.
+------------------------------------------------------------------------
+r7701 | gbazin | 2004-05-17 18:10:32 +0200 (Mon, 17 May 2004) | 1 line
+Changed paths:
+   M /trunk/src/input/input_programs.c
+
+* src/input/input_programs.c: if no program is specified by the user, don't add any to the list.
+------------------------------------------------------------------------
+r7702 | gbazin | 2004-05-17 21:22:50 +0200 (Mon, 17 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/dvbsub.c
+
+* modules/codec/dvbsub.c: coding style changes.
+------------------------------------------------------------------------
+r7703 | gbazin | 2004-05-17 21:38:13 +0200 (Mon, 17 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/video_chroma/i420_rgb_mmx.h
+
+* modules/video_chroma/i420_rgb_mmx.h: gcc-3.4 compilation fix.
+------------------------------------------------------------------------
