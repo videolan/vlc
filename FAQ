@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.15 2003/01/08 14:31:04 lool Exp $
+$Id: FAQ,v 1.16 2003/01/08 16:40:44 lool Exp $
 
 1. Using VLC
 
@@ -7,7 +7,7 @@ $Id: FAQ,v 1.15 2003/01/08 14:31:04 lool Exp $
 -----------------------
 Just launch vlc and use the "open disc" command from the graphical
 interface. In case of trouble, you may want to use the command line
-interface :
+interface:
     vlc dvd:/dev/dvd
 
 1.2 How do I read an encrypted DVD?
@@ -32,7 +32,7 @@ It should disappear after a few seconds if you stop moving the mouse.
 1.5 How do I use vlc if I don't want to install Gnome and all this
 #@!£% *$@&§% !@# bloat?
 ---------------------------------------------------------------------------
-You can run :
+You can run:
     vlc --intf dummy myfile.mpg
 Most commands are available from the command line, see vlc --help for
 more information.
@@ -43,16 +43,16 @@ If you don't know what is a raw device, don't even read this answer :-).
 There is an experimental support for raw devices in libdvdcss. It needs
 that you set up a raw device pointing to your DVD device (under Linux,
 use the "raw" utility). Then pass the raw device as second argument, for
-instance :
+instance:
     vlc dvd:/dev/dvd@/dev/raw0
 
 1.7 How do I use VLC as a client for VLS/VLMS streaming?
 -------------------------------------------------------
 First you must set up a VLS or VLMS stream. Please refer to the
-documentation of these programs. Then start VLC :
+documentation of these programs. Then start VLC:
     vlc udp:
 You shouldn't need any option. If you're paranoid and want to control
-everything, here is the exact syntax :
+everything, here is the exact syntax:
     vlc udp:[<server>[:<server port>]][@[<bind address>][:<bind port>]]
 
 1.8 How do I uninstall / reinstall VLC?
@@ -104,9 +104,9 @@ installed (often gtk-dev or gtk-devel) and recompile.
 -----------------------------------------------------------
 Wait a few seconds. Key cracking can take much time on some discs. If it
 still doesn't work, you can have a more verbose output using "vlc -vvvvv".
-Here are a few things to check for :
+Here are a few things to check for:
 * Did you install the libdvdcss package?
-* Do you have write access to your DVD device? For instance :
+* Do you have write access to your DVD device? For instance:
 chmod 666 /dev/hdc
 * Does your kernel log contain line about your DVD device?
 * Do you have a link from /dev/dvd to your real DVD device? For instance
@@ -119,7 +119,7 @@ ln -s hdc /dev/dvd
 -----------------------------------------------
 There is probably a problem with the output layer. There are several
 ways of troubleshooting it. First, try with another output plug-in, for
-instance :
+instance:
 vlc --vout sdl
 vlc --vout x11
 Second, change your screen depth and/or definition. It quite often helps.
@@ -130,8 +130,9 @@ releases optimized drivers for its boards).
 -------------------
 Your system is too slow to decode all pictures. It might be that your
 CPU basically isn't fast enough. It can also be that the subsystem is
-misconfigured/misdriven. Here are some elements to improve speed :
-* Turn on DMA on your DVD device, for instance :
+misconfigured/misdriven, this happens for example under Redhat. Here are
+some elements to improve speed:
+* Turn on DMA on your DVD device, for instance:
 hdparm -X34 -d1 /dev/dvd
 * Upgrade to the latest XFree86 version and the latest driver for your
 video board ; check that the xvideo plug-in is effectively used with
