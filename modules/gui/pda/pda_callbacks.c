@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.8 2003/11/08 18:31:01 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.9 2003/11/09 13:59:21 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -466,15 +466,16 @@ void addSelectedToPlaylist(GtkTreeModel *model,
 
         p_play_model = gtk_tree_view_get_model(p_tvplaylist);
 
-        /* Add a new row to the playlist treeview model */
-        gtk_list_store_append (GTK_LIST_STORE(p_play_model), &p_play_iter);
-        gtk_list_store_set (GTK_LIST_STORE(p_play_model), &p_play_iter,
-                                0, filename,   /* Add path to it !!! */
-                                1, "no info",
-                                -1 );
+        if (p_play_model)
+        {
+            /* Add a new row to the playlist treeview model */
+            gtk_list_store_append (GTK_LIST_STORE(p_play_model), &p_play_iter);
+            gtk_list_store_set (GTK_LIST_STORE(p_play_model), &p_play_iter,
+                                    0, filename,   /* Add path to it !!! */
+                                    1, "no info",
+                                    -1 );
+        }
     }
-    else
-       g_print("Error obtaining pointer to Play List");
 }
 
 void
@@ -514,13 +515,14 @@ onFileListRow                          (GtkTreeView     *treeview,
                                            G_TYPE_UINT64,
                                            G_TYPE_STRING,
                                            G_TYPE_STRING);
-                if (NULL == p_model)
-                    g_print( "ERROR: model has a NULL pointer\n" );
-                ReadDirectory(p_model, filename);
+                if (p_model)
+                {               
+                    ReadDirectory(p_model, filename);
 
-                /* Update TreeView with new model */
-                gtk_tree_view_set_model(treeview, (GtkTreeModel*) p_model);
-                g_object_unref(p_model);
+                    /* Update TreeView with new model */
+                    gtk_tree_view_set_model(treeview, (GtkTreeModel*) p_model);
+                    g_object_unref(p_model);
+                }
             }
             else
             {
@@ -593,8 +595,8 @@ NetworkBuildMRL                        (GtkEditable     *editable,
     GtkEntry      *networkProtocol = NULL;
     const gchar   *mrlNetworkType;
     const gchar   *mrlAddress;
-    gint     mrlPort;
     const gchar   *mrlProtocol;
+    gint           mrlPort;
 #define VLC_MAX_MRL     256
     char           text[VLC_MAX_MRL];
     int            pos = 0;
@@ -637,7 +639,7 @@ onAddNetworkPlaylist                   (GtkButton       *button,
     const gchar  *mrl_name;
 
     p_mrl = (GtkEntry*) lookup_widget(GTK_WIDGET(button),"entryMRL" );
-    if (NULL != p_mrl)
+    if (p_mrl)
     {
         mrl_name = gtk_entry_get_text(p_mrl);
 
