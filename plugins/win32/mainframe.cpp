@@ -635,9 +635,6 @@ void __fastcall TMainFrameDlg::ModeManage()
             i_Height += GroupBoxSlider->Height;
         }
 
-        /* resize main window */
-        this->Height = i_Height;
-
         /* control buttons for free pace streams */
         b_control = p_input_bank->pp_input[0]->stream.b_pace_control;
 
@@ -654,16 +651,16 @@ void __fastcall TMainFrameDlg::ModeManage()
     }
     else
     {
+        i_Height = StatusBar->Height + ToolBar->Height + 47;
+
         if( config_GetIntVariable( "network_channel" ) )
         {
             GroupBoxNetwork->Visible = true;
             LabelChannel->Visible = true;
+            i_Height += GroupBoxNetwork->Height;
         }
         else
         {
-            /* default mode */
-            ClientHeight = 37 + ToolBar->Height;
-
             /* unsensitize menus */
             MenuProgram->Enabled = false;
             MenuTitle->Enabled = false;
@@ -675,6 +672,9 @@ void __fastcall TMainFrameDlg::ModeManage()
             PopupSubtitles->Enabled = false;
         }
     }
+
+    /* resize main window */
+    this->Height = i_Height;
 
     /* set control items */
     ToolButtonBack->Enabled = false;
@@ -688,4 +688,5 @@ void __fastcall TMainFrameDlg::ModeManage()
     PopupSlow->Enabled = b_control;
     PopupFast->Enabled = b_control;
 }
+//---------------------------------------------------------------------------
 

@@ -36,6 +36,7 @@ class TGroupBoxPref : public TGroupBox
 public:
     __fastcall TGroupBoxPref( TComponent* Owner, module_config_t *p_config_arg );
     module_config_t *p_config;
+    virtual void __fastcall UpdateChanges();
     TListView * __fastcall CreateListView( TWinControl *Parent,
             int Left, int Width, int Top, int Height, TViewStyle ViewStyle );
     TButton * __fastcall CreateButton( TWinControl *Parent,
@@ -63,11 +64,11 @@ public:
     TLabel *LabelSelected;
     TEdit *Edit;
     module_t *ModuleSelected;
+    void __fastcall UpdateChanges();
     void __fastcall ListViewSelectItem( TObject *Sender, TListItem *Item,
                                         bool Selected );
     void __fastcall ButtonSelectClick( TObject *Sender );
     void __fastcall ButtonConfigClick( TObject *Sender );
-    void __fastcall EditChange( TObject *Sender );
 };
 //---------------------------------------------------------------------------
 class TGroupBoxString : public TGroupBoxPref
@@ -76,7 +77,7 @@ public:
     __fastcall TGroupBoxString( TComponent* Owner, module_config_t *p_config );
     TLabel *LabelDesc;
     TEdit *Edit;
-    void __fastcall EditChange( TObject *Sender );
+    void __fastcall UpdateChanges();
 };
 //---------------------------------------------------------------------------
 class TGroupBoxInteger : public TGroupBoxPref
@@ -86,7 +87,7 @@ public:
     TLabel *LabelDesc;
     TEdit *Edit;
     TUpDown *UpDown;
-    void __fastcall EditChange( TObject *Sender );
+    void __fastcall UpdateChanges();
 };
 //---------------------------------------------------------------------------
 class TGroupBoxBool : public TGroupBoxPref
@@ -95,7 +96,7 @@ public:
     __fastcall TGroupBoxBool( TComponent* Owner, module_config_t *p_config );
     TLabel *LabelDesc;
     TCheckBox *CheckBox;
-    void __fastcall CheckBoxClick( TObject *Sender );
+    void __fastcall UpdateChanges();
 };
 //---------------------------------------------------------------------------
 class TPreferencesDlg : public TForm

@@ -31,9 +31,9 @@
 #include "interface.h"
 #include "intf_playlist.h"
 
+#include "disc.h"
 #include "win32_common.h"
 
-#include "disc.h"
 //---------------------------------------------------------------------------
 //#pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -44,20 +44,7 @@ extern  struct intf_thread_s *p_intfGlobal;
 __fastcall TDiscDlg::TDiscDlg( TComponent* Owner )
         : TForm( Owner )
 {
-    char *psz_dvd_device = config_GetPszVariable( "dvd_device" );
-    char *psz_vcd_device = config_GetPszVariable( "vcd_device" );
-
-    if( psz_dvd_device )
-    {
-        EditDevice->Text.sprintf( "%s", psz_dvd_device );
-        free( psz_dvd_device );
-    }
-
-    if( psz_vcd_device )
-    {
-        EditDevice->Text.sprintf( "%s", psz_vcd_device );
-        free( psz_vcd_device );
-    }
+    RadioGroupTypeClick( RadioGroupType );
 }
 //---------------------------------------------------------------------------
 void __fastcall TDiscDlg::FormShow( TObject *Sender )
@@ -95,7 +82,7 @@ void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
     {
         Method = "vcd";
     }
-    
+
     /* Select title and chapter */
     Title.sprintf( "%d", UpDownTitle->Position );
     Chapter.sprintf( "%d", UpDownChapter->Position );
@@ -114,6 +101,27 @@ void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
     }
 
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+}
+//---------------------------------------------------------------------------
+void __fastcall TDiscDlg::RadioGroupTypeClick( TObject *Sender )
+{
+    TRadioGroup *RadioGroupType = (TRadioGroup *)Sender;
+    char *psz_device;
+
+    if( RadioGroupType->ItemIndex == 0 )
+    {
+        psz_device = config_GetPszVariable( "dvd_device" );
+    }
+    else
+    {
+        psz_device = config_GetPszVariable( "vcd_device" );
+    }
+
+    if( psz_device )
+    {
+        EditDevice->Text = psz_device;
+        free( psz_device );
+    }
 }
 //---------------------------------------------------------------------------
 

@@ -23,6 +23,9 @@
 #include <vcl.h>
 #pragma hdrstop
 
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>                                                /* strcmp */
+
 #include <videolan/vlc.h>
 
 #include "interface.h"
@@ -35,6 +38,7 @@
 #pragma resource "*.dfm"
 
 extern struct intf_thread_s *p_intfGlobal;
+
 
 /****************************************************************************
  * Functions to help components creation
@@ -124,6 +128,10 @@ TUpDown * __fastcall TGroupBoxPref::CreateUpDown( TWinControl *Parent,
     UpDown->Thousands = Thousands;
     return UpDown;
 }
+//---------------------------------------------------------------------------
+void __fastcall TGroupBoxPref::UpdateChanges()
+{
+}
 
 
 /****************************************************************************
@@ -163,7 +171,6 @@ __fastcall TGroupBoxPlugin::TGroupBoxPlugin( TComponent* Owner,
     vlc_mutex_lock( p_config->p_lock );
     Edit->Text = p_config->psz_value ? p_config->psz_value : "";
     vlc_mutex_unlock( p_config->p_lock );
-    Edit->OnChange = EditChange;
 
     Height = 233;
 };
@@ -182,7 +189,7 @@ void __fastcall TGroupBoxPlugin::ListViewSelectItem( TObject *Sender,
              p_module != NULL ;
              p_module = p_module->next )
         {
-            if( !strcmp( p_module->psz_name, Name.c_str() ) )
+            if( strcmp( p_module->psz_name, Name.c_str() ) == 0 )
             {
                 ModuleSelected = p_module;
                 LabelHint->Caption = p_module->psz_longname ?
@@ -203,13 +210,15 @@ void __fastcall TGroupBoxPlugin::ButtonSelectClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TGroupBoxPlugin::ButtonConfigClick( TObject *Sender )
 {
-    /* FIWME: TODO */
+    /* FIXME: TODO */
 }
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxPlugin::EditChange( TObject *Sender )
+void __fastcall TGroupBoxPlugin::UpdateChanges()
 {
-    TEdit *Edit = (TEdit *)Sender;
-    p_config->psz_value = Edit->Text.c_str();
+    /* XXX: Necessary, since c_str() returns only a temporary pointer... */
+    free( p_config->psz_value );
+    p_config->psz_value = (char *)malloc( Edit->Text.Length() + 1 );
+    strcpy( p_config->psz_value, Edit->Text.c_str() );
 }
 
 
@@ -228,7 +237,6 @@ __fastcall TGroupBoxString::TGroupBoxString( TComponent* Owner,
     vlc_mutex_lock( p_config->p_lock );
     Edit->Text = p_config->psz_value ? p_config->psz_value : "";
     vlc_mutex_unlock( p_config->p_lock );
-    Edit->OnChange = EditChange;
 
     /* vertical alignment */
     Height = LabelDesc->Height + 24;
@@ -236,10 +244,12 @@ __fastcall TGroupBoxString::TGroupBoxString( TComponent* Owner,
     Edit->Top = Top + ( Height - Edit->Height ) / 2 + 4;
 };
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxString::EditChange( TObject *Sender )
+void __fastcall TGroupBoxString::UpdateChanges()
 {
-    TEdit *Edit = (TEdit *)Sender;
-    p_config->psz_value = Edit->Text.c_str();
+    /* XXX: Necessary, since c_str() returns only a temporary pointer... */
+    free( p_config->psz_value );
+    p_config->psz_value = (char *)malloc( Edit->Text.Length() + 1 );
+    strcpy( p_config->psz_value, Edit->Text.c_str() );
 }
 
 
@@ -255,7 +265,6 @@ __fastcall TGroupBoxInteger::TGroupBoxInteger( TComponent* Owner,
 
     /* init edit */
     Edit = CreateEdit( this, 16, 148, 24, 21, "" );
-    Edit->OnChange = EditChange;
 
     /* init updown */
     UpDown = CreateUpDown( this, -1, 32767, p_config->i_value, false );
@@ -267,9 +276,8 @@ __fastcall TGroupBoxInteger::TGroupBoxInteger( TComponent* Owner,
     Edit->Top = Top + ( Height - Edit->Height ) / 2 + 4;
 };
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxInteger::EditChange( TObject *Sender )
+void __fastcall TGroupBoxInteger::UpdateChanges()
 {
-    TEdit *Edit = (TEdit *)Sender;
     p_config->i_value = StrToInt( Edit->Text );
 }
 
@@ -287,7 +295,6 @@ __fastcall TGroupBoxBool::TGroupBoxBool( TComponent* Owner,
     /* init checkbox */
     CheckBox = CreateCheckBox( this, 16, 184, 28, 17, p_config->psz_text );
     CheckBox->Checked = p_config->i_value;
-    CheckBox->OnClick = CheckBoxClick;
 
     /* vertical alignment */
     Height = LabelDesc->Height + 24;
@@ -295,9 +302,8 @@ __fastcall TGroupBoxBool::TGroupBoxBool( TComponent* Owner,
     CheckBox->Top = Top + ( Height - CheckBox->Height ) / 2 + 4;
 };
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxBool::CheckBoxClick( TObject *Sender )
+void __fastcall TGroupBoxBool::UpdateChanges()
 {
-    TCheckBox *CheckBox = (TCheckBox *)Sender;
     p_config->i_value = CheckBox->Checked ? 1 : 0;
 }
 
@@ -346,19 +352,20 @@ void __fastcall TPreferencesDlg::FormHide( TObject *Sender )
 
 void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 {
-    bool config_dialog;
-    module_t *p_module;
-    module_t *p_module_plugins;
-    int i, j;
-
-    TTabSheet *TabSheet;
-    TScrollBox *ScrollBox;
-    TPanel *Panel;
-    TGroupBoxPlugin *GroupBoxPlugin;
-    TGroupBoxString *GroupBoxString;
-    TGroupBoxInteger *GroupBoxInteger;
-    TGroupBoxBool *GroupBoxBool;
-    TListItem *ListItem;
+    bool                config_dialog;
+    module_t           *p_module;
+    module_t           *p_module_plugins;
+    unsigned int        i;
+    int                 i_pages, i_ctrl;
+    
+    TTabSheet          *TabSheet;
+    TScrollBox         *ScrollBox;
+    TPanel             *Panel;
+    TGroupBoxPlugin    *GroupBoxPlugin;
+    TGroupBoxString    *GroupBoxString;
+    TGroupBoxInteger   *GroupBoxInteger;
+    TGroupBoxBool      *GroupBoxBool;
+    TListItem          *ListItem;
 
     /* Check if the dialog box is already opened, if so this will save us
      * quite a bit of work. (the interface will be destroyed when you actually
@@ -476,14 +483,14 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     }
 
     /* Reorder groupboxes inside the tabsheets */
-    for( i = 0; i < PageControlPref->PageCount; i++ )
+    for( i_pages = 0; i_pages < PageControlPref->PageCount; i_pages++ )
     {
         /* get scrollbox from the tabsheet */
-        ScrollBox = (TScrollBox *)PageControlPref->Pages[i]->Controls[0];
+        ScrollBox = (TScrollBox *)PageControlPref->Pages[i_pages]->Controls[0];
 
-        for( j = ScrollBox->ControlCount - 1; j >= 0 ; j-- )
+        for( i_ctrl = ScrollBox->ControlCount - 1; i_ctrl >= 0 ; i_ctrl-- )
         {
-            ScrollBox->Controls[j]->Align = alTop;
+            ScrollBox->Controls[i_ctrl]->Align = alTop;
         }
     }
 
@@ -525,6 +532,7 @@ void __fastcall TPreferencesDlg::ButtonApplyClick( TObject *Sender )
             if( ScrollBox->Controls[j]->InheritsFrom( __classid( TGroupBoxPref ) ) )
             {
                 GroupBox = (TGroupBoxPref *)ScrollBox->Controls[j];
+                GroupBox->UpdateChanges();
                 SaveValue( GroupBox->p_config );
             }
         }
@@ -549,7 +557,8 @@ void __fastcall TPreferencesDlg::SaveValue( module_config_t *p_config )
         case MODULE_CONFIG_ITEM_STRING:
         case MODULE_CONFIG_ITEM_FILE:
         case MODULE_CONFIG_ITEM_PLUGIN:
-            config_PutPszVariable( p_config->psz_name, p_config->psz_value );
+            config_PutPszVariable( p_config->psz_name,
+                        *p_config->psz_value ? p_config->psz_value : NULL );
             break;
         case MODULE_CONFIG_ITEM_INTEGER:
         case MODULE_CONFIG_ITEM_BOOL:

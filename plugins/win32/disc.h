@@ -50,6 +50,7 @@ __published:	// IDE-managed Components
     void __fastcall FormHide(TObject *Sender);
     void __fastcall BitBtnCancelClick(TObject *Sender);
     void __fastcall BitBtnOkClick(TObject *Sender);
+    void __fastcall RadioGroupTypeClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TDiscDlg( TComponent* Owner );

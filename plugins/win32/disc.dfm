@@ -329,6 +329,7 @@ object DiscDlg: TDiscDlg
       'DVD'
       'VCD')
     TabOrder = 0
+    OnClick = RadioGroupTypeClick
   end
   object BitBtnOk: TBitBtn
     Left = 8
