@@ -175,7 +175,7 @@ AC_ARG_WITH(sdl,
     else
       LIB_SDL="-L/usr/X11R6/lib -lSDL"
     fi ])
-    if test "x$withval" == "x";
+    if test "x$withval" = "x";
     then
       PLUGINS=${PLUGINS}"sdl "
       LIB_SDL="-L/usr/X11R6/lib -lSDL"
@@ -192,10 +192,13 @@ AC_ARG_WITH(glide,
 AC_ARG_ENABLE(ncurses,
   [  --enable-ncurses        ncurses interface support (default disabled)],
   [if test x$enable_ncurses = xyes; then PLUGINS=${PLUGINS}"ncurses "; fi])
+AC_ARG_ENABLE(kde,
+  [  --enable-kde            KDE interface support (default disabled)],
+  [if test x$enable_kde = xyes; then PLUGINS=${PLUGINS}"kde "; ALIASE=${ALIASES}"kvlc"; fi])
 AC_ARG_ENABLE(gnome,
   [  --disable-gnome         Gnome support (default enabled)])
 if test x$enable_gnome != xno; then PLUGINS=${PLUGINS}"gnome "; ALIASES=${ALIASES}"gvlc "; fi
-AC_ARG_ENABLE(gnome,
+AC_ARG_ENABLE(x11,
   [  --disable-x11           X11 support (default enabled)])
 if test x$enable_x11 != xno; then PLUGINS=${PLUGINS}"x11 "; fi
 
