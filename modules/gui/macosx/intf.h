@@ -237,6 +237,7 @@ struct intf_sys_t
     
     bool b_small_window;
     
+    mtime_t i_end_scroll;
 }
 
 + (VLCMain *)sharedInstance;
@@ -258,6 +259,8 @@ struct intf_sys_t
 - (void)manage;
 - (void)manageIntf:(NSTimer *)o_timer;
 - (void)setupMenus;
+- (void)setScrollField:(NSString *)o_string stopAfter:(int )timeout;
+- (void)resetScrollField;
 
 - (void)updateMessageArray;
 - (void)playStatusUpdated:(int) i_status;

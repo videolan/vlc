@@ -247,17 +247,27 @@
 {
     intf_thread_t * p_intf = VLCIntf;
     audio_volume_t i_volume = (audio_volume_t)[sender intValue];
-
     aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_STEP );
+    [self updateVolumeSlider];
 }
 
 - (void)updateVolumeSlider
 {
+    NSString * o_text;
+    char * psz_text;
     intf_thread_t * p_intf = VLCIntf;
     audio_volume_t i_volume;
 
     aout_VolumeGet( p_intf, &i_volume );
-
+    psz_text = malloc( 32 * sizeof( char ) );
+/*FIXME: do we really need to work with a char * before NSString ? */
+    if( psz_text )
+    {
+        sprintf( psz_text, "Volume: %d", i_volume * 200 / AOUT_VOLUME_MAX );
+        o_text = [[NSString alloc] initWithCString:psz_text];
+        [o_main setScrollField:o_text stopAfter:1000000];
+        free( psz_text );
+    }
     [o_volumeslider setFloatValue: (float)(i_volume / AOUT_VOLUME_STEP)];
 }
 

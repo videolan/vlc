@@ -417,7 +417,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)initStrings
 {
     [o_window setTitle: _NS("VLC - Controller")];
-    [o_scrollfield setStringValue: _NS("VLC media player")];
+    [self setScrollField:_NS("VLC media player") stopAfter:-1];
 
     /* button controls */
     [o_btn_prev setToolTip: _NS("Previous")];
@@ -755,7 +755,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     NSDate * o_sleep_date;
     playlist_t * p_playlist;
-    vlc_value_t val;
 
     /* new thread requires a new pool */
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
@@ -797,7 +796,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             /* input stopped */
             p_intf->p_sys->b_intf_update = VLC_TRUE;
             p_intf->p_sys->i_play_status = END_S;
-            [o_scrollfield setStringValue: _NS("VLC media player") ];
+            [self setScrollField: _NS("VLC media player") stopAfter:-1];
             vlc_object_release( p_input );
             p_input = NULL;
         }
@@ -909,7 +908,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             if( o_temp == NULL )
                 o_temp = [NSString stringWithCString:
                     p_playlist->status.p_item->input.psz_name];
-            [o_scrollfield setStringValue: o_temp ];
+            [self setScrollField: o_temp stopAfter:-1];
 
             p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                                     FIND_ANYWHERE );
@@ -977,6 +976,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 #undef p_input
 
     [self updateMessageArray];
+
+    if( (i_end_scroll != -1) && (mdate() > i_end_scroll) )
+        [self resetScrollField];
 
     [NSTimer scheduledTimerWithTimeInterval: 0.3
         target: self selector: @selector(manageIntf:)
@@ -1050,6 +1052,41 @@ static VLCMain *_o_sharedMainInstance = nil;
         }
     }
 #undef p_input
+}
+
+- (void)setScrollField:(NSString *)o_string stopAfter:(int)timeout
+{
+    if( timeout != -1 )
+        i_end_scroll = mdate() + timeout;
+    else
+        i_end_scroll = -1;
+    [o_scrollfield setStringValue: o_string];
+}
+
+- (void)resetScrollField
+{
+    i_end_scroll = -1;
+#define p_input p_intf->p_sys->p_input
+    if( p_input && !p_input->b_die )
+    {
+        NSString *o_temp;
+        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                   FIND_ANYWHERE );
+        if( p_playlist == NULL )
+        {
+            return;
+        }
+        o_temp = [NSString stringWithUTF8String:
+                  p_playlist->status.p_item->input.psz_name];
+        if( o_temp == NULL )
+            o_temp = [NSString stringWithCString:
+                    p_playlist->status.p_item->input.psz_name];
+        [self setScrollField: o_temp stopAfter:-1];
+        vlc_object_release( p_playlist );
+        return;
+    }
+#undef p_input
+    [self setScrollField: _NS("VLC media player") stopAfter:-1];
 }
 
 - (void)updateMessageArray
