@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.131 2001/09/24 11:17:49 massiot Exp $
+ * $Id: input.c,v 1.132 2001/10/01 16:18:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -57,9 +57,7 @@
 #   include <sys/socket.h>
 #endif
 
-#ifdef STATS
-#   include <sys/times.h>
-#endif
+#include <sys/times.h>
 
 #include "config.h"
 #include "common.h"
@@ -264,9 +262,7 @@ static void RunThread( input_thread_t *p_input )
 
     while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
     {
-#ifdef STATS
         p_input->c_loops++;
-#endif
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -347,6 +343,7 @@ static void RunThread( input_thread_t *p_input )
         /* Demultiplex read packets. */
         for( i = 0; i < p_input->i_read_once && pp_packets[i] != NULL; i++ )
         {
+            p_input->stream.c_packets_read++;
             p_input->pf_demux( p_input, pp_packets[i] );
         }
 
@@ -386,14 +383,10 @@ static void RunThread( input_thread_t *p_input )
 static int InitThread( input_thread_t * p_input )
 {
 
-#ifdef STATS
     /* Initialize statistics */
     p_input->c_loops                    = 0;
-    p_input->c_bytes                    = 0;
-    p_input->c_payload_bytes            = 0;
-    p_input->c_packets_read             = 0;
-    p_input->c_packets_trashed          = 0;
-#endif
+    p_input->stream.c_packets_read      = 0;
+    p_input->stream.c_packets_trashed   = 0;
 
     /* Set locks. */
     vlc_mutex_init( &p_input->stream.stream_lock );
@@ -418,11 +411,11 @@ static int InitThread( input_thread_t * p_input )
     p_input->pf_init          = f.pf_init;
     if( f.pf_open != NULL )
     {
-        p_input->pf_open          = f.pf_open;
+        p_input->pf_open      = f.pf_open;
     }
     if( f.pf_close != NULL )
     {
-        p_input->pf_close         = f.pf_close;
+        p_input->pf_close     = f.pf_close;
     }
     p_input->pf_end           = f.pf_end;
     p_input->pf_init_bit_stream= f.pf_init_bit_stream;
@@ -487,15 +480,18 @@ static void EndThread( input_thread_t * p_input )
     pi_status = p_input->pi_status;
     *pi_status = THREAD_END;
 
-#ifdef STATS
+    if( p_main->b_stats )
     {
-        struct tms cpu_usage;
+        /* Display statistics */
+        struct tms  cpu_usage;
         times( &cpu_usage );
 
-        intf_Msg( "input stats: cpu usage (user: %d, system: %d)",
-                  cpu_usage.tms_utime, cpu_usage.tms_stime );
+        intf_StatMsg( "input stats: %d loops consuming user: %d, system: %d",
+                      p_input->c_loops,
+                      cpu_usage.tms_utime, cpu_usage.tms_stime );
+
+        input_DumpStream( p_input );
     }
-#endif
 
     /* Free all ES and destroy all decoder threads */
     input_EndStream( p_input );

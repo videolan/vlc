@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.5 2001/09/05 16:07:50 massiot Exp $
+ * $Id: video_parser.c,v 1.6 2001/10/01 16:18:49 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -36,9 +36,7 @@
 #include <errno.h>
 #include <string.h>
 
-#ifdef STATS
-#  include <sys/times.h>
-#endif
+#include <sys/times.h>
 
 #include "config.h"
 #include "common.h"
@@ -57,6 +55,8 @@
 #include "vdec_ext-plugins.h"
 #include "vpar_pool.h"
 #include "video_parser.h"
+
+#include "main.h"
 
 /*
  * Local prototypes
@@ -186,14 +186,12 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->picture.i_current_structure = 0;
 
     /* Initialize other properties */
-#ifdef STATS
     p_vpar->c_loops = 0;
     p_vpar->c_sequences = 0;
     memset(p_vpar->pc_pictures, 0, sizeof(p_vpar->pc_pictures));
     memset(p_vpar->pc_decoded_pictures, 0, sizeof(p_vpar->pc_decoded_pictures));
     memset(p_vpar->pc_malformed_pictures, 0,
            sizeof(p_vpar->pc_malformed_pictures));
-#endif
     vpar_InitScanTable( p_vpar );
 
     /*
@@ -235,9 +233,8 @@ static void RunThread( vpar_thread_t *p_vpar )
 
         while( (!p_vpar->p_fifo->b_die) && (!p_vpar->p_fifo->b_error) )
         {
-#ifdef STATS
             p_vpar->c_loops++;
-#endif
+
             /* Parse the next sequence, group or picture header */
             if( vpar_ParseHeader( p_vpar ) )
             {
@@ -317,48 +314,49 @@ static void EndThread( vpar_thread_t *p_vpar )
         vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
     }
 
-#ifdef STATS
-    intf_Msg("vpar stats: %d loops among %d sequence(s)",
-             p_vpar->c_loops, p_vpar->c_sequences);
-
+    if( p_main->b_stats )
     {
         struct tms cpu_usage;
         times( &cpu_usage );
 
-        intf_Msg("vpar stats: cpu usage (user: %d, system: %d)",
-                 cpu_usage.tms_utime, cpu_usage.tms_stime);
-    }
+        intf_StatMsg( "vpar stats: %d loops among %d sequence(s)",
+                      p_vpar->c_loops, p_vpar->c_sequences );
 
-    intf_Msg("vpar stats: Read %d frames/fields (I %d/P %d/B %d)",
-             p_vpar->pc_pictures[I_CODING_TYPE]
-             + p_vpar->pc_pictures[P_CODING_TYPE]
-             + p_vpar->pc_pictures[B_CODING_TYPE],
-             p_vpar->pc_pictures[I_CODING_TYPE],
-             p_vpar->pc_pictures[P_CODING_TYPE],
-             p_vpar->pc_pictures[B_CODING_TYPE]);
-    intf_Msg("vpar stats: Decoded %d frames/fields (I %d/P %d/B %d)",
-             p_vpar->pc_decoded_pictures[I_CODING_TYPE]
-             + p_vpar->pc_decoded_pictures[P_CODING_TYPE]
-             + p_vpar->pc_decoded_pictures[B_CODING_TYPE],
-             p_vpar->pc_decoded_pictures[I_CODING_TYPE],
-             p_vpar->pc_decoded_pictures[P_CODING_TYPE],
-             p_vpar->pc_decoded_pictures[B_CODING_TYPE]);
-    intf_Msg("vpar stats: Read %d malformed frames/fields (I %d/P %d/B %d)",
-             p_vpar->pc_malformed_pictures[I_CODING_TYPE]
-             + p_vpar->pc_malformed_pictures[P_CODING_TYPE]
-             + p_vpar->pc_malformed_pictures[B_CODING_TYPE],
-             p_vpar->pc_malformed_pictures[I_CODING_TYPE],
-             p_vpar->pc_malformed_pictures[P_CODING_TYPE],
-             p_vpar->pc_malformed_pictures[B_CODING_TYPE]);
+        intf_StatMsg( "vpar stats: cpu usage (user: %d, system: %d)",
+                      cpu_usage.tms_utime, cpu_usage.tms_stime );
+
+        intf_StatMsg( "vpar stats: Read %d frames/fields (I %d/P %d/B %d)",
+                      p_vpar->pc_pictures[I_CODING_TYPE]
+                      + p_vpar->pc_pictures[P_CODING_TYPE]
+                      + p_vpar->pc_pictures[B_CODING_TYPE],
+                      p_vpar->pc_pictures[I_CODING_TYPE],
+                      p_vpar->pc_pictures[P_CODING_TYPE],
+                      p_vpar->pc_pictures[B_CODING_TYPE] );
+        intf_StatMsg( "vpar stats: Decoded %d frames/fields (I %d/P %d/B %d)",
+                      p_vpar->pc_decoded_pictures[I_CODING_TYPE]
+                      + p_vpar->pc_decoded_pictures[P_CODING_TYPE]
+                      + p_vpar->pc_decoded_pictures[B_CODING_TYPE],
+                      p_vpar->pc_decoded_pictures[I_CODING_TYPE],
+                      p_vpar->pc_decoded_pictures[P_CODING_TYPE],
+                      p_vpar->pc_decoded_pictures[B_CODING_TYPE] );
+        intf_StatMsg( "vpar stats: Read %d malformed frames/fields (I %d/P %d/B %d)",
+                      p_vpar->pc_malformed_pictures[I_CODING_TYPE]
+                      + p_vpar->pc_malformed_pictures[P_CODING_TYPE]
+                      + p_vpar->pc_malformed_pictures[B_CODING_TYPE],
+                      p_vpar->pc_malformed_pictures[I_CODING_TYPE],
+                      p_vpar->pc_malformed_pictures[P_CODING_TYPE],
+                      p_vpar->pc_malformed_pictures[B_CODING_TYPE] );
 #define S   p_vpar->sequence
-    intf_Msg("vpar info: %s stream (%dx%d), %d.%d pi/s",
-             S.b_mpeg2 ? "MPEG-2" : "MPEG-1",
-             S.i_width, S.i_height, S.i_frame_rate/1001, S.i_frame_rate % 1001);
-    intf_Msg("vpar info: %s, %s, matrix_coeff: %d",
-             S.b_progressive ? "Progressive" : "Non-progressive",
-             S.i_scalable_mode ? "scalable" : "non-scalable",
-             S.i_matrix_coefficients);
-#endif
+        intf_StatMsg( "vpar info: %s stream (%dx%d), %d.%d pi/s",
+                      S.b_mpeg2 ? "MPEG-2" : "MPEG-1",
+                      S.i_width, S.i_height, S.i_frame_rate/1001,
+                      S.i_frame_rate % 1001 );
+        intf_StatMsg( "vpar info: %s, %s, matrix_coeff: %d",
+                      S.b_progressive ? "Progressive" : "Non-progressive",
+                      S.i_scalable_mode ? "scalable" : "non-scalable",
+                      S.i_matrix_coefficients );
+#undef S
+    }
 
     /* Dispose of matrices if they have been allocated. */
     if( p_vpar->sequence.intra_quant.b_allocated )

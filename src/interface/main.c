@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.115 2001/10/01 12:48:01 massiot Exp $
+ * $Id: main.c,v 1.116 2001/10/01 16:18:49 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -134,6 +134,7 @@
 #define OPT_WARNING             191
 #define OPT_VERSION             192
 #define OPT_STDOUT              193
+#define OPT_STATS               194
 
 /* Usage fashion */
 #define USAGE                     0
@@ -164,6 +165,7 @@ static const struct option longopts[] =
     {   "intf",             1,          0,      'I' },
     {   "warning",          1,          0,      OPT_WARNING },
     {   "stdout",           1,          0,      OPT_STDOUT },
+    {   "stats",            0,          0,      OPT_STATS },
 
     /* Audio options */
     {   "noaudio",          0,          0,      OPT_NOAUDIO },
@@ -275,15 +277,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
      */
     p_main->i_cpu_capabilities = CPUCapabilities();
     
-#if defined( __pentium__ ) || defined( __pentiumpro__ )
-    if( ! TestCPU( CPU_CAPABILITY_586 ) )
-    {
-        fprintf( stderr, "error: this program needs a Pentium CPU,\n"
-                         "please try a version without Pentium support\n" );
-        return( 1 );
-    }
-#endif
-
     /*
      * System specific initialization code
      */
@@ -327,6 +320,30 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
      * also open a console to display the debug messages.
      */
     RedirectSTDOUT();
+
+    if( p_main->b_stats )
+    {
+        char          p_capabilities[200];
+        p_capabilities[0] = '\0';
+
+#define PRINT_CAPABILITY( capability, string )                              \
+        if( p_main->i_cpu_capabilities & capability )                       \
+        {                                                                   \
+            strncat( p_capabilities, string " ",                            \
+                     sizeof(p_capabilities) - strlen(p_capabilities) );     \
+            p_capabilities[sizeof(p_capabilities) - 1] = '\0';              \
+        }
+
+        PRINT_CAPABILITY( CPU_CAPABILITY_486, "486" );
+        PRINT_CAPABILITY( CPU_CAPABILITY_586, "586" );
+        PRINT_CAPABILITY( CPU_CAPABILITY_PPRO, "Pentium Pro" );
+        PRINT_CAPABILITY( CPU_CAPABILITY_MMX, "MMX" );
+        PRINT_CAPABILITY( CPU_CAPABILITY_3DNOW, "3DNow!" );
+        PRINT_CAPABILITY( CPU_CAPABILITY_MMXEXT, "MMXEXT" );
+        PRINT_CAPABILITY( CPU_CAPABILITY_SSE, "SSE" );
+        PRINT_CAPABILITY( CPU_CAPABILITY_ALTIVEC, "Altivec" );
+        intf_StatMsg("info: CPU has capabilities %s", p_capabilities );
+    }
 
     /*
      * Initialize playlist and get commandline files
@@ -541,6 +558,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->b_video     = 1;
 
     p_main->i_warning_level = 0;
+    p_main->b_stats = 0;
 
     p_main->p_channel = NULL;
 
@@ -646,6 +664,10 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 
         case OPT_STDOUT:                                         /* --stdout */
             main_PutPszVariable( INTF_STDOUT_VAR, optarg );
+            break;
+
+        case OPT_STATS:
+            p_main->b_stats = 1;
             break;
 
         /* Audio options */
@@ -1022,12 +1044,6 @@ static void InstructionSignalHandler( int i_signal )
      * to an interface having been destroyed */
 
     /* Acknowledge the signal received */
-    fprintf( stderr, "warning: extended instructions unsupported, "
-                     "some optimizations will be disabled\n" );
-#ifdef SYS_LINUX
-    fprintf( stderr, "upgrade to kernel 2.4.x to get rid of this warning\n" );
-#endif
-
     i_illegal = 1;
     
 #ifdef HAVE_SIGRELSE
@@ -1152,6 +1168,15 @@ static int CPUCapabilities( void )
         if( i_illegal == 0 )
         {
             i_capabilities |= CPU_CAPABILITY_SSE;
+        }
+        else
+        {
+            fprintf( stderr, "warning: your OS doesn't have support for "
+                             "SSE instructions, "
+                             "some optimizations\nwill be disabled\n" );
+#ifdef SYS_LINUX
+            fprintf( stderr, "(you will need Linux kernel 2.4.x or later)\n" );
+#endif
         }
     }
     

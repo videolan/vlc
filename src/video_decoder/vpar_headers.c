@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.9 2001/09/26 12:32:25 massiot Exp $
+ * $Id: vpar_headers.c,v 1.10 2001/10/01 16:18:49 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -248,9 +248,8 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
         switch( GetBits32( &p_vpar->bit_stream ) )
         {
         case SEQUENCE_HEADER_CODE:
-#ifdef STATS
             p_vpar->c_sequences++;
-#endif
+
             SequenceHeader( p_vpar );
             return 0;
             break;
@@ -560,9 +559,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     /* Extension and User data. */
     ExtensionAndUserData( p_vpar );
 
-#ifdef STATS
     p_vpar->pc_pictures[p_vpar->picture.i_coding_type]++;
-#endif
 
     if( p_vpar->picture.i_current_structure )
     {
@@ -708,9 +705,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     }
 
     /* OK, now we are sure we will decode the picture. */
-#ifdef STATS
     p_vpar->pc_decoded_pictures[p_vpar->picture.i_coding_type]++;
-#endif
 
 #define P_picture p_vpar->picture.p_picture
     p_vpar->picture.b_error = 0;
@@ -832,9 +827,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     if( p_vpar->picture.b_error )
     {
         /* Trash picture. */
-#ifdef STATS
         p_vpar->pc_malformed_pictures[p_vpar->picture.i_coding_type]++;
-#endif
 
         vpar_SynchroEnd( p_vpar, p_vpar->picture.i_coding_type,
                          p_vpar->picture.i_structure, 1 );

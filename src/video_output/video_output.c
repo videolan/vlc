@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.140 2001/09/26 12:32:25 massiot Exp $
+ * $Id: video_output.c,v 1.141 2001/10/01 16:18:49 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -34,9 +34,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
-#ifdef STATS
-#   include <sys/times.h>
-#endif
+#include <sys/times.h>
 
 #include "config.h"
 #include "common.h"
@@ -214,13 +212,18 @@ vout_thread_t * vout_CreateThread   ( int *pi_status, int i_width, int i_height 
 
     /* Initialize statistics fields */
     p_vout->c_fps_samples       = 0;
+    p_vout->c_pictures          = 0;
+    p_vout->c_late_pictures     = 0;
+    p_vout->c_jitter_samples    = 0;
+    p_vout->display_jitter      = 0;
+    p_vout->c_loops             = 0;
 
     /* Initialize buffer index */
     p_vout->i_buffer_index      = 0;
 
     /* Initialize fonts */
-    p_vout->p_default_font = NULL;
-    p_vout->p_large_font = NULL;
+    p_vout->p_default_font      = NULL;
+    p_vout->p_large_font        = NULL;
 
     /* Initialize pictures and subpictures - translation tables and functions
      * will be initialized later in InitThread */
@@ -294,8 +297,8 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
         do
         {
             msleep( THREAD_SLEEP );
-        }while( (i_status != THREAD_OVER) && (i_status != THREAD_ERROR)
-                && (i_status != THREAD_FATAL) );
+        } while( (i_status != THREAD_OVER) && (i_status != THREAD_ERROR)
+                 && (i_status != THREAD_FATAL) );
     }
 }
 
@@ -873,10 +876,6 @@ static int InitThread( vout_thread_t *p_vout )
 
     vlc_mutex_lock( &p_vout->change_lock );
 
-#ifdef STATS
-    p_vout->c_loops = 0;
-#endif
-
     /* Create and initialize system-dependant method - this function issues its
      * own error messages */
     if( p_vout->pf_create( p_vout ) )
@@ -999,14 +998,13 @@ static void RunThread( vout_thread_t *p_vout)
         ephemer_date =  0;
         display_date =  0;
         current_date =  mdate();
-#ifdef STATS
+
         p_vout->c_loops++;
         if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
         {
-            intf_Msg("vout stats: picture heap: %d/%d",
-                     p_vout->i_pictures, VOUT_MAX_PICTURES);
+            intf_StatMsg( "vout info: picture heap: %d/%d",
+                          p_vout->i_pictures, VOUT_MAX_PICTURES );
         }
-#endif
 
         /*
          * Find the picture to display - this operation does not need lock,
@@ -1025,6 +1023,8 @@ static void RunThread( vout_thread_t *p_vout)
 
         if( p_pic )
         {
+            p_vout->c_pictures++;
+
             /* Computes FPS rate */
             p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ] = display_date;
 
@@ -1043,9 +1043,11 @@ static void RunThread( vout_thread_t *p_vout)
                     p_pic->i_status = DESTROYED_PICTURE;
                     p_vout->i_pictures--;
                 }
+                vlc_mutex_unlock( &p_vout->picture_lock );
+
                 intf_WarnMsg( 1,
                         "vout warning: late picture skipped (%p)", p_pic );
-                vlc_mutex_unlock( &p_vout->picture_lock );
+                p_vout->c_late_pictures++;
 
                 continue;
             }
@@ -1262,10 +1264,23 @@ static void RunThread( vout_thread_t *p_vout)
 #endif
         if( b_display /* && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) */ )
         {
+            mtime_t     jitter;
+
             p_vout->pf_display( p_vout );
 #ifndef SYS_BEOS
             p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
 #endif
+
+            /* Update statistics */
+            jitter = display_date - mdate();
+            if( jitter < 0 ) jitter = -jitter;
+            p_vout->display_jitter = ((p_vout->display_jitter
+                                        * p_vout->c_jitter_samples) + jitter)
+                                       / (p_vout->c_jitter_samples + 1);
+            if( p_vout->c_jitter_samples < MAX_JITTER_SAMPLES )
+            {
+                p_vout->c_jitter_samples++;
+            }
         }
 
         if( p_pic )
@@ -1341,15 +1356,18 @@ static void EndThread( vout_thread_t *p_vout )
     /* Store status */
     *p_vout->pi_status = THREAD_END;
 
-#ifdef STATS
+    if( p_main->b_stats )
     {
         struct tms cpu_usage;
         times( &cpu_usage );
 
-        intf_Msg( "vout stats: cpu usage (user: %d, system: %d)",
-                  cpu_usage.tms_utime, cpu_usage.tms_stime );
+        intf_StatMsg( "vout info: %d loops consuming user: %d, system: %d",
+                      p_vout->c_loops, cpu_usage.tms_utime, cpu_usage.tms_stime );
+        intf_StatMsg( "vout info: %d pictures received, discarded %d",
+                      p_vout->c_pictures, p_vout->c_late_pictures );
+        intf_StatMsg( "vout info: average display jitter of %lld µs",
+                      p_vout->display_jitter );
     }
-#endif
 
     /* Destroy all remaining pictures and subpictures */
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
@@ -1870,11 +1888,12 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
              (long) p_vout->c_fps_samples, (long) p_vout->render_time );
     Print( p_vout, 0, 0, LEFT_RALIGN, TOP_RALIGN, psz_buffer );
 
-#ifdef STATS
-    /*
-     * Print picture information in lower right corner
-     */
-    sprintf( psz_buffer, "%s picture %dx%d (%dx%d%+d%+d %s) -> %dx%d+%d+%d",
+    if( p_main->b_stats )
+    {
+        /*
+         * Print picture information in lower right corner
+         */
+        sprintf( psz_buffer, "%s picture %dx%d (%dx%d%+d%+d %s) -> %dx%d+%d+%d",
              (p_pic->i_type == YUV_420_PICTURE) ? "4:2:0" :
              ((p_pic->i_type == YUV_422_PICTURE) ? "4:2:2" :
               ((p_pic->i_type == YUV_444_PICTURE) ? "4:4:4" : "ukn-type")),
@@ -1889,8 +1908,8 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
              p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_height,
              p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_x,
              p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_y );
-    Print( p_vout, 0, 0, RIGHT_RALIGN, BOTTOM_RALIGN, psz_buffer );
-#endif
+        Print( p_vout, 0, 0, RIGHT_RALIGN, BOTTOM_RALIGN, psz_buffer );
+    }
 }
 
 /*****************************************************************************

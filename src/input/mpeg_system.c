@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.58 2001/09/24 11:17:49 massiot Exp $
+ * $Id: mpeg_system.c,v 1.59 2001/10/01 16:18:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -46,7 +46,7 @@
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
 
-#include "main.h"                           /* AC3/MPEG channel, SPU channel */
+#include "main.h"                   /* AC3/MPEG channel, SPU channel, b_stat */
 
 /*****************************************************************************
  * Local prototypes
@@ -643,10 +643,11 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
                      p_input->stream.pp_programs[0]->pp_es[i_new_es_number] );
     }
 
-#ifdef STATS
-    intf_Msg( "input info: The stream map after the PSM is now :" );
-    input_DumpStream( p_input );
-#endif
+    if( p_main->b_stats )
+    {
+        intf_StatMsg( "input info: The stream map after the PSM is now :" );
+        input_DumpStream( p_input );
+    }
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
@@ -905,9 +906,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
              && (!p_es->b_audio || !p_input->stream.control.b_mute) )
         {
             vlc_mutex_unlock( &p_input->stream.control.control_lock );
-#ifdef STATS
             p_es->c_packets++;
-#endif
             input_GatherPES( p_input, p_data, p_es, 1, 0 );
         }
         else
@@ -921,9 +920,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     if( b_trash )
     {
         p_input->pf_delete_packet( p_input->p_method_data, p_data );
-#ifdef STATS
-        p_input->c_packets_trashed++;
-#endif
+        p_input->stream.c_packets_trashed++;
     }
 }
 
@@ -997,9 +994,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
         ((p_es->p_decoder_fifo != NULL) || b_psi 
                                    || (p_pgrm_demux->i_pcr_pid == i_pid) ) )
     {
-#ifdef STATS
         p_es->c_packets++;
-#endif
 
         /* Extract adaptation field information if any */
 
@@ -1029,9 +1024,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                         "Invalid TS adaptation field (%p)",
                         p_data );
                     p_data->b_discard_payload = 1;
-#ifdef STATS
                     p_es->c_invalid_packets++;
-#endif
                 }
     
                 /* Now we are sure that the byte containing flags is present:
@@ -1139,9 +1132,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
     if( b_trash )
     {
         p_input->pf_delete_packet( p_input->p_method_data, p_data );
-#ifdef STATS
-        p_input->c_packets_trashed++;
-#endif
+        p_input->stream.c_packets_trashed++;
     }
     else
     {

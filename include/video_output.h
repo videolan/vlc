@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppenned video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.62 2001/09/26 12:32:25 massiot Exp $
+ * $Id: video_output.h,v 1.63 2001/10/01 16:18:48 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -99,7 +99,6 @@ typedef struct vout_yuv_s
     yuv_init_t *        pf_init;                    /* initialize YUV tables */
     yuv_reset_t *       pf_reset;                        /* reset YUV tables */
     yuv_end_t *         pf_end;                           /* free YUV tables */
-
 } vout_yuv_t;
 
 /*****************************************************************************
@@ -240,9 +239,12 @@ typedef struct vout_thread_s
     p_vout_font_t       p_default_font;                      /* default font */
     p_vout_font_t       p_large_font;                          /* large font */
 
-#ifdef STATS
+    /* Statistics */
     count_t             c_loops;
-#endif
+    count_t             c_pictures, c_late_pictures;
+    mtime_t             display_jitter;    /* average deviation from the PTS */
+    count_t             c_jitter_samples;  /* number of samples used for the *
+                                            * calculation of the jitter      */
 } vout_thread_t;
 
 /* Flags for changes - these flags are set in the i_changes field when another
@@ -260,6 +262,8 @@ typedef struct vout_thread_s
 
 /* Disabled for thread deadlocks issues --Meuuh */
 //#define VOUT_NODISPLAY_CHANGE   0xff00    /* changes which forbidden display */
+
+#define MAX_JITTER_SAMPLES      20
 
 /*****************************************************************************
  * Macros

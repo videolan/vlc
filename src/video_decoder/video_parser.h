@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.13 2001/09/05 16:07:50 massiot Exp $
+ * $Id: video_parser.h,v 1.14 2001/10/01 16:18:49 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -260,9 +260,8 @@ typedef struct video_synchro_s
                                          * reference picture
                                          * (backward_period * period / 2) */
 
-#ifdef STATS
+    /* statistics */
     unsigned int    i_trashed_pic, i_not_chosen_pic, i_pic;
-#endif
 } video_synchro_t;
 
 /* Synchro algorithms */
@@ -343,7 +342,6 @@ typedef struct vpar_thread_s
 
     void ( * pf_norm_scan ) ( u8 ppi_scan[2][64] );
 
-#ifdef STATS
     /* Statistics */
     count_t         c_loops;                              /* number of loops */
     count_t         c_sequences;                      /* number of sequences */
@@ -352,7 +350,6 @@ typedef struct vpar_thread_s
                                                    *        pictures decoded */
     count_t         pc_malformed_pictures[4];  /* number of pictures trashed
                                                 * during parsing             */
-#endif
 } vpar_thread_t;
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.4 2001/07/24 12:03:00 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.5 2001/10/01 16:18:49 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -144,10 +144,8 @@ void vpar_SynchroInit( vpar_thread_t * p_vpar )
     p_vpar->synchro.current_pts = mdate() + DEFAULT_PTS_DELAY;
     p_vpar->synchro.backward_pts = 0;
     p_vpar->synchro.i_current_period = p_vpar->synchro.i_backward_period = 0;
-#ifdef STATS
     p_vpar->synchro.i_trashed_pic = p_vpar->synchro.i_not_chosen_pic = 
         p_vpar->synchro.i_pic = 0;
-#endif
 }
 
 /*****************************************************************************
@@ -315,12 +313,10 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                     mstrtime(p_date, pts), b_decode ? "decoding" : "trashed",
                     S.p_tau[i_coding_type]);
 #endif
-#ifdef STATS
         if( !b_decode )
         {
             S.i_not_chosen_pic++;
         }
-#endif
         return( b_decode );
 #undef S
 #undef TAU_PRIME
@@ -333,9 +329,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
                         int i_structure )
 {
-#ifdef STATS
     p_vpar->synchro.i_trashed_pic++;
-#endif
 }
 
 /*****************************************************************************
@@ -422,8 +416,8 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
             p_vpar->synchro.i_n_p = p_vpar->synchro.i_eta_p;
         }
         p_vpar->synchro.i_eta_p = p_vpar->synchro.i_eta_b = 0;
-#ifdef STATS
-        if( p_vpar->synchro.i_type == VPAR_SYNCHRO_DEFAULT )
+
+        if( p_main->b_stats && p_vpar->synchro.i_type == VPAR_SYNCHRO_DEFAULT )
         {
             intf_Msg( "vpar synchro stats: I(%lld) P(%lld)[%d] B(%lld)[%d] YUV(%lld) : trashed %d:%d/%d",
                   p_vpar->synchro.p_tau[I_CODING_TYPE],
@@ -439,8 +433,8 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
             p_vpar->synchro.i_trashed_pic = p_vpar->synchro.i_not_chosen_pic
                 = p_vpar->synchro.i_pic = 0;
         }
-#endif
         break;
+
     case P_CODING_TYPE:
         p_vpar->synchro.i_eta_p++;
         if( p_vpar->synchro.i_eta_b
@@ -559,9 +553,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
     }
 #endif
 
-#ifdef STATS
     p_vpar->synchro.i_pic++;
-#endif
 }
 
 /*****************************************************************************

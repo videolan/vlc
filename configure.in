@@ -458,14 +458,6 @@ AC_ARG_ENABLE(debug,
 [ if test x$enableval = xyes; then DEBUG=1; fi ])
 
 dnl
-dnl  Enable/disable statistics
-dnl
-STATS=0
-AC_ARG_ENABLE(stats,
-[  --enable-stats          Enable printing of statistics (default disabled)],
-[ if test x$enableval = xyes; then STATS=1; fi ])
-
-dnl
 dnl  Trace mode
 dnl
 TRACE=0
@@ -994,7 +986,6 @@ AC_SUBST(ALIASES)
 AC_SUBST(DEFINE)
 AC_SUBST(INCLUDE)
 AC_SUBST(DEBUG)
-AC_SUBST(STATS)
 AC_SUBST(ASM)
 AC_SUBST(TRACE)
 AC_SUBST(CPROF)
@@ -1062,7 +1053,6 @@ vlc configuration
 -----------------
 vlc version           : ${VLC_VERSION}
 debug mode            : ${DEBUG}
-statistics            : ${STATS}
 trace mode            : ${TRACE}
 cprof/gprof support   : ${CPROF}/${GPROF}
 need builtin getopt   : ${NEED_GETOPT}

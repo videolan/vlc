@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.42 2001/09/05 16:07:49 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.43 2001/10/01 16:18:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -73,11 +73,8 @@ typedef struct es_descriptor_s
     struct decoder_fifo_s * p_decoder_fifo;
     vlc_thread_t            thread_id;                  /* ID of the decoder */
 
-#ifdef STATS
-    count_t                 c_payload_bytes;/* total of payload useful bytes */
     count_t                 c_packets;                 /* total packets read */
     count_t                 c_invalid_packets;       /* invalid packets read */
-#endif
 } es_descriptor_t;
 
 /* Special PID values - note that the PID is only on 13 bits, and that values
@@ -227,29 +224,13 @@ typedef struct stream_descriptor_s
 
     /* Stream control */
     stream_ctrl_t           control;
+
+    /* Statistics */
+    count_t                 c_packets_read;                  /* packets read */
+    count_t                 c_packets_trashed;            /* trashed packets */
 } stream_descriptor_t;
 
 #define MUTE_NO_CHANGE      -1
-
-/*****************************************************************************
- * i_p_config_t
- *****************************************************************************
- * This structure gives plugins pointers to the useful functions of input
- *****************************************************************************/
-struct input_thread_s;
-struct data_packet_s;
-struct es_descriptor_s;
-
-typedef struct i_p_config_s
-{
-    int                 (* pf_peek_stream)( struct input_thread_s *,
-                                            byte_t * buffer, size_t );
-    void                (* pf_demux_pes)( struct input_thread_s *,
-                                          struct data_packet_s *,
-                                          struct es_descriptor_s *,
-                                          boolean_t b_unit_start,
-                                          boolean_t b_packet_lost );
-} i_p_config_t;
 
 /*****************************************************************************
  * input_thread_t
@@ -311,7 +292,6 @@ typedef struct input_thread_s
     void                 (* pf_network_close ) ( struct input_thread_s * );
 #endif
 
-    i_p_config_t            i_p_config;              /* plugin configuration */
     char *                  p_source;
 
     int                     i_handle;           /* socket or file descriptor */
@@ -323,13 +303,7 @@ typedef struct input_thread_s
     /* General stream description */
     stream_descriptor_t     stream;                            /* PAT tables */
 
-#ifdef STATS
     count_t                 c_loops;
-    count_t                 c_bytes;                           /* bytes read */
-    count_t                 c_payload_bytes;         /* payload useful bytes */
-    count_t                 c_packets_read;                  /* packets read */
-    count_t                 c_packets_trashed;            /* trashed packets */
-#endif
 } input_thread_t;
 
 /* Input methods */

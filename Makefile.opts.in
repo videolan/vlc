@@ -35,7 +35,6 @@ ARCH = @ARCH@
 # Compilation options
 #
 DEBUG = @DEBUG@
-STATS = @STATS@
 TRACE = @TRACE@
 CPROF = @CPROF@
 GPROF = @GPROF@
@@ -131,10 +130,6 @@ endif
 ifeq ($(GPROF),1)
 PROGRAM_OPTIONS += GPROF
 DEFINE += -DGPROF
-endif
-ifeq ($(STATS),1)
-PROGRAM_OPTIONS += STATS
-DEFINE += -DSTATS
 endif
 
 # PROGRAM_BUILD is a complete identification of the build
@@ -233,9 +228,9 @@ endif
 ifneq (,$(findstring 86,$(ARCH)))
 # Optional Pentium Pro optimizations
 ifneq (,$(findstring ppro,$(ARCH)))
-CFLAGS += -march=pentiumpro -mcpu=pentiumpro
+CFLAGS += -mcpu=pentiumpro
 else
-CFLAGS += -march=pentium -mcpu=pentium
+CFLAGS += -mcpu=pentium
 endif
 endif
 

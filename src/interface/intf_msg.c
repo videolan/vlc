@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: intf_msg.c,v 1.37 2001/07/08 17:45:52 gbazin Exp $
+ * $Id: intf_msg.c,v 1.38 2001/10/01 16:18:49 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -63,7 +63,7 @@ typedef struct
 
 #ifdef TRACE
     /* Debugging informations - in TRACE mode, debug messages have calling
-     * location informations printed */
+     * location information printed */
     mtime_t date;                                     /* date of the message */
     char *  psz_file;               /* file in which the function was called */
     char *  psz_function;     /* function from which the function was called */
@@ -75,7 +75,8 @@ typedef struct
 #define INTF_MSG_STD    0                                /* standard message */
 #define INTF_MSG_ERR    1                                   /* error message */
 #define INTF_MSG_DBG    3                                   /* debug message */
-#define INTF_MSG_WARN   4                                  /* warning message*/
+#define INTF_MSG_WARN   4                                 /* warning message */
+#define INTF_MSG_STAT   5                               /* statistic message */
 
 
 /*****************************************************************************
@@ -237,6 +238,23 @@ void intf_WarnMsg( int i_level, char *psz_format, ... )
     }
 }
 
+/*****************************************************************************
+ * intf_StatMsg : print a statistic message
+ *****************************************************************************
+ * This function is the same as intf_Msg, except that it concerns statistic
+ * messages for testing purpose.
+ *****************************************************************************/
+void intf_StatMsg( char *psz_format, ... )
+{
+    va_list ap;
+    
+    if( p_main->b_stats )
+    {
+        va_start( ap, psz_format );
+        QueueMsg( p_main->p_msg, INTF_MSG_STAT, psz_format, ap );
+        va_end( ap );
+    }
+}
 
 /*****************************************************************************
  * _intf_DbgMsg: print a debugging message                               (ok ?)
@@ -597,6 +615,7 @@ static void PrintMsg( intf_msg_item_t *p_msg )
     switch( p_msg->i_type )
     {
     case INTF_MSG_STD:                                   /* regular messages */
+    case INTF_MSG_STAT:
     case INTF_MSG_ERR:
         snprintf( psz_msg, i_msg_len, "%s", p_msg->psz_msg );
         break;
@@ -622,6 +641,7 @@ static void PrintMsg( intf_msg_item_t *p_msg )
     switch( p_msg->i_type )
     {
     case INTF_MSG_STD:                                  /* standard messages */
+    case INTF_MSG_STAT:
         fprintf( stdout, "%s\n", psz_msg );
         break;
     case INTF_MSG_ERR:                                     /* error messages */
@@ -656,6 +676,7 @@ static void PrintMsg( intf_msg_item_t *p_msg )
     switch( p_msg->i_type )
     {
     case INTF_MSG_STD:                                  /* standard messages */
+    case INTF_MSG_STAT:
     case INTF_MSG_DBG:                                     /* debug messages */
         fprintf( stdout, "%s\n", p_msg->psz_msg );
         break;

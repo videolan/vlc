@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-intf.c,v 1.27 2001/07/18 14:21:00 massiot Exp $
+ * $Id: input_ext-intf.c,v 1.28 2001/10/01 16:18:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -191,7 +191,8 @@ void input_DumpStream( input_thread_t * p_input )
     char        psz_time2[OFFSETTOTIME_MAX_SIZE];
 
 #define S   p_input->stream
-    intf_Msg( "input info: Dumping stream ID 0x%x", S.i_stream_id );
+    intf_Msg( "input info: Dumping stream ID 0x%x [OK:%d/D:%d]", S.i_stream_id,
+              S.c_packets_read, S.c_packets_trashed );
     if( S.b_seekable )
         intf_Msg( "input info: seekable stream, position: %lld/%lld (%s/%s)",
                   S.p_selected_area->i_tell, S.p_selected_area->i_size,
@@ -213,9 +214,10 @@ void input_DumpStream( input_thread_t * p_input )
         for( j = 0; j < p_input->stream.pp_programs[i]->i_es_number; j++ )
         {
 #define ES  p_input->stream.pp_programs[i]->pp_es[j]
-            intf_Msg( "input info: ES 0x%x, stream 0x%x, type 0x%x, %s",
+            intf_Msg( "input info: ES 0x%x, stream 0x%x, type 0x%x, %s [OK:%d/ERR:%d]",
                       ES->i_id, ES->i_stream_id, ES->i_type,
-                      ES->p_decoder_fifo != NULL ? "selected" : "not selected");
+                      ES->p_decoder_fifo != NULL ? "selected" : "not selected",
+                      ES->c_packets, ES->c_invalid_packets );
 #undef ES
         }
     }

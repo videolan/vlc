@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_msg.h,v 1.15 2001/05/31 03:12:49 sam Exp $
+ * $Id: intf_msg.h,v 1.16 2001/10/01 16:18:48 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -86,6 +86,7 @@ void         intf_MsgDestroy     ( void );
 void         intf_Msg            ( char *psz_format, ... );
 void         intf_ErrMsg         ( char *psz_format, ... );
 void         intf_WarnMsg        ( int i_level, char *psz_format, ... );
+void         intf_StatMsg        ( char *psz_format, ... );
 
 void         intf_MsgImm         ( char *psz_format, ... );
 void         intf_ErrMsgImm      ( char *psz_format, ... );
