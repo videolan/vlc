@@ -1629,7 +1629,7 @@ then
   if test "${SYS}" = "darwin"
   then
     AX_ADD_PLUGINS([vcd cdda])
-    AX_ADD_LDFLAGS([vcd cdda],[-framework IOKit -framework CoreFoundation])
+    AX_ADD_LDFLAGS([vcd vcdx cdda],[-framework IOKit -framework CoreFoundation])
   fi
 fi
 
