@@ -240,7 +240,7 @@ int ReadDir( playlist_t *p_playlist, char *psz_name , int i_mode, int *pi_positi
     while( p_dir_content != NULL )
     {
         int i_size_entry = strlen( psz_name ) +
-                           p_dir_content->d_namlen + 2;
+                           strlen( p_dir_content->d_name ) + 2;
         char *psz_uri = (char *)malloc( sizeof(char)*i_size_entry);
 
         sprintf( psz_uri, "%s/%s", psz_name, p_dir_content->d_name );
