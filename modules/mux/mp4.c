@@ -742,7 +742,30 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
     int  i_stream_type;
     int  i_object_type_indication;
     int  i_decoder_specific_info_size;
+    int i;
+    int64_t i_bitrate_avg = 0;
+    int64_t i_bitrate_max = 0;
 
+    /* Compute avg/max bitrate */
+    for( i = 0; i < p_stream->i_entry_count; i++ )
+    {
+        i_bitrate_avg += p_stream->entry[i].i_size;
+        if( p_stream->entry[i].i_length > 0)
+        {
+            int64_t i_bitrate = I64C(8000000) * p_stream->entry[i].i_size / p_stream->entry[i].i_length;
+            if( i_bitrate > i_bitrate_max )
+                i_bitrate_max = i_bitrate;
+        }
+    }
+
+    if( p_stream->i_duration > 0 )
+        i_bitrate_avg = I64C(8000000) * i_bitrate_avg / p_stream->i_duration;
+    else
+        i_bitrate_avg = 0;
+    if( i_bitrate_max <= 1 )
+        i_bitrate_max = 0x7fffffff;
+
+    /* */
     if( p_stream->fmt.i_extra > 0 )
     {
         i_decoder_specific_info_size =
@@ -791,8 +814,8 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
     bo_add_8   ( esds, i_object_type_indication );
     bo_add_8   ( esds, ( i_stream_type << 2 ) | 1 );
     bo_add_24be( esds, 1024 * 1024 );       // bufferSizeDB
-    bo_add_32be( esds, 0x7fffffff );        // maxBitrate
-    bo_add_32be( esds, 0 );                 // avgBitrate
+    bo_add_32be( esds, i_bitrate_max );     // maxBitrate
+    bo_add_32be( esds, i_bitrate_avg );     // avgBitrate
 
     if( p_stream->fmt.i_extra > 0 )
     {
@@ -1561,11 +1584,6 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
                           ((int64_t)p_stream->fmt.video.i_height << 16) /
                           VOUT_ASPECT_FACTOR;
             }
-            fprintf( stderr, "%dx%d -> %dx%d a=%d/%d=%f\n",
-                     p_stream->fmt.video.i_width, p_stream->fmt.video.i_height,
-                     i_width, p_stream->fmt.video.i_height,
-                     p_stream->fmt.video.i_aspect, VOUT_ASPECT_FACTOR,
-                     (float)p_stream->fmt.video.i_aspect/(float)VOUT_ASPECT_FACTOR );
             // width (presentation)
             bo_add_32be( tkhd, i_width );
             // height(presentation)
