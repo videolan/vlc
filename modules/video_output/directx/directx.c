@@ -1624,6 +1624,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->i_planes = 3;
             break;
 
+        case VLC_FOURCC('U','Y','V','Y'):
         case VLC_FOURCC('Y','U','Y','2'):
 
             p_pic->p->p_pixels = p_pic->p_sys->ddsd.lpSurface;
