@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.25 2001/04/15 04:19:57 sam Exp $
+ * $Id: intf_beos.cpp,v 1.26 2001/04/29 17:03:20 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -119,23 +119,26 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
     menu_bar = new BMenuBar(rect, "main menu");
     AddChild( menu_bar );
 
-	BMenu *m; 
-	BMenu *am;
+	BMenu *mFile; 
+	BMenu *mAudio;
 	CDMenu *cd_menu;
+	
+	BMenuItem *mItem;
 
-	menu_bar->AddItem( m = new BMenu("File") );
+	menu_bar->AddItem( mFile = new BMenu("File") );
 	menu_bar->ResizeToPreferred();
-	m->AddItem( new BMenuItem("Open File" B_UTF8_ELLIPSIS, new BMessage(OPEN_FILE), 'O'));
+	mFile->AddItem(mItem = new BMenuItem("Open File" B_UTF8_ELLIPSIS, new BMessage(OPEN_FILE), 'O'));
 	cd_menu = new CDMenu("Open Disc");
-	m->AddItem(cd_menu);
-	m->AddSeparatorItem();
-	m->AddItem( new BMenuItem("About" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED), 'A'));
-	m->AddItem( new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
+	mFile->AddItem(cd_menu);
+	mFile->AddSeparatorItem();
+	mFile->AddItem(mItem = new BMenuItem("About" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED), 'A'));
+	mItem->SetTarget( be_app );
+	mFile->AddItem(mItem = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
 
-	menu_bar->AddItem (am = new BMenu("Audio") );
+	menu_bar->AddItem ( mAudio = new BMenu("Audio") );
 	menu_bar->ResizeToPreferred();
-	am->AddItem( new LanguageMenu("Language", AUDIO_ES, p_intf) );
-	am->AddItem( new LanguageMenu("Subtitles", SPU_ES, p_intf) );
+	mAudio->AddItem( new LanguageMenu("Language", AUDIO_ES, p_intf) );
+	mAudio->AddItem( new LanguageMenu("Subtitles", SPU_ES, p_intf) );
 	
 
     rect = Bounds();
@@ -245,10 +248,10 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 	Activate();
     switch( p_message->what )
     {
-    case B_ABOUT_REQUESTED:
-		alert = new BAlert(VOUT_TITLE, "BeOS " VOUT_TITLE "\n\n<www.videolan.org>", "Ok");
-	    alert->Go();
-	    break;    	
+//    case B_ABOUT_REQUESTED:
+//		alert = new BAlert(VOUT_TITLE, "BeOS " VOUT_TITLE "\n\n<www.videolan.org>", "Ok");
+//	    alert->Go();
+//	    break;    	
     
     case OPEN_FILE:
     	if(file_panel)

@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: beos_specific.cpp,v 1.9 2001/04/14 07:41:20 sam Exp $
+ * $Id: beos_specific.cpp,v 1.10 2001/04/29 17:03:20 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -25,12 +25,14 @@
 #include <Application.h>
 #include <Roster.h>
 #include <Path.h>
+#include <Alert.h>
 #include <stdio.h>
 #include <string.h> /* strdup() */
 #include <malloc.h>   /* free() */
 
 extern "C"
 {
+#include "config.h"
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
@@ -46,7 +48,8 @@ public:
     VlcApplication(char* );
     ~VlcApplication();
 
-    void ReadyToRun();
+    virtual void ReadyToRun();
+    virtual void AboutRequested();
 };
 
 /*****************************************************************************
@@ -140,7 +143,17 @@ VlcApplication::~VlcApplication( )
 }
 
 /*****************************************************************************
- * ~ReadyToRun: called when the BApplication is initialized
+ * AboutRequested: called by the system on B_ABOUT_REQUESTED
+ *****************************************************************************/
+void VlcApplication::AboutRequested( )
+{
+	BAlert *alert;
+	alert = new BAlert( VOUT_TITLE, "BeOS " VOUT_TITLE "\n\n<www.videolan.org>", "Ok" );
+	alert->Go( NULL );
+}
+
+/*****************************************************************************
+ * ReadyToRun: called when the BApplication is initialized
  *****************************************************************************/
 void VlcApplication::ReadyToRun( )
 {

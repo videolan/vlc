@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.24 2001/04/02 22:40:07 richards Exp $
+ * $Id: vout_beos.cpp,v 1.25 2001/04/29 17:03:20 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -121,29 +121,45 @@ BWindow *beos_GetAppWindow(char *name)
 
 int32 DrawingThread(void *data)
 {
-    VideoWindow *w;
-    w = (VideoWindow*) data;
+  VideoWindow *w;
+  w = (VideoWindow*) data;
     
-    while(!w->teardownwindow)
+  while(!w->teardownwindow)
+  {
+    if (w->Lock())
     {
-    w->Lock();
-       if( w->fDirty )
-            {
-           	if(w->fUsingOverlay)
-				{
-				rgb_color key;
-				w->view->SetViewOverlay(w->bitmap[w->i_buffer_index], w->bitmap[w->i_buffer_index]->Bounds(), w->Bounds(), &key, B_FOLLOW_ALL,
-				B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL|B_OVERLAY_TRANSFER_CHANNEL);
-				w->view->SetViewColor(key);
-				}
-           	else
-           		w->view->DrawBitmap(w->bitmap[w->i_buffer_index], w->bitmap[w->i_buffer_index]->Bounds(), w->Bounds());
-            w->fDirty = false;
-            }
-    w->Unlock();
-   	snooze(20000);
-    }
-    return B_OK;
+      if( w->fDirty )
+      {
+        if(w->fUsingOverlay)
+        {
+          rgb_color key;
+           w->view->SetViewOverlay( w->bitmap[w->i_buffer_index],
+                                    w->bitmap[w->i_buffer_index]->Bounds(),
+                                    w->Bounds(),
+                                    &key,
+                                    B_FOLLOW_ALL,
+				                    B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL
+				                    | B_OVERLAY_TRANSFER_CHANNEL );
+           w->view->SetViewColor(key);
+         }
+         else
+         {
+           w->view->DrawBitmap( w->bitmap[w->i_buffer_index],
+                                w->bitmap[w->i_buffer_index]->Bounds(),
+                                w->Bounds());
+         }
+         
+         w->fDirty = false;
+       }
+     w->Unlock();
+   }
+   else  // we couldn't lock the window, it probably closed.
+     return B_ERROR;
+     
+   snooze (20000);
+ } // while
+
+  return B_OK;
 }
 
 /*****************************************************************************

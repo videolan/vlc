@@ -4,7 +4,14 @@
 
 HEAD
 
-  * Nothing yet
+  * BeOS crash fix by Wade Majors <guru@startrek.com>.
+  * Slight modification in ClockManageRef: after a synchro reinit, we still
+    do the mwait and re-init last-cr.
+  * New audio output using direct AC3 pass-thru.
+  * Fix for a buffer overflow in the Gnome interface by Shane Harper
+    <shanegh@optusnet.com.au>.
+  * DVD chapter change fixed.
+  * Fixed a bug in TS input, which should be much smoother now.
 
 0.2.73
 Sat, 28 Apr 2001 07:02:35 +0200
