@@ -283,12 +283,10 @@ static void Run( intf_thread_t *p_intf )
                                  i_newvol*100/AOUT_VOLUME_MAX );
             }
         }
-        else if( i_action == ACTIONID_FULLSCREEN )
+        else if( i_action == ACTIONID_FULLSCREEN && p_vout )
         {
-            if( p_vout )
-            {
-                p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-            }
+            var_Get( p_vout, "fullscreen", &val );
+            var_Set( p_vout, "fullscreen", (vlc_value_t)!val.b_bool );
         }
         else if( i_action == ACTIONID_PLAY )
         {
