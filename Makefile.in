@@ -436,10 +436,7 @@ snapshot:
 	mv /tmp/${SNAPSHOTDIR}.tar.bz2 ..
 	@echo "Sources are in ../${SNAPSHOTDIR}.tar.[gz,bz2]"
 
-plugins: lib $(PLUGINS:%=lib/%.so)
-
-lib:
-	mkdir -p lib
+plugins: $(PLUGINS:%=lib/%.so)
 
 FORCE:
 
