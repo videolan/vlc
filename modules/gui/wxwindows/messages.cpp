@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.18 2003/12/22 02:24:52 sam Exp $
+ * $Id: messages.cpp,v 1.19 2003/12/27 14:36:30 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -157,7 +157,7 @@ void Messages::UpdateLog()
 
             /* Append all messages to log window */
             textctrl->SetDefaultStyle( *dbg_attr );
-            (*textctrl) << wxU(p_sub->p_msg[i_start].psz_module);
+            (*textctrl) << wxL2U(p_sub->p_msg[i_start].psz_module);
 
             switch( p_sub->p_msg[i_start].i_type )
             {
@@ -180,7 +180,7 @@ void Messages::UpdateLog()
             }
 
             /* Add message */
-            (*textctrl) << wxU(p_sub->p_msg[i_start].psz_msg) << wxT("\n");
+            (*textctrl) << wxL2U(p_sub->p_msg[i_start].psz_msg) << wxT("\n");
         }
 
         vlc_mutex_lock( p_sub->p_lock );

@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001,2003 VideoLAN
- * $Id: fileinfo.cpp,v 1.21 2003/12/22 02:24:52 sam Exp $
+ * $Id: fileinfo.cpp,v 1.22 2003/12/27 14:36:30 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -104,17 +104,17 @@ void FileInfo::UpdateFileInfo()
          * retrieved with the GetItemText() method, but it doesn't work on
          * Windows when the wxTR_HIDE_ROOT style is set. That's why we need to
          * use the fileinfo_root_label variable... */
-        fileinfo_root = fileinfo_tree->AddRoot( wxU(p_input->psz_name) );
-        fileinfo_root_label = wxU(p_input->psz_name);
+        fileinfo_root = fileinfo_tree->AddRoot( wxL2U(p_input->psz_name) );
+        fileinfo_root_label = wxL2U(p_input->psz_name);
     }
-    else if( fileinfo_root_label == wxU(p_input->psz_name) )
+    else if( fileinfo_root_label == wxL2U(p_input->psz_name) )
     {
         return;
     }
 
     /* We rebuild the tree from scratch */
     fileinfo_tree->DeleteChildren( fileinfo_root );
-    fileinfo_root_label = wxU(p_input->psz_name);
+    fileinfo_root_label = wxL2U(p_input->psz_name);
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -123,12 +123,12 @@ void FileInfo::UpdateFileInfo()
     while( p_cat )
     {
         wxTreeItemId cat = fileinfo_tree->AppendItem( fileinfo_root,
-                                                      wxU(p_cat->psz_name) );
+                                                      wxL2U(p_cat->psz_name) );
         input_info_t *p_info = p_cat->p_info;
         while( p_info )
         {
-            fileinfo_tree->AppendItem( cat, (wxString)wxU(p_info->psz_name) +
-                                       wxT(": ") + wxU(p_info->psz_value) );
+            fileinfo_tree->AppendItem( cat, (wxString)wxL2U(p_info->psz_name) +
+                                       wxT(": ") + wxL2U(p_info->psz_value) );
             p_info = p_info->p_next;
         }
         p_cat = p_cat->p_next;
