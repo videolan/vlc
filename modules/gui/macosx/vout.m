@@ -945,14 +945,17 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void)toggleFloatOnTop
 {
-    if( config_GetInt( p_vout, "video-on-top" ) )
+    vlc_value_t val;
+    if( var_Get( p_vout, "video-on-top", &val )>=0 && val.b_bool)
     {
-        config_PutInt( p_vout, "video-on-top", 0 );
+        val.b_bool = VLC_FALSE;
+        var_Set( p_vout, "video-on-top", val );
         [p_vout->p_sys->o_window setLevel: NSNormalWindowLevel];
     }
     else
     {
-        config_PutInt( p_vout, "video-on-top", 1 );
+        val.b_bool = VLC_TRUE;
+        var_Set( p_vout, "video-on-top", val );
         [p_vout->p_sys->o_window setLevel: NSStatusWindowLevel];
     }
 }
