@@ -207,6 +207,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Misc init */
     aout_DateSet( &p_sys->end_date, 0 );
+    p_sys->i_last_block_size = 0;
     p_sys->b_packetizer = VLC_FALSE;
     p_sys->i_headers = 0;
 
