@@ -402,6 +402,9 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
 Playlist::~Playlist()
 {
+    if( pp_sds != NULL )
+        free( pp_sds );
+
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                        FIND_ANYWHERE );
@@ -1394,7 +1397,7 @@ wxMenu *Playlist::SDMenu()
         if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
             i_number++;
     }
-    if( i_number ) pp_sds = (char **)malloc( i_number * sizeof(void *) );
+    if( i_number ) pp_sds = (char **)calloc( i_number, sizeof(void *) );
 
     i_number = 0;
     for( int i_index = 0; i_index < p_list->i_count; i_index++ )
