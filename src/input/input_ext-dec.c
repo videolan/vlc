@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.34 2002/08/26 23:00:23 massiot Exp $
+ * $Id: input_ext-dec.c,v 1.35 2002/10/21 10:46:34 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -469,5 +469,58 @@ void NextPTS( bit_stream_t * p_bit_stream, mtime_t * pi_pts,
         *pi_pts = 0;
         if( pi_dts != NULL) *pi_dts = 0;
     }
+}
+
+/****************************************************************************
+ * input_NextPES : extract a PES from the fifo. If pp_pes is NULL then this 
+ * PES is deleted, else pp_pes will be set to this PES
+ ****************************************************************************/
+int input_NextPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
+{
+    pes_packet_t *p_pes, *p_next;
+
+    vlc_mutex_lock( &p_fifo->data_lock );
+
+    /* if fifo is emty wait */
+    while( !p_fifo->p_first )
+    {
+        if( p_fifo->b_die )
+        {
+            vlc_mutex_unlock( &p_fifo->data_lock );
+            if( pp_pes )
+            {
+                *pp_pes = NULL;
+            }
+            return( -1 );
+        }
+        vlc_cond_signal( &p_fifo->data_wait );
+        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
+    }
+    p_pes = p_fifo->p_first;
+
+    p_next = p_pes->p_next;
+    p_pes->p_next = NULL;
+
+
+    p_fifo->p_first = p_next;
+    p_fifo->i_depth--;
+
+    if( !p_fifo->p_first )
+    {
+        /* No PES in the fifo */
+        /* pp_last no longer valid */
+        p_fifo->pp_last = &p_fifo->p_first;
+    }
+    vlc_mutex_unlock( &p_fifo->data_lock );
+
+    if( pp_pes )
+    {
+        *pp_pes = p_pes;
+    }
+    else
+    {
+        input_DeletePES( p_fifo->p_packets_mgt, p_pes );
+    }
+    return( 0 );
 }
 

@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.2 2002/10/20 17:44:17 fenrir Exp $
+ * $Id: araw.c,v 1.3 2002/10/21 10:46:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -52,7 +52,7 @@ typedef struct adec_thread_s
     waveformatex_t  format;
 
     /* The bit stream structure handles the PES stream at the bit level */
-    bit_stream_t        bit_stream;
+//    bit_stream_t        bit_stream;
 
     /* Input properties */
     decoder_fifo_t *p_fifo;
@@ -191,48 +191,6 @@ static void GetWaveFormatEx( waveformatex_t *p_wh,
     }
 }
 
-/* get the first pes from fifo */
-static pes_packet_t *PESGetFirst( decoder_fifo_t *p_fifo )
-{
-    pes_packet_t *p_pes;
-
-    vlc_mutex_lock( &p_fifo->data_lock );
-
-    /* if fifo is empty wait */ 
-    while( !p_fifo->p_first )
-    {
-        if( p_fifo->b_die )
-        {
-            vlc_mutex_unlock( &p_fifo->data_lock );
-            return NULL;
-        }
-        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-    }
-    p_pes = p_fifo->p_first;
-
-    vlc_mutex_unlock( &p_fifo->data_lock );
-
-    return p_pes;
-}
-static int PESGetSize( pes_packet_t *p_pes )
-{
-    data_packet_t *p_data;
-    int i_size = 0;
-
-    if( !p_pes )
-    {
-        return( 0 );
-    }
-
-    for( p_data = p_pes->p_first; p_data != NULL; p_data = p_data->p_next )
-    {
-        i_size += p_data->p_payload_end - p_data->p_payload_start;
-    }
-
-    return( i_size );
-}
-
-
 /*****************************************************************************
  * InitThread: initialize data before entering main loop
  *****************************************************************************/
@@ -282,8 +240,9 @@ static int InitThread( adec_thread_t * p_adec )
             return( -1 );
     }
     p_adec->output_format.i_rate = p_adec->format.i_samplespersec;
-    if( p_adec->output_format.i_channels <= 0 || 
-            p_adec->output_format.i_channels > 5 )
+
+    if( p_adec->format.i_channels <= 0 || 
+            p_adec->format.i_channels > 5 )
     {
         msg_Err( p_adec->p_fifo, "bad channels count(1-5)" );
         return( -1 );
@@ -306,10 +265,42 @@ static int InitThread( adec_thread_t * p_adec )
     }
 
     /* Init the BitStream */
-    InitBitstream( &p_adec->bit_stream, p_adec->p_fifo,
-                   NULL, NULL );
+//    InitBitstream( &p_adec->bit_stream, p_adec->p_fifo,
+//                   NULL, NULL );
 
     return( 0 );
+}
+
+static void GetPESData( u8 *p_buf, int i_max, pes_packet_t *p_pes )
+{
+    int i_copy;
+    int i_count;
+
+    data_packet_t   *p_data;
+
+    i_count = 0;
+    p_data = p_pes->p_first;
+    while( p_data != NULL && i_count < i_max )
+    {
+
+        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start, i_max - i_count );
+        
+        if( i_copy > 0 )
+        {
+            memcpy( p_buf,
+                    p_data->p_payload_start,
+                    i_copy );
+        }
+
+        p_data = p_data->p_next;
+        i_count += i_copy;
+        p_buf   += i_copy;
+    }
+
+    if( i_count < i_max )
+    {
+        memset( p_buf, 0, i_max - i_count );
+    }
 }
 
 /*****************************************************************************
@@ -320,12 +311,17 @@ static void DecodeThread( adec_thread_t *p_adec )
     aout_buffer_t   *p_aout_buffer;
     int             i_samples; // per channels
     int             i_size;
+
     pes_packet_t    *p_pes;
 
     /* **** get samples count **** */
-    p_pes = PESGetFirst( p_adec->p_fifo );
-    
-    i_size = PESGetSize( p_pes );
+    if( input_NextPES( p_adec->p_fifo, &p_pes ) < 0 )
+    {
+        p_adec->p_fifo->b_error = 1;
+        return;
+    }
+    i_size = p_pes->i_pes_size;
+
     if( p_adec->format.i_blockalign > 0 )
     {
         i_size -= i_size % p_adec->format.i_blockalign;
@@ -368,11 +364,13 @@ static void DecodeThread( adec_thread_t *p_adec )
     p_aout_buffer->start_date = aout_DateGet( &p_adec->date );
     p_aout_buffer->end_date = aout_DateIncrement( &p_adec->date,
                                                   i_samples );
-    GetChunk( &p_adec->bit_stream,
-              p_aout_buffer->p_buffer,
-              p_aout_buffer->i_nb_bytes );
+
+    GetPESData( p_aout_buffer->p_buffer, p_aout_buffer->i_nb_bytes, p_pes );
 
     aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
+
+
+    input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
 }
 
 
