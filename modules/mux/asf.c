@@ -887,8 +887,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
         i_den = VOUT_ASPECT_FACTOR * p_sys->track[i].fmt.video.i_width;
         vlc_reduce( &i_dst_num, &i_dst_den, i_num, i_den, 0 );
 
-        msg_Dbg( p_mux, "pixel aspect-ratio: %i/%i", i_dst_num, i_dst_den,
-                 p_sys->track[i].fmt.video.i_aspect, VOUT_ASPECT_FACTOR );
+        msg_Dbg( p_mux, "pixel aspect-ratio: %i/%i", i_dst_num, i_dst_den );
 
         bo_add_guid ( &bo, &asf_object_metadata_guid );
         bo_addle_u64( &bo, i_cm_size );
