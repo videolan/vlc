@@ -53,6 +53,8 @@ static int MosaicCallback( vlc_object_t *, char const *, vlc_value_t,
  *****************************************************************************/
 struct filter_sys_t
 {
+    vlc_mutex_t lock;
+
     image_handler_t *p_image;
 #ifdef IMAGE_2PASSES
     image_handler_t *p_image2;
@@ -157,6 +159,9 @@ static int CreateFilter( vlc_object_t *p_this )
     p_filter->pf_sub_filter = Filter;
     p_sys->p_pic = NULL;
 
+    vlc_mutex_init( p_filter, &p_sys->lock );
+    vlc_mutex_lock( &p_sys->lock );
+
 #define GET_VAR( name, min, max )                                           \
     p_sys->i_##name = __MIN( max, __MAX( min,                               \
                 var_CreateGetInteger( p_filter, "mosaic-" #name ) ) );      \
@@ -215,6 +220,8 @@ static int CreateFilter( vlc_object_t *p_this )
         p_sys->i_order_length = i_index;
     }
 
+    vlc_mutex_unlock( &p_sys->lock );
+
     vlc_thread_set_priority( p_filter, VLC_THREAD_PRIORITY_OUTPUT );
 
     return VLC_SUCCESS;
@@ -229,6 +236,8 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys = p_filter->p_sys;
     libvlc_t *p_libvlc = p_filter->p_libvlc;
     int i_index;
+
+    vlc_mutex_lock( &p_sys->lock );
 
     if( !p_sys->b_keep )
     {
@@ -260,6 +269,8 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_Destroy( p_libvlc, "mosaic-keep-aspect-ratio" );
 
     if( p_sys->p_pic ) p_sys->p_pic->pf_release( p_sys->p_pic );
+    vlc_mutex_unlock( &p_sys->lock );
+    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 
@@ -322,6 +333,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_stop = 0;
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->i_alpha = p_sys->i_alpha;
+
+    vlc_mutex_lock( &p_sys->lock );
 
     if( p_sys->i_position == 0 ) /* use automatic positioning */
     {
@@ -447,15 +460,22 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             p_converted = image_Convert( p_sys->p_image, p_middle,
                                          &fmt_middle, &fmt_out );
             p_middle->pf_release( p_middle );
-#else
-            p_converted = image_Convert( p_sys->p_image, p_pic->p_picture,
-                                         &fmt_in, &fmt_out );
-#endif
+
             if( !p_converted )
             {
                 msg_Warn( p_filter, "image chroma conversion failed" );
                 continue;
             }
+#else
+            p_converted = image_Convert( p_sys->p_image, p_pic->p_picture,
+                                         &fmt_in, &fmt_out );
+            if( !p_converted )
+            {
+                msg_Warn( p_filter,
+                           "image resizing and chroma conversion failed" );
+                continue;
+            }
+#endif
         }
         else
         {
@@ -474,6 +494,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         {
             msg_Err( p_filter, "cannot allocate SPU region" );
             p_filter->pf_sub_buffer_del( p_filter, p_spu );
+            vlc_mutex_unlock( &p_sys->lock );
             vlc_mutex_unlock( lockval.p_address );
             return NULL;
         }
@@ -532,6 +553,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_region_prev = p_region;
     }
 
+    vlc_mutex_unlock( &p_sys->lock );
     vlc_mutex_unlock( lockval.p_address );
 
     return p_spu;
@@ -547,45 +569,59 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     filter_sys_t *p_sys = (filter_sys_t *) p_data;
     if( !strcmp( psz_var, "mosaic-alpha" ) )
     {
+        vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "Changing alpha from %d/255 to %d/255",
                          p_sys->i_alpha, newval.i_int);
         p_sys->i_alpha = __MIN( __MAX( newval.i_int, 0 ), 255 );
+        vlc_mutex_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, "mosaic-height" ) )
     {
+        vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "Changing height from %dpx to %dpx",
                           p_sys->i_height, newval.i_int );
         p_sys->i_height = __MAX( newval.i_int, 0 );
+        vlc_mutex_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, "mosaic-width" ) )
     {
+        vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "Changing width from %dpx to %dpx",
                          p_sys->i_width, newval.i_int );
         p_sys->i_width = __MAX( newval.i_int, 0 );
+        vlc_mutex_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, "mosaic-xoffset" ) )
     {
+        vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "Changing x offset from %dpx to %dpx",
                          p_sys->i_xoffset, newval.i_int );
         p_sys->i_xoffset = __MAX( newval.i_int, 0 );
+        vlc_mutex_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, "mosaic-yoffset" ) )
     {
+        vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "Changing y offset from %dpx to %dpx",
                          p_sys->i_yoffset, newval.i_int );
         p_sys->i_yoffset = __MAX( newval.i_int, 0 );
+        vlc_mutex_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, "mosaic-vborder" ) )
     {
+        vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "Changing vertical border from %dpx to %dpx",
                          p_sys->i_vborder, newval.i_int );
         p_sys->i_vborder = __MAX( newval.i_int, 0 );
+        vlc_mutex_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, "mosaic-hborder" ) )
     {
+        vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "Changing horizontal border from %dpx to %dpx",
                          p_sys->i_vborder, newval.i_int );
         p_sys->i_hborder = __MAX( newval.i_int, 0 );
+        vlc_mutex_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, "mosaic-position" ) )
     {
@@ -595,26 +631,33 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
         }
         else
         {
+            vlc_mutex_lock( &p_sys->lock );
             msg_Dbg( p_this, "Changing position method from %d (%s) to %d (%s)",
                              p_sys->i_position, ppsz_pos_descriptions[p_sys->i_position],
                              newval.i_int, ppsz_pos_descriptions[newval.i_int]);
             p_sys->i_position = newval.i_int;
+            vlc_mutex_unlock( &p_sys->lock );
         }
     }
     else if( !strcmp( psz_var, "mosaic-rows" ) )
     {
+        vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "Changing number of rows from %d to %d",
                          p_sys->i_rows, newval.i_int );
         p_sys->i_rows = __MAX( newval.i_int, 1 );
+        vlc_mutex_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, "mosaic-cols" ) )
     {
+        vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "Changing number of columns from %d to %d",
                          p_sys->i_cols, newval.i_int );
         p_sys->i_cols = __MAX( newval.i_int, 1 );
+        vlc_mutex_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, "mosaic-keep-aspect-ratio" ) )
     {
+        vlc_mutex_lock( &p_sys->lock );
         if( newval.i_int )
         {
             msg_Dbg( p_this, "Keep aspect ratio" );
@@ -625,6 +668,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
             msg_Dbg( p_this, "Don't keep aspect ratio" );
             p_sys->b_ar = 0;
         }
+        vlc_mutex_unlock( &p_sys->lock );
     }
     return VLC_SUCCESS;
 }
