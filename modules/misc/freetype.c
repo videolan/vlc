@@ -131,6 +131,7 @@ struct line_desc_t
 
 static void Render    ( filter_t *, subpicture_t *, subpicture_data_t * );
 static void FreeString( subpicture_data_t * );
+static void FreeLine( line_desc_t * );
 
 /*****************************************************************************
  * filter_sys_t: freetype local data
@@ -395,9 +396,9 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
     filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_subpic = 0;
     subpicture_data_t *p_string = 0;
-    line_desc_t  *p_line = 0, *p_next = 0;
+    line_desc_t  *p_line = 0, *p_next = 0, *p_prev = 0;
     int i, i_pen_y, i_pen_x, i_error, i_glyph_index, i_previous;
-    uint32_t *psz_unicode, *psz_unicode_orig = 0, i_char;
+    uint32_t *psz_unicode, *psz_unicode_orig = 0, i_char, *psz_line_start;
     int i_string_length;
     char *psz_string;
     vlc_iconv_t iconv_handle = (vlc_iconv_t)(-1);
@@ -505,6 +506,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
     i_pen_y = 0;
     i_previous = 0;
     i = 0;
+    psz_line_start = psz_unicode;
 
 #define face p_sys->p_face
 #define glyph face->glyph
@@ -519,6 +521,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
 
         if( i_char == '\n' )
         {
+            psz_line_start = psz_unicode;
             p_next = NewLine( psz_string );
             if( p_next == NULL )
             {
@@ -529,6 +532,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
             p_line->i_width = line.xMax;
             p_line->i_height = face->size->metrics.height >> 6;
             p_line->pp_glyphs[ i ] = NULL;
+            p_prev = p_line;
             p_line = p_next;
             result.x = __MAX( result.x, line.xMax );
             result.y += face->size->metrics.height >> 6;
@@ -578,6 +582,43 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
 
         /* Do rest */
         line.xMax = p_line->p_glyph_pos[i].x + glyph_size.xMax - glyph_size.xMin + ((FT_BitmapGlyph)tmp_glyph)->left;
+        if( line.xMax > p_filter->fmt_out.video.i_visible_width - 20 )
+        {
+            p_line->pp_glyphs[ i ] = NULL;
+            FreeLine( p_line );
+            p_line = NewLine( psz_string );
+            if( p_prev )
+            {
+                p_prev->p_next = p_line;
+            }
+            else
+            {
+                p_string->p_lines = p_line;
+            }
+            while( psz_unicode > psz_line_start && *psz_unicode != ' ' )
+            {
+                psz_unicode--;
+            }
+            if( psz_unicode == psz_line_start )
+            {
+                msg_Err( p_filter, "Unbreakable string" );
+                goto error;
+            }
+            else
+            {
+
+                *psz_unicode = '\n';
+            }
+            psz_unicode = psz_line_start;
+            i_pen_x = 0;
+            i_previous = 0;
+            line.xMin = 0;
+            line.xMax = 0;
+            line.yMin = 0;
+            line.yMax = 0;
+            i = 0;
+            continue;            
+        }
         line.yMax = __MAX( line.yMax, glyph_size.yMax );
         line.yMin = __MIN( line.yMin, glyph_size.yMin );
 
@@ -611,9 +652,20 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
     return NULL;
 }
 
-static void FreeString( subpicture_data_t *p_string )
+static void FreeLine( line_desc_t *p_line )
 {
     unsigned int i;
+    for( i = 0; p_line->pp_glyphs[ i ] != NULL; i++ )
+    {
+        FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[ i ] );
+    }
+    free( p_line->pp_glyphs );
+    free( p_line->p_glyph_pos );
+    free( p_line );
+}
+
+static void FreeString( subpicture_data_t *p_string )
+{
     line_desc_t *p_line, *p_next;
 
     if( !p_string ) return;
@@ -621,13 +673,7 @@ static void FreeString( subpicture_data_t *p_string )
     for( p_line = p_string->p_lines; p_line != NULL; p_line = p_next )
     {
         p_next = p_line->p_next;
-        for( i = 0; p_line->pp_glyphs[ i ] != NULL; i++ )
-        {
-            FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[ i ] );
-        }
-        free( p_line->pp_glyphs );
-        free( p_line->p_glyph_pos );
-        free( p_line );
+        FreeLine( p_line );
     }
 
     free( p_string->psz_text );
