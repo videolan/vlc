@@ -2004,7 +2004,7 @@ then
       fi ])
   AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no, ${FREETYPE_PATH})
 
-  if test "x${FREETYPE_CONFIG}" != "xno"
+  if test "x${FREETYPE_CONFIG}" != "xno" -a "x${have_xosd}" = "xtrue"
   then
     PLUGINS="${PLUGINS} osdtext"
     CFLAGS_osdtext="${CFLAGS_osdtext} `${FREETYPE_CONFIG} --cflags`"
@@ -2896,7 +2896,8 @@ if test "x${NEED_QTE_MAIN}" != "xno"
 then
     PLUGINS="${PLUGINS} qte_main"
     CPPFLAGS_qte="${CPPFLAGS_qte} -DNEED_QTE_MAIN"
-	CPPFLAGS_opie="${CPPFLAGS_opie} -DNEED_QTE_MAIN"
+    CPPFLAGS_opie="${CPPFLAGS_opie} -DNEED_QTE_MAIN"
+    CFLAGS_vout_sdl="${CFLAGS_vout_sdl} -DNEED_QTE_MAIN"
     CPPFLAGS_qte_main="${CFLAGS_qte_main} ${CPPFLAGS_qte}"
     LDFLAGS_qte_main="${LDFLAGS_qte_main} ${LDFLAGS_qte}"
 fi
