@@ -58,25 +58,20 @@ int access_vaControlDefault( input_thread_t *p_input, int i_query, va_list args 
  *****************************************************************************/
 access_t *__access2_New( vlc_object_t *p_obj, char *psz_mrl )
 {
-    msg_Err( p_obj, "access2_New not yet implemented" );
-    return NULL;
-#if 0
     access_t *p_access = vlc_object_create( p_obj, VLC_OBJECT_ACCESS );
 
     char    *psz_dup = strdup( psz_mrl ? psz_mrl : "" );
     char    *psz = strchr( psz_dup, ':' );
-    char    *psz_module;
 
-    if( p_demux == NULL )
+    if( p_access == NULL )
     {
         free( psz_dup );
         return NULL;
     }
 
     /* Parse URL */
-    p_demux->psz_access = NULL;
-    p_demux->psz_demux  = NULL;
-    p_demux->psz_path   = NULL;
+    p_access->psz_access = NULL;
+    p_access->psz_path   = NULL;
 
     if( psz )
     {
@@ -86,105 +81,58 @@ access_t *__access2_New( vlc_object_t *p_obj, char *psz_mrl )
         {
             psz += 2;
         }
-        p_demux->psz_path = strdup( psz );
+        p_access->psz_path = strdup( psz );
 
         psz = strchr( psz_dup, '/' );
         if( psz )
         {
             *psz++ = '\0';
-            p_demux->psz_access = strdup( psz_dup );
-            p_demux->psz_demux  = strdup( psz );
+            p_access->psz_access = strdup( psz_dup );
         }
     }
     else
     {
-        p_demux->psz_path = strdup( psz_mrl );
+        p_access->psz_path = strdup( psz_mrl );
     }
     free( psz_dup );
 
 
-    if( p_demux->psz_access == NULL )
+    p_access->psz_demux = strdup( "" );
+    if( p_access->psz_access == NULL )
     {
-        p_demux->psz_access = strdup( "" );
+        p_access->psz_access = strdup( "" );
     }
-    if( p_demux->psz_demux == NULL )
+    if( p_access->psz_path == NULL )
     {
-        p_demux->psz_demux = strdup( "" );
+        p_access->psz_path = strdup( "" );
     }
-    if( p_demux->psz_path == NULL )
-    {
-        p_demux->psz_path = strdup( "" );
-    }
-    msg_Dbg( p_obj, "demux2_New: '%s' -> access='%s' demux='%s' path='%s'",
+    msg_Dbg( p_obj, "access2_New: '%s' -> access='%s' path='%s'",
              psz_mrl,
-             p_demux->psz_access, p_demux->psz_demux, p_demux->psz_path );
+             p_access->psz_access, p_access->psz_path );
 
-    p_demux->s          = s;
-    p_demux->out        = out;
-
-    p_demux->pf_demux   = NULL;
-    p_demux->pf_control = NULL;
-    p_demux->p_sys      = NULL;
-
-    psz_module = p_demux->psz_demux;
-    if( *psz_module == '\0' && strrchr( p_demux->psz_path, '.' ) )
-    {
-        /* XXX: add only file without any problem here and with strong detection.
-         *  - no .mp3, .a52, ... (aac is added as it works only by file ext anyway
-         *  - wav can't be added 'cause of a52 and dts in them as raw audio
-         */
-        static struct { char *ext; char *demux; } exttodemux[] =
-        {
-            { "aac",  "aac" },
-            { "aiff", "aiff" },
-            { "asf",  "asf" }, { "wmv",  "asf" }, { "wma",  "asf" },
-            { "avi",  "avi" },
-            { "au",   "au" },
-            { "flac", "flac" },
-            { "dv",   "dv" },
-            { "m3u",  "m3u" },
-            { "mkv",  "mkv" }, { "mka",  "mkv" }, { "mks",  "mkv" },
-            { "mp4",  "mp4" }, { "m4a",  "mp4" }, { "mov",  "mp4" }, { "moov", "mp4" },
-            { "mod",  "mod" }, { "xm",   "mod" },
-            { "nsv",  "nsv" },
-            { "ogg",  "ogg" }, { "ogm",  "ogg" },
-            { "pva",  "pva" },
-            { "rm",   "rm" },
-            { "",  "" },
-        };
-
-        char *psz_ext = strrchr( p_demux->psz_path, '.' ) + 1;
-        int  i;
-
-        for( i = 0; exttodemux[i].ext != NULL; i++ )
-        {
-            if( !strcasecmp( psz_ext, exttodemux[i].ext ) )
-            {
-                psz_module = exttodemux[i].demux;
-                break;
-            }
-        }
-    }
+    p_access->pf_read    = NULL;
+    p_access->pf_block   = NULL;
+    p_access->pf_seek    = NULL;
+    p_access->pf_control = NULL;
+    p_access->p_sys      = NULL;
 
     /* Before module_Need (for var_Create...) */
-    vlc_object_attach( p_demux, p_obj );
+    vlc_object_attach( p_access, p_obj );
 
-    p_demux->p_module =
-        module_Need( p_demux, "demux2", psz_module,
-                     !strcmp( psz_module, p_demux->psz_demux ) ? VLC_TRUE : VLC_FALSE );
+    p_access->p_module =
+        module_Need( p_access, "access2", p_access->psz_access, VLC_FALSE );
 
-    if( p_demux->p_module == NULL )
+    if( p_access->p_module == NULL )
     {
-        vlc_object_detach( p_demux );
-        free( p_demux->psz_path );
-        free( p_demux->psz_demux );
-        free( p_demux->psz_access );
-        vlc_object_destroy( p_demux );
+        vlc_object_detach( p_access );
+        free( p_access->psz_access );
+        free( p_access->psz_path );
+        free( p_access->psz_demux );
+        vlc_object_destroy( p_access );
         return NULL;
     }
 
-    return p_demux;
-#endif
+    return p_access;
 }
 
 /*****************************************************************************
