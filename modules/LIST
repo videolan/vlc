@@ -296,8 +296,6 @@ $Id$
  
  * mux_ts: MPEG transport stream muxer
 
- * mux_ts_dvbpsi: MPEG transport stream muxer using libdvbpsi
-
  * ncurses: interface module using the ncurses library.
 
  * nsv: NullSoft Video demuxer
@@ -329,8 +327,6 @@ $Id$
  * postprocessing_mmx: Video Postprocessing module using MMX
  
  * postprocessing_mmxext: Video Postprocessing module using MMX_EXT 
-
- * ps2: new generation MPEG PS demuxer
 
  * ps: input module for MPEG PS decapsulation.
  
@@ -431,11 +427,7 @@ $Id$
 
  * trivial_resampler: Simple audio resampler
  
- * ts2: new generation MPEG TS demuxer
-
  * ts: input module for MPEG TS decapsulation.
-
- * ts_dvbpsi: same as ts using libdvbpsi
 
  * u8tofixed32: unsigned 8 bits to fixed 32 bits audio converter 
 

@@ -105,7 +105,7 @@ static void    CloseProgram( input_thread_t * p_input );
 
 /* Satellite */
 #define BUDGET_TEXT N_("Budget mode")
-#define BUDGET_LONGTEXT N_("This allows you to stream an entire transponder with a budget card. Budget mode is compatible with the ts2 demux.")
+#define BUDGET_LONGTEXT N_("This allows you to stream an entire transponder with a budget card.")
 
 #define SATNO_TEXT N_("Satellite number in the Diseqc system")
 #define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=normal diseqc, -1=A, -2=B simple diseqc]")
