@@ -39,6 +39,7 @@ Buildrequires: XFree86-devel, desktop-file-utils, libpostproc >= 1.0
 %{!?_without_mpeg2dec:BuildRequires: mpeg2dec-devel >= 0.3.2}
 %{!?_without_wxwindows:BuildRequires: wxGTK-devel >= 2.4.2}
 %{!?_without_mozilla:BuildRequires: mozilla-devel >= %{mozver}}
+%{!?_without_mozilla:BuildRequires: mozplugger >= 1.3.2}
 %{!?_without_speex:BuildRequires: speex-devel >= 1.0.3}
 %{!?_without_aa:BuildRequires: aalib >= 1.4}
 
@@ -69,7 +70,7 @@ Requires: XFree86, desktop-file-utils
 %{?_with_ncurses:Requires: ncurses}
 %{!?_without_xosd:Requires: xosd >= 2.2.5}
 %{!?_without_lirc:Requires: lirc}
-%{!?_without_mozilla:Requires: mozilla = %{mozver}}
+%{!?_without_mozilla:Requires: mozilla >= %{mozver}}
 %{!?_without_speex:Requires: speex >= 1.0.3}
 %{!?_without_wxwindows:Requires: wxGTK >= 2.4.2}
 
@@ -105,10 +106,10 @@ to link statically to it.
 %setup -q -n vlc-%{version}-%{release}
 
 %build
-#cp %{_libdir}/mozilla/plugins/plugger.so %{_libdir}/mozilla-%{mozver}/plugins/plugger.so.bak -f
-#mv %{_libdir}/mozilla-%{mozver}/plugins/plugger.so.bak %{_libdir}/mozilla-%{mozver}/plugins/plugger.so -f
-#rm %{_libdir}/mozilla -fr
-#ln %{_libdir}/mozilla-%{mozver} %{_libdir}/mozilla -sf
+cp %{_libdir}/mozilla/plugins/mozplugger.so %{_libdir}/mozilla-%{mozver}/plugins/mozplugger.so.bak -f
+mv %{_libdir}/mozilla-%{mozver}/plugins/mozplugger.so.bak %{_libdir}/mozilla-%{mozver}/plugins/mozplugger.so -f
+rm %{_libdir}/mozilla -fr
+ln %{_libdir}/mozilla-%{mozver} %{_libdir}/mozilla -sf
 ln /usr/share/idl/mozilla-%{mozver} /usr/share/idl/mozilla -sf
 #ln %{_libdir}/libxvidcore.so.2 %{_libdir}/libxvidcore.so -sf
 
@@ -206,25 +207,24 @@ desktop-file-install --vendor gnome --delete-original             \
 
 %post
 ln /dev/cdrom /dev/dvd -sf
-ln %{_libdir}/libxvidcore.so.2 %{_libdir}/libxvidcore.so -sf
 
 %postun
 rm -f /dev/dvd
 rm /usr/share/idl/mozilla -fr
-rm %{_libdir}/libxvidcore.so -f
 
 %clean
 rm -rf %{buildroot}
 rm /usr/share/idl/mozilla -fr
-#rm /usr/lib/mozilla -fr
-#mkdir /usr/lib/mozilla/plugins -p --mode=755
-#mv %{_libdir}/mozilla-%{mozver}/plugins/plugger.so %{_libdir}/mozilla/plugins -f
-#rm %{_libdir}/libxvidcore.so -f
+rm /usr/lib/mozilla -fr
+mkdir /usr/lib/mozilla/plugins -p --mode=755
+mv %{_libdir}/mozilla-%{mozver}/plugins/mozplugger.so %{_libdir}/mozilla/plugins -f
 
 %files -f vlc.lang
 %defattr(-, root, root)
 %doc AUTHORS COPYING ChangeLog MAINTAINERS README THANKS
-%doc doc/fortunes.txt doc/web-streaming.html
+%doc doc/fortunes.txt doc/web-streaming.html doc/intf-vcd.txt doc/vlc-howto.sgml
+%doc doc/bugreport-howto.txt
+%exclude %{_datadir}/doc/vlc/*
 %{_bindir}/*vlc
 %{_libdir}/vlc
 %{_libdir}/libvlc_pic.a
@@ -241,6 +241,10 @@ rm /usr/share/idl/mozilla -fr
 %{_libdir}/libvlc.a
 
 %changelog
+* Sat Nov 29 2003 Jason Luka
+- Fixed Matroska/EBML problem
+- Updated script for mozilla plugin installation
+
 * Fri Nov 28 2003 Jason Luka
 - Update to 0.7.0-test1
 - Updated version numbers on dependancies
