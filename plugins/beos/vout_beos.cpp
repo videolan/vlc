@@ -188,7 +188,7 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
 			}
 		memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
 	 	memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
-	 	SetTitle("VideoLAN (BBitmap)");
+	 	SetTitle(VOUT_TITLE " (BBitmap output)");
 	 }
 
 	if(fUsingOverlay)
@@ -198,7 +198,7 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
 		view->SetViewOverlay(bitmap[0], bitmap[0]->Bounds(), Bounds(), &key, B_FOLLOW_ALL,
 				B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
 		view->SetViewColor(key);
-	 	SetTitle("VideoLAN (Overlay)");
+	 	SetTitle(VOUT_TITLE " (Overlay output)");
 		GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight); 
 		SetSizeLimits((float) Bounds().IntegerWidth(), maxWidth, (float) Bounds().IntegerHeight(), maxHeight);
 		}

@@ -19,9 +19,15 @@
 
 static GnomeUIInfo menubar_file_menu_uiinfo[] =
 {
-  GNOMEUIINFO_MENU_OPEN_ITEM (on_menubar_open_activate, NULL),
   {
-    GNOME_APP_UI_ITEM, N_("Open _disc..."),
+    GNOME_APP_UI_ITEM, N_("_Open File..."),
+    N_("Open a File"),
+    (gpointer) on_menubar_open_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_OPEN,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_("Open _Disc..."),
     N_("Open a DVD or VCD"),
     (gpointer) on_menubar_disc_activate, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_CDROM,
@@ -94,7 +100,7 @@ create_intf_window (void)
   GtkWidget *dockitem;
   GtkWidget *toolbar;
   GtkWidget *tmp_toolbar_icon;
-  GtkWidget *toolbar_open;
+  GtkWidget *toolbar_file;
   GtkWidget *toolbar_disc;
   GtkWidget *toolbar_back;
   GtkWidget *toolbar_stop;
@@ -215,23 +221,23 @@ create_intf_window (void)
   gtk_toolbar_set_button_relief (GTK_TOOLBAR (toolbar), GTK_RELIEF_NONE);
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_OPEN);
-  toolbar_open = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+  toolbar_file = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Open"),
-                                _("Open File"), NULL,
+                                _("Open a File"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
-  gtk_widget_ref (toolbar_open);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_open", toolbar_open,
+  gtk_widget_ref (toolbar_file);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_file", toolbar_file,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (toolbar_open);
+  gtk_widget_show (toolbar_file);
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_CDROM);
   toolbar_disc = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Disc"),
-                                NULL, NULL,
+                                _("Open a DVD or VCD"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_disc);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_disc", toolbar_disc,
@@ -409,7 +415,7 @@ create_intf_window (void)
                       GTK_SIGNAL_FUNC (on_intf_window_drag_data_received),
                       NULL);
   gnome_app_install_menu_hints (GNOME_APP (intf_window), menubar_uiinfo);
-  gtk_signal_connect (GTK_OBJECT (toolbar_open), "clicked",
+  gtk_signal_connect (GTK_OBJECT (toolbar_file), "clicked",
                       GTK_SIGNAL_FUNC (on_toolbar_open_clicked),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (toolbar_disc), "clicked",
@@ -495,10 +501,16 @@ static GnomeUIInfo intf_popup_uiinfo[] =
     0, (GdkModifierType) 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_MENU_OPEN_ITEM (on_popup_open_activate, NULL),
   {
-    GNOME_APP_UI_ITEM, N_("Open _disc..."),
-    N_("Open DVD or VCD"),
+    GNOME_APP_UI_ITEM, N_("_Open File..."),
+    N_("Open a File"),
+    (gpointer) on_popup_open_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_OPEN,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_("Open _Disc..."),
+    N_("Open a DVD or VCD"),
     (gpointer) on_popup_disc_activate, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_CDROM,
     0, (GdkModifierType) 0, NULL
@@ -857,11 +869,20 @@ create_intf_disc (void)
 {
   GtkWidget *intf_disc;
   GtkWidget *dialog_vbox4;
+  GtkWidget *hbox2;
   GtkWidget *frame1;
   GtkWidget *vbox4;
   GSList *disc_group = NULL;
   GtkWidget *disc_dvd;
   GtkWidget *disc_vcd;
+  GtkWidget *frame2;
+  GtkWidget *table1;
+  GtkWidget *label15;
+  GtkWidget *label16;
+  GtkObject *disc_title_adj;
+  GtkWidget *disc_title;
+  GtkObject *disc_chapter_adj;
+  GtkWidget *disc_chapter;
   GtkWidget *hbox1;
   GtkWidget *label14;
   GtkWidget *disc_name;
@@ -869,7 +890,7 @@ create_intf_disc (void)
   GtkWidget *disc_ok;
   GtkWidget *disc_cancel;
 
-  intf_disc = gnome_dialog_new (_("Open disc"), NULL);
+  intf_disc = gnome_dialog_new (_("Open Disc"), NULL);
   gtk_object_set_data (GTK_OBJECT (intf_disc), "intf_disc", intf_disc);
   gtk_window_set_policy (GTK_WINDOW (intf_disc), FALSE, FALSE, FALSE);
 
@@ -877,12 +898,19 @@ create_intf_disc (void)
   gtk_object_set_data (GTK_OBJECT (intf_disc), "dialog_vbox4", dialog_vbox4);
   gtk_widget_show (dialog_vbox4);
 
+  hbox2 = gtk_hbox_new (FALSE, 5);
+  gtk_widget_ref (hbox2);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "hbox2", hbox2,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hbox2);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox4), hbox2, TRUE, TRUE, 0);
+
   frame1 = gtk_frame_new (_("Disc type"));
   gtk_widget_ref (frame1);
   gtk_object_set_data_full (GTK_OBJECT (intf_disc), "frame1", frame1,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (frame1);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox4), frame1, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox2), frame1, TRUE, TRUE, 0);
 
   vbox4 = gtk_vbox_new (FALSE, 0);
   gtk_widget_ref (vbox4);
@@ -899,22 +927,80 @@ create_intf_disc (void)
   gtk_widget_show (disc_dvd);
   gtk_box_pack_start (GTK_BOX (vbox4), disc_dvd, FALSE, FALSE, 0);
 
-  disc_vcd = gtk_radio_button_new_with_label (disc_group, _("VCD (unsupported yet)"));
+  disc_vcd = gtk_radio_button_new_with_label (disc_group, _("VCD"));
   disc_group = gtk_radio_button_group (GTK_RADIO_BUTTON (disc_vcd));
   gtk_widget_ref (disc_vcd);
   gtk_object_set_data_full (GTK_OBJECT (intf_disc), "disc_vcd", disc_vcd,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (disc_vcd);
   gtk_box_pack_start (GTK_BOX (vbox4), disc_vcd, FALSE, FALSE, 0);
+  gtk_widget_set_sensitive (disc_vcd, FALSE);
 
-  hbox1 = gtk_hbox_new (FALSE, 0);
+  frame2 = gtk_frame_new (_("Starting position"));
+  gtk_widget_ref (frame2);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "frame2", frame2,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (frame2);
+  gtk_box_pack_start (GTK_BOX (hbox2), frame2, TRUE, TRUE, 0);
+
+  table1 = gtk_table_new (2, 2, FALSE);
+  gtk_widget_ref (table1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "table1", table1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (table1);
+  gtk_container_add (GTK_CONTAINER (frame2), table1);
+  gtk_container_set_border_width (GTK_CONTAINER (table1), 5);
+  gtk_table_set_row_spacings (GTK_TABLE (table1), 5);
+  gtk_table_set_col_spacings (GTK_TABLE (table1), 5);
+
+  label15 = gtk_label_new (_("Title"));
+  gtk_widget_ref (label15);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "label15", label15,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label15);
+  gtk_table_attach (GTK_TABLE (table1), label15, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label15), 0, 0.5);
+
+  label16 = gtk_label_new (_("Chapter"));
+  gtk_widget_ref (label16);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "label16", label16,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label16);
+  gtk_table_attach (GTK_TABLE (table1), label16, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label16), 0, 0.5);
+
+  disc_title_adj = gtk_adjustment_new (1, 1, 65536, 1, 10, 10);
+  disc_title = gtk_spin_button_new (GTK_ADJUSTMENT (disc_title_adj), 1, 0);
+  gtk_widget_ref (disc_title);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "disc_title", disc_title,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (disc_title);
+  gtk_table_attach (GTK_TABLE (table1), disc_title, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  disc_chapter_adj = gtk_adjustment_new (1, 1, 65536, 1, 10, 10);
+  disc_chapter = gtk_spin_button_new (GTK_ADJUSTMENT (disc_chapter_adj), 1, 0);
+  gtk_widget_ref (disc_chapter);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "disc_chapter", disc_chapter,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (disc_chapter);
+  gtk_table_attach (GTK_TABLE (table1), disc_chapter, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  hbox1 = gtk_hbox_new (FALSE, 5);
   gtk_widget_ref (hbox1);
   gtk_object_set_data_full (GTK_OBJECT (intf_disc), "hbox1", hbox1,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (hbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox4), hbox1, TRUE, TRUE, 0);
 
-  label14 = gtk_label_new (_("Device name (eg. /dev/cdrom or /dev/dvd): "));
+  label14 = gtk_label_new (_("Device name:"));
   gtk_widget_ref (label14);
   gtk_object_set_data_full (GTK_OBJECT (intf_disc), "label14", label14,
                             (GtkDestroyNotify) gtk_widget_unref);

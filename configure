@@ -610,7 +610,7 @@ host_os=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$host" 1>&6
 
 
-VLC_VERSION=0.2.62
+VLC_VERSION=0.2.63
 
 VLC_CODENAME=Urumov
 

@@ -702,6 +702,15 @@ on_disc_ok_clicked                     (GtkButton       *button,
         return;
     }
     
+    /* Select title and chapter */
+    main_PutIntVariable( INPUT_TITLE_VAR, gtk_spin_button_get_value_as_int(
+                              GTK_SPIN_BUTTON( lookup_widget(
+                                  GTK_WIDGET(button), "disc_title" ) ) ) );
+
+    main_PutIntVariable( INPUT_CHAPTER_VAR, gtk_spin_button_get_value_as_int(
+                              GTK_SPIN_BUTTON( lookup_widget(
+                                  GTK_WIDGET(button), "disc_chapter" ) ) ) );
+
     /* Build source name and add it to playlist */
     sprintf( psz_source, "%s:%s", psz_method, psz_device );
     intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, psz_source );

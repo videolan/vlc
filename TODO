@@ -82,7 +82,7 @@ Urgency: Normal
 Description: Write DVD plugin
  We need a DVD plugin which read the device directly, calls DeCSS
  (optional) and parse .ifo files.
-Status: Todo
+Status: Done 8 Feb 2001 (stef)
 
 Task: 0x44
 Difficulty: Guru
@@ -90,7 +90,7 @@ Urgency: Important
 Description: Write input_ext-intf.c
  This file will provide functions which allow the interface to change
  the pace of reading and change the position in the file.
-Status: Todo
+Status: Done 8 Feb 2001 (Meuuh)
 
 Task: 0x43
 Difficulty: Medium
@@ -278,7 +278,7 @@ Description: SPU error recovery
  The SPU decoder does not behave very well when a packet is missed or when
  it gets the stream at the middle of an SPU packet. Make it more error-
  friendly.
-Status: Todo
+Status: Done 26 Feb 2001 (sam)
 
 Task: 0x2b
 Difficulty: Hard
@@ -287,7 +287,7 @@ Description: Shoot the TODO list on the web site
  The TODO list on the web site hasn't been updated for months. We may
  wonder then why the hell to we put a TODO list on the web site ? Maybe
  we'd better shoot it in the head, that would make its suffering end.
-Status: Todo
+Status: Done 5 Mar 2001 (sam)
 
 Task: 0x2a
 Difficulty: Medium
@@ -454,7 +454,7 @@ Description: Split interface/video_output
  interface for instance. This will require a major rewrite of
  the interface, and a solid knowledge of how the vlc internals
  work.
-Status: Todo
+Status: Done 11 Feb 2001 (sam)
 
 Task: 0x17
 Difficulty: Hard
@@ -542,7 +542,7 @@ Description: Framebuffer exit bug
  When the vlc abnormally exits in framebuffer mode, it leaves
  the console in an unusable state. This does not happen on
  the Matrox framebuffer, but it does on the VESA one.
-Status: Todo
+Status: Done 18 Feb 2001 (sam)
 
 Task: 0x0c
 Difficulty: Hard
@@ -650,7 +650,7 @@ Description: Better Gnome interface
  The Gnome interface has many stubs and is actually rather
  unfunctional. Someone should make the buttons work when
  the appropriate hooks exist.
-Status: Todo
+Status: Done 12 Feb 2001 (sam)
 
 Task: 0x01
 Difficulty: Hard

@@ -85,12 +85,15 @@
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
 	      <name>menubar_open</name>
+	      <tooltip>Open a File</tooltip>
 	      <signal>
 		<name>activate</name>
 		<handler>on_menubar_open_activate</handler>
-		<last_modification_time>Sun, 11 Feb 2001 16:55:04 GMT</last_modification_time>
+		<last_modification_time>Sun, 04 Mar 2001 21:01:45 GMT</last_modification_time>
 	      </signal>
-	      <stock_item>GNOMEUIINFO_MENU_OPEN_ITEM</stock_item>
+	      <label>_Open File...</label>
+	      <right_justify>False</right_justify>
+	      <stock_icon>GNOME_STOCK_MENU_OPEN</stock_icon>
 	    </widget>
 
 	    <widget>
@@ -102,7 +105,7 @@
 		<handler>on_menubar_disc_activate</handler>
 		<last_modification_time>Sun, 04 Mar 2001 01:28:32 GMT</last_modification_time>
 	      </signal>
-	      <label>Open _disc...</label>
+	      <label>Open _Disc...</label>
 	      <right_justify>False</right_justify>
 	      <stock_icon>GNOME_STOCK_MENU_CDROM</stock_icon>
 	    </widget>
@@ -275,12 +278,12 @@
 	<widget>
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
-	  <name>toolbar_open</name>
-	  <tooltip>Open File</tooltip>
+	  <name>toolbar_file</name>
+	  <tooltip>Open a File</tooltip>
 	  <signal>
 	    <name>clicked</name>
 	    <handler>on_toolbar_open_clicked</handler>
-	    <last_modification_time>Sun, 11 Feb 2001 17:06:24 GMT</last_modification_time>
+	    <last_modification_time>Sun, 04 Mar 2001 21:01:24 GMT</last_modification_time>
 	  </signal>
 	  <label>Open</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_OPEN</stock_pixmap>
@@ -290,6 +293,7 @@
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_disc</name>
+	  <tooltip>Open a DVD or VCD</tooltip>
 	  <signal>
 	    <name>clicked</name>
 	    <handler>on_toolbar_disc_clicked</handler>
@@ -604,24 +608,27 @@
   <widget>
     <class>GtkPixmapMenuItem</class>
     <name>popup_open</name>
+    <tooltip>Open a File</tooltip>
     <signal>
       <name>activate</name>
       <handler>on_popup_open_activate</handler>
-      <last_modification_time>Sun, 11 Feb 2001 23:49:08 GMT</last_modification_time>
+      <last_modification_time>Sun, 04 Mar 2001 21:01:58 GMT</last_modification_time>
     </signal>
-    <stock_item>GNOMEUIINFO_MENU_OPEN_ITEM</stock_item>
+    <label>_Open File...</label>
+    <right_justify>False</right_justify>
+    <stock_icon>GNOME_STOCK_MENU_OPEN</stock_icon>
   </widget>
 
   <widget>
     <class>GtkPixmapMenuItem</class>
     <name>popup_disc</name>
-    <tooltip>Open DVD or VCD</tooltip>
+    <tooltip>Open a DVD or VCD</tooltip>
     <signal>
       <name>activate</name>
       <handler>on_popup_disc_activate</handler>
       <last_modification_time>Sun, 04 Mar 2001 02:57:11 GMT</last_modification_time>
     </signal>
-    <label>Open _disc...</label>
+    <label>Open _Disc...</label>
     <right_justify>False</right_justify>
     <stock_icon>GNOME_STOCK_MENU_CDROM</stock_icon>
   </widget>
@@ -1045,7 +1052,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 <widget>
   <class>GnomeDialog</class>
   <name>intf_disc</name>
-  <title>Open disc</title>
+  <title>Open Disc</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
   <modal>False</modal>
@@ -1112,11 +1119,10 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
     </widget>
 
     <widget>
-      <class>GtkFrame</class>
-      <name>frame1</name>
-      <label>Disc type</label>
-      <label_xalign>0</label_xalign>
-      <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+      <class>GtkHBox</class>
+      <name>hbox2</name>
+      <homogeneous>False</homogeneous>
+      <spacing>5</spacing>
       <child>
 	<padding>0</padding>
 	<expand>True</expand>
@@ -1124,49 +1130,203 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
       </child>
 
       <widget>
-	<class>GtkVBox</class>
-	<name>vbox4</name>
-	<homogeneous>False</homogeneous>
-	<spacing>0</spacing>
+	<class>GtkFrame</class>
+	<name>frame1</name>
+	<label>Disc type</label>
+	<label_xalign>0</label_xalign>
+	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+	<child>
+	  <padding>0</padding>
+	  <expand>True</expand>
+	  <fill>True</fill>
+	</child>
 
 	<widget>
-	  <class>GtkRadioButton</class>
-	  <name>disc_dvd</name>
-	  <can_focus>True</can_focus>
-	  <signal>
-	    <name>toggled</name>
-	    <handler>on_disc_dvd_toggled</handler>
-	    <last_modification_time>Sun, 04 Mar 2001 02:12:52 GMT</last_modification_time>
-	  </signal>
-	  <label>DVD</label>
-	  <active>False</active>
-	  <draw_indicator>True</draw_indicator>
-	  <group>disc</group>
-	  <child>
-	    <padding>0</padding>
-	    <expand>False</expand>
-	    <fill>False</fill>
-	  </child>
+	  <class>GtkVBox</class>
+	  <name>vbox4</name>
+	  <homogeneous>False</homogeneous>
+	  <spacing>0</spacing>
+
+	  <widget>
+	    <class>GtkRadioButton</class>
+	    <name>disc_dvd</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>toggled</name>
+	      <handler>on_disc_dvd_toggled</handler>
+	      <last_modification_time>Sun, 04 Mar 2001 02:12:52 GMT</last_modification_time>
+	    </signal>
+	    <label>DVD</label>
+	    <active>False</active>
+	    <draw_indicator>True</draw_indicator>
+	    <group>disc</group>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkRadioButton</class>
+	    <name>disc_vcd</name>
+	    <sensitive>False</sensitive>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>toggled</name>
+	      <handler>on_disc_vcd_toggled</handler>
+	      <last_modification_time>Sun, 04 Mar 2001 02:12:58 GMT</last_modification_time>
+	    </signal>
+	    <label>VCD</label>
+	    <active>False</active>
+	    <draw_indicator>True</draw_indicator>
+	    <group>disc</group>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
 	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkFrame</class>
+	<name>frame2</name>
+	<label>Starting position</label>
+	<label_xalign>0</label_xalign>
+	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+	<child>
+	  <padding>0</padding>
+	  <expand>True</expand>
+	  <fill>True</fill>
+	</child>
 
 	<widget>
-	  <class>GtkRadioButton</class>
-	  <name>disc_vcd</name>
-	  <can_focus>True</can_focus>
-	  <signal>
-	    <name>toggled</name>
-	    <handler>on_disc_vcd_toggled</handler>
-	    <last_modification_time>Sun, 04 Mar 2001 02:12:58 GMT</last_modification_time>
-	  </signal>
-	  <label>VCD (unsupported yet)</label>
-	  <active>False</active>
-	  <draw_indicator>True</draw_indicator>
-	  <group>disc</group>
-	  <child>
-	    <padding>0</padding>
-	    <expand>False</expand>
-	    <fill>False</fill>
-	  </child>
+	  <class>GtkTable</class>
+	  <name>table1</name>
+	  <border_width>5</border_width>
+	  <rows>2</rows>
+	  <columns>2</columns>
+	  <homogeneous>False</homogeneous>
+	  <row_spacing>5</row_spacing>
+	  <column_spacing>5</column_spacing>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label15</name>
+	    <label>Title</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <child>
+	      <left_attach>0</left_attach>
+	      <right_attach>1</right_attach>
+	      <top_attach>0</top_attach>
+	      <bottom_attach>1</bottom_attach>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	      <xexpand>False</xexpand>
+	      <yexpand>False</yexpand>
+	      <xshrink>False</xshrink>
+	      <yshrink>False</yshrink>
+	      <xfill>True</xfill>
+	      <yfill>False</yfill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label16</name>
+	    <label>Chapter</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <child>
+	      <left_attach>0</left_attach>
+	      <right_attach>1</right_attach>
+	      <top_attach>1</top_attach>
+	      <bottom_attach>2</bottom_attach>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	      <xexpand>False</xexpand>
+	      <yexpand>False</yexpand>
+	      <xshrink>False</xshrink>
+	      <yshrink>False</yshrink>
+	      <xfill>True</xfill>
+	      <yfill>False</yfill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkSpinButton</class>
+	    <name>disc_title</name>
+	    <can_focus>True</can_focus>
+	    <climb_rate>1</climb_rate>
+	    <digits>0</digits>
+	    <numeric>False</numeric>
+	    <update_policy>GTK_UPDATE_ALWAYS</update_policy>
+	    <snap>False</snap>
+	    <wrap>False</wrap>
+	    <value>1</value>
+	    <lower>1</lower>
+	    <upper>65536</upper>
+	    <step>1</step>
+	    <page>10</page>
+	    <page_size>10</page_size>
+	    <child>
+	      <left_attach>1</left_attach>
+	      <right_attach>2</right_attach>
+	      <top_attach>0</top_attach>
+	      <bottom_attach>1</bottom_attach>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	      <xexpand>True</xexpand>
+	      <yexpand>False</yexpand>
+	      <xshrink>False</xshrink>
+	      <yshrink>False</yshrink>
+	      <xfill>True</xfill>
+	      <yfill>False</yfill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkSpinButton</class>
+	    <name>disc_chapter</name>
+	    <can_focus>True</can_focus>
+	    <climb_rate>1</climb_rate>
+	    <digits>0</digits>
+	    <numeric>False</numeric>
+	    <update_policy>GTK_UPDATE_ALWAYS</update_policy>
+	    <snap>False</snap>
+	    <wrap>False</wrap>
+	    <value>1</value>
+	    <lower>1</lower>
+	    <upper>65536</upper>
+	    <step>1</step>
+	    <page>10</page>
+	    <page_size>10</page_size>
+	    <child>
+	      <left_attach>1</left_attach>
+	      <right_attach>2</right_attach>
+	      <top_attach>1</top_attach>
+	      <bottom_attach>2</bottom_attach>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	      <xexpand>True</xexpand>
+	      <yexpand>False</yexpand>
+	      <xshrink>False</xshrink>
+	      <yshrink>False</yshrink>
+	      <xfill>True</xfill>
+	      <yfill>False</yfill>
+	    </child>
+	  </widget>
 	</widget>
       </widget>
     </widget>
@@ -1175,7 +1335,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
       <class>GtkHBox</class>
       <name>hbox1</name>
       <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
+      <spacing>5</spacing>
       <child>
 	<padding>0</padding>
 	<expand>True</expand>
@@ -1185,7 +1345,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
       <widget>
 	<class>GtkLabel</class>
 	<name>label14</name>
-	<label>Device name (eg. /dev/cdrom or /dev/dvd): </label>
+	<label>Device name:</label>
 	<justify>GTK_JUSTIFY_CENTER</justify>
 	<wrap>False</wrap>
 	<xalign>0.5</xalign>

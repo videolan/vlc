@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.2 2001/03/04 03:12:00 sam Exp $
+ * $Id: intf_gtk.c,v 1.3 2001/03/05 01:29:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -258,7 +258,6 @@ static gint GtkManage( gpointer p_data )
             gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_popup ),
                                  "p_popup", p_intf );
         }
-//        gtk_widget_show( p_intf->p_sys->p_popup );
         gtk_menu_popup( GTK_MENU( p_intf->p_sys->p_popup ),
                         NULL, NULL, NULL, NULL, 0, GDK_CURRENT_TIME );
         p_intf->b_menu_change = 0;

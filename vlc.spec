@@ -1,10 +1,10 @@
 Name: vlc
-Version: 0.2.62
+Version: 0.2.63
 Release: 1
 Copyright: GPL
 Url: http://www.videolan.org/
 Group: X11/Applications/Graphics
-Source0: http://www.videolan.org/packages/0.2.62/vlc-0.2.62.tar.gz
+Source0: http://www.videolan.org/packages/0.2.63/vlc-0.2.63.tar.gz
 Packager: Samuel Hocevar <sam@zoy.org>
 
 Buildroot: /tmp/vlc-build

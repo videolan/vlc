@@ -1,27 +1,113 @@
+# The format of this file was inspired by the Linux kernel CREDITS file.
+# 
+# Authors and contributors are listed alphabetically.
+# 
+# The fields are: name (N), email (E), web-address (W), PGP key ID and
+# fingerprint (P), description (D), and snail-mail address (S).
 
-  Régis Duchesne <regis@via.ecp.fr>
-  Michel Lespinasse <walken@zoy.org>
+N: Pierre Baillet
+E: oct@zoy.org
+D: SDL audio and video output
 
-  Olivier Pomel <pomel@via.ecp.fr>
+N: Ethan C. Baldridge
+E: BaldridgeE@cadmus.com
+D: directory browsing code in modules.c
 
-  Pierre Baillet <oct@zoy.org>
-  Jean-Philippe Grimaldi <jeanphi@via.ecp.fr>
-  Andres Krapf <dae@via.ecp.fr>
-  Christophe Massiot <massiot@via.ecp.fr>
-  Vincent Seguin <seguin@via.ecp.fr>
-  Benoit Steiner <benny@via.ecp.fr>
+N: Stéphane Borel
+E: stef@via.ecp.fr
+D: MPEG video decoder
+D: DVD input
 
-  Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
-  Jean-Marc Dressler <polux@via.ecp.fr>
-  Gaël Hendryckx <jimmy@via.ecp.fr>
-  Samuel Hocevar <sam@zoy.org>
-  Brieuc Jeunhomme <bbp@via.ecp.fr>
-  Michel Kaempf <maxx@via.ecp.fr>
+N: Arnaud de Bossoreille de Ribou
+E: bozo@via.ecp.fr
+D: SDL video output
 
-  Stéphane Borel <stef@via.ecp.fr>
-  Renaud Dartus <reno@via.ecp.fr>
-  Henri Fallon <henri@via.ecp.fr>
+N: Tony Castley
+E: tcastley@mail.powerup.com.au
+D: BeOS interface
 
-  Richard Shepherd <richard@rshepherd.demon.co.uk>
-  Tony Castley <tcastley@mail.powerup.com.au>
+N: Renaud Dartus
+E: reno@via.ecp.fr
+D: AC3 decoder
+
+N: Jean-Marc Dressler
+E: polux@via.ecp.fr
+D: BeOS port
+D: MPEG video decoder
+
+N: Régis Duchesne
+E: regis@via.ecp.fr
+
+N: Henri Fallon
+E: henri@via.ecp.fr
+D: ALSA audio output
+D: input netlist
+D: MPEG TS input
+
+N: Jean-Philippe Grimaldi
+E: jeanphi@via.ecp.fr
+D: Bug fixes
+
+N: Gaël Hendryckx
+E: jimmy@via.ecp.fr
+D: IDCT and YUV transformations
+
+N: Samuel Hocevar
+E: sam@zoy.org
+D: playlist and modules system
+D: Gnome and Gtk+ interfaces, Glide and fb video outputs, Esound audio output
+D: DVD subtitles decoder
+
+N: Brieuc Jeunhomme
+E: bbp@via.ecp.fr
+D: Bug fixes
+
+N: Michel Kaempf
+E: maxx@via.ecp.fr
+D: audio output
+D: AC3 decoder
+D: MPEG audio decoder
+
+N: Andres Krapf
+E: dae@via.ecp.fr
+D: FreeBSD port and tests
+
+N: Markus Kuespert
+E: ltlBeBoy@beosmail.com
+D: BeOS port of the DVD ioctls
+
+N: Michel Lespinasse
+E: walken@zoy.org
+D: AC3 decoder
+D: MPEG audio decoder
+D: MPEG video decoder
+
+N: Christophe Massiot
+E: massiot@via.ecp.fr
+D: MPEG PS input
+D: bitstream and input core functions
+D: MPEG video decoder
+
+N: Arkadiusz Miskiewicz
+E: misiek@pld.ORG.PL
+D: Makefile and configure patches
+
+N: Olivier Pomel
+E: pomel@via.ecp.fr
+
+N: Vincent Seguin
+E: seguin@via.ecp.fr
+D: core vlc structure
+D: interface and message queue
+D: YUV transformations
+D: X11 and GGI video outputs
+
+N: Richard Shepherd
+E: richard@rshepherd.demon.co.uk
+D: BeOS video output (BBitmap and Overlay)
+
+N: Benoit Steiner
+E: benny@via.ecp.fr
+D: MPEG system input
+D: network input
 

@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.12 2001/03/04 16:20:16 sam Exp $
+ * $Id: intf_beos.cpp,v 1.13 2001/03/05 01:29:25 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -99,7 +99,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
 	float yStart = 10.0;
 
     SetName( "interface" );
-    SetTitle("VideoLan Client for BeOS");
+    SetTitle(VOUT_TITLE " (BeOS interface)");
     
     BView* p_view;
 
@@ -204,7 +204,10 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 		if (p_intf->p_input != NULL )
 		{
 			// silence the sound, otherwise very horrible
-			p_main->p_aout->vol = 0;
+			if (p_main->p_aout != NULL)
+			{
+				p_main->p_aout->vol = 0;
+			}
 			snooze(400000);
 			input_SetStatus(p_intf->p_input, INPUT_STATUS_END);
 		}
@@ -213,7 +216,10 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 		// starts playing in normal mode
 //		if (p_intf->p_input != NULL )
 //		{			
-//			p_main->p_aout->vol = vol_val;
+//			if (p_main->p_aout != NULL)
+//			{
+//				p_main->p_aout->vol = vol_val;
+//			}
 //			snooze(400000);
 //			input_SetStatus(p_intf->p_input, INPUT_STATUS_PLAY);
 //			playback_status = PLAYING;
@@ -226,13 +232,19 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			// mute the volume if currently playing
 			if (playback_status == PLAYING)
 			{
-				p_main->p_aout->vol = 0;
+				if (p_main->p_aout != NULL)
+				{
+					p_main->p_aout->vol = 0;
+				}
 				playback_status = PAUSED;
 			}
 			else
 			// restore the volume
 			{
-				p_main->p_aout->vol = vol_val;
+				if (p_main->p_aout != NULL)
+				{
+					p_main->p_aout->vol = vol_val;
+				}
 				playback_status = PLAYING;
 			}
 			snooze(400000);
@@ -243,7 +255,10 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 		// cycle the fast playback modes
 		if (p_intf->p_input != NULL )
 		{
-			p_main->p_aout->vol = 0;
+			if (p_main->p_aout != NULL)
+			{
+				p_main->p_aout->vol = 0;
+			}
 			snooze(400000);
 			input_SetStatus(p_intf->p_input, INPUT_STATUS_FASTER);
 		}
@@ -252,7 +267,10 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 		// cycle the slow playback modes
 		if (p_intf->p_input != NULL )
 		{
-			p_main->p_aout->vol = 0;
+			if (p_main->p_aout != NULL)
+			{
+				p_main->p_aout->vol = 0;
+			}
 			snooze(400000);
 			input_SetStatus(p_intf->p_input, INPUT_STATUS_SLOWER);
 		}

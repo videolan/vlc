@@ -4,31 +4,15 @@ INSTALL file for vlc, the VideoLAN Client
 Building VideoLAN
 =================
 
-A typical way to configure the vlc is :
+A typical way to configure vlc is:
 
    ./configure --prefix=/usr --enable-gnome --with-sdl
 
-For a full compilation, you may try :
-
-   ./configure --prefix=/usr --enable-gnome --enable-fb \
-           --with-glide --with-ggi --with-sdl --enable-esd --enable-alsa
-
 See `./configure --help' for more information.
 
-Then, run `make', and `make install' to install it.
+Then, run `make' to build vlc.
 
-
-To build a Debian package, you may use :
-
-   dpkg-buildpackage -rfakeroot -us -uc
-
-
-To build RedHat packages, use :
-
-   rpm -ba vlc.spec
-
-
-Here's a shortcut to copy-paste to do a clean build :
+Here is a shortcut to copy-paste for a clean build:
 
    make distclean 2>/dev/null ; ./configure --prefix=/usr --enable-gnome \
       --enable-fb --with-glide --with-ggi --with-sdl --enable-esd \
@@ -38,12 +22,25 @@ Here's a shortcut to copy-paste to do a clean build :
 Installing and running VideoLAN
 ===============================
 
-You can install the vlc and its plugins by typing :
+You can install the vlc and its plugins by typing:
 
    make install
 
-But you don't need to do it if you don't want ; vlc can be launched
-from the current directory as well :
+But you don't need to install it if you don't want to; vlc can be launched
+from the current directory as well:
 
    ./vlc
+
+
+Building packages
+=================
+
+To build a Debian package, you may use:
+
+   dpkg-buildpackage -rfakeroot -us -uc
+
+
+To build RedHat packages, use:
+
+   rpm -ba vlc.spec
 
