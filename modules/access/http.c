@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.55 2004/01/15 12:55:41 fenrir Exp $
+ * $Id: http.c,v 1.56 2004/01/15 13:45:27 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -563,7 +563,7 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable, off_t *pi_
             goto error;
         }
 
-        msg_Dbg( p_input, "Line=%s", psz );
+        /* msg_Dbg( p_input, "Line=%s", psz ); */
         if( *psz == '\0' )
         {
             free( psz );
