@@ -51,14 +51,14 @@ endif
 # ***************************************************************************
 
 ifeq ($(SYS),DARWIN)
-all: .autoconf .libtool .automake .intl .iconv .pkgcfg .freetype .fribidi \
+all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpgerror .gcrypt .gnutls
 endif
 ifeq ($(SYS),BEOS)
-all: .perl .autoconf .libtool .automake .intl .iconv .freetype .fribidi \
+all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
 	.dvdread .dvdnav .dvbpsi
@@ -270,7 +270,7 @@ libiconv: libiconv-$(LIBICONV_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .iconv: libiconv
-	(cd libiconv; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd libiconv; ./configure --prefix=$(PREFIX) --disable-nls && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
