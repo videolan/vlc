@@ -2,7 +2,7 @@
  * nsv.c: NullSoft Video demuxer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: nsv.c,v 1.6 2004/02/02 10:34:22 fenrir Exp $
+ * $Id: nsv.c,v 1.7 2004/02/02 10:41:46 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -465,7 +465,6 @@ static int ReadNSVs( demux_t *p_demux )
             p_sys->i_pcr_inc = p_sys->i_pcr_inc * (((header[16] ^ 0x80) >> 2 ) +1 );
         else
             p_sys->i_pcr_inc = p_sys->i_pcr_inc / (((header[16] ^ 0xc0) >> 2 ) +1 );
-        }
     }
     else if( header[16] != 0 )
     {
