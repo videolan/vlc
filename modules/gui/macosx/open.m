@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.29 2003/04/15 14:05:13 hartman Exp $
+ * $Id: open.m,v 1.30 2003/04/30 23:58:56 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -132,17 +132,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 - (void)awakeFromNib
 {
     intf_thread_t * p_intf = [NSApp getIntf];
-    char * psz_sout = config_GetPsz( p_intf, "sout" );
-
-    if ( psz_sout != NULL && *psz_sout )
-    {
-        [o_sout_cbox setState: YES];
-    }
-    else
-    {
-        [o_sout_cbox setState: NO];
-    }
-    free(psz_sout);
 
     [o_panel setTitle: _NS("Open Source")];
     [o_mrl_lbl setTitle: _NS("Media Resource Locator (MRL)")];
@@ -180,27 +169,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
 
-    [o_sout_cbox setTitle: _NS("Stream output:")];
-    [o_sout_btn_ok setTitle: _NS("OK")];
-    [o_sout_settings setTitle: _NS("Settings...")];
-    [o_sout_mrl_lbl setTitle: _NS("Stream output MRL")];
-    
-    [o_sout_access_lbl setTitle: _NS("Output Method")];
-    [[o_sout_access cellAtRow:0 column:0] setTitle: _NS("File")];
-    [[o_sout_access cellAtRow:1 column:0] setTitle: _NS("HTTP")];
-    [[o_sout_access cellAtRow:2 column:0] setTitle: _NS("UDP")];
-    [[o_sout_access cellAtRow:3 column:0] setTitle: _NS("RTP")];
-
-    [o_sout_file_btn_browse setTitle: _NS("Browse...")];
-    [o_sout_udp_addr_lbl setStringValue: _NS("Address")];
-    [o_sout_udp_port_lbl setStringValue: _NS("Port")];
-
-    [o_sout_mux_lbl setTitle: _NS("Encapsulation Method")];
-    [[o_sout_mux cellAtRow:0 column:0] setTitle: _NS("MPEG TS")];
-    [[o_sout_mux cellAtRow:0 column:1] setTitle: _NS("MPEG PS")];
-    [[o_sout_mux cellAtRow:0 column:2] setTitle: _NS("AVI")];
-    [[o_sout_mux cellAtRow:0 column:3] setTitle: _NS("Ogg")];
-    
     [o_file_sub_ckbox setTitle: _NS("Load subtitles file:")];
     [o_file_sub_btn_settings setTitle: _NS("Settings...")];
     [o_file_sub_btn_browse setTitle: _NS("Browse...")];
@@ -249,19 +217,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         selector: @selector(openNetInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: o_net_http_url];
-
-    [[NSNotificationCenter defaultCenter] addObserver: self
-        selector: @selector(soutInfoChanged:)
-        name: NSControlTextDidChangeNotification
-        object: o_sout_file_path];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-        selector: @selector(soutInfoChanged:)
-        name: NSControlTextDidChangeNotification
-        object: o_sout_udp_addr];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-        selector: @selector(soutInfoChanged:)
-        name: NSControlTextDidChangeNotification
-        object: o_sout_udp_port];
 }
 
 - (void)openTarget:(int)i_type
@@ -276,17 +231,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     if( i_result )
     {
-        NSString *o_sout = [o_sout_mrl stringValue];
         intf_thread_t * p_intf = [NSApp getIntf];
-        
-        if ( [o_sout_cbox state] )
-        {
-            config_PutPsz( p_intf, "sout", [o_sout lossyCString] );
-        }
-        else
-        {
-            config_PutPsz( p_intf, "sout", "" );
-        }
 
         NSString *o_source = [o_mrl stringValue];
         BOOL b_enq = [o_ckbox_enqueue state] == NSOnState ? YES : NO;
@@ -311,7 +256,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
             config_PutFloat( p_intf, "sub-fps", 0.0 );
         }
     }
-    [self soutModeChanged: nil];
 }
 
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi
@@ -661,140 +605,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     }
 
     [o_mrl setStringValue: o_mrl_string];
-}
-
-- (IBAction)soutChanged:(id)sender;
-{
-    if ([o_sout_cbox state] == NSOnState)
-    {
-        [o_sout_settings setEnabled:YES];
-    }
-    else
-    {
-        [o_sout_settings setEnabled:NO];
-    }
-}
-
-- (IBAction)soutSettings:(id)sender
-{
-    [self soutModeChanged: nil];
-    [NSApp beginSheet: o_sout_sheet
-        modalForWindow: [sender window]
-        modalDelegate: self
-        didEndSelector: NULL
-        contextInfo: nil];
-}
-
-- (IBAction)soutFileBrowse:(id)sender
-{
-    NSSavePanel *o_save_panel = [NSSavePanel savePanel];
-    NSString *o_mux_string;
-    if ( [[[o_sout_mux selectedCell] title] isEqualToString: _NS("MPEG PS")] )
-        o_mux_string = @"vob";
-    else if ( [[[o_sout_mux selectedCell] title] isEqualToString: _NS("AVI")] )
-        o_mux_string = @"avi";
-    else if ( [[[o_sout_mux selectedCell] title] isEqualToString: _NS("Ogg")] )
-        o_mux_string = @"ogm";
-    else
-        o_mux_string = @"ts";
-
-    NSString * o_name = [NSString stringWithFormat: @"vlc-output.%@",
-                         o_mux_string];
-
-    [o_save_panel setTitle: _NS("Save File")];
-    [o_save_panel setPrompt: _NS("Save")];
-
-    if( [o_save_panel runModalForDirectory: nil
-            file: o_name] == NSOKButton )
-    {
-        NSString *o_filename = [o_save_panel filename];
-        [o_sout_file_path setStringValue: o_filename];
-        [self soutInfoChanged: nil];
-    }
-}
-
-- (void)soutModeChanged:(NSNotification *)o_notification
-{
-    NSString *o_mode;
-    BOOL b_file = FALSE;
-    BOOL b_net = FALSE;
-
-    o_mode = [[o_sout_access selectedCell] title];
-
-    if( [o_mode isEqualToString: _NS("File")] ) b_file = TRUE;   
-    else if( [o_mode isEqualToString: _NS("UDP")] ) b_net = TRUE;
-    else if( [o_mode isEqualToString: _NS("RTP")] ) b_net = TRUE;
-
-    [o_sout_file_path setEnabled: b_file];
-    [o_sout_file_btn_browse setEnabled: b_file];
-    [o_sout_udp_addr setEnabled: !b_file];
-    [o_sout_udp_port setEnabled: !b_file];
-    [o_sout_udp_port_stp setEnabled: !b_file ];
-    
-    [[o_sout_mux cellAtRow:0 column: 1] setEnabled: !b_net];
-    [[o_sout_mux cellAtRow:0 column: 2] setEnabled: !b_net];
-    [[o_sout_mux cellAtRow:0 column: 3] setEnabled: !b_net];
-    if ( b_net )
-    {
-        [o_sout_mux selectCellAtRow:0 column: 0];
-    }
-
-    [self soutInfoChanged: nil];
-}
-
-- (void)soutInfoChanged:(NSNotification *)o_notification
-{
-    NSString *o_mode;
-    NSString *o_mux;
-    NSString *o_mrl_string;
-    NSString *o_mux_string;
-
-    o_mode = [[o_sout_access selectedCell] title];
-    o_mux = [[o_sout_mux selectedCell] title];
-
-    if ( [o_mux isEqualToString: _NS("AVI")] ) o_mux_string = @"avi";
-    else if ( [o_mux isEqualToString: _NS("Ogg")] ) o_mux_string = @"ogg";
-    else if ( [o_mux isEqualToString: _NS("MPEG PS")] ) o_mux_string = @"ps";
-    else o_mux_string = @"ts";
-
-    if ( [o_mode isEqualToString: _NS("File")] )
-    {
-        o_mrl_string = [NSString stringWithFormat: @"file/%@://%@",
-                        o_mux_string, [o_sout_file_path stringValue]];
-    }
-    else if ( [o_mode isEqualToString: _NS("HTTP")] )
-    {
-        o_mrl_string = [NSString stringWithFormat: @"http/%@://%@:%i",
-                        o_mux_string, [o_sout_udp_addr stringValue],
-                        [o_sout_udp_port intValue]];
-    }
-    else if ( [o_mode isEqualToString: _NS("UDP")] )
-    {
-        o_mrl_string = [NSString stringWithFormat: @"udp/%@://%@:%i",
-                        o_mux_string, [o_sout_udp_addr stringValue],
-                        [o_sout_udp_port intValue]];
-    }
-    else
-    {
-        o_mrl_string = [NSString stringWithFormat: @"rtp/%@://%@:%i",
-                        o_mux_string, [o_sout_udp_addr stringValue],
-                        [o_sout_udp_port intValue]];
-    }
-
-
-    [o_sout_mrl setStringValue: o_mrl_string];
-}
-
-- (IBAction)soutStepperChanged:(id)sender
-{
-    [o_sout_udp_port setIntValue: [o_sout_udp_port_stp intValue]];
-    [self soutInfoChanged: nil];
-}
-
-- (IBAction)soutCloseSheet:(id)sender
-{
-    [o_sout_sheet orderOut:sender];
-    [NSApp endSheet: o_sout_sheet];
 }
 
 - (IBAction)openFile:(id)sender

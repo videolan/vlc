@@ -548,6 +548,8 @@
 				8ED6C28403E2EB1C0059A3A7,
 				8ED6C28503E2EB1C0059A3A7,
 				8ED6C28603E2EB1C0059A3A7,
+				8E55FB7F0459B0FD00FB3317,
+				8E55FB800459B0FD00FB3317,
 				8ED6C28703E2EB1C0059A3A7,
 				8ED6C28803E2EB1C0059A3A7,
 			);
@@ -622,6 +624,20 @@
 //8E2
 //8E3
 //8E4
+		8E55FB7F0459B0FD00FB3317 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = output.h;
+			path = /Volumes/Users/pjotr/Development/vlc/modules/gui/macosx/output.h;
+			refType = 0;
+		};
+		8E55FB800459B0FD00FB3317 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = output.m;
+			path = /Volumes/Users/pjotr/Development/vlc/modules/gui/macosx/output.m;
+			refType = 0;
+		};
 		8E6BC6F6041643860059A3A7 = {
 			fileEncoding = 4;
 			isa = PBXFileReference;

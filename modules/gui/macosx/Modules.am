@@ -18,6 +18,8 @@ SOURCES_macosx = \
 	modules/gui/macosx/playlist.h \
 	modules/gui/macosx/prefs.m \
 	modules/gui/macosx/prefs.h \
+	modules/gui/macosx/output.h \
+	modules/gui/macosx/output.m \
 	modules/gui/macosx/vout.m \
 	modules/gui/macosx/vout.h \
 	$(NULL)

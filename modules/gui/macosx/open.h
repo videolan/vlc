@@ -2,7 +2,7 @@
  * open.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.h,v 1.13 2003/03/26 03:13:30 hartman Exp $
+ * $Id: open.h,v 1.14 2003/04/30 23:58:56 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -71,24 +71,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_net_http_url;
     IBOutlet id o_net_http_url_lbl;
 
-    IBOutlet id o_sout_cbox;
-    IBOutlet id o_sout_settings;
-    IBOutlet id o_sout_sheet;
-    IBOutlet id o_sout_mrl_lbl;
-    IBOutlet id o_sout_mrl;
-    IBOutlet id o_sout_access;
-    IBOutlet id o_sout_access_lbl;
-    IBOutlet id o_sout_file_path;
-    IBOutlet id o_sout_file_btn_browse;
-    IBOutlet id o_sout_udp_addr;
-    IBOutlet id o_sout_udp_addr_lbl;
-    IBOutlet id o_sout_udp_port;
-    IBOutlet id o_sout_udp_port_lbl;
-    IBOutlet id o_sout_udp_port_stp;
-    IBOutlet id o_sout_mux;
-    IBOutlet id o_sout_mux_lbl;
-    IBOutlet id o_sout_btn_ok;
-    
     IBOutlet id o_file_sub_ckbox;
     IBOutlet id o_file_sub_btn_settings;
     IBOutlet id o_file_sub_sheet;
@@ -124,14 +106,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (IBAction)openNetModeChanged:(id)sender;
 - (IBAction)openNetStepperChanged:(id)sender;
 - (void)openNetInfoChanged:(NSNotification *)o_notification;
-
-- (IBAction)soutChanged:(id)sender;
-- (IBAction)soutSettings:(id)sender;
-- (IBAction)soutFileBrowse:(id)sender;
-- (void)soutModeChanged:(NSNotification *)o_notification;
-- (void)soutInfoChanged:(NSNotification *)o_notification;
-- (IBAction)soutStepperChanged:(id)sender;
-- (IBAction)soutCloseSheet:(id)sender;
 
 - (IBAction)subsChanged:(id)sender;
 - (IBAction)subSettings:(id)sender;
