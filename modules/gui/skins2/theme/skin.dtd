@@ -176,11 +176,8 @@
         y           CDATA   "0"
         text        CDATA   "\0"
         font        CDATA   #REQUIRED
-        align       CDATA   "left"
+        color       CDATA   "#000000"
         width       CDATA   "0"
-        display     CDATA   "none"
-        scroll      CDATA   "true"
-        scrollspace CDATA   "20"
         help        CDATA   "\0"
     >
 <!ELEMENT Playlist (Slider)>

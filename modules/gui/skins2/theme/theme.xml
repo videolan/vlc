@@ -77,7 +77,7 @@
     <Group x="0" y="0">
       <Anchor x="7" y="151" priority="100"/>
       <Image x="0" y="0" image="mainbody" onclick="move"/>
-      <Text font="default_font" width="70" x="287" y="79" text="$T"/>
+      <Text font="default_font" width="70" x="287" y="79" text="$T" color="#000000"/>
       <Button x="42" y="42" up="preferences" down="preferences_onclick" over="preferences" action="dialogs.prefs()" tooltiptext="Preferences"/>
       <Button x="17" y="64" up="stop" down="stop_onclick" over="stop" action="vlc.stop()" tooltiptext="Stop"/>
       <CheckBox x="42" y="87" up1="playlist_button" down1="playlist_button_onclick" up2="playlist_button2" down2="playlist_button_onclick2" state="playlist_window.isVisible" action1="playlist_window.show()" action2="playlist_window.hide()" tooltiptext1="Show Playlist" tooltiptext2="Hide Playlist"/>

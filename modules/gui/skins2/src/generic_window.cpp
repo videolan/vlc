@@ -2,7 +2,7 @@
  * generic_window.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic_window.cpp,v 1.2 2004/01/25 21:38:57 asmax Exp $
+ * $Id: generic_window.cpp,v 1.3 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -503,8 +503,9 @@ CtrlGeneric *GenericWindow::findHitControl( int xPos, int yPos )
             int xRel = xPos - pos->getLeft();
             int yRel = yPos - pos->getTop();
 
+            CtrlGeneric *pCtrl = (*iter).m_pControl;
             // Control hit ?
-            if( (*iter).m_pControl->mouseOver( xRel, yRel ) )
+            if( pCtrl->isVisible() && pCtrl->mouseOver( xRel, yRel ) )
             {
                 pNewHitControl = (*iter).m_pControl;
                 break;

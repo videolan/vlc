@@ -2,7 +2,7 @@
  * ctrl_generic.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_generic.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_generic.cpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -27,12 +27,19 @@
 #include "../src/generic_window.hpp"
 #include "../src/os_graphics.hpp"
 #include "../utils/position.hpp"
+#include "../utils/var_bool.hpp"
 
 
-CtrlGeneric::CtrlGeneric( intf_thread_t *pIntf, const UString &rHelp ):
+CtrlGeneric::CtrlGeneric( intf_thread_t *pIntf, const UString &rHelp,
+                          VarBool *pVisible):
     SkinObject( pIntf ), m_pLayout( NULL ), m_pPosition( NULL ),
-    m_help( rHelp )
+    m_help( rHelp ), m_pVisible( pVisible )
 {
+    // Observe the visibility variable
+    if( m_pVisible )
+    {
+        m_pVisible->addObserver( this );
+    }
 }
 
 
@@ -41,6 +48,10 @@ CtrlGeneric::~CtrlGeneric()
     if( m_pPosition )
     {
         delete m_pPosition;
+    }
+    if( m_pVisible )
+    {
+        m_pVisible->delObserver( this );
     }
 }
 
@@ -106,5 +117,27 @@ GenericWindow *CtrlGeneric::getWindow() const
         return m_pLayout->getWindow();
     }
     return NULL;
+}
+
+
+bool CtrlGeneric::isVisible() const
+{
+    return !m_pVisible || m_pVisible->get();
+}
+
+
+void CtrlGeneric::onUpdate( Subject<VarBool> &rVariable )
+{
+    // Is it the visibily variable ?
+    if( &rVariable == m_pVisible )
+    {
+        // Redraw the layout
+        notifyLayout();
+    }
+    else
+    {
+        // Call the user-defined callback
+        onVarBoolUpdate( (VarBool&)rVariable );
+    }
 }
 

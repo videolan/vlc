@@ -2,7 +2,7 @@
  * ctrl_slider.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_slider.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: ctrl_slider.hpp,v 1.3 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -34,12 +34,10 @@
 class GenericBitmap;
 class OSGraphics;
 class VarPercent;
-class VarBool;
 
 
 /// Cursor of a slider
-class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>,
-    public Observer<VarBool>
+class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>
 {
     public:
         /// Create a cursor with 3 images (which are NOT copied, be careful)
@@ -70,8 +68,6 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>,
         FSM m_fsm;
         /// Variable associated to the cursor
         VarPercent &m_rVariable;
-        /// Visibility variable
-        VarBool *m_pVisible;
         /// Tooltip text
         const UString m_tooltip;
         /// Initial size of the control
@@ -109,9 +105,6 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>,
         /// Method called when the position variable is modified
         virtual void onUpdate( Subject<VarPercent> &rVariable );
 
-        /// Method called when the visibility variable is modified
-        virtual void onUpdate( Subject<VarBool> &rVariable );
-
         /// Methode to compute the resize factors
         void getResizeFactors( float &rFactorX, float &rFactorY ) const;
 };
@@ -121,7 +114,6 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>,
 class CtrlSliderBg: public CtrlGeneric
 {
     public:
-        /// If pVisible is NULL, the control is always visible
         CtrlSliderBg( intf_thread_t *pIntf, CtrlSliderCursor &rCursor,
                       const Bezier &rCurve, VarPercent &rVariable,
                       int thickness, VarBool *pVisible, const UString &rHelp );
@@ -140,8 +132,6 @@ class CtrlSliderBg: public CtrlGeneric
         VarPercent &m_rVariable;
         /// Thickness of the curve
         int m_thickness;
-        /// Visibility variable
-        VarBool *m_pVisible;
         /// Bezier curve of the slider
         const Bezier m_curve;
         /// Initial size of the control
@@ -149,9 +139,6 @@ class CtrlSliderBg: public CtrlGeneric
 
         /// Methode to compute the resize factors
         void getResizeFactors( float &rFactorX, float &rFactorY ) const;
-
-        /// Method called when the visibility variable is modified
-        virtual void onUpdate( Subject<VarBool> &rVariable );
 };
 
 

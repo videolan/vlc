@@ -2,7 +2,7 @@
  * ctrl_list.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_list.cpp,v 1.2 2004/02/27 13:24:12 gbazin Exp $
+ * $Id: ctrl_list.cpp,v 1.3 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -41,8 +41,8 @@
 CtrlList::CtrlList( intf_thread_t *pIntf, VarList &rList, GenericFont &rFont,
                     uint32_t fgColor, uint32_t playColor, uint32_t bgColor1,
                     uint32_t bgColor2, uint32_t selColor,
-                    const UString &rHelp ):
-    CtrlGeneric( pIntf, rHelp ), m_rList( rList ), m_rFont( rFont ),
+                    const UString &rHelp, VarBool *pVisible ):
+    CtrlGeneric( pIntf, rHelp, pVisible ), m_rList( rList ), m_rFont( rFont ),
     m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ),
     m_bgColor2( bgColor2 ), m_selColor( selColor ), m_pLastSelected( NULL ),
     m_pImage( NULL ), m_lastPos( 0 )

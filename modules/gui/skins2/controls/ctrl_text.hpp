@@ -2,7 +2,7 @@
  * ctrl_text.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_text.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_text.hpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -44,7 +44,7 @@ class CtrlText: public CtrlGeneric, public Observer<VarText>
         /// Create a text control with the optional given color
         CtrlText( intf_thread_t *pIntf, VarText &rVariable,
                   const GenericFont &rFont, const UString &rHelp,
-                  uint32_t color = 0 );
+                  uint32_t color, VarBool *pVisible );
         virtual ~CtrlText();
 
         /// Handle an event

@@ -2,7 +2,7 @@
  * skin_parser.cpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: skin_parser.cpp,v 1.1 2004/01/25 11:44:19 asmax Exp $
+ * $Id: skin_parser.cpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -163,7 +163,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
     {
         const BuilderData::Text textData( attr["id"], atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["font"],
-                attr["text"], atoi( attr["width"] ), attr["help"], m_curLayer,
+                attr["text"], atoi( attr["width"] ),
+                ConvertColor( attr["color"] ), attr["help"], m_curLayer,
                 m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_data.m_listText.push_back( textData );

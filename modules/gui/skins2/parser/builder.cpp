@@ -2,7 +2,7 @@
  * builder.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.cpp,v 1.6 2004/02/27 13:24:12 gbazin Exp $
+ * $Id: builder.cpp,v 1.7 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -216,7 +216,7 @@ void Builder::addButton( const BuilderData::Button &rData )
 
     CtrlButton *pButton = new CtrlButton( getIntf(), *pBmpUp, *pBmpOver,
         *pBmpDown, *pCommand, UString( getIntf(), rData.m_tooltip.c_str() ),
-        UString( getIntf(), rData.m_help.c_str() ) );
+        UString( getIntf(), rData.m_help.c_str() ), NULL );
 
     // Compute the position of the control
     // XXX (we suppose all the images have the same size...)
@@ -287,7 +287,7 @@ void Builder::addCheckbox( const BuilderData::Checkbox &rData )
         *pBmpOver1, *pBmpDown1, *pBmpUp2, *pBmpOver2, *pBmpDown2, *pCommand1,
         *pCommand2, UString( getIntf(), rData.m_tooltip1.c_str() ),
         UString( getIntf(), rData.m_tooltip2.c_str() ), *pVar,
-        UString( getIntf(), rData.m_help.c_str() ) );
+        UString( getIntf(), rData.m_help.c_str() ), NULL );
 
     // Compute the position of the control
     // XXX (we suppose all the images have the same size...)
@@ -322,7 +322,8 @@ void Builder::addImage( const BuilderData::Image &rData )
     }
 
     CtrlImage *pImage = new CtrlImage( getIntf(), *pBmp,
-                                UString( getIntf(), rData.m_help.c_str() ) );
+                                UString( getIntf(), rData.m_help.c_str() ),
+                                NULL);
 
     // Compute the position of the control
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,
@@ -334,13 +335,14 @@ void Builder::addImage( const BuilderData::Image &rData )
     if( rData.m_onclickId == "move" )
     {
         CtrlMove *pMove = new CtrlMove( getIntf(), m_pTheme->getWindowManager(),
-             *pImage, *pWindow, UString( getIntf(), rData.m_help.c_str() ) );
+             *pImage, *pWindow, UString( getIntf(), rData.m_help.c_str() ),
+             NULL);
         pLayout->addControl( pMove, pos, rData.m_layer );
     }
     else if( rData.m_onclickId == "resize" )
     {
         CtrlResize *pResize = new CtrlResize( getIntf(), *pImage, *pLayout,
-                UString( getIntf(), rData.m_help.c_str() ) );
+                UString( getIntf(), rData.m_help.c_str() ), NULL );
         pLayout->addControl( pResize, pos, rData.m_layer );
     }
     else
@@ -375,7 +377,7 @@ void Builder::addText( const BuilderData::Text &rData )
     m_pTheme->m_vars.push_back( VariablePtr( pVar ) );
 
     CtrlText *pText = new CtrlText( getIntf(), *pVar, *pFont,
-            UString( getIntf(), rData.m_help.c_str() ) );
+            UString( getIntf(), rData.m_help.c_str() ), rData.m_color, NULL );
 
     int height = pFont->getSize();
 
@@ -414,7 +416,8 @@ void Builder::addRadialSlider( const BuilderData::RadialSlider &rData )
     CtrlRadialSlider *pRadial =
         new CtrlRadialSlider( getIntf(), *pSeq, rData.m_nbImages, *pVar,
                               rData.m_minAngle, rData.m_maxAngle,
-                              UString( getIntf(), rData.m_help.c_str() ) );
+                              UString( getIntf(), rData.m_help.c_str() ),
+                              NULL );
 
     // XXX: resizing is not supported
     // Compute the position of the control
@@ -524,7 +527,7 @@ void Builder::addList( const BuilderData::List &rData )
     CtrlList *pList = new CtrlList( getIntf(), *pVar, *pFont,
        rData.m_fgColor, rData.m_playColor, rData.m_bgColor1,
        rData.m_bgColor2, rData.m_selColor,
-       UString( getIntf(), rData.m_help.c_str() ) );
+       UString( getIntf(), rData.m_help.c_str() ), NULL );
 
     // Compute the position of the control
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,

@@ -2,7 +2,7 @@
  * ctrl_checkbox.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_checkbox.cpp,v 1.2 2004/01/18 19:54:46 asmax Exp $
+ * $Id: ctrl_checkbox.cpp,v 1.3 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -41,8 +41,10 @@ CtrlCheckbox::CtrlCheckbox( intf_thread_t *pIntf,
                             CmdGeneric &rCommand1, CmdGeneric &rCommand2,
                             const UString &rTooltip1,
                             const UString &rTooltip2,
-                            VarBool &rVariable, const UString &rHelp ):
-    CtrlGeneric( pIntf, rHelp ), m_fsm( pIntf ), m_rVariable( rVariable ),
+                            VarBool &rVariable, const UString &rHelp,
+                            VarBool *pVisible ):
+    CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
+    m_rVariable( rVariable ),
     m_rCommand1( rCommand1 ), m_rCommand2( rCommand2 ),
     m_tooltip1( rTooltip1 ), m_tooltip2( rTooltip2 ),
     m_cmdUpOverDownOver( this, &transUpOverDownOver ),
@@ -247,7 +249,7 @@ void CtrlCheckbox::transHiddenUp( SkinObject *pCtrl )
 }
 
 
-void CtrlCheckbox::onUpdate( Subject<VarBool> &rVariable )
+void CtrlCheckbox::onVarBoolUpdate( VarBool &rVariable )
 {
     changeButton();
 }

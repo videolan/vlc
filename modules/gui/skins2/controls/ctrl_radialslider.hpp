@@ -2,7 +2,7 @@
  * ctrl_radialslider.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_radialslider.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: ctrl_radialslider.hpp,v 1.3 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -43,7 +43,8 @@ class CtrlRadialSlider: public CtrlGeneric, public Observer<VarPercent>
         /// composed of numImg subimages of the same size
         CtrlRadialSlider( intf_thread_t *pIntf, const GenericBitmap &rBmpSeq,
                           int numImg, VarPercent &rVariable, float minAngle,
-                          float maxAngle, const UString &rHelp );
+                          float maxAngle, const UString &rHelp,
+                          VarBool *pVisible );
 
         virtual ~CtrlRadialSlider();
 

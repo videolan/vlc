@@ -2,7 +2,7 @@
  * ctrl_list.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_list.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_list.hpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -41,7 +41,7 @@ class CtrlList: public CtrlGeneric, public Observer<VarList>,
         CtrlList( intf_thread_t *pIntf, VarList &rList, GenericFont &rFont,
                   uint32_t fgcolor, uint32_t playcolor, uint32_t bgcolor1,
                   uint32_t bgcolor2, uint32_t selColor,
-                  const UString &rHelp );
+                  const UString &rHelp, VarBool *pVisible );
         virtual ~CtrlList();
 
         /// Handle an event on the control.

@@ -2,7 +2,7 @@
  * ctrl_generic.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_generic.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_generic.hpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -29,16 +29,18 @@
 #include "../utils/pointer.hpp"
 #include "../utils/fsm.hpp"
 #include "../utils/ustring.hpp"
+#include "../utils/observer.hpp"
 
 class EvtGeneric;
 class OSGraphics;
 class GenericLayout;
 class Position;
 class GenericWindow;
+class VarBool;
 
 
 /// Base class for controls
-class CtrlGeneric: public SkinObject
+class CtrlGeneric: public SkinObject, public Observer<VarBool>
 {
     public:
         virtual ~CtrlGeneric();
@@ -73,8 +75,13 @@ class CtrlGeneric: public SkinObject
         /// Return true if the control can gain the focus
         virtual bool isFocusable() const { return false; }
 
+        /// Return true if the control is visible
+        virtual bool isVisible() const;
+
     protected:
-        CtrlGeneric( intf_thread_t *pIntf, const UString &rHelp );
+        // If pVisible is NULL, the control is always visible
+        CtrlGeneric( intf_thread_t *pIntf, const UString &rHelp,
+                     VarBool *pVisible = NULL );
 
         /// Tell the layout when the image has changed
         virtual void notifyLayout() const;
@@ -95,6 +102,9 @@ class CtrlGeneric: public SkinObject
         /// the Position object is set
         virtual void onPositionChange() {}
 
+        /// Overload this method to get notified of bool variable changes
+        virtual void onVarBoolUpdate( VarBool &rVar ) {}
+
     private:
         /// Associated layout
         GenericLayout *m_pLayout;
@@ -102,6 +112,11 @@ class CtrlGeneric: public SkinObject
         Position *m_pPosition;
         /// Help text
         UString m_help;
+        /// Visibilty variable
+        VarBool *m_pVisible;
+
+        /// Method called when an observed bool variable is changed
+        virtual void onUpdate( Subject<VarBool> &rVariable );
 };
 
 typedef CountedPtr<CtrlGeneric> CtrlGenericPtr;

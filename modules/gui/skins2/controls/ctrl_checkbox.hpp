@@ -2,7 +2,7 @@
  * ctrl_checkbox.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_checkbox.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_checkbox.hpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -32,11 +32,10 @@
 class GenericBitmap;
 class OSGraphics;
 class CmdGeneric;
-class VarBool;
 
 
 /// Base class for checkbox controls
-class CtrlCheckbox: public CtrlGeneric, public Observer<VarBool>
+class CtrlCheckbox: public CtrlGeneric
 {
     public:
         /// Create a checkbox with 6 images
@@ -49,7 +48,8 @@ class CtrlCheckbox: public CtrlGeneric, public Observer<VarBool>
                       const GenericBitmap &rBmpDown2,
                       CmdGeneric &rCommand1, CmdGeneric &rCommand2,
                       const UString &rTooltip1, const UString &rTooltip2,
-                      VarBool &rVariable, const UString &rHelp );
+                      VarBool &rVariable, const UString &rHelp,
+                      VarBool *pVisible);
 
         virtual ~CtrlCheckbox();
 
@@ -112,7 +112,7 @@ class CtrlCheckbox: public CtrlGeneric, public Observer<VarBool>
         static void transHiddenUp( SkinObject *pCtrl );
 
         /// Method called when the observed variable is modified
-        virtual void onUpdate( Subject<VarBool> &rVariable );
+        virtual void onVarBoolUpdate( VarBool &rVariable );
 
         /// Helper function to update the current state of images
         void changeButton();

@@ -2,7 +2,7 @@
  * generic_layout.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic_layout.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: generic_layout.cpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -123,6 +123,7 @@ const list<LayeredControl> &GenericLayout::getControlList() const
 
 void GenericLayout::onControlUpdate( const CtrlGeneric &rCtrl )
 {
+    // TODO: refresh only the needed area if possible
     refreshAll();
 }
 
@@ -181,11 +182,11 @@ void GenericLayout::refreshAll()
     list<LayeredControl>::const_iterator iter;
     for( iter = m_controlList.begin(); iter != m_controlList.end(); iter++ )
     {
-        const Position *pPos = (*iter).m_pControl->getPosition();
-        if( pPos )
+        CtrlGeneric *pCtrl = (*iter).m_pControl;
+        const Position *pPos = pCtrl->getPosition();
+        if( pCtrl->isVisible() && pPos )
         {
-            (*iter).m_pControl->draw( *m_pImage, pPos->getLeft(),
-                                      pPos->getTop() );
+            pCtrl->draw( *m_pImage, pPos->getLeft(), pPos->getTop() );
         }
     }
 

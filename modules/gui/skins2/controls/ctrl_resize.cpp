@@ -2,7 +2,7 @@
  * ctrl_resize.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_resize.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_resize.cpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -33,8 +33,9 @@
 
 
 CtrlResize::CtrlResize( intf_thread_t *pIntf, CtrlFlat &rCtrl,
-                        GenericLayout &rLayout, const UString &rHelp ):
-    CtrlFlat( pIntf, rHelp ), m_fsm( pIntf ), m_rCtrl( rCtrl ),
+                        GenericLayout &rLayout, const UString &rHelp,
+                        VarBool *pVisible ):
+    CtrlFlat( pIntf, rHelp, pVisible ), m_fsm( pIntf ), m_rCtrl( rCtrl ),
     m_rLayout( rLayout ), m_cmdResizeResize( this, &transResizeResize ),
     m_cmdStillResize( this, &transStillResize ),
     m_cmdResizeStill( this, &transResizeStill )

@@ -2,7 +2,7 @@
  * ctrl_button.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_button.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_button.cpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -33,9 +33,10 @@
 CtrlButton::CtrlButton( intf_thread_t *pIntf, const GenericBitmap &rBmpUp,
                         const GenericBitmap &rBmpOver,
                         const GenericBitmap &rBmpDown, CmdGeneric &rCommand,
-                        const UString &rTooltip, const UString &rHelp ):
-    CtrlGeneric( pIntf, rHelp ), m_fsm( pIntf ), m_rCommand( rCommand ),
-    m_tooltip( rTooltip ),
+                        const UString &rTooltip, const UString &rHelp,
+                        VarBool *pVisible ):
+    CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
+    m_rCommand( rCommand ), m_tooltip( rTooltip ),
     m_cmdUpOverDownOver( this, &transUpOverDownOver ),
     m_cmdDownOverUpOver( this, &transDownOverUpOver ),
     m_cmdDownOverDown( this, &transDownOverDown ),

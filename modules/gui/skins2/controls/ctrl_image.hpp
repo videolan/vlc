@@ -2,7 +2,7 @@
  * ctrl_image.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_image.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_image.hpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -38,7 +38,7 @@ class CtrlImage: public CtrlFlat
     public:
         // Create an image with the given bitmap (which is NOT copied)
         CtrlImage( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
-                   const UString &rHelp );
+                   const UString &rHelp, VarBool *pVisible );
         virtual ~CtrlImage();
 
         /// Handle an event on the control

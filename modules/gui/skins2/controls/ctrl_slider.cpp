@@ -2,7 +2,7 @@
  * ctrl_slider.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_slider.cpp,v 1.3 2004/02/01 21:13:04 ipkiss Exp $
+ * $Id: ctrl_slider.cpp,v 1.4 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -47,8 +47,8 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
                                     VarBool *pVisible,
                                     const UString &rTooltip,
                                     const UString &rHelp ):
-    CtrlGeneric( pIntf, rHelp ), m_fsm( pIntf ), m_rVariable( rVariable ),
-    m_pVisible( pVisible ), m_tooltip( rTooltip ),
+    CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
+    m_rVariable( rVariable ), m_tooltip( rTooltip ),
     m_width( rCurve.getWidth() ), m_height( rCurve.getHeight() ),
     m_cmdOverDown( this, &transOverDown ),
     m_cmdDownOver( this, &transDownOver ), m_cmdOverUp( this, &transOverUp ),
@@ -91,12 +91,6 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
     // Observe the position variable
     m_rVariable.addObserver( this );
 
-    // Observe the visibility variable
-    if( m_pVisible )
-    {
-        m_pVisible->addObserver( this );
-    }
-
     // Initial position of the cursor
     m_lastPercentage = m_rVariable.get();
 }
@@ -105,10 +99,6 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
 CtrlSliderCursor::~CtrlSliderCursor()
 {
     m_rVariable.delObserver( this );
-    if( m_pVisible )
-    {
-        m_pVisible->delObserver( this );
-    }
     SKINS_DELETE( m_pImgUp );
     SKINS_DELETE( m_pImgDown );
     SKINS_DELETE( m_pImgOver );
@@ -150,7 +140,7 @@ bool CtrlSliderCursor::mouseOver( int x, int y ) const
 
 void CtrlSliderCursor::draw( OSGraphics &rImage, int xDest, int yDest )
 {
-    if( m_pImg && (!m_pVisible || m_pVisible->get()) )
+    if( m_pImg )
     {
         // Compute the position of the cursor
         int xPos, yPos;
@@ -173,13 +163,6 @@ void CtrlSliderCursor::draw( OSGraphics &rImage, int xDest, int yDest )
 void CtrlSliderCursor::onUpdate( Subject<VarPercent> &rVariable )
 {
     // The position has changed
-    notifyLayout();
-}
-
-
-void CtrlSliderCursor::onUpdate( Subject<VarBool> &rVariable )
-{
-    // The visibility variable has changed
     notifyLayout();
 }
 
@@ -320,8 +303,8 @@ CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf, CtrlSliderCursor &rCursor,
                             const Bezier &rCurve, VarPercent &rVariable,
                             int thickness, VarBool *pVisible,
                             const UString &rHelp ):
-    CtrlGeneric( pIntf, rHelp ), m_rCursor( rCursor ), m_rVariable( rVariable ),
-    m_thickness( thickness ), m_pVisible( pVisible ), m_curve( rCurve ),
+    CtrlGeneric( pIntf, rHelp, pVisible ), m_rCursor( rCursor ),
+    m_rVariable( rVariable ), m_thickness( thickness ), m_curve( rCurve ),
     m_width( rCurve.getWidth() ), m_height( rCurve.getHeight() )
 {
 }
@@ -329,11 +312,6 @@ CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf, CtrlSliderCursor &rCursor,
 
 bool CtrlSliderBg::mouseOver( int x, int y ) const
 {
-    if( m_pVisible && !m_pVisible->get() )
-    {
-        return false;
-    }
-
     // Compute the resize factors
     float factorX, factorY;
     getResizeFactors( factorX, factorY );
@@ -389,13 +367,6 @@ void CtrlSliderBg::handleEvent( EvtGeneric &rEvent )
 
         m_rVariable.set( percentage );
     }
-}
-
-
-void CtrlSliderBg::onUpdate( Subject<VarBool> &rVariable )
-{
-    // The visibility variable has changed
-    notifyLayout();
 }
 
 

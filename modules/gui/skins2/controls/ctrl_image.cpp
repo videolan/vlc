@@ -2,7 +2,7 @@
  * ctrl_image.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_image.cpp,v 1.2 2004/02/01 14:44:11 asmax Exp $
+ * $Id: ctrl_image.cpp,v 1.3 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -32,8 +32,8 @@
 
 
 CtrlImage::CtrlImage( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
-                      const UString &rHelp ):
-    CtrlFlat( pIntf, rHelp ), m_rBitmap( rBitmap )
+                      const UString &rHelp, VarBool *pVisible ):
+    CtrlFlat( pIntf, rHelp, pVisible ), m_rBitmap( rBitmap )
 {
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
     // Create an initial unscaled image in the buffer

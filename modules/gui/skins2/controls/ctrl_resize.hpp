@@ -2,7 +2,7 @@
  * ctrl_resize.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_resize.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_resize.hpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -37,7 +37,8 @@ class CtrlResize: public CtrlFlat
 {
     public:
         CtrlResize( intf_thread_t *pIntf, CtrlFlat &rCtrl,
-                    GenericLayout &rLayout, const UString &rHelp );
+                    GenericLayout &rLayout, const UString &rHelp,
+                    VarBool *pVisible );
         virtual ~CtrlResize() {}
 
         /// Handle an event

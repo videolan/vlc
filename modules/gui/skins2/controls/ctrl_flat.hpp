@@ -2,7 +2,7 @@
  * ctrl_flat.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_flat.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_flat.hpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -32,8 +32,10 @@
 class CtrlFlat: public CtrlGeneric
 {
     protected:
-        CtrlFlat( intf_thread_t *pIntf, const UString &rHelp ):
-            CtrlGeneric( pIntf, rHelp ) {}
+        CtrlFlat( intf_thread_t *pIntf, const UString &rHelp,
+                  VarBool *pVisible ):
+            CtrlGeneric( pIntf, rHelp, pVisible ) {}
+
         virtual ~CtrlFlat() {}
 };
 

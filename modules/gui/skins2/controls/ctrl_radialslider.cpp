@@ -2,7 +2,7 @@
  * ctrl_radialslider.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_radialslider.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: ctrl_radialslider.cpp,v 1.3 2004/02/29 16:49:55 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -36,8 +36,9 @@
 CtrlRadialSlider::CtrlRadialSlider( intf_thread_t *pIntf,
                                     const GenericBitmap &rBmpSeq, int numImg,
                                     VarPercent &rVariable, float minAngle,
-                                    float maxAngle, const UString &rHelp ):
-    CtrlGeneric( pIntf, rHelp ), m_fsm( pIntf ), m_numImg( numImg ),
+                                    float maxAngle, const UString &rHelp,
+                                    VarBool *pVisible ):
+    CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ), m_numImg( numImg ),
     m_rVariable( rVariable ), m_minAngle( minAngle ), m_maxAngle( maxAngle ),
     m_cmdUpDown( this, &transUpDown ), m_cmdDownUp( this, &transDownUp ),
     m_cmdMove( this, &transMove ), m_position( 0 ), m_lastPos( 0 )
