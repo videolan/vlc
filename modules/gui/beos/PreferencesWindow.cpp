@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.10 2003/01/27 10:29:21 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.11 2003/01/28 10:05:15 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -206,6 +206,7 @@ void PreferencesWindow::MessageReceived( BMessage * p_message )
  *****************************************************************************/
 void PreferencesWindow::ReallyQuit()
 {
+    Lock();
     Hide();
     Quit();
 }

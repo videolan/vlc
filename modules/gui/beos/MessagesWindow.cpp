@@ -2,7 +2,7 @@
  * MessagesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.cpp,v 1.3 2003/01/28 08:17:26 titer Exp $
+ * $Id: MessagesWindow.cpp,v 1.4 2003/01/28 10:05:15 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -164,11 +164,13 @@ void MessagesWindow::UpdateMessages()
             fMessagesView->UnlockLooper();
             
             /* Scroll at the end */
-            fScrollBar->LockLooper();
-            float min, max;
-            fScrollBar->GetRange( &min, &max );
-            fScrollBar->SetValue( max );
-            fScrollBar->UnlockLooper();
+            if( fScrollBar->LockLooper() )
+            {
+                float min, max;
+                fScrollBar->GetRange( &min, &max );
+                fScrollBar->SetValue( max );
+                fScrollBar->UnlockLooper();
+            }
         }
 
         vlc_mutex_lock( p_sub->p_lock );
