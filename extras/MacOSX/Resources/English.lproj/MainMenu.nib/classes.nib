@@ -112,6 +112,7 @@
         {
             ACTIONS = {
                 openDisc = id; 
+                openDiscMenusChanged = id; 
                 openDiscStepperChanged = id; 
                 openDiscTypeChanged = id; 
                 openFile = id; 
@@ -135,6 +136,7 @@
                 "o_disc_chapter_stp" = id; 
                 "o_disc_device" = id; 
                 "o_disc_device_lbl" = id; 
+                "o_disc_dvd_menus" = id; 
                 "o_disc_title" = id; 
                 "o_disc_title_lbl" = id; 
                 "o_disc_title_stp" = id; 

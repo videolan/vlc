@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.5 2002/12/30 23:45:21 massiot Exp $
+ * $Id: open.m,v 1.6 2003/01/05 02:39:48 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -154,11 +154,11 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_disc_title_lbl setStringValue: _NS("Title")];
     [o_disc_chapter_lbl setStringValue: _NS("Chapter")];
     [o_disc_videots_btn_browse setStringValue: _NS("Browse...")];
+    [o_disc_dvd_menus setTitle: _NS("Use DVD menus")];
 
-    [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("DVD")];
-    [[o_disc_type cellAtRow:1 column:0] setTitle: _NS("DVD with menus")];
+    [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("VIDEO_TS folder")];
+    [[o_disc_type cellAtRow:1 column:0] setTitle: _NS("DVD")];
     [[o_disc_type cellAtRow:2 column:0] setTitle: _NS("VCD")];
-    [[o_disc_type cellAtRow:3 column:0] setTitle: _NS("VIDEO_TS folder")];
 
     [o_net_udp_port_lbl setStringValue: _NS("Port")];
     [o_net_udpm_addr_lbl setStringValue: _NS("Address")];
@@ -299,40 +299,36 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 - (IBAction)openDiscTypeChanged:(id)sender
 {
     NSString *o_type;
-    vlc_bool_t b_vts, b_device, b_title_chapter;
+    vlc_bool_t b_device, b_menus, b_title_chapter;
     
     [o_disc_device removeAllItems];
+    b_title_chapter = ![o_disc_dvd_menus state];
     
     o_type = [[o_disc_type selectedCell] title];
 
     if ( [o_type isEqualToString: _NS("VIDEO_TS folder")] )
     {
-        b_vts = 1; b_device = b_title_chapter = 0;
+        b_device = 0; b_menus = 1;
     }
     else
     {
         NSArray *o_devices;
         NSString *o_disc;
         const char *psz_class = NULL;
-        b_vts = 0; b_device = 1;
+        b_device = 1;
 
         if ( [o_type isEqualToString: _NS("VCD")] )
         {
             psz_class = kIOCDMediaClass;
             o_disc = o_type;
-            b_title_chapter = 1;
+            b_menus = 0; b_title_chapter = 1;
+            [o_disc_dvd_menus setState: FALSE];
         }
-        else if ( [o_type isEqualToString: _NS("DVD")] )
+        else
         {
             psz_class = kIODVDMediaClass;
             o_disc = o_type;
-            b_title_chapter = 1;
-        }
-        else /* DVD with menus */
-        {
-            psz_class = kIODVDMediaClass;
-            o_disc = _NS("DVD");
-            b_title_chapter = 0;
+            b_menus = 1;
         }
     
         o_devices = GetEjectableMediaOfClass( psz_class );
@@ -365,8 +361,9 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_disc_title_stp setEnabled: b_title_chapter];
     [o_disc_chapter setEnabled: b_title_chapter];
     [o_disc_chapter_stp setEnabled: b_title_chapter];
-    [o_disc_videots_folder setEnabled: b_vts];
-    [o_disc_videots_btn_browse setEnabled: b_vts];
+    [o_disc_videots_folder setEnabled: !b_device];
+    [o_disc_videots_btn_browse setEnabled: !b_device];
+    [o_disc_dvd_menus setEnabled: b_menus];
 
     [self openDiscInfoChanged: nil];
 }
@@ -394,12 +391,14 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     NSString *o_videots;
     NSString *o_mrl_string;
     int i_title, i_chapter;
+    vlc_bool_t b_menus;
 
     o_type = [[o_disc_type selectedCell] title];
     o_device = [o_disc_device stringValue];
     i_title = [o_disc_title intValue];
     i_chapter = [o_disc_chapter intValue];
     o_videots = [o_disc_videots_folder stringValue];
+    b_menus = [o_disc_dvd_menus state];
 
     if ( [o_type isEqualToString: _NS("VCD")] )
     {
@@ -414,22 +413,30 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         if ( [o_device isEqualToString:
                 [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
             o_device = @"";
-        o_mrl_string = [NSString stringWithFormat: @"dvdold://%@@%i,%i",
-                        o_device, i_title, i_chapter]; 
-    }
-    else if ( [o_type isEqualToString: _NS("DVD with menus")] )
-    {
-        if ( [o_device isEqualToString:
-                [NSString stringWithFormat: _NS("No %@s found"), _NS("DVD")]] )
-            o_device = @"";
-        o_mrl_string = [NSString stringWithFormat: @"dvdplay://%@", o_device]; 
+        if ( b_menus )
+            o_mrl_string = [NSString stringWithFormat: @"dvdplay://%@",
+                            o_device]; 
+        else
+            o_mrl_string = [NSString stringWithFormat: @"dvdold://%@@%i,%i",
+                            o_device, i_title, i_chapter]; 
     }
     else /* VIDEO_TS folder */
     {
-        o_mrl_string = [NSString stringWithFormat: @"dvdread://%@", o_videots]; 
+        if ( b_menus )
+            o_mrl_string = [NSString stringWithFormat: @"dvdplay://%@",
+                            o_videots]; 
+        else
+            o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i,%i",
+                            o_videots, i_title, i_chapter]; 
     }
 
     [o_mrl setStringValue: o_mrl_string]; 
+}
+
+- (IBAction)openDiscMenusChanged:(id)sender
+{
+    [self openDiscInfoChanged: nil];
+    [self openDiscTypeChanged: nil];
 }
 
 - (IBAction)openNetModeChanged:(id)sender
