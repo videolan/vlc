@@ -806,6 +806,7 @@ private:
     void OnMenuOpen( wxMenuEvent& event );
 
     wxMenu *ViewMenu();
+    wxMenu *SDMenu();
 
     void OnUp( wxCommandEvent& event);
     void OnDown( wxCommandEvent& event);
@@ -849,6 +850,9 @@ private:
     wxMenu *popup_menu;
 
     wxMenu *p_view_menu;
+    wxMenu *p_sd_menu;
+
+    char **pp_sds;
 
     ItemInfoDialog *iteminfo_dialog;
 

@@ -977,7 +977,7 @@ void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
     {
         if( p_intf->p_sys->p_popup_menu )
         {
-            p_menuitem = 
+            p_menuitem =
                 p_intf->p_sys->p_popup_menu->FindItem( event.GetId() );
         }
     }

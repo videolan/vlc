@@ -113,6 +113,25 @@ void playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
     return;
 }
 
+vlc_bool_t playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
+                                              const char *psz_module )
+{
+    int i;
+    vlc_mutex_lock( &p_playlist->object_lock );
+
+    for( i = 0 ; i< p_playlist->i_sds ; i ++ )
+    {
+        if( !strcmp( psz_module, p_playlist->pp_sds[i]->psz_module ) )
+        {
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            return VLC_TRUE;
+        }
+    }
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    return VLC_FALSE;
+}
+
+
 /**
  * Load all service discovery modules in a string
  *

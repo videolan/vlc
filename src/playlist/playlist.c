@@ -60,6 +60,7 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args );
  */
 playlist_t * __playlist_Create ( vlc_object_t *p_parent )
 {
+    int i_index;
     playlist_t *p_playlist;
     playlist_view_t *p_view;
     vlc_value_t     val;
@@ -90,6 +91,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     var_Create( p_playlist, "intf-show", VLC_VAR_BOOL );
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-show", val );
+
 
     /* Variables to control playback */
     var_CreateGetBool( p_playlist, "play-and-stop" );
@@ -923,6 +925,7 @@ static int ItemChange( vlc_object_t *p_obj, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     playlist_t *p_playlist = (playlist_t *)param;
+    int i_index;
 
     //p_playlist->b_need_update = VLC_TRUE;
     var_SetInteger( p_playlist, "item-change", newval.i_int );

@@ -107,7 +107,13 @@ enum
     /* custom events */
     UpdateItem_Event,
 
+    MenuDummy_Event = wxID_HIGHEST + 999,
+
     FirstView_Event = wxID_HIGHEST + 1000,
+    LastView_Event = wxID_HIGHEST + 1100,
+
+    FirstSD_Event = wxID_HIGHEST + 2000,
+    LastSD_Event = wxID_HIGHEST + 2100,
 };
 
 DEFINE_LOCAL_EVENT_TYPE( wxEVT_PLAYLIST );
@@ -205,6 +211,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     SetIcon( *p_intf->p_sys->p_icon );
 
     p_view_menu = NULL;
+    p_sd_menu = SDMenu();
 
     i_current_view = VIEW_SIMPLE;
 
@@ -221,6 +228,9 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxMenu *manage_menu = new wxMenu;
     manage_menu->Append( AddFile_Event, wxU(_("&Simple Add...")) );
     manage_menu->Append( AddMRL_Event, wxU(_("&Add MRL...")) );
+    manage_menu->AppendSeparator();
+    manage_menu->Append( MenuDummy_Event, wxU(_("Services discovery")),
+                         p_sd_menu );
     manage_menu->AppendSeparator();
     manage_menu->Append( Open_Event, wxU(_("&Open Playlist...")) );
     manage_menu->Append( Save_Event, wxU(_("&Save Playlist...")) );
@@ -1090,12 +1100,6 @@ void Playlist::OnDisableSelection( wxCommandEvent& WXUNUSED(event) )
 
 void Playlist::OnSelectAll( wxCommandEvent& WXUNUSED(event) )
 {
-#if 0
-    for( long item = 0; item < listview->GetItemCount(); item++ )
-    {
-        listview->Select( item, TRUE );
-    }
-#endif
 }
 
 /**********************************************************************
@@ -1203,12 +1207,6 @@ void Playlist::ShowInfos( int i_item )
 
 void Playlist::OnInfos( wxCommandEvent& WXUNUSED(event) )
 {
-    /* We use the first selected item, so find it */
-#if 0
-    long i_item = listview->GetNextItem( -1, wxLIST_NEXT_ALL,
-                                         wxLIST_STATE_SELECTED );
-    ShowInfos( i_item );
-#endif
 }
 
 void Playlist::OnEnDis( wxCommandEvent& event )
@@ -1220,15 +1218,6 @@ void Playlist::OnEnDis( wxCommandEvent& event )
     {
         return;
     }
-#if 0
-    long i_item = listview->GetNextItem( -1, wxLIST_NEXT_ALL,
-                                         wxLIST_STATE_SELECTED );
-
-    if( i_item >= 0 && i_item < p_playlist->i_size )
-    {
-       Rebuild();
-    }
-#endif
     vlc_object_release( p_playlist );
 }
 
@@ -1266,29 +1255,46 @@ void Playlist::OnMenuEvent( wxCommandEvent& event )
         event.Skip();
         return;
     }
-
-    int i_new_view = event.GetId() - FirstView_Event;
-
-    playlist_view_t *p_view = playlist_ViewFind( p_playlist, i_new_view );
-
-    if( p_view != NULL )
+    else if( event.GetId() < LastView_Event )
     {
-        i_current_view = i_new_view;
-        playlist_ViewUpdate( p_playlist, i_new_view );
-        Rebuild();
-        vlc_object_release( p_playlist );
-        return;
+
+        int i_new_view = event.GetId() - FirstView_Event;
+
+        playlist_view_t *p_view = playlist_ViewFind( p_playlist, i_new_view );
+
+        if( p_view != NULL )
+        {
+            i_current_view = i_new_view;
+            playlist_ViewUpdate( p_playlist, i_new_view );
+            Rebuild();
+            vlc_object_release( p_playlist );
+            return;
+        }
+        else if( i_new_view >= VIEW_FIRST_SORTED &&
+                 i_new_view <= VIEW_LAST_SORTED )
+        {
+            playlist_ViewInsert( p_playlist, i_new_view, "View" );
+            playlist_ViewUpdate( p_playlist, i_new_view );
+
+            i_current_view = i_new_view;
+
+            Rebuild();
+        }
     }
-    else if( i_new_view >= VIEW_FIRST_SORTED && i_new_view <= VIEW_LAST_SORTED )
+    else if( event.GetId() >= FirstSD_Event && event.GetId() < LastSD_Event )
     {
-        playlist_ViewInsert( p_playlist, i_new_view, "View" );
-        playlist_ViewUpdate( p_playlist, i_new_view );
-
-        i_current_view = i_new_view;
-
-        Rebuild();
+        if( !playlist_IsServicesDiscoveryLoaded( p_playlist,
+                                pp_sds[event.GetId() - FirstSD_Event] ) )
+        {
+            playlist_ServicesDiscoveryAdd( p_playlist,
+                            pp_sds[event.GetId() - FirstSD_Event] );
+        }
+        else
+        {
+            playlist_ServicesDiscoveryRemove( p_playlist,
+                            pp_sds[event.GetId() - FirstSD_Event] );
+        }
     }
-
     vlc_object_release( p_playlist );
 }
 
@@ -1337,6 +1343,47 @@ wxMenu * Playlist::ViewMenu()
     vlc_object_release( p_playlist);
 
     return p_view_menu;
+}
+
+wxMenu *Playlist::SDMenu()
+{
+
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                              VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( !p_playlist )
+    {
+        return NULL;
+    }
+    vlc_value_t val, val_list, text_list;
+    p_sd_menu = new wxMenu;
+
+    vlc_list_t *p_list = vlc_list_find( p_playlist, VLC_OBJECT_MODULE,
+                                        FIND_ANYWHERE );
+
+    int i_number = 0;
+    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
+    {
+        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+
+        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
+        {
+            p_sd_menu->AppendCheckItem( FirstSD_Event + i_number ,
+                       wxU( p_parser->psz_longname ? p_parser->psz_longname :
+                            p_parser->psz_shortname ) );
+
+            if( playlist_IsServicesDiscoveryLoaded( p_playlist,
+                                    p_parser->psz_shortname ) )
+            {
+                p_sd_menu->Check( FirstSD_Event + i_number, TRUE );
+            }
+
+            INSERT_ELEM( (void**)pp_sds, i_number, i_number,
+                         (void*)p_parser->psz_shortname );
+        }
+    }
+    vlc_list_release( p_list );
+    vlc_object_release( p_playlist );
+    return p_sd_menu;
 }
 
 

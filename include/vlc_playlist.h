@@ -231,6 +231,8 @@ VLC_EXPORT( int,  playlist_Clear, ( playlist_t * ) );
 VLC_EXPORT( int, playlist_ServicesDiscoveryAdd, (playlist_t *, const char *));
 VLC_EXPORT( void, playlist_ServicesDiscoveryRemove, (playlist_t *, const char *));
 VLC_EXPORT( int, playlist_AddSDModules, (playlist_t *, char *));
+VLC_EXPORT( vlc_bool_t, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const char *));
+
 
 /* Item management functions (act on items) */
 #define playlist_AddItem(p,pi,i1,i2) playlist_ItemAdd(p,pi,i1,i2)
