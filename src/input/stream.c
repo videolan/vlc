@@ -489,7 +489,15 @@ static int AStreamReadBlock( stream_t *s, void *p_read, int i_read )
         return 0;
 
     if( p_read == NULL )
-        return AStreamSeekBlock( s, p_sys->i_pos + i_read ) ? 0 : i_read;
+    {
+	/* seek within this stream if possible, else use plain old read and discard */
+        stream_sys_t *p_sys = s->p_sys;
+        access_t     *p_access = p_sys->p_access;
+        vlc_bool_t   b_aseek;
+        access2_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
+        if( b_aseek )
+            return AStreamSeekBlock( s, p_sys->i_pos + i_read ) ? 0 : i_read;
+    }
 
     while( i_data < i_read )
     {
@@ -808,7 +816,15 @@ static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
     if( tk->i_start >= tk->i_end ) return 0; /* EOF */
 
     if( p_read == NULL )
-        return AStreamSeekStream( s, p_sys->i_pos + i_read ) ? 0 : i_read;
+    {
+	/* seek within this stream if possible, else use plain old read and discard */
+        stream_sys_t *p_sys = s->p_sys;
+        access_t     *p_access = p_sys->p_access;
+        vlc_bool_t   b_aseek;
+        access2_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
+        if( b_aseek )
+            return AStreamSeekStream( s, p_sys->i_pos + i_read ) ? 0 : i_read;
+    }
 
 #if 0
     msg_Dbg( s, "AStreamReadStream: %d pos="I64Fd" tk=%d start="I64Fd
@@ -948,6 +964,7 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
     if( !b_aseek )
     {
         /* We can't do nothing */
+        msg_Dbg( s, "AStreamSeekStream: can't seek" );
         return VLC_EGENERIC;
     }
 
