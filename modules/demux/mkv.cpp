@@ -161,6 +161,29 @@ block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
 }
 #endif
 
+/**
+ * Helper function to print the mkv parse tree
+ */
+static void MkvTree( demux_t *p_this, int i_level, char *psz_format, ... )
+{
+    va_list args;
+    if( i_level > 9 )
+    {
+        msg_Err( p_this, "too deep tree" );
+        return;
+    }
+    va_start( args, psz_format );
+    static char *psz_foo = "|   |   |   |   |   |   |   |   |   |";
+    char *psz_foo2 = (char*)malloc( ( i_level * 4 + 3 + strlen( psz_format ) ) * sizeof(char) );
+    strncpy( psz_foo2, psz_foo, 4 * i_level );
+    psz_foo2[ 4 * i_level ] = '+';
+    psz_foo2[ 4 * i_level + 1 ] = ' ';
+    strcpy( &psz_foo2[ 4 * i_level + 2 ], psz_format );
+    __msg_GenericVa( VLC_OBJECT(p_this), VLC_MSG_DBG, "mkv", psz_foo2, args );
+    free( psz_foo2 );
+    va_end( args );
+}
+    
 /*****************************************************************************
  * Stream managment
  *****************************************************************************/
@@ -414,7 +437,7 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_demux, "cannot find KaxSegment" );
         goto error;
     }
-    msg_Dbg( p_demux, "+ Segment" );
+    MkvTree( p_demux, 0, "Segment" );
     p_sys->segment = (KaxSegment*)el;
     p_sys->cluster = NULL;
 
@@ -1977,13 +2000,13 @@ static void ParseTrackEntry( demux_t *p_demux, EbmlMaster *m )
         else if( MKV_IS_ID( l, KaxContentEncodings ) )
         {
             EbmlMaster *cencs = static_cast<EbmlMaster*>(l);
-            msg_Dbg( p_demux, "|   |   |   + Content Encodings" );
+            MkvTree( p_demux, 3, "Content Encodings" );
             for( unsigned int i = 0; i < cencs->ListSize(); i++ )
             {
                 EbmlElement *l2 = (*cencs)[i];
                 if( MKV_IS_ID( l2, KaxContentEncoding ) )
                 {
-                    msg_Dbg( p_demux, "|   |   |   |   + Content Encoding" );
+                    MkvTree( p_demux, 4, "Content Encoding" );
                     EbmlMaster *cenc = static_cast<EbmlMaster*>(l2);
                     for( unsigned int i = 0; i < cenc->ListSize(); i++ )
                     {
@@ -1991,29 +2014,29 @@ static void ParseTrackEntry( demux_t *p_demux, EbmlMaster *m )
                         if( MKV_IS_ID( l3, KaxContentEncodingOrder ) )
                         {
                             KaxContentEncodingOrder &encord = *(KaxContentEncodingOrder*)l3;
-                            msg_Dbg( p_demux, "|   |   |   |   |   + Order: %i", uint32( encord ) );
+                            MkvTree( p_demux, 5, "Order: %i", uint32( encord ) );
                         }
                         else if( MKV_IS_ID( l3, KaxContentEncodingScope ) )
                         {
                             KaxContentEncodingScope &encscope = *(KaxContentEncodingScope*)l3;
-                            msg_Dbg( p_demux, "|   |   |   |   |   + Scope: %i", uint32( encscope ) );
+                            MkvTree( p_demux, 5, "Scope: %i", uint32( encscope ) );
                         }
                         else if( MKV_IS_ID( l3, KaxContentEncodingType ) )
                         {
                             KaxContentEncodingType &enctype = *(KaxContentEncodingType*)l3;
-                            msg_Dbg( p_demux, "|   |   |   |   |   + Type: %i", uint32( enctype ) );
+                            MkvTree( p_demux, 5, "Type: %i", uint32( enctype ) );
                         }
                         else if( MKV_IS_ID( l3, KaxContentCompression ) )
                         {
                             EbmlMaster *compr = static_cast<EbmlMaster*>(l3);
-                            msg_Dbg( p_demux, "|   |   |   |   |   + Content Compression" );
+                            MkvTree( p_demux, 5, "Content Compression" );
                             for( unsigned int i = 0; i < compr->ListSize(); i++ )
                             {
                                 EbmlElement *l4 = (*compr)[i];
                                 if( MKV_IS_ID( l4, KaxContentCompAlgo ) )
                                 {
                                     KaxContentCompAlgo &compalg = *(KaxContentCompAlgo*)l4;
-                                    msg_Dbg( p_demux, "|   |   |   |   |   |   + Compression Algorithm: %i", uint32(compalg) );
+                                    MkvTree( p_demux, 6, "Compression Algorithm: %i", uint32(compalg) );
                                     if( uint32( compalg ) == 0 )
                                     {
                                         tk->b_compression_zlib = VLC_TRUE;
@@ -2021,21 +2044,21 @@ static void ParseTrackEntry( demux_t *p_demux, EbmlMaster *m )
                                 }
                                 else
                                 {
-                                    msg_Dbg( p_demux, "|   |   |   |   |   |   + Unknown (%s)", typeid(*l4).name() );
+                                    MkvTree( p_demux, 6, "Unknown (%s)", typeid(*l4).name() );
                                 }
                             }
                         }
 
                         else
                         {
-                            msg_Dbg( p_demux, "|   |   |   |   |   + Unknown (%s)", typeid(*l3).name() );
+                            MkvTree( p_demux, 5, "Unknown (%s)", typeid(*l3).name() );
                         }
                     }
                     
                 }
                 else
                 {
-                    msg_Dbg( p_demux, "|   |   |   |   + Unknown (%s)", typeid(*l2).name() );
+                    MkvTree( p_demux, 4, "Unknown (%s)", typeid(*l2).name() );
                 }
             }
                 
