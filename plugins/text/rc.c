@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.12 2002/04/19 13:56:11 sam Exp $
+ * $Id: rc.c,v 1.13 2002/05/18 07:30:03 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -161,7 +161,8 @@ static void intf_Run( intf_thread_t *p_intf )
         if( p_input_bank->pp_input[0] != NULL )
         {
             /* Get position */
-            if( S.i_mux_rate )
+            vlc_mutex_lock( &S.stream_lock );
+            if( !p_input_bank->pp_input[0]->b_die && S.i_mux_rate )
             {
                 f_ratio = 1.0 / ( 50 * S.i_mux_rate );
                 i_newpos = S.p_selected_area->i_tell * f_ratio;
@@ -174,6 +175,7 @@ static void intf_Run( intf_thread_t *p_intf )
                                           S.p_selected_area->i_size ) );
                 }
             }
+            vlc_mutex_unlock( &S.stream_lock );
         }
 #undef S
         vlc_mutex_unlock( &p_input_bank->lock );
