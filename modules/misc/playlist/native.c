@@ -2,7 +2,7 @@
  * native.c :  Native playlist export module
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: native.c,v 1.1 2004/01/11 00:45:06 zorglub Exp $
+ * $Id: native.c,v 1.2 2004/02/22 15:52:33 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -42,7 +42,7 @@ int Export_Native ( vlc_object_t * );
 int Export_Native( vlc_object_t *p_this )
 {
     playlist_t *p_playlist = (playlist_t*)p_this;
-    playlist_export_t *p_export = (playlist_export_t *)p_playlist->p_private;
 
     msg_Dbg(p_playlist, "Saving using native format");
+    return VLC_SUCCESS; 
 }
