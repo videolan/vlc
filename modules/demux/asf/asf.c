@@ -2,7 +2,7 @@
  * asf.c : ASF demux module
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.51 2004/01/31 05:27:02 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -42,7 +42,7 @@ static void Close ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("ASF v1.0 demuxer") );
-    set_capability( "demux", 200 );
+    set_capability( "demux2", 200 );
     set_callbacks( Open, Close );
     add_shortcut( "asf" );
 vlc_module_end();
@@ -51,10 +51,10 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int Demux  ( input_thread_t * );
-static int Control( input_thread_t *, int i_query, va_list args );
+static int Demux  ( demux_t * );
+static int Control( demux_t *, int i_query, va_list args );
 
-typedef struct asf_stream_s
+typedef struct
 {
     int i_cat;
 
@@ -66,18 +66,19 @@ typedef struct asf_stream_s
 
     block_t         *p_frame; /* use to gather complete frame */
 
-} asf_stream_t;
+} asf_track_t;
 
 struct demux_sys_t
 {
     mtime_t             i_time;     /* µs */
     mtime_t             i_length;   /* length of file file */
+    int64_t             i_bitrate;  /* global file bitrate */
 
     asf_object_root_t            *p_root;
     asf_object_file_properties_t *p_fp;
 
-    unsigned int        i_streams;
-    asf_stream_t        *stream[128];
+    unsigned int        i_track;
+    asf_track_t         *track[128];
 
     int64_t             i_data_begin;
     int64_t             i_data_end;
@@ -86,50 +87,52 @@ struct demux_sys_t
 };
 
 static mtime_t  GetMoviePTS( demux_sys_t * );
-static int      DemuxPacket( input_thread_t *, vlc_bool_t b_play_audio );
+static int      DemuxPacket( demux_t * );
 
 /*****************************************************************************
  * Open: check file and initializes ASF structures
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
-    input_thread_t  *p_input = (input_thread_t *)p_this;
-    uint8_t         *p_peek;
+    demux_t     *p_demux = (demux_t *)p_this;
+    demux_sys_t *p_sys;
+    uint8_t     *p_peek;
 
-    guid_t          guid;
+    guid_t      guid;
 
-    demux_sys_t     *p_sys;
     unsigned int    i_stream, i;
     asf_object_content_description_t *p_cd;
 
-    vlc_bool_t      b_seekable;
+    vlc_bool_t  b_seekable;
 
     /* a little test to see if it could be a asf stream */
-    if( input_Peek( p_input, &p_peek, 16 ) < 16 )
+    if( stream_Peek( p_demux->s, &p_peek, 16 ) < 16 )
     {
-        msg_Warn( p_input, "ASF plugin discarded (cannot peek)" );
+        msg_Warn( p_demux, "ASF plugin discarded (cannot peek)" );
         return VLC_EGENERIC;
     }
     ASF_GetGUID( &guid, p_peek );
     if( !ASF_CmpGUID( &guid, &asf_object_header_guid ) )
     {
-        msg_Warn( p_input, "ASF plugin discarded (not a valid file)" );
+        msg_Warn( p_demux, "ASF plugin discarded (not a valid file)" );
         return VLC_EGENERIC;
     }
 
-    /* Set p_input field */
-    p_input->pf_demux         = Demux;
-    p_input->pf_demux_control = Control;
-    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
+    /* Set p_demux fields */
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     memset( p_sys, 0, sizeof( demux_sys_t ) );
+
     p_sys->i_time = -1;
     p_sys->i_length = 0;
+    p_sys->i_bitrate = 0;
 
     /* Now load all object ( except raw data ) */
-    stream_Control( p_input->s, STREAM_CAN_FASTSEEK, &b_seekable );
-    if( (p_sys->p_root = ASF_ReadObjectRoot( p_input->s, b_seekable )) == NULL )
+    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
+    if( (p_sys->p_root = ASF_ReadObjectRoot( p_demux->s, b_seekable )) == NULL )
     {
-        msg_Warn( p_input, "ASF plugin discarded (not a valid file)" );
+        msg_Warn( p_demux, "ASF plugin discarded (not a valid file)" );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -137,49 +140,37 @@ static int Open( vlc_object_t * p_this )
 
     if( p_sys->p_fp->i_min_data_packet_size != p_sys->p_fp->i_max_data_packet_size )
     {
-        msg_Warn( p_input,
+        msg_Warn( p_demux,
                   "ASF plugin discarded (invalid file_properties object)" );
         goto error;
     }
 
-    p_sys->i_streams = ASF_CountObject( p_sys->p_root->p_hdr,
-                                          &asf_object_stream_properties_guid );
-    if( !p_sys->i_streams )
+    p_sys->i_track = ASF_CountObject( p_sys->p_root->p_hdr,
+                                      &asf_object_stream_properties_guid );
+    if( !p_sys->i_track )
     {
-        msg_Warn( p_input, "ASF plugin discarded (cannot find any stream!)" );
+        msg_Warn( p_demux, "ASF plugin discarded (cannot find any stream!)" );
         goto error;
     }
 
-    msg_Dbg( p_input, "found %d streams", p_sys->i_streams );
+    msg_Dbg( p_demux, "found %d streams", p_sys->i_track );
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_InitStream( p_input, 0 ) == -1)
+    for( i_stream = 0; i_stream < p_sys->i_track; i_stream ++ )
     {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot init stream" );
-        goto error;
-    }
-    p_input->stream.i_mux_rate = 0 ; /* updated later */
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    for( i_stream = 0; i_stream < p_sys->i_streams; i_stream ++ )
-    {
-        asf_stream_t    *p_stream;
+        asf_track_t    *tk;
         asf_object_stream_properties_t *p_sp;
 
         p_sp = ASF_FindObject( p_sys->p_root->p_hdr,
                                &asf_object_stream_properties_guid,
                                i_stream );
 
-        p_stream =
-            p_sys->stream[p_sp->i_stream_number] =
-                malloc( sizeof( asf_stream_t ) );
-        memset( p_stream, 0, sizeof( asf_stream_t ) );
+        tk = p_sys->track[p_sp->i_stream_number] = malloc( sizeof( asf_track_t ) );
+        memset( tk, 0, sizeof( asf_track_t ) );
 
-        p_stream->i_time = -1;
-        p_stream->p_sp = p_sp;
-        p_stream->p_es = NULL;
-        p_stream->p_frame = NULL;
+        tk->i_time = -1;
+        tk->p_sp = p_sp;
+        tk->p_es = NULL;
+        tk->p_frame = NULL;
 
         if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) &&
             p_sp->i_type_specific_data_length >= sizeof( WAVEFORMATEX ) - 2 )
@@ -203,11 +194,10 @@ static int Open( vlc_object_t * p_this )
                 memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )], fmt.i_extra );
             }
 
-            p_stream->i_cat = AUDIO_ES;
-            p_stream->p_es = es_out_Add( p_input->p_es_out, &fmt );
+            tk->i_cat = AUDIO_ES;
+            tk->p_es = es_out_Add( p_demux->out, &fmt );
 
-            msg_Dbg( p_input,
-                    "added new audio stream(codec:0x%x,ID:%d)",
+            msg_Dbg( p_demux, "added new audio stream(codec:0x%x,ID:%d)",
                     GetWLE( p_data ), p_sp->i_stream_number );
         }
         else if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_video ) &&
@@ -229,16 +219,16 @@ static int Open( vlc_object_t * p_this )
                 memcpy( fmt.p_extra, &p_data[sizeof( BITMAPINFOHEADER )], fmt.i_extra );
             }
 
-            p_stream->i_cat = VIDEO_ES;
-            p_stream->p_es = es_out_Add( p_input->p_es_out, &fmt );
+            tk->i_cat = VIDEO_ES;
+            tk->p_es = es_out_Add( p_demux->out, &fmt );
 
-            msg_Dbg( p_input, "added new video stream(ID:%d)",
+            msg_Dbg( p_demux, "added new video stream(ID:%d)",
                      p_sp->i_stream_number );
         }
         else
         {
-            p_stream->i_cat = UNKNOWN_ES;
-            msg_Dbg( p_input, "ignoring unknown stream(ID:%d)",
+            tk->i_cat = UNKNOWN_ES;
+            msg_Dbg( p_demux, "ignoring unknown stream(ID:%d)",
                      p_sp->i_stream_number );
         }
     }
@@ -256,13 +246,13 @@ static int Open( vlc_object_t * p_this )
 
 
     /* go to first packet */
-    stream_Seek( p_input->s, p_sys->i_data_begin );
+    stream_Seek( p_demux->s, p_sys->i_data_begin );
 
     /* try to calculate movie time */
     if( p_sys->p_fp->i_data_packets_count > 0 )
     {
         int64_t i_count;
-        int64_t i_size = stream_Size( p_input->s );
+        int64_t i_size = stream_Size( p_demux->s );
 
         if( p_sys->i_data_end > 0 && i_size > p_sys->i_data_end )
         {
@@ -280,8 +270,7 @@ static int Open( vlc_object_t * p_this )
 
         if( p_sys->i_length > 0 )
         {
-            p_input->stream.i_mux_rate =
-                i_size / 50 * (int64_t)1000000 / p_sys->i_length;
+            p_sys->i_bitrate = 8 * i_size * (int64_t)1000000 / p_sys->i_length;
         }
     }
 
@@ -317,7 +306,7 @@ static int Open( vlc_object_t * p_this )
         asf_object_codec_list_t *p_cl = ASF_FindObject( p_sys->p_root->p_hdr,
                                                         &asf_object_codec_list_guid, 0 );
 
-        if( p_sys->stream[i] )
+        if( p_sys->track[i] )
         {
             vlc_meta_t *tk = vlc_meta_New();
             TAB_APPEND( p_sys->meta->i_track, p_sys->meta->track, tk );
@@ -343,7 +332,7 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
-    ASF_FreeObjectRoot( p_input->s, p_sys->p_root );
+    ASF_FreeObjectRoot( p_demux->s, p_sys->p_root );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -352,49 +341,9 @@ error:
 /*****************************************************************************
  * Demux: read packet and send them to decoders
  *****************************************************************************/
-static int Demux( input_thread_t *p_input )
+static int Demux( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
-    vlc_bool_t b_play_audio;
-    int i;
-
-    /* catch seek from user */
-    if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
-    {
-        int64_t i_offset;
-
-        msleep( p_input->i_pts_delay );
-
-        i_offset = stream_Tell( p_input->s ) - p_sys->i_data_begin;
-        if( i_offset  < 0 )
-        {
-            i_offset = 0;
-        }
-        if( i_offset % p_sys->p_fp->i_min_data_packet_size > 0 )
-        {
-            i_offset -= i_offset % p_sys->p_fp->i_min_data_packet_size;
-        }
-
-        if( stream_Seek( p_input->s, i_offset + p_sys->i_data_begin ) )
-        {
-            msg_Warn( p_input, "cannot resynch after seek (EOF?)" );
-            return -1;
-        }
-
-        p_sys->i_time = -1;
-        for( i = 0; i < 128 ; i++ )
-        {
-#define p_stream p_sys->stream[i]
-            if( p_stream )
-            {
-                p_stream->i_time = -1;
-            }
-#undef p_stream
-        }
-    }
-
-    /* Check if we need to send the audio data to decoder */
-    b_play_audio = !p_input->stream.control.b_mute;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     for( ;; )
     {
@@ -402,12 +351,12 @@ static int Demux( input_thread_t *p_input )
         mtime_t i_time_begin = GetMoviePTS( p_sys );
         int i_result;
 
-        if( p_input->b_die )
+        if( p_demux->b_die )
         {
             break;
         }
 
-        if( ( i_result = DemuxPacket( p_input, b_play_audio ) ) <= 0 )
+        if( ( i_result = DemuxPacket( p_demux ) ) <= 0 )
         {
             return i_result;
         }
@@ -428,12 +377,10 @@ static int Demux( input_thread_t *p_input )
     p_sys->i_time = GetMoviePTS( p_sys );
     if( p_sys->i_time >= 0 )
     {
-        input_ClockManageRef( p_input,
-                              p_input->stream.p_selected_program,
-                              p_sys->i_time * 9 / 100 );
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time );
     }
 
-    return( 1 );
+    return 1;
 }
 
 /*****************************************************************************
@@ -441,26 +388,26 @@ static int Demux( input_thread_t *p_input )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys = p_input->p_demux_data;
-    int i_stream;
+    demux_t     *p_demux = (demux_t *)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int         i;
 
-    msg_Dbg( p_input, "freeing all memory" );
+    msg_Dbg( p_demux, "freeing all memory" );
 
     vlc_meta_Delete( p_sys->meta );
 
-    ASF_FreeObjectRoot( p_input->s, p_sys->p_root );
-    for( i_stream = 0; i_stream < 128; i_stream++ )
+    ASF_FreeObjectRoot( p_demux->s, p_sys->p_root );
+    for( i = 0; i < 128; i++ )
     {
-        asf_stream_t *p_stream = p_sys->stream[i_stream];
+        asf_track_t *tk = p_sys->track[i];
 
-        if( p_stream )
+        if( tk )
         {
-            if( p_stream->p_frame )
+            if( tk->p_frame )
             {
-                block_ChainRelease( p_stream->p_frame );
+                block_ChainRelease( tk->p_frame );
             }
-            free( p_stream );
+            free( tk );
         }
     }
     free( p_sys );
@@ -469,10 +416,11 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( input_thread_t *p_input, int i_query, va_list args )
+static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
     int64_t     *pi64;
+    int         i;
     vlc_meta_t **pp_meta;
 
     switch( i_query )
@@ -487,8 +435,20 @@ static int Control( input_thread_t *p_input, int i_query, va_list args )
             *pp_meta = vlc_meta_Duplicate( p_sys->meta );
             return VLC_SUCCESS;
 
+        case DEMUX_SET_POSITION:
+        case DEMUX_SET_TIME:
+            p_sys->i_time = -1;
+            for( i = 0; i < 128 ; i++ )
+            {
+                asf_track_t *tk = p_sys->track[i];
+                if( tk ) tk->i_time = -1;
+            }
+
         default:
-            return demux_vaControlDefault( p_input, i_query, args );
+            return demux2_vaControlHelper( p_demux->s,
+                                           p_sys->i_data_begin, p_sys->i_data_end,
+                                           p_sys->i_bitrate, p_sys->p_fp->i_min_data_packet_size,
+                                           i_query, args );
     }
 }
 
@@ -498,27 +458,27 @@ static int Control( input_thread_t *p_input, int i_query, va_list args )
 static mtime_t GetMoviePTS( demux_sys_t *p_sys )
 {
     mtime_t i_time;
-    int     i_stream;
+    int     i;
 
     i_time = -1;
-    for( i_stream = 0; i_stream < 128 ; i_stream++ )
+    for( i = 0; i < 128 ; i++ )
     {
-        asf_stream_t *p_stream = p_sys->stream[i_stream];
+        asf_track_t *tk = p_sys->track[i];
 
-        if( p_stream && p_stream->p_es && p_stream->i_time > 0)
+        if( tk && tk->p_es && tk->i_time > 0)
         {
             if( i_time < 0 )
             {
-                i_time = p_stream->i_time;
+                i_time = tk->i_time;
             }
             else
             {
-                i_time = __MIN( i_time, p_stream->i_time );
+                i_time = __MIN( i_time, tk->i_time );
             }
         }
     }
 
-    return( i_time );
+    return i_time;
 }
 
 #define GETVALUE2b( bits, var, def ) \
@@ -531,21 +491,21 @@ static mtime_t GetMoviePTS( demux_sys_t *p_sys )
         default: var = def; break;\
     }
 
-static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
+static int DemuxPacket( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
-    int     i_data_packet_min = p_sys->p_fp->i_min_data_packet_size;
-    uint8_t *p_peek;
-    int     i_skip;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int         i_data_packet_min = p_sys->p_fp->i_min_data_packet_size;
+    uint8_t     *p_peek;
+    int         i_skip;
 
-    int     i_packet_size_left;
-    int     i_packet_flags;
-    int     i_packet_property;
+    int         i_packet_size_left;
+    int         i_packet_flags;
+    int         i_packet_property;
 
-    int     b_packet_multiple_payload;
-    int     i_packet_length;
-    int     i_packet_sequence;
-    int     i_packet_padding_length;
+    int         b_packet_multiple_payload;
+    int         i_packet_length;
+    int         i_packet_sequence;
+    int         i_packet_padding_length;
 
     uint32_t    i_packet_send_time;
     uint16_t    i_packet_duration;
@@ -554,11 +514,10 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
     int         i_payload_length_type;
 
 
-    if( stream_Peek( p_input->s, &p_peek,i_data_packet_min)<i_data_packet_min )
+    if( stream_Peek( p_demux->s, &p_peek,i_data_packet_min)<i_data_packet_min )
     {
-        // EOF ?
-        msg_Warn( p_input, "cannot peek while getting new packet, EOF ?" );
-        return( 0 );
+        msg_Warn( p_demux, "cannot peek while getting new packet, EOF ?" );
+        return 0;
     }
     i_skip = 0;
 
@@ -585,7 +544,7 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
     }
     else
     {
-        msg_Warn( p_input, "p_peek[0]&0x80 != 0x80" );
+        msg_Warn( p_demux, "p_peek[0]&0x80 != 0x80" );
     }
 
     /* sanity check */
@@ -625,7 +584,7 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
 
     for( i_payload = 0; i_payload < i_payload_count ; i_payload++ )
     {
-        asf_stream_t   *p_stream;
+        asf_track_t   *tk;
 
         int i_stream_number;
         int i_media_object_number;
@@ -668,7 +627,7 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
         else if( i_replicated_data_length == 1 )
         {
 
-            msg_Dbg( p_input, "found compressed payload" );
+            msg_Dbg( p_demux, "found compressed payload" );
 
             i_pts = (mtime_t)i_tmp * 1000;
             i_pts_delta = (mtime_t)p_peek[i_skip] * 1000; i_skip++;
@@ -698,28 +657,22 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
         {
             break;
         }
-
 #if 0
-         msg_Dbg( p_input,
+         msg_Dbg( p_demux,
                   "payload(%d/%d) stream_number:%d media_object_number:%d media_object_offset:%d replicated_data_length:%d payload_data_length %d",
-                  i_payload + 1,
-                  i_payload_count,
-                  i_stream_number,
-                  i_media_object_number,
-                  i_media_object_offset,
-                  i_replicated_data_length,
-                  i_payload_data_length );
+                  i_payload + 1, i_payload_count, i_stream_number, i_media_object_number,
+                  i_media_object_offset, i_replicated_data_length, i_payload_data_length );
 #endif
 
-        if( !( p_stream = p_sys->stream[i_stream_number] ) )
+        if( ( tk = p_sys->track[i_stream_number] ) == NULL )
         {
-            msg_Warn( p_input,
+            msg_Warn( p_demux,
                       "undeclared stream[Id 0x%x]", i_stream_number );
             i_skip += i_payload_data_length;
             continue;   // over payload
         }
 
-        if( !p_stream->p_es )
+        if( !tk->p_es )
         {
             i_skip += i_payload_data_length;
             continue;
@@ -746,38 +699,35 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
             }
 
             /* FIXME I don't use i_media_object_number, sould I ? */
-            if( p_stream->p_frame && i_media_object_offset == 0 )
+            if( tk->p_frame && i_media_object_offset == 0 )
             {
                 /* send complete packet to decoder */
-                block_t *p_gather = block_ChainGather( p_stream->p_frame );
+                block_t *p_gather = block_ChainGather( tk->p_frame );
 
-                es_out_Send( p_input->p_es_out, p_stream->p_es, p_gather );
+                es_out_Send( p_demux->out, tk->p_es, p_gather );
 
-                p_stream->p_frame = NULL;
+                tk->p_frame = NULL;
             }
 
             i_read = i_sub_payload_data_length + i_skip;
-            if( ( p_frag = stream_Block( p_input->s, i_read ) ) == NULL )
+            if( ( p_frag = stream_Block( p_demux->s, i_read ) ) == NULL )
             {
-                msg_Warn( p_input, "cannot read data" );
-                return( 0 );
+                msg_Warn( p_demux, "cannot read data" );
+                return 0;
             }
             i_packet_size_left -= i_read;
 
             p_frag->p_buffer += i_skip;
             p_frag->i_buffer -= i_skip;
 
-            if( p_stream->p_frame == NULL )
+            if( tk->p_frame == NULL )
             {
-                p_stream->i_time =
+                tk->i_time =
                     ( (mtime_t)i_pts + i_payload * (mtime_t)i_pts_delta );
 
-                p_frag->i_pts =
-                    input_ClockGetTS( p_input,
-                                      p_input->stream.p_selected_program,
-                                      p_stream->i_time * 9 /100 );
+                p_frag->i_pts = tk->i_time;
 
-                if( p_stream->i_cat != VIDEO_ES )
+                if( tk->i_cat != VIDEO_ES )
                     p_frag->i_dts = p_frag->i_pts;
                 else
                 {
@@ -786,17 +736,16 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
                 }
             }
 
-            block_ChainAppend( &p_stream->p_frame, p_frag );
+            block_ChainAppend( &tk->p_frame, p_frag );
 
             i_skip = 0;
             if( i_packet_size_left > 0 )
             {
-                if( stream_Peek( p_input->s, &p_peek, i_packet_size_left )
+                if( stream_Peek( p_demux->s, &p_peek, i_packet_size_left )
                                                          < i_packet_size_left )
                 {
-                    // EOF ?
-                    msg_Warn( p_input, "cannot peek, EOF ?" );
-                    return( 0 );
+                    msg_Warn( p_demux, "cannot peek, EOF ?" );
+                    return 0;
                 }
             }
         }
@@ -804,26 +753,26 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
 
     if( i_packet_size_left > 0 )
     {
-        if( stream_Read( p_input->s, NULL, i_packet_size_left )
+        if( stream_Read( p_demux->s, NULL, i_packet_size_left )
                                                          < i_packet_size_left )
         {
-            msg_Warn( p_input, "cannot skip data, EOF ?" );
-            return( 0 );
+            msg_Warn( p_demux, "cannot skip data, EOF ?" );
+            return 0;
         }
     }
 
-    return( 1 );
+    return 1;
 
 loop_error_recovery:
-    msg_Warn( p_input, "unsupported packet header" );
+    msg_Warn( p_demux, "unsupported packet header" );
     if( p_sys->p_fp->i_min_data_packet_size != p_sys->p_fp->i_max_data_packet_size )
     {
-        msg_Err( p_input, "unsupported packet header, fatal error" );
-        return( -1 );
+        msg_Err( p_demux, "unsupported packet header, fatal error" );
+        return -1;
     }
-    stream_Read( p_input->s, NULL, i_data_packet_min );
+    stream_Read( p_demux->s, NULL, i_data_packet_min );
 
-    return( 1 );
+    return 1;
 }
 
 
