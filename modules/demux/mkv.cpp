@@ -793,14 +793,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->title && p_sys->title->i_seekpoint > 0 )
             {
                 int i_skp = (int)va_arg( args, int );
-                int64_t i_start = (int64_t)p_sys->title->seekpoint[i_skp]->i_time_offset;
 
-                if( p_sys->f_duration > 0.0 )
-                {
-                    double f_pos = (double)i_start / (double)(1000.0 * p_sys->f_duration );
-                    Seek( p_demux, -1, (int)(100 * f_pos+0.5));
-                    return VLC_SUCCESS;
-                }
+                Seek( p_demux, (int64_t)p_sys->title->seekpoint[i_skp]->i_time_offset, -1);
+                return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
 
@@ -839,7 +834,7 @@ static int BlockGet( demux_t *p_demux, KaxBlock **pp_block, int64_t *pi_ref1, in
 #define idx p_sys->index[p_sys->i_index - 1]
             if( p_sys->i_index > 0 && idx.i_time == -1 )
             {
-                idx.i_time        = (*pp_block)->GlobalTimecode() * (mtime_t) 1000 / p_sys->i_timescale;
+                idx.i_time        = (*pp_block)->GlobalTimecode() / (mtime_t)1000;
                 idx.b_key         = *pi_ref1 == -1 ? VLC_TRUE : VLC_FALSE;
             }
 #undef idx
@@ -1138,7 +1133,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, int i_percent)
             return;
         }
 
-        p_sys->i_pts = block->GlobalTimecode() * (mtime_t) 1000 / p_sys->i_timescale + 1;
+        p_sys->i_pts = block->GlobalTimecode() / (mtime_t) 1000 + 1;
 
         for( i_track = 0; i_track < p_sys->i_track; i_track++ )
         {
@@ -1193,7 +1188,7 @@ static int Demux( demux_t *p_demux)
             return 0;
         }
 
-        p_sys->i_pts = block->GlobalTimecode() * (mtime_t) 1000 / p_sys->i_timescale + 1;
+        p_sys->i_pts = block->GlobalTimecode() / (mtime_t) 1000 + 1;
 
         if( p_sys->i_pts > 0 )
         {
@@ -1432,7 +1427,7 @@ static void LoadCues( demux_t *p_demux )
             idx.i_track       = -1;
             idx.i_block_number= -1;
             idx.i_position    = -1;
-            idx.i_time        = -1;
+            idx.i_time        = 0;
             idx.b_key         = VLC_TRUE;
 
             ep->Down();
@@ -1444,7 +1439,7 @@ static void LoadCues( demux_t *p_demux )
 
                     ctime.ReadData( p_sys->es->I_O() );
 
-                    idx.i_time = uint64( ctime ) * (mtime_t)1000000000 / p_sys->i_timescale;
+                    idx.i_time = uint64( ctime ) * p_sys->i_timescale / (mtime_t)1000;
                 }
                 else if( MKV_IS_ID( el, KaxCueTrackPositions ) )
                 {
@@ -2184,6 +2179,8 @@ static void ParseInfo( demux_t *p_demux, EbmlElement *info )
             msg_Dbg( p_demux, "|   |   + Unknown (%s)", typeid(*l).name() );
         }
     }
+
+    p_sys->f_duration = p_sys->f_duration * p_sys->i_timescale / 1000000.0;
 }
 
 
@@ -2265,16 +2262,10 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca )
             ParseChapterAtom( p_demux, i_level+1, static_cast<EbmlMaster *>(l) );
         }
     }
-    if( sk->i_time_offset > 0 )
-    {
-        p_sys->title->i_seekpoint++;
-        p_sys->title->seekpoint = (seekpoint_t**)realloc( p_sys->title->seekpoint, p_sys->title->i_seekpoint * sizeof( seekpoint_t* ) );
-        p_sys->title->seekpoint[p_sys->title->i_seekpoint-1] = sk;
-    }
-    else
-    {
-        vlc_seekpoint_Delete( sk );
-    }
+    // A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value.
+    p_sys->title->i_seekpoint++;
+    p_sys->title->seekpoint = (seekpoint_t**)realloc( p_sys->title->seekpoint, p_sys->title->i_seekpoint * sizeof( seekpoint_t* ) );
+    p_sys->title->seekpoint[p_sys->title->i_seekpoint-1] = sk;
 }
 
 /*****************************************************************************
