@@ -31,6 +31,7 @@
 #include <vlc/input.h>
 
 #include "vlc_playlist.h"
+#include "vlc_meta.h"
 #include "network.h"
 
 /*****************************************************************************
@@ -118,6 +119,11 @@ struct access_sys_t
     vlc_bool_t b_chunked;
     int64_t    i_chunk;
 
+    int        i_icy_meta;
+    char       *psz_icy_name;
+    char       *psz_icy_genre;
+    char       *psz_icy_title;
+
     vlc_bool_t b_seekable;
     vlc_bool_t b_reconnect;
     vlc_bool_t b_pace_control;
@@ -191,6 +197,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_location = NULL;
     p_sys->psz_user_agent = NULL;
     p_sys->b_pace_control = VLC_TRUE;
+    p_sys->i_icy_meta = 0;
+    p_sys->psz_icy_name = NULL;
+    p_sys->psz_icy_genre = NULL;
+    p_sys->psz_icy_title = NULL;
 
     /* Parse URI */
     ParseURL( p_sys, p_access->psz_path );
@@ -372,6 +382,10 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
     if( p_sys->psz_location ) free( p_sys->psz_location );
 
+    if( p_sys->psz_icy_name ) free( p_sys->psz_icy_name );
+    if( p_sys->psz_icy_genre ) free( p_sys->psz_icy_genre );
+    if( p_sys->psz_icy_title ) free( p_sys->psz_icy_title );
+
     if( p_sys->psz_user_agent ) free( p_sys->psz_user_agent );
 
     if( p_sys->fd > 0 )
@@ -385,6 +399,7 @@ static void Close( vlc_object_t *p_this )
  * Read: Read up to i_len bytes from the http connection and place in
  * p_buffer. Return the actual number of bytes read
  *****************************************************************************/
+static int ReadICYMeta( access_t *p_access );
 static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -439,9 +454,24 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
         }
     }
 
+    if( p_sys->i_icy_meta > 0 && p_access->info.i_pos > 0 )
+    {
+        int64_t i_next = p_sys->i_icy_meta - 
+                                    p_access->info.i_pos % p_sys->i_icy_meta;
+        
+        if( i_next == p_sys->i_icy_meta )
+        {
+            if( ReadICYMeta( p_access ) )
+            {
+                p_access->info.b_eof = VLC_TRUE;
+                return -1;
+            }
+        }
+        if( i_len > i_next )
+            i_len = i_next;
+    }
 
-    i_read = net_Read( p_access, p_sys->fd, NULL, p_buffer, i_len,
-                       VLC_FALSE );
+    i_read = net_Read( p_access, p_sys->fd, NULL, p_buffer, i_len, VLC_FALSE );
     if( i_read > 0 )
     {
         p_access->info.i_pos += i_read;
@@ -481,6 +511,71 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     return i_read;
 }
 
+static int ReadICYMeta( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    uint8_t buffer[1];
+    char *psz_meta;
+    int i_read;
+    char *p;
+
+    /* Read meta data length */
+    i_read = net_Read( p_access, p_sys->fd, NULL, buffer, 1, VLC_TRUE );
+    if( i_read <= 0 )
+        return VLC_EGENERIC;
+
+    msg_Dbg( p_access, "ICY meta size=%d", buffer[0] * 16);
+
+    if( buffer[0] <= 0 )
+        return VLC_SUCCESS;
+
+
+    psz_meta = malloc( buffer[0] * 16 + 1 );
+    i_read = net_Read( p_access, p_sys->fd, NULL,
+                       psz_meta, buffer[0] * 16, VLC_TRUE );
+
+    if( i_read != buffer[0] * 16 )
+        return VLC_EGENERIC;
+
+    psz_meta[buffer[0]*16 + 1] = '\0'; /* Just in case */
+
+    msg_Warn( p_access, "icy-meta=%s", psz_meta );
+
+    /* Now parse the meta */
+    /* Look for StreamTitle= */
+    p = strcasestr( psz_meta, "StreamTitle=" );
+    if( p )
+    {
+        p += strlen( "StreamTitle=" );
+        if( *p == '\'' || *p == '"' )
+        {
+            char *psz = strchr( &p[1], p[0] );
+            if( !psz )
+                psz = strchr( &p[1], ';' );
+
+            if( psz ) *psz = '\0';
+        }
+        else
+        {
+            char *psz = strchr( &p[1], ';' );
+            if( psz ) *psz = '\0';
+        }
+
+        if( p_sys->psz_icy_title ) free( p_sys->psz_icy_title );
+
+        p_sys->psz_icy_title = strdup( &p[1] );
+
+        p_access->info.i_update |= INPUT_UPDATE_META;
+    }
+
+    free( psz_meta );
+
+    msg_Warn( p_access, "New Title=%s", p_sys->psz_icy_title );
+
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Seek: close and re-open a connection at the right place
  *****************************************************************************/
@@ -510,6 +605,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
     vlc_bool_t   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
+    vlc_meta_t **pp_meta;
 
     switch( i_query )
     {
@@ -541,6 +637,22 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         /* */
         case ACCESS_SET_PAUSE_STATE:
+            break;
+
+        case ACCESS_GET_META:
+            pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
+            *pp_meta = vlc_meta_New();
+            msg_Dbg( p_access, "GET META %s %s %s",
+                     p_sys->psz_icy_name, p_sys->psz_icy_genre, p_sys->psz_icy_title );
+            if( p_sys->psz_icy_name )
+                vlc_meta_Add( *pp_meta, VLC_META_DESCRIPTION,
+                              p_sys->psz_icy_name );
+            if( p_sys->psz_icy_genre )
+                vlc_meta_Add( *pp_meta, VLC_META_GENRE,
+                              p_sys->psz_icy_genre );
+            if( p_sys->psz_icy_title )
+                vlc_meta_Add( *pp_meta, VLC_META_TITLE,
+                              p_sys->psz_icy_title );
             break;
 
         case ACCESS_GET_TITLE_INFO:
@@ -619,12 +731,21 @@ static int Connect( access_t *p_access, int64_t i_tell )
     if( p_sys->psz_mime ) free( p_sys->psz_mime );
     if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
 
+    if( p_sys->psz_icy_genre ) free( p_sys->psz_icy_genre );
+    if( p_sys->psz_icy_name ) free( p_sys->psz_icy_name );
+    if( p_sys->psz_icy_title ) free( p_sys->psz_icy_title );
+
+
     p_sys->psz_location = NULL;
     p_sys->psz_mime = NULL;
     p_sys->psz_pragma = NULL;
     p_sys->b_mms = VLC_FALSE;
     p_sys->b_chunked = VLC_FALSE;
     p_sys->i_chunk = 0;
+    p_sys->i_icy_meta = 0;
+    p_sys->psz_icy_name = NULL;
+    p_sys->psz_icy_genre = NULL;
+    p_sys->psz_icy_title = NULL;
 
     p_access->info.i_size = 0;
     p_access->info.i_pos  = i_tell;
@@ -701,8 +822,12 @@ static int Connect( access_t *p_access, int64_t i_tell )
                     "Authorization: Basic %s\r\n", b64 );
         free( b64 );
     }
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
-                "Connection: Close\r\n" );
+
+    /* ICY meta data request */
+    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "Icy-MetaData: 1\r\n" );
+
+
+    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "Connection: Close\r\n");
 
     if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "\r\n" ) < 0 )
     {
@@ -828,6 +953,31 @@ static int Connect( access_t *p_access, int64_t i_tell )
             {
                 p_sys->b_chunked = VLC_TRUE;
             }
+        }
+        else if( !strcasecmp( psz, "Icy-MetaInt" ) )
+        {
+            msg_Dbg( p_access, "Icy-MetaInt: %s", p );
+            p_sys->i_icy_meta = atoi( p );
+            if( p_sys->i_icy_meta < 0 )
+                p_sys->i_icy_meta = 0;
+
+            msg_Warn( p_access, "ICY metaint=%d", p_sys->i_icy_meta );
+        }
+        else if( !strcasecmp( psz, "Icy-Name" ) )
+        {
+            if( p_sys->psz_icy_name ) free( p_sys->psz_icy_name );
+            p_sys->psz_icy_name = strdup( p );
+            msg_Dbg( p_access, "Icy-Name: %s", p_sys->psz_icy_name );
+        }
+        else if( !strcasecmp( psz, "Icy-Genre" ) )
+        {
+            if( p_sys->psz_icy_genre ) free( p_sys->psz_icy_genre );
+            p_sys->psz_icy_genre = strdup( p );
+            msg_Dbg( p_access, "Icy-Genre: %s", p_sys->psz_icy_genre );
+        }
+        else if( !strncasecmp( psz, "Icy-Notice", 10 ) )
+        {
+            msg_Dbg( p_access, "Icy-Notice: %s", p );
         }
         else if( !strncasecmp( psz, "icy-", 4 ) ||
                  !strncasecmp( psz, "ice-", 4 ) ||
