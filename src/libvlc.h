@@ -660,6 +660,10 @@ static char *ppsz_align_descriptions[] =
 #define VOL_DOWN_KEY_LONGTEXT N_("Select the key to decrease audio volume.")
 #define VOL_MUTE_KEY_TEXT N_("Mute")
 #define VOL_MUTE_KEY_LONGTEXT N_("Select the key to turn off audio volume.")
+#define SUBDELAY_UP_KEY_TEXT N_("Subtitle delay up")
+#define SUBDELAY_UP_KEY_LONGTEXT N_("Select the key to increase the subtitle delay.")
+#define SUBDELAY_DOWN_KEY_TEXT N_("Subtitle delay down")
+#define SUBDELAY_DOWN_KEY_LONGTEXT N_("Select the key to decrease the subtitle delay.")
 #define PLAY_BOOKMARK1_KEY_TEXT N_("Play playlist bookmark 1")
 #define PLAY_BOOKMARK2_KEY_TEXT N_("Play playlist bookmark 2")
 #define PLAY_BOOKMARK3_KEY_TEXT N_("Play playlist bookmark 3")
@@ -959,6 +963,10 @@ vlc_module_begin();
     add_key( "key-vol-up", KEY_MODIFIER_COMMAND|KEY_UP, NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-down", KEY_MODIFIER_COMMAND|KEY_DOWN, NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-mute", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'m', NULL, VOL_MUTE_KEY_TEXT, VOL_MUTE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-subdelay-up", KEY_MODIFIER_COMMAND|'j', NULL,
+             SUBDELAY_UP_KEY_TEXT, SUBDELAY_UP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-subdelay-down", KEY_MODIFIER_COMMAND|'h', NULL,
+             SUBDELAY_DOWN_KEY_TEXT, SUBDELAY_DOWN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-set-bookmark1", KEY_MODIFIER_COMMAND|KEY_F1, NULL, SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-set-bookmark2", KEY_MODIFIER_COMMAND|KEY_F2, NULL, SET_BOOKMARK2_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-set-bookmark3", KEY_MODIFIER_COMMAND|KEY_F3, NULL, SET_BOOKMARK3_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
@@ -1005,6 +1013,10 @@ vlc_module_begin();
     add_key( "key-vol-up", 'a', NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-down", 'z', NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-mute", 'm', NULL, VOL_MUTE_KEY_TEXT, VOL_MUTE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-subdelay-up", KEY_MODIFIER_COMMAND|'h', NULL,
+             SUBDELAY_UP_KEY_TEXT, SUBDELAY_UP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-subdelay-down", KEY_MODIFIER_COMMAND|'j', NULL,
+             SUBDELAY_DOWN_KEY_TEXT, SUBDELAY_DOWN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-set-bookmark1", KEY_MODIFIER_CTRL|KEY_F1, NULL, SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-set-bookmark2", KEY_MODIFIER_CTRL|KEY_F2, NULL, SET_BOOKMARK2_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-set-bookmark3", KEY_MODIFIER_CTRL|KEY_F3, NULL, SET_BOOKMARK3_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
@@ -1084,6 +1096,8 @@ static struct hotkey p_hotkeys[] =
     { "key-vol-up", ACTIONID_VOL_UP, 0 },
     { "key-vol-down", ACTIONID_VOL_DOWN, 0 },
     { "key-vol-mute", ACTIONID_VOL_MUTE, 0 },
+    { "key-subdelay-down", ACTIONID_SUBDELAY_DOWN, 0 },
+    { "key-subdelay-up", ACTIONID_SUBDELAY_UP, 0 },
     { "key-nav-activate", ACTIONID_NAV_ACTIVATE, 0 },
     { "key-nav-up", ACTIONID_NAV_UP, 0 },
     { "key-nav-down", ACTIONID_NAV_DOWN, 0 },

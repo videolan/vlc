@@ -378,6 +378,9 @@ enum input_query_e
     INPUT_DEL_BOOKMARK,    /* arg1= seekpoint_t *  res=can fail   */
     INPUT_SET_BOOKMARK,    /* arg1= int  res=can fail    */
 
+    INPUT_GET_SUBDELAY,    /* arg1 = int* res=can fail */
+    INPUT_SET_SUBDELAY,    /* arg1 = int  res=can fail */
+
     INPUT_GET_DIVISIONS
 };
 

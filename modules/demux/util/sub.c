@@ -2,7 +2,7 @@
  * sub.c: subtitle demux for external subtitle files
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sub.c,v 1.52 2004/02/22 15:59:53 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -73,7 +73,7 @@ static char *ppsz_sub_type[] = { "auto", "microdvd", "subrip", "ssa1",
 vlc_module_begin();
     set_description( _("Text subtitles demux") );
     set_capability( "subtitle demux", 12 );
-    add_float( "sub-fps", 25.0, NULL,
+    add_float( "sub-fps", 0.0, NULL,
                N_("Frames per second"),
                SUB_FPS_LONGTEXT, VLC_TRUE );
     add_integer( "sub-delay", 0, NULL,
@@ -96,7 +96,7 @@ static int Open ( vlc_object_t *p_this )
     p_sub->pf_demux = sub_demux;
     p_sub->pf_seek  = sub_seek;
     p_sub->pf_close = sub_close;
-    
+
     /* Initialize the variables */
     var_Create( p_this, "sub-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_this, "sub-delay", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -274,6 +274,7 @@ static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
     p_sub->i_subtitles = 0;
     p_sub->subtitle = NULL;
     p_sub->p_vobsub_file = 0;
+    p_sub->i_original_mspf = i_microsecperframe;
     p_sub->p_input = p_input;
 
     if( !psz_name || !*psz_name )
@@ -296,9 +297,15 @@ static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
     {
         i_microsecperframe = (mtime_t)( (float)1000000 / val.f_float );
     }
+    else if( val.f_float == 0 )
+    {
+        /* No value given */
+        i_microsecperframe = 0;
+    }
     else if( val.f_float <= 0 )
     {
-        i_microsecperframe = 40000; /* default: 25fps */
+        /* invalid value, default = 25fps */
+        i_microsecperframe = 40000;
     }
 
     var_Get( p_sub, "sub-type", &val);
@@ -499,6 +506,8 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
 {
     input_thread_t *p_input = p_sub->p_input;
     vlc_bool_t     b;
+    vlc_value_t    val;
+    mtime_t i_delay;
 
     es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE, p_sub->p_es, &b );
     if( b && !p_sub->i_previously_selected )
@@ -515,8 +524,10 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
 
     if( p_sub->i_sub_type != SUB_TYPE_VOBSUB )
     {
+        var_Get( p_sub, "sub-delay", &val );
+        i_delay = (mtime_t) val.i_int * 100000;
         while( p_sub->i_subtitle < p_sub->i_subtitles &&
-               p_sub->subtitle[p_sub->i_subtitle].i_start < i_maxdate )
+               p_sub->subtitle[p_sub->i_subtitle].i_start < i_maxdate - i_delay )
         {
             block_t *p_block;
             int i_len = strlen( p_sub->subtitle[p_sub->i_subtitle].psz_text ) + 1;
@@ -534,8 +545,13 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
                 continue;
             }
 
-            /* XXX we should convert all demuxers to use es_out_Control to set pcr and
-             * then remove that */
+            /* XXX we should convert all demuxers to use es_out_Control to set              * pcr and then remove that */
+            if( i_delay != 0 )
+            {
+                p_sub->subtitle[p_sub->i_subtitle].i_start += i_delay;
+                p_sub->subtitle[p_sub->i_subtitle].i_stop += i_delay;
+            }
+
             p_block->i_pts =
                 input_ClockGetTS( p_sub->p_input,
                                   p_sub->p_input->stream.p_selected_program,
@@ -551,7 +567,6 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
             }
 
             memcpy( p_block->p_buffer, p_sub->subtitle[p_sub->i_subtitle].psz_text, i_len );
-
             if( p_block->i_pts > 0 )
             {
                 es_out_Send( p_input->p_es_out, p_sub->p_es, p_block );
@@ -760,6 +775,10 @@ static int  sub_MicroDvdRead( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *
             buffer_text[i] = '\n';
         }
     }
+    if( i_microsecperframe == 0)
+    {
+        i_microsecperframe = 40000;
+    }
     p_subtitle->i_start = (mtime_t)i_start * (mtime_t)i_microsecperframe;
     p_subtitle->i_stop  = (mtime_t)i_stop  * (mtime_t)i_microsecperframe;
     p_subtitle->psz_text = strndup( buffer_text, MAX_LINE );
@@ -827,6 +846,16 @@ static int  sub_SubRipRead( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_
                     p_subtitle->i_start = i_start;
                     p_subtitle->i_stop = i_stop;
                     p_subtitle->psz_text = strdup( buffer_text );
+                    /* If framerate is available, use sub-fps */
+                    if( i_microsecperframe != 0 && p_sub->i_original_mspf != 0)
+                    {
+                        p_subtitle->i_start = (mtime_t)i_start *
+                                              (mtime_t)p_sub->i_original_mspf /
+                                              (mtime_t)i_microsecperframe;
+                        p_subtitle->i_stop  = (mtime_t)i_stop  *
+                                              (mtime_t)p_sub->i_original_mspf /
+                                              (mtime_t)i_microsecperframe;
+                    }
                     return( 0 );
                 }
                 else

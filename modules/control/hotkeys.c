@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: hotkeys.c,v 1.17 2004/02/17 03:12:00 hartman Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -247,6 +247,28 @@ static void Run( intf_thread_t *p_intf )
             aout_VolumeDown( p_intf, 1, &i_newvol );
             vout_OSDMessage( p_intf, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX);
         }
+        else if( i_action == ACTIONID_SUBDELAY_DOWN )
+        {
+            int i_delay;
+            if( input_Control( p_input, INPUT_GET_SUBDELAY, &i_delay ) ==
+                             VLC_SUCCESS )
+            {
+                i_delay--;
+                input_Control( p_input, INPUT_SET_SUBDELAY, i_delay );
+                vout_OSDMessage( p_intf, "Subtitle delay %i ms",i_delay*100);
+            }
+        }
+        else if( i_action == ACTIONID_SUBDELAY_UP )
+        {
+            int i_delay;
+            if( input_Control( p_input, INPUT_GET_SUBDELAY, &i_delay ) ==
+                             VLC_SUCCESS )
+            {
+                i_delay++;
+                input_Control( p_input, INPUT_SET_SUBDELAY, i_delay );
+                vout_OSDMessage( p_intf, "Subtitle delay %i ms",i_delay*100);
+            }
+        }
         else if( i_action == ACTIONID_VOL_MUTE )
         {
             audio_volume_t i_newvol = -1;
@@ -257,7 +279,8 @@ static void Run( intf_thread_t *p_intf )
             }
             else
             {
-                vout_OSDMessage( p_intf, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
+                vout_OSDMessage( p_intf, "Vol %d%%",
+                                 i_newvol*100/AOUT_VOLUME_MAX );
             }
         }
         else if( i_action == ACTIONID_FULLSCREEN )

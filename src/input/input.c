@@ -621,7 +621,8 @@ static int RunThread( input_thread_t *p_input )
 static int InitThread( input_thread_t * p_input )
 {
     vlc_meta_t *p_meta = NULL, *p_meta_user = NULL;
-    float f_fps;
+//    float f_fps;
+    double f_fps;
     playlist_t *p_playlist;
     mtime_t i_length;
 
@@ -1092,7 +1093,6 @@ static int InitThread( input_thread_t * p_input )
     /* Get fps */
     if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
     {
-        i_microsecondperframe = 0;
     }
     else
     {

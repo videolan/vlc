@@ -226,3 +226,5 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_PLAY_BOOKMARK9        44
 #define ACTIONID_PLAY_BOOKMARK10       45
 /* end of contiguous zone */
+#define ACTIONID_SUBDELAY_UP           46
+#define ACTIONID_SUBDELAY_DOWN         47

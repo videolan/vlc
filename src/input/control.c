@@ -26,6 +26,15 @@
 #include <vlc/input.h>
 
 #include "ninput.h"
+#include "../../modules/demux/util/sub.h"
+
+struct input_thread_sys_t
+{
+    /* subtitles */
+    int              i_sub;
+    subtitle_demux_t **sub;
+    int64_t          i_stop_time;
+};
 
 /****************************************************************************
  * input_Control
@@ -53,6 +62,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
     int     i_ret;
     seekpoint_t *p_bkmk, ***ppp_bkmk;
     int i_bkmk, *pi_bkmk;
+    int i, *pi;
     vlc_value_t val, text;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -170,6 +180,52 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                     i_ret = var_Set( p_input, "time", pos );
                 }
                 vlc_mutex_lock( &p_input->stream.stream_lock );
+            }
+            else
+            {
+                i_ret = VLC_EGENERIC;
+            }
+            break;
+
+        case INPUT_GET_SUBDELAY:
+            pi = (int)va_arg( args, int *);
+            /* We work on the first subtitle */
+            if( p_input->p_sys != NULL )
+            {
+                if( p_input->p_sys->i_sub > 0 )
+                {
+                    i_ret = var_Get( (vlc_object_t *)p_input->p_sys->sub[0],
+                                      "sub-delay", &val );
+                    *pi = val.i_int;
+                }
+                else
+                {
+                    msg_Dbg( p_input,"no subtitle track");
+                    i_ret = VLC_EGENERIC;
+                }
+            }
+            else
+            {
+                i_ret = VLC_EGENERIC;
+            }
+            break;
+
+        case INPUT_SET_SUBDELAY:
+            i = (int)va_arg( args, int );
+            /* We work on the first subtitle */
+            if( p_input->p_sys )
+            {
+                if( p_input->p_sys->i_sub > 0 )
+                {
+                    val.i_int = i;
+                    i_ret = var_Set( (vlc_object_t *)p_input->p_sys->sub[0],
+                                      "sub-delay", val );
+                }
+                else
+                {
+                    msg_Dbg( p_input,"no subtitle track");
+                    i_ret = VLC_EGENERIC;
+                }
             }
             else
             {
