@@ -15,7 +15,7 @@ disable the GUI. You will end-up with a vlc.log file in your current directory.
 
 If you want to play a DVD, run vlc and click on the Disc option in the
 interface. You then have to type your drive letter in the 'Device name'
-box (eg. 'D:' if your dvdrom drive is assigned the letter 'D').
+box (eg. 'D' if this is the letter for your dvdrom drive).
 ( !WARNING: you have to be in administrator mode (for now) on Win2k/XP or the
   DVD won't play. )
 
@@ -45,9 +45,15 @@ You must also not forget to install the extra development packages if you want
 to build the DirectX, GTK and SDL plugins.
 
 - compiling natively on Windoze:
-You first need to download and install MSYS-1.0.5 (version 1.0.6 doesn't seem
-to work as well) and MINGW.
-http://prdownloads.sourceforge.net/mingw/msys-1.0.5-i686-bin.tar.gz
+You will need to download and install the latest MSYS (version 1.0.7 as
+of now) and MINGW.
+The installation is really easy. Begin with the MSYS auto-installer and once
+this is done, extract MINGW into c:\msys\1.0\mingw. You also have to remember
+to remove the make utility included with MINGW as it conflicts with the one
+from MSYS (just rename or remove c:\msys\1.0\mingw\bin\make.exe).
+
+http://www.mingw.org/download.shtml
+http://prdownloads.sourceforge.net/mingw/MSYS-1.0.7-i686-2002.04.24-1.exe
 http://prdownloads.sourceforge.net/mingw/MinGW-1.1.tar.gz
 
 You must also not forget to install the extra development packages if you want
@@ -79,7 +85,8 @@ along those lines:
   --build=i386-linux \
   --with-gtk-config-path=/usr/local/gtk-win32/bin \
   --with-sdl-config-path=/usr/local/SDL-1.2.3-win32/i386-mingw32msvc/bin \
-  --with-directx=/usr/local/dxheaders
+  --with-directx=/usr/local/dxheaders \
+  --with-dvdcss-tree=../libdvdcss-win
 
 If you are cross-compiling using the mingw32 package provided by
 www.videolan.org, you have to use something along those lines:
@@ -90,14 +97,19 @@ www.videolan.org, you have to use something along those lines:
   --build=i386-linux \
   --with-gtk-config-path=/usr/local/gtk-win32/bin \
   --with-sdl-config-path=/usr/local/SDL-1.2.3-win32/i386-mingw32msvc/bin \
-  --with-directx=/usr/local/dxheaders
+  --with-directx=/usr/local/dxheaders \
+  --with-dvdcss-tree=../libdvdcss-win
 
 If you are compiling natively on Windoze, then you can use something
 along those lines:
-  MAKE=gmake ./configure \
+  ./configure \
   --with-gtk-config-path=/c/dev/gtk-win32/bin \
   --with-sdl-config-path=/c/dev/SDL-1.2.3-win32/i386-mingw32msvc/bin \
-  --with-directx=/c/dev/dxheaders
+  --with-directx=/c/dev/dxheaders \
+  --with-dvdcss-tree=../libdvdcss-win
+
+Note: when using the --with-dvdcss-tree you need to compile the tree
+beforehand.
 
 Building VideoLAN Client
 ========================
@@ -108,15 +120,11 @@ the core application. The configure script tries to guess for you.
 
 Once configured, to build vlc you have to:
 
-If you are cross-compiling from Debian, then just run `make'.
+If you are cross-compiling from Debian or compiling natively on Windoze,
+then just run `make'.
 
 If you are cross-compiling using the mingw32 package provided by
 www.videolan.org, run `PATH=/usr/local/cross-tools/bin:$PATH make'.
-
-If you are compiling natively on Windoze, run `MAKE=gmake gmake'.
-(note that msys sometimes stops in the middle of the build process and
-complains about not being able to create .dep files. If this happens, just
-re-run the above command another time and it should work)
 
 Building Win32 interface with bcc32 (Borland's compiler)
 ========================================================
