@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.27 2003/03/13 16:09:20 hartman Exp $
+ * $Id: ffmpeg.c,v 1.28 2003/03/24 13:50:55 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -497,6 +497,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             psz_name ="Windows Media Video 1";
             break;
         case FOURCC_WMV2:
+        case FOURCC_MSS1:
             i_cat = VIDEO_ES;
             i_codec = CODEC_ID_WMV2;
             psz_name ="Windows Media Video 2";

@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.18 2003/03/15 18:44:31 fenrir Exp $
+ * $Id: video.c,v 1.19 2003/03/24 13:50:55 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -280,6 +280,7 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
                     p_vdec->p_fifo->i_fourcc == FOURCC_M4S2 ||
                     p_vdec->p_fifo->i_fourcc == FOURCC_m4s2 ||
                     p_vdec->p_fifo->i_fourcc == FOURCC_WMV2 ||
+                    p_vdec->p_fifo->i_fourcc == FOURCC_MSS1 ||
                     p_vdec->p_fifo->i_fourcc == FOURCC_MJPG ||
                     p_vdec->p_fifo->i_fourcc == FOURCC_mjpg ||
                     p_vdec->p_fifo->i_fourcc == FOURCC_mjpa ||
