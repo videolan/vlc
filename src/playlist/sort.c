@@ -2,7 +2,7 @@
  * sort.c : Playlist sorting functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sort.c,v 1.8 2004/01/10 23:44:19 hartman Exp $
+ * $Id: sort.c,v 1.9 2004/01/23 10:48:08 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -35,7 +35,7 @@
  * \param p_playlist the playlist
  * \param i_mode: SORT_ID, SORT_TITLE, SORT_GROUP, SORT_AUTHOR, SORT_RANDOM
  * \param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
- * \return 0 on success
+ * \return VLC_SUCCESS on success
  */
 int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
 {
@@ -70,7 +70,7 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
         /* Notify the interfaces */
         var_Set( p_playlist, "intf-change", val );
 
-        return 0;
+        return VLC_SUCCESS;
     }
 
     for( i_position = 0; i_position < p_playlist->i_size -1 ; i_position ++ )
@@ -94,6 +94,11 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
             {
                 i_test = p_playlist->pp_items[i]->i_group -
                                  p_playlist->pp_items[i_small]->i_group;
+            }
+            else if( i_mode == SORT_DURATION )
+            {
+                i_test = p_playlist->pp_items[i]->i_duration -
+                                 p_playlist->pp_items[i_small]->i_duration;
             }
             else if( i_mode == SORT_AUTHOR )
             {
@@ -125,5 +130,5 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
     /* Notify the interfaces  */
     var_Set( p_playlist, "intf-change", val );
 
-    return 0;
+    return VLC_SUCCESS;
 }

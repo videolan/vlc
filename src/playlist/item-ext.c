@@ -2,7 +2,7 @@
  * item-ext.c : Exported playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item-ext.c,v 1.10 2004/01/17 14:08:37 sigmunau Exp $
+ * $Id: item-ext.c,v 1.11 2004/01/23 10:48:08 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -32,7 +32,7 @@
 #include "vlc_playlist.h"
 
 /**
- * Add a MRL into the playlist.
+ * Add a MRL into the playlist, duration given.
  *
  * \param p_playlist the playlist to add into
  * \param psz_uri the mrl to add to the playlist
@@ -102,7 +102,7 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_uri,
  * Search the position of an item by its id
  * \param p_playlist the playlist
  * \param i_id the id to find
- * \return the position, or -1 on failure
+ * \return the position, or VLC_EGENERIC on failure
  */
 int playlist_GetPositionById( playlist_t * p_playlist , int i_id )
 {
@@ -114,7 +114,7 @@ int playlist_GetPositionById( playlist_t * p_playlist , int i_id )
             return i;
         }
     }
-    return -1;
+    return VLC_EGENERIC;
 }
 
 
@@ -149,16 +149,20 @@ playlist_item_t * playlist_GetItemById( playlist_t * p_playlist , int i_id )
  * \param p_playlist the playlist
  * \param i_pos the postition of the item of which we change the group
  * \param i_group the new group
- * \return 0 on success, -1 on failure
+ * \return VLC_SUCCESS on success, VLC_EGENERIC on failure
  */
 int playlist_SetGroup( playlist_t *p_playlist, int i_pos, int i_group )
 {
     char *psz_group;
+    vlc_value_t val;
     /* Check the existence of the playlist */
     if( p_playlist == NULL)
     {
-        return -1;
+        return VLC_EGENERIC;
     }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+
     /* Get a correct item */
     if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {
@@ -169,7 +173,7 @@ int playlist_SetGroup( playlist_t *p_playlist, int i_pos, int i_group )
     }
     else
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     psz_group = playlist_FindGroup( p_playlist , i_group );
@@ -177,7 +181,11 @@ int playlist_SetGroup( playlist_t *p_playlist, int i_pos, int i_group )
     {
         p_playlist->pp_items[i_pos]->i_group = i_group ;
     }
-    return 0;
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    val.b_bool = i_pos;
+    var_Set( p_playlist, "item-change", val );
+
+    return VLC_SUCCESS;
 }
 
 /**
@@ -195,8 +203,11 @@ int playlist_SetName( playlist_t *p_playlist, int i_pos, char *psz_name )
     /* Check the existence of the playlist */
     if( p_playlist == NULL)
     {
-        return -1;
+        return VLC_EGENERIC;
     }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+
     /* Get a correct item */
     if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {
@@ -207,7 +218,7 @@ int playlist_SetName( playlist_t *p_playlist, int i_pos, char *psz_name )
     }
     else
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     if( p_playlist->pp_items[i_pos]->psz_name)
@@ -215,6 +226,8 @@ int playlist_SetName( playlist_t *p_playlist, int i_pos, char *psz_name )
 
     if( psz_name )
         p_playlist->pp_items[i_pos]->psz_name = strdup( psz_name );
+
+    vlc_mutex_unlock( &p_playlist->object_lock );
 
     val.b_bool = i_pos;
     var_Set( p_playlist, "item-change", val );
@@ -237,8 +250,11 @@ int playlist_SetDuration( playlist_t *p_playlist, int i_pos, mtime_t i_duration 
     /* Check the existence of the playlist */
     if( p_playlist == NULL)
     {
-        return -1;
+        return VLC_EGENERIC;
     }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+
     /* Get a correct item */
     if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {
@@ -263,6 +279,8 @@ int playlist_SetDuration( playlist_t *p_playlist, int i_pos, mtime_t i_duration 
     }
     playlist_AddInfo( p_playlist, i_pos, _("General") , _("Duration"),
                       "%s", psz_buffer );
+
+    vlc_mutex_unlock( &p_playlist->object_lock );
 
     val.b_bool = i_pos;
     var_Set( p_playlist, "item-change", val );
@@ -533,7 +551,7 @@ int playlist_EnableGroup( playlist_t * p_playlist, int i_group)
  * \param i_pos the position of the item to move
  * \param i_newpos the position of the item that will be behind the moved item
  *        after the move
- * \return returns 0
+ * \return returns VLC_SUCCESS
  */
 int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
 {
@@ -592,5 +610,5 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
 
-    return 0;
+    return VLC_SUCCESS;
 }

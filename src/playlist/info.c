@@ -2,7 +2,7 @@
  * info.c : Playlist info management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: info.c,v 1.5 2004/01/17 16:24:14 gbazin Exp $
+ * $Id: info.c,v 1.6 2004/01/23 10:48:08 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -34,13 +34,14 @@
  * Get one special info
  *
  * \param p_playlist the playlist to get the info from
- * \param i_item the item on which we want the info ( -1 for current )
+ * \param i_item position of the item on
+ *               which we want the info ( -1 for current )
  * \param psz_cat the category in which the info is stored
  * \param psz_name the name of the info
- * \return the info value if any, NULL else
+ * \return the info value if any, an empty string else
 */
 char * playlist_GetInfo( playlist_t *p_playlist, int i_item,
-                      const char * psz_cat, const char *psz_name )
+                         const char * psz_cat, const char *psz_name )
 {
     /* Check the existence of the playlist */
     if( p_playlist == NULL)
@@ -69,7 +70,7 @@ char * playlist_GetInfo( playlist_t *p_playlist, int i_item,
  * \param p_item the item on which we want the info
  * \param psz_cat the category in which the info is stored
  * \param psz_name the name of the info
- * \return the info value if any, NULL else
+ * \return the info value if any, an empty string else
 */
 char * playlist_GetItemInfo( playlist_item_t *p_item,
                       const char * psz_cat, const char *psz_name )
@@ -94,10 +95,11 @@ char * playlist_GetItemInfo( playlist_item_t *p_item,
 }
 
 /**
- * Get one info category. Creates it if it does not exist
+ * Get one info category. Create it if it does not exist
  *
- * \param p_playlist the playlist to get the info from
- * \param i_item the item on which we want the info ( -1 for current )
+ * \param p_playlist the playlist to get the category from
+ * \param i_item the position of the item on which we want
+ *               the info ( -1 for current )
  * \param psz_cat the category we want
  * \return the info category.
  */
@@ -128,9 +130,9 @@ playlist_GetCategory( playlist_t *p_playlist, int i_item,
 }
 
 /**
- * Get one info category (no p_playlist). Creates it if it does not exist
+ * Get one info category (no p_playlist). Create it if it does not exist
  *
- * \param p_item the playlist to search categories in
+ * \param p_item the playlist item to get the category from
  * \param psz_cat the category we want
  * \return the info category.
  */
@@ -156,14 +158,15 @@ item_info_category_t *playlist_GetItemCategory( playlist_item_t *p_item,
 /**
  * Create one info category.
  *
- * \param p_playlist the playlist to get the info from
- * \param i_item the item on which we want the info ( -1 for current )
+ * \param p_playlist the playlist
+ * \param i_item the position of the item for which we create
+ *               the category ( -1 for current )
  * \param psz_cat the category we want to create
  * \return the info category.
  */
 item_info_category_t *
 playlist_CreateCategory( playlist_t *p_playlist, int i_item,
-                      const char * psz_cat )
+                         const char * psz_cat )
 {
     playlist_item_t *p_item = NULL;
 
@@ -193,8 +196,8 @@ playlist_CreateCategory( playlist_t *p_playlist, int i_item,
 /**
  * Create one info category for an item ( no p_playlist required )
  *
- * \param p_playlist the playlist to get the info from
- * \param i_item the item on which we want the info ( -1 for current )
+ * \param p_playlist the playlist
+ * \param p_item the item to create category for
  * \param psz_cat the category we want to create
  * \return the info category.
  */
@@ -230,11 +233,14 @@ playlist_CreateItemCategory( playlist_item_t *p_item, const char *psz_cat )
 /**
  * Add an info item
  *
- * \param p_playlist the playlist to get the info from
- * \param i_item the item on which we want the info ( -1 for current )
+ * \param p_playlist the playlist
+ * \param i_item the position of the item on which we want
+ *               the info ( -1 for current )
  * \param psz_cat the category we want to put the info into
- *     (gets created if needed)
- * \return the info category.
+ *                (gets created if needed)
+ * \param psz_name the name of the info
+ * \param psz_format printf-style info
+ * \return VLC_SUCCESS
  */
 int playlist_AddInfo( playlist_t *p_playlist, int i_item,
                       const char * psz_cat, const char *psz_name,
@@ -248,7 +254,7 @@ int playlist_AddInfo( playlist_t *p_playlist, int i_item,
     /* Check the existence of the playlist */
     if( p_playlist == NULL)
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     /* Get a correct item */
@@ -262,7 +268,7 @@ int playlist_AddInfo( playlist_t *p_playlist, int i_item,
     }
     else
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     va_start( args, psz_format );
@@ -279,10 +285,11 @@ int playlist_AddInfo( playlist_t *p_playlist, int i_item,
 /**
  *  Add info to one item ( no need for p_playlist )
  *
- * \param p_item the item on which we want the info
- * \param psz_cat the category in which the info is stored (must exist !)
+ * \param p_item the item for which we add the info
+ * \param psz_cat the category in which the info is stored
  * \param psz_name the name of the info
- * \return the info value if any, NULL else
+ * \param psz_format printf-style info
+ * \return VLC_SUCCESS on success
 */
 int playlist_AddItemInfo( playlist_item_t *p_item,
                       const char *psz_cat, const char *psz_name,
@@ -298,7 +305,7 @@ int playlist_AddItemInfo( playlist_item_t *p_item,
     p_cat = playlist_GetItemCategory( p_item, psz_cat );
     if( p_cat == NULL)
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     for( i = 0 ; i< p_cat->i_infos ; i++)
@@ -317,7 +324,7 @@ int playlist_AddItemInfo( playlist_item_t *p_item,
     {
         if( ( p_info = malloc( sizeof( item_info_t) ) ) == NULL )
         {
-            return -1;
+            return VLC_EGENERIC;
         }
         p_info->psz_name = strdup( psz_name);
     }
@@ -339,14 +346,15 @@ int playlist_AddItemInfo( playlist_item_t *p_item,
                      p_info );
     }
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /**
  * Add a special info : option
  *
- * \param p_playlist the playlist to get the info from
- * \param i_item the item on which we want the info ( -1 for current )
+ * \param p_playlist the playlist
+ * \param i_item the position of the item on which we
+ *               add the option ( -1 for current )
  * \param psz_value the option to add
  * \return the info category.
  */
@@ -360,7 +368,7 @@ int playlist_AddOption( playlist_t *p_playlist, int i_item,
     /* Check the existence of the playlist */
     if( p_playlist == NULL)
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     /* Get a correct item */
@@ -373,20 +381,20 @@ int playlist_AddOption( playlist_t *p_playlist, int i_item,
     }
     else
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_cat = playlist_GetCategory( p_playlist, i_item , "Options" );
 
     if( p_cat == NULL)
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     if( ( p_info = malloc( sizeof( item_info_t) ) ) == NULL )
     {
         msg_Err( p_playlist, "out of memory" );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_info->psz_name = strdup( "option" );
@@ -397,7 +405,7 @@ int playlist_AddOption( playlist_t *p_playlist, int i_item,
 
     INSERT_ELEM( p_cat->pp_infos, p_cat->i_infos, p_cat->i_infos, p_info );
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /**
@@ -417,12 +425,12 @@ int playlist_AddItemOption( playlist_item_t *p_item,
     p_cat = playlist_GetItemCategory( p_item, "Options" );
     if( p_cat == NULL)
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     if( ( p_info = malloc( sizeof( item_info_t) ) ) == NULL )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_info->psz_name = strdup( "option" );
@@ -433,5 +441,5 @@ int playlist_AddItemOption( playlist_item_t *p_item,
 
     INSERT_ELEM( p_cat->pp_infos, p_cat->i_infos, p_cat->i_infos, p_info );
 
-    return 0;
+    return VLC_SUCCESS;
 }

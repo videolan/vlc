@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: playlist.c,v 1.74 2004/01/11 00:11:56 zorglub Exp $
+ * $Id: playlist.c,v 1.75 2004/01/23 10:48:08 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -35,7 +35,6 @@
 #include "vlc_playlist.h"
 
 #define PLAYLIST_FILE_HEADER_0_5  "# vlc playlist file version 0.5"
-#define PLAYLIST_FILE_HEADER_0_6  "# vlc playlist file version 0.6"
 
 /*****************************************************************************
  * Local prototypes

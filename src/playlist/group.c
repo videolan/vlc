@@ -2,7 +2,7 @@
  * playlist.c : Playlist groups management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: group.c,v 1.7 2004/01/11 00:45:06 zorglub Exp $
+ * $Id: group.c,v 1.8 2004/01/23 10:48:08 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -48,7 +48,7 @@ playlist_group_t * playlist_CreateGroup(playlist_t * p_playlist, char *psz_name)
     {
         if( !strcasecmp( p_playlist->pp_groups[i]->psz_name , psz_name ) )
         {
-            msg_Info( p_playlist, "This group already exists !");
+            msg_Info( p_playlist, "this group already exists");
             return p_playlist->pp_groups[i];
         }
     }
@@ -81,7 +81,7 @@ playlist_group_t * playlist_CreateGroup(playlist_t * p_playlist, char *psz_name)
  *
  * \param p_playlist the playlist to remove the group from
  * \param i_id the identifier of the group to remove
- * \return 0 on success
+ * \return VLC_SUCCESS
  */
 int playlist_DeleteGroup( playlist_t *p_playlist, int i_id )
 {
@@ -131,16 +131,16 @@ char *playlist_FindGroup( playlist_t *p_playlist, int i_id )
 }
 
 /**
- * Find the Id of a group given its name
+ * Find the id of a group given its name
  *
  * \param p_playlist the playlist where to find the group
- * \param char * the name to search for
+ * \param psz_name the name to search for
  * \return the id of the group
  */
 int playlist_GroupToId( playlist_t *p_playlist, char *psz_name )
 {
     int i;
-    for( i=0 ; i< p_playlist->i_groups; i++ )
+    for( i = 0 ; i< p_playlist->i_groups; i++ )
     {
         if( p_playlist->pp_groups[i]->psz_name)
         {
@@ -150,5 +150,5 @@ int playlist_GroupToId( playlist_t *p_playlist, char *psz_name )
             }
         }
     }
-    return 0;
+    return VLC_SUCCESS;
 }
