@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.20 2003/08/27 07:21:07 garf Exp $
+ * $Id: vlcshell.cpp,v 1.21 2003/08/27 08:44:28 garf Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -258,7 +258,6 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         "vlc"
         /* , "--plugin-path", "/Library/Internet Plug-Ins/VLC Plugin.plugin/Contents/MacOS/modules" */
         , "--plugin-path", plugin_path
-        , "--filter invert"
     };
 #else
     char *ppsz_foo[] =
