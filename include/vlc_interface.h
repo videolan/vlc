@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_interface.h,v 1.4 2003/07/20 10:38:49 gbazin Exp $
+ * $Id: vlc_interface.h,v 1.5 2003/08/30 13:59:15 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -127,3 +127,14 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 #define INTF_DIALOG_FILE_GENERIC 30
 
 #define INTF_DIALOG_EXIT       99
+
+/* Useful text messages shared by interfaces */
+#define INTF_ABOUT_MSG \
+    _( "VLC is an open-source and cross-platform multimedia " \
+       "player for various audio and video formats (MPEG-1, MPEG-2, MPEG-4, " \
+       "DivX, mp3, Ogg, ...) as well as DVDs, VCDs, CD audio, and various " \
+       "streaming protocols.\n\n" \
+       "VLC is also a streaming server with transcoding capabilities " \
+       "(UDP unicast and multicast, HTTP, ...) mainly designed for " \
+       "high-bandwidth networks.\n\n"\
+       "For more information, have a look at the web site." )

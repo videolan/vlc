@@ -202,10 +202,6 @@
  * joined. */
 #define VOUT_MAX_AREAS                  5
 
-/* Default fonts */
-#define VOUT_DEFAULT_FONT               "default8x9.psf"
-#define VOUT_LARGE_FONT                 "default8x16.psf"
-
 /* Statistics are displayed every n loops (=~ pictures) */
 #define VOUT_STATS_NB_LOOPS             100
 

@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.58 2003/08/28 15:59:04 gbazin Exp $
+ * $Id: interface.cpp,v 1.59 2003/08/30 13:59:15 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -606,11 +606,9 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
     msg.Printf( wxString(wxT("VLC media player " VERSION)) +
         wxU(_(" (wxWindows interface)\n\n")) +
         wxU(_("(C) 1996-2003 - the VideoLAN Team\n\n")) +
+        wxU( INTF_ABOUT_MSG ) + wxT("\n\n") +
         wxU(_("The VideoLAN team <videolan@videolan.org>\n"
-              "http://www.videolan.org/\n\n")) +
-        wxU(_("This is the VideoLAN Client, a DVD, MPEG and DivX player."
-              "\nIt can play MPEG and MPEG2 files from a file or from a "
-              "network source.")) );
+              "http://www.videolan.org/\n\n")) );
 
     wxMessageBox( msg, wxString::Format(wxU(_("About %s")),
                   wxT("VLC media player")), wxOK | wxICON_INFORMATION, this );
