@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.212 2003/02/09 23:42:06 sigmunau Exp $
+ * $Id: video_output.c,v 1.213 2003/02/26 18:15:33 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -651,7 +651,7 @@ static void RunThread( vout_thread_t *p_vout)
                     }
                 }
             }
-    
+
             /* If we found better than the last picture, destroy it */
             if( p_last_picture && p_picture != p_last_picture )
             {
@@ -698,8 +698,7 @@ static void RunThread( vout_thread_t *p_vout)
 
                 continue;
             }
-#if 0
-            /* Removed because it causes problems for some people --Meuuh */
+
             if( display_date > current_date + VOUT_BOGUS_DELAY )
             {
                 /* Picture is waaay too early: it will be destroyed */
@@ -716,13 +715,13 @@ static void RunThread( vout_thread_t *p_vout)
                     p_picture->i_status = DESTROYED_PICTURE;
                     p_vout->i_heap_size--;
                 }
-                intf_WarnMsg( 1, "vout warning: early picture skipped "
-                              "("I64Fd")", display_date - current_date );
+                msg_Warn( p_vout, "vout warning: early picture skipped "
+                          "("I64Fd")", display_date - current_date );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
                 continue;
             }
-#endif
+
             if( display_date > current_date + VOUT_DISPLAY_DELAY )
             {
                 /* A picture is ready to be rendered, but its rendering date

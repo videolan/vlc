@@ -2,7 +2,7 @@
  * dec.c : audio output API towards decoders
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dec.c,v 1.7 2003/02/23 01:25:26 massiot Exp $
+ * $Id: dec.c,v 1.8 2003/02/26 18:15:33 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -281,6 +281,14 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     if ( p_buffer->start_date == 0 )
     {
         msg_Warn( p_aout, "non-dated buffer received" );
+        aout_BufferFree( p_buffer );
+        return -1;
+    }
+
+    if ( p_buffer->start_date > mdate() + AOUT_MAX_ADVANCE_TIME )
+    {
+        msg_Warn( p_aout, "received buffer in the future ("I64Fd")",
+                  p_buffer->start_date - mdate());
         aout_BufferFree( p_buffer );
         return -1;
     }

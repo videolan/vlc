@@ -51,7 +51,7 @@
 #ifdef SYS_BEOS
 #  define CONFIG_DIR                    "config/settings/VideoLAN Client"
 #elif SYS_DARWIN
-#  define CONFIG_DIR			"Library/Preferences/VLC"
+#  define CONFIG_DIR                    "Library/Preferences/VLC"
 #elif defined( WIN32 ) || defined( UNDER_CE )
 #  define CONFIG_DIR                    "vlc"
 #else
@@ -144,6 +144,10 @@
 /* Max number of inputs */
 #define AOUT_MAX_INPUTS                 5
 
+/* Buffers which arrive in advance of more than AOUT_MAX_ADVANCE_TIME
+ * will be considered as bogus and be trashed */
+#define AOUT_MAX_ADVANCE_TIME           (mtime_t)(DEFAULT_PTS_DELAY * 3)
+
 /* Buffers which arrive in advance of more than AOUT_MAX_PREPARE_TIME
  * will cause the calling thread to sleep */
 #define AOUT_MAX_PREPARE_TIME           (mtime_t)(.5*CLOCK_FREQ)
@@ -222,7 +226,7 @@
 
 /* Pictures which are VOUT_BOGUS_DELAY or more in advance probably have
  * a bogus PTS and won't be displayed */
-#define VOUT_BOGUS_DELAY                ((int)(0.800*CLOCK_FREQ))
+#define VOUT_BOGUS_DELAY                ((mtime_t)(DEFAULT_PTS_DELAY * 3))
 
 /* Delay (in microseconds) before an idle screen is displayed */
 #define VOUT_IDLE_DELAY                 (5*CLOCK_FREQ)
