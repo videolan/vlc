@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.44 2004/02/25 18:22:54 fenrir Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -294,11 +294,21 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             else
             {
                 /* Use the value provided in the MPEG sequence header */
-                p_sys->i_aspect =
-                    ((uint64_t)p_sys->p_info->sequence->display_width) *
-                    p_sys->p_info->sequence->pixel_width * VOUT_ASPECT_FACTOR /
-                    p_sys->p_info->sequence->display_height /
-                    p_sys->p_info->sequence->pixel_height;
+                if( p_sys->p_info->sequence->pixel_height > 0 )
+                {
+                    p_sys->i_aspect =
+                        ((uint64_t)p_sys->p_info->sequence->display_width) *
+                        p_sys->p_info->sequence->pixel_width * VOUT_ASPECT_FACTOR /
+                        p_sys->p_info->sequence->display_height /
+                        p_sys->p_info->sequence->pixel_height;
+                }
+                else
+                {
+                    /* Handle invalid aspect as square */
+                    p_sys->i_aspect = VOUT_ASPECT_FACTOR *
+                                      p_sys->p_info->sequence->width /
+                                      p_sys->p_info->sequence->height;
+                }
             }
 
             msg_Dbg( p_dec, "%dx%d, aspect %d, %u.%03u fps",
