@@ -4,11 +4,11 @@
  *******************************************************************************
  * Manages structures containing PSI information, and affiliated decoders.
  * TO DO: Fonctions d'init des structures
- *******************************************************************************/
+ ******************************************************************************/
 
 /*******************************************************************************
  * Preamble
- *******************************************************************************/
+ ******************************************************************************/
 #include <errno.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -77,19 +77,20 @@ static int input_DelPsiPID( input_thread_t *p_input, int i_pid );
 static void DecodePgrmAssocSection( byte_t* p_pas, input_thread_t *p_input );
 static void DecodePgrmMapSection( byte_t* p_pms, input_thread_t *p_input );
 static void DecodeSrvDescrSection( byte_t* p_sdt, input_thread_t *p_input );
-static void DecodePgrmDescriptor( byte_t* p_descriptor, pgrm_descriptor_t* p_pgrm );
+static void DecodePgrmDescriptor( byte_t* p_descr, pgrm_descriptor_t* p_pgrm );
 static void DecodeESDescriptor( byte_t* p_descriptor, es_descriptor_t* p_es );
 
-static stream_descriptor_t* AddStreamDescr(input_thread_t* p_input,
-                                           u16 i_stream_id);
-static void DestroyStreamDescr(input_thread_t* p_input, u16 i_stream_id);
-static pgrm_descriptor_t* AddPgrmDescr(stream_descriptor_t* p_stream,
-                                       u16 i_pgrm_id);
-static void DestroyPgrmDescr(input_thread_t* p_input, stream_descriptor_t* p_stream, u16 i_pgrm_id);
-static es_descriptor_t* AddESDescr(input_thread_t* p_input,
-                                   pgrm_descriptor_t* p_pgrm, u16 i_es_pid);
-static void DestroyESDescr(input_thread_t* p_input, pgrm_descriptor_t* p_pgrm,
-                           u16 i_es_pid);
+static stream_descriptor_t* AddStreamDescr( input_thread_t* p_input,
+                                            u16 i_stream_id );
+static void DestroyStreamDescr( input_thread_t* p_input, u16 i_stream_id );
+static pgrm_descriptor_t* AddPgrmDescr( stream_descriptor_t* p_stream,
+                                       u16 i_pgrm_id );
+static void DestroyPgrmDescr( input_thread_t* p_input, 
+                              stream_descriptor_t* p_stream, u16 i_pgrm_id );
+static es_descriptor_t* AddESDescr( input_thread_t* p_input,
+                                    pgrm_descriptor_t* p_pgrm, u16 i_es_pid );
+static void DestroyESDescr( input_thread_t* p_input, pgrm_descriptor_t* p_pgrm,
+                            u16 i_es_pid);
 
 static void BuildCrc32Table();
 static int CheckCRC32( u8* p_pms, int i_size);
@@ -179,12 +180,16 @@ void input_PsiRead( input_thread_t *p_input /* ??? */ )
 
     for( i_index2 = 0; i_index2 < p_pgrm->i_es_number; i_index2++ )
     {
-      intf_DbgMsg( " ->Pid %d: type %d, PCR: %d, PSI: %d\n", p_pgrm->ap_es[i_index2]->i_id,
-                    p_pgrm->ap_es[i_index2]->i_type, p_pgrm->ap_es[i_index2]->b_pcr,
-                    p_pgrm->ap_es[i_index2]->b_psi);
+      intf_DbgMsg( " ->Pid %d: type %d, PCR: %d, PSI: %d\n",
+                   p_pgrm->ap_es[i_index2]->i_id,
+                   p_pgrm->ap_es[i_index2]->i_type,
+                   p_pgrm->ap_es[i_index2]->b_pcr,
+                   p_pgrm->ap_es[i_index2]->b_psi);
 
-      intf_IntfMsg( " ->Pid %d: type %d, PCR: %d, PSI: %d\n", p_pgrm->ap_es[i_index2]->i_id,
-                    p_pgrm->ap_es[i_index2]->i_type, p_pgrm->ap_es[i_index2]->b_pcr,
+      intf_IntfMsg( " ->Pid %d: type %d, PCR: %d, PSI: %d\n",
+                    p_pgrm->ap_es[i_index2]->i_id,
+                    p_pgrm->ap_es[i_index2]->i_type,
+                    p_pgrm->ap_es[i_index2]->b_pcr,
                     p_pgrm->ap_es[i_index2]->b_psi);
     }
   }
@@ -262,7 +267,7 @@ void input_PsiDecode( input_thread_t *p_input, psi_section_t* p_psi_section )
  ******************************************************************************/
 static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
 {
-  u8 i_stream_id;               /* Id of the stream described in that section */
+    u8 i_stream_id;             /* Id of the stream described in that section */
     u8 i_version;              /* Version of the table carried in the section */
 
     u16 i_pgrm_id;                       /* Id of the current described  pgrm */
@@ -282,34 +287,34 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
 
 #define p_descr (p_input->p_stream)
 
-   /* Read stream id and version number immediately, to be sure they will be
-      initialised in all cases we will need it */
-   i_stream_id = U16_AT(&p_pas[3]);
-   i_version = (p_pas[5] >> 1) & 0x1F;
-   //intf_DbgMsg("TS Id: %d, version: %d\n", U16_AT(&p_pas[3]),(p_pas[5] >> 1) & 0x1F);
+    /* Read stream id and version number immediately, to be sure they will be
+       initialised in all cases we will need it */
+    i_stream_id = U16_AT(&p_pas[3]);
+    i_version = (p_pas[5] >> 1) & 0x1F;
+    //intf_DbgMsg("TS Id: %d, version: %d\n", U16_AT(&p_pas[3]),(p_pas[5] >> 1) & 0x1F);
 
     /* Test if the stream has not changed by looking at the stream_id */
     if( p_descr->i_stream_id != i_stream_id )
     {
-      /* This can either mean that the PSI decoder has just started or that
-         the stream has changed */
-      if( p_descr->i_PAT_version== PSI_UNINITIALISED )
-        intf_DbgMsg("Building Program Association table\n");
-      else
-        intf_ErrMsg( "Stream Id has suddently changed ! Rebuilding PAT\n" );
+        /* This can either mean that the PSI decoder has just started or that
+           the stream has changed */
+        if( p_descr->i_PAT_version== PSI_UNINITIALISED )
+            intf_DbgMsg("Building Program Association table\n");
+        else
+            intf_ErrMsg( "Stream Id has suddently changed ! Rebuilding PAT\n" );
 
-      /* Whatever it is, ask the PSI decoder to rebuild the table */
-      b_is_invalid = 1;
+        /* Whatever it is, ask the PSI decoder to rebuild the table */
+        b_is_invalid = 1;
     }
     else
     {
-      /* Stream has not changed, test if the PMT is up to date */
-      if( p_descr->i_PAT_version != i_version )
-      {
-        intf_DbgMsg("PAT has been updated, rebuilding it\n");
-        /* Ask the PSI decoder to rebuild the table */
-        b_is_invalid = 1;
-      }
+        /* Stream has not changed, test if the PMT is up to date */
+        if( p_descr->i_PAT_version != i_version )
+        {
+            intf_DbgMsg("PAT has been updated, rebuilding it\n");
+            /* Ask the PSI decoder to rebuild the table */
+            b_is_invalid = 1;
+        }
     }
     
     /* Clear the table if needed */
@@ -334,14 +339,16 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
                 && p_input->pp_selected_es[i_es_index]->i_id != 17
 #endif
             )
-              input_DelPsiPID( p_input, p_input->pp_selected_es[i_es_index]->i_id );
+              input_DelPsiPID( p_input,
+                               p_input->pp_selected_es[i_es_index]->i_id );
           }
           else
-            input_DelPgrmElem( p_input, p_input->pp_selected_es[i_es_index]->i_id );
+            input_DelPgrmElem( p_input,
+                               p_input->pp_selected_es[i_es_index]->i_id );
         }
 
         /* Recreate a new stream description. Since it is virgin, the decoder
-           will on is own rebuild it entirely */
+           will rebuild it entirely on is own */
         DestroyStreamDescr(p_input, p_descr->i_stream_id);
         AddStreamDescr(p_input, i_stream_id);
 
@@ -352,8 +359,9 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
     /* Build the table if not already complete or if it was cleared */
     if( p_descr->b_is_PAT_complete )
     {
-      /* Nothing to do */
-      //intf_DbgMsg("Table already complete\n");
+        /* Nothing to do */
+        if( b_is_invalid )
+            intf_DbgMsg("Bug: table invalid but PAT said to be complete\n");
     }
     else
     {
@@ -380,10 +388,11 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
           {
             i_pgrm_id = U16_AT(&p_pas[8+4*i_pgrm_index]);
             i_pgrm_map_pid = U16_AT(&p_pas[8+4*i_pgrm_index+2]) & 0x1FFF;
-            intf_DbgMsg("Pgrm %d described on pid %d\n", i_pgrm_id, i_pgrm_map_pid);
+            intf_DbgMsg("Pgrm %d described on pid %d\n", i_pgrm_id,
+                        i_pgrm_map_pid);
 
-            /* Check we are not already receiving that pid because it carries info
-               for another program */
+            /* Check we are not already receiving that pid because it carries
+               info for another program */
             for( i_es_index = 0; i_es_index < INPUT_MAX_ES; i_es_index++ )
             {
               if( p_input->p_es[i_es_index].i_id == i_pgrm_map_pid)
@@ -402,7 +411,7 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
                (Network information table) */
             if( i_pgrm_id != 0 )
             {
-              intf_DbgMsg("Adding program %d to the Program Map Table\n", i_pgrm_id);
+              intf_DbgMsg("Adding program %d to the PMT\n", i_pgrm_id);
               AddPgrmDescr(p_descr, i_pgrm_id);
             }
           }
@@ -434,8 +443,8 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
  ******************************************************************************/
 static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
 {
-  u16 i_pgrm_number;         /* Id of the program described in that section */
-  u8 i_version;              /* Version of the description for that program */
+  u16 i_pgrm_number;           /* Id of the program described in that section */
+  u8 i_version;                /* Version of the description for that program */
   
   u16 i_offset;
   u16 i_section_length;
@@ -468,7 +477,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
     /* If none entry exists, this simply means that the PAT is not complete,
        so skip this section since it is the responsability of the PAT decoder
        to add pgrm_descriptor slots to the table of known pgrms */
-    intf_DbgMsg( "Pgrm %d is unknown: skipping its description\n", i_pgrm_number );
+    intf_DbgMsg( "Unknown pgrm %d: skipping its description\n", i_pgrm_number );
     return;
   }
 
@@ -535,11 +544,11 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
 
           /* Compute the length of the section minus the final CRC */
           i_section_length = (U16_AT(&p_pms[1]) & 0xFFF) + 3 - 4;
-          intf_DbgMsg("Section length (CRC not included): %d\n", i_section_length);
+          intf_DbgMsg("Section length (without CRC): %d\n", i_section_length);
 
           /* Read additional info stored in the descriptors if any */
-          intf_DbgMsg("description length for program %d: %d\n", p_pgrm->i_number,
-                   (U16_AT(&p_pms[10]) & 0x0FFF));
+          intf_DbgMsg("Description length for program %d: %d\n",
+                      p_pgrm->i_number, (U16_AT(&p_pms[10]) & 0x0FFF));
           i_descr_end = (U16_AT(&p_pms[10]) & 0x0FFF) + 12;
           intf_DbgMsg("description ends at offset: %d\n",  i_descr_end);
 
@@ -565,11 +574,12 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
             p_es = AddESDescr(p_input, p_pgrm, i_es_pid);
             if (!p_es)
             {
-              intf_ErrMsg("Warning: definition of program %d will be uncomplete\n", 
+              intf_ErrMsg("Warning: definition for pgrm %d won't be complete\n",
                           p_pgrm->i_number);
-              /* The best way to handle this is to stop decoding the info for that
-                 section but do as if everything is ok. Thus we will eventually have
-                 an uncomplete ES table marked as being complete and some error msgs */
+              /* The best way to handle this is to stop decoding the info for
+                 that section but do as if everything is ok. Thus we will
+                 eventually have an uncomplete ES table marked as being
+                 complete and some error msgs */
               break;
             }
             else
@@ -620,7 +630,8 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
                       if( p_program_data->cfg.b_video )
                       {
                            /* Spawn a video thread */
-                           input_AddPgrmElem( p_input, p_input->p_es[i_es_loop].i_id );
+                           input_AddPgrmElem( p_input,
+                                              p_input->p_es[i_es_loop].i_id );
                       }
                       break;
                   case MPEG1_AUDIO_ES:
@@ -628,7 +639,8 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
                       if( p_program_data->cfg.b_audio )
                       {
                           /* Spawn an audio thread */
-                          input_AddPgrmElem( p_input, p_input->p_es[i_es_loop].i_id );
+                          input_AddPgrmElem( p_input,
+                                             p_input->p_es[i_es_loop].i_id );
                       }
                       break;
                   default:
@@ -703,7 +715,8 @@ void DecodeSrvDescrSection( byte_t* p_sdt, input_thread_t *p_input )
        /* Find the program to which the description applies */
        for( i_index = 0; i_index < p_stream->i_pgrm_number; i_index++ )
        {
-         if( p_stream->ap_programs[i_index]->i_number == U16_AT(&p_sdt[i_offset]) )
+         if( p_stream->ap_programs[i_index]->i_number ==
+             U16_AT(&p_sdt[i_offset]) )
          {
            /* Here we are */
            intf_DbgMsg("FOUND: %d\n", p_stream->ap_programs[i_index]->i_number);
@@ -732,7 +745,8 @@ void DecodeSrvDescrSection( byte_t* p_sdt, input_thread_t *p_input )
  ******************************************************************************
  * Decode any descriptor applying to the definition of a program
  ******************************************************************************/
-static void DecodePgrmDescriptor( byte_t* p_descriptor, pgrm_descriptor_t* p_pgrm )
+static void DecodePgrmDescriptor( byte_t* p_descriptor,
+                                  pgrm_descriptor_t* p_pgrm )
 {
     u8 i_type;                                     /* Type of the descriptor */
     u8 i_length;                                 /* Length of the descriptor */
@@ -763,9 +777,10 @@ static void DecodePgrmDescriptor( byte_t* p_descriptor, pgrm_descriptor_t* p_pgr
            first byte of the name */
         if( p_descriptor[i_offset] >= 0x20 )
         {
-            /* The charset is the one of our computer: just manually dup the string */
+            /* The charset is the one of our computer: just dup the string */
             p_pgrm->psz_srv_name = malloc(i_length - i_offset +1);
-            memcpy(p_pgrm->psz_srv_name, &p_descriptor[i_offset], i_length - i_offset);
+            memcpy(p_pgrm->psz_srv_name, &p_descriptor[i_offset],
+                   i_length - i_offset);
             p_pgrm->psz_srv_name[i_length - i_offset + 1] = '\0';
         }
         else
@@ -791,7 +806,7 @@ static void DecodeESDescriptor( byte_t* p_descriptor, es_descriptor_t* p_es )
 {
     u8 i_type;                                     /* Type of the descriptor */
     u8 i_length;                                 /* Length of the descriptor */
-//    int i_offset;                      /* Current position in the descriptor */
+//    int i_offset;                    /* Current position in the descriptor */
 
     ASSERT(p_descriptor);
     ASSERT(p_es);
@@ -870,7 +885,7 @@ static int input_AddPsiPID( input_thread_t *p_input, int i_pid )
       {
         if( !p_input->pp_selected_es[i_index] )
         {
-          intf_DbgMsg( "Free Selected ES slot found at offset %d: Will use it for PID %d\n",
+          intf_DbgMsg( "Free Selected ES slot found at offset %d for PID %d\n",
                        i_index, i_pid );
           p_input->pp_selected_es[i_index] = p_psi_es;
           break;
@@ -1052,7 +1067,8 @@ static void Unset_known( byte_t* a_known_section, u8 i_section )
  ******************************************************************************
  * 
  ******************************************************************************/
-static stream_descriptor_t* AddStreamDescr(input_thread_t* p_input, u16 i_stream_id)
+static stream_descriptor_t* AddStreamDescr(input_thread_t* p_input,
+                                           u16 i_stream_id)
 {
   ASSERT(p_input);
   
@@ -1101,7 +1117,8 @@ static void DestroyStreamDescr(input_thread_t* p_input, u16 i_stream_id)
   /* Free the structures that describes the programs of that stream */
   for( i_index = 0; i_index < p_input->p_stream->i_pgrm_number; i_index++ )
   {
-    DestroyPgrmDescr( p_input, p_input->p_stream, p_input->p_stream->ap_programs[i_index]->i_number );
+    DestroyPgrmDescr( p_input, p_input->p_stream,
+                      p_input->p_stream->ap_programs[i_index]->i_number );
   }
 
   /* Free the table of pgrm descriptors */
@@ -1119,31 +1136,34 @@ static void DestroyStreamDescr(input_thread_t* p_input, u16 i_stream_id)
  ******************************************************************************
  * This program descriptor will be referenced in the given stream descriptor
  ******************************************************************************/
-static pgrm_descriptor_t* AddPgrmDescr(stream_descriptor_t* p_stream, u16 i_pgrm_id)
+static pgrm_descriptor_t* AddPgrmDescr( stream_descriptor_t* p_stream,
+                                        u16 i_pgrm_id)
 {
+  int i_pgrm_index = p_stream->i_pgrm_number;        /* Where to add the pgrm */
+  
   ASSERT(p_stream);
 
   intf_DbgMsg("Adding description for pgrm %d\n", i_pgrm_id);
 
   /* Add an entry to the list of program associated with the stream */
   p_stream->i_pgrm_number++;
-  p_stream->ap_programs = realloc( p_stream->ap_programs, 
-                                   p_stream->i_pgrm_number*sizeof(pgrm_descriptor_t*) );
+  p_stream->ap_programs = realloc( p_stream->ap_programs,
+                          p_stream->i_pgrm_number*sizeof(pgrm_descriptor_t*) );
 
   /* Allocate the structure to store this description */
-  p_stream->ap_programs[p_stream->i_pgrm_number-1] = malloc(sizeof(pgrm_descriptor_t));
+  p_stream->ap_programs[i_pgrm_index] = malloc(sizeof(pgrm_descriptor_t));
 
   /* Init this entry */
-  p_stream->ap_programs[p_stream->i_pgrm_number-1]->i_number = i_pgrm_id;
-  p_stream->ap_programs[p_stream->i_pgrm_number-1]->i_version = PSI_UNINITIALISED;
-  p_stream->ap_programs[p_stream->i_pgrm_number-1]->b_is_ok = 0;
+  p_stream->ap_programs[i_pgrm_index]->i_number = i_pgrm_id;
+  p_stream->ap_programs[i_pgrm_index]->i_version = PSI_UNINITIALISED;
+  p_stream->ap_programs[i_pgrm_index]->b_is_ok = 0;
 
-  p_stream->ap_programs[p_stream->i_pgrm_number-1]->i_es_number = 0;
-  p_stream->ap_programs[p_stream->i_pgrm_number-1]->ap_es = NULL;
+  p_stream->ap_programs[i_pgrm_index]->i_es_number = 0;
+  p_stream->ap_programs[i_pgrm_index]->ap_es = NULL;
 
   /* descriptors ???? */
 
-  return p_stream->ap_programs[p_stream->i_pgrm_number-1];
+  return p_stream->ap_programs[i_pgrm_index];
 }
 
 /******************************************************************************
@@ -1151,12 +1171,15 @@ static pgrm_descriptor_t* AddPgrmDescr(stream_descriptor_t* p_stream, u16 i_pgrm
  ******************************************************************************
  * All ES descriptions referenced in the descriptor will be deleted.
  ******************************************************************************/
-static void DestroyPgrmDescr( input_thread_t * p_input, stream_descriptor_t * p_stream, u16 i_pgrm_id )
+static void DestroyPgrmDescr( input_thread_t * p_input,
+                              stream_descriptor_t * p_stream, u16 i_pgrm_id )
 {
-  int i_index, i_pgrm_index;
-  pgrm_descriptor_t * p_pgrm;
+  int i_index, i_pgrm_index = -1;
+  pgrm_descriptor_t* p_pgrm = NULL;
 
   ASSERT( p_stream );
+
+  intf_DbgMsg("Deleting description for pgrm %d\n", i_pgrm_id);
 
   /* Find where this program is described */
   for( i_index = 0; i_index < p_stream->i_pgrm_number; i_index++ )
@@ -1169,6 +1192,10 @@ static void DestroyPgrmDescr( input_thread_t * p_input, stream_descriptor_t * p_
     }
   }
 
+  /* Make sure that the pgrm exists */
+  ASSERT(i_pgrm_index >= 0);
+  ASSERT(p_pgrm);
+  
   /* Free the structures that describe the es that belongs to that program */
   for( i_index = 0; i_index < p_pgrm->i_es_number; i_index++ )
   {
@@ -1183,8 +1210,10 @@ static void DestroyPgrmDescr( input_thread_t * p_input, stream_descriptor_t * p_
 
   /* Remove this program from the stream's list of programs */
   p_stream->i_pgrm_number--;
-  p_stream->ap_programs[ i_pgrm_index ] = p_stream->ap_programs[ p_stream->i_pgrm_number ];
-  p_stream->ap_programs = realloc( p_stream->ap_programs, p_stream->i_pgrm_number * sizeof(pgrm_descriptor_t *) );
+  p_stream->ap_programs[i_pgrm_index] = 
+                                 p_stream->ap_programs[p_stream->i_pgrm_number];
+  p_stream->ap_programs = realloc( p_stream->ap_programs,
+                          p_stream->i_pgrm_number*sizeof(pgrm_descriptor_t *) );
 }
 
 /******************************************************************************
@@ -1218,7 +1247,7 @@ static es_descriptor_t* AddESDescr(input_thread_t* p_input,
     /* Reserve the slot for that ES */
     p_es = &p_input->p_es[i_index];
     p_es->i_id = i_es_pid;
-    intf_DbgMsg("Slot %d in p_es table reserved for ES %d\n", i_index, i_es_pid);
+    intf_DbgMsg("Slot %d in p_es table assigned to ES %d\n", i_index, i_es_pid);
     
     /* Init its values */
     p_es->i_type = 0;  /* ??? */
@@ -1233,12 +1262,15 @@ static es_descriptor_t* AddESDescr(input_thread_t* p_input,
     if( p_pgrm )
     {
       p_pgrm->i_es_number++;
-      p_pgrm->ap_es = realloc( p_pgrm->ap_es, p_pgrm->i_es_number*sizeof(es_descriptor_t *) );
+      p_pgrm->ap_es = realloc( p_pgrm->ap_es,
+                               p_pgrm->i_es_number*sizeof(es_descriptor_t *) );
       p_pgrm->ap_es[p_pgrm->i_es_number-1] = p_es;
-      intf_DbgMsg("Added ES %d to definition of pgrm %d\n", i_es_pid, p_pgrm->i_number);
+      intf_DbgMsg( "Added ES %d to definition of pgrm %d\n",
+                   i_es_pid, p_pgrm->i_number );
     }
     else
-      intf_DbgMsg("Added ES %d not added to the definition of any pgrm\n", i_es_pid);
+      intf_DbgMsg( "Added ES %d not added to the definition of any pgrm\n",
+                   i_es_pid );
   }
   
   return p_es;
@@ -1249,12 +1281,11 @@ static es_descriptor_t* AddESDescr(input_thread_t* p_input,
  ******************************************************************************
  * 
  ******************************************************************************/
-static void DestroyESDescr(input_thread_t* p_input, pgrm_descriptor_t* p_pgrm, u16 i_pid)
+static void DestroyESDescr(input_thread_t* p_input,
+                           pgrm_descriptor_t* p_pgrm, u16 i_pid)
 {
   int i_index;
   
-  ASSERT(p_pgrm);
-
   /* Look for the description of the ES */
   for(i_index = 0; i_index < INPUT_MAX_ES; i_index++)
   {
@@ -1268,7 +1299,7 @@ static void DestroyESDescr(input_thread_t* p_input, pgrm_descriptor_t* p_pgrm, u
   }
 
   /* Remove this ES from the description of the program if it is associated to
-   one */
+     one */
   if( p_pgrm )
   {
     for( i_index = 0; i_index < INPUT_MAX_ES; i_index++ )

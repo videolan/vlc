@@ -4,11 +4,11 @@
  *******************************************************************************
  * Read an MPEG2 stream, demultiplex and parse it before sending it to
  * decoders.
- *******************************************************************************/
+ ******************************************************************************/
 
 /*******************************************************************************
  * Preamble
- *******************************************************************************/
+ ******************************************************************************/
 #include <errno.h>
 #include <pthread.h>
 #include <sys/uio.h>                                                 /* iovec */
@@ -1096,7 +1096,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
  * input_DemuxPSI:
  *******************************************************************************
  * Notice that current ES state has been locked by input_SortPacket. (No more true,
- * changed by benny - See if it'a ok, and definitely change the code ???????? )
+ * changed by benny - See if it's ok, and definitely change the code ???????? )
  *******************************************************************************/
 static __inline__ void input_DemuxPSI( input_thread_t *p_input,
                                        ts_packet_t *p_ts_packet,
@@ -1105,7 +1105,7 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
 {
     int i_data_offset;      /* Offset of the interesting data in the TS packet */
     u16 i_data_length;                                 /* Length of those data */
-    boolean_t b_first_section; /* Was there another section in the TS packet ? */
+    //boolean_t b_first_section; /* Was there another section in the TS packet ? */
     
     ASSERT(p_input);
     ASSERT(p_ts_packet);
@@ -1117,80 +1117,87 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
 
 //    intf_DbgMsg( "Packet: %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x (unit start: %d)\n", p_ts_packet->buffer[p_ts_packet->i_payload_start], p_ts_packet->buffer[p_ts_packet->i_payload_start+1], p_ts_packet->buffer[p_ts_packet->i_payload_start+2], p_ts_packet->buffer[p_ts_packet->i_payload_start+3], p_ts_packet->buffer[p_ts_packet->i_payload_start+4], p_ts_packet->buffer[p_ts_packet->i_payload_start+5], p_ts_packet->buffer[p_ts_packet->i_payload_start+6], p_ts_packet->buffer[p_ts_packet->i_payload_start+7], p_ts_packet->buffer[p_ts_packet->i_payload_start+8], p_ts_packet->buffer[p_ts_packet->i_payload_start+9], p_ts_packet->buffer[p_ts_packet->i_payload_start+10], p_ts_packet->buffer[p_ts_packet->i_payload_start+11], p_ts_packet->buffer[p_ts_packet->i_payload_start+12], p_ts_packet->buffer[p_ts_packet->i_payload_start+13], p_ts_packet->buffer[p_ts_packet->i_payload_start+14], p_ts_packet->buffer[p_ts_packet->i_payload_start+15], p_ts_packet->buffer[p_ts_packet->i_payload_start+16], p_ts_packet->buffer[p_ts_packet->i_payload_start+17], p_ts_packet->buffer[p_ts_packet->i_payload_start+18], p_ts_packet->buffer[p_ts_packet->i_payload_start+19], p_ts_packet->buffer[p_ts_packet->i_payload_start+20], b_unit_start);
 
-    /* The section we will deal with during the first iteration of the following
-       loop is the first one contained in the TS packet */
-    b_first_section = 1;
 
-    /* Reassemble the pieces of sections contained in the TS packet and decode
-       the sections that could have been completed */
-    do
+    /* Try to find the beginning of the payload in the packet to initialise
+       the do-while loop that follows -> Compute the i_data_offset variable:
+       by default, the value is set so that we won't enter in the while loop.
+       It will be set to a correct value if the data are not corrupted */
+    i_data_offset = TS_PACKET_SIZE;
+
+    /* Has the reassembly of a section already began in a previous packet ? */
+    if( p_psi->b_running_section )
     {
-        /* Has the reassembly of a section already began in a previous packet ? */
-        if( p_psi->b_running_section )
+        /* Was data lost since the last TS packet ? */
+        if( b_packet_lost )
         {
-            /* Was data lost since the last TS packet ? */
-            if( b_packet_lost )
-            {
-                /* Discard the section and wait for the begining of a new one to resynch */
-                p_psi->b_running_section = 0;
-                intf_DbgMsg( "Section discarded due to packet loss\n" );
-            }
-            else
-            {
-                /* The data that complete a previously began section are always at
-                   the beginning of the TS payload... */
-                i_data_offset = p_ts_packet->i_payload_start;
-                /* ...Unless there is a pointer field, that we have to bypass */
-                if( b_unit_start )
-                    i_data_offset ++;
-//                intf_DbgMsg( "New part of the section received at offset %d\n", i_data_offset );
-            }
+            /* Discard the packet and wait for the begining of a new one to resynch */
+            p_psi->b_running_section = 0;
+            p_psi->i_current_position = 0;
+            intf_DbgMsg( "PSI section(s) discarded due to packet loss\n" );
         }
-        /* We are looking for the beginning of a new section */
         else
         {
-            if( !b_unit_start )
+            /* The data that complete a previously began section are always at
+               the beginning of the TS payload... */
+            i_data_offset = p_ts_packet->i_payload_start;
+            /* ...Unless there is a pointer field, that we have to bypass */
+            if( b_unit_start )
+                i_data_offset++;
+//            intf_DbgMsg( "New part of the section received at offset %d\n", i_data_offset );
+        }
+    }
+    /* We are looking for the beginning of a new section */
+    else
+    {
+        if( b_unit_start )
+        {
+            /* Get the offset at which the data for that section can be found
+               The offset is stored in the pointer_field since we are interested in
+               the first section of the TS packet. Note that the +1 is to bypass
+               the pointer field */
+            i_data_offset = p_ts_packet->i_payload_start +
+                            p_ts_packet->buffer[p_ts_packet->i_payload_start] + 1;
+//            intf_DbgMsg( "New section beginning at offset %d in TS packet\n", i_data_offset );
+        }
+        else
+        {
+            /* This may either mean that the TS is bad or that the packet contains
+               the end of a section that had been discarded in a previous loop: 
+               trash the TS packet since we cannot do anything with those data: */
+            p_psi->b_running_section = 0;
+            p_psi->i_current_position = 0;
+            intf_DbgMsg( "PSI packet discarded due to lack of synchronisation\n" );
+        }
+    }
+
+    /* The section we will deal with during the first iteration of the following
+       loop is the first one contained in the TS packet */
+    //    b_first_section = 1;
+
+    /* Reassemble the pieces of sections contained in the TS packet and decode
+       the sections that could have been completed.
+       Stop when we reach the end of the packet or stuffing bytes */
+    while( i_data_offset < TS_PACKET_SIZE && p_ts_packet->buffer[i_data_offset] != 0xFF )
+    {
+        /* If the current section is a new one, reinit the data fields of the p_psi
+           struct to start its decoding */
+        if( !p_psi->b_running_section )
+        {
+            /* Read the length of the new section */
+            p_psi->i_length = (U16_AT(&p_ts_packet->buffer[i_data_offset+1]) & 0xFFF) + 3;
+//            intf_DbgMsg( "Section length %d\n", p_psi->i_length );
+            if( p_psi->i_length > PSI_SECTION_SIZE )
             {
-                /* Cannot do anything with those data: trash both PSI section and TS packet */
-                p_psi->b_running_section = 0;
+                /* The TS packet is corrupted, stop here to avoid possible a seg fault */
+                intf_DbgMsg( "PSI Section size is too big, aborting its reception\n" );
                 break;
             }
-            else
-            {
-                /* Get the offset at which the data for that section can be found */
-                if( b_first_section )
-                {
-                    /* The offset is stored in the pointer_field since we are interested in
-                       the first section of the TS packet. Note that the +1 is to bypass
-                       the pointer field */
-                    i_data_offset = p_ts_packet->i_payload_start +
-                     p_ts_packet->buffer[p_ts_packet->i_payload_start] + 1;
-                }
-                else
-                {
-                    /* Since no gap is allowed between 2 sections in a TS packet, the
-                       offset is given by the end of the previous section. In fact, there
-                       is nothing to do, i_offset was set to the right value in the
-                       previous iteration */
-                }
-//                intf_DbgMsg( "New section beginning at offset %d in TS packet\n", i_data_offset );
 
-                /* Read the length of that section */
-                p_psi->i_length = (U16_AT(&p_ts_packet->buffer[i_data_offset+1]) & 0xFFF) + 3;
-//                intf_DbgMsg( "Section length %d\n", p_psi->i_length );
-                if( p_psi->i_length > PSI_SECTION_SIZE )
-                {
-                  /* The TS packet is corrupted, stop here to avoid possible a seg fault */
-                  intf_DbgMsg( "Section size is too big, aborting its reception\n" );
-                  break;
-                }
-
-                /* Init the reassembly of that section */
-                p_psi->b_running_section = 1;
-                p_psi->i_current_position = 0;
-            }
+            /* Init the reassembly of that section */
+            p_psi->b_running_section = 1;
+            p_psi->i_current_position = 0;
         }
-
+        
         /* Compute the length of data related to the section in this TS packet */
         if( p_psi->i_length - p_psi->i_current_position > TS_PACKET_SIZE - i_data_offset)
             i_data_length = TS_PACKET_SIZE - i_data_offset;
@@ -1200,8 +1207,9 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
         /* Copy those data in the section buffer */
         memcpy( &p_psi->buffer[p_psi->i_current_position], &p_ts_packet->buffer[i_data_offset],
                 i_data_length );
-    
-        /* Interesting data are now after the ones we copied */
+
+        /* Interesting data are now after the ones we copied, since no gap is
+           allowed between 2 sections in a TS packets */
         i_data_offset += i_data_length;
 
         /* Decode the packet if it is now complete */
@@ -1216,7 +1224,7 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
             p_psi->b_running_section = 0;
         
             /* The new section won't be the first anymore */
-            b_first_section = 0;
+            //b_first_section = 0;
         }
         else
         {
@@ -1228,8 +1236,6 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
 //        intf_DbgMsg( "Must loop ? Next data offset: %d, stuffing: %d\n",
 //                     i_data_offset, p_ts_packet->buffer[i_data_offset] );
     }
-    /* Stop if we reached the end of the packet or stuffing bytes */
-    while( i_data_offset < TS_PACKET_SIZE && p_ts_packet->buffer[i_data_offset] != 0xFF );
 
     /* Relase the TS packet, we don't need it anymore */
     input_NetlistFreeTS( p_input, p_ts_packet );
