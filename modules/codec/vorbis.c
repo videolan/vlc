@@ -168,9 +168,11 @@ vlc_module_begin();
 
 vlc_module_end();
 
+#ifndef MODULE_NAME_IS_tremor
 static const char *ppsz_enc_options[] = {
     "quality", "max-bitrate", "min-bitrate", NULL
 };
+#endif
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -609,6 +611,8 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     var_Get( p_enc, ENC_CFG_PREFIX "quality", &val );
     i_quality = val.i_int;
+    if( i_quality > 10 ) i_quality = 10;
+    if( i_quality < 0 ) i_quality = 0;
     var_Get( p_enc, ENC_CFG_PREFIX "max-bitrate", &val );
     i_max_bitrate = val.i_int;
     var_Get( p_enc, ENC_CFG_PREFIX "min-bitrate", &val );
@@ -622,7 +626,7 @@ static int OpenEncoder( vlc_object_t *p_this )
         /* VBR mode */
         if( vorbis_encode_setup_vbr( &p_sys->vi,
               p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.audio.i_rate,
-              i_quality ) )
+              i_quality * 0.1 ) )
         {
             vorbis_info_clear( &p_sys->vi );
             free( p_enc->p_sys );
