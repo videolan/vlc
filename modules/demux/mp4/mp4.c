@@ -366,15 +366,16 @@ static int Open( vlc_object_t * p_this )
                     else
                     {
                         /* msg dbg relative ? */
-                        char *psz_absolute = alloca( strlen( p_demux->psz_path ) + strlen( psz_ref ) + 1);
+                        char *psz_absolute = alloca( strlen( p_demux->psz_access ) + 3 + strlen( p_demux->psz_path ) + strlen( psz_ref ) + 1);
                         char *end = strrchr( p_demux->psz_path, '/' );
 
                         if( end )
                         {
                             int i_len = end + 1 - p_demux->psz_path;
 
-                            strncpy( psz_absolute, p_demux->psz_path, i_len);
-                            psz_absolute[i_len] = '\0';
+                            strcpy( psz_absolute, p_demux->psz_access );
+                            strcat( psz_absolute, "://" );
+                            strncat( psz_absolute, p_demux->psz_path, i_len);
                         }
                         else
                         {
