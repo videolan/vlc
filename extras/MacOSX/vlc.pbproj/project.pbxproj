@@ -467,6 +467,7 @@
 				A0E6B59904407FBD0080DD97,
 				8EDAC3440440F72D0059A3A7,
 				8EE1AFA40444660F0059A3A7,
+				8E9CC7B2046EFD700059A3A7,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -510,6 +511,7 @@
 				8EE1AFA30444660F0059A3A7,
 				F69B0CA602E24F6401A80112,
 				8ED6C29D03E2F32E0059A3A7,
+				8E9CC7B1046EFD700059A3A7,
 				8ED6C29E03E2F32E0059A3A7,
 				A0E6B59804407FBD0080DD97,
 				8EBF3FA303F13FFB0059A3A7,
@@ -671,6 +673,19 @@
 			settings = {
 			};
 		};
+		8E9CC7B1046EFD700059A3A7 = {
+			fileEncoding = 12;
+			isa = PBXFileReference;
+			name = THANKS;
+			path = ../../THANKS;
+			refType = 2;
+		};
+		8E9CC7B2046EFD700059A3A7 = {
+			fileRef = 8E9CC7B1046EFD700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		8EBF3FA303F13FFB0059A3A7 = {
 			isa = PBXFileReference;
 			name = vlc.scriptSuite;
@@ -809,14 +824,14 @@
 			refType = 2;
 		};
 		8ED6C29D03E2F32E0059A3A7 = {
-			fileEncoding = 30;
+			fileEncoding = 12;
 			isa = PBXFileReference;
 			name = AUTHORS;
 			path = ../../AUTHORS;
 			refType = 2;
 		};
 		8ED6C29E03E2F32E0059A3A7 = {
-			fileEncoding = 30;
+			fileEncoding = 12;
 			isa = PBXFileReference;
 			name = COPYING;
 			path = ../../COPYING;
@@ -1017,7 +1032,7 @@
 			};
 		};
 		A0E6B59804407FBD0080DD97 = {
-			fileEncoding = 5;
+			fileEncoding = 12;
 			isa = PBXFileReference;
 			name = README;
 			path = Resources/README;

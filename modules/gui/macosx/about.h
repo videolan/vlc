@@ -2,7 +2,7 @@
  * about.h: MacOS X About Panel
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: about.h,v 1.1 2003/04/09 20:53:28 hartman Exp $
+ * $Id: about.h,v 1.2 2003/05/11 23:17:30 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  * 
@@ -34,11 +34,13 @@
     
     NSTimer *o_scroll_timer;
     float f_current;
+    float f_end;
     NSTimeInterval i_start;
     BOOL b_restart;
     
     NSString *o_credits_path;
     NSString *o_credits;
+    NSString *o_thanks;
     NSString *o_name_version;
     NSString *o_copyright;
     NSDictionary *o_info_dict;

@@ -2,7 +2,7 @@
  * about.m: MacOS X About Panel
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: about.m,v 1.1 2003/04/09 20:53:28 hartman Exp $
+ * $Id: about.m,v 1.2 2003/05/11 23:17:30 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -56,33 +56,34 @@ static VLAboutBox *_o_sharedInstance = nil;
     {
         NSString *o_name;
         NSString *o_version;
+        NSString *o_thanks_path;
     
-        // Get the info dictionary (Info.plist)
+        /* Get the info dictionary (Info.plist) */
         o_info_dict = [[NSBundle mainBundle] infoDictionary];
         
-        // Get the localized info dictionary (InfoPlist.strings)
+        /* Get the localized info dictionary (InfoPlist.strings) */
         localInfoBundle = CFBundleGetMainBundle();
         o_local_dict = (NSDictionary *)
                         CFBundleGetLocalInfoDictionary( localInfoBundle );
         
-        // Setup the app name field
+        /* Setup the name field */
         o_name = [o_local_dict objectForKey:@"CFBundleName"];
         
-        // Set the about box window title
+        /* Set the about box title */
         [o_about_window setTitle:_NS("About VLC media player")];
         
-        // Setup the version field
+        /* Setup the version field */
         o_version = [o_info_dict objectForKey:@"CFBundleVersion"];
     
-        // Setup the appnameversion field
+        /* Setup the nameversion field */
         o_name_version = [NSString stringWithFormat:@"%@ - Version %@", o_name, o_version];
         [o_name_version_field setStringValue: o_name_version];
         
-        // Setup our credits
+        /* Setup our credits */
         o_credits_path = [[NSBundle mainBundle] pathForResource:@"AUTHORS" ofType:nil];
-        o_credits = [NSString stringWithContentsOfFile: o_credits_path ];
+        o_credits = [[NSString alloc] initWithData: [NSData dataWithContentsOfFile: o_credits_path ] encoding:NSWindowsCP1252StringEncoding];
         
-        // Parse the string
+        /* Parse the authors string */
         NSMutableString *o_outString = [NSMutableString string];
         NSScanner *o_scan_credits = [NSScanner scannerWithString: o_credits];
         NSCharacterSet *o_stopSet = [NSCharacterSet characterSetWithCharactersInString:@"\n\r"];
@@ -119,14 +120,33 @@ static VLAboutBox *_o_sharedInstance = nil;
             }
             
             [o_outString appendFormat: @"%@ <%@>\n%@\n\n", o_name, o_email, o_jobs];
-            [o_credits_textview setString:o_outString];
         }
         
-        // Setup the copyright field
+        /* Parse the thanks string */
+        o_thanks_path = [[NSBundle mainBundle] pathForResource:@"THANKS" ofType:nil];
+        o_thanks = [[NSString alloc] initWithData: [NSData dataWithContentsOfFile: 
+                        o_thanks_path ] encoding:NSWindowsCP1252StringEncoding];
+        
+        NSScanner *o_scan_thanks = [NSScanner scannerWithString: o_thanks];
+        [o_scan_thanks scanUpToCharactersFromSet: o_stopSet intoString: nil];
+        
+        while( ![o_scan_thanks isAtEnd] )
+        {
+            NSString *o_person;
+            NSString *o_job;
+            
+            [o_scan_thanks scanUpToString:@" - " intoString: &o_person];
+            [o_scan_thanks scanString:@" - " intoString: nil];
+            [o_scan_thanks scanUpToCharactersFromSet: o_stopSet intoString: &o_job];
+            [o_outString appendFormat: @"%@\n%@\n\n", o_person, o_job];
+        }
+        [o_credits_textview setString:o_outString];
+        
+        /* Setup the copyright field */
         o_copyright = [o_local_dict objectForKey:@"NSHumanReadableCopyright"];
         [o_copyright_field setStringValue:o_copyright];
 
-        // Setup the window
+        /* Setup the window */
         [o_credits_textview setDrawsBackground: NO];
         [o_credits_scrollview setDrawsBackground: NO];
         [o_about_window setExcludedFromWindowsMenu:YES];
@@ -134,7 +154,7 @@ static VLAboutBox *_o_sharedInstance = nil;
         [o_about_window center];
     }
     
-    // Show the window
+    /* Show the window */
     b_restart = YES;
     [o_about_window makeKeyAndOrderFront:nil];
 }
@@ -157,19 +177,26 @@ static VLAboutBox *_o_sharedInstance = nil;
 {
     if (b_restart)
     {
-        // Reset the startTime
+        /* Reset the starttime */
         i_start = [NSDate timeIntervalSinceReferenceDate] + 3.0;
         f_current = 0;
+        f_end = [o_credits_textview bounds].size.height - [o_credits_scrollview bounds].size.height;
         b_restart = NO;
     }
 
     if ([NSDate timeIntervalSinceReferenceDate] >= i_start)
     {
-        // Scroll to the position
+        /* Scroll to the position */
         [o_credits_textview scrollPoint:NSMakePoint( 0, f_current )];
         
-        // Increment the scroll position
+        /* Increment the scroll position */
         f_current += 0.005;
+        
+        /* If at end, restart at the top */
+        if ( f_current >= f_end )
+        {
+            b_restart = YES;
+        }
     }
 }
 

@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.80 2003/05/11 19:09:51 hartman Exp $
+ * $Id: intf.m,v 1.81 2003/05/11 23:17:30 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -55,14 +55,19 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     }
 
     memset( p_intf->p_sys, 0, sizeof( *p_intf->p_sys ) );
-
+    
     p_intf->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
+    
+    /* Put Cocoa into multithread mode as soon as possible.
+     * http://developer.apple.com/techpubs/macosx/Cocoa/
+     * TasksAndConcepts/ProgrammingTopics/Multithreading/index.html
+     * This thread does absolutely nothing at all. */
+    [NSThread detachNewThreadSelector:@selector(self) toTarget:[NSString string] withObject:nil];
+    
     p_intf->p_sys->o_sendport = [[NSPort port] retain];
-
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
-
     p_intf->pf_run = Run;
-
+    
     [[VLCApplication sharedApplication] autorelease];
     [NSApp initIntlSupport];
     [NSApp setIntf: p_intf];

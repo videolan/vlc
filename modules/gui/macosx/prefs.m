@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.20 2003/05/09 01:19:43 hartman Exp $
+ * $Id: prefs.m,v 1.21 2003/05/11 23:17:30 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -475,6 +475,15 @@
                     free( psz_duptip );
                 }
                 [o_view addSubview: [o_combo_box autorelease]];
+                
+                for( i=0; p_item->ppsz_list[i]; i++ )
+                {
+                    [o_combo_box addItemWithObjectValue:
+                        [NSString stringWithCString: p_item->ppsz_list[i]]];
+                }
+                [o_combo_box setStringValue: [NSString stringWithCString: 
+                    p_item->psz_value ? p_item->psz_value : ""]];
+
                 [[NSNotificationCenter defaultCenter] addObserver: self
                     selector: @selector(configChanged:)
                     name: NSControlTextDidChangeNotification
@@ -483,12 +492,6 @@
                     selector: @selector(configChanged:)
                     name: NSComboBoxSelectionDidChangeNotification
                     object: o_combo_box];
-
-                for( i=0; p_item->ppsz_list[i]; i++ )
-                {
-                    [o_combo_box addItemWithObjectValue:
-                        [NSString stringWithCString: p_item->ppsz_list[i]]];
-                }
 
                 CONTROL_LABEL( p_item->psz_text );
 
