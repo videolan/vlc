@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.12 2003/04/17 13:08:02 karibu Exp $
+ * $Id: gtk2_run.cpp,v 1.13 2003/04/20 22:52:50 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -27,6 +27,10 @@
 //--- GTK2 ------------------------------------------------------------------
 #include <glib.h>
 #include <gdk/gdk.h>
+#include <gtk/gtk.h>
+
+//--- WWWINDOWS -------------------------------------------------------------
+#include <wx/wx.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -42,7 +46,10 @@
 #include "../os_theme.h"
 #include "../src/skin_common.h"
 #include "../src/vlcproc.h"
+#include "../src/wxdialogs.h"
 
+// include the icon graphic
+#include "share/vlc32x32.xpm"
 
 //---------------------------------------------------------------------------
 class CallBackObjects
@@ -59,17 +66,23 @@ bool IsVLCEvent( unsigned int msg );
 int  SkinManage( intf_thread_t *p_intf );
 
 
-
 //---------------------------------------------------------------------------
-// REFRESH TIMER CALLBACK
+// Local classes declarations.
 //---------------------------------------------------------------------------
-gboolean RefreshTimer( gpointer data )
+class Instance: public wxApp
 {
-    intf_thread_t *p_intf = (intf_thread_t *)data;
-    SkinManage( p_intf );
-    return true;
-}
-//---------------------------------------------------------------------------
+public:
+    Instance();
+    Instance( intf_thread_t *_p_intf, CallBackObjects *callback );
+
+    bool OnInit();
+    OpenDialog *open;
+
+private:
+    intf_thread_t *p_intf;
+    CallBackObjects *callbackobj;
+};
+
 
 //---------------------------------------------------------------------------
 // GTK2 interface
@@ -187,6 +200,49 @@ void GTK2Proc( GdkEvent *event, gpointer data )
     // If hwnd does not match any window or message not processed
     return DefWindowProc( hwnd, uMsg, wParam, lParam );
 #endif
+    gtk_main_do_event( event );
+
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+// Implementation of Instance class
+//---------------------------------------------------------------------------
+Instance::Instance( )
+{
+}
+
+Instance::Instance( intf_thread_t *_p_intf, CallBackObjects *callback )
+{
+    // Initialization
+    p_intf = _p_intf;
+    callbackobj = callback;
+}
+
+IMPLEMENT_APP_NO_MAIN(Instance)
+
+bool Instance::OnInit()
+{
+    // Set event callback. Yes, it's a big hack ;)
+    gdk_event_handler_set( GTK2Proc, (gpointer)callbackobj, NULL );
+
+    p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
+    p_intf->p_sys->OpenDlg = new OpenDialog( p_intf, NULL, FILE_ACCESS );
+    p_intf->p_sys->MessagesDlg = new Messages( p_intf, NULL );
+    return TRUE;
+}
+
+
+
+//---------------------------------------------------------------------------
+// REFRESH TIMER CALLBACK
+//---------------------------------------------------------------------------
+gboolean RefreshTimer( gpointer data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)data;
+    SkinManage( p_intf );
+    return true;
 }
 //---------------------------------------------------------------------------
 
@@ -196,20 +252,19 @@ void GTK2Proc( GdkEvent *event, gpointer data )
 //---------------------------------------------------------------------------
 void OSRun( intf_thread_t *p_intf )
 {
+    static char  *p_args[] = { "" };
+
     // Create VLC event object processing
     CallBackObjects *callbackobj = new CallBackObjects();
     callbackobj->Proc = new VlcProc( p_intf );
-    callbackobj->Loop = g_main_loop_new( NULL, TRUE );
 
-    // Set event callback
-    gdk_event_handler_set( GTK2Proc, (gpointer)callbackobj, NULL );
+    wxTheApp = new Instance( p_intf, callbackobj );
 
     // Add timer
     g_timeout_add( 200, (GSourceFunc)RefreshTimer, (gpointer)p_intf );
-
-    // Main event loop
-    g_main_loop_run( callbackobj->Loop );
-
+    
+    wxEntry( 1, p_args );
+    
     delete callbackobj;
 }
 //---------------------------------------------------------------------------
