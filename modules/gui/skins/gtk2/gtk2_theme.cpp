@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.4 2003/04/13 20:07:34 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.5 2003/04/13 22:55:15 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -26,6 +26,7 @@
 
 //--- GTK2 -----------------------------------------------------------------
 #include <gdk/gdk.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -265,9 +266,8 @@ void GTK2Theme::OnLoadTheme()
     attr.event_mask = GDK_ALL_EVENTS_MASK;
     attr.x = 100;
     attr.y = 100;
-    attr.window_type = GDK_WINDOW_TOPLEVEL;
     attr.width = 400;
-    attr.height = 200;
+    attr.height = 150;
     attr.window_type = GDK_WINDOW_TOPLEVEL;
     attr.wclass = GDK_INPUT_OUTPUT;
     attr.override_redirect = FALSE;
@@ -276,6 +276,7 @@ void GTK2Theme::OnLoadTheme()
     
     // Create the parent window
     ParentWindow = gdk_window_new( NULL, &attr, mask);
+
     gdk_window_show( ParentWindow );
 }
 //---------------------------------------------------------------------------
@@ -319,8 +320,8 @@ void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
         
     GdkWindowAttr attr;
     attr.event_mask = GDK_ALL_EVENTS_MASK;
-    attr.width = 100;
-    attr.height = 100;
+    attr.width = 400;
+    attr.height = 150;
     attr.window_type = GDK_WINDOW_CHILD;
     attr.wclass = GDK_INPUT_OUTPUT;
     

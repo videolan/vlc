@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.3 2003/04/13 20:07:34 asmax Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.4 2003/04/13 22:55:15 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -25,6 +25,7 @@
 #if !defined WIN32
 
 //--- GTK2 -----------------------------------------------------------------
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk/gdk.h>
 
 //--- VLC -------------------------------------------------------------------
@@ -98,6 +99,16 @@ GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
     // Delete objects
     DeleteObject( HBitmap );*/
     
+    // Load the bitmap image
+    Bmp = gdk_pixbuf_new_from_file( FileName.c_str(), NULL );
+    if( Bmp == NULL )
+    {
+        if( FileName != "" )
+            msg_Warn( p_intf, "Couldn't load bitmap: %s", FileName.c_str() );
+
+     //   Bmp = gdk_pixbuf_new( GDK_COLORSPACE_RGB, TRUE, 8, 1, 1);
+        Bmp = NULL;
+    }
 }
 //---------------------------------------------------------------------------
 GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, Graphics *from, int x, int y,
@@ -149,6 +160,13 @@ void GTK2Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
     // New method, not available in win95
     TransparentBlt( destDC, xRef, yRef, w, h, bmpDC, x, y, w, h, AlphaColor );
 */
+    GdkDrawable *destImg = ( (GTK2Graphics *)dest )->GetImageHandle();
+
+    GdkGC *gc = gdk_gc_new( destImg );
+    /*gdk_pixbuf_render_to_drawable( Bmp, destImg, gc, 0, 0, x, y, w, h,  
+            GDK_RGB_DITHER_NONE, 0, 0);*/
+    gdk_pixbuf_render_to_drawable( Bmp, destImg, gc, 0, 0, x, y, 50, 50,  
+            GDK_RGB_DITHER_NONE, 0, 0);
 }
 //---------------------------------------------------------------------------
 bool GTK2Bitmap::Hit( int x, int y)
