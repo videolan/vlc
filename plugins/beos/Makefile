@@ -7,7 +7,7 @@
 # Objects
 #
 
-PLUGIN_CPP = beos.o aout_beos.o vout_beos.o intf_beos.o DrawingTidbits.o TransportButton.o
+PLUGIN_CPP = beos.o aout_beos.o vout_beos.o intf_beos.o InterfaceWindow.o DrawingTidbits.o TransportButton.o
 BUILTIN_CPP = $(PLUGIN_CPP:%.o=BUILTIN_%.o)
 
 ALL_OBJ = $(PLUGIN_CPP) $(BUILTIN_CPP)
