@@ -413,7 +413,7 @@ static void SetTables( vout_thread_t *p_vout )
      */     
     for( i_index = 0; i_index < 256; i_index++ )
     {
-        i_gamma[i_index] = 255. * pow( (double)i_index / 255., p_vout->f_gamma );        
+        i_gamma[i_index] = 255. * exp( (double)i_index * p_vout->f_gamma / 255. );        
     }
 
     /*          

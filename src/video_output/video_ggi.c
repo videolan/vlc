@@ -122,15 +122,11 @@ void vout_SysDestroy( vout_thread_t *p_vout )
  * vout_SysManage: handle Sys events
  *******************************************************************************
  * This function should be called regularly by video output thread. It returns 
- * a negative value if something happened which does not allow the thread to 
- * continue, and a positive one if the thread can go on, but the images have 
- * been modified and therefore it is useless to display them.
+ * a non null value if an error occured.
  *******************************************************************************/
 int vout_SysManage( vout_thread_t *p_vout )
 {
-    //??
-
-    return( 0 );
+    return( 0 );    
 }
 
 /*******************************************************************************

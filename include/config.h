@@ -120,9 +120,8 @@
 #define INTF_IDLE_SLEEP                 100000
 
 /* Factor for changing gamma, and minimum and maximum values */
-#define INTF_GAMMA_FACTOR               1.1
-#define INTF_GAMMA_MIN                  0.1
-#define INTF_GAMMA_MAX                  10
+#define INTF_GAMMA_FACTOR               .1
+#define INTF_GAMMA_MAX                  3
 
 /*
  * X11 settings
@@ -247,7 +246,7 @@
 #define VOUT_GRAYSCALE_DEFAULT          0
 
 /* Default gamma */
-#define VOUT_GAMMA                      1.
+#define VOUT_GAMMA                      0.
 
 /*
  * Time settings
@@ -338,7 +337,7 @@
 /* Define to enable messages queues - disabling messages queue can be usefull
  * when debugging, since it allows messages which would not otherwise be printed,
  * due to a crash, to be printed anyway */
-//#define INTF_MSG_QUEUE
+#define INTF_MSG_QUEUE
 
 /* Format of the header for debug messages. The arguments following this header
  * are the file (char *), the function (char *) and the line (int) in which the

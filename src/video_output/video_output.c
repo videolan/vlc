@@ -39,7 +39,9 @@ static void     ErrorThread             ( vout_thread_t *p_vout );
 static void     EndThread               ( vout_thread_t *p_vout );
 static void     RenderPicture           ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderPictureInfo       ( vout_thread_t *p_vout, picture_t *p_pic );
-static int      RenderIdle              ( vout_thread_t *p_vout, int i_level );
+static int      RenderIdle              ( vout_thread_t *p_vout );
+static int      RenderInfo              ( vout_thread_t *p_vout );
+static int      Manage                  ( vout_thread_t *p_vout );
 
 /*******************************************************************************
  * vout_CreateThread: creates a new video output thread
@@ -112,20 +114,15 @@ vout_thread_t * vout_CreateThread               (
                 p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                 p_vout->f_x_ratio, p_vout->f_y_ratio, p_vout->b_grayscale );
 
-    /* Initialize changement properties */
-    p_vout->b_gamma_change      = 0;
-    p_vout->i_new_width         = p_vout->i_width;
-    p_vout->i_new_height        = p_vout->i_height; 
-
 #ifdef STATS
     /* Initialize statistics fields */
-    p_vout->c_loops             = 0;
-    p_vout->c_idle_loops        = 0;
-    p_vout->c_fps_samples       = 0;
+    p_vout->loop_time           = 0;    
+    p_vout->c_fps_samples       = 0;    
 #endif      
 
     /* Create thread and set locks */
-    vlc_mutex_init( &p_vout->lock );
+    vlc_mutex_init( &p_vout->picture_lock );
+    vlc_mutex_init( &p_vout->subtitle_lock );    
     if( vlc_thread_create( &p_vout->thread_id, "video output", 
 			   (void *) RunThread, (void *) p_vout) )
     {
@@ -185,6 +182,78 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
 }
 
 /*******************************************************************************
+ * vout_DisplaySubtitle: display a subtitle
+ *******************************************************************************
+ * Remove the reservation flag of a subtitle, which will cause it to be ready for
+ * display. The picture does not need to be locked, since it is ignored by
+ * the output thread if is reserved.
+ *******************************************************************************/
+void  vout_DisplaySubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
+{
+#ifdef DEBUG_VIDEO
+    char        psz_begin_date[MSTRTIME_MAX_SIZE];   /* buffer for date string */
+    char        psz_end_date[MSTRTIME_MAX_SIZE];     /* buffer for date string */
+#endif
+
+#ifdef DEBUG
+    /* Check if status is valid */
+    if( p_sub->i_status != RESERVED_SUBTITLE )
+    {
+        intf_DbgMsg("error: subtitle %p has invalid status %d\n", p_sub, p_sub->i_status );       
+    }   
+#endif
+
+    /* Remove reservation flag */
+    p_sub->i_status = READY_SUBTITLE;
+
+#ifdef DEBUG_VIDEO
+    /* Send subtitle informations */
+    intf_DbgMsg("subtitle %p: type=%d, begin date=%s, end date=%s\n", p_sub, p_sub->i_type, 
+                mstrtime( psz_begin_date, p_sub->begin_date ), 
+                mstrtime( psz_end_date, p_sub->end_date ) );    
+#endif
+}
+
+/*******************************************************************************
+ * vout_CreateSubtitle: allocate a subtitle in the video output heap.
+ *******************************************************************************
+ * This function create a reserved subtitle in the video output heap. 
+ * A null pointer is returned if the function fails. This method provides an
+ * already allocated zone of memory in the subtitle data fields. It needs locking
+ * since several pictures can be created by several producers threads. 
+ *******************************************************************************/
+subtitle_t *vout_CreateSubtitle( vout_thread_t *p_vout, int i_type, 
+                                 int i_size )
+{
+    //???
+}
+
+/*******************************************************************************
+ * vout_DestroySubtitle: remove a permanent or reserved subtitle from the heap
+ *******************************************************************************
+ * This function frees a previously reserved subtitle.
+ * It is meant to be used when the construction of a picture aborted.
+ * This function does not need locking since reserved subtitles are ignored by
+ * the output thread.
+ *******************************************************************************/
+void vout_DestroySubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
+{
+#ifdef DEBUG
+   /* Check if subtitle status is valid */
+   if( p_sub->i_status != RESERVED_SUBTITLE )
+   {
+       intf_DbgMsg("error: subtitle %p has invalid status %d\n", p_sub, p_sub->i_status );       
+   }   
+#endif
+
+    p_sub->i_status = DESTROYED_SUBTITLE;
+
+#ifdef DEBUG_VIDEO
+    intf_DbgMsg("subtitle %p\n", p_sub);    
+#endif
+}
+
+/*******************************************************************************
  * vout_DisplayPicture: display a picture
  *******************************************************************************
  * Remove the reservation flag of a picture, which will cause it to be ready for
@@ -201,7 +270,7 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
     /* Check if picture status is valid */
     if( p_pic->i_status != RESERVED_PICTURE )
     {
-        intf_DbgMsg("error: picture %d has invalid status %d\n", p_pic, p_pic->i_status );       
+        intf_DbgMsg("error: picture %p has invalid status %d\n", p_pic, p_pic->i_status );       
     }   
 #endif
 
@@ -232,7 +301,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
     picture_t * p_destroyed_picture = NULL;         /* first destroyed picture */    
 
     /* Get lock */
-    vlc_mutex_lock( &p_vout->lock );
+    vlc_mutex_lock( &p_vout->picture_lock );
 
     /* 
      * Look for an empty place 
@@ -258,7 +327,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
                 intf_DbgMsg("picture %p (in destroyed picture slot)\n", 
                             &p_vout->p_picture[i_picture] );                
 #endif
-		vlc_mutex_unlock( &p_vout->lock );
+		vlc_mutex_unlock( &p_vout->picture_lock );
 		return( &p_vout->p_picture[i_picture] );
 	    }
 	    else if( p_destroyed_picture == NULL )
@@ -350,13 +419,13 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
 #ifdef DEBUG_VIDEO
         intf_DbgMsg("picture %p (in free picture slot)\n", p_free_picture );        
 #endif
-        vlc_mutex_unlock( &p_vout->lock );
+        vlc_mutex_unlock( &p_vout->picture_lock );
         return( p_free_picture );
     }
     
     // No free or destroyed picture could be found
     intf_DbgMsg( "warning: heap is full\n" );
-    vlc_mutex_unlock( &p_vout->lock );
+    vlc_mutex_unlock( &p_vout->picture_lock );
     return( NULL );
 }
 
@@ -375,7 +444,7 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
    /* Check if picture status is valid */
    if( p_pic->i_status != RESERVED_PICTURE )
    {
-       intf_DbgMsg("error: picture %d has invalid status %d\n", p_pic, p_pic->i_status );       
+       intf_DbgMsg("error: picture %p has invalid status %d\n", p_pic, p_pic->i_status );       
    }   
 #endif
 
@@ -394,9 +463,9 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *******************************************************************************/
 void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    vlc_mutex_lock( &p_vout->lock );
+    vlc_mutex_lock( &p_vout->picture_lock );
     p_pic->i_refcount++;
-    vlc_mutex_unlock( &p_vout->lock );
+    vlc_mutex_unlock( &p_vout->picture_lock );
 
 #ifdef DEBUG_VIDEO
     intf_DbgMsg("picture %p\n", p_pic);    
@@ -410,13 +479,13 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *******************************************************************************/
 void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    vlc_mutex_lock( &p_vout->lock );
+    vlc_mutex_lock( &p_vout->picture_lock );
     p_pic->i_refcount--;
     if( (p_pic->i_refcount == 0) && (p_pic->i_status == DISPLAYED_PICTURE) )
     {
 	p_pic->i_status = DESTROYED_PICTURE;
     }
-    vlc_mutex_unlock( &p_vout->lock );
+    vlc_mutex_unlock( &p_vout->picture_lock );
 
 #ifdef DEBUG_VIDEO
     intf_DbgMsg("picture %p\n", p_pic);    
@@ -446,11 +515,13 @@ static int InitThread( vout_thread_t *p_vout )
         return( 1 );
     } 
 
-    /* Initialize pictures */    
+    /* Initialize pictures and subtitles */    
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
     {
-        p_vout->p_picture[i_index].i_type  = EMPTY_PICTURE;
-        p_vout->p_picture[i_index].i_status= FREE_PICTURE;
+        p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
+        p_vout->p_picture[i_index].i_status = FREE_PICTURE;
+        p_vout->p_subtitle[i_index].i_type  = EMPTY_SUBTITLE;
+        p_vout->p_subtitle[i_index].i_status= FREE_SUBTITLE;
     }
 
     /* Initialize convertion tables and functions */
@@ -477,11 +548,8 @@ static int InitThread( vout_thread_t *p_vout )
 static void RunThread( vout_thread_t *p_vout)
 {
     int             i_picture;                                /* picture index */
-    int             i_err;                                       /* error code */
-    int             i_idle_level = 0;                            /* idle level */
     mtime_t         current_date;                              /* current date */
     mtime_t         pic_date = 0;                              /* picture date */    
-    mtime_t         last_date = 0;                        /* last picture date */    
     boolean_t       b_display;                                 /* display flag */    
     picture_t *     p_pic;                                  /* picture pointer */
      
@@ -506,6 +574,7 @@ static void RunThread( vout_thread_t *p_vout)
          * since only READY_PICTURES are handled 
          */
         p_pic = NULL;         
+        current_date = mdate();
         for( i_picture = 0; i_picture < VOUT_MAX_PICTURES; i_picture++ )
 	{
 	    if( (p_vout->p_picture[i_picture].i_status == READY_PICTURE) &&
@@ -516,8 +585,7 @@ static void RunThread( vout_thread_t *p_vout)
                 pic_date = p_pic->date;                
 	    }
 	}
-        current_date = mdate();
-
+ 
         /* 
 	 * Render picture if any
 	 */
@@ -531,9 +599,9 @@ static void RunThread( vout_thread_t *p_vout)
 	    {
 		/* Picture is late: it will be destroyed and the thread will sleep and
                  * go to next picture */
-                vlc_mutex_lock( &p_vout->lock );
+                vlc_mutex_lock( &p_vout->picture_lock );
                 p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
-                vlc_mutex_unlock( &p_vout->lock );
+                vlc_mutex_unlock( &p_vout->picture_lock );
 #ifdef DEBUG_VIDEO
 		intf_DbgMsg( "warning: late picture %p skipped\n", p_pic );
 #endif
@@ -546,91 +614,72 @@ static void RunThread( vout_thread_t *p_vout)
 		 * as if no picture were found. The picture state is unchanged */
                 p_pic =         NULL;                
 	    }
-	    else
-	    {
-		/* Picture has not yet been displayed, and has a valid display
-		 * date : render it, then mark it as displayed */
-                if( p_vout->b_active )
-                {                    
-                    RenderPicture( p_vout, p_pic );
-                    if( p_vout->b_info )
-                    {
-                        RenderPictureInfo( p_vout, p_pic );                        
-                    }                    
-                }                
-                vlc_mutex_lock( &p_vout->lock );
-                p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
-                vlc_mutex_unlock( &p_vout->lock );
-	    }
         }
 
-        /* 
-         * Rebuild tables if gamma has changed
+              
+        /*
+         * Perform rendering, sleep and display rendered picture
          */
-        if( p_vout->b_gamma_change )
+        if( p_pic )
         {
-            //??
-            p_vout->b_gamma_change = 0;            
-            vout_ResetTables( p_vout );            // ?? test return value
-        }        
+            /* A picture is ready to be displayed : render it */
+            if( p_vout->b_active )
+            {                    
+                RenderPicture( p_vout, p_pic );
+                if( p_vout->b_info )
+                {
+                    RenderPictureInfo( p_vout, p_pic );
+                    RenderInfo( p_vout );                    
+                }                    
+                b_display = 1;                    
+            }
+            else
+            {
+                b_display = 0;                
+            } 
+
+            /* Remove picture from heap */
+            vlc_mutex_lock( &p_vout->picture_lock );
+            p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
+            vlc_mutex_unlock( &p_vout->picture_lock );                          
+        }            
+        else
+        {
+            /* No picture. However, an idle screen may be ready to display */
+            b_display = p_vout->b_active && (                   RenderIdle( p_vout ) | 
+                                            ( p_vout->b_info && RenderInfo( p_vout ) ));
+        }
+
+        /* Sleep a while or until a given date */
+        if( p_pic )
+        {
+#ifdef STATS
+            /* Computes loop time */
+            p_vout->loop_time = mdate() - current_date;            
+#endif
+            mwait( pic_date );
+        }
+        else
+        {
+            msleep( VOUT_IDLE_SLEEP );                
+        }            
+
+        /* On awakening, send immediately picture to display */
+        if( b_display && p_vout->b_active )
+        {
+            vout_SysDisplay( p_vout );
+        }
 
         /*
-         * Check events, sleep and display picture
+         * Check events and manage thread
 	 */
-        i_err = vout_SysManage( p_vout );
-	if( i_err < 0 )
+        if( vout_SysManage( p_vout ) | Manage( p_vout ) )
 	{
 	    /* A fatal error occured, and the thread must terminate immediately,
 	     * without displaying anything - setting b_error to 1 cause the
 	     * immediate end of the main while() loop. */
 	    p_vout->b_error = 1;
-	}
-	else 
-	{            
-	    if( p_pic )
-	    {
-		/* A picture is ready to be displayed : remove blank screen flag */
-                last_date =     pic_date;
-                i_idle_level =  0;
-                b_display =     1;                
-                
-                /* Sleep until its display date */
-		mwait( pic_date );
-	    }
-	    else
-	    {
-                /* If last picture was a long time ago, increase idle level, reset
-                 * date and render idle screen */
-                if( !i_err && (current_date - last_date > VOUT_IDLE_DELAY) )
-                {       
-                    last_date = current_date;                    
-                    b_display = p_vout->b_active && RenderIdle( p_vout, i_idle_level++ );
-                }
-                else
-                {
-                    b_display = 0;                    
-                }
-                
-#ifdef STATS
-		/* Update counters */
-		p_vout->c_idle_loops++;
-#endif
-
-		/* Sleep to wait for new pictures */
-		msleep( VOUT_IDLE_SLEEP );
-	    }
-
-            /* On awakening, send immediately picture to display */
-            if( b_display && p_vout->b_active )
-            {
-                vout_SysDisplay( p_vout );
-            }
-	}
-
-#ifdef STATS
-        /* Update counters */
-        p_vout->c_loops++;
-#endif
+	}  
     } 
 
     /*
@@ -709,12 +758,6 @@ static void EndThread( vout_thread_t *p_vout )
  *******************************************************************************/
 static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#ifdef DEBUG_VIDEO
-    /* Send picture informations and store rendering start date */
-    intf_DbgMsg("picture %p\n", p_pic );
-    p_vout->picture_render_time = mdate();    
-#endif
-
     /* 
      * Prepare scaling 
      */
@@ -724,8 +767,8 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
         /* X11: window can be resized, so resize it - the picture won't be 
          * rendered since any alteration of the window size means recreating the
          * XImages */
-        p_vout->i_new_width =   p_pic->i_width;
-        p_vout->i_new_height =  p_pic->i_height;
+/*        p_vout->i_new_width =   p_pic->i_width;
+        p_vout->i_new_height =  p_pic->i_height;*/
         return;        
 #else
         /* Other drivers: the video output thread can't change its size, so
@@ -746,7 +789,7 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
                                  4, p_pic->i_matrix_coefficients );
         break;        
     case YUV_422_PICTURE:
-/*     ???   p_vout->p_convert_yuv_420( p_vout, 
+ /* ??? p_vout->p_convert_yuv_420( p_vout, 
                                    p_pic->p_y, p_pic->p_u, p_pic->p_v,
                                    i_chroma_width, i_chroma_height,
                                    p_vout->i_width / 2, p_vout->i_height,
@@ -772,11 +815,6 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
      * Terminate scaling 
      */
     //??
-
-#ifdef DEBUG_VIDEO
-    /* Computes rendering time */
-    p_vout->picture_render_time = mdate() - p_vout->picture_render_time;    
-#endif
 }
 
 
@@ -810,9 +848,8 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
     /* 
      * Print statistics in upper left corner 
      */
-    sprintf( psz_buffer, "gamma=%.2f   %ld frames (%.1f %% idle)", 
-             p_vout->f_gamma, p_vout->c_fps_samples, p_vout->c_loops ? 
-             (double ) p_vout->c_idle_loops * 100 / p_vout->c_loops : 100. );    
+    sprintf( psz_buffer, "gamma=%.2f   %ld frames", 
+             p_vout->f_gamma, p_vout->c_fps_samples );
     vout_SysPrint( p_vout, 0, 0, -1, -1, psz_buffer );    
 #endif
     
@@ -838,67 +875,49 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
 
 #ifdef DEBUG_VIDEO
-    /* 
-     * Print picture info in lower right corner 
-     */
-    switch( p_pic->i_type )
-    {
-    case YUV_420_PICTURE:
-        sprintf( psz_buffer, "YUV 4:2:0 picture, rendering time: %lu us", 
-                 (unsigned long) p_vout->picture_render_time );
-        break;        
-    case YUV_422_PICTURE:
-        sprintf( psz_buffer, "YUV 4:2:2 picture, rendering time: %lu us", 
-                 (unsigned long) p_vout->picture_render_time );
-        break;        
-    case YUV_444_PICTURE:
-        sprintf( psz_buffer, "YUV 4:4:4 picture, rendering time: %lu us", 
-                 (unsigned long) p_vout->picture_render_time );
-        break;
-    default:
-        sprintf( psz_buffer, "unknown picture, rendering time: %lu us", 
-                 (unsigned long) p_vout->picture_render_time );    
-        break;        
-    }    
-    vout_SysPrint( p_vout, p_vout->i_width, p_vout->i_height, 1, 1, psz_buffer );    
+    //??
 #endif
 }
 
 /*******************************************************************************
  * RenderIdle: render idle picture
  *******************************************************************************
- * This function will clear the display or print a logo. Level will vary from 0
- * to a very high value that noone should never reach. It returns non 0 if 
- * something needs to be displayed and 0 if the previous picture can be kept.
+ * This function will clear the display or print a logo.
  *******************************************************************************/
-static int RenderIdle( vout_thread_t *p_vout, int i_level )
+static int RenderIdle( vout_thread_t *p_vout )
 {
-    byte_t      *pi_pic;                            /* pointer to picture data */
-    
-    /* Get frame pointer and clear display */
-    pi_pic = vout_SysGetPicture( p_vout );    
-     
-    
-    switch( i_level )
-    {
-    case 0:                                           /* level 0: clear screen */
-        memset( pi_pic, 0, p_vout->i_bytes_per_line * p_vout->i_height );
-        break;                
-    case 1:                                            /* level 1: "no stream" */        
-        memset( pi_pic, 0, p_vout->i_bytes_per_line * p_vout->i_height );
-        vout_SysPrint( p_vout, p_vout->i_width / 2, p_vout->i_height / 2,
-                       0, 0, "no stream" );     
-        break;
-    case 50:                                    /* level 50: copyright message */
-        memset( pi_pic, 0, p_vout->i_bytes_per_line * p_vout->i_height );
-        vout_SysPrint( p_vout, p_vout->i_width / 2, p_vout->i_height / 2,
-                       0, 0, COPYRIGHT_MESSAGE );        
-        break; 
-    default:                            /* other levels: keep previous picture */
-        return( 0 );
-        break;        
-    }
-
-    return( 1 );    
+    //??
+    return( 0 );    
 }
 
+/*******************************************************************************
+ * RenderInfo: render additionnal informations
+ *******************************************************************************
+ * ??
+ *******************************************************************************/
+static int RenderInfo( vout_thread_t *p_vout )
+{
+    //??
+    return( 0 );    
+}
+
+/*******************************************************************************
+ * Manage: manage thread
+ *******************************************************************************
+ * ??
+ *******************************************************************************/
+static int Manage( vout_thread_t *p_vout )
+{
+    //??
+
+    /* Detect unauthorized changes */
+    if( p_vout->i_changes )
+    {
+        /* Some changes were not acknowledged by vout_SysManage or this function,
+         * it means they should not be authorized */
+        intf_ErrMsg( "error: unauthorized changes in the video output thread\n" );        
+        return( 1 );        
+    }
+    
+    return( 0 );    
+}

@@ -421,6 +421,17 @@ static void Usage( void )
     intf_Msg("VLANs (Virtual Local Aera Networks) parameters:\n" \
 	     "  vlan_server=<host>[:<port>]     VLANs server address and port\n" \
 	     );
+
+    /* Interfaces keys */
+    intf_Msg("Interface keys: most interface accept the following commands:\n" \
+             "  [esc], q                        quit\n" \
+             "  +, -                            change volume\n" \
+             "  m                               mute\n" \
+             "  f                               fullscreen\n" \
+             "  0 - 9                           select channel\n" \
+             "  [space]                         toggle info printing\n" \
+             "  g, G                            change gamma\n" \
+             );    
 }
 
 /*******************************************************************************

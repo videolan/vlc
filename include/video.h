@@ -24,7 +24,7 @@ typedef u8 yuv_data_t;
  * Picture type and flags should only be modified by the output thread. Note
  * that an empty picture MUST have its flags set to 0.
  *******************************************************************************/
-typedef struct
+typedef struct picture_s
 {
     /* Type and flags - should NOT be modified except by the vout thread */
     int             i_type;                                    /* picture type */
@@ -69,7 +69,6 @@ typedef struct
     yuv_data_t *    p_v;          /* pointer to beginning of V image in p_data */
 } picture_t;
 
-
 /* Pictures types */
 #define EMPTY_PICTURE           0       /* picture slot is empty and available */
 #define YUV_420_PICTURE         100                       /* 4:2:0 YUV picture */
@@ -88,3 +87,38 @@ typedef struct
 #define AR_3_4_PICTURE          2                          /* 3:4 picture (TV) */
 #define AR_16_9_PICTURE         3                /* 16:9 picture (wide screen) */
 #define AR_221_1_PICTURE        4                    /* 2.21:1 picture (movie) */
+
+/*******************************************************************************
+ * subtitle_t: video subtitle                                            
+ *******************************************************************************
+ * Any subtitle destined to be displayed by a video output thread should be 
+ * stored in this structure from it's creation to it's effective display.
+ * Subtitle type and flags should only be modified by the output thread. Note
+ * that an empty subtitle MUST have its flags set to 0.
+ *******************************************************************************/
+typedef struct subtitle_s
+{
+    /* Type and flags - should NOT be modified except by the vout thread */
+    int             i_type;                                   /* subtitle type */
+    int             i_status;                                /* subtitle flags */
+
+    /* Other properties */
+    mtime_t         begin_date;                   /* beginning of display date */
+    mtime_t         end_date;                           /* end of display date */
+
+    /* Subtitle data - data can always be freely modified. p_data itself 
+     * (the pointer) should NEVER be modified. */
+    void *          p_data;                                   /* subtitle data */    
+} subtitle_t;
+
+/* Subtitle types */
+#define EMPTY_SUBTITLE          0      /* subtitle slot is empty and available */
+#define RLE_SUBTITLE            100                    /* RLE encoded subtitle */
+
+/* Subtitle status */
+#define FREE_SUBTITLE           0        /* subtitle is free and not allocated */
+#define RESERVED_SUBTITLE       1        /* subtitle is allocated and reserved */
+#define READY_SUBTITLE          2             /* subtitle is ready for display */
+#define DISPLAYED_SUBTITLE      3 /* subtitle has been displayed but is linked */
+#define DESTROYED_SUBTITLE      4    /* subtitle is allocated but no more used */
+

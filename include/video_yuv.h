@@ -33,5 +33,5 @@ void ConvertYUV420RGB16MMX( u8* p_y, u8* p_u, u8 *p_v,
                             unsigned int i_ypitch, unsigned int i_vpitch,
                             unsigned int i_aspect, u8 *p_pic, 
                             u32 i_dci_offset, u32 i_offset_to_line_0,
-                            int CCOPitch, int i_colortype );
+                            int i_pitch, int i_colortype );
 #endif

@@ -206,30 +206,25 @@ void vout_SysDestroy( vout_thread_t *p_vout )
  * vout_SysManage: handle X11 events
  *******************************************************************************
  * This function should be called regularly by video output thread. It manages
- * X11 events and allows window resizing. It returns a negative value if 
- * something happened which does not allow the thread to continue, and a 
- * positive one if the thread can go on, but the images have been modified and
- * therefore it is useless to display them.
+ * X11 events and allows window resizing. It returns a non null value on 
+ * error.
  *******************************************************************************/
 int vout_SysManage( vout_thread_t *p_vout )
 {
-    if( (p_vout->i_width != p_vout->i_new_width) || 
-        (p_vout->i_height != p_vout->i_new_height) )
-    {
+    if( p_vout->i_changes & VOUT_SIZE_CHANGE ) 
+    {        
+        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;        
         intf_DbgMsg("resizing window\n");        
 
         /* Resize window */
         XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window, 
-                       p_vout->i_new_width, p_vout->i_new_height );
+                       p_vout->i_width, p_vout->i_height );
 
-        /* Destroy then recreate XImages to change their size */
+        /* Destroy XImages to change their size */
         vout_SysEnd( p_vout );
-        p_vout->i_width = p_vout->i_new_width;
-        p_vout->i_height = p_vout->i_new_height;
 
-        /* If SysInit failed, the thread can't go on. Otherwise, it won't display
-         * the rendered image, but can continue */
-        return( vout_SysInit( p_vout ) ? -1 : 1);
+        /* Recreate XImages. If SysInit failed, the thread can't go on. */
+        return( vout_SysInit( p_vout ) );
     }
     
     return 0;
