@@ -744,6 +744,18 @@ static void Run( intf_thread_t *p_intf )
                 msg_rc(_("| logo-position #. . . . . . . . relative position\n"));
                 msg_rc(_("| logo-transparency #. . . . . . . . .transparency\n"));
                 msg_rc(  "| \n");
+                msg_rc(_("| mosaic-alpha # . . . . . . . . . . . . . . alpha\n"));
+                msg_rc(_("| mosaic-height #. . . . . . . . . . . . . .height\n"));
+                msg_rc(_("| mosaic-width # . . . . . . . . . . . . . . width\n"));
+                msg_rc(_("| mosaic-xoffset # . . . .top left corner position\n"));
+                msg_rc(_("| mosaic-yoffset # . . . .top left corner position\n"));
+                msg_rc(_("| mosaic-vborder # . . . . . . . . vertical border\n"));
+                msg_rc(_("| mosaic-hborder # . . . . . . . horizontal border\n"));
+                msg_rc(_("| mosaic-position {0=auto,1=fixed} . . . .position\n"));
+                msg_rc(_("| mosaic-rows #. . . . . . . . . . .number of rows\n"));
+                msg_rc(_("| mosaic-cols #. . . . . . . . . . .number of cols\n"));
+                msg_rc(_("| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio\n"));
+                msg_rc(  "| \n");
             }    
             msg_rc(_("| help . . . . . . . . . . . . . this help message\n"));
             msg_rc(_("| logout . . . . .  exit (if in socket connection)\n"));
