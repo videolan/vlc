@@ -1,8 +1,8 @@
 /*****************************************************************************
- * motion3dnow.c : 3DNow! motion compensation module for vlc
+ * motion3dnow.c : 3D Now! motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motion3dnow.c,v 1.8 2002/04/19 13:56:11 sam Exp $
+ * $Id: motion3dnow.c,v 1.9 2002/04/21 10:32:20 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -44,7 +44,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( _("3DNow! motion compensation module") )
+    SET_DESCRIPTION( _("3D Now! motion compensation module") )
     ADD_CAPABILITY( MOTION, 150 )
     ADD_REQUIREMENT( 3DNOW )
     ADD_SHORTCUT( "3dn" )
@@ -60,7 +60,7 @@ MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
 
 /*****************************************************************************
- * Motion compensation in 3DNow (OK I know this does MMXEXT too and it's ugly)
+ * Motion compensation in 3D Now! (OK I know this does MMXEXT too and it's ugly)
  *****************************************************************************/
 
 #define CPU_MMXEXT 0

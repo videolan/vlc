@@ -305,7 +305,7 @@
 	      <class>GtkMenuItem</class>
 	      <name>menubar_subpictures</name>
 	      <sensitive>False</sensitive>
-	      <tooltip>Select subtitle unit</tooltip>
+	      <tooltip>Select subtitles channel</tooltip>
 	      <label>_Subtitles</label>
 	      <right_justify>False</right_justify>
 	    </widget>
@@ -1204,7 +1204,7 @@
     <class>GtkPixmapMenuItem</class>
     <name>popup_subpictures</name>
     <sensitive>False</sensitive>
-    <tooltip>Select subtitle channel</tooltip>
+    <tooltip>Select subtitles channel</tooltip>
     <label>_Subtitles</label>
     <right_justify>False</right_justify>
     <stock_icon>GNOME_STOCK_MENU_FONT</stock_icon>
@@ -1331,7 +1331,7 @@
   <class>GnomeAbout</class>
   <name>intf_about</name>
   <modal>False</modal>
-  <copyright>(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002  - the VideoLAN Team</copyright>
+  <copyright>(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team</copyright>
   <authors>the VideoLAN team &lt;videolan@videolan.org&gt;
 http://www.videolan.org/
 </authors>
@@ -3754,7 +3754,7 @@ http://www.videolan.org/
       <widget>
 	<class>GtkFrame</class>
 	<name>frame13</name>
-	<label>Transponder Settings</label>
+	<label>Transponder settings</label>
 	<label_xalign>0</label_xalign>
 	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
 	<child>

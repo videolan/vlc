@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.16 2002/04/19 13:56:10 sam Exp $
+ * $Id: alsa.c,v 1.17 2002/04/21 10:32:20 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -55,7 +55,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( _("Alsa audio module") )
+    SET_DESCRIPTION( _("ALSA audio module") )
     ADD_CAPABILITY( AOUT, 50 )
     ADD_SHORTCUT( "alsa" )
 MODULE_INIT_STOP

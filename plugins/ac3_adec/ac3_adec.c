@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.25 2002/04/19 13:56:10 sam Exp $
+ * $Id: ac3_adec.c,v 1.26 2002/04/21 10:32:20 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -76,9 +76,9 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL)
 ADD_PLUGIN  ( DOWNMIX_METHOD_VAR, MODULE_CAPABILITY_DOWNMIX, NULL, NULL,
-              N_("AC3 downmix method"), NULL )
+              N_("AC3 downmix module"), NULL )
 ADD_PLUGIN  ( IMDCT_METHOD_VAR, MODULE_CAPABILITY_IMDCT, NULL, NULL,
-              N_("AC3 IMDCT method"), NULL )
+              N_("AC3 IMDCT module"), NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-04-19 15:54+0200\n"
+"POT-Creation-Date: 2002-04-21 12:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/interface/main.c:97
-msgid "interface method"
+msgid "interface module"
 msgstr ""
 
 #: src/interface/main.c:99
@@ -56,7 +56,7 @@ msgid ""
 msgstr ""
 
 #: src/interface/main.c:118
-msgid "audio output method"
+msgid "audio output module"
 msgstr ""
 
 #: src/interface/main.c:120
@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 
 #: src/interface/main.c:161
-msgid "video output method"
+msgid "video output module"
 msgstr ""
 
 #: src/interface/main.c:163
@@ -350,7 +350,7 @@ msgid "loop playlist on end"
 msgstr ""
 
 #: src/interface/main.c:307
-msgid "memory copy method"
+msgid "memory copy module"
 msgstr ""
 
 #: src/interface/main.c:310
@@ -509,12 +509,12 @@ msgstr ""
 msgid "ASCII-art video output module"
 msgstr ""
 
-#: plugins/ac3_adec/ac3_adec.c:79
-msgid "AC3 downmix method"
+#: plugins/ac3_adec/ac3_adec.c:79 plugins/downmix/downmix.c:47
+msgid "AC3 downmix module"
 msgstr ""
 
-#: plugins/ac3_adec/ac3_adec.c:81
-msgid "AC3 IMDCT method"
+#: plugins/ac3_adec/ac3_adec.c:81 plugins/imdct/imdct.c:47
+msgid "AC3 IMDCT module"
 msgstr ""
 
 #: plugins/ac3_adec/ac3_adec.c:85
@@ -538,7 +538,7 @@ msgid "Raw UDP access plug-in"
 msgstr ""
 
 #: plugins/alsa/alsa.c:58
-msgid "Alsa audio module"
+msgid "ALSA audio module"
 msgstr ""
 
 #: plugins/arts/arts.c:43
@@ -575,10 +575,6 @@ msgstr ""
 
 #: plugins/directx/directx.c:50
 msgid "DirectX extension module"
-msgstr ""
-
-#: plugins/downmix/downmix.c:47
-msgid "AC3 downmix module"
 msgstr ""
 
 #: plugins/downmix/downmix3dn.c:47
@@ -837,8 +833,9 @@ msgstr ""
 msgid "A_udio"
 msgstr ""
 
+#: plugins/gtk/gnome_interface.c:119 plugins/gtk/gnome_interface.c:923
 #: plugins/gtk/gtk_interface.c:396
-msgid "Select audio language"
+msgid "Select audio channel"
 msgstr ""
 
 #: plugins/gtk/gnome_interface.c:125 plugins/gtk/gnome_interface.c:929
@@ -846,8 +843,9 @@ msgstr ""
 msgid "_Subtitles"
 msgstr ""
 
+#: plugins/gtk/gnome_interface.c:126 plugins/gtk/gnome_interface.c:930
 #: plugins/gtk/gtk_interface.c:409
-msgid "Select sub-title"
+msgid "Select subtitles channel"
 msgstr ""
 
 #: plugins/gtk/gtk_interface.c:421 plugins/gtk/gtk_interface.c:1218
@@ -981,28 +979,28 @@ msgstr ""
 msgid "-:--:--"
 msgstr ""
 
-#: plugins/gtk/gtk_interface.c:694
-msgid "Title:  "
+#: plugins/gtk/gnome_interface.c:595 plugins/gtk/gtk_interface.c:694
+msgid "Title:"
 msgstr ""
 
 #: plugins/gtk/gnome_interface.c:602 plugins/gtk/gtk_interface.c:701
 msgid "--"
 msgstr ""
 
-#: plugins/gtk/gtk_interface.c:738
-msgid "Chapter:  "
+#: plugins/gtk/gnome_interface.c:638 plugins/gtk/gtk_interface.c:738
+msgid "Chapter:"
 msgstr ""
 
 #: plugins/gtk/gnome_interface.c:645 plugins/gtk/gtk_interface.c:745
 msgid "---"
 msgstr ""
 
-#: plugins/gtk/gtk_interface.c:775
-msgid "No server !"
+#: plugins/gtk/gnome_interface.c:674 plugins/gtk/gtk_interface.c:775
+msgid "No server"
 msgstr ""
 
 #: plugins/gtk/gtk_interface.c:789
-msgid "Channel:  "
+msgid "Channel:"
 msgstr ""
 
 #: plugins/gtk/gnome_interface.c:703 plugins/gtk/gtk_interface.c:804
@@ -1042,7 +1040,7 @@ msgstr ""
 msgid "About"
 msgstr ""
 
-#: plugins/gtk/gtk_interface.c:1346
+#: plugins/gtk/gnome_interface.c:1119 plugins/gtk/gtk_interface.c:1346
 msgid "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"
 msgstr ""
 
@@ -1063,8 +1061,9 @@ msgid ""
 msgstr ""
 
 #: plugins/gtk/gtk_interface.c:1387 plugins/gtk/gtk_interface.c:1610
-#: plugins/gtk/gtk_interface.c:1900 plugins/gtk/gtk_interface.c:2362
-#: plugins/gtk/gtk_interface.c:2568
+#: plugins/gtk/gtk_interface.c:1900 plugins/gtk/gtk_interface.c:2025
+#: plugins/gtk/gtk_interface.c:2256 plugins/gtk/gtk_interface.c:2362
+#: plugins/gtk/gtk_interface.c:2568 plugins/gtk/gtk_preferences.c:501
 msgid "OK"
 msgstr ""
 
@@ -1114,7 +1113,7 @@ msgstr ""
 
 #: plugins/gtk/gtk_interface.c:1617 plugins/gtk/gtk_interface.c:1907
 #: plugins/gtk/gtk_interface.c:2032 plugins/gtk/gtk_interface.c:2263
-#: plugins/gtk/gtk_interface.c:2575 plugins/gtk/gtk_preferences.c:514
+#: plugins/gtk/gtk_interface.c:2575 plugins/gtk/gtk_preferences.c:513
 msgid "Cancel"
 msgstr ""
 
@@ -1207,11 +1206,6 @@ msgstr ""
 msgid "h:"
 msgstr ""
 
-#: plugins/gtk/gtk_interface.c:2025 plugins/gtk/gtk_interface.c:2256
-#: plugins/gtk/gtk_preferences.c:502
-msgid "Ok"
-msgstr ""
-
 #: plugins/gtk/gnome_interface.c:1767 plugins/gtk/gtk_interface.c:2099
 msgid "Add"
 msgstr ""
@@ -1262,11 +1256,11 @@ msgstr ""
 msgid "Messages"
 msgstr ""
 
-#: plugins/gtk/gtk_interface.c:2411
-msgid "Open Satellite card"
+#: plugins/gtk/gnome_interface.c:2638 plugins/gtk/gtk_interface.c:2411
+msgid "Open Satellite Card"
 msgstr ""
 
-#: plugins/gtk/gtk_interface.c:2435
+#: plugins/gtk/gnome_interface.c:2654 plugins/gtk/gtk_interface.c:2435
 msgid "Transponder settings"
 msgstr ""
 
@@ -1327,24 +1321,8 @@ msgstr ""
 msgid "Choose chapter"
 msgstr ""
 
-#: plugins/gtk/gnome_interface.c:119 plugins/gtk/gnome_interface.c:923
-msgid "Select audio channel"
-msgstr ""
-
-#: plugins/gtk/gnome_interface.c:126
-msgid "Select subtitle unit"
-msgstr ""
-
-#: plugins/gtk/gnome_interface.c:595
-msgid "Title:"
-msgstr ""
-
 #: plugins/gtk/gnome_interface.c:615
 msgid "Select previous title"
-msgstr ""
-
-#: plugins/gtk/gnome_interface.c:638
-msgid "Chapter:"
 msgstr ""
 
 #: plugins/gtk/gnome_interface.c:658
@@ -1353,10 +1331,6 @@ msgstr ""
 
 #: plugins/gtk/gnome_interface.c:666
 msgid "Select next chapter"
-msgstr ""
-
-#: plugins/gtk/gnome_interface.c:674
-msgid "No server"
 msgstr ""
 
 #: plugins/gtk/gnome_interface.c:688
@@ -1377,14 +1351,6 @@ msgstr ""
 
 #: plugins/gtk/gnome_interface.c:916
 msgid "Navigate through titles and chapters"
-msgstr ""
-
-#: plugins/gtk/gnome_interface.c:930
-msgid "Select subtitle channel"
-msgstr ""
-
-#: plugins/gtk/gnome_interface.c:1119
-msgid "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002  - the VideoLAN Team"
 msgstr ""
 
 #: plugins/gtk/gnome_interface.c:1135
@@ -1445,14 +1411,6 @@ msgstr ""
 msgid "Channel server"
 msgstr ""
 
-#: plugins/gtk/gnome_interface.c:2638
-msgid "Open Satellite Card"
-msgstr ""
-
-#: plugins/gtk/gnome_interface.c:2654
-msgid "Transponder Settings"
-msgstr ""
-
 #: plugins/gtk/gnome_interface.c:2765
 msgid "6/7"
 msgstr ""
@@ -1474,11 +1432,11 @@ msgstr ""
 msgid "Selected:"
 msgstr ""
 
-#: plugins/gtk/gtk_preferences.c:493 plugins/gtk/gtk_preferences.c:510
+#: plugins/gtk/gtk_preferences.c:492 plugins/gtk/gtk_preferences.c:509
 msgid "Save"
 msgstr ""
 
-#: plugins/gtk/gtk_preferences.c:506
+#: plugins/gtk/gtk_preferences.c:505
 msgid "Apply"
 msgstr ""
 
@@ -1497,7 +1455,7 @@ msgstr ""
 msgid "Chapter %d"
 msgstr ""
 
-#: plugins/idct/idct.c:47
+#: plugins/idct/idct.c:47 plugins/mpeg_vdec/video_parser.c:82
 msgid "IDCT module"
 msgstr ""
 
@@ -1515,10 +1473,6 @@ msgstr ""
 
 #: plugins/idct/idctmmxext.c:53
 msgid "MMX EXT IDCT module"
-msgstr ""
-
-#: plugins/imdct/imdct.c:47
-msgid "AC3 IMDCT module"
 msgstr ""
 
 #: plugins/imdct/imdct3dn.c:47
@@ -1594,12 +1548,12 @@ msgstr ""
 msgid "X11 MGA module"
 msgstr ""
 
-#: plugins/motion/motion.c:45
+#: plugins/motion/motion.c:45 plugins/mpeg_vdec/video_parser.c:84
 msgid "motion compensation module"
 msgstr ""
 
 #: plugins/motion/motion3dnow.c:47
-msgid "3DNow! motion compensation module"
+msgid "3D Now! motion compensation module"
 msgstr ""
 
 #: plugins/motion/motionaltivec.c:48
@@ -1628,14 +1582,6 @@ msgstr ""
 
 #: plugins/mpeg_system/mpeg_ts.c:58
 msgid "ISO 13818-1 MPEG Transport Stream input"
-msgstr ""
-
-#: plugins/mpeg_vdec/video_parser.c:82
-msgid "IDCT method"
-msgstr ""
-
-#: plugins/mpeg_vdec/video_parser.c:84
-msgid "motion compensation method"
 msgstr ""
 
 #: plugins/mpeg_vdec/video_parser.c:88

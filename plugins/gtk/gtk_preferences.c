@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.23 2002/04/20 15:40:21 gbazin Exp $
+ * $Id: gtk_preferences.c,v 1.24 2002/04/21 10:32:20 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -498,7 +498,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     cancel_button =
         GTK_WIDGET(g_list_last(GNOME_DIALOG(config_dialog)->buttons)->data);
 #else
-    ok_button = gtk_button_new_with_label( _("Ok") );
+    ok_button = gtk_button_new_with_label( _("OK") );
     gtk_box_pack_start( GTK_BOX(dialog_action_area), ok_button,
                         TRUE, TRUE, 0 );
 

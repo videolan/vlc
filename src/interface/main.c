@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.180 2002/04/19 13:56:12 sam Exp $
+ * $Id: main.c,v 1.181 2002/04/21 10:32:21 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -94,7 +94,7 @@
 #include "modules_inner.h"                        /* for configuration stuff */
 
 
-#define INTF_TEXT N_("interface method")
+#define INTF_TEXT N_("interface module")
 #define INTF_LONGTEXT N_( \
     "This option allows you to select the interface used by vlc.\nNote that " \
     "the default behaviour is to automatically select the best method " \
@@ -115,7 +115,7 @@
     "This option allows you to set the default path that the interface will " \
     "open when looking for a file.")
 
-#define AOUT_TEXT N_("audio output method")
+#define AOUT_TEXT N_("audio output module")
 #define AOUT_LONGTEXT N_( \
     "This option allows you to select the audio audio output method used by " \
     "vlc.\nNote that the default behaviour is to automatically select the " \
@@ -158,7 +158,7 @@
     "This option allows you to delay the audio output. This can be handy if " \
     "you notice a lag between the video and the audio.")
 
-#define VOUT_TEXT N_("video output method")
+#define VOUT_TEXT N_("video output module")
 #define VOUT_LONGTEXT N_( \
     "This option allows you to select the video output method used by vlc.\n" \
     "Note that the default behaviour is to automatically select the best " \
@@ -304,7 +304,7 @@
 #define PLAYLIST_LOOP_TEXT N_("loop playlist on end")
 #define PLAYLIST_LOOP_LONGTEXT ""
 
-#define MEMCPY_TEXT N_("memory copy method")
+#define MEMCPY_TEXT N_("memory copy module")
 #define MEMCPY_LONGTEXT ""
 
 #define FAST_PTHREAD_TEXT N_("fast pthread on NT/2K/XP (developpers only)")

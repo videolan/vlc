@@ -123,7 +123,7 @@ static GnomeUIInfo menubar_settings_menu_uiinfo[] =
   },
   {
     GNOME_APP_UI_ITEM, N_("_Subtitles"),
-    N_("Select subtitle unit"),
+    N_("Select subtitles channel"),
     (gpointer) NULL, NULL, NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
@@ -927,7 +927,7 @@ static GnomeUIInfo intf_popup_uiinfo[] =
   },
   {
     GNOME_APP_UI_ITEM, N_("_Subtitles"),
-    N_("Select subtitle channel"),
+    N_("Select subtitles channel"),
     (gpointer) NULL, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_FONT,
     0, (GdkModifierType) 0, NULL
@@ -1116,7 +1116,7 @@ create_intf_about (void)
   GtkWidget *intf_about;
 
   intf_about = gnome_about_new ("VideoLAN Client", VERSION,
-                        _("(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002  - the VideoLAN Team"),
+                        _("(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"),
                         authors,
                         _("This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and MPEG 2 files from a file or from a network source."),
                         NULL);
@@ -2651,7 +2651,7 @@ create_intf_sat (void)
   gtk_widget_show (hbox10);
   gtk_box_pack_start (GTK_BOX (vbox15), hbox10, TRUE, TRUE, 0);
 
-  frame13 = gtk_frame_new (_("Transponder Settings"));
+  frame13 = gtk_frame_new (_("Transponder settings"));
   gtk_widget_ref (frame13);
   gtk_object_set_data_full (GTK_OBJECT (intf_sat), "frame13", frame13,
                             (GtkDestroyNotify) gtk_widget_unref);

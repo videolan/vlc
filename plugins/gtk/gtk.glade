@@ -315,7 +315,7 @@
 	      <class>GtkMenuItem</class>
 	      <name>menubar_audio</name>
 	      <sensitive>False</sensitive>
-	      <tooltip>Select audio language</tooltip>
+	      <tooltip>Select audio channel</tooltip>
 	      <label>A_udio</label>
 	      <right_justify>False</right_justify>
 	    </widget>
@@ -324,7 +324,7 @@
 	      <class>GtkMenuItem</class>
 	      <name>menubar_subpictures</name>
 	      <sensitive>False</sensitive>
-	      <tooltip>Select sub-title</tooltip>
+	      <tooltip>Select subtitles channel</tooltip>
 	      <label>_Subtitles</label>
 	      <right_justify>False</right_justify>
 	    </widget>
@@ -729,7 +729,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <name>title</name>
-	  <label>Title:  </label>
+	  <label>Title:</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -823,7 +823,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <name>chapter</name>
-	  <label>Chapter:  </label>
+	  <label>Chapter:</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -911,7 +911,7 @@
       <widget>
 	<class>GtkLabel</class>
 	<name>network_address_label</name>
-	<label>No server !</label>
+	<label>No server</label>
 	<justify>GTK_JUSTIFY_CENTER</justify>
 	<wrap>False</wrap>
 	<xalign>0.5</xalign>
@@ -939,7 +939,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <name>channel_label</name>
-	  <label>Channel:  </label>
+	  <label>Channel:</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -2420,7 +2420,7 @@ http://www.videolan.org/</label>
 	  <data>&quot;intf_jump&quot;</data>
 	  <last_modification_time>Sun, 13 May 2001 14:53:19 GMT</last_modification_time>
 	</signal>
-	<label>Ok</label>
+	<label>OK</label>
 	<relief>GTK_RELIEF_NORMAL</relief>
 	<child>
 	  <padding>0</padding>
@@ -2652,7 +2652,7 @@ http://www.videolan.org/</label>
 	  <data>&quot;intf_playlist&quot;</data>
 	  <last_modification_time>Sat, 12 May 2001 21:16:09 GMT</last_modification_time>
 	</signal>
-	<label>Ok</label>
+	<label>OK</label>
 	<relief>GTK_RELIEF_NORMAL</relief>
 	<child>
 	  <padding>0</padding>
@@ -3006,7 +3006,7 @@ http://www.videolan.org/</label>
 <widget>
   <class>GtkDialog</class>
   <name>intf_sat</name>
-  <title>Open Satellite card</title>
+  <title>Open Satellite Card</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
   <modal>True</modal>

@@ -393,7 +393,7 @@ create_intf_window (void)
   gtk_widget_show (menubar_audio);
   gtk_container_add (GTK_CONTAINER (menubar_settings_menu), menubar_audio);
   gtk_widget_set_sensitive (menubar_audio, FALSE);
-  gtk_tooltips_set_tip (tooltips, menubar_audio, _("Select audio language"), NULL);
+  gtk_tooltips_set_tip (tooltips, menubar_audio, _("Select audio channel"), NULL);
 
   menubar_subpictures = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_subpictures)->child),
@@ -406,7 +406,7 @@ create_intf_window (void)
   gtk_widget_show (menubar_subpictures);
   gtk_container_add (GTK_CONTAINER (menubar_settings_menu), menubar_subpictures);
   gtk_widget_set_sensitive (menubar_subpictures, FALSE);
-  gtk_tooltips_set_tip (tooltips, menubar_subpictures, _("Select sub-title"), NULL);
+  gtk_tooltips_set_tip (tooltips, menubar_subpictures, _("Select subtitles channel"), NULL);
 
   separator8 = gtk_menu_item_new ();
   gtk_widget_ref (separator8);
@@ -691,7 +691,7 @@ create_intf_window (void)
   gtk_widget_show (title_box);
   gtk_box_pack_start (GTK_BOX (dvd_box), title_box, TRUE, TRUE, 0);
 
-  title = gtk_label_new (_("Title:  "));
+  title = gtk_label_new (_("Title:"));
   gtk_widget_ref (title);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "title", title,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -735,7 +735,7 @@ create_intf_window (void)
   gtk_widget_show (chapter_box);
   gtk_box_pack_start (GTK_BOX (dvd_box), chapter_box, TRUE, TRUE, 0);
 
-  chapter = gtk_label_new (_("Chapter:  "));
+  chapter = gtk_label_new (_("Chapter:"));
   gtk_widget_ref (chapter);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "chapter", chapter,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -772,7 +772,7 @@ create_intf_window (void)
   gtk_box_pack_start (GTK_BOX (window_vbox), network_box, TRUE, TRUE, 0);
   gtk_widget_set_usize (network_box, 500, 24);
 
-  network_address_label = gtk_label_new (_("No server !"));
+  network_address_label = gtk_label_new (_("No server"));
   gtk_widget_ref (network_address_label);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_address_label", network_address_label,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -786,7 +786,7 @@ create_intf_window (void)
   gtk_widget_show (network_channel_box);
   gtk_box_pack_start (GTK_BOX (network_box), network_channel_box, TRUE, FALSE, 0);
 
-  channel_label = gtk_label_new (_("Channel:  "));
+  channel_label = gtk_label_new (_("Channel:"));
   gtk_widget_ref (channel_label);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "channel_label", channel_label,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2022,7 +2022,7 @@ create_intf_jump (void)
   gtk_widget_show (dialog_action_area2);
   gtk_container_set_border_width (GTK_CONTAINER (dialog_action_area2), 10);
 
-  jump_ok_button = gtk_button_new_with_label (_("Ok"));
+  jump_ok_button = gtk_button_new_with_label (_("OK"));
   gtk_widget_ref (jump_ok_button);
   gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_ok_button", jump_ok_button,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2253,7 +2253,7 @@ create_intf_playlist (void)
   gtk_widget_show (dialog_action_area3);
   gtk_container_set_border_width (GTK_CONTAINER (dialog_action_area3), 10);
 
-  playlist_ok_button = gtk_button_new_with_label (_("Ok"));
+  playlist_ok_button = gtk_button_new_with_label (_("OK"));
   gtk_widget_ref (playlist_ok_button);
   gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_ok_button", playlist_ok_button,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2408,7 +2408,7 @@ create_intf_sat (void)
 
   intf_sat = gtk_dialog_new ();
   gtk_object_set_data (GTK_OBJECT (intf_sat), "intf_sat", intf_sat);
-  gtk_window_set_title (GTK_WINDOW (intf_sat), _("Open Satellite card"));
+  gtk_window_set_title (GTK_WINDOW (intf_sat), _("Open Satellite Card"));
   gtk_window_set_modal (GTK_WINDOW (intf_sat), TRUE);
   gtk_window_set_policy (GTK_WINDOW (intf_sat), FALSE, FALSE, FALSE);
 
