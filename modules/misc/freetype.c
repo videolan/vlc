@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.26 2003/10/24 11:28:57 sam Exp $
+ * $Id: freetype.c,v 1.27 2003/10/24 14:13:59 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -31,7 +31,11 @@
 #include <vlc/vout.h>
 #include <osd.h>
 #include <math.h>
- 
+
+#ifdef HAVE_ERRNO_H
+#   include <errno.h>
+#endif
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
@@ -719,22 +723,22 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
         msg_Warn( p_vout, "Unable to do convertion" );
         goto error;
     }
+
     {
-        char *p_in_buffer;
-        uint32_t *p_out_buffer;
+        char *p_in_buffer, *p_out_buffer;
         int i_in_bytes, i_out_bytes, i_out_bytes_left, i_ret;
         i_in_bytes = strlen( psz_string );
         i_out_bytes = i_in_bytes * sizeof( uint32_t );
         i_out_bytes_left = i_out_bytes;
         p_in_buffer = psz_string;
-        p_out_buffer = p_unicode_string;
-        i_ret = iconv( iconv_handle, &p_in_buffer, &i_in_bytes, (char**)&p_out_buffer, &i_out_bytes_left );
+        p_out_buffer = (char *)p_unicode_string;
+        i_ret = iconv( iconv_handle, &p_in_buffer, &i_in_bytes, &p_out_buffer, &i_out_bytes_left );
         if( i_in_bytes )
         {
             msg_Warn( p_vout, "Failed to convert string to unicode (%s), bytes left %d", strerror(errno), i_in_bytes );
             goto error;
         }
-        *p_out_buffer = 0;
+        *(uint32_t*)p_out_buffer = 0;
         i_string_length = ( i_out_bytes - i_out_bytes_left ) / sizeof(uint32_t);
     }
         
