@@ -44,19 +44,19 @@ static void CloseFilter( vlc_object_t * );
 static void Blend( filter_t *, picture_t *, picture_t *, picture_t *,
                    int, int );
 static void BlendI420( filter_t *, picture_t *, picture_t *, picture_t *,
-                       int, int );
+                       int, int, int, int );
 static void BlendR16( filter_t *, picture_t *, picture_t *, picture_t *,
-                      int, int );
+                      int, int, int, int );
 static void BlendR24( filter_t *, picture_t *, picture_t *, picture_t *,
-                      int, int );
+                      int, int, int, int );
 static void BlendYUY2( filter_t *, picture_t *, picture_t *, picture_t *,
-                       int, int );
+                       int, int, int, int );
 static void BlendPalI420( filter_t *, picture_t *, picture_t *, picture_t *,
-                          int, int );
+                          int, int, int, int );
 static void BlendPalYUY2( filter_t *, picture_t *, picture_t *, picture_t *,
-                          int, int );
+                          int, int, int, int );
 static void BlendPalRV( filter_t *, picture_t *, picture_t *, picture_t *,
-                        int, int );
+                        int, int, int, int );
 
 /*****************************************************************************
  * Module descriptor
@@ -117,26 +117,36 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
                    picture_t *p_dst_orig, picture_t *p_src,
                    int i_x_offset, int i_y_offset )
 {
+    int i_width, i_height;
+
+    i_width = __MIN( p_filter->fmt_out.video.i_visible_width - i_x_offset,
+                     p_filter->fmt_in.video.i_visible_width );
+
+    i_height = __MIN( p_filter->fmt_out.video.i_visible_height - i_y_offset,
+                      p_filter->fmt_in.video.i_visible_height );
+
+    if( i_width <= 0 || i_height <= 0 ) return;
+
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','A') &&
         ( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('I','4','2','0') ||
           p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','V','1','2') ) )
     {
         BlendI420( p_filter, p_dst, p_dst_orig, p_src,
-                   i_x_offset, i_y_offset );
+                   i_x_offset, i_y_offset, i_width, i_height );
         return;
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','A') &&
         p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') )
     {
         BlendYUY2( p_filter, p_dst, p_dst_orig, p_src,
-                   i_x_offset, i_y_offset );
+                   i_x_offset, i_y_offset, i_width, i_height );
         return;
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','A') &&
         p_filter->fmt_out.video.i_chroma == VLC_FOURCC('R','V','1','6') )
     {
         BlendR16( p_filter, p_dst, p_dst_orig, p_src,
-                  i_x_offset, i_y_offset );
+                  i_x_offset, i_y_offset, i_width, i_height );
         return;
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','A') &&
@@ -144,7 +154,7 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
           p_filter->fmt_out.video.i_chroma == VLC_FOURCC('R','V','3','2') ) )
     {
         BlendR24( p_filter, p_dst, p_dst_orig, p_src,
-                  i_x_offset, i_y_offset );
+                  i_x_offset, i_y_offset, i_width, i_height );
         return;
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','P') &&
@@ -152,14 +162,14 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
           p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','V','1','2') ) )
     {
         BlendPalI420( p_filter, p_dst, p_dst_orig, p_src,
-                      i_x_offset, i_y_offset );
+                      i_x_offset, i_y_offset, i_width, i_height );
         return;
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','P') &&
         p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') )
     {
         BlendPalYUY2( p_filter, p_dst, p_dst_orig, p_src,
-                      i_x_offset, i_y_offset );
+                      i_x_offset, i_y_offset, i_width, i_height );
         return;
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','P') &&
@@ -168,7 +178,7 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
           p_filter->fmt_out.video.i_chroma == VLC_FOURCC('R','V','3','2') ) )
     {
         BlendPalRV( p_filter, p_dst, p_dst_orig, p_src,
-                    i_x_offset, i_y_offset );
+                    i_x_offset, i_y_offset, i_width, i_height );
         return;
     }
 
@@ -177,14 +187,15 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
 
 static void BlendI420( filter_t *p_filter, picture_t *p_dst,
                        picture_t *p_dst_orig, picture_t *p_src,
-                       int i_x_offset, int i_y_offset )
+                       int i_x_offset, int i_y_offset,
+                       int i_width, int i_height )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1_y, *p_src2_y, *p_dst_y;
     uint8_t *p_src1_u, *p_src2_u, *p_dst_u;
     uint8_t *p_src1_v, *p_src2_v, *p_dst_v;
     uint8_t *p_trans;
-    int i_width, i_height, i_x, i_y;
+    int i_x, i_y;
     vlc_bool_t b_even_scanline = i_y_offset % 2;
 
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
@@ -229,12 +240,6 @@ static void BlendI420( filter_t *p_filter, picture_t *p_dst,
     p_trans = p_src->p[A_PLANE].p_pixels +
               p_filter->fmt_in.video.i_x_offset +
               p_src->p[A_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
-
-    i_width = __MIN( p_filter->fmt_out.video.i_visible_width - i_x_offset,
-                     p_filter->fmt_in.video.i_visible_width );
-
-    i_height = __MIN( p_filter->fmt_out.video.i_visible_height - i_y_offset,
-                      p_filter->fmt_in.video.i_visible_height );
 
 #define MAX_TRANS 255
 #define TRANS_BITS  8
@@ -321,13 +326,14 @@ static inline void yuv_to_rgb( int *r, int *g, int *b,
 
 static void BlendR16( filter_t *p_filter, picture_t *p_dst_pic,
                       picture_t *p_dst_orig, picture_t *p_src,
-                      int i_x_offset, int i_y_offset )
+                      int i_x_offset, int i_y_offset,
+                      int i_width, int i_height )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_dst, *p_src1, *p_src2_y;
     uint8_t *p_src2_u, *p_src2_v;
     uint8_t *p_trans;
-    int i_width, i_height, i_x, i_y, i_pix_pitch;
+    int i_x, i_y, i_pix_pitch;
     int r, g, b;
 
     i_pix_pitch = p_dst_pic->p->i_pixel_pitch;
@@ -357,12 +363,6 @@ static void BlendR16( filter_t *p_filter, picture_t *p_dst_pic,
     p_trans = p_src->p[A_PLANE].p_pixels +
               p_filter->fmt_in.video.i_x_offset +
               p_src->p[A_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
-
-    i_width = __MIN( p_filter->fmt_out.video.i_visible_width - i_x_offset,
-                     p_filter->fmt_in.video.i_visible_width );
-
-    i_height = __MIN( p_filter->fmt_out.video.i_visible_height - i_y_offset,
-                      p_filter->fmt_in.video.i_visible_height );
 
 #define MAX_TRANS 255
 #define TRANS_BITS  8
@@ -407,13 +407,14 @@ static void BlendR16( filter_t *p_filter, picture_t *p_dst_pic,
 
 static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
                       picture_t *p_dst_orig, picture_t *p_src,
-                      int i_x_offset, int i_y_offset )
+                      int i_x_offset, int i_y_offset,
+                      int i_width, int i_height )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_dst, *p_src1, *p_src2_y;
     uint8_t *p_src2_u, *p_src2_v;
     uint8_t *p_trans;
-    int i_width, i_height, i_x, i_y, i_pix_pitch;
+    int i_x, i_y, i_pix_pitch;
     int r, g, b;
 
     i_pix_pitch = p_dst_pic->p->i_pixel_pitch;
@@ -443,12 +444,6 @@ static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
     p_trans = p_src->p[A_PLANE].p_pixels +
               p_filter->fmt_in.video.i_x_offset +
               p_src->p[A_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
-
-    i_width = __MIN( p_filter->fmt_out.video.i_visible_width - i_x_offset,
-                     p_filter->fmt_in.video.i_visible_width );
-
-    i_height = __MIN( p_filter->fmt_out.video.i_visible_height - i_y_offset,
-                      p_filter->fmt_in.video.i_visible_height );
 
 #define MAX_TRANS 255
 #define TRANS_BITS  8
@@ -503,13 +498,14 @@ static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
 
 static void BlendYUY2( filter_t *p_filter, picture_t *p_dst_pic,
                        picture_t *p_dst_orig, picture_t *p_src,
-                       int i_x_offset, int i_y_offset )
+                       int i_x_offset, int i_y_offset,
+                       int i_width, int i_height )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_dst, *p_src1, *p_src2_y;
     uint8_t *p_src2_u, *p_src2_v;
     uint8_t *p_trans;
-    int i_width, i_height, i_x, i_y, i_pix_pitch;
+    int i_x, i_y, i_pix_pitch;
 
     i_pix_pitch = 2;
     i_dst_pitch = p_dst_pic->p->i_pitch;
@@ -538,12 +534,6 @@ static void BlendYUY2( filter_t *p_filter, picture_t *p_dst_pic,
     p_trans = p_src->p[A_PLANE].p_pixels +
               p_filter->fmt_in.video.i_x_offset +
               p_src->p[A_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
-
-    i_width = __MIN( p_filter->fmt_out.video.i_visible_width - i_x_offset,
-                     p_filter->fmt_in.video.i_visible_width );
-
-    i_height = __MIN( p_filter->fmt_out.video.i_visible_height - i_y_offset,
-                      p_filter->fmt_in.video.i_visible_height );
 
 #define MAX_TRANS 255
 #define TRANS_BITS  8
@@ -609,13 +599,14 @@ static void BlendYUY2( filter_t *p_filter, picture_t *p_dst_pic,
 
 static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
                           picture_t *p_dst_orig, picture_t *p_src,
-                          int i_x_offset, int i_y_offset )
+                          int i_x_offset, int i_y_offset,
+                          int i_width, int i_height )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1_y, *p_src2, *p_dst_y;
     uint8_t *p_src1_u, *p_dst_u;
     uint8_t *p_src1_v, *p_dst_v;
-    int i_width, i_height, i_x, i_y;
+    int i_x, i_y;
     vlc_bool_t b_even_scanline = i_y_offset % 2;
 
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
@@ -649,12 +640,6 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
     i_src2_pitch = p_src->p->i_pitch;
     p_src2 = p_src->p->p_pixels + p_filter->fmt_in.video.i_x_offset +
              i_src2_pitch * p_filter->fmt_in.video.i_y_offset;
-
-    i_width = __MIN( p_filter->fmt_out.video.i_visible_width - i_x_offset,
-                     p_filter->fmt_in.video.i_visible_width );
-
-    i_height = __MIN( p_filter->fmt_out.video.i_visible_height - i_y_offset,
-                      p_filter->fmt_in.video.i_visible_height );
 
 #define MAX_TRANS 255
 #define TRANS_BITS  8
@@ -720,11 +705,12 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
 
 static void BlendPalYUY2( filter_t *p_filter, picture_t *p_dst_pic,
                           picture_t *p_dst_orig, picture_t *p_src,
-                          int i_x_offset, int i_y_offset )
+                          int i_x_offset, int i_y_offset,
+                          int i_width, int i_height )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1, *p_src2, *p_dst;
-    int i_width, i_height, i_x, i_y, i_pix_pitch;
+    int i_x, i_y, i_pix_pitch;
 
     i_pix_pitch = 2;
     i_dst_pitch = p_dst_pic->p->i_pitch;
@@ -740,12 +726,6 @@ static void BlendPalYUY2( filter_t *p_filter, picture_t *p_dst_pic,
     i_src2_pitch = p_src->p->i_pitch;
     p_src2 = p_src->p->p_pixels + p_filter->fmt_in.video.i_x_offset +
              i_src2_pitch * p_filter->fmt_in.video.i_y_offset;
-
-    i_width = __MIN( p_filter->fmt_out.video.i_visible_width - i_x_offset,
-                     p_filter->fmt_in.video.i_visible_width );
-
-    i_height = __MIN( p_filter->fmt_out.video.i_visible_height - i_y_offset,
-                      p_filter->fmt_in.video.i_visible_height );
 
 #define MAX_TRANS 255
 #define TRANS_BITS  8
@@ -813,11 +793,12 @@ static void BlendPalYUY2( filter_t *p_filter, picture_t *p_dst_pic,
 
 static void BlendPalRV( filter_t *p_filter, picture_t *p_dst_pic,
                         picture_t *p_dst_orig, picture_t *p_src,
-                        int i_x_offset, int i_y_offset )
+                        int i_x_offset, int i_y_offset,
+                        int i_width, int i_height )
 {
     int i_src1_pitch, i_src2_pitch, i_dst_pitch;
     uint8_t *p_src1, *p_src2, *p_dst;
-    int i_width, i_height, i_x, i_y, i_pix_pitch;
+    int i_x, i_y, i_pix_pitch;
     int r, g, b;
     video_palette_t rgbpalette;
 
@@ -835,12 +816,6 @@ static void BlendPalRV( filter_t *p_filter, picture_t *p_dst_pic,
     i_src2_pitch = p_src->p->i_pitch;
     p_src2 = p_src->p->p_pixels + p_filter->fmt_in.video.i_x_offset +
              i_src2_pitch * p_filter->fmt_in.video.i_y_offset;
-
-    i_width = __MIN( p_filter->fmt_out.video.i_visible_width - i_x_offset,
-                     p_filter->fmt_in.video.i_visible_width );
-
-    i_height = __MIN( p_filter->fmt_out.video.i_visible_height - i_y_offset,
-                      p_filter->fmt_in.video.i_visible_height );
 
 #define MAX_TRANS 255
 #define TRANS_BITS  8
