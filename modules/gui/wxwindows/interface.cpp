@@ -280,7 +280,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     SetDropTarget( new DragAndDrop( p_intf ) );
 #endif
 
-    UpdateAcceleratorTable();
+    SetupHotkeys();
 
     /* Start timer */
     timer = new Timer( p_intf, this );
@@ -702,43 +702,38 @@ void Interface::CreateOurExtendedPanel()
     extra_frame->Hide();
 }
 
-void Interface::UpdateAcceleratorTable()
+void Interface::SetupHotkeys()
 {
-    /* Set some hotkeys */
-    wxAcceleratorEntry entries[7];
-    vlc_value_t val;
-    int i = 0;
+    struct vlc_t::hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
+    int i_hotkeys;
 
-    var_Get( p_intf->p_vlc, "key-quit", &val );
-    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
-                      ConvertHotkey( val.i_int ), Exit_Event );
-    var_Get( p_intf->p_vlc, "key-stop", &val );
-    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
-                      ConvertHotkey( val.i_int ), StopStream_Event );
-    var_Get( p_intf->p_vlc, "key-play-pause", &val );
-    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
-                      ConvertHotkey( val.i_int ), PlayStream_Event );
-    var_Get( p_intf->p_vlc, "key-next", &val );
-    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
-                      ConvertHotkey( val.i_int ), NextStream_Event );
-    var_Get( p_intf->p_vlc, "key-prev", &val );
-    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
-                      ConvertHotkey( val.i_int ), PrevStream_Event );
-    var_Get( p_intf->p_vlc, "key-faster", &val );
-    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
-                      ConvertHotkey( val.i_int ), FastStream_Event );
-    var_Get( p_intf->p_vlc, "key-slower", &val );
-    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
-                      ConvertHotkey( val.i_int ), SlowStream_Event );
+    /* Count number of hoteys */
+    for( i_hotkeys = 0; p_hotkeys[i_hotkeys].psz_action != NULL; i_hotkeys++ );
 
-    wxAcceleratorTable accel( 7, entries );
+    p_intf->p_sys->i_first_hotkey_event = wxID_HIGHEST + 7000;
+    p_intf->p_sys->i_hotkeys = i_hotkeys;
+
+    wxAcceleratorEntry p_entries[i_hotkeys];
+
+    /* Setup the hotkeys as accelerators */
+    for( int i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+    {
+        p_entries[i].Set( ConvertHotkeyModifiers( p_hotkeys[i].i_key ),
+                          ConvertHotkey( p_hotkeys[i].i_key ),
+                          p_intf->p_sys->i_first_hotkey_event + i );
+    }
+
+    wxAcceleratorTable accel( i_hotkeys, p_entries );
 
     if( !accel.Ok() )
+    {
         msg_Err( p_intf, "invalid accelerator table" );
-
-    SetAcceleratorTable( accel );
-    msg_Dbg( p_intf, "accelerator table loaded" );
-
+    }
+    else
+    {
+        SetAcceleratorTable( accel );
+        msg_Dbg( p_intf, "accelerator table loaded" );
+    }
 }
 
 /*****************************************************************************

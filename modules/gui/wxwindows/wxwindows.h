@@ -130,6 +130,11 @@ struct intf_sys_t
     /* Popup menu */
     wxMenu              *p_popup_menu;
 
+    /* Hotkeys */
+    int                 i_first_hotkey_event;
+    int                 i_hotkeys;
+
+    /* Embedded vout */
     VideoWindow         *p_video_window;
     wxBoxSizer          *p_video_sizer;
 };
@@ -209,7 +214,7 @@ public:
     wxGauge     *volctrl;
 
 private:
-    void UpdateAcceleratorTable();
+    void SetupHotkeys();
     void CreateOurMenuBar();
     void CreateOurToolBar();
     void CreateOurExtendedPanel();
