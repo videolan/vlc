@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.22 2003/07/16 15:25:32 sam Exp $
+ * $Id: xcommon.c,v 1.23 2003/07/28 18:02:06 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -173,11 +173,9 @@ int E_(Activate) ( vlc_object_t *p_this )
     {
         if( strlen( psz_chroma ) >= 4 )
         {
-            i_chroma  = (unsigned char)psz_chroma[0] <<  0;
-            i_chroma |= (unsigned char)psz_chroma[1] <<  8;
-            i_chroma |= (unsigned char)psz_chroma[2] << 16;
-            i_chroma |= (unsigned char)psz_chroma[3] << 24;
-
+            /* Do not use direct assignment because we are not sure of the
+             * alignment. */
+            memcpy(&i_chroma, psz_chroma, 4);
             b_chroma = 1;
         }
 
@@ -195,7 +193,7 @@ int E_(Activate) ( vlc_object_t *p_this )
     }
 
     /* Check that we have access to an XVideo port providing this chroma */
-    p_vout->p_sys->i_xvport = XVideoGetPort( p_vout, i_chroma,
+    p_vout->p_sys->i_xvport = XVideoGetPort( p_vout, VLC2X11_FOURCC(i_chroma),
                                              &p_vout->output.i_chroma );
     if( p_vout->p_sys->i_xvport < 0 )
     {
@@ -212,7 +210,7 @@ int E_(Activate) ( vlc_object_t *p_this )
          * XVideo port for an YUY2 picture. We'll need to do an YUV
          * conversion, but at least it has got scaling. */
         p_vout->p_sys->i_xvport =
-                        XVideoGetPort( p_vout, VLC_FOURCC('Y','U','Y','2'),
+                        XVideoGetPort( p_vout, X11_FOURCC('Y','U','Y','2'),
                                                &p_vout->output.i_chroma );
         if( p_vout->p_sys->i_xvport < 0 )
         {
@@ -220,7 +218,7 @@ int E_(Activate) ( vlc_object_t *p_this )
              * XVideo port for a simple 16bpp RGB picture. We'll need to do
              * an YUV conversion, but at least it has got scaling. */
             p_vout->p_sys->i_xvport =
-                            XVideoGetPort( p_vout, VLC_FOURCC('R','V','1','6'),
+                            XVideoGetPort( p_vout, X11_FOURCC('R','V','1','6'),
                                                    &p_vout->output.i_chroma );
             if( p_vout->p_sys->i_xvport < 0 )
             {
@@ -230,6 +228,7 @@ int E_(Activate) ( vlc_object_t *p_this )
             }
         }
     }
+    p_vout->output.i_chroma = X112VLC_FOURCC(p_vout->output.i_chroma);
 #endif
 
     /* Create blank cursor (for mouse cursor autohiding) */
@@ -555,16 +554,29 @@ static int ManageVideo( vout_thread_t *p_vout )
                 }
                 break;
             case XK_Left:
-                input_Seek( p_vout, -5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+/*                input_Seek( p_vout, -5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
+                val.psz_string = "LEFT";
+                var_Set( p_vout, "key-pressed", val );
                 break;
             case XK_Right:
-                input_Seek( p_vout, 5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+/*                input_Seek( p_vout, 5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
+                val.psz_string = "RIGHT";
+                var_Set( p_vout, "key-pressed", val );
                 break;
             case XK_Up:
-                input_Seek( p_vout, 60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+/*                input_Seek( p_vout, 60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
+                val.psz_string = "UP";
+                var_Set( p_vout, "key-pressed", val );
                 break;
             case XK_Down:
-                input_Seek( p_vout, -60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+/*                input_Seek( p_vout, -60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
+                val.psz_string = "DOWN";
+                var_Set( p_vout, "key-pressed", val );
+                break;
+            case XK_Return:
+            case XK_KP_Enter:
+                val.psz_string = "ENTER";
+                var_Set( p_vout, "key-pressed", val );
                 break;
             case XK_Home:
                 input_Seek( p_vout, 0, INPUT_SEEK_BYTES | INPUT_SEEK_SET );
@@ -573,10 +585,10 @@ static int ManageVideo( vout_thread_t *p_vout )
                 input_Seek( p_vout, 0, INPUT_SEEK_BYTES | INPUT_SEEK_END );
                 break;
             case XK_Page_Up:
-                input_Seek( p_vout, 900, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                input_Seek( p_vout, 5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
             case XK_Page_Down:
-                input_Seek( p_vout, -900, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                input_Seek( p_vout, -5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
             case XK_space:
                 input_SetStatus( p_vout, INPUT_STATUS_PAUSE );
@@ -1864,16 +1876,17 @@ static int XVideoGetPort( vout_thread_t *p_vout,
 
     if( i_selected_port == -1 )
     {
+        int i_chroma_tmp = X112VLC_FOURCC( i_chroma );
         if( i_requested_adaptor == -1 )
         {
             msg_Warn( p_vout, "no free XVideo port found for format "
-                       "0x%.8x (%4.4s)", i_chroma, (char*)&i_chroma );
+                      "0x%.8x (%4.4s)", i_chroma_tmp, (char*)&i_chroma_tmp );
         }
         else
         {
             msg_Warn( p_vout, "XVideo adaptor %i does not have a free "
-                       "XVideo port for format 0x%.8x (%4.4s)",
-                       i_requested_adaptor, i_chroma, (char*)&i_chroma );
+                      "XVideo port for format 0x%.8x (%4.4s)",
+                      i_requested_adaptor, i_chroma_tmp, (char*)&i_chroma_tmp );
         }
     }
 

@@ -2,7 +2,7 @@
  * xcommon.h: Defines common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.h,v 1.5 2003/05/25 19:24:53 gbazin Exp $
+ * $Id: xcommon.h,v 1.6 2003/07/28 18:02:06 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -40,6 +40,16 @@
 #   define DATA_SIZE(p)   ((p)->bytes_per_line * (p)->height)
 #   define IMAGE_FREE     XDestroyImage
 #endif
+
+#define X11_FOURCC( a, b, c, d ) \
+        ( ((uint32_t)a) | ( ((uint32_t)b) << 8 ) \
+           | ( ((uint32_t)c) << 16 ) | ( ((uint32_t)d) << 24 ) )
+#define VLC2X11_FOURCC( i ) \
+        X11_FOURCC( ((char *)&i)[0], ((char *)&i)[1], ((char *)&i)[2], \
+                    ((char *)&i)[3] )
+#define X112VLC_FOURCC( i ) \
+        VLC_FOURCC( i & 0xff, (i >> 8) & 0xff, (i >> 16) & 0xff, \
+                    (i >> 24) & 0xff )
 
 /*****************************************************************************
  * x11_window_t: X11 window descriptor

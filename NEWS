@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.58 2003/07/27 14:10:02 massiot Exp $
+$Id: NEWS,v 1.59 2003/07/28 18:02:06 massiot Exp $
 
 Changes between 0.6.0 and 0.6.1:
 ---------------------------------
@@ -20,8 +20,10 @@ Win32 port:
  * Fixed 5.1 audio support for the sblive/audigy soundcards.
  * Fixed sound on Windows NT.
 
-Linux ports:
- * Fixed/improved alsa support and enabled multi-channel audio output.
+UNIX ports:
+ * Fixed/improved ALSA support and enabled multi-channel audio output.
+ * X11/Xvideo: Should now work on big endian machines, and you can now
+   use the arrow keys to browse through the DVD menus.
 
 Interfaces:
  * Small updates/fixes to the wxWindows interface.
