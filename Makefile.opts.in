@@ -141,7 +141,7 @@ INCLUDE += -Iinclude -Iextras -I/usr/local/include
 LIB += @LIB@ -L/usr/local/lib
 
 ifneq (,$(findstring mingw32,$(SYS)))
-LIB += -lws2_32
+LIB += -lws2_32 -lnetapi32
 endif
 
 #

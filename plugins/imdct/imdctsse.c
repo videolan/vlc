@@ -2,7 +2,7 @@
  * imdctsse.c : accelerated SSE IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdctsse.c,v 1.1 2001/05/15 16:19:42 sam Exp $
+ * $Id: imdctsse.c,v 1.2 2001/05/28 02:38:48 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -67,7 +67,7 @@ MODULE_CONFIG_END
 MODULE_INIT
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "AC3 IMDCT module";
+    p_module->psz_longname = "SSE AC3 IMDCT module";
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL

@@ -149,9 +149,11 @@ dnl
 case x$host_os in
   xmingw32msvc)
     MMX_PLUGINS="idctmmx motionmmx"
+    MMXEXT_PLUGINS="idctmmxext motionmmxext imdct3dn"
     ;;
   *)
     MMX_PLUGINS="yuvmmx idctmmx motionmmx"
+    MMXEXT_PLUGINS="idctmmxext motionmmxext imdct3dn imdctsse downmix3dn downmixsse"
     ;;
 esac
 
@@ -162,7 +164,7 @@ AC_TRY_COMPILE([void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],,
 
 AC_MSG_CHECKING([if \$CC groks MMX EXT or SSE inline assembly])
 AC_TRY_COMPILE([void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],,
-  ACCEL_PLUGINS="${ACCEL_PLUGINS} idctmmxext motionmmxext imdct3dn imdctsse downmix3dn downmixsse"
+  ACCEL_PLUGINS="${ACCEL_PLUGINS} ${MMXEXT_PLUGINS}"
   AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl

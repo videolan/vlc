@@ -2,7 +2,7 @@
  * ac3_imdct_3dn.c: accelerated 3D Now! ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_3dn.c,v 1.1 2001/05/16 14:51:29 reno Exp $
+ * $Id: ac3_imdct_3dn.c,v 1.2 2001/05/28 02:38:48 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -40,6 +40,10 @@
 #include "ac3_imdct.h"
 #include "ac3_imdct_common.h"
 #include "ac3_retables.h"
+
+#ifndef M_PI
+#   define M_PI 3.14159265358979323846
+#endif
 
 void _M( fft_64p )  ( complex_t *x );
 void _M( fft_128p ) ( complex_t *a );

@@ -4,7 +4,7 @@
  * modules.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.h,v 1.12 2001/05/06 04:32:02 sam Exp $
+ * $Id: netutils.h,v 1.13 2001/05/28 02:38:48 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Henri Fallon <henri@videolan.org>
@@ -32,5 +32,5 @@
  *****************************************************************************/
 int network_BuildLocalAddr ( struct sockaddr_in *, int, char * ); 
 int network_BuildRemoteAddr( struct sockaddr_in *, char * );
-int network_ChannelJoin    ( int i_channel_id );
+int network_ChannelJoin    ( int );
 int network_ChannelCreate  ( void );
