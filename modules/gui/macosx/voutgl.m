@@ -117,12 +117,10 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 
     p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
 
-    var_Create( p_vout, "macosx-vout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-vdev", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-fill", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-stretch", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-opaqueness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "macosx-opengl-effect", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     /* Setup the menuitem for the multiple displays. Read the vlc preference (macosx-vdev) for the primary display */
     NSArray * o_screens = [NSScreen screens];

@@ -120,6 +120,8 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
 
     psz_string = var_GetString( p_object, "audio-filter" );
 
+    vlc_object_release( p_object );
+
     if( !psz_string ) return VLC_FALSE;
 
     psz_parser = strstr( psz_string, psz_name );
@@ -186,8 +188,6 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
     psz_bands = var_GetString( p_object, "equalizer-bands" );
     if( !psz_bands )
         psz_bands = strdup( "0 0 0 0 0 0 0 0 0 0" );
-    if ( !psz_bands )
-        return;
 
     b_2p = var_GetBool( p_object, "equalizer-2pass" );
 
