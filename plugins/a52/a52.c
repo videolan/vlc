@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.1 2002/02/06 20:44:22 gbazin Exp $
+ * $Id: a52.c,v 1.2 2002/02/13 21:54:44 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -28,6 +28,7 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
+#include <stdint.h>
 
 #include <videolan/vlc.h>
 
@@ -119,6 +120,7 @@ static int decoder_Run ( decoder_config_t *p_config )
     /*
      * Initialize the thread properties
      */
+    p_a52_adec->p_aout_fifo = NULL;
     p_a52_adec->p_config = p_config;
     p_a52_adec->p_fifo = p_a52_adec->p_config->p_decoder_fifo;
     if( InitThread( p_a52_adec ) )
