@@ -125,7 +125,7 @@ typedef struct vout_thread_s
     u32                 i_blue_pixel;                                 /* blue */
     
     /* Palette */
-    u8                  lookup[1377];       /* lookup table for 8 bpp palette */
+    u8                  lookup[2176];       /* lookup table for 8 bpp palette */
 
     /* Pictures and rendering properties */
     boolean_t           b_grayscale;            /* color or grayscale display */

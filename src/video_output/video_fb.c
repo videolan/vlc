@@ -31,8 +31,15 @@
 #include "intf_msg.h"
 #include "main.h"
 
-#define RGB_MIN -24
-#define RGB_MAX 283
+//#define RGB_MIN 0
+//#define RGB_MAX 255
+#define RGB_MIN 0
+#define RGB_MAX 255
+#define SHIFT 20
+#define U_GREEN_COEF    ((int)(-0.391 * (1<<SHIFT) / 1.164))
+#define U_BLUE_COEF     ((int)(2.018 * (1<<SHIFT) / 1.164))
+#define V_RED_COEF      ((int)(1.596 * (1<<SHIFT) / 1.164))
+#define V_GREEN_COEF    ((int)(-0.813 * (1<<SHIFT) / 1.164))
 
 /******************************************************************************
  * vout_sys_t: video output framebuffer method descriptor
@@ -224,7 +231,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
 
         /* initializes black & white palette */
 	//FBInitBWPalette( p_vout );
-	FBInitRGBPalette( p_vout );
+        FBInitRGBPalette( p_vout );
 
         p_vout->i_bytes_per_pixel = 1;
         p_vout->i_bytes_per_line = p_vout->i_width;
@@ -299,54 +306,91 @@ static void FBCloseDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void FBInitRGBPalette( vout_thread_t *p_vout )
 {
+    #define SATURATE( x )    \
+    x = x + ( x >> 3 ) - 16; \
+    if( x < 0 ) x = 0;       \
+    if( x > 255 ) x = 255;
+
     int y,u,v;
-    float r,g,b;
+    int r,g,b;
+    int uvRed, uvGreen, uvBlue;
     unsigned int counter = 0;
     unsigned int allocated = 0;
-    unsigned int lastallocated = 0;
     unsigned short red[256], green[256], blue[256], transp[256];
+    unsigned char extralookup[2176];
     struct fb_cmap cmap = { 0, 256, red, green, blue, transp };
 
     for ( y = 0; y <= 256; y += 16 )
-    for ( u = -256; u <= 256; u += 64 )
-    for ( v = -256; v <= 256; v += 64 )
     {
-        r = (0.99     * y + 1.0      * u - 0.01     * v);
-        g = (1.005085 * y - 0.508475 * u - 0.181356 * v);
-        b = (1.0      * y                + 1.0      * v);
-
-        if( r > RGB_MIN && g > RGB_MIN && b > RGB_MIN
-            && r < RGB_MAX && g < RGB_MAX && b < RGB_MAX )
+        for ( u = 0; u <= 256; u += 32 )
+        for ( v = 0; v <= 256; v += 32 )
         {
-            if(allocated == 256) { fprintf(stderr, "sorry, no colors left\n"); exit(1); }
-            if(r<0) r=0;
-            if(g<0) g=0;
-            if(b<0) b=0;
-            if(r>255) r=255;
-            if(g>255) g=255;
-            if(b>255) b=255;
+            uvRed = (V_RED_COEF*(v-128)) >> SHIFT;
+            uvGreen = (U_GREEN_COEF*(u-128) + V_GREEN_COEF*(v-128)) >> SHIFT;
+            uvBlue = (U_BLUE_COEF*(u-128)) >> SHIFT;
+            r = y + uvRed;
+            g = y + uvGreen;
+            b = y + uvBlue;
+    
+            if( r >= RGB_MIN && g >= RGB_MIN && b >= RGB_MIN
+                && r <= RGB_MAX && g <= RGB_MAX && b <= RGB_MAX )
+            {
+                if(allocated == 256) { fprintf(stderr, "sorry, no colors left\n"); exit(1); }
+ 
+                /* saturate the colors */
+                SATURATE( r );
+                SATURATE( g );
+                SATURATE( b );
 
-            red[allocated] = (int)r << 8;
-            green[allocated] = (int)g << 8;
-            blue[allocated] = (int)b << 8;
-            transp[allocated] = 0;
+                red[allocated] = r << 8;
+                green[allocated] = g << 8;
+                blue[allocated] = b << 8;
+                transp[allocated] = 0;
 
-            u += 256;
-            v += 256;
-            //printf("%x (%i:%i:%i) %i %i %i\n", (y>>4)*81 + (u>>6)*9 + (v>>6), y>>4, u>>6, v>>6, (int)r, (int)g, (int)b);
-            //printf("%i %i\n", counter, (y>>4)*81 + (u>>6)*9 + (v>>6) );
-
-            u -= 256;
-            v -= 256;
-            /* allocate color */
-            p_vout->lookup[counter] = allocated;
-            allocated++;
-            /* set last allocated index */
-            lastallocated = allocated - 1;
+                /* allocate color */
+                extralookup[counter] = 1;
+                p_vout->lookup[counter++] = allocated;
+                allocated++;
+            }
+            else
+            {
+                extralookup[counter] = 0;
+                p_vout->lookup[counter++] = 0;
+            }
         }
-        else p_vout->lookup[counter] = lastallocated;
+        counter += 128-81;
+    }
 
-        counter++;
+    counter = 0;
+    for ( y = 0; y <= 256; y += 16 )
+    {
+        for ( u = 0; u <= 256; u += 32 )
+        for ( v = 0; v <= 256; v += 32 )
+        {
+            int y2, u2, v2;
+            int dist = 100000000;
+
+            if( p_vout->lookup[counter] || y==0)
+            {
+                counter++;
+                continue;
+            }
+
+	    for( y2 = y-16; y2 <= y; y2+= 16 )
+            for( u2 = 0; u2 <= 256; u2 += 32 )
+            for( v2 = 0; v2 <= 256; v2 += 32 )
+            {
+                if( extralookup[((y2>>4)<<7) + (u2>>5)*9 + (v2>>5)])
+                    /* find the nearest color */
+                    if( 128*(y-y2) + (u-u2)*(u-u2) + (v-v2)*(v-v2) < dist )
+                    {
+                        p_vout->lookup[counter] = p_vout->lookup[((y2>>4)<<7) + (u2>>5)*9 + (v2>>5)];
+                        dist = 128*(y-y2) + (u-u2)*(u-u2) + (v-v2)*(v-v2);
+                    }
+            }
+            counter++;
+        }
+        counter += 128-81;
     }
 
     ioctl( p_vout->p_sys->i_fb_dev, FBIOPUTCMAP, &cmap );
@@ -369,3 +413,4 @@ static void FBInitBWPalette( vout_thread_t *p_vout )
 
     ioctl( p_vout->p_sys->i_fb_dev, FBIOPUTCMAP, &cmap );
 }
+
