@@ -232,7 +232,7 @@ vlc-clean:
 	rm -Rf vlc.app
 
 distclean: clean
-	-cd po && $(MAKE) distclean
+	-cd po && $(MAKE) maintainer-clean
 	rm -f **/*.o **/*~ *.log
 	rm -f Makefile.opts
 	rm -f include/defs.h include/config.h include/modules_builtin.h

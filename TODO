@@ -664,7 +664,7 @@ Urgency: Wishlist
 Description: Rename channel names
  Channels should start from 1 (not 0) like on a VCR or TV,
  and Channel 0 should be renamed to "Playlist" or similar.
-Status: Todo
+Status: Done
 
 Task: 0x0d
 Difficulty: Medium
@@ -762,7 +762,7 @@ Description: Get rid of vlc.channels
  The file vlc.channels should be removed and information
  found in it put either into ~/.vlcrc or in another rc
  file. Note that this file can be modified by the vlc.
-Status: Todo
+Status: Done 9 Dec 2001 (sam)
 
 Task: 0x03
 Difficulty: Hard

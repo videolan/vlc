@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.23 2001/12/09 17:01:35 sam Exp $
+ * $Id: interface.h,v 1.24 2001/12/10 12:40:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -60,12 +60,6 @@ typedef struct intf_thread_s
 
     /* Interface callback */
     void             ( *pf_manage ) ( struct intf_thread_s * );
-
-    /* XXX: Channels array - new API */
-  //p_intf_channel_t *  p_channel[INTF_MAX_CHANNELS];/* channel descriptions */
-
-    /* Channels array - NULL if not used */
-    p_intf_channel_t    p_channel;                /* description of channels */
 
     /* Input thread - NULL if not active */
     p_input_thread_t    p_input;
