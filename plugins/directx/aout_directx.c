@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_directx.c,v 1.9 2001/08/05 15:32:46 gbazin Exp $
+ * $Id: aout_directx.c,v 1.10 2001/08/05 18:57:59 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -356,9 +356,6 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 
     if( p_aout->p_sys->b_buffer_underflown )
     {
-        /* reset the position to the beginning of the buffer */
-        dsresult = IDirectSoundBuffer_SetCurrentPosition(
-                                            p_aout->p_sys->p_dsbuffer, 1024 );
         /*  there has been an underflow so we need to play the new sample
          *  as soon as possible. This is why we query the play position */
         dsresult = IDirectSoundBuffer_GetCurrentPosition(
@@ -371,11 +368,26 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
             p_aout->p_sys->l_write_position = 0; 
         }
 
+        intf_WarnMsg( 3, "aout: aout_Play underflow");
         /* reinitialise the underflow detection counters */
-        p_aout->p_sys->l_data_written_from_beginning = 0;
-        p_aout->p_sys->l_data_played_from_beginning =
-         -(p_aout->p_sys->l_write_position % (p_aout->p_sys->l_buffer_size/2));
         p_aout->p_sys->b_buffer_underflown = 0;
+        p_aout->p_sys->l_data_written_from_beginning = 0;
+
+#define WRITE_P  p_aout->p_sys->l_write_position
+#define PLAY_P   l_play_position
+#define BUF_SIZE p_aout->p_sys->l_buffer_size
+        p_aout->p_sys->l_data_played_from_beginning = -(WRITE_P %(BUF_SIZE/2));
+        if( PLAY_P < BUF_SIZE/2 && WRITE_P > BUF_SIZE/2 )
+        {
+            p_aout->p_sys->l_data_played_from_beginning -= (BUF_SIZE/2);
+        }
+        if( PLAY_P > BUF_SIZE/2 && WRITE_P < BUF_SIZE/2 )
+        {
+            p_aout->p_sys->l_data_played_from_beginning -= (BUF_SIZE/2);
+        }        
+#undef WRITE_P
+#undef PLAY_P
+#undef BUF_SIZE
     }
 
     /* Before copying anything, we have to lock the buffer */
@@ -710,17 +722,19 @@ static void DirectSoundThread( aout_thread_t *p_aout )
         /* detect wrap-around */
         if( l_data_in_buffer < (-l_buffer_size/2) )
         {
+            intf_WarnMsg(3,"aout: DirectSoundThread wrap around: %li", l_data_in_buffer);
             l_data_in_buffer += l_buffer_size;
         }
 
         /* detect underflow */
         if( l_data_in_buffer <= 0 )
         {
-            intf_WarnMsg(3,"aout: DirectSoundThread underflow");
+            intf_WarnMsg(3,"aout: DirectSoundThread underflow: %li", l_data_in_buffer);
             p_aout->p_sys->b_buffer_underflown = 1;
             p_aout->p_sys->l_write_position =
                   (l_play_position + l_buffer_size/2) % l_buffer_size;
             l_data_in_buffer = l_buffer_size / 2;
+            p_aout->p_sys->l_data_played_from_beginning -= (l_buffer_size/2);
         }
 
 
@@ -776,5 +790,3 @@ static void DirectSoundThread( aout_thread_t *p_aout )
     intf_WarnMsg( 3, "aout: DirectSoundThread exiting" );
 
 }
-
-
