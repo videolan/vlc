@@ -135,10 +135,7 @@ po-clean:
 	-cd po && $(MAKE) clean
 
 plugins-clean:
-	for dir in $(PLUGINS_DIR) ; do \
-		( cd modules/$${dir} \
-			&& $(MAKE) -f ../../Makefile.modules clean ) ; done
-	rm -f modules/**/*.o modules/**/*.lo modules/**/*.moc modules/**/*.bak
+	for dir in $(shell echo $(PLUGIN_OBJ) $(BUILTIN_OBJ) | sed 's@\([^ ]*\)/[^ ]*@\1@g' ) ; do ( PWD=`pwd` ; cd $${dir} && $(MAKE) -f $$PWD/Makefile.modules clean ) ; done
 
 vlc-clean:
 	rm -f $(C_OBJ) $(CPP_OBJ)
