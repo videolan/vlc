@@ -2,7 +2,7 @@
  * gtk_main.c : Gtk+ wrapper for gtk_main
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gtk_main.c,v 1.13 2003/03/18 01:26:13 sam Exp $
+ * $Id: gtk_main.c,v 1.14 2003/03/19 17:40:43 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -173,7 +173,9 @@ static void GtkMain( vlc_object_t *p_this )
     static int    i_args   = 1;
 
     /* FIXME: deprecated ? */
-    /* gdk_threads_init(); */
+#if defined(MODULE_NAME_IS_gtk2_main) || defined(MODULE_NAME_IS_gnome2_main)
+    gdk_threads_init();
+#endif
 
 #if defined(MODULE_NAME_IS_gnome_main)
     gnome_init( p_this->p_vlc->psz_object_name, VERSION, i_args, p_args );
