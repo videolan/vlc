@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.10 2002/05/22 23:11:00 massiot Exp $
+ * $Id: http.c,v 1.10.2.1 2002/06/18 23:18:05 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -142,11 +142,21 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 #   define HTTP_USERAGENT "User-Agent: " COPYRIGHT_MESSAGE "\r\n"
 #   define HTTP_END       "\r\n"
  
-    snprintf( psz_buffer, sizeof(psz_buffer),
-              "%s"
-              "Range: bytes=%lld-\r\n"
-              HTTP_USERAGENT HTTP_END,
-              p_access_data->psz_buffer, i_tell );
+    if ( p_input->stream.b_seekable )
+    {
+         snprintf( psz_buffer, sizeof(psz_buffer),
+                   "%s"
+                   "Range: bytes=%lld-\r\n"
+                   HTTP_USERAGENT HTTP_END,
+                   p_access_data->psz_buffer, i_tell );
+    }
+    else
+    {
+         snprintf( psz_buffer, sizeof(psz_buffer),
+                   "%s"
+                   HTTP_USERAGENT HTTP_END,
+                   p_access_data->psz_buffer, i_tell );
+    }
     psz_buffer[sizeof(psz_buffer) - 1] = '\0';
 
     /* Send GET ... */
@@ -194,10 +204,15 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
                       strlen("Content-Length: ") ) )
         {
             psz_parser += strlen("Content-Length: ");
-            /* FIXME : this won't work for 64-bit lengths */
             vlc_mutex_lock( &p_input->stream.stream_lock );
+#ifdef HAVE_ATOLL
+            p_input->stream.p_selected_area->i_size = atoll( psz_parser )
+                                                        + i_tell;
+#else
+            /* FIXME : this won't work for 64-bit lengths */
             p_input->stream.p_selected_area->i_size = atoi( psz_parser )
                                                         + i_tell;
+#endif
             vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
 
@@ -393,7 +408,7 @@ static int HTTPOpen( input_thread_t * p_input )
         p_access_data->socket_desc.i_server_port = i_proxy_port;
 
         snprintf( p_access_data->psz_buffer, sizeof(p_access_data->psz_buffer),
-                  "GET http://%s:%d/%s HTTP/1.1\r\n",
+                  "GET http://%s:%d/%s\r\n HTTP/1.0\r\n",
                   psz_server_addr, i_server_port, psz_path );
     }
     else
@@ -414,14 +429,21 @@ static int HTTPOpen( input_thread_t * p_input )
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.b_pace_control = 1;
-    p_input->stream.b_seekable = 0;
+    p_input->stream.b_seekable = 1;
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.p_selected_area->i_size = 0;
     p_input->stream.i_method = INPUT_METHOD_NETWORK;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     p_input->i_mtu = 0;
  
-    return( HTTPConnect( p_input, 0 ) );
+    if( HTTPConnect( p_input, 0 ) )
+    {
+        char * psz_pos = strstr(p_access_data->psz_buffer, "HTTP/1.1");
+        p_input->stream.b_seekable = 0;
+        psz_pos[7] = 0;
+        return( HTTPConnect( p_input, 0 ) );
+    }
+    return 0;
 }
 
 /*****************************************************************************

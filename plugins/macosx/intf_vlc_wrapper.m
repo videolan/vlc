@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.6.2.7 2002/06/18 22:29:02 massiot Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.6.2.8 2002/06/18 23:18:05 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -487,7 +487,6 @@ static Intf_VLCWrapper *o_intf = nil;
 
     while( ( o_file = (NSString *)[o_enum nextObject] ) )
     {
-intf_Msg("Meuuh !");
         intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, 
                           [o_file fileSystemRepresentation] );
     }
