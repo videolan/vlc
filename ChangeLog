@@ -15768,3 +15768,345 @@ Changed paths:
 
 * modules/video_chroma/i420_rgb_mmx.h: gcc-3.4 compilation fix.
 ------------------------------------------------------------------------
+r7704 | gbazin | 2004-05-17 21:56:30 +0200 (Mon, 17 May 2004) | 2 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/configure.ac
+   M /trunk/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /trunk/extras/MacOSX/vlc.pbproj/project.pbxproj
+   M /trunk/po/de.po
+   M /trunk/po/en_GB.po
+   M /trunk/po/es.po
+   M /trunk/po/fr.po
+   M /trunk/po/hu.po
+   M /trunk/po/it.po
+   M /trunk/po/ja.po
+   M /trunk/po/nl.po
+   M /trunk/po/no.po
+   M /trunk/po/pl.po
+   M /trunk/po/pt_BR.po
+   M /trunk/po/ru.po
+   M /trunk/po/sv.po
+   M /trunk/po/vlc.pot
+
+* ALL: preparing for the 0.7.2-test3 release.
+
+------------------------------------------------------------------------
+r7705 | asmax | 2004-05-17 22:14:31 +0200 (Mon, 17 May 2004) | 2 lines
+Changed paths:
+   M /trunk/share/skins2/default/theme.xml
+
+  * theme.xml: please, no useless vout window in the default skin
+
+------------------------------------------------------------------------
+r7706 | gbazin | 2004-05-17 22:29:41 +0200 (Mon, 17 May 2004) | 1 line
+Changed paths:
+   M /trunk/vlc.win32.nsi
+
+* vlc.win32.nsi: start menu shortcut for skins2.
+------------------------------------------------------------------------
+r7707 | ipkiss | 2004-05-17 22:48:39 +0200 (Mon, 17 May 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/commands/cmd_input.cpp
+   M /trunk/modules/gui/skins2/commands/cmd_input.hpp
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+   M /trunk/modules/gui/skins2/src/vlcproc.cpp
+
+ * skins2:
+    - new possible action vlc.mute() to mute/un-mute
+    - vlc.isMute is now working well (in a boolean expression)
+
+------------------------------------------------------------------------
+r7708 | fkuehne | 2004-05-18 00:14:25 +0200 (Tue, 18 May 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/intf.h
+   M /trunk/modules/gui/macosx/intf.m
+   M /trunk/modules/gui/pda/pda.glade
+   M /trunk/po/de.po
+
+* modules/gui/macosx/intf.*: made the Services-menu translatable
+* modules/gui/macosx/macosx.m: rewritten a pref-string
+* modules/gui/pda/pda.glade: Fixed "VLC media player"
+* po/de.po: Updated translation
+------------------------------------------------------------------------
+r7709 | fkuehne | 2004-05-18 08:46:05 +0200 (Tue, 18 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/macosx/macosx.m
+
+* rewritten a pref-string
+------------------------------------------------------------------------
+r7710 | titer | 2004-05-18 11:08:44 +0200 (Tue, 18 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/vout.h
+   M /trunk/modules/gui/macosx/vout.m
+
+ macosx/vout*: fixed a possible segfault on vout close
+
+------------------------------------------------------------------------
+r7711 | rocky | 2004-05-18 12:49:15 +0200 (Tue, 18 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/access/vcdx/vcdplayer.h
+
+Tolerate vcdimager < 0.7.21. Patch thanks to Arwed v. Merkatz.
+
+------------------------------------------------------------------------
+r7712 | zorglub | 2004-05-18 13:21:22 +0200 (Tue, 18 May 2004) | 3 lines
+Changed paths:
+   M /trunk/src/input/stream.c
+
+Hopefully fix bug with playlist parsing (line-feed problem)
+
+
+------------------------------------------------------------------------
+r7713 | gbazin | 2004-05-18 16:50:19 +0200 (Tue, 18 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/src/vlcproc.cpp
+   M /trunk/modules/gui/wxwindows/bookmarks.cpp
+   M /trunk/modules/gui/wxwindows/video.cpp
+
+* skins2/src/vlcproc.cpp: a few cleanup fixes.
+* wxwindows/*: a few cleanup fixes.
+
+------------------------------------------------------------------------
+r7714 | gbazin | 2004-05-18 17:10:18 +0200 (Tue, 18 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/iteminfo.cpp
+
+* modules/gui/wxwindows/iteminfo.cpp: expand info tree by default.
+------------------------------------------------------------------------
+r7715 | ipkiss | 2004-05-18 20:47:02 +0200 (Tue, 18 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/utils/var_text.cpp
+
+ * skins2/utils/var_text.cpp: avoid an infinite loop when $H is specified in
+   a help string
+
+------------------------------------------------------------------------
+r7716 | zorglub | 2004-05-18 22:41:19 +0200 (Tue, 18 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/playlist/m3u.c
+   M /trunk/src/input/stream.c
+
+Skip leading tabs, spaces and line feeds
+
+------------------------------------------------------------------------
+r7717 | damienf | 2004-05-19 11:38:44 +0200 (Wed, 19 May 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/access/dshow/dshow.cpp
+
+- ordered device supported media types using an arbitrary fourcc preference priority before passing them to capture filter 
+- removed assumption where YUY2 chroma was considered identical to UYVY
+
+
+------------------------------------------------------------------------
+r7718 | damienf | 2004-05-19 11:40:58 +0200 (Wed, 19 May 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/access/dshow/filter.cpp
+   M /trunk/modules/access/dshow/filter.h
+
+- capture filter supports more than one media types
+- capture filter is more compatible with ICaptureGraphBuilder2
+- some code cleanups especially when dealing with media types
+
+------------------------------------------------------------------------
+r7719 | damienf | 2004-05-19 11:45:48 +0200 (Wed, 19 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/video_output/directx/directx.c
+   M /trunk/src/video_output/vout_pictures.c
+
+- added support for UYVY chroma for directx direct vout render
+
+------------------------------------------------------------------------
+r7720 | bigben | 2004-05-19 12:27:30 +0200 (Wed, 19 May 2004) | 4 lines
+Changed paths:
+   M /trunk/po/it.po
+
+update of italian translation (made by murray)
+
+
+
+------------------------------------------------------------------------
+r7721 | yoann | 2004-05-19 15:49:09 +0200 (Wed, 19 May 2004) | 3 lines
+Changed paths:
+   M /trunk/po/fr.po
+
+* po/fr.po: Updated French translation
+
+
+------------------------------------------------------------------------
+r7722 | hartman | 2004-05-19 23:01:58 +0200 (Wed, 19 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/mkv.cpp
+
+* mkv.cpp: add missing S_TEXT/ASS indentifier
+
+------------------------------------------------------------------------
+r7723 | hartman | 2004-05-20 01:58:06 +0200 (Thu, 20 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/macosx/misc.h
+   M /trunk/modules/gui/macosx/misc.m
+
+* iTunes style slider
+
+------------------------------------------------------------------------
+r7724 | titer | 2004-05-20 03:25:24 +0200 (Thu, 20 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/codec/cmml/intf.c
+
+ gcc < 3 fix
+
+------------------------------------------------------------------------
+r7725 | titer | 2004-05-20 03:42:09 +0200 (Thu, 20 May 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/video_filter/deinterlace.c
+
+ deinterlace.c: BeOS compile fix
+
+------------------------------------------------------------------------
+r7726 | titer | 2004-05-20 03:49:08 +0200 (Thu, 20 May 2004) | 2 lines
+Changed paths:
+   M /trunk/src/misc/cpu.c
+
+ misc/cpu.c: another BeOS compile fix
+
+------------------------------------------------------------------------
+r7727 | yoann | 2004-05-20 11:31:02 +0200 (Thu, 20 May 2004) | 4 lines
+Changed paths:
+   M /trunk/modules/gui/wxwindows/Modules.am
+   A /trunk/modules/gui/wxwindows/bitmaps/playlist.xpm
+   M /trunk/modules/gui/wxwindows/interface.cpp
+
+* changed the playlist icon in the wxwin interface (thanks to bigben)
+* added an open button
+
+
+------------------------------------------------------------------------
+r7728 | gbazin | 2004-05-20 12:16:52 +0200 (Thu, 20 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/open.cpp
+
+* modules/gui/wxwindows/open.cpp: simplified a string (sorry for the translations) because it was making the open dialog way too big.
+------------------------------------------------------------------------
+r7729 | ipkiss | 2004-05-20 13:18:55 +0200 (Thu, 20 May 2004) | 2 lines
+Changed paths:
+   A /trunk/doc/skins/skins2-howto.xml
+
+Docbook documentation on how to create a skin for the skins2 module.
+
+------------------------------------------------------------------------
+r7730 | hartman | 2004-05-20 14:19:15 +0200 (Thu, 20 May 2004) | 2 lines
+Changed paths:
+   M /trunk/THANKS
+
+* THANKS: credit Jan Van Boghout <vlc@macrabbit.com> - iTunes like slider for OSX intf
+
+------------------------------------------------------------------------
+r7731 | sam | 2004-05-20 15:14:55 +0200 (Thu, 20 May 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/gui/skins2/src/skin_main.cpp
+
+  * modules/gui/skins2/src/skin_main.cpp:
+    + Use the svlc shortcut for skins 2, too.
+
+------------------------------------------------------------------------
+r7732 | gbazin | 2004-05-20 15:17:07 +0200 (Thu, 20 May 2004) | 1 line
+Changed paths:
+   M /trunk/vlc.win32.nsi
+
+* vlc.win32.nsi: remove .dat from the list of registered extensions.
+------------------------------------------------------------------------
+r7733 | hartman | 2004-05-20 21:45:12 +0200 (Thu, 20 May 2004) | 2 lines
+Changed paths:
+   M /trunk/NEWS
+
+* small error in NEWS section concerning FLAC vs. FAAC
+
+------------------------------------------------------------------------
+r7734 | hartman | 2004-05-21 00:04:46 +0200 (Fri, 21 May 2004) | 2 lines
+Changed paths:
+   M /trunk/po/es.po
+
+* updated spanish translation by Javier Varela Calvo.
+
+------------------------------------------------------------------------
+r7735 | sam | 2004-05-21 12:25:10 +0200 (Fri, 21 May 2004) | 2 lines
+Changed paths:
+   M /trunk/po/es.po
+
+  * po/es.po: removed trailing ^Ms.
+
+------------------------------------------------------------------------
+r7736 | sam | 2004-05-21 12:46:36 +0200 (Fri, 21 May 2004) | 2 lines
+Changed paths:
+   M /trunk/po/es.po
+
+  * po/es.po: really removed all ^Ms.
+
+------------------------------------------------------------------------
+r7737 | gbazin | 2004-05-21 12:48:33 +0200 (Fri, 21 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/menus.cpp
+
+* modules/gui/wxwindows/menus.cpp: release the wxMutexGui lock before triggering object var callbacks.
+------------------------------------------------------------------------
+r7738 | sam | 2004-05-21 12:52:04 +0200 (Fri, 21 May 2004) | 2 lines
+Changed paths:
+   M /trunk/THANKS
+   M /trunk/po/es.po
+
+  * po/es.po: updated Spanish translation by Javier Varela Calvo. (hi goon!)
+
+------------------------------------------------------------------------
+r7739 | gbazin | 2004-05-21 13:01:35 +0200 (Fri, 21 May 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/speex.c
+
+* modules/codec/speex.c: fixed stupid bug in encoder.
+------------------------------------------------------------------------
+r7740 | sam | 2004-05-21 13:30:18 +0200 (Fri, 21 May 2004) | 2 lines
+Changed paths:
+   M /trunk/po/es.po
+
+  * po/es.po: minor translation fix.
+
+------------------------------------------------------------------------
+r7741 | gbazin | 2004-05-21 13:34:02 +0200 (Fri, 21 May 2004) | 1 line
+Changed paths:
+   M /trunk/po/de.po
+   M /trunk/po/en_GB.po
+   M /trunk/po/es.po
+   M /trunk/po/fr.po
+   M /trunk/po/hu.po
+   M /trunk/po/it.po
+   M /trunk/po/ja.po
+   M /trunk/po/nl.po
+   M /trunk/po/no.po
+   M /trunk/po/pl.po
+   M /trunk/po/pt_BR.po
+   M /trunk/po/ru.po
+   M /trunk/po/sv.po
+   M /trunk/po/vlc.pot
+
+* po/*: updated in preparation for release.
+------------------------------------------------------------------------
+r7742 | fkuehne | 2004-05-21 13:50:12 +0200 (Fri, 21 May 2004) | 1 line
+Changed paths:
+   M /trunk/po/de.po
+   M /trunk/po/es.po
+   M /trunk/po/fr.po
+   M /trunk/po/it.po
+   M /trunk/po/nl.po
+   M /trunk/po/pt_BR.po
+
+* Fixed the latest string changes
+------------------------------------------------------------------------
+r7743 | gbazin | 2004-05-21 13:54:37 +0200 (Fri, 21 May 2004) | 3 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /trunk/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+* configure.ac: fixed libspeex > 1.1.0 detection.
+* ALL: bumped version number to 0.7.2.
+
+------------------------------------------------------------------------
