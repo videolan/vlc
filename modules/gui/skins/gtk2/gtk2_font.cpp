@@ -2,7 +2,7 @@
  * gtk2_font.cpp: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.cpp,v 1.5 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: gtk2_font.cpp,v 1.6 2003/04/17 10:42:41 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -51,6 +51,8 @@ GTK2Font::GTK2Font( intf_thread_t *_p_intf, string fontname, int size,
     {
         msg_Err( _p_intf, "Could not load font %s", fontname.c_str());
     }*/
+    Context = gdk_pango_context_get();
+    Layout = pango_layout_new( Context );
 }
 //---------------------------------------------------------------------------
 GTK2Font::~GTK2Font()
@@ -111,13 +113,15 @@ void GTK2Font::GetSize( string text, int &w, int &h )
     /*FIXME*/
 /*    w = gdk_text_width( GFont, text.c_str(), text.length() );
     h = gdk_text_height( GFont, text.c_str(), text.length() );*/
-    w = 0;
-    h = 0;
+    w = 100;
+    h = 50;
 }
 //---------------------------------------------------------------------------
 void GTK2Font::GenericPrint( Graphics *dest, string text, int x, int y,
                                  int w, int h, int align, int color )
 {
+    GdkDrawable *drawable = ( (GTK2Graphics *)dest )->GetImage();
+    GdkGC *gc = ( (GTK2Graphics *)dest )->GetGC();
 /*    HDC DC = ( (GTK2Graphics *)dest )->GetImageHandle();
     // Set boundaries
     LPRECT r = new RECT;
@@ -143,6 +147,8 @@ void GTK2Font::GenericPrint( Graphics *dest, string text, int x, int y,
 
     // Free memory
     delete r;*/
+    pango_layout_set_text( Layout, text.c_str(), text.length() );
+    gdk_draw_layout( drawable, gc, x, y, Layout );
 }
 
 //---------------------------------------------------------------------------
