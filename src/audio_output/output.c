@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.39 2003/05/04 23:39:02 gbazin Exp $
+ * $Id: output.c,v 1.40 2003/05/11 01:00:26 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -271,7 +271,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     vlc_mutex_lock( &p_aout->output_fifo_lock );
 
     p_buffer = p_aout->output.fifo.p_first;
-    while ( p_buffer && p_buffer->start_date < mdate() )
+    while ( p_buffer && p_buffer->start_date < mdate() - AOUT_PTS_TOLERANCE )
     {
         msg_Dbg( p_aout, "audio output is too slow ("I64Fd"), "
                  "trashing "I64Fd"us", mdate() - p_buffer->start_date,
@@ -304,7 +304,8 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     /* Here we suppose that all buffers have the same duration - this is
      * generally true, and anyway if it's wrong it won't be a disaster. */
     if ( p_buffer->start_date > start_date
-                         + (p_buffer->end_date - p_buffer->start_date) )
+                         + (p_buffer->end_date - p_buffer->start_date)
+                         + AOUT_PTS_TOLERANCE )
     {
         vlc_mutex_unlock( &p_aout->output_fifo_lock );
         if ( !p_aout->output.b_starving )

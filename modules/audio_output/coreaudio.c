@@ -2,7 +2,7 @@
  * coreaudio.c: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: coreaudio.c,v 1.3 2003/05/04 22:42:15 gbazin Exp $
+ * $Id: coreaudio.c,v 1.4 2003/05/11 01:00:26 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -586,6 +586,13 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
 
     host_time.mFlags = kAudioTimeStampHostTimeValid;
     AudioDeviceTranslateTime( inDevice, inOutputTime, &host_time );
+
+#if 1
+    p_sys->clock_diff = - (mtime_t)
+        AudioConvertHostTimeToNanos( AudioGetCurrentHostTime() ) / 1000; 
+    p_sys->clock_diff += mdate();
+#endif
+
     current_date = p_sys->clock_diff +
                    AudioConvertHostTimeToNanos( host_time.mHostTime ) / 1000;
 

@@ -2,7 +2,7 @@
  * coreaudio.c resampler based on CoreAudio's AudioConverter
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: coreaudio.c,v 1.3 2003/05/04 15:02:42 massiot Exp $
+ * $Id: coreaudio.c,v 1.4 2003/05/11 01:00:26 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -54,6 +54,7 @@ struct aout_filter_sys_t
     AudioStreamBasicDescription s_src_stream_format;
     AudioStreamBasicDescription s_dst_stream_format;
     AudioConverterRef   s_converter;
+    unsigned int i_remainder;
     unsigned int i_first_rate;
 };
 
@@ -109,6 +110,7 @@ static int Create( vlc_object_t *p_this )
     }
     memset( p_filter->p_sys, 0, sizeof(struct aout_filter_sys_t) );
     p_sys->i_first_rate = i_first_rate;
+    p_sys->i_remainder = 0;
 
     p_sys->s_src_stream_format.mFormatID = kAudioFormatLinearPCM;
     p_sys->s_src_stream_format.mFormatFlags
@@ -240,11 +242,14 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                      (char *)&err );
         }
         p_filter->b_continuity = VLC_TRUE;
+        p_sys->i_remainder = 0;
     }
 #endif
 
-    i_out_nb = p_in_buf->i_nb_samples * p_filter->output.i_rate
-                                    / p_sys->i_first_rate;
+    i_out_nb = (p_in_buf->i_nb_samples * p_filter->output.i_rate
+                 + p_sys->i_remainder) / p_sys->i_first_rate;
+    p_sys->i_remainder = (p_in_buf->i_nb_samples * p_filter->output.i_rate
+                 + p_sys->i_remainder) % p_sys->i_first_rate;
 
     i_output_size = i_out_nb * 4 * i_nb_channels;
     if ( i_output_size > p_out_buf->i_size )
