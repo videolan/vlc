@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.2 2002/08/14 10:50:12 bozo Exp $
+ * $Id: alsa.c,v 1.3 2002/08/15 10:31:44 bozo Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -60,9 +60,9 @@ struct aout_sys_t
 };
 
 /* These values are in frames.
- * To convert them to a numer of bytes you have to multiply them by the
- * number of channel(s) (eg. 2 for stereo) and the size of a sample (eg.
- * 2 for s16). */
+   To convert them to a numer of bytes you have to multiply them by the
+   number of channel(s) (eg. 2 for stereo) and the size of a sample (eg.
+   2 for s16). */
 #define ALSA_DEFAULT_PERIOD_SIZE        2048
 #define ALSA_DEFAULT_BUFFER_SIZE        ( ALSA_DEFAULT_PERIOD_SIZE << 4 )
 #define ALSA_SPDIF_PERIOD_SIZE          1536
@@ -106,7 +106,7 @@ static int Open( vlc_object_t *p_this )
     /* Allows user to choose which ALSA device to use */
     char  psz_alsadev[128];
     char * psz_userdev;
-    int   i_snd_rc;
+    int i_snd_rc;
 
     /* Allocate structures */
     p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
@@ -358,17 +358,16 @@ static int ALSAThread( aout_instance_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
+    while ( !p_aout->b_die && !p_sys->b_initialized )
+        msleep( THREAD_SLEEP );
+
     while ( !p_aout->b_die )
     {
-        if( !p_sys->b_initialized )
-        {
-            msleep( THREAD_SLEEP );
-            continue;
-        }
-
         ALSAFill( p_aout );
 
-        msleep( p_sys->i_period_time );
+        /* Sleep during less than one period to avoid a lot of buffer
+           underruns */
+        msleep( p_sys->i_period_time >> 2 );
     }
 
     return 0;
@@ -382,15 +381,15 @@ static void ALSAFill( aout_instance_t * p_aout )
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
     aout_buffer_t * p_buffer;
-    mtime_t next_date = 0;
     snd_pcm_status_t * p_status;
     snd_timestamp_t ts_next;
-    int i_snd_rc, i_size;
-    byte_t * p_bytes;
+    int i_snd_rc;
     snd_pcm_uframes_t i_avail;
 
     snd_pcm_status_alloca( &p_status );
 
+    /* Wait for the device's readiness (ie. there is enough space in the
+       buffer to write at least one complete chunk) */
     i_snd_rc = snd_pcm_wait( p_sys->p_snd_pcm, THREAD_SLEEP );
     if( i_snd_rc < 0 )
     {
@@ -399,8 +398,10 @@ static void ALSAFill( aout_instance_t * p_aout )
         return;
     }
 
+    /* Fill in the buffer until space or audio output buffer shortage */
     while( VLC_TRUE )
     {
+        /* Get the status */
         i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
         if( i_snd_rc < 0 )
         {
@@ -409,13 +410,17 @@ static void ALSAFill( aout_instance_t * p_aout )
             return;
         }
 
+        /* Handle buffer underruns and reget the status */
         if( snd_pcm_status_get_state( p_status ) == SND_PCM_STATE_XRUN )
         {
+            /* Prepare the device */
             i_snd_rc = snd_pcm_prepare( p_sys->p_snd_pcm );
+
             if( i_snd_rc == 0 )
             {
-                msg_Err( p_aout, "recovered from buffer underrun" );
-                next_date = mdate();
+                msg_Warn( p_aout, "recovered from buffer underrun" );
+
+                /* Reget the status */
                 i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
                 if( i_snd_rc < 0 )
                 {
@@ -432,20 +437,26 @@ static void ALSAFill( aout_instance_t * p_aout )
             }
         }
 
+        /* Here the device should be either in the RUNNING state either in
+           the PREPARE state. p_status is valid. */
+
+        /* Try to write only if there is enough space */
         i_avail = snd_pcm_status_get_avail( p_status );
+
         if( i_avail >= p_aout->output.i_nb_samples )
         {
+            mtime_t next_date;
             snd_pcm_status_get_tstamp( p_status, &ts_next );
             next_date = (mtime_t)ts_next.tv_sec * 1000000 + ts_next.tv_usec;
 
             p_buffer = aout_OutputNextBuffer( p_aout, next_date, 0 );
 
+            /* Audio output buffer shortage -> stop the fill process and
+               wait in ALSAThread */
             if( p_buffer == NULL )
                 return;
 
-            p_bytes = p_buffer->p_buffer;
-
-            i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_bytes,
+            i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
                                        p_buffer->i_nb_samples );
 
             if( i_snd_rc < 0 )
