@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.83 2001/04/11 02:01:24 henri Exp $
+ * $Id: main.c,v 1.84 2001/04/11 14:10:49 ej Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -182,7 +182,7 @@ main_t *p_main;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  GetConfiguration        ( int i_argc, char *ppsz_argv[],
+static int  GetConfiguration        ( int *i_argc, char *ppsz_argv[],
                                       char *ppsz_env[] );
 static int  GetFilenames            ( int i_argc, char *ppsz_argv[] );
 static void Usage                   ( int i_fashion );
@@ -256,7 +256,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Read configuration
      */
-    if( GetConfiguration( i_argc, ppsz_argv, ppsz_env ) )  /* parse cmd line */
+    if( GetConfiguration( &i_argc, ppsz_argv, ppsz_env ) )  /* parse cmd line */
     {
         intf_MsgDestroy();
         return( errno );
@@ -504,13 +504,13 @@ void main_PutIntVariable( char *psz_name, int i_value )
  * stage, but most structures are not allocated, so only environment should
  * be used.
  *****************************************************************************/
-static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
+static int GetConfiguration( int *i_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
     int   i_cmd;
     char *p_tmp;
 
     /* Set default configuration and copy arguments */
-    p_main->i_argc    = i_argc;
+    p_main->i_argc    = *i_argc;
     p_main->ppsz_argv = ppsz_argv;
     p_main->ppsz_env  = ppsz_env;
 
@@ -534,9 +534,22 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         }
     }
 
+//when vlc.app is run by double clicking in Mac OS X, the 2nd arg is the PSN - process serial number (a unique PID-ish thingie)
+//still ok for real Darwin & when run from command line
+#ifdef SYS_DARWIN1_3
+    if ( strncmp( ppsz_argv[ 1 ] , "-psn" , 4) == 0 ) //for example -psn_0_9306113
+    {
+        //ppsz_argv[ 1 ] = NULL; //GDMF!... I can't do this or else the MacOSX window server will not pick up the PSN and not register the app and we crash...hence the following kludge
+        //otherwise we'll get confused w/ argv[1] being an input file name
+        *i_argc = *i_argc - 1;
+        p_main->i_argc--;
+        return( 0 );
+    }
+#endif
+
     /* Parse command line options */
     opterr = 0;
-    while( ( i_cmd = getopt_long( i_argc, ppsz_argv,
+    while( ( i_cmd = getopt_long( *i_argc, ppsz_argv,
                                   psz_shortopts, longopts, 0 ) ) != EOF )
     {
         switch( i_cmd )
