@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.5 2002/10/17 17:30:10 ipkiss Exp $
+ * $Id: events.c,v 1.6 2002/10/25 18:17:59 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -49,7 +49,6 @@
  *****************************************************************************/
 static int  DirectXCreateWindow( vout_thread_t *p_vout );
 static void DirectXCloseWindow ( vout_thread_t *p_vout );
-static void DirectXUpdateRects( vout_thread_t *p_vout );
 static long FAR PASCAL DirectXEventProc ( HWND hwnd, UINT message,
                                           WPARAM wParam, LPARAM lParam );
 
@@ -72,11 +71,11 @@ void DirectXEventThread( event_thread_t *p_event )
 
     /* Create a window for the video */
     /* Creating a window under Windows also initializes the thread's event
-     * message qeue */
+     * message queue */
     if( DirectXCreateWindow( p_event->p_vout ) )
     {
         msg_Err( p_event, "out of memory" );
-        p_event->b_dead = 1;
+        p_event->b_dead = VLC_TRUE;
     }
 
     /* signal the creation of the window */
@@ -164,7 +163,7 @@ void DirectXEventThread( event_thread_t *p_event )
             {
             case VK_ESCAPE:
                 /* exit application */
-                p_event->p_vlc->b_die = 1;
+                p_event->p_vlc->b_die = VLC_TRUE;
                 break;
 
             case VK_F1: network_ChannelJoin( p_event, 1 ); break;
@@ -189,7 +188,7 @@ void DirectXEventThread( event_thread_t *p_event )
             case 'q':
             case 'Q':
                 /* exit application */
-                p_event->p_vlc->b_die = 1;
+                p_event->p_vlc->b_die = VLC_TRUE;
                 break;
 
             case 'f':                            /* switch to fullscreen */
@@ -241,7 +240,7 @@ void DirectXEventThread( event_thread_t *p_event )
         p_event->p_vout->p_sys->hwnd = NULL; /* Window already destroyed */
     }
 
-    msg_Dbg( p_event, "DirectXEventThread Terminating" );
+    msg_Dbg( p_event, "DirectXEventThread terminating" );
 
     /* clear the changes formerly signaled */
     p_event->p_vout->p_sys->i_changes = 0;
@@ -262,17 +261,14 @@ void DirectXEventThread( event_thread_t *p_event )
 static int DirectXCreateWindow( vout_thread_t *p_vout )
 {
     HINSTANCE  hInstance;
-    WNDCLASSEX wc;                                /* window class components */
-    RECT       rect_window;
-    COLORREF   colorkey; 
+    COLORREF   colorkey;
     HDC        hdc;
     HMENU      hMenu;
-    HICON      vlc_icon = NULL;
-    char       vlc_path[MAX_PATH+1];
+    RECT       rect_window;
 
     msg_Dbg( p_vout, "DirectXCreateWindow" );
 
-    /* get this module's instance */
+    /* Get this module's instance */
     hInstance = GetModuleHandle(NULL);
 
     /* Create a BRUSH that will be used by Windows to paint the window
@@ -288,14 +284,16 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
      * comes from the potential dithering (depends on the display depth)
      * because we need to know the real RGB value of the chosen colorkey */
     hdc = GetDC( NULL );
-    for( colorkey = 5; colorkey < 0xFF /*all shades of red*/; colorkey++ )
+    for( colorkey = 0x0a; colorkey < 0xff /* all shades of red */; colorkey++ )
     {
         if( colorkey == GetNearestColor( hdc, colorkey ) )
-          break;
+        {
+            break;
+        }
     }
     msg_Dbg( p_vout, "background color: %i", colorkey );
 
-    /* create the actual brush */  
+    /* Create the actual brush */
     p_vout->p_sys->hbrush = CreateSolidBrush(colorkey);
     p_vout->p_sys->i_rgb_colorkey = (int)colorkey;
 
@@ -310,66 +308,98 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
     ReleaseDC( NULL, hdc );
 
-    /* Get the Icon from the main app */
-    vlc_icon = NULL;
-    if( GetModuleFileName( NULL, vlc_path, MAX_PATH ) )
+    /* If an external window was specified, we'll draw in it. */
+    p_vout->p_sys->hparent = p_vout->p_sys->hwnd =
+                (void*)(ptrdiff_t)config_GetInt( p_vout, "directx-window" );
+
+    if( p_vout->p_sys->hparent )
     {
-        vlc_icon = ExtractIcon( hInstance, vlc_path, 0 );
+        msg_Dbg( p_vout, "using external window %p\n", p_vout->p_sys->hwnd );
+
+        /* Set stuff in the window that we can not put directly in
+         * a class (see below). */
+        SetClassLong( p_vout->p_sys->hwnd,
+                      GCL_STYLE, CS_DBLCLKS );
+        SetClassLong( p_vout->p_sys->hwnd,
+                      GCL_HBRBACKGROUND, (LONG)p_vout->p_sys->hbrush );
+        SetClassLong( p_vout->p_sys->hwnd,
+                      GCL_HCURSOR, (LONG)LoadCursor(NULL, IDC_ARROW) );
+        p_vout->p_sys->pf_wndproc =
+               (WNDPROC)SetWindowLong( p_vout->p_sys->hwnd,
+                                       GWL_WNDPROC, (LONG)DirectXEventProc );
+
+        /* Blam! Erase everything that might have been there. */
+        RedrawWindow( p_vout->p_sys->hwnd, NULL, NULL,
+                      RDW_INVALIDATE | RDW_ERASE );
     }
-
-
-    /* fill in the window class structure */
-    wc.cbSize        = sizeof(WNDCLASSEX);
-    wc.style         = CS_DBLCLKS;                       /* style: dbl click */
-    wc.lpfnWndProc   = (WNDPROC)DirectXEventProc;           /* event handler */
-    wc.cbClsExtra    = 0;                             /* no extra class data */
-    wc.cbWndExtra    = 0;                            /* no extra window data */
-    wc.hInstance     = hInstance;                                /* instance */
-    wc.hIcon         = vlc_icon;                        /* load the vlc icon */
-    wc.hCursor       = LoadCursor(NULL, IDC_ARROW); /* load a default cursor */
-    wc.hbrBackground = p_vout->p_sys->hbrush;            /* background color */
-    wc.lpszMenuName  = NULL;                                      /* no menu */
-    wc.lpszClassName = "VLC DirectX";                 /* use a special class */
-    wc.hIconSm       = vlc_icon;                        /* load the vlc icon */
-
-    /* register the window class */
-    if (!RegisterClassEx(&wc))
+    else
     {
-        WNDCLASS wndclass;
+        WNDCLASSEX wc;                            /* window class components */
+        HICON      vlc_icon = NULL;
+        char       vlc_path[MAX_PATH+1];
 
-        /* free window background brush */
-        if( p_vout->p_sys->hbrush )
+        /* Get the Icon from the main app */
+        vlc_icon = NULL;
+        if( GetModuleFileName( NULL, vlc_path, MAX_PATH ) )
         {
-            DeleteObject( p_vout->p_sys->hbrush );
-            p_vout->p_sys->hbrush = NULL;
+            vlc_icon = ExtractIcon( hInstance, vlc_path, 0 );
         }
 
-        if( vlc_icon )
-            DestroyIcon( vlc_icon );
+        /* Fill in the window class structure */
+        wc.cbSize        = sizeof(WNDCLASSEX);
+        wc.style         = CS_DBLCLKS;                   /* style: dbl click */
+        wc.lpfnWndProc   = (WNDPROC)DirectXEventProc;       /* event handler */
+        wc.cbClsExtra    = 0;                         /* no extra class data */
+        wc.cbWndExtra    = 0;                        /* no extra window data */
+        wc.hInstance     = hInstance;                            /* instance */
+        wc.hIcon         = vlc_icon;                /* load the vlc big icon */
+        wc.hCursor       = LoadCursor(NULL, IDC_ARROW);    /* default cursor */
+        wc.hbrBackground = p_vout->p_sys->hbrush;        /* background color */
+        wc.lpszMenuName  = NULL;                                  /* no menu */
+        wc.lpszClassName = "VLC DirectX";             /* use a special class */
+        wc.hIconSm       = vlc_icon;              /* load the vlc small icon */
 
-        /* Check why it failed. If it's because one already exists then fine */
-        if( !GetClassInfo( hInstance, "VLC DirectX", &wndclass ) )
+        /* Register the window class */
+        if( !RegisterClassEx(&wc) )
         {
-            msg_Err( p_vout, "DirectXCreateWindow RegisterClass FAILED" );
-            return (1);
+            WNDCLASS wndclass;
+
+            /* Free window background brush */
+            if( p_vout->p_sys->hbrush )
+            {
+                DeleteObject( p_vout->p_sys->hbrush );
+                p_vout->p_sys->hbrush = NULL;
+            }
+
+            if( vlc_icon )
+            {
+                DestroyIcon( vlc_icon );
+            }
+
+            /* Check why it failed. If it's because one already exists
+             * then fine, otherwise return with an error. */
+            if( !GetClassInfo( hInstance, "VLC DirectX", &wndclass ) )
+            {
+                msg_Err( p_vout, "DirectXCreateWindow RegisterClass FAILED" );
+                return VLC_EGENERIC;
+            }
         }
-    }
 
-    /* when you create a window you give the dimensions you wish it to have.
-     * Unfortunatly these dimensions will include the borders and title bar.
-     * We use the following function to find out the size of the window
-     * corresponding to the useable surface we want */
-    rect_window.top    = 10;
-    rect_window.left   = 10;
-    rect_window.right  = rect_window.left + p_vout->p_sys->i_window_width;
-    rect_window.bottom = rect_window.top + p_vout->p_sys->i_window_height;
-    AdjustWindowRect( &rect_window, WS_OVERLAPPEDWINDOW|WS_SIZEBOX, 0 );
+        /* When you create a window you give the dimensions you wish it to
+         * have. Unfortunatly these dimensions will include the borders and
+         * titlebar. We use the following function to find out the size of
+         * the window corresponding to the useable surface we want */
+        rect_window.top    = 10;
+        rect_window.left   = 10;
+        rect_window.right  = rect_window.left + p_vout->p_sys->i_window_width;
+        rect_window.bottom = rect_window.top + p_vout->p_sys->i_window_height;
+        AdjustWindowRect( &rect_window, WS_OVERLAPPEDWINDOW|WS_SIZEBOX, 0 );
 
-    /* create the window */
-    p_vout->p_sys->hwnd = CreateWindow("VLC DirectX",/* name of window class */
+        /* Create the window */
+        p_vout->p_sys->hwnd =
+            CreateWindow( "VLC DirectX",             /* name of window class */
                     VOUT_TITLE " (DirectX Output)", /* window title bar text */
-                    WS_OVERLAPPEDWINDOW
-                    | WS_SIZEBOX,               /* window style */
+                    WS_OVERLAPPEDWINDOW | WS_SIZEBOX,        /* window style */
                     CW_USEDEFAULT,                   /* default X coordinate */
                     0,                               /* default Y coordinate */
                     rect_window.right - rect_window.left,    /* window width */
@@ -379,25 +409,28 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
                     hInstance,            /* handle of this program instance */
                     NULL);                        /* no additional arguments */
 
-    if (p_vout->p_sys->hwnd == NULL) {
-        msg_Warn( p_vout, "DirectXCreateWindow create window FAILED" );
-        return (1);
+        if( !p_vout->p_sys->hwnd )
+        {
+            msg_Warn( p_vout, "DirectXCreateWindow create window FAILED" );
+            return VLC_EGENERIC;
+        }
     }
 
-    /* store a p_vout pointer into the window local storage (for later use
+    /* Store a p_vout pointer into the window local storage (for later use
      * in DirectXEventProc).
      * We need to use SetWindowLongPtr when it is available in mingw */
     SetWindowLong( p_vout->p_sys->hwnd, GWL_USERDATA, (LONG)p_vout );
 
-    /* append a "Always On Top" entry in the system menu */
+    /* Append a "Always On Top" entry in the system menu */
     hMenu = GetSystemMenu( p_vout->p_sys->hwnd, FALSE );
     AppendMenu( hMenu, MF_SEPARATOR, 0, "" );
-    AppendMenu( hMenu, MF_STRING | MF_UNCHECKED, IDM_TOGGLE_ON_TOP, "Always on &Top");
+    AppendMenu( hMenu, MF_STRING | MF_UNCHECKED,
+                       IDM_TOGGLE_ON_TOP, "Always on &Top" );
 
-    /* now display the window */
-    ShowWindow(p_vout->p_sys->hwnd, SW_SHOW);
+    /* Now display the window */
+    ShowWindow( p_vout->p_sys->hwnd, SW_SHOW );
 
-    return ( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -409,11 +442,12 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
 {
     msg_Dbg( p_vout, "DirectXCloseWindow" );
 
-    if( p_vout->p_sys->hwnd != NULL )
+    if( p_vout->p_sys->hwnd && !p_vout->p_sys->hparent )
     {
         DestroyWindow( p_vout->p_sys->hwnd );
-        p_vout->p_sys->hwnd = NULL;
     }
+
+    p_vout->p_sys->hwnd = NULL;
 
     /* We don't unregister the Window Class because it could lead to race
      * conditions and it will be done anyway by the system when the app will
@@ -421,38 +455,64 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * DirectXUpdateRects: 
+ * DirectXUpdateRects: update clipping rectangles
  *****************************************************************************
- * This function is called when the window position and size is changed, and
+ * This function is called when the window position or size are changed, and
  * its job is to update the source and destination RECTs used to display the
  * picture.
  *****************************************************************************/
-static void DirectXUpdateRects( vout_thread_t *p_vout )
+void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
 {
-    int i_width, i_height, i_x, i_y;
-
 #define rect_src p_vout->p_sys->rect_src
 #define rect_src_clipped p_vout->p_sys->rect_src_clipped
 #define rect_dest p_vout->p_sys->rect_dest
 #define rect_dest_clipped p_vout->p_sys->rect_dest_clipped
-#define rect_display p_vout->p_sys->rect_display
 
-    vout_PlacePicture( p_vout, p_vout->p_sys->i_window_width,
-                       p_vout->p_sys->i_window_height,
+    int i_width, i_height, i_x, i_y;
+
+    RECT  rect;
+    POINT point;
+
+    /* Retrieve the window size */
+    GetClientRect( p_vout->p_sys->hwnd, &rect );
+
+    /* Retrieve the window position */
+    point.x = point.y = 0;
+    ClientToScreen( p_vout->p_sys->hwnd, &point );
+
+    /* If nothing changed, we can return */
+    if( !b_force
+         && p_vout->p_sys->i_window_width == rect.right
+         && p_vout->p_sys->i_window_height == rect.bottom
+         && p_vout->p_sys->i_window_x == point.x
+         && p_vout->p_sys->i_window_y == point.y )
+    {
+        return;
+    }
+
+    /* Update the window position and size */
+    p_vout->p_sys->i_window_x = point.x;
+    p_vout->p_sys->i_window_y = point.y;
+    p_vout->p_sys->i_window_width = rect.right;
+    p_vout->p_sys->i_window_height = rect.bottom;
+
+    vout_PlacePicture( p_vout, rect.right, rect.bottom,
                        &i_x, &i_y, &i_width, &i_height );
 
     /* Destination image position and dimensions */
-    rect_dest.left = i_x + p_vout->p_sys->i_window_x;
-    rect_dest.top = i_y + p_vout->p_sys->i_window_y;
+    rect_dest.left = point.x + i_x;
     rect_dest.right = rect_dest.left + i_width;
+    rect_dest.top = point.y + i_y;
     rect_dest.bottom = rect_dest.top + i_height;
 
 
     /* UpdateOverlay directdraw function doesn't automatically clip to the
-     * display size so we need to do it otherwise it will fails */
+     * display size so we need to do it otherwise it will fail */
 
     /* Clip the destination window */
-    IntersectRect( &rect_dest_clipped, &rect_dest, &rect_display );
+    IntersectRect( &rect_dest_clipped,
+                   &rect_dest,
+                   &p_vout->p_sys->rect_display );
 
 #if 0
     msg_Dbg( p_vout, "DirectXUpdateRects image_dst_clipped coords:"
@@ -478,7 +538,7 @@ static void DirectXUpdateRects( vout_thread_t *p_vout )
     /* Clip the source image */
     rect_src_clipped.left = (rect_dest_clipped.left - rect_dest.left) *
       p_vout->render.i_width / (rect_dest.right - rect_dest.left);
-    rect_src_clipped.right = p_vout->render.i_width - 
+    rect_src_clipped.right = p_vout->render.i_width -
       (rect_dest.right - rect_dest_clipped.right) * p_vout->render.i_width /
       (rect_dest.right - rect_dest.left);
     rect_src_clipped.top = (rect_dest_clipped.top - rect_dest.top) *
@@ -494,11 +554,23 @@ static void DirectXUpdateRects( vout_thread_t *p_vout )
                      rect_src_clipped.right, rect_src_clipped.bottom );
 #endif
 
+    /* Signal the size change */
+    if( !p_vout->p_sys->p_event->b_die )
+    {
+        if( p_vout->p_sys->b_using_overlay )
+        {
+            DirectXUpdateOverlay( p_vout );
+        }
+        else
+        {
+            p_vout->p_sys->i_changes |= VOUT_SIZE_CHANGE;
+        }
+    }
+
 #undef rect_src
 #undef rect_src_clipped
 #undef rect_dest
 #undef rect_dest_clipped
-#undef rect_display
 }
 
 /*****************************************************************************
@@ -518,47 +590,25 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     vout_thread_t *p_vout =
             (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
 
+    /* Just in case the window wasn't properly initialized yet */
+    if( !p_vout )
+    {
+        return DefWindowProc( hwnd, message, wParam, lParam );
+    }
+
     switch( message )
     {
 
     case WM_WINDOWPOSCHANGED:
-        {
-        RECT     rect_window;
-        POINT    point_window;
-
-        /* update the window position */
-        point_window.x = 0;
-        point_window.y = 0;
-        ClientToScreen( hwnd, &point_window );
-        p_vout->p_sys->i_window_x = point_window.x;
-        p_vout->p_sys->i_window_y = point_window.y;
-
-        /* update the window size */
-        GetClientRect( hwnd, &rect_window );
-        p_vout->p_sys->i_window_width = rect_window.right;
-        p_vout->p_sys->i_window_height = rect_window.bottom;
-
-        DirectXUpdateRects( p_vout );
-        if( p_vout->p_sys->b_using_overlay &&
-            !p_vout->p_sys->p_event->b_die )
-            DirectXUpdateOverlay( p_vout );
-
-        /* signal the size change */
-        if( !p_vout->p_sys->b_using_overlay &&
-            !p_vout->p_sys->p_event->b_die )
-            p_vout->p_sys->i_changes |= VOUT_SIZE_CHANGE;
-
+        DirectXUpdateRects( p_vout, VLC_TRUE );
         return 0;
-        }
-        break;
 
     /* the user wants to close the window */
     case WM_CLOSE:
         msg_Dbg( p_vout, "WinProc WM_CLOSE" );
         /* exit application */
-        p_vout->p_vlc->b_die = 1;
+        p_vout->p_vlc->b_die = VLC_TRUE;
         return 0;
-        break;
 
     /* the window has been closed so shut down everything now */
     case WM_DESTROY:
@@ -566,7 +616,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         /* just destroy the window */
         PostQuitMessage( 0 );
         return 0;
-        break;
 
     case WM_SYSCOMMAND:
         switch (wParam)
@@ -632,3 +681,4 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
     return DefWindowProc(hwnd, message, wParam, lParam);
 }
+

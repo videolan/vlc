@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.4 2002/10/22 21:10:28 sam Exp $
+ * $Id: directx.c,v 1.5 2002/10/25 18:17:59 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -98,11 +98,16 @@ static int  DirectXGetSurfaceDesc ( picture_t *p_pic );
     "isn't recommended as usually using video memory allows to benefit from " \
     "more hardware acceleration (like rescaling or YUV->RGB conversions). " \
     "This option doesn't have any effect when using overlays." )
+#define WINDOW_TEXT N_("specify an existing window")
+#define WINDOW_LONGTEXT N_( \
+    "Specify a window to use instead of opening a new one. This option is " \
+    "DANGEROUS, use with care." )
 
 vlc_module_begin();
     add_category_hint( N_("Video"), NULL );
     add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT );
     add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT );
+    add_integer( "directx-window", 0, NULL, WINDOW_TEXT, WINDOW_LONGTEXT );
     set_description( _("DirectX video module") );
     set_capability( "video output", 100 );
     add_shortcut( "directx" );
@@ -131,7 +136,7 @@ static int OpenVideo( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
-        return 1;
+        return VLC_ENOMEM;
     }
 
     /* Initialisations */
@@ -147,6 +152,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->p_clipper = NULL;
     p_vout->p_sys->hbrush = NULL;
     p_vout->p_sys->hwnd = NULL;
+    p_vout->p_sys->hparent = NULL;
     p_vout->p_sys->i_changes = 0;
     p_vout->p_sys->b_caps_overlay_clipping = 0;
     SetRectEmpty( &p_vout->p_sys->rect_display );
@@ -206,12 +212,11 @@ static int OpenVideo( vlc_object_t *p_this )
         goto error;
     }
 
-    return 0;
+    return VLC_SUCCESS;
 
  error:
     CloseVideo( VLC_OBJECT(p_vout) );
-    return 1;
-
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -282,7 +287,9 @@ static int Init( vout_thread_t *p_vout )
     }
 
     /* Change the window title bar text */
-    if( p_vout->p_sys->b_using_overlay )
+    if( p_vout->p_sys->hparent )
+        ; /* Do nothing */
+    else if( p_vout->p_sys->b_using_overlay )
         SetWindowText( p_vout->p_sys->hwnd,
                        VOUT_TITLE " (hardware YUV overlay DirectX output)" );
     else if( p_vout->p_sys->b_hw_yuv )
@@ -291,7 +298,7 @@ static int Init( vout_thread_t *p_vout )
     else SetWindowText( p_vout->p_sys->hwnd,
                         VOUT_TITLE " (software RGB DirectX output)" );
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -325,12 +332,14 @@ static void CloseVideo( vlc_object_t *p_this )
         vlc_object_detach( p_vout->p_sys->p_event );
 
         /* Kill DirectXEventThread */
-        p_vout->p_sys->p_event->b_die = 1;
+        p_vout->p_sys->p_event->b_die = VLC_TRUE;
 
         /* we need to be sure DirectXEventThread won't stay stuck in
          * GetMessage, so we send a fake message */
         if( p_vout->p_sys->hwnd )
+        {
             PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
+        }
 
         vlc_thread_join( p_vout->p_sys->p_event );
         vlc_object_destroy( p_vout->p_sys->p_event );
@@ -353,6 +362,13 @@ static int Manage( vout_thread_t *p_vout )
 {
     WINDOWPLACEMENT window_placement;
 
+    /* If we do not control our window, we check for geometry changes
+     * ourselves because the parent might not send us its events. */
+    if( p_vout->p_sys->hparent )
+    {
+        DirectXUpdateRects( p_vout, VLC_FALSE );
+    }
+
     /* We used to call the Win32 PeekMessage function here to read the window
      * messages. But since window can stay blocked into this function for a
      * long time (for example when you move your window on the screen), I
@@ -362,9 +378,9 @@ static int Manage( vout_thread_t *p_vout )
      * Scale Change 
      */
     if( p_vout->i_changes & VOUT_SCALE_CHANGE
-        || p_vout->p_sys->i_changes & VOUT_SCALE_CHANGE)
+         || p_vout->p_sys->i_changes & VOUT_SCALE_CHANGE )
     {
-        msg_Dbg( p_vout, "Scale Change" );
+        msg_Dbg( p_vout, "scale change" );
         if( !p_vout->p_sys->b_using_overlay )
             InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
         else
@@ -379,7 +395,7 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & VOUT_SIZE_CHANGE
         || p_vout->p_sys->i_changes & VOUT_SIZE_CHANGE )
     {
-        msg_Dbg( p_vout, "Size Change" );
+        msg_Dbg( p_vout, "size change" );
         if( !p_vout->p_sys->b_using_overlay )
             InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
         else
@@ -429,15 +445,20 @@ static int Manage( vout_thread_t *p_vout )
         ( (mdate() - p_vout->p_sys->i_lastmoved) > 5000000 ) )
     {
         /* Hide the mouse automatically */
-        p_vout->p_sys->b_cursor_hidden = 1;
-        PostMessage( p_vout->p_sys->hwnd, WM_VLC_HIDE_MOUSE, 0, 0 );
+        if( p_vout->p_sys->hwnd != p_vout->p_sys->hparent )
+        {
+            p_vout->p_sys->b_cursor_hidden = VLC_TRUE;
+            PostMessage( p_vout->p_sys->hwnd, WM_VLC_HIDE_MOUSE, 0, 0 );
+        }
     }
 
     /* Check if the event thread is still running */
     if( p_vout->p_sys->p_event->b_die )
-        return 1; /* exit */
+    {
+        return VLC_EGENERIC; /* exit */
+    }
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -466,11 +487,11 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
         ddbltfx.dwDDFX = DDBLTFX_NOTEARING;
 
         /* Blit video surface to display */
-        dxresult = IDirectDrawSurface2_Blt(p_vout->p_sys->p_display,
-                                           &p_vout->p_sys->rect_dest_clipped,
-                                           p_pic->p_sys->p_surface,
-                                           &p_vout->p_sys->rect_src_clipped,
-                                           DDBLT_ASYNC, &ddbltfx );
+        dxresult = IDirectDrawSurface2_Blt( p_vout->p_sys->p_display,
+                                            &p_vout->p_sys->rect_dest_clipped,
+                                            p_pic->p_sys->p_surface,
+                                            &p_vout->p_sys->rect_src_clipped,
+                                            DDBLT_ASYNC, &ddbltfx );
         if ( dxresult == DDERR_SURFACELOST )
         {
             /* Our surface can be lost so be sure
@@ -478,7 +499,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
             IDirectDrawSurface2_Restore( p_vout->p_sys->p_display );
 
             /* Now that the surface has been restored try to display again */
-            dxresult = IDirectDrawSurface2_Blt(p_vout->p_sys->p_display,
+            dxresult = IDirectDrawSurface2_Blt( p_vout->p_sys->p_display,
                                            &p_vout->p_sys->rect_dest_clipped,
                                            p_pic->p_sys->p_surface,
                                            &p_vout->p_sys->rect_src_clipped,
@@ -487,17 +508,18 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( dxresult != DD_OK )
         {
-            msg_Warn( p_vout, "could not Blit the surface" );
+            msg_Warn( p_vout, "could not blit surface (error %i)", dxresult );
             return;
         }
 
     }
     else /* using overlay */
     {
-
         /* Flip the overlay buffers if we are using back buffers */
         if( p_pic->p_sys->p_front_surface == p_pic->p_sys->p_surface )
+        {
             return;
+        }
 
         dxresult = IDirectDrawSurface2_Flip( p_pic->p_sys->p_front_surface,
                                              NULL, DDFLIP_WAIT );
@@ -515,16 +537,18 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
         }
 
         if( dxresult != DD_OK )
-            msg_Warn( p_vout, "could not flip overlay surface" );
+        {
+            msg_Warn( p_vout, "could not flip overlay (error %i)", dxresult );
+        }
 
-        if( !DirectXGetSurfaceDesc( p_pic ) )
+        if( DirectXGetSurfaceDesc( p_pic ) )
         {
             /* AAARRGG */
             msg_Err( p_vout, "cannot get surface desc" );
             return;
         }
 
-        if( !UpdatePictureStruct( p_vout, p_pic, p_vout->output.i_chroma ) )
+        if( UpdatePictureStruct( p_vout, p_pic, p_vout->output.i_chroma ) )
         {
             /* AAARRGG */
             msg_Err( p_vout, "invalid pic chroma" );
@@ -534,7 +558,6 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
         /* set currently displayed pic */
         p_vout->p_sys->p_current_surface = p_pic->p_sys->p_front_surface;
     }
-
 }
 
 
@@ -602,7 +625,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
     DirectXGetDDrawCaps( p_vout );
 
     msg_Dbg( p_vout, "End DirectXInitDDraw" );
-    return 0;
+    return VLC_SUCCESS;
 
  error:
     if( p_vout->p_sys->p_ddobject )
@@ -611,7 +634,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
         FreeLibrary( p_vout->p_sys->hddraw_dll );
     p_vout->p_sys->hddraw_dll = NULL;
     p_vout->p_sys->p_ddobject = NULL;
-    return 1;
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -641,8 +664,8 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
                                            &p_display, NULL );
     if( dxresult != DD_OK )
     {
-        msg_Err( p_vout, "cannot get direct draw primary surface" );
-        return 1;
+        msg_Err( p_vout, "cannot get primary surface (error %i)", dxresult );
+        return VLC_EGENERIC;
     }
 
     dxresult = IDirectDrawSurface_QueryInterface( p_display,
@@ -652,8 +675,9 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     IDirectDrawSurface_Release( p_display );
     if ( dxresult != DD_OK )
     {
-        msg_Err( p_vout, "cannot get IDirectDrawSurface2 interface" );
-        return 1;
+        msg_Err( p_vout, "cannot query IDirectDrawSurface2 interface "
+                         "(error %i)", dxresult );
+        return VLC_EGENERIC;
     }
 
     /* The clipper will be used only in non-overlay mode */
@@ -667,13 +691,16 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     dxresult = IDirectDrawSurface2_GetPixelFormat( p_vout->p_sys->p_display,
                                                    &pixel_format );
     if( dxresult != DD_OK )
-        msg_Warn( p_vout, "DirectXUpdateOverlay GetPixelFormat failed" );
+    {
+        msg_Warn( p_vout, "DirectXUpdateOverlay GetPixelFormat failed "
+                          "(error %i)", dxresult );
+    }
     p_vout->p_sys->i_colorkey = (DWORD)((( p_vout->p_sys->i_rgb_colorkey
                                            * pixel_format.dwRBitMask) / 255)
-                                        & pixel_format.dwRBitMask);
+                                        & pixel_format.dwRBitMask );
 #endif
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 
@@ -696,17 +723,17 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
                                            &p_vout->p_sys->p_clipper, NULL );
     if( dxresult != DD_OK )
     {
-        msg_Warn( p_vout, "DirectXCreateClipper cannot create clipper" );
+        msg_Warn( p_vout, "cannot create clipper (error %i)", dxresult );
         goto error;
     }
 
-    /* associate the clipper to the window */
+    /* Associate the clipper to the window */
     dxresult = IDirectDrawClipper_SetHWnd(p_vout->p_sys->p_clipper, 0,
                                           p_vout->p_sys->hwnd);
     if( dxresult != DD_OK )
     {
-        msg_Warn( p_vout,
-                  "DirectXCreateClipper cannot attach clipper to window" );
+        msg_Warn( p_vout, "cannot attach clipper to window (error %i)",
+                          dxresult );
         goto error;
     }
 
@@ -715,19 +742,20 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
                                              p_vout->p_sys->p_clipper);
     if( dxresult != DD_OK )
     {
-        msg_Warn( p_vout,
-                  "DirectXCreateClipper cannot attach clipper to surface" );
+        msg_Warn( p_vout, "cannot attach clipper to surface (error %i)",
+                          dxresult );
         goto error;
     }    
 
-    return 0;
+    return VLC_SUCCESS;
 
  error:
     if( p_vout->p_sys->p_clipper )
+    {
         IDirectDrawClipper_Release( p_vout->p_sys->p_clipper );
+    }
     p_vout->p_sys->p_clipper = NULL;
-    return 1;
-
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -784,7 +812,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
         if( dxresult != DD_OK )
         {
             *pp_surface_final = NULL;
-            return 0;
+            return VLC_EGENERIC;
         }
     }
 
@@ -825,7 +853,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
         if( dxresult != DD_OK )
         {
             *pp_surface_final = NULL;
-            return 0;
+            return VLC_EGENERIC;
         }
     }
 
@@ -836,12 +864,13 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
     IDirectDrawSurface_Release( p_surface );    /* Release the old interface */
     if ( dxresult != DD_OK )
     {
-        msg_Err( p_vout, "cannot get IDirectDrawSurface2 interface" );
+        msg_Err( p_vout, "cannot query IDirectDrawSurface2 interface "
+                         "(error %i)", dxresult );
         *pp_surface_final = NULL;
-        return 0;
+        return VLC_EGENERIC;
     }
 
-    return 1;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -958,7 +987,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                           int i_num_pics )
 {
     int i;
-    vlc_bool_t b_result_ok;
+    int i_ret = VLC_SUCCESS;
     LPDIRECTDRAWSURFACE2 p_surface;
 
     msg_Dbg( p_vout, "NewPictureVec" );
@@ -977,19 +1006,21 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
          * (you don't have to wait for the vsync) and provides for a very nice
          * video quality (no tearing). */
 
-        b_result_ok = DirectXCreateSurface( p_vout, &p_surface,
-                                            p_vout->output.i_chroma,
-                                            p_vout->p_sys->b_using_overlay,
-                                            2 /* number of backbuffers */ );
+        i_ret = DirectXCreateSurface( p_vout, &p_surface,
+                                      p_vout->output.i_chroma,
+                                      p_vout->p_sys->b_using_overlay,
+                                      2 /* number of backbuffers */ );
 
-        if( !b_result_ok )
+        if( i_ret != VLC_SUCCESS )
+        {
             /* Try to reduce the number of backbuffers */
-            b_result_ok = DirectXCreateSurface( p_vout, &p_surface,
-                                                p_vout->output.i_chroma,
-                                                p_vout->p_sys->b_using_overlay,
-                                                0 /* number of backbuffers */);
+            i_ret = DirectXCreateSurface( p_vout, &p_surface,
+                                          p_vout->output.i_chroma,
+                                          p_vout->p_sys->b_using_overlay,
+                                          0 /* number of backbuffers */ );
+        }
 
-        if( b_result_ok )
+        if( i_ret == VLC_SUCCESS )
         {
             DDSCAPS dds_caps;
             picture_t front_pic;
@@ -1001,7 +1032,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             if( p_pic[0].p_sys == NULL )
             {
                 DirectXCloseSurface( p_vout, p_surface );
-                return -1;
+                return VLC_ENOMEM;
             }
 
             /* set front buffer */
@@ -1023,10 +1054,10 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             p_vout->p_sys->p_current_surface = front_pic.p_sys->p_surface =
                 p_pic[0].p_sys->p_front_surface;
 
-            /* reset the front buffer memory */
-            if( DirectXGetSurfaceDesc( &front_pic ) &&
-                UpdatePictureStruct( p_vout, &front_pic,
-                                     p_vout->output.i_chroma ) )
+            /* Reset the front buffer memory */
+            if( !DirectXGetSurfaceDesc( &front_pic ) &&
+                !UpdatePictureStruct( p_vout, &front_pic,
+                                      p_vout->output.i_chroma ) )
             {
                 int i,j;
                 for( i = 0; i < front_pic.i_planes; i++ )
@@ -1050,14 +1081,15 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
      * want to display it */
     if( !p_vout->p_sys->b_using_overlay )
     {
-
         if( p_vout->p_sys->b_hw_yuv )
-            b_result_ok = DirectXCreateSurface( p_vout, &p_surface,
-                                                p_vout->output.i_chroma,
-                                                p_vout->p_sys->b_using_overlay,
-                                                0 /* no back buffers */ );
+        {
+            i_ret = DirectXCreateSurface( p_vout, &p_surface,
+                                          p_vout->output.i_chroma,
+                                          p_vout->p_sys->b_using_overlay,
+                                          0 /* no back buffers */ );
+        }
 
-        if( !p_vout->p_sys->b_hw_yuv || !b_result_ok )
+        if( i_ret || !p_vout->p_sys->b_hw_yuv )
         {
             /* Our last choice is to use a plain RGB surface */
             DDPIXELFORMAT ddpfPixelFormat;
@@ -1087,7 +1119,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                     break;
                 default:
                     msg_Err( p_vout, "unknown screen depth" );
-                    return 0;
+                    return VLC_EGENERIC;
                 }
                 p_vout->output.i_rmask = ddpfPixelFormat.dwRBitMask;
                 p_vout->output.i_gmask = ddpfPixelFormat.dwGBitMask;
@@ -1096,20 +1128,20 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 
             p_vout->p_sys->b_hw_yuv = 0;
 
-            b_result_ok = DirectXCreateSurface( p_vout, &p_surface,
-                                                p_vout->output.i_chroma,
-                                                p_vout->p_sys->b_using_overlay,
-                                                0 /* no back buffers */ );
+            i_ret = DirectXCreateSurface( p_vout, &p_surface,
+                                          p_vout->output.i_chroma,
+                                          p_vout->p_sys->b_using_overlay,
+                                          0 /* no back buffers */ );
         }
 
-        if( b_result_ok )
+        if( i_ret == VLC_SUCCESS )
         {
             /* Allocate internal structure */
             p_pic[0].p_sys = malloc( sizeof( picture_sys_t ) );
             if( p_pic[0].p_sys == NULL )
             {
                 DirectXCloseSurface( p_vout, p_surface );
-                return -1;
+                return VLC_ENOMEM;
             }
             p_pic[0].p_sys->p_surface = p_pic[0].p_sys->p_front_surface
                 = p_surface;
@@ -1129,28 +1161,27 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         p_pic[i].i_type   = DIRECT_PICTURE;
         PP_OUTPUTPICTURE[i] = &p_pic[i];
 
-        if( !DirectXGetSurfaceDesc( &p_pic[i] ) )
+        if( DirectXGetSurfaceDesc( &p_pic[i] ) )
         {
             /* AAARRGG */
             FreePictureVec( p_vout, p_pic, I_OUTPUTPICTURES );
             I_OUTPUTPICTURES = 0;
-            return -1;
+            return VLC_EGENERIC;
         }
 
-        if( !UpdatePictureStruct(p_vout, &p_pic[i], p_vout->output.i_chroma) )
+        if( UpdatePictureStruct(p_vout, &p_pic[i], p_vout->output.i_chroma) )
         {
-
             /* Unknown chroma, tell the guy to get lost */
             msg_Err( p_vout, "never heard of chroma 0x%.8x (%4.4s)",
                      p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma );
             FreePictureVec( p_vout, p_pic, I_OUTPUTPICTURES );
             I_OUTPUTPICTURES = 0;
-            return -1;
+            return VLC_EGENERIC;
         }
     }
 
     msg_Dbg( p_vout, "End NewPictureVec");
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -1182,7 +1213,6 @@ static void FreePictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
                                 int i_chroma )
 {
-
     switch( p_vout->output.i_chroma )
     {
         case VLC_FOURCC('R','G','B','2'):
@@ -1207,7 +1237,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
                     p_pic->p->i_pixel_pitch = 4;
                     break;
                 default:
-                    return -1;
+                    return VLC_EGENERIC;
             }
             p_pic->p->i_visible_pitch = p_vout->output.i_width *
               p_pic->p->i_pixel_pitch;
@@ -1284,11 +1314,10 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
 
         default:
             /* Not supported */
-            return 0;
-
+            return VLC_EGENERIC;
     }
 
-    return 1;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -1374,11 +1403,11 @@ static int DirectXGetSurfaceDesc( picture_t *p_pic )
     if( dxresult != DD_OK )
     {
 //X        msg_Err( p_vout, "DirectXGetSurfaceDesc cannot lock surface" );
-        return 0;
+        return VLC_EGENERIC;
     }
 
     /* Unlock the Surface */
     dxresult = IDirectDrawSurface2_Unlock( p_pic->p_sys->p_surface, NULL );
 
-    return 1;
+    return VLC_SUCCESS;
 }
