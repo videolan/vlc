@@ -1,6 +1,8 @@
+%define mozver 1.2,1
+
 Summary: The VideoLAN client, also a very good standalone video player.
 Name: vlc
-Version: 0.5.3
+Version: 0.6.3
 Release: 1
 Group: Applications/Multimedia
 License: GPL
@@ -8,7 +10,7 @@ URL: http://www.videolan.org/
 Source: http://www.videolan.org/pub/videolan/vlc/vlc-%{version}.tar.bz2
 Buildroot: %{_tmppath}/%{name}-root
 Packager: Jason Luka <jason@geshp.com>
-Buildrequires: XFree86-devel, desktop-file-utils
+Buildrequires: XFree86-devel, desktop-file-utils, libpostproc
 %{!?_without_dvd:Buildrequires: libdvdcss-devel}
 %{!?_without_dvdread:Buildrequires: libdvdread-devel}
 %{!?_without_dvdplay:Buildrequires: libdvdplay-devel}
@@ -18,7 +20,7 @@ Buildrequires: XFree86-devel, desktop-file-utils
 %{!?_without_ffmpeg:Buildrequires: ffmpeg-devel}
 %{!?_without_xvid:Buildrequires: xvidcore-devel}
 %{!?_without_a52:Buildrequires: a52dec-devel}
-%{?_with_dv:Buildrequires: libdv-devel}
+%{!?_without_dv:Buildrequires: libdv-devel}
 %{!?_without_flac:Buildrequires: flac-devel}
 %{!?_without_vorbis:Buildrequires: libvorbis-devel}
 %{!?_without_sdl:Buildrequires: SDL-devel}
@@ -29,24 +31,28 @@ Buildrequires: XFree86-devel, desktop-file-utils
 %{!?_without_gtk:Buildrequires: gtk+-devel}
 %{!?_without_gnome:Buildrequires: gnome-libs-devel}
 %{!?_without_lirc:Buildrequires: lirc}
-%{?_with_qt:Buildrequires: qt-devel}
-%{?_with_kde:Buildrequires: kdelibs-devel}
-%{?_with_ncurses:Buildrequires: ncurses-devel >= 5}
+%{!?_without_qt:Buildrequires: qt-devel}
+%{!?_without_kde:Buildrequires: kdelibs-devel}
+%{!?_without_ncurses:Buildrequires: ncurses-devel >= 5}
 %{!?_without_xosd:Buildrequires: xosd-devel}
-%{!?_without_lirc:Requires: lirc}
-%{?_with_mozilla:Requires: mozilla-devel}
+%{!?_without_mozilla:BuildRequires: mozilla-devel}
+%{!?_without_id3tag:BuildRequires: libid3tag-devel}
+%{!?_without_mpeg2dec:BuildRequires: mpeg2dec-devel >= 0.3.2}
+%{?_with_wxwindows:BuildRequires: wxGTK-devel >= 2.4.1}
+%{!?_without_mozilla:BuildRequires: mozilla-devel = %{mozver}}
+Obsoletes: videolan-client
 
 Requires: XFree86, desktop-file-utils
 %{!?_without_dvd:Requires: libdvdcss}
 %{!?_without_dvdread:Requires: libdvdread}
 %{!?_without_dvdplay:Requires: libdvdplay}
-#%%{!?_without_dvbpsi:Requires: libdvbpsi}
+%{!?_without_dvbpsi:Requires: libdvbpsi}
 #%%{!?_without_ogg:Requires: libogg}
 %{!?_without_mad:Requires: libmad}
 %{!?_without_ffmpeg:Requires: ffmpeg}
 #%%{!?_without_xvid:Requires: xvidcore}
 %{!?_without_a52:Requires: a52dec}
-#%%{?_with_dv:Requires: libdv}
+#%%{!?_without_dv:Requires: libdv}
 #%%{!?_without_flac:Requires: flac}
 #%%{!?_without_vorbis:Requires: libvorbis}
 #%%{!?_without_sdl:Requires: SDL}
@@ -61,7 +67,7 @@ Requires: XFree86, desktop-file-utils
 #%%{?_with_ncurses:Requires: ncurses}
 #%%{!?_without_xosd:Requires: xosd}
 #%%{!?_without_lirc:Requires: lirc}
-#%%{?_with_mozilla:Requires: mozilla}
+%{?_with_mozilla:Requires: mozilla = %{mozver}}
 
 %description
 VideoLAN Client (VLC) is a highly portable multimedia player for various
@@ -69,12 +75,15 @@ audio and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, ogg, ...) as
 well as DVDs, VCDs, and various streaming protocols.
 
 Available rpmbuild rebuild options :
---with dv mga qt kde ncurses
---without dvd dvdread dvdplay dvbpsi v4l avi asf aac ogg rawdv mad ffmpeg xvid
-          mp4 a52 vorbis flac aa esd arts alsa gtk gnome xosd lsp lirc pth
+--without dvd dvdread dvdplay dvbpsi dv v4l avi asf aac ogg rawdv mad ffmpeg xvid
+          mp4 a52 vorbis mpeg2dec flac aa esd arts gtk gnome xosd lsp lirc
+          pth id3tag dv qt kde ncurses faad
 
 Options that would need not yet existing add-on packages :
---with faad tremor tarkin theora svgalib ggi glide wxwindows
+--with tremor tarkin theora ggi glide svgalib mga
+
+Options removed for better Red Hat compatibility
+--with alsa wxwindows
 
 
 %package devel
@@ -95,6 +104,13 @@ to link statically to it.
 %setup -q -n vlc-%{version}
 
 %build
+cp %{_libdir}/mozilla/plugins/plugger.so %{_libdir}/mozilla-%{mozver}/plugins/plugger.so.bak -f
+mv %{_libdir}/mozilla-%{mozver}/plugins/plugger.so.bak %{_libdir}/mozilla-%{mozver}/plugins/plugger.so -f
+rm %{_libdir}/mozilla -fr
+ln %{_libdir}/mozilla-%{mozver} %{_libdir}/mozilla -sf
+ln /usr/share/idl/mozilla-%{mozver} /usr/share/idl/mozilla -sf
+ln %{_libdir}/libxvidcore.so.2 %{_libdir}/libxvidcore.so -sf
+
 %configure \
 	--enable-release \
 	%{?_without_dvd:--disable-dvd} \
@@ -110,17 +126,18 @@ to link statically to it.
 	%{?_without_rawdv:--disable-rawdv} \
 	%{!?_without_mad:--enable-mad} \
 	%{!?_without_ffmpeg:--enable-ffmpeg --with-ffmpeg=%{_prefix}} \
-	%{?_with_faad:--enable-faad} \
+	%{!?_without_faad:--enable-faad} \
 	%{!?_without_xvid:--enable-xvid} \
 	%{?_without_mp4:--disable-mp4} \
 	%{?_without_a52:--disable-a52} \
 	%{?_without_cinepak:--disable-cinepak} \
-	%{?_with_dv:--enable-dv} \
+	%{!?_without_dv:--enable-dv} \
 	%{!?_without_flac:--enable-flac} \
+	%{?_without_mpeg2dec:--disable-libmpeg2} \
 	%{?_without_vorbis:--disable-vorbis} \
 	%{?_with_tremor:--enable-tremor} \
 	%{?_with_tarkin:--enable-tarkin} \
-	%{?_with_theora:--enable-theora} \
+	%{!?_without_theora:--enable-theora} \
 	--enable-x11 \
 	--enable-xvideo \
 	%{?_without_sdl:--disable-sdl} \
@@ -136,25 +153,25 @@ to link statically to it.
 	--enable-oss \
 	%{!?_without_esd:--enable-esd} \
 	%{!?_without_arts:--enable-arts} \
-	%{!?_without_alsa:--enable-alsa} \
+	%{?_with_alsa:--enable-alsa} \
 	--disable-waveout \
 	%{!?_without_gtk:--enable-gtk} \
 	--disable-familiar \
 	%{!?_without_gnome:--enable-gnome} \
 	%{!?_with_wxwindows:--disable-wxwindows} \
-	%{?_with_qt:--enable-qt} \
-	%{?_with_kde:--enable-kde} \
+	%{!?_without_qt:--enable-qt} \
+	%{!?_without_kde:--enable-kde} \
 	--disable-opie \
 	--disable-macosx \
 	--disable-qnx \
 	--disable-intfwin \
-	%{?_with_ncurses:--enable-ncurses} \
+	%{!?_without_ncurses:--enable-ncurses} \
 	%{!?_without_xosd:--enable-xosd} \
 	%{?_without_slp:--disable-slp} \
 	%{!?_without_lirc:--enable-lirc} \
 	%{!?_without_pth:--enable-pth} \
 	--disable-st \
-	%{?_with_mozilla:--enable-mozilla} \
+	%{!?_without_mozilla:--enable-mozilla} \
 	--disable-testsuite \
 	--enable-plugins
 make %{?_smp_mflags}
@@ -167,7 +184,7 @@ find  %{buildroot}%{_libdir}/vlc -name "*.so" | xargs strip
 
 cat > %{name}.desktop << EOF
 [Desktop Entry]
-Name=VideoLAN Client
+Name=VideoLAN Media Player
 Comment=%{summary}
 Icon=%{_datadir}/vlc/vlc48x48.png
 Exec=vlc
@@ -175,22 +192,32 @@ Terminal=0
 Type=Application
 EOF
 
+mv %{buildroot}%{_libdir}/mozilla %{buildroot}%{_libdir}/mozilla-%{mozver} -f
+
 mkdir -p %{buildroot}%{_datadir}/applications
-desktop-file-install --vendor %{desktop_vendor} --delete-original \
+desktop-file-install --vendor gnome --delete-original             \
   --dir %{buildroot}%{_datadir}/applications                      \
-  --add-category X-Red-Hat-Extra                                  \
+  --add-category X-Red-Hat-Base                                   \
   --add-category Application                                      \
   --add-category AudioVideo                                       \
   %{name}.desktop
 
 %post
 ln /dev/cdrom /dev/dvd -sf
+ln %{_libdir}/libxvidcore.so.2 %{_libdir}/libxvidcore.so -sf
 
 %postun
 rm -f /dev/dvd
+rm /usr/share/idl/mozilla -fr
+rm %{_libdir}/libxvidcore.so -f
 
 %clean
 rm -rf %{buildroot}
+rm /usr/share/idl/mozilla -fr
+rm /usr/lib/mozilla -fr
+mkdir /usr/lib/mozilla/plugins -p --mode=755
+mv %{_libdir}/mozilla-%{mozver}/plugins/plugger.so %{_libdir}/mozilla/plugins -f
+rm %{_libdir}/libxvidcore.so -f
 
 %files -f vlc.lang
 %defattr(-, root, root)
@@ -198,7 +225,10 @@ rm -rf %{buildroot}
 %doc doc/fortunes.txt doc/web-streaming.html
 %{_bindir}/*vlc
 %{_libdir}/vlc
-%{_datadir}/applications/%{desktop_vendor}-%{name}.desktop
+%{_libdir}/libvlc_pic.a
+%{_libdir}/mozilla-%{mozver}/components/vlcintf.xpt
+%{_libdir}/mozilla-%{mozver}/plugins/libvlcplugin.so
+%{_datadir}/applications/gnome-%{name}.desktop
 %{_datadir}/vlc
 
 %files devel
@@ -209,8 +239,34 @@ rm -rf %{buildroot}
 %{_libdir}/libvlc.a
 
 %changelog
-* Mon Apr 7 2003 Jason Luka <jason@geshp.com>
-- Update to 0.5.3
+* Thu Sep 20 2003 Jason Luka
+- Removed wxinterface because it's redundant
+- Removed alsa support because it's not needed in Red Hat
+
+* Mon Aug 25 2003 Jason Luka
+- Added matroska support
+- Corrected some symlinking problems with the mozilla plugin
+
+* Fri Aug 22 2003 Jason Luka <jason@geshp.com>
+- Update to 0.6.2
+- Changed menu item name to VideoLAN Media Player
+- Added openslp support
+- Added libtar support (needed for skins)
+- Added symlink to libxvidcore.so, thanks to new version of that software
+
+* Fri Aug 1 2003 Jason Luka <jason@geshp.com>
+- Update to 0.6.1
+- Fixed file structure problems I created to accomodate the mozilla plugin
+- Changed vendor name for desktop install
+- Moved vlc to base menu
+- Moved plugins from /usr/lib/mozilla to /usr/lib/mozilla-x.x.x
+- Added custom patch to accomodate mozilla plugin
+- Added execution of bootstrap since Makefile.am was altered
+
+* Tue Jul 8 2003 Jason Luka <jason@geshp.com>
+- Update to 0.6.0
+- Add id3lib, dv, faad, qt, kde, and mozilla plugin support
+- Added script to symlink mozilla-1.2.1 directories to mozilla so build can complete
 
 * Sat Apr 5 2003 Jason Luka <jason@geshp.com>
 - Rebuilt for Red Hat 9
