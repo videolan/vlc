@@ -39,11 +39,11 @@ build-stamp:
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
-	(cd extras/ffmpeg && ./configure && make)
+	if test "$(PRESERVE_EXTRAS)" != "1"; then cd extras/ffmpeg && ./configure && make; fi
 
 	# Check that we have an faad tree in here (can be a symlink)
 	test -d extras/faad
-	(cd extras/faad && ./configure && cd libfaad && make)
+	if test "$(PRESERVE_EXTRAS)" != "1"; then cd extras/faad && ./configure && cd libfaad && make; fi
 
 	./configure --mandir=$${prefix}/share/man \
 		--infodir=$${prefix}/share/info $(CONFIG_FLAGS)
@@ -59,10 +59,10 @@ clean:
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
-	-(cd extras/ffmpeg && make distclean)
+	-if test "$(PRESERVE_EXTRAS)" != "1"; then cd extras/ffmpeg && make distclean; fi
 	# Check that we have an faad tree in here (can be a symlink)
 	test -d extras/faad
-	-(cd extras/faad && make distclean)
+	-if test "$(PRESERVE_EXTRAS)" != "1"; then cd extras/faad && make distclean; fi
 
 	-$(MAKE) distclean
 
