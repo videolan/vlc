@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.35 2003/05/15 22:27:36 massiot Exp $
+ * $Id: http.c,v 1.36 2003/06/02 16:01:21 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -374,6 +374,10 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
         p_input->stream.p_selected_area->i_tell = i_tell;
     }
     else
+    {
+        p_input->stream.b_seekable = VLC_FALSE;
+    }
+    if( i_code != 206 )
     {
         p_input->stream.b_seekable = VLC_FALSE;
     }
