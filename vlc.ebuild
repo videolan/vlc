@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.7 2003/06/21 17:04:20 sam Exp $
+# $Id: vlc.ebuild,v 1.8 2003/06/22 15:03:33 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -24,7 +24,7 @@ IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggv
 
 # Change these to correspond with the
 # unpacked dirnames of the CVS snapshots.
-PFFMPEG=ffmpeg-20030612
+PFFMPEG=ffmpeg-20030622
 PLIBMPEG2=mpeg2dec-20030612
 
 S=${WORKDIR}/${P}
@@ -34,9 +34,9 @@ SLIBMPEG2=${WORKDIR}/${PLIBMPEG2}
 DESCRIPTION="VLC media player - A videoplayer that plays DVD,
              VCD, files and networkstreams o.a."
 
-SRC_URI="http://www.videolan.org/pub/videolan/${PN}/${PV}/${P}.tar.bz2
-		 http://www.videolan.org/pub/testing/contrib/mpeg2dec-20030612.tar.bz2
-		 http://www.videolan.org/pub/testing/contrib/ffmpeg-20030612.tar.bz2"
+SRC_URI="http://www.videolan.org/pub/${PN}/${PV}/${P}.tar.bz2
+		 http://www.videolan.org/pub/${PN}/${PV}/contrib/mpeg2dec-20030612.tar.bz2
+		 http://www.videolan.org/pub/${PN}/${PV}/contrib/ffmpeg-20030612.tar.bz2"
 
 HOMEPAGE="http://www.videolan.org/vlc"
 

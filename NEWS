@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.51 2003/06/21 17:26:16 sigmunau Exp $
+$Id: NEWS,v 1.52 2003/06/22 15:03:33 hartman Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
@@ -7,11 +7,11 @@ Core Support:
  * Channel Server support was removed (was deprecated)
 
 Input access:
- * fixed a big bug in ftp and http access that prevented many platforms (OSX most prominently) to view ftp and http streams.
- * fixed large file support on Windows
+ * Fixed a big bug in ftp and http access that prevented many platforms (OSX most prominently) to view ftp and http streams.
+ * Fixed large file support on Windows
  * Video 4 Linux support
  * CD Digital Audio support
- * Fixed an ipv6 link-local multicasting bug affecting all platforms but GNU/Linux
+ * Fixed IPv6 multicasting on Windows and OSX.
 
 Input demux:
  * Better detection of AAC and mp3 files
@@ -25,6 +25,7 @@ Codecs:
  * Fixed a bug which was causing artefacts in DivX video (ffmpeg)
  * Updated our theora decoder to use the alpha 2 release of libtheora
  * If ffmpeg cannot keep up, skip and try to recover instead of stopping altogether
+ * Indeo Video 3 (IV32) support for little-endian computers. (so not for OSX)
 
 Interfaces:
  * The wxWindows interface is now fully useable as well as Unicode safe
@@ -40,12 +41,13 @@ Miscellaneous:
  * New reset option for the preferences
  * You can set your language in the prefences
  * New video chroma conversion module using ffmpeg
- * Added a Gentoo ebuild file to the distribution
+ * Added a Gentoo ebuild to the distribution
  * Added a new smaller subtitles font (now the default) + scripts to generate your own
 
 UNIX ports:
  * Basic support for the X11 Xinerama extension.
- * New skinnable interface ported to X11.
+ * New skinable interface ported to X11.
+ * Run opie-vlc and zaurus-vlc as GuiServer
 
 Mac OS X port:
  * When you add several items to the playlist, they are sorted alphabetically.
