@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.83 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: input_ext-intf.h,v 1.84 2003/01/16 23:25:54 lool Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -352,6 +352,7 @@ struct input_thread_t
 #define INPUT_METHOD_VLAN_BCAST  0x34            /* UDP broadcast with VLANs */
 #define INPUT_METHOD_SATELLITE   0x40               /* stream is read from a */
                                                            /* satellite card */
+#define INPUT_METHOD_SLP         0x50                          /* SLP stream */
 
 /* Status changing methods */
 #define INPUT_STATUS_END            0

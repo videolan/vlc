@@ -2499,14 +2499,14 @@ dnl
 dnl  SLP access plugin
 dnl
 AC_ARG_ENABLE(slp,
-  [  --enable-slp            SLP service discovery support (default disabled)])
-if test "x${enable_slp}" = "xyes"
+  [  --enable-slp            SLP service discovery support (default enabled)])
+if test "x${enable_slp}" != "xno"
 then
   AC_CHECK_HEADER(slp.h, have_slp="true", have_slp="false")
   if test "x${have_slp}" = "xtrue"
   then
-    PLUGINS="${PLUGINS} access_slp"
-    LDFLAGS_access_slp="${LDFLAGS_access_slp} -lslp"
+    PLUGINS="${PLUGINS} slp"
+    LDFLAGS_slp="${LDFLAGS_slp} -lslp"
   fi
 fi
 

@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.2 2003/01/10 06:16:55 lool Exp $
+ * $Id: slp.c,v 1.3 2003/01/16 23:25:55 lool Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -27,13 +27,20 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#include <vlc_playlist.h>
+
 #include <slp.h>
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Open       ( vlc_object_t * );
-static void Close      ( vlc_object_t * );
+static int  Open  ( vlc_object_t * );
+static void Close ( vlc_object_t * );
+static ssize_t Read  ( input_thread_t *, byte_t *, size_t );
+
+static int  Init  ( vlc_object_t * );
+static void End   ( vlc_object_t * );
+static int  Demux ( input_thread_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -59,15 +66,19 @@ static void Close      ( vlc_object_t * );
 vlc_module_begin();
     set_description( _("SLP access module") );
     add_category_hint( N_("slp"), NULL );
-    set_capability( "access", 0 );
-    add_shortcut( "slp" );
     add_string( "slp-srvtype", "service:vls.services.videolan.org:udpm",
                 NULL, SRVTYPE_TEXT, SRVTYPE_LONGTEXT );
     add_string( "slp-scopelist", "", NULL, SCOPELIST_TEXT,
                 SCOPELIST_LONGTEXT );
     add_string( "slp-filter", "", NULL, FILTER_TEXT, FILTER_LONGTEXT );
     add_string( "slp-lang", "", NULL, LANG_TEXT, LANG_LONGTEXT );
-    set_callbacks( Open, Close );
+    add_submodule();
+        set_capability( "access", 0 );
+        set_callbacks( Open, Close );
+    add_submodule();
+        add_shortcut( "demux_slp" );
+        set_capability( "demux", 0 );
+        set_callbacks( Init, End );
 vlc_module_end();
 
 /*****************************************************************************
@@ -123,7 +134,7 @@ static SLPBoolean SrvUrlCallback( SLPHandle hslp,
 }
 
 /*****************************************************************************
- * Open: initialize library
+ * Open: initialize library for the access module
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
@@ -131,6 +142,19 @@ static int Open( vlc_object_t * p_this )
     char *           psz_name = strdup(p_input->psz_name);
     SLPError         slpe_result;
     SLPHandle        slph_slp;
+    playlist_t *     p_playlist;
+
+    /* remove the "slp:" entry of the playlist */
+    p_playlist = (playlist_t *) vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+                                                 FIND_ANYWHERE );
+    if( !p_playlist )
+    {
+        msg_Err( p_input, "can't find playlist" );
+        return -1;
+    }
+
+    p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
+    vlc_object_release( (vlc_object_t *)p_playlist );
 
     /* get a new handle to the library */
     if( SLPOpen( config_GetPsz( p_input, "slp-lang" ),
@@ -155,14 +179,77 @@ static int Open( vlc_object_t * p_this )
         SLPClose( slph_slp );
     }
 
-    return( -1 );
+    if( !p_input->psz_demux || !*p_input->psz_demux )
+    {
+        p_input->psz_demux = "demux_slp";
+    }
+
+    p_input->pf_read = Read;
+    p_input->pf_set_program = NULL;
+    p_input->pf_set_area = NULL;
+    p_input->pf_seek = NULL;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.b_pace_control = VLC_FALSE;
+    p_input->stream.b_seekable = VLC_FALSE;
+    p_input->stream.b_connected = VLC_TRUE;
+    p_input->stream.p_selected_area->i_tell = 0;
+    p_input->stream.p_selected_area->i_size = 0;
+    p_input->stream.i_method = INPUT_METHOD_SLP;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    p_input->i_mtu = 0;
+
+    return 0;
 }
 
 /*****************************************************************************
- * Close: free unused data structures
+ * Close: close access
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
+    return;
+}
 
+/*****************************************************************************
+ * Read: should fill but zeroes the buffer
+ *****************************************************************************/
+static ssize_t Read  ( input_thread_t *p_input, byte_t *p_buffer, size_t s )
+{
+    memset( p_buffer, 0, s );
+    return s;
+}
+
+/*****************************************************************************
+ * Init: initialize demux
+ *****************************************************************************/
+int Init ( vlc_object_t *p_this )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+
+    if( p_input->stream.i_method != INPUT_METHOD_SLP )
+    {
+        return -1;
+    }
+
+    p_input->pf_demux  = Demux;
+    p_input->pf_rewind = NULL;
+
+    return 0;
+}
+
+/*****************************************************************************
+ * Demux: should demux but does nothing
+ *****************************************************************************/
+static int Demux ( input_thread_t * p_input )
+{
+    return 0;
+}
+
+/*****************************************************************************
+ * End: end demux
+ *****************************************************************************/
+static void End ( vlc_object_t *p_this )
+{
+    return;
 }
 
