@@ -2,7 +2,7 @@
  * preferences_widgets.h : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2003 VideoLAN
- * $Id: preferences_widgets.h,v 1.4 2003/11/05 00:39:16 gbazin Exp $
+ * $Id: preferences_widgets.h,v 1.5 2003/11/05 02:43:55 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -24,7 +24,7 @@
 class ConfigControl: public wxPanel
 {
 public:
-    ConfigControl( module_config_t *, wxWindow *parent );
+    ConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
     ~ConfigControl();
     wxSizer *Sizer();
 
@@ -39,6 +39,8 @@ public:
 protected:
     wxBoxSizer *sizer;
     wxStaticText *label;
+    vlc_object_t *p_this;
+    static int i_counter;
 
 private:
     wxString name;
@@ -52,7 +54,7 @@ ConfigControl *CreateConfigControl( vlc_object_t *,
 class KeyConfigControl: public ConfigControl
 {
 public:
-    KeyConfigControl( module_config_t *p_item, wxWindow *parent );
+    KeyConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
     ~KeyConfigControl();
     virtual int GetIntValue();
 private:
@@ -65,8 +67,7 @@ private:
 class ModuleConfigControl: public ConfigControl
 {
 public:
-    ModuleConfigControl( vlc_object_t *p_this, module_config_t *p_item,
-                         wxWindow *parent );
+    ModuleConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
     ~ModuleConfigControl();
     virtual wxString GetPszValue();
 private:
@@ -76,7 +77,7 @@ private:
 class StringConfigControl: public ConfigControl
 {
 public:
-    StringConfigControl( module_config_t *p_item, wxWindow *parent );
+    StringConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
     ~StringConfigControl();
     virtual wxString GetPszValue();
 private:
@@ -86,19 +87,28 @@ private:
 class StringListConfigControl: public ConfigControl
 {
 public:
-    StringListConfigControl( module_config_t *p_item, wxWindow *parent );
+    StringListConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
     ~StringListConfigControl();
     virtual wxString GetPszValue();
 private:
     wxComboBox *combo;
+
+    void OnRefresh( wxCommandEvent& );
+    char *psz_name;
+    vlc_object_t *p_this;
+    vlc_callback_t pf_list_update;
+
+    void UpdateCombo( module_config_t *p_item );
+
+    DECLARE_EVENT_TABLE()
 };
 
 class FileConfigControl: public ConfigControl
 {
 public:
-    FileConfigControl( module_config_t *p_item, wxWindow *parent );
+    FileConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
     ~FileConfigControl();
-    void FileConfigControl::OnBrowse( wxCommandEvent& );
+    void OnBrowse( wxCommandEvent& );
     virtual wxString GetPszValue();
 private:
     DECLARE_EVENT_TABLE()
@@ -110,7 +120,7 @@ private:
 class IntegerConfigControl: public ConfigControl
 {
 public:
-    IntegerConfigControl( module_config_t *p_item, wxWindow *parent );
+    IntegerConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
     ~IntegerConfigControl();
     virtual int GetIntValue();
 private:
@@ -120,17 +130,26 @@ private:
 class IntegerListConfigControl: public ConfigControl
 {
 public:
-    IntegerListConfigControl( module_config_t *p_item, wxWindow *parent );
+    IntegerListConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
     ~IntegerListConfigControl();
     virtual int GetIntValue();
 private:
     wxComboBox *combo;
+
+    void OnRefresh( wxCommandEvent& );
+    char *psz_name;
+    vlc_object_t *p_this;
+    vlc_callback_t pf_list_update;
+
+    void UpdateCombo( module_config_t *p_item );
+
+    DECLARE_EVENT_TABLE()
 };
 
 class RangedIntConfigControl: public ConfigControl
 {
 public:
-    RangedIntConfigControl( module_config_t *p_item, wxWindow *parent );
+    RangedIntConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
     ~RangedIntConfigControl();
     virtual int GetIntValue();
 private:
@@ -140,7 +159,7 @@ private:
 class FloatConfigControl: public ConfigControl
 {
 public:
-    FloatConfigControl( module_config_t *p_item, wxWindow *parent );
+    FloatConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
     ~FloatConfigControl();
     virtual float GetFloatValue();
 private:
@@ -150,7 +169,7 @@ private:
 class BoolConfigControl: public ConfigControl
 {
 public:
-    BoolConfigControl( module_config_t *p_item, wxWindow *parent );
+    BoolConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
     ~BoolConfigControl();
     virtual int GetIntValue();
 private:

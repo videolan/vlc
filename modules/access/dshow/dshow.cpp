@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.12 2003/11/03 20:22:21 gbazin Exp $
+ * $Id: dshow.cpp,v 1.13 2003/11/05 02:43:55 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -53,6 +53,8 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
                                      int, int, int, int, int, int );
 static bool ConnectFilters( IFilterGraph *, IBaseFilter *, IPin * );
 
+static int FindDevicesCallback( vlc_object_t *, char const *,
+                                vlc_value_t, vlc_value_t, void * );
 #if 0
     /* Debug only, use this to find out GUIDs */
     unsigned char p_st[];
@@ -61,8 +63,13 @@ static bool ConnectFilters( IFilterGraph *, IBaseFilter *, IPin * );
 #endif
 
 /*****************************************************************************
- * Module descriptior
+ * Module descriptor
  *****************************************************************************/
+static char *ppsz_vdev[] = { "", "none" };
+static char *ppsz_vdev_text[] = { N_("Default"), N_("None") };
+static char *ppsz_adev[] = { "", "none" };
+static char *ppsz_adev_text[] = { N_("Default"), N_("None") };
+
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for directshow streams. " \
@@ -92,9 +99,15 @@ vlc_module_begin();
     add_category_hint( N_("dshow"), NULL, VLC_TRUE );
     add_integer( "dshow-caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+
     add_string( "dshow-vdev", NULL, NULL, VDEV_TEXT, VDEV_LONGTEXT, VLC_FALSE);
+        change_string_list( ppsz_vdev, ppsz_vdev_text, FindDevicesCallback );
+
     add_string( "dshow-adev", NULL, NULL, ADEV_TEXT, ADEV_LONGTEXT, VLC_FALSE);
+        change_string_list( ppsz_adev, ppsz_adev_text, FindDevicesCallback );
+
     add_string( "dshow-size", NULL, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE);
+
     add_string( "dshow-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 VLC_TRUE );
     add_shortcut( "dshow" );
@@ -1336,4 +1349,63 @@ static int Demux( input_thread_t *p_input )
     }
 
     return 1;
+}
+
+/*****************************************************************************
+ * config variable callback
+ *****************************************************************************/
+static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
+                               vlc_value_t newval, vlc_value_t oldval, void * )
+{
+    module_t *p_module;
+    module_config_t *p_item;
+    vlc_bool_t b_audio = VLC_FALSE;
+    int i;
+
+    p_item = config_FindConfig( p_this, psz_name );
+    if( !p_item ) return VLC_SUCCESS;
+
+    if( !strcmp( psz_name, "dshow-adev" ) ) b_audio = VLC_TRUE;
+
+    /* Clear-up the current list */
+    if( p_item->i_list )
+    {
+        /* Keep the 2 first entries */
+        for( i = 2; i < p_item->i_list; i++ )
+        {
+            free( p_item->ppsz_list[i] );
+            free( p_item->ppsz_list_text[i] );
+        }
+        /* TODO: Remove when no more needed */
+        p_item->ppsz_list[i] = NULL;
+        p_item->ppsz_list_text[i] = NULL;
+    }
+    p_item->i_list = 2;
+
+    /* Find list of devices */
+    list<string> list_devices;
+
+    FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
+
+    if( !list_devices.size() ) return VLC_SUCCESS;
+
+    p_item->ppsz_list =
+        (char **)realloc( p_item->ppsz_list,
+                          (list_devices.size()+3) * sizeof(char *) );
+    p_item->ppsz_list_text =
+        (char **)realloc( p_item->ppsz_list_text,
+                          (list_devices.size()+3) * sizeof(char *) );
+
+    list<string>::iterator iter;
+    for( iter = list_devices.begin(), i = 2; iter != list_devices.end();
+         iter++, i++ )
+    {
+        p_item->ppsz_list[i] = strdup( iter->c_str() );
+        p_item->ppsz_list_text[i] = strdup( iter->c_str() );
+        p_item->i_list++;
+    }
+    p_item->ppsz_list[i] = NULL;
+    p_item->ppsz_list_text[i] = NULL;
+
+    return VLC_SUCCESS;
 }
