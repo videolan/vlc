@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.10 2003/03/24 17:15:29 gbazin Exp $
+ * $Id: ftp.c,v 1.11 2003/03/24 19:12:16 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -824,14 +824,17 @@ static ssize_t NetRead( input_thread_t *p_input,
     FD_SET( p_socket->i_handle, &fds );
 
     /* We'll wait 1 second if nothing happens */
-    timeout.tv_sec  = 0;
-    timeout.tv_usec = 1000000;
+    timeout.tv_sec  = 1;
+    timeout.tv_usec = 0;
 
     /* Find if some data is available */
     while( (i_ret = select( p_socket->i_handle + 1, &fds,
                             NULL, NULL, &timeout )) == 0
            || (i_ret < 0 && errno == EINTR) )
     {
+        timeout.tv_sec  = 1;
+        timeout.tv_usec = 0;
+
         if( p_input->b_die || p_input->b_error )
         {
             return 0;

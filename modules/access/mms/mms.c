@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.28 2003/03/24 17:15:29 gbazin Exp $
+ * $Id: mms.c,v 1.29 2003/03/24 19:12:16 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1473,6 +1473,9 @@ static int  NetFillBuffer( input_thread_t *p_input )
                             NULL, NULL, &timeout )) == 0
            || (i_ret < 0 && errno == EINTR) )
     {
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 500000;
+
         if( p_input->b_die || p_input->b_error )
         {
             return 0;
