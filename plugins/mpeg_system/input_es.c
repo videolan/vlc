@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.2 2001/12/10 04:53:11 sam Exp $
+ * $Id: input_es.c,v 1.3 2001/12/10 15:52:31 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -199,6 +199,12 @@ static int ESRead( input_thread_t * p_input,
     {
         intf_ErrMsg( "input error: ES readv error" );
         return( -1 );
+    }
+
+    /* EOF */
+    if( i_read == 0 && p_input->stream.b_seekable )
+    {
+        return( 1 );
     }
 
     input_NetlistMviovec( p_input->p_method_data,
