@@ -558,6 +558,12 @@
             [o_transcode_string appendFormat: @"acodec=\"%@\",ab=\"%@\"",
                 [o_transcode_audio_selector titleOfSelectedItem],
                 [o_transcode_audio_bitrate stringValue]];
+            if ( ![[o_transcode_audio_channels stringValue]
+                                            isEqualToString: @""])
+            {
+                [o_transcode_string appendFormat: @",channels=\"%@\"",
+                                   [o_transcode_audio_channels stringValue]];
+            }
         }
         [o_transcode_string appendString:@"}:"];
     }
