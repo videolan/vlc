@@ -2,7 +2,7 @@
  * window.h: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.h,v 1.5 2003/06/22 12:46:49 asmax Exp $
+ * $Id: window.h,v 1.6 2003/10/17 18:17:28 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -109,6 +109,7 @@ class SkinWindow
         void Hide();
         void Open();
         void Close();
+        virtual void ToggleOnTop() {}
 
         void RefreshAll();
         void Refresh( int x, int y, int w, int h );

@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.17 2003/10/17 16:40:09 gbazin Exp $
+ * $Id: theme.cpp,v 1.18 2003/10/17 18:17:28 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -116,6 +116,7 @@ void Theme::CreateSystemMenu()
     AddSystemMenu( "Open file...", EvtBank->Get( "open" ) );
     AddSystemMenu( "Change skin...", EvtBank->Get( "load_skin" ) );
     AddSystemMenu( "Preferences...", EvtBank->Get( "show_prefs" ) );
+    AddSystemMenu( "Always on top", EvtBank->Get( "on_top" ) );
     AddSystemMenu( "SEPARATOR", 0 );
     AddSystemMenu( "Exit", EvtBank->Get( "quit" ) );
 }

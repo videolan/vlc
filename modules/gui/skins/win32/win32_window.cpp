@@ -2,7 +2,7 @@
  * win32_window.cpp: Win32 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.cpp,v 1.12 2003/05/02 15:53:32 gbazin Exp $
+ * $Id: win32_window.cpp,v 1.13 2003/10/17 18:17:28 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -52,6 +52,8 @@
 #include "../os_graphics.h"
 #include "../src/skin_common.h"
 #include "../src/theme.h"
+#include "../os_theme.h"
+#include "../src/banks.h"
 
 //---------------------------------------------------------------------------
 // Fading API
@@ -130,18 +132,6 @@ Win32Window::~Win32Window()
 
 }
 //---------------------------------------------------------------------------
-void Win32Window::OSShow( bool show )
-{
-    if( show )
-    {
-        ShowWindow( hWnd, SW_SHOW );
-    }
-    else
-    {
-        ShowWindow( hWnd, SW_HIDE );
-    }
-}
-//---------------------------------------------------------------------------
 bool Win32Window::ProcessOSEvent( Event *evt )
 {
     unsigned int msg = evt->GetMessage();
@@ -211,6 +201,44 @@ bool Win32Window::ProcessOSEvent( Event *evt )
 
         default:
             return false;
+    }
+}
+//---------------------------------------------------------------------------
+void Win32Window::ToggleOnTop()
+{
+    Win32Theme *winTheme = (Win32Theme *)p_intf->p_sys->p_theme;
+    HMENU hMenu = GetSystemMenu( winTheme->GetParentWindow(), false );
+    Event *event = p_intf->p_sys->p_theme->EvtBank->Get( "on_top" );
+
+    if( !p_intf->p_sys->b_on_top )
+    {
+        // Set the window on top
+        SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0,
+                      SWP_NOSIZE | SWP_NOMOVE );
+        // Check the menu entry (FIXME: we shouldn't do that here...)
+        CheckMenuItem( hMenu, (unsigned int)event,
+                       MF_BYCOMMAND | MFS_CHECKED );
+    }
+    else
+    {
+        // Set the window not on top
+        SetWindowPos( hWnd, HWND_NOTOPMOST, 0, 0, 0, 0,
+                      SWP_NOSIZE | SWP_NOMOVE );
+        // Uncheck the menu entry (FIXME: we shouldn't do that here...)
+        CheckMenuItem( hMenu, (unsigned int)event,
+                       MF_BYCOMMAND | MFS_UNCHECKED );
+    }
+}
+//---------------------------------------------------------------------------
+void Win32Window::OSShow( bool show )
+{
+    if( show )
+    {
+        ShowWindow( hWnd, SW_SHOW );
+    }
+    else
+    {
+        ShowWindow( hWnd, SW_HIDE );
     }
 }
 //---------------------------------------------------------------------------

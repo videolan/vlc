@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.47 2003/10/17 16:40:09 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.48 2003/10/17 18:17:28 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -125,6 +125,17 @@ bool VlcProc::EventProc( Event *evt )
 
         case VLC_LOAD_SKIN:
             LoadSkin();
+            return true;
+
+        case VLC_ON_TOP:
+            for( list<SkinWindow *>::const_iterator win =
+                    p_intf->p_sys->p_theme->WindowList.begin();
+                win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+            {
+                (*win)->ToggleOnTop();
+            }
+            // Set the indicator to the new state
+            p_intf->p_sys->b_on_top = !p_intf->p_sys->b_on_top;
             return true;
 
         case VLC_DROP:
@@ -574,6 +585,5 @@ void VlcProc::ChangeVolume( unsigned int msg, long param )
             break;
     }
     aout_VolumeGet( p_intf, &volume );
-
 }
 //---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * banks.cpp: Bitmap bank, Event bank, Font bank and OffSet bank
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: banks.cpp,v 1.9 2003/09/05 15:55:30 asmax Exp $
+ * $Id: banks.cpp,v 1.10 2003/10/17 18:17:28 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -183,6 +183,7 @@ EventBank::EventBank( intf_thread_t *_p_intf )
     Add( "net",              "VLC_NET",                 "CTRL+N" );
     Add( "add_file",         "VLC_PLAYLIST_ADD_FILE",   "CTRL+A" );
     Add( "load_skin",        "VLC_LOAD_SKIN",           "CTRL+S" );
+    Add( "on_top",           "VLC_ON_TOP",              "CTRL+T" );
 }
 //---------------------------------------------------------------------------
 EventBank::~EventBank()

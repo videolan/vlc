@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.23 2003/07/20 10:38:49 gbazin Exp $
+ * $Id: skin_common.h,v 1.24 2003/10/17 18:17:28 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -71,6 +71,7 @@ struct intf_sys_t
     // Interface status
     int i_index;        // Set which file is being played
     int i_size;         // Size of playlist;
+    bool b_on_top;      // Indicates if the windows are on top
 
     // Interface dialogs
     Dialogs *p_dialogs;

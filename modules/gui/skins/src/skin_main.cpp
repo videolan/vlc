@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.50 2003/10/17 16:40:09 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.51 2003/10/17 18:17:28 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -89,6 +89,8 @@ static int Open ( vlc_object_t *p_this )
     // Initialize info on playlist
     p_intf->p_sys->i_index        = -1;
     p_intf->p_sys->i_size         = 0;
+
+    p_intf->p_sys->b_on_top = false;
 
     p_intf->p_sys->i_close_status = VLC_NOTHING;
 

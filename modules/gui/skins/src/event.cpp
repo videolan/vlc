@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.22 2003/10/17 16:40:09 gbazin Exp $
+ * $Id: event.cpp,v 1.23 2003/10/17 18:17:28 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -116,6 +116,8 @@ unsigned int Event::GetMessageType( string Desc )
         return VLC_NET;
     else if( Desc == "VLC_LOAD_SKIN" )
         return VLC_LOAD_SKIN;
+    else if( Desc == "VLC_ON_TOP" )
+        return VLC_ON_TOP;
     else if( Desc == "VLC_CHANGE_TRAY" )
         return VLC_CHANGE_TRAY;
     else if( Desc == "VLC_CHANGE_TASKBAR" )
