@@ -666,7 +666,12 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
             vod_MediaControl( p_vod, p_media, psz_session, VOD_MEDIA_PAUSE );
             p_rtsp->b_paused = VLC_TRUE;
-            return VLC_EGENERIC;
+
+            answer->i_status = 200;
+            answer->psz_status = strdup( "OK" );
+            answer->i_body = 0;
+            answer->p_body = NULL;
+            break;
 
         case HTTPD_MSG_TEARDOWN:
             /* for now only multicast so easy again */
