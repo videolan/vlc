@@ -69,6 +69,7 @@ HEADERS_include = \
 	include/beos_specific.h \
 	include/configuration.h \
 	include/darwin_specific.h \
+	include/charset.h \
 	include/codecs.h \
 	include/encoder.h \
 	include/ninput.h \
@@ -314,6 +315,7 @@ SOURCES_libvlc_common = \
 	src/audio_output/output.c \
 	src/audio_output/intf.c \
 	src/stream_output/stream_output.c \
+	src/misc/charset.c \
 	src/misc/mtime.c \
 	src/misc/modules.c \
 	src/misc/threads.c \

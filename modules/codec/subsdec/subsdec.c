@@ -2,7 +2,7 @@
  * subsdec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.5 2003/08/10 10:22:52 gbazin Exp $
+ * $Id: subsdec.c,v 1.6 2003/08/23 12:59:31 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -34,6 +34,7 @@
 #include <osd.h>
 
 #include "subsdec.h"
+#include "charset.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -47,7 +48,8 @@ static vout_thread_t *FindVout( subsdec_thread_t * );
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-static char *ppsz_encodings[] = { "ASCII", "ISO-8859-1", "ISO-8859-2", "ISO-8859-3",
+static char *ppsz_encodings[] = { N_("System Default"), 
+    "ASCII", "ISO-8859-1", "ISO-8859-2", "ISO-8859-3",
     "ISO-8859-4", "ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859-8", 
     "ISO-8859-9", "ISO-8859-10", "ISO-8859-13", "ISO-8859-14", "ISO-8859-15",
     "ISO-8859-16", "ISO-2022-JP", "ISO-2022-JP-1", "ISO-2022-JP-2", "ISO-2022-CN",
@@ -78,7 +80,7 @@ vlc_module_begin();
 
     add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
 #if defined(HAVE_ICONV)
-    add_string_from_list( "subsdec-encoding", "ISO-8859-1", ppsz_encodings, NULL, ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );
+    add_string_from_list( "subsdec-encoding", N_("System Default"), ppsz_encodings, NULL, ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );
 #endif
 vlc_module_end();
 
@@ -149,7 +151,16 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         /* Here we are dealing with text subtitles */
 #if defined(HAVE_ICONV)
         var_Get( p_subsdec->p_fifo, "subsdec-encoding", &val );
-        p_subsdec->iconv_handle = iconv_open( "UTF-8", val.psz_string);
+	if( strcmp( val.psz_string, N_("System Default") ) == 0 )
+        {
+            char *psz_charset =(char*)malloc( 100 );
+            vlc_current_charset(&psz_charset);
+            p_subsdec->iconv_handle = iconv_open( "UTF-8", psz_charset );
+        }
+        else
+        {
+            p_subsdec->iconv_handle = iconv_open( "UTF-8", val.psz_string );
+        }
         if( p_subsdec->iconv_handle == (iconv_t)-1 )
         {
             msg_Warn( p_subsdec->p_fifo, "Unable to do requested conversion" );

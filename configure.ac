@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.65 2003/08/23 12:47:24 lool Exp $
+dnl $Id: configure.ac,v 1.66 2003/08/23 12:59:31 hartman Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -254,6 +254,22 @@ dnl Check for usual libc functions
 AC_CHECK_FUNCS(strdup strndup atof lseek)
 AC_CHECK_FUNCS(strcasecmp,,[AC_CHECK_FUNCS(stricmp)])
 AC_CHECK_FUNCS(strncasecmp,,[AC_CHECK_FUNCS(strnicmp)])
+
+dnl Check for setlocal and langinfo
+AC_CHECK_FUNCS(setlocale)
+AC_CHECK_HEADERS(langinfo.h)
+AC_CHECK_FUNCS(nl_langinfo)
+
+AC_CACHE_CHECK([for nl_langinfo and CODESET], ac_cv_langinfo_codeset,
+  [AC_TRY_LINK([#include <langinfo.h>],
+    [char* cs = nl_langinfo(CODESET);],
+    ac_cv_langinfo_codeset=yes,
+    ac_cv_langinfo_codeset=no)
+  ])
+if test ${ac_cv_langinfo_codeset} = yes; then
+  AC_DEFINE(HAVE_LANGINFO_CODESET, 1,
+    [Define if you have <langinfo.h> and nl_langinfo(CODESET).])
+fi
 
 AC_CHECK_FUNCS(connect,,[
   AC_CHECK_LIB(socket,connect,[
