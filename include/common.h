@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.39 2001/08/22 17:21:45 massiot Exp $
+ * $Id: common.h,v 1.40 2001/09/25 11:46:13 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -197,6 +197,15 @@ struct pgrm_descriptor_s;
 #   define ATTR_ALIGN(align) __attribute__ ((__aligned__ ((ATTRIBUTE_ALIGNED_MAX < align) ? ATTRIBUTE_ALIGNED_MAX : align)))
 #else
 #   define ATTR_ALIGN(align)
+#endif
+
+/* Alignment of critical dynamic data structure */
+#ifdef HAVE_MEMALIGN
+    /* Some systems have memalign() but no declaration for it */
+    void * memalign( size_t align, size_t size );
+#else
+    /* Assume malloc alignment is sufficient */
+#   define memalign(align,size) malloc(size)
 #endif
 
 /* win32, cl and icl support */

@@ -92,7 +92,7 @@ $(BUILTIN_MOTIONALTIVEC): BUILTIN_MOTIONALTIVEC_%.o: %.c
 	$(RANLIB) $@
 
 ../motionaltivec.so: $(PLUGIN_MOTIONALTIVEC)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_ALTIVEC)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS)
 
 ../motionaltivec.a: $(BUILTIN_MOTIONALTIVEC)
 	ar r $@ $^

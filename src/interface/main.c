@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.113 2001/09/05 16:07:50 massiot Exp $
+ * $Id: main.c,v 1.114 2001/09/25 11:46:14 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1184,16 +1184,12 @@ static int CPUCapabilities( void )
     return( i_capabilities );
 
 #elif defined( __powerpc__ )
-#   if defined( vector )
     /* Test for Altivec */
     signal( SIGILL, InstructionSignalHandler );
 
     i_illegal = 0;
     if( setjmp( env ) == 0 )
     {
-        /* Set VSCR to 0 */
-        vec_mtvscr( (vector unsigned int)(0) );
-        /* Set the VRSAVE register in case the kernel looks at it */
         asm volatile ("mtspr 256,%0" : : "r" (-1));
     }
 
@@ -1203,7 +1199,6 @@ static int CPUCapabilities( void )
     }
 
     signal( SIGILL, NULL );     
-#   endif
 
     return( i_capabilities );
 

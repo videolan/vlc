@@ -28,6 +28,9 @@
 /* Define if you have the gettimeofday function.  */
 #undef HAVE_GETTIMEOFDAY
 
+/* Define if you have the memalign function.  */
+#undef HAVE_MEMALIGN
+
 /* Define if you have the putenv function.  */
 #undef HAVE_PUTENV
 
@@ -93,6 +96,9 @@
 
 /* Define if you have the <getopt.h> header file.  */
 #undef HAVE_GETOPT_H
+
+/* Define if you have the <gnome.h> header file.  */
+#undef HAVE_GNOME_H
 
 /* Define if you have the <gtk/gtk.h> header file.  */
 #undef HAVE_GTK_GTK_H

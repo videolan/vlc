@@ -2,7 +2,7 @@
  * vpar_pool.c : management of the pool of decoder threads
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vpar_pool.c,v 1.2 2001/08/22 17:21:46 massiot Exp $
+ * $Id: vpar_pool.c,v 1.3 2001/09/25 11:46:14 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -64,6 +64,8 @@ static void DecodeMacroblockPool( vdec_pool_t * p_pool, macroblock_t * p_mb );
  *****************************************************************************/
 void vpar_InitPool( vpar_thread_t * p_vpar )
 {
+    int j;
+
     /* Initialize mutex and cond. */
     vlc_mutex_init( &p_vpar->pool.lock );
     vlc_cond_init( &p_vpar->pool.wait_empty );
@@ -89,6 +91,12 @@ void vpar_InitPool( vpar_thread_t * p_vpar )
     p_vpar->pool.p_vdec->b_die = 0;
     p_vpar->pool.p_vdec->p_pool = &p_vpar->pool;
     vdec_InitThread( p_vpar->pool.p_vdec );
+
+    for( j = 0; j < 6; j++ )
+    {
+        p_vpar->pool.mb.p_idcts[j].pi_block =
+        memalign( 16, 64 * sizeof(dctelem_t) );
+    }
 }
 
 /*****************************************************************************
@@ -124,7 +132,14 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
 
             for( i = p_vpar->pool.i_smp - 1; i >= i_new_smp; i-- )
             {
+                int j;
+
                 vdec_DestroyThread( p_vpar->pool.pp_vdec[i] );
+
+                for( j = 0; j < 6; j++ )
+                {
+                    free( p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block );
+                }
             }
 
             p_vpar->pool.pp_vdec = realloc( p_vpar->pool.pp_vdec,
@@ -155,6 +170,14 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
 
             for( i = p_vpar->pool.i_smp; i < i_new_smp ; i++ )
             {
+                int j;
+
+                for( j = 0; j < 6; j++ )
+                {
+                    p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block =
+                        memalign( 16, 64 * sizeof(dctelem_t) );
+                }
+
                 p_vpar->pool.pp_vdec[i] = vdec_CreateThread( &p_vpar->pool );
             }
 
@@ -203,7 +226,14 @@ void vpar_EndPool( vpar_thread_t * p_vpar )
 
     for( i = 0; i < p_vpar->pool.i_smp; i++ )
     {
+        int j;
+
         vdec_DestroyThread( p_vpar->pool.pp_vdec[i] );
+
+        for( j = 0; j < 6; j++ )
+        {
+            free( p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block );
+        }
     }
 
     if( p_vpar->pool.i_smp )

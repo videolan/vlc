@@ -74,7 +74,6 @@ LIB_GGI = @LIB_GGI@
 LIB_GLIDE = @LIB_GLIDE@
 LIB_GNOME = @LIB_GNOME@
 LIB_GTK = @LIB_GTK@
-LIB_ALTIVEC = @LIB_ALTIVEC@
 LIB_LIBDVDCSS = @LIB_LIBDVDCSS@
 LIB_KDE = @LIB_KDE@
 LIB_MACOSX = @LIB_MACOSX@
@@ -237,7 +236,7 @@ endif
 
 # Optimizations for PowerPC
 ifneq (,$(findstring powerpc,$(ARCH)))
-CFLAGS += -mmultiple -mhard-float -mstring
+CFLAGS += -mmultiple -mhard-float -mstring -Wa,-m7400
 endif
 
 # Optimizations for Sparc

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.138 2001/08/22 21:18:43 gbazin Exp $
+ * $Id: video_output.c,v 1.139 2001/09/25 11:46:14 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -402,10 +402,10 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
         switch( i_type )
         {
         case TEXT_SUBPICTURE:                             /* text subpicture */
-            p_free_subpic->p_data = malloc( i_size + 1 );
+            p_free_subpic->p_data = memalign( 16, i_size + 1 );
             break;
         case DVD_SUBPICTURE:                          /* DVD subpicture unit */
-            p_free_subpic->p_data = malloc( i_size );
+            p_free_subpic->p_data = memalign( 16, i_size );
             break;
 #ifdef DEBUG
         default:
@@ -623,21 +623,24 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
         {
         case YUV_420_PICTURE:        /* YUV 420: 1,1/4,1/4 samples per pixel */
             i_chroma_width = i_width / 2;
-            p_free_picture->p_data = malloc( i_height * i_chroma_width * 3 * sizeof( yuv_data_t ) );
+            p_free_picture->p_data = memalign( 16, i_height * i_chroma_width
+                                                 * 3 * sizeof( yuv_data_t ) );
             p_free_picture->p_y = (yuv_data_t *)p_free_picture->p_data;
             p_free_picture->p_u = (yuv_data_t *)p_free_picture->p_data +i_height*i_chroma_width*4/2;
             p_free_picture->p_v = (yuv_data_t *)p_free_picture->p_data +i_height*i_chroma_width*5/2;
             break;
         case YUV_422_PICTURE:        /* YUV 422: 1,1/2,1/2 samples per pixel */
             i_chroma_width = i_width / 2;
-            p_free_picture->p_data = malloc( i_height * i_chroma_width * 4 * sizeof( yuv_data_t ) );
+            p_free_picture->p_data = memalign( 16, i_height * i_chroma_width
+                                                 * 4 * sizeof( yuv_data_t ) );
             p_free_picture->p_y = (yuv_data_t *)p_free_picture->p_data;
             p_free_picture->p_u = (yuv_data_t *)p_free_picture->p_data +i_height*i_chroma_width*2;
             p_free_picture->p_v = (yuv_data_t *)p_free_picture->p_data +i_height*i_chroma_width*3;
             break;
         case YUV_444_PICTURE:            /* YUV 444: 1,1,1 samples per pixel */
             i_chroma_width = i_width;
-            p_free_picture->p_data = malloc( i_height * i_chroma_width * 3 * sizeof( yuv_data_t ) );
+            p_free_picture->p_data = memalign( 16, i_height * i_chroma_width
+                                                 * 3 * sizeof( yuv_data_t ) );
             p_free_picture->p_y = (yuv_data_t *)p_free_picture->p_data;
             p_free_picture->p_u = (yuv_data_t *)p_free_picture->p_data +i_height*i_chroma_width;
             p_free_picture->p_v = (yuv_data_t *)p_free_picture->p_data +i_height*i_chroma_width*2;
