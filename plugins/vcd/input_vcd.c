@@ -238,8 +238,9 @@ static int VCDOpen( struct input_thread_s *p_input )
 
     p_vcd->p_sectors = ioctl_GetSectors( p_vcd->i_handle,
                                          psz_source );
-    if ( p_vcd->p_sectors == NULL )
+    if( p_vcd->p_sectors == NULL )
     {
+        input_BuffersEnd( p_input->p_method_data );
         close( p_vcd->i_handle );
         free( p_vcd );
         return -1;
@@ -282,19 +283,18 @@ static int VCDOpen( struct input_thread_s *p_input )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     p_input->psz_demux = "vcd";
-    
+
     return 0;
 }
-
-    
 
 /*****************************************************************************
  * VCDClose: closes vcd
  *****************************************************************************/
 static void VCDClose( struct input_thread_s *p_input )
 {
-    thread_vcd_data_t *     p_vcd
-        = (thread_vcd_data_t *)p_input->p_access_data;
+    thread_vcd_data_t *p_vcd = (thread_vcd_data_t *)p_input->p_access_data;
+
+    input_BuffersEnd( p_input->p_method_data );
     close( p_vcd->i_handle );
     free( p_vcd );
 }
@@ -498,13 +498,7 @@ static int VCDInit( input_thread_t * p_input )
  *****************************************************************************/
 static void VCDEnd( input_thread_t * p_input )
 {
-    thread_vcd_data_t *     p_vcd;
-
-    input_BuffersEnd( p_input->p_method_data );
-
-    p_vcd = (thread_vcd_data_t*)p_input->p_access_data;
-
-    free( p_vcd );
+    ;
 }
 
 

@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.3 2002/03/08 22:58:12 stef Exp $
+ * $Id: dvd_access.c,v 1.4 2002/03/09 13:42:46 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -114,7 +114,6 @@ void _M( access_getfunctions)( function_list_t * p_function_list )
 static int DVDOpen( struct input_thread_s *p_input )
 {
     char *               psz_device;
-    dvdcss_handle        dvdhandle;
     thread_dvd_data_t *  p_dvd;
     input_area_t *       p_area;
     int                  i;
@@ -142,23 +141,23 @@ static int DVDOpen( struct input_thread_s *p_input )
     /*
      *  get plugin ready
      */ 
-    dvdhandle = dvdcss_open( psz_device );
+    p_dvd->dvdhandle = dvdcss_open( psz_device );
     
     /* free allocated string */
     free( psz_device );
 
-
-    if( dvdhandle == NULL )
+    if( p_dvd->dvdhandle == NULL )
     {
         intf_ErrMsg( "dvd error: dvdcss can't open device" );
+        free( p_dvd );
         return -1;
     }
-
-    p_dvd->dvdhandle = (dvdcss_handle) dvdhandle;
 
     if( dvdcss_seek( p_dvd->dvdhandle, 0, DVDCSS_NOFLAGS ) < 0 )
     {
         intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+        dvdcss_close( p_dvd->dvdhandle );
+        free( p_dvd );
         return -1;
     }
 
@@ -166,6 +165,7 @@ static int DVDOpen( struct input_thread_s *p_input )
     if( IfoCreate( p_dvd ) < 0 )
     {
         intf_ErrMsg( "dvd error: allcation error in ifo" );
+        dvdcss_close( p_dvd->dvdhandle );
         free( p_dvd );
         return -1;
     }
@@ -174,6 +174,7 @@ static int DVDOpen( struct input_thread_s *p_input )
     {
         intf_ErrMsg( "dvd error: fatal failure in ifo" );
         IfoDestroy( p_dvd->p_ifo );
+        dvdcss_close( p_dvd->dvdhandle );
         free( p_dvd );
         return -1;
     }
@@ -237,6 +238,9 @@ static int DVDOpen( struct input_thread_s *p_input )
     if( DVDSetArea( p_input, p_area ) < 0 )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
+        IfoDestroy( p_dvd->p_ifo );
+        dvdcss_close( p_dvd->dvdhandle );
+        free( p_dvd );
         return -1;
     }
 
@@ -252,17 +256,11 @@ static int DVDOpen( struct input_thread_s *p_input )
  *****************************************************************************/
 static void DVDClose( struct input_thread_s *p_input )
 {
-    thread_dvd_data_t *     p_dvd;
-
-    p_dvd = (thread_dvd_data_t*)p_input->p_access_data;
+    thread_dvd_data_t *p_dvd = (thread_dvd_data_t*)p_input->p_access_data;
 
     IfoDestroy( p_dvd->p_ifo );
-
-    p_input->p_access_data = (void *)(p_dvd->dvdhandle);
+    dvdcss_close( p_dvd->dvdhandle );
     free( p_dvd );
-
-    /* Clean up libdvdcss */
-    dvdcss_close( (dvdcss_handle) p_input->p_access_data );
 }
 
 /*****************************************************************************
