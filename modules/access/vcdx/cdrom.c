@@ -95,13 +95,15 @@ void ioctl_Close( cddev_t *p_cddev )
  *                     This makes finding the end of the last track uniform
  *                     how it is done for other tracks.
  *****************************************************************************/
-track_t ioctl_GetTracksMap( vlc_object_t *p_this, const CdIo *cdio,
+track_t ioctl_GetTracksMap( vlc_object_t *p_this, const CdIo *p_cdio,
                             lsn_t **pp_sectors )
 {
-    track_t i_tracks     = cdio_get_num_tracks(cdio);
-    track_t first_track  = cdio_get_first_track_num(cdio);
+    track_t i_tracks     = cdio_get_num_tracks(p_cdio);
+    track_t first_track  = cdio_get_first_track_num(p_cdio);
     track_t i;
 
+    if (CDIO_INVALID_TRACK == i_tracks) 
+      return 0;
 
     *pp_sectors = malloc( (i_tracks + 1) * sizeof(lsn_t) );
     if( *pp_sectors == NULL )
@@ -116,7 +118,7 @@ track_t ioctl_GetTracksMap( vlc_object_t *p_this, const CdIo *cdio,
      */
     for( i = 0 ; i <= i_tracks ; i++ )
       {
-        (*pp_sectors)[ i ] = cdio_get_track_lsn(cdio, first_track+i);
+        (*pp_sectors)[ i ] = cdio_get_track_lsn(p_cdio, first_track+i);
       }
     
     return i_tracks;

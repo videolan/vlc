@@ -25,6 +25,7 @@
 #define _VCDPLAYER_H_
 
 #include <libvcd/info.h>
+#include "vlc_meta.h"
 
 #define INPUT_DBG_META        1 /* Meta information */
 #define INPUT_DBG_EVENT       2 /* input (keyboard/mouse) events */
@@ -43,13 +44,13 @@
 #if INPUT_DEBUG
 #define dbg_print(mask, s, args...) \
    if (p_vcd && p_vcd->i_debug & mask) \
-     msg_Dbg(p_input, "%s: "s, __func__ , ##args)
+     msg_Dbg(p_access, "%s: "s, __func__ , ##args)
 #else
 #define dbg_print(mask, s, args...) 
 #endif
 
-#define LOG_ERR(args...)  msg_Err( p_input, args )
-#define LOG_WARN(args...) msg_Warn( p_input, args )
+#define LOG_ERR(args...)  msg_Err( p_access, args )
+#define LOG_WARN(args...) msg_Warn( p_access, args )
 
 /* vcdplayer_read return status */
 typedef enum {
@@ -60,29 +61,25 @@ typedef enum {
 } vcdplayer_read_status_t;
 
 /*****************************************************************************
- * thread_vcd_data_t: VCD information
+ * access_vcd_data_t: VCD information
  *****************************************************************************/
 typedef struct thread_vcd_data_s
 {
   vcdinfo_obj_t *vcd;                   /* CD device descriptor */
-  vlc_bool_t   in_still;              /*  true if in still */
-  vlc_bool_t   b_svd;                 /*  true if we have SVD info */
-  unsigned int num_tracks;              /* Nb of tracks (titles) */
-  unsigned int num_segments;            /* Nb of segments */
-  unsigned int num_entries;             /* Nb of entries */
-  unsigned int num_lids;                /* Nb of List IDs */
+  vlc_bool_t   in_still;                /*  true if in still */
+  vlc_bool_t   b_svd;                   /*  true if we have SVD info */
+  track_t      i_tracks;                /* # of tracks */
+  unsigned int i_segments;              /* # of segments */
+  unsigned int i_entries;               /* # of entries */
+  unsigned int i_lids;                  /* # of List IDs */
+  unsigned int i_titles;                /* # of navigatable titles. */
   vcdinfo_itemid_t play_item;           /* play-item, VCDPLAYER_BAD_ENTRY 
                                            if none */
-  int          cur_lid;                 /* LID that play item is in. Implies 
+  int          i_lid;                   /* LID that play item is in. Implies 
                                            PBC is on. VCDPLAYER_BAD_ENTRY if 
                                            not none or not in PBC */
-#if (defined LIBVCD_VERSION_NUM) && (LIBVCD_VERSION_NUM >= 21)
   PsdListDescriptor_t pxd;              /* If PBC is on, the relevant 
                                             PSD/PLD */
-#else
-  PsdListDescriptor pxd;                /* If PBC is on, the relevant
-                                           PSD/PLD */
-#endif
   int          pdi;                     /* current pld index of pxd. -1 if 
                                            no index*/
   vcdinfo_itemid_t loop_item;           /* Where do we loop back to? 
@@ -91,25 +88,37 @@ typedef struct thread_vcd_data_s
   int          loop_count;              /* # of times play-item has been 
                                            played. Meaningful only in a 
                                            selection list.              */
-  track_t      cur_track;               /* Current track number */
-  lsn_t        cur_lsn;                 /* Current logical sector number */
+  track_t      i_track;                 /* Current track number */
+  lsn_t        i_lsn;                   /* Current logical sector number */
   lsn_t        end_lsn;                 /* LSN of end of current 
                                            entry/segment/track. */
   lsn_t        origin_lsn;              /* LSN of start of seek/slider */
-  lsn_t *      p_sectors;               /* Track sectors */
+  lsn_t *      p_sectors;               /* Track sectors. This is 0 origin
+                                           so the first VCD track will be
+                                           at 0 and this is the ISO9660 
+                                           filesystem. The first Mode2 form2
+                                           MPEG track is probably track 2 or
+                                           p_sectors[1].
+                                         */
   lsn_t *      p_entries;               /* Entry points */
   lsn_t *      p_segments;              /* Segments */
   vlc_bool_t   b_valid_ep;              /* Valid entry points flag */
   vlc_bool_t   b_end_of_track;          /* If the end of track was reached */
   int          i_debug;                 /* Debugging mask */
 
+  /* Information about CD */
+  vlc_meta_t    *p_meta;
+
+  input_title_t *p_title[CDIO_CD_MAX_TRACKS];
+
   /* Probably gets moved into another structure...*/
-  intf_thread_t *         p_intf;
-  int                     i_audio_nb;
-  int                     i_still_time;
-  vlc_bool_t              b_end_of_cell;
+  intf_thread_t *p_intf;
+  int            i_audio_nb;
+  int            i_still_time;
+  vlc_bool_t     b_end_of_cell;
+  input_thread_t *p_input;
   
-} thread_vcd_data_t;
+} access_vcd_data_t;
 
 /*!
   Get the next play-item in the list given in the LIDs. Note play-item
@@ -117,33 +126,33 @@ typedef struct thread_vcd_data_s
   confused with a user's list of favorite things to play or the 
   "next" field of a LID which moves us to a different LID.
  */
-vlc_bool_t vcdplayer_inc_play_item( input_thread_t *p_input );
+vlc_bool_t vcdplayer_inc_play_item( access_t *p_access );
 
 /*!
   Return true if playback control (PBC) is on
 */
-vlc_bool_t vcdplayer_pbc_is_on(const thread_vcd_data_t *p_this);
+vlc_bool_t vcdplayer_pbc_is_on(const access_vcd_data_t *p_this);
 
 /*!
   Play item assocated with the "default" selection.
 
   Return false if there was some problem.
 */
-vlc_bool_t vcdplayer_play_default( input_thread_t * p_input );
+vlc_bool_t vcdplayer_play_default( access_t * p_access );
 
 /*!
   Play item assocated with the "next" selection.
 
   Return false if there was some problem.
 */
-vlc_bool_t vcdplayer_play_next( input_thread_t * p_input );
+vlc_bool_t vcdplayer_play_next( access_t * p_access );
 
 /*!
   Play item assocated with the "prev" selection.
 
   Return false if there was some problem.
 */
-vlc_bool_t vcdplayer_play_prev( input_thread_t * p_input );
+vlc_bool_t vcdplayer_play_prev( access_t * p_access );
 
 /*!
   Play item assocated with the "return" selection.
@@ -151,10 +160,10 @@ vlc_bool_t vcdplayer_play_prev( input_thread_t * p_input );
   Return false if there was some problem.
 */
 vlc_bool_t
-vcdplayer_play_return( input_thread_t * p_input );
+vcdplayer_play_return( access_t * p_access );
 
-vcdplayer_read_status_t vcdplayer_pbc_nav ( input_thread_t * p_input );
-vcdplayer_read_status_t vcdplayer_non_pbc_nav ( input_thread_t * p_input );
+vcdplayer_read_status_t vcdplayer_pbc_nav     ( access_t * p_access );
+vcdplayer_read_status_t vcdplayer_non_pbc_nav ( access_t * p_access );
 
 #endif /* _VCDPLAYER_H_ */
 /* 

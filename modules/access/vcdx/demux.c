@@ -32,8 +32,6 @@
 #include <vlc/input.h>
 #include <vlc/intf.h>
 
-#include "../../demux/mpeg/system.h"
-
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
@@ -72,15 +70,15 @@ struct demux_sys_t
 };
 
 /*****************************************************************************
- * InitVCD: initializes structures
+ * VCDInit: initializes structures
  *****************************************************************************/
-int E_(InitVCD) ( vlc_object_t *p_this )
+int E_(VCDInit) ( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    vcd_data_t *    p_vcd = (vcd_data_t *)p_input->p_access_data;
+    vcd_data_t *    p_vcd = (vcd_data_t *)p_input->p_sys;
     demux_sys_t *   p_demux;
 
-    printf("++++ InitVCD CALLED\n");
+    printf("++++ VCDInit CALLED\n");
     
 
     if( p_input->stream.i_method != INPUT_METHOD_VCD )
@@ -115,9 +113,9 @@ int E_(InitVCD) ( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * EndVCD: frees unused data
+ * VCDEnd: frees unused data
  *****************************************************************************/
-void E_(EndVCD) ( vlc_object_t *p_this )
+void E_(VCDEnd) ( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     vcd_data_t *    p_vcd = p_input->p_demux_data->p_vcd;

@@ -2,11 +2,11 @@ SOURCES_vcdx = \
 	access.c \
 	cdrom.c \
 	cdrom.h \
-	demux.c \
-	intf.c \
 	intf.h \
 	vcd.c \
 	vcd.h \
 	vcdplayer.h \
 	vcdplayer.c \
+	info.c \
+	info.h \
 	$(NULL)
