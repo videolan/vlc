@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.11 2003/02/24 12:34:29 fenrir Exp $
+ * $Id: ts.c,v 1.12 2003/02/24 14:14:43 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -115,7 +115,8 @@ typedef struct sout_mux_s
 static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
-static int     Capability( int , void *, void * );
+
+static int     Capability(sout_instance_t *, int, void *, void * );
 static int     AddStream( sout_instance_t *, sout_input_t * );
 static int     DelStream( sout_instance_t *, sout_input_t * );
 static int     Mux      ( sout_instance_t * );
@@ -206,7 +207,7 @@ static void Close( vlc_object_t * p_this )
     p_sout->p_mux_data = NULL;
 }
 
-static int Capability( int i_query, void *p_args, void *p_answer )
+static int Capability( sout_instance_t *p_sout, int i_query, void *p_args, void *p_answer )
 {
    switch( i_query )
    {
