@@ -83,7 +83,7 @@ int BuildInetAddr( struct sockaddr_in *p_sa_in, char *psz_in_addr, int i_port )
     }
     /* Try to convert address directly from in_addr - this will work if
      * psz_in_addr is dotted decimal. */
-#if defined HAVE_ARPA_INET_H && !defined SYS_SOLARIS
+#if defined HAVE_ARPA_INET_H && !defined SYS_SOLARIS2_6
     else if( !inet_aton( psz_in_addr, &p_sa_in->sin_addr) )
 #else
     else if( (p_sa_in->sin_addr.s_addr = inet_addr( psz_in_addr )) == -1 )
