@@ -2,7 +2,7 @@
  * tooltip.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: tooltip.cpp,v 1.3 2004/01/25 11:44:19 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -98,6 +98,10 @@ void Tooltip::makeImage( const UString &rText )
 {
     // Render the text on a bitmap
     GenericBitmap *pBmpTip = m_rFont.drawString( rText, 0 );
+    if( !pBmpTip )
+    {
+        return;
+    }
     int w = pBmpTip->getWidth() + 10;
     int h = m_rFont.getSize() + 8;
 

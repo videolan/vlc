@@ -2,7 +2,7 @@
  * ctrl_list.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_list.cpp,v 1.3 2004/02/29 16:49:55 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -372,6 +372,10 @@ void CtrlList::makeImage()
 
         // Draw the text
         GenericBitmap *pText = m_rFont.drawString( *pStr, color, width );
+        if( !pText )
+        {
+            return;
+        }
         yPos += itemHeight - pText->getHeight();
         int ySrc = 0;
         if( yPos < 0 )

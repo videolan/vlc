@@ -2,7 +2,7 @@
  * ft2_font.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ft2_font.cpp,v 1.2 2004/02/27 13:24:12 gbazin Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -28,17 +28,26 @@
 
 
 FT2Font::FT2Font( intf_thread_t *pIntf, const string &rName, int size ):
-    GenericFont( pIntf ), m_name( rName ), m_buffer( NULL ), m_size( size )
+    GenericFont( pIntf ), m_name( rName ), m_buffer( NULL ), m_size( size ),
+    m_lib( NULL ), m_face( NULL ), m_dotGlyph( NULL )
 {
 }
 
 
 FT2Font::~FT2Font()
 {
-
-    FT_Done_Glyph( m_dotGlyph );
-    FT_Done_Face( m_face );
-    FT_Done_FreeType( m_lib );
+    if( m_dotGlyph )
+    {
+        FT_Done_Glyph( m_dotGlyph );
+    }
+    if( m_face )
+    {
+        FT_Done_Face( m_face );
+    }
+    if( m_lib )
+    {
+        FT_Done_FreeType( m_lib );
+    }
     if( m_buffer )
     {
         free( m_buffer );
@@ -137,6 +146,12 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
     int width1 = 0, width2 = 0;
     int yMin = 0, yMax = 0;
     uint32_t *pString = (uint32_t*)rString.u_str();
+
+    // Check if freetype has been initialized
+    if( !m_face )
+    {
+        return NULL;
+    }
 
     // Get the length of the string
     int len = rString.length();

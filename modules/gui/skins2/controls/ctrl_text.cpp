@@ -2,7 +2,7 @@
  * ctrl_text.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_text.cpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -193,6 +193,10 @@ void CtrlText::displayText( const UString &rText )
         delete m_pImg;
     }
     m_pImg = m_rFont.drawString( rText, m_color );
+    if( !m_pImg )
+    {
+        return;
+    }
     // 'Double' image
     const UString doubleStringWithSep = rText + SEPARATOR_STRING + rText;
     if( m_pImgDouble )
@@ -212,7 +216,7 @@ void CtrlText::displayText( const UString &rText )
 
 void CtrlText::onChangePosition()
 {
-    if( getPosition() )
+    if( m_pImg && getPosition() )
     {
         if( m_pImg->getWidth() < getPosition()->getWidth() )
         {
@@ -252,7 +256,8 @@ void CtrlText::transManualMoving( SkinObject *pCtrl )
 
     // Start the automatic movement, but only if the text is wider than the
     // control
-    if( pThis->m_pImg->getWidth() >= pThis->getPosition()->getWidth() )
+    if( pThis->m_pImg && 
+        pThis->m_pImg->getWidth() >= pThis->getPosition()->getWidth() )
     {
         // The current image may have been set incorrectly in displayText(), so
         // set the correct value
@@ -276,7 +281,8 @@ void CtrlText::transMove( SkinObject *pCtrl )
     EvtMouse *pEvtMouse = (EvtMouse*)pThis->m_pEvt;
 
     // Do nothing if the text fits in the control
-    if( pThis->m_pImg->getWidth() >= pThis->getPosition()->getWidth() )
+    if( pThis->m_pImg &&
+        pThis->m_pImg->getWidth() >= pThis->getPosition()->getWidth() )
     {
         // The current image may have been set incorrectly in displayText(), so
         // we set the correct value
@@ -308,6 +314,10 @@ void CtrlText::adjust( int &position )
     // {m_pImgDouble->getWidth()  - m_pImg->getWidth()} is the period of the
     // bitmap; remember that the string used to generate m_pImgDouble is of the
     // form: "foo  foo", the number of spaces being a parameter
+    if( !m_pImg )
+    {
+        return;
+    }
     position %= m_pImgDouble->getWidth()  - m_pImg->getWidth();
     if( position > 0 )
     {
