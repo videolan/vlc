@@ -352,6 +352,8 @@
                 "o_transcode_video_bitrate" = id; 
                 "o_transcode_video_bitrate_lbl" = id; 
                 "o_transcode_video_chkbox" = id; 
+                "o_transcode_video_scale" = id; 
+                "o_transcode_video_scale_lbl" = id; 
                 "o_transcode_video_selector" = id; 
             }; 
             SUPERCLASS = NSObject; 

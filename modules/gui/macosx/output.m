@@ -97,6 +97,10 @@
     [[NSNotificationCenter defaultCenter] addObserver: self
         selector: @selector(transcodeInfoChanged:)
         name: NSControlTextDidChangeNotification
+        object: o_transcode_video_scale];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(transcodeInfoChanged:)
+        name: NSControlTextDidChangeNotification
         object: o_transcode_audio_bitrate];
     [[NSNotificationCenter defaultCenter] addObserver: self
         selector: @selector(transcodeInfoChanged:)
@@ -124,6 +128,7 @@
         @"128", @"192", @"256", @"512", nil];
     NSArray *o_v_bitrates = [NSArray arrayWithObjects: @"16", @"32", @"64", @"96",
         @"128", @"192", @"256", @"384", @"512", @"768", @"1024", @"2048", @"3072", nil];
+    NSArray *o_v_scales = [NSArray arrayWithObjects: @"0.25",@"0.5",@"0.75",@"1",@"1.25",@"1.5",@"1.75",@"2",nil];
     NSArray *o_a_codecs = [NSArray arrayWithObjects: @"mpga", @"mp3 ", @"mp4a", @"a52 ", @"vorb", @"flac", @"spx ", nil];
     NSArray *o_v_codecs = [NSArray arrayWithObjects: @"mp1v", @"mp2v", @"mp4v", @"DIV1",
         @"DIV2", @"DIV3", @"H263", @"I263", @"WMV1", @"WMV2", @"MJPG", @"theo", nil];
@@ -158,6 +163,10 @@
     [o_transcode_video_bitrate_lbl setStringValue: _NS("Bitrate (kb/s)")];
     [o_transcode_video_bitrate removeAllItems];
     [o_transcode_video_bitrate addItemsWithObjectValues: o_v_bitrates];
+    [o_transcode_video_scale_lbl setStringValue: _NS("Scale")];
+    [o_transcode_video_scale removeAllItems];
+    [o_transcode_video_scale addItemsWithObjectValues: o_v_scales];
+    [o_transcode_video_scale selectItemWithObjectValue: @"1"];
     [o_transcode_audio_chkbox setTitle: _NS("Audio")];
     [o_transcode_audio_selector removeAllItems];
     [o_transcode_audio_selector addItemsWithTitles: o_a_codecs];
@@ -522,11 +531,13 @@
     {
         [o_transcode_video_selector setEnabled: YES];
         [o_transcode_video_bitrate setEnabled: YES];
+        [o_transcode_video_scale setEnabled: YES];
     }
     else
     {
         [o_transcode_video_selector setEnabled: NO];
         [o_transcode_video_bitrate setEnabled: NO];
+        [o_transcode_video_scale setEnabled: NO];
     }
     if( [o_transcode_audio_chkbox state] == NSOnState )
     {
@@ -554,9 +565,11 @@
         o_transcode_string = [NSMutableString stringWithString:@"transcode{"];
         if ( [o_transcode_video_chkbox state] == NSOnState )
         {
-            [o_transcode_string appendFormat: @"vcodec=\"%@\",vb=\"%@\"",
+            [o_transcode_string appendFormat: @"vcodec=\"%@\",vb=\"%@\""
+                                                            ",scale=\"%@\"",
                 [o_transcode_video_selector titleOfSelectedItem],
-                [o_transcode_video_bitrate stringValue]];
+                [o_transcode_video_bitrate stringValue],
+                [o_transcode_video_scale stringValue]];
             if ( [o_transcode_audio_chkbox state] == NSOnState )
             {
                 [o_transcode_string appendString: @","];
