@@ -79,12 +79,6 @@ struct access_sys_t
 
     int       fd_cmd;
     int       fd_data;
-
-    int64_t   i_size;
-
-    int64_t   i_tell;
-
-    vlc_bool_t b_eof;
 };
 
 static int  ftp_SendCommand( access_t *, char *, ... );
@@ -105,12 +99,21 @@ static int Open( vlc_object_t *p_this )
     int          i_answer;
     char         *psz_arg;
 
-    /* *** allocate access_sys_t *** */
-    p_sys = malloc( sizeof( access_sys_t ) );
+    /* Init p_access */
+    p_access->pf_read = Read;
+    p_access->pf_block = NULL;
+    p_access->pf_seek = Seek;
+    p_access->pf_control = Control;
+    p_access->info.i_update = 0;
+    p_access->info.i_size = 0;
+    p_access->info.i_pos = 0;
+    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.i_title = 0;
+    p_access->info.i_seekpoint = 0;
+    p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
     memset( p_sys, 0, sizeof( access_sys_t ) );
     p_sys->fd_cmd = -1;
     p_sys->fd_data = -1;
-    p_sys->i_tell = 0;
 
     /* *** Parse URL and get server addr/port and path *** */
     psz = p_access->psz_path;
@@ -139,9 +142,6 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "failed to connect with server" );
         goto exit_error;
     }
-
-    /* set p_access->p_sys */
-    p_access->p_sys = p_sys;
 
     for( ;; )
     {
@@ -237,9 +237,9 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "cannot get file size" );
         goto exit_error;
     }
-    p_sys->i_size = atoll( &psz_arg[4] );
+    p_access->info.i_size = atoll( &psz_arg[4] );
     free( psz_arg );
-    msg_Dbg( p_access, "file size: "I64Fd, p_sys->i_size );
+    msg_Dbg( p_access, "file size: "I64Fd, p_access->info.i_size );
 
     /* Start the 'stream' */
     if( ftp_StartStream( p_access, 0 ) < 0 )
@@ -251,11 +251,6 @@ static int Open( vlc_object_t *p_this )
     /* Update default_pts to a suitable value for ftp access */
     var_Create( p_access, "ftp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    /* *** set exported functions *** */
-    p_access->pf_read = Read;
-    p_access->pf_block = NULL;
-    p_access->pf_seek = Seek;
-    p_access->pf_control = Control;
     return VLC_SUCCESS;
 
 exit_error:
@@ -299,7 +294,6 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Seek( access_t *p_access, int64_t i_pos )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     if( i_pos < 0 )
     {
         return VLC_EGENERIC;
@@ -309,11 +303,12 @@ static int Seek( access_t *p_access, int64_t i_pos )
     ftp_StopStream( p_access );
     if( ftp_StartStream( p_access, i_pos ) < 0 )
     {
-        p_sys->b_eof = VLC_TRUE;
+        p_access->info.b_eof = VLC_TRUE;
         return VLC_EGENERIC;
     }
 
-    p_sys->i_tell = i_pos;
+    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.i_pos = i_pos;
 
     return VLC_SUCCESS;
 }
@@ -326,14 +321,14 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     access_sys_t *p_sys = p_access->p_sys;
     int i_read;
 
-    if( p_sys->b_eof )
+    if( p_access->info.b_eof )
         return 0;
 
     i_read = net_Read( p_access, p_sys->fd_data, p_buffer, i_len, VLC_FALSE );
     if( i_read == 0 )
-        p_sys->b_eof = VLC_TRUE;
+        p_access->info.b_eof = VLC_TRUE;
     else if( i_read > 0 )
-        p_sys->i_tell += i_read;
+        p_access->info.i_pos += i_read;
 
     return i_read;
 }
@@ -343,7 +338,6 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     vlc_bool_t   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
@@ -374,18 +368,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
             pi_int = (int*)va_arg( args, int * );
             *pi_int = 0;
             break;
-        case ACCESS_GET_SIZE:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = p_sys->i_size > 0 ? p_sys->i_size : 0;
-            break;
-        case ACCESS_GET_POS:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = p_sys->i_tell;
-            break;
-        case ACCESS_GET_EOF:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = p_sys->b_eof;
-            break;
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
@@ -397,6 +379,12 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_PAUSE_STATE:
             /* Nothing to do */
             break;
+
+        case ACCESS_GET_TITLE_INFO:
+        case ACCESS_GET_SEEKPOINT_INFO:
+        case ACCESS_SET_TITLE:
+        case ACCESS_SET_SEEKPOINT:
+            return VLC_EGENERIC;
 
         default:
             msg_Err( p_access, "unimplemented query in control" );

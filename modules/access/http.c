@@ -108,11 +108,8 @@ struct access_sys_t
 
     vlc_bool_t b_chunked;
     int64_t    i_chunk;
-    int64_t    i_tell;
-    int64_t    i_size;
 
     vlc_bool_t b_seekable;
-    vlc_bool_t b_eof;
 };
 
 /* */
@@ -133,18 +130,6 @@ static int  Open ( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     vlc_value_t   val;
-
-    /* Create private struct */
-    p_sys = malloc( sizeof( access_sys_t ) );
-    memset( p_sys, 0, sizeof( access_sys_t ) );
-    p_sys->fd = -1;
-    p_sys->b_proxy = VLC_FALSE;
-    p_sys->i_version = 1;
-    p_sys->b_seekable = VLC_TRUE;
-    p_sys->psz_mime = NULL;
-    p_sys->psz_location = NULL;
-    p_sys->psz_user_agent = NULL;
-    p_sys->b_eof = VLC_FALSE;
 
     /* First set ipv4/ipv6 */
     var_Create( p_access, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -171,8 +156,27 @@ static int  Open ( vlc_object_t *p_this )
         }
     }
 
-    /* Pts delay */
-    var_Create( p_access, "http-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    /* Set up p_access */
+    p_access->pf_read = Read;
+    p_access->pf_block = NULL;
+    p_access->pf_control = Control;
+    p_access->pf_seek = Seek;
+    p_access->info.i_update = 0;
+    p_access->info.i_size = 0;
+    p_access->info.i_pos = 0;
+    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.i_title = 0;
+    p_access->info.i_seekpoint = 0;
+    p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
+    memset( p_sys, 0, sizeof( access_sys_t ) );
+    p_sys->fd = -1;
+    p_sys->b_proxy = VLC_FALSE;
+    p_sys->i_version = 1;
+    p_sys->b_seekable = VLC_TRUE;
+    p_sys->psz_mime = NULL;
+    p_sys->psz_location = NULL;
+    p_sys->psz_user_agent = NULL;
+
 
     /* Parse URI */
     ParseURL( p_sys, p_access->psz_path );
@@ -254,7 +258,6 @@ static int  Open ( vlc_object_t *p_this )
     }
 
     /* Connect */
-    p_access->p_sys = p_sys;
     if( Connect( p_access, 0 ) )
     {
         /* Retry with http 1.0 */
@@ -287,15 +290,9 @@ static int  Open ( vlc_object_t *p_this )
                       p_playlist->i_index + 1 );
         vlc_object_release( p_playlist );
 
-        p_sys->i_size = 0;  /* Force to stop reading */
+        p_access->info.i_size = 0;  /* Force to stop reading */
     }
 
-    /* Set up p_access */
-    p_access->pf_read = Read;
-    p_access->pf_block = NULL;
-    p_access->pf_control = Control;
-    p_access->pf_seek = Seek;
-    p_access->p_sys = p_sys;
     if( !strcmp( p_sys->psz_protocol, "ICY" ) )
     {
         if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "video/nsv" ) )
@@ -306,6 +303,10 @@ static int  Open ( vlc_object_t *p_this )
         msg_Info( p_access, "ICY server found, %s demuxer selected",
                   p_access->psz_demux );
     }
+
+    /* Pts delay */
+    var_Create( p_access, "http-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
     return VLC_SUCCESS;
 
 error:
@@ -362,15 +363,16 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 
     if( p_sys->fd < 0 )
     {
-        p_sys->b_eof = VLC_TRUE;
+        p_access->info.b_eof = VLC_TRUE;
         return 0;
     }
 
-    if( p_sys->i_size > 0 && i_len + p_sys->i_tell > p_sys->i_size )
+    if( p_access->info.i_size > 0 &&
+        i_len + p_access->info.i_pos > p_access->info.i_size )
     {
-        if( ( i_len = p_sys->i_size - p_sys->i_tell ) == 0 )
+        if( ( i_len = p_access->info.i_size - p_access->info.i_pos ) == 0 )
         {
-            p_sys->b_eof = VLC_TRUE;
+            p_access->info.b_eof = VLC_TRUE;
             return 0;
         }
     }
@@ -378,7 +380,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     {
         if( p_sys->i_chunk < 0 )
         {
-            p_sys->b_eof = VLC_TRUE;
+            p_access->info.b_eof = VLC_TRUE;
             return 0;
         }
 
@@ -397,7 +399,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
             if( p_sys->i_chunk <= 0 )   /* eof */
             {
                 p_sys->i_chunk = -1;
-                p_sys->b_eof = VLC_TRUE;
+                p_access->info.b_eof = VLC_TRUE;
                 return 0;
             }
         }
@@ -412,7 +414,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     i_read = net_Read( p_access, p_sys->fd, p_buffer, i_len, VLC_FALSE );
     if( i_read > 0 )
     {
-        p_sys->i_tell += i_read;
+        p_access->info.i_pos += i_read;
 
         if( p_sys->b_chunked )
         {
@@ -430,7 +432,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     }
     else if( i_read == 0 )
     {
-        p_sys->b_eof = VLC_TRUE;
+        p_access->info.b_eof = VLC_TRUE;
     }
     return i_read;
 }
@@ -449,7 +451,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
     if( Connect( p_access, i_pos ) )
     {
         msg_Err( p_access, "seek failed" );
-        p_sys->b_eof = VLC_TRUE;
+        p_access->info.b_eof = VLC_TRUE;
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -491,18 +493,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
             pi_int = (int*)va_arg( args, int * );
             *pi_int = 0;
             break;
-        case ACCESS_GET_SIZE:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = p_sys->i_size > 0 ? p_sys->i_size : 0;
-            break;
-        case ACCESS_GET_POS:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = p_sys->i_tell;
-            break;
-        case ACCESS_GET_EOF:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = p_sys->b_eof;
-            break;
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
@@ -512,8 +502,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         /* */
         case ACCESS_SET_PAUSE_STATE:
-            /* Nothing to do */
             break;
+
+        case ACCESS_GET_TITLE_INFO:
+        case ACCESS_GET_SEEKPOINT_INFO:
+        case ACCESS_SET_TITLE:
+        case ACCESS_SET_SEEKPOINT:
+            return VLC_EGENERIC;
 
         default:
             msg_Err( p_access, "unimplemented query in control" );
@@ -588,8 +583,10 @@ static int Connect( access_t *p_access, int64_t i_tell )
     p_sys->psz_mime = NULL;
     p_sys->b_chunked = VLC_FALSE;
     p_sys->i_chunk = 0;
-    p_sys->i_size = -1;
-    p_sys->i_tell = i_tell;
+
+    p_access->info.i_size = 0;
+    p_access->info.i_pos  = i_tell;
+    p_access->info.b_eof  = VLC_FALSE;
 
 
     /* Open connection */
@@ -721,8 +718,8 @@ static int Connect( access_t *p_access, int64_t i_tell )
 
         if( !strcasecmp( psz, "Content-Length" ) )
         {
-            p_sys->i_size = i_tell + atoll( p );
-            msg_Dbg( p_access, "stream size="I64Fd, p_sys->i_size );
+            p_access->info.i_size = i_tell + atoll( p );
+            msg_Dbg( p_access, "stream size="I64Fd, p_access->info.i_size );
         }
         else if( !strcasecmp( psz, "Location" ) )
         {

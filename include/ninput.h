@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ninput.h
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
+ * Copyright (C) 1999-2004 VideoLAN
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -25,6 +25,85 @@
 #define _NINPUT_H 1
 
 #include "vlc_es.h"
+
+/* Seek point */
+struct seekpoint_t
+{
+    int64_t i_byte_offset;
+    int64_t i_time_offset;
+    char    *psz_name;
+};
+
+static inline seekpoint_t *vlc_seekpoint_New( void )
+{
+    seekpoint_t *point = (seekpoint_t*)malloc( sizeof( seekpoint_t ) );
+    point->i_byte_offset =
+    point->i_time_offset = 0;
+    point->psz_name = NULL;
+    return point;
+}
+
+static inline void vlc_seekpoint_Delete( seekpoint_t *point )
+{
+    if( !point ) return;
+    if( point->psz_name ) free( point->psz_name );
+    free( point );
+}
+
+static inline seekpoint_t *vlc_seekpoint_Duplicate( seekpoint_t *src )
+{
+    seekpoint_t *point = vlc_seekpoint_New();
+    if( src->psz_name ) point->psz_name = strdup( src->psz_name );
+    point->i_time_offset = src->i_time_offset;
+    point->i_byte_offset = src->i_byte_offset;
+    return point;
+}
+
+typedef struct
+{
+    vlc_bool_t  b_menu;      /* Is it a menu or a normal entry */
+    int64_t     i_length;    /* length if known, else 0 */
+    int         i_seekpoints;/* How many seekpoint, (0/1 has same meaning)*/
+
+    char        *psz_name;
+} input_title_t;
+
+static inline input_title_t *vlc_input_title_New( )
+{
+    input_title_t *t = (input_title_t*)malloc( sizeof( input_title_t ) );
+
+    t->b_menu = VLC_FALSE;
+    t->i_length = 0;
+    t->i_seekpoints = 0;
+    t->psz_name = NULL;
+
+    return t;
+}
+static inline void vlc_input_title_Delete( input_title_t *t )
+{
+    if( t )
+    {
+        if( t->psz_name ) free( t->psz_name );
+        free( t );
+    }
+}
+
+static inline input_title_t *vlc_input_title_Duplicate( input_title_t *t )
+{
+    input_title_t *dup = vlc_input_title_New( );
+
+    dup->b_menu      = t->b_menu;
+    dup->i_length    = t->i_length;
+    dup->i_seekpoints= t->i_seekpoints;
+    if( t->psz_name ) dup->psz_name = strdup( t->psz_name );
+
+    return dup;
+}
+
+/**
+ * \defgroup es out Es Out
+ * @{
+ */
 
 enum es_out_mode_e
 {
@@ -55,11 +134,6 @@ enum es_out_query_e
     ES_OUT_SET_PCR,             /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
     ES_OUT_SET_GROUP_PCR,       /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
     ES_OUT_RESET_PCR,           /* no arg */
-
-    /* ByBass automatic stream timestamp to absolute timestamp using pcr (and disable the automatic mode XXX:for all groups) */
-    ES_OUT_CONVERT_TIMESTAMP,       /* arg1=int64_t *pi_ts(microsecond!) */
-    ES_OUT_CONVERT_GROUP_TIMESTAMP, /* arg1=int i_group, arg2=int64_t *pi_ts(microsecond!)*/
-
 };
 
 struct es_out_t
@@ -100,6 +174,17 @@ static inline int es_out_Control( es_out_t *out, int i_query, ... )
     va_end( args );
     return i_result;
 }
+
+/**
+ * @}
+ */
+
+/* i_update field of access_t/demux_t */
+#define INPUT_UPDATE_NONE       0x0000
+#define INPUT_UPDATE_SIZE       0x0001
+#define INPUT_UPDATE_TITLE      0x0010
+#define INPUT_UPDATE_SEEKPOINT  0x0020
+
 /**
  * \defgroup access Access
  * @{
@@ -114,14 +199,18 @@ enum access_query_e
     ACCESS_CAN_CONTROL_PACE,/* arg1= vlc_bool_t*    cannot fail */
 
     /* */
-    ACCESS_GET_MTU,         /* arg1= int*           cannot fail (0 if no sense) */
-    ACCESS_GET_SIZE,        /* arg1= int64_t*       cannot fail (0 if unknown) */
-    ACCESS_GET_POS,         /* arg1= int64_t*       cannot fail */
-    ACCESS_GET_EOF,         /* arg1= vlc_bool_t*    cannot fail */
+    ACCESS_GET_MTU,         /* arg1= int*           cannot fail(0 if no sense)*/
     ACCESS_GET_PTS_DELAY,   /* arg1= int64_t*       cannot fail */
+    /* */
+    ACCESS_GET_TITLE_INFO,      /* arg1=input_title_t*** arg2=int* can fail */
+    ACCESS_GET_SEEKPOINT_INFO,  /* arg1=seekpoint_t ***  arg2=int* can fail */
 
     /* */
-    ACCESS_SET_PAUSE_STATE  /* arg1= vlc_bool_t     can fail if unsuported */
+    ACCESS_SET_PAUSE_STATE, /* arg1= vlc_bool_t     can fail */
+
+    /* */
+    ACCESS_SET_TITLE,       /* arg1= int            can fail */
+    ACCESS_SET_SEEKPOINT,   /* arg1= int            can fail */
 };
 
 struct access_t
@@ -143,6 +232,20 @@ struct access_t
     int         (*pf_seek) ( access_t *, int64_t );         /* can be null if can't seek */
 
     int         (*pf_control)( access_t *, int i_query, va_list args);  /* mandatory */
+
+    /* access has to maintain them uptodate */
+    struct
+    {
+        unsigned int i_update;  /* Access sets them on change,
+                                   Input removes them once take into account*/
+
+        int64_t      i_size;    /* Write only for access, read only for input */
+        int64_t      i_pos;     /* idem */
+        vlc_bool_t   b_eof;     /* idem */
+
+        int          i_title;    /* idem, start from 0 (could be menu) */
+        int          i_seekpoint;/* idem, start from 0 */
+    } info;
     access_sys_t *p_sys;
 };
 
@@ -347,6 +450,17 @@ struct demux_t
     /* set by demuxer */
     int (*pf_demux)  ( demux_t * );   /* demux one frame only */
     int (*pf_control)( demux_t *, int i_query, va_list args);
+
+    /* Demux has to maintain them uptodate
+     * when it is responsible of seekpoint/title*/
+    struct
+    {
+        unsigned int i_update;  /* Demux sets them on change,
+                                   Input removes them once take into account*/
+        /* Seekpoint/Title at demux level */
+        int          i_title;       /* idem, start from 0 (could be menu) */
+        int          i_seekpoint;   /* idem, start from 0 */
+    } info;
     demux_sys_t *p_sys;
 };
 
@@ -355,45 +469,19 @@ enum demux_query_e
     DEMUX_GET_POSITION,         /* arg1= double *       res=    */
     DEMUX_SET_POSITION,         /* arg1= double         res=can fail    */
 
+    DEMUX_GET_LENGTH,           /* arg1= int64_t *      res=    */
     DEMUX_GET_TIME,             /* arg1= int64_t *      res=    */
     DEMUX_SET_TIME,             /* arg1= int64_t        res=can fail    */
 
-    DEMUX_GET_LENGTH,           /* arg1= int64_t *      res=can fail    */
-
     DEMUX_GET_FPS,              /* arg1= float *        res=can fail    */
-    DEMUX_GET_META              /* arg1= vlc_meta_t **  res=can fail    */
+    DEMUX_GET_META,             /* arg1= vlc_meta_t **  res=can fail    */
+
+    DEMUX_GET_TITLE_INFO,       /* arg1=input_title_t*** arg2=int* can fail */
+    DEMUX_GET_SEEKPOINT_INFO,   /* arg1=seekpoint_t ***  arg2=int* can fail */
+
+    DEMUX_SET_TITLE,            /* arg1= int            can fail */
+    DEMUX_SET_SEEKPOINT,        /* arg1= int            can fail */
 };
-
-struct seekpoint_t
-{
-    int64_t i_byte_offset;
-    int64_t i_time_offset;
-    char    *psz_name;
-};
-
-static inline seekpoint_t *vlc_seekpoint_New( void )
-{
-    seekpoint_t *point = (seekpoint_t*)malloc( sizeof( seekpoint_t ) );
-    point->i_byte_offset = point->i_time_offset;
-    point->psz_name = NULL;
-    return point;
-}
-
-static inline void vlc_seekpoint_Delete( seekpoint_t *point )
-{
-    if( !point ) return;
-    if( point->psz_name ) free( point->psz_name );
-    free( point );
-}
-
-static inline seekpoint_t *vlc_seekpoint_Duplicate( seekpoint_t *src )
-{
-    seekpoint_t *point = vlc_seekpoint_New();
-    if( src->psz_name ) point->psz_name = strdup( src->psz_name );
-    point->i_time_offset = src->i_time_offset;
-    point->i_byte_offset = src->i_byte_offset;
-    return point;
-}
 
 /* Demux */
 VLC_EXPORT( int, demux_vaControl,        ( input_thread_t *, int i_query, va_list  ) );
