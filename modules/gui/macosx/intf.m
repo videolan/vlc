@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.55 2003/02/13 00:09:51 hartman Exp $
+ * $Id: intf.m,v 1.56 2003/02/13 02:00:56 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -552,6 +552,21 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         p_intf->p_sys->i_part = 0;
 
         p_playlist->p_input->stream.b_changed = 0;
+        
+        id o_awindow = [NSApp keyWindow];
+        NSArray *o_windows = [NSApp windows];
+        NSEnumerator *o_enumerator = [o_windows objectEnumerator];
+        
+        while ((o_awindow = [o_enumerator nextObject]))
+        {
+            if( [[o_awindow className] isEqualToString: @"VLCWindow"] )
+            {
+                vlc_mutex_unlock( &p_playlist->object_lock );
+                [o_awindow updateTitle];
+                vlc_mutex_lock( &p_playlist->object_lock );
+            }
+        }
+
         msg_Dbg( p_intf, "stream has changed, refreshing interface" );
     }
     else

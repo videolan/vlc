@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.31 2003/02/11 15:35:29 hartman Exp $
+ * $Id: vout.m,v 1.32 2003/02/13 02:00:56 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -800,6 +800,40 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 }
 
+- (void)updateTitle
+{
+    NSMutableString *o_title;
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                               FIND_ANYWHERE );
+    
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    o_title = [NSMutableString stringWithUTF8String: 
+        p_playlist->pp_items[p_playlist->i_index]->psz_name]; 
+    vlc_mutex_unlock( &p_playlist->object_lock );
+
+    vlc_object_release( p_playlist );
+
+    if (o_title)
+    {
+        NSRange prefixrange = [o_title rangeOfString: @"file:"];
+        if ( prefixrange.location != NSNotFound )
+            [o_title deleteCharactersInRange: prefixrange];
+
+        [self setTitleWithRepresentedFilename: o_title];
+    }
+    else
+    {
+        [self setTitle:
+            [NSString stringWithCString: VOUT_TITLE " (QuickTime)"]];
+    }
+}
+
 /* This is actually the same as VLCControls::stop. */
 - (BOOL)windowShouldClose:(id)sender
 {
@@ -930,12 +964,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     VLCView * o_view;
     NSScreen * o_screen;
     vout_thread_t * p_vout;
-    NSMutableString *o_title;
     vlc_bool_t b_main_screen;
-
-    intf_thread_t * p_intf = [NSApp getIntf];
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                               FIND_ANYWHERE );
     
     p_vout = (vout_thread_t *)[o_value pointerValue];
 
@@ -1020,35 +1049,9 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     [o_view lockFocus];
     p_vout->p_sys->p_qdport = [o_view qdPort];
     [o_view unlockFocus];
-
-
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-    o_title = [NSMutableString stringWithUTF8String: 
-        p_playlist->pp_items[p_playlist->i_index]->psz_name]; 
-    vlc_mutex_unlock( &p_playlist->object_lock ); 
-
-    vlc_object_release( p_playlist );
-
-    if (o_title)
-    {
-        NSRange prefixrange = [o_title rangeOfString: @"file:"];
-        if ( prefixrange.location != NSNotFound )
-            [o_title deleteCharactersInRange: prefixrange];
-
-        [p_vout->p_sys->o_window setTitleWithRepresentedFilename: o_title];
-        [p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
-    }
-    else
-    {
-        [p_vout->p_sys->o_window setTitle:
-            [NSString stringWithCString: VOUT_TITLE " (QuickTime)"]];
-        [p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
-    }
+    
+    [p_vout->p_sys->o_window updateTitle];
+    [p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
 }
 
 - (void)destroyWindow:(NSValue *)o_value
