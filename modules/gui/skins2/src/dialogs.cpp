@@ -43,7 +43,7 @@ static void showChangeSkinCB( intf_dialog_args_t *pArg )
 
             // Push the command in the asynchronous command queue
             AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
-            pQueue->remove( "resize" );
+            pQueue->remove( "change skin" );
             pQueue->push( CmdGenericPtr( pCmd ) );
         }
     }

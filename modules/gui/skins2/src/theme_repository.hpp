@@ -44,6 +44,12 @@ class ThemeRepository: public SkinObject
         virtual ~ThemeRepository();
 
     private:
+        /// Identifier for the special menu entry
+        static const char *kOpenDialog;
+
+       /// Look for themes in a directory
+        void parseDirectory( const string &rDir );
+
         /// Callback for menu item selection
         static int changeSkin( vlc_object_t *pThis, char const *pCmd,
                                vlc_value_t oldval, vlc_value_t newval,
