@@ -92,6 +92,8 @@ extern "C" {
 #define MATROSKA_COMPRESSION_NONE 0
 #define MATROSKA_COMPRESSION_ZLIB 1
 
+#define MKVD_TIMECODESCALE 1000000
+
 /**
  * What's between a directory and a filename?
  */
@@ -369,8 +371,8 @@ class matroska_segment_t
 public:
     matroska_segment_t( demux_sys_t *p_demuxer )
         :segment(NULL)
-        ,i_timescale(0)
-        ,f_duration(0.0)
+        ,i_timescale(MKVD_TIMECODESCALE)
+        ,f_duration(-1.0)
         ,i_cues_position(0)
         ,i_chapters_position(0)
         ,i_tags_position(0)
@@ -570,20 +572,19 @@ public:
     matroska_segment_t *FindSegment( EbmlBinary & uid ) const;
     void PreloadFamily( demux_t *p_demux );
     void PreloadLinked( demux_t *p_demux );
+    bool AnalyseAllSegmentsFound( EbmlStream *p_estream, const matroska_segment_t *p_segment );
 };
 
 static int  Demux  ( demux_t * );
 static int  Control( demux_t *, int, va_list );
 static void Seek   ( demux_t *, mtime_t i_date, double f_percent, const chapter_item_t *psz_chapter );
 
-#define MKVD_TIMECODESCALE 1000000
-
 #define MKV_IS_ID( el, C ) ( EbmlId( (*el) ) == C::ClassInfos.GlobalId )
 
 static void IndexAppendCluster  ( demux_t *p_demux, KaxCluster *cluster );
 static char *UTF8ToStr          ( const UTFstring &u );
 static void LoadCues            ( demux_t * );
-static void InformationCreate  ( demux_t * );
+static void InformationCreate   ( demux_t * );
 
 static void ParseInfo( demux_t *, EbmlElement *info );
 static void ParseTracks( demux_t *, EbmlElement *tracks );
@@ -602,8 +603,6 @@ static int Open( vlc_object_t * p_this )
     mkv_track_t        *p_track;
     uint8_t            *p_peek;
     std::string        s_path, s_filename;
-    int                i_upper_lvl;
-    size_t             i;
     size_t             i_track;
 
     EbmlElement *el = NULL;
@@ -631,8 +630,6 @@ static int Open( vlc_object_t * p_this )
 
     p_stream->in = new vlc_stream_io_callback( p_demux->s );
     p_stream->es = new EbmlStream( *p_stream->in );
-    p_segment->f_duration   = -1;
-    p_segment->i_timescale     = MKVD_TIMECODESCALE;
     p_track = new mkv_track_t(); 
     p_segment->tracks.push_back( p_track );
     p_sys->i_pts   = 0;
@@ -724,111 +721,10 @@ static int Open( vlc_object_t * p_this )
 #endif
                     {
                         // test wether this file belongs to the our family
-                        bool b_keep_file_opened = false;
                         StdIOCallback *p_file_io = new StdIOCallback(s_filename.c_str(), MODE_READ);
                         EbmlStream *p_estream = new EbmlStream(*p_file_io);
-                        EbmlElement *p_l0, *p_l1, *p_l2;
 
-                        // verify the EBML Header
-                        p_l0 = p_estream->FindNextID(EbmlHead::ClassInfos, 0xFFFFFFFFL);
-                        if (p_l0 == NULL)
-                        {
-                            delete p_estream;
-                            delete p_file_io;
-                            continue;
-                        }
-
-                        matroska_stream_t  *p_stream1 = new matroska_stream_t( p_sys );
-                        p_sys->streams.push_back( p_stream1 );
-
-                        p_l0->SkipData(*p_estream, EbmlHead_Context);
-                        delete p_l0;
-
-                        // find all segments in this file
-                        p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
-                        if (p_l0 == NULL)
-                        {
-                            delete p_estream;
-                            delete p_file_io;
-                            continue;
-                        }
-
-                        i_upper_lvl = 0;
-
-                        while (p_l0 != 0)
-                        {
-                            if (EbmlId(*p_l0) == KaxSegment::ClassInfos.GlobalId)
-                            {
-                                EbmlParser  *ep;
-                                matroska_segment_t *p_segment1 = new matroska_segment_t( p_sys );
-
-                                p_stream1->segments.push_back( p_segment1 );
-
-                                ep = new EbmlParser(p_estream, p_l0);
-                                p_segment1->ep = ep;
-
-                                bool b_this_segment_matches = false;
-                                while ((p_l1 = ep->Get()))
-                                {
-                                    if (MKV_IS_ID(p_l1, KaxInfo))
-                                    {
-                                        // find the families of this segment
-                                        KaxInfo *p_info = static_cast<KaxInfo*>(p_l1);
-
-                                        p_info->Read(*p_estream, KaxInfo::ClassInfos.Context, i_upper_lvl, p_l2, true);
-                                        for( i = 0; i < p_info->ListSize() && !b_this_segment_matches; i++ )
-                                        {
-                                            EbmlElement *l = (*p_info)[i];
-
-                                            if( MKV_IS_ID( l, KaxSegmentUID ) )
-                                            {
-                                                KaxSegmentUID *p_uid = static_cast<KaxSegmentUID*>(l);
-                                                if (p_segment->segment_uid == *p_uid)
-                                                    break;
-                                                p_segment1->segment_uid = *( new KaxSegmentUID(*p_uid) );
-                                            }
-                                            else if( MKV_IS_ID( l, KaxPrevUID ) )
-                                            {
-                                                p_segment1->prev_segment_uid = *( new KaxPrevUID( *static_cast<KaxPrevUID*>(l) ) );
-                                            }
-                                            else if( MKV_IS_ID( l, KaxNextUID ) )
-                                            {
-                                                p_segment1->next_segment_uid = *( new KaxNextUID( *static_cast<KaxNextUID*>(l) ) );
-                                            }
-                                            else if( MKV_IS_ID( l, KaxSegmentFamily ) )
-                                            {
-                                                KaxSegmentFamily *p_fam = new KaxSegmentFamily( *static_cast<KaxSegmentFamily*>(l) );
-                                                std::vector<KaxSegmentFamily>::iterator iter;
-                                                p_segment1->families.push_back( *p_fam );
-/*                                                for( iter = p_segment->families.begin();
-                                                     iter != p_segment->families.end();
-                                                     iter++ )
-                                                {
-                                                    if( *iter == *p_fam )
-                                                    {
-                                                        b_this_segment_matches = true;
-                                                        p_segment1->families.push_back( *p_fam );
-                                                        break;
-                                                    }
-                                                }*/
-                                            }
-                                        }
-                                        break;
-                                    }
-                                }
-
-                                if (b_this_segment_matches)
-                                {
-                                    b_keep_file_opened = true;
-                                }
-                            }
-
-                            p_l0->SkipData(*p_estream, EbmlHead_Context);
-                            delete p_l0;
-                            p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
-                        }
-
-                        if (!b_keep_file_opened)
+                        if ( !p_sys->AnalyseAllSegmentsFound( p_estream, p_segment ))
                         {
                             delete p_estream;
                             delete p_file_io;
@@ -1505,6 +1401,92 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
     }
 
 #undef tk
+}
+
+bool demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream, const matroska_segment_t *p_segment )
+{
+return false;
+    int i_upper_lvl = 0;
+    size_t i;
+    EbmlElement *p_l0, *p_l1, *p_l2;
+
+    // verify the EBML Header
+    p_l0 = p_estream->FindNextID(EbmlHead::ClassInfos, 0xFFFFFFFFL);
+    if (p_l0 == NULL)
+    {
+        return false;
+    }
+
+    matroska_stream_t  *p_stream1 = new matroska_stream_t( this );
+    streams.push_back( p_stream1 );
+
+    p_l0->SkipData(*p_estream, EbmlHead_Context);
+    delete p_l0;
+
+    // find all segments in this file
+    p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
+    if (p_l0 == NULL)
+    {
+        return false;
+    }
+
+    while (p_l0 != 0)
+    {
+        if (EbmlId(*p_l0) == KaxSegment::ClassInfos.GlobalId)
+        {
+            EbmlParser  *ep;
+            matroska_segment_t *p_segment1 = new matroska_segment_t( this );
+
+            p_stream1->segments.push_back( p_segment1 );
+
+            ep = new EbmlParser(p_estream, p_l0);
+            p_segment1->ep = ep;
+
+            while ((p_l1 = ep->Get()))
+            {
+                if (MKV_IS_ID(p_l1, KaxInfo))
+                {
+                    // find the families of this segment
+                    KaxInfo *p_info = static_cast<KaxInfo*>(p_l1);
+
+                    p_info->Read(*p_estream, KaxInfo::ClassInfos.Context, i_upper_lvl, p_l2, true);
+                    for( i = 0; i < p_info->ListSize(); i++ )
+                    {
+                        EbmlElement *l = (*p_info)[i];
+
+                        if( MKV_IS_ID( l, KaxSegmentUID ) )
+                        {
+                            KaxSegmentUID *p_uid = static_cast<KaxSegmentUID*>(l);
+                            if (p_segment && p_segment->segment_uid == *p_uid)
+                                break;
+                            p_segment1->segment_uid = *( new KaxSegmentUID(*p_uid) );
+                        }
+                        else if( MKV_IS_ID( l, KaxPrevUID ) )
+                        {
+                            p_segment1->prev_segment_uid = *( new KaxPrevUID( *static_cast<KaxPrevUID*>(l) ) );
+                        }
+                        else if( MKV_IS_ID( l, KaxNextUID ) )
+                        {
+                            p_segment1->next_segment_uid = *( new KaxNextUID( *static_cast<KaxNextUID*>(l) ) );
+                        }
+                        else if( MKV_IS_ID( l, KaxSegmentFamily ) )
+                        {
+                            KaxSegmentFamily *p_fam = new KaxSegmentFamily( *static_cast<KaxSegmentFamily*>(l) );
+                            std::vector<KaxSegmentFamily>::iterator iter;
+                            p_segment1->families.push_back( *p_fam );
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        p_l0->SkipData(*p_estream, EbmlHead_Context);
+        delete p_l0;
+        p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
+    }
+
+    return true;
 }
 
 static void UpdateCurrentToChapter( demux_t & demux )
