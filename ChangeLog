@@ -4,15 +4,79 @@
 
 HEAD
 
+  * Nothing yet.
+
+0.3.1
+Thu, 18 Apr 2002 06:43:42 +0200
+
+  * ./configure.in: switched version to 0.3.1.
+  * ./vlc.spec: imported Mandrakesoft's latest enhancements.
+  * ./configure.in, ./plugins/network/ipv6.c: support for the GNU glibc
+    extension gethostbyname2(), thanks to Thomas Graf.
+  * ./plugins/macosx/vout_macosx.c: finally fixed MacOS X aspect ratio. If you
+    know how to center the picture in the screen, and make the remaining space
+    black instead of white, PLEASE drop me a mail!
+  * ./src/input/mpeg_system.c: in TS demux, a program is selected only if a
+    PMT for it was found. This should fix the problem that occured when reading
+    a file directly extracted from a satellite card.
+  * ./plugins/access/udp.c: UDP access plugin uses input_SetProgram.
+  * ./AUTHORS: added people locations, just for fun.
+  * ./configure.in: disabled SSE plugins when using mingw32.
+  * ./src/misc/configuration.c: disabled the AltiVec warning message on the
+    PowerPC platform because it was misleading.
+  * ./plugins/dvdread/dvdread.c: have dvdread plug-in respond to dvd: URLs.
+  * ./plugins/macosx/intf_macosx.c: MacOS X interface shouldn't take as much
+    CPU as it used to.
+  * ./plugins/motion/motionaltivec.c: fixed a bug in AltiVec-enabled MC (thanks
+    walken).
+  * ./plugins/memcpy/memcpyaltivec.c: fixed a case of segfault in AltiVec-
+    enabled memcpy.
+  * ./doc/vlc-howto.sgml: big update of Henri's howto.
+  * ./plugins/mpeg_vdec/*: support for pictures with a pitch different from
+    the picture width, inspired by Gildas Bazin.
+  * ./plugins/satellite/input_satellite.c: fixed a typo in satellite input.
+  * ./src/interface/main.c: added options to configure antenna (sat_lnb_lof1,
+    sat_lnb_lof2, sat_lnb_slof and sat_diseqc). They only appear if satellite
+    input is compiled.
+  * ./plugins/satellite/input_satellite.c: fixed a few bugs in satellite
+    input (device was not closed in every failure case, symbol rate limits
+    in gnome interface were wrong).
+  * ./plugins/gtk/*: added FEC choice in command line, gtk and gnome
+    interfaces. Command line is now satellite:<frequency(Hz)>,
+    <polarization(0=V,1=H)>,<fec(1=1/2,2=2/3...)>,<symbol rate(kbyte/s)>
+  * ./plugins/beos/vout_beos.cpp: implemented a fix for nVidia overlays
+    thanks to Bertil.
   * ./Makefile: fixed the Win32 interface under Win2k/XP.
   * ./src/misc/modules_plugins.h: implemented a dlerror()-like wrapper
     for the Win32 API.
+  * ./plugins/mpeg_system/mpeg_ps.c: fixed another bug in PS demux: the first
+    program added was at the same time declared as the current program and as
+    a new program, which made the ES be selected two times.
+  * ./src/input/input_programs.c: fixed a bug in input_SetProgram, that made
+    the ps file input launch without video.
+  * ./plugins/beos/vout_beos.cpp: fixed code to close vout window, does not
+    segfault anymore.
+  * ./po/fr.po: french translation update
   * ./configure.in: fixed a bug in the libdvdread detection.
   * ./configure.in: fixed plugin compilation under Win32.
   * ./vlc.spec: imported MandrakeSoft's enhancements.
   * ./doc/developer/decoders.xml: fixed a typo preventing compilation.
   * ./plugins/aa/aa.c: we now parse the AAOPTS environment variable.
   * ./plugins/aa/aa.c: a few simplifications in the code.
+  * ./src/input/input.c: made file access plugin use input_SetProgram so that
+    we may change program when reading a file.
+  * ./src/input/input_programs.c: fixed a bug in input_SetProgram.
+  * ./src/interface/main.c: added --input_program <int> option, to choose the
+    program from the command line.
+  * ./plugins/memcpy/memcpyaltivec.c: fixed AltiVec-enabled version of
+    fastmemcpy.
+  * ./src/interface/main.c: fixed --memcpy switch.
+  * ./Makefile: changed CFLAGS_VLC to vlc_CFLAGS (last-minute changes are
+    great ideas :p)
+  * ./README - Mac OS X.rtf: new README file for MacOS X.
+  * ./Makefile: fixed the Win32 interface under Win2k/XP.
+  * ./src/misc/modules_plugins.h: implemented a dlerror()-like wrapper
+    for the Win32 API.
   * ./configure.in: wrote a better test for libdvdread detection.
   * ./plugins/gtk/gtk.glade: added lines this #@%$! Glade had munched, fixes
     a segfault in the Gtk+ popup menu when toggling the interface.

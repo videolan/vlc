@@ -1,3 +1,10 @@
+vlc (0.3.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Fixes a crash in the Gtk+ interface.
+
+ -- Samuel Hocevar <sam@zoy.org>  Thu, 18 Apr 2002 06:43:42 +0200
+
 vlc (0.3.0-1) unstable; urgency=low
 
   * New upstream release.

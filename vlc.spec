@@ -1,5 +1,5 @@
 %define name 		vlc
-%define vlc_ver 	0.3.0
+%define vlc_ver 	0.3.1
 %define version		%vlc_ver
 
 %define cvs     	0
@@ -11,21 +11,13 @@
 %define release 	1mdk
 %endif
 
-%define plugin_qt	0
-%define plugin_alsa	0
-
-%define configflags     --enable-release \
-                        --enable-dvd --without-dvdcss \
-                        --enable-gtk --enable-gnome --enable-ncurses \
-                        --disable-qt --disable-kde --enable-ncurses \
-                        --enable-x11 --enable-xvideo --enable-sdl --enable-fb \
-                        --enable-ggi --enable-mga --enable-aa \
-                        --enable-esd --enable-alsa --enable-mad 
+%define	plugin_qt	0
 
 Summary:	VideoLAN is a free MPEG, MPEG2 and DVD software solution.
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
+Packager:	Samuel Hocevar <sam@zoy.org>
 
 %if %{cvs} 
 Source0:	http://www.videolan.org/pub/videolan/vlc/snapshots/%{cvs_name}.tar.gz
@@ -42,9 +34,11 @@ Buildrequires:	libgtk+1.2-devel
 Buildrequires:	gnome-libs-devel
 Buildrequires:	db1-devel
 Buildrequires:	alsa-lib-devel
+Buildrequires:	libarts-devel
 Buildrequires:	libggi-devel
 Buildrequires:	aalib-devel
 Buildrequires:	SDL-devel
+Buildrequires:	liba52-devel
 
 %description
 VideoLAN is a free network-aware MPEG and DVD player.
@@ -99,17 +93,16 @@ install vlc-ncurses
 
 # video plugins
 %package aa
-Summary: Ascii Art plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: ASCII art video plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description aa
-The vlc-aa package includes the Simple DirectMedia Layer plug-in 
-for the VideoLAN client.
+The vlc-aa package includes the aalib plug-in for the VideoLAN client.
 If you are going to watch DVD with the aa video plugin, you should
 install vlc-aa
 
 %package sdl
-Summary: Simple DirectMedia Layer plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: Simple DirectMedia Layer video plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description sdl
@@ -119,7 +112,7 @@ If you are going to watch DVD with the sdl video plugin, you should
 install vlc-sdl
 
 %package ggi
-Summary: GGI plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: GGI video plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description ggi
@@ -127,29 +120,40 @@ The vlc-ggi package includes the GGI plug-in for the VideoLAN client.
 If you are going to watch DVD with the GGI video plugin, you should
 install vlc-ggi
 
-# audio plugins
+# codec plugins
 %package mad
-Summary: MAD plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: MAD audio codec plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description mad
 The vlc-mad package includes the MAD (MPEG Audio Decoder) plug-in
 for the VideoLAN client.
-If you are going to watch DVD with the mad audio plugin, you should
+If you are going to watch DVD with the mad codec plugin, you should
 install vlc-mad
 
+# audio plugins
 %package esd
-Summary: Enlightened Sound Daemon plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: Enlightened Sound Daemon audio plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description esd
-The vlc-esd packages includes the Enlightened Sound Daemon plug-in 
+The vlc-esd package includes the Enlightened Sound Daemon plug-in 
 for the VideoLAN client.
 If you are going to watch DVD with the esd audio plugin, you should
 install vlc-esd
 
+%package arts
+Summary: aRts audio plug-in for VideoLAN, a DVD and MPEG2 player
+Group: Video
+Requires: %{name} = %{version}
+%description arts
+The vlc-arts package includes the aRts audio plug-in
+for the VideoLAN client.
+If you are going to watch DVD with the aRts audio plugin, you should
+install vlc-arts
+
 %package alsa
-Summary: Advanced Linux Sound Architecture plug-in for VideoLAN, a DVD and Mpeg-2 player
+Summary: Advanced Linux Sound Architecture audio plug-in for VideoLAN, a DVD and MPGE2 player
 Group: Video
 Requires: %{name} = %{version}
 %description alsa
@@ -166,15 +170,12 @@ install vlc-alsa
 %endif
 
 %build
-%ifarch ppc
-# Dadou - 0.1.99h-mdk - Don't use configure here. It breaks build at present
-#                       time.
-./configure %{configflags}
-perl -pi -e "s|CFLAGS \+= -mcpu=604e|#CFLAGS \+= -mcpu=604e|" Makefile
-perl -pi -e "s|#CFLAGS \+= -mcpu=750|CFLAGS \+= -mcpu=750 -mtune=750|" Makefile
-%else
-%configure %{configflags}
-%endif
+%configure  --enable-release \
+            --enable-dvd --without-dvdcss \
+            --enable-gtk --enable-gnome --disable-qt --disable-kde --enable-ncurses \
+            --enable-x11 --enable-xvideo --enable-ggi --enable-sdl --enable-fb --enable-mga --enable-aa \
+            --enable-esd --enable-alsa --enable-arts \
+	    --enable-mad
 export QTDIR=%{_libdir}/qt2 
 %make
 
@@ -333,27 +334,52 @@ rm -fr %buildroot
 %doc README
 %{_libdir}/videolan/vlc/aa.so
 
-#audio plugins
+# codec plugin
 %files mad
 %defattr(-,root,root)
 %doc README
 %{_libdir}/videolan/vlc/mad.so
 
+#audio plugins
 %files esd
 %defattr(-,root,root)
 %doc README
 %{_libdir}/videolan/vlc/esd.so
 
-%if %{plugin_alsa}
+%files arts
+%defattr(-,root,root)
+%doc README
+%{_libdir}/videolan/vlc/arts.so
+
 %files alsa
 %defattr(-,root,root)
 %doc README
 %{_libdir}/videolan/vlc/alsa.so
-%endif
 
 %changelog
+* Thu Apr 18 2002 Samuel Hocevar <sam@zoy.org> 0.3.1
+- version 0.3.1.
+- patch0 is no longer needed.
+
+* Wed Apr 17 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.1-1mdk
+- version 0.3.1 (hum soon)
+- removed old %%ifarch ppc
+
+* Wed Apr 17 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.0-4mdk
+- added liba52 support (buildrequires).
+- added vlc-alsa audio plugin.
+- mad is a codec (audio) plugin. corrected description and summary.
+
+* Wed Apr 10 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.0-3mdk
+- added patch0 from CVS: fix crashing GTK popup menus thx Michal Bukovjan <bukovjan@mbox.dkm.cz>
+
+* Wed Apr 10 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.0-2mdk
+- added vlc-arts rpm plugin thx blindauer Emmanuel <manu@agat.net>
+- better summary for plug-in
+- add packager tag to myself
+
 * Sun Apr 07 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.0-1mdk
-- added aa (ASCII Art) plugin in vlc-aa rpm
+- added aa (Asci Art) plugin in vlc-aa rpm
 - merged with sam's one:
   * using his plugins list into %%files
   * removed libdvdcss from the whole tarball.
