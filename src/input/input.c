@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.181 2002/03/01 01:12:28 stef Exp $
+ * $Id: input.c,v 1.182 2002/03/02 03:15:22 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Alexis Guillard <alexis.guillard@bt.com>
@@ -130,12 +130,14 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->i_status   = THREAD_CREATE;
 
     /* Demux */
+    p_input->p_demux_module = NULL;
     p_input->pf_init    = NULL;
     p_input->pf_end     = NULL;
     p_input->pf_demux   = NULL;
     p_input->pf_rewind  = NULL;
 
     /* Access */
+    p_input->p_access_module = NULL;
     p_input->pf_open        = NULL;
     p_input->pf_close       = NULL;
     p_input->pf_read        = NULL;
