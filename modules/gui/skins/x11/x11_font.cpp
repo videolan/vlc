@@ -2,7 +2,7 @@
  * x11_font.cpp: X11 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_font.cpp,v 1.5 2003/06/01 22:11:24 asmax Exp $
+ * $Id: x11_font.cpp,v 1.6 2003/06/06 21:47:18 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -47,10 +47,18 @@ X11Font::X11Font( intf_thread_t *_p_intf, string fontname, int size,
     : SkinFont( _p_intf, fontname, size, color, weight, italic, underline )
 {
     display = g_pIntf->p_sys->display;
+    Underline = underline;
 
-    // FIXME: just a beginning...
+    char name[256];
+    char slant = ( italic ? 'i' : 'r' );
+    // FIXME: a lot of work...
+    size = ( size < 10 ? 8 : 12 );
+    snprintf( name, 256, "-*-helvetica-bold-%c-*-*-*-%i-*-*-*-*-*-*", 
+              slant, 10 * size );
+    msg_Warn( _p_intf, "loading font %s", name );
+
     XLOCK;
-    font = XLoadFont( display, "-misc-fixed-*-*-*-*-*-*-*-*-*-*-*-*" );
+    font = XLoadFont( display, name );
     XUNLOCK;
 }
 //---------------------------------------------------------------------------
@@ -84,14 +92,29 @@ void X11Font::GenericPrint( Graphics *dest, string text, int x, int y,
     GC gc = ( (X11Graphics *)dest )->GetGC();
 
     XGCValues gcVal;
+    // Change color to avoid transparency
     gcVal.foreground = (color == 0 ? 10 : color);
     gcVal.font = font;
-    
-    // Render text on buffer
+    XRectangle rect;
+    rect.x = x;
+    rect.y = y;
+    rect.width = w;
+    rect.height = h+1;
+
     XLOCK;
-    XChangeGC( display, gc, GCForeground|GCFont,  &gcVal );
-    XDrawString( display, drawable, gc, x, y+h, text.c_str(), 
-                 text.size());
+    XChangeGC( display, gc, GCForeground|GCFont, &gcVal );
+    // Set the clipping region
+    XSetClipRectangles( display, gc, 0, 0, &rect, 1, Unsorted );  
+    
+    // Render text no the drawable
+    XDrawString( display, drawable, gc, x, y+h, text.c_str(), text.size());
+    if( Underline )
+    {
+        XDrawLine( display, drawable, gc, x, y+h, x+w, y+h );
+    }
+    
+    // Reset the clip mask
+    XSetClipMask( display, gc, None );
     XUNLOCK;
 }
 
