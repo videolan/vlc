@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: modules.c,v 1.146 2004/03/03 20:39:53 gbazin Exp $
+ * $Id: modules.c,v 1.147 2004/03/04 23:59:16 fenrir Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -324,8 +324,16 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         /* Check if the user wants to override the "strict" mode */
         if( psz_last_shortcut )
         {
-            if( !strcmp(psz_last_shortcut, "none") ) b_strict = VLC_TRUE;
-            else if( !strcmp(psz_last_shortcut, "any") ) b_strict = VLC_FALSE;
+            if( !strcmp(psz_last_shortcut, "none") )
+            {
+                b_strict = VLC_TRUE;
+                i_shortcuts--;
+            }
+            else if( !strcmp(psz_last_shortcut, "any") )
+            {
+                b_strict = VLC_FALSE;
+                i_shortcuts--;
+            }
         }
     }
 
@@ -373,7 +381,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         }
 
         /* If we required a shortcut, check this plugin provides it. */
-        if( i_shortcuts )
+        if( i_shortcuts > 0 )
         {
             vlc_bool_t b_trash;
             int i_dummy, i_short = i_shortcuts;
@@ -383,17 +391,8 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
              * explicitly requested) */
             b_trash = !p_module->i_score;
 
-            while( i_short )
+            while( i_short > 0 )
             {
-                /* If we are in "strict" mode and we couldn't
-                 * find the module in the list of provided shortcuts,
-                 * then kick the bastard out of here!!! */
-                if( i_short == 1 && b_strict )
-                {
-                    b_trash = VLC_TRUE;
-                    break;
-                }
-
                 for( i_dummy = 0; p_module->pp_shortcuts[i_dummy]; i_dummy++ )
                 {
                     if( !strcasecmp( psz_name,
@@ -419,6 +418,14 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
                 }
                 psz_name++;
                 i_short--;
+            }
+
+            /* If we are in "strict" mode and we couldn't
+             * find the module in the list of provided shortcuts,
+             * then kick the bastard out of here!!! */
+            if( i_short == 0 && b_strict )
+            {
+                b_trash = VLC_TRUE;
             }
 
             if( b_trash )
