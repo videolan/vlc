@@ -377,6 +377,9 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
         return;
     }
 
+    /* Update the playlist */
+    Rebuild();
+
     /* We want to be noticed of playlist changes */
 
     /* Some global changes happened -> Rebuild all */
@@ -394,8 +397,6 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     vlc_object_release( p_playlist );
 
 
-    /* Update the playlist */
-    Rebuild();
 }
 
 Playlist::~Playlist()
