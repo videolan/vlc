@@ -401,7 +401,7 @@ static fe_code_rate_t DecodeFEC( input_thread_t * p_input, int i_val )
 {
     fe_code_rate_t      fe_fec = FEC_NONE;
 
-    msg_Dbg( p_input, "using feq=%d", i_val );
+    msg_Dbg( p_input, "using fec=%d", i_val );
 
     switch ( i_val )
     {
@@ -811,9 +811,9 @@ static int FrontendSetOFDM( input_thread_t * p_input )
     fep.inversion = DecodeInversion( p_input );
 
     fep.u.ofdm.bandwidth = DecodeBandwidth( p_input );
-    var_Get( p_input, "dvb-code-rate-HP", &val );
+    var_Get( p_input, "dvb-code-rate-hp", &val );
     fep.u.ofdm.code_rate_HP = DecodeFEC( p_input, val.i_int );
-    var_Get( p_input, "dvb-code-rate-LP", &val );
+    var_Get( p_input, "dvb-code-rate-lp", &val );
     fep.u.ofdm.code_rate_LP = DecodeFEC( p_input, val.i_int );
     fep.u.ofdm.constellation = DecodeModulation( p_input );
     fep.u.ofdm.transmission_mode = DecodeTransmission( p_input );
