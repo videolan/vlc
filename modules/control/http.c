@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.35 2003/11/17 15:29:03 garf Exp $
+ * $Id: http.c,v 1.36 2003/11/18 12:32:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1812,7 +1812,7 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                 {
                     int i_item, *p_items = NULL, i_nb_items = 0;
                     char item[512], *p_parser = p_request;
-                    int i,j,temp;
+                    int i,j;
 
                     /* Get the list of items to keep */
                     while( (p_parser =
@@ -1821,40 +1821,27 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                         if( !*item ) continue;
 
                         i_item = atoi( item );
-                        p_items = realloc( p_items, (i_nb_items + 3) *
+                        p_items = realloc( p_items, (i_nb_items + 1) *
                                            sizeof(int) );
-                        p_items[i_nb_items + 1] = i_item;
+                        p_items[i_nb_items] = i_item;
                         i_nb_items++;
                     }
 
-                    /* sort item list */
-                    for( i=1 ; i < (i_nb_items + 1) ; i++)
+                    /* The items need to be deleted from in reversed order */
+                    for( i = p_sys->p_playlist->i_size - 1; i >= 0 ; i-- )
                     {
-                        for( j=(i+1) ; j < (i_nb_items + 1) ; j++)
+                        /* Check if the item is in the keep list */
+                        for( j = 0 ; j < i_nb_items ; j++ )
                         {
-                            if( p_items[j] > p_items[i] )
-                            {
-                                temp = p_items[j];
-                                p_items[j] = p_items[i];
-                                p_items[i] = temp;
-                            }
+                            if( p_items[j] == i ) break;
+                        }
+                        if( j == i_nb_items )
+                        {
+                            playlist_Delete( p_sys->p_playlist, i );
+                            msg_Dbg( p_intf, "requested playlist delete: %d",
+                                     i );
                         }
                     }
-
-                    p_items[0] = p_sys->p_playlist->i_size;
-                    p_items[ i_nb_items + 1 ] = -1;
-
-                    /* The items need to be deleted from in reversed order */
-                        for( i=0 ; i <= i_nb_items ; i++ )
-                        {
-                            for( j = (p_items[i] - 1) ; j > p_items[i + 1] ; j-- )
-                            {
-                                playlist_Delete( p_sys->p_playlist,
-                                                 j );
-                                msg_Dbg( p_intf, "requested playlist delete: %d",
-                                         j );
-                            }
-                        }
 
                     if( p_items ) free( p_items );
                     break;
