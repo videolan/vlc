@@ -2,7 +2,7 @@
  * input_dvd.c: DVD reading
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.7 2001/01/29 06:10:10 stef Exp $
+ * $Id: input_dvd.c,v 1.8 2001/01/29 06:28:19 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -135,9 +135,9 @@ static void DVDInit( input_thread_t * p_input )
     lseek64( p_input->i_handle, 0, SEEK_SET );
 
     /* Ifo initialisation */
-    intf_Msg( 3, "Ifo: Initialization" );
     p_method->ifo = IfoInit( p_input->i_handle );
     IfoRead( &(p_method->ifo) );
+    intf_Msg( "Ifo: Initialized" );
 
 #if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     /* CSS authentication and keys */
@@ -145,7 +145,6 @@ static void DVDInit( input_thread_t * p_input )
     {
         int   i;
 
-        intf_Msg( 3, "CSS: Initialization" );
         p_method->css = CSSInit( p_input->i_handle );
         p_method->css.i_title_nb = p_method->ifo.vmg.mat.i_tts_nb;
         if( (p_method->css.p_title_key =
@@ -163,6 +162,7 @@ static void DVDInit( input_thread_t * p_input )
                     p_method->ifo.p_vts[i].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
         }
         CSSGetKeys( &(p_method->css) );
+        intf_Msg( "CSS: Initialized" );
     }
 #endif
 
