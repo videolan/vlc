@@ -2,7 +2,7 @@
  * es.c: functions to handle elementary streams.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: es.c,v 1.4 2002/11/05 18:25:43 gbazin Exp $
+ * $Id: es.c,v 1.5 2003/01/29 11:17:44 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -190,7 +190,7 @@ void dvdplay_Subp( input_thread_t * p_input )
     int                     i_subp      = -1;
     int                     i_id;
     int                     i;
-           
+
     p_dvd = (dvd_data_t*)(p_input->p_access_data);
     p_dvd->i_spu_nb = 0;
 
@@ -203,7 +203,7 @@ void dvdplay_Subp( input_thread_t * p_input )
         {
             p_attr = dvdplay_subp_attr( p_dvd->vmg, i-1 );
             ++p_dvd->i_spu_nb;
-            
+
             if( pi_palette )
             {
                 ADDES( i_id, VLC_FOURCC('s','p','u','b'), SPU_ES,
@@ -234,19 +234,33 @@ void dvdplay_LaunchDecoders( input_thread_t * p_input )
 
     p_dvd = (dvd_data_t*)(p_input->p_access_data);
 
+    /* For audio: check user settings first, then check dvdplay settings. */
+    i_audio = config_GetInt( p_input, "audio-channel" );
+    if( i_audio <= 0 || i_audio > p_dvd->i_audio_nb )
+    {
+        /* if i_audio = -1 dvdplay_audio_info() will select a default channel,
+         * otherwise it warns libdvdplay that we have chosen another stream. */
+        i_audio = -1;
+    }
     dvdplay_audio_info( p_dvd->vmg, &i_audio_nr, &i_audio );
+
+    /* For spu: check user settings first, the check dvdplay settings. */
+    i_subp = config_GetInt( p_input, "spu-channel" );
+    if( i_subp <= 0 || i_subp > p_dvd->i_spu_nb )
+    {
+        i_subp = -1;
+    }
     dvdplay_subp_info( p_dvd->vmg, &i_subp_nr, &i_subp );
 
     input_SelectES( p_input, p_input->stream.pp_es[0] );
 
-//    if( !i_audio ) i_audio = 1;
     if( i_audio > p_dvd->i_audio_nb ) i_audio = 1;
     if( ( i_audio > 0 ) && ( p_dvd->i_audio_nb > 0 ) )
     {
         if( config_GetInt( p_input, "audio-type" ) == REQUESTED_A52 )
         {
             int     i_a52 = i_audio;
-            
+
             while( ( i_a52 < p_dvd->i_audio_nb ) &&
                    ( p_input->stream.pp_es[i_a52]->i_fourcc !=
                         VLC_FOURCC('a','5','2','b') ) )
@@ -258,14 +272,15 @@ void dvdplay_LaunchDecoders( input_thread_t * p_input )
             {
                 input_SelectES( p_input,
                                 p_input->stream.pp_es[i_a52] );
-                
+
                 /* warn libdvdplay that we have chosen another stream */
                 dvdplay_audio_info( p_dvd->vmg, &i_audio_nr, &i_a52 );
             }
             else
             {
-//                input_SelectES( p_input,
-//                                p_input->stream.pp_es[i_audio] );
+                /* none found, select the default one */
+                input_SelectES( p_input,
+                                p_input->stream.pp_es[i_audio] );
             }
         }
         else
@@ -275,6 +290,7 @@ void dvdplay_LaunchDecoders( input_thread_t * p_input )
         }
     }
 
+    if( i_subp > p_dvd->i_spu_nb ) i_subp = -1;
     if( ( i_subp > 0 ) && ( p_dvd->i_spu_nb > 0 ) )
     {
         i_subp += p_dvd->i_audio_nb;

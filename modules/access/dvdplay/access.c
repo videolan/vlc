@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.10 2003/01/28 15:05:52 massiot Exp $
+ * $Id: access.c,v 1.11 2003/01/29 11:17:44 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -444,23 +444,32 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
             /* Retrieve the highlight from dvdplay */
             dvdplay_highlight( p_dvd->vmg, &p_dvd->hli );
 
-            /* Fill our internal variables with this data */
-            val.i_int = p_dvd->hli.i_x_start;
-            var_Set( p_input, "x-start", val );
-            val.i_int = p_dvd->hli.i_y_start;
-            var_Set( p_input, "y-start", val );
-            val.i_int = p_dvd->hli.i_x_end;
-            var_Set( p_input, "x-end", val );
-            val.i_int = p_dvd->hli.i_y_end;
-            var_Set( p_input, "y-end", val );
+            if( p_dvd->hli.i_x_start || p_dvd->hli.i_y_start ||
+                p_dvd->hli.i_x_end || p_dvd->hli.i_y_end )
+            {
+                /* Fill our internal variables with this data */
+                val.i_int = p_dvd->hli.i_x_start;
+                var_Set( p_input, "x-start", val );
+                val.i_int = p_dvd->hli.i_y_start;
+                var_Set( p_input, "y-start", val );
+                val.i_int = p_dvd->hli.i_x_end;
+                var_Set( p_input, "x-end", val );
+                val.i_int = p_dvd->hli.i_y_end;
+                var_Set( p_input, "y-end", val );
 
-            val.p_address = (void *)p_dvd->hli.pi_color;
-            var_Set( p_input, "color", val );
-            val.p_address = (void *)p_dvd->hli.pi_contrast;
-            var_Set( p_input, "contrast", val );
+                val.p_address = (void *)p_dvd->hli.pi_color;
+                var_Set( p_input, "color", val );
+                val.p_address = (void *)p_dvd->hli.pi_contrast;
+                var_Set( p_input, "contrast", val );
 
-            /* Tell the SPU decoder that there's a new highlight */
-            val.b_bool = VLC_TRUE;
+                /* Tell the SPU decoder that there's a new highlight */
+                val.b_bool = VLC_TRUE;
+            }
+            else
+            {
+                /* Turn off the highlight */
+                val.b_bool = VLC_FALSE;
+            }
             var_Set( p_input, "highlight", val );
 
             vlc_mutex_unlock( p_mutex );
