@@ -528,11 +528,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     p_fmt->i_height;
         }
 
-	if (p_subpic->p_region->fmt.i_aspect == 0)
-	  /* Set subtitle to be the same aspect ratio as the background
-	     source video.
-	   */
-	  p_subpic->p_region->fmt.i_aspect = p_pic_src->format.i_aspect;
+        if ( p_region && p_subpic->p_region->fmt.i_aspect == 0 )
+          /* Set subtitle to be the same aspect ratio as the background
+             source video. */
+            p_subpic->p_region->fmt.i_aspect = p_pic_src->format.i_aspect;
 
         i_scale_width = i_scale_width_orig;
         i_scale_height = i_scale_height_orig;
@@ -541,20 +540,20 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             p_subpic->i_original_picture_height )
         {
             i_scale_width = i_scale_width * p_fmt->i_width /
-                p_subpic->i_original_picture_width;
+                             p_subpic->i_original_picture_width;
             i_scale_height = i_scale_height * p_fmt->i_height /
-                p_subpic->i_original_picture_height;
+                             p_subpic->i_original_picture_height;
         }
 
         /* Take care of the aspect ratio */
-
-	if( p_subpic->p_region->fmt.i_aspect != p_pic_src->format.i_aspect)
-	{
-	  i_scale_width = (p_subpic->p_region->fmt.i_aspect*1000) / 
-	    p_pic_src->format.i_aspect;
-	  i_subpic_x = p_subpic->i_x * i_scale_width / 1000;
-	} else 
-	  i_subpic_x = p_subpic->i_x;
+        if( p_region && p_subpic->p_region->fmt.i_aspect !=
+                        p_pic_src->format.i_aspect)
+        {
+            i_scale_width = (p_subpic->p_region->fmt.i_aspect*1000) /
+            p_pic_src->format.i_aspect;
+            i_subpic_x = p_subpic->i_x * i_scale_width / 1000;
+        } else
+          i_subpic_x = p_subpic->i_x;
 
 
         if( p_region && p_region->fmt.i_sar_num * p_fmt->i_sar_den !=
