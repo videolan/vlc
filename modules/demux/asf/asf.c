@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.18 2003/01/25 16:58:34 fenrir Exp $
+ * $Id: asf.c,v 1.19 2003/01/29 21:54:34 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -464,9 +464,9 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
     /* *** parse error correction if present *** */
     if( p_peek[0]&0x80 )
     {
-        int i_error_correction_length_type;
-        int i_error_correction_data_length;
-        int i_opaque_data_present;
+        unsigned int i_error_correction_length_type;
+        unsigned int i_error_correction_data_length;
+        unsigned int i_opaque_data_present;
 
         i_error_correction_data_length = p_peek[0] & 0x0f;  // 4bits
         i_opaque_data_present = ( p_peek[0] >> 4 )& 0x01;    // 1bit
@@ -485,6 +485,12 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
     else
     {
         msg_Warn( p_input, "p_peek[0]&0x80 != 0x80" );
+    }
+
+    /* sanity check */
+    if( i_skip + 2 >= i_data_packet_min )
+    {
+        goto loop_error_recovery;
     }
 
     i_packet_flags = p_peek[i_skip]; i_skip++;
@@ -552,6 +558,11 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
             i_pts_delta = 0;
 
             i_media_object_offset = i_tmp;
+
+            if( i_skip >= i_packet_size_left )
+            {
+                break;
+            }
         }
         else if( i_replicated_data_length == 1 )
         {
@@ -580,6 +591,11 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
         {
             i_payload_data_length = i_packet_length -
                                         i_packet_padding_length - i_skip;
+        }
+
+        if( i_payload_data_length < 0 || i_skip + i_payload_data_length > i_packet_size_left )
+        {
+            break;
         }
 
 #if 0
