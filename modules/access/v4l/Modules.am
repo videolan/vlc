@@ -1,1 +1,2 @@
-SOURCES_v4l = modules/access/v4l/v4l.c
+SOURCES_v4l = modules/access/v4l/v4l.c \
+	modules/access/v4l/videodev_mjpeg.h

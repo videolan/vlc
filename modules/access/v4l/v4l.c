@@ -2,9 +2,11 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.16 2003/05/15 22:27:36 massiot Exp $
+ * $Id: v4l.c,v 1.17 2003/05/31 01:23:29 fenrir Exp $
  *
  * Author: Samuel Hocevar <sam@zoy.org>
+ *         Laurent Aimar <fenrir@via.ecp.fr>
+ *         Paul Forgey <paulf at aphrodite dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,6 +45,7 @@
 
 #include <fcntl.h>
 #include <linux/videodev.h>
+#include "videodev_mjpeg.h"
 
 #include <sys/soundcard.h>
 
@@ -86,6 +89,22 @@ vlc_module_end();
 /****************************************************************************
  * I. Access Part
  ****************************************************************************/
+#define MJPEG_BUFFER_SIZE (256*1024)
+
+struct quicktime_mjpeg_app1
+{
+    uint32_t    i_reserved;             /* set to 0 */
+    uint32_t    i_tag;                  /* 'mjpg' */
+    uint32_t    i_field_size;           /* offset following EOI */
+    uint32_t    i_padded_field_size;    /* offset following EOI+pad */
+    uint32_t    i_next_field;           /* offset to next field */
+    uint32_t    i_DQT_offset;
+    uint32_t    i_DHT_offset;
+    uint32_t    i_SOF_offset;
+    uint32_t    i_SOS_offset;
+    uint32_t    i_data_offset;          /* following SOS marker data */
+};
+
 struct access_sys_t
 {
     char    *psz_video_device;
@@ -104,11 +123,17 @@ struct access_sys_t
     int i_width;
     int i_height;
 
+    vlc_bool_t b_mjpeg;
+    int i_decimation;
+    int i_quality;
+
     struct video_capability vid_cap;
     struct video_mbuf       vid_mbuf;
+    struct mjpeg_requestbuffers mjpeg_buffers;
 
     uint8_t *p_video_mmap;
     int     i_frame_pos;
+
     struct video_mmap   vid_mmap;
     struct video_picture vid_picture;
 
@@ -195,6 +220,8 @@ static int AccessOpen( vlc_object_t *p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     access_sys_t   *p_sys;
     char           *psz_dup, *psz_parser;
+    struct mjpeg_params mjpeg;
+    int i;
 
     struct video_channel    vid_channel;
 
@@ -211,6 +238,10 @@ static int AccessOpen( vlc_object_t *p_this )
     p_sys->i_frequency      = -1;
     p_sys->i_width          = 0;
     p_sys->i_height         = 0;
+
+    p_sys->b_mjpeg     = VLC_FALSE;
+    p_sys->i_decimation = 1;
+    p_sys->i_quality = 100;
 
     p_sys->i_frame_pos = 0;
 
@@ -389,9 +420,29 @@ static int AccessOpen( vlc_object_t *p_this )
 
                 p_sys->b_stereo = VLC_FALSE;
             }
+            else if( !strncmp( psz_parser, "mjpeg", strlen( "mjpeg" ) ) )
+            {
+                psz_parser += strlen( "mjpeg" );
+
+                p_sys->b_mjpeg = VLC_TRUE;
+            }
+            else if( !strncmp( psz_parser, "decimation=", 
+                        strlen( "decimation=" ) ) )
+            {
+                p_sys->i_decimation = 
+                    strtol( psz_parser + strlen( "decimation=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "quality=",
+                        strlen( "quality=" ) ) )
+            {
+                p_sys->i_quality =
+                    strtol( psz_parser + strlen( "quality=" ),
+                            &psz_parser, 0 );
+            }
             else
             {
-                msg_Warn( p_input, "unknow option" );
+                msg_Warn( p_input, "unknown option" );
             }
 
             while( *psz_parser && *psz_parser != ':' )
@@ -567,55 +618,124 @@ static int AccessOpen( vlc_object_t *p_this )
                 msg_Err( p_input, "cannot set audio" );
                 goto failed;
             }
-
-            if( p_sys->psz_adev )
-            {
-                int    i_format;
-                if( ( p_sys->fd_audio = open( p_sys->psz_adev, O_RDONLY|O_NONBLOCK ) ) < 0 )
-                {
-                    msg_Err( p_input, "cannot open audio device" );
-                    goto failed;
-                }
-
-                i_format = AFMT_S16_LE;
-                if( ioctl( p_sys->fd_audio, SNDCTL_DSP_SETFMT, &i_format ) < 0
-                    || i_format != AFMT_S16_LE )
-                {
-                    msg_Err( p_input,
-                             "cannot set audio format (16b little endian)" );
-                    goto failed;
-                }
-
-                if( ioctl( p_sys->fd_audio, SNDCTL_DSP_STEREO,
-                           &p_sys->b_stereo ) < 0 )
-                {
-                    msg_Err( p_input, "cannot set audio channels count" );
-                    goto failed;
-                }
-
-                if( ioctl( p_sys->fd_audio, SNDCTL_DSP_SPEED,
-                           &p_sys->i_sample_rate ) < 0 )
-                {
-                    msg_Err( p_input, "cannot set audio sample rate" );
-                    goto failed;
-                }
-
-                msg_Dbg( p_input,
-                         "adev=`%s' %s %dHz",
-                         p_sys->psz_adev,
-                         p_sys->b_stereo ? "stereo" : "mono",
-                         p_sys->i_sample_rate );
-
-                p_sys->i_audio_frame_size = 0;
-                p_sys->i_audio_frame_size_allocated = 6*1024;
-                p_sys->p_audio_frame =
-                    malloc( p_sys->i_audio_frame_size_allocated );
-            }
         }
+
     }
 
-    /* fix width/heigh */
-    if( p_sys->i_width == 0 || p_sys->i_height == 0 )
+    if( p_sys->psz_adev )
+    {
+        int    i_format;
+        if( ( p_sys->fd_audio = open( p_sys->psz_adev, O_RDONLY|O_NONBLOCK ) ) < 0 )
+        {
+            msg_Err( p_input, "cannot open audio device" );
+            goto failed;
+        }
+
+        i_format = AFMT_S16_LE;
+        if( ioctl( p_sys->fd_audio, SNDCTL_DSP_SETFMT, &i_format ) < 0
+            || i_format != AFMT_S16_LE )
+        {
+            msg_Err( p_input,
+                     "cannot set audio format (16b little endian)" );
+            goto failed;
+        }
+
+        if( ioctl( p_sys->fd_audio, SNDCTL_DSP_STEREO,
+                   &p_sys->b_stereo ) < 0 )
+        {
+            msg_Err( p_input, "cannot set audio channels count" );
+            goto failed;
+        }
+
+        if( ioctl( p_sys->fd_audio, SNDCTL_DSP_SPEED,
+                   &p_sys->i_sample_rate ) < 0 )
+        {
+            msg_Err( p_input, "cannot set audio sample rate" );
+            goto failed;
+        }
+
+        msg_Dbg( p_input,
+                 "adev=`%s' %s %dHz",
+                 p_sys->psz_adev,
+                 p_sys->b_stereo ? "stereo" : "mono",
+                 p_sys->i_sample_rate );
+
+        p_sys->i_audio_frame_size = 0;
+        p_sys->i_audio_frame_size_allocated = 6*1024;
+        p_sys->p_audio_frame =
+            malloc( p_sys->i_audio_frame_size_allocated );
+    }
+
+    /* establish basic params with input and norm before feeling width
+     * or height */
+    if( p_sys->b_mjpeg )
+    {
+        struct quicktime_mjpeg_app1 *p_app1;
+        int32_t i_offset;
+
+        if( ioctl( p_sys->fd, MJPIOC_G_PARAMS, &mjpeg ) < 0 )
+        {
+            msg_Err( p_input, "cannot get mjpeg params" );
+            goto failed;
+        }
+        mjpeg.input = p_sys->i_channel;
+        mjpeg.norm  = p_sys->i_norm;
+        mjpeg.decimation = p_sys->i_decimation;
+
+        if( p_sys->i_width )
+            mjpeg.img_width = p_sys->i_width / p_sys->i_decimation;
+        if( p_sys->i_height )
+            mjpeg.img_height = p_sys->i_height / p_sys->i_decimation;
+
+        /* establish Quicktime APP1 marker while we are here */
+        mjpeg.APPn = 1;
+        mjpeg.APP_len = 40;
+
+        /* aligned */
+        p_app1 = (struct quicktime_mjpeg_app1 *)mjpeg.APP_data;
+        p_app1->i_reserved = 0;
+        p_app1->i_tag = VLC_FOURCC( 'm','j','p','g' );
+        p_app1->i_field_size = 0;
+        p_app1->i_padded_field_size = 0;
+        p_app1->i_next_field = 0;
+        /* XXX WARNING XXX */
+        /* these's nothing magic about these values.  We are dangerously
+         * assuming the encoder card is encoding mjpeg-a and is not throwing
+         * in marker tags we aren't expecting.  It's bad enough we have to
+         * search through the jpeg output for every frame we grab just to
+         * find the first field's end marker, so we take this risk to boost
+         * performance.
+         * This is really something the driver could do for us because this
+         * does conform to standards outside of Apple Quicktime.
+         */
+        i_offset = 0x2e;
+        p_app1->i_DQT_offset = hton32( i_offset );
+        i_offset = 0xb4;
+        p_app1->i_DHT_offset = hton32( i_offset );
+        i_offset = 0x258;
+        p_app1->i_SOF_offset = hton32( i_offset );
+        i_offset = 0x26b;
+        p_app1->i_SOS_offset = hton32( i_offset );
+        i_offset = 0x279;
+        p_app1->i_data_offset = hton32( i_offset );
+
+        /* SOF and SOS aren't specified by the mjpeg API because they aren't
+         * optional.  They will be present in the output. */
+        mjpeg.jpeg_markers = JPEG_MARKER_DHT | JPEG_MARKER_DQT;
+
+        if( ioctl( p_sys->fd, MJPIOC_S_PARAMS, &mjpeg ) < 0 )
+        {
+            msg_Err( p_input, "cannot set mjpeg params" );
+            goto failed;
+        }
+
+        p_sys->i_width = mjpeg.img_width * mjpeg.HorDcm;
+        p_sys->i_height = mjpeg.img_height * mjpeg.VerDcm *
+            mjpeg.field_per_buff;
+    }
+
+    /* fix width/height */
+    if( !p_sys->b_mjpeg && ( p_sys->i_width == 0 || p_sys->i_height == 0 ) )
     {
         struct video_window vid_win;
 
@@ -632,79 +752,130 @@ static int AccessOpen( vlc_object_t *p_this )
 
     p_sys->p_video_frame = NULL;
 
-    /* Find out video format used by device */
-    if( ioctl( p_sys->fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
+    if( p_sys->b_mjpeg )
     {
-        int i_chroma, i;
-        struct video_picture vid_picture = p_sys->vid_picture;
+        p_sys->i_chroma = VLC_FOURCC( 'I','4','2','0' );
+    }
+    else
+    {
+        /* Find out video format used by device */
+        if( ioctl( p_sys->fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
+        {
+            int i_chroma;
+            struct video_picture vid_picture = p_sys->vid_picture;
 
-        /* Try to set the format to something easy to encode */
-        vid_picture.palette = VIDEO_PALETTE_YUV420P;
-        if( ioctl( p_sys->fd, VIDIOCSPICT, &vid_picture ) == 0 )
-        {
-            p_sys->vid_picture = vid_picture;
-        }
-        else
-        {
-            vid_picture.palette = VIDEO_PALETTE_YUV422P;
+            /* Try to set the format to something easy to encode */
+            vid_picture.palette = VIDEO_PALETTE_YUV420P;
             if( ioctl( p_sys->fd, VIDIOCSPICT, &vid_picture ) == 0 )
             {
                 p_sys->vid_picture = vid_picture;
             }
-        }
+            else
+            {
+                vid_picture.palette = VIDEO_PALETTE_YUV422P;
+                if( ioctl( p_sys->fd, VIDIOCSPICT, &vid_picture ) == 0 )
+                {
+                    p_sys->vid_picture = vid_picture;
+                }
+            }
 
-        /* Find out final format */
-        switch( p_sys->vid_picture.palette )
+            /* Find out final format */
+            switch( p_sys->vid_picture.palette )
+            {
+            case VIDEO_PALETTE_GREY:
+                i_chroma = VLC_FOURCC( 'G', 'R', 'E', 'Y' );
+                break;
+            case VIDEO_PALETTE_HI240:
+                i_chroma = VLC_FOURCC( 'I', '2', '4', '0' );
+                break;
+            case VIDEO_PALETTE_RGB565:
+                i_chroma = VLC_FOURCC( 'R', 'V', '1', '6' );
+                break;
+            case VIDEO_PALETTE_RGB555:
+                i_chroma = VLC_FOURCC( 'R', 'V', '1', '5' );
+                break;
+            case VIDEO_PALETTE_RGB24:
+                i_chroma = VLC_FOURCC( 'R', 'V', '2', '4' );
+                break;
+            case VIDEO_PALETTE_RGB32:
+                i_chroma = VLC_FOURCC( 'R', 'V', '3', '2' );
+                break;
+            case VIDEO_PALETTE_YUV422:
+                i_chroma = VLC_FOURCC( 'I', '4', '2', '2' );
+                break;
+            case VIDEO_PALETTE_YUYV:
+                i_chroma = VLC_FOURCC( 'Y', 'U', 'Y', 'V' );
+                break;
+            case VIDEO_PALETTE_UYVY:
+                i_chroma = VLC_FOURCC( 'U', 'Y', 'V', 'Y' );
+                break;
+            case VIDEO_PALETTE_YUV420:
+                i_chroma = VLC_FOURCC( 'I', '4', '2', 'N' );
+                break;
+            case VIDEO_PALETTE_YUV411:
+                i_chroma = VLC_FOURCC( 'I', '4', '1', 'N' );
+                break;
+            case VIDEO_PALETTE_RAW:
+                i_chroma = VLC_FOURCC( 'G', 'R', 'A', 'W' );
+                break;
+            case VIDEO_PALETTE_YUV422P:
+                i_chroma = VLC_FOURCC( 'I', '4', '2', '2' );
+                break;
+            case VIDEO_PALETTE_YUV420P:
+                i_chroma = VLC_FOURCC( 'I', '4', '2', '0' );
+                break;
+            case VIDEO_PALETTE_YUV411P:
+                i_chroma = VLC_FOURCC( 'I', '4', '1', '1' );
+                break;
+            }
+            p_sys->i_chroma = i_chroma;
+        }
+        else
         {
-        case VIDEO_PALETTE_GREY:
-            i_chroma = VLC_FOURCC( 'G', 'R', 'E', 'Y' );
-            break;
-        case VIDEO_PALETTE_HI240:
-            i_chroma = VLC_FOURCC( 'I', '2', '4', '0' );
-            break;
-        case VIDEO_PALETTE_RGB565:
-            i_chroma = VLC_FOURCC( 'R', 'V', '1', '6' );
-            break;
-        case VIDEO_PALETTE_RGB555:
-            i_chroma = VLC_FOURCC( 'R', 'V', '1', '5' );
-            break;
-        case VIDEO_PALETTE_RGB24:
-            i_chroma = VLC_FOURCC( 'R', 'V', '2', '4' );
-            break;
-        case VIDEO_PALETTE_RGB32:
-            i_chroma = VLC_FOURCC( 'R', 'V', '3', '2' );
-            break;
-        case VIDEO_PALETTE_YUV422:
-            i_chroma = VLC_FOURCC( 'I', '4', '2', '2' );
-            break;
-        case VIDEO_PALETTE_YUYV:
-            i_chroma = VLC_FOURCC( 'Y', 'U', 'Y', 'V' );
-            break;
-        case VIDEO_PALETTE_UYVY:
-            i_chroma = VLC_FOURCC( 'U', 'Y', 'V', 'Y' );
-            break;
-        case VIDEO_PALETTE_YUV420:
-            i_chroma = VLC_FOURCC( 'I', '4', '2', 'N' );
-            break;
-        case VIDEO_PALETTE_YUV411:
-            i_chroma = VLC_FOURCC( 'I', '4', '1', 'N' );
-            break;
-        case VIDEO_PALETTE_RAW:
-            i_chroma = VLC_FOURCC( 'G', 'R', 'A', 'W' );
-            break;
-        case VIDEO_PALETTE_YUV422P:
-            i_chroma = VLC_FOURCC( 'I', '4', '2', '2' );
-            break;
-        case VIDEO_PALETTE_YUV420P:
-            i_chroma = VLC_FOURCC( 'I', '4', '2', '0' );
-            break;
-        case VIDEO_PALETTE_YUV411P:
-            i_chroma = VLC_FOURCC( 'I', '4', '1', '1' );
-            break;
+            msg_Err( p_input, "ioctl VIDIOCGPICT failed" );
+            goto failed;
+        }
+    }
+
+
+    if( p_sys->b_mjpeg )
+    {
+        int i;
+
+        p_sys->mjpeg_buffers.count = 8;
+        p_sys->mjpeg_buffers.size = MJPEG_BUFFER_SIZE;
+
+        if( ioctl( p_sys->fd, MJPIOC_REQBUFS, &p_sys->mjpeg_buffers ) < 0 )
+        {
+            msg_Err( p_input, "mmap unsupported" );
+            goto failed;
         }
 
-        p_sys->i_chroma = i_chroma;
+        p_sys->p_video_mmap = mmap( 0,
+                p_sys->mjpeg_buffers.size * p_sys->mjpeg_buffers.count,
+                PROT_READ | PROT_WRITE, MAP_SHARED, p_sys->fd, 0 );
+        if( p_sys->p_video_mmap == MAP_FAILED )
+        {
+            msg_Err( p_input, "mmap failed" );
+            goto failed;
+        }
 
+        p_sys->i_codec  = VLC_FOURCC( 'm','j','p','g' );
+        p_sys->p_encoder = NULL;
+        p_sys->i_frame_pos = -1;
+
+        /* queue up all the frames */
+        for( i = 0; i < (int)p_sys->mjpeg_buffers.count; i++ )
+        {
+            if( ioctl( p_sys->fd, MJPIOC_QBUF_CAPT, &i ) < 0 )
+            {
+                msg_Err( p_input, "unable to queue frame" );
+                goto failed;
+            }
+        }
+    }
+    else
+    {
         /* Fill in picture_t fields */
         vout_InitPicture( VLC_OBJECT(p_input), &p_sys->pic,
                           p_sys->i_width, p_sys->i_height, p_sys->i_chroma );
@@ -722,97 +893,92 @@ static int AccessOpen( vlc_object_t *p_this )
 
         msg_Dbg( p_input, "v4l device uses frame size: %i",
                  p_sys->i_video_frame_size );
-        msg_Dbg( p_input, "v4l device uses chroma: %4.4s", (char*)&i_chroma );
-    }
-    else
-    {
-        msg_Err( p_input, "ioctl VIDIOCGPICT failed" );
-        goto failed;
-    }
+        msg_Dbg( p_input, "v4l device uses chroma: %4.4s",
+                (char*)&p_sys->i_chroma );
 
-    /* Allocate mmap buffer */
-    if( ioctl( p_sys->fd, VIDIOCGMBUF, &p_sys->vid_mbuf ) < 0 )
-    {
-        msg_Err( p_input, "mmap unsupported" );
-        goto failed;
-    }
+        /* Allocate mmap buffer */
+        if( ioctl( p_sys->fd, VIDIOCGMBUF, &p_sys->vid_mbuf ) < 0 )
+        {
+            msg_Err( p_input, "mmap unsupported" );
+            goto failed;
+        }
 
-    p_sys->p_video_mmap = mmap( 0, p_sys->vid_mbuf.size,
-                                PROT_READ|PROT_WRITE, MAP_SHARED,
-                                p_sys->fd, 0 );
-    if( p_sys->p_video_mmap == MAP_FAILED )
-    {
-        /* FIXME -> normal read */
-        msg_Err( p_input, "mmap failed" );
-        goto failed;
-    }
+        p_sys->p_video_mmap = mmap( 0, p_sys->vid_mbuf.size,
+                                    PROT_READ|PROT_WRITE, MAP_SHARED,
+                                    p_sys->fd, 0 );
+        if( p_sys->p_video_mmap == MAP_FAILED )
+        {
+            /* FIXME -> normal read */
+            msg_Err( p_input, "mmap failed" );
+            goto failed;
+        }
 
-    /* init grabbing */
-    p_sys->vid_mmap.frame  = 0;
-    p_sys->vid_mmap.width  = p_sys->i_width;
-    p_sys->vid_mmap.height = p_sys->i_height;
-    p_sys->vid_mmap.format = p_sys->vid_picture.palette;
-    if( ioctl( p_sys->fd, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
-    {
-        msg_Warn( p_input, "%4.4s refused", (char*)&p_sys->i_chroma );
-        msg_Err( p_input, "chroma selection failed" );
-        goto failed;
-    }
+        /* init grabbing */
+        p_sys->vid_mmap.frame  = 0;
+        p_sys->vid_mmap.width  = p_sys->i_width;
+        p_sys->vid_mmap.height = p_sys->i_height;
+        p_sys->vid_mmap.format = p_sys->vid_picture.palette;
+        if( ioctl( p_sys->fd, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
+        {
+            msg_Warn( p_input, "%4.4s refused", (char*)&p_sys->i_chroma );
+            msg_Err( p_input, "chroma selection failed" );
+            goto failed;
+        }
 
-    /* encoder part */
-    if( p_sys->i_codec != VLC_FOURCC( 0, 0, 0, 0 ) )
-    {
-        msg_Dbg( p_input,
-                 "need a rencoder from %4.4s to %4.4s",
-                 (char*)&p_sys->i_chroma,
-                 (char*)&p_sys->i_codec );
+        /* encoder part */
+        if( p_sys->i_codec != VLC_FOURCC( 0, 0, 0, 0 ) )
+        {
+            msg_Dbg( p_input,
+                     "need a rencoder from %4.4s to %4.4s",
+                     (char*)&p_sys->i_chroma,
+                     (char*)&p_sys->i_codec );
 #define p_enc p_sys->p_encoder
-        p_enc = vlc_object_create( p_input, sizeof( video_encoder_t ) );
-        p_enc->i_codec = p_sys->i_codec;
-        p_enc->i_chroma= p_sys->i_chroma;
-        p_enc->i_width = p_sys->i_width;
-        p_enc->i_height= p_sys->i_height;
-        p_enc->i_aspect= 0;
+            p_enc = vlc_object_create( p_input, sizeof( video_encoder_t ) );
+            p_enc->i_codec = p_sys->i_codec;
+            p_enc->i_chroma= p_sys->i_chroma;
+            p_enc->i_width = p_sys->i_width;
+            p_enc->i_height= p_sys->i_height;
+            p_enc->i_aspect= 0;
 
 
-        p_enc->p_module = module_Need( p_enc, "video encoder",
-                                       "$video-encoder" );
-        if( !p_enc->p_module )
-        {
-            msg_Warn( p_input, "no suitable encoder to %4.4s",
-                      (char*)&p_enc->i_codec );
-            vlc_object_destroy( p_enc );
-            goto failed;
-        }
+            p_enc->p_module = module_Need( p_enc, "video encoder",
+                                           "$video-encoder" );
+            if( !p_enc->p_module )
+            {
+                msg_Warn( p_input, "no suitable encoder to %4.4s",
+                          (char*)&p_enc->i_codec );
+                vlc_object_destroy( p_enc );
+                goto failed;
+            }
 
-        /* *** init the codec *** */
-        if( p_enc->pf_init( p_enc ) )
-        {
-            msg_Err( p_input, "failed to initialize video encoder plugin" );
-            vlc_object_destroy( p_enc );
-            goto failed;
-        }
+            /* *** init the codec *** */
+            if( p_enc->pf_init( p_enc ) )
+            {
+                msg_Err( p_input, "failed to initialize video encoder plugin" );
+                vlc_object_destroy( p_enc );
+                goto failed;
+            }
 
-        /* *** alloacted buffer *** */
-        if( p_enc->i_buffer_size <= 0 )
-        {
-          p_enc->i_buffer_size = 1024 * 1024;// * p_enc->i_width * p_enc->i_height;
-        }
-        p_sys->i_video_frame_size = p_enc->i_buffer_size;
-        p_sys->i_video_frame_size_allocated = p_enc->i_buffer_size;
-        if( !( p_sys->p_video_frame = malloc( p_enc->i_buffer_size ) ) )
-        {
-            msg_Err( p_input, "out of memory" );
-            goto failed;
-        }
+            /* *** alloacted buffer *** */
+            if( p_enc->i_buffer_size <= 0 )
+            {
+              p_enc->i_buffer_size = 1024 * 1024;// * p_enc->i_width * p_enc->i_height;
+            }
+            p_sys->i_video_frame_size = p_enc->i_buffer_size;
+            p_sys->i_video_frame_size_allocated = p_enc->i_buffer_size;
+            if( !( p_sys->p_video_frame = malloc( p_enc->i_buffer_size ) ) )
+            {
+                msg_Err( p_input, "out of memory" );
+                goto failed;
+            }
 #undef p_enc
+        }
+        else
+        {
+            p_sys->i_codec  = p_sys->i_chroma;
+            p_sys->p_encoder = NULL;
+        }
     }
-    else
-    {
-        p_sys->i_codec  = p_sys->i_chroma;
-        p_sys->p_encoder = NULL;
-    }
-
 
     p_input->pf_read        = Read;
     p_input->pf_seek        = NULL;
@@ -883,11 +1049,21 @@ static void AccessClose( vlc_object_t *p_this )
 
     msg_Info( p_input, "v4l grabbing stoped" );
 
+    if( p_sys->b_mjpeg )
+    {
+        int i_noframe = -1;
+        ioctl( p_sys->fd, MJPIOC_QBUF_CAPT, &i_noframe );
+    }
+
     free( p_sys->psz_video_device );
     close( p_sys->fd );
-    if( p_sys->p_video_mmap )
+    if( p_sys->p_video_mmap && p_sys->p_video_mmap != MAP_FAILED )
     {
-        munmap( p_sys->p_video_mmap, p_sys->vid_mbuf.size );
+        if( p_sys->b_mjpeg )
+            munmap( p_sys->p_video_mmap, p_sys->mjpeg_buffers.size *
+                    p_sys->mjpeg_buffers.count );
+        else
+            munmap( p_sys->p_video_mmap, p_sys->vid_mbuf.size );
     }
     if( p_sys->fd_audio >= 0 )
     {
@@ -942,13 +1118,9 @@ static int GrabAudio( input_thread_t * p_input,
     return VLC_SUCCESS;
 }
 
-static int GrabVideo( input_thread_t * p_input,
-                      uint8_t **pp_data,
-                      int *pi_data,
-                      mtime_t  *pi_pts )
+static uint8_t *GrabCapture( input_thread_t *p_input )
 {
-    access_sys_t *p_sys   = p_input->p_access_data;
-
+    access_sys_t *p_sys = p_input->p_access_data;
     p_sys->vid_mmap.frame = ( p_sys->i_frame_pos + 1 ) %
                             p_sys->vid_mbuf.frames;
     for( ;; )
@@ -961,7 +1133,7 @@ static int GrabVideo( input_thread_t * p_input,
         if( errno != EAGAIN )
         {
             msg_Err( p_input, "failed while grabbing new frame" );
-            return( -1 );
+            return( NULL );
         }
         msg_Dbg( p_input, "another try ?" );
     }
@@ -971,15 +1143,120 @@ static int GrabVideo( input_thread_t * p_input,
     while( ioctl(p_sys->fd, VIDIOCSYNC, &p_sys->i_frame_pos) < 0 &&
            ( errno == EAGAIN || errno == EINTR ) );
 
-
     p_sys->i_frame_pos = p_sys->vid_mmap.frame;
+    /* leave i_video_frame_size alone */
+    return p_sys->p_video_mmap + p_sys->vid_mbuf.offsets[p_sys->i_frame_pos];
+}
+
+static uint8_t *GrabMJPEG( input_thread_t *p_input )
+{
+    access_sys_t *p_sys = p_input->p_access_data;
+    struct mjpeg_sync sync;
+    uint8_t *p_frame, *p_field, *p;
+    uint16_t tag;
+    uint32_t i_size;
+    struct quicktime_mjpeg_app1 *p_app1 = NULL;
+
+    /* re-queue the last frame we sync'd */
+    if( p_sys->i_frame_pos != -1 )
+        while( ioctl( p_sys->fd, MJPIOC_QBUF_CAPT, &p_sys->i_frame_pos ) < 0 &&
+                ( errno == EAGAIN || errno == EINTR ) );
+
+    /* sync on the next frame */
+    while( ioctl( p_sys->fd, MJPIOC_SYNC, &sync ) < 0 &&
+            ( errno == EAGAIN || errno == EINTR ) );
+
+    p_sys->i_frame_pos = sync.frame;
+    p_frame = p_sys->p_video_mmap + p_sys->mjpeg_buffers.size * sync.frame;
+
+    /* p_frame now points to the data.  fix up the Quicktime APP1 marker */
+    tag = 0xffd9;
+    tag = hton16( tag );
+    p_field = p_frame;
+
+    /* look for EOI */
+    p = memmem( p_field, sync.length, &tag, 2 );
+
+    if( p )
+    {
+        p += 2; /* data immediately following EOI */
+        /* UNALIGNED! */
+        p_app1 = (struct quicktime_mjpeg_app1 *)(p_field + 6);
+
+        i_size = ((uint32_t)(p - p_field));
+        i_size = hton32( i_size );
+        memcpy( &p_app1->i_field_size, &i_size, 4 );
+
+        while( *p == 0xff && *(p+1) == 0xff )
+            p++;
+
+        i_size = ((uint32_t)(p - p_field));
+        i_size = hton32( i_size );
+        memcpy( &p_app1->i_padded_field_size, &i_size, 4 );
+    }
+
+    tag = 0xffd8;
+    tag = hton16( tag );
+    p_field = memmem( p, sync.length - (size_t)(p - p_frame), &tag, 2 );
+
+    if( p_field )
+    {
+        i_size = (uint32_t)(p_field - p_frame);
+        i_size = hton32( i_size );
+        memcpy( &p_app1->i_next_field, &i_size, 4 );
+
+        /* UNALIGNED! */
+        p_app1 = (struct quicktime_mjpeg_app1 *)(p_field + 6);
+        tag = 0xffd9;
+        tag = hton16( tag );
+        p = memmem( p_field, sync.length - (size_t)(p_field - p_frame), 
+                &tag, 2 );
+
+        if( !p )
+        {
+            /* sometimes the second field doesn't have the EOI.  just put it
+             * there
+             */
+            p = p_frame + sync.length;
+            memcpy( p, &tag, 2 );
+            sync.length += 2;
+        }
+
+        p += 2;
+        i_size = (uint32_t)(p - p_field);
+        i_size = hton32( i_size );
+        memcpy( &p_app1->i_field_size, &i_size, 4 );
+        i_size = (uint32_t)(sync.length - (uint32_t)(p_field - p_frame));
+        i_size = hton32( i_size );
+        memcpy( &p_app1->i_padded_field_size, &i_size, 4 );
+    }
+
+    p_sys->i_video_frame_size = sync.length;
+    return p_frame;
+}
+
+static int GrabVideo( input_thread_t * p_input,
+                      uint8_t **pp_data,
+                      int *pi_data,
+                      mtime_t  *pi_pts )
+{
+    access_sys_t *p_sys   = p_input->p_access_data;
+    uint8_t *p_frame;
+
+    if( p_sys->b_mjpeg )
+        p_frame = GrabMJPEG( p_input );
+    else
+        p_frame = GrabCapture( p_input );
+
+    if( !p_frame )
+        return -1;
 
     if( p_sys->p_encoder )
     {
         int i;
+        /* notice we can't get here if we are using mjpeg */
 
-        p_sys->pic.p[0].p_pixels = p_sys->p_video_mmap +
-            p_sys->vid_mbuf.offsets[p_sys->i_frame_pos];
+        p_sys->pic.p[0].p_pixels = p_frame;
 
         for( i = 1; i < p_sys->pic.i_planes; i++ )
         {
@@ -994,8 +1271,7 @@ static int GrabVideo( input_thread_t * p_input,
     }
     else
     {
-        p_sys->p_video_frame = p_sys->p_video_mmap +
-                               p_sys->vid_mbuf.offsets[p_sys->i_frame_pos];
+        p_sys->p_video_frame = p_frame;
     }
 
     *pp_data = p_sys->p_video_frame;
