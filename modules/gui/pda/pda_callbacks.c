@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.26 2004/01/29 17:51:07 zorglub Exp $
+ * $Id: pda_callbacks.c,v 1.27 2004/02/10 20:28:37 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -91,7 +91,7 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options, int i_
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
     playlist_t    *p_playlist;
-    int           i , i_id , i_pos;
+    int           i_id , i_pos=0;
     GtkTreeView   *p_tvplaylist = NULL;
 
     p_playlist = (playlist_t *)
@@ -136,7 +136,8 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options, int i_
                 i_id = playlist_AddExt( p_playlist, (const char*)name,
                               (const char*)name,
                               PLAYLIST_APPEND, PLAYLIST_END,
-                              ppsz_options, i_pos );
+                              (mtime_t) 0,
+                              (const char **) ppsz_options, i_pos );
             }
 
             /* Cleanup memory */
@@ -814,6 +815,11 @@ void onUpdatePlaylist(GtkButton *button, gpointer user_data)
     vlc_object_release( p_playlist );
 }
 
+void deleteItemFromPlaylist(gpointer data, gpointer user_data)
+{
+    gtk_tree_path_free((GtkTreePath*) data); // removing an item.
+}
+
 void onDeletePlaylist(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
@@ -861,7 +867,10 @@ void onDeletePlaylist(GtkButton *button, gpointer user_data)
                     }
                 }
             }
+#if 0 
             g_list_foreach (p_rows, (GFunc*)gtk_tree_path_free, NULL);
+#endif /* Testing the next line */
+            g_list_foreach (p_rows, (GFunc*)deleteItemFromPlaylist, NULL);
             g_list_free (p_rows);
         }
 

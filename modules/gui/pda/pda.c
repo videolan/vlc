@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.19 2004/01/25 18:53:07 gbazin Exp $
+ * $Id: pda.c,v 1.20 2004/02/10 20:28:37 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -304,6 +304,8 @@ static void Run( intf_thread_t *p_intf )
     gtk_tree_view_columns_autosize(p_intf->p_sys->p_tvplaylist);
     gtk_tree_view_set_headers_clickable(p_intf->p_sys->p_tvplaylist, TRUE);
     /* END OF PLAYLIST GTK_TREE_VIEW */
+
+    /* Hide the Preference TAB for now. */
 
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
