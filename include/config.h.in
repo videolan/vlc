@@ -60,6 +60,7 @@
  * useful to track a bug */
 //#define TRACE_INTF
 //#define TRACE_INPUT
+//#define TRACE_DVDCSS
 //#define TRACE_AUDIO
 #define TRACE_VOUT
 #define TRACE_VPAR

@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.12 2001/10/16 10:46:24 stef Exp $
+ * $Id: css.c,v 1.13 2001/10/16 16:51:28 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Håkan Hjort <d95hjort@dtek.chalmers.se>
@@ -335,6 +335,7 @@ int CSSGetDiscKey( dvdcss_handle dvdcss )
         case DVDCSS_DISC:
             /* Crack Disc key to be able to use it */
             _dvdcss_debug( dvdcss, "cracking disc key with key hash" );
+            _dvdcss_debug( dvdcss, "building 64MB table ... this will take some time" );
             CSSDiscCrack( dvdcss->css.disc.p_disc_key );
             break;
 
@@ -368,6 +369,8 @@ int CSSGetTitleKey( dvdcss_handle dvdcss, int i_pos )
         int         i_blocks_read;
         int         i_best_plen;
         int         i_best_p;
+
+        _dvdcss_debug( dvdcss, "cracking title key ... this may take some time" );
 
         for( i = 0 ; i < KEY_SIZE ; i++ )
         {
@@ -459,6 +462,8 @@ int CSSGetTitleKey( dvdcss_handle dvdcss, int i_pos )
          * so we can read the title key and decrypt it.
          */
 
+        _dvdcss_debug( dvdcss, "decrypting title key with disc key" );
+        
         /* We need to authenticate again for every key
          * (to get a new session key ?) */
         CSSAuth( dvdcss );
@@ -885,6 +890,7 @@ static int CSSDiscCrack( u8 * p_disc_key )
      * Prepare tables for hash reversal
      */
 
+    
     /* initialize lookup tables for k[1] */
     K1table = malloc( 65536 * K1TABLEWIDTH );
     memset( K1table, 0 , 65536 * K1TABLEWIDTH );
@@ -903,10 +909,12 @@ static int CSSDiscCrack( u8 * p_disc_key )
             tmp3 = j ^ tmp2 ^ i; /* C[1] */
             tmp4 = K1table[ K1TABLEWIDTH * ( 256 * j + tmp3 ) ]; /* count of entries  here */
             tmp4++;
+/*
             if( tmp4 == K1TABLEWIDTH )
             {
-//                _dvdcss_debug( dvdcss, "Table disaster %d", tmp4 );
+                fprintf( stderr, "Table disaster %d", tmp4 );
             }
+*/
             if( tmp4 < K1TABLEWIDTH )
             {
                 K1table[ K1TABLEWIDTH * ( 256 * j + tmp3 ) +    tmp4 ] = i;
@@ -925,13 +933,14 @@ static int CSSDiscCrack( u8 * p_disc_key )
 
     tmp3 = 0;
 
+    fprintf( stderr, "initializing the big table" );
+
     for( i = 0 ; i < 16777216 ; i++ )
     {
 /*
         if( ( i & 0x07ffff ) == 0 )
         {
-            printf( "#" );
-            fflush( stdout );
+            fprintf( stderr, "#" );
         }
 */
         tmp = (( i + i ) & 0x1fffff0 ) | 0x8 | ( i & 0x7 );

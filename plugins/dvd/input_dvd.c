@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.90 2001/10/15 13:33:00 stef Exp $
+ * $Id: input_dvd.c,v 1.91 2001/10/16 16:51:28 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -199,7 +199,12 @@ static void DVDInit( input_thread_t * p_input )
 
     p_dvd->dvdhandle = (dvdcss_handle) p_input->i_handle;
 
-    dvdcss_seek( p_dvd->dvdhandle, 0, DVDCSS_NOFLAGS );
+    if( dvdcss_seek( p_dvd->dvdhandle, 0, DVDCSS_NOFLAGS ) < 0 )
+    {
+        intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+        p_input->b_error = 1;
+        return;
+    }
 
     /* We read DVD_BLOCK_READ_ONCE in each loop, so the input will receive
      * DVD_DATA_READ_ONCE at most */
@@ -306,6 +311,7 @@ static void DVDInit( input_thread_t * p_input )
 static void DVDOpen( struct input_thread_s *p_input )
 {
     dvdcss_handle dvdhandle;
+    int           i_flags;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -319,21 +325,28 @@ static void DVDOpen( struct input_thread_s *p_input )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
+    /* Error messages from libdvdcss only in verbose mode */
+    i_flags = p_main->i_warning_level ? DVDCSS_NOFLAGS : DVDCSS_INIT_QUIET;
+    
+    /* Debug message from libdvdcss selected from config.h #define */
+#ifdef TRACE_DVDCSS
+    i_flags |= DVDCSS_INIT_DEBUG;
+#endif
+
     /* XXX: put this shit in an access plugin */
     if( strlen( p_input->p_source ) > 4
          && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
     {
-        dvdhandle = dvdcss_open( p_input->p_source + 4,
-                                 DVDCSS_INIT_QUIET );
+        dvdhandle = dvdcss_open( p_input->p_source + 4, i_flags );
     }
     else
     {
-        dvdhandle = dvdcss_open( p_input->p_source,
-                                 DVDCSS_INIT_QUIET );
+        dvdhandle = dvdcss_open( p_input->p_source, i_flags );
     }
 
     if( dvdhandle == NULL )
     {
+        intf_ErrMsg( "dvd error: dvdcss can't open device" );
         p_input->b_error = 1;
         return;
     }
@@ -483,7 +496,11 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
          * It is only useful for title cracking method. Methods using the decrypted
          * disc key are fast enough to check the key at each seek
          */
-        dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_start, DVDCSS_SEEK_INI );
+        if( dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_start, DVDCSS_SEEK_INI ) < 0 )
+        {
+            intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+            return -1;
+        }
 
         p_dvd->i_size -= p_dvd->i_sector + 1;
 
@@ -831,9 +848,13 @@ static int DVDRead( input_thread_t * p_input,
         }
 
         /* Position the fd pointer on the right address */
-        i_sector = dvdcss_seek( p_dvd->dvdhandle,
-                                p_dvd->i_title_start + p_dvd->i_sector,
-                                DVDCSS_SEEK_MPEG );
+        if( ( i_sector = dvdcss_seek( p_dvd->dvdhandle,
+                                      p_dvd->i_title_start + p_dvd->i_sector,
+                                      DVDCSS_SEEK_MPEG ) ) < 0 )
+        {
+            intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+            return -1;
+        }
 
         /* update chapter : it will be easier when we have navigation
          * ES support */
@@ -994,6 +1015,7 @@ static int DVDRewind( input_thread_t * p_input )
 static void DVDSeek( input_thread_t * p_input, off_t i_off )
 {
     thread_dvd_data_t *     p_dvd;
+    int                     i_block;
     int                     i_prg_cell;
     int                     i_cell;
     int                     i_chapter;
@@ -1084,11 +1106,17 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     p_dvd->i_chapter = i_chapter;
     p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
 
+    if( ( i_block = dvdcss_seek( p_dvd->dvdhandle,
+                                 p_dvd->i_title_start + p_dvd->i_sector,
+                                 DVDCSS_SEEK_MPEG ) ) < 0 )
+    {
+        intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+        p_input->b_error = 1;
+        return;
+    }
+
     p_input->stream.p_selected_area->i_tell =
-        LB2OFF ( dvdcss_seek( p_dvd->dvdhandle,
-                              p_dvd->i_title_start + p_dvd->i_sector,
-                              DVDCSS_SEEK_MPEG ) )
-         - p_input->stream.p_selected_area->i_start;
+        LB2OFF ( i_block ) - p_input->stream.p_selected_area->i_start;
 
     intf_WarnMsg( 7, "Program Cell: %d Cell: %d Chapter: %d",
                      p_dvd->i_prg_cell, p_dvd->i_cell, p_dvd->i_chapter );
@@ -1218,9 +1246,13 @@ static int DVDChapterSelect( thread_dvd_data_t * p_dvd, int i_chapter )
     p_dvd->i_start = p_dvd->i_title_start + p_dvd->i_sector;
 
     /* Position the fd pointer on the right address */
-    p_dvd->i_start = dvdcss_seek( p_dvd->dvdhandle,
-                                  p_dvd->i_start,
-                                  DVDCSS_SEEK_MPEG );
+    if( ( p_dvd->i_start = dvdcss_seek( p_dvd->dvdhandle,
+                                        p_dvd->i_start,
+                                        DVDCSS_SEEK_MPEG ) ) < 0 )
+    {
+        intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+        return -1;
+    }
 
     p_dvd->i_chapter = i_chapter;
     return 0;
