@@ -2,7 +2,7 @@
  * equalizer.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: equalizer.h 1 2004-08-07 23:51:00Z djc $
+ * $Id$
  *
  * Authors: JŽr™me Decoodt <djc@videolan.org>
  *
@@ -26,9 +26,10 @@
  *****************************************************************************/
 @interface VLCEqualizer : NSObject
 {
-    IBOutlet id o_btn_2pass;
-    IBOutlet id o_btn_enable;
     IBOutlet id o_btn_equalizer;
+    IBOutlet id o_ckb_2pass;
+    IBOutlet id o_ckb_enable;
+    IBOutlet id o_fld_preamp;
     IBOutlet id o_popup_presets;
     IBOutlet id o_slider_band1;
     IBOutlet id o_slider_band10;
@@ -43,10 +44,14 @@
     IBOutlet id o_slider_preamp;
     IBOutlet id o_window;
 }
+- (void)initStrings;
+- (void)equalizerUpdated;
 - (IBAction)bandSliderUpdated:(id)sender;
 - (IBAction)changePreset:(id)sender;
 - (IBAction)enable:(id)sender;
 - (IBAction)preampSliderUpdated:(id)sender;
 - (IBAction)toggleWindow:(id)sender;
 - (IBAction)twopass:(id)sender;
+- (void)windowWillClose:(NSNotification *)aNotification;
+- (void)awakeFromNib;
 @end

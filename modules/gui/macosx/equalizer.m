@@ -4,7 +4,7 @@
  * Copyright (C) 2004 VideoLAN
  * $Id$
  *
- * Authors: JŽr™me Decoodt <djc@videolan.org>
+ * Authors: Jerome Decoodt <djc@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,24 +33,24 @@
 #include <math.h>
 
 #include "equalizer.h"
+#include "../../audio_filter/equalizer_presets.h"
 
 /*****************************************************************************
  * VLCEqualizer implementation 
  *****************************************************************************/
 @implementation VLCEqualizer
 
-static void ChangeFiltersString( playlist_t *p_playlist,
-                                 aout_instance_t *p_aout,
+static void ChangeFiltersString( intf_thread_t *p_intf,
                                  char *psz_name, vlc_bool_t b_add )
 {
     char *psz_parser, *psz_string;
-    vlc_object_t *p_object = NULL;
     int i;
-
-    if( p_playlist != NULL )
-        p_object = ( vlc_object_t* )p_playlist;
-    if( p_aout != NULL )
-        p_object = ( vlc_object_t* )p_aout;
+    vlc_object_t *p_object = vlc_object_find( p_intf,
+                                VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    aout_instance_t *p_aout = (aout_instance_t *)p_object;
+    if( p_object == NULL )
+        p_object = vlc_object_find( p_intf,
+                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_object == NULL )
         return;
 
@@ -103,25 +103,24 @@ static void ChangeFiltersString( playlist_t *p_playlist,
         }
     }
     free( psz_string );
+    vlc_object_release( p_object );
 }
 
-static vlc_bool_t GetFiltersStatus( playlist_t *p_playlist,
-                                 aout_instance_t *p_aout,
+static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
                                  char *psz_name )
 {
     char *psz_parser, *psz_string;
-    vlc_object_t *p_object = NULL;
-
-    if( p_playlist != NULL )
-        p_object = ( vlc_object_t* )p_playlist;
-    if( p_aout != NULL )
-        p_object = ( vlc_object_t* )p_aout;
+    vlc_object_t *p_object = vlc_object_find( p_intf,
+                                VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    if( p_object == NULL )
+        p_object = vlc_object_find( p_intf,
+                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_object == NULL )
         return VLC_FALSE;
 
     psz_string = var_GetString( p_object, "audio-filter" );
 
-    if( !psz_string ) psz_string = strdup("");
+    if( !psz_string ) return VLC_FALSE;
 
     psz_parser = strstr( psz_string, psz_name );
 
@@ -133,81 +132,65 @@ static vlc_bool_t GetFiltersStatus( playlist_t *p_playlist,
         return VLC_FALSE;
 }
 
-- (IBAction)bandSliderUpdated:(id)sender
+- (void)initStrings
 {
-    intf_thread_t *p_intf = VLCIntf;
-    aout_instance_t *p_aout = ( aout_instance_t * )vlc_object_find( p_intf,
-                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    playlist_t *p_playlist = ( playlist_t * )vlc_object_find( p_intf,
-                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    vlc_object_t *p_object = NULL;
+    int i;
+    [o_btn_equalizer setToolTip: _NS("Equalizer")];
+    [o_ckb_2pass setTitle: _NS("2 Pass")];
+    [o_ckb_2pass setToolTip: _NS("If you enable this settting, the "
+        "equalizer filter will be applied twice. The effect will be sharper")];
+    [o_ckb_enable setTitle: _NS("Enable")];
+    [o_ckb_enable setToolTip: _NS("Enable the equalizer. You can either "
+        "manually change the bands or use a preset.")];
+    [o_fld_preamp setStringValue: _NS("Preamp")];
 
-    char psz_values[102];
-    memset( psz_values, 0, 102 );
+    [o_popup_presets removeAllItems];
+    for( i = 0; i < 18 ; i++ )
+    {
+        [o_popup_presets insertItemWithTitle: _NS(preset_list[i]) atIndex: i];
+    }
+    [o_window setTitle: _NS("Equalizer")];
 
-    if( p_playlist != NULL )
-        p_object = ( vlc_object_t* )p_playlist;
-    if( p_aout != NULL )
-        p_object = ( vlc_object_t* )p_aout;
-    if( p_object == NULL )
-        return;
+    [o_slider_band1 setFloatValue: 0];
+    [o_slider_band2 setFloatValue: 0];
+    [o_slider_band3 setFloatValue: 0];
+    [o_slider_band4 setFloatValue: 0];
+    [o_slider_band5 setFloatValue: 0];
+    [o_slider_band6 setFloatValue: 0];
+    [o_slider_band7 setFloatValue: 0];
+    [o_slider_band8 setFloatValue: 0];
+    [o_slider_band9 setFloatValue: 0];
+    [o_slider_band10 setFloatValue: 0];
 
-    /* Write the new bands values */
-/* TODO: write a generic code instead of ten times the same thing */
-
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band1 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band2 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band3 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band4 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band5 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band6 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band7 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band8 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band9 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band10 floatValue] );
-
-    var_SetString( p_object, "equalizer-bands", psz_values );
-    if( p_aout )
-        vlc_object_release( p_aout );
-    if( p_playlist )
-        vlc_object_release( p_playlist );
+    [o_ckb_enable setState: NSOffState];
+    [o_ckb_2pass setState: NSOffState];
 }
 
-- (IBAction)changePreset:(id)sender
+- (void)equalizerUpdated
 {
     intf_thread_t *p_intf = VLCIntf;
     float f_preamp, f_band[10];
     char *psz_bands, *p_next;
     vlc_bool_t b_2p;
     int i;
-    aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
+    vlc_bool_t b_enabled = GetFiltersStatus( p_intf, "equalizer" );
+    vlc_object_t *p_object = vlc_object_find( p_intf,
                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    playlist_t *p_playlist = ( playlist_t * )vlc_object_find( p_intf,
-                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    vlc_object_t *p_object = NULL;
-    vlc_bool_t b_enabled = GetFiltersStatus( p_playlist, p_aout, "equalizer" );
-
-    static char *preset_list[] = {
-        "flat", "classical", "club", "dance", "fullbass", "fullbasstreble",
-        "fulltreble", "headphones","largehall", "live", "party", "pop", "reggae",
-        "rock", "ska", "soft", "softrock", "techno"
-    };
-
-    if( p_playlist != NULL )
-        p_object = ( vlc_object_t* )p_playlist;
-    if( p_aout != NULL )
-        p_object = ( vlc_object_t* )p_aout;
     if( p_object == NULL )
-    {
-        msg_Dbg( p_intf, "equalizer settings not set: no playlist nor aout found");
+        p_object = vlc_object_find( p_intf,
+                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_object == NULL )
         return;
-    }
-    
-    var_SetString( p_object , "equalizer-preset" , preset_list[[sender indexOfSelectedItem]] );
 
     f_preamp = var_GetFloat( p_object, "equalizer-preamp" );
     psz_bands = var_GetString( p_object, "equalizer-bands" );
+    if( !psz_bands )
+        psz_bands = strdup( "0 0 0 0 0 0 0 0 0 0" );
+    if ( !psz_bands )
+        return;
+
     b_2p = var_GetBool( p_object, "equalizer-2pass" );
+
     vlc_object_release( p_object );
 
 /* Set the preamp slider */
@@ -227,6 +210,8 @@ static vlc_bool_t GetFiltersStatus( playlist_t *p_playlist,
         if( !*psz_bands ) break; /* end of line */
         psz_bands = p_next+1;
     }
+    free( psz_bands );
+
     [o_slider_band1 setFloatValue: f_band[0]];
     [o_slider_band2 setFloatValue: f_band[1]];
     [o_slider_band3 setFloatValue: f_band[2]];
@@ -237,59 +222,105 @@ static vlc_bool_t GetFiltersStatus( playlist_t *p_playlist,
     [o_slider_band8 setFloatValue: f_band[7]];
     [o_slider_band9 setFloatValue: f_band[8]];
     [o_slider_band10 setFloatValue: f_band[9]];
-                                 
-    if( b_enabled == VLC_TRUE )
-        [o_btn_enable setState:NSOnState];
-    else
-        [o_btn_enable setState:NSOffState];
 
-    [o_btn_2pass setState:( ( b_2p == VLC_TRUE ) ? NSOnState : NSOffState )];
+/* Set the the checkboxes */
+    if( b_enabled == VLC_TRUE )
+        [o_ckb_enable setState:NSOnState];
+    else
+        [o_ckb_enable setState:NSOffState];
+
+    [o_ckb_2pass setState:( ( b_2p == VLC_TRUE ) ? NSOnState : NSOffState )];
+}
+
+- (IBAction)bandSliderUpdated:(id)sender
+{
+    intf_thread_t *p_intf = VLCIntf;
+    vlc_object_t *p_object = vlc_object_find( p_intf,
+                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    char psz_values[102];
+    memset( psz_values, 0, 102 );
+
+    if( p_object == NULL )
+        p_object = vlc_object_find( p_intf,
+                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_object == NULL )
+        return;
+
+    /* Write the new bands values */
+/* TODO: write a generic code instead of ten times the same thing */
+
+    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band1 floatValue] );
+    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band2 floatValue] );
+    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band3 floatValue] );
+    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band4 floatValue] );
+    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band5 floatValue] );
+    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band6 floatValue] );
+    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band7 floatValue] );
+    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band8 floatValue] );
+    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band9 floatValue] );
+    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band10 floatValue] );
+
+    var_SetString( p_object, "equalizer-bands", psz_values );
+    vlc_object_release( p_object );
+}
+
+- (IBAction)changePreset:(id)sender
+{
+    intf_thread_t *p_intf = VLCIntf;
+    int i;
+    vlc_object_t *p_object= vlc_object_find( p_intf,
+                                VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    char psz_values[102];
+    memset( psz_values, 0, 102 );
+
+    if( p_object == NULL )
+        p_object = vlc_object_find( p_intf,
+                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_object == NULL )
+        return;
+
+    var_SetString( p_object , "equalizer-preset" , preset_list[[sender indexOfSelectedItem]] );
+
+    for( i = 0; i < 10; i++ )
+        sprintf( psz_values, "%s %.1f", psz_values, eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[i] );
+    var_SetString( p_object, "equalizer-bands", psz_values );
+
+    [o_slider_preamp setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_preamp];
+    [o_slider_band1 setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[0]];
+    [o_slider_band2 setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[1]];
+    [o_slider_band3 setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[2]];
+    [o_slider_band4 setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[3]];
+    [o_slider_band5 setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[4]];
+    [o_slider_band6 setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[5]];
+    [o_slider_band7 setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[6]];
+    [o_slider_band8 setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[7]];
+    [o_slider_band9 setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[8]];
+    [o_slider_band10 setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[9]];
+
+    vlc_object_release( p_object );
 }
 
 - (IBAction)enable:(id)sender
 {
-    intf_thread_t *p_intf = VLCIntf;
-    aout_instance_t *p_aout= (aout_instance_t *)vlc_object_find( p_intf,
-                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    playlist_t *p_playlist = ( playlist_t * )vlc_object_find( p_intf,
-                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    ChangeFiltersString( p_playlist, p_aout, "equalizer", [sender state] );
-
-    [o_popup_presets setEnabled: [sender state]];
-    if( p_aout != NULL )
-        vlc_object_release( p_aout );
-    if( p_playlist != NULL )
-        vlc_object_release( p_playlist );
+    ChangeFiltersString( VLCIntf, "equalizer", [sender state] );
 }
 
 - (IBAction)preampSliderUpdated:(id)sender
 {
     intf_thread_t *p_intf = VLCIntf;
-    float f_preamp= [sender floatValue] ;
+    float f_preamp = [sender floatValue] ;
 
-    aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
+    vlc_object_t *p_object = vlc_object_find( p_intf,
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    playlist_t *p_playlist = ( playlist_t * )vlc_object_find( p_intf,
-                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-    vlc_object_t *p_object = NULL;
-
-    if( p_playlist != NULL )
-        p_object = ( vlc_object_t* )p_playlist;
-    if( p_aout != NULL )
-        p_object = ( vlc_object_t* )p_aout;
     if( p_object == NULL )
-    {
-        msg_Dbg( p_intf, "equalizer settings not set: no playlist nor aout found");
+        p_object = vlc_object_find( p_intf,
+                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_object == NULL )
         return;
-    }
-    
+
     var_SetFloat( p_object, "equalizer-preamp", f_preamp );
 
-    if( p_aout != NULL )
-        vlc_object_release( p_aout );
-    if( p_playlist != NULL )
-        vlc_object_release( p_playlist );
+    vlc_object_release( p_object );
 }
 
 - (IBAction)toggleWindow:(id)sender
@@ -301,77 +332,6 @@ static vlc_bool_t GetFiltersStatus( playlist_t *p_playlist,
     }
     else
     {
-        intf_thread_t *p_intf = VLCIntf;
-        float f_preamp, f_band[10];
-        char *psz_bands, *p_next;
-        vlc_bool_t b_2p;
-        int i;
-        aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
-                                    VLC_OBJECT_AOUT, FIND_ANYWHERE );
-        playlist_t *p_playlist = ( playlist_t * )vlc_object_find( p_intf,
-                                    VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-        vlc_object_t *p_object = NULL;
-
-        vlc_bool_t b_enabled = GetFiltersStatus( p_playlist, p_aout, "equalizer" );
-
-        if( p_playlist != NULL )
-            p_object = ( vlc_object_t* )p_playlist;
-        if( p_aout != NULL )
-            p_object = ( vlc_object_t* )p_aout;
-        if( p_object == NULL )
-        {
-            msg_Dbg( p_intf, "equalizer settings not set: no playlist nor aout found");
-            return;
-        }
-    
-        f_preamp = var_GetFloat( p_object, "equalizer-preamp" );
-        psz_bands = var_GetString( p_object, "equalizer-bands" );
-        b_2p = var_GetBool( p_object, "equalizer-2pass" );
-
-        if( p_aout != NULL )
-            vlc_object_release( p_aout );
-        if( p_playlist != NULL )
-            vlc_object_release( p_playlist );
-
-        if( !psz_bands )
-            psz_bands = "0 0 0 0 0 0 0 0 0 0";
-
-/* Set the preamp slider */
-        [o_slider_preamp setFloatValue: f_preamp];
-
-/* Set the bands slider */
-        for( i = 0; i < 10; i++ )
-        {
-            /* Read dB -20/20 */
-#ifdef HAVE_STRTOF
-            f_band[i] = strtof( psz_bands, &p_next );
-#else
-            f_band[i] = (float)strtod( psz_bands, &p_next );
-#endif
-            if( !p_next || p_next == psz_bands ) break; /* strtof() failed */
-
-            if( !*psz_bands ) break; /* end of line */
-            psz_bands = p_next+1;
-        }
-        [o_slider_band1 setFloatValue: f_band[0]];
-        [o_slider_band2 setFloatValue: f_band[1]];
-        [o_slider_band3 setFloatValue: f_band[2]];
-        [o_slider_band4 setFloatValue: f_band[3]];
-        [o_slider_band5 setFloatValue: f_band[4]];
-        [o_slider_band6 setFloatValue: f_band[5]];
-        [o_slider_band7 setFloatValue: f_band[6]];
-        [o_slider_band8 setFloatValue: f_band[7]];
-        [o_slider_band9 setFloatValue: f_band[8]];
-        [o_slider_band10 setFloatValue: f_band[9]];
-
-        if( b_enabled == VLC_TRUE )
-            [o_btn_enable setState:NSOnState];
-        else
-            [o_btn_enable setState:NSOffState];
-
-        [o_btn_2pass setState:( ( b_2p == VLC_TRUE ) ? NSOnState : NSOffState )];
-        
         [o_window makeKeyAndOrderFront:sender];
         [o_btn_equalizer setState:NSOnState];
     }
@@ -380,26 +340,18 @@ static vlc_bool_t GetFiltersStatus( playlist_t *p_playlist,
 - (IBAction)twopass:(id)sender
 {
     intf_thread_t *p_intf = VLCIntf;
-    aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
-                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    playlist_t *p_playlist = ( playlist_t * )vlc_object_find( p_intf,
-                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    vlc_object_t *p_object = NULL;
-
     vlc_bool_t b_2p = [sender state] ? VLC_TRUE : VLC_FALSE;
-
-    if( p_playlist != NULL )
-        p_object = ( vlc_object_t* )p_playlist;
-    if( p_aout != NULL )
-        p_object = ( vlc_object_t* )p_aout;
+    vlc_object_t *p_object= vlc_object_find( p_intf,
+                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    aout_instance_t *p_aout = (aout_instance_t *)p_object;
     if( p_object == NULL )
-    {
-        msg_Dbg( p_intf, "equalizer settings not set: no playlist nor aout found");
+        p_object = vlc_object_find( p_intf,
+                                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_object == NULL )
         return;
-    }
 
     var_SetBool( p_object, "equalizer-2pass", b_2p );
-    if( ( [o_btn_enable state] ) && ( p_aout != NULL ) )
+    if( ( [o_ckb_enable state] ) && ( p_aout != NULL ) )
     {
        int i;
         for( i = 0; i < p_aout->i_nb_inputs; i++ )
@@ -408,10 +360,20 @@ static vlc_bool_t GetFiltersStatus( playlist_t *p_playlist,
         }
     }
 
-    if( p_aout != NULL )
-        vlc_object_release( p_aout );
-    if( p_playlist != NULL )
-        vlc_object_release( p_playlist );
+    vlc_object_release( p_object );
+}
+
+- (void)windowWillClose:(NSNotification *)aNotification
+{
+    [o_btn_equalizer setState: NSOffState];
+}
+
+- (void)awakeFromNib
+{
+    [o_window setExcludedFromWindowsMenu: TRUE];
+    
+    [self initStrings];
+    [self equalizerUpdated];
 }
 
 @end

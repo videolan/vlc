@@ -63,9 +63,10 @@
             CLASS = VLCEqualizer; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                "o_btn_2pass" = id; 
-                "o_btn_enable" = id; 
                 "o_btn_equalizer" = id; 
+                "o_ckb_2pass" = id; 
+                "o_ckb_enable" = id; 
+                "o_fld_preamp" = id; 
                 "o_popup_presets" = id; 
                 "o_slider_band1" = id; 
                 "o_slider_band10" = id; 
@@ -168,6 +169,7 @@
                 "o_mi_device" = id; 
                 "o_mi_documentation" = id; 
                 "o_mi_double_window" = id; 
+                "o_mi_equalizer" = id; 
                 "o_mi_faster" = id; 
                 "o_mi_fittoscreen" = id; 
                 "o_mi_floatontop" = id; 

@@ -208,6 +208,7 @@ struct intf_sys_t
     IBOutlet id o_mi_minimize;
     IBOutlet id o_mi_close_window;
     IBOutlet id o_mi_controller;
+    IBOutlet id o_mi_equalizer;
     IBOutlet id o_mi_playlist;
     IBOutlet id o_mi_info;
     IBOutlet id o_mi_messages;

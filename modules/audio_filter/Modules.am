@@ -1,2 +1,2 @@
-SOURCES_equalizer = equalizer.c
+SOURCES_equalizer = equalizer.c equalizer.h
 SOURCES_normvol = normvol.c
