@@ -49,6 +49,11 @@
 #define VLCGL_RGB_FORMAT GL_RGBA
 #define VLCGL_RGB_TYPE GL_UNSIGNED_BYTE
 
+/* OpenGL effects */
+#define OPENGL_EFFECT_NONE             1
+#define OPENGL_EFFECT_CUBE             2
+#define OPENGL_EFFECT_TRANSPARENT_CUBE 4
+
 /*****************************************************************************
  * Vout interface
  *****************************************************************************/
@@ -76,7 +81,7 @@ vlc_module_begin();
     add_shortcut( "opengl" );
     set_callbacks( CreateVout, DestroyVout );
 
-    add_integer( "opengl-effect", 0, NULL, EFFECT_TEXT,
+    add_string( "opengl-effect", "none", NULL, EFFECT_TEXT,
                  EFFECT_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
@@ -106,7 +111,6 @@ static int CreateVout( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_sys_t *p_sys;
-    vlc_value_t val;
 
     /* Allocate structure */
     p_vout->p_sys = p_sys = malloc( sizeof( vout_sys_t ) );
@@ -116,9 +120,7 @@ static int CreateVout( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    var_Create( p_vout, "opengl-effect", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_vout, "opengl-effect", &val );
-    p_sys->i_effect = val.i_int;
+    var_Create( p_vout, "opengl-effect", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     /* A texture must have a size aligned on a power of 2 */
     p_sys->i_tex_width  = GetAlignedSize( p_vout->render.i_width );
@@ -173,6 +175,7 @@ static int Init( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
     int i_pixel_pitch;
+    vlc_value_t val;
 
     p_sys->p_vout->pf_init( p_sys->p_vout );
 
@@ -248,10 +251,38 @@ static int Init( vout_thread_t *p_vout )
     glDisable(GL_CULL_FACE);
     glClear( GL_COLOR_BUFFER_BIT );
 
-    if( p_sys->i_effect == 1 )
+    /* Check if the user asked for useless visual effects */
+    var_Get( p_vout, "opengl-effect", &val );
+    if( !val.psz_string || !strcmp( val.psz_string, "none" ))
     {
-        glEnable( GL_CULL_FACE);
+        p_sys->i_effect = OPENGL_EFFECT_NONE;
+    }
+    else if( !strcmp( val.psz_string, "cube" ) )
+    {
+        p_sys->i_effect = OPENGL_EFFECT_CUBE;
 
+        glEnable( GL_CULL_FACE);
+        //glEnable( GL_DEPTH_TEST );
+    }
+    else if( !strcmp( val.psz_string, "transparent-cube" ) )
+    {
+        p_sys->i_effect = OPENGL_EFFECT_TRANSPARENT_CUBE;
+
+        glDisable( GL_DEPTH_TEST );
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+    }
+    else
+    {
+        msg_Warn( p_vout, "no valid opengl effect provided, using "
+                  "\"none\"" );
+        p_sys->i_effect = OPENGL_EFFECT_NONE;
+    }
+    if( val.psz_string ) free( val.psz_string );
+
+    if( p_sys->i_effect & ( OPENGL_EFFECT_CUBE |
+                OPENGL_EFFECT_TRANSPARENT_CUBE ) )
+    {
         /* Set the perpective */
         glMatrixMode( GL_PROJECTION );
         glLoadIdentity();
@@ -321,7 +352,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                   p_sys->i_tex_width, p_sys->i_tex_height , 0,
                   VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, p_sys->p_buffer );
 
-    if( p_sys->i_effect != 1 )
+    if( p_sys->i_effect == OPENGL_EFFECT_NONE )
     {
         glEnable( GL_TEXTURE_2D );
         glBegin( GL_POLYGON );
