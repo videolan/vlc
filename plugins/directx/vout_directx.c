@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.31 2002/04/23 22:07:05 gbazin Exp $
+ * $Id: vout_directx.c,v 1.32 2002/04/29 21:22:35 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -443,7 +443,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
         /* Flip the overlay buffers if we are using back buffers */
         if( p_pic->p_sys->p_front_surface == p_pic->p_sys->p_surface )
-        return;
+            return;
 
         dxresult = IDirectDrawSurface3_Flip( p_pic->p_sys->p_front_surface,
                                              NULL, DDFLIP_WAIT );
@@ -707,8 +707,6 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
     LPDIRECTDRAWSURFACE p_surface;
     DDSURFACEDESC ddsd;
 
-    intf_WarnMsg( 3, "vout: DirectXCreateSurface" );
-
     /* Create the video surface */
     if( b_overlay )
     {
@@ -741,13 +739,8 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
         dxresult = IDirectDraw2_CreateSurface( p_vout->p_sys->p_ddobject,
                                                &ddsd,
                                                &p_surface, NULL );
-        if( dxresult == DD_OK )
+        if( dxresult != DD_OK )
         {
-            intf_WarnMsg( 3,"vout: DirectX YUV overlay created successfully" );
-        }
-        else
-        {
-            intf_ErrMsg( "vout error: can't create YUV overlay surface." );
             *pp_surface_final = NULL;
             return 0;
         }
@@ -769,13 +762,8 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
         dxresult = IDirectDraw2_CreateSurface( p_vout->p_sys->p_ddobject,
                                                &ddsd,
                                                &p_surface, NULL );
-        if( dxresult == DD_OK )
+        if( dxresult != DD_OK )
         {
-            intf_WarnMsg( 3,"vout: DirectX RGB surface created successfully" );
-        }
-        else
-        {
-            intf_ErrMsg( "vout error: can't create RGB surface." );
             *pp_surface_final = NULL;
             return 0;
         }
@@ -796,7 +784,6 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
     return 1;
 }
 
-
 /*****************************************************************************
  * DirectXUpdateOverlay: Move or resize overlay surface on video display.
  *****************************************************************************
@@ -812,10 +799,7 @@ void DirectXUpdateOverlay( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->p_current_surface == NULL ||
         !p_vout->p_sys->b_using_overlay )
-    {
-        intf_WarnMsg( 5, "vout: DirectXUpdateOverlay no overlay !!" );
         return;
-    }
 
     /* The new window dimensions should already have been computed by the
      * caller of this function */
@@ -936,10 +920,12 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             p_vout->output.i_chroma = FOURCC_YVYU;
             break;
         case FOURCC_YV12:
+            p_vout->output.i_chroma = FOURCC_YV12;
+            break;
         case FOURCC_I420:
         case FOURCC_IYUV:
         default:
-            p_vout->output.i_chroma = FOURCC_YV12;
+            p_vout->output.i_chroma = FOURCC_IYUV;
             break;
     }
 
@@ -956,11 +942,24 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         /* Triple buffering rocks! it doesn't have any processing overhead
          * (you don't have to wait for the vsync) and provides for a very nice
          * video quality (no tearing). */
+
         b_result_ok = DirectXCreateSurface( p_vout, &p_surface,
                                             p_vout->output.i_chroma,
                                             p_vout->p_sys->b_using_overlay,
                                             2 /* number of backbuffers */ );
         if( !b_result_ok )
+            /* Try another chroma */
+            if( p_vout->output.i_chroma == FOURCC_IYUV )
+            {
+                p_vout->output.i_chroma = FOURCC_YV12;
+                b_result_ok = DirectXCreateSurface( p_vout, &p_surface,
+                                                p_vout->output.i_chroma,
+                                                p_vout->p_sys->b_using_overlay,
+                                                2 /* number of backbuffers */);
+            }
+
+        if( !b_result_ok )
+            /* Try to reduce the number of backbuffers */
             b_result_ok = DirectXCreateSurface( p_vout, &p_surface,
                                                 p_vout->output.i_chroma,
                                                 p_vout->p_sys->b_using_overlay,
@@ -1015,8 +1014,13 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 
             DirectXUpdateOverlay( p_vout );
             I_OUTPUTPICTURES = 1;
+            intf_WarnMsg( 3,"vout: DirectX YUV overlay created successfully" );
         }
-        else p_vout->p_sys->b_using_overlay = 0;
+        else
+        {
+            intf_ErrMsg( "vout error: can't create YUV overlay surface." );
+            p_vout->p_sys->b_using_overlay = 0;
+        }
     }
 
     /* As we can't have overlays, we'll try to create plain RBG surfaces in
@@ -1049,6 +1053,11 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             }
             else break;
         }
+
+        if( I_OUTPUTPICTURES )
+            intf_WarnMsg( 3,"vout: DirectX RGB surface created successfully" );
+        else
+            intf_ErrMsg( "vout error: can't create RGB surface." );
 
         /* We couldn't use an YUV overlay so we need to indicate to
          * video_output which format we are falling back to */
@@ -1199,6 +1208,31 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[U_PLANE].i_pixel_bytes = 1;
             p_pic->p[U_PLANE].b_margin = 0;
+
+            p_pic->i_planes = 3;
+            break;
+
+        case FOURCC_IYUV:
+
+            p_pic->Y_PIXELS = p_pic->p_sys->ddsd.lpSurface;
+            p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
+            p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->ddsd.lPitch;
+            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
+            p_pic->p[Y_PLANE].b_margin = 0;
+
+            p_pic->U_PIXELS = p_pic->Y_PIXELS
+              + p_pic->p[Y_PLANE].i_lines * p_pic->p[Y_PLANE].i_pitch;
+            p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
+            p_pic->p[U_PLANE].i_pixel_bytes = 1;
+            p_pic->p[U_PLANE].b_margin = 0;
+
+            p_pic->V_PIXELS =  p_pic->U_PIXELS
+              + p_pic->p[U_PLANE].i_lines * p_pic->p[U_PLANE].i_pitch;
+            p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
+            p_pic->p[V_PLANE].i_pixel_bytes = 1;
+            p_pic->p[V_PLANE].b_margin = 0;
 
             p_pic->i_planes = 3;
             break;

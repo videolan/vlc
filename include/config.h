@@ -134,7 +134,7 @@
  * - short, in order to be able to play a new song very quickly (especially a
  *   song from the interface)
  * - long, in order to perform the buffer calculations as few as possible */
-#define AOUT_BUFFER_DURATION            50000
+#define AOUT_BUFFER_DURATION            100000
 
 /*****************************************************************************
  * Video configuration

@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.22 2002/04/25 21:52:42 sam Exp $
+ * $Id: vout_pictures.c,v 1.23 2002/04/29 21:22:35 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -552,7 +552,6 @@ void vout_AllocatePicture( picture_t *p_pic,
  *****************************************************************************/
 static void vout_CopyPicture( picture_t *p_src, picture_t *p_dest )
 {
-#if 0
     int i;
 
     for( i = 0; i < p_src->i_planes ; i++ )
@@ -600,6 +599,5 @@ static void vout_CopyPicture( picture_t *p_src, picture_t *p_dest )
             }
         }
     }
-#endif
 }
 
