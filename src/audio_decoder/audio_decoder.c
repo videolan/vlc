@@ -442,7 +442,7 @@ static void adec_layer2_get_table( u32 header, u8 freq_table[15],
 
 static int adec_layer2_mono (audiodec_t * p_adec, s16 * buffer)
 {
-    static u8 freq_table[15] = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+    static u8 freq_table[15] = {2, 1, 1, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2};
     static float L3_table[3] = {-2/3.0, 0, 2/3.0};
     static float L5_table[5] = {-4/5.0, -2/5.0, 0, 2/5.0, 4/5.0};
     static float L9_table[9] = {-8/9.0, -6/9.0, -4/9.0, -2/9.0, 0,
