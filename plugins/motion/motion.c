@@ -2,7 +2,7 @@
  * motion.c : C motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motion.c,v 1.14 2002/02/15 13:32:53 sam Exp $
+ * $Id: motion.c,v 1.15 2002/04/07 06:48:48 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -62,7 +62,7 @@ MODULE_DEACTIVATE_STOP
 #define avg2(a,b) ((a+b+1)>>1)
 #define avg4(a,b,c,d) ((a+b+c+d+2)>>2)
 
-#define predict_(i) (ref[i])
+#define predict_o(i) (ref[i])
 #define predict_x(i) (avg2 (ref[i], ref[i+1]))
 #define predict_y(i) (avg2 (ref[i], (ref+stride)[i]))
 #define predict_xy(i) (avg4 (ref[i], ref[i+1], (ref+stride)[i], (ref+stride)[i+1]))
@@ -72,7 +72,7 @@ MODULE_DEACTIVATE_STOP
 
 // mc function template
 
-#define MC_FUNC(op,xy)                                                                                \
+#define MC_FUNC(op,xy)                                                      \
 static void MC_##op##_##xy##16_c (yuv_data_t * dest, yuv_data_t * ref,      \
                                  int stride, int height)                    \
 {                                                                           \
@@ -116,8 +116,8 @@ static void MC_##op##_##xy##8_c (yuv_data_t * dest, yuv_data_t * ref,       \
 
 // definitions of the actual mc functions
 
-MC_FUNC (put,)
-MC_FUNC (avg,)
+MC_FUNC (put,o)
+MC_FUNC (avg,o)
 MC_FUNC (put,x)
 MC_FUNC (avg,x)
 MC_FUNC (put,y)
@@ -138,22 +138,22 @@ static void motion_getfunctions( function_list_t * p_function_list )
             /* Copying functions */
             {
                 /* Width == 16 */
-                MC_put_16_c, MC_put_x16_c, MC_put_y16_c, MC_put_xy16_c
+                MC_put_o16_c, MC_put_x16_c, MC_put_y16_c, MC_put_xy16_c
             },
             {
                 /* Width == 8 */
-                MC_put_8_c,  MC_put_x8_c,  MC_put_y8_c, MC_put_xy8_c
+                MC_put_o8_c,  MC_put_x8_c,  MC_put_y8_c, MC_put_xy8_c
             }
         },
         {
             /* Averaging functions */
             {
                 /* Width == 16 */
-                MC_avg_16_c, MC_avg_x16_c, MC_avg_y16_c, MC_avg_xy16_c
+                MC_avg_o16_c, MC_avg_x16_c, MC_avg_y16_c, MC_avg_xy16_c
             },
             {
                 /* Width == 8 */
-                MC_avg_8_c,  MC_avg_x8_c,  MC_avg_y8_c,  MC_avg_xy8_c
+                MC_avg_o8_c,  MC_avg_x8_c,  MC_avg_y8_c,  MC_avg_xy8_c
             }
         }
     };

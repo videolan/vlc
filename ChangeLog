@@ -4,7 +4,11 @@
 
 HEAD
 
-  * Nothing yet.
+  * ./configure.in: wrote a better test for libdvdread detection.
+  * ./plugins/gtk/gtk.glade: added lines this #@%$! Glade had munched, fixes
+    a segfault in the Gtk+ popup menu when toggling the interface.
+  * ./plugins/motion/motion.c: fixed a compilation issue on compilers which
+    do not accept empty macro arguments.
 
 0.3.0
 Sat,  6 Apr 2002 04:27:50 +0200

@@ -108,7 +108,7 @@ else
 fi
 
 dnl The -DSYS_FOO flag
-save_CFLAGS="${save_CFLAGS} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr '[a-z].' '[A-Z]_'`"
+save_CFLAGS="${save_CFLAGS} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcdefghijklmnopqrstuvwxyz.' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`"
 
 dnl Check for system libs needed
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty usleep vasprintf swab sigrelse getpwuid memalign posix_memalign)
@@ -645,26 +645,39 @@ if test "x$enableval" != "xno"
 then
   AC_ARG_WITH(dvdread, 
   [    --with-dvdread=PATH   libdvdread headers and libraries])
-  case "x$with_dvdread" in
-  x)
-    AC_CHECK_HEADERS(dvdread/dvd_reader.h,
-      [ PLUGINS="${PLUGINS} dvdread"
-        dvdread_LDFLAGS="${dvdread_LDFLAGS} -ldvdread" ])
-  ;;
-  *)
-    AC_MSG_CHECKING(for dvdread headers in ${withval})
-    if test -f ${withval}/include/dvdread/dvd_reader.h
+  if test "x$withval" = x
+  then
+    test_LDFLAGS=""
+    test_CFLAGS=""
+  else
+    test_LDFLAGS="-L${withval}/lib"
+    test_CFLAGS="-I${withval}/include"
+  fi
+  CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
+  AC_CHECK_HEADERS(dvdread/dvd_reader.h, [
+     AC_TRY_COMPILE([#include <dvdread/dvd_reader.h>],
+        [void foo() { int i=DVD_VIDEO_LB_LEN; }],[
+          PLUGINS="${PLUGINS} dvdread"
+          dvdread_LDFLAGS="${dvdread_LDFLAGS} ${test_LDFLAGS} -ldvdread"
+          dvdread_CFLAGS="${dvdread_CFLAGS} ${test_CFLAGS}"
+        ],[
+          if test "x$enableval" != x
+          then
+            AC_MSG_ERROR([Cannot find DVD_VIDEO_LB_LEN in dvdread/dvd_reader.h, please install libdvdread version 0.9.2 or later])
+          fi
+        ])
+  ],[
+    if test "x$enableval" != x
     then
-      AC_MSG_RESULT(yes)
-      PLUGINS="${PLUGINS} dvdread"
-      dvdread_LDFLAGS="${dvdread_LDFLAGS} -L${withval}/lib -ldvdread"
-      dvdread_CFLAGS="${dvdread_CFLAGS} -I${withval}/include"
-    else
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([Cannot find ${withval}/dvdread/dvd_reader.h])
+      if test "x$withval" != x
+      then
+        AC_MSG_ERROR([Cannot find dvdread/dvd_reader.h in ${withval}/include])
+      else
+        AC_MSG_ERROR([Cannot find dvdread/dvd_reader.h])
+      fi
     fi
-  ;;
-  esac
+  ])
+  CPPFLAGS="$save_CPPFLAGS"
 fi
 
 dnl
