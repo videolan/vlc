@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.77 2003/04/08 08:35:59 massiot Exp $
+ * $Id: libvlc.c,v 1.78 2003/04/09 19:58:25 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -155,7 +155,7 @@ int VLC_Create( void )
         psz_env = getenv( "VLC_VERBOSE" );
         libvlc.i_verbose = psz_env ? atoi( psz_env ) : -1;
 
-#ifdef HAVE_ISATTY
+#if defined( HAVE_ISATTY ) && !defined( WIN32 )
         libvlc.b_color = isatty( 2 ); /* 2 is for stderr */
 #else
         libvlc.b_color = VLC_FALSE;
@@ -435,7 +435,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
             libvlc.i_verbose = __MIN( i_tmp, 2 );
         }
     }
-    libvlc.b_color = libvlc.b_color || config_GetInt( p_vlc, "color" );
+    libvlc.b_color = libvlc.b_color && config_GetInt( p_vlc, "color" );
 
     /*
      * Output messages that may still be in the queue

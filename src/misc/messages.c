@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.29 2003/01/15 13:46:05 massiot Exp $
+ * $Id: messages.c,v 1.30 2003/04/09 19:58:25 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -408,20 +408,12 @@ static void FlushMsg ( msg_bank_t *p_bank )
  *****************************************************************************/
 static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 {
-#ifndef WIN32
 #   define COL(x)  "\033[" #x ";1m"
 #   define RED     COL(31)
 #   define GREEN   COL(32)
 #   define YELLOW  COL(33)
 #   define WHITE   COL(37)
 #   define GRAY    "\033[0m"
-#else
-#   define RED     ""
-#   define GREEN   ""
-#   define YELLOW  ""
-#   define WHITE   ""
-#   define GRAY    ""
-#endif
 
 #ifdef UNDER_CE
     int i_dummy;
