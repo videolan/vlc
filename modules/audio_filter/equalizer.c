@@ -100,6 +100,10 @@ typedef struct aout_filter_sys_t
     float *f_beta;
     float *f_gamma;
 
+    float f_newpreamp;
+    char *psz_newbands;
+    vlc_bool_t b_first;
+
     /* Filter dyn config */
     float *f_amp;   /* Per band amp */
     float f_gamp;   /* Global preamp */
@@ -120,8 +124,18 @@ static void DoWork( aout_instance_t *, aout_filter_t *,
 
 #define EQZ_IN_FACTOR (0.25)
 static int  EqzInit( aout_filter_t *, int );
-static void EqzFilter( aout_filter_t *, float *, float *, int, int );
+static void EqzFilter( aout_instance_t *,aout_filter_t *, float *, float *,
+                        int, int );
 static void EqzClean( aout_filter_t * );
+
+static int PresetCallback( vlc_object_t *, char const *,
+                                           vlc_value_t, vlc_value_t, void * );
+static int PreampCallback( vlc_object_t *, char const *,
+                                           vlc_value_t, vlc_value_t, void * );
+static int BandsCallback ( vlc_object_t *, char const *,
+                                           vlc_value_t, vlc_value_t, void * );
+
+
 
 /*****************************************************************************
  * Open:
@@ -178,7 +192,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
 
-    EqzFilter( p_filter, (float*)p_out_buf->p_buffer,
+    EqzFilter( p_aout, p_filter, (float*)p_out_buf->p_buffer,
                (float*)p_in_buf->p_buffer, p_in_buf->i_nb_samples,
                aout_FormatNbChannels( &p_filter->input ) );
 }
@@ -379,9 +393,9 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
 {
     aout_filter_sys_t *p_sys = p_filter->p_sys;
     const eqz_config_t *p_cfg;
-    char *psz;
     int i, ch;
-    float f_float;
+    vlc_value_t val1, val2, val3;
+    aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
 
     /* Select the config */
     if( i_rate == 48000 )
@@ -437,66 +451,41 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
         }
     }
 
-    /* Now parse config */
-    p_sys->b_2eqz = var_CreateGetBool( p_filter, "equalizer-2pass" );
-    f_float = var_CreateGetFloat( p_filter, "equalizer-preamp" );
-    if( f_float < -20.0 )
-        f_float = -20.0;
-    else if( f_float > 20.0 )
-        f_float = 20.0;
-    p_sys->f_gamp = pow( 10, f_float /20.0);
+    var_CreateGetString( p_aout,"equalizer-bands" );
+    var_CreateGetString( p_aout, "equalizer-preset" );
 
-    psz = var_CreateGetString( p_filter, "equalizer-preset" );
-    if( *psz && p_sys->i_band == 10 )
+    p_sys->b_2eqz = var_CreateGetBool( p_aout, "equalizer-2pass" );
+
+    var_CreateGetFloat( p_aout, "equalizer-preamp" );
+
+    /* Get initial values */
+    var_Get( p_aout, "equalizer-preset", &val1 );
+    var_Get( p_aout, "equalizer-bands", &val2 );
+    var_Get( p_aout, "equalizer-preamp", &val3 );
+
+    p_sys->b_first = VLC_TRUE;
+    PresetCallback( VLC_OBJECT( p_aout ), NULL, val1, val1, p_sys );
+    BandsCallback(  VLC_OBJECT( p_aout ), NULL, val2, val2, p_sys );
+    PreampCallback( VLC_OBJECT( p_aout ), NULL, val3, val3, p_sys );
+    p_sys->b_first = VLC_FALSE;
+
+    /* Register preset bands (for intf) if : */
+    /* We have no bands info --> the preset info must be given to the intf */
+    /* or The bands info matches the preset */
+    if( ( *(val2.psz_string) &&
+        strstr( p_sys->psz_newbands, val2.psz_string ) ) || !*val2.psz_string )
     {
-        int i;
-        /* */
-        for( i = 0; eqz_preset_10b[i] != NULL; i++ )
-        {
-            if( !strcasecmp( eqz_preset_10b[i]->psz_name, psz ) )
-            {
-                int j;
-                p_sys->f_gamp *= pow( 10, eqz_preset_10b[i]->f_preamp / 20.0 );
-                for( j = 0; j < p_sys->i_band; j++ )
-                    p_sys->f_amp[j] = EqzConvertdB( eqz_preset_10b[i]->f_amp[j] );
-                break;
-            }
-        }
-        if( eqz_preset_10b[i] == NULL )
-        {
-            msg_Err( p_filter, "equalizer preset '%s' not found", psz );
-            msg_Dbg( p_filter, "full list:" );
-            for( i = 0; eqz_preset_10b[i] != NULL; i++ )
-                msg_Dbg( p_filter, "  - '%s'", eqz_preset_10b[i]->psz_name );
-        }
+        var_SetString( p_aout, "equalizer-bands", p_sys->psz_newbands );
+        var_SetFloat( p_aout, "equalizer-preamp", p_sys->f_newpreamp );
     }
-    free( psz );
 
-    psz = var_CreateGetString( p_filter, "equalizer-bands" );
-    if( *psz )
-    {
-        char *p = psz;
-        int i;
-        for( i = 0; i < p_sys->i_band; i++ )
-        {
-            float f;
-
-            /* Read dB -20/20*/
-            f = strtof( p, &p );
-
-            p_sys->f_amp[i] = EqzConvertdB( f );
-
-            if( p == NULL )
-                break;
-            p++;
-            if( *p == '\0' )
-                break;
-        }
-    }
-    free( psz );
+    /* Add our own callbacks */
+    var_AddCallback( p_aout, "equalizer-preset", PresetCallback, p_sys );
+    var_AddCallback( p_aout, "equalizer-bands", BandsCallback, p_sys );
+    var_AddCallback( p_aout, "equalizer-preamp", PreampCallback, p_sys );
 
     msg_Dbg( p_filter, "equalizer loaded for %d Hz with %d bands %d pass",
-             i_rate, p_sys->i_band, p_sys->b_2eqz ? 2 : 1 );
+                        i_rate, p_sys->i_band, p_sys->b_2eqz ? 2 : 1 );
     for( i = 0; i < p_sys->i_band; i++ )
     {
         msg_Dbg( p_filter, "   %d Hz -> factor:%f alpha:%f beta:%f gamma:%f",
@@ -506,7 +495,8 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
     return VLC_SUCCESS;
 }
 
-static void EqzFilter( aout_filter_t *p_filter, float *out, float *in,
+static void EqzFilter( aout_instance_t *p_aout,
+                       aout_filter_t *p_filter, float *out, float *in,
                        int i_samples, int i_channels )
 {
     aout_filter_sys_t *p_sys = p_filter->p_sys;
@@ -571,9 +561,116 @@ static void EqzClean( aout_filter_t *p_filter )
 {
     aout_filter_sys_t *p_sys = p_filter->p_sys;
 
+    var_DelCallback( (aout_instance_t *)p_filter->p_parent,
+                        "equalizer-bands", BandsCallback, p_sys );
+    var_DelCallback( (aout_instance_t *)p_filter->p_parent,
+                        "equalizer-preset", PresetCallback, p_sys );
+    var_DelCallback( (aout_instance_t *)p_filter->p_parent,
+                        "equalizer-preamp", PreampCallback, p_sys );
+
     free( p_sys->f_alpha );
     free( p_sys->f_beta );
     free( p_sys->f_gamma );
 
     free( p_sys->f_amp );
+
+}
+
+
+static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
+                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    aout_filter_sys_t *p_sys = (aout_filter_sys_t *)p_data;
+    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+
+    char *psz_preset = newval.psz_string;
+    char psz_newbands[120];
+
+    memset( psz_newbands, 0, 120 );
+
+    if( *psz_preset && p_sys->i_band == 10 )
+    {
+        int i;
+        /* */
+        for( i = 0; eqz_preset_10b[i] != NULL; i++ )
+        {
+            if( !strcasecmp( eqz_preset_10b[i]->psz_name, psz_preset ) )
+            {
+                int j;
+                p_sys->f_gamp *= pow( 10, eqz_preset_10b[i]->f_preamp / 20.0 );
+                for( j = 0; j < p_sys->i_band; j++ )
+                {
+                    p_sys->f_amp[j] = EqzConvertdB(
+                                        eqz_preset_10b[i]->f_amp[j] );
+                    sprintf( psz_newbands, "%s %f", psz_newbands,
+                                         eqz_preset_10b[i]->f_amp[j] );
+                }
+                if( p_sys->b_first == VLC_FALSE )
+                {
+                    var_SetString( p_aout, "equalizer-bands", psz_newbands );
+                    var_SetFloat( p_aout, "equalizer-preamp",
+                                    eqz_preset_10b[i]->f_preamp );
+                }
+                else
+                {
+                    p_sys->psz_newbands = strdup( psz_newbands );
+                    p_sys->f_newpreamp = eqz_preset_10b[i]->f_preamp;
+                }
+                break;
+            }
+        }
+        if( eqz_preset_10b[i] == NULL )
+        {
+            msg_Err( p_aout, "equalizer preset '%s' not found", psz_preset );
+            msg_Dbg( p_aout, "full list:" );
+            for( i = 0; eqz_preset_10b[i] != NULL; i++ )
+                msg_Dbg( p_aout, "  - '%s'", eqz_preset_10b[i]->psz_name );
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+static int PreampCallback( vlc_object_t *p_this, char const *psz_cmd,
+                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    aout_filter_sys_t *p_sys = (aout_filter_sys_t *)p_data;
+
+    if( newval.f_float < -20.0 )
+        newval.f_float = -20.0;
+    else if( newval.f_float > 20.0 )
+        newval.f_float = 20.0;
+    p_sys->f_gamp = pow( 10, newval.f_float /20.0);
+
+    return VLC_SUCCESS;
+}
+
+static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
+                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    aout_filter_sys_t *p_sys = (aout_filter_sys_t *)p_data;
+
+    char *psz_bands = newval.psz_string;
+
+    /* Same thing for bands */
+    if( *psz_bands )
+    {
+        char *p = psz_bands;
+        int i;
+        for( i = 0; i < p_sys->i_band; i++ )
+        {
+            float f;
+
+            /* Read dB -20/20*/
+            f = strtof( p, &p );
+
+            p_sys->f_amp[i] = EqzConvertdB( f );
+
+            if( p == NULL )
+                break;
+            p++;
+            if( *p == '\0' )
+                break;
+        }
+    }
+    return VLC_SUCCESS;
 }

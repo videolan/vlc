@@ -3,7 +3,7 @@
  *               -> gives the feeling of a real room with a simple headphone
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: headphone.c,v 1.7 2004/01/25 18:53:06 gbazin Exp $
+ * $Id$
  *
  * Authors: Boris Dorès <babal@via.ecp.fr>
  *
@@ -306,6 +306,7 @@ static int Create( vlc_object_t *p_this )
           || (p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
                && p_filter->input.i_format != VLC_FOURCC('f','i','3','2')) )
     {
+        msg_Dbg( p_filter, "Filter discarded (invalid format)" );
         return -1;
     }
 

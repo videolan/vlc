@@ -505,7 +505,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     return 0;
 }
 
-static void ChangeFiltersString( aout_instance_t * p_aout,
+static int ChangeFiltersString( aout_instance_t * p_aout,
                                  char *psz_name, vlc_bool_t b_add )
 {
     vlc_value_t val;
@@ -526,6 +526,10 @@ static void ChangeFiltersString( aout_instance_t * p_aout,
                       val.psz_string, psz_name );
             free( psz_parser );
         }
+        else
+        {
+            return 0;
+        }
     }
     else
     {
@@ -538,12 +542,13 @@ static void ChangeFiltersString( aout_instance_t * p_aout,
         else
         {
             free( val.psz_string );
-            return;
+            return 0;
         }
     }
 
     var_Set( p_aout, "audio-filter", val );
     free( val.psz_string );
+    return 1;
 }
 
 static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
@@ -593,23 +598,28 @@ static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
     char *psz_mode = newval.psz_string;
     vlc_value_t val;
     int i;
+    int i_ret;
 
     if( !psz_mode || !*psz_mode )
     {
-        ChangeFiltersString( p_aout, "equalizer", VLC_FALSE );
+        i_ret = ChangeFiltersString( p_aout, "equalizer", VLC_FALSE );
     }
     else
     {
         val.psz_string = psz_mode;
         var_Create( p_aout, "equalizer-preset", VLC_VAR_STRING );
         var_Set( p_aout, "equalizer-preset", val );
-        ChangeFiltersString( p_aout, "equalizer", VLC_TRUE );
+        i_ret = ChangeFiltersString( p_aout, "equalizer", VLC_TRUE );
+
     }
 
     /* That sucks */
-    for( i = 0; i < p_aout->i_nb_inputs; i++ )
+    if( i_ret == 1 )
     {
-        p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+        for( i = 0; i < p_aout->i_nb_inputs; i++ )
+        {
+            p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+        }
     }
 
     return VLC_SUCCESS;

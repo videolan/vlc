@@ -780,7 +780,7 @@ static int Init( input_thread_t * p_input )
                 input_Control( p_input, INPUT_ADD_INFO, _("General"),
                                _("Author"), p_meta->value[i] );
 
-            input_Control( p_input, INPUT_ADD_INFO, _("File"),
+            input_Control( p_input, INPUT_ADD_INFO, _("Meta-informations"),
                           _(p_meta->name[i]), "%s", p_meta->value[i] );
         }
 
