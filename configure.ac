@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.73 2003/09/07 22:53:38 fenrir Exp $
+dnl $Id: configure.ac,v 1.74 2003/09/09 12:54:19 jpsaman Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1411,8 +1411,7 @@ then
   then
     AX_ADD_CFLAGS([dvb],[-I${with_dvb}/include])
   fi
-
-  CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_dvb}"
+  CPPFLAGS="${CPPFLAGS_save} -I${with_dvb}/include"
   AC_CHECK_HEADERS(linux/dvb/version.h linux/dvb/frontend.h, [
     AX_ADD_PLUGINS([dvb])
   ],[])
@@ -3103,9 +3102,8 @@ dnl
 if test "${NEED_GTK_MAIN}" != "no"
 then
     AX_ADD_PLUGINS([gtk_main])
-    AX_ADD_CFLAGS([gtk pda],[-DNEED_GTK_MAIN])
-    AX_ADD_CFLAGS([gtk_main],[${CFLAGS_gtk} ${CFLAGS_pda}])
-    AX_ADD_LDFLAGS([gtk_main],[${LDFLAGS_gtk} ${LDFLAGS_pda}])
+    AX_ADD_CFLAGS([gtk_main],[${CFLAGS_gtk}])
+    AX_ADD_LDFLAGS([gtk_main],[${LDFLAGS_gtk}])
 fi
 
 if test "${NEED_GNOME_MAIN}" != "no"
@@ -3119,8 +3117,9 @@ if test "${NEED_GTK2_MAIN}" != "no"
 then
     AX_ADD_PLUGINS([gtk2_main])
     AX_ADD_CFLAGS([gtk2],[-DNEED_GTK2_MAIN])
-    AX_ADD_CFLAGS([gtk2_main],[${CFLAGS_gtk2}])
-    AX_ADD_LDFLAGS([gtk2_main],[${LDFLAGS_gtk2}])
+    AX_ADD_CFLAGS([pda],[-DNEED_GTK2_MAIN])
+    AX_ADD_CFLAGS([gtk2_main],[${CFLAGS_gtk2} ${CFLAGS_pda}])
+    AX_ADD_LDFLAGS([gtk2_main],[${LDFLAGS_gtk2} ${LDFLAGS_pda}])
 fi
 
 if test "${NEED_GNOME2_MAIN}" != "no"
