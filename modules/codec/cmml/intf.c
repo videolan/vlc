@@ -85,11 +85,19 @@ static void  FollowAnchor               ( intf_thread_t * );
 static void  GoBack                     ( intf_thread_t * );
 static void  GoForward                  ( intf_thread_t * );
 
+static int   FollowAnchorCallback       ( vlc_object_t *, char const *,
+                                          vlc_value_t, vlc_value_t, void * );
+static int   GoBackCallback             ( vlc_object_t *, char const *,
+                                          vlc_value_t, vlc_value_t, void * );
+static int   GoForwardCallback          ( vlc_object_t *, char const *,
+                                          vlc_value_t, vlc_value_t, void * );
+
 static char *GetTimedURLFromPlaylistItem( intf_thread_t *, playlist_item_t * );
 static char *GetTimedURIFragmentForTime ( int );
 static int   GetCurrentTimeInSeconds    ( input_thread_t * );
 static int   DisplayAnchor              ( intf_thread_t *, vout_thread_t *,
                                           char *, char * );
+static int   DisplayPendingAnchor       ( intf_thread_t *, vout_thread_t * );
 static history_t * GetHistory           ( playlist_t * );
 static void  ReplacePlaylistItem        ( playlist_t *, char * );
 
@@ -110,10 +118,20 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     };
 
     p_intf->pf_run = RunIntf;
-    
+
     var_AddCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
     /* we also need to add the callback for "mouse-clicked", but do that later
      * when we've found a p_vout */
+
+    var_Create( p_intf->p_vlc, "browse-go-back", VLC_VAR_VOID );
+    var_AddCallback( p_intf->p_vlc, "browse-go-back",
+                     GoBackCallback, p_intf );
+    var_Create( p_intf->p_vlc, "browse-go-forward", VLC_VAR_VOID );
+    var_AddCallback( p_intf->p_vlc, "browse-go-forward",
+                     GoForwardCallback, p_intf );
+    var_Create( p_intf->p_vlc, "browse-follow-anchor", VLC_VAR_VOID );
+    var_AddCallback( p_intf->p_vlc, "browse-follow-anchor",
+                     FollowAnchorCallback, p_intf );
 
     return( 0 );
 }
@@ -186,8 +204,6 @@ static void RunIntf( intf_thread_t *p_intf )
     /* Main loop */
     while( !p_intf->b_die )
     {
-        vlc_value_t val;
-        decoder_t *p_cmml_decoder;
         
         /* find a video output if we currently don't have one */
         if( p_vout == NULL )
@@ -223,7 +239,7 @@ static void RunIntf( intf_thread_t *p_intf )
 #ifdef CMML_INTF_DEBUG
             msg_Dbg( p_intf, "Got a keypress: %d", val.i_int );
 #endif
-            
+
             for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
             {
                 if( p_hotkeys[i].i_key == val.i_int )
@@ -248,55 +264,11 @@ static void RunIntf( intf_thread_t *p_intf )
                         break;
                 }
             }
-        }       
+        }
 
         vlc_mutex_unlock( &p_intf->change_lock );
 
-        /*
-         * Get a pending anchor description/URL from the CMML decoder
-         * and display it on screen
-         */
-        p_cmml_decoder = p_intf->p_sys->p_cmml_decoder;
-        if( var_Get( p_cmml_decoder, "psz-current-anchor-description", &val )
-                == VLC_SUCCESS )
-        {
-            if( val.p_address )
-            {
-                char *psz_description = NULL;
-                char *psz_url = NULL;
-
-                psz_description = val.p_address;
-
-                if( var_Get( p_cmml_decoder, "psz-current-anchor-url", &val )
-                        == VLC_SUCCESS )
-                {
-                    psz_url = val.p_address;
-                }
-
-                if( p_vout != NULL )
-                {
-                    if( DisplayAnchor( p_intf, p_vout, psz_description,
-                                psz_url ) != VLC_SUCCESS )
-                    {
-                        /* text render unsuccessful: do nothing */
-                    }
-                    else
-                    {
-                        /* text render successful: clear description */
-                        val.p_address = NULL;
-                        if( var_Set( p_cmml_decoder,
-                                    "psz-current-anchor-description", val ) !=
-                                VLC_SUCCESS )
-                        {
-                            msg_Dbg( p_intf, "reset of "
-                                    "psz-current-anchor-description failed" );
-                        }
-                        free( psz_description );
-                        psz_url = NULL;
-                    }
-                }
-            }
-        }
+        (void) DisplayPendingAnchor( p_intf, p_vout );
 
         /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );
@@ -312,6 +284,76 @@ static void RunIntf( intf_thread_t *p_intf )
 
     vlc_object_release( p_intf->p_sys->p_input );
 }
+
+/*****************************************************************************
+ * DisplayPendingAnchor: get a pending anchor description/URL from the CMML
+ * decoder and display it on screen
+ *****************************************************************************/
+static int DisplayPendingAnchor( intf_thread_t *p_intf, vout_thread_t *p_vout )
+{
+    decoder_t *p_cmml_decoder;
+    char *psz_description = NULL;
+    char *psz_url = NULL;
+
+    intf_thread_t *p_primary_intf;
+    vlc_value_t val;
+
+    p_cmml_decoder = p_intf->p_sys->p_cmml_decoder;
+    if( var_Get( p_cmml_decoder, "psz-current-anchor-description", &val )
+            != VLC_SUCCESS )
+    {
+        return VLC_TRUE;
+    }
+
+    if( !val.p_address )
+        return VLC_TRUE;
+
+    psz_description = val.p_address;
+
+    if( var_Get( p_cmml_decoder, "psz-current-anchor-url", &val )
+            == VLC_SUCCESS )
+    {
+        psz_url = val.p_address;
+    }
+
+    if( p_vout != NULL )
+    {
+        /* don't display anchor if main interface can display it */
+        p_primary_intf = vlc_object_find( p_intf->p_vlc, VLC_OBJECT_INTF,
+                FIND_CHILD );
+
+        if( p_primary_intf )
+        {
+            if( var_Get( p_primary_intf, "intf-displays-cmml-description", &val )
+                    == VLC_SUCCESS )
+            {
+                if( val.b_bool == VLC_TRUE ) return TRUE;
+            }
+        }
+
+        /* display anchor as subtitle on-screen */
+        if( DisplayAnchor( p_intf, p_vout, psz_description, psz_url )
+                != VLC_SUCCESS )
+        {
+            /* text render unsuccessful: do nothing */
+            return VLC_FALSE;
+        }
+
+        /* text render successful: clear description */
+        val.p_address = NULL;
+        if( var_Set( p_cmml_decoder, "psz-current-anchor-description", val )
+                != VLC_SUCCESS )
+        {
+            msg_Dbg( p_intf,
+                     "reset of psz-current-anchor-description failed" );
+        }
+        free( psz_description );
+        psz_url = NULL;
+    }
+
+    return VLC_TRUE;
+}
+
 
 /*****************************************************************************
  * InitThread:
@@ -427,7 +469,7 @@ static void FollowAnchor ( intf_thread_t *p_intf )
         p_current_item = p_playlist->pp_items[p_playlist->i_index];
 #ifdef CMML_INTF_DEBUG
         msg_Dbg( p_intf, "Current playlist item URL is \"%s\"",
-                p_current_item->psz_uri );
+                p_current_item->input.psz_uri );
 #endif
 
         psz_uri_to_load = XURL_Concat( p_current_item->input.psz_uri,
@@ -492,6 +534,9 @@ static void FollowAnchor ( intf_thread_t *p_intf )
         }
         else
         {
+#ifdef CMML_INTF_DEBUG
+            msg_Dbg( p_intf, "calling browser_Open with \"%s\"", psz_url );
+#endif
             (void) browser_Open( psz_url );
             playlist_Command( p_playlist, PLAYLIST_PAUSE, 0 );
         }
@@ -568,6 +613,34 @@ char *GetTimedURIFragmentForTime( int seconds )
     asprintf( &psz_time, "%d", seconds );
 
     return psz_time;
+}
+
+static
+int GoBackCallback( vlc_object_t *p_this, char const *psz_var,
+                    vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *) p_data;
+    GoBack( p_intf );
+    return VLC_SUCCESS;
+}
+
+static
+int GoForwardCallback( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *) p_data;
+    GoForward( p_intf );
+    return VLC_SUCCESS;
+}
+
+static
+int FollowAnchorCallback( vlc_object_t *p_this, char const *psz_var,
+                          vlc_value_t oldval, vlc_value_t newval,
+                          void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *) p_data;
+    FollowAnchor( p_intf );
+    return VLC_SUCCESS;
 }
 
 static

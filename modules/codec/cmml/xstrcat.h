@@ -30,13 +30,13 @@
 /* like strcat, but realloc's enough memory for the new string too */
 
 static inline
-char *xstrcat( char *psz_string, char *psz_to_append )
+char *xstrcat( char *psz_string, const char *psz_to_append )
 {
     size_t i_new_string_length = strlen( psz_string ) +
         strlen( psz_to_append ) + 1;
 
     psz_string = (char *) realloc( psz_string, i_new_string_length );
-    
+
     return strcat( psz_string, psz_to_append );
 }
 

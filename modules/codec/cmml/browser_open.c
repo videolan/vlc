@@ -29,14 +29,14 @@
 
 #include "xstrcat.h"
 
-int browser_Open( char *psz_url )
+int browser_Open( const char *psz_url )
 {
 #ifdef SYS_DARWIN
     char *psz_open_commandline;
 
-    psz_open_commandline = strdup( "open " );
-    xstrcat( psz_open_commandline, psz_url );
-        
+    psz_open_commandline = strdup( "/usr/bin/open " );
+    psz_open_commandline = xstrcat( psz_open_commandline, psz_url );
+
     return system( psz_open_commandline );
 #elif defined( WIN32 )
     char *psz_open_commandline;

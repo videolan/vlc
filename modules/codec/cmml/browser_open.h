@@ -27,7 +27,7 @@
 #ifndef __BROWSER_OPEN_H__
 #define __BROWSER_OPEN_H__
 
-int browser_Open( char *psz_url );
+int browser_Open( const char *psz_url );
 
 #endif /* __BROWSER_OPEN_H__ */
 
