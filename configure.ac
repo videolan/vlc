@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.190 2004/03/05 14:03:20 garf Exp $
+dnl $Id$
 
 AC_INIT(vlc,0.7.2-cvs)
 
@@ -890,7 +890,6 @@ AX_ADD_PLUGINS([trivial_resampler ugly_resampler linear_resampler bandlimited_re
 AX_ADD_PLUGINS([trivial_channel_mixer headphone_channel_mixer])
 AX_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
 AX_ADD_PLUGINS([aout_file])
-#AX_ADD_PLUGINS([scope])
 AX_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
 AX_ADD_PLUGINS([id3 m3u playlist export])
 AX_ADD_PLUGINS([rawvideo])
@@ -3765,8 +3764,6 @@ AC_CONFIG_FILES([
   modules/codec/spudec/Makefile
   modules/control/Makefile
   modules/control/corba/Makefile
-  modules/control/lirc/Makefile
-  modules/control/rc/Makefile
   modules/control/telnet/Makefile
   modules/demux/Makefile
   modules/demux/asf/Makefile
@@ -3790,7 +3787,6 @@ AC_CONFIG_FILES([
   modules/gui/wxwindows/Makefile
   modules/misc/Makefile
   modules/misc/dummy/Makefile
-  modules/misc/logger/Makefile
   modules/misc/memcpy/Makefile
   modules/misc/network/Makefile
   modules/misc/testsuite/Makefile
@@ -3802,15 +3798,11 @@ AC_CONFIG_FILES([
   modules/stream_out/transrate/Makefile
   modules/video_chroma/Makefile
   modules/video_filter/Makefile
-  modules/video_filter/deinterlace/Makefile
   modules/video_output/Makefile
   modules/video_output/directx/Makefile
-  modules/video_output/mga/Makefile
   modules/video_output/qte/Makefile
   modules/video_output/x11/Makefile
   modules/visualization/Makefile
-  modules/visualization/scope/Makefile
-  modules/visualization/xosd/Makefile
   modules/visualization/visual/Makefile
 ])
 

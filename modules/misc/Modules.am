@@ -6,3 +6,4 @@ SOURCES_sap = sap.c
 SOURCES_screensaver = screensaver.c
 SOURCES_qte_main = qte_main.cpp
 SOURCES_freetype = freetype.c
+SOURCES_logger = logger.c

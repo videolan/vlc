@@ -7,4 +7,5 @@ SOURCES_clone = clone.c
 SOURCES_crop = crop.c
 SOURCES_motionblur = motionblur.c
 SOURCES_logo = logo.c
+SOURCES_deinterlace = deinterlace.c
 noinst_HEADERS += filter_common.h

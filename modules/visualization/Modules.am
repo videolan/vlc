@@ -1,1 +1,2 @@
 SOURCES_goom = goom.c
+SOURCES_xosd = xosd.c
