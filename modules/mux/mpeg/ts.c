@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.34 2003/11/17 11:25:54 fenrir Exp $
+ * $Id: ts.c,v 1.35 2003/11/17 14:46:37 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -212,6 +212,8 @@ struct sout_mux_sys_t
     int64_t             i_caching_delay;
     int64_t             i_pcr_delay;
 
+    int64_t             i_dts_delay;
+
     mtime_t             i_pcr;  /* last PCR emited */
 };
 
@@ -361,6 +363,12 @@ static int Open( vlc_object_t *p_this )
 
     msg_Dbg( p_mux, "caching="I64Fd" pcr="I64Fd,
              p_sys->i_caching_delay, p_sys->i_pcr_delay );
+
+    p_sys->i_dts_delay = 200000;
+    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "dts-delay" ) ) )
+    {
+        p_sys->i_dts_delay = (int64_t)atoi( val ) * 1000;
+    }
 
     /* for TS generation */
     p_sys->i_pcr    = 0;
@@ -540,6 +548,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     ts_stream_t     *p_stream;
+    char            *val;
 
     msg_Dbg( p_mux, "removing input" );
     p_stream = (ts_stream_t*)p_input->p_sys;
@@ -590,6 +599,22 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     if( p_stream->i_stream_id == 0xfa || p_stream->i_stream_id == 0xfb )
     {
         p_sys->i_mpeg4_streams--;
+    }
+    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "pid-video" ) ) )
+    {
+        int i_pid_video = strtol( val, NULL, 0 );
+        if ( i_pid_video == p_stream->i_pid )
+        {
+            p_sys->i_pid_video = i_pid_video;
+        }
+    }
+    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "pid-audio" ) ) )
+    {
+        int i_pid_audio = strtol( val, NULL, 0 );
+        if ( i_pid_audio == p_stream->i_pid )
+        {
+            p_sys->i_pid_audio = i_pid_audio;
+        }
     }
     free( p_stream );
 
@@ -807,7 +832,7 @@ static int Mux( sout_mux_t *p_mux )
             if( p_ts->i_flags&SOUT_BUFFER_FLAGS_PRIVATE_PCR )
             {
                 /* msg_Dbg( p_mux, "pcr=%lld ms", p_ts->i_dts / 1000 ); */
-                TSSetPCR( p_ts, p_ts->i_dts );
+                TSSetPCR( p_ts, p_ts->i_dts - p_sys->i_dts_delay );
             }
 
             /* latency */
@@ -927,7 +952,7 @@ static sout_buffer_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream, vlc_bool_
 
 static void TSSetPCR( sout_buffer_t *p_ts, mtime_t i_dts )
 {
-    mtime_t i_pcr = 9 * p_ts->i_dts / 100;
+    mtime_t i_pcr = 9 * i_dts / 100;
 
     p_ts->p_buffer[6]  = ( i_pcr >> 25 )&0xff;
     p_ts->p_buffer[7]  = ( i_pcr >> 17 )&0xff;

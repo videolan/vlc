@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.15 2003/11/07 19:30:28 massiot Exp $
+ * $Id: udp.c,v 1.16 2003/11/17 14:46:37 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -292,7 +292,7 @@ static void Close( vlc_object_t * p_this )
 }
 
 /*****************************************************************************
- * Read: standard read on a file descriptor.
+ * Write: standard write on a file descriptor.
  *****************************************************************************/
 static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 {
@@ -413,7 +413,7 @@ static void ThreadWrite( vlc_object_t *p_this )
     while( ! p_thread->b_die )
     {
         sout_buffer_t *p_pk;
-        mtime_t       i_date;
+        mtime_t       i_date, i_sent;
 
         p_pk = sout_FifoGet( p_thread->p_fifo );
 
@@ -428,7 +428,7 @@ static void ThreadWrite( vlc_object_t *p_this )
                 i_date_last = i_date;
                 continue;
             }
-            else if( i_date - i_date_last < -100000 )
+            else if( i_date - i_date_last < 0 )
             {
                 msg_Dbg( p_thread, "mmh, paquets in the past -> drop" );
 
@@ -438,9 +438,14 @@ static void ThreadWrite( vlc_object_t *p_this )
             }
         }
 
-
         mwait( i_date );
         send( p_thread->i_handle, p_pk->p_buffer, p_pk->i_size, 0 );
+        i_sent = mdate();
+        if ( i_sent > i_date + 20000 )
+        {
+            msg_Dbg( p_thread, "packet has been sent too late (" I64Fd ")",
+                     i_sent - i_date );
+        }
         sout_BufferDelete( p_sout, p_pk );
         i_date_last = i_date;
     }
