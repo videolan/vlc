@@ -419,6 +419,8 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "time-size", Other, NULL );
     
     /* logo on the fly items */
+    var_Create( p_intf, "logo-file", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "logo-file", Other, NULL );
     var_Create( p_intf, "logo-x", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "logo-x", Other, NULL );
     var_Create( p_intf, "logo-y", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
@@ -736,6 +738,7 @@ static void Run( intf_thread_t *p_intf )
                 msg_rc(_("| time-opacity # . . . . . . . . . . . . . opacity\n"));
                 msg_rc(_("| time-size # . . . . . . . . font size, in pixels\n"));
                 msg_rc(  "| \n");
+                msg_rc(_("| logo-file STRING . . . the overlay file path/name\n"));
                 msg_rc(_("| logo-x X . . . . . . . . . . . .offset from left\n"));
                 msg_rc(_("| logo-y Y . . . . . . . . . . . . offset from top\n"));
                 msg_rc(_("| logo-position #. . . . . . . . relative position\n"));
@@ -1230,6 +1233,14 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "time-size", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "logo-file" ) )
+    {
+        if( strlen( newval.psz_string ) > 0 )
+        {
+            val.psz_string = newval.psz_string;
+            var_Set( p_inp->p_libvlc, "logo-file", val );
         }
     }
     else if( !strcmp( psz_cmd, "logo-x" ) )
