@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.8 2002/06/01 12:32:00 sam Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.9 2002/06/01 23:42:04 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -812,7 +812,7 @@ static Intf_VLCWrapper *o_intf = nil;
     
                 o_item = [o_chapter addItemWithTitle: o_menu_title
                         action: pf_toggle_chapter keyEquivalent: @""];
-                [o_item setTag: i];
+                [o_item setTag: i + 1];
                 [o_item setTarget: self];
                 if( ( p_input->stream.p_selected_area->i_part == i + 1 ) )
                 {
@@ -874,9 +874,10 @@ static Intf_VLCWrapper *o_intf = nil;
                 }
     
                 o_item = [o_language addItemWithTitle: o_menu_title
-                        action: pf_toggle_language keyEquivalent: @""];
+                          action: pf_toggle_language keyEquivalent: @""];
                 [o_item setTag: i];
                 [o_item setTarget: self];
+                [o_item setEnabled: 1];
                 if( p_es->p_decoder_fifo != NULL )
                 {
                     [o_item setState: 1];
@@ -902,9 +903,10 @@ static Intf_VLCWrapper *o_intf = nil;
                 }
     
                 o_item = [o_subtitle addItemWithTitle: o_menu_title
-                        action: pf_toggle_subtitle keyEquivalent: @""];
+                          action: pf_toggle_subtitle keyEquivalent: @""];
                 [o_item setTag: i];
                 [o_item setTarget: self];
+                [o_item setEnabled: 1];
                 if( p_es->p_decoder_fifo != NULL )
                 {
                     [o_item setState: 1];
