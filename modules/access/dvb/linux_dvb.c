@@ -258,21 +258,26 @@ void E_(FrontendPoll)( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     frontend_t * p_frontend = p_sys->p_frontend;
-    int i_ret;
     struct dvb_frontend_event event;
     fe_status_t i_status, i_diff;
 
-    if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_GET_EVENT,
-                        &event )) < 0 )
+    for( ;; )
     {
-        msg_Err( p_access, "reading frontend status failed (%d) %s",
-                 i_ret, strerror(errno) );
-        return;
-    }
+        int i_ret = ioctl( p_sys->i_frontend_handle, FE_GET_EVENT, &event );
 
-    i_status = event.status;
-    i_diff = i_status ^ p_frontend->i_last_status;
-    p_frontend->i_last_status = i_status;
+        if( i_ret < 0 )
+        {
+            if( errno == EWOULDBLOCK )
+                return;
+
+            msg_Err( p_access, "reading frontend status failed (%d) %s",
+                     i_ret, strerror(errno) );
+            continue;
+        }
+
+        i_status = event.status;
+        i_diff = i_status ^ p_frontend->i_last_status;
+        p_frontend->i_last_status = i_status;
 
 #define IF_UP( x )                                                          \
     }                                                                       \
@@ -280,52 +285,53 @@ void E_(FrontendPoll)( access_t *p_access )
     {                                                                       \
         if ( i_status & (x) )
 
-    {
-        IF_UP( FE_HAS_SIGNAL )
-            msg_Dbg( p_access, "frontend has acquired signal" );
-        else
-            msg_Dbg( p_access, "frontend has lost signal" );
-
-        IF_UP( FE_HAS_CARRIER )
-            msg_Dbg( p_access, "frontend has acquired carrier" );
-        else
-            msg_Dbg( p_access, "frontend has lost carrier" );
-
-        IF_UP( FE_HAS_VITERBI )
-            msg_Dbg( p_access, "frontend has acquired stable FEC" );
-        else
-            msg_Dbg( p_access, "frontend has lost FEC" );
-
-        IF_UP( FE_HAS_SYNC )
-            msg_Dbg( p_access, "frontend has acquired sync" );
-        else
-            msg_Dbg( p_access, "frontend has lost sync" );
-
-        IF_UP( FE_HAS_LOCK )
         {
-            int32_t i_value;
-            msg_Dbg( p_access, "frontend has acquired lock" );
-            p_sys->i_frontend_timeout = 0;
+            IF_UP( FE_HAS_SIGNAL )
+                msg_Dbg( p_access, "frontend has acquired signal" );
+            else
+                msg_Dbg( p_access, "frontend has lost signal" );
 
-            /* Read some statistics */
-            if( ioctl( p_sys->i_frontend_handle, FE_READ_BER, &i_value ) >= 0 )
-                msg_Dbg( p_access, "- Bit error rate: %d", i_value );
-            if( ioctl( p_sys->i_frontend_handle, FE_READ_SIGNAL_STRENGTH, &i_value ) >= 0 )
-                msg_Dbg( p_access, "- Signal strength: %d", i_value );
-            if( ioctl( p_sys->i_frontend_handle, FE_READ_SNR, &i_value ) >= 0 )
-                msg_Dbg( p_access, "- SNR: %d", i_value );
-        }
-        else
-        {
-            msg_Dbg( p_access, "frontend has lost lock" );
-            p_sys->i_frontend_timeout = mdate() + FRONTEND_LOCK_TIMEOUT;
-        }
+            IF_UP( FE_HAS_CARRIER )
+                msg_Dbg( p_access, "frontend has acquired carrier" );
+            else
+                msg_Dbg( p_access, "frontend has lost carrier" );
 
-        IF_UP( FE_REINIT )
-        {
-            /* The frontend was reinited. */
-            msg_Warn( p_access, "reiniting frontend");
-            E_(FrontendSet)( p_access );
+            IF_UP( FE_HAS_VITERBI )
+                msg_Dbg( p_access, "frontend has acquired stable FEC" );
+            else
+                msg_Dbg( p_access, "frontend has lost FEC" );
+
+            IF_UP( FE_HAS_SYNC )
+                msg_Dbg( p_access, "frontend has acquired sync" );
+            else
+                msg_Dbg( p_access, "frontend has lost sync" );
+
+            IF_UP( FE_HAS_LOCK )
+            {
+                int32_t i_value;
+                msg_Dbg( p_access, "frontend has acquired lock" );
+                p_sys->i_frontend_timeout = 0;
+
+                /* Read some statistics */
+                if( ioctl( p_sys->i_frontend_handle, FE_READ_BER, &i_value ) >= 0 )
+                    msg_Dbg( p_access, "- Bit error rate: %d", i_value );
+                if( ioctl( p_sys->i_frontend_handle, FE_READ_SIGNAL_STRENGTH, &i_value ) >= 0 )
+                    msg_Dbg( p_access, "- Signal strength: %d", i_value );
+                if( ioctl( p_sys->i_frontend_handle, FE_READ_SNR, &i_value ) >= 0 )
+                    msg_Dbg( p_access, "- SNR: %d", i_value );
+            }
+            else
+            {
+                msg_Dbg( p_access, "frontend has lost lock" );
+                p_sys->i_frontend_timeout = mdate() + FRONTEND_LOCK_TIMEOUT;
+            }
+
+            IF_UP( FE_REINIT )
+            {
+                /* The frontend was reinited. */
+                msg_Warn( p_access, "reiniting frontend");
+                E_(FrontendSet)( p_access );
+            }
         }
     }
 }
