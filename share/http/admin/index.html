@@ -1,0 +1,96 @@
+<html>
+<head>
+    <title>VLC Media Player - Admin</title>
+    <vlc id="if" param1="url_param"/>
+        <meta http-equiv="refresh" content="0;URL=/adm.html" />
+    <vlc id="end" />
+
+    <vlc id="control" />
+    <vlc id="set" param1="sout" param2="string" />
+</head>
+<body>
+    <h2>
+        <center>
+        <a href="http://www.videolan.org">VLC Media Player - Admin <vlc id="value" param1="version" /></a> <form method="get" action=""> <input type="submit" name="control" value="shutdown" /> </form>
+        </center>
+    </h2>
+    <hr/>
+
+    <h3>Host list</h3>
+    <table border="1" cellspacing="0" >
+    <tr>
+        <th>Id</th><th>Host</th><th>IP</th><th>Port</th>
+    </tr>
+    <vlc id="foreach" param1="host" param2="hosts" />
+        <tr>
+        <td><vlc id="value" param1="host.id" /></td>
+        <td><vlc id="value" param1="host.host" /> </td>
+        <td><vlc id="value" param1="host.ip" /> </td>
+        <td><vlc id="value" param1="host.port" /> </td>
+        </tr>
+    <vlc id="end" />
+    </table>
+
+    <h3>File list</h3>
+    <table border="1" cellspacing="0" >
+    <tr>
+        <th>Id</th><th>URL</th><th>Mime</th><th>Protected</th><th>usage</th>
+    </tr>
+    <vlc id="foreach" param1="url" param2="urls" />
+        <vlc id="if" param1="url.stream 0 =" />
+            <tr>
+            <td><vlc id="value" param1="url.id" /></td>
+            <td><vlc id="value" param1="url.url" /></td>
+            <td><vlc id="value" param1="url.mime" /></td>
+            <td><vlc id="value" param1="url.protected" /></td>
+            <td><vlc id="value" param1="url.used" /></td>
+            </tr>
+        <vlc id="end" />
+    <vlc id="end" />
+    </table>
+
+    <h3>Stream list</h3>
+    <table border="1" cellspacing="0" >
+    <tr>
+        <th>Id</th><th>URL</th><th>Mime</th><th>Protected</th><th>usage</th>
+    </tr>
+    <vlc id="foreach" param1="url" param2="urls" />
+        <vlc id="if" param1="url.stream" />
+            <tr>
+            <td><vlc id="value" param1="url.id" /></td>
+            <td><vlc id="value" param1="url.url" /></td>
+            <td><vlc id="value" param1="url.mime" /></td>
+            <td><vlc id="value" param1="url.protected" /></td>
+            <td><vlc id="value" param1="url.used" /></td>
+            </tr>
+        <vlc id="end" />
+    <vlc id="end" />
+    </table>
+
+    <h3>Connections list</h3>
+    <table border="1" cellspacing="0" >
+    <tr>
+        <th>Id</th><th>ip</th><th>URL</th><th>Status</th><th>Actions</th>
+    </tr>
+    <vlc id="foreach" param1="con" param2="connections" />
+        <tr>
+        <td><vlc id="value" param1="con.id" /></td>
+        <td><vlc id="value" param1="con.ip" /></td>
+        <td><vlc id="value" param1="con.url" /></td>
+        <td><vlc id="value" param1="con.status" /></td>
+        <td>
+        <form method="get" action="">
+            <input type="hidden" name="id" value="<vlc id="value" param1="con.id" />"/>
+            <input type="submit" name="control" value="close" />
+        </form>
+
+        </td>
+        </tr>
+    <vlc id="end" />
+    </table>
+
+    <hr />
+    <p> <vlc id="value" param1="copyright" /> </p>
+</body>
+</html>
+
