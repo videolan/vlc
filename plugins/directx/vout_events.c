@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.23 2002/06/04 00:11:12 sam Exp $
+ * $Id: vout_events.c,v 1.24 2002/07/29 19:07:00 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -285,7 +285,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
                       p_vout->p_sys->rect_display.bottom,
                       p_vout->p_sys->i_display_depth );
 
-    ReleaseDC( p_vout->p_sys->hwnd, hdc );
+    ReleaseDC( NULL, hdc );
 
     /* Get the Icon from the main app */
     vlc_icon = NULL;
@@ -344,7 +344,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
     /* create the window */
     p_vout->p_sys->hwnd = CreateWindow("VLC DirectX",/* name of window class */
-                    "VLC DirectX",                  /* window title bar text */
+                    VOUT_TITLE " (DirectX Output)", /* window title bar text */
                     WS_OVERLAPPEDWINDOW
                     | WS_SIZEBOX,               /* window style */
                     CW_USEDEFAULT,                   /* default X coordinate */

@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.40 2002/07/23 00:39:16 sam Exp $
+ * $Id: vout_directx.c,v 1.41 2002/07/29 19:07:00 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -55,7 +55,7 @@
  *****************************************************************************/
 #include <initguid.h>
 DEFINE_GUID( IID_IDirectDraw2, 0xB3A6F3E0,0x2B43,0x11CF,0xA2,0xDE,0x00,0xAA,0x00,0xB9,0x33,0x56 );
-DEFINE_GUID( IID_IDirectDrawSurface3, 0xDA044E00,0x69B2,0x11D0,0xA1,0xD5,0x00,0xAA,0x00,0xB8,0xDF,0xBB );
+DEFINE_GUID( IID_IDirectDrawSurface2, 0x57805885,0x6eec,0x11cf,0x94,0x41,0xa8,0x23,0x03,0xc1,0x0e,0x27 );
 
 /*****************************************************************************
  * Local prototypes.
@@ -77,9 +77,9 @@ static void DirectXCloseDDraw     ( vout_thread_t *p_vout );
 static int  DirectXCreateDisplay  ( vout_thread_t *p_vout );
 static void DirectXCloseDisplay   ( vout_thread_t *p_vout );
 static int  DirectXCreateSurface  ( vout_thread_t *p_vout,
-                                    LPDIRECTDRAWSURFACE3 *, int, int, int );
+                                    LPDIRECTDRAWSURFACE2 *, int, int, int );
 static void DirectXCloseSurface   ( vout_thread_t *p_vout,
-                                    LPDIRECTDRAWSURFACE3 );
+                                    LPDIRECTDRAWSURFACE2 );
 static int  DirectXCreateClipper  ( vout_thread_t *p_vout );
 static void DirectXGetDDrawCaps   ( vout_thread_t *p_vout );
 static int  DirectXGetSurfaceDesc ( picture_t *p_pic );
@@ -111,7 +111,7 @@ static int vout_Create( vout_thread_t *p_vout )
     if( p_vout->p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
-        return( 1 );
+        return 1;
     }
 
     /* Initialisations */
@@ -143,25 +143,22 @@ static int vout_Create( vout_thread_t *p_vout )
      * window (because PeekMessage has to be called from the same thread which
      * created the window). */
     msg_Dbg( p_vout, "creating DirectXEventThread" );
-    p_vout->p_sys->p_event = vlc_object_create( p_vout, sizeof(event_thread_t) );
+    p_vout->p_sys->p_event =
+        vlc_object_create( p_vout, sizeof(event_thread_t) );
     p_vout->p_sys->p_event->p_vout = p_vout;
     if( vlc_thread_create( p_vout->p_sys->p_event,
                            "DirectX Events Thread", DirectXEventThread, 1 ) )
     {
         msg_Err( p_vout, "cannot create DirectXEventThread" );
         vlc_object_destroy( p_vout->p_sys->p_event );
-        free( p_vout->p_sys );
-        return( 1 );
+        p_vout->p_sys->p_event = NULL;
+        goto error;
     }
 
     if( p_vout->p_sys->p_event->b_error )
     {
         msg_Err( p_vout, "DirectXEventThread failed" );
-        p_vout->p_sys->p_event->b_die = 1;
-        vlc_thread_join( p_vout->p_sys->p_event );
-        vlc_object_destroy( p_vout->p_sys->p_event );
-        free( p_vout->p_sys );
-        return( 1 );
+        goto error;
     }
 
     vlc_object_attach( p_vout->p_sys->p_event, p_vout );
@@ -172,20 +169,22 @@ static int vout_Create( vout_thread_t *p_vout )
     if( DirectXInitDDraw( p_vout ) )
     {
         msg_Err( p_vout, "cannot initialize DirectDraw" );
-        vout_Destroy( p_vout );
-        return ( 1 );
+        goto error;
     }
 
     /* Create the directx display */
     if( DirectXCreateDisplay( p_vout ) )
     {
         msg_Err( p_vout, "cannot initialize DirectDraw" );
-        DirectXCloseDDraw( p_vout );
-        vout_Destroy( p_vout );
-        return ( 1 );
+        goto error;
     }
 
-    return( 0 );
+    return 0;
+
+ error:
+    vout_Destroy( p_vout );
+    return 1;
+
 }
 
 /*****************************************************************************
@@ -196,6 +195,7 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
+    int i_chroma_backup;
 
     /* Initialize the output structure.
      * Since DirectDraw can do rescaling for us, stick to the default
@@ -209,17 +209,62 @@ static int vout_Init( vout_thread_t *p_vout )
      * video decoder to decode directly into direct buffers as they are
      * created into video memory and video memory is _really_ slow */
 
+    /* Choose the chroma we will try first. */
+    switch( p_vout->render.i_chroma )
+    {
+        case VLC_FOURCC('Y','U','Y','2'):
+        case VLC_FOURCC('Y','U','N','V'):
+            p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+            break;
+        case VLC_FOURCC('U','Y','V','Y'):
+        case VLC_FOURCC('U','Y','N','V'):
+        case VLC_FOURCC('Y','4','2','2'):
+            p_vout->output.i_chroma = VLC_FOURCC('U','Y','V','Y');
+            break;
+        case VLC_FOURCC('Y','V','Y','U'):
+            p_vout->output.i_chroma = VLC_FOURCC('Y','V','Y','U');
+            break;
+        default:
+            p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
+            break;
+    }
+
     NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
+
+    i_chroma_backup = p_vout->output.i_chroma;
+
+    if( !I_OUTPUTPICTURES )
+    {
+        /* hmmm, it didn't work! Let's try commonly supported chromas */
+        p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
+        NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
+        if( !I_OUTPUTPICTURES )
+        {
+            /* hmmm, it didn't work! Let's try commonly supported chromas */
+            p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+            NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
+        }
+    }
+
+    if( !I_OUTPUTPICTURES )
+    {
+        /* If it still didn't work then don't try to use an overlay */
+        p_vout->output.i_chroma = i_chroma_backup;
+        p_vout->p_sys->b_using_overlay = 0;
+        NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
+    }
 
     /* Change the window title bar text */
     if( p_vout->p_sys->b_using_overlay )
         SetWindowText( p_vout->p_sys->hwnd,
-                       "VLC DirectX (using hardware overlay)" );
+                       VOUT_TITLE " (hardware YUV overlay DirectX output)" );
     else if( p_vout->p_sys->b_hw_yuv )
         SetWindowText( p_vout->p_sys->hwnd,
-                       "VLC DirectX (using hardware YUV->RGB conversion)" );
+                       VOUT_TITLE " (hardware YUV DirectX output)" );
+    else SetWindowText( p_vout->p_sys->hwnd,
+                        VOUT_TITLE " (software RGB DirectX output)" );
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
@@ -242,25 +287,27 @@ static void vout_End( vout_thread_t *p_vout )
 static void vout_Destroy( vout_thread_t *p_vout )
 {
     msg_Dbg( p_vout, "vout_Destroy" );
+
     DirectXCloseDisplay( p_vout );
     DirectXCloseDDraw( p_vout );
 
-    vlc_object_detach_all( p_vout->p_sys->p_event );
-
-    /* Kill DirectXEventThread */
-    p_vout->p_sys->p_event->b_die = 1;
-
-    /* we need to be sure DirectXEventThread won't stay stuck in GetMessage,
-     * so we send a fake message */
-    if( p_vout->p_sys->hwnd )
+    if( p_vout->p_sys->p_event )
     {
-        PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
+        vlc_object_detach_all( p_vout->p_sys->p_event );
+
+        /* Kill DirectXEventThread */
+        p_vout->p_sys->p_event->b_die = 1;
+
+        /* we need to be sure DirectXEventThread won't stay stuck in
+         * GetMessage, so we send a fake message */
+        if( p_vout->p_sys->hwnd )
+            PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
+
+        vlc_thread_join( p_vout->p_sys->p_event );
+        vlc_object_destroy( p_vout->p_sys->p_event );
     }
 
-    vlc_thread_join( p_vout->p_sys->p_event );
-    vlc_object_destroy( p_vout->p_sys->p_event );
-
-    if( p_vout->p_sys != NULL )
+    if( p_vout->p_sys )
     {
         free( p_vout->p_sys );
         p_vout->p_sys = NULL;
@@ -361,7 +408,7 @@ static int vout_Manage( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_event->b_die )
         return 1; /* exit */
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
@@ -398,7 +445,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         ddbltfx.dwDDFX = DDBLTFX_NOTEARING;
 
         /* Blit video surface to display */
-        dxresult = IDirectDrawSurface3_Blt(p_vout->p_sys->p_display,
+        dxresult = IDirectDrawSurface2_Blt(p_vout->p_sys->p_display,
                                            &p_vout->p_sys->rect_dest_clipped,
                                            p_pic->p_sys->p_surface,
                                            &p_vout->p_sys->rect_src_clipped,
@@ -407,10 +454,10 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         {
             /* Our surface can be lost so be sure
              * to check this and restore it if needed */
-            IDirectDrawSurface3_Restore( p_vout->p_sys->p_display );
+            IDirectDrawSurface2_Restore( p_vout->p_sys->p_display );
 
             /* Now that the surface has been restored try to display again */
-            dxresult = IDirectDrawSurface3_Blt(p_vout->p_sys->p_display,
+            dxresult = IDirectDrawSurface2_Blt(p_vout->p_sys->p_display,
                                            &p_vout->p_sys->rect_dest_clipped,
                                            p_pic->p_sys->p_surface,
                                            &p_vout->p_sys->rect_src_clipped,
@@ -431,17 +478,17 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         if( p_pic->p_sys->p_front_surface == p_pic->p_sys->p_surface )
             return;
 
-        dxresult = IDirectDrawSurface3_Flip( p_pic->p_sys->p_front_surface,
+        dxresult = IDirectDrawSurface2_Flip( p_pic->p_sys->p_front_surface,
                                              NULL, DDFLIP_WAIT );
         if ( dxresult == DDERR_SURFACELOST )
         {
             /* Our surface can be lost so be sure
              * to check this and restore it if needed */
-            IDirectDrawSurface3_Restore( p_vout->p_sys->p_display );
-            IDirectDrawSurface3_Restore( p_pic->p_sys->p_front_surface );
+            IDirectDrawSurface2_Restore( p_vout->p_sys->p_display );
+            IDirectDrawSurface2_Restore( p_pic->p_sys->p_front_surface );
 
             /* Now that the surface has been restored try to display again */
-            dxresult = IDirectDrawSurface3_Flip( p_pic->p_sys->p_front_surface,
+            dxresult = IDirectDrawSurface2_Flip( p_pic->p_sys->p_front_surface,
                                                  NULL, DDFLIP_WAIT );
             DirectXUpdateOverlay( p_vout );
         }
@@ -490,7 +537,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
     if( p_vout->p_sys->hddraw_dll == NULL )
     {
         msg_Warn( p_vout, "DirectXInitDDraw failed loading ddraw.dll" );
-        return( 1 );
+        goto error;
     }
       
     OurDirectDrawCreate = 
@@ -498,9 +545,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
     if ( OurDirectDrawCreate == NULL )
     {
         msg_Err( p_vout, "DirectXInitDDraw failed GetProcAddress" );
-        FreeLibrary( p_vout->p_sys->hddraw_dll );
-        p_vout->p_sys->hddraw_dll = NULL;
-        return( 1 );    
+        goto error;
     }
 
     /* Initialize DirectDraw now */
@@ -508,49 +553,44 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
     if( dxresult != DD_OK )
     {
         msg_Err( p_vout, "DirectXInitDDraw cannot initialize DDraw" );
-        p_vout->p_sys->p_ddobject = NULL;
-        FreeLibrary( p_vout->p_sys->hddraw_dll );
-        p_vout->p_sys->hddraw_dll = NULL;
-        return( 1 );
-    }
-
-    /* Set DirectDraw Cooperative level, ie what control we want over Windows
-     * display */
-    dxresult = IDirectDraw_SetCooperativeLevel( p_ddobject,
-                                           p_vout->p_sys->hwnd, DDSCL_NORMAL );
-    if( dxresult != DD_OK )
-    {
-        msg_Err( p_vout, "cannot set direct draw cooperative level" );
-        IDirectDraw_Release( p_ddobject );
-        p_vout->p_sys->p_ddobject = NULL;
-        FreeLibrary( p_vout->p_sys->hddraw_dll );
-        p_vout->p_sys->hddraw_dll = NULL;
-        return( 1 );
+        goto error;
     }
 
     /* Get the IDirectDraw2 interface */
     dxresult = IDirectDraw_QueryInterface( p_ddobject, &IID_IDirectDraw2,
                                         (LPVOID *)&p_vout->p_sys->p_ddobject );
+    /* Release the unused interface */
+    IDirectDraw_Release( p_ddobject );
     if( dxresult != DD_OK )
     {
         msg_Err( p_vout, "cannot get IDirectDraw2 interface" );
-        IDirectDraw_Release( p_ddobject );
-        p_vout->p_sys->p_ddobject = NULL;
-        FreeLibrary( p_vout->p_sys->hddraw_dll );
-        p_vout->p_sys->hddraw_dll = NULL;
-        return( 1 );
+        goto error;
     }
-    else
+
+    /* Set DirectDraw Cooperative level, ie what control we want over Windows
+     * display */
+    dxresult = IDirectDraw2_SetCooperativeLevel( p_vout->p_sys->p_ddobject,
+                                           p_vout->p_sys->hwnd, DDSCL_NORMAL );
+    if( dxresult != DD_OK )
     {
-        /* Release the unused interface */
-        IDirectDraw_Release( p_ddobject );
+        msg_Err( p_vout, "cannot set direct draw cooperative level" );
+        goto error;
     }
 
     /* Probe the capabilities of the hardware */
     DirectXGetDDrawCaps( p_vout );
 
     msg_Dbg( p_vout, "End DirectXInitDDraw" );
-    return( 0 );
+    return 0;
+
+ error:
+    if( p_vout->p_sys->p_ddobject )
+        IDirectDraw2_Release( p_vout->p_sys->p_ddobject );
+    if( p_vout->p_sys->hddraw_dll )
+        FreeLibrary( p_vout->p_sys->hddraw_dll );
+    p_vout->p_sys->hddraw_dll = NULL;
+    p_vout->p_sys->p_ddobject = NULL;
+    return 1;
 }
 
 /*****************************************************************************
@@ -581,26 +621,19 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     if( dxresult != DD_OK )
     {
         msg_Err( p_vout, "cannot get direct draw primary surface" );
-        p_vout->p_sys->p_display = NULL;
-        return( 1 );
+        return 1;
     }
 
     dxresult = IDirectDrawSurface_QueryInterface( p_display,
-                                         &IID_IDirectDrawSurface3,
+                                         &IID_IDirectDrawSurface2,
                                          (LPVOID *)&p_vout->p_sys->p_display );
+    /* Release the old interface */
+    IDirectDrawSurface_Release( p_display );
     if ( dxresult != DD_OK )
     {
-        msg_Err( p_vout, "cannot get IDirectDrawSurface3 interface" );
-        IDirectDrawSurface_Release( p_display );
-        p_vout->p_sys->p_display = NULL;
-        return( 1 );
+        msg_Err( p_vout, "cannot get IDirectDrawSurface2 interface" );
+        return 1;
     }
-    else
-    {
-        /* Release the old interface */
-        IDirectDrawSurface_Release( p_display );
-    }
-
 
     /* The clipper will be used only in non-overlay mode */
     DirectXCreateClipper( p_vout );
@@ -610,7 +643,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     /* compute the colorkey pixel value from the RGB value we've got */
     memset( &pixel_format, 0, sizeof( DDPIXELFORMAT ));
     pixel_format.dwSize = sizeof( DDPIXELFORMAT );
-    dxresult = IDirectDrawSurface3_GetPixelFormat( p_vout->p_sys->p_display,
+    dxresult = IDirectDrawSurface2_GetPixelFormat( p_vout->p_sys->p_display,
                                                    &pixel_format );
     if( dxresult != DD_OK )
         msg_Warn( p_vout, "DirectXUpdateOverlay GetPixelFormat failed" );
@@ -619,7 +652,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
                                         & pixel_format.dwRBitMask);
 #endif
 
-    return( 0 );
+    return 0;
 }
 
 
@@ -643,8 +676,7 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
     if( dxresult != DD_OK )
     {
         msg_Warn( p_vout, "DirectXCreateClipper cannot create clipper" );
-        p_vout->p_sys->p_clipper = NULL;
-        return( 1 );
+        goto error;
     }
 
     /* associate the clipper to the window */
@@ -654,9 +686,7 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
     {
         msg_Warn( p_vout,
                   "DirectXCreateClipper cannot attach clipper to window" );
-        IDirectDrawSurface_Release( p_vout->p_sys->p_clipper );
-        p_vout->p_sys->p_clipper = NULL;
-        return( 1 );
+        goto error;
     }
 
     /* associate the clipper with the surface */
@@ -666,12 +696,17 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
     {
         msg_Warn( p_vout,
                   "DirectXCreateClipper cannot attach clipper to surface" );
-        IDirectDrawSurface_Release( p_vout->p_sys->p_clipper );
-        p_vout->p_sys->p_clipper = NULL;
-        return( 1 );
+        goto error;
     }    
 
-    return( 0 );
+    return 0;
+
+ error:
+    if( p_vout->p_sys->p_clipper )
+        IDirectDrawClipper_Release( p_vout->p_sys->p_clipper );
+    p_vout->p_sys->p_clipper = NULL;
+    return 1;
+
 }
 
 /*****************************************************************************
@@ -685,7 +720,7 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
  * need to do any blitting to the main display...)
  *****************************************************************************/
 static int DirectXCreateSurface( vout_thread_t *p_vout,
-                                 LPDIRECTDRAWSURFACE3 *pp_surface_final,
+                                 LPDIRECTDRAWSURFACE2 *pp_surface_final,
                                  int i_chroma, int b_overlay,
                                  int i_backbuffers )
 {
@@ -775,12 +810,12 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
 
     /* Now that the surface is created, try to get a newer DirectX interface */
     dxresult = IDirectDrawSurface_QueryInterface( p_surface,
-                                     &IID_IDirectDrawSurface3,
+                                     &IID_IDirectDrawSurface2,
                                      (LPVOID *)pp_surface_final );
     IDirectDrawSurface_Release( p_surface );    /* Release the old interface */
     if ( dxresult != DD_OK )
     {
-        msg_Err( p_vout, "cannot get IDirectDrawSurface3 interface" );
+        msg_Err( p_vout, "cannot get IDirectDrawSurface2 interface" );
         *pp_surface_final = NULL;
         return 0;
     }
@@ -818,7 +853,7 @@ void DirectXUpdateOverlay( vout_thread_t *p_vout )
     if( !p_vout->p_sys->b_caps_overlay_clipping )
         dwFlags |= DDOVER_KEYDESTOVERRIDE;
 
-    dxresult = IDirectDrawSurface3_UpdateOverlay(
+    dxresult = IDirectDrawSurface2_UpdateOverlay(
                                          p_vout->p_sys->p_current_surface,
                                          &p_vout->p_sys->rect_src_clipped,
                                          p_vout->p_sys->p_display,
@@ -866,14 +901,14 @@ static void DirectXCloseDisplay( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_clipper != NULL )
     {
         msg_Dbg( p_vout, "DirectXCloseDisplay clipper" );
-        IDirectDraw2_Release( p_vout->p_sys->p_clipper );
+        IDirectDrawClipper_Release( p_vout->p_sys->p_clipper );
         p_vout->p_sys->p_clipper = NULL;
     }
 
     if( p_vout->p_sys->p_display != NULL )
     {
         msg_Dbg( p_vout, "DirectXCloseDisplay display" );
-        IDirectDraw2_Release( p_vout->p_sys->p_display );
+        IDirectDrawSurface2_Release( p_vout->p_sys->p_display );
         p_vout->p_sys->p_display = NULL;
     }
 }
@@ -884,12 +919,12 @@ static void DirectXCloseDisplay( vout_thread_t *p_vout )
  * This function returns all resources allocated for the surface.
  *****************************************************************************/
 static void DirectXCloseSurface( vout_thread_t *p_vout,
-                                 LPDIRECTDRAWSURFACE3 p_surface )
+                                 LPDIRECTDRAWSURFACE2 p_surface )
 {
     msg_Dbg( p_vout, "DirectXCloseSurface" );
     if( p_surface != NULL )
     {
-        IDirectDraw2_Release( p_surface );
+        IDirectDrawSurface2_Release( p_surface );
     }
 }
 
@@ -903,31 +938,11 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 {
     int i;
     vlc_bool_t b_result_ok;
-    LPDIRECTDRAWSURFACE3 p_surface;
+    LPDIRECTDRAWSURFACE2 p_surface;
 
     msg_Dbg( p_vout, "NewPictureVec" );
 
     I_OUTPUTPICTURES = 0;
-
-    /* Choose the chroma we will try first. */
-    switch( p_vout->render.i_chroma )
-    {
-        case VLC_FOURCC('Y','U','Y','2'):
-        case VLC_FOURCC('Y','U','N','V'):
-            p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
-            break;
-        case VLC_FOURCC('U','Y','V','Y'):
-        case VLC_FOURCC('U','Y','N','V'):
-        case VLC_FOURCC('Y','4','2','2'):
-            p_vout->output.i_chroma = VLC_FOURCC('U','Y','V','Y');
-            break;
-        case VLC_FOURCC('Y','V','Y','U'):
-            p_vout->output.i_chroma = VLC_FOURCC('Y','V','Y','U');
-            break;
-        default:
-            p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
-            break;
-    }
 
     /* First we try to use an YUV overlay surface.
      * The overlay surface that we create won't be used to decode directly
@@ -974,7 +989,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             /* Get the back buffer */
             memset( &dds_caps, 0, sizeof( DDSCAPS ) );
             dds_caps.dwCaps = DDSCAPS_BACKBUFFER;
-            if( DD_OK != IDirectDrawSurface3_GetAttachedSurface(
+            if( DD_OK != IDirectDrawSurface2_GetAttachedSurface(
                                                 p_surface, &dds_caps,
                                                 &p_pic[0].p_sys->p_surface ) )
             {
@@ -992,21 +1007,17 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                 UpdatePictureStruct( p_vout, &front_pic,
                                      p_vout->output.i_chroma ) )
             {
-                int j;
-                for( j = 0; j < front_pic.i_planes; j++ )
-                    memset( front_pic.p[j].p_pixels, 127,
-                            front_pic.p[j].i_lines * front_pic.p[j].i_pitch
-                            * front_pic.p[j].i_pixel_pitch );
+                int i,j;
+                for( i = 0; i < front_pic.i_planes; i++ )
+                    for( j = 0; j < front_pic.p[i].i_lines; j++)
+                        memset( front_pic.p[i].p_pixels + j *
+                                front_pic.p[i].i_pitch, 127,
+                                front_pic.p[i].i_visible_pitch );
             }
 
             DirectXUpdateOverlay( p_vout );
             I_OUTPUTPICTURES = 1;
             msg_Dbg( p_vout, "DirectX YUV overlay created successfully" );
-        }
-        else
-        {
-            msg_Err( p_vout, "cannot create YUV overlay surface" );
-            p_vout->p_sys->b_using_overlay = 0;
         }
     }
 
@@ -1031,7 +1042,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             DDPIXELFORMAT ddpfPixelFormat;
 
             ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
-            IDirectDrawSurface3_GetPixelFormat( p_vout->p_sys->p_display,
+            IDirectDrawSurface2_GetPixelFormat( p_vout->p_sys->p_display,
                                                 &ddpfPixelFormat );
 
             if( ddpfPixelFormat.dwFlags & DDPF_RGB )
@@ -1055,7 +1066,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                     break;
                 default:
                     msg_Err( p_vout, "unknown screen depth" );
-                    return( 0 );
+                    return 0;
                 }
                 p_vout->output.i_rmask = ddpfPixelFormat.dwRBitMask;
                 p_vout->output.i_gmask = ddpfPixelFormat.dwGBitMask;
@@ -1086,8 +1097,6 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 
             msg_Dbg( p_vout, "DirectX plain surface created successfully" );
         }
-        else
-            msg_Err( p_vout, "DirectX could not create plain surface" );
     }
 
 
@@ -1177,9 +1186,10 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
                     p_pic->p->i_pixel_pitch = 4;
                     break;
                 default:
-                    return( -1 );
+                    return -1;
             }
-            p_pic->p->i_visible_pitch = p_pic->p_sys->ddsd.lPitch;
+            p_pic->p->i_visible_pitch = p_vout->output.i_width *
+              p_pic->p->i_pixel_pitch;
             p_pic->i_planes = 1;
             break;
 
@@ -1189,21 +1199,24 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
             p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->ddsd.lPitch;
             p_pic->p[Y_PLANE].i_pixel_pitch = 1;
-            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
+            p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width *
+              p_pic->p[Y_PLANE].i_pixel_pitch;
 
             p_pic->V_PIXELS =  p_pic->Y_PIXELS
               + p_pic->p[Y_PLANE].i_lines * p_pic->p[Y_PLANE].i_pitch;
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
+            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width *
+              p_pic->p[V_PLANE].i_pixel_pitch;
 
             p_pic->U_PIXELS = p_pic->V_PIXELS
               + p_pic->p[V_PLANE].i_lines * p_pic->p[V_PLANE].i_pitch;
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
+            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width *
+              p_pic->p[U_PLANE].i_pixel_pitch;
 
             p_pic->i_planes = 3;
             break;
@@ -1214,23 +1227,38 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
             p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->ddsd.lPitch;
             p_pic->p[Y_PLANE].i_pixel_pitch = 1;
-            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
+            p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width *
+              p_pic->p[Y_PLANE].i_pixel_pitch;
 
             p_pic->U_PIXELS = p_pic->Y_PIXELS
               + p_pic->p[Y_PLANE].i_lines * p_pic->p[Y_PLANE].i_pitch;
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
+            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width *
+              p_pic->p[U_PLANE].i_pixel_pitch;
 
             p_pic->V_PIXELS =  p_pic->U_PIXELS
               + p_pic->p[U_PLANE].i_lines * p_pic->p[U_PLANE].i_pitch;
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
+            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width *
+              p_pic->p[V_PLANE].i_pixel_pitch;
 
             p_pic->i_planes = 3;
+            break;
+
+        case VLC_FOURCC('Y','U','Y','2'):
+
+            p_pic->p->p_pixels = p_pic->p_sys->ddsd.lpSurface;
+            p_pic->p->i_lines = p_vout->output.i_height;
+            p_pic->p->i_pitch = p_pic->p_sys->ddsd.lPitch;
+            p_pic->p->i_pixel_pitch = 2;
+            p_pic->p->i_visible_pitch = p_vout->output.i_width *
+              p_pic->p->i_pixel_pitch;
+
+            p_pic->i_planes = 1;
             break;
 
         default:
@@ -1308,7 +1336,7 @@ static int DirectXGetSurfaceDesc( picture_t *p_pic )
     /* Lock the surface to get a valid pointer to the picture buffer */
     memset( &p_pic->p_sys->ddsd, 0, sizeof( DDSURFACEDESC ));
     p_pic->p_sys->ddsd.dwSize = sizeof(DDSURFACEDESC);
-    dxresult = IDirectDrawSurface3_Lock( p_pic->p_sys->p_surface,
+    dxresult = IDirectDrawSurface2_Lock( p_pic->p_sys->p_surface,
                                          NULL, &p_pic->p_sys->ddsd,
                                          DDLOCK_NOSYSLOCK | DDLOCK_WAIT,
                                          NULL );
@@ -1316,8 +1344,8 @@ static int DirectXGetSurfaceDesc( picture_t *p_pic )
     {
         /* Your surface can be lost so be sure
          * to check this and restore it if needed */
-        dxresult = IDirectDrawSurface3_Restore( p_pic->p_sys->p_surface );
-        dxresult = IDirectDrawSurface3_Lock( p_pic->p_sys->p_surface, NULL,
+        dxresult = IDirectDrawSurface2_Restore( p_pic->p_sys->p_surface );
+        dxresult = IDirectDrawSurface2_Lock( p_pic->p_sys->p_surface, NULL,
                                              &p_pic->p_sys->ddsd,
                                              DDLOCK_NOSYSLOCK | DDLOCK_WAIT,
                                              NULL);
@@ -1329,7 +1357,7 @@ static int DirectXGetSurfaceDesc( picture_t *p_pic )
     }
 
     /* Unlock the Surface */
-    dxresult = IDirectDrawSurface3_Unlock( p_pic->p_sys->p_surface, NULL );
+    dxresult = IDirectDrawSurface2_Unlock( p_pic->p_sys->p_surface, NULL );
 
     return 1;
 }
