@@ -417,7 +417,7 @@ DATA_win32_rc = $(noinst_share_vlc_win32_rc_DATA)
 noinst_share_vlc_win32_rc_DATA = share/vlc_win32_rc.$(OBJEXT)
 noinst_share_vlc_win32_rcdir = $(libdir)
 share/vlc_win32_rc.$(OBJEXT): share/vlc_win32_rc.rc
-	$(WINDRES) --include-dir $(srcdir)/share -i $< -o $@
+	$(WINDRES) -DVERSION=$(VERSION) -DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` --include-dir $(srcdir)/share -i $< -o $@
 endif
 
 ###############################################################################

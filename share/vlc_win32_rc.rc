@@ -1,1 +1,30 @@
 VLC_ICON ICON "vlc48x48.ico"
+#ifndef VERSION_NUMBER
+#define VERSION_NUMBER 0,0,0,0
+#endif
+#ifndef VERSION
+#define VERSION 0.0.0
+#endif
+
+1 VERSIONINFO
+FILETYPE 1
+FILEOS 4
+PRODUCTVERSION VERSION_NUMBER
+FILEVERSION VERSION_NUMBER
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName", "VideoLAN"
+      VALUE "FileVersion", "VERSION"
+      VALUE "FileDescription", "An Opensource Media Player"
+      VALUE "LegalCopyright", "(c) 1996-2003 VideoLAN"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1200
+  END
+END
+
