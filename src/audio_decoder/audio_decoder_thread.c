@@ -207,8 +207,11 @@ static void RunThread (adec_thread_t * p_adec)
             do 
             {
                 adec_byte_stream_next ( p_byte_stream );
-            } while ( !((U32_AT((u32 *)p_adec->p_data->p_payload_start) & 0xFFFFFF00) == 0x100) && (!p_adec->b_die)
-                        && (!p_adec->b_error) );
+            } while ( !(!*p_adec->p_data->p_payload_start
+                         && !p_adec->p_data->p_payload_start[1]
+                         && p_adec->p_data->p_payload_start[2] == 1)
+                       && (!p_adec->b_die)
+                       && (!p_adec->b_error) );
 
             if( p_adec->b_die || p_adec->b_error )
             {
