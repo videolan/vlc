@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.97 2004/01/05 12:59:43 zorglub Exp $
+ * $Id: vlc_common.h,v 1.98 2004/01/07 23:39:40 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -610,6 +610,13 @@ static inline uint64_t GetQWLE( void * _p )
     VLC_EXPORT( char *, vlc_strdup, ( const char *s ) );
 #elif !defined(__PLUGIN__)
 #   define vlc_strdup NULL
+#endif
+
+#ifndef HAVE_VASPRINTF
+#   define vasprintf vlc_vasprintf
+    VLC_EXPORT( char *, vlc_vasprintf, ( const char *s ) );
+#elif !defined(__PLUGIN__)
+#   define vlc_vasprintf NULL
 #endif
 
 #ifndef HAVE_STRNDUP

@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.10 2003/10/08 19:40:42 gbazin Exp $
+ * $Id: libc.c,v 1.11 2004/01/07 23:39:41 fenrir Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -124,6 +124,52 @@ int vlc_strncasecmp( const char *s1, const char *s2, size_t n )
     }
 
     return i_delta;
+}
+#endif
+
+/*****************************************************************************
+ * vasprintf:
+ *****************************************************************************/
+#if !defined( HAVE_VASPRINTF )
+int vlc_vasprintf(char **strp, const char *fmt, va_list ap)
+{
+    /* Guess we need no more than 100 bytes. */
+    int     i_size = 100;
+    char    *p = malloc( i_size );
+    int     n;
+
+    if( p == NULL )
+    {
+        *strp = NULL;
+        return -1;
+    }
+
+    for( ;; )
+    {
+        /* Try to print in the allocated space. */
+        n = vsnprintf( p, i_size, fmt, args );
+
+        /* If that worked, return the string. */
+        if (n > -1 && n < i_size)
+        {
+            *strp = p;
+            return strlen( p );
+        }
+        /* Else try again with more space. */
+        if (n > -1)    /* glibc 2.1 */
+        {
+           i_size = n+1; /* precisely what is needed */
+        }
+        else           /* glibc 2.0 */
+        {
+           i_size *= 2;  /* twice the old size */
+        }
+        if( (p = realloc( p, i_size ) ) == NULL)
+        {
+            *strp = NULL;
+            return -1;
+        }
+    }
 }
 #endif
 

@@ -2,7 +2,7 @@
  * net.c:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: net.c,v 1.3 2004/01/07 14:59:03 fenrir Exp $
+ * $Id: net.c,v 1.4 2004/01/07 23:39:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -53,51 +53,6 @@
 
 #include <unistd.h>
 #include "network.h"
-
-
-/*****************************************************************************
- * vsprintf_m:
- *****************************************************************************
- * do like vsprintf but auto allocated memory
- * XXX: should be move elsewhere (under vlc_vasprintf)
- *****************************************************************************/
-static char *vsprintf_m( const char *fmt, va_list args )
-{
-    /* Guess we need no more than 100 bytes. */
-    int     i_size = 100;
-    char    *p = malloc( i_size );
-    int     n;
-
-    if( p == NULL )
-    {
-        return NULL;
-    }
-
-    for( ;; )
-    {
-        /* Try to print in the allocated space. */
-        n = vsnprintf( p, i_size, fmt, args );
-
-        /* If that worked, return the string. */
-        if (n > -1 && n < i_size)
-        {
-           return p;
-        }
-        /* Else try again with more space. */
-        if (n > -1)    /* glibc 2.1 */
-        {
-           i_size = n+1; /* precisely what is needed */
-        }
-        else           /* glibc 2.0 */
-        {
-           i_size *= 2;  /* twice the old size */
-        }
-        if( (p = realloc( p, i_size ) ) == NULL)
-        {
-           return NULL;
-        }
-    }
-}
 
 
 /*****************************************************************************
@@ -182,12 +137,13 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data, vlc_b
     int             i_recv;
     int             i_total = 0;
     int             i_ret;
+    vlc_bool_t      b_die = p_this->b_die;
 
     while( i_data > 0 )
     {
         do
         {
-            if( p_this->b_die || p_this->b_error )
+            if( p_this->b_die != b_die )
             {
                 return 0;
             }
@@ -234,11 +190,13 @@ int __net_Write( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data )
     int             i_total = 0;
     int             i_ret;
 
+    vlc_bool_t      b_die = p_this->b_die;
+
     while( i_data > 0 )
     {
         do
         {
-            if( p_this->b_die || p_this->b_error )
+            if( p_this->b_die != b_die )
             {
                 return 0;
             }
@@ -323,7 +281,7 @@ int net_Printf( vlc_object_t *p_this, int fd, char *psz_fmt, ... )
     int     i_size, i_ret;
 
     va_start( args, psz_fmt );
-    psz = vsprintf_m( psz_fmt, args );
+    vasprintf( &psz, psz_fmt, args );
     va_end( args );
 
     i_size = strlen( psz );
