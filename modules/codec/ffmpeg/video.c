@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.6 2002/11/27 12:41:45 fenrir Exp $
+ * $Id: video.c,v 1.7 2002/11/28 16:44:05 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -160,17 +160,20 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
     }
 
 #else
-    switch( i_aspect )
+    switch( p_vdec->p_context->aspect_ratio_info )
     {
         case( FF_ASPECT_4_3_625 ):
         case( FF_ASPECT_4_3_525 ):
             i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
+            break;
         case( FF_ASPECT_16_9_625 ):
         case( FF_ASPECT_16_9_525 ):
             i_aspect = VOUT_ASPECT_FACTOR * 16 / 9 ;
+            break;
         case( FF_ASPECT_SQUARE ):
         default:
             i_aspect = VOUT_ASPECT_FACTOR * i_width / i_height;
+            break;
     }
 #endif
     /* Spawn a video output if there is none. First we look for our children,
