@@ -2,7 +2,7 @@
  * PlayListWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.cpp,v 1.7 2003/02/01 12:01:11 stippi Exp $
+ * $Id: PlayListWindow.cpp,v 1.8 2003/02/03 17:18:48 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -46,12 +46,14 @@ enum
 	MSG_SELECT_ALL			= 'sall',
 	MSG_SELECT_NONE			= 'none',
 	MSG_RANDOMIZE			= 'rndm',
+	MSG_SORT_REVERSE		= 'srtr',
 	MSG_SORT_NAME			= 'srtn',
 	MSG_SORT_PATH			= 'srtp',
 	MSG_REMOVE				= 'rmov',
 	MSG_REMOVE_ALL			= 'rmal',
 
 	MSG_SELECTION_CHANGED	= 'slch',
+	MSG_SET_DISPLAY			= 'stds',
 };
 
 
@@ -103,6 +105,9 @@ PlayListWindow::PlayListWindow( BRect frame, const char* name,
 	editMenu->AddItem( fSelectNoneMI );
 
 	editMenu->AddSeparatorItem();
+	fSortReverseMI = new BMenuItem( "Sort Reverse",
+								 new BMessage( MSG_SORT_REVERSE ), 'F' );
+	editMenu->AddItem( fSortReverseMI );
 	fSortNameMI = new BMenuItem( "Sort by Name",
 								 new BMessage( MSG_SORT_NAME ), 'N' );
 fSortNameMI->SetEnabled( false );
@@ -122,6 +127,22 @@ fRandomizeMI->SetEnabled( false );
 	fRemoveAllMI = new BMenuItem( "Remove All",
 								  new BMessage( MSG_REMOVE_ALL ) );
 	editMenu->AddItem( fRemoveAllMI );
+
+	// Add View menu
+	fViewMenu = new BMenu( "View" );
+	fMenuBar->AddItem( fViewMenu );
+
+	fViewMenu->SetRadioMode( true );
+	BMessage* message = new BMessage( MSG_SET_DISPLAY );
+	message->AddInt32( "mode", DISPLAY_PATH );
+	item = new BMenuItem( "Path", message );
+	item->SetMarked( true );
+	fViewMenu->AddItem( item );
+
+	message = new BMessage( MSG_SET_DISPLAY );
+	message->AddInt32( "mode", DISPLAY_NAME );
+	item = new BMenuItem( "Name", message );
+	fViewMenu->AddItem( item );
 
 	// make menu bar resize to correct height
 	float menuWidth, menuHeight;
@@ -145,8 +166,8 @@ fRandomizeMI->SetEnabled( false );
 	// be up to date
 	UpdatePlaylist();
 	FrameResized( Bounds().Width(), Bounds().Height() );
-	SetSizeLimits( menuWidth * 2.0, menuWidth * 6.0,
-				   menuHeight * 5.0, menuHeight * 25.0 );
+	SetSizeLimits( menuWidth * 1.5, menuWidth * 8.0,
+				   menuHeight * 5.0, menuHeight * 50.0 );
 
 	UpdatePlaylist( true );
 	// start window thread in hidden state
@@ -193,6 +214,9 @@ PlayListWindow::MessageReceived( BMessage * p_message )
 			break;
 		case MSG_RANDOMIZE:
 			break;
+		case MSG_SORT_REVERSE:
+			fListView->SortReverse();
+			break;
 		case MSG_SORT_NAME:
 			break;
 		case MSG_SORT_PATH:
@@ -207,6 +231,13 @@ PlayListWindow::MessageReceived( BMessage * p_message )
 		case MSG_SELECTION_CHANGED:
 			_CheckItemsEnableState();
 			break;
+		case MSG_SET_DISPLAY:
+		{
+			uint32 mode;
+			if ( p_message->FindInt32( "mode", (int32*)&mode ) == B_OK )
+				SetDisplayMode( mode );
+			break;
+		}
 		case B_MODIFIERS_CHANGED:
 			fListView->ModifiersChanged();
 			break;
@@ -258,6 +289,42 @@ PlayListWindow::UpdatePlaylist( bool rebuild )
 }
 
 /*****************************************************************************
+ * PlayListWindow::SetDisplayMode
+ *****************************************************************************/
+void
+PlayListWindow::SetDisplayMode( uint32 mode )
+{
+	if ( Lock() )
+	{
+		// propagate to list view
+		fListView->SetDisplayMode( mode );
+		// mark correct menu item
+		for ( int32 i = 0; BMenuItem* item = fViewMenu->ItemAt( i ); i++ )
+		{
+			BMessage* message = item->Message();
+			uint32 itemMode;
+			if ( message
+				 && message->FindInt32( "mode", (int32*)&itemMode ) == B_OK
+				 && itemMode == mode )
+			{
+				item->SetMarked( true );
+				break;
+			}
+		}
+		Unlock();
+	}
+}
+
+/*****************************************************************************
+ * PlayListWindow::DisplayMode
+ *****************************************************************************/
+uint32
+PlayListWindow::DisplayMode() const
+{
+	return fListView->DisplayMode();
+}
+
+/*****************************************************************************
  * PlayListWindow::_CheckItemsEnableState
  *****************************************************************************/
 void
@@ -267,11 +334,12 @@ PlayListWindow::_CheckItemsEnableState() const
 	int32 test = fListView->CurrentSelection( 0 );
 	bool enable1 = test >= 0;
 	// check if at least two items selected
-//	test = fListView->CurrentSelection( 1 );
-//	bool enable2 = test >= 0;
+	test = fListView->CurrentSelection( 1 );
+	bool enable2 = test >= 0;
 	bool notEmpty = fListView->CountItems() > 0;
 	_SetMenuItemEnabled( fSelectAllMI, notEmpty );
 	_SetMenuItemEnabled( fSelectNoneMI, enable1 );
+	_SetMenuItemEnabled( fSortReverseMI, enable2 );
 //	_SetMenuItemEnabled( fSortNameMI, enable2 );
 //	_SetMenuItemEnabled( fSortPathMI, enable2 );
 //	_SetMenuItemEnabled( fRandomizeMI, enable2 );

@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.26 2003/02/01 12:01:10 stippi Exp $
+ * $Id: InterfaceWindow.cpp,v 1.27 2003/02/03 17:18:48 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -128,6 +128,50 @@ get_volume_info( BVolume& volume, BString& volumeName, bool& isCDROM, BString& d
 		}
  	}
  	return success;
+}
+
+// collect_folder_contents
+void
+collect_folder_contents( BDirectory& dir, BList& list, bool& deep, bool& asked, BEntry& entry )
+{
+	while ( dir.GetNextEntry( &entry, true ) == B_OK )
+	{
+		if ( !entry.IsDirectory() )
+		{
+			BPath path;
+			// since the directory will give us the entries in reverse order,
+			// we put them each at the same index, effectively reversing the
+			// items while adding them
+			if ( entry.GetPath( &path ) == B_OK )
+			{
+				BString* string = new BString( path.Path() );
+				if ( !list.AddItem( string, 0 ) )
+					delete string;	// at least don't leak
+			}
+		}
+		else
+		{
+			if ( !asked )
+			{
+				// ask user if we should parse sub-folders as well
+				BAlert* alert = new BAlert( "sub-folders?",
+											"Open files from all sub-folders as well?",
+											"No", "Yes", NULL, B_WIDTH_AS_USUAL,
+											B_IDEA_ALERT );
+				int32 buttonIndex = alert->Go();
+				deep = buttonIndex == 1;
+				asked = true;
+				// never delete BAlerts!!
+			}
+			if ( deep )
+			{
+				BDirectory subDir( &entry );
+				if ( subDir.InitCheck() == B_OK )
+					collect_folder_contents( subDir, list,
+											 deep, asked, entry );
+			}
+		}
+	}
 }
 
 
@@ -607,6 +651,19 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             p_wrapper->NavigateNext();
             break;
         // drag'n'drop and system messages
+        case MSG_SOUNDPLAY:
+        	// convert soundplay drag'n'drop message (containing paths)
+        	// to normal message (containing refs)
+        	{
+	        	const char* path;
+	        	for ( int32 i = 0; p_message->FindString( "path", i, &path ) == B_OK; i++ )
+	        	{
+	        		entry_ref ref;
+	        		if ( get_ref_for_path( path, &ref ) == B_OK )
+		        		p_message->AddRef( "refs", &ref );
+	        	}
+        	}
+        	// fall through
         case B_REFS_RECEIVED:
         case B_SIMPLE_DATA:
             {
@@ -614,86 +671,96 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                  * file(s) opened by drag & drop -> replace playlist;
                  * file(s) opened by 'shift' + drag & drop -> append */
                 bool replace = false;
+                bool reverse = false;
                 if ( p_message->WasDropped() )
+                {
                     replace = !( modifiers() & B_SHIFT_KEY );
+                    reverse = true;
+                }
                     
                 // build list of files to be played from message contents
                 entry_ref ref;
                 BList files;
-                for ( int i = 0; p_message->FindRef( "refs", i, &ref ) == B_OK; i++ )
-                {
-                    BPath path( &ref );
-                    if ( path.InitCheck() == B_OK )
-                    {
-                        bool add = true;
-                        // has the user dropped a folder?
-                        BDirectory dir( &ref );
-                        if ( dir.InitCheck() == B_OK)
-                        {
-	                        // has the user dropped a dvd disk icon?
-                       		// TODO: this code does not work for the following situation:
-                       		// if the user dropped the icon for his partition containing
-                       		// all his mp3 files, this routine will not do anything, because
-                       		// the folder that was dropped is a root folder, but no DVD drive
-							if ( dir.IsRootDirectory() )
-							{
-								BVolumeRoster volRoster;
-								BVolume vol;
-								BDirectory volumeRoot;
-								status_t status = volRoster.GetNextVolume( &vol );
-								while ( status == B_NO_ERROR )
+                
+                // if we should parse sub-folders as well
+           		bool askedAlready = false;
+           		bool parseSubFolders = askedAlready;
+           		// traverse refs in reverse order
+           		int32 count;
+           		type_code dummy;
+           		if ( p_message->GetInfo( "refs", &dummy, &count ) == B_OK && count > 0 )
+           		{
+           			int32 i = reverse ? count - 1 : 0;
+           			int32 increment = reverse ? -1 : 1;
+	                for ( ; p_message->FindRef( "refs", i, &ref ) == B_OK; i += increment )
+	                {
+	                    BPath path( &ref );
+	                    if ( path.InitCheck() == B_OK )
+	                    {
+	                        bool add = true;
+	                        // has the user dropped a folder?
+	                        BDirectory dir( &ref );
+	                        if ( dir.InitCheck() == B_OK)
+	                        {
+		                        // has the user dropped a dvd disk icon?
+								if ( dir.IsRootDirectory() )
 								{
-									if ( vol.GetRootDirectory( &volumeRoot ) == B_OK
-										 && dir == volumeRoot )
+									BVolumeRoster volRoster;
+									BVolume vol;
+									BDirectory volumeRoot;
+									status_t status = volRoster.GetNextVolume( &vol );
+									while ( status == B_NO_ERROR )
 									{
-										BString volumeName;
-										BString deviceName;
-										bool isCDROM;
-										if ( get_volume_info( vol, volumeName, isCDROM, deviceName )
-											 && isCDROM )
+										if ( vol.GetRootDirectory( &volumeRoot ) == B_OK
+											 && dir == volumeRoot )
 										{
-											BMessage msg( OPEN_DVD );
-											msg.AddString( "device", deviceName.String() );
-											PostMessage( &msg );
-											add = false;
+											BString volumeName;
+											BString deviceName;
+											bool isCDROM;
+											if ( get_volume_info( vol, volumeName, isCDROM, deviceName )
+												 && isCDROM )
+											{
+												BMessage msg( OPEN_DVD );
+												msg.AddString( "device", deviceName.String() );
+												PostMessage( &msg );
+												add = false;
+											}
+									 		break;
 										}
-								 		break;
-									}
-									else
-									{
-								 		vol.Unset();
-										status = volRoster.GetNextVolume( &vol );
+										else
+										{
+									 		vol.Unset();
+											status = volRoster.GetNextVolume( &vol );
+										}
 									}
 								}
-							}
-                        	else
-                        	{
-                        		// add all files from the dropped folder
-                        		// TODO: do this recursively
-                        		dir.Rewind();
-                        		add = false;
-                        		BEntry entry;
-                        		while ( dir.GetNextEntry( &entry ) == B_OK )
-                        		{
-									// ", 0" is because we receive the files in reverse order
-                        			if ( !entry.IsDirectory() && entry.GetPath( &path ) == B_OK )
-			                            files.AddItem( new BString( path.Path() ), 0 );
-                        		}
-                        	}
-                        }
-                        if( add )
-                        {
-                            files.AddItem( new BString( path.Path() ) );
-                        }
-                    }
-                }
-                // give the list to VLC
-                // BString objects allocated here will be deleted there
-                int32 index;
-                if ( p_message->FindInt32("drop index", &index) != B_OK )
-                	index = -1;
-                p_wrapper->OpenFiles( &files, replace, index );
-                _UpdatePlaylist();
+	                        	if ( add )
+	                        	{
+	                        		add = false;
+	                        		dir.Rewind();	// defensive programming
+	                        		BEntry entry;
+									collect_folder_contents( dir, files,
+															 parseSubFolders,
+															 askedAlready,
+															 entry );
+	                        	}
+	                        }
+	                        if ( add )
+	                        {
+	                        	BString* string = new BString( path.Path() );
+	                        	if ( !files.AddItem( string, 0 ) )
+	                        		delete string;	// at least don't leak
+	                        }
+	                    }
+	                }
+	                // give the list to VLC
+	                // BString objects allocated here will be deleted there
+	                int32 index;
+	                if ( p_message->FindInt32("drop index", &index) != B_OK )
+	                	index = -1;
+	                p_wrapper->OpenFiles( &files, replace, index );
+	                _UpdatePlaylist();
+           		}
             }
             break;
 
@@ -722,7 +789,9 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             }
             break;
         }
-                
+        case MSG_UPDATE:
+        	UpdateInterface();
+        	break;
         default:
             BWindow::MessageReceived( p_message );
             break;
@@ -819,11 +888,22 @@ void InterfaceWindow::UpdateInterface()
     }
     else
     {
-        _SetMenusEnabled( false );
-        if( !( p_wrapper->PlaylistSize() > 0 ) )
-            p_mediaControl->SetEnabled( false );
-        else
-            p_mediaControl->SetProgress( 0 );
+		if ( LockWithTimeout(INTERFACE_LOCKING_TIMEOUT) == B_OK )
+		{
+	        _SetMenusEnabled( false );
+	        if( !( p_wrapper->PlaylistSize() > 0 ) )
+	            p_mediaControl->SetEnabled( false );
+	        else
+	        {
+	            p_mediaControl->SetProgress( 0 );
+	            // enable/disable skip buttons
+	            bool canSkipPrev;
+	            bool canSkipNext;
+	            p_wrapper->GetNavCapabilities( &canSkipPrev, &canSkipNext );
+	            p_mediaControl->SetSkippable( canSkipPrev, canSkipNext );
+			}
+            Unlock();
+        }
     }
 
     /* always force the user-specified volume */
@@ -946,7 +1026,8 @@ InterfaceWindow::_ShowFilePanel( uint32 command, const char* windowTitle )
 {
 	if( !fFilePanel )
 	{
-		fFilePanel = new BFilePanel();
+		fFilePanel = new BFilePanel( B_OPEN_PANEL, NULL, NULL,
+									 B_FILE_NODE | B_DIRECTORY_NODE );
 		fFilePanel->SetTarget( this );
 	}
 	fFilePanel->Window()->SetTitle( windowTitle );
@@ -1022,6 +1103,10 @@ InterfaceWindow::_RestoreSettings()
 			launch_window( fMessagesWindow, showing );
 		if ( fSettings->FindBool( "settings showing", &showing ) == B_OK )
 			launch_window( fPreferencesWindow, showing );
+
+		uint32 displayMode;
+		if ( fSettings->FindInt32( "playlist display mode", (int32*)&displayMode ) == B_OK )
+			fPlaylistWindow->SetDisplayMode( displayMode );
 	}
 }
 
@@ -1057,6 +1142,11 @@ InterfaceWindow::_StoreSettings()
 			fSettings->AddBool( "settings showing", !fPreferencesWindow->IsHidden() );
 		fPreferencesWindow->Unlock();
 	}
+
+	uint32 displayMode = fPlaylistWindow->DisplayMode();
+	if (fSettings->ReplaceInt32( "playlist display mode", displayMode ) != B_OK )
+		fSettings->AddInt32( "playlist display mode", displayMode );
+
 	save_settings( fSettings, "interface_settings", "VideoLAN Client" );
 }
 

@@ -2,7 +2,7 @@
  * PlayListWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.h,v 1.6 2003/02/01 12:01:11 stippi Exp $
+ * $Id: PlayListWindow.h,v 1.7 2003/02/03 17:18:48 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -51,6 +51,9 @@ class PlayListWindow : public BWindow
 			void				ReallyQuit();
 			void				UpdatePlaylist( bool rebuild = false );
 
+			void				SetDisplayMode( uint32 mode );
+			uint32				DisplayMode() const;
+
  private:	
 			void				_CheckItemsEnableState() const;
 			void				_SetMenuItemEnabled( BMenuItem* item,
@@ -63,11 +66,13 @@ class PlayListWindow : public BWindow
 
 			BMenuItem*			fSelectAllMI;
 			BMenuItem*			fSelectNoneMI;
+			BMenuItem*			fSortReverseMI;
 			BMenuItem*			fSortNameMI;
 			BMenuItem*			fSortPathMI;
 			BMenuItem*			fRandomizeMI;
 			BMenuItem*			fRemoveMI;
 			BMenuItem*			fRemoveAllMI;
+			BMenu*				fViewMenu;
 			
 			intf_thread_t *     p_intf;
 			VlcWrapper *		p_wrapper;

@@ -2,7 +2,7 @@
  * ListViews.h: BeOS interface list view class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ListViews.h,v 1.3 2003/02/01 12:01:11 stippi Exp $
+ * $Id: ListViews.h,v 1.4 2003/02/03 17:18:48 stippi Exp $
  *
  * Authors: Stephan Aßmus <stippi@yellowbites.com>
  *
@@ -26,6 +26,13 @@
 
 #include <ListItem.h>
 #include <ListView.h>
+#include <String.h>
+
+enum
+{
+	DISPLAY_PATH	= 0,
+	DISPLAY_NAME,
+};
 
 class InterfaceWindow;
 
@@ -38,8 +45,12 @@ class PlaylistItem : public BStringItem
 
 		virtual	void		Draw( BView* owner, BRect frame,
 								  bool tintedLine,
+								  uint32 mode,
 								  bool active = false,
 								  bool playing = false );
+
+ private:
+		BString				fName;	// additional to BStringItem::Text()
 
 };
 
@@ -79,6 +90,7 @@ class DragSortableListView : public BListView
 	virtual	void			CopyItems( BList& items, int32 toIndex );
 	virtual	void			RemoveItemList( BList& indices );
 			void			RemoveSelected(); // uses RemoveItemList()
+			int32			CountSelectedItems() const;
 
 	virtual	BListItem*		CloneItem( int32 atIndex ) const = 0;
 	virtual	void			DrawListItem( BView* owner, int32 index,
@@ -130,11 +142,24 @@ class PlaylistView : public DragSortableListView
 			void			SetPlaying( bool playing );
 			void			RebuildList();
 
+			void			SortReverse();
+			void			SortByPath();
+			void			SortByName();
+
+			void			SetDisplayMode( uint32 mode );
+			uint32			DisplayMode() const
+								{ return fDisplayMode; }
+
  private:
+			BListItem*		_PlayingItem() const;
+			void			_SetPlayingIndex( BListItem* item );
+
 	int32					fCurrentIndex;
 	bool					fPlaying;
+	uint32					fDisplayMode;
 	InterfaceWindow*		fMainWindow;
 	BMessage*				fSelectionChangeMessage;
+	PlaylistItem*			fLastClickedItem;
 	
 	VlcWrapper*				fVlcWrapper;
 };

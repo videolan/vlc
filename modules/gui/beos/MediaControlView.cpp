@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.14 2003/02/01 12:01:11 stippi Exp $
+ * $Id: MediaControlView.cpp,v 1.15 2003/02/03 17:18:48 stippi Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -1454,12 +1454,12 @@ void
 PositionInfoView::_MakeString( BString& into, int32 index, int32 maxIndex ) const
 {
 	into = "";
-	if ( index >= 0)
+	if ( index >= 0 && maxIndex >= 0 )
 		into << index;
 	else
 		into << "-";
 	into << "/";
-	if ( maxIndex >= 0)
+	if ( maxIndex >= 0 )
 		into << maxIndex;
 	else
 		into << "-";

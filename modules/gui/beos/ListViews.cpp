@@ -2,7 +2,7 @@
  * ListViews.h: BeOS interface list view class implementation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ListViews.cpp,v 1.4 2003/02/02 11:29:12 stippi Exp $
+ * $Id: ListViews.cpp,v 1.5 2003/02/03 17:18:48 stippi Exp $
  *
  * Authors: Stephan Aßmus <stippi@yellowbites.com>
  *
@@ -25,6 +25,7 @@
 #include <malloc.h>
 
 #include <Bitmap.h>
+#include <Entry.h>
 #include <String.h>
 
 /* VLC headers */
@@ -44,8 +45,12 @@
  * PlaylistItem class
  *****************************************************************************/
 PlaylistItem::PlaylistItem( const char *name )
-	: BStringItem( name )
+	: BStringItem( name ),
+	  fName( "" )
 {
+	entry_ref ref;
+	if ( get_ref_for_path( name, &ref) == B_OK )
+		fName.SetTo( ref.name );
 }
 
 PlaylistItem::~PlaylistItem()
@@ -57,7 +62,7 @@ PlaylistItem::~PlaylistItem()
  *****************************************************************************/
 void
 PlaylistItem::Draw( BView *owner, BRect frame, bool tintedLine,
-					bool active, bool playing )
+					uint32 mode, bool active, bool playing )
 {
 	rgb_color color = (rgb_color){ 255, 255, 255, 255 };
 	if ( tintedLine )
@@ -71,7 +76,18 @@ PlaylistItem::Draw( BView *owner, BRect frame, bool tintedLine,
 	owner->SetHighColor( 0, 0, 0, 255 );
 	font_height fh;
 	owner->GetFontHeight( &fh );
-	BString truncatedString( Text() );
+	const char* text = Text();
+	switch ( mode )
+	{
+		case DISPLAY_NAME:
+			if ( fName.CountChars() > 0 )
+				text = fName.String();
+			break;
+		case DISPLAY_PATH:
+		default:
+			break;
+	}
+	BString truncatedString( text );
 	owner->TruncateString( &truncatedString, B_TRUNCATE_MIDDLE,
 						   frame.Width() - TEXT_OFFSET - 4.0 );
 	owner->DrawString( truncatedString.String(),
@@ -330,12 +346,15 @@ DragSortableListView::MessageReceived(BMessage* message)
 void
 DragSortableListView::MouseMoved(BPoint where, uint32 transit, const BMessage *msg)
 {
-	if ( msg && msg->what == B_SIMPLE_DATA )
+	if ( msg && ( msg->what == B_SIMPLE_DATA || msg->what == MSG_SOUNDPLAY ) )
 	{
 		bool replaceAll = !msg->HasPointer("list") && !(modifiers() & B_SHIFT_KEY);
 		switch ( transit )
 		{
 			case B_ENTERED_VIEW:
+				// remember drag message
+				// this is needed to react on modifier changes
+				fDragMessageCopy = *msg;
 			case B_INSIDE_VIEW:
 			{
 				if ( replaceAll )
@@ -359,19 +378,18 @@ DragSortableListView::MouseMoved(BPoint where, uint32 transit, const BMessage *m
 				break;
 			}
 			case B_EXITED_VIEW:
+				// forget drag message
+				fDragMessageCopy.what = 0;
 			case B_OUTSIDE_VIEW:
 				_RemoveDropAnticipationRect();
 				break;
 		}
-		// remember drag message
-		// this is needed to react on modifier changes
-		fDragMessageCopy = *msg;
 	}
 	else
 	{
 		_RemoveDropAnticipationRect();
-		fDragMessageCopy.what = 0;
 		BListView::MouseMoved(where, transit, msg);
+		fDragMessageCopy.what = 0;
 	}
 }
 
@@ -383,6 +401,7 @@ DragSortableListView::MouseUp( BPoint where )
 {
 	// remove drop mark
 	_SetDropAnticipationRect( BRect( 0.0, 0.0, -1.0, -1.0 ) );
+	// be sure to forget drag message
 	fDragMessageCopy.what = 0;
 	BListView::MouseUp( where );
 }
@@ -507,6 +526,18 @@ DragSortableListView::RemoveSelected()
 }
 
 /*****************************************************************************
+ * DragSortableListView::CountSelectedItems
+ *****************************************************************************/
+int32
+DragSortableListView::CountSelectedItems() const
+{
+	int32 count = 0;
+	while ( CurrentSelection( count ) >= 0 )
+		count++;
+	return count;
+}
+
+/*****************************************************************************
  * DragSortableListView::_SetDropAnticipationRect
  *****************************************************************************/
 void
@@ -585,8 +616,10 @@ PlaylistView::PlaylistView( BRect frame, InterfaceWindow* mainWindow,
 							| B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE ),
 	  fCurrentIndex( -1 ),
 	  fPlaying( false ),
+	  fDisplayMode( DISPLAY_PATH ),
 	  fMainWindow( mainWindow ),
 	  fSelectionChangeMessage( selectionChangeMessage ),
+	  fLastClickedItem( NULL ),
 	  fVlcWrapper( wrapper )
 {
 }
@@ -614,6 +647,7 @@ PlaylistView::MessageReceived( BMessage* message)
 {
 	switch ( message->what )
 	{
+		case MSG_SOUNDPLAY:
 		case B_SIMPLE_DATA:
 			if ( message->HasPointer( "list" ) )
 			{
@@ -649,17 +683,26 @@ PlaylistView::MouseDown( BPoint where )
 		{
 			if ( clicks == 2 )
 			{
-				fVlcWrapper->PlaylistJumpTo( i );
-				handled = true;
-			}
-			else if ( i == fCurrentIndex )
-			{
-				r.right = r.left + TEXT_OFFSET;
-				if ( r.Contains ( where ) )
+				// only do something if user clicked the same item twice
+				if ( fLastClickedItem == item )
 				{
-					fMainWindow->PostMessage( PAUSE_PLAYBACK );
-					InvalidateItem( i );
+					fVlcWrapper->PlaylistJumpTo( i );
 					handled = true;
+				}
+			}
+			else
+			{
+				// remember last clicked item
+				fLastClickedItem = item;
+				if ( i == fCurrentIndex )
+				{
+					r.right = r.left + TEXT_OFFSET;
+					if ( r.Contains ( where ) )
+					{
+						fMainWindow->PostMessage( PAUSE_PLAYBACK );
+						InvalidateItem( i );
+						handled = true;
+					}
 				}
 			}
 			break;
@@ -727,9 +770,7 @@ PlaylistView::MoveItems( BList& items, int32 index )
 		int32 count = items.CountItems();
 		int32 indexOriginal = index;
 		// remember currently playing item
-		int32 currentIndex, size;
-		fVlcWrapper->GetPlaylistInfo( currentIndex, size );
-		BListItem* playingItem = ItemAt( currentIndex );
+		BListItem* playingItem = _PlayingItem();
 		// collect item pointers for removal by index
 		for ( int32 i = 0; i < count; i++ )
 		{
@@ -761,15 +802,10 @@ PlaylistView::MoveItems( BList& items, int32 index )
 		// update GUI
 		DragSortableListView::MoveItems( items, indexOriginal );
 		// restore currently playing item
-		for ( int32 i = 0; BListItem* item = ItemAt( i ); i++ )
-		{
-			if ( item == playingItem )
-			{
-				fVlcWrapper->PlaylistSetPlaying( i );
-				SetCurrent( i );
-				break;
-			}
-		}
+		_SetPlayingIndex( playingItem );
+		// update interface (in case it isn't playing,
+		// there is a chance that it needs to update)
+		fMainWindow->PostMessage( MSG_UPDATE );
 		fVlcWrapper->PlaylistUnlock();
 	}
 }
@@ -789,9 +825,7 @@ PlaylistView::CopyItems( BList& items, int32 toIndex )
 		BList clonedItems;
 		int32 count = items.CountItems();
 		// remember currently playing item
-		int32 currentIndex, size;
-		fVlcWrapper->GetPlaylistInfo( currentIndex, size );
-		BListItem* playingItem = ItemAt( currentIndex );
+		BListItem* playingItem = _PlayingItem();
 		// collect cloned item pointers
 		for ( int32 i = 0; i < count; i++ )
 		{
@@ -815,15 +849,10 @@ PlaylistView::CopyItems( BList& items, int32 toIndex )
 		// update GUI
 		DragSortableListView::CopyItems( items, toIndex );
 		// restore currently playing item
-		for ( int32 i = 0; BListItem* item = ItemAt( i ); i++ )
-		{
-			if ( item == playingItem )
-			{
-				fVlcWrapper->PlaylistSetPlaying( i );
-				SetCurrent( i );
-				break;
-			}
-		}
+		_SetPlayingIndex( playingItem );
+		// update interface (in case it isn't playing,
+		// there is a chance that it needs to update)
+		fMainWindow->PostMessage( MSG_UPDATE );
 		fVlcWrapper->PlaylistUnlock();
 	}
 }
@@ -836,6 +865,8 @@ PlaylistView::RemoveItemList( BList& items )
 {
 	if ( fVlcWrapper->PlaylistLock() )
 	{
+		// remember currently playing item
+		BListItem* playingItem = _PlayingItem();
 		// collect item pointers for removal
 		BList removeItems;
 		int32 count = items.CountItems();
@@ -854,6 +885,11 @@ PlaylistView::RemoveItemList( BList& items )
 		}
 		// update GUI
 		DragSortableListView::RemoveItemList( items );
+		// restore currently playing item
+		_SetPlayingIndex( playingItem );
+		// update interface (in case it isn't playing,
+		// there is a chance that it needs to update)
+		fMainWindow->PostMessage( MSG_UPDATE );
 		fVlcWrapper->PlaylistUnlock();
 	}
 }
@@ -877,7 +913,8 @@ void
 PlaylistView::DrawListItem( BView* owner, int32 index, BRect frame ) const
 {
 	if ( PlaylistItem* item = dynamic_cast<PlaylistItem*>( ItemAt( index ) ) )
-		item->Draw( owner,  frame, index % 2, index == fCurrentIndex, fPlaying );
+		item->Draw( owner,  frame, index % 2,
+					fDisplayMode, index == fCurrentIndex, fPlaying );
 }
 
 /*****************************************************************************
@@ -891,8 +928,16 @@ PlaylistView::MakeDragMessage( BMessage* message ) const
 		message->AddPointer( "list", (void*)this );
 		int32 index;
 		for ( int32 i = 0; ( index = CurrentSelection( i ) ) >= 0; i++ )
+		{
 			message->AddInt32( "index", index );
-			// TODO: add refs to message (inter application communication)
+			// add refs to message (inter application communication)
+			if ( BStringItem* item = dynamic_cast<BStringItem*>( ItemAt( index ) ) )
+			{
+				entry_ref ref;
+				if ( get_ref_for_path( item->Text(), &ref ) == B_OK )
+					message->AddRef( "refs", &ref );
+			}
+		}
 	}
 }
 
@@ -937,4 +982,94 @@ PlaylistView::RebuildList()
 	// rebuild listview from VLC's playlist
 	for ( int i = 0; i < fVlcWrapper->PlaylistSize(); i++ )
 		AddItem( new PlaylistItem( fVlcWrapper->PlaylistItemName( i ) ) );
+}
+
+
+/*****************************************************************************
+ * PlaylistView::SortReverse
+ *****************************************************************************/
+void
+PlaylistView::SortReverse()
+{
+	if ( int32 count = CountSelectedItems() )
+	{
+		int32 last  = count - 1;
+		// remember currently playing item
+		BListItem* playingItem = _PlayingItem();
+		for ( int32 first = 0; first < count / 2; first++, last-- )
+		{
+			int32 index1 = CurrentSelection( first);
+			int32 index2 = CurrentSelection( last);
+			if ( SwapItems( index1, index2 ) )
+			{
+				// index2 > index1, so the list won't get messed up
+				// if we remove the items in that order
+				// TODO: Error checking + handling!
+				void* item2 = fVlcWrapper->PlaylistRemoveItem( index2 );
+				void* item1 = fVlcWrapper->PlaylistRemoveItem( index1 );
+				fVlcWrapper->PlaylistAddItem( item2, index1 );
+				fVlcWrapper->PlaylistAddItem( item1, index2 );
+			}
+		}
+		// restore currently playing item
+		_SetPlayingIndex( playingItem );
+	}
+}
+
+/*****************************************************************************
+ * PlaylistView::SortByPath
+ *****************************************************************************/
+void
+PlaylistView::SortByPath()
+{
+	
+}
+
+/*****************************************************************************
+ * PlaylistView::SortByName
+ *****************************************************************************/
+void
+PlaylistView::SortByName()
+{
+}
+
+/*****************************************************************************
+ * PlaylistView::SetDisplayMode
+ *****************************************************************************/
+void
+PlaylistView::SetDisplayMode( uint32 mode )
+{
+	if ( mode != fDisplayMode )
+	{
+		fDisplayMode = mode;
+		Invalidate();
+	}
+}
+
+/*****************************************************************************
+ * PlaylistView::_PlayingItem
+ *****************************************************************************/
+BListItem*
+PlaylistView::_PlayingItem() const
+{
+	int32 currentIndex, size;
+	fVlcWrapper->GetPlaylistInfo( currentIndex, size );
+	return ItemAt( currentIndex );
+}
+
+/*****************************************************************************
+ * PlaylistView::_SetPlayingIndex
+ *****************************************************************************/
+void
+PlaylistView::_SetPlayingIndex( BListItem* playingItem )
+{
+	for ( int32 i = 0; BListItem* item = ItemAt( i ); i++ )
+	{
+		if ( item == playingItem )
+		{
+			fVlcWrapper->PlaylistSetPlaying( i );
+			SetCurrent( i );
+			break;
+		}
+	}
 }

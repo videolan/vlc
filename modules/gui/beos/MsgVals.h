@@ -2,7 +2,7 @@
  * MsgVals.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: MsgVals.h,v 1.5 2003/01/25 20:15:41 titer Exp $
+ * $Id: MsgVals.h,v 1.6 2003/02/03 17:18:48 stippi Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -63,9 +63,11 @@ const uint32 RESIZE_100         = 'rsor';
 const uint32 RESIZE_200         = 'rsdb';
 const uint32 RESIZE_TRUE        = 'rstr';
 const uint32 ASPECT_CORRECT     = 'asco';
-const uint32 VERT_SYNC          = 'vsyn';
-const uint32 WINDOW_FEEL        = 'wfel';
-const uint32 SCREEN_SHOT        = 'scrn';
+const uint32 VERT_SYNC			= 'vsyn';
+const uint32 WINDOW_FEEL		= 'wfel';
+const uint32 SCREEN_SHOT		= 'scrn';
+const uint32 MSG_UPDATE			= 'updt';
+const uint32 MSG_SOUNDPLAY		= 'move';	// drag'n'drop from soundplay playlist
 const uint32 INTERFACE_CREATED  = 'ifcr';  /* see VlcApplication::MessageReceived()
                                             * in src/misc/beos_specific.cpp */
 
