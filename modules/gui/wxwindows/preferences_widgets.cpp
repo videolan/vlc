@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.20 2004/01/02 13:30:17 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.21 2004/01/24 12:30:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -554,7 +554,7 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *p_this,
                                             p_item->i_value),
                            wxDefaultPosition, wxDefaultSize,
                            wxSP_ARROW_KEYS,
-                           -16000, 16000, p_item->i_value);
+                           -10000000, 10000000, p_item->i_value);
     spin->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
