@@ -1,10 +1,11 @@
 NULL =
 EXTRA_DIST = \
 	patch \
+	control.h3600 \
 	control.gpe \
 	control.opie \
 	control.zaurus \
-	rules \
+	rules.h3600 \
 	rules.gpe \
 	rules.opie \
 	rules.zaurus \
