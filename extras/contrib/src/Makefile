@@ -678,10 +678,10 @@ DISTCLEAN_PKG += live.$(LIVEDOTCOM_VERSION).tar.gz
 # goom
 # ***************************************************************************
 
-goom-dj.tar.gz:
-	$(WGET) $(GOOMDJ_URL)
+goom-macosx-altivec-bin.tar.gz:
+	$(WGET) $(GOOM_URL)
 
-goom: goom-dj.tar.gz
+goom: goom-mascosx-altivec-bin.tar.gz
 	$(EXTRACT_GZ)
 
 .goom: goom
@@ -690,7 +690,7 @@ goom: goom-dj.tar.gz
 
 CLEAN_FILE += .goom
 CLEAN_PKG += goom
-DISTCLEAN_PKG += goom-dj.tar.gz
+DISTCLEAN_PKG += goom-macosx-altivec-bin.tar.gz
 
 # ***************************************************************************
 # libcaca

@@ -6,27 +6,32 @@ Changes between 0.7.1 and 0.7.2:
 Core support:
  * Bookmarks feature for easier seeking/access inside medias.
  * Support for video output embedded in interfaces.
- * Improved http daemon.
+ * Improved HTTP daemon
 
 Codecs:
  * New Continuous Media Markup Language (CMML) codec.
    (http://www.annodex.net/overview.html)
- * New h261 video decoder using openmash.
+ * New H.261 video decoder using openmash.
  * Packetizer interfaced between demux and codec when needed
    (allows using ffmpeg plugin to decode MPEG streams and better aac decoding).
 
 Input:
- * mmsh streaming fixes.
- * subviewer and subviewer v2 subtitles support.
- * Annodex support (http://www.annodex.net).
+ * --start-time <sec> and --stop-time <sec> to start and stop playing a 
+   file at the specified amount of seconds. Only works with a few
+   fileformats (avi, mov, mkv, mp4 )
+ * Improved directory access module.
  * New "file-cat" option to play truncated movies.
  * Better handling of meta info (title, author, description, etc...).
  * New options to pass meta info to the input.
- * New start-time and stop-time options.
+
+Demux:
+ * Annodex (http://www.annodex.net) support
+ * Subviewer and subviewer v2 subtitles support.
+ * mmsh streaming fixes.
 
 Stream output:
  * Improved session announcement system.
- * Minimize threads useage by default.
+ * Minimize threads usage by default.
  * Added faster than realtime stream output (limited by CPU) for file output.
  * Improved MOV/MP4 muxer.
  * Improved MPEG TS muxer.
@@ -36,8 +41,10 @@ Stream output:
 VideoLAN manager:
  * New videolan (media) manager (vlm): a little manager designed to launch
    and manage multiple streams from within one instance of VLC.
+ * Supports live streams and VoD.
+ * Supports scheduling.
  * Telnet interface for vlm.
- * Http interface for vlm.
+ * HTTP interface for vlm.
 
 Interfaces:
  * Skins II
@@ -47,6 +54,10 @@ Interfaces:
  * wxWindows
     - New design and set of icons.
     - Ability to embed video output.
+
+Mac OS X port:
+ * Support for 'groups' and playlist item properties.
+ * OpenGL video output is now the default when available.
 
 Win32 port:
  * DirectShow input plugin should work with more devices.

@@ -507,6 +507,10 @@ VLC.app: vlc
 	for i in $(srcdir)/share/http/* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC.app/Contents/MacOS/share/http/`basename $${i}` ; \
 	done ; \
+	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share/http/vlm
+	for i in $(srcdir)/share/http/vlm/* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC.app/Contents/MacOS/share/http/vlm/`basename $${i}` ; \
+	done ; \
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share/http/admin
 	for i in $(srcdir)/share/http/admin/* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC.app/Contents/MacOS/share/http/admin/`basename $${i}` ; \

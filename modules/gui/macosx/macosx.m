@@ -59,9 +59,9 @@ void E_(CloseVideo)   ( vlc_object_t * );
         "of the movie when resizing the video, stretch the video " \
         "to fill the entire window." )
 
-#define OPENGL_TEXT N_("Use OpenGL")
-#define OPENGL_LONGTEXT N_("Use OpenGL instead of QuickTime to " \
-        "render the video on the screen.")
+#define MACOSX_VOUT_TEXT N_("Force a video rendering mode.")
+#define MACOSX_VOUT_LONGTEXT N_("The default method is OpenGL " \
+        "for Quartz Extreme machines and Quartz for the others.")
 
 #define OPENGL_EFFECT_TEXT N_("OpenGL effect")
 #define OPENGL_EFFECT_LONGTEXT N_("Use 'None' to display the video " \
@@ -77,6 +77,9 @@ void E_(CloseVideo)   ( vlc_object_t * );
 static char * effect_list[] = { "none", "cube", "transparent-cube" };
 static char * effect_list_text[] = { N_("None"), N_("Cube"),
                                      N_("Transparent cube") };
+
+static char *ppsz_vout_list[] = { "auto", "quartz", "opengl" };
+static char *ppsz_vout_list_text[] = { N_("Auto"), "Quartz", "OpenGL" };
     
 vlc_module_begin();
     set_description( _("MacOS X interface, sound and video") );
@@ -91,8 +94,9 @@ vlc_module_begin();
                      VLC_FALSE );
         add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL,
                 OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, VLC_TRUE );
-        add_bool( "macosx-opengl", 1, NULL, OPENGL_TEXT,
-                  OPENGL_LONGTEXT, VLC_TRUE );
+        add_string( "macosx-vout", "auto", NULL, MACOSX_VOUT_TEXT,
+                MACOSX_VOUT_LONGTEXT, VLC_TRUE );
+        change_string_list( ppsz_vout_list, ppsz_vout_list_text, 0 );
         add_string( "macosx-opengl-effect", "none", NULL,
                     OPENGL_EFFECT_TEXT, OPENGL_EFFECT_LONGTEXT,
                     VLC_TRUE );

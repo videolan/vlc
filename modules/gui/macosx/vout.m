@@ -91,6 +91,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     OSErr err;
     int i_timeout;
+    char *psz_vout_type;
 
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -146,8 +147,22 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     p_vout->p_sys->s_rect.size.height = p_vout->i_window_height;
 
     /* Check if we should use QuickTime or OpenGL */
-    p_vout->p_sys->i_opengl = config_GetInt( p_vout, "macosx-opengl" );
+    psz_vout_type = config_GetPsz( p_vout, "macosx-vout" );
 
+    if( !strncmp( psz_vout_type, "auto", 4 ) )
+    {
+        p_vout->p_sys->i_opengl = CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay );
+    }
+    else if( !strncmp( psz_vout_type, "opengl", 6 ) )
+    {
+        p_vout->p_sys->i_opengl = VLC_TRUE;
+    }
+    else
+    {
+        p_vout->p_sys->i_opengl = VLC_FALSE;
+    }
+    free( psz_vout_type );
+    
     if( !p_vout->p_sys->i_opengl )
     {
         /* Initialize QuickTime */
@@ -190,6 +205,11 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
             free( p_vout->p_sys );
             return VLC_EGENERIC;        
         }
+        msg_Dbg( p_vout, "using Quartz mode" );
+    }
+    else
+    {
+        msg_Dbg( p_vout, "using OpenGL mode" );
     }
 
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
@@ -1506,7 +1526,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         NSOpenGLPFADepthSize, 24,
         NSOpenGLPFAFullScreen,
         NSOpenGLPFAScreenMask,
-        /* TODO handle macosxx-vdev */
+        /* TODO handle macosx-vdev */
         CGDisplayIDToOpenGLDisplayMask( kCGDirectMainDisplay ),
         0
     };
