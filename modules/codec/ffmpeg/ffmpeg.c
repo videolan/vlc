@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.34 2003/05/07 00:28:38 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.35 2003/05/07 15:44:59 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -164,7 +164,7 @@ vlc_module_begin();
     add_integer ( "ffmpeg-workaround-bugs", 1, NULL,
                   "workaround bugs", WORKAROUND_BUGS_LONGTEXT, VLC_FALSE );
     add_bool( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT, VLC_FALSE );
-    add_bool( "ffmpeg-truncated", VLC_FALSE, NULL, "truncated stream", "truncated stream", VLC_FALSE );
+    add_integer( "ffmpeg-truncated", -1, NULL, "truncated stream", "truncated stream -1:auto,0:disable,:1:enable", VLC_FALSE );
     add_category_hint( N_("Post processing"), NULL, VLC_FALSE );
 
     add_integer( "ffmpeg-pp-q", 0, NULL,

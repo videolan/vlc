@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.25 2003/05/07 00:28:38 fenrir Exp $
+ * $Id: video.c,v 1.26 2003/05/07 15:44:59 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -197,6 +197,8 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
 int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 {
     int i_tmp;
+    int i_truncated;
+
     p_vdec->p_ff_pic = avcodec_alloc_frame();
 
     if( ( p_vdec->p_format = (BITMAPINFOHEADER *)p_vdec->p_fifo->p_bitmapinfoheader) != NULL )
@@ -232,7 +234,9 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 
     /* FIXME search real LIBAVCODEC_BUILD */
 #if LIBAVCODEC_BUILD >= 4662
-    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-truncated" ) && ( p_vdec->p_codec->capabilities & CODEC_CAP_TRUNCATED ) )
+    i_truncated = config_GetInt( p_vdec->p_fifo, "ffmpeg-truncated" );
+    if( i_truncated == 1 ||
+        ( i_truncated == -1 && ( p_vdec->p_context->width == 0 || p_vdec->p_context->height == 0 ) ) )
     {
         p_vdec->p_context->flags |= CODEC_FLAG_TRUNCATED;
     }
