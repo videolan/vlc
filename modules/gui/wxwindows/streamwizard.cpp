@@ -2,7 +2,7 @@
  * stream.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: streamwizard.cpp,v 1.7 2004/03/01 18:31:13 gbazin Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -171,6 +171,7 @@ void StreamDialog::OnOpen( wxCommandEvent& event )
     if( p_open_dialog)
     {
        p_open_dialog->Show();
+       p_open_dialog->Enable();
        mrl = p_open_dialog->mrl;
        sout_button->Enable();
        step2_label->Enable();

@@ -118,6 +118,7 @@ enum
     EjectDisc_Event,
 
     StreamWizard_Event,
+    Wizard_Event,
 
     Playlist_Event,
     Logs_Event,
@@ -184,6 +185,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(OpenNet_Event, Interface::OnShowDialog)
     EVT_MENU(OpenSat_Event, Interface::OnShowDialog)
     EVT_MENU(StreamWizard_Event, Interface::OnShowDialog)
+    EVT_MENU(Wizard_Event, Interface::OnShowDialog)
     EVT_MENU(StopStream_Event, Interface::OnStopStream)
     EVT_MENU(PlayStream_Event, Interface::OnPlayStream)
     EVT_MENU(PrevStream_Event, Interface::OnPrevStream)
@@ -353,6 +355,8 @@ void Interface::CreateOurMenuBar()
     file_menu->AppendSeparator();
     file_menu->Append( StreamWizard_Event,
                        wxU(_("Streaming &Wizard...\tCtrl-W")),
+                       wxU(_(HELP_STREAMWIZARD)) );
+    file_menu->Append( Wizard_Event, wxU(_("New Wizard...")),
                        wxU(_(HELP_STREAMWIZARD)) );
     file_menu->AppendSeparator();
     file_menu->Append( Exit_Event, wxU(_("E&xit\tCtrl-X")),
@@ -873,6 +877,9 @@ void Interface::OnShowDialog( wxCommandEvent& event )
             break;
         case StreamWizard_Event:
             i_id = INTF_DIALOG_STREAMWIZARD;
+            break;
+        case Wizard_Event:
+            i_id = INTF_DIALOG_WIZARD;
             break;
         case Bookmarks_Event:
             i_id = INTF_DIALOG_BOOKMARKS;

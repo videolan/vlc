@@ -41,6 +41,7 @@
 #include <wx/gauge.h>
 #include <wx/accel.h>
 #include <wx/checkbox.h>
+#include <wx/wizard.h>
 #include "vlc_keys.h"
 
 /* Hmmm, work-around for newest wxWin */
@@ -150,6 +151,7 @@ class Playlist;
 class Messages;
 class FileInfo;
 class StreamDialog;
+class WizardDialog;
 class ItemInfoDialog;
 class NewGroup;
 class ExportPlaylist;
@@ -267,6 +269,8 @@ private:
     wxMenu *p_navig_menu;
 };
 
+/*class BookmarksDialog;
+*/
 /* Dialogs Provider */
 class DialogsProvider: public wxFrame
 {
@@ -285,6 +289,7 @@ private:
     void OnFileInfo( wxCommandEvent& event );
     void OnPreferences( wxCommandEvent& event );
     void OnStreamWizardDialog( wxCommandEvent& event );
+    void OnWizardDialog( wxCommandEvent& event );
     void OnBookmarks( wxCommandEvent& event );
 
     void OnOpenFileGeneric( wxCommandEvent& event );
@@ -312,6 +317,7 @@ public:
     Messages            *p_messages_dialog;
     FileInfo            *p_fileinfo_dialog;
     StreamDialog        *p_streamwizard_dialog;
+    WizardDialog        *p_wizard_dialog;
     wxFrame             *p_prefs_dialog;
     wxWindow            *p_bookmarks_dialog;
     wxFileDialog        *p_file_generic_dialog;
@@ -696,6 +702,30 @@ private:
     SoutDialog *p_sout_dialog;
 };
 
+/* Wizard */
+class WizardDialog : public wxWizard
+{
+public:
+    /* Constructor */
+    WizardDialog( intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~WizardDialog();
+    void SetTranscode( char *vcodec, int vb, char *acodec,int ab);
+    void SetMrl( const char *mrl );
+    void SetStream( char *method, char *address );
+    void SetTranscodeOut( char *address );
+    void SetAction( int i_action );
+    int  GetAction();
+    void SetMux( char *mux );
+    void Run();
+    int i_action;
+
+private:
+    int vb,ab;
+    char *vcodec,*acodec,*method,*address,*mrl,*mux;
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+};
 
 
 /* Preferences Dialog */

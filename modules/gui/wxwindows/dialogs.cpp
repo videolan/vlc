@@ -62,6 +62,8 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
                 DialogsProvider::OnPreferences)
     EVT_COMMAND(INTF_DIALOG_STREAMWIZARD, wxEVT_DIALOG,
                 DialogsProvider::OnStreamWizardDialog)
+    EVT_COMMAND(INTF_DIALOG_WIZARD, wxEVT_DIALOG,
+                DialogsProvider::OnWizardDialog)
     EVT_COMMAND(INTF_DIALOG_FILEINFO, wxEVT_DIALOG,
                 DialogsProvider::OnFileInfo)
     EVT_COMMAND(INTF_DIALOG_BOOKMARKS, wxEVT_DIALOG,
@@ -88,6 +90,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
     p_prefs_dialog = NULL;
     p_file_generic_dialog = NULL;
     p_streamwizard_dialog = NULL;
+    p_wizard_dialog = NULL;
     p_bookmarks_dialog = NULL;
 
     /* Give our interface a nice little icon */
@@ -116,6 +119,7 @@ DialogsProvider::~DialogsProvider()
     if( p_fileinfo_dialog ) delete p_fileinfo_dialog;
     if( p_file_generic_dialog ) delete p_file_generic_dialog;
     if( p_streamwizard_dialog ) delete p_streamwizard_dialog;
+    if( p_wizard_dialog ) delete p_wizard_dialog;
     if( p_bookmarks_dialog ) delete p_bookmarks_dialog;
 
 
@@ -201,6 +205,20 @@ void DialogsProvider::OnStreamWizardDialog( wxCommandEvent& WXUNUSED(event) )
     {
         p_streamwizard_dialog->Show( !p_streamwizard_dialog->IsShown() );
     }
+}
+
+void DialogsProvider::OnWizardDialog( wxCommandEvent& WXUNUSED(event) )
+{
+    fprintf(stderr,"AHAH %p\n",p_intf);
+    p_wizard_dialog = new WizardDialog( p_intf, this );
+
+    if( p_wizard_dialog )
+    {
+        p_wizard_dialog->Run();
+    }
+
+    delete p_wizard_dialog;
+    p_wizard_dialog = NULL;
 }
 
 void DialogsProvider::OnBookmarks( wxCommandEvent& WXUNUSED(event) )
