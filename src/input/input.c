@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.194 2002/04/23 14:16:20 sam Exp $
+ * $Id: input.c,v 1.195 2002/05/14 21:23:44 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -307,13 +307,14 @@ static int RunThread( input_thread_t *p_input )
                 p_input->pf_set_program( p_input, 
                         p_input->stream.p_new_program );
 
+                /* Escape all decoders for the stream discontinuity they
+                 * will encounter. */
+                input_EscapeDiscontinuity( p_input );
+
                 for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
                 {
                     pgrm_descriptor_t * p_pgrm
                                             = p_input->stream.pp_programs[i];
-                    /* Escape all decoders for the stream discontinuity they
-                     * will encounter. */
-                    input_EscapeDiscontinuity( p_input, p_pgrm );
 
                     /* Reinitialize synchro. */
                     p_pgrm->i_synchro_state = SYNCHRO_REINIT;
@@ -330,13 +331,14 @@ static int RunThread( input_thread_t *p_input )
 
                 p_input->pf_set_area( p_input, p_input->stream.p_new_area );
 
+                /* Escape all decoders for the stream discontinuity they
+                 * will encounter. */
+                input_EscapeDiscontinuity( p_input );
+
                 for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
                 {
                     pgrm_descriptor_t * p_pgrm
                                             = p_input->stream.pp_programs[i];
-                    /* Escape all decoders for the stream discontinuity they
-                     * will encounter. */
-                    input_EscapeDiscontinuity( p_input, p_pgrm );
 
                     /* Reinitialize synchro. */
                     p_pgrm->i_synchro_state = SYNCHRO_REINIT;
@@ -359,13 +361,14 @@ static int RunThread( input_thread_t *p_input )
                 p_input->pf_seek( p_input, i_new_pos );
                 vlc_mutex_lock( &p_input->stream.stream_lock );
 
+                /* Escape all decoders for the stream discontinuity they
+                 * will encounter. */
+                input_EscapeDiscontinuity( p_input );
+
                 for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
                 {
                     pgrm_descriptor_t * p_pgrm
                                             = p_input->stream.pp_programs[i];
-                    /* Escape all decoders for the stream discontinuity they
-                     * will encounter. */
-                    input_EscapeDiscontinuity( p_input, p_pgrm );
 
                     /* Reinitialize synchro. */
                     p_pgrm->i_synchro_state = SYNCHRO_REINIT;

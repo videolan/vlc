@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.33 2002/05/12 01:39:36 massiot Exp $
+ * $Id: input_dec.c,v 1.34 2002/05/14 21:23:44 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -159,14 +159,13 @@ void input_DecodePES( decoder_fifo_t * p_decoder_fifo, pes_packet_t * p_pes )
 /*****************************************************************************
  * input_EscapeDiscontinuity: send a NULL packet to the decoders
  *****************************************************************************/
-void input_EscapeDiscontinuity( input_thread_t * p_input,
-                                pgrm_descriptor_t * p_pgrm )
+void input_EscapeDiscontinuity( input_thread_t * p_input )
 {
     int     i_es, i;
 
-    for( i_es = 0; i_es < p_pgrm->i_es_number; i_es++ )
+    for( i_es = 0; i_es < p_input->stream.i_selected_es_number; i_es++ )
     {
-        es_descriptor_t * p_es = p_pgrm->pp_es[i_es];
+        es_descriptor_t * p_es = p_input->stream.pp_selected_es[i_es];
 
         if( p_es->p_decoder_fifo != NULL )
         {
@@ -183,22 +182,17 @@ void input_EscapeDiscontinuity( input_thread_t * p_input,
  *****************************************************************************/
 void input_EscapeAudioDiscontinuity( input_thread_t * p_input )
 {
-    int     i_pgrm, i_es, i;
+    int     i_es, i;
 
-    for( i_pgrm = 0; i_pgrm < p_input->stream.i_pgrm_number; i_pgrm++ )
+    for( i_es = 0; i_es < p_input->stream.i_selected_es_number; i_es++ )
     {
-        pgrm_descriptor_t * p_pgrm = p_input->stream.pp_programs[i_pgrm];
+        es_descriptor_t * p_es = p_input->stream.pp_selected_es[i_es];
 
-        for( i_es = 0; i_es < p_pgrm->i_es_number; i_es++ )
+        if( p_es->p_decoder_fifo != NULL && p_es->b_audio )
         {
-            es_descriptor_t * p_es = p_pgrm->pp_es[i_es];
-
-            if( p_es->p_decoder_fifo != NULL && p_es->b_audio )
+            for( i = 0; i < PADDING_PACKET_NUMBER; i++ )
             {
-                for( i = 0; i < PADDING_PACKET_NUMBER; i++ )
-                {
-                    input_NullPacket( p_input, p_es );
-                }
+                input_NullPacket( p_input, p_es );
             }
         }
     }

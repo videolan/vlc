@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.25 2002/05/10 02:04:16 fenrir Exp $
+ * $Id: input_ext-plugins.h,v 1.26 2002/05/14 21:23:44 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -81,8 +81,7 @@ vlc_thread_t input_RunDecoder( struct input_thread_s *,
                                struct es_descriptor_s * );
 void input_EndDecoder( struct input_thread_s *, struct es_descriptor_s * );
 void input_DecodePES ( struct decoder_fifo_s *, struct pes_packet_s * );
-void input_EscapeDiscontinuity( struct input_thread_s *,
-                                struct pgrm_descriptor_s * );
+void input_EscapeDiscontinuity( struct input_thread_s * );
 void input_EscapeAudioDiscontinuity( struct input_thread_s * );
 #else
 #   define input_DecodePES p_symbols->input_DecodePES
