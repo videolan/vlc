@@ -306,6 +306,7 @@
 			<array>
 				<string>mpg</string>
 				<string>mpeg</string>
+				<string>ts</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>mpeg.icns</string>

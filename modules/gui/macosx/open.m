@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.25 2003/03/24 15:20:26 hartman Exp $
+ * $Id: open.m,v 1.26 2003/03/26 03:13:30 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -137,28 +137,10 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     if ( psz_sout != NULL && *psz_sout )
     {
         [o_sout_cbox setState: YES];
-
-        NSRect s_rect = [o_panel frame];
-        s_rect.size.height = OPEN_PANEL_FULL_HEIGHT + WINDOW_TITLE_HEIGHT;
-        [o_panel setFrame: s_rect display: NO];
-
-        NSPoint s_point;
-        s_point.x = 0;
-        s_point.y = 0;
-        [[o_panel contentView] setBoundsOrigin: s_point];
     }
     else
     {
         [o_sout_cbox setState: NO];
-
-        NSRect s_rect = [o_panel frame];
-        s_rect.size.height = OPEN_PANEL_SHORT_HEIGHT + WINDOW_TITLE_HEIGHT;
-        [o_panel setFrame: s_rect display: NO];
-
-        NSPoint s_point;
-        s_point.x = 0;
-        s_point.y = OPEN_PANEL_FULL_HEIGHT - OPEN_PANEL_SHORT_HEIGHT;
-        [[o_panel contentView] setBoundsOrigin: s_point];
     }
     free(psz_sout);
 
@@ -175,9 +157,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     [o_file_btn_browse setTitle: _NS("Browse...")];
     [o_file_stream setTitle: _NS("Treat as a pipe rather than as a file")];
-
-    [o_file_sub_btn_browse setTitle: _NS("Browse...")];
-    [o_file_sub_ckbox setTitle: _NS("Load subtitles file:")];
 
     [o_disc_device_lbl setStringValue: _NS("Device name")];
     [o_disc_title_lbl setStringValue: _NS("Title")];
@@ -201,20 +180,37 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
 
-    [o_sout_cbox setTitle: _NS("Stream output")];
+    [o_sout_cbox setTitle: _NS("Stream output:")];
+    [o_sout_btn_ok setTitle: _NS("OK")];
+    [o_sout_settings setTitle: _NS("Settings")];
     [o_sout_mrl_lbl setTitle: _NS("Stream output MRL")];
+    
+    [o_sout_access_lbl setTitle: _NS("Output Method")];
     [[o_sout_access cellAtRow:0 column:0] setTitle: _NS("File")];
-    [[o_sout_access cellAtRow:1 column:0] setTitle: _NS("UDP")];
-    [[o_sout_access cellAtRow:2 column:0] setTitle: _NS("RTP")];
+    [[o_sout_access cellAtRow:1 column:0] setTitle: _NS("HTTP")];
+    [[o_sout_access cellAtRow:2 column:0] setTitle: _NS("UDP")];
+    [[o_sout_access cellAtRow:3 column:0] setTitle: _NS("RTP")];
 
     [o_sout_file_btn_browse setTitle: _NS("Browse...")];
     [o_sout_udp_addr_lbl setStringValue: _NS("Address")];
     [o_sout_udp_port_lbl setStringValue: _NS("Port")];
 
-    [[o_sout_mux cellAtRow:0 column:0] setTitle: _NS("AVI")];
-    [[o_sout_mux cellAtRow:0 column:1] setTitle: _NS("PS")];
-    [[o_sout_mux cellAtRow:0 column:2] setTitle: _NS("TS")];
-
+    [o_sout_mux_lbl setTitle: _NS("Encapsulation Method")];
+    [[o_sout_mux cellAtRow:0 column:0] setTitle: _NS("MPEG TS")];
+    [[o_sout_mux cellAtRow:0 column:1] setTitle: _NS("MPEG PS")];
+    [[o_sout_mux cellAtRow:0 column:2] setTitle: _NS("AVI")];
+    [[o_sout_mux cellAtRow:0 column:3] setTitle: _NS("Ogg")];
+    
+    [o_file_sub_ckbox setTitle: _NS("Load subtitles file:")];
+    [o_file_sub_btn_settings setTitle: _NS("Settings")];
+    [o_file_sub_btn_browse setTitle: _NS("Browse...")];
+    [o_file_sub_override setTitle: _NS("Override")];
+    [o_file_sub_delay_lbl setStringValue: _NS("delay")];
+    [o_file_sub_delay_stp setEnabled: NO];
+    [o_file_sub_fps_lbl setStringValue: _NS("fps")];
+    [o_file_sub_fps_stp setEnabled: NO];
+    [o_file_sub_ok_btn setStringValue: _NS("OK")];
+    
     [[NSNotificationCenter defaultCenter] addObserver: self
         selector: @selector(openFilePathChanged:)
         name: NSControlTextDidChangeNotification
@@ -274,10 +270,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     [o_tabview selectTabViewItemAtIndex: i_type];
     [o_ckbox_enqueue setState: NSOnState];
-    [o_file_sub_path setStringValue: @""];
     [o_file_sub_ckbox setState: NSOffState];
-    [o_file_sub_path setEnabled: NO];
-    [o_file_sub_btn_browse setEnabled: NO];
     
     i_result = [NSApp runModalForWindow: o_panel];
     [o_panel close];
@@ -300,9 +293,21 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
             [NSArray arrayWithObject: o_source] atPos: -1 enqueue:b_enq];
         
         if (([o_file_sub_ckbox state] == NSOnState) && !([subPath isEqualTo: @""]))
+        {
             config_PutPsz( p_intf, "sub-file", strdup( [subPath cString] ) );
+            if ( [o_file_sub_override state] )
+            {
+                config_PutInt( p_intf, "sub-delay", (int)( [o_file_sub_delay intValue] * 10 ) );
+                config_PutFloat( p_intf, "sub-fps", [o_file_sub_fps floatValue] );
+            }
+        }
+        else
+        {
+            config_PutPsz( p_intf, "sub-file", "" );
+            config_PutInt( p_intf, "sub-delay", 0 );
+            config_PutFloat( p_intf, "sub-fps", 0.0 );
+        }
     }
-
     [self soutModeChanged: nil];
 }
 
@@ -381,10 +386,22 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_open_panel setTitle: _NS("Open File")];
     [o_open_panel setPrompt: _NS("Open")];
 
-    if( [o_open_panel runModalForDirectory: nil 
-            file: nil types: nil] == NSOKButton )
+    [o_open_panel beginSheetForDirectory:nil
+        file:nil
+        types:nil
+        modalForWindow:[sender window]
+        modalDelegate: self
+        didEndSelector: @selector(pathChosenInPanel: 
+                        withReturn:
+                        contextInfo:)
+        contextInfo: nil];
+}
+
+- (void)pathChosenInPanel: (NSOpenPanel *) sheet withReturn:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if (returnCode == NSFileHandlingPanelOKButton)
     {
-        NSString *o_filename = [[o_open_panel filenames] objectAtIndex: 0];
+        NSString *o_filename = [[sheet filenames] objectAtIndex: 0];
         [o_file_path setStringValue: o_filename];
         [self openFilePathChanged: nil];
     }
@@ -393,36 +410,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 - (IBAction)openFileStreamChanged:(id)sender
 {
     [self openFilePathChanged: nil];
-}
-
-- (IBAction)loadSubsChanged:(id)sender
-{
-    if ([o_file_sub_ckbox state] == NSOnState)
-    {
-        [o_file_sub_path setEnabled:YES];
-        [o_file_sub_btn_browse setEnabled:YES];
-    }
-    else
-    {
-        [o_file_sub_path setEnabled:NO];
-        [o_file_sub_btn_browse setEnabled:NO];
-    }
-}
-
-- (IBAction)openSubBrowse:(id)sender
-{
-    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
-    
-    [o_open_panel setAllowsMultipleSelection: NO];
-    [o_open_panel setTitle: _NS("Open File")];
-    [o_open_panel setPrompt: _NS("Open")];
-
-    if( [o_open_panel runModalForDirectory: nil 
-            file: nil types: nil] == NSOKButton )
-    {
-        NSString *o_filename = [[o_open_panel filenames] objectAtIndex: 0];
-        [o_file_sub_path setStringValue: o_filename];
-    }
 }
 
 - (IBAction)openDiscTypeChanged:(id)sender
@@ -675,42 +662,36 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
 - (IBAction)soutChanged:(id)sender;
 {
-    [self soutModeChanged: nil];
-
-    if ( [o_sout_cbox state] )
+    if ([o_sout_cbox state] == NSOnState)
     {
-        NSPoint s_point;
-        s_point.x = 0;
-        s_point.y = 0;
-        [[o_panel contentView] setBoundsOrigin: s_point];
-        [[o_panel contentView] setNeedsDisplay: YES];
-
-        NSRect s_rect = [o_panel frame];
-        s_rect.size.height = OPEN_PANEL_FULL_HEIGHT + WINDOW_TITLE_HEIGHT;
-        s_rect.origin.y -= OPEN_PANEL_FULL_HEIGHT - OPEN_PANEL_SHORT_HEIGHT;
-        [o_panel setFrame: s_rect display: YES animate: NO];
+        [o_sout_settings setEnabled:YES];
     }
     else
     {
-        NSPoint s_point;
-        s_point.x = 0;
-        s_point.y = OPEN_PANEL_FULL_HEIGHT - OPEN_PANEL_SHORT_HEIGHT;
-        [[o_panel contentView] setBoundsOrigin: s_point];
-        [[o_panel contentView] setNeedsDisplay: YES];
-
-        NSRect s_rect = [o_panel frame];
-        s_rect.size.height = OPEN_PANEL_SHORT_HEIGHT + WINDOW_TITLE_HEIGHT;
-        s_rect.origin.y += OPEN_PANEL_FULL_HEIGHT - OPEN_PANEL_SHORT_HEIGHT;
-        [o_panel setFrame: s_rect display: YES animate:NO];
+        [o_sout_settings setEnabled:NO];
     }
+}
+
+- (IBAction)soutSettings:(id)sender
+{
+    [self soutModeChanged: nil];
+    [NSApp beginSheet: o_sout_sheet
+        modalForWindow: [sender window]
+        modalDelegate: self
+        didEndSelector: NULL
+        contextInfo: nil];
 }
 
 - (IBAction)soutFileBrowse:(id)sender
 {
     NSSavePanel *o_save_panel = [NSSavePanel savePanel];
     NSString *o_mux_string;
-    if ( [[[o_sout_mux selectedCell] title] isEqualToString: _NS("PS")] )
+    if ( [[[o_sout_mux selectedCell] title] isEqualToString: _NS("MPEG PS")] )
         o_mux_string = @"vob";
+    else if ( [[[o_sout_mux selectedCell] title] isEqualToString: _NS("AVI")] )
+        o_mux_string = @"avi";
+    else if ( [[[o_sout_mux selectedCell] title] isEqualToString: _NS("Ogg")] )
+        o_mux_string = @"ogm";
     else
         o_mux_string = @"ts";
 
@@ -743,15 +724,16 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     [o_sout_file_path setEnabled: b_file];
     [o_sout_file_btn_browse setEnabled: b_file];
-    [o_sout_udp_addr setEnabled: b_net];
-    [o_sout_udp_port setEnabled: b_net];
-    [o_sout_udp_port_stp setEnabled: b_net];
-    [[o_sout_mux cellAtRow:0 column: 0] setEnabled: !b_net];
+    [o_sout_udp_addr setEnabled: !b_file];
+    [o_sout_udp_port setEnabled: !b_file];
+    [o_sout_udp_port_stp setEnabled: !b_file ];
+    
     [[o_sout_mux cellAtRow:0 column: 1] setEnabled: !b_net];
-
+    [[o_sout_mux cellAtRow:0 column: 2] setEnabled: !b_net];
+    [[o_sout_mux cellAtRow:0 column: 3] setEnabled: !b_net];
     if ( b_net )
     {
-        [[o_sout_mux cellAtRow: 0 column:2] setState: YES];
+        [o_sout_mux selectCellAtRow:0 column: 0];
     }
 
     [self soutInfoChanged: nil];
@@ -768,13 +750,20 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     o_mux = [[o_sout_mux selectedCell] title];
 
     if ( [o_mux isEqualToString: _NS("AVI")] ) o_mux_string = @"avi";
-    else if ( [o_mux isEqualToString: _NS("PS")] ) o_mux_string = @"ps";
+    else if ( [o_mux isEqualToString: _NS("Ogg")] ) o_mux_string = @"ogg";
+    else if ( [o_mux isEqualToString: _NS("MPEG PS")] ) o_mux_string = @"ps";
     else o_mux_string = @"ts";
 
     if ( [o_mode isEqualToString: _NS("File")] )
     {
         o_mrl_string = [NSString stringWithFormat: @"file/%@://%@",
                         o_mux_string, [o_sout_file_path stringValue]];
+    }
+    else if ( [o_mode isEqualToString: _NS("HTTP")] )
+    {
+        o_mrl_string = [NSString stringWithFormat: @"http/%@://%@:%i",
+                        o_mux_string, [o_sout_udp_addr stringValue],
+                        [o_sout_udp_port intValue]];
     }
     else if ( [o_mode isEqualToString: _NS("UDP")] )
     {
@@ -795,9 +784,14 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
 - (IBAction)soutStepperChanged:(id)sender
 {
-    [o_sout_udp_port setIntValue: [o_net_udp_port_stp intValue]];
-
+    [o_sout_udp_port setIntValue: [o_sout_udp_port_stp intValue]];
     [self soutInfoChanged: nil];
+}
+
+- (IBAction)soutCloseSheet:(id)sender
+{
+    [o_sout_sheet orderOut:sender];
+    [NSApp endSheet: o_sout_sheet];
 }
 
 - (IBAction)openFile:(id)sender
@@ -816,6 +810,68 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         config_PutPsz( p_intf, "sout", NULL );
         [o_playlist appendArray: [o_open_panel filenames] atPos: -1 enqueue:NO];
     }
+}
+
+- (IBAction)subsChanged:(id)sender
+{
+    if ([o_file_sub_ckbox state] == NSOnState)
+    {
+        [o_file_sub_btn_settings setEnabled:YES];
+    }
+    else
+    {
+        [o_file_sub_btn_settings setEnabled:NO];
+    }
+}
+
+- (IBAction)subSettings:(id)sender
+{
+    [NSApp beginSheet: o_file_sub_sheet
+        modalForWindow: [sender window]
+        modalDelegate: self
+        didEndSelector: NULL
+        contextInfo: nil];
+}
+
+- (IBAction)subFileBrowse:(id)sender
+{
+    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+    
+    [o_open_panel setAllowsMultipleSelection: NO];
+    [o_open_panel setTitle: _NS("Open File")];
+    [o_open_panel setPrompt: _NS("Open")];
+
+    if( [o_open_panel runModalForDirectory: nil 
+            file: nil types: nil] == NSOKButton )
+    {
+        NSString *o_filename = [[o_open_panel filenames] objectAtIndex: 0];
+        [o_file_sub_path setStringValue: o_filename];
+    }
+}
+
+- (IBAction)subOverride:(id)sender
+{
+    BOOL b_state = [o_file_sub_override state];
+    [o_file_sub_delay setEnabled: b_state];
+    [o_file_sub_delay_stp setEnabled: b_state];
+    [o_file_sub_fps setEnabled: b_state];
+    [o_file_sub_fps_stp setEnabled: b_state];
+}
+
+- (IBAction)subDelayStepperChanged:(id)sender
+{
+    [o_file_sub_delay setIntValue: [o_file_sub_delay_stp intValue]];
+}
+
+- (IBAction)subFpsStepperChanged:(id)sender;
+{
+    [o_file_sub_fps setFloatValue: [o_file_sub_fps_stp floatValue]];
+}
+
+- (IBAction)subCloseSheet:(id)sender
+{
+    [o_file_sub_sheet orderOut:sender];
+    [NSApp endSheet: o_file_sub_sheet];
 }
 
 - (IBAction)panelCancel:(id)sender

@@ -153,7 +153,6 @@
         }, 
         {
             ACTIONS = {
-                loadSubsChanged = id; 
                 openDisc = id; 
                 openDiscMenusChanged = id; 
                 openDiscStepperChanged = id; 
@@ -165,14 +164,22 @@
                 openNet = id; 
                 openNetModeChanged = id; 
                 openNetStepperChanged = id; 
-                openSubBrowse = id; 
                 openVTSBrowse = id; 
                 panelCancel = id; 
                 panelOk = id; 
                 soutChanged = id; 
+                soutCloseSheet = id; 
                 soutFileBrowse = id; 
                 soutModeChanged = id; 
+                soutSettings = id; 
                 soutStepperChanged = id; 
+                subCloseSheet = id; 
+                subDelayStepperChanged = id; 
+                subFileBrowse = id; 
+                subFpsStepperChanged = id; 
+                subOverride = id; 
+                subSettings = id; 
+                subsChanged = id; 
             }; 
             CLASS = VLCOpen; 
             LANGUAGE = ObjC; 
@@ -196,8 +203,18 @@
                 "o_file_path" = id; 
                 "o_file_stream" = id; 
                 "o_file_sub_btn_browse" = id; 
+                "o_file_sub_btn_settings" = id; 
                 "o_file_sub_ckbox" = id; 
+                "o_file_sub_delay" = id; 
+                "o_file_sub_delay_lbl" = id; 
+                "o_file_sub_delay_stp" = id; 
+                "o_file_sub_fps" = id; 
+                "o_file_sub_fps_lbl" = id; 
+                "o_file_sub_fps_stp" = id; 
+                "o_file_sub_ok_btn" = id; 
+                "o_file_sub_override" = id; 
                 "o_file_sub_path" = id; 
+                "o_file_sub_sheet" = id; 
                 "o_mrl" = id; 
                 "o_mrl_lbl" = id; 
                 "o_net_http_url" = id; 
@@ -214,12 +231,17 @@
                 "o_panel" = id; 
                 "o_playlist" = id; 
                 "o_sout_access" = id; 
+                "o_sout_access_lbl" = id; 
+                "o_sout_btn_ok" = id; 
                 "o_sout_cbox" = id; 
                 "o_sout_file_btn_browse" = id; 
                 "o_sout_file_path" = id; 
                 "o_sout_mrl" = id; 
                 "o_sout_mrl_lbl" = id; 
                 "o_sout_mux" = id; 
+                "o_sout_mux_lbl" = id; 
+                "o_sout_settings" = id; 
+                "o_sout_sheet" = id; 
                 "o_sout_udp_addr" = id; 
                 "o_sout_udp_addr_lbl" = id; 
                 "o_sout_udp_port" = id; 

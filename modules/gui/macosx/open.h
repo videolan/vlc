@@ -2,7 +2,7 @@
  * open.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.h,v 1.12 2003/03/06 11:43:07 hartman Exp $
+ * $Id: open.h,v 1.13 2003/03/26 03:13:30 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -25,10 +25,6 @@
 
 NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
-#define OPEN_PANEL_FULL_HEIGHT 498
-#define OPEN_PANEL_SHORT_HEIGHT 329
-#define WINDOW_TITLE_HEIGHT 21
-
 /*****************************************************************************
  * Intf_Open interface
  *****************************************************************************/
@@ -49,9 +45,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_file_path;
     IBOutlet id o_file_btn_browse;
     IBOutlet id o_file_stream;
-    IBOutlet id o_file_sub_path;
-    IBOutlet id o_file_sub_btn_browse;
-    IBOutlet id o_file_sub_ckbox;
 
     IBOutlet id o_disc_type;
     IBOutlet id o_disc_device;
@@ -79,9 +72,12 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_net_http_url_lbl;
 
     IBOutlet id o_sout_cbox;
+    IBOutlet id o_sout_settings;
+    IBOutlet id o_sout_sheet;
     IBOutlet id o_sout_mrl_lbl;
     IBOutlet id o_sout_mrl;
     IBOutlet id o_sout_access;
+    IBOutlet id o_sout_access_lbl;
     IBOutlet id o_sout_file_path;
     IBOutlet id o_sout_file_btn_browse;
     IBOutlet id o_sout_udp_addr;
@@ -90,6 +86,22 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_sout_udp_port_lbl;
     IBOutlet id o_sout_udp_port_stp;
     IBOutlet id o_sout_mux;
+    IBOutlet id o_sout_mux_lbl;
+    IBOutlet id o_sout_btn_ok;
+    
+    IBOutlet id o_file_sub_ckbox;
+    IBOutlet id o_file_sub_btn_settings;
+    IBOutlet id o_file_sub_sheet;
+    IBOutlet id o_file_sub_path;
+    IBOutlet id o_file_sub_btn_browse;
+    IBOutlet id o_file_sub_override;
+    IBOutlet id o_file_sub_delay;
+    IBOutlet id o_file_sub_delay_lbl;
+    IBOutlet id o_file_sub_delay_stp;
+    IBOutlet id o_file_sub_fps;
+    IBOutlet id o_file_sub_fps_lbl;
+    IBOutlet id o_file_sub_fps_stp;
+    IBOutlet id o_file_sub_ok_btn;
 }
 
 - (void)openTarget:(int)i_type;
@@ -98,9 +110,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (IBAction)openFileGeneric:(id)sender;
 - (void)openFilePathChanged:(NSNotification *)o_notification;
 - (IBAction)openFileBrowse:(id)sender;
+- (void) pathChosenInPanel: (NSOpenPanel *) sheet withReturn:(int)returnCode contextInfo:(void  *)contextInfo;
 - (IBAction)openFileStreamChanged:(id)sender;
-- (IBAction)loadSubsChanged:(id)sender;
-- (IBAction)openSubBrowse:(id)sender;
 
 - (IBAction)openDisc:(id)sender;
 - (IBAction)openDiscTypeChanged:(id)sender;
@@ -115,10 +126,20 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (void)openNetInfoChanged:(NSNotification *)o_notification;
 
 - (IBAction)soutChanged:(id)sender;
+- (IBAction)soutSettings:(id)sender;
 - (IBAction)soutFileBrowse:(id)sender;
 - (void)soutModeChanged:(NSNotification *)o_notification;
 - (void)soutInfoChanged:(NSNotification *)o_notification;
 - (IBAction)soutStepperChanged:(id)sender;
+- (IBAction)soutCloseSheet:(id)sender;
+
+- (IBAction)subsChanged:(id)sender;
+- (IBAction)subSettings:(id)sender;
+- (IBAction)subFileBrowse:(id)sender;
+- (IBAction)subOverride:(id)sender;
+- (IBAction)subDelayStepperChanged:(id)sender;
+- (IBAction)subFpsStepperChanged:(id)sender;
+- (IBAction)subCloseSheet:(id)sender;
 
 - (IBAction)panelCancel:(id)sender;
 - (IBAction)panelOk:(id)sender;
