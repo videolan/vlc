@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.11 2002/03/26 23:08:40 gbazin Exp $
+ * $Id: configuration.c,v 1.12 2002/04/02 10:17:08 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -308,8 +308,8 @@ int config_LoadConfigFile( const char *psz_module_name )
     file = fopen( psz_filename, "r" );
     if( !file )
     {
-        intf_WarnMsg( 1, "config: couldn't open config file %s for reading",
-                         psz_filename );
+        intf_WarnMsg( 1, "config: couldn't open config file %s for reading (%s)",
+                         psz_filename, strerror(errno) );
         free( psz_filename );
         vlc_mutex_unlock( &p_main->config_lock );
         return -1;
@@ -401,7 +401,9 @@ int config_LoadConfigFile( const char *psz_module_name )
                         intf_WarnMsg( 7, "config: found <%s> option %s=%s",
                                       p_module->psz_name,
                                       p_module->p_config[i].psz_name,
-                                      p_module->p_config[i].psz_value );
+                                      p_module->p_config[i].psz_value != NULL ?
+                                        p_module->p_config[i].psz_value :
+                                        "(NULL)" );
                         break;
                     }
                 }
@@ -467,10 +469,15 @@ int config_SaveConfigFile( const char *psz_module_name )
     }
     sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
 #ifndef WIN32
-    mkdir( psz_filename, 0755 );
+    i = mkdir( psz_filename, 0755 );
 #else
-    mkdir( psz_filename );
+    i = mkdir( psz_filename );
 #endif
+    if( i )
+    {
+        intf_ErrMsg("Couldn't create %s (%s)", psz_filename, strerror(errno));
+    }
+
     strcat( psz_filename, "/" CONFIG_FILE );
 
 
@@ -479,8 +486,8 @@ int config_SaveConfigFile( const char *psz_module_name )
     file = fopen( psz_filename, "r" );
     if( !file )
     {
-        intf_WarnMsg( 1, "config: couldn't open config file %s for reading",
-                         psz_filename );
+        intf_WarnMsg( 1, "config: couldn't open config file %s for reading (%s)",
+                         psz_filename, strerror(errno) );
     }
     else
     {

@@ -89,8 +89,9 @@ case x"${target_os}" in
     ;;
   xbeos)
     SYS=beos
-    LIB_IPV4="${LIB_IPV4} -lbind"
+    LIB_VLC="${LIB_VLC} -lbe"
     LIB_BEOS="${LIB_BEOS} -lbe -lgame -lroot -ltracker"
+    LIB_IPV4="${LIB_IPV4} -lbind"
     PLDFLAGS="${PLDFLAGS} -nostart"
     ;;
   x*)
@@ -147,6 +148,7 @@ AC_CHECK_LIB(m,pow,
   LIB_IMDCT="${LIB_IMDCT} -lm"
   LIB_IMDCT3DN="${LIB_IMDCT3DN} -lm"
   LIB_IMDCTSSE="${LIB_IMDCTSSE} -lm"
+  LIB_CHROMA_I420_RGB="${LIB_CHROMA_I420_RGB} -lm"
 )
 
 dnl Check for pthreads - borrowed from XMMS
@@ -923,7 +925,7 @@ if test "x$enableval" != "xno" -a x$SYS != xmingw32
   then
     AC_CHECK_HEADERS(a52dec/a52.h, [
       BUILTINS="${BUILTINS} a52"
-      LIB_A52="${LIB_A52} -la52"
+      LIB_A52="${LIB_A52} -la52 -lm"
      ],[])
 fi
 
@@ -1609,6 +1611,7 @@ AC_SUBST(LIB_AA)
 AC_SUBST(LIB_ALSA)
 AC_SUBST(LIB_ARTS)
 AC_SUBST(LIB_BEOS)
+AC_SUBST(LIB_CHROMA_I420_RGB)
 AC_SUBST(LIB_DARWIN)
 AC_SUBST(LIB_DIRECTX)
 AC_SUBST(LIB_DSP)

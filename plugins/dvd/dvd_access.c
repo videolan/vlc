@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.11 2002/03/28 10:17:06 gbazin Exp $
+ * $Id: dvd_access.c,v 1.12 2002/04/02 10:17:08 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -79,7 +79,7 @@ static int  DVDOpen         ( struct input_thread_s * );
 static void DVDClose        ( struct input_thread_s * );
 static int  DVDSetArea      ( struct input_thread_s *, struct input_area_s * );
 static int  DVDSetProgram   ( struct input_thread_s *, pgrm_descriptor_t * );
-static int  DVDRead         ( struct input_thread_s *, byte_t *, size_t );
+static ssize_t DVDRead      ( struct input_thread_s *, byte_t *, size_t );
 static void DVDSeek         ( struct input_thread_s *, off_t );
 
 static char * DVDParse( input_thread_t * );
@@ -505,8 +505,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
  * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
  * bytes.
  *****************************************************************************/
-static int DVDRead( input_thread_t * p_input,
-                    byte_t * p_buffer, size_t i_count )
+static ssize_t DVDRead( input_thread_t * p_input,
+                        byte_t * p_buffer, size_t i_count )
 {
     thread_dvd_data_t *     p_dvd;
     int                     i_read;

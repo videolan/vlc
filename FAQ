@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.4 2001/11/27 13:06:23 massiot Exp $
+$Id: FAQ,v 1.5 2002/04/02 10:17:08 sam Exp $
 
 1. Using VLC
 
@@ -28,7 +28,7 @@ It should disappear after a few seconds if you stop moving the mouse.
 #@!£% *$@&§% !@# bloat ?
 ---------------------------------------------------------------------------
 You can run :
-    vlc -I dummy myfile.mpg
+    vlc --intf dummy myfile.mpg
 Most commands are available from the command line, see vlc --help for
 more information.
 
@@ -45,10 +45,10 @@ instance :
 -------------------------------------------------------
 First you must set up a VLS or VLMS stream. Please refer to the
 documentation of these programs. Then start VLC :
-    vlc udpstream:
+    vlc udp:
 You shouldn't need any option. If you're paranoid and want to control
 everything, here is the exact syntax :
-    vlc udpstream:[<server>[:<server port>]][@[<bind address>][:<bind port>]]
+    vlc udp:[<server>[:<server port>]][@[<bind address>][:<bind port>]]
 
 
 2. Troubleshooting
@@ -72,23 +72,17 @@ chmod 666 /dev/hdc
 * Do you have a link from /dev/dvd to your real DVD device ? For instance
 ln -s hdc /dev/dvd
 
-2.3 Running vlc pussycat.mpg doesn't do anything...
-------------------------------------------------
-Probably your MPEG-1 file doesn't have any system layer. This is common
-for MPEG-1 streams without any audio track. Currently VLC doesn't
-automatically detect this format, so you have to manually select it :
-vlc --input es pussycat.mpg
+2.3 [REMOVED]
+-------------
 
 2.4 The video runs but the picture is distorted...
 -----------------------------------------------
 There is probably a problem with the output layer. There are several
 ways of troubleshooting it. First, try with another output plug-in, for
 instance :
-vlc -V sdl
-vlc -V x11
-Second, try with an unoptimized YUV transform :
-vlc --yuv yuv
-Third, change your screen depth and/or definition. It quite often helps.
+vlc --vout sdl
+vlc --vout x11
+Second, change your screen depth and/or definition. It quite often helps.
 Lastly, have a look at your XFree86 video driver (nVidia for instance
 releases optimized drivers for its boards).
 
@@ -110,17 +104,16 @@ This is not normal ; it is a known problem and is being investigated.
 
 2.7 Audio and video are out of sync
 -----------------------------------
-This is not normal. Try using another output plug-in (for instance -A dsp),
+This is not normal. Try using another output plug-in (for instance --aout dsp),
 kill esd or artsd if they are running... This is a known problem and
 is being investigated.
 
-2.8 On some DVDs the subtitles are unreadable
----------------------------------------------
-This is a known bug and is being investigated.
+2.8 [REMOVED]
+-------------
 
 2.9 Sound volume is too low
 ----------------------------
-You can raise it with --volume command-line switch.
+You can raise it with --volume commandline switch.
 
 
 3. Ports and features
