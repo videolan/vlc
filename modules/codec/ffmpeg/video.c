@@ -405,6 +405,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int b_drawpicture;
+    int b_null_size = VLC_FALSE;
     block_t *p_block;
 
     if( !pp_block || !*pp_block ) return NULL;
@@ -476,6 +477,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->p_context->width <= 0 || p_sys->p_context->height <= 0 )
     {
         p_sys->p_context->hurry_up = 5;
+        b_null_size = VLC_TRUE;
     }
 
     /*
@@ -516,6 +518,16 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
                                        &b_gotpicture,
                                        p_sys->p_buffer, p_sys->i_buffer );
+        if( b_null_size && p_sys->p_context->width > 0 && p_sys->p_context->height > 0 )
+        {
+            /* Reparse it to not drop the I frame */
+            b_null_size = VLC_FALSE;
+            p_sys->p_context->hurry_up = 0;
+            i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
+                                           &b_gotpicture,
+                                           p_sys->p_buffer, p_sys->i_buffer );
+        }
+
         if( i_used < 0 )
         {
             msg_Warn( p_dec, "cannot decode one frame (%d bytes)",
