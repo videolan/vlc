@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.14 2003/02/02 01:23:36 jobi Exp $
+$Id: NEWS,v 1.15 2003/02/02 16:08:08 sam Exp $
 
 Changes between 0.4.6 and 0.5.0:
 --------------------------------
@@ -43,7 +43,7 @@ Codecs:
   * support for ADPCM audio codec
   * support for raw PCM data
   * support for Cinepak video codec
-  * support for DV video codec via libdv
+  * support for DV video codec via libdv or ffmpeg
   * support for AAC audio codec via libfaad2
   * support for Xvid codec
   * support for Xiph.org's Vorbis audio codec
@@ -82,12 +82,12 @@ Mac OS X port:
 
 Win32 port:
   * preferences dialog box redesigned
-  * waveout module supports multi-channel audio output
+  * waveout module supports multi-channel audio output and A52 over S/PDIF
   * support for VCDs
   * new dialog box to select avi subtitles
   * some new shortcuts (in particular to play/pause or stay on top)
   * new menu entry to spawn another interface
-  * rc interface is repaired
+  * rc interface is partly fixed and useable
 
 BeOS port:
   * new settings window for adjusting post-processing, brightness,
