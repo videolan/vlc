@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
- * $Id: access.c,v 1.19 2004/02/19 02:05:12 rocky Exp $
+ * $Id: access.c,v 1.20 2004/02/22 09:35:48 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -340,8 +340,8 @@ VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
         {
           VCDUpdateVar( p_input, i , VLC_VAR_ADDCHOICE,
                         "chapter",  
-			p_vcd->play_item.type == VCDINFO_ITEM_TYPE_ENTRY ?
-			_("Entry") : _("Segment"), 
+			p_vcd->play_item.type == VCDINFO_ITEM_TYPE_SEGMENT ?
+			_("Segment"): _("Entry"),
 			"Adding entry choice");
         }
 
@@ -1458,6 +1458,8 @@ E_(Open) ( vlc_object_t *p_this )
 
     p_input->p_access_data = (void *)p_vcd;
     p_vcd->i_debug         = config_GetInt( p_this, MODULE_STRING "-debug" );
+    p_vcd->in_still        = false;
+    p_vcd->play_item.type  = VCDINFO_ITEM_TYPE_NOTFOUND;
 
     /* Set where to log errors messages from libcdio. */
     p_vcd_input = (input_thread_t *)p_this;
