@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.21 2003/01/09 18:23:43 fenrir Exp $
+ * $Id: avi.c,v 1.22 2003/01/11 18:10:49 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -139,7 +139,7 @@ static int input_ReadInPES( input_thread_t *p_input,
         i_read = input_SplitBuffer(p_input,
                                    &p_data,
                                    __MIN( i_size -
-                                          p_pes->i_pes_size, 1024 ) );
+                                          p_pes->i_pes_size, 2048 ) );
         if( i_read <= 0 )
         {
             return p_pes->i_pes_size;
@@ -1083,12 +1083,6 @@ static int AVIInit( vlc_object_t * p_this )
     }
 
     /* *** movie length in sec *** */
-#if 0
-    p_avi->i_length = (mtime_t)p_avih->i_totalframes *
-                      (mtime_t)p_avih->i_microsecperframe /
-                      (mtime_t)1000000;
-#endif
-
     p_avi->i_length = AVI_MovieGetLength( p_input, p_avi );
     if( p_avi->i_length < (mtime_t)p_avih->i_totalframes *
                           (mtime_t)p_avih->i_microsecperframe /
@@ -1183,11 +1177,10 @@ static inline mtime_t AVI_PTSToByte( avi_stream_t *p_info,
                                        mtime_t i_pts )
 {
     return (mtime_t)((int64_t)i_pts *
-                     (int64_t)p_info->i_samplesize *
                      (int64_t)p_info->i_rate /
                      (int64_t)p_info->i_scale /
-                     (int64_t)1000000 );
-
+                     (int64_t)1000000 *
+                     (int64_t)p_info->i_samplesize );
 }
 
 static mtime_t AVI_GetDPTS( avi_stream_t *p_stream, int i_count )
@@ -1610,6 +1603,44 @@ static int    AVISeek   ( input_thread_t *p_input,
     }
 }
 
+#if 0
+static pes_packet_t *PES_split( input_thread_t *p_input, avi_stream_t *p_stream, pes_packet_t *p_pes )
+{
+    pes_packet_t  *p_pes2;
+    data_packet_t *p_data;
+    int           i_nb_data;
+
+    if( p_pes->i_nb_data < 2 )
+    {
+        return( NULL );
+    }
+    p_pes2 = input_NewPES( p_input->p_method_data );
+    p_pes2->i_pts = p_pes->i_pts;
+    p_pes2->i_dts = p_pes->i_dts;
+    p_pes2->i_nb_data = p_pes->i_nb_data/2;
+    p_pes2->i_pes_size = 0;
+    for( i_nb_data = 0, p_data = p_pes->p_first;
+         i_nb_data < p_pes2->i_nb_data;
+         i_nb_data++, p_data = p_data->p_next )
+    {
+        p_pes2->i_pes_size +=
+            p_data->p_payload_end - p_data->p_payload_start;
+        p_pes2->p_last = p_data;
+    }
+    p_pes2->p_first = p_pes->p_first;
+    p_pes2->p_last->p_next = NULL;
+
+    p_pes->p_first = p_data;
+    p_pes->i_pes_size -= p_pes2->i_pes_size;
+    p_pes->i_nb_data -= p_pes2->i_nb_data;
+//    p_pes->i_pts += AVI_GetDPTS( p_stream, p_pes2->i_pes_size );
+//    p_pes->i_dts += AVI_GetDPTS( p_stream, p_pes2->i_pes_size );
+    p_pes->i_pts = 0;
+    p_pes->i_dts = 0;
+    return( p_pes2 );
+}
+#endif
+
 /*****************************************************************************
  * AVIDemux_Seekable: reads and demuxes data packets for stream seekable
  *****************************************************************************
@@ -1871,9 +1902,8 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
         {
             i_size = __MIN( p_stream->p_index[p_stream->i_idxposc].i_length -
                                 p_stream->i_idxposb,
-//                                100 * 1024 ); // 10Ko max
-                            __MAX( toread[i_stream].i_toread, 128 ) );
-                            // 128 is to avoid infinit loop
+                            __MAX( toread[i_stream].i_toread,
+                                   p_stream->i_samplesize ) );
         }
         else
         {
@@ -1952,7 +1982,28 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
                     input_ClockGetTS( p_input,
                                       p_input->stream.p_selected_program,
                                       p_pes->i_pts * 9/100);
+#if 0
+            /* debuuging: split pes in 2 parts */
+            if( p_pes->i_nb_data >= 2 && p_stream->i_cat == AUDIO_ES )
+            {
+                pes_packet_t  *p_pes_;
+                data_packet_t *p_data;
+                int           i_nb_data;
 
+                p_pes_ = PES_split( p_input, p_stream, p_pes );
+                if( p_pes_->i_nb_data >= 2 )
+                {
+                    input_DecodePES( p_stream->p_es->p_decoder_fifo, PES_split( p_input,p_stream,p_pes_ ) );
+                }
+                input_DecodePES( p_stream->p_es->p_decoder_fifo,p_pes_ );
+
+                if( p_pes->i_nb_data >= 2 )
+                {
+                    input_DecodePES( p_stream->p_es->p_decoder_fifo, PES_split( p_input,p_stream,p_pes ) );
+                }
+                //input_DecodePES( p_stream->p_es->p_decoder_fifo,p_pes );
+            }
+#endif
             input_DecodePES( p_stream->p_es->p_decoder_fifo, p_pes );
         }
         else

@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.11 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: audio.c,v 1.12 2003/01/11 18:10:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -135,7 +135,7 @@ int E_( InitThread_Audio )( adec_thread_t *p_adec )
     p_adec->p_context->block_align = p_adec->format.i_blockalign;
 #endif
     p_adec->p_context->bit_rate = p_adec->format.i_avgbytespersec * 8;
-    
+
     if( ( p_adec->p_context->extradata_size = p_adec->format.i_size ) > 0 )
     {
         p_adec->p_context->extradata = 
@@ -145,34 +145,34 @@ int E_( InitThread_Audio )( adec_thread_t *p_adec )
                 p_adec->format.p_data,
                 p_adec->format.i_size );
     }
-    
+
     /* ***** Open the codec ***** */ 
     if (avcodec_open(p_adec->p_context, p_adec->p_codec) < 0)
     {
-        msg_Err( p_adec->p_fifo, 
+        msg_Err( p_adec->p_fifo,
                  "cannot open codec (%s)",
                  p_adec->psz_namecodec );
         return( -1 );
     }
     else
     {
-        msg_Dbg( p_adec->p_fifo, 
+        msg_Dbg( p_adec->p_fifo,
                  "ffmpeg codec (%s) started",
                  p_adec->psz_namecodec );
     }
 
-    p_adec->p_output = malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE );    
-    
+    p_adec->p_output = malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE );
+
 
     p_adec->output_format.i_format = AOUT_FMT_S16_NE;
     p_adec->output_format.i_rate = p_adec->format.i_samplespersec;
     p_adec->output_format.i_physical_channels
         = p_adec->output_format.i_original_channels
         = p_adec->format.i_nb_channels;
-    
+
     p_adec->p_aout = NULL;
     p_adec->p_aout_input = NULL;
-                        
+
     return( 0 );
 }
 
@@ -188,7 +188,7 @@ void  E_( DecodeThread_Audio )( adec_thread_t *p_adec )
     int     i_samplesperchannel;
     int     i_output_size;
     int     i_frame_size;
-    int     i_status;
+    int     i_used;
 
     do
     {
@@ -203,32 +203,67 @@ void  E_( DecodeThread_Audio )( adec_thread_t *p_adec )
 
         if( i_frame_size > 0 )
         {
-            if( p_adec->i_buffer_size < i_frame_size + 16 )
+            uint8_t *p_last;
+            int     i_need;
+
+
+            i_need = i_frame_size + 16 + p_adec->i_buffer;
+            if( p_adec->i_buffer_size < i_need )
             {
-                FREE( p_adec->p_buffer );
-                p_adec->p_buffer = malloc( i_frame_size + 16 );
-                p_adec->i_buffer_size = i_frame_size + 16;
+                p_last = p_adec->p_buffer;
+                p_adec->p_buffer = malloc( i_need );
+                p_adec->i_buffer_size = i_need;
+                if( p_adec->i_buffer > 0 )
+                {
+                    memcpy( p_adec->p_buffer, p_last, p_adec->i_buffer );
+                }
+                FREE( p_last );
             }
-            
-            E_( GetPESData )( p_adec->p_buffer, p_adec->i_buffer_size, p_pes );
+            i_frame_size =
+                E_( GetPESData )( p_adec->p_buffer + p_adec->i_buffer,
+                                  i_frame_size,
+                                  p_pes );
+            /* make ffmpeg happier but I'm not sure it's needed for audio */
+            memset( p_adec->p_buffer + p_adec->i_buffer + i_frame_size,
+                    0,
+                    16 );
         }
         input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
     } while( i_frame_size <= 0 );
-    
 
-    i_status = avcodec_decode_audio( p_adec->p_context,
-                                     (s16*)p_adec->p_output,
-                                     &i_output_size,
-                                     p_adec->p_buffer,
-                                     i_frame_size );
-    if( i_status < 0 )
+
+    i_frame_size += p_adec->i_buffer;
+
+usenextdata:
+    i_used = avcodec_decode_audio( p_adec->p_context,
+                                   (int16_t*)p_adec->p_output,
+                                   &i_output_size,
+                                   p_adec->p_buffer,
+                                   i_frame_size );
+    if( i_used < 0 )
     {
-        msg_Warn( p_adec->p_fifo, 
+        msg_Warn( p_adec->p_fifo,
                   "cannot decode one frame (%d bytes)",
                   i_frame_size );
+        p_adec->i_buffer = 0;
         return;
     }
+    else if( i_used < i_frame_size )
+    {
+        memmove( p_adec->p_buffer,
+                 p_adec->p_buffer + i_used,
+                 p_adec->i_buffer_size - i_used );
 
+        p_adec->i_buffer = i_frame_size - i_used;
+    }
+    else
+    {
+        p_adec->i_buffer = 0;
+    }
+
+    i_frame_size -= i_used;
+
+//    msg_Dbg( p_adec->p_fifo, "frame size:%d buffer used:%d", i_frame_size, i_used );
     if( i_output_size <= 0 )
     {
          msg_Warn( p_adec->p_fifo, 
@@ -274,7 +309,7 @@ void  E_( DecodeThread_Audio )( adec_thread_t *p_adec )
         msg_Err( p_adec->p_fifo, "cannot create aout" );
         return;
     }
-    
+
     if( p_adec->pts != 0 && p_adec->pts != aout_DateGet( &p_adec->date ) )
     {
         aout_DateSet( &p_adec->date, p_adec->pts );
@@ -302,7 +337,12 @@ void  E_( DecodeThread_Audio )( adec_thread_t *p_adec )
             p_aout_buffer->i_nb_bytes );
 
     aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
-   
+
+    if( i_frame_size > 0 )
+    {
+        goto usenextdata;
+    }
+
     return;
 }
 

@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.12 2002/12/18 16:16:30 sam Exp $
+ * $Id: libavi.c,v 1.13 2003/01/11 18:10:49 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -546,7 +546,7 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
             if( p_chk->strf.auds.p_wf->cbSize > 0 )
             {
                 memcpy( &p_chk->strf.auds.p_wf[1] ,
-                        p_buff + sizeof( WAVEFORMATEX ),
+                        p_buff + 8 + sizeof( WAVEFORMATEX ),    // 8=fourrc+size
                         p_chk->strf.auds.p_wf->cbSize );
             }
 #ifdef AVI_DEBUG
@@ -581,7 +581,7 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
             if( p_chk->strf.vids.p_bih->biSize - sizeof(BITMAPINFOHEADER) > 0 )
             {
                 memcpy( &p_chk->strf.vids.p_bih[1],
-                        p_buff + sizeof(BITMAPINFOHEADER),
+                        p_buff + 8 + sizeof(BITMAPINFOHEADER), // 8=fourrc+size
                         p_chk->strf.vids.p_bih->biSize -
                                                     sizeof(BITMAPINFOHEADER) );
             }
@@ -614,7 +614,7 @@ static int AVI_ChunkRead_strd( input_thread_t *p_input,
     AVI_READCHUNK_ENTER;
     p_chk->strd.p_data = malloc( p_chk->common.i_chunk_size );
     memcpy( p_chk->strd.p_data,
-            p_buff,
+            p_buff + 8,
             p_chk->common.i_chunk_size );
     AVI_READCHUNK_EXIT( VLC_SUCCESS );
 }

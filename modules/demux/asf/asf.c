@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.14 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: asf.c,v 1.15 2003/01/11 18:10:49 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -565,6 +565,12 @@ static int Demux( input_thread_t *p_input )
 
             mtime_t i_pts;
             mtime_t i_pts_delta;
+
+            if( i_skip >= i_packet_size_left )
+            {
+                /* prevent some segfault with invalid file */
+                break;
+            }
 
             i_stream_number = p_peek[i_skip] & 0x7f;
             i_skip++;
