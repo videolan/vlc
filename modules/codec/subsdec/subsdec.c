@@ -2,7 +2,7 @@
  * subsdec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.4 2003/07/25 01:11:32 hartman Exp $
+ * $Id: subsdec.c,v 1.5 2003/08/10 10:22:52 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,8 +65,10 @@ static char *ppsz_encodings[] = { "ASCII", "ISO-8859-1", "ISO-8859-2", "ISO-8859
     "Georgian-Academy", "Georgian-PS", "TIS-620", "MuleLao-1", "VISCII", "TCVN",
     "HPROMAN8", "NEXTSTEP", NULL };
 
-#define ENCODING_TEXT N_("subtitle text encoding")
-#define ENCODING_LONGTEXT N_("change the encoding used in text subtitles")
+#define ENCODING_TEXT N_("Subtitles text encoding")
+#define ENCODING_LONGTEXT N_("Change the encoding used in text subtitles")
+#define ALIGN_TEXT N_("Subtitles justification")
+#define ALIGN_LONGTEXT N_("Change the justification of substitles (0=center, 1=left, 2=right)")
 
 vlc_module_begin();
     set_description( _("file subtitles decoder") );
@@ -74,9 +76,9 @@ vlc_module_begin();
     set_callbacks( OpenDecoder, NULL );
     add_category_hint( N_("Subtitles"), NULL, VLC_FALSE );
 
+    add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
 #if defined(HAVE_ICONV)
-    add_string_from_list( "subsdec-encoding", "ISO-8859-1", ppsz_encodings, NULL,
-                          ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );
+    add_string_from_list( "subsdec-encoding", "ISO-8859-1", ppsz_encodings, NULL, ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );
 #endif
 vlc_module_end();
 
@@ -97,6 +99,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_fifo->pf_run = RunDecoder;
 
+    var_Create( p_this, "subsdec-align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 #if defined(HAVE_ICONV)
     var_Create( p_this, "subsdec-encoding", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 #endif
@@ -129,6 +132,8 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
 #if defined(HAVE_ICONV)
     p_subsdec->iconv_handle = (iconv_t)-1;
 #endif
+    var_Get( p_subsdec->p_fifo, "subsdec-align", &val );
+    p_subsdec->i_align = val.i_int;
 
     /*
      * Initialize thread and free configuration
@@ -143,12 +148,12 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     {
         /* Here we are dealing with text subtitles */
 #if defined(HAVE_ICONV)
-	var_Get( p_subsdec->p_fifo, "subsdec-encoding", &val );
-	p_subsdec->iconv_handle = iconv_open( "UTF-8", val.psz_string);
-	if( p_subsdec->iconv_handle == (iconv_t)-1 )
-	{
-	    msg_Warn( p_subsdec->p_fifo, "Unable to do requested conversion" );
-	}
+        var_Get( p_subsdec->p_fifo, "subsdec-encoding", &val );
+        p_subsdec->iconv_handle = iconv_open( "UTF-8", val.psz_string);
+        if( p_subsdec->iconv_handle == (iconv_t)-1 )
+        {
+            msg_Warn( p_subsdec->p_fifo, "Unable to do requested conversion" );
+        }
         free( val.psz_string);
 #endif
         while( (!p_subsdec->p_fifo->b_die) && (!p_subsdec->p_fifo->b_error) )
@@ -273,7 +278,7 @@ static void EndThread( subsdec_thread_t *p_subsdec )
 #if defined(HAVE_ICONV)
     if( p_subsdec->iconv_handle != (iconv_t)-1 )
     {
-	iconv_close( p_subsdec->iconv_handle );
+        iconv_close( p_subsdec->iconv_handle );
     }
 #endif
     CloseBitstream( &p_subsdec->bit_stream );
@@ -315,31 +320,32 @@ void E_(ParseText)( subsdec_thread_t *p_subsdec )
     if( psz_subtitle[0] != '\0' )
     {
 #if defined(HAVE_ICONV)
-	char *psz_new_subtitle, *psz_convert_buffer_out, *psz_convert_buffer_in;
-	size_t ret, inbytes_left, outbytes_left;
+        char *psz_new_subtitle, *psz_convert_buffer_out, *psz_convert_buffer_in;
+        size_t ret, inbytes_left, outbytes_left;
 
-	psz_new_subtitle = malloc( 6 * strlen( psz_subtitle ) * sizeof(char) );
-	psz_convert_buffer_out = psz_new_subtitle;
-	psz_convert_buffer_in = psz_subtitle;
-	inbytes_left = strlen( psz_subtitle );
-	outbytes_left = 6 * inbytes_left;
-	ret = iconv( p_subsdec->iconv_handle, &psz_convert_buffer_in,
+        psz_new_subtitle = malloc( 6 * strlen( psz_subtitle ) * sizeof(char) );
+        psz_convert_buffer_out = psz_new_subtitle;
+        psz_convert_buffer_in = psz_subtitle;
+        inbytes_left = strlen( psz_subtitle );
+        outbytes_left = 6 * inbytes_left;
+        ret = iconv( p_subsdec->iconv_handle, &psz_convert_buffer_in,
                      &inbytes_left, &psz_convert_buffer_out, &outbytes_left );
-	*psz_convert_buffer_out = '\0';
+        *psz_convert_buffer_out = '\0';
 
-	if( inbytes_left )
-	{
-	    msg_Warn( p_subsdec->p_fifo, "Something fishy happened during conversion" );
-	}
-	else
-	{
-	    msg_Dbg( p_subsdec->p_fifo, "reencoded \"%s\" into \"%s\"", psz_subtitle, psz_new_subtitle );
+        if( inbytes_left )
+        {
+            msg_Warn( p_subsdec->p_fifo, "Something fishy happened during conversion" );
+        }
+        else
+        {
+            msg_Dbg( p_subsdec->p_fifo, "reencoded \"%s\" into \"%s\"", psz_subtitle, psz_new_subtitle );
             psz_subtitle = psz_new_subtitle;
-	}
+        }
 #endif
-	vout_ShowTextAbsolute( p_subsdec->p_vout, psz_subtitle, NULL, 
-			       OSD_ALIGN_BOTTOM|OSD_ALIGN_LEFT, 20, 20, 
-			       i_pts, i_dts );
+        vout_ShowTextAbsolute( p_subsdec->p_vout, psz_subtitle, NULL, 
+                               OSD_ALIGN_BOTTOM | p_subsdec->i_align,
+                               p_subsdec->i_align ? 20 : 0, 10, 
+                               i_pts, i_dts );
 #if defined(HAVE_ICONV)
         free( psz_new_subtitle );
 #endif

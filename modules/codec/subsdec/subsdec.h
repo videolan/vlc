@@ -3,7 +3,7 @@
  * subsdec.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: subsdec.h,v 1.1 2003/07/22 20:49:10 hartman Exp $
+ * $Id: subsdec.h,v 1.2 2003/08/10 10:22:52 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -35,11 +35,6 @@ typedef struct subsdec_thread_t subsdec_thread_t;
 struct subsdec_thread_t
 {
     /*
-     * Thread properties and locks
-     */
-    vlc_thread_t        thread_id;                /* id for thread functions */
-
-    /*
      * Input properties
      */
     decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
@@ -54,6 +49,7 @@ struct subsdec_thread_t
     /*
      * Private properties
      */
+    int                 i_align;
 #if defined(HAVE_ICONV)
     iconv_t             iconv_handle;     /* handle to iconv instance */
 #endif

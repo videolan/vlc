@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.16 2003/08/04 23:31:53 gbazin Exp $
+ * $Id: freetype.c,v 1.17 2003/08/10 10:22:52 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -321,9 +321,14 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                     pen_x = i_pitch - p_line->i_width
                         - p_string->i_x_margin;
                 }
-                else
+                else if ( p_string->i_flags & OSD_ALIGN_LEFT )
                 {
                     pen_x = p_string->i_x_margin;
+                }
+                else
+                {
+                    pen_x = i_pitch / 2 - p_line->i_width / 2
+                        + p_string->i_x_margin;
                 }
 
                 for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
@@ -360,9 +365,14 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                     pen_x = i_pitch - ( p_line->i_width >> 1 )
                         - ( p_string->i_x_margin >> 1 );
                 }
-                else
+                else if ( p_string->i_flags & OSD_ALIGN_LEFT )
                 {
                     pen_x = p_string->i_x_margin >> 1;
+                }
+                else
+                {
+                    pen_x = i_pitch / 2 - p_line->i_width / 4
+                        + p_string->i_x_margin / 2;
                 }
 
                 for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
@@ -420,9 +430,13 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
             pen_x = i_pitch - p_line->i_width
                 - p_string->i_x_margin;
         }
-        else
+        else if ( p_string->i_flags & OSD_ALIGN_LEFT )
         {
             pen_x = p_string->i_x_margin;
+        }
+        else
+        {
+            pen_x = i_pitch / 2 - p_line->i_width / 2 + p_string->i_x_margin;
         }
         
         for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
