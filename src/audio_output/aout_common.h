@@ -2,9 +2,10 @@
  * aout_common.h: audio output inner functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_common.h,v 1.6 2001/11/07 22:58:13 jlj Exp $
+ * $Id: aout_common.h,v 1.7 2002/01/14 12:15:10 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Cyril Deguet <asmax@via.ecp.fr>   
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,15 +31,13 @@
 /* Creating as many aout_Thread functions as configurations was one solution,
  * examining the different cases in the Thread loop of an unique function was
  * another. I chose the first solution. */
-void aout_U8MonoThread        ( aout_thread_t * p_aout );
-void aout_U8StereoThread      ( aout_thread_t * p_aout );
-void aout_S8MonoThread        ( aout_thread_t * p_aout );
-void aout_S8StereoThread      ( aout_thread_t * p_aout );
-void aout_U16MonoThread       ( aout_thread_t * p_aout );
-void aout_U16StereoThread     ( aout_thread_t * p_aout );
-void aout_S16MonoThread       ( aout_thread_t * p_aout );
-void aout_S16StereoThread     ( aout_thread_t * p_aout );
+void aout_U8Thread            ( aout_thread_t * p_aout );
+void aout_S8Thread            ( aout_thread_t * p_aout );
+void aout_U16Thread           ( aout_thread_t * p_aout );
+void aout_S16Thread           ( aout_thread_t * p_aout );
 void aout_SpdifThread         ( aout_thread_t * p_aout );
+void aout_FillBuffer          ( aout_thread_t * p_aout, aout_fifo_t * p_fifo );
+
 
 #define UPDATE_INCREMENT( increment, integer ) \
     if ( ((increment).l_remainder += (increment).l_euclidean_remainder) >= 0 )\

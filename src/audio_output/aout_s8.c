@@ -2,7 +2,7 @@
  * aout_s8.c: 8 bit signed audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_s8.c,v 1.5 2001/12/30 07:09:56 sam Exp $
+ * $Id: aout_s8.c,v 1.6 2002/01/14 12:15:10 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -36,13 +36,8 @@
 /*****************************************************************************
  * Functions
  *****************************************************************************/
-void aout_S8MonoThread( aout_thread_t * p_aout )
+void aout_S8Thread( aout_thread_t * p_aout )
 {
-    intf_ErrMsg( "aout error: 8 bit signed mono thread unsupported" );
-}
-
-void aout_S8StereoThread( aout_thread_t * p_aout )
-{
-    intf_ErrMsg( "aout error: 8 bit signed stereo thread unsupported" );
+    intf_ErrMsg( "aout error: 8 bit signed thread unsupported" );
 }
 

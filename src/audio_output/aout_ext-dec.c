@@ -2,7 +2,7 @@
  * aout_ext-dec.c : exported fifo management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_ext-dec.c,v 1.9 2002/01/09 00:33:37 asmax Exp $
+ * $Id: aout_ext-dec.c,v 1.10 2002/01/14 12:15:10 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -114,22 +114,6 @@ aout_fifo_t * aout_CreateFifo( int i_type, int i_channels, long l_rate,
     /* Initialize the new fifo structure */
     switch ( p_aout->fifo[i_fifo].i_type = i_type )
     {
-        case AOUT_INTF_MONO_FIFO:
-        case AOUT_INTF_STEREO_FIFO:
-            p_aout->fifo[i_fifo].b_die = 0;
-
-            p_aout->fifo[i_fifo].i_channels = i_channels;
-            p_aout->fifo[i_fifo].b_stereo = ( i_channels == 2 );
-            p_aout->fifo[i_fifo].l_rate = l_rate;
-
-            p_aout->fifo[i_fifo].buffer = p_buffer;
-
-            p_aout->fifo[i_fifo].l_unit = 0;
-            InitializeIncrement( &p_aout->fifo[i_fifo].unit_increment,
-                                 l_rate, p_aout->l_rate );
-            p_aout->fifo[i_fifo].l_units = l_units;
-            break;
-
         case AOUT_ADEC_MONO_FIFO:
         case AOUT_ADEC_STEREO_FIFO:
         case AOUT_ADEC_SPDIF_FIFO:
@@ -222,14 +206,6 @@ void aout_FreeFifo( aout_fifo_t * p_fifo )
     switch ( p_fifo->i_type )
     {
         case AOUT_EMPTY_FIFO:
-
-            break;
-
-        case AOUT_INTF_MONO_FIFO:
-        case AOUT_INTF_STEREO_FIFO:
-
-            free( p_fifo->buffer );
-            p_fifo->i_type = AOUT_EMPTY_FIFO;
 
             break;
 

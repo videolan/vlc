@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.70 2002/01/09 00:33:37 asmax Exp $
+ * $Id: audio_output.c,v 1.71 2002/01/14 12:15:10 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -212,27 +212,27 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
         case AOUT_FMT_U8:
             intf_WarnMsg( 2, "aout info: unsigned 8 bits mono thread" );
             l_bytes = 1 * sizeof(u8) * p_aout->l_units;
-            pf_aout_thread = aout_U8MonoThread;
+            pf_aout_thread = aout_U8Thread;
             break;
 
         case AOUT_FMT_S8:
             intf_WarnMsg( 2, "aout info: signed 8 bits mono thread" );
             l_bytes = 1 * sizeof(s8) * p_aout->l_units;
-            pf_aout_thread = aout_S8MonoThread;
+            pf_aout_thread = aout_S8Thread;
             break;
 
         case AOUT_FMT_U16_LE:
         case AOUT_FMT_U16_BE:
             intf_WarnMsg( 2, "aout info: unsigned 16 bits mono thread" );
             l_bytes = 1 * sizeof(u16) * p_aout->l_units;
-            pf_aout_thread = aout_U16MonoThread;
+            pf_aout_thread = aout_U16Thread;
             break;
 
         case AOUT_FMT_S16_LE:
         case AOUT_FMT_S16_BE:
             intf_WarnMsg( 2, "aout info: signed 16 bits mono thread" );
             l_bytes = 1 * sizeof(s16) * p_aout->l_units;
-            pf_aout_thread = aout_S16MonoThread;
+            pf_aout_thread = aout_S16Thread;
             break;
 
         default:
@@ -249,27 +249,27 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
         case AOUT_FMT_U8:
             intf_WarnMsg( 2, "aout info: unsigned 8 bits stereo thread" );
             l_bytes = 2 * sizeof(u8) * p_aout->l_units;
-            pf_aout_thread = aout_U8StereoThread;
+            pf_aout_thread = aout_U8Thread;
             break;
 
         case AOUT_FMT_S8:
             intf_WarnMsg( 2, "aout info: signed 8 bits stereo thread" );
             l_bytes = 2 * sizeof(s8) * p_aout->l_units;
-            pf_aout_thread = aout_S8StereoThread;
+            pf_aout_thread = aout_S8Thread;
             break;
 
         case AOUT_FMT_U16_LE:
         case AOUT_FMT_U16_BE:
             intf_WarnMsg( 2, "aout info: unsigned 16 bits stereo thread" );
             l_bytes = 2 * sizeof(u16) * p_aout->l_units;
-            pf_aout_thread = aout_U16StereoThread;
+            pf_aout_thread = aout_U16Thread;
             break;
 
         case AOUT_FMT_S16_LE:
         case AOUT_FMT_S16_BE:
             intf_WarnMsg( 2, "aout info: signed 16 bits stereo thread" );
             l_bytes = 2 * sizeof(s16) * p_aout->l_units;
-            pf_aout_thread = aout_S16StereoThread;
+            pf_aout_thread = aout_S16Thread;
             break;
 
         case AOUT_FMT_AC3:

@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.40 2002/01/09 00:33:37 asmax Exp $
+ * $Id: audio_output.h,v 1.41 2002/01/14 12:15:10 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -120,11 +120,9 @@ typedef struct aout_fifo_s
   ( ((((fifo).l_end_frame + 1) - (fifo).l_start_frame) & AOUT_FIFO_SIZE) == 0 )
 
 #define AOUT_EMPTY_FIFO         0
-#define AOUT_INTF_MONO_FIFO     1
-#define AOUT_INTF_STEREO_FIFO   2
-#define AOUT_ADEC_MONO_FIFO     3
-#define AOUT_ADEC_STEREO_FIFO   4
-#define AOUT_ADEC_SPDIF_FIFO    5
+#define AOUT_ADEC_MONO_FIFO     1
+#define AOUT_ADEC_STEREO_FIFO   2
+#define AOUT_ADEC_SPDIF_FIFO    3
 
 /*****************************************************************************
  * aout_thread_t : audio output thread descriptor

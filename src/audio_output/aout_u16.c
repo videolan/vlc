@@ -2,7 +2,7 @@
  * aout_u16.c: 16 bit unsigned audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_u16.c,v 1.5 2001/12/30 07:09:56 sam Exp $
+ * $Id: aout_u16.c,v 1.6 2002/01/14 12:15:10 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -36,13 +36,8 @@
 /*****************************************************************************
  * Functions
  *****************************************************************************/
-void aout_U16MonoThread( aout_thread_t * p_aout )
+void aout_U16Thread( aout_thread_t * p_aout )
 {
-    intf_ErrMsg( "aout error: 16 bit unsigned mono thread unsupported" );
-}
-
-void aout_U16StereoThread( aout_thread_t * p_aout )
-{
-    intf_ErrMsg( "aout error: 16 bit unsigned stereo thread unsupported" );
+    intf_ErrMsg( "aout error: 16 bit unsigned thread unsupported" );
 }
 
