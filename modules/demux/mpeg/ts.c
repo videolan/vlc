@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.22 2003/05/05 22:48:22 gbazin Exp $
+ * $Id: ts.c,v 1.23 2003/05/06 21:01:58 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -1273,8 +1273,9 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
     p_pgrm_demux = (pgrm_ts_data_t *)p_pgrm->p_demux_data;
     p_pgrm_demux->i_pcr_pid = p_new_pmt->i_pcr_pid;
 
-    if( ( p_new_pmt->b_current_next && ( p_new_pmt->i_version != p_pgrm_demux->i_pmt_version ) ) ||
-            p_pgrm_demux->i_pmt_version == PMT_UNINITIALIZED )
+    if( ( p_new_pmt->b_current_next &&
+          ( p_new_pmt->i_version != p_pgrm_demux->i_pmt_version ) ) ||
+          p_pgrm_demux->i_pmt_version == PMT_UNINITIALIZED )
     {
         dvbpsi_descriptor_t *p_dr = p_new_pmt->p_first_descriptor;
         /* IOD */
@@ -1289,7 +1290,15 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
         p_es = p_new_pmt->p_first_es;
         while( p_es )
         {
-            int i_fourcc, i_cat, i_stream_id;
+            vlc_fourcc_t i_fourcc;
+            int i_size, i_cat, i_stream_id = 0;
+            es_ts_data_t demux_data;
+            BITMAPINFOHEADER *p_bih = NULL;
+            WAVEFORMATEX *p_wf = NULL;
+            char psz_desc[30];
+
+            memset( &demux_data, 0, sizeof(es_ts_data_t) );
+            *psz_desc = 0;
 
             switch( p_es->i_type )
             {
@@ -1372,168 +1381,144 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     i_stream_id = 0;
             }
 
-            /* Add this ES */
-            p_new_es = input_AddES( p_input, p_pgrm, (u16)p_es->i_pid,
-                                    i_cat, NULL, sizeof( es_ts_data_t ) );
-            if( p_new_es == NULL )
-            {
-                msg_Err( p_input, "could not add ES %d", p_es->i_pid );
-                p_input->b_error = 1;
-                return;
-            }
-            p_new_es->i_fourcc = i_fourcc;
-            p_new_es->i_stream_id = i_stream_id;
-
-            ((es_ts_data_t *)p_new_es->p_demux_data)->i_continuity_counter = 0xFF;
-
-            if( p_es->i_type == MPEG4_VIDEO_ES || p_es->i_type == MPEG4_AUDIO_ES )
+            if( p_es->i_type == MPEG4_VIDEO_ES ||
+                p_es->i_type == MPEG4_AUDIO_ES )
             {
                 /* mpeg4 stream, search sl_descriptor */
                 dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;
-                es_ts_data_t        *p_es_demux =
-                                        (es_ts_data_t*)p_new_es->p_demux_data;
 
-                while( p_dr && ( p_dr->i_tag != 0x1f ) )
-                    p_dr = p_dr->p_next;
+                while( p_dr && ( p_dr->i_tag != 0x1f ) ) p_dr = p_dr->p_next;
+
                 if( p_dr && p_dr->i_length == 2 )
                 {
                     int i_es_descr_index;
 
-                    p_es_demux->i_es_id =
+                    demux_data.i_es_id =
                         ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
-                    p_es_demux->p_es_descr = NULL;
+                    demux_data.p_es_descr = NULL;
 
                     msg_Warn( p_input, "found SL_descriptor" );
-                    for( i_es_descr_index = 0; i_es_descr_index < 255; i_es_descr_index++ )
+                    for( i_es_descr_index = 0; i_es_descr_index < 255;
+                         i_es_descr_index++ )
                     {
                         if( p_pgrm_demux->iod.es_descr[i_es_descr_index].b_ok &&
-                            p_pgrm_demux->iod.es_descr[i_es_descr_index].i_es_id == p_es_demux->i_es_id )
+                            p_pgrm_demux->iod.es_descr[i_es_descr_index].i_es_id == demux_data.i_es_id )
                         {
-                            p_es_demux->p_es_descr = &p_pgrm_demux->iod.es_descr[i_es_descr_index];
+                            demux_data.p_es_descr =
+                                &p_pgrm_demux->iod.es_descr[i_es_descr_index];
                             break;
                         }
                     }
                 }
-                if( p_es_demux->p_es_descr != NULL )
+
+                if( demux_data.p_es_descr != NULL )
                 {
-                    vlc_fourcc_t i_fourcc;
-                    int          i_cat;
-                    p_es_demux->b_mpeg4 = 1;
+#define DESCR demux_data.p_es_descr->dec_descr
+                    demux_data.b_mpeg4 = 1;
 
                     /* fix fourcc */
-                    switch( p_es_demux->p_es_descr->dec_descr.i_streamType )
+                    switch( DESCR.i_streamType )
                     {
-                        case 0x04:  /* VisualStream */
-                            i_cat = VIDEO_ES;
-                            switch( p_es_demux->p_es_descr->dec_descr.i_objectTypeIndication )
-                            {
-                                case 0x20:
-                                    i_fourcc = VLC_FOURCC('m','p','4','v');     // mpeg4
-                                    break;
-                                case 0x60:
-                                case 0x61:
-                                case 0x62:
-                                case 0x63:
-                                case 0x64:
-                                case 0x65:
-                                    i_fourcc = VLC_FOURCC( 'm','p','g','v' );   // mpeg2
-                                    break;
-                                case 0x6a:
-                                    i_fourcc = VLC_FOURCC( 'm','p','g','v' );   // mpeg1
-                                    break;
-                                case 0x6c:
-                                    i_fourcc = VLC_FOURCC( 'j','p','e','g' );   // mpeg1
-                                    break;
-                                default:
-                                    i_fourcc = 0;
-                                    break;
-                            }
+                    case 0x04:  /* VisualStream */
+                        i_cat = VIDEO_ES;
+                        switch( DESCR.i_objectTypeIndication )
+                        {
+                        case 0x20:
+                            i_fourcc = VLC_FOURCC('m','p','4','v');    // mpeg4
                             break;
-                        case 0x05:  /* AudioStream */
-                            i_cat = AUDIO_ES;
-                            switch( p_es_demux->p_es_descr->dec_descr.i_objectTypeIndication )
-                            {
-                                case 0x40:
-                                    i_fourcc = VLC_FOURCC('m','p','4','a');     // mpeg4
-                                    break;
-                                case 0x66:
-                                case 0x67:
-                                case 0x68:
-                                    i_fourcc = VLC_FOURCC('m','p','4','a');     // mpeg2 aac
-                                    break;
-                                case 0x69:
-                                    i_fourcc = VLC_FOURCC('m','p','g','a');     // mpeg2
-                                    break;
-                                case 0x6b:
-                                    i_fourcc = VLC_FOURCC('m','p','g','a');     // mpeg1
-                                    break;
-                                default:
-                                    i_fourcc = 0;
-                                    break;
-                            }
+                        case 0x60:
+                        case 0x61:
+                        case 0x62:
+                        case 0x63:
+                        case 0x64:
+                        case 0x65:
+                            i_fourcc = VLC_FOURCC( 'm','p','g','v' );  // mpeg2
+                            break;
+                        case 0x6a:
+                            i_fourcc = VLC_FOURCC( 'm','p','g','v' );  // mpeg1
+                            break;
+                        case 0x6c:
+                            i_fourcc = VLC_FOURCC( 'j','p','e','g' );  // mpeg1
                             break;
                         default:
-                            i_cat = UNKNOWN_ES;
                             i_fourcc = 0;
                             break;
-                    }
-
-                    p_new_es->i_fourcc = i_fourcc;
-                    p_new_es->i_cat    = i_cat;
-                    switch( i_cat )
-                    {
-                        case VIDEO_ES:
-                            {
-                                int i_size;
-                                BITMAPINFOHEADER *p_bih;
-
-                                i_size = sizeof( BITMAPINFOHEADER ) +
-                                                 p_es_demux->p_es_descr->dec_descr.i_decoder_specific_info_len;
-                                p_new_es->p_bitmapinfoheader = (void*)p_bih = malloc( i_size );
-                                p_bih->biSize = i_size;
-                                p_bih->biWidth = 0;
-                                p_bih->biHeight = 0;
-                                p_bih->biPlanes = 1;
-                                p_bih->biBitCount = 0;
-                                p_bih->biCompression = 0;
-                                p_bih->biSizeImage = 0;
-                                p_bih->biXPelsPerMeter = 0;
-                                p_bih->biYPelsPerMeter = 0;
-                                p_bih->biClrUsed = 0;
-                                p_bih->biClrImportant = 0;
-                                memcpy( &p_bih[1],
-                                        p_es_demux->p_es_descr->dec_descr.p_decoder_specific_info,
-                                        p_es_demux->p_es_descr->dec_descr.i_decoder_specific_info_len );
-                            }
+                        }
+                        break;
+                    case 0x05:  /* AudioStream */
+                        i_cat = AUDIO_ES;
+                        switch( DESCR.i_objectTypeIndication )
+                        {
+                        case 0x40:
+                            i_fourcc = VLC_FOURCC('m','p','4','a');    // mpeg4
                             break;
-                        case AUDIO_ES:
-                            {
-                                int i_size;
-                                WAVEFORMATEX *p_wf;
-
-                                i_size = sizeof( WAVEFORMATEX ) +
-                                                 p_es_demux->p_es_descr->dec_descr.i_decoder_specific_info_len;
-                                p_new_es->p_waveformatex = (void*)p_wf = malloc( i_size );
-                                p_wf->wFormatTag = 0xffff;
-                                p_wf->nChannels = 0;
-                                p_wf->nSamplesPerSec = 0;
-                                p_wf->nAvgBytesPerSec = 0;
-                                p_wf->nBlockAlign = 1;
-                                p_wf->wBitsPerSample = 0;
-                                p_wf->cbSize = p_es_demux->p_es_descr->dec_descr.i_decoder_specific_info_len;
-                                memcpy( &p_wf[1],
-                                        p_es_demux->p_es_descr->dec_descr.p_decoder_specific_info,
-                                        p_es_demux->p_es_descr->dec_descr.i_decoder_specific_info_len );
-                            }
+                        case 0x66:
+                        case 0x67:
+                        case 0x68:
+                            i_fourcc = VLC_FOURCC('m','p','4','a');// mpeg2 aac
+                            break;
+                        case 0x69:
+                            i_fourcc = VLC_FOURCC('m','p','g','a');    // mpeg2
+                            break;
+                        case 0x6b:
+                            i_fourcc = VLC_FOURCC('m','p','g','a');    // mpeg1
                             break;
                         default:
+                            i_fourcc = 0;
                             break;
+                        }
+                        break;
+                    default:
+                        i_cat = UNKNOWN_ES;
+                        i_fourcc = 0;
+                        break;
+                    }
+
+                    switch( i_cat )
+                    {
+                    case VIDEO_ES:
+                        i_size = sizeof( BITMAPINFOHEADER ) +
+                                 DESCR.i_decoder_specific_info_len;
+                        p_bih = malloc( i_size );
+                        p_bih->biSize = i_size;
+                        p_bih->biWidth = 0;
+                        p_bih->biHeight = 0;
+                        p_bih->biPlanes = 1;
+                        p_bih->biBitCount = 0;
+                        p_bih->biCompression = 0;
+                        p_bih->biSizeImage = 0;
+                        p_bih->biXPelsPerMeter = 0;
+                        p_bih->biYPelsPerMeter = 0;
+                        p_bih->biClrUsed = 0;
+                        p_bih->biClrImportant = 0;
+                        memcpy( &p_bih[1],
+                                DESCR.p_decoder_specific_info,
+                                DESCR.i_decoder_specific_info_len );
+                        break;
+                    case AUDIO_ES:
+                        i_size = sizeof( WAVEFORMATEX ) +
+                                 DESCR.i_decoder_specific_info_len;
+                        p_wf = malloc( i_size );
+                        p_wf->wFormatTag = 0xffff;
+                        p_wf->nChannels = 0;
+                        p_wf->nSamplesPerSec = 0;
+                        p_wf->nAvgBytesPerSec = 0;
+                        p_wf->nBlockAlign = 1;
+                        p_wf->wBitsPerSample = 0;
+                        p_wf->cbSize = DESCR.i_decoder_specific_info_len;
+                        memcpy( &p_wf[1],
+                                DESCR.p_decoder_specific_info,
+                                DESCR.i_decoder_specific_info_len );
+                        break;
+                    default:
+                        break;
                     }
                 }
                 else
                 {
-                    msg_Warn( p_input, "mpeg4 stream without (valid) sl_descriptor" );
-                    p_es_demux->b_mpeg4 = 0;
+                    msg_Warn( p_input,
+                              "mpeg4 stream without (valid) sl_descriptor" );
+                    demux_data.b_mpeg4 = 0;
                 }
 
             }
@@ -1541,24 +1526,20 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
             {
                 /* crapy ms codec stream, search private descriptor */
                 dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;
-                es_ts_data_t        *p_es_demux =
-                                        (es_ts_data_t*)p_new_es->p_demux_data;
 
-                while( p_dr && ( p_dr->i_tag != 0xa0 ) )
-                    p_dr = p_dr->p_next;
+                while( p_dr && ( p_dr->i_tag != 0xa0 ) ) p_dr = p_dr->p_next;
+
                 if( p_dr && p_dr->i_length >= 8 )
                 {
-                    int i_size;
                     int i_bih_size;
-                    BITMAPINFOHEADER *p_bih;
+                    i_fourcc = (p_dr->p_data[0] << 24) |
+                        (p_dr->p_data[1] << 16) | (p_dr->p_data[2] <<  8) |
+                        p_dr->p_data[3];
 
-                    p_new_es->i_fourcc = ( p_dr->p_data[0] << 24 )| ( p_dr->p_data[1] << 16 )|
-                                         ( p_dr->p_data[2] <<  8 )| ( p_dr->p_data[3] );
-
-                    i_bih_size = ( ( p_dr->p_data[8] << 8)|( p_dr->p_data[9] ) );
+                    i_bih_size = (p_dr->p_data[8] << 8) | p_dr->p_data[9];
                     i_size = sizeof( BITMAPINFOHEADER ) + i_bih_size;
 
-                    p_new_es->p_bitmapinfoheader = (void*)p_bih = malloc( i_size );
+                    p_bih = malloc( i_size );
                     p_bih->biSize = i_size;
                     p_bih->biWidth = ( p_dr->p_data[4] << 8 )|p_dr->p_data[5];
                     p_bih->biHeight = ( p_dr->p_data[6] << 8 )|p_dr->p_data[7];
@@ -1570,24 +1551,22 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     p_bih->biYPelsPerMeter = 0;
                     p_bih->biClrUsed = 0;
                     p_bih->biClrImportant = 0;
-                    memcpy( &p_bih[1],
-                            &p_dr->p_data[10],
-                            i_bih_size );
+                    memcpy( &p_bih[1], &p_dr->p_data[10], i_bih_size );
                 }
                 else
                 {
-                    msg_Warn( p_input, "private ms-codec stream without bih private sl_descriptor" );
-                    p_new_es->i_fourcc = 0;
-                    p_new_es->i_cat = UNKNOWN_ES;
+                    msg_Warn( p_input, "private ms-codec stream without bih "
+                              "private sl_descriptor" );
+                    i_fourcc = 0;
+                    i_cat = UNKNOWN_ES;
                 }
             }
 
-            if(    ( p_new_es->i_cat == AUDIO_ES )
-                || (p_new_es->i_cat == SPU_ES ) )
+            if( i_cat == AUDIO_ES || i_cat == SPU_ES )
             {
                 dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;
-                while( p_dr && ( p_dr->i_tag != 0x0a ) )
-                    p_dr = p_dr->p_next;
+                while( p_dr && ( p_dr->i_tag != 0x0a ) ) p_dr = p_dr->p_next;
+
                 if( p_dr )
                 {
                     dvbpsi_iso639_dr_t *p_decoded =
@@ -1596,19 +1575,19 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     {
                         const iso639_lang_t * p_iso;
                         p_iso = GetLang_2T((char*)p_decoded->i_iso_639_code);
-                        if(p_iso)
+
+                        if( p_iso )
                         {
-                            if(p_iso->psz_native_name[0])
-                                strcpy( p_new_es->psz_desc,
-                                        p_iso->psz_native_name );
+                            if( p_iso->psz_native_name[0] )
+                                strncpy( psz_desc,
+                                         p_iso->psz_native_name, 20 );
                             else
-                                strcpy( p_new_es->psz_desc,
-                                        p_iso->psz_eng_name );
+                                strncpy( psz_desc,
+                                         p_iso->psz_eng_name, 20 );
                         }
                         else
                         {
-                            strncpy( p_new_es->psz_desc,
-                                     p_decoded->i_iso_639_code, 3 );
+                            strncpy( psz_desc, p_decoded->i_iso_639_code, 3 );
                         }
                     }
                 }
@@ -1616,22 +1595,41 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                 {
                     case MPEG1_AUDIO_ES:
                     case MPEG2_AUDIO_ES:
-                        strcat( p_new_es->psz_desc, " (mpeg)" );
+                        strcat( psz_desc, " (mpeg)" );
                         break;
                     case LPCM_AUDIO_ES:
                     case LPCMB_AUDIO_ES:
-                        strcat( p_new_es->psz_desc, " (lpcm)" );
+                        strcat( psz_desc, " (lpcm)" );
                         break;
                     case A52_AUDIO_ES:
                     case A52DVB_AUDIO_ES:
                     case A52B_AUDIO_ES:
-                        strcat( p_new_es->psz_desc, " (A52)" );
+                        strcat( psz_desc, " (A52)" );
                         break;
                     case MPEG4_AUDIO_ES:
-                        strcat( p_new_es->psz_desc, " (aac)" );
+                        strcat( psz_desc, " (aac)" );
                         break;
                 }
             }
+
+            /* Add this ES */
+            p_new_es = input_AddES( p_input, p_pgrm, (u16)p_es->i_pid,
+                                    i_cat, psz_desc, sizeof( es_ts_data_t ) );
+            if( p_new_es == NULL )
+            {
+                msg_Err( p_input, "could not add ES %d", p_es->i_pid );
+                p_input->b_error = 1;
+                return;
+            }
+            p_new_es->i_fourcc = i_fourcc;
+            p_new_es->i_stream_id = i_stream_id;
+            p_new_es->p_bitmapinfoheader = (void*)p_bih;
+            p_new_es->p_waveformatex = (void*)p_wf;
+            memcpy( p_new_es->p_demux_data, &demux_data,
+                    sizeof(es_ts_data_t) );
+
+            ((es_ts_data_t *)p_new_es->p_demux_data)->i_continuity_counter =
+                0xFF;
 
             p_es = p_es->p_next;
         }
