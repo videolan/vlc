@@ -1,3 +1,4 @@
+# translation of de.po to German
 # German translation for VLC.
 # Copyright (C) 1999-2004 VideoLAN <videolan@videolan.org>
 #
@@ -9,9 +10,9 @@ msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-04-27 20:37+0200\n"
-"PO-Revision-Date: 2004-05-01 17:59+0200\n"
+"PO-Revision-Date: 2004-05-02 14:30+0200\n"
 "Last-Translator: Felix Kühne <fk@aenneburghardt.de>\n"
-"Language-Team: \n"
+"Language-Team: German\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -131,7 +132,7 @@ msgstr ""
 
 #: include/vlc_help.h:84
 msgid "Stream output access modules settings"
-msgstr "Streamingausgabe-Zugriffsmodul-Einstellungen"
+msgstr "Streamausgabe-Zugriffsmodul-Einstellungen"
 
 #: include/vlc_help.h:86
 msgid ""
@@ -139,7 +140,7 @@ msgid ""
 "access module."
 msgstr ""
 "In dieser Sektion können Sie den Zwischenspeicherwert für das UDP-"
-"Streamingausgabe-Zugriffsmodul festlegen."
+"Streamausgabe-Zugriffsmodul festlegen."
 
 #: include/vlc_help.h:89
 msgid "Subtitle demuxer settings"
@@ -908,8 +909,8 @@ msgid ""
 "This option allows you to select the audio output method used by VLC. The "
 "default behavior is to automatically select the best method available."
 msgstr ""
-"Diese Option erlaubt Ihnen den Tonausgabe-Modus festzulegen.gBeachten Sie: "
-"standardmäßig wird die beste Methode ausgewählt."
+"Diese Option erlaubt Ihnen die von VLC benutzte Tonausgabemethode festzulegen. "
+"Das standardmäßige Verhalten ist, die beste verfügbare Methode zu wählen."
 
 #: src/libvlc.h:112 modules/stream_out/display.c:37
 msgid "Enable audio"
@@ -1059,8 +1060,8 @@ msgid ""
 "This option allows you to select the video output method used by VLC. The "
 "default behavior is to automatically select the best method available."
 msgstr ""
-"Diese Option erlaubt Ihnen den Standard-Videoausgabemodus festzulegen. "
-"Beachten Sie: standardmäßig wird die beste Methode ausgewählt."
+"Diese Option erlaubt Ihnen die von VLC benutzte Bildausgabemethode festzulegen. "
+"Das standardmäßige Verhalten ist, die beste verfügbare Methode zu wählen."
 
 #: src/libvlc.h:183 modules/stream_out/display.c:39
 msgid "Enable video"
@@ -1085,7 +1086,7 @@ msgid ""
 "video characteristics."
 msgstr ""
 "Sie können hier die Bildbreite festlegen. Standardmäßig (-1) wird VLC die "
-"Eigenschaften des Films übernehmen"
+"Eigenschaften des Films übernehmen."
 
 #: src/libvlc.h:193 modules/stream_out/transcode.c:72
 #: modules/visualization/visual/visual.c:47
@@ -1097,7 +1098,7 @@ msgid ""
 "You can enforce the video height here. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"Sie können hier die Bildbreite festlegen. Standardmäßig (-1) wird VLC die "
+"Sie können hier die Bildhöhe festlegen. Standardmäßig (-1) wird VLC die "
 "Filmeigenschaften übernehmen."
 
 #: src/libvlc.h:198
@@ -1130,7 +1131,7 @@ msgstr "Bild-Titel"
 
 #: src/libvlc.h:210
 msgid "You can specify a custom video window title here."
-msgstr "Sie können hier einen eigenen Titel des Bildausgabefensters bestimmen."
+msgstr "Sie können hier einen eigenen Titel des Bildausgabefensters festlegen."
 
 #: src/libvlc.h:212
 msgid "Video alignment"
@@ -1191,8 +1192,8 @@ msgid ""
 "When enabled, the color information from the video won't be decoded (this "
 "can also allow you to save some processing power)."
 msgstr ""
-"Dies wird die Farbdekodierung komplett deaktivieren, dadurch kann "
-"Prozessorzeit gespart werden."
+"Wenn aktiviert, werden die Farbinformationen des Videos nicht dekodiert "
+"(dies erlaubt Ihnen, etwas Prozessorzeit zu sparen)."
 
 #: src/libvlc.h:231
 msgid "Fullscreen video output"
@@ -1340,15 +1341,15 @@ msgstr ""
 
 #: src/libvlc.h:295 modules/stream_out/rtp.c:57
 msgid "Time to live"
-msgstr "time to live"
+msgstr "Time To Live"
 
 #: src/libvlc.h:297
 msgid ""
 "Indicate here the Time To Live of the multicast packets sent by the stream "
 "output."
 msgstr ""
-"Geben Sie hier die 'Time To Live' der Multicast-Packets ein, die von der "
-"Streamingausgabe gesendet werden."
+"Geben Sie hier die \"Time To Live\" der Multicast-Pakete ein, die von der "
+"Streamausgabe gesendet werden."
 
 #: src/libvlc.h:300
 msgid "Choose program (SID)"
@@ -1475,7 +1476,7 @@ msgstr ""
 
 #: src/libvlc.h:358
 msgid "DVD device"
-msgstr "DVD-Gerät"
+msgstr "DVD-Device"
 
 #: src/libvlc.h:361
 msgid ""
@@ -1487,11 +1488,11 @@ msgstr ""
 
 #: src/libvlc.h:365
 msgid "This is the default DVD device to use."
-msgstr "Dies ist der Standard-DVD-Anschluss."
+msgstr "Dies ist standardmäßig benutzte DVD-Device."
 
 #: src/libvlc.h:368
 msgid "VCD device"
-msgstr "VCD-Gerät"
+msgstr "VCD-Device"
 
 #: src/libvlc.h:371
 msgid ""
@@ -1503,7 +1504,7 @@ msgstr ""
 
 #: src/libvlc.h:375
 msgid "This is the default VCD device to use."
-msgstr "Dies ist der Standard-VCD-Anschluss."
+msgstr "Dies ist standardmäßig benutzte VCD-Device."
 
 #: src/libvlc.h:378
 msgid "Audio CD device"
@@ -1651,16 +1652,16 @@ msgid ""
 "These options allow you to set default global options for the stream output "
 "subsystem."
 msgstr ""
-"Diese Optionen erlauben Ihnen globale Einstellungen für das Streamingausgabe-"
+"Diese Optionen erlauben Ihnen globale Einstellungen für das Streamausgabe-"
 "Untersystem festzulegen."
 
 #: src/libvlc.h:450
 msgid "Choose a stream output"
-msgstr "Wählen Sie eine Streamingausgabe"
+msgstr "Wählen Sie eine Streamausgabe"
 
 #: src/libvlc.h:452
 msgid "Empty if no stream output."
-msgstr "Leer, falls kein Streamingausgabeort verfügbar."
+msgstr "Leer, falls kein Streamausgabeort verfügbar."
 
 #: src/libvlc.h:454
 msgid "Enable streaming of all ES"
@@ -1696,7 +1697,7 @@ msgstr "Tonausgabe des Streams aktivieren"
 
 #: src/libvlc.h:472
 msgid "Keep stream output open"
-msgstr "Streamingausgabe offen lassen"
+msgstr "Streamausgabe offen lassen"
 
 #: src/libvlc.h:474
 msgid ""
@@ -1704,9 +1705,9 @@ msgid ""
 "playlist item (automatically insert the gather stream output if not "
 "specified)"
 msgstr ""
-"Dies erlaubt Ihnen eine einzige Streamingausgabeinstanz über mehrere "
+"Dies erlaubt Ihnen eine einzige Streamausgabeinstanz über mehrere "
 "Wiedergabelistenobjekte hinweg beizubehalten (automatisch wird die"
-"'gather'-Streamingausgabe benutzt, wenn nichts angeben wird)."
+"'gather'-Streamausgabe benutzt, wenn nichts angeben wird)."
 
 #: src/libvlc.h:478
 msgid "Preferred packetizer list"
@@ -2430,7 +2431,7 @@ msgstr "Dekoder"
 #: modules/gui/gtk/gtk_interface.c:3046 modules/gui/wxwindows/open.cpp:403
 #: modules/gui/wxwindows/streamout.cpp:148
 msgid "Stream output"
-msgstr "Streamingausgabe"
+msgstr "Streamausgabe"
 
 #: src/libvlc.h:930
 msgid "CPU"
@@ -4236,7 +4237,7 @@ msgstr "Format zur Benutzung im Wiedergabelistenfeld \"Titel\""
 
 #: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
 msgid "Dummy stream output"
-msgstr "Dummy-Streamingausgabe"
+msgstr "Dummy-Streamausgabe"
 
 #: modules/access_output/file.c:62
 msgid "Append to file"
@@ -4248,7 +4249,7 @@ msgstr "An Datei anhängen, wenn sie existiert, anstatt sie zu ersetzen."
 
 #: modules/access_output/file.c:67
 msgid "File stream output"
-msgstr "Datei-Streamingausgabe"
+msgstr "Datei-Streamausgabe"
 
 #: modules/access_output/http.c:46
 msgid "Username"
@@ -4272,7 +4273,7 @@ msgstr ""
 
 #: modules/access_output/http.c:55
 msgid "HTTP stream output"
-msgstr "HTTP-Streamingausgabe"
+msgstr "HTTP-Streamausgabe"
 
 #: modules/access_output/udp.c:63 modules/demux/livedotcom.cpp:53
 msgid "Caching value (ms)"
@@ -4329,7 +4330,7 @@ msgstr ""
 
 #: modules/access_output/udp.c:89
 msgid "UDP stream output"
-msgstr "UDP-Streamingausgabe"
+msgstr "UDP-Streamausgabe"
 
 #: modules/audio_filter/channel_mixer/headphone.c:49
 msgid ""
@@ -5618,7 +5619,7 @@ msgstr "+----[ Remote-Control-Befehle ]\n"
 #: modules/control/rc.c:455
 #, c-format
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist\n"
-msgstr "| add XYZ  . . . . . . . . . XYZ der Wiedergabeliste hinzufügen\n"
+msgstr "| add XYZ  . . . . . . . . .  XYZ der Wiedergabeliste hinzufügen\n"
 
 #: modules/control/rc.c:456
 #, c-format
@@ -5678,7 +5679,7 @@ msgstr "| chapter_p  . . . . . .  vorheriges Kapitel im aktuellen Objekt\n"
 #: modules/control/rc.c:468
 #, c-format
 msgid "| seek X . seek in seconds, for instance `seek 12'\n"
-msgstr "| seek X . Suchen in Sekunden, beispielsweise `seek 12'\n"
+msgstr "| seek X . . . . .  Suchen in Sekunden, beispielsweise `seek 12'\n"
 
 #: modules/control/rc.c:469
 #, c-format
@@ -7204,7 +7205,7 @@ msgstr "fps"
 
 #: modules/gui/gtk/gnome_interface.c:2051
 msgid "stream output"
-msgstr "Streamingausgabe"
+msgstr "Streamausgabe"
 
 #: modules/gui/gtk/gnome_interface.c:2058 modules/gui/gtk/gtk_interface.c:2378
 #: modules/gui/macosx/open.m:172 modules/gui/macosx/output.m:127
@@ -7263,7 +7264,7 @@ msgstr "Spring zu:"
 
 #: modules/gui/gtk/gnome_interface.c:2808
 msgid "stream output (MRL)"
-msgstr "Streamingausgabe (MRL)"
+msgstr "Streamausgabe (MRL)"
 
 #: modules/gui/gtk/gnome_interface.c:2823 modules/gui/gtk/gtk_interface.c:3078
 msgid "Destination Target: "
@@ -7461,11 +7462,11 @@ msgstr "Die Anzahl von Bildern/Frames pro Sekunde"
 
 #: modules/gui/gtk/gtk_interface.c:2376
 msgid "Use stream output"
-msgstr "Streamingausgabe benutzen"
+msgstr "Streamausgabe benutzen"
 
 #: modules/gui/gtk/gtk_interface.c:2384
 msgid "Stream output configuration "
-msgstr "Streamingausgaben-Einstellungen"
+msgstr "Streamausgaben-Einstellungen"
 
 #: modules/gui/gtk/gtk_interface.c:2530
 msgid "Select File"
@@ -7509,7 +7510,7 @@ msgstr "_Auswählen"
 
 #: modules/gui/gtk/gtk_interface.c:3063
 msgid "Stream output (MRL)"
-msgstr "Streamingausgabe (MRL)"
+msgstr "Streamausgabe (MRL)"
 
 #: modules/gui/gtk/gtk_support.c:130
 #, c-format
@@ -9191,7 +9192,7 @@ msgstr "Datei wählen"
 
 #: modules/gui/wxwindows/streamout.cpp:163
 msgid "Stream output MRL"
-msgstr "Streamingausgabe-MRL"
+msgstr "Streamausgabe MRL"
 
 #: modules/gui/wxwindows/streamout.cpp:167
 msgid "Destination Target:"
@@ -9811,11 +9812,11 @@ msgstr "Führt eine Verzögerung in der Darstellung des Streams ein."
 
 #: modules/stream_out/display.c:50
 msgid "Display stream output"
-msgstr "Streamingausgabe anzeigen"
+msgstr "Streamausgabe anzeigen"
 
 #: modules/stream_out/duplicate.c:40
 msgid "Duplicate stream output"
-msgstr "Streamingausgabe duplizieren"
+msgstr "Streamausgabe duplizieren"
 
 #: modules/stream_out/es.c:37 modules/stream_out/standard.c:40
 msgid "Output access method"
@@ -9902,11 +9903,11 @@ msgstr "Erlaubt Ihnen die Ausgabe-URL für die Bildstreamingausgabe festzulegen."
 
 #: modules/stream_out/es.c:78
 msgid "Elementary stream output"
-msgstr "Elementare Streamingausgabe"
+msgstr "Elementare Streamausgabe"
 
 #: modules/stream_out/gather.c:40
 msgid "Gathering stream output"
-msgstr "Streamingausgabeerfassung"
+msgstr "Streamausgabeerfassung"
 
 #: modules/stream_out/rtp.c:39
 msgid "Destination"
@@ -9944,11 +9945,11 @@ msgstr "Erlaubt Ihnen den Basisport für RTP-Streaming festzulegen."
 
 #: modules/stream_out/rtp.c:59
 msgid "Allows you to specify the time to live for the output stream."
-msgstr "Erlaubt Ihnen die Time-To-Live für die Streamingausgabe festzulegen."
+msgstr "Erlaubt Ihnen die Time-To-Live für die Streamausgabe festzulegen."
 
 #: modules/stream_out/rtp.c:67
 msgid "RTP stream output"
-msgstr "RTP-Streamingausgabe"
+msgstr "RTP-Streamausgabe"
 
 #: modules/stream_out/standard.c:46
 msgid "Allows you to specify the output muxer method used for the streaming output."
@@ -9984,7 +9985,7 @@ msgstr "Diese Session mit SLP ankündigen"
 
 #: modules/stream_out/standard.c:71
 msgid "Standard stream output"
-msgstr "Standard-Streamingausgabe"
+msgstr "Standard-Streamausgabe"
 
 #: modules/stream_out/transcode.c:51
 msgid "Video encoder"
@@ -10122,11 +10123,11 @@ msgstr "Erlaubt Ihnen die Anzahl von Threads festzulegen, die für das Umkodieren
 
 #: modules/stream_out/transcode.c:120
 msgid "Transcode stream output"
-msgstr "Streamingausgabe umkodieren"
+msgstr "Streamausgabe umkodieren"
 
 #: modules/stream_out/transrate/transrate.c:56
 msgid "MPEG2 video transrating stream output"
-msgstr "MPEG2-BildabtastratenumsetzungsStreamingausgabe"
+msgstr "MPEG2-Bildtransratenstreamausgabe"
 
 #: modules/video_chroma/i420_rgb.c:67
 msgid "I420,IYUV,YV12 to RGB2,RV15,RV16,RV24,RV32 conversions"
