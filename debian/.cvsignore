@@ -1,6 +1,7 @@
 tmp
 vlc
 vlc-*
+libdvdcss*
 delete
 files
 *debhelper

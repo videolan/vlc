@@ -15,6 +15,10 @@ export VIDDIR="usr/share/videolan"
 export PIXDIR="usr/share/pixmaps"
 export GNOMEDIR="usr/share/gnome/apps/Multimedia"
 
+# Library options
+version=0.0.2
+major=0
+
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -82,13 +86,13 @@ install: build
 
 # libdvdcss start
 	mv debian/vlc/usr/include/videolan/dvdcss.h \
-				debian/libdvdcss0.0.2-dev/usr/include/videolan
+				debian/libdvdcss$(version)-dev/usr/include/videolan
 	rmdir debian/vlc/usr/include/videolan
 	rmdir debian/vlc/usr/include
-	mv debian/vlc/usr/lib/*.a debian/libdvdcss0.0.2-dev/usr/lib
-	mv debian/vlc/usr/lib/*.so debian/libdvdcss0.0.2-dev/usr/lib
-	mv debian/vlc/usr/lib/*.so.* debian/libdvdcss0.0.2/usr/lib
-	ln -s libdvdcss0.0.2 debian/libdvdcss0.0.2-dev/usr/share/doc/libdvdcss0.0.2-dev
+	mv debian/vlc/usr/lib/*.a debian/libdvdcss$(version)-dev/usr/lib
+	mv debian/vlc/usr/lib/*.so debian/libdvdcss$(version)-dev/usr/lib
+	mv debian/vlc/usr/lib/*.so.* debian/libdvdcss$(version)/usr/lib
+	ln -s libdvdcss$(version) debian/libdvdcss$(version)-dev/usr/share/doc/libdvdcss$(version)-dev
 # libdvdcss stop
 
 # Build architecture-independent files here.
@@ -117,7 +121,7 @@ binary-arch: build install
 	dh_strip
 	dh_compress
 	dh_fixperms
-#	dh_makeshlibs
+	dh_makeshlibs
 	dh_installdeb
 #	dh_perl
 	dh_shlibdeps -Nvlc-glide
