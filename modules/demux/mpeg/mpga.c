@@ -2,7 +2,7 @@
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpga.c,v 1.9 2003/11/16 22:54:12 gbazin Exp $
+ * $Id: mpga.c,v 1.10 2003/11/21 16:07:20 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -342,7 +342,7 @@ error:
 static int Demux( input_thread_t * p_input )
 {
     demux_sys_t  *p_sys = p_input->p_demux_data;
-    pes_packet_t *p_pes;
+    block_t      *p_frame;
 
     uint32_t     header;
     uint8_t      *p_peek;
@@ -389,19 +389,19 @@ static int Demux( input_thread_t * p_input )
                           p_input->stream.p_selected_program,
                           p_sys->i_time * 9 / 100 );
 
-    if( ( p_pes = stream_PesPacket( p_input->s, mpga_frame_size( header ) ) )
-                                                                      == NULL )
+    if( ( p_frame = stream_Block( p_input->s, mpga_frame_size( header ) ) ) == NULL )
     {
         msg_Warn( p_input, "cannot read data" );
         return 0;
     }
 
-    p_pes->i_dts =
-    p_pes->i_pts = input_ClockGetTS( p_input,
-                                     p_input->stream.p_selected_program,
-                                     p_sys->i_time * 9 / 100 );
+    p_frame->i_dts =
+    p_frame->i_pts =
+        input_ClockGetTS( p_input,
+                          p_input->stream.p_selected_program,
+                          p_sys->i_time * 9 / 100 );
 
-    es_out_Send( p_input->p_es_out, p_sys->p_es, p_pes );
+    es_out_Send( p_input->p_es_out, p_sys->p_es, p_frame );
 
     p_sys->i_time += (mtime_t)1000000 *
                      (mtime_t)mpga_frame_samples( header ) /
