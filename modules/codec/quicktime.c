@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.11 2003/08/17 23:02:51 fenrir Exp $
+ * $Id: quicktime.c,v 1.12 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -273,9 +273,9 @@ static int GetPESData( uint8_t *p_buf, int i_max, pes_packet_t *p_pes )
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    switch( p_fifo->i_fourcc )
+    switch( p_dec->p_fifo->i_fourcc )
     {
         case VLC_FOURCC('S','V','Q','3'): /* Sorenson v3 */
     /*    case VLC_FOURCC('S','V','Q','1'):  Sorenson v1 
@@ -285,7 +285,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('r','l','e',' '): /* QuickTime animation (RLE) */
         case VLC_FOURCC('r','p','z','a'): /* QuickTime Apple Video */
         case VLC_FOURCC('a','z','p','r'): /* QuickTime animation (RLE) */
-            p_fifo->pf_run = RunDecoderVideo;
+            p_dec->pf_run = RunDecoderVideo;
             return VLC_SUCCESS;
 
         case VLC_FOURCC('m','p','4','a'): /* MPEG-4 audio */
@@ -309,7 +309,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         case 0x6D730002:                        /* Microsoft ADPCM-ACM */
         case 0x6D730011:                        /* DVI Intel IMAADPCM-ACM */
 
-            p_fifo->pf_run = RunDecoderAudio;
+            p_dec->pf_run = RunDecoderAudio;
             return VLC_SUCCESS;
         default:
             return VLC_EGENERIC;

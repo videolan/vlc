@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.29 2003/08/24 23:22:02 gbazin Exp $
+ * $Id: decoder.c,v 1.30 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -65,14 +65,14 @@ vlc_module_end();
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( p_fifo->i_fourcc != VLC_FOURCC('m','p','4','a') )
+    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('m','p','4','a') )
     {
         return VLC_EGENERIC;
     }
 
-    p_fifo->pf_run = RunDecoder;
+    p_dec->pf_run = RunDecoder;
     return VLC_SUCCESS;
 }
 
@@ -480,4 +480,3 @@ static void EndThread (adec_thread_t *p_adec)
 
     free( p_adec );
 }
-

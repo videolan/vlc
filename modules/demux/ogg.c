@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.31 2003/08/17 23:02:52 fenrir Exp $
+ * $Id: ogg.c,v 1.32 2003/09/02 20:19:26 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -601,7 +601,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                         i_keyframe_frequency_force >>= 1;
                     }
 
-                    p_stream->f_rate = (float)i_fps_numerator /
+                    p_stream->f_rate = ((float)i_fps_numerator) /
                                                 i_fps_denominator;
                     msg_Dbg( p_input,
                              "found theora header, bitrate: %i, rate: %f",

@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.18 2003/08/11 18:52:41 gbazin Exp $
+ * $Id: mpegvideo.c,v 1.19 2003/09/02 20:19:26 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -98,16 +98,16 @@ vlc_module_end();
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( p_fifo->i_fourcc != VLC_FOURCC( 'm', 'p', 'g', 'v') &&
-        p_fifo->i_fourcc != VLC_FOURCC( 'm', 'p', 'g', '1') &&
-        p_fifo->i_fourcc != VLC_FOURCC( 'm', 'p', 'g', '2') )
+    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC( 'm', 'p', 'g', 'v') &&
+        p_dec->p_fifo->i_fourcc != VLC_FOURCC( 'm', 'p', 'g', '1') &&
+        p_dec->p_fifo->i_fourcc != VLC_FOURCC( 'm', 'p', 'g', '2') )
     {
         return VLC_EGENERIC;
     }
 
-    p_fifo->pf_run = Run;
+    p_dec->pf_run = Run;
     return VLC_SUCCESS;
 }
 

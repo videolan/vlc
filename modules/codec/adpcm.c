@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.12 2003/08/17 23:02:51 fenrir Exp $
+ * $Id: adpcm.c,v 1.13 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -151,9 +151,9 @@ static int i_adaptation_coeff2[7] =
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    switch( p_fifo->i_fourcc )
+    switch( p_dec->p_fifo->i_fourcc )
     {
         case VLC_FOURCC('i','m','a', '4'): /* IMA ADPCM */
         case VLC_FOURCC('m','s',0x00,0x02): /* MS ADPCM */
@@ -161,13 +161,12 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('m','s',0x00,0x61): /* Duck DK4 ADPCM */
         case VLC_FOURCC('m','s',0x00,0x62): /* Duck DK3 ADPCM */
 
-            p_fifo->pf_run = RunDecoder;
+            p_dec->pf_run = RunDecoder;
             return VLC_SUCCESS;
 
         default:
             return VLC_EGENERIC;
     }
-
 }
 
 /*****************************************************************************
@@ -874,5 +873,3 @@ static void DecodeAdpcmDk3( adec_thread_t *p_adec,
     }
 
 }
-
-

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.75 2003/08/23 22:49:50 fenrir Exp $
+ * $Id: vlc_common.h,v 1.76 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -268,6 +268,8 @@ typedef struct slp_session_t    slp_session_t;*/
 
 /* Decoders */
 typedef struct decoder_fifo_t decoder_fifo_t;
+typedef struct decoder_t      decoder_t;
+typedef struct decoder_sys_t  decoder_sys_t;
 
 /* Misc */
 typedef struct data_packet_t data_packet_t;

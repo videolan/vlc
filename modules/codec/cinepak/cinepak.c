@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.11 2003/08/17 23:02:51 fenrir Exp $
+ * $Id: cinepak.c,v 1.12 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -70,13 +70,13 @@ vlc_module_end();
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
     
-    switch( p_fifo->i_fourcc )
+    switch( p_dec->p_fifo->i_fourcc )
     {
         case VLC_FOURCC('c','v','i','d'):
         case VLC_FOURCC('C','V','I','D'):
-            p_fifo->pf_run = RunDecoder;
+            p_dec->pf_run = RunDecoder;
             return VLC_SUCCESS;
     }
 
@@ -834,5 +834,3 @@ static void EndThread( videodec_thread_t *p_vdec )
 
     free( p_vdec );
 }
-
-

@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.16 2003/06/25 00:40:41 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.17 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -94,14 +94,14 @@ vlc_module_end();
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( p_fifo->i_fourcc != VLC_FOURCC( 'm', 'p', 'g', 'a') )
+    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC( 'm', 'p', 'g', 'a') )
     {
         return VLC_EGENERIC;
     }
 
-    p_fifo->pf_run = RunDecoder;
+    p_dec->pf_run = RunDecoder;
     return VLC_SUCCESS;
 }
 

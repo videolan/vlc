@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.16 2003/08/17 23:02:51 fenrir Exp $
+ * $Id: araw.c,v 1.17 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -80,9 +80,9 @@ vlc_module_end();
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    switch( p_fifo->i_fourcc )
+    switch( p_dec->p_fifo->i_fourcc )
     {
         case VLC_FOURCC('a','r','a','w'): /* from wav/avi/asf file */
         case VLC_FOURCC('t','w','o','s'): /* _signed_ big endian samples (mov)*/
@@ -90,13 +90,12 @@ static int OpenDecoder( vlc_object_t *p_this )
 
         case VLC_FOURCC('a','l','a','w'):
         case VLC_FOURCC('u','l','a','w'):
-            p_fifo->pf_run = RunDecoder;
+            p_dec->pf_run = RunDecoder;
             return VLC_SUCCESS;
 
         default:
             return VLC_EGENERIC;
     }
-
 }
 
 static int pi_channels_maps[6] =

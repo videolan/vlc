@@ -2,7 +2,7 @@
  * mpegaudio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegaudio.c,v 1.7 2003/08/26 23:12:37 fenrir Exp $
+ * $Id: mpegaudio.c,v 1.8 2003/09/02 20:19:26 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -110,14 +110,14 @@ static int mpegaudio_samplerate[2][4] = /* version 1 then 2 */
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( p_fifo->i_fourcc != VLC_FOURCC( 'm', 'p', 'g', 'a') )
+    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC( 'm', 'p', 'g', 'a') )
     {
         return VLC_EGENERIC;
     }
 
-    p_fifo->pf_run = Run;
+    p_dec->pf_run = Run;
     return VLC_SUCCESS;
 }
 

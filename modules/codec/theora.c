@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.5 2003/06/11 15:53:50 gbazin Exp $
+ * $Id: theora.c,v 1.6 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -24,27 +24,32 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/input.h>
-#include <vlc/decoder.h>
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                    /* memcpy(), memset() */
+
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include <vlc/decoder.h>
+#include <vlc/input.h>
+#include <vlc/sout.h>
+#include <input_ext-dec.h>
 
 #include <ogg/ogg.h>
 
 #include <theora/theora.h>
 
 /*****************************************************************************
- * dec_thread_t : theora decoder thread descriptor
+ * decoder_sys_t : theora decoder descriptor
  *****************************************************************************/
-typedef struct dec_thread_t
+struct decoder_sys_t
 {
+    /* Module mode */
+    vlc_bool_t b_packetizer;
+
     /*
-     * Thread properties
+     * Input properties
      */
-    vlc_thread_t        thread_id;                /* id for thread functions */
+    int i_headers;
 
     /*
      * Theora properties
@@ -54,29 +59,39 @@ typedef struct dec_thread_t
     theora_state     td;                   /* theora bitstream user comments */
 
     /*
-     * Input properties
-     */
-    decoder_fifo_t         *p_fifo;            /* stores the PES stream data */
-    pes_packet_t           *p_pes;            /* current PES we are decoding */
-
-    /*
      * Output properties
      */
     vout_thread_t *p_vout;
 
-} dec_thread_t;
+    /*
+     * Packetizer output properties
+     */
+    sout_packetizer_input_t *p_sout_input;
+    sout_format_t           sout_format;
+
+    /*
+     * Common properties
+     */
+    mtime_t i_pts;
+};
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  OpenDecoder  ( vlc_object_t * );
-static int  RunDecoder   ( decoder_fifo_t * );
-static void CloseDecoder ( dec_thread_t * );
+static int OpenDecoder   ( vlc_object_t * );
+static int OpenPacketizer( vlc_object_t * );
 
-static void DecodePacket ( dec_thread_t * );
-static int  GetOggPacket ( dec_thread_t *, ogg_packet *, mtime_t * );
+static int InitDecoder   ( decoder_t * );
+static int RunDecoder    ( decoder_t *, block_t * );
+static int EndDecoder    ( decoder_t * );
 
-static void theora_CopyPicture( dec_thread_t *, picture_t *, yuv_buffer * );
+static int ProcessPacket ( decoder_t *, ogg_packet *, mtime_t );
+static int DecodePacket  ( decoder_t *, ogg_packet * );
+static int SendPacket    ( decoder_t *, ogg_packet * );
+
+static void ParseTheoraComments( decoder_t * );
+
+static void theora_CopyPicture( decoder_t *, picture_t *, yuv_buffer * );
 
 /*****************************************************************************
  * Module descriptor
@@ -86,6 +101,12 @@ vlc_module_begin();
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, NULL );
     add_shortcut( "theora" );
+
+    add_submodule();
+    set_description( _("Theora video packetizer") );
+    set_capability( "packetizer", 100 );
+    set_callbacks( OpenPacketizer, NULL );
+    add_shortcut( "theora" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -93,224 +114,375 @@ vlc_module_end();
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( p_fifo->i_fourcc != VLC_FOURCC('t','h','e','o') )
+    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('t','h','e','o') )
     {
         return VLC_EGENERIC;
     }
 
-    p_fifo->pf_run = RunDecoder;
+    p_dec->pf_init = InitDecoder;
+    p_dec->pf_decode = RunDecoder;
+    p_dec->pf_end = EndDecoder;
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_dec->p_sys =
+          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    {
+        msg_Err( p_dec, "out of memory" );
+        return VLC_EGENERIC;
+    }
+    p_dec->p_sys->b_packetizer = VLC_FALSE;
+
     return VLC_SUCCESS;
 }
-/*****************************************************************************
- * RunDecoder: the theora decoder
- *****************************************************************************/
-static int RunDecoder( decoder_fifo_t *p_fifo )
+
+static int OpenPacketizer( vlc_object_t *p_this )
 {
-    dec_thread_t *p_dec;
-    ogg_packet oggpacket;
-    int i_chroma, i_aspect;
-    mtime_t i_pts;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    /* Allocate the memory needed to store the thread's structure */
-    if( (p_dec = (dec_thread_t *)malloc (sizeof(dec_thread_t)) )
-            == NULL)
-    {
-        msg_Err( p_fifo, "out of memory" );
-        goto error;
-    }
+    int i_ret = OpenDecoder( p_this );
 
-    /* Initialize the thread properties */
-    memset( p_dec, 0, sizeof(dec_thread_t) );
-    p_dec->p_fifo = p_fifo;
-    p_dec->p_pes  = NULL;
-    p_dec->p_vout = NULL;
+    if( i_ret == VLC_SUCCESS ) p_dec->p_sys->b_packetizer = VLC_TRUE;
+
+    return i_ret;
+}
+
+/*****************************************************************************
+ * InitDecoder: Initalize the decoder
+ *****************************************************************************/
+static int InitDecoder( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    p_sys->i_pts = 0;
+
+    p_sys->p_sout_input = NULL;
+    p_sys->sout_format.i_cat = VIDEO_ES;
+    p_sys->sout_format.i_fourcc = VLC_FOURCC( 't', 'h', 'e', 'o' );
+    p_sys->sout_format.i_width  = 0;
+    p_sys->sout_format.i_height = 0;
+    p_sys->sout_format.i_bitrate     = 0;
+    p_sys->sout_format.i_extra_data  = 0;
+    p_sys->sout_format.p_extra_data  = NULL;
 
     /* Init supporting Theora structures needed in header parsing */
-    theora_comment_init( &p_dec->tc );
-    theora_info_init( &p_dec->ti );
+    theora_comment_init( &p_sys->tc );
+    theora_info_init( &p_sys->ti );
 
-    /* Take care of the initial Theora header */
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
-        goto error;
+    p_sys->i_headers = 0;
 
-    oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
-    if( theora_decode_header( &p_dec->ti, &p_dec->tc, &oggpacket ) < 0 )
+    return VLC_SUCCESS;
+}
+
+/****************************************************************************
+ * RunDecoder: the whole thing
+ ****************************************************************************
+ * This function must be fed with ogg packets.
+ ****************************************************************************/
+static int RunDecoder( decoder_t *p_dec, block_t *p_block )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    ogg_packet oggpacket;
+    int i_ret;
+
+    /* Block to Ogg packet */
+    oggpacket.packet = p_block->p_buffer;
+    oggpacket.bytes = p_block->i_buffer;
+    oggpacket.granulepos = p_block->i_dts;
+    oggpacket.b_o_s = 0;
+    oggpacket.e_o_s = 0;
+    oggpacket.packetno = 0;
+
+    if( p_sys->i_headers == 0 )
     {
-        msg_Err( p_dec->p_fifo, "This bitstream does not contain Theora "
-                 "video data" );
-        goto error;
+        /* Take care of the initial Theora header */
+
+        oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
+        if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
+        {
+            msg_Err( p_dec->p_fifo, "This bitstream does not contain Theora "
+                     "video data" );
+            block_Release( p_block );
+            return VLC_EGENERIC;
+        }
+        p_sys->i_headers++;
+
+ 
+        if( p_sys->b_packetizer )
+        {
+            /* add a input for the stream ouput */
+            p_sys->sout_format.i_width  = p_sys->ti.width;
+            p_sys->sout_format.i_height = p_sys->ti.height;
+
+            p_sys->p_sout_input =
+                sout_InputNew( p_dec, &p_sys->sout_format );
+
+            if( !p_sys->p_sout_input )
+            {
+                msg_Err( p_dec, "cannot add a new stream" );
+                block_Release( p_block );
+                return VLC_EGENERIC;
+            }
+        }
+        else
+        {
+            /* Initialize video output */
+            int i_chroma, i_aspect;
+
+            if( p_sys->ti.aspect_denominator )
+                i_aspect = VOUT_ASPECT_FACTOR * p_sys->ti.aspect_numerator /
+                    p_sys->ti.aspect_denominator;
+            else
+                i_aspect = VOUT_ASPECT_FACTOR *
+                    p_sys->ti.frame_width / p_sys->ti.frame_height;
+
+            i_chroma = VLC_FOURCC('Y','V','1','2');
+
+            p_sys->p_vout =
+                vout_Request( p_dec, NULL,
+                              p_sys->ti.frame_width, p_sys->ti.frame_height,
+                              i_chroma, i_aspect );
+            if( p_sys->p_vout == NULL )
+            {
+                msg_Err( p_dec, "failed to create video output" );
+                block_Release( p_block );
+                return VLC_EGENERIC;
+            }
+        }
+
+        msg_Dbg( p_dec, "%dx%d %.02f fps video, frame content "
+                 "is %dx%d with offset (%d,%d)",
+                 p_sys->ti.width, p_sys->ti.height,
+                 (double)p_sys->ti.fps_numerator/p_sys->ti.fps_denominator,
+                 p_sys->ti.frame_width, p_sys->ti.frame_height,
+                 p_sys->ti.offset_x, p_sys->ti.offset_y );
+
+        if( p_sys->b_packetizer )
+        {
+            i_ret = SendPacket( p_dec, &oggpacket );
+            block_Release( p_block );
+            return i_ret;
+        }
+        else
+        {
+            block_Release( p_block );
+            return VLC_SUCCESS;
+        }
     }
 
-    /* The next two packets in order are the comment and codebook headers.
-       We need to watch out that these packets are not missing as a
-       missing or corrupted header is fatal. */
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
-        goto error;
-
-    if( theora_decode_header( &p_dec->ti, &p_dec->tc, &oggpacket ) < 0 )
+    if( p_sys->i_headers == 1 )
     {
-        msg_Err( p_dec->p_fifo, "2nd Theora header is corrupted" );
-        goto error;
+        /* The next packet in order is the comments header */
+        if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
+        {
+            msg_Err( p_dec, "2nd Theora header is corrupted" );
+            return VLC_EGENERIC;
+        }
+        p_sys->i_headers++;
+    
+        ParseTheoraComments( p_dec );
+
+        if( p_sys->b_packetizer )
+        {
+            i_ret = SendPacket( p_dec, &oggpacket );
+            block_Release( p_block );
+            return i_ret;
+        }
+        else
+        {
+            block_Release( p_block );
+            return VLC_SUCCESS;
+        }
     }
 
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
-        goto error;
-
-    if( theora_decode_header( &p_dec->ti, &p_dec->tc, &oggpacket ) < 0 )
+    if( p_sys->i_headers == 2 )
     {
-        msg_Err( p_dec->p_fifo, "3rd Theora header is corrupted" );
-        goto error;
+        /* The next packet in order is the codebooks header
+           We need to watch out that this packet is not missing as a
+           missing or corrupted header is fatal. */
+        if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
+        {
+            msg_Err( p_dec, "3rd Theora header is corrupted" );
+            return VLC_EGENERIC;
+        }
+        p_sys->i_headers++;
+    
+        if( !p_sys->b_packetizer )
+        {
+            /* We have all the headers, initialize decoder */
+            theora_decode_init( &p_sys->td, &p_sys->ti );
+        }
+
+        if( p_sys->b_packetizer )
+        {
+            i_ret = SendPacket( p_dec, &oggpacket );
+            block_Release( p_block );
+            return i_ret;
+        }
+        else
+        {
+            block_Release( p_block );
+            return VLC_SUCCESS;
+        }
     }
 
-    /* We have all the headers, initialize decoder */
-    theora_decode_init( &p_dec->td, &p_dec->ti );
-    msg_Dbg( p_dec->p_fifo, "%dx%d %.02f fps video, frame content is %dx%d "
-             "with offset (%d,%d)",
-             p_dec->ti.width, p_dec->ti.height,
-             (double)p_dec->ti.fps_numerator/p_dec->ti.fps_denominator,
-             p_dec->ti.frame_width, p_dec->ti.frame_height,
-             p_dec->ti.offset_x, p_dec->ti.offset_y );
+    i_ret = ProcessPacket( p_dec, &oggpacket, p_block->i_pts );
+    block_Release( p_block );
+    return i_ret;
+}
 
-    /* Initialize video output */
-    if( p_dec->ti.aspect_denominator )
-        i_aspect = VOUT_ASPECT_FACTOR * p_dec->ti.aspect_numerator /
-                    p_dec->ti.aspect_denominator;
+/*****************************************************************************
+ * ProcessPacket: processes a Vorbis packet.
+ *****************************************************************************/
+static int ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
+                          mtime_t i_pts )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* Date management */
+    if( i_pts > 0 && i_pts != p_sys->i_pts )
+    {
+        p_sys->i_pts = i_pts;
+    }
+
+    if( p_sys->b_packetizer )
+    {
+        return SendPacket( p_dec, p_oggpacket );
+    }
     else
-        i_aspect = VOUT_ASPECT_FACTOR * p_dec->ti.width / p_dec->ti.height;
-
-    i_chroma = VLC_FOURCC('Y','V','1','2');
-
-    p_dec->p_vout = vout_Request( p_dec->p_fifo, p_dec->p_vout,
-                                  p_dec->ti.width, p_dec->ti.height,
-                                  i_chroma, i_aspect );
-
-    /* theora decoder thread's main loop */
-    while( (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error) )
     {
-        DecodePacket( p_dec );
+        return DecodePacket( p_dec, p_oggpacket );
     }
-
-    /* If b_error is set, the theora decoder thread enters the error loop */
-    if( p_dec->p_fifo->b_error )
-    {
-        DecoderError( p_dec->p_fifo );
-    }
-
-    /* End of the theora decoder thread */
-    CloseDecoder( p_dec );
-
-    return 0;
-
- error:
-    DecoderError( p_fifo );
-    if( p_dec )
-    {
-        if( p_dec->p_fifo )
-            p_dec->p_fifo->b_error = 1;
-
-        /* End of the theora decoder thread */
-        CloseDecoder( p_dec );
-    }
-
-    return -1;
 }
 
 /*****************************************************************************
  * DecodePacket: decodes a Theora packet.
  *****************************************************************************/
-static void DecodePacket( dec_thread_t *p_dec )
+static int DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
-    ogg_packet oggpacket;
     picture_t *p_pic;
-    mtime_t i_pts;
     yuv_buffer yuv;
 
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
-    {
-        /* This should mean an eos */
-        return;
-    }
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    theora_decode_packetin( &p_dec->td, &oggpacket );
+    theora_decode_packetin( &p_sys->td, p_oggpacket );
 
     /* Decode */
-    theora_decode_YUVout( &p_dec->td, &yuv );
+    theora_decode_YUVout( &p_sys->td, &yuv );
 
     /* Get a new picture */
-    while( !(p_pic = vout_CreatePicture( p_dec->p_vout, 0, 0, 0 ) ) )
+    while( !(p_pic = vout_CreatePicture( p_sys->p_vout, 0, 0, 0 ) ) )
     {
         if( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
         {
-            return;
+            return VLC_EGENERIC;
         }
         msleep( VOUT_OUTMEM_SLEEP );
     }
-    if( !p_pic )
-        return;
+    if( !p_pic ) return VLC_EGENERIC;
 
     theora_CopyPicture( p_dec, p_pic, &yuv );
 
-    vout_DatePicture( p_dec->p_vout, p_pic, i_pts );
-    vout_DisplayPicture( p_dec->p_vout, p_pic );
-}
+    vout_DatePicture( p_sys->p_vout, p_pic, p_sys->i_pts );
+    vout_DisplayPicture( p_sys->p_vout, p_pic );
 
-/*****************************************************************************
- * GetOggPacket: get the following theora packet from the stream and send back
- *               the result in an ogg packet (for easy decoding by libtheora).
- *****************************************************************************
- * Returns VLC_EGENERIC in case of eof.
- *****************************************************************************/
-static int GetOggPacket( dec_thread_t *p_dec, ogg_packet *p_oggpacket,
-                         mtime_t *p_pts )
-{
-    if( p_dec->p_pes ) input_DeletePES( p_dec->p_fifo->p_packets_mgt,
-                                        p_dec->p_pes );
-
-    input_ExtractPES( p_dec->p_fifo, &p_dec->p_pes );
-    if( !p_dec->p_pes ) return VLC_EGENERIC;
-
-    p_oggpacket->packet = p_dec->p_pes->p_first->p_payload_start;
-    p_oggpacket->bytes = p_dec->p_pes->i_pes_size;
-    p_oggpacket->granulepos = p_dec->p_pes->i_dts;
-    p_oggpacket->b_o_s = 0;
-    p_oggpacket->e_o_s = 0;
-    p_oggpacket->packetno = 0;
-
-    *p_pts = p_dec->p_pes->i_pts;
+    /* Date management */
+    p_sys->i_pts += ( 1000000 * p_sys->ti.fps_numerator /
+                      p_sys->ti.fps_denominator ); /* 1 frame per packet */
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * CloseDecoder: theora decoder destruction
+ * SendPacket: send an ogg packet to the stream output.
  *****************************************************************************/
-static void CloseDecoder( dec_thread_t * p_dec )
+static int SendPacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_dec )
+    sout_buffer_t *p_sout_buffer =
+        sout_BufferNew( p_sys->p_sout_input->p_sout, p_oggpacket->bytes );
+
+    if( !p_sout_buffer ) return VLC_EGENERIC;
+
+    p_dec->p_vlc->pf_memcpy( p_sout_buffer->p_buffer,
+                             p_oggpacket->packet,
+                             p_oggpacket->bytes );
+
+    /* Date management */
+    p_sout_buffer->i_dts = p_sout_buffer->i_pts = p_sys->i_pts;
+    p_sys->i_pts += ( 1000000 * p_sys->ti.fps_numerator /
+                      p_sys->ti.fps_denominator ); /* 1 frame per packet */
+
+    if( p_sys->i_headers >= 3 )
+        p_sout_buffer->i_length = p_sys->i_pts - p_sout_buffer->i_pts;
+    else
+        p_sout_buffer->i_length = 0;
+
+    sout_InputSendBuffer( p_sys->p_sout_input, p_sout_buffer );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * ParseTheoraComments: FIXME should be done in demuxer
+ *****************************************************************************/
+static void ParseTheoraComments( decoder_t *p_dec )
+{
+    input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
+    input_info_category_t *p_cat =
+        input_InfoCategory( p_input, _("Theora Comment") );
+    int i = 0;
+    char *psz_name, *psz_value, *psz_comment;
+    while ( i < p_dec->p_sys->tc.comments )
     {
-        if( p_dec->p_pes )
-            input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_dec->p_pes );
-
-        vout_Request( p_dec->p_fifo, p_dec->p_vout, 0, 0, 0, 0 );
-
-        theora_info_clear( &p_dec->ti );
-        theora_comment_clear( &p_dec->tc );
-
-        free( p_dec );
+        psz_comment = strdup( p_dec->p_sys->tc.user_comments[i] );
+        if( !psz_comment )
+        {
+            msg_Warn( p_dec, "Out of memory" );
+            break;
+        }
+        psz_name = psz_comment;
+        psz_value = strchr( psz_comment, '=' );
+        if( psz_value )
+        {
+            *psz_value = '\0';
+            psz_value++;
+            input_AddInfo( p_cat, psz_name, psz_value );
+        }
+        free( psz_comment );
+        i++;
     }
+}
+
+/*****************************************************************************
+ * EndDecoder: theora decoder destruction
+ *****************************************************************************/
+static int EndDecoder( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( !p_sys->b_packetizer )
+        vout_Request( p_dec, p_sys->p_vout, 0, 0, 0, 0 );
+
+    theora_info_clear( &p_sys->ti );
+    theora_comment_clear( &p_sys->tc );
+
+    free( p_sys );
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * theora_CopyPicture: copy a picture from theora internal buffers to a
  *                     picture_t structure.
  *****************************************************************************/
-static void theora_CopyPicture( dec_thread_t *p_dec, picture_t *p_pic,
+static void theora_CopyPicture( decoder_t *p_dec, picture_t *p_pic,
                                 yuv_buffer *yuv )
 {
     int i_plane, i_line, i_width, i_dst_stride, i_src_stride;
+    int i_src_xoffset, i_src_yoffset;
     u8  *p_dst, *p_src;
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
@@ -318,12 +490,21 @@ static void theora_CopyPicture( dec_thread_t *p_dec, picture_t *p_pic,
         p_dst = p_pic->p[i_plane].p_pixels;
         p_src = i_plane ? (i_plane - 1 ? yuv->v : yuv->u ) : yuv->y;
         i_width = p_pic->p[i_plane].i_visible_pitch;
-        i_dst_stride = p_pic->p[i_plane].i_pitch;
-        i_src_stride = i_plane ? yuv->uv_stride : yuv->y_stride;
+        i_dst_stride  = p_pic->p[i_plane].i_pitch;
+        i_src_stride  = i_plane ? yuv->uv_stride : yuv->y_stride;
+        i_src_xoffset = p_dec->p_sys->ti.offset_x;
+        i_src_yoffset = p_dec->p_sys->ti.offset_y;
+        if( i_plane )
+        {
+            i_src_xoffset /= 2;
+            i_src_yoffset /= 2;
+        } 
+
+        p_src += (i_src_yoffset * i_src_stride + i_src_yoffset);
 
         for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
         {
-            p_dec->p_fifo->p_vlc->pf_memcpy( p_dst, p_src, i_width );
+            p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_width );
             p_src += i_src_stride;
             p_dst += i_dst_stride;
         }

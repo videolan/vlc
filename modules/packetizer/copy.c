@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.15 2003/08/11 20:19:45 fenrir Exp $
+ * $Id: copy.c,v 1.16 2003/09/02 20:19:26 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -80,9 +80,9 @@ static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes );
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    p_fifo->pf_run = Run;
+    p_dec->pf_run = Run;
 
     return VLC_SUCCESS;
 }
@@ -672,4 +672,3 @@ static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
     *pp_pes = p_fifo->p_first;
     vlc_mutex_unlock( &p_fifo->data_lock );
 }
-

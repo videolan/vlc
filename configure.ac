@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.71 2003/08/31 15:55:56 titer Exp $
+dnl $Id: configure.ac,v 1.72 2003/09/02 20:19:25 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1000,7 +1000,7 @@ if test "${enable_sout}" != "no"
 then
   AX_ADD_PLUGINS([access_output_dummy access_output_udp access_output_file access_output_http])
   AX_ADD_PLUGINS([mux_ts mux_ps mux_avi mux_mp4 mux_asf mux_dummy])
-  AX_ADD_PLUGINS([packetizer_mpegaudio packetizer_mpegvideo packetizer_a52])
+  AX_ADD_PLUGINS([packetizer_mpegaudio packetizer_mpegvideo])
   AX_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
   AX_ADD_PLUGINS([packetizer_copy])
 
@@ -1934,11 +1934,7 @@ if test "${enable_vorbis}" != "no"
 then
   AC_CHECK_HEADERS(vorbis/codec.h, [
     AX_ADD_PLUGINS([vorbis])
-    AX_ADD_LDFLAGS([vorbis],[-lvorbis -logg])
-    if test "${enable_sout}" != "no"; then
-      AX_ADD_PLUGINS([packetizer_vorbis])
-      AX_ADD_LDFLAGS([packetizer_vorbis],[-lvorbis -logg])
-    fi ],[])
+    AX_ADD_LDFLAGS([vorbis],[-lvorbis -logg]) ],[])
 fi
 
 dnl

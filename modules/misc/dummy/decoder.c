@@ -2,7 +2,7 @@
  * dec_dummy.c: dummy decoder plugin for vlc.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: decoder.c,v 1.5 2003/03/03 16:49:14 gbazin Exp $
+ * $Id: decoder.c,v 1.6 2003/09/02 20:19:26 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -56,7 +56,7 @@ static int Run ( decoder_fifo_t * );
  *****************************************************************************/
 int E_(OpenDecoder) ( vlc_object_t *p_this )
 {
-    ((decoder_fifo_t*)p_this)->pf_run = Run;
+    ((decoder_t*)p_this)->pf_run = Run;
 
     return VLC_SUCCESS;
 }

@@ -2,7 +2,7 @@
  * flac.c: flac decoder module making use of libflac
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: flacdec.c,v 1.3 2003/08/17 13:56:26 gbazin Exp $
+ * $Id: flacdec.c,v 1.4 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -114,14 +114,14 @@ vlc_module_end();
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( p_fifo->i_fourcc != VLC_FOURCC('f','l','a','c') )
+    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('f','l','a','c') )
     {
         return VLC_EGENERIC;
     }
 
-    p_fifo->pf_run = RunDecoder;
+    p_dec->pf_run = RunDecoder;
     return VLC_SUCCESS;
 }
 

@@ -2,7 +2,7 @@
  * sout.h: video output header for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: sout.h,v 1.2 2003/05/20 16:20:33 zorglub Exp $
+ * $Id: sout.h,v 1.3 2003/09/02 20:19:25 gbazin Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ extern "C" {
 /*****************************************************************************
  * Required internal headers
  *****************************************************************************/
+#include "vlc_block.h"
 #include "stream_output.h"
         
 # ifdef __cplusplus

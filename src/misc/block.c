@@ -1,8 +1,8 @@
 /*****************************************************************************
- * block.c
+ * block.c: Data blocks management functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: block.c,v 1.1 2003/08/23 22:49:50 fenrir Exp $
+ * $Id: block.c,v 1.2 2003/09/02 20:19:26 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -38,8 +38,9 @@ struct block_sys_t
     uint8_t     *p_allocated_buffer;
     int         i_allocated_buffer;
 
-    vlc_bool_t  b_modify;       /* has it be put in modify state */
-    int         i_duplicated;   /* how many times it has been duplicated (only content) */
+    vlc_bool_t  b_modify;       /* has it been put in modified state */
+    int         i_duplicated;   /* how many times has the content been
+                                 * duplicated */
 
 };
 
@@ -104,6 +105,7 @@ static block_t *BlockModify( block_t *p_block, vlc_bool_t b_will_modify )
 
     return p_mod;
 }
+
 static block_t *BlockDuplicate( block_t *p_block )
 {
     block_t *p_dup;
@@ -128,15 +130,16 @@ static block_t *BlockRealloc( block_t *p_block, int i_prebody, int i_body )
 {
 
     vlc_mutex_lock( &p_block->p_sys->lock );
-    if( i_prebody < 0 ||
-        ( p_block->p_buffer - i_prebody > p_block->p_sys->p_allocated_buffer ) )
+    if( i_prebody < 0 || p_block->p_buffer - i_prebody >
+        p_block->p_sys->p_allocated_buffer )
     {
         p_block->p_buffer -= i_prebody;
         p_block->i_buffer += i_prebody;
         i_prebody = 0;
     }
     if( i_body < 0 ||
-        ( p_block->p_buffer + i_body < p_block->p_sys->p_allocated_buffer + p_block->p_sys->i_allocated_buffer ) )
+        p_block->p_buffer + i_body < p_block->p_sys->p_allocated_buffer +
+        p_block->p_sys->i_allocated_buffer )
     {
         p_block->i_buffer = i_body;
         i_body = 0;
@@ -147,7 +150,8 @@ static block_t *BlockRealloc( block_t *p_block, int i_prebody, int i_body )
     {
         block_t *p_rea = block_New( p_block->p_manager, i_prebody + i_body );
 
-        memcpy( &p_rea->p_buffer[i_prebody], p_block->p_buffer, p_block->i_buffer );
+        memcpy( &p_rea->p_buffer[i_prebody], p_block->p_buffer,
+                p_block->i_buffer );
 
         return p_rea;
     }
@@ -160,7 +164,9 @@ static block_t *BlockRealloc( block_t *p_block, int i_prebody, int i_body )
         i_start = p_rea->p_buffer - p_rea->p_sys->p_allocated_buffer;
 
         p_rea->p_sys->i_allocated_buffer += i_body - p_rea->i_buffer;
-        p_rea->p_sys->p_allocated_buffer = realloc( p_rea->p_sys->p_allocated_buffer, p_rea->p_sys->i_allocated_buffer );
+        p_rea->p_sys->p_allocated_buffer =
+            realloc( p_rea->p_sys->p_allocated_buffer,
+                     p_rea->p_sys->i_allocated_buffer );
 
         p_rea->p_buffer = &p_rea->p_sys->p_allocated_buffer[i_start];
         p_rea->i_buffer = i_body;
@@ -170,6 +176,7 @@ static block_t *BlockRealloc( block_t *p_block, int i_prebody, int i_body )
 
     return p_block;
 }
+
 /*****************************************************************************
  * Standard block management
  *
@@ -203,7 +210,6 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
     block_t     *p_block;
     block_sys_t *p_sys;
 
-
     p_block = block_NewEmpty();
 
     p_block->i_buffer       = i_size;
@@ -218,7 +224,7 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
     p_block->pf_realloc     = BlockRealloc;
 
     /* that should be ok (no comunication between multiple p_vlc) */
-    p_block->p_manager      = p_obj->p_vlc;
+    p_block->p_manager      = VLC_OBJECT( p_obj->p_vlc );
 
     p_block->p_sys = p_sys = malloc( sizeof( block_sys_t ) );
     vlc_mutex_init( p_obj, &p_sys->lock );
@@ -230,7 +236,7 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
     return p_block;
 }
 
-void    block_ChainAppend( block_t **pp_list, block_t *p_block )
+void block_ChainAppend( block_t **pp_list, block_t *p_block )
 {
 
     if( *pp_list == NULL )
@@ -249,7 +255,7 @@ void    block_ChainAppend( block_t **pp_list, block_t *p_block )
     }
 }
 
-void    block_ChainRelease( block_t *p_block )
+void block_ChainRelease( block_t *p_block )
 {
     while( p_block )
     {
@@ -320,7 +326,7 @@ block_t *block_ChainGather( block_t *p_list )
 /*****************************************************************************
  * block_fifo_t managment
  *****************************************************************************/
-block_fifo_t * __block_FifoNew  ( vlc_object_t *p_obj )
+block_fifo_t *__block_FifoNew( vlc_object_t *p_obj )
 {
     block_fifo_t *p_fifo;
 
@@ -334,7 +340,7 @@ block_fifo_t * __block_FifoNew  ( vlc_object_t *p_obj )
     return p_fifo;
 }
 
-void           block_FifoRelease( block_fifo_t *p_fifo )
+void block_FifoRelease( block_fifo_t *p_fifo )
 {
     block_FifoEmpty( p_fifo );
     vlc_cond_destroy( &p_fifo->wait );
@@ -342,7 +348,7 @@ void           block_FifoRelease( block_fifo_t *p_fifo )
     free( p_fifo );
 }
 
-void            block_FifoEmpty( block_fifo_t *p_fifo )
+void block_FifoEmpty( block_fifo_t *p_fifo )
 {
     block_t *b;
 
@@ -362,7 +368,7 @@ void            block_FifoEmpty( block_fifo_t *p_fifo )
     vlc_mutex_unlock( &p_fifo->lock );
 }
 
-int           block_FifoPut    ( block_fifo_t *p_fifo, block_t *p_block )
+int block_FifoPut( block_fifo_t *p_fifo, block_t *p_block )
 {
     int i_size = 0;
     vlc_mutex_lock( &p_fifo->lock );
@@ -379,14 +385,14 @@ int           block_FifoPut    ( block_fifo_t *p_fifo, block_t *p_block )
 
     } while( p_block );
 
-    /* warm there is data in this fifo */
+    /* warn there is data in this fifo */
     vlc_cond_signal( &p_fifo->wait );
     vlc_mutex_unlock( &p_fifo->lock );
 
     return i_size;
 }
 
-block_t *      block_FifoGet    ( block_fifo_t *p_fifo )
+block_t *block_FifoGet( block_fifo_t *p_fifo )
 {
     block_t *b;
 
@@ -413,7 +419,7 @@ block_t *      block_FifoGet    ( block_fifo_t *p_fifo )
     return( b );
 }
 
-block_t *      block_FifoShow   ( block_fifo_t *p_fifo )
+block_t *block_FifoShow( block_fifo_t *p_fifo )
 {
     block_t *b;
 
@@ -432,7 +438,7 @@ block_t *      block_FifoShow   ( block_fifo_t *p_fifo )
 
 }
 
-block_t *      block_FifoGetFrame( block_fifo_t *p_fifo )
+block_t *block_FifoGetFrame( block_fifo_t *p_fifo )
 {
     block_t *b = NULL;
 
@@ -449,5 +455,3 @@ block_t *      block_FifoGetFrame( block_fifo_t *p_fifo )
 
     return b;
 }
-
-

@@ -2,7 +2,7 @@
  * xvid.c: a decoder for libxvidcore, the Xvid video codec
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: xvid.c,v 1.5 2003/02/20 01:52:45 sigmunau Exp $
+ * $Id: xvid.c,v 1.6 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -59,16 +59,16 @@ vlc_module_end();
  *****************************************************************************/
 static int OpenDecoder ( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( p_fifo->i_fourcc != VLC_FOURCC('x','v','i','d')
-         && p_fifo->i_fourcc != VLC_FOURCC('X','V','I','D')
-         && p_fifo->i_fourcc != VLC_FOURCC('D','I','V','X') )
+    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('x','v','i','d')
+         && p_dec->p_fifo->i_fourcc != VLC_FOURCC('X','V','I','D')
+         && p_dec->p_fifo->i_fourcc != VLC_FOURCC('D','I','V','X') )
     {
         return VLC_EGENERIC;
     }
 
-    p_fifo->pf_run = RunDecoder;
+    p_dec->pf_run = RunDecoder;
     return VLC_SUCCESS;
 }
 
@@ -271,4 +271,3 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
 
     return VLC_SUCCESS;
 }
-

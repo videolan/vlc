@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.16 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: vorbis.c,v 1.17 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -30,6 +30,8 @@
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/decoder.h>
+#include <vlc/input.h>
+#include <vlc/sout.h>
 #include <input_ext-dec.h>
 
 #include <vlc/input.h>
@@ -42,14 +44,17 @@
 #endif
 
 /*****************************************************************************
- * dec_thread_t : vorbis decoder thread descriptor
+ * decoder_sys_t : vorbis decoder descriptor
  *****************************************************************************/
-typedef struct dec_thread_t
+struct decoder_sys_t
 {
+    /* Module mode */
+    vlc_bool_t b_packetizer;
+
     /*
-     * Thread properties
+     * Input properties
      */
-    vlc_thread_t        thread_id;                /* id for thread functions */
+    int i_headers;
 
     /*
      * Vorbis properties
@@ -63,20 +68,25 @@ typedef struct dec_thread_t
     vorbis_block     vb; /* local working space for packet->PCM decode */
 
     /*
-     * Input properties
-     */
-    decoder_fifo_t         *p_fifo;            /* stores the PES stream data */
-    pes_packet_t           *p_pes;            /* current PES we are decoding */
-
-    /*
      * Output properties
      */
     aout_instance_t        *p_aout;
     aout_input_t           *p_aout_input;
-    audio_sample_format_t   output_format;
-    audio_date_t            end_date;
+    audio_sample_format_t   aout_format;
 
-} dec_thread_t;
+    /*
+     * Packetizer output properties
+     */
+    sout_packetizer_input_t *p_sout_input;
+    sout_format_t           sout_format;
+
+    /*
+     * Common properties
+     */
+    audio_date_t          end_date;
+    int                   i_last_block_size;
+
+};
 
 static int pi_channels_maps[6] =
 {
@@ -89,15 +99,21 @@ static int pi_channels_maps[6] =
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
 };
 
-/*****************************************************************************
+/****************************************************************************
  * Local prototypes
- *****************************************************************************/
-static int  OpenDecoder  ( vlc_object_t * );
-static int  RunDecoder   ( decoder_fifo_t * );
-static void CloseDecoder ( dec_thread_t * );
+ ****************************************************************************/
+static int OpenDecoder   ( vlc_object_t * );
+static int OpenPacketizer( vlc_object_t * );
 
-static void DecodePacket ( dec_thread_t * );
-static int  GetOggPacket ( dec_thread_t *, ogg_packet *, mtime_t * );
+static int InitDecoder   ( decoder_t * );
+static int RunDecoder    ( decoder_t *, block_t * );
+static int EndDecoder    ( decoder_t * );
+
+static int ProcessPacket ( decoder_t *, ogg_packet *, mtime_t );
+static int DecodePacket  ( decoder_t *, ogg_packet * );
+static int SendPacket    ( decoder_t *, ogg_packet * );
+
+static void ParseVorbisComments( decoder_t * );
 
 #ifdef MODULE_NAME_IS_tremor
 static void Interleave   ( int32_t *, const int32_t **, int, int );
@@ -116,6 +132,11 @@ vlc_module_begin();
     set_capability( "decoder", 100 );
 #endif
     set_callbacks( OpenDecoder, NULL );
+
+    add_submodule();
+    set_description( _("Vorbis audio packetizer") );
+    set_capability( "packetizer", 100 );
+    set_callbacks( OpenPacketizer, NULL );
 vlc_module_end();
 
 /*****************************************************************************
@@ -123,254 +144,379 @@ vlc_module_end();
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( p_fifo->i_fourcc != VLC_FOURCC('v','o','r','b') )
+    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('v','o','r','b') )
     {
         return VLC_EGENERIC;
     }
 
-    p_fifo->pf_run = RunDecoder;
+    p_dec->pf_init = InitDecoder;
+    p_dec->pf_decode = RunDecoder;
+    p_dec->pf_end = EndDecoder;
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_dec->p_sys =
+          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    {
+        msg_Err( p_dec, "out of memory" );
+        return VLC_EGENERIC;
+    }
+    p_dec->p_sys->b_packetizer = VLC_FALSE;
+
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * RunDecoder: the vorbis decoder
- *****************************************************************************/
-static int RunDecoder( decoder_fifo_t * p_fifo )
+static int OpenPacketizer( vlc_object_t *p_this )
 {
-    dec_thread_t *p_dec;
+    decoder_t *p_dec = (decoder_t*)p_this;
+
+    int i_ret = OpenDecoder( p_this );
+
+    if( i_ret == VLC_SUCCESS ) p_dec->p_sys->b_packetizer = VLC_TRUE;
+
+    return i_ret;
+}
+
+/*****************************************************************************
+ * InitDecoder: Initalize the decoder
+ *****************************************************************************/
+static int InitDecoder( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    aout_DateSet( &p_sys->end_date, 0 );
+
+    p_sys->p_aout = NULL;
+    p_sys->p_aout_input = NULL;
+    p_sys->aout_format.i_format = VLC_FOURCC('v','o','r','b');
+
+    p_sys->p_sout_input = NULL;
+    p_sys->sout_format.i_cat = AUDIO_ES;
+    p_sys->sout_format.i_fourcc = VLC_FOURCC( 'v', 'o', 'r', 'b' );
+    p_sys->sout_format.i_block_align = 0;
+    p_sys->sout_format.i_bitrate     = 0;
+    p_sys->sout_format.i_extra_data  = 0;
+    p_sys->sout_format.p_extra_data  = NULL;
+
+    /* Take care of vorbis init */
+    vorbis_info_init( &p_sys->vi );
+    vorbis_comment_init( &p_sys->vc );
+
+    p_sys->i_headers = 0;
+
+    return VLC_SUCCESS;
+}
+
+/****************************************************************************
+ * RunDecoder: the whole thing
+ ****************************************************************************
+ * This function must be fed with ogg packets.
+ ****************************************************************************/
+static int RunDecoder( decoder_t *p_dec, block_t *p_block )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
     ogg_packet oggpacket;
-    mtime_t i_pts;
+    int i_ret;
 
-    /* Allocate the memory needed to store the thread's structure */
-    if( (p_dec = (dec_thread_t *)malloc (sizeof(dec_thread_t)) )
-            == NULL)
+    /* Block to Ogg packet */
+    oggpacket.packet = p_block->p_buffer;
+    oggpacket.bytes = p_block->i_buffer;
+    oggpacket.granulepos = p_block->i_dts;
+    oggpacket.b_o_s = 0;
+    oggpacket.e_o_s = 0;
+    oggpacket.packetno = 0;
+
+    if( p_sys->i_headers == 0 )
     {
-        msg_Err( p_fifo, "out of memory" );
-        goto error;
-    }
+        /* Take care of the initial Vorbis header */
 
-    /* Initialize the thread properties */
-    memset( p_dec, 0, sizeof(dec_thread_t) );
-    p_dec->p_fifo = p_fifo;
-    p_dec->p_pes  = NULL;
-
-    /* Take care of the initial Vorbis header */
-    vorbis_info_init( &p_dec->vi );
-    vorbis_comment_init( &p_dec->vc );
-
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
-        goto error;
-
-    oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
-    if( vorbis_synthesis_headerin( &p_dec->vi, &p_dec->vc, &oggpacket ) < 0 )
-    {
-        msg_Err( p_dec->p_fifo, "This bitstream does not contain Vorbis "
-                 "audio data");
-        goto error;
-    }
-
-    /* The next two packets in order are the comment and codebook headers.
-       We need to watch out that these packets are not missing as a
-       missing or corrupted header is fatal. */
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
-        goto error;
-
-    if( vorbis_synthesis_headerin( &p_dec->vi, &p_dec->vc, &oggpacket ) < 0 )
-    {
-        msg_Err( p_dec->p_fifo, "2nd Vorbis header is corrupted" );
-        goto error;
-    }
-    /* parse the vorbis comment. FIXME should be done in demuxer*/
-    {
-        input_thread_t *p_input = (input_thread_t *)p_fifo->p_parent;
-        input_info_category_t *p_cat = input_InfoCategory( p_input,
-                                                           _("Vorbis Comment") );
-        int i = 0;
-        char *psz_name, *psz_value, *psz_comment;
-        while ( i < p_dec->vc.comments )
+        oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
+        if( vorbis_synthesis_headerin( &p_sys->vi, &p_sys->vc,
+                                       &oggpacket ) < 0 )
         {
-            psz_comment = strdup( p_dec->vc.user_comments[i] );
-            if ( !psz_comment )
+            msg_Err( p_dec->p_fifo, "This bitstream does not contain Vorbis "
+                     "audio data");
+            block_Release( p_block );
+            return VLC_EGENERIC;
+        }
+        p_sys->i_headers++;
+
+ 
+        if( p_sys->b_packetizer )
+        {
+            /* add a input for the stream ouput */
+            p_sys->sout_format.i_sample_rate = p_sys->vi.rate;
+            p_sys->sout_format.i_channels    = p_sys->vi.channels;
+            p_sys->sout_format.i_block_align = 1;
+            p_sys->sout_format.i_bitrate     = p_sys->vi.bitrate_nominal;
+
+            p_sys->p_sout_input =
+                sout_InputNew( p_dec, &p_sys->sout_format );
+
+            if( !p_sys->p_sout_input )
             {
-                msg_Warn( p_dec->p_fifo, "Out of memory" );
-                break;
+                msg_Err( p_dec, "cannot add a new stream" );
+                block_Release( p_block );
+                return VLC_EGENERIC;
             }
-            psz_name = psz_comment;
-            psz_value = strchr( psz_comment, '=' );
-            if( psz_value )
+        }
+        else
+        {
+#ifdef MODULE_NAME_IS_tremor
+            p_sys->aout_format.i_format = VLC_FOURCC('f','i','3','2');
+#else
+            p_sys->aout_format.i_format = VLC_FOURCC('f','l','3','2');
+#endif
+            p_sys->aout_format.i_physical_channels =
+                p_sys->aout_format.i_original_channels =
+                    pi_channels_maps[p_sys->vi.channels];
+            p_sys->aout_format.i_rate = p_sys->vi.rate;
+
+            p_sys->p_aout = NULL;
+            p_sys->p_aout_input = aout_DecNew( p_dec, &p_sys->p_aout,
+                                               &p_sys->aout_format );
+
+            if( p_sys->p_aout_input == NULL )
             {
-                *psz_value = '\0';
-                psz_value++;
-                input_AddInfo( p_cat, psz_name, psz_value );
+                msg_Err( p_dec, "failed to create aout fifo" );
+                block_Release( p_block );
+                return VLC_EGENERIC;
             }
-            free( psz_comment );
-            i++;
+        }
+
+        aout_DateInit( &p_sys->end_date, p_sys->vi.rate );
+
+        msg_Dbg( p_dec, "channels:%d samplerate:%ld bitrate:%ld",
+                 p_sys->vi.channels, p_sys->vi.rate,
+                 p_sys->vi.bitrate_nominal );
+
+        if( p_sys->b_packetizer )
+        {
+            i_ret = SendPacket( p_dec, &oggpacket );
+            block_Release( p_block );
+            return i_ret;
+        }
+        else
+        {
+            block_Release( p_block );
+            return VLC_SUCCESS;
         }
     }
+
+    if( p_sys->i_headers == 1 )
+    {
+        /* The next packet in order is the comments header */
+        if( vorbis_synthesis_headerin( &p_sys->vi, &p_sys->vc, &oggpacket )
+            < 0 )
+        {
+            msg_Err( p_dec, "2nd Vorbis header is corrupted" );
+            return VLC_EGENERIC;
+        }
+        p_sys->i_headers++;
     
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
-        goto error;
+        ParseVorbisComments( p_dec );
 
-    if( vorbis_synthesis_headerin( &p_dec->vi, &p_dec->vc, &oggpacket ) < 0 )
-    {
-        msg_Err( p_dec->p_fifo, "3rd Vorbis header is corrupted" );
-        goto error;
+        if( p_sys->b_packetizer )
+        {
+            i_ret = SendPacket( p_dec, &oggpacket );
+            block_Release( p_block );
+            return i_ret;
+        }
+        else
+        {
+            block_Release( p_block );
+            return VLC_SUCCESS;
+        }
     }
 
-    /* Initialize the Vorbis packet->PCM decoder */
-    vorbis_synthesis_init( &p_dec->vd, &p_dec->vi );
-    vorbis_block_init( &p_dec->vd, &p_dec->vb );
-
-#ifdef MODULE_NAME_IS_tremor
-    p_dec->output_format.i_format = VLC_FOURCC('f','i','3','2');
-#else
-    p_dec->output_format.i_format = VLC_FOURCC('f','l','3','2');
-#endif
-    p_dec->output_format.i_physical_channels =
-        p_dec->output_format.i_original_channels =
-            pi_channels_maps[p_dec->vi.channels];
-    p_dec->output_format.i_rate = p_dec->vi.rate;
-
-    aout_DateInit( &p_dec->end_date, p_dec->vi.rate );
-    p_dec->p_aout = NULL;
-    p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
-                                       &p_dec->p_aout,
-                                       &p_dec->output_format );
-
-    if( p_dec->p_aout_input == NULL )
+    if( p_sys->i_headers == 2 )
     {
-        msg_Err( p_dec->p_fifo, "failed to create aout fifo" );
-        goto error;
+        /* The next packet in order is the codebooks header
+           We need to watch out that this packet is not missing as a
+           missing or corrupted header is fatal. */
+        if( vorbis_synthesis_headerin( &p_sys->vi, &p_sys->vc, &oggpacket )
+            < 0 )
+        {
+            msg_Err( p_dec, "3rd Vorbis header is corrupted" );
+            return VLC_EGENERIC;
+        }
+        p_sys->i_headers++;
+    
+        if( !p_sys->b_packetizer )
+        {
+            /* Initialize the Vorbis packet->PCM decoder */
+            vorbis_synthesis_init( &p_sys->vd, &p_sys->vi );
+            vorbis_block_init( &p_sys->vd, &p_sys->vb );
+        }
+
+        if( p_sys->b_packetizer )
+        {
+            i_ret = SendPacket( p_dec, &oggpacket );
+            block_Release( p_block );
+            return i_ret;
+        }
+        else
+        {
+            block_Release( p_block );
+            return VLC_SUCCESS;
+        }
     }
 
-    /* vorbis decoder thread's main loop */
-    while( (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error) )
+    i_ret = ProcessPacket( p_dec, &oggpacket, p_block->i_pts );
+    block_Release( p_block );
+    return i_ret;
+}
+
+/*****************************************************************************
+ * ProcessPacket: processes a Vorbis packet.
+ *****************************************************************************/
+static int ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
+                          mtime_t i_pts )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* Date management */
+    if( i_pts > 0 && i_pts != aout_DateGet( &p_sys->end_date ) )
     {
-        DecodePacket( p_dec );
+        aout_DateSet( &p_sys->end_date, i_pts );
     }
 
-    /* If b_error is set, the vorbis decoder thread enters the error loop */
-    if( p_dec->p_fifo->b_error )
+    if( p_sys->b_packetizer )
     {
-        DecoderError( p_dec->p_fifo );
+        return SendPacket( p_dec, p_oggpacket );
     }
-
-    /* End of the vorbis decoder thread */
-    CloseDecoder( p_dec );
-
-    return 0;
-
- error:
-    DecoderError( p_fifo );
-    if( p_dec )
+    else
     {
-        if( p_dec->p_fifo )
-            p_dec->p_fifo->b_error = 1;
-
-        /* End of the vorbis decoder thread */
-        CloseDecoder( p_dec );
+        return DecodePacket( p_dec, p_oggpacket );
     }
-
-    return -1;
-
 }
 
 /*****************************************************************************
  * DecodePacket: decodes a Vorbis packet.
  *****************************************************************************/
-static void DecodePacket( dec_thread_t *p_dec )
+static int DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
-    aout_buffer_t *p_aout_buffer;
-    ogg_packet    oggpacket;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    int           i_samples;
+
 #ifdef MODULE_NAME_IS_tremor
     int32_t       **pp_pcm;
 #else
     float         **pp_pcm;
 #endif
-    int           i_samples;
-    mtime_t       i_pts;
 
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
-    {
-        /* This should mean an eos */
-        return;
-    }
-
-    /* Date management */
-    if( i_pts > 0 && i_pts != aout_DateGet( &p_dec->end_date ) )
-    {
-        aout_DateSet( &p_dec->end_date, i_pts );
-    }
-
-    if( vorbis_synthesis( &p_dec->vb, &oggpacket ) == 0 )
-        vorbis_synthesis_blockin( &p_dec->vd, &p_dec->vb );
+    if( vorbis_synthesis( &p_sys->vb, p_oggpacket ) == 0 )
+        vorbis_synthesis_blockin( &p_sys->vd, &p_sys->vb );
 
     /* **pp_pcm is a multichannel float vector. In stereo, for
      * example, pp_pcm[0] is left, and pp_pcm[1] is right. i_samples is
      * the size of each channel. Convert the float values
      * (-1.<=range<=1.) to whatever PCM format and write it out */
 
-    while( ( i_samples = vorbis_synthesis_pcmout( &p_dec->vd, &pp_pcm ) ) > 0 )
+    while( ( i_samples = vorbis_synthesis_pcmout( &p_sys->vd, &pp_pcm ) ) > 0 )
     {
 
-        p_aout_buffer = aout_DecNewBuffer( p_dec->p_aout, p_dec->p_aout_input,
+        aout_buffer_t *p_aout_buffer;
+        p_aout_buffer = aout_DecNewBuffer( p_sys->p_aout, p_sys->p_aout_input,
                                            i_samples );
         if( !p_aout_buffer )
         {
-            msg_Err( p_dec->p_fifo, "cannot get aout buffer" );
-            p_dec->p_fifo->b_error = 1;
-            return;
+            msg_Err( p_dec, "cannot get aout buffer" );
+            return VLC_SUCCESS;
         }
 
         /* Interleave the samples */
 #ifdef MODULE_NAME_IS_tremor
         Interleave( (int32_t *)p_aout_buffer->p_buffer,
-                    (const int32_t **)pp_pcm, p_dec->vi.channels, i_samples );
+                    (const int32_t **)pp_pcm, p_sys->vi.channels, i_samples );
 #else
         Interleave( (float *)p_aout_buffer->p_buffer,
-                    (const float **)pp_pcm, p_dec->vi.channels, i_samples );
+                    (const float **)pp_pcm, p_sys->vi.channels, i_samples );
 #endif
 
         /* Tell libvorbis how many samples we actually consumed */
-        vorbis_synthesis_read( &p_dec->vd, i_samples );
+        vorbis_synthesis_read( &p_sys->vd, i_samples );
 
         /* Date management */
-        p_aout_buffer->start_date = aout_DateGet( &p_dec->end_date );
-        p_aout_buffer->end_date = aout_DateIncrement( &p_dec->end_date,
+        p_aout_buffer->start_date = aout_DateGet( &p_sys->end_date );
+        p_aout_buffer->end_date = aout_DateIncrement( &p_sys->end_date,
                                                       i_samples );
 
-        aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_aout_buffer );
+        aout_DecPlay( p_sys->p_aout, p_sys->p_aout_input, p_aout_buffer );
     }
 
 }
 
 /*****************************************************************************
- * GetOggPacket: get the following vorbis packet from the stream and send back
- *               the result in an ogg packet (for easy decoding by libvorbis).
- *****************************************************************************
- * Returns VLC_EGENERIC in case of eof.
+ * SendPacket: send an ogg packet to the stream output.
  *****************************************************************************/
-static int GetOggPacket( dec_thread_t *p_dec, ogg_packet *p_oggpacket,
-                         mtime_t *p_pts )
+static int SendPacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
-    if( p_dec->p_pes ) input_DeletePES( p_dec->p_fifo->p_packets_mgt,
-                                        p_dec->p_pes );
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    int           i_block_size, i_samples;
 
-    input_ExtractPES( p_dec->p_fifo, &p_dec->p_pes );
-    if( !p_dec->p_pes ) return VLC_EGENERIC;
+    sout_buffer_t *p_sout_buffer =
+        sout_BufferNew( p_sys->p_sout_input->p_sout, p_oggpacket->bytes );
 
-    p_oggpacket->packet = p_dec->p_pes->p_first->p_payload_start;
-    p_oggpacket->bytes = p_dec->p_pes->i_pes_size;
-    p_oggpacket->granulepos = p_dec->p_pes->i_dts;
-    p_oggpacket->b_o_s = 0;
-    p_oggpacket->e_o_s = 0;
-    p_oggpacket->packetno = 0;
+    if( !p_sout_buffer ) return VLC_EGENERIC;
 
-    *p_pts = p_dec->p_pes->i_pts;
+    i_block_size = vorbis_packet_blocksize( &p_sys->vi, p_oggpacket );
+    if( i_block_size < 0 ) i_block_size = 0; /* non audio packet */
+    i_samples = ( p_sys->i_last_block_size + i_block_size ) >> 2;
+    p_sys->i_last_block_size = i_block_size;
+
+    p_dec->p_vlc->pf_memcpy( p_sout_buffer->p_buffer,
+                             p_oggpacket->packet,
+                             p_oggpacket->bytes );
+
+    p_sout_buffer->i_bitrate = p_sys->vi.bitrate_nominal;
+
+    /* Date management */
+    p_sout_buffer->i_dts = p_sout_buffer->i_pts =
+        aout_DateGet( &p_sys->end_date );
+
+    if( p_sys->i_headers >= 3 )
+        p_sout_buffer->i_length =
+            aout_DateIncrement( &p_sys->end_date, i_samples ) -
+            p_sout_buffer->i_pts;
+    else
+        p_sout_buffer->i_length = 0;
+
+    sout_InputSendBuffer( p_sys->p_sout_input, p_sout_buffer );
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * ParseVorbisComments: FIXME should be done in demuxer
+ *****************************************************************************/
+static void ParseVorbisComments( decoder_t *p_dec )
+{
+    input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
+    input_info_category_t *p_cat =
+        input_InfoCategory( p_input, _("Vorbis Comment") );
+    int i = 0;
+    char *psz_name, *psz_value, *psz_comment;
+    while ( i < p_dec->p_sys->vc.comments )
+    {
+        psz_comment = strdup( p_dec->p_sys->vc.user_comments[i] );
+        if( !psz_comment )
+        {
+            msg_Warn( p_dec, "Out of memory" );
+            break;
+        }
+        psz_name = psz_comment;
+        psz_value = strchr( psz_comment, '=' );
+        if( psz_value )
+        {
+            *psz_value = '\0';
+            psz_value++;
+            input_AddInfo( p_cat, psz_name, psz_value );
+        }
+        free( psz_comment );
+        i++;
+    }
 }
 
 /*****************************************************************************
@@ -395,23 +541,32 @@ static void Interleave( float *p_out, const float **pp_in,
 }
 
 /*****************************************************************************
- * CloseDecoder: vorbis decoder destruction
+ * EndDecoder: vorbis decoder destruction
  *****************************************************************************/
-static void CloseDecoder( dec_thread_t * p_dec )
+static int EndDecoder( decoder_t * p_dec )
 {
-    if( p_dec->p_aout_input != NULL )
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->p_aout_input != NULL )
     {
-        aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
+        aout_DecDelete( p_sys->p_aout, p_sys->p_aout_input );
     }
 
-    if( p_dec )
+    if( p_sys->p_sout_input != NULL )
     {
-        if( p_dec->p_pes )
-            input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_dec->p_pes );
-        vorbis_block_clear( &p_dec->vb );
-        vorbis_dsp_clear( &p_dec->vd );
-        vorbis_comment_clear( &p_dec->vc );
-        vorbis_info_clear( &p_dec->vi );  /* must be called last */
-        free( p_dec );
+        sout_InputDelete( p_sys->p_sout_input );
     }
+
+    if( !p_sys->b_packetizer && p_sys->i_headers >= 3 )
+    {
+        vorbis_block_clear( &p_sys->vb );
+        vorbis_dsp_clear( &p_sys->vd );
+    }
+
+    vorbis_comment_clear( &p_sys->vc );
+    vorbis_info_clear( &p_sys->vi );  /* must be called last */
+
+    free( p_sys );
+
+    return VLC_SUCCESS;
 }

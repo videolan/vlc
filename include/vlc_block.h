@@ -1,8 +1,8 @@
 /*****************************************************************************
- * block.h
+ * vlc_block.h: Data blocks management functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_block.h,v 1.1 2003/08/23 22:49:50 fenrir Exp $
+ * $Id: vlc_block.h,v 1.2 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -21,9 +21,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef _BLOCK_H
-#define _BLOCK_H 1
-
+#ifndef _VLC_BLOCK_H
+#define _VLC_BLOCK_H 1
 
 /*
  * block
@@ -108,4 +107,4 @@ VLC_EXPORT( block_t *,      block_FifoGet,      ( block_fifo_t * ) );
 VLC_EXPORT( block_t *,      block_FifoGetFrame, ( block_fifo_t * ) );
 VLC_EXPORT( block_t *,      block_FifoShow,     ( block_fifo_t * ) );
 
-#endif
+#endif /* VLC_BLOCK_H */

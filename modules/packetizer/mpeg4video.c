@@ -2,7 +2,7 @@
  * mpeg4video.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.12 2003/05/03 02:09:41 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.13 2003/09/02 20:19:26 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -104,11 +104,11 @@ vlc_module_end();
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    p_fifo->pf_run = Run;
+    p_dec->pf_run = Run;
 
-    switch(  p_fifo->i_fourcc )
+    switch( p_dec->p_fifo->i_fourcc )
     {
         case VLC_FOURCC( 'm', '4', 's', '2'):
         case VLC_FOURCC( 'M', '4', 'S', '2'):
@@ -485,4 +485,3 @@ static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
         *pp_pes = p_pes;
     }
 }
-

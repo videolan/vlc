@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.24 2003/07/22 20:49:10 hartman Exp $
+ * $Id: spudec.c,v 1.25 2003/09/02 20:19:26 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -59,15 +59,15 @@ vlc_module_end();
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( p_fifo->i_fourcc != VLC_FOURCC('s','p','u',' ')
-         && p_fifo->i_fourcc != VLC_FOURCC('s','p','u','b') )
+    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('s','p','u',' ')
+         && p_dec->p_fifo->i_fourcc != VLC_FOURCC('s','p','u','b') )
     {   
         return VLC_EGENERIC;
     }
     
-    p_fifo->pf_run = RunDecoder;
+    p_dec->pf_run = RunDecoder;
 
     return VLC_SUCCESS;
 }
@@ -230,4 +230,3 @@ static void EndThread( spudec_thread_t *p_spudec )
     CloseBitstream( &p_spudec->bit_stream );
     free( p_spudec );
 }
-

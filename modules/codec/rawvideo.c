@@ -2,7 +2,7 @@
  * rawvideo.c: Pseudo audio decoder; for raw video data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rawvideo.c,v 1.5 2003/05/02 03:40:01 fenrir Exp $
+ * $Id: rawvideo.c,v 1.6 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -76,9 +76,9 @@ vlc_module_end();
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    switch( p_fifo->i_fourcc )
+    switch( p_dec->p_fifo->i_fourcc )
     {
         /* Planar YUV */
         case VLC_FOURCC('I','4','4','4'):
@@ -99,13 +99,12 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('R','V','1','6'):
         case VLC_FOURCC('R','V','1','5'):
 
-            p_fifo->pf_run = RunDecoder;
+            p_dec->pf_run = RunDecoder;
             return VLC_SUCCESS;
 
         default:
             return VLC_EGENERIC;
     }
-
 }
 
 /*****************************************************************************

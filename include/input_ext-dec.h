@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.79 2003/03/04 13:21:19 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.80 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -110,8 +110,29 @@ struct decoder_fifo_t
     void *              p_waveformatex;
     void *              p_bitmapinfoheader;
 
+    decoder_t *         p_dec;
+};
+
+/*****************************************************************************
+ * decoder_t
+ *****************************************************************************
+ * The decoder descriptor.
+ *****************************************************************************/
+struct decoder_t
+{
+    VLC_COMMON_MEMBERS
+
     /* Module properties */
-    module_t *              p_module;
+    module_t *          p_module;
+    decoder_sys_t *     p_sys;
+    int                 ( * pf_init )  ( decoder_t * );
+    int                 ( * pf_decode )( decoder_t *, block_t * );
+    int                 ( * pf_end )   ( decoder_t * );
+
+    /* Input properties */
+    decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
+
+    /* Tmp field for old decoder api */
     int                 ( * pf_run ) ( decoder_fifo_t * );
 };
 

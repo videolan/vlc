@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.48 2003/08/15 13:16:38 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.49 2003/09/02 20:19:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -189,15 +189,16 @@ vlc_module_end();
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
 {
-    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    decoder_t *p_dec = (decoder_t*) p_this;
 
-    if( ffmpeg_GetFfmpegCodec( p_fifo->i_fourcc, NULL, NULL, NULL ) )
+    if( !ffmpeg_GetFfmpegCodec( p_dec->p_fifo->i_fourcc, NULL, NULL, NULL ) )
     {
-        p_fifo->pf_run = RunDecoder;
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
     }
 
-    return VLC_EGENERIC;
+    p_dec->pf_run = RunDecoder;
+
+    return VLC_SUCCESS;
 }
 
 typedef union decoder_thread_u
@@ -207,7 +208,6 @@ typedef union decoder_thread_u
     vdec_thread_t    video;
 
 } decoder_thread_t;
-
 
 /*****************************************************************************
  * RunDecoder: this function is called just after the thread is created
