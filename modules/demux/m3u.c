@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse pls, m3u, asx et b4s playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.24 2003/08/14 13:02:55 sigmunau Exp $
+ * $Id: m3u.c,v 1.25 2004/01/05 13:07:02 zorglub Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -551,9 +551,9 @@ static void ProcessLine ( input_thread_t *p_input, playlist_t *p_playlist,
 
     if( b_next && *ppsz_uri )
     {
-        playlist_AddExt( p_playlist, *ppsz_uri,
-                         *ppsz_name ? *ppsz_name : *ppsz_uri, -1, 
-                         0, 0, PLAYLIST_INSERT, *pi_position );
+        playlist_Add( p_playlist, *ppsz_uri,
+                         *ppsz_name ? *ppsz_name : *ppsz_uri,
+                          PLAYLIST_INSERT, *pi_position );
         (*pi_position)++;
         if( *ppsz_name )
         {
@@ -660,7 +660,7 @@ static int Demux ( input_thread_t *p_input )
         /* is there a pendding uri without b_next */
         if( psz_uri )
         {
-            playlist_Add( p_playlist, psz_uri, 0, 0,
+            playlist_Add( p_playlist, psz_uri, psz_uri,
                           PLAYLIST_INSERT, i_position );
         }
     }

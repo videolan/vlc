@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.50 2003/12/22 02:24:52 sam Exp $
+ * $Id: mkv.cpp,v 1.51 2004/01/05 13:07:02 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -2166,9 +2166,11 @@ static void InformationsCreate( input_thread_t *p_input )
 {
     demux_sys_t           *p_sys = p_input->p_demux_data;
     input_info_category_t *p_cat;
+    playlist_t            *p_playlist;
     int                   i_track;
 
     p_cat = input_InfoCategory( p_input, "Matroska" );
+    p_playlist = (playlist_t*)vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
     if( p_sys->f_duration > 1000.1 )
     {
         char psz_buffer[MSTRTIME_MAX_SIZE];

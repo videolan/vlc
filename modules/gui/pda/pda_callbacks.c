@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.23 2003/12/07 18:58:38 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.24 2004/01/05 13:07:03 zorglub Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -91,6 +91,7 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options, int i_
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
     playlist_t    *p_playlist;
+    int           i , i_id , i_pos;
     GtkTreeView   *p_tvplaylist = NULL;
 
     p_playlist = (playlist_t *)
@@ -132,8 +133,16 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options, int i_
             else
 #endif
             {
-                playlist_Add( p_playlist, (const char*)name, (const char**)ppsz_options, i_size,
+                i_id = playlist_Add( p_playlist, (const char*)name,
+                                (const char*)name,
                               PLAYLIST_APPEND, PLAYLIST_END );
+
+                i_pos = playlist_GetPositionById( p_playlist, i_id );
+
+                for( i = 0 ; i< i_size ; i++ )
+                {
+                    playlist_AddOption( p_playlist, i_pos , ppsz_options[i] );
+                }
             }
 
             /* Cleanup memory */
@@ -658,7 +667,7 @@ void onAddCameraToPlaylist(GtkButton *button, gpointer user_data)
     }
 
     i_pos = snprintf( &v4l_mrl[0], 6, "v4l");
-    v4l_mrl[5]='\0'; 
+    v4l_mrl[5]='\0';
 
     entryV4LChannel    = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryV4LChannel" );
     entryV4LFrequency  = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryV4LFrequency" );

@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.21 2003/12/22 02:24:51 sam Exp $
+ * $Id: theora.c,v 1.22 2004/01/05 13:07:02 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -27,6 +27,7 @@
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
 #include "input_ext-plugins.h"
+#include "vlc_playlist.h"
 
 #include <ogg/ogg.h>
 
@@ -337,6 +338,8 @@ static void ParseTheoraComments( decoder_t *p_dec )
     input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
     input_info_category_t *p_cat =
         input_InfoCategory( p_input, _("Theora comment") );
+    playlist_t *p_playlist = vlc_object_find( p_dec, VLC_OBJECT_PLAYLIST,
+                                              FIND_ANYWHERE );
     int i = 0;
     char *psz_name, *psz_value, *psz_comment;
     while ( i < p_dec->p_sys->tc.comments )
@@ -354,10 +357,13 @@ static void ParseTheoraComments( decoder_t *p_dec )
             *psz_value = '\0';
             psz_value++;
             input_AddInfo( p_cat, psz_name, psz_value );
+            playlist_AddInfo( p_playlist, -1, _("Theora comment") ,
+                              psz_name, psz_value );
         }
         free( psz_comment );
         i++;
     }
+    if( p_playlist) vlc_object_release( p_playlist );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * cmd_add_item.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_add_item.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: cmd_add_item.cpp,v 1.2 2004/01/05 13:07:03 zorglub Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -37,13 +37,13 @@ void CmdAddItem::execute()
     if( m_playNow )
     {
         // Enqueue and play the item
-        playlist_Add( pPlaylist, m_name.c_str(), 0, 0,
+        playlist_Add( pPlaylist, m_name.c_str(),m_name.c_str(),
                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
     }
     else
     {
         // Enqueue the item only
-        playlist_Add( pPlaylist, m_name.c_str(), 0, 0,
+        playlist_Add( pPlaylist, m_name.c_str(), m_name.c_str(),
                       PLAYLIST_APPEND, PLAYLIST_END );
     }
 }

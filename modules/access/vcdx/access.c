@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
- * $Id: access.c,v 1.14 2004/01/03 20:43:24 rocky Exp $
+ * $Id: access.c,v 1.15 2004/01/05 13:07:02 zorglub Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -979,12 +979,16 @@ VCDUpdateVar( input_thread_t *p_input, int i_num, int i_action,
 #define meta_info_add_str(title, str) \
   if ( str ) {                                                                \
     dbg_print( INPUT_DBG_META, "field: %s: %s\n", title, str);                \
-    input_AddInfo( p_cat, _(title), "%s", str );                        \
+    input_AddInfo( p_cat, _(title), "%s", str );                              \
+    playlist_AddInfo( p_playlist, -1, p_cat->psz_name, _(title),              \
+                      "%s",str );
   }
 
 #define meta_info_add_num(title, num) \
-  dbg_print( INPUT_DBG_META, "field %s: %d\n", title, num);                \
+  dbg_print( INPUT_DBG_META, "field %s: %d\n", title, num);                   \
   input_AddInfo( p_cat, _(title), "%d", num );                                \
+  playlist_AddInfo( p_playlist, -1, p_cat->psz_name, _(title),                \
+                    "%d",num );
 
 static void InformationCreate( input_thread_t *p_input  )
 {
@@ -992,7 +996,12 @@ static void InformationCreate( input_thread_t *p_input  )
   unsigned int i_nb = vcdinfo_get_num_entries(p_vcd->vcd);
   unsigned int last_entry = 0;
   input_info_category_t *p_cat;
+<<<<<<< access.c
+  playlist_item_t *p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+                                                 FIND_PARENT );
+=======
   track_t i_track;
+>>>>>>> 1.14
 
   p_cat = input_InfoCategory( p_input, "General" );
 
@@ -1024,6 +1033,9 @@ static void InformationCreate( input_thread_t *p_input  )
   meta_info_add_num( _("Tracks"),
 		     vcdinfo_get_num_tracks(p_vcd->vcd));
 
+<<<<<<< access.c
+  if( p_playlist) vlc_object_release( p_playlist );
+=======
   /* Spit out track information. Could also include MSF info.
    */
 
@@ -1047,6 +1059,7 @@ static void InformationCreate( input_thread_t *p_input  )
 	  last_entry++ ) ;
     meta_info_add_num( _("Last Entry Point"),  last_entry-1 );
   }
+>>>>>>> 1.14
 }
 
 #define add_format_str_info(val)			       \
@@ -1272,23 +1285,21 @@ VCDCreatePlayListItem(const input_thread_t *p_input,
 
   p_title =
     VCDFormatStr( p_input, p_vcd,
-                  config_GetPsz( p_input, MODULE_STRING "-title-format" ),
-                  psz_mrl, itemid );
-
-  playlist_AddExt( p_playlist, psz_mrl, p_title, i_duration,
-                   0, 0, playlist_operation, i_pos );
+		  config_GetPsz( p_input, MODULE_STRING "-title-format" ),
+		  psz_mrl, itemid );
+  
+  playlist_Add( p_playlist, psz_mrl, p_title, playlist_operation, i_pos );
 
   p_author =
     VCDFormatStr( p_input, p_vcd,
-                  config_GetPsz( p_input, MODULE_STRING "-author-format" ),
-                  psz_mrl, itemid );
+		  config_GetPsz( p_input, MODULE_STRING "-author-format" ),
+		  psz_mrl, itemid );
 
   /* FIXME: This is horrible, but until the playlist interface is fixed up
      something like this has to be done for the "Author" field.
    */
   if( i_pos == PLAYLIST_END ) i_pos = p_playlist->i_size - 1;
-  free(p_playlist->pp_items[i_pos]->psz_author);
-  p_playlist->pp_items[i_pos]->psz_author = strdup(p_author);
+  playlist_AddInfo(p_playlist, i_pos, _("General"), _("Author"), "%s",p_author);
 }
 
 static int

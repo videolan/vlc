@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.49 2003/12/15 14:25:43 hartman Exp $
+ * $Id: playlist.m,v 1.50 2004/01/05 13:07:03 zorglub Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -306,7 +306,7 @@
         o_current_name = [NSString stringWithUTF8String: 
             p_playlist->pp_items[i_current]->psz_name];
         o_current_author = [NSString stringWithUTF8String: 
-            p_playlist->pp_items[i_current]->psz_author];
+            playlist_GetInfo(p_playlist, i_current ,_("General"),_("Author") )];
         vlc_mutex_unlock( &p_playlist->object_lock );
 
 
@@ -394,9 +394,12 @@
             }
         }
     
-        playlist_AddExt( p_playlist, [o_url fileSystemRepresentation], [o_name UTF8String], -1, 
+        playlist_Add( p_playlist, [o_url fileSystemRepresentation], 
+                      [o_name UTF8String], i_mode, 
+                      i_position == -1 ? PLAYLIST_END : i_position + i_item);
+/*-1, 
             (ppsz_options != NULL ) ? (const char **)ppsz_options : 0, i_total_options,
-            i_mode, i_position == -1 ? PLAYLIST_END : i_position + i_item);
+            i_mode, i_position == -1 ? PLAYLIST_END : i_position + i_item);*/
     
         /* clean up */
         for( j = 0; j < i_total_options; j++ )
@@ -509,7 +512,7 @@
     {
         vlc_mutex_lock( &p_playlist->object_lock );
         o_value = [NSString stringWithUTF8String: 
-            p_playlist->pp_items[i_row]->psz_author]; 
+            playlist_GetInfo(p_playlist, i_row ,_("General"),_("Author") )];
         vlc_mutex_unlock( &p_playlist->object_lock );
     }
 

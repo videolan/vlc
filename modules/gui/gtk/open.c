@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.c,v 1.22 2003/12/22 14:32:56 sam Exp $
+ * $Id: open.c,v 1.23 2004/01/05 13:07:03 zorglub Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -650,7 +650,7 @@ void GtkOpenOk( GtkButton * button, gpointer user_data )
 
     psz_target = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
                                        GTK_WIDGET(button), "entry_open" ) ) );
-    playlist_Add( p_playlist, (char*)psz_target, 0, 0,
+    playlist_Add( p_playlist, (char*)psz_target, (char*)psz_target,
                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
     /* catch the GTK CList */

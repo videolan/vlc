@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.19 2003/12/28 20:50:20 asmax Exp $
+ * $Id: access.c,v 1.20 2004/01/05 13:07:02 zorglub Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -314,15 +314,20 @@ static void CDDASeek( input_thread_t * p_input, off_t i_off )
   if ( str ) {                                                 \
     dbg_print( INPUT_DBG_META, "field %s: %s\n", title, str);  \
     input_AddInfo( p_cat, _(title), "%s", str );               \
+    playlist_AddInfo( p_playlist, -1, p_cat->psz_name,         \
+                      _(title), "%s" , str );                  \
   }
 
 
 static void InformationCreate( input_thread_t *p_input  )
 {
   cdda_data_t *p_cdda = (cdda_data_t *) p_input->p_access_data;
+  playlist_t *p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+                                            FIND_PARENT );
   input_info_category_t *p_cat;
 
   p_cat = input_InfoCategory( p_input, "General" );
+  
 
 #ifdef HAVE_LIBCDDB
   if (p_cdda->i_cddb_enabled) {
@@ -363,6 +368,7 @@ static void InformationCreate( input_thread_t *p_input  )
     input_AddInfo( p_cat, _("Duration"), "%s",
                    secstotimestr( psz_buffer, i_duration ) );
   }
+  if( p_playlist ) vlc_object_release( p_playlist );
 }
 
 
@@ -655,27 +661,23 @@ CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
 
   dbg_print( INPUT_DBG_META, "mrl: %s, title: %s, duration, %ld, pos %d",
              psz_mrl, p_title, (long int) i_duration, i_pos );
+  playlist_Add( p_playlist, psz_mrl, p_title, playlist_operation, i_pos );
 
-  playlist_AddExt( p_playlist, psz_mrl, p_title, i_duration * 1000000,
-                   0, 0, playlist_operation, i_pos );
+  /* XXX Set the duration ! */
 
   p_author =
     CDDAFormatStr( p_input, p_cdda,
                    config_GetPsz( p_input, MODULE_STRING "-author-format" ),
                    psz_mrl, i_track );
 
-  /* FIXME: This is horrible, but until the playlist interface is fixed up
-     something like this has to be done for the "Author" field.
-   */
   if( i_pos == PLAYLIST_END ) i_pos = p_playlist->i_size - 1;
-  free(p_playlist->pp_items[i_pos]->psz_author);
-  p_playlist->pp_items[i_pos]->psz_author = strdup(p_author);
+  playlist_AddInfo( p_playlist, i_pos, _("General"),_("Author"),p_author);
 
 }
 
 static int
 CDDAFixupPlayList( input_thread_t *p_input, cdda_data_t *p_cdda,
-                  const char *psz_source, bool play_single_track)
+                   const char *psz_source, bool play_single_track)
 {
   int i;
   playlist_t * p_playlist;

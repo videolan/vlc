@@ -1,5 +1,5 @@
 List of vlc plugins (221)
-$Id: LIST,v 1.18 2003/12/06 22:47:37 jpsaman Exp $
+$Id: LIST,v 1.19 2004/01/05 13:07:02 zorglub Exp $
 
  * a52: A/52 basic parser/packetizer
 
@@ -30,6 +30,8 @@ $Id: LIST,v 1.18 2003/12/06 22:47:37 jpsaman Exp $
  * access_output_http: HTTP Network access module
 
  * access_output_udp: UDP Network access_output module
+
+ * access_tcp: TCP Network access module
 
  * access_udp: UDP Network access module 
 
@@ -92,6 +94,8 @@ $Id: LIST,v 1.18 2003/12/06 22:47:37 jpsaman Exp $
  * dshow: DirectShow access plugin for encoding cards under Windows
 
  * dts: DTS basic parser/packetizer
+ 
+ * dtssys: raw DTS stream input module
 
  * dtstospdif: Audio converter that encapsulates DTS into S/PDIF
 
@@ -178,17 +182,17 @@ $Id: LIST,v 1.18 2003/12/06 22:47:37 jpsaman Exp $
 
  * i420_rgb_mmx: MMX accelerated version of i420_rgb.
 
- * i420_ymga_mmx: MMX accelerated version of i420_ymga
-
  * i420_ymga: YUV to YUC conversion functions
-
- * i420_yuy2_mmx: MMX accelerated version of i420_yuy2.
+  
+ * i420_ymga_mmx: MMX accelerated version of i420_ymga
 
  * i420_yuy2: planar 4:2:0 YUV to packed YUV conversion functions.
 
- * i422_yuy2_mmx: MMX accelerated version of i422_yuy2.
+ * i420_yuy2_mmx: MMX accelerated version of i420_yuy2.
 
  * i422_yuy2: planar 4:2:2 YUV to packed YUV conversion functions.
+
+ * i422_yuy2_mmx: MMX accelerated version of i422_yuy2.
 
  * id3: ID3 tag skipper
  
@@ -226,13 +230,13 @@ $Id: LIST,v 1.18 2003/12/06 22:47:37 jpsaman Exp $
 
  * memcpy3dn: 3D Now! accelerated version of memcpy.
 
- * memcpyaltivec: Altivec accelerated version of memcpy.
-
  * memcpy: memory chunk copying module.
 
- * memcpymmxext: MMX EXT accelerated version of memcpy.
+ * memcpyaltivec: Altivec accelerated version of memcpy.
 
  * memcpymmx: MMX accelerated version of memcpy.
+ 
+ * memcpymmxext: MMX EXT accelerated version of memcpy.
 
  * mga: video output module for Matrox cards using the Linux mga kernel driver.
 
@@ -249,6 +253,8 @@ $Id: LIST,v 1.18 2003/12/06 22:47:37 jpsaman Exp $
  * mpga: MPEG-I/II Audio demuxer
 
  * mpgatofixed32: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
+ 
+ * mpgv: MPEG-I/II Vidéo demuxer
 
  * mux_asf: ASF muxer
 
@@ -261,10 +267,10 @@ $Id: LIST,v 1.18 2003/12/06 22:47:37 jpsaman Exp $
  * mux_ogg: OGG muxer
  
  * mux_ps: MPEG program stream muxer
+ 
+ * mux_ts: MPEG transport stream muxer
 
  * mux_ts_dvbpsi: MPEG transport stream muxer using libdvbpsi
-
- * mux_ts: MPEG transport stream muxer
 
  * ncurses: interface module using the ncurses library.
 
@@ -288,9 +294,9 @@ $Id: LIST,v 1.18 2003/12/06 22:47:37 jpsaman Exp $
 
  * postprocessing_c: Video Postprocessing module
 
- * postprocessing_mmxext: Video Postprocessing module using MMX_EXT 
-
  * postprocessing_mmx: Video Postprocessing module using MMX
+ 
+ * postprocessing_mmxext: Video Postprocessing module using MMX_EXT 
 
  * ps: input module for MPEG PS decapsulation.
 
@@ -298,11 +304,11 @@ $Id: LIST,v 1.18 2003/12/06 22:47:37 jpsaman Exp $
 
  * qnx: QNX RTOS plugin
 
- * qte_main: QT Embedded wrapper for gte_main
+ * qt: interface module using the Qt widget set.
 
  * qte: video output module for Qt Embedded.
  
- * qt: interface module using the Qt widget set.
+ * qte_main: QT Embedded wrapper for gte_main
 
  * quicktime: Quicktime decoder that uses the QT library
 
@@ -348,9 +354,9 @@ $Id: LIST,v 1.18 2003/12/06 22:47:37 jpsaman Exp $
 
  * stream_out_gather: stream out module gathering inputs for seemless transitions
 
- * stream_out_standard: standard stream output module
- 
  * stream_out_rtp: output using the RTP protocol
+ 
+ * stream_out_standard: standard stream output module
 
  * stream_out_transcode: audio & video transcoder using ffmpeg
 
@@ -383,9 +389,9 @@ $Id: LIST,v 1.18 2003/12/06 22:47:37 jpsaman Exp $
 
  * trivial_resampler: Simple audio resampler
 
- * ts_dvbpsi: same as ts using libdvbpsi
-
  * ts: input module for MPEG TS decapsulation.
+ 
+ * ts_dvbpsi: same as ts using libdvbpsi
 
  * u8tofixed32: unsigned 8 bits to fixed 32 bits audio converter 
 

@@ -2,7 +2,7 @@
  * speex.c: speex decoder/packetizer/encoder module making use of libspeex.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: speex.c,v 1.8 2003/12/22 02:24:51 sam Exp $
+ * $Id: speex.c,v 1.9 2004/01/05 13:07:02 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
+#include "vlc_playlist.h"
 
 #include <ogg/ogg.h>
 #include <speex.h>
@@ -461,6 +462,8 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
     input_info_category_t *p_cat =
         input_InfoCategory( p_input, _("Speex comment") );
+    playlist_t *p_playlist = vlc_object_find( p_dec, VLC_OBJECT_PLAYLIST,
+                                              FIND_ANYWHERE );
 
     char *p_buf = (char *)p_oggpacket->packet;
     SpeexMode *p_mode;
@@ -469,6 +472,8 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
     p_mode = speex_mode_list[p_sys->p_header->mode];
     input_AddInfo( p_cat, _("Mode"), "%s%s",
                    p_mode->modeName, p_sys->p_header->vbr ? " VBR" : "" );
+    playlist_AddInfo( p_playlist, -1, _("Speex comment") , _("Mode"), "%s%s",
+                    p_mode->modeName, p_sys->p_header->vbr ? " VBR" : "" );
 
     if( p_oggpacket->bytes < 8 )
     {
@@ -484,6 +489,9 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
     }
 
     input_AddInfo( p_cat, p_buf, "" );
+    playlist_AddInfo( p_playlist, -1, _("Speex comment") , p_buf , "" );
+
+    if( p_playlist ) vlc_object_release( p_playlist );
 
     /* TODO: finish comments parsing */
 }

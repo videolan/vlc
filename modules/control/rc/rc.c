@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.40 2003/12/22 14:32:55 sam Exp $
+ * $Id: rc.c,v 1.41 2004/01/05 13:07:02 zorglub Exp $
  *
  * Author: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -655,7 +655,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else if( !strcmp( psz_cmd, "add" ) )
     {
         printf( "trying to add %s to playlist\n", newval.psz_string );
-        playlist_Add( p_playlist, newval.psz_string, NULL, 0,
+        playlist_Add( p_playlist, newval.psz_string, newval.psz_string,
                       PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
     }
     else if( !strcmp( psz_cmd, "playlist" ) )

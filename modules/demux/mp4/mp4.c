@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.47 2004/01/05 12:37:52 jlj Exp $
+ * $Id: mp4.c,v 1.48 2004/01/05 13:07:02 zorglub Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -216,7 +216,7 @@ static int Open( vlc_object_t * p_this )
                         !strncmp( psz_ref, "rtsp://", 7 ) )
                     {
                         msg_Dbg( p_input, "adding ref = `%s'", psz_ref );
-                        playlist_Add( p_playlist, psz_ref, 0, 0,
+                        playlist_Add( p_playlist, psz_ref, psz_ref,
                                       PLAYLIST_APPEND, PLAYLIST_END );
                     }
                     else
@@ -238,7 +238,7 @@ static int Open( vlc_object_t * p_this )
                         }
                         strcat( psz_absolute, psz_ref );
                         msg_Dbg( p_input, "adding ref = `%s'", psz_absolute );
-                        playlist_Add( p_playlist, psz_absolute, 0, 0,
+                        playlist_Add( p_playlist, psz_absolute, psz_absolute,
                                       PLAYLIST_APPEND, PLAYLIST_END );
                     }
                 }
