@@ -477,5 +477,8 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
 
     DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
 
+    p_out->i_buffer = out_buf.i_nb_bytes;
+    p_out->i_samples = out_buf.i_nb_samples;
+
     return p_out;
 }
