@@ -144,7 +144,6 @@
     [[o_stream_type itemAtIndex: 1] setTitle: @"MMSH"];
     [[o_stream_type itemAtIndex: 2] setTitle: @"UDP"];
     [[o_stream_type itemAtIndex: 3] setTitle: @"RTP"];
-    [[o_stream_type itemAtIndex: 4] setTitle: @"RTP (New)"];
     [o_stream_type_lbl setStringValue: _NS("Type")];
 
     [o_mux_lbl setStringValue: _NS("Encapsulation Method")];
@@ -303,20 +302,6 @@
             [o_stream_address setEnabled: YES];
             [o_stream_ttl setEnabled: YES];
             [o_stream_ttl_stp setEnabled: YES];
-            [[o_mux_selector itemAtIndex: 1] setEnabled: NO];
-            [[o_mux_selector itemAtIndex: 2] setEnabled: NO];
-            [[o_mux_selector itemAtIndex: 3] setEnabled: NO];
-            [[o_mux_selector itemAtIndex: 4] setEnabled: NO];
-            [[o_mux_selector itemAtIndex: 5] setEnabled: NO];
-            [[o_mux_selector itemAtIndex: 6] setEnabled: NO];
-            [[o_mux_selector itemAtIndex: 7] setEnabled: NO];
-            [[o_mux_selector itemAtIndex: 8] setEnabled: YES];
-        }
-        else if( [o_mode isEqualToString: @"RTP (New)"] )
-        {
-            [o_stream_address setEnabled: YES];
-            [o_stream_ttl setEnabled: YES];
-            [o_stream_ttl_stp setEnabled: YES];
             [[o_mux_selector itemAtIndex: 0] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 1] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 2] setEnabled: NO];
@@ -335,11 +320,11 @@
         }
     }
 
-    if( ![[o_mux_selector selectedItem] isEnabled] && ![o_mode isEqualToString: @"RTP (New)"] )
+    if( ![[o_mux_selector selectedItem] isEnabled] && ![o_mode isEqualToString: @"RTP"] )
     {
         [o_mux_selector selectItemAtIndex: 0];
     }
-    else if (![[o_mux_selector selectedItem] isEnabled] && [o_mode isEqualToString: @"RTP (New)"] )
+    else if (![[o_mux_selector selectedItem] isEnabled] && [o_mode isEqualToString: @"RTP"] )
     {
         [o_mux_selector selectItemAtIndex: 8];
     }
@@ -419,10 +404,7 @@
                     o_announce = [o_announce stringByAppendingString: @",slp"];
             }
         }
-        else if ( [o_mode isEqualToString: @"RTP"] )
-            o_mode = @"rtp";
-
-        if ( ![o_mode isEqualToString: @"RTP (New)"] )
+        if ( ![o_mode isEqualToString: @"RTP"] )
         {
 
             [o_mrl_string appendFormat:
@@ -573,7 +555,6 @@
         }
         if ( [o_transcode_audio_chkbox state] == NSOnState )
         {
-fprintf(stderr,"%s\n",[[o_transcode_audio_bitrate stringValue] cString]);
             [o_transcode_string appendFormat: @"acodec=\"%@\",ab=\"%@\"",
                 [o_transcode_audio_selector titleOfSelectedItem],
                 [o_transcode_audio_bitrate stringValue]];
@@ -593,9 +574,9 @@ fprintf(stderr,"%s\n",[[o_transcode_audio_bitrate stringValue] cString]);
     NSString *o_mode;
     o_mode = [[o_stream_type selectedCell] title];
     [o_channel_name setEnabled: [o_sap_chkbox state] || [o_slp_chkbox state]
-                || [o_mode isEqualToString: @"RTP (New)"]];
+                || [o_mode isEqualToString: @"RTP"]];
 
-    if ([o_mode isEqualToString: @"RTP (New)"])
+    if ([o_mode isEqualToString: @"RTP"])
     {
         if ([[sender title] isEqualToString: _NS("SAP announce")])
         {
