@@ -1069,6 +1069,9 @@ static void RunThread( vout_thread_t *p_vout)
             b_display = p_vout->b_active;
             p_vout->last_display_date = display_date;
             p_vout->p_rendered_pic = p_pic;
+            
+
+
 
             /* FIXME: if b_need_render == 0 we need to do something with
              * the subpictures one day. */
@@ -1571,6 +1574,7 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
         /* Set picture position */
         i_pic_x = (p_vout->i_width - i_pic_width) / 2;
         i_pic_y = (p_vout->i_height - i_pic_height) / 2;
+
     }
     else
     {
@@ -1670,7 +1674,9 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #ifdef DEBUG_VOUT
     render_time = mdate();
 #endif
+ 
 
+    
     /*
      * Choose appropriate rendering function and render picture
      */

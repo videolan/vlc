@@ -233,8 +233,8 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
                                              SDL_YV12_OVERLAY, 
                                              p_vout->p_sys->p_display
                                            );
-                intf_Msg("[YUV acceleration] : %d\n",
-                            p_vout->p_sys->p_overlay->hw_overlay);
+                intf_Msg("[YUV acceleration] : %d,\n",
+                            p_vout->p_sys->p_overlay->hw_overlay); 
             }
 
             SDL_LockYUVOverlay(p_vout->p_sys->p_overlay);
@@ -254,12 +254,12 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
                    p_vout->p_rendered_pic->p_u,
                    p_vout->p_sys->p_overlay->h *
                    p_vout->p_sys->p_overlay->pitches[2] / 2);
-        
-            disp.x = 0;
-            disp.y = 0;
-            disp.w = p_vout->i_width;
-            disp.h = p_vout->i_height;
-        
+       
+            disp.w = (&p_vout->p_buffer[p_vout->i_buffer_index])->i_pic_width;
+            disp.h = (&p_vout->p_buffer[p_vout->i_buffer_index])->i_pic_height;
+            disp.x = (p_vout->i_width - disp.w)/2;
+            disp.y = (p_vout->i_height - disp.h)/2;
+ 
             SDL_DisplayYUVOverlay( p_vout->p_sys->p_overlay , &disp );
             SDL_UnlockYUVOverlay(p_vout->p_sys->p_overlay);
         }

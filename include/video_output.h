@@ -185,6 +185,7 @@ typedef struct vout_thread_s
     boolean_t           b_scale;                    /* allow picture scaling */
     mtime_t             render_time;             /* last picture render time */
 
+
     /* Idle screens management */
     mtime_t             last_display_date;     /* last non idle display date */
     mtime_t             last_idle_date;            /* last idle display date */
