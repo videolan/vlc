@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: interface.cpp,v 1.76 2003/12/04 10:25:47 gbazin Exp $
+ * $Id: interface.cpp,v 1.77 2003/12/11 05:12:37 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -290,7 +290,7 @@ void Interface::CreateOurMenuBar()
 #define HELP_SIMPLE N_("Quick file open")
 #define HELP_ADV N_("Advanced open")
 #define HELP_FILE  N_("Open a file")
-#define HELP_DISC  N_("Open a DVD or (S)VCD")
+#define HELP_DISC  N_("Open Disc Media")
 #define HELP_NET   N_("Open a network stream")
 #define HELP_SAT   N_("Open a satellite stream")
 #define HELP_EJECT N_("Eject the DVD/CD")
