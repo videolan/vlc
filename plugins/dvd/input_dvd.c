@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.89 2001/10/14 03:26:20 stef Exp $
+ * $Id: input_dvd.c,v 1.90 2001/10/15 13:33:00 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -461,7 +461,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             p_input->b_error = 1;
             return -1;
         }
-
+        
         /* temporary hack to fix size in some dvds */
         if( p_dvd->i_cell >= vts.cell_inf.i_cell_nb )
         {
@@ -477,6 +477,13 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             p_input->b_error = 1;
             return -1;
         }
+        
+        /*
+         * Force libdvdcss to check its title key.
+         * It is only useful for title cracking method. Methods using the decrypted
+         * disc key are fast enough to check the key at each seek
+         */
+        dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_start, DVDCSS_SEEK_INI );
 
         p_dvd->i_size -= p_dvd->i_sector + 1;
 
@@ -741,13 +748,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             p_dvd->i_chapter = 1;
         }
     }
-
-    /*
-     * Force libdvdcss to check its title key.
-     * It is only useful for title cracking method. Methods using the decrypted
-     * disc key are fast enough to check the key at each seek
-     */
-    dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_start, DVDCSS_SEEK_INI );
 
 #define title \
     p_dvd->p_ifo->vts.title_unit.p_title[p_dvd->i_title_id-1].title
