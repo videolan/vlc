@@ -2,7 +2,7 @@
  * i420_rgb16.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb16.c,v 1.3 2002/11/22 12:11:38 sam Exp $
+ * $Id: i420_rgb16.c,v 1.4 2002/11/25 19:29:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -39,8 +39,9 @@
 
 static void SetOffset( int, int, int, int, vlc_bool_t *, int *, int * );
 
+#if defined (MODULE_NAME_IS_i420_rgb)
 /*****************************************************************************
- * I420_RGB15: color YUV 4:2:0 to RGB 15 bpp
+ * I420_RGB16: color YUV 4:2:0 to RGB 16 bpp with dithering
  *****************************************************************************
  * Horizontal alignment needed:
  *  - input: 8 pixels (8 Y bytes, 4 U/V bytes), margins not allowed
@@ -49,8 +50,8 @@ static void SetOffset( int, int, int, int, vlc_bool_t *, int *, int * );
  *  - input: 2 lines (2 Y lines, 1 U/V line)
  *  - output: 1 line
  *****************************************************************************/
-void E_(I420_RGB15)( vout_thread_t *p_vout, picture_t *p_src,
-                                            picture_t *p_dest )
+void E_(I420_RGB16_dithering)( vout_thread_t *p_vout, picture_t *p_src,
+                                                      picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     u16 *p_pic = (u16*)p_dest->p->p_pixels;
@@ -61,18 +62,17 @@ void E_(I420_RGB15)( vout_thread_t *p_vout, picture_t *p_src,
     vlc_bool_t   b_hscale;                        /* horizontal scaling type */
     int          i_vscale;                          /* vertical scaling type */
     unsigned int i_x, i_y;                /* horizontal and vertical indexes */
+    unsigned int i_real_y;                                          /* y % 4 */
 
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
     int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
     u16 *       p_pic_start;       /* beginning of the current line for copy */
-#if defined (MODULE_NAME_IS_i420_rgb)
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     u16 *       p_yuv = p_vout->chroma.p_sys->p_rgb16;
     u16 *       p_ybase;                     /* Y dependant conversion table */
-#endif
 
     /* Conversion buffer pointer */
     u16 *       p_buffer_start = (u16*)p_vout->chroma.p_sys->p_buffer;
@@ -81,6 +81,20 @@ void E_(I420_RGB15)( vout_thread_t *p_vout, picture_t *p_src,
     /* Offset array pointer */
     int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
     int *       p_offset;
+
+    /* The dithering matrices */
+    int dither10[4] = {  0x0,  0x8,  0x2,  0xa };
+    int dither11[4] = {  0xc,  0x4,  0xe,  0x6 };
+    int dither12[4] = {  0x3,  0xb,  0x1,  0x9 };
+    int dither13[4] = {  0xf,  0x7,  0xd,  0x5 };
+
+    for(i_x = 0; i_x < 4; i_x++)
+    {
+        dither10[i_x] = dither10[i_x] << (SHIFT - 4 + p_vout->output.i_rrshift);
+        dither11[i_x] = dither11[i_x] << (SHIFT - 4 + p_vout->output.i_rrshift);
+        dither12[i_x] = dither12[i_x] << (SHIFT - 4 + p_vout->output.i_rrshift);
+        dither13[i_x] = dither13[i_x] << (SHIFT - 4 + p_vout->output.i_rrshift);
+    }
 
     i_right_margin = p_dest->p->i_pitch - p_dest->p->i_visible_pitch;
 
@@ -107,66 +121,60 @@ void E_(I420_RGB15)( vout_thread_t *p_vout, picture_t *p_src,
                     p_vout->output.i_height : p_vout->render.i_height;
     for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
     {
+        i_real_y = i_y & 0x3;
         p_pic_start = p_pic;
         p_buffer = b_hscale ? p_buffer_start : p_pic;
 
         for ( i_x = p_vout->render.i_width / 8; i_x--; )
         {
-#if defined (MODULE_NAME_IS_i420_rgb)
-            CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
-            CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
-            CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
-            CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx)
-            __asm__( MMX_INIT_16
-                     : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
-
-            __asm__( ".align 8"
-                     MMX_YUV_MUL
-                     MMX_YUV_ADD
-                     MMX_UNPACK_15
-                     : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
-
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-            p_buffer += 8;
-#endif
+            int *p_dither = dither10;
+            CONVERT_YUV_PIXEL_DITHER(2);
+            p_dither = dither11;
+            CONVERT_Y_PIXEL_DITHER(2);
+            p_dither = dither12;
+            CONVERT_YUV_PIXEL_DITHER(2);
+            p_dither = dither13;
+            CONVERT_Y_PIXEL_DITHER(2);
+            p_dither = dither10;
+            CONVERT_YUV_PIXEL_DITHER(2);
+            p_dither = dither11;
+            CONVERT_Y_PIXEL_DITHER(2);
+            p_dither = dither12;
+            CONVERT_YUV_PIXEL_DITHER(2);
+            p_dither = dither13;
+            CONVERT_Y_PIXEL_DITHER(2);
         }
 
         /* Here we do some unaligned reads and duplicate conversions, but
          * at least we have all the pixels */
         if( i_rewind )
         {
+            int *p_dither = dither10;
             p_y -= i_rewind;
             p_u -= i_rewind >> 1;
             p_v -= i_rewind >> 1;
             p_buffer -= i_rewind;
-#if defined (MODULE_NAME_IS_i420_rgb)
-            CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
-            CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
-            CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
-            CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx)
-            __asm__( MMX_INIT_16
-                     : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
-
-            __asm__( ".align 8"
-                     MMX_YUV_MUL
-                     MMX_YUV_ADD
-                     MMX_UNPACK_15
-                     : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
-
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-            p_buffer += 8;
-#endif
+            CONVERT_YUV_PIXEL_DITHER(2);
+            p_dither = dither11;
+            CONVERT_Y_PIXEL_DITHER(2);
+            p_dither = dither12;
+            CONVERT_YUV_PIXEL_DITHER(2);
+            p_dither = dither13;
+            CONVERT_Y_PIXEL_DITHER(2);
+            p_dither = dither10;
+            CONVERT_YUV_PIXEL_DITHER(2);
+            p_dither = dither11;
+            CONVERT_Y_PIXEL_DITHER(2);
+            p_dither = dither12;
+            CONVERT_YUV_PIXEL_DITHER(2);
+            p_dither = dither13;
+            CONVERT_Y_PIXEL_DITHER(2);
         }
         SCALE_WIDTH;
         SCALE_HEIGHT( 420, 2 );
     }
 }
+#endif
 
 /*****************************************************************************
  * I420_RGB16: color YUV 4:2:0 to RGB 16 bpp
@@ -239,29 +247,56 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
         p_pic_start = p_pic;
         p_buffer = b_hscale ? p_buffer_start : p_pic;
 
+#if defined (MODULE_NAME_IS_i420_rgb)
         for ( i_x = p_vout->render.i_width / 8; i_x--; )
         {
-#if defined (MODULE_NAME_IS_i420_rgb)
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx)
-            __asm__( MMX_INIT_16
-                     : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
-
-            __asm__( ".align 8"
-                     MMX_YUV_MUL
-                     MMX_YUV_ADD
-                     MMX_UNPACK_16
-                     : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
-
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-            p_buffer += 8;
-#endif
         }
+#elif defined (MODULE_NAME_IS_i420_rgb_mmx)
+        if( p_vout->output.i_rmask == 0x7c00 )
+        {
+            /* 15bpp 5/5/5 */
+            for ( i_x = p_vout->render.i_width / 8; i_x--; )
+            {
+                __asm__( MMX_INIT_16
+                         : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+
+                __asm__( ".align 8"
+                         MMX_YUV_MUL
+                         MMX_YUV_ADD
+                         MMX_UNPACK_15
+                         : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+
+                p_y += 8;
+                p_u += 4;
+                p_v += 4;
+                p_buffer += 8;
+            }
+        }
+        else
+        {
+            /* 16bpp 5/6/5 */
+            for ( i_x = p_vout->render.i_width / 8; i_x--; )
+            {
+                __asm__( MMX_INIT_16
+                         : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+
+                __asm__( ".align 8"
+                         MMX_YUV_MUL
+                         MMX_YUV_ADD
+                         MMX_UNPACK_16
+                         : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+
+                p_y += 8;
+                p_u += 4;
+                p_v += 4;
+                p_buffer += 8;
+            }
+        }
+#endif
 
         /* Here we do some unaligned reads and duplicate conversions, but
          * at least we have all the pixels */
@@ -280,11 +315,24 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
             __asm__( MMX_INIT_16
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
-            __asm__( ".align 8"
-                     MMX_YUV_MUL
-                     MMX_YUV_ADD
-                     MMX_UNPACK_16
-                     : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+            if( p_vout->output.i_rmask == 0x7c00 )
+            {
+                /* 15bpp 5/5/5 */
+                __asm__( ".align 8"
+                         MMX_YUV_MUL
+                         MMX_YUV_ADD
+                         MMX_UNPACK_15
+                         : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+            }
+            else
+            {
+                /* 16bpp 5/6/5 */
+                __asm__( ".align 8"
+                         MMX_YUV_MUL
+                         MMX_YUV_ADD
+                         MMX_UNPACK_16
+                         : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+            }
 
             p_y += 8;
             p_u += 4;

@@ -2,7 +2,7 @@
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_rgb.c,v 1.2 2002/11/20 13:37:36 sam Exp $
+ * $Id: i420_rgb.c,v 1.3 2002/11/25 19:29:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,6 +37,17 @@
 #endif
 
 /*****************************************************************************
+ * RGB2PIXEL: assemble RGB components to a pixel value, returns a uint32_t
+ *****************************************************************************/
+#define RGB2PIXEL( p_vout, i_r, i_g, i_b )          \
+    (((((uint32_t)i_r) >> p_vout->output.i_rrshift) \
+                       << p_vout->output.i_lrshift) \
+   | ((((uint32_t)i_g) >> p_vout->output.i_rgshift) \
+                       << p_vout->output.i_lgshift) \
+   | ((((uint32_t)i_b) >> p_vout->output.i_rbshift) \
+                       << p_vout->output.i_lbshift))
+
+/*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
 static int  Activate   ( vlc_object_t * );
@@ -54,7 +65,7 @@ static void Set8bppPalette      ( vout_thread_t *, u8 * );
 vlc_module_begin();
 #if defined (MODULE_NAME_IS_i420_rgb)
     set_description( _("I420,IYUV,YV12 to "
-                       "RGB,RV15,RV16,RV24,RV32 conversions") );
+                       "RGB2,RV15,RV16,RV24,RV32 conversions") );
     set_capability( "chroma", 80 );
 #elif defined (MODULE_NAME_IS_i420_rgb_mmx)
     set_description( _( "MMX I420,IYUV,YV12 to "
@@ -95,15 +106,33 @@ static int Activate( vlc_object_t *p_this )
                     break;
 #endif
                 case VLC_FOURCC('R','V','1','5'):
-                    p_vout->chroma.pf_convert = E_(I420_RGB15);
-                    break;
-
                 case VLC_FOURCC('R','V','1','6'):
+#if defined (MODULE_NAME_IS_i420_rgb_mmx)
+                    /* If we don't have support for the bitmasks, bail out */
+                    if( ( p_vout->output.i_rmask != 0x7c00
+                           || p_vout->output.i_gmask != 0x03e0
+                           || p_vout->output.i_bmask != 0x001f )
+                     && ( p_vout->output.i_rmask != 0xf800
+                           || p_vout->output.i_gmask != 0x07e0
+                           || p_vout->output.i_bmask != 0x001f ) )
+                    {
+                        return -1;
+                    }
+#endif
                     p_vout->chroma.pf_convert = E_(I420_RGB16);
                     break;
 
                 case VLC_FOURCC('R','V','2','4'):
                 case VLC_FOURCC('R','V','3','2'):
+#if defined (MODULE_NAME_IS_i420_rgb_mmx)
+                    /* If we don't have support for the bitmasks, bail out */
+                    if( p_vout->output.i_rmask != 0x00ff0000
+                         || p_vout->output.i_gmask != 0x0000ff00
+                         || p_vout->output.i_bmask != 0x000000ff )
+                    {
+                        return -1;
+                    }
+#endif
                     p_vout->chroma.pf_convert = E_(I420_RGB32);
                     break;
 

@@ -2,7 +2,7 @@
  * i420_rgb.h : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: i420_rgb.h,v 1.2 2002/11/25 19:29:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,11 +45,11 @@ struct chroma_sys_t
  * Prototypes
  *****************************************************************************/
 #ifdef MODULE_NAME_IS_i420_rgb
-void E_(I420_RGB8) ( vout_thread_t *, picture_t *, picture_t * );
+void E_(I420_RGB8)         ( vout_thread_t *, picture_t *, picture_t * );
+void E_(I420_RGB16_dither) ( vout_thread_t *, picture_t *, picture_t * );
 #endif
-void E_(I420_RGB15)( vout_thread_t *, picture_t *, picture_t * );
-void E_(I420_RGB16)( vout_thread_t *, picture_t *, picture_t * );
-void E_(I420_RGB32)( vout_thread_t *, picture_t *, picture_t * );
+void E_(I420_RGB16)        ( vout_thread_t *, picture_t *, picture_t * );
+void E_(I420_RGB32)        ( vout_thread_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
  * CONVERT_*_PIXEL: pixel conversion macros
@@ -74,6 +74,22 @@ void E_(I420_RGB32)( vout_thread_t *, picture_t *, picture_t * );
     i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;     \
     i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;                              \
     CONVERT_Y_PIXEL( BPP )                                                    \
+
+#define CONVERT_Y_PIXEL_DITHER( BPP )                                         \
+    /* Only Y sample is present */                                            \
+    p_ybase = p_yuv + *p_y++;                                                 \
+    *p_buffer++ = p_ybase[RED_OFFSET-((V_RED_COEF*128+p_dither[i_real_y])>>SHIFT) + i_red] |     \
+        p_ybase[GREEN_OFFSET-(((U_GREEN_COEF+V_GREEN_COEF)*128+p_dither[i_real_y])>>SHIFT)       \
+        + i_green ] | p_ybase[BLUE_OFFSET-((U_BLUE_COEF*128+p_dither[i_real_y])>>SHIFT) + i_blue];
+
+#define CONVERT_YUV_PIXEL_DITHER( BPP )                                       \
+    /* Y, U and V samples are present */                                      \
+    i_uval =    *p_u++;                                                       \
+    i_vval =    *p_v++;                                                       \
+    i_red =     (V_RED_COEF * i_vval) >> SHIFT;                               \
+    i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;     \
+    i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;                              \
+    CONVERT_Y_PIXEL_DITHER( BPP )                                             \
 
 #define CONVERT_4YUV_PIXEL( CHROMA )                                          \
     *p_pic++ = p_lookup[                                                      \

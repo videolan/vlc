@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.60 2002/11/20 13:37:35 sam Exp $
+ * $Id: video.h,v 1.61 2002/11/25 19:29:10 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -113,15 +113,6 @@ struct picture_heap_t
     /* Stuff used for palettized RGB planes */
     void (* pf_setpalette) ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 };
-
-/* RGB2PIXEL: assemble RGB components to a pixel value, returns a uint32_t */
-#define RGB2PIXEL( p_vout, i_r, i_g, i_b )          \
-    (((((uint32_t)i_r) >> p_vout->output.i_rrshift) \
-                       << p_vout->output.i_lrshift) \
-   | ((((uint32_t)i_g) >> p_vout->output.i_rgshift) \
-                       << p_vout->output.i_lgshift) \
-   | ((((uint32_t)i_b) >> p_vout->output.i_rbshift) \
-                       << p_vout->output.i_lbshift))
 
 /*****************************************************************************
  * Flags used to describe the status of a picture
