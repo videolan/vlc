@@ -931,25 +931,16 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, char *psz_host,
         vlc_value_t val;
         char psz_port[6];
         struct addrinfo hints;
+        int res;
 
         memset( &hints, 0, sizeof( hints ) );
-
-#if 0
-        /* 
-         * For now, keep IPv4 by default. That said, it should be safe to use
-         * IPv6 by default *on the server side*, as, apart from NetBSD, most
-         * systems accept IPv4 clients on IPv6 listening sockets.
-         */
-        hints.ai_family = PF_INET;
-#else
-        hints.ai_family = 0;
 
         /* Check if ipv4 or ipv6 were forced */
         var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Get( p_this, "ipv4", &val );
         if( val.b_bool )
             hints.ai_family = PF_INET;
-#endif
+
         var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Get( p_this, "ipv6", &val );
         if( val.b_bool )
@@ -964,9 +955,15 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, char *psz_host,
         snprintf( psz_port, sizeof( psz_port ), "%d", i_port );
         psz_port[sizeof( psz_port ) - 1] = '\0';
         
-        if( getaddrinfo( psz_host, psz_port, &hints, &res ) )
+        res = getaddrinfo( psz_host, psz_port, &hints, &res );
+        if( res != 0 )
         {
+#ifdef HAVE_GAI_STRERROR
+            msg_Err( p_this, "cannot resolve %s:%d : %s", psz_host, i_port,
+                     gai_strerror( res ) );
+#else
             msg_Err( p_this, "cannot resolve %s:%d", psz_host, i_port );
+#endif
             return NULL;
         }
     }
