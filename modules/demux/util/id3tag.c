@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.11 2003/10/20 00:01:06 hartman Exp $
+ * $Id: id3tag.c,v 1.12 2003/10/20 01:07:28 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  * 
@@ -66,6 +66,15 @@ static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
     int i_strings;
     char * psz_temp;
     int i;
+    vlc_value_t val;
+    
+    var_Get( p_input, "demuxed-id3", &val );
+
+    if( val.b_bool )
+    {
+        msg_Dbg( p_input, "The ID3 tag was already parsed" );
+        return;
+    }
     
     p_id3_tag = id3_tag_parse( p_data, i_size );
     p_category = input_InfoCategory( p_input, "ID3" );
@@ -120,6 +129,8 @@ static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
         i++;
     }
     id3_tag_delete( p_id3_tag );
+    val.b_bool = VLC_TRUE;
+    var_Change( p_input, "demuxed-id3", VLC_VAR_SETVALUE, &val, NULL );
 }
 
 /*****************************************************************************
@@ -129,7 +140,6 @@ static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
 static int ParseID3Tags( vlc_object_t *p_this )
 {
     input_thread_t *p_input;
-    vlc_value_t val;
     u8  *p_peek;
     int i_size;
     int i_size2;
@@ -140,17 +150,7 @@ static int ParseID3Tags( vlc_object_t *p_this )
     }
     p_input = (input_thread_t *)p_this;
 
-    var_Get( p_input, "demuxed-id3", &val );
-
-    if( val.b_bool )
-    {
-        msg_Dbg( p_input, "The ID3 tag was already parsed" );
-        return VLC_EGENERIC;
-    }
-    else
-    {
-        msg_Dbg( p_input, "Checking for ID3 tag" );
-    }
+    msg_Dbg( p_input, "Checking for ID3 tag" );
 
     if ( p_input->stream.b_seekable &&
          p_input->stream.i_method != INPUT_METHOD_NETWORK )
@@ -216,8 +216,6 @@ static int ParseID3Tags( vlc_object_t *p_this )
     i_size = id3_tag_query( p_peek, 10 );
     if ( i_size <= 0 )
     {
-        val.b_bool = VLC_TRUE;
-        var_Change( p_input, "demuxed-id3", VLC_VAR_SETVALUE, &val, NULL );
         return( VLC_SUCCESS );
     }
 
@@ -231,8 +229,5 @@ static int ParseID3Tags( vlc_object_t *p_this )
     ParseID3Tag( p_input, p_peek, i_size );
     msg_Dbg( p_input, "ID3 tag found, skiping %d bytes", i_size );
     p_input->p_current_data += i_size; /* seek passed end of ID3 tag */
-
-    val.b_bool = VLC_TRUE;
-    var_Change( p_input, "demuxed-id3", VLC_VAR_SETVALUE, &val, NULL );
     return( VLC_SUCCESS );
 }
