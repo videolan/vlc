@@ -1745,6 +1745,9 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             {
                 msg_Warn( p_demux, "private MSCODEC (vlc) without bih private descriptor" );
             }
+            /* For such stream we will gather them ourself and don't launch a packetize,
+             * Yes it's ugly but it's the only way to make DIV3 working */
+            pid->es->fmt.b_packetized = VLC_TRUE;
         }
 
         if( pid->es->fmt.i_cat == AUDIO_ES || pid->es->fmt.i_cat == SPU_ES )
