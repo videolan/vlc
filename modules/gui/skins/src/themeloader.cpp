@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: themeloader.cpp,v 1.2 2003/03/18 04:56:58 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,14 +28,14 @@
 #include <string>
 #include <fcntl.h>
 
+//--- VLC -------------------------------------------------------------------
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+
 #if defined( HAVE_LIBTAR_H ) && defined( HAVE_ZLIB_H )
 #   include <zlib.h>
 #   include <libtar.h>
 #endif
-
-//--- VLC -------------------------------------------------------------------
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "os_api.h"
