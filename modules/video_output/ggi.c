@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.5 2003/10/25 00:49:14 sam Exp $
+ * $Id: ggi.c,v 1.6 2004/01/26 16:45:02 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -54,12 +54,12 @@ static void SetPalette     ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t *
  * Module descriptor
  *****************************************************************************/
 #define DISPLAY_TEXT N_("X11 display name")
-#define DISPLAY_LONGTEXT N_("Specify the X11 hardware display you want to use."\
-                           "\nBy default VLC will use the value of the DISPLAY"\
-                           " environment variable.")
+#define DISPLAY_LONGTEXT N_( \
+            "Specify the X11 hardware display you want to use.\n" \
+            "By default, VLC will use the value of the DISPLAY " \
+            "environment variable.")
 
 vlc_module_begin();
-    add_category_hint( N_("Miscellaneous"), NULL, VLC_FALSE );
     add_string( "ggi-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
     set_description( "General Graphics Interface video output" );
     set_capability( "video output", 30 );

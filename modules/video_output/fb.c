@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.7 2003/10/25 00:49:14 sam Exp $
+ * $Id: fb.c,v 1.8 2004/01/26 16:45:02 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -64,10 +64,15 @@ static void GfxMode        ( int i_tty );
  *****************************************************************************/
 #define FB_DEV_VAR "fbdev"
 
+#define DEVICE_TEXT N_("Framebuffer device")
+#define DEVICE_LONGTEXT N_( \
+    "You can select here the framebuffer device that will be used " \
+    "for rendering (ususally /dev/fb0).")
+
 vlc_module_begin();
-    add_category_hint( N_("Frame Buffer"), NULL, VLC_FALSE );
-    add_file( FB_DEV_VAR, "/dev/fb0", NULL, N_("framebuffer device"), NULL, VLC_FALSE );
-    set_description( _("Linux console framebuffer video output") );
+    add_file( FB_DEV_VAR, "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
+              VLC_FALSE );
+    set_description( _("GNU/Linux console framebuffer video output") );
     set_capability( "video output", 30 );
     set_callbacks( Create, Destroy );
 vlc_module_end();

@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: directx.c,v 1.33 2004/01/06 19:12:08 gbazin Exp $
+ * $Id: directx.c,v 1.34 2004/01/26 16:45:02 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -106,16 +106,19 @@ static int FindDevicesCallback( vlc_object_t *, char const *,
 #define HW_YUV_LONGTEXT N_( \
     "Try to use hardware acceleration for YUV->RGB conversions. " \
     "This option doesn't have any effect when using overlays." )
+
 #define SYSMEM_TEXT N_("Use video buffers in system memory")
 #define SYSMEM_LONGTEXT N_( \
     "Create video buffers in system memory instead of video memory. This " \
     "isn't recommended as usually using video memory allows to benefit from " \
     "more hardware acceleration (like rescaling or YUV->RGB conversions). " \
     "This option doesn't have any effect when using overlays." )
+
 #define TRIPLEBUF_TEXT N_("Use triple buffering for overlays")
 #define TRIPLEBUF_LONGTEXT N_( \
     "Try to use triple bufferring when using YUV overlays. That results in " \
     "much better video quality (no flickering)." )
+
 #define DEVICE_TEXT N_("Name of desired display device")
 #define DEVICE_LONGTEXT N_("In a multimonitor configuration, you can specify "\
     "the Windows device name of the display that you want the video window " \
@@ -125,8 +128,6 @@ static char *ppsz_dev[] = { "" };
 static char *ppsz_dev_text[] = { N_("Default") };
 
 vlc_module_begin();
-    add_category_hint( N_("Video"), NULL, VLC_FALSE );
-
     add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
               VLC_TRUE );
     add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT,
@@ -261,7 +262,7 @@ static int OpenVideo( vlc_object_t *p_this )
     text.psz_string = _("Always on top");
     var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
     var_Get( p_vout, "video-on-top", &val );
-    p_vout->p_sys->b_on_top_change = val.b_bool; 
+    p_vout->p_sys->b_on_top_change = val.b_bool;
     var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
 
     return VLC_SUCCESS;
@@ -537,7 +538,7 @@ static int Manage( vout_thread_t *p_vout )
         HMENU hMenu = GetSystemMenu( p_vout->p_sys->hwnd, FALSE );
 
         var_Get( p_vout, "video-on-top", &val );
- 
+
         /* Set the window on top if necessary */
         if( val.b_bool && !( GetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE )
                            & WS_EX_TOPMOST ) )
@@ -582,7 +583,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( (p_vout->p_sys->p_display == NULL) )
     {
-        msg_Warn( p_vout, "no display!!" );
+        msg_Warn( p_vout, "no display!" );
         return;
     }
 
@@ -652,7 +653,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 /*****************************************************************************
  * DirectXEnumCallback: Device enumeration
  *****************************************************************************
- * This callback function is called by DirectDraw once for each 
+ * This callback function is called by DirectDraw once for each
  * available DirectDraw device.
  *****************************************************************************/
 BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
@@ -675,8 +676,8 @@ BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
         }
         else if( strcmp( psz_drivername, device.psz_string ) == 0 )
         {
-	    MONITORINFO monitor_info;
-	    monitor_info.cbSize = sizeof( MONITORINFO );
+            MONITORINFO monitor_info;
+            monitor_info.cbSize = sizeof( MONITORINFO );
 
             if( p_vout->p_sys->GetMonitorInfo( hmon, &monitor_info ) )
             {
@@ -756,7 +757,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
                                               MONITOR_DEFAULTTONEAREST );
 
         /* Enumerate displays */
-        OurDirectDrawEnumerateEx( DirectXEnumCallback, p_vout, 
+        OurDirectDrawEnumerateEx( DirectXEnumCallback, p_vout,
                                   DDENUM_ATTACHEDSECONDARYDEVICES );
     }
 
@@ -1614,7 +1615,7 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
                          bHasColorKey, bCanStretch, bCanBltFourcc );
 
         /* Don't ask for troubles */
-        if( !bCanBltFourcc ) p_vout->p_sys->b_hw_yuv = FALSE; 
+        if( !bCanBltFourcc ) p_vout->p_sys->b_hw_yuv = FALSE;
     }
 }
 
@@ -1678,7 +1679,7 @@ static int DirectXLockSurface( vout_thread_t *p_vout, picture_t *p_pic )
         return VLC_EGENERIC;
     }
     else
-        return VLC_SUCCESS;      
+        return VLC_SUCCESS;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.41 2003/12/22 14:32:56 sam Exp $
+ * $Id: xcommon.c,v 1.42 2004/01/26 16:45:03 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Sam Hocevar <sam@zoy.org>
@@ -1357,7 +1357,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
             XineramaScreenInfo *screens;   /* infos for xinerama */
             int i_num_screens;
 
-            msg_Dbg( p_vout, "Using XFree Xinerama extension");
+            msg_Dbg( p_vout, "using XFree Xinerama extension");
 
 #define SCREEN p_vout->p_sys->p_win->i_screen
 

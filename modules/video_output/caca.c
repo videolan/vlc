@@ -2,7 +2,7 @@
  * caca.c: Color ASCII Art video output plugin using libcaca
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: caca.c,v 1.8 2004/01/18 04:55:19 sam Exp $
+ * $Id: caca.c,v 1.9 2004/01/26 16:45:02 zorglub Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *
@@ -94,7 +94,7 @@ static int Create( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 
-        if( !SetConsoleActiveScreenBuffer( hstdout) ) 
+        if( !SetConsoleActiveScreenBuffer( hstdout) )
         {
             msg_Err( p_vout, "cannot set active screen buffer" );
             FreeConsole();
@@ -102,7 +102,7 @@ static int Create( vlc_object_t *p_this )
         }
 
         coord = GetLargestConsoleWindowSize( hstdout );
-        msg_Dbg( p_vout, "SetConsoleWindowInfo: %ix%i", coord.X, coord.Y ); 
+        msg_Dbg( p_vout, "SetConsoleWindowInfo: %ix%i", coord.X, coord.Y );
 
         /* Force size for now */
         coord.X = 100;
@@ -110,7 +110,7 @@ static int Create( vlc_object_t *p_this )
 
         if( !SetConsoleScreenBufferSize( hstdout, coord ) )
             msg_Warn( p_vout, "SetConsoleScreenBufferSize %i %i",
-                      coord.X, coord.Y ); 
+                      coord.X, coord.Y );
 
         /* Get the current screen buffer size and window position. */
         if( GetConsoleScreenBufferInfo( hstdout, &csbiInfo ) )

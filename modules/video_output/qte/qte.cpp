@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2003 VideoLAN
- * $Id: qte.cpp,v 1.20 2003/12/22 14:32:56 sam Exp $
+ * $Id: qte.cpp,v 1.21 2004/01/26 16:45:02 zorglub Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -78,8 +78,8 @@ extern "C"
  *****************************************************************************/
 #define DISPLAY_TEXT N_("QT Embedded display name")
 #define DISPLAY_LONGTEXT N_( \
-    "Specify the Qt Embedded hardware display you want to use. By default VLC will " \
-    "use the value of the DISPLAY environment variable.")
+    "Specify the Qt Embedded hardware display you want to use. " \
+    "By default VLC will use the value of the DISPLAY environment variable.")
 
 /*****************************************************************************
  * Local prototypes
@@ -176,7 +176,7 @@ static void Close ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-    msg_Dbg( p_vout, "Close" );
+    msg_Dbg( p_vout, "close" );
     if( p_vout->p_sys->p_event )
     {
         vlc_object_detach( p_vout->p_sys->p_event );
@@ -190,7 +190,7 @@ static void Close ( vlc_object_t *p_this )
     }
 
 #ifdef NEED_QTE_MAIN
-    msg_Dbg( p_vout, "Releasing gui-helper" );
+    msg_Dbg( p_vout, "releasing gui-helper" );
     module_Unneed( p_vout, p_vout->p_sys->p_qte_main );
 #endif
 
@@ -297,7 +297,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     {
 // shameless borrowed from opie mediaplayer....
 #ifndef USE_DIRECT_PAINTER
-        msg_Dbg(p_vout, "Not using direct painter");
+        msg_Dbg(p_vout, "not using direct painter");
         QPainter p(p_vout->p_sys->p_VideoWidget);
 
         /* rotate frame */
@@ -564,7 +564,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
 static void CloseDisplay( vout_thread_t *p_vout )
 {
     // quit qt application loop
-    msg_Dbg( p_vout, "Destroying Qt Window" );
+    msg_Dbg( p_vout, "destroying Qt Window" );
 #ifdef NEED_QTE_MAIN
     if(p_vout->p_sys->p_QApplication)
     {
