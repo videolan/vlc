@@ -2,7 +2,7 @@
  * vlc_es.h: Elementary stream formats descriptions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vlc_es.h,v 1.10 2004/02/07 00:33:08 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -142,8 +142,10 @@ struct es_format_t
     video_format_t video;
     subs_format_t  subs;
 
-    int     i_bitrate;
+    int            i_bitrate;
 
+    vlc_bool_t     b_packetized; /* wether the data is packetized
+                                    (ie. not truncated) */
     int     i_extra;
     void    *p_extra;
 
@@ -171,6 +173,7 @@ static inline void es_format_Init( es_format_t *fmt,
     memset( &fmt->video, 0, sizeof(video_format_t) );
     memset( &fmt->subs, 0, sizeof(subs_format_t) );
 
+    fmt->b_packetized           = VLC_TRUE;
     fmt->i_bitrate              = 0;
     fmt->i_extra                = 0;
     fmt->p_extra                = NULL;
@@ -185,9 +188,9 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
         dst->psz_description = strdup( src->psz_description );
     if( src->i_extra > 0 )
     {
+        dst->i_extra = src->i_extra;
         dst->p_extra = malloc( src->i_extra );
-        memcpy( dst->p_extra, src->p_extra,
-                src->i_extra );
+        memcpy( dst->p_extra, src->p_extra, src->i_extra );
     }
     else
     {

@@ -71,6 +71,9 @@ struct decoder_owner_sys_t
     sout_instance_t         *p_sout;
     sout_packetizer_input_t *p_sout_input;
 
+    /* Some decoders require already packetized data (ie. not truncated) */
+    decoder_t *p_packetizer;
+
     /* Current format in use by the output */
     video_format_t video;
     audio_format_t audio;
@@ -94,8 +97,8 @@ struct decoder_owner_sys_t
  */
 decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 {
-    decoder_t      *p_dec = NULL;
-    vlc_value_t    val;
+    decoder_t   *p_dec = NULL;
+    vlc_value_t val;
 
     /* If we are in sout mode, search for packetizer module */
     if( !p_es->b_force_decoder && p_input->stream.p_sout )
@@ -107,8 +110,6 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
             msg_Err( p_input, "could not create packetizer" );
             return NULL;
         }
-
-        p_dec->p_module = module_Need( p_dec, "packetizer", "$packetizer", 0 );
     }
     else
     {
@@ -119,9 +120,6 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
             msg_Err( p_input, "could not create decoder" );
             return NULL;
         }
-
-        /* default Get a suitable decoder module */
-        p_dec->p_module = module_Need( p_dec, "decoder", "$codec", 0 );
     }
 
     if( !p_dec->p_module )
@@ -162,6 +160,12 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
             return NULL;
         }
     }
+
+    /* Select a new ES */
+    INSERT_ELEM( p_input->stream.pp_selected_es,
+                 p_input->stream.i_selected_es_number,
+                 p_input->stream.i_selected_es_number,
+                 p_es );
 
     p_input->stream.b_changed = 1;
 
@@ -398,16 +402,10 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
     p_dec->pf_decode_sub = 0;
     p_dec->pf_packetize = 0;
 
-    /* Select a new ES */
-    INSERT_ELEM( p_input->stream.pp_selected_es,
-                 p_input->stream.i_selected_es_number,
-                 p_input->stream.i_selected_es_number,
-                 p_es );
-
     /* Initialize the decoder fifo */
     p_dec->p_module = NULL;
 
-    p_dec->fmt_in = p_es->fmt;
+    es_format_Copy( &p_dec->fmt_in, &p_es->fmt );
 
     if( p_es->p_waveformatex )
     {
@@ -480,6 +478,7 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
     p_dec->p_owner->p_vout = NULL;
     p_dec->p_owner->p_sout = p_input->stream.p_sout;
     p_dec->p_owner->p_sout_input = NULL;
+    p_dec->p_owner->p_packetizer = NULL;
     p_dec->p_owner->p_es_descriptor = p_es;
 
 
@@ -500,6 +499,40 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
     p_dec->pf_picture_unlink  = vout_unlink_picture;
 
     vlc_object_attach( p_dec, p_input );
+
+    /* Find a suitable decoder/packetizer module */
+    if( i_object_type == VLC_OBJECT_DECODER )
+        p_dec->p_module = module_Need( p_dec, "decoder", "$codec", 0 );
+    else
+        p_dec->p_module = module_Need( p_dec, "packetizer", "$packetizer", 0 );
+
+    /* Check if decoder requires already packetized data */
+    if( i_object_type == VLC_OBJECT_DECODER &&
+        p_dec->b_need_packetized && !p_dec->fmt_in.b_packetized )
+    {
+        p_dec->p_owner->p_packetizer =
+            vlc_object_create( p_input, VLC_OBJECT_PACKETIZER );
+        if( p_dec->p_owner->p_packetizer )
+        {
+            p_dec->p_owner->p_packetizer->fmt_in = null_es_format;
+            p_dec->p_owner->p_packetizer->fmt_out = null_es_format;
+            es_format_Copy( &p_dec->p_owner->p_packetizer->fmt_in,
+                            &p_dec->fmt_in );
+
+            vlc_object_attach( p_dec->p_owner->p_packetizer, p_input );
+
+            p_dec->p_owner->p_packetizer->p_module =
+                module_Need( p_dec->p_owner->p_packetizer,
+                             "packetizer", "$packetizer", 0 );
+
+            if( !p_dec->p_owner->p_packetizer->p_module )
+            {
+                es_format_Clean( &p_dec->p_owner->p_packetizer->fmt_in );
+                vlc_object_detach( p_dec->p_owner->p_packetizer );
+                vlc_object_destroy( p_dec->p_owner->p_packetizer );
+            }
+        }
+    }
 
     return p_dec;
 }
@@ -580,14 +613,17 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                     p_dec->p_owner->sout.i_group =
                         p_dec->p_owner->p_es_descriptor->p_pgrm->i_number;
                 }
-                p_dec->p_owner->sout.i_id = p_dec->p_owner->p_es_descriptor->i_id - 1;
+                p_dec->p_owner->sout.i_id =
+                    p_dec->p_owner->p_es_descriptor->i_id - 1;
                 if( p_dec->fmt_in.psz_language )
                 {
-                    p_dec->p_owner->sout.psz_language = strdup( p_dec->fmt_in.psz_language );
+                    p_dec->p_owner->sout.psz_language =
+                        strdup( p_dec->fmt_in.psz_language );
                 }
 
                 p_dec->p_owner->p_sout_input =
-                    sout_InputNew( p_dec->p_owner->p_sout, &p_dec->p_owner->sout );
+                    sout_InputNew( p_dec->p_owner->p_sout,
+                                   &p_dec->p_owner->sout );
 
                 if( p_dec->p_owner->p_sout_input == NULL )
                 {
@@ -596,7 +632,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 
                     while( p_sout_block )
                     {
-                        block_t       *p_next = p_sout_block->p_next;
+                        block_t *p_next = p_sout_block->p_next;
                         block_Release( p_sout_block );
                         p_sout_block = p_next;
                     }
@@ -625,12 +661,13 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 p_sout_buffer->i_dts = p_sout_block->i_dts;
                 p_sout_buffer->i_length = p_sout_block->i_length;
                 p_sout_buffer->i_flags =
-                        (p_sout_block->i_flags << SOUT_BUFFER_FLAGS_BLOCK_SHIFT)
-                          & SOUT_BUFFER_FLAGS_BLOCK_MASK;
+                    ( p_sout_block->i_flags << SOUT_BUFFER_FLAGS_BLOCK_SHIFT )
+                    & SOUT_BUFFER_FLAGS_BLOCK_MASK;
 
                 block_Release( p_sout_block );
 
-                sout_InputSendBuffer( p_dec->p_owner->p_sout_input, p_sout_buffer );
+                sout_InputSendBuffer( p_dec->p_owner->p_sout_input,
+                                      p_sout_buffer );
 
                 p_sout_block = p_next;
             }
@@ -654,7 +691,23 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
     {
         aout_buffer_t *p_aout_buf;
 
-        while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
+        if( p_dec->p_owner->p_packetizer )
+        {
+            block_t *p_packetized_block;
+            decoder_t *p_packetizer = p_dec->p_owner->p_packetizer;
+
+            while( (p_packetized_block =
+                    p_packetizer->pf_packetize( p_packetizer, &p_block )) )
+            {
+                while( (p_aout_buf =
+                        p_dec->pf_decode_audio( p_dec, &p_packetized_block )) )
+                {
+                    aout_DecPlay( p_dec->p_owner->p_aout,
+                                  p_dec->p_owner->p_aout_input, p_aout_buf );
+                }
+            }
+        }
+        else while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
         {
             aout_DecPlay( p_dec->p_owner->p_aout,
                           p_dec->p_owner->p_aout_input, p_aout_buf );
@@ -664,7 +717,24 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
     {
         picture_t *p_pic;
 
-        while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
+        if( p_dec->p_owner->p_packetizer )
+        {
+            block_t *p_packetized_block;
+            decoder_t *p_packetizer = p_dec->p_owner->p_packetizer;
+
+            while( (p_packetized_block =
+                    p_packetizer->pf_packetize( p_packetizer, &p_block )) )
+            {
+                while( (p_pic =
+                        p_dec->pf_decode_video( p_dec, &p_packetized_block )) )
+                {
+                    vout_DatePicture( p_dec->p_owner->p_vout, p_pic,
+                                      p_pic->date );
+                    vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
+                }
+            }
+        }
+        else while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
         {
             vout_DatePicture( p_dec->p_owner->p_vout, p_pic, p_pic->date );
             vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
@@ -693,8 +763,7 @@ static void DeleteDecoder( decoder_t * p_dec )
 {
     vlc_object_detach( p_dec );
 
-    msg_Dbg( p_dec,
-             "killing decoder fourcc `%4.4s', %d PES in FIFO",
+    msg_Dbg( p_dec, "killing decoder fourcc `%4.4s', %d PES in FIFO",
              (char*)&p_dec->fmt_in.i_codec,
              p_dec->p_owner->p_fifo->i_depth );
 
@@ -729,11 +798,21 @@ static void DeleteDecoder( decoder_t * p_dec )
     if( p_dec->p_owner->p_sout_input )
     {
         sout_InputDelete( p_dec->p_owner->p_sout_input );
-        if( p_dec->p_owner->sout.i_extra ) free(p_dec->p_owner->sout.p_extra);
+        es_format_Clean( &p_dec->p_owner->sout );
     }
 
-    if( p_dec->fmt_in.i_extra ) free( p_dec->fmt_in.p_extra );
-    if( p_dec->fmt_out.i_extra ) free( p_dec->fmt_out.p_extra );
+    es_format_Clean( &p_dec->fmt_in );
+    es_format_Clean( &p_dec->fmt_out );
+
+    if( p_dec->p_owner->p_packetizer )
+    {
+        module_Unneed( p_dec->p_owner->p_packetizer,
+                       p_dec->p_owner->p_packetizer->p_module );
+        es_format_Clean( &p_dec->p_owner->p_packetizer->fmt_in );
+        es_format_Clean( &p_dec->p_owner->p_packetizer->fmt_out );
+        vlc_object_detach( p_dec->p_owner->p_packetizer );
+        vlc_object_destroy( p_dec->p_owner->p_packetizer );
+    }
 
     free( p_dec->p_owner );
 }

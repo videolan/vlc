@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.80 2004/01/26 18:57:18 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -180,6 +180,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     switch( i_cat )
     {
     case VIDEO_ES:
+        p_dec->b_need_packetized = VLC_TRUE;
         p_dec->pf_decode_video = E_(DecodeVideo);
         i_result = E_( InitVideoDec )( p_dec, p_context, p_codec,
                                        i_codec_id, psz_namecodec );

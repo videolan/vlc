@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_programs.c,v 1.133 2004/02/25 12:38:33 fenrir Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -624,6 +624,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     p_es->c_invalid_packets = 0;
     p_es->b_force_decoder = VLC_FALSE;
     es_format_Init( &p_es->fmt, UNKNOWN_ES, 0 );
+    p_es->fmt.b_packetized = VLC_FALSE; /* Only there for old mpeg demuxers */
 
     if( i_data_len )
     {

@@ -2,7 +2,7 @@
  * vlc_codec.h: codec related structures
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: vlc_codec.h,v 1.8 2004/02/20 18:34:28 massiot Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -52,6 +52,9 @@ struct decoder_t
     aout_buffer_t *     ( * pf_decode_audio )( decoder_t *, block_t ** );
     void                ( * pf_decode_sub)   ( decoder_t *, block_t ** );
     block_t *           ( * pf_packetize )   ( decoder_t *, block_t ** );
+
+    /* Some decoders only accept packetized data (ie. not truncated) */
+    vlc_bool_t          b_need_packetized;
 
     /* Input format ie from demuxer (XXX: a lot of field could be invalid) */
     es_format_t         fmt_in;

@@ -2,7 +2,7 @@
  * ps.h: Program Stream demuxer helper
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ps.h,v 1.5 2004/01/30 01:09:24 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -101,6 +101,10 @@ static inline int ps_track_fill( ps_track_t *tk, int i_id )
             return VLC_EGENERIC;
         }
     }
+
+    /* PES packets usually contain truncated frames */
+    tk->fmt.b_packetized = VLC_FALSE;
+
     return VLC_SUCCESS;
 }
 

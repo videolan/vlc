@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: es_out.c,v 1.25 2004/01/31 20:21:47 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -331,54 +331,15 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 
     switch( fmt->i_cat )
     {
-        case AUDIO_ES:
-        {
-            WAVEFORMATEX *p_wf =
-                malloc( sizeof( WAVEFORMATEX ) + fmt->i_extra);
+    case AUDIO_ES:
+        es->i_channel = p_sys->i_audio;
+        break;
 
-            p_wf->wFormatTag        = WAVE_FORMAT_UNKNOWN;
-            p_wf->nChannels         = fmt->audio.i_channels;
-            p_wf->nSamplesPerSec    = fmt->audio.i_rate;
-            p_wf->nAvgBytesPerSec   = fmt->i_bitrate / 8;
-            p_wf->nBlockAlign       = fmt->audio.i_blockalign;
-            p_wf->wBitsPerSample    = fmt->audio.i_bitspersample;
-            p_wf->cbSize            = fmt->i_extra;
-            if( fmt->i_extra > 0 )
-            {
-                memcpy( &p_wf[1], fmt->p_extra, fmt->i_extra );
-            }
-            es->p_es->p_waveformatex = p_wf;
+    case VIDEO_ES:
+        es->i_channel = p_sys->i_video;
+        break;
 
-            es->i_channel = p_sys->i_audio;
-            break;
-        }
-        case VIDEO_ES:
-        {
-            BITMAPINFOHEADER *p_bih = malloc( sizeof( BITMAPINFOHEADER ) +
-                                              fmt->i_extra );
-            p_bih->biSize           = sizeof(BITMAPINFOHEADER) + fmt->i_extra;
-            p_bih->biWidth          = fmt->video.i_width;
-            p_bih->biHeight         = fmt->video.i_height;
-            p_bih->biPlanes         = 1;
-            p_bih->biBitCount       = 24;
-            p_bih->biCompression    = fmt->i_codec;
-            p_bih->biSizeImage      = fmt->video.i_width *
-                                          fmt->video.i_height;
-            p_bih->biXPelsPerMeter  = 0;
-            p_bih->biYPelsPerMeter  = 0;
-            p_bih->biClrUsed        = 0;
-            p_bih->biClrImportant   = 0;
-
-            if( fmt->i_extra > 0 )
-            {
-                memcpy( &p_bih[1], fmt->p_extra, fmt->i_extra );
-            }
-            es->p_es->p_bitmapinfoheader = p_bih;
-
-            es->i_channel = p_sys->i_video;
-            break;
-        }
-        case SPU_ES:
+    case SPU_ES:
         {
             subtitle_data_t *p_sub = malloc( sizeof( subtitle_data_t ) );
             memset( p_sub, 0, sizeof( subtitle_data_t ) );
@@ -396,9 +357,9 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             break;
         }
 
-        default:
-            es->i_channel = 0;
-            break;
+    default:
+        es->i_channel = 0;
+        break;
     }
 
     sprintf( psz_cat, _("Stream %d"), out->p_sys->i_id - 1 );

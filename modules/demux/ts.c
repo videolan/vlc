@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.13 2004/03/03 01:26:49 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1147,6 +1147,9 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
             es_format_Init( fmt, UNKNOWN_ES, 0 );
             break;
     }
+
+    /* PES packets usually contain truncated frames */
+    fmt->b_packetized = VLC_FALSE;
 
     return fmt->i_cat == UNKNOWN_ES ? VLC_EGENERIC : VLC_SUCCESS ;
 }

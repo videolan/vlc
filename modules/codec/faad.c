@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: faad.c,v 1.14 2004/02/25 17:48:52 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -160,6 +160,9 @@ static int Open( vlc_object_t *p_this )
     /* buffer */
     p_sys->i_buffer = p_sys->i_buffer_size = 0;
     p_sys->p_buffer = 0;
+
+    /* Faad2 can't deal with truncated data (eg. from MPEG TS) */
+    p_dec->b_need_packetized = VLC_TRUE;
 
     return VLC_SUCCESS;
 }
