@@ -121,6 +121,8 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     var_Create( p_input, "sub-file", VLC_VAR_FILE | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sub-autodetect-file", VLC_VAR_BOOL |
                 VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sub-autodetect-path", VLC_VAR_STRING |
+                VLC_VAR_DOINHERIT );
     var_Create( p_input, "sub-autodetect-fuzzy", VLC_VAR_INTEGER |
                 VLC_VAR_DOINHERIT );
 
@@ -632,7 +634,7 @@ static int InitThread( input_thread_t * p_input )
 
     /* Parse source string. Syntax : [[<access>][/<demux>]:][<source>] */
     char * psz_parser = p_input->psz_dupsource = strdup(p_input->psz_source);
-    vlc_value_t val;
+    vlc_value_t val, val1;
     int64_t i_microsecondperframe;
 
     subtitle_demux_t *p_sub_toselect = NULL;
@@ -1086,11 +1088,12 @@ static int InitThread( input_thread_t * p_input )
     psz_sub_file = val.psz_string;
 
     var_Get( p_input, "sub-autodetect-file", &val );
+    var_Get( p_input, "sub-autodetect-path", &val1 );
     if( val.b_bool )
     {
         subtitle_demux_t *p_sub;
         int i;
-        char **tmp = subtitles_Detect( p_input, "", p_input->psz_name );
+        char **tmp = subtitles_Detect( p_input, val1.psz_string, p_input->psz_name );
         char **tmp2 = tmp;
         for( i = 0; *tmp2 != NULL; i++ )
         {

@@ -2,7 +2,7 @@
  * subtitles.c
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: subtitles.c,v 1.10 2004/01/26 20:26:54 gbazin Exp $
+ * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
  * This is adapted code from the GPL'ed MPlayer (http://mplayerhq.hu)
@@ -160,7 +160,7 @@ static int compare_sub_priority( const void *a, const void *b )
  *
  * \ingroup Demux
  * \param p_this the calling \ref input_thread_t
- * \param psz_path a subdirectory to look into. This is not used atm.
+ * \param psz_path a list of subdirectories (separated by a ',') to look in.
  * \param psz_fname the complete filename to base the search on.
  * \return a NULL terminated array of filenames with detected possible subtitles.
  * The array contains max MAX_SUBTITLE_FILES items and you need to free it after use.
@@ -174,17 +174,64 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     char *tmp_fname_noext, *tmp_fname_trim, *tmp_fname_ext, *tmpresult;
 
     vlc_value_t fuzzy;
-    int len, i, j, i_sub_count;
+    int len, i, j, i_sub_count, i_nb_subdirs;
+    unsigned int k, i_max_sub_len;
     subfn *result; /* unsorted results */
     char **result2; /* sorted results */
+    char **subdirs; /* list of subdirectories to look in */
 
     FILE *f;
     DIR *d;
     struct dirent *de;
 
+    i_nb_subdirs = 1;
+    for( k = 0; k < strlen( psz_path ); k++ )
+    {
+        if( psz_path[k] == ',' ) 
+        {
+            i_nb_subdirs++;
+        }
+    }
+
+    i_max_sub_len = 0;
+    if( i_nb_subdirs >= 0 )
+    {
+        char *psz_parser;
+    
+        subdirs = (char**)malloc( sizeof(char*) * i_nb_subdirs );
+        i = 0;
+        psz_parser = psz_path;
+        while( psz_parser && *psz_parser )
+        {
+            char *psz_subdir;
+            psz_subdir = psz_parser;
+            psz_parser = strchr( psz_subdir, ',' );
+            if( psz_parser )
+            {
+                *psz_parser = '\0';
+                psz_parser++;
+                while( *psz_parser == ' ' )
+                {
+                    psz_parser++;
+                }
+            }
+            subdirs[i] = strdup( psz_subdir );
+            i++;
+            if( strlen( psz_subdir ) > i_max_sub_len )
+            {
+                i_max_sub_len = strlen( psz_subdir );
+            }
+        }
+    } 
+    else 
+    {
+        i_nb_subdirs = -1;
+        subdirs = NULL;
+    }
+
     i_sub_count = 0;
     len = ( strlen( psz_fname ) > 256 ? strlen( psz_fname ) : 256 ) +
-        ( strlen( psz_path ) > 256 ? strlen( psz_path ) : 256 ) + 2;
+        ( i_max_sub_len > 256 ? i_max_sub_len : 256 ) + 2;
 
     f_dir = (char*)malloc(len);
     f_fname = (char*)malloc(len);
@@ -223,12 +270,37 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     var_Get( p_this, "sub-autodetect-fuzzy", &fuzzy );
 
 
-    for( j = 0; j <= 1; j++)
+    for( j = -1; j < i_nb_subdirs; j++)
     {
-        d = opendir( j == 0 ? f_dir : psz_path );
+        if( j >= 0 )
+        {
+            if( subdirs[j] && subdirs[j][0] == '.' )
+            {
+                char* psz_dir;
+                psz_dir = (char *)malloc( len );
+                if( psz_dir ) 
+                {
+                    sprintf( psz_dir, "%s%s", f_dir, subdirs[j] );
+                    d = opendir( psz_dir );
+                    free( psz_dir );
+                }
+                else d = NULL;
+            }
+            else
+            {
+                d = opendir( subdirs[j] );
+            }
+        }
+        else
+        {
+            d = opendir( f_dir );
+        }
+
         if( d )
         {
             int b_found;
+            msg_Dbg( p_this, "looking for a subtitle file in %s", 
+                     j < 0 ? f_dir : subdirs[j] );
             while( ( de = readdir( d ) ) )
             {
                 /* retrieve various parts of the filename */
@@ -240,7 +312,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                 b_found = 0;
                 for( i = 0; sub_exts[i]; i++ )
                 {
-                    if( strcmp(sub_exts[i], tmp_fname_ext ) == 0 )
+                    if( strcmp( sub_exts[i], tmp_fname_ext ) == 0 )
                     {
                         b_found = 1;
                         msg_Dbg( p_this, "found a possible subtitle: %s",

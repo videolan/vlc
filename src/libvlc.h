@@ -345,6 +345,11 @@ static char *ppsz_align_descriptions[] =
     "3 = subtitle file matching the movie name with additional chars\n" \
     "4 = subtitle file matching the movie name exactly")
 
+#define SUB_PATH_TEXT N_("Subtitle autodetection paths")
+#define SUB_PATH_LONGTEXT \
+    N_("Look for a subtitle file in those paths too, if your subtitle " \
+    "file was not found in the current directory.")
+
 #define SUB_FILE_TEXT N_("Use subtitle file")
 #define SUB_FILE_LONGTEXT \
     N_("Load this subtitle file. To be used when autodetect cannot detect " \
@@ -845,6 +850,8 @@ vlc_module_begin();
                  SUB_AUTO_TEXT, SUB_AUTO_LONGTEXT, VLC_FALSE );
     add_integer( "sub-autodetect-fuzzy", 3, NULL,
                  SUB_FUZZY_TEXT, SUB_FUZZY_LONGTEXT, VLC_TRUE );
+    add_string( "sub-autodetect-path", "./Subtitles, ./subtitles", NULL,
+                 SUB_PATH_TEXT, SUB_PATH_LONGTEXT, VLC_TRUE );
     add_file( "sub-file", NULL, NULL,
                  SUB_FILE_TEXT, SUB_FILE_LONGTEXT, VLC_TRUE );
     add_integer( "input-repeat", 0, NULL,
