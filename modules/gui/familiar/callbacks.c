@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.19 2002/12/22 21:46:50 jpsaman Exp $
+ * $Id: callbacks.c,v 1.20 2003/01/03 20:55:00 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -495,5 +495,36 @@ on_familiar_delete_event               (GtkWidget       *widget,
 {
     FamiliarExit( GTK_WIDGET( widget ), user_data );
     return TRUE;
+}
+
+/* Slider Management */
+
+gboolean
+FamiliarSliderRelease                  (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GtkGetIntf( widget );
+
+    vlc_mutex_lock( &p_intf->change_lock );
+    p_intf->p_sys->b_slider_free = 1;
+    vlc_mutex_unlock( &p_intf->change_lock );
+
+    return FALSE;
+}
+
+
+gboolean
+FamiliarSliderPress                    (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GtkGetIntf( widget );
+
+    vlc_mutex_lock( &p_intf->change_lock );
+    p_intf->p_sys->b_slider_free = 0;
+    vlc_mutex_unlock( &p_intf->change_lock );
+
+    return FALSE;
 }
 

@@ -33,13 +33,11 @@ create_familiar (void)
   GtkWidget *toolbar_stop;
   GtkWidget *toolbar_forward;
   GtkWidget *toolbar_about;
-  GtkWidget *progress;
+  GtkWidget *slider_label;
+  GtkWidget *slider;
   GtkWidget *notebook;
   GtkWidget *fixedMedia;
   GtkWidget *labelUrl;
-  GtkWidget *comboURL;
-  GList *comboURL_items = NULL;
-  GtkWidget *comboURL_entry;
   GtkWidget *scrolledwindow1;
   GtkWidget *clistmedia;
   GtkWidget *labelname;
@@ -47,6 +45,9 @@ create_familiar (void)
   GtkWidget *labelsize;
   GtkWidget *labeluid;
   GtkWidget *labelgid;
+  GtkWidget *comboURL;
+  GList *comboURL_items = NULL;
+  GtkWidget *comboURL_entry;
   GtkWidget *media;
   GtkWidget *fixedPreferences;
   GtkWidget *buttonSave;
@@ -194,14 +195,26 @@ create_familiar (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_about);
 
-  progress = gtk_progress_bar_new ();
-  gtk_widget_set_name (progress, "progress");
-  gtk_widget_ref (progress);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "progress", progress,
+  slider_label = gtk_label_new (_("0:00:00"));
+  gtk_widget_set_name (slider_label, "slider_label");
+  gtk_widget_ref (slider_label);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "slider_label", slider_label,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (progress);
-  gtk_box_pack_start (GTK_BOX (vbox), progress, FALSE, FALSE, 0);
-  gtk_progress_set_activity_mode (GTK_PROGRESS (progress), TRUE);
+  gtk_widget_show (slider_label);
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), slider_label, NULL, NULL);
+
+  slider = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 6.25, 0)));
+  gtk_widget_set_name (slider, "slider");
+  gtk_widget_ref (slider);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "slider", slider,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (slider);
+  gtk_box_pack_start (GTK_BOX (vbox), slider, TRUE, FALSE, 0);
+  gtk_scale_set_draw_value (GTK_SCALE (slider), FALSE);
+  gtk_scale_set_value_pos (GTK_SCALE (slider), GTK_POS_RIGHT);
+  gtk_scale_set_digits (GTK_SCALE (slider), 3);
 
   notebook = gtk_notebook_new ();
   gtk_widget_set_name (notebook, "notebook");
@@ -228,31 +241,6 @@ create_familiar (void)
   gtk_fixed_put (GTK_FIXED (fixedMedia), labelUrl, 4, 8);
   gtk_widget_set_uposition (labelUrl, 4, 8);
   gtk_widget_set_usize (labelUrl, 38, 18);
-
-  comboURL = gtk_combo_new ();
-  gtk_widget_set_name (comboURL, "comboURL");
-  gtk_widget_ref (comboURL);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "comboURL", comboURL,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (comboURL);
-  gtk_fixed_put (GTK_FIXED (fixedMedia), comboURL, 40, 4);
-  gtk_widget_set_uposition (comboURL, 40, 4);
-  gtk_widget_set_usize (comboURL, 185, 24);
-  comboURL_items = g_list_append (comboURL_items, (gpointer) _("file://"));
-  comboURL_items = g_list_append (comboURL_items, (gpointer) _("ftp://"));
-  comboURL_items = g_list_append (comboURL_items, (gpointer) _("http://"));
-  comboURL_items = g_list_append (comboURL_items, (gpointer) _("udp://:1234"));
-  comboURL_items = g_list_append (comboURL_items, (gpointer) _("udpstream://@:1234"));
-  gtk_combo_set_popdown_strings (GTK_COMBO (comboURL), comboURL_items);
-  g_list_free (comboURL_items);
-
-  comboURL_entry = GTK_COMBO (comboURL)->entry;
-  gtk_widget_set_name (comboURL_entry, "comboURL_entry");
-  gtk_widget_ref (comboURL_entry);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "comboURL_entry", comboURL_entry,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (comboURL_entry);
-  gtk_entry_set_text (GTK_ENTRY (comboURL_entry), _("file://"));
 
   scrolledwindow1 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_set_name (scrolledwindow1, "scrolledwindow1");
@@ -317,6 +305,33 @@ create_familiar (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (labelgid);
   gtk_clist_set_column_widget (GTK_CLIST (clistmedia), 4, labelgid);
+
+  comboURL = gtk_combo_new ();
+  gtk_widget_set_name (comboURL, "comboURL");
+  gtk_widget_ref (comboURL);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "comboURL", comboURL,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (comboURL);
+  gtk_fixed_put (GTK_FIXED (fixedMedia), comboURL, 40, 4);
+  gtk_widget_set_uposition (comboURL, 40, 4);
+  gtk_widget_set_usize (comboURL, 185, 24);
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("file://"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("ftp://"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("http://"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("udp://:1234"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("udp6://:1234"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("rtp://:1234"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("rtp6://:1234"));
+  gtk_combo_set_popdown_strings (GTK_COMBO (comboURL), comboURL_items);
+  g_list_free (comboURL_items);
+
+  comboURL_entry = GTK_COMBO (comboURL)->entry;
+  gtk_widget_set_name (comboURL_entry, "comboURL_entry");
+  gtk_widget_ref (comboURL_entry);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "comboURL_entry", comboURL_entry,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (comboURL_entry);
+  gtk_entry_set_text (GTK_ENTRY (comboURL_entry), _("file://"));
 
   media = gtk_label_new (_("Media"));
   gtk_widget_set_name (media, "media");
@@ -480,14 +495,20 @@ create_familiar (void)
   gtk_signal_connect (GTK_OBJECT (toolbar_about), "clicked",
                       GTK_SIGNAL_FUNC (on_toolbar_about_clicked),
                       NULL);
-  gtk_signal_connect (GTK_OBJECT (comboURL_entry), "changed",
-                      GTK_SIGNAL_FUNC (on_comboURL_entry_changed),
+  gtk_signal_connect (GTK_OBJECT (slider), "button_release_event",
+                      GTK_SIGNAL_FUNC (FamiliarSliderRelease),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (slider), "button_press_event",
+                      GTK_SIGNAL_FUNC (FamiliarSliderPress),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (clistmedia), "select_row",
                       GTK_SIGNAL_FUNC (on_clistmedia_select_row),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (clistmedia), "click_column",
                       GTK_SIGNAL_FUNC (on_clistmedia_click_column),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (comboURL_entry), "changed",
+                      GTK_SIGNAL_FUNC (on_comboURL_entry_changed),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (cbautoplay), "toggled",
                       GTK_SIGNAL_FUNC (on_cbautoplay_toggled),

@@ -2,7 +2,7 @@
  * familiar.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: familiar.h,v 1.9 2002/12/16 22:06:59 jpsaman Exp $
+ * $Id: familiar.h,v 1.10 2003/01/03 20:55:01 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -34,13 +34,22 @@ struct intf_sys_t
     /* windows and widgets */
     GtkWidget *         p_window;                             /* main window */
     GtkNotebook *       p_notebook;
-    GtkProgressBar *    p_progess;
-//    GtkWidget *         p_notebook_about;
-//    GtkWidget *         p_notebook_open;
-//    GtkWidget *         p_notebook_preferences;
+    GtkHScale   *       p_slider;
     GtkCList    *       p_clist;
 
+    /* slider */
+    GtkLabel *          p_slider_label;
+    GtkAdjustment *     p_adj;                   /* slider adjustment object */
+    float               f_adj_oldvalue;                    /* previous value */
+
+    /* special actions */
+    vlc_bool_t          b_playing;
+    vlc_bool_t          b_window_changed;        /* window display toggled ? */
+    vlc_bool_t          b_slider_free;                      /* slider status */
+
+    /* Preference settings */
     vlc_bool_t          b_autoplayfile;
+
     /* The input thread */
     input_thread_t *    p_input;
 };

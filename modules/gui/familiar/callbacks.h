@@ -2,7 +2,7 @@
  * callbacks.h : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: callbacks.h,v 1.7 2002/09/30 11:05:38 sam Exp $
+ * $Id: callbacks.h,v 1.8 2003/01/03 20:55:00 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -84,4 +84,14 @@ on_cbautoplay_toggled                  (GtkToggleButton *togglebutton,
 gboolean
 on_familiar_delete_event               (GtkWidget       *widget,
                                         GdkEvent        *event,
+                                        gpointer         user_data);
+
+gboolean
+FamiliarSliderRelease                  (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+gboolean
+FamiliarSliderPress                    (GtkWidget       *widget,
+                                        GdkEventButton  *event,
                                         gpointer         user_data);

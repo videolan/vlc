@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.21 2002/12/22 23:23:45 jpsaman Exp $
+ * $Id: familiar.c,v 1.22 2003/01/03 20:55:00 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -52,6 +52,8 @@ static void Run          ( intf_thread_t * );
 
 void GtkAutoPlayFile     ( vlc_object_t * );
 static int Manage        ( intf_thread_t *p_intf );
+void E_(GtkDisplayDate)  ( GtkAdjustment *p_adj );
+gint E_(GtkModeManage)   ( intf_thread_t * p_intf );
 
 /*****************************************************************************
  * Module descriptor
@@ -100,6 +102,9 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_input = NULL;
 
     p_intf->p_sys->b_autoplayfile = 1;
+    p_intf->p_sys->b_playing = 0;
+    p_intf->p_sys->b_slider_free = 1;
+
     p_intf->pf_run = Run;
 
     return VLC_SUCCESS;
@@ -178,9 +183,21 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_notebook = GTK_NOTEBOOK( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "notebook" ) );
 
-    p_intf->p_sys->p_progess = GTK_PROGRESS_BAR( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_window ), "progress" ) );
-    gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_progess) );
+    /* Get the slider object */
+    p_intf->p_sys->p_slider = GTK_HSCALE( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_window ), "slider" ) );
+    p_intf->p_sys->p_slider_label = GTK_LABEL( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_window ), "slider_label" ) );
+
+    /* Connect the date display to the slider */
+#define P_SLIDER GTK_RANGE( gtk_object_get_data( \
+                         GTK_OBJECT( p_intf->p_sys->p_window ), "slider" ) )
+    p_intf->p_sys->p_adj = gtk_range_get_adjustment( P_SLIDER );
+
+    gtk_signal_connect ( GTK_OBJECT( p_intf->p_sys->p_adj ), "value_changed",
+                         GTK_SIGNAL_FUNC( E_(GtkDisplayDate) ), NULL );
+    p_intf->p_sys->f_adj_oldvalue = 0;
+#undef P_SLIDER
 
     p_intf->p_sys->p_clist = GTK_CLIST( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "clistmedia" ) );
@@ -192,6 +209,9 @@ static void Run( intf_thread_t *p_intf )
     /* Store p_intf to keep an eye on it */
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
                          "p_intf", p_intf );
+    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_adj),
+                         "p_intf", p_intf );
+
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
     ReadDirectory(p_intf->p_sys->p_clist, "/mnt");
@@ -212,8 +232,7 @@ static void Run( intf_thread_t *p_intf )
     msg_Dbg( p_intf, "Manage GTK keyboard events using timeouts" );
     /* Sleep to avoid using all CPU - since some interfaces needs to access
      * keyboard events, a 100ms delay is a good compromise */
-    i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, (GtkFunction)Manage,
-                               p_intf );
+    i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, (GtkFunction)Manage, p_intf );
 
     /* Enter Gtk mode */
     gtk_main();
@@ -222,7 +241,6 @@ static void Run( intf_thread_t *p_intf )
 #endif
 
     gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_window) );
-
 #ifdef NEED_GTK_MAIN
     gdk_threads_leave();
 #else
@@ -238,8 +256,7 @@ void GtkAutoPlayFile( vlc_object_t *p_this )
     GtkWidget *cbautoplay;
     intf_thread_t *p_intf;
     int i_index;
-    vlc_list_t list = vlc_list_find( p_this, VLC_OBJECT_INTF,
-                                                FIND_ANYWHERE );
+    vlc_list_t list = vlc_list_find( p_this, VLC_OBJECT_INTF, FIND_ANYWHERE );
 
     for( i_index = 0; i_index < list.i_count; i_index++ )
     {
@@ -249,7 +266,6 @@ void GtkAutoPlayFile( vlc_object_t *p_this )
         {
             continue;
         }
-
         cbautoplay = GTK_WIDGET( gtk_object_get_data(
                             GTK_OBJECT( p_intf->p_sys->p_window ),
                             "cbautoplay" ) );
@@ -262,11 +278,9 @@ void GtkAutoPlayFile( vlc_object_t *p_this )
         {
             p_intf->p_sys->b_autoplayfile = VLC_TRUE;
         }
-
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( cbautoplay ),
                                       p_intf->p_sys->b_autoplayfile );
     }
-
     vlc_list_release( &list );
 }
 
@@ -294,6 +308,63 @@ static int Manage( intf_thread_t *p_intf )
         p_intf->p_sys->p_input = NULL;
     }
 
+    if( p_intf->p_sys->p_input )
+    {
+        input_thread_t *p_input = p_intf->p_sys->p_input;
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        if( !p_input->b_die )
+        {
+            /* New input or stream map change */
+            if( p_input->stream.b_changed )
+            {
+                E_(GtkModeManage)( p_intf );
+                p_intf->p_sys->b_playing = 1;
+            }
+
+            /* Manage the slider */
+            if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
+            {
+                float newvalue = p_intf->p_sys->p_adj->value;
+
+#define p_area p_input->stream.p_selected_area
+                /* If the user hasn't touched the slider since the last time,
+                 * then the input can safely change it */
+                if( newvalue == p_intf->p_sys->f_adj_oldvalue )
+                {
+                    /* Update the value */
+                    p_intf->p_sys->p_adj->value =
+                    p_intf->p_sys->f_adj_oldvalue =
+                        ( 100. * p_area->i_tell ) / p_area->i_size;
+
+                    gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
+                                             "value_changed" );
+                }
+                /* Otherwise, send message to the input if the user has
+                 * finished dragging the slider */
+                else if( p_intf->p_sys->b_slider_free )
+                {
+                    off_t i_seek = ( newvalue * p_area->i_size ) / 100;
+
+                    /* release the lock to be able to seek */
+                    vlc_mutex_unlock( &p_input->stream.stream_lock );
+                    input_Seek( p_input, i_seek, INPUT_SEEK_SET );
+                    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+                    /* Update the old value */
+                    p_intf->p_sys->f_adj_oldvalue = newvalue;
+                }
+#undef p_area
+            }
+        }
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+    }
+    else if( p_intf->p_sys->b_playing && !p_intf->b_die )
+    {
+        E_(GtkModeManage)( p_intf );
+        p_intf->p_sys->b_playing = 0;
+    }
+
 #ifndef NEED_GTK_MAIN
     if( p_intf->b_die )
     {
@@ -310,3 +381,78 @@ static int Manage( intf_thread_t *p_intf )
 
     return TRUE;
 }
+
+/*****************************************************************************
+ * GtkDisplayDate: display stream date
+ *****************************************************************************
+ * This function displays the current date related to the position in
+ * the stream. It is called whenever the slider changes its value.
+ * The lock has to be taken before you call the function.
+ *****************************************************************************/
+void E_(GtkDisplayDate)( GtkAdjustment *p_adj )
+{
+    intf_thread_t *p_intf;
+
+    p_intf = gtk_object_get_data( GTK_OBJECT( p_adj ), "p_intf" );
+
+    if( p_intf->p_sys->p_input )
+    {
+#define p_area p_intf->p_sys->p_input->stream.p_selected_area
+        char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+
+        gtk_label_set_text( GTK_LABEL( p_intf->p_sys->p_slider_label ),
+                        input_OffsetToTime( p_intf->p_sys->p_input, psz_time,
+                                   ( p_area->i_size * p_adj->value ) / 100 ) );
+#undef p_area
+     }
+}
+
+/*****************************************************************************
+ * GtkModeManage: actualize the aspect of the interface whenever the input
+ *                changes.
+ *****************************************************************************
+ * The lock has to be taken before you call the function.
+ *****************************************************************************/
+gint E_(GtkModeManage)( intf_thread_t * p_intf )
+{
+    GtkWidget *     p_slider;
+    vlc_bool_t      b_control;
+
+#define GETWIDGET( ptr, name ) GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( \
+                           p_intf->p_sys->ptr ) , ( name ) ) )
+    /* hide slider */
+    p_slider = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                           p_intf->p_sys->p_window ), "slider" ) );
+    gtk_widget_hide( GTK_WIDGET( p_slider ) );
+
+    /* controls unavailable */
+    b_control = 0;
+
+    /* show the box related to current input mode */
+    if( p_intf->p_sys->p_input )
+    {
+        /* initialize and show slider for seekable streams */
+        if( p_intf->p_sys->p_input->stream.b_seekable )
+        {
+            p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue = 0;
+            gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
+                                     "value_changed" );
+            gtk_widget_show( GTK_WIDGET( p_slider ) );
+        }
+
+        /* control buttons for free pace streams */
+        b_control = p_intf->p_sys->p_input->stream.b_pace_control;
+
+        p_intf->p_sys->p_input->stream.b_changed = 0;
+        msg_Dbg( p_intf, "stream has changed, refreshing interface" );
+    }
+
+    /* set control items */
+    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_rewind"), b_control );
+    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_pause"), b_control );
+    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_forward"), b_control );
+
+#undef GETWIDGET
+    return TRUE;
+}
+
