@@ -1,8 +1,8 @@
 /*****************************************************************************
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: playlist.m,v 1.11 2003/02/13 14:16:41 hartman Exp $
+ * Copyright (C) 2002-2003 VideoLAN
+ * $Id: playlist.m,v 1.12 2003/02/23 05:53:53 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -65,7 +65,7 @@
     {
         case ' ':
             vlc_mutex_lock( &p_playlist->object_lock );
-            if( p_playlist != NULL && p_playlist->p_input != NULL )
+            if( p_playlist->p_input != NULL )
             {
                 input_SetStatus( p_playlist->p_input, INPUT_STATUS_PAUSE );
             }
@@ -300,7 +300,7 @@
     [o_table_view reloadData];
 }
 
-- (void)updateState
+- (void)updateRowSelection
 {
     int i_row;
 
@@ -312,26 +312,27 @@
     {
         return;
     }
-    
+
+    vlc_mutex_lock( &p_playlist->object_lock );    
     i_row = p_playlist->i_index;
+    vlc_mutex_unlock( &p_playlist->object_lock );
     vlc_object_release( p_playlist );
-    
+
     [o_table_view selectRow: i_row byExtendingSelection: NO];
     [o_table_view scrollRowToVisible: i_row];
-    
-    vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                                          FIND_ANYWHERE );
 
-    if ( p_vout == NULL )
+    vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                                      FIND_ANYWHERE );
+
+    if( p_vout == NULL || !p_vout->b_fullscreen )
     {
-        [[NSApp keyWindow] makeFirstResponder:o_table_view];
-        return;
+        [[NSApp keyWindow] makeFirstResponder: o_table_view];
     }
-    else if ( !p_vout->b_fullscreen )
+
+    if( p_vout != NULL )
     {
-        [[NSApp keyWindow] makeFirstResponder:o_table_view];
+        vlc_object_release( (vlc_object_t *)p_vout );
     }
-    vlc_object_release( (vlc_object_t *)p_vout );
 }
 
 @end
@@ -343,11 +344,13 @@
     int i_count = 0;
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                               FIND_ANYWHERE );
+                                                       FIND_ANYWHERE );
 
     if( p_playlist != NULL )
     {
+        vlc_mutex_lock( &p_playlist->object_lock );
         i_count = p_playlist->i_size;
+        vlc_mutex_unlock( &p_playlist->object_lock );
         vlc_object_release( p_playlist );
     }
 

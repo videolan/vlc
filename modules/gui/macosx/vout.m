@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.34 2003/02/15 12:57:51 hartman Exp $
+ * $Id: vout.m,v 1.35 2003/02/23 05:53:53 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -819,10 +819,11 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void)updateTitle
 {
-    NSMutableString *o_title;
+    NSMutableString * o_title;
+
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                               FIND_ANYWHERE );
+                                                       FIND_ANYWHERE );
     
     if( p_playlist == NULL )
     {
@@ -836,11 +837,13 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     vlc_object_release( p_playlist );
 
-    if (o_title)
+    if( o_title != nil )
     {
-        NSRange prefixrange = [o_title rangeOfString: @"file:"];
-        if ( prefixrange.location != NSNotFound )
-            [o_title deleteCharactersInRange: prefixrange];
+        NSRange prefix_range = [o_title rangeOfString: @"file:"];
+        if( prefix_range.location != NSNotFound )
+        {
+            [o_title deleteCharactersInRange: prefix_range];
+        }
 
         [self setTitleWithRepresentedFilename: o_title];
     }

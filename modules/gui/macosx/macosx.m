@@ -2,7 +2,7 @@
  * macosx.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: macosx.m,v 1.3 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: macosx.m,v 1.4 2003/02/23 05:53:53 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -56,7 +56,7 @@ vlc_module_begin();
         set_capability( "interface", 100 );
         set_callbacks( E_(OpenIntf), E_(CloseIntf) );
     add_submodule();
-        set_capability( "video output", 100 );
+        set_capability( "video output", 200 );
         set_callbacks( E_(OpenVideo), E_(CloseVideo) );
         add_category_hint( N_("Video"), NULL, VLC_FALSE );
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_TEXT, VLC_FALSE );
@@ -64,6 +64,6 @@ vlc_module_begin();
         set_capability( "audio output", 100 );
         set_callbacks( E_(OpenAudio), E_(CloseAudio) );
         add_category_hint( N_("Audio"), NULL, VLC_FALSE );
-        add_integer( "macosx-adev", 0, NULL, ADEV_TEXT, ADEV_TEXT, VLC_FALSE );
+        add_integer( "macosx-adev", -1, NULL, ADEV_TEXT, ADEV_TEXT, VLC_FALSE );
 vlc_module_end();
 

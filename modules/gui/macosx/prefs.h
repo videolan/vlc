@@ -1,8 +1,8 @@
 /*****************************************************************************
  * prefs.h: MacOS X plugin for vlc
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: prefs.h,v 1.3 2003/02/21 02:45:21 hartman Exp $
+ * Copyright (C) 2002-2003 VideoLAN
+ * $Id: prefs.h,v 1.4 2003/02/23 05:53:53 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *

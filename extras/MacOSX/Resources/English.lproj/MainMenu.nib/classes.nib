@@ -39,7 +39,7 @@
             ACTIONS = {showCategory = id; toggleInfoPanel = id; }; 
             CLASS = VLCInfo; 
             LANGUAGE = ObjC; 
-            OUTLETS = {"o_info_selector" = id; "o_info_view" = id; "o_info_window" = id; }; 
+            OUTLETS = {"o_selector" = id; "o_view" = id; "o_window" = id; }; 
             SUPERCLASS = NSObject; 
         }, 
         {

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.15 2003/02/21 02:45:21 hartman Exp $
+ * Copyright (C) 2002-2003 VideoLAN
+ * $Id: prefs.m,v 1.16 2003/02/23 05:53:53 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -280,7 +280,7 @@
 
     if( p_item ) do
     {
-        if( p_item->b_advanced && !config_GetInt( p_intf, "advanced" ))
+        if( p_item->b_advanced && !config_GetInt( p_intf, "advanced" ) )
         {
             continue;
         }
@@ -728,7 +728,7 @@
 {
     id o_vlc_control;
     NSEnumerator *o_enum;
-    BOOL b_advanced_change = FALSE;
+    BOOL b_adv_change = FALSE;
     
     NSWindow *o_pref_panel = [[sender superview] window];
     NSString *o_module_name = [[o_pref_panel toolbar] identifier];
@@ -762,7 +762,7 @@
                     psz_value = (char *)[o_value lossyCString];
     
                     config_PutPsz( p_intf, psz_name,
-                                *psz_value ? psz_value : NULL );
+                                   *psz_value ? psz_value : NULL );
                 }
                 break;
     
@@ -770,10 +770,13 @@
             case CONFIG_ITEM_BOOL:
                 {
                     int i_value = [o_vlc_control intValue];
-                    if ( !strcmp( psz_name, "advanced" ) && ( config_GetInt( p_intf, "advanced" ) != i_value ) )
+
+                    if( !strcmp( psz_name, "advanced" ) && 
+                        ( config_GetInt( p_intf, "advanced" ) != i_value ) )
                     {
-                        b_advanced_change = TRUE;
+                        b_adv_change = TRUE;
                     }
+
                     config_PutInt( p_intf, psz_name, i_value );
                 }
                 break;
@@ -795,11 +798,7 @@
         config_SaveConfigFile( p_intf, NULL );
     }
     
-    if ( [[sender title] isEqualToString: _NS("Apply")] && !b_advanced_change )
-    {
-        ;
-    }
-    else
+    if( ![[sender title] isEqualToString: _NS("Apply")] || b_adv_change )
     {
         [o_pref_panel close];
 
@@ -809,16 +808,17 @@
             [self performSelectorOnMainThread: @selector(destroyPrefPanel:)
                                             withObject: o_module_name
                                             waitUntilDone: YES];
-            if ( [[sender title] isEqualToString: _NS("Apply")] && b_advanced_change )
-            {
-                [self createPrefPanel:@"main"];
-            }
         }
         else
         {
             [NSTimer scheduledTimerWithTimeInterval: 0.1
                     target: self selector: @selector(destroyPrefPanel:)
                     userInfo: o_module_name repeats: NO];
+        }
+
+        if( [[sender title] isEqualToString: _NS("Apply")] && b_adv_change )
+        {
+            [self createPrefPanel: o_module_name];
         }
     }
 }

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * info.m: MacOS X info panel
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: info.m,v 1.2 2003/02/18 20:54:02 hartman Exp $
+ * Copyright (C) 2003 VideoLAN
+ * $Id: info.m,v 1.3 2003/02/23 05:53:53 jlj Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -22,13 +22,17 @@
  *****************************************************************************/
 
 #include "intf.h"
-
-#import "info.h"
+#include "info.h"
 
 /*****************************************************************************
  * VLCInfo implementation 
  *****************************************************************************/
 @implementation VLCInfo
+
+- (void)awakeFromNib
+{
+    [o_window setExcludedFromWindowsMenu: YES];
+}
 
 - (id)init
 {
@@ -36,9 +40,7 @@
 
     if( self != nil )
     {
-        p_intf = [NSApp getIntf];
-        
-        o_info_strings = [[NSMutableDictionary alloc] init];
+        o_strings = [[NSMutableDictionary alloc] init];
     }
 
     return( self );
@@ -46,91 +48,99 @@
 
 - (void)dealloc
 {
-    [o_info_strings release];
-
+    [o_strings release];
     [super dealloc];
 }
 
 - (IBAction)toggleInfoPanel:(id)sender
 {
-    if ( [o_info_window isVisible] )
+    if( [o_window isVisible] )
     {
-        [o_info_window orderOut:sender];
+        [o_window orderOut: sender];
     }
     else
     {
-        [o_info_window orderFront:sender];
+        [o_window orderFront: sender];
         [self updateInfo];
     }
 }
 
 - (IBAction)showCategory:(id)sender
 {
-    NSString *o_selected = [o_info_selector titleOfSelectedItem];
-    [o_info_view setString:(NSString *)[o_info_strings objectForKey: o_selected]];
-    [o_info_view setNeedsDisplay: YES];
+    NSString * o_title = [o_selector titleOfSelectedItem];
+    [o_view setString: [o_strings objectForKey: o_title]];
+    [o_view setNeedsDisplay: YES];
 }
 
 - (void)updateInfo
 {
-    if ( ![o_info_window isVisible] )
+    if( ![o_window isVisible] )
     {
         return;
     }
-    
+
+    intf_thread_t * p_intf = [NSApp getIntf]; 
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    
+
     if( p_playlist == NULL )
     {
-        [o_info_window orderOut:self];
         return;
     }
-    
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+
     if ( p_playlist->p_input == NULL )
     {
-        [o_info_window orderOut:self];
+        vlc_mutex_unlock( &p_playlist->object_lock );
         vlc_object_release( p_playlist );
         return;
     }
 
-    [o_info_strings removeAllObjects];
-    [o_info_selector removeAllItems];
-    [o_info_view setDrawsBackground: NO];
-    [[[o_info_view superview] superview] setDrawsBackground: NO];
-    [o_info_window setExcludedFromWindowsMenu:YES];
-    
+    [o_strings removeAllObjects];
+    [o_selector removeAllItems];
+
     vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
-    input_info_category_t *p_category = p_playlist->p_input->stream.p_info;
-    while ( p_category )
+    input_info_category_t * p_category = p_playlist->p_input->stream.p_info;
+
+    while( p_category )
     {
-        [self createInfoView: p_category ];
+        [self createInfoView: p_category];
         p_category = p_category->p_next;
     }
+
     vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+    vlc_mutex_unlock( &p_playlist->object_lock );
     vlc_object_release( p_playlist );
-    
-    [o_info_selector selectItemAtIndex: 0];
-    [self showCategory:o_info_selector];
+
+    [o_selector selectItemAtIndex: 0];
+    [self showCategory: o_selector];
 }
 
 - (void)createInfoView:(input_info_category_t *)p_category
 {
-    /* Add a catecory */
-    NSString *title = [NSString stringWithCString: p_category->psz_name];
-    [o_info_selector addItemWithTitle: title];
-    
-    /* Create the textfield content */
-    NSMutableString *catString = [NSMutableString string];
-    
+    NSString * o_title;
+    NSMutableString * o_content;
+    input_info_t * p_info;
+
+    /* Add a category */
+    o_title = [NSString stringWithCString: p_category->psz_name];
+    [o_selector addItemWithTitle: o_title];
+
+    /* Create empty content string */
+    o_content = [NSMutableString string];
+
     /* Add the fields */
-    input_info_t *p_info = p_category->p_info;
-    while ( p_info )
+    p_info = p_category->p_info;
+
+    while( p_info )
     {
-        [catString appendFormat: @"%s: %s\n\n", p_info->psz_name, p_info->psz_value];
+        [o_content appendFormat: @"%s: %s\n\n", p_info->psz_name,
+                                                p_info->psz_value]; 
         p_info = p_info->p_next;
     }
-    [o_info_strings setObject: catString forKey: title];
+
+    [o_strings setObject: o_content forKey: o_title];
 }
 
 @end
@@ -141,6 +151,7 @@
 {
     BOOL bEnabled = TRUE;
 
+    intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
 

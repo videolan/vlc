@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.60 2003/02/19 14:49:25 hartman Exp $
+ * $Id: intf.m,v 1.61 2003/02/23 05:53:53 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -435,15 +435,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
         if( p_playlist != NULL )
         {
-            vlc_value_t val;
-
-            if( var_Get( (vlc_object_t *)p_playlist, "intf-change", &val )
-                >= 0 && val.b_bool )
-            {
-                p_intf->p_sys->b_playlist_update = 1;
-                p_intf->p_sys->b_intf_update = VLC_TRUE;
-            }
-            
             vlc_mutex_lock( &p_playlist->object_lock );
             
             [self manage: p_playlist];
@@ -465,7 +456,16 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
 - (void)manage:(playlist_t *)p_playlist
 {
+    vlc_value_t val;
+
     intf_thread_t * p_intf = [NSApp getIntf];
+
+    if( var_Get( (vlc_object_t *)p_playlist, "intf-change", &val ) >= 0 &&
+        val.b_bool )
+    {
+        p_intf->p_sys->b_playlist_update = VLC_TRUE;
+        p_intf->p_sys->b_intf_update = VLC_TRUE;
+    }
 
 #define p_input p_playlist->p_input
 
@@ -508,8 +508,10 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
                     p_intf->p_sys->b_aout_update = 1;
                     b_need_menus = VLC_TRUE;
                 }
+
                 vlc_object_release( (vlc_object_t *)p_aout );
             }
+
             aout_VolumeGet( p_intf, &i_volume );
             p_intf->p_sys->b_mute = ( i_volume == 0 );
 
@@ -578,15 +580,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
             vout_Destroy( p_vout );
             vlc_mutex_lock( &p_playlist->object_lock );
         }
-
-        aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                            FIND_ANYWHERE );
-        if( p_aout != NULL )
-        {
-            vlc_object_detach( (vlc_object_t *)p_aout );
-            vlc_object_release( (vlc_object_t *)p_aout );
-            aout_Delete( p_aout ); 
-        }
     }
 
     p_intf->p_sys->b_intf_update = VLC_TRUE;
@@ -610,50 +603,45 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         return;
     }
 
-    vlc_mutex_lock( &p_playlist->object_lock );
-    
     if ( p_intf->p_sys->b_playlist_update )
     {
         vlc_value_t val;
-        val.b_bool = 0;
 
+        val.b_bool = 0;
         var_Set( (vlc_object_t *)p_playlist, "intf-change", val );
+
         [o_playlist playlistUpdated];
+
         p_intf->p_sys->b_playlist_update = VLC_FALSE;
     }
+
+    if( p_intf->p_sys->b_current_title_update )
+    {
+        id o_vout_wnd;
+
+        NSEnumerator * o_enum = [[NSApp windows] objectEnumerator];
+        
+        while( ( o_vout_wnd = [o_enum nextObject] ) )
+        {
+            if( [[o_vout_wnd className] isEqualToString: @"VLCWindow"] )
+            {
+                [o_vout_wnd updateTitle];
+            }
+        }
+
+        [o_playlist updateRowSelection];
+        [o_info updateInfo];
+
+        p_intf->p_sys->b_current_title_update = FALSE;
+    }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
 
 #define p_input p_playlist->p_input
 
     if( p_input != NULL )
     {
         vlc_mutex_lock( &p_input->stream.stream_lock );
-    }
-    
-    if( p_intf->p_sys->b_current_title_update )
-    {
-        id o_awindow = [NSApp keyWindow];
-        NSArray *o_windows = [NSApp windows];
-        NSEnumerator *o_enumerator = [o_windows objectEnumerator];
-        
-        while ((o_awindow = [o_enumerator nextObject]))
-        {
-            if( [[o_awindow className] isEqualToString: @"VLCWindow"] )
-            {
-                vlc_mutex_unlock( &p_playlist->object_lock );
-                [o_awindow updateTitle];
-                vlc_mutex_lock( &p_playlist->object_lock );
-            }
-        }
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        [o_playlist updateState];
-        vlc_mutex_lock( &p_playlist->object_lock );
-        if( p_input != NULL )
-        {
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-            [o_info updateInfo];
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-        }
-        p_intf->p_sys->b_current_title_update = FALSE;
     }
 
     if( p_intf->p_sys->b_intf_update )
