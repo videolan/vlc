@@ -1592,10 +1592,6 @@ SOURCE=..\..\include\threads.h
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\include\vdec_ext-plugins.h"
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\include\video.h
 # End Source File
 # Begin Source File

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: ffmpeg.c,v 1.2 2002/08/04 18:39:41 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -42,7 +42,6 @@
 #   include <sys/times.h>
 #endif
 
-#include "vdec_ext-plugins.h"
 #include "avcodec.h"                                            /* ffmpeg */
 #include "ffmpeg.h"
 

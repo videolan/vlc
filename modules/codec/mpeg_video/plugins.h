@@ -2,7 +2,7 @@
  * vdec_ext-plugins.h : structures from the video decoder exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_ext-plugins.h,v 1.14 2002/07/20 18:01:41 sam Exp $
+ * $Id: plugins.h,v 1.1 2002/08/04 18:39:41 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *

@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.12 2002/07/31 20:56:53 sam Exp $
+ * $Id: objects.c,v 1.13 2002/08/04 18:39:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -36,8 +36,6 @@
 
 #include "video.h"
 #include "video_output.h"
-
-#include "vdec_ext-plugins.h"
 
 #include "audio_output.h"
 

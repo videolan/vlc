@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: decoder.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: decoder.c,v 1.2 2002/08/04 18:39:41 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -37,8 +37,7 @@
 #   include <unistd.h>                                           /* getpid() */
 #endif
 
-#include "vdec_ext-plugins.h"
-
+#include "plugins.h"
 #include "decoder.h"
 #include "pool.h"
 #include "parser.h"
