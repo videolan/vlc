@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.26 2002/10/25 15:42:00 gbazin Exp $
+ * $Id: aout_internal.h,v 1.27 2002/11/01 15:06:23 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -272,6 +272,7 @@ void aout_FifoSet( aout_instance_t *, aout_fifo_t *, mtime_t );
 void aout_FifoMoveDates( aout_instance_t *, aout_fifo_t *, mtime_t );
 VLC_EXPORT( aout_buffer_t *, aout_FifoPop, ( aout_instance_t * p_aout, aout_fifo_t * p_fifo ) );
 void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo );
+VLC_EXPORT( mtime_t, aout_FifoFirstDate, ( aout_instance_t *, aout_fifo_t * ) );
 
 /* From intf.c :*/
 VLC_EXPORT( void, aout_VolumeSoftInit, ( aout_instance_t * ) );

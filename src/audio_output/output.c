@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.20 2002/10/31 09:40:26 gbazin Exp $
+ * $Id: output.c,v 1.21 2002/11/01 15:06:23 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -193,13 +193,20 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     if ( p_buffer == NULL )
     {
         p_aout->output.fifo.pp_last = &p_aout->output.fifo.p_first;
+
+#if 0 /* This is bad because the audio output might just be trying to fill
+       * in it's internal buffers. And anyway, it's up to the audio output
+       * to deal with this kind of starvation. */
+
         /* Set date to 0, to allow the mixer to send a new buffer ASAP */
         aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
-        vlc_mutex_unlock( &p_aout->output_fifo_lock );
         if ( !p_aout->output.b_starving )
             msg_Dbg( p_aout,
                  "audio output is starving (no input), playing silence" );
         p_aout->output.b_starving = 1;
+#endif
+
+        vlc_mutex_unlock( &p_aout->output_fifo_lock );
         return NULL;
     }
 

@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.5 2002/10/22 23:08:00 massiot Exp $
+ * $Id: common.c,v 1.6 2002/11/01 15:06:23 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -312,6 +312,16 @@ void aout_FifoMoveDates( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
 mtime_t aout_FifoNextStart( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
     return aout_DateGet( &p_fifo->end_date );
+}
+
+/*****************************************************************************
+ * aout_FifoFirstDate : return the playing date of the first buffer in the
+ * FIFO
+ *****************************************************************************/
+mtime_t aout_FifoFirstDate( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
+{
+    return p_fifo->p_first ?
+        aout_DateGet( &p_fifo->p_first->start_date ) : 0;
 }
 
 /*****************************************************************************
