@@ -124,7 +124,11 @@ static int Create( vlc_object_t *p_this )
     int i_ret;
 
     if ( p_filter->input.i_format != VLC_FOURCC('a','5','2',' ')
+#ifdef LIBA52_FIXED
+          || p_filter->output.i_format != VLC_FOURCC('f','i','3','2') )
+#else
           || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
+#endif
     {
         return -1;
     }
@@ -317,7 +321,11 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     filter_sys_t    *p_sys = (filter_sys_t *)p_filter->p_sys;
+#ifdef LIBA52_FIXED
+    sample_t        i_sample_level = (1 << 24);
+#else
     sample_t        i_sample_level = 1;
+#endif
     int             i_flags = p_sys->i_flags;
     int             i_bytes_per_block = 256 * p_sys->i_nb_channels
                       * sizeof(float);
@@ -408,7 +416,11 @@ static int OpenFilter( vlc_object_t *p_this )
     }
 
     p_filter->fmt_out.audio.i_format =
+#ifdef LIBA52_FIXED
+        p_filter->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');
+#else
         p_filter->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+#endif
 
     /* Allocate the memory needed to store the module's structure */
     p_sys = p_filter->p_sys = malloc( sizeof(filter_sys_t) );
