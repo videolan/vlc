@@ -48,12 +48,12 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
     unsigned char     *ReadStart;
 
     if ( p_mad_adec->p_fifo->b_die == 1 ) {
-        msg_Err( p_mad_adec->p_fifo, "libmad_input stopping libmad decoder" );
+        msg_Dbg( p_mad_adec->p_fifo, "libmad_input stopping libmad decoder" );
         return MAD_FLOW_STOP;
     }
 
     if ( p_mad_adec->p_fifo->b_error == 1 ) {
-        msg_Err( p_mad_adec->p_fifo, "libmad_input ignoring current audio frame" );
+        msg_Warn( p_mad_adec->p_fifo, "libmad_input ignoring current audio frame" );
         return MAD_FLOW_IGNORE;
     }
 
@@ -125,7 +125,7 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
 
         if ( p_mad_adec->p_fifo->b_error == 1 )
         {
-            msg_Err( p_mad_adec->p_fifo, "libmad_input ignoring current audio frame" );    
+            msg_Warn( p_mad_adec->p_fifo, "libmad_input ignoring current audio frame" );    
             return MAD_FLOW_IGNORE;
         }
 
