@@ -65,6 +65,11 @@
 #define NETSYNC_PORT_MASTER 9875
 #define NETSYNC_PORT_SLAVE  9876
 
+/* Needed for Solaris */
+#ifndef INADDR_NONE
+#define INADDR_NONE 0xffffffff
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
