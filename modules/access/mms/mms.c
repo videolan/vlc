@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.14 2002/12/18 14:17:09 sam Exp $
+ * $Id: mms.c,v 1.15 2002/12/30 08:56:19 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -115,6 +115,11 @@ static void mms_ParseURL( url_t *p_url, char *psz_url );
  */
 /*
  * Merci :))
+ */
+/*
+ * Vous pourriez signer vos commentaires (même si on voit bien qui peut
+ * écrire ce genre de trucs :p), et écrire en anglais, bordel de
+ * merde :p.
  */
 
 /*****************************************************************************

@@ -1,6 +1,6 @@
 dnl Autoconf settings for vlc
 
-AC_INIT(vlc,0.5.0-cvs)
+AC_INIT(vlc,0.5.0-test2)
 
 CONFIGURE_LINE="$0 $*"
 CODENAME="Natalya"
@@ -124,7 +124,6 @@ case "x${target_os}" in
         LDFLAGS_ipv6="${LDFLAGS_ipv6} -lws2_32"
         LDFLAGS_access_http="${LDFLAGS_access_http} -lws2_32"
         LDFLAGS_access_mms="${LDFLAGS_access_mms} -lws2_32"
-        LDFLAGS_access_rtp="${LDFLAGS_access_rtp} -lws2_32"
         LDFLAGS_access_udp="${LDFLAGS_access_udp} -lws2_32"
         LDFLAGS_access_ftp="${LDFLAGS_access_ftp} -lws2_32"
         LDFLAGS_access_output_udp="${LDFLAGS_access_output_udp} -lws2_32"
@@ -278,7 +277,6 @@ AC_CHECK_FUNC(send,,[
   AC_CHECK_LIB(socket,send,
     LDFLAGS_access_http="${LDFLAGS_access_http} -lsocket"
     LDFLAGS_access_mms="${LDFLAGS_access_mms} -lsocket"
-    LDFLAGS_access_rtp="${LDFLAGS_access_rtp} -lsocket"
     LDFLAGS_access_udp="${LDFLAGS_access_udp} -lsocket"
     LDFLAGS_access_ftp="${LDFLAGS_access_ftp} -lsocket"
     LDFLAGS_sap="${LDFLAGS_sap} -lsocket"
@@ -737,7 +735,7 @@ PLUGINS="${PLUGINS} aout_file"
 PLUGINS="${PLUGINS} i420_rgb i420_yuy2 i422_yuy2 i420_ymga"
 PLUGINS="${PLUGINS} id3 m3u"
 PLUGINS="${PLUGINS} wav araw demuxdump demuxsub adpcm"
-PLUGINS="${PLUGINS} access_udp access_http access_rtp ipv4 access_mms sap access_ftp"
+PLUGINS="${PLUGINS} access_udp access_http ipv4 access_mms access_ftp sap"
 
 dnl
 dnl  Accelerated modules

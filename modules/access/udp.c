@@ -1,10 +1,11 @@
 /*****************************************************************************
- * udp.c: raw UDP access plug-in
+ * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.7 2002/12/16 16:48:04 gbazin Exp $
+ * $Id: udp.c,v 1.8 2002/12/30 08:56:19 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ *          Tristan Leteurtre <tooney@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,12 +53,16 @@
 
 #include "network.h"
 
+#define RTP_HEADER_LEN 12
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  Open       ( vlc_object_t * );
 static void Close      ( vlc_object_t * );
 static ssize_t Read    ( input_thread_t *, byte_t *, size_t );
+static ssize_t RTPRead ( input_thread_t *, byte_t *, size_t );
+static ssize_t RTPChoose( input_thread_t *, byte_t *, size_t );
 
 /*****************************************************************************
  * Module descriptor
@@ -217,7 +222,7 @@ static int Open( vlc_object_t *p_this )
         i_bind_port = config_GetInt( p_this, "server-port" );
     }
 
-    p_input->pf_read = Read;
+    p_input->pf_read = RTPChoose;
     p_input->pf_set_program = input_SetProgram;
     p_input->pf_set_area = NULL;
     p_input->pf_seek = NULL;
@@ -348,3 +353,132 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 #endif
 }
 
+/*****************************************************************************
+ * RTPRead : read from the network, and parse the RTP header
+ *****************************************************************************/
+static ssize_t RTPRead( input_thread_t * p_input, byte_t * p_buffer,
+                        size_t i_len )
+{
+    int         i_rtp_version;
+    int         i_CSRC_count;
+    int         i_payload_type;
+
+    byte_t *    p_tmp_buffer = alloca( p_input->i_mtu );
+
+    /* Get the raw data from the socket.
+     * We first assume that RTP header size is the classic RTP_HEADER_LEN. */
+    ssize_t i_ret = Read( p_input, p_tmp_buffer, p_input->i_mtu );
+
+    if ( !i_ret ) return 0;
+
+    /* Parse the header and make some verifications.
+     * See RFC 1889 & RFC 2250. */
+
+    i_rtp_version  = ( p_tmp_buffer[0] & 0xC0 ) >> 6;
+    i_CSRC_count   = ( p_tmp_buffer[0] & 0x0F );
+    i_payload_type = ( p_tmp_buffer[1] & 0x7F );
+
+    if ( i_rtp_version != 2 )
+        msg_Dbg( p_input, "RTP version is %u, should be 2", i_rtp_version );
+
+    if ( i_payload_type != 33 && i_payload_type != 14
+          && i_payload_type != 32 )
+        msg_Dbg( p_input, "unsupported RTP payload type (%u)", i_payload_type );
+
+    /* Return the packet without the RTP header. */
+    i_ret -= ( RTP_HEADER_LEN + 4 * i_CSRC_count );
+
+    if ( (size_t)i_ret > i_len )
+    {
+        /* This should NOT happen. */
+        msg_Warn( p_input, "RTP input trashing %d bytes", i_ret - i_len );
+        i_ret = i_len;
+    }
+
+    p_input->p_vlc->pf_memcpy( p_buffer,
+                       p_tmp_buffer + RTP_HEADER_LEN + 4 * i_CSRC_count,
+                       i_ret );
+
+    return i_ret;
+}
+
+/*****************************************************************************
+ * RTPChoose : read from the network, and decide whether it's UDP or RTP
+ *****************************************************************************/
+static ssize_t RTPChoose( input_thread_t * p_input, byte_t * p_buffer,
+                          size_t i_len )
+{
+    int         i_rtp_version;
+    int         i_CSRC_count;
+    int         i_payload_type;
+
+    byte_t *    p_tmp_buffer = alloca( p_input->i_mtu );
+
+    /* Get the raw data from the socket.
+     * We first assume that RTP header size is the classic RTP_HEADER_LEN. */
+    ssize_t i_ret = Read( p_input, p_tmp_buffer, p_input->i_mtu );
+
+    if ( !i_ret ) return 0;
+    
+    /* Check that it's not TS. */
+    if ( p_tmp_buffer[0] == 0x47 )
+    {
+        msg_Dbg( p_input, "detected TS over raw UDP" );
+        p_input->pf_read = Read;
+        p_input->p_vlc->pf_memcpy( p_buffer, p_tmp_buffer, i_ret );
+        return i_ret;
+    }
+
+    /* Parse the header and make some verifications.
+     * See RFC 1889 & RFC 2250. */
+
+    i_rtp_version  = ( p_tmp_buffer[0] & 0xC0 ) >> 6;
+    i_CSRC_count   = ( p_tmp_buffer[0] & 0x0F );
+    i_payload_type = ( p_tmp_buffer[1] & 0x7F );
+
+    if ( i_rtp_version != 2 )
+    {
+        msg_Dbg( p_input, "no RTP header detected" );
+        p_input->pf_read = Read;
+        p_input->p_vlc->pf_memcpy( p_buffer, p_tmp_buffer, i_ret );
+        return i_ret;
+    }
+
+    switch ( i_payload_type )
+    {
+    case 33:
+        msg_Dbg( p_input, "detected TS over RTP" );
+        break;
+
+    case 14:
+        msg_Dbg( p_input, "detected MPEG audio over RTP" );
+        break;
+
+    case 32:
+        msg_Dbg( p_input, "detected MPEG video over RTP" );
+        break;
+
+    default:
+        msg_Dbg( p_input, "no RTP header detected" );
+        p_input->pf_read = Read;
+        p_input->p_vlc->pf_memcpy( p_buffer, p_tmp_buffer, i_ret );
+        return i_ret;
+    }
+
+    /* Return the packet without the RTP header. */
+    p_input->pf_read = RTPRead;
+    i_ret -= ( RTP_HEADER_LEN + 4 * i_CSRC_count );
+
+    if ( (size_t)i_ret > i_len )
+    {
+        /* This should NOT happen. */
+        msg_Warn( p_input, "RTP input trashing %d bytes", i_ret - i_len );
+        i_ret = i_len;
+    }
+
+    p_input->p_vlc->pf_memcpy( p_buffer,
+                       p_tmp_buffer + RTP_HEADER_LEN + 4 * i_CSRC_count,
+                       i_ret );
+
+    return i_ret;
+}

@@ -1,10 +1,11 @@
 /*****************************************************************************
- * darwin_specific.c: Darwin specific features 
+ * darwin_specific.m: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.c,v 1.16 2002/12/27 00:17:49 massiot Exp $
+ * $Id: darwin_specific.m,v 1.1 2002/12/30 08:56:19 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,14 +26,74 @@
 
 #include <vlc/vlc.h>
 
+#include <Cocoa/Cocoa.h>
+
 /*****************************************************************************
  * Static vars
  *****************************************************************************/
 static char * psz_program_path;
 
 /*****************************************************************************
- * system_Init: fill in program path.
+ * system_Init: fill in program path & retrieve language
  *****************************************************************************/
+static int FindLanguage( const char * psz_lang )
+{
+    const char * psz_short = NULL;
+
+    if ( !strcmp(psz_lang, "German") )
+    {
+        psz_short = "de";
+    }
+    else if ( !strcmp(psz_lang, "British") )
+    {
+        psz_short = "en_GB";
+    }
+    else if ( !strcmp(psz_lang, "French") )
+    {
+        psz_short = "fr";
+    }
+    else if ( !strcmp(psz_lang, "Italian") )
+    {
+        psz_short = "it";
+    }
+    else if ( !strcmp(psz_lang, "Japanese") )
+    {
+        psz_short = "ja";
+    }
+    else if ( !strcmp(psz_lang, "Dutch") )
+    {
+        psz_short = "nl";
+    }
+    else if ( !strcmp(psz_lang, "no") )
+    {
+        psz_short = "no";
+    }
+    else if ( !strcmp(psz_lang, "pl") )
+    {
+        psz_short = "pl";
+    }
+    else if ( !strcmp(psz_lang, "ru") )
+    {
+        psz_short = "ru";
+    }
+    else if ( !strcmp(psz_lang, "se") )
+    {
+        psz_short = "se";
+    }
+    else if ( !strcmp(psz_lang, "English") )
+    {
+        psz_short = "C";
+    }
+
+    if ( psz_short != NULL )
+    {
+        setenv("LANG", psz_short, 1);
+        return 1;
+    }
+
+    return 0;
+}
+
 void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
     char i_dummy;
@@ -52,6 +113,28 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
         }
 
         p_char++;
+    }
+
+    /* Check if $LANG is set. */
+    if ( (p_char = getenv("LANG")) == NULL )
+    {
+        /* Retrieve user's preferences. */
+        NSUserDefaults * p_defs =
+            [[NSUserDefaults standardUserDefaults] autorelease];
+        NSArray * p_languages =
+            [[p_defs objectForKey:@"AppleLanguages"] autorelease];
+        NSEnumerator * p_enumerator =
+            [[p_languages objectEnumerator] autorelease];
+        NSString * p_lang;
+
+        while ( (p_lang = [[p_enumerator nextObject] autorelease]) )
+        {
+            const char * psz_string = [p_lang lossyCString];
+            if ( FindLanguage( psz_string ) )
+            {
+                break;
+            }
+        }
     }
 }
 

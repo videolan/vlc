@@ -308,10 +308,12 @@ lib_LIBRARIES += lib/libvlc.a $(LIBRARIES_libvlc_pic)
 lib_libvlc_a_SOURCES = $(SOURCES_libvlc)
 lib_libvlc_a_CFLAGS = $(CPPFLAGS_default) -D__VLC__ $(CFLAGS_default) @CFLAGS_vlc@
 lib_libvlc_a_CXXFLAGS = $(CPPFLAGS_default) -D__VLC__ $(CXXFLAGS_default)
+lib_libvlc_a_OBJCFLAGS = $(CPPFLAGS_default) -D__VLC__ $(OBJCFLAGS_default)
 
 lib_libvlc_pic_a_SOURCES = $(SOURCES_libvlc)
 lib_libvlc_pic_a_CFLAGS = $(CPPFLAGS_pic) -D__VLC__ $(CFLAGS_pic) @CFLAGS_vlc@
 lib_libvlc_pic_a_CXXFLAGS = $(CPPFLAGS_pic) -D__VLC__ $(CXXFLAGS_pic)
+lib_libvlc_pic_a_OBJCFLAGS = $(CPPFLAGS_pic) -D__VLC__ $(OBJCFLAGS_pic)
 
 if HAVE_BEOS
 OPT_SOURCES_libvlc_beos = $(SOURCES_libvlc_beos)
@@ -345,7 +347,7 @@ SOURCES_libvlc_beos = \
 	$(NULL)
 
 SOURCES_libvlc_darwin = \
-	src/misc/darwin_specific.c \
+	src/misc/darwin_specific.m \
 	$(NULL)
 
 SOURCES_libvlc_win32 = \
