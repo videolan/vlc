@@ -461,6 +461,7 @@ static void Close( vlc_object_t *p_this )
     {
         net_Close( p_sys->pi_fd[i] );
     }
+    FREE( p_sys->pi_fd );
 
     if( config_GetInt( p_sd, "sap-cache" ) )
     {
@@ -471,6 +472,7 @@ static void Close( vlc_object_t *p_this )
     {
         RemoveAnnounce( p_sd, p_sys->pp_announces[i] );
     }
+    FREE( p_sys->pp_announces );
 
     p_playlist = (playlist_t *) vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
                                                  FIND_ANYWHERE );
@@ -819,6 +821,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
 
     if( !p_item )
     {
+        free( p_sap );
         return NULL;
     }
 
@@ -846,7 +849,6 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     if( !p_playlist )
     {
         msg_Err( p_sd, "playlist not found" );
-        FREE( psz_value );
         free( p_sap );
         return NULL;
     }
@@ -864,13 +866,11 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
                 p_child = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
                                                psz_grp, p_sd->p_sys->p_node );
             free( psz_grp );
-            free( psz_value );
         }
         else
         {
             vlc_object_release( p_playlist );
             msg_Err( p_sd, "out of memory");
-            free( psz_value );
             free( p_sap );
             return NULL;
         }
@@ -1296,6 +1296,7 @@ static char *convert_from_utf8( struct services_discovery_t *p_sd,
     if( ret == (size_t)(-1) || i_in )
     {
         msg_Warn( p_sd, "Failed to convert \"%s\" from UTF-8", psz_unicode );
+        free( psz_local );
         return strdup( psz_unicode );
     }
     *psz_out = '\0';
@@ -1410,6 +1411,8 @@ static void FreeSDP( sdp_t *p_sdp )
     FREE( p_sdp->psz_connection );
     FREE( p_sdp->psz_media );
     FREE( p_sdp->psz_uri );
+    FREE( p_sdp->psz_username );
+    FREE( p_sdp->psz_network_type );
 
     FREE( p_sdp->psz_address );
     FREE( p_sdp->psz_address_type );
@@ -1434,7 +1437,11 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
 
     if( p_announce->p_sdp ) FreeSDP( p_announce->p_sdp );
 
-    if( !p_playlist ) return VLC_EGENERIC;
+    if( !p_playlist )
+    {
+        free( p_announce );
+        return VLC_EGENERIC;
+    }
 
     if( p_announce->p_item )
     {
