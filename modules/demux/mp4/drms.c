@@ -2,7 +2,7 @@
  * drms.c: DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.c,v 1.13 2004/02/17 13:13:31 gbazin Exp $
+ * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Sam Hocevar <sam@zoy.org>
@@ -102,9 +102,24 @@ struct md5_s
  *****************************************************************************/
 struct shuffle_s
 {
+    uint32_t i_version;
     uint32_t p_commands[ 20 ];
     uint32_t p_bordel[ 16 ];
 };
+
+/*****************************************************************************
+ * shuffle_ext_s: extended shuffle structure
+ *****************************************************************************
+ * This structure stores the static information needed to shuffle data using
+ * a custom algorithm.
+ *****************************************************************************/
+struct shuffle_ext_s
+{
+    uint32_t * p_bordel;
+    uint32_t i_cmd, i_jc, i_tmp;
+};
+
+#define SWAP( a, b ) { (a) ^= (b); (b) ^= (a); (a) ^= (b); }
 
 /*****************************************************************************
  * drms_s: DRMS structure
@@ -135,8 +150,19 @@ static void AddMD5        ( struct md5_s *, const uint8_t *, uint32_t );
 static void EndMD5        ( struct md5_s * );
 static void Digest        ( struct md5_s *, uint32_t * );
 
-static void InitShuffle   ( struct shuffle_s *, uint32_t * );
+static void InitShuffle   ( struct shuffle_s *, uint32_t *, uint32_t );
 static void DoShuffle     ( struct shuffle_s *, uint32_t *, uint32_t );
+
+static uint32_t FirstPass ( uint32_t * );
+static void SecondPass    ( struct shuffle_ext_s * );
+static uint32_t ThirdPass ( uint32_t * );
+static void FourthPass    ( uint32_t *, uint32_t );
+static void FifthPass     ( uint32_t * );
+static void BigShuffle1   ( struct shuffle_ext_s * );
+static void BigShuffle2   ( struct shuffle_ext_s * );
+static void TinyShuffle1  ( uint32_t * );
+static void TinyShuffle2  ( uint32_t * );
+static void DoExtShuffle  ( uint32_t * );
 
 static int GetSystemKey   ( uint32_t *, vlc_bool_t );
 static int WriteUserKey   ( void *, uint32_t * );
@@ -647,12 +673,15 @@ static void Digest( struct md5_s *p_md5, uint32_t *p_input )
  * This function initialises tables in the p_shuffle structure that will be
  * used later by DoShuffle. The only external parameter is p_sys_key.
  *****************************************************************************/
-static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key )
+static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key,
+                         uint32_t i_version )
 {
     char p_secret1[] = "Tv!*";
     static char const p_secret2[] = "v8rhvsaAvOKMFfUH%798=[;."
                                     "f8677680a634ba87fnOIf)(*";
     unsigned int i;
+
+    p_shuffle->i_version = i_version;
 
     /* Fill p_commands using the key and a secret seed */
     for( i = 0; i < 20; i++ )
@@ -696,6 +725,34 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
     uint32_t *p_bordel = p_shuffle->p_bordel;
     unsigned int i;
 
+    static uint32_t i_secret = 0;
+
+    static uint32_t p_secret1[] =
+    {
+        0xAAAAAAAA, 0x01757700, 0x00554580, 0x01724500, 0x00424580,
+        0x01427700, 0x00000080, 0xC1D59D01, 0x80144981, 0x815C8901,
+        0x80544981, 0x81D45D01, 0x00000080, 0x81A3BB03, 0x00A2AA82,
+        0x01A3BB03, 0x0022A282, 0x813BA202, 0x00000080, 0x6D575737,
+        0x4A5275A5, 0x6D525725, 0x4A5254A5, 0x6B725437, 0x00000080,
+        0xD5DDB938, 0x5455A092, 0x5D95A013, 0x4415A192, 0xC5DD393A,
+        0x00000080, 0x55555555
+    };
+
+    static char p_secret2[] =
+        "pbclevtug (p) Nccyr Pbzchgre, Vap.  Nyy Evtugf Erfreirq.";
+
+    if( i_secret == 0 )
+    {
+        REVERSE( p_secret1, sizeof(p_secret1)/sizeof(p_secret1[ 0 ]) );
+        for( ; p_secret2[ i_secret ] != '\0'; i_secret++ )
+        {
+#define ROT13(c) (((c)>='A'&&(c)<='Z')?(((c)-'A'+13)%26)+'A':\
+                  ((c)>='a'&&(c)<='z')?(((c)-'a'+13)%26)+'a':c)
+            p_secret2[ i_secret ] = ROT13(p_secret2[ i_secret ]);
+        }
+        i_secret++; /* include zero terminator */
+    }
+
     /* Using the MD5 hash of a memory block is probably not one-way enough
      * for the iTunes people. This function randomises p_bordel depending on
      * the values in p_commands to make things even more messy in p_bordel. */
@@ -729,6 +786,11 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
         }
     }
 
+    if( p_shuffle->i_version == 0x01000300 )
+    {
+        DoExtShuffle( p_bordel );
+    }
+
     /* Convert our newly randomised p_bordel to big endianness and take
      * its MD5 hash. */
     InitMD5( &md5 );
@@ -737,12 +799,777 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
         p_big_bordel[ i ] = U32_AT(p_bordel + i);
     }
     AddMD5( &md5, (uint8_t *)p_big_bordel, 64 );
+    if( p_shuffle->i_version == 0x01000300 )
+    {
+        AddMD5( &md5, (uint8_t *)p_secret1, sizeof(p_secret1) );
+        AddMD5( &md5, (uint8_t *)p_secret2, i_secret );
+    }
     EndMD5( &md5 );
 
     /* XOR our buffer with the computed checksum */
     for( i = 0; i < i_size; i++ )
     {
         p_buffer[ i ] ^= md5.p_digest[ i ];
+    }
+}
+
+/*****************************************************************************
+ * DoExtShuffle: extended shuffle
+ *****************************************************************************
+ * This is even uglier.
+ *****************************************************************************/
+static void DoExtShuffle( uint32_t * p_bordel )
+{
+    uint32_t i_ret;
+    struct shuffle_ext_s exs;
+    exs.p_bordel = p_bordel;
+
+    exs.i_tmp = FirstPass( p_bordel );
+
+    SecondPass( &exs );
+
+    i_ret = ThirdPass( p_bordel );
+
+    FourthPass( p_bordel, i_ret );
+
+    FifthPass( p_bordel );
+}
+
+static uint32_t FirstPass( uint32_t * p_bordel )
+{
+    uint32_t i, j;
+    uint32_t i_cmd, i_ret;
+
+    i_ret = 5;
+    i_cmd = (p_bordel[ 5 ] + 10) >> 2;
+
+    if( p_bordel[ 5 ] > 0x7D0 )
+    {
+        i_cmd -= 0x305;
+    }
+
+    switch( i_cmd & 3 )
+    {
+        case 0:
+            p_bordel[ 5 ] += 5;
+            break;
+        case 1:
+            p_bordel[ 4 ] -= 1;
+            break;
+        case 2:
+            if( p_bordel[ 4 ] & 5 )
+            {
+                p_bordel[ 1 ] ^= 0x4D;
+            }
+            /* no break */
+        case 3:
+            p_bordel[ 12 ] += 5;
+            break;
+    }
+
+    for( ; ; )
+    {
+        for( ; ; )
+        {
+            p_bordel[ 1 ] += 0x10000000;
+            p_bordel[ 3 ] += 0x12777;
+
+            if( (p_bordel[ 10 ] & 1) && i_ret )
+            {
+                i_ret--;
+                p_bordel[ 1 ] -= p_bordel[ 2 ];
+                p_bordel[ 11 ] += p_bordel[ 12 ];
+                break;
+            }
+
+            if( (p_bordel[ 1 ] + p_bordel[ 2 ]) >= 0x7D0 )
+            {
+                i_cmd = ((p_bordel[ 3 ] ^ 0x567F) >> 2) & 7;
+
+                switch( i_cmd )
+                {
+                    case 0:
+                        for( i = 0; i < 3; i++ )
+                        {
+                            if( p_bordel[ i + 10 ] > 0x4E20 )
+                            {
+                                p_bordel[ i + 1 ] += p_bordel[ i + 2 ];
+                            }
+                        }
+                        break;
+                    case 4:
+                        p_bordel[ 1 ] -= p_bordel[ 2 ];
+                        /* no break */
+                    case 3:
+                        p_bordel[ 11 ] += p_bordel[ 12 ];
+                        break;
+                    case 6:
+                        p_bordel[ 3 ] ^= p_bordel[ 4 ];
+                        /* no break */
+                    case 8:
+                        p_bordel[ 13 ] &= p_bordel[ 14 ];
+                        /* no break */
+                    case 1:
+                        p_bordel[ 0 ] |= p_bordel[ 1 ];
+                        if( i_ret )
+                        {
+                            return i_ret;
+                        }
+                        break;
+                }
+
+                break;
+            }
+        }
+
+        for( i = 0, i_cmd = 0; i < 16; i++ )
+        {
+            if( p_bordel[ i ] < p_bordel[ i_cmd ] )
+            {
+                i_cmd = i;
+            }
+        }
+
+        if( i_ret && i_cmd != 5 )
+        {
+            i_ret--;
+        }
+        else
+        {
+            if( i_cmd == 5 )
+            {
+                p_bordel[ 8 ] &= p_bordel[ 6 ] >> 1;
+                p_bordel[ 3 ] <<= 1;
+            }
+
+            for( i = 0; i < 3; i++ )
+            {
+                p_bordel[ 11 ] += 1;
+                if( p_bordel[ 11 ] & 5 )
+                {
+                    p_bordel[ 8 ] += p_bordel[ 9 ];
+                }
+                else if( i_ret )
+                {
+                    i_ret--;
+                    i_cmd = 3;
+                    goto break2;
+                }
+            }
+
+            i_cmd = (p_bordel[ 15 ] + 0x93) >> 3;
+            if( p_bordel[ 15 ] & 0x100 )
+            {
+                i_cmd ^= 0xDEAD;
+            }
+        }
+
+        switch( i_cmd & 3 )
+        {
+            case 0:
+                while( p_bordel[ 11 ] & 1 )
+                {
+                    p_bordel[ 11 ] >>= 1;
+                    p_bordel[ 12 ] += 1;
+                }
+                /* no break */
+            case 2:
+                p_bordel[ 14 ] -= 0x19FE;
+                break;
+            case 3:
+                if( i_ret )
+                {
+                    i_ret--;
+                    p_bordel[ 5 ] += 5;
+                    continue;
+                }
+                break;
+        }
+
+        i_cmd = ((p_bordel[ 3 ] + p_bordel[ 4 ] + 10) >> 1) - p_bordel[ 4 ];
+        break;
+    }
+break2:
+
+    switch( i_cmd & 3 )
+    {
+        case 0:
+            p_bordel[ 14 ] >>= 1;
+            break;
+        case 1:
+            p_bordel[ 5 ] <<= 2;
+            break;
+        case 2:
+            p_bordel[ 12 ] |= 5;
+            break;
+        case 3:
+            p_bordel[ 15 ] &= 0x55;
+            if( i_ret )
+            {
+                p_bordel[ 2 ] &= 0xB62FC;
+                return i_ret;
+            }
+            break;
+    }
+
+    for( i = 0, j = 0; i < 16; i++ )
+    {
+        if( (p_bordel[ i ] & 0x777) > (p_bordel[ j ] & 0x777) )
+        {
+            j = i;
+        }
+    }
+
+    if( j > 5 )
+    {
+        for( ; j < 15; j++ )
+        {
+            p_bordel[ j ] += p_bordel[ j + 1 ];
+        }
+    }
+    else
+    {
+        p_bordel[ 2 ] &= 0xB62FC;
+    }
+
+    return i_ret;
+}
+
+static void SecondPass( struct shuffle_ext_s * p_exs )
+{
+    uint32_t i;
+
+    p_exs->i_cmd = p_exs->p_bordel[ 6 ] + 0x194B;
+    if( p_exs->p_bordel[ 6 ] > 0x2710 )
+    {
+        p_exs->i_cmd >>= 1;
+    }
+
+    switch( p_exs->i_cmd & 3 )
+    {
+        case 1:
+            p_exs->p_bordel[ 3 ] += 0x19FE;
+            break;
+        case 2:
+            p_exs->p_bordel[ 7 ] -= p_exs->p_bordel[ 3 ] >> 2;
+            /* no break */
+        case 0:
+            p_exs->p_bordel[ 5 ] ^= 0x248A;
+            break;
+    }
+
+    p_exs->i_jc = 5;
+
+    for( i = 0, p_exs->i_cmd = 0; i < 16; i++ )
+    {
+        if( p_exs->p_bordel[ i ] > p_exs->p_bordel[ p_exs->i_cmd ] )
+        {
+            p_exs->i_cmd = i;
+        }
+    }
+
+    switch( p_exs->i_cmd )
+    {
+        case 0:
+            if( p_exs->p_bordel[ 1 ] < p_exs->p_bordel[ 8 ] )
+            {
+                p_exs->p_bordel[ 5 ] += 1;
+            }
+            break;
+        case 4:
+            if( (p_exs->p_bordel[ 9 ] & 0x7777) == 0x3333 )
+            {
+                p_exs->p_bordel[ 5 ] -= 1;
+            }
+            else
+            {
+                p_exs->i_jc--;
+                if( p_exs->p_bordel[ 1 ] < p_exs->p_bordel[ 8 ] )
+                {
+                    p_exs->p_bordel[ 5 ] += 1;
+                }
+                break;
+            }
+            /* no break */
+        case 7:
+            p_exs->p_bordel[ 2 ] -= 1;
+            p_exs->p_bordel[ 1 ] -= p_exs->p_bordel[ 5 ];
+            TinyShuffle1( p_exs->p_bordel );
+            return;
+        case 10:
+            p_exs->p_bordel[ 4 ] -= 1;
+            p_exs->p_bordel[ 5 ] += 1;
+            p_exs->p_bordel[ 6 ] -= 1;
+            p_exs->p_bordel[ 7 ] += 1;
+            break;
+        default:
+            p_exs->p_bordel[ 15 ] ^= 0x18547EFF;
+            break;
+    }
+
+    BigShuffle1( p_exs );
+}
+
+static void BigShuffle1( struct shuffle_ext_s * p_exs )
+{
+    uint32_t i, j;
+
+    for( i = 0; i < 3; i++ )
+    {
+        p_exs->i_cmd = p_exs->p_bordel[ 12 ] + p_exs->p_bordel[ 13 ] + p_exs->p_bordel[ 6 ];
+        p_exs->i_cmd -= (((uint32_t)(((uint64_t)p_exs->i_cmd * 0x0CCCCCCCD) >> 32)) >> 2) * 5;
+
+        if( p_exs->i_cmd > 4 )
+        {
+            break;
+        }
+
+        switch( p_exs->i_cmd )
+        {
+            case 0:
+                p_exs->p_bordel[ 12 ] -= 1;
+                /* no break */
+            case 1:
+                p_exs->p_bordel[ 12 ] -= 1;
+                p_exs->p_bordel[ 13 ] += 1;
+                break;
+            case 2:
+                p_exs->p_bordel[ 13 ] += 4;
+                /* no break */
+            case 3:
+                p_exs->p_bordel[ 12 ] -= 1;
+                break;
+            case 4:
+                if( p_exs->i_jc )
+                {
+                    p_exs->i_jc--;
+                    p_exs->p_bordel[ 5 ] += 1;
+                    p_exs->p_bordel[ 6 ] -= 1;
+                    p_exs->p_bordel[ 7 ] += 1;
+                    BigShuffle1( p_exs );
+                    return;
+                }
+                break;
+        }
+    }
+
+    for( i = 0, j = 0; i < 16; i++ )
+    {
+        if( p_exs->p_bordel[ i ] < p_exs->p_bordel[ j ] )
+        {
+            j = i;
+        }
+    }
+
+    if( (p_exs->p_bordel[ j ] % (j + 1)) > 10 )
+    {
+        p_exs->p_bordel[ 1 ] -= 1;
+
+        p_exs->p_bordel[ 2 ] += 0x13;
+        p_exs->p_bordel[ 12 ] += 1;
+    }
+
+    BigShuffle2( p_exs );
+}
+
+static void BigShuffle2( struct shuffle_ext_s * p_exs )
+{
+    uint32_t i;
+
+    p_exs->p_bordel[ 2 ] &= 0x7F3F;
+
+    for( i = 0; i < 5; i++ )
+    {
+        p_exs->i_cmd = (p_exs->p_bordel[ 2 ] + 0xA) + i;
+        p_exs->i_cmd -= (((uint32_t)(((uint64_t)p_exs->i_cmd * 0x0CCCCCCCD) >> 32)) >> 2) * 5;
+
+        if( p_exs->i_cmd > 4 )
+        {
+            continue;
+        }
+
+        switch( p_exs->i_cmd )
+        {
+            case 0:
+                p_exs->p_bordel[ 12 ] &= p_exs->p_bordel[ 2 ];
+                /* no break */
+            case 1:
+                p_exs->p_bordel[ 3 ] ^= p_exs->p_bordel[ 15 ];
+                break;
+            case 2:
+                p_exs->p_bordel[ 15 ] += 0x576;
+                /* no break */
+            case 3:
+                p_exs->p_bordel[ 7 ] -= 0x2D;
+                /* no break */
+            case 4:
+                p_exs->p_bordel[ 1 ] <<= 1;
+                break;
+        }
+    }
+
+    p_exs->i_cmd = (p_exs->p_bordel[ 2 ] * 2) + 15;
+    p_exs->i_cmd -= (((uint32_t)(((uint64_t)p_exs->i_cmd * 0x0CCCCCCCD) >> 32)) >> 2) * 5;
+
+    switch( p_exs->i_cmd )
+    {
+        case 0:
+            if( ( p_exs->p_bordel[ 3 ] + p_exs->i_tmp ) <=
+                ( p_exs->p_bordel[ 1 ] + p_exs->p_bordel[ 15 ] ) )
+            {
+                p_exs->p_bordel[ 3 ] += 1;
+            }
+            break;
+        case 3:
+            p_exs->p_bordel[ 5 ] >>= 2;
+            break;
+        case 4:
+            p_exs->p_bordel[ 10 ] -= 0x13;
+            break;
+    }
+
+    p_exs->i_cmd = ((p_exs->p_bordel[ 2 ] * 2) + 10) >> 1;
+    if( p_exs->p_bordel[ 2 ] & 1 )
+    {
+        if( p_exs->i_jc )
+        {
+            p_exs->i_jc--;
+            p_exs->p_bordel[ 2 ] += 0x13;
+            p_exs->p_bordel[ 12 ] += 1;
+            BigShuffle2( p_exs );
+            return;
+        }
+    }
+
+    p_exs->i_cmd -= p_exs->p_bordel[ 2 ];
+    p_exs->i_cmd -= (((uint32_t)(((uint64_t)p_exs->i_cmd * 0x0CCCCCCCD) >> 32)) >> 3) * 10;
+
+    switch( p_exs->i_cmd )
+    {
+        case 0:
+            for( i = 0; i < 5; i++ )
+            {
+                if( ( p_exs->p_bordel[ 1 ] & p_exs->p_bordel[ 2 ] ) >
+                    ( p_exs->p_bordel[ 7 ] & p_exs->p_bordel[ 12 ] ) )
+                {
+                    p_exs->p_bordel[ 2 ] += 1;
+                    p_exs->p_bordel[ 7 ] ^= p_exs->p_bordel[ 2 ];
+                }
+            }
+        case 1:
+            p_exs->p_bordel[ 3 ] -= 1;
+            p_exs->p_bordel[ 4 ] |= 0x400000;
+            break;
+        case 2:
+            if( p_exs->p_bordel[ 13 ] >= p_exs->p_bordel[ 3 ] )
+            {
+                if( p_exs->i_jc )
+                {
+                    p_exs->i_jc--;
+                    p_exs->p_bordel[ 5 ] += 1;
+                    p_exs->p_bordel[ 6 ] -= 1;
+                    p_exs->p_bordel[ 7 ] += 1;
+                    BigShuffle1( p_exs );
+                }
+                return;
+            }
+            else
+            {
+                p_exs->p_bordel[ 5 ] += 3;
+            }
+            break;
+        case 3:
+            p_exs->p_bordel[ 1 ] ^= (p_exs->p_bordel[ 5 ] + p_exs->p_bordel[ 15 ]);
+            break;
+        case 4:
+            p_exs->p_bordel[ 14 ] += 1;
+            break;
+        case 5:
+            p_exs->p_bordel[ 2 ] &= 0x10076000;
+            break;
+        case 6:
+            p_exs->p_bordel[ 1 ] -= p_exs->p_bordel[ 5 ];
+            /* no break */
+        case 7:
+            TinyShuffle1( p_exs->p_bordel );
+            break;
+        case 8:
+            p_exs->p_bordel[ 7 ] ^= ((p_exs->p_bordel[ 1 ] + p_exs->p_bordel[ 5 ]) - p_exs->p_bordel[ 8 ]);
+            break;
+        case 9:
+            if( (p_exs->p_bordel[ 1 ] ^ p_exs->p_bordel[ 10 ]) > 0x6000 )
+            {
+                p_exs->p_bordel[ 11 ] += 1;
+            }
+            break;
+    }
+}
+
+static uint32_t ThirdPass( uint32_t * p_bordel )
+{
+    uint32_t i_cmd, i_ret = 5;
+
+    i_cmd = ((p_bordel[ 7 ] + p_bordel[ 14 ] + 10) >> 1) - p_bordel[ 14 ];
+    i_cmd -= (((uint32_t)(((uint64_t)i_cmd * 0x0CCCCCCCD) >> 32)) >> 3) * 10;
+
+    switch( i_cmd )
+    {
+        case 0:
+            p_bordel[ 1 ] <<= 1;
+            p_bordel[ 2 ] <<= 2;
+            p_bordel[ 3 ] <<= 3;
+            break;
+        case 6:
+            p_bordel[ i_cmd + 3 ] &= 0x5EDE36B;
+            /* no break */
+        case 2:
+            while( i_cmd )
+            {
+                i_cmd -= 1;
+                p_bordel[ i_cmd ] += p_bordel[ i_cmd + 3 ];
+            }
+            i_ret--;
+            TinyShuffle2( p_bordel );
+            return i_ret;
+        case 3:
+            if( (p_bordel[ 11 ] & p_bordel[ 2 ]) > 0x211B )
+            {
+                p_bordel[ 6 ] += 1;
+            }
+            break;
+        case 4:
+            p_bordel[ 7 ] += 1;
+            /* no break */
+        case 5:
+            p_bordel[ 9 ] ^= p_bordel[ 2 ];
+            break;
+        case 7:
+            p_bordel[ 2 ] ^= (p_bordel[ 1 ] & p_bordel[ 13 ]);
+            break;
+        case 8:
+            p_bordel[ 0 ] -= p_bordel[ 11 ] & p_bordel[ 15 ];
+            i_ret--;
+            return i_ret;
+        case 9:
+            p_bordel[ 6 ] >>= (p_bordel[ 14 ] & 3);
+            break;
+    }
+
+    SWAP( p_bordel[ 0 ], p_bordel[ 10 ] );
+
+    TinyShuffle2( p_bordel );
+
+    return i_ret;
+}
+
+static void FourthPass( uint32_t * p_bordel, uint32_t i_jc )
+{
+    uint32_t i, j;
+    uint32_t i_cmd;
+
+    i = (((p_bordel[ 9 ] + p_bordel[ 15 ] + 12) >> 2) - p_bordel[ 4 ]) & 7;
+
+    while( i-- )
+    {
+        SWAP( p_bordel[ i ], p_bordel[ i + 3 ] );
+    }
+
+    SWAP( p_bordel[ 10 ], p_bordel[ 1 ] );
+
+    i_cmd = p_bordel[ 5 ];
+    i_cmd -= (((uint32_t)(((uint64_t)i_cmd * 0x0CCCCCCCD) >> 32)) >> 2) * 5;
+
+    switch( i_cmd )
+    {
+        case 0:
+            p_bordel[ 0 ] += 1;
+            break;
+        case 2:
+            p_bordel[ 11 ] ^= (p_bordel[ 3 ] + p_bordel[ 6 ] + p_bordel[ 8 ]);
+            break;
+        case 3:
+            for( i = 4; i < 15; i++ )
+            {
+                if( p_bordel[ i ] & 5 )
+                {
+                    break;
+                }
+
+                SWAP( p_bordel[ i ], p_bordel[ 15 - i ] );
+            }
+            break;
+        case 4:
+            if( i_jc )
+            {
+                p_bordel[ 12 ] -= 1;
+                p_bordel[ 13 ] += 1;
+                p_bordel[ 2 ] -= 0x64;
+                p_bordel[ 3 ] += 0x64;
+                return;
+            }
+            break;
+    }
+
+    for( i = 0, j = 0; i < 16; i++ )
+    {
+        if( p_bordel[ i ] > p_bordel[ j ] )
+        {
+            j = i;
+        }
+    }
+
+    i_cmd = p_bordel[ j ];
+    i_cmd -= (((uint32_t)(((uint64_t)i_cmd * 0x51EB851F) >> 32)) >> 5) * 0x64;
+
+    switch( i_cmd )
+    {
+        case 0x0:
+            SWAP( p_bordel[ j ], p_bordel[ 0 ] );
+            break;
+        case 0x8:
+            p_bordel[ 1 ] >>= 1;
+            p_bordel[ 2 ] <<= 1;
+            p_bordel[ 14 ] >>= 3;
+            p_bordel[ 15 ] <<= 4;
+            break;
+        case 0x39:
+            p_bordel[ j ] += p_bordel[ 13 ];
+            break;
+        case 0x4c:
+            if( i_jc )
+            {
+                p_bordel[ 1 ] += 0x20E;
+                p_bordel[ 5 ] += 0x223D;
+                p_bordel[ 13 ] -= 0x576;
+                p_bordel[ 15 ] += 0x576;
+            }
+            break;
+        case 0x5b:
+            p_bordel[ 2 ] -= 0x64;
+            p_bordel[ 3 ] += 0x64;
+            p_bordel[ 12 ] -= 1;
+            p_bordel[ 13 ] += 1;
+            break;
+        case 0x63:
+            p_bordel[ 0 ] += 1;
+            p_bordel[ j ] += p_bordel[ 13 ];
+            break;
+    }
+}
+
+static void FifthPass( uint32_t * p_bordel )
+{
+    uint32_t i;
+    uint32_t i_cmd;
+
+    i = (p_bordel[ 0 ] & p_bordel[ 6 ]) & 0xF;
+
+    i_cmd = p_bordel[ i ];
+    i_cmd -= ((((uint32_t)(((uint64_t)i_cmd * 0x10624DD3) >> 32)) >> 6) * 0x3E8);
+
+    switch( i_cmd )
+    {
+        case 0x7:
+            if( (p_bordel[ i ] & 0x777) > (p_bordel[ 7 ] & 0x5555) )
+            {
+                p_bordel[ i ] ^= p_bordel[ 5 ] & p_bordel[ 3 ];
+            }
+            break;
+        case 0x13:
+            p_bordel[ 15 ] &= 0x5555;
+            break;
+        case 0x5d:
+            p_bordel[ i ] ^= p_bordel[ 15 ];
+            break;
+        case 0x64:
+            SWAP( p_bordel[ 0 ], p_bordel[ 1 ] );
+            SWAP( p_bordel[ 1 ], p_bordel[ 7 ] );
+            SWAP( p_bordel[ 4 ], p_bordel[ 9 ] );
+            SWAP( p_bordel[ 8 ], p_bordel[ 5 ] );
+            SWAP( p_bordel[ 6 ], p_bordel[ 1 ] );
+            SWAP( p_bordel[ 3 ], p_bordel[ 0 ] );
+            SWAP( p_bordel[ 13 ], p_bordel[ 14 ] );
+            break;
+        case 0x149:
+            p_bordel[ i ] += p_bordel[ 1 ] ^ 0x80080011;
+            p_bordel[ i ] += p_bordel[ 2 ] ^ 0xBEEFDEAD;
+            p_bordel[ i ] += p_bordel[ 3 ] ^ 0x8765F444;
+            p_bordel[ i ] += p_bordel[ 4 ] ^ 0x78145326;
+            break;
+        case 0x237:
+            p_bordel[ 12 ] -= p_bordel[ i ];
+            p_bordel[ 13 ] += p_bordel[ i ];
+            break;
+        case 0x264:
+            p_bordel[ i ] += p_bordel[ 1 ];
+            p_bordel[ i ] -= p_bordel[ 7 ];
+            p_bordel[ i ] -= p_bordel[ 8 ];
+            p_bordel[ i ] += p_bordel[ 9 ];
+            p_bordel[ i ] += p_bordel[ 13 ];
+            break;
+        case 0x2f2:
+            i = __MIN( i, 12 );
+            p_bordel[ i + 1 ] >>= 1;
+            p_bordel[ i + 2 ] <<= 4;
+            p_bordel[ i + 3 ] >>= 3;
+            break;
+        case 0x309:
+            p_bordel[ 1 ] += 0x20E;
+            p_bordel[ 5 ] += 0x223D;
+            p_bordel[ 13 ] -= 0x576;
+            p_bordel[ 15 ] += 0x576;
+            break;
+        case 0x3d5:
+            if( (p_bordel[ i ] ^ 0x8765F441) < 0x2710 )
+            {
+                SWAP( p_bordel[ 0 ], p_bordel[ 1 ] );
+            }
+            else
+            {
+                SWAP( p_bordel[ 1 ], p_bordel[ 11 ] );
+            }
+            break;
+    }
+}
+
+static void TinyShuffle1( uint32_t * p_bordel )
+{
+    uint32_t i;
+
+    for( i = 0; i < 3; i++ )
+    {
+        switch( p_bordel[ 1 ] & 3 )
+        {
+            case 0:
+                p_bordel[ 1 ] += 1;
+                /* no break */
+            case 1:
+                p_bordel[ 3 ] -= 8;
+                break;
+            case 2:
+                p_bordel[ 13 ] &= 0xFEFEFEF7;
+                break;
+            case 3:
+                p_bordel[ 8 ] |= 0x80080011;
+                break;
+        }
+    }
+}
+
+static void TinyShuffle2( uint32_t * p_bordel )
+{
+    uint32_t i;
+
+    for( i = 0; i < 8; i++ )
+    {
+        if( p_bordel[ 3 ] & 0x7514 )
+        {
+            SWAP( p_bordel[ i ], p_bordel[ i + 5 ] );
+        }
+        else
+        {
+            SWAP( p_bordel[ i ], p_bordel[ i + 7 ] );
+        }
     }
 }
 
@@ -919,7 +1746,7 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
     /* Decrypt and shuffle our data at the same time */
     InitAES( &aes, p_sys_key );
     REVERSE( p_sys_key, 4 );
-    InitShuffle( &shuffle, p_sys_key );
+    InitShuffle( &shuffle, p_sys_key, p_sci_data[ 0 ] );
 
     memcpy( p_sci_key, p_secret, 16 );
     REVERSE( p_sci_key, 4 );
