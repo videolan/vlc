@@ -2,7 +2,7 @@
  * vpar_synchro.h : video parser blocks management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.h,v 1.6 2001/01/15 19:54:34 massiot Exp $
+ * $Id: vpar_synchro.h,v 1.7 2001/01/16 13:27:14 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -64,9 +64,10 @@ typedef struct video_synchro_s
     unsigned int    i_eta_p, i_eta_b;
     boolean_t       b_dropped_last;            /* for special synchros below */
     mtime_t         backward_pts, current_pts;
-    mtime_t         current_period;     /* period to add to the next picture */
-    mtime_t         backward_period;    /* period to add after the next
-                                         * reference picture                 */
+    int             i_current_period;   /* period to add to the next picture */
+    int             i_backward_period;  /* period to add after the next
+                                         * reference picture
+                                         * (backward_period * period / 2) */
 
 #ifdef STATS
     unsigned int    i_trashed_pic, i_not_chosen_pic, i_pic;
