@@ -3,7 +3,7 @@
  * FIXME : check the return value of realloc() and malloc() !
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.17 2000/12/22 17:53:30 massiot Exp $
+ * $Id: input_programs.c,v 1.18 2000/12/28 18:00:38 massiot Exp $
  *
  * Authors:
  *
@@ -243,7 +243,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
 {
     es_descriptor_t * p_es;
 
-    intf_DbgMsg("Adding description for ES %d", i_es_id);
+    intf_DbgMsg("Adding description for ES 0x%x", i_es_id);
 
     p_es = (es_descriptor_t *)malloc( sizeof(es_descriptor_t) );
     p_input->stream.i_es_number++;
@@ -470,7 +470,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     decoder_capabilities_t  decoder;
 
 #ifdef DEBUG_INPUT
-    intf_DbgMsg( "Selecting ES %d", p_es->i_id );
+    intf_DbgMsg( "Selecting ES 0x%x", p_es->i_id );
 #endif
 
     if( p_es->p_decoder_fifo != NULL )
