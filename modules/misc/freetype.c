@@ -396,7 +396,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
     subpicture_data_t *p_string = 0;
     line_desc_t  *p_line = 0, *p_next = 0;
     int i, i_pen_y, i_pen_x, i_error, i_glyph_index, i_previous;
-    uint32_t *p_unicode_string, i_char;
+    uint32_t *psz_unicode, *psz_unicode_orig = 0, i_char;
     int i_string_length;
     char *psz_string;
     vlc_iconv_t iconv_handle = (vlc_iconv_t)(-1);
@@ -437,8 +437,9 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
     p_string->p_lines = 0;
     p_string->psz_text = strdup( psz_string );
 
-    p_unicode_string = malloc( ( strlen(psz_string) + 1 ) * sizeof(uint32_t) );
-    if( p_unicode_string == NULL )
+    psz_unicode = psz_unicode_orig =
+        malloc( ( strlen(psz_string) + 1 ) * sizeof(uint32_t) );
+    if( psz_unicode == NULL )
     {
         msg_Err( p_filter, "Out of memory" );
         goto error;
@@ -461,7 +462,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
         i_out_bytes = i_in_bytes * sizeof( uint32_t );
         i_out_bytes_left = i_out_bytes;
         p_in_buffer = psz_string;
-        p_out_buffer = (char *)p_unicode_string;
+        p_out_buffer = (char *)psz_unicode;
         i_ret = vlc_iconv( iconv_handle, &p_in_buffer, &i_in_bytes,
                            &p_out_buffer, &i_out_bytes_left );
 
@@ -482,10 +483,10 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
         uint32_t *p_fribidi_string;
         FriBidiCharType base_dir = FRIBIDI_TYPE_ON;
         p_fribidi_string = malloc( (i_string_length + 1) * sizeof(uint32_t) );
-        fribidi_log2vis( (FriBidiChar*)p_unicode_string, i_string_length,
+        fribidi_log2vis( (FriBidiChar*)psz_unicode, i_string_length,
                          &base_dir, (FriBidiChar*)p_fribidi_string, 0, 0, 0 );
-        free( p_unicode_string );
-        p_unicode_string = p_fribidi_string;
+        free( psz_unicode_orig );
+        psz_unicode = psz_unicode_orig = p_fribidi_string;
         p_fribidi_string[ i_string_length ] = 0;
     }
 #endif
@@ -507,9 +508,9 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
 #define face p_sys->p_face
 #define glyph face->glyph
 
-    while( *p_unicode_string )
+    while( *psz_unicode )
     {
-        i_char = *p_unicode_string++;
+        i_char = *psz_unicode++;
         if( i_char == '\r' ) /* ignore CR chars wherever they may be */
         {
             continue;
@@ -597,12 +598,14 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
     Render( p_filter, p_subpic, p_string );
     FreeString( p_string );
     block_Release( p_block );
+    if( psz_unicode_orig ) free( psz_unicode_orig );
     return p_subpic;
 
  error:
     FreeString( p_string );
     if( p_subpic ) p_filter->pf_sub_buffer_del( p_filter, p_subpic );
     block_Release( p_block );
+    if( psz_unicode_orig ) free( psz_unicode_orig );
     return NULL;
 }
 
