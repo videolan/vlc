@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: ncurses.c,v 1.10 2004/01/11 00:01:35 fenrir Exp $
+ * $Id: ncurses.c,v 1.11 2004/01/11 14:53:36 garf Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -448,13 +448,13 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
         /* Navigation */
         case KEY_RIGHT:
-            p_sys->f_slider += 5.0;
+            p_sys->f_slider += 1.0;
             if( p_sys->f_slider > 99.9 ) p_sys->f_slider = 99.9;
             ManageSlider ( p_intf );
             return 1;
 
         case KEY_LEFT:
-            p_sys->f_slider -= 5.0;
+            p_sys->f_slider -= 1.0;
             if( p_sys->f_slider < 0.0 ) p_sys->f_slider = 0.0;
             ManageSlider ( p_intf );
             return 1;
