@@ -118,12 +118,6 @@ void Timer::Notify( void )
 
             p_main_interface->TogglePlayButton( PLAYING_S );
             i_old_playing_status = PLAYING_S;
-
-            /* Take care of the volume */
-            audio_volume_t i_volume;
-            aout_VolumeGet( p_intf, &i_volume );                        
-            SendMessage( p_main_interface->hwndVol, TBM_SETPOS, 1,
-                         200 - (i_volume * 200 * 2 / AOUT_VOLUME_MAX ) );
         }
     }
     else if( p_intf->p_sys->p_input->b_dead )
@@ -182,6 +176,9 @@ void Timer::Notify( void )
                     }
                 }
             }
+
+            /* Take care of the volume, etc... */
+            p_main_interface->Update();
 
             /* Manage Playing status */
             var_Get( p_input, "state", &val );

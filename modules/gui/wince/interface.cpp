@@ -108,7 +108,7 @@ Interface::Interface()
   : hwndMain(0), hwndCB(0), hwndTB(0), hwndSlider(0), hwndLabel(0),
     hwndVol(0), hwndSB(0),
     fileinfo(0), messages(0), preferences(0), playlist(0),
-    timer(0), open(0), video(0)
+    timer(0), open(0), video(0), b_volume_hold(0)
 {
 }
 
@@ -915,17 +915,34 @@ void Interface::OnChange( int wp )
 
     if( LOWORD(wp) == SB_THUMBPOSITION || LOWORD(wp) == SB_ENDSCROLL )
     {
-        Change( 200 - (int)dwPos );
+        VolumeChange( 200 - (int)dwPos );
+        b_volume_hold = VLC_FALSE;
+    }
+    else
+    {
+        b_volume_hold = VLC_TRUE;
     }
 }
 
-void Interface::Change( int i_volume )
+void Interface::VolumeChange( int i_volume )
 {
     aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_MAX / 200 / 2 );
-#if 0
-    SetToolTip( wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
-                i_volume ) );
-#endif
+}
+
+void Interface::VolumeUpdate()
+{
+    audio_volume_t i_volume;
+
+    if( b_volume_hold ) return;
+
+    aout_VolumeGet( p_intf, &i_volume );
+
+    int i_volume_ctrl = 200 - i_volume * 200 * 2 / AOUT_VOLUME_MAX;
+
+    DWORD dwPos = SendMessage( hwndVol, TBM_GETPOS, 0, 0 );
+    if( i_volume_ctrl == (int)dwPos ) return;
+
+    SendMessage( hwndVol, TBM_SETPOS, 1, i_volume_ctrl );
 }
 
 void Interface::OnStopStream( void )
@@ -981,4 +998,10 @@ void Interface::OnFastStream( void )
     vlc_value_t val; val.b_bool = VLC_TRUE;
     var_Set( p_input, "rate-faster", val );
     vlc_object_release( p_input );
+}
+
+void Interface::Update()
+{
+    /* Misc updates */
+    VolumeUpdate();
 }

@@ -141,6 +141,7 @@ public:
 
     HWND CreateMenuBar( HWND, HINSTANCE );
     void TogglePlayButton( int i_playing_status );
+    void Update();
 
     HWND hwndMain;      // Handle to the main window.
 
@@ -171,7 +172,8 @@ protected:
 
     void OnSliderUpdate( int wp );
     void OnChange( int wp );
-    void Change( int i_volume );
+    void VolumeChange( int i_volume );
+    void VolumeUpdate( void );
     void OnStopStream( void );
     void OnPrevStream( void );
     void OnNextStream( void );
@@ -185,6 +187,8 @@ private:
     HMENU menu_video;
     HMENU menu_audio;
     HMENU menu_navigation;
+
+    vlc_bool_t b_volume_hold;
 };
 
 /* File Info */
