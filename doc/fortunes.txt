@@ -229,11 +229,6 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-<Meuuh> mais non henri, si on t'appréciait à la qualité de ton code, y'aurait
-        longtemps qu'on t'aurait fait bouffer de la strychnine
-
-  -- #videolan
-%
 <ArkanumJ> BTW, the CVS version runs well on MacOS X, but the sound is a bit
            broken. 
 <Dnumgis> ArkanumJ: sound is a bit broken everywhere I think
@@ -311,13 +306,6 @@ the Boston strangler is to the woman home alone.
 %
 <Meuuh> pleasehelp : are you trying with a dolby trailer ?
 <pleasehelp> no... using windows
-
-  -- #videolan
-%
-<henrisson> hal_3k: don't worry, I'll soon be replaced by a lib
-<hal_3k> henri: you'll be replaced by a lib? does the lib know how to
-         program? ;)
-<Meuuh> do you think henri knows ? :p
 
   -- #videolan
 %

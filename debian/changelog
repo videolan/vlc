@@ -1,3 +1,12 @@
+vlc (0.5.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * The vlc-glide package is now Architecture: i386 only.
+  * The vlc-plugin-mad package Provides: mp3-decoder.
+  * The deprecated vlc-* packages have a proper link to /usr/share/doc/vlc/.
+
+ -- Samuel Hocevar <sam@zoy.org>  Sat, 15 Feb 2003 03:43:33 +0100
+
 vlc (0.5.0-1) unstable; urgency=low
 
   * New upstream release (Closes: #157166).

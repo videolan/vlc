@@ -2,7 +2,7 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
-Build-Depends: debhelper (>=2.2.0), gettext, xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt3-dev, libasound2-dev (>=0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, kdelibs4-dev, dvb-dev, libdv2-dev, libxosd-dev, svgalibg1-dev (>=1.4.0), libogg-dev, libvorbis-dev, libwxgtk2.4-dev, libdvdplay0-dev, libdvdread2-dev, libslp-dev
+Build-Depends: debhelper (>=2.2.0), gettext, fortune-mod, xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt3-dev, libasound2-dev (>=0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, kdelibs4-dev, dvb-dev, libdv2-dev, libxosd-dev, svgalibg1-dev (>=1.4.0), libogg-dev, libvorbis-dev, libwxgtk2.4-dev, libdvdplay0-dev, libdvdread2-dev, libslp-dev
 Standards-Version: 3.5.6
 
 Package: vlc
@@ -135,7 +135,7 @@ Description: Glide video output plugin for VLC
  plugin from the preferences menu.
 
 Package: vlc-glide
-Architecture: any
+Architecture: i386
 Depends: vlc-plugin-glide
 Description: legacy package that you should remove
  This package is now called vlc-plugin-glide.
@@ -161,6 +161,7 @@ Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Conflicts: vlc-mad (<< 0.5.0)
 Replaces: vlc-mad (<< 0.5.0)
+Provides: mp3-decoder
 Description: MPEG audio codec plugin for VLC
  This plugin adds support for libmad, the MPEG audio decoder library,
  to the VLC media player. It is based on libmad, a 100% fixed-point based
