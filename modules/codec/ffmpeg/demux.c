@@ -45,8 +45,8 @@
 /* Version checking */
 #if (LIBAVFORMAT_BUILD >= 4611) && defined(HAVE_LIBAVFORMAT)
 
-#if LIBAVFORMAT_BUILD >= 4619
-#   define av_seek_frame(a,b,c) av_seek_frame(a,b,c,AVSEEK_FLAG_BYTE)
+#if LIBAVFORMAT_BUILD < 4619
+#   define av_seek_frame(a,b,c,d) av_seek_frame(a,b,c)
 #endif
 
 /*****************************************************************************
@@ -99,8 +99,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Should we call it only once ? */
-    av_register_all();
+    av_register_all(); /* Can be called several times */
 
     /* Guess format */
     if( !( fmt = av_probe_input_format( &pd, 1 ) ) )
@@ -122,16 +121,36 @@ int E_(OpenDemux)( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    /* Don't trigger false alarms on bin files */
+    if( !p_demux->b_force && !strcmp( fmt->name, "psxstr" ) )
+    {
+        int i_len;
+
+        if( !p_demux->psz_path ) return VLC_EGENERIC;
+
+        i_len = strlen( p_demux->psz_path );
+        if( i_len < 4 ) return VLC_EGENERIC;
+
+        if( strcasecmp( &p_demux->psz_path[i_len - 4], ".str" ) &&
+            strcasecmp( &p_demux->psz_path[i_len - 4], ".xai" ) &&
+            strcasecmp( &p_demux->psz_path[i_len - 4], ".xa" ) )
+        {
+            return VLC_EGENERIC;
+        }
+    }
+
     msg_Dbg( p_demux, "detected format: %s", fmt->name );
 
     /* Fill p_demux fields */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_sys->ic = 0;
     p_sys->fmt = fmt;
     p_sys->i_tk = 0;
     p_sys->tk = NULL;
     p_sys->i_pcr_tk = -1;
+    p_sys->i_pcr = -1;
 
     /* Create I/O wrapper */
     p_sys->io_buffer_size = 32768;  /* FIXME */
@@ -157,12 +176,14 @@ int E_(OpenDemux)( vlc_object_t *p_this )
                               p_sys->fmt, NULL ) )
     {
         msg_Err( p_demux, "av_open_input_stream failed" );
+        E_(CloseDemux)( p_this );
         return VLC_EGENERIC;
     }
 
     if( av_find_stream_info( p_sys->ic ) )
     {
         msg_Err( p_demux, "av_find_stream_info failed" );
+        E_(CloseDemux)( p_this );
         return VLC_EGENERIC;
     }
 
@@ -230,9 +251,8 @@ void E_(CloseDemux)( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    av_close_input_file( p_sys->ic );
-
-    free( p_sys->io_buffer );
+    if( p_sys->ic ) av_close_input_file( p_sys->ic );
+    if( p_sys->io_buffer ) free( p_sys->io_buffer );
     free( p_sys );
 }
 
@@ -302,22 +322,24 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     switch( i_query )
     {
         case DEMUX_GET_POSITION:
-            pf = (double*) va_arg( args, double* );
+            pf = (double*) va_arg( args, double* ); *pf = 0.0;
             i64 = stream_Size( p_demux->s );
             if( i64 > 0 )
             {
                 *pf = (double)stream_Tell( p_demux->s ) / (double)i64;
             }
-            else
+
+            if( p_sys->ic->duration != AV_NOPTS_VALUE && p_sys->i_pcr > 0 )
             {
-                *pf = 0.0;
+                *pf = (double)p_sys->i_pcr / (double)p_sys->ic->duration;
             }
+
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
             f = (double) va_arg( args, double );
             i64 = stream_Tell( p_demux->s );
-            if( i64 && p_sys->i_pcr )
+            if( i64 && p_sys->i_pcr > 0 )
             {
                 int64_t i_size = stream_Size( p_demux->s );
 
@@ -325,15 +347,27 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 if( p_sys->ic->start_time != AV_NOPTS_VALUE )
                     i64 += p_sys->ic->start_time;
 
+                if( p_sys->ic->duration != AV_NOPTS_VALUE )
+                    i64 = p_sys->ic->duration * f;
+
                 msg_Warn( p_demux, "DEMUX_SET_POSITION: "I64Fd, i64 );
 
-                if( av_seek_frame( p_sys->ic, -1, i64 ) )
+                if( av_seek_frame( p_sys->ic, -1, i64, 0 ) < 0 )
                 {
                     return VLC_EGENERIC;
                 }
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
                 p_sys->i_pcr = -1; /* Invalidate time display */
             }
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_LENGTH:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_sys->ic->duration != AV_NOPTS_VALUE )
+            {
+                *pi64 = p_sys->ic->duration;
+            }
+            else *pi64 = 0;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
@@ -348,7 +382,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             msg_Warn( p_demux, "DEMUX_SET_TIME: "I64Fd, i64 );
 
-            if( av_seek_frame( p_sys->ic, -1, i64 ) < 0 )
+            if( av_seek_frame( p_sys->ic, -1, i64, 0 ) < 0 )
             {
                 return VLC_EGENERIC;
             }
