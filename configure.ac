@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.64 2003/08/21 16:59:35 hartman Exp $
+dnl $Id: configure.ac,v 1.65 2003/08/23 12:47:24 lool Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -2562,7 +2562,7 @@ dnl
 dnl  PDA Gtk+2 module
 dnl
 AC_ARG_ENABLE(pda,
-  [  --enable-pda           PDA interface needs Gtk2 suport (default disabled)])
+  [  --enable-pda          PDA interface needs Gtk2 support (default disabled)])
 if test "x${enable_pda}" = "xyes"
 then
   PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
