@@ -91,7 +91,7 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-
+#define EQZ_BANDS_MAX 10
 typedef struct aout_filter_sys_t
 {
     /* Filter static config */
@@ -210,7 +210,7 @@ typedef struct
         float f_alpha;
         float f_beta;
         float f_gamma;
-    } band[0];
+    } band[EQZ_BANDS_MAX];
 
 } eqz_config_t;
 
@@ -253,7 +253,7 @@ typedef struct
     char *psz_name;
     int  i_band;
     float f_preamp;
-    float f_amp[0];
+    float f_amp[EQZ_BANDS_MAX];
 } eqz_preset_t;
 
 static const eqz_preset_t eqz_preset_flat_10b=
