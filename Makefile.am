@@ -362,6 +362,7 @@ SOURCES_libvlc_common = \
 	src/misc/variables.c \
 	src/misc/error.c \
 	src/misc/net.c \
+	src/misc/vlm.c \
 	src/extras/libc.c \
 	$(NULL)
 
