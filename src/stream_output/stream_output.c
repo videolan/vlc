@@ -130,6 +130,10 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
         p_sout->psz_chain = sout_stream_url_to_chain( p_sout, psz_dest );
         msg_Dbg( p_sout, "using sout chain=`%s'", p_sout->psz_chain );
     }
+    p_sout->p_stream = NULL;
+
+    /* attach it for inherit */
+    vlc_object_attach( p_sout, p_parent );
 
     p_sout->p_stream = sout_stream_new( p_sout, p_sout->psz_chain );
 
@@ -143,8 +147,6 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
         vlc_object_destroy( p_sout );
         return NULL;
     }
-
-    vlc_object_attach( p_sout, p_parent );
 
     return p_sout;
 }
@@ -288,6 +290,8 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
     p_access->pf_seek    = NULL;
     p_access->pf_read    = NULL;
     p_access->pf_write   = NULL;
+    p_access->p_module   = NULL;
+    vlc_object_attach( p_access, p_sout );
 
     p_access->p_module   =
         module_Need( p_access, "sout access", p_access->psz_access, VLC_TRUE );
@@ -307,6 +311,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
  *****************************************************************************/
 void sout_AccessOutDelete( sout_access_out_t *p_access )
 {
+    vlc_object_detach( p_access );
     if( p_access->p_module )
     {
         module_Unneed( p_access, p_access->p_module );
@@ -378,6 +383,9 @@ sout_mux_t * sout_MuxNew         ( sout_instance_t *p_sout,
     p_mux->pp_inputs    = NULL;
 
     p_mux->p_sys        = NULL;
+    p_mux->p_module = NULL;
+
+    vlc_object_attach( p_mux, p_sout );
 
     p_mux->p_module     =
         module_Need( p_mux, "sout mux", p_mux->psz_mux, VLC_TRUE );
@@ -440,6 +448,7 @@ sout_mux_t * sout_MuxNew         ( sout_instance_t *p_sout,
  *****************************************************************************/
 void sout_MuxDelete( sout_mux_t *p_mux )
 {
+    vlc_object_detach( p_mux );
     if( p_mux->p_module )
     {
         module_Unneed( p_mux, p_mux->p_module );
@@ -915,6 +924,96 @@ static void sout_cfg_free( sout_cfg_t *p_cfg )
     }
 }
 
+void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix, const char **ppsz_options, sout_cfg_t *cfg )
+{
+    char *psz_name;
+    int  i_type;
+    int  i;
+
+    /* First, var_Create all variables */
+    for( i = 0; ppsz_options[i] != NULL; i++ )
+    {
+        asprintf( &psz_name, "%s%s", psz_prefix, ppsz_options[i] );
+
+        i_type = config_GetType( p_this, psz_name );
+
+        var_Create( p_this, psz_name, i_type | VLC_VAR_DOINHERIT );
+        free( psz_name );
+    }
+
+    /* Now parse options and set value */
+    if( psz_prefix == NULL ) psz_prefix = "";
+
+    while( cfg )
+    {
+        vlc_value_t val;
+
+        if( cfg->psz_name == NULL || *cfg->psz_name == '\0' )
+        {
+            cfg = cfg->p_next;
+            continue;
+        }
+        for( i = 0; ppsz_options[i] != NULL; i++ )
+        {
+            if( !strcmp( ppsz_options[i], cfg->psz_name ) )
+            {
+                break;
+            }
+        }
+        if( ppsz_options[i] == NULL )
+        {
+            cfg = cfg->p_next;
+            continue;
+        }
+
+        /* create name */
+        asprintf( &psz_name, "%s%s", psz_prefix, cfg->psz_name );
+
+        /* get the type of the variable */
+        i_type = config_GetType( p_this, psz_name );
+        if( !i_type )
+        {
+            /* TODO check for no, no- */
+        }
+
+        if( !i_type )
+        {
+            msg_Warn( p_this, "unknown option %s (value=%s)", cfg->psz_name, cfg->psz_value );
+            goto next;
+        }
+        if( i_type != VLC_VAR_BOOL && cfg->psz_value == NULL )
+        {
+            msg_Warn( p_this, "missing value for option %s", cfg->psz_name );
+            goto next;
+        }
+
+        switch( i_type )
+        {
+            case VLC_VAR_INTEGER:
+                val.i_int = atoi( cfg->psz_value ? cfg->psz_value : "0" );
+                break;
+            case VLC_VAR_FLOAT:
+                val.f_float = atof( cfg->psz_value ? cfg->psz_value : "0" );
+                break;
+            case VLC_VAR_STRING:
+                val.psz_string = cfg->psz_value;
+                break;
+
+            case VLC_VAR_BOOL:
+            default:
+                msg_Warn( p_this, "unhandled config var type" );
+                memset( &val, 0, sizeof( vlc_value_t ) );
+                break;
+        }
+        var_Set( p_this, psz_name, val );
+        msg_Dbg( p_this, "set sout option: %s to %s", psz_name, cfg->psz_value );
+
+    next:
+        free( psz_name );
+        cfg = cfg->p_next;
+    }
+}
+
 
 /*
  * XXX name and p_cfg are used (-> do NOT free them)
@@ -946,6 +1045,8 @@ sout_stream_t *sout_stream_new( sout_instance_t *p_sout,
 
     msg_Dbg( p_sout, "stream=`%s'", p_stream->psz_name );
 
+    vlc_object_attach( p_stream, p_sout );
+
     p_stream->p_module =
         module_Need( p_stream, "sout stream", p_stream->psz_name, VLC_TRUE );
 
@@ -961,6 +1062,8 @@ sout_stream_t *sout_stream_new( sout_instance_t *p_sout,
 void sout_stream_delete( sout_stream_t *p_stream )
 {
     msg_Dbg( p_stream, "destroying chain... (name=%s)", p_stream->psz_name );
+
+    vlc_object_detach( p_stream );
     if( p_stream->p_module ) module_Unneed( p_stream, p_stream->p_module );
 
     FREE( p_stream->psz_name );

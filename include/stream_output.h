@@ -333,6 +333,9 @@ VLC_EXPORT( void,               sout_MuxDeleteStream, ( sout_mux_t *, sout_input
 VLC_EXPORT( void,               sout_MuxDelete,       ( sout_mux_t * ) );
 VLC_EXPORT( void,               sout_MuxSendBuffer, ( sout_mux_t *, sout_input_t  *, block_t * ) );
 
+#define sout_ParseCfg( a, b, c, d ) __sout_ParseCfg( VLC_OBJECT(a), b, c, d )
+VLC_EXPORT( void,               __sout_ParseCfg,      ( vlc_object_t *, char *psz_prefix, const char **ppsz_options, sout_cfg_t * ) );
+
 VLC_EXPORT( char *,             sout_cfg_parser, ( char **, sout_cfg_t **, char * ) );
 VLC_EXPORT( sout_stream_t *,    sout_stream_new, ( sout_instance_t *, char *psz_chain ) );
 VLC_EXPORT( void,               sout_stream_delete, ( sout_stream_t *p_stream ) );
