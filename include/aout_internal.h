@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.9 2002/08/21 23:17:41 sam Exp $
+ * $Id: aout_internal.h,v 1.10 2002/08/21 23:19:58 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -80,12 +80,12 @@ typedef struct aout_alloc_t
 /*****************************************************************************
  * aout_fifo_t : audio output buffer FIFO
  *****************************************************************************/
-typedef struct aout_fifo_t
+struct aout_fifo_t
 {
     aout_buffer_t *         p_first;
     aout_buffer_t **        pp_last;
     audio_date_t            end_date;
-} aout_fifo_t;
+};
 
 /*****************************************************************************
  * aout_filter_t : audio output filter
