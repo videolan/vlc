@@ -639,9 +639,12 @@ static void ClearChannels( intf_thread_t *p_intf, vout_thread_t *p_vout )
 {
     int i;
 
-    vout_ClearOSDChannel( p_vout, DEFAULT_CHAN );
-    for( i = 0; i < CHANNELS_NUMBER; i++ )
+    if( p_vout )
     {
-        vout_ClearOSDChannel( p_vout, p_intf->p_sys->p_channels[ i ] );
+        vout_ClearOSDChannel( p_vout, DEFAULT_CHAN );
+        for( i = 0; i < CHANNELS_NUMBER; i++ )
+        {
+            vout_ClearOSDChannel( p_vout, p_intf->p_sys->p_channels[ i ] );
+        }
     }
 }
