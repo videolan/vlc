@@ -1654,7 +1654,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, int i_percent)
             return;
         }
 
-        p_sys->i_pts = block->GlobalTimecode() * (mtime_t) 1000 / p_sys->i_timescale;
+        p_sys->i_pts = block->GlobalTimecode() * (mtime_t) 1000 / p_sys->i_timescale + 1;
 
         for( i_track = 0; i_track < p_sys->i_track; i_track++ )
         {
@@ -1709,7 +1709,7 @@ static int Demux( demux_t *p_demux)
             return 0;
         }
 
-        p_sys->i_pts = block->GlobalTimecode() * (mtime_t) 1000 / p_sys->i_timescale;
+        p_sys->i_pts = block->GlobalTimecode() * (mtime_t) 1000 / p_sys->i_timescale + 1;
 
         if( p_sys->i_pts > 0 )
         {

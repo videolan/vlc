@@ -135,7 +135,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
 
-    p_sys->i_time = 0;
+    p_sys->i_time = 1;
 
     /* peek the begining (10 is for adts header) */
     if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )

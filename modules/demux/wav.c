@@ -100,7 +100,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->p_es         = NULL;
-    p_sys->i_time       = 0;
+    p_sys->i_time       = 1;
 
     /* skip riff header */
     stream_Read( p_demux->s, NULL, 12 );  /* cannot fail as peek succeed */

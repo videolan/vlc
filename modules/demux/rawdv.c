@@ -203,7 +203,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->frame_size = dv_header.dsf ? 12 * 150 * 80 : 10 * 150 * 80;
     p_sys->f_rate = dv_header.dsf ? 25 : 29.97;
 
-    p_sys->i_pcr = 0;
+    p_sys->i_pcr = 1;
     p_sys->p_es_video = NULL;
     p_sys->p_es_audio = NULL;
 

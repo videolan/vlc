@@ -2,7 +2,7 @@
  * au.c : au file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: au.c,v 1.14 2004/03/03 11:40:19 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -131,7 +131,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys = p_demux->p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->i_time = 0;
+    p_sys->i_time = 1;
     p_sys->i_header_size = GetDWBE( &hdr[0] );
 
     /* skip extra header data */
