@@ -26,13 +26,13 @@
 #define WINDOW_MANAGER_HPP
 
 #include "skin_common.hpp"
+#include "generic_window.hpp"
 #include <list>
 #include <map>
 #include <set>
 #include <utility>
 
 
-class GenericWindow;
 class Anchor;
 
 
@@ -46,13 +46,13 @@ class WindowManager: public SkinObject
 
         /// Add a window to the list of known windows. Necessary if you want
         /// your window to be movable...
-        void registerWindow( GenericWindow *pWindow );
+        void registerWindow( GenericWindow &rWindow );
 
         /// Remove a previously registered window
-        void unregisterWindow( GenericWindow *pWindow );
+        void unregisterWindow( GenericWindow &rWindow );
 
         /// Tell the window manager that a move is initiated for pWindow.
-        void startMove( GenericWindow *pWindow );
+        void startMove( GenericWindow &rWindow );
 
         /// Tell the window manager that the current move ended.
         void stopMove();
@@ -60,16 +60,22 @@ class WindowManager: public SkinObject
         /// Move the pWindow window to (left, top), and move all its
         /// anchored windows.
         /// If a new anchoring is detected, the windows will move accordingly.
-        void move( GenericWindow *pWindow, int left, int top ) const;
+        void move( GenericWindow &rWindow, int left, int top ) const;
 
-        /// Raise all the windows, pWindow being above the others
-        void raiseAll( GenericWindow *pWindow ) const;
+        /// Raise all the windows, rWindow being above the others
+        void raiseAll( GenericWindow &rWindow ) const;
 
         /// Show all the registered windows
         void showAll() const;
 
         /// Hide all the registered windows
         void hideAll() const;
+
+        /// Show the given window
+        void show( GenericWindow &rWindow ) { rWindow.show(); }
+
+        /// Hide the given window
+        void hide( GenericWindow &rWindow ) { rWindow.hide(); }
 
         /// Toggle all the windows on top
         void toggleOnTop();

@@ -2,7 +2,7 @@
  * ctrl_move.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_move.cpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -106,7 +106,7 @@ void CtrlMove::transStillMoving( SkinObject *pCtrl )
 
     pThis->captureMouse();
 
-    pThis->m_rWindowManager.startMove( &pThis->m_rWindow );
+    pThis->m_rWindowManager.startMove( pThis->m_rWindow );
 }
 
 
@@ -120,7 +120,7 @@ void CtrlMove::transMovingMoving( SkinObject *pCtrl )
     int yNewTop = pEvtMotion->getYPos() - pThis->m_yPos +
                   pThis->m_rWindow.getTop();
 
-    pThis->m_rWindowManager.move( &pThis->m_rWindow, xNewLeft, yNewTop );
+    pThis->m_rWindowManager.move( pThis->m_rWindow, xNewLeft, yNewTop );
 }
 
 

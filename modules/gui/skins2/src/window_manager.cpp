@@ -29,33 +29,27 @@
 #include "../utils/position.hpp"
 
 
-void WindowManager::registerWindow( GenericWindow *pWindow )
+void WindowManager::registerWindow( GenericWindow &rWindow )
 {
-    if( pWindow == NULL )
-    {
-        msg_Dbg( getIntf(), "WM: registering a NULL window" );
-        return;
-    }
-
     // Add the window to the set
-    m_allWindows.insert( pWindow );
+    m_allWindows.insert( &rWindow );
 }
 
 
-void WindowManager::unregisterWindow( GenericWindow *pWindow )
+void WindowManager::unregisterWindow( GenericWindow &rWindow )
 {
     // Erase every possible reference to the window
-    m_allWindows.erase( pWindow );
-    m_movingWindows.erase( pWindow );
-    m_dependencies.erase( pWindow );
+    m_allWindows.erase( &rWindow );
+    m_movingWindows.erase( &rWindow );
+    m_dependencies.erase( &rWindow );
 }
 
 
-void WindowManager::startMove( GenericWindow *pWindow )
+void WindowManager::startMove( GenericWindow &rWindow )
 {
     // Rebuild the set of moving windows
     m_movingWindows.clear();
-    buildDependSet( m_movingWindows, pWindow );
+    buildDependSet( m_movingWindows, &rWindow );
 
     // Change the opacity of the moving windows
     WinSet_t::const_iterator it;
@@ -119,14 +113,14 @@ void WindowManager::stopMove()
 }
 
 
-void WindowManager::move( GenericWindow *pWindow, int left, int top ) const
+void WindowManager::move( GenericWindow &rWindow, int left, int top ) const
 {
     // Compute the real move offset
-    int xOffset = left - pWindow->getLeft();
-    int yOffset = top - pWindow->getTop();
+    int xOffset = left - rWindow.getLeft();
+    int yOffset = top - rWindow.getTop();
 
     // Check anchoring; this can change the values of xOffset and yOffset
-    checkAnchors( pWindow, xOffset, yOffset );
+    checkAnchors( &rWindow, xOffset, yOffset );
 
     // Move all the windows
     WinSet_t::const_iterator it;
@@ -137,19 +131,19 @@ void WindowManager::move( GenericWindow *pWindow, int left, int top ) const
 }
 
 
-void WindowManager::raiseAll( GenericWindow *pWindow ) const
+void WindowManager::raiseAll( GenericWindow &rWindow ) const
 {
     // Raise all the windows
     WinSet_t::const_iterator it;
     for( it = m_allWindows.begin(); it != m_allWindows.end(); it++ )
     {
-        if( *it !=  pWindow )
+        if( *it !=  &rWindow )
         {
             (*it)->raise();
         }
     }
     // Make sure to raise the given window at the end, so that it is above
-    pWindow->raise();
+    rWindow.raise();
 }
 
 

@@ -2,7 +2,7 @@
  * interpreter.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: interpreter.cpp,v 1.5 2004/02/01 14:44:11 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -121,7 +121,8 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         GenericWindow *pWin = pTheme->getWindowById( windowId );
         if( pWin )
         {
-            pCommand = new CmdShowWindow( getIntf(), *pWin );
+            pCommand = new CmdShowWindow( getIntf(), pTheme->getWindowManager(),
+                                          *pWin );
         }
         else
         {
@@ -135,7 +136,8 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         GenericWindow *pWin = pTheme->getWindowById( windowId );
         if( pWin )
         {
-            pCommand = new CmdHideWindow( getIntf(), *pWin );
+            pCommand = new CmdHideWindow( getIntf(), pTheme->getWindowManager(),
+                                          *pWin );
         }
         else
         {

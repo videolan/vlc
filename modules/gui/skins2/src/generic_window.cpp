@@ -59,7 +59,7 @@ GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
     m_pCapturingControl( NULL ), m_pFocusControl( NULL ), m_varVisible( pIntf )
 {
     // Register as a moving window
-    m_rWindowManager.registerWindow( this );
+    m_rWindowManager.registerWindow( *this );
 
     // Get the OSFactory
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
@@ -79,7 +79,7 @@ GenericWindow::~GenericWindow()
 {
     m_varVisible.delObserver( this );
     // Unregister from the window manager
-    m_rWindowManager.unregisterWindow( this );
+    m_rWindowManager.unregisterWindow( *this );
 
     if( m_pTooltip )
     {
@@ -156,7 +156,7 @@ void GenericWindow::processEvent( EvtMouse &rEvtMouse )
     if( rEvtMouse.getAction() == EvtMouse::kDown )
     {
         // Raise all the windows
-        m_rWindowManager.raiseAll( this );
+        m_rWindowManager.raiseAll( *this );
 
         if( pNewHitControl && pNewHitControl->isFocusable() )
         {

@@ -2,7 +2,7 @@
  * cmd_show_window.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_show_window.hpp,v 1.2 2004/01/18 19:54:45 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -27,23 +27,27 @@
 
 #include "cmd_generic.hpp"
 #include "../src/generic_window.hpp"
+#include "../src/window_manager.hpp"
 
 
 /// Command to show a window
 class CmdShowWindow: public CmdGeneric
 {
     public:
-        CmdShowWindow( intf_thread_t *pIntf, GenericWindow &rWin ):
-            CmdGeneric( pIntf ), m_rWin( rWin ) {}
+        CmdShowWindow( intf_thread_t *pIntf, WindowManager &rWinManager,
+                       GenericWindow &rWin ):
+            CmdGeneric( pIntf ), m_rWinManager( rWinManager ), m_rWin( rWin ) {}
         virtual ~CmdShowWindow() {}
 
         /// This method does the real job of the command
-        virtual void execute() { m_rWin.show(); }
+        virtual void execute() { m_rWinManager.show( m_rWin ); }
 
         /// Return the type of the command
         virtual string getType() const { return "show window"; }
 
     private:
+        /// Reference to the window manager
+        WindowManager &m_rWinManager;
         /// Reference to the window
         GenericWindow &m_rWin;
 };
@@ -53,17 +57,20 @@ class CmdShowWindow: public CmdGeneric
 class CmdHideWindow: public CmdGeneric
 {
     public:
-        CmdHideWindow( intf_thread_t *pIntf, GenericWindow &rWin ):
-            CmdGeneric( pIntf ), m_rWin( rWin ) {}
+        CmdHideWindow( intf_thread_t *pIntf, WindowManager &rWinManager,
+                       GenericWindow &rWin ):
+            CmdGeneric( pIntf ), m_rWinManager( rWinManager ), m_rWin( rWin ) {}
         virtual ~CmdHideWindow() {}
 
         /// This method does the real job of the command
-        virtual void execute() { m_rWin.hide(); }
+        virtual void execute() { m_rWinManager.hide( m_rWin ); }
 
         /// Return the type of the command
         virtual string getType() const { return "hide window"; }
 
     private:
+        /// Reference to the window manager
+        WindowManager &m_rWinManager;
         /// Reference to the window
         GenericWindow &m_rWin;
 };
