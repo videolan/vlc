@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.155 2004/01/24 15:18:29 gbazin Exp $
+dnl $Id: configure.ac,v 1.156 2004/01/25 21:03:16 rocky Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -1523,7 +1523,7 @@ then
    [AC_MSG_WARN(libcdio library not found)
    HAVE_CDDAX=no])
 
-  if test x$enable_cddb != no; then
+  if test x$enable_libcddb != no; then
     PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.4, [
       HAVE_LIBCDDB=yes 
       AC_DEFINE(HAVE_LIBCDDB, [], [Define this if you have libcddb installed])
@@ -1533,13 +1533,6 @@ then
       [AC_MSG_WARN(new enough libcddb not found. CDDB access disabled) 
       HAVE_LIBCDDB=no])
   fi
-
-  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.65,
-   [enable_cddax="no"
-    AX_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
-    AX_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
-    AX_ADD_PLUGINS([cddax])], 
-   [AC_MSG_WARN(libcdio library not found)])
 
   if test "${enable_vcdx}" != "no"
   then
