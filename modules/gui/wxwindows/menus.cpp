@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.21 2003/10/14 22:41:41 gbazin Exp $
+ * $Id: menus.cpp,v 1.22 2003/10/15 12:24:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -64,7 +64,7 @@ enum
 {
     /* menu items */
     MenuDummy_Event = wxID_HIGHEST + 1000,
-    OpenFileSimple_Event,
+    OpenFileSimple_Event = wxID_HIGHEST + 1100,
     OpenFile_Event,
     OpenDisc_Event,
     OpenNet_Event,
@@ -363,6 +363,7 @@ Menu::Menu( intf_thread_t *_p_intf, wxWindow *p_parent,
             int i_start_id ): wxMenu( )
 {
     vlc_object_t *p_object;
+    vlc_bool_t b_section_empty = VLC_FALSE;
     int i;
 
     /* Initializations */
@@ -374,28 +375,37 @@ Menu::Menu( intf_thread_t *_p_intf, wxWindow *p_parent,
     {
         if( !ppsz_varnames[i] )
         {
+            if( b_section_empty )
+            {
+                Append( MenuDummy_Event + i, wxU(_("Empty")) );
+                Enable( MenuDummy_Event + i, FALSE );
+            }
+
             AppendSeparator();
+            b_section_empty = VLC_TRUE;
             continue;
         }
 
         if( !pi_objects[i] )
         {
             Append( MenuDummy_Event, wxU(ppsz_varnames[i]) );
+            b_section_empty = VLC_FALSE;
             continue;
         }
 
         p_object = (vlc_object_t *)vlc_object_get( p_intf, pi_objects[i] );
         if( p_object == NULL ) continue;
 
+        b_section_empty = VLC_FALSE;
         CreateMenuItem( this, ppsz_varnames[i], p_object );
         vlc_object_release( p_object );
     }
 
     /* Special case for empty menus */
-    if( GetMenuItemCount() == 0 )
+    if( GetMenuItemCount() == 0 || b_section_empty )
     {
-        Append( MenuDummy_Event, wxU(_("Empty")) );
-        Enable( MenuDummy_Event, FALSE );
+        Append( MenuDummy_Event + i, wxU(_("Empty")) );
+        Enable( MenuDummy_Event + i, FALSE );
     }
 }
 

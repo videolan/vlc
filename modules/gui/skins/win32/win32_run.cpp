@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.20 2003/06/22 12:46:49 asmax Exp $
+ * $Id: win32_run.cpp,v 1.21 2003/10/15 12:24:14 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -185,6 +185,9 @@ void OSRun( intf_thread_t *p_intf )
         // Check if vlc is closing
         Proc->IsClosing();
     }
+
+    /* Cleanup */
+    delete Proc;
 }
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg )

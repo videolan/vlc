@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.44 2003/09/05 15:55:30 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.45 2003/10/15 12:24:14 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -52,7 +52,7 @@ VlcProc::VlcProc( intf_thread_t *_p_intf )
         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist != NULL )
     {
-        // We want to be noticed of playlit changes
+        // We want to be notified of playlit changes
         var_AddCallback( p_playlist, "intf-change", RefreshCallback, this );
 
         // Raise/lower interface with middle click on vout
@@ -70,6 +70,7 @@ VlcProc::~VlcProc()
     if( p_playlist != NULL )
     {
         var_DelCallback( p_playlist, "intf-change", RefreshCallback, this );
+        var_DelCallback( p_playlist, "intf-show", IntfShowCallback, this );
         vlc_object_release( p_playlist );
     }
 }

@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.48 2003/10/14 22:41:41 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.49 2003/10/15 12:24:14 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -51,14 +51,6 @@
 // need to access C++ objects from there
 //---------------------------------------------------------------------------
 intf_thread_t *g_pIntf;
-
-//---------------------------------------------------------------------------
-// Exported interface functions.
-//---------------------------------------------------------------------------
-#ifdef WIN32
-extern "C" __declspec( dllexport )
-    int __VLC_SYMBOL( vlc_entry ) ( module_t *p_module );
-#endif
 
 //---------------------------------------------------------------------------
 // Local prototypes.

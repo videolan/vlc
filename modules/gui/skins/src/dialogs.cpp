@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.15 2003/10/14 22:41:41 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.16 2003/10/15 12:24:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -100,6 +100,17 @@ Dialogs::~Dialogs()
 
         module_Unneed( p_provider, p_module );
         vlc_object_destroy( p_provider );
+    }
+
+    /* Unregister callbacks */
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist != NULL )
+    {
+        var_DelCallback( p_playlist, "intf-popupmenu", PopupMenuCB,
+                         p_intf->p_sys->p_dialogs );
+        vlc_object_release( p_playlist );
     }
 }
 

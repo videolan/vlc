@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dialogs.cpp,v 1.8 2003/08/28 15:59:03 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.9 2003/10/15 12:24:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -106,6 +106,12 @@ DialogsProvider::~DialogsProvider()
     if( p_file_generic_dialog ) delete p_file_generic_dialog;
 
     if( p_intf->p_sys->p_icon ) delete p_intf->p_sys->p_icon;
+
+    /* We must set this here because on win32 this destructor will be
+     * automatically called so we must not call it again on wxApp->OnExit().
+     * There shouldn't be any race conditions as all this should be done
+     * from the same thread. */
+    p_intf->p_sys->p_wxwindow = NULL;
 }
 
 void DialogsProvider::OnIdle( wxIdleEvent& WXUNUSED(event) )

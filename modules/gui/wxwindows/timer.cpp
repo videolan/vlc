@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.33 2003/10/14 22:41:41 gbazin Exp $
+ * $Id: timer.cpp,v 1.34 2003/10/15 12:24:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -67,6 +67,15 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
 
 Timer::~Timer()
 {
+    /* Unregister callback */
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist != NULL )
+    {
+        var_DelCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
+        vlc_object_release( p_playlist );
+    }
 }
 
 /*****************************************************************************
