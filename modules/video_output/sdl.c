@@ -2,7 +2,7 @@
  * sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: sdl.c,v 1.8 2003/02/10 23:16:37 marcari Exp $
+ * $Id: sdl.c,v 1.9 2003/02/10 23:50:08 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -42,7 +42,6 @@
 
 #include SDL_INCLUDE_FILE
 
-#include "aout_internal.h"
 #include "netutils.h"
 
 #define SDL_MAX_DIRECTBUFFERS 10
@@ -504,42 +503,28 @@ static int Manage( vout_thread_t *p_vout )
 
             case SDLK_b:
                 {
-                    aout_instance_t * p_aout;
                     audio_volume_t i_volume;
-                    p_aout = vlc_object_find( p_vout, VLC_OBJECT_AOUT,
-                                                      FIND_ANYWHERE );
-                    if( p_aout != NULL )
+                    if ( !aout_VolumeDown( p_vout, 1, &i_volume ) )
                     {
-                        if ( !aout_VolumeDown( p_aout, 1, &i_volume ) )
-                        {
-                            msg_Dbg( p_vout, "audio volume is now %d", i_volume );
-                        }
-                        else
-                        {
-                            msg_Dbg( p_vout, "audio volume: operation not supported" );
-                        }
-                        vlc_object_release( (vlc_object_t *)p_aout );
+                        msg_Dbg( p_vout, "audio volume is now %d", i_volume );
+                    }
+                    else
+                    {
+                        msg_Dbg( p_vout, "audio volume: operation not supported" );
                     }
                 }
                 break;
 
             case SDLK_n:
                 {
-                    aout_instance_t * p_aout;
                     audio_volume_t i_volume;
-                    p_aout = vlc_object_find( p_vout, VLC_OBJECT_AOUT,
-                                                      FIND_ANYWHERE );
-                    if( p_aout != NULL )
+                    if ( !aout_VolumeUp( p_vout, 1, &i_volume ) )
                     {
-                        if ( !aout_VolumeUp( p_aout, 1, &i_volume ) )
-                        {
-                            msg_Dbg( p_vout, "audio volume is now %d", i_volume );
-                        }
-                        else
-                        {
-                            msg_Dbg( p_vout, "audio volume: operation not supported" );
-                        }
-                        vlc_object_release( (vlc_object_t *)p_aout );
+                        msg_Dbg( p_vout, "audio volume is now %d", i_volume );
+                    }
+                    else
+                    {
+                        msg_Dbg( p_vout, "audio volume: operation not supported" );
                     }
                 }
                 break;
