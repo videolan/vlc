@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: directx.c,v 1.32 2004/01/05 22:06:15 gbazin Exp $
+ * $Id: directx.c,v 1.33 2004/01/06 19:12:08 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -675,6 +675,27 @@ BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
         }
         else if( strcmp( psz_drivername, device.psz_string ) == 0 )
         {
+	    MONITORINFO monitor_info;
+	    monitor_info.cbSize = sizeof( MONITORINFO );
+
+            if( p_vout->p_sys->GetMonitorInfo( hmon, &monitor_info ) )
+            {
+                RECT rect;
+
+                /* Move window to the right screen */
+                GetWindowRect( p_vout->p_sys->hwnd, &rect );
+                if( !IntersectRect( &rect, &rect, &monitor_info.rcWork ) )
+                {
+                    rect.left = monitor_info.rcWork.left;
+                    rect.top = monitor_info.rcWork.top;
+                    msg_Dbg( p_vout, "DirectXEnumCallback: Setting window "
+                             "position to %d,%d", rect.left, rect.top );
+                    SetWindowPos( p_vout->p_sys->hwnd, NULL,
+                                  rect.left, rect.top, 0, 0,
+                                  SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE );
+                }
+            }
+
             p_vout->p_sys->hmonitor = hmon;
         }
         else return TRUE; /* Keep enumerating */
