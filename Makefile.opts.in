@@ -184,6 +184,7 @@ LIB += -L/usr/local/lib @LIB@
 DEFINE += @DEFINE@
 CFLAGS += $(DEFINE) $(INCLUDE)
 CFLAGS += -Wall -Winline
+CFLAGS += -pipe
 CFLAGS += -D_REENTRANT
 CFLAGS += -D_GNU_SOURCE
 
