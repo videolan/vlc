@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.11 2001/12/30 07:09:55 sam Exp $
+ * $Id: esd.c,v 1.12 2001/12/31 04:53:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,6 +46,8 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( "EsounD audio module" )
     ADD_CAPABILITY( AOUT, 50 )
+    ADD_SHORTCUT( "esd" )
+    ADD_SHORTCUT( "esound" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.36 2001/12/30 07:09:54 sam Exp $
+ * $Id: video.h,v 1.37 2001/12/31 04:53:33 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -30,9 +30,17 @@ typedef u8 pixel_data_t;
 
 typedef struct plane_s
 {
-    pixel_data_t *p_data;
-    int           i_bytes;
-    int           i_line_bytes;
+    pixel_data_t *p_data;                       /* Start of the plane's data */
+
+    /* Variables used for fast memcpy operations */
+    int i_bytes;                       /* Total number of bytes in the plane */
+    int i_line_bytes;                     /* Total number of bytes in a line */
+
+    /* Variables used for RGB planes */
+    int i_red_mask;
+    int i_green_mask;
+    int i_blue_mask;
+
 } plane_t;
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.3 2001/12/30 07:09:55 sam Exp $
+ * $Id: wall.c,v 1.4 2001/12/31 04:53:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -72,7 +72,12 @@ typedef struct vout_sys_s
     int    i_col;
     int    i_row;
     int    i_vout;
-    struct vout_thread_s **pp_vout;
+    struct vout_list_s
+    {
+        int i_width;
+        int i_height;
+        struct vout_thread_s *p_vout;
+    } *pp_vout;
 
 } vout_sys_t;
 
@@ -128,12 +133,12 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    p_vout->p_sys->i_col = 2;
-    p_vout->p_sys->i_row = 3;
+    p_vout->p_sys->i_col = 3;
+    p_vout->p_sys->i_row = 2;
 
     p_vout->p_sys->pp_vout = malloc( p_vout->p_sys->i_row *
                                      p_vout->p_sys->i_col *
-                                     sizeof(vout_thread_t*) );
+                                     sizeof(struct vout_list_s) );
     if( p_vout->p_sys->pp_vout == NULL )
     {
         intf_ErrMsg("error: %s", strerror(ENOMEM) );
@@ -150,7 +155,7 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
-    int i_index;
+    int i_index, i_row, i_col, i_width, i_height;
     char *psz_filter;
     picture_t *p_pic;
     
@@ -177,23 +182,50 @@ static int vout_Init( vout_thread_t *p_vout )
 
     intf_WarnMsg( 1, "filter: spawning the real video outputs" );
 
-    for( p_vout->p_sys->i_vout = 0;
-         p_vout->p_sys->i_vout < p_vout->p_sys->i_row * p_vout->p_sys->i_col;
-         p_vout->p_sys->i_vout++ )
+    p_vout->p_sys->i_vout = 0;
+
+    for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
     {
-        p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ] =
-            vout_CreateThread( NULL,
-                p_vout->render.i_width / p_vout->p_sys->i_col,
-                p_vout->render.i_height / p_vout->p_sys->i_row,
-                p_vout->render.i_chroma,
-                p_vout->render.i_aspect * p_vout->p_sys->i_row
-                                        / p_vout->p_sys->i_col );
-        if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ] == NULL )
+        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
         {
-             intf_ErrMsg( "vout error: failed to get %ix%i vout threads",
-                          p_vout->p_sys->i_col, p_vout->p_sys->i_row );
-             RemoveAllVout( p_vout );
-             return 0;
+            if( i_col + 1 < p_vout->p_sys->i_col )
+            {
+                i_width = ( p_vout->render.i_width
+                             / p_vout->p_sys->i_col ) & ~0xf;
+            }
+            else
+            {
+                i_width = p_vout->render.i_width
+                           - ( ( p_vout->render.i_width
+                                  / p_vout->p_sys->i_col ) & ~0xf ) * i_col;
+            }
+
+            if( i_row + 1 < p_vout->p_sys->i_row )
+            {
+                i_height = p_vout->render.i_height / p_vout->p_sys->i_row;
+            }
+            else
+            {
+                i_height = p_vout->render.i_height
+                            - p_vout->render.i_height
+                               / p_vout->p_sys->i_row * i_row;
+            }
+
+            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout =
+                vout_CreateThread( NULL, i_width, i_height,
+                                   p_vout->render.i_chroma,
+                                   p_vout->render.i_aspect
+                                    * p_vout->render.i_height / i_height
+                                    * i_width / p_vout->render.i_width );
+            if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout == NULL )
+            {
+                intf_ErrMsg( "vout error: failed to get %ix%i vout threads",
+                             p_vout->p_sys->i_col, p_vout->p_sys->i_row );
+                RemoveAllVout( p_vout );
+                return 0;
+            }
+
+            p_vout->p_sys->i_vout++;
         }
     }
 
@@ -263,35 +295,74 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
         {
             while( ( p_outpic =
-                vout_CreatePicture( p_vout->p_sys->pp_vout[ i_vout ], 0, 0, 0 )
+                vout_CreatePicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
+                                    0, 0, 0 )
                    ) == NULL )
             {
                 if( p_vout->b_die || p_vout->b_error )
                 {
-                    vout_DestroyPicture( p_vout->p_sys->pp_vout[ i_vout ], 
-                                         p_outpic );
+                    vout_DestroyPicture(
+                        p_vout->p_sys->pp_vout[ i_vout ].p_vout, p_outpic );
                     return;
                 }
 
                 msleep( VOUT_OUTMEM_SLEEP );
             }
 
-            vout_DatePicture( p_vout->p_sys->pp_vout[ i_vout ],
+            vout_DatePicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
                               p_outpic, i_date );
-            vout_LinkPicture( p_vout->p_sys->pp_vout[ i_vout ],
+            vout_LinkPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
                               p_outpic );
 
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
-                FAST_MEMCPY( p_outpic->planes[ i_index ].p_data,
-                             p_pic->planes[ i_index ].p_data
-                                 + p_pic->planes[ i_index ].i_bytes / 2,
-                             p_outpic->planes[ i_index ].i_bytes );
+                yuv_data_t *p_in, *p_in_end, *p_out;
+                int i_out_bytes, i_offset;
+
+                /* XXX: beware, it's p_outpic ! */
+                i_out_bytes = p_outpic->planes[ i_index ].i_line_bytes;
+
+                if( i_col + 1 < p_vout->p_sys->i_col )
+                {
+                    i_offset = i_out_bytes * i_col;
+                }
+                else
+                {
+                    i_offset = p_pic->planes[ i_index ].i_line_bytes
+                                - i_out_bytes;
+                }
+
+                p_in = p_pic->planes[ i_index ].p_data
+                        + p_pic->planes[ i_index ].i_bytes
+                           / p_vout->p_sys->i_row * i_row
+                        + i_offset;
+
+                if( i_row + 1 < p_vout->p_sys->i_row )
+                {
+                    p_in_end = p_in
+                                + p_pic->planes[ i_index ].i_bytes
+                                   / p_vout->p_sys->i_row;
+                }
+                else
+                {
+                    p_in_end = p_pic->planes[ i_index ].p_data
+                                + p_pic->planes[ i_index ].i_bytes
+                                + i_offset;
+                }
+
+                p_out = p_outpic->planes[ i_index ].p_data;
+
+                while( p_in < p_in_end )
+                {
+                    FAST_MEMCPY( p_out, p_in, i_out_bytes );
+                    p_in += p_pic->planes[ i_index ].i_line_bytes;
+                    p_out += i_out_bytes;
+                }
             }
 
-            vout_UnlinkPicture( p_vout->p_sys->pp_vout[ i_vout ],
+            vout_UnlinkPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
                                 p_outpic );
-            vout_DisplayPicture( p_vout->p_sys->pp_vout[ i_vout ],
+            vout_DisplayPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
                                  p_outpic );
 
             i_vout++;
@@ -304,8 +375,8 @@ static void RemoveAllVout( vout_thread_t *p_vout )
     while( p_vout->p_sys->i_vout )
     {
          --p_vout->p_sys->i_vout;
-         vout_DestroyThread( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ],
-                             NULL );
+         vout_DestroyThread(
+             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout, NULL );
     }
 }
 

@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ts.c,v 1.10 2001/12/30 07:09:55 sam Exp $
+ * $Id: input_ts.c,v 1.11 2001/12/31 04:53:33 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -126,7 +126,7 @@ static int TSProbe( probedata_t * p_data )
     input_thread_t * p_input = (input_thread_t *)p_data;
 
     char * psz_name = p_input->p_source;
-    int i_score = 2;
+    int i_score = 0;
 
     if( ( strlen(psz_name) >= 10 && !strncasecmp( psz_name, "udpstream:", 10 ) )
             || ( strlen(psz_name) >= 4 && !strncasecmp( psz_name, "udp:", 4 ) ) )

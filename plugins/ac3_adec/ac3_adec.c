@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.11 2001/12/30 07:09:54 sam Exp $
+ * $Id: ac3_adec.c,v 1.12 2001/12/31 04:53:33 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -312,17 +312,9 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
     intf_DbgMsg ( "ac3_adec debug: ac3_adec thread (%p) initialized", 
                   p_ac3thread );
 
-    /*
-     * Bit stream
-     */
-    p_ac3thread->p_config->pf_init_bit_stream(
-            &p_ac3thread->ac3_decoder->bit_stream,
-            p_ac3thread->p_config->p_decoder_fifo,
-            BitstreamCallback, (void *) p_ac3thread );
-    
     /* Creating the audio output fifo */
     p_ac3thread->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_STEREO_FIFO, 2, 0, 0,
-                                               AC3DEC_FRAME_SIZE, NULL  );
+                                                AC3DEC_FRAME_SIZE, NULL  );
     if ( p_ac3thread->p_aout_fifo == NULL )
     {
         free( IMDCT->w_1 );
@@ -357,6 +349,14 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
         return( -1 );
     }
 
+    /*
+     * Bit stream
+     */
+    p_ac3thread->p_config->pf_init_bit_stream(
+            &p_ac3thread->ac3_decoder->bit_stream,
+            p_ac3thread->p_config->p_decoder_fifo,
+            BitstreamCallback, (void *) p_ac3thread );
+    
     intf_DbgMsg("ac3dec debug: ac3 decoder thread %p initialized", p_ac3thread);
     
     return( 0 );

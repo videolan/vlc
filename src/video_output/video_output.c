@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.149 2001/12/30 07:09:56 sam Exp $
+ * $Id: video_output.c,v 1.150 2001/12/31 04:53:33 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -94,6 +94,7 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     vout_thread_t * p_vout;                             /* thread descriptor */
     int             i_status;                               /* thread status */
     int             i_index;                                /* loop variable */
+    char          * psz_plugin;
 
     /* Allocate descriptor */
     p_vout = (vout_thread_t *) malloc( sizeof(vout_thread_t) );
@@ -105,11 +106,13 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     }
 
     /* Choose the best module */
-    p_vout->p_module =
-        module_Need( MODULE_CAPABILITY_VOUT,
-                     main_GetPszVariable( VOUT_FILTER_VAR,
-                         main_GetPszVariable( VOUT_METHOD_VAR, NULL ) ),
-                     NULL );
+    psz_plugin = main_GetPszVariable( VOUT_FILTER_VAR, "" );
+    if( psz_plugin[0] == '\0' )
+    {
+        psz_plugin = main_GetPszVariable( VOUT_METHOD_VAR, "" );
+    }
+
+    p_vout->p_module = module_Need( MODULE_CAPABILITY_VOUT, psz_plugin, NULL );
 
     if( p_vout->p_module == NULL )
     {

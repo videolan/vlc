@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.1 2001/12/30 07:09:56 sam Exp $
+ * $Id: xcommon.c,v 1.2 2001/12/31 04:53:33 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -333,11 +333,16 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 #endif
 
+    /* Create blank cursor (for mouse cursor autohiding) */
+    p_vout->p_sys->b_mouse_pointer_visible = 1;
+    CreateCursor( p_vout );
+
     /* Spawn base window - this window will include the video output window,
      * but also command buttons, subtitles and other indicators */
     if( CreateWindow( p_vout ) )
     {
         intf_ErrMsg( "vout error: cannot create X11 window" );
+        DestroyCursor( p_vout );
         XCloseDisplay( p_vout->p_sys->p_display );
         free( p_vout->p_sys );
         return( 1 );
@@ -347,15 +352,11 @@ static int vout_Create( vout_thread_t *p_vout )
     if( InitDisplay( p_vout ) )
     {
         intf_ErrMsg( "vout error: cannot initialize X11 display" );
+        DestroyCursor( p_vout );
         XCloseDisplay( p_vout->p_sys->p_display );
         free( p_vout->p_sys );
         return( 1 );
     }
-
-    /* Create blank cursor (for mouse cursor autohiding) */
-    CreateCursor( p_vout );
-
-    p_vout->p_sys->b_mouse_pointer_visible = 1;
 
     /* Disable screen saver and return */
     DisableXScreenSaver( p_vout );

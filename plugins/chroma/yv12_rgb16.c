@@ -2,7 +2,7 @@
  * yv12_rgb16.c : YUV to paletted RGB16 conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: yv12_rgb16.c,v 1.1 2001/12/30 07:09:54 sam Exp $
+ * $Id: yv12_rgb16.c,v 1.2 2001/12/31 04:53:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -182,28 +182,33 @@ static void ConvertYUV420RGB16( vout_thread_t *p_vout, picture_t *p_source,
         int i_dst = p_dest->planes[ RGB_PLANE ].i_line_bytes / 2;
 
         /* Masks: 0xf800 0x07e0 0x001f */
-#define RED ((u16*)p_out)[i_dst--] = (u16)(p_in[i_src--]>>3) << 11;
-#define GREEN ((u16*)p_out)[i_dst--] = (u16)(p_in[i_src--]>>2) << 5;
-#define BLUE ((u16*)p_out)[i_dst--] = (u16)(p_in[i_src--]>>3) << 0;
-#define WHITE ((u16*)p_out)[i_dst--] = ((u16)(p_in[i_src]>>3) << 11) | ((u16)(p_in[i_src]>>2) << 5) | ((u16)(p_in[i_src]>>3) << 0); i_src--;
-#define BLACK ((u16*)p_out)[i_dst--] = 0; i_src--;
+#define RED ((u16*)p_out)[--i_dst] = (u16)(p_in[--i_src]>>3) << 11;
+#define GREEN ((u16*)p_out)[--i_dst] = (u16)(p_in[--i_src]>>2) << 5;
+#define BLUE ((u16*)p_out)[--i_dst] = (u16)(p_in[--i_src]>>3) << 0;
+#define WHITE ((u16*)p_out)[--i_dst] = ((u16)(p_in[i_src]>>3) << 11) | ((u16)(p_in[i_src]>>2) << 5) | ((u16)(p_in[i_src]>>3) << 0); --i_src;
+#define BLACK ((u16*)p_out)[--i_dst] = 0; --i_src;
         
         while( i_src && i_dst )
         {
-            BLACK; BLUE; GREEN; RED; GREEN; BLUE; WHITE; RED;
-            GREEN; BLUE; WHITE; RED; BLACK; BLUE; GREEN; RED;
+            WHITE; WHITE; WHITE; WHITE; WHITE; WHITE; WHITE; WHITE;
+            //BLACK; BLUE; GREEN; RED; GREEN; BLUE; WHITE; RED;
         }
 
         p_in += p_source->planes[ Y_PLANE ].i_line_bytes;
         p_out += p_dest->planes[ RGB_PLANE ].i_line_bytes;
+
+        if( p_in >= p_in_end || p_out >= p_out_end )
+        {
+            break;
+        }
 
         i_src = p_source->planes[ Y_PLANE ].i_line_bytes;
         i_dst = p_dest->planes[ RGB_PLANE ].i_line_bytes / 2;
 
         while( i_src && i_dst )
         {
-            GREEN; RED; WHITE; BLUE; BLACK; RED; GREEN; BLUE;
-            BLACK; RED; GREEN; BLUE; GREEN; RED; WHITE; BLUE;
+            WHITE; WHITE; WHITE; WHITE; WHITE; WHITE; WHITE; WHITE;
+            //GREEN; RED; WHITE; BLUE; BLACK; RED; GREEN; BLUE;
         }
 
         p_in += p_source->planes[ Y_PLANE ].i_line_bytes;
