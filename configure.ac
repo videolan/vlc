@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.80 2003/10/02 21:12:45 gbazin Exp $
+dnl $Id: configure.ac,v 1.81 2003/10/04 10:54:45 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1570,6 +1570,14 @@ then
       dnl       linker would miserably barf on multiple definitions.
       AX_ADD_LDFLAGS([stream_out_transcode],[])
       AX_ADD_LDFLAGS([ffmpeg],[-lmp3lame]) ])
+
+  AC_ARG_WITH(ffmpeg-faac,
+    [    --with-ffmpeg-faac      if ffmpeg has been compiled with faac support],
+    [
+      dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
+      dnl       linker would miserably barf on multiple definitions.
+      AX_ADD_LDFLAGS([stream_out_transcode],[])
+      AX_ADD_LDFLAGS([ffmpeg],[-lfaac]) ])
 
   AC_ARG_WITH(ffmpeg-tree,
     [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
