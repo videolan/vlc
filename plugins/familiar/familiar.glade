@@ -300,6 +300,21 @@ udpstream://@:1234
 	      <handler>on_clistmedia_click_column</handler>
 	      <last_modification_time>Sun, 18 Aug 2002 19:41:06 GMT</last_modification_time>
 	    </signal>
+	    <signal>
+	      <name>start_selection</name>
+	      <handler>on_clistmedia_start_selection</handler>
+	      <last_modification_time>Tue, 01 Oct 2002 19:25:54 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>end_selection</name>
+	      <handler>on_clistmedia_end_selection</handler>
+	      <last_modification_time>Tue, 01 Oct 2002 19:26:13 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>enter_notify_event</name>
+	      <handler>on_clistmedia_enter_notify_event</handler>
+	      <last_modification_time>Tue, 01 Oct 2002 19:26:50 GMT</last_modification_time>
+	    </signal>
 	    <columns>5</columns>
 	    <column_widths>123,80,80,80,80</column_widths>
 	    <selection_mode>GTK_SELECTION_SINGLE</selection_mode>

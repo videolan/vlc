@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: familiar_callbacks.c,v 1.6.2.2 2002/09/30 22:01:43 jpsaman Exp $
+ * $Id: familiar_callbacks.c,v 1.6.2.3 2002/10/01 19:46:47 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -55,7 +55,7 @@
 #include "familiar_support.h"
 #include "familiar.h"
 
-/*#include "netutils.h"*/
+#include "netutils.h"
 
 static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url );
 static char* get_file_perm(const char *path);
@@ -101,8 +101,8 @@ static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
 
-    g_print( "%s\n",psz_url );
     intf_ErrMsg( "@@@ MediaURLOpenChanged" );
+    g_print( "%s\n",psz_url );
     if( p_intf->p_sys->p_input != NULL )
     {
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
@@ -111,7 +111,6 @@ static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
     else
     {
         vlc_mutex_lock( &p_main->p_playlist->change_lock );
-
         if( p_main->p_playlist->b_stopped )
         {
             if( p_main->p_playlist->i_size )
@@ -133,13 +132,12 @@ static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
  ****************************************************************/
 void ReadDirectory( GtkCList *clist, char *psz_dir )
 {
-//    intf_thread_t *p_intf = GtkGetIntf( clist );
+    intf_thread_t *p_intf = GtkGetIntf( clist );
     struct dirent **namelist;
     int n=-1;
     int status=-1;
 
     intf_ErrMsg( "@@@ ReadDirectory - Enter" );
-    g_print( "%s\n",psz_dir );
     if (psz_dir)
     {
        status = chdir(psz_dir);
@@ -156,23 +154,21 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
         gchar *ppsz_text[2];
         int i;
 
-        gtk_clist_freeze( clist );
-        gtk_clist_clear( clist );
+        gtk_clist_freeze( p_intf->p_sys->p_clist );
+        gtk_clist_clear( p_intf->p_sys->p_clist );
         g_print( "dir entries: %d\n",n );
         for (i=0; i<n; i++)
         {
             /* This is a list of strings. */
             ppsz_text[0] = namelist[i]->d_name;
             ppsz_text[1] = get_file_perm(namelist[i]->d_name);
-            g_print( "%s %s\n",ppsz_text[0],ppsz_text[1] );
             if (strcmp(ppsz_text[1],"") == 0)
                 intf_ErrMsg("File system error unknown filetype encountered.");
-            gtk_clist_insert( clist, i, ppsz_text );
-            g_print( "%s\n",ppsz_text[0] );
+            gtk_clist_insert( p_intf->p_sys->p_clist, i, ppsz_text );
             free(namelist[i]);
         }
+        gtk_clist_thaw( p_intf->p_sys->p_clist );
         free(namelist);
-        gtk_clist_thaw( clist );
     }
     intf_ErrMsg( "@@@ ReadDirectory - Exit" );
 }
@@ -467,25 +463,23 @@ on_clistmedia_select_row               (GtkCList        *clist,
                                         GdkEvent        *event,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GtkGetIntf( clist );
     gchar *text[2];
     gint ret;
     struct stat st;
 
-    if (clist == NULL)
-       intf_ErrMsg("clist is unusable.");
+//    gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+//    gdk_window_raise( p_intf->p_sys->p_window->window );
 
-    ret = gtk_clist_get_text (clist, row, 0, text);
+    ret = gtk_clist_get_text (p_intf->p_sys->p_clist, row, 0, text);
     if (ret)
     {
         if (lstat((char*)text[0], &st)==0)
         {
             if (S_ISDIR(st.st_mode))
-            {
-               g_print( "read dir %s\n", text[0] );
-               ReadDirectory(clist, text[0]);
-            }
+               ReadDirectory(p_intf->p_sys->p_clist, text[0]);
             else
-               MediaURLOpenChanged(GTK_WIDGET(clist), text[0]);
+               MediaURLOpenChanged(GTK_WIDGET(p_intf->p_sys->p_clist), text[0]);
        }
     }
 }
@@ -510,7 +504,32 @@ on_familiar_delete_event               (GtkWidget       *widget,
                                         gpointer         user_data)
 {
     GtkExit( GTK_WIDGET( widget ), user_data );
-    exit (0); //dirty
     return TRUE;
+}
+
+
+void
+on_clistmedia_start_selection          (GtkCList        *clist,
+                                        gpointer         user_data)
+{
+    g_print( ">>>>start_selection\n" );
+}
+
+
+void
+on_clistmedia_end_selection            (GtkCList        *clist,
+                                        gpointer         user_data)
+{
+    g_print( ">>>>end_selection\n" );
+}
+
+
+gboolean
+on_clistmedia_enter_notify_event       (GtkWidget       *widget,
+                                        GdkEventCrossing *event,
+                                        gpointer         user_data)
+{
+  g_print( ">>>>enter_notify_event\n" );
+  return FALSE;
 }
 

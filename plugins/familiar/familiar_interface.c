@@ -489,6 +489,15 @@ create_familiar (void)
   gtk_signal_connect (GTK_OBJECT (clistmedia), "click_column",
                       GTK_SIGNAL_FUNC (on_clistmedia_click_column),
                       NULL);
+  gtk_signal_connect (GTK_OBJECT (clistmedia), "start_selection",
+                      GTK_SIGNAL_FUNC (on_clistmedia_start_selection),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (clistmedia), "end_selection",
+                      GTK_SIGNAL_FUNC (on_clistmedia_end_selection),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (clistmedia), "enter_notify_event",
+                      GTK_SIGNAL_FUNC (on_clistmedia_enter_notify_event),
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (cbautoplay), "toggled",
                       GTK_SIGNAL_FUNC (on_cbautoplay_toggled),
                       NULL);
