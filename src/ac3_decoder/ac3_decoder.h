@@ -3,8 +3,8 @@
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
- * Michel Kaempf <maxx@via.ecp.fr>
+ * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Renaud Dartus <reno@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -355,6 +355,63 @@ typedef struct ac3_bit_stream_s
     unsigned int total_bits_read; /* temporary */
 } ac3_bit_stream_t;
 
+typedef struct bit_allocate_s
+{
+    s16 psd[256];
+    s16 bndpsd[256];
+    s16 excite[256];
+    s16 mask[256];
+    s16 sdecay;
+    s16 fdecay;
+    s16 sgain;
+    s16 dbknee;
+    s16 floor;
+} bit_allocate_t;
+
+/* These store the persistent state of the packed mantissas */
+typedef struct mantissa_s
+{
+    float q_1[2];
+    float q_2[2];
+    float q_4[1];
+    s32 q_1_pointer;
+    s32 q_2_pointer;
+    s32 q_4_pointer;
+    u16 lfsr_state;
+} mantissa_t;
+
+typedef struct complex_s {
+    float real;
+    float imag;
+} complex_t;
+
+#define N 512
+
+typedef struct imdct_s
+{
+    complex_t buf[N/4];
+
+    /* Delay buffer for time domain interleaving */
+    float delay[6][256];
+
+    /* Twiddle factors for IMDCT */
+    float xcos1[N/4];
+    float xsin1[N/4];
+    float xcos2[N/8];
+    float xsin2[N/8];
+    
+    /* Twiddle factor LUT */
+    complex_t *w[7];
+    complex_t w_1[1];
+    complex_t w_2[2];
+    complex_t w_4[4];
+    complex_t w_8[8];
+    complex_t w_16[16];
+    complex_t w_32[32];
+    complex_t w_64[64];
+
+} imdct_t;
+
 struct ac3dec_s
 {
     /*
@@ -373,6 +430,10 @@ struct ac3dec_s
 
     stream_coeffs_t     coeffs;
     stream_samples_t    samples;
+
+    bit_allocate_t      bit_allocate;
+    mantissa_t          mantissa;
+    imdct_t             imdct;
 };
 
 /**** ac3 decoder inline functions ****/

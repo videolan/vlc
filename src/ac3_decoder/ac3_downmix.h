@@ -1,11 +1,9 @@
 /*****************************************************************************
- * ac3_bit_stream.h: getbits functions for the ac3 decoder
+ * ac3_downmix.h: ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
  *
- * Authors: Michel Lespinasse <walken@zoy.org>
- *          Renaud Dartus <reno@videolan.org>
- *
+ * Authors: Renaud Dartus <reno@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,25 +20,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-static __inline__ u32 bitstream_get (ac3_bit_stream_t * p_bit_stream, 
-                                     u32 num_bits)
-{
-    u32 result=0;
-    while (p_bit_stream->i_available < num_bits)
-    {
-        if (p_bit_stream->byte_stream.p_byte >= p_bit_stream->byte_stream.p_end)
-        {
-            /* no, switch to next buffer */
-            ac3_byte_stream_next (&p_bit_stream->byte_stream);
-        }
-        p_bit_stream->buffer |=((u32) *(p_bit_stream->byte_stream.p_byte++)) 
-            << (24 - p_bit_stream->i_available);
-        p_bit_stream->i_available += 8;
-    }
-    result = p_bit_stream->buffer >> (32 - num_bits);
-    p_bit_stream->buffer <<= num_bits;
-    p_bit_stream->i_available -= num_bits;
-    p_bit_stream->total_bits_read += num_bits;
-    
-    return result;
-}
+#define NORM 16384
+
+typedef struct dm_par_s {
+    float unit;
+    float clev;
+    float slev;
+} dm_par_t;
+
+void downmix_3f_2r_to_2ch_c(float *samples, dm_par_t * dm_par);
+void downmix_3f_1r_to_2ch_c(float *samples, dm_par_t * dm_par);
+void downmix_2f_2r_to_2ch_c(float *samples, dm_par_t * dm_par);
+void downmix_2f_1r_to_2ch_c(float *samples, dm_par_t * dm_par);
+void downmix_3f_0r_to_2ch_c(float *samples, dm_par_t * dm_par);            
+void stream_sample_2ch_to_s16_c(s16 *s16_samples, float *left, float *right);
+void stream_sample_1ch_to_s16_c(s16 *s16_samples, float *center);      

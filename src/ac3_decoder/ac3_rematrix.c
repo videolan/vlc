@@ -3,7 +3,8 @@
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Aaron Holtzman <aholtzma@engr.uvic.ca>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +31,7 @@ struct rematrix_band_s {
     u32 end;
 };
 
-static struct rematrix_band_s rematrix_band[] = { {13,24}, {25,36}, {37 ,60}, {61,252}};
+static const struct rematrix_band_s rematrix_band[] = { {13,24}, {25,36}, {37 ,60}, {61,252}};
 
 static __inline__ u32 min (u32 a, u32 b)
 {

@@ -2,9 +2,9 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.24 2001/02/11 01:15:10 sam Exp $
+ * $Id: ac3_decoder_thread.c,v 1.25 2001/02/20 12:06:28 reno Exp $
  *
- * Authors:
+ * Authors: Michel Lespinasse <walken@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -164,9 +164,6 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
 
     intf_DbgMsg ("ac3dec debug: running ac3 decoder thread (%p) (pid == %i)", p_ac3dec, getpid());
 
-    /* FIXME ! Qu'est-ce que c'est que ce bordel !?!?!?!? --Meuuh */
-    //msleep (INPUT_PTS_DELAY);
-
     /* Initializing the ac3 decoder thread */
     if (InitThread (p_ac3dec)) /* XXX?? */
     {
@@ -210,7 +207,7 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
             {
                 if (p_byte_stream->p_byte >= p_byte_stream->p_end)
                 {
-                    ac3_byte_stream_next (p_byte_stream);                    
+                    ac3_byte_stream_next (p_byte_stream);
                 }
                 p_byte_stream->p_byte++;
             }
@@ -326,7 +323,6 @@ static void EndThread (ac3dec_thread_t * p_ac3dec)
 void ac3_byte_stream_next (ac3_byte_stream_t * p_byte_stream)
 {
     ac3dec_thread_t * p_ac3dec = p_byte_stream->info;
-
     /* We are looking for the next TS packet that contains real data,
      * and not just a PES header */
     do

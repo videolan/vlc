@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
  *
- * Authors:
+ * Authors: Michel Lespinasse <walken@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,13 +36,13 @@
 void bit_allocate (ac3dec_t *);
 
 /* ac3_downmix.c */
-void downmix (ac3dec_t *, s16 *);
+int downmix (ac3dec_t *, s16 *);
 
 /* ac3_exponent.c */
 int exponent_unpack (ac3dec_t *);
 
 /* ac3_imdct.c */
-void imdct (ac3dec_t * p_ac3dec);
+void imdct (ac3dec_t * p_ac3dec, s16 * buffer);
 
 /* ac3_mantissa.c */
 void mantissa_unpack (ac3dec_t *);

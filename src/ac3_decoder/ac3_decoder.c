@@ -3,7 +3,9 @@
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Michel Lespinasse <walken@zoy.org>
+ *          Aaron Holtzman <aholtzma@engr.uvic.ca>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,17 +21,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
 #include "defs.h"
 
 #include "int_types.h"
 #include "ac3_decoder.h"
 #include "ac3_internal.h"
 
+#include <stdio.h>
+
+void imdct_init (imdct_t * p_imdct);
+
 int ac3_init (ac3dec_t * p_ac3dec)
 {
     //p_ac3dec->bit_stream.buffer = 0;
     //p_ac3dec->bit_stream.i_available = 0;
-
+    p_ac3dec->mantissa.lfsr_state = 1;       /* dither_gen initialization */
+    imdct_init(&p_ac3dec->imdct);
+    
     return 0;
 }
 
@@ -39,7 +48,7 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
 
     if (parse_bsi (p_ac3dec))
         return 1;
-
+    
     for (i = 0; i < 6; i++) {
         if (parse_audblk (p_ac3dec, i))
             return 1;
@@ -49,8 +58,8 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
         mantissa_unpack (p_ac3dec);
         if  (p_ac3dec->bsi.acmod == 0x2)
             rematrix (p_ac3dec);
-        imdct (p_ac3dec);
-        downmix (p_ac3dec, buffer);
+        imdct (p_ac3dec, buffer);
+//        downmix (p_ac3dec, buffer);
 
         buffer += 2*256;
     }

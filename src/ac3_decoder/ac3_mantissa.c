@@ -4,6 +4,7 @@
  * Copyright (C) 1999, 2000, 2001 VideoLAN
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Aaron Holtzman <aholtzma@engr.uvic.ca>
  *          Renaud Dartus <reno@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,21 +37,21 @@
 #define Q0 ((-2 << 15) / 3.0)
 #define Q1 (0)
 #define Q2 ((2 << 15) / 3.0)
-static float q_1_0[ 32 ] =
+static const float q_1_0[ 32 ] =
 {
     Q0, Q0, Q0, Q0, Q0, Q0, Q0, Q0, Q0,
     Q1, Q1, Q1, Q1, Q1, Q1, Q1, Q1, Q1,
     Q2, Q2, Q2, Q2, Q2, Q2, Q2, Q2, Q2,
     0, 0, 0, 0, 0
 };
-static float q_1_1[ 32 ] =
+static const float q_1_1[ 32 ] =
 {
     Q0, Q0, Q0, Q1, Q1, Q1, Q2, Q2, Q2,
     Q0, Q0, Q0, Q1, Q1, Q1, Q2, Q2, Q2,
     Q0, Q0, Q0, Q1, Q1, Q1, Q2, Q2, Q2,
     0, 0, 0, 0, 0
 };
-static float q_1_2[ 32 ] =
+static const float q_1_2[ 32 ] =
 {
     Q0, Q1, Q2, Q0, Q1, Q2, Q0, Q1, Q2,
     Q0, Q1, Q2, Q0, Q1, Q2, Q0, Q1, Q2,
@@ -66,7 +67,7 @@ static float q_1_2[ 32 ] =
 #define Q2 (0)
 #define Q3 ((2 << 15) / 5.0)
 #define Q4 ((4 << 15) / 5.0)
-static float q_2_0[ 128 ] =
+static const float q_2_0[ 128 ] =
 {
     Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,Q0,
     Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,Q1,
@@ -75,7 +76,7 @@ static float q_2_0[ 128 ] =
     Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,Q4,
     0, 0, 0
 };
-static float q_2_1[ 128 ] =
+static const float q_2_1[ 128 ] =
 {
     Q0,Q0,Q0,Q0,Q0,Q1,Q1,Q1,Q1,Q1,Q2,Q2,Q2,Q2,Q2,Q3,Q3,Q3,Q3,Q3,Q4,Q4,Q4,Q4,Q4,
     Q0,Q0,Q0,Q0,Q0,Q1,Q1,Q1,Q1,Q1,Q2,Q2,Q2,Q2,Q2,Q3,Q3,Q3,Q3,Q3,Q4,Q4,Q4,Q4,Q4,
@@ -84,7 +85,7 @@ static float q_2_1[ 128 ] =
     Q0,Q0,Q0,Q0,Q0,Q1,Q1,Q1,Q1,Q1,Q2,Q2,Q2,Q2,Q2,Q3,Q3,Q3,Q3,Q3,Q4,Q4,Q4,Q4,Q4,
     0, 0, 0
 };
-static float q_2_2[ 128 ] =
+static const float q_2_2[ 128 ] =
 {
     Q0,Q1,Q2,Q3,Q4,Q0,Q1,Q2,Q3,Q4,Q0,Q1,Q2,Q3,Q4,Q0,Q1,Q2,Q3,Q4,Q0,Q1,Q2,Q3,Q4,
     Q0,Q1,Q2,Q3,Q4,Q0,Q1,Q2,Q3,Q4,Q0,Q1,Q2,Q3,Q4,Q0,Q1,Q2,Q3,Q4,Q0,Q1,Q2,Q3,Q4,
@@ -110,7 +111,7 @@ static float q_2_2[ 128 ] =
 #define Q8 ((6 << 15) / 11.0)
 #define Q9 ((8 << 15) / 11.0)
 #define QA ((10 << 15) / 11.0)
-static float q_4_0[ 128 ] =
+static const float q_4_0[ 128 ] =
 {
     Q0, Q0, Q0, Q0, Q0, Q0, Q0, Q0, Q0, Q0, Q0,
     Q1, Q1, Q1, Q1, Q1, Q1, Q1, Q1, Q1, Q1, Q1,
@@ -125,7 +126,7 @@ static float q_4_0[ 128 ] =
     QA, QA, QA, QA, QA, QA, QA, QA, QA, QA, QA,
     0,  0,  0,  0,  0,  0,  0
 };
-static float q_4_1[ 128 ] =
+static const float q_4_1[ 128 ] =
 {
     Q0, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, QA,
     Q0, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, QA,
@@ -154,14 +155,14 @@ static float q_4_1[ 128 ] =
 
 /* Lookup tables of 0.16 two's complement quantization values */
 
-static float q_3[8] =
+static const float q_3[8] =
 {
     (-6 << 15)/7.0, (-4 << 15)/7.0, (-2 << 15)/7.0,
     0           , (2 << 15)/7.0, (4 << 15)/7.0,
     (6 << 15)/7.0, 0
 };
 
-static float q_5[16] =
+static const float q_5[16] =
 {
     (-14 << 15)/15.0, (-12 << 15)/15.0, (-10 << 15)/15.0,
     (-8 << 15)/15.0,  (-6 << 15)/15.0,  (-4 << 15)/15.0,
@@ -171,22 +172,14 @@ static float q_5[16] =
     0
 };
 
-/* These store the persistent state of the packed mantissas */
-static float q_1[2];
-static float q_2[2];
-static float q_4[1];
-static s32 q_1_pointer;
-static s32 q_2_pointer;
-static s32 q_4_pointer;
-
 /* Conversion from bap to number of bits in the mantissas
  * zeros account for cases 0,1,2,4 which are special cased */
-static u16 qnttztab[16] =
+static const u16 qnttztab[16] =
 {
     0, 0, 0, 3, 0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16
 };
 
-static float exp_lut[ 25 ] =
+static const float exp_lut[ 25 ] =
 {
     6.10351562500000000000000000e-05,
     3.05175781250000000000000000e-05,
@@ -215,7 +208,7 @@ static float exp_lut[ 25 ] =
     3.63797880709171295166015625e-12,
 };
 
-const u16 dither_lut[256] =
+static const u16 dither_lut[256] =
 {
  0x0000, 0xa011, 0xe033, 0x4022, 0x6077, 0xc066, 0x8044, 0x2055,
  0xc0ee, 0x60ff, 0x20dd, 0x80cc, 0xa099, 0x0088, 0x40aa, 0xe0bb,
@@ -251,14 +244,13 @@ const u16 dither_lut[256] =
  0x8bf4, 0x2be5, 0x6bc7, 0xcbd6, 0xeb83, 0x4b92, 0x0bb0, 0xaba1
 };
 
-u16 lfsr_state = 1;
-
-static __inline__ u16 dither_gen (void)
+static __inline__ u16 dither_gen (mantissa_t * p_mantissa)
 {
         s16 state;
 
-        state = dither_lut[lfsr_state >> 8] ^ (lfsr_state << 8);
-        lfsr_state = (u16) state;
+        state = dither_lut[p_mantissa->lfsr_state >> 8] ^ 
+                    (p_mantissa->lfsr_state << 8);
+        p_mantissa->lfsr_state = (u16) state;
         return ( (state * (s32) (0.707106 * 256.0)) >> 8 );
 }
 
@@ -274,75 +266,75 @@ static __inline__ float float_get (ac3dec_t * p_ac3dec, u16 bap, u16 exp)
     case 0:
         if (p_ac3dec->audblk.dithflag[exp])
         {
-            return ( dither_gen() * exp_lut[exp] );
+            return ( dither_gen(&p_ac3dec->mantissa) * exp_lut[exp] );
         }    
         return (0);
 
     case 1:
-        if (q_1_pointer >= 0)
+        if (p_ac3dec->mantissa.q_1_pointer >= 0)
         {
-            return (q_1[q_1_pointer--] * exp_lut[exp]);
+            return (p_ac3dec->mantissa.q_1[p_ac3dec->mantissa.q_1_pointer--] * exp_lut[exp]);
         }
 
         if ((group_code = bitstream_get(&(p_ac3dec->bit_stream),5)) >= 27)
         {
-            intf_ErrMsg ( "ac3dec error: invalid mantissa" );
+            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa" );
         }
 
-        q_1[ 1 ] = q_1_1[ group_code ];
-        q_1[ 0 ] = q_1_2[ group_code ];
+        p_ac3dec->mantissa.q_1[ 1 ] = q_1_1[ group_code ];
+        p_ac3dec->mantissa.q_1[ 0 ] = q_1_2[ group_code ];
 
-        q_1_pointer = 1;
+        p_ac3dec->mantissa.q_1_pointer = 1;
 
         return (q_1_0[group_code] * exp_lut[exp]);
 
     case 2:
-        if (q_2_pointer >= 0)
+        if (p_ac3dec->mantissa.q_2_pointer >= 0)
         {
-            return (q_2[q_2_pointer--] * exp_lut[exp]);
+            return (p_ac3dec->mantissa.q_2[p_ac3dec->mantissa.q_2_pointer--] * exp_lut[exp]);
         }
         
         if ((group_code = bitstream_get(&(p_ac3dec->bit_stream),7)) >= 125)
         {
-            intf_ErrMsg ( "ac3dec error: invalid mantissa" );
+            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa" );
         }
 
-        q_2[ 1 ] = q_2_1[ group_code ];
-        q_2[ 0 ] = q_2_2[ group_code ];
+        p_ac3dec->mantissa.q_2[ 1 ] = q_2_1[ group_code ];
+        p_ac3dec->mantissa.q_2[ 0 ] = q_2_2[ group_code ];
 
-        q_2_pointer = 1;
+        p_ac3dec->mantissa.q_2_pointer = 1;
 
         return (q_2_0[ group_code ] * exp_lut[exp]);
 
     case 3:
         if ((group_code = bitstream_get(&(p_ac3dec->bit_stream),3)) >= 7)
         {
-            intf_ErrMsg ( "ac3dec error: invalid mantissa" );
+            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa" );
         }
 
         return (q_3[group_code] * exp_lut[exp]);
 
     case 4:
-        if (q_4_pointer >= 0)
+        if (p_ac3dec->mantissa.q_4_pointer >= 0)
         {
-            return (q_4[q_4_pointer--] * exp_lut[exp]);
+            return (p_ac3dec->mantissa.q_4[p_ac3dec->mantissa.q_4_pointer--] * exp_lut[exp]);
         }
 
         if ((group_code = bitstream_get(&(p_ac3dec->bit_stream),7)) >= 121)
         {
-            intf_ErrMsg ( "ac3dec error: invalid mantissa" );
+            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa" );
         }
 
-        q_4[ 0 ] = q_4_1[ group_code ];
+        p_ac3dec->mantissa.q_4[ 0 ] = q_4_1[ group_code ];
 
-        q_4_pointer = 0;
+        p_ac3dec->mantissa.q_4_pointer = 0;
 
         return (q_4_0[ group_code ] * exp_lut[exp]);
 
     case 5:
         if ((group_code = bitstream_get(&(p_ac3dec->bit_stream),4)) >= 15)
         {
-            intf_ErrMsg ( "ac3dec error: invalid mantissa" );
+            intf_WarnMsg ( 1, "ac3dec error: invalid mantissa" );
         }
 
         return (q_5[group_code] * exp_lut[exp]);
@@ -394,7 +386,7 @@ static __inline__ void uncouple_channel (ac3dec_t * p_ac3dec, u32 ch)
              * so the channels are uncorrelated */
             if (p_ac3dec->audblk.dithflag[ch] && !p_ac3dec->audblk.cpl_bap[i])
             {
-                p_ac3dec->coeffs.fbw[ch][i] = cpl_coord * dither_gen() * 
+                p_ac3dec->coeffs.fbw[ch][i] = cpl_coord * dither_gen(&p_ac3dec->mantissa) * 
                     exp_lut[p_ac3dec->audblk.cpl_exp[i]];
             } else {
                 p_ac3dec->coeffs.fbw[ch][i]  = cpl_coord * p_ac3dec->audblk.cplfbw[i];
@@ -408,10 +400,10 @@ void mantissa_unpack (ac3dec_t * p_ac3dec)
 {
     int i, j;
 
-    q_1_pointer = -1;
-    q_2_pointer = -1;
-    q_4_pointer = -1;
-
+    p_ac3dec->mantissa.q_1_pointer = -1;
+    p_ac3dec->mantissa.q_2_pointer = -1;
+    p_ac3dec->mantissa.q_4_pointer = -1;
+    
     if (p_ac3dec->audblk.cplinu)
     {
         /* 1 */

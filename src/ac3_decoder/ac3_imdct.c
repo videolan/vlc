@@ -3,7 +3,9 @@
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Aaron Holtzman <aholtzma@engr.uvic.ca>
+ *          Renaud Dartus <reno@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,28 +21,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
 #include "defs.h"
 
 #include <math.h>
+#include <stdio.h>
 
 #include "int_types.h"
 #include "ac3_decoder.h"
 #include "ac3_internal.h"
 
-void imdct_do_256(float x[],float y[],float delay[]);
-void imdct_do_512(float x[],float y[],float delay[]);
+#include "ac3_downmix.h"
 
-typedef struct complex_s {
-    float real;
-    float imag;
-} complex_t;
-
-#define N 512
-
-static complex_t buf[N/4];
+void imdct_do_256(imdct_t * p_imdct, float x[],float y[], int id);
+void imdct_do_512(imdct_t * p_imdct, float x[],float y[], int id);
 
 /* 128 point bit-reverse LUT */
-static u8 bit_reverse_512[] = {
+static const u8 bit_reverse_512[] = {
     0x00, 0x40, 0x20, 0x60, 0x10, 0x50, 0x30, 0x70,
     0x08, 0x48, 0x28, 0x68, 0x18, 0x58, 0x38, 0x78,
     0x04, 0x44, 0x24, 0x64, 0x14, 0x54, 0x34, 0x74,
@@ -58,7 +55,7 @@ static u8 bit_reverse_512[] = {
     0x07, 0x47, 0x27, 0x67, 0x17, 0x57, 0x37, 0x77,
     0x0f, 0x4f, 0x2f, 0x6f, 0x1f, 0x5f, 0x3f, 0x7f};
 
-static u8 bit_reverse_256[] = {
+static const u8 bit_reverse_256[] = {
     0x00, 0x20, 0x10, 0x30, 0x08, 0x28, 0x18, 0x38,
     0x04, 0x24, 0x14, 0x34, 0x0c, 0x2c, 0x1c, 0x3c,
     0x02, 0x22, 0x12, 0x32, 0x0a, 0x2a, 0x1a, 0x3a,
@@ -67,25 +64,6 @@ static u8 bit_reverse_256[] = {
     0x05, 0x25, 0x15, 0x35, 0x0d, 0x2d, 0x1d, 0x3d,
     0x03, 0x23, 0x13, 0x33, 0x0b, 0x2b, 0x1b, 0x3b,
     0x07, 0x27, 0x17, 0x37, 0x0f, 0x2f, 0x1f, 0x3f};
-
-/* Twiddle factor LUT */
-static complex_t *w[7];
-static complex_t w_1[1];
-static complex_t w_2[2];
-static complex_t w_4[4];
-static complex_t w_8[8];
-static complex_t w_16[16];
-static complex_t w_32[32];
-static complex_t w_64[64];
-
-/* Twiddle factors for IMDCT */
-static float xcos1[N/4];
-static float xsin1[N/4];
-static float xcos2[N/8];
-static float xsin2[N/8];
-
-/* Delay buffer for time domain interleaving */
-static float delay[6][256];
 
 /* Windowing function for Modified DCT - Thank you acroread */
 static float window[] = {
@@ -141,33 +119,32 @@ static __inline__ complex_t cmplx_mult(complex_t a, complex_t b)
     return ret;
 }
 
-static void imdct_init(void) __attribute__ ((__constructor__));
-static void imdct_init(void)
+void imdct_init(imdct_t * p_imdct)
 {
     int i,k;
     complex_t angle_step;
     complex_t current_angle;
-
+    
     /* Twiddle factors to turn IFFT into IMDCT */
     for (i=0; i < N/4; i++) {
-        xcos1[i] = -cos(2 * M_PI * (8*i+1)/(8*N)) ;
-        xsin1[i] = -sin(2 * M_PI * (8*i+1)/(8*N)) ;
+        p_imdct->xcos1[i] = -cos(2 * M_PI * (8*i+1)/(8*N)) ;
+        p_imdct->xsin1[i] = -sin(2 * M_PI * (8*i+1)/(8*N)) ;
     }
 
     /* More twiddle factors to turn IFFT into IMDCT */
     for (i=0; i < N/8; i++) {
-        xcos2[i] = -cos(2 * M_PI * (8*i+1)/(4*N)) ;
-        xsin2[i] = -sin(2 * M_PI * (8*i+1)/(4*N)) ;
+        p_imdct->xcos2[i] = -cos(2 * M_PI * (8*i+1)/(4*N)) ;
+        p_imdct->xsin2[i] = -sin(2 * M_PI * (8*i+1)/(4*N)) ;
     }
 
     /* Canonical twiddle factors for FFT */
-    w[0] = w_1;
-    w[1] = w_2;
-    w[2] = w_4;
-    w[3] = w_8;
-    w[4] = w_16;
-    w[5] = w_32;
-    w[6] = w_64;
+    p_imdct->w[0] = p_imdct->w_1;
+    p_imdct->w[1] = p_imdct->w_2;
+    p_imdct->w[2] = p_imdct->w_4;
+    p_imdct->w[3] = p_imdct->w_8;
+    p_imdct->w[4] = p_imdct->w_16;
+    p_imdct->w[5] = p_imdct->w_32;
+    p_imdct->w[6] = p_imdct->w_64;
 
     for (i = 0; i < 7; i++) {
         angle_step.real = cos(-2.0f * M_PI / (1 << (i+1)));
@@ -177,21 +154,53 @@ static void imdct_init(void)
         current_angle.imag = 0.0f;
 
         for (k = 0; k < 1 << i; k++) {
-            w[i][k] = current_angle;
+            p_imdct->w[i][k] = current_angle;
             current_angle = cmplx_mult(current_angle,angle_step);
         }
     }
 }
 
-void imdct (ac3dec_t * p_ac3dec)
+void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
 {
-    int i;
+    int i, i_stream_done;
+    int doable = 0;
+    void (*do_imdct)(imdct_t * p_imdct, float x[],float y[], int id);
+    
+    /* Test if dm in frequency is doable */
+    if ( !(doable = p_ac3dec->audblk.blksw[0]) )
+        do_imdct = imdct_do_512;
+    else
+        do_imdct = imdct_do_256;
 
-    for (i=0; i<p_ac3dec->bsi.nfchans;i++) {
-        if (p_ac3dec->audblk.blksw[i])
-            imdct_do_256(p_ac3dec->coeffs.fbw[i],p_ac3dec->samples.channel[i],delay[i]);
-        else
-            imdct_do_512(p_ac3dec->coeffs.fbw[i],p_ac3dec->samples.channel[i],delay[i]);
+    /* Downmix in the frequency domain if all the channes use the same imdct */
+    for (i=0; i < p_ac3dec->bsi.nfchans; i++)
+    {
+        if ( doable != p_ac3dec->audblk.blksw[i] )
+        {
+            do_imdct = NULL;
+            break;
+        }
+    }
+    
+    if (do_imdct)
+    {
+        i_stream_done = downmix(p_ac3dec, buffer);
+        do_imdct(&p_ac3dec->imdct,p_ac3dec->coeffs.fbw[0],p_ac3dec->samples.channel[0], 0);
+        do_imdct(&p_ac3dec->imdct, p_ac3dec->coeffs.fbw[1],p_ac3dec->samples.channel[1], 1);
+    } else {
+        for (i=0; i<p_ac3dec->bsi.nfchans;i++) {
+            if (p_ac3dec->audblk.blksw[i])
+                imdct_do_256(&p_ac3dec->imdct, p_ac3dec->coeffs.fbw[i],p_ac3dec->samples.channel[i], i);
+            else
+                imdct_do_512(&p_ac3dec->imdct, p_ac3dec->coeffs.fbw[i],p_ac3dec->samples.channel[i], i);
+        }
+        i_stream_done = downmix(p_ac3dec, buffer);
+    }
+
+    if ( !i_stream_done ) /* We have to stream sample */
+    {
+        stream_sample_2ch_to_s16_c(buffer, p_ac3dec->samples.channel[0],
+                p_ac3dec->samples.channel[1]);
     }
 
     /* XXX?? We don't bother with the IMDCT for the LFE as it's currently
@@ -200,8 +209,7 @@ void imdct (ac3dec_t * p_ac3dec)
     //    imdct_do_512(coeffs->lfe,samples->channel[5],delay[5]);
 }
 
-void
-imdct_do_512(float x[],float y[],float delay[])
+void imdct_do_512(imdct_t * p_imdct, float x[], float y[], int id)
 {
     int i,k;
     int p,q;
@@ -222,15 +230,15 @@ imdct_do_512(float x[],float y[],float delay[])
     /* Pre IFFT complex multiply plus IFFT cmplx conjugate */
     for (i=0; i < N/4; i++) {
         /* z[i] = (X[N/2-2*i-1] + j * X[2*i]) * (xcos1[i] + j * xsin1[i]) ; */
-        buf[i].real =  (x[N/2-2*i-1] * xcos1[i])  - (x[2*i]       * xsin1[i]);
-        buf[i].imag = -((x[2*i]       * xcos1[i])  + (x[N/2-2*i-1] * xsin1[i]));
+        p_imdct->buf[i].real =  (x[N/2-2*i-1] * p_imdct->xcos1[i])  - (x[2*i]       * p_imdct->xsin1[i]);
+        p_imdct->buf[i].imag = -((x[2*i]       * p_imdct->xcos1[i])  + (x[N/2-2*i-1] * p_imdct->xsin1[i]));
     }
 
     /* Bit reversed shuffling */
     for (i=0; i<N/4; i++) {
         k = bit_reverse_512[i];
         if (k < i)
-            swap_cmplx(&buf[i],&buf[k]);
+            swap_cmplx(&p_imdct->buf[i],&p_imdct->buf[k]);
     }
 
     /* FFT Merge */
@@ -242,14 +250,14 @@ imdct_do_512(float x[],float y[],float delay[])
             for (i = 0; i < 128; i += two_m_plus_one) {
                 p = k + i;
                 q = p + two_m;
-                tmp_a_r = buf[p].real;
-                tmp_a_i = buf[p].imag;
-                tmp_b_r = buf[q].real * w[m][k].real - buf[q].imag * w[m][k].imag;
-                tmp_b_i = buf[q].imag * w[m][k].real + buf[q].real * w[m][k].imag;
-                buf[p].real = tmp_a_r + tmp_b_r;
-                buf[p].imag =  tmp_a_i + tmp_b_i;
-                buf[q].real = tmp_a_r - tmp_b_r;
-                buf[q].imag =  tmp_a_i - tmp_b_i;
+                tmp_a_r = p_imdct->buf[p].real;
+                tmp_a_i = p_imdct->buf[p].imag;
+                tmp_b_r = p_imdct->buf[q].real * p_imdct->w[m][k].real - p_imdct->buf[q].imag * p_imdct->w[m][k].imag;
+                tmp_b_i = p_imdct->buf[q].imag * p_imdct->w[m][k].real + p_imdct->buf[q].real * p_imdct->w[m][k].imag;
+                p_imdct->buf[p].real = tmp_a_r + tmp_b_r;
+                p_imdct->buf[p].imag =  tmp_a_i + tmp_b_i;
+                p_imdct->buf[q].real = tmp_a_r - tmp_b_r;
+                p_imdct->buf[q].imag =  tmp_a_i - tmp_b_i;
             }
         }
     }
@@ -257,42 +265,41 @@ imdct_do_512(float x[],float y[],float delay[])
     /* Post IFFT complex multiply  plus IFFT complex conjugate*/
     for (i=0; i < N/4; i++) {
         /* y[n] = z[n] * (xcos1[n] + j * xsin1[n]) ; */
-        tmp_a_r =   buf[i].real;
-        tmp_a_i = - buf[i].imag;
-        buf[i].real =(tmp_a_r * xcos1[i])  - (tmp_a_i  * xsin1[i]);
-        buf[i].imag =(tmp_a_r * xsin1[i])  + (tmp_a_i  * xcos1[i]);
+        tmp_a_r =   p_imdct->buf[i].real;
+        tmp_a_i = - p_imdct->buf[i].imag;
+        p_imdct->buf[i].real =(tmp_a_r * p_imdct->xcos1[i])  - (tmp_a_i  * p_imdct->xsin1[i]);
+        p_imdct->buf[i].imag =(tmp_a_r * p_imdct->xsin1[i])  + (tmp_a_i  * p_imdct->xcos1[i]);
     }
 
     y_ptr = y;
-    delay_ptr = delay;
+    delay_ptr = p_imdct->delay[id];
     window_ptr = window;
     /* Window and convert to real valued signal */
     for (i=0; i<N/8; i++) {
-        *y_ptr++   = 2.0f * (-buf[N/8+i].imag   * *window_ptr++ + *delay_ptr++);
-        *y_ptr++   = 2.0f * (buf[N/8-i-1].real * *window_ptr++ + *delay_ptr++);
+        *y_ptr++   = 2.0f * (-p_imdct->buf[N/8+i].imag   * *window_ptr++ + *delay_ptr++);
+        *y_ptr++   = 2.0f * (p_imdct->buf[N/8-i-1].real * *window_ptr++ + *delay_ptr++);
     }
 
     for (i=0; i<N/8; i++) {
-        *y_ptr++  = 2.0f * (-buf[i].real       * *window_ptr++ + *delay_ptr++);
-        *y_ptr++  = 2.0f * (buf[N/4-i-1].imag * *window_ptr++ + *delay_ptr++);
+        *y_ptr++  = 2.0f * (-p_imdct->buf[i].real       * *window_ptr++ + *delay_ptr++);
+        *y_ptr++  = 2.0f * (p_imdct->buf[N/4-i-1].imag * *window_ptr++ + *delay_ptr++);
     }
 
     /* The trailing edge of the window goes into the delay line */
-    delay_ptr = delay;
+    delay_ptr = p_imdct->delay[id];
 
     for (i=0; i<N/8; i++) {
-        *delay_ptr++  = -buf[N/8+i].real   * *--window_ptr;
-        *delay_ptr++  =  buf[N/8-i-1].imag * *--window_ptr;
+        *delay_ptr++  = -p_imdct->buf[N/8+i].real   * *--window_ptr;
+        *delay_ptr++  =  p_imdct->buf[N/8-i-1].imag * *--window_ptr;
     }
 
     for (i=0; i<N/8; i++) {
-        *delay_ptr++  =  buf[i].imag       * *--window_ptr;
-        *delay_ptr++  = -buf[N/4-i-1].real * *--window_ptr;
+        *delay_ptr++  =  p_imdct->buf[i].imag       * *--window_ptr;
+        *delay_ptr++  = -p_imdct->buf[N/4-i-1].real * *--window_ptr;
     }
 }
 
-void
-imdct_do_256(float x[],float y[],float delay[])
+void imdct_do_256(imdct_t * p_imdct,float x[],float y[], int id)
 {
     int i,k;
     int p,q;
@@ -307,8 +314,8 @@ imdct_do_256(float x[],float y[],float delay[])
 
     complex_t *buf_1, *buf_2;
 
-    buf_1 = &buf[0];
-    buf_2 = &buf[64];
+    buf_1 = &p_imdct->buf[0];
+    buf_2 = &p_imdct->buf[64];
 
     /* Pre IFFT complex multiply plus IFFT cmplx conjugate */
     for (k=0; k<N/8; k++) {
@@ -319,11 +326,11 @@ imdct_do_256(float x[],float y[],float delay[])
         q = 2 * (2 * k);
 
        /* Z1[k] = (X1[N/4-2*k-1] + j * X1[2*k]) * (xcos2[k] + j * xsin2[k]); */
-        buf_1[k].real =    x[p] * xcos2[k] - x[q] * xsin2[k];
-        buf_1[k].imag = - (x[q] * xcos2[k] + x[p] * xsin2[k]);
+        buf_1[k].real =    x[p] * p_imdct->xcos2[k] - x[q] * p_imdct->xsin2[k];
+        buf_1[k].imag = - (x[q] * p_imdct->xcos2[k] + x[p] * p_imdct->xsin2[k]);
        /* Z2[k] = (X2[N/4-2*k-1] + j * X2[2*k]) * (xcos2[k] + j * xsin2[k]); */
-        buf_2[k].real =    x[p + 1] * xcos2[k] - x[q + 1] * xsin2[k];
-        buf_2[k].imag = - (x[q + 1] * xcos2[k] + x[p + 1] * xsin2[k]);
+        buf_2[k].real =    x[p + 1] * p_imdct->xcos2[k] - x[q + 1] * p_imdct->xsin2[k];
+        buf_2[k].imag = - (x[q + 1] * p_imdct->xcos2[k] + x[p + 1] * p_imdct->xsin2[k]);
     }
 
     /* IFFT Bit reversed shuffling */
@@ -347,8 +354,8 @@ imdct_do_256(float x[],float y[],float delay[])
                 /* Do block 1 */
                 tmp_a_r = buf_1[p].real;
                 tmp_a_i = buf_1[p].imag;
-                tmp_b_r = buf_1[q].real * w[m][k].real - buf_1[q].imag * w[m][k].imag;
-                tmp_b_i = buf_1[q].imag * w[m][k].real + buf_1[q].real * w[m][k].imag;
+                tmp_b_r = buf_1[q].real * p_imdct->w[m][k].real - buf_1[q].imag * p_imdct->w[m][k].imag;
+                tmp_b_i = buf_1[q].imag * p_imdct->w[m][k].real + buf_1[q].real * p_imdct->w[m][k].imag;
                 buf_1[p].real = tmp_a_r + tmp_b_r;
                 buf_1[p].imag =  tmp_a_i + tmp_b_i;
                 buf_1[q].real = tmp_a_r - tmp_b_r;
@@ -357,8 +364,8 @@ imdct_do_256(float x[],float y[],float delay[])
                 /* Do block 2 */
                 tmp_a_r = buf_2[p].real;
                 tmp_a_i = buf_2[p].imag;
-                tmp_b_r = buf_2[q].real * w[m][k].real - buf_2[q].imag * w[m][k].imag;
-                tmp_b_i = buf_2[q].imag * w[m][k].real + buf_2[q].real * w[m][k].imag;
+                tmp_b_r = buf_2[q].real * p_imdct->w[m][k].real - buf_2[q].imag * p_imdct->w[m][k].imag;
+                tmp_b_i = buf_2[q].imag * p_imdct->w[m][k].real + buf_2[q].real * p_imdct->w[m][k].imag;
                 buf_2[p].real = tmp_a_r + tmp_b_r;
                 buf_2[p].imag =  tmp_a_i + tmp_b_i;
                 buf_2[q].real = tmp_a_r - tmp_b_r;
@@ -372,13 +379,13 @@ imdct_do_256(float x[],float y[],float delay[])
         /* y1[n] = z1[n] * (xcos2[n] + j * xs in2[n]) ; */
         tmp_a_r =   buf_1[i].real;
         tmp_a_i = - buf_1[i].imag;
-        buf_1[i].real =(tmp_a_r * xcos2[i])  - (tmp_a_i  * xsin2[i]);
-        buf_1[i].imag =(tmp_a_r * xsin2[i])  + (tmp_a_i  * xcos2[i]);
+        buf_1[i].real =(tmp_a_r * p_imdct->xcos2[i])  - (tmp_a_i  * p_imdct->xsin2[i]);
+        buf_1[i].imag =(tmp_a_r * p_imdct->xsin2[i])  + (tmp_a_i  * p_imdct->xcos2[i]);
         /* y2[n] = z2[n] * (xcos2[n] + j * xsin2[n]) ; */
         tmp_a_r =   buf_2[i].real;
         tmp_a_i = - buf_2[i].imag;
-        buf_2[i].real =(tmp_a_r * xcos2[i])  - (tmp_a_i  * xsin2[i]);
-        buf_2[i].imag =(tmp_a_r * xsin2[i])  + (tmp_a_i  * xcos2[i]);
+        buf_2[i].real =(tmp_a_r * p_imdct->xcos2[i])  - (tmp_a_i  * p_imdct->xsin2[i]);
+        buf_2[i].imag =(tmp_a_r * p_imdct->xsin2[i])  + (tmp_a_i  * p_imdct->xcos2[i]);
     }
 
     /* Window and convert to real valued signal */
@@ -395,7 +402,7 @@ imdct_do_256(float x[],float y[],float delay[])
 
     /* Overlap and add */
     for (i=0; i<N/2; i++) {
-        y[i] = 2 * (y[i] + delay[i]);
-        delay[i] = y[N/2+i];
+        y[i] = 2 * (y[i] + p_imdct->delay[id][i]);
+        p_imdct->delay[id][i] = y[N/2+i];
     }
 }

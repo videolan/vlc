@@ -218,7 +218,8 @@ AC3_DECODER =	src/ac3_decoder/ac3_decoder_thread.o \
 		src/ac3_decoder/ac3_mantissa.o \
 		src/ac3_decoder/ac3_rematrix.o \
 		src/ac3_decoder/ac3_imdct.o \
-		src/ac3_decoder/ac3_downmix.o
+		src/ac3_decoder/ac3_downmix.o \
+		src/ac3_decoder/ac3_downmix_c.o
 
 LPCM_DECODER =	src/lpcm_decoder/lpcm_decoder_thread.o \
 		src/lpcm_decoder/lpcm_decoder.o
