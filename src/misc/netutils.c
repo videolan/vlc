@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.38 2001/10/03 02:20:39 tcastley Exp $
+ * $Id: netutils.c,v 1.39 2001/10/10 14:25:15 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -58,7 +58,7 @@
 #endif
 
 #if defined( WIN32 )                    /* tools to get the MAC adress from  */
-#include <windows.h>                    /* the interface under Windows	     */
+#include <windows.h>                    /* the interface under Windows       */
 #include <stdio.h>
 #endif
 
@@ -219,8 +219,9 @@ int network_ChannelCreate( void )
     intf_ErrMsg( "error: channel changing is not yet supported under BeOS" );
     return( 1 );
 
+/* FIXME : channel handling only work for linux */
 #elif defined( SYS_LINUX ) || defined( WIN32 )
-/* FIXME : channels handling only work for linux */
+
     /* Allocate structure */
     p_main->p_channel = malloc( sizeof( input_channel_t ) );
     if( p_main->p_channel == NULL )
@@ -485,7 +486,7 @@ static int GetMacAddress( int i_socket, char *psz_mac )
     {
         if ( GetAdapterInfo ( AdapterList.lana[ i ], psz_mac ) == 0 )
         {
-	    i_ret = 0;
+            i_ret = 0;
         }
     }
 
@@ -544,7 +545,7 @@ static int GetAdapterInfo( int i_adapter, char *psz_string )
                 (int) ( Adapter.adapt.adapter_address[4] ),
                 (int) ( Adapter.adapt.adapter_address[5] ) );
 
-	intf_WarnMsg( 2, "network: found MAC address %s", psz_string );
+        intf_WarnMsg( 2, "network: found MAC address %s", psz_string );
 
         return 0;
     }

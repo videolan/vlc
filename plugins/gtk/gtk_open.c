@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.6 2001/07/25 03:12:33 sam Exp $
+ * $Id: gtk_open.c,v 1.7 2001/10/10 14:25:15 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -336,10 +336,10 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         }
 
         /* Build source name and add it to playlist */
-        sprintf( psz_source, "%s://%s:%i::%s", psz_protocol,
-                                               psz_server,
-                                               i_port,
-                                               psz_broadcast );
+        sprintf( psz_source, "%s://%s:%i/%s", psz_protocol,
+                                              psz_server,
+                                              i_port,
+                                              psz_broadcast );
     }
     else
     {

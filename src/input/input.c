@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.141 2001/10/03 15:10:55 sam Exp $
+ * $Id: input.c,v 1.142 2001/10/10 14:25:15 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -729,7 +729,7 @@ static void NetworkOpen( input_thread_t * p_input )
                 psz_port++;
 
                 psz_broadcast = psz_port;
-                while( *psz_broadcast && *psz_broadcast != ':' )
+                while( *psz_broadcast && *psz_broadcast != '/' )
                 {
                     psz_broadcast++;
                 }
@@ -738,7 +738,7 @@ static void NetworkOpen( input_thread_t * p_input )
                 {
                     *psz_broadcast = '\0';
                     psz_broadcast++;
-                    while( *psz_broadcast && *psz_broadcast == ':' )
+                    while( *psz_broadcast && *psz_broadcast == '/' )
                     {
                         psz_broadcast++;
                     }
@@ -844,8 +844,8 @@ static void NetworkOpen( input_thread_t * p_input )
     
     if( i_opt < 0x80000 )
     {
-        intf_WarnMsg( 1, "input warning: socket receive buffer size just %d instead of %d bytes.",
-                     i_opt, 0x80000 );
+        intf_WarnMsg( 1, "input warning: socket receive buffer size just 0x%x"
+                         " instead of 0x%x bytes.", i_opt, 0x80000 );
     }
 
     /* Build the local socket */

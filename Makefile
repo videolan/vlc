@@ -66,6 +66,8 @@ ifneq (,$(findstring mingw32,$(SYS)))
 RESOURCE_OBJ :=	share/vlc_win32_rc.o
 endif
 
+VLC_OBJ := $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ)
+
 #
 # Generated header
 #
@@ -379,8 +381,8 @@ endif
 #
 # Main application target
 #
-vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ) plugins
-	$(CC) $(CFLAGS) -o $@ $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ) $(LCFLAGS)
+vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(VLC_OBJ) $(BUILTIN_OBJ) plugins
+	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) $(BUILTIN_OBJ) $(LCFLAGS)
 ifeq ($(SYS),beos)
 	xres -o $@ ./share/vlc_beos.rsrc
 	mimeset -f $@

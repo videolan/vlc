@@ -25,7 +25,7 @@ build-stamp:
 
 	case $(DEB_BUILD_ARCH) in \
 	i386) \
-		ARCH_FLAGS="--enable-alsa --with-glide --disable-ppro" ;; \
+		ARCH_FLAGS="--enable-alsa --with-glide" ;; \
 	alpha|ia64|m68k|powerpc) \
 		ARCH_FLAGS="--enable-alsa" ;; \
 	*) \
@@ -34,6 +34,11 @@ build-stamp:
 	./configure $$ARCH_FLAGS --mandir=$${prefix}/share/man \
 		--infodir=$${prefix}/share/info \
 		$(shell echo $(CONFIG_FLAGS)) $(shell echo $(LIBDVDCSS_FLAGS))
+
+	# Fix Makefile
+	sed -e 's/^\(PLUGINS.*\)xvideo/\1/' -e 's/^BUILTINS.*/& xvideo/' \
+		< Makefile.opts > Makefile.opts.tmp
+	mv -f Makefile.opts.tmp Makefile.opts
 
 	$(MAKE)
 

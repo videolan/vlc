@@ -1,8 +1,10 @@
-vlc (0.2.83-3) unstable; urgency=low
+vlc (0.2.90-1) unstable; urgency=low
 
   * Fixed syntax error in build dependencies (Closes: #109722).
+  * XVideo module now compiled as built-in, to avoid PIC and non-PIC
+    code collision (Closes: #111790).
 
- -- Samuel Hocevar <sam@zoy.org>  Sun,  9 Sep 2001 09:28:06 +0200
+ -- Samuel Hocevar <sam@zoy.org>  Wed, 10 Oct 2001 15:00:29 +0200
 
 vlc (0.2.83-2) unstable; urgency=low
 

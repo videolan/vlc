@@ -1,6 +1,6 @@
 # This is borrowed and adapted from Mandrake's Cooker
 %define name 	vlc
-%define vlc_ver 0.2.83
+%define vlc_ver 0.2.90
 %define version	%vlc_ver
 
 # libdvdcss
@@ -103,7 +103,7 @@ install vlc-ncurses
 
 %build
 %configure --with-dvdcss=local-shared \
-       --enable-gnome --enable-gtk \
+	   --enable-gnome --enable-gtk \
 	   --enable-x11 --enable-qt --enable-ncurses \
 	   --enable-esd --disable-alsa \
 	   --enable-fb \
@@ -156,6 +156,9 @@ rm -fr %buildroot
 
 
 %changelog
+* Wed Oct 10 2001 Christophe Massiot <massiot@via.ecp.fr> 0.2.90-1
+- version 0.2.90
+
 * Tue Oct 02 2001 Christophe Massiot <massiot@via.ecp.fr>
 - Imported Mandrake's vlc.spec into the CVS
 

@@ -4,6 +4,7 @@
 
 HEAD
 
+  * Darwin ioctl, courtesy of ej0.
   * If we see 3000 unencrypted blocks assume that the title is unencrypted.
   * If we have not seen any encrypted block and then discover that the block
     just read is not a valid block of an MPEG2 Program stream, assume that the
