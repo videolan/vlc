@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.7 2003/07/14 21:32:59 sigmunau Exp $
+ * $Id: lirc.c,v 1.8 2003/08/14 18:12:39 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -361,6 +361,39 @@ static void Run( intf_thread_t *p_intf )
                 {
                     input_SetStatus( p_input, INPUT_STATUS_SLOWER );
                 }
+/* beginning of modifications by stephane Thu Jun 19 15:29:49 CEST 2003 */
+		else if ( !strcmp(c, "CHAPTER_N" ) ||
+                          !strcmp( c, "CHAPTER_P" ) )
+                {
+                    unsigned int i_chapter = 0;
+                    
+                    if( !strcmp( c, "CHAPTER_N" ) )
+                    {
+                        vlc_mutex_lock( &p_input->stream.stream_lock );
+                        i_chapter = p_input->stream.p_selected_area->i_part + 1;
+                        vlc_mutex_unlock( &p_input->stream.stream_lock );
+                    }
+                    else if( !strcmp( c, "CHAPTER_P" ) )
+                    {
+                        vlc_mutex_lock( &p_input->stream.stream_lock );
+                        i_chapter = p_input->stream.p_selected_area->i_part - 1;
+                        vlc_mutex_unlock( &p_input->stream.stream_lock );
+                    }
+                    
+                    vlc_mutex_lock( &p_input->stream.stream_lock );
+                    if( ( i_chapter > 0 ) && ( i_chapter <
+                                               p_input->stream.p_selected_area->i_part_nb ) )
+                    {
+                        input_area_t *p_area = p_input->stream.p_selected_area;
+                        p_input->stream.p_selected_area->i_part = i_chapter;
+                        vlc_mutex_unlock( &p_input->stream.stream_lock );
+                        input_ChangeArea( p_input, p_area );
+                        input_SetStatus( p_input, INPUT_STATUS_PLAY );
+                        vlc_mutex_lock( &p_input->stream.stream_lock );
+                    }
+                    vlc_mutex_unlock( &p_input->stream.stream_lock );
+		}
+/* end of modification by stephane Thu Jun 19 15:29:49 CEST 2003 */
             }
         }
 
