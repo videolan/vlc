@@ -2,7 +2,7 @@
  * ogt.c : Overlay Graphics Text (SVCD subtitles) decoder thread
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ogt.c,v 1.6 2003/12/28 04:51:52 rocky Exp $
+ * $Id: ogt.c,v 1.7 2004/01/01 13:55:17 rocky Exp $
  *
  * Authors: Rocky Bernstein
  *   based on code from:
@@ -284,7 +284,7 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* FIXME - remove append_data and use chainappend */
-    VCDSubAppendData( p_dec, p_buffer, p_block->i_buffer - 5 );
+    VCDSubAppendData( p_dec, p_buffer, p_block->i_buffer - SPU_HEADER_LEN );
 
     block_ChainAppend( &p_sys->p_block, p_block );
 

@@ -2,7 +2,7 @@
  * cvd.c : CVD Subtitle decoder thread
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cvd.c,v 1.4 2003/12/30 04:43:52 rocky Exp $
+ * $Id: cvd.c,v 1.5 2004/01/01 13:54:24 rocky Exp $
  *
  * Authors: Rocky Bernstein
  *   based on code from:
@@ -252,7 +252,7 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* FIXME - remove append_data and use chainappend */
-    VCDSubAppendData( p_dec, p_buffer, p_block->i_buffer - 1 );
+    VCDSubAppendData( p_dec, p_buffer, p_block->i_buffer - SPU_HEADER_LEN );
 
     block_ChainAppend( &p_sys->p_block, p_block );
 
