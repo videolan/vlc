@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.35 2003/07/27 15:49:27 gbazin Exp $
+ * $Id: input_ext-plugins.c,v 1.36 2003/08/03 20:25:04 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -520,6 +520,10 @@ ssize_t input_FillBuffer( input_thread_t * p_input )
         ReleaseBuffer( p_input->p_method_data, p_input->p_data_buffer );
     }
 
+    p_input->p_data_buffer = p_buf;
+    p_input->p_current_data = (byte_t *)p_buf + sizeof(data_buffer_t);
+    p_input->p_last_data = p_input->p_current_data + i_remains;
+
     /* Do not hold the lock during pf_read (blocking call). */
     vlc_mutex_unlock( &p_input->p_method_data->lock );
 
@@ -535,9 +539,7 @@ ssize_t input_FillBuffer( input_thread_t * p_input )
 
     if( i_ret < 0 ) i_ret = 0;
 
-    p_input->p_data_buffer = p_buf;
-    p_input->p_current_data = (byte_t *)p_buf + sizeof(data_buffer_t);
-    p_input->p_last_data = p_input->p_current_data + i_remains + i_ret;
+    p_input->p_last_data += i_ret;
 
     return (ssize_t)i_remains + i_ret;
 }
