@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.33 2003/05/12 01:17:10 hartman Exp $
+ * $Id: open.m,v 1.34 2003/05/20 18:53:03 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -154,6 +154,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("VIDEO_TS folder")];
     [[o_disc_type cellAtRow:1 column:0] setTitle: _NS("DVD")];
     [[o_disc_type cellAtRow:2 column:0] setTitle: _NS("VCD")];
+    [[o_disc_type cellAtRow:3 column:0] setTitle: _NS("Audio CD")];
 
     [o_net_udp_port_lbl setStringValue: _NS("Port")];
     [o_net_udpm_addr_lbl setStringValue: _NS("Address")];
@@ -385,6 +386,13 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
             b_menus = 0; b_title_chapter = 1;
             [o_disc_dvd_menus setState: FALSE];
         }
+        else if ( [o_type isEqualToString: _NS("Audio CD")])
+        {
+            psz_class = kIOCDMediaClass;
+            o_disc = o_type;
+            b_menus = 0; b_title_chapter = 0;
+            [o_disc_dvd_menus setState: FALSE];
+        }
         else
         {
             psz_class = kIODVDMediaClass;
@@ -468,6 +476,14 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
             o_device = @"";
         o_mrl_string = [NSString stringWithFormat: @"vcd://%@@%i,%i",
                         o_device, i_title, i_chapter]; 
+    }
+    else if ( [o_type isEqualToString: _NS("Audio CD")] )
+    {
+        if ( [o_device isEqualToString:
+                [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
+            o_device = @"";
+        o_mrl_string = [NSString stringWithFormat: @"cdda://%@",
+                        o_device]; 
     }
     else if ( [o_type isEqualToString: _NS("DVD")] )
     {

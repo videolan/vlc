@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.39 2003/05/15 01:23:05 hartman Exp $
+ * $Id: intf.h,v 1.40 2003/05/20 18:53:03 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -210,6 +210,7 @@ struct intf_sys_t
     
     IBOutlet id o_mu_help;
     IBOutlet id o_mi_readme;
+    IBOutlet id o_mi_documentation;
     IBOutlet id o_mi_reportabug;
     IBOutlet id o_mi_website;
     IBOutlet id o_mi_license;
@@ -251,6 +252,7 @@ struct intf_sys_t
 - (IBAction)closeError:(id)sender;
 
 - (IBAction)openReadMe:(id)sender;
+- (IBAction)openDocumentation:(id)sender;
 - (IBAction)reportABug:(id)sender;
 - (IBAction)openWebsite:(id)sender;
 - (IBAction)openLicense:(id)sender;

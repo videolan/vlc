@@ -53,6 +53,7 @@
                 clearRecentItems = id; 
                 closeError = id; 
                 openCrashLog = id; 
+                openDocumentation = id; 
                 openLicense = id; 
                 openReadMe = id; 
                 openRecentItem = id; 
@@ -99,6 +100,7 @@
                 "o_mi_cut" = id; 
                 "o_mi_deinterlace" = id; 
                 "o_mi_device" = id; 
+                "o_mi_documentation" = id; 
                 "o_mi_double_window" = id; 
                 "o_mi_faster" = id; 
                 "o_mi_fittoscreen" = id; 

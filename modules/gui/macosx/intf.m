@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.84 2003/05/20 15:23:25 hartman Exp $
+ * $Id: intf.m,v 1.85 2003/05/20 18:53:03 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -390,6 +390,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
     [o_mu_help setTitle: _NS("Help")];
     [o_mi_readme setTitle: _NS("ReadMe...")];
+    [o_mi_documentation setTitle: _NS("Online Documentation")];
     [o_mi_reportabug setTitle: _NS("Report a Bug")];
     [o_mi_website setTitle: _NS("VideoLAN Website")];
     [o_mi_license setTitle: _NS("License")];
@@ -1203,6 +1204,14 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
     [[NSWorkspace sharedWorkspace] openFile: o_path 
                                    withApplication: @"TextEdit"];
+}
+
+- (IBAction)openDocumentation:(id)sender
+{
+    NSURL * o_url = [NSURL URLWithString: 
+        @"http://www.videolan.org/doc/"];
+
+    [[NSWorkspace sharedWorkspace] openURL: o_url];
 }
 
 - (IBAction)reportABug:(id)sender

@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.22 2003/05/20 15:23:25 hartman Exp $
+ * $Id: prefs.m,v 1.23 2003/05/20 18:53:03 hartman Exp $
  *
  * Authors:	Jon Lech Johansen <jon-vl@nanocrew.net>
  *		Derk-Jan Hartman <thedj at users.sf.net>
@@ -120,7 +120,6 @@
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)o_notification
 {
-    NSLog( [[o_tree itemAtRow:[o_tree selectedRow]] getName] );
     [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID] andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]];
 }
 
@@ -129,11 +128,8 @@
     id o_vlc_config = [o_unknown isKindOfClass: [NSNotification class]] ?
                       [o_unknown object] : o_unknown;
 
-    NSString *o_module_name = [o_vlc_config moduleName];
-
     int i_type = [o_vlc_config configType];
     NSString *o_name = [o_vlc_config configName];
-    NSLog( o_name);
     char *psz_name = (char *)[o_name UTF8String];
 
     switch( i_type )
@@ -145,7 +141,6 @@
             NSString *o_value;
 
             o_value = [o_vlc_config titleOfSelectedItem];
-            NSLog( o_value);
             psz_value = (char *)[o_value UTF8String];
 
             config_PutPsz( p_intf, psz_name, psz_value );
@@ -160,7 +155,6 @@
             NSString *o_value;
 
             o_value = [o_vlc_config stringValue];
-            NSLog( o_value);
             psz_value = (char *)[o_value UTF8String];
 
             config_PutPsz( p_intf, psz_name, psz_value );
