@@ -9,13 +9,6 @@
 # Configuration
 ################################################################################
 
-# Environment
-CC=gcc
-#CC=gcc295
-SHELL=/bin/sh
-INSTALL=install
-PREFIX=/usr
-
 # Audio output settings
 AUDIO = dsp
 #AUDIO += esd
@@ -25,15 +18,26 @@ AUDIO = dsp
 AUDIO += dummy
 
 # Video output settings
-VIDEO = x11
-#VIDEO += fb
-#VIDEO += ggi
-#VIDEO += glide
+VOUT = x11
+#VOUT += fb
+#VOUT += ggi
+#VOUT += glide
 # Not yet supported
-#VIDEO = beos
-#VIDEO += dga
+#VOUT = beos
+#VOUT += dga
 # Fallback method that should always work
-VIDEO += dummy
+VOUT += dummy
+
+# Interface settings
+INTF = x11
+#INTF += fb
+#INTF += ggi
+#INTF += glide
+# Not yet supported
+#INTF = beos
+#INTF += dga
+# Fallback method that should always work
+INTF += dummy
 
 # Target architecture
 ARCH=X86
@@ -304,15 +308,17 @@ endif
 #
 # Plugins
 #
-interface_plugin =	$(VIDEO:%=interface/intf_%.so)
-audio_plugin =		$(AUDIO:%=audio_output/aout_%.so)
-video_plugin = 		$(VIDEO:%=video_output/vout_%.so)
+intf_plugin =           $(INTF:%=plugins/intf/intf_%.so)
+aout_plugin =           $(AOUT:%=plugins/aout/aout_%.so)
+vout_plugin =           $(VOUT:%=plugins/vout/vout_%.so)
 
-PLUGIN_OBJ = $(interface_plugin) $(audio_plugin) $(video_plugin)
+PLUGIN_OBJ = $(intf_plugin) $(aout_plugin) $(vout_plugin)
 
 #
 # Other lists of files
 #
+C_OBJ := $(C_OBJ:%.o=src/%.o)
+ASM_OBJ := $(ASM_OBJ:%.o=src/%.o)
 sources := $(C_OBJ:%.o=%.c) $(PLUGIN_OBJ:%.so=%.c)
 dependancies := $(sources:%.c=.dep/%.d)
 
@@ -377,11 +383,11 @@ $(PLUGIN_OBJ): %.so: Makefile.dep
 $(PLUGIN_OBJ): %.so: .dep/%.d
 
 # audio plugins
-audio_output/aout_dummy.so audio_output/aout_dsp.so: %.so: %.c
+plugins/aout/aout_dummy.so plugins/aout/aout_dsp.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
 
-audio_output/aout_esd.so: %.so: %.c
+plugins/aout/aout_esd.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 ifeq ($(SYS), BSD)
 		@$(CC) $(CCFLAGS) $(CFLAGS) -lesd -shared -o $@ $<
@@ -390,20 +396,20 @@ else
 endif
 
 # video plugins
-interface/intf_dummy.so video_output/vout_dummy.so \
-	interface/intf_fb.so video_output/vout_fb.so: %.so: %.c
+plugins/intf/intf_dummy.so plugins/vout/vout_dummy.so \
+	plugins/intf/intf_fb.so plugins/vout/vout_fb.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
 
-interface/intf_x11.so video_output/vout_x11.so: %.so: %.c
+plugins/intf/intf_x11.so plugins/vout/vout_x11.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
 
-interface/intf_glide.so video_output/vout_glide.so: %.so: %.c
+plugins/intf/intf_glide.so plugins/vout/vout_glide.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/include/glide -lglide2x -shared -o $@ $<
 
-interface/intf_ggi.so video_output/vout_ggi.so: %.so: %.c
+plugins/intf/intf_ggi.so plugins/vout/vout_ggi.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -lggi -shared -o $@ $<
 
