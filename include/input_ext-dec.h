@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.35 2001/09/24 11:17:49 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.36 2001/10/03 12:46:17 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -203,7 +203,7 @@ typedef struct bit_stream_s
 /*****************************************************************************
  * Protoypes from input_ext-dec.c
  *****************************************************************************/
-void UnalignedShowBits( struct bit_stream_s *, unsigned int );
+u32  UnalignedShowBits( struct bit_stream_s *, unsigned int );
 void UnalignedRemoveBits( struct bit_stream_s * );
 u32  UnalignedGetBits( struct bit_stream_s *, unsigned int );
 
@@ -254,19 +254,7 @@ static __inline__ u32 ShowBits( bit_stream_t * p_bit_stream,
                     >> (8 * sizeof(WORD_TYPE) - i_bits) );
     }
 
-    UnalignedShowBits( p_bit_stream, i_bits );
-
-    /* Now that we have filled in the buffers, do it again. Can't call
-     * ShowBits() instead, because the function is inline... */
-    if( p_bit_stream->fifo.i_available >= i_bits )
-    {
-        return( p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - i_bits) );
-    }
-
-    return( (p_bit_stream->fifo.buffer |
-                (WORD_AT( p_bit_stream->p_byte )
-                    >> p_bit_stream->fifo.i_available))
-                >> (8 * sizeof(WORD_TYPE) - i_bits) );
+    return( UnalignedShowBits( p_bit_stream, i_bits ) );
 }
 
 /*****************************************************************************
@@ -505,38 +493,6 @@ static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
     {
         AlignWord( p_bit_stream );
     }
-}
-
-
-/*
- * The following functions are now deprecated.
- */
-
-static __inline__ byte_t _GetByte( bit_stream_t * p_bit_stream )
-{
-    if ( p_bit_stream->p_byte >= p_bit_stream->p_end )
-    {
-        p_bit_stream->pf_next_data_packet( p_bit_stream );
-    }
-
-    return( *(p_bit_stream->p_byte++) );
-}
-
-static __inline__ void NeedBits( bit_stream_t * p_bit_stream, int i_bits )
-{
-    while ( p_bit_stream->fifo.i_available < i_bits )
-    {
-        p_bit_stream->fifo.buffer |= ((WORD_TYPE)_GetByte( p_bit_stream ))
-                                     << (8 * sizeof(WORD_TYPE) - 8
-                                            - p_bit_stream->fifo.i_available);
-        p_bit_stream->fifo.i_available += 8;
-    }
-}
-
-static __inline__ void DumpBits( bit_stream_t * p_bit_stream, int i_bits )
-{
-    p_bit_stream->fifo.buffer <<= i_bits;
-    p_bit_stream->fifo.i_available -= i_bits;
 }
 
 

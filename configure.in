@@ -990,6 +990,18 @@ AC_ARG_ENABLE(alsa,
 dnl  end of non-BeOS stuff
 fi
 
+dnl
+dnl  Plug-ins - this must be AT THE END
+dnl
+AC_ARG_ENABLE(plugins,
+  [  --disable-plugins       Make all plug-ins built-in (default plug-ins enabled)],
+  [if test x$enable_plugins = xno
+   then
+     BUILTINS="${BUILTINS} ${PLUGINS}"
+     PLUGINS=
+   fi])
+
+
 dnl 
 dnl  Configuration is finished
 dnl
@@ -1074,7 +1086,7 @@ trace mode            : ${TRACE}
 cprof/gprof support   : ${CPROF}/${GPROF}
 need builtin getopt   : ${NEED_GETOPT}
 built-in modules      :${BUILTINS}
-plugin modules        :${PLUGINS}
+plug-in modules       :${PLUGINS}
 vlc aliases           :${ALIASES}"
 fi
 

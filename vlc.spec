@@ -108,7 +108,7 @@ install vlc-ncurses
 	   --enable-esd --disable-alsa \
 	   --enable-fb \
 	   --enable-xvideo \
-	   --with-sdl 
+	   --enable-sdl 
 export QTDIR=%{_libdir}/qt2 
 %make
 

@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-dec.c,v 1.19 2001/09/24 11:17:49 massiot Exp $
+ * $Id: input_ext-dec.c,v 1.20 2001/10/03 12:46:17 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -153,7 +153,7 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
  * UnalignedShowBits : places i_bits bits into the bit buffer, even when
  * not aligned on a word boundary
  *****************************************************************************/
-void UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
+u32 UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
 {
     /* We just fill in the bit buffer. */
     while( p_bit_stream->fifo.i_available < i_bits )
@@ -221,6 +221,9 @@ void UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
             break;
         }
     }
+
+    /* It shouldn't loop :-)) */
+    return( ShowBits( p_bit_stream, i_bits ) );
 }
 
 /*****************************************************************************
