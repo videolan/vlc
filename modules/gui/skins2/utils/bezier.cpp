@@ -2,7 +2,7 @@
  * bezier.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: bezier.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: bezier.cpp,v 1.3 2004/02/01 21:13:04 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -50,75 +50,69 @@ Bezier::Bezier( intf_thread_t *p_intf, const vector<float> &rAbscissas,
     m_topVect.reserve( MAX_BEZIER_POINT + 1 );
 
     // Calculate the first point
-    getPoint( 0, oldx, oldy );
+    computePoint( 0, oldx, oldy );
     m_leftVect[0] = oldx;
     m_topVect[0]  = oldy;
 
-    // Compute the number of different points
+    // Calculate the other points
     float percentage;
     for( float j = 1; j <= MAX_BEZIER_POINT; j++ )
     {
         percentage = j / MAX_BEZIER_POINT;
-        getPoint( percentage, cx, cy );
+        computePoint( percentage, cx, cy );
         if( ( flag == kCoordsBoth && ( cx != oldx || cy != oldy ) ) ||
             ( flag == kCoordsX && cx != oldx ) ||
             ( flag == kCoordsY && cy != oldy ) )
         {
+            m_percVect.push_back( percentage );
             m_leftVect.push_back( cx );
             m_topVect.push_back( cy );
             oldx = cx;
             oldy = cy;
         }
     }
-    m_nbPoints = m_leftVect.size();
+    m_nbPoints = m_percVect.size();
+
+    // Small hack to ensure that the percentage of the last point is always 1
+    m_percVect[m_nbPoints - 1] = 1;
 }
 
 
 float Bezier::getNearestPercent( int x, int y ) const
 {
     int nearest = findNearestPoint( x, y );
-    return (float)nearest / (float)(m_nbPoints - 1);
+    return m_percVect[nearest];
 }
 
 
 float Bezier::getMinDist( int x, int y ) const
 {
-    // XXX: duplicate code with findNearestPoint
-    int minDist = (m_leftVect[0] - x) * (m_leftVect[0] - x) +
-                  (m_topVect[0] - y) * (m_topVect[0] - y);
-
-    int dist;
-    for( int i = 1; i < m_nbPoints; i++ )
-    {
-        dist = (m_leftVect[i] - x) * (m_leftVect[i] - x) +
-               (m_topVect[i] - y) * (m_topVect[i] - y);
-        if( dist < minDist )
-        {
-            minDist = dist;
-        }
-    }
-    return sqrt( minDist );
+    int nearest = findNearestPoint( x, y );
+    return sqrt( (m_leftVect[nearest] - x) * (m_leftVect[nearest] - x) +
+                 (m_topVect[nearest] - y) * (m_topVect[nearest] - y) );
 }
 
 
 void Bezier::getPoint( float t, int &x, int &y ) const
 {
-    // See http://astronomy.swin.edu.au/~pbourke/curves/bezier/ for a simple
-    // explanation of the algorithm
-    float xPos = 0;
-    float yPos = 0;
-    float coeff;
-    for( int i = 0; i < m_nbCtrlPt; i++ )
+    // Find the precalculated point whose percentage is nearest from t
+    int refPoint = 0;
+    float minDiff = fabs( m_percVect[0] - t );
+
+    // The percentages are stored in increasing order, so we can stop the loop
+    // as soon as 'diff' starts increasing
+    float diff;
+    while( refPoint < m_nbPoints &&
+           (diff = fabs( m_percVect[refPoint] - t )) <= minDiff )
     {
-        coeff = computeCoeff( i, m_nbCtrlPt - 1, t );
-        xPos += m_ptx[i] * coeff;
-        yPos += m_pty[i] * coeff;
+        refPoint++;
+        minDiff = diff;
     }
 
-    // float cast to avoid strange truncatures
-    // XXX: not very nice...
-    x = (int)(float)xPos;
-    y = (int)(float)yPos;
+    // The searched point is then (refPoint - 1)
+    // We know that refPoint > 0 because we looped at least once
+    x = m_leftVect[refPoint - 1];
+    y = m_topVect[refPoint - 1];
 }
 
 
@@ -152,7 +146,6 @@ int Bezier::getHeight() const
 
 int Bezier::findNearestPoint( int x, int y ) const
 {
-    // XXX: duplicate code with getMinDist
     // The distance to the first point is taken as the reference
     int refPoint = 0;
     int minDist = (m_leftVect[0] - x) * (m_leftVect[0] - x) +
@@ -171,6 +164,27 @@ int Bezier::findNearestPoint( int x, int y ) const
     }
 
     return refPoint;
+}
+
+
+void Bezier::computePoint( float t, int &x, int &y ) const
+{
+    // See http://astronomy.swin.edu.au/~pbourke/curves/bezier/ for a simple
+    // explanation of the algorithm
+    float xPos = 0;
+    float yPos = 0;
+    float coeff;
+    for( int i = 0; i < m_nbCtrlPt; i++ )
+    {
+        coeff = computeCoeff( i, m_nbCtrlPt - 1, t );
+        xPos += m_ptx[i] * coeff;
+        yPos += m_pty[i] * coeff;
+    }
+
+    // Float cast to avoid strange truncatures
+    // XXX: not very nice...
+    x = (int)(float)xPos;
+    y = (int)(float)yPos;
 }
 
 

@@ -2,7 +2,7 @@
  * bezier.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: bezier.hpp,v 1.3 2004/02/01 16:15:40 asmax Exp $
+ * $Id: bezier.hpp,v 1.4 2004/02/01 21:13:04 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -53,13 +53,12 @@ class Bezier: public SkinObject
 
         /// Return the percentage (between 0 and 1) of the curve point nearest
         /// from (x, y)
-
         float getNearestPercent( int x, int y ) const;
 
         /// Return the distance of (x, y) to the curve
         float getMinDist( int x, int y ) const;
 
-        /// Get the coordinates of the point at t precent of
+        /// Get the coordinates of the point at t percent of
         /// the curve (t must be between 0 and 1)
         void getPoint( float t, int &x, int &y ) const;
 
@@ -83,9 +82,14 @@ class Bezier: public SkinObject
         /// Vectors with the coordinates of the different points of the curve
         vector<int> m_leftVect;
         vector<int> m_topVect;
+        /// Vector with the percentages associated with the points of the curve
+        vector<float> m_percVect;
 
         /// Return the index of the curve point that is the nearest from (x, y)
         int findNearestPoint( int x, int y ) const;
+        /// Compute the coordinates of a point corresponding to a given
+        /// percentage
+        void computePoint( float t, int &x, int &y ) const;
         /// Helper function to compute a coefficient of the curve
         inline float computeCoeff( int i, int n, float t ) const;
         /// x^n
