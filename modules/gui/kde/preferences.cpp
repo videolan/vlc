@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.5 2002/10/03 10:15:01 sigmunau Exp $
+ * $Id: preferences.cpp,v 1.6 2002/10/10 19:34:06 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -166,7 +166,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                 connect(kl, SIGNAL(textChanged ( const QString & )),
                         ci, SLOT(setValue( const QString &)));
                 QToolTip::add(kl, p_item->psz_longtext);
-                kl->setMaxLength(10);
+                kl->setMaxLength(40);
                 
                 vlc_mutex_unlock( p_item->p_lock );
                 

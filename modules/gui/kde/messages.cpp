@@ -61,7 +61,9 @@ void KMessagesWindow::update()
              i_start != i_stop;
              i_start = (i_start+1) % VLC_MSG_QSIZE )
         {
-            text->setText( text->text() + QString(p_msg->p_msg[i_start].psz_module) + ppsz_type[p_msg->p_msg[i_start].i_type] + p_msg->p_msg[i_start].psz_msg + "<br>");
+            text->append( QString(p_msg->p_msg[i_start].psz_module) +
+                          ppsz_type[p_msg->p_msg[i_start].i_type] +
+                          p_msg->p_msg[i_start].psz_msg + "<br>");
             
 //             /* Append all messages to log window */
 //             gtk_text_insert( p_intf->p_sys->p_messages_text, NULL, &gray,
