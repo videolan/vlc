@@ -15,12 +15,14 @@ GENERATEDFILES = MediaControl-common.c MediaControl-skels.c MediaControl.h
 
 endif
 
+CORBAIDLFILE = MediaControl.idl
+
 EXTRA_DIST += $(CORBAIDLFILE)
+EXTRA_DIST += mediacontrol-core.h
 BUILT_SOURCES += $(GENERATEDFILES)
 
 if ENABLE_CORBA
 
-CORBAIDLFILE = MediaControl.idl
 
 corbaidldir = $(datadir)/idl
 corbaidl_DATA = $(CORBAIDLFILE)
