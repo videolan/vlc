@@ -77,7 +77,6 @@ src/input/input_clock.c
 src/input/input_dec.c
 src/input/input_ext-intf.c
 src/input/input_ext-plugins.c
-src/input/input_info.c
 src/input/input_programs.c
 src/input/stream.c
 src/input/subtitles.c
@@ -332,7 +331,6 @@ modules/demux/mp4/drmstables.h
 modules/demux/mp4/libmp4.c
 modules/demux/mp4/libmp4.h
 modules/demux/mp4/mp4.c
-modules/demux/mp4/mp4.h
 modules/demux/mpeg/m4v.c
 modules/demux/mpeg/mpga.c
 modules/demux/mpeg/mpgv.c
@@ -352,6 +350,7 @@ modules/demux/ps.h
 modules/demux/pva.c
 modules/demux/rawdv.c
 modules/demux/real.c
+modules/demux/sgimb.c
 modules/demux/ts.c
 modules/demux/util/id3.c
 modules/demux/util/id3genres.h
@@ -584,8 +583,6 @@ modules/gui/skins2/commands/cmd_input.cpp
 modules/gui/skins2/commands/cmd_input.hpp
 modules/gui/skins2/commands/cmd_layout.cpp
 modules/gui/skins2/commands/cmd_layout.hpp
-modules/gui/skins2/commands/cmd_notify_playlist.cpp
-modules/gui/skins2/commands/cmd_notify_playlist.hpp
 modules/gui/skins2/commands/cmd_on_top.cpp
 modules/gui/skins2/commands/cmd_on_top.hpp
 modules/gui/skins2/commands/cmd_playlist.cpp
@@ -595,6 +592,8 @@ modules/gui/skins2/commands/cmd_quit.hpp
 modules/gui/skins2/commands/cmd_resize.cpp
 modules/gui/skins2/commands/cmd_resize.hpp
 modules/gui/skins2/commands/cmd_show_window.hpp
+modules/gui/skins2/commands/cmd_vars.cpp
+modules/gui/skins2/commands/cmd_vars.hpp
 modules/gui/skins2/controls/ctrl_button.cpp
 modules/gui/skins2/controls/ctrl_button.hpp
 modules/gui/skins2/controls/ctrl_checkbox.cpp
@@ -764,8 +763,8 @@ modules/gui/wxwindows/streamout.cpp
 modules/gui/wxwindows/streamwizard.cpp
 modules/gui/wxwindows/subtitles.cpp
 modules/gui/wxwindows/timer.cpp
-modules/gui/wxwindows/v4l.cpp
 modules/gui/wxwindows/video.cpp
+modules/gui/wxwindows/wizard.cpp
 modules/gui/wxwindows/wxwindows.cpp
 modules/gui/wxwindows/wxwindows.h
 modules/misc/dummy/aout.c
@@ -787,7 +786,6 @@ modules/misc/network/ipv4.c
 modules/misc/network/ipv6.c
 modules/misc/playlist/export.c
 modules/misc/playlist/m3u.c
-modules/misc/playlist/native.c
 modules/misc/playlist/old.c
 modules/misc/qte_main.cpp
 modules/misc/sap.c
