@@ -391,6 +391,12 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 }
                 else if( p_input->bookmark[i_bkmk]->i_byte_offset )
                 {
+                    // don't crash on bookmarks in live streams
+                    if( stream_Size( p_input->input.p_stream ) == 0 )
+                    {
+                        vlc_mutex_unlock( &p_input->input.p_item->lock );
+                        return VLC_EGENERIC;
+                    }
                     pos.f_float = !p_input->input.p_stream ? 0 :
                         p_input->bookmark[i_bkmk]->i_byte_offset /
                         stream_Size( p_input->input.p_stream );
