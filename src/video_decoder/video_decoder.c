@@ -156,16 +156,6 @@ int vdec_InitThread( vdec_thread_t *p_vdec )
 
     intf_DbgMsg("vdec debug: initializing video decoder thread %p\n", p_vdec);
 
-    /* Initialize other properties */
-#ifdef STATS
-    p_vdec->c_loops = 0;
-    p_vdec->c_idle_loops = 0;
-    p_vdec->c_decoded_pictures = 0;
-    p_vdec->c_decoded_i_pictures = 0;
-    p_vdec->c_decoded_p_pictures = 0;
-    p_vdec->c_decoded_b_pictures = 0;
-#endif
-
 #ifndef HAVE_MMX
     /* Init crop table */
     p_vdec->pi_crop = p_vdec->pi_crop_buf + (VDEC_CROPRANGE >> 1);

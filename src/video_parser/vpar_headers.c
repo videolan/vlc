@@ -268,7 +268,9 @@ int vpar_NextSequenceHeader( vpar_thread_t * p_vpar )
     {
         NextStartCode( p_vpar );
         if( ShowBits( &p_vpar->bit_stream, 32 ) == SEQUENCE_HEADER_CODE )
+        {
             return 0;
+        }
         RemoveBits( &p_vpar->bit_stream, 8 );
     }
     return 1;
@@ -285,6 +287,9 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
         switch( GetBits32( &p_vpar->bit_stream ) )
         {
         case SEQUENCE_HEADER_CODE:
+#ifdef STATS
+            p_vpar->c_sequences++;
+#endif
             SequenceHeader( p_vpar );
             return 0;
             break;
@@ -565,6 +570,10 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         p_vpar->picture.b_progressive_frame = 1;
     }
 
+#ifdef STATS
+        p_vpar->pc_pictures[p_vpar->picture.i_coding_type]++;
+#endif
+
     if( p_vpar->picture.i_current_structure &&
         (i_structure == FRAME_STRUCTURE ||
          i_structure == p_vpar->picture.i_current_structure) )
@@ -646,6 +655,10 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     }
 
     /* OK, now we are sure we will decode the picture. */
+#ifdef STATS
+    p_vpar->pc_decoded_pictures[p_vpar->picture.i_coding_type]++;
+#endif
+
 #define P_picture p_vpar->picture.p_picture
     p_vpar->picture.b_error = 0;
     p_vpar->picture.b_frame_structure = (i_structure == FRAME_STRUCTURE);
@@ -739,8 +752,13 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         }
 #endif
 
+#ifdef STATS
+        p_vpar->pc_malformed_pictures[p_vpar->picture.i_coding_type]++;
+#endif
+
         if( P_picture->i_deccount != 1 )
         {
+            vpar_SynchroEnd( p_vpar, 1 );
             vout_DestroyPicture( p_vpar->p_vout, P_picture );
         }
 

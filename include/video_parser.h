@@ -137,16 +137,12 @@ typedef struct vpar_thread_s
 #ifdef STATS
     /* Statistics */
     count_t         c_loops;                              /* number of loops */
-    count_t         c_idle_loops;                    /* number of idle loops */
     count_t         c_sequences;                      /* number of sequences */
-    count_t         c_pictures;                   /* number of pictures read */
-    count_t         c_i_pictures;               /* number of I pictures read */
-    count_t         c_p_pictures;               /* number of P pictures read */
-    count_t         c_b_pictures;               /* number of B pictures read */
-    count_t         c_decoded_pictures;        /* number of pictures decoded */
-    count_t         c_decoded_i_pictures;    /* number of I pictures decoded */
-    count_t         c_decoded_p_pictures;    /* number of P pictures decoded */
-    count_t         c_decoded_b_pictures;    /* number of B pictures decoded */
+    count_t         pc_pictures[4]; /* number of (coding_type) pictures read */
+    count_t         pc_decoded_pictures[4];       /* number of (coding_type)
+                                                   *        pictures decoded */
+    count_t         pc_malformed_pictures[4];  /* number of pictures trashed
+                                                * during parsing             */
 #endif
 } vpar_thread_t;
 

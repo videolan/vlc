@@ -228,15 +228,11 @@ static int InitThread( vpar_thread_t *p_vpar )
     /* Initialize other properties */
 #ifdef STATS
     p_vpar->c_loops = 0;
-    p_vpar->c_idle_loops = 0;
-    p_vpar->c_pictures = 0;
-    p_vpar->c_i_pictures = 0;
-    p_vpar->c_p_pictures = 0;
-    p_vpar->c_b_pictures = 0;
-    p_vpar->c_decoded_pictures = 0;
-    p_vpar->c_decoded_i_pictures = 0;
-    p_vpar->c_decoded_p_pictures = 0;
-    p_vpar->c_decoded_b_pictures = 0;
+    p_vpar->c_sequences = 0;
+    memset(p_vpar->pc_pictures, 0, sizeof(p_vpar->pc_pictures));
+    memset(p_vpar->pc_decoded_pictures, 0, sizeof(p_vpar->pc_decoded_pictures));
+    memset(p_vpar->pc_malformed_pictures, 0,
+           sizeof(p_vpar->pc_malformed_pictures));
 #endif
 
     /* Initialize video FIFO */
@@ -319,12 +315,11 @@ static void RunThread( vpar_thread_t *p_vpar )
         /* Find the next sequence header in the stream */
         p_vpar->b_error = vpar_NextSequenceHeader( p_vpar );
 
-#ifdef STATS
-        p_vpar->c_sequences++;
-#endif
-
         while( (!p_vpar->b_die) && (!p_vpar->b_error) )
         {
+#ifdef STATS
+            p_vpar->c_loops++;
+#endif
             /* Parse the next sequence, group or picture header */
             if( vpar_ParseHeader( p_vpar ) )
             {
@@ -397,6 +392,32 @@ static void EndThread( vpar_thread_t *p_vpar )
 #ifdef DEBUG
     /* Check for remaining PES packets */
     /* XXX?? */
+#endif
+
+#ifdef STATS
+    intf_Msg("vpar stats: %d loops among %d sequence(s)\n",
+             p_vpar->c_loops, p_vpar->c_sequences);
+    intf_Msg("vpar stats: Read %d frames/fields (I %d/P %d/B %d)\n",
+             p_vpar->pc_pictures[I_CODING_TYPE]
+             + p_vpar->pc_pictures[P_CODING_TYPE]
+             + p_vpar->pc_pictures[B_CODING_TYPE],
+             p_vpar->pc_pictures[I_CODING_TYPE],
+             p_vpar->pc_pictures[P_CODING_TYPE],
+             p_vpar->pc_pictures[B_CODING_TYPE]);
+    intf_Msg("vpar stats: Decoded %d frames/fields (I %d/P %d/B %d)\n",
+             p_vpar->pc_decoded_pictures[I_CODING_TYPE]
+             + p_vpar->pc_decoded_pictures[P_CODING_TYPE]
+             + p_vpar->pc_decoded_pictures[B_CODING_TYPE],
+             p_vpar->pc_decoded_pictures[I_CODING_TYPE],
+             p_vpar->pc_decoded_pictures[P_CODING_TYPE],
+             p_vpar->pc_decoded_pictures[B_CODING_TYPE]);
+    intf_Msg("vpar stats: Read %d malformed frames/fields (I %d/P %d/B %d)\n",
+             p_vpar->pc_malformed_pictures[I_CODING_TYPE]
+             + p_vpar->pc_malformed_pictures[P_CODING_TYPE]
+             + p_vpar->pc_malformed_pictures[B_CODING_TYPE],
+             p_vpar->pc_malformed_pictures[I_CODING_TYPE],
+             p_vpar->pc_malformed_pictures[P_CODING_TYPE],
+             p_vpar->pc_malformed_pictures[B_CODING_TYPE]);
 #endif
 
     /* Destroy thread structures allocated by InitThread */

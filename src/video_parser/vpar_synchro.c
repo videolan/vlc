@@ -131,7 +131,7 @@ static int  SynchroType( void );
 static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type );
 
 /* Error margins */
-#define DELTA                   (int)(0.060*CLOCK_FREQ)
+#define DELTA                   (int)(0.040*CLOCK_FREQ)
 
 #define DEFAULT_NB_P            5
 #define DEFAULT_NB_B            1
@@ -299,22 +299,11 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                 b_decode = (pts - now) > (TAU_PRIME(B_CODING_TYPE) + DELTA);
 
                 /* Remember that S.i_eta_b is for the moment only eta_b - 1. */
-                if( S.i_eta_p != S.i_n_p ) /* next P */
-                {
-                    b_decode &= (pts - now
-                                 + period
-                                 * ( 2 * S.i_n_b - S.i_eta_b - 1))
-                                   > (TAU_PRIME(B_CODING_TYPE)
-                                       + TAU_PRIME(P_CODING_TYPE) + DELTA);
-                }
-                else /* next I */
-                {
-                    b_decode &= (pts - now
-                                 + period
-                                 * ( 2 * S.i_n_b - S.i_eta_b - 1))
-                                   > (TAU_PRIME(B_CODING_TYPE)
-                                       + TAU_PRIME(I_CODING_TYPE) + DELTA);
-                }
+                b_decode &= (pts - now
+                             + period
+                             * ( 2 * S.i_n_b - S.i_eta_b + 2))
+                               > (TAU_PRIME(B_CODING_TYPE)
+                                   + TAU_PRIME(P_CODING_TYPE) + DELTA);
             }
             else
             {
@@ -370,24 +359,27 @@ void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
 /*****************************************************************************
  * vpar_SynchroEnd : Called when the image is totally decoded
  *****************************************************************************/
-void vpar_SynchroEnd( vpar_thread_t * p_vpar )
+void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_garbage )
 {
     mtime_t     tau;
     int         i_coding_type;
 
     vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
 
-    tau = mdate() - p_vpar->synchro.p_date_fifo[p_vpar->synchro.i_start];
-    i_coding_type = p_vpar->synchro.pi_coding_types[p_vpar->synchro.i_start];
-
-    /* Mean with average tau, to ensure stability. */
-    p_vpar->synchro.p_tau[i_coding_type] =
-        (p_vpar->synchro.pi_meaningful[i_coding_type]
-          * p_vpar->synchro.p_tau[i_coding_type] + tau)
-        / (p_vpar->synchro.pi_meaningful[i_coding_type] + 1);
-    if( p_vpar->synchro.pi_meaningful[i_coding_type] < MAX_PIC_AVERAGE )
+    if (!i_garbage)
     {
-        p_vpar->synchro.pi_meaningful[i_coding_type]++;
+        tau = mdate() - p_vpar->synchro.p_date_fifo[p_vpar->synchro.i_start];
+        i_coding_type = p_vpar->synchro.pi_coding_types[p_vpar->synchro.i_start];
+
+        /* Mean with average tau, to ensure stability. */
+        p_vpar->synchro.p_tau[i_coding_type] =
+            (p_vpar->synchro.pi_meaningful[i_coding_type]
+             * p_vpar->synchro.p_tau[i_coding_type] + tau)
+            / (p_vpar->synchro.pi_meaningful[i_coding_type] + 1);
+        if( p_vpar->synchro.pi_meaningful[i_coding_type] < MAX_PIC_AVERAGE )
+        {
+            p_vpar->synchro.pi_meaningful[i_coding_type]++;
+        }
     }
 
     FIFO_INCREMENT( i_start );
@@ -472,7 +464,9 @@ static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
     case I_CODING_TYPE:
         p_vpar->synchro.i_eta_p = p_vpar->synchro.i_eta_b = 0;
 #ifdef STATS
-        intf_Msg( "vpar synchro stats: I(%lld) P(%lld)[%d] B(%lld)[%d] YUV(%lld) : %d/%d\n",
+        if( p_vpar->synchro.i_type == VPAR_SYNCHRO_DEFAULT )
+        {
+            intf_Msg( "vpar synchro stats: I(%lld) P(%lld)[%d] B(%lld)[%d] YUV(%lld) : %d/%d\n",
                   p_vpar->synchro.p_tau[I_CODING_TYPE],
                   p_vpar->synchro.p_tau[P_CODING_TYPE],
                   p_vpar->synchro.i_n_p,
@@ -482,7 +476,8 @@ static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
                   1 + p_vpar->synchro.i_n_p * (1 + p_vpar->synchro.i_n_b) -
                   p_vpar->synchro.i_trashed_pic,
                   1 + p_vpar->synchro.i_n_p * (1 + p_vpar->synchro.i_n_b) );
-        p_vpar->synchro.i_trashed_pic = 0;
+            p_vpar->synchro.i_trashed_pic = 0;
+        }
 #endif
         break;
     case P_CODING_TYPE:

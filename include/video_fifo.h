@@ -155,7 +155,7 @@ static __inline__ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo,
         vout_DisplayPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
 
         /* Warn Synchro for its records. */
-        vpar_SynchroEnd( p_fifo->p_vpar );
+        vpar_SynchroEnd( p_fifo->p_vpar, 0 );
 
         /* Unlink referenced pictures */
         if( p_mb->p_forward != NULL )
@@ -183,7 +183,7 @@ static __inline__ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo,
         vout_DisplayPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
 
         /* Warn Synchro for its records. */
-        vpar_SynchroEnd( p_fifo->p_vpar );
+        vpar_SynchroEnd( p_fifo->p_vpar, 0 );
     }
 #endif
 }
@@ -211,7 +211,7 @@ static __inline__ void vpar_DestroyMacroblock( video_fifo_t * p_fifo,
         vout_DestroyPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
 
         /* Warn Synchro for its records. */
-        vpar_SynchroEnd( p_fifo->p_vpar );
+        vpar_SynchroEnd( p_fifo->p_vpar, 1 );
 
         /* Unlink referenced pictures */
         if( p_mb->p_forward != NULL )
@@ -239,7 +239,7 @@ static __inline__ void vpar_DestroyMacroblock( video_fifo_t * p_fifo,
         vout_DestroyPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
 
         /* Warn Synchro for its records. */
-        vpar_SynchroEnd( p_fifo->p_vpar );
+        vpar_SynchroEnd( p_fifo->p_vpar, 1 );
     }
 #endif
 }

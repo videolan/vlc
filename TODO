@@ -24,7 +24,7 @@ Description: Have more statistics messages displayed
  events, but there is no way to print these structures. In stats
  mode, we should print these structures regularly, or at quit
  time (whichever is the more convenient).
-Status: Todo
+Status: Done 27 Nov 2000 (Meuuh)
 
 Task: 0x3c
 Difficulty: Easy
@@ -42,7 +42,7 @@ Description: Write intf_WarnMsg and intf_StatMsg
  We have intf_ErrMsg to display fatal errors, but warnings are
  drowned in an ocean of unreadable intf_DbgMsg. Same for
  statistics messages.
-Status: Todo
+Status: Done 23 Nov 2000 (Stef)
 
 Task: 0x3a
 Difficulty: Hard

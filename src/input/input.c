@@ -905,6 +905,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
 #ifdef STATS
         i_dummy = p_ts_packet->i_payload_end - p_ts_packet->i_payload_start;
         p_es_descriptor->c_payload_bytes += i_dummy;
+        p_input->c_payload_bytes += i_dummy;
 #endif
 
         /* We can check if the packet is finished */
@@ -1400,6 +1401,14 @@ static void EndThread( input_thread_t * p_input )
     intf_DbgMsg("\n");
     pi_status = p_input->pi_status;
     *pi_status = THREAD_END;
+
+#ifdef STATS
+    intf_Msg("input stats: Done %d loops\n", p_input->c_loops);
+    intf_Msg("input stats: Read %d bytes (payload : %d)\n", p_input->c_bytes,
+             p_input->c_payload_bytes);
+    intf_Msg("input stats: Read %d packets (trashed : %d)\n",
+             p_input->c_packets_read, p_input->c_packets_trashed);
+#endif
 
     /* Close input method */
     p_input->p_Close( p_input );

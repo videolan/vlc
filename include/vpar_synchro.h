@@ -91,5 +91,5 @@ void vpar_SynchroTrash          ( struct vpar_thread_s * p_vpar,
                                   int i_coding_type, int i_structure );
 void vpar_SynchroDecode         ( struct vpar_thread_s * p_vpar,
                                   int i_coding_type, int i_structure );
-void vpar_SynchroEnd            ( struct vpar_thread_s * p_vpar );
+void vpar_SynchroEnd            ( struct vpar_thread_s * p_vpar, int i_garbage );
 mtime_t vpar_SynchroDate        ( struct vpar_thread_s * p_vpar );
