@@ -58,7 +58,12 @@ struct demux_sys_t
     es_out_id_t     *p_es;
 
     int64_t         i_block_offset;
-    int32_t         i_block_size;
+
+    int64_t         i_loop_offset;
+    unsigned        i_loop_count;
+    unsigned        i_silence_countdown;
+
+    int32_t         i_block_size;    
 
     date_t          pts;
 };
@@ -106,11 +111,11 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
-
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_sys->i_block_offset = p_sys->i_block_size = 0;
+    p_sys->i_silence_countdown = p_sys->i_block_offset = p_sys->i_block_size =
+    p_sys->i_loop_count = 0;
     p_sys->p_es = NULL;
 
     date_Init( &p_sys->pts, 1, 1 );
@@ -146,14 +151,16 @@ static int ReadBlockHeader( demux_t *p_demux )
 
     switch( *buf )
     {
-        /*case 0: -- not possible caught earlier with stream_Read */
+        case 0: /* not possible : caught with earlier stream_Read */
+            goto corrupt;
+
         case 1:
             if( i_block_size < 2 )
-                return VLC_EGENERIC;
+                goto corrupt;
             i_block_size -= 2;
 
             if( stream_Read( p_demux->s, buf, 2 ) < 2 )
-                return VLC_EGENERIC;
+                goto corrupt;
 
             new_fmt.audio.i_rate = 1000000L / (256L - buf[0]);
             if( buf[1] )
@@ -171,29 +178,67 @@ static int ReadBlockHeader( demux_t *p_demux )
             new_fmt.i_bitrate = p_sys->fmt.audio.i_rate * 8;
             break;
 
-        /* FIXME: support block types 2, 3, 6, 7, 8 properly */
-        case 2:
-        case 3:
-        case 6:
-        case 7:
-        case 8:
+        case 2: /* data block with same format as the previous one */
+            if( p_sys->p_es == NULL )
+                goto corrupt; /* no previous block! */
 
-        /* non-audio block types can be skipped */
-        case 4:
-        case 5:
-            if( stream_Read( p_demux->s, NULL, i_block_size ) < i_block_size )
-                return VLC_EGENERIC;
-            i_block_size = 0;
+            memcpy( &new_fmt, &p_sys->fmt, sizeof( new_fmt ) );
             break;
+
+        case 3: /* silence block */
+            if( ( i_block_size != 3 )
+             || ( stream_Read( p_demux->s, buf, 3 ) < 3 ) )
+                goto corrupt;
+
+            i_block_size = 0;
+            p_sys->i_silence_countdown = GetWLE( buf );
+
+            new_fmt.audio.i_rate = 1000000L / (256L - buf[2]);
+            new_fmt.i_codec = VLC_FOURCC('u','8',' ',' ');
+            new_fmt.audio.i_bytes_per_frame = 1;
+            new_fmt.audio.i_frame_length = 1;
+            new_fmt.audio.i_channels = 1;
+            new_fmt.audio.i_blockalign = 1;
+            new_fmt.audio.i_bitspersample = 8;
+            new_fmt.i_bitrate = p_sys->fmt.audio.i_rate * 8;
+            break;
+
+        case 6: /* repeat block */
+            if( ( i_block_size != 2 )
+             || ( stream_Read( p_demux->s, buf, 2 ) < 2 ) )
+                goto corrupt;
+
+            i_block_size = 0;
+            p_sys->i_loop_count = GetWLE( buf );
+            p_sys->i_loop_offset = stream_Tell( p_demux->s );
+            break;
+
+        case 7: /* repeat end block */
+            if( i_block_size != 0 )
+                goto corrupt;
+
+            if( p_sys->i_loop_count > 0 )
+            {
+                if( stream_Seek( p_demux->s, p_sys->i_loop_offset ) )
+                    msg_Warn( p_demux, "cannot loop: seek failed" );
+                else
+                    p_sys->i_loop_count--;
+            }
+            break;
+
+        /* FIXME: support block type 8 properly */
+        case 8:
+            msg_Err( p_demux, "Unimplemented block type 8" );
+            return VLC_EGENERIC;
 
         case 9:
             if( i_block_size < 12 )
-                return VLC_EGENERIC;
+                goto corrupt;
             i_block_size -= 12;
 
             if( ( stream_Read( p_demux->s, buf, 8 ) < 8 )
              || ( stream_Read( p_demux->s, NULL, 4 ) < 4 ) )
-                return VLC_EGENERIC;
+                goto corrupt;
 
             new_fmt.audio.i_rate = GetDWLE( buf );
             new_fmt.audio.i_bitspersample = buf[4];
@@ -251,14 +296,20 @@ static int ReadBlockHeader( demux_t *p_demux )
             break;
 
         default:
-            msg_Dbg( p_demux, "Unsupported block type %u", (unsigned)*buf);
-            return VLC_EGENERIC;
+            msg_Dbg( p_demux, "Unknown block type %u - skipping block",
+                     (unsigned)*buf);
+        case 4: /* blocks of non-audio types can be skipped */
+        case 5:
+            if( stream_Read( p_demux->s, NULL, i_block_size ) < i_block_size )
+                goto corrupt;
+            i_block_size = 0;
+            break;
     }
 
     p_sys->i_block_size = i_block_size;
     p_sys->i_block_offset = stream_Tell( p_demux->s );
 
-    if( i_block_size )
+    if( i_block_size || p_sys->i_silence_countdown )
     {
         /* we've read a block with data in it - update decoder */
         msg_Dbg( p_demux, "fourcc: %4.4s, channels: %d, "
@@ -284,6 +335,10 @@ static int ReadBlockHeader( demux_t *p_demux )
     }
 
     return VLC_SUCCESS;
+
+corrupt:
+    msg_Err( p_demux, "corrupted file - halting demux" );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -297,17 +352,31 @@ static int Demux( demux_t *p_demux )
     block_t     *p_block;
     int64_t     i_offset;
 
-    i_offset = stream_Tell( p_demux->s );
-
-    while( i_offset >= p_sys->i_block_offset + p_sys->i_block_size )
-        if( ReadBlockHeader( p_demux ) != VLC_SUCCESS )
-            return 0;
-
-    p_block = stream_Block( p_demux->s, p_sys->fmt.audio.i_bytes_per_frame );
-    if( p_block == NULL )
+    if( p_sys->i_silence_countdown == 0 )
     {
-        msg_Warn( p_demux, "cannot read data" );
-        return 0;
+        i_offset = stream_Tell( p_demux->s );
+
+        while( ( i_offset >= p_sys->i_block_offset + p_sys->i_block_size )
+             && ( p_sys->i_silence_countdown == 0 ) )
+            if( ReadBlockHeader( p_demux ) != VLC_SUCCESS )
+                return 0;
+
+        p_block = stream_Block( p_demux->s,
+                                p_sys->fmt.audio.i_bytes_per_frame );
+        if( p_block == NULL )
+        {
+            msg_Warn( p_demux, "cannot read data" );
+            return 0;
+        }
+    }
+    else
+    {   /* emulates silence from the stream */
+        p_block = block_New( p_demux, 1 );
+        if( p_block == NULL )
+            return VLC_ENOMEM;
+
+        p_block->p_buffer[0] = 0;
+        p_sys->i_silence_countdown--;
     }
 
     p_block->i_dts = p_block->i_pts =
