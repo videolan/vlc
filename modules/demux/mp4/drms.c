@@ -1637,6 +1637,7 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
     /* Decrypt and shuffle our data at the same time */
     InitAES( &aes, p_sys_key );
     REVERSE( p_sys_key, 4 );
+    REVERSE( p_sci_data, 1 );
     InitShuffle( &shuffle, p_sys_key, p_sci_data[ 0 ] );
 
     memcpy( p_sci_key, p_secret, 16 );
