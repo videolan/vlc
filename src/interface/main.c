@@ -480,7 +480,7 @@ static void Usage( int i_fashion )
               "      --aout <plugin>            \taudio output method\n"
               "      --stereo, --mono           \tstereo/mono audio\n"
               "\n"
-              "      --novideo                  \tdisable audio\n"
+              "      --novideo                  \tdisable video\n"
               "      --vout <plugin>            \tvideo output method\n"
               "      --display <display>        \tdisplay string\n"
               "      --width <w>, --height <h>  \tdisplay dimensions\n"

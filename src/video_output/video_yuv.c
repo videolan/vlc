@@ -313,6 +313,14 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
  * and 4 Bpp.
  *****************************************************************************/
 #define SCALE_HEIGHT( CHROMA, BPP )                                           \
+                                                                              \
+    /* If line is odd, rewind 4:2:0 U and V samples */                        \
+    if( ((CHROMA == 420) || (CHROMA == 422)) && !(i_y & 0x1) )                \
+    {                                                                         \
+        p_u -= i_chroma_width;                                                \
+        p_v -= i_chroma_width;                                                \
+    }                                                                         \
+                                                                              \
     /*                                                                        \
      * Handle vertical scaling. The current line can be copied or next one    \
      * can be ignored.                                                        \
@@ -331,7 +339,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
                     if( (i_scale_count -= i_pic_height) >= 0 )                \
                     {                                                         \
                         p_y += i_width;                                       \
-                        i_y+=2;                                               \
+                        i_y += 2;                                             \
                         p_u += i_chroma_width;                                \
                         p_v += i_chroma_width;                                \
                         continue;                                             \
@@ -359,7 +367,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
             }                                                                 \
             while( (i_scale_count -= i_pic_height) >= 0 )                     \
             {                                                                 \
-            /* Height reduction: skip next source line */                     \
+                /* Height reduction: skip next source line */                 \
                 p_y += i_width;                                               \
                 if( (CHROMA == 420) || (CHROMA == 422) )                      \
                 {                                                             \
@@ -437,7 +445,6 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
      * Handle vertical scaling. The current line can be copied or next one    \
      * can be ignored.                                                        \
      */                                                                       \
-                                                                              \
     switch( i_vertical_scaling )                                              \
     {                                                                         \
     case -1:                             /* vertical scaling factor is < 1 */ \
