@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: avi.c,v 1.86 2004/01/31 14:49:52 fenrir Exp $
+ * $Id: avi.c,v 1.87 2004/02/08 18:30:30 sigmunau Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -327,6 +327,7 @@ static int Open( vlc_object_t * p_this )
                 tk->i_samplesize = 0;
                 fmt.video.i_width  = p_vids->p_bih->biWidth;
                 fmt.video.i_height = p_vids->p_bih->biHeight;
+                fmt.video.i_bits_per_pixel = p_vids->p_bih->biBitCount;
                 fmt.i_extra =
                     __MIN( p_vids->p_bih->biSize - sizeof( BITMAPINFOHEADER ),
                            p_vids->i_chunk_size - sizeof(BITMAPINFOHEADER) );
@@ -1581,6 +1582,8 @@ vlc_fourcc_t AVI_FourccGetCodec( unsigned int i_cat, vlc_fourcc_t i_codec )
             /* XXX DIV1 <- msmpeg4v1, DIV2 <- msmpeg4v2, DIV3 <- msmpeg4v3, mp4v for mpeg4 */
             switch( i_codec )
             {
+                case FOURCC_1:
+                    return VLC_FOURCC('m','r','l','e');
                 case FOURCC_DIV1:
                 case FOURCC_div1:
                 case FOURCC_MPG4:

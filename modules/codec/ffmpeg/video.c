@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.63 2004/02/08 12:09:50 gbazin Exp $
+ * $Id: video.c,v 1.64 2004/02/08 18:30:30 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -219,6 +219,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     /* ***** Fill p_context with init values ***** */
     p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
     p_sys->p_context->height = p_dec->fmt_in.video.i_height;
+    p_sys->p_context->bits_per_sample = p_dec->fmt_in.video.i_bits_per_pixel;
 
     /*  ***** Get configuration of ffmpeg plugin ***** */
     i_tmp = config_GetInt( p_dec, "ffmpeg-workaround-bugs" );
