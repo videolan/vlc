@@ -36,6 +36,7 @@
 #include <AppEvnts.hpp>
 #include <ExtCtrls.hpp>
 #include "CSPIN.h"
+#include <ActnList.hpp>
 //---------------------------------------------------------------------------
 class TMainFrameDlg : public TForm
 {
@@ -72,7 +73,6 @@ __published:	// IDE-managed Components
     TMenuItem *MenuAngle;
     TMenuItem *N3;
     TMenuItem *MenuPlaylist;
-    TMenuItem *MenuModules;
     TMenuItem *MenuMessages;
     TMenuItem *MenuSettings;
     TMenuItem *MenuAudio;
@@ -90,10 +90,8 @@ __published:	// IDE-managed Components
     TMenuItem *PopupBack;
     TMenuItem *PopupSlow;
     TMenuItem *PopupFast;
-    TMenuItem *N5;
     TMenuItem *PopupToggleInterface;
     TMenuItem *PopupFullscreen;
-    TMenuItem *N6;
     TMenuItem *PopupNext;
     TMenuItem *PopupPrev;
     TMenuItem *PopupJump;
@@ -135,56 +133,64 @@ __published:	// IDE-managed Components
     TMenuItem *PopupClose;
     TMenuItem *N9;
     TCSpinEdit *SpinEditChannel;
-        TToolButton *ToolButton1;
+    TToolButton *ToolButton1;
+    TActionList *ActionList1;
+    TAction *OpenFileAction;
+    TAction *OpenDiscAction;
+    TAction *NetworkStreamAction;
+    TAction *PlayAction;
+    TAction *PauseAction;
+    TAction *StopAction;
+    TAction *EjectAction;
+    TAction *SlowAction;
+    TAction *FastAction;
+    TAction *PreviousAction;
+    TAction *NextAction;
+    TAction *BackAction;
+    TAction *PlaylistAction;
+    TAction *ExitAction;
+    TAction *FullscreenAction;
+    TAction *PreferencesAction;
+    TAction *MessagesAction;
+    TAction *AboutAction;
+    TMenuItem *Control1;
+    TMenuItem *N5;
+    TMenuItem *N6;
+    TMenuItem *N10;
+    TAction *PrevTitleAction;
+    TAction *NextTitleAction;
+    TAction *PrevChapterAction;
+    TAction *NextChapterAction;
     void __fastcall TimerManageTimer( TObject *Sender );
     void __fastcall TrackBarChange( TObject *Sender );
     void __fastcall FormClose( TObject *Sender, TCloseAction &Action );
-    void __fastcall MenuOpenFileClick( TObject *Sender );
-    void __fastcall MenuOpenDiscClick( TObject *Sender );
-    void __fastcall MenuNetworkStreamClick( TObject *Sender );
-    void __fastcall MenuExitClick( TObject *Sender );
     void __fastcall MenuHideinterfaceClick( TObject *Sender );
-    void __fastcall MenuFullscreenClick( TObject *Sender );
-    void __fastcall MenuPlaylistClick( TObject *Sender );
-    void __fastcall MenuMessagesClick( TObject *Sender );
-    void __fastcall MenuPreferencesClick( TObject *Sender );
-    void __fastcall MenuAboutClick( TObject *Sender );
-    void __fastcall ToolButtonFileClick( TObject *Sender );
-    void __fastcall ToolButtonDiscClick( TObject *Sender );
-    void __fastcall ToolButtonNetClick( TObject *Sender );
-    void __fastcall ToolButtonPlaylistClick( TObject *Sender );
-    void __fastcall ToolButtonBackClick( TObject *Sender );
-    void __fastcall ToolButtonStopClick( TObject *Sender );
-    void __fastcall ToolButtonPlayClick( TObject *Sender );
-    void __fastcall ToolButtonPauseClick( TObject *Sender );
-    void __fastcall ToolButtonSlowClick( TObject *Sender );
-    void __fastcall ToolButtonFastClick( TObject *Sender );
-    void __fastcall ToolButtonPrevClick( TObject *Sender );
-    void __fastcall ToolButtonNextClick( TObject *Sender );
-    void __fastcall ToolButtonEjectClick( TObject *Sender );
     void __fastcall PopupCloseClick( TObject *Sender );
-    void __fastcall PopupPlayClick( TObject *Sender );
-    void __fastcall PopupPauseClick( TObject *Sender );
-    void __fastcall PopupStopClick( TObject *Sender );
-    void __fastcall PopupBackClick( TObject *Sender );
-    void __fastcall PopupSlowClick( TObject *Sender );
-    void __fastcall PopupFastClick( TObject *Sender );
     void __fastcall PopupToggleInterfaceClick( TObject *Sender );
-    void __fastcall PopupFullscreenClick( TObject *Sender );
-    void __fastcall PopupNextClick( TObject *Sender );
-    void __fastcall PopupPrevClick( TObject *Sender );
     void __fastcall PopupJumpClick( TObject *Sender );
-    void __fastcall PopupPlaylistClick( TObject *Sender );
-    void __fastcall PopupPreferencesClick( TObject *Sender );
-    void __fastcall PopupExitClick( TObject *Sender );
-    void __fastcall PopupOpenFileClick( TObject *Sender );
-    void __fastcall PopupOpenDiscClick( TObject *Sender );
-    void __fastcall PopupNetworkStreamClick( TObject *Sender );
-    void __fastcall ButtonTitlePrevClick( TObject *Sender );
-    void __fastcall ButtonTitleNextClick( TObject *Sender );
-    void __fastcall ButtonChapterPrevClick( TObject *Sender );
-    void __fastcall ButtonChapterNextClick( TObject *Sender );
     void __fastcall ButtonGoClick( TObject *Sender );
+    void __fastcall OpenFileActionExecute( TObject *Sender );
+    void __fastcall OpenDiscActionExecute( TObject *Sender );
+    void __fastcall NetworkStreamActionExecute( TObject *Sender );
+    void __fastcall BackActionExecute( TObject *Sender );
+    void __fastcall PlayActionExecute( TObject *Sender );
+    void __fastcall PauseActionExecute( TObject *Sender );
+    void __fastcall StopActionExecute( TObject *Sender );
+    void __fastcall SlowActionExecute( TObject *Sender );
+    void __fastcall FastActionExecute( TObject *Sender );
+    void __fastcall PlaylistActionExecute( TObject *Sender );
+    void __fastcall ExitActionExecute( TObject *Sender );
+    void __fastcall PreviousActionExecute( TObject *Sender );
+    void __fastcall NextActionExecute( TObject *Sender );
+    void __fastcall FullscreenActionExecute( TObject *Sender );
+    void __fastcall PreferencesActionExecute( TObject *Sender );
+    void __fastcall MessagesActionExecute( TObject *Sender );
+    void __fastcall AboutActionExecute( TObject *Sender );
+    void __fastcall EjectActionExecute( TObject *Sender );
+    void __fastcall PrevTitleActionExecute( TObject *Sender );
+    void __fastcall NextTitleActionExecute( TObject *Sender );
+    void __fastcall PrevChapterActionExecute( TObject *Sender );
+    void __fastcall NextChapterActionExecute( TObject *Sender );
 private:	// User declarations
 public:		// User declarations
     TStringList *StringListPref;                   /* stores config dialogs */

@@ -69,14 +69,12 @@ __fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::FormShow( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->MenuNetworkStream->Checked = true;
-    p_intfGlobal->p_sys->p_window->PopupNetworkStream->Checked = true;
+    p_intfGlobal->p_sys->p_window->NetworkStreamAction->Checked = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::FormHide( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->MenuNetworkStream->Checked = false;
-    p_intfGlobal->p_sys->p_window->PopupNetworkStream->Checked = false;
+    p_intfGlobal->p_sys->p_window->NetworkStreamAction->Checked = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::BitBtnCancelClick( TObject *Sender )

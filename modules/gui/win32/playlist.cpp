@@ -68,16 +68,12 @@ char * __fastcall TPlaylistDlg::rindex( char *s, char c )
  ****************************************************************************/
 void __fastcall TPlaylistDlg::FormShow( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->MenuPlaylist->Checked = true;
-    p_intfGlobal->p_sys->p_window->PopupPlaylist->Checked = true;
-    p_intfGlobal->p_sys->p_window->ToolButtonPlaylist->Down = true;
+    p_intfGlobal->p_sys->p_window->PlaylistAction->Checked = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::FormHide( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->MenuPlaylist->Checked = false;
-    p_intfGlobal->p_sys->p_window->PopupPlaylist->Checked = false;
-    p_intfGlobal->p_sys->p_window->ToolButtonPlaylist->Down = false;
+    p_intfGlobal->p_sys->p_window->PlaylistAction->Checked = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::BitBtnOkClick( TObject *Sender )
@@ -85,7 +81,7 @@ void __fastcall TPlaylistDlg::BitBtnOkClick( TObject *Sender )
     Hide();
 }
 //---------------------------------------------------------------------------
-void __fastcall TPlaylistDlg::ListViewPlaylistDblClick( TObject *Sender )
+void __fastcall TPlaylistDlg::PlayStreamActionExecute( TObject *Sender )
 {
     TListItem *Item;
     TListItem *ItemStart;
@@ -125,13 +121,13 @@ void __fastcall TPlaylistDlg::ListViewPlaylistKeyDown( TObject *Sender,
     /* 'suppr' or 'backspace' */
     if( ( Key == VK_DELETE ) || ( Key == VK_BACK ) )
     {
-        MenuDeleteSelectedClick( Sender );
+        DeleteSelectionActionExecute( Sender );
     }
 
     /* 'enter' */
     if( Key == VK_RETURN )
     {
-        PopupPlayClick( Sender );
+        PlayStreamActionExecute( Sender );
     }
 }
 //---------------------------------------------------------------------------
@@ -157,21 +153,21 @@ void __fastcall TPlaylistDlg::ListViewPlaylistCustomDrawItem(
 
 
 /*****************************************************************************
- * Menu callbacks
+ * Menu and popup callbacks
  ****************************************************************************/
 void __fastcall TPlaylistDlg::MenuAddFileClick( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->MenuOpenFileClick( Sender );
+    p_intfGlobal->p_sys->p_window->OpenFileActionExecute( Sender );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::MenuAddDiscClick( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->MenuOpenDiscClick( Sender );
+    p_intfGlobal->p_sys->p_window->OpenDiscActionExecute( Sender );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::MenuAddNetClick( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->MenuNetworkStreamClick( Sender );
+    p_intfGlobal->p_sys->p_window->NetworkStreamActionExecute( Sender );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::MenuAddUrlClick( TObject *Sender )
@@ -179,7 +175,7 @@ void __fastcall TPlaylistDlg::MenuAddUrlClick( TObject *Sender )
     /* TODO */
 }
 //---------------------------------------------------------------------------
-void __fastcall TPlaylistDlg::MenuDeleteSelectedClick( TObject *Sender )
+void __fastcall TPlaylistDlg::DeleteSelectionActionExecute( TObject *Sender )
 {
 #if 0 /* PLAYLIST TARASS */
     /* user wants to delete a file in the queue */
@@ -205,7 +201,7 @@ void __fastcall TPlaylistDlg::MenuDeleteSelectedClick( TObject *Sender )
 #endif
 }
 //---------------------------------------------------------------------------
-void __fastcall TPlaylistDlg::MenuDeleteAllClick( TObject *Sender )
+void __fastcall TPlaylistDlg::DeleteAllActionExecute( TObject *Sender )
 {
 #if 0 /* PLAYLIST TARASS */
     int         i_pos;
@@ -227,7 +223,7 @@ void __fastcall TPlaylistDlg::MenuDeleteAllClick( TObject *Sender )
 #endif
 }
 //---------------------------------------------------------------------------
-void __fastcall TPlaylistDlg::MenuSelectionInvertClick( TObject *Sender )
+void __fastcall TPlaylistDlg::InvertSelectionActionExecute( TObject *Sender )
 {
 #if 0 /* PLAYLIST TARASS */
 #define NOT( var ) ( (var) ? false : true )
@@ -244,40 +240,10 @@ void __fastcall TPlaylistDlg::MenuSelectionInvertClick( TObject *Sender )
 #endif
 }
 //---------------------------------------------------------------------------
-void __fastcall TPlaylistDlg::MenuSelectionCropClick( TObject *Sender )
+void __fastcall TPlaylistDlg::CropSelectionActionExecute( TObject *Sender )
 {
-    MenuSelectionInvertClick( Sender );
-    MenuDeleteSelectedClick( Sender );
-}
-//---------------------------------------------------------------------------
-
-
-/*****************************************************************************
- * Popup callbacks
- ****************************************************************************/
-void __fastcall TPlaylistDlg::PopupPlayClick( TObject *Sender )
-{
-    ListViewPlaylistDblClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TPlaylistDlg::PopupInvertSelectionClick( TObject *Sender )
-{
-    MenuSelectionInvertClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TPlaylistDlg::PopupCropSelectionClick( TObject *Sender )
-{
-    MenuSelectionCropClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TPlaylistDlg::PopupDeleteSelectedClick( TObject *Sender )
-{
-    MenuDeleteSelectedClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TPlaylistDlg::PopupDeleteAllClick( TObject *Sender )
-{
-    MenuDeleteAllClick( Sender );
+    InvertSelectionActionExecute( Sender );
+    DeleteSelectionActionExecute( Sender );
 }
 //---------------------------------------------------------------------------
 

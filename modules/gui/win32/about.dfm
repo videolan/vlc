@@ -277,7 +277,7 @@ object AboutDlg: TAboutDlg
     WordWrap = True
   end
   object Label3: TLabel
-    Left = 38
+    Left = 30
     Top = 80
     Width = 227
     Height = 13
@@ -290,7 +290,7 @@ object AboutDlg: TAboutDlg
     Height = 49
   end
   object Label5: TLabel
-    Left = 82
+    Left = 83
     Top = 96
     Width = 121
     Height = 13

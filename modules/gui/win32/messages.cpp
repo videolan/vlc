@@ -49,12 +49,12 @@ void __fastcall TMessagesDlg::ButtonOKClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMessagesDlg::FormHide( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->MenuMessages->Checked = false;
+    p_intfGlobal->p_sys->p_window->MessagesAction->Checked = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TMessagesDlg::FormShow( TObject *Sender )
 {
-    p_intfGlobal->p_sys->p_window->MenuMessages->Checked = true;
+    p_intfGlobal->p_sys->p_window->MessagesAction->Checked = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TMessagesDlg::UpdateLog()
@@ -80,10 +80,10 @@ void __fastcall TMessagesDlg::UpdateLog()
                 RichEditMessages->SelAttributes->Color = clRed;
                 break;
             case VLC_MSG_WARN:
-                RichEditMessages->SelAttributes->Color = clBlack;
+                RichEditMessages->SelAttributes->Color = clBlue;
                 break;
             default:
-                RichEditMessages->SelAttributes->Color = clBlue;
+                RichEditMessages->SelAttributes->Color = clBlack;
                 break;
             }
 

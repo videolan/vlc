@@ -1,6 +1,6 @@
 object MainFrameDlg: TMainFrameDlg
-  Left = 314
-  Top = 198
+  Left = 179
+  Top = 442
   Width = 541
   Height = 306
   BorderIcons = [biSystemMenu, biMinimize]
@@ -153,26 +153,17 @@ object MainFrameDlg: TMainFrameDlg
     object ToolButtonFile: TToolButton
       Left = 0
       Top = 0
-      Hint = 'Open a file'
-      Caption = 'File'
-      ImageIndex = 0
-      OnClick = ToolButtonFileClick
+      Action = OpenFileAction
     end
     object ToolButtonDisc: TToolButton
       Left = 39
       Top = 0
-      Hint = 'Open a DVD or VCD'
-      Caption = 'Disc'
-      ImageIndex = 1
-      OnClick = ToolButtonDiscClick
+      Action = OpenDiscAction
     end
     object ToolButtonNet: TToolButton
       Left = 78
       Top = 0
-      Hint = 'Open a network stream'
-      Caption = 'Net'
-      ImageIndex = 2
-      OnClick = ToolButtonNetClick
+      Action = NetworkStreamAction
     end
     object ToolButtonSep1: TToolButton
       Left = 117
@@ -185,45 +176,27 @@ object MainFrameDlg: TMainFrameDlg
     object ToolButtonBack: TToolButton
       Left = 125
       Top = 0
-      Caption = 'Back'
-      Enabled = False
-      ImageIndex = 3
-      OnClick = ToolButtonBackClick
+      Action = BackAction
     end
     object ToolButtonPlay: TToolButton
       Left = 164
       Top = 0
-      Hint = 'Play stream'
-      Caption = 'Play'
-      ImageIndex = 5
-      OnClick = ToolButtonPlayClick
+      Action = PlayAction
     end
     object ToolButtonPause: TToolButton
       Left = 203
       Top = 0
-      Hint = 'Pause stream'
-      Caption = 'Pause'
-      Enabled = False
-      ImageIndex = 6
-      OnClick = ToolButtonPauseClick
+      Action = PauseAction
     end
     object ToolButtonStop: TToolButton
       Left = 242
       Top = 0
-      Hint = 'Stop stream'
-      Caption = 'Stop'
-      Enabled = False
-      ImageIndex = 4
-      OnClick = ToolButtonStopClick
+      Action = StopAction
     end
     object ToolButtonEject: TToolButton
       Left = 281
       Top = 0
-      Hint = 'Eject disc'
-      Caption = 'Eject'
-      Enabled = False
-      ImageIndex = 7
-      OnClick = ToolButtonEjectClick
+      Action = EjectAction
     end
     object ToolButton1: TToolButton
       Left = 320
@@ -236,20 +209,12 @@ object MainFrameDlg: TMainFrameDlg
     object ToolButtonSlow: TToolButton
       Left = 328
       Top = 0
-      Hint = 'Play slower'
-      Caption = 'Slow'
-      Enabled = False
-      ImageIndex = 8
-      OnClick = ToolButtonSlowClick
+      Action = SlowAction
     end
     object ToolButtonFast: TToolButton
       Left = 367
       Top = 0
-      Hint = 'Play faster'
-      Caption = 'Fast'
-      Enabled = False
-      ImageIndex = 9
-      OnClick = ToolButtonFastClick
+      Action = FastAction
     end
     object ToolButtonSep2: TToolButton
       Left = 406
@@ -262,27 +227,18 @@ object MainFrameDlg: TMainFrameDlg
     object ToolButtonPlaylist: TToolButton
       Left = 414
       Top = 0
-      Hint = 'Open playlist'
-      Caption = 'Playlist'
-      ImageIndex = 10
+      Action = PlaylistAction
       Style = tbsCheck
-      OnClick = ToolButtonPlaylistClick
     end
     object ToolButtonPrev: TToolButton
       Left = 453
       Top = 0
-      Hint = 'Previous file'
-      Caption = 'Prev'
-      ImageIndex = 11
-      OnClick = ToolButtonPrevClick
+      Action = PreviousAction
     end
     object ToolButtonNext: TToolButton
       Left = 492
       Top = 0
-      Hint = 'Next file'
-      Caption = 'Next'
-      ImageIndex = 12
-      OnClick = ToolButtonNextClick
+      Action = NextAction
     end
   end
   object StatusBar: TStatusBar
@@ -403,40 +359,32 @@ object MainFrameDlg: TMainFrameDlg
       Top = 8
       Width = 33
       Height = 19
-      Hint = 'Jump to previous title'
-      Caption = 'Prev'
+      Action = PrevTitleAction
       TabOrder = 0
-      OnClick = ButtonTitlePrevClick
     end
     object ButtonTitleNext: TButton
       Left = 184
       Top = 8
       Width = 33
       Height = 19
-      Hint = 'Jump to next title'
-      Caption = 'Next'
+      Action = NextTitleAction
       TabOrder = 1
-      OnClick = ButtonTitleNextClick
     end
     object ButtonChapterPrev: TButton
       Left = 368
       Top = 8
       Width = 33
       Height = 19
-      Hint = 'Jump to previous chapter'
-      Caption = 'Prev'
+      Action = PrevChapterAction
       TabOrder = 2
-      OnClick = ButtonChapterPrevClick
     end
     object ButtonChapterNext: TButton
       Left = 400
       Top = 8
       Width = 33
       Height = 19
-      Hint = 'Jump to next chapter'
-      Caption = 'Next'
+      Action = NextChapterAction
       TabOrder = 3
-      OnClick = ButtonChapterNextClick
     end
   end
   object GroupBoxSlider: TGroupBox
@@ -471,41 +419,30 @@ object MainFrameDlg: TMainFrameDlg
     object MenuFile: TMenuItem
       Caption = '&File'
       object MenuOpenFile: TMenuItem
-        Caption = '&Open file...'
-        Hint = 'Open a file'
-        ShortCut = 114
-        OnClick = MenuOpenFileClick
+        Action = OpenFileAction
+        Caption = 'Open &file...'
       end
       object MenuOpenDisc: TMenuItem
+        Action = OpenDiscAction
         Caption = 'Open &disc...'
-        Hint = 'Open a DVD or VCD'
-        ShortCut = 115
-        OnClick = MenuOpenDiscClick
       end
       object MenuNetworkStream: TMenuItem
+        Action = NetworkStreamAction
         Caption = '&Network stream...'
-        Hint = 'Select a network stream'
-        ShortCut = 116
-        OnClick = MenuNetworkStreamClick
       end
       object N8: TMenuItem
         Caption = '-'
         Visible = False
       end
       object MenuEjectDisc: TMenuItem
-        Caption = '&Eject Disc'
-        Hint = 'Eject disc'
-        Visible = False
-        OnClick = ToolButtonEjectClick
+        Action = EjectAction
+        Caption = '&Eject disc'
       end
       object N1: TMenuItem
         Caption = '-'
       end
       object MenuExit: TMenuItem
-        Caption = 'E&xit'
-        Hint = 'Exit the program'
-        ShortCut = 16465
-        OnClick = MenuExitClick
+        Action = ExitAction
       end
     end
     object MenuView: TMenuItem
@@ -516,9 +453,7 @@ object MainFrameDlg: TMainFrameDlg
         OnClick = MenuHideinterfaceClick
       end
       object MenuFullscreen: TMenuItem
-        Caption = '&Fullscreen'
-        Hint = 'Toggle fullscreen'
-        OnClick = MenuFullscreenClick
+        Action = FullscreenAction
       end
       object N2: TMenuItem
         Caption = '-'
@@ -547,19 +482,11 @@ object MainFrameDlg: TMainFrameDlg
         Caption = '-'
       end
       object MenuPlaylist: TMenuItem
+        Action = PlaylistAction
         Caption = '&Playlist...'
-        Hint = 'Open the playlist window'
-        OnClick = MenuPlaylistClick
-      end
-      object MenuModules: TMenuItem
-        Caption = '&Modules...'
-        Enabled = False
-        Hint = 'Open the modules window'
       end
       object MenuMessages: TMenuItem
-        Caption = 'Me&ssages...'
-        Hint = 'Open the messages window'
-        OnClick = MenuMessagesClick
+        Action = MessagesAction
       end
     end
     object MenuSettings: TMenuItem
@@ -578,17 +505,13 @@ object MainFrameDlg: TMainFrameDlg
         Caption = '-'
       end
       object MenuPreferences: TMenuItem
-        Caption = '&Preferences...'
-        Hint = 'Configure the application'
-        OnClick = MenuPreferencesClick
+        Action = PreferencesAction
       end
     end
     object MenuHelp: TMenuItem
       Caption = '&Help'
       object MenuAbout: TMenuItem
-        Caption = '&About...'
-        Hint = 'About this application'
-        OnClick = MenuAboutClick
+        Action = AboutAction
       end
     end
   end
@@ -2334,64 +2257,59 @@ object MainFrameDlg: TMainFrameDlg
       Caption = '&Close this popup'
       OnClick = PopupCloseClick
     end
+    object PopupToggleInterface: TMenuItem
+      Caption = '&Toggle interface'
+      OnClick = PopupToggleInterfaceClick
+    end
     object N9: TMenuItem
       Caption = '-'
     end
-    object PopupPlay: TMenuItem
-      Caption = '&Play'
-      OnClick = PopupPlayClick
-    end
-    object PopupPause: TMenuItem
-      Caption = 'Pause'
-      OnClick = PopupPauseClick
-    end
-    object PopupStop: TMenuItem
-      Caption = 'Stop'
-      OnClick = PopupStopClick
-    end
-    object PopupBack: TMenuItem
-      Caption = 'Back'
-      OnClick = PopupBackClick
-    end
-    object PopupSlow: TMenuItem
-      Caption = 'Slow'
-      OnClick = PopupSlowClick
-    end
-    object PopupFast: TMenuItem
-      Caption = 'Fast'
-      OnClick = PopupFastClick
-    end
-    object N5: TMenuItem
-      Caption = '-'
-    end
-    object PopupToggleInterface: TMenuItem
-      Caption = 'Toggle &Interface'
-      OnClick = PopupToggleInterfaceClick
-    end
-    object PopupFullscreen: TMenuItem
-      Caption = '&Fullscreen'
-      OnClick = PopupFullscreenClick
-    end
-    object N6: TMenuItem
-      Caption = '-'
-    end
-    object PopupNext: TMenuItem
-      Caption = 'Next'
-      OnClick = PopupNextClick
-    end
-    object PopupPrev: TMenuItem
-      Caption = 'Prev'
-      OnClick = PopupPrevClick
-    end
-    object PopupJump: TMenuItem
-      Caption = '&Jump...'
-      OnClick = PopupJumpClick
-    end
-    object PopupProgram: TMenuItem
-      Caption = 'Program'
+    object Control1: TMenuItem
+      Caption = 'Control'
+      object PopupBack: TMenuItem
+        Action = BackAction
+      end
+      object PopupPlay: TMenuItem
+        Action = PlayAction
+      end
+      object PopupPause: TMenuItem
+        Action = PauseAction
+      end
+      object PopupStop: TMenuItem
+        Action = StopAction
+      end
+      object PopupSlow: TMenuItem
+        Action = SlowAction
+      end
+      object PopupFast: TMenuItem
+        Action = FastAction
+      end
+      object N5: TMenuItem
+        Caption = '-'
+      end
+      object PopupPrev: TMenuItem
+        Action = PreviousAction
+      end
+      object PopupNext: TMenuItem
+        Action = NextAction
+      end
+      object PopupJump: TMenuItem
+        Caption = '&Jump...'
+        OnClick = PopupJumpClick
+      end
+      object N6: TMenuItem
+        Caption = '-'
+      end
+      object PopupFullscreen: TMenuItem
+        Action = FullscreenAction
+        ShortCut = 70
+      end
     end
     object PopupNavigation: TMenuItem
       Caption = 'Navigation'
+    end
+    object PopupProgram: TMenuItem
+      Caption = 'Program'
     end
     object PopupAudio: TMenuItem
       Caption = 'Audio'
@@ -2399,40 +2317,201 @@ object MainFrameDlg: TMainFrameDlg
     object PopupSubtitles: TMenuItem
       Caption = 'Subtitles'
     end
-    object PopupFile: TMenuItem
-      Caption = 'File'
-      object PopupOpenFile: TMenuItem
-        Caption = 'Open file...'
-        OnClick = PopupOpenFileClick
-      end
-      object PopupOpenDisc: TMenuItem
-        Caption = 'Open disc...'
-        OnClick = PopupOpenDiscClick
-      end
-      object PopupNetworkStream: TMenuItem
-        Caption = 'Network stream...'
-        OnClick = PopupNetworkStreamClick
-      end
+    object N10: TMenuItem
+      Caption = '-'
     end
     object PopupPlaylist: TMenuItem
+      Action = PlaylistAction
       Caption = 'Playlist...'
-      OnClick = PopupPlaylistClick
     end
     object PopupPreferences: TMenuItem
-      Caption = 'Preferences...'
-      OnClick = PopupPreferencesClick
+      Action = PreferencesAction
+    end
+    object PopupFile: TMenuItem
+      Caption = 'New stream'
+      object PopupOpenFile: TMenuItem
+        Action = OpenFileAction
+        Caption = 'Open file...'
+      end
+      object PopupOpenDisc: TMenuItem
+        Action = OpenDiscAction
+        Caption = 'Open disc...'
+      end
+      object PopupNetworkStream: TMenuItem
+        Action = NetworkStreamAction
+        Caption = 'Network stream...'
+      end
     end
     object N7: TMenuItem
       Caption = '-'
     end
     object PopupExit: TMenuItem
-      Caption = 'E&xit'
-      OnClick = PopupExitClick
+      Action = ExitAction
     end
   end
   object TimerManage: TTimer
     OnTimer = TimerManageTimer
     Left = 136
     Top = 208
+  end
+  object ActionList1: TActionList
+    Left = 168
+    Top = 208
+    object OpenFileAction: TAction
+      Category = 'Menu'
+      Caption = 'File'
+      Hint = 'Open a file'
+      ImageIndex = 0
+      ShortCut = 114
+      OnExecute = OpenFileActionExecute
+    end
+    object OpenDiscAction: TAction
+      Category = 'Menu'
+      Caption = 'Disc'
+      Hint = 'Open a DVD or VCD'
+      ImageIndex = 1
+      ShortCut = 115
+      OnExecute = OpenDiscActionExecute
+    end
+    object NetworkStreamAction: TAction
+      Category = 'Menu'
+      Caption = 'Net'
+      Hint = 'Open a network stream'
+      ImageIndex = 2
+      ShortCut = 116
+      OnExecute = NetworkStreamActionExecute
+    end
+    object BackAction: TAction
+      Category = 'Control'
+      Caption = 'Back'
+      Enabled = False
+      ImageIndex = 3
+      OnExecute = BackActionExecute
+    end
+    object PlayAction: TAction
+      Category = 'Control'
+      Caption = 'Play'
+      Hint = 'Play stream'
+      ImageIndex = 5
+      OnExecute = PlayActionExecute
+    end
+    object PauseAction: TAction
+      Category = 'Control'
+      Caption = 'Pause'
+      Enabled = False
+      Hint = 'Pause stream'
+      ImageIndex = 6
+      OnExecute = PauseActionExecute
+    end
+    object StopAction: TAction
+      Category = 'Control'
+      Caption = 'Stop'
+      Enabled = False
+      Hint = 'Stop stream'
+      ImageIndex = 4
+      OnExecute = StopActionExecute
+    end
+    object EjectAction: TAction
+      Category = 'Control'
+      Caption = 'Eject'
+      Enabled = False
+      Hint = 'Eject disc'
+      ImageIndex = 7
+      OnExecute = EjectActionExecute
+    end
+    object SlowAction: TAction
+      Category = 'Control'
+      Caption = 'Slow'
+      Enabled = False
+      Hint = 'Play slower'
+      ImageIndex = 8
+      OnExecute = SlowActionExecute
+    end
+    object FastAction: TAction
+      Category = 'Control'
+      Caption = 'Fast'
+      Enabled = False
+      Hint = 'Play faster'
+      ImageIndex = 9
+      OnExecute = FastActionExecute
+    end
+    object PreviousAction: TAction
+      Category = 'Control'
+      Caption = 'Prev'
+      Hint = 'Previous file'
+      ImageIndex = 11
+      OnExecute = PreviousActionExecute
+    end
+    object NextAction: TAction
+      Category = 'Control'
+      Caption = 'Next'
+      Hint = 'Next file'
+      ImageIndex = 12
+      OnExecute = NextActionExecute
+    end
+    object PlaylistAction: TAction
+      Category = 'Menu'
+      Caption = 'Playlist'
+      Hint = 'Open the playlist window'
+      ImageIndex = 10
+      ShortCut = 16464
+      OnExecute = PlaylistActionExecute
+    end
+    object ExitAction: TAction
+      Category = 'Menu'
+      Caption = 'Exit'
+      Hint = 'Exit the program'
+      ShortCut = 16465
+      OnExecute = ExitActionExecute
+    end
+    object FullscreenAction: TAction
+      Category = 'Control'
+      Caption = 'Fullscreen'
+      Hint = 'Toggle fullscreen'
+      OnExecute = FullscreenActionExecute
+    end
+    object PreferencesAction: TAction
+      Category = 'Menu'
+      Caption = 'Preferences...'
+      Hint = 'Configure the application'
+      OnExecute = PreferencesActionExecute
+    end
+    object MessagesAction: TAction
+      Category = 'Menu'
+      Caption = 'Messages...'
+      Hint = 'Open the messages window'
+      ShortCut = 16461
+      OnExecute = MessagesActionExecute
+    end
+    object AboutAction: TAction
+      Category = 'Menu'
+      Caption = 'About...'
+      Hint = 'About this application'
+      OnExecute = AboutActionExecute
+    end
+    object PrevTitleAction: TAction
+      Category = 'Control'
+      Caption = 'Prev'
+      Hint = 'Jump to previous title'
+      OnExecute = PrevTitleActionExecute
+    end
+    object NextTitleAction: TAction
+      Category = 'Control'
+      Caption = 'Next'
+      Hint = 'Jump to next title'
+      OnExecute = NextTitleActionExecute
+    end
+    object PrevChapterAction: TAction
+      Category = 'Control'
+      Caption = 'Prev'
+      Hint = 'Jump to previous chapter'
+      OnExecute = PrevChapterActionExecute
+    end
+    object NextChapterAction: TAction
+      Category = 'Control'
+      Caption = 'Next'
+      Hint = 'Jump to next chapter'
+      OnExecute = NextChapterActionExecute
+    end
   end
 end

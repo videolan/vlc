@@ -334,16 +334,14 @@ void __fastcall TPreferencesDlg::FormClose( TObject *Sender,
 void __fastcall TPreferencesDlg::FormShow( TObject *Sender )
 {
 /*
-    p_intfGlobal->p_sys->p_window->MenuPreferences->Checked = true;
-    p_intfGlobal->p_sys->p_window->PopupPreferences->Checked = true;
+    p_intfGlobal->p_sys->p_window->PreferencesAction->Checked = true;
 */
 }
 //---------------------------------------------------------------------------
 void __fastcall TPreferencesDlg::FormHide( TObject *Sender )
 {
 /*
-    p_intfGlobal->p_sys->p_window->MenuPreferences->Checked = false;
-    p_intfGlobal->p_sys->p_window->PopupPreferences->Checked = false;
+    p_intfGlobal->p_sys->p_window->PreferencesAction->Checked = false;
 */
 }
 

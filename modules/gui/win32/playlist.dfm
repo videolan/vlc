@@ -1,6 +1,6 @@
 object PlaylistDlg: TPlaylistDlg
-  Left = 447
-  Top = 197
+  Left = 162
+  Top = 364
   Width = 335
   Height = 436
   Caption = 'Playlist'
@@ -51,11 +51,11 @@ object PlaylistDlg: TPlaylistDlg
     TabOrder = 1
     ViewStyle = vsReport
     OnCustomDrawItem = ListViewPlaylistCustomDrawItem
-    OnDblClick = ListViewPlaylistDblClick
+    OnDblClick = PlayStreamActionExecute
     OnKeyDown = ListViewPlaylistKeyDown
   end
   object MainMenuPlaylist: TMainMenu
-    Left = 24
+    Left = 8
     Top = 352
     object MenuAdd: TMenuItem
       Caption = '&Add'
@@ -80,54 +80,79 @@ object PlaylistDlg: TPlaylistDlg
     object MenuDelete: TMenuItem
       Caption = '&Delete'
       object MenuDeleteAll: TMenuItem
-        Caption = '&All'
-        OnClick = MenuDeleteAllClick
+        Action = DeleteAllAction
       end
       object MenuDeleteSelected: TMenuItem
-        Caption = '&Selected'
-        OnClick = MenuDeleteSelectedClick
+        Action = DeleteSelectionAction
+        Caption = '&Selection'
       end
     end
     object MenuSelection: TMenuItem
       Caption = '&Selection'
       object MenuSelectionCrop: TMenuItem
-        Caption = '&Crop'
-        OnClick = MenuSelectionCropClick
+        Action = CropSelectionAction
       end
       object MenuSelectionInvert: TMenuItem
-        Caption = '&Invert'
-        OnClick = MenuSelectionInvertClick
+        Action = InvertSelectionAction
       end
     end
   end
   object PopupMenuPlaylist: TPopupMenu
-    Left = 272
+    Left = 40
     Top = 352
     object PopupPlay: TMenuItem
-      Caption = '&Play'
-      OnClick = PopupPlayClick
+      Action = PlayStreamAction
     end
     object N1: TMenuItem
       Caption = '-'
     end
     object PopupInvertSelection: TMenuItem
+      Action = InvertSelectionAction
       Caption = '&Invert selection'
-      OnClick = PopupInvertSelectionClick
     end
     object PopupCropSelection: TMenuItem
+      Action = CropSelectionAction
       Caption = '&Crop selection'
-      OnClick = PopupCropSelectionClick
     end
     object N2: TMenuItem
       Caption = '-'
     end
     object PopupDeleteSelected: TMenuItem
-      Caption = '&Delete selected'
-      OnClick = PopupDeleteSelectedClick
+      Action = DeleteSelectionAction
+      Caption = '&Delete selection'
     end
     object PopupDeleteAll: TMenuItem
+      Action = DeleteAllAction
       Caption = 'Delete &all'
-      OnClick = PopupDeleteAllClick
+    end
+  end
+  object ActionList1: TActionList
+    Left = 264
+    Top = 352
+    object InvertSelectionAction: TAction
+      Caption = 'Invert'
+      Hint = 'Invert selection'
+      OnExecute = InvertSelectionActionExecute
+    end
+    object CropSelectionAction: TAction
+      Caption = 'Crop'
+      Hint = 'Crop selection'
+      OnExecute = CropSelectionActionExecute
+    end
+    object DeleteSelectionAction: TAction
+      Caption = 'Delete'
+      Hint = 'Delete selection'
+      OnExecute = DeleteSelectionActionExecute
+    end
+    object DeleteAllAction: TAction
+      Caption = 'All'
+      Hint = 'Delete all items'
+      OnExecute = DeleteAllActionExecute
+    end
+    object PlayStreamAction: TAction
+      Caption = 'Play'
+      Hint = 'Play the selected stream'
+      OnExecute = PlayStreamActionExecute
     end
   end
 end

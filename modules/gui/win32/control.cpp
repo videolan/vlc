@@ -64,7 +64,7 @@ bool ControlPlay( TObject *Sender )
         vlc_object_find( p_intfGlobal, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
-        p_intfGlobal->p_sys->p_window->MenuOpenFileClick( Sender );
+        p_intfGlobal->p_sys->p_window->OpenFileActionExecute( Sender );
         return false;
     }
 
@@ -79,7 +79,7 @@ bool ControlPlay( TObject *Sender )
     {
         vlc_mutex_unlock( &p_playlist->object_lock );
         vlc_object_release( p_playlist );
-        p_intfGlobal->p_sys->p_window->MenuOpenFileClick( Sender );
+        p_intfGlobal->p_sys->p_window->OpenFileActionExecute( Sender );
     }
 
     return true;

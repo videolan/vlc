@@ -125,9 +125,9 @@ void __fastcall TMainFrameDlg::FormClose( TObject *Sender,
 
 
 /*****************************************************************************
- * Menu callbacks
+ * Main callbacks
  ****************************************************************************/
-void __fastcall TMainFrameDlg::MenuOpenFileClick( TObject *Sender )
+void __fastcall TMainFrameDlg::OpenFileActionExecute( TObject *Sender )
 {
     AnsiString      FileName;
     playlist_t *    p_playlist;
@@ -153,7 +153,7 @@ void __fastcall TMainFrameDlg::MenuOpenFileClick( TObject *Sender )
     vlc_object_release( p_playlist );
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::MenuOpenDiscClick( TObject *Sender )
+void __fastcall TMainFrameDlg::OpenDiscActionExecute( TObject *Sender )
 {
     TDiscDlg *p_disc = p_intfGlobal->p_sys->p_disc;
     if( p_disc == NULL )
@@ -164,7 +164,7 @@ void __fastcall TMainFrameDlg::MenuOpenDiscClick( TObject *Sender )
     p_disc->Show();
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::MenuNetworkStreamClick( TObject *Sender )
+void __fastcall TMainFrameDlg::NetworkStreamActionExecute( TObject *Sender )
 {
     TNetworkDlg *p_network = p_intfGlobal->p_sys->p_network;
     if( p_network == NULL )
@@ -175,17 +175,12 @@ void __fastcall TMainFrameDlg::MenuNetworkStreamClick( TObject *Sender )
     p_network->Show();
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::MenuExitClick( TObject *Sender )
+void __fastcall TMainFrameDlg::ExitActionExecute( TObject *Sender )
 {
     Close();
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::MenuHideinterfaceClick( TObject *Sender )
-{
-     this->SendToBack();
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::MenuFullscreenClick( TObject *Sender )
+void __fastcall TMainFrameDlg::FullscreenActionExecute( TObject *Sender )
 {
     vout_thread_t *p_vout;
 
@@ -200,7 +195,7 @@ void __fastcall TMainFrameDlg::MenuFullscreenClick( TObject *Sender )
     vlc_object_release( p_vout );
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::MenuPlaylistClick( TObject *Sender )
+void __fastcall TMainFrameDlg::PlaylistActionExecute( TObject *Sender )
 {
     TPlaylistDlg *p_playwin = p_intfGlobal->p_sys->p_playwin;
     if( p_playwin->Visible )
@@ -223,89 +218,64 @@ void __fastcall TMainFrameDlg::MenuPlaylistClick( TObject *Sender )
     }
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::MenuMessagesClick( TObject *Sender )
+void __fastcall TMainFrameDlg::MessagesActionExecute( TObject *Sender )
 {
      p_intfGlobal->p_sys->p_messages->Show();
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::MenuPreferencesClick( TObject *Sender )
+void __fastcall TMainFrameDlg::PreferencesActionExecute( TObject *Sender )
 {
     CreatePreferences( "main" );
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::MenuAboutClick( TObject *Sender )
+void __fastcall TMainFrameDlg::AboutActionExecute( TObject *Sender )
 {
     p_intfGlobal->p_sys->p_about = new TAboutDlg( this );
     p_intfGlobal->p_sys->p_about->ShowModal();
     delete p_intfGlobal->p_sys->p_about;
 }
 //---------------------------------------------------------------------------
-
-
-/*****************************************************************************
- * Toolbar callbacks
- ****************************************************************************/
-void __fastcall TMainFrameDlg::ToolButtonFileClick( TObject *Sender )
-{
-    MenuOpenFileClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonDiscClick( TObject *Sender )
-{
-    MenuOpenDiscClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonNetClick( TObject *Sender )
-{
-    MenuNetworkStreamClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonPlaylistClick( TObject *Sender )
-{
-    MenuPlaylistClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonBackClick( TObject *Sender )
+void __fastcall TMainFrameDlg::BackActionExecute( TObject *Sender )
 {
     ControlBack( Sender );
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonStopClick( TObject *Sender )
-{
-    ControlStop( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonPlayClick( TObject *Sender )
+void __fastcall TMainFrameDlg::PlayActionExecute( TObject *Sender )
 {
     ControlPlay( Sender );
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonPauseClick( TObject *Sender )
+void __fastcall TMainFrameDlg::PauseActionExecute( TObject *Sender )
 {
     ControlPause( Sender );
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonSlowClick( TObject *Sender )
+void __fastcall TMainFrameDlg::StopActionExecute( TObject *Sender )
+{
+    ControlStop( Sender );
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainFrameDlg::SlowActionExecute( TObject *Sender )
 {
     ControlSlow( Sender );
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonFastClick( TObject *Sender )
+void __fastcall TMainFrameDlg::FastActionExecute( TObject *Sender )
 {
     ControlFast( Sender );
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonPrevClick( TObject *Sender )
+void __fastcall TMainFrameDlg::PreviousActionExecute(TObject *Sender)
 {
     p_intfGlobal->p_sys->p_playwin->Previous();
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonNextClick( TObject *Sender )
+void __fastcall TMainFrameDlg::NextActionExecute(TObject *Sender)
 {
     p_intfGlobal->p_sys->p_playwin->Next();
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonEjectClick( TObject *Sender )
+void __fastcall TMainFrameDlg::EjectActionExecute( TObject *Sender )
 {
     AnsiString Device = "";
     char * psz_current;
@@ -359,43 +329,11 @@ void __fastcall TMainFrameDlg::ToolButtonEjectClick( TObject *Sender )
 
 
 /*****************************************************************************
- * Popup callbacks
+ * Menu and popup callbacks
  ****************************************************************************/
-void __fastcall TMainFrameDlg::PopupCloseClick( TObject *Sender )
+void __fastcall TMainFrameDlg::MenuHideinterfaceClick( TObject *Sender )
 {
-    /* We do nothing, we just need a click on a menu item
-     * to close the popup. Don't ask me why... */
-    return;
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupPlayClick( TObject *Sender )
-{
-    ToolButtonPlayClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupPauseClick( TObject *Sender )
-{
-    ToolButtonPauseClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupStopClick( TObject *Sender )
-{
-    ToolButtonStopClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupBackClick( TObject *Sender )
-{
-    ToolButtonBackClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupSlowClick( TObject *Sender )
-{
-    ToolButtonSlowClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupFastClick( TObject *Sender )
-{
-    ToolButtonFastClick( Sender );
+     this->SendToBack();
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::PopupToggleInterfaceClick( TObject *Sender )
@@ -403,19 +341,11 @@ void __fastcall TMainFrameDlg::PopupToggleInterfaceClick( TObject *Sender )
     this->BringToFront();
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupFullscreenClick( TObject *Sender )
+void __fastcall TMainFrameDlg::PopupCloseClick( TObject *Sender )
 {
-    MenuFullscreenClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupNextClick( TObject *Sender )
-{
-    ToolButtonNextClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupPrevClick( TObject *Sender )
-{
-    ToolButtonPrevClick( Sender );
+    /* We do nothing, we just need a click on a menu item
+     * to close the popup. Don't ask me why... */
+    return;
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::PopupJumpClick( TObject *Sender )
@@ -423,42 +353,12 @@ void __fastcall TMainFrameDlg::PopupJumpClick( TObject *Sender )
     // TODO
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupPlaylistClick( TObject *Sender )
-{
-    MenuPlaylistClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupPreferencesClick( TObject *Sender )
-{
-    MenuPreferencesClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupExitClick( TObject *Sender )
-{
-    MenuExitClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupOpenFileClick( TObject *Sender )
-{
-    MenuOpenFileClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupOpenDiscClick( TObject *Sender )
-{
-    MenuOpenDiscClick( Sender );
-}
-//---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::PopupNetworkStreamClick( TObject *Sender )
-{
-    MenuNetworkStreamClick( Sender );
-}
-//---------------------------------------------------------------------------
 
 
 /*****************************************************************************
  * Callbacks for DVD/VCD navigation
  ****************************************************************************/
-void __fastcall TMainFrameDlg::ButtonTitlePrevClick( TObject *Sender )
+void __fastcall TMainFrameDlg::PrevTitleActionExecute( TObject *Sender )
 {
     intf_thread_t * p_intf;
     input_area_t  * p_area;
@@ -482,7 +382,7 @@ void __fastcall TMainFrameDlg::ButtonTitlePrevClick( TObject *Sender )
     }
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ButtonTitleNextClick( TObject *Sender )
+void __fastcall TMainFrameDlg::NextTitleActionExecute( TObject *Sender )
 {
     intf_thread_t * p_intf;
     input_area_t  * p_area;
@@ -505,7 +405,7 @@ void __fastcall TMainFrameDlg::ButtonTitleNextClick( TObject *Sender )
     }
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ButtonChapterPrevClick( TObject *Sender )
+void __fastcall TMainFrameDlg::PrevChapterActionExecute( TObject *Sender )
 {
     intf_thread_t * p_intf = p_intfGlobal;
     input_area_t  * p_area;
@@ -526,7 +426,7 @@ void __fastcall TMainFrameDlg::ButtonChapterPrevClick( TObject *Sender )
     }
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ButtonChapterNextClick( TObject *Sender )
+void __fastcall TMainFrameDlg::NextChapterActionExecute( TObject *Sender )
 {
     intf_thread_t * p_intf = p_intfGlobal;
     input_area_t  * p_area;
@@ -685,15 +585,12 @@ void __fastcall TMainFrameDlg::ModeManage()
 
     /* set control items */
     ToolButtonBack->Enabled = false;
-    ToolButtonStop->Enabled = true;
     ToolButtonEject->Enabled = !b_control;
-    ToolButtonPause->Enabled = b_control;
-    ToolButtonSlow->Enabled = b_control;
-    ToolButtonFast->Enabled = b_control;
+    StopAction->Enabled = true;
+    PauseAction->Enabled = b_control;
+    SlowAction->Enabled = b_control;
+    FastAction->Enabled = b_control;
     PopupBack->Enabled = false;
-    PopupPause->Enabled = b_control;
-    PopupSlow->Enabled = b_control;
-    PopupFast->Enabled = b_control;
 }
 //---------------------------------------------------------------------------
 

@@ -31,6 +31,7 @@
 #include <Menus.hpp>
 #include <Grids.hpp>
 #include <ComCtrls.hpp>
+#include <ActnList.hpp>
 
 //---------------------------------------------------------------------------
 class TPlaylistDlg : public TForm
@@ -58,10 +59,15 @@ __published:	// IDE-managed Components
     TMenuItem *N2;
     TMenuItem *PopupInvertSelection;
     TMenuItem *PopupCropSelection;
+    TActionList *ActionList1;
+    TAction *InvertSelectionAction;
+    TAction *CropSelectionAction;
+    TAction *DeleteSelectionAction;
+    TAction *DeleteAllAction;
+    TAction *PlayStreamAction;
     void __fastcall FormShow( TObject *Sender );
     void __fastcall FormHide( TObject *Sender );
     void __fastcall BitBtnOkClick( TObject *Sender );
-    void __fastcall ListViewPlaylistDblClick( TObject *Sender );
     void __fastcall ListViewPlaylistKeyDown( TObject *Sender, WORD &Key,
             TShiftState Shift );
     void __fastcall ListViewPlaylistCustomDrawItem( TCustomListView *Sender,
@@ -70,15 +76,11 @@ __published:	// IDE-managed Components
     void __fastcall MenuAddDiscClick( TObject *Sender );
     void __fastcall MenuAddNetClick( TObject *Sender );
     void __fastcall MenuAddUrlClick( TObject *Sender );
-    void __fastcall MenuDeleteSelectedClick( TObject *Sender );
-    void __fastcall MenuDeleteAllClick( TObject *Sender );
-    void __fastcall MenuSelectionInvertClick( TObject *Sender );
-    void __fastcall MenuSelectionCropClick( TObject *Sender );
-    void __fastcall PopupPlayClick( TObject *Sender );
-    void __fastcall PopupInvertSelectionClick( TObject *Sender );
-    void __fastcall PopupCropSelectionClick( TObject *Sender );
-    void __fastcall PopupDeleteSelectedClick( TObject *Sender );
-    void __fastcall PopupDeleteAllClick( TObject *Sender );
+    void __fastcall InvertSelectionActionExecute( TObject *Sender );
+    void __fastcall CropSelectionActionExecute( TObject *Sender );
+    void __fastcall DeleteSelectionActionExecute( TObject *Sender );
+    void __fastcall DeleteAllActionExecute( TObject *Sender );
+    void __fastcall PlayStreamActionExecute( TObject *Sender );
 private:	// User declarations
     char * __fastcall rindex( char *s, char c );
 public:		// User declarations
