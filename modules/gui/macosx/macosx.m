@@ -2,7 +2,7 @@
  * macosx.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: macosx.m,v 1.6 2003/03/30 23:35:06 jlj Exp $
+ * $Id: macosx.m,v 1.7 2003/04/19 13:55:56 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -46,6 +46,11 @@ void E_(CloseVideo)   ( vlc_object_t * );
  *****************************************************************************/
 #define VDEV_TEXT N_("video device")
 
+#define OPAQUENESS_TEXT N_("opaqueness")
+#define OPAQUENESS_LONGTEXT N_( \
+    "Set the transparency of the video output. 1 is non-transparent (default) " \
+    "0 is fully transparent.")
+
 vlc_module_begin();
     set_description( _("MacOS X interface, sound and video") );
     add_submodule();
@@ -56,5 +61,6 @@ vlc_module_begin();
         set_callbacks( E_(OpenVideo), E_(CloseVideo) );
         add_category_hint( N_("Video"), NULL, VLC_FALSE );
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_TEXT, VLC_FALSE );
+        add_float( "opaqueness", 1, NULL, OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 

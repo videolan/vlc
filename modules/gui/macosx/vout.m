@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.43 2003/03/19 13:55:43 hartman Exp $
+ * $Id: vout.m,v 1.44 2003/04/19 13:55:56 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -1255,6 +1255,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             styleMask: i_stylemask
             backing: NSBackingStoreBuffered
             defer: NO screen: o_screen];
+
+        [p_vout->p_sys->o_window setAlphaValue: config_GetFloat( p_vout, "opaqueness" )];
 
         if( !p_vout->p_sys->b_pos_saved )   
         {
