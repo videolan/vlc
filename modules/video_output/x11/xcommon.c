@@ -2145,10 +2145,11 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
             vlc_mutex_lock( &p_vout->p_sys->lock );
 
             /* Update dimensions */
+            /* FIXME: export InitWindowSize() from vout core */
             XResizeWindow( p_vout->p_sys->p_display,
                            p_vout->p_sys->p_win->base_window,
-                           p_vout->render.i_width * f_arg,
-                           p_vout->render.i_height * f_arg );
+                           p_vout->i_window_width * f_arg,
+                           p_vout->i_window_height * f_arg );
 
             vlc_mutex_unlock( &p_vout->p_sys->lock );
             return VLC_SUCCESS;

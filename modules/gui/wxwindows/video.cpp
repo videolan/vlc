@@ -2,7 +2,7 @@
  * video.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004, 2003 VideoLAN
- * $Id: interface.cpp 6961 2004-03-05 17:34:23Z sam $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -280,8 +280,8 @@ int VideoWindow::ControlWindow( void *p_window, int i_query, va_list args )
             double f_arg = va_arg( args, double );
 
             /* Update dimensions */
-            wxSizeEvent event( wxSize(p_vout->render.i_width * f_arg,
-                                      p_vout->render.i_height * f_arg),
+            wxSizeEvent event( wxSize(p_vout->i_window_width * f_arg,
+                                      p_vout->i_window_height * f_arg),
                                UpdateSize_Event );
             AddPendingEvent( event );
 
