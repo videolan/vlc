@@ -1,6 +1,24 @@
+diff -ru ffmpeg-original/configure ffmpeg/configure
+--- ffmpeg-original/configure	Fri Aug 13 02:59:48 2004
++++ ffmpeg/configure	Mon Aug 16 12:54:10 2004
+@@ -351,11 +351,11 @@
+   ;;
+   --make=*) make=`echo $opt | cut -d '=' -f 2`
+   ;;
+-  --extra-cflags=*) CFLAGS="${opt#--extra-cflags=}"
++  --extra-cflags=*) CFLAGS="$CFLAGS ${opt#--extra-cflags=}"
+   ;;
+-  --extra-ldflags=*) LDFLAGS=${opt#--extra-ldflags=}
++  --extra-ldflags=*) LDFLAGS="$LDFLAGS ${opt#--extra-ldflags=}"
+   ;;
+-  --extra-libs=*) extralibs=${opt#--extra-libs=}
++  --extra-libs=*) extralibs="$extralibs ${opt#--extra-libs=}"
+   ;;
+   --cpu=*) cpu=`echo $opt | cut -d '=' -f 2`
+   ;;
 diff -ru ffmpeg-original/libavcodec/eval.c ffmpeg/libavcodec/eval.c
---- ffmpeg-original/libavcodec/eval.c	Wed Feb 18 12:49:30 2004
-+++ ffmpeg/libavcodec/eval.c	Fri Jul 23 11:39:29 2004
+--- ffmpeg-original/libavcodec/eval.c	Wed Feb 18 13:49:30 2004
++++ ffmpeg/libavcodec/eval.c	Mon Aug 16 12:46:02 2004
 @@ -34,6 +34,8 @@
  #include <string.h>
  #include <math.h>
@@ -10,21 +28,9 @@ diff -ru ffmpeg-original/libavcodec/eval.c ffmpeg/libavcodec/eval.c
  #ifndef NAN
    #define NAN 0
  #endif
-diff -ru ffmpeg-original/libavcodec/msmpeg4.c ffmpeg/libavcodec/msmpeg4.c
---- ffmpeg-original/libavcodec/msmpeg4.c	Tue May 25 18:07:24 2004
-+++ ffmpeg/libavcodec/msmpeg4.c	Fri Jul 23 11:49:38 2004
-@@ -716,7 +716,7 @@
-        necessitate to modify mpegvideo.c. The problem comes from the
-        fact they decided to store the quantized DC (which would lead
-        to problems if Q could vary !) */
--#if defined ARCH_X86 && !defined PIC
-+#if defined ARCH_X86 && !defined PIC && !defined __PIC__
-     asm volatile(
-         "movl %3, %%eax		\n\t"
- 	"shrl $1, %%eax		\n\t"
 diff -ru ffmpeg-original/libavformat/tcp.c ffmpeg/libavformat/tcp.c
---- ffmpeg-original/libavformat/tcp.c	Sat Jun 19 03:59:34 2004
-+++ ffmpeg/libavformat/tcp.c	Fri Jul 23 11:52:23 2004
+--- ffmpeg-original/libavformat/tcp.c	Thu Aug 12 02:09:32 2004
++++ ffmpeg/libavformat/tcp.c	Mon Aug 16 12:46:02 2004
 @@ -32,6 +32,7 @@
  #include <netdb.h>
  #include <sys/time.h>
@@ -33,7 +39,7 @@ diff -ru ffmpeg-original/libavformat/tcp.c ffmpeg/libavformat/tcp.c
  
  typedef struct TCPContext {
      int fd;
-@@ -120,11 +121,13 @@
+@@ -113,11 +114,13 @@
                  break;
          }
          

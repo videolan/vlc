@@ -116,10 +116,10 @@ class vlc_stream_io_callback: public IOCallback
   public:
     vlc_stream_io_callback( stream_t * );
 
-    virtual uint32_t read            ( void *p_buffer, size_t i_size);
+    virtual uint32   read            ( void *p_buffer, size_t i_size);
     virtual void     setFilePointer  ( int64_t i_offset, seek_mode mode = seek_beginning );
     virtual size_t   write           ( const void *p_buffer, size_t i_size);
-    virtual uint64_t getFilePointer  ( void );
+    virtual uint64   getFilePointer  ( void );
     virtual void     close           ( void );
 };
 
@@ -1245,7 +1245,7 @@ vlc_stream_io_callback::vlc_stream_io_callback( stream_t *s_ )
     mb_eof = VLC_FALSE;
 }
 
-uint32_t vlc_stream_io_callback::read( void *p_buffer, size_t i_size )
+uint32 vlc_stream_io_callback::read( void *p_buffer, size_t i_size )
 {
     if( i_size <= 0 || mb_eof )
     {
@@ -1288,7 +1288,7 @@ size_t vlc_stream_io_callback::write( const void *p_buffer, size_t i_size )
 {
     return 0;
 }
-uint64_t vlc_stream_io_callback::getFilePointer( void )
+uint64 vlc_stream_io_callback::getFilePointer( void )
 {
     return stream_Tell( s );
 }

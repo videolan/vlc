@@ -66,7 +66,7 @@ static void MergeAltivec ( void *, const void *, const void *, size_t );
 #if defined(CAN_COMPILE_MMXEXT)
 static void MergeMMX     ( void *, const void *, const void *, size_t );
 #endif
-#if defined(CAN_COMPILE_SSE) && !defined(SYS_BEOS)
+#if defined(CAN_COMPILE_SSE)
 static void MergeSSE2    ( void *, const void *, const void *, size_t );
 #endif
 #if defined(CAN_COMPILE_MMXEXT) || defined(CAN_COMPILE_SSE)
@@ -176,7 +176,7 @@ static int Create( vlc_object_t *p_this )
     }
     else
 #endif
-#if defined(CAN_COMPILE_SSE) && !defined(SYS_BEOS)
+#if defined(CAN_COMPILE_SSE)
     if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_SSE2 )
     {
         p_vout->p_sys->pf_merge = MergeSSE2;
@@ -900,7 +900,7 @@ static void MergeMMX( void *_p_dest, const void *_p_s1, const void *_p_s2,
 }
 #endif
 
-#if defined(CAN_COMPILE_SSE) && !defined(SYS_BEOS)
+#if defined(CAN_COMPILE_SSE)
 static void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
                        size_t i_bytes )
 {

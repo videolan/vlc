@@ -188,7 +188,7 @@ uint32_t CPUCapabilities( void )
 
     if( i_edx & 0x04000000 )
     {
-#   if defined(CAN_COMPILE_SSE) && !defined(SYS_BEOS)
+#   if defined(CAN_COMPILE_SSE)
         /* We test if OS supports the SSE instructions */
         psz_capability = "SSE2";
         i_illegal = 0;

@@ -59,8 +59,8 @@ endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
-	.FLAC .speex .faad .faac .lame .ffmpeg .dvdcss .dvdread .dvdnav \
-	.dvbpsi .dts
+	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
+	.dvdread .dvdnav .dvbpsi .dts
 endif
 
 FORCE:
@@ -353,7 +353,7 @@ mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
 
 mpeg2dec: mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/mpeg2dec.patch
+#	patch -p 0 < Patches/mpeg2dec.patch
 
 .mpeg2: mpeg2dec
 	(cd $<; ./configure --prefix=$(PREFIX) --without-x --disable-dsl && make && make install)
@@ -587,6 +587,7 @@ libebml-$(LIBEBML_VERSION).tar.gz:
 
 libebml: libebml-$(LIBEBML_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/ebml.patch
 	-rm -rf $@/CVS
 
 .ebml: libebml
@@ -607,6 +608,7 @@ libmatroska-$(LIBMATROSKA_VERSION).tar.gz:
 
 libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/matroska.patch
 	-rm -rf $@/CVS
 
 .matroska: libmatroska
@@ -636,7 +638,7 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 #	patch -p 0 < Patches/ffmpeg.patch
 
 .ffmpeg: ffmpeg
-	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-faac --enable-pp --disable-vhook --disable-audio-beos --disable-ffserver --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame --disable-zlib --enable-a52 && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
+	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-faac --enable-pp --disable-vhook --disable-audio-beos --disable-ffserver --disable-vorbis --disable-faad --enable-mp3lame --disable-zlib --enable-a52 && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
 	touch $@
 
 CLEAN_FILE += .ffmpeg
