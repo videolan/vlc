@@ -102,7 +102,6 @@ typedef struct intf_msg_s
      * dummy integer is used to fill it. */
     int                     i_dummy;                        /* unused filler */
 #endif
-//    int                     i_warning_level;
 } intf_msg_t;
 
 /*****************************************************************************
@@ -415,6 +414,9 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
      */
     p_msg_item->i_type =     i_type;
     p_msg_item->psz_msg =    psz_str;
+#ifdef DEBUG    
+    p_msg_item->date =         mdate();
+#endif
 
 #ifdef INTF_MSG_QUEUE /*......................................... queue mode */
     vlc_mutex_unlock( &p_msg->lock );                      /* give lock back */
@@ -464,9 +466,7 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
     vlc_mutex_lock( &p_msg->lock );                              /* get lock */
     if( p_msg->i_count == INTF_MSG_QSIZE )          /* flush queue if needed */
     {
-#ifdef DEBUG               /* in debug mode, queue overflow causes a warning */
         fprintf(stderr, "warning: message queue overflow\n" );
-#endif
         FlushLockedMsg( p_msg );
     }
     p_msg_item = p_msg->msg + p_msg->i_count++;            /* select message */
@@ -539,7 +539,10 @@ static void PrintMsg( intf_msg_item_t *p_msg )
         break;
 
     case INTF_MSG_WARN:                                   /* Warning message */
-        asprintf( &psz_msg, "%s", p_msg->psz_msg );
+        mstrtime( psz_date, p_msg->date );
+        asprintf( &psz_msg, "(%s) %s",
+                  psz_date, p_msg->psz_msg );
+
         break;
         
     case INTF_MSG_INTF:                                /* interface messages */
