@@ -1554,15 +1554,6 @@ static httpd_client_t *httpd_ClientNew( int fd, struct sockaddr_storage *sock,
                                         tls_session_t *p_tls )
 {
     httpd_client_t *cl = malloc( sizeof( httpd_client_t ) );
-    /* set this new socket non-block */
-#if defined( WIN32 ) || defined( UNDER_CE )
-    {
-        unsigned long i_dummy = 1;
-        ioctlsocket( fd, FIONBIO, &i_dummy );
-    }
-#else
-    fcntl( fd, F_SETFL, O_NONBLOCK );
-#endif
     cl->i_ref   = 0;
     cl->fd      = fd;
     memcpy( &cl->sock, sock, sizeof( cl->sock ) );
@@ -2431,6 +2422,17 @@ static void httpd_HostThread( httpd_host_t *host )
             fd = accept( host->fd, (struct sockaddr *)&sock, &i_sock_size );
             if( fd >= 0 )
             {
+                /* set this new socket non-block */
+#if defined( WIN32 ) || defined( UNDER_CE )
+                {
+                    unsigned long i_dummy = 1;
+                    ioctlsocket( fd, FIONBIO, &i_dummy );
+                }
+#else
+                fcntl( fd, F_SETFL, O_NONBLOCK );
+#endif
+
+                /* FIXME: that MUST be non-blocking */
                 if( p_tls != NULL)
                 {
                     p_tls = tls_SessionHandshake( p_tls, fd );
