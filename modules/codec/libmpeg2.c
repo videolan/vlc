@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.4 2003/03/25 23:06:49 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.5 2003/03/26 22:56:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -266,6 +266,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                 if( p_dec->p_info->display_picture->flags & PIC_FLAG_PTS )
                 {
                     p_dec->i_pts = p_pic->date;
+                    p_dec->i_period_remainder = 0;
                 }
                 else
                 {
@@ -280,6 +281,23 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                 vout_DatePicture( p_dec->p_vout, p_pic, p_dec->i_pts );
 
                 vout_DisplayPicture( p_dec->p_vout, p_pic );
+
+                /* Handle pulldown by adding some delay to the pts of the next
+                 * picture. */
+                if( p_dec->p_info->display_picture->nb_fields > 2 )
+                {
+                    int i_repeat_fields =
+                        p_dec->p_info->display_picture->nb_fields - 2;
+
+                    p_dec->i_pts += ( (p_dec->p_info->sequence->frame_period +
+                                       p_dec->i_period_remainder)
+                                      / 27 / 2 * i_repeat_fields );
+                    p_dec->i_period_remainder =
+                        p_dec->p_info->sequence->frame_period +
+                        p_dec->i_period_remainder -
+                        ( p_dec->p_info->sequence->frame_period +
+                          p_dec->i_period_remainder ) / 27 / 2 * 27 * 2;
+                }
             }
             break;
 
