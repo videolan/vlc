@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.29 2002/12/14 21:32:42 fenrir Exp $
+ * $Id: libvlc.h,v 1.30 2002/12/14 22:33:21 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -489,8 +489,8 @@ vlc_module_begin();
     /* Stream output */
     add_category_hint( N_("Stream output"), NULL );
     add_module( "packetizer", "packetizer", NULL, NULL, PACKETIZER_TEXT, PACKETIZER_LONGTEXT );
-    add_module( "mux", "mux", NULL, NULL, MUX_TEXT, MUX_LONGTEXT );
-    add_module( "access_output", "access_output", NULL, NULL, ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT );
+    add_module( "mux", "sout mux", NULL, NULL, MUX_TEXT, MUX_LONGTEXT );
+    add_module( "access_output", "sout access", NULL, NULL, ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT );
     add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT );
 
     /* CPU options */
