@@ -10,7 +10,7 @@
         <meta http-equiv="refresh" content="0;URL=/" />
     <vlc id="end" />
 
-    <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty" />
+    <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty,seek" />
     <vlc id="set" param1="sout" param2="string" />
  </head>
  <body>
@@ -25,8 +25,16 @@
         <td><input type="submit" name="control" value="pause" /></td>
         <td><input type="submit" name="control" value="previous" /></td>
         <td><input type="submit" name="control" value="next" /></td>
+        <td><input type="submit" name="control" value="empty" /></td>
         <td><a href="info.html">Informations</a></td>
         <td><a href="admin/">Administration</a></td>
+       </tr>
+      </table>
+     </form>
+     <form>
+      <table>
+       <tr>
+        <td>Seek (in percentage): <input type="text" name="percent" size="3">%<input type="submit" name="control" value="seek"></td>
        </tr>
       </table>
      </form>

@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.26 2003/11/02 22:51:56 gbazin Exp $
+ * $Id: http.c,v 1.27 2003/11/03 03:21:37 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1322,6 +1322,7 @@ enum macroType
         MVLC_ADD,
         MVLC_DEL,
         MVLC_EMPTY,
+        MVLC_SEEK,
 
         MVLC_CLOSE,
         MVLC_SHUTDOWN,
@@ -1353,6 +1354,7 @@ StrToMacroTypeTab [] =
         { "pause",          MVLC_PAUSE },
         { "next",           MVLC_NEXT },
         { "previous",       MVLC_PREVIOUS },
+        { "seek",           MVLC_SEEK },
 
         /* playlist management */
         { "add",            MVLC_ADD },
@@ -1478,6 +1480,22 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                                       p_sys->p_playlist->i_index - 1 );
                     msg_Dbg( p_intf, "requested playlist next" );
                     break;
+                case MVLC_SEEK:
+                {
+                    vlc_value_t val;
+                    char percent[3];
+
+                    if( p_sys->p_input )
+                    {
+                        uri_extract_value( p_request, "percent", percent, 3 );
+                        val.f_float = ((float)atoi( percent )) / 100.0;
+                        var_Set( p_sys->p_input, "position", val );
+                        msg_Dbg( p_intf, "requested seek percent: %i", atoi( percent ) );
+                    }
+                    break;
+                }
+
+              
 
                 /* playlist management */
                 case MVLC_ADD:
@@ -1946,12 +1964,36 @@ static int  http_get( httpd_file_callback_args_t *p_args,
         int  i_buffer;
         uint8_t *p_buffer;
         uint8_t *dst;
+        vlc_value_t val;
+        char position[3]; /* percentage */
+        char time[12]; /* in seconds */
+        char length[12]; /* in seconds */
+ 
+#define p_sys p_args->p_intf->p_sys
+        if( p_sys->p_input )
+        {
+            var_Get( p_sys->p_input, "position", &val);
+            sprintf( position, "%d" , (int)((val.f_float) * 100.0));
+            var_Get( p_sys->p_input, "time", &val);
+            sprintf( time, "%d" , (int)(val.i_time / 1000) );
+            var_Get( p_sys->p_input, "length", &val);
+            sprintf( length, "%d" , (int)(val.i_time / 1000) );
+        } else
+        {
+            sprintf( position, "%d", 0 );
+            sprintf( time, "%d", 0 );
+            sprintf( length, "%d", 0 );
+        }
+#undef p_sys
 
         p_args->vars = mvar_New( "variables", "" );
         mvar_AppendNewVar( p_args->vars, "url_param", i_request > 0 ? "1" : "0" );
         mvar_AppendNewVar( p_args->vars, "url_value", p_request );
         mvar_AppendNewVar( p_args->vars, "version",   VERSION_MESSAGE );
         mvar_AppendNewVar( p_args->vars, "copyright", COPYRIGHT_MESSAGE );
+        mvar_AppendNewVar( p_args->vars, "stream_position", position );
+        mvar_AppendNewVar( p_args->vars, "stream_time", time );
+        mvar_AppendNewVar( p_args->vars, "stream_length", length );
 
         SSInit( &p_args->stack );
 
