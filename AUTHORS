@@ -1,4 +1,4 @@
-# $Id: AUTHORS,v 1.94 2003/06/11 22:46:42 gbazin Exp $
+# $Id: AUTHORS,v 1.95 2003/07/07 17:01:16 sam Exp $
 # 
 # The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors are listed alphabetically.
@@ -30,6 +30,11 @@ E: stippi@yellowbites.com
 C: stippi
 D: BeOS module fixes and enhancements
 S: Germany
+
+N: Olivier Aubert
+E: oaubert at lisi dot univ-lyon1 dot fr
+D: CORBA interface
+S: France
 
 N: Sigmund Augdal
 E: sigmunau@idi.ntnu.no

@@ -1,4 +1,4 @@
-$Id: HACKING,v 1.9 2003/07/01 11:58:29 sam Exp $
+$Id: HACKING,v 1.10 2003/07/07 17:01:16 sam Exp $
 
 Hacking vlc
 ===========
@@ -65,4 +65,7 @@ How to add a module
 To add a module to the repository, just add its sources to a Modules.am
 file. If you create a new Modules.am, do not forget to add a corresponding
 Makefile line at the end of configure.ac.
+
+To have the module built, you need to add a call to AX_ADD_PLUGINS or
+AX_ADD_BUILTINS to configure.ac with your new module name as argument.
 
