@@ -308,6 +308,8 @@ module_t * module_Need( module_bank_t *p_bank,
     /* We release the global lock */
     vlc_mutex_unlock( &p_bank->lock );
 
+    intf_Msg( "module: locking module `%s'", p_bestmodule->psz_name );
+
     /* Don't forget that the module is still locked if bestmodule != NULL */
     return( p_bestmodule );
 }
@@ -326,6 +328,8 @@ void module_Unneed( module_bank_t * p_bank, module_t * p_module )
     /* Just unlock the module - we can't do anything if it fails,
      * so there is no need to check the return value. */
     UnlockModule( p_module );
+
+    intf_Msg( "module: unlocking module `%s'", p_module->psz_name );
 
     /* We release the global lock */
     vlc_mutex_unlock( &p_bank->lock );

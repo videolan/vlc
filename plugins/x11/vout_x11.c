@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.7 2001/01/05 18:46:44 massiot Exp $
+ * $Id: vout_x11.c,v 1.8 2001/01/15 06:18:23 sam Exp $
  *
  * Authors:
  *
@@ -156,7 +156,7 @@ int vout_X11Init( vout_thread_t *p_vout )
         }
         if( i_err )                                      /* an error occured */
         {
-            intf_Msg("XShm video sextension deactivated" );
+            intf_Msg("vout: XShm video sextension deactivated" );
             p_vout->p_sys->b_shm = 0;
         }
     }
@@ -265,7 +265,7 @@ int vout_X11Manage( vout_thread_t *p_vout )
          * tables. This is needed since conversion buffer size may have
          * changed */
         p_vout->i_changes |= VOUT_YUV_CHANGE;
-        intf_Msg("Video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
+        intf_Msg("vout: video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
     }
 
     return 0;
@@ -364,7 +364,7 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
     p_vout->p_sys->i_screen     = DefaultScreen( p_vout->p_sys->p_display );
     if( !p_vout->p_sys->b_shm )
     {
-        intf_Msg("XShm video extension is not available");
+        intf_Msg("vout: XShm video extension is not available");
     }
 
     /* Get screen depth */

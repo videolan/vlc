@@ -2,7 +2,7 @@
  * intf_mga.c: MGA interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_mga.c,v 1.6 2001/01/05 18:46:43 massiot Exp $
+ * $Id: intf_mga.c,v 1.7 2001/01/15 06:18:23 sam Exp $
  *
  * Authors:
  *
@@ -249,7 +249,7 @@ static int X11CreateWindow( intf_thread_t *p_intf )
                              &p_intf->p_sys->wm_delete_window, 1 ) )
     {
         /* WM_DELETE_WINDOW is not supported by window manager */
-        intf_Msg("error: missing or bad window manager - please exit program kindly.");
+        intf_Msg("intf error: missing or bad window manager - please exit program kindly.");
     }
 
     /* Creation of a graphic context that doesn't generate a GraphicsExpose event
@@ -449,7 +449,7 @@ void X11EnableScreenSaver( intf_thread_t *p_intf )
 {
     if( p_intf->p_sys->i_ss_count++ == 0 )
     {
-        intf_Msg("Enabling screen saver");
+        intf_DbgMsg("intf: enabling screen saver");
         XSetScreenSaver( p_intf->p_sys->p_display, p_intf->p_sys->i_ss_timeout,
                          p_intf->p_sys->i_ss_interval, p_intf->p_sys->i_ss_blanking,
                          p_intf->p_sys->i_ss_exposure );
@@ -471,7 +471,7 @@ void X11DisableScreenSaver( intf_thread_t *p_intf )
                          &p_intf->p_sys->i_ss_exposure );
 
         /* Disable screen saver */
-        intf_Msg("Disabling screen saver");
+        intf_DbgMsg("intf: disabling screen saver");
         XSetScreenSaver( p_intf->p_sys->p_display, 0,
                          p_intf->p_sys->i_ss_interval, p_intf->p_sys->i_ss_blanking,
                          p_intf->p_sys->i_ss_exposure );

@@ -278,7 +278,7 @@ endif
 ifneq (,$(findstring 86,$(ARCH)))
 ifneq (,$(findstring mmx,$(ARCH)))
 ASM_OBJ =		src/video_output/video_yuv_mmx.o
-PLUGIN_IDCTMMX_ASM = 	plugins/idct/idctmmx_asm.o
+STD_PLUGIN_ASM = 	plugins/idct/idctmmx_asm.o
 endif
 endif
 
@@ -359,7 +359,8 @@ PLUGIN_IDCTCLASSIC =	plugins/idct/idctclassic.o \
 			plugins/idct/idct_common.o
 
 PLUGIN_IDCTMMX =	plugins/idct/idctmmx.o \
-			plugins/idct/idct_common.o
+			plugins/idct/idct_common.o \
+			plugins/idct/idctmmx_asm.o
 
 PLUGIN_ALSA =	plugins/alsa/alsa.o \
 		plugins/alsa/aout_alsa.o
@@ -380,12 +381,12 @@ STD_PLUGIN_OBJ =$(PLUGIN_BEOS) \
 		$(PLUGIN_ALSA) \
 		$(PLUGIN_NULL)
 
-STD_PLUGIN_ASM =$(PLUGIN_IDCTMMX_ASM)
-
+# list duplicates
 STD_PLUGIN_COMMON =	plugins/idct/idct_common.o
+
 # filter out duplicates from the plugin object lists
-STD_PLUGIN_OBJ :=	$(filter-out $(STD_PLUGIN_COMMON), $(STD_PLUGIN_OBJ)) \
-			$(STD_PLUGIN_COMMON)
+STD_PLUGIN_OBJ :=	$(filter-out $(STD_PLUGIN_COMMON) $(STD_PLUGIN_ASM), \
+				 $(STD_PLUGIN_OBJ)) $(STD_PLUGIN_COMMON)
 
 #
 # Other lists of files
@@ -432,6 +433,7 @@ show:
 	@echo CFLAGS: $(CFLAGS)
 	@echo DCFLAGS: $(DCFLAGS)
 	@echo LCFLAGS: $(LCFLAGS)
+	@echo STD_PLUGIN_OBJ: $(STD_PLUGIN_OBJ)
 
 # ugliest of all, but I have no time to do it -- sam
 snapshot:
@@ -571,7 +573,7 @@ lib/yuvmmx.so: $(PLUGIN_YUVMMX)
 lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 
-lib/idctmmx.so: $(PLUGIN_IDCTMMX) $(PLUGIN_IDCTMMX_ASM)
+lib/idctmmx.so: $(PLUGIN_IDCTMMX)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
 lib/yuv.so: $(PLUGIN_YUV)
@@ -586,7 +588,7 @@ lib/idct.so: $(PLUGIN_IDCT)
 lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
 
-lib/idctmmx.so: $(PLUGIN_IDCTMMX) $(PLUGIN_IDCTMMX_ASM)
+lib/idctmmx.so: $(PLUGIN_IDCTMMX)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
 endif
 

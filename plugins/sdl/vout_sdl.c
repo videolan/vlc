@@ -249,7 +249,7 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
                                              SDL_YV12_OVERLAY, 
                                              p_vout->p_sys->p_display
                                            );
-                intf_Msg("[YUV acceleration] : %d,",
+                intf_Msg("vout: YUV acceleration set to %d,",
                             p_vout->p_sys->p_overlay->hw_overlay); 
             }
 

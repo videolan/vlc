@@ -158,7 +158,7 @@ int vout_FBManage( vout_thread_t *p_vout )
         /* Tell the video output thread that it will need to rebuild YUV
          * tables. This is needed since conversion buffer size may have changed */
         p_vout->i_changes |= VOUT_YUV_CHANGE;
-        intf_Msg("Video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
+        intf_Msg("vout: video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
 #endif
     }
 
@@ -267,7 +267,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
 
     /* FIXME: if the image is full-size, it gets cropped on the left
      * because of the xres / xres_virtual slight difference */
-    intf_Msg( "%ix%i (virtual %ix%i)", p_vout->p_sys->var_info.xres, p_vout->p_sys->var_info.yres, p_vout->p_sys->var_info.xres_virtual, p_vout->p_sys->var_info.yres_virtual );
+    intf_Msg( "vout: %ix%i (virtual %ix%i)", p_vout->p_sys->var_info.xres, p_vout->p_sys->var_info.yres, p_vout->p_sys->var_info.xres_virtual, p_vout->p_sys->var_info.yres_virtual );
     p_vout->i_width =                   p_vout->p_sys->var_info.xres_virtual ? p_vout->p_sys->var_info.xres_virtual : p_vout->p_sys->var_info.xres;
     p_vout->i_height =                  p_vout->p_sys->var_info.yres;
     p_vout->i_screen_depth =            p_vout->p_sys->var_info.bits_per_pixel;

@@ -54,7 +54,7 @@ playlist_t * playlist_Create ( void )
     p_playlist->i_index = 0;
     p_playlist->p_list = NULL;
 
-    intf_Msg("Playlist created");
+    intf_Msg("playlist: playlist created");
     return( p_playlist );
 }
 

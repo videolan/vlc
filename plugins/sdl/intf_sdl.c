@@ -2,7 +2,7 @@
  * intf_sdl.c: SDL interface plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_sdl.c,v 1.21 2001/01/08 22:42:50 bozo Exp $
+ * $Id: intf_sdl.c,v 1.22 2001/01/15 06:18:23 sam Exp $
  *
  * Authors:
  *
@@ -166,7 +166,7 @@ void intf_SDLManage( intf_thread_t *p_intf )
 
 void intf_SDL_Resize( intf_thread_t * p_intf, int width, int height )
 {
-    intf_Msg( "Video display resized (%dx%d)", width, height ); 
+    intf_Msg( "intf: video display resized (%dx%d)", width, height ); 
     vlc_mutex_lock( &p_intf->p_vout->change_lock );
     p_intf->p_vout->p_sys->i_width = width;
     p_intf->p_vout->p_sys->i_height = height;

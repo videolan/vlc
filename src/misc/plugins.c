@@ -65,7 +65,7 @@ plugin_bank_t * bank_Create( void )
     p_bank = malloc( sizeof( plugin_bank_t ) );
     if( !p_bank )
     {
-        intf_ErrMsg("plugin bank error: %s", strerror( ENOMEM ) );
+        intf_ErrMsg("plugin error: failed to create bank (%s)", strerror( ENOMEM ) );
         return( NULL );
     }
 
@@ -76,7 +76,7 @@ plugin_bank_t * bank_Create( void )
     }
     p_bank->i_plugin_count = MAX_PLUGIN_COUNT;
 
-    intf_Msg("Plugin bank initialized");
+    intf_Msg("plugin: bank initialized");
     return( p_bank );
 }
 
@@ -108,11 +108,6 @@ void bank_Init( plugin_bank_t * p_bank )
     SEEK_PLUGIN( "yuvmmx" );
     SEEK_PLUGIN( "yuv" );
 
-    /* Audio pluins */
-    SEEK_PLUGIN( "dsp" );
-    SEEK_PLUGIN( "esd" );
-    SEEK_PLUGIN( "alsa" );
-    
     /* Dummy plugin */
     SEEK_PLUGIN( "dummy" );
 
@@ -239,7 +234,7 @@ int AllocatePlugin( plugin_id_t plugin_id, plugin_bank_t * p_bank,
 
 
     /* Tell the world we found it */
-    intf_Msg( "Plugin %i: %s %s [0x%x]", i,
+    intf_Msg( "plugin: #%i, %s %s (score 0x%x)", i,
               p_bank->p_info[ i ]->psz_name,
               p_bank->p_info[ i ]->psz_version,
               p_bank->p_info[ i ]->i_score );

@@ -462,7 +462,7 @@ int vout_BeManage( vout_thread_t *p_vout )
         /* Tell the video output thread that it will need to rebuild YUV
          * tables. This is needed since convertion buffer size may have changed */
         p_vout->i_changes |= VOUT_YUV_CHANGE;
-        intf_Msg("Video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
+        intf_Msg("vout: video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
     }
     return( 0 );
 }

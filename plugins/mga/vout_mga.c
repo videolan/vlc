@@ -133,13 +133,13 @@ int vout_MGAInit( vout_thread_t *p_vout )
 
     if (p_vout->p_sys->p_mga->card_type == MGA_G200)
     {
-        intf_Msg( "detected MGA G200 (%d MB Ram)",
+        intf_Msg( "vout: detected MGA G200 (%d MB Ram)",
                   p_vout->p_sys->p_mga->ram_size );
         p_vout->p_sys->b_g400 = 0;
     }
     else
     {
-        intf_Msg( "detected MGA G400 (%d MB Ram)",
+        intf_Msg( "vout: detected MGA G400 (%d MB Ram)",
                   p_vout->p_sys->p_mga->ram_size );
         p_vout->p_sys->b_g400 = 1;
     }
@@ -180,7 +180,7 @@ int vout_MGAInit( vout_thread_t *p_vout )
         }
         if( i_err )                                      /* an error occured */
         {
-            intf_Msg("XShm video sextension deactivated" );
+            intf_Msg("vout: XShm video sextension deactivated" );
             p_vout->p_sys->b_shm = 0;
         }
     }
@@ -292,7 +292,7 @@ int vout_MGAManage( vout_thread_t *p_vout )
         /* Tell the video output thread that it will need to rebuild YUV
          * tables. This is needed since convertion buffer size may have changed */
         p_vout->i_changes |= VOUT_YUV_CHANGE;
-        intf_Msg("Video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
+        intf_Msg("vout: video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
     }
 
     return 0;
@@ -360,7 +360,7 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
     p_vout->p_sys->i_screen     = DefaultScreen( p_vout->p_sys->p_display );
     if( !p_vout->p_sys->b_shm )
     {
-        intf_Msg("XShm video extension is not available");
+        intf_Msg("vout: XShm video extension is not available");
     }
 
     /* Get screen depth */

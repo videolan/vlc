@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_dec.c,v 1.6 2001/01/12 17:33:18 massiot Exp $
+ * $Id: input_dec.c,v 1.7 2001/01/15 06:18:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -53,10 +53,17 @@ vlc_thread_t input_RunDecoder( decoder_capabilities_t * p_decoder,
  *****************************************************************************/
 void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 {
+    int i_dummy;
+
     p_es->p_decoder_fifo->b_die = 1;
 
-    /* Make sure the thread leaves the NextDataPacket() function */
-    input_NullPacket( p_input, p_es );
+    /* Make sure the thread leaves the NextDataPacket() function by
+     * sending it a few null packets. */
+    for( i_dummy = 0; i_dummy < 10; i_dummy++ )
+    {
+        input_NullPacket( p_input, p_es );
+    }
+
     if( p_es->p_pes != NULL )
     {
         input_DecodePES( p_es->p_decoder_fifo, p_es->p_pes );

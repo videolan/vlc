@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.68 2001/01/14 07:08:00 stef Exp $
+ * $Id: input.c,v 1.69 2001/01/15 06:18:23 sam Exp $
  *
  * Authors: 
  *
@@ -394,7 +394,7 @@ static void FileOpen( input_thread_t * p_input )
     p_input->stream.i_tell = 0;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    intf_Msg( "Opening file %s", p_config->p_source );
+    intf_Msg( "input: opening file %s", p_config->p_source );
     if( (p_input->i_handle = open( p_config->p_source,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
     {
@@ -411,7 +411,7 @@ static void FileOpen( input_thread_t * p_input )
  *****************************************************************************/
 static void DvdOpen( input_thread_t * p_input )
 {
-    intf_Msg( "Opening DVD %s", p_input->p_config->p_source );
+    intf_Msg( "input: opening DVD %s", p_input->p_config->p_source );
     if( (p_input->i_handle = open( p_input->p_config->p_source,
                                    O_RDONLY|O_LARGEFILE )) == (-1) )
     {

@@ -2,7 +2,7 @@
  * idctmmx.c : MMX IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmx.c,v 1.1 2001/01/13 12:57:20 sam Exp $
+ * $Id: idctmmx.c,v 1.2 2001/01/15 06:18:23 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -34,12 +34,6 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
-
-#include "intf_msg.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
 
 #include "video.h"
 #include "video_output.h"

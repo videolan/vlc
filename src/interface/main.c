@@ -235,7 +235,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->p_playlist = playlist_Create( );
     if( !p_main->p_playlist )
     {
-        intf_Msg( "Playlist initialization failed" );
+        intf_ErrMsg( "playlist error: playlist initialization failed" );
         intf_MsgDestroy();
         return( errno );
     }
@@ -247,7 +247,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->p_bank = bank_Create( );
     if( !p_main->p_bank )
     {
-        intf_Msg( "Plugin bank initialization failed" );
+        intf_ErrMsg( "plugin error: plugin bank initialization failed" );
         playlist_Destroy( p_main->p_playlist );
         intf_MsgDestroy();
         return( errno );
@@ -260,7 +260,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->p_module_bank = module_CreateBank( );
     if( !p_main->p_module_bank )
     {
-        intf_Msg( "Module bank initialization failed" );
+        intf_ErrMsg( "module error: module bank initialization failed" );
         bank_Destroy( p_main->p_bank );
         playlist_Destroy( p_main->p_playlist );
         intf_MsgDestroy();
@@ -291,7 +291,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         if( p_main->p_aout == NULL )
         {
             /* On error during audio initialization, switch off audio */
-            intf_Msg( "Audio initialization failed : audio is deactivated" );
+            intf_ErrMsg( "aout error: audio initialization failed, audio is deactivated" );
             p_main->b_audio = 0;
         }
     }
@@ -354,7 +354,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Terminate messages interface and program
      */
-    intf_Msg( "Program terminated." );
+    intf_Msg( "intf: program terminated." );
     intf_MsgDestroy();
 
     return( 0 );

@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.7 2001/01/10 19:22:11 massiot Exp $
+ * $Id: input.h,v 1.8 2001/01/15 06:18:23 sam Exp $
  *
  * Authors:
  *
@@ -117,6 +117,11 @@ static __inline__ void input_NullPacket( input_thread_t * p_input,
         p_input->b_error = 1;
         return;
     }
+
+    /* XXX FIXME SARASS TODO: remove the following one-liner kludge when
+     * we have bitstream IV, we won't need it anymore */
+    ((WORD_TYPE *)p_bit_stream->p_byte)++;
+
     memset( p_pad_data->p_buffer, 0, PADDING_PACKET_SIZE );
     p_pad_data->b_discard_payload = 1;
     p_pes = p_es->p_pes;

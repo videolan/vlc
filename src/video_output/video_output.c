@@ -269,8 +269,8 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         return( NULL );
     }
 
-    intf_Msg( "Video display initialized (%dx%d, %d/%d bpp)", p_vout->i_width,
-              p_vout->i_height, p_vout->i_screen_depth,
+    intf_Msg( "vout: video display initialized (%dx%d, %d/%d bpp)",
+              p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
               p_vout->i_bytes_per_pixel * 8 );
 
     /* If status is NULL, wait until the thread is created */

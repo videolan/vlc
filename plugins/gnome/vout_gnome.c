@@ -153,7 +153,7 @@ int vout_GnomeInit( vout_thread_t *p_vout )
         }
         if( i_err )                                      /* an error occured */
         {
-            intf_Msg("XShm video extension deactivated" );
+            intf_Msg("vout: XShm video extension deactivated" );
             p_vout->p_sys->b_shm = 0;
         }
     }
@@ -260,7 +260,7 @@ int vout_GnomeManage( vout_thread_t *p_vout )
         /* Tell the video output thread that it will need to rebuild YUV
          * tables. This is needed since convertion buffer size may have changed */
         p_vout->i_changes |= VOUT_YUV_CHANGE;
-        intf_Msg("Video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
+        intf_Msg("vout: video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
     }
 
     return 0;
@@ -359,7 +359,7 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
     p_vout->p_sys->i_screen     = DefaultScreen( p_vout->p_sys->p_display );
     if( !p_vout->p_sys->b_shm )
     {
-        intf_Msg("XShm video extension is not available");
+        intf_Msg("vout: XShm video extension is not available");
     }
 
     /* Get screen depth */

@@ -167,7 +167,7 @@ intf_thread_t* intf_Create( void )
         return( NULL );
     }
 
-    intf_Msg("Interface initialized");
+    intf_Msg("intf: interface initialized");
     return( p_intf );
 }
 
