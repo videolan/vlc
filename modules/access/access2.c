@@ -67,6 +67,8 @@ vlc_module_begin();
 
     add_shortcut( "vcd" );
     add_shortcut( "svcd" );
+
+    add_shortcut( "v4l" );
 vlc_module_end();
 
 /*****************************************************************************

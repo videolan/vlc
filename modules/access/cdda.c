@@ -112,7 +112,7 @@ static int Open( vlc_object_t *p_this )
         free( psz_dup );
 
         /* Only when selected */
-        if( *p_access->psz_access == '\0' )
+        if( strcmp( p_access->psz_access, "cdda" ) )
             return VLC_EGENERIC;
 
 
