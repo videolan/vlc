@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.53 2003/08/16 21:05:14 zorglub Exp $
+ * $Id: wxwindows.h,v 1.54 2003/08/19 21:16:09 adn Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -32,15 +32,6 @@
 #include "vlc_keys.h"
 
 DECLARE_LOCAL_EVENT_TYPE( wxEVT_DIALOG, 0 );
-
-enum
-{
-    FILE_ACCESS,
-    DISC_ACCESS,
-    NET_ACCESS,
-    SAT_ACCESS,
-    FILE_SIMPLE_ACCESS
-};
 
 class OpenDialog;
 class Playlist;
@@ -159,8 +150,13 @@ private:
     void OnExit( wxCommandEvent& event );
     void OnAbout( wxCommandEvent& event );
 
+    void OnOpenFileSimple( wxCommandEvent& event );
+    void OnOpenFile( wxCommandEvent& event );
+    void OnOpenDisc( wxCommandEvent& event );
+    void OnOpenNet( wxCommandEvent& event );
+    void OnOpenSat( wxCommandEvent& event );
+    void OnOpenV4L( wxCommandEvent& event );
     void OnShowDialog( wxCommandEvent& event );
-
     void OnPlayStream( wxCommandEvent& event );
     void OnStopStream( wxCommandEvent& event );
     void OnSliderUpdate( wxScrollEvent& event );
@@ -240,6 +236,7 @@ public:
 };
 
 /* Open Dialog */
+class V4LDialog;
 class SoutDialog;
 class SubsFileDialog;
 class OpenDialog: public wxFrame
@@ -260,6 +257,7 @@ private:
     wxPanel *DiscPanel( wxWindow* parent );
     wxPanel *NetPanel( wxWindow* parent );
     wxPanel *SatPanel( wxWindow* parent );
+    wxPanel *V4LPanel( wxWindow* parent );
 
     void UpdateMRL( int i_access_method );
 
@@ -281,6 +279,11 @@ private:
     /* Event handlers for the net page */
     void OnNetPanelChange( wxCommandEvent& event );
     void OnNetTypeChange( wxCommandEvent& event );
+
+    /* Event handlers for the v4l page */
+    void OnV4LPanelChange( wxCommandEvent& event );
+    void OnV4LTypeChange( wxCommandEvent& event );
+    void OnV4LSettingsChange( wxCommandEvent& event );
 
     /* Event handlers for the stream output */
     void OnSubsFileEnable( wxCommandEvent& event );
@@ -325,6 +328,14 @@ private:
     int        i_net_ports[4];
     wxTextCtrl *net_addrs[4];
 
+    /* Controls for the v4l panel */
+    wxRadioBox *video_type;
+    wxTextCtrl *video_device;
+    wxSpinCtrl *video_channel;
+    wxButton *v4l_button;
+    V4LDialog *v4l_dialog;
+    wxArrayString v4l_mrl;
+
     /* Controls for the subtitles file */
     wxButton *subsfile_button;
     wxCheckBox *subsfile_checkbox;
@@ -342,6 +353,72 @@ private:
     wxButton *demuxdump_button;
     wxCheckBox *demuxdump_checkbox;
     wxFileDialog *demuxdump_dialog;
+};
+
+enum
+{
+    FILE_ACCESS = 0,
+    DISC_ACCESS,
+    NET_ACCESS,
+    SAT_ACCESS,
+    V4L_ACCESS,
+    FILE_SIMPLE_ACCESS
+};
+
+/* V4L Dialog */
+class V4LDialog: public wxDialog
+{
+public:
+    /* Constructor */
+    V4LDialog( intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~V4LDialog();
+
+    wxArrayString GetOptions();
+
+private:
+    void UpdateMRL();
+    wxPanel *AudioPanel( wxWindow* parent );
+    wxPanel *CommonPanel( wxWindow* parent );
+    void    ParseMRL();
+
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnOk( wxCommandEvent& event );
+    void OnCancel( wxCommandEvent& event );
+    void OnMRLChange( wxCommandEvent& event );
+    void OnAudioEnable( wxCommandEvent& event );
+    void OnAudioChannel( wxCommandEvent& event );
+    void OnSizeEnable( wxCommandEvent& event );
+    void OnSize( wxCommandEvent& event );
+    void OnNormEnable( wxCommandEvent& event );
+    void OnNorm( wxCommandEvent& event );
+    void OnFrequencyEnable( wxCommandEvent& event );
+    void OnFrequency( wxCommandEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    wxWindow *p_parent;
+
+    wxComboBox *mrl_combo;
+
+    int i_access_type;
+
+    /* Controls for the v4l advanced options */
+    wxPanel *common_subpanel;
+    wxPanel *common_panel;
+    wxCheckBox *size_checkbox;
+    wxComboBox *size_combo;
+    wxCheckBox *norm_checkbox;
+    wxComboBox *norm_combo;
+    wxCheckBox *frequency_checkbox;
+    wxSpinCtrl *frequency;
+
+    wxPanel *audio_subpanel;
+    wxPanel *audio_panel;
+    wxCheckBox *audio_checkbox;
+    wxTextCtrl *audio_device;
+    wxSpinCtrl *audio_channel;
+
 };
 
 /* Stream output Dialog */
@@ -375,9 +452,9 @@ private:
     /* Event handlers for the net access output */
     void OnNetChange( wxCommandEvent& event );
 
-    /* Event specific to the sap address */
-    void OnSAPAddrChange( wxCommandEvent& event );
-    
+    /* Event specific to the announce address */
+    void OnAnnounceAddrChange( wxCommandEvent& event );
+
     /* Event handlers for the encapsulation panel */
     void OnEncapsulationChange( wxCommandEvent& event );
 
@@ -387,6 +464,7 @@ private:
 
     /* Event handlers for the misc panel */
     void OnSAPMiscChange( wxCommandEvent& event );
+    void OnSLPMiscChange( wxCommandEvent& event );
 
     DECLARE_EVENT_TABLE();
 
@@ -408,8 +486,9 @@ private:
     /* Controls for the SAP announces */
     wxPanel *misc_subpanels[1];
     wxCheckBox *sap_checkbox;
-    wxTextCtrl *sap_addr;
-                            
+    wxCheckBox *slp_checkbox;
+    wxTextCtrl *announce_addr;
+
     /* Controls for the encapsulation */
     wxRadioButton *encapsulation_radios[5];
     int i_encapsulation_type;
@@ -500,7 +579,7 @@ private:
     wxTextAttr *dbg_attr;
 
     wxFileDialog *save_log_dialog;
-    
+
     vlc_bool_t b_verbose;
 };
 
@@ -556,7 +635,7 @@ private:
     void OnClose( wxCommandEvent& event );
 
     DECLARE_EVENT_TABLE();
-   
+
     intf_thread_t *p_intf;
     wxTreeCtrl *fileinfo_tree;
     wxTreeItemId fileinfo_root;
@@ -674,5 +753,5 @@ static inline int ConvertHotkey( int i_hotkey )
         default:
             return 0;
         }
-    }             
+    }
 }
