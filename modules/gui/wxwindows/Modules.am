@@ -19,7 +19,6 @@ SOURCES_wxwindows = \
 	subtitles.cpp \
 	bookmarks.cpp \
 	video.cpp \
-	v4l.cpp \
 	$(NULL)
 
 EXTRA_DIST += \
