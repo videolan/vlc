@@ -995,7 +995,7 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
             if( p_sys->stream.i_used < 1024 )
                 p_sys->stream.i_used = 1024;
 
-            if( AStreamRefillStream( s ) )
+            if( AStreamRefillStream( s ) && i_pos == tk->i_end )
                 return VLC_EGENERIC;
 
             return VLC_SUCCESS;
