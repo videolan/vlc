@@ -618,8 +618,6 @@ public:
     std::vector<matroska_segment_t*> segments;
 
     demux_sys_t                      & sys;
-
-    void PreloadFamily( const matroska_segment_t & segment );
 };
 
 class demux_sys_t
@@ -663,7 +661,7 @@ public:
     float                   f_duration;
 
     matroska_segment_t *FindSegment( const EbmlBinary & uid ) const;
-    void PreloadFamily( );
+    void PreloadFamily( const matroska_segment_t & of_segment );
     void PreloadLinked( matroska_segment_t *p_segment );
     bool PreparePlayback( );
     matroska_stream_t *AnalyseAllSegmentsFound( EbmlStream *p_estream );
@@ -803,7 +801,7 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    p_sys->PreloadFamily( );
+    p_sys->PreloadFamily( *p_segment );
     p_sys->PreloadLinked( p_segment );
     if ( !p_sys->PreparePlayback( ) )
     {
@@ -3394,32 +3392,13 @@ const chapter_item_t *chapter_item_t::FindTimecode( mtime_t i_user_timecode ) co
     return psz_result;
 }
 
-void demux_sys_t::PreloadFamily( )
+void demux_sys_t::PreloadFamily( const matroska_segment_t & of_segment )
 {
-/* TODO enable family handling again
-    matroska_stream_t *p_stream = Stream();
-    if ( p_stream )
+    for (size_t i=0; i<opened_segments.size(); i++)
     {
-        matroska_segment_t *p_segment = p_stream->Segment();
-        if ( p_segment )
-        {
-            for (size_t i=0; i<streams.size(); i++)
-            {
-                streams[i]->PreloadFamily( *p_segment );
-            }
-        }
-    }
-*/
-}
-
-void matroska_stream_t::PreloadFamily( const matroska_segment_t & of_segment )
-{
-    for (size_t i=0; i<segments.size(); i++)
-    {
-        segments[i]->PreloadFamily( of_segment );
+        opened_segments[i]->PreloadFamily( of_segment );
     }
 }
-
 bool matroska_segment_t::PreloadFamily( const matroska_segment_t & of_segment )
 {
     if ( b_preloaded )
