@@ -1829,7 +1829,7 @@ static void ParseTrackEntry( demux_t *p_demux, EbmlMaster *m )
     tk->psz_codec_info_url = NULL;
     tk->psz_codec_download_url = NULL;
     
-    tk->b_compression_zlib = MATROSKA_COMPRESSION_NONE;
+    tk->b_compression_zlib = VLC_FALSE;
 
     for( i = 0; i < m->ListSize(); i++ )
     {
@@ -1963,10 +1963,71 @@ static void ParseTrackEntry( demux_t *p_demux, EbmlMaster *m )
             tk->psz_codec_name = UTF8ToStr( UTFstring( cname ) );
             msg_Dbg( p_demux, "|   |   |   + Track Codec Name=%s", tk->psz_codec_name );
         }
-        else if( MKV_IS_ID( l, KaxContentEncoding ) )
+        else if( MKV_IS_ID( l, KaxContentEncodings ) )
         {
-            KaxContentEncoding &cenc = *(KaxContentEncoding*)l;
-            msg_Dbg( p_demux, "|   |   |   + Track Content Compression: ZLIB" );
+            EbmlMaster *cencs = static_cast<EbmlMaster*>(l);
+            msg_Dbg( p_demux, "|   |   |   + Content Encodings" );
+            for( unsigned int i = 0; i < cencs->ListSize(); i++ )
+            {
+                EbmlElement *l2 = (*cencs)[i];
+                if( MKV_IS_ID( l2, KaxContentEncoding ) )
+                {
+                    msg_Dbg( p_demux, "|   |   |   |   + Content Encoding" );
+                    EbmlMaster *cenc = static_cast<EbmlMaster*>(l2);
+                    for( unsigned int i = 0; i < cenc->ListSize(); i++ )
+                    {
+                        EbmlElement *l3 = (*cenc)[i];
+                        if( MKV_IS_ID( l3, KaxContentEncodingOrder ) )
+                        {
+                            KaxContentEncodingOrder &encord = *(KaxContentEncodingOrder*)l3;
+                            msg_Dbg( p_demux, "|   |   |   |   |   + Order: %i", uint32( encord ) );
+                        }
+                        else if( MKV_IS_ID( l3, KaxContentEncodingScope ) )
+                        {
+                            KaxContentEncodingScope &encscope = *(KaxContentEncodingScope*)l3;
+                            msg_Dbg( p_demux, "|   |   |   |   |   + Scope: %i", uint32( encscope ) );
+                        }
+                        else if( MKV_IS_ID( l3, KaxContentEncodingType ) )
+                        {
+                            KaxContentEncodingType &enctype = *(KaxContentEncodingType*)l3;
+                            msg_Dbg( p_demux, "|   |   |   |   |   + Type: %i", uint32( enctype ) );
+                        }
+                        else if( MKV_IS_ID( l3, KaxContentCompression ) )
+                        {
+                            EbmlMaster *compr = static_cast<EbmlMaster*>(l3);
+                            msg_Dbg( p_demux, "|   |   |   |   |   + Content Compression" );
+                            for( unsigned int i = 0; i < compr->ListSize(); i++ )
+                            {
+                                EbmlElement *l4 = (*compr)[i];
+                                if( MKV_IS_ID( l4, KaxContentCompAlgo ) )
+                                {
+                                    KaxContentCompAlgo &compalg = *(KaxContentCompAlgo*)l4;
+                                    msg_Dbg( p_demux, "|   |   |   |   |   |   + Compression Algorithm: %i", uint32(compalg) );
+                                    if( uint32( compalg ) == 0 )
+                                    {
+                                        tk->b_compression_zlib = VLC_TRUE;
+                                    }
+                                }
+                                else
+                                {
+                                    msg_Dbg( p_demux, "|   |   |   |   |   |   + Unknown (%s)", typeid(*l4).name() );
+                                }
+                            }
+                        }
+
+                        else
+                        {
+                            msg_Dbg( p_demux, "|   |   |   |   |   + Unknown (%s)", typeid(*l3).name() );
+                        }
+                    }
+                    
+                }
+                else
+                {
+                    msg_Dbg( p_demux, "|   |   |   |   + Unknown (%s)", typeid(*l2).name() );
+                }
+            }
+                
         }
 //        else if( EbmlId( *l ) == KaxCodecSettings::ClassInfos.GlobalId )
 //        {
