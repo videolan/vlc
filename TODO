@@ -22,7 +22,7 @@ Description: Win32 port
  Win32 is probably the most common desktop platform, we should support it
  as well. Besides, most students at Centrale use Windows and VideoLAN was
  originally designed for them.
-Status: Todo
+Status: Done 26 Apr 2001 (gbazin)
 
 Task: 0x5c
 Difficulty: Medium
@@ -63,7 +63,7 @@ Difficulty: Medium
 Urgency: Critical
 Description: Language and subtitles selection in network input
  The vls will probably have to be modified as well.
-Status: Todo
+Status: Done (henri)
 
 Task: 0x57
 Difficulty: Guru
@@ -95,7 +95,7 @@ Difficulty: Hard
 Urgency: Wishlist
 Description: Hardware AC3 decoding
  Some soundcards directly grok Dolby AC3. This would spare a lot of CPU time.
-Status: Todo
+Status: Done (stef)
 
 Task: 0x53
 Difficulty: Medium

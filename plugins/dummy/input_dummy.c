@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dummy.c,v 1.3 2001/07/17 09:48:07 massiot Exp $
+ * $Id: input_dummy.c,v 1.4 2001/07/26 03:13:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -128,7 +128,7 @@ static void DummyOpen( input_thread_t * p_input )
 
     if( ( i_len <= 4 ) || strncasecmp( psz_name, "vlc:", 4 ) )
     {
-        /* If the user specified "vlc:" then it's probably a file */
+        /* If the command doesn't start with "vlc:" then it's not for us */
         return;
     }
 

@@ -2,7 +2,7 @@
  * transforms_yuvmmx.h: MMX YUV transformation assembly
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: transforms_yuvmmx.h,v 1.5 2001/07/01 08:49:09 gbazin Exp $
+ * $Id: transforms_yuvmmx.h,v 1.6 2001/07/26 03:13:30 sam Exp $
  *
  * Authors: Olie Lho <ollie@sis.com.tw>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -129,14 +129,14 @@ paddsw    %%mm6, %%mm2          # Y even + Cgreen 00 G6 00 G4 00 G2 00 G0   \n\
 paddsw    %%mm7, %%mm5          # Y odd  + Cgreen 00 G7 00 G5 00 G3 00 G1   \n\
                                                                             \n\
 # Limit RGB even to 0..255                                                  \n\
-packuswb  %%mm0, %%mm0          # B6 B4 B2 B0 | B6 B4 B2 B0                 \n\
-packuswb  %%mm1, %%mm1          # R6 R4 R2 R0 | R6 R4 R2 R0                 \n\
-packuswb  %%mm2, %%mm2          # G6 G4 G2 G0 | G6 G4 G2 G0                 \n\
+packuswb  %%mm0, %%mm0          # B6 B4 B2 B0 / B6 B4 B2 B0                 \n\
+packuswb  %%mm1, %%mm1          # R6 R4 R2 R0 / R6 R4 R2 R0                 \n\
+packuswb  %%mm2, %%mm2          # G6 G4 G2 G0 / G6 G4 G2 G0                 \n\
                                                                             \n\
 # Limit RGB odd to 0..255                                                   \n\
-packuswb  %%mm3, %%mm3          # B7 B5 B3 B1 | B7 B5 B3 B1                 \n\
-packuswb  %%mm4, %%mm4          # R7 R5 R3 R1 | R7 R5 R3 R1                 \n\
-packuswb  %%mm5, %%mm5          # G7 G5 G3 G1 | G7 G5 G3 G1                 \n\
+packuswb  %%mm3, %%mm3          # B7 B5 B3 B1 / B7 B5 B3 B1                 \n\
+packuswb  %%mm4, %%mm4          # R7 R5 R3 R1 / R7 R5 R3 R1                 \n\
+packuswb  %%mm5, %%mm5          # G7 G5 G3 G1 / G7 G5 G3 G1                 \n\
                                                                             \n\
 # Interleave RGB even and odd                                               \n\
 punpcklbw %%mm3, %%mm0          #                 B7 B6 B5 B4 B3 B2 B1 B0   \n\

@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.5 2001/07/11 02:01:03 sam Exp $
+ * $Id: css.c,v 1.6 2001/07/26 03:13:30 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -261,8 +261,6 @@ int CSSInit( dvdcss_handle dvdcss )
         _dvdcss_error( dvdcss, "ioctl_ReadKey failed" );
         return -1;
     }
-
-fprintf( stderr, "DISK KEY: %02x %02x %02x %02x %02x\n", p_buffer[0], p_buffer[1], p_buffer[2], p_buffer[3], p_buffer[4] );
 
     /* Unencrypt disc key using bus key */
     for( i = 0 ; i < 2048 ; i++ )
