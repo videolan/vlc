@@ -52,6 +52,16 @@ typedef struct vout_thread_s
     count_t         c_pictures;           /* number of pictures added to heap */
 #endif
 
+    /* YUV translation tables, for 15,16 and 24/32 bpp displays. 16 bits and 32
+     * bits pointers points on the same data.
+     * CAUTION: these tables are translated: their origin is -384 */
+    u16 *           pi_trans16_red;
+    u16 *           pi_trans16_green;
+    u16 *           pi_trans16_blue;
+    u32 *           pi_trans32_red;
+    u32 *           pi_trans32_green;
+    u32 *           pi_trans32_blue;          
+
     /* Rendering functions - these functions are of vout_render_blank_t and 
      * vout_render_line_t, but are not declared here using these types since
      * they require vout_thread_t to be defined */
