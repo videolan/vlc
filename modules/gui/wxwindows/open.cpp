@@ -845,7 +845,13 @@ void OpenDialog::UpdateMRL( int i_access_method )
             break;
 
         case 3: /* CD-DA */
-            mrltemp = wxT("cdda://") + disc_device->GetValue();
+            mrltemp = 
+#ifdef HAVE_CDDAX
+	      wxT("cddax://") 
+#else
+	      wxT("cdda://") 
+#endif
+	      + disc_device->GetValue();
             if( i_disc_title > 0 )
                 mrltemp += wxString::Format( wxT("@%d"), i_disc_title );
 
