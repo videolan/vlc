@@ -2,7 +2,7 @@
  * renderer.c : dummy text rendering functions
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: renderer.c,v 1.3 2003/12/07 19:09:37 jpsaman Exp $
+ * $Id: renderer.c,v 1.4 2003/12/08 17:48:13 yoann Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -24,7 +24,7 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 
-static int  AddText   ( vout_thread_t *, char *, text_style_t *, int,
+static subpicture_t * AddText ( vout_thread_t *, char *, text_style_t *, int,
                         int, int, mtime_t, mtime_t );
 
 int E_(OpenRenderer)( vlc_object_t *p_this )
@@ -34,7 +34,7 @@ int E_(OpenRenderer)( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static int  AddText   ( vout_thread_t *p_vout, char *psz_string,
+static subpicture_t * AddText ( vout_thread_t *p_vout, char *psz_string,
                         text_style_t *p_style , int i_flags, int i_x_margin,
                         int i_y_margin, mtime_t i_start, mtime_t i_stop )
 {

@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.21 2003/07/15 18:12:05 sigmunau Exp $
+ * $Id: vout_subpictures.c,v 1.22 2003/12/08 17:48:13 yoann Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -161,6 +161,11 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     if( p_subpic->pf_destroy )
     {
         p_subpic->pf_destroy( p_subpic );
+    }
+
+    if( p_subpic == p_vout->last_osd_message )
+    {
+        p_vout->last_osd_message = NULL;
     }
 
     p_subpic->i_status = FREE_SUBPICTURE;

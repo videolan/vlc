@@ -2,7 +2,7 @@
  * video_output.h : video output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.104 2003/12/07 19:09:37 jpsaman Exp $
+ * $Id: video_output.h,v 1.105 2003/12/08 17:48:13 yoann Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -122,6 +122,8 @@ struct vout_thread_t
     picture_t           p_picture[2*VOUT_MAX_PICTURES];        /**< pictures */
     subpicture_t        p_subpicture[VOUT_MAX_PICTURES];    /**< subpictures */
 
+    subpicture_t *      last_osd_message;
+
     /* Statistics */
     count_t          c_loops;
     count_t          c_pictures, c_late_pictures;
@@ -141,7 +143,7 @@ struct vout_thread_t
                                                            the text renderer */
     module_t *            p_text_renderer_module;  /**< text renderer module */
     /** callback used when a new string needs to be shown on the vout */
-    int ( *pf_add_string ) ( vout_thread_t *, char *, text_style_t *, int,
+    subpicture_t * ( *pf_add_string ) ( vout_thread_t *, char *, text_style_t *, int,
                              int, int, mtime_t, mtime_t );
 };
 

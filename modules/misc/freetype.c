@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.37 2003/12/07 19:00:33 jpsaman Exp $
+ * $Id: freetype.c,v 1.38 2003/12/08 17:48:13 yoann Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -77,8 +77,8 @@ static void RenderYUY2( vout_thread_t *, picture_t *,
                         const subpicture_t * );
 static void RenderRV32( vout_thread_t *, picture_t *,
                         const subpicture_t * );
-static int  AddText   ( vout_thread_t *, char *, text_style_t *, int,
-                        int, int, mtime_t, mtime_t );
+static subpicture_t *AddText ( vout_thread_t *, char *, text_style_t *, int,
+                               int, int, mtime_t, mtime_t );
 
 static void FreeString( subpicture_t * );
 
@@ -634,7 +634,7 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
  * needed glyphs into memory. It is used as pf_add_string callback in
  * the vout method by this module
  */
-static int AddText ( vout_thread_t *p_vout, char *psz_string,
+static subpicture_t *AddText ( vout_thread_t *p_vout, char *psz_string,
                      text_style_t *p_style, int i_flags, int i_hmargin,
                      int i_vmargin, mtime_t i_start, mtime_t i_stop )
 {
@@ -654,7 +654,7 @@ static int AddText ( vout_thread_t *p_vout, char *psz_string,
     /* Sanity check */
     if ( !psz_string || !*psz_string )
     {
-        return VLC_EGENERIC;
+        return NULL;
     }
 
     result.x = 0;
@@ -672,7 +672,7 @@ static int AddText ( vout_thread_t *p_vout, char *psz_string,
     p_subpic = vout_CreateSubPicture( p_vout, MEMORY_SUBPICTURE );
     if ( p_subpic == NULL )
     {
-        return VLC_EGENERIC;
+        return NULL;
     }
     p_subpic->p_sys = 0;
     p_subpic->pf_render = Render;
@@ -851,7 +851,7 @@ static int AddText ( vout_thread_t *p_vout, char *psz_string,
     p_string->i_height = result.y;
     p_string->i_width = result.x;
     vout_DisplaySubPicture( p_vout, p_subpic );
-    return VLC_SUCCESS;
+    return p_subpic;
 
 #undef face
 #undef glyph
@@ -859,7 +859,7 @@ static int AddText ( vout_thread_t *p_vout, char *psz_string,
  error:
     FreeString( p_subpic );
     vout_DestroySubPicture( p_vout, p_subpic );
-    return VLC_EGENERIC;
+    return NULL;
 }
 
 static void FreeString( subpicture_t *p_subpic )

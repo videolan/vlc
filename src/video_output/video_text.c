@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.46 2003/10/30 22:34:48 hartman Exp $
+ * $Id: video_text.c,v 1.47 2003/12/08 17:48:13 yoann Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -33,21 +33,25 @@
  * \param i_vmargin vertical margin in pixels
  * \param i_duration Amount of time the text is to be shown.
  */
-void vout_ShowTextRelative( vout_thread_t *p_vout, char *psz_string, 
+subpicture_t *vout_ShowTextRelative( vout_thread_t *p_vout, char *psz_string, 
 			      text_style_t *p_style, int i_flags, 
 			      int i_hmargin, int i_vmargin, 
 			      mtime_t i_duration )
 {
+    subpicture_t *p_subpic = NULL;
     mtime_t i_now = mdate();
+
     if ( p_vout->pf_add_string )
     {
-	p_vout->pf_add_string( p_vout, psz_string, p_style, i_flags, i_hmargin,
-			       i_vmargin, i_now, i_now + i_duration );
+	    p_subpic = p_vout->pf_add_string( p_vout, psz_string, p_style, i_flags, 
+                             i_hmargin, i_vmargin, i_now, i_now + i_duration );
     }
     else
     {
-	msg_Warn( p_vout, "No text renderer found" );
+	    msg_Warn( p_vout, "No text renderer found" );
     }
+    
+    return p_subpic;
 }
 
 /**
@@ -70,12 +74,12 @@ void vout_ShowTextAbsolute( vout_thread_t *p_vout, char *psz_string,
 {
     if ( p_vout->pf_add_string )
     {
-	p_vout->pf_add_string( p_vout, psz_string, p_style, i_flags, i_hmargin,
+	    p_vout->pf_add_string( p_vout, psz_string, p_style, i_flags, i_hmargin,
 			       i_vmargin, i_start, i_stop );
     }
     else
     {
-	msg_Warn( p_vout, "No text renderer found" );
+	    msg_Warn( p_vout, "No text renderer found" );
     }
 }
 
@@ -96,9 +100,13 @@ void vout_OSDMessage( vlc_object_t *p_caller, char *psz_string )
 
     if( p_vout )
     {
-        vout_ShowTextRelative( p_vout, psz_string, NULL,
-                               OSD_ALIGN_TOP|OSD_ALIGN_RIGHT,
-                               30,20,1000000 );
+        if( p_vout->last_osd_message )
+        {
+            vout_DestroySubPicture( p_vout, p_vout->last_osd_message );
+            p_vout->last_osd_message = NULL;
+        }
+        p_vout->last_osd_message = vout_ShowTextRelative( p_vout, psz_string, 
+                        NULL, OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,1000000 );
         vlc_object_release( p_vout );
     }
 }

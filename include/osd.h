@@ -2,7 +2,7 @@
  * osd.h : Constants for use with osd modules
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: osd.h,v 1.5 2003/10/30 22:34:48 hartman Exp $
+ * $Id: osd.h,v 1.6 2003/12/08 17:48:13 yoann Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -45,6 +45,6 @@ struct text_style_t
 };
 static const text_style_t default_text_style = { 22, 0xffffff, VLC_FALSE, VLC_FALSE, VLC_FALSE };
 
-VLC_EXPORT( void, vout_ShowTextRelative, ( vout_thread_t *, char *, text_style_t *, int, int, int, mtime_t ) );
+VLC_EXPORT( subpicture_t *, vout_ShowTextRelative, ( vout_thread_t *, char *, text_style_t *, int, int, int, mtime_t ) );
 VLC_EXPORT( void,  vout_ShowTextAbsolute, ( vout_thread_t *, char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
 VLC_EXPORT( void,  vout_OSDMessage, ( vlc_object_t *, char * ) );
