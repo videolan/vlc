@@ -33,6 +33,7 @@ Demuxers:
  * Support for DTS audio in MPEG TS (ETSI TS 102 154 Annex G)
  * Skins2 .vlt file loader (only when skin2 is the current interface)
  * Improved Ogg demuxer
+ * Support for so called AACPlus webstreams
 
 Codecs:
  * G.726 audio support
@@ -101,7 +102,6 @@ Misc:
  * Roku HD1000 Video output
  * Server/client network synchronization module
  * VBrick streams fully supported
- * Kasenna MediaBase streams largely supported
  * Cisco IP/TV streams supported
  * Experimental OpenGL video output for X11 and win32
  * a Time filter that displays the current time over the video
