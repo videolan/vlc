@@ -3415,7 +3415,7 @@ if test "${enable_mmx+set}" = set; then
   enableval="$enable_mmx"
    if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}${ACCEL_PLUGINS}; fi 
 else
-   if test x${host_cpu} = xi686 -o x${host_cpu} = xi586; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}${ACCEL_PLUGINS}; fi 
+   if test x${host_cpu} = xi686 -o x${host_cpu} = xi586 -o x${host_cpu} = xx86; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}${ACCEL_PLUGINS}; fi 
 fi
 
 # Check whether --enable-css or --disable-css was given.

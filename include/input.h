@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.34 2001/03/07 00:18:46 henri Exp $
+ * $Id: input.h,v 1.35 2001/03/19 13:26:59 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -51,8 +51,10 @@ void input_FileClose( struct input_thread_s * );
 /*****************************************************************************
  * Prototypes from input.c to open a network socket 
  *****************************************************************************/
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
 void input_NetworkOpen ( struct input_thread_s * );
 void input_NetworkClose( struct input_thread_s * );
+#endif
 
 
 /*****************************************************************************

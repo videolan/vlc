@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.11 2001/03/18 20:46:16 henri Exp $
+ * $Id: input_ts.c,v 1.12 2001/03/19 13:26:59 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -34,6 +34,9 @@
 #include <errno.h>
 
 #include <sys/types.h>
+#ifdef SYS_NTO
+#include <sys/select.h>
+#endif
 #include <sys/uio.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -76,12 +79,12 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 #define input p_function_list->functions.input
     p_function_list->pf_probe = TSProbe;
     input.pf_init             = TSInit;
-#ifdef SYS_BEOS
-    input.pf_open             = input_FileOpen;
-    input.pf_close            = input_FileClose;
-#else
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
     input.pf_open             = input_NetworkOpen;
     input.pf_close            = input_NetworkClose;
+#else
+    input.pf_open             = input_FileOpen;
+    input.pf_close            = input_FileClose;
 #endif
     input.pf_end              = TSEnd;
     input.pf_set_area         = NULL;

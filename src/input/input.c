@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.93 2001/03/15 01:42:20 sam Exp $
+ * $Id: input.c,v 1.94 2001/03/19 13:26:59 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -38,7 +38,7 @@
 
 /* Network functions */
 
-#ifndef SYS_BEOS
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
 #include <netdb.h>                                             /* hostent ... */
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -514,7 +514,7 @@ void input_FileClose( input_thread_t * p_input )
 }
 
 
-#ifndef SYS_BEOS
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
 /*****************************************************************************
  * input_NetworkOpen : open a network socket 
  *****************************************************************************/

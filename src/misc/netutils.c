@@ -54,7 +54,7 @@
 
 #include "intf_msg.h"
 
-#ifndef SYS_BEOS /* I need help for the BeOS portage */
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
 
 #include "netutils.h"
 

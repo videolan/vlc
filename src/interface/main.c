@@ -29,12 +29,12 @@
 
 #include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
 #include <stdio.h>                                              /* sprintf() */
-#include <unistd.h>                                    /* getopt() under QNX */
 
 #ifdef HAVE_GETOPT_H
 #include <getopt.h>                                              /* getopt() */
 #endif
 
+#include <unistd.h>
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                  /* getenv(), strtol(),  */
 #include <string.h>                                            /* strerror() */

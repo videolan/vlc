@@ -139,6 +139,15 @@ aout_thread_t *aout_CreateThread( int *pi_status )
         return( NULL );
     }
 
+    if( p_aout->l_rate == 0 )
+    {
+        intf_ErrMsg( "aout error: null sample rate" );
+        p_aout->pf_close( p_aout );
+        module_Unneed( p_main->p_bank, p_aout->p_module );
+        free( p_aout );
+        return( NULL );
+    }
+
     p_aout->b_stereo = ( p_aout->i_channels == 2 ) ? 1 : 0; /* FIXME: only works
                                                    for i_channels == 1 or 2 ??*/
 

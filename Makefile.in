@@ -58,7 +58,7 @@ PROGRAM_BUILD = `date` $(USER)
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including SYS_xx. It will be passed to C compiler.
-DEFINE += -DSYS_$(shell echo $(SYS) | sed 's/-.*//' | tr a-z. A-Z_)
+DEFINE += -DSYS_$(shell echo $(SYS) | sed 's/-.*//' | tr '[a-z].' '[A-Z]_')
 
 # On Linux activate 64-bit off_t (by default under BSD)
 ifneq (,$(findstring linux,$(SYS)))
@@ -615,10 +615,8 @@ $(PLUGIN_QT:%.o=%.moc): %.moc: %.cpp
 
 $(PLUGIN_KDE): %.o: Makefile.dep
 $(PLUGIN_KDE): %.o: .dep/%.dpp
-$(PLUGIN_KDE): %.o: %.moc
-	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/kde -I/usr/include/qt -fno-rtti -c -o $@ $(<:%.moc=%.cpp)
-$(PLUGIN_KDE:%.o=%.moc): %.moc: %.cpp
-	moc -i $< -o $@
+$(PLUGIN_KDE): %.o: %.cpp
+	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/kde -I/usr/include/qt -fno-rtti -c -o $@ $<
 
 $(PLUGIN_BEOS): %.o: Makefile.dep
 $(PLUGIN_BEOS): %.o: .dep/%.dpp
@@ -635,7 +633,11 @@ ifeq ($(SYS),beos)
 	rm -f ./plugins/_APP_
 	ln -s ../vlc ./plugins/_APP_
 else
+ifeq ($(SYS),nto-qnx)
+	$(CC) $(CFLAGS) $(LCFLAGS) -Xlinker -export-dynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
+else
 	$(CC) $(CFLAGS) $(LCFLAGS) --export-dynamic @DYNAMIC_FLAG@ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
+endif
 endif
 
 #
@@ -673,8 +675,13 @@ lib/alsa.so: $(PLUGIN_ALSA)
 lib/fb.so: $(PLUGIN_FB)
 	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
+ifeq ($(SYS),nto-qnx)
+lib/x11.so: $(PLUGIN_X11)
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext -lsocket
+else
 lib/x11.so: $(PLUGIN_X11)
 	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext
+endif
 
 lib/mga.so: $(PLUGIN_MGA)
 	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext
