@@ -56,11 +56,10 @@ typedef struct plane_t
  */
 struct picture_t
 {
-    /** \name Picture format
-     * Describes the properties of the picture
-     * @{*/
+    /** 
+     * The properties of the picture
+     */
     video_frame_format_t format;
-    /**@}*/
 
     /** Picture data - data can always be freely modified, but p_data may
      * NEVER be modified. A direct buffer can be handled as the plugin
