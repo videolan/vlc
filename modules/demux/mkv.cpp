@@ -133,6 +133,10 @@ vlc_module_begin();
             N_("Seek based on percent not time"),
             N_("Seek based on percent not time"), VLC_TRUE );
 
+    add_bool( "mkv-use-dummy", 0, NULL,
+            N_("Dummy Elements"),
+            N_("Read and discard unknown EBML elements (not good for broken files)"), VLC_TRUE );
+
     add_shortcut( "mka" );
     add_shortcut( "mkv" );
 vlc_module_end();
@@ -238,12 +242,12 @@ class vlc_stream_io_callback: public IOCallback
 class EbmlParser
 {
   public:
-    EbmlParser( EbmlStream *es, EbmlElement *el_start );
+    EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux );
     ~EbmlParser( void );
 
     void Up( void );
     void Down( void );
-    void Reset( void );
+    void Reset( demux_t *p_demux );
     EbmlElement *Get( void );
     void        Keep( void );
 
@@ -253,11 +257,13 @@ class EbmlParser
     EbmlStream  *m_es;
     int         mi_level;
     EbmlElement *m_el[10];
+	int64_t      mi_remain_size[10];
 
     EbmlElement *m_got;
 
     int         mi_user_level;
     vlc_bool_t  mb_keep;
+	vlc_bool_t  mb_dummy;
 };
 
 
@@ -921,11 +927,6 @@ int matroska_segment_t::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
         EbmlElement *el;
         int         i_level;
 
-        if( sys.demuxer.b_die )
-        {
-            return VLC_EGENERIC;
-        }
-
         el = ep->Get();
         i_level = ep->GetLevel();
 
@@ -1197,7 +1198,7 @@ matroska_stream_t *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
             matroska_segment_t *p_segment1 = new matroska_segment_t( *this, *p_estream );
             b_keep_segment = false;
 
-            ep = new EbmlParser(p_estream, p_l0);
+			ep = new EbmlParser(p_estream, p_l0, &demuxer );
             p_segment1->ep = ep;
             p_segment1->segment = (KaxSegment*)p_l0;
 
@@ -1568,7 +1569,7 @@ bool matroska_segment_t::Select( mtime_t i_start_time )
     }
     
     sys.i_start_pts = i_start_time;
-    ep->Reset();
+    ep->Reset( &sys.demuxer );
 
     // reset the stream reading to the first cluster of the segment used
     es.I_O().setFilePointer( i_start_pos );
@@ -1821,6 +1822,9 @@ static int Demux( demux_t *p_demux)
 
     for( ;; )
     {
+		if ( p_sys->demuxer.b_die )
+			return 0;
+
         if( p_sys->i_pts >= p_sys->i_start_pts  )
             p_vsegment->UpdateCurrentToChapter( *p_demux );
         
@@ -1843,11 +1847,9 @@ static int Demux( demux_t *p_demux)
             continue;
         }
 
+
         if( p_segmet->BlockGet( &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
-            if ( p_sys->demuxer.b_die )
-                return 0;
-
             if ( p_vsegment->EditionIsOrdered() )
             {
                 // check if there are more chapters to read
@@ -1965,13 +1967,14 @@ void vlc_stream_io_callback::close( void )
 /*****************************************************************************
  * Ebml Stream parser
  *****************************************************************************/
-EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start )
+EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux )
 {
     int i;
 
     m_es = es;
     m_got = NULL;
     m_el[0] = el_start;
+	mi_remain_size[0] = el_start->GetSize();
 
     for( i = 1; i < 6; i++ )
     {
@@ -1980,6 +1983,7 @@ EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start )
     mi_level = 1;
     mi_user_level = 1;
     mb_keep = VLC_FALSE;
+	mb_dummy = config_GetInt( p_demux, "mkv-use-dummy" );
 }
 
 EbmlParser::~EbmlParser( void )
@@ -2022,7 +2026,7 @@ int EbmlParser::GetLevel( void )
     return mi_user_level;
 }
 
-void EbmlParser::Reset( void )
+void EbmlParser::Reset( demux_t *p_demux )
 {
     while ( mi_level > 0)
     {
@@ -2037,6 +2041,7 @@ void EbmlParser::Reset( void )
 #else
     m_es->I_O().setFilePointer( m_el[0]->GetElementPosition() + m_el[0]->ElementSize(true) - m_el[0]->GetSize() );
 #endif
+	mb_dummy = config_GetInt( p_demux, "mkv-use-dummy" );
 }
 
 EbmlElement *EbmlParser::Get( void )
@@ -2065,7 +2070,8 @@ EbmlElement *EbmlParser::Get( void )
         mb_keep = VLC_FALSE;
     }
 
-    m_el[mi_level] = m_es->FindNextElement( m_el[mi_level - 1]->Generic().Context, i_ulev, 0xFFFFFFFFL, true, 1 );
+	m_el[mi_level] = m_es->FindNextElement( m_el[mi_level - 1]->Generic().Context, i_ulev, 0xFFFFFFFFL, mb_dummy, 1 );
+//	mi_remain_size[mi_level] = m_el[mi_level]->GetSize();
     if( i_ulev > 0 )
     {
         while( i_ulev > 0 )
@@ -2134,7 +2140,7 @@ void matroska_segment_t::LoadCues( )
         return;
     }
 
-    ep = new EbmlParser( &es, cues );
+	ep = new EbmlParser( &es, cues, &sys.demuxer );
     while( ( el = ep->Get() ) != NULL )
     {
         if( MKV_IS_ID( el, KaxCuePoint ) )
@@ -2244,7 +2250,7 @@ void matroska_segment_t::LoadTags( )
     }
 
     msg_Dbg( &sys.demuxer, "Tags" );
-    ep = new EbmlParser( &es, tags );
+	ep = new EbmlParser( &es, tags, &sys.demuxer );
     while( ( el = ep->Get() ) != NULL )
     {
         if( MKV_IS_ID( el, KaxTag ) )
@@ -3486,7 +3492,7 @@ bool matroska_segment_t::Preload( )
 
     EbmlElement *el = NULL;
 
-    ep->Reset();
+    ep->Reset( &sys.demuxer );
 
     while( ( el = ep->Get() ) != NULL )
     {
@@ -3673,7 +3679,7 @@ void matroska_segment_t::Seek( mtime_t i_date, mtime_t i_time_offset )
                 i_seek_time, (int)( 100 * i_seek_position / stream_Size( sys.demuxer.s ) ) );
 
     delete ep;
-    ep = new EbmlParser( &es, segment );
+	ep = new EbmlParser( &es, segment, &sys.demuxer );
     cluster = NULL;
 
     es.I_O().setFilePointer( i_seek_position, seek_beginning );
