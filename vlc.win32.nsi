@@ -176,8 +176,11 @@ Section "Start Menu + Desktop Shortcut" SEC02
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player.lnk" \
     "$INSTDIR\vlc.exe" "--intf wxwin"
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player (skins).lnk" \
+    "$INSTDIR\vlc.exe" "--intf skins2"
+  CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player (old skins).lnk" \
     "$INSTDIR\vlc.exe" "--intf skins"
-  CreateShortCut "$DESKTOP\VLC media player.lnk" "$INSTDIR\vlc.exe"
+  CreateShortCut "$DESKTOP\VLC media player.lnk" \
+    "$INSTDIR\vlc.exe" "--intf wxwin"
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" \
     "${PRODUCT_WEB_SITE}"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Website.lnk" \
