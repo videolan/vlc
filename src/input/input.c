@@ -59,7 +59,7 @@ static void UpdateFromDemux( input_thread_t * );
 static void ParseOption( input_thread_t *p_input, const char *psz_option );
 
 static void DecodeUrl  ( char * );
-static void MRLSplit( char *, char **, char **, char ** );
+static void MRLSplit( input_thread_t *, char *, char **, char **, char ** );
 
 static input_source_t *InputSourceNew( input_thread_t *);
 static int  InputSourceInit( input_thread_t *, input_source_t *, char * );
@@ -468,8 +468,11 @@ static int Run( input_thread_t *p_input )
         /* We have finish to demux data but not to play them */
         while( !p_input->b_die )
         {
+#if 0
             if( input_EsOutDecodersEmpty( p_input->p_es_out ) )
+#endif
                 break;
+
             msg_Dbg( p_input, "waiting decoder fifos to empty" );
 
             msleep( INPUT_IDLE_SLEEP );
@@ -1502,7 +1505,7 @@ static int InputSourceInit( input_thread_t *p_input,
     vlc_value_t val;
 
     /* Split uri */
-    MRLSplit( psz_dup, &psz_access, &psz_demux, &psz_path );
+    MRLSplit( p_input, psz_dup, &psz_access, &psz_demux, &psz_path );
 
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
@@ -1895,7 +1898,7 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option )
     return;
 }
 
-static void MRLSplit( char *psz_dup,
+static void MRLSplit( input_thread_t *p_input, char *psz_dup,
                       char **ppsz_access, char **ppsz_demux, char **ppsz_path )
 {
     char *psz_access = NULL;
@@ -1904,14 +1907,17 @@ static void MRLSplit( char *psz_dup,
     char *psz;
 
     psz = strchr( psz_dup, ':' );
+
 #if defined( WIN32 ) || defined( UNDER_CE )
     if( psz - psz_dup == 1 )
     {
-        msg_Warn( p_input, "drive letter %c: found in source string", psz_dup[0] );
+        msg_Warn( p_input, "drive letter %c: found in source string",
+                  psz_dup[0] );
         psz_path = psz_dup;
     }
     else
 #endif
+
     if( psz )
     {
         *psz++ = '\0';
@@ -1949,4 +1955,3 @@ static void MRLSplit( char *psz_dup,
     else
         *ppsz_path = psz_path;
 }
-
