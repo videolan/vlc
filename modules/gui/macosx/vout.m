@@ -282,11 +282,10 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
 /*****************************************************************************
  * vout_Init: initialize video thread output method
  *****************************************************************************/
+static int vout_InitOpenGL( vout_thread_t *p_vout );
+static int vout_InitQuickTime( vout_thread_t *p_vout );
 static int vout_Init( vout_thread_t *p_vout )
 {
-    int i_index;
-    picture_t *p_pic;
-
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure; we already found a codec,
@@ -296,28 +295,99 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
-    if( !p_vout->p_sys->i_opengl )
+    if( p_vout->p_sys->i_opengl )
     {
-        SetPort( p_vout->p_sys->p_qdport );
-        QTScaleMatrix( p_vout );
-
-        if( QTCreateSequence( p_vout ) )
-        {
-            msg_Err( p_vout, "unable to create sequence" );
-            return( 1 );
-        }
+        return vout_InitOpenGL( p_vout );
     }
     else
     {
-        p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
-        p_vout->output.i_rmask  = 0xFF0000;
-        p_vout->output.i_gmask  = 0x00FF00;
-        p_vout->output.i_bmask  = 0x0000FF;
+        return vout_InitQuickTime( p_vout );    
+    }
+}
+
+static int vout_InitOpenGL( vout_thread_t *p_vout )
+{
+    picture_t *p_pic;
+    int i_bytes;
+    int i_index;
+    
+    /* Apple OpenGL extensions only accept YUV as YUY2 */
+    p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+    p_vout->output.i_rmask  = 0xFF0000;
+    p_vout->output.i_gmask  = 0x00FF00;
+    p_vout->output.i_bmask  = 0x0000FF;
+
+    /* Allocate our 2 picture buffers */
+    i_bytes = 2 * p_vout->output.i_width * p_vout->output.i_height;
+    p_vout->p_sys->p_data[0] = vlc_memalign(
+            &p_vout->p_sys->p_data_orig[0], 16, i_bytes );
+    p_vout->p_sys->p_data[1] = vlc_memalign(
+            &p_vout->p_sys->p_data_orig[1], 16, i_bytes );
+    p_vout->p_sys->i_cur_pic = 1;
+
+    /* We declare only one picture and will switch buffers
+       manually */
+    p_pic = NULL;
+    while( I_OUTPUTPICTURES < 1 )
+    {
+        /* Find an empty picture slot */
+        for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
+        {
+            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+            {
+                p_pic = p_vout->p_picture + i_index;
+                break;
+            }
+        }
+        if( p_pic == NULL )
+        {
+            break;
+        }
+
+        vout_InitPicture( VLC_OBJECT( p_vout ), p_pic,
+                p_vout->output.i_chroma, p_vout->output.i_width,
+                p_vout->output.i_height, p_vout->output.i_aspect );
+        p_pic->p_data = p_vout->p_sys->p_data[0];
+        p_pic->p[0].p_pixels = p_pic->p_data;
+        for( i_index = 1; i_index < p_pic->i_planes; i_index++ )
+        {
+            p_pic->p[i_index].p_pixels =
+                p_pic->p[i_index-1].p_pixels +
+                p_pic->p[i_index-1].i_lines *
+                p_pic->p[i_index-1].i_pitch;
+        }
+
+        p_pic->i_status = DESTROYED_PICTURE;
+        p_pic->i_type   = DIRECT_PICTURE;
+
+        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
+        I_OUTPUTPICTURES++;
+    }
+
+    [p_vout->p_sys->o_glview lockFocus];
+    [p_vout->p_sys->o_glview initTextures];
+    [p_vout->p_sys->o_glview reshape];
+    [p_vout->p_sys->o_glview unlockFocus];
+
+    return 0;
+}
+
+static int vout_InitQuickTime( vout_thread_t *p_vout )
+{
+    picture_t *p_pic;
+    int i_index;
+
+    SetPort( p_vout->p_sys->p_qdport );
+    QTScaleMatrix( p_vout );
+
+    if( QTCreateSequence( p_vout ) )
+    {
+        msg_Err( p_vout, "unable to create sequence" );
+        return( 1 );
     }
 
     /* Try to initialize up to QT_MAX_DIRECTBUFFERS direct buffers */
-    while( I_OUTPUTPICTURES <
-           p_vout->p_sys->i_opengl ? 1 : QT_MAX_DIRECTBUFFERS )
+    while( I_OUTPUTPICTURES < QT_MAX_DIRECTBUFFERS )
     {
         p_pic = NULL;
 
@@ -330,46 +400,24 @@ static int vout_Init( vout_thread_t *p_vout )
                 break;
             }
         }
-
-        /* Allocate the picture */
         if( p_pic == NULL )
         {
             break;
         }
 
-        if( !p_vout->p_sys->i_opengl )
+        /* Allocate the picture */
+        if( QTNewPicture( p_vout, p_pic ) )
         {
-            if( QTNewPicture( p_vout, p_pic ) )
-            {
-                break;
-            }
-        }
-        else
-        {
-            /* Nothing special to do, we just need a basic allocated
-               picture_t */
-            vout_AllocatePicture( VLC_OBJECT( p_vout ), p_pic,
-                    p_vout->output.i_chroma, p_vout->output.i_width,
-                    p_vout->output.i_height, p_vout->output.i_aspect );
+            break;
         }
 
         p_pic->i_status = DESTROYED_PICTURE;
         p_pic->i_type   = DIRECT_PICTURE;
 
         PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
-
         I_OUTPUTPICTURES++;
     }
-
-    if( p_vout->p_sys->i_opengl )
-    {
-        [p_vout->p_sys->o_glview lockFocus];
-        [p_vout->p_sys->o_glview initTextures];
-        [p_vout->p_sys->o_glview reshape];
-        [p_vout->p_sys->o_glview unlockFocus];
-    }
-
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
@@ -398,7 +446,8 @@ static void vout_End( vout_thread_t *p_vout )
         }
         else
         {
-            free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
+            free( p_vout->p_sys->p_data_orig[0] );
+            free( p_vout->p_sys->p_data_orig[1] );
         }
     }
 }
@@ -509,11 +558,30 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     {
         if( [p_vout->p_sys->o_glview lockFocusIfCanDraw] )
         {
-            /* Texture gotta be reload before the buffer is filled
-               (thanks to gcc from arstechnica forums) */
+            int i_index;
+            int i_old = p_vout->p_sys->i_cur_pic;
+            int i_new = ( i_old + 1 ) % 2;
+ 
+            /* Draw the new picture */
+            p_vout->p_sys->i_cur_pic = i_new;
             [p_vout->p_sys->o_glview drawRect:
                 [p_vout->p_sys->o_glview bounds]];
-            [p_vout->p_sys->o_glview reloadTexture];
+           
+            /* Reload the other texture. Textures have to be reloaded
+               before the buffer is filled (thanks to gcc from
+               arstechnica forums) */
+            [p_vout->p_sys->o_glview reloadTexture: i_old];
+
+            /* Switch buffers */
+            p_pic->p_data = p_vout->p_sys->p_data[i_old];
+            p_pic->p[0].p_pixels = p_pic->p_data;
+            for( i_index = 1; i_index < p_pic->i_planes; i_index++ )
+            {
+                p_pic->p[i_index].p_pixels =
+                    p_pic->p[i_index-1].p_pixels +
+                    p_pic->p[i_index-1].i_lines *
+                    p_pic->p[i_index-1].i_pitch;
+            }
             [p_vout->p_sys->o_glview unlockFocus];
         }
     }
@@ -1414,9 +1482,10 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         glTranslatef( 0.0, 0.0, - 5.0 );
     }
 
-    i_texture    = 0;
-    initDone     = 0;
-    isFullScreen = 0;
+    pi_textures[0] = 0;
+    pi_textures[1] = 0;
+    initDone       = 0;
+    isFullScreen   = 0;
 
     return self;
 }
@@ -1434,12 +1503,12 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     glViewport( 0, 0, (GLint) bounds.size.width,
                 (GLint) bounds.size.height );
 
-    /* Quad size is set in order to preserve the aspect ratio */
     if( config_GetInt( p_vout, "macosx-stretch" ) )
     {
         f_x = 1.0;
         f_y = 1.0;
     }
+    /* Quad size is set in order to preserve the aspect ratio */
     else if( bounds.size.height * p_vout->output.i_aspect <
         bounds.size.width * VOUT_ASPECT_FACTOR )
     {
@@ -1457,53 +1526,57 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void) initTextures
 {
+    int i;
     [currentContext makeCurrentContext];
 
     /* Free previous texture if any */
-    if( i_texture )
+    if( initDone )
     {
-        glDeleteTextures( 1, &i_texture );
+        glDeleteTextures( 2, pi_textures );
     }
     
     /* Create textures */
-    glGenTextures( 1, &i_texture );
+    glGenTextures( 2, pi_textures );
 
     glEnable( GL_TEXTURE_RECTANGLE_EXT );
     glEnable( GL_UNPACK_CLIENT_STORAGE_APPLE );
 
-    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
+    for( i = 0; i < 2; i++ )
+    {
+        glBindTexture( GL_TEXTURE_RECTANGLE_EXT, pi_textures[i] );
 
-    /* Use VRAM texturing */
-    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-            GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_CACHED_APPLE );
+        /* Use VRAM texturing */
+        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+                GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_CACHED_APPLE );
 
-    /* Tell the driver not to make a copy of the texture but to use
-       our buffer */
-    glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
+        /* Tell the driver not to make a copy of the texture but to use
+           our buffer */
+        glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
 
-    /* Linear interpolation */
-    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-            GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-            GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        /* Linear interpolation */
+        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+                GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+                GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-    /* I have no idea what this exactly does, but it seems to be
-       necessary for scaling */
-    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-            GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-            GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
+        /* I have no idea what this exactly does, but it seems to be
+           necessary for scaling */
+        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+                GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+                GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
 
-    glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGBA,
-            p_vout->output.i_width, p_vout->output.i_height, 0,
-            GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
-            PP_OUTPUTPICTURE[0]->p_data );
+        glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGBA,
+                p_vout->output.i_width, p_vout->output.i_height, 0,
+                GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
+                p_vout->p_sys->p_data[i] );
+    }
 
     initDone = 1;
 }
 
-- (void)reloadTexture
+- (void)reloadTexture: (int) index
 {
     if( !initDone )
     {
@@ -1512,7 +1585,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     
     [currentContext makeCurrentContext];
 
-    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
+    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, pi_textures[index] );
 
     /* glTexSubImage2D is faster than glTexImage2D
        http://developer.apple.com/samplecode/Sample_Code/Graphics_3D/
@@ -1520,7 +1593,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     glTexSubImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, 0, 0,
             p_vout->output.i_width, p_vout->output.i_height,
             GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
-            PP_OUTPUTPICTURE[0]->p_data );
+            p_vout->p_sys->p_data[index] );
 }
 
 - (void)goFullScreen
@@ -1536,7 +1609,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         NSOpenGLPFADepthSize, 24,
         NSOpenGLPFAFullScreen,
         NSOpenGLPFAScreenMask,
-        /* TODO handle macosx-vdev */
+        /* TODO multi monitor support */
         CGDisplayIDToOpenGLDisplayMask( kCGDirectMainDisplay ),
         0
     };
@@ -1549,6 +1622,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* Create the new OpenGL context */
+    /* TODO have the shared context working so we don't have to
+       re-init textures */
     fullScreenContext = [[NSOpenGLContext alloc]
         initWithFormat: fmt shareContext: nil];
     if( !fullScreenContext )
@@ -1559,6 +1634,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     currentContext = fullScreenContext;
 
     /* Capture display, switch to fullscreen */
+    /* XXX we should capture only the display the user wants the
+       picture on */
     if( CGCaptureAllDisplays() != CGDisplayNoErr )
     {
         msg_Warn( p_vout, "CGCaptureAllDisplays() failed" );
@@ -1740,7 +1817,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* Draw */
-    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
+    glBindTexture( GL_TEXTURE_RECTANGLE_EXT,
+                   pi_textures[p_vout->p_sys->i_cur_pic] );
     if( i_effect & ( OPENGL_EFFECT_CUBE |
                 OPENGL_EFFECT_TRANSPARENT_CUBE ) )
     {

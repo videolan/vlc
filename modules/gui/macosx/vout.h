@@ -61,7 +61,8 @@
 {
     vout_thread_t   * p_vout;
     int               i_effect;
-    unsigned long     i_texture;
+    unsigned long     pi_textures[2];
+    int               i_curTexture;
     float             f_x;
     float             f_y;
     int               initDone;
@@ -72,7 +73,7 @@
 
 - (id) initWithFrame: (NSRect) frame vout: (vout_thread_t*) p_vout;
 - (void) initTextures;
-- (void) reloadTexture;
+- (void) reloadTexture: (int) index;
 - (void) goFullScreen;
 - (void) exitFullScreen;
 - (void) cleanUp;
@@ -115,5 +116,9 @@ struct vout_sys_t
     Ptr p_fullscreen_state;
 #endif
 
+    /* OpenGL */
     VLCGLView * o_glview;
+    uint8_t   * p_data[2];
+    uint8_t   * p_data_orig[2];
+    int         i_cur_pic;
 };
