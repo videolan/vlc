@@ -258,7 +258,7 @@ static int OpenFilter( vlc_object_t *p_this )
     mad_synth_init( &p_sys->mad_synth );
     mad_stream_options( &p_sys->mad_stream, MAD_OPTION_IGNORECRC );
 
-    msg_Err( p_this, "%4.4s->%4.4s, bits per sample: %i",
+    msg_Dbg( p_this, "%4.4s->%4.4s, bits per sample: %i",
              (char *)&p_filter->fmt_in.i_codec,
              (char *)&p_filter->fmt_out.i_codec,
              p_filter->fmt_out.audio.i_bitspersample );
