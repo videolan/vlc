@@ -1298,6 +1298,40 @@ int vout_VarCallback( vlc_object_t * p_this, const char * psz_variable,
 }
 
 /*****************************************************************************
+ * Helper thread for object variables callbacks.
+ * Only used to avoid deadlocks when using the video embedded mode.
+ *****************************************************************************/
+typedef struct suxor_thread_t
+{
+    VLC_COMMON_MEMBERS
+    input_thread_t *p_input;
+
+} suxor_thread_t;
+
+static void SuxorRestartVideoES( suxor_thread_t *p_this )
+{
+    vlc_value_t val;
+
+    /* Now restart current video stream */
+    var_Get( p_this->p_input, "video-es", &val );
+    if( val.i_int >= 0 )
+    {
+        vlc_value_t val_es;
+        val_es.i_int = -VIDEO_ES;
+        var_Set( p_this->p_input, "video-es", val_es );
+        var_Set( p_this->p_input, "video-es", val );
+    }
+
+    vlc_object_release( p_this->p_input );
+
+#ifdef WIN32
+    CloseHandle( p_this->thread_id );
+#endif
+
+    vlc_object_destroy( p_this );
+}
+
+/*****************************************************************************
  * object variables callbacks: a bunch of object variables are used by the
  * interfaces to interact with the vout.
  *****************************************************************************/
@@ -1350,21 +1384,35 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
         var_Set( p_input, "deinterlace-mode", val );
     }
 
+    val.b_bool = VLC_TRUE;
+    var_Set( p_vout, "intf-change", val );
+
     /* Now restart current video stream */
     var_Get( p_input, "video-es", &val );
     if( val.i_int >= 0 )
     {
-        vlc_value_t val_es;
-        val_es.i_int = -VIDEO_ES;
-        p_vout->b_filter_change = VLC_TRUE;
-        var_Set( p_input, "video-es", val_es );
-        var_Set( p_input, "video-es", val );
+        if( p_vout->p_parent_intf )
+        {
+            p_vout->b_filter_change = VLC_TRUE;
+            suxor_thread_t *p_suxor =
+                vlc_object_create( p_vout, sizeof(suxor_thread_t) );
+            p_suxor->p_input = p_input;
+            vlc_object_yield( p_input );
+            vlc_thread_create( p_suxor, "suxor", SuxorRestartVideoES,
+                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
+        }
+        else
+        {
+            vlc_value_t val_es;
+            val_es.i_int = -VIDEO_ES;
+            p_vout->b_filter_change = VLC_TRUE;
+            var_Set( p_input, "video-es", val_es );
+            var_Set( p_input, "video-es", val );
+        }
     }
 
     vlc_object_release( p_input );
 
-    val.b_bool = VLC_TRUE;
-    var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;
 }
 
@@ -1384,20 +1432,34 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
         return( VLC_EGENERIC );
     }
 
+    val.b_bool = VLC_TRUE;
+    var_Set( p_vout, "intf-change", val );
+
     /* Now restart current video stream */
     var_Get( p_input, "video-es", &val );
     if( val.i_int >= 0 )
     {
-        vlc_value_t val_es;
-        val_es.i_int = -VIDEO_ES;
-        p_vout->b_filter_change = VLC_TRUE;
-        var_Set( p_input, "video-es", val_es );
-        var_Set( p_input, "video-es", val );
+        if( p_vout->p_parent_intf )
+        {
+            p_vout->b_filter_change = VLC_TRUE;
+            suxor_thread_t *p_suxor =
+                vlc_object_create( p_vout, sizeof(suxor_thread_t) );
+            p_suxor->p_input = p_input;
+            vlc_object_yield( p_input );
+            vlc_thread_create( p_suxor, "suxor", SuxorRestartVideoES,
+                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
+        }
+        else
+        {
+            vlc_value_t val_es;
+            val_es.i_int = -VIDEO_ES;
+            p_vout->b_filter_change = VLC_TRUE;
+            var_Set( p_input, "video-es", val_es );
+            var_Set( p_input, "video-es", val );
+        }
     }
 
     vlc_object_release( p_input );
 
-    val.b_bool = VLC_TRUE;
-    var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;
 }
