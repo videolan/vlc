@@ -1,8 +1,9 @@
 vlc (0.2.92-1) unstable; urgency=low
 
   * New upstream release.
+  * Added vlc-mad package.
 
- -- Christophe Massiot <massiot@via.ecp.fr>  Fri,  7 Dec 2001 20:18:56 +0100
+ -- Samuel Hocevar <sam@zoy.org>  Sun,  9 Dec 2001 17:01:44 +0100
 
 vlc (0.2.91-2) unstable; urgency=low
 

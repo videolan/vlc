@@ -758,19 +758,19 @@ fi
 dnl
 dnl  libmad plugin
 dnl
-AC_ARG_WITH(libmad,
-  [  --with-libmad[=PATH]    libmad module (default disabled)],
+AC_ARG_WITH(mad,
+  [  --with-mad[=PATH]       libmad module (default disabled)],
   [ if test "x$with_val" != "xno"; then
       if test -n $with_val; then
-	    CFLAGS_MAD_ADEC="-I$with_val/include"
-        LIB_MAD_ADEC="-L$with_val/lib -lmad"
+	    CFLAGS_MAD="-I$with_val/include"
+        LIB_MAD="-L$with_val/lib -lmad"
       else
-        LIB_MAD_ADEC="-lmad"
+        LIB_MAD="-lmad"
       fi
       save_CFLAGS=$CFLAGS
       save_LDFLAGS=$LDFLAGS
-      CFLAGS="$CFLAGS $CFLAGS_MAD_ADEC"
-      LDFLAGS="$LDFLAGS $LIB_MAD_ADEC"
+      CFLAGS="$CFLAGS $CFLAGS_MAD"
+      LDFLAGS="$LDFLAGS $LIB_MAD"
       AC_CHECK_HEADERS(mad.h, ,
       [ echo "Cannot find development headers for libmad..."
         exit 1
@@ -781,7 +781,7 @@ AC_ARG_WITH(libmad,
       ])
       CFLAGS=$save_CFLAGS
       LDFLAGS=$save_LDFLAGS
-      BUILTINS="${BUILTINS} mad_adec"
+      PLUGINS="${PLUGINS} mad"
     fi ])
 
 dnl special case for BeOS
@@ -1234,7 +1234,7 @@ AC_SUBST(LIB_GTK)
 AC_SUBST(LIB_KDE)
 AC_SUBST(LIB_LIBDVDCSS)
 AC_SUBST(LIB_MACOSX)
-AC_SUBST(LIB_MAD_ADEC)
+AC_SUBST(LIB_MAD)
 AC_SUBST(LIB_NCURSES)
 AC_SUBST(LIB_QNX)
 AC_SUBST(LIB_QT)
@@ -1253,7 +1253,7 @@ AC_SUBST(CFLAGS_LIBDVDCSS)
 AC_SUBST(CFLAGS_ARTS)
 AC_SUBST(CFLAGS_ESD)
 AC_SUBST(CFLAGS_GTK)
-AC_SUBST(CFLAGS_MAD_ADEC)
+AC_SUBST(CFLAGS_MAD)
 AC_SUBST(CFLAGS_SDL)
 AC_SUBST(CFLAGS_X11)
 

@@ -18,20 +18,20 @@ include ../../Makefile.modules
 
 $(PLUGIN_MAD): %.o: .dep/%.d
 $(PLUGIN_MAD): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_MAD_ADEC) -DPLUGIN -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_MAD) -DPLUGIN -c -o $@ $<
 
 $(BUILTIN_MAD): BUILTIN_%.o: .dep/%.d
 $(BUILTIN_MAD): BUILTIN_%.o: %.c
-	$(CC) $(CFLAGS) $(CFLAGS_MAD_ADEC) -DBUILTIN -c -o $@ $<
+	$(CC) $(CFLAGS) $(CFLAGS_MAD) -DBUILTIN -c -o $@ $<
 
 #
 # Real targets
 #
 
-../mad_adec.so: $(PLUGIN_MAD)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_MAD_ADEC)
+../mad.so: $(PLUGIN_MAD)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_MAD)
 
-../mad_adec.a: $(BUILTIN_MAD)
+../mad.a: $(BUILTIN_MAD)
 	ar r $@ $^
 	$(RANLIB) $@
 

@@ -80,7 +80,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		kde/kde \
 		lpcm_adec/lpcm_adec \
 		macosx/macosx \
-		mad_adec/mad_adec \
+		mad_adec/mad \
 		memcpy/memcpy \
 		memcpy/memcpymmx \
 		memcpy/memcpymmxext \

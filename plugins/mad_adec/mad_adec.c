@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#define MODULE_NAME mad_adec
+#define MODULE_NAME mad
 #include "modules_inner.h"
 
 /*****************************************************************************
@@ -36,6 +36,7 @@
 #include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 
 #include "audio_output.h"
 
