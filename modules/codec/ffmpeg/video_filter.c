@@ -280,10 +280,6 @@ void E_(CloseDeinterlace)( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( p_sys->p_rsc ) img_resample_close( p_sys->p_rsc );
-
-    avpicture_free( &p_sys->tmp_pic );
-
     free( p_sys );
 }
 
