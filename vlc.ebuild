@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.22 2004/01/08 21:55:06 hartman Exp $
+# $Id: vlc.ebuild,v 1.23 2004/01/08 22:34:54 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -34,7 +34,7 @@ inherit libtool
 inherit gcc
 
 IUSE="arts ncurses dvd gtk nls 3dfx svga fbcon esd X alsa ggi speex
-      oggvorbis gnome xv oss sdl aalib slp truetype v4l lirc 
+      oggvorbis gnome xv oss sdl aalib slp bidi truetype v4l lirc 
 	  wxwindows imlib matroska dvb mozilla debug faad xosd altivec png"
 
 # Change these to correspond with the
@@ -59,7 +59,7 @@ KEYWORDS="~x86 ~ppc ~sparc ~alpha ~mips ~hppa ~amd64 ~ia64 ~ppc64"
 
 DEPEND="X? ( virtual/x11 )
 	aalib? ( >=media-libs/aalib-1.4_rc4-r2 
-			>=media-libs/libcaca-0.2 )
+			>=media-libs/libcaca-0.6 )
 	alsa? ( >=media-libs/alsa-lib-0.9_rc2 )
 	dvb? ( media-libs/libdvb
 		media-tv/linuxtv-dvb )
@@ -107,9 +107,6 @@ src_unpack() {
 	
 	unpack ${A}
 
-	# Mozilla plugin related fix
-	epatch ${FILESDIR}/${PV}-mozilla-fix.patch
-
 	# Change the location of the glide headers
 	cd ${S}
 	sed -i \
@@ -140,8 +137,7 @@ src_compile(){
 	./configure \
 		--enable-mp3lame \
 		--enable-pp \
-		--disable-vorbis 
-		`use_enable mmx` || die "ffmpeg failed to configure"
+		--disable-vorbis || die "ffmpeg failed to configure"
 	
 	cd libavcodec
 	make || die "ffmpeg->libavcodec failed to compile"
@@ -202,7 +198,7 @@ src_compile(){
 		`use_enable v4l` \
 		`use_enable dvd` \
 		`use_enable dvd vcd` `use_enable dvdread` `use_enable dvd dvdplay` \
-		`use_enable dvb satellite` `use_enable dvb pvr`
+		`use_enable dvb satellite` `use_enable dvb pvr` \
 		`use_enable joystick` `use_enable lirc` \
 		`use_enable arts` \
 		`use_enable gtk` `use_enable gnome` \
