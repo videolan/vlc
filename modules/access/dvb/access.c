@@ -162,8 +162,12 @@ int E_(Open) ( vlc_object_t *p_this )
         else if (strncmp( p_input->psz_access, "terrestrial",11) ==0)
             frontend_info.type = FE_OFDM;
 
-        frontend_info.frequency_max =   12999000; /* KHz */
-        frontend_info.frequency_min =    9750000;
+//        frontend_info.frequency_max =   12999000; /* in KHz, lnb_lof2 */
+//        frontend_info.frequency_min =    9750000; /* lnb_lof1 */
+
+        frontend_info.frequency_max = u_lnb_lof2; /* in KHz, lnb_lof2 */
+        frontend_info.frequency_min = u_lnb_lof1; /* lnb_lof1 */
+
         frontend_info.symbol_rate_max = 30000000;
         frontend_info.symbol_rate_min =  1000000;
     }
