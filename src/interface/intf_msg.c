@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: intf_msg.c,v 1.28 2001/03/21 13:42:34 sam Exp $
+ * $Id: intf_msg.c,v 1.29 2001/04/25 06:56:47 benny Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -575,7 +575,8 @@ static void FlushLockedMsg ( intf_msg_t *p_msg )
 static void PrintMsg( intf_msg_item_t *p_msg )
 {
     char    psz_date[MSTRTIME_MAX_SIZE];            /* formatted time buffer */
-    char *  psz_msg;                                       /* message buffer */
+    int     i_msg_len = MSTRTIME_MAX_SIZE + strlen(p_msg->psz_msg) + 200;
+    char    psz_msg[i_msg_len];                            /* message buffer */
 
     /* Format message - the message is formatted here because in case the log
      * file is used, it avoids another format string parsing */
@@ -583,23 +584,23 @@ static void PrintMsg( intf_msg_item_t *p_msg )
     {
     case INTF_MSG_STD:                                   /* regular messages */
     case INTF_MSG_ERR:
-        asprintf( &psz_msg, "%s", p_msg->psz_msg );
+        snprintf( psz_msg, i_msg_len, "%s", p_msg->psz_msg );
         break;
 
     case INTF_MSG_WARN:                                   /* Warning message */
         mstrtime( psz_date, p_msg->date );
-        asprintf( &psz_msg, "(%s) %s",
+        snprintf( psz_msg, i_msg_len, "(%s) %s",
                   psz_date, p_msg->psz_msg );
 
         break;
         
     case INTF_MSG_INTF:                                /* interface messages */
-        asprintf( &psz_msg, "%s", p_msg->psz_msg );
+        snprintf( psz_msg, i_msg_len, "%s", p_msg->psz_msg );
         break;
 
     case INTF_MSG_DBG:                                     /* debug messages */
         mstrtime( psz_date, p_msg->date );
-        asprintf( &psz_msg, "(%s) " INTF_MSG_DBG_FORMAT "%s",
+        snprintf( psz_msg, i_msg_len, "(%s) " INTF_MSG_DBG_FORMAT "%s",
                   psz_date, p_msg->psz_file, p_msg->psz_function, p_msg->i_line,
                   p_msg->psz_msg );
         break;
@@ -641,9 +642,6 @@ static void PrintMsg( intf_msg_item_t *p_msg )
         fwrite( "\n", 1, 1, p_main->p_msg->p_log_file );
     }
 #endif
-
-    /* Free formatted message */
-    free( psz_msg );
 }
 
 #else
