@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.130 2003/08/23 22:49:50 fenrir Exp $
+ * $Id: modules.c,v 1.131 2003/09/10 11:37:52 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -367,8 +367,8 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
 
                 for( i_dummy = 0; p_module->pp_shortcuts[i_dummy]; i_dummy++ )
                 {
-                    if( !strcmp( psz_name,
-                                 p_module->pp_shortcuts[i_dummy] ) )
+                    if( !strcasecmp( psz_name,
+                                     p_module->pp_shortcuts[i_dummy] ) )
                     {
                         /* Found it */
                         b_trash = VLC_FALSE;

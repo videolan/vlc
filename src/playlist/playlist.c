@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.49 2003/09/08 12:02:16 zorglub Exp $
+ * $Id: playlist.c,v 1.50 2003/09/10 11:37:53 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -488,6 +488,8 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
  void playlist_Command( playlist_t * p_playlist, playlist_command_t i_command,
                        int i_arg )
 {
+    vlc_value_t val;
+
     vlc_mutex_lock( &p_playlist->object_lock );
 
     switch( i_command )
@@ -508,7 +510,8 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
         }
         if( p_playlist->p_input )
         {
-            input_SetStatus( p_playlist->p_input, INPUT_STATUS_PLAY );
+            val.i_int = PLAYING_S;
+            var_Set( p_playlist->p_input, "state", val );
         }
         break;
 
@@ -516,7 +519,8 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
         p_playlist->i_status = PLAYLIST_PAUSED;
         if( p_playlist->p_input )
         {
-            input_SetStatus( p_playlist->p_input, INPUT_STATUS_PAUSE );
+            val.i_int = PAUSE_S;
+            var_Set( p_playlist->p_input, "state", val );
         }
         break;
 
