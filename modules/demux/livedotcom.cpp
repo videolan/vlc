@@ -71,7 +71,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_description( _("live.com (RTSP/RTP/SDP) demuxer" ) );
     set_capability( "demux2", 50 );
-    set_name( "Live.com RTP/RTSP");
+    set_shortname( "Live.com RTP/RTSP");
     set_callbacks( Open, Close );
     add_shortcut( "live" );
     set_category( CAT_INPUT );
