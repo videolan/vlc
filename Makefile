@@ -65,6 +65,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		esd/esd \
 		fb/fb \
 		filter/filter_bob \
+		filter/filter_bob422 \
 		filter/filter_invert \
 		filter/filter_wall \
 		ggi/ggi \
