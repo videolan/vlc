@@ -67,9 +67,10 @@
     int               initDone;
 }
 
-- (id) initWithFrame: (NSRect) frame vout: (vout_thread_t*) p_vout;
+- (id)   initWithFrame: (NSRect) frame vout: (vout_thread_t*) p_vout;
 - (void) initTextures;
 - (void) reloadTexture: (int) index;
+- (void) cleanUp;
 
 @end
 

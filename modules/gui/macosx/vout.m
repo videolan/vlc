@@ -455,6 +455,11 @@ void E_(CloseVideo) ( vlc_object_t *p_this )
 {       
     vout_thread_t * p_vout = (vout_thread_t *)p_this;     
 
+    if( p_vout->p_sys->i_opengl )
+    {
+        [p_vout->p_sys->o_glview cleanUp];
+    }
+
     if( CoDestroyWindow( p_vout ) )
     {
         msg_Err( p_vout, "unable to destroy window" );
@@ -1586,6 +1591,11 @@ CATCH_MOUSE_EVENTS
             p_vout->output.i_width, p_vout->output.i_height,
             GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
             p_vout->p_sys->p_data[index] );
+}
+
+- (void) cleanUp
+{
+    initDone = 0;
 }
 
 - (void) drawQuad
