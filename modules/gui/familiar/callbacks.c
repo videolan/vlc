@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.14 2002/12/15 22:45:35 jpsaman Exp $
+ * $Id: callbacks.c,v 1.15 2002/12/16 21:48:17 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -95,8 +95,6 @@ static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
     intf_thread_t *p_intf = GtkGetIntf( widget );
     playlist_t *p_playlist;
 
-    g_print( "%s\n",psz_url );
-
     // Add p_url to playlist .... but how ?
     p_playlist = (playlist_t *)
              vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -125,43 +123,36 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
     struct dirent **namelist;
     int n,status;
 
-    if ( p_intf->p_sys->b_filelist_update == 0)
+    msg_Dbg(p_intf, "changing to dir %s\n", psz_dir);
+    if (psz_dir)
     {
-        msg_Err(p_intf, "changing to dir %s\n", psz_dir);
-        p_intf->p_sys->b_filelist_update = 1;
-        if (psz_dir)
-        {
-           status = chdir(psz_dir);
-           if (status<0)
-              msg_Err( p_intf, "file is not a directory" );
-        }
-        n = scandir(".", &namelist, 0, alphasort);
-
-        if (n<0)
-            perror("scandir");
-        else
-        {
-            gchar *ppsz_text[2];
-            int i;
-
-            gtk_clist_freeze( clist );
-            gtk_clist_clear( clist );
-            for (i=0; i<n; i++)
-            {
-                /* This is a list of strings. */
-                ppsz_text[0] = namelist[i]->d_name;
-                ppsz_text[1] = get_file_perm(namelist[i]->d_name);
-                if (strcmp(ppsz_text[1],"") == 0)
-                    msg_Err( p_intf->p_sys->p_input, "File system error unknown filetype encountered.");
-                gtk_clist_insert( clist, i, ppsz_text );
-                free(namelist[i]);
-            }
-            gtk_clist_thaw( clist );
-            free(namelist);
-        }
+       status = chdir(psz_dir);
+       if (status<0)
+          msg_Err( p_intf, "permision denied" );			
     }
-    p_intf->p_sys->b_filelist_update = 0;
+    n = scandir(".", &namelist, 0, alphasort);
 
+    if (n<0)
+        perror("scandir");
+    else
+    {
+        gchar *ppsz_text[2];
+        int i;
+
+        gtk_clist_freeze( clist );
+        gtk_clist_clear( clist );
+        for (i=0; i<n; i++)
+        {
+            /* This is a list of strings. */
+            ppsz_text[0] = namelist[i]->d_name;
+            ppsz_text[1] = get_file_perm(namelist[i]->d_name);
+//            msg_Dbg(p_intf, "(%d) file: %s permission: %s", i, ppsz_text[0], ppsz_text[1] );
+            gtk_clist_insert( clist, i, ppsz_text );
+            free(namelist[i]);
+        }
+        gtk_clist_thaw( clist );
+        free(namelist);
+    }
 }
 
 static char* get_file_perm(const char *path)
@@ -394,7 +385,7 @@ void
 on_comboURL_entry_changed              (GtkEditable     *editable,
                                         gpointer         user_data)
 {
-    intf_thread_t * p_intf = GtkGetIntf( GTK_WIDGET( editable ) );
+//    intf_thread_t * p_intf = GtkGetIntf( GTK_WIDGET(editable) );
     gchar *       psz_url;
     struct stat st;
 
@@ -415,16 +406,30 @@ on_comboURL_entry_changed              (GtkEditable     *editable,
     }
     else if (lstat((char*)psz_url, &st)==0)
     {
+#if 0
+// This piece of code crashes in ReadDirectory at gtk_clist_insert()
+// I cannot figure out why. So for now it is mandatory to use the
+// file://  syntax for opening a file on a known location.
+// The strange thing is it only crashes for names beginning with "/" or "."
+// The combobox is means as a URL box, so having "file://" in front
+// is not that strange ;-)
         if (S_ISDIR(st.st_mode))
-           ReadDirectory(p_intf->p_sys->p_clist, psz_url);
-        else if( (S_ISLNK(st.st_mode)) || (S_ISCHR(st.st_mode)) ||
-                 (S_ISBLK(st.st_mode)) || (S_ISFIFO(st.st_mode))||
-                 (S_ISSOCK(st.st_mode))|| (S_ISREG(st.st_mode)) )
         {
-           MediaURLOpenChanged(GTK_WIDGET(editable), psz_url);
+		    if (!p_intf->p_sys->p_clist)
+			    msg_Err(p_intf, "p_clist pointer invalid!!" );
+            ReadDirectory(p_intf->p_sys->p_clist, psz_url);
+        }
+        else
+#endif
+        if( (S_ISLNK(st.st_mode)) || (S_ISCHR(st.st_mode)) ||
+            (S_ISBLK(st.st_mode)) || (S_ISFIFO(st.st_mode))||
+            (S_ISSOCK(st.st_mode))|| (S_ISREG(st.st_mode)) )
+        {
+            MediaURLOpenChanged(GTK_WIDGET(editable), psz_url);
         }
    }
 }
+
 
 void
 on_clistmedia_click_column             (GtkCList        *clist,
@@ -457,7 +462,7 @@ on_clistmedia_select_row               (GtkCList        *clist,
                                         GdkEvent        *event,
                                         gpointer         user_data)
 {
-    intf_thread_t * p_intf = GtkGetIntf( GTK_WIDGET( clist ) );
+    intf_thread_t * p_intf = GtkGetIntf( GTK_WIDGET(clist) );
     gchar *text[2];
     gint ret;
     struct stat st;

@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.15 2002/12/15 22:45:35 jpsaman Exp $
+ * $Id: familiar.c,v 1.16 2002/12/16 21:48:17 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -86,20 +86,19 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-#ifdef NEED_GTK_MAIN
+//#ifdef NEED_GTK_MAIN
     p_intf->p_sys->p_gtk_main = module_Need( p_this, "gtk_main", "gtk" );
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
         free( p_intf->p_sys );
         return VLC_ENOMOD;
     }
-#endif
+//#endif
 
     /* Initialize Gtk+ thread */
     p_intf->p_sys->p_input = NULL;
 
     p_intf->p_sys->b_autoplayfile = 1;
-    p_intf->p_sys->b_filelist_update = 0;
     p_intf->pf_run = Run;
 
     return VLC_SUCCESS;
@@ -117,9 +116,9 @@ static void Close( vlc_object_t *p_this )
         vlc_object_release( p_intf->p_sys->p_input );
     }
 
-#ifdef NEED_GTK_MAIN
+//#ifdef NEED_GTK_MAIN
     module_Unneed( p_intf, p_intf->p_sys->p_gtk_main );
-#endif
+//#endif
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -162,7 +161,7 @@ static void Run( intf_thread_t *p_intf )
 
 // FIXME: magic path
     add_pixmap_directory("share");
-    add_pixmap_directory("/usr/share/videolan");
+    add_pixmap_directory("/usr/share/vlc");
 
     p_intf->p_sys->p_window = create_familiar();
     if (p_intf->p_sys->p_window == NULL)
@@ -196,7 +195,7 @@ static void Run( intf_thread_t *p_intf )
     gtk_widget_show( p_intf->p_sys->p_window );
     ReadDirectory(p_intf->p_sys->p_clist, "/mnt");
 
-#ifdef NEED_GTK_MAIN
+//#ifdef NEED_GTK_MAIN
     /* Sleep to avoid using all CPU - since some interfaces need to
      * access keyboard events, a 100ms delay is a good compromise */
     while( !p_intf->b_die )
@@ -205,15 +204,15 @@ static void Run( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
         gdk_threads_enter();
     }
-#endif
+//#endif
 
     gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_window) );
 
-#ifdef NEED_GTK_MAIN
+//#ifdef NEED_GTK_MAIN
     gdk_threads_leave();
-#else
+//#else
     gtk_main_quit();
-#endif
+//#endif
 }
 
 /*****************************************************************************
