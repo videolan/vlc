@@ -27,6 +27,7 @@
 
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                            /* "input.h" */
+#include <string.h>                                                /* memset */
 
 #include "config.h"
 #include "common.h"

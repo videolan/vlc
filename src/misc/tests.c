@@ -66,6 +66,9 @@ int TestMethod( char * psz_var, char * psz_method )
  *****************************************************************************/
 int TestMMX( void )
 {
+#ifndef __i386__
+    return( 0 );
+#else
 /* FIXME: under beos, gcc does not support the following inline assembly */ 
 #ifdef SYS_BEOS
     return( 1 );
@@ -132,7 +135,7 @@ int TestMMX( void )
         return( 0 );
 
     return( 1 );
-
+#endif
 #endif
 }
 
