@@ -573,7 +573,7 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_ENOOBJ;
     }
 
-    p_sys->psz_filename = var_CreateGetString( p_input , "logo-file" ); 
+    p_sys->psz_filename = var_CreateGetString( p_input->p_libvlc , "logo-file" ); 
     if( !p_sys->psz_filename || !*p_sys->psz_filename )
     {
         msg_Err( p_this, "logo file not specified" );
@@ -582,17 +582,17 @@ static int CreateFilter( vlc_object_t *p_this )
         return 0;
     }
 
-    p_sys->posx = var_CreateGetInteger( p_input , "logo-x" );
-    p_sys->posy = var_CreateGetInteger( p_input , "logo-y" );
-    p_sys->pos = var_CreateGetInteger( p_input , "logo-position" );
-    p_sys->i_trans = var_CreateGetInteger( p_input, "logo-transparency");
+    p_sys->posx = var_CreateGetInteger( p_input->p_libvlc , "logo-x" );
+    p_sys->posy = var_CreateGetInteger( p_input->p_libvlc , "logo-y" );
+    p_sys->pos = var_CreateGetInteger( p_input->p_libvlc , "logo-position" );
+    p_sys->i_trans = var_CreateGetInteger( p_input->p_libvlc, "logo-transparency");
     p_sys->i_trans = __MAX( __MIN( p_sys->i_trans, 255 ), 0 );
 
-    var_AddCallback( p_input, "logo-file", LogoCallback, p_sys );
-    var_AddCallback( p_input, "logo-x", LogoCallback, p_sys );
-    var_AddCallback( p_input, "logo-y", LogoCallback, p_sys );
-    var_AddCallback( p_input, "logo-position", LogoCallback, p_sys );
-    var_AddCallback( p_input, "logo-transparency", LogoCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "logo-file", LogoCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "logo-x", LogoCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "logo-y", LogoCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "logo-position", LogoCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "logo-transparency", LogoCallback, p_sys );
     vlc_object_release( p_input );
 
     p_sys->b_absolute = VLC_TRUE;
@@ -639,11 +639,11 @@ static void DestroyFilter( vlc_object_t *p_this )
     p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
     if( !p_input ) return;
 
-    var_Destroy( p_input , "logo-file" );
-    var_Destroy( p_input , "logo-x" );
-    var_Destroy( p_input , "logo-y" );
-    var_Destroy( p_input , "logo-position" );
-    var_Destroy( p_input , "logo-transparency" );
+    var_Destroy( p_input->p_libvlc , "logo-file" );
+    var_Destroy( p_input->p_libvlc , "logo-x" );
+    var_Destroy( p_input->p_libvlc , "logo-y" );
+    var_Destroy( p_input->p_libvlc , "logo-position" );
+    var_Destroy( p_input->p_libvlc , "logo-transparency" );
     vlc_object_release( p_input );
 }
 

@@ -104,23 +104,22 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    /* hook to the playlist */
+    /* Hook used for callback variables */
     p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( !p_input )
     {
         return VLC_ENOOBJ;
     }
-/* p_access->p_libvlc p_demux->p_libvlc */
 
-    p_sys->i_xoff = var_CreateGetInteger( p_input , "marq-x" );
-    p_sys->i_yoff = var_CreateGetInteger( p_input , "marq-y" );
-    p_sys->i_timeout = var_CreateGetInteger( p_input , "marq-timeout" );
-    p_sys->psz_marquee =  var_CreateGetString( p_input, "marq-marquee" );
+    p_sys->i_xoff = var_CreateGetInteger( p_input->p_libvlc , "marq-x" );
+    p_sys->i_yoff = var_CreateGetInteger( p_input->p_libvlc , "marq-y" );
+    p_sys->i_timeout = var_CreateGetInteger( p_input->p_libvlc , "marq-timeout" );
+    p_sys->psz_marquee =  var_CreateGetString( p_input->p_libvlc, "marq-marquee" );
 
-    var_AddCallback( p_input, "marq-x", MarqueeCallback, p_sys );
-    var_AddCallback( p_input, "marq-y", MarqueeCallback, p_sys );
-    var_AddCallback( p_input, "marq-marquee", MarqueeCallback, p_sys );
-    var_AddCallback( p_input, "marq-timeout", MarqueeCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "marq-x", MarqueeCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "marq-y", MarqueeCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "marq-marquee", MarqueeCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "marq-timeout", MarqueeCallback, p_sys );
 
     vlc_object_release( p_input );
 
@@ -149,10 +148,10 @@ static void DestroyFilter( vlc_object_t *p_this )
     {
         return;
     }
-    var_Destroy( p_input , "marq-marquee" );
-    var_Destroy( p_input , "marq-x" );
-    var_Destroy( p_input , "marq-y" );
-    var_Destroy( p_input , "marq-timeout" );
+    var_Destroy( p_input->p_libvlc , "marq-marquee" );
+    var_Destroy( p_input->p_libvlc , "marq-x" );
+    var_Destroy( p_input->p_libvlc , "marq-y" );
+    var_Destroy( p_input->p_libvlc , "marq-timeout" );
     vlc_object_release( p_input );
 }
 

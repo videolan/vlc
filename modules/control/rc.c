@@ -890,12 +890,12 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0 )
         {
             val.psz_string = newval.psz_string;
-            var_Set( p_inp, "marq-marquee", val );
+            var_Set( p_inp->p_libvlc, "marq-marquee", val );
         }
         else 
         {
                 val.psz_string = "";
-                var_Set( p_inp, "marq-marquee", val);
+                var_Set( p_inp->p_libvlc, "marq-marquee", val);
         }
     }
     else if( !strcmp( psz_cmd, "marq-x" ) )
@@ -903,7 +903,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp, "marq-x", val );
+            var_Set( p_inp->p_libvlc, "marq-x", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-y" ) )
@@ -911,7 +911,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp, "marq-y", val );
+            var_Set( p_inp->p_libvlc, "marq-y", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-timeout" ) )
