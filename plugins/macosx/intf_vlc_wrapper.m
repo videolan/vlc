@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.1 2002/05/12 20:56:34 massiot Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.2 2002/05/14 20:13:04 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -255,6 +255,15 @@ static Intf_VLCWrapper *o_intf = nil;
     /* FIXME : this will only eject the first drive found */
     NSArray * o_devices = GetEjectableMediaOfClass(kIODVDMediaClass);
     const char * psz_device;
+
+    if ( p_input_bank->pp_input[0] != NULL &&
+         (p_input_bank->pp_input[0]->stream.i_method == INPUT_METHOD_VCD ||
+          p_input_bank->pp_input[0]->stream.i_method == INPUT_METHOD_DVD ||
+          p_input_bank->pp_input[0]->stream.i_method == INPUT_METHOD_DISC) )
+    {
+        intf_ErrMsg("error: cannot eject the disc while you're reading from it");
+        return;
+    }
 
     if ( o_devices == nil )
     {
