@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.32 2003/12/11 23:12:46 gbazin Exp $
+ * $Id: events.c,v 1.33 2003/12/16 22:10:56 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -533,6 +533,13 @@ void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
     rect_src_clipped.bottom = p_vout->render.i_height -
       (rect_dest.bottom - rect_dest_clipped.bottom) * p_vout->render.i_height /
       (rect_dest.bottom - rect_dest.top);
+
+    /* The destination coordinates need to be relative to the current
+     * directdraw primary surface (display) */
+    rect_dest_clipped.left -= p_vout->p_sys->rect_display.left;
+    rect_dest_clipped.right -= p_vout->p_sys->rect_display.left;
+    rect_dest_clipped.top -= p_vout->p_sys->rect_display.top;
+    rect_dest_clipped.bottom -= p_vout->p_sys->rect_display.top;
 
 #if 0
     msg_Dbg( p_vout, "DirectXUpdateRects image_src_clipped"
