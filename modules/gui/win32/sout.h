@@ -2,7 +2,7 @@
  * sout.h: the stream ouput dialog box
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: sout.h,v 1.3 2003/01/26 03:55:36 ipkiss Exp $
+ * $Id: sout.h,v 1.4 2003/02/12 02:11:58 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *

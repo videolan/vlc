@@ -2,7 +2,7 @@
  * subtitles.cpp: Dialog box for divx subtitle selection
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: subtitles.cpp,v 1.2 2003/01/26 03:55:36 ipkiss Exp $
+ * $Id: subtitles.cpp,v 1.3 2003/02/12 02:11:58 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *

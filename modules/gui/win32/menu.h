@@ -2,7 +2,7 @@
  * menu.h: prototypes for menu functions
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: menu.h,v 1.4 2003/01/23 03:33:34 ipkiss Exp $
+ * $Id: menu.h,v 1.5 2003/02/12 02:11:58 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *

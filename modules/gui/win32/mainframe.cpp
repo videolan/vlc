@@ -26,6 +26,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
+#include <vlc/aout.h>
 
 #include "dragdrop.h"
 #include "mainframe.h"
@@ -43,7 +44,12 @@
 
 #include "netutils.h"
 
-//---------------------------------------------------------------------------
+/*****************************************************************************
+ * BORLAND SUCKS
+ * If the following pragma doesn't end with \r\n instead of \n, the file
+ * doesn't compile anymore... Funny, isn't it?
+ * With vim, you can use ":set ff=dos" to correct it
+ *****************************************************************************/
 #pragma link "CSPIN"
 #pragma resource "*.dfm"
 
