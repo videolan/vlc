@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.105 2002/11/18 18:05:13 sam Exp $
+ * $Id: modules.c,v 1.106 2002/11/18 18:37:23 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -711,7 +711,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
                   && !strncasecmp( file->d_name + i_len - strlen( LIBEXT ),
                                    LIBEXT, strlen( LIBEXT ) ) )
         {
-            AllocatePluginFile( p_this, psz_file )
+            AllocatePluginFile( p_this, psz_file );
         }
 
         free( psz_file );
