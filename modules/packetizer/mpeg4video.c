@@ -232,7 +232,8 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         {
             /* Copy the complete VOL */
             p_dec->fmt_out.i_extra = p_start - p_vol;
-            p_dec->fmt_out.p_extra = malloc( p_dec->fmt_out.i_extra );
+            p_dec->fmt_out.p_extra =
+                realloc( p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
             memcpy( p_dec->fmt_out.p_extra, p_vol, p_dec->fmt_out.i_extra );
             m4v_VOLParse( &p_dec->fmt_out,
                           p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
@@ -497,6 +498,3 @@ static int m4v_VOLParse( es_format_t *fmt, uint8_t *p_vol, int i_vol )
     }
     return VLC_SUCCESS;
 }
-
-
-
