@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.72 2003/09/02 20:19:25 gbazin Exp $
+dnl $Id: configure.ac,v 1.73 2003/09/07 22:53:38 fenrir Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1005,7 +1005,7 @@ then
   AX_ADD_PLUGINS([packetizer_copy])
 
   AX_ADD_PLUGINS([stream_out_dummy stream_out_standard stream_out_es])
-  AX_ADD_PLUGINS([stream_out_duplicate stream_out_display])
+  AX_ADD_PLUGINS([stream_out_duplicate stream_out_display stream_out_gather])
 
   dnl Ogg and vorbis are handled in their respective section
 fi
