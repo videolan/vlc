@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.19 2003/03/21 17:14:56 gbazin Exp $
+ * $Id: intf_eject.c,v 1.20 2003/03/24 17:15:30 gbazin Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -157,11 +157,13 @@ int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
     {
         st.dwItem = MCI_STATUS_READY;
 	/* Eject disc */
-        mciSendCommand( op.wDeviceID, MCI_SET, MCI_SET_DOOR_OPEN, 0 );
+        i_ret = mciSendCommand( op.wDeviceID, MCI_SET, MCI_SET_DOOR_OPEN, 0 );
 	/* Release access to the device */
 	mciSendCommand( op.wDeviceID, MCI_CLOSE, MCI_WAIT, 0 );
     }
+    else i_ret = VLC_EGENERIC;
 
+    return i_ret;
 #else   /* WIN32 */
 
     int i_fd;

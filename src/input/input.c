@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.225 2003/03/14 00:24:08 sigmunau Exp $
+ * $Id: input.c,v 1.226 2003/03/24 17:15:30 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -341,7 +341,7 @@ static int RunThread( input_thread_t *p_input )
         /* Read and demultiplex some data. */
         i_count = p_input->pf_demux( p_input );
 
-        if( i_count == 0 && p_input->stream.b_connected )
+        if( i_count == 0 )
         {
             /* End of file - we do not set b_die because only the
              * playlist is allowed to do so. */

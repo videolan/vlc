@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.30 2003/03/05 17:55:13 gbazin Exp $
+ * $Id: input_ext-plugins.c,v 1.31 2003/03/24 17:15:30 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -517,6 +517,12 @@ ssize_t input_FillBuffer( input_thread_t * p_input )
                               (byte_t *)p_buf + sizeof(data_buffer_t)
                                + i_remains,
                               p_input->i_bufsize );
+    if( i_ret < 0 && i_remains == 0 )
+    {
+        /* Our internal buffers are empty, we can signal the error */
+        return -1;
+    }
+
     if( i_ret < 0 ) i_ret = 0;
 
     p_input->p_data_buffer = p_buf;
@@ -538,7 +544,7 @@ ssize_t input_Peek( input_thread_t * p_input, byte_t ** pp_byte, size_t i_size )
         /* Go to the next buffer */
         ssize_t i_ret = input_FillBuffer( p_input );
 
-        if( i_ret == -1 )
+        if( i_ret < 0 )
         {
             return -1;
         }
@@ -564,7 +570,7 @@ ssize_t input_SplitBuffer( input_thread_t * p_input,
         /* Go to the next buffer */
         ssize_t i_ret = input_FillBuffer( p_input );
 
-        if( i_ret == -1 )
+        if( i_ret < 0 )
         {
             return -1;
         }

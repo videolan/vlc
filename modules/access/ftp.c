@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.9 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: ftp.c,v 1.10 2003/03/24 17:15:29 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -374,7 +374,6 @@ static int Open( vlc_object_t *p_this )
     p_input->stream.b_pace_control = 1;
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.b_seekable = 1;
-    p_input->stream.b_connected = 1;
     p_input->stream.p_selected_area->i_size = p_access->i_filesize;
     p_input->stream.i_method = INPUT_METHOD_NETWORK;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -817,6 +816,7 @@ static ssize_t NetRead( input_thread_t *p_input,
 #else
     struct timeval  timeout;
     fd_set          fds;
+    ssize_t         i_recv;
     int             i_ret;
 
     /* Initialize file descriptor set */
@@ -828,26 +828,30 @@ static ssize_t NetRead( input_thread_t *p_input,
     timeout.tv_usec = 1000000;
 
     /* Find if some data is available */
-    i_ret = select( p_socket->i_handle + 1, &fds,
-                    NULL, NULL, &timeout );
+    while( (i_ret = select( p_socket->i_handle + 1, &fds,
+                            NULL, NULL, &timeout )) == 0
+           || (i_ret < 0 && errno == EINTR) )
+    {
+        if( p_input->b_die || p_input->b_error )
+        {
+            return 0;
+        }
+    }
 
-    if( i_ret == -1 && errno != EINTR )
+    if( i_ret < 0 )
     {
         msg_Err( p_input, "network select error (%s)", strerror(errno) );
+        return -1;
     }
-    else if( i_ret > 0 )
+
+    i_recv = recv( p_socket->i_handle, p_buffer, i_len, 0 );
+
+    if( i_recv < 0 )
     {
-        ssize_t i_recv = recv( p_socket->i_handle, p_buffer, i_len, 0 );
-
-        if( i_recv < 0 )
-        {
-            msg_Err( p_input, "recv failed (%s)", strerror(errno) );
-        }
-
-        return i_recv;
+        msg_Err( p_input, "recv failed (%s)", strerror(errno) );
     }
 
-    return 0;
+    return i_recv;
 
 #endif
 }

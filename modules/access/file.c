@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.13 2003/03/04 21:12:04 gbazin Exp $
+ * $Id: file.c,v 1.14 2003/03/24 17:15:29 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -130,7 +130,6 @@ static int Open( vlc_object_t *p_this )
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    p_input->stream.b_connected = 1;
     if( *p_input->psz_access && !strncmp( p_input->psz_access, "stream", 7 ) )
     {
         /* stream:%s */

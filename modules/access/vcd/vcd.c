@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.16 2003/03/11 23:56:54 gbazin Exp $
+ * $Id: vcd.c,v 1.17 2003/03/24 17:15:30 gbazin Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -171,7 +171,6 @@ static int VCDOpen( vlc_object_t *p_this )
 
     p_input->stream.b_pace_control = 1;
     p_input->stream.b_seekable = 1;
-    p_input->stream.b_connected = 1;
     p_input->stream.p_selected_area->i_size = 0;
     p_input->stream.p_selected_area->i_tell = 0;
 

@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.8 2003/02/20 01:52:45 sigmunau Exp $
+ * $Id: slp.c,v 1.9 2003/03/24 17:15:29 gbazin Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -340,7 +340,6 @@ static int Open( vlc_object_t * p_this )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.b_pace_control = VLC_FALSE;
     p_input->stream.b_seekable = VLC_FALSE;
-    p_input->stream.b_connected = VLC_TRUE;
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.p_selected_area->i_size = 0;
     p_input->stream.i_method = INPUT_METHOD_SLP;

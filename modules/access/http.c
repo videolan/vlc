@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.27 2003/03/22 23:03:02 sigmunau Exp $
+ * $Id: http.c,v 1.28 2003/03/24 17:15:29 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -611,7 +611,6 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.b_pace_control = VLC_TRUE;
     p_input->stream.b_seekable = VLC_TRUE;
-    p_input->stream.b_connected = VLC_TRUE;
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.p_selected_area->i_size = 0;
     p_input->stream.i_method = INPUT_METHOD_NETWORK;
@@ -700,6 +699,7 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
     struct timeval  timeout;
     fd_set          fds;
+    ssize_t         i_recv;
     int             i_ret;
 
     /* Initialize file descriptor set */
@@ -711,35 +711,35 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     timeout.tv_usec = 500000;
 
     /* Find if some data is available */
-    i_ret = select( p_access_data->i_handle + 1, &fds,
-                    NULL, NULL, &timeout );
-
+    while( (i_ret = select( p_access_data->i_handle + 1, &fds,
+                            NULL, NULL, &timeout )) == 0
 #ifdef HAVE_ERRNO_H
-    if( i_ret == -1 && errno != EINTR )
+           || (i_ret < 0 && errno == EINTR)
+#endif
+           )
     {
-        msg_Err( p_input, "network select error (%s)", strerror(errno) );
+        if( p_input->b_die || p_input->b_error )
+        {
+            return 0;
+        }
     }
-#else
-    if( i_ret == -1 )
+
+    if( i_ret < 0 )
     {
         msg_Err( p_input, "network select error" );
+        return -1;
     }
-#endif
-    else if( i_ret > 0 )
+
+    i_recv = recv( p_access_data->i_handle, p_buffer, i_len, 0 );
+
+    if( i_recv < 0 )
     {
-        ssize_t i_recv = recv( p_access_data->i_handle, p_buffer, i_len, 0 );
-
-        if( i_recv < 0 )
-        {
 #ifdef HAVE_ERRNO_H
-            msg_Err( p_input, "recv failed (%s)", strerror(errno) );
+        msg_Err( p_input, "recv failed (%s)", strerror(errno) );
 #else
-            msg_Err( p_input, "recv failed" );
+        msg_Err( p_input, "recv failed" );
 #endif
-        }
-
-        return i_recv;
     }
 
-    return 0;
+    return i_recv;
 }

@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.86 2003/03/09 23:39:05 jlj Exp $
+ * $Id: input_ext-intf.h,v 1.87 2003/03/24 17:15:29 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -222,7 +222,6 @@ struct stream_descriptor_t
                                                disc or network */
     vlc_bool_t              b_pace_control;    /* can we read when we want ? */
     vlc_bool_t              b_seekable;               /* can we do lseek() ? */
-    vlc_bool_t              b_connected;     /* does read() == 0 imply EOF ? */
 
     /* if (b_seekable) : */
     unsigned int            i_area_nb;

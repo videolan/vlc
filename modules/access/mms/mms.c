@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.27 2003/03/16 01:49:28 fenrir Exp $
+ * $Id: mms.c,v 1.28 2003/03/24 17:15:29 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -252,14 +252,6 @@ static int Open( vlc_object_t *p_this )
     /* *** finished to set some variable *** */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.b_pace_control = 0;
-    if( p_access->i_proto == MMS_PROTO_UDP )
-    {
-        p_input->stream.b_connected = 0;
-    }
-    else
-    {
-        p_input->stream.b_connected = 1;
-    }
     p_input->stream.p_selected_area->i_tell = 0;
     /*
      * i_flags_broadcast
@@ -1477,11 +1469,17 @@ static int  NetFillBuffer( input_thread_t *p_input )
     timeout.tv_usec = 500000;
 
     /* Find if some data is available */
-    i_ret = select( i_handle_max + 1,
-                    &fds,
-                    NULL, NULL, &timeout );
+    while( (i_ret = select( i_handle_max + 1, &fds,
+                            NULL, NULL, &timeout )) == 0
+           || (i_ret < 0 && errno == EINTR) )
+    {
+        if( p_input->b_die || p_input->b_error )
+        {
+            return 0;
+        }
+    }
 
-    if( i_ret == -1 && errno != EINTR )
+    if( i_ret < 0 )
     {
         msg_Err( p_input, "network select error (%s)", strerror(errno) );
         return -1;
