@@ -2,7 +2,7 @@
  * scope.c : Scope effect module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: scope.c,v 1.3 2003/08/18 14:57:09 sigmunau Exp $
+ * $Id: scope.c,v 1.4 2003/08/19 18:51:03 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -125,17 +125,16 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 {
     picture_t *p_outpic;
     int i_index, i_image;
-    int i_size = p_in_buf->i_size;
     byte_t *p_buffer = p_in_buf->p_buffer;
     uint8_t  *ppp_area[2][3];
     float *p_sample;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
-    for( i_image = 0; (i_image + 1) * SCOPE_WIDTH * 8 < i_size ; i_image++ )
+    for( i_image = 0; (i_image + 1) * SCOPE_WIDTH  < p_in_buf->i_nb_samples ; i_image++ )
     {
         /* Don't stay here forever */
-        if( mdate() >= p_in_buf->start_date - 10000 )
+        if( mdate() >= p_in_buf->end_date - 10000 )
         {
             break;
         }
@@ -166,7 +165,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             for( j = 0 ; j < 3 ; j++ )
             {
                 ppp_area[i_index][j] =
-                    p_outpic->p[j].p_pixels + i_index * p_outpic->p[j].i_lines
+                    p_outpic->p[j].p_pixels + 3 * i_index * p_outpic->p[j].i_lines
                                 / p_filter->input.i_original_channels * p_outpic->p[j].i_pitch;
             }
         }
@@ -177,38 +176,37 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         {
             int i;
             int i_tmp_value;
-            uint8_t i_value;
-
+            uint8_t i_right_value, i_left_value;
+            if ( *p_sample >= 1.0 ) i_tmp_value = 32767;
+            else if ( *p_sample < -1.0 ) i_tmp_value = -32768;
+            else i_tmp_value = *p_sample * 32768.0;
+            i_left_value = i_tmp_value / 256 + 128;
+            p_sample++;
+            if ( *p_sample >= 1.0 ) i_tmp_value = 32767;
+            else if ( *p_sample < -1.0 ) i_tmp_value = -32768;
+            else i_tmp_value = *p_sample * 32768.0;
+            p_sample++;
+            i_right_value = i_tmp_value / 256 + 128;
             for( i = 0 ; i < 2 ; i++ )
             {
                 /* Left channel */
-                if ( *p_sample >= 1.0 ) i_tmp_value = 32767;
-                else if ( *p_sample < -1.0 ) i_tmp_value = -32768;
-                else i_tmp_value = *p_sample * 32768.0;
-                p_sample++;
-                i_value = i_tmp_value / 256 + 128;
                 *(ppp_area[0][0]
                    + p_outpic->p[0].i_pitch * i_index / SCOPE_WIDTH
-                   + p_outpic->p[0].i_lines * i_value / 512
+                   + p_outpic->p[0].i_lines * i_left_value / 512
                        * p_outpic->p[0].i_pitch) = 0xbf;
                 *(ppp_area[0][1]
                    + p_outpic->p[1].i_pitch * i_index / SCOPE_WIDTH
-                   + p_outpic->p[1].i_lines * i_value / 512
+                   + p_outpic->p[1].i_lines * i_left_value / 512
                       * p_outpic->p[1].i_pitch) = 0xff;
 
                 /* Right channel */
-                if ( *p_sample >= 1.0 ) i_tmp_value = 32767;
-                else if ( *p_sample < -1.0 ) i_tmp_value = -32768;
-                else i_tmp_value = *p_sample * 32768.0;
-                p_sample++;
-                i_value = i_tmp_value / 256 + 128;
                 *(ppp_area[1][0]
                    + p_outpic->p[0].i_pitch * i_index / SCOPE_WIDTH
-                   + p_outpic->p[0].i_lines * i_value / 512
+                   + p_outpic->p[0].i_lines * i_right_value / 512
                       * p_outpic->p[0].i_pitch) = 0x9f;
                 *(ppp_area[1][2]
                    + p_outpic->p[2].i_pitch * i_index / SCOPE_WIDTH
-                   + p_outpic->p[2].i_lines * i_value / 512
+                   + p_outpic->p[2].i_lines * i_right_value / 512
                       * p_outpic->p[2].i_pitch) = 0xdd;
             }
         }
