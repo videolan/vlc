@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.16 2002/11/17 06:46:55 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.17 2002/11/18 02:46:10 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -105,7 +105,7 @@ vlc_module_begin();
 #if LIBAVCODEC_BUILD >= 4611
     add_integer ( "ffmpeg-error-resilience", -1, NULL, 
                   "error resilience", ERROR_RESILIENCE_LONGTEXT );
-    add_integer ( "ffmpeg-workaround-bugs", 0, NULL, 
+    add_integer ( "ffmpeg-workaround-bugs", 1, NULL, 
                   "workaround bugs", WORAROUND_BUG_LONGTEXT );
 #endif
     add_bool( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT );
