@@ -343,6 +343,26 @@ if test "${ac_cv_type_socklen_t}" != "no"; then
   AC_DEFINE(HAVE_SOCKLEN_T, 1, [Define if <sys/socket.h> defines socklen_t.])
 fi
 
+dnl Check for struct sockaddr_storage
+AH_TEMPLATE(sockaddr_storage, [Define to `sockaddr' if <sys/socket.h> does not define.])
+AH_TEMPLATE(ss_family, [Define to `sa_family' if <sys/socket.h> does not define.])
+AC_CACHE_CHECK([for struct sockaddr_storage], ac_cv_struct_sockaddr_storage,
+  [AC_TRY_COMPILE(
+    [#include <sys/types.h>
+     #if defined( UNDER_CE )
+     # include <winsock.h>
+     #elif defined( WIN32 )
+     # include <winsock2.h>
+     #else
+     # include <sys/socket.h>
+     #endif], [struct sockaddr_storage addr;],
+     ac_cv_struct_sockaddr_storage=yes,
+     ac_cv_struct_sockaddr_storage=no)])
+if test $ac_cv_struct_sockaddr_storage = no; then
+  AC_DEFINE(sockaddr_storage, sockaddr)
+  AC_DEFINE(ss_family, sa_family)
+fi
+
 dnl Check for va_copy
 AC_CACHE_CHECK([for va_copy], ac_cv_c_va_copy,
   AC_TRY_LINK(

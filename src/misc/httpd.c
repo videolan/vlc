@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Remi Denis-Courmont <courmisch@via.ecp.fr> 
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +27,7 @@
 
 #include "vlc_httpd.h"
 
+#include <string.h>
 #include <errno.h>
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -200,8 +202,9 @@ struct httpd_host_t
     int         i_ref;
 
     /* address/port and socket for listening at connections */
-    struct sockaddr_in sock;
-    int                fd;
+    struct sockaddr_storage sock;
+    int                     i_sock_size;
+    int                     fd;
 
     vlc_mutex_t lock;
 
@@ -260,7 +263,8 @@ struct httpd_client_t
 
     int     i_ref;
 
-    struct  sockaddr_in sock;
+    struct  sockaddr_storage sock;
+    int     i_sock_size;
     int     fd;
 
     int     i_mode;
@@ -857,7 +861,7 @@ void httpd_StreamDelete( httpd_stream_t *stream )
 #endif
 
 static void httpd_HostThread( httpd_host_t * );
-static int BuildAddr( struct sockaddr_in * p_socket,
+static int BuildAddr( struct sockaddr_storage * p_socket, int *pi_sock_size,
                       const char * psz_address, int i_port );
 
 
@@ -867,11 +871,11 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
     httpd_t      *httpd;
     httpd_host_t *host;
     vlc_value_t lockval;
-    struct sockaddr_in sock;
-    int i;
+    struct sockaddr_storage sock;
+    int i, i_sock_size;
 
     /* resolv */
-    if( BuildAddr( &sock, psz_host, i_port ) )
+    if( BuildAddr( &sock, &i_sock_size, psz_host, i_port ) )
     {
         msg_Err( p_this, "cannot build address for %s:%d", psz_host, i_port );
         return NULL;
@@ -901,9 +905,34 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
     /* verify if it already exist */
     for( i = 0; i < httpd->i_host; i++ )
     {
-        if( httpd->host[i]->sock.sin_port == sock.sin_port &&
-            ( httpd->host[i]->sock.sin_addr.s_addr == INADDR_ANY ||
-              httpd->host[i]->sock.sin_addr.s_addr == sock.sin_addr.s_addr ) )
+        vlc_bool_t b_match = VLC_FALSE;
+
+        if (sock.ss_family != httpd->host[i]->sock.ss_family ||
+            i_sock_size != httpd->host[i]->i_sock_size)
+            continue;
+        
+        switch (sock.ss_family)
+        {
+            case AF_INET:
+            {
+                const struct sockaddr_in *p_mysock, *p_thatsock;
+                
+                p_mysock = (const struct sockaddr_in *)&sock;
+                p_thatsock = (const struct sockaddr_in *)&httpd->host[i]->sock;
+                
+                b_match = p_mysock->sin_port == p_thatsock->sin_port &&
+                          ( p_mysock->sin_addr.s_addr == INADDR_ANY ||
+                            p_mysock->sin_addr.s_addr ==
+                                              p_thatsock->sin_addr.s_addr ) ?
+                          VLC_TRUE : VLC_FALSE;
+                break;
+            }
+            
+            default:
+                msg_Dbg( p_this, "host with unknown address family" );
+        }
+        
+        if (b_match == VLC_TRUE)
         {
             /* yep found */
             host = httpd->host[i];
@@ -920,14 +949,15 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
     host->httpd = httpd;
     vlc_mutex_init( httpd, &host->lock );
     host->i_ref = 1;
-    memcpy( &host->sock, &sock, sizeof( struct sockaddr_in ) );
+    memcpy( &host->sock, &sock, sizeof( struct sockaddr_storage ) );
+    host->i_sock_size = i_sock_size;
     host->i_url     = 0;
     host->url       = NULL;
     host->i_client  = 0;
     host->client    = NULL;
 
     /* create the listening socket */
-    if( ( host->fd = socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 )
+    if( ( host->fd = socket( PF_INET, SOCK_STREAM, 0 ) ) < 0 )
     {
         goto socket_error;
     }
@@ -939,8 +969,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
         msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR)" );
     }
     /* bind it */
-    if( bind( host->fd, (struct sockaddr *)&host->sock,
-        sizeof( struct sockaddr_in ) ) < 0 )
+    if( bind( host->fd, (struct sockaddr *)&host->sock, host->i_sock_size ) )
     {
         msg_Err( p_this, "cannot bind socket" );
         goto socket_error;
@@ -1291,8 +1320,8 @@ void httpd_ClientModeBidir( httpd_client_t *cl )
 
 char* httpd_ClientIP( httpd_client_t *cl )
 {
-    /* FIXME not thread safe */
-    return strdup( inet_ntoa( cl->sock.sin_addr ) );
+    /* FIXME not thread safe - should use inet_ntop if available */
+    return strdup( inet_ntoa( ((const struct sockaddr_in *)&cl->sock)->sin_addr ) );
 }
 
 static void httpd_ClientClean( httpd_client_t *cl )
@@ -1313,7 +1342,8 @@ static void httpd_ClientClean( httpd_client_t *cl )
     }
 }
 
-static httpd_client_t *httpd_ClientNew( int fd, struct sockaddr_in *sock )
+static httpd_client_t *httpd_ClientNew( int fd, struct sockaddr_storage *sock,
+                                        int i_sock_size )
 {
     httpd_client_t *cl = malloc( sizeof( httpd_client_t ) );
     /* set this new socket non-block */
@@ -1327,7 +1357,8 @@ static httpd_client_t *httpd_ClientNew( int fd, struct sockaddr_in *sock )
 #endif
     cl->i_ref   = 0;
     cl->fd      = fd;
-    cl->sock    = *sock;
+    memcpy( &cl->sock, sock, sizeof( cl->sock ) );
+    cl->i_sock_size = i_sock_size;
     cl->url     = NULL;
 
     httpd_ClientInit( cl );
@@ -1796,7 +1827,7 @@ static void httpd_HostThread( httpd_host_t *host )
                   cl->i_activity_date + cl->i_activity_timeout < mdate() ) ) )
             {
                 msg_Dbg( host, "connection closed(%s)",
-                         inet_ntoa(cl->sock.sin_addr) );
+                         inet_ntoa(((const struct sockaddr_in *)&cl->sock)->sin_addr) );
                 httpd_ClientClean( cl );
                 TAB_REMOVE( host->i_client, host->client, cl );
                 free( cl );
@@ -2141,21 +2172,21 @@ static void httpd_HostThread( httpd_host_t *host )
         /* accept new connections */
         if( FD_ISSET( host->fd, &fds_read ) )
         {
-            int     i_sock_size = sizeof( struct sockaddr_in );
-            struct  sockaddr_in sock;
+            int     i_sock_size = sizeof( struct sockaddr_storage );
+            struct  sockaddr_storage sock;
             int     fd;
 
             fd = accept( host->fd, (struct sockaddr *)&sock, &i_sock_size );
             if( fd > 0 )
             {
-                httpd_client_t *cl = httpd_ClientNew( fd, &sock );
+                httpd_client_t *cl = httpd_ClientNew( fd, &sock, i_sock_size );
 
                 vlc_mutex_lock( &host->lock );
                 TAB_APPEND( host->i_client, host->client, cl );
                 vlc_mutex_unlock( &host->lock );
 
                 msg_Dbg( host, "new connection (%s)",
-                         inet_ntoa(sock.sin_addr) );
+                         inet_ntoa(((const struct sockaddr_in *)&sock)->sin_addr) );
             }
         }
         /* now try all others socket */
@@ -2183,16 +2214,17 @@ static void httpd_HostThread( httpd_host_t *host )
     }
 }
 
-static int BuildAddr( struct sockaddr_in * p_socket,
+static int BuildAddr( struct sockaddr_storage * p_socket, int *pi_sock_size,
                       const char * psz_address, int i_port )
 {
     /* Reset struct */
-    memset( p_socket, 0, sizeof( struct sockaddr_in ) );
-    p_socket->sin_family = AF_INET;                                /* family */
-    p_socket->sin_port = htons( (uint16_t)i_port );
+    memset( p_socket, 0, sizeof( struct sockaddr_storage ) );
+    p_socket->ss_family = AF_INET;                                /* family */
+    *pi_sock_size = sizeof( struct sockaddr_in );
+    ((struct sockaddr_in *)p_socket)->sin_port = htons( (uint16_t)i_port );
     if( !*psz_address )
     {
-        p_socket->sin_addr.s_addr = INADDR_ANY;
+        ((struct sockaddr_in *)p_socket)->sin_addr.s_addr = INADDR_ANY;
     }
     else
     {
@@ -2201,11 +2233,11 @@ static int BuildAddr( struct sockaddr_in * p_socket,
         /* Try to convert address directly from in_addr - this will work if
          * psz_address is dotted decimal. */
 #ifdef HAVE_ARPA_INET_H
-        if( !inet_aton( psz_address, &p_socket->sin_addr ) )
+        if( !inet_aton( psz_address, &((struct sockaddr_in *)p_socket)->sin_addr ) )
 #else
-        p_socket->sin_addr.s_addr = inet_addr( psz_address );
-/*        if( p_socket->sin_addr.s_addr == INADDR_NONE )*/
-        if( p_socket->sin_addr.s_addr == INADDR_BROADCAST )
+        ((struct sockaddr_in *)p_socket)->sin_addr.s_addr = inet_addr( psz_address );
+/*        if( ((struct sockaddr_in *)p_socket)->sin_addr.s_addr == INADDR_NONE )*/
+        if( ((struct sockaddr_in *)p_socket)->sin_addr.s_addr == INADDR_BROADCAST )
 #endif
         {
             /* We have a fqdn, try to find its address */
@@ -2215,7 +2247,7 @@ static int BuildAddr( struct sockaddr_in * p_socket,
             }
 
             /* Copy the first address of the host in the socket address */
-            memcpy( &p_socket->sin_addr, p_hostent->h_addr_list[0],
+            memcpy( &((struct sockaddr_in *)p_socket)->sin_addr, p_hostent->h_addr_list[0],
                      p_hostent->h_length );
         }
     }
