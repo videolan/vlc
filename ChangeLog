@@ -2,9 +2,18 @@
 # ChangeLog for vlc #
 #===================#
 
-HEAD
+0.4.3
+Not released yet.
 
-  * Nothing yet.
+  * ./plugins/access/http.c: fixed a bug with HTTP/1.0 servers.
+  * ./src/interface/main.c: new --mtu option.
+  * ./configure.in: fixed nanosleep detection on some platforms.
+  * ./plugins/beos/*: created a wrapper class for VLC functions and
+    interaction, improved file and disk opening, fixed drag and drop, added
+    right click menu and always on top mode.
+  * ./plugins/beos/VideoWindow.h: fixed pop-up menu's radio mode.
+  * ./plugins/beos/VideoWindow.h: fixed changing workspaces problem.
+  * ./plugins/beos/VideoWindow.h: added a popup menu to enable changing.
 
 0.4.2
 Sun,  7 Jul 2002 22:15:33 +0200
