@@ -28,6 +28,14 @@
 /* Default audio output format (AOUT_FMT_S16_NE = Native Endianess) */
 #define AOUT_DEFAULT_FORMAT     AOUT_FMT_S16_NE
 
+/* #define AOUT_DEFAULT_FORMAT     AOUT_FMT_S8 */
+/* #define AOUT_DEFAULT_FORMAT     AOUT_FMT_U8 */
+/* #define AOUT_DEFAULT_FORMAT     AOUT_FMT_S16_BE */
+/* #define AOUT_DEFAULT_FORMAT     AOUT_FMT_S16_LE */
+/* #define AOUT_DEFAULT_FORMAT     AOUT_FMT_U16_BE */
+/* #define AOUT_DEFAULT_FORMAT     AOUT_FMT_U16_LE */
+
+
 /* Default stereo mode (0 stands for mono, 1 for stereo) */
 #define AOUT_DEFAULT_STEREO     1
 

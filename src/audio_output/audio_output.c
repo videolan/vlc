@@ -548,6 +548,293 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
 
 void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
 {
+    int i_fifo;
+    long l_buffer, l_buffer_limit;
+    long l_units, l_bytes;
+
+    intf_DbgMsg("adec debug: ********aout_Thread_U8_Stereo********\n");
+    intf_DbgMsg("adec debug: running audio output thread (%p) (pid == %i)\n", p_aout, getpid());
+
+    /* As the s32_buffer was created with calloc(), we don't have to set this
+     * memory to zero and we can immediately jump into the thread's loop */
+    while ( !p_aout->b_die )
+    {
+        vlc_mutex_lock( &p_aout->fifos_lock );
+        for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
+	{
+            switch ( p_aout->fifo[i_fifo].i_type )
+	    {
+	        case AOUT_EMPTY_FIFO:
+                    break;
+
+	        case AOUT_INTF_MONO_FIFO:
+                    if ( p_aout->fifo[i_fifo].l_units > p_aout->l_units )
+		    {
+                        l_buffer = 0;
+                        while ( l_buffer < (p_aout->l_units << 1) ) /* p_aout->b_stereo == 1 */
+			{
+                            p_aout->s32_buffer[l_buffer++] +=
+                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
+                            p_aout->s32_buffer[l_buffer++] +=
+                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
+                            UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
+                        }
+                        p_aout->fifo[i_fifo].l_units -= p_aout->l_units;
+                    }
+                    else
+		    {
+                        l_buffer = 0;
+                        while ( l_buffer < (p_aout->fifo[i_fifo].l_units << 1) ) /* p_aout->b_stereo == 1 */
+			{
+                            p_aout->s32_buffer[l_buffer++] +=
+                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
+                            p_aout->s32_buffer[l_buffer++] +=
+                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
+                            UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
+                        }
+                        free( p_aout->fifo[i_fifo].buffer ); /* !! */
+                        p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]); /* !! */
+                    }
+                    break;
+
+                case AOUT_INTF_STEREO_FIFO:
+                    if ( p_aout->fifo[i_fifo].l_units > p_aout->l_units )
+		    {
+                        l_buffer = 0;
+                        while ( l_buffer < (p_aout->l_units << 1) ) /* p_aout->b_stereo == 1 */
+			{
+                            p_aout->s32_buffer[l_buffer++] +=
+                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] );
+                            p_aout->s32_buffer[l_buffer++] +=
+                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit+1] );
+                            UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
+                        }
+                        p_aout->fifo[i_fifo].l_units -= p_aout->l_units;
+                    }
+                    else
+		    {
+                        l_buffer = 0;
+                        while ( l_buffer < (p_aout->fifo[i_fifo].l_units << 1) ) /* p_aout->b_stereo == 1 */
+			{
+                            p_aout->s32_buffer[l_buffer++] +=
+                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] );
+                            p_aout->s32_buffer[l_buffer++] +=
+                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit+1] );
+                            UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
+                        }
+                        free( p_aout->fifo[i_fifo].buffer ); /* !! */
+                        p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]); /* !! */
+                    }
+                    break;
+
+                case AOUT_ADEC_MONO_FIFO:
+                    if ( p_aout->fifo[i_fifo].b_die )
+                    {
+                        free( p_aout->fifo[i_fifo].buffer );
+                        free( p_aout->fifo[i_fifo].date );
+                        p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                        continue;
+                    }
+
+                    l_units = p_aout->l_units;
+                    l_buffer = 0;
+                    while ( l_units > 0 )
+                    {
+                        if ( !p_aout->fifo[i_fifo].b_next_frame )
+                        {
+                            if ( NextFrame(p_aout, &p_aout->fifo[i_fifo], p_aout->date + ((((mtime_t)(l_buffer >> 1)) * 1000000) / ((mtime_t)p_aout->l_rate))) )
+                            {
+                                break;
+                            }
+                        }
+
+                        if ( p_aout->fifo[i_fifo].l_units > l_units )
+                        {
+                            l_buffer_limit = p_aout->l_units << 1; /* p_aout->b_stereo == 1 */
+                            while ( l_buffer < l_buffer_limit )
+                            {
+                                p_aout->s32_buffer[l_buffer++] +=
+                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
+                                p_aout->s32_buffer[l_buffer++] +=
+                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
+
+                                UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
+                                if ( p_aout->fifo[i_fifo].l_unit >= /* p_aout->fifo[i_fifo].b_stereo == 0 */
+                                     ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 0)) )
+                                {
+                                    p_aout->fifo[i_fifo].l_unit -= /* p_aout->fifo[i_fifo].b_stereo == 0 */
+                                        ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 0));
+                                }
+                            }
+                            p_aout->fifo[i_fifo].l_units -= l_units;
+                            break;
+                        }
+                        else
+                        {
+                            l_buffer_limit = l_buffer + (p_aout->fifo[i_fifo].l_units << 1);
+                            /* p_aout->b_stereo == 1 */
+                            while ( l_buffer < l_buffer_limit )
+                            {
+                                p_aout->s32_buffer[l_buffer++] +=
+                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
+                                p_aout->s32_buffer[l_buffer++] +=
+                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
+
+                                UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
+                                if ( p_aout->fifo[i_fifo].l_unit >= /* p_aout->fifo[i_fifo].b_stereo == 0 */
+                                     ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 0)) )
+                                {
+                                    p_aout->fifo[i_fifo].l_unit -= /* p_aout->fifo[i_fifo].b_stereo == 0 */
+                                        ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 0));
+                                }
+                            }
+                            l_units -= p_aout->fifo[i_fifo].l_units;
+
+                            vlc_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
+                            p_aout->fifo[i_fifo].l_start_frame = p_aout->fifo[i_fifo].l_next_frame;
+                            vlc_cond_signal( &p_aout->fifo[i_fifo].data_wait );
+                            vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
+
+                            /* p_aout->fifo[i_fifo].b_start_frame = 1; */
+                            p_aout->fifo[i_fifo].l_next_frame += 1;
+                            p_aout->fifo[i_fifo].l_next_frame &= AOUT_FIFO_SIZE;
+                            p_aout->fifo[i_fifo].b_next_frame = 0;
+                        }
+                    }
+                    break;
+
+                case AOUT_ADEC_STEREO_FIFO:
+                    if ( p_aout->fifo[i_fifo].b_die )
+                    {
+                        free( p_aout->fifo[i_fifo].buffer );
+                        free( p_aout->fifo[i_fifo].date );
+                        p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                        continue;
+                    }
+
+                    l_units = p_aout->l_units;
+                    l_buffer = 0;
+                    while ( l_units > 0 )
+                    {
+                        if ( !p_aout->fifo[i_fifo].b_next_frame )
+                        {
+                            if ( NextFrame(p_aout, &p_aout->fifo[i_fifo], p_aout->date + ((((mtime_t)(l_buffer >> 1)) * 1000000) / ((mtime_t)p_aout->l_rate))) )
+                            {
+                                break;
+                            }
+                        }
+
+                        if ( p_aout->fifo[i_fifo].l_units > l_units )
+                        {
+                            l_buffer_limit = p_aout->l_units << 1; /* p_aout->b_stereo == 1 */
+                            while ( l_buffer < l_buffer_limit )
+                            {
+                                p_aout->s32_buffer[l_buffer++] +=
+                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] );
+                                p_aout->s32_buffer[l_buffer++] +=
+                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit+1] );
+
+                                UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
+                                if ( p_aout->fifo[i_fifo].l_unit >= /* p_aout->fifo[i_fifo].b_stereo == 1 */
+                                     ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 1)) )
+                                {
+                                    p_aout->fifo[i_fifo].l_unit -= /* p_aout->fifo[i_fifo].b_stereo == 1 */
+                                        ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 1));
+                                }
+                            }
+                            p_aout->fifo[i_fifo].l_units -= l_units;
+                            break;
+                        }
+                        else
+                        {
+                            l_buffer_limit = l_buffer + (p_aout->fifo[i_fifo].l_units << 1);
+                            /* p_aout->b_stereo == 1 */
+                            while ( l_buffer < l_buffer_limit )
+                            {
+                                p_aout->s32_buffer[l_buffer++] +=
+                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] );
+                                p_aout->s32_buffer[l_buffer++] +=
+                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit+1] );
+
+                                UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
+                                if ( p_aout->fifo[i_fifo].l_unit >= /* p_aout->fifo[i_fifo].b_stereo == 1 */
+                                     ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 1)) )
+                                {
+                                    p_aout->fifo[i_fifo].l_unit -= /* p_aout->fifo[i_fifo].b_stereo == 1 */
+                                        ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 1));
+                                }
+                            }
+                            l_units -= p_aout->fifo[i_fifo].l_units;
+
+                            vlc_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
+                            p_aout->fifo[i_fifo].l_start_frame = p_aout->fifo[i_fifo].l_next_frame;
+                            vlc_cond_signal( &p_aout->fifo[i_fifo].data_wait );
+                            vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
+
+                            /* p_aout->fifo[i_fifo].b_start_frame = 1; */
+                            p_aout->fifo[i_fifo].l_next_frame += 1;
+                            p_aout->fifo[i_fifo].l_next_frame &= AOUT_FIFO_SIZE;
+                            p_aout->fifo[i_fifo].b_next_frame = 0;
+                        }
+                    }
+                    break;
+
+	        default:
+                    intf_DbgMsg("aout debug: unknown fifo type (%i)\n", p_aout->fifo[i_fifo].i_type);
+                    break;
+            }
+        }
+        vlc_mutex_unlock( &p_aout->fifos_lock );
+
+        l_buffer_limit = p_aout->l_units  << 1 ; /* p_aout->b_stereo == 1 */
+
+        for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )
+    	{
+            ((u8 *)p_aout->buffer)[l_buffer] = (u8)( (p_aout->s32_buffer[l_buffer] / 256) + 128 );
+            p_aout->s32_buffer[l_buffer] = 0;
+        }
+        l_bytes = p_aout->p_sys_getbufinfo( p_aout, l_buffer_limit );
+        p_aout->date = mdate() + ((((mtime_t)(l_bytes / 2 )) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(u8) << (p_aout->b_stereo) == 2 */
+        p_aout->p_sys_playsamples( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(u8) );
+        if ( l_bytes > (l_buffer_limit * sizeof(u8)) )
+        {
+            msleep( p_aout->l_msleep );
+        }
+    }
+
+    vlc_mutex_lock( &p_aout->fifos_lock );
+    for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
+    {
+        switch ( p_aout->fifo[i_fifo].i_type )
+        {
+            case AOUT_EMPTY_FIFO:
+                break;
+
+            case AOUT_INTF_MONO_FIFO:
+            case AOUT_INTF_STEREO_FIFO:
+                free( p_aout->fifo[i_fifo].buffer ); /* !! */
+                p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
+                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                break;
+
+            case AOUT_ADEC_MONO_FIFO:
+            case AOUT_ADEC_STEREO_FIFO:
+                free( p_aout->fifo[i_fifo].buffer );
+                free( p_aout->fifo[i_fifo].date );
+                p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
+                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                break;
+
+            default:
+                break;
+        }
+    }
+    vlc_mutex_unlock( &p_aout->fifos_lock );
+
 }
 
 void aout_Thread_S16_Mono( aout_thread_t * p_aout )
@@ -560,7 +847,8 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
     long l_buffer, l_buffer_limit;
     long l_units, l_bytes;
 
-    intf_DbgMsg("adec debug: running audio output thread (%p) (pid == %i)\n", p_aout, getpid());
+   intf_DbgMsg("adec debug: ********aout_Thread_S16_Stereo********\n");
+   intf_DbgMsg("adec debug: running audio output thread (%p) (pid == %i)\n", p_aout, getpid());
 
     /* As the s32_buffer was created with calloc(), we don't have to set this
      * memory to zero and we can immediately jump into the thread's loop */
