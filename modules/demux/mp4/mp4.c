@@ -433,7 +433,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->track = calloc( p_sys->i_tracks, sizeof( mp4_track_t ) );
     memset( p_sys->track, 0, p_sys->i_tracks * sizeof( mp4_track_t ) );
 
-    /* now process each track and extract all usefull informations */
+    /* now process each track and extract all usefull information */
     for( i = 0; i < p_sys->i_tracks; i++ )
     {
         p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%d]", i );

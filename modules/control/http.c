@@ -2360,7 +2360,7 @@ static void Execute( httpd_file_sys_t *p_args,
                         {
                             index = mvar_PlaylistSetNew( m.param1, p_intf->p_sys->p_playlist );
                         }
-                        else if( !strcmp( m.param2, "informations" ) )
+                        else if( !strcmp( m.param2, "information" ) )
                         {
                             index = mvar_InfoSetNew( m.param1, p_intf->p_sys->p_input );
                         }
@@ -3102,7 +3102,7 @@ static char *Find_end_MRL( char *psz )
 
 /**********************************************************************
  * parse_MRL: parse the MRL, find the mrl string and the options,
- * create an item with all informations in it, and return the item.
+ * create an item with all information in it, and return the item.
  * return NULL if there is an error.
  **********************************************************************/
 playlist_item_t * parse_MRL( intf_thread_t *p_intf, char *psz )

@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.6 2004/01/26 16:45:02 zorglub Exp $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -74,7 +74,7 @@ vlc_module_end();
  *****************************************************************************/
 struct vout_sys_t
 {
-    /* GGI system informations */
+    /* GGI system information */
     ggi_visual_t        p_display;                         /* display device */
 
     ggi_mode            mode;                             /* mode descriptor */

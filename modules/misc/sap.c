@@ -146,7 +146,7 @@ static void free_sd( sess_descr_t * );
 /* Detect multicast addresses */
 static int  ismult( char * );
 
-/* The struct that contains sdp informations */
+/* The struct that contains sdp information */
 struct  sess_descr_t
 {
     int  i_version;
@@ -160,7 +160,7 @@ struct  sess_descr_t
     attr_descr_t  **pp_attributes;
 };
 
-/* All this informations are not useful yet.  */
+/* All this information is not useful yet.  */
 struct media_descr_t
 {
     char *psz_medianame;

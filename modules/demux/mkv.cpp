@@ -260,7 +260,7 @@ struct demux_sys_t
 static void IndexAppendCluster  ( demux_t *p_demux, KaxCluster *cluster );
 static char *UTF8ToStr          ( const UTFstring &u );
 static void LoadCues            ( demux_t * );
-static void InformationsCreate  ( demux_t * );
+static void InformationCreate  ( demux_t * );
 
 static void ParseInfo( demux_t *, EbmlElement *info );
 static void ParseTracks( demux_t *, EbmlElement *tracks );
@@ -624,8 +624,8 @@ static int Open( vlc_object_t * p_this )
 #undef tk
     }
 
-    /* add informations */
-    InformationsCreate( p_demux );
+    /* add information */
+    InformationCreate( p_demux );
 
     return VLC_SUCCESS;
 
@@ -1419,7 +1419,7 @@ EbmlElement *EbmlParser::Get( void )
  *
  *  * LoadTags : load ... the tags element
  *
- *  * InformationsCreate : create all informations, load tags if present
+ *  * InformationCreate : create all information, load tags if present
  *
  *****************************************************************************/
 static void LoadCues( demux_t *p_demux )
@@ -2109,7 +2109,7 @@ static void ParseInfo( demux_t *p_demux, EbmlElement *info )
     unsigned int i;
     int i_upper_level = 0;
 
-    msg_Dbg( p_demux, "|   + Informations" );
+    msg_Dbg( p_demux, "|   + Information" );
 
     /* Master elements */
     m = static_cast<EbmlMaster *>(info);
@@ -2342,9 +2342,9 @@ static void ParseChapters( demux_t *p_demux, EbmlElement *chapters )
 }
 
 /*****************************************************************************
- * InformationsCreate:
+ * InformationCreate:
  *****************************************************************************/
-static void InformationsCreate( demux_t *p_demux )
+static void InformationCreate( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int         i_track;

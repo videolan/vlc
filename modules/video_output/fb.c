@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.9 2004/03/02 13:53:14 kuehne Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -85,19 +85,19 @@ vlc_module_end();
  *****************************************************************************/
 struct vout_sys_t
 {
-    /* System informations */
+    /* System information */
     int                 i_tty;                          /* tty device handle */
     struct termios      old_termios;
 
-    /* Original configuration informations */
+    /* Original configuration information */
     struct sigaction            sig_usr1;           /* USR1 previous handler */
     struct sigaction            sig_usr2;           /* USR2 previous handler */
     struct vt_mode              vt_mode;                 /* previous VT mode */
 
     /* Framebuffer information */
     int                         i_fd;                       /* device handle */
-    struct fb_var_screeninfo    old_info;      /* original mode informations */
-    struct fb_var_screeninfo    var_info;       /* current mode informations */
+    struct fb_var_screeninfo    old_info;       /* original mode information */
+    struct fb_var_screeninfo    var_info;        /* current mode information */
     vlc_bool_t                  b_pan;     /* does device supports panning ? */
     struct fb_cmap              fb_cmap;                /* original colormap */
     uint16_t                    *p_palette;              /* original palette */
@@ -482,7 +482,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     }
     free( psz_device );
 
-    /* Get framebuffer device informations */
+    /* Get framebuffer device information */
     if( ioctl( p_vout->p_sys->i_fd,
                FBIOGET_VSCREENINFO, &p_vout->p_sys->var_info ) )
     {
@@ -507,7 +507,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-    /* Get some informations again, in the definitive configuration */
+    /* Get some information again, in the definitive configuration */
     if( ioctl( p_vout->p_sys->i_fd, FBIOGET_FSCREENINFO, &fix_info )
          || ioctl( p_vout->p_sys->i_fd,
                    FBIOGET_VSCREENINFO, &p_vout->p_sys->var_info ) )

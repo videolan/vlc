@@ -767,7 +767,7 @@ static int Init( input_thread_t * p_input )
 
     if( p_meta && p_meta->i_meta > 0 )
     {
-        msg_Dbg( p_input, "meta informations:" );
+        msg_Dbg( p_input, "meta information:" );
         for( i = 0; i < p_meta->i_meta; i++ )
         {
             msg_Dbg( p_input, "  - '%s' = '%s'",
@@ -780,7 +780,7 @@ static int Init( input_thread_t * p_input )
                 input_Control( p_input, INPUT_ADD_INFO, _("General"),
                                _("Author"), p_meta->value[i] );
 
-            input_Control( p_input, INPUT_ADD_INFO, _("Meta-informations"),
+            input_Control( p_input, INPUT_ADD_INFO, _("Meta-information"),
                           _(p_meta->name[i]), "%s", p_meta->value[i] );
         }
 

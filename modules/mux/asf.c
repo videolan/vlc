@@ -100,7 +100,7 @@ typedef struct
     int          i_id;
     int          i_cat;
 
-    /* codec informations */
+    /* codec information */
     uint16_t     i_tag;     /* for audio */
     vlc_fourcc_t i_fourcc;  /* for video */
     char         *psz_name; /* codec name */

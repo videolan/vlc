@@ -1402,7 +1402,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
 
 #define SCREEN p_vout->p_sys->p_win->i_screen
 
-            /* Get Informations about Xinerama (num of screens) */
+            /* Get Information about Xinerama (num of screens) */
             screens = XineramaQueryScreens( p_vout->p_sys->p_display,
                                             &i_num_screens );
 
@@ -1516,7 +1516,7 @@ static void DisableXScreenSaver( vout_thread_t *p_vout )
     int dummy;
 #endif
 
-    /* Save screen saver informations */
+    /* Save screen saver information */
     XGetScreenSaver( p_vout->p_sys->p_display, &p_vout->p_sys->i_ss_timeout,
                      &p_vout->p_sys->i_ss_interval,
                      &p_vout->p_sys->i_ss_blanking,
@@ -1798,7 +1798,7 @@ static int InitDisplay( vout_thread_t *p_vout )
 {
 #ifdef MODULE_NAME_IS_x11
     XPixmapFormatValues *       p_formats;                 /* pixmap formats */
-    XVisualInfo *               p_xvisual;           /* visuals informations */
+    XVisualInfo *               p_xvisual;            /* visuals information */
     XVisualInfo                 xvisual_template;         /* visual template */
     int                         i_count;                       /* array size */
 #endif

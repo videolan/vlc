@@ -748,7 +748,7 @@ static int DemuxInit( demux_t *p_demux )
         }
     }
 
-    /* Create meta informations */
+    /* Create meta information */
     p_sys->meta = vlc_meta_New();
 
     if( ( p_cd = ASF_FindObject( p_sys->p_root->p_hdr,

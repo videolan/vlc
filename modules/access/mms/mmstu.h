@@ -69,7 +69,7 @@ struct access_sys_t
     size_t      i_media;
     size_t      i_media_used;
 
-    /* extracted informations */
+    /* extracted information */
     int         i_command;
 
     /* from 0x01 answer (not yet set) */

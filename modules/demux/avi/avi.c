@@ -200,18 +200,26 @@ static int Open( vlc_object_t * p_this )
     avi_chunk_avih_t    *p_avih;
 
     unsigned int i_track;
-    unsigned int i;
+    unsigned int i, i_peeker;
 
     uint8_t  *p_peek;
 
 
     /* Is it an avi file ? */
-    if( stream_Peek( p_demux->s, &p_peek, 12 ) < 12 )
+    if( stream_Peek( p_demux->s, &p_peek, 200 ) < 200 )
     {
         msg_Err( p_demux, "cannot peek()" );
         return VLC_EGENERIC;
     }
-    if( strncmp( &p_peek[0], "RIFF", 4 ) || strncmp( &p_peek[8], "AVI ", 4 ) )
+    for( i_peeker = 0; i_peeker < 188; i_peeker++ )
+    {
+        if( !strncmp( &p_peek[0], "RIFF", 4 ) && !strncmp( &p_peek[8], "AVI ", 4 ) )
+        {
+            break;
+        }
+        p_peek++;
+    }
+    if( i_peeker == 188 )
     {
         msg_Warn( p_demux, "avi module discarded (invalid header)" );
         return VLC_EGENERIC;
@@ -236,6 +244,11 @@ static int Open( vlc_object_t * p_this )
     if( !p_sys->b_seekable || config_GetInt( p_demux, "avi-interleaved" ) )
     {
         p_demux->pf_demux = Demux_UnSeekable;
+    }
+
+    if( i_peeker > 0 )
+    {
+	stream_Read( p_demux->s, NULL, i_peeker );
     }
 
     if( AVI_ChunkReadRoot( p_demux->s, &p_sys->ck_root ) )
@@ -292,7 +305,7 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    /* print informations on streams */
+    /* print information on streams */
     msg_Dbg( p_demux, "AVIH: %d stream, flags %s%s%s%s ",
              i_track,
              p_avih->i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
