@@ -2,7 +2,7 @@
  * bits.h
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: bits.h,v 1.3 2003/01/08 10:34:58 fenrir Exp $
+ * $Id: bits.h,v 1.4 2003/05/05 15:52:13 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -31,8 +31,8 @@ typedef struct bits_buffer_s
     uint8_t *p_data;
 
 } bits_buffer_t;
- 
-static inline int bits_initwrite( bits_buffer_t *p_buffer, 
+
+static inline int bits_initwrite( bits_buffer_t *p_buffer,
                                   int i_size, void *p_data )
 {
     p_buffer->i_size = i_size;
@@ -41,9 +41,9 @@ static inline int bits_initwrite( bits_buffer_t *p_buffer,
     p_buffer->p_data = p_data;
     p_buffer->p_data[0] = 0;
     if( !p_buffer->p_data )
-    {   
+    {
         if( !( p_buffer->p_data = malloc( i_size ) ) )
-        {        
+        {
             return( -1 );
         }
         else
@@ -67,12 +67,14 @@ static inline void bits_align( bits_buffer_t *p_buffer )
     }
 }
 
-static inline void bits_write( bits_buffer_t *p_buffer, 
+static inline void bits_write( bits_buffer_t *p_buffer,
                                int i_count, uint64_t i_bits )
 {
     while( i_count > 0 )
     {
-        if( ( i_bits >> ( i_count - 1 ) )&0x01 )
+        i_count--;
+
+        if( ( i_bits >> i_count )&0x01 )
         {
             p_buffer->p_data[p_buffer->i_data] |= p_buffer->i_mask;
         }
@@ -84,13 +86,8 @@ static inline void bits_write( bits_buffer_t *p_buffer,
         if( p_buffer->i_mask == 0 )
         {
             p_buffer->i_data++;
-            if( p_buffer->i_data < p_buffer->i_size )
-            {
-//                p_buffer->p_data[p_buffer->i_data] = 0;
-                p_buffer->i_mask = 0x80;
-            }
+            p_buffer->i_mask = 0x80;
         }
-        i_count--;
     }
 }
 
