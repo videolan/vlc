@@ -663,7 +663,7 @@ void Interface::OnExit( wxCommandEvent& WXUNUSED(event) )
 void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
 {
     wxString msg;
-    msg.Printf( wxString(wxT("VLC media player " VERSION)) +
+    msg.Printf( wxString(wxT("VLC media player " PACKAGE_VERSION)) +
         wxU(_(" (wxWindows interface)\n\n")) +
         wxU(_("(c) 1996-2004 - the VideoLAN Team\n\n")) +
         wxU( vlc_wraptext(INTF_ABOUT_MSG,WRAPCOUNT,ISUTF8) ) + wxT("\n\n") +

@@ -81,7 +81,7 @@ vlc_module_begin();
 #if defined(MODULE_NAME_is_ffmpegaltivec) \
      || (defined(CAN_COMPILE_ALTIVEC) && !defined(NO_ALTIVEC_IN_FFMPEG))
     set_description( _("AltiVec ffmpeg audio/video decoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
-    add_requirement( ALTIVEC );
+    /*add_requirement( ALTIVEC );*/
     set_capability( "decoder", 71 );
 #else
     set_description( _("ffmpeg audio/video decoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)") );

@@ -38,6 +38,13 @@
 
 #include "config.h"
 
+#if !defined(PACKAGE_NAME)
+#   define PACKAGE_NAME PACKAGE
+#endif
+#if !defined(PACKAGE_VERSION)
+#   define PACKAGE_VERSION VERSION
+#endif
+
 #if defined( __BORLANDC__ )
 #   undef HAVE_VARIADIC_MACROS
 #   undef HAVE_STDINT_H
@@ -929,17 +936,13 @@ VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
       defined(MODULE_NAME_IS_pda))
     /* Declare nothing: gnome.h will do it for us */
 #elif defined( ENABLE_NLS )
-#if defined( HAVE_INCLUDED_GETTEXT )
-#   include "libintl.h"
-#else
-#   include <libintl.h>
-#endif
+#   if defined( HAVE_INCLUDED_GETTEXT )
+#       include "libintl.h"
+#   else
+#       include <libintl.h>
+#   endif
 #   undef _
-#if defined( __BORLANDC__ )
-#define _(String) vlc_dgettext (PACKAGE_TARNAME, String)
-#else
-#   define _(String) vlc_dgettext (PACKAGE, String)
-#endif
+#   define _(String) vlc_dgettext (PACKAGE_NAME, String)
 #   define N_(String) ((char*)(String))
 #else
 #   define _(String) ((char*)(String))

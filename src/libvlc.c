@@ -408,10 +408,10 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
         msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
 
-        textdomain( PACKAGE );
+        textdomain( PACKAGE_NAME );
 
 #if defined( ENABLE_UTF8 )
-        bind_textdomain_codeset( PACKAGE, "UTF-8" );
+        bind_textdomain_codeset( PACKAGE_NAME, "UTF-8" );
 #endif
 
         module_EndBank( p_vlc );
@@ -1758,17 +1758,17 @@ static void SetLanguage ( char const *psz_lang )
               "locale" );
     psz_path = psz_tmp;
 #endif
-    if( !bindtextdomain( PACKAGE, psz_path ) )
+    if( !bindtextdomain( PACKAGE_NAME, psz_path ) )
     {
         fprintf( stderr, "warning: no domain %s in directory %s\n",
-                 PACKAGE, psz_path );
+                 PACKAGE_NAME, psz_path );
     }
 
     /* Set the default domain */
-    textdomain( PACKAGE );
+    textdomain( PACKAGE_NAME );
 
 #if defined( ENABLE_UTF8 )
-    bind_textdomain_codeset( PACKAGE, "UTF-8" );
+    bind_textdomain_codeset( PACKAGE_NAME, "UTF-8" );
 #endif
 
 #endif
