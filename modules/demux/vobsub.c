@@ -422,7 +422,6 @@ static int ParseVobSubIDX( demux_t *p_demux )
             return( VLC_EGENERIC );
         }
         
-msg_Dbg( p_demux, "%s", line );
         if( *line == 0 || *line == '\r' || *line == '\n' || *line == '#' ) 
             continue;
         else if( !strncmp( "size:", line, 5 ) )
@@ -456,7 +455,7 @@ msg_Dbg( p_demux, "%s", line );
                 memset( current_tk, 0, sizeof( vobsub_track_t ) );
                 current_tk->i_current_subtitle = 0;
                 current_tk->i_subtitles = 0;
-                current_tk->p_subtitles = NULL;
+                current_tk->p_subtitles = (subtitle_t*)malloc( sizeof( subtitle_t ) );;
                 current_tk->i_track_id = i_track_id;
 
                 es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
@@ -481,15 +480,26 @@ msg_Dbg( p_demux, "%s", line );
              */
             unsigned int h, m, s, ms, loc;
             int i_start, i_location = 0;
+            
+            vobsub_track_t *current_tk = &p_sys->track[p_sys->i_tracks - 1];
 
             if( sscanf( line, "timestamp: %d:%d:%d:%d, filepos: %x",
                         &h, &m, &s, &ms, &loc ) == 5 )
             {
+                subtitle_t *current_sub;
+                
                 i_start = ( (mtime_t)h * 3600*1000 +
                             (mtime_t)m * 60*1000 +
                             (mtime_t)s * 1000 +
                             (mtime_t)ms ) * 1000;
                 i_location = loc;
+                
+                current_tk->i_subtitles++;
+                current_tk->p_subtitles = (subtitle_t*)realloc( current_tk->p_subtitles, sizeof( subtitle_t ) * (current_tk->i_subtitles + 1 ) );
+                current_sub = &current_tk->p_subtitles[current_tk->i_subtitles - 1];
+                
+                current_sub->i_start = i_start;
+                current_sub->i_vobsub_location = i_location;
             }
         }
     }
@@ -549,18 +559,18 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
             p_pkt->i_dts = p_pkt->i_pts = p_bk->i_pts;
             p_pkt->i_length = 0;
             
-            if( tk.p_es && tk.i_track_id == i_id )
+            if( tk.p_es && tk.i_track_id == i_spu )
             {
                 es_out_Send( p_demux->out, tk.p_es, p_pkt );
-                p_bk->i_pts = 0;    /* only first packet has a pts */
+                p_bk->i_pts = 0;     /*only first packet has a pts */
+                break;
             }
-            else
+            else if( i == p_sys->i_tracks - 1 )
             {
                 block_Release( p_pkt );
-                continue;
             }
+#undef tk
         }
-#undef tk        
     }
 
     return VLC_SUCCESS;
