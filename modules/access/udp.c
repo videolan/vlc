@@ -2,10 +2,12 @@
  * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.23 2003/10/22 17:12:30 gbazin Exp $
+ * $Id: udp.c,v 1.24 2003/10/23 14:30:26 jpsaman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
+ *
+ * Reviewed: 23 October 2003, Jean-Paul Saman <jpsaman@wxs.nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -339,9 +341,9 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     timeout.tv_usec = 500000;
 
     /* Find if some data is available */
-    while( (i_ret = select( p_access_data->i_handle + 1, &fds,
-                            NULL, NULL, &timeout )) == 0
-           || (i_ret < 0 && errno == EINTR) )
+    while( ((i_ret = select( p_access_data->i_handle + 1, &fds,
+                            NULL, NULL, &timeout )) == 0)
+           || ((i_ret < 0) && (errno == EINTR)) )
     {
         FD_ZERO( &fds );
         FD_SET( p_access_data->i_handle, &fds );
@@ -400,7 +402,7 @@ static ssize_t RTPRead( input_thread_t * p_input, byte_t * p_buffer,
      * We first assume that RTP header size is the classic RTP_HEADER_LEN. */
     ssize_t i_ret = Read( p_input, p_tmp_buffer, p_input->i_mtu );
 
-    if ( i_ret < 0 ) return 0;
+    if ( i_ret <= 0 ) return 0; /* i_ret is at least 1 */
 
     /* Parse the header and make some verifications.
      * See RFC 1889 & RFC 2250. */
@@ -415,6 +417,16 @@ static ssize_t RTPRead( input_thread_t * p_input, byte_t * p_buffer,
     if ( i_payload_type != 33 && i_payload_type != 14
           && i_payload_type != 32 )
         msg_Dbg( p_input, "unsupported RTP payload type (%u)", i_payload_type );
+
+    /* A CSRC extension field is 32 bits in size (4 bytes) */
+    if ( i_ret < (RTP_HEADER_LEN + 4*i_CSRC_count) )
+    {
+        /* Packet is not big enough to hold the complete RTP_HEADER with
+         * CSRC extensions.
+         */
+        msg_Warn( p_input, "RTP input trashing %d bytes", i_ret - i_len );
+        return 0;
+    }
 
     /* Return the packet without the RTP header. */
     i_ret -= ( RTP_HEADER_LEN + 4 * i_CSRC_count );
@@ -449,7 +461,7 @@ static ssize_t RTPChoose( input_thread_t * p_input, byte_t * p_buffer,
      * We first assume that RTP header size is the classic RTP_HEADER_LEN. */
     ssize_t i_ret = Read( p_input, p_tmp_buffer, p_input->i_mtu );
 
-    if ( i_ret < 0 ) return 0;
+    if ( i_ret <= 0 ) return 0; /* i_ret is at least 1 */
     
     /* Check that it's not TS. */
     if ( p_tmp_buffer[0] == 0x47 )
@@ -496,8 +508,19 @@ static ssize_t RTPChoose( input_thread_t * p_input, byte_t * p_buffer,
         return i_ret;
     }
 
-    /* Return the packet without the RTP header. */
     p_input->pf_read = RTPRead;
+
+    /* A CSRC extension field is 32 bits in size (4 bytes) */
+    if ( i_ret < (RTP_HEADER_LEN + 4*i_CSRC_count) )
+    {
+        /* Packet is not big enough to hold the complete RTP_HEADER with
+         * CSRC extensions.
+         */
+        msg_Warn( p_input, "RTP input trashing %d bytes", i_ret - i_len );
+        return 0;
+    }
+
+    /* Return the packet without the RTP header. */
     i_ret -= ( RTP_HEADER_LEN + 4 * i_CSRC_count );
 
     if ( (size_t)i_ret > i_len )
