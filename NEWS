@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.50 2003/06/15 22:32:06 hartman Exp $
+$Id: NEWS,v 1.51 2003/06/21 17:26:16 sigmunau Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
@@ -67,7 +67,6 @@ Win32 port:
  * Added support for compressed skins files (.vlt files)
  * Fixed SVCD chapters support.
  * Fixed memory leak with 5.1 audio.
- * Fixed ipv6 multicast support (not tested).
 
 BeOS port:
  * Interface localization
