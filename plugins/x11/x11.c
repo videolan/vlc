@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.18 2002/06/01 12:32:00 sam Exp $
+ * $Id: x11.c,v 1.19 2002/06/27 19:01:28 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -51,10 +51,16 @@
     "Specify the X11 hardware display you want to use. By default vlc will " \
     "use the value of the DISPLAY environment variable.")
 
+#define DRAWABLE_TEXT N_("X11 drawable")
+#define DRAWABLE_LONGTEXT N_( \
+    "Specify a X11 drawable to use instead of opening a new window. This " \
+    "option is DANGEROUS, use with care.")
+
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
 ADD_STRING  ( "x11-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
 ADD_BOOL    ( "x11-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
+ADD_INTEGER ( "x11-drawable", -1, NULL, DRAWABLE_TEXT, DRAWABLE_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

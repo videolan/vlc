@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.40 2002/06/05 18:07:03 stef Exp $
+ * $Id: xcommon.c,v 1.41 2002/06/27 19:01:28 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -142,6 +142,7 @@ struct vout_sys_s
     int                 i_screen;                           /* screen number */
     GC                  gc;              /* graphic context instance handler */
     Window              window;                               /* root window */
+    vlc_bool_t          b_createwindow;       /* are we the window's owner ? */
     Window              video_window;     /* sub-window for displaying video */
 
 #ifdef HAVE_SYS_SHM_H
@@ -925,6 +926,8 @@ static int CreateWindow( vout_thread_t *p_vout )
     vlc_bool_t              b_configure_notify;
     vlc_bool_t              b_map_notify;
 
+    long long int           i_drawable;
+
     /* Set main window's size */
     p_vout->p_sys->i_width = p_vout->i_window_width;
     p_vout->p_sys->i_height = p_vout->i_window_height;
@@ -943,39 +946,54 @@ static int CreateWindow( vout_thread_t *p_vout )
     xwindow_attributes.background_pixel = BlackPixel(p_vout->p_sys->p_display,
                                                      p_vout->p_sys->i_screen);
     xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask;
-    
 
-    /* Create the window and set hints - the window must receive
-     * ConfigureNotify events, and until it is displayed, Expose and
-     * MapNotify events. */
+    /* Check whether someone provided us with a window */
+    i_drawable = config_GetInt( p_vout, MODULE_STRING "-drawable");
 
-    p_vout->p_sys->window =
-        XCreateWindow( p_vout->p_sys->p_display,
-                       DefaultRootWindow( p_vout->p_sys->p_display ),
-                       0, 0,
-                       p_vout->p_sys->i_width,
-                       p_vout->p_sys->i_height,
-                       0,
-                       0, InputOutput, 0,
-                       CWBackingStore | CWBackPixel | CWEventMask,
-                       &xwindow_attributes );
+    if( i_drawable == -1 )
+    {
+        p_vout->p_sys->b_createwindow = 1;
 
-    /* Set window manager hints and properties: size hints, command,
-     * window's name, and accepted protocols */
-    XSetWMNormalHints( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                       &xsize_hints );
-    /* XXX: DISABLED! makes browsers crash */
-#if 0
-    XSetCommand( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                 p_vout->p_vlc->ppsz_argv, p_vout->p_vlc->i_argc );
-#endif
-    XStoreName( p_vout->p_sys->p_display, p_vout->p_sys->window,
+        /* Create the window and set hints - the window must receive
+         * ConfigureNotify events, and until it is displayed, Expose and
+         * MapNotify events. */
+
+        p_vout->p_sys->window =
+            XCreateWindow( p_vout->p_sys->p_display,
+                           DefaultRootWindow( p_vout->p_sys->p_display ),
+                           0, 0,
+                           p_vout->p_sys->i_width,
+                           p_vout->p_sys->i_height,
+                           0,
+                           0, InputOutput, 0,
+                           CWBackingStore | CWBackPixel | CWEventMask,
+                           &xwindow_attributes );
+
+        /* Set window manager hints and properties: size hints, command,
+         * window's name, and accepted protocols */
+        XSetWMNormalHints( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                           &xsize_hints );
+        XSetCommand( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                     p_vout->p_vlc->ppsz_argv, p_vout->p_vlc->i_argc );
+
+        XStoreName( p_vout->p_sys->p_display, p_vout->p_sys->window,
 #ifdef MODULE_NAME_IS_x11
-                VOUT_TITLE " (X11 output)"
+                    VOUT_TITLE " (X11 output)"
 #else
-                VOUT_TITLE " (XVideo output)"
+                    VOUT_TITLE " (XVideo output)"
 #endif
-              );
+                  );
+    }
+    else
+    {
+        p_vout->p_sys->b_createwindow = 0;
+        p_vout->p_sys->window = i_drawable;
+
+        XChangeWindowAttributes( p_vout->p_sys->p_display,
+                                 p_vout->p_sys->window,
+                                 CWBackingStore | CWBackPixel | CWEventMask,
+                                 &xwindow_attributes );
+    }
 
     if( (p_vout->p_sys->wm_protocols == None)        /* use WM_DELETE_WINDOW */
         || (p_vout->p_sys->wm_delete_window == None)
@@ -993,36 +1011,49 @@ static int CreateWindow( vout_thread_t *p_vout )
                                    p_vout->p_sys->window,
                                    GCGraphicsExposures, &xgcvalues);
 
-    /* Send orders to server, and wait until window is displayed - three
-     * events must be received: a MapNotify event, an Expose event allowing
-     * drawing in the window, and a ConfigureNotify to get the window
-     * dimensions. Once those events have been received, only ConfigureNotify
-     * events need to be received. */
-    b_expose = 0;
-    b_configure_notify = 0;
-    b_map_notify = 0;
-    XMapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window);
-    do
+    if( p_vout->p_sys->b_createwindow )
     {
-        XNextEvent( p_vout->p_sys->p_display, &xevent);
-        if( (xevent.type == Expose)
-            && (xevent.xexpose.window == p_vout->p_sys->window) )
+        /* Send orders to server, and wait until window is displayed - three
+         * events must be received: a MapNotify event, an Expose event allowing
+         * drawing in the window, and a ConfigureNotify to get the window
+         * dimensions. Once those events have been received, only
+         * ConfigureNotify events need to be received. */
+        b_expose = 0;
+        b_configure_notify = 0;
+        b_map_notify = 0;
+        XMapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
+        do
         {
-            b_expose = 1;
-        }
-        else if( (xevent.type == MapNotify)
-                 && (xevent.xmap.window == p_vout->p_sys->window) )
-        {
-            b_map_notify = 1;
-        }
-        else if( (xevent.type == ConfigureNotify)
-                 && (xevent.xconfigure.window == p_vout->p_sys->window) )
-        {
-            b_configure_notify = 1;
-            p_vout->p_sys->i_width = xevent.xconfigure.width;
-            p_vout->p_sys->i_height = xevent.xconfigure.height;
-        }
-    } while( !( b_expose && b_configure_notify && b_map_notify ) );
+            XNextEvent( p_vout->p_sys->p_display, &xevent);
+            if( (xevent.type == Expose)
+                && (xevent.xexpose.window == p_vout->p_sys->window) )
+            {
+                b_expose = 1;
+            }
+            else if( (xevent.type == MapNotify)
+                     && (xevent.xmap.window == p_vout->p_sys->window) )
+            {
+                b_map_notify = 1;
+            }
+            else if( (xevent.type == ConfigureNotify)
+                     && (xevent.xconfigure.window == p_vout->p_sys->window) )
+            {
+                b_configure_notify = 1;
+                p_vout->p_sys->i_width = xevent.xconfigure.width;
+                p_vout->p_sys->i_height = xevent.xconfigure.height;
+            }
+        } while( !( b_expose && b_configure_notify && b_map_notify ) );
+    }
+    else
+    {
+        /* Get the window's geometry information */
+        Window dummy1;
+        unsigned int dummy2, dummy3;
+        XGetGeometry( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                      &dummy1, &dummy2, &dummy3,
+                      &p_vout->p_sys->i_width, &p_vout->p_sys->i_height,
+                      &dummy2, &dummy3 );
+    }
 
     XSelectInput( p_vout->p_sys->p_display, p_vout->p_sys->window,
                   StructureNotifyMask | KeyPressMask |
@@ -1030,7 +1061,8 @@ static int CreateWindow( vout_thread_t *p_vout )
                   PointerMotionMask );
 
 #ifdef MODULE_NAME_IS_x11
-    if( XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
+    if( p_vout->p_sys->b_createwindow &&
+         XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
     {
         /* Allocate a new palette */
         p_vout->p_sys->colormap =
@@ -1045,8 +1077,8 @@ static int CreateWindow( vout_thread_t *p_vout )
                                  p_vout->p_sys->window,
                                  CWColormap, &xwindow_attributes );
     }
-
 #endif
+
     /* Create video output sub-window. */
     p_vout->p_sys->video_window =  XCreateSimpleWindow(
                                       p_vout->p_sys->p_display,
