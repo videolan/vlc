@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.25 2003/08/10 14:21:16 gbazin Exp $
+ * $Id: ts.c,v 1.26 2003/08/10 14:23:15 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -331,7 +331,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    msg_Dbg( p_mux, "pcr_delay="I64d" pcr_soft_delay="I64Fd,
+    msg_Dbg( p_mux, "pcr_delay="I64Fd" pcr_soft_delay="I64Fd,
              p_sys->i_pcr_delay, p_sys->i_pcr_soft_delay );
 
     /* for TS génération */
@@ -791,7 +791,8 @@ static int TSFill( sout_mux_t *p_mux, sout_input_t *p_input )
         }
 
         msg_Dbg( p_mux, "dropping buffer size=%d dts="I64Fd" pcr_dts="I64Fd
-                 " diff="I64Fd, p_data->i_size, i_dts, p_sys->i_dts );
+                 " diff="I64Fd, p_data->i_size, i_dts, p_sys->i_dts,
+                 p_sys->i_dts + p_sys->i_length - i_dts );
         sout_BufferDelete( p_mux->p_sout, p_data );
     }
 
