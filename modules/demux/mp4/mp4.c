@@ -702,9 +702,6 @@ static int Demux( demux_t *p_demux )
                 else
                     p_block->i_pts = 0;
 
-                if( tk->fmt.i_cat == VIDEO_ES )
-                    msg_Dbg( p_demux, "pts=%lld dts=%lld", p_block->i_pts, p_block->i_dts );
-
                 if( !tk->b_drms || ( tk->b_drms && tk->p_drms ) )
                     es_out_Send( p_demux->out, tk->p_es, p_block );
             }

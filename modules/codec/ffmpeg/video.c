@@ -639,10 +639,6 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         {
             p_pic->date = p_sys->i_pts;
 
-            static int64_t i_old = 0;
-            msg_Dbg( p_dec, "pts=%lld diff=%lld", p_pic->date, p_pic->date - i_old );
-            i_old = p_pic->date;
-
             /* interpolate the next PTS */
             if( p_sys->p_context->frame_rate > 0 )
             {
@@ -670,7 +666,6 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         else
         {
             p_dec->pf_vout_buffer_del( p_dec, p_pic );
-            msg_Dbg( p_dec, "pts=0" );
         }
     }
 
