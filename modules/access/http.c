@@ -110,6 +110,7 @@ struct access_sys_t
     int        i_version;
 
     char       *psz_mime;
+    char       *psz_pragma;
     char       *psz_location;
 
     vlc_bool_t b_chunked;
@@ -183,6 +184,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_version = 1;
     p_sys->b_seekable = VLC_TRUE;
     p_sys->psz_mime = NULL;
+    p_sys->psz_pragma = NULL;
     p_sys->psz_location = NULL;
     p_sys->psz_user_agent = NULL;
     p_sys->b_pace_control = VLC_TRUE;
@@ -292,6 +294,12 @@ static int Open( vlc_object_t *p_this )
         p_access->info.i_size = 0;  /* Force to stop reading */
     }
 
+    if( p_sys->psz_pragma != NULL )
+    {
+        msg_Dbg( p_access, "This is actually a live mms server, BAIL" );
+        goto error;
+    }
+
     if( !strcmp( p_sys->psz_protocol, "ICY" ) )
     {
         if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "video/nsv" ) )
@@ -320,6 +328,7 @@ error:
     vlc_UrlClean( &p_sys->url );
     vlc_UrlClean( &p_sys->proxy );
     if( p_sys->psz_mime ) free( p_sys->psz_mime );
+    if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
     if( p_sys->psz_location ) free( p_sys->psz_location );
     if( p_sys->psz_user_agent ) free( p_sys->psz_user_agent );
     if( p_sys->psz_user ) free( p_sys->psz_user );
@@ -348,6 +357,7 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->psz_passwd ) free( p_sys->psz_passwd );
 
     if( p_sys->psz_mime ) free( p_sys->psz_mime );
+    if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
     if( p_sys->psz_location ) free( p_sys->psz_location );
 
     if( p_sys->psz_user_agent ) free( p_sys->psz_user_agent );
@@ -594,9 +604,11 @@ static int Connect( access_t *p_access, int64_t i_tell )
     /* Clean info */
     if( p_sys->psz_location ) free( p_sys->psz_location );
     if( p_sys->psz_mime ) free( p_sys->psz_mime );
+    if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
 
     p_sys->psz_location = NULL;
     p_sys->psz_mime = NULL;
+    p_sys->psz_pragma = NULL;
     p_sys->b_chunked = VLC_FALSE;
     p_sys->i_chunk = 0;
 
@@ -769,6 +781,12 @@ static int Connect( access_t *p_access, int64_t i_tell )
             if( p_sys->psz_mime ) free( p_sys->psz_mime );
             p_sys->psz_mime = strdup( p );
             msg_Dbg( p_access, "Content-Type: %s", p_sys->psz_mime );
+        }
+        else if( !strcasecmp( psz, "Pragma" ) )
+        {
+            if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
+            p_sys->psz_pragma = strdup( p );
+            msg_Dbg( p_access, "Pragma: %s", p_sys->psz_pragma );
         }
         else if( !strcasecmp( psz, "Server" ) &&
                  !strncasecmp( p, "Icecast", 7 ) )
