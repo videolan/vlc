@@ -2,7 +2,7 @@
  * subtitle.h : Common SVCD and CVD subtitles header
  *****************************************************************************
  * Copyright (C) 2003,2004 VideoLAN
- * $Id: subtitle.h,v 1.4 2004/01/04 04:56:21 rocky Exp $
+ * $Id: subtitle.h,v 1.5 2004/01/04 22:22:10 gbazin Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -154,7 +154,7 @@ struct subpicture_sys_t
   int     i_debug;              /* debugging mask */
   mtime_t i_pts;                /* presentation timestamp */
 
-  u_int8_t *p_data;             /* Image data one byte T, Y, U, V */
+  uint8_t *p_data;             /* Image data one byte T, Y, U, V */
 
   /* Link to our input */
   vlc_object_t * p_input;
