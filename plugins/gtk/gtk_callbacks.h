@@ -2,7 +2,7 @@
  * gtk_callbacks.h : Callbacks for the gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.h,v 1.15 2001/05/30 23:02:03 stef Exp $
+ * $Id: gtk_callbacks.h,v 1.16 2002/01/09 02:01:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -70,3 +70,12 @@ void     GtkNetworkJoin         ( GtkEditable *, gpointer );
 void     GtkChannelGo           ( GtkButton *, gpointer );
 
 void     GtkNetworkOpenChannel  ( GtkToggleButton *, gpointer );
+
+void
+GtkEjectDiscActivate                   (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+gboolean
+GtkDiscEject                           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);

@@ -100,6 +100,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		memcpy/memcpymmxext \
 		memcpy/memcpy3dn \
 		mga/mga \
+		mga/xmga \
 		motion/motion \
 		motion/motionmmx \
 		motion/motionmmxext \
@@ -122,7 +123,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 #
 # C Objects
 # 
-INTERFACE := main interface intf_msg intf_playlist
+INTERFACE := main interface intf_msg intf_playlist intf_eject
 INPUT := input input_ext-dec input_ext-intf input_dec input_programs input_clock mpeg_system
 VIDEO_OUTPUT := video_output video_text vout_pictures vout_subpictures
 AUDIO_OUTPUT := audio_output aout_ext-dec aout_u8 aout_s8 aout_u16 aout_s16 aout_spdif

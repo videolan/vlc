@@ -2,10 +2,11 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.30 2002/01/07 02:12:29 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.31 2002/01/09 02:01:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
+ *          Julien BLACHE <jb@technologeek.org>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +31,8 @@
 
 #include <videolan/vlc.h>
 
+#include <unistd.h>
+
 #include <gtk/gtk.h>
 
 #include <string.h>
@@ -39,6 +42,7 @@
 
 #include "interface.h"
 #include "intf_playlist.h"
+#include "intf_eject.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -463,3 +467,55 @@ void GtkJumpActivate( GtkMenuItem * menuitem, gpointer user_data )
     GtkJumpShow( GTK_WIDGET( menuitem ), NULL, user_data );
 }
 
+
+/****************************************************************************
+ * Callbacks for disc ejection
+ ****************************************************************************/
+gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
+                        gpointer user_data )
+{
+  char *psz_device = NULL;
+
+  /*
+   * Get the active input
+   * Determine whether we can eject a media, ie it's a VCD or DVD
+   * If it's neither a VCD nor a DVD, then return
+   */
+
+  /*
+   * Don't really know if I must lock the stuff here, we're using it read-only
+   */
+
+  if (p_main->p_playlist->current.psz_name != NULL)
+  {
+      if (strncmp(p_main->p_playlist->current.psz_name, "dvd", 3)
+          || strncmp(p_main->p_playlist->current.psz_name, "vcd", 3))
+      {
+          /* Determine the device name by omitting the first 4 characters */
+          psz_device = strdup((p_main->p_playlist->current.psz_name + 4));
+      }
+  }
+
+  if( psz_device == NULL )
+  {
+      return TRUE;
+  }
+
+  /* If there's a stream playing, we aren't allowed to eject ! */
+  if( p_input_bank->pp_input[0] == NULL )
+  {
+      intf_WarnMsg( 4, "intf: ejecting %s", psz_device );
+
+      intf_Eject( psz_device );
+  }
+
+  free(psz_device);
+  return TRUE;
+}
+
+void GtkEjectDiscActivate ( GtkMenuItem *menuitem, gpointer user_data )
+{
+  fprintf(stderr, "DEBUG: EJECT called from MENU !\n");
+
+  GtkDiscEject( GTK_WIDGET( menuitem ), NULL, user_data );
+}

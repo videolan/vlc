@@ -2,7 +2,7 @@
  * glide.c : 3dfx Glide plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: glide.c,v 1.10 2002/01/07 02:12:29 sam Exp $
+ * $Id: glide.c,v 1.11 2002/01/09 02:01:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -60,7 +60,6 @@ static int  vout_Manage    ( vout_thread_t * );
 static void vout_Render    ( vout_thread_t *, picture_t * );
 static void vout_Display   ( vout_thread_t *, picture_t * );
 
-static int  NewPicture     ( vout_thread_t *, picture_t * );
 static int  OpenDisplay    ( vout_thread_t * );
 static void CloseDisplay   ( vout_thread_t * );
 
@@ -94,9 +93,8 @@ typedef struct vout_sys_s
 {
     GrLfbInfo_t                 p_buffer_info;           /* back buffer info */
 
-    /* Dummy video memory */
-    byte_t *                    p_video;                      /* base adress */
-    size_t                      i_page_size;                    /* page size */
+    u8* pp_buffer[2];
+    int i_index;
 
 } vout_sys_t;
 
@@ -167,36 +165,49 @@ int vout_Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES = 0;
 
-    /* Try to initialize up to 1 direct buffers */
-    while( I_OUTPUTPICTURES < 1 )
+    p_pic = NULL;
+
+    /* Find an empty picture slot */
+    for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
     {
-        p_pic = NULL;
-
-        /* Find an empty picture slot */
-        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+        if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
         {
-            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
-            {
-                p_pic = p_vout->p_picture + i_index;
-                break;
-            }
-        }
-
-        /* Allocate the picture */
-        if( p_pic == NULL || NewPicture( p_vout, p_pic ) )
-        {
+            p_pic = p_vout->p_picture + i_index;
             break;
         }
-
-        p_pic->i_status = DESTROYED_PICTURE;
-        p_pic->i_type   = DIRECT_PICTURE;
-
-        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
-
-        I_OUTPUTPICTURES++;
     }
 
-    return( 0 );
+    if( p_pic == NULL )
+    {
+        return -1;
+    }
+
+    /* We know the chroma, allocate a buffer which will be used
+     * directly by the decoder */
+    p_pic->i_planes = 1;
+
+    p_pic->p->p_pixels = p_vout->p_sys->pp_buffer[p_vout->p_sys->i_index];
+    p_pic->p->i_pixel_bytes = GLIDE_BYTES_PER_PIXEL;
+    p_pic->p->i_lines = GLIDE_HEIGHT;
+
+    p_pic->p->b_margin = 1;
+    p_pic->p->b_hidden = 1;
+    p_pic->p->i_visible_bytes = GLIDE_WIDTH * GLIDE_BYTES_PER_PIXEL;
+    p_pic->p->i_pitch = p_vout->p_sys->p_buffer_info.strideInBytes;
+                         /*1024 * GLIDE_BYTES_PER_PIXEL*/
+
+    p_pic->p->i_red_mask =   0xf800;
+    p_pic->p->i_green_mask = 0x07e0;
+    p_pic->p->i_blue_mask =  0x001f;
+
+    p_pic->i_status = DESTROYED_PICTURE;
+    p_pic->i_type   = DIRECT_PICTURE;
+
+    PP_OUTPUTPICTURE[ 0 ] = p_pic;
+
+    I_OUTPUTPICTURES = 1;
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -286,18 +297,6 @@ static int OpenDisplay( vout_thread_t *p_vout )
     GrScreenResolution_t resolution = GR_RESOLUTION_800x600;
     GrLfbInfo_t p_front_buffer_info;                    /* front buffer info */
 
-    p_vout->p_sys->i_page_size = GLIDE_WIDTH * GLIDE_HEIGHT
-                                  * GLIDE_BYTES_PER_PIXEL;
-
-    /* Map two framebuffers a the very beginning of the fb */
-    p_vout->p_sys->p_video = malloc( p_vout->p_sys->i_page_size * 2 );
-    if( (int)p_vout->p_sys->p_video == -1 )
-    {
-        intf_ErrMsg( "vout error: can't map video memory (%s)",
-                     strerror(errno) );
-        return( 1 );
-    }
-
     grGlideGetVersion( version );
     grGlideInit();
 
@@ -308,8 +307,8 @@ static int OpenDisplay( vout_thread_t *p_vout )
     }
 
     grSstSelect( 0 );
-    if( !grSstWinOpen(0, resolution, GR_REFRESH_60Hz,
-                        GR_COLORFORMAT_ABGR, GR_ORIGIN_UPPER_LEFT, 2, 1) )
+    if( !grSstWinOpen( 0, resolution, GR_REFRESH_60Hz,
+                       GR_COLORFORMAT_ABGR, GR_ORIGIN_UPPER_LEFT, 2, 1 ) )
     {
         intf_ErrMsg( "vout error: can't open 3dfx screen" );
         return( 1 );
@@ -347,9 +346,13 @@ static int OpenDisplay( vout_thread_t *p_vout )
         grGlideShutdown();
         return( 1 );
     }
-    grLfbUnlock(GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER );
+    grLfbUnlock( GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER );
     
     grBufferClear( 0, 0, 0 );
+
+    p_vout->p_sys->pp_buffer[0] = p_vout->p_sys->p_buffer_info.lfbPtr;
+    p_vout->p_sys->pp_buffer[1] = p_front_buffer_info.lfbPtr;
+    p_vout->p_sys->i_index = 0;
 
     return( 0 );
 }
@@ -367,34 +370,5 @@ static void CloseDisplay( vout_thread_t *p_vout )
 
     /* shutdown Glide */
     grGlideShutdown();
-    free( p_vout->p_sys->p_video );
-}
-
-/*****************************************************************************
- * NewPicture: allocate a picture
- *****************************************************************************
- * Returns 0 on success, -1 otherwise
- *****************************************************************************/
-static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    /* We know the chroma, allocate a buffer which will be used
-     * directly by the decoder */
-    p_pic->p->p_pixels = p_vout->p_sys->p_video;
-    p_pic->p->i_pixel_bytes = GLIDE_BYTES_PER_PIXEL;
-    p_pic->p->i_lines = GLIDE_HEIGHT;
-
-    p_pic->p->b_margin = 1;
-    p_pic->p->b_hidden = 1;
-    p_pic->p->i_visible_bytes = GLIDE_WIDTH * GLIDE_BYTES_PER_PIXEL;
-    p_pic->p->i_pitch = p_vout->p_sys->p_buffer_info.strideInBytes;
-                         /*1024 * GLIDE_BYTES_PER_PIXEL*/
-
-    p_pic->p->i_red_mask =   0xf800;
-    p_pic->p->i_green_mask = 0x07e0;
-    p_pic->p->i_blue_mask =  0x001f;
-
-    p_pic->i_planes = 1;
-
-    return 0;
 }
 

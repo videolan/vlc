@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.86 2002/01/07 02:12:30 sam Exp $
+ * $Id: interface.c,v 1.87 2002/01/09 02:01:14 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -128,18 +128,33 @@ static void intf_Manage( intf_thread_t *p_intf )
 
     vlc_mutex_lock( &p_input_bank->lock );
 
-    if( p_input_bank->i_count 
-         && ( p_input_bank->pp_input[0]->b_error
-               || p_input_bank->pp_input[0]->b_eof ) )
+    if( p_input_bank->i_count )
     {
-        intf_WarnMsg( 3, "intf: input thread destroyed" );
-        input_DestroyThread( p_input_bank->pp_input[0], NULL );
-        p_input_bank->pp_input[0] = NULL;
-        p_input_bank->i_count--;
-    }
+        int i_input;
+        input_thread_t *p_input;
 
+        for( i_input = 0; i_input < p_input_bank->i_count; i_input++ )
+        {
+            p_input = p_input_bank->pp_input[i_input];
+            
+            if( p_input->i_status == THREAD_OVER )
+            {
+                /* XXX: completely stupid ! */
+                input_DestroyThread( p_input );
+                p_input_bank->pp_input[i_input] = NULL;
+                p_input_bank->i_count--;
+            }
+            else if( ( p_input->i_status == THREAD_READY
+                        || p_input->i_status == THREAD_ERROR )
+                     && ( p_input->b_error || p_input->b_eof ) )
+            {
+                input_StopThread( p_input, NULL );
+            }
+
+        }
+    }
     /* If no stream is being played, try to find one */
-    if( !p_input_bank->i_count && !p_intf->b_die )
+    else
     {
 //        vlc_mutex_lock( &p_main->p_playlist->change_lock );
 
@@ -155,14 +170,20 @@ static void intf_Manage( intf_thread_t *p_intf )
             }
             else
             {
+                input_thread_t *p_input;
+
                 p_main->p_playlist->b_stopped = 0;
                 p_main->p_playlist->i_mode = PLAYLIST_FORWARD + 
                     main_GetIntVariable( PLAYLIST_LOOP_VAR,
                                          PLAYLIST_LOOP_DEFAULT );
                 intf_WarnMsg( 3, "intf: creating new input thread" );
-                p_input_bank->pp_input[0] =
-                    input_CreateThread( &p_main->p_playlist->current, NULL );
-                p_input_bank->i_count++;
+                p_input = input_CreateThread( &p_main->p_playlist->current,
+                                              NULL );
+                if( p_input != NULL )
+                {
+                    p_input_bank->pp_input[ p_input_bank->i_count ] = p_input;
+                    p_input_bank->i_count++;
+                }
             }
         }
         else

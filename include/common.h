@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.66 2002/01/07 02:12:29 sam Exp $
+ * $Id: common.h,v 1.67 2002/01/09 02:01:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -468,6 +468,7 @@ typedef struct module_symbols_s
     void ( * intf_PlaylistDestroy ) ( struct playlist_s * );
     void ( * intf_PlaylistJumpto )  ( struct playlist_s *, int );
     void ( * intf_UrlDecode )       ( char * );
+    int  ( * intf_Eject )           ( const char * );
 
     void    ( * msleep )         ( mtime_t );
     mtime_t ( * mdate )          ( void );
@@ -576,6 +577,7 @@ typedef struct module_symbols_s
 
     struct module_s * ( * module_Need ) ( int, char *, struct probedata_s * );
     void ( * module_Unneed )            ( struct module_s * );
+
 } module_symbols_t;
 
 #ifdef PLUGIN

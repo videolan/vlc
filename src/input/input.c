@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.168 2002/01/07 02:12:29 sam Exp $
+ * $Id: input.c,v 1.169 2002/01/09 02:01:14 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -113,11 +113,15 @@ void input_InitBank ( void )
  *****************************************************************************/
 void input_EndBank ( void )
 {
+    int i_input;
+
     /* Ask all remaining video outputs to die */
-    while( p_input_bank->i_count )
+    for( i_input = 0; i_input < p_input_bank->i_count; i_input++ )
     {
+        input_StopThread(
+                p_input_bank->pp_input[ i_input ], NULL );
         input_DestroyThread(
-                p_input_bank->pp_input[ --p_input_bank->i_count ], NULL );
+                p_input_bank->pp_input[ i_input ] );
     }
 
     vlc_mutex_destroy( &p_input_bank->lock );
@@ -134,7 +138,6 @@ void input_EndBank ( void )
 input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
 {
     input_thread_t *    p_input;                        /* thread descriptor */
-    int                 i_status;                           /* thread status */
 
     /* Allocate descriptor */
     p_input = (input_thread_t *)malloc( sizeof(input_thread_t) );
@@ -146,16 +149,15 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     }
 
     /* Initialize thread properties */
-    p_input->b_die              = 0;
-    p_input->b_error            = 0;
-    p_input->b_eof              = 0;
+    p_input->b_die      = 0;
+    p_input->b_error    = 0;
+    p_input->b_eof      = 0;
 
     /* Set target */
-    p_input->p_source           = p_item->psz_name;
+    p_input->p_source   = p_item->psz_name;
 
-    /* I have never understood that stuff --Meuuh */
-    p_input->pi_status          = (pi_status != NULL) ? pi_status : &i_status;
-    *p_input->pi_status         = THREAD_CREATE;
+    /* Set status */
+    p_input->i_status   = THREAD_CREATE;
 
     /* Initialize stream description */
     p_input->stream.i_es_number = 0;
@@ -196,6 +198,7 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
         return( NULL );
     }
 
+#if 0
     /* If status is NULL, wait until the thread is created */
     if( pi_status == NULL )
     {
@@ -204,36 +207,30 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
             msleep( THREAD_SLEEP );
         } while( (i_status != THREAD_READY) && (i_status != THREAD_ERROR)
                 && (i_status != THREAD_FATAL) );
-        if( i_status != THREAD_READY )
-        {
-            return( NULL );
-        }
     }
+#endif
+
     return( p_input );
 }
 
 /*****************************************************************************
- * input_DestroyThread: mark an input thread as zombie
+ * input_StopThread: mark an input thread as zombie
  *****************************************************************************
  * This function should not return until the thread is effectively cancelled.
  *****************************************************************************/
-void input_DestroyThread( input_thread_t *p_input, int *pi_status )
+void input_StopThread( input_thread_t *p_input, int *pi_status )
 {
-    int         i_status;                                   /* thread status */
-
-    /* Set status */
-    p_input->pi_status = (pi_status != NULL) ? pi_status : &i_status;
-    *p_input->pi_status = THREAD_DESTROY;
+    /* Make the thread exit from a possible vlc_cond_wait() */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
 
     /* Request thread destruction */
     p_input->b_die = 1;
 
-    /* Make the thread exit from a possible vlc_cond_wait() */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
     vlc_cond_signal( &p_input->stream.stream_wait );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* If status is NULL, wait until thread has been destroyed */
+#if 0
     if( pi_status == NULL )
     {
         do
@@ -242,6 +239,25 @@ void input_DestroyThread( input_thread_t *p_input, int *pi_status )
         } while ( (i_status != THREAD_OVER) && (i_status != THREAD_ERROR)
                   && (i_status != THREAD_FATAL) );
     }
+#endif
+}
+
+/*****************************************************************************
+ * input_DestroyThread: mark an input thread as zombie
+ *****************************************************************************
+ * This function should not return until the thread is effectively cancelled.
+ *****************************************************************************/
+void input_DestroyThread( input_thread_t *p_input )
+{
+    /* Join the thread */
+    vlc_thread_join( p_input->thread_id );
+
+    /* Destroy Mutex locks */
+    vlc_mutex_destroy( &p_input->stream.control.control_lock );
+    vlc_mutex_destroy( &p_input->stream.stream_lock );
+    
+    /* Free input structure */
+    free( p_input );
 }
 
 /*****************************************************************************
@@ -254,12 +270,14 @@ static void RunThread( input_thread_t *p_input )
     if( InitThread( p_input ) )
     {
         /* If we failed, wait before we are killed, and exit */
-        *p_input->pi_status = THREAD_ERROR;
+        p_input->i_status = THREAD_ERROR;
         p_input->b_error = 1;
         ErrorThread( p_input );
         DestroyThread( p_input );
         return;
     }
+
+    p_input->i_status = THREAD_READY;
 
     /* initialization is complete */
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -507,8 +525,6 @@ static int InitThread( input_thread_t * p_input )
         return( -1 );
     }
 
-    *p_input->pi_status = THREAD_READY;
-
     return( 0 );
 }
 
@@ -531,11 +547,8 @@ static void ErrorThread( input_thread_t *p_input )
  *****************************************************************************/
 static void EndThread( input_thread_t * p_input )
 {
-    int *       pi_status;                                  /* thread status */
-
     /* Store status */
-    pi_status = p_input->pi_status;
-    *pi_status = THREAD_END;
+    p_input->i_status = THREAD_END;
 
     if( p_main->b_stats )
     {
@@ -605,20 +618,8 @@ static void CloseThread( input_thread_t * p_input )
  *****************************************************************************/
 static void DestroyThread( input_thread_t * p_input )
 {
-    int *       pi_status;                                  /* thread status */
-
-    /* Store status */
-    pi_status = p_input->pi_status;
-
-    /* Destroy Mutex locks */
-    vlc_mutex_destroy( &p_input->stream.control.control_lock );
-    vlc_mutex_destroy( &p_input->stream.stream_lock );
-    
-    /* Free input structure */
-    free( p_input );
-
     /* Update status */
-    *pi_status = THREAD_OVER;
+    p_input->i_status = THREAD_OVER;
 }
 
 /*****************************************************************************

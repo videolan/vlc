@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.6 2002/01/07 02:12:29 sam Exp $
+ * $Id: gnome.c,v 1.7 2002/01/09 02:01:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -329,53 +329,56 @@ static gint GnomeManage( gpointer p_data )
     {
         vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
 
-        /* New input or stream map change */
-        if( p_input_bank->pp_input[0]->stream.b_changed )
+        if( !p_input_bank->pp_input[0]->b_die )
         {
-            GtkModeManage( p_intf );
-            GtkSetupMenus( p_intf );
-            p_intf->p_sys->b_playing = 1;
-        }
+            /* New input or stream map change */
+            if( p_input_bank->pp_input[0]->stream.b_changed )
+            {
+                GtkModeManage( p_intf );
+                GtkSetupMenus( p_intf );
+                p_intf->p_sys->b_playing = 1;
+            }
 
-        /* Manage the slider */
-        if( p_input_bank->pp_input[0]->stream.b_seekable )
-        {
-            float           newvalue;
-            newvalue = p_intf->p_sys->p_adj->value;
+            /* Manage the slider */
+            if( p_input_bank->pp_input[0]->stream.b_seekable )
+            {
+                float           newvalue;
+                newvalue = p_intf->p_sys->p_adj->value;
     
 #define p_area p_input_bank->pp_input[0]->stream.p_selected_area
-            /* If the user hasn't touched the slider since the last time,
-             * then the input can safely change it */
-            if( newvalue == p_intf->p_sys->f_adj_oldvalue )
-            {
-                /* Update the value */
-                p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue =
-                    ( 100. * p_area->i_tell ) / p_area->i_size;
+                /* If the user hasn't touched the slider since the last time,
+                 * then the input can safely change it */
+                if( newvalue == p_intf->p_sys->f_adj_oldvalue )
+                {
+                    /* Update the value */
+                    p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue =
+                        ( 100. * p_area->i_tell ) / p_area->i_size;
     
-                gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
-                                         "value_changed" );
-            }
-            /* Otherwise, send message to the input if the user has
-             * finished dragging the slider */
-            else if( p_intf->p_sys->b_slider_free )
-            {
-                off_t i_seek = ( newvalue * p_area->i_size ) / 100;
+                    gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
+                                             "value_changed" );
+                }
+                /* Otherwise, send message to the input if the user has
+                 * finished dragging the slider */
+                else if( p_intf->p_sys->b_slider_free )
+                {
+                    off_t i_seek = ( newvalue * p_area->i_size ) / 100;
+        
+                    vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+                    input_Seek( p_input_bank->pp_input[0], i_seek );
+                    vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
     
-                vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
-                input_Seek( p_input_bank->pp_input[0], i_seek );
-                vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
-    
-                /* Update the old value */
-                p_intf->p_sys->f_adj_oldvalue = newvalue;
-            }
+                    /* Update the old value */
+                    p_intf->p_sys->f_adj_oldvalue = newvalue;
+                }
 #undef p_area
-        }
+            }
 
-        if( p_intf->p_sys->i_part !=
-            p_input_bank->pp_input[0]->stream.p_selected_area->i_part )
-        {
-            p_intf->p_sys->b_chapter_update = 1;
-            GtkSetupMenus( p_intf );
+            if( p_intf->p_sys->i_part !=
+                p_input_bank->pp_input[0]->stream.p_selected_area->i_part )
+            {
+                p_intf->p_sys->b_chapter_update = 1;
+                GtkSetupMenus( p_intf );
+            }
         }
 
         vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );

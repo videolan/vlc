@@ -948,7 +948,7 @@ AC_ARG_ENABLE(mga,
   [  --enable-mga            Linux kernel Matrox support (default disabled)],
   [ if test x$enable_mga = xyes
     then
-      PLUGINS="${PLUGINS} mga"
+      PLUGINS="${PLUGINS} mga xmga"
     fi ])
 
 dnl

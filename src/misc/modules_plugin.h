@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.3 2002/01/07 02:12:30 sam Exp $
+ * $Id: modules_plugin.h,v 1.4 2002/01/09 02:01:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -174,6 +174,7 @@ module_error( void )
     (p_symbols)->intf_PlaylistDestroy = intf_PlaylistDestroy; \
     (p_symbols)->intf_PlaylistJumpto = intf_PlaylistJumpto; \
     (p_symbols)->intf_UrlDecode = intf_UrlDecode; \
+    (p_symbols)->intf_Eject = intf_Eject; \
     (p_symbols)->msleep = msleep; \
     (p_symbols)->mdate = mdate; \
     (p_symbols)->network_ChannelCreate = network_ChannelCreate; \

@@ -142,6 +142,26 @@
 
 	    <widget>
 	      <class>GtkMenuItem</class>
+	      <name>menubar_eject</name>
+	      <tooltip>Eject disc</tooltip>
+	      <signal>
+		<name>activate</name>
+		<handler>GtkEjectDiscActivate</handler>
+		<data>&quot;intf_window&quot;</data>
+		<last_modification_time>Fri, 21 Dec 2001 12:51:34 GMT</last_modification_time>
+	      </signal>
+	      <label>_Eject Disc</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>separator14</name>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
 	      <name>menubar_exit</name>
 	      <tooltip>Exit the program</tooltip>
 	      <accelerator>
@@ -439,6 +459,19 @@
 	    <last_modification_time>Sun, 13 May 2001 15:10:57 GMT</last_modification_time>
 	  </signal>
 	  <label>Stop</label>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_eject</name>
+	  <signal>
+	    <name>button_press_event</name>
+	    <handler>GtkDiscEject</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Fri, 21 Dec 2001 15:33:26 GMT</last_modification_time>
+	  </signal>
+	  <label>Eject</label>
 	</widget>
 
 	<widget>

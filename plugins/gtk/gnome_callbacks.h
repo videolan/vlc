@@ -11,7 +11,11 @@ GnomeMenubarDiscOpenActivate           (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-GnomeMenbarNetworkOpenActivate         (GtkMenuItem     *menuitem,
+GnomeMenubarNetworkOpenActivate         (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+GnomeMenubarDiscEjectActivate         (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
@@ -141,3 +145,4 @@ GtkNetworkOpenBroadcast                (GtkToggleButton *togglebutton,
 void
 GtkNetworkOpenChannel                  (GtkToggleButton *togglebutton,
                                         gpointer         user_data);
+

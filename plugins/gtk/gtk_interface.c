@@ -29,6 +29,8 @@ create_intf_window (void)
   GtkWidget *menubar_disc;
   GtkWidget *menubar_network;
   GtkWidget *separator4;
+  GtkWidget *menubar_eject;
+  GtkWidget *separator14;
   GtkWidget *menubar_exit;
   GtkWidget *menubar_view;
   GtkWidget *menubar_view_menu;
@@ -60,6 +62,7 @@ create_intf_window (void)
   GtkWidget *toolbar_network;
   GtkWidget *toolbar_back;
   GtkWidget *toolbar_stop;
+  GtkWidget *toolbar_eject;
   GtkWidget *toolbar_play;
   GtkWidget *toolbar_pause;
   GtkWidget *toolbar_slow;
@@ -195,6 +198,26 @@ create_intf_window (void)
   gtk_widget_show (separator4);
   gtk_container_add (GTK_CONTAINER (menubar_file_menu), separator4);
   gtk_widget_set_sensitive (separator4, FALSE);
+
+  menubar_eject = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_eject)->child),
+                                   _("_Eject Disc"));
+  gtk_widget_add_accelerator (menubar_eject, "activate_item", menubar_file_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (menubar_eject);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_eject", menubar_eject,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (menubar_eject);
+  gtk_container_add (GTK_CONTAINER (menubar_file_menu), menubar_eject);
+  gtk_tooltips_set_tip (tooltips, menubar_eject, _("Eject disc"), NULL);
+
+  separator14 = gtk_menu_item_new ();
+  gtk_widget_ref (separator14);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator14", separator14,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (separator14);
+  gtk_container_add (GTK_CONTAINER (menubar_file_menu), separator14);
+  gtk_widget_set_sensitive (separator14, FALSE);
 
   menubar_exit = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_exit)->child),
@@ -500,6 +523,17 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_stop);
 
+  toolbar_eject = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Eject"),
+                                NULL, NULL,
+                                NULL, NULL, NULL);
+  gtk_widget_ref (toolbar_eject);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_eject", toolbar_eject,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (toolbar_eject);
+
   toolbar_play = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
@@ -776,6 +810,9 @@ create_intf_window (void)
   gtk_signal_connect (GTK_OBJECT (menubar_network), "activate",
                       GTK_SIGNAL_FUNC (GtkNetworkOpenActivate),
                       "intf_window");
+  gtk_signal_connect (GTK_OBJECT (menubar_eject), "activate",
+                      GTK_SIGNAL_FUNC (GtkEjectDiscActivate),
+                      "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_exit), "activate",
                       GTK_SIGNAL_FUNC (GtkExitActivate),
                       "intf_window");
@@ -811,6 +848,9 @@ create_intf_window (void)
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (toolbar_stop), "button_press_event",
                       GTK_SIGNAL_FUNC (GtkControlStop),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_eject), "button_press_event",
+                      GTK_SIGNAL_FUNC (GtkDiscEject),
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (toolbar_play), "button_press_event",
                       GTK_SIGNAL_FUNC (GtkControlPlay),

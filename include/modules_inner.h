@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.10 2001/12/30 07:09:54 sam Exp $
+ * $Id: modules_inner.h,v 1.11 2002/01/09 02:01:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -56,15 +56,15 @@
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
 #ifdef BUILTIN
-#   define _M( function )  CONCATENATE( function, MODULE_NAME )
-#   define _X( function )  CONCATENATE( function, MODULE_NAME )
-#   define DECLARE_SYMBOLS ;
-#   define STORE_SYMBOLS   ;
+#   define _M( function )          CONCATENATE( function, MODULE_NAME )
+#   define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_NAME )
+#   define DECLARE_SYMBOLS         ;
+#   define STORE_SYMBOLS           ;
 #else
-#   define _M( function )  function
-#   define _X( function )  CONCATENATE( function, MODULE_SYMBOL )
-#   define DECLARE_SYMBOLS module_symbols_t* p_symbols;
-#   define STORE_SYMBOLS   p_symbols = p_module->p_symbols;
+#   define _M( function )          function
+#   define __VLC_SYMBOL( symbol  ) CONCATENATE( symbol, MODULE_SYMBOL )
+#   define DECLARE_SYMBOLS         module_symbols_t* p_symbols;
+#   define STORE_SYMBOLS           p_symbols = p_module->p_symbols;
 #endif
 
 #define MODULE_STRING STRINGIFY( MODULE_NAME )
@@ -75,7 +75,7 @@
  * instance the module name, its shortcuts, its capabilities...
  */
 #define MODULE_INIT_START                                                     \
-    int _X( InitModule ) ( module_t *p_module )                               \
+    int __VLC_SYMBOL( InitModule ) ( module_t *p_module )                     \
     {                                                                         \
         int i_shortcut = 0;                                                   \
         p_module->psz_name = MODULE_STRING;                                   \
@@ -115,7 +115,7 @@
 #define MODULE_ACTIVATE_START                                                 \
     DECLARE_SYMBOLS;                                                          \
                                                                               \
-    int _X( ActivateModule ) ( module_t *p_module )                           \
+    int __VLC_SYMBOL( ActivateModule ) ( module_t *p_module )                 \
     {                                                                         \
         p_module->p_functions =                                               \
           ( module_functions_t * )malloc( sizeof( module_functions_t ) );     \
@@ -136,7 +136,7 @@
  * here.
  */
 #define MODULE_DEACTIVATE_START                                               \
-    int _X( DeactivateModule )( module_t *p_module )                          \
+    int __VLC_SYMBOL( DeactivateModule )( module_t *p_module )                \
     {                                                                         \
         free( p_module->p_functions );
 

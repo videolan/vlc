@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.11 2002/01/07 02:12:29 sam Exp $
+ * $Id: gtk_display.c,v 1.12 2002/01/09 02:01:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -225,6 +225,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
 
     /* set control items */
     gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_back"), FALSE );
+    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_eject"), !b_control);
     gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_pause"), b_control );
     gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_slow"), b_control );
     gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_fast"), b_control );

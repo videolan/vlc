@@ -32,8 +32,16 @@ static GnomeUIInfo menubar_file_menu_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("_Network Stream..."),
     N_("Select a Network Stream"),
-    (gpointer) GnomeMenbarNetworkOpenActivate, NULL, NULL,
+    (gpointer) GnomeMenubarNetworkOpenActivate, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_REFRESH,
+    0, (GdkModifierType) 0, NULL
+  },
+  GNOMEUIINFO_SEPARATOR,
+  {
+    GNOME_APP_UI_ITEM, N_("_Eject Disc"),
+    N_("Eject disc"),
+    (gpointer) GnomeMenubarDiscEjectActivate, NULL, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_TOP,
     0, (GdkModifierType) 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
@@ -145,6 +153,7 @@ create_intf_window (void)
   GtkWidget *toolbar_network;
   GtkWidget *toolbar_back;
   GtkWidget *toolbar_stop;
+  GtkWidget *toolbar_eject;
   GtkWidget *toolbar_play;
   GtkWidget *toolbar_pause;
   GtkWidget *toolbar_slow;
@@ -220,8 +229,18 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_file_menu_uiinfo[4].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_exit",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_eject",
                             menubar_file_menu_uiinfo[4].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (menubar_file_menu_uiinfo[5].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator15",
+                            menubar_file_menu_uiinfo[5].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (menubar_file_menu_uiinfo[6].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_exit",
+                            menubar_file_menu_uiinfo[6].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_uiinfo[1].widget);
@@ -389,6 +408,18 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_stop", toolbar_stop,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_stop);
+
+  tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_TOP);
+  toolbar_eject = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Eject"),
+                                _("Eject disc"), NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_eject);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_eject", toolbar_eject,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (toolbar_eject);
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_FORWARD);
   toolbar_play = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
@@ -681,6 +712,9 @@ create_intf_window (void)
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (toolbar_stop), "button_press_event",
                       GTK_SIGNAL_FUNC (GtkControlStop),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_eject), "button_press_event",
+                      GTK_SIGNAL_FUNC (GtkDiscEject),
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (toolbar_play), "button_press_event",
                       GTK_SIGNAL_FUNC (GtkControlPlay),

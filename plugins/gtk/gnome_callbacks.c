@@ -30,12 +30,18 @@ GnomeMenubarDiscOpenActivate           (GtkMenuItem     *menuitem,
 
 
 void
-GnomeMenbarNetworkOpenActivate         (GtkMenuItem     *menuitem,
+GnomeMenubarNetworkOpenActivate         (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
     GtkNetworkOpenShow( GTK_WIDGET( menuitem ), NULL, "intf_window" );
 }
 
+void
+GnomeMenubarDiscEjectActivate           (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+     GtkDiscEject( GTK_WIDGET( menuitem ), NULL, "intf_window" );
+}
 
 void
 GnomeMenubarExitActivate               (GtkMenuItem     *menuitem,
@@ -259,6 +265,3 @@ GnomePopupJumpActivate                 (GtkMenuItem     *menuitem,
 {
     GtkJumpShow( GTK_WIDGET( menuitem ), NULL, "intf_popup" );
 }
-
-
-

@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dummy.c,v 1.12 2002/01/04 14:01:34 sam Exp $
+ * $Id: input_dummy.c,v 1.13 2002/01/09 02:01:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -89,10 +89,10 @@ static int DummyProbe( probedata_t *p_data )
     if( ( strlen(psz_name) > 4 ) && !strncasecmp( psz_name, "vlc:", 4 ) )
     {
         /* If the user specified "vlc:" then it's probably a file */
-        return( 100 );
+        return( 1 );
     }
 
-    return( 1 );
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -153,7 +153,6 @@ static void DummyOpen( input_thread_t * p_input )
     }
 
     intf_ErrMsg( "input error: unknown command `%s'", psz_name );
-
 }
 
 /*****************************************************************************

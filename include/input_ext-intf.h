@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.56 2002/01/07 02:12:29 sam Exp $
+ * $Id: input_ext-intf.h,v 1.57 2002/01/09 02:01:14 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -259,7 +259,7 @@ typedef struct input_thread_s
     boolean_t               b_error;
     boolean_t               b_eof;
     vlc_thread_t            thread_id;            /* id for thread functions */
-    int *                   pi_status;              /* temporary status flag */
+    int                     i_status;                         /* status flag */
 
     /* Input module */
     struct module_s *       p_input_module;
@@ -343,7 +343,8 @@ void   input_EndBank        ( void );
 
 struct input_thread_s * input_CreateThread ( struct playlist_item_s *,
                                              int *pi_status );
-void   input_DestroyThread  ( struct input_thread_s *, int *pi_status );
+void   input_StopThread     ( struct input_thread_s *, int *pi_status );
+void   input_DestroyThread  ( struct input_thread_s * );
 
 void   input_SetStatus      ( struct input_thread_s *, int );
 void   input_Seek           ( struct input_thread_s *, off_t );

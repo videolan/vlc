@@ -93,7 +93,6 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GnomeMenubarFileOpenActivate</handler>
-		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Sat, 19 May 2001 16:27:02 GMT</last_modification_time>
 	      </signal>
 	      <label>_Open File...</label>
@@ -108,7 +107,6 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GnomeMenubarDiscOpenActivate</handler>
-		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Sat, 19 May 2001 16:27:10 GMT</last_modification_time>
 	      </signal>
 	      <label>Open _Disc...</label>
@@ -122,9 +120,8 @@
 	      <tooltip>Select a Network Stream</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenbarNetworkOpenActivate</handler>
-		<data>&quot;intf_window&quot;</data>
-		<last_modification_time>Sat, 19 May 2001 16:27:39 GMT</last_modification_time>
+		<handler>GnomeMenubarNetworkOpenActivate</handler>
+		<last_modification_time>Fri, 21 Dec 2001 13:11:28 GMT</last_modification_time>
 	      </signal>
 	      <label>_Network Stream...</label>
 	      <right_justify>False</right_justify>
@@ -139,11 +136,30 @@
 
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
+	      <name>menubar_eject</name>
+	      <tooltip>Eject disc</tooltip>
+	      <signal>
+		<name>activate</name>
+		<handler>GnomeMenubarDiscEjectActivate</handler>
+		<last_modification_time>Fri, 21 Dec 2001 13:11:28 GMT</last_modification_time>
+	      </signal>
+	      <label>_Eject Disc</label>
+	      <right_justify>False</right_justify>
+	      <stock_icon>GNOME_STOCK_MENU_TOP</stock_icon>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>separator15</name>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
 	      <name>menubar_exit</name>
 	      <signal>
 		<name>activate</name>
 		<handler>GnomeMenubarExitActivate</handler>
-		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Sat, 19 May 2001 16:27:52 GMT</last_modification_time>
 	      </signal>
 	      <stock_item>GNOMEUIINFO_MENU_EXIT_ITEM</stock_item>
@@ -166,7 +182,6 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GnomeMenubarWindowToggleActivate</handler>
-		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Sat, 19 May 2001 16:28:06 GMT</last_modification_time>
 	      </signal>
 	      <label>_Hide interface</label>
@@ -179,7 +194,6 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GnomeMenubarFullscreenActivate</handler>
-		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Sat, 19 May 2001 16:28:15 GMT</last_modification_time>
 	      </signal>
 	      <label>_Fullscreen</label>
@@ -232,7 +246,6 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GnomeMenubarPlaylistActivate</handler>
-		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Sat, 19 May 2001 16:28:41 GMT</last_modification_time>
 	      </signal>
 	      <label>_Playlist...</label>
@@ -248,7 +261,6 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GnomeMenubarModulesActivate</handler>
-		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Sat, 19 May 2001 16:28:53 GMT</last_modification_time>
 	      </signal>
 	      <label>_Modules...</label>
@@ -297,7 +309,6 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GnomeMenubarPreferencesActivate</handler>
-		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Sat, 19 May 2001 16:29:03 GMT</last_modification_time>
 	      </signal>
 	      <stock_item>GNOMEUIINFO_MENU_PREFERENCES_ITEM</stock_item>
@@ -320,7 +331,6 @@
 	      <signal>
 		<name>activate</name>
 		<handler>GnomeMenubarAboutActivate</handler>
-		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Sat, 19 May 2001 16:29:19 GMT</last_modification_time>
 	      </signal>
 	      <stock_item>GNOMEUIINFO_MENU_ABOUT_ITEM</stock_item>
@@ -432,6 +442,21 @@
 	  </signal>
 	  <label>Stop</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_STOP</stock_pixmap>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_eject</name>
+	  <tooltip>Eject disc</tooltip>
+	  <signal>
+	    <name>button_press_event</name>
+	    <handler>GtkDiscEject</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Fri, 21 Dec 2001 15:24:18 GMT</last_modification_time>
+	  </signal>
+	  <label>Eject</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_TOP</stock_pixmap>
 	</widget>
 
 	<widget>

@@ -6439,7 +6439,7 @@ if test "${enable_mga+set}" = set; then
   enableval="$enable_mga"
    if test x$enable_mga = xyes
     then
-      PLUGINS="${PLUGINS} mga"
+      PLUGINS="${PLUGINS} mga xmga"
     fi 
 fi
 

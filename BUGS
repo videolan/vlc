@@ -1,5 +1,5 @@
 List of known vlc bugs
-$Id: BUGS,v 1.3 2002/01/05 16:09:49 sam Exp $
+$Id: BUGS,v 1.4 2002/01/09 02:01:14 sam Exp $
 
    Please try to keep this file up to date. Also, grep for FIXME in the
 source files for more and more bugs to fix.
@@ -17,10 +17,7 @@ Core:
 
 Input:
 
-  * There is a memory leak in the input because the input thread is
-  never joined for termination.
-
-  * vlc:foo targets don't work anymore.
+  -
 
 
 Audio output:
@@ -36,8 +33,6 @@ Video output:
   * Subtitle colors are just plain wrong.
 
   * The DirectX video output plugin is broken because of vout4.
-
-  * The GGI video output plugin is broken because of vout4.
 
   * The BeOS video output plugin is broken because of vout4.
 
@@ -68,4 +63,9 @@ Gtk interface:
   crash.
 
   * Saving preferences does not work at all.
+
+
+Misc:
+
+  * The Jin-Roh DVD seems to segfault.
 
