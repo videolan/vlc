@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.32 2003/09/07 22:48:29 fenrir Exp $
+ * $Id: libmp4.c,v 1.33 2003/09/08 00:35:16 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,10 +20,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <stdarg.h>
-#include <string.h>                                              /* strdup() */
-#include <errno.h>
-#include <sys/types.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
@@ -37,8 +33,6 @@
 /*****************************************************************************
  * Here are defined some macro to make life simpler but before using it
  *  *look* at the code.
- *
- *  XXX: All macro are written in capital letters
  *
  *****************************************************************************/
 #define MP4_BOX_HEADERSIZE( p_box ) \
@@ -122,16 +116,14 @@
 
 */
 
-static uint32_t Get24bBE( uint8_t *p_buff )
+static uint32_t Get24bBE( uint8_t *p )
 {
-    return( ( p_buff[0] <<16 ) + ( p_buff[1] <<8 ) + p_buff[2] );
+    return( ( p[0] <<16 ) + ( p[1] <<8 ) + p[2] );
 }
 
 static void GetUUID( UUID_t *p_uuid, uint8_t *p_buff )
 {
-    memcpy( p_uuid,
-            p_buff,
-            16 );
+    memcpy( p_uuid, p_buff, 16 );
 }
 
 static void CreateUUID( UUID_t *p_uuid, uint32_t i_fourcc )
@@ -143,39 +135,28 @@ static void CreateUUID( UUID_t *p_uuid, uint32_t i_fourcc )
 
 /* some functions for mp4 encoding of variables */
 
-void MP4_ConvertDate2Str( char *psz, uint64_t i_date )
+static void MP4_ConvertDate2Str( char *psz, uint64_t i_date )
 {
     int i_day;
     int i_hour;
     int i_min;
     int i_sec;
 
+    /* date begin at 1 jan 1904 */
+    i_date += ((1904ULL * 365) + 17) * 24 * 60 * 60;
+
     i_day = i_date / ( 60*60*24);
     i_hour = ( i_date /( 60*60 ) ) % 60;
     i_min  = ( i_date / 60 ) % 60;
     i_sec =  i_date % 60;
-    /* FIXME do it correctly, date begin at 1 jan 1904 */
     sprintf( psz, "%dd-%2.2dh:%2.2dm:%2.2ds",
                    i_day, i_hour, i_min, i_sec );
 }
 
-#if 0
-static void DataDump( uint8_t *p_data, int i_data )
-{
-    int i;
-    fprintf( stderr, "\nDumping %d bytes\n", i_data );
-    for( i = 0; i < i_data; i++ )
-    {
-        int c;
-
-        c = p_data[i];
-        if( c < 32 || c > 127 ) c = '.';
-        fprintf( stderr, "%c", c );
-        if( i % 60 == 59 ) fprintf( stderr, "\n" );
-    }
-    fprintf( stderr, "\n" );
-}
-#endif
+/*****************************************************************************
+ * Some prototypes.
+ *****************************************************************************/
+static MP4_Box_t *MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_father );
 
 /*****************************************************************************
  * Some basic functions to manipulate stream more easily in vlc
@@ -187,7 +168,7 @@ static void DataDump( uint8_t *p_data, int i_data )
  * MP4_ReadData read data from the file in a buffer
  *
  *****************************************************************************/
-off_t MP4_TellAbsolute( input_thread_t *p_input )
+static off_t MP4_TellAbsolute( input_thread_t *p_input )
 {
     off_t i_pos;
 
@@ -200,8 +181,7 @@ off_t MP4_TellAbsolute( input_thread_t *p_input )
     return( i_pos );
 }
 
-int MP4_SeekAbsolute( input_thread_t *p_input,
-                      off_t i_pos)
+static int MP4_SeekAbsolute( input_thread_t *p_input, off_t i_pos)
 {
     off_t i_filepos;
 
@@ -267,7 +247,7 @@ int MP4_SeekAbsolute( input_thread_t *p_input,
 }
 
 /* return 1 if success, 0 if fail */
-int MP4_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
+static int MP4_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
 {
     data_packet_t *p_data;
 
@@ -462,7 +442,7 @@ int MP4_SeekStream( MP4_Stream_t *p_stream, off_t i_pos)
  *
  * RETURN : 0 if it fail, 1 otherwise
  *****************************************************************************/
-int MP4_ReadBoxCommon( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBoxCommon( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     int      i_read;
     uint8_t  *p_peek;
@@ -523,7 +503,7 @@ int MP4_ReadBoxCommon( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
  *****************************************************************************
  * if p_box == NULL, go to the next box in witch we are( at the begining ).
  *****************************************************************************/
-int MP4_NextBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_NextBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_Box_t box;
 
@@ -549,16 +529,6 @@ int MP4_NextBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     }
     return( MP4_SeekStream( p_stream, p_box->i_size + p_box->i_pos ) ? 0 : 1 );
 }
-/*****************************************************************************
- * MP4_MP4_GotoBox : Go to this particular box
- *****************************************************************************
- * RETURN : 0 if it fail, 1 otherwise
- *****************************************************************************/
-int MP4_GotoBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
-{
-    return( MP4_SeekStream( p_stream, p_box->i_pos ) ? 0 : 1 );
-}
-
 
 /*****************************************************************************
  * For all known box a loader is given,
@@ -579,29 +549,21 @@ static int MP4_ReadBoxContainerRaw( MP4_Stream_t *p_stream, MP4_Box_t *p_contain
 
     do
     {
-        p_box = malloc( sizeof( MP4_Box_t ) );
-
-        if( MP4_ReadBox( p_stream, p_box , p_container ) )
+        if( ( p_box = MP4_ReadBox( p_stream, p_container ) ) == NULL )
         {
-            /* chain this box with the father and the other at same level */
-            if( !p_container->p_first )
-            {
-                p_container->p_first = p_box;
-            }
-            else
-            {
-                p_container->p_last->p_next = p_box;
-            }
-            p_container->p_last = p_box;
+            break;
+        }
+        /* chain this box with the father and the other at same level */
+        if( !p_container->p_first )
+        {
+            p_container->p_first = p_box;
         }
         else
         {
-            /* free memory */
-            free( p_box );
-            break;
+            p_container->p_last->p_next = p_box;
         }
-
-    }while( MP4_NextBox( p_stream, p_box ) == 1 );
+        p_container->p_last = p_box;
+    } while( MP4_NextBox( p_stream, p_box ) == 1 );
 
     return( 1 );
 }
@@ -1804,7 +1766,6 @@ static void MP4_FreeBox_cmvd( MP4_Box_t *p_box )
 static int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_Stream_t *p_stream_memory;
-    MP4_Box_t *p_umov;
 
     MP4_Box_t *p_dcom;
     MP4_Box_t *p_cmvd;
@@ -1834,9 +1795,9 @@ static int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
         return( 0 );
     }
 
-    if( !( p_dcom = MP4_FindBox( p_box, FOURCC_dcom ) )||
-        !( p_cmvd = MP4_FindBox( p_box, FOURCC_cmvd ) )||
-        !( p_cmvd->data.p_cmvd->p_data ) )
+    if( ( p_dcom = MP4_BoxGet( p_box, "dcom" ) ) == NULL ||
+        ( p_cmvd = MP4_BoxGet( p_box, "cmvd" ) ) == NULL ||
+        p_cmvd->data.p_cmvd->p_data == NULL )
     {
         msg_Warn( p_stream->p_input, "Read Box: \"cmov\" incomplete" );
         return( 1 );
@@ -1913,27 +1874,21 @@ static int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     msg_Dbg( p_stream->p_input,
              "Read Box: \"cmov\" box succesfully uncompressed" );
 
-    //DataDump( p_data, p_cmvd->data.p_cmvd->i_uncompressed_size );
     /* now create a memory stream */
     p_stream_memory = MP4_MemoryStream( p_stream->p_input,
                                         p_cmvd->data.p_cmvd->i_uncompressed_size,
                                         p_cmvd->data.p_cmvd->p_data );
 
-    //DataDump( p_stream_memory->p_buffer, p_stream_memory->i_stop );
-
     /* and read uncompressd moov */
-    p_umov = malloc( sizeof( MP4_Box_t ) );
+    p_box->data.p_cmov->p_moov = MP4_ReadBox( p_stream_memory, NULL );
 
-    i_result = MP4_ReadBox( p_stream_memory, p_umov, NULL );
-
-    p_box->data.p_cmov->p_moov = p_umov;
     free( p_stream_memory );
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream->p_input,
              "Read Box: \"cmov\" compressed movie header completed" );
 #endif
-    return( i_result );
+    return( p_box->data.p_cmov->p_moov ? 1 : 0 );
 #endif /* HAVE_ZLIB_H */
 }
 
@@ -2171,20 +2126,22 @@ static struct
  * MP4_ReadBox : parse the actual box and the children
  *  XXX : Do not go to the next box
  *****************************************************************************/
-int MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father )
+static MP4_Box_t *MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_father )
 {
-    int i_result;
+    MP4_Box_t    *p_box = malloc( sizeof( MP4_Box_t ) );
     unsigned int i_index;
 
     if( !MP4_ReadBoxCommon( p_stream, p_box ) )
     {
         msg_Warn( p_stream->p_input, "Cannot read one box" );
-        return( 0 );
+        free( p_box );
+        return NULL;
     }
     if( !p_box->i_size )
     {
         msg_Dbg( p_stream->p_input, "Found an empty box (null size)" );
-        return( 0 );
+        free( p_box );
+        return NULL;
     }
     p_box->p_father = p_father;
 
@@ -2202,123 +2159,15 @@ int MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father )
         msg_Warn( p_stream->p_input,
                   "Unknown box type %4.4s (uncompletetly loaded)",
                   (char*)&p_box->i_type );
-        return( 1 );
     }
-    else
+    else if( !(MP4_Box_Function[i_index].MP4_ReadBox_function)( p_stream, p_box ) )
     {
-        i_result =
-           (MP4_Box_Function[i_index].MP4_ReadBox_function)( p_stream, p_box );
+        free( p_box );
+        return NULL;
     }
 
-    return( i_result );
+    return p_box;
 }
-
-#if 0
-/*****************************************************************************
- * MP4_CountBox: given a box, count how many child have the requested type
- * FIXME : support GUUID
- *****************************************************************************/
-int MP4_CountBox( MP4_Box_t *p_box, uint32_t i_type )
-{
-    unsigned int i_count;
-    MP4_Box_t *p_child;
-
-    if( !p_box )
-    {
-        return( 0 );
-    }
-
-    i_count = 0;
-    p_child = p_box->p_first;
-    while( p_child )
-    {
-        if( p_child->i_type == i_type )
-        {
-            i_count++;
-        }
-        p_child = p_child->p_next;
-    }
-
-    return( i_count );
-}
-#endif
-
-/*****************************************************************************
- * MP4_FindBox:  find first box with i_type child of p_box
- *      return NULL if not found
- *****************************************************************************/
-
-MP4_Box_t *MP4_FindBox( MP4_Box_t *p_box, uint32_t i_type )
-{
-    MP4_Box_t *p_child;
-
-    if( !p_box )
-    {
-        return( NULL );
-    }
-
-    p_child = p_box->p_first;
-    while( p_child )
-    {
-        if( p_child->i_type == i_type )
-        {
-            return( p_child );
-        }
-        p_child = p_child->p_next;
-    }
-
-    return( NULL );
-}
-
-
-#if 0
-/*****************************************************************************
- * MP4_FindNextBox:  find next box with thesame type and at the same level
- *                  than p_box
- *****************************************************************************/
-MP4_Box_t *MP4_FindNextBox( MP4_Box_t *p_box )
-{
-    MP4_Box_t *p_next;
-
-    if( !p_box )
-    {
-        return( NULL );
-    }
-
-    p_next = p_box->p_next;
-    while( p_next )
-    {
-        if( p_next->i_type == p_box->i_type )
-        {
-            return( p_next );
-        }
-        p_next = p_next->p_next;
-    }
-    return( NULL );
-}
-/*****************************************************************************
- * MP4_FindNbBox:  find the box i_number
- *****************************************************************************/
-MP4_Box_t *MP4_FindNbBox( MP4_Box_t *p_box, uint32_t i_number )
-{
-    MP4_Box_t *p_child = p_box->p_first;
-
-    if( !p_child )
-    {
-        return( NULL );
-    }
-
-    while( i_number )
-    {
-        if( !( p_child = p_child->p_next ) )
-        {
-            return( NULL );
-        }
-        i_number--;
-    }
-    return( p_child );
-}
-#endif
 
 /*****************************************************************************
  * MP4_FreeBox : free memory after read with MP4_ReadBox and all
@@ -2327,21 +2176,19 @@ MP4_Box_t *MP4_FindNbBox( MP4_Box_t *p_box, uint32_t i_number )
 void MP4_BoxFree( input_thread_t *p_input, MP4_Box_t *p_box )
 {
     unsigned int i_index;
-
-    MP4_Box_t *p_child;
-    MP4_Box_t *p_next;
+    MP4_Box_t    *p_child;
 
     if( !p_box )
     {
         return; /* hehe */
     }
-    p_child = p_box->p_first;
-    while( p_child )
+
+    for( p_child = p_box->p_first; p_child != NULL; )
     {
+        MP4_Box_t *p_next;
+
         p_next = p_child->p_next;
         MP4_BoxFree( p_input, p_child );
-        /* MP4_FreeBoxChildren have free all data expect p_child itself */
-        free( p_child );
         p_child = p_next;
     }
 
@@ -2369,12 +2216,9 @@ void MP4_BoxFree( input_thread_t *p_input, MP4_Box_t *p_box )
         }
 
         free( p_box->data.p_data );
-        p_box->data.p_data = NULL;
     }
 
-    p_box->p_first = NULL;
-    p_box->p_last = NULL;
-
+    free( p_box );
 }
 
 /*****************************************************************************
@@ -2383,12 +2227,13 @@ void MP4_BoxFree( input_thread_t *p_input, MP4_Box_t *p_box )
  *  The first box is a virtual box "root" and is the father for all first
  *  level boxes for the file, a sort of virtual contener
  *****************************************************************************/
-int MP4_BoxGetRoot( input_thread_t *p_input, MP4_Box_t *p_root )
+MP4_Box_t *MP4_BoxGetRoot( input_thread_t *p_input )
 {
+    MP4_Box_t *p_root;
     MP4_Stream_t *p_stream;
     int i_result;
 
-    MP4_SeekAbsolute( p_input, 0 );     /* Go to the begining */
+    p_root = malloc( sizeof( MP4_Box_t ) );
     p_root->i_pos = 0;
     p_root->i_type = VLC_FOURCC( 'r', 'o', 'o', 't' );
     p_root->i_shortsize = 1;
@@ -2415,10 +2260,10 @@ int MP4_BoxGetRoot( input_thread_t *p_input, MP4_Box_t *p_root )
 
         /* check if there is a cmov, if so replace
           compressed moov by  uncompressed one */
-        if( ( ( p_moov = MP4_FindBox( p_root, FOURCC_moov ) )&&
-              ( p_cmov = MP4_FindBox( p_moov, FOURCC_cmov ) ) ) ||
-            ( ( p_moov = MP4_FindBox( p_root, FOURCC_foov ) )&&
-              ( p_cmov = MP4_FindBox( p_moov, FOURCC_cmov ) ) ) )
+        if( ( ( p_moov = MP4_BoxGet( p_root, "moov" ) ) &&
+              ( p_cmov = MP4_BoxGet( p_root, "moov/cmov" ) ) ) ||
+            ( ( p_moov = MP4_BoxGet( p_root, "foov" ) ) &&
+              ( p_cmov = MP4_BoxGet( p_root, "foov/cmov" ) ) ) )
         {
             /* rename the compressed moov as a box to skip */
             p_moov->i_type = FOURCC_skip;
@@ -2435,7 +2280,8 @@ int MP4_BoxGetRoot( input_thread_t *p_input, MP4_Box_t *p_root )
             p_root->p_first = p_moov;
         }
     }
-    return( i_result );
+
+    return p_root;
 }
 
 

@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.35 2003/09/07 22:48:29 fenrir Exp $
+ * $Id: mp4.c,v 1.36 2003/09/08 00:35:16 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -138,21 +138,28 @@ static int Open( vlc_object_t * p_this )
     p_input->pf_demux = Demux;
     p_input->pf_demux_control = Control;
 
-
     /* create our structure that will contains all data */
     p_input->p_demux_data = p_demux = malloc( sizeof( demux_sys_t ) );
     memset( p_demux, 0, sizeof( demux_sys_t ) );
 
-    /* Now load all boxes ( except raw data ) */
-    if( !MP4_BoxGetRoot( p_input, &p_demux->box_root ) )
+    /* Create stream facilities */
+    if( ( p_demux->s= stream_OpenInput( p_input ) ) == NULL )
     {
-        msg_Warn( p_input, "MP4 plugin discarded (not a valid file)" );
+        msg_Err( p_input, "cannot create stream_t" );
+        free( p_demux );
         return VLC_EGENERIC;
     }
 
-    MP4_BoxDumpStructure( p_input, &p_demux->box_root );
+    /* Now load all boxes ( except raw data ) */
+    if( ( p_demux->p_root = MP4_BoxGetRoot( p_input ) ) == NULL )
+    {
+        msg_Warn( p_input, "MP4 plugin discarded (not a valid file)" );
+        goto error;
+    }
 
-    if( ( p_ftyp = MP4_BoxGet( &p_demux->box_root, "/ftyp" ) ) )
+    MP4_BoxDumpStructure( p_input, p_demux->p_root );
+
+    if( ( p_ftyp = MP4_BoxGet( p_demux->p_root, "/ftyp" ) ) )
     {
         switch( p_ftyp->data.p_ftyp->i_major_brand )
         {
@@ -174,9 +181,9 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* the file need to have one moov box */
-    if( MP4_BoxCount( &p_demux->box_root, "/moov" ) <= 0 )
+    if( MP4_BoxCount( p_demux->p_root, "/moov" ) <= 0 )
     {
-        MP4_Box_t *p_foov = MP4_BoxGet( &p_demux->box_root, "/foov" );
+        MP4_Box_t *p_foov = MP4_BoxGet( p_demux->p_root, "/foov" );
 
         if( !p_foov )
         {
@@ -187,7 +194,7 @@ static int Open( vlc_object_t * p_this )
         p_foov->i_type = FOURCC_moov;
     }
 
-    if( ( p_rmra = MP4_BoxGet( &p_demux->box_root,  "/moov/rmra" ) ) )
+    if( ( p_rmra = MP4_BoxGet( p_demux->p_root,  "/moov/rmra" ) ) )
     {
         playlist_t *p_playlist;
         int        i_count = MP4_BoxCount( p_rmra, "rmda" );
@@ -267,7 +274,7 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    if( !(p_mvhd = MP4_BoxGet( &p_demux->box_root, "/moov/mvhd" ) ) )
+    if( !(p_mvhd = MP4_BoxGet( p_demux->p_root, "/moov/mvhd" ) ) )
     {
         if( !p_rmra )
         {
@@ -288,7 +295,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     if( !( p_demux->i_tracks =
-                MP4_BoxCount( &p_demux->box_root, "/moov/trak" ) ) )
+                MP4_BoxCount( p_demux->p_root, "/moov/trak" ) ) )
     {
         msg_Err( p_input, "cannot find any /moov/trak" );
         goto error;
@@ -332,7 +339,7 @@ static int Open( vlc_object_t * p_this )
     /* now process each track and extract all usefull informations */
     for( i = 0; i < p_demux->i_tracks; i++ )
     {
-        p_trak = MP4_BoxGet( &p_demux->box_root, "/moov/trak[%d]", i );
+        p_trak = MP4_BoxGet( p_demux->p_root, "/moov/trak[%d]", i );
         MP4_TrackCreate( p_input, &p_demux->track[i], p_trak );
 
         if( p_demux->track[i].b_ok )
@@ -391,7 +398,12 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
-    Close( VLC_OBJECT( p_input ) );
+    stream_Release( p_demux->s );
+    if( p_demux->p_root )
+    {
+        MP4_BoxFree( p_input, p_demux->p_root );
+    }
+    free( p_demux );
     return VLC_EGENERIC;
 }
 
@@ -491,7 +503,6 @@ static int Demux( input_thread_t *p_input )
                 size_t i_size;
                 off_t i_pos;
 
-                data_packet_t *p_data;
                 pes_packet_t *p_pes;
 
                 /* caculate size and position for this sample */
@@ -502,44 +513,20 @@ static int Demux( input_thread_t *p_input )
                 //msg_Dbg( p_input, "stream %d size=%6d pos=%8lld",  i_track, i_size, i_pos );
 
                 /* go,go go ! */
-                if( MP4_SeekAbsolute( p_input, i_pos ) )
+                if( stream_Seek( p_demux->s, i_pos ) )
                 {
                     msg_Warn( p_input, "track[0x%x] will be disabled (eof?)", track.i_track_ID );
                     MP4_TrackUnselect( p_input, &track );
                     break;
                 }
 
-
-                /* now create a pes */
-                if( !(p_pes = input_NewPES( p_input->p_method_data ) ) )
+                /* now read pes */
+                if( ( p_pes = stream_PesPacket( p_demux->s, i_size ) ) == NULL )
                 {
+                    msg_Warn( p_input, "track[0x%x] will be disabled (eof?)", track.i_track_ID );
+                    MP4_TrackUnselect( p_input, &track );
                     break;
                 }
-                /* and a data packet for the data */
-                if( !(p_data = input_NewPacket( p_input->p_method_data, i_size ) ) )
-                {
-                    input_DeletePES( p_input->p_method_data, p_pes );
-                    break;
-                }
-                p_data->p_payload_end = p_data->p_payload_start + i_size;
-
-                /* initialisation of all the field */
-                p_pes->i_dts = p_pes->i_pts = 0;
-                p_pes->p_first = p_pes->p_last  = p_data;
-                p_pes->i_nb_data = 1;
-                p_pes->i_pes_size = i_size;
-                if( i_size > 0 )
-                {
-                    if( MP4_ReadData( p_input, p_data->p_payload_start, i_size ) )
-                    {
-                        input_DeletePES( p_input->p_method_data, p_pes );
-
-                        msg_Warn( p_input, "track[0x%x] will be disabled (eof?)", track.i_track_ID );
-                        MP4_TrackUnselect( p_input, &track );
-                        break;
-                    }
-                }
-
                 p_pes->i_dts =
                     p_pes->i_pts = input_ClockGetTS( p_input,
                                                      p_input->stream.p_selected_program,
@@ -657,7 +644,8 @@ static void Close ( vlc_object_t * p_this )
     demux_sys_t *p_demux = p_input->p_demux_data;
 
     msg_Dbg( p_input, "freeing all memory" );
-    MP4_BoxFree( p_input, &p_demux->box_root );
+
+    MP4_BoxFree( p_input, p_demux->p_root );
     for( i_track = 0; i_track < p_demux->i_tracks; i_track++ )
     {
         MP4_TrackDestroy( p_input, &p_demux->track[i_track] );
