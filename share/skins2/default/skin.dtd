@@ -1,10 +1,11 @@
-<!-- version 1.99
+<!-- version 2.0
 -->
 
 
 <!ELEMENT Theme (ThemeInfo,(Bitmap|Font|Window)*)>
     <!ATTLIST Theme
-        version     CDATA   "1.0"
+        version     CDATA   #REQUIRED
+        tooltipfont CDATA   "defaultfont"
         magnet      CDATA   "15"
         alpha       CDATA   "255"
         movealpha   CDATA   "255"

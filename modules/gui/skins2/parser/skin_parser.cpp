@@ -25,7 +25,7 @@
 #include <math.h>
 
 // Current DTD version
-#define SKINS_DTD_VERSION "1.99"
+#define SKINS_DTD_VERSION "2.0"
 
 
 SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName ):
@@ -180,9 +180,9 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
             m_errors = true;
             return;
         }
-        const BuilderData::Theme theme( atoi( attr["magnet"] ),
-                atoi( attr["alpha"] ), atoi( attr["movealpha"] ),
-                atoi( attr["fadetime"] ) );
+        const BuilderData::Theme theme( attr["tooltipfont"],
+                atoi( attr["magnet"] ), atoi( attr["alpha"] ),
+                atoi( attr["movealpha"] ), atoi( attr["fadetime"] ) );
         m_data.m_listTheme.push_back( theme );
     }
 

@@ -42,9 +42,10 @@ struct BuilderData
     /// Type definition
     struct Theme
     {
-        Theme( int magnet, uint32_t alpha, uint32_t moveAlpha, uint32_t fadeTime ):
-m_magnet( magnet ), m_alpha( alpha ), m_moveAlpha( moveAlpha ), m_fadeTime( fadeTime ) {}
+        Theme( const string & tooltipfont, int magnet, uint32_t alpha, uint32_t moveAlpha, uint32_t fadeTime ):
+m_tooltipfont( tooltipfont ), m_magnet( magnet ), m_alpha( alpha ), m_moveAlpha( moveAlpha ), m_fadeTime( fadeTime ) {}
 
+        const string m_tooltipfont;
         int m_magnet;
         uint32_t m_alpha;
         uint32_t m_moveAlpha;

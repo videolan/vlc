@@ -1,6 +1,6 @@
 <!DOCTYPE Theme SYSTEM "skin.dtd">
 
-<Theme version="1.99" magnet="20" alpha="255" movealpha="192" fadetime="500">
+<Theme version="2.0" magnet="20" alpha="255" movealpha="192" fadetime="500">
   <ThemeInfo name="VLC OSX Interface" author="BigBen"
              email="bigben@videolan.org" webpage="http://www.videolan.org"/>
 
@@ -62,8 +62,8 @@
   <Bitmap id="stop_onclick" file="stop_onclick.png" alphacolor="#FF0000"/>
   <Bitmap id="volume_radial" file="volume.png" alphacolor="#FF0000"/>
 
-  <Font id="default_font" font="FreeSansBold.ttf" size="15"/> 
-  <Font id="playlist_font" font="FreeSansBold.ttf" size="12"/> 
+  <Font id="default_font" font="FreeSansBold.ttf" size="15"/>
+  <Font id="playlist_font" font="FreeSansBold.ttf" size="12"/>
 
   <Window x="230" y="250" dragdrop="true">
 

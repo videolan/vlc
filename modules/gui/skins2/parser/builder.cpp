@@ -116,10 +116,8 @@ void Builder::addTheme( const BuilderData::Theme &rData )
     rManager.setMagnetValue( rData.m_magnet );
     rManager.setAlphaValue( rData.m_alpha );
     rManager.setMoveAlphaValue( rData.m_moveAlpha );
-    // XXX:  font to fix
     GenericFont *pFont = new FT2Font( getIntf(), "FreeSans.ttf", 12 );
     pFont->init();
-    rManager.createTooltip( *pFont );
 }
 
 
