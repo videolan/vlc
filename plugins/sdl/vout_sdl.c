@@ -90,7 +90,7 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
     p_vout->p_sys->p_overlay = NULL;
 
     /* Initialize library */
-    if( SDL_Init(SDL_INIT_VIDEO) < 0 )
+    if( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTTHREAD) < 0 )
     {
         intf_ErrMsg( "error: can't initialize SDL library: %s",
                      SDL_GetError() );
