@@ -64,6 +64,9 @@ vlc_module_begin();
     add_shortcut( "mmsh" );
     add_shortcut( "mmst" );
     add_shortcut( "mmsu" );
+
+    add_shortcut( "vcd" );
+    add_shortcut( "svcd" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -85,6 +88,8 @@ typedef struct
     vlc_bool_t b_first_read;
 
 } access2_sys_t;
+
+static void UpdateInfo( input_thread_t *p_input, vlc_bool_t b_force_chapter );
 
 /*****************************************************************************
  * Access2Open: initializes structures
@@ -299,38 +304,10 @@ update:
         }
         p_sys->b_first_read = VLC_FALSE;
     }
-    /* Title change */
-    if( p_access->info.i_update & INPUT_UPDATE_TITLE )
-    {
-        vlc_value_t val;
-        msg_Dbg( p_input, "INPUT_UPDATE_TITLE" );
 
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.p_selected_area = p_input->stream.pp_areas[p_access->info.i_title+1];
-        p_input->stream.b_changed = VLC_TRUE;
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-        val.i_int = p_access->info.i_title+1;
-        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
-
-        p_access->info.i_update &= ~INPUT_UPDATE_TITLE;
-    }
-    /* Size change */
-    if( p_access->info.i_update & INPUT_UPDATE_SIZE )
-    {
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.p_selected_area->i_size  = p_access->info.i_size;
-        p_input->stream.b_changed = VLC_TRUE;
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-        p_access->info.i_update &= ~INPUT_UPDATE_SIZE;
-    }
-
-    if( p_access->info.i_update & INPUT_UPDATE_SEEKPOINT )
-    {
-        /* TODO */
-        msg_Err( p_input, "INPUT_UPDATE_SEEKPOINT to do" );
-    }
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    UpdateInfo( p_input, VLC_FALSE );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return i_total;
 }
@@ -343,7 +320,7 @@ static int Access2SetArea( input_thread_t * p_input, input_area_t * p_area )
 {
     access2_sys_t *p_sys = (access2_sys_t*)p_input->p_access_data;
     access_t      *p_access = p_sys->p_access;
-    vlc_value_t  val;
+    int           i_seekpoint = p_area->i_part - 1;
 
     /* we can't use the interface slider until initilization is complete */
     p_input->stream.b_seekable = 0;
@@ -354,17 +331,20 @@ static int Access2SetArea( input_thread_t * p_input, input_area_t * p_area )
         if( access2_Control( p_access, ACCESS_SET_TITLE, (int)(p_area->i_id - 1) ) )
             return VLC_EGENERIC;
 
-        /* Change the default area */
-        p_input->stream.p_selected_area = p_input->stream.pp_areas[p_access->info.i_title+1];
-        p_input->stream.p_selected_area->i_tell = p_access->info.i_pos;
-
-        /* Update the navigation variables without triggering a callback */
-        val.i_int = p_access->info.i_title+1;;
-        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
-
-        /* Clear the flag */
-        p_access->info.i_update &= ~INPUT_UPDATE_TITLE;
+        p_input->stream.p_selected_area = p_area;
     }
+    fprintf( stderr, "Access2SetArea: part=%d seekpart=%d nbseekpoint=%d\n",
+             p_area->i_part, i_seekpoint, p_sys->title[p_access->info.i_title]->i_seekpoint );
+
+    if( i_seekpoint != p_access->info.i_seekpoint &&
+        i_seekpoint >= 0 &&
+        i_seekpoint < p_sys->title[p_access->info.i_title]->i_seekpoint )
+    {
+        msg_Dbg( p_input, "setting seekpoint" );
+        access2_Control( p_access, ACCESS_SET_SEEKPOINT, (int)i_seekpoint );
+    }
+
+    UpdateInfo( p_input, VLC_TRUE );
 
     /* warn interface that something has changed */
     p_input->stream.b_seekable = VLC_TRUE;
@@ -411,4 +391,63 @@ static int  Access2Control( input_thread_t *p_input, int i_query, va_list args )
     access_t      *p_access = p_sys->p_access;
 
     return access2_vaControl( p_access, i_query, args );
+}
+
+/*****************************************************************************
+ * UpdateInfo:
+ *****************************************************************************/
+static void UpdateInfo( input_thread_t *p_input, vlc_bool_t b_force_chapter )
+{
+    access2_sys_t *p_sys = (access2_sys_t*)p_input->p_access_data;
+    access_t      *p_access = p_sys->p_access;
+
+    /* Title change */
+    if( p_access->info.i_update & INPUT_UPDATE_TITLE )
+    {
+        int i_seekpoint;
+        int i;
+
+        vlc_value_t val;
+        msg_Dbg( p_input, "INPUT_UPDATE_TITLE" );
+
+        p_input->stream.p_selected_area = p_input->stream.pp_areas[p_access->info.i_title+1];
+        p_input->stream.p_selected_area->i_part = 1;
+        p_input->stream.p_selected_area->i_tell = p_access->info.i_pos;
+        p_input->stream.b_changed = VLC_TRUE;
+
+        val.i_int = p_access->info.i_title+1;
+        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
+
+        var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
+        i_seekpoint = p_sys->title[p_access->info.i_title]->i_seekpoint;
+        for( i = 0; i < i_seekpoint ? i_seekpoint : 0; i++ )
+        {
+            val.i_int = i + 1;
+            var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val, NULL );
+        }
+
+        p_access->info.i_update &= ~INPUT_UPDATE_TITLE;
+    }
+    /* b_force_chapter: don't force a chapter change when a there is
+     * pending user one (as it reset i_part */
+    if( p_access->info.i_update & INPUT_UPDATE_SEEKPOINT &&
+        ( b_force_chapter || !p_input->stream.p_new_area ) )
+    {
+        vlc_value_t val;
+        /* TODO is it complete ? */
+        p_input->stream.p_selected_area->i_part = p_access->info.i_seekpoint + 1;
+
+        val.i_int = p_input->stream.p_selected_area->i_part;
+        var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
+
+        p_access->info.i_update &= ~INPUT_UPDATE_SEEKPOINT;
+    }
+    /* Size change */
+    if( p_access->info.i_update & INPUT_UPDATE_SIZE )
+    {
+        p_input->stream.p_selected_area->i_size  = p_access->info.i_size;
+        p_input->stream.b_changed = VLC_TRUE;
+
+        p_access->info.i_update &= ~INPUT_UPDATE_SIZE;
+    }
 }
