@@ -342,22 +342,13 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
                                wxTR_MULTIPLE | wxTR_EXTENDED );
 
     /* Create image list */
-
-    wxImageList *p_images = new wxImageList( 16 , 16, TRUE);
-
-    wxIcon icons[10];
-    icons[ ITEM_TYPE_UNKNOWN ] = wxIcon( type_unknown_xpm );
-    icons[ ITEM_TYPE_DISC ] = wxIcon( type_disc_xpm );
-    icons[ ITEM_TYPE_DIRECTORY ] = wxIcon( type_directory_xpm );
-    icons[ ITEM_TYPE_PLAYLIST ] = wxIcon( type_playlist_xpm );
-    icons[ ITEM_TYPE_NET ] = wxIcon( type_net_xpm );
-    icons[ ITEM_TYPE_CARD ] = wxIcon( type_card_xpm );
-
-    for( unsigned int i = 0; i< WXSIZEOF( icons ) ; i++ )
-    {
-         p_images->Add( wxIcon( icons[i] ));
-    }
-
+    wxImageList *p_images = new wxImageList( 16 , 16, TRUE );
+    p_images->Add( wxIcon( type_unknown_xpm ) );
+    p_images->Add( wxIcon( type_disc_xpm ) );
+    p_images->Add( wxIcon( type_directory_xpm ) );
+    p_images->Add( wxIcon( type_playlist_xpm ) );
+    p_images->Add( wxIcon( type_net_xpm ) );
+    p_images->Add( wxIcon( type_card_xpm ) );
     treectrl->AssignImageList( p_images );
 
     treectrl->AddRoot( wxU(_("root" )), -1, -1, NULL );
