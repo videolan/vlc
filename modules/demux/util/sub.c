@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.22 2003/08/23 22:02:45 hartman Exp $
+ * $Id: sub.c,v 1.23 2003/08/24 00:36:38 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -243,7 +243,8 @@ char* sub_detect( subtitle_demux_t *p_sub, char *psz_filename)
     DIR *p_dir_handle;
     struct dirent *p_dir_afile;
     char * ppsz_sub_exts[] = { "sub", "srt", "smi", "ssa", NULL};
-    char *psz_result, *psz_basename, *psz_dir, *psz_file_noext, *psz_extension;
+    char *psz_result, *psz_basename, *psz_dir = NULL;
+    char *psz_file_noext, *psz_extension;
     int i;
     size_t i_dirlen = 0;
 
@@ -264,20 +265,20 @@ char* sub_detect( subtitle_demux_t *p_sub, char *psz_filename)
                 return "";
             }
             strncpy( psz_dir, psz_filename, i_dirlen );
-            psz_dir[i_dirlen] = '\0';            
+            psz_dir[i_dirlen] = '\0';
             ++psz_basename;
         }
         else
         {
             psz_basename = psz_filename;
         }
-        
+
         psz_extension = strrchr( psz_basename , '.' );
-        
+
         if( psz_extension )
         {
             size_t i_baselen = ( 1 + psz_extension ) - psz_basename;
-            
+
             psz_file_noext = (char*)malloc( i_baselen + 1 );
             if( !psz_file_noext )
             {
@@ -288,14 +289,14 @@ char* sub_detect( subtitle_demux_t *p_sub, char *psz_filename)
             ++psz_extension;
         }
         else return "";
-        
-        p_dir_handle = opendir( psz_dir );
-	if( p_dir_handle ) {
+
+        p_dir_handle = opendir( psz_dir ? psz_dir : "" );
+        if( p_dir_handle ) {
             int i_found = 0;
 
-	    while(( p_dir_afile = readdir( p_dir_handle ))) {
+            while(( p_dir_afile = readdir( p_dir_handle ))) {
                 char* psz_afile_ext = strrchr( p_dir_afile->d_name, '.' );
-                
+
                 if( psz_afile_ext )
                 {
                     ++psz_afile_ext;
@@ -323,7 +324,6 @@ char* sub_detect( subtitle_demux_t *p_sub, char *psz_filename)
             }
             closedir( p_dir_handle );
         }
-        
     }
     return "";
 }
