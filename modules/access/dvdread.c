@@ -97,7 +97,7 @@ vlc_module_begin();
 vlc_module_end();
 
 /* how many blocks DVDRead will read in each loop */
-#define DVD_BLOCK_READ_ONCE 64
+#define DVD_BLOCK_READ_ONCE 4
 
 /*****************************************************************************
  * Local prototypes
@@ -933,12 +933,13 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned int i_tmp;
-    unsigned int i_chapter = 0;
+    unsigned int i_chapter = -1;
     unsigned int i_cell = 0;
     unsigned int i_vobu = 0;
     unsigned int i_sub_cell = 0;
     int i_block;
 
+    msg_Err( p_demux, "seek offset: %i", i_block_offset );
 #define p_pgc p_sys->p_cur_pgc
 #define p_vts p_sys->p_vts_file
 
@@ -970,6 +971,13 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
 
     } while( i_tmp <= i_cell );
 
+    if( i_chapter < p_sys->i_chapters &&
+	p_demux->info.i_seekpoint != i_chapter )
+    {
+        p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+	p_demux->info.i_seekpoint = i_chapter;
+    }
+
     /* Find vobu */
     while( p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu] <= i_block )
     {
@@ -986,7 +994,7 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
 #if 1
     msg_Dbg( p_demux, "cell %d i_sub_cell %d chapter %d vobu %d "
              "cell_sector %d vobu_sector %d sub_cell_sector %d",
-             i_cell, i_sub_cell,i_chapter, i_vobu,
+             i_cell, i_sub_cell, i_chapter, i_vobu,
              p_sys->p_cur_pgc->cell_playback[i_cell].first_sector,
              p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu],
              p_vts->vts_c_adt->cell_adr_table[i_sub_cell - 1].start_sector);
@@ -1183,9 +1191,14 @@ static void DemuxTitles( demux_t *p_demux,
         msg_Dbg( p_demux, "title %d has %d chapters", i, i_chapters );
 
         t = vlc_input_title_New();
+        t->psz_name = malloc( strlen( _("Title %i") ) + 20 );
+        sprintf( t->psz_name, _("Title %i"), i + 1 );
+
         for( j = 0; j < __MAX( i_chapters, 1 ); j++ )
         {
             s = vlc_seekpoint_New();
+            s->psz_name = malloc( strlen( _("Chapter %i") ) + 20 );
+            sprintf( s->psz_name, _("Chapter %i"), j + 1 );
             TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
         }
 
