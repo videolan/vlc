@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <dlfcn.h>                                                /* plugins */
+
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
@@ -22,7 +24,6 @@
 #include "video.h"
 #include "video_output.h"
 #include "video_text.h"
-#include "video_sys.h"
 #include "video_yuv.h"
 #include "intf_msg.h"
 #include "main.h"
@@ -72,94 +73,42 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     vout_thread_t * p_vout;                             /* thread descriptor */
     int             i_status;                               /* thread status */
     int             i_index;               /* index for array initialization */
+    char *          psz_method;
+    char *          psz_plugin;
 
     /* Allocate descriptor */
     intf_DbgMsg("\n");
     p_vout = (vout_thread_t *) malloc( sizeof(vout_thread_t) );
     if( p_vout == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        intf_ErrMsg( "error: %s\n", strerror(ENOMEM) );
         return( NULL );
     }
 
-    /* Sets method-specific functions */
-    switch( i_method )
+    /* Initialize method-dependent functions */
+    psz_method = main_GetPszVariable( VOUT_METHOD_VAR, VOUT_DEFAULT_METHOD );
+
+    psz_plugin = malloc( sizeof("./video_output/vout_.so") + strlen(psz_method) );
+    sprintf( psz_plugin, "./video_output/vout_%s.so", psz_method );
+
+    p_vout->p_vout_plugin = dlopen( psz_plugin, RTLD_LAZY );
+    
+    if( p_vout->p_vout_plugin == NULL )
     {
-#ifdef VIDEO_DUMMY
-        case VOUT_DUMMY_METHOD:
-            p_vout->p_sys_create =    vout_DummySysCreate;
-            p_vout->p_sys_init =      vout_DummySysInit;
-            p_vout->p_sys_end =       vout_DummySysEnd;
-            p_vout->p_sys_destroy =   vout_DummySysDestroy;
-            p_vout->p_sys_manage =    vout_DummySysManage;
-            p_vout->p_sys_display =   vout_DummySysDisplay;
-            break;
-#endif
-#ifdef VIDEO_X11
-        case VOUT_X11_METHOD:
-            p_vout->p_sys_create =    vout_X11SysCreate;
-            p_vout->p_sys_init =      vout_X11SysInit;
-            p_vout->p_sys_end =       vout_X11SysEnd;
-            p_vout->p_sys_destroy =   vout_X11SysDestroy;
-            p_vout->p_sys_manage =    vout_X11SysManage;
-            p_vout->p_sys_display =   vout_X11SysDisplay;
-            break;
-#endif
-#ifdef VIDEO_FB
-        case VOUT_FB_METHOD:
-            p_vout->p_sys_create =    vout_FBSysCreate;
-            p_vout->p_sys_init =      vout_FBSysInit;
-            p_vout->p_sys_end =       vout_FBSysEnd;
-            p_vout->p_sys_destroy =   vout_FBSysDestroy;
-            p_vout->p_sys_manage =    vout_FBSysManage;
-            p_vout->p_sys_display =   vout_FBSysDisplay;
-            break;
-#endif
-#ifdef VIDEO_GLIDE
-        case VOUT_GLIDE_METHOD:
-            p_vout->p_sys_create =    vout_GlideSysCreate;
-            p_vout->p_sys_init =      vout_GlideSysInit;
-            p_vout->p_sys_end =       vout_GlideSysEnd;
-            p_vout->p_sys_destroy =   vout_GlideSysDestroy;
-            p_vout->p_sys_manage =    vout_GlideSysManage;
-            p_vout->p_sys_display =   vout_GlideSysDisplay;
-            break;
-#endif
-#ifdef VIDEO_DGA
-        case VOUT_DGA_METHOD:
-            p_vout->p_sys_create =    vout_DGASysCreate;
-            p_vout->p_sys_init =      vout_DGASysInit;
-            p_vout->p_sys_end =       vout_DGASysEnd;
-            p_vout->p_sys_destroy =   vout_DGASysDestroy;
-            p_vout->p_sys_manage =    vout_DGASysManage;
-            p_vout->p_sys_display =   vout_DGASysDisplay;
-            break;
-#endif
-#ifdef VIDEO_GGI
-        case VOUT_GGI_METHOD:
-            p_vout->p_sys_create =    vout_GGISysCreate;
-            p_vout->p_sys_init =      vout_GGISysInit;
-            p_vout->p_sys_end =       vout_GGISysEnd;
-            p_vout->p_sys_destroy =   vout_GGISysDestroy;
-            p_vout->p_sys_manage =    vout_GGISysManage;
-            p_vout->p_sys_display =   vout_GGISysDisplay;
-            break;
-#endif
-#ifdef VIDEO_BEOS
-        case VOUT_BEOS_METHOD:
-            p_vout->p_sys_create =    vout_BSysCreate;
-            p_vout->p_sys_init =      vout_BSysInit;
-            p_vout->p_sys_end =       vout_BSysEnd;
-            p_vout->p_sys_destroy =   vout_BSysDestroy;
-            p_vout->p_sys_manage =    vout_BSysManage;
-            p_vout->p_sys_display =   vout_BSysDisplay;
-            break;
-#endif
-        default:
-            intf_ErrMsg( "error: video output method not available\n" );
-            free( p_vout );
-            return( NULL );
+        intf_ErrMsg( "error: could not open video plugin %s\n", psz_method );
+        free( psz_plugin );
+        free( p_vout );
+        return( NULL );
     }
+    free( psz_plugin );
+
+    /* Get plugins */
+    p_vout->p_sys_create =  dlsym(p_vout->p_vout_plugin, "vout_SysCreate");
+    p_vout->p_sys_init =    dlsym(p_vout->p_vout_plugin, "vout_SysInit");
+    p_vout->p_sys_end =     dlsym(p_vout->p_vout_plugin, "vout_SysEnd");
+    p_vout->p_sys_destroy = dlsym(p_vout->p_vout_plugin, "vout_SysDestroy");
+    p_vout->p_sys_manage =  dlsym(p_vout->p_vout_plugin, "vout_SysManage");
+    p_vout->p_sys_display = dlsym(p_vout->p_vout_plugin, "vout_SysDisplay");
 
     /* Initialize thread properties - thread id and locks will be initialized
      * later */
@@ -222,8 +171,9 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
      * own error messages */
     if( p_vout->p_sys_create( p_vout, psz_display, i_root_window ) )
     {
-      free( p_vout );
-      return( NULL );
+        dlclose( p_vout->p_vout_plugin );
+        free( p_vout );
+        return( NULL );
     }
     intf_DbgMsg("actual configuration: %dx%d, %d/%d bpp (%d Bpl), masks: 0x%x/0x%x/0x%x\n",
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
@@ -247,6 +197,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     if( p_vout->p_default_font == NULL )
     {
         p_vout->p_sys_destroy( p_vout );
+        dlclose( p_vout->p_vout_plugin );
         free( p_vout );
         return( NULL );
     }
@@ -255,6 +206,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     {
         vout_UnloadFont( p_vout->p_default_font );
         p_vout->p_sys_destroy( p_vout );
+        dlclose( p_vout->p_vout_plugin );
         free( p_vout );
         return( NULL );
     }
@@ -270,6 +222,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         vout_UnloadFont( p_vout->p_default_font );
         vout_UnloadFont( p_vout->p_large_font );
         p_vout->p_sys_destroy( p_vout );
+        dlclose( p_vout->p_vout_plugin );
         free( p_vout );
         return( NULL );
     }
@@ -1289,6 +1242,11 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     vout_UnloadFont( p_vout->p_default_font );
     vout_UnloadFont( p_vout->p_large_font );
     p_vout->p_sys_destroy( p_vout );
+
+    /* Close plugin */
+    dlclose( p_vout->p_vout_plugin );
+
+    /* Free structure */
     free( p_vout );
     *pi_status = i_status;
 }

@@ -211,7 +211,10 @@
 
 /* Environment variable containing the audio output method */
 #define AOUT_METHOD_VAR                 "vlc_aout"
-					
+
+/* The fallback method */
+#define AOUT_DEFAULT_METHOD "dsp"
+
 /* Environment variable used to store dsp device name, and default value */
 #define AOUT_DSP_VAR                    "vlc_dsp"
 #define AOUT_DSP_DEFAULT                "/dev/dsp"
@@ -234,7 +237,10 @@
 
 /* Environment variable containing the display method */
 #define VOUT_METHOD_VAR                 "vlc_vout"
-					
+
+/* The fallback method */
+#define VOUT_DEFAULT_METHOD             "x11"
+
 /* Environment variable used in place of DISPLAY if available */
 #define VOUT_DISPLAY_VAR                "vlc_display"
 

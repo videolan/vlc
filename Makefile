@@ -16,7 +16,7 @@ SHELL=/bin/sh
 # Audio output settings
 AUDIO = dsp
 # Not yet supported
-AUDIO += esd
+#AUDIO += esd
 # Fallback method that should always work
 AUDIO += dummy
 
@@ -64,12 +64,10 @@ PROGRAM_VERSION = 0.95.0
 # audio options
 audio := $(shell echo $(AUDIO) | tr 'A-Z' 'a-z')
 AUDIO := $(shell echo $(AUDIO) | tr 'a-z' 'A-Z')
-DEFINE += $(AUDIO:%=-DAUDIO_%)
 
 # video options
 video := $(shell echo $(VIDEO) | tr 'A-Z' 'a-z')
 VIDEO := $(shell echo $(VIDEO) | tr 'a-z' 'A-Z')
-DEFINE += $(VIDEO:%=-DVIDEO_%)
 
 # PROGRAM_OPTIONS is an identification string of the compilation options
 PROGRAM_OPTIONS = $(ARCH) $(SYS)
@@ -103,33 +101,12 @@ endif
 #
 INCLUDE += -Iinclude
 
-ifneq (,$(findstring x11,$(video)))
-INCLUDE += -I/usr/X11R6/include
-endif
-
-ifneq (,$(findstring glide,$(video)))
-INCLUDE += -I/usr/include/glide
-endif
-
 #
 # Libraries
 #
 LIB += -lpthread
 LIB += -lm
-
-ifneq (,$(findstring x11,$(video)))
-LIB += -L/usr/X11R6/lib -lX11 -lXext 
-endif
-ifneq (,$(findstring ggi,$(video)))
-LIB += -lggi
-endif
-ifneq (,$(findstring glide,$(video)))
-LIB += -lglide2x
-endif
-
-ifneq (,$(findstring esd,$(audio)))
-LIB += -lesd -laudiofile
-endif
+LIB += -ldl
 
 #
 # C compiler flags: compilation
@@ -207,8 +184,7 @@ interface_obj =  		interface/main.o \
 						interface/intf_msg.o \
 						interface/intf_cmd.o \
 						interface/intf_ctrl.o \
-						interface/intf_console.o \
-						$(video:%=interface/intf_%.o)
+						interface/intf_console.o
 
 input_obj =         		input/input_vlan.o \
 						input/input_file.o \
@@ -219,13 +195,11 @@ input_obj =         		input/input_vlan.o \
 						input/input_psi.o \
 						input/input.o
 
-audio_output_obj = 		audio_output/audio_output.o \
-						$(audio:%=audio_output/aout_%.o)
+audio_output_obj = 		audio_output/audio_output.o
 
 video_output_obj = 		video_output/video_output.o \
 						video_output/video_text.o \
-						video_output/video_yuv.o \
-						$(video:%=video_output/vout_%.o)
+						video_output/video_yuv.o
 
 ac3_decoder_obj =		ac3_decoder/ac3_decoder.o \
 						ac3_decoder/ac3_parse.o \
@@ -303,9 +277,20 @@ endif
 endif
 
 #
+# Plugins
+#
+interface_plugin =	$(video:%=interface/intf_%.so)
+audio_plugin =		$(audio:%=audio_output/aout_%.so)
+video_plugin = 		$(video:%=video_output/vout_%.so)
+
+PLUGIN_OBJ = $(interface_plugin) \
+                $(audio_plugin) \
+                $(video_plugin) \
+
+#
 # Other lists of files
 #
-sources := $(C_OBJ:%.o=%.c)
+sources := $(C_OBJ:%.o=%.c) $(PLUGIN_OBJ:%.so=%.c)
 dependancies := $(sources:%.c=dep/%.d)
 
 # All symbols must be exported
@@ -321,10 +306,10 @@ export
 all: vlc
 
 clean:
-	rm -f $(C_OBJ) $(ASM_OBJ)
+	rm -f $(C_OBJ) $(ASM_OBJ) $(PLUGIN_OBJ)
 
 distclean: clean
-	rm -f **/*.o **/*~ *.log
+	rm -f **/*.o **/*.so **/*~ *.log
 	rm -f vlc gmon.out core
 	rm -rf dep
 
@@ -340,8 +325,8 @@ FORCE:
 #
 # Real targets
 #
-vlc: $(C_OBJ) $(ASM_OBJ)
-	$(CC) $(LCFLAGS) $(CFLAGS) -o $@ $(C_OBJ) $(ASM_OBJ)	
+vlc: $(C_OBJ) $(ASM_OBJ) $(PLUGIN_OBJ)
+	$(CC) $(LCFLAGS) $(CFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(ASM_OBJ)	
 
 #
 # Generic rules (see below)
@@ -352,13 +337,50 @@ $(dependancies): %.d: FORCE
 $(C_OBJ): %.o: Makefile.dep
 $(C_OBJ): %.o: dep/%.d
 $(C_OBJ): %.o: %.c
-	@echo "compiling $*.c"
+	@echo "compiling $*.o from $*.c"
 	@$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
 $(ASM_OBJ): %.o: Makefile.dep
 $(ASM_OBJ): %.o: %.S
-	@echo "assembling $*.S"
+	@echo "assembling $*.o from $*.S"
 	@$(CC) $(CFLAGS) -c -o $@ $<
+
+$(PLUGIN_OBJ): %.so: Makefile.dep
+$(PLUGIN_OBJ): %.so: dep/%.d
+
+# audio plugins
+audio_output/aout_dummy.so \
+	audio_output/aout_dsp.so: %.so: %.c
+		@echo "compiling $*.so from $*.c"
+		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
+
+audio_output/aout_esd.so: %.so: %.c
+		@echo "compiling $*.so from $*.c"
+		@$(CC) $(CCFLAGS) $(CFLAGS) -laudiofile -lesd -shared -o $@ $<
+
+# video plugins
+interface/intf_dummy.so \
+	video_output/vout_dummy.so \
+	interface/intf_fb.so \
+	video_output/vout_fb.so: %.so: %.c
+		@echo "compiling $*.so from $*.c"
+		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
+
+interface/intf_x11.so \
+	video_output/vout_x11.so: %.so: %.c
+		@echo "compiling $*.so from $*.c"
+		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/X11R6/include -L/usr/X11R6/lib -lX11 -lXext -shared -o $@ $<
+
+interface/intf_glide.so \
+	video_output/vout_glide.so: %.so: %.c
+		@echo "compiling $*.so from $*.c"
+		@$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/include/glide -lglide2x -shared -o $@ $<
+
+interface/intf_ggi.so \
+	video_output/vout_ggi.so: %.so: %.c
+		@echo "compiling $*.so from $*.c"
+		@$(CC) $(CCFLAGS) $(CFLAGS) -lggi -shared -o $@ $<
+
 
 ################################################################################
 # Note on generic rules and dependancies

@@ -164,7 +164,8 @@ typedef struct aout_thread_s
     vlc_mutex_t         fifos_lock;
     aout_fifo_t         fifo[ AOUT_MAX_FIFOS ];
 
-    /* method-dependant functions */
+    /* Plugins */
+    void *                      p_aout_plugin;        /* video output plugin */
     aout_sys_open_t *           p_sys_open;
     aout_sys_reset_t *          p_sys_reset;
     aout_sys_setformat_t *      p_sys_setformat;
@@ -207,21 +208,6 @@ typedef struct aout_thread_s
     p_aout_sys_t        p_sys;
 
 } aout_thread_t;
-
-/* Output methods */
-#define AOUT_DUMMY_METHOD       0x0000                 /* dummy video output */
-#define AOUT_DSP_METHOD         0x0001                     /* linux /dev/dsp */
-
-/* Get the fallback method */
-#ifdef AUDIO_DSP
-#define AOUT_DEFAULT_METHOD "dsp"
-#else
-#ifdef AUDIO_ESD
-#define AOUT_DEFAULT_METHOD "esd"
-#else
-#define AOUT_DEFAULT_METHOD "dummy"
-#endif
-#endif
 
 /* Those are from <linux/soundcard.h> but are needed because of formats
  * on other platforms */

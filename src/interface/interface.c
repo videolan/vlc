@@ -16,6 +16,8 @@
 #include <sys/types.h>
 #include <sys/uio.h>                                          /* for input.h */
 
+#include <dlfcn.h>                                                /* plugins */
+
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
@@ -28,8 +30,6 @@
 #include "main.h"
 #include "video.h"
 #include "video_output.h"
-
-#include "intf_sys.h"
 
 /*****************************************************************************
  * intf_channel_t: channel description
@@ -62,13 +62,14 @@ static int      ParseChannel    ( intf_channel_t *p_channel, char *psz_str );
 /*****************************************************************************
  * intf_Create: prepare interface before main loop
  *****************************************************************************
- * This function opens output devices and create specific interfaces. It send
- * it's own error messages.
+ * This function opens output devices and creates specific interfaces. It sends
+ * its own error messages.
  *****************************************************************************/
 intf_thread_t* intf_Create( void )
 {
     intf_thread_t *p_intf;
     char * psz_method;
+    char * psz_plugin;
 
     /* Allocate structure */
     p_intf = malloc( sizeof( intf_thread_t ) );
@@ -78,69 +79,27 @@ intf_thread_t* intf_Create( void )
         return( NULL );
     }
 
-    /* initialize method-dependent functions */
+    /* Initialize method-dependent functions */
     psz_method = main_GetPszVariable( VOUT_METHOD_VAR, VOUT_DEFAULT_METHOD );
+ 
+    psz_plugin = malloc( sizeof("./interface/intf_.so") + strlen(psz_method) );
+    sprintf( psz_plugin, "./interface/intf_%s.so", psz_method );
 
-    if( !strcmp(psz_method, "dummy") )
+    p_intf->p_intf_plugin = dlopen( psz_plugin, RTLD_LAZY );
+
+    if( p_intf->p_intf_plugin == NULL )
     {
-        p_intf->p_sys_create =    intf_DummySysCreate;
-        p_intf->p_sys_manage =    intf_DummySysManage;
-        p_intf->p_sys_destroy =   intf_DummySysDestroy;
-    }
-#ifdef VIDEO_X11
-    else if( !strcmp(psz_method, "x11") )
-    {
-        p_intf->p_sys_create =    intf_X11SysCreate;
-        p_intf->p_sys_manage =    intf_X11SysManage;
-        p_intf->p_sys_destroy =   intf_X11SysDestroy;
-    }
-#endif
-#ifdef VIDEO_FB
-    else if( !strcmp(psz_method, "fb") )
-    {
-        p_intf->p_sys_create =    intf_FBSysCreate;
-        p_intf->p_sys_manage =    intf_FBSysManage;
-        p_intf->p_sys_destroy =   intf_FBSysDestroy;
-    }
-#endif
-#ifdef VIDEO_GGI
-    else if( !strcmp(psz_method, "ggi") )
-    {
-        p_intf->p_sys_create =    intf_GGISysCreate;
-        p_intf->p_sys_manage =    intf_GGISysManage;
-        p_intf->p_sys_destroy =   intf_GGISysDestroy;
-    }
-#endif
-#ifdef VIDEO_DGA
-    else if( !strcmp(psz_method, "dga") )
-    {
-        p_intf->p_sys_create =    intf_DGASysCreate;
-        p_intf->p_sys_manage =    intf_DGASysManage;
-        p_intf->p_sys_destroy =   intf_DGASysDestroy;
-    }
-#endif
-#ifdef VIDEO_GLIDE
-    else if( !strcmp(psz_method, "glide") )
-    {
-        p_intf->p_sys_create =    intf_GlideSysCreate;
-        p_intf->p_sys_manage =    intf_GlideSysManage;
-        p_intf->p_sys_destroy =   intf_GlideSysDestroy;
-    }
-#endif
-#ifdef VIDEO_BEOS
-    else if( !strcmp(psz_method, "beos") )
-    {
-        p_intf->p_sys_create =    intf_BSysCreate;
-        p_intf->p_sys_manage =    intf_BSysManage;
-        p_intf->p_sys_destroy =   intf_BSysDestroy;
-    }
-#endif
-    else
-    {
-        intf_ErrMsg( "error: requested video output method not available\n" );
+        intf_ErrMsg( "error: could not open interface plugin %s\n", psz_plugin );
+        free( psz_plugin );
         free( p_intf );
         return( NULL );
     }
+    free( psz_plugin );
+
+    /* Get plugins */
+    p_intf->p_sys_create =  dlsym(p_intf->p_intf_plugin, "intf_SysCreate");
+    p_intf->p_sys_manage =  dlsym(p_intf->p_intf_plugin, "intf_SysManage");
+    p_intf->p_sys_destroy = dlsym(p_intf->p_intf_plugin, "intf_SysDestroy");
 
     /* Initialize structure */
     p_intf->b_die =     0;
@@ -157,6 +116,7 @@ intf_thread_t* intf_Create( void )
     if( p_intf->p_console == NULL )
     {
         intf_ErrMsg("error: can't create control console\n");
+        dlclose( p_intf->p_intf_plugin );
         free( p_intf );
         return( NULL );
     }
@@ -164,6 +124,7 @@ intf_thread_t* intf_Create( void )
     {
         intf_ErrMsg("error: can't create interface\n");
         intf_ConsoleDestroy( p_intf->p_console );
+        dlclose( p_intf->p_intf_plugin );
         free( p_intf );
         return( NULL );
     }
@@ -228,6 +189,9 @@ void intf_Destroy( intf_thread_t *p_intf )
     /* Unload channels */
     UnloadChannels( p_intf );
 
+    /* Close plugin */
+    dlclose( p_intf->p_intf_plugin );
+    
     /* Free structure */
     free( p_intf );
 }
