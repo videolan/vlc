@@ -2,7 +2,7 @@
  * drms.c : DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.c,v 1.2 2004/01/09 04:37:43 jlj Exp $
+ * $Id: drms.c,v 1.3 2004/01/09 13:08:08 hartman Exp $
  *
  * Author: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -603,14 +603,14 @@ static int get_sci_data( uint32_t **pp_sci, uint32_t *p_sci_size )
 #ifdef WIN32
     HANDLE i_file;
     DWORD i_size, i_read;
-    TCHAR p_path[ MAX_PATH ];
+    TCHAR p_path[ PATH_MAX ];
     TCHAR *p_filename = _T("\\Apple Computer\\iTunes\\SC Info\\SC Info.sidb");
 
     if( SUCCEEDED( SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA,
                                     NULL, 0, p_path ) ) )
     {
         _tcsncat( p_path, p_filename, min( _tcslen( p_filename ),
-                  (MAX_PATH-1) - _tcslen( p_path ) ) );
+                  (PATH_MAX-1) - _tcslen( p_path ) ) );
 
         i_file = CreateFile( p_path, GENERIC_READ, 0, NULL,
                              OPEN_EXISTING, 0, NULL );
@@ -815,7 +815,7 @@ static int rw_user_key( void *p_drms, uint32_t i_rw, uint32_t *p_user_key )
 {
     FILE *file;
     int i_ret = -1;
-    char sz_path[ MAX_PATH ];
+    char sz_path[ PATH_MAX ];
 
 #define DRMS_PI_DIRNAME "drms"
 #ifdef WIN32
@@ -1000,11 +1000,11 @@ void *drms_alloc( char *psz_homedir )
             p_drms = NULL;
         }
 
-        p_drms->psz_homedir = malloc( MAX_PATH );
+        p_drms->psz_homedir = malloc( PATH_MAX );
         if( p_drms->psz_homedir != NULL )
         {
-            strncpy( p_drms->psz_homedir, psz_homedir, MAX_PATH );
-            p_drms->psz_homedir[ MAX_PATH - 1 ] = '\0';
+            strncpy( p_drms->psz_homedir, psz_homedir, PATH_MAX );
+            p_drms->psz_homedir[ PATH_MAX - 1 ] = '\0';
         }
         else
         {
