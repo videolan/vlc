@@ -103,6 +103,7 @@ install vlc-ncurses
 %endif
 
 %build
+export QTDIR=%{_libdir}/qt-2.3.0/
 %configure --with-dvdcss=local-shared \
 	   --enable-gnome --enable-gtk \
 	   --enable-x11 --enable-qt --enable-ncurses \
@@ -110,7 +111,6 @@ install vlc-ncurses
 	   --enable-fb \
 	   --enable-xvideo \
 	   --enable-sdl 
-export QTDIR=%{_libdir}/qt-2.3.0/
 make
 
 %install
