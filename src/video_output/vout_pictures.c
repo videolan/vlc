@@ -36,11 +36,6 @@
 
 #include "vout_pictures.h"
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static void CopyPicture( vout_thread_t *, picture_t *, picture_t * );
-
 /**
  * Display a picture
  *
@@ -310,7 +305,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                 /* We have subtitles. First copy the picture to
                  * the spare direct buffer, then render the
                  * subtitles. */
-                CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
+                vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
 
                 vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0],
                                         p_pic , p_subpic );
@@ -349,7 +344,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                 return NULL;
             }
 
-        CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
+        vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
         vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_pic, p_subpic );
 
         if( PP_OUTPUTPICTURE[0]->pf_unlock )
@@ -390,7 +385,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
             if( p_vout->p_picture[0].pf_lock( p_vout, &p_vout->p_picture[0] ) )
                 return NULL;
 
-        CopyPicture( p_vout, p_tmp_pic, &p_vout->p_picture[0] );
+        vout_CopyPicture( p_vout, &p_vout->p_picture[0], p_tmp_pic );
     }
     else
     {
@@ -494,9 +489,9 @@ void vout_PlacePicture( vout_thread_t *p_vout,
  * used exactly like a video buffer. The video output thread then manages
  * how it gets displayed.
  */
-void vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
-                           vlc_fourcc_t i_chroma,
-                           int i_width, int i_height, int i_aspect )
+int __vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
+                            vlc_fourcc_t i_chroma,
+                            int i_width, int i_height, int i_aspect )
 {
     int i_bytes, i_index, i_width_aligned, i_height_aligned;
 
@@ -504,8 +499,12 @@ void vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
     i_width_aligned = (i_width + 15) >> 4 << 4;
     i_height_aligned = (i_height + 15) >> 4 << 4;
 
-    vout_InitPicture( p_this, p_pic, i_chroma,
-                      i_width, i_height, i_aspect );
+    if( vout_InitPicture( p_this, p_pic, i_chroma,
+                          i_width, i_height, i_aspect ) != VLC_SUCCESS )
+    {
+        p_pic->i_planes = 0;
+        return VLC_EGENERIC;
+    }
 
     /* Calculate how big the new image should be */
     i_bytes = p_pic->format.i_bits_per_pixel *
@@ -516,7 +515,7 @@ void vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
     if( p_pic->p_data == NULL )
     {
         p_pic->i_planes = 0;
-        return;
+        return VLC_EGENERIC;
     }
 
     /* Fill the p_pixels field for each plane */
@@ -527,6 +526,8 @@ void vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
         p_pic->p[i_index].p_pixels = p_pic->p[i_index-1].p_pixels +
             p_pic->p[i_index-1].i_lines * p_pic->p[i_index-1].i_pitch;
     }
+
+    return VLC_SUCCESS;
 }
 
 /**
@@ -619,9 +620,9 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
  * \param i_height The height of the picture
  * \param i_aspect The aspect ratio of the picture
  */
-void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
-                       vlc_fourcc_t i_chroma,
-                       int i_width, int i_height, int i_aspect )
+int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
+                        vlc_fourcc_t i_chroma,
+                        int i_width, int i_height, int i_aspect )
 {
     int i_index, i_width_aligned, i_height_aligned;
 
@@ -826,8 +827,10 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             msg_Err( p_this, "unknown chroma type 0x%.8x (%4.4s)",
                              i_chroma, (char*)&i_chroma );
             p_pic->i_planes = 0;
-            return;
+            return VLC_EGENERIC;
     }
+
+    return VLC_SUCCESS;
 }
 
 /**
@@ -892,17 +895,15 @@ int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
     }
 }
 
-/* Following functions are local */
-
 /*****************************************************************************
- * CopyPicture: copy a picture to another one
+ * vout_CopyPicture: copy a picture to another one
  *****************************************************************************
  * This function takes advantage of the image format, and reduces the
  * number of calls to memcpy() to the minimum. Source and destination
  * images must have same width (hence i_visible_pitch), height, and chroma.
  *****************************************************************************/
-static void CopyPicture( vout_thread_t * p_vout,
-                         picture_t *p_src, picture_t *p_dest )
+void __vout_CopyPicture( vlc_object_t *p_this,
+                         picture_t *p_dest, picture_t *p_src )
 {
     int i;
 
@@ -911,7 +912,7 @@ static void CopyPicture( vout_thread_t * p_vout,
         if( p_src->p[i].i_pitch == p_dest->p[i].i_pitch )
         {
             /* There are margins, but with the same width : perfect ! */
-            p_vout->p_vlc->pf_memcpy(
+            p_this->p_vlc->pf_memcpy(
                          p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
                          p_src->p[i].i_pitch * p_src->p[i].i_visible_lines );
         }
@@ -924,12 +925,13 @@ static void CopyPicture( vout_thread_t * p_vout,
 
             for( i_line = p_src->p[i].i_visible_lines; i_line--; )
             {
-                p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                p_this->p_vlc->pf_memcpy( p_out, p_in,
                                           p_src->p[i].i_visible_pitch );
                 p_in += p_src->p[i].i_pitch;
                 p_out += p_dest->p[i].i_pitch;
             }
         }
     }
+
     p_dest->date = p_src->date;
 }

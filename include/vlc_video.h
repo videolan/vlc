@@ -299,7 +299,48 @@ struct subpicture_t
  * \param i_aspect_x the decoded x-axis portion of i_aspect. This is set.
  * \param i_aspect_y the decoded y-axis portion of i_aspect  This is set.
  */
-VLC_EXPORT( void,  vout_AspectRatio, ( unsigned int i_aspect, unsigned int *i_aspect_x, unsigned int *i_aspect_y ) );
+VLC_EXPORT( void, vout_AspectRatio, ( unsigned int i_aspect, unsigned int *i_aspect_x, unsigned int *i_aspect_y ) );
+
+/**
+ * vout_CopyPicture
+ *
+ * Copy the source picture onto the destination picture.
+ * \param p_this a vlc object
+ * \param p_dst pointer to the destination picture.
+ * \param p_src pointer to the source picture.
+ */
+#define vout_CopyPicture(a,b,c) __vout_CopyPicture(VLC_OBJECT(a),b,c)
+VLC_EXPORT( void, __vout_CopyPicture, ( vlc_object_t *p_this, picture_t *p_dst, picture_t *p_src ) );
+
+/**
+ * vout_InitPicture
+ *
+ * Initialise different fields of a picture_t (but does not allocate memory).
+ * \param p_this a vlc object
+ * \param p_pic pointer to the picture structure.
+ * \param i_chroma the wanted chroma for the picture.
+ * \param i_width the wanted width for the picture.
+ * \param i_height the wanted height for the picture.
+ * \param i_aspect the wanted aspect ratio for the picture.
+ */
+#define vout_InitPicture(a,b,c,d,e,f) \
+        __vout_InitPicture(VLC_OBJECT(a),b,c,d,e,f)
+VLC_EXPORT( int, __vout_InitPicture, ( vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_aspect ) );
+
+/**
+ * vout_AllocatePicture
+ *
+ * Initialise different fields of a picture_t and allocates the picture buffer.
+ * \param p_this a vlc object
+ * \param p_pic pointer to the picture structure.
+ * \param i_chroma the wanted chroma for the picture.
+ * \param i_width the wanted width for the picture.
+ * \param i_height the wanted height for the picture.
+ * \param i_aspect the wanted aspect ratio for the picture.
+ */
+#define vout_AllocatePicture(a,b,c,d,e,f) \
+        __vout_AllocatePicture(VLC_OBJECT(a),b,c,d,e,f)
+VLC_EXPORT( int, __vout_AllocatePicture,( vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_aspect ) );
 
 /**@}*/
 
