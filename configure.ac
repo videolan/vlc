@@ -3926,7 +3926,6 @@ AC_CONFIG_FILES([
   modules/gui/gtk2/Makefile
   modules/gui/kde/Makefile
   modules/gui/macosx/Makefile
-  modules/gui/ncurses/Makefile
   modules/gui/qnx/Makefile
   modules/gui/qt/Makefile
   modules/gui/skins/Makefile
