@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.12 2003/07/11 09:50:10 gbazin Exp $
+ * $Id: http.c,v 1.13 2003/07/11 18:19:43 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -339,7 +339,7 @@ static char *FileToUrl( char *name )
 #ifdef WIN32
     while( *name == '\\' || *name == '/' )
 #else
-    while( *name == '\\' )
+    while( *name == '/' )
 #endif
     {
         name++;
@@ -740,7 +740,7 @@ static char *mvar_GetValue( mvar_t *v, char *field )
         }
         else
         {
-            return "";
+            return field;
         }
     }
 }
@@ -930,6 +930,168 @@ static mvar_t *mvar_HttpdInfoSetNew( char *name, httpd_t *p_httpd, int i_type )
 
     return s;
 }
+static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
+{
+    mvar_t *s = mvar_New( name, "set" );
+    char           tmp[MAX_DIR_SIZE], *p, *src;
+#ifdef HAVE_SYS_STAT_H
+    struct stat   stat_info;
+#endif
+    DIR           *p_dir;
+    struct dirent *p_dir_content;
+    char          sep;
+
+    /* convert all / to native separator */
+#if defined( WIN32 )
+    while( p = strchr( psz_dir, '/' ) )
+    {
+        *p = '\\';
+    }
+    sep = '\\';
+#else
+    sep = '/';
+#endif
+
+    /* remove trailling separoator */
+    while( strlen( psz_dir ) > 1 && psz_dir[strlen( psz_dir ) -1 ] == sep )
+    {
+        psz_dir[strlen( psz_dir ) -1 ]  ='\0';
+    }
+    /* remove double separator */
+    for( p = src = psz_dir; *src != '\0'; src++, p++ )
+    {
+        if( src[0] == sep && src[1] == sep )
+        {
+            src++;
+        }
+        *p = *src;
+    }
+    *p = '\0';
+
+    if( *psz_dir == '\0' )
+    {
+        return s;
+    }
+    /* first fix all .. dir */
+    p = src = psz_dir;
+    while( *src )
+    {
+        if( src[0] == '.' && src[1] == '.' )
+        {
+            src += 2;
+            if( p <= &psz_dir[1] )
+            {
+                continue;
+            }
+
+            p -= 2;
+
+            while( p > &psz_dir[1] && *p != sep )
+            {
+                p--;
+            }
+        }
+        else if( *src == sep )
+        {
+            if( p > psz_dir && p[-1] == sep )
+            {
+                src++;
+            }
+            else
+            {
+                *p++ = *src++;
+            }
+        }
+        else
+        {
+            do
+            {
+                *p++ = *src++;
+            } while( *src && *src != sep );
+        }
+    }
+    *p = '\0';
+
+    fprintf( stderr," mvar_FileSetNew: name=`%s' dir=`%s'\n", name, psz_dir );
+
+#ifdef HAVE_SYS_STAT_H
+    if( stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
+    {
+        return s;
+    }
+#endif
+
+    if( ( p_dir = opendir( psz_dir ) ) == NULL )
+    {
+        fprintf( stderr, "cannot open dir (%s)", psz_dir );
+        return s;
+    }
+
+    /* remove traling / or \ */
+    for( p = &psz_dir[strlen( psz_dir) - 1]; p >= psz_dir && ( *p =='/' || *p =='\\' ); p-- )
+    {
+        *p = '\0';
+    }
+
+    for( ;; )
+    {
+        mvar_t *f;
+
+        /* parse psz_src dir */
+        if( ( p_dir_content = readdir( p_dir ) ) == NULL )
+        {
+            break;
+        }
+        if( !strcmp( p_dir_content->d_name, "." ) )
+        {
+            continue;
+        }
+
+#if defined( WIN32 )
+        sprintf( tmp, "%s\\%s", psz_dir, p_dir_content->d_name );
+#else
+        sprintf( tmp, "%s/%s", psz_dir, p_dir_content->d_name );
+#endif
+
+#ifdef HAVE_SYS_STAT_H
+        if( stat( tmp, &stat_info ) == -1 )
+        {
+            continue;
+        }
+#endif
+        f = mvar_New( name, "set" );
+        mvar_AppendNewVar( f, "name", tmp );
+#ifdef HAVE_SYS_STAT_H
+        if( S_ISDIR( stat_info.st_mode ) )
+        {
+            mvar_AppendNewVar( f, "type", "directory" );
+        }
+        else if( S_ISREG( stat_info.st_mode ) )
+        {
+            mvar_AppendNewVar( f, "type", "file" );
+        }
+        else
+        {
+            mvar_AppendNewVar( f, "type", "unknown" );
+        }
+
+        sprintf( tmp, "%lld", stat_info.st_size );
+        mvar_AppendNewVar( f, "size", tmp );
+
+        /* FIXME memory leak FIXME */
+        ctime_r( &stat_info.st_mtime, tmp );
+        mvar_AppendNewVar( f, "date", tmp );
+#else
+        mvar_AppendNewVar( f, "type", "unknown" );
+        mvar_AppendNewVar( f, "size", "unknown" );
+        mvar_AppendNewVar( f, "date", "unknown" );
+#endif
+        mvar_AppendVar( s, f );
+    }
+
+    return s;
+}
+
 static void SSInit( stack_t * );
 static void SSClean( stack_t * );
 static void EvaluateRPN( mvar_t  *, stack_t *, char * );
@@ -1316,9 +1478,16 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
         {
             char *s, *v;
 
-            EvaluateRPN( p_args->vars, &p_args->stack, m->param1 );
-            s = SSPop( &p_args->stack );
-            v = mvar_GetValue( p_args->vars, s );
+            if( m->param1 )
+            {
+                EvaluateRPN( p_args->vars, &p_args->stack, m->param1 );
+                s = SSPop( &p_args->stack );
+                v = mvar_GetValue( p_args->vars, s );
+            }
+            else
+            {
+                v = s = SSPop( &p_args->stack );
+            }
 
             PRINTS( "%s", v );
             free( s );
@@ -1478,9 +1647,17 @@ static void Execute( httpd_file_callback_args_t *p_args,
                         mvar_t *index;
                         int    i_idx;
                         mvar_t *v;
-                        if( !strncmp( m.param2, "integer=", 8 ) )
+                        if( !strcmp( m.param2, "integer" ) )
                         {
-                            index = mvar_IntegerSetNew( m.param1, &m.param2[8] );
+                            char *arg = SSPop( &p_args->stack );
+                            index = mvar_IntegerSetNew( m.param1, arg );
+                            free( arg );
+                        }
+                        else if( !strcmp( m.param2, "directory" ) )
+                        {
+                            char *arg = SSPop( &p_args->stack );
+                            index = mvar_FileSetNew( m.param1, arg );
+                            free( arg );
                         }
                         else if( !strcmp( m.param2, "playlist" ) )
                         {
@@ -1610,6 +1787,7 @@ static int  http_get( httpd_file_callback_args_t *p_args,
 
         p_args->vars = mvar_New( "variables", "" );
         mvar_AppendNewVar( p_args->vars, "url_param", i_request > 0 ? "1" : "0" );
+        mvar_AppendNewVar( p_args->vars, "url_value", p_request );
         mvar_AppendNewVar( p_args->vars, "version",   VERSION_MESSAGE );
         mvar_AppendNewVar( p_args->vars, "copyright", COPYRIGHT_MESSAGE );
 
@@ -1803,11 +1981,13 @@ static void  EvaluateRPN( mvar_t  *vars, stack_t *st, char *exp )
         {
             /* extract string */
             p = &s[0];
+            exp++;
             while( *exp && *exp != '\'' )
             {
                 *p++ = *exp++;
             }
             *p = '\0';
+            exp++;
             SSPush( st, s );
             continue;
         }
@@ -1992,6 +2172,16 @@ static void  EvaluateRPN( mvar_t  *vars, stack_t *st, char *exp )
             SSPush( st, value );
 
             free( name );
+        }
+        else if( !strcmp( s, "url_extract" ) )
+        {
+            char *url = mvar_GetValue( vars, "url_value" );
+            char *name = SSPop( st );
+            char value[512];
+
+            uri_extract_value( url, name, value, 512 );
+            uri_decode_url_encoded( value );
+            SSPush( st, value );
         }
         else
         {
