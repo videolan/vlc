@@ -2,7 +2,7 @@
  * vpar_blocks.h : video parser blocks management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.h,v 1.2 2001/01/17 18:17:30 massiot Exp $
+ * $Id: vpar_blocks.h,v 1.32 2001/01/18 05:13:22 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -52,7 +52,8 @@ typedef struct macroblock_s
 
     /* IDCT information */
     dctelem_t               ppi_blocks[12][64];                    /* blocks */
-    f_idct_t                pf_idct[12];             /* sparse IDCT or not ? */
+    void ( * pf_idct[12] )  ( struct vdec_thread_s *,
+                              dctelem_t*, int );     /* sparse IDCT or not ? */
     int                     pi_sparse_pos[12];             /* position of the
                                                             * non-NULL coeff */
 

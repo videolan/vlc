@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.68 2001/01/17 18:17:31 massiot Exp $
+ * $Id: video_parser.c,v 1.69 2001/01/18 05:13:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -52,10 +52,10 @@
 #include "video_output.h"
 
 #include "video_decoder.h"
-#include "../video_decoder/vdec_motion.h"
+#include "vdec_motion.h"
 #include "../video_decoder/vdec_idct.h"
 
-#include "../video_decoder/vpar_blocks.h"
+#include "vpar_blocks.h"
 #include "../video_decoder/vpar_headers.h"
 #include "../video_decoder/vpar_synchro.h"
 #include "../video_decoder/video_parser.h"
@@ -101,30 +101,100 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
 
     p_vpar->p_vout = p_config->p_vout;
 
-    /* Choose the best IDCT module */
-    p_vpar->p_module = module_Need( p_main->p_module_bank,
-                                    MODULE_CAPABILITY_IDCT, NULL );
+    /*
+     * Choose the best motion compensation module
+     */
+    p_vpar->p_motion_module = module_Need( p_main->p_module_bank,
+                                           MODULE_CAPABILITY_MOTION, NULL );
 
-    if( p_vpar->p_module == NULL )
+    if( p_vpar->p_motion_module == NULL )
     {
-        intf_ErrMsg( "vpar error: no suitable IDCT module" );
+        intf_ErrMsg( "vpar error: no suitable motion compensation module" );
         free( p_vpar );
         return( 0 );
     }
 
-#define idct_functions p_vpar->p_module->p_functions->idct.functions.idct
-    p_vpar->pf_init         = idct_functions.pf_init;
-    p_vpar->pf_sparse_idct  = idct_functions.pf_sparse_idct;
-    p_vpar->pf_idct         = idct_functions.pf_idct;
-    p_vpar->pf_norm_scan    = idct_functions.pf_norm_scan;
-#undef idct_functions
+#define m ( p_vpar->pppf_motion )
+#define s ( p_vpar->ppf_motion_skipped )
+#define f ( p_vpar->p_motion_module->p_functions->motion.functions.motion )
+    m[0][0][0] = m[0][0][1] = m[0][0][2] = m[0][0][3] = NULL;
+    m[0][1][0] = m[0][1][1] = m[0][1][2] = m[0][1][3] = NULL;
+    m[1][0][0] = NULL;
+    m[1][1][0] = NULL;
+    m[2][0][0] = NULL;
+    m[2][1][0] = NULL;
+    m[3][0][0] = NULL;
+    m[3][1][0] = NULL;
+
+    m[1][0][1] = f.pf_field_field_420;
+    m[1][1][1] = f.pf_frame_field_420;
+    m[2][0][1] = f.pf_field_field_422;
+    m[2][1][1] = f.pf_frame_field_422;
+    m[3][0][1] = f.pf_field_field_444;
+    m[3][1][1] = f.pf_frame_field_444;
+
+    m[1][0][2] = f.pf_field_16x8_420;
+    m[1][1][2] = f.pf_frame_frame_420;
+    m[2][0][2] = f.pf_field_16x8_422;
+    m[2][1][2] = f.pf_frame_frame_422;
+    m[3][0][2] = f.pf_field_16x8_444;
+    m[3][1][2] = f.pf_frame_frame_444;
+
+    m[1][0][3] = f.pf_field_dmv_420;
+    m[1][1][3] = f.pf_frame_dmv_420;
+    m[2][0][3] = f.pf_field_dmv_422;
+    m[2][1][3] = f.pf_frame_dmv_422;
+    m[3][0][3] = f.pf_field_dmv_444;
+    m[3][1][3] = f.pf_frame_dmv_444;
+
+    s[0][0] = s[0][1] = s[0][2] = s[0][3] = NULL;
+    s[1][0] = NULL;
+    s[2][0] = NULL;
+    s[3][0] = NULL;
+
+    s[1][1] = f.pf_field_field_420;
+    s[2][1] = f.pf_field_field_422;
+    s[3][1] = f.pf_field_field_444;
+
+    s[1][2] = f.pf_field_field_420;
+    s[2][2] = f.pf_field_field_422;
+    s[3][2] = f.pf_field_field_444;
+
+    s[1][3] = f.pf_frame_frame_420;
+    s[2][3] = f.pf_frame_frame_422;
+    s[3][3] = f.pf_frame_frame_444;
+#undef f
+#undef s
+#undef m
+
+     /*
+      * Choose the best IDCT module
+      */
+    p_vpar->p_idct_module = module_Need( p_main->p_module_bank,
+                                         MODULE_CAPABILITY_IDCT, NULL );
+
+    if( p_vpar->p_idct_module == NULL )
+    {
+        intf_ErrMsg( "vpar error: no suitable IDCT module" );
+        module_Unneed( p_main->p_module_bank, p_vpar->p_motion_module );
+        free( p_vpar );
+        return( 0 );
+    }
+
+#define f p_vpar->p_idct_module->p_functions->idct.functions.idct
+    p_vpar->pf_init         = f.pf_init;
+    p_vpar->pf_sparse_idct  = f.pf_sparse_idct;
+    p_vpar->pf_idct         = f.pf_idct;
+    p_vpar->pf_norm_scan    = f.pf_norm_scan;
+#undef f
 
     /* Spawn the video parser thread */
     if ( vlc_thread_create( &p_vpar->thread_id, "video parser",
                             (vlc_thread_func_t)RunThread, (void *)p_vpar ) )
     {
         intf_ErrMsg("vpar error: can't spawn video parser thread");
-        module_Unneed( p_main->p_module_bank, p_vpar->p_module );
+        module_Unneed( p_main->p_module_bank, p_vpar->p_idct_module );
+        module_Unneed( p_main->p_module_bank, p_vpar->p_motion_module );
         free( p_vpar );
         return( 0 );
     }
@@ -434,7 +504,8 @@ static void EndThread( vpar_thread_t *p_vpar )
     
     vlc_mutex_destroy( &(p_vpar->synchro.fifo_lock) );
     
-    module_Unneed( p_main->p_module_bank, p_vpar->p_module );
+    module_Unneed( p_main->p_module_bank, p_vpar->p_idct_module );
+    module_Unneed( p_main->p_module_bank, p_vpar->p_motion_module );
 
     free( p_vpar );
 

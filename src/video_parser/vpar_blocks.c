@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.71 2001/01/17 18:17:31 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.72 2001/01/18 05:13:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -45,10 +45,10 @@
 #include "video_output.h"
 
 #include "video_decoder.h"
+#include "vdec_motion.h"
 #include "../video_decoder/vdec_idct.h"
-#include "../video_decoder/vdec_motion.h"
 
-#include "../video_decoder/vpar_blocks.h"
+#include "vpar_blocks.h"
 #include "../video_decoder/vpar_headers.h"
 #include "../video_decoder/vpar_synchro.h"
 #include "../video_decoder/video_parser.h"
@@ -1585,17 +1585,6 @@ static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
 {
     macroblock_t *  p_mb;
 
-    static f_motion_t   pf_motion_skipped[4][4] =
-    {
-        {NULL, NULL, NULL, NULL},
-        {NULL, vdec_MotionFieldField420, vdec_MotionFieldField420,
-            vdec_MotionFrameFrame420},
-        {NULL, vdec_MotionFieldField422, vdec_MotionFieldField422,
-            vdec_MotionFrameFrame422},
-        {NULL, vdec_MotionFieldField444, vdec_MotionFieldField444,
-            vdec_MotionFrameFrame444},
-    };
-
     if( i_coding_type == I_CODING_TYPE )
     {
         intf_DbgMsg("vpar error: skipped macroblock in I-picture");
@@ -1616,8 +1605,8 @@ static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
                     i_structure, b_second_field );
 
     /* Motion type is picture structure. */
-    p_mb->pf_motion = pf_motion_skipped[i_chroma_format]
-                                       [i_structure];
+    p_mb->pf_motion = p_vpar->ppf_motion_skipped[i_chroma_format]
+                                                [i_structure];
     p_mb->i_coded_block_pattern = 0;
 
     /* Motion direction and motion vectors depend on the coding type. */
@@ -1820,27 +1809,6 @@ static __inline__ void ParseMacroblock(
                            boolean_t b_second_field )     /* second field of a
                                                            * field picture   */
 {
-    static f_motion_t   pppf_motion[4][2][4] =
-      {
-        { {NULL, NULL, NULL, NULL},
-          {NULL, NULL, NULL, NULL}
-        },
-        { {NULL, vdec_MotionFieldField420, vdec_MotionField16x8420,
-            vdec_MotionFieldDMV420},
-          {NULL, vdec_MotionFrameField420, vdec_MotionFrameFrame420,
-            vdec_MotionFrameDMV420}
-        },
-        { {NULL, vdec_MotionFieldField422, vdec_MotionField16x8422,
-            vdec_MotionFieldDMV422},
-          {NULL, vdec_MotionFrameField422, vdec_MotionFrameFrame422,
-            vdec_MotionFrameDMV422}
-        },
-        { {NULL, vdec_MotionFieldField444, vdec_MotionField16x8444,
-            vdec_MotionFieldDMV444},
-          {NULL, vdec_MotionFrameField444, vdec_MotionFrameFrame444,
-            vdec_MotionFrameDMV444}
-        }
-      };
     static int      pi_x[12] = {0,8,0,8,0,0,0,0,8,8,8,8};
     static int      pi_y[2][12] = { {0,0,8,8,0,0,8,8,0,0,8,8},
                                     {0,0,1,1,0,0,1,1,0,0,1,1} };
@@ -1943,9 +1911,9 @@ static __inline__ void ParseMacroblock(
             = 1 << (7 + p_vpar->picture.i_intra_dc_precision);
 
         /* Motion function pointer. */
-        p_mb->pf_motion = pppf_motion[i_chroma_format]
-                                     [i_structure == FRAME_STRUCTURE]
-                                     [p_vpar->mb.i_motion_type];
+        p_mb->pf_motion = p_vpar->pppf_motion[i_chroma_format]
+                                             [i_structure == FRAME_STRUCTURE]
+                                             [p_vpar->mb.i_motion_type];
 
         if( p_mb->i_mb_type & MB_PATTERN )
         {

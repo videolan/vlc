@@ -451,8 +451,9 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
     p_module->prev = NULL;
     p_bank->first = p_module;
 
-    intf_Msg( "module: dynamic module `%s', %s",
-              p_module->psz_name, p_module->psz_longname );
+    /* Immediate message so that a slow module doesn't make the user wait */
+    intf_MsgImm( "module: dynamic module `%s', %s",
+                 p_module->psz_name, p_module->psz_longname );
 
     return( 0 );
 }

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.25 2001/01/12 17:33:18 massiot Exp $
+ * $Id: input_programs.c,v 1.26 2001/01/18 05:13:22 sam Exp $
  *
  * Authors:
  *
@@ -577,6 +577,11 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         intf_ErrMsg( "Unknown stream type %d", p_es->i_type );
         return( -1 );
         break;
+    }
+
+    if( p_es->thread_id == 0 )
+    {
+        return( -1 );
     }
 
     if( p_es->p_decoder_fifo != NULL )

@@ -225,22 +225,13 @@ SPU_DECODER =	src/spu_decoder/spu_decoder.o
 
 #GEN_DECODER =	src/generic_decoder/generic_decoder.o
 
-
 VIDEO_PARSER = 	src/video_parser/video_parser.o \
 		src/video_parser/vpar_headers.o \
 		src/video_parser/vpar_blocks.o \
 		src/video_parser/vpar_synchro.o \
 		src/video_parser/video_fifo.o
 
-ifneq (,$(findstring mmx,$(ARCH)))
-	vdec_motion_inner = src/video_decoder/vdec_motion_inner_mmx.o
-else
-	vdec_motion_inner = src/video_decoder/vdec_motion_inner.o
-endif
-
-VIDEO_DECODER =	src/video_decoder/video_decoder.o \
-		src/video_decoder/vdec_motion.o \
-		$(vdec_motion_inner)
+VIDEO_DECODER =	src/video_decoder/video_decoder.o
 
 MISC =		src/misc/mtime.o \
 		src/misc/tests.o \
@@ -344,6 +335,18 @@ PLUGIN_YUVMMX =	plugins/yuv/yuvmmx.o \
 		plugins/yuv/video_yuvmmx.o \
 		plugins/yuv/transforms_yuvmmx.o
 
+PLUGIN_MOTION =	plugins/motion/motion.o \
+		plugins/motion/vdec_motion_common.o \
+		plugins/motion/vdec_motion_inner.o
+
+PLUGIN_MOTIONMMX =	plugins/motion/motionmmx.o \
+			plugins/motion/vdec_motion_common.o \
+			plugins/motion/vdec_motion_inner_mmx.o
+
+PLUGIN_MOTIONMMXEXT =	plugins/motion/motionmmxext.o \
+			plugins/motion/vdec_motion_common.o \
+			plugins/motion/vdec_motion_inner_mmxext.o
+
 PLUGIN_IDCT =	plugins/idct/idct.o \
 		plugins/idct/idct_common.o
 
@@ -369,6 +372,9 @@ STD_PLUGIN_OBJ =$(PLUGIN_BEOS) \
 		$(PLUGIN_X11) \
 		$(PLUGIN_YUV) \
 		$(PLUGIN_YUVMMX) \
+		$(PLUGIN_MOTION) \
+		$(PLUGIN_MOTIONMMX) \
+		$(PLUGIN_MOTIONMMXEXT) \
 		$(PLUGIN_IDCT) \
 		$(PLUGIN_IDCTCLASSIC) \
 		$(PLUGIN_IDCTMMX) \
@@ -378,7 +384,8 @@ STD_PLUGIN_OBJ =$(PLUGIN_BEOS) \
 		$(PLUGIN_NULL)
 
 # list duplicates
-STD_PLUGIN_COMMON =	plugins/idct/idct_common.o
+STD_PLUGIN_COMMON =	plugins/idct/idct_common.o \
+			plugins/motion/vdec_motion_common.o
 
 # filter out duplicates from the plugin object lists
 STD_PLUGIN_OBJ :=	$(filter-out $(STD_PLUGIN_COMMON) $(STD_PLUGIN_ASM), \
@@ -404,8 +411,8 @@ all: vlc @ALIASES@ plugins
 
 clean:
 	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ)
-	rm -f plugins/*/*.o src/*/*.o
-	rm -f vlc @ALIASES@ lib/*.so
+	rm -f plugins/*/*.o src/*/*.o lib/*.so
+	rm -f vlc @ALIASES@
 
 distclean: clean
 	rm -f src/*/*.o plugins/*/*.o **/*~ *.log
@@ -558,13 +565,22 @@ lib/null.so: $(PLUGIN_NULL)
 lib/dummy.so: $(PLUGIN_DUMMY)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 
-lib/idct.so: $(PLUGIN_IDCT)
-	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-
 lib/yuv.so: $(PLUGIN_YUV)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 
 lib/yuvmmx.so: $(PLUGIN_YUVMMX)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
+lib/motion.so: $(PLUGIN_MOTION)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
+lib/motionmmx.so: $(PLUGIN_MOTIONMMX)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
+lib/motionmmxext.so: $(PLUGIN_MOTIONMMXEXT)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
+lib/idct.so: $(PLUGIN_IDCT)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 
 lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC)
@@ -586,6 +602,15 @@ lib/yuv.so: $(PLUGIN_YUV)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
 
 lib/yuvmmx.so: $(PLUGIN_YUVMMX)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/motion.so: $(PLUGIN_MOTION)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/motionmmx.so: $(PLUGIN_MOTIONMMX)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/motionmmxext.so: $(PLUGIN_MOTIONMMXEXT)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
 
 lib/idct.so: $(PLUGIN_IDCT)

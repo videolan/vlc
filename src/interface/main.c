@@ -79,8 +79,9 @@
 #define OPT_WIDTH               163
 #define OPT_HEIGHT              164
 #define OPT_COLOR               165
-#define OPT_IDCT                166
-#define OPT_YUV                 167
+#define OPT_MOTION              167
+#define OPT_IDCT                168
+#define OPT_YUV                 169
 
 #define OPT_VLANS               170
 #define OPT_SERVER              171
@@ -122,6 +123,7 @@ static const struct option longopts[] =
     {   "height",           1,          0,      OPT_HEIGHT },
     {   "grayscale",        0,          0,      'g' },
     {   "color",            0,          0,      OPT_COLOR },
+    {   "motion",           1,          0,      OPT_MOTION },
     {   "idct",             1,          0,      OPT_IDCT },
     {   "yuv",              1,          0,      OPT_YUV },
 
@@ -569,6 +571,9 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_COLOR:                                           /* --color */
             main_PutIntVariable( VOUT_GRAYSCALE_VAR, 0 );
             break;
+	case OPT_MOTION:                                         /* --motion */
+            main_PutPszVariable( MOTION_METHOD_VAR, optarg );
+            break;
 	case OPT_IDCT:                                             /* --idct */
             main_PutPszVariable( IDCT_METHOD_VAR, optarg );
             break;
@@ -670,6 +675,7 @@ static void Usage( int i_fashion )
               "\n      --width <w>, --height <h>  \tdisplay dimensions"
               "\n  -g, --grayscale                \tgrayscale output"
               "\n      --color                    \tcolor output"
+              "\n      --motion <module>          \tmotion compensation method"
               "\n      --idct <module>            \tIDCT method"
               "\n      --yuv <module>             \tYUV method"
               "\n      --synchro <type>           \tforce synchro algorithm"
@@ -714,6 +720,7 @@ static void Usage( int i_fashion )
               "\n  " VOUT_HEIGHT_VAR "=<height>             \tdislay height"
               "\n  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path"
               "\n  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output"
+              "\n  " MOTION_METHOD_VAR "=<method name>      \tmotion compensation method"
               "\n  " IDCT_METHOD_VAR "=<method name>        \tIDCT method"
               "\n  " YUV_METHOD_VAR "=<method name>         \tYUV method"
               "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm" );

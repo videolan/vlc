@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vdec_motion.c : motion compensation routines
+ * vdec_motion_common.c : common motion compensation routines common
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion.c,v 1.35 2001/01/05 18:46:44 massiot Exp $
+ * $Id: vdec_motion_common.c,v 1.1 2001/01/18 05:13:22 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -32,25 +32,60 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
+#include "modules.h"
 
 #include "intf_msg.h"
 
-#include "stream_control.h"
-#include "input_ext-dec.h"
-
 #include "video.h"
-#include "video_output.h"
 
-#include "vdec_idct.h"
-#include "video_decoder.h"
 #include "vdec_motion.h"
-
 #include "vpar_blocks.h"
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
-#include "video_parser.h"
-#include "video_fifo.h"
+
+extern int motion_Probe( probedata_t *p_data );
+
+static void vdec_MotionFieldField420  ( macroblock_t * p_mb );
+static void vdec_MotionFieldField422  ( macroblock_t * p_mb );
+static void vdec_MotionFieldField444  ( macroblock_t * p_mb );
+static void vdec_MotionField16x8420   ( macroblock_t * p_mb );
+static void vdec_MotionField16x8422   ( macroblock_t * p_mb );
+static void vdec_MotionField16x8444   ( macroblock_t * p_mb );
+static void vdec_MotionFieldDMV420    ( macroblock_t * p_mb );
+static void vdec_MotionFieldDMV422    ( macroblock_t * p_mb );
+static void vdec_MotionFieldDMV444    ( macroblock_t * p_mb );
+static void vdec_MotionFrameFrame420  ( macroblock_t * p_mb );
+static void vdec_MotionFrameFrame422  ( macroblock_t * p_mb );
+static void vdec_MotionFrameFrame444  ( macroblock_t * p_mb );
+static void vdec_MotionFrameField420  ( macroblock_t * p_mb );
+static void vdec_MotionFrameField422  ( macroblock_t * p_mb );
+static void vdec_MotionFrameField444  ( macroblock_t * p_mb );
+static void vdec_MotionFrameDMV420    ( macroblock_t * p_mb );
+static void vdec_MotionFrameDMV422    ( macroblock_t * p_mb );
+static void vdec_MotionFrameDMV444    ( macroblock_t * p_mb );
+
+/*****************************************************************************
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+void motion_getfunctions( function_list_t * p_function_list )
+{
+    p_function_list->pf_probe = motion_Probe;
+
+#define list p_function_list->functions.motion
+#define motion_functions( yuv ) \
+    list.pf_field_field_##yuv = vdec_MotionFieldField##yuv; \
+    list.pf_field_16x8_##yuv  = vdec_MotionField16x8##yuv;  \
+    list.pf_field_dmv_##yuv   = vdec_MotionFieldDMV##yuv;   \
+    list.pf_frame_field_##yuv = vdec_MotionFrameField##yuv; \
+    list.pf_frame_frame_##yuv = vdec_MotionFrameFrame##yuv; \
+    list.pf_frame_dmv_##yuv   = vdec_MotionFrameDMV##yuv;
+    motion_functions( 420 )
+    motion_functions( 422 )
+    motion_functions( 444 )
+#undef motion_functions
+#undef list
+
+    return;
+}
 
 #define __MotionComponents(width,height)                \
 void MotionComponent_x_y_copy_##width##_##height ();    \
@@ -62,10 +97,10 @@ void MotionComponent_X_y_avg_##width##_##height ();     \
 void MotionComponent_x_Y_avg_##width##_##height ();     \
 void MotionComponent_X_Y_avg_##width##_##height ();
 
-__MotionComponents (16,16)        /* 444, 422, 420 */
+__MotionComponents (16,16)       /* 444, 422, 420 */
 __MotionComponents (16,8)        /* 444, 422, 420 */
-__MotionComponents (8,8)        /* 422, 420 */
-__MotionComponents (8,4)        /* 420 */
+__MotionComponents (8,8)         /* 422, 420 */
+__MotionComponents (8,4)         /* 420 */
 #if 0
 __MotionComponents (8,16)        /* 422 */
 #endif
@@ -407,17 +442,17 @@ static __inline__ void Motion444(
     }                                                                   \
 }
 
-void vdec_MotionFieldField420( macroblock_t * p_mb )
+static void vdec_MotionFieldField420( macroblock_t * p_mb )
 {
     FIELDFIELD( Motion420 )
 }
 
-void vdec_MotionFieldField422( macroblock_t * p_mb )
+static void vdec_MotionFieldField422( macroblock_t * p_mb )
 {
     //FIELDFIELD( Motion422 )
 }
 
-void vdec_MotionFieldField444( macroblock_t * p_mb )
+static void vdec_MotionFieldField444( macroblock_t * p_mb )
 {
     //FIELDFIELD( Motion444 )
 }
@@ -489,17 +524,17 @@ void vdec_MotionFieldField444( macroblock_t * p_mb )
     }                                                                   \
 }
 
-void vdec_MotionField16x8420( macroblock_t * p_mb )
+static void vdec_MotionField16x8420( macroblock_t * p_mb )
 {
     FIELD16X8( Motion420 )
 }
 
-void vdec_MotionField16x8422( macroblock_t * p_mb )
+static void vdec_MotionField16x8422( macroblock_t * p_mb )
 {
     //FIELD16X8( Motion422 )
 }
 
-void vdec_MotionField16x8444( macroblock_t * p_mb )
+static void vdec_MotionField16x8444( macroblock_t * p_mb )
 {
     //FIELD16X8( Motion444 )
 }
@@ -531,17 +566,17 @@ void vdec_MotionField16x8444( macroblock_t * p_mb )
             p_mb->i_l_stride, p_mb->i_c_stride, 16, 0, 1 );             \
 } /* FIELDDMV */
 
-void vdec_MotionFieldDMV420( macroblock_t * p_mb )
+static void vdec_MotionFieldDMV420( macroblock_t * p_mb )
 {
     FIELDDMV( Motion420 )
 }
 
-void vdec_MotionFieldDMV422( macroblock_t * p_mb )
+static void vdec_MotionFieldDMV422( macroblock_t * p_mb )
 {
     //FIELDDMV( Motion422 )
 }
 
-void vdec_MotionFieldDMV444( macroblock_t * p_mb )
+static void vdec_MotionFieldDMV444( macroblock_t * p_mb )
 {
     //FIELDDMV( Motion444 )
 }
@@ -576,17 +611,17 @@ void vdec_MotionFieldDMV444( macroblock_t * p_mb )
     }                                                                   \
 } /* FRAMEFRAME */
 
-void vdec_MotionFrameFrame420( macroblock_t * p_mb )
+static void vdec_MotionFrameFrame420( macroblock_t * p_mb )
 {
     FRAMEFRAME( Motion420 )
 }
 
-void vdec_MotionFrameFrame422( macroblock_t * p_mb )
+static void vdec_MotionFrameFrame422( macroblock_t * p_mb )
 {
     //FRAMEFRAME( Motion422 )
 }
 
-void vdec_MotionFrameFrame444( macroblock_t * p_mb )
+static void vdec_MotionFrameFrame444( macroblock_t * p_mb )
 {
     //FRAMEFRAME( Motion444 )
 }
@@ -641,17 +676,17 @@ void vdec_MotionFrameFrame444( macroblock_t * p_mb )
     }                                                                   \
 } /* FRAMEFIELD */
 
-void vdec_MotionFrameField420( macroblock_t * p_mb )
+static void vdec_MotionFrameField420( macroblock_t * p_mb )
 {
     FRAMEFIELD( Motion420 )
 }
 
-void vdec_MotionFrameField422( macroblock_t * p_mb )
+static void vdec_MotionFrameField422( macroblock_t * p_mb )
 {
     //FRAMEFIELD( Motion422 )
 }
 
-void vdec_MotionFrameField444( macroblock_t * p_mb )
+static void vdec_MotionFrameField444( macroblock_t * p_mb )
 {
     //FRAMEFIELD( Motion444 )
 }
@@ -689,17 +724,18 @@ void vdec_MotionFrameField444( macroblock_t * p_mb )
             p_mb->i_l_stride << 1, p_mb->i_c_stride << 1, 8, 0, 1 );    \
 } /* FRAMEDMV */
 
-void vdec_MotionFrameDMV420( macroblock_t * p_mb )
+static void vdec_MotionFrameDMV420( macroblock_t * p_mb )
 {
     FRAMEDMV( Motion420 )
 }
 
-void vdec_MotionFrameDMV422( macroblock_t * p_mb )
+static void vdec_MotionFrameDMV422( macroblock_t * p_mb )
 {
     //FRAMEDMV( Motion422 )
 }
 
-void vdec_MotionFrameDMV444( macroblock_t * p_mb )
+static void vdec_MotionFrameDMV444( macroblock_t * p_mb )
 {
     //FRAMEDMV( Motion444 )
 }
+

@@ -2,7 +2,7 @@
  * vdec_motion_inner.c : motion compensation inner routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_inner.c,v 1.12 2001/01/05 18:46:44 massiot Exp $
+ * $Id: vdec_motion_inner.c,v 1.1 2001/01/18 05:13:22 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -32,25 +32,8 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
-
-#include "intf_msg.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
 
 #include "video.h"
-#include "video_output.h"
-
-#include "vdec_idct.h"
-#include "video_decoder.h"
-#include "vdec_motion.h"
-
-#include "vpar_blocks.h"
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
-#include "video_parser.h"
-#include "video_fifo.h"
 
 #define __MotionComponent_x_y_copy(width,height)                        \
 void MotionComponent_x_y_copy_##width##_##height(yuv_data_t * p_src,    \

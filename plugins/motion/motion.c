@@ -1,5 +1,5 @@
 /*****************************************************************************
- * yuv.c : C YUV module for vlc
+ * motion.c : C motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME yuv
+#define MODULE_NAME motion
 
 /*****************************************************************************
  * Preamble
@@ -33,9 +33,9 @@
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 
 #include "video.h"
-#include "video_output.h"
 
 #include "modules.h"
 #include "modules_inner.h"
@@ -43,13 +43,13 @@
 /*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
-extern void yuv_getfunctions( function_list_t * p_function_list );
+extern void motion_getfunctions( function_list_t * p_function_list );
 
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for YUV module" )
+ADD_WINDOW( "Configuration for motion compensation module" )
     ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_END
 
@@ -64,11 +64,11 @@ MODULE_CONFIG_END
 int InitModule( module_t * p_module )
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "YUV transformations module";
+    p_module->psz_longname = "motion compensation module";
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_YUV;
+                                | MODULE_CAPABILITY_MOTION;
 
     return( 0 );
 }
@@ -89,7 +89,7 @@ int ActivateModule( module_t * p_module )
         return( -1 );
     }
 
-    yuv_getfunctions( &p_module->p_functions->yuv );
+    motion_getfunctions( &p_module->p_functions->motion );
 
     p_module->p_config = p_config;
 
@@ -108,5 +108,19 @@ int DeactivateModule( module_t * p_module )
     free( p_module->p_functions );
 
     return( 0 );
+}
+
+/*****************************************************************************
+ * motion_Probe: tests probe the CPU and return a score
+ *****************************************************************************/
+int motion_Probe( probedata_t *p_data )
+{
+    if( TestMethod( MOTION_METHOD_VAR, "motion" ) )
+    {
+        return( 999 );
+    }
+
+    /* This module always works */
+    return( 50 );
 }
 

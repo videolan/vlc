@@ -278,6 +278,9 @@
 /* Environment variable containing the display method */
 #define VOUT_METHOD_VAR                 "vlc_vout"
 
+/* Environment variable containing the motion compensation method */
+#define MOTION_METHOD_VAR               "vlc_motion"
+
 /* Environment variable containing the IDCT method */
 #define IDCT_METHOD_VAR                 "vlc_idct"
 

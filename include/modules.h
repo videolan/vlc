@@ -40,12 +40,13 @@ typedef void *  module_handle_t;
 #define MODULE_CAPABILITY_DECAPS   1 <<  2  /* Decaps */
 #define MODULE_CAPABILITY_ADEC     1 <<  3  /* Audio decoder */
 #define MODULE_CAPABILITY_VDEC     1 <<  4  /* Video decoder */
-#define MODULE_CAPABILITY_IDCT     1 <<  5  /* IDCT transformation */
-#define MODULE_CAPABILITY_AOUT     1 <<  6  /* Audio output */
-#define MODULE_CAPABILITY_VOUT     1 <<  7  /* Video output */
-#define MODULE_CAPABILITY_YUV      1 <<  8  /* YUV colorspace conversion */
-#define MODULE_CAPABILITY_AFX      1 <<  9  /* Audio effects */
-#define MODULE_CAPABILITY_VFX      1 << 10  /* Video effects */
+#define MODULE_CAPABILITY_MOTION   1 <<  5  /* Video decoder */
+#define MODULE_CAPABILITY_IDCT     1 <<  6  /* IDCT transformation */
+#define MODULE_CAPABILITY_AOUT     1 <<  7  /* Audio output */
+#define MODULE_CAPABILITY_VOUT     1 <<  8  /* Video output */
+#define MODULE_CAPABILITY_YUV      1 <<  9  /* YUV colorspace conversion */
+#define MODULE_CAPABILITY_AFX      1 << 10  /* Audio effects */
+#define MODULE_CAPABILITY_VFX      1 << 11  /* Video effects */
 
 /* FIXME: not yet used */
 typedef struct probedata_s
@@ -73,6 +74,21 @@ typedef struct function_list_s
                                        byte_t *buffer, int i_size );
             void ( * pf_close )      ( struct aout_thread_s * p_aout );
         } aout;
+
+        struct
+        {
+#define motion_functions( yuv ) \
+            void ( * pf_field_field_##yuv ) ( struct macroblock_s * ); \
+            void ( * pf_field_16x8_##yuv )  ( struct macroblock_s * ); \
+            void ( * pf_field_dmv_##yuv )   ( struct macroblock_s * ); \
+            void ( * pf_frame_field_##yuv ) ( struct macroblock_s * ); \
+            void ( * pf_frame_frame_##yuv ) ( struct macroblock_s * ); \
+            void ( * pf_frame_dmv_##yuv )   ( struct macroblock_s * );
+	    motion_functions( 420 )
+	    motion_functions( 422 )
+	    motion_functions( 444 )
+#undef motion_functions
+        } motion;
 
         struct
         {
@@ -105,6 +121,7 @@ typedef struct module_functions_s
     function_list_t decaps;
     function_list_t adec;
     function_list_t vdec;
+    function_list_t motion;
     function_list_t idct;
     function_list_t aout;
     function_list_t vout;

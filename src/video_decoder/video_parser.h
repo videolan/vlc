@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.5 2001/01/17 18:17:30 massiot Exp $
+ * $Id: video_parser.h,v 1.6 2001/01/18 05:13:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -133,8 +133,13 @@ typedef struct vpar_thread_s
     u8                      pi_default_intra_quant[64];
     u8                      pi_default_nonintra_quant[64];
 
+    /* Motion compensation plugin used and shortcuts */
+    struct module_s *       p_motion_module;
+    void ( * pppf_motion[4][2][4] )     ( struct macroblock_s * );
+    void ( * ppf_motion_skipped[4][4] ) ( struct macroblock_s * );
+
     /* IDCT plugin used and shortcuts to access its capabilities */
-    struct module_s *       p_module;
+    struct module_s *       p_idct_module;
     idct_init_t             pf_init;
     f_idct_t                pf_sparse_idct;
     f_idct_t                pf_idct;

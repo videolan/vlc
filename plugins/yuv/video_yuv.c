@@ -82,7 +82,7 @@ static int yuv_Probe( probedata_t *p_data )
     }
 
     /* This module always works */
-    return( 100 );
+    return( 50 );
 }
 
 /*****************************************************************************

@@ -3,7 +3,7 @@
  *                           MMX
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_inner_mmx.c,v 1.8 2001/01/16 17:59:23 massiot Exp $
+ * $Id: vdec_motion_inner_mmx.c,v 1.1 2001/01/18 05:13:22 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>, largerly inspired by the
  *          work done by the livid project <http://www.linuxvideo.org/>
@@ -32,25 +32,8 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
-
-#include "intf_msg.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
 
 #include "video.h"
-#include "video_output.h"
-
-#include "vdec_idct.h"
-#include "video_decoder.h"
-#include "vdec_motion.h"
-
-#include "vpar_blocks.h"
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
-#include "video_parser.h"
-#include "video_fifo.h"
 
 #include "attributes.h"
 #include "mmx.h"

@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctclassic.c,v 1.5 2001/01/17 18:17:30 massiot Exp $
+ * $Id: idctclassic.c,v 1.6 2001/01/18 05:13:22 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -73,7 +73,7 @@ MODULE_CONFIG_END
 int InitModule( module_t * p_module )
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "classic C IDCT module";
+    p_module->psz_longname = "classic IDCT module";
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL

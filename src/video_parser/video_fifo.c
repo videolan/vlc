@@ -2,7 +2,7 @@
  * video_fifo.c : video FIFO management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_fifo.c,v 1.27 2001/01/13 12:57:21 sam Exp $
+ * $Id: video_fifo.c,v 1.28 2001/01/18 05:13:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -41,10 +41,10 @@
 #include "video_output.h"
 
 #include "video_decoder.h"
+#include "vdec_motion.h"
 #include "../video_decoder/vdec_idct.h"
-#include "../video_decoder/vdec_motion.h"
 
-#include "../video_decoder/vpar_blocks.h"
+#include "vpar_blocks.h"
 #include "../video_decoder/vpar_headers.h"
 #include "../video_decoder/vpar_synchro.h"
 #include "../video_decoder/video_parser.h"

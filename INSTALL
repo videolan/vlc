@@ -28,6 +28,13 @@ To build RedHat packages, use :
    rpm -ba vlc.spec
 
 
+Here's a shortcut to copy-paste to do a clean build :
+
+   make distclean 2>/dev/null ; ./configure --prefix=/usr --enable-gnome \
+      --enable-fb --with-glide --with-ggi --with-sdl --enable-esd \
+      --enable-alsa && make
+
+
 Installing and running VideoLAN
 ===============================
 

@@ -2,7 +2,7 @@
  * vdec_motion.h : types for the motion compensation algorithm
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion.h,v 1.1 2000/12/21 17:19:52 massiot Exp $
+ * $Id: vdec_motion.h,v 1.14 2001/01/18 05:13:22 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -40,24 +40,3 @@ struct motion_arg_s;
 
 typedef void (*f_motion_t)( struct macroblock_s* );
 
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-void vdec_MotionFieldField420( struct macroblock_s * p_mb );
-void vdec_MotionField16x8420( struct macroblock_s * p_mb );
-void vdec_MotionFieldDMV420( struct macroblock_s * p_mb );
-void vdec_MotionFrameFrame420( struct macroblock_s * p_mb );
-void vdec_MotionFrameField420( struct macroblock_s * p_mb );
-void vdec_MotionFrameDMV420( struct macroblock_s * p_mb );
-void vdec_MotionFieldField422( struct macroblock_s * p_mb );
-void vdec_MotionField16x8422( struct macroblock_s * p_mb );
-void vdec_MotionFieldDMV422( struct macroblock_s * p_mb );
-void vdec_MotionFrameFrame422( struct macroblock_s * p_mb );
-void vdec_MotionFrameField422( struct macroblock_s * p_mb );
-void vdec_MotionFrameDMV422( struct macroblock_s * p_mb );
-void vdec_MotionFieldField444( struct macroblock_s * p_mb );
-void vdec_MotionField16x8444( struct macroblock_s * p_mb );
-void vdec_MotionFieldDMV444( struct macroblock_s * p_mb );
-void vdec_MotionFrameFrame444( struct macroblock_s * p_mb );
-void vdec_MotionFrameField444( struct macroblock_s * p_mb );
-void vdec_MotionFrameDMV444( struct macroblock_s * p_mb );

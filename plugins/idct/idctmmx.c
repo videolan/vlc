@@ -2,7 +2,7 @@
  * idctmmx.c : MMX IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmx.c,v 1.6 2001/01/17 18:17:30 massiot Exp $
+ * $Id: idctmmx.c,v 1.7 2001/01/18 05:13:22 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -153,7 +153,7 @@ static int idct_Probe( probedata_t *p_data )
         }
         else
         {
-            return( 100 );
+            return( 150 );
         }
     }
     else

@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.44 2001/01/05 18:46:44 massiot Exp $
+ * $Id: video_decoder.c,v 1.45 2001/01/18 05:13:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -45,9 +45,9 @@
 #include "video.h"
 #include "video_output.h"
 
+#include "vdec_motion.h"
 #include "vdec_idct.h"
 #include "video_decoder.h"
-#include "vdec_motion.h"
 
 #include "vpar_blocks.h"
 #include "vpar_headers.h"
