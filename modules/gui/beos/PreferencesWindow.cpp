@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.23 2003/05/20 11:44:18 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.24 2003/05/25 17:21:36 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -29,8 +29,6 @@
 #include "PreferencesWindow.h"
 
 /* TODO:
-    - handle CONFIG_HINT_SUBCATEGORY
-    - use BSliders for integer_with_range and float_with_range
     - add the needed LockLooper()s
     - fix horizontal window resizing */
 
@@ -107,7 +105,6 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
         return;
     }
 
-
     /* First, handle the main module */
     module_t * p_module = NULL;
     module_config_t * p_item;
@@ -130,7 +127,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
             StringItemWithView * stringItem;
             stringItem = new StringItemWithView( p_item->psz_text );
             p_item++;
-            stringItem->fConfigView = BuildConfigView( &p_item, true );
+            BuildConfigView( stringItem, &p_item, true );
             fOutline->AddItem( stringItem );
         }
     }
@@ -193,7 +190,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
         /* Now add the item ! */
         StringItemWithView * stringItem;
         stringItem = new StringItemWithView( p_module->psz_object_name );
-        stringItem->fConfigView = BuildConfigView( &p_item, false );
+        BuildConfigView( stringItem, &p_item, false );
         fOutline->AddUnder( stringItem, capabilityItem );
     }
 
@@ -287,10 +284,6 @@ void PreferencesWindow::FrameResized( float width, float height )
 {
     BWindow::FrameResized( width, height );
 
-    /* Get the current config BView */
-    BView * view;
-    view = fConfigScroll->ChildAt( 0 );
-
     UpdateScrollBar();
 }
 
@@ -302,38 +295,29 @@ void PreferencesWindow::Update()
     /* Get the selected item, if any */
     if( fOutline->CurrentSelection() < 0 )
         return;
-    StringItemWithView * selectedItem =
-        (StringItemWithView*) fOutline->ItemAt( fOutline->CurrentSelection() );
+    fCurrent = (StringItemWithView*)
+        fOutline->ItemAt( fOutline->CurrentSelection() );
 
-    if( !selectedItem->fConfigView )
+    if( !fCurrent->fConfigBox )
         /* This is a category */
         return;
 
-    if( fConfigScroll )
-    {
-        /* If we don't do this, the config BView will remember a wrong position */
-        BScrollBar * scrollBar = fConfigScroll->ScrollBar( B_VERTICAL );
-        scrollBar->SetValue( 0 );
+    /* Detach the old item */
+    if( fDummyView->CountChildren() > 0 )
+        fDummyView->RemoveChild( fDummyView->ChildAt( 0 ) );
 
-        /* Detach the current config BView, remove the BScrollView */
-        BView * view;
-        while( ( view = fConfigScroll->ChildAt( 0 ) ) )
-            fConfigScroll->RemoveChild( view );
-        fDummyView->RemoveChild( fConfigScroll );
-        delete fConfigScroll;
-    }
-
-    /* Create a BScrollView with the new config BView in it */
-    BRect oldBounds = selectedItem->fConfigView->Bounds();
-    selectedItem->fConfigView->ResizeTo( fDummyView->Bounds().Width() -
-                                             B_V_SCROLL_BAR_WIDTH,
-                                         fDummyView->Bounds().Height() );
-    fConfigScroll = new BScrollView( "", selectedItem->fConfigView, B_FOLLOW_ALL_SIDES,
-                                     0, false, true, B_NO_BORDER );
-    fConfigScroll->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
-    fDummyView->AddChild( fConfigScroll );
-    selectedItem->fConfigView->ResizeTo( oldBounds.Width(),
-                                         oldBounds.Height() );
+    /* Resize and show the new config box */
+    fCurrent->fConfigBox->ResizeTo( fDummyView->Bounds().Width(),
+                                    fDummyView->Bounds().Height() );
+    fDummyView->AddChild( fCurrent->fConfigBox );
+    
+    /* Force redrawing of its children */
+    BRect rect = fCurrent->fConfigBox->Bounds();
+    rect.InsetBy( 10,10 );
+    rect.top += 10;
+    fCurrent->fConfigScroll->ResizeTo( rect.Width(), rect.Height() );
+    fCurrent->fConfigScroll->Draw( fCurrent->fConfigScroll->Bounds() );
+    
     UpdateScrollBar();
 }
 
@@ -345,22 +329,21 @@ void PreferencesWindow::UpdateScrollBar()
 {
     /* We have to fix the scrollbar manually because it doesn't handle
        correctly simple BViews */
-
-    /* Get the current config view */
-    BView * view;
-    view = fConfigScroll->ChildAt( 0 );
+       
+    if( !fCurrent )
+        return;
 
     /* Get the available BRect for display */
-    BRect display = fConfigScroll->Bounds();
+    BRect display = fCurrent->fConfigScroll->Bounds();
     display.right -= B_V_SCROLL_BAR_WIDTH;
 
     /* Fix the scrollbar */
     BScrollBar * scrollBar;
     long max;
-	BRect visible = display & view->Bounds();
-	BRect total = display | view->Bounds();
-    scrollBar = fConfigScroll->ScrollBar( B_VERTICAL );
-    max = (long)( view->Bounds().Height() - visible.Height() );
+	BRect visible = display & fCurrent->fConfigView->Bounds();
+	BRect total = display | fCurrent->fConfigView->Bounds();
+    scrollBar = fCurrent->fConfigScroll->ScrollBar( B_VERTICAL );
+    max = (long)( fCurrent->fConfigView->Bounds().Height() - visible.Height() );
     if( max < 0 ) max = 0;
     scrollBar->SetRange( 0, max );
     scrollBar->SetProportion( visible.Height() / total.Height() );
@@ -464,6 +447,32 @@ void PreferencesWindow::ApplyChanges( bool doIt )
                     }
                 }
             }
+            else if( !strcmp( name, "ConfigSlider" ) )
+            {
+                ConfigSlider * slider;
+                slider = (ConfigSlider*) child;
+                
+                switch( slider->fConfigType )
+                {
+                    case CONFIG_ITEM_INTEGER:
+                        if( doIt )
+                            config_PutInt( p_intf, slider->fConfigName,
+                                           slider->Value() );
+                        else
+                            slider->SetValue( config_GetInt( p_intf,
+                                                  slider->fConfigName ) );
+                        break;
+                        
+                    case CONFIG_ITEM_FLOAT:
+                        if( doIt )
+                            config_PutFloat( p_intf, slider->fConfigName,
+                                             (float)slider->Value() / 100.0 );
+                        else
+                            slider->SetValue( config_GetFloat( p_intf,
+                                                  slider->fConfigName ) * 100.0 );
+                        break;
+                }
+            }
         }
     }
 }
@@ -490,27 +499,45 @@ void PreferencesWindow::ReallyQuit()
 /*****************************************************************************
  * PreferencesWindow::BuildConfigView
  *****************************************************************************/
-BView * PreferencesWindow::BuildConfigView( module_config_t ** pp_item,
-                                            bool stop_after_category )
+void PreferencesWindow::BuildConfigView( StringItemWithView * stringItem,
+                                         module_config_t ** pp_item,
+                                         bool stop_after_category )
 {
-    /* Build the config view for this module */
+    /* Build the BBox */
     BRect rect = fDummyView->Bounds();
-    rect.right -= B_V_SCROLL_BAR_WIDTH;
-    BView * configView;
-    configView = new BView( rect, "config view",
-                            B_FOLLOW_NONE, B_WILL_DRAW );
-    configView->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
+    stringItem->fConfigBox = new BBox( rect, "config box", B_FOLLOW_ALL );
+    stringItem->fConfigBox->SetLabel( stringItem->fText );
+    
+    /* Build the BView */
+    rect = stringItem->fConfigBox->Bounds();
+    rect.InsetBy( 10,10 );
+    rect.top += 10;
+    rect.right -= B_V_SCROLL_BAR_WIDTH + 5;
+    stringItem->fConfigView = new BView( rect, "config view",
+                                         B_FOLLOW_NONE, B_WILL_DRAW );
+    stringItem->fConfigView->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
 
-    rect = configView->Bounds();
+    /* Add all the settings options */
+    rect = stringItem->fConfigView->Bounds();
     rect.InsetBy( 10, 10 );
     ConfigTextControl * textControl;
     ConfigCheckBox * checkBox;
     ConfigMenuField * menuField;
+    ConfigSlider * slider;
     BPopUpMenu * popUp;
 
-    bool categoryHit = false;
-    do
+    for( ; (*pp_item)->i_type != CONFIG_HINT_END; (*pp_item)++ )
     {
+        if( stop_after_category && (*pp_item)->i_type == CONFIG_HINT_CATEGORY )
+            break;
+            
+        /* Discard a few options */
+        if( (*pp_item)->psz_name &&
+            ( !strcmp( (*pp_item)->psz_name, "volume" ) ||
+              !strcmp( (*pp_item)->psz_name, "saved-volume" ) ||
+              !strcmp( (*pp_item)->psz_name, "advanced" ) ) )
+            continue;
+
         switch( (*pp_item)->i_type )
         {
             case CONFIG_ITEM_STRING:
@@ -529,7 +556,7 @@ BView * PreferencesWindow::BuildConfigView( module_config_t ** pp_item,
                         menuItem = new BMenuItem( (*pp_item)->ppsz_list[i], new BMessage() );
                         popUp->AddItem( menuItem );
                     }
-                    configView->AddChild( menuField );
+                    stringItem->fConfigView->AddChild( menuField );
                     rect.top = rect.bottom + 10;
                 }
                 else
@@ -537,51 +564,73 @@ BView * PreferencesWindow::BuildConfigView( module_config_t ** pp_item,
                     rect.bottom = rect.top + 20;
                     textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
                                                          CONFIG_ITEM_STRING, (*pp_item)->psz_name );
-                    configView->AddChild( textControl );
+                    stringItem->fConfigView->AddChild( textControl );
                     rect.top = rect.bottom + 10;
                 }
                 break;
 
             case CONFIG_ITEM_INTEGER:
-                rect.bottom = rect.top + 20;
-                textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
-                                                     CONFIG_ITEM_INTEGER, (*pp_item)->psz_name );
-                configView->AddChild( textControl );
-                rect.top = rect.bottom + 10;
+
+                if( (*pp_item)->i_min == (*pp_item)->i_max )
+                {
+                    rect.bottom = rect.top + 20;
+                    textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
+                                                         CONFIG_ITEM_INTEGER,
+                                                         (*pp_item)->psz_name );
+                    stringItem->fConfigView->AddChild( textControl );
+                    rect.top = rect.bottom + 10;
+                }
+                else
+                {
+                    rect.bottom = rect.top + 30;
+                    slider = new ConfigSlider( rect, (*pp_item)->psz_text,
+                                               CONFIG_ITEM_INTEGER, (*pp_item)->i_min,
+                                               (*pp_item)->i_max, (*pp_item)->psz_name );
+                    stringItem->fConfigView->AddChild( slider );
+                    rect.top = rect.bottom + 10;
+                }
                 break;
 
             case CONFIG_ITEM_FLOAT:
-                rect.bottom = rect.top + 20;
-                textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
-                                                     CONFIG_ITEM_FLOAT, (*pp_item)->psz_name );
-                configView->AddChild( textControl );
-                rect.top = rect.bottom + 10;
+                if( (*pp_item)->f_min == (*pp_item)->f_max )
+                {
+                    rect.bottom = rect.top + 20;
+                    textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
+                                                         CONFIG_ITEM_FLOAT, (*pp_item)->psz_name );
+                    stringItem->fConfigView->AddChild( textControl );
+                    rect.top = rect.bottom + 10;
+                }
+                else
+                {
+                    rect.bottom = rect.top + 30;
+                    slider = new ConfigSlider( rect, (*pp_item)->psz_text,
+                                               CONFIG_ITEM_FLOAT, 100 * (*pp_item)->f_min,
+                                               100 * (*pp_item)->f_max, (*pp_item)->psz_name );
+                    stringItem->fConfigView->AddChild( slider );
+                    rect.top = rect.bottom + 10;
+                }
                 break;
 
             case CONFIG_ITEM_BOOL:
-                if( !strcmp( (*pp_item)->psz_name, "advanced" ) )
-                    /* Don't show this one, the interface doesn't handle it anyway */
-                    break;
-
                 rect.bottom = rect.top + 20;
                 checkBox = new ConfigCheckBox( rect, (*pp_item)->psz_text,
                                                (*pp_item)->psz_name );
-                configView->AddChild( checkBox );
+                stringItem->fConfigView->AddChild( checkBox );
                 rect.top = rect.bottom + 10;
                 break;
-
-            case CONFIG_HINT_CATEGORY:
-                if( stop_after_category )
-                    categoryHit = true;
         }
+    }
 
-    } while( !categoryHit &&
-             (*pp_item)->i_type != CONFIG_HINT_END &&
-             (*pp_item)++ );
+    /* Put the BView into a BScrollView */
+    
+    stringItem->fConfigScroll =
+        new BScrollView( "config scroll", stringItem->fConfigView,
+                         B_FOLLOW_ALL, 0, false, true, B_FANCY_BORDER );
+    stringItem->fConfigScroll->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
+    stringItem->fConfigBox->AddChild( stringItem->fConfigScroll );
 
     /* Adjust the configView size */
-    configView->ResizeTo( configView->Bounds().Width(), rect.top );
-
-    return configView;
+    stringItem->fConfigView->ResizeTo(
+        stringItem->fConfigView->Bounds().Width(), rect.top );
 }
 

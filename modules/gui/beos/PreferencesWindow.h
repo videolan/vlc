@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.16 2003/05/20 11:44:18 titer Exp $
+ * $Id: PreferencesWindow.h,v 1.17 2003/05/25 17:21:36 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -39,11 +39,17 @@ class StringItemWithView : public BStringItem
                             StringItemWithView( const char * text )
                                 : BStringItem( text )
                             {
+                                fConfigBox = NULL;
+                                fConfigScroll = NULL;
                                 fConfigView = NULL;
+                                fText = strdup( text );
                             }
 
-    /* Here we store the config BView associated to this module */
+    /* Here we store the config BBox associated to this module */
+    BBox *                  fConfigBox;
+    BScrollView *           fConfigScroll;
     BView *                 fConfigView;
+    char *                  fText;
 };
 
 class ConfigTextControl : public BTextControl
@@ -90,6 +96,22 @@ class ConfigMenuField : public BMenuField
     char *                  fConfigName;
 };
 
+class ConfigSlider : public BSlider
+{
+    public:
+                            ConfigSlider( BRect rect, char * label, int type,
+                                          int min, int max, char * configName )
+                               : BSlider( rect, "ConfigSlider", label,
+                                          new BMessage(), min, max )
+                            {
+                                fConfigType = type;
+                                fConfigName = strdup( configName );
+                            }
+                            
+    int                     fConfigType;
+    char * fConfigName;
+};
+
 class PreferencesWindow : public BWindow
 {
   public:
@@ -110,13 +132,15 @@ class PreferencesWindow : public BWindow
             void            ReallyQuit();
 
   private:
-    BView *                 BuildConfigView( module_config_t ** pp_item,
+    void                    BuildConfigView( StringItemWithView * stringItem,
+                                             module_config_t ** pp_item,
                                              bool stop_after_category );
 
     BView *                 fPrefsView;
     BOutlineListView *      fOutline;
     BView *                 fDummyView;
     BScrollView *           fConfigScroll;
+    StringItemWithView *    fCurrent;
 
     intf_thread_t *         p_intf;
 };
