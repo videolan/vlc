@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.1 2002/03/01 00:33:18 massiot Exp $
+ * $Id: ipv4.c,v 1.2 2002/03/01 01:59:18 xav Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -154,6 +154,7 @@ static int OpenUDP( network_socket_t * p_socket )
     int i_bind_port = p_socket->i_bind_port;
     char * psz_server_addr = p_socket->psz_server_addr;
     int i_server_port = p_socket->i_server_port;
+    char * psz_bind_win32;		/* WIN32 multicast kludge */
 
     int i_handle, i_opt, i_opt_size;
     struct sockaddr_in sock;
@@ -209,9 +210,29 @@ static int OpenUDP( network_socket_t * p_socket )
         intf_WarnMsg( 1, "ipv4 warning: socket buffer size is 0x%x"
                          " instead of 0x%x", i_opt, 0x80000 );
     }
-
+    
+/* Under Win32 and for the multicast, we bind on INADDR_ANY, so let's call BuildAddr with NULL instead of psz_bind_addr */
+    
     /* Build the local socket */
-    if ( BuildAddr( &sock, psz_bind_addr, i_bind_port ) == -1 )
+
+#ifdef WIN32
+    
+#ifndef IN_MULTICAST
+#   define IN_MULTICAST(a)         IN_CLASSD(a)
+#endif
+
+    psz_bind_win32 = psz_bind_addr ;
+    
+/* Check if this is a multicast socket */
+
+    if (IN_MULTICAST( ntohl(psz_bind_address) ) )
+    {
+	    psz_bind_win32 = NULL ;
+    }
+    if ( BuildAddr( &sock, psz_bind_win32, i_bind_port ) == -1 )
+#else
+    if ( BuildAddr( &sock, psz_bind_addr, i_bind_port ) == -1 )	    
+#endif	
     {
         close( i_handle );
         return( -1 );
@@ -242,12 +263,20 @@ static int OpenUDP( network_socket_t * p_socket )
 #ifndef IN_MULTICAST
 #   define IN_MULTICAST(a)         IN_CLASSD(a)
 #endif
+
+#ifndef WIN32
     if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
     {
         struct ip_mreq imr;
- 
         imr.imr_interface.s_addr = INADDR_ANY;
         imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
+#else
+    if( IN_MULTICAST( ntohl(inet_addr(psz_bind_addr) ) ) )
+    {
+        struct ip_mreq imr;
+        imr.imr_interface.s_addr = INADDR_ANY;
+        imr.imr_multiaddr.s_addr = inet_addr(psz_bind_addr);
+#endif			    
         if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                         (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
         {
