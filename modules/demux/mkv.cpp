@@ -1145,7 +1145,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         {
             p_block->i_length = i_duration * 1000;
         }
-msg_Warn( p_demux, "Sending block %d", p_block );
+
         es_out_Send( p_demux->out, tk->p_es, p_block );
 
         /* use time stamp only for first block */
