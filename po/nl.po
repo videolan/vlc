@@ -863,8 +863,7 @@ msgstr "Interface standaard zoekpad"
 msgid ""
 "This option allows you to set the default path that the interface will open "
 "when looking for a file."
-msgstr ""
-"Stel het standaard zoekpad in waar de interface naar bestanden gaat zoeken."
+msgstr "Stel het standaard zoekpad in waar de interface naar bestanden gaat zoeken."
 
 #: src/libvlc.h:94
 msgid "Modules search path"
@@ -927,8 +926,7 @@ msgid "Audio output volume"
 msgstr "Geluidsvolume"
 
 #: src/libvlc.h:122
-msgid ""
-"You can set the default audio output volume here, in a range from 0 to 1024."
+msgid "You can set the default audio output volume here, in a range from 0 to 1024."
 msgstr "Het standaard geluidsvolume is in te stellen tussen 0 en 1024."
 
 #: src/libvlc.h:125
@@ -1184,8 +1182,7 @@ msgid "Fullscreen video output"
 msgstr "Volledig scherm"
 
 #: src/libvlc.h:233
-msgid ""
-"If this option is enabled, VLC will always start a video in fullscreen mode."
+msgid "If this option is enabled, VLC will always start a video in fullscreen mode."
 msgstr ""
 "Als deze optie gebruikt wordt, dan zal VLC een video altijd op volledige "
 "scherm grootte afspelen."
@@ -1345,10 +1342,8 @@ msgid "Choose audio"
 msgstr "Selecteer audio"
 
 #: src/libvlc.h:306
-msgid ""
-"Give the default type of audio you want to use in a DVD. (Developers only)"
-msgstr ""
-"Stel het standaard type audio in voor gebruik bij DVD. (Alleen ontwikkelaars)"
+msgid "Give the default type of audio you want to use in a DVD. (Developers only)"
+msgstr "Stel het standaard type audio in voor gebruik bij DVD. (Alleen ontwikkelaars)"
 
 #: src/libvlc.h:309
 msgid "Choose audio channel"
@@ -1367,10 +1362,8 @@ msgid "Choose subtitle track"
 msgstr "Selecteer een ondertitelings-kanaal"
 
 #: src/libvlc.h:316
-msgid ""
-"Give the stream number of the subtitle channel you want to use (from 1 to n)."
-msgstr ""
-"Selecteer met behulp van een nummer (van 1 tot n) het ondertitelingskanaal."
+msgid "Give the stream number of the subtitle channel you want to use (from 1 to n)."
+msgstr "Selecteer met behulp van een nummer (van 1 tot n) het ondertitelingskanaal."
 
 #: src/libvlc.h:319 src/libvlc.h:320
 msgid "Number of time the same input will be repeated"
@@ -1403,8 +1396,7 @@ msgid "Autodetect subtitle files"
 msgstr "Detecteer automatisch bestanden met ondertiteling"
 
 #: src/libvlc.h:335
-msgid ""
-"Automatically detect a subtitle file, if no subtitle filename is specified."
+msgid "Automatically detect a subtitle file, if no subtitle filename is specified."
 msgstr "Detecteer automatisch een ondertitelingsbestand, indien geen"
 
 #: src/libvlc.h:338
@@ -1610,8 +1602,7 @@ msgid "Preferred encoders list"
 msgstr "Lijst van geprefereerde encoders"
 
 #: src/libvlc.h:443
-msgid ""
-"This allows you to select a list of encoders that VLC will use in priority"
+msgid "This allows you to select a list of encoders that VLC will use in priority"
 msgstr ""
 "Hiermee kan een lijst van encoders worden gemaakt die VLC een hogere "
 "prioriteit zal toekennen."
@@ -1636,8 +1627,7 @@ msgstr "Stream alle ES"
 
 #: src/libvlc.h:456
 msgid "This allows you to stream all ES (video, audio and subtitles)"
-msgstr ""
-"Hiermee kunnen alle ES (video, audio en ondertiteling) worden gestreamed."
+msgstr "Hiermee kunnen alle ES (video, audio en ondertiteling) worden gestreamed."
 
 #: src/libvlc.h:458
 msgid "Display while streaming"
@@ -1683,8 +1673,7 @@ msgid "Preferred packetizer list"
 msgstr "Kies de geprefereerde packetizer"
 
 #: src/libvlc.h:480
-msgid ""
-"This allows you to select the order in which VLC will choose its packetizers."
+msgid "This allows you to select the order in which VLC will choose its packetizers."
 msgstr "Stel de volgorde in waarin VLC packetizers zal kiezen."
 
 #: src/libvlc.h:483
@@ -1877,8 +1866,7 @@ msgstr "Toegangsmodule"
 
 #: src/libvlc.h:564
 msgid "This is a legacy entry to let you configure access modules."
-msgstr ""
-"Backwards compatibiliteits optie voor het configureren van toegangsmodulse."
+msgstr "Backwards compatibiliteits optie voor het configureren van toegangsmodulse."
 
 #: src/libvlc.h:566
 msgid "Demux module"
@@ -1886,8 +1874,7 @@ msgstr "Demux module"
 
 #: src/libvlc.h:568
 msgid "This is a legacy entry to let you configure demux modules."
-msgstr ""
-"Backwards compatibiliteits optie voor het configureren van demuxmodulse."
+msgstr "Backwards compatibiliteits optie voor het configureren van demuxmodulse."
 
 #: src/libvlc.h:570
 msgid "Allow real-time priority"
@@ -1981,8 +1968,7 @@ msgstr ""
 
 #: src/libvlc.h:612
 msgid "Condition variables implementation for Win9x (developers only)"
-msgstr ""
-"Conditionele variabelen implementatie voor Win9x (alleen ontwikkelaars)"
+msgstr "Conditionele variabelen implementatie voor Win9x (alleen ontwikkelaars)"
 
 #: src/libvlc.h:615
 msgid ""
@@ -2204,8 +2190,7 @@ msgstr "Activeer"
 
 #: src/libvlc.h:674
 msgid "Select the key to activate selected item in DVD menus."
-msgstr ""
-"Selecteer de sneltoets om huidige selectie in DVD menu's te selecteren."
+msgstr "Selecteer de sneltoets om huidige selectie in DVD menu's te selecteren."
 
 #: src/libvlc.h:675 modules/gui/gtk/gnome_interface.c:909
 msgid "Volume up"
@@ -2241,8 +2226,7 @@ msgstr "Verhoog ondertitel vertraging"
 
 #: src/libvlc.h:682
 msgid "Select the key to increase the subtitle delay."
-msgstr ""
-"Selecteer de sneltoets om de vertraging van de ondertiteling te verhogen."
+msgstr "Selecteer de sneltoets om de vertraging van de ondertiteling te verhogen."
 
 #: src/libvlc.h:683
 msgid "Subtitle delay down"
@@ -2250,8 +2234,7 @@ msgstr "Verlaag ondertitel vertraging"
 
 #: src/libvlc.h:684
 msgid "Select the key to decrease the subtitle delay."
-msgstr ""
-"Selecteer de sneltoets om de vertraging van de ondertiteling te verlagen."
+msgstr "Selecteer de sneltoets om de vertraging van de ondertiteling te verlagen."
 
 #: src/libvlc.h:685
 msgid "Play playlist bookmark 1"
@@ -3397,8 +3380,7 @@ msgstr "CDDB server timeout"
 
 #: modules/access/cdda/cdda.c:174
 msgid "Time (in seconds) to wait for a response from the CDDB server"
-msgstr ""
-"Tijd (in seconden) waarop wordt gewacht voor een antwoord van de CDDB server"
+msgstr "Tijd (in seconden) waarop wordt gewacht voor een antwoord van de CDDB server"
 
 #: modules/access/cdda/cdda.c:179 modules/access/cdda/cdda.c:180
 msgid "Directory to cache CDDB requests"
@@ -3518,8 +3500,7 @@ msgid "Device properties"
 msgstr "Apparaat eigenschappen"
 
 #: modules/access/dshow/dshow.cpp:133
-msgid ""
-"Show the properties dialog of the selected device before starting the stream."
+msgid "Show the properties dialog of the selected device before starting the stream."
 msgstr ""
 "Toon de instellingenvenster van het geselecteerde apparaat voordat de invoer "
 "gestart wordt."
@@ -3845,8 +3826,7 @@ msgid "FTP user name"
 msgstr "FTP gebruikersnaam"
 
 #: modules/access/ftp.c:45
-msgid ""
-"Allows you to modify the user name that will be used for the connection."
+msgid "Allows you to modify the user name that will be used for the connection."
 msgstr "Wijzig de gebruikersnaam voor de connectie."
 
 #: modules/access/ftp.c:47
@@ -3899,8 +3879,7 @@ msgstr "HTTP gebruikersnaam"
 msgid ""
 "Allows you to modify the user name that will be used for the connection "
 "(Basic authentication only)."
-msgstr ""
-"Wijzig de gebruikersnaam voor de connectie (Alleen Basic authentificatie)."
+msgstr "Wijzig de gebruikersnaam voor de connectie (Alleen Basic authentificatie)."
 
 #: modules/access/http.c:57
 msgid "HTTP password"
@@ -3911,8 +3890,7 @@ msgid "HTTP user agent"
 msgstr "HTTP 'gebruikers agent'"
 
 #: modules/access/http.c:62
-msgid ""
-"Allows you to modify the user agent that will be used for the connection."
+msgid "Allows you to modify the user agent that will be used for the connection."
 msgstr "Wijzig de 'gebruikers agent' voor deze connectie."
 
 #: modules/access/http.c:66
@@ -4292,8 +4270,7 @@ msgstr "Afspeel controle gebruiken?"
 msgid ""
 "If VCD is authored with playback control, use it. Otherwise we play by "
 "tracks."
-msgstr ""
-"Gebruik VCD playback control indien gewenst, anders speel de tracks af."
+msgstr "Gebruik VCD playback control indien gewenst, anders speel de tracks af."
 
 #: modules/access/vcdx/vcd.c:112
 msgid "Format to use in playlist \"author\""
@@ -4324,8 +4301,7 @@ msgid "Username"
 msgstr "Gebruikersnaam"
 
 #: modules/access_output/http.c:47
-msgid ""
-"Allows you to give a user name that will be requested to access the stream."
+msgid "Allows you to give a user name that will be requested to access the stream."
 msgstr "De gebruikersnaam die nodig is om de stream op te vragen."
 
 #: modules/access_output/http.c:49
@@ -4333,8 +4309,7 @@ msgid "Password"
 msgstr "Wachtwoord"
 
 #: modules/access_output/http.c:50
-msgid ""
-"Allows you to give a password that will be requested to access the stream."
+msgid "Allows you to give a password that will be requested to access the stream."
 msgstr "Het wachtwoord dat nodig is om de stream op te vragen."
 
 #: modules/access_output/http.c:55
@@ -5628,8 +5603,7 @@ msgid "Show stream position"
 msgstr "Laat stream positie zien"
 
 #: modules/control/rc.c:78
-msgid ""
-"Show the current position in seconds within the stream from time to time."
+msgid "Show the current position in seconds within the stream from time to time."
 msgstr "Laat regelmatig de huidige positie (in seconden) in de video zien."
 
 #: modules/control/rc.c:80
@@ -5898,8 +5872,7 @@ msgid "Force index creation"
 msgstr "forceer de creatie van een index"
 
 #: modules/demux/avi/avi.c:45
-msgid ""
-"Recreate a index for the AVI file so we can seek trough it more reliably."
+msgid "Recreate a index for the AVI file so we can seek trough it more reliably."
 msgstr "Maak de index voor een AVI bestand opnieuw aan."
 
 #: modules/demux/avi/avi.c:51
@@ -7282,8 +7255,7 @@ msgstr "Instellingen..."
 msgid ""
 "Sorry, the module manager isn't functional yet. Please retry in a later "
 "version."
-msgstr ""
-"Sorry, de module manager is nog niet functioneel. Probeer een latere versie."
+msgstr "Sorry, de module manager is nog niet functioneel. Probeer een latere versie."
 
 #: modules/gui/gtk/gnome_interface.c:2312 modules/gui/gtk/gtk_interface.c:2780
 msgid "All"
@@ -7872,9 +7844,8 @@ msgid "Preferences..."
 msgstr "Voorkeuren..."
 
 #: modules/gui/macosx/intf.m:529
-#, fuzzy
 msgid "Services"
-msgstr "Apparaat"
+msgstr "Voorzieningen"
 
 #: modules/gui/macosx/intf.m:530
 msgid "Hide VLC"
@@ -7986,8 +7957,7 @@ msgid "Error"
 msgstr "Fout"
 
 #: modules/gui/macosx/intf.m:625
-msgid ""
-"An error has occurred which probably prevented the execution of your request:"
+msgid "An error has occurred which probably prevented the execution of your request:"
 msgstr ""
 "Er is een fout opgetreden die het onmogelijk maakte om uw verzoek af te "
 "handelen :"
@@ -8067,8 +8037,7 @@ msgstr "Kies een render methode"
 msgid ""
 "The default method is OpenGL for Quartz Extreme machines and Quartz for the "
 "others."
-msgstr ""
-"Standaard is OpenGL voor machines met Quartz Extreme en Quartz voor de rest."
+msgstr "Standaard is OpenGL voor machines met Quartz Extreme en Quartz voor de rest."
 
 #: modules/gui/macosx/macosx.m:66
 msgid "OpenGL effect"
@@ -9499,8 +9468,7 @@ msgstr "Lettertype grootte"
 
 #: modules/misc/freetype.c:101
 msgid "The size of the fonts used by the osd module"
-msgstr ""
-"De grootte van de lettertypen die zal worden gebruikt voor de OSD module"
+msgstr "De grootte van de lettertypen die zal worden gebruikt voor de OSD module"
 
 #: modules/misc/freetype.c:104
 msgid "Smaller"
@@ -9656,8 +9624,7 @@ msgid "SAP timeout (seconds)"
 msgstr "SAP timeout (seconden)"
 
 #: modules/misc/sap.c:100
-msgid ""
-"Sets the time before SAP items get deleted if no new announce is received."
+msgid "Sets the time before SAP items get deleted if no new announce is received."
 msgstr ""
 "De tijd waarna het SAP element wordt verwijderd, indien er geen nieuwe "
 "aankondigen aangekomen is."
@@ -9701,8 +9668,7 @@ msgstr "Wijzig de account gegevens voor de connectie."
 
 #: modules/mux/asf.c:50
 #, fuzzy
-msgid ""
-"Allows you to define the copyright string that will be put in ASF comments."
+msgid "Allows you to define the copyright string that will be put in ASF comments."
 msgstr "Wijzig de account gegevens voor de connectie."
 
 #: modules/mux/asf.c:52
@@ -9907,8 +9873,7 @@ msgid "Output access method"
 msgstr "Uitvoer methodes"
 
 #: modules/stream_out/es.c:39 modules/stream_out/standard.c:42
-msgid ""
-"Allows you to specify the output access method used for the streaming output."
+msgid "Allows you to specify the output access method used for the streaming output."
 msgstr ""
 
 #: modules/stream_out/es.c:41
@@ -9978,8 +9943,7 @@ msgid "Audio output URL"
 msgstr "Audio uitvoer URL"
 
 #: modules/stream_out/es.c:65
-msgid ""
-"Allows you to specify the output URL used for the audio streaming output."
+msgid "Allows you to specify the output URL used for the audio streaming output."
 msgstr ""
 
 #: modules/stream_out/es.c:67
@@ -9987,8 +9951,7 @@ msgid "Video output URL"
 msgstr "Video uitvoer URL"
 
 #: modules/stream_out/es.c:69
-msgid ""
-"Allows you to specify the output URL used for the video streaming output."
+msgid "Allows you to specify the output URL used for the video streaming output."
 msgstr ""
 
 #: modules/stream_out/es.c:78
@@ -10039,8 +10002,7 @@ msgid "RTP stream output"
 msgstr "RTP stream uitvoer"
 
 #: modules/stream_out/standard.c:46
-msgid ""
-"Allows you to specify the output muxer method used for the streaming output."
+msgid "Allows you to specify the output muxer method used for the streaming output."
 msgstr ""
 
 #: modules/stream_out/standard.c:54
@@ -10080,8 +10042,7 @@ msgid "Video encoder"
 msgstr "Video encoder"
 
 #: modules/stream_out/transcode.c:53
-msgid ""
-"Allows you to specify the video encoder to use and its associated options."
+msgid "Allows you to specify the video encoder to use and its associated options."
 msgstr ""
 
 #: modules/stream_out/transcode.c:55
@@ -10171,8 +10132,7 @@ msgstr "Audio codec"
 
 #: modules/stream_out/transcode.c:91
 #, fuzzy
-msgid ""
-"Allows you to specify the audio encoder to use and its associated options."
+msgid "Allows you to specify the audio encoder to use and its associated options."
 msgstr "Hiermee kunt u de bitrate van de audio specificeren (in kB/s)."
 
 #: modules/stream_out/transcode.c:93
@@ -10203,8 +10163,7 @@ msgstr "Samplerate"
 
 #: modules/stream_out/transcode.c:103
 #, fuzzy
-msgid ""
-"Allows you to specify the audio sample rate used for the streaming output."
+msgid "Allows you to specify the audio sample rate used for the streaming output."
 msgstr "Wijzig de gebruikersnaam voor de connectie."
 
 #: modules/stream_out/transcode.c:105
@@ -10272,8 +10231,7 @@ msgstr "Wijzig contrast (0-2)"
 
 #: modules/video_filter/adjust.c:61
 msgid "Set the image contrast, between 0 and 2. Defaults to 1"
-msgstr ""
-"Wijzig het contrast van het beeld. Waarden tussen 0 en 2, 1 is normaal."
+msgstr "Wijzig het contrast van het beeld. Waarden tussen 0 en 2, 1 is normaal."
 
 #: modules/video_filter/adjust.c:62
 msgid "Image hue (0-360)"
@@ -10289,8 +10247,7 @@ msgstr "Wijzig de kleurverzadiging (0-3)"
 
 #: modules/video_filter/adjust.c:65
 msgid "Set the image saturation, between 0 and 3. Defaults to 1"
-msgstr ""
-"Wijzig de kleurverziging van het beeld. Waarden tussen 0 en 3, 0 is normaal."
+msgstr "Wijzig de kleurverziging van het beeld. Waarden tussen 0 en 3, 0 is normaal."
 
 #: modules/video_filter/adjust.c:66
 msgid "Image brightness (0-2)"
@@ -10298,8 +10255,7 @@ msgstr "Wijzig helderheid (0-2)"
 
 #: modules/video_filter/adjust.c:67
 msgid "Set the image brightness, between 0 and 2. Defaults to 1"
-msgstr ""
-"Wijzig de helderheid van het beeld. Waarden tussen 0 en 2, 0 is normaal."
+msgstr "Wijzig de helderheid van het beeld. Waarden tussen 0 en 2, 0 is normaal."
 
 #: modules/video_filter/adjust.c:68
 msgid "Image gamma (0-10)"
@@ -10307,8 +10263,7 @@ msgstr "Beeld gamma correctie (0-10)"
 
 #: modules/video_filter/adjust.c:69
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1"
-msgstr ""
-"Wijzig de gamma van het beeld. Waarden tussen 0.01 en 10, 1 is normaal."
+msgstr "Wijzig de gamma van het beeld. Waarden tussen 0.01 en 10, 1 is normaal."
 
 #: modules/video_filter/adjust.c:73
 msgid "Image properties filter"
@@ -10483,8 +10438,7 @@ msgstr "Aantal kolommen"
 
 #: modules/video_filter/wall.c:54
 #, fuzzy
-msgid ""
-"Select the number of horizontal video windows in which to split the video"
+msgid "Select the number of horizontal video windows in which to split the video"
 msgstr ""
 "Selecteer het aantal horizontale videoschermen waarin de video verdeeld moet "
 "worden."
@@ -10683,8 +10637,7 @@ msgstr "Gebruik gedeeld geheugen"
 
 #: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
 msgid "Use shared memory to communicate between VLC and the X server."
-msgstr ""
-"Gebruik gedeeld geheugen voor het communiceren tussen VLC en de X server"
+msgstr "Gebruik gedeeld geheugen voor het communiceren tussen VLC en de X server"
 
 #: modules/video_output/x11/x11.c:61
 msgid "choose the screen to be used for fullscreen mode."
@@ -12776,3 +12729,4 @@ msgstr "XOSD interface"
 
 #~ msgid "port:"
 #~ msgstr "poort:"
+

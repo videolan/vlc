@@ -63,8 +63,7 @@ msgstr "Configurações de filtros de audio"
 
 #: include/vlc_help.h:55
 msgid "Audio filters can be set in the Audio section, and configured here."
-msgstr ""
-"Filtros de audio podem ser ajustados na seção Audio, e configurados aqui."
+msgstr "Filtros de audio podem ser ajustados na seção Audio, e configurados aqui."
 
 #: include/vlc_help.h:58
 msgid "Audio output modules settings"
@@ -939,8 +938,7 @@ msgid "Audio output volume"
 msgstr "Volume da saída de audio"
 
 #: src/libvlc.h:122
-msgid ""
-"You can set the default audio output volume here, in a range from 0 to 1024."
+msgid "You can set the default audio output volume here, in a range from 0 to 1024."
 msgstr ""
 "Você pode ajustar o volume padrão da saída de audio aqui, em uma faixa de 0 "
 "a 1024."
@@ -1206,8 +1204,7 @@ msgid "Fullscreen video output"
 msgstr "Saída de vídeo em tela cheia"
 
 #: src/libvlc.h:233
-msgid ""
-"If this option is enabled, VLC will always start a video in fullscreen mode."
+msgid "If this option is enabled, VLC will always start a video in fullscreen mode."
 msgstr ""
 "Quando esta opção estiver habilitada, o VLC irá sempre iniciar o vídeo no "
 "modo tela cheia"
@@ -1317,8 +1314,7 @@ msgstr "Porta do servidor"
 
 #: src/libvlc.h:282
 msgid "This is the port used for UDP streams. By default, we chose 1234."
-msgstr ""
-"Esta é a porta usada para streams UDP. Por padrão, nós escolhemos 1234."
+msgstr "Esta é a porta usada para streams UDP. Por padrão, nós escolhemos 1234."
 
 #: src/libvlc.h:284
 msgid "MTU of the network interface"
@@ -1371,8 +1367,7 @@ msgid "Choose audio"
 msgstr "Escolha o audio"
 
 #: src/libvlc.h:306
-msgid ""
-"Give the default type of audio you want to use in a DVD. (Developers only)"
+msgid "Give the default type of audio you want to use in a DVD. (Developers only)"
 msgstr ""
 "Dê o tipo padrão de audio que você que usar em um DVD. (Apenas "
 "desenvolvedores)"
@@ -1394,10 +1389,8 @@ msgid "Choose subtitle track"
 msgstr "Escolha a faixa de legendas"
 
 #: src/libvlc.h:316
-msgid ""
-"Give the stream number of the subtitle channel you want to use (from 1 to n)."
-msgstr ""
-"Dê o número do stream do canal de legendas que você que usar (de 1 a n)."
+msgid "Give the stream number of the subtitle channel you want to use (from 1 to n)."
+msgstr "Dê o número do stream do canal de legendas que você que usar (de 1 a n)."
 
 #: src/libvlc.h:319 src/libvlc.h:320
 msgid "Number of time the same input will be repeated"
@@ -1427,8 +1420,7 @@ msgid "Autodetect subtitle files"
 msgstr "Auto-detectar arquivos de legendas"
 
 #: src/libvlc.h:335
-msgid ""
-"Automatically detect a subtitle file, if no subtitle filename is specified."
+msgid "Automatically detect a subtitle file, if no subtitle filename is specified."
 msgstr ""
 
 #: src/libvlc.h:338
@@ -1637,8 +1629,7 @@ msgid "Preferred encoders list"
 msgstr "Lista de codificadores preferida"
 
 #: src/libvlc.h:443
-msgid ""
-"This allows you to select a list of encoders that VLC will use in priority"
+msgid "This allows you to select a list of encoders that VLC will use in priority"
 msgstr ""
 "Isto permite que você seleciona a ordem em que o VLC irá escolher seus "
 "codificadores."
@@ -1665,8 +1656,7 @@ msgstr "Habilitar streaming de todos os ES"
 
 #: src/libvlc.h:456
 msgid "This allows you to stream all ES (video, audio and subtitles)"
-msgstr ""
-"Isto permite que você faça o stream de todos os ES (vídeo, audio e legendas)"
+msgstr "Isto permite que você faça o stream de todos os ES (vídeo, audio e legendas)"
 
 #: src/libvlc.h:458
 msgid "Display while streaming"
@@ -1715,8 +1705,7 @@ msgid "Preferred packetizer list"
 msgstr "Lista de empacotador favorita"
 
 #: src/libvlc.h:480
-msgid ""
-"This allows you to select the order in which VLC will choose its packetizers."
+msgid "This allows you to select the order in which VLC will choose its packetizers."
 msgstr ""
 "Isto permite que você seleciona a ordem em que o VLC irá escolher seus "
 "empacotadores."
@@ -1727,8 +1716,7 @@ msgstr "Módulo mux"
 
 #: src/libvlc.h:485
 msgid "This is a legacy entry to let you configure mux modules"
-msgstr ""
-"Esta é uma entrada legado para permitir que você configure os módulos mux"
+msgstr "Esta é uma entrada legado para permitir que você configure os módulos mux"
 
 #: src/libvlc.h:487
 msgid "Access output module"
@@ -1913,8 +1901,7 @@ msgstr "Módulo de acesso"
 
 #: src/libvlc.h:564
 msgid "This is a legacy entry to let you configure access modules."
-msgstr ""
-"Esta é uma entrada legado para deixar você configurar os módulos de acesso"
+msgstr "Esta é uma entrada legado para deixar você configurar os módulos de acesso"
 
 #: src/libvlc.h:566
 msgid "Demux module"
@@ -1922,8 +1909,7 @@ msgstr "Módulo de demux"
 
 #: src/libvlc.h:568
 msgid "This is a legacy entry to let you configure demux modules."
-msgstr ""
-"Esta é uma entrada legado para deixar você configurar os módulos de demux"
+msgstr "Esta é uma entrada legado para deixar você configurar os módulos de demux"
 
 #: src/libvlc.h:570
 msgid "Allow real-time priority"
@@ -2021,8 +2007,7 @@ msgstr ""
 
 #: src/libvlc.h:612
 msgid "Condition variables implementation for Win9x (developers only)"
-msgstr ""
-"Implementação de variáveis de condição para Win9x (apenas desenvolvedores)"
+msgstr "Implementação de variáveis de condição para Win9x (apenas desenvolvedores)"
 
 #: src/libvlc.h:615
 msgid ""
@@ -2386,8 +2371,7 @@ msgstr "Configurar marcador 10 da lista de reprodução"
 
 #: src/libvlc.h:706
 msgid "Select the key to set this playlist bookmark."
-msgstr ""
-"Selecione a tecla para configurar este marcador da lista de reprodução."
+msgstr "Selecione a tecla para configurar este marcador da lista de reprodução."
 
 #: src/libvlc.h:708
 msgid "Go back in browsing history"
@@ -3438,8 +3422,7 @@ msgstr "Entrada de Audio de CD Digital (CD-DA)"
 #: modules/access/cdda/cdda.c:116 modules/access/vcdx/vcd.c:100
 #: modules/codec/ogt/subtitle.h:39
 msgid "If nonzero, this gives additional debug information."
-msgstr ""
-"Se não for zero, isto irá fornecer informações de depuração adicionais."
+msgstr "Se não for zero, isto irá fornecer informações de depuração adicionais."
 
 #: modules/access/cdda/cdda.c:121
 msgid "Caching value in microseconds"
@@ -3467,8 +3450,7 @@ msgstr "Fazer procuras CDDB"
 
 #: modules/access/cdda/cdda.c:142
 msgid "If set, lookup CD-DA track information using the CDDB protocol"
-msgstr ""
-"Se ativo, procurar informação de Faixa de CD-DA usando o protocolo CDDB"
+msgstr "Se ativo, procurar informação de Faixa de CD-DA usando o protocolo CDDB"
 
 #: modules/access/cdda/cdda.c:147
 msgid "CDDB server"
@@ -3504,8 +3486,7 @@ msgstr "Contatar CDDB via o protocolo HTTP"
 
 #: modules/access/cdda/cdda.c:168
 msgid "If set, the CDDB server gets information via the CDDB HTTP protocol"
-msgstr ""
-"Se ajustado, o servidor CDDB pega informações via o protocolo CDDB HTTP"
+msgstr "Se ajustado, o servidor CDDB pega informações via o protocolo CDDB HTTP"
 
 #: modules/access/cdda/cdda.c:173
 msgid "CDDB server timeout"
@@ -3635,8 +3616,7 @@ msgstr "Propriedades do dispositivo"
 
 #: modules/access/dshow/dshow.cpp:133
 #, fuzzy
-msgid ""
-"Show the properties dialog of the selected device before starting the stream."
+msgid "Show the properties dialog of the selected device before starting the stream."
 msgstr "Mostra o diálogo de propriedade do dispositivo selecionado."
 
 #: modules/access/dshow/dshow.cpp:143
@@ -3960,10 +3940,8 @@ msgid "FTP user name"
 msgstr "Nome de usuário FTP"
 
 #: modules/access/ftp.c:45
-msgid ""
-"Allows you to modify the user name that will be used for the connection."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgid "Allows you to modify the user name that will be used for the connection."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/access/ftp.c:47
 msgid "FTP password"
@@ -4029,8 +4007,7 @@ msgid "HTTP user agent"
 msgstr "agente de usuário HTTP"
 
 #: modules/access/http.c:62
-msgid ""
-"Allows you to modify the user agent that will be used for the connection."
+msgid "Allows you to modify the user agent that will be used for the connection."
 msgstr "Permite o agente de usuário que será usado na conexão."
 
 #: modules/access/http.c:66
@@ -4441,10 +4418,8 @@ msgstr "Nome de usuário FTP"
 
 #: modules/access_output/http.c:47
 #, fuzzy
-msgid ""
-"Allows you to give a user name that will be requested to access the stream."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgid "Allows you to give a user name that will be requested to access the stream."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/access_output/http.c:49
 #, fuzzy
@@ -4453,8 +4428,7 @@ msgstr "Senha FTP"
 
 #: modules/access_output/http.c:50
 #, fuzzy
-msgid ""
-"Allows you to give a password that will be requested to access the stream."
+msgid "Allows you to give a password that will be requested to access the stream."
 msgstr "Permite que você modifique a senha que será usada na a conexão."
 
 #: modules/access_output/http.c:55
@@ -4474,8 +4448,7 @@ msgstr "Tempo de vida"
 #: modules/access_output/udp.c:69
 #, fuzzy
 msgid "Allows you to define the time to live of the outgoing stream."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/access_output/udp.c:72
 #, fuzzy
@@ -4544,8 +4517,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/headphone.c:62
 msgid "headphone channel mixer with virtual spatialization effect"
-msgstr ""
-"mixador de canais para fone de ouvido com efeito de espacialização virtual"
+msgstr "mixador de canais para fone de ouvido com efeito de espacialização virtual"
 
 #: modules/audio_filter/channel_mixer/trivial.c:46
 msgid "audio filter for trivial channel mixing"
@@ -5016,8 +4988,7 @@ msgstr ""
 msgid ""
 "Allows you to specify the number of frames that will be coded for one key "
 "frame."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/codec/ffmpeg/ffmpeg.h:166
 msgid "Ratio of B frames"
@@ -5028,8 +4999,7 @@ msgstr ""
 msgid ""
 "Allows you to specify the number of B frames that will be coded between two "
 "reference frames."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/codec/ffmpeg/ffmpeg.h:170
 #, fuzzy
@@ -5482,8 +5452,7 @@ msgstr "Limiar de movimento (10-100)"
 
 #: modules/control/gestures.c:79
 msgid "Amount of movement required for a mouse gesture to be recorded."
-msgstr ""
-"Quantidade de movimento necessário para que um gesto do mouse seja gravado"
+msgstr "Quantidade de movimento necessário para que um gesto do mouse seja gravado"
 
 #: modules/control/gestures.c:82
 msgid "Trigger button"
@@ -5607,8 +5576,7 @@ msgstr "Endereço do host"
 
 #: modules/control/http.c:72
 msgid "You can set the address and port the http interface will bind to."
-msgstr ""
-"Você pode ajustar o endereço e a porta em que a interface http será atada."
+msgstr "Você pode ajustar o endereço e a porta em que a interface http será atada."
 
 #: modules/control/http.c:73 modules/control/http.c:74
 msgid "Source directory"
@@ -5756,10 +5724,8 @@ msgid "Show stream position"
 msgstr "Mostrar posição do stream"
 
 #: modules/control/rc.c:78
-msgid ""
-"Show the current position in seconds within the stream from time to time."
-msgstr ""
-"Mostra a posição atual em segundos dentro do stream de tempos em tempos."
+msgid "Show the current position in seconds within the stream from time to time."
+msgstr "Mostra a posição atual em segundos dentro do stream de tempos em tempos."
 
 #: modules/control/rc.c:80
 msgid "Fake TTY"
@@ -6027,8 +5993,7 @@ msgid "Force index creation"
 msgstr "Forçar criação do index"
 
 #: modules/demux/avi/avi.c:45
-msgid ""
-"Recreate a index for the AVI file so we can seek trough it more reliably."
+msgid "Recreate a index for the AVI file so we can seek trough it more reliably."
 msgstr ""
 "Recriar o index de um arquivo AVI para que possamos procurar através do "
 "mesmo com mais facilmente."
@@ -8014,9 +7979,8 @@ msgid "Preferences..."
 msgstr "Preferências..."
 
 #: modules/gui/macosx/intf.m:529
-#, fuzzy
 msgid "Services"
-msgstr "Dispositivo"
+msgstr "Seriços"
 
 #: modules/gui/macosx/intf.m:530
 msgid "Hide VLC"
@@ -8128,10 +8092,8 @@ msgid "Error"
 msgstr "Erro"
 
 #: modules/gui/macosx/intf.m:625
-msgid ""
-"An error has occurred which probably prevented the execution of your request:"
-msgstr ""
-"Um erro ocorreu que provavelmente impediu a execução de seu requerimento:"
+msgid "An error has occurred which probably prevented the execution of your request:"
+msgstr "Um erro ocorreu que provavelmente impediu a execução de seu requerimento:"
 
 #: modules/gui/macosx/intf.m:626
 msgid "If you believe that it is a bug, please follow the instructions at:"
@@ -9533,8 +9495,7 @@ msgstr "Opções das legendas"
 
 #: modules/gui/wxwindows/subtitles.cpp:162
 msgid "Override frames per second. It will only work with MicroDVD subtitles."
-msgstr ""
-"Sobrepujar quadros por segundo. Só irá funcionar com legendas MicroDVD."
+msgstr "Sobrepujar quadros por segundo. Só irá funcionar com legendas MicroDVD."
 
 #: modules/gui/wxwindows/subtitles.cpp:218
 msgid "Open file"
@@ -9822,8 +9783,7 @@ msgid "SAP timeout (seconds)"
 msgstr ""
 
 #: modules/misc/sap.c:100
-msgid ""
-"Sets the time before SAP items get deleted if no new announce is received."
+msgid "Sets the time before SAP items get deleted if no new announce is received."
 msgstr ""
 
 #: modules/misc/sap.c:102
@@ -9865,8 +9825,7 @@ msgstr "Permite que você modifique a conta que será usada para a conexão."
 
 #: modules/mux/asf.c:50
 #, fuzzy
-msgid ""
-"Allows you to define the copyright string that will be put in ASF comments."
+msgid "Allows you to define the copyright string that will be put in ASF comments."
 msgstr "Permite que você modifique a conta que será usada para a conexão."
 
 #: modules/mux/asf.c:52
@@ -10073,8 +10032,7 @@ msgstr "Métodos de saída"
 
 #: modules/stream_out/es.c:39 modules/stream_out/standard.c:42
 #, fuzzy
-msgid ""
-"Allows you to specify the output access method used for the streaming output."
+msgid "Allows you to specify the output access method used for the streaming output."
 msgstr "Permite que você modifique a conta que será usada para a conexão."
 
 #: modules/stream_out/es.c:41
@@ -10121,8 +10079,7 @@ msgstr "Módulo de saída de audio"
 #: modules/stream_out/es.c:55
 #, fuzzy
 msgid "Allows you to specify the muxer used for the audio streaming output."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/stream_out/es.c:56
 #, fuzzy
@@ -10154,8 +10111,7 @@ msgstr "Saída CoreAudio"
 
 #: modules/stream_out/es.c:65
 #, fuzzy
-msgid ""
-"Allows you to specify the output URL used for the audio streaming output."
+msgid "Allows you to specify the output URL used for the audio streaming output."
 msgstr "Permite que você modifique a conta que será usada para a conexão."
 
 #: modules/stream_out/es.c:67
@@ -10165,8 +10121,7 @@ msgstr "Módulo de saída de vídeo"
 
 #: modules/stream_out/es.c:69
 #, fuzzy
-msgid ""
-"Allows you to specify the output URL used for the video streaming output."
+msgid "Allows you to specify the output URL used for the video streaming output."
 msgstr "Permite que você modifique a conta que será usada para a conexão."
 
 #: modules/stream_out/es.c:78
@@ -10190,8 +10145,7 @@ msgstr "Nome do dispositivo"
 #: modules/stream_out/rtp.c:44
 #, fuzzy
 msgid "Allows you to specify the session name used for the streaming output."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/stream_out/rtp.c:45
 #, fuzzy
@@ -10218,8 +10172,7 @@ msgstr "Permite que você modifique a senha que será usada na a conexão."
 #: modules/stream_out/rtp.c:59
 #, fuzzy
 msgid "Allows you to specify the time to live for the output stream."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/stream_out/rtp.c:67
 msgid "RTP stream output"
@@ -10227,10 +10180,8 @@ msgstr "Saída de Stream RTP"
 
 #: modules/stream_out/standard.c:46
 #, fuzzy
-msgid ""
-"Allows you to specify the output muxer method used for the streaming output."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgid "Allows you to specify the output muxer method used for the streaming output."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/stream_out/standard.c:54
 msgid "Name of the session that will be announced with SAP or SLP"
@@ -10274,10 +10225,8 @@ msgstr "Codec de vídeo"
 
 #: modules/stream_out/transcode.c:53
 #, fuzzy
-msgid ""
-"Allows you to specify the video encoder to use and its associated options."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgid "Allows you to specify the video encoder to use and its associated options."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/stream_out/transcode.c:55
 #, fuzzy
@@ -10319,8 +10268,7 @@ msgstr "Modo desentrelaçado"
 #: modules/stream_out/transcode.c:68
 #, fuzzy
 msgid "Allows you to deinterlace the video before encoding."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/stream_out/transcode.c:71
 #, fuzzy
@@ -10379,10 +10327,8 @@ msgstr "Codec de audio"
 
 #: modules/stream_out/transcode.c:91
 #, fuzzy
-msgid ""
-"Allows you to specify the audio encoder to use and its associated options."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgid "Allows you to specify the audio encoder to use and its associated options."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/stream_out/transcode.c:93
 #, fuzzy
@@ -10413,10 +10359,8 @@ msgstr "Taxa de Amostra:"
 
 #: modules/stream_out/transcode.c:103
 #, fuzzy
-msgid ""
-"Allows you to specify the audio sample rate used for the streaming output."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgid "Allows you to specify the audio sample rate used for the streaming output."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/stream_out/transcode.c:105
 #, fuzzy
@@ -10428,8 +10372,7 @@ msgstr "Canais de Audio"
 msgid ""
 "Allows you to specify the number of audio channels used for the streaming "
 "output."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/stream_out/transcode.c:110
 #, fuzzy
@@ -10439,8 +10382,7 @@ msgstr "Número de streams"
 #: modules/stream_out/transcode.c:112
 #, fuzzy
 msgid "Allows you to specify the number of threads used for the transcoding."
-msgstr ""
-"Permite que você modifique o nome de usuário que será usado para a conexão."
+msgstr "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/stream_out/transcode.c:120
 msgid "Transcode stream output"
@@ -10691,10 +10633,8 @@ msgstr "Número de colunas"
 
 #: modules/video_filter/wall.c:54
 #, fuzzy
-msgid ""
-"Select the number of horizontal video windows in which to split the video"
-msgstr ""
-"Selecione o número de janelas horizontais de vídeo em que dividir o vídeo"
+msgid "Select the number of horizontal video windows in which to split the video"
+msgstr "Selecione o número de janelas horizontais de vídeo em que dividir o vídeo"
 
 #: modules/video_filter/wall.c:57
 msgid "Number of rows"
@@ -10881,8 +10821,7 @@ msgstr "Usar memória compartilhada"
 
 #: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
 msgid "Use shared memory to communicate between VLC and the X server."
-msgstr ""
-"Usar memória compartilhada para se comunicar entre o VLC e o servidor X"
+msgstr "Usar memória compartilhada para se comunicar entre o VLC e o servidor X"
 
 #: modules/video_output/x11/x11.c:61
 msgid "choose the screen to be used for fullscreen mode."
@@ -11495,3 +11434,4 @@ msgstr "Interface XOSD"
 
 #~ msgid "scope effect"
 #~ msgstr "efeito de alcance"
+

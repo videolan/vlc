@@ -821,8 +821,7 @@ msgstr "Moins de messages"
 
 #: src/libvlc.h:71
 msgid "This options turns off all warning and information messages."
-msgstr ""
-"Cette option désactive tous les messages d'avertissement et d'information."
+msgstr "Cette option désactive tous les messages d'avertissement et d'information."
 
 #: src/libvlc.h:74
 msgid ""
@@ -935,8 +934,7 @@ msgid "Audio output volume"
 msgstr "Volume de la sortie audio"
 
 #: src/libvlc.h:122
-msgid ""
-"You can set the default audio output volume here, in a range from 0 to 1024."
+msgid "You can set the default audio output volume here, in a range from 0 to 1024."
 msgstr "Spécifiez ici le volume de la sortie audio, de 0 à 1024."
 
 #: src/libvlc.h:125
@@ -1199,8 +1197,7 @@ msgid "Fullscreen video output"
 msgstr "Sortie vidéo en plein écran"
 
 #: src/libvlc.h:233
-msgid ""
-"If this option is enabled, VLC will always start a video in fullscreen mode."
+msgid "If this option is enabled, VLC will always start a video in fullscreen mode."
 msgstr ""
 "Lorsque cette option est activée, VLC lancera toujours la vidéo en mode "
 "plein écran."
@@ -1346,8 +1343,7 @@ msgstr "TTL"
 msgid ""
 "Indicate here the Time To Live of the multicast packets sent by the stream "
 "output."
-msgstr ""
-"Indiquez ici le TTL des paquets multicast envoyés par le stream output."
+msgstr "Indiquez ici le TTL des paquets multicast envoyés par le stream output."
 
 #: src/libvlc.h:300
 msgid "Choose program (SID)"
@@ -1362,10 +1358,8 @@ msgid "Choose audio"
 msgstr "Choisir la piste audio"
 
 #: src/libvlc.h:306
-msgid ""
-"Give the default type of audio you want to use in a DVD. (Developers only)"
-msgstr ""
-"Indiquez le type d'audio prédéfini que vous souhaitez utiliser dans un DVD."
+msgid "Give the default type of audio you want to use in a DVD. (Developers only)"
+msgstr "Indiquez le type d'audio prédéfini que vous souhaitez utiliser dans un DVD."
 
 #: src/libvlc.h:309
 msgid "Choose audio channel"
@@ -1384,8 +1378,7 @@ msgid "Choose subtitle track"
 msgstr "Choisir la piste de sous-titres"
 
 #: src/libvlc.h:316
-msgid ""
-"Give the stream number of the subtitle channel you want to use (from 1 to n)."
+msgid "Give the stream number of the subtitle channel you want to use (from 1 to n)."
 msgstr ""
 "Indiquez le numéro du canal de sous-titres que vous souhaitez lire par "
 "défaut dans un DVD (de 1 à n)."
@@ -1421,10 +1414,8 @@ msgid "Autodetect subtitle files"
 msgstr "Autodétecte le fichier de sous-titres"
 
 #: src/libvlc.h:335
-msgid ""
-"Automatically detect a subtitle file, if no subtitle filename is specified."
-msgstr ""
-"Détecte automatiquement un fichier de sous-titres si aucun n'est spécifié."
+msgid "Automatically detect a subtitle file, if no subtitle filename is specified."
+msgstr "Détecte automatiquement un fichier de sous-titres si aucun n'est spécifié."
 
 #: src/libvlc.h:338
 msgid "Subtitle autodetection fuzziness"
@@ -1469,8 +1460,7 @@ msgstr "Utiliser un fichier de sous-titres"
 msgid ""
 "Load this subtitle file. To be used when autodetect cannot detect your "
 "subtitle file."
-msgstr ""
-"Charge ce fichier de sous-titres. A utiliser quand l'autodétection échoue."
+msgstr "Charge ce fichier de sous-titres. A utiliser quand l'autodétection échoue."
 
 #: src/libvlc.h:358
 msgid "DVD device"
@@ -1637,10 +1627,8 @@ msgid "Preferred encoders list"
 msgstr "Liste d'encodeurs préférés"
 
 #: src/libvlc.h:443
-msgid ""
-"This allows you to select a list of encoders that VLC will use in priority"
-msgstr ""
-"Ceci permet de choisir une liste d'encodeurs que VLC choisira en priorité"
+msgid "This allows you to select a list of encoders that VLC will use in priority"
+msgstr "Ceci permet de choisir une liste d'encodeurs que VLC choisira en priorité"
 
 #: src/libvlc.h:447
 msgid ""
@@ -1711,8 +1699,7 @@ msgid "Preferred packetizer list"
 msgstr "Liste des empaqueteurs préférés"
 
 #: src/libvlc.h:480
-msgid ""
-"This allows you to select the order in which VLC will choose its packetizers."
+msgid "This allows you to select the order in which VLC will choose its packetizers."
 msgstr ""
 "Cette option permet de choisir l'ordre dans lequel VLC choisira ses "
 "empaqueteurs."
@@ -1870,8 +1857,7 @@ msgstr "Boucler en fin de liste de lecture"
 msgid ""
 "If you want VLC to keep playing the playlist indefinitely then enable this "
 "option."
-msgstr ""
-"Sélectionnez cette option pour que VLC joue la liste de lecture indéfiniment."
+msgstr "Sélectionnez cette option pour que VLC joue la liste de lecture indéfiniment."
 
 #: src/libvlc.h:548
 msgid "Repeat the current item"
@@ -1961,8 +1947,7 @@ msgstr "Minimiser le nombre de threads nécessaires à VLC"
 
 #: src/libvlc.h:586
 msgid "This option minimizes the number of threads needed to run VLC"
-msgstr ""
-"Cette option permet de minimiser le nombre de threads requis pour lancer VLC."
+msgstr "Cette option permet de minimiser le nombre de threads requis pour lancer VLC."
 
 #: src/libvlc.h:588
 msgid "Allow only one running instance"
@@ -2040,8 +2025,7 @@ msgstr ""
 
 #: src/libvlc.h:623
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
-msgstr ""
-"Ces réglages sont les attributions globales de touches de VLC\"hotkeys\"."
+msgstr "Ces réglages sont les attributions globales de touches de VLC\"hotkeys\"."
 
 #: src/libvlc.h:626 src/video_output/vout_intf.c:213
 #: modules/gui/beos/VideoOutput.cpp:1202 modules/gui/macosx/applescript.m:121
@@ -2052,8 +2036,7 @@ msgstr "Plein écran"
 
 #: src/libvlc.h:627
 msgid "Select the hotkey to use to swap fullscreen state."
-msgstr ""
-"Sélectionnez la combinaison de touches à utiliser pour passer en plein écran."
+msgstr "Sélectionnez la combinaison de touches à utiliser pour passer en plein écran."
 
 #: src/libvlc.h:628
 msgid "Play/Pause"
@@ -2071,8 +2054,7 @@ msgstr "Pause seulement"
 
 #: src/libvlc.h:631
 msgid "Select the hotkey to use to pause."
-msgstr ""
-"Sélectionnez la combinaison de touches à utiliser pour passer en pause."
+msgstr "Sélectionnez la combinaison de touches à utiliser pour passer en pause."
 
 #: src/libvlc.h:632
 msgid "Play only"
@@ -2089,8 +2071,7 @@ msgstr "Accélérer"
 
 #: src/libvlc.h:635
 msgid "Select the hotkey to use for fast forward playback."
-msgstr ""
-"Sélectionnez la combinaison de touches à utiliser pour l'avance rapide."
+msgstr "Sélectionnez la combinaison de touches à utiliser pour l'avance rapide."
 
 #: src/libvlc.h:636 modules/gui/macosx/controls.m:126
 #: modules/gui/macosx/controls.m:618 modules/gui/macosx/intf.m:554
@@ -2143,8 +2124,7 @@ msgstr "Stop"
 
 #: src/libvlc.h:643
 msgid "Select the hotkey to stop the playback."
-msgstr ""
-"Sélectionnez la combinaison de touches à utiliser pour arrêter la lecture."
+msgstr "Sélectionnez la combinaison de touches à utiliser pour arrêter la lecture."
 
 #: src/libvlc.h:644 modules/gui/macosx/intf.m:518
 msgid "Position"
@@ -2152,8 +2132,7 @@ msgstr "Position"
 
 #: src/libvlc.h:645
 msgid "Select the hotkey to display the position."
-msgstr ""
-"Sélectionnez la combinaison de touches à utiliser pour afficher la position."
+msgstr "Sélectionnez la combinaison de touches à utiliser pour afficher la position."
 
 #: src/libvlc.h:647
 msgid "Jump 10 seconds backwards"
@@ -2280,8 +2259,7 @@ msgstr "Augmenter le volume"
 
 #: src/libvlc.h:676
 msgid "Select the key to increase audio volume."
-msgstr ""
-"Sélectionnez la combinaison de touches à utiliser pour augmenter le volume."
+msgstr "Sélectionnez la combinaison de touches à utiliser pour augmenter le volume."
 
 #: src/libvlc.h:677 modules/gui/gtk/gnome_interface.c:916
 msgid "Volume down"
@@ -2289,8 +2267,7 @@ msgstr "Baisser le volume"
 
 #: src/libvlc.h:678
 msgid "Select the key to decrease audio volume."
-msgstr ""
-"Sélectionnez la combinaison de touches à utiliser pour diminuer le volume."
+msgstr "Sélectionnez la combinaison de touches à utiliser pour diminuer le volume."
 
 #: src/libvlc.h:679 modules/control/hotkeys.c:277 modules/control/lirc.c:215
 #: modules/gui/gtk/gnome_interface.c:140 modules/gui/gtk/gnome_interface.c:923
@@ -2412,8 +2389,7 @@ msgstr "Régler le favori n°10"
 
 #: src/libvlc.h:706
 msgid "Select the key to set this playlist bookmark."
-msgstr ""
-"Sélectionnez la combinaison de touches à utiliser pour régler ce favori."
+msgstr "Sélectionnez la combinaison de touches à utiliser pour régler ce favori."
 
 #: src/libvlc.h:708
 msgid "Go back in browsing history"
@@ -2536,8 +2512,7 @@ msgstr "Affiche l'aide du module (peut être combiné avec --advanced)"
 
 #: src/libvlc.h:1100
 msgid "save the current command line options in the config"
-msgstr ""
-"Enregistre les options de la ligne de commande actuelle dans la configuration"
+msgstr "Enregistre les options de la ligne de commande actuelle dans la configuration"
 
 #: src/libvlc.h:1102
 msgid "reset the current config to the default values"
@@ -3402,8 +3377,7 @@ msgstr "Entrée Compact Disc Digital Audio (CD-DA)"
 #: modules/access/cdda/cdda.c:116 modules/access/vcdx/vcd.c:100
 #: modules/codec/ogt/subtitle.h:39
 msgid "If nonzero, this gives additional debug information."
-msgstr ""
-"Si différent de zéro, donne des informations supplémentaires de débogage."
+msgstr "Si différent de zéro, donne des informations supplémentaires de débogage."
 
 #: modules/access/cdda/cdda.c:121
 msgid "Caching value in microseconds"
@@ -3596,8 +3570,7 @@ msgid "Device properties"
 msgstr "Propriétés du périphérique"
 
 #: modules/access/dshow/dshow.cpp:133
-msgid ""
-"Show the properties dialog of the selected device before starting the stream."
+msgid "Show the properties dialog of the selected device before starting the stream."
 msgstr ""
 "Affiche la fenêtre de propriétés du périphérique sélectionné avant le début "
 "du flux."
@@ -3678,8 +3651,7 @@ msgstr "Teste les capacités de la carte DVB"
 
 #: modules/access/dvb/access.c:95
 msgid "Some DVB cards do not like to be probed for their capabilities."
-msgstr ""
-"Certaines cartes DVB ne supportent pas la détection de leur capacités. "
+msgstr "Certaines cartes DVB ne supportent pas la détection de leur capacités. "
 
 #: modules/access/dvb/access.c:97 modules/access/satellite/satellite.c:62
 msgid "Antenna lnb_lof1 (kHz)"
@@ -3915,8 +3887,7 @@ msgid "FTP user name"
 msgstr "Nom d'utilisateur FTP"
 
 #: modules/access/ftp.c:45
-msgid ""
-"Allows you to modify the user name that will be used for the connection."
+msgid "Allows you to modify the user name that will be used for the connection."
 msgstr ""
 "Ceci vous permet de modifier le nom d'utilisateur qui sera utilisé pour la "
 "connexion."
@@ -3937,8 +3908,7 @@ msgstr "Compte FTP"
 
 #: modules/access/ftp.c:51
 msgid "Allows you to modify the account that will be used for the connection."
-msgstr ""
-"Ceci vous permet de modifier le compte qui sera utilisé pour la connexion."
+msgstr "Ceci vous permet de modifier le compte qui sera utilisé pour la connexion."
 
 #: modules/access/ftp.c:55
 msgid "FTP input"
@@ -3987,8 +3957,7 @@ msgid "HTTP user agent"
 msgstr "Agent Utilisateur HTTP"
 
 #: modules/access/http.c:62
-msgid ""
-"Allows you to modify the user agent that will be used for the connection."
+msgid "Allows you to modify the user agent that will be used for the connection."
 msgstr ""
 "Ceci vous permet de modifier l'agent utilisateur qui sera utilisé pour la "
 "connexion."
@@ -4027,8 +3996,7 @@ msgstr "PVR"
 
 #: modules/access/pvr/pvr.c:78
 msgid "MPEG Encoding cards input (with ivtv drivers)"
-msgstr ""
-"Entrées pour les cartes d'encodage MPEG supportées par les drivers ivtv"
+msgstr "Entrées pour les cartes d'encodage MPEG supportées par les drivers ivtv"
 
 #: modules/access/satellite/satellite.c:41
 msgid "Demux number"
@@ -4403,8 +4371,7 @@ msgid "Username"
 msgstr "Nom d'utilisateur"
 
 #: modules/access_output/http.c:47
-msgid ""
-"Allows you to give a user name that will be requested to access the stream."
+msgid "Allows you to give a user name that will be requested to access the stream."
 msgstr ""
 "Ceci vous permet de préciser le nom d'utilisateur qui sera demandé pour "
 "accéder au flux."
@@ -4414,8 +4381,7 @@ msgid "Password"
 msgstr "Mot de passe"
 
 #: modules/access_output/http.c:50
-msgid ""
-"Allows you to give a password that will be requested to access the stream."
+msgid "Allows you to give a password that will be requested to access the stream."
 msgstr ""
 "Ceci vous permet de modifier le mot de passe qui sera demandé pour accéder "
 "au flux."
@@ -4994,8 +4960,7 @@ msgstr "Tolérance du débit de la vidéo"
 
 #: modules/codec/ffmpeg/ffmpeg.h:171
 msgid "Allows you to specify the video bitrate tolerance in kbit/s."
-msgstr ""
-"Ceci vous permet de modifier la tolérance du débit de la vidéo en kbits/s."
+msgstr "Ceci vous permet de modifier la tolérance du débit de la vidéo en kbits/s."
 
 #: modules/codec/ffmpeg/ffmpeg.h:174
 msgid "Enable interlaced encoding"
@@ -5029,8 +4994,7 @@ msgstr "Taille du buffer de contrôle de débit"
 
 #: modules/codec/ffmpeg/ffmpeg.h:187
 msgid "Allows you to specify the rate control buffer size."
-msgstr ""
-"Ceci vous permet de spécifier la taille du buffer pour le contrôle de débit."
+msgstr "Ceci vous permet de spécifier la taille du buffer pour le contrôle de débit."
 
 #: modules/codec/ffmpeg/ffmpeg.h:190
 msgid "Rate control buffer aggressiveness"
@@ -5112,8 +5076,7 @@ msgstr "Minimum de l'échelle de quantization vidéo"
 
 #: modules/codec/ffmpeg/ffmpeg.h:223
 msgid "Allows you to specify the minimum video quantizer scale."
-msgstr ""
-"Ceci vous permet de spécifier le minimum de l'échelle de quantization vidéo."
+msgstr "Ceci vous permet de spécifier le minimum de l'échelle de quantization vidéo."
 
 #: modules/codec/ffmpeg/ffmpeg.h:226
 msgid "Maximum video quantizer scale"
@@ -5121,8 +5084,7 @@ msgstr "Maximum de l'échelle de quantization vidéo"
 
 #: modules/codec/ffmpeg/ffmpeg.h:227
 msgid "Allows you to specify the maximum video quantizer scale."
-msgstr ""
-"Ceci vous permet de spécifier le maximum de l'échelle de quantization vidéo."
+msgstr "Ceci vous permet de spécifier le maximum de l'échelle de quantization vidéo."
 
 #: modules/codec/ffmpeg/ffmpeg.h:230
 msgid "Enable trellis quantization"
@@ -5468,8 +5430,7 @@ msgstr "Seuil de mouvement (10-100)"
 
 #: modules/control/gestures.c:79
 msgid "Amount of movement required for a mouse gesture to be recorded."
-msgstr ""
-"La quantité de mouvement requise pour enregistrer un mouvement de souris"
+msgstr "La quantité de mouvement requise pour enregistrer un mouvement de souris"
 
 #: modules/control/gestures.c:82
 msgid "Trigger button"
@@ -5477,8 +5438,7 @@ msgstr "Bouton de souris"
 
 #: modules/control/gestures.c:84
 msgid "You can set the trigger button for mouse gestures here."
-msgstr ""
-"Vous pouvez régler le bouton de déclenchement des mouvements de souris ici."
+msgstr "Vous pouvez régler le bouton de déclenchement des mouvements de souris ici."
 
 #: modules/control/gestures.c:87
 msgid "Middle"
@@ -5594,8 +5554,7 @@ msgstr "Adresse de l'hôte"
 
 #: modules/control/http.c:72
 msgid "You can set the address and port the http interface will bind to."
-msgstr ""
-"Indiquez l'adresse et le port par lesquelles l'interface HTTP sera joignable."
+msgstr "Indiquez l'adresse et le port par lesquelles l'interface HTTP sera joignable."
 
 #: modules/control/http.c:73 modules/control/http.c:74
 msgid "Source directory"
@@ -5733,10 +5692,8 @@ msgid "Show stream position"
 msgstr "Montrer la position dans le flux"
 
 #: modules/control/rc.c:78
-msgid ""
-"Show the current position in seconds within the stream from time to time."
-msgstr ""
-"Affiche la position actuelle en secondes dans le flux de temps en temps."
+msgid "Show the current position in seconds within the stream from time to time."
+msgstr "Affiche la position actuelle en secondes dans le flux de temps en temps."
 
 #: modules/control/rc.c:80
 msgid "Fake TTY"
@@ -5753,8 +5710,7 @@ msgstr "Interface de commande à distance"
 #: modules/control/rc.c:116
 #, c-format
 msgid "Remote control interface initialized, `h' for help\n"
-msgstr ""
-"Interface de commande à distance initialisée, 'h' pour obtenir de l'aide.\n"
+msgstr "Interface de commande à distance initialisée, 'h' pour obtenir de l'aide.\n"
 
 #: modules/control/rc.c:382 modules/control/rc.c:395
 #, c-format
@@ -5999,8 +5955,7 @@ msgid "Force index creation"
 msgstr "Forcer la création d'index"
 
 #: modules/demux/avi/avi.c:45
-msgid ""
-"Recreate a index for the AVI file so we can seek trough it more reliably."
+msgid "Recreate a index for the AVI file so we can seek trough it more reliably."
 msgstr ""
 "Recréer un index pour le fichier AVI afin d'augmenter la fiabilité du "
 "déplacement dans le fichier."
@@ -7974,9 +7929,8 @@ msgid "Preferences..."
 msgstr "Préférences..."
 
 #: modules/gui/macosx/intf.m:529
-#, fuzzy
 msgid "Services"
-msgstr "Périphérique"
+msgstr "Services"
 
 #: modules/gui/macosx/intf.m:530
 msgid "Hide VLC"
@@ -8088,8 +8042,7 @@ msgid "Error"
 msgstr "Erreur"
 
 #: modules/gui/macosx/intf.m:625
-msgid ""
-"An error has occurred which probably prevented the execution of your request:"
+msgid "An error has occurred which probably prevented the execution of your request:"
 msgstr ""
 "Une erreur est survenue, qui a probablement empêché le déroulement normal du "
 "programme :"
@@ -8161,9 +8114,8 @@ msgstr ""
 "la fenêtre vidéo, étire l'image pour remplir toute la fenêtre."
 
 #: modules/gui/macosx/macosx.m:62
-#, fuzzy
 msgid "video rendering mode"
-msgstr "Force un mode de rendu vidéo."
+msgstr "mode de rendu vidéo"
 
 #: modules/gui/macosx/macosx.m:63
 msgid ""
@@ -9209,14 +9161,12 @@ msgid "Force options for separate subtitle files."
 msgstr "Régler les options pour les fichiers de sous-titres séparés."
 
 #: modules/gui/wxwindows/open.cpp:611
-#, fuzzy
 msgid "DVD (menus)"
-msgstr "menus DVD"
+msgstr "DVD (menus)"
 
 #: modules/gui/wxwindows/open.cpp:615
-#, fuzzy
 msgid "DVD (test)"
-msgstr "menus DVD"
+msgstr "DVD (test)"
 
 #: modules/gui/wxwindows/open.cpp:664
 msgid "RTSP"
@@ -9642,8 +9592,7 @@ msgstr "Format d'enregistrement"
 msgid ""
 "Specify the log format. Available choices are \"text\" (default) and \"html"
 "\"."
-msgstr ""
-"Sélectionner le format d'enregistrement, \"text\" (prédéfini) ou \"html\""
+msgstr "Sélectionner le format d'enregistrement, \"text\" (prédéfini) ou \"html\""
 
 #: modules/misc/logger.c:97
 msgid "File logging interface"
@@ -9758,8 +9707,7 @@ msgid "SAP timeout (seconds)"
 msgstr "Temps d'expiration SAP (en secondes)"
 
 #: modules/misc/sap.c:100
-msgid ""
-"Sets the time before SAP items get deleted if no new announce is received."
+msgid "Sets the time before SAP items get deleted if no new announce is received."
 msgstr ""
 "Règle le temps avant que les éléments SAP ne soient effacés si aucune "
 "nouvelle annonce n'est reçue."
@@ -9794,17 +9742,14 @@ msgstr "Tests de performance divers"
 
 #: modules/mux/asf.c:44
 msgid "Allows you to define the title that will be put in ASF comments."
-msgstr ""
-"Ceci vous permet de définir le titre qui sera mis dans les commentaires ASF."
+msgstr "Ceci vous permet de définir le titre qui sera mis dans les commentaires ASF."
 
 #: modules/mux/asf.c:47
 msgid "Allows you to define the author that will be put in ASF comments."
-msgstr ""
-"Ceci vous permet de définir l'auteur qui sera mis dans les commentaires ASF."
+msgstr "Ceci vous permet de définir l'auteur qui sera mis dans les commentaires ASF."
 
 #: modules/mux/asf.c:50
-msgid ""
-"Allows you to define the copyright string that will be put in ASF comments."
+msgid "Allows you to define the copyright string that will be put in ASF comments."
 msgstr ""
 "Ceci vous permet de définir le copyright qui sera mis dans les commentaires "
 "ASF."
@@ -10025,8 +9970,7 @@ msgid "Output access method"
 msgstr "Méthode de sortie"
 
 #: modules/stream_out/es.c:39 modules/stream_out/standard.c:42
-msgid ""
-"Allows you to specify the output access method used for the streaming output."
+msgid "Allows you to specify the output access method used for the streaming output."
 msgstr "Ceci vous permet de spécifier la méthode de sortie pour la diffusion."
 
 #: modules/stream_out/es.c:41
@@ -10037,8 +9981,7 @@ msgstr "Module de sortie audio"
 msgid ""
 "Allows you to specify the output access method used for the audio streaming "
 "output."
-msgstr ""
-"Ceci vous permet de spécifier la méthode de sortie pour la diffusion audio."
+msgstr "Ceci vous permet de spécifier la méthode de sortie pour la diffusion audio."
 
 #: modules/stream_out/es.c:45
 msgid "Video output access method"
@@ -10048,8 +9991,7 @@ msgstr "Module de sortie vidéo"
 msgid ""
 "Allows you to specify the output access method used for the video streaming "
 "output."
-msgstr ""
-"Ceci vous permet de spécifier la méthode de sortie pour la diffusion vidéo."
+msgstr "Ceci vous permet de spécifier la méthode de sortie pour la diffusion vidéo."
 
 #: modules/stream_out/es.c:50 modules/stream_out/standard.c:44
 msgid "Output muxer"
@@ -10057,8 +9999,7 @@ msgstr "Multiplexeur de sortie"
 
 #: modules/stream_out/es.c:52 modules/stream_out/rtp.c:53
 msgid "Allows you to specify the muxer used for the streaming output."
-msgstr ""
-"Ceci vous permet de spécifier le multiplexeur utiliser pour la diffusion."
+msgstr "Ceci vous permet de spécifier le multiplexeur utiliser pour la diffusion."
 
 #: modules/stream_out/es.c:53
 msgid "Audio output muxer"
@@ -10087,16 +10028,14 @@ msgstr "URL de sortie"
 #: modules/stream_out/es.c:62 modules/stream_out/rtp.c:41
 #: modules/stream_out/standard.c:50
 msgid "Allows you to specify the output URL used for the streaming output."
-msgstr ""
-"Ceci vous permet de spécifier l'URL de sortie utilisée pour la diffusion."
+msgstr "Ceci vous permet de spécifier l'URL de sortie utilisée pour la diffusion."
 
 #: modules/stream_out/es.c:63
 msgid "Audio output URL"
 msgstr "URL de sortie audio"
 
 #: modules/stream_out/es.c:65
-msgid ""
-"Allows you to specify the output URL used for the audio streaming output."
+msgid "Allows you to specify the output URL used for the audio streaming output."
 msgstr "Ceci vous permet de spécifier une URL de sortie pour le flux audio."
 
 #: modules/stream_out/es.c:67
@@ -10104,8 +10043,7 @@ msgid "Video output URL"
 msgstr "URL de sortie vidéo"
 
 #: modules/stream_out/es.c:69
-msgid ""
-"Allows you to specify the output URL used for the video streaming output."
+msgid "Allows you to specify the output URL used for the video streaming output."
 msgstr "Ceci vous permet de spécifier une URL de sortie pour le flux vidéo."
 
 #: modules/stream_out/es.c:78
@@ -10126,8 +10064,7 @@ msgstr "Nom de session"
 
 #: modules/stream_out/rtp.c:44
 msgid "Allows you to specify the session name used for the streaming output."
-msgstr ""
-"Ceci vous permet de spécifier le nom de session utilisé pour la diffusion."
+msgstr "Ceci vous permet de spécifier le nom de session utilisé pour la diffusion."
 
 #: modules/stream_out/rtp.c:45
 msgid "SDP"
@@ -10149,8 +10086,7 @@ msgstr "Multiplexeur :"
 
 #: modules/stream_out/rtp.c:56
 msgid "Allows you to specify the base port used for the RTP streaming"
-msgstr ""
-"Ceci vous permet de modifier le port de base utilisé pour la diffusion RTP."
+msgstr "Ceci vous permet de modifier le port de base utilisé pour la diffusion RTP."
 
 #: modules/stream_out/rtp.c:59
 msgid "Allows you to specify the time to live for the output stream."
@@ -10161,10 +10097,8 @@ msgid "RTP stream output"
 msgstr "Flux de sortie RTP"
 
 #: modules/stream_out/standard.c:46
-msgid ""
-"Allows you to specify the output muxer method used for the streaming output."
-msgstr ""
-"Ceci vous permet de spécifier le multiplexeur de sortie pour la diffusion."
+msgid "Allows you to specify the output muxer method used for the streaming output."
+msgstr "Ceci vous permet de spécifier le multiplexeur de sortie pour la diffusion."
 
 #: modules/stream_out/standard.c:54
 msgid "Name of the session that will be announced with SAP or SLP"
@@ -10203,8 +10137,7 @@ msgid "Video encoder"
 msgstr "Encodeur vidéo"
 
 #: modules/stream_out/transcode.c:53
-msgid ""
-"Allows you to specify the video encoder to use and its associated options."
+msgid "Allows you to specify the video encoder to use and its associated options."
 msgstr ""
 "Ceci vous permet de choisir l'encodeur vidéo à utiliser ainsi que de "
 "configurer ses options associées."
@@ -10227,8 +10160,7 @@ msgstr "Débit vidéo"
 
 #: modules/stream_out/transcode.c:61
 msgid "Allows you to specify the video bitrate used for the streaming output."
-msgstr ""
-"Ceci vous permet de spécifier le débit vidéo utilisé pour la diffusion."
+msgstr "Ceci vous permet de spécifier le débit vidéo utilisé pour la diffusion."
 
 #: modules/stream_out/transcode.c:63
 msgid "Video scaling"
@@ -10270,8 +10202,7 @@ msgstr "Coupe gauche de l'image"
 
 #: modules/stream_out/transcode.c:81
 msgid "Allows you to specify the left coordinate for the video cropping."
-msgstr ""
-"Ceci vous permet de spécifier la coordonnée gauche pour la coupe de l'image."
+msgstr "Ceci vous permet de spécifier la coordonnée gauche pour la coupe de l'image."
 
 #: modules/stream_out/transcode.c:82
 msgid "Video crop bottom"
@@ -10298,8 +10229,7 @@ msgid "Audio encoder"
 msgstr "Encodeur audio"
 
 #: modules/stream_out/transcode.c:91
-msgid ""
-"Allows you to specify the audio encoder to use and its associated options."
+msgid "Allows you to specify the audio encoder to use and its associated options."
 msgstr ""
 "Ceci vous permet de spécifier l'encodeur audio à utiliser, et ses options "
 "associées."
@@ -10322,16 +10252,14 @@ msgstr "Débit audio"
 
 #: modules/stream_out/transcode.c:99
 msgid "Allows you to specify the audio bitrate used for the streaming output."
-msgstr ""
-"Ceci vous permet de spécifier le débit audio utilisé pour la diffusion."
+msgstr "Ceci vous permet de spécifier le débit audio utilisé pour la diffusion."
 
 #: modules/stream_out/transcode.c:101
 msgid "Audio sample rate"
 msgstr "Fréquence d'échantillonage audio"
 
 #: modules/stream_out/transcode.c:103
-msgid ""
-"Allows you to specify the audio sample rate used for the streaming output."
+msgid "Allows you to specify the audio sample rate used for the streaming output."
 msgstr ""
 "Ceci vous permet de spécifier la fréquence d'échantillonnage audio utilisée "
 "pour la diffusion."
@@ -10602,8 +10530,7 @@ msgid "Number of columns"
 msgstr "Nombre de colonnes"
 
 #: modules/video_filter/wall.c:54
-msgid ""
-"Select the number of horizontal video windows in which to split the video"
+msgid "Select the number of horizontal video windows in which to split the video"
 msgstr ""
 "Indiquez le nombre de fenêtres dans lesquelles découper horizontalement la "
 "vidéo"
@@ -10797,8 +10724,7 @@ msgstr "Utiliser la mémoire partagée"
 
 #: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
 msgid "Use shared memory to communicate between VLC and the X server."
-msgstr ""
-"Utiliser la mémoire partagée pour communiquer entre VLC et le serveur X."
+msgstr "Utiliser la mémoire partagée pour communiquer entre VLC et le serveur X."
 
 #: modules/video_output/x11/x11.c:61
 msgid "choose the screen to be used for fullscreen mode."
@@ -11980,3 +11906,4 @@ msgstr "Interface XOSD"
 
 #~ msgid "Input Type"
 #~ msgstr "Entrée"
+
