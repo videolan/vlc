@@ -100,8 +100,8 @@ vlc_module_begin();
         add_string( "macosx-opengl-effect", "none", NULL,
                     OPENGL_EFFECT_TEXT, OPENGL_EFFECT_LONGTEXT,
                     VLC_TRUE );
+        change_string_list( effect_list, effect_list_text, 0 );
         add_bool( "macosx-fill", 0, NULL, FILL_TEXT, FILL_LONGTEXT,
                   VLC_TRUE );
-        change_string_list( effect_list, effect_list_text, 0 );
 vlc_module_end();
 
