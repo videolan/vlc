@@ -26,16 +26,18 @@
 #include "vlc_block.h"
 #include "vlc_filter.h"
 
-static subpicture_t *RenderText( filter_t *, block_t * );
+static int RenderText( filter_t *, subpicture_region_t *,
+                       subpicture_region_t * );
 
 int E_(OpenRenderer)( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    p_filter->pf_render_string = RenderText;
+    p_filter->pf_render_text = RenderText;
     return VLC_SUCCESS;
 }
 
-static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
+static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
+                       subpicture_region_t *p_region_in )
 {
-    return NULL;
+    return VLC_EGENERIC;
 }
