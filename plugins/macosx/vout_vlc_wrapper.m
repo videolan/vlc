@@ -2,7 +2,7 @@
  * vout_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_vlc_wrapper.m,v 1.2 2002/05/18 18:48:24 massiot Exp $
+ * $Id: vout_vlc_wrapper.m,v 1.2.2.1 2002/06/01 23:41:41 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -34,6 +34,10 @@
 #include "video_output.h"
 
 #include "interface.h"
+#include "intf_playlist.h"
+
+#include "stream_control.h"
+#include "input_ext-intf.h"
 
 #include "macosx.h"
 #include "vout_vlc_wrapper.h"
@@ -116,8 +120,26 @@ static Vout_VLCWrapper *o_vout = nil;
             p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
             break;
 
+        case (unichar)0x1b: /* escape */
+            if ( p_vout->b_fullscreen )
+            {
+                p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+            }
+            break;
+
         case 'q': case 'Q':
             p_main->p_intf->b_die = 1;
+            break;
+
+        case ' ':
+            if ( p_input_bank->pp_input[0] != NULL )
+            {
+                input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PAUSE );
+
+                vlc_mutex_lock( &p_main->p_playlist->change_lock );
+                p_main->p_playlist->b_stopped = 0;
+                vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+            }
             break;
 
         default:
