@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.9 2003/07/23 19:11:08 titer Exp $
+ * $Id: freetype.c,v 1.10 2003/07/23 21:45:13 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -122,6 +122,7 @@ static int Create( vlc_object_t *p_this )
     char *psz_fontfile;
     int i, i_error;
     double gamma_inv = 1.0f / gamma_value;
+    vlc_value_t val;
 
     /* Allocate structure */
     p_vout->p_text_renderer_data = malloc( sizeof( text_renderer_sys_t ) );
@@ -136,17 +137,34 @@ static int Create( vlc_object_t *p_this )
             (uint8_t)( pow( (double)i / 255.0f, gamma_inv) * 255.0f );
     }
 
+    if( !var_Type( p_vout, "freetype-font" ) )
+    {
+        var_Create( p_vout, "freetype-font", VLC_VAR_STRING );
+        var_Change( p_vout, "freetype-font", VLC_VAR_INHERITVALUE, NULL, NULL );
+    }
+    if( !var_Type( p_vout, "freetype-fontsize" ) )
+    {
+        var_Create( p_vout, "freetype-fontsize", VLC_VAR_INTEGER );
+        var_Change( p_vout, "freetype-fontsize", VLC_VAR_INHERITVALUE, NULL, NULL );
+    }
+
     /* Look what method was requested */
-    psz_fontfile = config_GetPsz( p_vout, "freetype-font" );
-#ifdef WIN32
+    var_Get( p_vout, "freetype-font", &val );
+    psz_fontfile = (char *)malloc( PATH_MAX + 1 );
+    strcat( psz_fontfile, val.psz_string );
+    free( val.psz_string);
+    
     if( !psz_fontfile || !*psz_fontfile )
     {
         if( psz_fontfile ) free( psz_fontfile );
-        psz_fontfile = (char *)malloc( MAX_PATH + 1 );
-        GetWindowsDirectory( psz_fontfile, MAX_PATH + 1 );
+        psz_fontfile = (char *)malloc( PATH_MAX + 1 );
+#ifdef WIN32
+        GetWindowsDirectory( psz_fontfile, PATH_MAX + 1 );
         strcat( psz_fontfile, "\\fonts\\arial.ttf" );
-    }
+#elif SYS_DARWIN
+        strcat( psz_fontfile, DEFAULT_FONT );
 #endif
+    }
 
     i_error = FT_Init_FreeType( &p_vout->p_text_renderer_data->p_library );
     if( i_error )
@@ -190,13 +208,12 @@ static int Create( vlc_object_t *p_this )
 
     p_vout->p_text_renderer_data->i_use_kerning =
         FT_HAS_KERNING(p_vout->p_text_renderer_data->p_face);
+    var_Get( p_vout, "freetype-fontsize", &val );
 
-    i_error = FT_Set_Pixel_Sizes( p_vout->p_text_renderer_data->p_face, 0,
-                                  config_GetInt( p_vout, "freetype-fontsize" ) );
+    i_error = FT_Set_Pixel_Sizes( p_vout->p_text_renderer_data->p_face, 0, val.i_int );
     if( i_error )
     {
-        msg_Err( p_vout, "couldn't set font size to %d",
-                 config_GetInt( p_vout, "osd-fontsize" ) );
+        msg_Err( p_vout, "couldn't set font size to %d", val.i_int );
         free( p_vout->p_text_renderer_data );
         return VLC_EGENERIC;
     }
@@ -445,12 +462,12 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
         {
             i_pen_x = 0;
             result.x = __MAX( result.x, line.xMax );
-            result.y += face->height >> 6;
+            result.y += face->size->metrics.height / 26.6;
             line.xMin = 0;
             line.xMax = 0;
             line.yMin = 0;
             line.yMax = 0;
-            i_pen_y += face->height >> 6;
+            i_pen_y += face->size->metrics.height / 26.6;
             continue;
         }
         i_glyph_index = FT_Get_Char_Index( face, i_char );

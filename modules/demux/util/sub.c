@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.17 2003/07/14 21:32:59 sigmunau Exp $
+ * $Id: sub.c,v 1.18 2003/07/23 21:45:13 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -92,6 +92,28 @@ static int Open ( vlc_object_t *p_this )
     p_sub->pf_demux = sub_demux;
     p_sub->pf_seek  = sub_seek;
     p_sub->pf_close = sub_close;
+
+    /* Initialize the variables */
+    if( !var_Type( p_this, "sub-file" ) )
+    {
+        var_Create( p_this, "sub-file", VLC_VAR_STRING );
+        var_Change( p_this, "sub-file", VLC_VAR_INHERITVALUE, NULL, NULL );
+    }
+    if( !var_Type( p_this, "sub-fps" ) )
+    {
+        var_Create( p_this, "sub-fps", VLC_VAR_FLOAT );
+        var_Change( p_this, "sub-fps", VLC_VAR_INHERITVALUE, NULL, NULL );
+    }
+    if( !var_Type( p_this, "sub-delay" ) )
+    {
+        var_Create( p_this, "sub-delay", VLC_VAR_INTEGER );
+        var_Change( p_this, "sub-delay", VLC_VAR_INHERITVALUE, NULL, NULL );
+    }
+    if( !var_Type( p_this, "sub-type" ) )
+    {
+        var_Create( p_this, "sub-type", VLC_VAR_STRING );
+        var_Change( p_this, "sub-type", VLC_VAR_INHERITVALUE, NULL, NULL );
+    }
 
     return VLC_SUCCESS;
 }
@@ -229,9 +251,9 @@ static int  sub_open ( subtitle_demux_t *p_sub,
                        mtime_t i_microsecperframe )
 {
     text_t  txt;
+    vlc_value_t val;
 
     int     i;
-    char    *psz_file_type;
     int     i_sub_type;
     int     i_max;
     int (*pf_read_subtitle)( text_t *, subtitle_t *, mtime_t ) = NULL;
@@ -244,11 +266,14 @@ static int  sub_open ( subtitle_demux_t *p_sub,
 
     if( !psz_name || !*psz_name)
     {
-        psz_name = config_GetPsz( p_sub, "sub-file" );
-        if( !psz_name || !*psz_name )
+        var_Get( p_sub, "sub-file", &val );
+        if( !val.psz_string || !*val.psz_string )
         {
+            if( val.psz_string) free( val.psz_string);
             return VLC_EGENERIC;
         }
+        psz_name = strdup( val.psz_string );
+        free( val.psz_string );
     }
     else
     {
@@ -265,19 +290,19 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     msg_Dbg( p_sub, "opened `%s'", psz_name );
     free( psz_name );
 
-
-    if(  config_GetFloat( p_sub, "sub-fps" ) >= 1.0 )
+    var_Get( p_sub, "sub-fps", &val );
+    if( val.i_int >= 1.0 )
     {
-        i_microsecperframe = (mtime_t)( (float)1000000 /
-                                        config_GetFloat( p_sub, "sub-fps" ) );
+        var_Get( p_sub, "sub-fps", &val );
+        i_microsecperframe = (mtime_t)( (float)1000000 / val.f_float );
     }
     else if( i_microsecperframe <= 0 )
     {
         i_microsecperframe = 40000; /* default: 25fps */
     }
 
-    psz_file_type = config_GetPsz( p_sub, "sub-type" );
-    if( psz_file_type && *psz_file_type)
+    var_Get( p_sub, "sub-type", &val);
+    if( val.psz_string && *val.psz_string )
     {
         int i;
 
@@ -289,7 +314,7 @@ static int  sub_open ( subtitle_demux_t *p_sub,
                 break;
             }
             if( !strcmp( sub_read_subtitle_function[i].psz_type_name,
-                         psz_file_type ) )
+                         val.psz_string ) )
             {
                 i_sub_type = sub_read_subtitle_function[i].i_type;
                 break;
@@ -300,7 +325,7 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     {
         i_sub_type = SUB_TYPE_UNKNOWN;
     }
-    FREE( psz_file_type );
+    FREE( val.psz_string );
 
     /* *** Now try to autodetect subtitle format *** */
     if( i_sub_type == SUB_TYPE_UNKNOWN )
@@ -571,6 +596,7 @@ static void  sub_fix( subtitle_demux_t *p_sub )
     mtime_t i_delay;
     int     i_index;
     int     i_done;
+    vlc_value_t val;
 
     /* *** fix order (to be sure...) *** */
     /* We suppose that there are near in order and this durty bubble sort
@@ -600,7 +626,8 @@ static void  sub_fix( subtitle_demux_t *p_sub )
     } while( !i_done );
 
     /* *** and at the end add delay *** */
-    i_delay = (mtime_t)config_GetInt( p_sub, "sub-delay" ) * 100000;
+    var_Get( p_sub, "sub-delay", &val );
+    i_delay = (mtime_t) val.i_int * 100000;
     if( i_delay != 0 )
     {
         for( i = 0; i < p_sub->i_subtitles; i++ )
