@@ -200,4 +200,8 @@ shortcut.
   open         CTRL+O       Open a file.
   add_file     CTRL+A       Add a file.
   load_skin    CTRL+S       Change skin.
+  show_prefs                Show the preferences dialog box.
+  show_info                 Show the FileInfo dialog box.
+  show_log                  Show the Messages dialog box.
+  hide_log                  Hide the Messages dialog box.
 

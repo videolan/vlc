@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.16 2003/05/31 23:23:59 ipkiss Exp $
+ * $Id: event.cpp,v 1.17 2003/06/20 21:34:37 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -137,8 +137,10 @@ unsigned int Event::GetMessageType( string Desc )
         return VLC_ENDSTREAMPOS;
     else if( Desc == "VLC_TOTALSTREAMPOS" )
         return VLC_TOTALSTREAMPOS;
-    else if( Desc == "VLC_STREAMNAME" )
-        return VLC_STREAMNAME;
+    else if( Desc == "VLC_STREAM_NAME" )
+        return VLC_STREAM_NAME;
+    else if( Desc == "VLC_STREAM_TITLE" )
+        return VLC_STREAM_TITLE;
     else if( Desc == "VLC_HELP_TEXT" )
         return VLC_HELP_TEXT;
 

@@ -2,7 +2,7 @@
  * event.h: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.h,v 1.9 2003/05/05 16:09:40 gbazin Exp $
+ * $Id: event.h,v 1.10 2003/06/20 21:34:37 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -80,8 +80,9 @@ using namespace std;
 #define VLC_STREAMPOS       (VLC_MESSAGE + 106)
 #define VLC_ENDSTREAMPOS    (VLC_MESSAGE + 107)
 #define VLC_TOTALSTREAMPOS  (VLC_MESSAGE + 108)
-#define VLC_STREAMNAME      (VLC_MESSAGE + 109)
-#define VLC_HELP_TEXT       (VLC_MESSAGE + 110)
+#define VLC_STREAM_NAME     (VLC_MESSAGE + 109)
+#define VLC_STREAM_TITLE    (VLC_MESSAGE + 110)
+#define VLC_HELP_TEXT       (VLC_MESSAGE + 111)
 
 // Volume control
 #define VLC_VOLUME_CHANGE   (VLC_MESSAGE + 201)

@@ -2,7 +2,7 @@
  * banks.cpp: Bitmap bank, Event bank, Font bank and OffSet bank
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: banks.cpp,v 1.6 2003/04/28 20:46:41 ipkiss Exp $
+ * $Id: banks.cpp,v 1.7 2003/06/20 21:34:37 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -151,7 +151,8 @@ EventBank::EventBank( intf_thread_t *_p_intf )
     Add( "time",             "VLC_STREAMPOS",           "none" );
     Add( "left_time",        "VLC_ENDSTREAMPOS",        "none" );
     Add( "total_time",       "VLC_TOTALSTREAMPOS",      "none" );
-    Add( "file_name",        "VLC_STREAMNAME",          "none" );
+    Add( "file_name",        "VLC_STREAM_NAME",         "none" );
+    Add( "title",            "VLC_STREAM_TITLE",        "none" );
     Add( "help",             "VLC_HELP_TEXT",           "none" );
 
     Add( "tray",             "VLC_CHANGE_TRAY",         "CTRL+T" );
