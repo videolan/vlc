@@ -2991,7 +2991,8 @@ void matroska_segment_t::ParseInfo( EbmlElement *info )
         }
     }
 
-    i_duration *= i_timescale / 1000000.0;
+    double f_dur = double(i_duration) * double(i_timescale) / 1000000.0;
+    i_duration = mtime_t(f_dur);
 }
 
 
