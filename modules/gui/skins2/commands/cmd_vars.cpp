@@ -1,11 +1,10 @@
 /*****************************************************************************
- * cmd_notify_playlist.cpp
+ * cmd_vars.cpp
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
- * $Id: cmd_notify_playlist.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * Copyright (C) 2004 VideoLAN
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include "cmd_notify_playlist.hpp"
+#include "cmd_vars.hpp"
 #include "../src/vlcproc.hpp"
+#include "../vars/stream.hpp"
 #include "../vars/playlist.hpp"
 
 
@@ -33,3 +33,11 @@ void CmdNotifyPlaylist::execute()
     Playlist &rVar = VlcProc::instance( getIntf() )->getPlaylistVar();
     rVar.onChange();
 }
+
+
+void CmdSetStream::execute()
+{
+    // Change the stream variable
+    m_rStream.set( m_name, m_updateVLC );
+}
+

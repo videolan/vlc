@@ -2,7 +2,7 @@
  * ctrl_list.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_list.hpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -87,6 +87,9 @@ class CtrlList: public CtrlGeneric, public Observer<VarList>,
 
         /// Called when the position is set
         virtual void onPositionChange();
+
+        /// Check if the list must be scrolled
+        void autoScroll();
 
         /// Draw the image of the control
         void makeImage();

@@ -29,8 +29,8 @@
 #include "os_timer.hpp"
 #include "var_manager.hpp"
 #include "../commands/async_queue.hpp"
-#include "../commands/cmd_notify_playlist.hpp"
 #include "../commands/cmd_quit.hpp"
+#include "../commands/cmd_vars.hpp"
 #include "../utils/var_bool.hpp"
 
 
@@ -81,6 +81,11 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_VAR( m_cVarPaused, VarBoolImpl, "vlc.isPaused" )
     REGISTER_VAR( m_cVarSeekable, VarBoolImpl, "vlc.isSeekable" )
 #undef REGISTER_VAR
+
+    // XXX WARNING XXX
+    // The object variable callbacks are called from other VLC threads,
+    // so they must put commands in the queue and NOT do anything else
+    // (X11 calls are not reentrant)
 
     // Called when the playlist changes
     var_AddCallback( pIntf->p_sys->p_playlist, "intf-change",
@@ -226,8 +231,7 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->remove( "notify playlist" );
     pQueue->push( CmdGenericPtr( pCmd ) );
-/*
-    p_playlist_dialog->UpdateItem( new_val.i_int );*/
+
     return VLC_SUCCESS;
 }
 
@@ -238,16 +242,22 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
 {
     VlcProc *pThis = ( VlcProc* )pParam;
 
-    // Update the stream variable
-    // XXX: we should not need to access p_inpu->psz_source directly, a
-    // getter should be provided by VLC core
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+
     playlist_t *p_playlist = (playlist_t*)pObj;
     if( p_playlist->p_input )
     {
+        // Create a command to update the stream variable
+        // XXX: we should not need to access p_inpu->psz_source directly, a
+        // getter should be provided by VLC core
         Stream *pStream = (Stream*)pThis->m_cVarStream.get();
         UString srcName( pThis->getIntf(),
                          p_playlist->p_input->psz_source );
-        pStream->set( srcName, false );
+        CmdSetStream *pCmd = new CmdSetStream( pThis->getIntf(), *pStream,
+                                               srcName, false );
+        // Push the command in the asynchronous command queue
+        pQueue->remove( "set stream" );
+        pQueue->push( CmdGenericPtr( pCmd ) );
     }
 
     // Create a playlist notify command
@@ -255,12 +265,9 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
     CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
 
     // Push the command in the asynchronous command queue
-    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->remove( "notify playlist" );
     pQueue->push( CmdGenericPtr( pCmd ) );
 
-//     p_playlist_dialog->UpdateItem( old_val.i_int );
-//     p_playlist_dialog->UpdateItem( new_val.i_int );
     return VLC_SUCCESS;
 }
 

@@ -29,7 +29,7 @@
 
 class UString;
 
-/// Variable for VLC volume
+/// Variable for VLC stream name
 class Stream: public VarText
 {
     public:

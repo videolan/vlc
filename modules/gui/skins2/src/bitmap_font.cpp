@@ -69,17 +69,9 @@ BitmapFont::BitmapFont( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
             m_table[(size_t)specialChars[i]].m_xPos = (11 + i) * m_width;
             m_table[(size_t)specialChars[i]].m_yPos = m_height;
         }
-        m_table[(size_t)'Å'].m_xPos = m_table[(size_t)'å'].m_xPos = 0;
-        m_table[(size_t)'Ö'].m_xPos = m_table[(size_t)'ö'].m_xPos = m_width;
-        m_table[(size_t)'Ä'].m_xPos = m_table[(size_t)'ä'].m_xPos = 3 * m_width;
         m_table[(size_t)'?'].m_xPos = 4 * m_width;
         m_table[(size_t)'*'].m_xPos = 5 * m_width;
-        static const char thirdLine[] = {'Å', 'å', 'Ö', 'ö', 'Ä', 'ä', '?',
-            '*'};
-        for( int i = 0; i < 8; i++ )
-        {
-            m_table[(size_t)thirdLine[i]].m_yPos = 2 * m_height;
-        }
+        m_table[(size_t)'?'].m_yPos = m_table[(size_t)'*'].m_yPos = 2 * m_height;
     }
 }
 

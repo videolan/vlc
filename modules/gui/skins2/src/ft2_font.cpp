@@ -238,8 +238,8 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
     }
 
     // Adjust the size for vertical padding
-    yMax == __MAX( yMax, m_ascender );
-    yMin == __MIN( yMin, m_descender );
+    yMax = __MAX( yMax, m_ascender );
+    yMin = __MIN( yMin, m_descender );
 
     // Create the bitmap
     FT2Bitmap *pBmp = new FT2Bitmap( getIntf(), __MIN( width1, width2 ),

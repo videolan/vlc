@@ -14,8 +14,6 @@ SOURCES_skins2 = \
 	commands/cmd_input.hpp \
 	commands/cmd_layout.cpp \
 	commands/cmd_layout.hpp \
-	commands/cmd_notify_playlist.cpp \
-	commands/cmd_notify_playlist.hpp \
 	commands/cmd_on_top.cpp \
 	commands/cmd_on_top.hpp \
 	commands/cmd_playlist.cpp \
@@ -25,6 +23,8 @@ SOURCES_skins2 = \
 	commands/cmd_resize.cpp \
 	commands/cmd_resize.hpp \
 	commands/cmd_show_window.hpp \
+	commands/cmd_vars.cpp \
+	commands/cmd_vars.hpp \
 	\
 	controls/ctrl_button.cpp \
 	controls/ctrl_button.hpp \

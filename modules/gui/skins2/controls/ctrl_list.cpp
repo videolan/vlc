@@ -72,8 +72,7 @@ CtrlList::~CtrlList()
 
 void CtrlList::onUpdate( Subject<VarList> &rList )
 {
-    makeImage();
-    notifyLayout();
+    autoScroll();
     m_pLastSelected = NULL;
 }
 
@@ -320,6 +319,47 @@ void CtrlList::draw( OSGraphics &rImage, int xDest, int yDest )
     if( m_pImage )
     {
         rImage.drawGraphics( *m_pImage, 0, 0, xDest, yDest );
+    }
+}
+
+
+void CtrlList::autoScroll()
+{
+    // Get the size of the control
+    const Position *pPos = getPosition();
+    if( !pPos )
+    {
+        return;
+    }
+    int height = pPos->getHeight();
+
+    // How many lines can be displayed ?
+    int itemHeight = m_rFont.getSize() + LINE_INTERVAL;
+    int maxItems = height / itemHeight;
+
+    // Find the current playing stream
+    int playIndex = 0;
+    VarList::ConstIterator it;
+    for( it = m_rList.begin(); it != m_rList.end(); it++ )
+    {
+        if( (*it).m_playing )
+        {
+            break;
+        }
+        playIndex++;
+    }
+    if( it != m_rList.end() &&
+        ( playIndex < m_lastPos || playIndex >= m_lastPos + maxItems ) )
+    {
+        // Scroll the list to have the playing stream visible
+        VarPercent &rVarPos = m_rList.getPositionVar();
+        rVarPos.set( 1.0 - (float)playIndex / (float)m_rList.size() );
+        // The image will be changed by onUpdate(VarPercent&)
+    }
+    else
+    {
+        makeImage();
+        notifyLayout();
     }
 }
 
