@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.82 2003/11/30 16:00:24 fenrir Exp $
+ * $Id: input_dec.c,v 1.83 2003/12/24 09:46:08 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -265,6 +265,7 @@ void input_DecodePES( decoder_t * p_dec, pes_packet_t * p_pes )
             p_block->i_pts = p_pes->i_pts;
             p_block->i_dts = p_pes->i_dts;
             p_block->b_discontinuity = p_pes->b_discontinuity;
+            p_block->i_rate = p_pes->i_rate;
 
             input_DecodeBlock( p_dec, p_block );
         }

@@ -2,7 +2,7 @@
  * vlc_block.h: Data blocks management functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_block.h,v 1.4 2003/10/27 01:04:38 gbazin Exp $
+ * $Id: vlc_block.h,v 1.5 2003/12/24 09:46:08 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -40,6 +40,7 @@ struct block_t
     mtime_t     i_length;
 
     vlc_bool_t  b_discontinuity; /* only temporary */
+    int         i_rate;
 
     int         i_buffer;
     uint8_t     *p_buffer;

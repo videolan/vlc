@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.40 2003/12/22 16:40:04 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.41 2003/12/24 09:46:08 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -221,7 +221,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_sys->i_current_pts = p_block->i_pts;
             }
 
-            p_sys->i_current_rate = DEFAULT_RATE;//p_pes->i_rate;
+            p_sys->i_current_rate = p_block->i_rate;
 
             mpeg2_buffer( p_sys->p_mpeg2dec, p_block->p_buffer,
                           p_block->p_buffer + p_block->i_buffer );

@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: es_out.c,v 1.10 2003/12/22 02:24:50 sam Exp $
+ * $Id: es_out.c,v 1.11 2003/12/24 09:46:08 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -465,7 +465,9 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     }
 
     vlc_mutex_lock( &out->p_sys->p_input->stream.stream_lock );
-    if( es->p_es->p_dec )
+    p_block->i_rate = out->p_sys->p_input->stream.control.i_rate;
+    if( es->p_es->p_dec &&
+        (es->p_es->i_cat!=AUDIO_ES || !p_sys->p_input->stream.control.b_mute) )
     {
         input_DecodeBlock( es->p_es->p_dec, p_block );
     }
