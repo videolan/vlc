@@ -320,6 +320,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     listview->SetColumnWidth( 0, 250 );
     listview->InsertColumn( 1, wxU(_("Duration")) );
     listview->SetColumnWidth( 1, 75 );
+    listview->Layout();
 
     /* Create the Up-Down buttons */
     wxButton *up_button =
@@ -338,7 +339,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer->Add( listview, 1, wxEXPAND | wxALL, 5 );
-    panel_sizer->Add( bottom_sizer, 0, wxEXPAND | wxALL, 5);
+    panel_sizer->Add( bottom_sizer, 0, wxALL, 5);
     panel_sizer->Layout();
 
     playlist_panel->SetSizerAndFit( panel_sizer );
@@ -371,19 +372,15 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Update the playlist */
     Rebuild();
-    DoSize();
 }
 
 void Playlist::OnSize( wxSizeEvent& event)
 {
-    DoSize();
-    event.Skip();
-}
-
-void Playlist::DoSize()
-{
     wxSize size = GetClientSize();
-    if( listview ) listview->SetSize( 0,0, size.x ,size.y * 4 / 5);
+    if( listview )
+        listview->SetColumnWidth( 0, size.x - listview->GetColumnWidth(1)
+				  - 15 /* margins */ );
+    event.Skip();
 }
 
 Playlist::~Playlist()

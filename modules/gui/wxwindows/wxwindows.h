@@ -677,8 +677,7 @@ private:
 
     /* Event handlers (these functions should _not_ be virtual) */
 
-    void OnSize( wxSizeEvent &event);
-    void DoSize();
+    void OnSize( wxSizeEvent &event );
 
     void OnAddFile( wxCommandEvent& event );
     void OnAddMRL( wxCommandEvent& event );
