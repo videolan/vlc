@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.9 2003/06/24 18:42:50 fenrir Exp $
+ * $Id: mkv.cpp,v 1.10 2003/06/24 19:35:46 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -87,12 +87,11 @@ static int  Demux     ( input_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-#if 0
     add_category_hint( N_("mkv-demuxer"), NULL, VLC_TRUE );
-        add_bool( "mkv-index", 0, NULL,
-                  N_("Create index if no cues found"),
-                  N_("Create index if no cues found"), VLC_TRUE );
-#endif
+        add_bool( "mkv-seek-percent", 1, NULL,
+                  N_("Seek based on percent not time"),
+                  N_("Seek based on percent not time"), VLC_TRUE );
+
     set_description( _("mka/mkv stream demuxer" ) );
     set_capability( "demux", 50 );
     set_callbacks( Activate, Deactivate );
@@ -1535,7 +1534,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
     p_sys->cluster = NULL;
 
     /* seek without index or without date */
-    if( !p_sys->b_cues || i_date < 0 )
+    if( config_GetInt( p_input, "mkv-seek-percent" ) || !p_sys->b_cues || i_date < 0 )
     {
         int64_t i_pos = i_percent * p_input->stream.p_selected_area->i_size / 100;
 
