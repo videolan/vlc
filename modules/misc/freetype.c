@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.2 2003/07/19 14:41:30 sigmunau Exp $
+ * $Id: freetype.c,v 1.3 2003/07/19 15:15:01 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -82,7 +82,7 @@ struct subpicture_sys_t
     /** The string associated with this subpicture */
     byte_t        *psz_text;
     /** NULL-terminated list of glyphs making the string */
-    FT_Glyph      *pp_glyphs;
+    FT_BitmapGlyph      *pp_glyphs;
     /** list of relative positions for the glyphs */
     FT_Vector     *p_glyph_pos;
 };
@@ -206,7 +206,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic,
 		    const subpicture_t *p_subpic )
 {
     subpicture_sys_t *p_string = p_subpic->p_sys;
-    int i_plane, i_error,x,y,pen_x, pen_y;
+    int i_plane, x, y, pen_x, pen_y;
     unsigned int i;
     
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
@@ -241,19 +241,12 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic,
 	    {
 		if( p_string->pp_glyphs[i] )
 		{
-		    FT_Glyph p_glyph = p_string->pp_glyphs[i];
-		    FT_BitmapGlyph p_image;
-		    i_error = FT_Glyph_To_Bitmap( &p_glyph,
-						  FT_RENDER_MODE_NORMAL,
-						  &p_string->p_glyph_pos[i],
-						  0 );
-		    if ( i_error ) continue;
-		    p_image = (FT_BitmapGlyph)p_glyph;
-#define alpha p_vout->p_text_renderer_data->pi_gamma[p_image->bitmap.buffer[x+ y*p_image->bitmap.width]]
-#define pixel p_in[(p_string->p_glyph_pos[i].y + pen_y + y - p_image->top)*i_pitch+x+pen_x+p_string->p_glyph_pos[i].x+p_image->left]
-		    for(y = 0; y < p_image->bitmap.rows; y++ )
+		    FT_BitmapGlyph p_glyph = p_string->pp_glyphs[ i ];
+#define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ x + y * p_glyph->bitmap.width ] ]
+#define pixel p_in[ ( p_string->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch+x + pen_x + p_string->p_glyph_pos[ i ].x + p_glyph->left ]
+		    for(y = 0; y < p_glyph->bitmap.rows; y++ )
 		    {
-			for( x = 0; x < p_image->bitmap.width; x++ )
+			for( x = 0; x < p_glyph->bitmap.width; x++ )
 			{
 			    //                                pixel = alpha;
 			    //                                pixel = (pixel^alpha)^pixel;
@@ -261,7 +254,6 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic,
                                 ( 255 * alpha >> 8 );
 			}
 		    }
-		    FT_Done_Glyph( p_glyph );
 		}
 	    }
 	}
@@ -284,6 +276,7 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     FT_BBox line;
     FT_BBox glyph_size;
     FT_Vector result;
+    FT_Glyph tmp_glyph;
 
     result.x = 0;
     result.y = 0;
@@ -380,14 +373,20 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
             msg_Err( p_vout, "FT_Load_Glyph returned %d", i_error );
             return VLC_EGENERIC;
         }
-        i_error = FT_Get_Glyph( glyph, &p_string->pp_glyphs[ i ] );
+        i_error = FT_Get_Glyph( glyph, &tmp_glyph );
         if ( i_error )
         {
             msg_Err( p_vout, "FT_Get_Glyph returned %d", i_error );
             return VLC_EGENERIC;
         }
-        FT_Glyph_Get_CBox( p_string->pp_glyphs[i],
-                           ft_glyph_bbox_pixels, &glyph_size );
+        FT_Glyph_Get_CBox( tmp_glyph, ft_glyph_bbox_pixels, &glyph_size );
+        i_error = FT_Glyph_To_Bitmap( &tmp_glyph,
+                                      FT_RENDER_MODE_NORMAL,
+                                      &p_string->p_glyph_pos[i],
+                                      1 );
+        if ( i_error ) continue;
+        p_string->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
+        
         /* Do rest */
         line.xMax = p_string->p_glyph_pos[i].x + glyph_size.xMax - glyph_size.xMin;
         line.yMax = __MAX( line.yMax, glyph_size.yMax );
@@ -416,7 +415,7 @@ static void FreeString( subpicture_t *p_subpic )
     subpicture_sys_t *p_string = p_subpic->p_sys;
     for ( i = 0; p_string->pp_glyphs[ i ] != NULL; i++ )
     {
-	FT_Done_Glyph( p_string->pp_glyphs[ i ] );
+	FT_Done_Glyph( (FT_Glyph)p_string->pp_glyphs[ i ] );
     }
     free( p_string->psz_text );
     free( p_string->p_glyph_pos );
