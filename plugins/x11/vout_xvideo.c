@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.2 2001/04/01 06:42:05 sam Exp $
+ * $Id: vout_xvideo.c,v 1.3 2001/04/04 16:33:07 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -131,8 +131,10 @@ static void XVideoDestroyShmImage    ( vout_thread_t *, XvImage *,
 static void XVideoTogglePointer      ( vout_thread_t * );
 static void XVideoEnableScreenSaver  ( vout_thread_t * );
 static void XVideoDisableScreenSaver ( vout_thread_t * );
+static void XVideoSetAttribute       ( vout_thread_t *, char *, float );
 
 static int  XVideoCheckForXv         ( Display * );
+static int  XVideoGetPort            ( Display * );
 static void XVideoOutputCoords       ( const picture_t *, const boolean_t,
                                        const int, const int,
                                        int *, int *, int *, int * );
@@ -218,6 +220,14 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
+    if( (p_vout->p_sys->xv_port = XVideoGetPort( p_vout->p_sys->p_display ))<0 )
+        return 1;
+
+    /* XXX The brightness and contrast values should be read from environment
+     * XXX variables... */
+    XVideoSetAttribute( p_vout, "XV_BRIGHTNESS", 0.5 );
+    XVideoSetAttribute( p_vout, "XV_CONTRAST",   0.5 );
+
     p_vout->p_sys->b_mouse = 1;
 
     /* Disable screen saver and return */
@@ -229,7 +239,7 @@ static int vout_Create( vout_thread_t *p_vout )
 /*****************************************************************************
  * vout_Init: initialize XVideo video thread output method
  *****************************************************************************
- * This function create the XImages needed by the output thread. It is called
+ * This function creates the XvImage needed by the output thread. It is called
  * at the beginning of the thread, but also each time the window is resized.
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
@@ -241,7 +251,7 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->p_sys->b_shm = 0;
 #endif
 
-    /* Create XImages using XShm extension */
+    /* Create XvImage using XShm extension */
     i_err = XVideoCreateShmImage( p_vout, &p_vout->p_sys->p_xvimage,
                                   &p_vout->p_sys->shm_info );
     if( i_err )
@@ -249,7 +259,7 @@ static int vout_Init( vout_thread_t *p_vout )
         intf_Msg( "vout: XShm video extension unavailable" );
         /* p_vout->p_sys->b_shm = 0; */
     }
-    p_vout->b_need_render = 0; /* = 1 if not using Xv extension. */
+    p_vout->b_need_render = 0;
 
     /* Set bytes per line and initialize buffers */
     p_vout->i_bytes_per_line =
@@ -682,9 +692,9 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * XVideoCreateShmImage: create an XImage using shared memory extension
+ * XVideoCreateShmImage: create an XvImage using shared memory extension
  *****************************************************************************
- * Prepare an XImage for DisplayX11ShmImage function.
+ * Prepare an XvImage for display function.
  * The order of the operations respects the recommandations of the mit-shm
  * document by J.Corbet and K.Packard. Most of the parameters were copied from
  * there.
@@ -692,33 +702,6 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
 static int XVideoCreateShmImage( vout_thread_t *p_vout, XvImage **pp_xvimage,
                                  XShmSegmentInfo *p_shm_info)
 {
-    int            i_adaptors;
-    XvAdaptorInfo *adaptor_info;
-
-    /* find xv_port... */
-    switch( XvQueryAdaptors( p_vout->p_sys->p_display,
-                             DefaultRootWindow( p_vout->p_sys->p_display ),
-                             &i_adaptors, &adaptor_info ) )
-    {
-        case Success:
-            break;
-
-        case XvBadExtension:
-            intf_ErrMsg( "vout error: XvBadExtension for XvQueryAdaptors" );
-            return( -1 );
-
-        case XvBadAlloc:
-            intf_ErrMsg( "vout error: XvBadAlloc for XvQueryAdaptors" );
-            return( -1 );
-
-        default:
-            intf_ErrMsg( "vout error: XvQueryAdaptors failed" );
-            return( -1 );
-    }
-
-    /* XXX is this right? */
-    p_vout->p_sys->xv_port = adaptor_info[ i_adaptors - 1 ].base_id;
-
     #define GUID_YUV12_PLANAR 0x32315659
 
     *pp_xvimage = XvShmCreateImage( p_vout->p_sys->p_display,
@@ -905,5 +888,76 @@ static void XVideoOutputCoords( const picture_t *p_pic, const boolean_t scale,
     /* Set picture position */
     *dx = (win_w - *w) / 2;
     *dy = (win_h - *h) / 2;
+}
+
+
+static int XVideoGetPort( Display *dpy )
+{
+    int            i, i_adaptors;
+    XvAdaptorInfo *adaptor_info;
+
+    switch( XvQueryAdaptors( dpy, DefaultRootWindow( dpy ),
+                             &i_adaptors, &adaptor_info ) )
+    {
+        case Success:
+            break;
+
+        case XvBadExtension:
+            intf_ErrMsg( "vout error: XvBadExtension for XvQueryAdaptors" );
+            return( -1 );
+
+        case XvBadAlloc:
+            intf_ErrMsg( "vout error: XvBadAlloc for XvQueryAdaptors" );
+            return( -1 );
+
+        default:
+            intf_ErrMsg( "vout error: XvQueryAdaptors failed" );
+            return( -1 );
+    }
+
+    for( i=0; i < i_adaptors; ++i )
+        if( ( adaptor_info[ i ].type & XvInputMask ) &&
+            ( adaptor_info[ i ].type & XvImageMask ) )
+            {
+                return adaptor_info[ i ].base_id;
+            }
+
+    intf_ErrMsg( "vout error: didn't find an Xvideo image input port." );
+    return( -1 );
+}
+
+
+/*****************************************************************************
+ * XVideoSetAttribute
+ *****************************************************************************
+ * This function can be used to set attributes, e.g. XV_BRIGHTNESS and
+ * XV_CONTRAST. "value" should be in the range of 0 to 1.
+ *****************************************************************************/
+static void XVideoSetAttribute( vout_thread_t *p_vout,
+                                char *attr_name, float f_value )
+{
+    int             i_attrib;
+    XvAttribute    *p_attrib;
+    Display        *p_dpy   = p_vout->p_sys->p_display;
+    int             xv_port = p_vout->p_sys->xv_port;
+
+    p_attrib = XvQueryPortAttributes( p_dpy, xv_port, &i_attrib );
+
+    do
+    {
+        i_attrib--;
+
+        if( !strcmp( p_attrib[ i_attrib ].name, attr_name ) )
+        {
+            int i_sv = f_value * ( p_attrib[ i_attrib ].max_value
+                                    - p_attrib[ i_attrib ].min_value + 1 )
+                        + p_attrib[ i_attrib ].min_value;
+
+            XvSetPortAttribute( p_dpy, xv_port,
+                            XInternAtom( p_dpy, attr_name, False ), i_sv );
+            return;
+        }
+
+    } while( i_attrib > 0 );
 }
 

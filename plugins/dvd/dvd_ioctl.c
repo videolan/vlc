@@ -2,7 +2,7 @@
  * dvd_ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.c,v 1.5 2001/04/04 02:49:18 sam Exp $
+ * $Id: dvd_ioctl.c,v 1.6 2001/04/04 16:33:07 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -232,7 +232,7 @@ int ioctl_LUSendChallenge( css_t *p_css, u8 *p_challenge )
 
     i_ret = ioctl( p_css->i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
-    memcpy( p_challenge, p_buffer + 4, sizeof(dvd_challenge) );
+    memcpy( p_challenge, p_buffer + 4, 12 );
 
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
@@ -325,7 +325,7 @@ int ioctl_LUSendKey1( css_t *p_css, u8 *p_key )
 
     i_ret = ioctl( p_css->i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
-    memcpy( p_key, p_buffer + 4, sizeof(dvd_key) );
+    memcpy( p_key, p_buffer + 4, 8 );
 
 #else
     /* DVD ioctls unavailable - do as if the ioctl failed */
@@ -396,7 +396,7 @@ int ioctl_HostSendChallenge( css_t *p_css, u8 *p_challenge )
     rdc.command[ 10 ] = 0x01 | (p_css->i_agid << 6);
 
     p_buffer[ 1 ] = 0xe;
-    memcpy( p_buffer + 4, p_challenge, sizeof(dvd_challenge) );
+    memcpy( p_buffer + 4, p_challenge, 12 );
 
     return ioctl( p_css->i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
@@ -432,7 +432,7 @@ int ioctl_HostSendKey2( css_t *p_css, u8 *p_key )
     rdc.command[ 10 ] = 0x3 | (p_css->i_agid << 6);
 
     p_buffer[ 1 ] = 0xa;
-    memcpy( p_buffer + 4, p_key, sizeof(dvd_key) );
+    memcpy( p_buffer + 4, p_key, 8 );
 
     return ioctl( p_css->i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 

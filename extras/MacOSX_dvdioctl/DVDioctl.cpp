@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 1998-2000 Apple Computer, Inc. All rights reserved.
  * Copyright (C) 2001 VideoLAN
- * $Id: DVDioctl.cpp,v 1.2 2001/04/04 02:49:18 sam Exp $
+ * $Id: DVDioctl.cpp,v 1.3 2001/04/04 16:33:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -80,10 +80,10 @@ OSDefineMetaClassAndStructors( DVDioctl, IOService )
 /*****************************************************************************
  * Variable typedefs
  *****************************************************************************/
-typedef void * dkr_t;
-typedef enum { DKRTYPE_BUF, DKRTYPE_DIO } dkrtype_t;
-typedef struct dio { dev_t dev; struct uio * uio; } dio_t;
-typedef struct buf buf_t;
+typedef enum       { DKRTYPE_BUF, DKRTYPE_DIO }      dkrtype_t;
+typedef struct dio { dev_t dev; struct uio * uio; }  dio_t;
+typedef struct buf                                   buf_t;
+typedef void *                                       dkr_t;
 
 /*****************************************************************************
  * Local prototypes
