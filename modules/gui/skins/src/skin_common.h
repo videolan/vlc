@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.8 2003/04/29 12:54:57 gbazin Exp $
+ * $Id: skin_common.h,v 1.9 2003/04/30 19:22:27 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -32,14 +32,16 @@
 
 
 class Theme;
-class wxIcon;
 class OpenDialog;
 class Messages;
 class SoutDialog;
 class PrefsDialog;
 class FileInfo;
+#ifndef BASIC_SKINS
+class wxIcon;
+#endif
 #ifdef WIN32
-    class ExitTimer;
+class ExitTimer;
 #endif
 
 #ifdef X11_SKINS
@@ -65,13 +67,14 @@ struct intf_sys_t
     int  i_close_status;
     bool b_all_win_closed;
 
-    // message bank subscription
+    // Message bank subscription
     msg_subscription_t *p_sub;
 
     // Interface status
-    int         i_index;        // Set wich file is being played
-    int         i_size;         // Size of playlist;
+    int i_index;        // Set which file is being played
+    int i_size;         // Size of playlist;
 
+#ifndef BASIC_SKINS
     wxIcon *p_icon;
 
     // Dialogs
@@ -84,20 +87,23 @@ struct intf_sys_t
     // Wait wxwindows initialization
     vlc_mutex_t init_lock;
     vlc_cond_t  init_cond;
+#endif
 
 #ifdef X11_SKINS
     Display *display;
 #endif
 
 #ifdef WIN32
+#ifndef BASIC_SKINS
     bool b_wx_die;
     ExitTimer *p_kludgy_timer;
+#endif
 
     // We dynamically load msimg32.dll to get a pointer to TransparentBlt()
     HINSTANCE h_msimg32_dll;
     BOOL (WINAPI *TransparentBlt)( HDC,int,int,int,int,HDC,int,
                                    int,int,int,UINT );
-    // idem for user32.dll and SetLayeredWindowAttributes()
+    // Idem for user32.dll and SetLayeredWindowAttributes()
     HINSTANCE h_user32_dll;
     BOOL (WINAPI *SetLayeredWindowAttributes)( HWND,COLORREF,BYTE,DWORD );
 #endif

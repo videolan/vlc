@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.16 2003/04/25 12:37:52 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.17 2003/04/30 19:22:27 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -23,7 +23,9 @@
  * USA.
  *****************************************************************************/
 
+#ifndef BASIC_SKINS
 #include <wx/wx.h>
+#endif
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/vlc.h>
@@ -45,8 +47,10 @@ extern "C" {
 #include "window.h"
 #include "vlcproc.h"
 #include "skin_common.h"
-#include "wxdialogs.h"
 
+#ifndef BASIC_SKINS
+#include "wxdialogs.h"
+#endif
 
 
 //---------------------------------------------------------------------------
@@ -131,6 +135,7 @@ bool VlcProc::EventProc( Event *evt )
             OpenFile( false );
             return true;
 
+#ifndef BASIC_SKINS
         case VLC_LOG_SHOW:
             p_intf->p_sys->MessagesDlg->Show(
                 !p_intf->p_sys->MessagesDlg->IsShown() );
@@ -148,6 +153,7 @@ bool VlcProc::EventProc( Event *evt )
             p_intf->p_sys->InfoDlg->Show(
                 !p_intf->p_sys->InfoDlg->IsShown() );
             return true;
+#endif
 
         case VLC_INTF_REFRESH:
             InterfaceRefresh( (bool)evt->GetParam2() );
@@ -328,6 +334,7 @@ void VlcProc::EnabledEvent( string type, bool state )
 //---------------------------------------------------------------------------
 void VlcProc::LoadSkin()
 {
+#ifndef BASIC_SKINS
     if( p_intf->p_sys->p_new_theme_file == NULL )
     {
         wxFileDialog dialog( NULL, _("Open a skin file"), "", "",
@@ -382,10 +389,12 @@ void VlcProc::LoadSkin()
         delete (char *)p_intf->p_sys->p_new_theme_file;
         p_intf->p_sys->p_new_theme_file = NULL;
     }
+#endif
 }
 //---------------------------------------------------------------------------
 void VlcProc::OpenFile( bool play )
 {
+#ifndef BASIC_SKINS
     if( p_intf->p_sys->OpenDlg->ShowModal() != wxID_OK )
     {
         return;
@@ -419,6 +428,7 @@ void VlcProc::OpenFile( bool play )
     p_intf->p_sys->p_theme->EvtBank->Get( "playlist_refresh" )
         ->PostSynchroMessage();
     InterfaceRefresh();
+#endif
 }
 //---------------------------------------------------------------------------
 void VlcProc::DropFile( unsigned int param )
@@ -627,7 +637,6 @@ void VlcProc::AddNetworkChannelServer( char *server )
     }
 
     delete[] name;
-
 }
 //---------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.22 2003/04/29 12:54:57 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.23 2003/04/30 19:22:27 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -24,7 +24,9 @@
  *****************************************************************************/
 
 //--- GENERAL ---------------------------------------------------------------
+#ifndef BASIC_SKINS
 #include <wx/wx.h>
+#endif
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/vlc.h>
@@ -41,7 +43,9 @@
 #include "themeloader.h"
 #include "vlcproc.h"
 #include "skin_common.h"
+#ifndef BASIC_SKINS
 #include "wxdialogs.h"
+#endif
 
 #ifdef X11_SKINS
 #include <X11/Xlib.h>
@@ -97,10 +101,9 @@ static int Open ( vlc_object_t *p_this )
     // Set no new theme when opening file
     p_intf->p_sys->p_new_theme_file = NULL;
 
-    // Initialize Win32 thread
+    // Initialize info on playlist
     p_intf->p_sys->i_index        = -1;
     p_intf->p_sys->i_size         = 0;
-
 
     p_intf->p_sys->i_close_status = VLC_NOTHING;
 
@@ -148,9 +151,11 @@ static int Open ( vlc_object_t *p_this )
 
 #endif
 
+#ifndef BASIC_SKINS
     // Initialize conditions and mutexes
     vlc_mutex_init( p_intf, &p_intf->p_sys->init_lock );
     vlc_cond_init( p_intf, &p_intf->p_sys->init_cond );
+#endif
 
     p_intf->p_sys->p_theme = (Theme *)new OSTheme( p_intf );
 
@@ -181,9 +186,11 @@ static void Close ( vlc_object_t *p_this )
     // Unsuscribe to messages bank
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
+#ifndef BASIC_SKINS
     // Destroy conditions and mutexes
     vlc_cond_destroy( &p_intf->p_sys->init_cond );
     vlc_mutex_destroy( &p_intf->p_sys->init_lock );
+#endif
 
 #ifdef WIN32
     // Unload msimg32.dll and user32.dll
@@ -232,6 +239,9 @@ static void Run( intf_thread_t *p_intf )
 #endif
         {
             // Last chance: the user can  select a new theme file
+// FIXME: wxWindows isn't initialized yet !!!
+#if 0
+#ifndef BASIC_SKINS
             wxFileDialog dialog( NULL, _("Open a skin file"), "", "",
                 "Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
                     "All files|*.*", wxOPEN );
@@ -247,6 +257,8 @@ static void Run( intf_thread_t *p_intf )
                 }
             }
             else
+#endif
+#endif
             {
                 delete Loader;
                 return;
@@ -317,11 +329,13 @@ int SkinManage( intf_thread_t *p_intf )
 
     OSAPI_PostMessage( NULL, VLC_INTF_REFRESH, 0, (long)false );
 
+#ifndef BASIC_SKINS
     // Update the log window
     p_intf->p_sys->MessagesDlg->UpdateLog();
 
     // Update the file info window
     p_intf->p_sys->InfoDlg->UpdateFileInfo();
+#endif
 
     //-------------------------------------------------------------------------
     if( p_intf->p_sys->p_input != NULL && !p_intf->p_sys->p_input->b_die )

@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.12 2003/04/29 12:54:57 gbazin Exp $
+ * $Id: win32_run.cpp,v 1.13 2003/04/30 19:22:27 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -26,7 +26,9 @@
 #ifdef WIN32
 
 //--- GENERAL ---------------------------------------------------------------
+#ifndef BASIC_SKINS
 #include <wx/wx.h>
+#endif
 #include <windows.h>
 
 //--- VLC -------------------------------------------------------------------
@@ -43,10 +45,11 @@
 #include "../os_theme.h"
 #include "../src/skin_common.h"
 #include "../src/vlcproc.h"
-#include "../src/wxdialogs.h"
 
-// include the icon graphic
-#include "share/vlc32x32.xpm"
+#ifndef BASIC_SKINS
+#include "../src/wxdialogs.h"
+#include "share/vlc32x32.xpm"       // include the graphic icon
+#endif
 
 //---------------------------------------------------------------------------
 // Specific method
@@ -55,6 +58,7 @@ bool IsVLCEvent( unsigned int msg );
 int  SkinManage( intf_thread_t *p_intf );
 
 
+#ifndef BASIC_SKINS
 //---------------------------------------------------------------------------
 // Local classes declarations.
 //---------------------------------------------------------------------------
@@ -190,6 +194,7 @@ void SkinsDialogsThread( intf_thread_t *p_intf )
     return;
 }
 
+#endif // WX_SKINS
 
 //---------------------------------------------------------------------------
 // Refresh Timer Callback
@@ -215,6 +220,7 @@ void OSRun( intf_thread_t *p_intf )
     Event *ProcessEvent;
     int KeyModifier = 0;
 
+#ifndef BASIC_SKINS
     // Create a new thread for wxWindows
     if( vlc_thread_create( p_intf, "Skins Dialogs Thread", SkinsDialogsThread,
                            0, 0 ) )
@@ -226,6 +232,7 @@ void OSRun( intf_thread_t *p_intf )
     vlc_mutex_lock( &p_intf->p_sys->init_lock );
     vlc_cond_wait( &p_intf->p_sys->init_cond, &p_intf->p_sys->init_lock );
     vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+#endif
 
      // Create refresh timer
     SetTimer( ((OSTheme *)p_intf->p_sys->p_theme)->GetParentWindow(), 42, 200,
@@ -340,8 +347,10 @@ void OSRun( intf_thread_t *p_intf )
         Proc->IsClosing();
     }
 
+#ifndef BASIC_SKINS
     // Tell wxWindows it's time to exit
     p_intf->p_sys->b_wx_die = 1;
+#endif
 }
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg )

@@ -1703,6 +1703,7 @@ dnl
 AC_CHECK_HEADERS(zlib.h, [
   LDFLAGS_mp4="${LDFLAGS_mp4} -lz"
   LDFLAGS_skins="${LDFLAGS_skins} -lz"
+  LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lz"
 ] )
 
 
@@ -1711,6 +1712,7 @@ dnl skins module
 dnl
 AC_CHECK_HEADERS(libtar.h, [
   LDFLAGS_skins="${LDFLAGS_skins} -ltar"
+  LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -ltar"
 ] )
 
 
@@ -2367,14 +2369,14 @@ dnl
 dnl Skins module
 dnl
 AC_ARG_ENABLE(skins,
-  [  --enable-skins          Win32 skins module (default enabled on Win32)])
+  [  --enable-skins          Skins interface module (default enabled on Win32)])
 if test "x${enable_skins}" != "xno"; then
   WXWINDOWS_PATH="${PATH}"
-  AC_ARG_WITH(wx-config-path,
-    [    --with-wx-config-path=PATH wx-config path (default search in \$PATH)],
-    [ if test "x${with_wx_config_path}" != "xno"
+  AC_ARG_WITH(skins-wx-config-path,
+    [    --with-skins-wx-config-path=PATH wx-config path for the skins plugin (default search in \$PATH)],
+    [ if test "x${with_skins_wx_config_path}" != "xno"
       then
-        WXWINDOWS_PATH="${with_wx_config_path}:${PATH}"
+        WXWINDOWS_PATH="${with_skins_wx_config_path}:${PATH}"
       fi ])
   # look for wx-config
   AC_PATH_PROG(WX_CONFIG, wx-config, no, ${WXWINDOWS_PATH})
@@ -2384,7 +2386,7 @@ if test "x${enable_skins}" != "xno"; then
     then
       AC_MSG_ERROR([Your development package for wxWindows is too old, you need at least version 2.3.0. Please upgrade and try again. Alternatively you can also configure with --disable-skins.])
     fi
-    CPPFLAGS_skins="${CPPFLAGS_skins} `${WX_CONFIG} --cxxflags`"
+    CPPFLAGS_skins="${CPPFLAGS_skins} `${WX_CONFIG} --cxxflags` -DWX_SKINS"
     LDFLAGS_skins="${LDFLAGS_skins} `${WX_CONFIG} --libs`"
   fi
 
@@ -2396,10 +2398,29 @@ if test "x${enable_skins}" != "xno"; then
     if test "x${enable_skins}" = "xyes"; then
       PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
       PLUGINS="${PLUGINS} skins"
-      CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins -Imodules/gui/skins/src -Imodules/gui/skins/gtk2 -Imodules/gui/skins/controls -Imodules/gui/skins/parser ${GTK2_CFLAGS} -DGTK2_SKINS"
+      CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins ${GTK2_CFLAGS} -DGTK2_SKINS"
       LDFLAGS_skins="${LDFLAGS_skins} -lstdc++  ${GTK2_LIBS}"
     fi
   fi
+fi
+
+dnl
+dnl Basic skins module (i.e. without wxWindows dialogs)
+dnl
+AC_ARG_ENABLE(basic-skins,
+  [  --enable-basic-skins    Skins interface module without wxWindows dialogs (default disabled)])
+if test "x${enable_basic_skins}" = "xyes"; then
+  if test "x${SYS}" = "xmingw32" -o "x${SYS}" = "xcygwin"; then
+    PLUGINS="${PLUGINS} basic_skins"
+    CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -U_OFF_T_ -U_off_t -fno-rtti -Imodules/gui/skins"
+    LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lstdc++ -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32"
+  else
+    PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
+    PLUGINS="${PLUGINS} basic_skins"
+    CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins ${GTK2_CFLAGS} -DGTK2_SKINS"
+    LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++  ${GTK2_LIBS}"
+  fi
+  CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -DBASIC_SKINS"
 fi
 
 dnl
