@@ -21,13 +21,13 @@ EXTRA_DIST = \
 	MAINTAINERS \
 	README.MacOSX.rtf \
 	bootstrap \
-	install-win32 \
 	src/extras/COPYING \
 	toolbox \
 	vlc-config.in.in \
 	vlc.ebuild \
 	vlc.spec \
 	vlc.spec.mdk \
+	vlc.win32.nsi \
 	$(NULL)
 
 BUILT_SOURCES =
@@ -566,19 +566,19 @@ remove_distdir_woody = \
 # XXX: this rule is probably only useful to you if you have exactly
 # the same setup as me. Contact sam@zoy.org if you need to use it.
 #
-# Check that tmp isn't in the way
 package-win32-base:
+# Check that tmp isn't in the way
 	@if test -e "$(srcdir)/vlc-${VERSION}"; then \
 	  echo "Error: please remove $(srcdir)/vlc-${VERSION}, it is in the way"; \
 	  false; \
 	else \
 	  echo "OK."; mkdir -p "$(srcdir)/vlc-${VERSION}"; \
 	fi
-# Create installation script
-	cp "$(srcdir)/install-win32" "$(srcdir)/vlc-${VERSION}/nsi"
+
 # Copy relevant files
+	cp "$(srcdir)/vlc.win32.nsi" "$(srcdir)/vlc-${VERSION}/"
 	cp "$(top_builddir)/vlc$(EXEEXT)" "$(srcdir)/vlc-${VERSION}/"
-	cp "$(top_builddir)/vlc$(EXEEXT).manifest" "$(srcdir)/vlc-${VERSION}/"
+	cp "$(top_builddir)/vlc.exe.manifest" "$(srcdir)/vlc-${VERSION}/"
 	$(STRIP) "$(srcdir)/vlc-${VERSION}/vlc$(EXEEXT)"
 	@if test -n "$(UPX)"; then \
            $(UPX) -9 "$(srcdir)/vlc-${VERSION}/vlc$(EXEEXT)"; fi ;
@@ -637,6 +637,8 @@ package-win32-base:
 	cp $(srcdir)/share/http/vlm/*.html \
            $(srcdir)/vlc-${VERSION}/http/vlm/ ;
 
+	cp $(srcdir)/share/vlc48x48.ico $(srcdir)/vlc-${VERSION}/ ;
+
 	mkdir -p "$(srcdir)/vlc-${VERSION}/mozilla"
 if BUILD_MOZILLA
 	cp $(srcdir)/mozilla/*$(LIBEXT) $(srcdir)/vlc-${VERSION}/mozilla/ ;
@@ -649,7 +651,7 @@ endif
 package-win32-base-exe:
 # Create package 
 	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe \
-             -- /DVERSION=${VERSION} $(srcdir)/vlc-${VERSION}/nsi
+             -- /DVERSION=${VERSION} $(srcdir)/vlc-${VERSION}/vlc.win32.nsi
 
 package-win32-base-zip:
 # Create package 
