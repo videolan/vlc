@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: ncurses.c,v 1.8 2004/01/10 03:36:03 hartman Exp $
+ * $Id: ncurses.c,v 1.9 2004/01/10 23:31:33 sigmunau Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -440,12 +440,15 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         case 'f':
         {
             vout_thread_t *p_vout;
-            p_vout = vlc_object_find( p_intf->p_sys->p_input,
-                                      VLC_OBJECT_VOUT, FIND_CHILD );
-            if( p_vout )
+            if( p_intf->p_sys->p_input )
             {
-                p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                vlc_object_release( p_vout );
+                p_vout = vlc_object_find( p_intf->p_sys->p_input,
+                                          VLC_OBJECT_VOUT, FIND_CHILD );
+                if( p_vout )
+                {
+                    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                    vlc_object_release( p_vout );
+                }
             }
             return 0;
         }
