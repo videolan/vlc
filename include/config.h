@@ -42,8 +42,8 @@
 #define PROGRAM_OPTIONS         VIDEO_OPTIONS " " ARCH_OPTIONS
 
 /* Program version and copyright message */
-#define PROGRAM_VERSION		"DR 2.1"
-#define COPYRIGHT_MESSAGE	"VideoLAN Client v" PROGRAM_VERSION " (" __DATE__ ") - " PROGRAM_OPTIONS " - (c)1999 VideoLAN\n"
+#define PROGRAM_VERSION		"1.0-dev"
+#define COPYRIGHT_MESSAGE	"VideoLAN Client v" PROGRAM_VERSION " (" __DATE__ ") - " PROGRAM_OPTIONS " - (c)1999-2000 VideoLAN\n"
 
 /*******************************************************************************
  * General compilation options

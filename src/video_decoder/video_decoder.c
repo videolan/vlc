@@ -325,7 +325,7 @@ void vdec_AddBlock( elem_t * p_block, yuv_data_t * p_data, int i_incr )
  *******************************************************************************/
 void vdec_CopyBlock( elem_t * p_block, yuv_data_t * p_data, int i_incr )
 {
-    int i_x, i_y;
+    int i_y;
     
     for( i_y = 0; i_y < 8; i_y++ )
     {
@@ -335,6 +335,8 @@ void vdec_CopyBlock( elem_t * p_block, yuv_data_t * p_data, int i_incr )
         p_data += i_incr+8;
         p_block += 8;
 #else
+        int i_x;
+
         for( i_x = 0; i_x < 8; i_x++ )
         {
             /* ??? Need clip to be MPEG-2 compliant */

@@ -303,12 +303,12 @@ typedef struct
  ******************************************************************************/
 
 /* function pointers */
-struct input_thread_struct;
-struct input_cfg_struct;
-typedef int (*f_open_t)( struct input_thread_struct *, struct input_cfg_struct *);
-typedef int (*f_read_t)( struct input_thread_struct *, const struct iovec *,
+struct input_thread_s;
+struct input_cfg_s;
+typedef int (*f_open_t)( struct input_thread_s *, struct input_cfg_s *);
+typedef int (*f_read_t)( struct input_thread_s *, const struct iovec *,
                          size_t );
-typedef void (*f_clean_t)( struct input_thread_struct * );
+typedef void (*f_clean_t)( struct input_thread_s * );
 
 typedef struct input_thread_s
 {

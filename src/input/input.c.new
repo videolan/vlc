@@ -112,9 +112,9 @@ input_thread_t *input_CreateThread( input_cfg_t *p_cfg )
     {
         /* File methods */
         case INPUT_METHOD_TS_FILE:
-            p_input->p_open = &input_FileCreateMethod;
-            p_input->p_read = &input_FileRead;
-            p_input->p_clean = &input_FileDestroyMethod;
+            p_input->p_open = input_FileCreateMethod;
+            p_input->p_read = input_FileRead;
+            p_input->p_clean = input_FileDestroyMethod;
             break;
 
         /* Network methods */
@@ -122,9 +122,9 @@ input_thread_t *input_CreateThread( input_cfg_t *p_cfg )
         case INPUT_METHOD_TS_MCAST:
         case INPUT_METHOD_TS_BCAST:
         case INPUT_METHOD_TS_VLAN_BCAST:
-            p_input->p_open = &input_NetworkCreateMethod;
-            p_input->p_read = &input_NetworkRead;
-            p_input->p_clean = &input_NetworkDestroyMethod;
+            p_input->p_open = input_NetworkCreateMethod;
+            p_input->p_read = input_NetworkRead;
+            p_input->p_clean = input_NetworkDestroyMethod;
             break;
 
         case INPUT_METHOD_NONE:
