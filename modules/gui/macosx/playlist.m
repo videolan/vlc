@@ -84,7 +84,7 @@
                 o_number = [o_to_delete lastObject];
                 i_row = [o_number intValue];
 
-                if( p_playlist->i_index == i_row && p_playlist->i_status )
+                if( p_playlist->i_index == i_row && p_playlist->status.i_status )
                 {
                     playlist_Stop( p_playlist );
                 }
@@ -368,7 +368,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         o_number = [o_to_delete lastObject];
         i_row = [o_number intValue];
 
-        if( p_playlist->i_index == i_row && p_playlist->i_status )
+        if( p_playlist->i_index == i_row && p_playlist->status.i_status )
         {
             playlist_Stop( p_playlist );
         }
@@ -388,6 +388,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (IBAction)toggleItemsEnabled:(id)sender
 {
+#if 0
     int i, c, i_row;
     NSMutableArray *o_selected;
     NSNumber *o_number;
@@ -410,7 +411,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         {
             o_number = [o_selected lastObject];
             i_row = [o_number intValue];
-            if( p_playlist->i_index == i_row && p_playlist->i_status )
+            if( p_playlist->i_index == i_row && p_playlist->status.i_status )
             {
                 playlist_Stop( p_playlist );
             }
@@ -430,10 +431,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
     vlc_object_release( p_playlist );
     [self playlistUpdated];
+#endif
 }
 
 - (IBAction)enableGroup:(id)sender
 {
+#if 0
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
@@ -444,10 +447,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 p_playlist->pp_items[[o_table_view selectedRow]]->i_group);
         vlc_object_release(p_playlist);
     }
+#endif
 }
 
 - (IBAction)disableGroup:(id)sender
 {
+#if 0
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
@@ -458,6 +463,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 p_playlist->pp_items[[o_table_view selectedRow]]->i_group);
         vlc_object_release(p_playlist);
     }
+#endif
 }
 
 - (IBAction)selectAll:(id)sender
@@ -728,6 +734,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (void)deleteGroup:(int)i_id
 {
+#if 0
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
@@ -776,6 +783,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         vlc_object_release(p_playlist);
         [self playlistUpdated];
     }
+#endif
 }
 
 - (NSColor *)getColor:(int)i_group
@@ -927,6 +935,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                                                FIND_ANYWHERE );
     if (p_playlist)
     {
+#if 0
         if ((p_playlist->i_groups) > 1 )
         {
             [o_cell setDrawsBackground: VLC_TRUE];
@@ -937,7 +946,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         {
             [o_cell setDrawsBackground: VLC_FALSE];
         }
-
+#endif
         if (!p_playlist->pp_items[i_rows]->b_enabled)
         {
             [o_cell setTextColor: [NSColor colorWithDeviceRed:0.3686 green:0.3686 blue:0.3686 alpha:1.0]];

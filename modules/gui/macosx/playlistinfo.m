@@ -179,7 +179,7 @@
         playlist_ItemAddInfo(p_playlist->pp_items[i_item],_("General"),_("Author"), [[o_author_txt stringValue] cString]);
 
         c = (int)[o_selected count];
-
+#if 0
         if ([[o_group_cbx stringValue] isEqual:
                     [o_group_cbx objectValueOfSelectedItem]])
         {
@@ -208,7 +208,7 @@
             }
         }
 
-
+#endif
         vlc_mutex_unlock(&p_playlist->pp_items[i_item]->input.lock);
         val.b_bool = VLC_TRUE;
         var_Set( p_playlist,"intf-change",val );
@@ -219,6 +219,7 @@
 
 - (IBAction)handleGroup:(id)sender
 {
+#if 0
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
@@ -240,10 +241,12 @@
         }
     vlc_object_release(p_playlist);
     }
+#endif
 }
 
 - (IBAction)deleteOutlineGroup:(id)sender
 {
+#if 0
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
@@ -265,10 +268,12 @@
         }
     vlc_object_release(p_playlist);
     }
+#endif
 }
 
 - (IBAction)createOutlineGroup:(id)sender;
 {
+#if 0
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
@@ -281,10 +286,12 @@
         [[[VLCMain sharedInstance] getPlaylist] playlistUpdated];
         vlc_object_release(p_playlist);
     }
+#endif
 }
 
 -(void)createComboBox
 {
+#if 0
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
@@ -307,6 +314,7 @@
         }
     vlc_object_release(p_playlist);
     }
+#endif
 }
 
 - (int)getItem
