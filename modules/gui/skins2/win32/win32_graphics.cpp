@@ -136,8 +136,12 @@ void Win32Graphics::drawBitmap( const GenericBitmap &rBitmap,
             uint8_t a = *(pBmpData++);
 
             // Draw the pixel
-           ((UINT32 *)pBits)[x + y * width] =
-                   (a << 24) | (r << 16) | (g << 8) | b;
+            // Note: the colours are multiplied by a/255, because of the
+            // algorithm used by Windows for the AlphaBlending
+            ((UINT32 *)pBits)[x + y * width] =
+                (a << 24) | (((r * a) >> 8) << 16) |
+                            (((g * a) >> 8) << 8) |
+                             ((b * a) >> 8);
 
             if( a > 0 )
             {
