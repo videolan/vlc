@@ -335,6 +335,8 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "marq-x", Input, NULL );
     var_Create( p_intf, "marq-y", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "marq-y", Input, NULL );
+    var_Create( p_intf, "marq-timeout", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "marq-timeout", Input, NULL );
 
     var_Create( p_intf, "pause", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "pause", Input, NULL );
@@ -598,6 +600,7 @@ static void Run( intf_thread_t *p_intf )
             printf(_("| marquee STRING . . . . . overlay STRING in video\n"));
             printf(_("| marq-x X . . . . . .offset of marquee, from left\n"));
             printf(_("| marq-y Y . . . . . . offset of marquee, from top\n"));
+            printf(_("| marq-timeout T. . . . .timeout of marquee, in ms\n"));
             printf("| \n");
             printf(_("| seek X . seek in seconds, for instance `seek 12'\n"));
             printf(_("| pause  . . . . . . . . . . . . . .  toggle pause\n"));
@@ -724,6 +727,23 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
                 }
             val.i_int = atoi( newval.psz_string );
             var_Set( p_pl, "marq-y", val );
+             vlc_object_release( p_pl );
+        }
+        vlc_object_release( p_input );
+        return VLC_SUCCESS;
+    }
+    else if( !strcmp( psz_cmd, "marq-timeout" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            vlc_object_t *p_pl =
+                  vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+            if( !p_pl )
+                {
+                  return VLC_ENOOBJ;
+                }
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_pl, "marq-timeout", val );
              vlc_object_release( p_pl );
         }
         vlc_object_release( p_input );
