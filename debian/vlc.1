@@ -65,6 +65,12 @@ Choose the display coordinates.
 .B \-g, \-\-grayscale
 Grayscale output.
 .TP
+.B \-\-fullscreen
+Full screen output.
+.TP
+.B \-\-overlay
+Overlay (hardware accelerated output), if available.
+.TP
 .B \-\-color
 Color output.
 .TP
@@ -135,6 +141,8 @@ also accepts a lot of parameters to customize its behaviour.
  vlc_height=<height>           dislay height
  vlc_fb_dev=<filename>         framebuffer device
  vlc_grayscale={1|0}           grayscale or color
+ vlc_fullscreen={1|0}          full screen
+ vlc_overlay={1|0}             overlay
  vlc_idct=<method name>        IDCT method
  vlc_yuv=<method name>         YUV method
  vlc_synchro={I|I+|IP|IP+|IPB} synchro algorithm

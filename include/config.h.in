@@ -319,6 +319,14 @@
 #define VOUT_GRAYSCALE_VAR              "vlc_grayscale"
 #define VOUT_GRAYSCALE_DEFAULT          0
 
+/* Environment variable for fullscreen mode, and default value */
+#define VOUT_FULLSCREEN_VAR             "vlc_fullscreen"
+#define VOUT_FULLSCREEN_DEFAULT         0
+
+/* Environment variable for overlay mode, and default value */
+#define VOUT_OVERLAY_VAR                "vlc_overlay"
+#define VOUT_OVERLAY_DEFAULT            0
+
 /* Default gamma */
 #define VOUT_GAMMA                      0.
 

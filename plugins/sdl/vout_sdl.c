@@ -49,6 +49,7 @@
  * This structure is part of the video output thread descriptor.
  * It describes the SDL specific properties of an output thread.
  *****************************************************************************/
+/* FIXME: SOME CLUELESS MORON DEFINED THIS STRUCTURE IN INTF_SDL.C AS WELL */
 typedef struct vout_sys_s
 {
     int i_width;
@@ -56,6 +57,7 @@ typedef struct vout_sys_s
     SDL_Surface *   p_display;                             /* display device */
     SDL_Overlay *   p_overlay;                             /* overlay device */
     boolean_t   b_fullscreen;
+    boolean_t   b_overlay;
     boolean_t   b_reopen_display;
     boolean_t   b_toggle_fullscreen;
     Uint8   *   p_buffer[2];
@@ -104,15 +106,10 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
        and it's impossible to switch between soft/hard yuv */
     p_vout->b_need_render = 1;
 
-    if(psz_display != NULL && strcmp(psz_display,"fullscreen")==0)
-    {
-        p_vout->p_sys->b_fullscreen = 1;
-    }
-    else
-    {
-        p_vout->p_sys->b_fullscreen = 0;
-    }
-
+    p_vout->p_sys->b_fullscreen = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
+                                VOUT_FULLSCREEN_DEFAULT );
+    p_vout->p_sys->b_overlay = main_GetIntVariable( VOUT_OVERLAY_VAR,
+                                VOUT_OVERLAY_DEFAULT );
     p_vout->p_sys->i_width = main_GetIntVariable( VOUT_WIDTH_VAR, 
                                 VOUT_WIDTH_DEFAULT );
     p_vout->p_sys->i_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
@@ -252,8 +249,9 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
                                              SDL_YV12_OVERLAY, 
                                              p_vout->p_sys->p_display
                                            );
-                intf_Msg("vout: YUV acceleration set to %d,",
-                            p_vout->p_sys->p_overlay->hw_overlay); 
+                intf_Msg("vout: YUV acceleration %s",
+                            p_vout->p_sys->p_overlay->hw_overlay
+                            ? "activated" : "unavailable !" ); 
             }
 
             SDL_LockYUVOverlay(p_vout->p_sys->p_overlay);

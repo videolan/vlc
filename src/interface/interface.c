@@ -245,7 +245,7 @@ void intf_Run( intf_thread_t *p_intf )
     }
 
     /* Main loop */
-    while(!p_intf->b_die)
+    while(!p_intf->b_die && (p_intf->p_input != NULL) )
     {
         /* Flush waiting messages */
         intf_FlushMsg();

@@ -1,8 +1,8 @@
-vlc (0.2.5-1) unstable; urgency=low
+vlc (0.2.50-1) unstable; urgency=low
 
   * Unstable release.
 
- -- Samuel Hocevar <sam@zoy.org>  Fri, 19 Jan 2001 05:16:58 +0100
+ -- Samuel Hocevar <sam@zoy.org>  Wed, 31 Jan 2001 04:30:37 +0100
 
 vlc (0.1.99i) unstable; urgency=low
 

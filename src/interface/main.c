@@ -69,19 +69,16 @@
 /* Long options return values - note that values corresponding to short options
  * chars, and in general any regular char, should be avoided */
 #define OPT_NOAUDIO             150
-#define OPT_AOUT                151
-#define OPT_STEREO              152
-#define OPT_MONO                153
+#define OPT_STEREO              151
+#define OPT_MONO                152
 
 #define OPT_NOVIDEO             160
-#define OPT_VOUT                161
-#define OPT_DISPLAY             162
-#define OPT_WIDTH               163
-#define OPT_HEIGHT              164
-#define OPT_COLOR               165
-#define OPT_MOTION              167
-#define OPT_IDCT                168
-#define OPT_YUV                 169
+#define OPT_DISPLAY             161
+#define OPT_WIDTH               162
+#define OPT_HEIGHT              163
+#define OPT_COLOR               164
+#define OPT_FULLSCREEN          165
+#define OPT_OVERLAY             166
 
 #define OPT_VLANS               170
 #define OPT_SERVER              171
@@ -89,9 +86,14 @@
 #define OPT_BROADCAST           173
 #define OPT_DVD                 174
 
-#define OPT_SYNCHRO             180
+#define OPT_AOUT                180
+#define OPT_VOUT                181
+#define OPT_MOTION              182
+#define OPT_IDCT                183
+#define OPT_YUV                 184
 
-#define OPT_WARNING             190
+#define OPT_SYNCHRO             190
+#define OPT_WARNING             191
 
 /* Usage fashion */
 #define USAGE                     0
@@ -126,6 +128,8 @@ static const struct option longopts[] =
     {   "motion",           1,          0,      OPT_MOTION },
     {   "idct",             1,          0,      OPT_IDCT },
     {   "yuv",              1,          0,      OPT_YUV },
+    {   "fullscreen",       0,          0,      OPT_FULLSCREEN },
+    {   "overlay",          0,          0,      OPT_OVERLAY },
 
     /* DVD options */
     {   "dvdaudio",         1,          0,      'a' },
@@ -564,12 +568,17 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_HEIGHT:                                         /* --height */
             main_PutPszVariable( VOUT_HEIGHT_VAR, optarg );
             break;
-
         case 'g':                                         /* -g, --grayscale */
             main_PutIntVariable( VOUT_GRAYSCALE_VAR, 1 );
             break;
         case OPT_COLOR:                                           /* --color */
             main_PutIntVariable( VOUT_GRAYSCALE_VAR, 0 );
+            break;
+	case OPT_FULLSCREEN:                                 /* --fullscreen */
+            main_PutIntVariable( VOUT_FULLSCREEN_VAR, 1 );
+            break;
+	case OPT_OVERLAY:                                       /* --overlay */
+            main_PutIntVariable( VOUT_OVERLAY_VAR, 1 );
             break;
 	case OPT_MOTION:                                         /* --motion */
             main_PutPszVariable( MOTION_METHOD_VAR, optarg );
@@ -720,10 +729,13 @@ static void Usage( int i_fashion )
               "\n  " VOUT_HEIGHT_VAR "=<height>             \tdislay height"
               "\n  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path"
               "\n  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output"
+              "\n  " VOUT_FULLSCREEN_VAR "={1|0}            \tfullscreen"
+              "\n  " VOUT_OVERLAY_VAR "={1|0}               \toverlay"
               "\n  " MOTION_METHOD_VAR "=<method name>      \tmotion compensation method"
               "\n  " IDCT_METHOD_VAR "=<method name>        \tIDCT method"
               "\n  " YUV_METHOD_VAR "=<method name>         \tYUV method"
-              "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm" );
+              "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm"
+ );
 
     /* DVD parameters */
     intf_Msg( "\nDVD parameters:"

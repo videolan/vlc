@@ -2,7 +2,7 @@
  * intf_sdl.c: SDL interface plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_sdl.c,v 1.23 2001/01/15 12:42:57 reno Exp $
+ * $Id: intf_sdl.c,v 1.24 2001/01/31 03:42:39 sam Exp $
  *
  * Authors:
  *
@@ -50,6 +50,7 @@
 
 #include "main.h"
 
+/* FIXME: SOME CLUELESS MORON DEFINED THIS STRUCTURE IN VOUT_SDL.C AS WELL */
 typedef struct vout_sys_s
 {
     int i_width;
@@ -57,6 +58,7 @@ typedef struct vout_sys_s
     SDL_Surface *   p_display;                             /* display device */
     SDL_Overlay *   p_overlay;
     boolean_t   b_fullscreen;
+    boolean_t   b_overlay;
     boolean_t   b_reopen_display;
     boolean_t   b_toggle_fullscreen;
     Uint8   *   p_buffer[2];
@@ -128,7 +130,13 @@ void intf_SDLManage( intf_thread_t *p_intf )
 {
     SDL_Event event;                                            /* SDL event */
     Uint8   i_key;
-    
+ 
+    if( p_intf->p_vout->p_sys->b_overlay )
+    {
+        intf_SDL_YUVSwitch(p_intf);
+        p_intf->p_vout->p_sys->b_overlay = 0;
+    }
+
     while ( SDL_PollEvent(&event) )
     {
         i_key = event.key.keysym.sym;                          /* forward it */
@@ -178,7 +186,6 @@ void intf_SDL_YUVSwitch(intf_thread_t * p_intf)
 {
     vlc_mutex_lock( &p_intf->p_vout->change_lock );
     p_intf->p_vout->b_need_render = 1 - p_intf->p_vout->b_need_render;
-    intf_DbgMsg( "need render now : '%d'",p_intf->p_vout->b_need_render); 
     p_intf->p_vout->p_sys->b_reopen_display = 1;
     vlc_mutex_unlock( &p_intf->p_vout->change_lock );
 }
