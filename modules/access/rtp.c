@@ -2,7 +2,7 @@
  * rtp.c: RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rtp.c,v 1.2 2002/09/30 11:05:34 sam Exp $
+ * $Id: rtp.c,v 1.3 2002/10/03 20:49:31 jpsaman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -291,14 +291,14 @@ static int RTPNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
 is supported", i_payload_type );
  
     // If both bytes are wrong, maybe a synchro error occurred...
-    if (( i_rtp_version != 2 ) && ( i_payload_type != 0x33 ))
+    if (( i_rtp_version != 2 ) && ( i_payload_type != 33 ))
     {
          msg_Dbg( p_input, "Too many RTP errors, trying to re-synchronize" );
  
         //Trying to re-synchronize
 	for ( i=0 ; (i<i_len) ||
                     ((( p_tmp_buffer[0] & 0xC0 ) >> 6 == 2 )
-                     && ( p_tmp_buffer[1] & 0x7F ) >> 6 == 0x33 ) ; i++);
+                     && ( p_tmp_buffer[1] & 0x7F ) == 33 ) ; i++);
 
 	if (i!=i_len)
 	{
