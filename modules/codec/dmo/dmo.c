@@ -62,7 +62,7 @@ FARPROC WINAPI GetProcAddress(HMODULE,LPCSTR);
 int     WINAPI FreeLibrary(HMODULE);
 #endif /* LOADER */
 
-typedef long STDCALL (*GETCLASS) ( const GUID*, const GUID*, void** );
+typedef long (STDCALL *GETCLASS) ( const GUID*, const GUID*, void** );
 
 static int pi_channels_maps[7] =
 {
@@ -697,6 +697,7 @@ void DecoderClose( vlc_object_t *p_this )
 
     if( !p_sys ) return;
 
+    if( p_sys->p_dmo ) p_sys->p_dmo->vt->Release( (IUnknown *)p_sys->p_dmo );
     FreeLibrary( p_sys->hmsdmo_dll );
 
 #ifdef LOADER
@@ -1542,6 +1543,7 @@ void EncoderClose( vlc_object_t *p_this )
 
     if( !p_sys ) return;
 
+    if( p_sys->p_dmo ) p_sys->p_dmo->vt->Release( (IUnknown *)p_sys->p_dmo );
     FreeLibrary( p_sys->hmsdmo_dll );
 
 #ifdef LOADER
