@@ -2709,7 +2709,6 @@ static void ParseTracks( demux_t *p_demux, EbmlElement *tracks )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     matroska_stream_t  *p_stream = p_sys->Stream();
-    matroska_segment_t *p_segment = p_stream->Segment();
     EbmlElement *el;
     EbmlMaster  *m;
     unsigned int i;
