@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ftp.c,v 1.20 2003/07/31 23:44:49 fenrir Exp $
+ * $Id: ftp.c,v 1.21 2003/09/10 21:09:05 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -28,7 +28,6 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/stat.h>
-#include <string.h>
 #include <errno.h>
 #include <fcntl.h>
 
@@ -335,24 +334,7 @@ static int Open( vlc_object_t *p_this )
         goto exit_error;
     }
 
-#ifdef HAVE_ATOLL
     p_access->i_filesize = atoll( psz_arg + 4 );
-#else
-    {
-        int64_t i_size = 0;
-        char    *psz_parser = psz_arg + 4;
-        int     sign = 1;
-
-        while( *psz_parser == ' ' || *psz_parser == '\t' ) psz_parser++;
-
-        if( *psz_parser == '-' ) sign = -1;
-        while( *psz_parser >= '0' && *psz_parser <= '9' )
-        {
-            i_size = i_size * 10 + *psz_parser++ - '0';
-        }
-        p_access->i_filesize = i_size * sign;
-    }
-#endif
 
     msg_Dbg( p_input, "file size: "I64Fd, p_access->i_filesize );
     FREE( psz_arg );
