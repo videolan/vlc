@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.20 2002/04/24 23:08:08 gbazin Exp $
+ * $Id: configuration.c,v 1.21 2002/05/01 21:31:53 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -363,7 +363,7 @@ int config_LoadConfigFile( const char *psz_module_name )
 
     intf_WarnMsg( 5, "config: opening config file %s", psz_filename );
 
-    file = fopen( psz_filename, "r" );
+    file = fopen( psz_filename, "rt" );
     if( !file )
     {
         intf_WarnMsg( 1, "config: couldn't open config file %s for reading (%s)",
@@ -551,7 +551,7 @@ int config_SaveConfigFile( const char *psz_module_name )
 
     intf_WarnMsg( 5, "config: opening config file %s", psz_filename );
 
-    file = fopen( psz_filename, "r" );
+    file = fopen( psz_filename, "rt" );
     if( !file )
     {
         intf_WarnMsg( 1, "config: couldn't open config file %s for reading (%s)",
@@ -631,7 +631,7 @@ int config_SaveConfigFile( const char *psz_module_name )
      * Save module config in file
      */
 
-    file = fopen( psz_filename, "w" );
+    file = fopen( psz_filename, "wt" );
     if( !file )
     {
         intf_WarnMsg( 1, "config: couldn't open config file %s for writing",

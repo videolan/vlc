@@ -2,7 +2,7 @@
  * logger.c : file logging plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: logger.c,v 1.7 2002/04/21 11:23:03 gbazin Exp $
+ * $Id: logger.c,v 1.8 2002/05/01 21:31:53 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -127,7 +127,7 @@ static int intf_Open( intf_thread_t *p_intf )
 
     /* Open the log file and remove any buffering for the stream */
     intf_WarnMsg( 1, "intf: opening logfile `%s'", psz_filename );
-    p_intf->p_sys->p_file = fopen( psz_filename, "w" );
+    p_intf->p_sys->p_file = fopen( psz_filename, "wt" );
     setvbuf( p_intf->p_sys->p_file, NULL, _IONBF, 0 );
 
     p_intf->p_sys->p_sub = intf_MsgSub();
