@@ -2,7 +2,7 @@
  * nsv.c: NullSoft Video demuxer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: nsv.c,v 1.9 2004/02/15 16:59:18 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -85,7 +85,6 @@ static int Open( vlc_object_t *p_this )
     demux_sys_t *p_sys;
 
     uint8_t     *p_peek;
-    int         i;
 
     if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
     {
@@ -419,7 +418,7 @@ static int ReSynch( demux_t *p_demux )
  *****************************************************************************/
 static int ReadNSVf( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
+    /* demux_sys_t *p_sys = p_demux->p_sys; */
     uint8_t     *p;
     int         i_size;
 
