@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
- * $Id: access.c,v 1.26 2004/02/22 10:30:22 rocky Exp $
+ * $Id: access.c,v 1.27 2004/02/22 21:32:42 gbazin Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -169,7 +169,7 @@ CDDAPlay( input_thread_t *p_input, int i_track )
 {
   cdda_data_t *p_cdda = (cdda_data_t *) p_input->p_access_data;
 
-  if( i_track >= p_cdda->i_nb_tracks || i_track < 1 )
+  if( i_track > p_cdda->i_nb_tracks || i_track < 1 )
     return VLC_FALSE;
 
   CDDASetArea( p_input, p_input->stream.pp_areas[i_track] );
@@ -1028,7 +1028,7 @@ E_(Open)( vlc_object_t *p_this )
     else if( p_cdda->i_nb_tracks <= 0 )
         msg_Err( p_input, "no audio tracks found" );
 
-    if( p_cdda->i_nb_tracks <= 1)
+    if( p_cdda->i_nb_tracks <= 0 )
     {
         ioctl_Close( p_cdda->p_cddev );
         free( p_cdda );
@@ -1036,7 +1036,7 @@ E_(Open)( vlc_object_t *p_this )
         return -1;
     }
 
-    if( i_track >= p_cdda->i_nb_tracks || i_track < 1 )
+    if( i_track > p_cdda->i_nb_tracks || i_track < 1 )
         i_track = 1;
 
     /* Set stream and area data */
