@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.11 2003/10/25 00:49:13 sam Exp $
+ * $Id: dshow.cpp,v 1.12 2003/11/03 20:22:21 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -40,6 +40,7 @@
 static int     AccessOpen  ( vlc_object_t * );
 static void    AccessClose ( vlc_object_t * );
 static ssize_t Read        ( input_thread_t *, byte_t *, size_t );
+static ssize_t ReadDV      ( input_thread_t *, byte_t *, size_t );
 
 static int  DemuxOpen  ( vlc_object_t * );
 static void DemuxClose ( vlc_object_t * );
@@ -516,6 +517,14 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
             else if( dshow_stream.mt.subtype == MEDIASUBTYPE_YVU9 )
                 dshow_stream.i_fourcc = VLC_FOURCC( 'Y', 'V', 'U', '9' );
 
+            /* DV formats */
+            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_dvsl )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'd', 'v', 's', 'l' );
+            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_dvsd )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'd', 'v', 's', 'd' );
+            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_dvhd )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'd', 'v', 'h', 'd' );
+
             else goto fail;
 
             dshow_stream.header.video =
@@ -536,6 +545,19 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
                 if( i_height > 0 ) dshow_stream.b_invert = VLC_TRUE;
                 else i_height = - i_height;
             }
+
+            /* Check if we are dealing with a DV stream */
+            if( dshow_stream.i_fourcc == VLC_FOURCC( 'd', 'v', 's', 'l' ) ||
+                dshow_stream.i_fourcc == VLC_FOURCC( 'd', 'v', 's', 'd' ) ||
+                dshow_stream.i_fourcc == VLC_FOURCC( 'd', 'v', 'h', 'd' ) )
+            {
+                p_input->pf_read = ReadDV;
+                if( !p_input->psz_demux || !*p_input->psz_demux )
+                {
+                    p_input->psz_demux = "rawdv";
+                }
+            }
+
 
             /* Add video stream to header */
             p_sys->i_header_size += 20;
@@ -1021,6 +1043,79 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
 
         /* The caller got what he wanted */
         return p_buffer - p_buf_orig;
+    }
+
+    return 0; /* never reached */
+}
+
+/*****************************************************************************
+ * ReadDV: reads from the DV device into PES packets.
+ *****************************************************************************
+ * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
+ * bytes.
+ *****************************************************************************/
+static ssize_t ReadDV( input_thread_t * p_input, byte_t * p_buffer,
+                       size_t i_len )
+{
+    access_sys_t   *p_sys = p_input->p_access_data;
+    dshow_stream_t *p_stream = NULL;
+    VLCMediaSample  sample;
+    int             i_data_size;
+    uint8_t         *p_data;
+
+    /* Read 1 DV frame (they contain the video and audio data) */
+
+    /* There must be only 1 elementary stream to produce a valid
+     * raw DV stream*/
+    p_stream = p_sys->pp_streams[0];
+
+    while( 1 )
+    {
+        /* Get new sample/frame from the elementary stream (blocking). */
+        vlc_mutex_lock( &p_sys->lock );
+
+        if( p_stream->p_capture_filter->CustomGetPin()
+              ->CustomGetSample( &sample ) != S_OK )
+        {
+            /* No data available. Wait until some data has arrived */
+            vlc_cond_wait( &p_sys->wait, &p_sys->lock );
+            vlc_mutex_unlock( &p_sys->lock );
+            continue;
+        }
+
+        vlc_mutex_unlock( &p_sys->lock );
+
+        /*
+         * We got our sample
+         */
+        i_data_size = sample.p_sample->GetActualDataLength();
+        sample.p_sample->GetPointer( &p_data );
+
+        REFERENCE_TIME i_pts, i_end_date;
+        HRESULT hr = sample.p_sample->GetTime( &i_pts, &i_end_date );
+        if( hr != VFW_S_NO_STOP_TIME && hr != S_OK ) i_pts = 0;
+
+        if( !i_pts )
+        {
+            if( p_stream->mt.majortype == MEDIATYPE_Video || !p_stream->b_pts )
+            {
+                /* Use our data timestamp */
+                i_pts = sample.i_timestamp;
+                p_stream->b_pts = VLC_TRUE;
+            }
+        }
+
+#if 0
+        msg_Info( p_input, "access read %i data_size %i PTS: "I64Fd,
+                  i_len, i_data_size, i_pts );
+#endif
+
+        p_input->p_vlc->pf_memcpy( p_buffer, p_data, i_data_size );
+
+        sample.p_sample->Release();
+
+        /* The caller got what he wanted */
+        return i_data_size;
     }
 
     return 0; /* never reached */
