@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.27 2003/10/19 13:39:11 hartman Exp $
+ * $Id: libavi.c,v 1.28 2003/10/20 17:18:54 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -340,8 +340,8 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
                 if( p_chk->strf.auds.p_wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE )
                 {
                     /* Found an extensible header atm almost nothing uses that. */
-                    msg_Warn( (vlc_object_t*)s, "WAVE_FORMAT_EXTENSIBLE or vorbis 
-                                        audio dectected: both are not supported" );
+                    msg_Warn( (vlc_object_t*)s, "WAVE_FORMAT_EXTENSIBLE or "
+                              "vorbis audio dectected: not supported" );
                 }
             }
             else
