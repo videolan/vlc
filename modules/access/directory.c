@@ -2,7 +2,7 @@
  * directory.c: expands a directory (directory: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: directory.c,v 1.5 2004/02/16 17:16:24 zorglub Exp $
+ * $Id: directory.c,v 1.6 2004/02/17 13:13:31 gbazin Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -101,7 +101,7 @@ vlc_module_begin();
     add_shortcut( "dir" );
     add_string( "recursive", "expand" , NULL, RECURSIVE_TEXT,
                 RECURSIVE_LONGTEXT, VLC_FALSE );
-    //change_string_list( psz_recursive_list, psz_recursive_list_text, 0 );
+      change_string_list( psz_recursive_list, psz_recursive_list_text, 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -293,7 +293,15 @@ int ReadDir( input_thread_t *p_input, char *psz_name , int i_mode )
             strcmp( p_dir_content->d_name, ".." ) &&
             p_access_data->i_pos + i_size_entry < MAX_DIR_SIZE )
         {
+#if defined( DT_DIR )
             if( p_dir_content->d_type == DT_DIR )
+#elif defined( S_ISDIR )
+            struct stat stat_data;
+            stat( psz_entry, &stat_data );
+            if( S_ISDIR(stat_data.st_mode) )
+#else
+            if( 0 )
+#endif
             {
                 if( i_mode == MODE_NONE )
                 {

@@ -2,7 +2,7 @@
  * drms.c: DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.c,v 1.12 2004/01/26 17:15:40 jlj Exp $
+ * $Id: drms.c,v 1.13 2004/02/17 13:13:31 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Sam Hocevar <sam@zoy.org>
@@ -145,7 +145,7 @@ static int GetUserKey     ( void *, uint32_t * );
 
 static int GetSCIData     ( char *, uint32_t **, uint32_t * );
 static int HashSystemInfo ( uint32_t * );
-static int GetiPodID      ( long long * );
+static int GetiPodID      ( int64_t * );
 
 #ifdef WORDS_BIGENDIAN
 /*****************************************************************************
@@ -756,7 +756,7 @@ static int GetSystemKey( uint32_t *p_sys_key, vlc_bool_t b_ipod )
     static char const p_secret1[ 8 ] = "YuaFlafu";
     static char const p_secret2[ 8 ] = "zPif98ga";
     struct md5_s md5;
-    long long i_ipod_id;
+    int64_t i_ipod_id;
     uint32_t p_system_hash[ 4 ];
 
     /* Compute the MD5 hash of our system info */
@@ -1116,8 +1116,6 @@ static int HashSystemInfo( uint32_t *p_system_hash )
     struct md5_s md5;
     int i_ret = 0;
 
-    InitMD5( &md5 );
-
 #ifdef WIN32
     HKEY i_key;
     unsigned int i;
@@ -1142,6 +1140,8 @@ static int HashSystemInfo( uint32_t *p_system_hash )
             _T("ProductId")
         }
     };
+
+    InitMD5( &md5 );
 
     AddMD5( &md5, "cache-control", 13 );
     AddMD5( &md5, "Ethernet", 8 );
@@ -1183,6 +1183,7 @@ static int HashSystemInfo( uint32_t *p_system_hash )
     }
 
 #else
+    InitMD5( &md5 );
     i_ret = -1;
 #endif
 
@@ -1197,7 +1198,7 @@ static int HashSystemInfo( uint32_t *p_system_hash )
  *****************************************************************************
  * This function gets the iPod ID.
  *****************************************************************************/
-static int GetiPodID( long long *p_ipod_id )
+static int GetiPodID( int64_t *p_ipod_id )
 {
     int i_ret = -1;
 
@@ -1241,7 +1242,7 @@ static int GetiPodID( long long *p_ipod_id )
                     {
                         if( CFGetTypeID( value ) == CFNumberGetTypeID() )
                         {
-                            long long i_ipod_id;
+                            int64_t i_ipod_id;
                             CFNumberGetValue( (CFNumberRef)value,
                                               kCFNumberLongLongType,
                                               &i_ipod_id );

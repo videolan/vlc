@@ -2,7 +2,7 @@
  * a52.c : raw A/52 stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.4 2004/02/13 22:37:35 gbazin Exp $
+ * $Id: a52.c,v 1.5 2004/02/17 13:13:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -70,7 +70,7 @@ vlc_module_end();
 /*****************************************************************************
  * CheckSync: Check if buffer starts with an A52 sync code
  *****************************************************************************/
-int CheckSync( uint8_t *p_peek, vlc_bool_t *p_big_endian )
+static int CheckSync( uint8_t *p_peek, vlc_bool_t *p_big_endian )
 {
     /* Little endian version of the bitstream */
     if( p_peek[0] == 0x77 && p_peek[1] == 0x0b &&

@@ -2,7 +2,7 @@
  * dts.c : raw DTS stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dts.c,v 1.7 2004/02/08 16:48:11 gbazin Exp $
+ * $Id: dts.c,v 1.8 2004/02/17 13:13:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -64,7 +64,7 @@ vlc_module_end();
 /*****************************************************************************
  * CheckSync: Check if buffer starts with a DTS sync code
  *****************************************************************************/
-int CheckSync( uint8_t *p_peek )
+static int CheckSync( uint8_t *p_peek )
 {
     /* 14 bits, little endian version of the bitstream */
     if( p_peek[0] == 0xff && p_peek[1] == 0x1f &&
