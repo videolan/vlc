@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.27 2002/12/09 00:52:42 babal Exp $
+ * $Id: input.c,v 1.28 2002/12/22 17:08:42 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -326,13 +326,12 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
             p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
             p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
         }
-
     }
 
     /* Adding the start date will be managed by aout_FifoPush(). */
-    p_buffer->start_date = start_date;
     p_buffer->end_date = start_date +
         (p_buffer->end_date - p_buffer->start_date);
+    p_buffer->start_date = start_date;
 
     /* Actually run the resampler now. */
     if ( p_input->i_nb_resamplers > 0 && p_aout->mixer.mixer.i_rate !=
