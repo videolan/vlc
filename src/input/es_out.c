@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: es_out.c,v 1.3 2003/11/27 05:46:01 fenrir Exp $
+ * $Id: es_out.c,v 1.4 2003/11/27 12:22:15 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -183,7 +183,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
             i_wanted  = es->i_channel;
         }
 
-        if( i_wanted == es->i_channel )
+        if( i_wanted == es->i_channel && es->p_es->p_dec == NULL )
         {
             input_SelectES( p_input, es->p_es );
         }
@@ -252,7 +252,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
                             p_prgm,
                             out->p_sys->i_id,
                             fmt->i_cat,
-                            fmt->psz_description, 0 );
+                            fmt->psz_language, 0 );
     es->p_es->i_stream_id = out->p_sys->i_id;
     es->p_es->i_fourcc = fmt->i_codec;
 
@@ -510,6 +510,9 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
                 return VLC_SUCCESS;
             }
+            vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
+            return VLC_SUCCESS;
+
         case ES_OUT_GET_ES_STATE:
             es = (es_out_id_t*) va_arg( args, es_out_id_t * );
             pb = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
