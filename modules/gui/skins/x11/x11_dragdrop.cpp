@@ -2,7 +2,7 @@
  * x11_dragdrop.cpp: X11 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_dragdrop.cpp,v 1.5 2003/06/22 00:00:28 asmax Exp $
+ * $Id: x11_dragdrop.cpp,v 1.6 2003/06/22 15:07:13 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -108,16 +108,28 @@ void X11DropObject::DndEnter( ldata_t data )
             break;
         }
     }
-    fprintf(stderr,"dndenter\n");
 }
 //---------------------------------------------------------------------------
 void X11DropObject::DndPosition( ldata_t data )
 {   
     Window src = data[0];
+    Time time = data[2];
     
     XLOCK;
+    Atom selectionAtom = XInternAtom( display, "XdndSelection", 0 );
+    Atom targetAtom = XInternAtom( display, "text/plain", 0 );
+    Atom propAtom = XInternAtom( display, "VLC_SELECTION", 0 );
+   
     Atom actionAtom = XInternAtom( display, "XdndActionCopy", 0 );
-    Atom typeAtom = XInternAtom( display, "XdndStatus", 0 );
+    Atom typeAtom = XInternAtom( display, "XdndFinished", 0 );
+
+    // Convert the selection into the given target
+    // NEEDED or it doesn't work !!!
+    XConvertSelection( display, selectionAtom, targetAtom, propAtom, src, 
+                       time );
+ 
+    actionAtom = XInternAtom( display, "XdndActionCopy", 0 );
+    typeAtom = XInternAtom( display, "XdndStatus", 0 );
 
     XEvent event;
     event.type = ClientMessage;
@@ -134,19 +146,19 @@ void X11DropObject::DndPosition( ldata_t data )
     {
         event.xclient.data.l[1] = 0;          // do not accept
     }
-    event.xclient.data.l[2] = 0;              // empty rectangle
-    event.xclient.data.l[3] = 0;
+    int w, h;
+    OSAPI_GetScreenSize( w, h );
+    event.xclient.data.l[2] = 0;
+    event.xclient.data.l[3] = (w << 16) | h;
     event.xclient.data.l[4] = actionAtom;
  
     // Tell the source whether we accept the drop
     XSendEvent( display, src, False, 0, &event );
     XUNLOCK;
-    fprintf(stderr,"dndpos\n");
 }
 //---------------------------------------------------------------------------
 void X11DropObject::DndLeave( ldata_t data )
 {
-    fprintf(stderr,"dndleave\n");
 }
 //---------------------------------------------------------------------------
 void X11DropObject::DndDrop( ldata_t data )
@@ -199,7 +211,6 @@ void X11DropObject::DndDrop( ldata_t data )
     
         char *name = new char[selection.size()+1];
         strncpy( name, selection.c_str(), selection.size()+1 );
-    fprintf(stderr,"dnddrop %s\n", name);
         OSAPI_PostMessage( NULL, VLC_DROP, (unsigned int)name, 0 );
     }
     
