@@ -56,8 +56,9 @@ config:
 		--host=arm-linux \
 		--target=arm-linux \
 		$(shell echo $(CONFIG_FLAGS)) \
-	LDFLAGS="-L/usr/local/arm/2.95.3/arm-linux/lib -L/usr/local/arm/2.95.3/arm-linux/usr/lib -L/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/lib" \
-	CPPFLAGS="-I/usr/local/arm/2.95.3/arm-linux/include -I/usr/local/arm/2.95.3/arm-linux/usr/include -I/usr/local/arm/2.95.3/arm-linux/QtPalmtop/include"
+		LDFLAGS="-L/usr/local/arm/2.95.3/arm-linux/lib -L/usr/local/arm/2.95.3/arm-linux/lib -L/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/lib" \
+        	CPPFLAGS="-I/usr/local/arm/2.95.3/arm-linux/usr/include -I/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/include"
+
 
 build-stamp:
 # This is ugly -- I know
