@@ -143,7 +143,7 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
          * performance reasons. */
         if( p_vout->b_filter_change )
         {
-            var_Get( p_this, "filter", &val );
+            var_Get( p_vout, "filter", &val );
             psz_filter_chain = val.psz_string;
 
             if( psz_filter_chain && !*psz_filter_chain )
@@ -1278,24 +1278,12 @@ typedef struct suxor_thread_t
 {
     VLC_COMMON_MEMBERS
     input_thread_t *p_input;
-    vout_thread_t *p_vout;
-    char *psz_mode;
 
 } suxor_thread_t;
 
 static void SuxorRestartVideoES( suxor_thread_t *p_this )
 {
     vlc_value_t val;
-
-    if( p_this->psz_mode )
-    {
-        vlc_value_t val;
-        val.psz_string = p_this->psz_mode;
-        var_Set( p_this->p_vout, "deinterlace-mode", val );
-        free( p_this->psz_mode );
-    }
-
-    if( p_this->p_vout ) vlc_object_release( p_this->p_vout );
 
     /* Now restart current video stream */
     var_Get( p_this->p_input, "video-es", &val );
