@@ -217,6 +217,9 @@
 /* Define if you have the <gtk/gtk.h> header file.  */
 #undef HAVE_GTK_GTK_H
 
+/* Define if you have the <gpe/init.h> header file.  */
+#undef HAVE_GPE_INIT_H
+
 /* Define if you have the <image.h> header file.  */
 #undef HAVE_IMAGE_H
 
