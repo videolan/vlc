@@ -329,6 +329,7 @@ static int Open( vlc_object_t * p_this )
         avi_track_t      *tk = malloc( sizeof( avi_track_t ) );
         avi_chunk_list_t *p_strl = AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, i );
         avi_chunk_strh_t *p_strh = AVI_ChunkFind( p_strl, AVIFOURCC_strh, 0 );
+        avi_chunk_STRING_t *p_strn = AVI_ChunkFind( p_strl, AVIFOURCC_strn, 0 );
         avi_chunk_strf_auds_t *p_auds;
         avi_chunk_strf_vids_t *p_vids;
         es_format_t fmt;
@@ -460,6 +461,10 @@ static int Open( vlc_object_t * p_this )
                 msg_Warn( p_demux, "stream[%d] unknown type", i );
                 free( tk );
                 continue;
+        }
+        if( p_strn )
+        {
+            fmt.psz_description = strdup( p_strn->p_str );
         }
         tk->p_es = es_out_Add( p_demux->out, &fmt );
         TAB_APPEND( p_sys->i_track, p_sys->track, tk );
