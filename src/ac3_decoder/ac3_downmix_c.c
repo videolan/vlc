@@ -27,10 +27,8 @@
 
 #include "ac3_decoder.h"
 #include "ac3_internal.h"
-#include "ac3_bit_stream.h"
 
 #include "ac3_downmix.h"
-
 void __inline__ downmix_3f_2r_to_2ch_c (float *samples, dm_par_t *dm_par)
 {
 	int i;
@@ -145,6 +143,6 @@ void __inline__ stream_sample_1ch_to_s16_c (s16 *out_buf, float *center)
 
 	for (i=0; i < 256; i++) {
 		*out_buf++ = tmp = (s16) (0.7071f * *center++ * NORM);
-		*out_buf++ = tmp * NORM;
+		*out_buf++ = tmp;
 	}
 }

@@ -45,7 +45,7 @@ int ac3_init (ac3dec_t * p_ac3dec)
 int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
 {
     int i;
-
+    
     if (parse_bsi (p_ac3dec))
         return 1;
     

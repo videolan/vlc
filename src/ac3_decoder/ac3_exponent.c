@@ -23,16 +23,21 @@
  *****************************************************************************/
 #include "defs.h"
 
-#include <stdio.h>                                           /* "intf_msg.h" */
-
 #include "config.h"
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
 
-#include "intf_msg.h"
+#include "stream_control.h"
+#include "input_ext-dec.h"
+
+#include "audio_output.h"
 
 #include "ac3_decoder.h"
+#include "ac3_decoder_thread.h"
+
+#include "intf_msg.h"
+
 #include "ac3_bit_stream.h"
 #include "ac3_internal.h"
 

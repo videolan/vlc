@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.25 2001/02/20 12:06:28 reno Exp $
+ * $Id: ac3_decoder_thread.c,v 1.26 2001/02/22 05:31:55 reno Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -231,7 +231,7 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
         {
             p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = LAST_MDATE;
         }
-
+        
         if (ac3_sync_frame (&p_ac3dec->ac3_decoder, &sync_info))
         {
             sync = 0;

@@ -30,8 +30,11 @@ static __inline__ u32 bitstream_get (ac3_bit_stream_t * p_bit_stream,
     {
         if (p_bit_stream->byte_stream.p_byte >= p_bit_stream->byte_stream.p_end)
         {
+            ac3dec_thread_t * p_ac3dec = p_bit_stream->byte_stream.info;
+            
             /* no, switch to next buffer */
-            ac3_byte_stream_next (&p_bit_stream->byte_stream);
+            if(!p_ac3dec->p_fifo->b_die)
+                ac3_byte_stream_next (&p_bit_stream->byte_stream);
         }
         p_bit_stream->buffer |=((u32) *(p_bit_stream->byte_stream.p_byte++)) 
             << (24 - p_bit_stream->i_available);

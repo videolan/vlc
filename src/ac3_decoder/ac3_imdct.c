@@ -201,6 +201,8 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
     {
         stream_sample_2ch_to_s16_c(buffer, p_ac3dec->samples.channel[0],
                 p_ac3dec->samples.channel[1]);
+    } else {
+        stream_sample_1ch_to_s16_c(buffer, p_ac3dec->samples.channel[0]);
     }
 
     /* XXX?? We don't bother with the IMDCT for the LFE as it's currently

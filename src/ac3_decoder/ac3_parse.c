@@ -24,10 +24,21 @@
 
 #include "defs.h"
 
+#include "config.h"
 #include "common.h"
-#include "intf_msg.h"
 
+#include "threads.h"
+#include "mtime.h"
+
+#include "stream_control.h"
+#include "input_ext-dec.h"
+
+#include "audio_output.h"
+
+#include "intf_msg.h"
 #include "ac3_decoder.h"
+#include "ac3_decoder_thread.h"
+
 #include "ac3_internal.h"
 #include "ac3_bit_stream.h"
 
@@ -94,10 +105,9 @@ int ac3_sync_frame (ac3dec_t * p_ac3dec, ac3_sync_info_t * p_sync_info)
     
     p_ac3dec->bit_stream.total_bits_read = 0;
     p_ac3dec->bit_stream.i_available = 0;
-
+    
     /* sync word - should be 0x0b77 */
-    buf =  bitstream_get(&(p_ac3dec->bit_stream),16);
-    if (buf != 0x0b77)
+    if( (buf =  bitstream_get(&(p_ac3dec->bit_stream),16)) != 0x0b77)
     {
         return 1;
     }

@@ -41,7 +41,6 @@ int __inline__ downmix (ac3dec_t * p_ac3dec, s16 * out_buf)
 {
 
     dm_par_t    dm_par;
-    float       * center = 0;
     
     dm_par.clev = 0.0;
     dm_par.slev = 0.0;
@@ -83,12 +82,11 @@ int __inline__ downmix (ac3dec_t * p_ac3dec, s16 * out_buf)
    		case 2:
    			break;
    		default:	// 1/0
+            /* FIXME
    			if (p_ac3dec->bsi.acmod == 1)
    				center = p_ac3dec->samples.channel[0];
    			else if (p_ac3dec->bsi.acmod == 0)
-   				center = p_ac3dec->samples.channel[0]; /* FIXME */
-    			
-            stream_sample_1ch_to_s16_c (out_buf, center);
+   				center = p_ac3dec->samples.channel[0]; */
             return 1;
 	}
     return 0;
