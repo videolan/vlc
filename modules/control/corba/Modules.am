@@ -5,9 +5,6 @@ SOURCES_corba = corba.c mediacontrol-core.c mediacontrol-plugin.c
 nodist_SOURCES_corba = \
 	MediaControl-common.c \
 	MediaControl-skels.c \
-	MediaControl-skelimpl.c \
-	MediaControl-stubs.c \
-	MediaControl-imodule.c \
 	MediaControl.h \
 	$(NULL)
 
@@ -25,7 +22,7 @@ ORBIT_IDL=$(shell pkg-config --variable=orbit_idl ORBit-2.0)
 GENERATEDFILES = MediaControl-common.c MediaControl-skels.c MediaControl.h
 BUILT_SOURCES += $(GENERATEDFILES) MediaControl-imodule.c
 
-corba.c: MediaControl.h
+## corba.c: MediaControl.h
 
 ## Needed for both MediaControl.so and libcorba_plugin compilation
 INCLUDES = $(LIBMEDIACONTROL_CFLAGS)
@@ -35,11 +32,15 @@ MediaControl.so: MediaControl-imodule.c
 	$(CC) -fPIC -o MediaControl-imodule.o -c $< $(LIBMEDIACONTROL_CFLAGS)
 	$(CC) -shared -o $@ MediaControl-imodule.o $(LIBMEDIACONTROL_LIBS)
 
-$(GENERATEDFILES): MediaControl.idl
-	$(ORBIT_IDL) --skeleton-impl $(corbaidl_DATA)
+$(GENERATEDFILES): $(corbaidl_DATA)
+	$(ORBIT_IDL) $(corbaidl_DATA)
 
+## We invoke 2 times $(ORBIT_IDL), else the --imodule
+## invocation builds MediaControl-common.c without some
+## glue code that is needed.
 MediaControl-imodule.c: $(corbaidl_DATA)
 	$(ORBIT_IDL) --imodule $<
+	$(ORBIT_IDL) $<
 
 clean:
 	$(RM) -f $(GENERATEDFILES)
