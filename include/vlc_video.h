@@ -74,6 +74,7 @@ struct picture_t
      * @{*/
     int             i_status;                             /**< picture flags */
     int             i_type;                /**< is picture a direct buffer ? */
+    vlc_bool_t      b_slow;                 /**< is picture in slow memory ? */
     int             i_matrix_coefficients;   /**< in YUV type, encoding type */
     /**@}*/
 

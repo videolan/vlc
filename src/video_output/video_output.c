@@ -236,12 +236,13 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
 
     /* Initialize pictures and subpictures - translation tables and functions
      * will be initialized later in InitThread */
-    for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES; i_index++)
+    for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES + 1; i_index++)
     {
         p_vout->p_picture[i_index].pf_lock = NULL;
         p_vout->p_picture[i_index].pf_unlock = NULL;
         p_vout->p_picture[i_index].i_status = FREE_PICTURE;
         p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
+        p_vout->p_picture[i_index].b_slow   = 0;
     }
 
     for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++)
@@ -1114,7 +1115,7 @@ static void EndThread( vout_thread_t *p_vout )
     }
 
     /* Destroy all remaining pictures */
-    for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES; i_index++ )
+    for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES + 1; i_index++ )
     {
         if ( p_vout->p_picture[i_index].i_type == MEMORY_PICTURE )
         {

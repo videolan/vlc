@@ -1533,6 +1533,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
     {
         p_pic[i].i_status = DESTROYED_PICTURE;
         p_pic[i].i_type   = DIRECT_PICTURE;
+        p_pic[i].b_slow   = VLC_TRUE;
         p_pic[i].pf_lock  = DirectXLockSurface;
         p_pic[i].pf_unlock = DirectXUnlockSurface;
         PP_OUTPUTPICTURE[i] = &p_pic[i];

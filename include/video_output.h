@@ -123,7 +123,7 @@ struct vout_thread_t
     /**@}*/
 
     /* Picture and subpicture heaps */
-    picture_t           p_picture[2*VOUT_MAX_PICTURES];        /**< pictures */
+    picture_t           p_picture[2*VOUT_MAX_PICTURES+1];      /**< pictures */
     subpicture_t        p_subpicture[VOUT_MAX_PICTURES];    /**< subpictures */
     subpicture_t        *p_default_channel;   /**< subpicture in the default
                                                    channel */
