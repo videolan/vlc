@@ -4138,7 +4138,6 @@ AC_CONFIG_FILES([
   modules/codec/cmml/Makefile
   modules/codec/dmo/Makefile
   modules/codec/ffmpeg/Makefile
-  modules/codec/ffmpeg/postprocessing/Makefile
   modules/codec/ogt/Makefile
   modules/codec/spudec/Makefile
   modules/control/Makefile
