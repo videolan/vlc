@@ -6,6 +6,7 @@
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -144,16 +145,16 @@ int vlc_strncasecmp( const char *s1, const char *s2, size_t n )
 #if !defined( HAVE_STRCASESTR ) && !defined( HAVE_STRISTR )
 char * vlc_strcasestr( const char *psz_big, const char *psz_little )
 {
-    char *p_pos = psz_big;
+    char *p_pos = (char *)psz_big;
 
-    if( !psz_big || !psz_little || !*psz_little ) return psz_big;
+    if( !psz_big || !psz_little || !*psz_little ) return p_pos;
  
     while( *p_pos ) 
     {
         if( toupper( *p_pos ) == toupper( *psz_little ) )
         {
             char * psz_cur1 = p_pos + 1;
-            char * psz_cur2 = psz_little + 1;
+            char * psz_cur2 = (char *)psz_little + 1;
             while( *psz_cur1 && *psz_cur2 &&
                    toupper( *psz_cur1 ) == toupper( *psz_cur2 ) )
             {
@@ -462,7 +463,7 @@ size_t vlc_iconv( vlc_iconv_t cd, char **inbuf, size_t *inbytesleft,
 #if defined(HAVE_ICONV)
     return iconv( cd, inbuf, inbytesleft, outbuf, outbytesleft );
 #else
-    int i_bytes = __MIN(inbytesleft, outbytesleft);
+    int i_bytes = __MIN(*inbytesleft, *outbytesleft);
     if( !inbuf || !outbuf || !i_bytes ) return (size_t)(-1);
     memcpy( *outbuf, *inbuf, i_bytes );
     inbuf += i_bytes;
