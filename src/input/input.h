@@ -46,3 +46,17 @@ typedef struct input_capabilities_s
  *****************************************************************************/
 void InitBitstream  ( struct bit_stream_s *, struct decoder_fifo_s * );
 void NextDataPacket ( struct bit_stream_s * );
+
+/*****************************************************************************
+ * Prototypes from input_programs.c
+ *****************************************************************************/
+void input_InitStream( struct input_thread_s *, size_t );
+struct pgrm_descriptor_s * input_AddProgram( struct input_thread_s *,
+                                             u16, size_t );
+void input_DelProgram( struct input_thread_s *, u16 );
+struct es_descriptor_s * input_AddES( struct input_thread_s *,
+                                      struct pgrm_descriptor_s *, u16,
+                                      size_t );
+void input_DelES( struct input_thread_s *, u16 );
+int input_SelectES( struct input_thread_s *, struct es_descriptor_s * );
+

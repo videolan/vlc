@@ -80,7 +80,6 @@ static int PSProbe( input_thread_t * p_input )
 static void PSInit( input_thread_t * p_input )
 {
     thread_ps_data_t *  p_method;
-    stream_ps_data_t *  p_demux;
 
     if( (p_method =
          (thread_ps_data_t *)malloc( sizeof(thread_ps_data_t) )) == NULL )
@@ -103,19 +102,8 @@ static void PSInit( input_thread_t * p_input )
 
     /* Pre-parse the stream to gather stream_descriptor_t. */
 
-    /* FIXME */
-    p_input->stream.pp_programs =
-         (pgrm_descriptor_t **)malloc( sizeof(pgrm_descriptor_t *) );
-    p_input->stream.pp_programs[0] =
-         (pgrm_descriptor_t *)malloc( sizeof(pgrm_descriptor_t) );
-    p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_START;
-    p_input->stream.pp_programs[0]->delta_cr = 0;
-    p_input->stream.pp_programs[0]->last_cr = 0;
-    p_input->stream.pp_programs[0]->c_average_count = 0;
-
-    p_demux = (stream_ps_data_t *)malloc( sizeof( stream_ps_data_t) );
-    p_input->stream.p_demux_data = (void *)p_demux;
-    p_demux->b_is_PSM_complete = 0;
+    input_InitStream( p_input, 0 );
+    input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
 }
 
 /*****************************************************************************

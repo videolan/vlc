@@ -806,11 +806,12 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         i_id = p_data->p_buffer[3];                     /* ID of the stream. */
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        for( i_dummy = 0; i_dummy < INPUT_MAX_ES; i_dummy++ )
+        for( i_dummy = 0; i_dummy < INPUT_MAX_SELECTED_ES; i_dummy++ )
         {
-            if( p_input->p_es[i_dummy].i_id == i_id )
+            if( p_input->pp_selected_es[i_dummy] != NULL
+                && p_input->pp_selected_es[i_dummy]->i_id == i_id )
             {
-                p_es = &p_input->p_es[i_dummy];
+                p_es = p_input->pp_selected_es[i_dummy];
                 break;
             }
         }
@@ -822,106 +823,36 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
             /* FIXME ! */
             if( (i_id & 0xC0L) == 0xC0L )
             {
+                vlc_mutex_lock( &p_input->stream.stream_lock );
                 /* MPEG video and audio */
-                for( i_dummy = 0; i_dummy < INPUT_MAX_ES; i_dummy++ )
-                {
-                    if( p_input->p_es[i_dummy].i_id == EMPTY_ID )
-                    {
-                        p_es = &p_input->p_es[i_dummy];
-                        break;
-                    }
-                }
+                p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
+                                    i_id, 0 );
 
                 if( p_es != NULL && (i_id & 0xF0L) == 0xE0L )
                 {
                     /* MPEG video */
-                    vdec_config_t * p_config;
-                    p_es->i_id = p_es->i_stream_id = i_id;
+                    p_es->i_stream_id = i_id;
                     p_es->i_type = MPEG2_VIDEO_ES;
-                    p_es->p_pgrm = p_input->stream.pp_programs[0];
-                    p_es->p_pes = NULL;
 
 #ifdef AUTO_SPAWN
-                    p_config = (vdec_config_t *)malloc( sizeof(vdec_config_t) );
-                    p_config->p_vout = p_input->p_default_vout;
-                    /* FIXME ! */
-                    p_config->decoder_config.i_stream_id = i_id;
-                    p_config->decoder_config.i_type = MPEG2_VIDEO_ES;
-                    p_config->decoder_config.p_stream_ctrl =
-                        &p_input->stream.control;
-                    p_config->decoder_config.p_decoder_fifo =
-                        (decoder_fifo_t *)malloc( sizeof(decoder_fifo_t) );
-                    vlc_mutex_init(&p_config->decoder_config.p_decoder_fifo->data_lock);
-                    vlc_cond_init(&p_config->decoder_config.p_decoder_fifo->data_wait);
-                    p_config->decoder_config.p_decoder_fifo->i_start =
-                        p_config->decoder_config.p_decoder_fifo->i_end = 0;
-                    p_config->decoder_config.p_decoder_fifo->b_die = 0;
-                    p_config->decoder_config.p_decoder_fifo->p_packets_mgt =
-                        p_input->p_method_data;
-                    p_config->decoder_config.p_decoder_fifo->pf_delete_pes =
-                        p_input->p_plugin->pf_delete_pes;
-                    p_es->p_decoder_fifo = p_config->decoder_config.p_decoder_fifo;
-                    p_config->decoder_config.pf_init_bit_stream =
-                        InitBitstream;
-                    for( i_dummy = 0; i_dummy < INPUT_MAX_SELECTED_ES; i_dummy++ )
-                    {
-                        if( p_input->pp_selected_es[i_dummy] == NULL )
-                        {
-                            p_input->pp_selected_es[i_dummy] = p_es;
-                            break;
-                        }
-                    }
-
-                    p_es->thread_id = vpar_CreateThread( p_config );
+                    input_SelectES( p_input, p_es );
 #endif
                 }
                 else if( p_es != NULL && (i_id & 0xE0) == 0xC0 )
                 {
                     /* MPEG audio */
-                    adec_config_t * p_config;
-                    p_es->i_id = p_es->i_stream_id = i_id;
+                    p_es->i_stream_id = i_id;
                     p_es->i_type = MPEG2_AUDIO_ES;
-                    p_es->p_pgrm = p_input->stream.pp_programs[0];
-                    p_es->p_pes = NULL;
 
 #ifdef AUTO_SPAWN
-                    p_config = (adec_config_t *)malloc( sizeof(adec_config_t) );
-                    p_config->p_aout = p_input->p_default_aout;
-                    /* FIXME ! */
-                    p_config->decoder_config.i_stream_id = i_id;
-                    p_config->decoder_config.i_type = MPEG2_AUDIO_ES;
-                    p_config->decoder_config.p_stream_ctrl =
-                        &p_input->stream.control;
-                    p_config->decoder_config.p_decoder_fifo =
-                        (decoder_fifo_t *)malloc( sizeof(decoder_fifo_t) );
-                    vlc_mutex_init(&p_config->decoder_config.p_decoder_fifo->data_lock);
-                    vlc_cond_init(&p_config->decoder_config.p_decoder_fifo->data_wait);
-                    p_config->decoder_config.p_decoder_fifo->i_start =
-                        p_config->decoder_config.p_decoder_fifo->i_end = 0;
-                    p_config->decoder_config.p_decoder_fifo->b_die = 0;
-                    p_config->decoder_config.p_decoder_fifo->p_packets_mgt =
-                        p_input->p_method_data;
-                    p_config->decoder_config.p_decoder_fifo->pf_delete_pes =
-                        p_input->p_plugin->pf_delete_pes;
-                    p_es->p_decoder_fifo = p_config->decoder_config.p_decoder_fifo;
-                    p_config->decoder_config.pf_init_bit_stream =
-                        InitBitstream;
-                    for( i_dummy = 0; i_dummy < INPUT_MAX_SELECTED_ES; i_dummy++ )
-                    {
-                        if( p_input->pp_selected_es[i_dummy] == NULL )
-                        {
-                            p_input->pp_selected_es[i_dummy] = p_es;
-                            break;
-                        }
-                    }
-
-                    p_es->thread_id = adec_CreateThread( p_config );
+                    input_SelectES( p_input, p_es );
 #endif
                 }
                 else
                 {
                     b_trash = 1;
                 }
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
             }
             else
                 b_trash = 1;

@@ -188,6 +188,7 @@ INTERFACE =	src/interface/main.o \
 INPUT =		src/input/input_ps.o \
 		src/input/mpeg_system.o \
 		src/input/input_ext-dec.o \
+		src/input/input_programs.o \
 		src/input/input.o
 
 AUDIO_OUTPUT = 	src/audio_output/audio_output.o
