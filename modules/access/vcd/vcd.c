@@ -320,7 +320,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
 static block_t *Block( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int i_skip = p_access->info.i_pos % VCD_DATA_SIZE;
     int i_blocks = VCD_BLOCKS_ONCE;
     block_t *p_block;
     int i_read;
@@ -358,28 +357,30 @@ static block_t *Block( access_t *p_access )
     if( !( p_block = block_New( p_access, i_blocks * VCD_DATA_SIZE ) ) )
     {
         msg_Err( p_access, "cannot get a new block of size: %i",
-		 i_blocks * VCD_DATA_SIZE );
+                 i_blocks * VCD_DATA_SIZE );
         return NULL;
     }
 
     if( ioctl_ReadSectors( VLC_OBJECT(p_access), p_sys->vcddev,
             p_sys->i_sector, p_block->p_buffer, i_blocks, VCD_TYPE ) < 0 )
     {
-        msg_Err( p_access, "cannot read a sector" );
+        msg_Err( p_access, "cannot read sector %i", p_sys->i_sector );
         block_Release( p_block );
+
+        /* Try to skip one sector (in case of bad sectors) */
+        p_sys->i_sector++;
+        p_access->info.i_pos += VCD_DATA_SIZE;
         return NULL;
     }
 
+    /* Update seekpoints */
     for( i_read = 0; i_read < i_blocks; i_read++ )
     {
         input_title_t *t = p_sys->title[p_access->info.i_title];
 
-        /* A good sector read */
-        p_sys->i_sector++;
-
         if( t->i_seekpoint > 0 &&
             p_access->info.i_seekpoint + 1 < t->i_seekpoint &&
-            p_access->info.i_pos - i_skip + i_read * VCD_DATA_SIZE >=
+            p_access->info.i_pos + i_read * VCD_DATA_SIZE >=
             t->seekpoint[p_access->info.i_seekpoint+1]->i_byte_offset )
         {
             msg_Dbg( p_access, "seekpoint change" );
@@ -389,9 +390,7 @@ static block_t *Block( access_t *p_access )
     }
 
     /* Update a few values */
-    p_block->i_buffer = i_read * VCD_DATA_SIZE;
-    p_block->i_buffer -= i_skip;
-    p_block->p_buffer += i_skip;
+    p_sys->i_sector += i_blocks;
     p_access->info.i_pos += p_block->i_buffer;
 
     return p_block;
@@ -407,6 +406,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
     int i_seekpoint;
 
     /* Next sector to read */
+    p_access->info.i_pos = i_pos;
     p_sys->i_sector = i_pos / VCD_DATA_SIZE +
         p_sys->p_sectors[p_access->info.i_title + 1];
 
