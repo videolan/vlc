@@ -3,7 +3,7 @@
  * and TS system layers
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: mpeg_system.h,v 1.2 2000/12/20 16:04:31 massiot Exp $
+ * $Id: mpeg_system.h,v 1.3 2000/12/22 10:58:27 massiot Exp $
  *
  * Authors:
  *
@@ -111,7 +111,6 @@ typedef struct stream_ps_data_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void input_DecodePES( struct input_thread_s *, struct es_descriptor_s * );
 void input_ParsePES( struct input_thread_s *, struct es_descriptor_s * );
 void input_GatherPES( struct input_thread_s *, struct data_packet_s *,
                       struct es_descriptor_s *, boolean_t, boolean_t );

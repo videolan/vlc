@@ -3,7 +3,7 @@
  * decoder
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_dec.h,v 1.1 2000/12/21 19:24:27 massiot Exp $
+ * $Id: input_dec.h,v 1.2 2000/12/22 10:58:27 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -28,3 +28,4 @@
 //decoder_capabilities_s * input_ProbeDecoder( void );
 vlc_thread_t input_RunDecoder( struct decoder_capabilities_s *, void * );
 void input_EndDecoder( struct decoder_fifo_s *, vlc_thread_t );
+void input_DecodePES( struct decoder_fifo_s *, struct pes_packet_s * );

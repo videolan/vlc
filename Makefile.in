@@ -106,7 +106,7 @@ ifeq ($(OPTIMS),1)
 CFLAGS += -O6
 CFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 CFLAGS += -funroll-all-loops -fstrict-aliasing
-#CFLAGS += -fomit-frame-pointer
+CFLAGS += -fomit-frame-pointer
 
 # Optimizations for x86 familiy
 ifneq (,$(findstring 86,$(ARCH)))

@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.14 2000/12/21 19:24:27 massiot Exp $
+ * $Id: mpeg_system.c,v 1.15 2000/12/22 10:58:27 massiot Exp $
  *
  * Authors: 
  *
@@ -42,6 +42,7 @@
 
 #include "input.h"
 #include "mpeg_system.h"
+#include "input_dec.h"
 
 #include "main.h"                           /* AC3/MPEG channel, SPU channel */
 
@@ -53,62 +54,6 @@
 /*
  * PES Packet management
  */
-
-/*****************************************************************************
- * input_DecodePES
- *****************************************************************************
- * Put a PES in the decoder's fifo.
- *****************************************************************************/
-void input_DecodePES( input_thread_t * p_input, es_descriptor_t * p_es )
-{
-#define p_pes (p_es->p_pes)
-
-    if( p_es->p_decoder_fifo != NULL )
-    {
-        vlc_mutex_lock( &p_es->p_decoder_fifo->data_lock );
-
-#if 0
-        if( p_input->stream.b_pace_control )
-        {
-            /* FIXME : normally we shouldn't need this... */
-            while( DECODER_FIFO_ISFULL( *p_es->p_decoder_fifo ) )
-            {
-                vlc_mutex_unlock( &p_es->p_decoder_fifo->data_lock );
-                msleep( 20000 );
-                vlc_mutex_lock( &p_es->p_decoder_fifo->data_lock );
-            }
-        }
-#endif
-
-        if( !DECODER_FIFO_ISFULL( *p_es->p_decoder_fifo ) )
-        {
-            //intf_DbgMsg("Putting %p into fifo %p/%d\n",
-            //            p_pes, p_fifo, p_fifo->i_end);
-            p_es->p_decoder_fifo->buffer[p_es->p_decoder_fifo->i_end] = p_pes;
-            DECODER_FIFO_INCEND( *p_es->p_decoder_fifo );
-
-            /* Warn the decoder that it's got work to do. */
-            vlc_cond_signal( &p_es->p_decoder_fifo->data_wait );
-        }
-        else
-        {
-            /* The FIFO is full !!! This should not happen. */
-            p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
-            intf_ErrMsg( "PES trashed - fifo full ! (%d, %d)",
-                       p_es->i_id, p_es->i_type);
-        }
-        vlc_mutex_unlock( &p_es->p_decoder_fifo->data_lock );
-    }
-    else
-    {
-        intf_ErrMsg("No fifo to receive PES %p (who wrote this damn code ?)",
-                    p_pes);
-        p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
-    }
-    p_pes = NULL;
-
-#undef p_pes
-}
 
 /*****************************************************************************
  * input_ParsePES
@@ -385,7 +330,17 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
 
         /* Now we can eventually put the PES packet in the decoder's
          * PES fifo */
-        input_DecodePES( p_input, p_es );
+        if( p_es->p_decoder_fifo != NULL )
+        {
+            input_DecodePES( p_es->p_decoder_fifo, p_pes );
+        }
+        else
+        {
+            intf_ErrMsg("No fifo to receive PES %p (who wrote this damn code ?)",
+                        p_pes);
+            p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+        }
+        p_pes = NULL;
     }
 #undef p_pes
 }
@@ -438,7 +393,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
 
             p_pes->p_first = p_pad_data;
             p_pes->b_messed_up = p_pes->b_discontinuity = 1;
-            input_DecodePES( p_input, p_es );
+            input_DecodePES( p_es->p_decoder_fifo, p_pes );
         }
 
         p_es->b_discontinuity = 0;

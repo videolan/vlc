@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_dec.c,v 1.1 2000/12/21 19:24:27 massiot Exp $
+ * $Id: input_dec.c,v 1.2 2000/12/22 10:58:27 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -31,6 +31,7 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+#include "intf_msg.h"
 
 #include "stream_control.h"
 #include "input_ext-dec.h"
@@ -68,3 +69,29 @@ void input_EndDecoder( decoder_fifo_t * p_decoder_fifo, vlc_thread_t thread_id )
     }
 }
 
+/*****************************************************************************
+ * input_DecodePES
+ *****************************************************************************
+ * Put a PES in the decoder's fifo.
+ *****************************************************************************/
+void input_DecodePES( decoder_fifo_t * p_decoder_fifo, pes_packet_t * p_pes )
+{
+    vlc_mutex_lock( &p_decoder_fifo->data_lock );
+
+    if( !DECODER_FIFO_ISFULL( *p_decoder_fifo ) )
+    {
+        p_decoder_fifo->buffer[p_decoder_fifo->i_end] = p_pes;
+        DECODER_FIFO_INCEND( *p_decoder_fifo );
+
+        /* Warn the decoder that it's got work to do. */
+        vlc_cond_signal( &p_decoder_fifo->data_wait );
+    }
+    else
+    {
+        /* The FIFO is full !!! This should not happen. */
+        p_decoder_fifo->pf_delete_pes( p_decoder_fifo->p_packets_mgt,
+                                       p_pes );
+        intf_ErrMsg( "PES trashed - fifo full !" );
+    }
+    vlc_mutex_unlock( &p_decoder_fifo->data_lock );
+}

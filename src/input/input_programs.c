@@ -3,7 +3,7 @@
  * FIXME : check the return value of realloc() and malloc() !
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.13 2000/12/21 19:24:27 massiot Exp $
+ * $Id: input_programs.c,v 1.14 2000/12/22 10:58:27 massiot Exp $
  *
  * Authors:
  *
@@ -262,6 +262,10 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     {
         p_es->p_demux_data = malloc( i_data_len );
         memset( p_es->p_demux_data, 0, i_data_len );
+    }
+    else
+    {
+        p_es->p_demux_data = NULL;
     }
 
     /* Add this ES to the program definition if one is given */
