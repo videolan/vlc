@@ -203,7 +203,7 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 
 #if 1
             p_vcd->p_intf->p_sys->b_still = 1;
-            input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+            var_SetInteger( p_input, "state", PAUSE_S );
 #endif
 
             vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -216,7 +216,7 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
             input_ClockManageControl( p_input, p_pgrm, 0 );
 
             p_vcd->p_intf->p_sys->b_still = 1;
-            input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+            var_SetInteger( p_input, "state", PAUSE_S );
 
             return i_read + M2F2_SECTOR_SIZE;
           }
@@ -564,8 +564,7 @@ VCDPlay( input_thread_t *p_input, vcdinfo_itemid_t itemid )
 #if 1
     if ( p_vcd->in_still != b_was_still ) {
       if (p_input->stream.pp_selected_es) {
-	input_SetStatus( p_input, INPUT_STATUS_END );
-	input_SetStatus( p_input, INPUT_STATUS_PLAY );
+        var_SetInteger( p_input, "state", PLAYING_S );
       }
     }
 #endif

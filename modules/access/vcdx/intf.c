@@ -2,7 +2,7 @@
  * intf.c: Video CD interface to handle user interaction and still time
  *****************************************************************************
  * Copyright (C) 2002,2003 VideoLAN
- * $Id: intf.c,v 1.12 2003/12/22 14:32:55 sam Exp $
+ * $Id$
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *   from DVD code by Stéphane Borel <stef@via.ecp.fr>
@@ -139,8 +139,7 @@ static void RunIntf( intf_thread_t *p_intf )
             {
                 /* Still time has elasped; set to continue playing. */
                 dbg_print(INPUT_DBG_STILL, "wait time done - setting play");
-                input_SetStatus( p_intf->p_sys->p_input,
-                                 INPUT_STATUS_PLAY );
+                var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
                 p_intf->p_sys->m_still_time = 0;
                 p_intf->p_sys->b_still = 0;
                 mlast = 0;
@@ -233,7 +232,7 @@ static void RunIntf( intf_thread_t *p_intf )
             if( p_intf->p_sys->b_still )
               {
                 dbg_print(INPUT_DBG_STILL, "Playing still after activate");
-                input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+                var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
                 p_intf->p_sys->b_still = 0;
                 p_intf->p_sys->b_inf_still = 0;
                 p_intf->p_sys->m_still_time = 0;
@@ -383,7 +382,7 @@ int vcdIntfResetStillTime( intf_thread_t *p_intf )
 {
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_sys->m_still_time = 0;
-    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+    var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
     vlc_mutex_unlock( &p_intf->change_lock );
 
     return VLC_SUCCESS;

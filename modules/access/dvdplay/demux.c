@@ -2,7 +2,7 @@
  * demux.c: demux functions for dvdplay.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: demux.c,v 1.8 2004/03/03 20:39:51 gbazin Exp $
+ * $Id$
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -176,7 +176,7 @@ static int Demux( input_thread_t * p_input )
         pgrm_descriptor_t * p_pgrm;
 
         /* when we receive still_time flag, we have to pause immediately */
-        input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+        var_SetInteger( p_input, "state", PAUSE_S );
 
         dvdIntfStillTime( p_dvd->p_intf, p_dvd->i_still_time );
         p_dvd->i_still_time = 0;

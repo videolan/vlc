@@ -2,7 +2,7 @@
  * intf.c: interface for DVD video manager
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.9 2003/10/29 01:33:27 gbazin Exp $
+ * $Id$
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -144,8 +144,7 @@ static void RunIntf( intf_thread_t *p_intf )
             else
             {
                 /* still time elasped */
-                input_SetStatus( p_intf->p_sys->p_input,
-                                 INPUT_STATUS_PLAY );
+                var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
                 p_intf->p_sys->m_still_time = 0;
                 p_intf->p_sys->b_still = 0;
                 mlast = 0;
@@ -163,8 +162,7 @@ static void RunIntf( intf_thread_t *p_intf )
                 }
                 if( !p_intf->p_sys->m_still_time )
                 {
-                    input_SetStatus( p_intf->p_sys->p_input,
-                                     INPUT_STATUS_PLAY );
+                    var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
                 }
                 mlast = mtime;
             }
@@ -207,7 +205,7 @@ static void RunIntf( intf_thread_t *p_intf )
 
             if( i_activate && p_intf->p_sys->b_still )
             {
-                input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+                var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
                 p_intf->p_sys->b_still = 0;
                 p_intf->p_sys->b_inf_still = 0;
                 p_intf->p_sys->m_still_time = 0;
@@ -268,7 +266,7 @@ static void RunIntf( intf_thread_t *p_intf )
                 
                 if( i_activate && p_intf->p_sys->b_still )
                 {
-                    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+                    var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
                     p_intf->p_sys->b_still = 0;
                     p_intf->p_sys->b_inf_still = 0;
                     p_intf->p_sys->m_still_time = 0;
@@ -441,7 +439,7 @@ int dvdIntfResetStillTime( intf_thread_t *p_intf )
 {
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_sys->m_still_time = 0;
-    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+    var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
     vlc_mutex_unlock( &p_intf->change_lock );
 
     return VLC_SUCCESS;
