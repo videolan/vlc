@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.49 2004/01/22 00:24:45 hartman Exp $
+ * $Id: sap.c,v 1.50 2004/01/22 01:14:50 sigmunau Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -403,8 +403,8 @@ static void Run( intf_thread_t *p_intf )
         for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
         {
            struct sap_announce_t *p_announce;
-           if( mdate() - p_intf->p_sys->pp_announces[i]->i_last > 1000000*
-               p_sys->i_timeout )
+           mtime_t i_timeout = (mtime_t)1000000*p_sys->i_timeout;
+           if( mdate() - p_intf->p_sys->pp_announces[i]->i_last > i_timeout )
            {
                msg_Dbg(p_intf,"Time out for %s, deleting (%i/%i)",
                        p_intf->p_sys->pp_announces[i]->psz_name,
@@ -900,6 +900,7 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                      p_intf->p_sys->i_announces,
                      p_intf->p_sys->i_announces,
                      p_announce );
+        free( psz_item_uri );
     }
 }
 
