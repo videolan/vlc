@@ -379,8 +379,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case ACCESS_SET_PRIVATE_ID_STATE:
-            b_bool = (vlc_bool_t)va_arg( args, vlc_bool_t ); /* b_selected */
             i_int  = (int)va_arg( args, int );               /* Private data (pid for now)*/
+            b_bool = (vlc_bool_t)va_arg( args, vlc_bool_t ); /* b_selected */
             if( !p_sys->b_budget_mode )
             {
                 /* FIXME we may want to give the real type (me ?, I don't ;) */

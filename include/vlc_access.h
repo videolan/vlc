@@ -54,7 +54,7 @@ enum access_query_e
 
     /* Special mode for access/demux communication
      * XXX: avoid to use it unless you can't */
-    ACCESS_SET_PRIVATE_ID_STATE,    /* arg1= vlc_bool_t b_selected, int i_private_data can fail */
+    ACCESS_SET_PRIVATE_ID_STATE,    /* arg1= int i_private_data, vlc_bool_t b_selected can fail */
 };
 
 struct access_t
