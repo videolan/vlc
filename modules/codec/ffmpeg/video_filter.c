@@ -50,6 +50,7 @@ struct filter_sys_t
 {
     vlc_bool_t b_resize;
     vlc_bool_t b_convert;
+    vlc_bool_t b_resize_first;
 
     es_format_t fmt_in;
     int i_src_ffmpeg_chroma;
@@ -98,7 +99,6 @@ int E_(OpenFilter)( vlc_object_t *p_this )
 
     /* Misc init */
     p_sys->p_rsc = NULL;
-    p_sys->b_convert = b_convert;
     p_sys->i_src_ffmpeg_chroma =
         E_(GetFfmpegChroma)( p_filter->fmt_in.video.i_chroma );
     p_sys->i_dst_ffmpeg_chroma =
@@ -107,29 +107,15 @@ int E_(OpenFilter)( vlc_object_t *p_this )
     es_format_Init( &p_sys->fmt_in, 0, 0 );
     es_format_Init( &p_sys->fmt_out, 0, 0 );
 
+    /* Dummy alloc, will be reallocated in CheckInit */
+    avpicture_alloc( &p_sys->tmp_pic, p_sys->i_src_ffmpeg_chroma,
+                     p_filter->fmt_out.video.i_width,
+                     p_filter->fmt_out.video.i_height );
+
     if( CheckInit( p_filter ) != VLC_SUCCESS )
     {
         free( p_sys );
         return VLC_EGENERIC;
-    }
-
-    if( p_sys->b_resize && p_sys->b_convert )
-    {
-        if ( p_filter->fmt_in.video.i_width * p_filter->fmt_in.video.i_height >
-             p_filter->fmt_out.video.i_width * p_filter->fmt_out.video.i_height )
-        {
-            /* Resizing then conversion */
-            avpicture_alloc( &p_sys->tmp_pic, p_sys->i_src_ffmpeg_chroma,
-                             p_filter->fmt_out.video.i_width,
-                             p_filter->fmt_out.video.i_height );
-        }
-        else
-        {
-            /* Conversion then resizing */
-            avpicture_alloc( &p_sys->tmp_pic, p_sys->i_dst_ffmpeg_chroma,
-                             p_filter->fmt_in.video.i_width,
-                             p_filter->fmt_in.video.i_height );
-        }
     }
 
     msg_Dbg( p_filter, "input: %ix%i %4.4s -> %ix%i %4.4s",
@@ -174,9 +160,20 @@ static int CheckInit( filter_t *p_filter )
         if( p_sys->p_rsc ) img_resample_close( p_sys->p_rsc );
         p_sys->p_rsc = 0;
 
+        p_sys->b_convert =
+          p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma;
+
         p_sys->b_resize =
           p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width ||
           p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height;
+
+        p_sys->b_resize_first =
+          p_filter->fmt_in.video.i_width * p_filter->fmt_in.video.i_height >
+          p_filter->fmt_out.video.i_width * p_filter->fmt_out.video.i_height;
+
+        if( E_(GetFfmpegChroma)( p_filter->fmt_in.video.i_chroma ) !=
+            VLC_FOURCC('I','4','2','0') )
+            p_sys->b_resize_first = VLC_FALSE;
 
         if( p_sys->b_resize )
         {
@@ -190,6 +187,23 @@ static int CheckInit( filter_t *p_filter )
                 msg_Err( p_filter, "img_resample_init failed" );
                 return VLC_EGENERIC;
             }
+        }
+
+        avpicture_free( &p_sys->tmp_pic );
+
+        if( p_sys->b_resize_first )
+        {
+            /* Resizing then conversion */
+            avpicture_alloc( &p_sys->tmp_pic, p_sys->i_src_ffmpeg_chroma,
+                             p_filter->fmt_out.video.i_width,
+                             p_filter->fmt_out.video.i_height );
+        }
+        else
+        {
+            /* Conversion then resizing */
+            avpicture_alloc( &p_sys->tmp_pic, p_sys->i_dst_ffmpeg_chroma,
+                             p_filter->fmt_in.video.i_width,
+                             p_filter->fmt_in.video.i_height );
         }
 
         p_sys->fmt_in = p_filter->fmt_in;
@@ -208,7 +222,6 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
     AVPicture src_pic, dest_pic, inter_pic;
     AVPicture *p_src, *p_dst;
     picture_t *p_pic_dst;
-    vlc_bool_t b_resize = p_sys->b_resize;
     int i;
 
     /* Check if format properties changed */
@@ -256,15 +269,13 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
 
     p_src = &src_pic;
 
-    if( b_resize && p_sys->p_rsc )
+    if( p_sys->b_resize && p_sys->p_rsc )
     {
         p_dst = &dest_pic;
-        if ( p_filter->fmt_in.video.i_width * p_filter->fmt_in.video.i_height >
-             p_filter->fmt_out.video.i_width * p_filter->fmt_out.video.i_height )
+        if( p_sys->b_resize_first )
         {
-            if ( p_sys->b_convert ) p_dst = &p_sys->tmp_pic;
+            if( p_sys->b_convert ) p_dst = &p_sys->tmp_pic;
             img_resample( p_sys->p_rsc, p_dst, p_src );
-            b_resize = VLC_FALSE;
             p_src = p_dst;
         }
     }
@@ -273,7 +284,7 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
     {
         video_format_t *p_fmt = &p_filter->fmt_out.video;
         p_dst = &dest_pic;
-        if( b_resize )
+        if( p_sys->b_resize && !p_sys->b_resize_first )
         {
             p_dst = &p_sys->tmp_pic;
             p_fmt = &p_filter->fmt_in.video;
@@ -286,7 +297,7 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
         p_src = p_dst;
     }
 
-    if( b_resize && p_sys->p_rsc )
+    if( p_sys->b_resize && !p_sys->b_resize_first && p_sys->p_rsc )
     {
         p_dst = &dest_pic;
         img_resample( p_sys->p_rsc, p_dst, p_src );
