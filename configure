@@ -3359,7 +3359,7 @@ else
 #include "confdefs.h"
 #include <sys/types.h>
 int main() {
-void quux() { boolean_t foo; }
+boolean_t foo;
 ; return 0; }
 EOF
 if { (eval echo configure:3366: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
@@ -3392,7 +3392,7 @@ else
 #include "confdefs.h"
 #include <pthread.h>
 int main() {
-void quux() { boolean_t foo; }
+boolean_t foo;
 ; return 0; }
 EOF
 if { (eval echo configure:3399: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
@@ -3425,7 +3425,7 @@ else
 #include "confdefs.h"
 #include <cthreads.h>
 int main() {
-void quux() { boolean_t foo; }
+boolean_t foo;
 ; return 0; }
 EOF
 if { (eval echo configure:3432: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
@@ -3718,7 +3718,7 @@ else
 #include "confdefs.h"
 
 int main() {
-void quux(){void *p;asm volatile("packuswb %%mm1,%%mm2"::"r"(p));}
+void *p;asm volatile("packuswb %%mm1,%%mm2"::"r"(p));
 ; return 0; }
 EOF
 if { (eval echo configure:3725: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
@@ -3748,7 +3748,7 @@ else
 #include "confdefs.h"
 
 int main() {
-void quux(){void *p;asm volatile("maskmovq %%mm1,%%mm2"::"r"(p));}
+void *p;asm volatile("maskmovq %%mm1,%%mm2"::"r"(p));
 ; return 0; }
 EOF
 if { (eval echo configure:3755: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
@@ -3778,7 +3778,7 @@ else
 #include "confdefs.h"
 
 int main() {
-void quux(){void *p;asm volatile("pfadd %%mm1,%%mm2"::"r"(p));}
+void *p;asm volatile("pfadd %%mm1,%%mm2"::"r"(p));
 ; return 0; }
 EOF
 if { (eval echo configure:3785: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
@@ -3812,7 +3812,7 @@ else
 #include "confdefs.h"
 
 int main() {
-void quux(){void *p;asm volatile("xorps %%xmm1,%%xmm2"::"r"(p));}
+void *p;asm volatile("xorps %%xmm1,%%xmm2"::"r"(p));
 ; return 0; }
 EOF
 if { (eval echo configure:3819: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
@@ -3846,7 +3846,7 @@ else
 #include "confdefs.h"
 
 int main() {
-void quux(){asm volatile("vperm 0,1,2,3");}
+asm volatile("vperm 0,1,2,3");
 ; return 0; }
 EOF
 if { (eval echo configure:3853: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
@@ -3863,7 +3863,7 @@ else
 #include "confdefs.h"
 
 int main() {
-void quux(){asm volatile("vperm 0,1,2,3");}
+asm volatile("vperm 0,1,2,3");
 ; return 0; }
 EOF
 if { (eval echo configure:3870: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
@@ -3904,7 +3904,7 @@ else
 #include "confdefs.h"
 
 int main() {
-void quux(){vec_mtvscr((vector unsigned int)(0));}
+vec_mtvscr((vector unsigned int)(0));
 ; return 0; }
 EOF
 if { (eval echo configure:3911: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
@@ -3922,7 +3922,7 @@ else
 #include "confdefs.h"
 
 int main() {
-void quux(){vec_mtvscr((vector unsigned int)(0));}
+vec_mtvscr((vector unsigned int)(0));
 ; return 0; }
 EOF
 if { (eval echo configure:3929: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then

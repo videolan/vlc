@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.1 2001/11/13 12:09:18 henri Exp $
+ * $Id: spu_decoder.c,v 1.2 2001/11/13 15:08:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -89,7 +89,7 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     p_module->i_capabilities = MODULE_CAPABILITY_DEC;
-    p_module->psz_longname = "Subtitles decoder module";
+    p_module->psz_longname = "subtitles decoder module";
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

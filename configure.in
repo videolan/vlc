@@ -262,7 +262,7 @@ LDFLAGS="${save_LDFLAGS}"
 dnl Check for boolean_t
 AC_CACHE_CHECK([for boolean_t in sys/types.h],
     [ac_cv_c_boolean_t_sys_types_h],
-    [AC_TRY_COMPILE([#include <sys/types.h>], [void quux() { boolean_t foo; }],
+    [AC_TRY_COMPILE([#include <sys/types.h>], [boolean_t foo;],
      ac_cv_c_boolean_t_sys_types_h=yes, ac_cv_c_boolean_t_sys_types_h=no)])
 if test x"$ac_cv_c_boolean_t_sys_types_h" != x"no"; then
     AC_DEFINE(BOOLEAN_T_IN_SYS_TYPES_H, 1, Define if <sys/types.h> defines boolean_t.)
@@ -270,7 +270,7 @@ fi
 
 AC_CACHE_CHECK([for boolean_t in pthread.h],
     [ac_cv_c_boolean_t_pthread_h],
-    [AC_TRY_COMPILE([#include <pthread.h>], [void quux() { boolean_t foo; }],
+    [AC_TRY_COMPILE([#include <pthread.h>], [boolean_t foo;],
      ac_cv_c_boolean_t_pthread_h=yes, ac_cv_c_boolean_t_pthread_h=no)])
 if test x"$ac_cv_c_boolean_t_pthread_h" != x"no"; then
     AC_DEFINE(BOOLEAN_T_IN_PTHREAD_H, 1, Define if <pthread.h> defines boolean_t.)
@@ -278,7 +278,7 @@ fi
 
 AC_CACHE_CHECK([for boolean_t in cthreads.h],
     [ac_cv_c_boolean_t_cthreads_h],
-    [AC_TRY_COMPILE([#include <cthreads.h>], [void quux() { boolean_t foo; }],
+    [AC_TRY_COMPILE([#include <cthreads.h>], [boolean_t foo;],
      ac_cv_c_boolean_t_cthreads_h=yes, ac_cv_c_boolean_t_cthreads_h=no)])
 if test x"$ac_cv_c_boolean_t_cthreads_h" != x"no"; then
     AC_DEFINE(BOOLEAN_T_IN_CTHREADS_H, 1, Define if <cthreads.h> defines boolean_t.)
@@ -309,7 +309,7 @@ ALTIVEC_MODULES="idctaltivec motionaltivec"
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [ac_cv_mmx_inline],
-    [AC_TRY_COMPILE(,[void quux(){void *p;asm volatile("packuswb %%mm1,%%mm2"::"r"(p));}],
+    [AC_TRY_COMPILE(,[void *p;asm volatile("packuswb %%mm1,%%mm2"::"r"(p));],
                     ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
 if test x"$ac_cv_mmx_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
@@ -317,7 +317,7 @@ fi
 
 AC_CACHE_CHECK([if \$CC groks MMX EXT inline assembly],
     [ac_cv_mmxext_inline],
-    [AC_TRY_COMPILE(,[void quux(){void *p;asm volatile("maskmovq %%mm1,%%mm2"::"r"(p));}],
+    [AC_TRY_COMPILE(,[void *p;asm volatile("maskmovq %%mm1,%%mm2"::"r"(p));],
                     ac_cv_mmxext_inline=yes, ac_cv_mmxext_inline=no)])
 if test x"$ac_cv_mmxext_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMXEXT_MODULES}"
@@ -325,7 +325,7 @@ fi
 
 AC_CACHE_CHECK([if \$CC groks 3D Now! inline assembly],
     [ac_cv_3dnow_inline],
-    [AC_TRY_COMPILE(,[void quux(){void *p;asm volatile("pfadd %%mm1,%%mm2"::"r"(p));}],
+    [AC_TRY_COMPILE(,[void *p;asm volatile("pfadd %%mm1,%%mm2"::"r"(p));],
                     ac_cv_3dnow_inline=yes, ac_cv_3dnow_inline=no)])
 if test x"$ac_cv_3dnow_inline" != x"no"; then
   AC_DEFINE(HAVE_3DNOW, 1, Define if \$CC groks 3D Now! inline assembly.)
@@ -334,7 +334,7 @@ fi
 
 AC_CACHE_CHECK([if \$CC groks SSE inline assembly],
     [ac_cv_sse_inline],
-    [AC_TRY_COMPILE(,[void quux(){void *p;asm volatile("xorps %%xmm1,%%xmm2"::"r"(p));}],
+    [AC_TRY_COMPILE(,[void *p;asm volatile("xorps %%xmm1,%%xmm2"::"r"(p));],
                     ac_cv_sse_inline=yes, ac_cv_sse_inline=no)])
 if test x"$ac_cv_sse_inline" != x"no"; then
   AC_DEFINE(HAVE_SSE, 1, Define if \$CC groks SSE inline assembly.)
@@ -343,11 +343,11 @@ fi
 
 AC_CACHE_CHECK([if \$CC groks Altivec inline assembly],
     [ac_cv_altivec_inline],
-    [AC_TRY_COMPILE(,[void quux(){asm volatile("vperm 0,1,2,3");}],
+    [AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
          ac_cv_altivec_inline=yes,
          [save_CFLAGS=$CFLAGS
           CFLAGS="$CFLAGS -Wa,-m7400"
-          AC_TRY_COMPILE(,[void quux(){asm volatile("vperm 0,1,2,3");}],
+          AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
             [ac_cv_altivec_inline=yes; CFLAGS_ALTIVEC="-Wa,-m7400"],
             ac_cv_altivec_inline=no)
           CFLAGS=$save_CFLAGS
@@ -362,11 +362,11 @@ AC_CACHE_CHECK([if \$CC groks Altivec C extensions],
     [save_CFLAGS=$CFLAGS
      CFLAGS="$CFLAGS -faltivec"
      # Darwin test
-     AC_TRY_COMPILE(,[void quux(){vec_mtvscr((vector unsigned int)(0));}],
+     AC_TRY_COMPILE(,[vec_mtvscr((vector unsigned int)(0));],
         ac_cv_c_altivec=-faltivec, [
         # Linux/PPC test
         CFLAGS="$save_CFLAGS $CFLAGS_ALTIVEC -fvec"
-        AC_TRY_COMPILE(,[void quux(){vec_mtvscr((vector unsigned int)(0));}],
+        AC_TRY_COMPILE(,[vec_mtvscr((vector unsigned int)(0));],
             [ac_cv_c_altivec="-fvec"], ac_cv_c_altivec=no)
         ])
      CFLAGS=$save_CFLAGS

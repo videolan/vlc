@@ -1,4 +1,4 @@
-/* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
+/* include/defs.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
 
 /* Define to empty if the keyword does not work.  */
 #undef const
