@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.16 2002/01/22 23:14:26 massiot Exp $
+ * $Id: ac3_adec.c,v 1.17 2002/01/23 23:14:59 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -254,8 +254,13 @@ static int decoder_Run ( decoder_config_t * p_config )
              int i_sync_ptr;
 #define p_bit_stream (&p_ac3thread->ac3_decoder->bit_stream)
 
-             /* Go to the next data packet and jump to sync_ptr */
-             BitstreamNextDataPacket( p_bit_stream );
+             /* Go to the next PES packet and jump to sync_ptr */
+             do {
+                BitstreamNextDataPacket( p_bit_stream );
+             } while( !p_bit_stream->p_decoder_fifo->b_die
+                       && !p_bit_stream->p_decoder_fifo->b_error
+                       && p_bit_stream->p_data !=
+                          p_bit_stream->p_decoder_fifo->p_first->p_first );
              i_sync_ptr = *(p_bit_stream->p_byte - 2) << 8
                             | *(p_bit_stream->p_byte - 1);
              p_bit_stream->p_byte += i_sync_ptr;
