@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
- * Copyright (C) 1999-2004 VideoLAN
+ * Copyright (C) 1999-2005 VideoLAN
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -42,6 +42,7 @@
 #include <wx/accel.h>
 #include <wx/checkbox.h>
 #include <wx/wizard.h>
+#include <wx/taskbar.h>
 #include "vlc_keys.h"
 
 
@@ -93,6 +94,7 @@ class DialogsProvider;
 class PrefsTreeCtrl;
 class AutoBuiltPanel;
 class VideoWindow;
+class Systray;
 
 /*****************************************************************************
  * intf_sys_t: description and status of wxwindows interface
@@ -289,11 +291,15 @@ class Interface: public wxFrame
 {
 public:
     /* Constructor */
-    Interface( intf_thread_t *p_intf );
+    Interface( intf_thread_t *p_intf, long style = wxDEFAULT_FRAME_STYLE );
     virtual ~Interface();
     void Init();
     void TogglePlayButton( int i_playing_status );
     void Update();
+    void PlayStream();
+    void StopStream();
+    void PrevStream();
+    void NextStream();
 
     wxBoxSizer  *frame_sizer;
     wxStatusBar *statusbar;
@@ -314,8 +320,8 @@ public:
     vlc_bool_t b_extra;
     vlc_bool_t b_undock;
 
-
     wxGauge     *volctrl;
+    Systray     *p_systray;
 
 private:
     void SetupHotkeys();
@@ -576,7 +582,7 @@ private:
     /* Event specific to the announce address */
     void OnAnnounceGroupChange( wxCommandEvent& event );
     void OnAnnounceAddrChange( wxCommandEvent& event );
-    
+
     /* Event handlers for the encapsulation panel */
     void OnEncapsulationChange( wxCommandEvent& event );
 
@@ -969,7 +975,6 @@ private:
     wxTreeItemId fileinfo_root;
     wxString fileinfo_root_label;
 
-
 };
 
 #if wxUSE_DRAG_AND_DROP
@@ -1017,3 +1022,4 @@ private:
 
 } // end of wxvlc namespace
 using namespace wxvlc;
+

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2004 VideoLAN
+ * Copyright (C) 2000-2005 VideoLAN
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -39,7 +39,7 @@
 #include "wxwindows.h"
 
 /* Temporary hack */
-#if defined(WIN32) && defined(_WX_INIT_H_) 
+#if defined(WIN32) && defined(_WX_INIT_H_)
 #if (wxMAJOR_VERSION <= 2) && (wxMINOR_VERSION <= 5) && (wxRELEASE_NUMBER < 3)
 /* Hack to detect wxWindows 2.5 which has a different wxEntry() prototype */
 extern int wxEntry( HINSTANCE hInstance, HINSTANCE hPrevInstance = NULL,
@@ -89,6 +89,10 @@ private:
 #define BOOKMARKS_TEXT N_("Show bookmarks dialog")
 #define BOOKMARKS_LONGTEXT N_("Show bookmarks dialog when the interface " \
     "starts.")
+#define TASKBAR_TEXT N_("Show taskbar entry")
+#define TASKBAR_LONGTEXT N_("Show taskbar entry")
+#define SYSTRAY_TEXT N_("Show systray icon")
+#define SYSTRAY_LONGTEXT N_("Show systray icon")
 
 vlc_module_begin();
 #ifdef WIN32
@@ -111,6 +115,10 @@ vlc_module_begin();
               EMBED_TEXT, EMBED_LONGTEXT, VLC_FALSE );
     add_bool( "wxwin-bookmarks", 0, NULL,
               BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_FALSE );
+    add_bool( "wxwin-taskbar", 1, NULL,
+              TASKBAR_TEXT, TASKBAR_LONGTEXT, VLC_FALSE );
+    add_bool( "wxwin-systray", 0, NULL,
+              SYSTRAY_TEXT, SYSTRAY_LONGTEXT, VLC_FALSE );
 
     add_submodule();
     set_description( _("wxWindows dialogs provider") );
@@ -296,7 +304,12 @@ bool Instance::OnInit()
     if( !p_intf->pf_show_dialog )
     {
         /* The module is used in interface mode */
-        Interface *MainInterface = new Interface( p_intf );
+        long style = wxDEFAULT_FRAME_STYLE;
+        if ( ! config_GetInt( p_intf, "wxwin-taskbar" ) )
+        {
+            style = wxDEFAULT_FRAME_STYLE|wxFRAME_NO_TASKBAR;
+        }
+        Interface *MainInterface = new Interface( p_intf, style );
         p_intf->p_sys->p_wxwindow = MainInterface;
 
         /* Show the interface */

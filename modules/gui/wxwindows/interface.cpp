@@ -49,6 +49,8 @@
 
 /* include the icon graphic */
 #include "../../../share/vlc32x32.xpm"
+/* include a small icon graphic for the systray icon */
+#include "../../../share/vlc16x16.xpm"
 
 /*****************************************************************************
  * Local class declarations.
@@ -96,6 +98,26 @@ BEGIN_EVENT_TABLE(wxVolCtrl, wxWindow)
     EVT_LEFT_DOWN(wxVolCtrl::OnChange)
     EVT_MOTION(wxVolCtrl::OnChange)
 END_EVENT_TABLE()
+
+/* Systray integration */
+class Systray: public wxTaskBarIcon
+{
+public:
+    Systray( Interface* p_main_interface );
+    virtual ~Systray() {};
+    wxMenu* CreatePopupMenu();
+
+private:
+    void OnLeftClick( wxTaskBarIconEvent& event );
+    void OnPlayStream ( wxCommandEvent& event );
+    void OnStopStream ( wxCommandEvent& event );
+    void OnPrevStream ( wxCommandEvent& event );
+    void OnNextStream ( wxCommandEvent& event );
+    void OnExit(  wxCommandEvent& event );
+    Interface* p_main_interface;
+    DECLARE_EVENT_TABLE()
+};
+
 
 /*****************************************************************************
  * Event Table.
@@ -146,7 +168,9 @@ enum
     /* it is important for the id corresponding to the "About" command to have
      * this standard value as otherwise it won't be handled properly under Mac
      * (where it is special and put into the "Apple" menu) */
-    About_Event = wxID_ABOUT
+    About_Event = wxID_ABOUT,
+
+    Iconize_Event
 };
 
 BEGIN_EVENT_TABLE(Interface, wxFrame)
@@ -201,12 +225,24 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
 
 END_EVENT_TABLE()
 
+BEGIN_EVENT_TABLE(Systray, wxTaskBarIcon)
+    /* Mouse events */
+    EVT_TASKBAR_LEFT_DOWN(Systray::OnLeftClick)
+    /* Menu events */
+    EVT_MENU(Iconize_Event, Systray::OnLeftClick)
+    EVT_MENU(Exit_Event, Systray::OnExit)
+    EVT_MENU(PlayStream_Event, Systray::OnPlayStream)
+    EVT_MENU(NextStream_Event, Systray::OnNextStream)
+    EVT_MENU(PrevStream_Event, Systray::OnPrevStream)
+    EVT_MENU(StopStream_Event, Systray::OnStopStream)
+END_EVENT_TABLE()
+
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-Interface::Interface( intf_thread_t *_p_intf ):
+Interface::Interface( intf_thread_t *_p_intf, long style ):
     wxFrame( NULL, -1, wxT("VLC media player"),
-             wxDefaultPosition, wxSize(700,100), wxDEFAULT_FRAME_STYLE )
+             wxDefaultPosition, wxSize(700,100), style )
 {
     /* Initializations */
     p_intf = _p_intf;
@@ -217,7 +253,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     extra_window = NULL;
 
     /* Give our interface a nice little icon */
-    SetIcon( wxIcon( vlc_xpm ) );
+    SetIcon( wxIcon( vlc16x16_xpm ) );
 
     /* Create a sizer for the main frame */
     frame_sizer = new wxBoxSizer( wxVERTICAL );
@@ -228,6 +264,18 @@ Interface::Interface( intf_thread_t *_p_intf ):
                                       wxSize(0,0) );
     p_dummy->SetFocus();
     frame_sizer->Add( p_dummy, 0, 0 );
+
+    /* Systray integration */
+    p_systray = NULL;
+    if ( config_GetInt( p_intf, "wxwin-systray" ) )
+    {
+        p_systray = new Systray(this);
+        p_systray->SetIcon( wxIcon( vlc_xpm ), wxT("VLC media player") );
+        if ( (! p_systray->IsOk()) || (! p_systray->IsIconInstalled()) )
+        {
+            msg_Warn(p_intf, "Cannot set systray icon, weird things may happen");
+        }
+    }
 
     /* Creation of the menu bar */
     CreateOurMenuBar();
@@ -280,6 +328,11 @@ Interface::Interface( intf_thread_t *_p_intf ):
 
 Interface::~Interface()
 {
+    if( p_systray )
+    {
+        delete p_systray;
+    }
+
     if( p_intf->p_sys->p_wxwindow )
     {
         delete p_intf->p_sys->p_wxwindow;
@@ -874,7 +927,13 @@ void Interface::OnUndock(wxCommandEvent& event)
 }
 #endif
 
+
 void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
+{
+    PlayStream();
+}
+
+void Interface::PlayStream()
 {
     wxCommandEvent dummy;
     playlist_t *p_playlist =
@@ -925,6 +984,10 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
 }
 
 void Interface::OnStopStream( wxCommandEvent& WXUNUSED(event) )
+{
+    StopStream();
+}
+void Interface::StopStream()
 {
     playlist_t * p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -990,6 +1053,11 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
 
 void Interface::OnPrevStream( wxCommandEvent& WXUNUSED(event) )
 {
+    PrevStream();
+}
+
+void Interface::PrevStream()
+{
     playlist_t * p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                        FIND_ANYWHERE );
@@ -1019,6 +1087,11 @@ void Interface::OnPrevStream( wxCommandEvent& WXUNUSED(event) )
 }
 
 void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
+{
+    NextStream();
+}
+
+void Interface::NextStream()
 {
     playlist_t * p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -1221,3 +1294,59 @@ void wxVolCtrl::UpdateVolume()
     SetToolTip( wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
                 i_gauge_volume / 2 ) );
 }
+
+/*****************************************************************************
+ * Definition of Systray class.
+ *****************************************************************************/
+
+Systray::Systray( Interface *_p_main_interface )
+{
+    p_main_interface = _p_main_interface;
+}
+
+/* Event handlers */
+void Systray::OnLeftClick( wxTaskBarIconEvent& event )
+{
+    p_main_interface->Show( ! p_main_interface->IsShown() );
+}
+
+void Systray::OnExit( wxCommandEvent& event )
+{
+    p_main_interface->Close(TRUE);
+}
+
+void Systray::OnPrevStream( wxCommandEvent& event )
+{
+    p_main_interface->PrevStream();
+}
+
+void Systray::OnNextStream( wxCommandEvent& event )
+{
+    p_main_interface->NextStream();
+}
+
+void Systray::OnPlayStream( wxCommandEvent& event )
+{
+    p_main_interface->PlayStream();
+}
+
+void Systray::OnStopStream( wxCommandEvent& event )
+{
+    p_main_interface->StopStream();
+}
+
+/* Systray popup menu */
+wxMenu* Systray::CreatePopupMenu()
+{
+    wxMenu* systray_menu = new wxMenu;
+    systray_menu->Append( Exit_Event, wxU(_("Quit VLC")) );
+    systray_menu->AppendSeparator();
+    systray_menu->Append( PlayStream_Event, wxU(_("Play/Pause")) );
+    systray_menu->Append( PrevStream_Event, wxU(_("Previous")) );
+    systray_menu->Append( NextStream_Event, wxU(_("Next")) );
+    systray_menu->Append( StopStream_Event, wxU(_("Stop")) );
+    systray_menu->AppendSeparator();
+    systray_menu->Append( Iconize_Event, wxU(_("Show/Hide interface")) );
+    return systray_menu;
+}
+
