@@ -2,7 +2,7 @@
  * libmp4.h : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.h,v 1.9 2003/03/13 16:09:20 hartman Exp $
+ * $Id: libmp4.h,v 1.10 2003/04/22 08:51:28 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -107,10 +107,12 @@
 #define FOURCC_MAC6 VLC_FOURCC( 'M', 'A', 'C', '6' )
 #define FOURCC_alaw VLC_FOURCC( 'a', 'l', 'a', 'w' )
 #define FOURCC_ulaw VLC_FOURCC( 'u', 'l', 'a', 'w' )
+#define FOURCC_Qclp VLC_FOURCC( 'Q', 'c', 'l', 'p' )
 
 #define FOURCC_zlib VLC_FOURCC( 'z', 'l', 'i', 'b' )
 #define FOURCC_SVQ1 VLC_FOURCC( 'S', 'V', 'Q', '1' )
 #define FOURCC_SVQ3 VLC_FOURCC( 'S', 'V', 'Q', '3' )
+#define FOURCC_ZyGo VLC_FOURCC( 'Z', 'y', 'G', 'o' )
 #define FOURCC_3IV1 VLC_FOURCC( '3', 'I', 'V', '1' )
 #define FOURCC_3iv1 VLC_FOURCC( '3', 'i', 'v', '1' )
 #define FOURCC_3IV2 VLC_FOURCC( '3', 'I', 'V', '2' )
@@ -365,6 +367,11 @@ typedef struct MP4_Box_data_sample_soun_s
     uint32_t i_bytes_per_packet;
     uint32_t i_bytes_per_frame;
     uint32_t i_bytes_per_sample;
+
+    /* XXX hack */
+    int     i_qt_description;
+    uint8_t *p_qt_description;
+
 } MP4_Box_data_sample_soun_t;
 
 typedef struct MP4_Box_data_sample_vide_s
@@ -372,9 +379,12 @@ typedef struct MP4_Box_data_sample_vide_s
     uint8_t  i_reserved1[6];
     uint16_t i_data_reference_index;
 
-    uint16_t i_predefined1;
-    uint16_t i_reserved2;
-    uint32_t i_predefined2[3];
+    uint16_t i_qt_version;
+    uint16_t i_qt_revision_level;
+    uint32_t i_qt_vendor;
+
+    uint32_t i_qt_temporal_quality;
+    uint32_t i_qt_spatial_quality;
 
     int16_t  i_width;
     int16_t  i_height;
@@ -382,14 +392,18 @@ typedef struct MP4_Box_data_sample_vide_s
     uint32_t i_horizresolution;
     uint32_t i_vertresolution;
 
-    uint32_t i_reserved3;
-    uint16_t i_predefined3;
-    
+    uint32_t i_qt_data_size;
+    uint16_t i_qt_frame_count;
+
     uint8_t  i_compressorname[32];
     int16_t  i_depth;
 
-    int16_t  i_predefined4;
-    
+    int16_t  i_qt_color_table;
+
+    /* XXX hack ImageDescription */
+    int     i_qt_image_description;
+    uint8_t *p_qt_image_description;
+
 } MP4_Box_data_sample_vide_t;
 
 typedef struct MP4_Box_data_sample_hint_s

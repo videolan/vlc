@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.20 2003/04/16 16:32:42 fenrir Exp $
+ * $Id: libmp4.c,v 1.21 2003/04/22 08:51:27 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1208,6 +1208,23 @@ int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_data_reference_index );
 
+    /*
+     * XXX hack -> produce a copy of the nearly complete chunk
+     */
+    if( i_read > 0 )
+    {
+        p_box->data.p_sample_soun->i_qt_description = i_read;
+        p_box->data.p_sample_soun->p_qt_description = malloc( i_read );
+        memcpy( p_box->data.p_sample_soun->p_qt_description,
+                p_peek,
+                i_read );
+    }
+    else
+    {
+        p_box->data.p_sample_soun->i_qt_description = 0;
+        p_box->data.p_sample_soun->p_qt_description = NULL;
+    }
+
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_qt_version );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_qt_revision_level );
     MP4_GET4BYTES( p_box->data.p_sample_soun->i_qt_vendor );
@@ -1320,13 +1337,29 @@ int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_data_reference_index );
 
-    MP4_GET2BYTES( p_box->data.p_sample_vide->i_predefined1 );
-    MP4_GET2BYTES( p_box->data.p_sample_vide->i_reserved2 );
-
-    for( i = 0; i < 3 ; i++ )
+    /*
+     * XXX hack -> produce a copy of the nearly complete chunk
+     */
+    if( i_read > 0 )
     {
-        MP4_GET4BYTES( p_box->data.p_sample_vide->i_predefined2[i] );
+        p_box->data.p_sample_vide->i_qt_image_description = i_read;
+        p_box->data.p_sample_vide->p_qt_image_description = malloc( i_read );
+        memcpy( p_box->data.p_sample_vide->p_qt_image_description,
+                p_peek,
+                i_read );
     }
+    else
+    {
+        p_box->data.p_sample_vide->i_qt_image_description = 0;
+        p_box->data.p_sample_vide->p_qt_image_description = NULL;
+    }
+
+    MP4_GET2BYTES( p_box->data.p_sample_vide->i_qt_version );
+    MP4_GET2BYTES( p_box->data.p_sample_vide->i_qt_revision_level );
+    MP4_GET4BYTES( p_box->data.p_sample_vide->i_qt_vendor );
+
+    MP4_GET4BYTES( p_box->data.p_sample_vide->i_qt_temporal_quality );
+    MP4_GET4BYTES( p_box->data.p_sample_vide->i_qt_spatial_quality );
 
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_width );
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_height );
@@ -1334,14 +1367,14 @@ int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET4BYTES( p_box->data.p_sample_vide->i_horizresolution );
     MP4_GET4BYTES( p_box->data.p_sample_vide->i_vertresolution );
 
-    MP4_GET4BYTES( p_box->data.p_sample_vide->i_reserved3 );
-    MP4_GET2BYTES( p_box->data.p_sample_vide->i_predefined3 );
+    MP4_GET4BYTES( p_box->data.p_sample_vide->i_qt_data_size );
+    MP4_GET2BYTES( p_box->data.p_sample_vide->i_qt_frame_count );
 
     memcpy( &p_box->data.p_sample_vide->i_compressorname, p_peek, 32 );
     p_peek += 32; i_read -= 32;
 
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_depth );
-    MP4_GET2BYTES( p_box->data.p_sample_vide->i_predefined4 );
+    MP4_GET2BYTES( p_box->data.p_sample_vide->i_qt_color_table );
 
     MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 78);
     MP4_ReadBoxContainerRaw( p_stream, p_box );
@@ -2098,11 +2131,13 @@ static struct
     { FOURCC_raw,   MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC_MAC3,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC_MAC6,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_Qclp,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
 
     { FOURCC_vide,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_mp4v,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_SVQ1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_SVQ3,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_ZyGo,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_DIVX,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_h263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_cvid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },

@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.21 2003/04/14 03:23:30 fenrir Exp $
+ * $Id: mp4.c,v 1.22 2003/04/22 08:51:28 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -444,6 +444,8 @@ static int MP4Demux( input_thread_t *p_input )
                 i_size = MP4_TrackSampleSize( &track );
 
                 i_pos  = MP4_GetTrackPos( &track );
+
+                //msg_Dbg( p_input, "stream %d size=%6d pos=%8lld",  i_track, i_size, i_pos );
 
                 /* go,go go ! */
                 if( ! MP4_SeekAbsolute( p_input, i_pos ) )
@@ -926,6 +928,26 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
                 p_decconfig->i_decoder_specific_info_len;
         p_decoder_specific_info =
                 p_decconfig->p_decoder_specific_info;
+    }
+    else
+    {
+        switch( p_sample->i_type )
+        {
+            /* qt decoder, send the complete chunk */
+            case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
+            case VLC_FOURCC( 'Z', 'y', 'G', 'o' ):
+                i_decoder_specific_info_len = p_sample->data.p_sample_vide->i_qt_image_description;
+                p_decoder_specific_info     = p_sample->data.p_sample_vide->p_qt_image_description;
+                break;
+            case VLC_FOURCC( 'Q', 'D', 'M', 'C' ):
+            case VLC_FOURCC( 'Q', 'D', 'M', '2' ):
+            case VLC_FOURCC( 'Q', 'c', 'l', 'p' ):
+                i_decoder_specific_info_len = p_sample->data.p_sample_soun->i_qt_description;
+                p_decoder_specific_info     = p_sample->data.p_sample_soun->p_qt_description;
+                break;
+            default:
+                break;
+        }
     }
 
 #undef p_decconfig
