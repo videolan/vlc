@@ -18,7 +18,7 @@
 #include "common.h"
 #include "mtime.h"
 #include "intf_msg.h"
-
+#include "xutils.h"
 
 
 /*******************************************************************************
@@ -57,10 +57,9 @@ int XTryLoadFont( Display *p_display, char *psz_font, XFontStruct **p_font )
  * are made to XDisableScreenSaver, n successive calls to XEnableScreenSaver
  * will be required before the screen saver could effectively be activated.
  *******************************************************************************/
-int XEnableScreenSaver( Display *p_display )
+void XEnableScreenSaver( Display *p_display )
 {
     /* ?? */
-    return( 0 );
 }
 
 /*******************************************************************************
@@ -68,8 +67,7 @@ int XEnableScreenSaver( Display *p_display )
  *******************************************************************************
  * See XEnableScreenSaver
  *******************************************************************************/
-int XDisableScreenSaver( Display *p_display )
+void XDisableScreenSaver( Display *p_display )
 {
     /* ?? */
-    return( 0 );
 }
