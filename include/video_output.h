@@ -2,7 +2,7 @@
  * video_output.h : video output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.100 2003/10/24 21:27:06 gbazin Exp $
+ * $Id: video_output.h,v 1.101 2003/11/05 09:16:55 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -85,7 +85,7 @@ struct vout_thread_t
     vlc_bool_t          b_scale;                  /**< allow picture scaling */
     vlc_bool_t          b_fullscreen;         /**< toogle fullscreen display */
     vlc_bool_t          b_override_aspect;       /**< aspect ratio overriden */
-    mtime_t             render_time;           /**< last picture render time */
+    uint32_t            render_time;           /**< last picture render time */
     unsigned int        i_window_width;              /**< video window width */
     unsigned int        i_window_height;            /**< video window height */
     unsigned int        i_alignment;          /**< video alignment in window */
