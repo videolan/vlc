@@ -1,7 +1,13 @@
-$Id: NEWS,v 1.61 2003/08/02 14:06:22 gbazin Exp $
+$Id: NEWS,v 1.62 2003/08/05 11:54:11 jpsaman Exp $
 
 Changes between 0.6.1 and 0.6.2:
 ---------------------------------
+
+Access input:
+ * Support for DVB-S/C/T cards using v4l2 API for Linux 2.6.x kernels.
+
+iPaq port:
+ * Familiar interface with Gtk+-1.2 and GPE support removed (deprecreated)
 
 Changes between 0.6.0 and 0.6.1:
 ---------------------------------

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.53 2003/08/03 13:49:37 titer Exp $
+dnl $Id: configure.ac,v 1.54 2003/08/05 11:54:11 jpsaman Exp $
 
 AC_INIT(vlc,0.6.2-cvs)
 
@@ -2573,89 +2573,6 @@ then
   fi
 fi
 
-
-dnl
-dnl  Familiar module uses Gtk+ library
-dnl
-AC_ARG_ENABLE(familiar,
-  [  --enable-familiar       Familiar Gtk+ support (default disabled)])
-if test "${enable_familiar}" = "yes"
-then
-  GTK_PATH="${PATH}"
-  AC_ARG_WITH(gtk-config-path,
-    [    --with-gtk-config-path=PATH gtk-config path (default search in \$PATH)],
-    [ if test "${with_gtk_config_path}" != "no"
-      then
-        GTK_PATH="${with_gtk_config_path}:${PATH}"
-      fi ])
-  # look for gtk-config
-  AC_PATH_PROG(GTK12_CONFIG, gtk12-config, no, ${GTK_PATH})
-  GTK_CONFIG=${GTK12_CONFIG}
-  if test "${GTK_CONFIG}" = "no"
-  then
-    AC_PATH_PROG(GTK_CONFIG, gtk-config, no, ${GTK_PATH})
-  fi
-  # check for cross-compiling
-  GTK_PREFIX=
-  AC_ARG_WITH(gtk-prefix,
-    [    --with-gtk-prefix=PATH path to libgtk (needed for cross-compiling),
-                          e.g use as:
-                          --with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
-  if test "${with_gtk_prefix}" != "no" -a -n "${with_gtk_prefix}"
-  then
-    GTK_PREFIX="--prefix=${with_gtk_prefix}"
-  fi
-  if test "${GTK_CONFIG}" != "no"
-  then
-    if expr 1.2.0 \> `${GTK_CONFIG} --version` >/dev/null
-    then
-      AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-familiar.])
-    fi
-    AX_ADD_CFLAGS([familiar],[`${GTK_CONFIG} ${GTK_PREFIX} --cflags gtk gthread`])
-    AX_ADD_LDFLAGS([familiar],[`${GTK_CONFIG} ${GTK_PREFIX} --libs gtk gthread | sed 's,-rdynamic,,'`])
-    # now look for the gtk.h header
-    CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_familiar}"
-    ac_cv_gtk_headers=yes
-    AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, , [
-      ac_cv_gtk_headers=no
-      echo "Cannot find gtk development headers."
-    ])
-    if test "${ac_cv_gtk_headers}" = "yes"
-    then
-      AX_ADD_PLUGINS([familiar])
-    fi
-    CPPFLAGS="${CPPFLAGS_save}"
-
-    # now look for gpe support
-    AC_ARG_WITH(gpe-prefix,
-    [    --with-gpe-prefix=PATH gpe installation path prefix (default search in \$PATH)],[],[])
-    if test "${with_gpe_prefix}" != "no" -a -n "${with_gpe_prefix}"
-    then
-      AX_ADD_CFLAGS([gpe],[-I${with_gpe_prefix}/include])
-      AX_ADD_LDFLAGS([gpe],[-lXi -lgdk_pixbuf -L${with_gpe_prefix}/lib -lgpewidget])
-      # now look for gpe/init.h header file
-      CFLAGS_save="${CFLAGS}"
-      LDFLAGS_save="${LDFLAGS}"
-      CFLAGS="${CFLAGS_familiar} ${CFLAGS_gpe}"
-      LDFLAGS="${LDFLAGS_familiar} ${LDFLAGS_gpe}"
-      CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_familiar} ${CFLAGS_gpe}"
-      ac_cv_gpe_headers=yes
-      AC_CHECK_HEADERS(gpe/init.h, ,
-        [ ac_cv_gpe_headers=no
-          AC_MSG_ERROR([Cannot find development headers for libgpewidget...]) ])
-      CFLAGS="${CFLAGS_save}"
-      LDFLAGS="${LDFLAG_save}"
-      if test "${ac_cv_gpe_headers}" = "yes"
-      then
-        AX_ADD_CFLAGS([familiar],[${CFLAGS_gpe}])
-        AX_ADD_LDFLAGS([familiar],[${LDFLAGS_gpe}])
-      fi
-    else
-	  NEED_GTK_MAIN=yes
-    fi # end gpe support
-  fi # end gtk+ support
-fi
-
 dnl
 dnl  Gnome module
 dnl
@@ -3112,16 +3029,16 @@ dnl
 if test "${NEED_GTK_MAIN}" != "no"
 then
     AX_ADD_PLUGINS([gtk_main])
-    AX_ADD_CFLAGS([gtk familiar pda],[-DNEED_GTK_MAIN])
-    AX_ADD_CFLAGS([gtk_main],[${CFLAGS_gtk} ${CFLAGS_familiar} ${CFLAGS_pda}])
-    AX_ADD_LDFLAGS([gtk_main],[${LDFLAGS_gtk} ${LDFLAGS_familiar} ${LDFLAGS_pda}])
+    AX_ADD_CFLAGS([gtk pda],[-DNEED_GTK_MAIN])
+    AX_ADD_CFLAGS([gtk_main],[${CFLAGS_gtk} ${CFLAGS_pda}])
+    AX_ADD_LDFLAGS([gtk_main],[${LDFLAGS_gtk} ${LDFLAGS_pda}])
 fi
 
 if test "${NEED_GNOME_MAIN}" != "no"
 then
     AX_ADD_PLUGINS([gnome_main])
-    AX_ADD_CFLAGS([gnome_main],[${CFLAGS_gtk} ${CFLAGS_familiar} ${CFLAGS_pda} ${CFLAGS_gnome}])
-    AX_ADD_LDFLAGS([gnome_main],[${LDFLAGS_gtk} ${LDFLAGS_familiar} ${LDFLAGS_pda} ${LDFLAGS_gnome}])
+    AX_ADD_CFLAGS([gnome_main],[${CFLAGS_gtk} ${CFLAGS_pda} ${CFLAGS_gnome}])
+    AX_ADD_LDFLAGS([gnome_main],[${LDFLAGS_gtk} ${LDFLAGS_pda} ${LDFLAGS_gnome}])
 fi
 
 if test "${NEED_GTK2_MAIN}" != "no"
@@ -3318,7 +3235,6 @@ AC_OUTPUT([
   modules/encoder/ffmpeg/Makefile
   modules/gui/Makefile
   modules/gui/beos/Makefile
-  modules/gui/familiar/Makefile
   modules/gui/pda/Makefile
   modules/gui/gtk/Makefile
   modules/gui/gtk2/Makefile

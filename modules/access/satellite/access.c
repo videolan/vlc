@@ -206,7 +206,6 @@ int E_(Open) ( vlc_object_t *p_this )
         return -1;
     }
 
-
     /* Get antenna configuration options */
     b_diseqc = config_GetInt( p_input, "diseqc" );
     i_lnb_lof1 = config_GetInt( p_input, "lnb-lof1" );
