@@ -156,10 +156,49 @@ u32 UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
         else
         {
             p_bit_stream->pf_next_data_packet( p_bit_stream );
-            p_bit_stream->fifo.buffer |= *(p_bit_stream->p_byte++)
-                                            << (8 * sizeof(WORD_TYPE) - 8
-                                            - p_bit_stream->fifo.i_available);
-            p_bit_stream->fifo.i_available += 8;
+
+            if( (ptrdiff_t)p_bit_stream->p_byte & (sizeof(WORD_TYPE) - 1) )
+            {
+                /* We are not aligned anymore. */
+                if( ((ptrdiff_t)p_bit_stream->p_byte
+                                    & (sizeof(WORD_TYPE) - 1)) * 8
+                        < p_bit_stream->fifo.i_available )
+                {
+                    /* We are not aligned, and won't be. Copy the first word
+                     * of the packet in a temporary buffer, and we'll see
+                     * later. */
+                    int     i;
+                    p_bit_stream->i_showbits_buffer = 0;
+
+                    for( i = 0; i < sizeof(WORD_TYPE) ; i++ )
+                    {
+                        if( p_bit_stream->p_byte >= p_bit_stream->p_end )
+                        {
+                            p_bit_stream->pf_next_data_packet( p_bit_stream );
+                        }
+                        ((byte_t *)&p_bit_stream->i_showbits_buffer)[i] =
+                            * p_bit_stream->p_byte;
+                        p_bit_stream->p_byte++;
+                    }
+
+                    /* This is kind of kludgy. */
+                    p_bit_stream->p_data->p_payload_start += sizeof(WORD_TYPE);
+                    p_bit_stream->p_byte =
+                        (byte_t *)&p_bit_stream->i_showbits_buffer;
+                    p_bit_stream->p_end =
+                        (byte_t *)&p_bit_stream->i_showbits_buffer
+                            + sizeof(WORD_TYPE);
+                    p_bit_stream->showbits_data.p_next = p_bit_stream->p_data;
+                    p_bit_stream->p_data = &p_bit_stream->showbits_data;
+                }
+                else
+                {
+                    /* We are not aligned, but we can be. */
+                    AlignWord( p_bit_stream );
+                }
+            }
+
+            return( ShowBits( p_bit_stream, i_bits ) );
         }
     }
     return( p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - i_bits) );

@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.24 2001/03/02 13:20:28 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.25 2001/03/06 19:33:58 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -164,10 +164,13 @@ typedef struct bit_stream_s
      */
     /* Current data packet (in the current PES packet of the PES stream) */
     data_packet_t *         p_data;
-    /* Pointer to the next byte that is to be read (in the current TS packet) */
+    /* Pointer to the next byte that is to be read (in the current packet) */
     byte_t *                p_byte;
-    /* Pointer to the last byte that is to be read (in the current TS packet */
+    /* Pointer to the last byte that is to be read (in the current packet */
     byte_t *                p_end;
+    /* Temporary buffer in case we're not aligned when changing data packets. */
+    WORD_TYPE               i_showbits_buffer;
+    data_packet_t           showbits_data;
 } bit_stream_t;
 
 /*****************************************************************************
