@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.59 2002/05/14 19:47:25 sam Exp $
+ * $Id: modules.c,v 1.60 2002/05/18 14:03:13 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -35,9 +35,7 @@
 
 #include <videolan/vlc.h>
 
-#if !defined( _MSC_VER )
 #include <dirent.h>
-#endif
 
 #if defined(HAVE_DLFCN_H)                                /* Linux, BSD, Hurd */
 #   include <dlfcn.h>                        /* dlopen(), dlsym(), dlclose() */
@@ -45,7 +43,7 @@
 #elif defined(HAVE_IMAGE_H)                                          /* BeOS */
 #   include <image.h>
 #   define HAVE_DYNAMIC_PLUGINS
-#elif defined(WIN32) && defined( __MINGW32__ )
+#elif defined(WIN32)
 #   define HAVE_DYNAMIC_PLUGINS
 #else
 #   undef HAVE_DYNAMIC_PLUGINS

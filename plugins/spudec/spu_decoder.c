@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.20 2002/05/15 00:40:26 sam Exp $
+ * $Id: spu_decoder.c,v 1.21 2002/05/18 14:03:13 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -436,7 +436,7 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                         p_spu->p_sys->b_palette = 1;
                         for( i = 0; i < 4 ; i++ )
                         {
-                            i_color = ((u32*)((void*)p_spudec->p_config->
+                            i_color = ((u32*)((char*)p_spudec->p_config->
                                         p_demux_data + sizeof(int)))[
                                           GetBits(&p_spudec->bit_stream, 4) ];
 

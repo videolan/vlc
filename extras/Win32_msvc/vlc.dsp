@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "." /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /I . /I../../include /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "." /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "__VLC__" /YX /FD /I../../include /c
 # ADD BASE RSC /l 0x414 /d "NDEBUG"
 # ADD RSC /l 0x414 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -66,7 +66,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "." /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /I . /I../../include /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "." /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "__VLC__" /YX /FD /GZ /I../../include /c
 # ADD BASE RSC /l 0x414 /d "_DEBUG"
 # ADD RSC /l 0x809 /i "../" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -105,49 +105,102 @@ SOURCE=..\..\extras\GNUgetopt\getopt.h
 SOURCE=..\..\extras\GNUgetopt\getopt1.c
 # End Source File
 # End Group
+# Begin Group "dirent"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\dirent.c
+# End Source File
+# End Group
 # Begin Group "libdvdcss"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\extras\libdvdcss\css.c
+SOURCE=..\..\..\libdvdcss\src\common.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\extras\libdvdcss\css.h
+SOURCE=..\..\..\libdvdcss\src\config.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\extras\libdvdcss\csstables.h
+SOURCE=..\..\..\libdvdcss\src\css.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\extras\libdvdcss\ioctl.c
+SOURCE=..\..\..\libdvdcss\src\css.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\extras\libdvdcss\ioctl.h
+SOURCE=..\..\..\libdvdcss\src\csstables.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\extras\libdvdcss\libdvdcss.c
+SOURCE=..\..\..\libdvdcss\src\dvdcss\dvdcss.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\extras\libdvdcss\libdvdcss.h
+SOURCE=..\..\..\libdvdcss\src\ioctl.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\libdvdcss\src\ioctl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\libdvdcss\src\libdvdcss.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\libdvdcss\src\libdvdcss.h
 # End Source File
 # End Group
 # End Group
 # Begin Group "plugins"
 
 # PROP Default_Filter ""
+# Begin Group "a52"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\plugins\a52\a52.c
+
+!IF  "$(CFG)" == "vlc - Win32 Release"
+
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=a52 /D "USE_A52DEC_TREE" /I../a52dec
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=a52 /D "USE_A52DEC_TREE" /I../a52dec
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\plugins\a52\a52.h
+
+!IF  "$(CFG)" == "vlc - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
 # Begin Group "ac3_adec"
 
 # PROP Default_Filter ""
 # Begin Source File
 
 SOURCE=..\..\plugins\ac3_adec\ac3_adec.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=ac3_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=ac3_adec
 # End Source File
 # Begin Source File
 
@@ -156,12 +209,12 @@ SOURCE=..\..\plugins\ac3_adec\ac3_adec.h
 # Begin Source File
 
 SOURCE=..\..\plugins\ac3_adec\ac3_bit_allocate.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=ac3_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=ac3_adec
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\ac3_adec\ac3_decoder.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=ac3_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=ac3_adec
 # End Source File
 # Begin Source File
 
@@ -170,7 +223,7 @@ SOURCE=..\..\plugins\ac3_adec\ac3_decoder.h
 # Begin Source File
 
 SOURCE=..\..\plugins\ac3_adec\ac3_exponent.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=ac3_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=ac3_adec
 # End Source File
 # Begin Source File
 
@@ -179,7 +232,7 @@ SOURCE=..\..\plugins\ac3_adec\ac3_exponent.h
 # Begin Source File
 
 SOURCE=..\..\plugins\ac3_adec\ac3_imdct.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=ac3_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=ac3_adec
 # End Source File
 # Begin Source File
 
@@ -188,7 +241,7 @@ SOURCE=..\..\plugins\ac3_adec\ac3_internal.h
 # Begin Source File
 
 SOURCE=..\..\plugins\ac3_adec\ac3_mantissa.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=ac3_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=ac3_adec
 # End Source File
 # Begin Source File
 
@@ -197,12 +250,12 @@ SOURCE=..\..\plugins\ac3_adec\ac3_mantissa.h
 # Begin Source File
 
 SOURCE=..\..\plugins\ac3_adec\ac3_parse.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=ac3_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=ac3_adec
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\ac3_adec\ac3_rematrix.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=ac3_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=ac3_adec
 # End Source File
 # End Group
 # Begin Group "access"
@@ -211,17 +264,17 @@ SOURCE=..\..\plugins\ac3_adec\ac3_rematrix.c
 # Begin Source File
 
 SOURCE=..\..\plugins\access\file.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=file
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=file
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\access\http.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=http
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=http
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\access\udp.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=udp
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=udp
 # End Source File
 # End Group
 # Begin Group "chroma"
@@ -230,7 +283,7 @@ SOURCE=..\..\plugins\access\udp.c
 # Begin Source File
 
 SOURCE=..\..\plugins\chroma\i420_rgb.c
-# ADD CPP /D "BUILTIN" /D "MODULE_NAME_IS_chroma_i420_rgb" /D MODULE_NAME=chroma_i420_rgb
+# ADD CPP /D "__BUILTIN__" /D "MODULE_NAME_IS_chroma_i420_rgb" /D MODULE_NAME=chroma_i420_rgb
 # End Source File
 # Begin Source File
 
@@ -239,12 +292,12 @@ SOURCE=..\..\plugins\chroma\i420_rgb.h
 # Begin Source File
 
 SOURCE=..\..\plugins\chroma\i420_rgb16.c
-# ADD CPP /D "BUILTIN" /D "MODULE_NAME_IS_chroma_i420_rgb" /D MODULE_NAME=chroma_i420_rgb
+# ADD CPP /D "__BUILTIN__" /D "MODULE_NAME_IS_chroma_i420_rgb" /D MODULE_NAME=chroma_i420_rgb
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\chroma\i420_rgb8.c
-# ADD CPP /D "BUILTIN" /D "MODULE_NAME_IS_chroma_i420_rgb" /D MODULE_NAME=chroma_i420_rgb
+# ADD CPP /D "__BUILTIN__" /D "MODULE_NAME_IS_chroma_i420_rgb" /D MODULE_NAME=chroma_i420_rgb
 # End Source File
 # Begin Source File
 
@@ -253,7 +306,7 @@ SOURCE=..\..\plugins\chroma\i420_rgb_c.h
 # Begin Source File
 
 SOURCE=..\..\plugins\chroma\i420_yuy2.c
-# ADD CPP /D "BUILTIN" /D "MODULE_NAME_IS_chroma_i420_yuy2" /D MODULE_NAME=chroma_i420_yuy2
+# ADD CPP /D "__BUILTIN__" /D "MODULE_NAME_IS_chroma_i420_yuy2" /D MODULE_NAME=chroma_i420_yuy2
 # End Source File
 # Begin Source File
 
@@ -262,7 +315,7 @@ SOURCE=..\..\plugins\chroma\i420_yuy2.h
 # Begin Source File
 
 SOURCE=..\..\plugins\chroma\i422_yuy2.c
-# ADD CPP /D "BUILTIN" /D "MODULE_NAME_IS_chroma_i422_yuy2" /D MODULE_NAME=chroma_i422_yuy2
+# ADD CPP /D "__BUILTIN__" /D "MODULE_NAME_IS_chroma_i422_yuy2" /D MODULE_NAME=chroma_i422_yuy2
 # End Source File
 # Begin Source File
 
@@ -275,17 +328,17 @@ SOURCE=..\..\plugins\chroma\i422_yuy2.h
 # Begin Source File
 
 SOURCE=..\..\plugins\directx\aout_directx.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=directx
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=directx
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\directx\directx.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=directx
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=directx
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\directx\vout_directx.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=directx
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=directx
 # End Source File
 # Begin Source File
 
@@ -294,7 +347,7 @@ SOURCE=..\..\plugins\directx\vout_directx.h
 # Begin Source File
 
 SOURCE=..\..\plugins\directx\vout_events.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=directx
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=directx
 # End Source File
 # End Group
 # Begin Group "downmix"
@@ -303,7 +356,7 @@ SOURCE=..\..\plugins\directx\vout_events.c
 # Begin Source File
 
 SOURCE=..\..\plugins\downmix\ac3_downmix_c.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=downmix
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=downmix
 # End Source File
 # Begin Source File
 
@@ -312,7 +365,7 @@ SOURCE=..\..\plugins\downmix\ac3_downmix_common.h
 # Begin Source File
 
 SOURCE=..\..\plugins\downmix\downmix.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=downmix
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=downmix
 # End Source File
 # End Group
 # Begin Group "dummy"
@@ -321,32 +374,32 @@ SOURCE=..\..\plugins\downmix\downmix.c
 # Begin Source File
 
 SOURCE=..\..\plugins\dummy\aout_dummy.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=dummy
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=dummy
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\dummy\dummy.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=dummy
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=dummy
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\dummy\input_dummy.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=dummy
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=dummy
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\dummy\intf_dummy.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=dummy
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=dummy
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\dummy\null.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=null
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=null
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\dummy\vout_dummy.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=dummy
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=dummy
 # End Source File
 # End Group
 # Begin Group "dvd"
@@ -355,7 +408,7 @@ SOURCE=..\..\plugins\dummy\vout_dummy.c
 # Begin Source File
 
 SOURCE=..\..\plugins\dvd\dvd.c
-# ADD CPP /I "../libdvdcss" /D "BUILTIN" /D MODULE_NAME=dvd
+# ADD CPP /I "../../include" /I "../../../libdvdcss/src" /D "__BUILTIN__" /D MODULE_NAME=dvd
 # End Source File
 # Begin Source File
 
@@ -364,17 +417,17 @@ SOURCE=..\..\plugins\dvd\dvd.h
 # Begin Source File
 
 SOURCE=..\..\plugins\dvd\dvd_access.c
-# ADD CPP /I "../libdvdcss" /D "BUILTIN" /D MODULE_NAME=dvd
+# ADD CPP /I "../../include" /I "../../../libdvdcss/src" /D "__BUILTIN__" /D MODULE_NAME=dvd
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\dvd\dvd_demux.c
-# ADD CPP /I "../libdvdcss" /D "BUILTIN" /D MODULE_NAME=dvd
+# ADD CPP /I "../../include" /I "../../../libdvdcss/src" /D "__BUILTIN__" /D MODULE_NAME=dvd
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\dvd\dvd_es.c
-# ADD CPP /I "../libdvdcss" /D "BUILTIN" /D MODULE_NAME=dvd
+# ADD CPP /I "../../include" /I "../../../libdvdcss/src" /D "__BUILTIN__" /D MODULE_NAME=dvd
 # End Source File
 # Begin Source File
 
@@ -383,7 +436,7 @@ SOURCE=..\..\plugins\dvd\dvd_es.h
 # Begin Source File
 
 SOURCE=..\..\plugins\dvd\dvd_ifo.c
-# ADD CPP /I "../libdvdcss" /D "BUILTIN" /D MODULE_NAME=dvd
+# ADD CPP /I "../../include" /I "../../../libdvdcss/src" /D "__BUILTIN__" /D MODULE_NAME=dvd
 # End Source File
 # Begin Source File
 
@@ -392,7 +445,7 @@ SOURCE=..\..\plugins\dvd\dvd_ifo.h
 # Begin Source File
 
 SOURCE=..\..\plugins\dvd\dvd_seek.c
-# ADD CPP /I "../libdvdcss" /D "BUILTIN" /D MODULE_NAME=dvd
+# ADD CPP /I "../../include" /I "../../../libdvdcss/src" /D "__BUILTIN__" /D MODULE_NAME=dvd
 # End Source File
 # Begin Source File
 
@@ -401,7 +454,7 @@ SOURCE=..\..\plugins\dvd\dvd_seek.h
 # Begin Source File
 
 SOURCE=..\..\plugins\dvd\dvd_summary.c
-# ADD CPP /I "../libdvdcss" /D "BUILTIN" /D MODULE_NAME=dvd
+# ADD CPP /I "../../include" /I "../../../libdvdcss/src" /D "__BUILTIN__" /D MODULE_NAME=dvd
 # End Source File
 # Begin Source File
 
@@ -410,7 +463,7 @@ SOURCE=..\..\plugins\dvd\dvd_summary.h
 # Begin Source File
 
 SOURCE=..\..\plugins\dvd\dvd_udf.c
-# ADD CPP /I "../libdvdcss" /D "BUILTIN" /D MODULE_NAME=dvd
+# ADD CPP /I "../../include" /I "../../../libdvdcss/src" /D "__BUILTIN__" /D MODULE_NAME=dvd
 # End Source File
 # Begin Source File
 
@@ -426,12 +479,12 @@ SOURCE=..\..\plugins\filter\deinterlace.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=deinterlace
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=deinterlace
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=deinterlace
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=deinterlace
 
 !ENDIF 
 
@@ -442,12 +495,12 @@ SOURCE=..\..\plugins\filter\distort.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=distort
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=distort
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=distort
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=distort
 
 !ENDIF 
 
@@ -471,12 +524,12 @@ SOURCE=..\..\plugins\filter\invert.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=insert
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=insert
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=insert
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=insert
 
 !ENDIF 
 
@@ -487,12 +540,12 @@ SOURCE=..\..\plugins\filter\transform.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=transform
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=transform
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=transform
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=transform
 
 !ENDIF 
 
@@ -503,12 +556,12 @@ SOURCE=..\..\plugins\filter\wall.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=wall
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=wall
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=wall
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=wall
 
 !ENDIF 
 
@@ -520,7 +573,7 @@ SOURCE=..\..\plugins\filter\wall.c
 # Begin Source File
 
 SOURCE=..\..\plugins\fx\scope.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=scope
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=scope
 # End Source File
 # End Group
 # Begin Group "gtk"
@@ -532,12 +585,12 @@ SOURCE=..\..\plugins\gtk\gtk.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ENDIF 
 
@@ -548,12 +601,12 @@ SOURCE=..\..\plugins\gtk\gtk_callbacks.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ENDIF 
 
@@ -590,12 +643,12 @@ SOURCE=..\..\plugins\gtk\gtk_control.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ENDIF 
 
@@ -619,12 +672,12 @@ SOURCE=..\..\plugins\gtk\gtk_display.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ENDIF 
 
@@ -648,12 +701,12 @@ SOURCE=..\..\plugins\gtk\gtk_interface.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ENDIF 
 
@@ -677,12 +730,12 @@ SOURCE=..\..\plugins\gtk\gtk_menu.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ENDIF 
 
@@ -706,12 +759,12 @@ SOURCE=..\..\plugins\gtk\gtk_modules.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ENDIF 
 
@@ -735,12 +788,12 @@ SOURCE=..\..\plugins\gtk\gtk_open.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ENDIF 
 
@@ -764,12 +817,12 @@ SOURCE=..\..\plugins\gtk\gtk_playlist.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ENDIF 
 
@@ -793,12 +846,12 @@ SOURCE=..\..\plugins\gtk\gtk_preferences.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ENDIF 
 
@@ -822,12 +875,12 @@ SOURCE=..\..\plugins\gtk\gtk_support.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=gtk
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=gtk
 
 !ENDIF 
 
@@ -856,7 +909,7 @@ SOURCE=..\..\plugins\idct\block_c.h
 # Begin Source File
 
 SOURCE=..\..\plugins\idct\idct.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=idct
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=idct
 # End Source File
 # Begin Source File
 
@@ -873,7 +926,7 @@ SOURCE=..\..\plugins\idct\idct_sparse.h
 # Begin Source File
 
 SOURCE=..\..\plugins\idct\idctclassic.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=idctclassic
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=idctclassic
 # End Source File
 # End Group
 # Begin Group "imdct"
@@ -882,12 +935,12 @@ SOURCE=..\..\plugins\idct\idctclassic.c
 # Begin Source File
 
 SOURCE=..\..\plugins\imdct\ac3_imdct_c.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=imdct
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=imdct
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\imdct\ac3_imdct_common.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=imdct
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=imdct
 # End Source File
 # Begin Source File
 
@@ -904,12 +957,12 @@ SOURCE=..\..\plugins\imdct\ac3_srfft.h
 # Begin Source File
 
 SOURCE=..\..\plugins\imdct\ac3_srfft_c.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=imdct
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=imdct
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\imdct\imdct.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=imdct
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=imdct
 # End Source File
 # End Group
 # Begin Group "lpcm_adec"
@@ -918,7 +971,7 @@ SOURCE=..\..\plugins\imdct\imdct.c
 # Begin Source File
 
 SOURCE=..\..\plugins\lpcm_adec\lpcm_adec.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=lpcm_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=lpcm_adec
 # End Source File
 # Begin Source File
 
@@ -938,11 +991,11 @@ SOURCE=..\..\plugins\memcpy\memcpy.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=memcpy
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=memcpy
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=memcpy /D "MODULE_NAME_IS_memcpy"
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=memcpy /D "MODULE_NAME_IS_memcpy"
 
 !ENDIF 
 
@@ -954,7 +1007,7 @@ SOURCE=..\..\plugins\memcpy\memcpy.c
 # Begin Source File
 
 SOURCE=..\..\plugins\motion\motion.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=motion
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=motion
 # End Source File
 # End Group
 # Begin Group "mpeg_adec"
@@ -963,7 +1016,7 @@ SOURCE=..\..\plugins\motion\motion.c
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_adec\adec_layer1.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_adec
 # End Source File
 # Begin Source File
 
@@ -972,7 +1025,7 @@ SOURCE=..\..\plugins\mpeg_adec\adec_layer1.h
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_adec\adec_layer2.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_adec
 # End Source File
 # Begin Source File
 
@@ -981,7 +1034,7 @@ SOURCE=..\..\plugins\mpeg_adec\adec_layer2.h
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_adec\adec_math.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_adec
 # End Source File
 # Begin Source File
 
@@ -990,7 +1043,7 @@ SOURCE=..\..\plugins\mpeg_adec\adec_math.h
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_adec\mpeg_adec.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_adec
 # End Source File
 # Begin Source File
 
@@ -999,7 +1052,7 @@ SOURCE=..\..\plugins\mpeg_adec\mpeg_adec.h
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_adec\mpeg_adec_generic.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_adec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_adec
 # End Source File
 # Begin Source File
 
@@ -1012,17 +1065,27 @@ SOURCE=..\..\plugins\mpeg_adec\mpeg_adec_generic.h
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_system\mpeg_es.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_es
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_es
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_system\mpeg_ps.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_ps
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_ps
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_system\mpeg_ts.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_ts
+
+!IF  "$(CFG)" == "vlc - Win32 Release"
+
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_ts
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
+
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_ts /D "MODULE_NAME_IS_mpeg_ts"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "mpeg_vdec"
@@ -1031,7 +1094,7 @@ SOURCE=..\..\plugins\mpeg_system\mpeg_ts.c
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_vdec\video_decoder.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_vdec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_vdec
 # End Source File
 # Begin Source File
 
@@ -1040,7 +1103,7 @@ SOURCE=..\..\plugins\mpeg_vdec\video_decoder.h
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_vdec\video_parser.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_vdec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_vdec
 # End Source File
 # Begin Source File
 
@@ -1049,7 +1112,7 @@ SOURCE=..\..\plugins\mpeg_vdec\video_parser.h
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_vdec\vpar_blocks.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_vdec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_vdec
 # End Source File
 # Begin Source File
 
@@ -1058,12 +1121,12 @@ SOURCE=..\..\plugins\mpeg_vdec\vpar_blocks.h
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_vdec\vpar_headers.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_vdec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_vdec
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_vdec\vpar_pool.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_vdec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_vdec
 # End Source File
 # Begin Source File
 
@@ -1072,7 +1135,7 @@ SOURCE=..\..\plugins\mpeg_vdec\vpar_pool.h
 # Begin Source File
 
 SOURCE=..\..\plugins\mpeg_vdec\vpar_synchro.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=mpeg_vdec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=mpeg_vdec
 # End Source File
 # End Group
 # Begin Group "network"
@@ -1081,7 +1144,7 @@ SOURCE=..\..\plugins\mpeg_vdec\vpar_synchro.c
 # Begin Source File
 
 SOURCE=..\..\plugins\network\ipv4.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=ipv4
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=ipv4
 # End Source File
 # End Group
 # Begin Group "sdl"
@@ -1093,12 +1156,12 @@ SOURCE=..\..\plugins\sdl\aout_sdl.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=sdl
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=sdl
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=sdl
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=sdl
 
 !ENDIF 
 
@@ -1109,12 +1172,12 @@ SOURCE=..\..\plugins\sdl\sdl.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=sdl
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=sdl
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=sdl
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=sdl
 
 !ENDIF 
 
@@ -1125,12 +1188,12 @@ SOURCE=..\..\plugins\sdl\vout_sdl.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=sdl
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=sdl
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=sdl
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=sdl
 
 !ENDIF 
 
@@ -1142,7 +1205,7 @@ SOURCE=..\..\plugins\sdl\vout_sdl.c
 # Begin Source File
 
 SOURCE=..\..\plugins\spudec\spu_decoder.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=spudec
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=spudec
 # End Source File
 # Begin Source File
 
@@ -1155,7 +1218,7 @@ SOURCE=..\..\plugins\spudec\spu_decoder.h
 # Begin Source File
 
 SOURCE=..\..\plugins\text\logger.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=logger
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=logger
 # End Source File
 # Begin Source File
 
@@ -1163,12 +1226,12 @@ SOURCE=..\..\plugins\text\rc.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=rc
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=rc
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=rc
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=rc
 
 !ENDIF 
 
@@ -1183,12 +1246,12 @@ SOURCE=..\..\plugins\vcd\cdrom_tools.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=vcd
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=vcd
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=vcd
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=vcd
 
 !ENDIF 
 
@@ -1212,12 +1275,12 @@ SOURCE=..\..\plugins\vcd\input_vcd.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=vcd
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=vcd
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=vcd
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=vcd
 
 !ENDIF 
 
@@ -1241,12 +1304,12 @@ SOURCE=..\..\plugins\vcd\vcd.c
 
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=vcd
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=vcd
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=vcd
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=vcd
 
 !ENDIF 
 
@@ -1258,7 +1321,7 @@ SOURCE=..\..\plugins\vcd\vcd.c
 # Begin Source File
 
 SOURCE=..\..\plugins\win32\waveout.c
-# ADD CPP /D "BUILTIN" /D MODULE_NAME=waveout
+# ADD CPP /D "__BUILTIN__" /D MODULE_NAME=waveout
 # End Source File
 # End Group
 # End Group
@@ -1565,8 +1628,9 @@ SOURCE=..\..\share\vlc_win32_rc.rc
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
-# ADD BASE RSC /l 0x40c /i "\vlc-win\share"
-# ADD RSC /l 0x40c /i "../../" /i "\vlc-win\share"
+# ADD BASE RSC /l 0x40c /i "\vlc-win32\share" /i "\vlc-win\share"
+# SUBTRACT BASE RSC /i "../"
+# ADD RSC /l 0x40c /i "\vlc-win32\share" /i "\vlc-win\share" /i "../../"
 # SUBTRACT RSC /i "../"
 
 !ENDIF 
