@@ -1,3 +1,812 @@
+2003-03-10 Monday 20:30  sam
+
+   * ./toolbox: added --update-changelog flag.
+
+2003-03-10 Monday 19:26  gbazin
+
+ * src/video_output/vout_pictures.c: declaration of FOURCC_RV24, courtesy of Olivier Aubert.
+
+2003-03-10 Monday 19:17  gbazin
+
+ * modules/gui/gtk/gnome.c, modules/gui/gtk/gtk.c: small change to the slider behaviour.
+
+2003-03-10 Monday 18:12  sam
+
+   * ./configure.ac.in: moved an extra -lws2_32 to a win32 specific case.
+
+2003-03-10 Monday 11:41  massiot
+
+ Fixed a major bug with 5.1 output and the OSS plug-in.
+
+2003-03-10 Monday 09:23  jlj
+
+   * ./modules/codec/dts.c: minor fix.
+
+2003-03-10 Monday 02:07  fenrir
+
+  * improved seeking and fixed play back when reading from stdin (when
+ reported size is null).
+
+2003-03-10 Monday 01:12  gbazin
+
+ * modules/access/vcd/cdrom.c: small win32 bugfix.
+ * configure.ac.in: on win32 we link ws2_32 with the slp plugin.
+
+2003-03-10 Monday 01:04  massiot
+
+ * Bumped up version number to 0.5.2
+ * Fix for the "lock-up" problem under MacOS X. Removed the rt-priority
+   configuration variable.
+
+2003-03-10 Monday 00:39  jlj
+
+   * ./modules/demux/mpeg: DTS support.
+
+2003-03-09 Sunday 21:07  jlj
+
+   * DTS S/PDIF support.
+
+2003-03-09 Sunday 20:44  gbazin
+
+ * configure.ac.in: fixed my previous commit.
+ * NEWS: added an entry about fixes in the dvd menu support.
+
+2003-03-09 Sunday 20:25  gbazin
+
+ * configure.ac.in: don't include the screensaver plugin on win32.
+ * src/misc/variables.c: fixed a bug in var_Change() and in var_DelCallback().
+ * modules/codec/spudec/parse.c: removed unnessecary code.
+ * modules/access/dvdplay/access.c: fixed some navigation problems.
+
+2003-03-09 Sunday 17:22  fenrir
+
+  * fixed a really stupid bug with compressed header, improved parsing
+ of audio stsd box. (handle qt3+ audio box)
+  (I still need to fix mp4.c to read audio track that aren't mp4a)
+
+2003-03-08 Saturday 02:55  sigmunau
+
+ added a down, right gesture to quit vlc and an up, right gesture that swaps
+ fullscreen on/off, removed the down gesture as it is now covered by the up,
+ right gesture
+
+2003-03-07 Friday 01:53  gbazin
+
+ * modules/gui/gtk/gnome.c, modules/gui/gtk/gtk.c: clean up the gtk/gnome
+ messages window regularly.
+
+2003-03-07 Friday 00:52  sigmunau
+
+ NEWS: added note about .pls handeling and the http audio fix
+
+2003-03-07 Friday 00:10  gbazin
+
+ * src/audio_output/dec.c, include/aout_internal.h: the aout core was
+ automatically discarding audio samples that were above AOUT_MAX_ADVANCE_TIME
+ in the future. Problem is that p_input->i_pts_delay isn't a fixed value. We
+ now fetch this value from the input thread when we create an aout_instance_t.
+ This solves problems with the http access plugin.
+
+2003-03-06 Thursday 23:17  hartman
+
+ * Updated README on Mac OS X issues.
+
+2003-03-06 Thursday 16:30  sigmunau
+
+ the m3u demux now reads the pls files shoutcast uses.
+
+2003-03-06 Thursday 16:24  hartman
+
+ * the close window command was reacting irratic because of my meddling
+   with the responder chain. HANDS OFF you little devil ;)
+
+2003-03-06 Thursday 15:40  hartman
+
+ * not < but > ;)
+   time to stop for today
+
+2003-03-06 Thursday 13:52  hartman
+
+ * fixed an issue with blackbars at certain aspect ratios when you resize
+   the video window. (half, double)
+
+2003-03-06 Thursday 13:05  hartman
+
+ ALL: fixed: http://bugzilla.videolan.org/cgi-bin/bugzilla/show_bug.cgi?id=425
+      having two close buttons in one window goes against Apple's UIG.
+
+2003-03-06 Thursday 12:43  hartman
+
+ * modules/gui/macosx/applescript.?
+ * extras/MacOSX/Resources/vlc.scriptSuite
+ * extras/MacOSX/Resources/English.lproj/vlc.scriptTerminology
+   - moved existing applescript commands to these files
+   - added several control commands. supported are: play/pause, stop,
+     previous, next, fullscreen, mute, volumeUp and volumeDown.
+     These correspond to the existing menuitems. This still requires work
+     in the future to make it more correct AppleScript, but it works for now.
+
+ * modules/gui/macosx/controls.?
+   - split up the controls.m into a .m and a .h
+
+ * modules/gui/macosx/intf.?
+   - added a getControls method to gain access to the controller object from
+     the AppleScript commands.
+
+ * modules/gui/macosx/open.?
+   - removed the applescript support existing here and moved it to applescript.?
+
+ * modules/gui/macosx/playlist.m
+   - made the tooltips for the add and remove buttons localizable.
+
+ * modules/gui/macosx/vout.m
+   - added a comment on the meaning of otherMouse events.
+
+ * ALL:
+   - updated copyright information to include the current year ;)
+
+2003-03-06 Thursday 12:15  fenrir
+
+  * http: lalala, forgot one line :)
+
+2003-03-06 Thursday 12:09  fenrir
+
+  * http: fixed a segfault while using it more than once.
+
+2003-03-06 Thursday 11:15  hartman
+
+ * If labels are nil, then it shouldn't disable the entire preference panel.
+   fixes #428 more permenantly. the cause was a missing rt-priority desc.
+
+2003-03-06 Thursday 11:11  jpsaman
+
+ More sizing stuff.
+
+2003-03-06 Thursday 10:58  massiot
+
+ Fixed a segfault in the OS X preferences panel.
+
+2003-03-06 Thursday 10:27  jpsaman
+
+ Updated version number.
+
+2003-03-06 Thursday 01:10  sigmunau
+
+ we now insert playlist entries right after the playlist file, and not at the
+ end of playlist. Should close bug reported on mailing list by Stepan Roh
+ about "redirection".
+
+2003-03-05 Wednesday 23:37  gbazin
+
+ * modules/audio_filter/resampler/bandlimited.c: another bug-fix ( should be the last one ;)
+ * install-win32: the FAQ wasn't being included in the package.
+
+2003-03-05 Wednesday 20:58  gbazin
+
+ * Makefile.am: make package-win32 creates FAQ.htm not faq.htm.
+
+2003-03-05 Wednesday 20:31  gbazin
+
+ * modules/audio_filter/resampler/bandlimited.c: added a few more sanity checks.
+
+2003-03-05 Wednesday 20:16  hartman
+
+ * updated italian translation by Bruno <allevb@tin.it>
+   i had to merge it by hand, because it was pretty outdated.
+
+2003-03-05 Wednesday 18:55  gbazin
+
+ * src/input/input_ext-plugins.c: added an msleep() call in case we fail to
+    allocate a new buffer in input_FillBuffer(). This is necessary because
+    the input thread has an high priority and we don't want it to loop
+    without any interruption.
+
+2003-03-05 Wednesday 01:11  massiot
+
+ * Fixed LDFLAGS_mp4 variable.
+
+2003-03-05 Wednesday 01:05  sigmunau
+
+ added not that gestures are now supported on osx and windows, with a comment
+ telling that this isn't really useful yet.
+
+2003-03-05 Wednesday 00:37  massiot
+
+ Bumped up to 0.5.2-test3
+
+2003-03-05 Wednesday 00:36  massiot
+
+ * Made rt-priority a real-time variable (shut-up sam) and misc attempts
+   to improve responsiveness under OS X
+
+2003-03-05 Wednesday 00:32  hartman
+
+ * this code should allow for the use of gestures under OS X.
+
+2003-03-04 Tuesday 23:48  gbazin
+
+ * modules/video_output/directx: added support for the mouse gestures interface.
+
+2003-03-04 Tuesday 23:36  hartman
+
+ * grrr debug message in the wild.
+
+2003-03-04 Tuesday 23:08  gbazin
+
+ * modules/audio_filter/resampler/bandlimited.c: small bug-fixes.
+ * NEWS: added a note for the fixed MSVC project files.
+
+2003-03-04 Tuesday 22:54  hartman
+
+ * NEWS:
+   - added item on fix of 'clicking' sound between stream changes.
+   - added item on new bandlimited resampler
+ * ALL:
+   - bumped up revision number to 0.5.2-test3
+
+2003-03-04 Tuesday 22:12  gbazin
+
+ * include/vlc_common.h: on win32 we include malloc.h (otherwise alloca is
+    not declared).
+ * modules/access/file.c: use _lseeki64 instead of lseek on win32. This
+    should allow seeking on files > 1.2Gb (Hopefully closes #168).
+
+2003-03-04 Tuesday 20:28  gbazin
+
+ * modules/audio_filter/resampler/bandlimited.c: fix bug that was affecting
+    quality badly + some clean-up.
+    Changed the module priority so it is now the default resampler.
+
+2003-03-04 Tuesday 18:31  hartman
+
+ ALL:
+  - the german translation requires two different translations of the word
+    File. I added a _ANS() function to the macosx version that gets the
+    translation of 1:File and strips the first two characters of this
+    alternate translation.
+  - updated all .po files to make sure we don't break anything
+  - committed the March 1 version of the german translation by Felix
+    Kuhne <FK@aenneburghardt.de>
+
+2003-03-04 Tuesday 14:21  massiot
+
+ * Fixed a major bug in the LPCM codec.
+ * Moved input_ExtractPES to where it belongs, input_ext-dec.c.
+
+2003-03-04 Tuesday 04:27  gbazin
+
+ * modules/audio_filter/resampler/bandlimited.[ch]: new high-quality
+    bandlimited interpolation resampler.
+    It is not yet enabled by default because it requires a bit more works
+    (not fully stable yet because of buffer overflows under certain conditions).
+
+ * src/audio_output/input.c: the resamplers are now always active (expcept
+    in spdif mode).
+
+ * modules/audio_filter/resampler/*: modified the resampler to return the
+    input buffer when no resampling is needed.
+
+2003-03-04 Tuesday 00:58  hartman
+
+ * updated dutch strings.
+
+2003-03-04 Tuesday 00:48  massiot
+
+ * mpeg_video is back as a built-in because it is reproduceably faster than
+   as a plug-in,
+ * Another desperate attempt at fixing OS X lock-ups.
+
+2003-03-03 Monday 20:39  hartman
+
+ * NEWS:
+   - added remarks on m-audio fixes and other OSX specific fixes.
+   - added improved ID3 detection item
+ * README.MacOSX.rtf
+   - updated to reflect M-Audio fixes.
+ * ./extras/MacOSX/Resources/English.lproj/MainMenu.nib/*:
+   - widened the Browse.. button to allow for the german word: durchsuchen.
+
+2003-03-03 Monday 17:49  gbazin
+
+ * ALL: another bunch of fixes for the MSVC build.
+
+2003-03-03 Monday 15:21  gbazin
+
+ * ALL: Finally fixed the MSVC project files.
+        Don't include io.h on win32 when not necessary.
+        A few build fixes for MSVC.
+
+ * src/misc/win32_specific.c: try to load winsock2 instead of winsock1 when
+    present.
+
+2003-03-03 Monday 15:19  massiot
+
+ * Fixed a bug in LPCM codec.
+ * Changed an error into a warning.
+
+2003-03-03 Monday 02:38  fenrir
+
+  * fixed play back of  mms://viptvr.yacast.fr/encoderfranceinfo (asf
+ header send over multiples packets).
+
+2003-03-02 Sunday 20:07  gbazin
+
+ * configure.ac.in: fixed libid3tag detection.
+
+2003-03-02 Sunday 19:17  fenrir
+
+  * fixed seek flag with broadcasted data.
+
+2003-03-02 Sunday 18:13  fenrir
+
+  * forgot to initialize a variable.
+
+2003-03-02 Sunday 18:12  fenrir
+
+  * fixed a bug.
+
+2003-03-02 Sunday 13:10  gbazin
+
+ * NEWS: started filling in the NEWS file for the 0.5.2 release.
+
+2003-03-02 Sunday 03:47  gbazin
+
+ * configure.ac.in: Removed unused options.
+    We also don't link with lrt anymore when using GNU-pth (lrt depends on
+    lpthread).
+
+2003-03-02 Sunday 02:35  gbazin
+
+ * src/misc/threads.c, include/vlc_threads_funcs.h: another bunch of fixes
+    for the GNU-pth implementation.
+
+2003-03-02 Sunday 00:26  gbazin
+
+ * src/misc/threads.c, include/vlc_threads_funcs.h: fixed gnu-pth thread
+    implementation and fixed an initialization bug in libvlc.
+
+2003-03-01 Saturday 22:32  ipkiss
+
+  - about.dfm: the layout of the "About" dialog box is slightly different
+  - misc.cpp: toolbar buttons are translated too
+  - mainframe.dfm: removed the "Back" and "Eject" toolbar buttons, which
+    were rather useless, and added an "Eject disc" menu entry
+    Also hid the caption for all the toolbar buttons
+  - win32.cpp: Added a config option to display or not these captions
+  - preferences.cpp: small modification to support non-advanced mode
+
+2003-03-01 Saturday 20:25  gbazin
+
+ * install-win32, Makefile.am: added the html faq to the win32 package.
+ * toolbox, msvc/*: few fixes to the msvc project files generation.
+    (compiling plugins won't work yet because there are a few hacks that
+     need to be done in order to compile dlls that use the c-runtime)
+
+2003-02-28 Friday 18:23  fenrir
+
+  * try a workaround for BeOS MediaKit files.
+
+2003-02-28 Friday 11:19  massiot
+
+ German translation, courtesy of Felix Kühne <FK@aenneburghardt.de>.
+
+2003-02-28 Friday 05:31  ipkiss
+
+ Internationalization now works for the win32 interface (thanks Gildas).
+ I've voluntarily disabled the translation of the toolbar buttons
+ strings, because it looks really awful...
+
+2003-02-27 Thursday 23:09  ipkiss
+
+ A few modifications to get closer to i18n in the win32 interface
+
+2003-02-27 Thursday 17:38  gbazin
+
+ * modules/demux/avi/avi.c: compilation fix.
+
+2003-02-27 Thursday 16:07  fenrir
+
+  * httpd: clean up, kick up unused connection (it waits 10s), use select
+ to way (instead of a hard coded sleep ;)
+
+2003-02-27 Thursday 14:19  gbazin
+
+ * ALL: i18n updates and fixes.
+
+2003-02-27 Thursday 13:44  marcari
+
+ * updates for the YOPY ports (thx to Sebastien Chaumat !)
+
+2003-02-27 Thursday 09:19  massiot
+
+ * Bumped up revision number to 0.5.2-test2
+ * Another attempt at fixing the "VLC is locking up OS X" problem
+ * Updated po files
+
+2003-02-26 Wednesday 22:00  asmax
+
+ * compilation fixes...
+
+2003-02-26 Wednesday 20:39  gbazin
+
+ * configure.ac.in, Makefile.am, install-win32: fixed the package-win32 make
+    target, and included the locales in the installer script.
+ * src/libvlc.c: on win32 we look for the locales in vlc's directory.
+
+2003-02-26 Wednesday 19:15  massiot
+
+ * Added sanity checks for PTS in the future.
+
+2003-02-26 Wednesday 16:47  marcari
+
+ * implementation of the 'autoplay file' button callback
+ * when clicking a link : follows the link and don't try to open it
+ * yopy does not always sees the '.' and '..', so workaround :
+     - all the hidden files are not displayed
+     - the '..' directory is each time added by hand
+
+2003-02-26 Wednesday 16:44  marcari
+
+ * small modification for linupy :
+     - added a pixmpa directory
+     - added a set_usize (how do we maximize cleanly a gtk-window ?)
+     - chdir to '.' instead of '/mnt' (should it be '~' or '/' ?)
+
+2003-02-26 Wednesday 14:51  gbazin
+
+ * src/input/input_ext-dec.c: added a few sanity checks that avoid crashing
+    badly when we reach the end of the stream (decoder stream).
+ * modules/packetizer/mpegvideo.c: fixed a bug that was causing an infinite
+    loop when the end of the stream was reached.
+
+2003-02-26 Wednesday 13:38  fenrir
+
+  * ts.c: added "ts" shorcut for ts_dvbpsi.
+
+2003-02-26 Wednesday 05:23  babal
+
+ - link the headphone channel mixer with the math library
+
+2003-02-25 Tuesday 22:09  gbazin
+
+ * modules/codec/libmpeg2.c: fixed pts handling.
+
+2003-02-25 Tuesday 19:26  gbazin
+
+ * configure.ac.in: accidentaly changed AM_GNU_GETTEXT_VERSION to 0.11.5 in
+    my last commit.
+ * po/Makevars: file needed by newer versions of gettext.
+
+2003-02-25 Tuesday 18:17  fenrir
+
+  * stream_output.* : added a flags variable to sout_buffer_t, allowing to
+ mark headers.
+  * httpd : added a way to use stream header, and changed the way that
+ stream data are stored (allow better client handling).
+  * http : use stream header, and add mime type detection by looking
+ at file extention (could be improved).
+  * ogg: fixed a segfault when removing a stream, mark header.
+
+2003-02-25 Tuesday 18:15  gbazin
+
+ * configure.ac.in, modules/codec/Modules.am, modules/codec/libmpeg2.c:
+    Added a simple mpeg video decoder based on libmpeg2. It is mainly useful
+    for comparing the performance against our custom decoder as it is currently
+    missing some important features like the synchro stuff.
+
+2003-02-25 Tuesday 00:28  fenrir
+
+  * stream_output.c : added a sanity check.
+
+2003-02-25 Tuesday 00:27  fenrir
+
+  * all : ogg/ogm muxer. Yet very limited as it accepts only mp3/a52 audio
+ and mpeg4/divx3 video streams. (Created files seem to work only with vlc).
+
+2003-02-24 Monday 18:06  jlj
+
+   * a52tofloat32.c: changed an error into warning.
+
+2003-02-24 Monday 15:40  sigmunau
+
+ updated documentation to reflect that input_AccessReinit should be called
+ before, and not after a random seek
+
+2003-02-24 Monday 15:14  fenrir
+
+  * all : fix compilation.
+
+2003-02-24 Monday 13:34  fenrir
+
+  * stream_output.c : fixed compilation.
+  * mux/* implemented pf_mux_capacity.
+
+2003-02-24 Monday 12:14  gbazin
+
+ * configure.ac.in, modules/misc/httpd.c: compilation fixes for win32.
+
+2003-02-24 Monday 12:00  fenrir
+
+  * stream_output.h : add a private parameter to sout_instance_t only used
+ by src/stream_output.c (avoid changing every time stream_output.h...)
+
+2003-02-24 Monday 11:45  fenrir
+
+  * stream output: fixed name inconsistency, added a new exported
+ functions by muxer.
+  * wav: fixed a warning.
+
+2003-02-24 Monday 10:26  fenrir
+
+  * asf: fix seek for http.
+
+2003-02-24 Monday 10:18  fenrir
+
+  * wav: proper seek handling. (wav file readable over http).
+
+2003-02-23 Sunday 23:35  fenrir
+
+  * enable httpd(by default) and http.
+
+2003-02-23 Sunday 20:07  fenrir
+
+  * all : declaration of http and httpd.
+
+2003-02-23 Sunday 20:05  fenrir
+
+  * modules/access_output/http : http output.
+  * httpd : mini http server (be carefull about security issue...)
+
+2003-02-23 Sunday 19:07  fenrir
+
+  * all : added streaming support for crappy ms video codec into TS.
+  - Only vlc is able to read such TS.
+  - I use stream id 0xa0 and descriptor 0xa0, I hope there aren't used.
+  - DivX1/2/3, wmv1/2, h/i263 should be supported, others could be
+    quickly added.
+  - Please test.
+
+2003-02-23 Sunday 17:31  sigmunau
+
+ added a demux and decoder for flac files (disabled by default). Works for
+ 16bit per sample streams, only tested with stereo
+
+2003-02-23 Sunday 06:53  jlj
+
+   * ./modules/gui/macosx/aout.m: M-Audio Revolution fixes.
+                                  Dynamic device support.
+   * ./modules/gui/macosx: Minor fixes and cosmetic changes.
+
+2003-02-23 Sunday 02:25  massiot
+
+ * Destroy audio-device and audio-channels when no output plug-in is
+   available.
+
+2003-02-22 Saturday 17:10  fenrir
+
+  * fix compilation.
+
+2003-02-22 Saturday 15:11  sigmunau
+
+  Fixed seme seeking issues with http access module, fixed an error that
+ caused id3v2.4 tags at the end of the file to not work. Added checks to
+ avoid seeking off the ends of the file. Should close #325, please confirm
+
+2003-02-21 Friday 23:59  gbazin
+
+ * src/audio_output/input.c: fixed buffer allocation bug that was triggered
+    when using "in place" resamplers.
+
+2003-02-21 Friday 17:31  hartman
+
+ DJ's first steps in C and vlc decoders ;)
+ * modules/audio_filter/converter/mpgatofixed32.c:
+   - fixed an issue that could cause glitches when switching from one stream
+     to another. the buffer wasn't entirely getting 0000 because multiple
+     channels were not taken into account when doing this.
+ * ALL:
+   - if float32 then clear the buffer with (float)0
+
+2003-02-21 Friday 16:16  hartman
+
+ * previous commit seems to break some things. reverting.
+
+2003-02-21 Friday 15:17  hartman
+
+ * (float) 0 the buffer if it cannot be decoded and fixed32.
+   right Meuuh ??? ;)
+
+2003-02-21 Friday 04:49  hartman
+
+ * VLC.app should show its version in the Finder now
+   Meeuh, one more place that needs version string updated before a release.
+   might be made automated ?
+
+2003-02-21 Friday 04:22  hartman
+
+ * ignore project Builder user files and backup .nib files.
+ * vlc.app changed to VLC.app. cvsignore changed to reflect this.
+
+2003-02-21 Friday 03:45  hartman
+
+ * If the "show advanced" option has been changed and you press the Apply
+   button, the preferences window is destroyed and created.
+
+2003-02-20 Thursday 19:10  hartman
+
+ * prefs obey the advanced option. Apply does not as of yet.
+
+2003-02-20 Thursday 17:07  gbazin
+
+ * src/libvlc.h, modules/audio_output: added a global --spdif config option
+    to allow using the spdif output by default if available.
+ * modules/misc/dummy/*: on win32 added a quiet mode that doesn't display
+    a dos command box.
+ * modules/control/rc/rc.c: on win32 enabled the echo mode and the
+    backspace key.
+ * modules/codec/mpeg_audio.c: fixed a sync bug.
+
+2003-02-20 Thursday 02:52  sigmunau
+
+ * include/configuration.h: added a new flag to the configuration stucture to
+ indicate wether it is an "advanced" option or not. The goal with this is to
+ hide the user from all the strange options that very seldom needs to be
+ changed. added an extra argument to all the add_* macros to indicate wether
+ the item is advanced or not.
+ * src/libvlc.h: added an "show advanced options" config option default
+ disabled
+ * src/libvlc.c: the advanced options are not listed by vlc --help and
+ friends unless --advanced is used
+ * modules/gtk/preferences.c: the gtk/gnome preferences dialog don't show
+ advanced options unless advanced is set
+ all: set the advanced flag to VLC_FALSE or VLC_TRUE for all options, by
+ using some common sense. Please check and correct
+
+ note: All interfaces should still work like they used to, see the change in
+ modules/gtk/preferences.c to find out how to "hide" options.
+
+ second note: I think I've changed all the modules, but I could not test
+ everyone for compilation, expect some broken modules (the fix is to add ",
+ VLC_TRUE" as last argument to the add_* I forgot)
+
+2003-02-19 Wednesday 23:08  gbazin
+
+ * modules/audio_output/directx.c: forgot to enable channel re-ordering.
+ * modules/audio_output/waveout.c: fixed a crash that happened when probing
+    devices supporting S/PDIF. (Should fix 354)
+
+2003-02-19 Wednesday 15:49  hartman
+
+ * increased accuracy of positionslider in OSX. although this will not solve
+   all problems this will improve results a bit (by my own experience).
+
+2003-02-19 Wednesday 11:02  gbazin
+
+ * src/libvlc.c: "stty size" won't work on win32 so make ConsoleWidth()
+    always return 80.
+
+2003-02-19 Wednesday 00:34  gbazin
+
+ * modules/demux/mp4/*: added FOURCC_dvc (DV - NTSC), FOURCC_dvp (DV - PAL)
+    and FOURCC_twos (PCM audio).
+
+2003-02-18 Tuesday 23:40  ipkiss
+
+  * src/misc/modules.c: on Windows, we look for the plugins in vlc's root
+    directory when there is no 'plugins' nor 'modules' subdirectory
+    (may close #306)
+
+2003-02-18 Tuesday 23:33  gbazin
+
+ * modules/codec/ffmpeg/video.c: got rid of ffmpeg_ConvertPictureI410toI420()
+    and use img_convert() from ffmpeg instead. Also added support for the
+    PIX_FMT_YUV411P pixel format so we can now decode the DV Quicktime videos
+    from media.xiph.org.
+
+2003-02-18 Tuesday 21:54  hartman
+
+ * Only update the info window if it is visible
+
+2003-02-18 Tuesday 20:42  gbazin
+
+ * modules/demux/rawdv.c: added support for DV audio now that ffmpeg can
+    decode this.
+ * modules/codec/ffmpeg/ffmpeg.h, modules/codec/ffmpeg/ffmpeg.c: added the
+    necessary fourcc for DV audio.
+
+2003-02-18 Tuesday 19:49  fenrir
+
+  * mpeg_audio.c: removed some fprintf...
+
+2003-02-18 Tuesday 19:33  titer
+
+  * ipv4.c, libvlc.h: add a --ttl option to set time-to-live when
+                      multicasting with the stream output
+  * modules/control/: missing cvsignore
+
+2003-02-18 Tuesday 14:13  sam
+
+   * ./mozilla/*: s/VideoLAN Client/VLC/g.
+
+2003-02-18 Tuesday 01:51  fenrir
+
+  * raah, corrected mpeg2-layer3 playback (and streaming). (that my last
+ fix had broken :p )
+
+2003-02-18 Tuesday 01:20  hartman
+
+ * Changed an Error message. Many people did not understand:
+   no suitable decoder module for fourcc `IV31'
+   I have appended:
+   VLC probably does not support this sound or video format.
+
+2003-02-18 Tuesday 01:17  massiot
+
+ * Fixed a segfault in the Japanese preferences panel.
+
+2003-02-18 Tuesday 00:47  hartman
+
+ * Fixed the localization issue on MacOSX.
+
+2003-02-18 Tuesday 00:10  jpsaman
+
+ Juglin with dependencies.
+
+2003-02-17 Monday 23:19  gbazin
+
+ * modules/audio_output/directx.c: added multichannel support to the
+    directx plugin.
+ * modules/audio_output/waveout.c: fixed quad audio channels detection and
+    a few misplaced debug messages.
+ * configure.ac.in: don't link anymore the rc plugin with the winsock lib.
+
+2003-02-17 Monday 23:03  asmax
+
+ * added a SAP server, with some kludges because the SAP client in vlc
+   is not RFC-compliant...
+
+2003-02-17 Monday 19:58  hartman
+
+ * NEWS: added info about the new 0.5.1a release for OSX.
+ * extras/MacOSX/vlc.pbproj/project.pbxproj: bumped revision #
+
+2003-02-17 Monday 18:06  massiot
+
+ Fixed the "everything is in Japanese" bug. :p
+
+2003-02-17 Monday 17:56  gbazin
+
+ * modules/control/rc/rc.c: finally fixed the rc interface under win32 by
+    using WaitForSingleObject() on the console handle and ReadConsoleInput().
+    (Closes #59)
+
+2003-02-17 Monday 15:43  massiot
+
+ Now 0.5.2-cvs (estimated release date in two weeks from now).
+
+2003-02-17 Monday 11:52  hartman
+
+ * Whoops. i forgot to add these files. sorry everyone.
+
+2003-02-17 Monday 10:47  gbazin
+
+ * modules/audio_filter/resampler/linear.c: lowered the priority of the linear
+    resampler so the ugly resampler is once again the default. The quality of
+    the ugly resampler is currently better than the linear one because of a
+    design defect.
+
+2003-02-17 Monday 08:22  sam
+
+   * ./debian/woody-buildpackage: Debian package creation fixes.
+
+2003-02-17 Monday 07:31  sam
+
+   * ./modules/gui/macosx/Modules.am: removed %#$@#!#@ non-existent file!
+
+2003-02-17 Monday 07:15  sam
+
+   * Updated NEWS and ChangeLog.
+
 2003-02-17 Monday 07:00  sam
 
    * ./src/misc/modules.c: hmpf, Wine does not complain about "/"s in paths,
@@ -2919,10 +3728,6 @@
  no time to fix the playlist save&restore issue before the release (and
  wouldn't be wise anyway), so deactivated it in the win32 interface.
 
-2002-12-29 Sunday 02:33  massiot
-
- PTS calculation fix for the mad plug-in, courtesy of KKI_ on IRC.
-
 2002-12-29 Sunday 02:16  massiot
 
  OS X port :
@@ -3495,12 +4300,6 @@
 2002-12-12 Thursday 11:56  garf
 
   * fixed one or two things (thanks sam)
-
-2002-12-11 Wednesday 23:56  gbazin
-
- * modules/codec/mad/*: don't let mad drop corrupted mpeg frames without telling us. When
- this happens, we miscalculate the pts of the next valid frame, which in turn causes heavy
- resampling. This fix should be most useful for web radios.
 
 2002-12-11 Wednesday 22:50  jpsaman
 
@@ -6624,10 +7423,6 @@
    * ./modules/codec/faad/decoder.c: the AAC decoder is in sync with aout3.
    * ./modules/codec/a52old/a52old.c: the a52old decoder as well.
 
-2002-08-22 Thursday 23:41  sam
-
-   Forgot one file in my previous commit.
-
 2002-08-22 Thursday 19:14  sam
 
    * ./modules/audio_filter/converter/fixed32tofloat32.c: fixed conversion.
@@ -7177,10 +7972,6 @@
 
  It's really amazing how much aout3 simplifies these plugins :)
 
-2002-08-10 Saturday 19:54  jpsaman
-
- Allocation of New buffers seems alright now.
-
 2002-08-10 Saturday 19:53  jpsaman
 
  Enabled mad plugin again.
@@ -7189,11 +7980,6 @@
 
    * ./modules/gui/win32/Makefile: fixed the Win32 interface compilation.
    * ./modules/gui/win32/win32.cpp: merged intfwin.cpp into this file.
-
-2002-08-10 Saturday 15:40  jpsaman
-
- Adapted mad codec plugin to new aout3. Not tested yet.`
- Plugin is not being build by new built structure, this needs to be fixed first.
 
 2002-08-10 Saturday 13:35  jpsaman
 
