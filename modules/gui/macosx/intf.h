@@ -203,6 +203,8 @@ struct intf_sys_t
     IBOutlet id o_mu_subtitle;
     IBOutlet id o_mi_deinterlace;
     IBOutlet id o_mu_deinterlace;
+    IBOutlet id o_mi_ffmpeg_pp;
+    IBOutlet id o_mu_ffmpeg_pp;
 
     IBOutlet id o_mu_window;
     IBOutlet id o_mi_minimize;

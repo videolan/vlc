@@ -464,6 +464,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mu_subtitle setTitle: _NS("Subtitles Track")];
     [o_mi_deinterlace setTitle: _NS("Deinterlace")];
     [o_mu_deinterlace setTitle: _NS("Deinterlace")];
+    [o_mi_ffmpeg_pp setTitle: _NS("Post processing")];
+    [o_mu_ffmpeg_pp setTitle: _NS("Post processing")];
 
     [o_mu_window setTitle: _NS("Window")];
     [o_mi_minimize setTitle: _NS("Minimize Window")];
@@ -985,11 +987,26 @@ static VLCMain *_o_sharedMainInstance = nil;
 
             if ( p_vout != NULL )
             {
+                vlc_object_t * p_dec_obj;
+
                 [o_controls setupVarMenuItem: o_mi_screen target: (vlc_object_t *)p_vout
                     var: "video-device" selector: @selector(toggleVar:)];
 
                 [o_controls setupVarMenuItem: o_mi_deinterlace target: (vlc_object_t *)p_vout
                     var: "deinterlace" selector: @selector(toggleVar:)];
+
+                p_dec_obj = (vlc_object_t *)vlc_object_find(
+                                                     (vlc_object_t *)p_vout,
+                                                     VLC_OBJECT_DECODER,
+                                                     FIND_PARENT );
+                if ( p_dec_obj != NULL )
+                {
+                   [o_controls setupVarMenuItem: o_mi_ffmpeg_pp target:
+                        (vlc_object_t *)p_dec_obj var:"ffmpeg-pp-q" selector:
+                        @selector(toggleVar:)];
+
+                    vlc_object_release(p_dec_obj);
+                }
                 vlc_object_release( (vlc_object_t *)p_vout );
             }
         }
@@ -1111,6 +1128,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_subtitle setEnabled: b_enabled];
     [o_mi_channels setEnabled: b_enabled];
     [o_mi_deinterlace setEnabled: b_enabled];
+    [o_mi_ffmpeg_pp setEnabled: b_enabled];
     [o_mi_device setEnabled: b_enabled];
     [o_mi_screen setEnabled: b_enabled];
 }
