@@ -1382,7 +1382,7 @@ create_intf_disc (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (disc_name);
   gtk_box_pack_start (GTK_BOX (hbox1), disc_name, TRUE, TRUE, 0);
-  gtk_entry_set_text (GTK_ENTRY (disc_name), DVD_DEVICE);
+  gtk_entry_set_text (GTK_ENTRY (disc_name), config_GetPszVariable( "dvd_device" ));
 
   dialog_action_area4 = GNOME_DIALOG (intf_disc)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_disc), "dialog_action_area4", dialog_action_area4);
@@ -2314,7 +2314,7 @@ create_intf_open (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (entry1);
   gtk_box_pack_start (GTK_BOX (hbox6), entry1, TRUE, TRUE, 0);
-  gtk_entry_set_text (GTK_ENTRY (entry1), DVD_DEVICE);
+  gtk_entry_set_text (GTK_ENTRY (entry1), config_GetPszVariable( "dvd_device" ));
 
   tab_disc = gtk_label_new (_("Disc"));
   gtk_widget_ref (tab_disc);

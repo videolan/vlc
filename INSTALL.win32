@@ -76,6 +76,7 @@ along those lines:
 
   make distclean ; \
   ./configure --host=i586-mingw32msvc --target=i586-mingw32msvc \
+  --build=i386-linux \
   --with-gtk-config-path=/usr/local/gtk-win32/bin \
   --with-sdl-config-path=/usr/local/SDL-1.2.3-win32/i386-mingw32msvc/bin \
   --with-directx=/usr/local/dxheaders
@@ -86,6 +87,7 @@ www.videolan.org, you have to use something along those lines:
   CC=/usr/local/cross-tools/bin/i586-mingw32msvc-gcc \
   PATH=/usr/local/cross-tools/bin:$PATH \
   ./configure --host=i586-mingw32msvc --target=i586-mingw32msvc \
+  --build=i386-linux \
   --with-gtk-config-path=/usr/local/gtk-win32/bin \
   --with-sdl-config-path=/usr/local/SDL-1.2.3-win32/i386-mingw32msvc/bin \
   --with-directx=/usr/local/dxheaders

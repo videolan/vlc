@@ -49,8 +49,6 @@
 
 #define PACKAGE "vlc"
 #define VERSION "0.2.92-dev"
-#define DVD_DEVICE "E:"
-#define VCD_DEVICE "E:"
 #define COPYRIGHT_MESSAGE "VideoLAN Client - version 0.2.92-dev_2002-03-22 Ourumov - (c) 1996-2002 VideoLAN"
 #define MODULE_SUFFIX "__MODULE_0_2_92_dev_2002_03_22"
 #define MODULE_SYMBOL 0_2_92_dev_2002_03_22

@@ -421,7 +421,9 @@ dnl
 MMX_MODULES="memcpymmx idctmmx motionmmx chroma_i420_rgb_mmx chroma_i420_yuy2_mmx chroma_i422_yuy2_mmx chroma_i420_ymga_mmx"
 MMXEXT_MODULES="memcpymmxext idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn imdct3dn downmix3dn"
+if test x$SYS != xmingw32; then
 SSE_MODULES="imdctsse downmixsse"
+fi
 ALTIVEC_MODULES="idctaltivec motionaltivec memcpyaltivec"
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
@@ -517,23 +519,6 @@ if test x"$ac_cv_ld_altivec" != x"no"; then
   LIB_VLC="${LIB_VLC} -framework vecLib"
 fi
 fi # end if mingw32
-
-dnl
-dnl  DVD and VCD devices
-dnl
-case x$SYS in
-  xmingw32)
-    DVD_DEVICE="E:"
-    VCD_DEVICE="E:"
-    ;;
-  *)
-    DVD_DEVICE="/dev/dvd"
-    VCD_DEVICE="/dev/cdrom"
-    ;;
-esac
-
-AC_DEFINE_UNQUOTED(DVD_DEVICE, "$DVD_DEVICE")
-AC_DEFINE_UNQUOTED(VCD_DEVICE, "$VCD_DEVICE")
 
 
 dnl
@@ -1596,8 +1581,6 @@ AC_SUBST(WINDRES)
 AC_SUBST(DLL_PATH)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
-AC_SUBST(VCD_DEVICE)
-AC_SUBST(DVD_DEVICE)
 
 AC_SUBST(LDFLAGS)
 AC_SUBST(PLDFLAGS)
