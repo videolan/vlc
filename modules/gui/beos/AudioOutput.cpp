@@ -2,7 +2,7 @@
  * AudioOutput.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.22 2002/12/26 18:17:38 stippi Exp $
+ * $Id: AudioOutput.cpp,v 1.23 2003/01/04 17:14:22 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -120,6 +120,13 @@ static void Play( void *aout, void *p_buffer, size_t i_size,
 {
     aout_buffer_t * p_aout_buffer;
     aout_instance_t *p_aout = (aout_instance_t*) aout;
+    
+    if( (int)i_size != 8 * p_aout->output.i_nb_samples )
+    {
+        msg_Warn( p_aout, "BSoundPlayer buffer size changed (%d -> %d)",
+                  8 * p_aout->output.i_nb_samples, i_size );
+        p_aout->output.i_nb_samples = i_size / 8;
+    }
 
     vlc_mutex_lock( &p_aout->output_fifo_lock );
     p_aout_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
