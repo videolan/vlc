@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.22 2001/12/30 07:09:56 sam Exp $
+ * $Id: input_dec.c,v 1.23 2001/12/31 03:26:27 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -47,11 +47,17 @@ vlc_thread_t input_RunDecoder( input_thread_t * p_input,
 {
     probedata_t probedata;
     vlc_thread_t thread_id;
+    char * psz_plugin = NULL;
 
     /* Get a suitable module */
     probedata.i_type = p_es->i_type;
 
-    p_es->p_module = module_Need( MODULE_CAPABILITY_DECODER, NULL, &probedata );
+    if( p_es->i_type == MPEG1_AUDIO_ES || p_es->i_type == MPEG2_AUDIO_ES )
+    {
+        psz_plugin = main_GetPszVariable( ADEC_MPEG_VAR, NULL );
+    }
+
+    p_es->p_module = module_Need( MODULE_CAPABILITY_DECODER, psz_plugin, &probedata );
     if( p_es->p_module == NULL )
     {
         intf_ErrMsg( "input error: no suitable decoder module for type 0x%x",
