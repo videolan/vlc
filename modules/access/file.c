@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.12 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: file.c,v 1.13 2003/03/04 21:12:04 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -48,6 +48,12 @@
 #   include <io.h>
 #endif
 
+#if defined( WIN32 ) && !defined( UNDER_CE )
+#   ifdef lseek
+#       undef lseek
+#   endif
+#   define lseek _lseeki64
+#endif
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/

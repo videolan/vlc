@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.56 2003/03/03 16:49:14 gbazin Exp $
+ * $Id: vlc_common.h,v 1.57 2003/03/04 21:12:04 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -99,6 +99,10 @@ typedef uint8_t                 byte_t;
 /* Not portable in a 64-bit environment. */
 typedef int                 ptrdiff_t;
 #   endif
+#endif
+
+#if defined( WIN32 )
+#   include <malloc.h>
 #endif
 
 #if defined( WIN32 ) || defined( UNDER_CE )
@@ -608,11 +612,6 @@ typedef __int64 off_t;
 #   if defined( __BORLANDC__ )
 #       undef off_t
 #       define off_t unsigned __int64
-#   endif
-
-#   ifdef lseek
-#       undef lseek
-#       define lseek _lseeki64
 #   endif
 
 #   ifndef O_NONBLOCK
