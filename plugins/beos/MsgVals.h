@@ -25,6 +25,7 @@
 #define PLAYING		0
 #define PAUSED		1
 
+const uint32 OPEN_FILE      = 'OPFL';
 const uint32 OPEN_DVD       = 'OPDV';
 const uint32 STOP_PLAYBACK  = 'STPL';
 const uint32 START_PLAYBACK = 'PLAY';

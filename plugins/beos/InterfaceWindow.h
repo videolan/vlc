@@ -22,6 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MENU_HEIGHT 15
+
 class InterfaceWindow : public BWindow
 {
 public:
@@ -38,6 +40,7 @@ public:
 	BCheckBox * p_mute;
 	sem_id	fScrubSem;
 	bool	fSeeking;
+	BFilePanel *file_panel;
 };
 
 class InterfaceView : public BView
@@ -50,7 +53,19 @@ public:
 };
 
 
-class SeekSlider : public BSlider
+class MediaSlider : public BSlider
+{
+public:
+	MediaSlider(BRect frame,
+				BMessage *message,
+				int32 minValue,
+				int32 maxValue);
+	~MediaSlider();
+	virtual void DrawThumb(void);
+};
+				
+
+class SeekSlider : public MediaSlider
 {
 public:
 	SeekSlider(BRect frame,

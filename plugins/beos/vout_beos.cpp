@@ -128,9 +128,8 @@ int32 DrawingThread(void *data)
     w->Lock();
        if( w->fDirty )
             {
-              if(!w->fUsingOverlay)
-              	w->view->DrawBitmap(w->bitmap[w->i_buffer_index], w->bitmap[w->i_buffer_index]->Bounds(), w->Bounds());
-              w->fDirty = false;
+           	w->view->DrawBitmap(w->bitmap[w->i_buffer_index], w->bitmap[w->i_buffer_index]->Bounds(), w->Bounds());
+            w->fDirty = false;
             }
     w->Unlock();
    	snooze(20000);
@@ -143,13 +142,14 @@ int32 DrawingThread(void *data)
  *****************************************************************************/
 
 VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_output )
-        : BWindow(frame, name, B_TITLED_WINDOW, NULL)
+        : BWindow(frame, name, B_DOCUMENT_WINDOW, NULL)
 {
 	float minWidth, minHeight, maxWidth, maxHeight; 
 
     teardownwindow = false;
     is_zoomed = false;
     p_vout = p_video_output;
+    fDrawThreadID = NULL;
 
     rect = Frame();
     view = new VLCView(Bounds());
@@ -192,6 +192,10 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
 	 	SetTitle(VOUT_TITLE " (BBitmap output)");
 	 }
 
+	i_bytes_per_pixel = bitmap[0]->BytesPerRow()/bitmap[0]->Bounds().IntegerWidth();
+    fRowBytes = bitmap[0]->BytesPerRow();
+    fDirty = false;
+
 	if(fUsingOverlay)
 		{
 		memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
@@ -203,13 +207,12 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
 		GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight); 
 		SetSizeLimits((float) Bounds().IntegerWidth(), maxWidth, (float) Bounds().IntegerHeight(), maxHeight);
 		}
-
-	i_bytes_per_pixel = bitmap[0]->BytesPerRow()/bitmap[0]->Bounds().IntegerWidth();
-    fRowBytes = bitmap[0]->BytesPerRow();
-    fDirty = false;
-    fDrawThreadID = spawn_thread(DrawingThread, "drawing_thread",
+	else
+    	{
+	    fDrawThreadID = spawn_thread(DrawingThread, "drawing_thread",
                     B_DISPLAY_PRIORITY, (void*) this);
-    resume_thread(fDrawThreadID);
+ 		resume_thread(fDrawThreadID);
+   		}
     Show();
 }
 
@@ -219,9 +222,9 @@ VideoWindow::~VideoWindow()
 
     Hide();
     Sync();
-    wait_for_thread(fDrawThreadID, &result);
     if(!fUsingOverlay)
     	{
+	    wait_for_thread(fDrawThreadID, &result);
     	delete bitmap[0];
     	delete bitmap[1];
     	}
@@ -245,6 +248,7 @@ if(is_zoomed)
 	{
 	MoveTo(rect.left, rect.top);
 	ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
+	SetLook(B_DOCUMENT_WINDOW_LOOK);
 	be_app->ShowCursor();
 	}
 else
@@ -256,6 +260,7 @@ else
 	delete screen;
 	MoveTo(0,0);
 	ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
+	SetLook(B_NO_BORDER_WINDOW_LOOK);
 	be_app->HideCursor();
 	}
 is_zoomed = !is_zoomed;

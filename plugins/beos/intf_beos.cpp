@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.14 2001/03/05 13:28:47 richards Exp $
+ * $Id: intf_beos.cpp,v 1.15 2001/03/05 20:36:04 richards Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -48,7 +48,11 @@
 #include <NodeInfo.h>
 #include <Locker.h>
 #include <DirectWindow.h>
-
+#include <Box.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
+#include <FilePanel.h>
+#include <Alert.h>
 #include <malloc.h>
 #include <string.h>
 
@@ -95,19 +99,37 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
     : BWindow(frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
     	B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK |B_ASYNCHRONOUS_CONTROLS)
 {
+    file_panel = NULL;
     p_intf = p_interface;
 	BRect ButtonRect;
 	float xStart = 2.0;
-	float yStart = 10.0;
+	float yStart = 40.0;
 
     SetName( "interface" );
     SetTitle(VOUT_TITLE " (BeOS interface)");
+    BRect rect(0, 0, 0, MENU_HEIGHT);
     
-    BView* p_view;
+    BMenuBar *menu_bar; 
+    menu_bar = new BMenuBar(rect, "main menu");
+    AddChild( menu_bar );
 
-	/* Add the view */
-    p_view = new BView( Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW );
-	p_view->SetViewColor(216,216,216);
+	BMenu *m;
+	BMenuItem *i;
+
+	menu_bar->AddItem( m = new BMenu("File") );
+	menu_bar->ResizeToPreferred();
+	m->AddItem( new BMenuItem("Open file...", new BMessage(OPEN_FILE), 'O'));
+	m->AddItem( new BMenuItem("Open DVD...", new BMessage(OPEN_DVD), 'D'));
+	m->AddSeparatorItem();
+	m->AddItem( new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
+	
+
+    rect = Bounds();
+    rect.top += menu_bar->Bounds().IntegerHeight()+1;
+
+    BBox* p_view;
+	p_view = new BBox( rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW );
+	p_view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
     
    	/* Buttons */
    	/* Slow play */
@@ -159,28 +181,37 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
 											kDisabledStopButtonBitmapBits,
 											new BMessage(STOP_PLAYBACK));
    	p_view->AddChild( p_stop );
-   	
+
+	ButtonRect.SetLeftTop(BPoint(xStart + 5, yStart + 6));
+	ButtonRect.SetRightBottom(ButtonRect.LeftTop() + kSpeakerButtonSize);
+	xStart += kSpeakerIconBitmapWidth;
+ 
+	TransportButton* p_mute = new TransportButton(ButtonRect, B_EMPTY_STRING,
+											kSpeakerIconBits,
+											kPressedSpeakerIconBits,
+											kSpeakerIconBits,
+											new BMessage(VOLUME_MUTE));
+
+   	p_view->AddChild( p_mute );
+ 
    	/* Seek Status */	
-	p_seek = new SeekSlider(BRect(5,35,355,65), this, 0, 100,
+    rgb_color fill_color = {0,255,0};
+	p_seek = new SeekSlider(BRect(5,10,250,30), this, 0, 100,
 						B_TRIANGLE_THUMB);
 	p_seek->SetValue(0);
-	p_seek->UseFillColor(TRUE);
+	p_seek->UseFillColor(true, &fill_color);
     p_view->AddChild( p_seek );
 
    	/* Volume Slider */	
-	p_vol = new BSlider(BRect(xStart,2,300,20), "vol", "Volume", 
-						 new BMessage(VOLUME_CHG), 0, VOLUME_MAX);
+	p_vol = new MediaSlider(BRect(xStart,40,250,60), new BMessage(VOLUME_CHG),
+							0, VOLUME_MAX);
 	p_vol->SetValue(VOLUME_DEFAULT);
+	p_vol->UseFillColor(true, &fill_color);
     p_view->AddChild( p_vol );
     
-    /* Volume Mute */
-	p_mute = new BCheckBox(BRect(300,10,355,25), "mute", "Mute",
-						 new BMessage(VOLUME_MUTE));
-    p_view->AddChild( p_mute );
-							 
 	/* Set size and Show */
     AddChild( p_view );
-	ResizeTo(360,70);
+	ResizeTo(260,70 + menu_bar->Bounds().IntegerHeight()+1);
     Show();
 }
 
@@ -196,11 +227,27 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 	int vol_val = p_vol->Value();	// remember the current volume
 	static int playback_status;		// remember playback state
 	
+	BAlert *alert;
+	
 	Activate();
     switch( p_message->what )
     {
-    case OPEN_DVD:
+    case OPEN_FILE:
+    	if(file_panel)
+    		{
+    		file_panel->Show();
+    		break;
+    		}
+    	file_panel = new BFilePanel();
+    	file_panel->SetTarget(this);
+    	file_panel->Show();
     	break;
+
+    case OPEN_DVD:
+    	alert = new BAlert(VOUT_TITLE, "Opening DVDs not yet implemented", "Bummer");
+    	alert->Go();
+    	break;
+
     case STOP_PLAYBACK:
     	// this currently stops playback not nicely
 		if (p_intf->p_input != NULL )
@@ -300,7 +347,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 		// mute
         if (p_main->p_aout != NULL) 
    	    {
-			if (p_mute->Value() == B_CONTROL_OFF)
+			if (p_main->p_aout->vol == 0)
 			{
 				p_main->p_aout->vol = vol_val;
 			}	
@@ -312,6 +359,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 		break;
 	case SELECT_CHANNEL:
 		break;
+	case B_REFS_RECEIVED:
     case B_SIMPLE_DATA:
         {
             entry_ref ref;
@@ -319,8 +367,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             {
                 BPath path( &ref );
                 char * psz_name = strdup(path.Path());
-                intf_WarnMsg( 1, "intf: dropped text/uri-list data `%s'",
-                              psz_name );
                 intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, psz_name );
             }
 
@@ -342,6 +388,37 @@ bool InterfaceWindow::QuitRequested()
 
     return( false );
 }
+/*****************************************************************************
+ * MediaSlider
+ *****************************************************************************/
+MediaSlider::MediaSlider(BRect frame,
+						BMessage *message,
+						int32 minValue,
+						int32 maxValue)
+					:BSlider(frame, NULL, NULL, message, minValue, maxValue)
+{
+
+}
+
+MediaSlider::~MediaSlider()
+{
+
+}
+
+void MediaSlider::DrawThumb(void)
+{
+	BRect r;
+	BView *v;
+
+	r = ThumbFrame();
+	v = OffscreenView();
+	v->SetHighColor(0,0,0);
+	r.InsetBy(r.IntegerWidth()/4, r.IntegerHeight()/6);
+	v->StrokeEllipse(r);
+	v->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	r.InsetBy(1,1);
+	v->FillEllipse(r);
+}
 
 /*****************************************************************************
  * SeekSlider
@@ -351,8 +428,7 @@ SeekSlider::SeekSlider(BRect frame,
 				int32 minValue,
 				int32 maxValue,
 				thumb_style thumbType = B_TRIANGLE_THUMB)
-			:BSlider(frame, B_EMPTY_STRING, B_EMPTY_STRING,
-					NULL, minValue, maxValue, thumbType)
+			:MediaSlider(frame, NULL, minValue, maxValue)
 {
 	fOwner = owner;
 	fMouseDown = false;

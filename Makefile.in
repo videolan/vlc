@@ -607,7 +607,7 @@ endif
 #
 
 lib/beos.so: $(PLUGIN_BEOS)
-	$(CC) $(PCFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_ -lbe -lgame -lroot
+	$(CC) $(PCFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_ -lbe -lgame -lroot -ltracker
 
 lib/esd.so: $(PLUGIN_ESD)
 ifneq (,$(findstring bsd,$(SYS)))
