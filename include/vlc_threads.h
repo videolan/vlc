@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_threads.h,v 1.4 2002/07/05 11:18:56 sam Exp $
+ * $Id: vlc_threads.h,v 1.5 2002/07/16 21:29:10 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -178,7 +178,7 @@ typedef struct
  * Function definitions
  *****************************************************************************/
 VLC_EXPORT( int,  __vlc_threads_init,  ( vlc_object_t * ) );
-VLC_EXPORT( int,    vlc_threads_end,   ( void ) );
+VLC_EXPORT( int,  __vlc_threads_end,   ( vlc_object_t * ) );
 VLC_EXPORT( int,  __vlc_mutex_init,    ( vlc_object_t *, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_mutex_destroy, ( char *, int, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_cond_init,     ( vlc_object_t *, vlc_cond_t * ) );
@@ -192,6 +192,12 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, char *, int ) );
  *****************************************************************************/
 #define vlc_threads_init( P_THIS )                                          \
     __vlc_threads_init( CAST_TO_VLC_OBJECT(P_THIS) )
+
+/*****************************************************************************
+ * vlc_threads_end: deinitialize threads system
+ *****************************************************************************/
+#define vlc_threads_end( P_THIS )                                          \
+    __vlc_threads_end( CAST_TO_VLC_OBJECT(P_THIS) )
 
 /*****************************************************************************
  * vlc_mutex_init: initialize a mutex

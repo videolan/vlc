@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.8 2002/07/05 11:18:56 sam Exp $
+ * $Id: threads.c,v 1.9 2002/07/16 21:29:10 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -69,20 +69,49 @@ typedef struct wrapper_s
 #endif /* GPROF */
 
 /*****************************************************************************
+ * Global mutexes for lazy initialization of the threads system
+ *****************************************************************************/
+static volatile int i_initializations = 0;
+
+#if defined( PTH_INIT_IN_PTH_H )
+    /* Unimplemented */
+#elif defined( ST_INIT_IN_ST_H )
+    /* Unimplemented */
+#elif defined( WIN32 )
+    /* Unimplemented */
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
+#elif defined( HAVE_CTHREADS_H )
+    /* Unimplemented */
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+    /* Unimplemented */
+#endif
+
+/*****************************************************************************
  * vlc_threads_init: initialize threads system
+ *****************************************************************************
+ * This function requires lazy initialization of a global lock in order to
+ * keep the library really thread-safe. Some architectures don't support this
+ * and thus do not guarantee the complete reentrancy.
  *****************************************************************************/
 int __vlc_threads_init( vlc_object_t *p_this )
 {
-    /* FIXME: this is definitely _not_ threadsafe, but at least it works
-     * under all implementations. We should for instance use pthread_once
-     * for lazy initialization of the global lock. */
-    static int i_status = VLC_THREADS_UNINITIALIZED;
-    int i_ret;
+    static volatile int i_status = VLC_THREADS_UNINITIALIZED;
+    int i_ret = 0;
 
-    if( i_status == VLC_THREADS_READY )
-    {
-        return 0;
-    }
+#if defined( PTH_INIT_IN_PTH_H )
+    /* Unimplemented */
+#elif defined( ST_INIT_IN_ST_H )
+    /* Unimplemented */
+#elif defined( WIN32 )
+    /* Unimplemented */
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    pthread_mutex_lock( &once_mutex );
+#elif defined( HAVE_CTHREADS_H )
+    /* Unimplemented */
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+    /* Unimplemented */
+#endif
 
     if( i_status == VLC_THREADS_UNINITIALIZED )
     {
@@ -90,35 +119,49 @@ int __vlc_threads_init( vlc_object_t *p_this )
 
 #if defined( PTH_INIT_IN_PTH_H )
         i_ret = pth_init();
-
 #elif defined( ST_INIT_IN_ST_H )
         i_ret = st_init();
-
 #elif defined( WIN32 )
-        i_ret = 0;
-
+        /* Unimplemented */
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-        i_ret = 0;
-
+        /* Unimplemented */
 #elif defined( HAVE_CTHREADS_H )
-        i_ret = 0;
-
+        /* Unimplemented */
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
-        i_ret = 0;
-
+        /* Unimplemented */
 #endif
+
         if( i_ret )
         {
             i_status = VLC_THREADS_ERROR;
-            return i_ret;
         }
-
-        vlc_mutex_init( p_this, p_this->p_vlc->p_global_lock );
-
-        i_status = VLC_THREADS_READY;
-
-        return i_ret;
+        else
+        {
+            vlc_mutex_init( p_this, p_this->p_vlc->p_global_lock );
+            i_status = VLC_THREADS_READY;
+        }
     }
+    else
+    {
+        i_ret = ( i_status == VLC_THREADS_READY );
+    }
+
+    i_initializations++;
+
+#if defined( PTH_INIT_IN_PTH_H )
+    /* Unimplemented */
+#elif defined( ST_INIT_IN_ST_H )
+    /* Unimplemented */
+#elif defined( WIN32 )
+    /* Unimplemented */
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    pthread_mutex_unlock( &once_mutex );
+    return i_ret;
+#elif defined( HAVE_CTHREADS_H )
+    /* Unimplemented */
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+    /* Unimplemented */
+#endif
 
     /* Wait until the other thread has initialized the thread library */
     while( i_status == VLC_THREADS_PENDING )
@@ -126,30 +169,45 @@ int __vlc_threads_init( vlc_object_t *p_this )
         msleep( THREAD_SLEEP );
     }
 
-    return( i_status == VLC_THREADS_READY );
+    return i_status == VLC_THREADS_READY;
 }
 
 /*****************************************************************************
  * vlc_threads_end: stop threads system
+ *****************************************************************************
+ * FIXME: This function is far from being threadsafe. We should undo exactly
+ * what we did above in vlc_threads_init.
  *****************************************************************************/
-int vlc_threads_end( void )
+int __vlc_threads_end( vlc_object_t *p_this )
 {
 #if defined( PTH_INIT_IN_PTH_H )
-    return pth_kill();
+    i_initializations--;
+    if( i_initializations == 0 )
+    {
+        return pth_kill();
+    }
+    return 0;
 
 #elif defined( ST_INIT_IN_ST_H )
+    i_initializations--;
     return 0;
 
 #elif defined( WIN32 )
+    i_initializations--;
     return 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    pthread_mutex_lock( &once_mutex );
+    i_initializations--;
+    pthread_mutex_unlock( &once_mutex );
     return 0;
 
 #elif defined( HAVE_CTHREADS_H )
+    i_initializations--;
     return 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
+    i_initializations--;
     return 0;
 
 #endif

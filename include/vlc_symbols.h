@@ -31,6 +31,7 @@ struct module_symbols_s
     int (* __vlc_mutex_destroy_inner) ( char *, int, vlc_mutex_t * ) ;
     int (* __vlc_mutex_init_inner) ( vlc_object_t *, vlc_mutex_t * ) ;
     int (* __vlc_thread_create_inner) ( vlc_object_t *, char *, int, char *, void * ( * ) ( void * ), vlc_bool_t ) ;
+    int (* __vlc_threads_end_inner) ( vlc_object_t * ) ;
     int (* __vlc_threads_init_inner) ( vlc_object_t * ) ;
     int (* input_AccessInit_inner) ( input_thread_t * ) ;
     int (* input_ChangeArea_inner) ( input_thread_t *, input_area_t * ) ;
@@ -44,7 +45,6 @@ struct module_symbols_s
     int (* input_UnselectES_inner) ( input_thread_t *, es_descriptor_t * ) ;
     int (* playlist_Add_inner) ( playlist_t *, const char *, int, int ) ;
     int (* playlist_Delete_inner) ( playlist_t *, int ) ;
-    int (* vlc_threads_end_inner) ( void ) ;
     int (* vout_ChromaCmp_inner) ( u32, u32 ) ;
     module_config_t * (* config_FindConfig_inner) ( vlc_object_t *, const char *psz_name ) ;
     module_t * (* __module_Need_inner) ( vlc_object_t *, int, const char *, void * ) ;
@@ -188,6 +188,7 @@ struct module_symbols_s
 #   define __vlc_thread_create p_symbols->__vlc_thread_create_inner
 #   define __vlc_thread_join p_symbols->__vlc_thread_join_inner
 #   define __vlc_thread_ready p_symbols->__vlc_thread_ready_inner
+#   define __vlc_threads_end p_symbols->__vlc_threads_end_inner
 #   define __vlc_threads_init p_symbols->__vlc_threads_init_inner
 #   define __vout_CreateThread p_symbols->__vout_CreateThread_inner
 #   define aout_DestroyFifo p_symbols->aout_DestroyFifo_inner
@@ -253,7 +254,6 @@ struct module_symbols_s
 #   define playlist_Add p_symbols->playlist_Add_inner
 #   define playlist_Command p_symbols->playlist_Command_inner
 #   define playlist_Delete p_symbols->playlist_Delete_inner
-#   define vlc_threads_end p_symbols->vlc_threads_end_inner
 #   define vout_AllocatePicture p_symbols->vout_AllocatePicture_inner
 #   define vout_ChromaCmp p_symbols->vout_ChromaCmp_inner
 #   define vout_CreatePicture p_symbols->vout_CreatePicture_inner

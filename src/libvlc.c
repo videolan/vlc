@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.14 2002/07/15 19:15:05 sam Exp $
+ * $Id: libvlc.c,v 1.15 2002/07/16 21:29:10 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -771,8 +771,8 @@ vlc_error_t vlc_destroy( vlc_t *p_vlc )
     }
     vlc_mutex_unlock( p_vlc->p_global_lock );
 
-    /* Stop thread system FIXME: last one out please shut the door! */
-    //vlc_threads_end( );
+    /* Stop thread system: last one out please shut the door! */
+    vlc_threads_end( p_vlc );
 
     /* Destroy mutexes */
     vlc_mutex_destroy( &p_vlc->structure_lock );

@@ -302,7 +302,7 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->playlist_Add_inner = playlist_Add; \
     (p_symbols)->playlist_Delete_inner = playlist_Delete; \
     (p_symbols)->__vlc_threads_init_inner = __vlc_threads_init; \
-    (p_symbols)->vlc_threads_end_inner = vlc_threads_end; \
+    (p_symbols)->__vlc_threads_end_inner = __vlc_threads_end; \
     (p_symbols)->__vlc_mutex_init_inner = __vlc_mutex_init; \
     (p_symbols)->__vlc_mutex_destroy_inner = __vlc_mutex_destroy; \
     (p_symbols)->__vlc_cond_init_inner = __vlc_cond_init; \
