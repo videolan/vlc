@@ -242,6 +242,21 @@ void input_EsOutSetDelay( es_out_t *out, int i_cat, int64_t i_delay )
         p_sys->i_spu_delay = i_delay;
 }
 
+vlc_bool_t input_EsOutDecodersEmpty( es_out_t *out )
+{
+    es_out_sys_t      *p_sys = out->p_sys;
+    int i;
+
+    for( i = 0; i < p_sys->i_es; i++ )
+    {
+        es_out_id_t *es = p_sys->es[i];
+
+        if( es->p_dec && !input_DecoderEmpty( es->p_dec ) )
+            return VLC_FALSE;
+    }
+    return VLC_TRUE;
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/

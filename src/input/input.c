@@ -62,7 +62,8 @@ static void DecodeUrl  ( char * );
 static void MRLSplit( input_thread_t *, char *, char **, char **, char ** );
 
 static input_source_t *InputSourceNew( input_thread_t *);
-static int  InputSourceInit( input_thread_t *, input_source_t *, char * );
+static int  InputSourceInit( input_thread_t *, input_source_t *,
+                             char *, char *psz_forced_demux );
 static void InputSourceClean( input_thread_t *, input_source_t * );
 
 static void SlaveDemux( input_thread_t *p_input );
@@ -146,7 +147,6 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     /* Init control buffer */
     vlc_mutex_init( p_input, &p_input->lock_control );
     p_input->i_control = 0;
-    p_input->p_sys = NULL;
 
     /* Parse input options */
     vlc_mutex_lock( &p_item->lock );
@@ -444,17 +444,15 @@ static int Run( input_thread_t *p_input )
 
                 if( old_val.i_time != val.i_time )
                 {
-                    /* TODO */
-#if 0
                     char psz_buffer[MSTRTIME_MAX_SIZE];
 
-                    vlc_mutex_lock( &p_input->p_item->lock );
-                    p_input->p_item->i_duration = i_length;
-                    vlc_mutex_unlock( &p_input->p_item->lock );
+                    vlc_mutex_lock( &p_input->input.p_item->lock );
+                    p_input->input.p_item->i_duration = i_length;
+                    vlc_mutex_unlock( &p_input->input.p_item->lock );
 
-                    input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Duration"),
-                       msecstotimestr( psz_buffer, i_length / 1000 ) );
-#endif
+                    input_Control( p_input, INPUT_ADD_INFO,
+                                   _("General"), _("Duration"),
+                    msecstotimestr( psz_buffer, i_length / 1000 ) );
                 }
             }
 
@@ -500,7 +498,9 @@ static int Run( input_thread_t *p_input )
 static int Init( input_thread_t * p_input )
 {
     char *psz;
+    char *psz_subtitle;
     vlc_value_t val;
+    double f_fps;
 
     /* Initialize optional stream output. (before access/demuxer) */
     psz = var_GetString( p_input, "sout" );
@@ -522,7 +522,7 @@ static int Init( input_thread_t * p_input )
     es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
 
     if( InputSourceInit( p_input, &p_input->input,
-                         p_input->input.p_item->psz_uri ) )
+                         p_input->input.p_item->psz_uri, NULL ) )
     {
         goto error;
     }
@@ -563,11 +563,6 @@ static int Init( input_thread_t * p_input )
     var_Get( p_input, "audio-desync", &val );
     if( val.i_int < 0 )
         p_input->i_pts_delay -= (val.i_int * 1000);
-
-    /* Init input_thread_sys_t */
-    p_input->p_sys = malloc( sizeof( input_thread_sys_t ) );
-    p_input->p_sys->i_sub = 0;
-    p_input->p_sys->sub   = NULL;
 
     /* TODO: check meta data from users */
 
@@ -611,8 +606,78 @@ static int Init( input_thread_t * p_input )
     }
 
 
-    /* TODO: do subtitle loading (and slave) */
+    /* Load subtitles */
+    /* Get fps and set it if not already set */
+    if( !demux2_Control( p_input->input.p_demux, DEMUX_GET_FPS, &f_fps ) &&
+        f_fps > 1.0 )
+    {
+        vlc_value_t fps;
 
+        if( var_Get( p_input, "sub-fps", &fps ) )
+        {
+            var_Create( p_input, "sub-fps", VLC_VAR_FLOAT| VLC_VAR_DOINHERIT );
+            var_SetFloat( p_input, "sub-fps", f_fps );
+        }
+    }
+
+    /* Look for and add subtitle files */
+    psz_subtitle = var_GetString( p_input, "sub-file" );
+    if( *psz_subtitle )
+    {
+        input_source_t *sub;
+        vlc_value_t count;
+        vlc_value_t list;
+
+        msg_Dbg( p_input, "forced subtitle: %s", psz_subtitle );
+
+        var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
+
+        /* */
+        sub = InputSourceNew( p_input );
+        if( !InputSourceInit( p_input, sub, psz_subtitle, "subtitle" ) )
+        {
+            TAB_APPEND( p_input->i_slave, p_input->slave, sub );
+
+            /* Select the ES */
+            if( !var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list, NULL ) )
+            {
+                if( count.i_int == 0 )
+                    count.i_int++;  /* if it was first one, there is disable too */
+
+                if( count.i_int < list.p_list->i_count )
+                {
+                    input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &list.p_list->p_values[count.i_int] );
+                }
+                var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list, NULL );
+            }
+        }
+    }
+
+    var_Get( p_input, "sub-autodetect-file", &val );
+    if( val.b_bool )
+    {
+        char *psz_autopath = var_GetString( p_input, "sub-autodetect-path" );
+        char **subs = subtitles_Detect( p_input, psz_autopath,
+                                        p_input->input.p_item->psz_uri );
+        input_source_t *sub;
+        int i;
+
+        for( i = 0; subs[i] != NULL; i++ )
+        {
+            if( strcmp( psz_subtitle, subs[i] ) )
+            {
+                sub = InputSourceNew( p_input );
+                if( !InputSourceInit( p_input, sub, subs[i], "subtitle" ) )
+                {
+                    TAB_APPEND( p_input->i_slave, p_input->slave, sub );
+                }
+            }
+            free( subs[i] );
+        }
+        free( subs );
+        free( psz_autopath );
+    }
+    free( psz_subtitle );
 
     /* Set up es_out */
     es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_TRUE );
@@ -973,26 +1038,6 @@ static void End( input_thread_t * p_input )
         if( p_pl )
             vlc_object_release( p_pl );
     }
-
-    /* TODO subs */
-#if 0
-    /* Destroy subtitles demuxers */
-    if( p_input->p_sys )
-    {
-        for( i = 0; i < p_input->p_sys->i_sub; i++ )
-        {
-            subtitle_Close( p_input->p_sys->sub[i] );
-        }
-        if( p_input->p_sys->i_sub > 0 )
-        {
-            free( p_input->p_sys->sub );
-        }
-
-    }
-#endif
-
-    /* Free input_thread_sys_t */
-    free( p_input->p_sys );
 
     /* Tell we're dead */
     p_input->b_dead = VLC_TRUE;
@@ -1496,7 +1541,8 @@ static input_source_t *InputSourceNew( input_thread_t *p_input )
  * InputSourceInit:
  *****************************************************************************/
 static int InputSourceInit( input_thread_t *p_input,
-                            input_source_t *in, char *psz_mrl )
+                            input_source_t *in, char *psz_mrl,
+                            char *psz_forced_demux )
 {
     char *psz_dup = strdup( psz_mrl );
     char *psz_access;
@@ -1510,6 +1556,8 @@ static int InputSourceInit( input_thread_t *p_input,
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
 
+    if( psz_forced_demux && *psz_forced_demux )
+        psz_demux = psz_forced_demux;
 
     /* Try access_demux if no demux given */
     if( *psz_access && *psz_demux == '\0' )
@@ -1571,7 +1619,7 @@ static int InputSourceInit( input_thread_t *p_input,
             *psz_access == '\0' && ( *psz_demux || *psz_path ) )
         {
             free( psz_dup );
-            psz_dup = strdup( in->p_item->psz_uri );
+            psz_dup = strdup( psz_mrl );
             psz_access = "";
             psz_demux = "";
             psz_path = psz_dup;
@@ -1583,8 +1631,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
         if( in->p_access == NULL )
         {
-            msg_Err( p_input, "no suitable access module for `%s'",
-                     in->p_item->psz_uri );
+            msg_Err( p_input, "no suitable access module for `%s'", psz_mrl );
             goto error;
         }
 
@@ -1717,7 +1764,7 @@ static void SlaveDemux( input_thread_t *p_input )
                     i_ret = 0;
                     break;
                 }
-                msg_Dbg( p_input, "slave time=%lld input=%lld", i_stime, i_time );
+                //msg_Dbg( p_input, "slave time=%lld input=%lld", i_stime, i_time );
                 if( i_stime >= i_time )
                     break;
 

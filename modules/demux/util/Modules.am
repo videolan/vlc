@@ -7,8 +7,4 @@ SOURCES_id3tag = \
 	id3genres.h \
 	$(NULL)
 
-SOURCES_demuxsub = \
-	sub.c \
-	sub.h \
-	$(NULL)
 

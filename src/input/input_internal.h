@@ -23,9 +23,6 @@
 
 #ifndef _INPUT_INTERNAL_H
 #define _INPUT_INTERNAL_H 1
-#include "../../modules/demux/util/sub.h"
-
-
 
 enum input_control_e
 {
@@ -60,13 +57,6 @@ enum input_control_e
     INPUT_CONTROL_SET_AUDIO_DELAY,
     INPUT_CONTROL_SET_SPU_DELAY,
 };
-struct input_thread_sys_t
-{
-    /* subtitles */
-    int              i_sub;
-    subtitle_demux_t **sub;
-};
-
 
 /* Internal helpers */
 static inline void input_ControlPush( input_thread_t *p_input,
@@ -114,15 +104,17 @@ stream_t *stream_AccessNew( access_t *p_access );
 void stream_AccessDelete( stream_t *s );
 void stream_AccessReset( stream_t *s );
 
-/* Decoder FIXME make it public */
-void input_DecoderDiscontinuity( decoder_t * p_dec );
+/* decoder.c FIXME make it public ?*/
+void       input_DecoderDiscontinuity( decoder_t * p_dec );
+vlc_bool_t input_DecoderEmpty( decoder_t * p_dec );
 
 /* es_out.c */
-es_out_t *input_EsOutNew( input_thread_t * );
-void      input_EsOutDelete( es_out_t * );
+es_out_t  *input_EsOutNew( input_thread_t * );
+void       input_EsOutDelete( es_out_t * );
 es_out_id_t *input_EsOutGetFromID( es_out_t *, int i_id );
-void      input_EsOutDiscontinuity( es_out_t *, vlc_bool_t b_audio );
-void      input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );
+void       input_EsOutDiscontinuity( es_out_t *, vlc_bool_t b_audio );
+void       input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );
+vlc_bool_t input_EsOutDecodersEmpty( es_out_t * );
 
 /* clock.c */
 enum /* Synchro states */

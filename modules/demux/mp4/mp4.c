@@ -528,6 +528,17 @@ static int Demux( demux_t *p_demux )
 
     if( i_track_selected <= 0 )
     {
+        p_sys->i_time += __MAX( p_sys->i_timescale / 10 , 1 );
+        if( p_sys->i_timescale > 0 )
+        {
+            int64_t i_length = (mtime_t)1000000 *
+                               (mtime_t)p_sys->i_duration /
+                               (mtime_t)p_sys->i_timescale;
+            if( MP4_GetMoviePTS( p_sys ) >= i_length )
+                return 0;
+            return 1;
+        }
+
         msg_Warn( p_demux, "no track selected, exiting..." );
         return 0;
     }

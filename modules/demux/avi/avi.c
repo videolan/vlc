@@ -610,8 +610,17 @@ static int Demux_Seekable( demux_t *p_demux )
 
     if( i_track_count <= 0 )
     {
+        int64_t i_length = p_sys->i_length * (mtime_t)1000000;
+
+        p_sys->i_time += 25*1000;  /* read 25ms */
+        if( i_length > 0 )
+        {
+            if( p_sys->i_time >= i_length )
+                return 0;
+            return 1;
+        }
         msg_Warn( p_demux, "no track selected, exiting..." );
-        return( 0 );
+        return 0;
     }
 
     /* wait for the good time */

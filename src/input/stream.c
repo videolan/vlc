@@ -1152,35 +1152,76 @@ static void AStreamPrebufferStream( stream_t *s )
  * \param s Stream handle to read from
  * \return A null-terminated string. This must be freed,
  */
-/* FIXME don't use stupid MAX_LINE -> do the same than net_ReadLine */
-#define MAX_LINE 1024
+#define STREAM_PROBE_LINE 1024
 char *stream_ReadLine( stream_t *s )
 {
-    uint8_t *p_data;
-    char    *p_line;
-    int      i_data;
-    int      i = 0;
-    i_data = stream_Peek( s, &p_data, MAX_LINE );
+    char    *p_line = NULL;
+    int      i_line = 0;
 
-    while( i < i_data && p_data[i] != '\n' &&  p_data[i] != '\r' )
+    for( ;; )
     {
-        i++;
-    }
-    if( i_data <= 0 )
-    {
-        return NULL;
-    }
-    else
-    {
-        p_line = malloc( i + 1 );
-        if( p_line == NULL )
+        char *psz_lf, *psz_cr;
+        uint8_t *p_data;
+        int      i_data;
+
+        int i_read;
+
+        /* Probe new data */
+        i_data = stream_Peek( s, &p_data, STREAM_PROBE_LINE );
+
+        if( i_data <= 0 )   /* No data */
+            goto exit;
+
+        /* See if there is a '\n' */
+        psz_lf = memchr( p_data, '\n', __MAX( i_data - 1, 1 ) );
+        psz_cr = memchr( p_data, '\r', __MAX( i_data - 1, 1 ) );
+
+        if( psz_lf && !psz_cr && p_data[i_data-1] == '\r' )
         {
-            msg_Err( s, "out of memory" );
-            return NULL;
+            psz_cr = &p_data[i_data-1];
         }
-        i = stream_Read( s, p_line, i + 1 );
-        p_line[ i - 1 ] = '\0';
+        if( psz_cr && !psz_lf && p_data[i_data-1] == '\n' )
+        {
+            psz_lf = &p_data[i_data-1];
+        }
 
-        return p_line;
+        if( psz_lf || psz_cr )
+        {
+            char *psz;
+            if( !psz_lf  )
+                psz = psz_cr;
+            else if( !psz_cr )
+                psz = psz_lf;
+            else
+                psz = __MIN( psz_cr, psz_lf );
+
+            i_read = (psz - (char*)p_data) + 1;
+            p_line = realloc( p_line, i_read + 1 ); /* +1 for easy \0 append */
+            i_read = stream_Read( s, &p_line[i_line], i_read );
+            if( i_read > 0 )
+                i_line += i_read;
+
+            goto exit;
+        }
+
+        /* Read data (+1 for easy \0 append) */
+        p_line = realloc( p_line, i_line + STREAM_PROBE_LINE + 1 );
+        i_read = stream_Read( s, &p_line[i_line], STREAM_PROBE_LINE );
+
+        if( i_read <= 0 )
+            goto exit;
+        i_line += i_read;
     }
+
+exit:
+    while( i_line > 0 &&
+           ( p_line[i_line-1] == '\n' || p_line[i_line-1] == '\r' ) )
+    {
+        i_line--;
+    }
+    if( i_line > 0 )
+        p_line[i_line] = '\0';
+
+    return p_line;
 }
+

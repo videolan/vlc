@@ -250,6 +250,15 @@ void input_DecoderDiscontinuity( decoder_t * p_dec )
     input_DecoderDecode( p_dec, p_null );
 }
 
+vlc_bool_t input_DecoderEmpty( decoder_t * p_dec )
+{
+    if( p_dec->p_owner->b_own_thread && p_dec->p_owner->p_fifo->i_depth > 0 )
+    {
+        return VLC_FALSE;
+    }
+    return VLC_TRUE;
+}
+
 #if 0
 /**
  * Create a NULL packet for padding in case of a data loss
