@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.44 2003/10/27 01:04:38 gbazin Exp $
+ * $Id: transcode.c,v 1.45 2003/10/27 17:50:54 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -334,10 +334,6 @@ struct sout_stream_id_t
     mtime_t         i_dts;
     mtime_t         i_length;
 
-    int             i_buffer_in;
-    int             i_buffer_in_pos;
-    uint8_t         *p_buffer_in;
-
     int             i_buffer;
     int             i_buffer_pos;
     uint8_t         *p_buffer;
@@ -652,10 +648,6 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
         }
     }
 
-    id->i_buffer_in      = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
-    id->i_buffer_in_pos = 0;
-    id->p_buffer_in      = malloc( id->i_buffer_in );
-
     id->i_buffer     = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
     id->i_buffer_pos = 0;
     id->p_buffer     = malloc( id->i_buffer );
@@ -680,13 +672,19 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     if( !id->p_encoder->p_module )
     {
         vlc_object_destroy( id->p_encoder );
-	id->p_encoder = NULL;
+        id->p_encoder = NULL;
     }
 
     id->b_enc_inited = VLC_FALSE;
 
     id->f_dst.i_extra_data = id->p_encoder->i_extra_data;
     id->f_dst.p_extra_data = id->p_encoder->p_extra_data;
+
+    /* Hack for mp3 transcoding support */
+    if( id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','3',' ' ) )
+    {
+        id->f_dst.i_fourcc = VLC_FOURCC( 'm','p','g','a' );
+    }
 
     return VLC_SUCCESS;
 }
@@ -703,7 +701,6 @@ static void transcode_audio_ffmpeg_close( sout_stream_t *p_stream,
     module_Unneed( id->p_encoder, id->p_encoder->p_module );
     vlc_object_destroy( id->p_encoder );
 
-    free( id->p_buffer_in );
     free( id->p_buffer );
 }
 
@@ -712,205 +709,159 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
                                            sout_buffer_t *in,
                                            sout_buffer_t **out )
 {
-    vlc_bool_t b_again = VLC_FALSE;
     aout_buffer_t aout_buf;
     block_t *p_block;
+    int i_buffer = in->i_size;
+    char *p_buffer = in->p_buffer;
+    id->i_dts = in->i_dts;
     *out = NULL;
 
-    /* gather data into p_buffer_in */
-    id->i_dts = in->i_dts -
-                (mtime_t)1000000 *
-                (mtime_t)(id->i_buffer_pos / 2 / id->ff_dec_c->channels )/
-                (mtime_t)id->ff_dec_c->sample_rate;
-
-    if( id->i_buffer_in_pos + (int)in->i_size > id->i_buffer_in )
+    while( i_buffer )
     {
-        /* extend buffer_in */
-        id->i_buffer_in = id->i_buffer_in_pos + in->i_size + 1024;
-        id->p_buffer_in = realloc( id->p_buffer_in, id->i_buffer_in );
-    }
-    memcpy( &id->p_buffer_in[id->i_buffer_in_pos],
-            in->p_buffer, in->i_size );
-    id->i_buffer_in_pos += in->i_size;
+        id->i_buffer_pos = 0;
 
-    do
-    {
         /* decode as much data as possible */
         if( id->ff_dec )
         {
-            for( ;; )
-            {
-                int i_buffer_size;
-                int i_used;
+            int i_used;
 
-                i_used = avcodec_decode_audio( id->ff_dec_c,
-                         (int16_t*)&id->p_buffer,
-                         &i_buffer_size, id->p_buffer_in,
-                         id->i_buffer_in_pos );
+            i_used = avcodec_decode_audio( id->ff_dec_c,
+                         (int16_t*)id->p_buffer, &id->i_buffer_pos,
+                         p_buffer, i_buffer );
 
-#if 0
-                msg_Warn( p_stream, "avcodec_decode_audio: %d used on %d",
-                          i_used, id->i_buffer_in_pos );
+#if 1
+            msg_Warn( p_stream, "avcodec_decode_audio: %d used on %d",
+                      i_used, i_buffer );
 #endif
-
-                id->i_buffer_pos += i_buffer_size;
-
-                if( i_used < 0 )
-                {
-                    msg_Warn( p_stream, "error audio decoding");
-                    id->i_buffer_in_pos = 0;
-                    break;
-                }
-                else if( i_used < id->i_buffer_in_pos )
-                {
-                    memmove( id->p_buffer_in,
-                             &id->p_buffer_in[i_used],
-                             id->i_buffer_in - i_used );
-                    id->i_buffer_in_pos -= i_used;
-                }
-                else
-                {
-                    id->i_buffer_in_pos = 0;
-                    break;
-                }
-
-                if( id->i_buffer_pos >= AVCODEC_MAX_AUDIO_FRAME_SIZE )
-                {
-                    /* buffer full */
-                    b_again = VLC_TRUE;
-                    break;
-                }
+            if( i_used < 0 )
+            {
+                msg_Warn( p_stream, "error audio decoding");
+                break;
             }
+
+            i_buffer -= i_used;
+            p_buffer += i_used;
         }
         else
         {
-            int16_t *sout  = (int16_t*)&id->p_buffer[id->i_buffer_pos];
-            int     i_used = 0;
+            int16_t *sout = (int16_t*)id->p_buffer;
 
-            if( id->f_src.i_fourcc == VLC_FOURCC( 's', '8', ' ', ' ' ) )
+            if( id->f_src.i_fourcc == VLC_FOURCC( 's', '8', ' ', ' ' ) ||
+                id->f_src.i_fourcc == VLC_FOURCC( 'u', '8', ' ', ' ' ) )
             {
-                int8_t *sin = (int8_t*)id->p_buffer_in;
-                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos )
-                                           / 2, id->i_buffer_in_pos );
-                i_used = i_samples;
-                while( i_samples > 0 )
-                {
-                    *sout++ = ( *sin++ ) << 8;
-                    i_samples--;
-                }
+                int8_t *sin = (int8_t*)p_buffer;
+                int i_used = __MIN( id->i_buffer/2, i_buffer );
+                int i_samples = i_used;
+
+                if( id->f_src.i_fourcc == VLC_FOURCC( 's', '8', ' ', ' ' ) )
+                    while( i_samples > 0 )
+                    {
+                        *sout++ = ( *sin++ ) << 8;
+                        i_samples--;
+                    }
+                else
+                    while( i_samples > 0 )
+                    {
+                        *sout++ = ( *sin++ - 128 ) << 8;
+                        i_samples--;
+                    }
+
+                i_buffer -= i_used;
+                p_buffer += i_used;
+                id->i_buffer_pos = i_used * 2;
             }
-            else if( id->f_src.i_fourcc == VLC_FOURCC( 'u', '8', ' ', ' ' ) )
+            else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'l' ) ||
+                     id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'b' ) )
             {
-                int8_t *sin = (int8_t*)id->p_buffer_in;
-                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos )
-                                           / 2, id->i_buffer_in_pos );
-                i_used = i_samples;
-                while( i_samples > 0 )
-                {
-                    *sout++ = ( *sin++ - 128 ) << 8;
-                    i_samples--;
-                }
-            }
-            else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'l' ) )
-            {
-                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos )
-                                           / 2, id->i_buffer_in_pos / 2);
+                int16_t *sin = (int16_t*)p_buffer;
+                int i_used = __MIN( id->i_buffer, i_buffer );
+                int i_samples = i_used / 2;
+                int b_invert_indianness;
+
+                if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'l' ) )
 #ifdef WORDS_BIGENDIAN
-                uint8_t *sin = (uint8_t*)id->p_buffer_in;
-                i_used = i_samples * 2;
-                while( i_samples > 0 )
-                {
-                    uint8_t tmp[2];
-
-                    tmp[1] = *sin++;
-                    tmp[0] = *sin++;
-                    *sout++ = *(int16_t*)tmp;
-                    i_samples--;
-                }
-
+                    b_invert_indianness = 1;
 #else
-                memcpy( sout, id->p_buffer_in, i_samples * 2 );
-                sout += i_samples;
-                i_used = i_samples * 2;
+                    b_invert_indianness = 0;
 #endif
-            }
-            else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'b' ) )
-            {
-                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos )
-                                           / 2, id->i_buffer_in_pos / 2);
+                else
 #ifdef WORDS_BIGENDIAN
-                memcpy( sout, id->p_buffer_in, i_samples * 2 );
-                sout += i_samples;
-                i_used = i_samples * 2;
+                    b_invert_indianness = 0;
 #else
-                uint8_t *sin = (uint8_t*)id->p_buffer_in;
-                i_used = i_samples * 2;
-                while( i_samples > 0 )
-                {
-                    uint8_t tmp[2];
-
-                    tmp[1] = *sin++;
-                    tmp[0] = *sin++;
-                    *sout++ = *(int16_t*)tmp;
-                    i_samples--;
-                }
+                    b_invert_indianness = 1;
 #endif
-            }
 
-            id->i_buffer_pos = (uint8_t*)sout - id->p_buffer;
-            if( i_used < id->i_buffer_in_pos )
-            {
-                memmove( id->p_buffer_in,
-                         &id->p_buffer_in[i_used],
-                         id->i_buffer_in - i_used );
+                if( b_invert_indianness )
+                {
+                    while( i_samples > 0 )
+                    {
+                        uint8_t tmp[2];
+
+                        tmp[1] = *sin++;
+                        tmp[0] = *sin++;
+                        *sout++ = *(int16_t*)tmp;
+                        i_samples--;
+                    }
+                }
+                else
+                {
+                    memcpy( sout, sin, i_used );
+                    sout += i_samples;
+                }
+
+                i_buffer -= i_used;
+                p_buffer += i_used;
+                id->i_buffer_pos = i_used;
             }
-            id->i_buffer_in_pos -= i_used;
         }
 
         if( id->i_buffer_pos == 0 ) continue;
 
         /* Encode as much data as possible */
-	if( id->b_enc_inited )
-	{
-            while( id->p_encoder->pf_header &&
-		   (p_block = id->p_encoder->pf_header( id->p_encoder )) )
-            {
-                sout_buffer_t *p_out;
-                p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
-                memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
-                p_out->i_dts = in->i_dts;
-                p_out->i_pts = in->i_dts;
-                sout_BufferChain( out, p_out );
-            }
+        if( !id->b_enc_inited && id->p_encoder->pf_header )
+        {
+ 	    p_block = id->p_encoder->pf_header( id->p_encoder );
+	    while( p_block )
+	    {
+	        sout_buffer_t *p_out;
+		block_t *p_prev_block = p_block;
+
+		p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
+		memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
+		p_out->i_dts = p_out->i_pts = in->i_dts;
+		p_out->i_length = 0;
+		sout_BufferChain( out, p_out );
+
+		p_block = p_block->p_next;
+		block_Release( p_prev_block );
+	    }
 
             id->b_enc_inited = VLC_TRUE;
-	}
+        }
 
         aout_buf.p_buffer = id->p_buffer;
         aout_buf.i_nb_bytes = id->i_buffer_pos;
-        aout_buf.i_nb_samples = id->i_buffer_pos / 2 / id->ff_dec_c->channels;
+        aout_buf.i_nb_samples = id->i_buffer_pos / 2 / id->f_src.i_channels;
         aout_buf.start_date = id->i_dts;
         aout_buf.end_date = id->i_dts;
 
-	p_block = id->p_encoder->pf_encode_audio( id->p_encoder, &aout_buf );
-	while( p_block )
-	{
-	    sout_buffer_t *p_out;
-	    block_t *p_prev_block = p_block;
+        p_block = id->p_encoder->pf_encode_audio( id->p_encoder, &aout_buf );
+        while( p_block )
+        {
+            sout_buffer_t *p_out;
+            block_t *p_prev_block = p_block;
 
-	    p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
-	    memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
-	    p_out->i_dts = p_block->i_dts;
-	    p_out->i_pts = p_block->i_pts;
-	    p_out->i_length = p_block->i_length;
-	    sout_BufferChain( out, p_out );
+            p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
+            memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
+            p_out->i_dts = p_block->i_dts;
+            p_out->i_pts = p_block->i_pts;
+            p_out->i_length = p_block->i_length;
+            sout_BufferChain( out, p_out );
 
-	    p_block = p_block->p_next;
-	    block_Release( p_prev_block );
-	}
-	id->i_buffer_pos = 0;
-
-    } while( b_again );
+            p_block = p_block->p_next;
+            block_Release( p_prev_block );
+        }
+    }
 
     return VLC_SUCCESS;
 }
@@ -1013,12 +964,12 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     if( id->p_encoder->format.video.i_width <= 0 )
     {
         id->p_encoder->format.video.i_width = id->f_dst.i_width =
-	    id->ff_dec_c->width - p_sys->i_crop_left - p_sys->i_crop_right;
+            id->ff_dec_c->width - p_sys->i_crop_left - p_sys->i_crop_right;
     }
     if( id->p_encoder->format.video.i_height <= 0 )
     {
         id->p_encoder->format.video.i_height = id->f_dst.i_height =
-	    id->ff_dec_c->height - p_sys->i_crop_top - p_sys->i_crop_bottom;
+            id->ff_dec_c->height - p_sys->i_crop_top - p_sys->i_crop_bottom;
     }
 
     id->p_ff_pic         = avcodec_alloc_frame();
@@ -1064,7 +1015,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
 }
 
 static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream,
-					   sout_stream_id_t *id )
+                                           sout_stream_id_t *id )
 {
     /* Close decoder */
     if( id->ff_dec )
@@ -1189,21 +1140,28 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             id->p_encoder->i_extra_data = 0;
             id->p_encoder->p_extra_data = NULL;
 
-	    id->p_encoder->p_module =
-	        module_Need( id->p_encoder, "video encoder", NULL );
-	    if( !id->p_encoder->p_module )
-	    {
-	        vlc_object_destroy( id->p_encoder );
-		msg_Err( p_stream, "cannot find encoder" );
-		return VLC_EGENERIC;
-	    }
+            id->p_encoder->p_module =
+                module_Need( id->p_encoder, "video encoder", NULL );
+            if( !id->p_encoder->p_module )
+            {
+                vlc_object_destroy( id->p_encoder );
+                msg_Err( p_stream, "cannot find encoder" );
+                return VLC_EGENERIC;
+            }
 
             id->f_dst.i_extra_data = id->p_encoder->i_extra_data;
             id->f_dst.p_extra_data = id->p_encoder->p_extra_data;
 
+            /* Hack for mp2v/mp1v transcoding support */
+            if( id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','1','v' ) ||
+                id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','2','v' ) )
+            {
+                id->f_dst.i_fourcc = VLC_FOURCC( 'm','p','g','v' );
+            }
+
             if( !( id->id =
                      p_stream->p_sys->p_out->pf_add( p_stream->p_sys->p_out,
-						     &id->f_dst ) ) )
+                                                     &id->f_dst ) ) )
             {
                 msg_Err( p_stream, "cannot add this stream" );
                 transcode_video_ffmpeg_close( p_stream, id );
@@ -1212,7 +1170,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             }
 
             while( id->p_encoder->pf_header &&
-		   (p_block = id->p_encoder->pf_header( id->p_encoder )) )
+                   (p_block = id->p_encoder->pf_header( id->p_encoder )) )
             {
                 sout_buffer_t *p_out;
                 p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
@@ -1331,41 +1289,41 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
               id->ff_dec_c->frame_rate_base / (2 * id->ff_dec_c->frame_rate);
         }
 
-	/* Encoding */
-	block_t *p_block;
-	picture_t pic;
-	int i_plane;
+        /* Encoding */
+        block_t *p_block;
+        picture_t pic;
+        int i_plane;
 
-	vout_InitPicture( VLC_OBJECT(p_stream), &pic,
-			  id->p_encoder->format.video.i_chroma,
-			  id->f_dst.i_width, id->f_dst.i_height,
-			  id->f_dst.i_width * VOUT_ASPECT_FACTOR /
-			  id->f_dst.i_height );
+        vout_InitPicture( VLC_OBJECT(p_stream), &pic,
+                          id->p_encoder->format.video.i_chroma,
+                          id->f_dst.i_width, id->f_dst.i_height,
+                          id->f_dst.i_width * VOUT_ASPECT_FACTOR /
+                          id->f_dst.i_height );
 
-	for( i_plane = 0; i_plane < pic.i_planes; i_plane++ )
-	{
-	    pic.p[i_plane].p_pixels = frame->data[i_plane];
-	    pic.p[i_plane].i_pitch = frame->linesize[i_plane];
-	}
+        for( i_plane = 0; i_plane < pic.i_planes; i_plane++ )
+        {
+            pic.p[i_plane].p_pixels = frame->data[i_plane];
+            pic.p[i_plane].i_pitch = frame->linesize[i_plane];
+        }
 
-	pic.date = frame->pts;
+        pic.date = frame->pts;
 
-	p_block = id->p_encoder->pf_encode_video( id->p_encoder, &pic );
-	while( p_block )
-	{
-	    sout_buffer_t *p_out;
-	    block_t *p_prev_block = p_block;
+        p_block = id->p_encoder->pf_encode_video( id->p_encoder, &pic );
+        while( p_block )
+        {
+            sout_buffer_t *p_out;
+            block_t *p_prev_block = p_block;
 
-	    p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
-	    memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
-	    p_out->i_dts = p_block->i_dts;
-	    p_out->i_pts = p_block->i_pts;
-	    p_out->i_length = p_block->i_length;
-	    sout_BufferChain( out, p_out );
+            p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
+            memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
+            p_out->i_dts = p_block->i_dts;
+            p_out->i_pts = p_block->i_pts;
+            p_out->i_length = p_block->i_length;
+            sout_BufferChain( out, p_out );
 
-	    p_block = p_block->p_next;
-	    block_Release( p_prev_block );
-	}
+            p_block = p_block->p_next;
+            block_Release( p_prev_block );
+        }
 
         if( i_data <= 0 )
         {

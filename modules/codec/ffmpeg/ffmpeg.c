@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.55 2003/10/27 01:04:38 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.56 2003/10/27 17:50:54 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -136,10 +136,21 @@ vlc_module_end();
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*) p_this;
-    int i_cat;
+    int i_cat, i_codec_id;
+    char *psz_namecodec;
 
-    if( !E_(GetFfmpegCodec)( p_dec->p_fifo->i_fourcc, &i_cat, NULL, NULL ) )
+    if( !E_(GetFfmpegCodec)( p_dec->p_fifo->i_fourcc, &i_cat, &i_codec_id,
+                             &psz_namecodec ) )
     {
+        return VLC_EGENERIC;
+    }
+
+    /* Initialization must be done before avcodec_find_decoder() */
+    E_(InitLibavcodec)(p_this);
+
+    if( !avcodec_find_decoder( i_codec_id ) )
+    {
+        msg_Err( p_dec, "codec not found (%s)", psz_namecodec );
         return VLC_EGENERIC;
     }
 
@@ -159,8 +170,6 @@ static int InitDecoder( decoder_t *p_dec )
     char *psz_namecodec;
     AVCodecContext *p_context;
     AVCodec        *p_codec;
-
-    E_(InitLibavcodec)( VLC_OBJECT(p_dec->p_fifo) );
 
     /* *** determine codec type *** */
     E_(GetFfmpegCodec)( p_dec->p_fifo->i_fourcc,
@@ -620,6 +629,13 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
         psz_name = "A52 Audio (aka AC3)";
         break;
 
+    /* AAC audio */
+    case VLC_FOURCC('m','p','4','a'):
+        i_cat    = AUDIO_ES;
+        i_codec  = CODEC_ID_AAC;
+        psz_name = "MPEG AAC Audio";
+        break;
+
     default:
         i_cat = UNKNOWN_ES;
         i_codec = CODEC_ID_NONE;
@@ -632,10 +648,10 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
         if( pi_cat ) *pi_cat = i_cat;
         if( pi_ffmpeg_codec ) *pi_ffmpeg_codec = i_codec;
         if( ppsz_name ) *ppsz_name = psz_name;
-        return( VLC_TRUE );
+        return VLC_TRUE;
     }
 
-    return( VLC_FALSE );
+    return VLC_FALSE;
 }
 
 int E_(GetFfmpegChroma)( vlc_fourcc_t i_chroma )

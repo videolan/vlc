@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vorbis.c: vorbis decoder module making use of libvorbis.
+ * vorbis.c: vorbis decoder/encoder/packetizer module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.20 2003/10/27 01:04:38 gbazin Exp $
+ * $Id: vorbis.c,v 1.21 2003/10/27 17:50:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -630,6 +630,7 @@ struct encoder_sys_t
 
     int i_last_block_size;
     int i_samples_delay;
+    int i_channels;
 
     /*
      * Packetizer output properties
@@ -649,7 +650,7 @@ struct encoder_sys_t
 static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
-    encoder_sys_t *p_sys = p_enc->p_sys;
+    encoder_sys_t *p_sys;
 
     if( p_enc->i_fourcc != VLC_FOURCC('v','o','r','b') )
     {
@@ -685,6 +686,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     vorbis_analysis_init( &p_sys->vd, &p_sys->vi );
     vorbis_block_init( &p_sys->vd, &p_sys->vb );
 
+    p_sys->i_channels = aout_FormatNbChannels( &p_enc->format.audio );
     p_sys->i_last_block_size = 0;
     p_sys->i_samples_delay = 0;
     p_sys->i_headers = 0;
@@ -701,7 +703,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 static block_t *Headers( encoder_t *p_enc )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
-    block_t *p_block, **pp_block = NULL;
+    block_t *p_block, *p_chain = NULL;
 
     /* Create theora headers */
     if( !p_sys->i_headers )
@@ -718,14 +720,12 @@ static block_t *Headers( encoder_t *p_enc )
 
             p_block->i_dts = p_block->i_pts = p_block->i_length = 0;
 
-            block_ChainAppend( pp_block, p_block );
+            block_ChainAppend( &p_chain, p_block );
         }
         p_sys->i_headers = 3;
-
-        return *pp_block;
     }
 
-    return NULL;
+    return p_chain;
 }
 
 /****************************************************************************
@@ -739,16 +739,15 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     ogg_packet oggpacket;
     block_t *p_block, *p_chain = NULL;
     float **buffer;
-    int i_samples;
+    int i, j;
 
     p_sys->i_pts = p_aout_buf->start_date -
                 (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
                 (mtime_t)p_enc->format.audio.i_rate;
 
-    i_samples = p_aout_buf->i_nb_samples;
-    p_sys->i_samples_delay += i_samples;
+    p_sys->i_samples_delay += p_aout_buf->i_nb_samples;
 
-    buffer = vorbis_analysis_buffer( &p_sys->vd, i_samples );
+    buffer = vorbis_analysis_buffer( &p_sys->vd, p_aout_buf->i_nb_samples );
 
 #if 0
     if( id->ff_dec_c->channels != id->ff_enc_c->channels )
@@ -765,22 +764,24 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
             }
         }
     }
-
-    /* convert samples to float and uninterleave */
-    for( i = 0; i < id->f_dst.i_channels; i++ )
-    {
-        for( j = 0 ; j < i_samples ; j++ )
-        {
-            buffer[i][j]= ((float)( ((int16_t *)id->p_buffer)
-                                    [j*id->f_src.i_channels + i ] ))/ 32768.f;
-        }
-    }
 #endif
 
-    vorbis_analysis_wrote( &p_sys->vd, i_samples );
+    /* convert samples to float and uninterleave */
+    for( i = 0; i < p_sys->i_channels; i++ )
+    {
+        for( j = 0 ; j < p_aout_buf->i_nb_samples ; j++ )
+        {
+            buffer[i][j]= ((float)( ((int16_t *)p_aout_buf->p_buffer )
+                                    [j * p_sys->i_channels + i ] )) / 32768.f;
+        }
+    }
+
+    vorbis_analysis_wrote( &p_sys->vd, p_aout_buf->i_nb_samples );
 
     while( vorbis_analysis_blockout( &p_sys->vd, &p_sys->vb ) == 1 )
     {
+        int i_samples;
+
         vorbis_analysis( &p_sys->vb, NULL );
         vorbis_bitrate_addblock( &p_sys->vb );
 
