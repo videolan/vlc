@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.82 2004/02/25 19:27:23 titer Exp $
+ * $Id: vout.m,v 1.83 2004/02/26 13:04:55 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -657,7 +657,15 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
     i_width = s_rect.right - s_rect.left;
     i_height = s_rect.bottom - s_rect.top;
 
-    if( i_height * p_vout->output.i_aspect < i_width * VOUT_ASPECT_FACTOR )
+    if( config_GetInt( p_vout, "macosx-stretch" ) )
+    {
+        factor_x = FixDiv( Long2Fix( i_width ),
+                           Long2Fix( p_vout->output.i_width ) );
+        factor_y = FixDiv( Long2Fix( i_height ),
+                           Long2Fix( p_vout->output.i_height ) );
+                           
+    }
+    else if( i_height * p_vout->output.i_aspect < i_width * VOUT_ASPECT_FACTOR )
     {
         int i_adj_width = i_height * p_vout->output.i_aspect /
                           VOUT_ASPECT_FACTOR;
@@ -686,12 +694,7 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
 
     ScaleMatrix( p_vout->p_sys->p_matrix,
                  factor_x, factor_y,
-                 Long2Fix(0), Long2Fix(0) );            
-
-    TranslateMatrix( p_vout->p_sys->p_matrix, 
-                     Long2Fix(i_offset_x), 
-                     Long2Fix(i_offset_y) );
-
+                 Long2Fix(i_offset_x), Long2Fix(i_offset_y) );
 }
 
 /*****************************************************************************
@@ -1374,7 +1377,12 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
                 (GLint) bounds.size.height );
 
     /* Quad size is set in order to preserve the aspect ratio */
-    if( bounds.size.height * p_vout->render.i_aspect <
+    if( config_GetInt( p_vout, "macosx-stretch" ) )
+    {
+        f_x = 1.0;
+        f_y = 1.0;
+    }
+    else if( bounds.size.height * p_vout->render.i_aspect <
         bounds.size.width * VOUT_ASPECT_FACTOR )
     {
         f_x = bounds.size.height * p_vout->render.i_aspect /
@@ -1492,7 +1500,13 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     [fullScreenContext makeCurrentContext];
     unsigned width  = CGDisplayPixelsWide( kCGDirectMainDisplay );
     unsigned height = CGDisplayPixelsHigh( kCGDirectMainDisplay );
-    if( height * p_vout->output.i_aspect < width * VOUT_ASPECT_FACTOR )
+    
+    if( config_GetInt( p_vout, "macosx-stretch" ) )
+    {
+        f_x = 1.0;
+        f_y = 1.0;
+    }
+    else if( height * p_vout->output.i_aspect < width * VOUT_ASPECT_FACTOR )
     {
         f_x = (float) height * p_vout->output.i_aspect /
             width / VOUT_ASPECT_FACTOR;

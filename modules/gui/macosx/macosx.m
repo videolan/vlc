@@ -2,7 +2,7 @@
  * macosx.m: MacOS X module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: macosx.m,v 1.21 2004/02/09 17:42:12 titer Exp $
+ * $Id: macosx.m,v 1.22 2004/02/26 13:04:55 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -53,6 +53,11 @@ void E_(CloseVideo)   ( vlc_object_t * );
 #define OPAQUENESS_LONGTEXT N_( \
     "Set the transparency of the video output. 1 is non-transparent (default) " \
     "0 is fully transparent.")
+    
+#define STRETCH_TEXT N_("Stretch Aspect Ratio")
+#define STRETCH_LONGTEXT N_("Instead of keeping the aspect ratio " \
+        "of the movie when resizing the video, stretch the video " \
+        "to fill the entire window." )
 
 #define OPENGL_TEXT N_("Use OpenGL")
 #define OPENGL_LONGTEXT N_("Use OpenGL instead of QuickTime to " \
@@ -76,6 +81,8 @@ vlc_module_begin();
         set_capability( "video output", 200 );
         set_callbacks( E_(OpenVideo), E_(CloseVideo) );
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT,
+                     VLC_FALSE );
+        add_bool( "macosx-stretch", 0, NULL, STRETCH_TEXT, STRETCH_LONGTEXT,
                      VLC_FALSE );
         add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL,
                 OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, VLC_TRUE );
