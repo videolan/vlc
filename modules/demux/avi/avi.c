@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.74 2003/11/22 15:10:38 fenrir Exp $
+ * $Id: avi.c,v 1.75 2003/11/23 13:15:27 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -465,7 +465,6 @@ static int Demux_Seekable( input_thread_t *p_input )
     unsigned int i_track_count = 0;
     unsigned int i_track;
     vlc_bool_t b_stream;
-    vlc_bool_t b_play_audio;
     /* cannot be more than 100 stream (dcXX or wbXX) */
     avi_track_toread_t toread[100];
 
@@ -510,9 +509,6 @@ static int Demux_Seekable( input_thread_t *p_input )
 
 
     p_sys->i_time += 25*1000;  /* read 25ms */
-
-    /* Check if we need to send the audio data to decoder */
-    b_play_audio = !p_input->stream.control.b_mute;
 
     /* init toread */
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
@@ -758,20 +754,21 @@ static int Demux_Seekable( input_thread_t *p_input )
 
         b_stream = VLC_TRUE; /* at least one read succeed */
 
-        p_frame->i_dts =
         p_frame->i_pts =
             input_ClockGetTS( p_input,
                               p_input->stream.p_selected_program,
                               p_frame->i_pts * 9/100);
-        //p_pes->i_rate = p_input->stream.control.i_rate;
-        if( b_play_audio || tk->i_cat != AUDIO_ES )
-        {
-            es_out_Send( p_input->p_es_out, tk->p_es, p_frame );
-        }
+
+        if( tk->i_cat != VIDEO_ES )
+            p_frame->i_dts = p_frame->i_pts;
         else
         {
-            block_Release( p_frame );
+            p_frame->i_dts = p_frame->i_pts;
+            p_frame->i_pts = 0;
         }
+
+        //p_pes->i_rate = p_input->stream.control.i_rate;
+        es_out_Send( p_input->p_es_out, tk->p_es, p_frame );
     }
 }
 
@@ -885,11 +882,18 @@ static int Demux_UnSeekable( input_thread_t *p_input )
                     {
                         return( -1 );
                     }
-                    p_frame->i_dts =
                     p_frame->i_pts =
                         input_ClockGetTS( p_input,
                                           p_input->stream.p_selected_program,
                                           AVI_GetPTS( p_stream ) * 9/100);
+
+                    if( avi_pk.i_cat != VIDEO_ES )
+                        p_frame->i_dts = p_frame->i_pts;
+                    else
+                    {
+                        p_frame->i_dts = p_frame->i_pts;
+                        p_frame->i_pts = 0;
+                    }
 
                     //p_pes->i_rate = p_input->stream.control.i_rate;
                     es_out_Send( p_input->p_es_out, p_stream->p_es, p_frame );

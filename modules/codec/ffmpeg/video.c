@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.49 2003/11/23 03:55:01 fenrir Exp $
+ * $Id: video.c,v 1.50 2003/11/23 13:15:27 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -52,6 +52,7 @@ struct decoder_sys_t
 
     /* Video decoder specific part */
     mtime_t input_pts;
+    mtime_t input_dts;
     mtime_t i_pts;
 
     AVFrame          *p_ff_pic;
@@ -318,7 +319,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     }
 
     /* ***** misc init ***** */
-    p_sys->input_pts = 0;
+    p_sys->input_pts = p_sys->input_dts = 0;
     p_sys->i_pts = 0;
     p_sys->b_has_b_frames = VLC_FALSE;
     p_sys->i_late_frames = 0;
@@ -346,10 +347,13 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 
     p_block = *pp_block;
 
-    if( p_block->i_pts > 0 )
+    if( p_block->i_pts > 0 || p_block->i_dts > 0 )
     {
         p_sys->input_pts = p_block->i_pts;
-        p_block->i_pts = 0; /* Make sure we don't reuse the same pts twice */
+        p_sys->input_dts = p_block->i_dts;
+
+        /* Make sure we don't reuse the same timestamps twice */
+        p_block->i_pts = p_block->i_dts = 0;
     }
 
     /* TODO implement it in a better way */
@@ -485,17 +489,13 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             p_pic = (picture_t *)p_sys->p_ff_pic->opaque;
         }
 
-        /* Set the PTS
-         * There is an ugly hack here because some demuxers pass us a dts
-         * instead of a pts so this screw up things for streams with
-         * B frames. */
+        /* Set the PTS */
+        if( p_sys->p_ff_pic->pts ) p_sys->i_pts = p_sys->p_ff_pic->pts;
+
+        /* Sanity check (seems to be needed for some streams ) */
         if( p_sys->p_ff_pic->pict_type == FF_B_TYPE )
-            p_sys->b_has_b_frames = VLC_TRUE;
-        if( p_sys->p_ff_pic->pts &&
-            ( !p_sys->p_context->has_b_frames || !p_sys->b_has_b_frames ||
-              p_sys->p_ff_pic->pict_type == FF_B_TYPE ) )
         {
-            p_sys->i_pts = p_sys->p_ff_pic->pts;
+            p_sys->b_has_b_frames = VLC_TRUE;
         }
 
         /* Send decoded frame to vout */
@@ -622,8 +622,24 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     picture_t *p_pic;
 
     /* Set picture PTS */
-    p_ff_pic->pts = p_sys->input_pts;
-    p_sys->input_pts = 0;
+    if( p_sys->input_pts )
+    {
+        p_ff_pic->pts = p_sys->input_pts;
+    }
+    else if( p_sys->input_dts )
+    {
+        /* Some demuxers only set the dts so let's try to find a useful
+         * timestamp from this */
+        if( !p_context->has_b_frames || !p_sys->b_has_b_frames ||
+            !p_ff_pic->reference )
+        {
+            p_ff_pic->pts = p_sys->input_dts;
+        }
+        else p_ff_pic->pts = 0;
+    }
+    else p_ff_pic->pts = 0;
+
+    p_sys->input_pts = p_sys->input_dts = 0;
 
     /* Not much to do in indirect rendering mode */
     if( !p_sys->b_direct_rendering )

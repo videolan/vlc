@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ogg.c,v 1.45 2003/11/22 12:41:32 gbazin Exp $
+ * $Id: ogg.c,v 1.46 2003/11/23 13:15:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -259,6 +259,13 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     int i_header_len = 0;
     mtime_t i_pts;
 
+    /* Sanity check */
+    if( !p_oggpacket->bytes )
+    {
+        msg_Dbg( p_input, "discarding 0 sized packet" );
+        return;
+    }
+
     if( p_stream->b_force_backup )
     {
         ogg_packet *p_packet_backup;
@@ -450,9 +457,21 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     {
         return;
     }
-    p_block->i_dts = p_block->i_pts = i_pts;
 
-    if( p_stream->fmt.i_cat == SPU_ES ) p_block->i_dts = 0;
+    if( p_stream->fmt.i_cat == AUDIO_ES )
+        p_block->i_dts = p_block->i_pts = i_pts;
+    else if( p_stream->fmt.i_cat == SPU_ES )
+    {
+        p_block->i_pts = i_pts;
+        p_block->i_dts = 0;
+    }
+    else if( p_stream->fmt.i_codec == VLC_FOURCC( 't','h','e','o' ) )
+        p_block->i_dts = p_block->i_pts = i_pts;
+    else
+    {
+        p_block->i_dts = i_pts;
+        p_block->i_pts = 0;
+    }
 
     if( p_stream->fmt.i_codec != VLC_FOURCC( 'v','o','r','b' ) &&
         p_stream->fmt.i_codec != VLC_FOURCC( 's','p','x',' ' ) &&

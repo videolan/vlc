@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.45 2003/11/21 16:02:36 fenrir Exp $
+ * $Id: asf.c,v 1.46 2003/11/23 13:15:27 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -739,11 +739,18 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
                 p_stream->i_time =
                     ( (mtime_t)i_pts + i_payload * (mtime_t)i_pts_delta );
 
-                p_frag->i_dts =
                 p_frag->i_pts =
                     input_ClockGetTS( p_input,
                                       p_input->stream.p_selected_program,
                                       p_stream->i_time * 9 /100 );
+
+                if( p_stream->i_cat != VIDEO_ES )
+                    p_frag->i_dts = p_frag->i_pts;
+                else
+                {
+                    p_frag->i_dts = p_frag->i_pts;
+                    p_frag->i_pts = 0;
+                }
             }
 
             block_ChainAppend( &p_stream->p_frame, p_frag );
