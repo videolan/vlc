@@ -4256,7 +4256,7 @@ msgstr "Lire"
 
 #: modules/control/hotkeys.c:325
 msgid "Jump -10 seconds"
-msgstr "Saut de +10 secondes"
+msgstr "Saut de -10 secondes"
 
 #: modules/control/hotkeys.c:331
 msgid "Jump +10 seconds"
