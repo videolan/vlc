@@ -245,6 +245,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Initialize the synchro properties
      */
+#if 0
     p_vpar->synchro.i_last_decode_pts = 0;
     p_vpar->synchro.i_last_display_pts = 0;
     p_vpar->synchro.i_images_since_pts = 0;
@@ -280,6 +281,13 @@ static int InitThread( vpar_thread_t *p_vpar )
         p_vpar->synchro.tab_b[i_dummy].mean = 6;
         p_vpar->synchro.tab_b[i_dummy].deviation = .5;
     }
+#else
+    p_vpar->synchro.kludge_level = 5;
+    p_vpar->synchro.kludge_nbp = p_vpar->synchro.kludge_p = 5;
+    p_vpar->synchro.kludge_nbb = p_vpar->synchro.kludge_b = 6;
+    p_vpar->synchro.kludge_b = 0;
+    p_vpar->synchro.kludge_prevdate = 0;
+#endif
 
     /* Mark thread as running and return */
     intf_DbgMsg("vpar debug: InitThread(%p) succeeded\n", p_vpar);

@@ -43,6 +43,7 @@
  * Local prototypes
  */
 
+#if 0
 /*****************************************************************************
  * vpar_SynchroUpdateTab : Update a mean table in the synchro structure
  *****************************************************************************/
@@ -398,3 +399,120 @@ mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
     return i_displaydate;
 }
 
+#else
+
+/* synchro a deux balles backportee du decodeur de reference. NE MARCHE PAS
+AVEC LES IMAGES MONOTRAMES */
+
+boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
+                              int i_structure )
+{
+    switch (i_coding_type) 
+    {
+    case B_CODING_TYPE:
+        if ((p_vpar->synchro.kludge_level <= p_vpar->synchro.kludge_nbp))
+        {
+            p_vpar->synchro.kludge_b++;
+            return( 0 );
+        }
+        if (p_vpar->synchro.kludge_b %
+             (p_vpar->synchro.kludge_nbb /
+                (p_vpar->synchro.kludge_level - p_vpar->synchro.kludge_nbp)))
+        {
+            p_vpar->synchro.kludge_b++;
+            return( 0 );
+        }
+        p_vpar->synchro.kludge_b++;
+        return( 1 );
+
+    case P_CODING_TYPE:
+        if (p_vpar->synchro.kludge_p++ >= p_vpar->synchro.kludge_level) 
+        {
+            return( 0 );
+        }
+        return( 1 );
+
+    default:
+        return( 1 );
+    }
+}
+
+void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
+                        int i_structure )
+{
+    if (DECODER_FIFO_START(p_vpar->fifo)->b_has_pts)
+    {
+        p_vpar->synchro.kludge_nbframes = 0;
+        p_vpar->synchro.kludge_date = DECODER_FIFO_START(p_vpar->fifo)->i_pts;
+        DECODER_FIFO_START(p_vpar->fifo)->b_has_pts = 0;
+    }
+    else
+        p_vpar->synchro.kludge_nbframes++;
+}
+
+void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
+                            int i_structure )
+{
+    if (DECODER_FIFO_START(p_vpar->fifo)->b_has_pts)
+    {
+        p_vpar->synchro.kludge_nbframes = 0;
+        p_vpar->synchro.kludge_date = DECODER_FIFO_START(p_vpar->fifo)->i_pts;
+        DECODER_FIFO_START(p_vpar->fifo)->b_has_pts = 0;
+    }
+    else
+        p_vpar->synchro.kludge_nbframes++;
+}
+
+mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
+{
+    return( p_vpar->synchro.kludge_date
+            + p_vpar->synchro.kludge_nbframes*1000000/(p_vpar->sequence.r_frame_rate ) );
+}
+
+void vpar_SynchroEnd( vpar_thread_t * p_vpar )
+{
+}
+
+void vpar_SynchroKludge( vpar_thread_t * p_vpar, mtime_t date )
+{
+    mtime_t     show_date;
+    int         temp = p_vpar->synchro.kludge_level;
+
+    p_vpar->synchro.kludge_nbp = p_vpar->synchro.kludge_p ? p_vpar->synchro.kludge_p : 5;
+    p_vpar->synchro.kludge_nbb = p_vpar->synchro.kludge_b ? p_vpar->synchro.kludge_b : 6;
+    show_date = date - mdate();
+    p_vpar->synchro.kludge_p = 0;
+    p_vpar->synchro.kludge_b = 0;
+
+    if (show_date < (SYNC_DELAY - SYNC_TOLERATE) && show_date <= p_vpar->synchro.kludge_prevdate)
+    {
+        p_vpar->synchro.kludge_level--;
+        if (p_vpar->synchro.kludge_level < 0)
+            p_vpar->synchro.kludge_level = 0;
+        else if (p_vpar->synchro.kludge_level >
+                     p_vpar->synchro.kludge_nbp + p_vpar->synchro.kludge_nbb)
+            p_vpar->synchro.kludge_level = p_vpar->synchro.kludge_nbp + p_vpar->synchro.kludge_nbb;
+#ifdef DEBUG
+        if (temp != p_vpar->synchro.kludge_level)
+            intf_DbgMsg("vdec debug: Level changed from %d to %d (%Ld)\n",
+                        temp, p_vpar->synchro.kludge_level, show_date );
+#endif
+    }
+    else if (show_date > (SYNC_DELAY + SYNC_TOLERATE) && show_date >= p_vpar->synchro.kludge_prevdate)
+    {
+        p_vpar->synchro.kludge_level++;
+        if (p_vpar->synchro.kludge_level > p_vpar->synchro.kludge_nbp + p_vpar->synchro.kludge_nbb)
+            p_vpar->synchro.kludge_level = p_vpar->synchro.kludge_nbp + p_vpar->synchro.kludge_nbb;
+#ifdef DEBUG
+        if (temp != p_vpar->synchro.kludge_level)
+            intf_DbgMsg("vdec debug: Level changed from %d to %d (%Ld)\n",
+                        temp, p_vpar->synchro.kludge_level, show_date );
+#endif
+    }
+
+    p_vpar->synchro.kludge_prevdate = show_date;
+    if ((p_vpar->synchro.kludge_level - p_vpar->synchro.kludge_nbp) > p_vpar->synchro.kludge_nbb)
+        p_vpar->synchro.kludge_level = p_vpar->synchro.kludge_nbb + p_vpar->synchro.kludge_nbp;
+}
+
+#endif

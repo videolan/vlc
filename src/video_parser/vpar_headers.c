@@ -156,13 +156,25 @@ static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
             vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
         if( p_vpar->sequence.p_backward != NULL )
         {
+#if 0
             vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
                               vpar_SynchroDate( p_vpar ) );
+#else
+            mtime_t     date;
+            date = vpar_SynchroDate( p_vpar );
+            vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
+                              date );
+            if( p_vpar->synchro.i_coding_type == I_CODING_TYPE )
+                vpar_SynchroKludge( p_vpar, date );
+#endif
         }
         p_vpar->sequence.p_forward = p_vpar->sequence.p_backward;
         p_vpar->sequence.p_backward = p_newref;
         if( p_newref != NULL )
             vout_LinkPicture( p_vpar->p_vout, p_newref );
+#if 1
+        p_vpar->synchro.i_coding_type = i_coding_type;
+#endif
     }
     else if( p_newref != NULL )
     {

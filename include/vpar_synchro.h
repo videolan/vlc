@@ -18,6 +18,7 @@
 /*****************************************************************************
  * video_synchro_t and video_synchro_tab_s : timers for the video synchro
  *****************************************************************************/
+#if 0
 typedef struct video_synchro_tab_s
 {
     double mean;
@@ -77,6 +78,18 @@ typedef struct video_synchro_s
     double actual_fps;
 
 } video_synchro_t;
+#else
+typedef struct video_synchro_s
+{
+    int         kludge_level, kludge_p, kludge_b, kludge_nbp, kludge_nbb;
+    int         kludge_nbframes;
+    mtime_t     kludge_date, kludge_prevdate;
+    int         i_coding_type;
+} video_synchro_t;
+
+#define SYNC_TOLERATE   10000 /* 10 ms */
+#define SYNC_DELAY      100000
+#endif
 
 /*****************************************************************************
  * Prototypes
