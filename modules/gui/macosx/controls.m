@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.20 2003/02/07 20:23:17 hartman Exp $
+ * $Id: controls.m,v 1.21 2003/02/07 21:30:25 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -380,7 +380,7 @@
     {
         if( [[o_window className] isEqualToString: @"VLCWindow"] )
         {
-            [o_window halfWindow];
+            [o_window scaleWindowWithFactor: 0.5];
         }
     }
 }
@@ -395,7 +395,7 @@
     {
         if( [[o_window className] isEqualToString: @"VLCWindow"] )
         {
-            [o_window normalWindow];
+            [o_window scaleWindowWithFactor: 1];
         }
     }
 }
@@ -410,7 +410,7 @@
     {
         if( [[o_window className] isEqualToString: @"VLCWindow"] )
         {
-            [o_window doubleWindow];
+            [o_window scaleWindowWithFactor: 2];
         }
     }
 }

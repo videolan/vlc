@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.24 2003/02/07 20:23:17 hartman Exp $
+ * $Id: vout.m,v 1.25 2003/02/07 21:30:25 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -725,37 +725,25 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     return( p_vout );
 }
 
-- (void)halfWindow
+- (void)scaleWindowWithFactor: (float)factor
 {
     NSSize newsize;
+    NSPoint topleftbase;
+    NSPoint topleftscreen;
     
-    newsize.width = (int) p_vout->render.i_width / 2 ;
-    newsize.height = ((int) p_vout->render.i_height / 2 ) + WINDOW_TITLE_HEIGHT ;
-    [self setContentSize: newsize];
-    //[[self contentView] setFrameSize: newsize];
-    p_vout->i_changes |= VOUT_SIZE_CHANGE;
-}
-
-- (void)normalWindow
-{
-    NSSize newsize;
-    
-    newsize.width = p_vout->render.i_width ;
-    newsize.height = p_vout->render.i_height + WINDOW_TITLE_HEIGHT ;
-    [self setContentSize: newsize];
-    //[[self contentView] setFrameSize: newsize];
-    p_vout->i_changes |= VOUT_SIZE_CHANGE;
-}
-
-- (void)doubleWindow
-{
-    NSSize newsize;
-    
-    newsize.width = p_vout->render.i_width * 2 ;
-    newsize.height = (p_vout->render.i_height * 2 ) + WINDOW_TITLE_HEIGHT;
-    [self setContentSize: newsize];
-    //[[self contentView] setFrameSize: newsize];
-    p_vout->i_changes |= VOUT_SIZE_CHANGE;
+    if ( !p_vout->b_fullscreen )
+    {
+        topleftbase.x = 0;
+        topleftbase.y = [self frame].size.height;
+        topleftscreen = [self convertBaseToScreen: topleftbase];
+        
+        newsize.width = (int) ( p_vout->render.i_width * factor );
+        newsize.height = (int) ( ( p_vout->render.i_height + WINDOW_TITLE_HEIGHT ) * factor );
+        [self setContentSize: newsize];
+        
+        [self setFrameTopLeftPoint: topleftscreen];
+        p_vout->i_changes |= VOUT_SIZE_CHANGE;
+    }
 }
 
 - (void)toggleFullscreen
