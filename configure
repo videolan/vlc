@@ -3088,7 +3088,7 @@ if test x$enable_dsp != xno; then PLUGINS=${PLUGINS}"dsp "; fi
 # Check whether --enable-esd or --disable-esd was given.
 if test "${enable_esd+set}" = set; then
   enableval="$enable_esd"
-  if test x$enable_gnome = xyes; then PLUGINS=${PLUGINS}"esd "; fi
+  if test x$enable_esd = xyes; then PLUGINS=${PLUGINS}"esd "; fi
 fi
 
 # Check whether --enable-fb or --disable-fb was given.
