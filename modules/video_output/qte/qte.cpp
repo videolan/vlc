@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.cpp,v 1.6 2002/12/09 21:36:41 jpsaman Exp $
+ * $Id: qte.cpp,v 1.7 2002/12/11 21:50:03 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -396,8 +396,6 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 //            p_pic->p->i_pixel_bytes = 2;
 //            p_pic->p->b_margin      = 0;
             p_pic->i_planes         = 1;
-
-
         }
         else
         {
@@ -436,7 +434,6 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         return -1;
         break;
     }
-
 
     msg_Dbg(p_vout, "-NewPicture: %d %d %d",p_vout->output.i_width,
                                  p_vout->output.i_height,
@@ -478,6 +475,10 @@ static int CreateQtWindow( vout_thread_t *p_vout )
 
     p_vout->p_sys->p_event = (event_thread_t*) vlc_object_create( p_vout, sizeof(event_thread_t) );
     p_vout->p_sys->p_event->p_vout = p_vout;
+
+    /* Initializations */
+    p_vout->p_sys->i_width  = 320;
+    p_vout->p_sys->i_height = 240;
 
     /* create thread to exec the qpe application */
     if ( vlc_thread_create( p_vout->p_sys->p_event, "QT Embedded Thread",
@@ -544,6 +545,8 @@ static void RunQtThread(event_thread_t *p_event)
 {
     int     argc    = 0;
 
+    msg_Dbg( p_event->p_vout, "+qte::RunQtThread" );
+
     if(qApp == NULL)
     {
         QApplication* pApp = new QApplication(argc, NULL);
@@ -552,14 +555,17 @@ static void RunQtThread(event_thread_t *p_event)
             p_event->p_vout->p_sys->pcQApplication = pApp;
             p_event->p_vout->p_sys->bOwnsQApp = TRUE;
         }
+        msg_Dbg( p_event->p_vout, "RunQtThread application created" );
     }
     else
     {
         p_event->p_vout->p_sys->pcQApplication = qApp;
+        msg_Dbg( p_event->p_vout, "RunQtThread applicaton attached" );
     }
 
     /* signal the creation of the window */
     vlc_thread_ready( p_event );
+    msg_Dbg( p_event->p_vout, "+qte::RunQtThread ready" );
 
     if (p_event->p_vout->p_sys->pcQApplication)
     {
@@ -567,7 +573,6 @@ static void RunQtThread(event_thread_t *p_event)
         vo.showFullScreen();
         vo.show();
         p_event->p_vout->p_sys->pcVoutWidget = &vo;
-
         p_event->p_vout->p_sys->bRunning = TRUE;
 
         if(p_event->p_vout->p_sys->bOwnsQApp)
@@ -596,6 +601,6 @@ static void RunQtThread(event_thread_t *p_event)
         p_event->p_vout->p_sys->pcQApplication = NULL;
     }
 
-    msg_Dbg( p_event, "RunQtThread terminating" );
+    msg_Dbg( p_event->p_vout, "-qte::RunQtThread terminating" );
 }
 
