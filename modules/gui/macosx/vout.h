@@ -2,7 +2,7 @@
  * vout.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.h,v 1.17 2004/01/25 17:01:57 murray Exp $
+ * $Id: vout.h,v 1.18 2004/01/26 18:30:37 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -47,8 +47,22 @@
 /*****************************************************************************
  * VLCView interface
  *****************************************************************************/
-@interface VLCView : NSQuickDrawView
+@interface VLCQTView : NSQuickDrawView
 {
+}
+
+@end
+
+/*****************************************************************************
+ * VLCView interface
+ *****************************************************************************/
+@interface VLCGLView : NSOpenGLView
+{
+    @public
+    int           i_init_done;
+    int           i_textures_loaded;
+    int           i_index;
+    unsigned long pi_textures[3];
 }
 
 @end
@@ -70,9 +84,12 @@
  *****************************************************************************/
 struct vout_sys_t
 {
+    int i_opengl;
+    
     NSRect s_rect;
     int b_pos_saved;
     VLCWindow * o_window;
+    VLCGLView * o_glview;
 
     vlc_bool_t b_mouse_moved;
     mtime_t i_time_mouse_last_moved;

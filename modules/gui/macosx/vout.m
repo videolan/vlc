@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.69 2004/01/25 17:01:57 murray Exp $
+ * $Id: vout.m,v 1.70 2004/01/26 18:30:37 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -32,6 +32,9 @@
 #include <string.h>                                            /* strerror() */
 
 #include <QuickTime/QuickTime.h>
+
+#include <OpenGL/gl.h>
+#include <OpenGL/glext.h>
 
 #include <vlc_keys.h>
 
@@ -129,11 +132,6 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         }
     }
 
-    p_vout->p_sys->h_img_descr = 
-        (ImageDescriptionHandle)NewHandleClear( sizeof(ImageDescription) );
-    p_vout->p_sys->p_matrix = (MatrixRecordPtr)malloc( sizeof(MatrixRecord) );
-    p_vout->p_sys->p_fullscreen_state = NULL;
-
     p_vout->p_sys->b_mouse_moved = VLC_TRUE;
     p_vout->p_sys->i_time_mouse_last_moved = mdate();
 
@@ -141,38 +139,51 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     p_vout->p_sys->s_rect.size.width = p_vout->i_window_width;
     p_vout->p_sys->s_rect.size.height = p_vout->i_window_height;
 
-    if( ( err = EnterMovies() ) != noErr )
-    {
-        msg_Err( p_vout, "EnterMovies failed: %d", err );
-        free( p_vout->p_sys->p_matrix );
-        DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
-        free( p_vout->p_sys );
-        return( 1 );
-    } 
+    /* Check if we should use QuickTime or OpenGL */
+    p_vout->p_sys->i_opengl = config_GetInt( p_vout, "macosx-opengl" );
 
-    /* Damn QT isn't thread safe. so keep a lock in the p_vlc object */
-    vlc_mutex_lock( &p_vout->p_vlc->quicktime_lock );
+    if( !p_vout->p_sys->i_opengl )
+    {
+        /* Initialize QuickTime */
+        p_vout->p_sys->h_img_descr = 
+            (ImageDescriptionHandle)NewHandleClear( sizeof(ImageDescription) );
+        p_vout->p_sys->p_matrix =
+            (MatrixRecordPtr)malloc( sizeof(MatrixRecord) );
+        p_vout->p_sys->p_fullscreen_state = NULL;
 
-    err = FindCodec( kYUV420CodecType, bestSpeedCodec,
-                        nil, &p_vout->p_sys->img_dc );
-    
-    vlc_mutex_unlock( &p_vout->p_vlc->quicktime_lock );
-    if( err == noErr && p_vout->p_sys->img_dc != 0 )
-    {
-        p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
-        p_vout->p_sys->i_codec = kYUV420CodecType;
-    }
-    else
-    {
-        msg_Err( p_vout, "failed to find an appropriate codec" );
-    }
+        if( ( err = EnterMovies() ) != noErr )
+        {
+            msg_Err( p_vout, "EnterMovies failed: %d", err );
+            free( p_vout->p_sys->p_matrix );
+            DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
+            free( p_vout->p_sys );
+            return( 1 );
+        } 
 
-    if( p_vout->p_sys->img_dc == 0 )
-    {
-        free( p_vout->p_sys->p_matrix );
-        DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
-        free( p_vout->p_sys );
-        return VLC_EGENERIC;        
+        /* Damn QT isn't thread safe. so keep a lock in the p_vlc object */
+        vlc_mutex_lock( &p_vout->p_vlc->quicktime_lock );
+
+        err = FindCodec( kYUV420CodecType, bestSpeedCodec,
+                            nil, &p_vout->p_sys->img_dc );
+        
+        vlc_mutex_unlock( &p_vout->p_vlc->quicktime_lock );
+        if( err == noErr && p_vout->p_sys->img_dc != 0 )
+        {
+            p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
+            p_vout->p_sys->i_codec = kYUV420CodecType;
+        }
+        else
+        {
+            msg_Err( p_vout, "failed to find an appropriate codec" );
+        }
+
+        if( p_vout->p_sys->img_dc == 0 )
+        {
+            free( p_vout->p_sys->p_matrix );
+            DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
+            free( p_vout->p_sys );
+            return VLC_EGENERIC;        
+        }
     }
 
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
@@ -224,8 +235,11 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     if( CoCreateWindow( p_vout ) )
     {
         msg_Err( p_vout, "unable to create window" );
-        free( p_vout->p_sys->p_matrix );
-        DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
+        if( !p_vout->p_sys->i_opengl )
+        {
+            free( p_vout->p_sys->p_matrix );
+            DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
+        }
         free( p_vout->p_sys ); 
         return( 1 );
     }
@@ -256,17 +270,28 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
-    SetPort( p_vout->p_sys->p_qdport );
-    QTScaleMatrix( p_vout );
-
-    if( QTCreateSequence( p_vout ) )
+    if( !p_vout->p_sys->i_opengl )
     {
-        msg_Err( p_vout, "unable to create sequence" );
-        return( 1 );
+        SetPort( p_vout->p_sys->p_qdport );
+        QTScaleMatrix( p_vout );
+
+        if( QTCreateSequence( p_vout ) )
+        {
+            msg_Err( p_vout, "unable to create sequence" );
+            return( 1 );
+        }
+    }
+    else
+    {
+        p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+        p_vout->output.i_rmask  = 0xFF0000;
+        p_vout->output.i_gmask  = 0x00FF00;
+        p_vout->output.i_bmask  = 0x0000FF;
     }
 
     /* Try to initialize up to QT_MAX_DIRECTBUFFERS direct buffers */
-    while( I_OUTPUTPICTURES < QT_MAX_DIRECTBUFFERS )
+    while( I_OUTPUTPICTURES <
+           ( p_vout->p_sys->i_opengl ? 3 : QT_MAX_DIRECTBUFFERS ) )
     {
         p_pic = NULL;
 
@@ -281,9 +306,23 @@ static int vout_Init( vout_thread_t *p_vout )
         }
 
         /* Allocate the picture */
-        if( p_pic == NULL || QTNewPicture( p_vout, p_pic ) )
+        if( p_pic == NULL )
         {
             break;
+        }
+
+        if( !p_vout->p_sys->i_opengl )
+        {
+            if( QTNewPicture( p_vout, p_pic ) )
+            {
+                break;
+            }
+        }
+        else
+        {
+            vout_AllocatePicture( p_vout, p_pic, p_vout->output.i_chroma,
+                    p_vout->output.i_width, p_vout->output.i_height,
+                    p_vout->output.i_aspect );
         }
 
         p_pic->i_status = DESTROYED_PICTURE;
@@ -292,6 +331,12 @@ static int vout_Init( vout_thread_t *p_vout )
         PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
 
         I_OUTPUTPICTURES++;
+    }
+
+    if( p_vout->p_sys->i_opengl )
+    {
+        p_vout->p_sys->o_glview->i_index = -1;
+        p_vout->p_sys->o_glview->i_init_done = 1;
     }
 
     return( 0 );
@@ -304,13 +349,23 @@ static void vout_End( vout_thread_t *p_vout )
 {
     int i_index;
 
-    QTDestroySequence( p_vout );
+    if( !p_vout->p_sys->i_opengl )
+    {
+        QTDestroySequence( p_vout );
+    }
 
     /* Free the direct buffers we allocated */
     for( i_index = I_OUTPUTPICTURES; i_index; )
     {
         i_index--;
-        QTFreePicture( p_vout, PP_OUTPUTPICTURE[ i_index ] );
+        if( !p_vout->p_sys->i_opengl )
+        {
+            QTFreePicture( p_vout, PP_OUTPUTPICTURE[ i_index ] );
+        }
+        else
+        {
+            free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
+        }
     }
 }
 
@@ -326,13 +381,16 @@ void E_(CloseVideo) ( vlc_object_t *p_this )
         msg_Err( p_vout, "unable to destroy window" );
     }
 
-    if ( p_vout->p_sys->p_fullscreen_state != NULL )
-        EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
+    if( !p_vout->p_sys->i_opengl )
+    {
+        if ( p_vout->p_sys->p_fullscreen_state != NULL )
+            EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
 
-    ExitMovies();
+        ExitMovies();
 
-    free( p_vout->p_sys->p_matrix );
-    DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
+        free( p_vout->p_sys->p_matrix );
+        DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
+    }
 
     free( p_vout->p_sys );
 }
@@ -357,9 +415,12 @@ static int vout_Manage( vout_thread_t *p_vout )
 
     if( p_vout->i_changes & VOUT_SIZE_CHANGE ) 
     {
-        QTScaleMatrix( p_vout );
-        SetDSequenceMatrix( p_vout->p_sys->i_seq, 
-                            p_vout->p_sys->p_matrix );
+        if( !p_vout->p_sys->i_opengl )
+        {
+            QTScaleMatrix( p_vout );
+            SetDSequenceMatrix( p_vout->p_sys->i_seq, 
+                                p_vout->p_sys->p_matrix );
+        }
  
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
     }
@@ -392,20 +453,31 @@ static int vout_Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    OSErr err;
-    CodecFlags flags;
-
-    if( ( err = DecompressSequenceFrameS( 
-                    p_vout->p_sys->i_seq,
-                    p_pic->p_sys->p_info,
-                    p_pic->p_sys->i_size,                    
-                    codecFlagUseImageBuffer, &flags, nil ) != noErr ) )
+    if( !p_vout->p_sys->i_opengl )
     {
-        msg_Warn( p_vout, "DecompressSequenceFrameS failed: %d", err );
+        OSErr err;
+        CodecFlags flags;
+
+        if( ( err = DecompressSequenceFrameS( 
+                        p_vout->p_sys->i_seq,
+                        p_pic->p_sys->p_info,
+                        p_pic->p_sys->i_size,                    
+                        codecFlagUseImageBuffer, &flags, nil ) != noErr ) )
+        {
+            msg_Warn( p_vout, "DecompressSequenceFrameS failed: %d", err );
+        }
+        else
+        {
+            QDFlushPortBuffer( p_vout->p_sys->p_qdport, nil );
+        }
     }
     else
     {
-        QDFlushPortBuffer( p_vout->p_sys->p_qdport, nil );
+        p_vout->p_sys->o_glview->i_index++; 
+        p_vout->p_sys->o_glview->i_index %= 3;
+        [p_vout->p_sys->o_glview setNeedsDisplay: YES];
+        p_pic->p->p_pixels =
+            PP_OUTPUTPICTURE[(p_vout->p_sys->o_glview->i_index+1)%3]->p_data;
     }
 }
 
@@ -484,6 +556,12 @@ static int CoDestroyWindow( vout_thread_t *p_vout )
  *****************************************************************************/
 static int CoToggleFullscreen( vout_thread_t *p_vout )
 {
+    if( p_vout->p_sys->i_opengl )
+    {
+        /* TODO */
+        return 0;
+    }
+    
     QTDestroySequence( p_vout );
 
     if( CoDestroyWindow( p_vout ) )
@@ -530,7 +608,7 @@ static void VLCHideMouse ( vout_thread_t *p_vout, BOOL b_hide )
     
     if ( b_hide && b_inside )
     {
-        /* only hide if mouse over VLCView */
+        /* only hide if mouse over VLCQTView */
         [NSCursor setHiddenUntilMouseMoves: YES];
     }
     else if ( !b_hide )
@@ -936,9 +1014,9 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 @end
 
 /*****************************************************************************
- * VLCView implementation
+ * VLCQTView implementation
  *****************************************************************************/
-@implementation VLCView
+@implementation VLCQTView
 
 - (void)drawRect:(NSRect)rect
 {
@@ -1181,6 +1259,141 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 @end
 
 /*****************************************************************************
+ * VLCGLView implementation
+ *****************************************************************************/
+@implementation VLCGLView
+
+
+- (id) initWithFrame: (NSRect) frame
+{
+    NSOpenGLPixelFormatAttribute attribs[] =
+    {
+        NSOpenGLPFAAccelerated,
+        NSOpenGLPFANoRecovery,
+        NSOpenGLPFADoubleBuffer,
+        0
+    };
+
+    NSOpenGLPixelFormat * fmt = [[NSOpenGLPixelFormat alloc]
+        initWithAttributes: attribs];
+
+    self = [super initWithFrame:frame pixelFormat: fmt];
+
+    [[self openGLContext] makeCurrentContext];
+    [[self openGLContext] update];
+
+    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+    glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+    glClearColor( 1.0, 1.0, 1.0, 1.0 );
+    glColor4f( 1.0, 1.0, 1.0, 1.0 );
+    glClearColor( 0.5, 0.5, 0.5, 0.5 );
+
+    i_init_done       = 0;
+    i_textures_loaded = 0;
+
+    return self;
+}
+
+- (void) reshape
+{
+   NSRect bounds;
+
+   [[self openGLContext] update];
+   bounds = [self bounds];
+   glViewport( 0, 0, (GLsizei) bounds.size.width,
+               (GLsizei) bounds.size.height );
+}
+
+- (void)drawRect:(NSRect)rect
+{
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
+
+
+    /* Make this current context */
+    [[self openGLContext] makeCurrentContext];
+
+    if( !i_init_done )
+    {
+        /* Nothing to display, blank the view */
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        return;
+    }
+
+    if( !i_textures_loaded )
+    {
+        int i;
+        glGenTextures( 3, pi_textures );
+        for( i = 0; i < 3; i++ )
+        {
+            /* Create the texture */
+            glDisable( GL_TEXTURE_2D );
+            glEnable( GL_TEXTURE_RECTANGLE_EXT );
+            glBindTexture(GL_TEXTURE_RECTANGLE_EXT, pi_textures[i]);
+
+            /* Map our buffer to the texture */
+            glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGB8,
+                    p_vout->output.i_width, p_vout->output.i_height, 0,
+                    GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
+                    PP_OUTPUTPICTURE[i]->p_data );
+        }
+    }
+
+    glDisable( GL_TEXTURE_2D );
+    glEnable( GL_TEXTURE_RECTANGLE_EXT );
+    glBindTexture(GL_TEXTURE_RECTANGLE_EXT, pi_textures[i_index] );
+
+    /* Turn on AGP transferts */
+    glTexParameterf( GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_PRIORITY, 0.0 );
+
+    /* Use AGP texturing */
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_CACHED_APPLE );
+
+    /* Tell the driver not to make a copy of the texture but to use out
+       buffer */
+    glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE);
+
+    /* Linear interpolation */
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+    /* I have no idea what this exactly does, but it seems to be
+       necessary for scaling */
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
+
+
+    /* Draw a quad with our texture on it */
+    glBegin( GL_QUADS );
+        /* Top left */
+        glTexCoord2f( 0.0f, 0.0f );
+        glVertex2f( -1.0f, 1.0f );
+        /* Bottom left */
+        glTexCoord2f( 0.0f, (float) p_vout->output.i_height );
+        glVertex2f( -1.0f, -1.0f );
+        /* Bottom right */
+        glTexCoord2f( (float) p_vout->output.i_width,
+                (float) p_vout->output.i_height );
+        glVertex2f( 1.0f, -1.0f );
+        /* Top right */
+        glTexCoord2f( (float) p_vout->output.i_width, 0.0f );
+        glVertex2f( 1.0f, 1.0f );
+    glEnd();
+
+    /* Wait for the job to be done */
+    [[self openGLContext] flushBuffer];
+}
+
+@end
+
+/*****************************************************************************
  * VLCVout implementation
  *****************************************************************************/
 @implementation VLCVout
@@ -1188,7 +1401,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 - (void)createWindow:(NSValue *)o_value
 {
     vlc_value_t val;
-    VLCView * o_view;
+    VLCQTView * o_view;
     NSScreen * o_screen;
     vout_thread_t * p_vout;
     vlc_bool_t b_main_screen;
@@ -1223,6 +1436,12 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         }
     } 
 
+    if( p_vout->p_sys->i_opengl )
+    {
+        /* XXX Fix fullscreen mode */
+        p_vout->b_fullscreen = 0;
+    }
+
     if( p_vout->b_fullscreen )
     {
         NSRect screen_rect = [o_screen frame];
@@ -1249,9 +1468,12 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
                                    NSClosableWindowMask |
                                    NSResizableWindowMask;
         
-        if ( p_vout->p_sys->p_fullscreen_state != NULL )
-            EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
-        p_vout->p_sys->p_fullscreen_state = NULL;
+        if( !p_vout->p_sys->i_opengl )
+        {
+            if ( p_vout->p_sys->p_fullscreen_state != NULL )
+                EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
+            p_vout->p_sys->p_fullscreen_state = NULL;
+        }
 
         [p_vout->p_sys->o_window 
             initWithContentRect: p_vout->p_sys->s_rect
@@ -1272,15 +1494,25 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         }
     }
 
-    o_view = [[VLCView alloc] init];
-    /* FIXME: [o_view setMenu:] */
-    [p_vout->p_sys->o_window setContentView: o_view];
-    [o_view autorelease];
+    if( !p_vout->p_sys->i_opengl )
+    {
+        o_view = [[VLCQTView alloc] init];
+        /* FIXME: [o_view setMenu:] */
+        [p_vout->p_sys->o_window setContentView: o_view];
+        [o_view autorelease];
 
-    [o_view lockFocus];
-    p_vout->p_sys->p_qdport = [o_view qdPort];
-
-    [o_view unlockFocus];
+        [o_view lockFocus];
+        p_vout->p_sys->p_qdport = [o_view qdPort];
+        [o_view unlockFocus];
+    }
+    else
+    {
+#define o_glview p_vout->p_sys->o_glview
+        o_glview = [[VLCGLView alloc] initWithFrame: p_vout->p_sys->s_rect];
+        [p_vout->p_sys->o_window setContentView: o_glview];
+        [o_glview autorelease];
+#undef o_glview
+    }
     
     [p_vout->p_sys->o_window updateTitle];
     [p_vout->p_sys->o_window makeKeyAndOrderFront: nil];

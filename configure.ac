@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.160 2004/01/26 16:54:56 titer Exp $
+dnl $Id: configure.ac,v 1.161 2004/01/26 18:30:37 titer Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -3103,11 +3103,11 @@ AC_ARG_ENABLE(macosx,
   [if test "${enable_macosx}" = "yes"
    then
      AX_ADD_BUILTINS([macosx])
-     AX_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC])
+     AX_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC -framework OpenGL])
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
      AX_ADD_BUILTINS([macosx])
-     AX_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC])
+     AX_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC -framework OpenGL])
    )])
 
 dnl
