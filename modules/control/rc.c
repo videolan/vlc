@@ -1,7 +1,7 @@
 /*****************************************************************************
  * rc.c : remote control stdin/stdout module for vlc
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004 - 2005 VideoLAN
  * $Id$
  *
  * Author: Peter Surda <shurdeek@panorama.sth.ac.at>
@@ -357,16 +357,38 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "next", Playlist, NULL );
     var_Create( p_intf, "goto", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "goto", Playlist, NULL );
-  
+ 
+    /* marquee on the fly items */
     var_Create( p_intf, "marq-marquee", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "marq-marquee", Other, NULL );
     var_Create( p_intf, "marq-x", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "marq-x", Other, NULL );
     var_Create( p_intf, "marq-y", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "marq-y", Other, NULL );
+    var_Create( p_intf, "marq-position", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "marq-position", Other, NULL );
+    var_Create( p_intf, "marq-color", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "marq-color", Other, NULL );
+    var_Create( p_intf, "marq-opacity", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "marq-opacity", Other, NULL );
     var_Create( p_intf, "marq-timeout", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "marq-timeout", Other, NULL );
 
+    /* time on the fly items */
+    var_Create( p_intf, "time-format", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "time-format", Other, NULL );
+    var_Create( p_intf, "time-x", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "time-x", Other, NULL );
+    var_Create( p_intf, "time-y", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "time-y", Other, NULL );
+    var_Create( p_intf, "time-position", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "time-position", Other, NULL );
+    var_Create( p_intf, "time-color", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "time-color", Other, NULL );
+    var_Create( p_intf, "time-opacity", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "time-opacity", Other, NULL );
+    
+    
     var_Create( p_intf, "pause", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "pause", Input, NULL );
     var_Create( p_intf, "seek", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
@@ -660,7 +682,17 @@ static void Run( intf_thread_t *p_intf )
                 msg_rc(_("| marq-marquee STRING  . . overlay STRING in video\n"));
                 msg_rc(_("| marq-x X . . . . .  offset of marquee, from left\n"));
                 msg_rc(_("| marq-y Y . . . . . . offset of marquee, from top\n"));
+                msg_rc(_("| marq-position #. . .  .relative position control\n"));
+                msg_rc(_("| marq-color # . . . .  font color of marquee, RGB\n"));
+                msg_rc(_("| marq-opacity # . . . . . . . .opacity of marquee\n"));
                 msg_rc(_("| marq-timeout T. . . .  timeout of marquee, in ms\n"));
+                msg_rc(  "| \n");
+                msg_rc(_("| time-format STRING . . . overlay STRING in video\n"));
+                msg_rc(_("| time-x X . . . . .offset of timestamp, from left\n"));
+                msg_rc(_("| time-y Y . . . . . offset of timestamp, from top\n"));
+                msg_rc(_("| time-position #. . .  .relative position control\n"));
+                msg_rc(_("| time-color # . . .  font color of timestamp, RGB\n"));
+                msg_rc(_("| time-opacity # . . . . . . .opacity of timestamp\n"));
                 msg_rc(  "| \n");
             }    
             msg_rc(_("| help . . . . . . . . . . . . . this help message\n"));
@@ -964,12 +996,89 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
             var_Set( p_inp->p_libvlc, "marq-y", val );
         }
     }
+    else if( !strcmp( psz_cmd, "marq-position" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "marq-position", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "marq-color" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = strtol( newval.psz_string, NULL, 0 );
+            var_Set( p_inp->p_libvlc, "marq-color", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "marq-opacity" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = strtol( newval.psz_string, NULL, 0 );
+            var_Set( p_inp->p_libvlc, "marq-opacity", val );
+        }
+    }
     else if( !strcmp( psz_cmd, "marq-timeout" ) )
     {
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp, "marq-timeout", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "time-format" ) )
+    {
+        if( strlen( newval.psz_string ) > 0 )
+        {
+            val.psz_string = newval.psz_string;
+            var_Set( p_inp->p_libvlc, "time-format", val );
+        }
+        else 
+        {
+                val.psz_string = "";
+                var_Set( p_inp->p_libvlc, "time-format", val);
+        }
+    }
+    else if( !strcmp( psz_cmd, "time-x" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "time-x", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "time-y" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "time-y", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "time-position" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "time-position", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "time-color" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = strtol( newval.psz_string, NULL, 0 );
+            var_Set( p_inp->p_libvlc, "time-color", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "time-opacity" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = strtol( newval.psz_string, NULL, 0 );
+            var_Set( p_inp->p_libvlc, "time-opacity", val );
         }
     }
  

@@ -3,7 +3,7 @@
  * This header is required by all modules which have to handle pictures. It
  * includes all common video types and constants.
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
+ * Copyright (C) 1999 - 2005 VideoLAN
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -208,7 +208,7 @@ struct subpicture_region_t
 
     int             i_x;                             /**< position of region */
     int             i_y;                             /**< position of region */
-
+    int i_font_color, i_font_opacity;     /**< controls for text subpictures */
     subpicture_region_t *p_next;                /**< next region in the list */
     subpicture_region_t *p_cache;       /**< modified version of this region */
     /**@}*/

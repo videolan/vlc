@@ -1,7 +1,7 @@
 /*****************************************************************************
  * time.c : time display video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2003-2004 VideoLAN
+ * Copyright (C) 2003-2005 VideoLAN
  * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -40,6 +40,18 @@
 static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
 static subpicture_t *Filter( filter_t *, mtime_t );
+static int TimeCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data );
+static int pi_color_values[] = { 0xf0000000, 0x00000000, 0x00808080, 0x00C0C0C0, 
+               0x00FFFFFF, 0x00800000, 0x00FF0000, 0x00FF00FF, 0x00FFFF00, 
+               0x00808000, 0x00008000, 0x00008080, 0x0000FF00, 0x00800080, 
+               0x00000080, 0x000000FF, 0x0000FFFF}; 
+static char *ppsz_color_descriptions[] = { N_("Default"), N_("Black"), 
+               N_("Gray"), N_("Silver"), N_("White"), N_("Maroon"), N_("Red"),
+               N_("Fuchsia"), N_("Yellow"), N_("Olive"), N_("Green"), 
+               N_("Teal"), N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"), 
+               N_("Aqua") };
 
 /*****************************************************************************
  * filter_sys_t: time filter descriptor
@@ -48,6 +60,9 @@ struct filter_sys_t
 {
     int i_xoff, i_yoff;  /* offsets for the display string in the video window */
     char *psz_format;    /* time format string */
+    int i_pos;  /* permit relative positioning (top, bottom, left, right, center) */
+    int  i_font_color, i_font_opacity; /* font color control */
+    vlc_bool_t b_absolute;  /* position control, relative vs. absolute */
 
     time_t last_time;
 };
@@ -58,6 +73,23 @@ struct filter_sys_t
 #define POSX_LONGTEXT N_("X offset, from the left screen edge" )
 #define POSY_TEXT N_("Y offset, from the top")
 #define POSY_LONGTEXT N_("Y offset, down from the top" )
+#define OPACITY_TEXT N_("Opacity, -1..255")
+#define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of overlay text. " \
+    "-1 = use freetype-opacity, 0 = transparent, 255 = totally opaque. " )
+#define COLOR_TEXT N_("Text Default Color")
+#define COLOR_LONGTEXT N_("The color of overlay text. 1 byte for each color, hexadecimal." \
+    "-1 = use freetype-color, #000000 = all colors off, " \
+    "0xFF0000 = just Red, 0xFFFFFF = all color on [White]" )
+#define POS_TEXT N_("Time position")
+#define POS_LONGTEXT N_( \
+  "You can enforce the time position on the video " \
+  "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
+  "also use combinations of these values by adding them).")
+
+static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static char *ppsz_pos_descriptions[] =
+     { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
+     N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
 /*****************************************************************************
  * Module descriptor
@@ -69,20 +101,28 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
     set_callbacks( CreateFilter, DestroyFilter );
     add_string( "time-format", "%Y-%m-%d   %H:%M:%S", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
-    add_integer( "time-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
+    add_integer( "time-x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
     add_integer( "time-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
+    add_integer( "time-position", 9, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
+    /* 9 sets the default to bottom-left, minimizing jitter */
+    change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
+    add_integer_with_range( "time-opacity", -1, -1, 255, NULL,
+        OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
+    add_integer( "time-color", -1, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
+        change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
     set_description( _("Time display sub filter") );
     add_shortcut( "time" );
 vlc_module_end();
 
 /*****************************************************************************
- * CreateFilter: allocates logo video filter
+ * CreateFilter: allocates time video filter
  *****************************************************************************/
 static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-    vlc_value_t val;
+    vlc_object_t *p_input;
+    vlc_value_t     val;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -91,14 +131,29 @@ static int CreateFilter( vlc_object_t *p_this )
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
+    /* Hook used for callback variables */
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
+    {
+        return VLC_ENOOBJ;
+    }
 
-    var_Create( p_this, "time-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_filter, "time-x", &val );
-    p_sys->i_xoff = val.i_int;
-    var_Create( p_this, "time-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_filter, "time-y", &val );
-    p_sys->i_yoff = val.i_int;
-    p_sys->psz_format = var_CreateGetString( p_this, "time-format" );
+    p_sys->i_xoff = var_CreateGetInteger( p_input->p_libvlc , "time-x" );
+    p_sys->i_yoff = var_CreateGetInteger( p_input->p_libvlc , "time-y" );
+    p_sys->psz_format = var_CreateGetString( p_input->p_libvlc, "time-format" );
+    p_sys->i_pos = var_CreateGetInteger( p_input->p_libvlc , "time-position" );
+    var_Create( p_input->p_libvlc, "time-opacity", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    p_sys->i_font_opacity = var_CreateGetInteger( p_input->p_libvlc , "time-opacity" );
+    p_sys->i_font_color = var_CreateGetInteger( p_input->p_libvlc , "time-color" );
+    
+    var_AddCallback( p_input->p_libvlc, "time-x", TimeCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "time-y", TimeCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "time-format", TimeCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "time-position", TimeCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "time-color", TimeCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "time-opacity", TimeCallback, p_sys );
+
+    vlc_object_release( p_input );
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
@@ -113,11 +168,24 @@ static void DestroyFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
+    vlc_object_t *p_input;
 
     if( p_sys->psz_format ) free( p_sys->psz_format );
     free( p_sys );
+    /* Delete the time variables */
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
+    {
+        return;
+    }
+    var_Destroy( p_input->p_libvlc , "time-format" );
+    var_Destroy( p_input->p_libvlc , "time-x" );
+    var_Destroy( p_input->p_libvlc , "time-y" );
+    var_Destroy( p_input->p_libvlc , "time-position" );
+    var_Destroy( p_input->p_libvlc , "time-color");
+    var_Destroy( p_input->p_libvlc , "time-opacity");
+    vlc_object_release( p_input );
 }
-
 
 static char *FormatTime(char *tformat )
 {
@@ -156,16 +224,22 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     if( p_sys->last_time == time( NULL ) ) return NULL;
 
+    p_sys->b_absolute = VLC_TRUE;
+    if( p_sys->i_xoff < 0 || p_sys->i_yoff < 0 )
+    {
+        p_sys->b_absolute = VLC_FALSE;
+    }
+
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
-    
+
+    p_spu->b_absolute = p_sys->b_absolute;
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('T','E','X','T');
     fmt.i_aspect = 0;
     fmt.i_width = fmt.i_height = 0;     
     fmt.i_x_offset = 0;
     fmt.i_y_offset = 0;
-    
     p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );
     if( !p_spu->p_region )
     {
@@ -182,7 +256,48 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->b_absolute = VLC_FALSE;
     p_spu->i_x = p_sys->i_xoff;
     p_spu->i_y = p_sys->i_yoff;
+    p_spu->p_region->i_font_color = p_sys->i_font_color;
+    p_spu->p_region->i_font_opacity = p_sys->i_font_opacity;;
 
-    p_spu->i_flags = OSD_ALIGN_LEFT|OSD_ALIGN_TOP ;
+    p_spu->i_flags = p_sys->i_pos;
+
     return p_spu;
+}
+/**********************************************************************
+ * Callback to update params on the fly
+ **********************************************************************/
+static int TimeCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data )
+{
+    filter_sys_t *p_sys = (filter_sys_t *) p_data;
+
+    if( !strncmp( psz_var, "time-format", 11 ) )
+    {
+        if( p_sys->psz_format ) free( p_sys->psz_format );
+        p_sys->psz_format = strdup( newval.psz_string );
+    }
+    else if ( !strncmp( psz_var, "time-x", 6 ) )
+    {
+        p_sys->i_xoff = newval.i_int;
+    }
+    else if ( !strncmp( psz_var, "time-y", 6 ) )
+    {
+        p_sys->i_yoff = newval.i_int;
+    }
+    else if ( !strncmp( psz_var, "time-color", 8 ) )  /* "time-col" */ 
+    {
+        p_sys->i_font_color = newval.i_int;
+    }
+    else if ( !strncmp( psz_var, "time-opacity", 8 ) ) /* "time-opa" */ 
+    {
+        p_sys->i_font_opacity = newval.i_int;
+    }
+    else if ( !strncmp( psz_var, "time-position", 8 ) )
+    /* willing to accept a match against time-pos */
+    {
+        p_sys->i_pos = newval.i_int;
+        p_sys->i_xoff = -1;       /* force to relative positioning */
+    }
+    return VLC_SUCCESS;
 }

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
- * Copyright (C) 2000-2004 VideoLAN
+ * Copyright (C) 2000-2005 VideoLAN
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -257,6 +257,8 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     p_region->p_cache = 0;
     p_region->fmt = *p_fmt;
     p_region->psz_text = 0;
+    p_region->i_font_color = -1; /* default to using freetype-color -opacity */
+    p_region->i_font_opacity = -1;
 
     if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
         p_fmt->p_palette = p_region->fmt.p_palette =
@@ -378,12 +380,11 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
     p_subpic->pf_render  = 0;
     p_subpic->pf_destroy = 0;
     p_subpic->p_sys      = 0;
-
     vlc_mutex_unlock( &p_spu->subpicture_lock );
 
     p_subpic->pf_create_region = __spu_CreateRegion;
     p_subpic->pf_destroy_region = __spu_DestroyRegion;
-
+    
     return p_subpic;
 }
 
@@ -442,6 +443,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                             subpicture_t *p_subpic,
                             int i_scale_width_orig, int i_scale_height_orig )
 {
+
     /* Get lock */
     vlc_mutex_lock( &p_spu->subpicture_lock );
 
@@ -460,7 +462,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_spu->p_blend->fmt_out.video.i_y_offset = 0;
             p_spu->p_blend->fmt_out.video.i_aspect = p_fmt->i_aspect;
             p_spu->p_blend->fmt_out.video.i_chroma = p_fmt->i_chroma;
-
             p_spu->p_blend->fmt_in.video.i_chroma = VLC_FOURCC('Y','U','V','P');
 
             p_spu->p_blend->p_module =
@@ -470,7 +471,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         /* Load the text rendering module */
         if( !p_spu->p_text && p_region )
         {
-            p_spu->p_text = vlc_object_create( p_spu, VLC_OBJECT_FILTER );
+	        p_spu->p_text = vlc_object_create( p_spu, VLC_OBJECT_FILTER );
             vlc_object_attach( p_spu->p_text, p_spu );
 
             p_spu->p_text->fmt_out.video.i_width =
@@ -479,10 +480,9 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             p_spu->p_text->fmt_out.video.i_height =
                 p_spu->p_text->fmt_out.video.i_visible_height =
                     p_fmt->i_height;
-
+                
             p_spu->p_text->pf_sub_buffer_new = spu_new_buffer;
             p_spu->p_text->pf_sub_buffer_del = spu_del_buffer;
-
             p_spu->p_text->p_module =
                 module_Need( p_spu->p_text, "text renderer", 0, 0 );
         }
@@ -556,7 +556,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     subpicture_region_t tmp_region;
                     block_t *p_new_block =
                         block_New( p_spu, strlen(p_region->psz_text) + 1 );
-
                     if( p_new_block )
                     {
                         memcpy( p_new_block->p_buffer, p_region->psz_text,
@@ -565,8 +564,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                             p_subpic->i_start;
                         p_new_block->i_length =
                             p_subpic->i_start - p_subpic->i_stop;
-                        p_subpic_tmp = p_spu->p_text->pf_render_string(
-                            p_spu->p_text, p_new_block );
+                    /*  the actual call  to RenderText in freetype.c: */
+                           p_subpic_tmp = p_spu->p_text->pf_render_string(
+                            p_spu->p_text, p_new_block, 
+                            p_region->i_font_color, p_region->i_font_opacity);
 
                         if( p_subpic_tmp )
                         {
@@ -808,7 +809,6 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date )
             {
                 continue;
             }
-
             if( display_date &&
                 display_date < p_spu->p_subpicture[i_index].i_start )
             {
