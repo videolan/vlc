@@ -2,7 +2,7 @@ Package: opie-vlc
 Section: graphics
 Priority: optional
 Version: 0.5.1
-Release: test1
+Release: 1
 Conflicts: gpe-apps, vlc, gpe-vlc, libsdl
 Architecture: arm
 Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>,  Christophe Massiot <massiot@via.ecp.fr>

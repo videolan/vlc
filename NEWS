@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.16 2003/02/13 21:53:25 massiot Exp $
+$Id: NEWS,v 1.17 2003/02/15 20:02:16 jpsaman Exp $
 
 Changes between 0.5.0 and 0.5.1:
 --------------------------------
@@ -47,6 +47,10 @@ Win32 port:
 BeOS port:
  * lower BeOS priorities to avoid lock-up
 
+Opie port:
+ * Native video output is working again.
+ * Only commandline interface support.
+ * Support for MPEG4, DivX through ffmpeg package.
 
 Changes between 0.4.6 and 0.5.0:
 --------------------------------
