@@ -44,14 +44,6 @@ Status: Todo
 
 
 Task
-Difficulty: Medium
-Platform: any
-Urgency: Important
-Description: Update matroska demux
- Better Seeking
-Status: Todo
-
-Task
 Difficulty: Easy to Difficult
 Platform: Any
 Urgency: Important
@@ -172,14 +164,6 @@ Status: Todo
 Task
 Difficulty: Easy
 Urgency: Normal
-Platform: any
-Description: 24 bit LPCM
-- Increasingly more DVDs use 24 bit LPCM sound. We should support it.
-Status: Todo
-
-Task
-Difficulty: Easy
-Urgency: Normal
 Platform: Mac OS X
 Description: LPCM
 The LPCM decoder outputs really small samples which aren't accepted properly by the macosx coreaudio resampler, causing VLC to not output any sound with many DVD's. A test sample that shows this effect on the mac is the Madonna clip.
@@ -207,8 +191,9 @@ Difficulty: Medium
 Urgency: Normal
 Platform: Mac OS X
 Description: Finish Mac Mozilla plugin
-The Mac mozilla plugin needs some more work to be useable. Basic funtionality is working. However the video-output part needs some more work since it was crashing. See svn history for the old code. 
-Status: Halfway (stalled)
+The Mac mozilla plugin needs some more work to be useable. Mostly done now,
+needs testing.
+Status: 90%
 
 Task
 Difficulty: Easy
@@ -247,7 +232,6 @@ Description: wxWidgets fixes
  - Rename wxWindows to wxWidgets<br />
  - Problems with slider (doesn't go where you click, keep updating while seeking
 ?)<br />
- - Reversed arrows
 Status: Todo
 
 Task
@@ -472,14 +456,6 @@ Possibly see: <a href="http://bugzilla.videolan.org/cgi-bin/bugzilla/show_bug.cg
 Status: Todo
 
 Task
-Difficulty: Hard
-Urgency: Wishlist
-Platform: Windows
-Description: ActiveX control for VLC
- We need an ActiveX version of VLC for IE integration
-Status: Done by damienf
-
-Task
 Difficulty: Easy
 Urgency: Wishlist
 Platform: any
@@ -650,15 +626,6 @@ Description: More service discovery modules
 - libhal based discovery (should be able to find cd,dvd,capture cards,etc etc <br />
 - Perhaps a generalized webpage parser (use user supplied templates to parse
    streams from popular websites )
-Status: Todo
-
-Task
-Difficulty: Medium
-Platform: any
-Urgency: Wishlist
-Description: Autoselect a track based on preferred language
-Problems might exist with formats that don't have headers?
-Most part easy to do, because the language info is stored in the ES format structs these days.
 Status: Todo
 
 Task
