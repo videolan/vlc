@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.21 2003/06/14 12:32:16 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.22 2003/06/19 18:44:16 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -604,6 +604,7 @@ VideoWindow::SetFullScreen(bool doIt)
 {
 	if (doIt)
 	{
+	    SetLook( B_NO_BORDER_WINDOW_LOOK );
 		BScreen screen(this);
 		BRect rect = screen.Frame();
 		Activate();
@@ -615,6 +616,7 @@ VideoWindow::SetFullScreen(bool doIt)
 	}
 	else
 	{
+	    SetLook( B_TITLED_WINDOW_LOOK );
 		MoveTo(winSize.left, winSize.top);
 		ResizeTo(winSize.IntegerWidth(), winSize.IntegerHeight());
 		be_app->ShowCursor();
