@@ -58,7 +58,11 @@ typedef struct vpar_thread_s
     macroblock_parsing_t    mb;
     video_synchro_t         synchro;
 
-    /* Lookup table for Macroblock_Address_Increment */
+    /* Lookup tables */
+#ifdef MPEG2_COMPLIANT
+    s16                     pi_crop_buf[65536];
+    s16 *                   pi_crop;
+#endif
     mb_addr_inc_t           mb_addr_inc[2048];
 
 #ifdef STATS
@@ -100,7 +104,7 @@ void            vpar_DestroyThread      ( vpar_thread_t *p_vpar /*, int *pi_stat
 static __inline__ void LoadQuantizerScale( struct vpar_thread_s * p_vpar )
 {
     /* Quantization coefficient table */
-    static unsigned char    ppi_quantizer_scale[3][32] =
+    static u8   ppi_quantizer_scale[3][32] =
     {
         /* MPEG-2 */
         {

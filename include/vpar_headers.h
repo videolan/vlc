@@ -34,9 +34,6 @@ typedef struct quant_matrix_s
                           /* Has the matrix been allocated by vpar_headers ? */
 } quant_matrix_t;
 
-extern int *    pi_default_intra_quant;
-extern int *    pi_default_nonintra_quant;
-
 /*****************************************************************************
  * sequence_t : sequence descriptor
  *****************************************************************************/

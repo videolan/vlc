@@ -221,6 +221,9 @@ static int InitThread( vpar_thread_t *p_vpar )
     }
 
     /* Initialize lookup tables */
+#ifdef MPEG2_COMPLIANT
+    vpar_InitCrop( p_vpar );
+#endif
     InitMbAddrInc( p_vpar );
 
     /* Mark thread as running and return */

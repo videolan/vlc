@@ -89,9 +89,21 @@ typedef struct
 #define MACROBLOCK_ESCAPE               8
 #define MACROBLOCK_STUFFING             15
 
+/* Scan */
+#define SCAN_ZIGZAG                         0
+#define SCAN_ALT                            1
+
+/*****************************************************************************
+ * Constants
+ *****************************************************************************/
+extern int *    pi_default_intra_quant;
+extern int *    pi_default_nonintra_quant;
+extern u8       pi_scan[2][64];
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+void vpar_InitCrop( struct vpar_thread_s* p_vpar );
 int vpar_CodedPattern420( struct vpar_thread_s* p_vpar );
 int vpar_CodedPattern422( struct vpar_thread_s* p_vpar );
 int vpar_CodedPattern444( struct vpar_thread_s* p_vpar );
