@@ -48,6 +48,10 @@
 
 - (IBAction)forward:(id)sender;
 - (IBAction)backward:(id)sender;
+- (IBAction)forward1Min:(id)sender;
+- (IBAction)backward1Min:(id)sender;
+- (IBAction)forward5Min:(id)sender;
+- (IBAction)backward5Min:(id)sender;
 
 - (IBAction)volumeUp:(id)sender;
 - (IBAction)volumeDown:(id)sender;

@@ -22,13 +22,18 @@
         {
             ACTIONS = {
                 backward = id; 
+                backward1Min = id; 
+                backward5Min = id; 
                 faster = id; 
                 forward = id; 
+                forward1Min = id; 
+                forward5Min = id; 
                 loop = id; 
                 mute = id; 
                 next = id; 
                 pause = id; 
                 play = id; 
+                position = id; 
                 prev = id; 
                 random = id; 
                 repeat = id; 
@@ -101,6 +106,8 @@
                 "o_mi_audiotrack" = id; 
                 "o_mi_bring_atf" = id; 
                 "o_mi_bwd" = id; 
+                "o_mi_bwd1m" = id; 
+                "o_mi_bwd5m" = id; 
                 "o_mi_channels" = id; 
                 "o_mi_chapter" = id; 
                 "o_mi_clear" = id; 
@@ -117,6 +124,8 @@
                 "o_mi_floatontop" = id; 
                 "o_mi_fullscreen" = id; 
                 "o_mi_fwd" = id; 
+                "o_mi_fwd1m" = id; 
+                "o_mi_fwd5m" = id; 
                 "o_mi_half_window" = id; 
                 "o_mi_hide" = id; 
                 "o_mi_hide_others" = id; 
@@ -137,6 +146,7 @@
                 "o_mi_paste" = id; 
                 "o_mi_play" = id; 
                 "o_mi_playlist" = id; 
+                "o_mi_position" = id; 
                 "o_mi_prefs" = id; 
                 "o_mi_previous" = id; 
                 "o_mi_program" = id; 

@@ -170,6 +170,10 @@ struct intf_sys_t
     IBOutlet id o_mi_loop;
     IBOutlet id o_mi_fwd;
     IBOutlet id o_mi_bwd;
+    IBOutlet id o_mi_fwd1m;
+    IBOutlet id o_mi_bwd1m;
+    IBOutlet id o_mi_fwd5m;
+    IBOutlet id o_mi_bwd5m;
     IBOutlet id o_mi_program;
     IBOutlet id o_mu_program;
     IBOutlet id o_mi_title;
