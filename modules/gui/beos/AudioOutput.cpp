@@ -2,7 +2,7 @@
  * aout.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.11 2002/10/13 15:39:16 titer Exp $
+ * $Id: AudioOutput.cpp,v 1.12 2002/10/14 23:11:52 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -32,6 +32,7 @@
 #include <string.h>
 
 #include <SoundPlayer.h>
+#include <media/MediaDefs.h>
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
@@ -46,8 +47,7 @@
 typedef struct aout_sys_t
 {
     BSoundPlayer *p_player;
-    float *p_buffer;
-    int i_got_data;
+    
 } aout_sys_t;
 
 /*****************************************************************************
@@ -66,18 +66,25 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
 	p_aout->output.p_sys = (aout_sys_t *) malloc( sizeof( aout_sys_t ) );
 	
 	aout_sys_t *p_sys = p_aout->output.p_sys;
-	p_sys->i_got_data = 0;
-	p_sys->p_buffer = (float*) malloc( 16384 ); /*FIXME*/
 
     aout_VolumeSoftInit( p_aout );
+    
+    media_raw_audio_format *p_format;
+    p_format = (media_raw_audio_format*)
+        malloc( sizeof( media_raw_audio_format ) );
+    
+    p_format->frame_rate = p_aout->output.output.i_rate;
+    p_format->channel_count = p_aout->output.output.i_channels;
+    p_format->format = media_raw_audio_format::B_AUDIO_FLOAT;
+    p_format->byte_order = B_MEDIA_LITTLE_ENDIAN;
+    p_format->buffer_size = 16384;
     
     p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
     p_aout->output.i_nb_samples = FRAME_SIZE;
     p_aout->output.pf_play = DoNothing;
-    p_aout->output.output.i_rate = 44100;
-    p_aout->output.output.i_channels = 2;
-
-    p_sys->p_player = new BSoundPlayer( "player", Play, NULL, p_this );
+    
+    p_sys->p_player = new BSoundPlayer( p_format, "player",
+                                        Play, NULL, p_this );
     p_sys->p_player->Start();
     p_sys->p_player->SetHasData( true );
         
@@ -93,7 +100,6 @@ void E_(CloseAudio) ( vlc_object_t *p_this )
     aout_sys_t * p_sys = (aout_sys_t *) p_aout->output.p_sys;
     
     p_sys->p_player->Stop();
-    p_aout->b_die = 1;
     delete p_sys->p_player;
     free( p_sys );
 }
@@ -106,36 +112,17 @@ static void Play( void *aout, void *buffer, size_t size,
 {
     aout_buffer_t * p_aout_buffer;
     aout_instance_t *p_aout = (aout_instance_t*) aout;
-    aout_sys_t *p_sys = p_aout->output.p_sys;
 
     float *p_buffer = (float*) buffer;
 
-    /* <kludge> */
-    /* Usually BSoundPlay asks for 8192 bytes buffers, while vlc gives
-    a 16384 one. So we keep the second half of it in p_sys->p_buffer */
-
-    if( p_sys->i_got_data )
-    {
-        memcpy( p_buffer, p_sys->p_buffer, 8192 );
-        p_sys->i_got_data = 0;
-    }
-    else
-    {
-        p_aout_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
-
-        if( p_aout_buffer != NULL )
-        {
-            memcpy( p_buffer,
-                    p_aout_buffer->p_buffer,
-                    8192 );
-            memcpy( p_sys->p_buffer,
-                    p_aout_buffer->p_buffer + 8192,
-                    8192 );
-            p_sys->i_got_data = 1;
-        }
-    }
+    p_aout_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
     
-    /* </kludge> */
+    if( p_aout_buffer != NULL )
+    {
+       memcpy( p_buffer,
+               p_aout_buffer->p_buffer,
+               MIN( size, p_aout_buffer->i_nb_bytes ) );
+    }
 }
 
 /*****************************************************************************
