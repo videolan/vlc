@@ -120,6 +120,9 @@ typedef struct
         uint8_t *pps;
     } avc;
 
+    /* for spu */
+    int64_t i_last_dts;
+
 } mp4_stream_t;
 
 struct sout_mux_sys_t
@@ -172,6 +175,7 @@ static block_t *bo_to_sout( sout_instance_t *p_sout,  bo_t *box );
 
 static bo_t *GetMoovBox( sout_mux_t *p_mux );
 
+static block_t *ConvertSUBT( sout_mux_t *, mp4_stream_t *, block_t *);
 static void ConvertAVC1( sout_mux_t *, mp4_stream_t *, block_t * );
 
 /*****************************************************************************
@@ -399,6 +403,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
         case VLC_FOURCC( 'h', '2', '6', '4' ):
             break;
+        case VLC_FOURCC( 's', 'u', 'b', 't' ):
+            msg_Warn( p_mux, "subtitle track added like in .mov (even when creating .mp4)" );
+            break;
         default:
             msg_Err( p_mux, "unsupported codec %4.4s in mp4",
                      (char*)&p_input->p_fmt->i_codec );
@@ -452,7 +459,12 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
 
         if( p_fifo->i_depth <= 1 )
         {
-            return -1; // wait that all fifo have at least 2 packets
+            if( p_mux->pp_inputs[i]->p_fmt->i_cat != SPU_ES )
+            {
+                return -1; // wait that all fifo have at least 2 packets
+            }
+            /* For SPU, we wait only 1 packet */
+            continue;
         }
 
         p_buf = block_FifoShow( p_fifo );
@@ -485,7 +497,7 @@ static int Mux( sout_mux_t *p_mux )
         sout_input_t    *p_input;
         int             i_stream;
         mp4_stream_t    *p_stream;
-        block_t   *p_data;
+        block_t         *p_data;
         mtime_t         i_dts;
 
         if( MuxGetStream( p_mux, &i_stream, &i_dts) < 0 )
@@ -501,28 +513,37 @@ static int Mux( sout_mux_t *p_mux )
         {
             ConvertAVC1( p_mux, p_stream, p_data );
         }
-        if( p_input->p_fifo->i_depth > 0 )
+        else if( p_stream->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) )
         {
-            block_t *p_next = block_FifoShow( p_input->p_fifo );
-            int64_t       i_diff  = p_next->i_dts - p_data->i_dts;
+            p_data = ConvertSUBT( p_mux, p_stream, p_data );
+        }
 
-            if( i_diff < I64C(1000000 ) )   /* protection */
+        if( p_stream->fmt.i_cat != SPU_ES )
+        {
+            /* Fix length of the sample */
+            if( p_input->p_fifo->i_depth > 0 )
             {
-                p_data->i_length = i_diff;
-            }
-        }
-        if( p_data->i_length <= 0 )
-        {
-            msg_Warn( p_mux, "i_length <= 0" );
-            p_stream->i_length_neg += p_data->i_length - 1;
-            p_data->i_length = 1;
-        }
-        else if( p_stream->i_length_neg < 0 )
-        {
-            int64_t i_recover = __MIN( p_data->i_length / 4, - p_stream->i_length_neg );
+                block_t *p_next = block_FifoShow( p_input->p_fifo );
+                int64_t       i_diff  = p_next->i_dts - p_data->i_dts;
 
-            p_data->i_length -= i_recover;
-            p_stream->i_length_neg += i_recover;
+                if( i_diff < I64C(1000000 ) )   /* protection */
+                {
+                    p_data->i_length = i_diff;
+                }
+            }
+            if( p_data->i_length <= 0 )
+            {
+                msg_Warn( p_mux, "i_length <= 0" );
+                p_stream->i_length_neg += p_data->i_length - 1;
+                p_data->i_length = 1;
+            }
+            else if( p_stream->i_length_neg < 0 )
+            {
+                int64_t i_recover = __MIN( p_data->i_length / 4, - p_stream->i_length_neg );
+
+                p_data->i_length -= i_recover;
+                p_stream->i_length_neg += i_recover;
+            }
         }
 
         /* Save starting time */
@@ -538,6 +559,24 @@ static int Mux( sout_mux_t *p_mux )
             }
         }
 
+        if( p_stream->fmt.i_cat == SPU_ES && p_stream->i_entry_count > 0 )
+        {
+            int64_t i_length = p_data->i_dts - p_stream->i_last_dts;
+
+            if( i_length <= 0 )
+            {
+                /* FIXME handle this broken case */
+                i_length = 1;
+            }
+
+            /* Fix last entry */
+            if( p_stream->entry[p_stream->i_entry_count-1].i_length <= 0 )
+            {
+                p_stream->entry[p_stream->i_entry_count-1].i_length = i_length;
+            }
+        }
+
+
         /* add index entry */
         p_stream->entry[p_stream->i_entry_count].i_pos    = p_sys->i_pos;
         p_stream->entry[p_stream->i_entry_count].i_size   = p_data->i_buffer;
@@ -547,7 +586,8 @@ static int Mux( sout_mux_t *p_mux )
         p_stream->entry[p_stream->i_entry_count].i_flags  = p_data->i_flags;
 
         p_stream->i_entry_count++;
-        if( p_stream->i_entry_count >= p_stream->i_entry_max )
+        /* XXX: -1 to always have 2 entry for easy adding of empty SPU */
+        if( p_stream->i_entry_count >= p_stream->i_entry_max - 1 )
         {
             p_stream->i_entry_max += 1000;
             p_stream->entry =
@@ -559,8 +599,48 @@ static int Mux( sout_mux_t *p_mux )
         p_stream->i_duration += p_data->i_length;
         p_sys->i_pos += p_data->i_buffer;
 
+        /* Save the DTS */
+        p_stream->i_last_dts = p_data->i_dts;
+
         /* write data */
         sout_AccessOutWrite( p_mux->p_access, p_data );
+
+        if( p_stream->fmt.i_cat == SPU_ES )
+        {
+            int64_t i_length = p_stream->entry[p_stream->i_entry_count-1].i_length;
+
+            if( i_length != 0 )
+            {
+                /* TODO */
+                msg_Dbg( p_mux, "writing a empty subs" ) ;
+
+                /* Append a idx entry */
+                p_stream->entry[p_stream->i_entry_count].i_pos    = p_sys->i_pos;
+                p_stream->entry[p_stream->i_entry_count].i_size   = 3;
+                p_stream->entry[p_stream->i_entry_count].i_pts_dts= 0;
+                p_stream->entry[p_stream->i_entry_count].i_length = 0;
+                p_stream->entry[p_stream->i_entry_count].i_flags  = 0;
+
+                /* XXX: No need to grow the entry here */
+                p_stream->i_entry_count++;
+
+                /* Fix last dts */
+                p_stream->i_last_dts += i_length;
+
+                /* Write a " " */
+                p_data = block_New( p_mux, 3 );
+                p_data->p_buffer[0] = 0;
+                p_data->p_buffer[1] = 1;
+                p_data->p_buffer[2] = ' ';
+
+                p_sys->i_pos += p_data->i_buffer;
+
+                sout_AccessOutWrite( p_mux->p_access, p_data );
+            }
+
+            /* Fix duration */
+            p_stream->i_duration = p_stream->i_last_dts - p_stream->i_dts_start;
+        }
     }
 
     return( VLC_SUCCESS );
@@ -569,6 +649,20 @@ static int Mux( sout_mux_t *p_mux )
 /*****************************************************************************
  *
  *****************************************************************************/
+static block_t *ConvertSUBT( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
+{
+    p_block = block_Realloc( p_block, 2, p_block->i_buffer );
+
+    /* No trailling '\0' */
+    if( p_block->i_buffer > 2 && p_block->p_buffer[p_block->i_buffer-1] == '\0' )
+        p_block->i_buffer--;
+
+    p_block->p_buffer[0] = ( (p_block->i_buffer - 2) >> 8 )&0xff;
+    p_block->p_buffer[1] = ( (p_block->i_buffer - 2)      )&0xff;
+
+    return p_block;
+}
+
 static void ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
 {
     uint8_t *src = p_block->p_buffer;
@@ -1108,6 +1202,44 @@ static bo_t *GetVideBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     return vide;
 }
 
+static bo_t *GetTextBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
+{
+
+    bo_t *text = box_new( "text" );
+    int  i;
+
+    for( i = 0; i < 6; i++ )
+    {
+        bo_add_8( text, 0 );        // reserved;
+    }
+    bo_add_16be( text, 1 );         // data-reference-index
+
+    bo_add_32be( text, 0 );         // display flags
+    bo_add_32be( text, 0 );         // justification
+    for( i = 0; i < 3; i++ )
+    {
+        bo_add_16be( text, 0 );     // back ground color
+    }
+
+    bo_add_16be( text, 0 );         // box text
+    bo_add_16be( text, 0 );         // box text
+    bo_add_16be( text, 0 );         // box text
+    bo_add_16be( text, 0 );         // box text
+
+    bo_add_64be( text, 0 );         // reserved
+    for( i = 0; i < 3; i++ )
+    {
+        bo_add_16be( text, 0xff );  // foreground color
+    }
+
+    bo_add_8 ( text, 9 );
+    bo_add_mem( text, 9, "Helvetica" );
+
+    box_fix( text );
+
+    return text;
+}
+
 static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
@@ -1130,6 +1262,10 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     {
         bo_t *vide = GetVideBox( p_mux, p_stream );
         box_gather( stsd, vide );
+    }
+    else if( p_stream->fmt.i_cat == SPU_ES )
+    {
+        box_gather( stsd, GetTextBox( p_mux, p_stream ) );
     }
     box_fix( stsd );
 
@@ -1366,13 +1502,6 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
 
         p_stream = p_sys->pp_streams[i_trak];
 
-        if( p_stream->fmt.i_cat != AUDIO_ES &&
-            p_stream->fmt.i_cat != VIDEO_ES )
-        {
-            msg_Err( p_mux, "FIXME ignoring trak (noaudio&&novideo)" );
-            continue;
-        }
-
         if( p_stream->fmt.i_cat == AUDIO_ES )
             i_timescale = p_stream->fmt.audio.i_rate;
         else
@@ -1431,7 +1560,7 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
             bo_add_32be( tkhd, 0 );                 // width (presentation)
             bo_add_32be( tkhd, 0 );                 // height(presentation)
         }
-        else
+        else if( p_stream->fmt.i_cat == VIDEO_ES )
         {
             // width (presentation)
             bo_add_32be( tkhd, p_stream->fmt.video.i_aspect *
@@ -1440,6 +1569,25 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
             // height(presentation)
             bo_add_32be( tkhd, p_stream->fmt.video.i_height << 16 );
         }
+        else
+        {
+            int i_width = 320;
+            int i_height = 200;
+            int i;
+            for( i = 0; i < p_sys->i_nb_streams; i++ )
+            {
+                mp4_stream_t *tk = p_sys->pp_streams[i];
+                if( tk->fmt.i_cat == VIDEO_ES )
+                {
+                    i_width = p_stream->fmt.video.i_aspect * p_stream->fmt.video.i_height / VOUT_ASPECT_FACTOR;
+                    i_height = p_stream->fmt.video.i_height;
+                    break;
+                }
+            }
+            bo_add_32be( tkhd, i_width << 16 );     // width (presentation)
+            bo_add_32be( tkhd, i_height << 16 );    // height(presentation)
+        }
+
         box_fix( tkhd );
         box_gather( trak, tkhd );
 
@@ -1554,9 +1702,13 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         {
             bo_add_fourcc( hdlr, "soun" );
         }
-        else
+        else if( p_stream->fmt.i_cat == VIDEO_ES )
         {
             bo_add_fourcc( hdlr, "vide" );
+        }
+        else if( p_stream->fmt.i_cat == SPU_ES )
+        {
+            bo_add_fourcc( hdlr, "text" );
         }
 
         bo_add_32be( hdlr, 0 );         // reserved
@@ -1566,8 +1718,10 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         bo_add_8( hdlr, 12 );
         if( p_stream->fmt.i_cat == AUDIO_ES )
             bo_add_mem( hdlr, 12, "SoundHandler" );
-        else
+        else if( p_stream->fmt.i_cat == VIDEO_ES )
             bo_add_mem( hdlr, 12, "VideoHandler" );
+        else
+            bo_add_mem( hdlr, 12, "Text Handler" );
 
         box_fix( hdlr );
         box_gather( mdia, hdlr );
@@ -1600,6 +1754,25 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
             box_fix( vmhd );
 
             box_gather( minf, vmhd );
+        }
+        else if( p_stream->fmt.i_cat == SPU_ES )
+        {
+            bo_t *gmhd = box_new( "gmhd" );
+            bo_t *gmin = box_full_new( "gmin", 0, 1 );
+
+            bo_add_16be( gmin, 0 );     // graphicsmode
+            for( i = 0; i < 3; i++ )
+            {
+                bo_add_16be( gmin, 0 ); // opcolor
+            }
+            bo_add_16be( gmin, 0 );     // balance
+            bo_add_16be( gmin, 0 );     // reserved
+            box_fix( gmin );
+
+            box_gather( gmhd, gmin );
+            box_fix( gmhd );
+
+            box_gather( minf, gmhd );
         }
 
         /* dinf */
