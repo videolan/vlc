@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.154 2001/11/12 22:42:56 sam Exp $
+ * $Id: input.c,v 1.155 2001/11/13 16:00:54 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -65,6 +65,7 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 #include "netutils.h"
 #include "modules.h"
 
@@ -434,8 +435,9 @@ static int InitThread( input_thread_t * p_input )
     }
     else 
 #endif
-        if( ( strlen( p_input->p_source ) > 4 )
-              && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+        if( ( ( strlen( p_input->p_source ) > 4 )
+                && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+            || TestMethod( INPUT_METHOD_VAR, "dvd" ) )
     {
         /* DVD - this is THE kludge */
         f.pf_open( p_input );
@@ -559,8 +561,9 @@ static void CloseThread( input_thread_t * p_input )
     }
     else 
 #endif
-    if( ( strlen( p_input->p_source ) > 4 )
-          && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    if( ( ( strlen( p_input->p_source ) > 4 )
+            && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+        || TestMethod( INPUT_METHOD_VAR, "dvd" ) )
     {
         f.pf_close( p_input );
     }
