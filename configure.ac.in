@@ -2182,11 +2182,11 @@ AC_ARG_ENABLE(macosx,
   [if test "x${enable_macosx}" = "xyes"
    then
      BUILTINS="${BUILTINS} macosx"
-     LDFLAGS_macosx="${LDFLAGS_macosx} -framework CoreAudio -framework AudioToolbox -framework IOKit -framework Cocoa -framework Carbon -framework AGL -framework QuickTime -lobjc -ObjC"
+     LDFLAGS_macosx="${LDFLAGS_macosx} -framework CoreAudio -framework AudioToolbox -framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC"
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
      BUILTINS="${BUILTINS} macosx"
-     LDFLAGS_macosx="${LDFLAGS_macosx} -framework CoreAudio -framework AudioToolbox -framework IOKit -framework Cocoa -framework Carbon -framework AGL -framework QuickTime -lobjc -ObjC"
+     LDFLAGS_macosx="${LDFLAGS_macosx} -framework CoreAudio -framework AudioToolbox -framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC"
    )])
 
 dnl
