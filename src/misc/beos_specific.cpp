@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: beos_specific.cpp,v 1.5 2001/03/21 13:42:34 sam Exp $
+ * $Id: beos_specific.cpp,v 1.6 2001/03/25 17:09:14 richards Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -61,13 +61,10 @@ void beos_Create( void )
     BPath path;
     app_info info; 
     
+    be_app = NULL;
     vlc_thread_create( &beos_app_thread, "app thread", (vlc_thread_func_t)beos_AppThread, 0 );
-    msleep( 100000 );
-    // FIXME: we need to verify that be_app is initialized and the msleep is not enough
-    //        but the following code does not work as it should and I have no good
-    //        solution at the moment.
-    //while( be_app == NULL )
-    //    msleep( 5000 );
+    while( be_app == NULL )
+        msleep( 5000 );
     
     be_app->GetAppInfo(&info); 
     BEntry entry(&info.ref); 

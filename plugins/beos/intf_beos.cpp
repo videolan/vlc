@@ -2,11 +2,11 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.21 2001/03/17 19:33:22 richards Exp $
+ * $Id: intf_beos.cpp,v 1.22 2001/03/25 17:09:14 richards Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
- *          Tony Castley <tcastley@mail.powerup.com.au>
+ *          Tony Castley <tony@castley.net>
  *          Richard Shepherd <richard@rshepherd.demon.co.uk>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -81,7 +81,6 @@ extern "C"
 #include "audio_output.h"
 #include "MsgVals.h"
 
-
 #include "main.h"
 }
 
@@ -121,17 +120,22 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
     AddChild( menu_bar );
 
 	BMenu *m; 
+	BMenu *am;
 	CDMenu *cd_menu;
 
 	menu_bar->AddItem( m = new BMenu("File") );
 	menu_bar->ResizeToPreferred();
 	m->AddItem( new BMenuItem("Open File...", new BMessage(OPEN_FILE), 'O'));
 	cd_menu = new CDMenu("Open Disc");
-	//GetCD("/dev/disk", cd_menu);
 	m->AddItem(cd_menu);
 	m->AddSeparatorItem();
 	m->AddItem( new BMenuItem("About...", new BMessage(B_ABOUT_REQUESTED), 'A'));
 	m->AddItem( new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
+
+	menu_bar->AddItem (am = new BMenu("Audio") );
+	menu_bar->ResizeToPreferred();
+	am->AddItem( new LanguageMenu("Language", 0, p_intf) );
+	am->AddItem( new LanguageMenu("Subtitles", 1, p_intf) );
 	
 
     rect = Bounds();
@@ -345,15 +349,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 		break;
 	case SEEK_PLAYBACK:
 		// handled by semaphores;
-/*	    if( p_intf->p_input != NULL )
-	    {
-	    	float new_position;
-		    if (p_message->FindFloat("be:value", &new_position) == B_OK)
-		    {
-		    	printf("%e\n", new_position);
-	        	input_Seek( p_intf->p_input, new_position * 100 );
-		    }
-	    } */
 		break;
 	case VOLUME_CHG:
 		// adjust the volume
@@ -379,6 +374,18 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 		}
 		break;
 	case SELECT_CHANNEL:
+		{
+			int32 i = p_message->FindInt32("channel");
+			input_ChangeES(p_intf->p_input, 
+					p_intf->p_input->stream.pp_es[i], 1);
+		}
+		break;
+	case SELECT_SUBTITLE:
+		{
+			int32 i = p_message->FindInt32("subtitle");
+			input_ChangeES(p_intf->p_input, 
+					p_intf->p_input->stream.pp_es[i], 2);
+		}
 		break;
 	case B_REFS_RECEIVED:
     case B_SIMPLE_DATA:
@@ -402,7 +409,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 /*****************************************************************************
  * InterfaceWindow::QuitRequested
  *****************************************************************************/
-
 bool InterfaceWindow::QuitRequested()
 {
     p_intf->b_die = 1;
@@ -413,38 +419,31 @@ bool InterfaceWindow::QuitRequested()
 /*****************************************************************************
  * CDMenu::CDMenu
  *****************************************************************************/
-
 CDMenu::CDMenu(const char *name)
 	: BMenu(name)
 {
-
 }
+
 /*****************************************************************************
  * CDMenu::~CDMenu
  *****************************************************************************/
-
-
 CDMenu::~CDMenu()
 {
-
 }
+
 /*****************************************************************************
  * CDMenu::AttachedToWindow
  *****************************************************************************/
-
 void CDMenu::AttachedToWindow(void)
 {
-int32 items = CountItems();
-for(int32 i = 0; i < items; i++)
-	RemoveItem(i); 
-GetCD("/dev/disk");
-BMenu::AttachedToWindow();
+	while (RemoveItem((long int)0) != NULL);  // remove all items
+	GetCD("/dev/disk");
+	BMenu::AttachedToWindow();
 }
 
 /*****************************************************************************
  * CDMenu::GetCD
  *****************************************************************************/
-
 int CDMenu::GetCD(const char *directory)
 { 
 	BDirectory dir; 
@@ -508,6 +507,92 @@ int CDMenu::GetCD(const char *directory)
 		} 
 	}
 	return B_ERROR;
+}
+
+/*****************************************************************************
+ * LanguageMenu::LanguageMenu
+ *****************************************************************************/
+LanguageMenu::LanguageMenu(const char *name, int menu_kind, intf_thread_t  *p_interface)
+	:BMenu(name)
+{
+	kind = menu_kind;
+	p_intf = p_interface;
+}
+
+/*****************************************************************************
+ * LanguageMenu::~LanguageMenu
+ *****************************************************************************/
+LanguageMenu::~LanguageMenu()
+{
+}
+
+/*****************************************************************************
+ * LanguageMenu::AttachedToWindow
+ *****************************************************************************/
+void LanguageMenu::AttachedToWindow(void)
+{
+	while (RemoveItem((long int)0) != NULL); // remove all items
+	SetRadioMode(true);
+	GetChannels();
+	BMenu::AttachedToWindow();
+}
+
+/*****************************************************************************
+ * LanguageMenu::GetChannels
+ *****************************************************************************/
+int LanguageMenu::GetChannels()
+{ 
+	char* 	psz_name;
+	bool	b_active;
+	bool	b_found;
+	int32 	i;
+	es_descriptor_t *p_es;
+	
+	if (p_intf->p_input == NULL)
+		return 1;
+		
+	for (i = 0; i < p_intf->p_input->stream.i_selected_es_number; i++)
+	{
+		if ((kind == 0) && p_intf->p_input->stream.pp_selected_es[i]->b_audio)
+		{
+			p_es = p_intf->p_input->stream.pp_selected_es[i];
+		}
+		else if ((kind == 1) && p_intf->p_input->stream.pp_selected_es[i]->b_spu)
+		{
+			p_es = p_intf->p_input->stream.pp_selected_es[i];
+		}
+	}		
+	for (i = 0; i < p_intf->p_input->stream.i_es_number; i++)
+	{
+		if (kind == 0) //audio
+		{
+			b_found = p_intf->p_input->stream.pp_es[i]->b_audio;
+		}
+		else
+		{
+			b_found = p_intf->p_input->stream.pp_es[i]->b_spu;
+		}
+		if (b_found)
+		{
+			psz_name = p_intf->p_input->stream.pp_es[i]->psz_desc;
+			BMessage *msg;
+			if (kind == 0) //audio
+			{
+				msg = new BMessage(SELECT_CHANNEL);
+				msg->AddInt32("channel", i);
+			}
+			else
+			{
+				msg = new BMessage(SELECT_SUBTITLE);
+				msg->AddInt32("subtitle", i);
+			}
+			BMenuItem *menu_item;
+			menu_item = new BMenuItem(psz_name, msg);
+			AddItem(menu_item);
+			b_active = (p_es == p_intf->p_input->stream.pp_es[i]);
+			menu_item->SetMarked(b_active);
+		}
+	}
 }
 
 

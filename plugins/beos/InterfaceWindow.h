@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.8 2001/03/21 13:42:33 sam Exp $
+ * $Id: InterfaceWindow.h,v 1.9 2001/03/25 17:09:14 richards Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -36,6 +36,18 @@ private:
 	int GetCD(const char *directory);
 };
 
+class LanguageMenu : public BMenu
+{
+public:
+	LanguageMenu(const char *name, int menu_kind, intf_thread_t  *p_interface);
+	~LanguageMenu();
+	void AttachedToWindow(void);
+private:
+	intf_thread_t  *p_intf;
+	int kind;
+	int GetChannels();
+};
+
 class InterfaceWindow : public BWindow
 {
 public:
@@ -46,14 +58,17 @@ public:
     virtual bool    QuitRequested();
     virtual void    MessageReceived(BMessage *message);
     
-	
-    intf_thread_t  *p_intf;
-	MediaSlider * p_vol;
 	SeekSlider * p_seek;
-	BCheckBox * p_mute;
 	sem_id	fScrubSem;
 	bool	fSeeking;
+
+private:	
+    intf_thread_t  *p_intf;
+	MediaSlider * p_vol;
+	BCheckBox * p_mute;
 	BFilePanel *file_panel;
+	es_descriptor_t *  p_audio_es;
+    es_descriptor_t *  p_spu_es;
 
 };
 

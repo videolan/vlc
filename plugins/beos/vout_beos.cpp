@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.22 2001/03/21 13:42:33 sam Exp $
+ * $Id: vout_beos.cpp,v 1.23 2001/03/25 17:09:14 richards Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -197,7 +197,6 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
 
 	if(fUsingOverlay)
 		{
-		memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
 		rgb_color key;
 		view->SetViewOverlay(bitmap[0], bitmap[0]->Bounds(), Bounds(), &key, B_FOLLOW_ALL,
 				B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
@@ -205,6 +204,7 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
 	 	SetTitle(VOUT_TITLE " (Overlay output)");
 		GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight); 
 		SetSizeLimits((float) Bounds().IntegerWidth(), maxWidth, (float) Bounds().IntegerHeight(), maxHeight);
+		memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
 		}
 	else
 		{
