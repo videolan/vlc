@@ -148,7 +148,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>asx.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>ASX File</string>
+			<string>ASX file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -161,7 +161,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>sub.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Subtitle File</string>
+			<string>Subtitle file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -232,7 +232,7 @@
 				<string>bin</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>Iso file</string>
+			<string>ISO file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -255,7 +255,7 @@
 				<string>aac</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>Advanced Audio Coding</string>
+			<string>AAC file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -291,7 +291,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>avi.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Avi container</string>
+			<string>AVI container</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -497,7 +497,7 @@
 				<string>mka</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>Matroska Audio</string>
+			<string>Matroska Audio File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -507,7 +507,7 @@
 				<string>mkv</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>Matroska Video</string>
+			<string>Matroska Video File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -518,6 +518,16 @@
 			</array>
 			<key>CFBundleTypeName</key>
 			<string>Matroska Elementry Stream</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>m4a</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>MPEG-4 Audio File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
