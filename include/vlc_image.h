@@ -26,6 +26,10 @@
 
 #include "vlc_video.h"
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 struct image_handler_t
 {
     picture_t * (*pf_read) ( image_handler_t *, block_t *,
@@ -52,5 +56,9 @@ VLC_EXPORT( void, image_HandlerDelete, ( image_handler_t * ) );
 #define image_ReadUrl( a, b, c, d ) a->pf_read_url( a, b, c, d )
 #define image_Write( a, b, c, d ) a->pf_write( a, b, c, d )
 #define image_WriteUrl( a, b, c, d, e ) a->pf_write_url( a, b, c, d, e )
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif /* _VLC_IMAGE_H */

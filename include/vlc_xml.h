@@ -24,6 +24,10 @@
 #ifndef _VLC_XML_H
 #define _VLC_XML_H
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 struct xml_t
 {
     VLC_COMMON_MEMBERS
@@ -71,5 +75,9 @@ struct xml_reader_t
 #define XML_READER_STARTELEM 1
 #define XML_READER_ENDELEM 2
 #define XML_READER_TEXT 3
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif
