@@ -77,6 +77,8 @@
 static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
+#define SOUT_CFG_PREFIX "sout-ts-"
+
 vlc_module_begin();
 #if defined MODULE_NAME_IS_mux_ts
     set_description( _("TS muxer") );
@@ -89,12 +91,40 @@ vlc_module_begin();
     add_shortcut( "ts" );
     add_shortcut( "ts_dvbpsi" );
 #endif
+    add_integer( SOUT_CFG_PREFIX "pid-video", 0, NULL, "Video PID", "",  VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "pid-audio", 0, NULL, "Audio PID", "",  VLC_TRUE );
+
+    add_integer( SOUT_CFG_PREFIX "bmin", 0, NULL, "Minimum bitrate", "",  VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "bmax", 0, NULL, "Maximum bitrate", "",  VLC_TRUE );
+
+    add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL, "Shapping delay(ms)", "",  VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "pcr", 30, NULL, "PCR delay(ms)", "",  VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "dts-delay", 200, NULL, "DTS delay(ms)", "",  VLC_TRUE );
+
+    add_bool( SOUT_CFG_PREFIX "use-key-frames", VLC_FALSE, NULL, "Use key frame for shaping", "",  VLC_TRUE );
+
+    add_bool( SOUT_CFG_PREFIX "crypt-audio", VLC_TRUE, NULL, "Crypt audio with CSA", "",  VLC_TRUE );
+
+    add_string( SOUT_CFG_PREFIX "csa-ck", "", NULL, "CSA Key", "CSA Key", VLC_TRUE );
+
     set_callbacks( Open, Close );
 vlc_module_end();
 
 /*****************************************************************************
  * Local data structures
  *****************************************************************************/
+static const char *ppsz_sout_options[] = {
+    "pid-video", "pid-audio",
+    "bmin", "bmax",
+    "shaping",
+    "pcr",
+    "use-key-frames",
+    "dts-delay",
+    "csa-ck",
+    "crypt-audio",
+    NULL
+};
+
 #define SOUT_BUFFER_FLAGS_PRIVATE_PCR  ( 1 << BLOCK_FLAG_PRIVATE_SHIFT )
 #define SOUT_BUFFER_FLAGS_PRIVATE_CSA  ( 2 << BLOCK_FLAG_PRIVATE_SHIFT )
 typedef struct
@@ -273,9 +303,10 @@ static int Open( vlc_object_t *p_this )
 {
     sout_mux_t          *p_mux =(sout_mux_t*)p_this;
     sout_mux_sys_t      *p_sys;
-    char                *val;
+    vlc_value_t         val;
 
     msg_Dbg( p_mux, "Open" );
+    sout_ParseCfg( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
     p_sys = malloc( sizeof( sout_mux_sys_t ) );
 
@@ -300,23 +331,18 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_pid_free = 0x43;
 
-    p_sys->i_pid_video = 0;
-    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "pid-video" ) ) )
+    var_Get( p_mux, SOUT_CFG_PREFIX "pid-video", &val );
+    p_sys->i_pid_video = val.i_int;
+    if ( p_sys->i_pid_video > p_sys->i_pid_free )
     {
-        p_sys->i_pid_video = strtol( val, NULL, 0 );
-        if ( p_sys->i_pid_video > p_sys->i_pid_free )
-        {
-            p_sys->i_pid_free = p_sys->i_pid_video + 1;
-        }
+        p_sys->i_pid_free = p_sys->i_pid_video + 1;
     }
-    p_sys->i_pid_audio = 0;
-    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "pid-audio" ) ) )
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "pid-audio", &val );
+    p_sys->i_pid_audio = val.i_int;
+    if ( p_sys->i_pid_audio > p_sys->i_pid_free )
     {
-        p_sys->i_pid_audio = strtol( val, NULL, 0 );
-        if ( p_sys->i_pid_audio > p_sys->i_pid_free )
-        {
-            p_sys->i_pid_free = p_sys->i_pid_audio + 1;
-        }
+        p_sys->i_pid_free = p_sys->i_pid_audio + 1;
     }
 
     p_sys->i_pcr_pid = 0x1fff;
@@ -327,16 +353,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_null_continuity_counter = 0;
 
     /* Allow to create constrained stream */
-    p_sys->i_bitrate_min = 0;
-    p_sys->i_bitrate_max = 0;
-    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "bmin" ) ) )
-    {
-        p_sys->i_bitrate_min = atoll( val );
-    }
-    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "bmax" ) ) )
-    {
-        p_sys->i_bitrate_max = atoll( val );
-    }
+    var_Get( p_mux, SOUT_CFG_PREFIX "bmin", &val );
+    p_sys->i_bitrate_min = val.i_int;
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "bmax", &val );
+    p_sys->i_bitrate_max = val.i_int;
+
     if( p_sys->i_bitrate_min > 0 && p_sys->i_bitrate_max > 0 &&
         p_sys->i_bitrate_min > p_sys->i_bitrate_max )
     {
@@ -350,64 +372,57 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_mux, "bmin and bmax no more supported (if you need them report it)" );
     }
 
-    p_sys->i_shaping_delay = 200000;
-    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "shaping" ) ) )
+    var_Get( p_mux, SOUT_CFG_PREFIX "shaping", &val );
+    p_sys->i_shaping_delay = (int64_t)val.i_int * 1000;
+    if( p_sys->i_shaping_delay <= 0 )
     {
-        p_sys->i_shaping_delay = (int64_t)atoi( val ) * 1000;
-        if( p_sys->i_shaping_delay <= 0 )
-        {
-            msg_Err( p_mux,
-                     "invalid shaping ("I64Fd"ms) reseting to 200ms",
-                     p_sys->i_shaping_delay / 1000 );
-            p_sys->i_shaping_delay = 200000;
-        }
-    }
-    p_sys->i_pcr_delay = 30000;
-    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "pcr" ) ) )
-    {
-        p_sys->i_pcr_delay = (int64_t)atoi( val ) * 1000;
-        if( p_sys->i_pcr_delay <= 0 ||
-            p_sys->i_pcr_delay >= p_sys->i_shaping_delay )
-        {
-            msg_Err( p_mux,
-                     "invalid pcr delay ("I64Fd"ms) reseting to 30ms",
-                     p_sys->i_pcr_delay / 1000 );
-            p_sys->i_pcr_delay = 30000;
-        }
-    }
-    p_sys->b_use_key_frames = VLC_FALSE;
-    if( sout_cfg_find( p_mux->p_cfg, "use-key-frames" ) )
-    {
-        p_sys->b_use_key_frames = VLC_TRUE;
+        msg_Err( p_mux,
+                 "invalid shaping ("I64Fd"ms) reseting to 200ms",
+                 p_sys->i_shaping_delay / 1000 );
+        p_sys->i_shaping_delay = 200000;
     }
 
-    p_sys->i_dts_delay = 200000;
-    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "dts-delay" ) ) )
+    var_Get( p_mux, SOUT_CFG_PREFIX "pcr", &val );
+    p_sys->i_pcr_delay = (int64_t)val.i_int * 1000;
+    if( p_sys->i_pcr_delay <= 0 ||
+        p_sys->i_pcr_delay >= p_sys->i_shaping_delay )
     {
-        p_sys->i_dts_delay = (int64_t)atoi( val ) * 1000;
+        msg_Err( p_mux,
+                 "invalid pcr delay ("I64Fd"ms) reseting to 30ms",
+                 p_sys->i_pcr_delay / 1000 );
+        p_sys->i_pcr_delay = 30000;
     }
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "dts-delay", &val );
+    p_sys->i_dts_delay = (int64_t)val.i_int * 1000;
 
     msg_Dbg( p_mux, "shaping="I64Fd" pcr="I64Fd" dts_delay="I64Fd,
              p_sys->i_shaping_delay, p_sys->i_pcr_delay, p_sys->i_dts_delay );
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "use-key-frames", &val );
+    p_sys->b_use_key_frames = val.b_bool;
 
     /* for TS generation */
     p_sys->i_pcr    = 0;
 
     p_sys->csa      = NULL;
-    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "csa-ck" ) ) )
+    var_Get( p_mux, SOUT_CFG_PREFIX "csa-ck", &val );
+    if( val.psz_string )
     {
+        char *psz = val.psz_string;
+
         /* skip 0x */
-        if( val[0] == '0' && ( val[1] == 'x' || val[1] == 'X' ) )
+        if( psz[0] == '0' && ( psz[1] == 'x' || psz[1] == 'X' ) )
         {
-            val += 2;
+            psz += 2;
         }
-        if( strlen( val ) != 16 )
+        if( strlen( psz ) != 16 )
         {
             msg_Dbg( p_mux, "invalid csa ck (it must be 16 chars long)" );
         }
         else
         {
-            uint64_t i_ck = strtoll( val, NULL, 16 );
+            uint64_t i_ck = strtoll( psz, NULL, 16 );
             uint8_t  ck[8];
             int      i;
 
@@ -423,11 +438,10 @@ static int Open( vlc_object_t *p_this )
             csa_SetCW( p_sys->csa, ck, ck );
         }
     }
-    p_sys->b_crypt_audio = VLC_TRUE;
-    if( sout_cfg_find( p_mux->p_cfg, "no-crypt-audio" ) )
-    {
-        p_sys->b_crypt_audio = VLC_FALSE;
-    }
+    if( val.psz_string ) free( val.psz_string );
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "crypt-audio", &val );
+    p_sys->b_crypt_audio = val.b_bool;
 
     return VLC_SUCCESS;
 }
@@ -657,7 +671,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     ts_stream_t     *p_stream;
-    char            *val;
+    vlc_value_t     val;
 
     p_stream = (ts_stream_t*)p_input->p_sys;
     msg_Dbg( p_mux, "removing input pid=%d", p_stream->i_pid );
@@ -710,18 +724,21 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         p_sys->i_mpeg4_streams--;
     }
-    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "pid-video" ) ) )
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "pid-video", &val );
+    if( val.i_int > 0 )
     {
-        int i_pid_video = strtol( val, NULL, 0 );
+        int i_pid_video = val.i_int;
         if ( i_pid_video == p_stream->i_pid )
         {
             p_sys->i_pid_video = i_pid_video;
             msg_Dbg( p_mux, "freeing video PID %d", i_pid_video );
         }
     }
-    if( ( val = sout_cfg_find_value( p_mux->p_cfg, "pid-audio" ) ) )
+    var_Get( p_mux, SOUT_CFG_PREFIX "pid-audio", &val );
+    if( val.i_int > 0 )
     {
-        int i_pid_audio = strtol( val, NULL, 0 );
+        int i_pid_audio = val.i_int;
         if ( i_pid_audio == p_stream->i_pid )
         {
             p_sys->i_pid_audio = i_pid_audio;
