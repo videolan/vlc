@@ -2,8 +2,11 @@
 
 <xsl:import href="/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/xhtml/docbook.xsl"/>
 
-<xsl:param name="html.stylesheet" select="'screen.css'"/>
+<xsl:param name="html.stylesheet" select="'../screen.css'"/>
+<xsl:param name="toc.section.depth" select="1"/>
+<xsl:param name="generate.toc" select="'book toc chapter nop'"/>
 
+<xsl:output method="xml" encoding="iso-8859-15" indent="yes" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"/>
 
 </xsl:stylesheet>
 
