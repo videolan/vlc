@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.50 2002/01/24 13:32:53 sam Exp $
+ * $Id: modules.c,v 1.51 2002/02/04 09:58:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -268,18 +268,25 @@ int module_NeedIntf( intf_module_t *p_intf )
  *****************************************************************************/
 module_t * module_Need( int i_capability, char *psz_name, probedata_t *p_data )
 {
-    module_t * p_module;
+    typedef struct module_list_s
+    {
+        struct module_s *p_module;
+        struct module_list_s* p_next;
+    } module_list_t;
+    struct module_list_s *p_list, *p_first;
+
+    int i_score = 0;
+    int i_index = 0;
+
+    module_t *p_module;
+    char     *psz_realname = NULL;
 
     /* We take the global lock */
     vlc_mutex_lock( &p_module_bank->lock );
 
     if( psz_name != NULL && *psz_name )
     {
-        /* A module name was requested. Use the first matching one. */
-        char     *psz_realname = NULL;
-        int       i_index;
-        boolean_t b_ok = 0;
-
+        /* A module name was requested. */
         psz_realname = strdup( psz_name );
         if( psz_realname )
         {
@@ -291,159 +298,120 @@ module_t * module_Need( int i_capability, char *psz_name, probedata_t *p_data )
             }
             psz_name = psz_realname;
         }
-            
-        for( p_module = p_module_bank->first;
-             p_module != NULL;
-             p_module = p_module->next )
+    }
+
+    /* Sort the modules and test them */
+    p_list = malloc( p_module_bank->i_count * sizeof( module_list_t ) );
+    p_first = NULL;
+
+    /* Parse the module list for capabilities and probe each of them */
+    for( p_module = p_module_bank->first ;
+         p_module != NULL ;
+         p_module = p_module->next )
+    {
+        /* Test that this module can do everything we need */
+        if( !(p_module->i_capabilities & ( 1 << i_capability )) )
         {
-            /* Test that this module can do everything we need */
-            if( !(p_module->i_capabilities & ( 1 << i_capability )) )
+            continue;
+        }
+
+        /* Test if we have the required CPU */
+        if( (p_module->i_cpu_capabilities & p_main->i_cpu_capabilities)
+              != p_module->i_cpu_capabilities )
+        {
+            continue;
+        }
+
+        /* Test if this plugin exports the required shortcut */
+        if( psz_name != NULL && *psz_name )
+        {
+            boolean_t b_ok = 0;
+            int i_dummy;
+
+            for( i_dummy = 0;
+                 !b_ok && p_module->pp_shortcuts[i_dummy];
+                 i_dummy++ )
+            {
+                b_ok = !strcmp( psz_name, p_module->pp_shortcuts[i_dummy] );
+            }
+
+            if( !b_ok )
             {
                 continue;
-            }
-
-            /* Test if we have the required CPU */
-            if( (p_module->i_cpu_capabilities & p_main->i_cpu_capabilities)
-                  != p_module->i_cpu_capabilities )
-            {
-                continue;
-            }
-
-            /* Test if this plugin exports the required shortcut */
-            for( i_index = 0;
-                 !b_ok && p_module->pp_shortcuts[i_index];
-                 i_index++ )
-            {
-                b_ok = !strcmp( psz_name, p_module->pp_shortcuts[i_index] );
-            }
-
-            if( b_ok )
-            {
-                break;
             }
         }
 
-        if( b_ok )
+        /* Test if we requested a particular intf plugin */
+#if 0
+        if( i_capability == MODULE_CAPABILITY_INTF
+             && p_module->psz_program != NULL
+             && strcmp( p_module->psz_program, p_main->psz_arg0 ) )
         {
-            /* Open it ! */
-            LockModule( p_module );
+            continue;
+        }
+#endif
+
+        /* Store this new module */
+        p_list[ i_index ].p_module = p_module;
+
+        if( i_index == 0 )
+        {
+            p_list[ i_index ].p_next = NULL;
+            p_first = p_list;
         }
         else
         {
-            intf_ErrMsg( "module error: requested %s module `%s' not found",
-                         GetCapabilityName( i_capability ), psz_name );
-        }
+            /* Ok, so at school you learned that quicksort is quick, and
+             * bubble sort sucks raw eggs. But that's when dealing with
+             * thousands of items. Here we have barely 50. */
+            struct module_list_s *p_newlist = p_first;
 
-        if( psz_realname )
-        {
-            free( psz_realname );
-        }
-    }
-    else
-    {
-        /* No module name was requested. Sort the modules and test them */
-        typedef struct module_list_s
-        {
-            struct module_s *p_module;
-            struct module_list_s* p_next;
-        } module_list_t;
-
-        int i_score = 0;
-        int i_index = 0;
-        struct module_list_s *p_list = malloc( p_module_bank->i_count
-                                                * sizeof( module_list_t ) );
-        struct module_list_s *p_first = NULL;
-
-        /* Parse the module list for capabilities and probe each of them */
-        for( p_module = p_module_bank->first ;
-             p_module != NULL ;
-             p_module = p_module->next )
-        {
-            /* Test that this module can do everything we need */
-            if( !(p_module->i_capabilities & ( 1 << i_capability )) )
+            if( p_first->p_module->pi_score[i_capability]
+                 < p_module->pi_score[i_capability] )
             {
-                continue;
-            }
-
-            /* Test if we have the required CPU */
-            if( (p_module->i_cpu_capabilities & p_main->i_cpu_capabilities)
-                  != p_module->i_cpu_capabilities )
-            {
-                continue;
-            }
-
-            /* Test if we requested a particular intf plugin */
-#if 0
-            if( i_capability == MODULE_CAPABILITY_INTF
-                 && p_module->psz_program != NULL
-                 && strcmp( p_module->psz_program, p_main->psz_arg0 ) )
-            {
-                continue;
-            }
-#endif
-
-            /* Store this new module */
-            p_list[ i_index ].p_module = p_module;
-
-            if( i_index == 0 )
-            {
-                p_list[ i_index ].p_next = NULL;
-                p_first = p_list;
+                p_list[ i_index ].p_next = p_first;
+                p_first = &p_list[ i_index ];
             }
             else
             {
-                /* Ok, so at school you learned that quicksort is quick, and
-                 * bubble sort sucks raw eggs. But that's when dealing with
-                 * thousands of items. Here we have barely 50. */
-                struct module_list_s *p_newlist = p_first;
-
-                if( p_first->p_module->pi_score[i_capability]
-                     < p_module->pi_score[i_capability] )
+                while( p_newlist->p_next != NULL
+                        && p_newlist->p_next
+                             ->p_module->pi_score[i_capability]
+                            >= p_module->pi_score[i_capability] )
                 {
-                    p_list[ i_index ].p_next = p_first;
-                    p_first = &p_list[ i_index ];
+                    p_newlist = p_newlist->p_next;
                 }
-                else
-                {
-                    while( p_newlist->p_next != NULL
-                            && p_newlist->p_next
-                                 ->p_module->pi_score[i_capability]
-                                >= p_module->pi_score[i_capability] )
-                    {
-                        p_newlist = p_newlist->p_next;
-                    }
 
-                    p_list[ i_index ].p_next = p_newlist->p_next;
-                    p_newlist->p_next = &p_list[ i_index ];
-                }
+                p_list[ i_index ].p_next = p_newlist->p_next;
+                p_newlist->p_next = &p_list[ i_index ];
             }
-
-            i_index++;
         }
 
-        /* Parse the linked list and use the first successful module */
-        while( p_first != NULL )
-        {
-            LockModule( p_first->p_module );
-
-            /* Test the requested capability */
-            i_score += ((function_list_t *)p_first->p_module->p_functions)
-                                            [i_capability].pf_probe( p_data );
-
-            /* If the high score was broken, we have a new champion */
-            if( i_score )
-            {
-                break;
-            }
-
-            UnlockModule( p_first->p_module );
-
-            p_first = p_first->p_next;
-        }
-
-        p_module = (p_first == NULL) ? NULL : p_first->p_module;
-        free( p_list );
+        i_index++;
     }
+
+    /* Parse the linked list and use the first successful module */
+    while( p_first != NULL )
+    {
+        LockModule( p_first->p_module );
+
+        /* Test the requested capability */
+        i_score += ((function_list_t *)p_first->p_module->p_functions)
+                                        [i_capability].pf_probe( p_data );
+
+        /* If the high score was broken, we have a new champion */
+        if( i_score )
+        {
+            break;
+        }
+
+        UnlockModule( p_first->p_module );
+
+        p_first = p_first->p_next;
+    }
+
+    p_module = (p_first == NULL) ? NULL : p_first->p_module;
+    free( p_list );
 
     /* We can release the global lock, module refcount was incremented */
     vlc_mutex_unlock( &p_module_bank->lock );
@@ -453,6 +421,16 @@ module_t * module_Need( int i_capability, char *psz_name, probedata_t *p_data )
         intf_WarnMsg( 1, "module: locking %s module `%s'",
                          GetCapabilityName( i_capability ),
                          p_module->psz_name );
+    }
+    else if( psz_name != NULL && *psz_name )
+    {
+        intf_ErrMsg( "module error: requested %s module `%s' not found",
+                     GetCapabilityName( i_capability ), psz_name );
+    }
+
+    if( psz_realname )
+    {
+        free( psz_realname );
     }
 
     /* Don't forget that the module is still locked if bestmodule != NULL */
