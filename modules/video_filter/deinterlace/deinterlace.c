@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: deinterlace.c,v 1.24 2004/02/13 10:42:24 titer Exp $
+ * $Id: deinterlace.c,v 1.25 2004/03/04 22:47:42 sigmunau Exp $
  *
  * Author: Sam Hocevar <sam@zoy.org>
  *
@@ -891,6 +891,10 @@ static void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
     uint8_t* p_dest = (uint8_t*)_p_dest;
     const uint8_t *p_s1 = (const uint8_t *)_p_s1;
     const uint8_t *p_s2 = (const uint8_t *)_p_s2;
+    while( (int)p_s1 % 16 )
+    {
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+    }        
     uint8_t* p_end = p_dest + i_bytes - 16;
     while( p_dest < p_end )
     {
