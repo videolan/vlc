@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.10 2003/04/13 20:00:20 fenrir Exp $
+ * $Id: stream_output.h,v 1.11 2003/07/31 19:14:59 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -37,6 +37,13 @@
  *
  */
 #define SOUT_BUFFER_FLAGS_HEADER    0x0001
+
+/*
+ * Flags for muxer/access private usage.
+ */
+#define SOUT_BUFFER_FLAGS_PRIVATE_MASK  0xffff0000
+#define SOUT_BUFFER_FLAGS_PRIVATE_SHIFT 16
+
 struct sout_buffer_t
 {
     size_t                  i_allocated_size;
@@ -126,6 +133,8 @@ struct sout_access_out_t
     sout_instance_t         *p_sout;
 
     char                    *psz_access;
+    sout_cfg_t              *p_cfg;
+
     char                    *psz_name;
     sout_access_out_sys_t   *p_sys;
     int                     (* pf_seek  )( sout_access_out_t *,
@@ -156,6 +165,7 @@ struct  sout_mux_t
     sout_instance_t         *p_sout;
 
     char                    *psz_mux;
+    sout_cfg_t              *p_cfg;
 
     sout_access_out_t       *p_access;
 
