@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.15 2002/04/01 05:49:00 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.16 2002/04/01 07:37:53 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -37,7 +37,7 @@ typedef struct colorcombo
 colorcombo colspace[]=
 {
 	{B_YUV422,   "B_YUV422",   FOURCC_Y422, 3},
-	{B_YCbCr422, "B_YCbCr422", FOURCC_UYVY, 3},
+	{B_YCbCr422, "B_YCbCr422", FOURCC_YUY2, 3},
 	{B_RGB32,    "B_RGB32",    FOURCC_RV32, 1},
 	{B_RGB16,    "B_RGB16",    FOURCC_RV16, 1}
 };
