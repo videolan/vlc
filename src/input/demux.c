@@ -171,7 +171,7 @@ static void SeekOffset( input_thread_t *p_input, int64_t i_pos )
 demux_t *__demux2_New( vlc_object_t *p_obj,
                        char *psz_mrl, stream_t *s, es_out_t *out )
 {
-    demux_t *p_demux = vlc_object_create( p_obj, sizeof( demux_t ) );
+    demux_t *p_demux = vlc_object_create( p_obj, VLC_OBJECT_DEMUX );
 
     char    *psz_dup = strdup( psz_mrl ? psz_mrl : "" );
     char    *psz = strchr( psz_dup, ':' );
