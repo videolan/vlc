@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.41 2003/07/11 23:36:01 gbazin Exp $
+ * $Id: wxwindows.h,v 1.42 2003/07/12 13:33:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -130,6 +130,9 @@ public:
      * (and keep the last settings) */
     OpenDialog  *p_open_dialog;
 
+    /* idem for the simple open file dialog */
+    wxFileDialog *p_file_dialog;
+
 private:
     void CreateOurMenuBar();
     void CreateOurToolBar();
@@ -145,6 +148,7 @@ private:
     void OnFileInfo( wxCommandEvent& event );
     void OnPreferences( wxCommandEvent& event );
 
+    void OnOpenFileSimple( wxCommandEvent& event );
     void OnOpenFile( wxCommandEvent& event );
     void OnOpenDisc( wxCommandEvent& event );
     void OnOpenNet( wxCommandEvent& event );
@@ -289,7 +293,8 @@ enum
     FILE_ACCESS = 0,
     DISC_ACCESS,
     NET_ACCESS,
-    SAT_ACCESS
+    SAT_ACCESS,
+    FILE_SIMPLE_ACCESS
 };
 
 /* Stream output Dialog */
@@ -469,6 +474,7 @@ private:
     void DeleteItem( int item );
 
     /* Event handlers (these functions should _not_ be virtual) */
+    void OnAddFile( wxCommandEvent& event );
     void OnAddMRL( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
     void OnOpen( wxCommandEvent& event );

@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.11 2003/05/20 23:17:59 gbazin Exp $
+ * $Id: playlist.cpp,v 1.12 2003/07/12 13:33:10 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -59,7 +59,8 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 enum
 {
     /* menu items */
-    AddMRL_Event = 1,
+    AddFile_Event = 1,
+    AddMRL_Event,
     Close_Event,
     Open_Event,
     Save_Event,
@@ -74,6 +75,7 @@ enum
 
 BEGIN_EVENT_TABLE(Playlist, wxFrame)
     /* Menu events */
+    EVT_MENU(AddFile_Event, Playlist::OnAddFile)
     EVT_MENU(AddMRL_Event, Playlist::OnAddMRL)
     EVT_MENU(Close_Event, Playlist::OnClose)
     EVT_MENU(Open_Event, Playlist::OnOpen)
@@ -112,6 +114,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, Interface *_p_main_interface ):
 
     /* Create our "Manage" menu */
     wxMenu *manage_menu = new wxMenu;
+    manage_menu->Append( AddFile_Event, wxU(_("&Simple Add...")) );
     manage_menu->Append( AddMRL_Event, wxU(_("&Add MRL...")) );
     manage_menu->Append( Open_Event, wxU(_("&Open Playlist...")) );
     manage_menu->Append( Save_Event, wxU(_("&Save Playlist...")) );
@@ -357,6 +360,38 @@ void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
     }
 
     vlc_object_release( p_playlist );
+}
+
+void Playlist::OnAddFile( wxCommandEvent& WXUNUSED(event) )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    if( p_main_interface->p_file_dialog == NULL )
+        p_main_interface->p_file_dialog =
+            new wxFileDialog( this, wxU(_("Open file")), wxT(""), wxT(""),
+                              wxT("*"), wxOPEN | wxMULTIPLE );
+
+    if( p_main_interface->p_file_dialog &&
+        p_main_interface->p_file_dialog->ShowModal() == wxID_OK )
+    {
+        wxArrayString paths;
+
+        p_main_interface->p_file_dialog->GetPaths( paths );
+
+        for( size_t i = 0; i < paths.GetCount(); i++ )
+            playlist_Add( p_playlist, (const char *)paths[i].mb_str(),
+                          PLAYLIST_APPEND, PLAYLIST_END );
+    }
+
+    vlc_object_release( p_playlist );
+
+    Rebuild();
 }
 
 void Playlist::OnAddMRL( wxCommandEvent& WXUNUSED(event) )

@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.44 2003/07/09 21:42:28 gbazin Exp $
+ * $Id: interface.cpp,v 1.45 2003/07/12 13:33:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -124,6 +124,7 @@ enum
 {
     /* menu items */
     Exit_Event = wxID_HIGHEST,
+    OpenFileSimple_Event,
     OpenFile_Event,
     OpenDisc_Event,
     OpenNet_Event,
@@ -167,6 +168,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_RIGHT_UP(Interface::OnContextMenu)
 
     /* Toolbar events */
+    EVT_MENU(OpenFileSimple_Event, Interface::OnOpenFileSimple)
     EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
     EVT_MENU(OpenDisc_Event, Interface::OnOpenDisc)
     EVT_MENU(OpenNet_Event, Interface::OnOpenNet)
@@ -194,6 +196,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     p_prefs_dialog = NULL;
     i_old_playing_status = PAUSE_S;
     p_open_dialog = NULL;
+    p_file_dialog = NULL;
 
     /* Give our interface a nice little icon */
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
@@ -242,6 +245,7 @@ Interface::~Interface()
     /* Clean up */
     if( p_open_dialog ) delete p_open_dialog;
     if( p_prefs_dialog ) p_prefs_dialog->Destroy();
+    if( p_file_dialog ) delete p_file_dialog;
     if( p_intf->p_sys->p_icon ) delete p_intf->p_sys->p_icon;
 }
 
@@ -267,14 +271,16 @@ void Interface::CreateOurMenuBar()
 
     /* Create the "File" menu */
     wxMenu *file_menu = new wxMenu;
-    file_menu->Append( OpenFile_Event, wxU(_("&Open File...")),
+    file_menu->Append( OpenFileSimple_Event, wxU(_("Simple &Open ...")),
+                       wxU(_(HELP_FILE)) );
+    file_menu->Append( OpenFile_Event, wxU(_("Open &File...")),
                        wxU(_(HELP_FILE)) );
     file_menu->Append( OpenDisc_Event, wxU(_("Open &Disc...")),
                        wxU(_(HELP_DISC)) );
-    file_menu->Append( OpenNet_Event, wxU(_("&Network Stream...")),
+    file_menu->Append( OpenNet_Event, wxU(_("Open &Network Stream...")),
                        wxU(_(HELP_NET)) );
 #if 0
-    file_menu->Append( OpenSat_Event, wxU(_("&Satellite Stream...")),
+    file_menu->Append( OpenSat_Event, wxU(_("Open &Satellite Stream...")),
                        wxU(_(HELP_NET)) );
 #endif
 #if 0
@@ -643,6 +649,35 @@ void Interface::OnPreferences( wxCommandEvent& WXUNUSED(event) )
     {
         p_prefs_dialog->Show( true );
     }
+}
+
+void Interface::OnOpenFileSimple( wxCommandEvent& WXUNUSED(event) )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    if( p_file_dialog == NULL )
+        p_file_dialog = new wxFileDialog( this, wxU(_("Open file")),
+            wxT(""), wxT(""), wxT("*"), wxOPEN | wxMULTIPLE );
+
+    if( p_file_dialog && p_file_dialog->ShowModal() == wxID_OK )
+    {
+        wxArrayString paths;
+
+        p_file_dialog->GetPaths( paths );
+
+        for( size_t i = 0; i < paths.GetCount(); i++ )
+            playlist_Add( p_playlist, (const char *)paths[i].mb_str(),
+                          PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO),
+                          PLAYLIST_END );
+    }
+
+    vlc_object_release( p_playlist );
 }
 
 void Interface::OnOpenFile( wxCommandEvent& WXUNUSED(event) )

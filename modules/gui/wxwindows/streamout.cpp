@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.23 2003/07/11 23:36:01 gbazin Exp $
+ * $Id: streamout.cpp,v 1.24 2003/07/12 13:33:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -773,8 +773,8 @@ void SoutDialog::OnFileChange( wxCommandEvent& WXUNUSED(event) )
 
 void SoutDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
 {
-    wxFileDialog dialog( this, wxU(_("Save file")),
-                         wxT(""), wxT(""), wxT("*"), wxSAVE );
+    wxFileDialog dialog( this, wxU(_("Save file")), wxT(""), wxT(""), wxT("*"),
+                         wxSAVE | wxOVERWRITE_PROMPT );
 
     if( dialog.ShowModal() == wxID_OK )
     {
