@@ -116,6 +116,10 @@ static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     char *psz_descfilename;
+    char buffer[256];
+    int x1, x2, y1, y2, i_level, i_downspeed, i_upspeed, i;
+    area_t *p_area;
+    FILE * p_file;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -154,10 +158,7 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Parse description file and allocate areas */
-    char buffer[256];
-    int x1, x2, y1, y2, i_level, i_downspeed, i_upspeed, i;
-    area_t *p_area;
-    FILE * p_file = fopen( psz_descfilename, "r" );
+    p_file = fopen( psz_descfilename, "r" );
     if( !p_file )
     {
         msg_Err( p_this, "Failed to open descritpion file %s",
