@@ -1028,6 +1028,7 @@ static int AStreamRefillStream( stream_t *s )
     int i_toread =
         __MIN( p_sys->stream.i_used, STREAM_CACHE_TRACK_SIZE -
                (tk->i_end - tk->i_start - p_sys->stream.i_offset) );
+    vlc_bool_t b_read = VLC_FALSE;
     int64_t i_start, i_stop;
 
     if( i_toread <= 0 ) return VLC_EGENERIC; /* EOF */
@@ -1054,8 +1055,11 @@ static int AStreamRefillStream( stream_t *s )
         }
         else if( i_read == 0 )
         {
-            return VLC_EGENERIC;
+            if( !b_read )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
         }
+        b_read = VLC_TRUE;
 
         /* Update end */
         tk->i_end += i_read;
