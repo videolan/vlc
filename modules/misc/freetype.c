@@ -501,7 +501,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     {
             FT_Set_Pixel_Sizes( p_sys->p_face, 0, p_sys->i_font_size );
     }
-    else          
+    else
     {
         i_error = FT_Set_Pixel_Sizes( p_sys->p_face, 0, i_font_size );
         if( i_error )
@@ -684,7 +684,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     p_region_out->i_x = p_region_in->i_x;
     p_region_out->i_y = p_region_in->i_y;
 
-    Render( p_filter, p_region_out, p_line, result.x, result.y );
+    Render( p_filter, p_region_out, p_lines, result.x, result.y );
 
     if( psz_unicode_orig ) free( psz_unicode_orig );
     FreeLines( p_lines );
