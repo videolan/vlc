@@ -1152,76 +1152,65 @@ static void AStreamPrebufferStream( stream_t *s )
  * \param s Stream handle to read from
  * \return A null-terminated string. This must be freed,
  */
-#define STREAM_PROBE_LINE 1024
+#define STREAM_PROBE_LINE 2048
+#define STREAM_LINE_MAX (2048*100)
 char *stream_ReadLine( stream_t *s )
 {
-    char    *p_line = NULL;
-    int      i_line = 0;
+    char *p_line = NULL;
+    int i_line = 0, i_read = 0;
 
-    for( ;; )
+    while( i_read < STREAM_LINE_MAX )
     {
-        char *psz_lf, *psz_cr;
+        char *psz_eol;
         uint8_t *p_data;
-        int      i_data;
-
-        int i_read;
+        int i_data;
 
         /* Probe new data */
         i_data = stream_Peek( s, &p_data, STREAM_PROBE_LINE );
+        if( i_data <= 0 ) break; /* No more data */
 
-        if( i_data <= 0 )   /* No data */
-            goto exit;
-
-        /* See if there is a '\n' */
-        psz_lf = memchr( p_data, '\n', __MAX( i_data - 1, 1 ) );
-        psz_cr = memchr( p_data, '\r', __MAX( i_data - 1, 1 ) );
-
-        if( psz_lf && !psz_cr && p_data[i_data-1] == '\r' )
+        /* Check if there is an EOL */
+        if( ( psz_eol = memchr( p_data, '\n', i_data ) ) )
         {
-            psz_cr = &p_data[i_data-1];
-        }
-        if( psz_cr && !psz_lf && p_data[i_data-1] == '\n' )
-        {
-            psz_lf = &p_data[i_data-1];
-        }
+            i_data = (psz_eol - (char *)p_data) + 1;
+            p_line = realloc( p_line, i_line + i_data + 1 );
+            i_data = stream_Read( s, &p_line[i_line], i_data );
+            if( i_data <= 0 ) break; /* Hmmm */
+            i_line += (i_data - 1);
+            i_read += i_data;
 
-        if( psz_lf || psz_cr )
-        {
-            char *psz;
-            if( !psz_lf  )
-                psz = psz_cr;
-            else if( !psz_cr )
-                psz = psz_lf;
-            else
-                psz = __MIN( psz_cr, psz_lf );
+            /* Remove trailing LF/CR */
+            while( stream_Peek( s, &p_data, 1 ) == 1 &&
+                   i_read < STREAM_LINE_MAX )
+            {
+                if( p_data[0] != '\n' && p_data[0] != '\r' ) break;
 
-            i_read = (psz - (char*)p_data) + 1;
-            p_line = realloc( p_line, i_read + 1 ); /* +1 for easy \0 append */
-            i_read = stream_Read( s, &p_line[i_line], i_read );
-            if( i_read > 0 )
-                i_line += i_read;
+                i_data = stream_Read( s, NULL, 1 );
+                if( i_data <= 0 ) break; /* Hmmm */
+                i_read += i_data;
+            }
 
-            goto exit;
+            /* We have our line */
+            break;
         }
 
         /* Read data (+1 for easy \0 append) */
         p_line = realloc( p_line, i_line + STREAM_PROBE_LINE + 1 );
-        i_read = stream_Read( s, &p_line[i_line], STREAM_PROBE_LINE );
-
-        if( i_read <= 0 )
-            goto exit;
-        i_line += i_read;
+        i_data = stream_Read( s, &p_line[i_line], STREAM_PROBE_LINE );
+        if( i_data <= 0 ) break; /* Hmmm */
+        i_line += i_data;
+        i_read += i_data;
     }
 
-exit:
-    while( i_line > 0 &&
-           ( p_line[i_line-1] == '\n' || p_line[i_line-1] == '\r' ) )
-    {
-        i_line--;
-    }
+    /* Remove trailing CR */
+    while( i_line > 0 && p_line[i_line-1] == '\r' ) i_line--;
+
     if( i_line > 0 )
+    {
         p_line[i_line] = '\0';
+        return p_line;
+    }
 
-    return p_line;
+    if( p_line ) free( p_line );
+    return NULL;
 }
-
