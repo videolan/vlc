@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.8 2003/03/15 18:44:31 fenrir Exp $
+ * $Id: sub.c,v 1.9 2003/03/16 16:07:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -183,6 +183,13 @@ static char *text_get_line( text_t *txt )
     }
 
     return( txt->line[txt->i_line++] );
+}
+static void text_previous_line( text_t *txt )
+{
+    if( txt->i_line > 0 )
+    {
+        txt->i_line--;
+    }
 }
 static void text_rewind( text_t *txt )
 {
@@ -873,41 +880,123 @@ static int  sub_Vplayer( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsec
     return( 0 );
 }
 
-static int  sub_Sami( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe )
+static char *sub_SamiSearch( text_t *txt, char *psz_start, char *psz_str )
 {
-#if 0
-    char buffer[MAX_LINE + 1];
-    char buffer_text[MAX_LINE + 1];
-    char *p;
+    if( psz_start )
+    {
+        if( strstr( psz_start, psz_str ) )
+        {
+            char *s = strstr( psz_start, psz_str );
 
-    /* first find "Start=" */
-    /* the <P ... > */
-    /* then all text and remove <...> until new "Start="*/
+            s += strlen( psz_str );
+
+            return( s );
+        }
+    }
     for( ;; )
     {
-        int i_state;
-        if( ( s = text_get_line( txt ) ) == NULL )
+        char *p;
+        if( ( p = text_get_line( txt ) ) == NULL )
         {
-            return( VLC_EGENERIC );
+            return NULL;
         }
-
-        if( fgets( buffer, MAX_LINE, p_file ) <= 0)
+        if( strstr( p, psz_str ) )
         {
-            return( -1 );
+            char *s = strstr( p, psz_str );
+
+            s += strlen( psz_str );
+
+            return(  s);
         }
-        i_start = 0;
-
-        buffer[MAX_LINE] = '\0';
-        memset( buffer_text, '\0', MAX_LINE );
-
-        for( ;; )
-        {
-            if( p = strstr( buffer, "Start=" ) )
-            {
-
-
-            }
     }
-#endif
-    return( VLC_EGENERIC );
 }
+
+static int  sub_Sami( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe )
+{
+    char *p;
+    int i_start;
+
+    int  i_text;
+    char buffer_text[10*MAX_LINE + 1];
+#define ADDC( c ) \
+    if( i_text < 10*MAX_LINE )      \
+    {                               \
+        buffer_text[i_text++] = c;  \
+        buffer_text[i_text] = '\0'; \
+    }
+
+    /* search "Start=" */
+    if( !( p = sub_SamiSearch( txt, NULL, "Start=" ) ) )
+    {
+        return VLC_EGENERIC;
+    }
+
+    /* get start value */
+    i_start = strtol( p, &p, 0 );
+
+    /* search <P */
+    if( !( p = sub_SamiSearch( txt, p, "<P" ) ) )
+    {
+        return VLC_EGENERIC;
+    }
+    /* search > */
+    if( !( p = sub_SamiSearch( txt, p, ">" ) ) )
+    {
+        return VLC_EGENERIC;
+    }
+
+    i_text = 0;
+    buffer_text[0] = '\0';
+    /* now get all txt until  a "Start=" line */
+    for( ;; )
+    {
+        if( *p )
+        {
+            if( *p == '<' )
+            {
+                if( !strncmp( p, "<br", 3 ) || !strncmp( p, "<BR", 3 ) )
+                {
+                    ADDC( '\n' );
+                }
+                else if( strstr( p, "Start=" ) )
+                {
+                    text_previous_line( txt );
+                    break;
+                }
+                p = sub_SamiSearch( txt, p, ">" );
+            }
+            else if( !strncmp( p, "&nbsp;", 6 ) )
+            {
+                ADDC( ' ' );
+                p += 6;
+            }
+            else if( *p == '\t' )
+            {
+                ADDC( ' ' );
+                p++;
+            }
+            else
+            {
+                ADDC( *p );
+                p++;
+            }
+        }
+        else
+        {
+            p = text_get_line( txt );
+        }
+
+        if( p == NULL )
+        {
+            break;
+        }
+    }
+
+    p_subtitle->i_start = i_start * 1000;
+    p_subtitle->i_stop  = 0;
+    p_subtitle->psz_text = strndup( buffer_text, 10*MAX_LINE );
+
+    return( VLC_SUCCESS );
+#undef ADDC
+}
+
