@@ -2,7 +2,7 @@
  * render.c : Philips OGT (SVCD Subtitle) renderer
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: render.c,v 1.6 2004/01/01 13:51:38 rocky Exp $
+ * $Id: render.c,v 1.7 2004/01/01 15:56:56 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -314,7 +314,8 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
 {
     /* Common variables */
     uint8_t *p_pixel_base;
-    ogt_yuvt_t *p_source = (ogt_yuvt_t *)p_spu->p_sys->p_data;
+    ogt_yuvt_t *p_src_start = (ogt_yuvt_t *)p_spu->p_sys->p_data;
+    ogt_yuvt_t *p_src_end   = &p_src_start[p_spu->i_height * p_spu->i_width];
 
     int i_x, i_y;
 
@@ -323,6 +324,13 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
 
     /* Crop-specific */
     int i_x_start, i_y_start, i_x_end, i_y_end;
+
+    struct subpicture_sys_t *p_sys = p_spu->p_sys;
+
+    dbg_print( (DECODE_DBG_CALL|DECODE_DBG_RENDER), 
+	       "spu width: %d, height %d, scaled (%d, %d)", 
+	       p_spu->i_width,  p_spu->i_height, 
+	       p_vout->output.i_width, p_vout->output.i_height );
 
     i_xscale = ( p_vout->output.i_width << 6 ) / p_vout->render.i_width;
     i_yscale = ( p_vout->output.i_height << 6 ) / p_vout->render.i_height;
@@ -343,24 +351,37 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
     /* Draw until we reach the bottom of the subtitle */
     for( i_y = 0 ; i_y < i_height ; )
     {
+        int i_y_src = (i_y / i_yscale) * p_spu->i_width;
         i_ytmp = i_y >> 6;
         i_y += i_yscale;
+
 
         /* Check whether we need to draw one line or more than one */
         if( i_ytmp + 1 >= ( i_y >> 6 ) )
         {
+
             /* Just one line : we precalculate i_y >> 6 */
             i_yreal = p_pic->p->i_pitch * i_ytmp;
 
             /* Draw until we reach the end of the line */
-            for( i_x = i_width ; i_x ; i_x--, p_source++ )
+            for( i_x = i_width ; i_x ; i_x-- )
             {
+	      ogt_yuvt_t *p_source;
+
 	      if( b_crop
 		  && ( i_x < i_x_start || i_x > i_x_end
 		       || i_y < i_y_start || i_y > i_y_end ) )
                 {
 		  continue;
                 }
+
+	      p_source = &p_src_start[i_y_src + ((i_width - i_x) / i_xscale)];
+
+	      if (p_source >= p_src_end) {
+		msg_Err( p_vout, "Trying to access beyond subtitle %d x %d %d",
+			 (i_width - i_x) / i_xscale, i_y / i_yscale, i_height);
+		return;
+	      }
 	      
 	      switch( p_source->s.t )
                 {
@@ -404,14 +425,24 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
             i_ynext = p_pic->p->i_pitch * i_y >> 6;
 
             /* Draw until we reach the end of the line */
-            for( i_x = i_width ; i_x ; i_x--, p_source++ )
+            for( i_x = i_width ; i_x ; i_x-- )
             {
+	      ogt_yuvt_t *p_source;
+
 	      if( b_crop
 		  && ( i_x < i_x_start || i_x > i_x_end
 		       || i_y < i_y_start || i_y > i_y_end ) )
                 {
 		  continue;
                 }
+	      
+	      p_source = &p_src_start[i_y_src + ((i_width - i_x) / i_xscale)];
+
+	      if (p_source >= p_src_end) {
+		msg_Err( p_vout, "Trying to access beyond subtitle %d x %d %d",
+			 (i_width - i_x) / i_xscale, i_y / i_yscale, i_height);
+		return;
+	      }
 	      
 	      switch( p_source->s.t )
                 {
