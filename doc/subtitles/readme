@@ -1,0 +1,19 @@
+How to create new subtitles fonts
+---------------------------------
+
+VLC uses run-length encoded fonts. We already provide 2 of these fonts
+(share/font-eutopiabold21.rle and share/font-eutopiabold36.rle) but you might
+also want to generate your own.
+
+Two (very basic) perl scripts are provided to generate these fonts files,
+vlc-gimp.pl and vlc-font.pl. vlc-gimp.pl is perl-fu, and uses gimp's font
+plotting routines to create an image, which should be saved as an RAW PNM.
+Installing vlc-gimp.pl with "gimptool --install-bin vlc-gimp.pl" will add a new
+entry in the Xtns/Perl-Fu menu in gimp.
+vlc-font.pl extracts the characters from the raw PNM, and creates a run-length
+encoded font file which VLC can use. As already stated these scripts are quite
+basic so you will have to hack them to your liking.
+
+Also note that the subtitler engine in VLC is currently being replaced to use
+the freetype library which will allow the use of fonts already available on
+your system and some other new powerful features.
