@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.35 2003/04/06 16:30:43 gbazin Exp $
+$Id: NEWS,v 1.36 2003/04/06 23:00:24 hartman Exp $
 
 Changes between 0.5.2 and 0.5.3:
 ---------------------------------
@@ -25,7 +25,8 @@ Input demux:
 
 Codecs:
  * support for 3ivx D4 (not previous versions)
- * support for '3ivd' and '3vid' files
+ * support for '3ivd' and '3vid' encodings
+ * support for 'MSS1' codec ( same as WMV2 )
  * support for SAMI subtitles (untested and incomplete)
  * better SSA4 subtitles recognition
  * new codec for raw I420 video
@@ -52,11 +53,12 @@ Mac OS X port:
  * fixed the hiding of the mouse on multiple monitors
  * fixed a big issue with some USB speakers
  * support for mono audio output devices
- * reset the device to its default mode before quitting VLC
+ * reset the audio-device to its default mode before quitting VLC
  * fixed several cosmetic issues
  * you can drag the controller window by its background (as it should be)
  * the messages window remembers more lines
- * delay and fps can now be overriden with subtitles files
+ * delay and fps can now be overruled with subtitles files
+ * http and ogg stream output options
  * Apple menu and friends will now be translated as well
 
 Win32 port:
