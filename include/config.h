@@ -376,3 +376,11 @@
 
 /* Maximal number of commands which can be saved in history list */
 #define INTF_CONSOLE_MAX_HISTORY        20
+
+/*****************************************************************************
+ * Synchro configuration
+ *****************************************************************************/
+
+#define VOUT_SYNCHRO_LEVEL_START        5
+#define VOUT_SYNCHRO_LEVEL_MAX          15
+#define VOUT_SYNCHRO_HEAP_IDEAL_SIZE    5

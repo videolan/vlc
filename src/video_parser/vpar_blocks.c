@@ -37,6 +37,19 @@
 #include "video_parser.h"
 #include "video_fifo.h"
 
+
+
+
+
+
+
+static int i_count = 0;
+
+
+
+
+
+
 /*
  * Welcome to vpar_blocks.c ! Here's where the heavy processor-critical parsing
  * task is done. This file is divided in several parts :
@@ -530,9 +543,11 @@ void vpar_InitDCTTables( vpar_thread_t * p_vpar )
     p_vpar->pppl_dct_dc_size[1][0] = pl_dct_dc_chrom_init_table_1;
     p_vpar->pppl_dct_dc_size[1][1] = pl_dct_dc_chrom_init_table_2;
 
-    memset( p_vpar->ppl_dct_coef[0], MB_ERROR, 16 );
-    memset( p_vpar->ppl_dct_coef[1], MB_ERROR, 16 );
-
+    /* ??? MB_ERROR is replaced by 0 because if we use -1 we 
+     * can block in DecodeMPEG2Intra and others */
+    memset( p_vpar->ppl_dct_coef[0], 0, 16 );
+    memset( p_vpar->ppl_dct_coef[1], 0, 16 );
+    
     /* For table B14 & B15, we have a pointer to tables */
     /* We fill the table thanks to the fonction defined above */
     FillDCTTable( p_vpar->ppl_dct_coef[0], pl_DCT_tab0, 256, 60,  4 );
@@ -1614,14 +1629,24 @@ static __inline__ void ParseMacroblock(
     static int      pi_x[12] = {0,8,0,8,0,0,0,0,8,8,8,8};
     static int      pi_y[2][12] = { {0,0,8,8,0,0,8,8,0,0,8,8},
                                     {0,0,1,1,0,0,1,1,0,0,1,1} };
-
     int             i_mb, i_b, i_mask;
+    int i_inc;
     macroblock_t *  p_mb;
     yuv_data_t *    p_data1;
     yuv_data_t *    p_data2;
 
-    *pi_mb_address += MacroblockAddressIncrement( p_vpar );
+i_count++;
 
+    i_inc = MacroblockAddressIncrement( p_vpar );
+    *pi_mb_address += i_inc;
+
+    if( i_inc < 0 )
+    {
+        fprintf( stderr, "vpar error: bad address increment (%d)\n", i_inc );
+        p_vpar->picture.b_error = 1;
+        return;
+    }
+    
     if( *pi_mb_address - i_mb_previous - 1 )
     {
         /* Skipped macroblock (ISO/IEC 13818-2 7.6.6). */
@@ -1833,8 +1858,15 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
         {
             RemoveBits( &p_vpar->bit_stream, 8 );
         }
-    }
+    }    
     *pi_mb_address = (i_vert_code - 1)*p_vpar->sequence.i_mb_width;
+
+    if( *pi_mb_address < i_mb_address_save )
+    {
+        fprintf( stderr, "vpar error: slices do not follow, maybe a PES has been trashed\n" );
+        p_vpar->picture.b_error = 1;
+        return;
+    }
 
     /* Reset DC coefficients predictors (ISO/IEC 13818-2 7.2.1). */
     p_vpar->mb.pi_dc_dct_pred[0] = p_vpar->mb.pi_dc_dct_pred[1]
@@ -1851,9 +1883,12 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
                          i_chroma_format, i_structure,
                          b_second_field );
         i_mb_address_save = *pi_mb_address;
+        if( p_vpar->picture.b_error )
+        {
+            return;
+        }
     }
-    while( ShowBits( &p_vpar->bit_stream, 23 ) && !p_vpar->picture.b_error
-            && !p_vpar->b_die );
+    while( ShowBits( &p_vpar->bit_stream, 23 ) && !p_vpar->b_die );
     NextStartCode( p_vpar );
 }
 

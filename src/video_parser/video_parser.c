@@ -292,7 +292,9 @@ static int InitThread( vpar_thread_t *p_vpar )
         p_vpar->synchro.tab_b[i_dummy].mean = 6;
         p_vpar->synchro.tab_b[i_dummy].deviation = .5;
     }
-#else
+#endif
+
+#ifdef MEUUH_SYNCHRO
     p_vpar->synchro.kludge_level = 5;
     p_vpar->synchro.kludge_nbp = p_vpar->synchro.kludge_p = 5;
     p_vpar->synchro.kludge_nbb = p_vpar->synchro.kludge_b = 6;
@@ -300,6 +302,17 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->synchro.kludge_prevdate = 0;
 #endif
 
+#ifdef POLUX_SYNCHRO
+    p_vpar->synchro.i_current_frame_date = 0;
+    p_vpar->synchro.i_backward_frame_date = 0;
+    
+    p_vpar->synchro.i_p_nb = 5;
+    p_vpar->synchro.i_b_nb = 6;
+    p_vpar->synchro.i_p_count = 0;
+    p_vpar->synchro.i_b_count = 0;
+    p_vpar->synchro.i_i_count = 0;
+#endif
+    
     /* Mark thread as running and return */
     intf_DbgMsg("vpar debug: InitThread(%p) succeeded\n", p_vpar);
     return( 0 );

@@ -15,7 +15,7 @@
  *  "video_fifo.h"
  *****************************************************************************/
 
-#define SAM_SYNCHRO
+#define POLUX_SYNCHRO
 
 /*****************************************************************************
  * video_synchro_t and video_synchro_tab_s : timers for the video synchro
@@ -80,7 +80,9 @@ typedef struct video_synchro_s
     double actual_fps;
 
 } video_synchro_t;
-#else
+#endif
+
+#ifdef MEUUH_SYNCHRO
 typedef struct video_synchro_s
 {
     int         kludge_level, kludge_p, kludge_b, kludge_nbp, kludge_nbb;
@@ -91,6 +93,27 @@ typedef struct video_synchro_s
 
 #define SYNC_TOLERATE   10000 /* 10 ms */
 #define SYNC_DELAY      500000
+#endif
+
+#ifdef POLUX_SYNCHRO
+
+typedef struct video_synchro_s
+{
+    /* Date Section */
+    
+    /* Dates needed to compute the date of the current frame 
+     * We also use the stream frame rate (sequence.r_frame_rate) */
+    mtime_t     i_current_frame_date;
+    mtime_t     i_backward_frame_date;
+
+    /* Frame Trashing Section */
+    
+    int         i_b_nb, i_p_nb;   /* number of decoded P and B between two I */
+    int         i_b_count, i_p_count, i_i_count;
+    int         i_b_trasher;                /* used for brensenham algorithm */
+    
+} video_synchro_t;
+
 #endif
 
 /*****************************************************************************

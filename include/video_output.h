@@ -159,22 +159,26 @@ typedef struct vout_thread_s
      * good indication of the thread status */
     mtime_t             render_time;             /* last picture render time */
     count_t             c_fps_samples;                     /* picture counts */
-    mtime_t             p_fps_sample[ VOUT_FPS_SAMPLES ];/* FPS samples dates */
+    mtime_t             p_fps_sample[VOUT_FPS_SAMPLES]; /* FPS samples dates */
 #endif
 
     /* Rendering buffers */
     int                 i_buffer_index;                      /* buffer index */
     vout_buffer_t       p_buffer[2];                   /* buffers properties */
 
-    /* Videos heap and translation tables */
+    /* Videos heap and translation tables */    
     picture_t           p_picture[VOUT_MAX_PICTURES];            /* pictures */
     subpicture_t        p_subpicture[VOUT_MAX_PICTURES];      /* subpictures */
+    int                 i_pictures;                     /* current heap size */
     vout_yuv_t          yuv;                           /* translation tables */
 
     /* Bitmap fonts */
     p_vout_font_t       p_default_font;                      /* default font */
     p_vout_font_t       p_large_font;                          /* large font */
 
+    /* Synchronisation informations - synchro level is updated by the vout
+     * thread and read by decoder threads */
+    int                 i_synchro_level;                   /* trashing level */    
 } vout_thread_t;
 
 /* Output methods */

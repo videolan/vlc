@@ -50,6 +50,7 @@ static void     RenderSubPicture  ( vout_thread_t *p_vout,
 static void     RenderInterface   ( vout_thread_t *p_vout );
 static int      RenderIdle        ( vout_thread_t *p_vout );
 static void     RenderInfo        ( vout_thread_t *p_vout );
+static void     Synchronize       ( vout_thread_t *p_vout, s64 i_delay );
 static int      Manage            ( vout_thread_t *p_vout );
 static int      Align             ( vout_thread_t *p_vout, int *pi_x,
                                     int *pi_y, int i_width, int i_height,
@@ -210,6 +211,10 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         p_vout->p_subpicture[i_index].i_type  = EMPTY_SUBPICTURE;
         p_vout->p_subpicture[i_index].i_status= FREE_SUBPICTURE;
     }
+    p_vout->i_pictures = 0;    
+
+    /* Initialize synchronization informations */
+    p_vout->i_synchro_level     = VOUT_SYNCHRO_LEVEL_START;
 
     /* Create and initialize system-dependant method - this function issues its
      * own error messages */
@@ -599,6 +604,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
                  * can end immediately - this is the best possible case, since no
                  * memory allocation needs to be done */
                 p_vout->p_picture[i_picture].i_status = RESERVED_PICTURE;
+                p_vout->i_pictures++;                
 #ifdef DEBUG_VIDEO
                 intf_DbgMsg("picture %p (in destroyed picture slot)\n",
                             &p_vout->p_picture[i_picture] );
@@ -682,6 +688,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
             p_free_picture->i_display_height            = i_height;
             p_free_picture->i_aspect_ratio              = AR_SQUARE_PICTURE;
             p_free_picture->i_refcount                  = 0;
+            p_vout->i_pictures++;            
         }
         else
         {
@@ -711,11 +718,11 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
  * This function frees a previously reserved picture or a permanent
  * picture. It is meant to be used when the construction of a picture aborted.
  * Note that the picture will be destroyed even if it is linked !
- * This function does not need locking since reserved pictures are ignored by
- * the output thread.
  *****************************************************************************/
 void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
+   vlc_mutex_lock( &p_vout->picture_lock );   
+
 #ifdef DEBUG
    /* Check if picture status is valid */
    if( (p_pic->i_status != RESERVED_PICTURE) &&
@@ -726,11 +733,13 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
    }
 #endif
 
-    p_pic->i_status = DESTROYED_PICTURE;
+   p_pic->i_status = DESTROYED_PICTURE;
+   p_vout->i_pictures--;    
 
 #ifdef DEBUG_VIDEO
-    intf_DbgMsg("picture %p\n", p_pic);
+   intf_DbgMsg("picture %p\n", p_pic);
 #endif
+   vlc_mutex_unlock( &p_vout->picture_lock );   
 }
 
 /*****************************************************************************
@@ -772,6 +781,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     if( (p_pic->i_refcount == 0) && (p_pic->i_status == DISPLAYED_PICTURE) )
     {
         p_pic->i_status = DESTROYED_PICTURE;
+        p_vout->i_pictures--;        
     }
 
 #ifdef DEBUG_VIDEO
@@ -981,18 +991,35 @@ static void RunThread( vout_thread_t *p_vout)
             /* Computes FPS rate */
             p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ] = display_date;
 #endif
+#if 0
             if( display_date < current_date )
             {
                 /* Picture is late: it will be destroyed and the thread will sleep and
                  * go to next picture */
+
                 vlc_mutex_lock( &p_vout->picture_lock );
-                p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
-            intf_DbgMsg( "warning: late picture %p skipped refcount=%d\n", p_pic, p_pic->i_refcount );
+                if( p_pic->i_refcount )
+                {
+                    p_pic->i_status = DISPLAYED_PICTURE;                    
+                }
+                else
+                {
+                    p_pic->i_status = DESTROYED_PICTURE;
+                    p_vout->i_pictures--;                    
+                }
+                intf_DbgMsg( "warning: late picture %p skipped refcount=%d\n", p_pic, p_pic->i_refcount );
                 vlc_mutex_unlock( &p_vout->picture_lock );
+
                 p_pic =         NULL;
                 display_date =  0;
+
+                /* Update synchronization information as if display delay 
+                 * was 0 */
+                Synchronize( p_vout, 0 );                
             }
-            else if( display_date > current_date + VOUT_DISPLAY_DELAY )
+            else 
+#endif                
+                if( display_date > current_date + VOUT_DISPLAY_DELAY )
             {
                 /* A picture is ready to be rendered, but its rendering date is
                  * far from the current one so the thread will perform an empty loop
@@ -1000,6 +1027,12 @@ static void RunThread( vout_thread_t *p_vout)
                 p_pic =         NULL;
                 display_date =  0;
             }
+            else
+            {
+                /* Picture will be displayed, update synchronization 
+                 * information */
+                Synchronize( p_vout, display_date - current_date );
+            }            
         }
 
         /*
@@ -1033,7 +1066,15 @@ static void RunThread( vout_thread_t *p_vout)
 
             /* Remove picture from heap */
             vlc_mutex_lock( &p_vout->picture_lock );
-            p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
+            if( p_pic->i_refcount )
+            {
+                p_pic->i_status = DISPLAYED_PICTURE;                    
+            }
+            else
+            {
+                p_pic->i_status = DESTROYED_PICTURE;
+                p_vout->i_pictures--;                    
+            }
             vlc_mutex_unlock( &p_vout->picture_lock );
 
             /* Render interface and subpicture */
@@ -1767,8 +1808,8 @@ static void RenderInfo( vout_thread_t *p_vout )
             break;
         }
     }
-    sprintf( psz_buffer, "pic: %d/%d/%d",
-             i_reserved_pic, i_ready_pic, VOUT_MAX_PICTURES );
+    sprintf( psz_buffer, "pic: %d (%d/%d)/%d",
+             p_vout->i_pictures, i_reserved_pic, i_ready_pic, VOUT_MAX_PICTURES );
     Print( p_vout, 0, 0, LEFT_RALIGN, BOTTOM_RALIGN, psz_buffer );
 #endif
 }
@@ -1863,6 +1904,76 @@ static void RenderInterface( vout_thread_t *p_vout )
 
     /* Activate modified area */
     SetBufferArea( p_vout, 0, p_vout->i_height - i_height, p_vout->i_width, i_height );
+}
+
+/*****************************************************************************
+ * Synchronize: update synchro level depending of heap state
+ *****************************************************************************
+ * This function is called during the main vout loop.
+ *****************************************************************************/
+static void Synchronize( vout_thread_t *p_vout, s64 i_delay )
+{
+    int i_synchro_inc = 0;
+    //???? gore following
+    static int i_panic_count = 0;
+    static int i_last_synchro_inc = 0;
+    static float r_synchro_level = VOUT_SYNCHRO_LEVEL_START;
+    static int i_truc = 1;
+
+    //?? heap size is p_vout->i_pictures
+    //?? 
+    if( i_delay < 0 )
+    {
+//        intf_Msg("PANIC %d\n", i_panic_count++);
+    }
+/*
+    if( p_vout->i_pictures > VOUT_SYNCHRO_HEAP_IDEAL_SIZE+1 )
+    {
+        i_synchro_inc++;
+    }
+    else if( p_vout->i_pictures < VOUT_SYNCHRO_HEAP_IDEAL_SIZE )
+    {
+        i_synchro_inc--;
+    }
+*/    
+    if( i_delay < 10000 )
+    {
+        i_truc = 4;
+    }
+    
+    if( i_delay < 20000 )
+    {
+        i_synchro_inc--;
+    }   
+    else if( i_delay > 50000 )
+    {
+        i_synchro_inc++;
+    }
+    
+    if( i_synchro_inc*i_last_synchro_inc < 0 )
+    {
+        i_truc = 2;
+    }
+    else
+    {
+        i_truc *= 2;
+    }
+    if( i_truc > VOUT_SYNCHRO_LEVEL_MAX || i_delay == 0 )
+    {
+        i_truc = 2;
+    }
+    
+    r_synchro_level += (float)i_synchro_inc / i_truc;
+    p_vout->i_synchro_level = (int) r_synchro_level;
+    
+    if( r_synchro_level > VOUT_SYNCHRO_LEVEL_MAX )
+    {
+        r_synchro_level = VOUT_SYNCHRO_LEVEL_MAX;
+    }
+
+//    printf( "synchro level : %d, (%d, %d) (%d, %f) - %Ld\n", p_vout->i_synchro_level,
+//            i_last_synchro_inc, i_synchro_inc, i_truc, r_synchro_level, i_delay );    
+    i_last_synchro_inc = i_synchro_inc;    
 }
 
 /*****************************************************************************

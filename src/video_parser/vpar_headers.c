@@ -156,10 +156,15 @@ static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
             vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
         if( p_vpar->sequence.p_backward != NULL )
         {
+#ifdef POLUX_SYNCHRO
+            vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
+                              vpar_SynchroDate( p_vpar ) );
+#endif
 #ifdef SAM_SYNCHRO
             vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
                               vpar_SynchroDate( p_vpar ) );
-#else
+#endif
+#ifdef MEUUH_SYNCHRO
             mtime_t     date;
             date = vpar_SynchroDate( p_vpar );
             vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
@@ -172,15 +177,14 @@ static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
         p_vpar->sequence.p_backward = p_newref;
         if( p_newref != NULL )
             vout_LinkPicture( p_vpar->p_vout, p_newref );
-#ifndef SAM_SYNCHRO
+#ifdef MEUUH_SYNCHRO
         p_vpar->synchro.i_coding_type = i_coding_type;
 #endif
     }
     else if( p_newref != NULL )
     {
         /* Put date immediately. */
-        vout_DatePicture( p_vpar->p_vout, p_newref,
-                          vpar_SynchroDate( p_vpar ) );
+        vout_DatePicture( p_vpar->p_vout, p_newref, vpar_SynchroDate(p_vpar) );
     }
 }
 
@@ -525,7 +529,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     RemoveBits( &p_vpar->bit_stream, 10 ); /* temporal_reference */
     p_vpar->picture.i_coding_type = GetBits( &p_vpar->bit_stream, 3 );
     RemoveBits( &p_vpar->bit_stream, 16 ); /* vbv_delay */
-
+    
     if( p_vpar->picture.i_coding_type == P_CODING_TYPE
         || p_vpar->picture.i_coding_type == B_CODING_TYPE )
     {
@@ -646,15 +650,21 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                                p_vpar->picture.i_coding_type, i_structure );
         }
     }
-
+#ifdef POLUX_SYNCHRO
+    else if( !p_vpar->picture.i_current_structure )
+    {
+        vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
+    }
+#endif
+    
     if( !b_parsable )
     {
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, NULL );
-
+#ifndef POLUX_SYNCHRO
         /* Warn Synchro we have trashed a picture. */
         vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
-
+#endif
         /* Update context. */
         if( i_structure != FRAME_STRUCTURE )
             p_vpar->picture.i_current_structure = i_structure;

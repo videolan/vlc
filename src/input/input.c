@@ -893,11 +893,12 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
             /* This part of the header does not fit in the current TS packet:
                copy the part of the header we are interested in to the
                p_pes_header_save buffer. The buffer is dynamicly allocated if
-	       needed so it's time expensive but this situation almost never
-	       occur. */
+               needed so it's time expensive but this situation almost never occur. */
             intf_DbgMsg("Code never tested encountered, WARNING ! (benny)\n");
-	    if( !p_pes->p_pes_header_save )
-	        p_pes->p_pes_header_save = malloc(PES_HEADER_SIZE);
+            if( !p_pes->p_pes_header_save )
+            {
+                p_pes->p_pes_header_save = malloc(PES_HEADER_SIZE); 
+            }
 
             do
             {

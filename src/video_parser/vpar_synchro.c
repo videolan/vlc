@@ -399,7 +399,9 @@ mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
     return i_displaydate;
 }
 
-#else
+#endif
+
+#ifdef MEUUH_SYNCHRO
 
 /* synchro a deux balles backportee du decodeur de reference. NE MARCHE PAS
 AVEC LES IMAGES MONOTRAMES */
@@ -513,6 +515,148 @@ void vpar_SynchroKludge( vpar_thread_t * p_vpar, mtime_t date )
     p_vpar->synchro.kludge_prevdate = show_date;
     if ((p_vpar->synchro.kludge_level - p_vpar->synchro.kludge_nbp) > p_vpar->synchro.kludge_nbb)
         p_vpar->synchro.kludge_level = p_vpar->synchro.kludge_nbb + p_vpar->synchro.kludge_nbp;
+}
+
+#endif
+
+
+#ifdef POLUX_SYNCHRO
+
+void vpar_SynchroSetCurrentDate( vpar_thread_t * p_vpar, int i_coding_type )
+{
+    pes_packet_t * p_pes = 
+        p_vpar->bit_stream.p_decoder_fifo->buffer[p_vpar->bit_stream.p_decoder_fifo->i_start]; 
+
+    
+    switch( i_coding_type )
+    {
+    case B_CODING_TYPE:
+        if( p_pes->b_has_pts )
+        {
+            if( p_pes->i_pts < p_vpar->synchro.i_current_frame_date )
+            {
+                fprintf( stderr, "vpar warning: pts_date < current_date\n" );
+            }
+            p_vpar->synchro.i_current_frame_date = p_pes->i_pts;
+            p_pes->b_has_pts = 0;
+        }
+        else
+        {
+            p_vpar->synchro.i_current_frame_date += 1000000/(1+p_vpar->sequence.r_frame_rate);
+        }
+        break;
+        
+    default:
+
+        if( p_vpar->synchro.i_backward_frame_date == 0 )
+        {
+            p_vpar->synchro.i_current_frame_date += 1000000/(1+p_vpar->sequence.r_frame_rate);
+        }
+        else
+        {
+            if( p_vpar->synchro.i_backward_frame_date < p_vpar->synchro.i_current_frame_date )
+            {
+                fprintf( stderr, "vpar warning: backward_date < current_date (%Ld)\n",
+                         p_vpar->synchro.i_backward_frame_date - p_vpar->synchro.i_current_frame_date );
+            }
+            p_vpar->synchro.i_current_frame_date = p_vpar->synchro.i_backward_frame_date;
+            p_vpar->synchro.i_backward_frame_date = 0;
+        }
+
+        if( p_pes->b_has_pts )
+        {
+            p_vpar->synchro.i_backward_frame_date = p_pes->i_pts;
+            p_pes->b_has_pts = 0;
+        }
+       break;
+    }
+}
+
+boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
+                              int i_structure )
+{
+    boolean_t b_result = 1;
+    int i_synchro_level = p_vpar->p_vout->i_synchro_level;
+    
+    vpar_SynchroSetCurrentDate( p_vpar, i_coding_type );
+
+    /* 
+     * The synchro level is updated by the video input (see SynchroLevelUpdate)
+     * so we just use the synchro_level to decide which frame to trash
+     */
+    
+    switch( i_coding_type )
+    {
+    case I_CODING_TYPE:
+       if( p_vpar->synchro.i_i_count != 0 )
+        {
+            p_vpar->synchro.i_p_nb = p_vpar->synchro.i_p_count;
+            p_vpar->synchro.i_b_nb = p_vpar->synchro.i_b_count;
+        }
+        p_vpar->synchro.i_p_count = p_vpar->synchro.i_b_count = 0;
+        p_vpar->synchro.i_b_trasher = p_vpar->synchro.i_b_nb / 2;
+        p_vpar->synchro.i_i_count++;
+        break;
+
+    case P_CODING_TYPE:
+        p_vpar->synchro.i_p_count++;
+        if( p_vpar->synchro.i_p_count > i_synchro_level )
+        {
+            b_result = 0;
+        }
+        break;
+        
+    case B_CODING_TYPE:
+        p_vpar->synchro.i_b_count++;
+        if( p_vpar->synchro.i_p_nb >= i_synchro_level )
+        {
+            /* We must trash all the B */
+            b_result = 0;
+        }
+        else
+        {
+            /* We use the brensenham algorithm to decide which B to trash */
+            p_vpar->synchro.i_b_trasher +=
+                p_vpar->synchro.i_b_nb - (i_synchro_level-p_vpar->synchro.i_p_nb);
+            if( p_vpar->synchro.i_b_trasher >= p_vpar->synchro.i_b_nb )
+            {
+                b_result = 0;
+                p_vpar->synchro.i_b_trasher -= p_vpar->synchro.i_b_nb;
+            }
+        }
+        break;
+    }
+   
+    return( b_result );
+}
+
+void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
+                        int i_structure )
+{
+    vpar_SynchroChoose( p_vpar, i_coding_type, i_structure );
+}
+
+void vpar_SynchroUpdateLevel()
+{
+    //vlc_mutex_lock( &level_lock );
+    //vlc_mutex_unlock( &level_lock );
+}
+
+mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
+{
+//fprintf( stderr, "delay : %Ld\n" , mdate() - p_vpar->synchro.i_current_frame_date );
+    return( p_vpar->synchro.i_current_frame_date );
+}
+
+/* functions with no use */
+
+void vpar_SynchroEnd( vpar_thread_t * p_vpar )
+{
+}
+
+void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
+                            int i_structure )
+{
 }
 
 #endif
