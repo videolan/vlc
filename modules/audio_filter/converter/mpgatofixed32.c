@@ -273,14 +273,19 @@ static int OpenFilter( vlc_object_t *p_this )
     mad_synth_init( &p_sys->mad_synth );
     mad_stream_options( &p_sys->mad_stream, MAD_OPTION_IGNORECRC );
 
+    if( p_this->p_libvlc->i_cpu & CPU_CAPABILITY_FPU )
+        p_filter->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+    else
+        p_filter->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');
+    p_filter->fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
+
+    p_filter->fmt_out.audio.i_bitspersample = sizeof(float);
+    p_filter->fmt_out.audio.i_rate = p_filter->fmt_in.audio.i_rate;
+
     msg_Dbg( p_this, "%4.4s->%4.4s, bits per sample: %i",
              (char *)&p_filter->fmt_in.i_codec,
              (char *)&p_filter->fmt_out.i_codec,
              p_filter->fmt_out.audio.i_bitspersample );
-
-    p_filter->fmt_out.i_codec =
-        p_filter->fmt_out.audio.i_format = VLC_FOURCC('f','l','3','2');
-    p_filter->fmt_out.audio.i_bitspersample = sizeof(float);
 
     return 0;
 }

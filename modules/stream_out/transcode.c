@@ -890,6 +890,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
                                 sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+    es_format_t fmt_last;
 
     /*
      * Open decoder
@@ -911,6 +912,9 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     }
     id->p_decoder->fmt_out.audio.i_bitspersample = 
         audio_BitsPerSample( id->p_decoder->fmt_out.i_codec );
+    fmt_last = id->p_decoder->fmt_out;
+    /* FIX decoders so we don't have to do this */
+    fmt_last.audio.i_rate = id->p_decoder->fmt_in.audio.i_rate;
 
     /*
      * Open encoder
@@ -962,7 +966,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_in.audio.i_bitspersample =
         audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
-    /* Check if we need a filter for chroma conversion or resizing */
+    /* Check if we need a filter for the audio format conversion */
     if( id->p_decoder->fmt_out.i_codec !=
         id->p_encoder->fmt_in.i_codec )
     {
@@ -972,7 +976,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
 
         id->pp_filter[0]->pf_audio_buffer_new = __block_New;
 
-        id->pp_filter[0]->fmt_in = id->p_decoder->fmt_out;
+        id->pp_filter[0]->fmt_in = fmt_last;
         id->pp_filter[0]->fmt_out = id->p_encoder->fmt_in;
         id->pp_filter[0]->p_module =
             module_Need( id->pp_filter[0], "audio filter2", 0, 0 );
@@ -993,6 +997,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
 
         id->pp_filter[0]->fmt_out.audio.i_bitspersample = 
             audio_BitsPerSample( id->pp_filter[0]->fmt_out.i_codec );
+        fmt_last = id->pp_filter[0]->fmt_out;
 
         /* Try a 2 stage conversion */
         if( id->pp_filter[0]->fmt_out.i_codec !=
@@ -1029,6 +1034,86 @@ static int transcode_audio_new( sout_stream_t *p_stream,
                 return VLC_EGENERIC;
             }
             else id->i_filter++;
+
+            fmt_last = id->pp_filter[1]->fmt_out;
+        }
+    }
+
+    /* Check if we need a filter for channel downmixing */
+    if( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels )
+    {
+        id->pp_filter[id->i_filter] =
+            vlc_object_create( p_stream, VLC_OBJECT_FILTER );
+        vlc_object_attach( id->pp_filter[id->i_filter], p_stream );
+
+        id->pp_filter[id->i_filter]->pf_audio_buffer_new = __block_New;
+
+        id->pp_filter[id->i_filter]->fmt_in = fmt_last;
+        id->pp_filter[id->i_filter]->fmt_out = id->p_encoder->fmt_in;
+        id->pp_filter[id->i_filter]->fmt_out.audio.i_rate =
+            fmt_last.audio.i_rate;
+
+        id->pp_filter[id->i_filter]->p_module =
+            module_Need( id->pp_filter[id->i_filter], "audio filter2", 0, 0 );
+        if( id->pp_filter[id->i_filter]->p_module )
+        {
+            id->pp_filter[id->i_filter]->fmt_out.audio.i_bitspersample = 
+                audio_BitsPerSample( id->pp_filter[id->i_filter]->fmt_out.i_codec );
+            fmt_last = id->pp_filter[id->i_filter]->fmt_out;
+
+            id->i_filter++;
+        }
+        else
+        {
+            msg_Dbg( p_stream, "no audio filter found for mixing from"
+                     " %i to %i channels",
+                     id->pp_filter[id->i_filter]->fmt_in.audio.i_channels,
+                     id->pp_filter[id->i_filter]->fmt_out.audio.i_channels );
+            vlc_object_detach( id->pp_filter[id->i_filter] );
+            vlc_object_destroy( id->pp_filter[id->i_filter] );
+            id->p_encoder->fmt_in.audio.i_channels = fmt_last.audio.i_channels;
+            id->p_encoder->fmt_out.audio.i_channels =fmt_last.audio.i_channels;
+
+            id->p_encoder->fmt_in.audio.i_physical_channels =
+                id->p_encoder->fmt_in.audio.i_original_channels =
+                    fmt_last.audio.i_physical_channels;
+            id->p_encoder->fmt_out.audio.i_physical_channels =
+                id->p_encoder->fmt_out.audio.i_original_channels =
+                    fmt_last.audio.i_physical_channels;
+        }
+    }
+
+    /* Check if we need a filter for the sampling rate conversion */
+    if( fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate )
+    {
+        id->pp_filter[id->i_filter] =
+            vlc_object_create( p_stream, VLC_OBJECT_FILTER );
+        vlc_object_attach( id->pp_filter[id->i_filter], p_stream );
+
+        id->pp_filter[id->i_filter]->pf_audio_buffer_new = __block_New;
+
+        id->pp_filter[id->i_filter]->fmt_in = fmt_last;
+        id->pp_filter[id->i_filter]->fmt_out = id->p_encoder->fmt_in;
+        id->pp_filter[id->i_filter]->p_module =
+            module_Need( id->pp_filter[id->i_filter], "audio filter2", 0, 0 );
+        if( id->pp_filter[id->i_filter]->p_module )
+        {
+            id->pp_filter[id->i_filter]->fmt_out.audio.i_bitspersample = 
+                audio_BitsPerSample( id->pp_filter[id->i_filter]->fmt_out.i_codec );
+            fmt_last = id->pp_filter[id->i_filter]->fmt_out;
+
+            id->i_filter++;
+        }
+        else
+        {
+            msg_Dbg( p_stream, "no audio filter found resampling from"
+                     " %iHz to %iHz",
+                     id->pp_filter[id->i_filter]->fmt_in.audio.i_rate,
+                     id->pp_filter[id->i_filter]->fmt_out.audio.i_rate );
+            vlc_object_detach( id->pp_filter[id->i_filter] );
+            vlc_object_destroy( id->pp_filter[id->i_filter] );
+            id->p_encoder->fmt_in.audio.i_rate = fmt_last.audio.i_rate;
+            id->p_encoder->fmt_out.audio.i_rate = fmt_last.audio.i_rate;
         }
     }
 

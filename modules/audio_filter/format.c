@@ -220,8 +220,9 @@ static int Open( vlc_object_t *p_this )
     if( ConvertTable[i].pf_convert == NULL )
         return VLC_EGENERIC;
 
-    
     p_filter->pf_audio_filter = ConvertTable[i].pf_convert;
+    p_filter->fmt_out.audio = p_filter->fmt_in.audio;
+    p_filter->fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
 
     msg_Dbg( p_this, "%4.4s->%4.4s, bits per sample: %i",
              (char *)&p_filter->fmt_in.i_codec,

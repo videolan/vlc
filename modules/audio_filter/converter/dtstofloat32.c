@@ -414,6 +414,7 @@ static int OpenFilter( vlc_object_t *p_this )
                   p_filter->fmt_in.audio, p_filter->fmt_out.audio );
 
     p_filter->pf_audio_filter = Convert;
+    p_filter->fmt_out.audio.i_rate = p_filter->fmt_in.audio.i_rate;
 
     return i_ret;
 }
