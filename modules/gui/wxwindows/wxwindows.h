@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.67 2003/11/05 17:57:29 gbazin Exp $
+ * $Id: wxwindows.h,v 1.68 2003/11/09 20:13:46 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -314,8 +314,8 @@ private:
     wxPanel *FilePanel( wxWindow* parent );
     wxPanel *DiscPanel( wxWindow* parent );
     wxPanel *NetPanel( wxWindow* parent );
-    wxPanel *SatPanel( wxWindow* parent );
     wxPanel *V4LPanel( wxWindow* parent );
+    wxPanel *AutoBuildPanel( wxWindow* parent, const module_t * );
 
     void UpdateMRL( int i_access_method );
 

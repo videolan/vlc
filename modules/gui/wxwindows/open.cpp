@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.40 2003/11/05 17:57:29 gbazin Exp $
+ * $Id: open.cpp,v 1.41 2003/11/09 20:13:46 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -51,6 +51,8 @@
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
+
+#include "preferences_widgets.h"
 
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0
@@ -256,12 +258,16 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     notebook->AddPage( NetPanel( notebook ), wxU(_("Network")),
                        i_access_method == NET_ACCESS );
 #ifndef WIN32
-    notebook->AddPage( SatPanel( notebook ), wxU(_("Satellite")),
-                       i_access_method == SAT_ACCESS );
-
     notebook->AddPage( V4LPanel( notebook ), wxU(_("Video For Linux")),
                        i_access_method == V4L_ACCESS );
 #endif
+
+    module_t *p_module = config_FindModule( VLC_OBJECT(p_intf), "dshow" );
+    if( p_module )
+    {
+        notebook->AddPage( AutoBuildPanel( notebook, p_module ),
+                           wxU( p_module->psz_longname ) );
+    }
 
     /* Update Disc panel */
     wxCommandEvent dummy_event;
@@ -582,10 +588,32 @@ wxPanel *OpenDialog::V4LPanel( wxWindow* parent )
 }
 #endif
 
-wxPanel *OpenDialog::SatPanel( wxWindow* parent )
+wxPanel *OpenDialog::AutoBuildPanel( wxWindow* parent,
+                                     const module_t *p_module )
 {
     wxPanel *panel = new wxPanel( parent, -1, wxDefaultPosition,
                                   wxSize(200, 200) );
+
+    wxBoxSizer *sizer = new wxBoxSizer( wxVERTICAL );
+
+    module_config_t *p_item = p_module->p_config;
+
+    if( p_item ) do
+    {
+        if( p_item->i_type & CONFIG_HINT || p_item->b_advanced )
+            continue;
+
+        ConfigControl *control =
+            CreateConfigControl( VLC_OBJECT(p_intf), p_item, panel );
+
+        /* Don't add items that were not recognized */
+        if( control == NULL ) continue;
+
+        sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
+    }
+    while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+
+    panel->SetSizerAndFit( sizer );
     return panel;
 }
 
