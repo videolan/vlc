@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.28 2003/10/29 17:32:55 zorglub Exp $
+ * $Id: sap.c,v 1.29 2003/11/03 22:36:45 sam Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -226,7 +226,7 @@ static void Run( intf_thread_t *p_intf )
 
     if( sap_ipv4 == -1 || sap_ipv6 == -1 || sap_ipv6_scope == NULL )
     {
-        msg_Warn( p_intf, "Unable to parse module configuration" );
+        msg_Warn( p_intf, "unable to parse module configuration" );
         return;
     }
 
@@ -234,9 +234,11 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
     {
-        msg_Err( p_intf, "Out of memory !");
-        return VLC_EGENERIC;
+        msg_Err( p_intf, "out of memory");
+        p_intf->b_die = VLC_TRUE;
+        return;
     }
+
     /* Create our playlist group */
     p_playlist =
           (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -269,7 +271,8 @@ static void Run( intf_thread_t *p_intf )
 
         if( !( p_network = module_Need( p_intf, "network", psz_network ) ) )
         {
-            msg_Warn( p_intf, "failed to open a connection (udp)" );
+            msg_Warn( p_intf, "failed to open a UDP connection" );
+            p_intf->b_die = VLC_TRUE;
             return;
         }
         module_Unneed( p_intf, p_network );
@@ -286,7 +289,7 @@ static void Run( intf_thread_t *p_intf )
 
         if( !psz_addrv6)
         {
-            msg_Warn( p_intf, "Out of memory !" );
+            msg_Warn( p_intf, "out of memory" );
         }
         /* Max size of an IPv6 address */
 
@@ -307,7 +310,8 @@ static void Run( intf_thread_t *p_intf )
 
         if( !( p_network = module_Need( p_intf, "network", psz_network ) ) )
         {
-            msg_Warn( p_intf, "failed to open a connection (udp)" );
+            msg_Warn( p_intf, "failed to open a UDP connection" );
+            p_intf->b_die = VLC_TRUE;
             return;
         }
         module_Unneed( p_intf, p_network );
@@ -327,7 +331,7 @@ static void Run( intf_thread_t *p_intf )
 
         if( i_read < 0 )
         {
-            msg_Err( p_intf, "Cannot read in the socket" );
+            msg_Err( p_intf, "cannot read from socket" );
         }
         if( i_read == 0 )
         {
@@ -344,14 +348,14 @@ static void Run( intf_thread_t *p_intf )
     {
         if( close( fd ) )
         {
-            msg_Warn( p_intf, "Ohoh, unable to close the socket" );
+            msg_Warn( p_intf, "uh-oh, unable to close the socket" );
         }
     }
     if( fdv6 > 0)
     {
         if( close( fdv6 ) )
         {
-            msg_Warn( p_intf, "Ohoh, unable to close the socket" );
+            msg_Warn( p_intf, "uh-oh, unable to close the socket" );
         }
     }
 }
@@ -397,8 +401,8 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
         p_item = malloc( sizeof( playlist_item_t ) );
         if( p_item == NULL )
         {
-            msg_Err( p_intf, "Not enough memory for p_item in sesstoitem()" );
-            return 0;
+            msg_Err( p_intf, "out of memory for p_item in sesstoitem()" );
+            return VLC_ENOMEM;
         }
         p_item->psz_name = strdup( p_sd->psz_sessionname );
         p_item->i_type = 0;
@@ -415,7 +419,7 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
         if( !p_sd->pp_media[i_count] )
         {
-            return 0;
+            return VLC_EGENERIC;
         }
 
         mfield_parse( p_sd->pp_media[i_count]->psz_medianame,
@@ -423,7 +427,7 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
         if( !psz_proto || !psz_port )
         {
-            return 0;
+            return VLC_EGENERIC;
         }
 
         if( p_sd->pp_media[i_count]->psz_mediaconnection )
@@ -438,7 +442,7 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
         if( psz_uri == NULL )
         {
-            return 0;
+            return VLC_EGENERIC;
         }
 
         for( i = 0 ; i< p_sd->i_attributes ; i++ )
@@ -451,7 +455,6 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             if(!strcasecmp( p_sd->pp_attributes[i]->psz_field , "http-path"))
             {
                 psz_http_path = strdup(  p_sd->pp_attributes[i]->psz_value );
-
             }
         }
 
@@ -466,9 +469,9 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
             if( p_item->psz_uri == NULL )
             {
-                msg_Err( p_intf, "Not enough memory");
+                msg_Err( p_intf, "out of memory");
                 free( p_item );
-                return 0;
+                return VLC_ENOMEM;
             }
 
             if( i_multicast == 1)
@@ -492,9 +495,9 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
             if( p_item->psz_uri == NULL )
             {
-                msg_Err( p_intf, "Not enough memory");
+                msg_Err( p_intf, "out of memory" );
                 free( p_item );
-                return 0;
+                return VLC_ENOMEM;
             }
 
             sprintf( p_item->psz_uri, "%s://%s:%s%s", psz_proto,
@@ -520,8 +523,7 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             free(psz_http_path);
     }
 
-    return 1;
-
+    return VLC_SUCCESS;
 }
 
 /**********************************************************************
@@ -687,17 +689,17 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
     char *psz_eof;
 
     unsigned int i;
-    // According to RFC 2327, the first bytes should be exactly "v="
-    if((p_packet[0] != 'v') || (p_packet[1] != '='))
+    /* According to RFC 2327, the first bytes should be exactly "v=" */
+    if( p_packet[0] != 'v' || p_packet[1] != '=' )
     {
-        msg_Warn(p_intf, "Bad SDP packet");
+        msg_Warn( p_intf, "bad SDP packet %.2x%.2x", p_packet[0], p_packet[1] );
         return NULL;
     }
 
     if( ( sd = malloc( sizeof(sess_descr_t) ) ) == NULL )
     {
-        msg_Err( p_intf, "Not enough memory for sd in parse_sdp()" );
-        return( NULL );
+        msg_Err( p_intf, "out of memory for sd in parse_sdp()" );
+        return NULL;
     }
 
     sd->pp_media = NULL;
@@ -785,14 +787,14 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
                     }
                     if( !sd->pp_attributes )
                     {
-                        msg_Warn( p_intf, "Out of memory !" );
+                        msg_Warn( p_intf, "out of memory" );
                         return NULL;
                     }
                     sd->pp_attributes[sd->i_attributes] =
                             malloc( sizeof( attr_descr_t ) );
                     if( ! sd->pp_attributes[sd->i_attributes])
                     {
-                        msg_Warn( p_intf, "Out of memory !" );
+                        msg_Warn( p_intf, "out of memory" );
                         return NULL;
                     }
 
@@ -838,7 +840,7 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
                     }
                     if( !sd->pp_media )
                     {
-                        msg_Warn( p_intf, "Out of memory !" );
+                        msg_Warn( p_intf, "out of memory" );
                         return NULL;
                     }
                     sd->pp_media[sd->i_media] =
@@ -926,16 +928,26 @@ static int ismult( char *psz_uri )
     /* IPv6 */
     if( psz_uri[0] == '[')
     {
-      if( strncasecmp( &psz_uri[1], "FF0" , 3) ||
-          strncasecmp( &psz_uri[2], "FF0" , 3))
-            return( VLC_TRUE );
-        else
-            return( VLC_FALSE );
+        if( !strncasecmp( &psz_uri[1], "FF0" , 3) &&
+            !strncasecmp( &psz_uri[2], "FF0" , 3) )
+        {
+            return VLC_FALSE;
+        }
+
+        return VLC_TRUE;
     }
 
-    if( *psz_end != '.' ) { return( VLC_FALSE ); }
+    if( *psz_end != '.' )
+    {
+        return VLC_FALSE;
+    }
 
-    return( i_value < 224 ? VLC_FALSE : VLC_TRUE );
+    if( i_value < 224 )
+    {
+        return VLC_FALSE;
+    }
+
+    return VLC_TRUE;
 }
 
 
@@ -978,34 +990,33 @@ static ssize_t NetRead( intf_thread_t *p_intf,
     timeout.tv_usec = 500000;
 
     /* Find if some data is available */
-    i_ret = select( i_max_handle + 1, &fds,
-    NULL, NULL, &timeout );
+    i_ret = select( i_max_handle + 1, &fds, NULL, NULL, &timeout );
 
     if( i_ret == -1 && errno != EINTR )
     {
         msg_Err( p_intf, "network select error (%s)", strerror(errno) );
     }
     else if( i_ret > 0 )
-   {
-      /* Get the data */
-      if(i_handle >0)
-      {
-         if(FD_ISSET( i_handle, &fds ))
-         {
-             i_recv = recv( i_handle, p_buffer, i_len, 0 );
-         }
-      }
-      if(i_handle_v6 >0)
-      {
-         if(FD_ISSET( i_handle_v6, &fds ))
-         {
-            i_recv = recv( i_handle_v6, p_buffer, i_len, 0 );
-         }
-      }
-
-       if( i_recv < 0 )
+    {
+        /* Get the data */
+        if(i_handle >0)
         {
-           msg_Err( p_intf, "recv failed (%s)", strerror(errno) );
+            if(FD_ISSET( i_handle, &fds ))
+            {
+                i_recv = recv( i_handle, p_buffer, i_len, 0 );
+            }
+        }
+        if(i_handle_v6 >0)
+        {
+            if(FD_ISSET( i_handle_v6, &fds ))
+            {
+                i_recv = recv( i_handle_v6, p_buffer, i_len, 0 );
+            }
+        }
+
+        if( i_recv < 0 )
+        {
+            msg_Err( p_intf, "recv failed (%s)", strerror(errno) );
         }
         return i_recv;
     }
