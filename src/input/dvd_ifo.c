@@ -2,6 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
+ * $Id: dvd_ifo.c,v 1.7 2001/02/08 01:34:41 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -33,6 +34,7 @@
 
 #include "intf_msg.h"
 #include "dvd_ifo.h"
+#include "input_dvd.h"
 
 /*
  * IFO Management.
@@ -176,8 +178,7 @@ void IfoEnd( ifo_t* p_ifo )
 /*fprintf(stderr, "Pos : %lld Val : %llx\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
                                 (long long)*(p_field) );    */                \
-        p_ifo->i_pos =                                                      \
-                   lseek64( p_ifo->i_fd, p_ifo->i_pos + (i_len), SEEK_SET );\
+        p_ifo->i_pos += i_len;                                              \
     }
 
 #define GETC( p_field )                                                     \
@@ -186,7 +187,7 @@ void IfoEnd( ifo_t* p_ifo )
 /*fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
                                           *(p_field) );*/                     \
-        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 1 , SEEK_SET );\
+        p_ifo->i_pos += 1;                                                  \
     }
 
 #define GETS( p_field )                                                     \
@@ -196,7 +197,7 @@ void IfoEnd( ifo_t* p_ifo )
 /*fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
                                           *(p_field) );*/                     \
-        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 2 , SEEK_SET );\
+        p_ifo->i_pos += 2;                                                  \
     }
 
 #define GETL( p_field )                                                     \
@@ -206,7 +207,7 @@ void IfoEnd( ifo_t* p_ifo )
 /*fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
                                           *(p_field) );*/                     \
-        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 4 , SEEK_SET );\
+        p_ifo->i_pos += 4;                                                  \
     }
 
 #define GETLL( p_field )                                                    \
@@ -216,7 +217,7 @@ void IfoEnd( ifo_t* p_ifo )
 /*fprintf(stderr, "Pos : %lld Value : %lld\n",                                \
                                 (long long)(p_ifo->i_pos - i_start),        \
                                             *(p_field) );*/                   \
-        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 8 , SEEK_SET );\
+        p_ifo->i_pos += 8;                                                  \
     }
 
 #define FLUSH( i_len )                                                      \
@@ -246,9 +247,8 @@ void IfoEnd( ifo_t* p_ifo )
                                 (int)((p_com)->i_sub_cmd),                  \
                                 (int)((p_com)->i_v0),                       \
                                 (int)((p_com)->i_v2),                       \
-                                (int)((p_com)->i_v4) );*/                     \
-        p_ifo->i_pos =                                                      \
-                   lseek64( p_ifo->i_fd, p_ifo->i_pos + 8, SEEK_SET );      \
+                                (int)((p_com)->i_v4) );           */          \
+        p_ifo->i_pos += 8;                                                  \
     }
 
 static pgc_t ReadPGC( ifo_t* p_ifo )
@@ -1110,19 +1110,70 @@ void IfoRead( ifo_t* p_ifo )
 /*
  * IFO virtual machine : a set of commands that give the behaviour of the dvd
  */
-
+#if 0
 /*****************************************************************************
  * CommandRead : translates the command strings in ifo into command
  * structures.
  *****************************************************************************/
-ifo_command_t CommandRead( ifo_t* p_ifo )
+void CommandRead( ifo_command_t com )
 {
-    ifo_command_t   com;
+    u8*     pi_code = (u8*)(&com);
 
-    return com;
+    switch( com.i_type )
+    {
+        case 0:                                     /* Goto */
+            if( !pi_code[1] )
+            {
+                fprintf( stderr, "NOP\n" );
+            }
+            else if( cmd.i_cmp )
+            {
+                
+            }
+            break;
+        case 1:                                     /* Lnk */
+            break;
+        case 2:                                     /* SetSystem */
+            break;
+        case 3:                                     /* Set */
+            break;
+        case 4:                                     /* */
+            break;
+        case 5:                                     /* */
+            break;
+        case 6:                                     /* */
+            break;
+        default:
+            fprintf( stderr, "Unknown Command\n" );
+            break;
+    }
+
+    return;
 }
 
 /*****************************************************************************
- *
+ * IfoGoto
  *****************************************************************************/
+static void IfoGoto( ifo_command_t cmd )
+{
+    
 
+    return;
+}
+
+/*****************************************************************************
+ * IfoLnk
+ *****************************************************************************/
+static void IfoLnk( ifo_t* p_ifo )
+{
+    return;
+}
+
+/*****************************************************************************
+ * IfoJmp
+ *****************************************************************************/
+static void IfoJmp( ifo_t* p_ifo )
+{
+    return;
+}
+#endif

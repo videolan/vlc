@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.28 2001/01/07 03:56:40 henri Exp $
+ * $Id: input_netlist.c,v 1.29 2001/02/08 01:34:42 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -52,7 +52,7 @@
  * input_NetlistInit: allocates netlist buffers and init indexes
  *****************************************************************************/
 int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
-                       size_t i_buffer_size )
+                       size_t i_buffer_size, int i_read_once )
 {
     unsigned int i_loop;
     netlist_t * p_netlist;
@@ -155,13 +155,16 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
     p_netlist->i_nb_pes = i_nb_pes;
     p_netlist->i_buffer_size = i_buffer_size;
 
+    p_netlist->i_read_once = i_read_once;
+
     return (0); /* Everything went all right */
 }
 
 /*****************************************************************************
  * input_NetlistGetiovec: returns an iovec pointer for a readv() operation
  *****************************************************************************/
-struct iovec * input_NetlistGetiovec( void * p_method_data )
+struct iovec * input_NetlistGetiovec( void * p_method_data,
+                                      struct data_packet_s ** pp_data )
 {
     netlist_t * p_netlist;
 
@@ -169,9 +172,9 @@ struct iovec * input_NetlistGetiovec( void * p_method_data )
     p_netlist = ( netlist_t * ) p_method_data;
     
     /* check */
-    if ( 
+    if( 
      (p_netlist->i_data_end - p_netlist->i_data_start + p_netlist->i_nb_data)
-     %p_netlist->i_nb_data < INPUT_READ_ONCE )
+     %p_netlist->i_nb_data < p_netlist->i_read_once )
     {
         intf_ErrMsg("Empty iovec FIFO. Unable to allocate memory");
         return (NULL);
@@ -181,13 +184,21 @@ struct iovec * input_NetlistGetiovec( void * p_method_data )
      * so, as a solution, we chose to have a FIFO a bit longer
      * than i_nb_data, and copy the begining of the FIFO to its end
      * if the readv needs to go after the end */
-    if( p_netlist->i_nb_data - p_netlist->i_data_start < INPUT_READ_ONCE )
+    if( p_netlist->i_nb_data - p_netlist->i_data_start <
+                                                    p_netlist->i_read_once )
+    {
         memcpy( &p_netlist->p_free_iovec[p_netlist->i_nb_data], 
                 p_netlist->p_free_iovec, 
-                INPUT_READ_ONCE-(p_netlist->i_nb_data-p_netlist->i_data_start)
-                * sizeof(struct iovec *)
+                (p_netlist->i_read_once-
+                    (p_netlist->i_nb_data-p_netlist->i_data_start))
+                    * sizeof(struct iovec*)
               );
+
+    }
  
+    /* Gives a pointer to the data_packet struct associated with io_vec */
+    *pp_data = p_netlist->pp_free_data[p_netlist->i_data_start];
+
     /* Initialize payload start and end */
     p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_start 
         = p_netlist->pp_free_data[p_netlist->i_data_start]->p_buffer;
@@ -259,10 +270,6 @@ struct data_packet_s * input_NetlistNewPacket( void * p_method_data,
     /* unlock */
     vlc_mutex_unlock (&p_netlist->lock);
 
-    if (i_buffer_size < p_netlist->i_buffer_size) 
-    {
-        p_return->p_payload_end = p_return->p_payload_start + i_buffer_size;
-    }
    
     /* initialize data */
     p_return->p_next = NULL;
@@ -363,7 +370,7 @@ void input_NetlistDeletePES( void * p_method_data, pes_packet_t * p_pes )
         p_netlist->pp_free_data[p_netlist->i_data_end] = p_current_packet;
         
         p_netlist->p_free_iovec[p_netlist->i_data_end].iov_base 
-            = p_netlist->p_data->p_buffer;
+            = p_current_packet->p_buffer;
     
         p_current_packet = p_current_packet->p_next;
     }
@@ -375,6 +382,7 @@ void input_NetlistDeletePES( void * p_method_data, pes_packet_t * p_pes )
     
     /* unlock */
     vlc_mutex_unlock (&p_netlist->lock);
+
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.30 2001/02/07 17:44:52 massiot Exp $
+ * $Id: mpeg_system.c,v 1.31 2001/02/08 01:34:42 stef Exp $
  *
  * Authors: 
  *
@@ -396,6 +396,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
         p_pes = NULL;
     }
 #undef p_pes
+
 }
 
 /*****************************************************************************
@@ -858,7 +859,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     /* Trash the packet if it has no payload or if it isn't selected */
     if( b_trash )
     {
-        p_input->p_plugin->pf_delete_packet( p_input, p_data );
+        p_input->p_plugin->pf_delete_packet( p_input->p_method_data, p_data );
 #ifdef STATS
         p_input->c_packets_trashed++;
 #endif

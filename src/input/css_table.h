@@ -2,6 +2,7 @@
  * css_table.h : Various tables needed by css unencryption
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
+ * $Id: css_table.h,v 1.2 2001/02/08 01:34:41 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *

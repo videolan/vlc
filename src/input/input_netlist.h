@@ -24,6 +24,9 @@ typedef struct netlist_s
     /* Index */
     unsigned int            i_data_start, i_data_end;
     unsigned int            i_pes_start, i_pes_end;
+
+    /* Number of blocs read once by readv */
+    unsigned int            i_read_once;
 } netlist_t;
 
 /*****************************************************************************
@@ -31,8 +34,9 @@ typedef struct netlist_s
  *****************************************************************************/
 int                     input_NetlistInit( struct input_thread_s *,
                                            int i_nb_data, int i_nb_pes,
-                                           size_t i_buffer_size );
-struct iovec *          input_NetlistGetiovec( void * );
+                                           size_t i_buffer_size,
+                                           int i_read_once );
+struct iovec *          input_NetlistGetiovec( void *, struct data_packet_s** );
 void                    input_NetlistMviovec( void *, size_t );
 struct data_packet_s *  input_NetlistNewPacket( void *, size_t );
 struct pes_packet_s *   input_NetlistNewPES( void * );

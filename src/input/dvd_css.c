@@ -2,6 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
+ * $Id: dvd_css.c,v 1.5 2001/02/08 01:34:41 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -46,6 +47,8 @@
 
 #include "intf_msg.h"
 #include "dvd_css.h"
+#include "dvd_ifo.h"
+#include "input_dvd.h"
 #include "css_table.h"
 
 /*****************************************************************************
@@ -657,6 +660,25 @@ static int CSScracker( int StartVal,
 /*
  * Authentication and keys
  */
+
+/*****************************************************************************
+ * CSSTest : check if the disc is encrypted or not
+ *****************************************************************************/
+int CSSTest( int i_fd )
+{
+    dvd_struct dvd;
+
+    dvd.type = DVD_STRUCT_COPYRIGHT;
+    dvd.copyright.layer_num = 0;
+
+    if( ioctl( i_fd, DVD_READ_STRUCT, &dvd ) < 0 )
+    {
+        intf_ErrMsg( "DVD ioctl error" );
+        return -1;
+    }
+
+    return dvd.copyright.cpst;
+}
 
 /*****************************************************************************
  * CSSInit : CSS Structure initialisation and DVD authentication.
