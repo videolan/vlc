@@ -216,13 +216,13 @@ HEADERS_include_built = \
 	$(NULL)
 
 include/vlc_symbols.h: Makefile $(HEADERS_include)
-	./toolbox --update-includes $(BUILTINS)
+	cd $(srcdir) && ./toolbox --update-includes $(BUILTINS)
 
 src/misc/modules_plugin.h: Makefile src/misc/modules_plugin.h.in $(HEADERS_include)
-	./toolbox --update-includes $(BUILTINS)
+	cd $(srcdir) && ./toolbox --update-includes $(BUILTINS)
 
 src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in
-	./toolbox --update-includes $(BUILTINS)
+	cd $(srcdir) && ./toolbox --update-includes $(BUILTINS)
 
 # These dependencies are mandatory
 $(SOURCES): include/vlc_symbols.h
@@ -233,7 +233,7 @@ $(SOURCES_libvlc): src/misc/modules_plugin.h src/misc/modules_builtin.h $(LIB_in
 ###############################################################################
 
 intl/libintl.a: FORCE
-	cd intl && $(MAKE)
+	cd $(srcdir)/intl && $(MAKE)
 
 if BUILD_INTL
 LIB_intl = intl/libintl.a
@@ -316,18 +316,9 @@ EXTRA_DIST += \
 	evc/modules_builtin_evc.h \
 	$(NULL)
 
-show-libvlc-sources: FORCE
-	@echo X: $(SOURCES_libvlc_common) $(SOURCES_libvlc_win32) $(SOURCES_libvlc_dirent) $(SOURCES_libvlc_getopt)
-
-show-libvlc-headers: FORCE
-	@echo X: $(HEADERS_include) $(HEADERS_include_built)
-
-show-libvlc-pkg-headers: FORCE
-	@echo X: $(dist_pkginclude_HEADERS)
-
 dist-hook:
-	mv vlc.ebuild vlc-${VERSION}.ebuild
-	cd $(distdir); ./toolbox --update-vc
+	mv $(distdir)/vlc.ebuild $(distdir)/vlc-${VERSION}.ebuild
+	cd $(distdir) && $(srcdir)/toolbox --update-vc
 
 ###############################################################################
 # Building libvlc
@@ -471,16 +462,17 @@ vlc_CFLAGS = $(CPPFLAGS_default) $(CFLAGS_default)
 DEPENDENCIES_vlc = lib/libvlc.a $(L_builtin) $(DATA_win32_rc) $(LIB_intl)
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
-	@rm -f vlc$(EXEEXT)
+	@rm -f $(srcdir)/vlc$(EXEEXT)
 	$(LINK) $(vlc_LDFLAGS) $(vlc_OBJECTS) $(vlc_LDADD) $(LIBS)
 
 if HAVE_BEOS
-	xres -o $@ ./share/vlc_beos.rsrc
+	xres -o $@ $(srcdir)/share/vlc_beos.rsrc
 	mimeset -f $@
-	rm -Rf locale ; mkdir locale
+	rm -Rf $(srcdir)/locale ; mkdir $(srcdir)/locale
 	for i in $(ALL_LINGUAS); do \
-		mkdir -p locale/$${i}/LC_MESSAGES ; \
-		cp po/$${i}.gmo locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+		mkdir -p $(srcdir)/locale/$${i}/LC_MESSAGES ; \
+		cp $(srcdir)/po/$${i}.gmo \
+			$(srcdir)/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	done
 endif
 
@@ -497,26 +489,28 @@ vlc_app_DATA = VLC.app
 vlc_appdir = $(bindir)
 VLC.app: vlc $(PLUGIN_FILES)
 	rm -Rf VLC.app
-	cd extras/MacOSX ; pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'
-	cp -r extras/MacOSX/build/vlc.bundle ./VLC.app
-	$(INSTALL) -d VLC.app/Contents/MacOS
-	$(INSTALL) vlc VLC.app/Contents/MacOS/VLC
-	$(INSTALL) -d VLC.app/Contents/MacOS/modules
+	cd $(srcdir)/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'
+	cp -r $(srcdir)/extras/MacOSX/build/vlc.bundle $(srcdir)/VLC.app
+	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS
+	$(INSTALL) vlc $(srcdir)/VLC.app/Contents/MacOS/VLC
+	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/modules
 	for i in dummy $(PLUGIN_FILES) ; do if test "x$$i" != "xdummy" ; then \
-		$(INSTALL) $$i VLC.app/Contents/MacOS/modules/ ; \
+		$(INSTALL) $(srcdir)/$$i \
+			$(srcdir)/VLC.app/Contents/MacOS/modules/ ; \
 	fi ; done
-	$(INSTALL) -d VLC.app/Contents/MacOS/share
-	$(INSTALL) -m 644 share/*.psf share/*.rle VLC.app/Contents/MacOS/share
-	$(INSTALL) -d VLC.app/Contents/MacOS/locale
+	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/share
+	$(INSTALL) -m 644 $(srcdir)/share/*.psf $(srcdir)/share/*.rle \
+		$(srcdir)/VLC.app/Contents/MacOS/share
+	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/locale
 	for i in $(ALL_LINGUAS); do \
-		mkdir -p VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
-		cp po/$${i}.gmo VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
-		mkdir -p VLC.app/Contents/Resources/$${i}.lproj ; \
-		ln -sf ../English.lproj/InfoPlist.strings VLC.app/Contents/Resources/$${i}.lproj ; \
-		ln -sf ../English.lproj/MainMenu.nib VLC.app/Contents/Resources/$${i}.lproj ; \
-		ln -sf ../English.lproj/vlc.scriptTerminology VLC.app/Contents/Resources/$${i}.lproj ; \
+		mkdir -p $(srcdir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
+		cp $(srcdir)/po/$${i}.gmo $(srcdir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+		mkdir -p $(srcdir)/VLC.app/Contents/Resources/$${i}.lproj ; \
+		ln -sf ../English.lproj/InfoPlist.strings $(srcdir)/VLC.app/Contents/Resources/$${i}.lproj ; \
+		ln -sf ../English.lproj/MainMenu.nib $(srcdir)/VLC.app/Contents/Resources/$${i}.lproj ; \
+		ln -sf ../English.lproj/vlc.scriptTerminology $(srcdir)/VLC.app/Contents/Resources/$${i}.lproj ; \
 	done
-	echo -n "APPLVLC#" >| VLC.app/Contents/PkgInfo
+	printf "APPLVLC#" >| $(srcdir)/VLC.app/Contents/PkgInfo
 endif
 
 if HAVE_WIN32
@@ -524,7 +518,7 @@ DATA_win32_rc = $(noinst_share_vlc_win32_rc_DATA)
 noinst_share_vlc_win32_rc_DATA = share/vlc_win32_rc.$(OBJEXT)
 noinst_share_vlc_win32_rcdir = $(libdir)
 share/vlc_win32_rc.$(OBJEXT): share/vlc_win32_rc.rc
-	$(WINDRES) --include-dir share -i $< -o $@
+	$(WINDRES) --include-dir $(srcdir)/share -i $< -o $@
 endif
 
 ###############################################################################
@@ -536,114 +530,120 @@ endif
 #
 # Check that tmp isn't in the way
 package-win32:
-	@if test -e tmp; then \
-		echo "Error: please remove ./tmp, it is in the way"; false; \
+	@if test -e $(srcdir)/tmp; then \
+		echo "Error: please remove $(srcdir)/tmp, it is in the way"; \
+		false; \
 	else \
-		echo "OK."; mkdir tmp; \
+		echo "OK."; mkdir $(srcdir)/tmp; \
 	fi
 # Create installation script
-	cp install-win32 tmp/nsi
+	cp $(srcdir)/install-win32 $(srcdir)/tmp/nsi
 # Copy relevant files
-	cp vlc$(EXEEXT) tmp/ 
-	$(STRIP) tmp/vlc$(EXEEXT)
-	cp INSTALL.win32 tmp/INSTALL.txt ; unix2dos tmp/INSTALL.txt
+	cp $(srcdir)/vlc$(EXEEXT) $(srcdir)/tmp/ 
+	$(STRIP) $(srcdir)/tmp/vlc$(EXEEXT)
+	cp $(srcdir)/INSTALL.win32 $(srcdir)/tmp/INSTALL.txt
+	unix2dos $(srcdir)/tmp/INSTALL.txt
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
-			do cp $$file tmp/$${file}.txt ; \
-			unix2dos tmp/$${file}.txt ; done
+		do cp $(srcdir)/$$file $(srcdir)/tmp/$${file}.txt ; \
+		unix2dos $(srcdir)/tmp/$${file}.txt ; done
 
-	mkdir tmp/plugins
+	mkdir $(srcdir)/tmp/plugins
 	for i in dummy $(PLUGIN_FILES) ; do if test "x$$i" != "xdummy" ; then \
-		$(INSTALL) $$i tmp/plugins/ ; \
+		$(INSTALL) $(srcdir)/$$i $(srcdir)/tmp/plugins/ ; \
 	fi ; done
 
-	for i in dummy tmp/plugins/*$(LIBEXT) ; \
-		do if test $$i != tmp/plugins/libwin32_plugin$(LIBEXT) \
+	for i in dummy $(srcdir)/tmp/plugins/*$(LIBEXT) ; \
+		do if test $$i != $(srcdir)/tmp/plugins/libwin32_plugin$(LIBEXT) \
 		-a $$i != dummy ; then $(STRIP) $$i ; fi ; done
 
-	mkdir tmp/share
-	cp share/*.rle tmp/share/ ;
+	mkdir $(srcdir)/tmp/share
+	cp $(srcdir)/share/*.rle $(srcdir)/tmp/share/ ;
 
-	mkdir tmp/locale
+	mkdir $(srcdir)/tmp/locale
 	for i in $(ALL_LINGUAS); do \
-		mkdir -p tmp/locale/$${i}/LC_MESSAGES ; \
-		cp po/$${i}.gmo tmp/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+		mkdir -p $(srcdir)/tmp/locale/$${i}/LC_MESSAGES ; \
+		cp $(srcdir)/po/$${i}.gmo \
+		   $(srcdir)/tmp/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	done
 
-	mkdir -p tmp/skins/default
-	for i in share/skins/default/*.*; do \
-		cp $$i tmp/skins/default/ || true ; \
+	mkdir -p $(srcdir)/tmp/skins/default
+	for i in $(srcdir)/share/skins/default/*.*; do \
+		cp $$i $(srcdir)/tmp/skins/default/ || true ; \
 	done
-	for i in doc/skins/*.txt; do \
-		cp $$i tmp/skins/ || true ; \
+	for i in $(srcdir)/doc/skins/*.txt; do \
+		cp $$i $(srcdir)/tmp/skins/ || true ; \
 	done
 
-	$(MAKE) -C doc/faq html ;
-	cp doc/faq/faq.html tmp/FAQ.htm ;
+	$(MAKE) -C $(srcdir)/doc/faq html ;
+	cp $(srcdir)/doc/faq/faq.html $(srcdir)/tmp/FAQ.htm ;
 
 # Create package 
-	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} tmp/nsi
+	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} $(srcdir)/tmp/nsi
 # Clean up
-	rm -Rf tmp
+	rm -Rf $(srcdir)/tmp
 
 package-beos:
 # Check that tmp isn't in the way
-	@if test -e tmp; then \
-		echo "Error: please remove ./tmp, it is in the way"; false; \
+	@if test -e $(srcdir)/tmp; then \
+		echo "Error: please remove $(srcdir)/tmp, it is in the way"; \
+		false; \
 	else \
-		echo "OK."; mkdir tmp; \
+		echo "OK."; mkdir $(srcdir)/tmp; \
 	fi
 
 # Copy relevant files
-	mkdir -p tmp/vlc
-	cp vlc AUTHORS COPYING ChangeLog README THANKS NEWS tmp/vlc/
+	mkdir -p $(srcdir)/tmp/vlc
+	cd $(srcdir) && \
+		cp vlc AUTHORS COPYING ChangeLog README THANKS NEWS tmp/vlc/
 # We cannot use ${PLUGIN_FILES}, it looks like it is too long for the BeOS shell...
-	if [ `find modules -name "lib*_plugin.so" | wc -l` -gt 0 ]; then \
-		mkdir -p tmp/vlc/plugins; \
-		find modules -name "lib*_plugin.so" | xargs -i{} cp {} tmp/vlc/plugins/; \
+	if [ `find $(srcdir)/modules -name "lib*_plugin.so" | wc -l` -gt 0 ]; then \
+		mkdir -p $(srcdir)/tmp/vlc/plugins; \
+		find $(srcdir)/modules -name "lib*_plugin.so" | xargs -i{} cp {} $(srcdir)/tmp/vlc/plugins/; \
 	fi
 	for i in $(ALL_LINGUAS); do \
-		mkdir -p tmp/vlc/locale/$${i}/LC_MESSAGES ; \
-		cp po/$${i}.gmo tmp/vlc/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+		mkdir -p $(srcdir)/tmp/vlc/locale/$${i}/LC_MESSAGES ; \
+		cp $(srcdir)/po/$${i}.gmo $(srcdir)/tmp/vlc/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	done
-	mkdir -p tmp/vlc/share
-	cp share/*.rle tmp/vlc/share/
+	mkdir -p $(srcdir)/tmp/vlc/share
+	cp $(srcdir)/share/*.rle $(srcdir)/tmp/vlc/share/
 
 # Create package with debug symbols
-	mimeset -f tmp/vlc/* tmp/vlc/*/*
-	mv tmp/vlc tmp/vlc-${VERSION}
-	(cd tmp ; zip -9 -r vlc-${VERSION}-BeOS.zip vlc-${VERSION} )
-	mv tmp/vlc-${VERSION}-BeOS.zip .
+	mimeset -f $(srcdir)/tmp/vlc/* $(srcdir)/tmp/vlc/*/*
+	mv $(srcdir)/tmp/vlc $(srcdir)/tmp/vlc-${VERSION}
+	(cd $(srcdir)/tmp ; zip -9 -r vlc-${VERSION}-BeOS.zip vlc-${VERSION} )
+	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS.zip $(srcdir)/
 
 # Create package without debug symbols
-	strip tmp/vlc-${VERSION}/vlc
-	if [ -d tmp/vlc-${VERSION}/plugins ]; then \
-		strip tmp/vlc-${VERSION}/plugins/lib*_plugin.so; \
+	strip $(srcdir)/tmp/vlc-${VERSION}/vlc
+	if [ -d $(srcdir)/tmp/vlc-${VERSION}/plugins ]; then \
+		strip $(srcdir)/tmp/vlc-${VERSION}/plugins/lib*_plugin.so; \
 	fi
-	xres -o tmp/vlc-${VERSION}/vlc share/vlc_beos.rsrc
-	mimeset -f tmp/vlc-${VERSION}/* tmp/vlc-${VERSION}/*/*
-	(cd tmp ; zip -9 -r vlc-${VERSION}-BeOS-stripped.zip vlc-${VERSION} )
-	mv tmp/vlc-${VERSION}-BeOS-stripped.zip .
+	xres -o $(srcdir)/tmp/vlc-${VERSION}/vlc $(srcdir)/share/vlc_beos.rsrc
+	mimeset -f $(srcdir)/tmp/vlc-${VERSION}/* $(srcdir)/tmp/vlc-${VERSION}/*/*
+	(cd $(srcdir)/tmp ; zip -9 -r vlc-${VERSION}-BeOS-stripped.zip vlc-${VERSION} )
+	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS-stripped.zip $(srcdir)/
 
 # Clean up
-	rm -Rf tmp
+	rm -Rf $(srcdir)/tmp
 
 package-macosx:
 # Check that tmp isn't in the way
-	@if test -e tmp; then \
-		echo "Error: please remove ./tmp, it is in the way"; false; \
+	@if test -e $(srcdir)/tmp; then \
+		echo "Error: please remove $(srcdir)/tmp, it is in the way"; \
+		false; \
 	else \
-		echo "OK."; mkdir tmp; \
+		echo "OK."; mkdir $(srcdir)/tmp; \
 	fi
 
 # Copy relevant files 
-	cp -R VLC.app tmp/
-	cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS tmp/
+	cp -R $(srcdir)/VLC.app $(srcdir)/tmp/
+	cd $(srcdir) && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS tmp/
 
 # Create disk image 
-	./extras/MacOSX/macosx-dmg 18 "vlc-${VERSION}" tmp/* 
+	$(srcdir)/extras/MacOSX/macosx-dmg 18 "vlc-${VERSION}" $(srcdir)/tmp/* 
 
 # Clean up
-	rm -Rf tmp
+	rm -Rf $(srcdir)/tmp
 
 ###############################################################################
 # Building the Mozilla plugin
@@ -727,7 +727,7 @@ DATA_npvlc_rc = $(noinst_mozilla_npvlc_rc_DATA)
 noinst_mozilla_npvlc_rc_DATA = mozilla/npvlc_rc.$(OBJEXT)
 noinst_mozilla_npvlc_rcdir = $(libdir)
 mozilla/npvlc_rc.$(OBJEXT): mozilla/npvlc_rc.rc
-	$(WINDRES) --include-dir mozilla -i $< -o $@
+	$(WINDRES) --include-dir $(srcdir)/mozilla -i $< -o $@
 endif
 endif
 
