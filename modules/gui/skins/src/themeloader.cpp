@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.6 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: themeloader.cpp,v 1.7 2003/04/20 19:03:15 jlj Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -40,6 +40,7 @@
 #if defined( HAVE_LIBTAR_H ) && defined( HAVE_ZLIB_H )
 #   include <zlib.h>
 #   include <libtar.h>
+#   include <errno.h>
 #endif
 
 //--- SKIN ------------------------------------------------------------------
