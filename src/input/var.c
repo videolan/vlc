@@ -130,6 +130,11 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Change( p_input, "program", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_input, "program", ProgramCallback, NULL );
 
+    /* Programs */
+    var_Create( p_input, "programs", VLC_VAR_LIST | VLC_VAR_DOINHERIT );
+    text.psz_string = _("Programs");
+    var_Change( p_input, "programs", VLC_VAR_SETTEXT, &text, NULL );
+
     /* Title */
     var_Create( p_input, "title", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Title");

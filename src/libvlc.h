@@ -281,6 +281,11 @@ static char *ppsz_align_descriptions[] =
 #define INPUT_PROGRAM_LONGTEXT N_( \
     "Choose the program to select by giving its Service ID.")
 
+#define INPUT_PROGRAMS_TEXT N_("Choose programs")
+#define INPUT_PROGRAMS_LONGTEXT N_( \
+    "Choose the programs to select by giving a comma-separated list of" \
+    "SIDs.")
+
 #define INPUT_AUDIO_TEXT N_("Choose audio")
 #define INPUT_AUDIO_LONGTEXT N_( \
     "Give the default type of audio you want to use in a DVD. " \
@@ -890,6 +895,8 @@ vlc_module_begin();
 
     add_integer( "program", 0, NULL,
                  INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT, VLC_TRUE );
+    add_string( "programs", "", NULL,
+                INPUT_PROGRAMS_TEXT, INPUT_PROGRAMS_LONGTEXT, VLC_FALSE );
     add_integer( "audio-type", -1, NULL,
                  INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT, VLC_TRUE );
     add_integer( "audio-channel", -1, NULL,

@@ -514,6 +514,7 @@ static int Init( input_thread_t * p_input )
     vlc_value_t val;
     double f_fps;
     vlc_meta_t *p_meta, *p_meta_user;
+    int i_es_out_mode;
     int i, i_delay;
 
     /* Initialize optional stream output. (before access/demuxer) */
@@ -745,20 +746,45 @@ static int Init( input_thread_t * p_input )
 
     /* Set up es_out */
     es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_TRUE );
-    val.b_bool =  VLC_FALSE;
+    i_es_out_mode = ES_OUT_MODE_AUTO;
+    val.p_list = NULL;
     if( p_input->p_sout )
     {
         var_Get( p_input, "sout-all", &val );
+        if ( val.b_bool )
+        {
+            i_es_out_mode = ES_OUT_MODE_ALL;
+            val.p_list = NULL;
+        }
+        else
+        {
+            var_Get( p_input, "programs", &val );
+            if ( val.p_list && val.p_list->i_count )
+            {
+                i_es_out_mode = ES_OUT_MODE_PARTIAL;
+                /* Note : we should remove the "program" callback. */
+            }
+            else
+                var_Change( p_input, "programs", VLC_VAR_FREELIST, &val, NULL );
+        }
     }
-    es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE,
-                    val.b_bool ? ES_OUT_MODE_ALL : ES_OUT_MODE_AUTO );
+    es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE, i_es_out_mode );
 
     /* Inform the demuxer about waited group (needed only for DVB) */
-    if( val.b_bool )
-        demux2_Control( p_input->input.p_demux, DEMUX_SET_GROUP, -1 );
+    if( i_es_out_mode == ES_OUT_MODE_ALL )
+    {
+        demux2_Control( p_input->input.p_demux, DEMUX_SET_GROUP, -1, NULL );
+    }
+    else if( i_es_out_mode == ES_OUT_MODE_PARTIAL )
+    {
+        demux2_Control( p_input->input.p_demux, DEMUX_SET_GROUP, -1,
+                        val.p_list );
+    }
     else
+    {
         demux2_Control( p_input->input.p_demux, DEMUX_SET_GROUP,
-                       (int) var_GetInteger( p_input, "program" ) );
+                       (int) var_GetInteger( p_input, "program" ), NULL );
+    }
 
     if( p_input->p_sout )
     {
@@ -1265,7 +1291,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             es_out_Control( p_input->p_es_out,
                             ES_OUT_SET_GROUP, val.i_int );
 
-            demux2_Control( p_input->input.p_demux, DEMUX_SET_GROUP, val.i_int );
+            demux2_Control( p_input->input.p_demux, DEMUX_SET_GROUP, val.i_int,
+                            NULL );
             break;
 
         case INPUT_CONTROL_SET_ES:

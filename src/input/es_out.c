@@ -73,6 +73,7 @@ struct es_out_sys_t
     /* all programs */
     int           i_pgrm;
     es_out_pgrm_t **pgrm;
+    es_out_pgrm_t **pp_selected_pgrm; /* --programs */
     es_out_pgrm_t *p_pgrm;  /* Master program */
 
     /* all es */
@@ -423,7 +424,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 
     if( fmt->i_group < 0 )
     {
-        msg_Err( p_input, "invakud group number" );
+        msg_Err( p_input, "invalid group number" );
         return NULL;
     }
 
@@ -618,6 +619,22 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
     {
         if( !es->p_dec )
             EsSelect( out, es );
+    }
+    else if( p_sys->i_mode == ES_OUT_MODE_PARTIAL )
+    {
+        vlc_value_t val;
+        int i;
+        var_Get( p_sys->p_input, "programs", &val );
+        for ( i = 0; i < val.p_list->i_count; i++ )
+        {
+            if ( val.p_list->p_values[i].i_int == es->p_pgrm->i_id || b_force )
+            {
+                if( !es->p_dec )
+                    EsSelect( out, es );
+                break;
+            }
+        }
+        var_Change( p_sys->p_input, "programs", VLC_VAR_FREELIST, &val, NULL );
     }
     else if( p_sys->i_mode == ES_OUT_MODE_AUTO )
     {
@@ -843,7 +860,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
         case ES_OUT_SET_MODE:
             i = (int) va_arg( args, int );
             if( i == ES_OUT_MODE_NONE || i == ES_OUT_MODE_ALL ||
-                i == ES_OUT_MODE_AUTO )
+                i == ES_OUT_MODE_AUTO || i == ES_OUT_MODE_PARTIAL )
             {
                 p_sys->i_mode = i;
 
