@@ -313,9 +313,6 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_enc->fmt_in.i_codec  = AOUT_FMT_S16_NE;
         p_context->sample_rate = p_enc->fmt_in.audio.i_rate;
         p_context->channels    = p_enc->fmt_in.audio.i_channels;
-        p_sys->i_frame_size = p_context->frame_size * 2 * p_context->channels;
-        p_sys->p_buffer = malloc( p_sys->i_frame_size );
-        p_sys->p_buffer_out = malloc( 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
     }
 
     /* Misc parameters */
@@ -361,6 +358,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
     if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
+        p_sys->p_buffer_out = malloc( 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
         p_sys->i_frame_size = p_context->frame_size * 2 * p_context->channels;
         p_sys->p_buffer = malloc( p_sys->i_frame_size );
     }
