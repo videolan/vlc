@@ -2,7 +2,7 @@
  * duplicate.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: duplicate.c,v 1.2 2003/05/19 11:38:05 gbazin Exp $
+ * $Id: duplicate.c,v 1.3 2003/09/20 23:46:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -173,7 +173,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     for( i_stream = 0; i_stream < p_sys->i_nb_streams; i_stream++ )
     {
-        if( id->pp_ids[i_stream] )
+        if( id->i_nb_ids > i_stream && id->pp_ids[i_stream] )
         {
             p_sys->pp_streams[i_stream]->pf_del( p_sys->pp_streams[i_stream],
                                                  id->pp_ids[i_stream] );
@@ -195,7 +195,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     {
         sout_buffer_t *p_dup;
 
-        if( id->pp_ids[i_stream] )
+        if( id->i_nb_ids > i_stream && id->pp_ids[i_stream] )
         {
             p_dup = sout_BufferDuplicate( p_stream->p_sout, p_buffer );
 
@@ -206,7 +206,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     }
 
     i_stream = p_sys->i_nb_streams - 1;
-    if( id->pp_ids[i_stream] )
+    if( id->i_nb_ids > i_stream && id->pp_ids[i_stream] )
     {
         p_sys->pp_streams[i_stream]->pf_send( p_sys->pp_streams[i_stream],
                                               id->pp_ids[i_stream],
