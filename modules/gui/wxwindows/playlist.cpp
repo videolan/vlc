@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.16 2003/08/27 11:53:26 gbazin Exp $
+ * $Id: playlist.cpp,v 1.17 2003/09/08 12:02:16 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -49,6 +49,8 @@ enum
     /* menu items */
     AddFile_Event = 1,
     AddMRL_Event,
+    Sort_Event,
+    RSort_Event,
     Close_Event,
     Open_Event,
     Save_Event,
@@ -59,6 +61,9 @@ enum
     Loop_Event,
     SelectAll_Event,
 
+    SearchText_Event,
+    Search_Event,
+
     /* controls */
     ListView_Event
 };
@@ -67,6 +72,8 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     /* Menu events */
     EVT_MENU(AddFile_Event, Playlist::OnAddFile)
     EVT_MENU(AddMRL_Event, Playlist::OnAddMRL)
+    EVT_MENU(Sort_Event, Playlist::OnSort)
+    EVT_MENU(RSort_Event, Playlist::OnRSort)
     EVT_MENU(Close_Event, Playlist::OnClose)
     EVT_MENU(Open_Event, Playlist::OnOpen)
     EVT_MENU(Save_Event, Playlist::OnSave)
@@ -82,7 +89,10 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
 
     /* Button events */
     EVT_BUTTON( Close_Event, Playlist::OnClose)
+    EVT_BUTTON( Search_Event, Playlist::OnSearch)
     EVT_BUTTON( Save_Event, Playlist::OnSave)
+
+    EVT_TEXT(SearchText_Event, Playlist::OnSearchTextChange)
 
     /* Special events : we don't want to destroy the window when the user
      * clicks on (X) */
@@ -107,6 +117,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxMenu *manage_menu = new wxMenu;
     manage_menu->Append( AddFile_Event, wxU(_("&Simple Add...")) );
     manage_menu->Append( AddMRL_Event, wxU(_("&Add MRL...")) );
+    manage_menu->Append( Sort_Event, wxU(_("&Sort...")) );
+    manage_menu->Append( RSort_Event, wxU(_("&Reverse Sort...")) );
     manage_menu->Append( Open_Event, wxU(_("&Open Playlist...")) );
     manage_menu->Append( Save_Event, wxU(_("&Save Playlist...")) );
     manage_menu->AppendSeparator();
@@ -160,19 +172,43 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     int b_loop = config_GetInt( p_intf, "loop") ; 
     loop_checkbox->SetValue( b_loop );
 
+    /* Create the Search Textbox */
+    search_text =
+	new wxTextCtrl( playlist_panel, SearchText_Event, wxT(""), 
+			wxDefaultPosition, wxSize( 100, -1), 
+			wxTE_PROCESS_ENTER);    
+
+    /* Create the search button */
+    wxButton *search_button = 
+	new wxButton( playlist_panel, Search_Event, wxU(_("Search")) );
+
+ 
     /* Place everything in sizers */
+    wxBoxSizer *search_sizer = new wxBoxSizer( wxHORIZONTAL );
+    search_sizer->Add( search_text, 0, wxEXPAND|wxALL, 5);
+    search_sizer->Add( search_button, 0, wxEXPAND|wxALL, 5);
+    search_sizer->Add( random_checkbox, 0, 
+			     wxEXPAND|wxALIGN_RIGHT|wxALL, 5);
+    search_sizer->Add( loop_checkbox, 0, 
+		              wxEXPAND|wxALIGN_RIGHT|wxALL, 5);
+    search_sizer->Layout();
+
     wxBoxSizer *close_button_sizer = new wxBoxSizer( wxHORIZONTAL );
     close_button_sizer->Add( close_button, 0, wxALL, 5 );
-    close_button_sizer->Add( random_checkbox, 0, 
+/*    close_button_sizer->Add( random_checkbox, 0, 
 			     wxEXPAND|wxALIGN_RIGHT|wxALL, 5);
     close_button_sizer->Add( loop_checkbox, 0, 
-		              wxEXPAND|wxALIGN_RIGHT|wxALL, 5);
+		              wxEXPAND|wxALIGN_RIGHT|wxALL, 5);*/
     close_button_sizer->Layout();
+
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
+
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer->Add( listview, 1, wxEXPAND | wxALL, 5 );
+    panel_sizer->Add( search_sizer, 0 , wxALIGN_CENTRE);
     panel_sizer->Add( close_button_sizer, 0, wxALIGN_CENTRE );
     panel_sizer->Layout();
+
     playlist_panel->SetSizerAndFit( panel_sizer );
     main_sizer->Add( playlist_panel, 1, wxGROW, 0 );
     main_sizer->Layout();
@@ -385,6 +421,92 @@ void Playlist::OnAddMRL( wxCommandEvent& WXUNUSED(event) )
 #if 0
     Rebuild();
 #endif
+}
+
+void Playlist::OnSort( wxCommandEvent& WXUNUSED(event) )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    playlist_Sort( p_playlist , 0  );
+   
+    vlc_object_release( p_playlist );
+
+    Rebuild();
+
+    return;
+}
+
+void Playlist::OnRSort( wxCommandEvent& WXUNUSED(event) )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    playlist_Sort( p_playlist , 1 );
+   
+    vlc_object_release( p_playlist );
+
+    Rebuild();
+
+    return;
+}
+
+void Playlist::OnSearchTextChange( wxCommandEvent& WXUNUSED(event) )
+{
+ /* Does nothing */
+}
+
+void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
+{
+    wxString search_string= search_text->GetValue();
+
+    int i_current;
+    int i_first = 0 ; 
+    int i_item = -1;
+
+    for( i_current = 0 ; i_current <= listview->GetItemCount() ; i_current++ ) 
+    {
+	if( listview->GetItemState( i_current, wxLIST_STATE_SELECTED)
+		== wxLIST_STATE_SELECTED )
+	{
+	    i_first = i_current;
+	    break;
+	}
+    }
+
+    for ( i_current = i_first + 1; i_current <= listview->GetItemCount()
+		 ; i_current++ )
+    {
+	wxListItem listitem;
+ 	listitem.SetId( i_current );
+	listview->GetItem( listitem );
+	if( listitem.m_text.Contains( search_string ) )
+	{
+	   i_item = i_current;
+	   break;
+	}
+    }
+    for( long item = 0; item < listview->GetItemCount(); item++ )
+    {
+        listview->Select( item, FALSE );
+    }
+ 
+    wxListItem listitem;
+    listitem.SetId(i_item);
+    listitem.m_state = wxLIST_STATE_SELECTED;
+    listview->Select( i_item, TRUE );
+    listview->Focus( i_item );
+
 }
 
 void Playlist::OnInvertSelection( wxCommandEvent& WXUNUSED(event) )

@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.58 2003/08/28 15:59:04 gbazin Exp $
+ * $Id: wxwindows.h,v 1.59 2003/09/08 12:02:16 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -656,7 +656,11 @@ private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnAddFile( wxCommandEvent& event );
     void OnAddMRL( wxCommandEvent& event );
+    void OnSort( wxCommandEvent& event );
+    void OnRSort( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
+    void OnSearch( wxCommandEvent& event );
+    void OnSearchTextChange( wxCommandEvent& event );
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
     void OnInvertSelection( wxCommandEvent& event );
@@ -668,6 +672,8 @@ private:
     void OnKeyDown( wxListEvent& event );
     void Rebuild();
 
+    wxTextCtrl *search_text;
+    
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;

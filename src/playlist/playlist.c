@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.48 2003/09/07 22:43:17 fenrir Exp $
+ * $Id: playlist.c,v 1.49 2003/09/08 12:02:16 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -363,6 +363,50 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
 
     return 0;
 }
+
+
+/**
+ * Sort the playlist
+ *
+ */
+int playlist_Sort( playlist_t * p_playlist , int i_type )
+{
+    int i , i_small , i_position; 
+    playlist_item_t *p_temp;
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    
+    for( i_position = 0; i_position < p_playlist->i_size -1 ; i_position ++ )
+    {
+        i_small  = i_position;
+        for( i = i_position + 1 ; i<  p_playlist->i_size ; i++)
+        {
+                
+           if(  (strcasecmp( p_playlist->pp_items[i]->psz_name, 
+                p_playlist->pp_items[i_small]->psz_name) < 0 
+                                  && i_type == SORT_NORMAL ) || 
+                (strcasecmp( p_playlist->pp_items[i]->psz_name,
+                p_playlist->pp_items[i_small]->psz_name) > 0 
+                                  && i_type == SORT_REVERSE ) )
+               i_small = i;
+         
+           p_temp = p_playlist->pp_items[i_position];
+           p_playlist->pp_items[i_position] = p_playlist->pp_items[i_small];
+           p_playlist->pp_items[i_small] = p_temp;
+           
+        }
+    }    
+
+    for( i=0;i< p_playlist->i_size;i++)
+            msg_Dbg(p_playlist,"%s",p_playlist->pp_items[i]->psz_name);
+
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    
+    return 0;
+
+}
+
+     
 
 /**
  * Move an item in a playlist

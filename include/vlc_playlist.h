@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.12 2003/08/14 13:02:55 sigmunau Exp $
+ * $Id: vlc_playlist.h,v 1.13 2003/09/08 12:02:16 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -82,6 +82,9 @@ struct playlist_t
     /*@}*/
 };
 
+#define SORT_NORMAL 0
+#define SORT_REVERSE 1
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
@@ -102,6 +105,7 @@ VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char **, 
 VLC_EXPORT( int,  playlist_AddExt,    ( playlist_t *, const char *, const char *, mtime_t, const char **, int, int, int ) );
 VLC_EXPORT( int,  playlist_AddItem, ( playlist_t *, playlist_item_t *, int, int ) );
 VLC_EXPORT( int,  playlist_Delete, ( playlist_t *, int ) );
+VLC_EXPORT( int,  playlist_Sort, ( playlist_t *, int) );
 VLC_EXPORT( int,  playlist_Move, ( playlist_t *, int, int ) );
 VLC_EXPORT( int,  playlist_LoadFile, ( playlist_t *, const char * ) );
 VLC_EXPORT( int,  playlist_SaveFile, ( playlist_t *, const char * ) );
