@@ -2,7 +2,7 @@
  * flac.c : FLAC demuc module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: flac.c,v 1.4 2003/08/17 13:56:26 gbazin Exp $
+ * $Id: flac.c,v 1.5 2003/09/07 22:48:29 fenrir Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -72,6 +72,7 @@ static int Init( vlc_object_t * p_this )
     }
 
     p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
     p_input->pf_rewind = NULL;
 
     /* Have a peep at the show. */

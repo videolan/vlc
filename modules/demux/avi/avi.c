@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.59 2003/08/23 11:46:06 fenrir Exp $
+ * $Id: avi.c,v 1.60 2003/09/07 22:48:29 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-#include "ninput.h"
 #include "codecs.h"
 
 #include "../util/sub.h"
@@ -58,6 +57,7 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static int    Control         ( input_thread_t *, int, va_list );
 static int    Seek            ( input_thread_t *, mtime_t, int );
 static int    Demux_Seekable  ( input_thread_t * );
 static int    Demux_UnSeekable( input_thread_t *p_input );
@@ -159,6 +159,7 @@ static int Open( vlc_object_t * p_this )
     }
     stream_Control( p_avi->s, STREAM_CAN_FASTSEEK, &p_avi->b_seekable );
 
+    p_input->pf_demux_control = Control;
     p_input->pf_demux = Demux_Seekable;
     /* For unseekable stream, automaticaly use Demux_UnSeekable */
     if( !p_avi->b_seekable || config_GetInt( p_input, "avi-interleaved" ) )
@@ -460,7 +461,6 @@ static int Open( vlc_object_t * p_this )
     {
         msg_Warn( p_input, "broken or missing index, 'seek' will be axproximative or will have strange behavour" );
     }
-
     /* fix some BeOS MediaKit generated file */
     for( i = 0 ; i < p_avi->i_streams; i++ )
     {
@@ -656,7 +656,7 @@ static int Demux_Seekable( input_thread_t *p_input )
         msg_Warn( p_input, "no track selected, exiting..." );
         return( 0 );
     }
-
+#if 0
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
         mtime_t i_date;
@@ -678,7 +678,7 @@ static int Demux_Seekable( input_thread_t *p_input )
             subtitle_Seek( p_avi->p_sub, p_avi->i_time );
         }
     }
-
+#endif
 
     /* wait for the good time */
 
@@ -1131,8 +1131,7 @@ static int Demux_UnSeekable( input_thread_t *p_input )
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int    Seek   ( input_thread_t *p_input,
-                          mtime_t i_date, int i_percent )
+static int Seek( input_thread_t *p_input, mtime_t i_date, int i_percent )
 {
 
     demux_sys_t *p_avi = p_input->p_demux_data;
@@ -1184,7 +1183,7 @@ static int    Seek   ( input_thread_t *p_input,
                 return( -1 );
             }
 
-            /* be sure that the index exit */
+            /* be sure that the index exist */
             if( AVI_StreamChunkSet( p_input,
                                     i_stream,
                                     0 ) )
@@ -1253,6 +1252,93 @@ static int    Seek   ( input_thread_t *p_input,
     }
 }
 
+/*****************************************************************************
+ * Control:
+ *****************************************************************************
+ *
+ *****************************************************************************/
+static int    Control( input_thread_t *p_input, int i_query, va_list args )
+{
+    demux_sys_t *p_sys = p_input->p_demux_data;
+    double   f, *pf;
+    int64_t i64, *pi64;
+
+    switch( i_query )
+    {
+        case DEMUX_GET_POSITION:
+            pf = (double*)va_arg( args, double * );
+            if( p_sys->i_length > 0 )
+            {
+                *pf = (double)p_sys->i_time / (double)( p_sys->i_length * (mtime_t)1000000 );
+                return VLC_SUCCESS;
+            }
+            else if( stream_Size( p_sys->s ) > 0 )
+            {
+                unsigned int i;
+                int64_t i_tmp;
+
+                i64 = 0;
+                /* search the more advanced selected es */
+                for( i = 0; i < p_sys->i_streams; i++ )
+                {
+#define tk  p_sys->pp_info[i]
+                    if( tk->b_activated && tk->i_idxposc < tk->i_idxnb )
+                    {
+                        i_tmp = tk->p_index[tk->i_idxposc].i_pos +
+                                tk->p_index[tk->i_idxposc].i_length + 8;
+                        if( i_tmp > i64 )
+                        {
+                            i64 = i_tmp;
+                        }
+                    }
+#undef tk
+                }
+                *pf = (double)i64 / (double)stream_Size( p_sys->s );
+                return VLC_SUCCESS;
+            }
+            else
+            {
+                *pf = 0.0;
+                return VLC_SUCCESS;
+            }
+        case DEMUX_SET_POSITION:
+            if( p_sys->b_seekable )
+            {
+                int i_ret;
+
+                f = (double)va_arg( args, double );
+                i64 = (mtime_t)(1000000.0 * p_sys->i_length * f );
+                i_ret = Seek( p_input, i64, (int)(f * 100) );
+                if( p_sys->p_sub )
+                {
+                    subtitle_Seek( p_sys->p_sub, p_sys->i_time );
+                }
+                return i_ret;
+            }
+            else
+            {
+                return demux_vaControlDefault( p_input, i_query, args );
+            }
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = p_sys->i_time;
+            return VLC_SUCCESS;
+
+        case DEMUX_SET_TIME:
+            msg_Err( p_input, "FIXME DEMUX_SET_TIME to be implemented" );
+            return VLC_EGENERIC;
+            /* return demux_vaControlDefault( p_input, i_query, args ); */
+
+        case DEMUX_GET_LENGTH:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = p_sys->i_length * (mtime_t)1000000;
+            return VLC_SUCCESS;
+
+        default:
+            return demux_vaControlDefault( p_input, i_query, args );
+    }
+    return VLC_EGENERIC;
+}
 
 /*****************************************************************************
  * Function to convert pts to chunk or byte

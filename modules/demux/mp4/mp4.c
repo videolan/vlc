@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.34 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: mp4.c,v 1.35 2003/09/07 22:48:29 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,9 +24,6 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
-#include <errno.h>
-#include <sys/types.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
@@ -36,55 +33,44 @@
 #include "mp4.h"
 
 /*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int    MP4Init    ( vlc_object_t * );
-static void __MP4End     ( vlc_object_t * );
-static int    MP4Demux   ( input_thread_t * );
-
-static int    MP4DemuxRef( input_thread_t *p_input )
-{
-    return 0;
-}
-
-/* New input could have something like that... */
-static int   MP4Seek     ( input_thread_t *, mtime_t );
-
-#define MP4End(a) __MP4End(VLC_OBJECT(a))
-
-/*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open    ( vlc_object_t * );
+static void Close     ( vlc_object_t * );
+
 vlc_module_begin();
     set_description( _("MP4 demuxer") );
     set_capability( "demux", 242 );
-    set_callbacks( MP4Init, __MP4End );
+    set_callbacks( Open, Close );
 vlc_module_end();
+
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static int    Demux   ( input_thread_t * );
+static int    DemuxRef( input_thread_t *p_input )
+{
+    return 0;
+}
+static int   Seek     ( input_thread_t *, mtime_t );
+static int   Control  ( input_thread_t *, int, va_list );
 
 /*****************************************************************************
  * Declaration of local function
  *****************************************************************************/
 
-static void MP4_TrackCreate ( input_thread_t *,
-                              track_data_mp4_t *,
-                              MP4_Box_t  * );
-static void MP4_TrackDestroy( input_thread_t *,
-                              track_data_mp4_t * );
+static void MP4_TrackCreate ( input_thread_t *, track_data_mp4_t *, MP4_Box_t  *);
+static void MP4_TrackDestroy( input_thread_t *, track_data_mp4_t * );
 
-static int  MP4_TrackSelect ( input_thread_t *,
-                              track_data_mp4_t *,
-                              mtime_t );
-static void MP4_TrackUnselect(input_thread_t *,
-                              track_data_mp4_t * );
+static int  MP4_TrackSelect ( input_thread_t *, track_data_mp4_t *, mtime_t );
+static void MP4_TrackUnselect(input_thread_t *, track_data_mp4_t * );
 
-static int  MP4_TrackSeek   ( input_thread_t *,
-                              track_data_mp4_t *,
-                              mtime_t );
+static int  MP4_TrackSeek   ( input_thread_t *, track_data_mp4_t *, mtime_t );
 
-static uint64_t MP4_GetTrackPos( track_data_mp4_t * );
-static int  MP4_TrackSampleSize( track_data_mp4_t * );
-static int  MP4_TrackNextSample( input_thread_t *,
-                                 track_data_mp4_t * );
+static uint64_t MP4_GetTrackPos    ( track_data_mp4_t * );
+static int      MP4_TrackSampleSize( track_data_mp4_t * );
+static int      MP4_TrackNextSample( input_thread_t *, track_data_mp4_t * );
 
 #define MP4_Set4BytesLE( p, dw ) \
     *((uint8_t*)p)   = ( (dw)&0xff ); \
@@ -100,9 +86,9 @@ static int  MP4_TrackNextSample( input_thread_t *,
     if( p ) { free( p ); (p) = NULL;}
 
 /*****************************************************************************
- * MP4Init: check file and initializes MP4 structures
+ * Open: check file and initializes MP4 structures
  *****************************************************************************/
-static int MP4Init( vlc_object_t * p_this )
+static int Open( vlc_object_t * p_this )
 {
     input_thread_t  *p_input = (input_thread_t *)p_this;
     uint8_t         *p_peek;
@@ -119,63 +105,49 @@ static int MP4Init( vlc_object_t * p_this )
     unsigned int    i;
     vlc_bool_t      b_audio;
 
-    /* I need to seek */
-    if( !p_input->stream.b_seekable )
-    {
-        msg_Warn( p_input, "MP4 plugin discarded (unseekable)" );
-        return( VLC_EGENERIC );
-
-    }
-    /* Initialize access plug-in structures. */
-    if( p_input->i_mtu == 0 )
-    {
-        /* Improve speed. */
-        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE ;
-    }
-
-    p_input->pf_demux = MP4Demux;
-
     /* a little test to see if it could be a mp4 */
     if( input_Peek( p_input, &p_peek, 8 ) < 8 )
     {
         msg_Warn( p_input, "MP4 plugin discarded (cannot peek)" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
-
-
     switch( VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] ) )
     {
-        case( FOURCC_ftyp ):
-        case( FOURCC_moov ):
-        case( FOURCC_foov ):
-        case( FOURCC_moof ):
-        case( FOURCC_mdat ):
-        case( FOURCC_udta ):
-        case( FOURCC_free ):
-        case( FOURCC_skip ):
-        case( FOURCC_wide ):
+        case FOURCC_ftyp:
+        case FOURCC_moov:
+        case FOURCC_foov:
+        case FOURCC_moof:
+        case FOURCC_mdat:
+        case FOURCC_udta:
+        case FOURCC_free:
+        case FOURCC_skip:
+        case FOURCC_wide:
             break;
          default:
             msg_Warn( p_input, "MP4 plugin discarded (not a valid file)" );
-            return( VLC_EGENERIC );
+            return VLC_EGENERIC;
     }
+    /* I need to seek */
+    if( !p_input->stream.b_seekable )
+    {
+        msg_Warn( p_input, "MP4 plugin discarded (unseekable)" );
+        return VLC_EGENERIC;
+    }
+
+    /*Set exported functions */
+    p_input->pf_demux = Demux;
+    p_input->pf_demux_control = Control;
+
 
     /* create our structure that will contains all data */
-    if( !( p_input->p_demux_data =
-                p_demux = malloc( sizeof( demux_sys_t ) ) ) )
-    {
-        msg_Err( p_input, "out of memory" );
-        return( VLC_EGENERIC );
-    }
+    p_input->p_demux_data = p_demux = malloc( sizeof( demux_sys_t ) );
     memset( p_demux, 0, sizeof( demux_sys_t ) );
-    p_input->p_demux_data = p_demux;
-
 
     /* Now load all boxes ( except raw data ) */
     if( !MP4_BoxGetRoot( p_input, &p_demux->box_root ) )
     {
         msg_Warn( p_input, "MP4 plugin discarded (not a valid file)" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
     MP4_BoxDumpStructure( p_input, &p_demux->box_root );
@@ -209,8 +181,7 @@ static int MP4Init( vlc_object_t * p_this )
         if( !p_foov )
         {
             msg_Err( p_input, "MP4 plugin discarded (no moov box)" );
-            MP4End( p_input );
-            return( VLC_EGENERIC );
+            goto error;
         }
         /* we have a free box as a moov, rename it */
         p_foov->i_type = FOURCC_moov;
@@ -301,13 +272,12 @@ static int MP4Init( vlc_object_t * p_this )
         if( !p_rmra )
         {
             msg_Err( p_input, "cannot find /moov/mvhd" );
-            MP4End( p_input );
-            return VLC_EGENERIC;
+            goto error;
         }
         else
         {
             msg_Warn( p_input, "cannot find /moov/mvhd (pure ref file)" );
-            p_input->pf_demux = MP4DemuxRef;
+            p_input->pf_demux = DemuxRef;
             return VLC_SUCCESS;
         }
     }
@@ -321,8 +291,7 @@ static int MP4Init( vlc_object_t * p_this )
                 MP4_BoxCount( &p_demux->box_root, "/moov/trak" ) ) )
     {
         msg_Err( p_input, "cannot find any /moov/trak" );
-        MP4End( p_input );
-        return( VLC_EGENERIC );
+        goto error;
     }
     msg_Dbg( p_input, "find %d track%c",
                         p_demux->i_tracks,
@@ -334,19 +303,16 @@ static int MP4Init( vlc_object_t * p_this )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot init stream" );
-        MP4End( p_input );
-        return( VLC_EGENERIC );
+        goto error;
     }
     /* Needed to create program _before_ MP4_TrackCreate */
     if( input_AddProgram( p_input, 0, 0) == NULL )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot add program" );
-        MP4End( p_input );
-        return( VLC_EGENERIC );
+        goto error;
     }
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-    /* XXX beurk and beurk, see MP4Demux and MP4Seek */
     if( p_demux->i_duration/p_demux->i_timescale > 0 )
     {
         p_input->stream.i_mux_rate =
@@ -422,15 +388,19 @@ static int MP4Init( vlc_object_t * p_this )
     p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    return( VLC_SUCCESS );
+    return VLC_SUCCESS;
+
+error:
+    Close( VLC_OBJECT( p_input ) );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
- * MP4Demux: read packet and send them to decoders
+ * Demux: read packet and send them to decoders
  *****************************************************************************
  * TODO check for newly selected track (ie audio upt to now )
  *****************************************************************************/
-static int MP4Demux( input_thread_t *p_input )
+static int Demux( input_thread_t *p_input )
 {
     demux_sys_t *p_demux = p_input->p_demux_data;
     unsigned int i_track;
@@ -478,25 +448,6 @@ static int MP4Demux( input_thread_t *p_input )
     {
         msg_Warn( p_input, "no track selected, exiting..." );
         return( 0 );
-    }
-
-
-    /* XXX beurk, beuRK and BEURK,
-       but only way I've found to detect seek from interface */
-    if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
-    {
-        mtime_t i_date;
-
-        /* first wait for empty buffer, arbitrary time FIXME */
-        msleep( DEFAULT_PTS_DELAY );
-        /* *** calculate new date *** */
-
-        i_date = (mtime_t)1000000 *
-                 (mtime_t)p_demux->i_duration /
-                 (mtime_t)p_demux->i_timescale *
-                 (mtime_t)MP4_TellAbsolute( p_input ) /
-                 (mtime_t)p_input->stream.p_selected_area->i_size;
-        MP4Seek( p_input, i_date );
     }
 
     /* first wait for the good time to read a packet */
@@ -617,9 +568,9 @@ static int MP4Demux( input_thread_t *p_input )
     return( 1 );
 }
 /*****************************************************************************
- * MP4Seek: Got to i_date
+ * Seek: Got to i_date
  ******************************************************************************/
-static int   MP4Seek     ( input_thread_t *p_input, mtime_t i_date )
+static int   Seek     ( input_thread_t *p_input, mtime_t i_date )
 {
     demux_sys_t *p_demux = p_input->p_demux_data;
     unsigned int i_track;
@@ -641,9 +592,65 @@ static int   MP4Seek     ( input_thread_t *p_input, mtime_t i_date )
 }
 
 /*****************************************************************************
- * MP4End: frees unused data
+ * Control:
  *****************************************************************************/
-static void __MP4End ( vlc_object_t * p_this )
+static int   Control  ( input_thread_t *p_input, int i_query, va_list args )
+{
+    demux_sys_t *p_sys = p_input->p_demux_data;
+
+    double   f, *pf;
+    int64_t i64, *pi64;
+
+    switch( i_query )
+    {
+        case DEMUX_GET_POSITION:
+            pf = (double*)va_arg( args, double * );
+            if( p_sys->i_duration > 0 )
+            {
+                *pf = (double)p_sys->i_time / (double)p_sys->i_duration;
+            }
+            else
+            {
+                *pf = 0.0;
+            }
+            return VLC_SUCCESS;
+
+        case DEMUX_SET_POSITION:
+            f = (double)va_arg( args, double );
+            i64 = (int64_t)( f *
+                             (double)1000000 *
+                             (double)p_sys->i_duration /
+                             (double)p_sys->i_timescale );
+            return Seek( p_input, i64 );
+
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = (mtime_t)1000000 *
+                    (mtime_t)p_sys->i_time /
+                    (mtime_t)p_sys->i_timescale;
+            return VLC_SUCCESS;
+
+        case DEMUX_SET_TIME:
+            i64 = (int64_t)va_arg( args, int64_t );
+            return Seek( p_input, i64 );
+
+        case DEMUX_GET_LENGTH:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = (mtime_t)1000000 *
+                    (mtime_t)p_sys->i_duration /
+                    (mtime_t)p_sys->i_timescale;
+            return VLC_SUCCESS;
+
+        default:
+            msg_Err( p_input, "control query unimplemented !!!" );
+            return demux_vaControlDefault( p_input, i_query, args );
+    }
+}
+
+/*****************************************************************************
+ * Close: frees unused data
+ *****************************************************************************/
+static void Close ( vlc_object_t * p_this )
 {
     unsigned int i_track;
     input_thread_t *  p_input = (input_thread_t *)p_this;
@@ -659,6 +666,7 @@ static void __MP4End ( vlc_object_t * p_this )
 
     FREE( p_input->p_demux_data );
 }
+
 
 
 /****************************************************************************

@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.5 2003/08/22 20:32:27 fenrir Exp $
+ * $Id: wav.c,v 1.6 2003/09/07 22:48:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -30,7 +30,6 @@
 #include <vlc/input.h>
 
 #include <codecs.h>
-#include <ninput.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -104,6 +103,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_input->pf_demux     = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
     p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->p_wf           = NULL;
     p_sys->p_es           = NULL;

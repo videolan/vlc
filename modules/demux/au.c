@@ -2,7 +2,7 @@
  * au.c : au file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: au.c,v 1.5 2003/08/22 20:32:27 fenrir Exp $
+ * $Id: au.c,v 1.6 2003/09/07 22:48:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -30,7 +30,6 @@
 #include <vlc/input.h>
 
 #include <codecs.h>
-#include <ninput.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -320,6 +319,7 @@ static int Open( vlc_object_t * p_this )
                                 (mtime_t)p_sys->wf.nSamplesPerSec;
 
         p_input->pf_demux = DemuxPCM;
+        p_input->pf_demux_control = demux_vaControlDefault;
     }
 
     /*  create one program */

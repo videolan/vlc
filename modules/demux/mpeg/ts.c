@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.34 2003/08/14 23:32:51 fenrir Exp $
+ * $Id: ts.c,v 1.35 2003/09/07 22:48:29 fenrir Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -136,6 +136,7 @@ static int Activate( vlc_object_t * p_this )
 
     /* Set the demux function */
     p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
 
 #if 0
     /* XXX Unused already done by src/input.c */

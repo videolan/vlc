@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.25 2003/08/30 02:03:44 fenrir Exp $
+ * $Id: libavi.c,v 1.26 2003/09/07 22:48:29 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-#include "ninput.h"
 #include "codecs.h"                                      /* BITMAPINFOHEADER */
 
 #include "libavi.h"

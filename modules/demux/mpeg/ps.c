@@ -2,7 +2,7 @@
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ps.c,v 1.9 2003/03/09 23:39:05 jlj Exp $
+ * $Id: ps.c,v 1.10 2003/09/07 22:48:29 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -74,6 +74,7 @@ static int Activate( vlc_object_t * p_this )
 
     /* Set the demux function */
     p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
 
     /* Initialize access plug-in structures. */
     if( p_input->i_mtu == 0 )

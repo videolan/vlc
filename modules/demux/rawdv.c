@@ -2,7 +2,7 @@
  * rawdv.c : raw dv input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rawdv.c,v 1.9 2003/08/17 23:02:52 fenrir Exp $
+ * $Id: rawdv.c,v 1.10 2003/09/07 22:48:29 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -139,6 +139,7 @@ static int Activate( vlc_object_t * p_this )
     }
 
     p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
 
     /* Have a peep at the show. */
     if( input_Peek(p_input, &p_peek, DV_PAL_FRAME_SIZE) < DV_NTSC_FRAME_SIZE )

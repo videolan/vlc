@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.32 2003/09/02 20:19:26 gbazin Exp $
+ * $Id: ogg.c,v 1.33 2003/09/07 22:48:29 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -1092,6 +1092,7 @@ static int Activate( vlc_object_t * p_this )
 
     /* Set the demux function */
     p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
 
     /* Initialize access plug-in structures. */
     if( p_input->i_mtu == 0 )

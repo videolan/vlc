@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.25 2003/08/26 19:43:51 hartman Exp $
+ * $Id: mkv.cpp,v 1.26 2003/09/07 22:48:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -36,7 +36,6 @@
 
 #include <codecs.h>                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "iso_lang.h"
-#include "ninput.h"
 
 #include <iostream>
 #include <cassert>
@@ -300,6 +299,7 @@ static int Open( vlc_object_t * p_this )
 
     /* Set the demux function */
     p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
 
     /* peek the begining */
     if( input_Peek( p_input, &p_peek, 4 ) < 4 )

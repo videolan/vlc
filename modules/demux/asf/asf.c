@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.36 2003/08/25 23:36:16 fenrir Exp $
+ * $Id: asf.c,v 1.37 2003/09/07 22:48:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -28,7 +28,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-#include "ninput.h"
 
 #include "codecs.h"                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "libasf.h"
@@ -117,7 +116,8 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Set p_input field */
-    p_input->pf_demux = Demux;
+    p_input->pf_demux         = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
     p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
     memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->i_time = -1;

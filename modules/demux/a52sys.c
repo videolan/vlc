@@ -2,7 +2,7 @@
  * a52.c : Raw a52 Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52sys.c,v 1.4 2003/08/01 00:04:28 fenrir Exp $
+ * $Id: a52sys.c,v 1.5 2003/09/07 22:48:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -28,8 +28,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-
-#include <ninput.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -129,6 +127,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
 
     p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->i_time = 0;

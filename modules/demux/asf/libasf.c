@@ -2,7 +2,7 @@
  * libasf.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.17 2003/08/24 15:05:27 fenrir Exp $
+ * $Id: libasf.c,v 1.18 2003/09/07 22:48:29 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-#include "ninput.h"
 
 #include "codecs.h"                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "libasf.h"

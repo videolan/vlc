@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.31 2003/08/17 23:02:52 fenrir Exp $
+ * $Id: libmp4.c,v 1.32 2003/09/07 22:48:29 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -519,7 +519,7 @@ int MP4_ReadBoxCommon( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 
 /*****************************************************************************
- * MP4_MP4_NextBox : Go to the next box
+ * MP4_NextBox : Go to the next box
  *****************************************************************************
  * if p_box == NULL, go to the next box in witch we are( at the begining ).
  *****************************************************************************/
@@ -566,7 +566,7 @@ int MP4_GotoBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
  *       after called one of theses functions, file position is unknown
  *       you need to call MP4_GotoBox to go where you want
  *****************************************************************************/
-int MP4_ReadBoxContainerRaw( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
+static int MP4_ReadBoxContainerRaw( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
 {
     MP4_Box_t *p_box;
 
@@ -607,7 +607,7 @@ int MP4_ReadBoxContainerRaw( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
 }
 
 
-int MP4_ReadBoxContainer( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
+static int MP4_ReadBoxContainer( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
 {
     if( p_container->i_size <= (size_t)MP4_BOX_HEADERSIZE(p_container ) + 8 )
     {
@@ -621,12 +621,12 @@ int MP4_ReadBoxContainer( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
     return( MP4_ReadBoxContainerRaw( p_stream, p_container ) );
 }
 
-void MP4_FreeBox_Common( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_Common( MP4_Box_t *p_box )
 {
     /* Up to now do nothing */
 }
 
-int MP4_ReadBoxSkip( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBoxSkip( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     /* XXX sometime moov is hiden in a free box */
     if( p_box->p_father && p_box->p_father->i_type == VLC_FOURCC( 'r', 'o', 'o', 't' )&&
@@ -662,7 +662,7 @@ int MP4_ReadBoxSkip( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     return( 1 );
 }
 
-int MP4_ReadBox_ftyp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_ftyp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_ftyp_t );
 
@@ -688,13 +688,13 @@ int MP4_ReadBox_ftyp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_ftyp( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_ftyp( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_ftyp->i_compatible_brands );
 }
 
 
-int MP4_ReadBox_mvhd(  MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_mvhd(  MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 #ifdef MP4_VERBOSE
@@ -766,7 +766,7 @@ int MP4_ReadBox_mvhd(  MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-int MP4_ReadBox_tkhd(  MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_tkhd(  MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 #ifdef MP4_VERBOSE
@@ -830,7 +830,7 @@ int MP4_ReadBox_tkhd(  MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 }
 
 
-int MP4_ReadBox_mdhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_mdhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
     uint16_t i_language;
@@ -883,7 +883,7 @@ int MP4_ReadBox_mdhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 }
 
 
-int MP4_ReadBox_hdlr( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_hdlr( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_hdlr_t );
 
@@ -904,12 +904,12 @@ int MP4_ReadBox_hdlr( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_hdlr( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_hdlr( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_hdlr->psz_name );
 }
 
-int MP4_ReadBox_vmhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_vmhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 
@@ -933,7 +933,7 @@ int MP4_ReadBox_vmhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-int MP4_ReadBox_smhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_smhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_smhd_t );
 
@@ -953,7 +953,7 @@ int MP4_ReadBox_smhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 }
 
 
-int MP4_ReadBox_hmhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_hmhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_hmhd_t );
 
@@ -977,7 +977,7 @@ int MP4_ReadBox_hmhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-int MP4_ReadBox_url( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_url( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_url_t );
 
@@ -993,12 +993,12 @@ int MP4_ReadBox_url( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 }
 
 
-void MP4_FreeBox_url( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_url( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_url->psz_location )
 }
 
-int MP4_ReadBox_urn( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_urn( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_urn_t );
 
@@ -1014,14 +1014,14 @@ int MP4_ReadBox_urn( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 #endif
     MP4_READBOX_EXIT( 1 );
 }
-void MP4_FreeBox_urn( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_urn( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_urn->psz_name );
     FREE( p_box->data.p_urn->psz_location );
 }
 
 
-int MP4_ReadBox_dref( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_dref( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_dref_t );
 
@@ -1041,7 +1041,7 @@ int MP4_ReadBox_dref( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 }
 
 
-int MP4_ReadBox_stts( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_stts( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
     MP4_READBOX_ENTER( MP4_Box_data_stts_t );
@@ -1068,13 +1068,13 @@ int MP4_ReadBox_stts( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_stts( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_stts( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_stts->i_sample_count );
     FREE( p_box->data.p_stts->i_sample_delta );
 }
 
-int MP4_ReadBox_ctts( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_ctts( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
     MP4_READBOX_ENTER( MP4_Box_data_ctts_t );
@@ -1102,7 +1102,7 @@ int MP4_ReadBox_ctts( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_ctts( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_ctts( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_ctts->i_sample_count );
     FREE( p_box->data.p_ctts->i_sample_offset );
@@ -1123,7 +1123,7 @@ static int MP4_ReadLengthDescriptor( uint8_t **pp_peek, int64_t  *i_read )
     return( i_len );
 }
 
-int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
 #define es_descriptor p_box->data.p_esds->es_descriptor
     unsigned int i_len;
@@ -1209,7 +1209,7 @@ int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 #undef es_descriptor
 }
 
-void MP4_FreeBox_esds( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_esds( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_esds->es_descriptor.psz_URL );
     if( p_box->data.p_esds->es_descriptor.p_decConfigDescr )
@@ -1219,7 +1219,7 @@ void MP4_FreeBox_esds( input_thread_t *p_input, MP4_Box_t *p_box )
     FREE( p_box->data.p_esds->es_descriptor.p_decConfigDescr );
 }
 
-int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 
@@ -1301,7 +1301,7 @@ int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 }
 
 
-int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 
@@ -1367,7 +1367,7 @@ int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 }
 
 
-int MP4_ReadBox_stsd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_stsd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
 
     MP4_READBOX_ENTER( MP4_Box_data_stsd_t );
@@ -1389,7 +1389,7 @@ int MP4_ReadBox_stsd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 }
 
 
-int MP4_ReadBox_stsz( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_stsz( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 
@@ -1421,12 +1421,12 @@ int MP4_ReadBox_stsz( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_stsz( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_stsz( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_stsz->i_entry_size );
 }
 
-int MP4_ReadBox_stsc( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_stsc( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 
@@ -1458,14 +1458,14 @@ int MP4_ReadBox_stsc( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_stsc( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_stsc( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_stsc->i_first_chunk );
     FREE( p_box->data.p_stsc->i_samples_per_chunk );
     FREE( p_box->data.p_stsc->i_sample_description_index );
 }
 
-int MP4_ReadBox_stco_co64( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_stco_co64( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 
@@ -1506,12 +1506,12 @@ int MP4_ReadBox_stco_co64( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_stco_co64( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_stco_co64( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_co64->i_chunk_offset );
 }
 
-int MP4_ReadBox_stss( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_stss( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 
@@ -1540,12 +1540,12 @@ int MP4_ReadBox_stss( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_stss( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_stss( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_stss->i_sample_number )
 }
 
-int MP4_ReadBox_stsh( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_stsh( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 
@@ -1577,14 +1577,14 @@ int MP4_ReadBox_stsh( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_stsh( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_stsh( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_stsh->i_shadowed_sample_number )
     FREE( p_box->data.p_stsh->i_sync_sample_number )
 }
 
 
-int MP4_ReadBox_stdp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_stdp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 
@@ -1609,12 +1609,12 @@ int MP4_ReadBox_stdp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_stdp( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_stdp( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_stdp->i_priority )
 }
 
-int MP4_ReadBox_padb( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_padb( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 
@@ -1653,7 +1653,7 @@ int MP4_ReadBox_padb( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_padb( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_padb( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_padb->i_reserved1 );
     FREE( p_box->data.p_padb->i_pad2 );
@@ -1661,7 +1661,7 @@ void MP4_FreeBox_padb( input_thread_t *p_input, MP4_Box_t *p_box )
     FREE( p_box->data.p_padb->i_pad1 );
 }
 
-int MP4_ReadBox_elst( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_elst( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
 
@@ -1711,7 +1711,7 @@ int MP4_ReadBox_elst( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_elst( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_elst( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_elst->i_segment_duration );
     FREE( p_box->data.p_elst->i_media_time );
@@ -1719,7 +1719,7 @@ void MP4_FreeBox_elst( input_thread_t *p_input, MP4_Box_t *p_box )
     FREE( p_box->data.p_elst->i_media_rate_fraction );
 }
 
-int MP4_ReadBox_cprt( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_cprt( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i_language;
     unsigned int i;
@@ -1748,13 +1748,13 @@ int MP4_ReadBox_cprt( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-void MP4_FreeBox_cprt( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_cprt( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_cprt->psz_notice );
 }
 
 
-int MP4_ReadBox_dcom( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_dcom( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_dcom_t );
 
@@ -1767,7 +1767,7 @@ int MP4_ReadBox_dcom( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-int MP4_ReadBox_cmvd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_cmvd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_cmvd_t );
 
@@ -1795,13 +1795,13 @@ int MP4_ReadBox_cmvd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_READBOX_EXIT( 1 );
 }
-void MP4_FreeBox_cmvd( input_thread_t *p_input, MP4_Box_t *p_box )
+static void MP4_FreeBox_cmvd( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_cmvd->p_data );
 }
 
 
-int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_Stream_t *p_stream_memory;
     MP4_Box_t *p_umov;
@@ -1937,7 +1937,7 @@ int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 #endif /* HAVE_ZLIB_H */
 }
 
-int MP4_ReadBox_rdrf( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_rdrf( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     uint32_t i_len;
     MP4_READBOX_ENTER( MP4_Box_data_rdrf_t );
@@ -1969,13 +1969,14 @@ int MP4_ReadBox_rdrf( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 #endif
     MP4_READBOX_EXIT( 1 );
 }
-void MP4_FreeBox_rdrf( input_thread_t *p_input, MP4_Box_t *p_box )
+
+static void MP4_FreeBox_rdrf( MP4_Box_t *p_box )
 {
     FREE( p_box->data.p_rdrf->psz_ref )
 }
 
 
-int MP4_ReadBox_rmdr( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_rmdr( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_rmdr_t );
 
@@ -1991,7 +1992,7 @@ int MP4_ReadBox_rmdr( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-int MP4_ReadBox_rmqu( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_rmqu( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_rmqu_t );
 
@@ -2005,7 +2006,7 @@ int MP4_ReadBox_rmqu( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-int MP4_ReadBox_rmvc( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_rmvc( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_rmvc_t );
     MP4_GETVERSIONFLAGS( p_box->data.p_rmvc );
@@ -2034,7 +2035,7 @@ static struct
 {
     uint32_t i_type;
     int  (*MP4_ReadBox_function )( MP4_Stream_t *p_stream, MP4_Box_t *p_box );
-    void (*MP4_FreeBox_function )( input_thread_t *p_input, MP4_Box_t *p_box );
+    void (*MP4_FreeBox_function )( MP4_Box_t *p_box );
 } MP4_Box_Function [] =
 {
     /* Containers */
@@ -2364,7 +2365,7 @@ void MP4_BoxFree( input_thread_t *p_input, MP4_Box_t *p_box )
         }
         else
         {
-            MP4_Box_Function[i_index].MP4_FreeBox_function( p_input, p_box );
+            MP4_Box_Function[i_index].MP4_FreeBox_function( p_box );
         }
 
         free( p_box->data.p_data );
