@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.14 2002/02/19 00:50:19 sam Exp $
+ * $Id: vpar_headers.c,v 1.15 2002/02/27 22:57:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -489,6 +489,33 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     /* Spawn a video output if there is none */
     vlc_mutex_lock( &p_vout_bank->lock );
     
+    if( p_vout_bank->i_count != 0 )
+    {
+        /* Take the first video output FIXME: take the best one */
+        p_vpar->p_vout = p_vout_bank->pp_vout[ 0 ];
+
+        if( p_vpar->p_vout->render.i_width != p_vpar->sequence.i_width
+             || p_vpar->p_vout->render.i_height != p_vpar->sequence.i_height
+             || p_vpar->p_vout->render.i_chroma != ChromaToFourCC( p_vpar->sequence.i_chroma_format )
+             || p_vpar->p_vout->render.i_aspect != p_vpar->sequence.i_aspect )
+        {
+            p_vout_bank->pp_vout[ 0 ] = NULL;
+            p_vout_bank->i_count--;
+            vlc_mutex_unlock( &p_vout_bank->lock );
+            vout_DestroyThread( p_vpar->p_vout, NULL );
+            vlc_mutex_lock( &p_vout_bank->lock );
+
+            /* XXX: race condition here if p_vout_bank->i_count was updated */
+            if( p_vout_bank->i_count )
+            {
+                vlc_mutex_unlock( &p_vout_bank->lock );
+                intf_ErrMsg( "vpar error: can't open vout, aborting" );
+                p_vpar->p_fifo->b_error = 1;
+                return;
+            }
+        }
+    }
+
     if( p_vout_bank->i_count == 0 )
     {
         intf_WarnMsg( 1, "vpar: no vout present, spawning one" );
@@ -513,11 +540,6 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 
         p_vout_bank->pp_vout[ p_vout_bank->i_count ] = p_vpar->p_vout;
         p_vout_bank->i_count++;
-    }
-    else
-    {
-        /* Take the first video output FIXME: take the best one */
-        p_vpar->p_vout = p_vout_bank->pp_vout[ 0 ];
     }
 
     vlc_mutex_unlock( &p_vout_bank->lock );

@@ -2,7 +2,7 @@
  * scope.c : Scope effect module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: scope.c,v 1.1 2002/02/25 04:30:03 sam Exp $
+ * $Id: scope.c,v 1.2 2002/02/27 22:57:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,7 +52,9 @@ static void aout_getfunctions( function_list_t * p_function_list );
  *****************************************************************************/
 typedef struct aout_sys_s
 {
-    struct aout_fifo_s *p_aout_fifo; /* XXX: unused yet */
+    struct aout_thread_s aout;
+    struct aout_fifo_s *p_aout_fifo;
+
     struct vout_thread_s *p_vout;
 
 } aout_sys_t;
@@ -127,6 +129,10 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     /* Force the output method */
     p_aout->i_format = AOUT_FMT_U16_LE;
     p_aout->i_channels = 2;
+
+    p_aout->p_sys->aout.i_format = p_aout->i_format;
+    p_aout->p_sys->aout.i_channels = p_aout->i_channels;
+    p_aout->p_sys->aout.i_rate = p_aout->i_rate;
 
     return( 0 );
 }

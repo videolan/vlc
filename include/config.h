@@ -121,8 +121,8 @@
 /* Number of audio output frames contained in an audio output fifo.
  * (AOUT_FIFO_SIZE + 1) must be a power of 2, in order to optimise the
  * %(AOUT_FIFO_SIZE + 1) operation with an &AOUT_FIFO_SIZE.
- * With 511 we have at least 511*384/2/48000=2 seconds of sound */
-#define AOUT_FIFO_SIZE                  511
+ * With 255 we have at least 255*384/2/48000=1 second of sound */
+#define AOUT_FIFO_SIZE                  255
 
 /* Maximum number of audio fifos. The value of AOUT_MAX_FIFOS should be a power
  * of two, in order to optimize the '/AOUT_MAX_FIFOS' and '*AOUT_MAX_FIFOS'
@@ -133,7 +133,7 @@
  * - short, in order to be able to play a new song very quickly (especially a
  *   song from the interface)
  * - long, in order to perform the buffer calculations as few as possible */
-#define AOUT_BUFFER_DURATION            100000
+#define AOUT_BUFFER_DURATION            50000
 
 /*****************************************************************************
  * Video configuration

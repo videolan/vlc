@@ -2,7 +2,7 @@
  * aout_pcm.c: PCM audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: aout_pcm.c,v 1.1 2002/02/24 22:06:50 sam Exp $
+ * $Id: aout_pcm.c,v 1.2 2002/02/27 22:57:10 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -51,7 +51,7 @@ static int  NextFrame ( aout_thread_t * p_aout, aout_fifo_t * p_fifo,
 void aout_PCMThread( aout_thread_t * p_aout )
 {
     int i_fifo;
-    int i_buffer, i_buffer_limit, i_bytes;
+    int i_buffer, i_buffer_limit, i_units = 0;
 
     /* As the s32_buffer was created with calloc(), we don't have to set this
      * memory to zero and we can immediately jump into the thread's loop */
@@ -118,13 +118,13 @@ void aout_PCMThread( aout_thread_t * p_aout )
             break;
         }
 
-        i_bytes = p_aout->pf_getbufinfo( p_aout, i_buffer_limit );
-
         switch ( p_aout->i_format )
         {
         case AOUT_FMT_U8:
         case AOUT_FMT_S8:
-            p_aout->date = mdate() + ((((mtime_t)((i_bytes + 4 *
+            i_units = p_aout->pf_getbufinfo( p_aout, i_buffer_limit );
+
+            p_aout->date = mdate() + ((((mtime_t)((i_units + 4 *
                 p_aout->i_latency) / p_aout->i_channels)) * 1000000) /
                 ((mtime_t)p_aout->i_rate)) + p_main->i_desync;
 
@@ -136,7 +136,9 @@ void aout_PCMThread( aout_thread_t * p_aout )
         case AOUT_FMT_U16_BE:
         case AOUT_FMT_S16_LE:
         case AOUT_FMT_S16_BE:
-            p_aout->date = mdate() + ((((mtime_t)((i_bytes + 4 *
+            i_units = p_aout->pf_getbufinfo( p_aout, i_buffer_limit * 2 ) / 2;
+
+            p_aout->date = mdate() + ((((mtime_t)((i_units + 4 *
                 p_aout->i_latency) / (2 * p_aout->i_channels))) * 1000000) /
                 ((mtime_t)p_aout->i_rate)) + p_main->i_desync;
 
@@ -145,7 +147,7 @@ void aout_PCMThread( aout_thread_t * p_aout )
             break;
         }
 
-        if ( i_bytes > i_buffer_limit )
+        if ( i_units > i_buffer_limit )
         {
             msleep( p_aout->i_msleep );
         }

@@ -2,7 +2,7 @@
  * aout_spdif.c: AC3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.23 2002/02/24 22:06:50 sam Exp $
+ * $Id: aout_spdif.c,v 1.24 2002/02/27 22:57:10 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -55,9 +55,9 @@ void aout_SpdifThread( aout_thread_t * p_aout )
     {
         for( i_fifo = 0 ; i_fifo < AOUT_MAX_FIFOS ; i_fifo++ )
         {
-            /* the loop read each fifo so that we can change the stream
+            /* The loop reads each fifo so that we can change the stream
              * on the fly but mulitplexing is not handled yet so
-             * the sound will be broken is more than one fifo has data */ 
+             * the sound will be broken if more than one fifo has data */ 
             /* TODO: write the muliplexer :) */
             if( p_aout->fifo[i_fifo].i_format == AOUT_FIFO_SPDIF )
             {
@@ -93,7 +93,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
 
                     vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
 
-                    /* play spdif frame to the external decoder 
+                    /* Play spdif frame to the external decoder 
                      * the kernel driver will sleep until the
                      * dsp buffer is empty enough to accept the data */
                     if( m_play > ( mdate() - m_frame_time ) )
