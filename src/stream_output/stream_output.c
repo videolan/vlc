@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.26 2003/04/18 22:38:11 fenrir Exp $
+ * $Id: stream_output.c,v 1.27 2003/04/29 21:32:21 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -312,7 +312,7 @@ sout_mux_t * sout_MuxNew         ( sout_instance_t *p_sout,
     }
 
     p_mux->p_sout       = p_sout;
-    p_mux->psz_mux      = strdup( psz_mux);
+    p_mux->psz_mux      = strdup( psz_mux ? psz_mux : "" );
     p_mux->p_access     = p_access;
     p_mux->i_preheader  = 0;
     p_mux->pf_capacity  = NULL;
