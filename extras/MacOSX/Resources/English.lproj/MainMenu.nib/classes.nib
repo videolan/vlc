@@ -22,12 +22,12 @@
                 toggleTitle = id; 
                 toggleVar = id; 
                 volumeDown = id; 
-                volumeSliderUpdate = id; 
+                volumeSliderUpdated = id; 
                 volumeUp = id; 
             }; 
             CLASS = VLCControls; 
             LANGUAGE = ObjC; 
-            OUTLETS = {"o_main" = id; "o_mi_mute" = id; "o_open" = id; "o_volumeslider" = id; }; 
+            OUTLETS = {"o_main" = id; "o_open" = id; "o_volumeslider" = id; }; 
             SUPERCLASS = NSObject; 
         }, 
         {
@@ -45,13 +45,13 @@
             CLASS = VLCMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                "o_btn_fastforward" = id; 
+                "o_btn_faster" = id; 
                 "o_btn_next" = id; 
                 "o_btn_play" = id; 
                 "o_btn_playlist" = id; 
                 "o_btn_prefs" = id; 
                 "o_btn_prev" = id; 
-                "o_btn_slowmotion" = id; 
+                "o_btn_slower" = id; 
                 "o_btn_stop" = id; 
                 "o_controls" = id; 
                 "o_dmi_play" = id; 

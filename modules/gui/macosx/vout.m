@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.20 2003/01/28 15:59:38 hartman Exp $
+ * $Id: vout.m,v 1.21 2003/01/31 02:53:52 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -31,12 +31,6 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/aout.h>
-#include <vlc/intf.h>
-
-#include <Cocoa/Cocoa.h>
 #include <QuickTime/QuickTime.h>
 
 #include "intf.h"
@@ -424,61 +418,14 @@ static int CoSendRequest( vout_thread_t *p_vout, SEL sel )
 {
     int i_ret = 0;
 
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    VLCVout * o_vlv = [[[VLCVout alloc] init] autorelease];
+    VLCVout * o_vlv = [[VLCVout alloc] init];
 
-    if( [o_vlv respondsToSelector: @selector(performSelectorOnMainThread:
-                                             withObject:waitUntilDone:)] )
-    {
-        [o_vlv performSelectorOnMainThread: sel
-            withObject: [NSValue valueWithPointer: p_vout]
-            waitUntilDone: YES];
-    }
-    else if( [NSApp respondsToSelector: @selector(getIntf)] )
-    {
-        NSArray * o_array;
-        NSValue * o_value;
-        NSPort * o_recv_port;
-        NSInvocation * o_inv;
-        NSPortMessage * o_msg;
-        intf_thread_t * p_intf;
-        NSMethodSignature * o_sig;
-
-        p_intf = (intf_thread_t *)[NSApp getIntf];
-
-        o_recv_port = [[NSPort port] retain];
-        o_value = [NSValue valueWithPointer: p_vout];
-
-        o_sig = [VLCVout instanceMethodSignatureForSelector: sel];
-        o_inv = [NSInvocation invocationWithMethodSignature: o_sig];
-        [o_inv setArgument: &o_value atIndex: 2];
-        [o_inv setTarget: o_vlv];
-        [o_inv setSelector: sel];
-
-        o_array = [NSArray arrayWithObject:
-            [NSData dataWithBytes: &o_inv length: sizeof(o_inv)]];
-        o_msg = [[NSPortMessage alloc]
-            initWithSendPort: p_intf->p_sys->o_sendport
-            receivePort: o_recv_port components: o_array];
-
-        p_vout->p_sys->o_lock =
-            [[NSConditionLock alloc] initWithCondition: 0];
-        [o_msg sendBeforeDate: [NSDate distantPast]];
-        [p_vout->p_sys->o_lock lockWhenCondition: 1];
-        [p_vout->p_sys->o_lock unlock];
-        [p_vout->p_sys->o_lock release];
-        p_vout->p_sys->o_lock = nil;
-
-        [o_msg release];
-        [o_recv_port release];
-    }
-    else
+    if( ( i_ret = ExecuteOnMainThread( o_vlv, sel, (void *)p_vout ) ) )
     {
         msg_Err( p_vout, "SendRequest: no way to communicate with mt" );
-        i_ret = 1;
     }
 
-    [o_pool release];
+    [o_vlv release];
 
     return( i_ret );
 }
@@ -842,7 +789,6 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     playlist_Stop( p_playlist );
     vlc_object_release( p_playlist );
-    p_intf->p_sys->b_stopping = 1;
 
     /* The window will be closed by the intf later. */
     return NO;

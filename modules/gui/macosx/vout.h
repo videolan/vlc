@@ -2,7 +2,7 @@
  * vout.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.h,v 1.4 2003/01/05 01:55:07 massiot Exp $
+ * $Id: vout.h,v 1.5 2003/01/31 02:53:52 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -67,8 +67,6 @@
  *****************************************************************************/
 struct vout_sys_t
 {
-    NSConditionLock * o_lock;
-
     NSRect s_rect;
     int b_pos_saved;
     VLCWindow * o_window;

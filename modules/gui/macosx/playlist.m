@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: playlist.m,v 1.6 2003/01/29 11:34:11 jlj Exp $
+ * $Id: playlist.m,v 1.7 2003/01/31 02:53:52 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -28,11 +28,6 @@
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-
-#include <Cocoa/Cocoa.h> 
-
 #include "intf.h"
 #include "playlist.h"
 
@@ -48,23 +43,40 @@
 
 - (void)keyDown:(NSEvent *)o_event
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
     unichar key = 0;
+    playlist_t * p_playlist;
+    intf_thread_t * p_intf = [NSApp getIntf];
 
     if( [[o_event characters] length] )
     {
         key = [[o_event characters] characterAtIndex: 0];
     }
 
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    if( p_playlist != NULL )
+    {
+        vlc_mutex_lock( &p_playlist->object_lock );
+    }
+
     switch( key )
     {
         case ' ':
-            input_SetStatus(  p_intf->p_sys->p_input , INPUT_STATUS_PAUSE );
+            if( p_playlist != NULL && p_playlist->p_input != NULL )
+            {
+                input_SetStatus( p_playlist->p_input, INPUT_STATUS_PAUSE );
+            }
             break;
 
         default:
             [super keyDown: o_event];
             break;
+    }
+
+    if( p_playlist != NULL )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_release( p_playlist );
     }
 }
 

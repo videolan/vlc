@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.19 2003/01/29 11:34:11 jlj Exp $
+ * $Id: intf.h,v 1.20 2003/01/31 02:53:52 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -26,6 +26,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
+#include <vlc/aout.h>
 
 #include <Cocoa/Cocoa.h>
 
@@ -48,6 +49,8 @@
 
 #define _NS(s) [NSApp localizedString: _(s)]
 
+int ExecuteOnMainThread( id target, SEL sel, void * p_arg );
+
 /*****************************************************************************
  * intf_sys_t: description and status of the interface
  *****************************************************************************/
@@ -58,8 +61,11 @@ struct intf_sys_t
 
     /* special actions */
     vlc_bool_t b_playing;
-    vlc_bool_t b_stopping;
     vlc_bool_t b_mute;
+
+    /* interface update */
+    vlc_bool_t b_intf_update;
+    vlc_bool_t b_play_status; 
 
     /* menus handlers */
     vlc_bool_t b_chapter_update;
@@ -69,9 +75,6 @@ struct intf_sys_t
     vlc_bool_t b_spu_update;
     vlc_bool_t b_aout_update;
     vlc_bool_t b_vout_update;
-
-    /* The input thread */
-    input_thread_t * p_input;
 
     /* The messages window */
     msg_subscription_t * p_sub;
@@ -96,12 +99,15 @@ struct intf_sys_t
 
     IBOutlet id o_btn_playlist; /* btn playlist   */
     IBOutlet id o_btn_prev;     /* btn previous   */
-    IBOutlet id o_btn_slowmotion;   /* btn slowmotion     */
+    IBOutlet id o_btn_slower;   /* btn slower     */
     IBOutlet id o_btn_play;     /* btn play       */
     IBOutlet id o_btn_stop;     /* btn stop       */
-    IBOutlet id o_btn_fastforward;   /* btn fastforward     */
+    IBOutlet id o_btn_faster;   /* btn faster     */
     IBOutlet id o_btn_next;     /* btn next       */
     IBOutlet id o_btn_prefs;    /* btn prefs      */
+
+    NSImage * o_img_play;       /* btn play img   */
+    NSImage * o_img_pause;      /* btn pause img  */
 
     IBOutlet id o_controls;     /* VLCControls    */
     IBOutlet id o_playlist;     /* VLCPlaylist    */
@@ -191,11 +197,18 @@ struct intf_sys_t
 - (void)terminate;
 
 - (void)manage;
-- (void)manageMode;
-- (void)setControlItems;
+- (void)manage:(playlist_t *)p_playlist;
+- (void)manageMode:(playlist_t *)p_playlist;
+- (void)manageIntf:(NSTimer *)o_timer;
 
-- (void)setupMenus;
-- (void)setupLangMenu:(NSMenuItem *)o_mi
+- (void)updateMessageArray;
+- (void)playStatusUpdated:(BOOL)b_pause;
+- (void)setSubmenusEnabled:(BOOL)b_enabled;
+- (void)manageVolumeSlider;
+
+- (void)setupMenus:(input_thread_t *)p_input;
+- (void)setupLangMenu:(input_thread_t *)p_input
+                      mi:(NSMenuItem *)o_mi
                       es:(es_descriptor_t *)p_es
                       category:(int)i_cat
                       selector:(SEL)pf_callback;
@@ -210,7 +223,6 @@ struct intf_sys_t
 - (IBAction)viewPreferences:(id)sender;
 
 - (IBAction)timesliderUpdate:(id)sender;
-- (void)displayTime;
 
 - (IBAction)closeError:(id)sender;
 

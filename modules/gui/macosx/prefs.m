@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.9 2003/01/27 17:41:01 ipkiss Exp $
+ * $Id: prefs.m,v 1.10 2003/01/31 02:53:52 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -28,13 +28,8 @@
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
 
-#import <Cocoa/Cocoa.h>
-
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-
-#import "intf.h"
-#import "prefs.h"
+#include "intf.h"
+#include "prefs.h"
 
 /*****************************************************************************
  * VLCPrefs implementation
