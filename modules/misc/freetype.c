@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.17 2003/08/10 10:22:52 gbazin Exp $
+ * $Id: freetype.c,v 1.18 2003/08/17 15:22:49 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -57,6 +57,8 @@ static void Render    ( vout_thread_t *, picture_t *,
 static void RenderI420( vout_thread_t *, picture_t *,
                         const subpicture_t * );
 static void RenderYUY2( vout_thread_t *, picture_t *,
+                        const subpicture_t * );
+static void RenderRV32( vout_thread_t *, picture_t *,
                         const subpicture_t * );
 static int  AddText   ( vout_thread_t *, byte_t *, text_style_t *, int,
                         int, int, mtime_t, mtime_t );
@@ -266,13 +268,12 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic,
         case VLC_FOURCC('R','V','1','6'):
             RenderRV16( p_vout, p_pic, p_subpic );
             break;
-
+#endif
         /* RV32 target, scaling */
         case VLC_FOURCC('R','V','2','4'):
         case VLC_FOURCC('R','V','3','2'):
             RenderRV32( p_vout, p_pic, p_subpic );
             break;
-#endif
         /* NVidia or BeOS overlay, no scaling */
         case VLC_FOURCC('Y','U','Y','2'):
             RenderYUY2( p_vout, p_pic, p_subpic );
@@ -335,7 +336,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                 {
                     FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 #define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ x + y * p_glyph->bitmap.width ] ]
-#define pixel p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch+x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ]
+#define pixel p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch + x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ]
                     for(y = 0; y < p_glyph->bitmap.rows; y++ )
                     {
                         for( x = 0; x < p_glyph->bitmap.width; x++ )
@@ -458,6 +459,73 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
     }
 }
 
+/**
+ * Draw a string on a RV32 picture
+ */
+static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
+                    const subpicture_t *p_subpic )
+{
+    subpicture_sys_t *p_string = p_subpic->p_sys;
+    int i_plane, x, y, pen_x, pen_y;
+    unsigned int i;
+    line_desc_t *p_line;
+
+    i_plane = 0;
+    
+    for( p_line = p_subpic->p_sys->p_lines; p_line != NULL; p_line = p_line->p_next )
+    {
+        uint8_t *p_in;
+        int i_pitch = p_pic->p[ i_plane ].i_pitch;
+        
+        p_in = p_pic->p[ i_plane ].p_pixels;
+        
+        if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
+        {
+            pen_y = p_pic->p[ i_plane ].i_lines - p_string->i_height -
+                p_string->i_y_margin;
+        }
+        else
+        {
+            pen_y = p_string->i_y_margin;
+        }
+        pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.ascender >> 6;
+        if ( p_string->i_flags & OSD_ALIGN_RIGHT )
+        {
+            pen_x = i_pitch - p_line->i_width
+                - p_string->i_x_margin;
+        }
+        else if ( p_string->i_flags & OSD_ALIGN_LEFT )
+        {
+            pen_x = p_string->i_x_margin;
+        }
+        else
+        {
+            pen_x = i_pitch / 2 - p_line->i_width / 2
+                + p_string->i_x_margin;
+        }
+        
+        for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
+        {
+            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
+#define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ x + y * p_glyph->bitmap.width ] ]
+#define pixel( c ) p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch + ( x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ) * 4 + c ]
+            for(y = 0; y < p_glyph->bitmap.rows; y++ )
+            {
+                for( x = 0; x < p_glyph->bitmap.width; x++ )
+                {
+                    pixel( 0 ) = ( ( pixel( 0 ) * ( 255 - alpha ) ) >> 8 ) +
+                        ( 255 * alpha >> 8 );
+                    pixel( 1 ) = ( ( pixel( 1 ) * ( 255 - alpha ) ) >> 8 ) +
+                        ( 255 * alpha >> 8 );
+                    pixel( 2 ) = ( ( pixel( 2 ) * ( 255 - alpha ) ) >> 8 ) +
+                        ( 255 * alpha >> 8 );
+#undef alpha
+#undef pixel
+                }
+            }
+        }
+    }
+}
 
 /**
  * This function receives a string and creates a subpicture for it. It
