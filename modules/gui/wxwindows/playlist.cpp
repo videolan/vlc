@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.42 2004/02/23 12:17:24 gbazin Exp $
+ * $Id: playlist.cpp,v 1.43 2004/02/24 18:19:44 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -1206,9 +1206,9 @@ int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
 
     wxCommandEvent event( wxEVT_PLAYLIST, UpdateItem_Event );
     event.SetInt( old_val.i_int );
-    p_playlist_dialog->AddPendingEvent( event );
+    p_playlist_dialog->ProcessEvent( event );
     event.SetInt( new_val.i_int );
-    p_playlist_dialog->AddPendingEvent( event );
+    p_playlist_dialog->ProcessEvent( event );
 
     return 0;
 }
@@ -1223,7 +1223,7 @@ int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
 
     wxCommandEvent event( wxEVT_PLAYLIST, UpdateItem_Event );
     event.SetInt( new_val.i_int );
-    p_playlist_dialog->AddPendingEvent( event );
+    p_playlist_dialog->ProcessEvent( event );
 
     return 0;
 }
