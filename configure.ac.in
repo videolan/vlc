@@ -959,8 +959,13 @@ then
     then
       AC_CHECK_HEADERS(dvbpsi/dr.h,
         [ PLUGINS="${PLUGINS} ts_dvbpsi"
-          LDFLAGS_ts_dvbpsi="${LDFLAGS_ts_dvbpsi} -ldvbpsi" ], [],
-        [  AC_MSG_ERROR([cannot find libdvbpsi headers]) ])
+          LDFLAGS_ts_dvbpsi="${LDFLAGS_ts_dvbpsi} -ldvbpsi" ],
+        [  AC_MSG_ERROR([cannot find libdvbpsi headers]) ],
+        [#include <stdint.h>
+#include <dvbpsi/dvbpsi.h>
+#include <dvbpsi/descriptor.h>
+#include <dvbpsi/pat.h>
+#include <dvbpsi/pmt.h>])
     else
       AC_MSG_CHECKING(for libdvbpsi.a in ${with_dvbpsi_tree})
       real_dvbpsi_tree="`cd ${with_dvbpsi_tree} 2>/dev/null && pwd`"
