@@ -2,10 +2,11 @@
  * text.cpp: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.cpp,v 1.9 2003/04/28 14:12:32 asmax Exp $
+ * $Id: text.cpp,v 1.10 2003/06/05 22:16:15 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
+ *          Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,6 +43,11 @@
 #include "../src/window.h"
 #include "../os_window.h"
 #include "../src/skin_common.h"
+
+#ifdef X11_SKINS
+#include "../x11/x11_timer.h"
+extern intf_thread_t *g_pIntf;
+#endif
 
 
 
@@ -114,10 +120,23 @@
 
     //-----------------------------------------------------------------------
     // X11 methods
-    //-----------------------------------------------------------------------
+    //----------------------------------------------------------------------- 
+    void ScrollingTextTimer( void *data )
+    { 
+        if( (ControlText *)data != NULL
+            && !( (ControlText *)data )->GetSelected() )
+        {
+            ( (ControlText *)data )->DoScroll();
+        }
+    }
+
     //-----------------------------------------------------------------------
     void ControlText::StartScrolling()
     {
+        X11Timer *timer = new X11Timer( g_pIntf, 100000, ScrollingTextTimer, 
+                                        (void*)this );
+        X11TimerManager *timerManager = X11TimerManager::Instance( g_pIntf );
+        timerManager->addTimer( timer );
     }
     //-----------------------------------------------------------------------
     void ControlText::StopScrolling()

@@ -106,6 +106,8 @@ COMMON_skins = \
 	modules/gui/skins/x11/x11_run.cpp \
 	modules/gui/skins/x11/x11_theme.cpp \
 	modules/gui/skins/x11/x11_theme.h \
+	modules/gui/skins/x11/x11_timer.cpp \
+	modules/gui/skins/x11/x11_timer.h \
 	modules/gui/skins/x11/x11_window.cpp \
 	modules/gui/skins/x11/x11_window.h
 

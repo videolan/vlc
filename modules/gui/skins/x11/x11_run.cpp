@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.14 2003/06/03 22:18:58 gbazin Exp $
+ * $Id: x11_run.cpp,v 1.15 2003/06/05 22:16:15 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -41,6 +41,8 @@
 #include "../os_theme.h"
 #include "../src/skin_common.h"
 #include "../src/vlcproc.h"
+#include "x11_timer.h"
+
 
 //---------------------------------------------------------------------------
 // Specific method
@@ -151,6 +153,13 @@ int ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
     return 0;
 }
 
+
+void RefreshCallback( void *data )
+{
+    SkinManage( (intf_thread_t*)data );
+}
+
+
 //---------------------------------------------------------------------------
 // X11 interface
 //---------------------------------------------------------------------------
@@ -160,9 +169,15 @@ void OSRun( intf_thread_t *p_intf )
 
     Display *display = ((OSTheme *)p_intf->p_sys->p_theme)->GetDisplay();
 
+
+    // Timer for SkinManage
+    X11Timer *refreshTimer = new X11Timer( p_intf, 100000, RefreshCallback,
+                                           (void*)p_intf );
+    X11TimerManager *timerManager = X11TimerManager::Instance( p_intf );
+    timerManager->addTimer( refreshTimer );
+
     // Main event loop
     int close = 0;
-    int count = 0;
     while( !close )
     {
         XEvent event;
@@ -180,14 +195,12 @@ void OSRun( intf_thread_t *p_intf )
             nPending = XPending( display );
             XUNLOCK;
         }
-        
         msleep( 1000 );
-        if( ++count == 100 )
-        {
-            count = 0;
-            SkinManage( p_intf );    // Call every 100 ms
-        }
     }
+
+    timerManager->Destroy();
+    delete refreshTimer;
+    
 }
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg )
