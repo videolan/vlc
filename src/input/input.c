@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.163 2001/12/07 18:33:08 sam Exp $
+ * $Id: input.c,v 1.164 2001/12/10 16:16:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -459,24 +459,27 @@ static int InitThread( input_thread_t * p_input )
     }
     else 
 #endif
-        if( ( ( strlen( p_input->p_source ) > 4 )
-                && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
-            || TestMethod( INPUT_METHOD_VAR, "dvd" ) )
+        if( ( ( ( strlen( p_input->p_source ) > 4 )
+                  && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+              || TestMethod( INPUT_METHOD_VAR, "dvd" ) ) 
+             && f.pf_open != NULL )
     {
         /* DVD - this is THE kludge */
         f.pf_open( p_input );
         p_input->stream.i_method = INPUT_METHOD_DVD;
     }
-    else if( ( ( strlen( p_input->p_source ) > 8 )
-                 && !strncasecmp( p_input->p_source, "dvdread:", 8 ) )
-              || TestMethod( INPUT_METHOD_VAR, "dvdread" ) )
+    else if( ( ( ( strlen( p_input->p_source ) > 8 )
+                   && !strncasecmp( p_input->p_source, "dvdread:", 8 ) )
+                || TestMethod( INPUT_METHOD_VAR, "dvdread" ) )
+             && f.pf_open != NULL )
     {
         /* DVDRead - this is THE kludge */
         f.pf_open( p_input );
         p_input->stream.i_method = INPUT_METHOD_DVD;
     }
     else if( ( strlen( p_input->p_source ) > 4 )
-               && !strncasecmp( p_input->p_source, "vlc:", 4 ) )
+               && !strncasecmp( p_input->p_source, "vlc:", 4 )
+               && f.pf_open != NULL )
     {
         /* Dummy input - very kludgy */
         f.pf_open( p_input );
