@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.12 2001/08/22 17:21:45 massiot Exp $
+ * $Id: video_parser.h,v 1.13 2001/09/05 16:07:50 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -330,11 +330,18 @@ typedef struct vpar_thread_s
     /* Motion compensation plug-in used and shortcuts */
     struct module_s *       p_motion_module;
 
-    /* IDCT plugin used and shortcuts */
+    /* IDCT plug-in used and shortcuts */
     struct module_s *       p_idct_module;
-    void ( * pf_sparse_idct ) ( void *, dctelem_t*, int );
-    void ( * pf_idct )        ( void *, dctelem_t*, int );
-    void ( * pf_norm_scan )   ( u8 ppi_scan[2][64] );
+    void ( * pf_sparse_idct_add )( dctelem_t *, yuv_data_t *, int,
+                                 void *, int );
+    void ( * pf_idct_add )     ( dctelem_t *, yuv_data_t *, int,
+                                 void *, int );
+    void ( * pf_sparse_idct_copy )( dctelem_t *, yuv_data_t *, int,
+                                  void *, int );
+    void ( * pf_idct_copy )    ( dctelem_t *, yuv_data_t *, int,
+                                 void *, int );
+
+    void ( * pf_norm_scan ) ( u8 ppi_scan[2][64] );
 
 #ifdef STATS
     /* Statistics */

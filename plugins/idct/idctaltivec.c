@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctaltivec.c,v 1.11 2001/08/22 17:21:45 massiot Exp $
+ * $Id: idctaltivec.c,v 1.12 2001/09/05 16:07:49 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -37,9 +37,7 @@
 #include "mtime.h"
 #include "tests.h"                                              /* TestCPU() */
 
-#include "vdec_idct.h"
-
-#include "idctaltivec.h"
+#include "idct.h"
 
 #include "modules.h"
 #include "modules_export.h"
@@ -48,8 +46,8 @@
  * Local prototypes.
  *****************************************************************************/
 static void idct_getfunctions( function_list_t * p_function_list );
-static int  idct_Probe      ( probedata_t *p_data );
-static void vdec_NormScan   ( u8 ppi_scan[2][64] );
+void idct_block_copy_altivec( dctelem_t *, yuv_data_t *, int, void *, int );
+void idct_block_add_altivec( dctelem_t *, yuv_data_t *, int, void *, int );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -75,23 +73,6 @@ MODULE_DEACTIVATE_STOP
 /* Following functions are local */
 
 /*****************************************************************************
- * Functions exported as capabilities.
- *****************************************************************************/
-static void idct_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->pf_probe = idct_Probe;
-#define F p_function_list->functions.idct
-    F.pf_idct_init = _M( vdec_InitIDCT );
-    F.pf_sparse_idct = _M( vdec_SparseIDCT );
-    F.pf_idct = _M( vdec_IDCT );
-    F.pf_norm_scan = vdec_NormScan;
-    F.pf_decode_init = _M( vdec_InitDecode );
-    F.pf_addblock = _M( vdec_AddBlock );
-    F.pf_copyblock = _M( vdec_CopyBlock );
-#undef F
-}
-
-/*****************************************************************************
  * idct_Probe: return a preference score
  *****************************************************************************/
 static int idct_Probe( probedata_t *p_data )
@@ -107,23 +88,36 @@ static int idct_Probe( probedata_t *p_data )
         return( 999 );
     }
 
-    /* The Altivec iDCT is deactivated until it really works */
-    return( 0 /* 200 */ );
+    return( 200 );
 }
 
 /*****************************************************************************
- * vdec_NormScan : Soon, transpose
+ * Placeholders for unused functions
  *****************************************************************************/
-static void vdec_NormScan( u8 ppi_scan[2][64] )
+static void NormScan( u8 ppi_scan[2][64] )
 {
 }
 
-/*****************************************************************************
- * vdec_IDCT :
- *****************************************************************************/
-void _M( vdec_IDCT )( void * p_unused_data, dctelem_t * p_block,
-                      int i_idontcare )
+static void InitIDCT( void * p_idct_data )
 {
-    IDCT( p_block, p_block );
+}
+
+
+/*****************************************************************************
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+static void idct_getfunctions( function_list_t * p_function_list )
+{
+    p_function_list->pf_probe = idct_Probe;
+#define F p_function_list->functions.idct
+    F.pf_idct_init = InitIDCT;
+    F.pf_norm_scan = NormScan;
+    /* FIXME : it would be a nice idea to use sparse IDCT functions */
+    F.pf_sparse_idct_add = idct_block_add_altivec;
+    F.pf_sparse_idct_copy = idct_block_copy_altivec;
+    F.pf_idct_add = idct_block_add_altivec;
+    F.pf_idct_copy = idct_block_copy_altivec;
+#undef F
 }
 

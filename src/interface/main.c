@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.112 2001/08/22 14:23:57 sam Exp $
+ * $Id: main.c,v 1.113 2001/09/05 16:07:50 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1068,7 +1068,7 @@ static int CPUCapabilities( void )
     slot_name( hi.cpu_type, hi.cpu_subtype, &psz_name, &psz_subname );
     /* FIXME: need better way to detect newer proccessors.
      * could do strncmp(a,b,5), but that's real ugly */
-    if( strcmp(psz_name, "ppc7400") || strcmp(psz_name, "ppc7450") )
+    if( !strcmp(psz_name, "ppc7400") || !strcmp(psz_name, "ppc7450") )
     {
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
     }
@@ -1181,6 +1181,30 @@ static int CPUCapabilities( void )
     }
 
     signal( SIGILL, NULL );     
+    return( i_capabilities );
+
+#elif defined( __powerpc__ )
+#   if defined( vector )
+    /* Test for Altivec */
+    signal( SIGILL, InstructionSignalHandler );
+
+    i_illegal = 0;
+    if( setjmp( env ) == 0 )
+    {
+        /* Set VSCR to 0 */
+        vec_mtvscr( (vector unsigned int)(0) );
+        /* Set the VRSAVE register in case the kernel looks at it */
+        asm volatile ("mtspr 256,%0" : : "r" (-1));
+    }
+
+    if( i_illegal == 0 )
+    {
+        i_capabilities |= CPU_CAPABILITY_ALTIVEC;
+    }
+
+    signal( SIGILL, NULL );     
+#   endif
+
     return( i_capabilities );
 
 #else

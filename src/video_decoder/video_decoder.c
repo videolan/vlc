@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.57 2001/08/22 17:21:45 massiot Exp $
+ * $Id: video_decoder.c,v 1.58 2001/09/05 16:07:50 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -150,7 +150,6 @@ void vdec_InitThread( vdec_thread_t * p_vdec )
 
     p_vdec->p_idct_data = NULL;
 
-    p_vdec->p_pool->pf_decode_init( p_vdec );
     p_vdec->p_pool->pf_idct_init( &p_vdec->p_idct_data );
 
     /* Mark thread as running and return */
@@ -259,18 +258,15 @@ void PSZ_NAME ( vdec_thread_t *p_vdec, macroblock_t * p_mb )                \
             if( p_mb->i_coded_block_pattern & (1 << (5 - i)) )              \
             {                                                               \
                 /*                                                          \
-                 * Inverse DCT (ISO/IEC 13818-2 section Annex A)            \
-                 */                                                         \
-                p_idct->pf_idct( p_vdec->p_idct_data, p_idct->pi_block,     \
-                                 p_idct->i_sparse_pos );                    \
-                                                                            \
-                /*                                                          \
-                 * Adding prediction and coefficient data (ISO/IEC          \
+                 * Inverse DCT (ISO/IEC 13818-2 section Annex A) and        \
+                 * adding prediction and coefficient data (ISO/IEC          \
                  * 13818-2 section 7.6.8)                                   \
                  */                                                         \
-                p_pool->pf_addblock( p_idct->pi_block, p_idct->p_dct_data,  \
-                                     i < 4 ? p_mb->i_lum_dct_stride :       \
-                                             p_mb->i_chrom_dct_stride );    \
+                p_idct->pf_idct( p_idct->pi_block, p_idct->p_dct_data,      \
+                                 i < 4 ? p_mb->i_lum_dct_stride :           \
+                                         p_mb->i_chrom_dct_stride,          \
+                                 p_vdec->p_idct_data,                       \
+                                 p_idct->i_sparse_pos );                    \
             }                                                               \
         }                                                                   \
     }                                                                       \
@@ -280,11 +276,11 @@ void PSZ_NAME ( vdec_thread_t *p_vdec, macroblock_t * p_mb )                \
         for( i = 0, p_idct = p_mb->p_idcts; i < 4 + 2 * B_COLOR;            \
              i++, p_idct++ )                                                \
         {                                                                   \
-            p_idct->pf_idct( p_vdec->p_idct_data, p_idct->pi_block,         \
+            p_idct->pf_idct( p_idct->pi_block, p_idct->p_dct_data,          \
+                             i < 4 ? p_mb->i_lum_dct_stride :               \
+                                     p_mb->i_chrom_dct_stride,              \
+                             p_vdec->p_idct_data,                           \
                              p_idct->i_sparse_pos );                        \
-            p_pool->pf_copyblock( p_idct->pi_block, p_idct->p_dct_data,     \
-                                  i < 4 ? p_mb->i_lum_dct_stride :          \
-                                          p_mb->i_chrom_dct_stride );       \
         }                                                                   \
     }                                                                       \
 }

@@ -2,7 +2,7 @@
  * motion3dnow.c : 3DNow! motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motion3dnow.c,v 1.1 2001/08/22 17:21:45 massiot Exp $
+ * $Id: motion3dnow.c,v 1.2 2001/09/05 16:07:49 massiot Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -85,7 +85,7 @@ static int motion_Probe( probedata_t *p_data )
         return( 999 );
     }
 
-    return( 200 );
+    return( 250 );
 }
 
 /*****************************************************************************

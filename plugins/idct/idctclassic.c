@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctclassic.c,v 1.14 2001/08/22 17:21:45 massiot Exp $
+ * $Id: idctclassic.c,v 1.15 2001/09/05 16:07:49 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -37,7 +37,8 @@
 #include "mtime.h"
 #include "tests.h"
 
-#include "vdec_idct.h"
+#include "idct.h"
+#include "block_c.h"
 
 #include "modules.h"
 #include "modules_export.h"
@@ -46,9 +47,6 @@
  * Local and extern prototypes.
  *****************************************************************************/
 static void idct_getfunctions( function_list_t * p_function_list );
-static int  idct_Probe      ( probedata_t *p_data );
-static void vdec_NormScan   ( u8 ppi_scan[2][64] );
-
 
 /*****************************************************************************
  * Build configuration tree.
@@ -74,24 +72,6 @@ MODULE_DEACTIVATE_STOP
 /* Following functions are local */
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void idct_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->pf_probe = idct_Probe;
-#define F p_function_list->functions.idct
-    F.pf_idct_init = _M( vdec_InitIDCT );
-    F.pf_sparse_idct = _M( vdec_SparseIDCT );
-    F.pf_idct = _M( vdec_IDCT );
-    F.pf_norm_scan = vdec_NormScan;
-    F.pf_decode_init = _M( vdec_InitDecode );
-    F.pf_addblock = _M( vdec_AddBlock );
-    F.pf_copyblock = _M( vdec_CopyBlock );
-#undef F
-}
-
-/*****************************************************************************
  * idct_Probe: returns a preference score
  *****************************************************************************/
 static int idct_Probe( probedata_t *p_data )
@@ -107,20 +87,17 @@ static int idct_Probe( probedata_t *p_data )
 }
 
 /*****************************************************************************
- * vdec_NormScan : Unused in this IDCT
+ * NormScan : Unused in this IDCT
  *****************************************************************************/
-static void vdec_NormScan( u8 ppi_scan[2][64] )
+static void NormScan( u8 ppi_scan[2][64] )
 {
 }
 
 /*****************************************************************************
- * vdec_IDCT : IDCT function for normal matrices
+ * IDCT : IDCT function for normal matrices
  *****************************************************************************/
-void _M( vdec_IDCT )( void * p_unused_data, dctelem_t * p_block,
-                      int i_idontcare )
+static __inline__ void IDCT( dctelem_t * p_block )
 {
-    /* dct classique: pour tester la meilleure entre la classique et la */
-    /* no classique */
     s32 tmp0, tmp1, tmp2, tmp3;
     s32 tmp10, tmp11, tmp12, tmp13;
     s32 z1, z2, z3, z4, z5;
@@ -336,4 +313,7 @@ void _M( vdec_IDCT )( void * p_unused_data, dctelem_t * p_block,
         dataptr++;                      /* advance pointer to next column */
     }
 }
+
+#include "idct_sparse.h"
+#include "idct_decl.h"
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vdec_block_c.c: Macroblock copy functions in C
+ * block_c.h: Macroblock copy functions in C
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vdec_block_c.c,v 1.6 2001/08/22 17:21:45 massiot Exp $
+ * $Id: block_c.h,v 1.1 2001/09/05 16:07:49 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -21,32 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* MODULE_NAME defined in Makefile together with -DBUILTIN */
-#ifdef BUILTIN
-#   include "modules_inner.h"
-#else
-#   define _M( foo ) foo
-#endif
-
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-#include "defs.h"
-
-#include <string.h>
-
-#include "config.h"
-#include "common.h"
-#include "threads.h"
-#include "mtime.h"
-
-#include "intf_msg.h"
-
-#include "vdec_idct.h"
-
-#include "modules.h"
-#include "modules_export.h"
-
 /*****************************************************************************
  * Static variables
  *****************************************************************************
@@ -56,9 +30,9 @@ static u8  pi_crop_buf[VDEC_CROPRANGE];
 static u8 *pi_crop;
 
 /*****************************************************************************
- * vdec_InitDecode: initialize video decoder thread
+ * InitBlock: initialize the crop table
  *****************************************************************************/
-void _M( vdec_InitDecode ) ( )
+static void InitBlock ( )
 {
     int i_dummy;
 
@@ -82,10 +56,10 @@ void _M( vdec_InitDecode ) ( )
 }
 
 /*****************************************************************************
- * vdec_AddBlock : add a block
+ * AddBlock: add a block
  *****************************************************************************/
-void _M( vdec_AddBlock ) ( dctelem_t * p_block, yuv_data_t * p_data,
-                           int i_incr )
+static __inline__ void AddBlock( dctelem_t * p_block, yuv_data_t * p_data,
+                                 int i_incr )
 {
     int i = 8;
 
@@ -105,10 +79,10 @@ void _M( vdec_AddBlock ) ( dctelem_t * p_block, yuv_data_t * p_data,
 }
 
 /*****************************************************************************
- * vdec_CopyBlock : copy a block
+ * CopyBlock: copy a block
  *****************************************************************************/
-void _M( vdec_CopyBlock )( dctelem_t * p_block, yuv_data_t * p_data,
-                           int i_incr )
+static __inline__ void CopyBlock( dctelem_t * p_block, yuv_data_t * p_data,
+                                  int i_incr )
 {
     int i = 8;
 

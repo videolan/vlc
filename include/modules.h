@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.28 2001/08/22 17:21:45 massiot Exp $
+ * $Id: modules.h,v 1.29 2001/09/05 16:07:49 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -170,13 +170,15 @@ typedef struct function_list_s
         struct
         {
             void ( * pf_idct_init )    ( void ** );
-            void ( * pf_sparse_idct )  ( void *, dctelem_t *, int );
-            void ( * pf_idct )         ( void *, dctelem_t *, int );
+            void ( * pf_sparse_idct_add )( dctelem_t *, yuv_data_t *, int,
+                                         void *, int );
+            void ( * pf_idct_add )     ( dctelem_t *, yuv_data_t *, int,
+                                         void *, int );
+            void ( * pf_sparse_idct_copy )( dctelem_t *, yuv_data_t *, int,
+                                         void *, int );
+            void ( * pf_idct_copy )    ( dctelem_t *, yuv_data_t *, int,
+                                         void *, int );
             void ( * pf_norm_scan )    ( u8 ppi_scan[2][64] );
-
-            void ( * pf_decode_init )  ( );
-            void ( * pf_addblock )     ( dctelem_t *, yuv_data_t *, int );
-            void ( * pf_copyblock )    ( dctelem_t *, yuv_data_t *, int );
         } idct;
 
         /* YUV transformation plugin */

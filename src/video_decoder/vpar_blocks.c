@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.8 2001/09/04 23:21:34 jlj Exp $
+ * $Id: vpar_blocks.c,v 1.9 2001/09/05 16:07:50 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -304,23 +304,23 @@ store_coeff:
         {
             if( i_nc == 0 )
             {
-                p_idct->pf_idct = p_vpar->pf_sparse_idct;
+                p_idct->pf_idct = p_vpar->pf_sparse_idct_copy;
                 p_idct->i_sparse_pos = 63;
             }
             else
             {
-                p_idct->pf_idct = p_vpar->pf_idct;
+                p_idct->pf_idct = p_vpar->pf_idct_copy;
             }
         }
         else 
         {
-            p_idct->pf_idct = p_vpar->pf_sparse_idct;
+            p_idct->pf_idct = p_vpar->pf_sparse_idct_copy;
             p_idct->i_sparse_pos = i_coeff - p_tab->i_run;
         }
     }
     else
     {
-        p_idct->pf_idct = p_vpar->pf_idct;
+        p_idct->pf_idct = p_vpar->pf_idct_copy;
     }
 }
 
@@ -448,23 +448,23 @@ store_coeff:
         {
             if( i_nc == 0 )
             {
-                p_idct->pf_idct = p_vpar->pf_sparse_idct;
+                p_idct->pf_idct = p_vpar->pf_sparse_idct_copy;
                 p_idct->i_sparse_pos = 63;
             }
             else
             {
-                p_idct->pf_idct = p_vpar->pf_idct;
+                p_idct->pf_idct = p_vpar->pf_idct_copy;
             }
         }
         else 
         {
-            p_idct->pf_idct = p_vpar->pf_sparse_idct;
+            p_idct->pf_idct = p_vpar->pf_sparse_idct_copy;
             p_idct->i_sparse_pos = i_coeff - p_tab->i_run;
         }
     }
     else
     {
-        p_idct->pf_idct = p_vpar->pf_idct;
+        p_idct->pf_idct = p_vpar->pf_idct_copy;
     }
 }
 
@@ -614,17 +614,17 @@ coeff_2:
         {
             if( i_nc == 0 )
             {
-                p_idct->pf_idct = p_vpar->pf_sparse_idct;
+                p_idct->pf_idct = p_vpar->pf_sparse_idct_add;
                 p_idct->i_sparse_pos = 63;
             }
             else
             {
-                p_idct->pf_idct = p_vpar->pf_idct;
+                p_idct->pf_idct = p_vpar->pf_idct_add;
             }
         }
         else 
         {
-            p_idct->pf_idct = p_vpar->pf_sparse_idct;
+            p_idct->pf_idct = p_vpar->pf_sparse_idct_add;
             if( i_nc == 0 )
             {
                 p_idct->i_sparse_pos = 0;
@@ -637,7 +637,7 @@ coeff_2:
     }
     else
     {
-        p_idct->pf_idct = p_vpar->pf_idct;
+        p_idct->pf_idct = p_vpar->pf_idct_add;
     }
 }
 
@@ -775,12 +775,12 @@ store_coeff:
 
     if( i_nc <= 1 )
     {
-        p_idct->pf_idct = p_vpar->pf_sparse_idct;
+        p_idct->pf_idct = p_vpar->pf_sparse_idct_copy;
         p_idct->i_sparse_pos = i_coeff - p_tab->i_run;
     }
     else
     {
-        p_idct->pf_idct = p_vpar->pf_idct;
+        p_idct->pf_idct = p_vpar->pf_idct_copy;
     }
 }
 
@@ -930,7 +930,7 @@ coeff_2:
 
     if( i_nc <= 1 )
     {
-        p_idct->pf_idct = p_vpar->pf_sparse_idct;
+        p_idct->pf_idct = p_vpar->pf_sparse_idct_add;
         if( i_nc == 0 )
         {
             p_idct->i_sparse_pos = 0;
@@ -942,7 +942,7 @@ coeff_2:
     }
     else
     {
-        p_idct->pf_idct = p_vpar->pf_idct;
+        p_idct->pf_idct = p_vpar->pf_idct_add;
     }
 }
 

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.4 2001/08/22 17:21:45 massiot Exp $
+ * $Id: video_parser.c,v 1.5 2001/09/05 16:07:50 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -153,12 +153,11 @@ static int InitThread( vpar_thread_t *p_vpar )
 
 #define f p_vpar->p_idct_module->p_functions->idct.functions.idct
     p_vpar->pool.pf_idct_init   = f.pf_idct_init;
-    p_vpar->pf_sparse_idct      = f.pf_sparse_idct;
-    p_vpar->pf_idct             = f.pf_idct;
+    p_vpar->pf_sparse_idct_add  = f.pf_sparse_idct_add;
+    p_vpar->pf_idct_add         = f.pf_idct_add;
+    p_vpar->pf_sparse_idct_copy = f.pf_sparse_idct_copy;
+    p_vpar->pf_idct_copy        = f.pf_idct_copy;
     p_vpar->pf_norm_scan        = f.pf_norm_scan;
-    p_vpar->pool.pf_decode_init = f.pf_decode_init;
-    p_vpar->pool.pf_addblock    = f.pf_addblock;
-    p_vpar->pool.pf_copyblock   = f.pf_copyblock;
 #undef f
 
     /* Initialize input bitstream */

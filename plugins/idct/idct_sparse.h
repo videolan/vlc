@@ -1,10 +1,10 @@
 /*****************************************************************************
- * vdec_idct.c : common IDCT functions
+ * idct_sparse.h : Sparse IDCT functions (must be include at the end)
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_idct.c,v 1.4 2001/08/22 17:21:45 massiot Exp $
+ * $Id: idct_sparse.h,v 1.1 2001/09/05 16:07:49 massiot Exp $
  *
- * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
+ * Author: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,37 +21,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* MODULE_NAME defined in Makefile together with -DBUILTIN */
-#ifdef BUILTIN
-#   include "modules_inner.h"
-#else
-#   define _M( foo ) foo
-#endif
-
 /*****************************************************************************
- * Preamble
+ * InitIDCT : initialize data for SparseIDCT
  *****************************************************************************/
-#include "defs.h"
-
-#include <stdlib.h>                                              /* malloc() */
-#include <string.h>                                    /* memcpy(), memset() */
-
-#include "config.h"
-#include "common.h"
-#include "threads.h"
-#include "mtime.h"
-
-#include "video.h"
-#include "video_output.h"
-
-#include "modules.h"
-
-#include "vdec_idct.h"
-
-/*****************************************************************************
- * vdec_InitIDCT : initialize datas for vdec_SparseIDCT
- *****************************************************************************/
-void _M( vdec_InitIDCT ) ( void ** pp_idct_data )
+static void InitIDCT ( void ** pp_idct_data )
 {
     int i;
     dctelem_t * p_pre;
@@ -63,16 +36,17 @@ void _M( vdec_InitIDCT ) ( void ** pp_idct_data )
     for( i = 0 ; i < 64 ; i++ )
     {
         p_pre[i*64+i] = 1 << SPARSE_SCALE_FACTOR;
-        _M( vdec_IDCT )( NULL, &p_pre[i*64], 0) ;
+        IDCT( &p_pre[i*64] ) ;
     }
-    return;
+
+    InitBlock();
 }
 
 /*****************************************************************************
- * vdec_SparseIDCT : IDCT function for sparse matrices
+ * SparseIDCT : IDCT function for sparse matrices
  *****************************************************************************/
-void _M( vdec_SparseIDCT ) ( void * p_idct_data,
-                             dctelem_t * p_block, int i_sparse_pos )
+static __inline__ void SparseIDCT( dctelem_t * p_block, void * p_idct_data,
+                                   int i_sparse_pos )
 {
     short int val;
     int * dp;
@@ -124,6 +98,21 @@ void _M( vdec_SparseIDCT ) ( void * p_idct_data,
         p_dest += 16;
         p_source += 16;
     }
-    return;
 }
 
+/*****************************************************************************
+ * Final declarations
+ *****************************************************************************/
+static void SparseIDCTCopy( dctelem_t * p_block, yuv_data_t * p_dest,
+                            int i_stride, void * p_idct_data, int i_sparse_pos )
+{
+    SparseIDCT( p_block, p_idct_data, i_sparse_pos );
+    CopyBlock( p_block, p_dest, i_stride );
+}
+
+static void SparseIDCTAdd( dctelem_t * p_block, yuv_data_t * p_dest,
+                           int i_stride, void * p_idct_data, int i_sparse_pos )
+{
+    SparseIDCT( p_block, p_idct_data, i_sparse_pos );
+    AddBlock( p_block, p_dest, i_stride );
+}

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vdec_block_mmx.c: Macroblock copy functions in MMX assembly
+ * block_mmx.h: Macroblock copy functions in MMX assembly
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vdec_block_mmx.c,v 1.6 2001/08/22 17:21:45 massiot Exp $
+ * $Id: block_mmx.h,v 1.1 2001/09/05 16:07:49 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -22,49 +22,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* MODULE_NAME defined in Makefile together with -DBUILTIN */
-#ifdef BUILTIN
-#   include "modules_inner.h"
-#else
-#   define _M( foo ) foo
-#endif
-
 /*****************************************************************************
- * Preamble
+ * InitBlock: placeholder because we don't need a crop table, MMX does it for us
  *****************************************************************************/
-#include "defs.h"
-
-#include <string.h>
-
-#include "config.h"
-#include "common.h"
-#include "threads.h"
-#include "mtime.h"
-
-#include "intf_msg.h"
-
-#include "input_ext-dec.h"
-
-#include "video.h"
-#include "video_output.h"
-
-#include "vdec_idct.h"
-
-#include "modules.h"
-#include "modules_export.h"
-
-#include "mmx.h"
-
-/*****************************************************************************
- * vdec_InitDecode: initialize video decoder thread
- *****************************************************************************/
-void _M( vdec_InitDecode ) ( )
+static __inline__ void InitBlock( )
 {
     ;
 }
 
 /*****************************************************************************
- * vdec_AddBlock : add a block
+ * AddBlock: add a block
  *****************************************************************************/
 #define ADD_MMX(offset,r1,r2,r3,r4)                                         \
     movq_m2r (*(p_data+2*i_incr), r1);                                      \
@@ -77,8 +44,8 @@ void _M( vdec_InitDecode ) ( )
     punpckhbw_r2r (mm0, r2);                                                \
     paddsw_m2r (*(p_block+offset+4), r2);
 
-void _M( vdec_AddBlock ) ( dctelem_t * p_block, yuv_data_t * p_data,
-                           int i_incr )
+static __inline__ void AddBlock( dctelem_t * p_block, yuv_data_t * p_data,
+                                 int i_incr )
 {
     movq_m2r (*p_data, mm1);
     pxor_r2r (mm0, mm0);
@@ -106,7 +73,7 @@ void _M( vdec_AddBlock ) ( dctelem_t * p_block, yuv_data_t * p_data,
 }
 
 /*****************************************************************************
- * vdec_CopyBlock : copy a block
+ * CopyBlock: copy a block
  *****************************************************************************/
 #define COPY_MMX(offset,r0,r1,r2)                                           \
     movq_m2r (*(p_block+offset), r0);                                       \
@@ -115,8 +82,8 @@ void _M( vdec_AddBlock ) ( dctelem_t * p_block, yuv_data_t * p_data,
     movq_r2m (r2, *p_data);                                                 \
     packuswb_r2r (r1, r0);
 
-void _M( vdec_CopyBlock ) ( dctelem_t * p_block, yuv_data_t * p_data,
-                            int i_incr )
+static __inline__ void CopyBlock( dctelem_t * p_block, yuv_data_t * p_data,
+                                  int i_incr )
 {
     movq_m2r (*(p_block+0*8), mm0);
     movq_m2r (*(p_block+0*8+4), mm1);

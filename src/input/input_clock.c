@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.21 2001/07/20 16:20:25 massiot Exp $
+ * $Id: input_clock.c,v 1.22 2001/09/05 16:07:50 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -84,6 +84,8 @@
 /*****************************************************************************
  * ClockToSysdate: converts a movie clock to system date
  *****************************************************************************/
+static void ClockNewRef( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
+                         mtime_t i_clock, mtime_t i_sysdate );
 static mtime_t ClockToSysdate( input_thread_t * p_input,
                                pgrm_descriptor_t * p_pgrm, mtime_t i_clock )
 {
@@ -93,10 +95,10 @@ static mtime_t ClockToSysdate( input_thread_t * p_input,
     {
         i_sysdate = (mtime_t)(i_clock - p_pgrm->cr_ref) 
                         * (mtime_t)p_input->stream.control.i_rate
-                        * (mtime_t)300
-                        / (mtime_t)27
-                        / (mtime_t)DEFAULT_RATE
-                        + (mtime_t)p_pgrm->sysdate_ref;
+                        * (mtime_t)300;
+        i_sysdate /= 27;
+        i_sysdate /= 1000;
+        i_sysdate += (mtime_t)p_pgrm->sysdate_ref;
     }
 
     return( i_sysdate );
@@ -122,7 +124,7 @@ static void ClockNewRef( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
                          mtime_t i_clock, mtime_t i_sysdate )
 {
     p_pgrm->cr_ref = i_clock;
-    p_pgrm->sysdate_ref = p_pgrm->last_syscr ? p_pgrm->last_syscr : i_sysdate;
+    p_pgrm->sysdate_ref = i_sysdate;
 }
 
 /*****************************************************************************
@@ -132,7 +134,6 @@ static void ClockNewRef( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
 void input_ClockInit( pgrm_descriptor_t * p_pgrm )
 {
     p_pgrm->last_cr = 0;
-    p_pgrm->last_syscr = 0;
     p_pgrm->cr_ref = 0;
     p_pgrm->sysdate_ref = 0;
     p_pgrm->delta_cr = 0;
@@ -160,7 +161,6 @@ int input_ClockManageControl( input_thread_t * p_input,
         p_input->stream.control.i_status = PAUSE_S;
         vlc_cond_wait( &p_input->stream.stream_wait,
                        &p_input->stream.stream_lock );
-        p_pgrm->last_syscr = 0;
         ClockNewRef( p_input, p_pgrm, i_clock, mdate() );
 
         if( p_input->stream.i_new_status == PAUSE_S )
@@ -233,7 +233,6 @@ void input_ClockManageRef( input_thread_t * p_input,
         else
         {
             p_pgrm->last_cr = 0;
-            p_pgrm->last_syscr = 0;
             p_pgrm->delta_cr = 0;
             p_pgrm->c_average_count = 0;
         }
@@ -261,8 +260,7 @@ void input_ClockManageRef( input_thread_t * p_input,
             /* Wait a while before delivering the packets to the decoder.
              * In case of multiple programs, we arbitrarily follow the
              * clock of the first program. */
-            p_pgrm->last_syscr = ClockToSysdate( p_input, p_pgrm, i_clock );
-            mwait( p_pgrm->last_syscr );
+            mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
 
             /* Now take into account interface changes. */
             input_ClockManageControl( p_input, p_pgrm, i_clock );

@@ -2,7 +2,7 @@
  * idctmmxext.c : MMX EXT IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmxext.c,v 1.13 2001/08/22 17:21:45 massiot Exp $
+ * $Id: idctmmxext.c,v 1.14 2001/09/05 16:07:49 massiot Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -41,9 +41,10 @@
 #include "mtime.h"
 #include "tests.h"                                              /* TestCPU() */
 
-#include "vdec_idct.h"
-
 #include "mmx.h"
+
+#include "idct.h"
+#include "block_mmx.h"
 
 #include "modules.h"
 #include "modules_export.h"
@@ -52,8 +53,6 @@
  * Local prototypes.
  *****************************************************************************/
 static void idct_getfunctions( function_list_t * p_function_list );
-static int  idct_Probe      ( probedata_t *p_data );
-static void vdec_NormScan   ( u8 ppi_scan[2][64] );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -79,23 +78,6 @@ MODULE_DEACTIVATE_STOP
 /* Following functions are local */
 
 /*****************************************************************************
- * Functions exported as capabilities.
- *****************************************************************************/
-static void idct_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->pf_probe = idct_Probe;
-#define F p_function_list->functions.idct
-    F.pf_idct_init = _M( vdec_InitIDCT );
-    F.pf_sparse_idct = _M( vdec_SparseIDCT );
-    F.pf_idct = _M( vdec_IDCT );
-    F.pf_norm_scan = vdec_NormScan;
-    F.pf_decode_init = _M( vdec_InitDecode );
-    F.pf_addblock = _M( vdec_AddBlock );
-    F.pf_copyblock = _M( vdec_CopyBlock );
-#undef F
-}
-
-/*****************************************************************************
  * idct_Probe: return a preference score
  *****************************************************************************/
 static int idct_Probe( probedata_t *p_data )
@@ -116,9 +98,9 @@ static int idct_Probe( probedata_t *p_data )
 }
 
 /*****************************************************************************
- * vdec_NormScan : This IDCT uses reordered coeffs, so we patch the scan table
+ * NormScan : This IDCT uses reordered coeffs, so we patch the scan table
  *****************************************************************************/
-static void vdec_NormScan( u8 ppi_scan[2][64] )
+static void NormScan( u8 ppi_scan[2][64] )
 {
     int     i, j;
 
@@ -133,7 +115,7 @@ static void vdec_NormScan( u8 ppi_scan[2][64] )
 }
 
 /*****************************************************************************
- * vdec_IDCT :
+ * IDCT :
  *****************************************************************************/
 #define ROW_SHIFT 11
 #define COL_SHIFT 6
@@ -410,8 +392,7 @@ static s32 rounder3[] ATTR_ALIGN(8) =
 static s32 rounder5[] ATTR_ALIGN(8) =
     rounder (-0.441341716183);  // C3*(-C5/C4+C5-C3)/2
 
-void _M( vdec_IDCT )( void * p_unused_data, dctelem_t * p_block,
-                      int i_idontcare )
+static __inline__ void IDCT( dctelem_t * p_block )
 {
     static dctelem_t table04[] ATTR_ALIGN(16) =
         table (22725, 21407, 19266, 16384, 12873,  8867, 4520);
@@ -444,3 +425,5 @@ void _M( vdec_IDCT )( void * p_unused_data, dctelem_t * p_block,
     Col( p_block, 4 );
 }
 
+#include "idct_sparse.h"
+#include "idct_decl.h"

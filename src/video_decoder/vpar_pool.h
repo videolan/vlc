@@ -2,7 +2,7 @@
  * vpar_pool.h : video parser/video decoders communication
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_pool.h,v 1.2 2001/08/22 17:21:46 massiot Exp $
+ * $Id: vpar_pool.h,v 1.3 2001/09/05 16:07:50 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -74,10 +74,6 @@ typedef struct vdec_pool_s
 
     /* Access to the plug-ins needed by the video decoder thread */
     void ( * pf_idct_init )   ( void ** );
-    void ( * pf_decode_init ) ( );
-    void ( * pf_addblock )    ( dctelem_t *, yuv_data_t *, int );
-    void ( * pf_copyblock )   ( dctelem_t *, yuv_data_t *, int );
-
     void ( * ppppf_motion[2][2][4] ) ( yuv_data_t *, yuv_data_t *,
                                        int, int );
 } vdec_pool_t;
