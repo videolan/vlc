@@ -2,7 +2,7 @@
  * vlc_stream.h
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: ninput.h 7930 2004-06-07 18:23:15Z fenrir $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -176,7 +176,9 @@ VLC_EXPORT( char *, stream_ReadLine, ( stream_t * ) );
 VLC_EXPORT( stream_t *,__stream_DemuxNew, ( vlc_object_t *p_obj, char *psz_demux, es_out_t *out ) );
 VLC_EXPORT( void,      stream_DemuxSend,  ( stream_t *s, block_t *p_block ) );
 VLC_EXPORT( void,      stream_DemuxDelete,( stream_t *s ) );
-
+#define stream_MemoryNew( a, b, c ) __stream_MemoryNew( VLC_OBJECT(a), b, c )
+VLC_EXPORT( stream_t *,__stream_MemoryNew, (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i_size ) );
+VLC_EXPORT( void,      stream_MemoryDelete,( stream_t *s, vlc_bool_t b_free_buffer ) );
 /**
  * @}
  */

@@ -340,6 +340,7 @@ SOURCES_libvlc_common = \
 	src/input/input.c \
 	src/input/input_internal.h \
 	src/input/stream.c \
+	src/input/mem_stream.c \
 	src/input/subtitles.c \
 	src/input/var.c \
 	src/video_output/video_output.c \
