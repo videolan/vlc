@@ -711,6 +711,10 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
                                         wxDefaultPosition, wxDefaultSize );
     }
 
+    /* Timeshift */
+    net_timeshift  = new wxCheckBox( panel, NetTimeshift_Event,
+                                     wxU(_("Allow timeshifting")) );
+
     /* UDP/RTP row */
     wxFlexGridSizer *subpanel_sizer;
     wxStaticText *label;
@@ -771,17 +775,6 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
         net_subpanels[i]->SetSizerAndFit( subpanel_sizer );
     }
 
-    /* Timeshift */
-    wxPanel *timeshift_panel = new wxPanel( panel, -1 );
-    subpanel_sizer = new wxFlexGridSizer( 1,1,20 );
-    net_timeshift  = new wxCheckBox( timeshift_panel, NetTimeshift_Event,
-                                  wxU(_("Allow timeshifting")) );
-    subpanel_sizer->Add( net_timeshift, 0, wxALIGN_RIGHT
-                                         | wxALIGN_CENTER_VERTICAL);
-    timeshift_panel->SetSizerAndFit( subpanel_sizer );
-    net_timeshift->Enable();
-
-
     /* Stuff everything into the main panel */
     for( i=0; i<4; i++ )
     {
@@ -790,7 +783,8 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
         sizer->Add( net_subpanels[i], 1, wxEXPAND | wxALIGN_LEFT |
                     wxALIGN_CENTER_VERTICAL | wxALL, 5  );
     }
-    sizer->Add( timeshift_panel );
+    sizer->Add( net_timeshift, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL |
+                wxALL, 5 );
 
     sizer_row->Add( sizer, 0, wxEXPAND | wxALL, 5 );
 
