@@ -1914,10 +1914,11 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
     ts_pid_t             *pmt = NULL;
     ts_prg_psi_t         *prg = NULL;
-    int                  i;
+    ts_pid_t             **pp_clean = NULL;
+    int                  i_clean = 0, i;
 
     /* CA descriptor */
-    uint16_t            i_vpid = 0, i_apid1 = 0, i_apid2 = 0, i_apid3 = 0;
+    uint16_t             i_vpid = 0, i_apid1 = 0, i_apid2 = 0, i_apid3 = 0;
 
     msg_Dbg( p_demux, "PMTCallBack called" );
 
@@ -1935,8 +1936,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 break;
             }
         }
-        if( pmt )
-            break;
+        if( pmt ) break;
     }
 
     if( pmt == NULL )
@@ -1961,13 +1961,14 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         if( pid->b_valid && pid->p_owner == pmt->psi &&
             pid->i_owner_number == prg->i_number && pid->psi == NULL )
         {
-            if( p_sys->b_dvb_control &&
-                ( p_sys->i_dvb_program < 0 || p_sys->i_dvb_program == prg->i_number ) )
+            if( p_sys->b_dvb_control && ( p_sys->i_dvb_program < 0 ||
+                p_sys->i_dvb_program == prg->i_number ) )
             {
-                stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, i, VLC_FALSE );
+                stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                ACCESS_SET_PRIVATE_ID_STATE, i, VLC_FALSE );
             }
 
-            PIDClean( p_demux->out, pid );
+            TAB_APPEND( i_clean, pp_clean, pid );
         }
     }
     if( prg->iod )
@@ -2013,9 +2014,19 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
     for( p_es = p_pmt->p_first_es; p_es != NULL; p_es = p_es->p_next )
     {
-        ts_pid_t *pid = &p_sys->pid[p_es->i_pid];
+        ts_pid_t tmp_pid, *old_pid = 0, *pid = &tmp_pid;
 
-        if( pid->b_valid )
+        /* Find out if the PID was already declared */
+        for( i = 0; i < i_clean; i++ )
+        {
+            if( pp_clean[i] == &p_sys->pid[p_es->i_pid] )
+            {
+                old_pid = pp_clean[i];
+                break;
+            }
+        }
+
+        if( !old_pid && p_sys->pid[p_es->i_pid].b_valid )
         {
             msg_Warn( p_demux, "pmt error: pid=0x%x already defined",
                       p_es->i_pid );
@@ -2025,6 +2036,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         PIDInit( pid, VLC_FALSE, pmt->psi );
         PIDFillFormat( pid, p_es->i_type );
         pid->i_owner_number = prg->i_number;
+        pid->i_pid          = p_es->i_pid;
+        pid->b_seen         = p_sys->pid[p_es->i_pid].b_seen;
 
         if ( pid->es->fmt.i_cat == VIDEO_ES && !i_vpid )
             i_vpid = p_es->i_pid;
@@ -2311,19 +2324,54 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             msg_Dbg( p_demux, "  * es pid=0x%x type=0x%x fcc=%4.4s",
                      p_es->i_pid, p_es->i_type, (char*)&pid->es->fmt.i_codec );
 
-            if( p_sys->b_es_id_pid )
+            if( p_sys->b_es_id_pid ) pid->es->fmt.i_id = p_es->i_pid;
+
+            /* Check if we can avoid restarting the ES */
+            if( old_pid &&
+                pid->es->fmt.i_codec == old_pid->es->fmt.i_codec &&
+                pid->es->fmt.i_extra == old_pid->es->fmt.i_extra &&
+                pid->es->fmt.i_extra == 0 &&
+                pid->i_extra_es == old_pid->i_extra_es &&
+                ( ( !pid->es->fmt.psz_language &&
+                    !old_pid->es->fmt.psz_language ) ||
+                  ( pid->es->fmt.psz_language &&
+                    old_pid->es->fmt.psz_language &&
+                    !strcmp( pid->es->fmt.psz_language,
+                             old_pid->es->fmt.psz_language ) ) ) )
             {
-                pid->es->fmt.i_id = p_es->i_pid;
+                pid->es->id = old_pid->es->id;
+                old_pid->es->id = NULL;
+                for( i = 0; i < pid->i_extra_es; i++ )
+                {
+                    pid->extra_es[i]->id = old_pid->extra_es[i]->id;
+                    old_pid->extra_es[i]->id = NULL;
+                }
             }
-
-            pid->es->id = es_out_Add( p_demux->out, &pid->es->fmt );
-
-            for( i = 0; i < pid->i_extra_es; i++ )
+            else
             {
-                pid->extra_es[i]->id =
-                    es_out_Add( p_demux->out, &pid->extra_es[i]->fmt);
+                if( old_pid )
+                {
+                    PIDClean( p_demux->out, old_pid );
+                    TAB_REMOVE( i_clean, pp_clean, old_pid );
+                    old_pid = 0;
+                }
+
+                pid->es->id = es_out_Add( p_demux->out, &pid->es->fmt );
+                for( i = 0; i < pid->i_extra_es; i++ )
+                {
+                    pid->extra_es[i]->id =
+                        es_out_Add( p_demux->out, &pid->extra_es[i]->fmt );
+                }
             }
         }
+
+        /* Add ES to the list */
+        if( old_pid )
+        {
+            PIDClean( p_demux->out, old_pid );
+            TAB_REMOVE( i_clean, pp_clean, old_pid );
+        }
+        p_sys->pid[p_es->i_pid] = *pid;
 
         for( p_dr = p_es->p_first_descriptor; p_dr != NULL;
              p_dr = p_dr->p_next )
@@ -2335,7 +2383,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 prg->cad[prg->i_nb_cad] = malloc( p_dr->i_length + 2 );
                 prg->cad[prg->i_nb_cad][0] = 0x9;
                 prg->cad[prg->i_nb_cad][1] = p_dr->i_length;
-                memcpy( prg->cad[prg->i_nb_cad] + 2, p_dr->p_data, p_dr->i_length );
+                memcpy( prg->cad[prg->i_nb_cad] + 2, p_dr->p_data,
+                        p_dr->i_length );
                 prg->i_cad_length[prg->i_nb_cad] = p_dr->i_length + 2;
                 prg->i_nb_cad++;
             }
@@ -2346,8 +2395,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             }
         }
 
-        if( p_sys->b_dvb_control &&
-            ( p_sys->i_dvb_program < 0 || p_sys->i_dvb_program == prg->i_number ) )
+        if( p_sys->b_dvb_control && ( p_sys->i_dvb_program < 0 ||
+            p_sys->i_dvb_program == prg->i_number ) )
         {
             /* Set demux filter */
             stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
@@ -2355,7 +2404,11 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                             VLC_TRUE );
         }
     }
-    dvbpsi_DeletePMT(p_pmt);
+
+    dvbpsi_DeletePMT( p_pmt );
+
+    for( i = 0; i < i_clean; i++ ) PIDClean( p_demux->out, pp_clean[i] );
+    if( i_clean ) free( pp_clean );
 
     if( p_sys->b_dvb_control &&
         ( p_sys->i_dvb_program < 0 || p_sys->i_dvb_program == prg->i_number ) )
