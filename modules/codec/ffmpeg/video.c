@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.16 2003/01/08 10:41:57 fenrir Exp $
+ * $Id: video.c,v 1.17 2003/02/18 22:33:54 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -83,6 +83,7 @@ static inline uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
             return( VLC_FOURCC('I','4','4','4') );
 #if LIBAVCODEC_BUILD >= 4615
         case PIX_FMT_YUV410P:
+        case PIX_FMT_YUV411P:
 #endif
         case PIX_FMT_BGR24:
         default:
@@ -96,7 +97,7 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
 {
     vout_thread_t *p_vout;
     unsigned int   i_width = p_context->width;
-    unsigned int   i_height =p_context->height;
+    unsigned int   i_height = p_context->height;
     uint32_t       i_chroma = ffmpeg_PixFmtToChroma( p_context->pix_fmt );
     unsigned int   i_aspect;
 
@@ -109,9 +110,6 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
     {
         /* we make conversion if possible*/
         i_chroma = VLC_FOURCC('I','4','2','0');
-        msg_Warn( p_vdec->p_fifo, "Internal chroma conversion (FIXME)");
-        /* It's mainly for I410 -> I420 conversion that I've made,
-           it's buggy and very slow */
     }
 #if LIBAVCODEC_BUILD >= 4640
     i_aspect = VOUT_ASPECT_FACTOR * p_context->aspect_ratio;
@@ -143,110 +141,6 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
                            i_width, i_height, i_chroma, i_aspect );
 
     return p_vout;
-}
-
-/* FIXME FIXME FIXME this is a big shit
-   does someone want to rewrite this function ?
-   or said to me how write a better thing
-   FIXME FIXME FIXME
-*/
-#if LIBAVCODEC_BUILD >= 4641
-static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
-                                             AVFrame *p_ff_pic,
-                                             vdec_thread_t   *p_vdec )
-#else
-static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
-                                             AVPicture *p_ff_pic,
-                                             vdec_thread_t   *p_vdec )
-#endif
-{
-    uint8_t *p_src, *p_dst;
-    uint8_t *p_plane[3];
-    int i_plane;
-
-    int i_stride, i_lines;
-    int i_height, i_width;
-    int i_y, i_x;
-
-    i_height = p_vdec->p_context->height;
-    i_width  = p_vdec->p_context->width;
-
-    p_dst = p_pic->p[0].p_pixels;
-    p_src  = p_ff_pic->data[0];
-
-    /* copy first plane */
-    for( i_y = 0; i_y < i_height; i_y++ )
-    {
-        p_vdec->p_fifo->p_vlc->pf_memcpy( p_dst, p_src, i_width);
-        p_dst += p_pic->p[0].i_pitch;
-        p_src += p_ff_pic->linesize[0];
-    }
-
-    /* process each plane in a temporary buffer */
-    for( i_plane = 1; i_plane < 3; i_plane++ )
-    {
-        i_stride = p_ff_pic->linesize[i_plane];
-        i_lines = i_height / 4;
-
-        p_dst = p_plane[i_plane] = malloc( i_lines * i_stride * 2 * 2 );
-        p_src  = p_ff_pic->data[i_plane];
-
-        /* for each source line */
-        for( i_y = 0; i_y < i_lines; i_y++ )
-        {
-            for( i_x = 0; i_x < i_stride - 1; i_x++ )
-            {
-                p_dst[2 * i_x    ] = p_src[i_x];
-                p_dst[2 * i_x + 1] = ( p_src[i_x] + p_src[i_x + 1]) / 2;
-
-            }
-            p_dst[2 * i_stride - 2] = p_src[i_x];
-            p_dst[2 * i_stride - 1] = p_src[i_x];
-
-            p_dst += 4 * i_stride; /* process the next even lines */
-            p_src += i_stride;
-        }
-    }
-
-    for( i_plane = 1; i_plane < 3; i_plane++ )
-    {
-        i_stride = p_ff_pic->linesize[i_plane];
-        i_lines = i_height / 4;
-
-        p_dst = p_plane[i_plane] + 2*i_stride;
-        p_src  = p_plane[i_plane];
-
-        for( i_y = 0; i_y < i_lines - 1; i_y++ )
-        {
-            for( i_x = 0; i_x <  2 * i_stride ; i_x++ )
-            {
-                p_dst[i_x] = ( p_src[i_x] + p_src[i_x + 4*i_stride])/2;
-            }
-
-            p_dst += 4 * i_stride; /* process the next odd lines */
-            p_src += 4 * i_stride;
-        }
-        /* last line */
-        p_vdec->p_fifo->p_vlc->pf_memcpy( p_dst, p_src, 2*i_stride );
-    }
-    /* copy to p_pic, by block
-       if I do pixel per pixel it segfault. It's why I use
-       temporaries buffers */
-    for( i_plane = 1; i_plane < 3; i_plane++ )
-    {
-        int i_size;
-        p_src  = p_plane[i_plane];
-        p_dst = p_pic->p[i_plane].p_pixels;
-
-        i_size = __MIN( 2*i_stride, p_pic->p[i_plane].i_pitch);
-        for( i_y = 0; i_y < __MIN(p_pic->p[i_plane].i_lines, 2 * i_lines); i_y++ )
-        {
-            p_vdec->p_fifo->p_vlc->pf_memcpy( p_dst, p_src, i_size );
-            p_src += 2 * i_stride;
-            p_dst += p_pic->p[i_plane].i_pitch;
-        }
-        free( p_plane[i_plane] );
-    }
 }
 
 /*****************************************************************************
@@ -313,21 +207,6 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 
     p_vdec->b_direct_rendering = 0;
 
-#if LIBAVCODEC_BUILD >= 4641
-    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-dr" ) &&
-        p_vdec->p_codec->capabilities & CODEC_CAP_DR1 &&
-        p_vdec->p_context->pix_fmt != PIX_FMT_YUV410P ) /* <- FIXME */
-    {
-        msg_Dbg( p_vdec->p_fifo, "using direct rendering" );
-        p_vdec->b_direct_rendering = 1;
-        p_vdec->p_context->flags|= CODEC_FLAG_EMU_EDGE;
-        p_vdec->p_context->get_buffer     = ffmpeg_GetFrameBuf;
-        p_vdec->p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
-        p_vdec->p_context->opaque = p_vdec;
-
-    }
-#endif
-
 #if 0
     /* check if codec support truncated frames */
 //    if( p_vdec->p_codec->capabilities & CODEC_FLAG_TRUNCATED )
@@ -350,6 +229,24 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
         msg_Dbg( p_vdec->p_fifo, "ffmpeg codec (%s) started",
                                  p_vdec->psz_namecodec );
     }
+
+#if LIBAVCODEC_BUILD >= 4641
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-dr" ) &&
+        p_vdec->p_codec->capabilities & CODEC_CAP_DR1 &&
+        ffmpeg_PixFmtToChroma( p_vdec->p_context->pix_fmt ) )
+    {
+        /* FIXME: some codecs set pix_fmt only after a frame
+         * has been decoded. */
+
+        msg_Dbg( p_vdec->p_fifo, "using direct rendering" );
+        p_vdec->b_direct_rendering = 1;
+        p_vdec->p_context->flags|= CODEC_FLAG_EMU_EDGE;
+        p_vdec->p_context->get_buffer     = ffmpeg_GetFrameBuf;
+        p_vdec->p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
+        p_vdec->p_context->opaque = p_vdec;
+
+    }
+#endif
 
     /* ***** init this codec with special data ***** */
     if( p_vdec->p_format &&
@@ -663,7 +560,8 @@ usenextdata:
             msleep( VOUT_OUTMEM_SLEEP );
         }
 
-        /* fill p_picture_t from AVVideoFrame, do I410->I420 if needed */
+        /* fill p_picture_t from AVVideoFrame and do chroma conversion
+         * if needed */
         ffmpeg_CopyPicture( p_pic, p_vdec->p_ff_pic, p_vdec );
     }
     else
@@ -785,12 +683,27 @@ static void ffmpeg_CopyPicture( picture_t    *p_pic,
         /* we need to convert to I420 */
         switch( p_vdec->p_context->pix_fmt )
         {
+            AVPicture dest_pic;
+            int i;
+
 #if LIBAVCODEC_BUILD >= 4615
             case( PIX_FMT_YUV410P ):
-                ffmpeg_ConvertPictureI410toI420( p_pic, p_ff_pic, p_vdec );
+            case( PIX_FMT_YUV411P ):
+                for( i = 0; i < p_pic->i_planes; i++ )
+                {
+                    dest_pic.data[i] = p_pic->p[i].p_pixels;
+                    dest_pic.linesize[i] = p_pic->p[i].i_pitch;
+                }
+                img_convert( &dest_pic, PIX_FMT_YUV420P,
+                             (AVPicture *)p_ff_pic,
+                             p_vdec->p_context->pix_fmt,
+                             p_vdec->p_context->width,
+                             p_vdec->p_context->height );
                 break;
 #endif
             default:
+                msg_Err( p_vdec->p_fifo, "don't know how to convert chroma %i",
+                         p_vdec->p_context->pix_fmt );
                 p_vdec->p_fifo->b_error = 1;
                 break;
         }
@@ -897,6 +810,4 @@ static void  ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
     vout_UnlinkPicture( p_vdec->p_vout, p_pic );
 }
 
-
 #endif
-
