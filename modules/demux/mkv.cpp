@@ -1094,6 +1094,10 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         msg_Err( p_demux, "invalid track number=%d", block->TrackNum() );
         return;
     }
+    if( tk.p_es == NULL )
+    {
+        return;
+    }
 
     es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk.p_es, &b );
     if( !b )
