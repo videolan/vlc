@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.1 2003/07/14 21:32:59 sigmunau Exp $
+ * $Id: freetype.c,v 1.2 2003/07/19 14:41:30 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -257,7 +257,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic,
 			{
 			    //                                pixel = alpha;
 			    //                                pixel = (pixel^alpha)^pixel;
-			    pixel = ((pixel*(255-alpha))>>8) + (255*alpha>>8);
+			    pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 ) +
+                                ( 255 * alpha >> 8 );
 			}
 		    }
 		    FT_Done_Glyph( p_glyph );
@@ -353,12 +354,12 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
         {
             i_pen_x = 0;
             result.x = __MAX( result.x, line.xMax );
-            result.y += line.yMax - line.yMin;
+            result.y += face->height >> 6;
             line.xMin = 0;
             line.xMax = 0;
             line.yMin = 0;
             line.yMax = 0;
-            i_pen_y = result.y + 1;
+            i_pen_y += face->height >> 6;
             continue;
         }
         i_glyph_index = FT_Get_Char_Index( face, i_char );
