@@ -157,9 +157,7 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
                 p_vout->psz_filter_chain = NULL;
             }
 
-            if( ( !psz_filter_chain && !p_vout->psz_filter_chain ) ||
-                ( psz_filter_chain && p_vout->psz_filter_chain &&
-                  !strcmp( psz_filter_chain, p_vout->psz_filter_chain ) ) )
+            if( !psz_filter_chain && !p_vout->psz_filter_chain )
             {
                 p_vout->b_filter_change = VLC_FALSE;
             }
