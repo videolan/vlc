@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.105 2003/12/11 19:34:47 hartman Exp $
+ * $Id: intf.m,v 1.106 2003/12/15 15:38:26 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -738,7 +738,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
             /* seekable streams */
             b_seekable = p_input->stream.b_seekable;
 
-            /* control buttons for free pace streams */
+            /* check wether slow/fast motion is possible*/
             b_control = p_input->stream.b_pace_control; 
 
             /* chapters & titles */
@@ -748,8 +748,8 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         }
 
         [o_btn_stop setEnabled: b_input];
-        [o_btn_ff setEnabled: b_control];
-        [o_btn_rewind setEnabled: b_control];
+        [o_btn_ff setEnabled: b_seekable];
+        [o_btn_rewind setEnabled: b_seekable];
         [o_btn_prev setEnabled: (b_plmul || b_chapters)];
         [o_btn_next setEnabled: (b_plmul || b_chapters)];
 
