@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.288 2004/02/08 17:21:50 fenrir Exp $
+ * $Id: input.c,v 1.289 2004/02/11 19:17:14 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -119,6 +119,9 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
     var_Create( p_input, "sout-audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-keep",  VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+
+    /* repeat variable */
+    var_Create( p_input, "input-repeat", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
     /* decoders */
     var_Create( p_input, "minimize-threads", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -466,10 +469,28 @@ static int RunThread( input_thread_t *p_input )
 
         if( i_count == 0 )
         {
-            /* End of file - we do not set b_die because only the
-             * playlist is allowed to do so. */
-            msg_Info( p_input, "EOF reached" );
-            p_input->b_eof = 1;
+            vlc_value_t repeat;
+
+            var_Get( p_input, "input-repeat", &repeat );
+            if( repeat.i_int == 0 || p_input->stream.i_area_nb <= 0 )
+            {
+                /* End of file - we do not set b_die because only the
+                 * playlist is allowed to do so. */
+                msg_Info( p_input, "EOF reached" );
+                p_input->b_eof = 1;
+            }
+            else
+            {
+                msg_Dbg( p_input, "repeating the same input (%d)", repeat.i_int );
+                if( repeat.i_int > 0 )
+                {
+                    repeat.i_int--;
+                    var_Set( p_input, "input-repeat", repeat );
+                }
+
+                p_input->stream.p_new_area = p_input->stream.pp_areas[0];
+                p_input->stream.p_new_area->i_seek = 0;
+            }
         }
         else if( i_count < 0 )
         {

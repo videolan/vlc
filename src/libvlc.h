@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.132 2004/01/31 18:02:32 alexis Exp $
+ * $Id: libvlc.h,v 1.133 2004/02/11 19:17:13 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -320,6 +320,9 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
 #define INPUT_SUBT_LONGTEXT N_( \
     "Give the stream number of the subtitle channel you want to use " \
     "(from 1 to n).")
+
+#define INPUT_REPEAT_TEXT N_("Number of time the same input will be repeated")
+#define INPUT_REPEAT_LONGTEXT N_("Number of time the same input will be repeated")
 
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
 #define SUB_AUTO_LONGTEXT \
@@ -772,7 +775,8 @@ vlc_module_begin();
                  SUB_FUZZY_TEXT, SUB_FUZZY_LONGTEXT, VLC_TRUE );
     add_file( "sub-file", NULL, NULL,
                  SUB_FILE_TEXT, SUB_FILE_LONGTEXT, VLC_TRUE );
-
+    add_integer( "input-repeat", 0, NULL,
+                 INPUT_REPEAT_TEXT, INPUT_REPEAT_LONGTEXT, VLC_TRUE );
 
     add_file( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT, VLC_FALSE );
     add_file( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT, VLC_FALSE );
