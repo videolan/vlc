@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.40 2003/11/17 13:05:17 bigben Exp $
+ * $Id: playlist.m,v 1.41 2003/11/17 14:11:05 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -144,6 +144,32 @@
     [o_random_ckb setTitle: _NS("Random")];
     [o_loop_ckb setTitle: _NS("Repeat All")];
     [o_repeat_ckb setTitle: _NS("Repeat One")];
+
+
+    vlc_value_t val;
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist != NULL )
+    {
+    int i_state;
+
+    var_Get( p_playlist, "random", &val );
+    i_state = val.b_bool ? NSOnState : NSOffState;
+    [o_random_ckb setState: i_state];
+
+    var_Get( p_playlist, "loop", &val );
+    i_state = val.b_bool ? NSOnState : NSOffState;
+    [o_loop_ckb setState: i_state];
+
+    var_Get( p_playlist, "repeat", &val );
+    i_state = val.b_bool ? NSOnState : NSOffState;
+    [o_repeat_ckb setState: i_state];
+
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_release( p_playlist );
+    }
+
 
 }
 
