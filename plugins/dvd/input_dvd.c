@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.71 2001/06/12 22:14:44 sam Exp $
+ * $Id: input_dvd.c,v 1.72 2001/06/13 00:03:08 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -99,7 +99,7 @@
 #define DVD_DATA_READ_ONCE  (4 * DVD_BLOCK_READ_ONCE)
 
 /* Size of netlist */
-#define DVD_NETLIST_SIZE    2048
+#define DVD_NETLIST_SIZE    256
 
 /*****************************************************************************
  * Local prototypes

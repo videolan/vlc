@@ -1,13 +1,13 @@
 /*****************************************************************************
  * dvd_netlist.c: Specific netlist for DVD packets
- * ---
+ *****************************************************************************
  * The original is in src/input.
  * There is only one major change from input_netlist.c : data is now a
  * pointer to an offset in iovec ; and iovec has a reference counter. It
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: dvd_netlist.c,v 1.9 2001/06/03 12:47:21 sam Exp $
+ * $Id: dvd_netlist.c,v 1.10 2001/06/13 00:03:08 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -238,9 +238,9 @@ dvd_netlist_t * DVDNetlistInit( int i_nb_iovec, int i_nb_data, int i_nb_pes,
 /*****************************************************************************
  * DVDGetiovec: returns an iovec pointer for a readv() operation
  *****************************************************************************
- * We return an iovec vector, so that readv can read many packets at a time,
- * and we set pp_data to direct to the fifo pointer, which will allow us
- * to get the corresponding data_packet.
+ * We return an iovec vector, so that readv can read many packets at a time.
+ * pp_data will be set to direct to the fifo pointer in DVDMviovec, which
+ * will allow us to get the corresponding data_packet.
  *****************************************************************************/
 struct iovec * DVDGetiovec( void * p_method_data )
 {
@@ -249,23 +249,21 @@ struct iovec * DVDGetiovec( void * p_method_data )
     /* cast */
     p_netlist = (dvd_netlist_t *)p_method_data;
     
-    /* check */
-    if( (
+    /* check that we have enough free iovec */
+    while( (
      (p_netlist->i_iovec_end - p_netlist->i_iovec_start)
         & p_netlist->i_nb_iovec ) < p_netlist->i_read_once )
     {
-        intf_ErrMsg("Empty iovec FIFO (%d:%d). Unable to allocate memory",
-                    p_netlist->i_iovec_start, p_netlist->i_iovec_end );
-        return (NULL);
+        intf_WarnMsg( 12, "input info: waiting for free iovec" );
+        msleep( INPUT_IDLE_SLEEP );
     }
 
-    if( (
+    while( (
      (p_netlist->i_data_end - p_netlist->i_data_start)
         & p_netlist->i_nb_data ) < p_netlist->i_read_once )
     {
-        intf_ErrMsg("Empty data FIFO (%d:%d). Unable to allocate memory", 
-                    p_netlist->i_data_start, p_netlist->i_data_end );
-        return (NULL);
+        intf_WarnMsg( 12, "input info: waiting for free data packet" );
+        msleep( INPUT_IDLE_SLEEP );
     }
     /* readv only takes contiguous buffers 
      * so, as a solution, we chose to have a FIFO a bit longer

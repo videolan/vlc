@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.13 2001/06/12 18:16:49 stef Exp $
+ * $Id: aout_spdif.c,v 1.14 2001/06/13 00:03:08 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -74,6 +74,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
      * last significant frame */
     i_blank = 0;
     mdelta = 0;
+    mplay = 0;
 
     /* Compute the theorical duration of an ac3 frame */
 
@@ -141,7 +142,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
 
         if( i_frame )
         {
-            mwait( mplay );
+            mwait( mplay + SLEEP_TIME );
         }
         else
         {
