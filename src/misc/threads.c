@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.37 2003/03/01 23:26:08 gbazin Exp $
+ * $Id: threads.c,v 1.38 2003/03/02 01:35:30 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -95,7 +95,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
         p_libvlc->b_ready = VLC_FALSE;
 
 #if defined( PTH_INIT_IN_PTH_H )
-        i_ret = pth_init();
+        i_ret = ( pth_init() == FALSE );
 
 #elif defined( ST_INIT_IN_ST_H )
         i_ret = st_init();
@@ -185,7 +185,7 @@ int __vlc_threads_end( vlc_object_t *p_this )
     i_initializations--;
     if( i_initializations == 0 )
     {
-        return pth_kill();
+        return ( pth_kill() == FALSE );
     }
 
 #elif defined( ST_INIT_IN_ST_H )
@@ -260,7 +260,7 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
     p_mutex->p_this = p_this;
 
 #if defined( PTH_INIT_IN_PTH_H )
-    return pth_mutex_init( &p_mutex->mutex );
+    return ( pth_mutex_init( &p_mutex->mutex ) == FALSE );
 
 #elif defined( ST_INIT_IN_ST_H )
     p_mutex->mutex = st_mutex_new();
@@ -402,7 +402,7 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     p_condvar->p_this = p_this;
 
 #if defined( PTH_INIT_IN_PTH_H )
-    return pth_cond_init( &p_condvar->cond );
+    return ( pth_cond_init( &p_condvar->cond ) == FALSE );
 
 #elif defined( ST_INIT_IN_ST_H )
     p_condvar->cond = st_cond_new();
@@ -574,7 +574,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 
 #if defined( PTH_INIT_IN_PTH_H )
     p_this->thread_id = pth_spawn( PTH_ATTR_DEFAULT, func, p_data );
-    i_ret = 0;
+    i_ret = p_this->thread_id == NULL;
 
 #elif defined( ST_INIT_IN_ST_H )
     p_this->thread_id = st_thread_create( func, p_data, 1, 0 );
@@ -734,7 +734,7 @@ void __vlc_thread_join( vlc_object_t *p_this, char * psz_file, int i_line )
     int i_ret = 0;
 
 #if defined( PTH_INIT_IN_PTH_H )
-    i_ret = pth_join( p_this->thread_id, NULL );
+    i_ret = ( pth_join( p_this->thread_id, NULL ) == FALSE );
 
 #elif defined( ST_INIT_IN_ST_H )
     i_ret = st_thread_join( p_this->thread_id, NULL );

@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.14 2003/03/01 23:26:08 gbazin Exp $
+ * $Id: vlc_threads_funcs.h,v 1.15 2003/03/02 01:35:30 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -73,7 +73,7 @@ static inline int __vlc_mutex_lock( char * psz_file, int i_line,
     const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
-    i_result = pth_mutex_acquire( &p_mutex->mutex, FALSE, NULL );
+    i_result = ( pth_mutex_acquire( &p_mutex->mutex, FALSE, NULL ) == FALSE );
 
 #elif defined( ST_INIT_IN_ST_H )
     i_result = st_mutex_lock( p_mutex->mutex );
@@ -144,7 +144,7 @@ static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
     const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
-    i_result = pth_mutex_release( &p_mutex->mutex );
+    i_result = ( pth_mutex_release( &p_mutex->mutex ) == FALSE );
 
 #elif defined( ST_INIT_IN_ST_H )
     i_result = st_mutex_unlock( p_mutex->mutex );
@@ -229,7 +229,7 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
     const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
-    i_result = pth_cond_notify( &p_condvar->cond, FALSE );
+    i_result = ( pth_cond_notify( &p_condvar->cond, FALSE ) == FALSE );
 
 #elif defined( ST_INIT_IN_ST_H )
     i_result = st_cond_signal( p_condvar->cond );
@@ -364,7 +364,7 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
     const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
-    i_result = pth_cond_notify( &p_condvar->cond, FALSE );
+    i_result = ( pth_cond_notify( &p_condvar->cond, TRUE ) == FALSE );
 
 #elif defined( ST_INIT_IN_ST_H )
     i_result = st_cond_broadcast( p_condvar->cond );
@@ -504,7 +504,8 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
     const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
-    i_result = pth_cond_await( &p_condvar->cond, &p_mutex->mutex, NULL );
+    i_result = ( pth_cond_await( &p_condvar->cond, &p_mutex->mutex, NULL )
+                 == FALSE );
 
 #elif defined( ST_INIT_IN_ST_H )
     st_mutex_unlock( p_mutex->mutex );
