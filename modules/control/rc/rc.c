@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.17 2002/12/14 19:34:06 gbazin Exp $
+ * $Id: rc.c,v 1.18 2003/01/14 01:30:09 sigmunau Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -60,6 +60,8 @@
 static int  Activate     ( vlc_object_t * );
 static void Run          ( intf_thread_t *p_intf );
 
+static int  Input        ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
 static int  Playlist     ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Quit         ( vlc_object_t *, char const *,
@@ -151,31 +153,35 @@ static void Run( intf_thread_t *p_intf )
     var_Create( p_intf, "intf", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "intf", Intf, NULL );
 
+    var_Create( p_intf, "add", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "add", Playlist, NULL );
+    var_Create( p_intf, "playlist", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "playlist", Playlist, NULL );
     var_Create( p_intf, "play", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "play", Playlist, NULL );
     var_Create( p_intf, "stop", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "stop", Playlist, NULL );
-    var_Create( p_intf, "pause", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "pause", Playlist, NULL );
-    var_Create( p_intf, "seek", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "seek", Playlist, NULL );
     var_Create( p_intf, "prev", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "prev", Playlist, NULL );
     var_Create( p_intf, "next", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "next", Playlist, NULL );
 
+    var_Create( p_intf, "pause", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "pause", Input, NULL );
+    var_Create( p_intf, "seek", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "seek", Input, NULL );
     var_Create( p_intf, "title", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "title", Playlist, NULL );
+    var_AddCallback( p_intf, "title", Input, NULL );
     var_Create( p_intf, "title_n", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "title_n", Playlist, NULL );
+    var_AddCallback( p_intf, "title_n", Input, NULL );
     var_Create( p_intf, "title_p", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "title_p", Playlist, NULL );
+    var_AddCallback( p_intf, "title_p", Input, NULL );
     var_Create( p_intf, "chapter", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "chapter", Playlist, NULL );
+    var_AddCallback( p_intf, "chapter", Input, NULL );
     var_Create( p_intf, "chapter_n", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "chapter_n", Playlist, NULL );
+    var_AddCallback( p_intf, "chapter_n", Input, NULL );
     var_Create( p_intf, "chapter_p", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "chapter_p", Playlist, NULL );
+    var_AddCallback( p_intf, "chapter_p", Input, NULL );
 
     var_Create( p_intf, "volume", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "volume", Volume, NULL );
@@ -351,15 +357,6 @@ static void Run( intf_thread_t *p_intf )
             }
             else switch( psz_cmd[0] )
             {
-            case 'a':
-            case 'A':
-                if( psz_cmd[1] == ' ' && p_playlist )
-                {
-                    playlist_Add( p_playlist, psz_cmd + 2,
-                                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-                }
-                break;
-
             case 'f':
             case 'F':
                 if( p_input )
@@ -386,7 +383,8 @@ static void Run( intf_thread_t *p_intf )
             case 'H':
                 printf("+----[ remote control commands ]\n");
                 printf("| \n");
-                printf("| a XYZ  . . . . . . . . . . . add XYZ to playlist\n");
+                printf("| add XYZ  . . . . . . . . . . add XYZ to playlist\n");
+                printf("| playlist . . .  show items currently in playlist\n");
                 printf("| play . . . . . . . . . . . . . . . . play stream\n");
                 printf("| stop . . . . . . . . . . . . . . . . stop stream\n");
                 printf("| next . . . . . . . . . . . .  next playlist item\n");
@@ -437,11 +435,10 @@ static void Run( intf_thread_t *p_intf )
     }
 }
 
-static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
+static int Input(  vlc_object_t *p_this, char const *psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t * p_input;
-    playlist_t *     p_playlist;
 
     p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
 
@@ -571,11 +568,15 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         return VLC_SUCCESS;
     }
 
+}
 
-    p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
-                                           FIND_PARENT );
-    vlc_object_release( p_input );
+static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
+                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    playlist_t *     p_playlist;
 
+    p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
     if( !p_playlist )
     {
         return VLC_ENOOBJ;
@@ -597,6 +598,33 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else if( !strcmp( psz_cmd, "stop" ) )
     {
         playlist_Stop( p_playlist );
+    }
+    else if( !strcmp( psz_cmd, "add" ) )
+    {
+        printf( "trying to add %s to playlist\n", newval.psz_string );
+        playlist_Add( p_playlist, newval.psz_string,
+                      PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
+    }
+    else if( !strcmp( psz_cmd, "playlist" ) )
+    {
+        int i;
+        for ( i = 0; i < p_playlist->i_size; i++ )
+        {
+            printf( "|%s%s   %s|\n", i == p_playlist->i_index?"*":" ",
+                    p_playlist->pp_items[i]->psz_name,
+                    p_playlist->pp_items[i]->psz_uri );
+        }
+        if ( i == 0 )
+        {
+            printf( "| no etries\n" );
+        }
+    }
+    /*
+     * sanity check
+     */
+    else
+    {
+        printf( "unknown command!\n" );
     }
 
     vlc_object_release( p_playlist );
