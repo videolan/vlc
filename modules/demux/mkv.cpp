@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.2 2003/06/22 12:27:16 fenrir Exp $
+ * $Id: mkv.cpp,v 1.3 2003/06/22 14:36:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -399,6 +399,8 @@ typedef struct
     int             i_data_init;
     uint8_t         *p_data_init;
 
+    /* hack : it's for seek */
+    vlc_bool_t      b_search_keyframe;
 } mkv_track_t;
 
 typedef struct
@@ -1443,11 +1445,241 @@ static void Deactivate( vlc_object_t *p_this )
     free( p_sys );
 }
 
+static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
+{
+    demux_sys_t    *p_sys   = p_input->p_demux_data;
+
+    *pp_block = NULL;
+    *pi_ref1  = -1;
+    *pi_ref2  = -1;
+
+    for( ;; )
+    {
+        EbmlElement *el;
+        int         i_level;
+
+        if( p_input->b_die )
+        {
+            return VLC_EGENERIC;
+        }
+
+        el = p_sys->ep->Get();
+        i_level = p_sys->ep->GetLevel();
+
+        if( el == NULL && *pp_block != NULL )
+        {
+            return VLC_SUCCESS;
+        }
+
+        if( el == NULL )
+        {
+            if( p_sys->ep->GetLevel() > 1 )
+            {
+                p_sys->ep->Up();
+                continue;
+            }
+            msg_Warn( p_input, "EOF" );
+            return VLC_EGENERIC;
+        }
+
+        /* do parsing */
+        if( i_level == 1 )
+        {
+            if( EbmlId( *el ) == KaxCluster::ClassInfos.GlobalId )
+            {
+                p_sys->cluster = (KaxCluster*)el;
+                p_sys->ep->Down();
+            }
+            else if( EbmlId( *el ) == KaxCues::ClassInfos.GlobalId )
+            {
+                msg_Warn( p_input, "find KaxCues FIXME" );
+                return VLC_EGENERIC;
+            }
+            else
+            {
+                msg_Dbg( p_input, "unknown (%s)", typeid( el ).name() );
+            }
+        }
+        else if( i_level == 2 )
+        {
+            if( EbmlId( *el ) == KaxClusterTimecode::ClassInfos.GlobalId )
+            {
+                KaxClusterTimecode &ctc = *(KaxClusterTimecode*)el;
+
+                ctc.ReadData( p_sys->es->I_O() );
+                p_sys->cluster->InitTimecode( uint64( ctc ), p_sys->i_timescale );
+            }
+            else if( EbmlId( *el ) == KaxBlockGroup::ClassInfos.GlobalId )
+            {
+                p_sys->ep->Down();
+            }
+        }
+        else if( i_level == 3 )
+        {
+            if( EbmlId( *el ) == KaxBlock::ClassInfos.GlobalId )
+            {
+                *pp_block = (KaxBlock*)el;
+
+                (*pp_block)->ReadData( p_sys->es->I_O() );
+                (*pp_block)->SetParent( *p_sys->cluster );
+
+                p_sys->ep->Keep();
+            }
+            else if( EbmlId( *el ) == KaxBlockDuration::ClassInfos.GlobalId )
+            {
+                KaxBlockDuration &dur = *(KaxBlockDuration*)el;
+
+                dur.ReadData( p_sys->es->I_O() );
+                *pi_duration = uint64( dur );
+            }
+            else if( EbmlId( *el ) == KaxReferenceBlock::ClassInfos.GlobalId )
+            {
+                KaxReferenceBlock &ref = *(KaxReferenceBlock*)el;
+
+                ref.ReadData( p_sys->es->I_O() );
+                if( *pi_ref1 == -1 )
+                {
+                    *pi_ref1 = int64( ref );
+                }
+                else
+                {
+                    *pi_ref2 = int64( ref );
+                }
+            }
+        }
+        else
+        {
+            msg_Err( p_input, "invalid level = %d", i_level );
+            return VLC_EGENERIC;
+        }
+    }
+}
+
+static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts, mtime_t i_duration )
+{
+    demux_sys_t    *p_sys   = p_input->p_demux_data;
+
+    int             i_track;
+    pes_packet_t    *p_pes;
+    unsigned int    i;
+
+#define tk  p_sys->track[i_track]
+    for( i_track = 0; i_track < p_sys->i_track; i_track++ )
+    {
+        if( tk.i_number == block->TrackNum() )
+        {
+            break;
+        }
+    }
+
+    if( i_track >= p_sys->i_track )
+    {
+        msg_Err( p_input, "invalid track number=%d", block->TrackNum() );
+        delete block;
+
+        return;
+    }
+
+    if( tk.p_es->p_decoder_fifo == NULL )
+    {
+        delete block;
+        return;
+    }
+
+    if( ( p_pes = input_NewPES( p_input->p_method_data ) ) == NULL )
+    {
+        msg_Err( p_input, "cannot allocate PES" );
+    }
+
+
+    p_pes->i_pts = i_pts;
+    p_pes->i_dts = i_pts;
+    if( tk.i_cat == SPU_ES )
+    {
+        /* special case : dts mean end of display */
+        if( i_duration > 0 )
+        {
+            /* FIXME not sure about that */
+            p_pes->i_dts += i_duration * 1000;// * (mtime_t) 1000 / p_sys->i_timescale;
+        }
+        else
+        {
+            /* unknown */
+            p_pes->i_dts = 0;
+        }
+    }
+
+    p_pes->p_first = p_pes->p_last = NULL;
+    p_pes->i_nb_data = 0;
+    p_pes->i_pes_size = 0;
+
+    for( i = 0; i < block->NumberFrames(); i++ )
+    {
+        data_packet_t *p_data = NULL;
+        DataBuffer &data = block->GetBuffer(i);
+
+        if( ( p_data = input_NewPacket( p_input->p_method_data, data.Size() ) ) != NULL )
+        {
+            memcpy( p_data->p_payload_start, data.Buffer(), data.Size() );
+
+            p_data->p_payload_end = p_data->p_payload_start + data.Size();
+
+            if( p_pes->p_first == NULL )
+            {
+                p_pes->p_first = p_data;
+            }
+            else
+            {
+                p_pes->p_last->p_next  = p_data;
+            }
+            p_pes->i_nb_data++;
+            p_pes->i_pes_size += data.Size();
+            p_pes->p_last  = p_data;
+        }
+    }
+    if( tk.i_cat == SPU_ES && p_pes->p_first && p_pes->i_pes_size > 0 )
+    {
+        p_pes->p_first->p_payload_end[-1] = '\0';
+    }
+
+    if( !tk.b_inited && tk.i_data_init > 0 )
+    {
+        pes_packet_t *p_init;
+        data_packet_t *p_data;
+
+        msg_Dbg( p_input, "sending header (%d bytes)", tk.i_data_init );
+
+        p_init = input_NewPES( p_input->p_method_data );
+
+        p_data = input_NewPacket( p_input->p_method_data, tk.i_data_init );
+        memcpy( p_data->p_payload_start, tk.p_data_init, tk.i_data_init );
+        p_data->p_payload_end = p_data->p_payload_start + tk.i_data_init;
+
+        p_init->p_first = p_init->p_last = p_data;
+        p_init->i_nb_data = 1;
+        p_init->i_pes_size = tk.i_data_init;
+
+        input_DecodePES( tk.p_es->p_decoder_fifo, p_init );
+    }
+    tk.b_inited = VLC_TRUE;
+
+    input_DecodePES( tk.p_es->p_decoder_fifo, p_pes );
+
+#undef tk
+}
+
 static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
 {
     demux_sys_t    *p_sys   = p_input->p_demux_data;
 
-    int i_index;
+    KaxBlock    *block;
+    int64_t     i_block_duration;
+    int64_t     i_block_ref1;
+    int64_t     i_block_ref2;
+
+    int         i_index;
+    int         i_track_skipping;
+    int         i_track;
 
     msg_Dbg( p_input, "seek request to %lld (%d%%)", i_date, i_percent );
 
@@ -1473,9 +1705,54 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
 
     p_sys->ep = new EbmlParser( p_sys->es, p_sys->segment );
 
-//    p_sys->cluster = p_sys->es->FindNextElement( p_sys->segment->Generic().Context,
-//                                                 i_ulev, 0xFFFFFFFFL, true, 1);
+    /* now parse until key frame */
+#define tk  p_sys->track[i_track]
+    i_track_skipping = 0;
+    for( i_track = 0; i_track < p_sys->i_track; i_track++ )
+    {
+        if( tk.i_cat == VIDEO_ES )
+        {
+            tk.b_search_keyframe = VLC_TRUE;
+            i_track_skipping++;
+        }
+    }
 
+
+    while( i_track_skipping > 0 )
+    {
+        if( BlockGet( p_input, &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        {
+            msg_Warn( p_input, "cannot get block EOF?" );
+
+            return;
+        }
+
+        p_sys->i_pts = block->GlobalTimecode() * (mtime_t) 1000 / p_sys->i_timescale;
+
+        for( i_track = 0; i_track < p_sys->i_track; i_track++ )
+        {
+            if( tk.i_number == block->TrackNum() )
+            {
+                break;
+            }
+        }
+
+        if( i_track < p_sys->i_track )
+        {
+            if( tk.i_cat == VIDEO_ES && i_block_ref1 == -1 && tk.b_search_keyframe )
+            {
+                tk.b_search_keyframe = VLC_FALSE;
+                i_track_skipping--;
+            }
+            if( tk.i_cat == VIDEO_ES && !tk.b_search_keyframe )
+            {
+                BlockDecode( p_input, block, 0, 0 );
+            }
+        }
+
+        delete block;
+    }
+#undef tk
 }
 
 /*****************************************************************************
@@ -1486,11 +1763,11 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
 static int Demux( input_thread_t * p_input )
 {
     demux_sys_t    *p_sys   = p_input->p_demux_data;
-    mtime_t        i_start_pts = p_sys->i_pts;
-    KaxBlock *block = NULL;
-    int64_t i_block_duration = -1;
-    int64_t i_block_ref1 = 0;
-    int64_t i_block_ref2 = 0;
+    mtime_t        i_start_pts;
+    KaxBlock *block;
+    int64_t i_block_duration;
+    int64_t i_block_ref1;
+    int64_t i_block_ref2;
 
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
@@ -1507,232 +1784,47 @@ static int Demux( input_thread_t * p_input )
                         p_input->stream.p_selected_area->i_size;
 
         Seek( p_input, i_date, i_percent);
-        i_start_pts = -1;
     }
+
+    i_start_pts = p_sys->i_pts;
 
     for( ;; )
     {
-        EbmlElement *el;
-        int         i_level;
+        mtime_t i_pts;
 
-        el = p_sys->ep->Get();
-        i_level = p_sys->ep->GetLevel();
-
-        /* First send last collected blocks (before ep->Up, because of cluster) */
-        if( el == NULL && block != NULL )
+        if( BlockGet( p_input, &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
-            /* we have data */
-            int i_track;
-#define tk  p_sys->track[i_track]
-            for( i_track = 0; i_track < p_sys->i_track; i_track++ )
-            {
-                if( tk.i_number == block->TrackNum() )
-                {
-                    break;
-                }
-            }
+            msg_Warn( p_input, "cannot get block EOF?" );
 
-            p_sys->i_pts = block->GlobalTimecode() * (mtime_t) 1000 / p_sys->i_timescale;
-
-            if( p_sys->i_pts > 0 )
-            {
-                input_ClockManageRef( p_input,
-                                      p_input->stream.p_selected_program,
-                                      p_sys->i_pts * 9 / 100 );
-            }
-
-            if( i_track >= p_sys->i_track )
-            {
-                msg_Err( p_input, "invalid track number=%d", block->TrackNum() );
-            }
-            else if( tk.p_es->p_decoder_fifo != NULL )
-            {
-                pes_packet_t  *p_pes;
-                unsigned int i;
-
-                if( ( p_pes = input_NewPES( p_input->p_method_data ) ) != NULL )
-                {
-                    mtime_t i_pts;
-
-                    i_pts = input_ClockGetTS( p_input,
-                                              p_input->stream.p_selected_program,
-                                              p_sys->i_pts * 9 / 100 );
-
-                    p_pes->i_pts = i_pts;
-                    p_pes->i_dts = i_pts;
-                    if( tk.i_cat == SPU_ES )
-                    {
-                        /* special case : dts mean end of display */
-                        if( i_block_duration > 0 )
-                        {
-                            /* FIXME not sure about that */
-                            p_pes->i_dts += i_block_duration * 1000;// * (mtime_t) 1000 / p_sys->i_timescale;
-                        }
-                        else
-                        {
-                            /* unknown */
-                            p_pes->i_dts = 0;
-                        }
-                    }
-
-                    p_pes->p_first = p_pes->p_last = NULL;
-                    p_pes->i_nb_data = 0;
-                    p_pes->i_pes_size = 0;
-
-                    for( i = 0; i < block->NumberFrames(); i++ )
-                    {
-                        data_packet_t *p_data = NULL;
-                        DataBuffer &data = block->GetBuffer(i);
-
-                        if( ( p_data = input_NewPacket( p_input->p_method_data, data.Size() ) ) != NULL )
-                        {
-                            memcpy( p_data->p_payload_start, data.Buffer(), data.Size() );
-
-                            p_data->p_payload_end = p_data->p_payload_start + data.Size();
-
-                            if( p_pes->p_first == NULL )
-                            {
-                                p_pes->p_first = p_data;
-                            }
-                            else
-                            {
-                                p_pes->p_last->p_next  = p_data;
-                            }
-                            p_pes->i_nb_data++;
-                            p_pes->i_pes_size += data.Size();
-                            p_pes->p_last  = p_data;
-                        }
-                    }
-                    if( tk.i_cat == SPU_ES && p_pes->p_first && p_pes->i_pes_size > 0 )
-                    {
-                        p_pes->p_first->p_payload_end[-1] = '\0';
-                    }
-
-                    if( !tk.b_inited && tk.i_data_init > 0 )
-                    {
-                        pes_packet_t *p_init;
-                        data_packet_t *p_data;
-
-                        msg_Dbg( p_input, "sending header (%d bytes)", tk.i_data_init );
-
-                        p_init = input_NewPES( p_input->p_method_data );
-
-                        p_data = input_NewPacket( p_input->p_method_data, tk.i_data_init );
-                        memcpy( p_data->p_payload_start, tk.p_data_init, tk.i_data_init );
-                        p_data->p_payload_end = p_data->p_payload_start + tk.i_data_init;
-
-                        p_init->p_first = p_init->p_last = p_data;
-                        p_init->i_nb_data = 1;
-                        p_init->i_pes_size = tk.i_data_init;
-
-                        input_DecodePES( tk.p_es->p_decoder_fifo, p_init );
-                    }
-                    tk.b_inited = VLC_TRUE;
-
-                    input_DecodePES( tk.p_es->p_decoder_fifo, p_pes );
-                }
-                else
-                {
-                    tk.b_inited = VLC_FALSE;
-                }
-            }
-#undef tk
-            delete block;
-            block = NULL;
-
-            if( i_start_pts == -1 )
-            {
-                i_start_pts = p_sys->i_pts;
-            }
-            else if( p_sys->i_pts > i_start_pts + (mtime_t)100000)
-            {
-                return 1;
-            }
-        }
-
-        if( el == NULL )
-        {
-            if( p_sys->ep->GetLevel() > 1 )
-            {
-                p_sys->ep->Up();
-                continue;
-            }
-            msg_Warn( p_input, "EOF" );
             return 0;
         }
 
-        /* do parsing */
-        if( i_level == 1 )
+        p_sys->i_pts = block->GlobalTimecode() * (mtime_t) 1000 / p_sys->i_timescale;
+
+        if( p_sys->i_pts > 0 )
         {
-            if( EbmlId( *el ) == KaxCluster::ClassInfos.GlobalId )
-            {
-                p_sys->cluster = (KaxCluster*)el;
-                p_sys->ep->Down();
-            }
-            else if( EbmlId( *el ) == KaxCues::ClassInfos.GlobalId )
-            {
-                msg_Warn( p_input, "find KaxCues FIXME" );
-                return 0;
-            }
-            else
-            {
-                msg_Dbg( p_input, "unknown (%s)", typeid( el ).name() );
-            }
+            input_ClockManageRef( p_input,
+                                  p_input->stream.p_selected_program,
+                                  p_sys->i_pts * 9 / 100 );
         }
-        else if( i_level == 2 )
-        {
-            if( EbmlId( *el ) == KaxClusterTimecode::ClassInfos.GlobalId )
-            {
-                KaxClusterTimecode &ctc = *(KaxClusterTimecode*)el;
 
-                ctc.ReadData( p_sys->es->I_O() );
-                p_sys->cluster->InitTimecode( uint64( ctc ), p_sys->i_timescale );
-            }
-            else if( EbmlId( *el ) == KaxBlockGroup::ClassInfos.GlobalId )
-            {
-                p_sys->ep->Down();
-            }
+        i_pts = input_ClockGetTS( p_input,
+                                  p_input->stream.p_selected_program,
+                                  p_sys->i_pts * 9 / 100 );
+
+        BlockDecode( p_input, block, i_pts, i_block_duration );
+
+        delete block;
+
+        if( i_start_pts == -1 )
+        {
+            i_start_pts = p_sys->i_pts;
         }
-        else if( i_level == 3 )
+        else if( p_sys->i_pts > i_start_pts + (mtime_t)100000)
         {
-            if( EbmlId( *el ) == KaxBlock::ClassInfos.GlobalId )
-            {
-                block = (KaxBlock*)el;
-
-                block->ReadData( p_sys->es->I_O() );
-                block->SetParent( *p_sys->cluster );
-
-                p_sys->ep->Keep();
-            }
-            else if( EbmlId( *el ) == KaxBlockDuration::ClassInfos.GlobalId )
-            {
-                KaxBlockDuration &dur = *(KaxBlockDuration*)el;
-
-                dur.ReadData( p_sys->es->I_O() );
-                i_block_duration = uint64( dur );
-            }
-            else if( EbmlId( *el ) == KaxReferenceBlock::ClassInfos.GlobalId )
-            {
-                KaxReferenceBlock &ref = *(KaxReferenceBlock*)el;
-
-                ref.ReadData( p_sys->es->I_O() );
-                if( i_block_ref1 == 0 )
-                {
-                    i_block_ref1 = int64( ref );
-                }
-                else
-                {
-                    i_block_ref2 = int64( ref );
-                }
-            }
-        }
-        else
-        {
-            msg_Err( p_input, "invalid level = %d", i_level );
-            return 0;
+            return 1;
         }
     }
-
 }
 
 
