@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.33 2003/05/31 12:24:39 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.34 2003/06/08 16:04:30 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -774,8 +774,20 @@ bool VlcWrapper::IsUsingMenus()
     if( !p_input )
         return false;
 
-    if( !strncmp( PlaylistItemName( PlaylistCurrent() ), "dvdplay:", 8 ) )
+    vlc_mutex_lock( &p_playlist->object_lock );
+    if( p_playlist->i_index < 0 )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        return false;
+    }
+    
+    char * psz_name = p_playlist->pp_items[p_playlist->i_index]->psz_name;
+    if( !strncmp( psz_name, "dvdplay:", 8 ) )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
         return true;
+    }
+    vlc_mutex_unlock( &p_playlist->object_lock );
 
     return false;
 }
