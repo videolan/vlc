@@ -105,7 +105,7 @@ enum nal_priority_e
 
 static block_t *ParseNALBlock( decoder_t *, block_t * );
 
-static block_t *nal_get_encoded( decoder_t *, uint8_t *p, int );
+static block_t *nal_get_annexeb( decoder_t *, uint8_t *p, int );
 
 /*****************************************************************************
  * Open: probe the packetizer and return score
@@ -163,7 +163,7 @@ static int Open( vlc_object_t *p_this )
         for( i = 0; i < i_sps; i++ )
         {
             int i_length = GetWBE( p );
-            block_t *p_sps = nal_get_encoded( p_dec, p+2, i_length );
+            block_t *p_sps = nal_get_annexeb( p_dec, p+2, i_length );
 
             ParseNALBlock( p_dec, p_sps );
             p += 2 + i_length;
@@ -173,7 +173,7 @@ static int Open( vlc_object_t *p_this )
         for( i = 0; i < i_pps; i++ )
         {
             int i_length = GetWBE( p );
-            block_t *p_pps = nal_get_encoded( p_dec, p+2, i_length );
+            block_t *p_pps = nal_get_annexeb( p_dec, p+2, i_length );
 
             ParseNALBlock( p_dec, p_pps );
             p += 2 + i_length;
@@ -307,7 +307,7 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
 
         if( i_size > 0 )
         {
-            block_t *p_part = nal_get_encoded( p_dec, p, i_size );
+            block_t *p_part = nal_get_annexeb( p_dec, p, i_size );
 
             p_part->i_dts = p_block->i_dts;
             p_part->i_pts = p_block->i_pts;
@@ -323,67 +323,19 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
     return p_ret;
 }
 
-static block_t *nal_get_encoded( decoder_t *p_dec, uint8_t *p, int i_size )
+static block_t *nal_get_annexeb( decoder_t *p_dec, uint8_t *p, int i_size )
 {
     block_t *p_nal;
-    int     i_nal_size = 5;
-    uint8_t *src = &p[1];
-    uint8_t *end = &p[i_size];
-    uint8_t *dst;
-    int     i_count = 0;
 
-    /* 1: compute real size */
-    while( src < end )
-    {
-        if( i_count == 2 && *src <= 0x03 )
-        {
-            i_nal_size++;
-            i_count = 0;
-        }
-        if( *src == 0 )
-        {
-            i_count++;
-        }
-        else
-        {
-            i_count = 0;
-        }
-        i_nal_size++;
-        src++;
-    }
+    p_nal = block_New( p_dec, 4 + i_size );
 
-    /* 2: encode it */
-    p_nal = block_New( p_dec, i_nal_size );
-    i_count = 0;
-    src = p;
-    dst = p_nal->p_buffer;
-
-    /* add start code */
-    *dst++ = 0x00;
-    *dst++ = 0x00;
-    *dst++ = 0x00;
-    *dst++ = 0x01;
-
-    /* nal type */
-    *dst++ = *src++;
-
-    while( src < end )
-    {
-        if( i_count == 2 && *src <= 0x03 )
-        {
-            *dst++ = 0x03;
-            i_count = 0;
-        }
-        if( *src == 0 )
-        {
-            i_count++;
-        }
-        else
-        {
-            i_count = 0;
-        }
-        *dst++ = *src++;
-    }
+    /* Add start code */
+    p_nal->p_buffer[0] = 0x00;
+    p_nal->p_buffer[1] = 0x00;
+    p_nal->p_buffer[2] = 0x00;
+    p_nal->p_buffer[3] = 0x01;
+    /* Copy nalu */
+    memcpy( &p_nal->p_buffer[4], p, i_size );
 
     return p_nal;
 }

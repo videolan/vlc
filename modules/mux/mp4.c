@@ -665,70 +665,58 @@ static block_t *ConvertSUBT( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_blo
 
 static void ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
 {
-    uint8_t *src = p_block->p_buffer;
-    int     i_src = p_block->i_buffer;
-    uint8_t *end = &p_block->p_buffer[i_src];
+    uint8_t *last = p_block->p_buffer;  /* Assume it starts with 0x00000001 */
+    uint8_t *dat  = &p_block->p_buffer[4];
+    uint8_t *end = &p_block->p_buffer[p_block->i_buffer];
 
-    uint8_t *dst = p_block->p_buffer;
 
-    while( src < end )
+    /* Replace the 4 bytes start code with 4 bytes size,
+     * FIXME are all startcode 4 bytes ? (I don't think :( */
+    while( dat < end )
     {
-        uint8_t *fix = dst;
-        int i_type;
         int i_size;
 
-        if( src[0] != 0 || src[1] != 0 || src[2] != 0 || src[3] != 1 )
-            break;
-
-        /* skip start code and room for size */
-        src += 4;
-        dst += 4;
-
-        /* nal type */
-        i_type = (*dst++ = *src++)&0x1f;
-
-        /* nal content */
-        while( src < end )
+        while( dat < end - 4 )
         {
-            if( src < end - 4 && src[0] == 0x00 && src[1] == 0x00  && src[2] == 0x00 &&  src[3] == 0x01 )
+            if( dat[0] == 0x00 && dat[1] == 0x00  &&
+                dat[2] == 0x00 && dat[3] == 0x01 )
             {
                 break;
             }
-
-            if( src < end - 3 && src[0] == 0x00 && src[1] == 0x00  && src[2] == 0x03 )
-            {
-                *dst++ = 0x00;
-                *dst++ = 0x00;
-
-                src += 3;
-                continue;
-            }
-            *dst++ = *src++;
+            dat++;
         }
-        i_size = dst - &fix[4];
-        fix[0] = (i_size >> 24)&0xff;
-        fix[1] = (i_size >> 16)&0xff;
-        fix[2] = (i_size >>  8)&0xff;
-        fix[3] = (i_size      )&0xff;
+        if( dat >= end - 4 )
+        {
+            dat = end;
+        }
 
-        if( i_type == 7 && tk->avc.i_sps <= 0 )        /* SPS */
+        /* Fix size */
+        i_size = dat - &last[4];
+        last[0] = ( i_size >> 24 )&0xff;
+        last[1] = ( i_size >> 16 )&0xff;
+        last[2] = ( i_size >>  8 )&0xff;
+        last[3] = ( i_size       )&0xff;
+
+        if( last[4] == 7 && tk->avc.i_sps <= 0 )  /* SPS */
         {
             tk->avc.i_sps = i_size;
             tk->avc.sps = malloc( i_size );
-            memcpy( tk->avc.sps, &fix[4], i_size );
+            memcpy( tk->avc.sps, &last[4], i_size );
 
             tk->avc.i_profile = tk->avc.sps[1];
             tk->avc.i_level   = tk->avc.sps[3];
         }
-        else if( i_type == 8 && tk->avc.i_pps <= 0)   /* PPS */
+        else if( last[4] == 8 && tk->avc.i_pps <= 0 )   /* PPS */
         {
             tk->avc.i_pps = i_size;
             tk->avc.pps = malloc( i_size );
-            memcpy( tk->avc.pps, &fix[4], i_size );
+            memcpy( tk->avc.pps, &last[4], i_size );
         }
-    }
 
-    p_block->i_buffer = dst - p_block->p_buffer;
+        last = dat;
+
+        dat += 4;
+    }
 }
 
 

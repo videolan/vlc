@@ -1220,7 +1220,7 @@ static int  TrackCreateES   ( demux_t   *p_demux,
                 }
                 break;
 
-            /* avc1: send avcC (h264 without annexe B) */
+            /* avc1: send avcC (h264 without annexe B, ie without start code)*/
             case VLC_FOURCC( 'a', 'v', 'c', '1' ):
             {
                 MP4_Box_t *p_avcC = MP4_BoxGet( p_sample, "avcC" );
