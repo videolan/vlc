@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.5 2002/10/27 16:58:14 gbazin Exp $
+ * $Id: araw.c,v 1.6 2002/11/08 14:23:49 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -233,8 +233,9 @@ static int InitThread( adec_thread_t * p_adec )
         case( 4 ):
             p_adec->output_format.i_format = VLC_FOURCC('s','3','2','l');
             break;
-
         case( 1 ):
+            p_adec->output_format.i_format = VLC_FOURCC('u','8',' ',' ');
+            break;
         default:
             msg_Err( p_adec->p_fifo, "bad parameters(bits/sample)" );
             return( -1 );
