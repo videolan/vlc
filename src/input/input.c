@@ -735,6 +735,13 @@ static int Init( input_thread_t * p_input )
     es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE,
                     val.b_bool ? ES_OUT_MODE_ALL : ES_OUT_MODE_AUTO );
 
+    /* Inform the demuxer about waited group (needed only for DVB) */
+    if( val.b_bool )
+        demux2_Control( p_input->input.p_demux, DEMUX_SET_GROUP, -1 );
+    else
+        demux2_Control( p_input->input.p_demux, DEMUX_SET_GROUP,
+                       (int) var_GetInteger( p_input, "program" ) );
+
     if( p_input->p_sout )
     {
         if( p_input->p_sout->i_out_pace_nocontrol > 0 )
@@ -1239,6 +1246,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             /* No need to force update, es_out does it if needed */
             es_out_Control( p_input->p_es_out,
                             ES_OUT_SET_GROUP, val.i_int );
+
+            demux2_Control( p_input->input.p_demux, DEMUX_SET_GROUP, val.i_int );
             break;
 
         case INPUT_CONTROL_SET_ES:
