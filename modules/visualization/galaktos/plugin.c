@@ -260,9 +260,9 @@ static void Thread( vlc_object_t *p_this )
     }
 
     /* Free the openGL provider */
-    module_Unneed( p_sys->p_thread->p_opengl, p_sys->p_thread->p_module );
-    vlc_object_detach( p_sys->p_thread->p_opengl );
-    vlc_object_destroy( p_sys->p_thread->p_opengl );
+    module_Unneed( p_thread->p_opengl, p_thread->p_module );
+    vlc_object_detach( p_thread->p_opengl );
+    vlc_object_destroy( p_thread->p_opengl );
 }
 
 /*****************************************************************************
