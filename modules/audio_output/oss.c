@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.15 2002/08/24 10:19:42 sam Exp $
+ * $Id: oss.c,v 1.16 2002/08/24 11:46:44 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,7 +65,8 @@ struct aout_sys_t
     volatile vlc_bool_t   b_initialized;
 };
 
-#define FRAME_SIZE 1024
+#define FRAME_SIZE 2048
+#define FRAME_COUNT 8
 #define A52_FRAME_NB 1536
 
 /*****************************************************************************
@@ -107,7 +108,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
-        return 1;
+        return VLC_ENOMEM;
     }
 
     /* Initialize some variables */
@@ -115,7 +116,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_aout, "no audio device given (maybe /dev/dsp ?)" );
         free( p_sys );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     /* Open the sound device */
@@ -124,7 +125,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_aout, "cannot open audio device (%s)", psz_device );
         free( psz_device );
         free( p_sys );
-        return -1;
+        return VLC_EGENERIC;
     }
     free( psz_device );
 
@@ -136,13 +137,13 @@ static int Open( vlc_object_t *p_this )
         close( p_sys->i_fd );
         free( psz_device );
         free( p_sys );
-        return -1;
+        return VLC_ETHREAD;
     }
 
     p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -158,6 +159,7 @@ static int SetFormat( aout_instance_t *p_aout )
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     int i_format;
     int i_rate;
+    int i_fragments;
     vlc_bool_t b_stereo;
 
     p_sys->b_initialized = VLC_FALSE;
@@ -166,7 +168,15 @@ static int SetFormat( aout_instance_t *p_aout )
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
     {
         msg_Err( p_aout, "cannot reset OSS audio device" );
-        return -1;
+        return VLC_EGENERIC;
+    }
+
+    /* Set the fragment size */
+    i_fragments = FRAME_COUNT << 16 | FRAME_SIZE;
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFRAGMENT, &i_fragments ) < 0 )
+    {
+        msg_Err( p_aout, "cannot set fragment size (%.8x)", i_fragments );
+        return VLC_EGENERIC;
     }
 
     /* Set the output format */
@@ -186,9 +196,8 @@ static int SetFormat( aout_instance_t *p_aout )
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
          || i_format != p_aout->output.output.i_format )
     {
-        msg_Err( p_aout, "cannot set audio output format (%i)",
-                          i_format );
-        return -1;
+        msg_Err( p_aout, "cannot set audio output format (%i)", i_format );
+        return VLC_EGENERIC;
     }
 
     if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
@@ -208,7 +217,7 @@ static int SetFormat( aout_instance_t *p_aout )
         {
             msg_Err( p_aout, "cannot set number of audio channels (%i)",
                               p_aout->output.output.i_channels );
-            return -1;
+            return VLC_EGENERIC;
         }
 
         if ( b_stereo + 1 != p_aout->output.output.i_channels )
@@ -225,7 +234,7 @@ static int SetFormat( aout_instance_t *p_aout )
         {
             msg_Err( p_aout, "cannot set audio output rate (%i)",
                              p_aout->output.output.i_rate );
-            return -1;
+            return VLC_EGENERIC;
         }
 
         if( i_rate != p_aout->output.output.i_rate )
@@ -238,7 +247,7 @@ static int SetFormat( aout_instance_t *p_aout )
 
     p_sys->b_initialized = VLC_TRUE;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -256,8 +265,9 @@ static void Close( vlc_object_t * p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-    p_aout->b_die = 1;
+    p_aout->b_die = VLC_TRUE;
     vlc_thread_join( p_aout );
+    p_aout->b_die = VLC_FALSE;
 
     ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL );
     close( p_sys->i_fd );
@@ -333,7 +343,7 @@ static int OSSThread( aout_instance_t * p_aout )
         {
             i_size = FRAME_SIZE / p_aout->output.output.i_frame_length
                       * p_aout->output.output.i_bytes_per_frame;
-            p_bytes = alloca( i_size );
+            p_bytes = malloc( i_size );
             memset( p_bytes, 0, i_size );
         }
 
@@ -348,7 +358,11 @@ static int OSSThread( aout_instance_t * p_aout )
         {
             aout_BufferFree( p_buffer );
         }
+        else
+        {
+            free( p_bytes );
+        }
     }
 
-    return 0;
+    return VLC_SUCCESS;
 }
