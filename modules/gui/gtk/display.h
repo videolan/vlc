@@ -2,7 +2,7 @@
  * display.h: Gtk+ tools for main interface.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: display.h,v 1.2 2002/09/30 11:05:39 sam Exp $
+ * $Id: display.h,v 1.3 2003/08/03 23:11:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -28,6 +28,8 @@
 
 gint E_(GtkModeManage)      ( intf_thread_t * p_intf );
 void E_(GtkDisplayDate)     ( GtkAdjustment *p_adj );
-void E_(GtkHideTooltips)    ( vlc_object_t * );
-void    GtkHideToolbarText  ( vlc_object_t * );
+int  E_(GtkHideTooltips)    ( vlc_object_t *, const char *,
+                              vlc_value_t, vlc_value_t, void * );
+int  GtkHideToolbarText     ( vlc_object_t *, const char *,
+                              vlc_value_t, vlc_value_t, void * );
 

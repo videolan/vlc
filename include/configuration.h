@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.28 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: configuration.h,v 1.29 2003/08/03 23:11:21 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -64,7 +64,8 @@ struct module_config_t
     float       f_max;                               /* Option maximum value */
 
     /* Function to call when commiting a change */
-    void ( * pf_callback ) ( vlc_object_t * );
+    vlc_callback_t pf_callback;
+    void          *p_callback_data;
 
     char       **ppsz_list;        /* List of possible values for the option */
 

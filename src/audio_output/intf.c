@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.17 2003/02/12 14:22:23 hartman Exp $
+ * $Id: intf.c,v 1.18 2003/08/03 23:11:21 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -385,12 +385,13 @@ int aout_Restart( aout_instance_t * p_aout )
  * that when those are changed, it is a significant change which implies
  * rebuilding the audio-device and audio-channels variables.
  *****************************************************************************/
-void aout_FindAndRestart( vlc_object_t * p_this )
+int aout_FindAndRestart( vlc_object_t * p_this, const char *psz_name,
+                         vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
     aout_instance_t * p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
 
-    if ( p_aout == NULL ) return;
+    if ( p_aout == NULL ) return VLC_SUCCESS;
 
     if ( var_Type( p_aout, "audio-device" ) != 0 )
     {
@@ -403,6 +404,8 @@ void aout_FindAndRestart( vlc_object_t * p_this )
 
     aout_Restart( p_aout );
     vlc_object_release( p_aout );
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.60 2003/07/23 01:13:48 gbazin Exp $
+ * $Id: configuration.c,v 1.61 2003/08/03 23:11:21 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -218,6 +218,7 @@ void __config_PutPsz( vlc_object_t *p_this,
                       const char *psz_name, const char *psz_value )
 {
     module_config_t *p_config;
+    vlc_value_t oldval, val;
 
     p_config = config_FindConfig( p_this, psz_name );
 
@@ -238,18 +239,24 @@ void __config_PutPsz( vlc_object_t *p_this,
 
     vlc_mutex_lock( p_config->p_lock );
 
-    /* free old string */
-    if( p_config->psz_value ) free( p_config->psz_value );
+    /* backup old value */
+    oldval.psz_string = p_config->psz_value;
 
     if( psz_value && *psz_value ) p_config->psz_value = strdup( psz_value );
     else p_config->psz_value = NULL;
+
+    val.psz_string = p_config->psz_value;
 
     vlc_mutex_unlock( p_config->p_lock );
 
     if( p_config->pf_callback )
     {
-        p_config->pf_callback( p_this );
+        p_config->pf_callback( p_this, psz_name, oldval, val,
+                               p_config->p_callback_data );
     }
+
+    /* free old string */
+    if( oldval.psz_string ) free( oldval.psz_string );
 }
 
 /*****************************************************************************
@@ -262,6 +269,7 @@ void __config_PutPsz( vlc_object_t *p_this,
 void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
 {
     module_config_t *p_config;
+    vlc_value_t oldval, val;
 
     p_config = config_FindConfig( p_this, psz_name );
 
@@ -277,6 +285,9 @@ void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
         msg_Err( p_this, "option %s does not refer to an int", psz_name );
         return;
     }
+
+    /* backup old value */
+    oldval.i_int = p_config->i_value;
 
     /* if i_min == i_max == 0, then do not use them */
     if ((p_config->i_min == 0) && (p_config->i_max == 0))
@@ -296,9 +307,12 @@ void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
         p_config->i_value = i_value;
     }
 
+    val.i_int = p_config->i_value;
+
     if( p_config->pf_callback )
     {
-        p_config->pf_callback( p_this );
+        p_config->pf_callback( p_this, psz_name, oldval, val,
+                               p_config->p_callback_data );
     }
 }
 
@@ -312,6 +326,7 @@ void __config_PutFloat( vlc_object_t *p_this,
                         const char *psz_name, float f_value )
 {
     module_config_t *p_config;
+    vlc_value_t oldval, val;
 
     p_config = config_FindConfig( p_this, psz_name );
 
@@ -326,6 +341,9 @@ void __config_PutFloat( vlc_object_t *p_this,
         msg_Err( p_this, "option %s does not refer to a float", psz_name );
         return;
     }
+
+    /* backup old value */
+    oldval.f_float = p_config->f_value;
 
     /* if f_min == f_max == 0, then do not use them */
     if ((p_config->f_min == 0) && (p_config->f_max == 0))
@@ -345,9 +363,12 @@ void __config_PutFloat( vlc_object_t *p_this,
         p_config->f_value = f_value;
     }
 
+    val.f_float = p_config->f_value;
+
     if( p_config->pf_callback )
     {
-        p_config->pf_callback( p_this );
+        p_config->pf_callback( p_this, psz_name, oldval, val,
+                               p_config->p_callback_data );
     }
 }
 

@@ -2,7 +2,7 @@
  * xcommon.h: Defines common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.h,v 1.7 2003/07/29 09:32:14 sam Exp $
+ * $Id: xcommon.h,v 1.8 2003/08/03 23:11:21 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -128,6 +128,17 @@ struct vout_sys_t
     Cursor              blank_cursor;                   /* the hidden cursor */
     mtime_t             i_time_button_last_pressed;   /* to track dbl-clicks */
     Pixmap              cursor_pixmap;
+
+    /* Window manager properties */
+    Atom                net_wm_state;
+    Atom                net_wm_state_fullscreen;
+    vlc_bool_t          b_net_wm_state_fullscreen;
+    Atom                net_wm_state_above;
+    vlc_bool_t          b_net_wm_state_above;
+    Atom                net_wm_state_stays_on_top;
+    vlc_bool_t          b_net_wm_state_stays_on_top;
+    Atom                net_wm_state_below;
+    vlc_bool_t          b_net_wm_state_below;
 };
 
 /*****************************************************************************

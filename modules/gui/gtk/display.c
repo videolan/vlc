@@ -2,7 +2,7 @@
  * display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: display.c,v 1.10 2003/05/05 16:09:39 gbazin Exp $
+ * $Id: display.c,v 1.11 2003/08/03 23:11:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -215,7 +215,8 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
  * GtkHideTooltips: show or hide the tooltips depending on the configuration
  *                  option gnome-tooltips
  *****************************************************************************/
-void E_(GtkHideTooltips)( vlc_object_t *p_this )
+int E_(GtkHideTooltips)( vlc_object_t *p_this, const char *psz_name,
+                         vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
     intf_thread_t *p_intf;
     int i_index;
@@ -244,6 +245,7 @@ void E_(GtkHideTooltips)( vlc_object_t *p_this )
     }
 
     vlc_list_release( p_list );
+    return VLC_SUCCESS;
 }
 
 #ifdef MODULE_NAME_IS_gnome
@@ -253,7 +255,8 @@ void E_(GtkHideTooltips)( vlc_object_t *p_this )
  *****************************************************************************
  * FIXME: GNOME only because of missing icons in gtk interface
  *****************************************************************************/
-void GtkHideToolbarText( vlc_object_t *p_this )
+int GtkHideToolbarText( vlc_object_t *p_this, const char *psz_name,
+                        vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
     GtkToolbarStyle style;
     GtkToolbar * p_toolbar;
@@ -281,5 +284,6 @@ void GtkHideToolbarText( vlc_object_t *p_this )
     }
 
     vlc_list_release( p_list );
+    return VLC_SUCCESS;
 }
 #endif

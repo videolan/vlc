@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.27 2003/08/02 14:06:22 gbazin Exp $
+ * $Id: xcommon.c,v 1.28 2003/08/03 23:11:21 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -116,6 +116,8 @@ static void XVideoReleasePort( vout_thread_t *, int );
 static void SetPalette     ( vout_thread_t *,
                              uint16_t *, uint16_t *, uint16_t * );
 #endif
+
+static void TestNetWMSupport( vout_thread_t * );
 
 /*****************************************************************************
  * Activate: allocate X11 video thread output method
@@ -268,6 +270,8 @@ int E_(Activate) ( vlc_object_t *p_this )
     /* Misc init */
     p_vout->p_sys->b_altfullscreen = 0;
     p_vout->p_sys->i_time_button_last_pressed = 0;
+
+    TestNetWMSupport( p_vout );
 
     return VLC_SUCCESS;
 }
@@ -1453,13 +1457,41 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                                      p_vout->p_sys->p_win->base_window,
                                      CWOverrideRedirect,
                                      &attributes);
+
+            /* Make sure the change is effective */
+            XReparentWindow( p_vout->p_sys->p_display,
+                             p_vout->p_sys->p_win->base_window,
+                             DefaultRootWindow( p_vout->p_sys->p_display ),
+                             0, 0 );
         }
 
-        /* Make sure the change is effective */
-        XReparentWindow( p_vout->p_sys->p_display,
-                         p_vout->p_sys->p_win->base_window,
-                         DefaultRootWindow( p_vout->p_sys->p_display ),
-                         0, 0 );
+        if( p_vout->p_sys->b_net_wm_state_fullscreen )
+        {
+            XClientMessageEvent event;
+
+            memset( &event, 0, sizeof( XClientMessageEvent ) );
+
+            event.type = ClientMessage;
+            event.message_type = p_vout->p_sys->net_wm_state;
+            event.display = p_vout->p_sys->p_display;
+            event.window = p_vout->p_sys->p_win->base_window;
+            event.format = 32;
+            event.data.l[ 0 ] = 1; /* set property */
+            event.data.l[ 1 ] = p_vout->p_sys->net_wm_state_fullscreen;
+
+            XSendEvent( p_vout->p_sys->p_display,
+                        DefaultRootWindow( p_vout->p_sys->p_display ),
+                        False, SubstructureRedirectMask,
+                        (XEvent*)&event );
+        }
+        else
+        {
+            /* Make sure the change is effective */
+            XReparentWindow( p_vout->p_sys->p_display,
+                             p_vout->p_sys->p_win->base_window,
+                             DefaultRootWindow( p_vout->p_sys->p_display ),
+                             0, 0 );
+        }
 
         /* fullscreen window size and position */
         p_vout->p_sys->p_win->i_width =
@@ -2197,3 +2229,74 @@ static void SetPalette( vout_thread_t *p_vout,
                   p_vout->p_sys->colormap, p_colors, 255 );
 }
 #endif
+
+/*****************************************************************************
+ * TestNetWMSupport: tests for Extended Window Manager Hints support
+ *****************************************************************************/
+static void TestNetWMSupport( vout_thread_t *p_vout )
+{
+    int i_ret, i_format;
+    unsigned long i, i_items, i_bytesafter;
+    Atom net_wm_supported, *p_args = NULL;
+
+    p_vout->p_sys->b_net_wm_state_fullscreen = VLC_FALSE;
+    p_vout->p_sys->b_net_wm_state_above = VLC_FALSE;
+    p_vout->p_sys->b_net_wm_state_below = VLC_FALSE;
+    p_vout->p_sys->b_net_wm_state_stays_on_top = VLC_FALSE;
+
+    net_wm_supported =
+        XInternAtom( p_vout->p_sys->p_display, "_NET_SUPPORTED", False );
+
+    i_ret = XGetWindowProperty( p_vout->p_sys->p_display,
+                                DefaultRootWindow( p_vout->p_sys->p_display ),
+                                net_wm_supported,
+                                0, 16384, False, AnyPropertyType,
+                                &net_wm_supported,
+                                &i_format, &i_items, &i_bytesafter,
+                                (unsigned char **)&p_args );
+
+    if( i_ret != Success || i_items == 0 ) return;
+
+    msg_Dbg( p_vout, "Window manager supports NetWM" );
+
+    p_vout->p_sys->net_wm_state =
+        XInternAtom( p_vout->p_sys->p_display, "_NET_WM_STATE", False );
+    p_vout->p_sys->net_wm_state_fullscreen =
+        XInternAtom( p_vout->p_sys->p_display, "_NET_WM_STATE_FULLSCREEN",
+                     False );
+    p_vout->p_sys->net_wm_state_above =
+        XInternAtom( p_vout->p_sys->p_display, "_NET_WM_STATE_ABOVE", False );
+    p_vout->p_sys->net_wm_state_below =
+        XInternAtom( p_vout->p_sys->p_display, "_NET_WM_STATE_BELOW", False );
+    p_vout->p_sys->net_wm_state_stays_on_top =
+        XInternAtom( p_vout->p_sys->p_display, "_NET_WM_STATE_STAYS_ON_TOP",
+                     False );
+
+    for( i = 0; i < i_items; i++ )
+    {
+        if( p_args[i] == p_vout->p_sys->net_wm_state_fullscreen )
+        {
+            msg_Dbg( p_vout,
+                     "Window manager supports _NET_WM_STATE_FULLSCREEN" );
+            p_vout->p_sys->b_net_wm_state_fullscreen = VLC_TRUE;
+        }
+        else if( p_args[i] == p_vout->p_sys->net_wm_state_above )
+        {
+            msg_Dbg( p_vout, "Window manager supports _NET_WM_STATE_ABOVE" );
+            p_vout->p_sys->b_net_wm_state_above = VLC_TRUE;
+        }
+        else if( p_args[i] == p_vout->p_sys->net_wm_state_below )
+        {
+            msg_Dbg( p_vout, "Window manager supports _NET_WM_STATE_BELOW" );
+            p_vout->p_sys->b_net_wm_state_below = VLC_TRUE;
+        }
+        else if( p_args[i] == p_vout->p_sys->net_wm_state_stays_on_top )
+        {
+            msg_Dbg( p_vout,
+                     "Window manager supports _NET_WM_STATE_STAYS_ON_TOP" );
+            p_vout->p_sys->b_net_wm_state_stays_on_top = VLC_TRUE;
+        }
+    }
+
+    XFree( p_args );
+}

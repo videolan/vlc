@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.33 2003/07/27 16:20:53 gbazin Exp $
+ * $Id: alsa.c,v 1.34 2003/08/03 23:11:21 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -72,7 +72,7 @@ struct aout_sys_t
    number of channel(s) (eg. 2 for stereo) and the size of a sample (eg.
    2 for s16). */
 #define ALSA_DEFAULT_PERIOD_SIZE        1024
-#define ALSA_DEFAULT_BUFFER_SIZE        ( ALSA_DEFAULT_PERIOD_SIZE << 4 )
+#define ALSA_DEFAULT_BUFFER_SIZE        ( ALSA_DEFAULT_PERIOD_SIZE << 8 )
 #define ALSA_SPDIF_PERIOD_SIZE          A52_FRAME_NB
 #define ALSA_SPDIF_BUFFER_SIZE          ( ALSA_SPDIF_PERIOD_SIZE << 4 )
 /* Why << 4 ? --Meuuh */
@@ -107,7 +107,7 @@ vlc_module_end();
  *****************************************************************************/
 static void Probe( aout_instance_t * p_aout,
                    const char * psz_device, const char * psz_iec_device,
-                   int i_snd_pcm_format )
+                   int *pi_snd_pcm_format )
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     vlc_value_t val, text;
@@ -140,29 +140,27 @@ static void Probe( aout_instance_t * p_aout,
         }
 
         if ( snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
-                                           i_snd_pcm_format ) < 0 )
+                                           *pi_snd_pcm_format ) < 0 )
         {
-            /* Assume a FPU enabled computer can handle float32 format.
-               If somebody tells us it's not always true then we'll have
-               to change this */
-            msg_Warn( p_aout, "unable to set stream sample size and word order"
-                              ", disabling linear PCM audio" );
-            snd_pcm_close( p_sys->p_snd_pcm );
-            var_Destroy( p_aout, "audio-device" );
-            return;
+            if( *pi_snd_pcm_format != SND_PCM_FORMAT_S16 )
+            {
+                *pi_snd_pcm_format = SND_PCM_FORMAT_S16;
+                if ( snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
+                                                   *pi_snd_pcm_format ) < 0 )
+                {
+                    msg_Warn( p_aout, "unable to set stream sample size and "
+                              "word order, disabling linear PCM audio" );
+                    snd_pcm_close( p_sys->p_snd_pcm );
+                    var_Destroy( p_aout, "audio-device" );
+                    return;
+                }
+            }
         }
 
         i_channels = aout_FormatNbChannels( &p_aout->output.output );
 
         while ( i_channels > 0 )
         {
-            /* Here we have to probe multi-channel capabilities but I have
-               no idea (at the moment) of how its managed by the ALSA
-               library.
-               It seems that '6' channels aren't well handled on a stereo
-               sound card like my i810 but it requires some more
-               investigations. That's why '4' and '6' cases are disabled.
-               -- Bozo */
             if ( !snd_pcm_hw_params_test_channels( p_sys->p_snd_pcm, p_hw,
                                                    i_channels ) )
             {
@@ -339,7 +337,16 @@ static int Open( vlc_object_t *p_this )
        and we have to probe the available audio formats and channels */
     if ( var_Type( p_aout, "audio-device" ) == 0 )
     {
-        Probe( p_aout, psz_device, psz_iec_device, i_snd_pcm_format );
+        Probe( p_aout, psz_device, psz_iec_device, &i_snd_pcm_format );
+        switch( i_snd_pcm_format )
+        {
+        case SND_PCM_FORMAT_FLOAT:
+            i_vlc_pcm_format = VLC_FOURCC('f','l','3','2');
+            break;
+        case SND_PCM_FORMAT_S16:
+            i_vlc_pcm_format = AOUT_FMT_S16_NE;
+            break;
+        }
     }
 
     if ( var_Get( p_aout, "audio-device", &val ) < 0 )
@@ -360,6 +367,8 @@ static int Open( vlc_object_t *p_this )
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
                | AOUT_CHAN_LFE;
+        free( psz_device );
+        psz_device = strdup( "surround51" );
     }
     else if ( val.i_int == AOUT_VAR_2F2R )
     {
@@ -367,6 +376,8 @@ static int Open( vlc_object_t *p_this )
         p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+        free( psz_device );
+        psz_device = strdup( "surround40" );
     }
     else if ( val.i_int == AOUT_VAR_STEREO )
     {
@@ -416,6 +427,8 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
+        msg_Dbg( p_aout, "opening ALSA device `%s'", psz_device );
+
         if ( ( i_snd_rc = snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
                             SND_PCM_STREAM_PLAYBACK, 0 ) ) < 0 )
         {
