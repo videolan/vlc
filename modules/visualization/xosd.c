@@ -40,9 +40,8 @@
  *****************************************************************************/
 struct intf_sys_t
 {
-    input_thread_t * p_input;   /* associated input thread */
     xosd * p_osd;               /* libxosd handle */
-    char * psz_source;          /* current file || NULL */
+    vlc_bool_t  b_need_update;   /* Update display ? */
 };
 
 #define MAX_LINE_LENGTH 256
@@ -54,6 +53,9 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
 static void Run          ( intf_thread_t * );
+
+static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
+                vlc_value_t oval, vlc_value_t nval, void *param );
 
 /*****************************************************************************
  * Module descriptor
@@ -70,15 +72,21 @@ static void Run          ( intf_thread_t * );
 
 #define FONT_TEXT N_("Font")
 #define FONT_LONGTEXT N_("Font used to display text in the xosd output")
+/* FIXME FIXME FIXME: Gettextize */
+#define COLOUR_TEXT ("Colour")
+#define COLOUR_LONGTEXT ("Colour used to display text in the xosd output")
 
 vlc_module_begin();
     set_description( _("XOSD interface") );
     add_bool( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT, VLC_TRUE );
-    add_integer( "xosd-text-offset", 0, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, VLC_TRUE );
-    add_integer( "xosd-shadow-offset", 1, NULL,
+    add_integer( "xosd-text-offset", 30, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, VLC_TRUE );
+    add_integer( "xosd-shadow-offset", 2, NULL,
                  SHD_OFS_TEXT, SHD_OFS_LONGTEXT, VLC_TRUE );
-    add_string( "xosd-font", "-misc-fixed-medium-r-*-*-*-300-*-*-*-*-*-*",
+    add_string( "xosd-font",
+                "-adobe-helvetica-bold-r-normal-*-*-160-*-*-p-*-iso8859-1",
                 NULL, FONT_TEXT, FONT_LONGTEXT, VLC_TRUE );
+    add_string( "xosd-colour", "LawnGreen",
+                    NULL, COLOUR_TEXT, COLOUR_LONGTEXT, VLC_TRUE );
     set_capability( "interface", 10 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -108,10 +116,12 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_osd =
 #if defined(HAVE_XOSD_VERSION_0) || defined(HAVE_XOSD_VERSION_1)
         xosd_init( config_GetPsz( p_intf, "xosd-font" ),
-                   "LawnGreen", 3, XOSD_top, 0, 1 );
+                   config_GetPsz( p_intf,"xosd-colour" ), 3,
+                   XOSD_top, 0, 1 );
 #else
         xosd_init( config_GetPsz( p_intf, "xosd-font" ),
-                   "LawnGreen", 3, XOSD_top, 0, 0, 1 );
+                   config_GetPsz( p_intf,"xosd-colour" ), 3,
+                    XOSD_top, 0, 0, 1 );
 #endif
 
     if( p_intf->p_sys->p_osd == NULL )
@@ -120,15 +130,47 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Initialize to NULL */
-    p_intf->p_sys->psz_source = NULL;
+    playlist_t *p_playlist =
+            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return VLC_EGENERIC;
+    }
 
+    var_AddCallback( p_playlist, "playlist-current", PlaylistNext, p_this );
+    var_AddCallback( p_playlist, "item-change", PlaylistNext, p_this );
+
+    vlc_object_release( p_playlist );
+
+    /* Set user preferences */
+    xosd_set_font( p_intf->p_sys->p_osd,
+                    config_GetPsz( p_intf, "xosd-font" ) );
+    xosd_set_outline_colour( p_intf->p_sys->p_osd,"black" );
+#ifdef HAVE_XOSD_VERSION_2
+    xosd_set_horizontal_offset( p_intf->p_sys->p_osd,
+                    config_GetInt( p_intf, "xosd-text-offset" ) );
+    xosd_set_vertical_offset( p_intf->p_sys->p_osd,
+                    config_GetInt( p_intf, "xosd-text-offset" ) );
+#else
+    xosd_set_offset( p_intf->p_sys->p_osd,
+                    config_GetInt( p_intf, "xosd-text-offset" ) );
+#endif
+    xosd_set_shadow_offset( p_intf->p_sys->p_osd,
+                    config_GetInt( p_intf, "xosd-shadow-offset" ));
+    xosd_set_pos( p_intf->p_sys->p_osd,
+                    config_GetInt( p_intf, "xosd-position" ) ?
+                                         XOSD_bottom: XOSD_top );
+
+    /* Initialize to NULL */
     xosd_display( p_intf->p_sys->p_osd,
                   0,
                   XOSD_string,
                   "xosd interface initialized" );
 
     p_intf->pf_run = Run;
+
+    p_intf->p_sys->b_need_update = VLC_TRUE;
 
     return VLC_SUCCESS;
 }
@@ -140,10 +182,8 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    if( p_intf->p_sys->psz_source ) free( p_intf->p_sys->psz_source );
-
     /* Uninitialize library */
-    xosd_uninit( p_intf->p_sys->p_osd );
+    xosd_destroy( p_intf->p_sys->p_osd );
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -156,69 +196,100 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    p_intf->p_sys->p_input = NULL;
+    int i_size,i_index;
+    playlist_t *p_playlist;
+    playlist_item_t *p_item = NULL;
+    input_item_t item;
+    char psz_duration[MSTRTIME_MAX_SIZE+2];
+    char *psz_display = NULL;
 
     while( !p_intf->b_die )
     {
-        /* Manage the input part */
-        if( p_intf->p_sys->p_input == NULL )
+        if( p_intf->p_sys->b_need_update == VLC_TRUE )
         {
-            p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                              FIND_ANYWHERE );
-        }
-        else if( p_intf->p_sys->p_input->b_dead )
-        {
-            vlc_object_release( p_intf->p_sys->p_input );
-            p_intf->p_sys->p_input = NULL;
-        }
-        else /* We have a valid input */
-        {
-            /* Did source change? */
-            if ( (p_intf->p_sys->psz_source == NULL)
-                 || (strcmp( p_intf->p_sys->psz_source,
-                             p_intf->p_sys->p_input->psz_source ) != 0)
-               )
+            p_intf->p_sys->b_need_update = VLC_FALSE;
+            p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                                      VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+            if( !p_playlist )
             {
-                if( p_intf->p_sys->psz_source )
-                    free( p_intf->p_sys->psz_source );
-
-                p_intf->p_sys->psz_source =
-                    strdup( p_intf->p_sys->p_input->psz_source );
-
-                /* Set user preferences */
-                xosd_set_font( p_intf->p_sys->p_osd,
-                               config_GetPsz( p_intf, "xosd-font" ) );
-#ifdef HAVE_XOSD_VERSION_2
-                xosd_set_horizontal_offset( p_intf->p_sys->p_osd,
-                    config_GetInt( p_intf, "xosd-text-offset" ) );
-                xosd_set_vertical_offset( p_intf->p_sys->p_osd,
-                    config_GetInt( p_intf, "xosd-text-offset" ) );
-#else
-                xosd_set_offset( p_intf->p_sys->p_osd,
-                    config_GetInt( p_intf, "xosd-text-offset" ) );
-#endif
-                xosd_set_shadow_offset( p_intf->p_sys->p_osd,
-                    config_GetInt( p_intf, "xosd-shadow-offset" ));
-                xosd_set_pos( p_intf->p_sys->p_osd,
-                    config_GetInt( p_intf, "xosd-position" ) ? XOSD_bottom
-                                                             : XOSD_top );
-
-                /* Display */
-                xosd_display( p_intf->p_sys->p_osd,
-                              0,                               /* first line */
-                              XOSD_string,
-                              p_intf->p_sys->psz_source );
+                continue;
             }
+
+            if( p_playlist->i_size < 0 || p_playlist->i_index < 0 )
+            {
+                vlc_object_release( p_playlist );
+                continue;
+            }
+            if( psz_display )
+            {
+                free( psz_display );
+                psz_display = NULL;
+            }
+            if( p_playlist->i_status == PLAYLIST_STOPPED )
+            {
+                psz_display = (char *)malloc( sizeof(char )*strlen(_("Stop")));
+                sprintf( psz_display,_("Stop") );
+                vlc_object_release( p_playlist );
+            }
+            else if( p_playlist->i_status == PLAYLIST_PAUSED )
+            {
+                psz_display = (char *)malloc( sizeof(char )*strlen(_("Pause")));
+                sprintf( psz_display,_("Pause") );
+                vlc_object_release( p_playlist );
+            }
+            else
+            {
+    //           vlc_mutex_lock(&p_playlist->object_lock );
+                 p_item = playlist_ItemGetByPos( p_playlist,
+                                 p_playlist->i_index );
+                item = p_item->input;
+                if( !p_item )
+                {
+                    vlc_object_release( p_playlist );
+     //            vlc_mutex_unlock(&p_playlist->object_lock );
+                    continue;
+                }
+                i_size = p_playlist->i_size;
+                i_index = p_playlist->i_index+1;
+    //            vlc_mutex_unlock(&p_playlist->object_lock );
+
+                vlc_object_release( p_playlist );
+
+                if( item.i_duration != -1 )
+                {
+                    char psz_durationstr[MSTRTIME_MAX_SIZE];
+                    secstotimestr( psz_durationstr, item.i_duration/1000000 );
+                    sprintf( psz_duration, "(%s)", psz_durationstr );
+                }
+                else
+                {
+                    sprintf( psz_duration," " );
+                }
+
+                psz_display = (char *)malloc( sizeof(char )*
+                                          (strlen( item.psz_name ) +
+                                          MSTRTIME_MAX_SIZE + 2+6 + 10 +10 ));
+                sprintf( psz_display," %i/%i - %s %s",
+                         i_index,i_size, item.psz_name, psz_duration);
+            }
+
+            /* Display */
+            xosd_display( p_intf->p_sys->p_osd,
+                            0,                               /* first line */
+                            XOSD_string,
+                            psz_display );
         }
 
         msleep( INTF_IDLE_SLEEP );
     }
+}
 
-    if( p_intf->p_sys->p_input )
-    {
-        vlc_object_release( p_intf->p_sys->p_input );
-        p_intf->p_sys->p_input = NULL;
-    }
+static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
+                vlc_value_t oval, vlc_value_t nval, void *param )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)param;
 
+    p_intf->p_sys->b_need_update = VLC_TRUE;
+    return VLC_SUCCESS;
 }
 
