@@ -253,7 +253,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     ViewMenu();
 
     /* Append the freshly created menus to the menu bar */
-    wxMenuBar *menubar = new wxMenuBar( wxMB_DOCKABLE );
+    wxMenuBar *menubar = new wxMenuBar();
     menubar->Append( manage_menu, wxU(_("&Manage")) );
     menubar->Append( sort_menu, wxU(_("S&ort")) );
     menubar->Append( selection_menu, wxU(_("&Selection")) );
@@ -283,7 +283,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Create the toolbar */
     wxToolBar *toolbar =
-        CreateToolBar( wxTB_HORIZONTAL | wxTB_FLAT | wxTB_DOCKABLE );
+        CreateToolBar( wxTB_HORIZONTAL | wxTB_FLAT );
 
     /* Create the random tool */
     toolbar->AddTool( Random_Event, wxT(""), wxBitmap(shuffle_on_xpm),
