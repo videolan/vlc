@@ -180,7 +180,7 @@ bool ThemeLoader::parse( const string &xmlFile )
     // Extract the path of the XML file
     string path;
     const string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
-    size_type p = xmlFile.rfind( sep, xmlFile.size() );
+    string::size_type p = xmlFile.rfind( sep, xmlFile.size() );
     if( p != string::npos )
     {
         path = xmlFile.substr( 0, p + 1 );
