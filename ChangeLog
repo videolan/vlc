@@ -4,6 +4,7 @@
 
 HEAD
 
+  * ./plugins/qnx/vout_qnx.c: QNX compilation fix.
   * ./plugins/spudec/spu_decoder.c: fixed a margin bug in the SPU renderer
     which caused subtitles to appear slanted in odd width windows.
   * ./plugins/gtk/gtk_display.c, ./plugins/win32/mainframe.cpp: we deactivate
