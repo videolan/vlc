@@ -90,6 +90,9 @@ subpicture_t * E_(ParsePacket)( decoder_t *p_dec )
     /* Get display time now. If we do it later, we may miss the PTS. */
     p_spu_data->i_pts = p_sys->i_pts;
 
+    p_spu->i_original_picture_width = p_dec->fmt_in.subs.spu.i_original_frame_width;
+    p_spu->i_original_picture_height = p_dec->fmt_in.subs.spu.i_original_frame_height;
+
     /* Getting the control part */
     if( ParseControlSeq( p_dec, p_spu, p_spu_data ) )
     {
@@ -98,7 +101,7 @@ subpicture_t * E_(ParsePacket)( decoder_t *p_dec )
         return NULL;
     }
 
-     /* We try to display it */
+    /* We try to display it */
     if( ParseRLE( p_dec, p_spu, p_spu_data ) )
     {
         /* There was a parse error, delete the subpicture */

@@ -253,12 +253,14 @@ struct subpicture_t
      * changed by the video output thread, or simply ignored depending of the
      * subtitle type. */
     /**@{*/
-    int             i_x;                 /**< offset from alignment position */
-    int             i_y;                 /**< offset from alignment position */
-    int             i_width;                              /**< picture width */
-    int             i_height;                            /**< picture height */
-    int             b_absolute;                    /**< position is absolute */
-    int             i_flags;                             /**< position flags */
+    int          i_x;                    /**< offset from alignment position */
+    int          i_y;                    /**< offset from alignment position */
+    int          i_width;                                 /**< picture width */
+    int          i_height;                               /**< picture height */
+    int          i_original_picture_width;  /**< original width of the movie */
+    int          i_original_picture_height;/**< original height of the movie */
+    int          b_absolute;                       /**< position is absolute */
+    int          i_flags;                                /**< position flags */
      /**@}*/
 
     /** Pointer to function that renders this subtitle in a picture */
