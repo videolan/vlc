@@ -125,7 +125,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
     p_enc->fmt_out.i_codec = VLC_FOURCC('m','p','g','a');
 
-    sout_ParseCfg( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
+    sout_CfgParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
     p_sys->p_toolame = toolame_init();
 
