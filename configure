@@ -6993,9 +6993,9 @@ if test "x$enableval" != "xno"
 then
   if test x$SYS = xmingw32
   then
-    # Check whether --with-directx-path or --without-directx-path was given.
-if test "${with_directx_path+set}" = set; then
-  withval="$with_directx_path"
+    # Check whether --with-directx or --without-directx was given.
+if test "${with_directx+set}" = set; then
+  withval="$with_directx"
   :
 fi
 

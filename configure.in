@@ -1020,7 +1020,7 @@ if test "x$enableval" != "xno"
 then
   if test x$SYS = xmingw32
   then
-    AC_ARG_WITH(directx-path, 
+    AC_ARG_WITH(directx, 
     [    --with-directx=PATH   Win32 DirectX headers and libraries])
     if test "x$with_directx" = "x"
     then
