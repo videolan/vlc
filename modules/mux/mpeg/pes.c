@@ -2,7 +2,7 @@
  * pes.c: PES packetizer used by the MPEG multiplexers
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.c,v 1.13 2003/12/01 23:39:11 gbazin Exp $
+ * $Id: pes.c,v 1.14 2003/12/10 23:16:04 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -90,14 +90,14 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
             /* arg, a little more difficult */
             if( b_mpeg2 )
             {
-                int     i_pts_dts;
+                int i_pts_dts;
 
-                if( i_pts >= 0 && i_dts >= 0 )
+                if( i_pts > 0 && i_dts > 0 )
                 {
                     bits_write( &bits, 16, i_es_size + i_extra+ 13 );
                     i_pts_dts = 0x03;
                 }
-                else if( i_pts >= 0 )
+                else if( i_pts > 0 )
                 {
                     bits_write( &bits, 16, i_es_size  + i_extra + 8 );
                     i_pts_dts = 0x02;
@@ -162,12 +162,12 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
             {
                 int i_pts_dts;
 
-                if( i_pts >= 0 && i_dts >= 0 )
+                if( i_pts > 0 && i_dts > 0 )
                 {
                     bits_write( &bits, 16, i_es_size + i_extra + 10 /* + stuffing */ );
                     i_pts_dts = 0x03;
                 }
-                else if( i_pts >= 0 )
+                else if( i_pts > 0 )
                 {
                     bits_write( &bits, 16, i_es_size + i_extra + 5 /* + stuffing */ );
                     i_pts_dts = 0x02;
@@ -255,8 +255,8 @@ int E_( EStoPES )( sout_instance_t *p_sout,
         i_stream_id  = PES_PRIVATE_STREAM_1;
     }
 
-    i_pts = p_es->i_pts < 0 ? -1 : p_es->i_pts * 9 / 100; // 90000 units clock
-    i_dts = p_es->i_dts < 0 ? -1 : p_es->i_dts * 9 / 100; // 90000 units clock
+    i_pts = p_es->i_pts <= 0 ? 0 : p_es->i_pts * 9 / 100; // 90000 units clock
+    i_dts = p_es->i_dts <= 0 ? 0 : p_es->i_dts * 9 / 100; // 90000 units clock
 
     i_size = p_es->i_size;
     p_data = p_es->p_buffer;
@@ -269,8 +269,8 @@ int E_( EStoPES )( sout_instance_t *p_sout,
         i_pes_payload = __MIN( i_size, PES_PAYLOAD_SIZE_MAX );
         i_pes_header  = PESHeader( header, i_pts, i_dts, i_pes_payload,
                                    i_stream_id, i_private_id, b_mpeg2 );
-        i_dts = -1; // only first PES has a dts/pts
-        i_pts = -1;
+        i_dts = 0; // only first PES has a dts/pts
+        i_pts = 0;
 
         if( p_es  )
         {
