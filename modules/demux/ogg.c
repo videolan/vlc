@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.6 2002/11/03 23:00:32 gbazin Exp $
+ * $Id: ogg.c,v 1.7 2002/11/05 21:57:41 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -143,6 +143,22 @@ typedef struct stream_header
 #define PACKET_LEN_BITS2     0x02
 #define PACKET_IS_SYNCPOINT  0x08
 
+/* Some functions to manipulate memory */
+static uint16_t GetWLE( uint8_t *p_buff )
+{
+    return( (p_buff[0]) + ( p_buff[1] <<8 ) );
+}
+
+static uint32_t GetDWLE( uint8_t *p_buff )
+{
+    return( p_buff[0] + ( p_buff[1] <<8 ) +
+            ( p_buff[2] <<16 ) + ( p_buff[3] <<24 ) );
+}
+
+static uint64_t GetQWLE( uint8_t *p_buff )
+{
+    return( GetDWLE( p_buff ) + ( ((uint64_t)GetDWLE( p_buff + 4 )) << 32 ) );
+}
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -515,8 +531,15 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                         /* We need to get rid of the header packet */
                         ogg_stream_packetout( &p_stream->os, &oggpacket );
 
-                        p_stream->p_bih = (BITMAPINFOHEADER*)
-                            calloc( 1, sizeof(BITMAPINFOHEADER) );
+                        p_stream->p_bih = (BITMAPINFOHEADER *)
+                            malloc( sizeof(BITMAPINFOHEADER) );
+                        if( !p_stream->p_bih )
+                        {
+                            /* Mem allocation error, just ignore the stream */
+                            free( p_stream );
+                            p_ogg->i_streams--;
+                            continue;
+                        }
                         p_stream->p_bih->biSize = sizeof(BITMAPINFOHEADER);
                         p_stream->p_bih->biCompression=
                             p_stream->i_fourcc = VLC_FOURCC( st->subtype[0],
@@ -526,11 +549,14 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                         msg_Dbg( p_input, "found video header of type: %.4s",
                                  (char *)&p_stream->i_fourcc );
 
-                        p_stream->i_rate = 10000000.0 / st->time_unit;
-
-                        p_stream->p_bih->biBitCount = st->bits_per_sample;
-                        p_stream->p_bih->biWidth = st->sh.video.width;
-                        p_stream->p_bih->biHeight = st->sh.video.height;
+                        p_stream->i_rate = 10000000.0 /
+                            GetQWLE((uint8_t *)&st->time_unit);
+                        p_stream->p_bih->biBitCount =
+                            GetWLE((uint8_t *)&st->bits_per_sample);
+                        p_stream->p_bih->biWidth =
+                            GetDWLE((uint8_t *)&st->sh.video.width);
+                        p_stream->p_bih->biHeight =
+                            GetDWLE((uint8_t *)&st->sh.video.height);
                         p_stream->p_bih->biPlanes= 1 ;
                         p_stream->p_bih->biSizeImage =
                             (p_stream->p_bih->biBitCount >> 3) *
@@ -542,36 +568,44 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                             p_stream->i_rate, p_stream->p_bih->biWidth,
                             p_stream->p_bih->biHeight,
                             p_stream->p_bih->biBitCount);
+
+                        p_stream->i_bitrate = 1; /* FIXME */
                     }
                     /* Check for audio header (new format) */
                     else if( !strncmp( st->streamtype, "audio", 5 ) )
                     {
                         char p_buffer[5];
-                        int i_extra_size = st->size - sizeof(stream_header);
 
                         p_stream->i_cat = AUDIO_ES;
 
                         /* We need to get rid of the header packet */
                         ogg_stream_packetout( &p_stream->os, &oggpacket );
 
+                        p_stream->p_wf = (WAVEFORMATEX *)
+                            malloc( sizeof(WAVEFORMATEX) );
+                        if( !p_stream->p_wf )
+                        {
+                            /* Mem allocation error, just ignore the stream */
+                            free( p_stream );
+                            p_ogg->i_streams--;
+                            continue;
+                        }
+
                         memcpy( p_buffer, st->subtype, 4 );
                         p_buffer[4] = '\0';
-                        p_stream->p_wf = (WAVEFORMATEX *)
-                            calloc( 1, sizeof(WAVEFORMATEX) + i_extra_size );
-
                         p_stream->p_wf->wFormatTag = strtol(p_buffer,NULL,16);
-                        p_stream->p_wf->nChannels = st->sh.audio.channels;
+                        p_stream->p_wf->nChannels =
+                            GetWLE((uint8_t *)&st->sh.audio.channels);
                         p_stream->i_rate = p_stream->p_wf->nSamplesPerSec =
-                            st->samples_per_unit;
+                            GetQWLE((uint8_t *)&st->samples_per_unit);
                         p_stream->i_bitrate = p_stream->p_wf->nAvgBytesPerSec =
-                            st->sh.audio.avgbytespersec;
+                            GetDWLE((uint8_t *)&st->sh.audio.avgbytespersec);
                         p_stream->i_bitrate *= 8;
-                        p_stream->p_wf->nBlockAlign = st->sh.audio.blockalign;
-                        p_stream->p_wf->wBitsPerSample = st->bits_per_sample;
-                        p_stream->p_wf->cbSize = i_extra_size;
-                        if( i_extra_size )
-                            memcpy( p_stream->p_wf + sizeof(WAVEFORMATEX),
-                                    &st[1] , i_extra_size );
+                        p_stream->p_wf->nBlockAlign =
+                            GetWLE((uint8_t *)&st->sh.audio.blockalign);
+                        p_stream->p_wf->wBitsPerSample =
+                            GetWLE((uint8_t *)&st->bits_per_sample);
+                        p_stream->p_wf->cbSize = 0;
 
                         switch( p_stream->p_wf->wFormatTag )
                         {
@@ -611,6 +645,14 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                                  p_stream->p_wf->nSamplesPerSec,
                                  p_stream->p_wf->wBitsPerSample,
                                  p_stream->p_wf->nAvgBytesPerSec * 8 / 1024 );
+                    }
+                    /* Check for text (subtitles) header */
+                    else if( !strncmp(st->streamtype, "text", 4) )
+                    {
+                        msg_Dbg( p_input, "found text subtitles header" );
+                        p_stream->i_cat = SPU_ES;
+                        p_stream->i_fourcc =
+                            VLC_FOURCC( 's', 'u', 'b', 't' );
                     }
                     else
                     {
