@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.195.2.10 2002/10/24 21:08:28 massiot Exp $
+ * $Id: main.c,v 1.195.2.11 2002/10/29 19:16:35 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -269,8 +269,14 @@
     "(from 1 to n).")
 
 #define DVD_DEV_TEXT N_("DVD device")
+#ifdef WIN32
+#define DVD_DEV_LONGTEXT N_( \
+    "This is the default DVD drive to use. Don't forget the colon after the " \
+    "drive letter (eg D:)")
+#else
 #define DVD_DEV_LONGTEXT N_( \
     "This is the default DVD device to use.")
+#endif
 
 #define VCD_DEV_TEXT N_("VCD device")
 #define VCD_DEV_LONGTEXT N_( \
