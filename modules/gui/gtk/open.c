@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: open.c,v 1.5 2003/01/10 10:01:47 lool Exp $
+ * $Id: open.c,v 1.6 2003/01/10 11:02:21 asmax Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -532,6 +532,14 @@ void GtkOpenOk( GtkButton * button, gpointer user_data )
     GtkRebuildCList( p_playlist_clist, p_playlist );
 
     vlc_object_release( p_playlist );
+
+    /* Enable the channel box when network channel is selected */
+    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
+                                               "network_channel" ) )->active )
+    {
+        p_intf->p_sys->b_playing = 1;
+    }
+    
 }
 
 void GtkOpenCancel( GtkButton * button, gpointer user_data )
