@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.13 2003/02/18 00:17:06 massiot Exp $
+ * $Id: prefs.m,v 1.14 2003/02/20 18:10:16 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -280,7 +280,10 @@
 
     if( p_item ) do
     {
-
+        if( p_item->b_advanced && !config_GetInt( p_intf, "advanced" ))
+        {
+            continue;
+        }
         switch( p_item->i_type )
         {
 
