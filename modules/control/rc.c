@@ -71,6 +71,8 @@ static void Run          ( intf_thread_t * );
 
 static vlc_bool_t ReadCommand( intf_thread_t *, char *, int * );
 
+static playlist_item_t *parse_MRL( intf_thread_t *, char * );
+
 static int  Input        ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Playlist     ( vlc_object_t *, char const *,
@@ -821,11 +823,17 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     {
         playlist_Stop( p_playlist );
     }
-    else if( !strcmp( psz_cmd, "add" ) )
+    else if( !strcmp( psz_cmd, "add" ) &&
+             newval.psz_string && *newval.psz_string )
     {
-        msg_rc( _("trying to add %s to playlist\n"), newval.psz_string );
-        playlist_Add( p_playlist, newval.psz_string, newval.psz_string,
-                      PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
+        playlist_item_t *p_item = parse_MRL( p_intf, newval.psz_string );
+
+        if( p_item )
+        {
+            msg_rc( _("trying to add %s to playlist\n"), newval.psz_string );
+            playlist_AddItem( p_playlist, p_item,
+                              PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
+        }
     }
     else if( !strcmp( psz_cmd, "playlist" ) )
     {
@@ -1201,4 +1209,81 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     }
 
     return VLC_FALSE;
+}
+
+/*****************************************************************************
+ * parse_MRL: build a playlist item from a full mrl
+ *****************************************************************************
+ * MRL format: "simplified-mrl [:option-name[=option-value]]"
+ * We don't check for '"' or '\'', we just assume that a ':' that follows a
+ * space is a new option. Should be good enough for our purpose.
+ *****************************************************************************/
+static playlist_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
+{
+#define SKIPSPACE( p ) { while( *p && ( *p == ' ' || *p == '\t' ) ) p++; }
+#define SKIPTRAILINGSPACE( p, d ) \
+    { char *e=d; while( e > p && (*(e-1)==' ' || *(e-1)=='\t') ){e--;*e=0;} }
+
+    playlist_item_t *p_item = NULL;
+    char *psz_item = NULL, *psz_item_mrl = NULL, *psz_orig;
+    char **ppsz_options = NULL;
+    int i, i_options = 0;
+
+    if( !psz_mrl ) return 0;
+
+    psz_mrl = psz_orig = strdup( psz_mrl );
+    while( *psz_mrl )
+    {
+        SKIPSPACE( psz_mrl );
+        psz_item = psz_mrl;
+
+        for( ; *psz_mrl; psz_mrl++ )
+        {
+            if( (*psz_mrl == ' ' || *psz_mrl == '\t') && psz_mrl[1] == ':' )
+            {
+                /* We have a complete item */
+                break;
+            }
+            if( (*psz_mrl == ' ' || *psz_mrl == '\t') &&
+                (psz_mrl[1] == '"' || psz_mrl[1] == '\'') && psz_mrl[2] == ':')
+            {
+                /* We have a complete item */
+                break;
+            }
+        }
+
+        if( *psz_mrl ) { *psz_mrl = 0; psz_mrl++; }
+        SKIPTRAILINGSPACE( psz_item, psz_item + strlen( psz_item ) );
+
+        /* Remove '"' and '\'' if necessary */
+        if( *psz_item == '"' && psz_item[strlen(psz_item)-1] == '"' )
+        { psz_item++; psz_item[strlen(psz_item)-1] = 0; }
+        if( *psz_item == '\'' && psz_item[strlen(psz_item)-1] == '\'' )
+        { psz_item++; psz_item[strlen(psz_item)-1] = 0; }
+
+        if( !psz_item_mrl ) psz_item_mrl = psz_item;
+        else if( *psz_item )
+        {
+            i_options++;
+            ppsz_options = realloc( ppsz_options, i_options * sizeof(char *) );
+            ppsz_options[i_options - 1] = &psz_item[1];
+        }
+
+        if( *psz_mrl ) SKIPSPACE( psz_mrl );
+    }
+
+    /* Now create a playlist item */
+    if( psz_item_mrl )
+    {
+        p_item = playlist_ItemNew( p_intf, psz_item_mrl, psz_item_mrl );
+        for( i = 0; i < i_options; i++ )
+        {
+            playlist_ItemAddOption( p_item, ppsz_options[i] );
+        }
+    }
+
+    if( i_options ) free( ppsz_options );
+    free( psz_orig );
+
+    return p_item;
 }
