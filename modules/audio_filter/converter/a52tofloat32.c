@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52tofloat32.c,v 1.11 2003/01/22 09:54:28 massiot Exp $
+ * $Id: a52tofloat32.c,v 1.12 2003/01/22 18:31:47 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -279,6 +279,22 @@ static void Duplicate( float * p_out, const float * p_in )
 }
 
 /*****************************************************************************
+ * Exchange: helper function to exchange left & right channels
+ *****************************************************************************/
+static void Exchange( float * p_out, const float * p_in )
+{
+    int i;
+    const float * p_first = p_in + 256;
+    const float * p_second = p_in;
+
+    for ( i = 0; i < 256; i++ )
+    {
+        *p_out++ = *p_first++;
+        *p_out++ = *p_second++;
+    }
+}
+
+/*****************************************************************************
  * DoWork: decode an ATSC A/52 frame.
  *****************************************************************************/
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
@@ -330,6 +346,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         {
             Duplicate( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
                        p_samples );
+        }
+        else if ( p_filter->output.i_original_channels
+                    & AOUT_CHAN_REVERSESTEREO )
+        {
+            Exchange( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
+                      p_samples );
         }
         else
         {

@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.30 2003/01/22 09:54:29 massiot Exp $
+ * $Id: output.c,v 1.31 2003/01/22 18:31:47 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -69,7 +69,12 @@ int aout_OutputNew( aout_instance_t * p_aout,
         /* The user may have selected a different channels configuration. */
         var_Get( p_aout, "audio-channels", &val );
 
-        if ( !strcmp( val.psz_string, N_("Both") ) )
+        if ( !strcmp( val.psz_string, N_("Reverse stereo") ) )
+        {
+            p_aout->output.output.i_original_channels |=
+                                        AOUT_CHAN_REVERSESTEREO;
+        }
+        else if ( !strcmp( val.psz_string, N_("Both") ) )
         {
             p_aout->output.output.i_original_channels =
                 AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
@@ -113,9 +118,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
                          NULL );
     }
     else if ( p_aout->output.output.i_physical_channels ==
-                 (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)
-              && (p_aout->output.output.i_original_channels
-                   & AOUT_CHAN_PHYSMASK) == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
+                 (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
     {
         /* Stereo - create the audio-channels variable. */
         var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
@@ -131,6 +134,8 @@ int aout_OutputNew( aout_instance_t * p_aout,
         val.psz_string = N_("Left");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
         val.psz_string = N_("Right");
+        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
+        val.psz_string = N_("Reverse stereo");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
                          NULL );

@@ -2,7 +2,7 @@
  * trivial.c : trivial channel mixer plug-in (drops unwanted channels)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.9 2003/01/14 14:51:02 massiot Exp $
+ * $Id: trivial.c,v 1.10 2003/01/22 18:31:47 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -131,6 +131,17 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             {
                 *p_dest = *p_src;
                 p_dest++;
+                p_src += 2;
+            }
+        }
+        else if ( p_filter->output.i_original_channels
+                                        & AOUT_CHAN_REVERSESTEREO )
+        {
+            /* Reverse-stereo mode */
+            for ( i = p_in_buf->i_nb_samples; i -= 2; )
+            {
+                *p_dest++ = p_src[1];
+                *p_dest++ = p_src[0];
                 p_src += 2;
             }
         }
