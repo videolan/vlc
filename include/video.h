@@ -31,13 +31,20 @@ typedef struct
     int             i_status;                                 /* picture flags */
     int             i_matrix_coefficients;       /* in YUV type, encoding type */    
     
-    /* Picture properties - those properties are fixed at initialization and 
-     * should NOT be modified. Note that for YUV pictures, i_bytes_per_line is
-     * the number of bytes for Y samples - the total size allocated will depend
-     * of the picture format */
+    /* Picture static properties - those properties are fixed at initialization
+     * and should NOT be modified. Note that for YUV pictures, i_bytes_per_line
+     * has no signification and is replaced by i_width */
     int             i_width;                                  /* picture width */
     int             i_height;                                /* picture height */
     int             i_bytes_per_line;        /* total number of bytes per line */
+
+    /* Picture dynamic properties - those properties can be changed by the 
+     * decoder */
+    int             i_display_horizontal_offset;     /* ISO/IEC 13818-2 6.3.12 */
+    int             i_display_vertical_offset;       /* ISO/IEC 13818-2 6.3.12 */
+    int             i_display_width;                   /* useful picture width */
+    int             i_display_height;                 /* useful picture height */
+    int             i_aspect_ratio;                            /* aspect ratio */  
     
     /* Link reference counter - it can be modified using vout_Link and 
      * vout_Unlink functions, or directly if the picture is independant */
@@ -77,10 +84,8 @@ typedef struct
 #define DISPLAYED_PICTURE       3  /* picture has been displayed but is linked */
 #define DESTROYED_PICTURE       4     /* picture is allocated but no more used */
 
-
-
-
-
-
-
-
+/* Aspect ratios (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
+#define AR_SQUARE_PICTURE       1                             /* square pixels */
+#define AR_3_4_PICTURE          2                          /* 3:4 picture (TV) */
+#define AR_16_9_PICTURE         3                /* 16:9 picture (wide screen) */
+#define AR_221_1_PICTURE        4                    /* 2.21:1 picture (movie) */
