@@ -2,7 +2,7 @@
  * mpeg4video.c: mpeg 4 video packetizer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.17 2003/11/26 08:18:09 gbazin Exp $
+ * $Id: mpeg4video.c,v 1.18 2003/11/30 22:14:39 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -111,6 +111,7 @@ static int Open( vlc_object_t *p_this )
         case VLC_FOURCC( 'X', 'v', 'i', 'D'):
         case VLC_FOURCC( 'x', 'v', 'i', 'd'):
         case VLC_FOURCC( 'D', 'X', '5', '0'):
+        case VLC_FOURCC( 'd', 'x', '5', '0'):
         case VLC_FOURCC( 0x04, 0,   0,   0):
         case VLC_FOURCC( '3', 'I', 'V', '2'):
             break;

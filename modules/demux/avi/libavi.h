@@ -2,7 +2,7 @@
  * libavi.h : LibAVI library
  ******************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.h,v 1.12 2003/10/19 13:39:12 hartman Exp $
+ * $Id: libavi.h,v 1.13 2003/11/30 22:14:39 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -305,6 +305,7 @@ void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
 #define FOURCC_XVID         VLC_FOURCC('X','V','I','D')
 #define FOURCC_XviD         VLC_FOURCC('X','v','i','D')
 #define FOURCC_DX50         VLC_FOURCC('D','X','5','0')
+#define FOURCC_dx50         VLC_FOURCC('d','x','5','0')
 #define FOURCC_mp4v         VLC_FOURCC('m','p','4','v')
 #define FOURCC_4            VLC_FOURCC( 4,  0,  0,  0 )
 
