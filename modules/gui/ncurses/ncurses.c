@@ -811,25 +811,22 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
 
         if( p_input )
         {
-            input_info_category_t * p_category;
-            input_info_t * p_info;
+            int i,j;
 
             vlc_mutex_lock( &p_input->stream.stream_lock );
-            p_category = p_input->stream.p_info;
-            while ( p_category )
+            for ( i = 0; i < p_input->p_item->i_categories; i++ )
             {
+                info_category_t *p_category = p_input->p_item->pp_categories[i];
                 if( y >= y_end ) break;
                 MainBoxWrite( p_intf, l++, 1, "  [%s]", p_category->psz_name );
-                p_info = p_category->p_info;
-                while ( p_info )
+                for ( j = 0; j < p_category->i_infos; j++ )
                 {
+                    info_t *p_info = p_category->pp_infos[j];
                     if( y >= y_end ) break;
                     MainBoxWrite( p_intf, l++, 1, "      %s: %s", p_info->psz_name, p_info->psz_value );
-                    p_info = p_info->p_next;
                 }
-                p_category = p_category->p_next;
             }
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            vlc_mutex_unlock( &p_input->p_item->lock );
         }
         else
         {
