@@ -290,6 +290,7 @@ Determination: start at step 5.
         versions of libcdio and libcddb can be obtained by running 
           pkg-config --modversion libcdio
           pkg-config --modversion libcddb
+
      d) what you input or requested (e.g. the full command line entered -
         if it is possible to reproduce the problem by giving a
         commandline that is desirable since it is probably the simplest
@@ -298,9 +299,12 @@ Determination: start at step 5.
         People often give (some part) of an error message neglecting
         to also include what was requested or entered that led to the
         output.
+
+     e) The setting for this plugin. That is the values of the
+        variables that start cddax- listed above. On Unix this can
+	generally be found in ~/.vlc/vlcrc
   
-  
-     e) Exactly the messages that were what given. You can turn
+     f) Exactly the messages that were what given. You can turn
         increase the verbosity level by setting "verbosity=2" in the
         vlc preferences files. On Unix the preferences file is
         generally in ~/vlc/.vlcrc but there are GUI ways to set this
@@ -443,4 +447,4 @@ analyze the contents of a CD.
 The tool cd-read from libcdio can be used to show the sectors of 
 the CD or CD image or extract sectors. 
 
-$Id: intf-cdda.txt,v 1.5 2004/02/11 12:23:07 rocky Exp $
+$Id: intf-cdda.txt,v 1.6 2004/02/11 12:37:28 rocky Exp $
