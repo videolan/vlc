@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.31 2003/10/31 22:46:19 hartman Exp $
+ * $Id: sub.c,v 1.32 2003/11/02 01:41:12 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -837,29 +837,31 @@ static int  sub_SSARead( text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsec
             }
             p_subtitle->psz_text = malloc( strlen( p_buffer_text ) + 1);
             i_text = 0;
-            while( *p_buffer_text )
+            while( p_buffer_text[0] != '\0' )
             {
-                if( *p_buffer_text == '\\' && ( *p_buffer_text =='n' || *p_buffer_text =='N' ) )
+                if( p_buffer_text[0] == '\\' && ( p_buffer_text[1] =='n' || p_buffer_text[1] =='N' ) )
                 {
                     p_subtitle->psz_text[i_text] = '\n';
                     i_text++;
                     p_buffer_text += 2;
                 }
-                else if( *p_buffer_text == '{' && *p_buffer_text == '\\')
+                else if( p_buffer_text[0] == '{' && p_buffer_text[1] == '\\' )
                 {
-                    while( *p_buffer_text && *p_buffer_text != '}' )
+                    /* SSA control code */
+                    while( p_buffer_text[0] != '\0' && p_buffer_text[0] != '}' )
                     {
                         p_buffer_text++;
                     }
+                    p_buffer_text++;
                 }
                 else
                 {
-                    p_subtitle->psz_text[i_text] = *p_buffer_text;
+                    p_subtitle->psz_text[i_text] = p_buffer_text[0];
                     i_text++;
                     p_buffer_text++;
                 }
             }
-            p_subtitle->psz_text[i_text] = '\0';
+            p_subtitle->psz_text[++i_text] = '\0';
             p_subtitle->i_start = i_start;
             p_subtitle->i_stop = i_stop;
             return( 0 );

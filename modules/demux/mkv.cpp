@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.32 2003/10/31 15:54:52 hartman Exp $
+ * $Id: mkv.cpp,v 1.33 2003/11/02 01:41:12 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1636,7 +1636,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
 
             if( p_pes->p_first && p_pes->i_pes_size > 0 )
             {
-                p_pes->p_first->p_payload_end[-1] = '\0';
+                p_pes->p_first->p_payload_end[0] = '\0';
             }
             if( !strcmp( tk.psz_codec, "S_TEXT/SSA" ) ||
                 !strcmp( tk.psz_codec, "S_SSA" ) ||
@@ -1656,29 +1656,30 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
                 }
                 memmove( p_pes->p_first->p_payload_start, start,
                          strlen( start) + 1 );
-                /* remove all {\... } stuff */
+                
+		/* Fix the SSA string */
                 src = dst = (char*)p_pes->p_first->p_payload_start;
-                for( ;; )
+                while( *src )
                 {
-                    if( src[0] == '{' && src[1] == '\\' )
+                    if( src[0] == '\\' && ( src[1] == 'n' || src[1] == 'N' ) )
                     {
-                        while( *src )
+                        dst[0] = '\n'; dst++; src += 2;
+                    }
+                    else if( src[0] == '{' && src[1] == '\\' )
+                    {
+                        while( *src && src[0] != '}' )
                         {
-                            if( *src == '}' )
-                            {
-                                src++;
-                                break;
-                            }
                             src++;
                         }
+                        src++;
                     }
-                    if( *src == '\0' )
+                    else
                     {
-                        break;
+                        dst[0] = src[0]; dst++; src++;
                     }
-                    *dst++ = *src++;
                 }
-                *dst++ = '\0';
+                dst++;
+                dst[0] = '\0';
             }
         }
 
