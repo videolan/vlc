@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.14 2002/08/11 08:30:01 gbazin Exp $
+ * $Id: win32_specific.c,v 1.15 2002/09/17 14:56:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -37,19 +37,6 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
     WSADATA Data;
     int i_err;
-    HINSTANCE hInstLib;
-
-    /* dynamically get the address of SignalObjectAndWait */
-    if( (GetVersion() < 0x80000000) )
-    {
-        /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
-        hInstLib = LoadLibrary( "kernel32" );
-        if( hInstLib)
-            p_this->p_vlc->SignalObjectAndWait =
-                (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib,
-                                                     "SignalObjectAndWait" );
-    }
-    else p_this->p_vlc->SignalObjectAndWait = NULL;
 
     /* WinSock Library Init. */
     i_err = WSAStartup( MAKEWORD( 1, 1 ), &Data );
@@ -59,10 +46,8 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
         fprintf( stderr, "error: can't initiate WinSocks, error %i\n", i_err );
     }
 
-    p_this->p_vlc->b_fast_mutex = 0;
-    p_this->p_vlc->i_win9x_cv = 0;
-
-    _fmode = _O_BINARY;  /* sets the default file-translation mode */
+    /* Set the default file-translation mode */
+    _fmode = _O_BINARY;
 }
 
 /*****************************************************************************

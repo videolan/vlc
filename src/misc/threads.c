@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.15 2002/08/30 23:27:06 massiot Exp $
+ * $Id: threads.c,v 1.16 2002/09/17 14:56:13 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -104,7 +104,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
 #elif defined( ST_INIT_IN_ST_H )
     /* Unimplemented */
 #elif defined( WIN32 )
-    /* Unimplemented */
+    HINSTANCE hInstLib;
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     pthread_mutex_lock( &once_mutex );
 #elif defined( HAVE_CTHREADS_H )
@@ -122,7 +122,26 @@ int __vlc_threads_init( vlc_object_t *p_this )
 #elif defined( ST_INIT_IN_ST_H )
         i_ret = st_init();
 #elif defined( WIN32 )
-        /* Unimplemented */
+        /* dynamically get the address of SignalObjectAndWait */
+        if( GetVersion() < 0x80000000 )
+        {
+            /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
+            hInstLib = LoadLibrary( "kernel32" );
+            if( hInstLib )
+            {
+                p_this->p_vlc->SignalObjectAndWait =
+                    (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib,
+                                                     "SignalObjectAndWait" );
+            }
+        }
+        else
+        {
+            p_this->p_vlc->SignalObjectAndWait = NULL;
+        }
+
+        p_this->p_vlc->b_fast_mutex = 0;
+        p_this->p_vlc->i_win9x_cv = 0;
+
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
         /* Unimplemented */
 #elif defined( HAVE_CTHREADS_H )

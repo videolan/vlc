@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.30 2002/08/21 09:26:53 xav Exp $
+ * $Id: libvlc.c,v 1.31 2002/09/17 14:56:13 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -242,14 +242,14 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 #endif
 
     /*
-     * System specific initialization code
-     */
-    system_Init( p_vlc, &i_argc, ppsz_argv );
-
-    /*
      * Initialize message queue
      */
     msg_Create( p_vlc );
+
+    /*
+     * System specific initialization code
+     */
+    system_Init( p_vlc, &i_argc, ppsz_argv );
 
     /* Get the executable name (similar to the basename command) */
     if( i_argc > 0 )
