@@ -2,7 +2,7 @@
  * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.4 2003/09/02 16:00:24 gbazin Exp $
+ * $Id: mp4.c,v 1.5 2003/10/07 14:59:10 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -624,8 +624,8 @@ static void Close( vlc_object_t * p_this )
             }
             bo_add_16be( soun, 1 );         // data-reference-index
 
-            /* SoundDescriptionV1 */
-            bo_add_16be( soun, 1 );         // version;
+            /* SoundDescription */
+            bo_add_16be( soun, 0 );         // version;
             bo_add_16be( soun, 0 );         // revision level (0)
             bo_add_32be( soun, 0 );         // vendor
             bo_add_16be( soun, p_stream->p_fmt->i_channels );   // channel-count

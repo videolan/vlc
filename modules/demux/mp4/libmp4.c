@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.33 2003/09/08 00:35:16 fenrir Exp $
+ * $Id: libmp4.c,v 1.34 2003/10/07 14:59:10 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@
 #include <vlc/input.h>
 
 #ifdef HAVE_ZLIB_H
-#   include <zlib.h>                                     /* for compressed moov */
+#   include <zlib.h>                                  /* for compressed moov */
 #endif
 
 #include "libmp4.h"
@@ -1102,6 +1102,11 @@ static int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     {
         i_len = MP4_ReadLengthDescriptor( &p_peek, &i_read );
 
+#ifdef MP4_VERBOSE
+        msg_Dbg( p_stream->p_input, "Found esds MPEG4ESDescr (%dBytes)",
+		 i_len );
+#endif
+
         MP4_GET2BYTES( es_descriptor.i_ES_ID );
         MP4_GET1BYTE( i_flags );
         es_descriptor.b_stream_dependence = ( (i_flags&0x80) != 0);
@@ -1137,11 +1142,17 @@ static int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
     if( i_type != 0x04)/* MP4DecConfigDescrTag */
     {
-        es_descriptor.p_decConfigDescr = NULL;
-        MP4_READBOX_EXIT( 1 ); /* rest isn't interesting up to now */
+         es_descriptor.p_decConfigDescr = NULL;
+         MP4_READBOX_EXIT( 1 ); /* rest isn't interesting up to now */
     }
 
     i_len = MP4_ReadLengthDescriptor( &p_peek, &i_read );
+
+#ifdef MP4_VERBOSE
+        msg_Dbg( p_stream->p_input, "Found esds MP4DecConfigDescr (%dBytes)",
+		 i_len );
+#endif
+
     es_descriptor.p_decConfigDescr =
             malloc( sizeof( MP4_descriptor_decoder_config_t ));
 
@@ -1161,6 +1172,12 @@ static int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     }
 
     i_len = MP4_ReadLengthDescriptor( &p_peek, &i_read );
+
+#ifdef MP4_VERBOSE
+        msg_Dbg( p_stream->p_input, "Found esds MP4DecSpecificDescr (%dBytes)",
+		 i_len );
+#endif
+
     es_descriptor.p_decConfigDescr->i_decoder_specific_info_len = i_len;
     es_descriptor.p_decConfigDescr->p_decoder_specific_info = malloc( i_len );
     memcpy( es_descriptor.p_decConfigDescr->p_decoder_specific_info,
@@ -2009,6 +2026,7 @@ static struct
     { FOURCC_rmda,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
     { FOURCC_tref,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
     { FOURCC_gmhd,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
+    { FOURCC_wave,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
 
     /* specific box */
     { FOURCC_ftyp,  MP4_ReadBox_ftyp,       MP4_FreeBox_ftyp },

@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.39 2003/09/19 21:53:48 fenrir Exp $
+ * $Id: mp4.c,v 1.40 2003/10/07 14:59:10 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -984,7 +984,8 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
     /* now see if esds is present and if so create a data packet
         with decoder_specific_info  */
 #define p_decconfig p_esds->data.p_esds->es_descriptor.p_decConfigDescr
-    if( ( p_esds = MP4_BoxGet( p_sample, "esds" ) )&&
+    if( ( ( p_esds = MP4_BoxGet( p_sample, "esds" ) ) ||
+          ( p_esds = MP4_BoxGet( p_sample, "wave/esds" ) ) )&&
         ( p_esds->data.p_esds )&&
         ( p_decconfig ) )
     {
