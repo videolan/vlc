@@ -1305,12 +1305,24 @@ typedef struct suxor_thread_t
 {
     VLC_COMMON_MEMBERS
     input_thread_t *p_input;
+    vout_thread_t *p_vout;
+    char *psz_mode;
 
 } suxor_thread_t;
 
 static void SuxorRestartVideoES( suxor_thread_t *p_this )
 {
     vlc_value_t val;
+
+    if( p_this->psz_mode )
+    {
+        vlc_value_t val;
+        val.psz_string = p_this->psz_mode;
+        var_Set( p_this->p_vout, "deinterlace-mode", val );
+        free( p_this->psz_mode );
+    }
+
+    if( p_this->p_vout ) vlc_object_release( p_this->p_vout );
 
     /* Now restart current video stream */
     var_Get( p_this->p_input, "video-es", &val );
@@ -1377,9 +1389,8 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( psz_mode && *psz_mode )
     {
-        val.psz_string = psz_mode;
-        var_Set( p_vout, "deinterlace-mode", val );
         /* Modify input as well because the vout might have to be restarted */
+        val.psz_string = psz_mode;
         var_Create( p_input, "deinterlace-mode", VLC_VAR_STRING );
         var_Set( p_input, "deinterlace-mode", val );
     }
@@ -1391,24 +1402,15 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Get( p_input, "video-es", &val );
     if( val.i_int >= 0 )
     {
-        if( p_vout->p_parent_intf )
-        {
-            p_vout->b_filter_change = VLC_TRUE;
-            suxor_thread_t *p_suxor =
-                vlc_object_create( p_vout, sizeof(suxor_thread_t) );
-            p_suxor->p_input = p_input;
-            vlc_object_yield( p_input );
-            vlc_thread_create( p_suxor, "suxor", SuxorRestartVideoES,
-                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
-        }
-        else
-        {
-            vlc_value_t val_es;
-            val_es.i_int = -VIDEO_ES;
-            p_vout->b_filter_change = VLC_TRUE;
-            var_Set( p_input, "video-es", val_es );
-            var_Set( p_input, "video-es", val );
-        }
+        p_vout->b_filter_change = VLC_TRUE;
+        suxor_thread_t *p_suxor =
+            vlc_object_create( p_vout, sizeof(suxor_thread_t) );
+        p_suxor->p_input = p_input; vlc_object_yield( p_input );
+        p_suxor->p_vout = p_vout; vlc_object_yield( p_vout );
+        if( psz_mode && *psz_mode )
+            p_suxor->psz_mode = strdup( psz_mode );
+        vlc_thread_create( p_suxor, "suxor", SuxorRestartVideoES,
+                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
     }
 
     vlc_object_release( p_input );
@@ -1439,24 +1441,13 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Get( p_input, "video-es", &val );
     if( val.i_int >= 0 )
     {
-        if( p_vout->p_parent_intf )
-        {
-            p_vout->b_filter_change = VLC_TRUE;
-            suxor_thread_t *p_suxor =
-                vlc_object_create( p_vout, sizeof(suxor_thread_t) );
-            p_suxor->p_input = p_input;
-            vlc_object_yield( p_input );
-            vlc_thread_create( p_suxor, "suxor", SuxorRestartVideoES,
-                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
-        }
-        else
-        {
-            vlc_value_t val_es;
-            val_es.i_int = -VIDEO_ES;
-            p_vout->b_filter_change = VLC_TRUE;
-            var_Set( p_input, "video-es", val_es );
-            var_Set( p_input, "video-es", val );
-        }
+        p_vout->b_filter_change = VLC_TRUE;
+        suxor_thread_t *p_suxor =
+            vlc_object_create( p_vout, sizeof(suxor_thread_t) );
+        p_suxor->p_input = p_input;
+        vlc_object_yield( p_input );
+        vlc_thread_create( p_suxor, "suxor", SuxorRestartVideoES,
+                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
     }
 
     vlc_object_release( p_input );
