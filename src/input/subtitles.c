@@ -2,7 +2,7 @@
  * subtitles.c
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: subtitles.c,v 1.8 2004/01/25 17:16:06 zorglub Exp $
+ * $Id: subtitles.c,v 1.9 2004/01/26 19:20:10 gbazin Exp $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
  * This is adapted code from the GPL'ed MPlayer (http://mplayerhq.hu)
@@ -165,7 +165,8 @@ static int compare_sub_priority( const void *a, const void *b )
  * \return a NULL terminated array of filenames with detected possible subtitles.
  * The array contains max MAX_SUBTITLE_FILES items and you need to free it after use.
  */
-char** subtitles_Detect( input_thread_t *p_this, char *psz_path, char *psz_fname )
+char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
+                         char *psz_fname )
 {
     /* variables to be used for derivatives of psz_fname */
     char *f_dir, *f_fname, *f_fname_noext, *f_fname_trim, *tmp;
@@ -204,14 +205,16 @@ char** subtitles_Detect( input_thread_t *p_this, char *psz_path, char *psz_fname
     if( tmp )
     {
         int pos;
-        strcpy( f_fname, tmp + 1 );
-        pos = tmp - psz_fname;
-        strncpy( f_dir, psz_fname, pos + 1 );
-        f_dir[pos + 1] = 0;
+        strncpy( f_fname, tmp + 1, len - 1 );
+        f_fname[len - 1] = 0;
+        pos = tmp - psz_fname + 1;
+        strncpy( f_dir, psz_fname, __MIN(pos,len-1) );
+        f_dir[__MIN(pos,len-1)] = 0;
     }
     else
     {
-        strcpy( f_fname, psz_fname );
+        strncpy( f_fname, psz_fname, len - 1 );
+        f_fname[len - 1] = 0;
         strcpy( f_dir, "" );
     }
 
