@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: playlist.c,v 1.79 2004/01/29 17:51:08 zorglub Exp $
+ * $Id: playlist.c,v 1.80 2004/02/23 12:17:24 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -162,7 +162,7 @@ void playlist_Destroy( playlist_t * p_playlist )
  * \param i_command the command to do
  * \param i_arg the argument to the command. See playlist_command_t for details
  */
- void playlist_Command( playlist_t * p_playlist, playlist_command_t i_command,
+void playlist_Command( playlist_t * p_playlist, playlist_command_t i_command,
                        int i_arg )
 {
     vlc_value_t val;
@@ -262,36 +262,31 @@ void playlist_Destroy( playlist_t * p_playlist )
 }
 
 
-static void ObjectGarbageCollector( playlist_t *p_playlist,
-                                    int i_type,
-                                    mtime_t *pi_obj_destroyed_date )
+static mtime_t ObjectGarbageCollector( playlist_t *p_playlist, int i_type,
+                                       mtime_t destroy_date )
 {
     vlc_object_t *p_obj;
-    if( *pi_obj_destroyed_date > mdate() )
-    {
-        return;
-    }
 
-    if( *pi_obj_destroyed_date == 0 )
+    if( destroy_date > mdate() ) return;
+
+    if( destroy_date == 0 )
     {
         /* give a little time */
-        *pi_obj_destroyed_date = mdate() + I64C(300000);
+        return mdate() + I64C(1000000);
     }
     else
     {
-        while( ( p_obj = vlc_object_find( p_playlist,
-                                           i_type,
-                                           FIND_CHILD ) ) )
+        while( ( p_obj = vlc_object_find( p_playlist, i_type, FIND_CHILD ) ) )
         {
             if( p_obj->p_parent != (vlc_object_t*)p_playlist )
             {
-                /* only first chiled (ie unused) */
+                /* only first child (ie unused) */
                 vlc_object_release( p_obj );
                 break;
             }
             if( i_type == VLC_OBJECT_VOUT )
             {
-                msg_Dbg( p_playlist, "vout garbage collector destroying 1 vout" );
+                msg_Dbg( p_playlist, "garbage collector destroying 1 vout" );
                 vlc_object_detach( p_obj );
                 vlc_object_release( p_obj );
                 vout_Destroy( (vout_thread_t *)p_obj );
@@ -302,7 +297,7 @@ static void ObjectGarbageCollector( playlist_t *p_playlist,
                 sout_DeleteInstance( (sout_instance_t*)p_obj );
             }
         }
-        *pi_obj_destroyed_date = 0;
+        return 0;
     }
 }
 
@@ -382,10 +377,12 @@ static void RunThread ( playlist_t *p_playlist )
             else if( p_playlist->p_input->stream.control.i_status != INIT_S )
             {
                 vlc_mutex_unlock( &p_playlist->object_lock );
-                ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
-                                        &i_vout_destroyed_date );
-                ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT,
-                                        &i_sout_destroyed_date );
+                i_vout_destroyed_date =
+                    ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
+                                            i_vout_destroyed_date );
+                i_vout_destroyed_date =
+                    ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT,
+                                            i_sout_destroyed_date );
                 vlc_mutex_lock( &p_playlist->object_lock );
             }
         }
@@ -403,10 +400,10 @@ static void RunThread ( playlist_t *p_playlist )
         else if( p_playlist->i_status == PLAYLIST_STOPPED )
         {
             vlc_mutex_unlock( &p_playlist->object_lock );
-            ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT,
-                                    &i_sout_destroyed_date );
-            ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
-                                    &i_vout_destroyed_date );
+            i_sout_destroyed_date =
+                ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT, mdate() );
+            i_vout_destroyed_date =
+                ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT, mdate() );
             vlc_mutex_lock( &p_playlist->object_lock );
         }
         vlc_mutex_unlock( &p_playlist->object_lock );
@@ -531,9 +528,7 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
     /* Boundary check */
     if( p_playlist->i_index >= p_playlist->i_size )
     {
-        if( p_playlist->i_status == PLAYLIST_STOPPED
-             || b_random
-             || b_loop )
+        if( p_playlist->i_status == PLAYLIST_STOPPED || b_random || b_loop )
         {
             p_playlist->i_index -= p_playlist->i_size
                          * ( p_playlist->i_index / p_playlist->i_size );
@@ -551,8 +546,8 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
     }
 
     /* Check that the item is enabled */
-   if( p_playlist->pp_items[p_playlist->i_index]->b_enabled == VLC_FALSE &&
-       p_playlist->i_enabled != 0)
+    if( p_playlist->pp_items[p_playlist->i_index]->b_enabled == VLC_FALSE &&
+        p_playlist->i_enabled != 0)
     {
         SkipItem( p_playlist , 1 );
     }

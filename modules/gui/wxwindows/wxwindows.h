@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: wxwindows.h,v 1.90 2004/02/22 15:03:33 gbazin Exp $
+ * $Id: wxwindows.h,v 1.91 2004/02/23 12:17:24 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -798,6 +798,9 @@ private:
     void OnPopupEna( wxMenuEvent& event );
     void OnPopupInfo( wxMenuEvent& event );
     void Rebuild();
+
+    /* Custom events */
+    void OnPlaylistEvent( wxCommandEvent& event );
 
     wxTextCtrl *search_text;
     wxButton *search_button;

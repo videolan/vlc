@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.41 2004/02/16 17:14:39 zorglub Exp $
+ * $Id: playlist.cpp,v 1.42 2004/02/23 12:17:24 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -88,7 +88,12 @@ enum
     ListView_Event,
 
     Browse_Event,  /* For export playlist */
+
+    /* custom events */
+    UpdateItem_Event
 };
+
+DEFINE_LOCAL_EVENT_TYPE( wxEVT_PLAYLIST );
 
 BEGIN_EVENT_TABLE(Playlist, wxFrame)
     /* Menu events */
@@ -142,6 +147,9 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     EVT_BUTTON( Down_Event, Playlist::OnDown)
 
     EVT_TEXT(SearchText_Event, Playlist::OnSearchTextChange)
+
+    /* Custom events */
+    EVT_COMMAND(-1, wxEVT_PLAYLIST, Playlist::OnPlaylistEvent)
 
     /* Special events : we don't want to destroy the window when the user
      * clicks on (X) */
@@ -973,6 +981,7 @@ void Playlist::OnRandom( wxCommandEvent& event )
     var_Set( p_playlist , "random", val);
     vlc_object_release( p_playlist );
 }
+
 void Playlist::OnLoop ( wxCommandEvent& event )
 {
     vlc_value_t val;
@@ -1014,6 +1023,7 @@ void Playlist::OnActivateItem( wxListEvent& event )
     {
         return;
     }
+
     playlist_Goto( p_playlist, event.GetIndex() );
 
     vlc_object_release( p_playlist );
@@ -1159,6 +1169,19 @@ void Playlist::OnPopupInfo( wxMenuEvent& event )
 }
 
 /*****************************************************************************
+ * Custom events management
+ *****************************************************************************/
+void Playlist::OnPlaylistEvent( wxCommandEvent& event )
+{
+    switch( event.GetId() )
+    {
+    case UpdateItem_Event:
+        UpdateItem( event.GetInt() );
+        break;
+    }
+}
+
+/*****************************************************************************
  * PlaylistChanged: callback triggered by the intf-change playlist variable
  *  We don't rebuild the playlist directly here because we don't want the
  *  caller to block for a too long time.
@@ -1180,11 +1203,15 @@ int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
                  vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     Playlist *p_playlist_dialog = (Playlist *)param;
-    p_playlist_dialog->UpdateItem( old_val.i_int );
-    p_playlist_dialog->UpdateItem( new_val.i_int );
+
+    wxCommandEvent event( wxEVT_PLAYLIST, UpdateItem_Event );
+    event.SetInt( old_val.i_int );
+    p_playlist_dialog->AddPendingEvent( event );
+    event.SetInt( new_val.i_int );
+    p_playlist_dialog->AddPendingEvent( event );
+
     return 0;
 }
-
 
 /*****************************************************************************
  * ItemChanged: callback triggered by the item-change playlist variable
@@ -1193,10 +1220,13 @@ int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
                  vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     Playlist *p_playlist_dialog = (Playlist *)param;
-    p_playlist_dialog->UpdateItem( new_val.i_int );
+
+    wxCommandEvent event( wxEVT_PLAYLIST, UpdateItem_Event );
+    event.SetInt( new_val.i_int );
+    p_playlist_dialog->AddPendingEvent( event );
+
     return 0;
 }
-
 
 /***************************************************************************
  * NewGroup Class
