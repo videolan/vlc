@@ -1851,6 +1851,7 @@ static void GetPMT( sout_mux_t *p_mux,
             uint8_t data[4] = { 0x44, 0x54, 0x53, 0x32 };
             dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, data );
         }
+#ifdef _DVBPSI_DR_59_H_
         else if( p_stream->i_codec == VLC_FOURCC('d','v','b','s') )
         {
             /* DVB subtitles */
@@ -1872,6 +1873,7 @@ static void GetPMT( sout_mux_t *p_mux,
                                        p_descr->i_length, p_descr->p_data );
             continue;
         }
+#endif /* _DVBPSI_DR_59_H_ */
 
         if( p_stream->lang[0] != 0 )
         {
