@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.28 2002/04/24 00:36:24 sam Exp $
+ * $Id: interface.h,v 1.28.2.1 2002/10/03 16:44:41 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -26,7 +26,7 @@
 /*****************************************************************************
  * intf_thread_t: describe an interface thread
  *****************************************************************************
- * This structe describes all interface-specific data of the main (interface)
+ * This struct describes all interface-specific data of the main (interface)
  * thread.
  *****************************************************************************/
 typedef struct intf_thread_s
@@ -108,3 +108,20 @@ void                 intf_MsgUnsub  ( intf_subscription_t * );
 #   define intf_MsgUnsub p_symbols->intf_MsgUnsub
 #endif
 
+/*****************************************************************************
+ * Macros
+ *****************************************************************************/
+#ifdef WIN32
+#    define CONSOLE_INTRO_MSG \
+                AllocConsole(); \
+                freopen( "CONOUT$", "w", stdout ); \
+                freopen( "CONOUT$", "w", stderr ); \
+                freopen( "CONIN$", "r", stdin ); \
+                intf_Msg( VERSION_MESSAGE ); \
+                intf_Msg( _("\nWarning: if you can't access the GUI anymore, "\
+                            "open a dos command box, go to the directory " \
+                            "where you installed VLC and run " \
+                            "\"vlc -I intfwin\"\n") )
+#else
+#    define CONSOLE_INTRO_MSG
+#endif

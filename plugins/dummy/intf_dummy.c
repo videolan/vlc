@@ -2,7 +2,7 @@
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: intf_dummy.c,v 1.17 2002/05/19 15:23:35 gbazin Exp $
+ * $Id: intf_dummy.c,v 1.17.2.1 2002/10/03 16:44:41 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -71,14 +71,8 @@ static int intf_Open( intf_thread_t *p_intf )
         return( 1 );
     };
 
-#ifdef WIN32
-    AllocConsole();
-    freopen( "CONOUT$", "w", stdout );
-    freopen( "CONOUT$", "w", stderr );
-    freopen( "CONIN$", "r", stdin );
-    intf_Msg( VERSION_MESSAGE );
-    intf_Msg( _("\nUsing the dummy interface plugin...") );
-#endif
+    CONSOLE_INTRO_MSG;
+    intf_Msg( _("Using the dummy interface plugin...") );
 
     return( 0 );
 }

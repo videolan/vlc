@@ -75,7 +75,7 @@ case x"${target_os}" in
   x*mingw32*)
     SYS=mingw32
     AC_CHECK_TOOL(WINDRES, windres, :)
-    save_CFLAGS="${save_CFLAGS} -fnative-struct -D_OFF_T_ -D_off_t=long"
+    save_CFLAGS="${save_CFLAGS} -D_OFF_T_ -D_off_t=long"
     vlc_LDFLAGS="${vlc_LDFLAGS} -mwindows -Xlinker --force-exe-suffix"
     vlc_LDFLAGS="${vlc_LDFLAGS} -lws2_32 -lnetapi32"
     ipv4_LDFLAGS="${ipv4_LDFLAGS} -lws2_32"
@@ -102,10 +102,7 @@ case x"${target_os}" in
 esac
 
 dnl Flags for plugin compilation
-if test x"${SYS}" = xmingw32
-then
-  plugins_CFLAGS="${plugins_CFLAGS} -fnative-struct"
-else
+if test x"${SYS}" != xmingw32; then
   plugins_CFLAGS="${plugins_CFLAGS} -fPIC"
 fi
 
@@ -332,6 +329,23 @@ AC_CACHE_CHECK([if \$CC accepts -fomit-frame-pointer],
      AC_TRY_COMPILE([],,ac_cv_c_omit_frame_pointer=yes, ac_cv_c_omit_frame_pointer=no)])
 if test x"$ac_cv_c_omit_frame_pointer" != x"no"; then
     CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
+fi
+
+dnl Check for fnative-struct or mms-bitfields support for mingw32
+if test x$SYS = xmingw32
+then
+    AC_CACHE_CHECK([if \$CC accepts -mms-bitfields],
+        [ac_cv_c_mms_bitfields],
+        [CFLAGS="${save_CFLAGS} -mms-bitfields"
+         AC_TRY_COMPILE([],,ac_cv_c_mms_bitfields=yes,
+                        ac_cv_c_mms_bitfields=no)])
+    if test x"$ac_cv_c_mms_bitfields" != x"no"; then
+        save_CFLAGS="${save_CFLAGS} -mms-bitfields"
+        plugins_CFLAGS="${plugins_CFLAGS} -mms-bitfields"
+    else
+        save_CFLAGS="${save_CFLAGS} -fnative-struct"
+        plugins_CFLAGS="${plugins_CFLAGS} -fnative-struct"
+    fi
 fi
 
 dnl Check for Darwin plugin linking flags

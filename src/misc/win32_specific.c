@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.7.2.1 2002/07/29 16:12:24 gbazin Exp $
+ * $Id: win32_specific.c,v 1.7.2.2 2002/10/03 16:44:42 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -59,6 +59,8 @@ void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
                                                      "SignalObjectAndWait" );
     }
     else p_main->p_sys->SignalObjectAndWait = NULL;
+
+    p_main->p_sys->b_fast_mutex = p_main->p_sys->i_win9x_cv = 0;
 
     /* WinSock Library Init. */
     i_err = WSAStartup( MAKEWORD( 1, 1 ), &Data );

@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.36.2.1 2002/07/29 16:22:14 gbazin Exp $
+ * $Id: vout_directx.c,v 1.36.2.2 2002/10/03 16:44:41 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1039,6 +1039,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
      * want to display it */
     if( !p_vout->p_sys->b_using_overlay )
     {
+        b_result_ok = 0;
 
         if( p_vout->p_sys->b_hw_yuv )
             b_result_ok = DirectXCreateSurface( p_vout, &p_surface,

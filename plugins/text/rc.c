@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.14 2002/05/19 15:23:35 gbazin Exp $
+ * $Id: rc.c,v 1.14.2.1 2002/10/03 16:44:41 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -120,13 +120,7 @@ static int intf_Open( intf_thread_t *p_intf )
         return( 1 );
     }
 
-#ifdef WIN32
-    AllocConsole();
-    freopen( "CONOUT$", "w", stdout );
-    freopen( "CONOUT$", "w", stderr );
-    freopen( "CONIN$", "r", stdin );
-    intf_Msg( VERSION_MESSAGE );
-#endif
+    CONSOLE_INTRO_MSG;
 
     intf_Msg( "rc: remote control interface initialized, `h' for help" );
     return( 0 );
