@@ -1359,7 +1359,7 @@
       <widget>
 	<class>GtkPixmapMenuItem</class>
 	<name>popup_disc</name>
-	<tooltip>Open a DVD or VCD</tooltip>
+	<tooltip>Open Disc Media</tooltip>
 	<signal>
 	  <name>activate</name>
 	  <handler>GtkDiscOpenShow</handler>

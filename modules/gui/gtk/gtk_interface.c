@@ -185,7 +185,7 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (menubar_disc);
   gtk_container_add (GTK_CONTAINER (menubar_file_menu), menubar_disc);
-  gtk_tooltips_set_tip (tooltips, menubar_disc, _("Open a DVD or VCD"), NULL);
+  gtk_tooltips_set_tip (tooltips, menubar_disc, _("Open Disc Media"), NULL);
   gtk_widget_add_accelerator (menubar_disc, "activate", accel_group,
                               GDK_F4, 0,
                               GTK_ACCEL_VISIBLE);
@@ -1914,7 +1914,7 @@ create_intf_open (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "hbox24", hbox24,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (hbox24);
-  gtk_table_attach (GTK_TABLE (table5), hbox24, 1, 3, 0, 1,
+  gtk_table_attach (GTK_TABLE (table5), hbox24, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
 
@@ -2198,7 +2198,7 @@ create_intf_open (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label26), 0, 0.5);
 
-  sat_freq_adj = gtk_adjustment_new (11954000, 10000000, 12999000, 1, 10, 10);
+  sat_freq_adj = gtk_adjustment_new (1.1954e+07, 1e+07, 1.2999e+07, 1, 10, 10);
   sat_freq = gtk_spin_button_new (GTK_ADJUSTMENT (sat_freq_adj), 1, 0);
   gtk_widget_ref (sat_freq);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "sat_freq", sat_freq,
@@ -2243,7 +2243,7 @@ create_intf_open (void)
   gtk_widget_show (sat_pol_hor);
   gtk_box_pack_start (GTK_BOX (hbox23), sat_pol_hor, FALSE, FALSE, 0);
 
-  sat_srate_adj = gtk_adjustment_new (27500000, 1000000, 30000000, 1, 10, 10);
+  sat_srate_adj = gtk_adjustment_new (2.75e+07, 1e+06, 3e+07, 1, 10, 10);
   sat_srate = gtk_spin_button_new (GTK_ADJUSTMENT (sat_srate_adj), 1, 0);
   gtk_widget_ref (sat_srate);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "sat_srate", sat_srate,
