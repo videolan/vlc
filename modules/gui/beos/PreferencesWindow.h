@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.18 2003/12/21 21:30:43 titer Exp $
+ * $Id$
  *
  * Authors: Eric Petit <titer@videolan.org>
  *

@@ -2,7 +2,7 @@
  * pda.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: pda.h,v 1.5 2003/11/18 20:36:40 jpsaman Exp $
+ * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *

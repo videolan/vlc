@@ -2,7 +2,7 @@
  * pluginbox.h: includes for the pluginbox class
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: pluginsbox.h,v 1.3 2003/03/29 14:30:55 sigmunau Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *

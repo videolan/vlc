@@ -2,7 +2,7 @@
  * DrawingTidbits.cpp
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: DrawingTidbits.cpp,v 1.4 2004/01/26 16:52:31 zorglub Exp $
+ * $Id$
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>

@@ -2,7 +2,7 @@
  * preferences.h: includes for the preferences window
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.h,v 1.2 2002/08/12 17:38:10 sigmunau Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *

@@ -2,7 +2,7 @@
  * test1.c : Empty C module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: test1.c,v 1.1 2002/10/04 13:13:54 sam Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

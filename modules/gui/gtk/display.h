@@ -2,7 +2,7 @@
  * display.h: Gtk+ tools for main interface.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: display.h,v 1.3 2003/08/03 23:11:21 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>

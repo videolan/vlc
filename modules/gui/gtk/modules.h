@@ -2,7 +2,7 @@
  * gtk_modules.h: prototypes for modules functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: modules.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>

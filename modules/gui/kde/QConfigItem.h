@@ -2,7 +2,7 @@
  * QConfigItem.h : includes for the QConfigItem class
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: QConfigItem.h,v 1.3 2002/10/13 14:26:47 sigmunau Exp $
+ * $Id$
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *

@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: common.h,v 1.7 2003/01/26 14:49:09 fenrir Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

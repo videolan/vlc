@@ -2,7 +2,7 @@
  * gtk_modules.c : functions to build modules configuration boxes.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: modules.c,v 1.2 2002/08/08 22:28:22 sam Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>

@@ -2,7 +2,7 @@
  * test4.c : Miscellaneous stress tests module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: test4.c,v 1.7 2003/05/04 22:42:17 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

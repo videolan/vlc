@@ -2,7 +2,7 @@
  * bits.h :
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_bits.h,v 1.1 2003/11/18 20:15:38 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *

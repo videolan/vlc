@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.18 2004/01/25 15:42:57 kuehne Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *

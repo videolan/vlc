@@ -2,7 +2,7 @@
  * win32_specific.h: Win32 specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.h,v 1.5 2004/01/25 18:17:08 zorglub Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>

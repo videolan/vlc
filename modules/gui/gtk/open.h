@@ -2,7 +2,7 @@
  * gtk_open.h: prototypes for open functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: open.h,v 1.2 2003/12/12 03:01:13 rocky Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>

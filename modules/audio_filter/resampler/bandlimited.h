@@ -2,7 +2,7 @@
  * bandlimited.h : bandlimited interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: bandlimited.h,v 1.1 2003/03/04 03:27:40 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *

@@ -2,7 +2,7 @@
  * QConfigItem.cpp: The QConfigItem class
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: QConfigItem.cpp,v 1.3 2002/10/13 14:26:47 sigmunau Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon 12.08.2002
  *

@@ -2,7 +2,7 @@
  * bits.h
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: bits.h,v 1.4 2003/05/05 15:52:13 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>

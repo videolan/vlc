@@ -2,7 +2,7 @@
  * intf.h: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf.h,v 1.1 2002/09/30 11:05:39 sam Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

@@ -2,7 +2,7 @@
  * sout.c :
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: sout.c,v 1.2 2003/05/05 16:09:39 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      

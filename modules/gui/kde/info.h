@@ -2,7 +2,7 @@
  * info.h: the KInfoWindow class
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: info.h,v 1.2 2003/12/22 14:23:14 sam Exp $
+ * $Id$
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *

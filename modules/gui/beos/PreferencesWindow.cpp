@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.27 2003/12/22 00:06:05 titer Exp $
+ * $Id$
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
