@@ -1,1 +1,1 @@
-spudec_SOURCES = spudec.c
+spudec_SOURCES = spudec.c parse.c render.c

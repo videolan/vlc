@@ -2,7 +2,7 @@
  * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.4 2002/08/13 20:28:56 fenrir Exp $
+ * $Id: audio.c,v 1.5 2002/08/16 03:07:56 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -477,7 +477,7 @@ static int SkipID3Tag( input_thread_t *p_input )
         i_size += 10;
     }
     i_size += 10;
-    msg_Dbg( p_input, "ID3 tag found, skiping %d bytes", i_size );
+    msg_Dbg( p_input, "ID3 tag found, skipping %d bytes", i_size );
     if ( input_Peek( p_input, &p_peek, i_size ) < i_size )
     {
         msg_Err( p_input, "cannot peek()" );
@@ -497,20 +497,22 @@ static int SkipID3Tag( input_thread_t *p_input )
 static int CheckPS( input_thread_t *p_input )
 {
     u8  *p_peek;
+    int i_startcode = 0;
     int i_size = input_Peek( p_input, &p_peek, 8196 );
 
     while( i_size > 4 )
     {
-        if( ( p_peek[0] == 0 ) && ( p_peek[1] == 0 )&&
-            ( p_peek[2] == 1 ) && ( p_peek[3] >= 0xb9 ) )
+        if( ( p_peek[0] == 0 ) && ( p_peek[1] == 0 ) &&
+            ( p_peek[2] == 1 ) && ( p_peek[3] >= 0xb9 ) &&
+            ++i_startcode >= 3 )
         {
-            return( 1 );  /* it could be ps so ...*/
+            return 1;
         }
         p_peek++;
         i_size--;
     }
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************

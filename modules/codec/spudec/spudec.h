@@ -2,7 +2,7 @@
  * spudec.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spudec.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: spudec.h,v 1.2 2002/08/16 03:07:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -82,23 +82,11 @@ typedef struct spudec_thread_t
 #define SPU_CMD_END                 0xff
 
 /*****************************************************************************
- * AddNibble: read a nibble from a source packet and add it to our integer.
- *****************************************************************************/
-static inline unsigned int AddNibble( unsigned int i_code,
-                                      u8 *p_src, int *pi_index )
-{
-    if( *pi_index & 0x1 )
-    {
-        return( i_code << 4 | ( p_src[(*pi_index)++ >> 1] & 0xf ) );
-    }
-    else
-    {
-        return( i_code << 4 | p_src[(*pi_index)++ >> 1] >> 4 );
-    }
-}
-
-/*****************************************************************************
  * Prototypes
  *****************************************************************************/
-vlc_thread_t       spudec_CreateThread( decoder_fifo_t * p_fifo );
+int  E_(SyncPacket)           ( spudec_thread_t * );
+void E_(ParsePacket)          ( spudec_thread_t * );
+
+void E_(RenderSPU)            ( vout_thread_t *, picture_t *,
+                                const subpicture_t * );
 

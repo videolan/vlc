@@ -117,7 +117,7 @@ void KInterface::initActions()
     next->setStatusText( i18n( "Next" ) );
     // use the absolute path to your ktestui.rc file for testing purpose in createGUI();
 
-    createGUI("plugins/kde/ui.rc");
+    createGUI("modules/gui/kde/ui.rc");
 }
 
 void KInterface::initStatusBar()
