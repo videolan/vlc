@@ -206,9 +206,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	ac3_sync_info_t sync_info;
 
 	if (!sync) { /* have to find a synchro point */
-
 	    int ptr;
 	    ac3_byte_stream_t * p_byte_stream;
+
+	    printf ("sync\n");
 
 	    p_byte_stream = ac3_byte_stream (&p_ac3dec->ac3_decoder);
 

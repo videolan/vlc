@@ -26,10 +26,8 @@ void imdct (ac3dec_t * p_ac3dec);
 void mantissa_unpack (ac3dec_t *);
 
 /* ac3_parse.c */
-int ac3_test_sync (ac3dec_t *);
-void parse_syncinfo (ac3dec_t *);
-void parse_bsi (ac3dec_t *);
-void parse_audblk (ac3dec_t *);
+int parse_bsi (ac3dec_t *);
+int parse_audblk (ac3dec_t *, int);
 void parse_auxdata (ac3dec_t *);
 
 /* ac3_rematrix.c */

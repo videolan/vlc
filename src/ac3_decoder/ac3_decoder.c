@@ -5,7 +5,7 @@
 int ac3_init (ac3dec_t * p_ac3dec)
 {
     //p_ac3dec->bit_stream.buffer = 0;
-    p_ac3dec->bit_stream.i_available = 0;
+    //p_ac3dec->bit_stream.i_available = 0;
 
     return 0;
 }
@@ -14,10 +14,12 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
 {
     int i;
 
-    parse_bsi (p_ac3dec);
+    if (parse_bsi (p_ac3dec))
+	return 1;
 
     for (i = 0; i < 6; i++) {
-	parse_audblk (p_ac3dec);
+	if (parse_audblk (p_ac3dec, i))
+	    return 1;
 	if (exponent_unpack (p_ac3dec))
 	    return 1;
 	bit_allocate (p_ac3dec);
