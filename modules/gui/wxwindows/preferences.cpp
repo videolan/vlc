@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.22 2003/06/19 12:21:53 gbazin Exp $
+ * $Id: preferences.cpp,v 1.23 2003/07/20 12:22:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1024,7 +1024,12 @@ void ConfigEvtHandler::OnCommandEvent( wxCommandEvent& event )
     if( config_data->i_config_type == CONFIG_ITEM_FILE )
     {
         wxFileDialog dialog( p_prefs_dialog, wxU(_("Open file")),
-                             wxT(""), wxT(""), wxT("*.*"), wxOPEN | wxSAVE );
+                             wxT(""), wxT(""), wxT("*.*"),
+#if defined( __WXMSW__ )
+                             wxOPEN );
+#else
+                             wxOPEN | wxSAVE );
+#endif
 
         if( dialog.ShowModal() == wxID_OK )
         {

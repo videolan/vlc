@@ -464,8 +464,6 @@ package-win32:
 # Copy relevant files
 	cp "$(top_builddir)/vlc$(EXEEXT)" "$(srcdir)/tmp/"
 	$(STRIP) "$(srcdir)/tmp/vlc$(EXEEXT)"
-	cp "$(srcdir)/INSTALL.win32" "$(srcdir)/tmp/INSTALL.txt"
-	unix2dos "$(srcdir)/tmp/INSTALL.txt"
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
 	  do cp "$(srcdir)/$$file" "$(srcdir)/tmp/$${file}.txt" ; \
 	  unix2dos "$(srcdir)/tmp/$${file}.txt" ; done
