@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.15 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: theora.c,v 1.16 2003/12/07 17:09:33 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
+#include "input_ext-plugins.h"
 
 #include <ogg/ogg.h>
 
@@ -514,19 +515,27 @@ static block_t *Headers( encoder_t *p_enc )
     /* Create theora headers */
     if( !p_sys->b_headers )
     {
-        ogg_packet oggpackets[3];
+        ogg_packet oggpackets;
         int i;
-
-        theora_encode_header( &p_sys->td, &oggpackets[0] );
-        theora_encode_comment( &p_sys->tc, &oggpackets[1] );
-        theora_encode_tables( &p_sys->td, &oggpackets[2] );
 
         /* Ogg packet to block */
         for( i = 0; i < 3; i++ )
         {
-            block_t *p_block = block_New( p_enc, oggpackets[i].bytes );
-            memcpy( p_block->p_buffer, oggpackets[i].packet,
-                    oggpackets[i].bytes );
+            switch( i )
+            {
+            case 0:
+                theora_encode_header( &p_sys->td, &oggpackets );
+                break;
+            case 1:
+                theora_encode_comment( &p_sys->tc, &oggpackets );
+                break;
+            case 2:
+                theora_encode_tables( &p_sys->td, &oggpackets );
+                break;
+            }
+
+            block_t *p_block = block_New( p_enc, oggpackets.bytes );
+            memcpy( p_block->p_buffer, oggpackets.packet, oggpackets.bytes );
             p_block->i_dts = p_block->i_pts = p_block->i_length = 0;
             block_ChainAppend( &p_chain, p_block );
         }

@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.24 2003/12/04 22:37:02 gbazin Exp $
+ * $Id: ogg.c,v 1.25 2003/12/07 17:09:33 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -319,6 +319,9 @@ static int Capability( sout_mux_t *p_mux, int i_query, void *p_args,
    switch( i_query )
    {
         case SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME:
+            *(vlc_bool_t*)p_answer = VLC_TRUE;
+            return( SOUT_MUX_CAP_ERR_OK );
+        case SOUT_MUX_CAP_GET_ADD_STREAM_WAIT:
             *(vlc_bool_t*)p_answer = VLC_TRUE;
             return( SOUT_MUX_CAP_ERR_OK );
         default:

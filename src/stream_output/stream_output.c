@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.35 2003/11/21 15:32:09 fenrir Exp $
+ * $Id: stream_output.c,v 1.36 2003/12/07 17:09:33 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -382,8 +382,8 @@ sout_mux_t * sout_MuxNew         ( sout_instance_t *p_sout,
     {
         int b_answer;
         if( p_mux->pf_capacity( p_mux,
-                                SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME,
-                                NULL, (void*)&b_answer ) != SOUT_MUX_CAP_ERR_OK )
+                                SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME, NULL,
+                                (void*)&b_answer ) != SOUT_MUX_CAP_ERR_OK )
         {
             b_answer = VLC_FALSE;
         }
@@ -392,6 +392,19 @@ sout_mux_t * sout_MuxNew         ( sout_instance_t *p_sout,
             msg_Dbg( p_sout, "muxer support adding stream at any time" );
             p_mux->b_add_stream_any_time = VLC_TRUE;
             p_mux->b_waiting_stream = VLC_FALSE;
+
+            if( p_mux->pf_capacity( p_mux,
+                                    SOUT_MUX_CAP_GET_ADD_STREAM_WAIT, NULL,
+                                    (void*)&b_answer ) != SOUT_MUX_CAP_ERR_OK )
+            {
+                b_answer = VLC_FALSE;
+            }
+            if( b_answer )
+            {
+                msg_Dbg( p_sout, "muxer prefers waiting for all ES before "
+                         "starting muxing" );
+                p_mux->b_waiting_stream = VLC_TRUE;
+            }
         }
         else
         {
@@ -409,7 +422,7 @@ sout_mux_t * sout_MuxNew         ( sout_instance_t *p_sout,
     return p_mux;
 }
 
-void sout_MuxDelete              ( sout_mux_t *p_mux )
+void sout_MuxDelete( sout_mux_t *p_mux )
 {
     if( p_mux->p_module )
     {
@@ -422,14 +435,14 @@ void sout_MuxDelete              ( sout_mux_t *p_mux )
     vlc_object_destroy( p_mux );
 }
 
-sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux,
-                                 es_format_t *p_fmt )
+sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux, es_format_t *p_fmt )
 {
     sout_input_t *p_input;
 
-    if( !p_mux->b_add_stream_any_time && !p_mux->b_waiting_stream)
+    if( !p_mux->b_add_stream_any_time && !p_mux->b_waiting_stream )
     {
-        msg_Err( p_mux, "cannot add a new stream (unsuported while muxing for this format)" );
+        msg_Err( p_mux, "cannot add a new stream (unsuported while muxing "
+                        "for this format)" );
         return NULL;
     }
     if( p_mux->i_add_stream_start < 0 )

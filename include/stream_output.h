@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.17 2003/11/22 17:03:57 fenrir Exp $
+ * $Id: stream_output.h,v 1.18 2003/12/07 17:09:33 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -124,6 +124,7 @@ struct sout_access_out_t
     int                     (* pf_write )( sout_access_out_t *,
                                            sout_buffer_t * );
 };
+
 /*
  * i_query parameter of pf_mux_capacity
  */
@@ -131,6 +132,9 @@ struct sout_access_out_t
 #define SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME    0x01
 /* SOUT_MUX_CAP_GET_STREAMABLE:             p_args=NULL, p_answer=&boolean */
 #define SOUT_MUX_CAP_GET_STREAMABLE             0x02
+/* SOUT_MUX_CAP_GET_ADD_STREAM_WAIT:        p_args=NULL, p_answer=&boolean */
+#define SOUT_MUX_CAP_GET_ADD_STREAM_WAIT        0x03
+
 /*
  * return error code
  */

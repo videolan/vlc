@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.60 2003/12/07 12:11:13 gbazin Exp $
+ * $Id: transcode.c,v 1.61 2003/12/07 17:09:33 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -1261,16 +1261,25 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 return VLC_EGENERIC;
             }
 
-            while( id->p_encoder->pf_header &&
-                   (p_block = id->p_encoder->pf_header( id->p_encoder )) )
+            if( id->p_encoder->pf_header )
             {
-                sout_buffer_t *p_out;
-                p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
-                memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
-                p_out->i_dts = in->i_dts;
-                p_out->i_pts = in->i_dts;
-                p_out->i_length = 0;
-                sout_BufferChain( out, p_out );
+                p_block = id->p_encoder->pf_header( id->p_encoder );
+                while( p_block )
+                {
+                    sout_buffer_t *p_out;
+                    block_t *p_prev_block = p_block;
+
+                    p_out = sout_BufferNew( p_stream->p_sout,
+                                            p_block->i_buffer );
+                    memcpy( p_out->p_buffer, p_block->p_buffer,
+                            p_block->i_buffer);
+                    p_out->i_dts = p_out->i_pts = in->i_dts;
+                    p_out->i_length = 0;
+                    sout_BufferChain( out, p_out );
+
+                    p_block = p_block->p_next;
+                    block_Release( p_prev_block );
+                }
             }
 
             id->i_inter_pixfmt =
