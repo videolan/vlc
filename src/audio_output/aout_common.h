@@ -2,7 +2,7 @@
  * aout_common.h: audio output inner functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_common.h,v 1.8 2002/01/14 19:54:36 asmax Exp $
+ * $Id: aout_common.h,v 1.9 2002/01/15 11:51:11 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>   
@@ -72,8 +72,9 @@ void aout_##format##Thread( aout_thread_t * p_aout )                          \
                                                                               \
         for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )           \
         {                                                                     \
-            ((type *)p_aout->buffer)[l_buffer] = (type)( buffer_copy );       \
-            p_aout->s32_buffer[l_buffer] = 0;                                 \
+            ((type *)p_aout->buffer)[l_buffer] = (type)( buffer_copy *        \
+                    p_aout->i_volume / 256 );                                 \
+             p_aout->s32_buffer[l_buffer] = 0;                                \
         }                                                                     \
                                                                               \
         l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );            \
