@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.17 2003/04/25 17:35:52 fenrir Exp $
+ * $Id: audio.c,v 1.18 2003/04/25 18:57:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -258,9 +258,6 @@ usenextdata:
                   p_adec->p_context->channels );
     }
 
-    /* **** Now we can output these samples **** */
-    i_samplesperchannel = i_output_size / 2
-                           / aout_FormatNbChannels( &p_adec->output_format );
     /* **** First check if we have a valid output **** */
     if( ( p_adec->p_aout_input == NULL )||
         ( p_adec->output_format.i_original_channels !=
@@ -298,12 +295,16 @@ usenextdata:
         return;
     }
 
+    /* **** Now we can output these samples **** */
+    i_samplesperchannel = i_output_size / 2
+                           / aout_FormatNbChannels( &p_adec->output_format );
+
     p = &p_adec->p_output[0];
     while( i_samplesperchannel > 0 )
     {
         int i_samples;
 
-        i_samples = __MIN( 1000, i_samplesperchannel );
+        i_samples = __MIN( 8000, i_samplesperchannel );
 
         p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout,
                                            p_adec->p_aout_input,
@@ -327,7 +328,6 @@ usenextdata:
         p += i_samples * 2 * aout_FormatNbChannels( &p_adec->output_format );
         i_samplesperchannel -= i_samples;
 
-//        msg_Dbg( p_adec->p_fifo, "p_aout_buffer->i_nb_bytes=%d c*2*i_samples=%d", p_aout_buffer->i_nb_bytes, i_samples * 2 * aout_FormatNbChannels( &p_adec->output_format ) );
     }
 
     if( i_frame_size > 0 )
