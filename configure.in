@@ -348,12 +348,15 @@ AC_CACHE_CHECK([if \$CC groks Altivec inline assembly],
          [save_CFLAGS=$CFLAGS
           CFLAGS="$CFLAGS -Wa,-m7400"
           AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
-            [ac_cv_altivec_inline=yes; CFLAGS_ALTIVEC="-Wa,-m7400"],
+            [ac_cv_altivec_inline="-Wa,-m7400"],
             ac_cv_altivec_inline=no)
           CFLAGS=$save_CFLAGS
          ])])
 if test x"$ac_cv_altivec_inline" != x"no"; then
   AC_DEFINE(CAN_COMPILE_ALTIVEC, 1, Define if \$CC groks ALTIVEC inline assembly.)
+  if test x"$ac_cv_altivec_inline" != x"yes"; then
+    CFLAGS_ALTIVEC="$CFLAGS_ALTIVEC $ac_cv_altivec_inline"
+  fi
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
 
