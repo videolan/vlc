@@ -450,13 +450,14 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
        OS X, we first render, then reload the texture to be used next
        time. */
 
+#ifdef SYS_DARWIN
     glBindTexture( VLCGL_TARGET, p_sys->p_textures[p_sys->i_index] );
+#else
 
-#ifndef SYS_DARWIN
     /* Update the texture */
     glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0,
                      p_vout->render.i_width, p_vout->render.i_height,
-                     VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, p_sys->p_buffer );
+                     VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, p_sys->pp_buffer[0] );
 #endif
 
     if( p_sys->i_effect == OPENGL_EFFECT_NONE )
@@ -516,11 +517,11 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     glDisable( VLCGL_TARGET );
 
+#ifdef SYS_DARWIN
     /* Switch buffers */
     p_sys->i_index = ( p_sys->i_index + 1 ) & 1;
     p_pic->p->p_pixels = p_sys->pp_buffer[p_sys->i_index];
 
-#ifdef SYS_DARWIN
     /* Update the texture */
     glBindTexture( VLCGL_TARGET, p_sys->p_textures[p_sys->i_index] );
     glTexSubImage2D( VLCGL_TARGET, 0, 0, 0, p_sys->i_tex_width,
