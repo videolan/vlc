@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: open.m,v 1.2 2002/08/06 23:43:58 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -44,7 +44,7 @@
 
 #import "intf.h"
 #import "playlist.h"
-#import "intf_open.h"
+#import "open.h"
 
 /*****************************************************************************
  * GetEjectableMediaOfClass 
