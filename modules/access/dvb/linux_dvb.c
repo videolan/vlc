@@ -405,6 +405,7 @@ static fe_code_rate_t DecodeFEC( input_thread_t * p_input, int i_val )
 
     switch ( i_val )
     {
+        case 0: fe_fec = FEC_NONE; break;
         case 1: fe_fec = FEC_1_2; break;
         case 2: fe_fec = FEC_2_3; break;
         case 3: fe_fec = FEC_3_4; break;
