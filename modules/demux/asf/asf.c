@@ -2,7 +2,7 @@
  * asf.c : ASF demux module
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.50 2004/01/29 18:02:58 zorglub Exp $
+ * $Id: asf.c,v 1.51 2004/01/31 05:27:02 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -29,7 +29,7 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
-#include "vlc_playlist.h"
+#include "vlc_meta.h"
 
 #include "codecs.h"                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "libasf.h"
@@ -51,7 +51,8 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Demux   ( input_thread_t * );
+static int Demux  ( input_thread_t * );
+static int Control( input_thread_t *, int i_query, va_list args );
 
 typedef struct asf_stream_s
 {
@@ -80,6 +81,8 @@ struct demux_sys_t
 
     int64_t             i_data_begin;
     int64_t             i_data_end;
+
+    vlc_meta_t          *meta;
 };
 
 static mtime_t  GetMoviePTS( demux_sys_t * );
@@ -101,9 +104,6 @@ static int Open( vlc_object_t * p_this )
 
     vlc_bool_t      b_seekable;
 
-    input_info_category_t *p_cat;
-    playlist_item_t *p_item = NULL;
-
     /* a little test to see if it could be a asf stream */
     if( input_Peek( p_input, &p_peek, 16 ) < 16 )
     {
@@ -119,7 +119,7 @@ static int Open( vlc_object_t * p_this )
 
     /* Set p_input field */
     p_input->pf_demux         = Demux;
-    p_input->pf_demux_control = demux_vaControlDefault;
+    p_input->pf_demux_control = Control;
     p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
     memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->i_time = -1;
@@ -285,136 +285,61 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    /* We add all info about this stream */
-    p_cat = input_InfoCategory( p_input, _("Asf") );
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_input,
-                                     VLC_OBJECT_PLAYLIST,  FIND_PARENT);
-    if( p_playlist )
-    {
-        vlc_mutex_lock( &p_playlist->object_lock );
-        p_item = playlist_ItemGetByPos( p_playlist, -1 );
-        vlc_mutex_unlock( &p_playlist->object_lock );
-    }
-    if( p_item )
-    {
-        vlc_mutex_lock( &p_item->lock );
-    }
-
-    if( p_sys->i_length > 0 )
-    {
-        int64_t i_second = p_sys->i_length / (int64_t)1000000;
-
-        input_AddInfo( p_cat, _("Length"), "%d:%d:%d",
-                       (int)(i_second / 36000),
-                       (int)(( i_second / 60 ) % 60),
-                       (int)(i_second % 60) );
-        if( p_item )
-        {
-            playlist_ItemAddInfo( p_item, _("Asf"), _("Length"),
-                               "%d:%d:%d",
-                               (int)(i_second / 36000),
-                               (int)(( i_second / 60 ) % 60),
-                               (int)(i_second % 60) );
-        }
-    }
-    input_AddInfo( p_cat, _("Number of streams"), "%d" , p_sys->i_streams );
-    if( p_item )
-    {
-        playlist_ItemAddInfo( p_item, _("Asf"),_("Number of streams"),"%d",
-                         p_sys->i_streams );
-    }
+    /* Create meta informations */
+    p_sys->meta = vlc_meta_New();
 
     if( ( p_cd = ASF_FindObject( p_sys->p_root->p_hdr,
                                  &asf_object_content_description_guid, 0 ) ) )
     {
-        if( *p_cd->psz_title )
+        if( p_cd->psz_title && *p_cd->psz_title )
         {
-            input_AddInfo( p_cat, _("Title"), p_cd->psz_title );
-            if( p_item )
-            {
-                playlist_ItemAddInfo( p_item, _("Asf"),_("Title"),
-                                  p_cd->psz_title );
-                playlist_ItemSetName( p_item, p_cd->psz_title );
-            }
+            vlc_meta_Add( p_sys->meta, VLC_META_TITLE, p_cd->psz_title );
         }
-        if( p_cd->psz_author )
+        if( p_cd->psz_author && *p_cd->psz_author )
         {
-            input_AddInfo( p_cat, _("Author"), p_cd->psz_author );
-            if( p_item )
-            {
-                playlist_ItemAddInfo( p_item, _("Asf"),_("Author"),
-                                  p_cd->psz_author );
-                playlist_ItemAddInfo( p_item, _("General"),_("Author"),
-                                  p_cd->psz_author );
-            }
+             vlc_meta_Add( p_sys->meta, VLC_META_AUTHOR, p_cd->psz_author );
         }
-        if( p_cd->psz_copyright )
+        if( p_cd->psz_copyright && *p_cd->psz_copyright )
         {
-            input_AddInfo( p_cat, _("Copyright"), p_cd->psz_copyright );
-            if( p_item )
-            {
-                playlist_ItemAddInfo( p_item, _("Asf"),  _("Copyright"),
-                                      p_cd->psz_copyright );
-            }
+            vlc_meta_Add( p_sys->meta, VLC_META_COPYRIGHT, p_cd->psz_copyright );
         }
-        if( *p_cd->psz_description )
+        if( p_cd->psz_description && *p_cd->psz_description )
         {
-            input_AddInfo( p_cat, _("Description"), p_cd->psz_description );
-            if( p_item )
-            {
-                playlist_ItemAddInfo( p_item, _("Asf"),  _("Description"),
-                                      p_cd->psz_description );
-            }
+            vlc_meta_Add( p_sys->meta, VLC_META_DESCRIPTION, p_cd->psz_description );
         }
-        if( *p_cd->psz_rating )
+        if( p_cd->psz_rating && *p_cd->psz_rating )
         {
-            input_AddInfo( p_cat, _("Rating"), p_cd->psz_rating );
-            if( p_item )
-            {
-                playlist_ItemAddInfo( p_item, _("Asf"),  _("Rating"),
-                                      p_cd->psz_rating );
-            }
+            vlc_meta_Add( p_sys->meta, VLC_META_RATING, p_cd->psz_rating );
         }
     }
-
-    /* FIXME to port to new way */
     for( i_stream = 0, i = 0; i < 128; i++ )
     {
-        asf_object_codec_list_t *p_cl =
-            ASF_FindObject( p_sys->p_root->p_hdr,
-                            &asf_object_codec_list_guid, 0 );
+        asf_object_codec_list_t *p_cl = ASF_FindObject( p_sys->p_root->p_hdr,
+                                                        &asf_object_codec_list_guid, 0 );
 
         if( p_sys->stream[i] )
         {
-            char *psz_cat = malloc( strlen(_("Stream")) + 10 );
-            sprintf( psz_cat, "%s %d", _("Stream"), i_stream );
-            p_cat = input_InfoCategory( p_input, psz_cat);
+            vlc_meta_t *tk = vlc_meta_New();
+            TAB_APPEND( p_sys->meta->i_track, p_sys->meta->track, tk );
 
             if( p_cl && i_stream < p_cl->i_codec_entries_count )
             {
-                input_AddInfo( p_cat, _("Codec name"),
-                               p_cl->codec[i_stream].psz_name );
-                input_AddInfo( p_cat, _("Codec description"),
-                               p_cl->codec[i_stream].psz_description );
-                if( p_item )
+                if( p_cl->codec[i_stream].psz_name &&
+                    *p_cl->codec[i_stream].psz_name )
                 {
-                    playlist_ItemAddInfo( p_item, psz_cat, _("Codec name"),
-                                      p_cl->codec[i_stream].psz_name );
-                    playlist_ItemAddInfo( p_item, psz_cat,
-                                    _("Codec description"),
-                                     p_cl->codec[i_stream].psz_description );
+                    vlc_meta_Add( tk, VLC_META_CODEC_NAME,
+                                  p_cl->codec[i_stream].psz_name );
+                }
+                if( p_cl->codec[i_stream].psz_description &&
+                    *p_cl->codec[i_stream].psz_description )
+                {
+                    vlc_meta_Add( tk, VLC_META_CODEC_DESCRIPTION,
+                                  p_cl->codec[i_stream].psz_description );
                 }
             }
-            free( psz_cat );
             i_stream++;
         }
     }
-    if( p_item )
-    {
-        vlc_mutex_unlock( &p_item->lock );
-    }
-
-    if( p_playlist ) vlc_object_release( p_playlist );
     return VLC_SUCCESS;
 
 error:
@@ -522,6 +447,8 @@ static void Close( vlc_object_t * p_this )
 
     msg_Dbg( p_input, "freeing all memory" );
 
+    vlc_meta_Delete( p_sys->meta );
+
     ASF_FreeObjectRoot( p_input->s, p_sys->p_root );
     for( i_stream = 0; i_stream < 128; i_stream++ )
     {
@@ -539,6 +466,31 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( input_thread_t *p_input, int i_query, va_list args )
+{
+    demux_sys_t *p_sys = p_input->p_demux_data;
+    int64_t     *pi64;
+    vlc_meta_t **pp_meta;
+
+    switch( i_query )
+    {
+        case DEMUX_GET_LENGTH:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = p_sys->i_length;
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_META:
+            pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
+            *pp_meta = vlc_meta_Duplicate( p_sys->meta );
+            return VLC_SUCCESS;
+
+        default:
+            return demux_vaControlDefault( p_input, i_query, args );
+    }
+}
 
 /*****************************************************************************
  *
