@@ -1,3 +1,17 @@
+vlc (0.6.3+cvs-20031024-1) unstable; urgency=low
+
+  * New CVS snapshot.
+  * debian/rules:
+    + Disabled the deprecated satellite plugin; the dvb plugin is now
+      the recommended one (Closes: #216367).
+    + Don't install fortunes in /usr/share/games, they are too private for
+      common mortals (Closes: #212856). They are still available in the
+      /usr/share/doc/vlc directory though.
+  * debian/control:
+    + Depend on ttf-freefont for subtitles.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 24 Oct 2003 13:23:27 +0200
+
 vlc (0.6.2-3) unstable; urgency=low
 
   * debian/control:

@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 # debian/rules for the VideoLAN Client - uses debhelper.
-# $Id: rules,v 1.104 2003/09/02 13:44:23 sam Exp $
+# $Id: rules,v 1.105 2003/10/24 11:31:51 sam Exp $
 # based on Joey Hess's one.
 
 # Uncomment this to turn on verbose mode.
@@ -33,7 +33,7 @@ CONFIG_FLAGS += \
 	--enable-mp4 \
 	--enable-dvb \
 	--enable-dv \
-	--enable-satellite \
+	--disable-satellite \
 	--enable-ogg \
 	--enable-vorbis \
 	--enable-wxwindows \
@@ -200,8 +200,8 @@ install: build
 	cp debian/gvlc.desktop debian/gvlc/$(GNOMEDIR)
 	cp debian/gnome-vlc.desktop debian/gnome-vlc/$(GNOMEDIR)
 
-	cp doc/fortunes.txt debian/vlc/usr/share/games/fortunes/vlc
-	strfile doc/fortunes.txt debian/vlc/usr/share/games/fortunes/vlc.dat
+	#cp doc/fortunes.txt debian/vlc/usr/share/games/fortunes/vlc
+	#strfile doc/fortunes.txt debian/vlc/usr/share/games/fortunes/vlc.dat
 
 	# Package: libvlc0-dev
 	mv debian/vlc/usr/bin/vlc-config debian/libvlc0-dev/usr/bin/
