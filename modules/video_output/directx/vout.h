@@ -2,7 +2,7 @@
  * vout.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout.h,v 1.8 2003/11/19 23:44:35 gbazin Exp $
+ * $Id: vout.h,v 1.9 2003/11/20 17:48:44 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -119,4 +119,5 @@ void DirectXUpdateRects ( vout_thread_t *p_vout, vlc_bool_t b_force );
  *****************************************************************************/
 #define WM_VLC_HIDE_MOUSE WM_APP
 #define WM_VLC_CREATE_VIDEO_WIN WM_APP + 1
+#define WM_VLC_DESTROY_VIDEO_WIN WM_APP + 2
 #define IDM_TOGGLE_ON_TOP WM_USER + 1

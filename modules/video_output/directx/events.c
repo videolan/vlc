@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.29 2003/11/19 23:44:35 gbazin Exp $
+ * $Id: events.c,v 1.30 2003/11/20 17:48:44 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -50,8 +50,8 @@
  *****************************************************************************/
 static int  DirectXCreateWindow( vout_thread_t *p_vout );
 static void DirectXCloseWindow ( vout_thread_t *p_vout );
-static long FAR PASCAL DirectXEventProc ( HWND hwnd, UINT message,
-                                          WPARAM wParam, LPARAM lParam );
+static long FAR PASCAL DirectXEventProc( HWND, UINT, WPARAM, LPARAM );
+static long FAR PASCAL DirectXVideoEventProc( HWND, UINT, WPARAM, LPARAM );
 
 static void DirectXPopupMenu( event_thread_t *p_event, vlc_bool_t b_open )
 {
@@ -106,7 +106,13 @@ void DirectXEventThread( event_thread_t *p_event )
         if( p_event->b_die )
             break;
 
-        if( p_event->p_vout->p_sys->hparent ) msleep( INTF_IDLE_SLEEP );
+        if( p_event->p_vout->p_sys->hparent )
+        {
+            /* Parent window was created in another thread so we can't
+             * access the window messages. */
+            msleep( INTF_IDLE_SLEEP );
+            continue;
+        }
 
         switch( msg.message )
         {
@@ -311,8 +317,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
                                        GWL_WNDPROC, (LONG)DirectXEventProc );
 
         /* Blam! Erase everything that might have been there. */
-        RedrawWindow( p_vout->p_sys->hwnd, NULL, NULL,
-                      RDW_INVALIDATE | RDW_ERASE );
+        InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
     }
     else
     {
@@ -424,9 +429,13 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
     }
     else if( p_vout->p_sys->hparent )
     {
+        /* Get rid of the video sub-window */
+        PostMessage( p_vout->p_sys->hvideownd, WM_VLC_DESTROY_VIDEO_WIN, 0, 0);
+
         /* We don't want our windowproc to be called anymore */
         SetWindowLong( p_vout->p_sys->hwnd,
                        GWL_WNDPROC, (LONG)p_vout->p_sys->pf_wndproc );
+        SetWindowLong( p_vout->p_sys->hwnd, GWL_USERDATA, (LONG)NULL );
 
         /* Blam! Erase everything that might have been there. */
         InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
@@ -587,6 +596,13 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         p_vout = (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
     }
 
+    if( !p_vout )
+    {
+        /* Hmmm mozilla does manage somehow to save the pointer to our
+         * windowproc and still calls it after the vout has been closed. */
+        return DefWindowProc(hwnd, message, wParam, lParam);
+    }
+
     switch( message )
     {
 
@@ -653,17 +669,30 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
         if( !p_vout->p_sys->hvideownd )
         {
-            msg_Warn( p_vout, "Can create video sub-window" );
+            msg_Warn( p_vout, "Can't create video sub-window" );
         }
         else
         {
             SetWindowLong( p_vout->p_sys->hvideownd,
-                           GWL_WNDPROC, (LONG)DefWindowProc );
+                           GWL_WNDPROC, (LONG)DirectXVideoEventProc );
         }
         break;
 
     default:
         //msg_Dbg( p_vout, "WinProc WM Default %i", message );
+        break;
+    }
+
+    return DefWindowProc(hwnd, message, wParam, lParam);
+}
+static long FAR PASCAL DirectXVideoEventProc( HWND hwnd, UINT message,
+                                              WPARAM wParam, LPARAM lParam )
+{
+    switch( message )
+    {
+    case WM_VLC_DESTROY_VIDEO_WIN:
+        /* Destroy video sub-window */
+        DestroyWindow( hwnd );
         break;
     }
 

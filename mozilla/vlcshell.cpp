@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.26 2003/10/23 17:04:40 sam Exp $
+ * $Id: vlcshell.cpp,v 1.27 2003/11/20 17:48:44 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -104,26 +104,9 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event );
 #   define VOUT_PLUGINS "directx,wingdi,dummy"
 #   define AOUT_PLUGINS "directx,waveout,dummy"
 
-HINSTANCE g_hDllInstance = NULL;
-
-BOOL WINAPI DllMain( HINSTANCE hinstDLL, /* handle of DLL module */
-                     DWORD fdwReason,    /* reason for calling the function */
-                     LPVOID lpvReserved )
-{
-    switch( fdwReason )
-    {
-    case DLL_PROCESS_ATTACH:
-        g_hDllInstance = hinstDLL;
-        break;
-    case DLL_THREAD_ATTACH:
-    case DLL_PROCESS_DETACH:
-    case DLL_THREAD_DETACH:
-        break;
-    }
-    return TRUE;
-}
-
+#if defined(XP_WIN) && !USE_LIBVLC
 LRESULT CALLBACK Manage( HWND, UINT, WPARAM, LPARAM );
+#endif
 #endif
 
 /******************************************************************************
@@ -555,8 +538,10 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         /* Window was destroyed. Invalidate everything. */
         if( p_plugin->p_npwin )
         {
+#if !USE_LIBVLC
             SetWindowLong( p_plugin->p_hwnd, GWL_WNDPROC,
                            (LONG)p_plugin->pf_wndproc );
+#endif
             p_plugin->pf_wndproc = NULL;
             p_plugin->p_hwnd = NULL;
         }
@@ -571,24 +556,31 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         {
             /* Same window, but something may have changed. First we
              * update the plugin structure, then we redraw the window */
-            InvalidateRect( p_plugin->p_hwnd, NULL, TRUE );
             p_plugin->i_width = window->width;
             p_plugin->i_height = window->height;
             p_plugin->p_npwin = window;
+#if !USE_LIBVLC
+            InvalidateRect( p_plugin->p_hwnd, NULL, TRUE );
             UpdateWindow( p_plugin->p_hwnd );
+#endif
             return NPERR_NO_ERROR;
         }
 
         /* Window has changed. Destroy the one we have, and go
          * on as if it was a real initialization. */
+#if !USE_LIBVLC
         SetWindowLong( p_plugin->p_hwnd, GWL_WNDPROC,
                        (LONG)p_plugin->pf_wndproc );
+#endif
         p_plugin->pf_wndproc = NULL;
         p_plugin->p_hwnd = NULL;
     }
 
+#if !USE_LIBVLC
     p_plugin->pf_wndproc = (WNDPROC)SetWindowLong( (HWND)window->window,
                                                    GWL_WNDPROC, (LONG)Manage );
+#endif
+
     p_plugin->p_hwnd = (HWND)window->window;
     SetProp( p_plugin->p_hwnd, "w00t", (HANDLE)p_plugin );
     InvalidateRect( p_plugin->p_hwnd, NULL, TRUE );
@@ -810,14 +802,13 @@ void NPP_Print( NPP instance, NPPrint* printInfo )
 /******************************************************************************
  * Windows-only methods
  *****************************************************************************/
-#ifdef XP_WIN
+#if defined(XP_WIN) && !USE_LIBVLC
 LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpar )
 {
     VlcPlugin* p_plugin = (VlcPlugin*) GetProp( p_hwnd, "w00t" );
 
     switch( i_msg )
     {
-#if !USE_LIBVLC
         case WM_PAINT:
         {
             PAINTSTRUCT paintstruct;
@@ -834,7 +825,6 @@ LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpar )
             EndPaint( p_hwnd, &paintstruct );
             break;
         }
-#endif
         default:
             p_plugin->pf_wndproc( p_hwnd, i_msg, wpar, lpar );
             break;

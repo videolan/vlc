@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.24 2003/11/19 23:44:35 gbazin Exp $
+ * $Id: directx.c,v 1.25 2003/11/20 17:48:44 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -162,7 +162,6 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->hwnd = NULL;
     p_vout->p_sys->hparent = NULL;
     p_vout->p_sys->i_changes = 0;
-    p_vout->p_sys->b_caps_overlay_clipping = 0;
     SetRectEmpty( &p_vout->p_sys->rect_display );
     p_vout->p_sys->b_using_overlay = config_GetInt( p_vout, "overlay" );
     p_vout->p_sys->b_use_sysmem = config_GetInt( p_vout, "directx-use-sysmem");
@@ -959,9 +958,7 @@ int DirectXUpdateOverlay( vout_thread_t *p_vout )
     ddofx.dckDestColorkey.dwColorSpaceLowValue = p_vout->p_sys->i_colorkey;
     ddofx.dckDestColorkey.dwColorSpaceHighValue = p_vout->p_sys->i_colorkey;
 
-    dwFlags = DDOVER_SHOW;
-    if( !p_vout->p_sys->b_caps_overlay_clipping )
-        dwFlags |= DDOVER_KEYDESTOVERRIDE;
+    dwFlags = DDOVER_SHOW | DDOVER_KEYDESTOVERRIDE;
 
     dxresult = IDirectDrawSurface2_UpdateOverlay(
                                          p_vout->p_sys->p_current_surface,
@@ -1448,7 +1445,7 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
     }
     else
     {
-        BOOL bHasOverlay, bHasOverlayFourCC, bCanClipOverlay,
+        BOOL bHasOverlay, bHasOverlayFourCC, bCanDeinterlace,
              bHasColorKey, bCanStretch, bCanBltFourcc;
 
         /* Determine if the hardware supports overlay surfaces */
@@ -1457,8 +1454,8 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
         /* Determine if the hardware supports overlay surfaces */
         bHasOverlayFourCC = ((ddcaps.dwCaps & DDCAPS_OVERLAYFOURCC) ==
                        DDCAPS_OVERLAYFOURCC) ? TRUE : FALSE;
-        /* Determine if the hardware supports overlay surfaces */
-        bCanClipOverlay = ((ddcaps.dwCaps & DDCAPS_OVERLAYCANTCLIP) ==
+        /* Determine if the hardware supports overlay deinterlacing */
+        bCanDeinterlace = ((ddcaps.dwCaps & DDCAPS2_CANFLIPODDEVEN) ==
                        0 ) ? TRUE : FALSE;
         /* Determine if the hardware supports colorkeying */
         bHasColorKey = ((ddcaps.dwCaps & DDCAPS_COLORKEY) ==
@@ -1471,14 +1468,10 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
                         DDCAPS_BLTFOURCC) ? TRUE : FALSE;
 
         msg_Dbg( p_vout, "DirectDraw Capabilities: overlay=%i yuvoverlay=%i "
-                         "can_clip_overlay=%i colorkey=%i stretch=%i "
+                         "can_deinterlace_overlay=%i colorkey=%i stretch=%i "
                          "bltfourcc=%i",
-                         bHasOverlay, bHasOverlayFourCC, bCanClipOverlay,
+                         bHasOverlay, bHasOverlayFourCC, bCanDeinterlace,
                          bHasColorKey, bCanStretch, bCanBltFourcc );
-
-        /* Overlay clipping support is interesting for us as it means we can
-         * get rid of the colorkey alltogether */
-        p_vout->p_sys->b_caps_overlay_clipping = bCanClipOverlay;
 
         /* Don't ask for troubles */
         if( !bCanBltFourcc ) p_vout->p_sys->b_hw_yuv = FALSE; 
