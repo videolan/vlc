@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.7 2003/11/08 16:04:05 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.8 2003/11/08 18:31:01 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -588,53 +588,36 @@ NetworkBuildMRL                        (GtkEditable     *editable,
 {
     GtkSpinButton *networkPort = NULL;
     GtkEntry      *entryMRL = NULL;
-    GtkEntry      *networkMRLType = NULL;
+    GtkEntry      *networkType = NULL;
     GtkEntry      *networkAddress = NULL;
     GtkEntry      *networkProtocol = NULL;
-    GtkEntry      *networkType = NULL;
-    const gchar   *mrlType;
+    const gchar   *mrlNetworkType;
     const gchar   *mrlAddress;
     gint     mrlPort;
     const gchar   *mrlProtocol;
-    const gchar   *mrlNetworkType;
 #define VLC_MAX_MRL     256
     char           text[VLC_MAX_MRL];
     int            pos = 0;
 
     entryMRL = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryMRL" );
 
-    networkMRLType  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryNetworkMRLType" );
+    networkType     = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryNetworkType" );
     networkAddress  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryNetworkAddress" );
     networkPort     = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryNetworkPort" );
     networkProtocol = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryNetworkProtocolType" );
-    networkType     = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryNetworkType" );
 
-    mrlType        = gtk_entry_get_text(GTK_ENTRY(networkMRLType));
+    mrlNetworkType  = gtk_entry_get_text(GTK_ENTRY(networkType));
     mrlAddress     = gtk_entry_get_text(GTK_ENTRY(networkAddress));
     mrlPort        = gtk_spin_button_get_value_as_int(networkPort);
     mrlProtocol    = gtk_entry_get_text(GTK_ENTRY(networkProtocol));
-    mrlNetworkType = gtk_entry_get_text(GTK_ENTRY(networkType));
 
     /* Build MRL from parts ;-) */
-    pos = snprintf( &text[0], VLC_MAX_MRL, "%s", (char*)mrlType);
-    if (strncasecmp( (char*)mrlProtocol, "IPv6",4)==0 )
+    pos = snprintf( &text[0], VLC_MAX_MRL, "%s://", (char*)mrlProtocol);
+    if (strncasecmp( (char*)mrlNetworkType, "multicast",9)==0)
     {
-        pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "6://" );
-        if (strncasecmp( (char*)mrlNetworkType, "multicast",9)==0)
-        {
-            pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "@" );
-        }
-        pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "[%s]:%d", (char*)mrlAddress, (int)mrlPort );
+        pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "@" );
     }
-    else
-    {
-        pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "://" );
-        if (strncasecmp( (char*)mrlNetworkType, "multicast",9)==0)
-        {
-            pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "@" );
-        }
-        pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "%s:%d", (char*)mrlAddress, (int)mrlPort );
-    }
+    pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "%s:%d", (char*)mrlAddress, (int)mrlPort );
 
     if (pos >= VLC_MAX_MRL)
         text[VLC_MAX_MRL-1]='\0';
