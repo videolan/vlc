@@ -754,6 +754,12 @@ difficulty to understand how VLC skins work.</para>
   <listitem><para>
     <emphasis>playlist.setRepeat(false)</emphasis>: Stop repeating the current playlist item.
   </para></listitem>
+  <listitem><para>
+    <emphasis>playlist.load()</emphasis>: Load an external playlist file.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>playlist.save()</emphasis>: Save the current playlist.
+  </para></listitem>
 -->
   <listitem><para>
     <emphasis>WindowID.show()</emphasis>: Show the <link linkend="Window">Window</link> whose <link linkend="windowid">id</link> attribute is 'WindowID'.
