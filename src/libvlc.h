@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.67 2003/05/17 11:35:14 gbazin Exp $
+ * $Id: libvlc.h,v 1.68 2003/05/21 13:10:05 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -370,10 +370,6 @@ static char *ppsz_language[] = { "auto", "de", "en_GB", "fr", "it",
     "When selected, VLC will randomly play files in the playlist until " \
     "interrupted.")
 
-#define LAUNCH_TEXT N_("Launch playlist on startup")
-#define LAUNCH_LONGTEXT N_( \
-    "If you want VLC to start playing on startup, then enable this option.")
-
 #define ENQUEUE_TEXT N_("Enqueue items in playlist")
 #define ENQUEUE_LONGTEXT N_( \
     "If you want VLC to add items to the playlist as you open them, then " \
@@ -565,7 +561,6 @@ vlc_module_begin();
     /* Playlist options */
     add_category_hint( N_("Playlist"), NULL, VLC_FALSE );
     add_bool_with_short( "random", 'Z', 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT, VLC_FALSE );
-    add_bool( "playlist", 0, NULL, LAUNCH_TEXT, LAUNCH_LONGTEXT, VLC_FALSE );
     add_bool( "enqueue", 0, NULL, ENQUEUE_TEXT, ENQUEUE_LONGTEXT, VLC_FALSE );
     add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, VLC_FALSE );
 
