@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.4 2003/06/12 11:37:48 zorglub Exp $
+ * $Id: standard.c,v 1.5 2003/06/23 11:41:26 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -31,6 +31,8 @@
 #include <vlc/vlc.h>
 #include <vlc/sout.h>
 #include <announce.h>
+
+#define DEFAULT_IPV6_SCOPE "8"
 
 /*****************************************************************************
  * Exported prototypes
@@ -69,12 +71,14 @@ static int Open( vlc_object_t *p_this )
     sout_instance_t     *p_sout = p_stream->p_sout;
     sout_stream_sys_t   *p_sys = malloc( sizeof( sout_stream_sys_t) );
 
-    char                *psz_mux    = sout_cfg_find_value( p_stream->p_cfg, "mux" );
-    char                *psz_access = sout_cfg_find_value( p_stream->p_cfg, "access" );
-    char                *psz_url    = sout_cfg_find_value( p_stream->p_cfg, "url" );
-
+    char   *psz_mux      = sout_cfg_find_value( p_stream->p_cfg, "mux" );
+    char   *psz_access   = sout_cfg_find_value( p_stream->p_cfg, "access" );
+    char   *psz_url      = sout_cfg_find_value( p_stream->p_cfg, "url" );
+    char   *psz_ipv      = sout_cfg_find_value( p_stream->p_cfg, "sap_ipv" );
+    char   *psz_v6_scope = sout_cfg_find_value( p_stream->p_cfg, "sap_v6scope");
     sout_cfg_t          *p_sap_cfg  = sout_cfg_find( p_stream->p_cfg, "sap" );
 
+    
     char                *psz_sap = NULL;
 
     char                *psz_port = "1234";
@@ -83,9 +87,12 @@ static int Open( vlc_object_t *p_this )
     
     sout_access_out_t *p_access;
     sout_mux_t        *p_mux;    
-   
+  
    p_sys->b_sap=0;
    /* SAP is only valid for UDP or RTP streaming */
+  if( psz_access == NULL )
+          psz_access="udp";
+   
    if(p_sap_cfg && (strstr(psz_access,"udp") || strstr( psz_access ,  "rtp" )))
    {
         msg_Info( p_this, "SAP Enabled");
@@ -99,6 +106,13 @@ static int Open( vlc_object_t *p_this )
                 psz_sap = strdup ( psz_url );
         }        
    }
+   
+   /* Get SAP IP version to use */
+   if(psz_ipv == NULL)
+           psz_ipv = "4";
+   if(psz_v6_scope == NULL)
+           psz_v6_scope= DEFAULT_IPV6_SCOPE;
+   
    msg_Dbg( p_this, "creating `%s/%s://%s'",
              psz_access, psz_mux, psz_url );
        
@@ -127,8 +141,8 @@ static int Open( vlc_object_t *p_this )
     /*  *** Create the SAP Session structure *** */
     if(p_sys->b_sap)
     {        
-        msg_Dbg( p_sout , "Creating SAP" );
-        p_sap = sout_SAPNew( p_sout , psz_url , psz_port , psz_sap );
+        msg_Dbg( p_sout , "Creating SAP with IPv%i",atoi(psz_ipv) );
+        p_sap = sout_SAPNew( p_sout , psz_url , psz_port , psz_sap, atoi(psz_ipv), psz_v6_scope );
         if(!p_sap)
         {
                 msg_Err( p_sout,"Unable to initialize SAP. SAP disabled");
@@ -163,7 +177,7 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_t *p_access = p_sys->p_mux->p_access;
 
     if(p_sys -> b_sap)
-          sout_SAPDelete( p_this ,p_sys->p_sap ); 
+          sout_SAPDelete( (sout_instance_t *)p_this ,p_sys->p_sap ); 
 
     sout_MuxDelete( p_sys->p_mux );
     sout_AccessOutDelete( p_access );

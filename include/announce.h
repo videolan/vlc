@@ -2,11 +2,9 @@
  * announce.h : Session announcement
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: announce.h,v 1.3 2003/06/12 11:37:48 zorglub Exp $
+ * $Id: announce.h,v 1.4 2003/06/23 11:41:26 zorglub Exp $
  *
- * Authors: Christophe Massiot <massiot@via.ecp.fr>
- *          Laurent Aimar <fenrir@via.ecp.fr>
- *          Eric Petit <titer@videolan.org>
+ * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,6 +54,8 @@ struct sap_session_t
         unsigned int socket;
         unsigned int sendnow;
         struct sockaddr_in addr;
+        struct sockaddr_in6 addr6;
+        int i_ip_version;
 };
 
 
@@ -63,6 +63,6 @@ struct sap_session_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( sap_session_t *,            sout_SAPNew,         ( sout_instance_t *,char * , char * , char * ) );
-VLC_EXPORT( void,            sout_SAPSend,        ( sout_instance_t *,sap_session_t * ) );
+VLC_EXPORT( sap_session_t *,            sout_SAPNew,         ( sout_instance_t *,char * , char * , char * ,int , char *) );
+VLC_EXPORT( void,            sout_SAPSend,        ( sout_instance_t *,sap_session_t *) );
 VLC_EXPORT( void,            sout_SAPDelete,      ( sout_instance_t *,sap_session_t * ) );

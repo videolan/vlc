@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.53 2003/06/22 18:07:23 gbazin Exp $
+$Id: NEWS,v 1.54 2003/06/23 11:41:25 zorglub Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
@@ -36,7 +36,7 @@ Stream output:
  * New stream output scheme. It is now possible to build a chain of stream outputs allowing for instance to stream and display some content at the same time.
  * The stream output now allows to transcode content on the fly.
  * Fixed major bug that prevented streaming mpeg 1/2 video with pulldown content.
- * SAP (Session Announcement Protocol) support.
+ * SAP/SDP announcing support. (both IPv4 and IPv6)
 
 Miscellaneous:
  * New reset option for the preferences
@@ -44,6 +44,7 @@ Miscellaneous:
  * New video chroma conversion module using ffmpeg
  * Added a Gentoo ebuild to the distribution
  * Added a new smaller subtitles font (now the default) + scripts to generate your own
+ * SAP/SDP IPv6 support
 
 UNIX ports:
  * Basic support for the X11 Xinerama extension.
