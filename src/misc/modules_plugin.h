@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.11 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: modules_plugin.h,v 1.12 2002/02/24 21:36:20 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -189,6 +189,7 @@ module_error( void )
     (p_symbols)->input_OffsetToTime = input_OffsetToTime; \
     (p_symbols)->input_ChangeES = input_ChangeES; \
     (p_symbols)->input_ToggleES = input_ToggleES; \
+    (p_symbols)->input_ChangeProgram = input_ChangeProgram; \
     (p_symbols)->input_ChangeArea = input_ChangeArea; \
     (p_symbols)->input_FindES = input_FindES; \
     (p_symbols)->input_AddES = input_AddES; \

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.76 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: common.h,v 1.77 2002/02/24 21:36:20 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -488,6 +488,7 @@ typedef struct module_symbols_s
                                       struct es_descriptor_s *, boolean_t );
     int  ( * input_ChangeArea )     ( struct input_thread_s *,
                                       struct input_area_s * );
+    int  ( * input_ChangeProgram )  ( struct input_thread_s *, u16 );
     struct es_descriptor_s * ( * input_FindES ) ( struct input_thread_s *,
                                                   u16 );
     struct es_descriptor_s * ( * input_AddES ) ( struct input_thread_s *,

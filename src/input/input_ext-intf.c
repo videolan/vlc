@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.33 2002/01/10 04:11:25 sam Exp $
+ * $Id: input_ext-intf.c,v 1.34 2002/02/24 21:36:20 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -328,15 +328,25 @@ int input_ChangeArea( input_thread_t * p_input, input_area_t * p_area )
 }
 
 /****************************************************************************
- * input_ChangeProgram: interface request an area change
+ * input_ChangeProgram: interface request a program change
  ****************************************************************************/
 int input_ChangeProgram( input_thread_t * p_input, 
-            pgrm_descriptor_t * p_program )
+             u16 i_program_number )
 {
+    pgrm_descriptor_t *       p_program;
+    
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    p_input->stream.p_new_program = p_program;
+    p_program = input_FindProgram( p_input, i_program_number );
 
+    if ( p_program == NULL )
+    {
+        intf_ErrMsg("input: Could not find selected program");
+        return -1;
+    }
+
+    p_input->stream.p_new_program = p_program;
+    
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return 0;

@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_common.h,v 1.2 2002/02/19 03:54:55 sam Exp $
+ * $Id: gtk_common.h,v 1.3 2002/02/24 21:36:20 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,6 +52,8 @@ typedef struct intf_sys_s
     boolean_t           b_slider_free;                      /* slider status */
 
     /* menus handlers */
+    boolean_t           b_program_update;   /* do we need to update programs 
+                                                                        menu */
     boolean_t           b_title_update;  /* do we need to update title menus */
     boolean_t           b_chapter_update;            /* do we need to update
                                                                chapter menus */

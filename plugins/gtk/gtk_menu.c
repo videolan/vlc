@@ -2,10 +2,11 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.18 2002/01/07 02:12:29 sam Exp $
+ * $Id: gtk_menu.c,v 1.19 2002/02/24 21:36:20 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
+ *          Johan Bilien <jobi@via.ecp.fr>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -178,6 +179,34 @@ void GtkPopupNavigationToggle( GtkCheckMenuItem * menuitem,
         input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
     }
 }
+
+/*
+ * Program
+ */
+
+void GtkMenubarProgramToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
+{
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+
+    if( menuitem->active && !p_intf->p_sys->b_program_update )
+    {
+        u16 i_program_id = (u16)user_data;
+        
+        input_ChangeProgram( p_input_bank->pp_input[0], i_program_id );
+        
+        p_intf->p_sys->b_program_update = 1;
+        
+        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        GtkSetupMenus( p_intf );
+        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        
+        p_intf->p_sys->b_title_update = 0;
+
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+
+    }
+}
+
 
 /*
  * Title
@@ -399,6 +428,104 @@ static gint GtkRadioMenu( intf_thread_t * p_intf,
 
     /* be sure that menu is sensitive, if there are several items */
     if( i_nb > 1 )
+    {
+        gtk_widget_set_sensitive( p_root, TRUE );
+    }
+
+    return TRUE;
+}
+
+/*****************************************************************************
+ * GtkProgramMenu: update the programs menu of the interface 
+ *****************************************************************************
+ * Builds the program menu according to what have been found in the PAT 
+ * by the input. Usefull for multi-programs streams such as DVB ones.
+ *****************************************************************************/
+static gint GtkProgramMenu( gpointer          p_data,
+                                GtkWidget *       p_root,
+                          void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
+{
+    intf_thread_t *     p_intf;
+    GtkWidget *         p_menu;
+    GtkWidget *         p_item;
+    GtkWidget *         p_item_active;
+    GSList *            p_group;
+    char                psz_name[ GTK_MENU_LABEL_SIZE ];
+    gint                i_item;
+    gint                i;
+
+    /* cast */
+    p_intf = (intf_thread_t *)p_data;
+
+    /* temporary hack to avoid blank menu when an open menu is removed */
+    if( GTK_MENU_ITEM(p_root)->submenu != NULL )
+    {
+        gtk_menu_popdown( GTK_MENU( GTK_MENU_ITEM(p_root)->submenu ) );
+    }
+    /* removes previous menu */
+    gtk_menu_item_remove_submenu( GTK_MENU_ITEM( p_root ) );
+    gtk_widget_set_sensitive( p_root, FALSE );
+
+    p_group = NULL;
+
+    /* menu container */
+    p_menu = gtk_menu_new();
+
+    p_item_active = NULL;
+    i_item = 0;
+
+    /* create a set of program buttons and append them to the container */
+    for( i = 0 ; i < p_input_bank->pp_input[0]->stream.i_pgrm_number ; i++ )
+    {
+        i_item++;
+        snprintf( psz_name, GTK_MENU_LABEL_SIZE, "id %x",
+            p_input_bank->pp_input[0]->stream.pp_programs[i]->i_number );
+            
+        if( psz_name[0] == '\0' )
+        {
+            snprintf( psz_name, GTK_MENU_LABEL_SIZE,
+                      "Program %d", i_item );
+            psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
+        }
+
+        p_item = gtk_radio_menu_item_new_with_label( p_group, psz_name );
+        p_group =
+            gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
+
+        if( p_input_bank->pp_input[0]->stream.p_new_program ==
+                p_input_bank->pp_input[0]->stream.pp_programs[i] ||
+                p_input_bank->pp_input[0]->stream.p_selected_program == 
+                p_input_bank->pp_input[0]->stream.pp_programs[i] )
+        {
+            /* don't lose p_item when we append into menu */
+            p_item_active = p_item;
+        }
+
+        gtk_widget_show( p_item );
+
+        /* setup signal hanling */
+        gtk_signal_connect( GTK_OBJECT( p_item ), "toggled",
+                        GTK_SIGNAL_FUNC( pf_toggle ),
+                        (gpointer)( p_input_bank->pp_input[0]->
+                        stream.pp_programs[i]->i_number ) );
+
+        gtk_menu_append( GTK_MENU( p_menu ), p_item );
+    }
+
+    /* link the new menu to the menubar item */
+    gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_root ), p_menu );
+
+    /* activation will call signals so we can only do it
+     * when submenu is attached to menu - to get intf_window 
+     * We have to release the lock since input_ToggleES needs it */
+    if( p_item_active != NULL )
+    {
+        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_active ),
+                                        TRUE );
+    }
+
+    /* be sure that menu is sensitive if more than 1 program */
+    if( i_item > 1 )
     {
         gtk_widget_set_sensitive( p_root, TRUE );
     }
@@ -785,6 +912,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
     GtkWidget *         p_popup_menu;
     gint                i;
 
+    p_intf->p_sys->b_title_update |= p_intf->p_sys->b_program_update;
     p_intf->p_sys->b_chapter_update |= p_intf->p_sys->b_title_update;
     p_intf->p_sys->b_angle_update |= p_intf->p_sys->b_title_update;
     p_intf->p_sys->b_audio_update |= p_intf->p_sys->b_title_update;
@@ -792,6 +920,16 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
 
 //    vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
 
+    if( p_intf->p_sys->b_program_update )
+    { 
+        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
+                            p_intf->p_sys->p_window ), "menubar_program" ) );
+        
+        GtkProgramMenu( p_intf, p_menubar_menu, GtkMenubarProgramToggle );
+        
+        p_intf->p_sys->b_program_update = 0;
+    }
+    
     if( p_intf->p_sys->b_title_update )
     { 
         char            psz_title[5];

@@ -208,6 +208,15 @@
 
 	    <widget>
 	      <class>GtkMenuItem</class>
+	      <name>menubar_program</name>
+	      <sensitive>False</sensitive>
+	      <tooltip>Choose the program</tooltip>
+	      <label>Progr_am</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
 	      <name>menubar_title</name>
 	      <sensitive>False</sensitive>
 	      <tooltip>Choose title</tooltip>

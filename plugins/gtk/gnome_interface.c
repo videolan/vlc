@@ -67,6 +67,13 @@ static GnomeUIInfo menubar_view_menu_uiinfo[] =
   },
   GNOMEUIINFO_SEPARATOR,
   {
+    GNOME_APP_UI_ITEM, N_("Progr_am"),
+    N_("Choose the program"),
+    (gpointer) NULL, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
     GNOME_APP_UI_ITEM, N_("_Title"),
     N_("Choose title"),
     (gpointer) NULL, NULL, NULL,
@@ -271,42 +278,48 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[3].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_title",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_program",
                             menubar_view_menu_uiinfo[3].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_set_sensitive (menubar_view_menu_uiinfo[3].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[4].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_chapter",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_title",
                             menubar_view_menu_uiinfo[4].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_set_sensitive (menubar_view_menu_uiinfo[4].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[5].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_angle",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_chapter",
                             menubar_view_menu_uiinfo[5].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_set_sensitive (menubar_view_menu_uiinfo[5].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[6].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator7",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_angle",
                             menubar_view_menu_uiinfo[6].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[6].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[7].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_playlist",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator7",
                             menubar_view_menu_uiinfo[7].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[8].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_modules",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_playlist",
                             menubar_view_menu_uiinfo[8].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[8].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[9].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_messages",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_modules",
                             menubar_view_menu_uiinfo[9].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[9].widget, FALSE);
+
+  gtk_widget_ref (menubar_view_menu_uiinfo[10].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_messages",
+                            menubar_view_menu_uiinfo[10].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_uiinfo[2].widget);

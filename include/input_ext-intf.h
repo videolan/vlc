@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.59 2002/02/15 13:32:52 sam Exp $
+ * $Id: input_ext-intf.h,v 1.60 2002/02/24 21:36:20 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -351,6 +351,7 @@ int    input_ChangeES       ( struct input_thread_s *,
 int    input_ToggleES       ( struct input_thread_s *,
                               struct es_descriptor_s *, boolean_t );
 int    input_ChangeArea     ( struct input_thread_s *, struct input_area_s * );
+int    input_ChangeProgram  ( struct input_thread_s *, u16 );
 int    input_ToggleGrayscale( struct input_thread_s * );
 int    input_ToggleMute     ( struct input_thread_s * );
 int    input_SetSMP         ( struct input_thread_s *, int );
@@ -362,5 +363,6 @@ int    input_SetSMP         ( struct input_thread_s *, int );
 #   define input_ChangeES       p_symbols->input_ChangeES
 #   define input_ToggleES       p_symbols->input_ToggleES
 #   define input_ChangeArea     p_symbols->input_ChangeArea
+#   define input_ChangeProgram  p_symbols->input_ChangeProgram
 #endif
 

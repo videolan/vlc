@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.14 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: gtk_display.c,v 1.15 2002/02/24 21:36:20 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -181,6 +181,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
         b_control = p_input_bank->pp_input[0]->stream.b_pace_control;
 
         /* get ready for menu regeneration */
+        p_intf->p_sys->b_program_update = 1;
         p_intf->p_sys->b_title_update = 1;
         p_intf->p_sys->b_chapter_update = 1;
         p_intf->p_sys->b_angle_update = 1;
@@ -211,6 +212,8 @@ gint GtkModeManage( intf_thread_t * p_intf )
             gtk_widget_show( GTK_WIDGET( p_file_box ) );
 
             /* unsensitize menus */
+            gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_program"),
+                    FALSE );
             gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_title"), FALSE );
             gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_chapter"),
                                       FALSE );
