@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include "interpreter.hpp"
+#include "expr_evaluator.hpp"
 #include "../commands/cmd_playlist.hpp"
 #include "../commands/cmd_dialogs.hpp"
 #include "../commands/cmd_dummy.hpp"
@@ -74,6 +75,13 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "vlc.faster()", CmdFaster )
     REGISTER_CMD( "vlc.slower()", CmdSlower )
     REGISTER_CMD( "vlc.stop()", CmdStop )
+
+    // Register the constant bool variables in the var manager
+    VarManager *pVarManager = VarManager::instance( getIntf() );
+    VarBool *pVarTrue = new VarBoolTrue( getIntf() );
+    pVarManager->registerVar( VariablePtr( pVarTrue ), "true" );
+    VarBool *pVarFalse = new VarBoolFalse( getIntf() );
+    pVarManager->registerVar( VariablePtr( pVarFalse ), "false" );
 }
 
 
@@ -165,74 +173,101 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
 
 VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
 {
-    // Try to get the variable from the variable manager
     VarManager *pVarManager = VarManager::instance( getIntf() );
-    VarBool *pVar = (VarBool*)pVarManager->getVar( rName, "bool" );
 
-    if( pVar )
+   // Convert the expression into Reverse Polish Notation
+    ExprEvaluator *pEvaluator = new ExprEvaluator( getIntf() );
+    pEvaluator->parse( rName );
+
+    list<VarBool*> varStack;
+
+    // Get the first token from the RPN stack
+    string token = pEvaluator->getToken();
+    while( !token.empty() )
     {
-        return pVar;
-    }
-    else if( rName.find( " and " ) != string::npos )
-    {
-        int leftPos = rName.find( " and " );
-        string name1 = rName.substr( 0, leftPos );
-        int rightPos = leftPos + 5;   // 5 is the size of " and "
-        string name2 = rName.substr( rightPos, rName.size() - rightPos );
-        // Retrive the two boolean variables
-        VarBool *pVar1 = getVarBool( name1, pTheme );
-        VarBool *pVar2 = getVarBool( name2, pTheme );
-        // Create a composite boolean variable
-        if( pVar1 && pVar2 )
+        if( token == "and" )
         {
+            // Get the 2 last variables on the stack
+            if( varStack.empty() )
+            {
+                msg_Err( getIntf(), "Invalid boolean expression: %s",
+                         rName.c_str());
+                return NULL;
+            }
+            VarBool *pVar1 = varStack.back();
+            varStack.pop_back();
+            if( varStack.empty() )
+            {
+                msg_Err( getIntf(), "Invalid boolean expression: %s",
+                         rName.c_str());
+                return NULL;
+            }
+            VarBool *pVar2 = varStack.back();
+            varStack.pop_back();
+
+            // Create a composite boolean variable
             VarBool *pNewVar = new VarBoolAndBool( getIntf(), *pVar1, *pVar2 );
+            varStack.push_back( pNewVar );
             // Register this variable in the manager
-            pVarManager->registerVar( VariablePtr( pNewVar ), rName );
-            return pNewVar;
+            pVarManager->registerVar( VariablePtr( pNewVar ) );
         }
-        else
+        else if( token == "not" )
         {
-            return NULL;
-        }
-    }
-    else if( rName.find( "not " ) != string::npos )
-    {
-        int rightPos = rName.find( "not " ) + 4;
-        string name = rName.substr( rightPos, rName.size() - rightPos );
-        // Retrive the boolean variable
-        VarBool *pVar = getVarBool( name, pTheme );
-        // Create a composite boolean variable
-        if( pVar )
-        {
+            // Get the last variable on the stack
+            if( varStack.empty() )
+            {
+                msg_Err( getIntf(), "Invalid boolean expression: %s",
+                         rName.c_str());
+                return NULL;
+            }
+            VarBool *pVar = varStack.back();
+            varStack.pop_back();
+
+            // Create a composite boolean variable
             VarBool *pNewVar = new VarNotBool( getIntf(), *pVar );
+            varStack.push_back( pNewVar );
             // Register this variable in the manager
-            pVarManager->registerVar( VariablePtr( pNewVar ), rName );
-            return pNewVar;
+            pVarManager->registerVar( VariablePtr( pNewVar ) );
+        }
+        else if( token.find( ".isVisible" ) != string::npos )
+        {
+            int leftPos = token.find( ".isVisible" );
+            string windowId = token.substr( 0, leftPos );
+            TopWindow *pWin = pTheme->getWindowById( windowId );
+            if( pWin )
+            {
+                // Push the visibility variable on the stack
+                varStack.push_back( &pWin->getVisibleVar() );
+            }
+            else
+            {
+                msg_Err( getIntf(), "Unknown window (%s)", windowId.c_str() );
+                return NULL;
+            }
         }
         else
         {
-            return NULL;
+            // Try to get the variable from the variable manager
+            VarBool *pVar = (VarBool*)pVarManager->getVar( token, "bool" );
+            if( !pVar )
+            {
+                msg_Err( getIntf(), "Cannot resolve boolean variable: %s",
+                         token.c_str());
+                return NULL;
+            }
+            varStack.push_back( pVar );
         }
+        // Get the first token from the RPN stack
+        token = pEvaluator->getToken();
     }
-    else if( rName.find( ".isVisible" ) != string::npos )
+
+    // The stack should contain a single variable
+    if( varStack.size() != 1 )
     {
-        int leftPos = rName.find( ".isVisible" );
-        string windowId = rName.substr( 0, leftPos );
-        TopWindow *pWin = pTheme->getWindowById( windowId );
-        if( pWin )
-        {
-            return &pWin->getVisibleVar();
-        }
-        else
-        {
-            msg_Err( getIntf(), "Unknown window (%s)", windowId.c_str() );
-            return NULL;
-        }
-    }
-    else
-    {
+        msg_Err( getIntf(), "Invalid boolean expression: %s", rName.c_str() );
         return NULL;
     }
+    return varStack.back();
 }
 
 

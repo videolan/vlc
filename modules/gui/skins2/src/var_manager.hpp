@@ -2,7 +2,7 @@
  * var_manager.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_manager.hpp,v 1.3 2004/01/24 13:08:12 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -39,8 +39,11 @@ class VarManager: public SkinObject
         /// Delete the instance of VarManager
         static void destroy( intf_thread_t *pIntf );
 
-        /// Register a variable in the manager
+        /// Register a named variable in the manager
         void registerVar( const VariablePtr &rcVar, const string &rName );
+
+        /// Register an anonymous variable in the manager
+        void registerVar( const VariablePtr &rcVar );
 
         /// Get a variable by its name (NULL if not found)
         Variable *getVar( const string &rName );
@@ -59,10 +62,12 @@ class VarManager: public SkinObject
         VarText m_tooltipText;
         /// Help text
         VarText m_helpText;
-        /// Map of registerd variables
+        /// Map of named registered variables
         map<string, VariablePtr> m_varMap;
-        /// List of registed variables
+        /// List of named registed variables
         list<string> m_varList;
+        /// List of anonymous registed variables
+        list<VariablePtr> m_anonVarList;
 
         /// Private because it is a singleton
         VarManager( intf_thread_t *pIntf );

@@ -49,6 +49,26 @@ class VarBool: public Variable, public Subject<VarBool>
 };
 
 
+/// Constant true VarBool
+class VarBoolTrue: public VarBool
+{
+    public:
+        VarBoolTrue( intf_thread_t *pIntf ): VarBool( pIntf ) {}
+        virtual ~VarBoolTrue() {}
+        virtual bool get() const { return true; }
+};
+
+
+/// Constant false VarBool
+class VarBoolFalse: public VarBool
+{
+    public:
+        VarBoolFalse( intf_thread_t *pIntf ): VarBool( pIntf ) {}
+        virtual ~VarBoolFalse() {}
+        virtual bool get() const { return false; }
+};
+
+
 /// Boolean variable implementation (read/write)
 class VarBoolImpl: public VarBool
 {
@@ -77,6 +97,25 @@ class VarBoolAndBool: public VarBool, public Observer<VarBool>
 
         // Get the boolean value
         virtual bool get() const { return m_rVar1.get() && m_rVar2.get(); }
+
+        // Called when one of the observed variables is changed
+        void onUpdate( Subject<VarBool> &rVariable );
+
+    private:
+        /// Boolean variables
+        VarBool &m_rVar1, &m_rVar2;
+};
+
+
+/// Disjunction of two boolean variables (OR)
+class VarBoolOrBool: public VarBool, public Observer<VarBool>
+{
+    public:
+        VarBoolOrBool( intf_thread_t *pIntf, VarBool &rVar1, VarBool &rVar2 );
+        virtual ~VarBoolOrBool();
+
+        // Get the boolean value
+        virtual bool get() const { return m_rVar1.get() || m_rVar2.get(); }
 
         // Called when one of the observed variables is changed
         void onUpdate( Subject<VarBool> &rVariable );

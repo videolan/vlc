@@ -2,7 +2,7 @@
  * var_manager.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_manager.cpp,v 1.3 2004/01/24 13:08:12 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -34,10 +34,16 @@ VarManager::VarManager( intf_thread_t *pIntf ): SkinObject( pIntf ),
 VarManager::~VarManager()
 {
     // Delete the variables in the reverse order they were added
-    list<string>::const_iterator it;
-    for( it = m_varList.begin(); it != m_varList.end(); it++ )
+    list<string>::const_iterator it1;
+    for( it1 = m_varList.begin(); it1 != m_varList.end(); it1++ )
     {
-        m_varMap.erase(*it);
+        m_varMap.erase(*it1);
+    }
+
+    // Delete the anonymous variables
+    while( !m_anonVarList.empty() )
+    {
+        m_anonVarList.pop_back();
     }
 }
 
@@ -70,7 +76,13 @@ void VarManager::destroy( intf_thread_t *pIntf )
 void VarManager::registerVar( const VariablePtr &rcVar, const string &rName )
 {
     m_varMap[rName] = rcVar;
-    m_varList.push_front(rName);
+    m_varList.push_front( rName );
+}
+
+
+void VarManager::registerVar( const VariablePtr &rcVar )
+{
+    m_anonVarList.push_back( rcVar );
 }
 
 

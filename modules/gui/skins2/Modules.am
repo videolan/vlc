@@ -70,6 +70,8 @@ SOURCES_skins2 = \
 	parser/builder.cpp \
 	parser/builder.hpp \
 	parser/builder_data.hpp \
+	parser/expr_evaluator.cpp \
+	parser/expr_evaluator.hpp \
 	parser/interpreter.cpp \
 	parser/interpreter.hpp \
 	parser/skin_parser.cpp \

@@ -44,7 +44,7 @@ void VarBoolImpl::set( bool value )
 }
 
 
-VarBoolAndBool::VarBoolAndBool( intf_thread_t *pIntf,  VarBool &rVar1,
+VarBoolAndBool::VarBoolAndBool( intf_thread_t *pIntf, VarBool &rVar1,
                                 VarBool &rVar2 ):
     VarBool( pIntf ), m_rVar1( rVar1 ), m_rVar2( rVar2 )
 {
@@ -61,6 +61,28 @@ VarBoolAndBool::~VarBoolAndBool()
 
 
 void VarBoolAndBool::onUpdate( Subject<VarBool> &rVariable )
+{
+    notify();
+}
+
+
+VarBoolOrBool::VarBoolOrBool( intf_thread_t *pIntf, VarBool &rVar1,
+                              VarBool &rVar2 ):
+    VarBool( pIntf ), m_rVar1( rVar1 ), m_rVar2( rVar2 )
+{
+    m_rVar1.addObserver( this );
+    m_rVar2.addObserver( this );
+}
+
+
+VarBoolOrBool::~VarBoolOrBool()
+{
+    m_rVar1.delObserver( this );
+    m_rVar2.delObserver( this );
+}
+
+
+void VarBoolOrBool::onUpdate( Subject<VarBool> &rVariable )
 {
     notify();
 }
