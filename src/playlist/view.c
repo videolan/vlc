@@ -317,6 +317,7 @@ int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
         else if( b_delete_items )
         {
             /* Delete the item here */
+            playlist_Delete( p_playlist, p_root->pp_children[i]->input.i_id );
         }
     }
     return VLC_SUCCESS;

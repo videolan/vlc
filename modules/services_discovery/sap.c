@@ -342,6 +342,8 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
+
+    playlist_t *p_playlist;
     int i;
 
     for( i = p_sys->i_fd-1 ; i >= 0 ; i-- )
@@ -357,6 +359,15 @@ static void Close( vlc_object_t *p_this )
     for( i = p_sys->i_announces  - 1;  i>= 0; i-- )
     {
         RemoveAnnounce( p_sd, p_sys->pp_announces[i] );
+    }
+
+    p_playlist = (playlist_t *) vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
+                                                 FIND_ANYWHERE );
+
+    if( p_playlist )
+    {
+        playlist_NodeDelete( p_playlist, p_sys->p_node, VLC_TRUE );
+        vlc_object_release( p_playlist );
     }
 
     free( p_sys );
@@ -473,12 +484,17 @@ static int Demux( demux_t *p_demux )
 
    playlist_t *p_playlist;
 
+   if( !psz_sdp )
+   {
+        return -1;
+   }
+
    /* Gather the complete sdp file */
    for( ;; )
    {
+        fprintf(stderr,"read %i at %p\n",i_max_sdp - i_sdp - 1, &psz_sdp[i_sdp]);
         int i_read = stream_Read( p_demux->s,
                                   &psz_sdp[i_sdp], i_max_sdp - i_sdp - 1 );
-
 
         if( i_read < 0 )
 
