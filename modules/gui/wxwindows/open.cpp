@@ -608,11 +608,11 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
 
     static const wxString disc_type_array[] =
     {
-        wxU(_("DVD (menus support)")),
+        wxU(_("DVD (menus)")),
         wxU(_("DVD")),
         wxU(_("VCD")),
         wxU(_("Audio CD")),
-        wxU(_("DVD (experimental)"))
+        wxU(_("DVD (test)"))
     };
 
     disc_type = new wxRadioBox( panel, DiscType_Event, wxU(_("Disc type")),
