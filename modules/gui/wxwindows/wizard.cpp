@@ -239,7 +239,6 @@ class wizInputPage : public wxWizardPage
         OpenDialog *p_open_dialog;
         wxListView *listview;
         wxPanel *open_panel;
-        wxPanel *pl_panel;
         wxWizardPage *p_prev;
         wxWizardPage *p_streaming_page;
         wxWizardPage *p_transcode_page;
@@ -530,11 +529,13 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
     p_parent = (WizardDialog *)parent;
     b_chosen = false;
     p_open_dialog = NULL;
-    pl_panel = NULL;
+    listview = NULL;    
     mainSizer = new wxBoxSizer(wxVERTICAL);
 
     /* Create the texts */
     pageHeader( this, mainSizer, INPUT_TITLE, INPUT_TEXT );
+
+    mainSizer->Add( 0,20,0 );
 
     /* Create the radio buttons */
     input_radios[0] = new wxRadioButton( this, InputRadio0_Event ,
@@ -568,10 +569,8 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
     {
         if( p_playlist->i_size > 0)
         {
-            pl_panel = new wxPanel(this, -1);
-            wxBoxSizer *plSizer = new wxBoxSizer( wxHORIZONTAL );
-            listview = new wxListView( pl_panel, ListView_Event,
-                                       wxDefaultPosition, wxSize(300,300),
+            listview = new wxListView( this, ListView_Event,
+                                       wxDefaultPosition, wxDefaultSize,
                                        wxLC_REPORT | wxSUNKEN_BORDER );
             listview->InsertColumn( 0, wxU(_("Name")) );
             listview->InsertColumn( 1, wxU(_("URI")) );
@@ -586,13 +585,10 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
                                                             input.psz_uri) );
             }
             listview->Select( p_playlist->i_index , TRUE);
-            plSizer->Add( listview, 1, wxALL | wxEXPAND , 5 );
-            pl_panel->SetSizer( plSizer );
-            plSizer->Layout();
-            mainSizer->Add( pl_panel, 1, wxALL|wxEXPAND, 5 );
+            mainSizer->Add( listview, 1, wxALL|wxEXPAND, 5 );
 
-            pl_panel->Hide();
-            mainSizer->Hide( pl_panel );
+            listview->Hide();
+            mainSizer->Hide( listview );
             mainSizer->Layout();
         }
         else
@@ -653,10 +649,10 @@ void wizInputPage::OnInputChange(wxEvent& event)
     i_input = event.GetId() - InputRadio0_Event;
     if( i_input == 0 )
     {
-        if( pl_panel )
+        if( listview )
         {
-            pl_panel->Hide();
-            mainSizer->Hide( pl_panel );
+            listview->Hide();
+            mainSizer->Hide( listview );
             open_panel->Show();
             mainSizer->Show( open_panel );
             mainSizer->Layout();
@@ -666,8 +662,8 @@ void wizInputPage::OnInputChange(wxEvent& event)
     {
         open_panel->Hide();
         mainSizer->Hide( open_panel );
-        pl_panel->Show();
-        mainSizer->Show( pl_panel );
+        listview->Show();
+        mainSizer->Show( listview );
         mainSizer->Layout();
     }
 }
