@@ -2400,7 +2400,7 @@ AC_CHECK_HEADERS(png.h, [
     AX_ADD_LDFLAGS([logo],[-lpng -lz])
     AX_ADD_PLUGINS([logo])
     AX_ADD_LDFLAGS([svcdsub],[-lpng -lz])
-    AX_ADD_LDFLAGS([cvdsub],[-lpng -lz])
+    AX_ADD_LDFLAGS([cvdsub],[-lpng -lz -lm])
     AC_DEFINE(HAVE_LIBPNG, [], [Define if you have the PNG library: libpng])])
 
 dnl
@@ -2681,7 +2681,7 @@ dnl
 dnl Roku HD1000 Video output module
 dnl
 AC_ARG_ENABLE(hd1000v,
-  [  --enable-hd1000v        HD1000 Video Output module (default enabled on HD1 000)])
+  [  --enable-hd1000v        HD1000 Video Output module (default enabled on HD1000)])
 if test "${enable_hd1000v}" != "no" &&
   (test "${SYS}" != "mingw32" || test "${enable_hd1000v}" = "yes")
 then
@@ -2697,7 +2697,7 @@ then
   if test "$can_build_roku" = "yes"
   then
     AX_ADD_PLUGINS([hd1000v])
-    AX_ADD_LDFLAGS([hd1000v],[-lCascade])
+    AX_ADD_LDFLAGS([hd1000v],[-lCascade -ldvbpsi -lmad])
   fi
   AC_LANG_POP([C++])
 fi
@@ -3160,7 +3160,7 @@ dnl
 dnl  PDA Gtk+2 module
 dnl
 AC_ARG_ENABLE(pda,
-  [  --enable-pda          PDA interface needs Gtk2 support (default disabled)])
+  [  --enable-pda            PDA interface needs Gtk2 support (default disabled)])
 if test "x${enable_pda}" = "xyes"
 then
   PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
