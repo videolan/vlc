@@ -2,7 +2,7 @@
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ps.c,v 1.8 2003/03/03 14:19:09 massiot Exp $
+ * $Id: ps.c,v 1.9 2003/03/09 23:39:05 jlj Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -219,6 +219,20 @@ static int Activate( vlc_object_t * p_this )
                         {
                         case -1:
                         case REQUESTED_MPEG:
+                            input_SelectES( p_input, p_es );
+                        }
+                        break;
+
+                    case VLC_FOURCC('d','t','s',' '):
+                    case VLC_FOURCC('d','t','s','b'):
+                        if( config_GetInt( p_input, "audio-channel" )
+                                == ((p_es->i_id & 0x700) >> 8) ||
+                           ( config_GetInt( p_input, "audio-channel" ) < 0
+                              && !((p_es->i_id & 0x700) >> 8) ) )
+                        switch( config_GetInt( p_input, "audio-type" ) )
+                        {
+                        case -1:
+                        case REQUESTED_DTS:
                             input_SelectES( p_input, p_es );
                         }
                         break;

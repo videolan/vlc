@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.10 2003/02/08 19:10:21 massiot Exp $
+ * $Id: system.c,v 1.11 2003/03/09 23:39:05 jlj Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -873,6 +873,24 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                         {
                         case -1:
                         case REQUESTED_MPEG:
+                            input_SelectES( p_input, p_es );
+                        }
+#endif
+                    }
+                    else if( (i_id & 0xF8FF) == 0x88BD )
+                    {
+                        p_es->i_fourcc = VLC_FOURCC('d','t','s','b');
+                        p_es->i_cat = AUDIO_ES;
+#ifdef AUTO_SPAWN
+                        if( !p_input->stream.b_seekable )
+                        if( config_GetInt( p_input, "audio-channel" )
+                                == ((p_es->i_id & 0x700) >> 8) ||
+                            ( config_GetInt( p_input, "audio-channel" ) < 0
+                              && !((p_es->i_id & 0x700) >> 8)) )
+                        switch( config_GetInt( p_input, "audio-type" ) )
+                        {
+                        case -1:
+                        case REQUESTED_DTS:
                             input_SelectES( p_input, p_es );
                         }
 #endif

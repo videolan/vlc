@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.85 2003/02/08 22:20:28 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.86 2003/03/09 23:39:05 jlj Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -33,6 +33,7 @@
 #define REQUESTED_MPEG         1
 #define REQUESTED_A52          2
 #define REQUESTED_LPCM         3
+#define REQUESTED_DTS          4
 #define REQUESTED_NOAUDIO    255
 
 #define OFFSETTOTIME_MAX_SIZE       10
