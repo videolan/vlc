@@ -2,7 +2,7 @@
  * dts.c: parse DTS audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dts.c,v 1.16 2004/02/06 18:15:44 gbazin Exp $
+ * $Id: dts.c,v 1.17 2004/02/07 00:56:44 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -334,7 +334,9 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
 
     p_dec->fmt_out.audio.i_rate     = p_sys->i_rate;
     p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
-    p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->i_frame_size;
+    /* Hack for DTS S/PDIF filter which needs to pad the DTS frames */
+    p_dec->fmt_out.audio.i_bytes_per_frame =
+        __MAX( p_sys->i_frame_size, p_sys->i_frame_length * 4 );
     p_dec->fmt_out.audio.i_frame_length = p_sys->i_frame_length;
 
     p_dec->fmt_out.audio.i_original_channels = p_sys->i_channels_conf;
