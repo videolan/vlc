@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.35 2002/12/25 21:02:35 massiot Exp $
+##  $Id: bootstrap,v 1.36 2002/12/25 22:05:16 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -275,7 +275,9 @@ fi
 if test "$do_po" = "yes"
 then
   cd po
-  make update-po #2>&1 | grep '^[^:]*:$' | cut -f1 -d: | tr '\n' ' ' | sed 's/ $//'
+  rm -f vlc.pot
+  make vlc.pot
+  make update-po
   cd ..
 
   exit 0

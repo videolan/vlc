@@ -62,6 +62,7 @@ if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
   INCLUDES="${INCLUDES} -I\\\$(top_srcdir)/intl"
 fi
 AM_CONDITIONAL(BUILD_INTL, test "${nls_cv_force_use_gnu_gettext}" = "yes")
+XGETTEXT="${XGETTEXT} --keyword=_NS"
 
 dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL

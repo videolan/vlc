@@ -15,6 +15,7 @@ EXTRA_DIST = FAQ HACKING MAINTAINERS STATUS src/extras/COPYING \
 MOSTLYCLEANFILES =
 BUILT_SOURCES =
 SUFFIXES = 
+NULL =
 
 # List of programs, libraries and headers that need to be built and/or
 # distributed. Initialized to empty because we'll use += later.

@@ -1,3 +1,4 @@
+NULL =
 EXTRA_DIST = \
 	patch \
 	control \
