@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.195.2.3 2002/07/19 21:12:18 massiot Exp $
+ * $Id: main.c,v 1.195.2.4 2002/07/19 21:14:40 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -396,7 +396,6 @@ ADD_INTEGER ( "server-port", 1234, NULL, SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT 
 ADD_BOOL    ( "network-channel", 0, NULL, NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT )
 ADD_STRING  ( "channel-server", "localhost", NULL, CHAN_SERV_TEXT, CHAN_SERV_LONGTEXT )
 ADD_INTEGER ( "channel-port", 6010, NULL, CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT )
-ADD_INTEGER ( "server-port", 1234, NULL, SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT )
 ADD_INTEGER ( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT )
 ADD_STRING  ( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT )
 
