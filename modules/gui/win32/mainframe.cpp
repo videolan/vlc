@@ -216,6 +216,11 @@ void __fastcall TMainFrameDlg::FullscreenActionExecute( TObject *Sender )
 {
     vout_thread_t *p_vout;
 
+    if( p_intf->p_sys->p_input == NULL )
+    {
+        return;
+    }
+
     p_vout = (vout_thread_t *)vlc_object_find( p_intf->p_sys->p_input,
                                                VLC_OBJECT_VOUT, FIND_CHILD );
     if( p_vout == NULL )
