@@ -732,9 +732,6 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
                      p_input->stream.pp_programs[0]->pp_es[i_new_es_number] );
     }
 
-    msg_Dbg( p_input, "the stream map after the PSM is now:" );
-    input_DumpStream( p_input );
-
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 

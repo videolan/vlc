@@ -297,7 +297,6 @@ static int Activate( vlc_object_t * p_this )
             }
         }
 #endif
-        input_DumpStream( p_input );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     else
