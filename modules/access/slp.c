@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.15 2003/09/07 22:49:05 fenrir Exp $
+ * $Id: slp.c,v 1.16 2003/09/14 16:41:48 zorglub Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -134,7 +134,7 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
 {
     input_thread_t * p_input = (input_thread_t  *)p_cookie;
     playlist_t * p_playlist;
-    char psz_item[42] = "udp:@";
+    char psz_item[42] = ""; //"udp:@";
     char * psz_s;                           /* to hold the uri of the stream */
     SLPHandle slph_slp3;
     SLPError slpe_result;

@@ -2,7 +2,7 @@
  * visual.c : Visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.c,v 1.6 2003/09/10 10:21:09 zorglub Exp $
+ * $Id: visual.c,v 1.7 2003/09/14 16:41:48 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -72,8 +72,6 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 #define STARS_TEXT N_( "Number of stars" )
 #define STARS_LONGTEXT N_( \
         "Defines the number of stars to draw with random effect" )
-
-//static char *effect_list[] = { "dummy", "random", "scope", "spectrum", NULL };
 
 vlc_module_begin();
     add_category_hint( N_("visualizer") , NULL , VLC_FALSE);
@@ -176,7 +174,7 @@ static int Open( vlc_object_t *p_this )
         }
         
         p_current_effect = p_current_effect -> p_next;
-        p_current_effect->psz_func = NULL;
+        p_current_effect->psz_func = strdup("dummy");
         p_current_effect->p_next = NULL;
         p_current_effect->i_width = p_filter->p_sys->i_width;
         p_current_effect->i_height = p_filter->p_sys->i_height;
@@ -196,8 +194,8 @@ static int Open( vlc_object_t *p_this )
 #endif
         if(! ( strncasecmp(psz_effects,"dummy",5) &&
                strncasecmp(psz_effects,"scope",5) &&
-               strncasecmp(psz_effects,"spectrum",5) &&
-               strncasecmp(psz_effects,"random",5) ) )
+               strncasecmp(psz_effects,"spectrum",8) &&
+               strncasecmp(psz_effects,"random",6) ) )
             p_current_effect->psz_func = strdup( psz_effects ) ;
         
         p_current_effect->psz_args  = NULL;
@@ -228,19 +226,19 @@ static int Open( vlc_object_t *p_this )
 
     /* Open the video output */
     p_filter->p_sys->p_vout =
-    /*     vout_Request( p_filter, NULL,
+         vout_Request( p_filter, NULL,
                          p_filter->p_sys->i_width, 
                          p_filter->p_sys->i_height,
                   VLC_FOURCC('I','4','2','0'), 
                   VOUT_ASPECT_FACTOR * p_filter->p_sys->i_width/
-                  p_filter->p_sys->i_height  );        */
+                  p_filter->p_sys->i_height  );        
 
-            vout_Create( p_filter, 
+/*            vout_Create( p_filter, 
                          p_filter->p_sys->i_width, 
                          p_filter->p_sys->i_height,
                          VLC_FOURCC('I','4','2','0'), 
                          VOUT_ASPECT_FACTOR * p_filter->p_sys->i_width/
-                         p_filter->p_sys->i_height );
+                         p_filter->p_sys->i_height );*/
     
     if( p_filter->p_sys->p_vout == NULL )
     {
@@ -281,7 +279,7 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     {
             if(p_aout->b_die )
                return;
-            msleep( 2 );
+            msleep( VOUT_OUTMEM_SLEEP );
     }
 
     /* Blank the picture */

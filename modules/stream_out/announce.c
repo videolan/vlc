@@ -406,15 +406,17 @@ static char * sout_SLPBuildName(char *psz_url,char *psz_name)
     char *psz_service;
     unsigned int i_size;
 
-    /* name to build is: service:$(name).videolan://$(url) */
+    /* name to build is: service:vlc.services.videolan://$(url) */
 
-    i_size =  8 + strlen(psz_name) + 12 + strlen(psz_url) + 1;
+    i_size =  8 + 12 + 12 + 5 + strlen(psz_url) + 1;
 
     psz_service=(char *)malloc(i_size * sizeof(char));
 
     snprintf( psz_service , i_size, 
-              "service:%s.videolan://%s",
-              psz_name,psz_url);
+              "service:vlc.services.videolan://udp:@%s",
+              psz_url);
+        /* How piggy  ! */
+      
     psz_service[i_size]='\0'; /* Just to make sure */    
 
     return psz_service;
