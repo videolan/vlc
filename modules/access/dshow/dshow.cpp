@@ -84,20 +84,6 @@ static void PropertiesPage( vlc_object_t *, IBaseFilter *,
  *  u8      data
  */
 
-static void SetDWBE( uint8_t *p, uint32_t dw )
-{
-    p[0] = (dw >> 24)&0xff;
-    p[1] = (dw >> 16)&0xff;
-    p[2] = (dw >>  8)&0xff;
-    p[3] = (dw      )&0xff;
-}
-
-static void SetQWBE( uint8_t *p, uint64_t qw )
-{
-    SetDWBE( p, (qw >> 32)&0xffffffff );
-    SetDWBE( &p[4], qw&0xffffffff );
-}
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
