@@ -269,7 +269,7 @@ void PrefsDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     prefs_tree->CleanChanges();
 }
 
-void PrefsDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
+void PrefsDialog::OnCancel( wxEvent& WXUNUSED(event) )
 {
     this->Hide();
     prefs_tree->CleanChanges();

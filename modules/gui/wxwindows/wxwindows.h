@@ -774,7 +774,7 @@ private:
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnOk( wxCommandEvent& event );
-    void OnCancel( wxCommandEvent& event );
+    void OnCancel( wxEvent& event );
     void OnSave( wxCommandEvent& event );
     void OnResetAll( wxCommandEvent& event );
     void OnAdvanced( wxCommandEvent& event );
@@ -842,7 +842,7 @@ private:
     void OnAddFile( wxCommandEvent& event );
     void OnAddDir( wxCommandEvent& event );
     void OnAddMRL( wxCommandEvent& event );
-    void OnClose( wxCommandEvent& event );
+    void OnClose( wxCloseEvent& event );
 
     void OnEnableSelection( wxCommandEvent& event );
     void OnDisableSelection( wxCommandEvent& event );
@@ -895,12 +895,12 @@ private:
     playlist_item_t *p_popup_item;
     playlist_item_t *p_popup_parent;
     void OnPopup( wxContextMenuEvent& event );
-    void OnPopupPlay( wxMenuEvent& event );
-    void OnPopupPreparse( wxMenuEvent& event );
-    void OnPopupSort( wxMenuEvent& event );
-    void OnPopupDel( wxMenuEvent& event );
-    void OnPopupEna( wxMenuEvent& event );
-    void OnPopupInfo( wxMenuEvent& event );
+    void OnPopupPlay( wxCommandEvent& event );
+    void OnPopupPreparse( wxCommandEvent& event );
+    void OnPopupSort( wxCommandEvent& event );
+    void OnPopupDel( wxCommandEvent& event );
+    void OnPopupEna( wxCommandEvent& event );
+    void OnPopupInfo( wxCommandEvent& event );
     void Rebuild( vlc_bool_t );
 
     void Preparse( playlist_t *p_playlist );

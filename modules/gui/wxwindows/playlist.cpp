@@ -957,7 +957,7 @@ void Playlist::DeleteNode( playlist_item_t *p_item )
 }
 
 
-void Playlist::OnClose( wxCommandEvent& WXUNUSED(event) )
+void Playlist::OnClose( wxCloseEvent& WXUNUSED(event) )
 {
     Hide();
 }
@@ -1452,7 +1452,7 @@ void Playlist::OnPopup( wxContextMenuEvent& event )
     }
 }
 
-void Playlist::OnPopupPlay( wxMenuEvent& event )
+void Playlist::OnPopupPlay( wxCommandEvent& event )
 {
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -1491,7 +1491,7 @@ void Playlist::OnPopupPlay( wxMenuEvent& event )
     vlc_object_release( p_playlist );
 }
 
-void Playlist::OnPopupPreparse( wxMenuEvent& event )
+void Playlist::OnPopupPreparse( wxCommandEvent& event )
 {
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -1528,7 +1528,7 @@ void Playlist::Preparse( playlist_t *p_playlist )
     }
 }
 
-void Playlist::OnPopupDel( wxMenuEvent& event )
+void Playlist::OnPopupDel( wxCommandEvent& event )
 {
     PlaylistItem *p_wxitem;
 
@@ -1544,7 +1544,7 @@ void Playlist::OnPopupDel( wxMenuEvent& event )
     }
 }
 
-void Playlist::OnPopupSort( wxMenuEvent& event )
+void Playlist::OnPopupSort( wxCommandEvent& event )
 {
     PlaylistItem *p_wxitem;
 
@@ -1570,7 +1570,7 @@ void Playlist::OnPopupSort( wxMenuEvent& event )
     }
 }
 
-void Playlist::OnPopupInfo( wxMenuEvent& event )
+void Playlist::OnPopupInfo( wxCommandEvent& event )
 {
     if( p_popup_item )
     {

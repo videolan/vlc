@@ -159,7 +159,7 @@ void ConfigControl::SetUpdateCallback( void (*p_callback)( void * ),
     p_update_data = p_data;
 }
 
-void ConfigControl::OnUpdate( wxCommandEvent& WXUNUSED(event) )
+void ConfigControl::OnUpdate( wxEvent& WXUNUSED(event) )
 {
     if( pf_update_callback )
     {
@@ -743,7 +743,7 @@ int IntegerConfigControl::GetIntValue()
     return i_value; //spin->GetValue();
 }
 
-void IntegerConfigControl::OnUpdate( wxCommandEvent &event )
+void IntegerConfigControl::OnUpdate( wxScrollEvent &event )
 {
     i_value = event.GetInt();
     ConfigControl::OnUpdate( event );
