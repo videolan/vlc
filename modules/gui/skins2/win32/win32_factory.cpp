@@ -237,12 +237,6 @@ OSTooltip *Win32Factory::createOSTooltip()
 }
 
 
-const string Win32Factory::getDirSeparator() const
-{
-    return "\\";
-}
-
-
 int Win32Factory::getScreenWidth() const
 {
     return GetSystemMetrics(SM_CXSCREEN);
