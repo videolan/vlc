@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <vlc/aout.h>
+#include <vlc/vout.h>
 
 #include "vlcproc.hpp"
 #include "os_factory.hpp"
@@ -55,7 +56,8 @@ void VlcProc::destroy( intf_thread_t *pIntf )
 }
 
 
-VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf )
+VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ), m_pVoutWindow( NULL ),
+    m_pVout( NULL )
 {
     // Create a timer to poll the status of the vlc
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
@@ -73,7 +75,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf )
                               "playlist.slider" );
     REGISTER_VAR( m_cVarRandom, VarBoolImpl, "playlist.isRandom" )
     REGISTER_VAR( m_cVarLoop, VarBoolImpl, "playlist.isLoop" )
-    REGISTER_VAR( m_cVarTime, Time, "time" )
+    REGISTER_VAR( m_cVarTime, StreamTime, "time" )
     REGISTER_VAR( m_cVarVolume, Volume, "volume" )
     REGISTER_VAR( m_cVarStream, Stream, "stream" )
     REGISTER_VAR( m_cVarMute, VarBoolImpl, "vlc.isMute" ) // XXX broken
@@ -98,6 +100,11 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf )
     var_AddCallback( pIntf->p_sys->p_playlist, "item-change",
                      onItemChange, this );
 
+    // Callbacks for vout requests
+    getIntf()->pf_request_window = &getWindow;
+    getIntf()->pf_release_window = &releaseWindow;
+    getIntf()->pf_control_window = &controlWindow;
+
     getIntf()->p_sys->p_input = NULL;
 }
 
@@ -113,6 +120,18 @@ VlcProc::~VlcProc()
 }
 
 
+void VlcProc::setVoutWindow( void *pVoutWindow )
+{
+    m_pVoutWindow = pVoutWindow;
+    // Reparent the vout window
+    if( m_pVout )
+    {
+        if( vout_Control( m_pVout, VOUT_REPARENT ) != VLC_SUCCESS )
+            vout_Control( m_pVout, VOUT_CLOSE );
+    }
+}
+
+
 void VlcProc::manage()
 {
     // Did the user requested to quit vlc ?
@@ -124,7 +143,7 @@ void VlcProc::manage()
     }
 
     // Get the VLC variables
-    Time *pTime = (Time*)m_cVarTime.get();
+    StreamTime *pTime = (StreamTime*)m_cVarTime.get();
     Volume *pVolume = (Volume*)m_cVarVolume.get();
     VarBoolImpl *pVarPlaying = (VarBoolImpl*)m_cVarPlaying.get();
     VarBoolImpl *pVarStopped = (VarBoolImpl*)m_cVarStopped.get();
@@ -274,6 +293,31 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
     pQueue->remove( "notify playlist" );
     pQueue->push( CmdGenericPtr( pCmd ) );
 
+    return VLC_SUCCESS;
+}
+
+
+void *VlcProc::getWindow( intf_thread_t *pIntf, vout_thread_t *pVout,
+                          int *pXHint, int *pYHint,
+                          unsigned int *pWidthHint,
+                          unsigned int *pHeightHint )
+{
+    VlcProc *pThis = pIntf->p_sys->p_vlcProc;
+    pThis->m_pVout = pVout;
+    return pThis->m_pVoutWindow;
+}
+
+
+void VlcProc::releaseWindow( intf_thread_t *pIntf, void *pWindow )
+{
+    VlcProc *pThis = pIntf->p_sys->p_vlcProc;
+    pThis->m_pVout = NULL;
+}
+
+
+int VlcProc::controlWindow( intf_thread_t *pIntf, void *pWindow,
+                            int query, va_list args )
+{
     return VLC_SUCCESS;
 }
 

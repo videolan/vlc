@@ -28,7 +28,7 @@
 #include <vlc/input.h>
 
 
-void Time::set( float percentage, bool updateVLC )
+void StreamTime::set( float percentage, bool updateVLC )
 {
     VarPercent::set( percentage );
 
@@ -43,7 +43,7 @@ void Time::set( float percentage, bool updateVLC )
 }
 
 
-const string Time::getAsStringPercent() const
+const string StreamTime::getAsStringPercent() const
 {
     int value = (int)(100. * get());
     // 0 <= value <= 100, so we need 4 chars
@@ -56,7 +56,7 @@ const string Time::getAsStringPercent() const
 }
 
 
-const string Time::getAsStringCurrTime() const
+const string StreamTime::getAsStringCurrTime() const
 {
     if( getIntf()->p_sys->p_input == NULL ||
         !getIntf()->p_sys->p_input->stream.b_seekable )
@@ -71,7 +71,7 @@ const string Time::getAsStringCurrTime() const
 }
 
 
-const string Time::getAsStringTimeLeft() const
+const string StreamTime::getAsStringTimeLeft() const
 {
     if( getIntf()->p_sys->p_input == NULL ||
         !getIntf()->p_sys->p_input->stream.b_seekable )
@@ -87,7 +87,7 @@ const string Time::getAsStringTimeLeft() const
 }
 
 
-const string Time::getAsStringDuration() const
+const string StreamTime::getAsStringDuration() const
 {
     if( getIntf()->p_sys->p_input == NULL ||
         !getIntf()->p_sys->p_input->stream.b_seekable )
@@ -102,7 +102,7 @@ const string Time::getAsStringDuration() const
 }
 
 
-const string Time::formatTime( int seconds ) const
+const string StreamTime::formatTime( int seconds ) const
 {
     char *psz_time = new char[MSTRTIME_MAX_SIZE];
     snprintf( psz_time, MSTRTIME_MAX_SIZE, "%d:%02d:%02d",

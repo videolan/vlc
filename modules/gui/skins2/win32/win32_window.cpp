@@ -25,6 +25,7 @@
 #ifdef WIN32_SKINS
 
 #include "../src/generic_window.hpp"
+#include "../src/vlcproc.hpp"
 #include "win32_window.hpp"
 #include "win32_dragdrop.hpp"
 #include "win32_factory.hpp"
@@ -78,12 +79,11 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         // Register the window as a drop target
         RegisterDragDrop( m_hWnd, m_pDropTarget );
     }
-    // XXX: Kludge to tell VLC that this window is the vout
+
+    // XXX Set this window as the vout
     if( pParentWindow )
     {
-        vlc_value_t value;
-        value.i_int = (int) (ptrdiff_t) (void *) m_hWnd;
-        var_Set( getIntf()->p_vlc, "drawable", value );
+        VlcProc::instance( getIntf() )->setVoutWindow( (void*)m_hWnd );
     }
 }
 

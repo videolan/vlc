@@ -80,7 +80,7 @@ void ExprEvaluator::parse( const string &rExpr )
             // TODO compare to a set of operators
             if( token == "not" || token == "or" || token == "and" )
             {
-                // Pop the operator stock while the operator has a higher
+                // Pop the operator stack while the operator has a higher
                 // precedence than the top of the stack
                 while( !opStack.empty() &&
                        hasPrecedency( token, opStack.back() ) )

@@ -27,6 +27,7 @@
 #include <X11/Xatom.h>
 
 #include "../src/generic_window.hpp"
+#include "../src/vlcproc.hpp"
 #include "x11_window.hpp"
 #include "x11_display.hpp"
 #include "x11_graphics.hpp"
@@ -108,24 +109,21 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     // Associate the window to the main "parent" window
     XSetTransientForHint( XDISPLAY, m_wnd, m_rDisplay.getMainWindow() );
 
-    // XXX Kludge to tell VLC that this window is the vout
+    // XXX Set this window as the vout
     if( m_pParent )
     {
-        vlc_value_t value;
-        value.i_int = (int) (ptrdiff_t) (void *) m_wnd;
-        var_Set( getIntf()->p_vlc, "drawable", value );
+        VlcProc::instance( getIntf() )->setVoutWindow( (void*)m_wnd );
     }
+
 }
 
 
 X11Window::~X11Window()
 {
-    // XXX Kludge to tell VLC that this window is no more the vout
+    // XXX This window is no more the vout
     if( m_pParent )
     {
-        vlc_value_t value;
-        value.i_int = 0;
-        var_Set( getIntf()->p_vlc, "drawable", value );
+        VlcProc::instance( getIntf() )->setVoutWindow( NULL );
     }
 
     X11Factory *pFactory = (X11Factory*)X11Factory::instance( getIntf() );

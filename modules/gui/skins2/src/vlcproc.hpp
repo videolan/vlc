@@ -49,7 +49,7 @@ class VlcProc: public SkinObject
         Playlist &getPlaylistVar() { return *((Playlist*)m_cPlaylist.get()); }
 
         /// Getter for the time variable
-        Time &getTimeVar() { return *((Time*)(m_cVarTime.get())); }
+        StreamTime &getTimeVar() { return *((StreamTime*)(m_cVarTime.get())); }
 
         /// Getter for the volume variable
         Volume &getVolumeVar() { return *((Volume*)(m_cVarVolume.get())); }
@@ -71,6 +71,9 @@ class VlcProc: public SkinObject
 
         /// Getter for the seekable variable
         VarBool &getIsSeekableVar() { return *((VarBool*)(m_cVarSeekable.get())); }
+
+        /// Set the vout window handle
+        void setVoutWindow( void *pVoutWindow );
 
     protected:
         // Protected because it is a singleton
@@ -97,6 +100,10 @@ class VlcProc: public SkinObject
         VariablePtr m_cVarStopped;
         VariablePtr m_cVarPaused;
         VariablePtr m_cVarSeekable;
+        /// Vout window hanlde
+        void *m_pVoutWindow;
+        /// Vout thread
+        vout_thread_t *m_pVout;
 
         /// Poll VLC internals to update the status (volume, current time in
         /// the stream, current filename, play/pause/stop status, ...)
@@ -123,6 +130,19 @@ class VlcProc: public SkinObject
         static int onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
                                      vlc_value_t oldVal, vlc_value_t newVal,
                                      void *pParam );
+
+        /// Callback to request a vout window
+        static void *getWindow( intf_thread_t *pIntf, vout_thread_t *pVout,
+                                int *pXHint, int *pYHint,
+                                unsigned int *pWidthHint,
+                                unsigned int *pHeightHint );
+
+        /// Callback to release a vout window
+        static void releaseWindow( intf_thread_t *pIntf, void *pWindow );
+
+        /// Callback to change a vout window
+        static int controlWindow( intf_thread_t *pIntf, void *pWindow,
+                                  int query, va_list args );
 };
 
 

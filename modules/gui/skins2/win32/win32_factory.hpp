@@ -90,7 +90,6 @@ class Win32Factory: public OSFactory
         /// Map to find the GenericWindow associated with a Win32Window
         map<HWND, GenericWindow*> m_windowMap;
 
-
         /// Functions dynamically loaded from the dll, because they don't exist
         /// on Win9x/NT4
         // We dynamically load msimg32.dll to get a pointer to TransparentBlt()

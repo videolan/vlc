@@ -28,12 +28,12 @@
 #include "../utils/var_percent.hpp"
 #include <string>
 
-/// Variable for VLC volume
-class Time: public VarPercent
+/// Variable for VLC strem time
+class StreamTime: public VarPercent
 {
     public:
-        Time( intf_thread_t *pIntf ): VarPercent( pIntf ) {}
-        virtual ~Time() {}
+        StreamTime( intf_thread_t *pIntf ): VarPercent( pIntf ) {}
+        virtual ~StreamTime() {}
 
         virtual void set( float percentage, bool updateVLC );
 
