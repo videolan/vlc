@@ -6,8 +6,8 @@ AC_CANONICAL_SYSTEM
 CONFIGURE_LINE="$0 $*"
 
 PACKAGE="vlc"
-VERSION="0.4.0"
-CODENAME=Ourumov
+VERSION="0.5.0-cvs"
+CODENAME="Natalya"
 
 dnl
 dnl  Save *FLAGS

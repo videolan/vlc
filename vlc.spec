@@ -1,7 +1,7 @@
 
 
 %define name 		vlc
-%define vlc_ver 	0.4.0
+%define vlc_ver 	0.5.0-cvs
 %define version		%vlc_ver
 
 %define cvs     	0
