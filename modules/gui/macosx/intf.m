@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.40 2003/01/30 15:39:38 hartman Exp $
+ * $Id: intf.m,v 1.41 2003/01/30 15:46:29 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -648,7 +648,7 @@ static void Run( intf_thread_t *p_intf )
         vlc_object_release( p_playlist );
     }
     
-    if ( b_input = ( p_intf->p_sys->p_input != NULL ) )
+    if ( ( b_input = ( p_intf->p_sys->p_input != NULL ) ) )
     {
         /* control buttons for free pace streams */
         b_control = p_intf->p_sys->p_input->stream.b_pace_control;
