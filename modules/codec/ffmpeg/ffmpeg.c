@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.72 2004/01/08 21:48:43 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.73 2004/01/08 22:02:29 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -582,10 +582,11 @@ static struct
     { VLC_FOURCC('4','x','m','v'), CODEC_ID_4XM,
       VIDEO_ES, "4X Technologies Video" },
 
+#if LIBAVCODEC_BUILD >= 4694
     /* Duck TrueMotion */
     { VLC_FOURCC('D','U','C','K'), CODEC_ID_TRUEMOTION1,
       VIDEO_ES, "Duck TrueMotion v1 Video" },
-
+#endif
 
     /*
      *  Audio Codecs
