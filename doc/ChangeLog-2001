@@ -488,8 +488,7 @@
 
 2001-12-10 Monday 10:58  massiot
 
- * MPEG-1 aspect ratio patch, courtesy of Vladimir Chernyshov
-   <greengrass@writeme.com> ;
+ * MPEG-1 aspect ratio patch, courtesy of Vladimir Chernyshov.
  * Seeking patch for X11, courtesy of Peter Surda <shurdeek@panorama.sth.ac.at>.
 
 2001-12-10 Monday 04:54  sam

@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.15 2003/12/30 21:55:48 zorglub Exp $
+$Id: THANKS,v 1.16 2004/02/19 18:55:34 courmisch Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -67,7 +67,7 @@ Thomas Graf <tgraf@europe.com> - gettext support, German translation
 Thomas L. Wood <twood@lucent.com> - fixed a bug in QuantMatrixExtension
 Valek Filippov <frob@df.ru> - Russian translation
 Vicente Jimenez Aguilar <vice@v1ce.net> - Spanish translation
-Vladimir Chernyshov <greengrass@writeme.com> - MMX motion optimizations
+Vladimir Chernyshov - MMX motion optimizations
 Wade Majors <guru@startrek.com> - BeOS icon integration, debugging and fixes
 Watanabe Go <go@dsl.gr.jp> - fix for non-ASCII filenames
 Xavier Maillard <zedek@fxgsproject.org> - audio converters

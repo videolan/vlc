@@ -5868,12 +5868,12 @@
 
  (ported from v0_4_1_branch)
    * ./plugins/motion/motionmmx.c: MMX motion optimizations courtesy of
-     Vladimir Chernyshov <greengrass@writeme.com>.
+     Vladimir Chernyshov.
 
 2002-06-02 Sunday 23:17  sam
 
    * ./plugins/motion/motionmmx.c: MMX motion optimizations courtesy of
-     Vladimir Chernyshov <greengrass@writeme.com>.
+     Vladimir Chernyshov.
 
 2002-06-02 Sunday 23:11  sam
 
