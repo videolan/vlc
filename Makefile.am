@@ -518,7 +518,7 @@ VLC.app: vlc
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
 	cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'
-	cp -r $(top_builddir)/tmp/extras/MacOSX/build/vlc.bundle \
+	cp -r $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	      $(top_builddir)/VLC.app
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS

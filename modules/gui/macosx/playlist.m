@@ -53,7 +53,7 @@
 #include "intf.h"
 #include "playlist.h"
 #include "controls.h"
-#include <OSD.h>
+#include "osd.h"
 
 /*****************************************************************************
  * VLCPlaylistView implementation 
