@@ -399,8 +399,7 @@ public:
         ,psz_segment_filename(NULL)
         ,psz_title(NULL)
         ,psz_date_utc(NULL)
-        ,i_current_edition(-1)
-        ,psz_current_chapter(NULL)
+        ,i_default_edition(0)
         ,sys(demuxer)
         ,ep(NULL)
         ,b_preloaded(false)
@@ -491,22 +490,14 @@ public:
     char                    *psz_title;
     char                    *psz_date_utc;
 
-    std::vector<chapter_edition_t> editions;
-    int                            i_current_edition;
-    const chapter_item_t           *psz_current_chapter;
+    std::vector<chapter_edition_t> stored_editions;
+    int                            i_default_edition;
 
     std::vector<KaxSegmentFamily>  families;
     
     demux_sys_t                    & sys;
     EbmlParser                     *ep;
     bool                           b_preloaded;
-
-    inline chapter_edition_t *Edition()
-    {
-        if ( i_current_edition >= 0 && size_t(i_current_edition) < editions.size() )
-            return &editions[i_current_edition];
-        return NULL;
-    }
 
     bool Preload( );
     bool PreloadFamily( const matroska_segment_t & segment );
@@ -534,6 +525,8 @@ class virtual_segment_t
 public:
     virtual_segment_t( matroska_segment_t *p_segment )
         :i_current_segment(0)
+        ,i_current_edition(-1)
+        ,psz_current_chapter(NULL)
     {
         linked_segments.push_back( p_segment );
 
@@ -547,13 +540,29 @@ public:
     void PreloadLinked( );
     float Duration( ) const;
     void LoadCues( );
-    void Seek( mtime_t i_date, mtime_t i_time_offset );
+    void Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, const chapter_item_t *psz_chapter );
+
+    inline chapter_edition_t *Edition()
+    {
+        if ( i_current_edition >= 0 && size_t(i_current_edition) < editions.size() )
+            return &editions[i_current_edition];
+        return NULL;
+    }
+    
+    inline bool EditionIsOrdered() const
+    {
+        return (editions.size() != 0 && i_current_edition >= 0 && editions[i_current_edition].b_ordered);
+    }
 
     matroska_segment_t * Segment() const
     {
         if ( linked_segments.size() == 0 || i_current_segment >= linked_segments.size() )
             return NULL;
         return linked_segments[i_current_segment];
+    }
+
+    inline const chapter_item_t *CurrentChapter() const {
+        return psz_current_chapter;
     }
 
     bool SelectNext()
@@ -567,11 +576,16 @@ public:
     }
 
 /* TODO handle/merge chapters here */
+    void UpdateCurrentToChapter( demux_t & demux );
 
 protected:
     std::vector<matroska_segment_t*> linked_segments;
     std::vector<KaxSegmentUID>       linked_uids;
     size_t                           i_current_segment;
+
+    std::vector<chapter_edition_t>   editions;
+    int                              i_current_edition;
+    const chapter_item_t             *psz_current_chapter;
 
     void                             AppendUID( const EbmlBinary & UID );
 };
@@ -719,7 +733,6 @@ static int Open( vlc_object_t * p_this )
     p_stream->p_in->setFilePointer( p_segment->cluster->GetElementPosition() );
 
     /* get the files from the same dir from the same family (based on p_demux->psz_path) */
-    /* TODO handle multi-segment files */
     if (p_demux->psz_path[0] != '\0' && !strcmp(p_demux->psz_access, ""))
     {
         // assume it's a regular file
@@ -845,7 +858,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_POSITION:
             pf = (double*)va_arg( args, double * );
             if ( p_sys->f_duration > 0.0 )
-                *pf = (double)p_sys->i_pts / (1000.0 * p_sys->f_duration);
+                *pf = (double)(p_sys->i_pts >= p_sys->i_start_pts ? p_sys->i_pts : p_sys->i_start_pts ) / (1000.0 * p_sys->f_duration);
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
@@ -1572,44 +1585,43 @@ void matroska_segment_t::UnSelect( )
     }
 }
 
-static void UpdateCurrentToChapter( demux_t & demux )
+void virtual_segment_t::UpdateCurrentToChapter( demux_t & demux )
 {
     demux_sys_t & sys = *demux.p_sys;
-    matroska_segment_t *p_segment = sys.p_current_segment->Segment();
     const chapter_item_t *psz_curr_chapter;
 
     /* update current chapter/seekpoint */
-    if ( p_segment->editions.size())
+    if ( editions.size() )
     {
         /* 1st, we need to know in which chapter we are */
-        psz_curr_chapter = p_segment->editions[p_segment->i_current_edition].FindTimecode( sys.i_pts );
+        psz_curr_chapter = editions[i_current_edition].FindTimecode( sys.i_pts );
 
         /* we have moved to a new chapter */
-        if (p_segment->psz_current_chapter != NULL && psz_curr_chapter != NULL && p_segment->psz_current_chapter != psz_curr_chapter)
+        if (psz_curr_chapter != NULL && psz_current_chapter != psz_curr_chapter)
         {
-            if (p_segment->psz_current_chapter->i_seekpoint_num != psz_curr_chapter->i_seekpoint_num && psz_curr_chapter->i_seekpoint_num > 0)
+            if (psz_current_chapter->i_seekpoint_num != psz_curr_chapter->i_seekpoint_num && psz_curr_chapter->i_seekpoint_num > 0)
             {
                 demux.info.i_update |= INPUT_UPDATE_SEEKPOINT;
                 demux.info.i_seekpoint = psz_curr_chapter->i_seekpoint_num - 1;
             }
 
-            if (p_segment->editions[p_segment->i_current_edition].b_ordered )
+            if ( editions[i_current_edition].b_ordered )
             {
                 /* TODO check if we need to silently seek to a new location in the stream (switch to another chapter) */
-                if (p_segment->psz_current_chapter->i_end_time != psz_curr_chapter->i_start_time)
+                if (psz_current_chapter->i_end_time != psz_curr_chapter->i_start_time)
                     Seek(&demux, sys.i_pts, -1, psz_curr_chapter);
                 /* count the last duration time found for each track in a table (-1 not found, -2 silent) */
                 /* only seek after each duration >= end timecode of the current chapter */
             }
 
-//            p_segment->i_user_time = psz_curr_chapter->i_user_start_time - psz_curr_chapter->i_start_time;
-//            p_segment->i_start_pts = psz_curr_chapter->i_user_start_time;
+//            i_user_time = psz_curr_chapter->i_user_start_time - psz_curr_chapter->i_start_time;
+//            i_start_pts = psz_curr_chapter->i_user_start_time;
         }
-        p_segment->psz_current_chapter = psz_curr_chapter;
+        psz_current_chapter = psz_curr_chapter;
     }
 }
 
-static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chapter_item_t *psz_chapter)
+static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chapter_item_t *psz_chapter )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_t  *p_vsegment = p_sys->p_current_segment;
@@ -1686,29 +1698,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
         }
     }
 
-    // find the actual time for an ordered edition
-    if ( psz_chapter == NULL )
-    {
-        if ( p_segment->editions.size() && p_segment->editions[p_segment->i_current_edition].b_ordered )
-        {
-            /* 1st, we need to know in which chapter we are */
-            psz_chapter = p_segment->editions[p_segment->i_current_edition].FindTimecode( i_date );
-        }
-    }
-
-    if ( psz_chapter != NULL )
-    {
-        p_segment->psz_current_chapter = psz_chapter;
-        p_sys->i_chapter_time = i_time_offset = psz_chapter->i_user_start_time - psz_chapter->i_start_time;
-        p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-        p_demux->info.i_seekpoint = psz_chapter->i_seekpoint_num - 1;
-    }
-
-//    p_sys->i_start_pts = i_date;
-
-//    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
-
-    p_vsegment->Seek( i_date, i_time_offset );
+    p_vsegment->Seek( *p_demux, i_date, i_time_offset, psz_chapter );
 }
 
 /*****************************************************************************
@@ -1719,8 +1709,9 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
 static int Demux( demux_t *p_demux)
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
-    matroska_segment_t *p_segment = p_sys->p_current_segment->Segment();
-    if ( p_segment == NULL ) return 0;
+    virtual_segment_t  *p_vsegment = p_sys->p_current_segment;
+    matroska_segment_t *p_segmet = p_vsegment->Segment();
+    if ( p_segmet == NULL ) return 0;
     int                i_block_count = 0;
 
     KaxBlock *block;
@@ -1731,20 +1722,20 @@ static int Demux( demux_t *p_demux)
     for( ;; )
     {
         if( p_sys->i_pts >= p_sys->i_start_pts  )
-            UpdateCurrentToChapter( *p_demux );
+            p_vsegment->UpdateCurrentToChapter( *p_demux );
         
-        if ( p_segment->editions.size() && p_segment->editions[p_segment->i_current_edition].b_ordered && p_segment->psz_current_chapter == NULL )
+        if ( p_vsegment->EditionIsOrdered() && p_vsegment->CurrentChapter() == NULL )
         {
             /* nothing left to read in this ordered edition */
-            if ( !p_sys->p_current_segment->SelectNext() )
+            if ( !p_vsegment->SelectNext() )
                 return 0;
-            p_segment->UnSelect( );
+            p_segmet->UnSelect( );
             
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             /* switch to the next segment */
-            p_segment = p_sys->p_current_segment->Segment();
-            if ( !p_segment->Select( 0 ) )
+            p_segmet = p_vsegment->Segment();
+            if ( !p_segmet->Select( 0 ) )
             {
                 msg_Err( p_demux, "Failed to select new segment" );
                 return 0;
@@ -1752,30 +1743,30 @@ static int Demux( demux_t *p_demux)
             continue;
         }
 
-        if( p_segment->BlockGet( &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        if( p_segmet->BlockGet( &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
-            if ( p_segment->editions.size() && p_segment->editions[p_segment->i_current_edition].b_ordered )
+            if ( p_vsegment->EditionIsOrdered() )
             {
                 // check if there are more chapters to read
-                if ( p_segment->psz_current_chapter != NULL )
+                if ( p_vsegment->CurrentChapter() != NULL )
                 {
-                    p_sys->i_pts = p_segment->psz_current_chapter->i_user_end_time;
+                    p_sys->i_pts = p_vsegment->CurrentChapter()->i_user_end_time;
                     return 1;
                 }
 
                 return 0;
             }
             msg_Warn( p_demux, "cannot get block EOF?" );
-            p_segment->UnSelect( );
+            p_segmet->UnSelect( );
             
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             /* switch to the next segment */
-            if ( !p_sys->p_current_segment->SelectNext() )
+            if ( !p_vsegment->SelectNext() )
                 // no more segments in this stream
                 return 0;
-            p_segment = p_sys->p_current_segment->Segment();
-            if ( !p_segment->Select( 0 ) )
+            p_segmet = p_vsegment->Segment();
+            if ( !p_segmet->Select( 0 ) )
             {
                 msg_Err( p_demux, "Failed to select new segment" );
                 return 0;
@@ -2994,7 +2985,6 @@ void matroska_segment_t::ParseChapters( EbmlElement *chapters )
     EbmlMaster  *m;
     unsigned int i;
     int i_upper_level = 0;
-    int i_default_edition = 0;
     float f_dur;
 
     /* Master elements */
@@ -3033,14 +3023,14 @@ void matroska_segment_t::ParseChapters( EbmlElement *chapters )
                 else if( MKV_IS_ID( l, KaxEditionFlagDefault ) )
                 {
                     if (uint8(*static_cast<KaxEditionFlagDefault *>( l )) != 0)
-                        i_default_edition = editions.size();
+                        i_default_edition = stored_editions.size();
                 }
                 else
                 {
                     msg_Dbg( &sys.demuxer, "|   |   |   + Unknown (%s)", typeid(*l).name() );
                 }
             }
-            editions.push_back( edition );
+            stored_editions.push_back( edition );
         }
         else
         {
@@ -3048,17 +3038,15 @@ void matroska_segment_t::ParseChapters( EbmlElement *chapters )
         }
     }
 
-    for( i = 0; i < editions.size(); i++ )
+    for( i = 0; i < stored_editions.size(); i++ )
     {
-        editions[i].RefreshChapters( *sys.title );
+        stored_editions[i].RefreshChapters( *sys.title );
     }
     
-    i_current_edition = i_default_edition;
-    
-    if ( editions[i_default_edition].b_ordered )
+    if ( stored_editions[i_default_edition].b_ordered )
     {
         /* update the duration of the segment according to the sum of all sub chapters */
-        f_dur = editions[i_default_edition].Duration() / I64C(1000);
+        f_dur = stored_editions[i_default_edition].Duration() / I64C(1000);
         if (f_dur > 0.0)
             f_duration = f_dur;
     }
@@ -3327,7 +3315,7 @@ const chapter_item_t *chapter_edition_t::FindTimecode( mtime_t i_user_timecode )
 
 void demux_sys_t::PreloadFamily( )
 {
-/* family handling disabled  for the moment
+/* TODO enable family handling again
     matroska_stream_t *p_stream = Stream();
     if ( p_stream )
     {
@@ -3577,31 +3565,38 @@ void matroska_segment_t::Seek( mtime_t i_date, mtime_t i_time_offset )
     int64_t     i_block_ref1;
     int64_t     i_block_ref2;
     size_t      i_track;
+    int64_t     i_seek_position = i_start_pos;
+    int64_t     i_seek_time = f_start_time * 1000;
 
-    int         i_idx = 0;
-
-    for( ; i_idx < i_index; i_idx++ )
+    if ( i_index > 0 )
     {
-        if( index[i_idx].i_time + i_time_offset > i_date )
+        int i_idx = 0;
+
+        for( ; i_idx < i_index; i_idx++ )
         {
-            break;
+            if( index[i_idx].i_time + i_time_offset > i_date )
+            {
+                break;
+            }
         }
-    }
 
-    if( i_idx > 0 )
-    {
-        i_idx--;
+        if( i_idx > 0 )
+        {
+            i_idx--;
+        }
+
+        i_seek_position = index[i_idx].i_position;
+        i_seek_time = index[i_idx].i_time;
     }
 
     msg_Dbg( &sys.demuxer, "seek got "I64Fd" (%d%%)",
-                index[i_idx].i_time,
-                (int)( 100 * index[i_idx].i_position / stream_Size( sys.demuxer.s ) ) );
+                i_seek_time, (int)( 100 * i_seek_position / stream_Size( sys.demuxer.s ) ) );
 
     delete ep;
     ep = new EbmlParser( &es, segment );
     cluster = NULL;
 
-    es.I_O().setFilePointer( index[i_idx].i_position, seek_beginning );
+    es.I_O().setFilePointer( i_seek_position, seek_beginning );
 
     sys.i_start_pts = i_date;
 
@@ -3666,9 +3661,29 @@ void matroska_segment_t::Seek( mtime_t i_date, mtime_t i_time_offset )
 #undef tk
 }
 
-void virtual_segment_t::Seek( mtime_t i_date, mtime_t i_time_offset )
+void virtual_segment_t::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, const chapter_item_t *psz_chapter )
 {
+    demux_sys_t *p_sys = demuxer.p_sys;
     size_t i;
+
+    // find the actual time for an ordered edition
+    if ( psz_chapter == NULL )
+    {
+        if ( EditionIsOrdered() )
+        {
+            /* 1st, we need to know in which chapter we are */
+            psz_chapter = editions[i_current_edition].FindTimecode( i_date );
+        }
+    }
+
+    if ( psz_chapter != NULL )
+    {
+        psz_current_chapter = psz_chapter;
+        p_sys->i_chapter_time = i_time_offset = psz_chapter->i_user_start_time - psz_chapter->i_start_time;
+        demuxer.info.i_update |= INPUT_UPDATE_SEEKPOINT;
+        demuxer.info.i_seekpoint = psz_chapter->i_seekpoint_num - 1;
+    }
+
     // find the best matching segment
     for ( i=0; i<linked_segments.size(); i++ )
     {
