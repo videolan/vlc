@@ -2,7 +2,7 @@
 # src/packages.mak : Archives locations
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN   
-# $Id: packages.mak,v 1.5 2003/12/07 22:23:00 hartman Exp $
+# $Id: packages.mak,v 1.6 2003/12/16 23:01:41 massiot Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -47,11 +47,12 @@ LIBID3TAG_VERSION=0.15.0b
 LIBID3TAG_URL=ftp://ftp.mars.org/pub/mpeg/libid3tag-$(LIBID3TAG_VERSION).tar.gz
 LIBMAD_VERSION=0.15.0b
 LIBMAD_URL=ftp://ftp.mars.org/pub/mpeg/libmad-$(LIBMAD_VERSION).tar.gz
-OGG_VERSION=20031111
+OGG_VERSION=1.1
 OGG_URL=$(VIDEOLAN)/libogg-$(OGG_VERSION).tar.gz
 OGG_CVSROOT=:pserver:anoncvs@xiph.org:/usr/local/cvsroot
 VORBIS_VERSION=1.0
 VORBIS_URL=http://www.xiph.org/ogg/vorbis/download/libvorbis-$(VORBIS_VERSION).tar.gz
+#VORBIS_URL=$(VIDEOLAN)/libvorbis-$(VORBIS_VERSION).tar.gz
 THEORA_VERSION=1.0alpha2
 THEORA_URL=http://www.theora.org/files/libtheora-$(THEORA_VERSION).tar.gz
 FLAC_VERSION=1.1.0

@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.8 2003/12/07 22:23:00 hartman Exp $
+# $Id: Makefile,v 1.9 2003/12/16 23:01:41 massiot Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -515,18 +515,18 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.gz
 # ffmpeg
 # ***************************************************************************
 
-ffmpeg:
-	cvs -d $(FFMPEG_CVSROOT) login
-	cvs -d $(FFMPEG_CVSROOT) co ffmpeg
-	patch -p 0 < Patches/ffmpeg.patch.cvs
-	(cd $@; ./bootstrap)
+#ffmpeg:
+#	cvs -d $(FFMPEG_CVSROOT) login
+#	cvs -d $(FFMPEG_CVSROOT) co ffmpeg
+#	patch -p 0 < Patches/ffmpeg.patch.cvs
+#	(cd $@; ./bootstrap)
 
-#ffmpeg-$(FFMPEG_VERSION).tar.gz:
-#	$(WGET) $(FFMPEG_URL)
-#
-#ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
-#	$(EXTRACT_GZ)
-#	patch -p 0 < Patches/ffmpeg.patch
+ffmpeg-$(FFMPEG_VERSION).tar.gz:
+	$(WGET) $(FFMPEG_URL)
+
+ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
+	$(EXTRACT_GZ)
+	patch -p 0 < Patches/ffmpeg.patch
 
 .ffmpeg: ffmpeg
 	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-mp3lame --enable-pp --disable-vhook --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
