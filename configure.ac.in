@@ -1726,8 +1726,13 @@ then
     then
       AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-gtk.])
     fi
-    CFLAGS_gtk="${CFLAGS_gtk} `${GTK_CONFIG} --cflags gtk gthread`"
-    LDFLAGS_gtk="${LDFLAGS_gtk} `${GTK_CONFIG} --libs gtk gthread | sed 's,-rdynamic,,'`"
+    if test "x${SYS}" != "xmingw32"; then
+      CFLAGS_gtk="${CFLAGS_gtk} `${GTK_CONFIG} --cflags gtk gthread`"
+      LDFLAGS_gtk="${LDFLAGS_gtk} `${GTK_CONFIG} --libs gtk gthread | sed 's,-rdynamic,,'`"
+    else
+      CFLAGS_gtk="${CFLAGS_gtk} `${GTK_CONFIG} --cflags gtk`"
+      LDFLAGS_gtk="${LDFLAGS_gtk} `${GTK_CONFIG} --libs gtk | sed 's,-rdynamic,,'`"
+    fi
     # now look for the gtk.h header
     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_gtk}"
     ac_cv_gtk_headers=yes
@@ -2070,8 +2075,10 @@ AC_ARG_ENABLE(st,
     fi])
 ])
 
-LDFLAGS_vlc="${LDFLAGS_vlc} ${THREAD_LIB}"
-LDFLAGS_plugins="${LDFLAGS_plugins} ${THREAD_LIB}"
+if test "x${SYS}" != "xmingw32"; then
+  LDFLAGS_vlc="${LDFLAGS_vlc} ${THREAD_LIB}"
+  LDFLAGS_plugins="${LDFLAGS_plugins} ${THREAD_LIB}"
+fi
 
 dnl
 dnl  Mozilla plugin

@@ -2,7 +2,7 @@
  * aout.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.2 2002/10/06 19:28:28 gbazin Exp $
+ * $Id: directx.c,v 1.3 2002/10/11 10:08:06 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -178,13 +178,6 @@ static int OpenAudio( vlc_object_t *p_this )
         CreateEvent( NULL, FALSE, FALSE, NULL );
 
     vlc_mutex_lock( &p_aout->output.p_sys->buffer_lock );
-
-    /* first release the current secondary buffer */
-    DirectxDestroySecondaryBuffer( p_aout );
-
-    /* calculate the frame size in bytes */
-    p_aout->output.p_sys->p_notif->i_buffer_size = FRAME_SIZE * sizeof(s16)
-                                            * p_aout->output.output.i_channels;
 
     /* then create a new secondary buffer */
     if( DirectxCreateSecondaryBuffer( p_aout ) )
@@ -363,26 +356,29 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
     DSBUFFERDESC         dsbdesc;
     DSBCAPS              dsbcaps;
 
+    if( p_aout->output.output.i_channels > 2 )
+        p_aout->output.output.i_channels = 2;
+
     /* First set the buffer format */
-    memset(&waveformat, 0, sizeof(WAVEFORMATEX)); 
-    waveformat.wFormatTag      = WAVE_FORMAT_PCM; 
+    memset(&waveformat, 0, sizeof(WAVEFORMATEX));
+    waveformat.wFormatTag      = WAVE_FORMAT_PCM;
     waveformat.nChannels       = p_aout->output.output.i_channels;
-    waveformat.nSamplesPerSec  = p_aout->output.output.i_rate; 
-    waveformat.wBitsPerSample  = 16; 
+    waveformat.nSamplesPerSec  = p_aout->output.output.i_rate;
+    waveformat.wBitsPerSample  = 16;
     waveformat.nBlockAlign     = waveformat.wBitsPerSample / 8 *
                                  waveformat.nChannels;
     waveformat.nAvgBytesPerSec = waveformat.nSamplesPerSec *
                                      waveformat.nBlockAlign;
 
     /* Then fill in the descriptor */
-    memset(&dsbdesc, 0, sizeof(DSBUFFERDESC)); 
-    dsbdesc.dwSize = sizeof(DSBUFFERDESC); 
+    memset(&dsbdesc, 0, sizeof(DSBUFFERDESC));
+    dsbdesc.dwSize = sizeof(DSBUFFERDESC);
     dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2/* Better position accuracy */
                     | DSBCAPS_CTRLPOSITIONNOTIFY     /* We need notification */
                     | DSBCAPS_GLOBALFOCUS;      /* Allows background playing */
     dsbdesc.dwBufferBytes = FRAME_SIZE * 2 /* frames*/ *      /* buffer size */
                             sizeof(s16) * p_aout->output.output.i_channels;
-    dsbdesc.lpwfxFormat = &waveformat; 
+    dsbdesc.lpwfxFormat = &waveformat;
  
     if( IDirectSound_CreateSoundBuffer( p_aout->output.p_sys->p_dsobject,
                                         &dsbdesc,
@@ -393,12 +389,15 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
         goto error;
     }
 
-    /* backup the size of the secondary sound buffer */
-    memset(&dsbcaps, 0, sizeof(DSBCAPS)); 
+    /* backup the size of a frame */
+    p_aout->output.p_sys->p_notif->i_buffer_size = FRAME_SIZE * sizeof(s16)
+                                            * p_aout->output.output.i_channels;
+
+    memset(&dsbcaps, 0, sizeof(DSBCAPS));
     dsbcaps.dwSize = sizeof(DSBCAPS);
     IDirectSoundBuffer_GetCaps( p_aout->output.p_sys->p_dsbuffer, &dsbcaps  );
-
-    msg_Dbg( p_aout, "DirectxCreateSecondaryBuffer: %li",
+    msg_Dbg( p_aout, "requested %li bytes buffer and got %li bytes.",
+             2 * p_aout->output.p_sys->p_notif->i_buffer_size,
              dsbcaps.dwBufferBytes );
 
     /* Now the secondary buffer is created, we need to setup its position
@@ -413,7 +412,7 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
                                 &IID_IDirectSoundNotify,
                                 (LPVOID *)&p_aout->output.p_sys->p_dsnotify ) )
     {
-        msg_Warn( p_aout, "cannot get Notify interface" );
+        msg_Err( p_aout, "cannot get Notify interface" );
         goto error;
     }
         
@@ -421,10 +420,9 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
                                     p_aout->output.p_sys->p_dsnotify, 2,
                                     p_aout->output.p_sys->p_notif->p_events ) )
     {
-        msg_Warn( p_aout, "cannot set position Notification" );
+        msg_Err( p_aout, "cannot set position Notification" );
         goto error;
     }
-
     p_aout->output.output.i_format = AOUT_FMT_S16_NE;
     p_aout->output.i_nb_samples = FRAME_SIZE;
 
@@ -486,13 +484,6 @@ static void DirectSoundThread( notification_thread_t *p_notif )
     /* Tell the main thread that we are ready */
     vlc_thread_ready( p_notif );
 
-    /* this thread must be high-priority */
-    if( !SetThreadPriority( GetCurrentThread(),
-                            THREAD_PRIORITY_ABOVE_NORMAL ) )
-    {
-        msg_Warn( p_notif, "DirectSoundThread could not raise its priority" );
-    }
-
     msg_Dbg( p_notif, "DirectSoundThread ready" );
 
     while( !p_notif->b_die )
@@ -546,8 +537,10 @@ static void DirectSoundThread( notification_thread_t *p_notif )
             continue;
         }
 
-        /* FIXME : take into account DirectSound latency instead of mdate() */
-        p_buffer = aout_OutputNextBuffer( p_aout, mdate(), VLC_FALSE );
+        /* We also take into account the latency instead of just mdate() */
+        p_buffer = aout_OutputNextBuffer( p_aout,
+            mdate() + 1000000 / p_aout->output.output.i_rate * FRAME_SIZE,
+            VLC_FALSE );
 
         /* Now do the actual memcpy into the circular buffer */
         if ( l_bytes1 != p_notif->i_buffer_size )
