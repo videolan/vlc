@@ -101,9 +101,9 @@ int spu_Init( spu_t *p_spu )
     char *psz_filter, *psz_filter_orig;
     vlc_value_t val;
 
-    /* If the user requested an SPU margin, we force the position. */
-    var_Create( p_spu, "spumargin", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_spu, "spumargin", &val );
+    /* If the user requested a sub margin, we force the position. */
+    var_Create( p_spu, "sub-margin", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_spu, "sub-margin", &val );
     p_spu->i_margin = val.i_int;
 
     var_Create( p_spu, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
