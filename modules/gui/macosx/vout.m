@@ -7,7 +7,7 @@
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Derk-Jan Hartman <thedj@users.sourceforge.net>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *          Eric Petit <titer@m0k.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -52,11 +52,8 @@
 
 struct picture_sys_t
 {
-    void *p_info;
+    void *p_data;
     unsigned int i_size;
-
-    /* When using I420 output */
-    PlanarPixmapInfoYUV420 pixmap_i420;
 };
 
 /*****************************************************************************
@@ -181,15 +178,15 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         vlc_mutex_lock( &p_vout->p_vlc->quicktime_lock );
 
         /* Can we find the right chroma ? */
-        err = FindCodec( kYUV420CodecType, bestSpeedCodec,
+        err = FindCodec( kComponentVideoUnsigned, bestSpeedCodec,
                             nil, &p_vout->p_sys->img_dc );
         
         vlc_mutex_unlock( &p_vout->p_vlc->quicktime_lock );
         
         if( err == noErr && p_vout->p_sys->img_dc != 0 )
         {
-            p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
-            p_vout->p_sys->i_codec = kYUV420CodecType;
+            p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+            p_vout->p_sys->i_codec = kComponentVideoUnsigned;
         }
         else
         {
@@ -532,13 +529,13 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
         OSErr err;
         CodecFlags flags;
 
-        if( ( err = DecompressSequenceFrameS( 
+        if( ( err = DecompressSequenceFrameWhen( 
                         p_vout->p_sys->i_seq,
-                        p_pic->p_sys->p_info,
+                        p_pic->p_sys->p_data,
                         p_pic->p_sys->i_size,                    
-                        codecFlagUseImageBuffer, &flags, nil ) != noErr ) )
+                        codecFlagUseImageBuffer, &flags, NULL, NULL ) != noErr ) )
         {
-            msg_Warn( p_vout, "DecompressSequenceFrameS failed: %d", err );
+            msg_Warn( p_vout, "DecompressSequenceFrameWhen failed: %d", err );
         }
         else
         {
@@ -931,9 +928,9 @@ static int QTCreateSequence( vout_thread_t *p_vout )
 
     p_descr->idSize = sizeof(ImageDescription);
     p_descr->cType = p_vout->p_sys->i_codec;
-    p_descr->version = 1;
+    p_descr->version = 2;
     p_descr->revisionLevel = 0;
-    p_descr->vendor = 'appl';
+    p_descr->vendor = 'mpla';
     p_descr->width = p_vout->output.i_width;
     p_descr->height = p_vout->output.i_height;
     p_descr->hRes = Long2Fix(72);
@@ -949,14 +946,15 @@ static int QTCreateSequence( vout_thread_t *p_vout )
     if( ( err = DecompressSequenceBeginS( 
                               &p_vout->p_sys->i_seq,
                               p_vout->p_sys->h_img_descr,
-                              NULL, 0,
+                              NULL,
+                              (p_descr->width * p_descr->height * 16) / 8,
                               p_vout->p_sys->p_qdport,
                               NULL, NULL,
                               p_vout->p_sys->p_matrix,
-                              0, NULL,
+                              srcCopy, NULL,
                               codecFlagUseImageBuffer,
                               codecLosslessQuality,
-                              p_vout->p_sys->img_dc ) ) )
+                              bestSpeedCodec ) ) )
     {
         msg_Err( p_vout, "DecompressSequenceBeginS failed: %d", err );
         return( 1 );
@@ -980,9 +978,6 @@ static void QTDestroySequence( vout_thread_t *p_vout )
  *****************************************************************************/
 static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    int i_width  = p_vout->output.i_width;
-    int i_height = p_vout->output.i_height;
-
     /* We know the chroma, allocate a buffer which will be used
      * directly by the decoder */
     p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
@@ -991,54 +986,28 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
         return( -1 );
     }
+    
+    vout_InitPicture( VLC_OBJECT( p_vout), p_pic, p_vout->output.i_chroma,
+                      p_vout->output.i_width, p_vout->output.i_height,
+                      p_vout->output.i_aspect );
 
     switch( p_vout->output.i_chroma )
     {
-        case VLC_FOURCC('I','4','2','0'):
-
-            p_pic->p_sys->p_info = (void *)&p_pic->p_sys->pixmap_i420;
-            p_pic->p_sys->i_size = sizeof(PlanarPixmapInfoYUV420);
+        case VLC_FOURCC('Y','U','Y','2'):
+            p_pic->p_sys->i_size = p_vout->output.i_width * p_vout->output.i_height * 2;
 
             /* Allocate the memory buffer */
             p_pic->p_data = vlc_memalign( &p_pic->p_data_orig,
-                                          16, i_width * i_height * 3 / 2 );
+                                          16, p_pic->p_sys->i_size );
 
-            /* Y buffer */
-            p_pic->Y_PIXELS = p_pic->p_data; 
-            p_pic->p[Y_PLANE].i_lines = i_height;
-            p_pic->p[Y_PLANE].i_pitch = i_width;
-            p_pic->p[Y_PLANE].i_pixel_pitch = 1;
-            p_pic->p[Y_PLANE].i_visible_pitch = i_width;
+            p_pic->p[0].p_pixels = p_pic->p_data;
+            p_pic->p[0].i_lines = p_vout->output.i_height;
+            p_pic->p[0].i_pitch = p_vout->output.i_width * 2;
+            p_pic->p[0].i_pixel_pitch = 1;
+            p_pic->p[0].i_visible_pitch = p_vout->output.i_width * 2;
+            p_pic->i_planes = 1;
 
-            /* U buffer */
-            p_pic->U_PIXELS = p_pic->Y_PIXELS + i_height * i_width;
-            p_pic->p[U_PLANE].i_lines = i_height / 2;
-            p_pic->p[U_PLANE].i_pitch = i_width / 2;
-            p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = i_width / 2;
-
-            /* V buffer */
-            p_pic->V_PIXELS = p_pic->U_PIXELS + i_height * i_width / 4;
-            p_pic->p[V_PLANE].i_lines = i_height / 2;
-            p_pic->p[V_PLANE].i_pitch = i_width / 2;
-            p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = i_width / 2;
-
-            /* We allocated 3 planes */
-            p_pic->i_planes = 3;
-
-#define P p_pic->p_sys->pixmap_i420
-            P.componentInfoY.offset = (void *)p_pic->Y_PIXELS
-                                       - p_pic->p_sys->p_info;
-            P.componentInfoCb.offset = (void *)p_pic->U_PIXELS
-                                        - p_pic->p_sys->p_info;
-            P.componentInfoCr.offset = (void *)p_pic->V_PIXELS
-                                        - p_pic->p_sys->p_info;
-
-            P.componentInfoY.rowBytes = i_width;
-            P.componentInfoCb.rowBytes = i_width / 2;
-            P.componentInfoCr.rowBytes = i_width / 2;
-#undef P
+            p_pic->p_sys->p_data = (void *)p_pic->p[0].p_pixels;
 
             break;
 
