@@ -1,24 +1,35 @@
-# This is borrowed and adapted from Mandrake's Cooker
-%define name 	vlc
-%define vlc_ver 0.2.92-dev
-%define version	%vlc_ver
+# The source tarball must be free of deCSS code..
+# ask me <yduret@mandrakesoft.com> before uploading
 
-# libdvdcss
-%define major   0
-%define lib_ver 1.0.1-dev
-%define lib_name libdvdcss%{major}
+%define name 		vlc
+%define vlc_ver 	0.2.92
+%define version		%vlc_ver
 
-%define cvs     0
-
-%if %{cvs}
-%define cvsdate 20011002
-%define release	0.%{cvsdate}
-%define cvs_name %{name}-snapshot-%{cvsdate}-00
+%define css		0
+%if %{css}
+%define css_src		%nil
 %else
-%define release 1
+%define css_src         -nocss
+%endif 
+%define css_name	libdvdcss
+%define css_version	1.0.0
+%define css_release	1mdk
+%define css_major	1
+%define css_lib_name	%{css_name}%{css_major}
+
+%define cvs     	0
+%if %{cvs}
+%define cvsdate 	20010619
+%define release		0.%{cvsdate}mdk
+%define cvs_name 	%{name}-snapshot-%{cvsdate}-00
+%else
+%define release 	2mdk
 %endif
 
-Summary:	VideoLAN is a free MPEG, MPEG-2 and DVD software solution.
+%define	plugin_qt	0
+%define	plugin_alsa	0
+
+Summary:	VideoLAN is a free MPEG, MPEG2 and DVD software solution.
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
@@ -26,39 +37,35 @@ Release:	%{release}
 %if %{cvs} 
 Source0:	http://www.videolan.org/pub/videolan/vlc/snapshots/%{cvs_name}.tar.bz2
 %else
-Source0:	http://www.videolan.org/pub/videolan/vlc/%{version}/%{name}-%{version}.tar.bz2
+Source0:	http://www.videolan.org/packages/%{version}/%{name}-%{version}%{css_src}.tar.bz2
 %endif
 License:	GPL
 Group:		Video
 URL:		http://videolan.org/
 BuildRoot:	%_tmppath/%name-%version-%release-root
-#This is for Mandrake :
-#Buildrequires:	libncurses5-devel
-#Buildrequires:	libqt2-devel
-#Buildrequires:	libgtk+1.2-devel
-#Buildrequires:	gnome-libs-devel
-#Buildrequires:	db1-devel
-#This is for RedHat :
-Buildrequires: ncurses-devel
-Buildrequires: qt-devel
-Buildrequires: gtk+-devel
-Buildrequires: gnome-libs-devel
-Buildrequires: SDL-devel
-Buildrequires: db1
+Buildrequires:	libncurses5-devel
+Buildrequires:	libqt2-devel
+Buildrequires:	libgtk+1.2-devel
+Buildrequires:	gnome-libs-devel
+Buildrequires:	db1-devel
+Buildrequires:	alsa-lib-devel
+Buildrequires:	libggi-devel
 
 %description
 VideoLAN is a free network-aware MPEG and DVD player.
-The VideoLAN Client allows to play MPEG-2 Transport Streams from the
+The VideoLAN Client allows to play MPEG2 Transport Streams from the
 network or from a file, as well as direct DVD playback.
 VideoLAN is a project of students from the Ecole Centrale Paris.
-This version add MPEG-1 support, direct DVD support, DVD decryption, 
+This version add MPEG1 support, direct DVD support, DVD decryption, 
 arbitrary, seeking in the stream, pause, fast forward and slow motion, 
 hardware YUV acceleration and a few new interface features 
 including drag'n'drop.
 You may install vlc-gnome, vlc-gtk and vlc-qt vlc-gnome vlc-ncurses.
+This package contains no deCSS functionality.
+You need the decss library available from http://www.videolan.org
 
 %package gtk
-Summary: Gtk plug-in for VideoLAN, a DVD and MPEG-2 player
+Summary: Gtk plug-in for VideoLAN, a DVD and Mpeg-2 player
 Group: Video
 Requires: %{name} = %{version}
 %description gtk
@@ -68,7 +75,7 @@ install vlc-gtk.
 
 
 %package gnome
-Summary: Gnome plug-in for VideoLAN, a DVD and MPEG-2 player
+Summary: Gnome plug-in for VideoLAN, a DVD and Mpeg-2 player
 Group: Video
 Requires: %{name} = %{version}
 %description gnome
@@ -77,7 +84,7 @@ If you are going to watch DVD with the Gnome front-end, you should
 install vlc-gnome.
 
 %package qt
-Summary: Qt2 plug-in for VideoLAN, a DVD and MPEG-2 player
+Summary: Qt2 plug-in for VideoLAN, a DVD and Mpeg-2 player
 Group: Video
 Requires: %{name} = %{version}
 %description qt
@@ -86,13 +93,86 @@ If you are going to watch DVD with the Qt2 front-end, you should
 install vlc-qt
 
 %package ncurses
-Summary: Ncurses console-based plug-in for VideoLAN, a DVD and MPEG-2 player
+Summary: Ncurses console-based plug-in for VideoLAN, a DVD and Mpeg-2 player
 Group: Video
 Requires: %{name} = %{version}
 %description ncurses
 The vlc-ncurses packages includes the ncurses plug-in for the VideoLAN client.
 If you are going to watch DVD with the ncurses front-end, you should
 install vlc-ncurses
+
+%package sdl
+Summary: Simple DirectMedia Layer plug-in for VideoLAN, a DVD and Mpeg-2 player
+Group: Video
+Requires: %{name} = %{version}
+%description sdl
+The vlc-sdl packages includes the Simple DirectMedia Layer plug-in 
+for the VideoLAN client.
+If you are going to watch DVD with the sdl plugin, you should
+install vlc-sdl
+
+%package ggi
+Summary: GGI plug-in for VideoLAN, a DVD and Mpeg-2 player
+Group: Video
+Requires: %{name} = %{version}
+%description ggi
+The vlc-ggi packages includes the GGI plug-in for the VideoLAN client.
+If you are going to watch DVD with the GGI plugin, you should
+install vlc-ggi
+
+%package esd
+Summary: Enlightened Sound Daemon plug-in for VideoLAN, a DVD and Mpeg-2 player
+Group: Video
+Requires: %{name} = %{version}
+%description esd
+The vlc-esd packages includes the Enlightened Sound Daemon plug-in 
+for the VideoLAN client.
+If you are going to watch DVD with the esd plugin, you should
+install vlc-esd
+
+%package alsa
+Summary: Advanced Linux Sound Architecture plug-in for VideoLAN, a DVD and Mpeg-2 player
+Group: Video
+Requires: %{name} = %{version}
+%description alsa
+The vlc-alsa packages includes the Advanced Linux Sound Architecture plug-in for the VideoLAN client.
+If you are going to watch DVD with the esd plugin, you should install vlc-alsa
+
+%package -n %{css_lib_name}
+Summary:        A library for accessing DVDs like block device usind deCSS if needed.
+Version:	%{css_version}
+Release:	%{css_release}
+Group:          System/Libraries
+Provides:       %{css_name} = %{css_version}-%{css_release}
+
+%description -n %{css_lib_name}
+libdvdcss is a simple library designed for accessing DVDs like a block device
+without having to bother about the decryption. The important features are:
+ * Portability. Currently supported platforms are GNU/Linux, FreeBSD, BeOS
+   and Windows. The MacOS X version is being worked on as well.
+ * Simplicity. There are currently 7 functions in the API, and we intend to
+   keep this number low.
+ * Freedom. libdvdcss is released under the General Public License, ensuring
+   it will stay free, and used only for free software products.
+ * Just better. Unlike most similar projects, libdvdcss doesn't require the
+   region of your drive to be set.
+
+%package -n %{css_lib_name}-devel
+Summary:        Development tools for programs which will use the libdvdcss library.
+Version:        %{css_version}
+Release:        %{css_release}
+Group:          Development/C
+Requires:       %{css_lib_name} = %{css_version}
+Provides:       %{css_name}-devel = %{css_version}-%{css_release}
+
+%description -n %{css_lib_name}-devel
+The %{css_name}-devel package includes the header files and static libraries
+necessary for developing programs which will manipulate DVDs files using
+the %{css_name} library.
+
+If you are going to develop programs which will manipulate DVDs,
+you should install %{css_name}-devel.  You'll also need to have the %css_name
+package installed.
 
 
 %prep
@@ -103,68 +183,207 @@ install vlc-ncurses
 %endif
 
 %build
-export QTDIR=%{_libdir}/qt-2.3.0/
-%configure --enable-release --with-dvdcss=local-shared \
-	   --enable-gnome --enable-gtk \
-	   --enable-x11 --enable-qt --enable-ncurses \
-	   --enable-esd --disable-alsa \
-	   --enable-fb \
+%ifarch ppc
+# Dadou - 0.1.99h-mdk - Don't use configure here. It breaks build at present
+#                       time.
+./configure --enable-release \
+            --with-dvdcss=local-shared \
+	    --prefix=%_prefix \
+	    --enable-gnome --enable-x11 --enable-gtk --enable-qt \
+	    --enable-esd \
+	    --enable-fb \
+	    --enable-xvideo \
+	    --enable-sdl
+perl -pi -e "s|CFLAGS \+= -mcpu=604e|#CFLAGS \+= -mcpu=604e|" Makefile
+perl -pi -e "s|#CFLAGS \+= -mcpu=750|CFLAGS \+= -mcpu=750 -mtune=750|" Makefile
+%else
+#export CC="gcc-3.0.1" CXX="g++-3.0.1"
+%configure --enable-release \
+           --with-dvdcss=local-shared \
+           --enable-gnome --enable-gtk \
+	   --enable-x11 --disable-qt --enable-ncurses \
+	   --enable-esd --enable-alsa \
+	   --enable-fb --enable-mga \
 	   --enable-xvideo \
+	   --with-ggi \
 	   --enable-sdl 
-make
+%endif
+# thier configure check if /dev/dsp exists...
+perl -pi -e 's#(PLUGINS :=\s)#$1dsp #' Makefile.opts
+export QTDIR=%{_libdir}/qt2 
+%make
 
 %install
-%makeinstall
+%makeinstall_std
 install -d %buildroot/%_mandir/man1
 install doc/vlc.1 %buildroot/%_mandir/man1
+
+# menu
+mkdir -p $RPM_BUILD_ROOT/%{_menudir}
+cat > $RPM_BUILD_ROOT/%{_menudir}/vlc << EOF
+?package(vlc): command="%{_bindir}/vlc" hotkey="V" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2 and DVD software solution" section="Multimedia/Video" title="VideoLAN Client" icon="vlc.png" hints="Video"
+EOF
+cat > $RPM_BUILD_ROOT/%{_menudir}/vlc-gtk << EOF
+?package(vlc-gtk): command="%{_bindir}/gvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2 and DVD software solution" section="Multimedia/Video" title="Gtk VideoLAN Client" icon="gvlc.png" hints="Video"
+EOF
+cat > $RPM_BUILD_ROOT/%{_menudir}/vlc-gnome << EOF
+?package(vlc-gnome): command="%{_bindir}/gnome-vlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2 and DVD software solution" section="Multimedia/Video" title="Gnome VideoLAN Client" icon="gnome-vlc.png" hints="Video"
+EOF
+cat > $RPM_BUILD_ROOT/%{_menudir}/vlc-qt << EOF
+?package(vlc-gnome): command="%{_bindir}/qvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2 and DVD software solution" section="Multimedia/Video" title="Qt VideoLAN Client" icon="qvlc.png" hints="Video"
+EOF
+
+# icons
+mkdir -p %{buildroot}/{%{_miconsdir},%{_liconsdir}}
+install -m 644 %buildroot/%_datadir/videolan/vlc16x16.png %buildroot/%{_miconsdir}/vlc.png
+install -m 644 %buildroot/%_datadir/videolan/vlc32x32.png %buildroot/%{_iconsdir}/vlc.png
+install -m 644 %buildroot/%_datadir/videolan/vlc48x48.png %buildroot/%{_liconsdir}/vlc.png
+install -m 644 %buildroot/%_datadir/videolan/gnome-vlc16x16.png %buildroot/%{_miconsdir}/gnome-vlc.png
+install -m 644 %buildroot/%_datadir/videolan/gnome-vlc32x32.png %buildroot/%{_iconsdir}/gnome-vlc.png
+install -m 644 %buildroot/%_datadir/videolan/gnome-vlc48x48.png %buildroot/%{_liconsdir}/gnome-vlc.png
+install -m 644 %buildroot/%_datadir/videolan/gvlc16x16.png %buildroot/%{_miconsdir}/gvlc.png
+install -m 644 %buildroot/%_datadir/videolan/gvlc32x32.png %buildroot/%{_iconsdir}/gvlc.png
+install -m 644 %buildroot/%_datadir/videolan/gvlc48x48.png %buildroot/%{_liconsdir}/gvlc.png
+install -m 644 %buildroot/%_datadir/videolan/kvlc16x16.png %buildroot/%{_miconsdir}/kvlc.png
+install -m 644 %buildroot/%_datadir/videolan/kvlc32x32.png %buildroot/%{_iconsdir}/kvlc.png
+install -m 644 %buildroot/%_datadir/videolan/kvlc48x48.png %buildroot/%{_liconsdir}/kvlc.png
+install -m 644 %buildroot/%_datadir/videolan/qvlc16x16.png %buildroot/%{_miconsdir}/qvlc.png
+install -m 644 %buildroot/%_datadir/videolan/qvlc32x32.png %buildroot/%{_iconsdir}/qvlc.png
+install -m 644 %buildroot/%_datadir/videolan/qvlc48x48.png %buildroot/%{_liconsdir}/qvlc.png
+
+%post
+%update_menus
+%postun
+%update_menus
 
 %clean
 rm -fr %buildroot
 
 %files
 %defattr(-,root,root,-)
-%doc README COPYING FAQ AUTHORS
+%doc README COPYING
 %{_bindir}/vlc
-
+%dir %{_libdir}/videolan/vlc
 %{_libdir}/videolan/vlc/dsp.so
-%{_libdir}/videolan/vlc/esd.so
 %{_libdir}/videolan/vlc/fb.so
-%{_libdir}/videolan/vlc/sdl.so
-%{_libdir}/videolan/vlc/x*.so
-
-%dir %{_datadir}/videolan
-%{_datadir}/videolan/*
+%{_libdir}/videolan/vlc/x11.so
+# ac3_spdif: AC3 decoder using SPDIF pass-through.
+%{_libdir}/videolan/vlc/ac3_spdif.so
+# spudec: DVD subtitles decoder.
+%{_libdir}/videolan/vlc/spu_dec.so
+# nothing useful for the moment.
+#%dir %{_datadir}/videolan
+#%{_datadir}/videolan/*
 %{_mandir}/man1/*
+%{_menudir}/vlc
+%{_miconsdir}/vlc.png
+%{_iconsdir}/vlc.png
+%{_liconsdir}/vlc.png
 
 %files gtk
 %defattr(-,root,root)
+%doc README
 %{_libdir}/videolan/vlc/gtk.so
 %{_bindir}/gvlc
+%{_menudir}/vlc-gtk
+%{_miconsdir}/gvlc.png
+%{_iconsdir}/gvlc.png
+%{_liconsdir}/gvlc.png
+%post gtk
+%update_menus
+%postun gtk
+%update_menus
 
 %files gnome
 %defattr(-,root,root)
+%doc README
 %{_libdir}/videolan/vlc/gnome.so
 %{_bindir}/gnome-vlc
+%{_menudir}/vlc-gnome
+%{_miconsdir}/gnome-vlc.png
+%{_iconsdir}/gnome-vlc.png
+%{_liconsdir}/gnome-vlc.png
+%post   gnome
+%update_menus
+%postun gnome
+%update_menus
 
+%if %{plugin_qt}
 %files qt
 %defattr(-,root,root)
+%doc README
 %{_libdir}/videolan/vlc/qt.so
 %{_bindir}/qvlc
+%{_menudir}/vlc-qt
+%{_miconsdir}/qvlc.png
+%{_iconsdir}/qvlc.png
+%{_liconsdir}/qvlc.png
+%post   qt
+%update_menus
+%postun qt
+%update_menus
+%endif
 
 %files ncurses
 %defattr(-,root,root)
+%doc README
 %{_libdir}/videolan/vlc/ncurses.so
 
+%files sdl
+%defattr(-,root,root)
+%doc README
+%{_libdir}/videolan/vlc/sdl.so
+
+%files ggi
+%defattr(-,root,root)
+%doc README
+%{_libdir}/videolan/vlc/ggi.so
+
+%files esd
+%defattr(-,root,root)
+%doc README
+%{_libdir}/videolan/vlc/esd.so
+
+%if %{plugin_alsa}
+%files alsa
+%defattr(-,root,root)
+%doc README
+%{_libdir}/videolan/vlc/alsa.so
+%endif
+
+%if %{css}
+%files -n %{css_lib_name}
+%defattr(-,root,root,-)
+%doc COPYING AUTHORS
+%{_libdir}/*.so.*
+%post   -n %{css_lib_name} -p /sbin/ldconfig
+%postun -n %{css_lib_name} -p /sbin/ldconfig
+
+%files -n %{css_lib_name}-devel
+%defattr(-,root,root)
+%doc COPYING
+%{_libdir}/*.a
+%{_libdir}/*.so
+%{_includedir}/*
+%endif
 
 %changelog
-* Mon Nov 12 2001 Christophe Massiot <massiot@via.ecp.fr> 0.2.91-1
-- version 0.2.91
+* Thu Jan 17 2002 Yves Duret <yduret@mandrakesoft.com> 0.2.92-2mdk
+- readded libdvdcss rpm in specfile. use %%define css 1 with correct sources
+  to build libdvdcss rpm.
 
-* Wed Oct 10 2001 Christophe Massiot <massiot@via.ecp.fr> 0.2.90-1
-- version 0.2.90
+* Wed Jan 09 2002 Yves Duret <yduret@mandrakesoft.com> 0.2.92-1mdk
+- version 0.2.92
+- %%makeinstall_std
+- splitted again, added vlc-sdl vlc-esd vlc-ggi
+- bring back some missing plugins
+- fixed buildrequires
+- added menu entries and icons (from cvs)
 
-* Tue Oct 02 2001 Christophe Massiot <massiot@via.ecp.fr>
-- Imported Mandrake's vlc.spec into the CVS
+* Tue Oct 23 2001 Yves Duret <yduret@mandrakesoft.com> 0.2.83-2mdk
+- rebuild against libpng3
+- added some doc for sir rpmlint
+- #5583: option -g
 
 * Thu Aug 23 2001 Yves Duret <yduret@mandrakesoft.com> 0.2.83-1mdk
 - version 0.2.83 : 
