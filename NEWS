@@ -18,7 +18,7 @@ Core support:
  * Renamed --spu-channel to --sub-track
  * Renamed --spumargin to --sub-margin
  * Renamed --audio-channel to --audio-track
- * Renamed --filter to --video-filter
+ * Renamed --filter to --vout-filter
    Multiple video filters are now seperated by ',' instead of ':'
  * Track selection based on preferred language (--sub-language and --audio-language)
  * Many bugfixes...

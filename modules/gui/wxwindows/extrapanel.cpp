@@ -328,7 +328,7 @@ wxPanel *ExtraPanel::VideoPanel( wxWindow *parent )
     panel_sizer->SetSizeHints( panel );
 
     /* Write down initial values */
-    psz_filters = config_GetPsz( p_intf, "video-filter" );
+    psz_filters = config_GetPsz( p_intf, "vout-filter" );
     if( psz_filters && strstr( psz_filters, "adjust" ) )
     {
         adjust_check->SetValue( 1 );
@@ -985,7 +985,7 @@ static void ChangeVFiltersString( intf_thread_t *p_intf,
     vout_thread_t *p_vout;
     char *psz_parser, *psz_string;
 
-    psz_string = config_GetPsz( p_intf, "video-filter" );
+    psz_string = config_GetPsz( p_intf, "vout-filter" );
 
     if( !psz_string ) psz_string = strdup("");
 
@@ -1026,14 +1026,14 @@ static void ChangeVFiltersString( intf_thread_t *p_intf,
          }
     }
     /* Vout is not kept, so put that in the config */
-    config_PutPsz( p_intf, "video-filter", psz_string );
+    config_PutPsz( p_intf, "vout-filter", psz_string );
 
     /* Try to set on the fly */
     p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
     if( p_vout )
     {
-        var_SetString( p_vout, "video-filter", psz_string );
+        var_SetString( p_vout, "vout-filter", psz_string );
         vlc_object_release( p_vout );
     }
 
