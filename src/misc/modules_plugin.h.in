@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h.in,v 1.4 2002/09/30 11:05:42 sam Exp $
+ * $Id: modules_plugin.h.in,v 1.5 2002/10/31 11:16:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,7 +46,7 @@ static int module_load( const char * psz_filename, module_handle_t * handle )
     /* We should NOT open modules with RTLD_GLOBAL, or we are going to get
      * namespace collisions when two modules have common public symbols,
      * but ALSA is being a pest here. */
-    if( strstr( psz_filename, "alsa" LIBEXT ) )
+    if( strstr( psz_filename, "alsa" ) )
     {
         *handle = dlopen( psz_filename, RTLD_NOW | RTLD_GLOBAL );
         return( *handle == NULL );

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.99 2002/10/29 18:57:40 sam Exp $
+ * $Id: modules.c,v 1.100 2002/10/31 11:16:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -423,7 +423,6 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     p_tmp = p_first;
     while( p_tmp != NULL )
     {
-msg_Dbg(p_this,"candidate: %s\n", p_tmp->p_module->psz_object_name);
         vlc_object_yield( p_tmp->p_module );
         p_tmp = p_tmp->p_next;
     }

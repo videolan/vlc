@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.15 2002/10/29 13:22:48 sam Exp $
+ * $Id: playlist.c,v 1.16 2002/10/31 11:16:29 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -136,8 +136,6 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
     if( !(i_mode & PLAYLIST_REPLACE)
          || i_pos < 0 || i_pos >= p_playlist->i_size )
     {
-        int i_index;
-
         /* Additional boundary checks */
         if( i_mode & PLAYLIST_APPEND )
         {
@@ -194,8 +192,6 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
  *****************************************************************************/
 int playlist_Delete( playlist_t * p_playlist, int i_pos )
 {
-    int i_index;
-
     vlc_mutex_lock( &p_playlist->object_lock );
 
     if( i_pos >= 0 && i_pos < p_playlist->i_size )

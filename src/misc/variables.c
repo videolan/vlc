@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.12 2002/10/29 13:38:37 sam Exp $
+ * $Id: variables.c,v 1.13 2002/10/31 11:16:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -477,6 +477,9 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
     /* Check boundaries and list */
     CheckValue( p_var, &val );
 
+    /* Set the variable */
+    p_var->val = val;
+
     /* Deal with callbacks. Tell we're in a callback, release the lock,
      * call stored functions, retake the lock. */
     if( p_var->i_entries )
@@ -508,9 +511,6 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
         p_var = &p_this->p_vars[i_var];
         p_var->b_incallback = VLC_FALSE;
     }
-
-    /* Set the variable */
-    p_var->val = val;
 
     /* Free data if needed */
     p_var->pf_free( &oldval );
