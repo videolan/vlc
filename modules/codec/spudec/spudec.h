@@ -2,7 +2,7 @@
  * spudec.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spudec.h,v 1.7 2003/07/22 20:49:10 hartman Exp $
+ * $Id: spudec.h,v 1.8 2003/11/22 19:55:47 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,7 +21,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-typedef struct spudec_thread_t spudec_thread_t;
+struct decoder_sys_t
+{
+    int b_packetizer;
+
+    mtime_t i_pts;
+    int i_spu_size;
+    int i_rle_size;
+    int i_spu;
+
+    block_t *p_block;
+
+    uint8_t buffer[65536 + 20 ]; /* we will never overflow more than 11 bytes if I'm right */
+
+    vout_thread_t *p_vout;
+};
 
 struct subpicture_sys_t
 {
@@ -45,35 +59,6 @@ struct subpicture_sys_t
 };
 
 /*****************************************************************************
- * spudec_thread_t : sub picture unit decoder thread descriptor
- *****************************************************************************/
-struct spudec_thread_t
-{
-    /*
-     * Thread properties and locks
-     */
-    vlc_thread_t        thread_id;                /* id for thread functions */
-
-    /*
-     * Input properties
-     */
-    decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
-    /* The bit stream structure handles the PES stream at the bit level */
-    bit_stream_t        bit_stream;
-
-    /*
-     * Output properties
-     */
-    vout_thread_t *     p_vout;          /* needed to create the spu objects */
-
-    /*
-     * Private properties
-     */
-    unsigned int        i_spu_size;            /* size of current SPU packet */
-    unsigned int        i_rle_size;                  /* size of the RLE part */
-};
-
-/*****************************************************************************
  * Amount of bytes we GetChunk() in one go
  *****************************************************************************/
 #define SPU_CHUNK_SIZE              0x200
@@ -93,9 +78,7 @@ struct spudec_thread_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-int  E_(SyncPacket)           ( spudec_thread_t * );
-void E_(ParsePacket)          ( spudec_thread_t * );
+void E_(ParsePacket)( decoder_t * );
 
-void E_(RenderSPU)            ( vout_thread_t *, picture_t *,
-                                const subpicture_t * );
+void E_(RenderSPU)  ( vout_thread_t *, picture_t *, const subpicture_t * );
 

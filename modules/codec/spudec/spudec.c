@@ -2,15 +2,16 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.27 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: spudec.c,v 1.28 2003/11/22 19:55:47 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,169 +26,258 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                    /* memcpy(), memset() */
 
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
+#include <vlc/input.h>
 
 #include "spudec.h"
 
 /*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  OpenDecoder   ( vlc_object_t * );      
-static int  RunDecoder    ( decoder_fifo_t * );
-static int  InitThread    ( spudec_thread_t * );
-static void EndThread     ( spudec_thread_t * );
-static vout_thread_t *FindVout( spudec_thread_t *);
-
-/*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
+static int  DecoderOpen   ( vlc_object_t * );
+static int  PacketizerOpen( vlc_object_t * );
+
+static void Close  ( vlc_object_t * );
+
 vlc_module_begin();
     set_description( _("DVD subtitles decoder") );
     set_capability( "decoder", 50 );
-    set_callbacks( OpenDecoder, NULL );
+    set_callbacks( DecoderOpen, Close );
+
+    add_submodule();
+    set_description( _("DVD subtitles packetizer") );
+    set_capability( "decoder", 50 );
+    set_callbacks( PacketizerOpen, Close );
 vlc_module_end();
 
 /*****************************************************************************
- * OpenDecoder: probe the decoder and return score
+ * Local prototypes
+ *****************************************************************************/
+static vout_thread_t *FindVout( decoder_t *);
+
+static block_t *Reassemble( decoder_t *, block_t ** );
+
+static void     Decode   ( decoder_t *, block_t ** );
+static block_t *Packetize( decoder_t *, block_t ** );
+
+/*****************************************************************************
+ * DecoderOpen
  *****************************************************************************
- * Tries to launch a decoder and return score so that the interface is able 
+ * Tries to launch a decoder and return score so that the interface is able
  * to chose.
  *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+static int DecoderOpen( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_t     *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','p','u',' ')
-         && p_dec->fmt_in.i_codec != VLC_FOURCC('s','p','u','b') )
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC( 's','p','u',' ' ) &&
+        p_dec->fmt_in.i_codec != VLC_FOURCC( 's','p','u','b' ) )
     {
         return VLC_EGENERIC;
     }
 
-    p_dec->pf_run = RunDecoder;
+    p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
+
+    p_sys->b_packetizer = VLC_FALSE;
+    p_sys->i_spu_size = 0;
+    p_sys->i_spu      = 0;
+    p_sys->p_block    = NULL;
+    p_sys->p_vout     = NULL;
+
+    es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
+
+    p_dec->pf_decode_sub = Decode;
+    p_dec->pf_packetize  = Packetize;
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * RunDecoder: this function is called just after the thread is created
+ * PacketizerOpen
+ *****************************************************************************
+ * Tries to launch a decoder and return score so that the interface is able
+ * to chose.
  *****************************************************************************/
-static int RunDecoder( decoder_fifo_t * p_fifo )
+static int PacketizerOpen( vlc_object_t *p_this )
 {
-    spudec_thread_t *     p_spudec;
+    decoder_t *p_dec = (decoder_t*)p_this;
 
-    /* Allocate the memory needed to store the thread's structure */
-    p_spudec = (spudec_thread_t *)malloc( sizeof(spudec_thread_t) );
-
-    if ( p_spudec == NULL )
+    if( DecoderOpen( p_this ) )
     {
-        msg_Err( p_fifo, "out of memory" );
-        DecoderError( p_fifo );
-        return( -1 );
+        return VLC_EGENERIC;
     }
+    p_dec->p_sys->b_packetizer = VLC_TRUE;
 
-    /*
-     * Initialize the thread properties
-     */
-    p_spudec->p_vout = NULL;
-    p_spudec->p_fifo = p_fifo;
+    return VLC_SUCCESS;
+}
 
-    /*
-     * Initialize thread and free configuration
-     */
-    p_spudec->p_fifo->b_error = InitThread( p_spudec );
+/*****************************************************************************
+ * Close:
+ *****************************************************************************/
+static void Close( vlc_object_t *p_this )
+{
+    decoder_t     *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    /*
-     * Main loop - it is not executed if an error occured during
-     * initialization
-     */
-    while( (!p_spudec->p_fifo->b_die) && (!p_spudec->p_fifo->b_error) )
+    if( !p_sys->b_packetizer )
     {
-        if( E_(SyncPacket)( p_spudec ) )
+        /* FIXME check if it's ok to not lock vout */
+        if( p_sys->p_vout != NULL && p_sys->p_vout->p_subpicture != NULL )
         {
-            continue;
-        }
+            subpicture_t *  p_subpic;
+            int             i_subpic;
 
-        /* Find/Wait for a video output */
-        p_spudec->p_vout = FindVout( p_spudec );
-        if( p_spudec->p_vout)
-        {
-            E_(ParsePacket)( p_spudec );
-            vlc_object_release( p_spudec->p_vout );
+            for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
+            {
+                p_subpic = &p_sys->p_vout->p_subpicture[i_subpic];
+
+                if( p_subpic != NULL &&
+                    ( ( p_subpic->i_status == RESERVED_SUBPICTURE ) ||
+                      ( p_subpic->i_status == READY_SUBPICTURE ) ) )
+                {
+                    vout_DestroySubPicture( p_sys->p_vout, p_subpic );
+                }
+            }
         }
     }
 
-    /*
-     * Error loop
-     */
-    if( p_spudec->p_fifo->b_error )
+    if( p_sys->p_block )
     {
-        DecoderError( p_spudec->p_fifo );
-
-        /* End of thread */
-        EndThread( p_spudec );
-        return -1;
+        block_ChainRelease( p_sys->p_block );
     }
 
-    /* End of thread */
-    EndThread( p_spudec );
-    return 0;
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * Decode:
+ *****************************************************************************/
+static void     Decode   ( decoder_t *p_dec, block_t **pp_block )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t       *p_spu = Reassemble( p_dec, pp_block );
+
+    if( p_spu )
+    {
+        p_sys->i_spu = block_ChainExtract( p_spu, p_sys->buffer, 65536 );
+        p_sys->i_pts = p_spu->i_pts;
+        block_ChainRelease( p_spu );
+
+        if( ( p_sys->p_vout = FindVout( p_dec ) ) )
+        {
+            /* Parse and decode */
+            E_(ParsePacket)( p_dec );
+
+            vlc_object_release( p_sys->p_vout );
+        }
+
+        /* reinit context */
+        p_sys->i_spu_size = 0;
+        p_sys->i_rle_size = 0;
+        p_sys->i_spu      = 0;
+        p_sys->p_block    = NULL;
+    }
+}
+
+/*****************************************************************************
+ * Packetize:
+ *****************************************************************************/
+static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t       *p_spu = Reassemble( p_dec, pp_block );
+
+    if( p_spu )
+    {
+        /* reinit context */
+        p_sys->i_spu_size = 0;
+        p_sys->i_rle_size = 0;
+        p_sys->i_spu      = 0;
+        p_sys->p_block    = NULL;
+
+        return block_ChainGather( p_spu );
+    }
+    return NULL;
+}
+
+/*****************************************************************************
+ * Reassemble:
+ *****************************************************************************/
+static block_t *Reassemble( decoder_t *p_dec, block_t **pp_block )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block;
+
+    if( pp_block == NULL || *pp_block == NULL )
+    {
+        return NULL;
+    }
+    p_block = *pp_block;
+    *pp_block = NULL;
+
+    if( p_sys->i_spu_size <= 0 && ( p_block->i_pts <= 0 || p_block->i_buffer < 4 ) )
+    {
+        msg_Dbg( p_dec, "invalid starting packet (size < 4 or pts <=0)" );
+        block_Release( p_block );
+        return NULL;
+    }
+
+    block_ChainAppend( &p_sys->p_block, p_block );
+    p_sys->i_spu += p_block->i_buffer;
+
+    if( p_sys->i_spu_size <= 0 )
+    {
+        p_sys->i_spu_size = ( p_block->p_buffer[0] << 8 )| p_block->p_buffer[1];
+        p_sys->i_rle_size = ( ( p_block->p_buffer[2] << 8 )| p_block->p_buffer[3] ) - 4;
+
+        msg_Dbg( p_dec, "i_spu_size=%d i_rle=%d", p_sys->i_spu_size, p_sys->i_rle_size );
+
+        if( p_sys->i_spu_size <= 0 || p_sys->i_rle_size >= p_sys->i_spu_size )
+        {
+            p_sys->i_spu_size = 0;
+            p_sys->i_rle_size = 0;
+            p_sys->i_spu      = 0;
+            p_sys->p_block    = NULL;
+
+            block_Release( p_block );
+            return NULL;
+        }
+    }
+
+    if( p_sys->i_spu >= p_sys->i_spu_size )
+    {
+        /* We have a complete sub */
+        block_t *p_ret = p_sys->p_block;
+
+        msg_Dbg( p_dec, "SPU packets size=%d should be %d",
+                 p_sys->i_spu, p_sys->i_spu_size );
+        return p_ret;
+    }
+    return NULL;
 }
 
 /* following functions are local */
 
 /*****************************************************************************
- * InitThread: initialize spu decoder thread
- *****************************************************************************
- * This function is called from RunThread and performs the second step of the
- * initialization. It returns 0 on success. Note that the thread's flag are not
- * modified inside this function.
- *****************************************************************************/
-static int InitThread( spudec_thread_t *p_spudec )
-{
-    int i_ret;
-    
-    /* Call InitBitstream anyway so p_spudec->bit_stream is in a known
-     * state before calling CloseBitstream */
-    i_ret = InitBitstream( &p_spudec->bit_stream, p_spudec->p_fifo,
-                            NULL, NULL );
-
-    /* Check for a video output */
-    p_spudec->p_vout = FindVout( p_spudec );
-    
-    if( !p_spudec->p_vout )
-    {
-        return -1;
-    }
-    
-    /* It was just a check */
-    vlc_object_release( p_spudec->p_vout );
-    p_spudec->p_vout = NULL;
-    
-    return i_ret;
-}
-
-/*****************************************************************************
  * FindVout: Find a vout or wait for one to be created.
  *****************************************************************************/
-static vout_thread_t *FindVout( spudec_thread_t *p_spudec )
+static vout_thread_t *FindVout( decoder_t *p_dec )
 {
     vout_thread_t *p_vout = NULL;
-    
+
     /* Find an available video output */
     do
     {
-        if( p_spudec->p_fifo->b_die || p_spudec->p_fifo->b_error )
+        if( p_dec->b_die || p_dec->b_error )
         {
             break;
         }
 
-        p_vout = vlc_object_find( p_spudec->p_fifo, VLC_OBJECT_VOUT,
-                                                              FIND_ANYWHERE );
-
+        p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
         if( p_vout )
         {
             break;
@@ -200,33 +290,3 @@ static vout_thread_t *FindVout( spudec_thread_t *p_spudec )
     return p_vout;
 }
 
-/*****************************************************************************
- * EndThread: thread destruction
- *****************************************************************************
- * This function is called when the thread ends after a sucessful
- * initialization.
- *****************************************************************************/
-static void EndThread( spudec_thread_t *p_spudec )
-{
-    if( p_spudec->p_vout != NULL 
-         && p_spudec->p_vout->p_subpicture != NULL )
-    {
-        subpicture_t *  p_subpic;
-        int             i_subpic;
-    
-        for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
-        {
-            p_subpic = &p_spudec->p_vout->p_subpicture[i_subpic];
-
-            if( p_subpic != NULL &&
-              ( ( p_subpic->i_status == RESERVED_SUBPICTURE )
-             || ( p_subpic->i_status == READY_SUBPICTURE ) ) )
-            {
-                vout_DestroySubPicture( p_spudec->p_vout, p_subpic );
-            }
-        }
-    }
-    
-    CloseBitstream( &p_spudec->bit_stream );
-    free( p_spudec );
-}
