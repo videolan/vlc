@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.117 2003/11/22 18:11:22 gbazin Exp $
+dnl $Id: configure.ac,v 1.118 2003/11/23 03:58:33 rocky Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1528,14 +1528,14 @@ AC_ARG_ENABLE(vcdx,
 
 if test "${enable_vcdx}" != "no"
 then
-  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.63,
+  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.65,
    [enable_cdda="no"
     AX_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
     AX_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
     AX_ADD_PLUGINS([cddax])], 
    [AC_MSG_WARN(libcdio library not found)])
 
-  PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.18-cdio,
+  PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.20-cdio,
    [enable_vcd="no"
     AX_ADD_LDFLAGS([vcdx],[$VCDINFO_LIBS])
     AX_ADD_CFLAGS([vcdx],[$VCDINFO_CFLAGS])

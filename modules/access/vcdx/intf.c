@@ -2,7 +2,7 @@
  * intf.c: Video CD interface to handle user interaction and still time
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.3 2003/11/09 18:06:11 rocky Exp $
+ * $Id: intf.c,v 1.4 2003/11/23 03:58:33 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *   from DVD code by Stéphane Borel <stef@via.ecp.fr>
@@ -203,8 +203,9 @@ static void RunIntf( intf_thread_t *p_intf )
 		dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_ACTIVATE" );
 
 		if ( vcdplayer_pbc_is_on( p_vcd ) && number_addend != 0 ) {
-		  lid_t next_num=vcdplayer_selection2lid(p_input, 
-							 number_addend);
+		  lid_t next_num=vcdinfo_selection_get_lid(p_vcd->vcd, 
+							   itemid.num,
+							   number_addend);
 		  if (VCDINFO_INVALID_LID != next_num) {
 		    itemid.num  = next_num;
 		    itemid.type = VCDINFO_ITEM_TYPE_LID;

@@ -3,7 +3,7 @@
  *               using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 Rocky Bernstein <rocky@panix.com>
- * $Id: vcdplayer.c,v 1.2 2003/11/09 00:52:32 rocky Exp $
+ * $Id: vcdplayer.c,v 1.3 2003/11/23 03:58:33 rocky Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,61 +48,6 @@ bool
 vcdplayer_pbc_is_on(const thread_vcd_data_t *p_vcd) 
 {
   return VCDINFO_INVALID_ENTRY != p_vcd->cur_lid; 
-}
-
-lid_t
-vcdplayer_selection2lid ( input_thread_t *p_input, int entry_num ) 
-{
-  /* FIXME: Some of this probably gets moved to vcdinfo. */
-  /* Convert selection number to lid and then entry number...*/
-  thread_vcd_data_t *     p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
-  unsigned int offset;
-  unsigned int bsn=vcdinf_get_bsn(p_vcd->pxd.psd);
-  vcdinfo_obj_t *obj = p_vcd->vcd;
-
-  dbg_print( (INPUT_DBG_CALL|INPUT_DBG_PBC), 
-            "Called lid %u, entry_num %d bsn %d", p_vcd->cur_lid, 
-             entry_num, bsn);
-
-  if ( (entry_num - bsn + 1) > 0) {
-    offset = vcdinfo_lid_get_offset(obj, p_vcd->cur_lid, entry_num-bsn+1);
-  } else {
-    LOG_ERR( "Selection number %u too small. bsn %u", entry_num, bsn );
-    return VCDINFO_INVALID_LID;
-  }
-  
-  if (offset != VCDINFO_INVALID_OFFSET) {
-    vcdinfo_offset_t *ofs;
-    int old = entry_num;
-    
-    switch (offset) {
-    case PSD_OFS_DISABLED:
-      LOG_ERR( "Selection %u disabled", entry_num );
-      return VCDINFO_INVALID_LID;
-    case PSD_OFS_MULTI_DEF:
-      LOG_ERR( "Selection %u multi_def", entry_num );
-      return VCDINFO_INVALID_LID;
-    case PSD_OFS_MULTI_DEF_NO_NUM:
-      LOG_ERR( "Selection %u multi_def_no_num", entry_num );
-      return VCDINFO_INVALID_LID;
-    default: ;
-    }
-    
-    ofs = vcdinfo_get_offset_t(obj, offset);
-
-    if (NULL == ofs) {
-      LOG_ERR( "error in vcdinfo_get_offset" );
-      return -1;
-    }
-    dbg_print(INPUT_DBG_PBC,
-              "entry %u turned into selection lid %u", 
-              old, ofs->lid);
-    return ofs->lid;
-    
-  } else {
-    LOG_ERR( "invalid or unset entry %u", entry_num );
-    return VCDINFO_INVALID_LID;
-  }
 }
 
 static void
@@ -294,7 +239,9 @@ vcdplayer_pbc_nav ( input_thread_t * p_input )
           unsigned int bsn=vcdinf_get_bsn(p_vcd->pxd.psd);
           int rand_selection=bsn +
             (int) ((num_selections+0.0)*rand()/(RAND_MAX+1.0));
-          lid_t rand_lid=vcdplayer_selection2lid (p_input, rand_selection);
+          lid_t rand_lid=vcdinfo_selection_get_lid (p_vcd->vcd, 
+						    p_vcd->cur_lid, 
+						    rand_selection);
           itemid.num = rand_lid;
           itemid.type = VCDINFO_ITEM_TYPE_LID;
           dbg_print(INPUT_DBG_PBC, "random selection %d, lid: %d", 
@@ -378,7 +325,6 @@ vcdplayer_play_default( input_thread_t * p_input )
 {
   thread_vcd_data_t *p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
 
-  vcdinfo_obj_t     *obj  = p_vcd->vcd;
   vcdinfo_itemid_t   itemid;
 
   dbg_print( (INPUT_DBG_CALL|INPUT_DBG_PBC), 
@@ -388,24 +334,18 @@ vcdplayer_play_default( input_thread_t * p_input )
 
   if  (vcdplayer_pbc_is_on(p_vcd)) {
 
-    vcdinfo_lid_get_pxd(obj, &(p_vcd->pxd), p_vcd->cur_lid);
-    
-    switch (p_vcd->pxd.descriptor_type) {
-    case PSD_TYPE_SELECTION_LIST:
-    case PSD_TYPE_EXT_SELECTION_LIST:
-      if (p_vcd->pxd.psd == NULL) return false;
-      vcdplayer_update_entry( p_input, 
-			      vcdinfo_get_default_offset(p_vcd->vcd, 
-							 p_vcd->cur_lid), 
-			      &itemid.num, "default");
-      break;
+    lid_t lid=vcdinfo_get_multi_default_lid(p_vcd->vcd, p_vcd->cur_lid,
+					    itemid.num);
 
-    case PSD_TYPE_PLAY_LIST: 
-    case PSD_TYPE_END_LIST:
-    case PSD_TYPE_COMMAND_LIST:
-      LOG_WARN( "There is no PBC 'default' selection here" );
-      return false;
+    if (VCDINFO_INVALID_LID != lid) {
+      itemid.num  = lid;
+      itemid.type = VCDINFO_ITEM_TYPE_LID;
+      dbg_print(INPUT_DBG_PBC, "DEFAULT to %d\n", itemid.num);
+    } else {
+      dbg_print(INPUT_DBG_PBC, "no DEFAULT for LID %d\n", p_vcd->cur_lid);
     }
+    
+
   } else {
 
     /* PBC is not on. "default" selection beginning of current 
