@@ -114,7 +114,7 @@ case "x${target_os}" in
     save_CFLAGS="${save_CFLAGS} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"; CFLAGS="${save_CFLAGS}"
     vlc_LDFLAGS="${vlc_LDFLAGS} -lbe"
     plugins_LDFLAGS="${plugins_LDFLAGS} -nostart"
-    beos_LDFLAGS="${beos_LDFLAGS} -lbe -lgame -lroot -ltracker"
+    beos_LDFLAGS="${beos_LDFLAGS} -lbe -lgame -lroot -ltracker -lstdc++.r4"
     ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind"
     ;;
   x*)
@@ -196,6 +196,7 @@ AC_CHECK_LIB(m,pow,
   imdct3dn_LDFLAGS="${imdct3dn_LDFLAGS} -lm"
   imdctsse_LDFLAGS="${imdctsse_LDFLAGS} -lm"
   i420_rgb_LDFLAGS="${i420_rgb_LDFLAGS} -lm"
+  faad_LDFLAGS="${faad_LDFLAGS} -lm"
 )
 
 dnl Check for pthreads - borrowed from XMMS
@@ -439,7 +440,7 @@ dnl  default modules
 dnl
 BUILTINS="${BUILTINS}"
 PLUGINS="${PLUGINS} misc/dummy/dummy misc/null/null"
-PLUGINS="${PLUGINS} control/rc/rc misc/logger/logger access/file access/udp access/http access/rtp misc/network/ipv4 misc/memcpy/memcpy"
+PLUGINS="${PLUGINS} control/rc/rc misc/logger/logger access/file misc/memcpy/memcpy"
 PLUGINS="${PLUGINS} demux/mpeg/es demux/mpeg/audio demux/mpeg/mpeg_system demux/mpeg/ps demux/mpeg/ts"
 PLUGINS="${PLUGINS} codec/mpeg_video/idct/idct codec/mpeg_video/idct/idctclassic codec/mpeg_video/motion/motion codec/mpeg_video/mpeg_video codec/spudec/spudec codec/spdif codec/mpeg_audio/mpeg_audio"
 #PLUGINS="${PLUGINS} codec/a52old/imdct/imdct codec/a52old/downmix/downmix codec/a52old/a52old codec/lpcm/lpcm"
@@ -452,6 +453,11 @@ PLUGINS="${PLUGINS} audio_output/file"
 PLUGINS="${PLUGINS} video_chroma/i420_rgb video_chroma/i420_yuy2 video_chroma/i422_yuy2 video_chroma/i420_ymga"
 
 dnl
+dnl  Network modules
+dnl
+NETWORK_MODULES="access/udp access/http access/rtp misc/network/ipv4"
+
+dnl
 dnl  Accelerated modules
 dnl
 MMX_MODULES="misc/memcpy/memcpymmx codec/mpeg_video/idct/idctmmx codec/mpeg_video/motion/motionmmx video_chroma/i420_rgb_mmx video_chroma/i420_yuy2_mmx video_chroma/i422_yuy2_mmx video_chroma/i420_ymga_mmx"
@@ -459,6 +465,11 @@ MMXEXT_MODULES="misc/memcpy/memcpymmxext codec/mpeg_video/idct/idctmmxext codec/
 THREEDNOW_MODULES="misc/memcpy/memcpy3dn codec/a52old/imdct/imdct3dn codec/a52old/downmix/downmix3dn"
 SSE_MODULES="codec/a52old/imdct/imdctsse codec/a52old/downmix/downmixsse"
 ALTIVEC_MODULES="codec/mpeg_video/idct/idctaltivec codec/mpeg_video/motion/motionaltivec misc/memcpy/memcpyaltivec"
+
+if test x$SYS != xbeos
+then
+  PLUGINS="${PLUGINS} ${NETWORK}"
+fi
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [ac_cv_mmx_inline],
@@ -1048,7 +1059,7 @@ then
       dnl  Use a custom libffmpeg
       AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
       BUILTINS="${BUILTINS} codec/ffmpeg/ffmpeg"
-      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} ${real_ffmpeg_tree}/libavcodec/libavcodec.a -lm"
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} ${real_ffmpeg_tree}/libavcodec/libavcodec.a"
       ffmpeg_CFLAGS="${ffmpeg_CFLAGS} -I${real_ffmpeg_tree}/libavcodec"
     else
       dnl  The given libavcodec wasn't built
@@ -1057,10 +1068,10 @@ then
     fi
   else
     CFLAGS="${save_CFLAGS} ${ffmpeg_CFLAGS}"
-    LDFLAGS="${save_LDFLAGS} ${ffmpeg_LDFLAGS} -lm"
+    LDFLAGS="${save_LDFLAGS} ${ffmpeg_LDFLAGS}"
     AC_CHECK_LIB(avcodec, avcodec_init, [
       BUILTINS="${BUILTINS} codec/ffmpeg/ffmpeg"
-      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lavcodec -lm" ],
+      ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -lavcodec" ],
       [ AC_MSG_ERROR([Cannot find libavcodec library...]) ])
     LDFLAGS="${save_LDFLAGS}"
     CFLAGS="${save_CFLAGS}"
@@ -1081,7 +1092,7 @@ then
     faad_CFLAGS="${faad_CFLAGS} -I${with_faad}/include"
     faad_LDFLAGS="${faad_LDFLAGS} -L${with_faad}/lib"
   fi
-  faad_LDFLAGS="${faad_LDFLAGS} -lm"
+  faad_LDFLAGS="${faad_LDFLAGS}"
 
   AC_ARG_WITH(faad-tree, 
   [    --with-faad-tree=PATH faad tree for static linking])

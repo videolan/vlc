@@ -2,7 +2,7 @@
  * vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.2 2002/08/06 10:54:34 tcastley Exp $
+ * $Id: VlcWrapper.cpp,v 1.3 2002/08/18 11:32:06 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -452,7 +452,7 @@ void Intf_VLCWrapper::openNetHTTP(BString o_addr)
 
 void Intf_VLCWrapper::toggleMute( )
 {
-    input_ToggleMute( p_intf->p_sys->p_input );
+    /*input_ToggleMute( p_intf->p_sys->p_input );*/
 }
 
 /* menus management */
