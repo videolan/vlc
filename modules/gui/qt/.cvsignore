@@ -1,3 +1,7 @@
 .deps
 .dirstamp
 *.moc.*
+*.dll
+*.dylib
+*.sl
+*.so
