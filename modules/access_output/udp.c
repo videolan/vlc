@@ -383,7 +383,11 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
             p_buffer->p_buffer += i_write;
             p_buffer->i_buffer -= i_write;
             if ( p_buffer->i_flags & BLOCK_FLAG_CLOCK )
+            {
+                if ( p_sys->p_buffer->i_flags & BLOCK_FLAG_CLOCK )
+                    msg_Warn( p_access, "putting two PCRs at once" );
                 p_sys->p_buffer->i_flags |= BLOCK_FLAG_CLOCK;
+            }
 
             if( p_sys->p_buffer->i_buffer == p_sys->i_mtu || i_packets > 1 )
             {
