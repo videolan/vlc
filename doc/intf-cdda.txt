@@ -1,4 +1,22 @@
-Features over the older CD-DA plugin
+This file documents the ``Extended'' VLC CD-DA Plugin
+
+Copyright (C) 2003 Rocky Bernstein (rocky@panix.com)
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The Free Software Foundation's Back-Cover Text is: ``You have
+freedom to copy and modify this GNU Manual, like GNU software.  Copies
+published by the Free Software Foundation raise funds for GNU
+development.''
+
+- - - - - -
+
+Features over the older VLC CD-DA plugin
 
 Internally I think this is much much cleaner. It uses the 
 libcdio for disk reading and libcddb to get CDDB information.
@@ -16,10 +34,70 @@ Features:
 -  Will scan for a CD-ROM drive with a CD-DA loaded in it.
 
 -----------------------------------------------------------------
-Quick start
+General Info
 -----------------------------------------------------------------
-If you're new to using the plugin some, here are some common things
-that will probably trip you up. 
+
+Much of what I write in this section can be found elsewhere. See for
+example http://www.pctechguide.com/08cd-rom.htm, or the libcdio
+documentation.
+
+The Sony and Philips Corporations invented and Compact Disc (CD) in
+the early 1980s. The specifications for the layout is often referred
+to by the color of the cover on the specification. 
+
+The first type of CD specification that was produced was the Compact
+Disc Digital Audio (CD-DA) or just plain ``audio CD'' and is commonly
+called the ``Red Book''. Music CD's are recorded in this format which
+basically allows for around 74 minutes of audio per disc and for that
+information to be split up into *tracks*. Tracks are broken up into
+"sectors" and each sector contains 2,352 bytes. To play one 44.1 kHz
+CD-DA sampled audio second, 75 sectors are used.
+
+A CD can hold at most 99 such tracks. Between the tracks CD
+specifications require a ``2 second'' in gap (called a @term{lead-in
+gap}. This is unused space with no ``data'' similar to the space
+between tracks on an old phonograph. The word ``second'' here really
+refers to a measure of space and not really necessarily an amount of
+time. However in the special case here where you have an audio CD, the
+amount of time to play a gap of this size will take 2 seconds. Note
+this is independent of how fast your CD drive can read a sector.
+
+The beginning (or inner edge) of the CD is supposed to have a ``2
+second'' lead-in gap and there is supposed to be another ``2 second''
+*lead-out* gap at the end (or outer edge) of the CD.
+
+CD-DA ``Red Book'' Specification
+
+One can create and then write or "burn" a CD in the CD-DA format
+and in this process sometimes one writes the bytes that will appear as
+a file on a hard disk. This is called a "CD disk image". This
+plugin may be able to play this file just the same as if it were
+burned onto a CD.
+
+As there are a number of CD-burning programs, there are a number of
+CD-image formats. This plugin uses libcdio which currently understands
+the BIN/CUE disk-image format used by a popular DOS/Window mastering
+tool and a limited subset of the proprietary and unpublished form at
+used by the Nero burning software. Over time however perhaps more
+disk-image formats will be recognized.
+
+Audio CD Identification Information (CDDB)
+
+The Philips Red-Book specification allows for a Compact Disc to have a
+Media Catalog Number or MCN written on it, and probably this
+was how they CD's would be identified. Alas, very few audio discs
+actually have a Medium Catalog Number on the box, and the way the code
+is written on CD is *not* uniform across all discs!
+
+However the listening community wanted a way to identify an audio CD,
+so a database of CD information was gathered by basically making a
+``signature'' or hash from the number of tracks on a disk and a
+checksum of the bytes of the tracks. This is referred to as CDDB
+information. Using the hash the database gives information about the
+titles of the tracks, the CD album name, year it was published and so
+on. This plugin has the ability to show this information courtesy of
+libcddb written by Kris Verbeeck.
+
 
 -----------------------------------------------------------------
 MRLS:
@@ -117,13 +195,13 @@ Or
   %T %M otherwise
 
 - -
-cddax-cddb_email
+cddax-cddb-email
 
 # email given on cddb requests
 # string, default: me@home
 
 - -
-cddax-cddb_enabled
+cddax-cddb-enabled
 
 # Do we use CDDB to retrieve CD information?
 # bool, default: 1
@@ -211,7 +289,7 @@ Determination: start at step 5.
    There may also be a message may under "setup/logs".
 
 2. (There plugin was loaded and preferences found).  In the "cddax" tab
-   of preference. An important selection is "vcdx-device."  If this is
+   of preference. An important selection is "cddax-device."  If this is
    set to the empty string, CDDAX will try to scan your drives for a
    suitable device if the driver has the capability to scan for
    drives. However you can set the device to something of your
@@ -294,3 +372,4 @@ analyze the contents of a CD.
 The tool cd-read from libcdio can be used to show the sectors of 
 the CD or CD image or extract sectors. 
 
+$Id: intf-cdda.txt,v 1.2 2003/12/01 04:05:29 rocky Exp $
