@@ -360,12 +360,10 @@ static int  Open ( vlc_object_t *p_this )
 static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
-    x264_picture_t  pic;
-    int        i_nal;
+    x264_picture_t pic;
     x264_nal_t *nal;
     block_t *p_block;
-    int i_out;
-    int i;
+    int i_nal, i_out, i;
 
     /* init pic */
     memset( &pic, 0, sizeof( x264_picture_t ) );
@@ -377,7 +375,11 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
         pic.img.i_stride[i] = p_pict->p[i].i_pitch;
     }
 
+#if X264_BUILD >= 0x0013
+    x264_encoder_encode( p_sys->h, &nal, &i_nal, &pic, &pic );
+#else
     x264_encoder_encode( p_sys->h, &nal, &i_nal, &pic );
+#endif
     for( i = 0, i_out = 0; i < i_nal; i++ )
     {
         int i_size = p_sys->i_buffer - i_out;
