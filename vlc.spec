@@ -408,7 +408,7 @@ rm -fr %buildroot
 %{_libdir}/videolan/vlc/alsa.so
 
 %changelog
-* Mon Oct 28 2002 Alexis de Lattre <alexis@videolan.org> 0.4.6
+* Wed Nov 13 2002 Alexis de Lattre <alexis@videolan.org> 0.4.6
 - new upstream release
 
 * Mon Oct 14 2002 Alexis de Lattre <alexis@videolan.org> 0.4.5

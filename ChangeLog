@@ -3,7 +3,7 @@
 #===================#
 
 0.4.6
-Wed, 13 Nov 2002 ??
+Wed, 13 Nov 2002 23:41:00 +0200
 
   * FAQ: changed Debian repository location to HTTP (for better upload
     stats estimations on our side).
