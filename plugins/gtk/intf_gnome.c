@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: intf_gnome.c,v 1.7 2001/12/07 18:33:07 sam Exp $
+ * $Id: intf_gnome.c,v 1.7.2.1 2001/12/29 23:35:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -124,6 +124,13 @@ static int intf_Probe( probedata_t *p_data )
     {
         return( 200 );
     }
+
+#ifndef WIN32
+    if( getenv( "DISPLAY" ) == NULL )
+    {
+        return( 15 );
+    }
+#endif
 
     return( 100 );
 }

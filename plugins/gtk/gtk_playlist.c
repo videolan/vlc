@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.22 2001/12/07 18:33:07 sam Exp $
+ * $Id: gtk_playlist.c,v 1.22.2.1 2001/12/29 23:35:10 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -706,17 +706,24 @@ void GtkRebuildCList( GtkCList * p_clist, playlist_t * p_playlist )
     for( i_dummy = 0; i_dummy < p_playlist->i_size ; i_dummy++ )
     {
 #ifdef WIN32 /* WIN32 HACK */
-        ppsz_text[0] = g_strdup( "" );
+        ppsz_text[0] = "";
 #else
-        ppsz_text[0] = g_strdup( rindex( (char *)(p_playlist->p_item[
-                p_playlist->i_size - 1 - i_dummy].psz_name ), '/' ) + 1 );
+        ppsz_text[0] = rindex( p_playlist->p_item[
+                p_playlist->i_size - 1 - i_dummy].psz_name, '/' );
+        if ( ppsz_text[0] == NULL )
+        {
+            ppsz_text[0] =
+              p_playlist->p_item[ p_playlist->i_size - 1 - i_dummy ].psz_name;
+        }
+        else
+        {
+            /* Skip leading '/' */
+            ppsz_text[0]++;
+        }
 #endif
-        ppsz_text[1] = g_strdup( "no info");
+        ppsz_text[1] = "no info";
         
         gtk_clist_insert( p_clist, 0, ppsz_text );
-        
-        free( ppsz_text[0] );
-        free( ppsz_text[1] );
     }
     gtk_clist_set_background( p_clist, p_playlist->i_index, &red);
     gtk_clist_thaw( p_clist );

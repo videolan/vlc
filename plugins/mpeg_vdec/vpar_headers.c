@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.2.2.2 2001/12/13 23:56:18 sam Exp $
+ * $Id: vpar_headers.c,v 1.2.2.3 2001/12/29 23:35:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -484,7 +484,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
             intf_ErrMsg( "vpar error: can't open vout, aborting" );
             vlc_mutex_unlock( &p_vout_bank->lock );
 
-            /* XXX ! XXX ! XXX ! what to do here ? */
+            p_vpar->p_fifo->b_error = 1;
             return;
         }
         

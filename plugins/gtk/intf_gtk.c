@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: intf_gtk.c,v 1.29 2001/12/07 18:33:07 sam Exp $
+ * $Id: intf_gtk.c,v 1.29.2.1 2001/12/29 23:35:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -125,6 +125,13 @@ static int intf_Probe( probedata_t *p_data )
     {
         return( 190 );
     }
+
+#ifndef WIN32
+    if( getenv( "DISPLAY" ) == NULL )
+    {
+        return( 10 );
+    }
+#endif
 
     return( 90 );
 }

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.105 2001/12/07 18:33:07 sam Exp $
+ * $Id: input_dvd.c,v 1.105.2.1 2001/12/29 23:35:10 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -220,7 +220,6 @@ static void DVDInit( input_thread_t * p_input )
     if( IfoCreate( p_dvd ) < 0 )
     {
         intf_ErrMsg( "dvd error: allcation error in ifo" );
-        dvdcss_close( p_dvd->dvdhandle );
         free( p_dvd );
         p_input->b_error = 1;
         return;
@@ -230,7 +229,6 @@ static void DVDInit( input_thread_t * p_input )
     {
         intf_ErrMsg( "dvd error: fatal failure in ifo" );
         IfoDestroy( p_dvd->p_ifo );
-        dvdcss_close( p_dvd->dvdhandle );
         free( p_dvd );
         p_input->b_error = 1;
         return;
