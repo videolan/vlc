@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.39 2002/06/01 12:31:59 sam Exp $
+ * $Id: input_dvdread.c,v 1.40 2002/06/02 13:49:35 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -1204,12 +1204,12 @@ static void DvdReadLauchDecoders( input_thread_t * p_input )
     
     p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);            
             
-    if( !config_GetInt( p_input, "novideo" ) )
+    if( config_GetInt( p_input, "video" ) )
     {
         input_SelectES( p_input, p_input->stream.pp_es[0] );
     }
 
-    if( !config_GetInt( p_input, "noaudio" ) )
+    if( config_GetInt( p_input, "audio" ) )
     {
         /* For audio: first one if none or a not existing one specified */
         int i_audio = config_GetInt( p_input, "audio-channel" );
@@ -1244,7 +1244,7 @@ static void DvdReadLauchDecoders( input_thread_t * p_input )
         }
     }
 
-    if( !config_GetInt( p_input, "novideo" ) )
+    if( config_GetInt( p_input, "video" ) )
     {
         /* for spu, default is none */
         int i_spu = config_GetInt( p_input, "spu-channel" );

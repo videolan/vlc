@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.25 2002/06/01 12:32:00 sam Exp $
+ * $Id: spu_decoder.c,v 1.26 2002/06/02 13:49:35 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -884,6 +884,7 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
     /* RV16 target, scaling */
     case FOURCC_RV16:
 
+    /* XXX: this is a COMPLETE HACK, memcpy is unable to do u16s anyway */
     /* FIXME: get this from the DVD */
     for( i_color = 0; i_color < 4; i_color++ )
     {
@@ -900,7 +901,7 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
     p_dest = p_pic->p->p_pixels + ( i_width >> 6 ) * 2
               /* Add the picture coordinates and the SPU coordinates */
               + ( (p_spu->i_x * i_xscale) >> 6 ) * 2
-              + ( (p_spu->i_y * i_yscale) >> 6 ) * p_vout->output.i_width * 2;
+              + ( (p_spu->i_y * i_yscale) >> 6 ) * p_pic->p->i_pitch;
 
     /* Draw until we reach the bottom of the subtitle */
     for( i_y = 0 ; i_y < i_height ; )
@@ -912,7 +913,7 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
         if( i_ytmp + 1 >= ( i_y >> 6 ) )
         {
             /* Just one line : we precalculate i_y >> 6 */
-            i_yreal = p_vout->output.i_width * 2 * i_ytmp;
+            i_yreal = p_pic->p->i_pitch * i_ytmp;
 
             /* Draw until we reach the end of the line */
             for( i_x = i_width ; i_x ; )
@@ -948,8 +949,8 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
         }
         else
         {
-            i_yreal = p_vout->output.i_width * 2 * i_ytmp;
-            i_ynext = p_vout->output.i_width * 2 * i_y >> 6;
+            i_yreal = p_pic->p->i_pitch * i_ytmp;
+            i_ynext = p_pic->p->i_pitch * i_y >> 6;
 
             /* Draw until we reach the end of the line */
             for( i_x = i_width ; i_x ; )
@@ -966,7 +967,7 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
                 case 0x0f:
                     i_len = i_xscale * ( *p_source++ >> 2 );
                     for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
-                         i_ytmp += p_vout->output.i_width * 2 )
+                         i_ytmp += p_pic->p->i_pitch )
                     {
                         memset( p_dest - 2 * ( i_x >> 6 ) + i_ytmp,
                                 p_clut16[ i_color ],
@@ -979,7 +980,7 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
                     /* FIXME: we should do transparency */
                     i_len = i_xscale * ( *p_source++ >> 2 );
                     for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
-                         i_ytmp += p_vout->output.i_width * 2 )
+                         i_ytmp += p_pic->p->i_pitch )
                     {
                         memset( p_dest - 2 * ( i_x >> 6 ) + i_ytmp,
                                 p_clut16[ i_color ],
@@ -1015,7 +1016,7 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
     p_dest = p_pic->p->p_pixels + ( i_width >> 6 ) * 4
               /* Add the picture coordinates and the SPU coordinates */
               + ( (p_spu->i_x * i_xscale) >> 6 ) * 4
-              + ( (p_spu->i_y * i_yscale) >> 6 ) * p_vout->output.i_width * 4;
+              + ( (p_spu->i_y * i_yscale) >> 6 ) * p_pic->p->i_pitch;
 
     /* Draw until we reach the bottom of the subtitle */
     for( i_y = 0 ; i_y < i_height ; )
@@ -1027,7 +1028,7 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
         if( i_ytmp + 1 >= ( i_y >> 6 ) )
         {
             /* Just one line : we precalculate i_y >> 6 */
-            i_yreal = p_vout->output.i_width * 4 * i_ytmp;
+            i_yreal = p_pic->p->i_pitch * i_ytmp;
 
             /* Draw until we reach the end of the line */
             for( i_x = i_width ; i_x ; )
@@ -1061,8 +1062,8 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
         }
         else
         {
-            i_yreal = p_vout->output.i_width * 4 * i_ytmp;
-            i_ynext = p_vout->output.i_width * 4 * i_y >> 6;
+            i_yreal = p_pic->p->i_pitch * i_ytmp;
+            i_ynext = p_pic->p->i_pitch * i_y >> 6;
 
             /* Draw until we reach the end of the line */
             for( i_x = i_width ; i_x ; )
@@ -1079,7 +1080,7 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
                 case 0x0f:
                     i_len = i_xscale * ( *p_source++ >> 2 );
                     for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
-                         i_ytmp += p_vout->output.i_width * 4 )
+                         i_ytmp += p_pic->p->i_pitch )
                     {
                         memset( p_dest - 4 * ( i_x >> 6 ) + i_ytmp,
                                 p_clut32[ i_color ],
@@ -1092,7 +1093,7 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
                     /* FIXME: we should do transparency */
                     i_len = i_xscale * ( *p_source++ >> 2 );
                     for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
-                         i_ytmp += p_vout->output.i_width * 4 )
+                         i_ytmp += p_pic->p->i_pitch )
                     {
                         memset( p_dest - 4 * ( i_x >> 6 ) + i_ytmp,
                                 p_clut32[ i_color ],

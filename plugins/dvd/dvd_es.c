@@ -1,7 +1,7 @@
 /* dvd_es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_es.c,v 1.12 2002/06/01 12:31:58 sam Exp $
+ * $Id: dvd_es.c,v 1.13 2002/06/02 13:49:35 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -255,13 +255,13 @@ void DVDLaunchDecoders( input_thread_t * p_input )
     p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
 
     /* Select Video stream (always 0) */
-    if( !config_GetInt( p_input, "novideo" ) )
+    if( config_GetInt( p_input, "video" ) )
     {
         input_SelectES( p_input, p_input->stream.pp_es[0] );
     }
 
     /* Select audio stream */
-    if( p_dvd->i_audio_nb > 0 && !config_GetInt( p_input, "noaudio" ) )
+    if( p_dvd->i_audio_nb > 0 && config_GetInt( p_input, "audio" ) )
     {
         /* For audio: first one if none or a not existing one specified */
         i_audio = config_GetInt( p_input, "audio-channel" );
@@ -295,7 +295,7 @@ void DVDLaunchDecoders( input_thread_t * p_input )
     }
 
     /* Select subtitle */
-    if( p_dvd->i_spu_nb > 0 && !config_GetInt( p_input, "novideo" ) )
+    if( p_dvd->i_spu_nb > 0 && config_GetInt( p_input, "video" ) )
     {
         /* for spu, default is none */
         i_spu = config_GetInt( p_input, "spu-channel" );

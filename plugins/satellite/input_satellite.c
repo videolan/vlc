@@ -409,7 +409,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
         {
             case MPEG1_VIDEO_ES:
             case MPEG2_VIDEO_ES:
-                if ( !config_GetInt( p_input, "novideo" ) )
+                if ( config_GetInt( p_input, "video" ) )
                 {
                     ioctl_SetDMXFilter( p_es->i_id, &p_es->i_demux_fd, 1);
                     input_SelectES( p_input , p_es );
@@ -417,7 +417,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
                 break;
             case MPEG1_AUDIO_ES:
             case MPEG2_AUDIO_ES:
-                if ( !config_GetInt( p_input, "noaudio" ) )
+                if ( config_GetInt( p_input, "audio" ) )
                 {
                     ioctl_SetDMXFilter( p_es->i_id, &p_es->i_demux_fd, 2);
                     input_SelectES( p_input , p_es );
