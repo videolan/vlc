@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.62 2002/03/05 17:46:33 stef Exp $
+ * $Id: input_ext-intf.h,v 1.63 2002/03/21 02:27:04 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -71,7 +71,10 @@ typedef struct es_descriptor_s
                                            * fast forward and slow motion ?  */
     u8                      i_cat;        /* stream category: video, audio,
                                            * spu, other */
-
+#ifdef HAVE_SATELLITE
+    int                     i_dmx_fd;     /* used to store demux device
+                                             file handle */
+#endif
     char                    psz_desc[20]; /* description of ES: audio language
                                            * for instance ; NULL if not
                                            *  available */
@@ -315,7 +318,8 @@ typedef struct input_thread_s
 #define INPUT_METHOD_MCAST       0x32                       /* UDP multicast */
 #define INPUT_METHOD_BCAST       0x33                       /* UDP broadcast */
 #define INPUT_METHOD_VLAN_BCAST  0x34            /* UDP broadcast with VLANs */
-
+#define INPUT_METHOD_SATELLITE   0x40               /* stream is read from a */
+                                                           /* satellite card */
 
 /* Status changing methods */
 #define INPUT_STATUS_END            0

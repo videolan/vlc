@@ -833,6 +833,17 @@ then
 fi
 
 dnl
+dnl  Satellite input module
+dnl
+AC_ARG_ENABLE(satellite,
+  [  --enable-satellite       Satellite card support (default disabled)],
+  [ if test x$enable_satellite = xyes
+    then
+      BUILTINS="${BUILTINS} satellite"
+      AC_DEFINE(HAVE_SATELLITE, 1, define if compiling with satellite card support)
+    fi])
+
+dnl
 dnl  ipv6 plugin
 dnl
 AC_CHECK_FUNC(inet_pton,[PLUGINS="${PLUGINS} ipv6"])

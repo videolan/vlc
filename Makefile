@@ -51,6 +51,7 @@ PLUGINS_DIR :=	a52 \
 		network \
 		qnx \
 		qt \
+		satellite \
 		sdl \
 		spudec \
 		text \
@@ -130,6 +131,7 @@ PLUGINS_TARGETS := a52/a52 \
 		network/ipv6 \
 		qnx/qnx \
 		qt/qt \
+		satellite/satellite \
 		sdl/sdl \
 		spudec/spudec \
 		text/logger \

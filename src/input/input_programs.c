@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.75 2002/03/19 23:02:29 jobi Exp $
+ * $Id: input_programs.c,v 1.76 2002/03/21 02:27:04 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -492,6 +492,9 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     p_es->p_decoder_fifo = NULL;
     p_es->b_audio = 0;
     p_es->i_cat = UNKNOWN_ES;
+#ifdef HAVE_SATELLITE
+    p_es->i_dmx_fd = 0;
+#endif
 
     if( i_data_len )
     {
