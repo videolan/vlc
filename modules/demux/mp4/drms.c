@@ -2,7 +2,7 @@
  * drms.c: DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.c,v 1.5 2004/01/16 18:26:57 sam Exp $
+ * $Id: drms.c,v 1.6 2004/01/18 01:21:33 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Sam Hocevar <sam@zoy.org>
@@ -100,14 +100,13 @@ struct drms_s
 {
     uint32_t i_user;
     uint32_t i_key;
-    uint8_t *p_iviv;
+    uint8_t  p_iviv[ 16 ];
     uint8_t *p_name;
-    uint32_t i_name_len;
 
     uint32_t p_key[ 4 ];
     struct aes_s aes;
 
-    char    *psz_homedir;
+    char     psz_homedir[ PATH_MAX ];
 };
 
 /*****************************************************************************
@@ -118,13 +117,11 @@ static void DecryptAES    ( struct aes_s *, uint32_t *, const uint32_t * );
 
 static void InitMD5       ( struct md5_s * );
 static void AddMD5        ( struct md5_s *, const uint8_t *, uint32_t );
-static void AddNativeMD5  ( struct md5_s *, uint32_t *, uint32_t );
 static void EndMD5        ( struct md5_s * );
 static void Digest        ( struct md5_s *, const uint32_t * );
 
 static void InitShuffle   ( struct shuffle_s *, uint32_t * );
 static void DoShuffle     ( struct shuffle_s *, uint8_t *, uint32_t );
-static void Bordelize     ( uint32_t *, uint32_t );
 
 static int GetSystemKey   ( uint32_t * );
 static int WriteUserKey   ( void *, uint32_t * );
@@ -132,14 +129,14 @@ static int ReadUserKey    ( void *, uint32_t * );
 static int GetUserKey     ( void *, uint32_t * );
 
 static int GetSCIData     ( uint32_t **, uint32_t * );
-static int HashSystemInfo ( struct md5_s * );
+static int HashSystemInfo ( uint32_t * );
 
 /*****************************************************************************
  * BlockXOR: XOR two 128 bit blocks
  *****************************************************************************/
 static inline void BlockXOR( uint32_t *p_dest, uint32_t *p_s1, uint32_t *p_s2 )
 {
-    uint32_t i;
+    int i;
 
     for( i = 0; i < 4; i++ )
     {
@@ -163,17 +160,8 @@ void *drms_alloc( char *psz_homedir )
 
     memset( p_drms, 0, sizeof(struct drms_s) );
 
-    p_drms->psz_homedir = malloc( PATH_MAX );
-    if( p_drms->psz_homedir != NULL )
-    {
-        strncpy( p_drms->psz_homedir, psz_homedir, PATH_MAX );
-        p_drms->psz_homedir[ PATH_MAX - 1 ] = '\0';
-    }
-    else
-    {
-        free( (void *)p_drms );
-        p_drms = NULL;
-    }
+    strncpy( p_drms->psz_homedir, psz_homedir, PATH_MAX );
+    p_drms->psz_homedir[ PATH_MAX - 1 ] = '\0';
 
     return (void *)p_drms;
 }
@@ -190,16 +178,6 @@ void drms_free( void *_p_drms )
         free( (void *)p_drms->p_name );
     }
 
-    if( p_drms->p_iviv != NULL )
-    {
-        free( (void *)p_drms->p_iviv );
-    }
-
-    if( p_drms->psz_homedir != NULL )
-    {
-        free( (void *)p_drms->psz_homedir );
-    }
-
     free( p_drms );
 }
 
@@ -210,28 +188,28 @@ void drms_decrypt( void *_p_drms, uint32_t *p_buffer, uint32_t i_bytes )
 {
     struct drms_s *p_drms = (struct drms_s *)_p_drms;
     uint32_t p_key[ 4 ];
-    uint32_t i_blocks, i;
+    unsigned int i_blocks;
 
     /* AES is a block cypher, round down the byte count */
     i_blocks = i_bytes / 16;
     i_bytes = i_blocks * 16;
 
     /* Initialise the key */
-    memcpy( p_key, p_drms->p_key, 4 * sizeof(uint32_t) );
+    memcpy( p_key, p_drms->p_key, 16 );
 
     /* Unscramble */
-    for( i = i_blocks; i--; )
+    while( i_blocks-- )
     {
-        uint32_t  p_tmp[ 4 ];
+        uint32_t p_tmp[ 4 ];
 
         DecryptAES( &p_drms->aes, p_tmp, p_buffer );
         BlockXOR( p_tmp, p_key, p_tmp );
 
         /* Use the previous scrambled data as the key for next block */
-        memcpy( p_key, p_buffer, 4 * sizeof(uint32_t) );
+        memcpy( p_key, p_buffer, 16 );
 
         /* Copy unscrambled data back to the buffer */
-        memcpy( p_buffer, p_tmp, 4 * sizeof(uint32_t) );
+        memcpy( p_buffer, p_tmp, 16 );
 
         p_buffer += 4;
     }
@@ -249,7 +227,6 @@ int drms_init( void *_p_drms, uint32_t i_type,
     switch( i_type )
     {
         case FOURCC_user:
-        {
             if( i_len < sizeof(p_drms->i_user) )
             {
                 i_ret = -1;
@@ -257,11 +234,9 @@ int drms_init( void *_p_drms, uint32_t i_type,
             }
 
             p_drms->i_user = U32_AT( p_info );
-        }
-        break;
+            break;
 
         case FOURCC_key:
-        {
             if( i_len < sizeof(p_drms->i_key) )
             {
                 i_ret = -1;
@@ -269,42 +244,26 @@ int drms_init( void *_p_drms, uint32_t i_type,
             }
 
             p_drms->i_key = U32_AT( p_info );
-        }
-        break;
+            break;
 
         case FOURCC_iviv:
-        {
             if( i_len < sizeof(p_drms->p_key) )
             {
                 i_ret = -1;
                 break;
             }
 
-            p_drms->p_iviv = malloc( sizeof(p_drms->p_key) );
-            if( p_drms->p_iviv == NULL )
-            {
-                i_ret = -1;
-                break;
-            }
-
-            memcpy( p_drms->p_iviv, p_info, sizeof(p_drms->p_key) );
-        }
-        break;
+            memcpy( p_drms->p_iviv, p_info, 16 );
+            break;
 
         case FOURCC_name:
-        {
-            p_drms->i_name_len = strlen( p_info );
+            p_drms->p_name = strdup( p_info );
 
-            p_drms->p_name = malloc( p_drms->i_name_len );
             if( p_drms->p_name == NULL )
             {
                 i_ret = -1;
-                break;
             }
-
-            memcpy( p_drms->p_name, p_info, p_drms->i_name_len );
-        }
-        break;
+            break;
 
         case FOURCC_priv:
         {
@@ -318,8 +277,8 @@ int drms_init( void *_p_drms, uint32_t i_type,
             }
 
             InitMD5( &md5 );
-            AddMD5( &md5, p_drms->p_name, p_drms->i_name_len );
-            AddMD5( &md5, p_drms->p_iviv, sizeof(p_drms->p_key) );
+            AddMD5( &md5, p_drms->p_name, strlen( p_drms->p_name ) );
+            AddMD5( &md5, p_drms->p_iviv, 16 );
             EndMD5( &md5 );
 
             if( GetUserKey( p_drms, p_drms->p_key ) )
@@ -331,18 +290,14 @@ int drms_init( void *_p_drms, uint32_t i_type,
             InitAES( &p_drms->aes, p_drms->p_key );
 
             memcpy( p_priv, p_info, 64 );
-            memcpy( p_drms->p_key, md5.p_digest, sizeof(p_drms->p_key) );
-            drms_decrypt( p_drms, p_priv, sizeof(p_priv) );
+            memcpy( p_drms->p_key, md5.p_digest, 16 );
+            drms_decrypt( p_drms, p_priv, 64 );
 
             InitAES( &p_drms->aes, p_priv + 6 );
-            memcpy( p_drms->p_key, p_priv + 12, sizeof(p_drms->p_key) );
+            memcpy( p_drms->p_key, p_priv + 12, 16 );
 
-            free( (void *)p_drms->psz_homedir );
-            p_drms->psz_homedir = NULL;
             free( (void *)p_drms->p_name );
             p_drms->p_name = NULL;
-            free( (void *)p_drms->p_iviv );
-            p_drms->p_iviv = NULL;
         }
         break;
     }
@@ -359,26 +314,27 @@ int drms_init( void *_p_drms, uint32_t i_type,
  *****************************************************************************/
 static void InitAES( struct aes_s *p_aes, uint32_t *p_key )
 {
-    uint32_t i, t, i_key, i_tmp;
+    unsigned int i, t;
+    uint32_t i_key, i_seed;
 
-    memset( p_aes->pp_enc_keys[1], 0, 4 * sizeof(uint32_t) );
-    memcpy( p_aes->pp_enc_keys[0], p_key, 4 * sizeof(uint32_t) );
+    memset( p_aes->pp_enc_keys[1], 0, 16 );
+    memcpy( p_aes->pp_enc_keys[0], p_key, 16 );
 
     /* Generate the key tables */
-    i_tmp = p_aes->pp_enc_keys[ 0 ][ 3 ];
+    i_seed = p_aes->pp_enc_keys[ 0 ][ 3 ];
 
     for( i_key = 0; i_key < AES_KEY_COUNT; i_key++ )
     {
         uint32_t j;
 
-        i_tmp = AES_ROR( i_tmp, 8 );
+        i_seed = AES_ROR( i_seed, 8 );
 
         j = p_aes_table[ i_key ];
 
-        j ^= p_aes_encrypt[ (i_tmp >> 24) & 0xFF ]
-              ^ AES_ROR( p_aes_encrypt[ (i_tmp >> 16) & 0xFF ], 8 )
-              ^ AES_ROR( p_aes_encrypt[ (i_tmp >> 8) & 0xFF ], 16 )
-              ^ AES_ROR( p_aes_encrypt[ i_tmp & 0xFF ], 24 );
+        j ^= p_aes_encrypt[ (i_seed >> 24) & 0xff ]
+              ^ AES_ROR( p_aes_encrypt[ (i_seed >> 16) & 0xff ], 8 )
+              ^ AES_ROR( p_aes_encrypt[ (i_seed >> 8) & 0xff ], 16 )
+              ^ AES_ROR( p_aes_encrypt[ i_seed & 0xff ], 24 );
 
         j ^= p_aes->pp_enc_keys[ i_key ][ 0 ];
         p_aes->pp_enc_keys[ i_key + 1 ][ 0 ] = j;
@@ -389,11 +345,11 @@ static void InitAES( struct aes_s *p_aes, uint32_t *p_key )
         j ^= p_aes->pp_enc_keys[ i_key ][ 3 ];
         p_aes->pp_enc_keys[ i_key + 1 ][ 3 ] = j;
 
-        i_tmp = j;
+        i_seed = j;
     }
 
     memcpy( p_aes->pp_dec_keys[ 0 ],
-            p_aes->pp_enc_keys[ 0 ], 4 * sizeof(uint32_t) );
+            p_aes->pp_enc_keys[ 0 ], 16 );
 
     for( i = 1; i < AES_KEY_COUNT; i++ )
     {
@@ -403,9 +359,9 @@ static void InitAES( struct aes_s *p_aes, uint32_t *p_key )
 
             j = p_aes->pp_enc_keys[ i ][ t ];
 
-            k = (((j >> 7) & 0x01010101) * 27) ^ ((j & 0xFF7F7F7F) << 1);
-            l = (((k >> 7) & 0x01010101) * 27) ^ ((k & 0xFF7F7F7F) << 1);
-            m = (((l >> 7) & 0x01010101) * 27) ^ ((l & 0xFF7F7F7F) << 1);
+            k = (((j >> 7) & 0x01010101) * 27) ^ ((j & 0xff7f7f7f) << 1);
+            l = (((k >> 7) & 0x01010101) * 27) ^ ((k & 0xff7f7f7f) << 1);
+            m = (((l >> 7) & 0x01010101) * 27) ^ ((l & 0xff7f7f7f) << 1);
 
             j ^= m;
 
@@ -424,7 +380,7 @@ static void DecryptAES( struct aes_s *p_aes,
 {
     uint32_t p_wtxt[ 4 ]; /* Working cyphertext */
     uint32_t p_tmp[ 4 ];
-    uint32_t round, t;
+    unsigned int i_round, t;
 
     for( t = 0; t < 4; t++ )
     {
@@ -433,7 +389,7 @@ static void DecryptAES( struct aes_s *p_aes,
     }
 
     /* Rounds 0 - 8 */
-    for( round = 0; round < (AES_KEY_COUNT - 1); round++ )
+    for( i_round = 0; i_round < (AES_KEY_COUNT - 1); i_round++ )
     {
         for( t = 0; t < 4; t++ )
         {
@@ -443,7 +399,7 @@ static void DecryptAES( struct aes_s *p_aes,
         for( t = 0; t < 4; t++ )
         {
             p_wtxt[ t ] = p_tmp[ t ]
-                    ^ p_aes->pp_dec_keys[ (AES_KEY_COUNT - 1) - round ][ t ];
+                    ^ p_aes->pp_dec_keys[ (AES_KEY_COUNT - 1) - i_round ][ t ];
         }
     }
 
@@ -451,7 +407,7 @@ static void DecryptAES( struct aes_s *p_aes,
     for( t = 0; t < 4; t++ )
     {
         p_dest[ t ] = AES_XOR_ROR( p_aes_decrypt, p_wtxt );
-        p_dest[ t ] ^= p_aes->pp_dec_keys[ (AES_KEY_COUNT - 1) - round ][ t ];
+        p_dest[ t ] ^= p_aes->pp_dec_keys[ 0 ][ t ];
     }
 }
 
@@ -463,11 +419,11 @@ static void DecryptAES( struct aes_s *p_aes,
 static void InitMD5( struct md5_s *p_md5 )
 {
     p_md5->p_digest[ 0 ] = 0x67452301;
-    p_md5->p_digest[ 1 ] = 0xEFCDAB89;
-    p_md5->p_digest[ 2 ] = 0x98BADCFE;
+    p_md5->p_digest[ 1 ] = 0xefcdab89;
+    p_md5->p_digest[ 2 ] = 0x98badcfe;
     p_md5->p_digest[ 3 ] = 0x10325476;
 
-    memset( p_md5->p_data, 0, 16 * sizeof(uint32_t) );
+    memset( p_md5->p_data, 0, 64 );
     p_md5->i_bits = 0;
 }
 
@@ -476,8 +432,8 @@ static void InitMD5( struct md5_s *p_md5 )
  *****************************************************************************/
 static void AddMD5( struct md5_s *p_md5, const uint8_t *p_src, uint32_t i_len )
 {
-    uint32_t i_current; /* Current bytes in the spare buffer */
-    uint32_t i_offset = 0;
+    unsigned int i_current; /* Current bytes in the spare buffer */
+    unsigned int i_offset = 0;
 
     i_current = (p_md5->i_bits / 8) & 63;
 
@@ -500,7 +456,7 @@ static void AddMD5( struct md5_s *p_md5, const uint8_t *p_src, uint32_t i_len )
     while( i_len >= 64 )
     {
         uint32_t p_tmp[ 16 ];
-        memcpy( p_tmp, p_src + i_offset, 16 * sizeof(uint32_t) );
+        memcpy( p_tmp, p_src + i_offset, 64 );
         Digest( p_md5, p_tmp );
         i_offset += 64;
         i_len -= 64;
@@ -511,33 +467,6 @@ static void AddMD5( struct md5_s *p_md5, const uint8_t *p_src, uint32_t i_len )
 }
 
 /*****************************************************************************
- * AddNativeMD5: add i_len big-endian uin32_t to an MD5 message
- *****************************************************************************
- * FIXME: I don't really understand what this is supposed to do, especially
- * with big values of i_len ...
- *****************************************************************************/
-static void AddNativeMD5( struct md5_s *p_md5, uint32_t *p_src, uint32_t i_len )
-{
-    uint32_t i, x, y;
-    /* XXX: it's 32, not 16! */
-    uint32_t p_tmp[ 32 ];
-
-    /* Convert big endian p_src to native-endian p_tmp */
-    for( x = i_len; x; x -= y )
-    {
-        /* XXX: this looks weird! */
-        y = x > 32 ? 32 : x;
-
-        for( i = 0; i < y; i++ )
-        {
-            p_tmp[ i ] = U32_AT(p_src + i);
-        }
-    }
-
-    AddMD5( p_md5, (uint8_t *)p_tmp, i_len * sizeof(uint32_t) );
-}
-
-/*****************************************************************************
  * EndMD5: finish an MD5 message
  *****************************************************************************
  * This function adds adequate padding to the end of the message, and appends
@@ -545,7 +474,7 @@ static void AddNativeMD5( struct md5_s *p_md5, uint32_t *p_src, uint32_t i_len )
  *****************************************************************************/
 static void EndMD5( struct md5_s *p_md5 )
 {
-    uint32_t i_current;
+    unsigned int i_current;
 
     i_current = (p_md5->i_bits / 8) & 63;
 
@@ -674,54 +603,37 @@ static void Digest( struct md5_s *p_md5, const uint32_t *p_input )
  *****************************************************************************/
 static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key )
 {
-    uint32_t p_native_key[ 4 ];
-    uint32_t i, i_seed = 0x5476212A; /* *!vT */
+    char p_secret1[] = "*!vT";
+    static char const p_secret2[] = "v8rhvsaAvOKMFfUH%798=[;."
+                                    "f8677680a634ba87fnOIf)(*";
+    unsigned int i;
 
-    /* Store the system key in native endianness */
-    for( i = 0; i < 4; i++ )
-    {
-        p_native_key[ i ] = U32_AT(p_sys_key + i);
-    }
-
-    /* Fill p_commands using the native key and our seed */
+    /* Fill p_commands using the key and a secret seed */
     for( i = 0; i < 20; i++ )
     {
         struct md5_s md5;
+        /* Convert the secret to big endian */
+        uint32_t i_big_secret = U32_AT(p_secret1);
         int32_t i_hash;
 
         InitMD5( &md5 );
-        AddNativeMD5( &md5, p_native_key, 4 );
-        AddNativeMD5( &md5, &i_seed, 1 );
+        AddMD5( &md5, (uint8_t *)p_sys_key, 16 );
+        AddMD5( &md5, (uint8_t *)&i_big_secret, 4 );
         EndMD5( &md5 );
 
-        i_seed++;
+        p_secret1[ 0 ]++;
 
         i_hash = ((int32_t)U32_AT(md5.p_digest)) % 1024;
 
         p_shuffle->p_commands[ i ] = i_hash < 0 ? i_hash * -1 : i_hash;
     }
 
-    /* Fill p_bordel with completely meaningless initial values.
-     * FIXME: check endianness issues. */
-    p_shuffle->p_bordel[  0 ] = p_native_key[ 0 ];
-    p_shuffle->p_bordel[  1 ] = 0x68723876; /* v8rh */
-    p_shuffle->p_bordel[  2 ] = 0x41617376; /* vsaA */
-    p_shuffle->p_bordel[  3 ] = 0x4D4B4F76; /* voKM */
-
-    p_shuffle->p_bordel[  4 ] = p_native_key[ 1 ];
-    p_shuffle->p_bordel[  5 ] = 0x48556646; /* FfUH */
-    p_shuffle->p_bordel[  6 ] = 0x38393725; /* %798 */
-    p_shuffle->p_bordel[  7 ] = 0x2E3B5B3D; /* =[;. */
-
-    p_shuffle->p_bordel[  8 ] = p_native_key[ 2 ];
-    p_shuffle->p_bordel[  9 ] = 0x37363866; /* f867 */
-    p_shuffle->p_bordel[ 10 ] = 0x30383637; /* 7680 */
-    p_shuffle->p_bordel[ 11 ] = 0x34333661; /* a634 */
-
-    p_shuffle->p_bordel[ 12 ] = p_native_key[ 3 ];
-    p_shuffle->p_bordel[ 13 ] = 0x37386162; /* ba87 */
-    p_shuffle->p_bordel[ 14 ] = 0x494F6E66; /* fnOI */
-    p_shuffle->p_bordel[ 15 ] = 0x2A282966; /* f)(* */
+    /* Fill p_bordel with completely meaningless initial values. */
+    for( i = 0; i < 4; i++ )
+    {
+        p_shuffle->p_bordel[ 4 * i ] = U32_AT(p_sys_key + i);
+        memcpy( p_shuffle->p_bordel + 4 * i + 1, p_secret2 + 12 * i, 12 );
+    }
 }
 
 /*****************************************************************************
@@ -734,19 +646,51 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
                        uint8_t *p_buffer, uint32_t i_len )
 {
     struct md5_s md5;
-    uint32_t i;
+    uint32_t p_big_bordel[ 16 ];
+    uint32_t *p_bordel = p_shuffle->p_bordel;
+    unsigned int i;
 
-    /* Randomize p_bordel and compute its MD5 checksum */
+    /* Using the MD5 hash of a memory block is probably not one-way enough
+     * for the iTunes people. This function randomises p_bordel depending on
+     * the values in p_commands to make things even more messy in p_bordel. */
     for( i = 0; i < 20; i++ )
     {
-        if( p_shuffle->p_commands[ i ] )
+        uint8_t i_command, i_index;
+
+        if( !p_shuffle->p_commands[ i ] )
         {
-            Bordelize( p_shuffle->p_bordel, p_shuffle->p_commands[ i ] );
+            continue;
+        }
+
+        i_command = (p_shuffle->p_commands[ i ] & 0x300) >> 8;
+        i_index = p_shuffle->p_commands[ i ] & 0xff;
+
+        switch( i_command )
+        {
+        case 0x3:
+            p_bordel[ i_index & 0xf ] = p_bordel[ i_index >> 4 ]
+                                      + p_bordel[ ((i_index + 0x10) >> 4) & 0xf ];
+            break;
+        case 0x2:
+            p_bordel[ i_index >> 4 ] ^= p_shuffle_xor[ 0xff - i_index ];
+            break;
+        case 0x1:
+            p_bordel[ i_index >> 4 ] -= p_shuffle_sub[ 0xff - i_index ];
+            break;
+        default:
+            p_bordel[ i_index >> 4 ] += p_shuffle_add[ 0xff - i_index ];
+            break;
         }
     }
 
+    /* Convert our newly randomised p_bordel to big endianness and take
+     * its MD5 hash. */
     InitMD5( &md5 );
-    AddNativeMD5( &md5, p_shuffle->p_bordel, 16 );
+    for( i = 0; i < 16; i++ )
+    {
+        p_big_bordel[ i ] = U32_AT(p_bordel + i);
+    }
+    AddMD5( &md5, (uint8_t *)p_big_bordel, 64 );
     EndMD5( &md5 );
 
     /* There are only 16 bytes in an MD5 hash */
@@ -763,69 +707,34 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
 }
 
 /*****************************************************************************
- * Bordelize: helper for DoShuffle
- *****************************************************************************
- * Using the MD5 hash of a string is probably not one-way enough. This
- * function randomises p_bordel depending on the value of i_command to make
- * things even more messy in p_bordel.
- *****************************************************************************/
-static void Bordelize( uint32_t *p_bordel, uint32_t i_command )
-{
-    uint32_t i, x;
-
-    i = (i_command / 16) & 15;
-    x = (~(i_command & 15)) & 15;
-
-    if( (i_command & 768) == 768 )
-    {
-        x = (~i) & 15;
-        i = i_command & 15;
-
-        p_bordel[ i ] = p_bordel[ ((16 - x) & 15) ] + p_bordel[ (15 - x) ];
-    }
-    else if( (i_command & 512) == 512 )
-    {
-        p_bordel[ i ] ^= p_shuffle_xor[ 15 - i ][ x ];
-    }
-    else if( (i_command & 256) == 256 )
-    {
-        p_bordel[ i ] -= p_shuffle_sub[ 15 - i ][ x ];
-    }
-    else
-    {
-        p_bordel[ i ] += p_shuffle_add[ 15 - i ][ x ];
-    }
-}
-
-/*****************************************************************************
  * GetSystemKey: get the system key
  *****************************************************************************
  * Compute the system key from various system information, see HashSystemInfo.
  *****************************************************************************/
 static int GetSystemKey( uint32_t *p_sys_key )
 {
+    static char const p_secret1[ 8 ] = "YuaFlafu";
+    static char const p_secret2[ 8 ] = "zPif98ga";
     struct md5_s md5;
-    uint32_t p_tmp_key[ 4 ];
+    uint32_t p_system_hash[ 4 ];
 
-    InitMD5( &md5 );
-    if( HashSystemInfo( &md5 ) )
+    /* Compute the MD5 hash of our system info */
+    if( HashSystemInfo( p_system_hash ) )
     {
         return -1;
     }
-    EndMD5( &md5 );
 
-    /* Write our digest to p_tmp_key */
-    memcpy( p_tmp_key, md5.p_digest, 4 * sizeof(uint32_t) );
-
+    /* Combine our system info hash with additional secret data. The resulting
+     * MD5 hash will be our system key. */
     InitMD5( &md5 );
-    AddMD5( &md5, "YuaFlafu", 8 );
-    AddMD5( &md5, (uint8_t *)p_tmp_key, 6 );
-    AddMD5( &md5, (uint8_t *)p_tmp_key, 6 );
-    AddMD5( &md5, (uint8_t *)p_tmp_key, 6 );
-    AddMD5( &md5, "zPif98ga", 8 );
+    AddMD5( &md5, p_secret1, 8 );
+    AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
+    AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
+    AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
+    AddMD5( &md5, p_secret2, 8 );
     EndMD5( &md5 );
 
-    memcpy( p_sys_key, md5.p_digest, 4 * sizeof(uint32_t) );
+    memcpy( p_sys_key, md5.p_digest, 16 );
 
     return 0;
 }
@@ -913,24 +822,17 @@ static int ReadUserKey( void *_p_drms, uint32_t *p_user_key )
  *****************************************************************************/
 static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
 {
+    static char const p_secret[] = "mUfnpognadfgf873";
     struct drms_s *p_drms = (struct drms_s *)_p_drms;
     struct aes_s aes;
     struct shuffle_s shuffle;
     uint32_t i, y;
-    uint32_t *p_tmp;
-    uint32_t *p_cur_key;
+    uint32_t *p_sci_data;
     uint32_t p_sys_key[ 4 ];
-    uint32_t i_sci_size;
-    uint32_t *pp_sci[ 2 ];
+    uint32_t i_sci_size, i_blocks;
+    uint32_t *p_sci0, *p_sci1, *p_buffer;
+    uint32_t p_sci_key[ 4 ];
     int i_ret = -1;
-
-    uint32_t p_sci_key[ 4 ] =
-    {
-        0x6e66556d, /* nfUm */
-        0x6e676f70, /* ngop */
-        0x67666461, /* gfda */
-        0x33373866  /* 378f */
-    };
 
     if( !ReadUserKey( p_drms, p_user_key ) )
     {
@@ -942,85 +844,93 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
         return -1;
     }
 
-    if( GetSCIData( pp_sci + 0, &i_sci_size ) )
+    if( GetSCIData( &p_sci_data, &i_sci_size ) )
     {
         return -1;
     }
 
-    p_tmp = pp_sci[ 0 ];
-    pp_sci[ 1 ] = (uint32_t *)(((uint8_t *)pp_sci[ 0 ]) + i_sci_size);
-    i_sci_size -= sizeof(*pp_sci[ 0 ]);
+    /* Phase 1: unscramble the SCI data using the system key and shuffle
+     *          it using DoShuffle(). */
 
+    /* Skip the first 4 bytes (some sort of header). Decrypt the rest. */
+    i_blocks = (i_sci_size - 4) / 16;
+    p_buffer = p_sci_data + 1;
+
+    /* Decrypt and shuffle our data at the same time */
     InitAES( &aes, p_sys_key );
-
-    for( i = 0, p_cur_key = p_sci_key;
-         i < i_sci_size / sizeof(p_drms->p_key); i++ )
-    {
-        y = i * sizeof(*pp_sci[ 0 ]);
-
-        DecryptAES( &aes, pp_sci[ 1 ] + y + 1, pp_sci[ 0 ] + y + 1 );
-        BlockXOR( pp_sci[ 1 ] + y + 1, p_cur_key, pp_sci[ 1 ] + y + 1 );
-
-        p_cur_key = pp_sci[ 0 ] + y + 1;
-    }
-
-    /* Shuffle pp_sci[ 1 ] using a custom routine */
     InitShuffle( &shuffle, p_sys_key );
 
-    for( i = 0; i < i_sci_size / sizeof(p_drms->p_key); i++ )
-    {
-        y = i * sizeof(*pp_sci[ 1 ]);
+    /* FIXME: check for endianness */
+    memcpy( p_sci_key, p_secret, 16 );
 
-        DoShuffle( &shuffle, (uint8_t *)(pp_sci[ 1 ] + y + 1),
-                   sizeof(p_drms->p_key) );
+    while( i_blocks-- )
+    {
+        uint32_t p_tmp[ 4 ];
+
+        DecryptAES( &aes, p_tmp, p_buffer );
+        BlockXOR( p_tmp, p_sci_key, p_tmp );
+
+        /* Use the previous scrambled data as the key for next block */
+        memcpy( p_sci_key, p_buffer, 16 );
+
+        /* Shuffle the decrypted data using a custom routine */
+        DoShuffle( &shuffle, (uint8_t *)p_tmp, 16 );
+
+        /* Copy this block back to p_buffer */
+        memcpy( p_buffer, p_tmp, 16 );
+
+        p_buffer += 4;
     }
 
-    y = 0;
-    i = U32_AT( &pp_sci[ 1 ][ 5 ] );
-    i_sci_size -= 21 * sizeof(*pp_sci[ 1 ]);
-    pp_sci[ 1 ] += 22;
-    pp_sci[ 0 ] = NULL;
+    /* Phase 2: look for the user key in the generated data. I must admit I
+     *          do not understand what is going on here, because it almost
+     *          looks like we are browsing data that makes sense, even though
+     *          the DoShuffle() part made it completely meaningless. */
 
-    while( i_sci_size > 0 && i > 0 )
+    y = 0;
+    i = U32_AT( p_sci_data + 5 );
+    i_sci_size -= 22 * sizeof(uint32_t);
+    p_sci1 = p_sci_data + 22;
+    p_sci0 = NULL;
+
+    while( i_sci_size >= 20 && i > 0 )
     {
-        if( pp_sci[ 0 ] == NULL )
+        if( p_sci0 == NULL )
         {
-            i_sci_size -= 18 * sizeof(*pp_sci[ 1 ]);
-            if( i_sci_size <= 0 )
+            i_sci_size -= 18 * sizeof(uint32_t);
+            if( i_sci_size < 20 )
             {
                 break;
             }
 
-            pp_sci[ 0 ] = pp_sci[ 1 ];
-            y = U32_AT( &pp_sci[ 1 ][ 17 ] );
-            pp_sci[ 1 ] += 18;
+            p_sci0 = p_sci1;
+            y = U32_AT( p_sci1 + 17 );
+            p_sci1 += 18;
         }
 
         if( !y )
         {
             i--;
-            pp_sci[ 0 ] = NULL;
+            p_sci0 = NULL;
             continue;
         }
 
-        if( U32_AT( &pp_sci[ 0 ][ 0 ] ) == p_drms->i_user &&
-            ( i_sci_size >=
-              (sizeof(p_drms->p_key) + sizeof(pp_sci[ 1 ][ 0 ]) ) ) &&
-            ( ( U32_AT( &pp_sci[ 1 ][ 0 ] ) == p_drms->i_key ) ||
-              ( !p_drms->i_key ) || ( pp_sci[ 1 ] == (pp_sci[ 0 ] + 18) ) ) )
+        if( U32_AT( p_sci0 ) == p_drms->i_user &&
+            ( ( U32_AT( p_sci1 ) == p_drms->i_key ) ||
+              ( !p_drms->i_key ) || ( p_sci1 == (p_sci0 + 18) ) ) )
         {
-            memcpy( p_user_key, &pp_sci[ 1 ][ 1 ], sizeof(p_drms->p_key) );
+            memcpy( p_user_key, p_sci1 + 1, 16 );
             WriteUserKey( p_drms, p_user_key );
             i_ret = 0;
             break;
         }
 
         y--;
-        pp_sci[ 1 ] += 5;
-        i_sci_size -= 5 * sizeof(*pp_sci[ 1 ]);
+        p_sci1 += 5;
+        i_sci_size -= 5 * sizeof(uint32_t);
     }
 
-    free( (void *)p_tmp );
+    free( p_sci_data );
 
     return i_ret;
 }
@@ -1030,7 +940,7 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
  *****************************************************************************
  * Read SCI data from "\Apple Computer\iTunes\SC Info\SC Info.sidb"
  *****************************************************************************/
-static int GetSCIData( uint32_t **pp_sci, uint32_t *p_sci_size )
+static int GetSCIData( uint32_t **pp_sci, uint32_t *pi_sci_size )
 {
     int i_ret = -1;
 
@@ -1070,15 +980,15 @@ static int GetSCIData( uint32_t **pp_sci, uint32_t *p_sci_size )
         {
             i_size = GetFileSize( i_file, NULL );
             if( i_size != INVALID_FILE_SIZE &&
-                i_size > (sizeof(*pp_sci[ 0 ]) * 22) )
+                i_size > (sizeof(uint32_t) * 22) )
             {
-                *pp_sci = malloc( i_size * 2 );
+                *pp_sci = malloc( i_size );
                 if( *pp_sci != NULL )
                 {
                     if( ReadFile( i_file, *pp_sci, i_size, &i_read, NULL ) &&
                         i_read == i_size )
                     {
-                        *p_sci_size = i_size;
+                        *pi_sci_size = i_size;
                         i_ret = 0;
                     }
                     else
@@ -1103,18 +1013,21 @@ static int GetSCIData( uint32_t **pp_sci, uint32_t *p_sci_size )
 }
 
 /*****************************************************************************
- * HashSystemInfo: add system information to an MD5 hash
+ * HashSystemInfo: hash system information
  *****************************************************************************
- * This function adds the C: hard drive serial number, BIOS version, CPU type
- * and Windows version to an MD5 hash.
+ * This function computes the MD5 hash of the C: hard drive serial number,
+ * BIOS version, CPU type and Windows version.
  *****************************************************************************/
-static int HashSystemInfo( struct md5_s *p_md5 )
+static int HashSystemInfo( uint32_t *p_system_hash )
 {
+    struct md5_s md5;
     int i_ret = 0;
+
+    InitMD5( &md5 );
 
 #ifdef WIN32
     HKEY i_key;
-    uint32_t i;
+    unsigned int i;
     DWORD i_size;
     DWORD i_serial;
     LPBYTE p_reg_buf;
@@ -1137,14 +1050,14 @@ static int HashSystemInfo( struct md5_s *p_md5 )
         }
     };
 
-    AddMD5( p_md5, "cache-control", 13 );
-    AddMD5( p_md5, "Ethernet", 8 );
+    AddMD5( &md5, "cache-control", 13 );
+    AddMD5( &md5, "Ethernet", 8 );
 
     GetVolumeInformation( _T("C:\\"), NULL, 0, &i_serial,
                           NULL, NULL, NULL, 0 );
-    AddMD5( p_md5, (uint8_t *)&i_serial, 4 );
+    AddMD5( &md5, (uint8_t *)&i_serial, 4 );
 
-    for( i = 0; i < sizeof(p_reg_keys)/sizeof(p_reg_keys[ 0 ]); i++ )
+    for( i = 0; i < sizeof(p_reg_keys) / sizeof(p_reg_keys[ 0 ]); i++ )
     {
         if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, p_reg_keys[ i ][ 0 ],
                           0, KEY_READ, &i_key ) != ERROR_SUCCESS )
@@ -1167,7 +1080,7 @@ static int HashSystemInfo( struct md5_s *p_md5 )
                                  NULL, NULL, p_reg_buf,
                                  &i_size ) == ERROR_SUCCESS )
             {
-                AddMD5( p_md5, (uint8_t *)p_reg_buf, i_size );
+                AddMD5( &md5, (uint8_t *)p_reg_buf, i_size );
             }
 
             free( p_reg_buf );
@@ -1179,6 +1092,9 @@ static int HashSystemInfo( struct md5_s *p_md5 )
 #else
     i_ret = -1;
 #endif
+
+    EndMD5( &md5 );
+    memcpy( p_system_hash, md5.p_digest, 16 );
 
     return i_ret;
 }
