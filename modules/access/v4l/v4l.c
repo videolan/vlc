@@ -66,11 +66,8 @@
 /*****************************************************************************
  * Module descriptior
  *****************************************************************************/
-static int  AccessOpen ( vlc_object_t * );
-static void AccessClose( vlc_object_t * );
-
-static int  DemuxOpen  ( vlc_object_t * );
-static void DemuxClose ( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
@@ -103,31 +100,22 @@ vlc_module_begin();
                 VLC_TRUE );
 
     add_shortcut( "v4l" );
-    set_capability( "access2", 10 );
-    set_callbacks( AccessOpen, AccessClose );
-
-    add_submodule();
-        set_description( _("Video4Linux demuxer") );
-        add_shortcut( "v4l" );
-        set_capability( "demux2", 20 );
-        set_callbacks( DemuxOpen, DemuxClose );
+    set_capability( "access_demux", 10 );
+    set_callbacks( Open, Close );
 vlc_module_end();
-
 
 /*****************************************************************************
  * Access: local prototypes
  *****************************************************************************/
-static int AccessRead   ( access_t *, uint8_t *, int );
-static int AccessControl( access_t *, int, va_list );
+static int Demux  ( demux_t * );
+static int Control( demux_t *, int, va_list );
 
+static void ParseMRL    ( demux_t * );
+static int  OpenVideoDev( demux_t *, char * );
+static int  OpenAudioDev( demux_t *, char * );
 
-static void ParseMRL    ( access_t * );
-static int  OpenVideoDev( access_t *, char * );
-static int  OpenAudioDev( access_t *, char * );
-
-static int GrabAudio( access_t *, uint8_t **, int *, mtime_t * );
-static int GrabVideo( access_t *, uint8_t **, int *, mtime_t * );
-
+static block_t *GrabAudio( demux_t * );
+static block_t *GrabVideo( demux_t * );
 
 #define MJPEG_BUFFER_SIZE (256*1024)
 
@@ -170,7 +158,7 @@ static struct
     { 0, 0 }
 };
 
-struct access_sys_t
+struct demux_sys_t
 {
     /* Devices */
     char *psz_device;         /* Main device from MRL, can be video or audio */
@@ -215,91 +203,38 @@ struct access_sys_t
     struct video_mmap   vid_mmap;
     struct video_picture vid_picture;
 
-    uint8_t *p_video_frame;
-    int     i_video_frame_size;
-    int     i_video_frame_size_allocated;
+    int          i_video_frame_size;
+    es_out_id_t  *p_es_video;
 
     /* Audio properties */
     vlc_fourcc_t i_acodec_raw;
     int          i_sample_rate;
     vlc_bool_t   b_stereo;
-
-    uint8_t *p_audio_frame;
-    int     i_audio_frame_size;
-    int     i_audio_frame_size_allocated;
-
-    /* header */
-    int     i_streams;
-    int     i_header_size;
-    int     i_header_pos;
-    uint8_t *p_header;      // at lest 8 bytes allocated
-
-    /* data */
-    int     i_data_size;
-    int     i_data_pos;
-    uint8_t *p_data;        // never allocated
+    int          i_audio_max_frame_size;
+    block_t      *p_block_audio;
+    es_out_id_t  *p_es_audio;
 };
 
-/*
- * header:
- *  fcc  ".v4l"
- *  u32    stream count
- *      fcc "auds"|"vids"       0
- *      fcc codec               4
- *      if vids
- *          u32 width           8
- *          u32 height          12
- *          u32 padding         16
- *      if auds
- *          u32 channels        12
- *          u32 samplerate      8
- *          u32 samplesize      16
- *
- * data:
- *  u32     stream number
- *  u32     data size
- *  u8      data
- */
-
-static void SetDWBE( uint8_t *p, uint32_t dw )
-{
-    p[0] = (dw >> 24)&0xff;
-    p[1] = (dw >> 16)&0xff;
-    p[2] = (dw >>  8)&0xff;
-    p[3] = (dw      )&0xff;
-}
-
-static void SetQWBE( uint8_t *p, uint64_t qw )
-{
-    SetDWBE( p,     (qw >> 32)&0xffffffff );
-    SetDWBE( &p[4], qw&0xffffffff);
-}
-
 /*****************************************************************************
- * AccessOpen: opens v4l device
+ * Open: opens v4l device
  *****************************************************************************
  *
  * url: <video device>::::
  *
  *****************************************************************************/
-static int AccessOpen( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this )
 {
-    access_t     *p_access = (access_t*)p_this;
-    access_sys_t *p_sys;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
 
-    /* Set up p_access */
-    p_access->pf_read = AccessRead;
-    p_access->pf_block = NULL;
-    p_access->pf_control = AccessControl;
-    p_access->pf_seek = NULL;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = VLC_FALSE;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
-    p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
-    memset( p_sys, 0, sizeof( access_sys_t ) );
+    /* Set up p_demux */
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    p_demux->info.i_update = 0;
+    p_demux->info.i_title = 0;
+    p_demux->info.i_seekpoint = 0;
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    memset( p_sys, 0, sizeof( demux_sys_t ) );
 
     p_sys->i_audio          = -1;
     p_sys->i_norm           = VIDEO_MODE_AUTO;    // auto
@@ -318,36 +253,30 @@ static int AccessOpen( vlc_object_t *p_this )
     p_sys->i_decimation = 1;
     p_sys->i_quality = 100;
 
-    p_sys->i_video_frame_size_allocated = 0;
-    p_sys->i_frame_pos = 0;
-
-    p_sys->p_audio_frame  = 0;
     p_sys->i_sample_rate  = 44100;
     p_sys->b_stereo       = VLC_TRUE;
-
-    p_sys->p_header    = NULL;
-    p_sys->i_data_size = 0;
-    p_sys->i_data_pos  = 0;
-    p_sys->p_data      = NULL;
 
     p_sys->psz_device = p_sys->psz_vdev = p_sys->psz_adev = NULL;
     p_sys->fd_video = -1;
     p_sys->fd_audio = -1;
 
-    ParseMRL( p_access );
+    p_sys->p_es_video = p_sys->p_es_audio = 0;
+    p_sys->p_block_audio = 0;
+
+    ParseMRL( p_demux );
 
     /* Find main device (video or audio) */
     if( p_sys->psz_device && *p_sys->psz_device )
     {
-        msg_Dbg( p_access, "main device=`%s'", p_sys->psz_device );
+        msg_Dbg( p_demux, "main device=`%s'", p_sys->psz_device );
 
         /* Try to open as video device */
-        p_sys->fd_video = OpenVideoDev( p_access, p_sys->psz_device );
+        p_sys->fd_video = OpenVideoDev( p_demux, p_sys->psz_device );
 
         if( p_sys->fd_video < 0 )
         {
             /* Try to open as audio device */
-            p_sys->fd_audio = OpenAudioDev( p_access, p_sys->psz_device );
+            p_sys->fd_audio = OpenAudioDev( p_demux, p_sys->psz_device );
             if( p_sys->fd_audio >= 0 )
             {
                 if( p_sys->psz_adev ) free( p_sys->psz_adev );
@@ -366,9 +295,9 @@ static int AccessOpen( vlc_object_t *p_this )
     /* If no device opened, only continue if the access was forced */
     if( p_sys->fd_video < 0 && p_sys->fd_audio < 0 )
     {
-        if( strcmp( p_access->psz_access, "v4l" ) )
+        if( strcmp( p_demux->psz_access, "v4l" ) )
         {
-            AccessClose( p_this );
+            Close( p_this );
             return VLC_EGENERIC;
         }
     }
@@ -379,12 +308,12 @@ static int AccessOpen( vlc_object_t *p_this )
         if( !p_sys->psz_vdev || !*p_sys->psz_vdev )
         {
             if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
-            p_sys->psz_vdev = var_CreateGetString( p_access, "v4l-vdev" );;
+            p_sys->psz_vdev = var_CreateGetString( p_demux, "v4l-vdev" );;
         }
 
         if( p_sys->psz_vdev && *p_sys->psz_vdev )
         {
-            p_sys->fd_video = OpenVideoDev( p_access, p_sys->psz_vdev );
+            p_sys->fd_video = OpenVideoDev( p_demux, p_sys->psz_vdev );
         }
     }
 
@@ -394,92 +323,75 @@ static int AccessOpen( vlc_object_t *p_this )
         if( !p_sys->psz_adev || !*p_sys->psz_adev )
         {
             if( p_sys->psz_adev ) free( p_sys->psz_adev );
-            p_sys->psz_adev = var_CreateGetString( p_access, "v4l-adev" );;
+            p_sys->psz_adev = var_CreateGetString( p_demux, "v4l-adev" );;
         }
 
         if( p_sys->psz_adev && *p_sys->psz_adev )
         {
-            p_sys->fd_audio = OpenAudioDev( p_access, p_sys->psz_adev );
+            p_sys->fd_audio = OpenAudioDev( p_demux, p_sys->psz_adev );
         }
     }
 
     if( p_sys->fd_video < 0 && p_sys->fd_audio < 0 )
     {
-        AccessClose( p_this );
+        Close( p_this );
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_access, "v4l grabbing started" );
+    msg_Dbg( p_demux, "v4l grabbing started" );
 
-    /* create header */
-    p_sys->i_streams     = 0;
-    p_sys->i_header_size = 8;
-    p_sys->i_header_pos  = 8;
-    p_sys->p_header      = malloc( p_sys->i_header_size );
-
-    memcpy( p_sys->p_header, ".v4l", 4 );
-
+    /* Declare elementary streams */
     if( p_sys->fd_video >= 0 )
     {
-        p_sys->i_header_size += 20;
-        p_sys->p_header = realloc( p_sys->p_header, p_sys->i_header_size );
+        es_format_t fmt;
+        es_format_Init( &fmt, VIDEO_ES, p_sys->i_fourcc );
+        fmt.video.i_width  = p_sys->i_width;
+        fmt.video.i_height = p_sys->i_height;
 
-        SetDWBE( &p_sys->p_header[4], ++p_sys->i_streams );
-
-        memcpy(  &p_sys->p_header[p_sys->i_header_pos], "vids", 4 );
-        memcpy(  &p_sys->p_header[p_sys->i_header_pos+4],
-                 &p_sys->i_fourcc, 4 );
-        SetDWBE( &p_sys->p_header[p_sys->i_header_pos+8], p_sys->i_width );
-        SetDWBE( &p_sys->p_header[p_sys->i_header_pos+12], p_sys->i_height );
-        SetDWBE( &p_sys->p_header[p_sys->i_header_pos+16], 0 );
-
-        p_sys->i_header_pos = p_sys->i_header_size;
+        msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
+                 (char*)&fmt.i_codec, fmt.video.i_width, fmt.video.i_height );
+        p_sys->p_es_video = es_out_Add( p_demux->out, &fmt );
     }
 
     if( p_sys->fd_audio >= 0 )
     {
-        p_sys->i_header_size += 20;
-        p_sys->p_header = realloc( p_sys->p_header, p_sys->i_header_size );
+        es_format_t fmt;
+        es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC('a','r','a','w') );
 
-        SetDWBE( &p_sys->p_header[4], ++p_sys->i_streams );
+        fmt.audio.i_channels = p_sys->b_stereo ? 2 : 1;
+        fmt.audio.i_rate = p_sys->i_sample_rate;
+        fmt.audio.i_bitspersample = 16; // FIXME ?
+        fmt.audio.i_blockalign = fmt.audio.i_channels *
+            fmt.audio.i_bitspersample / 8;
+        fmt.i_bitrate = fmt.audio.i_channels * fmt.audio.i_rate *
+            fmt.audio.i_bitspersample;
 
-        memcpy(  &p_sys->p_header[p_sys->i_header_pos], "auds", 4 );
-        memcpy(  &p_sys->p_header[p_sys->i_header_pos+4], "araw", 4 );
-        SetDWBE( &p_sys->p_header[p_sys->i_header_pos+8],
-                 p_sys->b_stereo ? 2 : 1 );
-        SetDWBE( &p_sys->p_header[p_sys->i_header_pos+12],
-                 p_sys->i_sample_rate );
-        SetDWBE( &p_sys->p_header[p_sys->i_header_pos+16], 16 );
+        msg_Dbg( p_demux, "new audio es %d channels %dHz",
+                 fmt.audio.i_channels, fmt.audio.i_rate );
 
-        p_sys->i_header_pos = p_sys->i_header_size;
+        p_sys->p_es_audio = es_out_Add( p_demux->out, &fmt );
     }
-    p_sys->i_header_pos = 0;
 
     /* Update default_pts to a suitable value for access */
-    var_Create( p_access, "v4l-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
-    /* Force v4l demuxer */
-    p_access->psz_demux = strdup( "v4l" );
+    var_Create( p_demux, "v4l-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * AccessClose: close device, free resources
+ * Close: close device, free resources
  *****************************************************************************/
-static void AccessClose( vlc_object_t *p_this )
+static void Close( vlc_object_t *p_this )
 {
-    access_t     *p_access = (access_t *)p_this;
-    access_sys_t *p_sys    = p_access->p_sys;
+    demux_t     *p_demux = (demux_t *)p_this;
+    demux_sys_t *p_sys   = p_demux->p_sys;
 
     if( p_sys->psz_device ) free( p_sys->psz_device );
     if( p_sys->psz_vdev )   free( p_sys->psz_vdev );
     if( p_sys->psz_adev )   free( p_sys->psz_adev );
     if( p_sys->fd_video >= 0 ) close( p_sys->fd_video );
     if( p_sys->fd_audio >= 0 ) close( p_sys->fd_audio );
-
-    if( p_sys->p_header ) free( p_sys->p_header );
-    if( p_sys->p_audio_frame ) free( p_sys->p_audio_frame );
+    if( p_sys->p_block_audio ) block_Release( p_sys->p_block_audio );
 
     if( p_sys->b_mjpeg )
     {
@@ -500,161 +412,75 @@ static void AccessClose( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * AccessControl:
+ * Control:
  *****************************************************************************/
-static int AccessControl( access_t *p_access, int i_query, va_list args )
+static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    vlc_bool_t   *pb_bool;
-    int          *pi_int;
-    int64_t      *pi_64;
+    vlc_bool_t *pb;
+    int64_t    *pi64;
 
     switch( i_query )
     {
-        /* */
-        case ACCESS_CAN_SEEK:
-        case ACCESS_CAN_FASTSEEK:
-        case ACCESS_CAN_PAUSE:
-        case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_FALSE;
-            break;
+        /* Special for access_demux */
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_SET_PAUSE_STATE:
+        case DEMUX_CAN_CONTROL_PACE:
+            pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            *pb = VLC_FALSE;
+            return VLC_SUCCESS;
 
-        /* */
-        case ACCESS_GET_MTU:
-            pi_int = (int*)va_arg( args, int * );
-            *pi_int = 0;
-            break;
+        case DEMUX_GET_PTS_DELAY:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = (int64_t)var_GetInteger( p_demux, "v4l-caching" ) * 1000;
+            return VLC_SUCCESS;
 
-        case ACCESS_GET_PTS_DELAY:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = (int64_t)var_GetInteger( p_access, "v4l-caching" ) * I64C(1000);
-            break;
-
-        /* */
-        case ACCESS_SET_PAUSE_STATE:
-        case ACCESS_GET_TITLE_INFO:
-        case ACCESS_SET_TITLE:
-        case ACCESS_SET_SEEKPOINT:
-            return VLC_EGENERIC;
-
+        /* TODO implement others */
         default:
-            msg_Err( p_access, "unimplemented query in control" );
             return VLC_EGENERIC;
-
     }
-    return VLC_SUCCESS;
+
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
- * AccessRead:
+ * Demux:
  *****************************************************************************/
-static int AccessRead( access_t *p_access, uint8_t *p_buffer, int i_len )
+static int Demux( demux_t *p_demux )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    int          i_data = 0;
-    int          i_stream;
-    mtime_t      i_pts;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    es_out_id_t  *p_es = p_sys->p_es_audio;
+    block_t *p_block;
 
-    while( i_len > 0 )
+    /* Try grabbing audio frames first */
+    if( p_sys->fd_audio < 0 || !( p_block = GrabAudio( p_demux ) ) )
     {
-        /* First copy header if any */
-        if( p_sys->i_header_pos < p_sys->i_header_size )
-        {
-            int i_copy;
-
-            i_copy = __MIN( p_sys->i_header_size - p_sys->i_header_pos,
-                            (int)i_len );
-            memcpy( p_buffer, &p_sys->p_header[p_sys->i_header_pos], i_copy );
-            p_sys->i_header_pos += i_copy;
-
-            p_buffer += i_copy;
-            i_len -= i_copy;
-            i_data += i_copy;
-        }
-
-        /* then data */
-        if( i_len > 0 && p_sys->i_data_pos < p_sys->i_data_size )
-        {
-            int i_copy;
-
-            i_copy = __MIN( p_sys->i_data_size - p_sys->i_data_pos,
-                            (int)i_len );
-
-            memcpy( p_buffer, &p_sys->p_data[p_sys->i_data_pos], i_copy );
-            p_sys->i_data_pos += i_copy;
-
-            p_buffer += i_copy;
-            i_len -= i_copy;
-            i_data += i_copy;
-        }
-
-        /* The caller got what he wanted */
-        if( i_len == 0 )
-        {
-            return i_data;
-        }
-
-        /* Read no more than one frame at a time.
-         * That kills latency, especially for encoded v4l streams */
-        if( p_sys->i_data_size && p_sys->i_data_pos == p_sys->i_data_size )
-        {
-            p_sys->i_data_pos = 0; p_sys->i_data_size = 0;
-            return i_data;
-        }
-
-        /* Re-fill data by grabbing audio/video */
-        p_sys->i_data_pos = p_sys->i_data_size = 0;
-
-        /* Try grabbing audio frames first */
-        i_stream = p_sys->i_streams - 1;
-        if( p_sys->fd_audio < 0 ||
-            GrabAudio( p_access, &p_sys->p_data,
-                       &p_sys->i_data_size, &i_pts ) != VLC_SUCCESS )
-        {
-            int i_ret = VLC_ETIMEOUT;
-
-            /* Try grabbing video frame */
-            i_stream = 0;
-            if( p_sys->fd_video > 0 )
-            {
-                i_ret = GrabVideo( p_access, &p_sys->p_data,
-                                   &p_sys->i_data_size, &i_pts );
-            }
-
-            /* No video or timeout */
-            if( i_ret == VLC_ETIMEOUT )
-            {
-                /* Sleep so we do not consume all the cpu, 10ms seems
-                 * like a good value (100fps) */
-                msleep( 10000 );
-                continue;
-            }
-            else if( i_ret != VLC_SUCCESS )
-            {
-                msg_Err( p_access, "Error during capture!" );
-                return -1;
-            }
-        }
-
-        /* create pseudo header */
-        p_sys->i_header_size = 16;
-        p_sys->i_header_pos  = 0;
-        SetDWBE( &p_sys->p_header[0], i_stream );
-        SetDWBE( &p_sys->p_header[4], p_sys->i_data_size );
-        SetQWBE( &p_sys->p_header[8], i_pts );
+        /* Try grabbing video frame */
+        p_es = p_sys->p_es_video;
+        if( p_sys->fd_video > 0 ) p_block = GrabVideo( p_demux );
     }
 
-    return i_data;
+    if( !p_block )
+    {
+        /* Sleep so we do not consume all the cpu, 10ms seems
+         * like a good value (100fps) */
+        msleep( 10000 );
+        return 1;
+    }
+
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
+    es_out_Send( p_demux->out, p_es, p_block );
+
+    return 1;
 }
 
 /*****************************************************************************
  * ParseMRL: parse the options contained in the MRL
  *****************************************************************************/
-static void ParseMRL( access_t *p_access )
+static void ParseMRL( demux_t *p_demux )
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
-    char *psz_dup = strdup( p_access->psz_path );
+    char *psz_dup = strdup( p_demux->psz_path );
     char *psz_parser = psz_dup;
 
     while( *psz_parser && *psz_parser != ':' )
@@ -709,7 +535,7 @@ static void ParseMRL( access_t *p_access )
                             &psz_parser, 0 );
                 if( p_sys->i_frequency < 30000 )
                 {
-                    msg_Warn( p_access, "v4l syntax has changed : "
+                    msg_Warn( p_demux, "v4l syntax has changed : "
                               "'frequency' is now channel frequency in kHz");
                 }
             }
@@ -760,7 +586,7 @@ static void ParseMRL( access_t *p_access )
                         p_sys->i_height = strtol( psz_parser + 1,
                                                   &psz_parser, 0 );
                     }
-                    msg_Dbg( p_access, "WxH %dx%d", p_sys->i_width,
+                    msg_Dbg( p_demux, "WxH %dx%d", p_sys->i_width,
                              p_sys->i_height );
                 }
             }
@@ -853,7 +679,7 @@ static void ParseMRL( access_t *p_access )
             }
             else
             {
-                msg_Warn( p_access, "unknown option" );
+                msg_Warn( p_demux, "unknown option" );
             }
 
             while( *psz_parser && *psz_parser != ':' )
@@ -878,9 +704,9 @@ static void ParseMRL( access_t *p_access )
 /*****************************************************************************
  * OpenVideoDev:
  *****************************************************************************/
-static int OpenVideoDev( access_t *p_access, char *psz_device )
+static int OpenVideoDev( demux_t *p_demux, char *psz_device )
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    demux_sys_t *p_sys = p_demux->p_sys;
     int i_fd;
 
     struct video_channel vid_channel;
@@ -889,17 +715,17 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
 
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
-        msg_Err( p_access, "cannot open device (%s)", strerror( errno ) );
+        msg_Err( p_demux, "cannot open device (%s)", strerror( errno ) );
         goto vdev_failed;
     }
 
     if( ioctl( i_fd, VIDIOCGCAP, &p_sys->vid_cap ) < 0 )
     {
-        msg_Err( p_access, "cannot get capabilities (%s)", strerror( errno ) );
+        msg_Err( p_demux, "cannot get capabilities (%s)", strerror( errno ) );
         goto vdev_failed;
     }
 
-    msg_Dbg( p_access,
+    msg_Dbg( p_demux,
              "V4L device %s %d channels %d audios %d < w < %d %d < h < %d",
              p_sys->vid_cap.name,
              p_sys->vid_cap.channels,
@@ -909,60 +735,56 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
 
     if( p_sys->i_channel < 0 || p_sys->i_channel >= p_sys->vid_cap.channels )
     {
-        msg_Dbg( p_access, "invalid channel, falling back on channel 0" );
+        msg_Dbg( p_demux, "invalid channel, falling back on channel 0" );
         p_sys->i_channel = 0;
     }
     if( p_sys->i_audio >= p_sys->vid_cap.audios )
     {
-        msg_Dbg( p_access, "invalid audio, falling back with no audio" );
+        msg_Dbg( p_demux, "invalid audio, falling back with no audio" );
         p_sys->i_audio = -1;
     }
 
     if( p_sys->i_width < p_sys->vid_cap.minwidth ||
         p_sys->i_width > p_sys->vid_cap.maxwidth )
     {
-        msg_Dbg( p_access, "invalid width %i", p_sys->i_width );
+        msg_Dbg( p_demux, "invalid width %i", p_sys->i_width );
         p_sys->i_width = 0;
     }
     if( p_sys->i_height < p_sys->vid_cap.minheight ||
         p_sys->i_height > p_sys->vid_cap.maxheight )
     {
-        msg_Dbg( p_access, "invalid height %i", p_sys->i_height );
+        msg_Dbg( p_demux, "invalid height %i", p_sys->i_height );
         p_sys->i_height = 0;
     }
 
     if( !( p_sys->vid_cap.type & VID_TYPE_CAPTURE ) )
     {
-        msg_Err( p_access, "cannot grab" );
+        msg_Err( p_demux, "cannot grab" );
         goto vdev_failed;
     }
 
     vid_channel.channel = p_sys->i_channel;
     if( ioctl( i_fd, VIDIOCGCHAN, &vid_channel ) < 0 )
     {
-        msg_Err( p_access, "cannot get channel infos (%s)",
+        msg_Err( p_demux, "cannot get channel infos (%s)",
                           strerror( errno ) );
         goto vdev_failed;
     }
-    msg_Dbg( p_access,
+    msg_Dbg( p_demux,
              "setting channel %s(%d) %d tuners flags=0x%x type=0x%x norm=0x%x",
-             vid_channel.name,
-             vid_channel.channel,
-             vid_channel.tuners,
-             vid_channel.flags,
-             vid_channel.type,
-             vid_channel.norm );
+             vid_channel.name, vid_channel.channel, vid_channel.tuners,
+             vid_channel.flags, vid_channel.type, vid_channel.norm );
 
     if( p_sys->i_tuner >= vid_channel.tuners )
     {
-        msg_Dbg( p_access, "invalid tuner, falling back on tuner 0" );
+        msg_Dbg( p_demux, "invalid tuner, falling back on tuner 0" );
         p_sys->i_tuner = 0;
     }
 
     vid_channel.norm = p_sys->i_norm;
     if( ioctl( i_fd, VIDIOCSCHAN, &vid_channel ) < 0 )
     {
-        msg_Err( p_access, "cannot set channel (%s)", strerror( errno ) );
+        msg_Err( p_demux, "cannot set channel (%s)", strerror( errno ) );
         goto vdev_failed;
     }
 
@@ -977,22 +799,22 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
             vid_tuner.tuner = p_sys->i_tuner;
             if( ioctl( i_fd, VIDIOCGTUNER, &vid_tuner ) < 0 )
             {
-                msg_Err( p_access, "cannot get tuner (%s)", strerror( errno ) );
+                msg_Err( p_demux, "cannot get tuner (%s)", strerror( errno ) );
                 goto vdev_failed;
             }
-            msg_Dbg( p_access, "tuner %s low=%d high=%d, flags=0x%x "
+            msg_Dbg( p_demux, "tuner %s low=%d high=%d, flags=0x%x "
                      "mode=0x%x signal=0x%x",
                      vid_tuner.name, vid_tuner.rangelow, vid_tuner.rangehigh,
                      vid_tuner.flags, vid_tuner.mode, vid_tuner.signal );
 
-            msg_Dbg( p_access, "setting tuner %s (%d)",
+            msg_Dbg( p_demux, "setting tuner %s (%d)",
                      vid_tuner.name, vid_tuner.tuner );
 
             /* FIXME FIXME to be checked FIXME FIXME */
             //vid_tuner.mode = p_sys->i_norm;
             if( ioctl( i_fd, VIDIOCSTUNER, &vid_tuner ) < 0 )
             {
-                msg_Err( p_access, "cannot set tuner (%s)", strerror( errno ) );
+                msg_Err( p_demux, "cannot set tuner (%s)", strerror( errno ) );
                 goto vdev_failed;
             }
         }
@@ -1008,11 +830,11 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
             int driver_frequency = p_sys->i_frequency * 16 /1000;
             if( ioctl( i_fd, VIDIOCSFREQ, &driver_frequency ) < 0 )
             {
-                msg_Err( p_access, "cannot set frequency (%s)",
+                msg_Err( p_demux, "cannot set frequency (%s)",
                                   strerror( errno ) );
                 goto vdev_failed;
             }
-            msg_Dbg( p_access, "frequency %d (%d)", p_sys->i_frequency,
+            msg_Dbg( p_demux, "frequency %d (%d)", p_sys->i_frequency,
                                                    driver_frequency );
         }
     }
@@ -1028,7 +850,7 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
             vid_audio.audio = p_sys->i_audio;
             if( ioctl( i_fd, VIDIOCGAUDIO, &vid_audio ) < 0 )
             {
-                msg_Err( p_access, "cannot get audio (%s)", strerror( errno ) );
+                msg_Err( p_demux, "cannot get audio (%s)", strerror( errno ) );
                 goto vdev_failed;
             }
 
@@ -1037,7 +859,7 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
 
             if( ioctl( i_fd, VIDIOCSAUDIO, &vid_audio ) < 0 )
             {
-                msg_Err( p_access, "cannot set audio (%s)", strerror( errno ) );
+                msg_Err( p_demux, "cannot set audio (%s)", strerror( errno ) );
                 goto vdev_failed;
             }
         }
@@ -1053,7 +875,7 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
 
         if( ioctl( i_fd, MJPIOC_G_PARAMS, &mjpeg ) < 0 )
         {
-            msg_Err( p_access, "cannot get mjpeg params (%s)",
+            msg_Err( p_demux, "cannot get mjpeg params (%s)",
                               strerror( errno ) );
             goto vdev_failed;
         }
@@ -1104,7 +926,7 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
 
         if( ioctl( i_fd, MJPIOC_S_PARAMS, &mjpeg ) < 0 )
         {
-            msg_Err( p_access, "cannot set mjpeg params (%s)",
+            msg_Err( p_demux, "cannot set mjpeg params (%s)",
                               strerror( errno ) );
             goto vdev_failed;
         }
@@ -1121,16 +943,14 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
 
         if( ioctl( i_fd, VIDIOCGWIN, &vid_win ) < 0 )
         {
-            msg_Err( p_access, "cannot get win (%s)", strerror( errno ) );
+            msg_Err( p_demux, "cannot get win (%s)", strerror( errno ) );
             goto vdev_failed;
         }
         p_sys->i_width  = vid_win.width;
         p_sys->i_height = vid_win.height;
 
-        msg_Dbg( p_access, "will use %dx%d", p_sys->i_width, p_sys->i_height );
+        msg_Dbg( p_demux, "will use %dx%d", p_sys->i_width, p_sys->i_height );
     }
-
-    p_sys->p_video_frame = NULL;
 
     if( !p_sys->b_mjpeg )
     {
@@ -1157,10 +977,13 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
             }
             if( ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
             {
-                msg_Dbg( p_access, "v4l device uses brightness: %d", vid_picture.brightness );
-                msg_Dbg( p_access, "v4l device uses colour: %d", vid_picture.colour );
-                msg_Dbg( p_access, "v4l device uses hue: %d", vid_picture.hue );
-                msg_Dbg( p_access, "v4l device uses contrast: %d", vid_picture.contrast );
+                msg_Dbg( p_demux, "v4l device uses brightness: %d",
+                         vid_picture.brightness );
+                msg_Dbg( p_demux, "v4l device uses colour: %d",
+                         vid_picture.colour );
+                msg_Dbg( p_demux, "v4l device uses hue: %d", vid_picture.hue );
+                msg_Dbg( p_demux, "v4l device uses contrast: %d",
+                         vid_picture.contrast );
                 p_sys->vid_picture = vid_picture;
             }
         }
@@ -1175,7 +998,7 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
             vid_picture.palette = 0;
             p_sys->i_fourcc = 0;
 
-            psz = var_CreateGetString( p_access, "v4l-chroma" );
+            psz = var_CreateGetString( p_demux, "v4l-chroma" );
             if( strlen( psz ) >= 4 )
             {
                 int i_chroma = VLC_FOURCC( psz[0], psz[1], psz[2], psz[3] );
@@ -1228,7 +1051,7 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
         }
         else
         {
-            msg_Err( p_access, "ioctl VIDIOCGPICT failed" );
+            msg_Err( p_demux, "ioctl VIDIOCGPICT failed" );
             goto vdev_failed;
         }
     }
@@ -1242,7 +1065,7 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
 
         if( ioctl( i_fd, MJPIOC_REQBUFS, &p_sys->mjpeg_buffers ) < 0 )
         {
-            msg_Err( p_access, "mmap unsupported" );
+            msg_Err( p_demux, "mmap unsupported" );
             goto vdev_failed;
         }
 
@@ -1251,7 +1074,7 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
                 PROT_READ | PROT_WRITE, MAP_SHARED, i_fd, 0 );
         if( p_sys->p_video_mmap == MAP_FAILED )
         {
-            msg_Err( p_access, "mmap failed" );
+            msg_Err( p_demux, "mmap failed" );
             goto vdev_failed;
         }
 
@@ -1263,7 +1086,7 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
         {
             if( ioctl( i_fd, MJPIOC_QBUF_CAPT, &i ) < 0 )
             {
-                msg_Err( p_access, "unable to queue frame" );
+                msg_Err( p_demux, "unable to queue frame" );
                 goto vdev_failed;
             }
         }
@@ -1271,12 +1094,12 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
     else
     {
         /* Fill in picture_t fields */
-        vout_InitPicture( VLC_OBJECT(p_access), &p_sys->pic, p_sys->i_fourcc,
+        vout_InitPicture( VLC_OBJECT(p_demux), &p_sys->pic, p_sys->i_fourcc,
                           p_sys->i_width, p_sys->i_height, p_sys->i_width *
                           VOUT_ASPECT_FACTOR / p_sys->i_height );
         if( !p_sys->pic.i_planes )
         {
-            msg_Err( p_access, "unsupported chroma" );
+            msg_Err( p_demux, "unsupported chroma" );
             goto vdev_failed;
         }
         p_sys->i_video_frame_size = 0;
@@ -1286,15 +1109,15 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
               p_sys->pic.p[i].i_visible_pitch;
         }
 
-        msg_Dbg( p_access, "v4l device uses frame size: %i",
+        msg_Dbg( p_demux, "v4l device uses frame size: %i",
                  p_sys->i_video_frame_size );
-        msg_Dbg( p_access, "v4l device uses chroma: %4.4s",
+        msg_Dbg( p_demux, "v4l device uses chroma: %4.4s",
                 (char*)&p_sys->i_fourcc );
 
         /* Allocate mmap buffer */
         if( ioctl( i_fd, VIDIOCGMBUF, &p_sys->vid_mbuf ) < 0 )
         {
-            msg_Err( p_access, "mmap unsupported" );
+            msg_Err( p_demux, "mmap unsupported" );
             goto vdev_failed;
         }
 
@@ -1304,7 +1127,7 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
         if( p_sys->p_video_mmap == MAP_FAILED )
         {
             /* FIXME -> normal read */
-            msg_Err( p_access, "mmap failed" );
+            msg_Err( p_demux, "mmap failed" );
             goto vdev_failed;
         }
 
@@ -1315,8 +1138,8 @@ static int OpenVideoDev( access_t *p_access, char *psz_device )
         p_sys->vid_mmap.format = p_sys->vid_picture.palette;
         if( ioctl( i_fd, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
         {
-            msg_Warn( p_access, "%4.4s refused", (char*)&p_sys->i_fourcc );
-            msg_Err( p_access, "chroma selection failed" );
+            msg_Warn( p_demux, "%4.4s refused", (char*)&p_sys->i_fourcc );
+            msg_Err( p_demux, "chroma selection failed" );
             goto vdev_failed;
         }
     }
@@ -1331,14 +1154,14 @@ vdev_failed:
 /*****************************************************************************
  * OpenAudioDev:
  *****************************************************************************/
-static int OpenAudioDev( access_t *p_access, char *psz_device )
+static int OpenAudioDev( demux_t *p_demux, char *psz_device )
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    demux_sys_t *p_sys = p_demux->p_sys;
     int i_fd, i_format;
 
     if( (i_fd = open( psz_device, O_RDONLY | O_NONBLOCK )) < 0 )
     {
-        msg_Err( p_access, "cannot open audio device (%s)", strerror( errno ) );
+        msg_Err( p_demux, "cannot open audio device (%s)", strerror( errno ) );
         goto adev_fail;
     }
 
@@ -1346,7 +1169,7 @@ static int OpenAudioDev( access_t *p_access, char *psz_device )
     if( ioctl( i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
         || i_format != AFMT_S16_LE )
     {
-        msg_Err( p_access, "cannot set audio format (16b little endian) "
+        msg_Err( p_demux, "cannot set audio format (16b little endian) "
                  "(%s)", strerror( errno ) );
         goto adev_fail;
     }
@@ -1354,7 +1177,7 @@ static int OpenAudioDev( access_t *p_access, char *psz_device )
     if( ioctl( i_fd, SNDCTL_DSP_STEREO,
                &p_sys->b_stereo ) < 0 )
     {
-        msg_Err( p_access, "cannot set audio channels count (%s)",
+        msg_Err( p_demux, "cannot set audio channels count (%s)",
                  strerror( errno ) );
         goto adev_fail;
     }
@@ -1362,18 +1185,16 @@ static int OpenAudioDev( access_t *p_access, char *psz_device )
     if( ioctl( i_fd, SNDCTL_DSP_SPEED,
                &p_sys->i_sample_rate ) < 0 )
     {
-        msg_Err( p_access, "cannot set audio sample rate (%s)",
+        msg_Err( p_demux, "cannot set audio sample rate (%s)",
                  strerror( errno ) );
         goto adev_fail;
     }
 
-    msg_Dbg( p_access, "openened adev=`%s' %s %dHz",
+    msg_Dbg( p_demux, "openened adev=`%s' %s %dHz",
              psz_device, p_sys->b_stereo ? "stereo" : "mono",
              p_sys->i_sample_rate );
 
-    p_sys->i_audio_frame_size = 0;
-    p_sys->i_audio_frame_size_allocated = 6*1024;
-    p_sys->p_audio_frame = malloc( p_sys->i_audio_frame_size_allocated );
+    p_sys->i_audio_max_frame_size = 6 * 1024;
 
     return i_fd;
 
@@ -1386,45 +1207,52 @@ static int OpenAudioDev( access_t *p_access, char *psz_device )
 /*****************************************************************************
  * GrabAudio: grab audio
  *****************************************************************************/
-static int GrabAudio( access_t * p_access, uint8_t **pp_data,
-                      int      *pi_data, mtime_t  *pi_pts )
+static block_t *GrabAudio( demux_t *p_demux )
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    demux_sys_t *p_sys = p_demux->p_sys;
     struct audio_buf_info buf_info;
-    int i_read;
-    int i_correct;
+    int i_read, i_correct;
+    block_t *p_block;
 
-    i_read = read( p_sys->fd_audio, p_sys->p_audio_frame,
-                   p_sys->i_audio_frame_size_allocated );
+    if( p_sys->p_block_audio ) p_block = p_sys->p_block_audio;
+    else p_block = block_New( p_demux, p_sys->i_audio_max_frame_size );
 
-    if( i_read <= 0 )
+    if( !p_block )
     {
-        return VLC_EGENERIC;
+        msg_Warn( p_demux, "cannot get block" );
+        return 0;
     }
 
-    p_sys->i_audio_frame_size = i_read;
+    p_sys->p_block_audio = p_block;
 
-    /* from vls : correct the date because of kernel buffering */
+    i_read = read( p_sys->fd_audio, p_block->p_buffer,
+                   p_sys->i_audio_max_frame_size );
+
+    if( i_read <= 0 ) return 0;
+
+    p_block->i_buffer = i_read;
+    p_sys->p_block_audio = 0;
+
+    /* Correct the date because of kernel buffering */
     i_correct = i_read;
     if( ioctl( p_sys->fd_audio, SNDCTL_DSP_GETISPACE, &buf_info ) == 0 )
     {
         i_correct += buf_info.bytes;
     }
 
+    p_block->i_pts = p_block->i_dts =
+        mdate() - I64C(1000000) * (mtime_t)i_correct /
+        2 / ( p_sys->b_stereo ? 2 : 1) / p_sys->i_sample_rate;
 
-    *pp_data = p_sys->p_audio_frame;
-    *pi_data = p_sys->i_audio_frame_size;
-    *pi_pts  = mdate() - (mtime_t)1000000 * (mtime_t)i_correct /
-                         2 / ( p_sys->b_stereo ? 2 : 1) / p_sys->i_sample_rate;
-    return VLC_SUCCESS;
+    return p_block;
 }
 
 /*****************************************************************************
  * GrabVideo:
  *****************************************************************************/
-static uint8_t *GrabCapture( access_t *p_access )
+static uint8_t *GrabCapture( demux_t *p_demux )
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    demux_sys_t *p_sys = p_demux->p_sys;
     int i_captured_frame = p_sys->i_frame_pos;
 
     p_sys->vid_mmap.frame = (p_sys->i_frame_pos + 1) % p_sys->vid_mbuf.frames;
@@ -1433,23 +1261,23 @@ static uint8_t *GrabCapture( access_t *p_access )
     {
         if( errno != EAGAIN )
         {
-            msg_Err( p_access, "failed capturing new frame" );
+            msg_Err( p_demux, "failed capturing new frame" );
             return NULL;
         }
 
-        if( p_access->b_die )
+        if( p_demux->b_die )
         {
             return NULL;
         }
 
-        msg_Dbg( p_access, "grab failed, trying again" );
+        msg_Dbg( p_demux, "grab failed, trying again" );
     }
 
     while( ioctl(p_sys->fd_video, VIDIOCSYNC, &p_sys->i_frame_pos) < 0 )
     {
         if( errno != EAGAIN && errno != EINTR )    
         {
-            msg_Err( p_access, "failed syncing new frame" );
+            msg_Err( p_demux, "failed syncing new frame" );
             return NULL;
         }
     }
@@ -1459,9 +1287,9 @@ static uint8_t *GrabCapture( access_t *p_access )
     return p_sys->p_video_mmap + p_sys->vid_mbuf.offsets[i_captured_frame];
 }
 
-static uint8_t *GrabMJPEG( access_t *p_access )
+static uint8_t *GrabMJPEG( demux_t *p_demux )
 {
-    access_sys_t *p_sys = p_access->p_sys;
+    demux_sys_t *p_sys = p_demux->p_sys;
     struct mjpeg_sync sync;
     uint8_t *p_frame, *p_field, *p;
     uint16_t tag;
@@ -1476,7 +1304,7 @@ static uint8_t *GrabMJPEG( access_t *p_access )
         {
             if( errno != EAGAIN && errno != EINTR )
             {
-                msg_Err( p_access, "failed capturing new frame" );
+                msg_Err( p_demux, "failed capturing new frame" );
                 return NULL;
             }
         }
@@ -1487,7 +1315,7 @@ static uint8_t *GrabMJPEG( access_t *p_access )
     {
         if( errno != EAGAIN && errno != EINTR )    
         {
-            msg_Err( p_access, "failed syncing new frame" );
+            msg_Err( p_demux, "failed syncing new frame" );
             return NULL;
         }
     }
@@ -1561,209 +1389,33 @@ static uint8_t *GrabMJPEG( access_t *p_access )
     return p_frame;
 }
 
-static int GrabVideo( access_t * p_access, uint8_t **pp_data,
-                      int *pi_data, mtime_t  *pi_pts )
+static block_t *GrabVideo( demux_t *p_demux )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    uint8_t      *p_frame;
-
+    demux_sys_t *p_sys = p_demux->p_sys;
+    uint8_t     *p_frame;
+    block_t     *p_block;
 
     if( p_sys->f_fps >= 0.1 && p_sys->i_video_pts > 0 )
     {
         mtime_t i_dur = (mtime_t)((double)1000000 / (double)p_sys->f_fps);
 
-        /* Did we wait long enougth ? */
-        if( p_sys->i_video_pts + i_dur > mdate() )
-        {
-            return VLC_ETIMEOUT;
-        }
+        /* Did we wait long enough ? (frame rate reduction) */
+        if( p_sys->i_video_pts + i_dur > mdate() ) return 0;
     }
 
-    if( p_sys->b_mjpeg )
-        p_frame = GrabMJPEG( p_access );
-    else
-        p_frame = GrabCapture( p_access );
+    if( p_sys->b_mjpeg ) p_frame = GrabMJPEG( p_demux );
+    else p_frame = GrabCapture( p_demux );
 
-    if( !p_frame )
-        return VLC_EGENERIC;
+    if( !p_frame ) return 0;
 
-    p_sys->i_video_pts   = mdate();
-    p_sys->p_video_frame = p_frame;
-
-    *pp_data = p_sys->p_video_frame;
-    *pi_data = p_sys->i_video_frame_size;
-    *pi_pts  = p_sys->i_video_pts;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Demux: local prototypes
- *****************************************************************************/
-struct demux_sys_t
-{
-    int         i_es;
-    es_out_id_t **es;
-};
-
-static int Demux       ( demux_t * );
-static int DemuxControl( demux_t *, int, va_list );
-
-/****************************************************************************
- * DemuxOpen:
- ****************************************************************************/
-static int DemuxOpen( vlc_object_t *p_this )
-{
-    demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t    *p_sys;
-
-    uint8_t        *p_peek;
-    int            i_es;
-    int            i;
-
-    /* a little test to see if it's a v4l stream */
-    if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
+    if( !( p_block = block_New( p_demux, p_sys->i_video_frame_size ) ) )
     {
-        return VLC_EGENERIC;
-    }
-
-    if( strncmp( p_peek, ".v4l", 4 ) || ( i_es = GetDWBE( &p_peek[4] ) ) <= 0 )
-    {
-        return VLC_EGENERIC;
-    }
-
-
-    p_demux->pf_demux   = Demux;
-    p_demux->pf_control = DemuxControl;
-    p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->i_es = 0;
-    p_sys->es   = NULL;
-
-    if( stream_Peek( p_demux->s, &p_peek, 8 + 20 * i_es ) < 8 + 20 * i_es )
-    {
-        msg_Err( p_demux, "v4l plugin discarded (cannot peek)" );
-        return VLC_EGENERIC;
-    }
-    p_peek += 8;
-
-    for( i = 0; i < i_es; i++ )
-    {
-        es_format_t fmt;
-
-        if( !strncmp( p_peek, "auds", 4 ) )
-        {
-            es_format_Init( &fmt, AUDIO_ES,
-                VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] ) );
-
-            fmt.audio.i_channels = GetDWBE( &p_peek[8] );
-            fmt.audio.i_rate = GetDWBE( &p_peek[12] );
-            fmt.audio.i_bitspersample = GetDWBE( &p_peek[16] );
-            fmt.audio.i_blockalign = fmt.audio.i_channels *
-                                     fmt.audio.i_bitspersample / 8;
-            fmt.i_bitrate = fmt.audio.i_channels *
-                            fmt.audio.i_rate *
-                            fmt.audio.i_bitspersample;
-
-            msg_Dbg( p_demux, "new audio es %d channels %dHz",
-                     fmt.audio.i_channels, fmt.audio.i_rate );
-
-            TAB_APPEND( p_sys->i_es, p_sys->es,
-                        es_out_Add( p_demux->out, &fmt ) );
-        }
-        else if( !strncmp( p_peek, "vids", 4 ) )
-        {
-            es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( p_peek[4], p_peek[5],
-                            p_peek[6], p_peek[7] ) );
-            fmt.video.i_width  = GetDWBE( &p_peek[8] );
-            fmt.video.i_height = GetDWBE( &p_peek[12] );
-
-            msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
-                     (char*)&fmt.i_codec,
-                     fmt.video.i_width, fmt.video.i_height );
-            TAB_APPEND( p_sys->i_es, p_sys->es,
-                        es_out_Add( p_demux->out, &fmt ) );
-        }
-
-        p_peek += 20;
-    }
-
-    /* Skip header */
-    stream_Read( p_demux->s, NULL, 8 + 20 * i_es );
-
-    return VLC_SUCCESS;
-}
-
-/****************************************************************************
- * DemuxClose:
- ****************************************************************************/
-static void DemuxClose( vlc_object_t *p_this )
-{
-    demux_t     *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    if( p_sys->i_es > 0 )
-    {
-        free( p_sys->es );
-    }
-    free( p_sys );
-}
-
-/****************************************************************************
- * Demux:
- ****************************************************************************/
-static int Demux( demux_t *p_demux )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    block_t     *p_block;
-
-    int i_es;
-    int i_size;
-
-    uint8_t *p_peek;
-    mtime_t i_pts;
-
-    if( stream_Peek( p_demux->s, &p_peek, 16 ) < 16 )
-    {
-        msg_Warn( p_demux, "cannot peek (EOF ?)" );
+        msg_Warn( p_demux, "cannot get block" );
         return 0;
     }
 
-    i_es   = GetDWBE( &p_peek[0] );
-    if( i_es < 0 || i_es >= p_sys->i_es )
-    {
-        msg_Err( p_demux, "cannot find ES" );
-        return -1;
-    }
+    memcpy( p_block->p_buffer, p_frame, p_sys->i_video_frame_size );
+    p_sys->i_video_pts = p_block->i_pts = p_block->i_dts = mdate();
 
-    i_size = GetDWBE( &p_peek[4] );
-    i_pts  = GetQWBE( &p_peek[8] );
-
-    if( ( p_block = stream_Block( p_demux->s, 16 + i_size ) ) == NULL )
-    {
-        msg_Warn( p_demux, "cannot read data" );
-        return 0;
-    }
-
-    p_block->p_buffer += 16;
-    p_block->i_buffer -= 16;
-
-    p_block->i_dts =
-    p_block->i_pts = i_pts;
-
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_pts );
-    es_out_Send( p_demux->out, p_sys->es[i_es], p_block );
-
-    return 1;
+    return p_block;
 }
-
-/****************************************************************************
- * DemuxControl:
- ****************************************************************************/
-static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
-{
-   return demux2_vaControlHelper( p_demux->s,
-                                  0, -1,
-                                  0, 1,
-                                  i_query, args );
-}
-
