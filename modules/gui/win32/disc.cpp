@@ -131,6 +131,7 @@ void __fastcall TDiscDlg::DisableTitles( Boolean disable )
 {
     if( disable )
     {
+        GroupBoxPosition->Enabled = false;
         LabelTitle->Enabled = false;
         LabelChapter->Enabled = false;
         SpinEditTitle->Enabled = false;
@@ -140,6 +141,7 @@ void __fastcall TDiscDlg::DisableTitles( Boolean disable )
     }
     else
     {
+        GroupBoxPosition->Enabled = true;
         LabelTitle->Enabled = true;
         LabelChapter->Enabled = true;
         SpinEditTitle->Enabled = true;

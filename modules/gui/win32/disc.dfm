@@ -26,18 +26,27 @@ object DiscDlg: TDiscDlg
     Height = 13
     Caption = 'Device &name:'
   end
+  object CheckBoxMenus: TCheckBox
+    Left = 96
+    Top = 8
+    Width = 97
+    Height = 17
+    Caption = '&Menus'
+    TabOrder = 1
+    OnClick = CheckBoxMenusClick
+  end
   object GroupBoxPosition: TGroupBox
     Tag = 3
     Left = 96
-    Top = 8
+    Top = 33
     Width = 144
-    Height = 97
+    Height = 72
     Caption = 'Starting position'
-    TabOrder = 1
+    TabOrder = 2
     object LabelTitle: TLabel
       Tag = 3
       Left = 8
-      Top = 44
+      Top = 19
       Width = 23
       Height = 13
       Caption = '&Title:'
@@ -45,14 +54,14 @@ object DiscDlg: TDiscDlg
     object LabelChapter: TLabel
       Tag = 3
       Left = 8
-      Top = 72
+      Top = 47
       Width = 40
       Height = 13
       Caption = '&Chapter:'
     end
     object SpinEditTitle: TCSpinEdit
       Left = 56
-      Top = 39
+      Top = 14
       Width = 80
       Height = 22
       TabStop = True
@@ -70,24 +79,15 @@ object DiscDlg: TDiscDlg
     end
     object SpinEditChapter: TCSpinEdit
       Left = 56
-      Top = 67
+      Top = 42
       Width = 80
       Height = 22
       TabStop = True
       MaxValue = 65535
       MinValue = 1
       ParentColor = False
-      TabOrder = 2
-      Value = 1
-    end
-    object CheckBoxMenus: TCheckBox
-      Left = 8
-      Top = 16
-      Width = 97
-      Height = 17
-      Caption = '&Menus'
       TabOrder = 0
-      OnClick = CheckBoxMenusClick
+      Value = 1
     end
   end
   object RadioGroupType: TRadioGroup
@@ -113,7 +113,7 @@ object DiscDlg: TDiscDlg
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 3
+    TabOrder = 4
     OnClick = ButtonOkClick
   end
   object ButtonCancel: TButton
@@ -125,7 +125,7 @@ object DiscDlg: TDiscDlg
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 4
+    TabOrder = 5
     OnClick = ButtonCancelClick
   end
   object EditDevice: TEdit
@@ -134,7 +134,7 @@ object DiscDlg: TDiscDlg
     Top = 113
     Width = 144
     Height = 21
-    TabOrder = 2
+    TabOrder = 3
     Text = 'F:\'
   end
 end
