@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: open.c,v 1.3 2002/09/30 11:05:39 sam Exp $
+ * $Id: open.c,v 1.4 2002/11/25 12:19:04 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -274,8 +274,8 @@ static void GtkNetworkOpenChanged( GtkWidget *button, gpointer user_data )
     }
     else if( SELECTED( "network_http" ) )
     {
-        g_string_sprintfa( p_target, "http://%s",
-                           gtk_entry_get_text( GTK_ENTRY( lookup_widget(
+        g_string_assign( p_target,
+                         gtk_entry_get_text( GTK_ENTRY( lookup_widget(
                                GTK_WIDGET(button), "network_http_url" ) ) ) );
     }
 
@@ -461,6 +461,10 @@ static void GtkOpenShow( intf_thread_t *p_intf, int i_page )
             psz_var );
         free( psz_var );
     }
+
+    gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_open ), "network_http_url" ) ),
+        "http://" );
 
     gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_open ), "network_channel_port" ) ),
