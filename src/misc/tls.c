@@ -78,7 +78,7 @@ tls_ServerCreate( vlc_object_t *p_this, const char *psz_cert,
 /*****************************************************************************
  * tls_ServerDelete:
  *****************************************************************************
- * Releases data allocated with tls_ServerCreate
+ * Releases data allocated with tls_ServerCreate.
  *****************************************************************************/
 void
 tls_ServerDelete( tls_server_t *p_server )
@@ -96,11 +96,11 @@ tls_ServerDelete( tls_server_t *p_server )
 /*****************************************************************************
  * tls_ClientCreate:
  *****************************************************************************
- * Allocates a client's TLS credentials.
+ * Allocates a client's TLS credentials and shakes hands through the network.
  * Returns NULL on error.
  *****************************************************************************/
 tls_session_t *
-tls_ClientCreate( vlc_object_t *p_this, const char *psz_ca )
+tls_ClientCreate( vlc_object_t *p_this, const char *psz_ca, int fd )
 {
     tls_t *p_tls;
     tls_session_t *p_session;
@@ -114,8 +114,14 @@ tls_ClientCreate( vlc_object_t *p_this, const char *psz_ca )
         p_session = __tls_ClientCreate( p_tls, psz_ca );
         if( p_session != NULL )
         {
-            msg_Dbg( p_this, "TLS/SSL provider initialized" );
-            return p_session;
+            p_session = tls_SessionHandshake( p_session, fd );
+            if( p_session != NULL )
+            {
+                msg_Dbg( p_this, "TLS/SSL provider initialized" );
+                return p_session;
+            }
+            else
+                msg_Err( p_this, "TLS/SSL session handshake error" );
         }
         else
             msg_Err( p_this, "TLS/SSL provider error" );
@@ -133,14 +139,14 @@ tls_ClientCreate( vlc_object_t *p_this, const char *psz_ca )
 /*****************************************************************************
  * tls_ClientDelete:
  *****************************************************************************
- * Releases data allocated with tls_ClientCreate
+ * Releases data allocated with tls_ClientCreate.
  *****************************************************************************/
 void
 tls_ClientDelete( tls_session_t *p_session )
 {
     tls_t *p_tls = p_session->p_tls;
 
-    __tls_ClientDelete( p_session );
+    tls_SessionClose( p_session );
 
     module_Unneed( p_tls, p_tls->p_module );
     vlc_object_detach( p_tls );

@@ -98,13 +98,12 @@ VLC_EXPORT( void, tls_ServerDelete, ( tls_server_t * ) );
 # define tls_ServerSessionPrepare( a ) (((tls_server_t *)a)->pf_session_prepare (a))
 
 # define __tls_ClientCreate( a, b ) (((tls_t *)a)->pf_client_create (a, b ))
-VLC_EXPORT( tls_session_t *, tls_ClientCreate, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( tls_session_t *, tls_ClientCreate, ( vlc_object_t *, const char *, int ) );
 VLC_EXPORT( void, tls_ClientDelete, ( tls_session_t * ) );
 
 # define tls_SessionHandshake( a, b ) (((tls_session_t *)a)->pf_handshake (a, b))
 
 # define tls_SessionClose( a ) (((tls_session_t *)a)->pf_close (a))
-# define __tls_ClientDelete( a ) tls_SessionClose( a )
 
 /* NOTE: It is assumed that a->sock.p_sys = a */
 # define tls_Send( a, b, c ) (((tls_session_t *)a)->sock.pf_send (a, b, c ))
