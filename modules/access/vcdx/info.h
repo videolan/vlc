@@ -29,7 +29,7 @@
 /*
  Fills out playlist information.
  */
-int VCDFixupPlayList( access_t *p_access, access_vcd_data_t *p_vcd,
+int VCDFixupPlayList( access_t *p_access, vcdplayer_t *p_vcd,
 		      const char *psz_source, vcdinfo_itemid_t *itemid,
 		      vlc_bool_t b_single_track );
 
@@ -39,8 +39,10 @@ int VCDFixupPlayList( access_t *p_access, access_vcd_data_t *p_vcd,
 void VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl );
 
 
-char * VCDFormatStr(const access_t *p_access, access_vcd_data_t *p_vcd,
+char * VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcd,
 		    const char format_str[], const char *mrl,
 		    const vcdinfo_itemid_t *itemid);
+
+void VCDUpdateTitle( access_t *p_access );
 
 #endif /* VCD_INFO_H */

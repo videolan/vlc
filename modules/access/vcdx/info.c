@@ -40,7 +40,7 @@ static inline void
 MetaInfoAddStr(access_t *p_access, char *p_cat,
                char *title, const char *str)
 {
-  access_vcd_data_t *p_vcd = (access_vcd_data_t *) p_access->p_sys;
+  vcdplayer_t *p_vcd = (vcdplayer_t *) p_access->p_sys;
   if ( str ) {
     dbg_print( INPUT_DBG_META, "field: %s: %s", title, str);
     input_Control( p_vcd->p_input, INPUT_ADD_INFO, p_cat, title, "%s", str);
@@ -51,7 +51,7 @@ MetaInfoAddStr(access_t *p_access, char *p_cat,
 static inline void
 MetaInfoAddNum(access_t *p_access, char *psz_cat, char *title, int num)
 {
-  access_vcd_data_t *p_vcd = (access_vcd_data_t *) p_access->p_sys;
+  vcdplayer_t *p_vcd = (vcdplayer_t *) p_access->p_sys;
   dbg_print( INPUT_DBG_META, "field %s: %d", title, num);
   input_Control( p_vcd->p_input, INPUT_ADD_INFO, psz_cat, title, "%d", num );
 }
@@ -65,7 +65,7 @@ MetaInfoAddNum(access_t *p_access, char *psz_cat, char *title, int num)
 void 
 VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
 {
-  access_vcd_data_t *p_vcd = (access_vcd_data_t *) p_access->p_sys;
+  vcdplayer_t *p_vcd = (vcdplayer_t *) p_access->p_sys;
   unsigned int i_entries = vcdinfo_get_num_entries(p_vcd->vcd);
   unsigned int last_entry = 0;
   char *psz_cat;
@@ -174,7 +174,7 @@ VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
    %% : a %
 */
 char *
-VCDFormatStr(const access_t *p_access, access_vcd_data_t *p_vcd,
+VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcd,
              const char format_str[], const char *mrl,
              const vcdinfo_itemid_t *itemid)
 {
@@ -312,7 +312,7 @@ VCDFormatStr(const access_t *p_access, access_vcd_data_t *p_vcd,
 
 static void
 VCDCreatePlayListItem(const access_t *p_access,
-                      access_vcd_data_t *p_vcd,
+                      vcdplayer_t *p_vcd,
                       playlist_t *p_playlist,
                       const vcdinfo_itemid_t *itemid,
                       char *psz_mrl, int psz_mrl_max,
@@ -362,7 +362,7 @@ VCDCreatePlayListItem(const access_t *p_access,
 }
 
 int
-VCDFixupPlayList( access_t *p_access, access_vcd_data_t *p_vcd,
+VCDFixupPlayList( access_t *p_access, vcdplayer_t *p_vcd,
                   const char *psz_source, vcdinfo_itemid_t *itemid,
                   vlc_bool_t b_single_item )
 {
@@ -412,5 +412,29 @@ VCDFixupPlayList( access_t *p_access, access_vcd_data_t *p_vcd,
   vlc_object_release( p_playlist );
   free(psz_mrl);
   return 0;
+}
+
+void
+VCDUpdateTitle( access_t *p_access )
+{ 
+
+    vcdplayer_t *p_vcd= (vcdplayer_t *)p_access->p_sys;
+
+    unsigned int psz_mrl_max = strlen(VCD_MRL_PREFIX) 
+      + strlen(p_vcd->psz_source) + sizeof("@E999")+3;
+    char *psz_mrl = malloc( psz_mrl_max );
+
+    if( psz_mrl ) 
+    {
+        char *psz_name;
+	snprintf(psz_mrl, psz_mrl_max, "%s%s", 
+		 VCD_MRL_PREFIX, p_vcd->psz_source);
+	psz_name = VCDFormatStr( p_access, p_vcd,
+				 config_GetPsz( p_access, MODULE_STRING 
+						"-title-format" ),
+				psz_mrl, &(p_vcd->play_item) );
+	input_Control( p_vcd->p_input, INPUT_SET_NAME, psz_name );
+	free(psz_mrl);
+    }
 }
 

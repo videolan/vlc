@@ -26,12 +26,12 @@
  *****************************************************************************/
 struct intf_sys_t
 {
-  input_thread_t    * p_input;
-  access_vcd_data_t * p_vcd;
+  input_thread_t *p_input;
+  vcdplayer_t    *p_vcd;
 
-  vlc_bool_t          b_still;        /* True if we are in a still frame */
-  vlc_bool_t          b_inf_still;    /* True if still wait time is infinite */
-  mtime_t             m_still_time;   /* Time in microseconds remaining
+  vlc_bool_t      b_still;        /* True if we are in a still frame */
+  vlc_bool_t      b_inf_still;    /* True if still wait time is infinite */
+  mtime_t         m_still_time;   /* Time in microseconds remaining
                                          to wait in still frame.
                                        */
 #if FINISHED

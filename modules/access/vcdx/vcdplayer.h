@@ -52,6 +52,17 @@
 #define LOG_ERR(args...)  msg_Err( p_access, args )
 #define LOG_WARN(args...) msg_Warn( p_access, args )
 
+/*------------------------------------------------------------------
+  General definitions and structures.
+---------------------------------------------------------------------*/
+
+#define VCDPLAYER_IN_STILL  65535
+
+typedef struct {
+  lsn_t  start_LSN; /* LSN where play item starts */
+  size_t size;      /* size in sector units of play item. */
+} vcdplayer_play_item_info_t;
+
 /* vcdplayer_read return status */
 typedef enum {
   READ_BLOCK,
@@ -61,7 +72,7 @@ typedef enum {
 } vcdplayer_read_status_t;
 
 /*****************************************************************************
- * access_vcd_data_t: VCD information
+ * vcdplayer_t: VCD information
  *****************************************************************************/
 typedef struct thread_vcd_data_s
 {
@@ -70,8 +81,6 @@ typedef struct thread_vcd_data_s
   /* Current State: position */
   int          i_debug;                 /* Debugging mask */
   vlc_bool_t   in_still;                /* true if in still */
-  vcdinfo_itemid_t play_item;           /* play-item, VCDPLAYER_BAD_ENTRY 
-                                           if none */
   int          i_lid;                   /* LID that play item is in. Implies 
                                            PBC is on. VCDPLAYER_BAD_ENTRY if 
                                            not none or not in PBC */
@@ -79,6 +88,8 @@ typedef struct thread_vcd_data_s
                                             PSD/PLD */
   int          pdi;                     /* current pld index of pxd. -1 if 
                                            no index*/
+  vcdinfo_itemid_t play_item;           /* play-item, VCDPLAYER_BAD_ENTRY 
+                                           if none */
   vcdinfo_itemid_t loop_item;           /* Where do we loop back to? 
                                            Meaningful only in a selection 
                                            list */
@@ -90,7 +101,10 @@ typedef struct thread_vcd_data_s
   lsn_t        end_lsn;                 /* LSN of end of current 
                                            entry/segment/track. */
   lsn_t        origin_lsn;              /* LSN of start of seek/slider */
-
+  lsn_t        track_lsn;               /* LSN of start track origin of track 
+                                           we are in. */
+  lsn_t        track_end_lsn;           /* LSN of end of current track (if 
+                                           entry). */
   lsn_t *      p_entries;               /* Entry points */
   lsn_t *      p_segments;              /* Segments */
   vlc_bool_t   b_valid_ep;              /* Valid entry points flag */
@@ -109,6 +123,13 @@ typedef struct thread_vcd_data_s
   unsigned int i_segments;              /* # of segments */
   unsigned int i_entries;               /* # of entries */
   unsigned int i_lids;                  /* # of List IDs */
+
+  /* Tracks, segment, and entry information. The number of entries for
+     each is given by the corresponding num_* field above.  */
+  vcdplayer_play_item_info_t *track;
+  vcdplayer_play_item_info_t *segment;
+  vcdplayer_play_item_info_t *entry;
+
   unsigned int i_titles;                /* # of navigatable titles. */
 
   input_title_t *p_title[CDIO_CD_MAX_TRACKS];
@@ -120,7 +141,7 @@ typedef struct thread_vcd_data_s
   vlc_bool_t     b_end_of_cell;
   input_thread_t *p_input;
   
-} access_vcd_data_t;
+} vcdplayer_t;
 
 /*!
   Get the next play-item in the list given in the LIDs. Note play-item
@@ -133,7 +154,7 @@ vlc_bool_t vcdplayer_inc_play_item( access_t *p_access );
 /*!
   Return true if playback control (PBC) is on
 */
-vlc_bool_t vcdplayer_pbc_is_on(const access_vcd_data_t *p_this);
+vlc_bool_t vcdplayer_pbc_is_on(const vcdplayer_t *p_this);
 
 /*!
   Play item assocated with the "default" selection.
@@ -163,6 +184,13 @@ vlc_bool_t vcdplayer_play_prev( access_t * p_access );
 */
 vlc_bool_t
 vcdplayer_play_return( access_t * p_access );
+
+/* 
+   Set's start origin and size for subsequent seeks.  
+   input: p_vcd->i_lsn, p_vcd->play_item
+   changed: p_vcd->origin_lsn, p_vcd->end_lsn
+*/
+void vcdplayer_set_origin(access_t * p_access);
 
 vcdplayer_read_status_t vcdplayer_pbc_nav     ( access_t * p_access );
 vcdplayer_read_status_t vcdplayer_non_pbc_nav ( access_t * p_access );
