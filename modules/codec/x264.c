@@ -31,40 +31,123 @@
 
 #include <x264.h>
 
+#define SOUT_CFG_PREFIX "sout-x264-"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define SOUT_CFG_PREFIX "sout-x264-"
-static char *enc_analyse_list[] = {
-    "all", "normal", "fast", "none"
-};
+#define QP_TEXT N_("Quantizer parameter")
+#define QP_LONGTEXT N_( \
+    "This selects the quantizer to use (1 to 51). Lower values result in " \
+    "better fidelity, but higher bitrates. 26 is a good default value." )
 
-static char *enc_analyse_list_text[] = {
-    N_("all"), N_("normal"), N_("fast"), N_("none")
-};
+#define QPMIN_TEXT N_("Minimum quantizer parameter")
+#define QPMIN_LONGTEXT N_( "Minimum quantizer, 15/35 seems to be a useful " \
+    "range." )
+
+#define QPMAX_TEXT N_("Maximum quantizer parameter")
+#define QPMAX_LONGTEXT N_( "Maximum quantizer parameter." )
+
+#define CABAC_TEXT N_("Enable CABAC")
+#define CABAC_LONGTEXT N_( "Enable CABAC (Context-Adaptive Binary Arithmetic "\
+    "Coding). Slightly slows down encoding and decoding, but should save " \
+    "10-15% bitrate." )
+
+#define LOOPF_TEXT N_("Enable loop filter")
+#define LOOPF_LONGTEXT N_( "Use deblocking loop filter (increases quality).")
+
+#define ANALYSE_TEXT N_("Analyse mode")
+#define ANALYSE_LONGTEXT N_( "This selects the analysing mode.")
+
+#define KEYINT_TEXT N_("Sets maximum interval between I frames")
+#define KEYINT_LONGTEXT N_( "Larger values save bits, thus improve quality, " \
+    "at the cost of seeking precision." )
+
+#define IDRINT_TEXT N_("IDR frames")
+#define IDRINT_LONGTEXT N_("In H.264, I-Frames do not necessarily bound a " \
+    "closed GOP because it is allowable for a P-frame to be predicted from " \
+    "more frames than just the one frame before it (also see frameref). " \
+    "Therefore, I-frames are not necessarily seekable. " \
+    "IDR-Frames restrict subsequent P-frames from referring to any frame " \
+    "prior to the IDR-Frame." )
+
+#define BFRAMES_TEXT N_("B frames")
+#define BFRAMES_LONGTEXT N_( "Number of consecutive B-Frames between I and " \
+    "P-frames." )
+
+#define FRAMEREF_TEXT N_("Number of previous frames used as predictors.")
+#define FRAMEREF_LONGTEXT N_( "This is effective in Anime, but seems to " \
+    "make little difference in live-action source material. Some decoders " \
+    "are unable to deal with large frameref values." )
+
+#define SCENE_TEXT N_("Scene-cut detection.")
+#define SCENE_LONGTEXT N_( "Controls how aggressively to insert extra " \
+    "I-frames. With small values of scenecut, the codec often has to force " \
+    "an I-frame when it would exceed keyint. " \
+    "Good values of scenecut may find a better location for the I-frame. " \
+    "Large values use more I-frames than necessary, thus wasting bits. " \
+    "-1 disables scene-cut detection, so I-frames are be inserted only every "\
+    "other keyint frames, which probably leads to ugly encoding artifacts." )
+
+static char *enc_analyse_list[] =
+  { "", "all", "normal", "fast", "none" };
+static char *enc_analyse_list_text[] =
+  { N_("default"), N_("all"), N_("normal"), N_("fast"), N_("none") };
 
 vlc_module_begin();
     set_description( _("h264 video encoder using x264 library"));
     set_capability( "encoder", 200 );
-
-    add_integer( SOUT_CFG_PREFIX "qp", 0, NULL, "Set fixed QP (1-51)", "", VLC_FALSE );
-    add_bool( SOUT_CFG_PREFIX "cabac", 1, NULL, "Enable CABAC", "", VLC_FALSE );
-    add_bool( SOUT_CFG_PREFIX "loopfilter", 1, NULL, "Enable loop filter", "", VLC_FALSE );
-
-    add_string( SOUT_CFG_PREFIX "analyse", "", NULL, "Analyse mode", "", VLC_FALSE );
-        change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
     set_callbacks( Open, Close );
-vlc_module_end();
 
+    add_integer( SOUT_CFG_PREFIX "qp", 0, NULL, QP_TEXT, QP_LONGTEXT,
+                 VLC_FALSE );
+        change_integer_range( 0, 51 );
+    add_integer( SOUT_CFG_PREFIX "qp-min", 10, NULL, QPMIN_TEXT,
+                 QPMIN_LONGTEXT, VLC_FALSE );
+        change_integer_range( 0, 51 );
+    add_integer( SOUT_CFG_PREFIX "qp-max", 51, NULL, QPMAX_TEXT,
+                 QPMAX_LONGTEXT, VLC_FALSE );
+        change_integer_range( 0, 51 );
+
+    add_bool( SOUT_CFG_PREFIX "cabac", 1, NULL, CABAC_TEXT, CABAC_LONGTEXT,
+              VLC_FALSE );
+
+    add_bool( SOUT_CFG_PREFIX "loopfilter", 1, NULL, LOOPF_TEXT,
+              LOOPF_LONGTEXT, VLC_FALSE );
+
+    add_string( SOUT_CFG_PREFIX "analyse", "", NULL, ANALYSE_TEXT,
+                ANALYSE_LONGTEXT, VLC_FALSE );
+        change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
+
+    add_integer( SOUT_CFG_PREFIX "keyint", 250, NULL, KEYINT_TEXT,
+                 KEYINT_LONGTEXT, VLC_FALSE );
+
+    add_integer( SOUT_CFG_PREFIX "idrint", 2, NULL, IDRINT_TEXT,
+                 IDRINT_LONGTEXT, VLC_FALSE );
+
+    add_integer( SOUT_CFG_PREFIX "bframes", 0, NULL, BFRAMES_TEXT,
+                 BFRAMES_LONGTEXT, VLC_FALSE );
+        change_integer_range( 0, 16 );
+
+    add_integer( SOUT_CFG_PREFIX "frameref", 1, NULL, FRAMEREF_TEXT,
+                 FRAMEREF_LONGTEXT, VLC_FALSE );
+        change_integer_range( 1, 15 );
+
+    add_integer( SOUT_CFG_PREFIX "scenecut", 40, NULL, SCENE_TEXT,
+                 SCENE_LONGTEXT, VLC_FALSE );
+        change_integer_range( -1, 100 );
+
+vlc_module_end();
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "qp", "cabac", "loopfilter", "analyse", NULL
+    "qp", "qp-max", "qp-max", "cabac", "loopfilter", "analyse",
+    "keyint", "idrint", "bframes", "frameref", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -86,11 +169,14 @@ static int  Open ( vlc_object_t *p_this )
     encoder_t     *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
     vlc_value_t    val;
+    int i_qmin = 0, i_qmax = 0;
 
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC( 'h', '2', '6', '4' ) && !p_enc->b_force )
+    if( p_enc->fmt_out.i_codec != VLC_FOURCC( 'h', '2', '6', '4' ) &&
+        !p_enc->b_force )
     {
         return VLC_EGENERIC;
     }
+
     if( p_enc->fmt_in.video.i_width % 16 != 0 ||
         p_enc->fmt_in.video.i_height % 16!= 0 )
     {
@@ -112,18 +198,33 @@ static int  Open ( vlc_object_t *p_this )
     x264_param_default( &p_sys->param );
     p_sys->param.i_width  = p_enc->fmt_in.video.i_width;
     p_sys->param.i_height = p_enc->fmt_in.video.i_height;
-    p_sys->param.i_idrframe = 1;
-    if( p_enc->i_iframes > 0 )
-    {
-        p_sys->param.i_iframe = p_enc->i_iframes;
-    }
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "qp-min", &val );
+    if( val.i_int >= 1 && val.i_int <= 51 ) i_qmin = val.i_int;
+    var_Get( p_enc, SOUT_CFG_PREFIX "qp-max", &val );
+    if( val.i_int >= 1 && val.i_int <= 51 ) i_qmax = val.i_int;
+
     var_Get( p_enc, SOUT_CFG_PREFIX "qp", &val );
     if( val.i_int >= 1 && val.i_int <= 51 )
     {
+        if( i_qmin > val.i_int ) i_qmin = val.i_int;
+        if( i_qmax < val.i_int ) i_qmax = val.i_int;
+
 #if X264_BUILD >= 0x000a
         p_sys->param.rc.i_qp_constant = val.i_int;
+        p_sys->param.rc.i_qp_min = i_qmin;
+        p_sys->param.rc.i_qp_max = i_qmax;
 #else
         p_sys->param.i_qp_constant = val.i_int;
+#endif
+    }
+    else
+    {
+        /* No QP -> constant bitrate */
+#if X264_BUILD >= 0x000a
+        p_sys->param.rc.i_bitrate = p_enc->fmt_out.i_bitrate / 1000;
+        p_sys->param.rc.i_rc_buffer_size = p_sys->param.rc.i_bitrate;
+        p_sys->param.rc.i_rc_init_buffer = p_sys->param.rc.i_bitrate / 4;
 #endif
     }
 
@@ -132,6 +233,43 @@ static int  Open ( vlc_object_t *p_this )
 
     var_Get( p_enc, SOUT_CFG_PREFIX "loopfilter", &val );
     p_sys->param.b_deblocking_filter = val.b_bool;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "keyint", &val );
+    if( val.i_int > 0 ) p_sys->param.i_iframe = val.i_int;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "idrint", &val );
+    if( val.i_int > 0 ) p_sys->param.i_idrframe = val.i_int;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "bframes", &val );
+    if( val.i_int >= 0 && val.i_int <= 16 ) p_sys->param.i_bframe = val.i_int;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "frameref", &val );
+    if( val.i_int > 0 && val.i_int <= 15 )
+        p_sys->param.i_frame_reference = val.i_int;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "scenecut", &val );
+    if( val.i_int >= -1 && val.i_int <= 100 )
+        p_sys->param.i_scenecut_threshold = val.i_int;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "analyse", &val );
+    if( !strcmp( val.psz_string, "none" ) )
+    {
+        p_sys->param.analyse.inter = 0;
+    }
+    else if( !strcmp( val.psz_string, "fast" ) )
+    {
+        p_sys->param.analyse.inter = X264_ANALYSE_I4x4;
+    }
+    else if( !strcmp( val.psz_string, "normal" ) )
+    {
+        p_sys->param.analyse.inter =
+            X264_ANALYSE_I4x4 | X264_ANALYSE_PSUB16x16;
+    }
+    else if( !strcmp( val.psz_string, "all" ) )
+    {
+        p_sys->param.analyse.inter =
+            X264_ANALYSE_I4x4 | X264_ANALYSE_PSUB16x16 | X264_ANALYSE_PSUB8x8;
+    }
 
     if( p_enc->fmt_in.video.i_aspect > 0 )
     {
@@ -164,29 +302,12 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.cpu &= ~(X264_CPU_SSE|X264_CPU_SSE2);
     }
 
-    var_Get( p_enc, SOUT_CFG_PREFIX "analyse", &val );
-    if( !strcmp( val.psz_string, "none" ) )
-    {
-        p_sys->param.analyse.inter = 0;
-    }
-    else if( !strcmp( val.psz_string, "fast" ) )
-    {
-        p_sys->param.analyse.inter = X264_ANALYSE_I4x4;
-    }
-    else if( !strcmp( val.psz_string, "normal" ) )
-    {
-        p_sys->param.analyse.inter = X264_ANALYSE_I4x4  | X264_ANALYSE_PSUB16x16;
-    }
-    else if( !strcmp( val.psz_string, "all" ) )
-    {
-        p_sys->param.analyse.inter = X264_ANALYSE_I4x4  |
-                                     X264_ANALYSE_PSUB16x16 | X264_ANALYSE_PSUB8x8;
-    }
     /* Open the encoder */
     p_sys->h = x264_encoder_open( &p_sys->param );
 
     /* alloc mem */
-    p_sys->i_buffer = 4 * p_enc->fmt_in.video.i_width * p_enc->fmt_in.video.i_height + 1000;
+    p_sys->i_buffer = 4 * p_enc->fmt_in.video.i_width *
+        p_enc->fmt_in.video.i_height + 1000;
     p_sys->p_buffer = malloc( p_sys->i_buffer );
 
     /* get the globals headers */
@@ -267,7 +388,6 @@ static void Close( vlc_object_t *p_this )
 {
     encoder_t     *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
-
 
     x264_encoder_close( p_sys->h );
     free( p_sys->p_buffer );
