@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: preferences.cpp,v 1.47 2004/02/06 03:52:09 hartman Exp $
+ * $Id: preferences.cpp,v 1.48 2004/02/26 00:23:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -459,8 +459,8 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
          i_child_index < GetChildrenCount( plugins_item, FALSE );
          i_child_index++ )
     {
-        capability_item = GetNextChild( plugins_item, cookie );
         SortChildren( capability_item );
+        capability_item = GetNextChild( plugins_item, cookie );
     }
 
     /* Clean-up everything */
@@ -627,10 +627,11 @@ ConfigTreeData *PrefsTreeCtrl::FindModuleConfig( ConfigTreeData *config_data )
 
 void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
 {
-    ConfigTreeData *config_data;
+    ConfigTreeData *config_data = NULL;
 
-    config_data = FindModuleConfig( (ConfigTreeData *)GetItemData(
-                                    event.GetOldItem() ) );
+    if( event.GetOldItem() )
+        config_data = FindModuleConfig( (ConfigTreeData *)GetItemData(
+                                        event.GetOldItem() ) );
     if( config_data && config_data->panel )
     {
         config_data->panel->Hide();

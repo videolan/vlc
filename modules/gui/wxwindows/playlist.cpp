@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.43 2004/02/24 18:19:44 zorglub Exp $
+ * $Id: playlist.cpp,v 1.44 2004/02/26 00:23:04 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -171,10 +171,11 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxFrame( p_parent, -1, wxU(_("Playlist")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
+    vlc_value_t val;
+
     /* Initializations */
     iteminfo_dialog = NULL;
     p_intf = _p_intf;
-    vlc_value_t  val;
     i_update_counter = 0;
     i_sort_mode = MODE_NONE;
     b_need_update = VLC_FALSE;
@@ -185,7 +186,6 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     i_author_sorted = 0;
     i_group_sorted = 0;
     i_duration_sorted = 0;
-
 
     var_Create( p_intf, "random", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_intf, "loop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -340,8 +340,10 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     top_sizer->Layout();
 
     wxBoxSizer *bottom_sizer = new wxBoxSizer( wxHORIZONTAL );
-    bottom_sizer->Add( updown_sizer, 0, wxEXPAND |wxRIGHT | wxLEFT | wxALIGN_LEFT, 4);
-    bottom_sizer->Add( button_sizer , 0, wxEXPAND|wxLEFT | wxRIGHT | wxALIGN_RIGHT, 4 );
+    bottom_sizer->Add( updown_sizer, 0,
+                       wxEXPAND |wxRIGHT | wxLEFT | wxALIGN_LEFT, 4 );
+    bottom_sizer->Add( button_sizer , 0,
+                       wxEXPAND|wxLEFT | wxRIGHT | wxALIGN_RIGHT, 4 );
     bottom_sizer->Layout();
 
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
@@ -411,6 +413,8 @@ Playlist::~Playlist()
  **********************************************************************/
 void Playlist::UpdateItem( int i )
 {
+    if( i < 0 ) return; /* Sanity check */
+
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                        FIND_ANYWHERE );
@@ -494,12 +498,12 @@ void Playlist::Rebuild()
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 
-    if( i_focused )
+    if( i_focused >= 0 && i_focused < p_playlist->i_size )
     {
         listview->Focus( i_focused );
         listview->Select( i_focused );
     }
-    else
+    else if( p_playlist->i_index >= 0 )
     {
         listview->Focus( p_playlist->i_index );
     }
@@ -524,7 +528,7 @@ void Playlist::UpdatePlaylist()
     vlc_mutex_lock( &lock );
     if( this->b_need_update )
     {
-        b_need_update =VLC_TRUE;
+        b_need_update = VLC_TRUE;
         this->b_need_update = VLC_FALSE;
     }
     vlc_mutex_unlock( &lock );
@@ -546,7 +550,6 @@ void Playlist::UpdatePlaylist()
     }
 
     /* Update the colour of items */
-
     vlc_mutex_lock( &p_playlist->object_lock );
     if( p_intf->p_sys->i_playing != p_playlist->i_index )
     {
@@ -564,6 +567,7 @@ void Playlist::UpdatePlaylist()
         p_intf->p_sys->i_playing = p_playlist->i_index;
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
+
     vlc_object_release( p_playlist );
 }
 
@@ -641,8 +645,8 @@ void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
         return;
     }
 
-    wxFileDialog dialog( this, wxU(_("Open playlist")),
-                         wxT(""), wxT(""), wxT("All playlists|*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u"), wxOPEN );
+    wxFileDialog dialog( this, wxU(_("Open playlist")), wxT(""), wxT(""),
+        wxT("All playlists|*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u"), wxOPEN );
 
     if( dialog.ShowModal() == wxID_OK )
     {
@@ -673,7 +677,7 @@ void Playlist::OnAddMRL( wxCommandEvent& WXUNUSED(event) )
 /********************************************************************
  * Move functions
  ********************************************************************/
-void Playlist::OnUp( wxCommandEvent& event)
+void Playlist::OnUp( wxCommandEvent& event )
 {
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -684,25 +688,18 @@ void Playlist::OnUp( wxCommandEvent& event)
     }
 
     /* We use the first selected item, so find it */
-    long i_item = listview->GetNextItem( i_item, wxLIST_NEXT_ALL,
+    long i_item = listview->GetNextItem( -1, wxLIST_NEXT_ALL,
                                          wxLIST_STATE_SELECTED);
     if( i_item > 0 && i_item < p_playlist->i_size )
     {
-        playlist_Move( p_playlist , i_item, i_item - 1);
-        if( i_item > 1 )
-        {
-            listview->Focus( i_item - 1 );
-        }
-        else
-        {
-            listview->Focus(0);
-        }
+        playlist_Move( p_playlist, i_item, i_item - 1 );
+        listview->Focus( i_item - 1 );
     }
     vlc_object_release( p_playlist );
     return;
 }
 
-void Playlist::OnDown( wxCommandEvent& event)
+void Playlist::OnDown( wxCommandEvent& event )
 {
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -713,7 +710,7 @@ void Playlist::OnDown( wxCommandEvent& event)
     }
 
     /* We use the first selected item, so find it */
-    long i_item = listview->GetNextItem( i_item, wxLIST_NEXT_ALL,
+    long i_item = listview->GetNextItem( -1, wxLIST_NEXT_ALL,
                                          wxLIST_STATE_SELECTED );
     if( i_item >= 0 && i_item < p_playlist->i_size - 1 )
     {
@@ -846,24 +843,24 @@ void Playlist::OnSearchTextChange( wxCommandEvent& WXUNUSED(event) )
 
 void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
 {
-    wxString search_string= search_text->GetValue();
+    wxString search_string = search_text->GetValue();
 
     int i_current;
     int i_first = 0 ;
     int i_item = -1;
 
-    for( i_current = 0 ; i_current <= listview->GetItemCount() ; i_current++ )
+    for( i_current = 0; i_current < listview->GetItemCount(); i_current++ )
     {
-        if( listview->GetItemState( i_current, wxLIST_STATE_SELECTED )
-                   == wxLIST_STATE_SELECTED )
+        if( listview->GetItemState( i_current, wxLIST_STATE_SELECTED ) ==
+              wxLIST_STATE_SELECTED )
         {
             i_first = i_current;
             break;
         }
     }
 
-    for ( i_current = i_first + 1; i_current <= listview->GetItemCount() ;
-          i_current++ )
+    for( i_current = i_first + 1; i_current < listview->GetItemCount();
+         i_current++ )
     {
         wxListItem listitem;
         listitem.SetId( i_current );
@@ -874,6 +871,9 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
             break;
         }
     }
+
+    if( i_item < 0 || i_item >= listview->GetItemCount() ) return;
+
     for( long item = 0; item < listview->GetItemCount(); item++ )
     {
         listview->Select( item, FALSE );
@@ -1118,7 +1118,6 @@ void Playlist::OnPopup( wxListEvent& event )
     Playlist::PopupMenu( popup_menu , ScreenToClient( wxGetMousePosition() ) );
 }
 
-
 void Playlist::OnPopupPlay( wxMenuEvent& event )
 {
     playlist_t *p_playlist =
@@ -1206,9 +1205,9 @@ int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
 
     wxCommandEvent event( wxEVT_PLAYLIST, UpdateItem_Event );
     event.SetInt( old_val.i_int );
-    p_playlist_dialog->ProcessEvent( event );
+    p_playlist_dialog->AddPendingEvent( event );
     event.SetInt( new_val.i_int );
-    p_playlist_dialog->ProcessEvent( event );
+    p_playlist_dialog->AddPendingEvent( event );
 
     return 0;
 }
@@ -1223,7 +1222,7 @@ int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
 
     wxCommandEvent event( wxEVT_PLAYLIST, UpdateItem_Event );
     event.SetInt( new_val.i_int );
-    p_playlist_dialog->ProcessEvent( event );
+    p_playlist_dialog->AddPendingEvent( event );
 
     return 0;
 }
