@@ -1,5 +1,5 @@
 #! /bin/sh
-# $Id: woody-buildpackage,v 1.14 2003/04/11 19:15:36 sam Exp $
+# $Id: woody-buildpackage,v 1.15 2003/07/04 14:56:51 sam Exp $
 # Build VLC on a Debian woody system
 
 set -x
@@ -49,6 +49,7 @@ sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
 sed -e '/# Package: wxvlc/,/^ *$/d' \
     -e 's,^ARCH_EXCLUDE =,& -Nwxvlc,' \
     -e 's,--enable-wxwindows,--disable-wxwindows,' \
+    -e 's,--enable-skins,--disable-skins,' \
     -e 's,--enable-flac,--disable-flac,' \
     -e 's, debian/changelog , debian/changelog.woody ,' \
     -e 's,dh_gencontrol[^#]*,& -- -ldebian/changelog.woody,' \
@@ -71,7 +72,7 @@ chg=../"$pva.changes"
 # Do the real work
 dpkg-checkbuilddeps -B debian/control.woody || exit 1
 fakeroot debian/rules.woody clean
-cd ..; dpkg-source -l"$dirn"/debian/changelog.woody -b "$dirn"; cd "$dirn"
+#cd ..; dpkg-source -l"$dirn"/debian/changelog.woody -b "$dirn"; cd "$dirn"
 debian/rules.woody build
 fakeroot debian/rules.woody binary
 dpkg-genchanges -ldebian/changelog.woody -cdebian/control.woody >"$chg"

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for the VLC media player
-##  $Id: bootstrap,v 1.63 2003/07/04 13:53:06 sam Exp $
+##  $Id: bootstrap,v 1.64 2003/07/04 14:56:51 sam Exp $
 ##
 ##  Authors: Sam Hocevar <sam@zoy.org>
 
@@ -163,8 +163,7 @@ L${count}b = lib${mod}.a
 L${count}pic = lib${mod}_pic.a
 EOF
     if [ "${NODIST}" != "#" ]; then cat >> modules/${dir}/Makefile.am << EOF
-B${count}p = \$(nodist_SOURCES_${mod})
-B${count}b = \$(nodist_SOURCES_${mod})
+B${count} = \$(nodist_SOURCES_${mod})
 EOF
     fi
     cat >> modules/${dir}/Makefile.am << EOF
@@ -172,7 +171,7 @@ endif
 
 EOF
     if [ "${NODIST}" != "#" ]; then cat >> modules/${dir}/Makefile.am << EOF
-${PRIVATE}BUILT_SOURCES += \$(B${count}p) \$(B${count}b)
+${PRIVATE}BUILT_SOURCES += \$(B${count})
 EOF
     fi
     cat >> modules/${dir}/Makefile.am << EOF
