@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.2 2002/10/14 16:46:55 sam Exp $
+ * $Id: variables.h,v 1.3 2002/10/14 19:04:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,6 +31,7 @@
 #define VLC_VAR_TIME      0x0500
 #define VLC_VAR_ADDRESS   0x0600
 #define VLC_VAR_COMMAND   0x0700
+#define VLC_VAR_MUTEX     0x0800
 
 /*****************************************************************************
  * vlc_value_t is the common union for variable values; variable_t is the
@@ -45,6 +46,7 @@ struct variable_t
     vlc_value_t  val;
 
     /* Lots of other things that can be added */
+    int          i_usage;
     vlc_bool_t   b_set;
     vlc_bool_t   b_active;
 };

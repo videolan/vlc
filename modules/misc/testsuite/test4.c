@@ -2,7 +2,7 @@
  * test4.c : Miscellaneous stress tests module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: test4.c,v 1.1 2002/10/14 16:34:17 sam Exp $
+ * $Id: test4.c,v 1.2 2002/10/14 19:04:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -228,7 +228,7 @@ static void * Dummy( vlc_object_t *p_this )
 
     while( !p_this->b_die )
     {
-        msleep( 1000 );
+        msleep( 10000 );
     }
 
     for( i = MAXOBJ/MAXTH; i--; )

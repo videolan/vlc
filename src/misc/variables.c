@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.2 2002/10/14 16:46:56 sam Exp $
+ * $Id: variables.c,v 1.3 2002/10/14 19:04:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,8 +49,31 @@ static int LookupInner    ( variable_t *, int, u32 );
 int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 {
     int i_new;
+    variable_t *p_var;
 
     vlc_mutex_lock( &p_this->var_lock );
+
+    /* FIXME: if the variable already exists, we don't duplicate it. But we
+     * duplicate the lookups. It's not that serious, but if anyone finds some
+     * time to rework Insert() so that only one lookup has to be done, feel
+     * free to do so. */
+    i_new = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
+
+    if( i_new >= 0 )
+    {
+        /* If the types differ, variable creation failed. */
+        if( i_type != p_this->p_vars[i_new].i_type )
+        {
+            vlc_mutex_unlock( &p_this->var_lock );
+            return VLC_EBADVAR;
+        }
+
+        p_this->p_vars[i_new].i_usage++;
+        vlc_mutex_unlock( &p_this->var_lock );
+        return VLC_SUCCESS;
+    }
+
+    i_new = Insert( p_this->p_vars, p_this->i_vars, psz_name );
 
     if( (p_this->i_vars & 15) == 15 )
     {
@@ -58,20 +81,21 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
                                   (p_this->i_vars+17) * sizeof(variable_t) );
     }
 
-    i_new = Insert( p_this->p_vars, p_this->i_vars, psz_name );
-
     memmove( p_this->p_vars + i_new + 1,
              p_this->p_vars + i_new,
              (p_this->i_vars - i_new) * sizeof(variable_t) );
 
-    p_this->p_vars[i_new].i_hash = HashString( psz_name );
-    p_this->p_vars[i_new].psz_name = strdup( psz_name );
+    p_var = &p_this->p_vars[i_new];
 
-    p_this->p_vars[i_new].i_type = i_type;
-    memset( &p_this->p_vars[i_new].val, 0, sizeof(vlc_value_t) );
+    p_var->i_hash = HashString( psz_name );
+    p_var->psz_name = strdup( psz_name );
 
-    p_this->p_vars[i_new].b_set = VLC_FALSE;
-    p_this->p_vars[i_new].b_active = VLC_TRUE;
+    p_var->i_type = i_type;
+    memset( &p_var->val, 0, sizeof(vlc_value_t) );
+
+    p_var->i_usage = 1;
+    p_var->b_set = VLC_FALSE;
+    p_var->b_active = VLC_TRUE;
 
     p_this->i_vars++;
 
@@ -89,6 +113,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 {
     int i_del;
+    variable_t *p_var;
 
     vlc_mutex_lock( &p_this->var_lock );
 
@@ -101,21 +126,29 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
         return VLC_ENOVAR;
     }
 
+    p_var = &p_this->p_vars[i_del];
+
+    if( p_var->i_usage > 1 )
+    {
+        p_var->i_usage--;
+        vlc_mutex_unlock( &p_this->var_lock );
+        return VLC_SUCCESS;
+    }
+
     /* Free value if needed */
-    switch( p_this->p_vars[i_del].i_type )
+    switch( p_var->i_type )
     {
         case VLC_VAR_STRING:
         case VLC_VAR_MODULE:
         case VLC_VAR_FILE:
-            if( p_this->p_vars[i_del].b_set
-                 && p_this->p_vars[i_del].val.psz_string )
+            if( p_var->b_set && p_var->val.psz_string )
             {
-                free( p_this->p_vars[i_del].val.psz_string );
+                free( p_var->val.psz_string );
             }
             break;
     }
 
-    free( p_this->p_vars[i_del].psz_name );
+    free( p_var->psz_name );
 
     memmove( p_this->p_vars + i_del,
              p_this->p_vars + i_del + 1,
