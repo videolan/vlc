@@ -10,14 +10,6 @@
 ; Personnalization of James Clark's stylesheet for PS & PDF output
 ; These parameters overide James Clark's one.
 
-; Only produce a table of contents (not a table of figure, etc...)
-(define ($generate-book-lot-list$)
-  (list ))
-
-; Depth of the table of contents
-(define (toc-depth nd)
-      2)
-
 ; Magins
 (define %left-margin%
   3pi)

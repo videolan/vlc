@@ -1,45 +1,32 @@
-<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook V4.1//EN'
+<!DOCTYPE article PUBLIC '-//OASIS//DTD DocBook V4.1//EN'
 [
 
   <!ENTITY faq SYSTEM "faq.sgml">
-  <!ENTITY fdl SYSTEM "fdl.sgml">
 ]>
 
-<book>
+<article>
 
-<bookinfo>
+<articleinfo>
 
-<title>Frequently Asked Questions for the VideoLAN Client</title>
+<title>VLC FAQ</title>
 
 <copyright>
     <year>2002, 2003</year>
     <holder>the VideoLAN project</holder>
 </copyright>
 
-<legalnotice>
-
-<para>
-Permission is granted to copy, distribute and/or modify this document
-under the terms of the GNU Free Documentation License, Version 1.1 or
-any later version published by the Free Software Foundation ; with no
-Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
-Texts. The text of the license can be found in the appendix
-<xref linkend="gfdl" endterm="tgfdl">.</para>
-  
-</legalnotice>
-
-
-
 <abstract>
 
-<para>This document is the FAQ (Frequently Asked Questions) for the VideoLAN Client. For a complete user guide, please have a look at the VideoLAN Client User Guide, available on the  <ulink url="http://www.videolan.org">VideoLAN Website</ulink>
+<para>This document is the VideoLAN Client (VLC) Frequently
+Asked Questions. For a complete user guide, please have
+a look at the VLC User Guide, available on the <ulink
+url="http://www.videolan.org/doc/">VideoLAN website</ulink></para>
+
 </abstract>
 
-</bookinfo>
+</articleinfo>
 
-<toc></toc>
 
 &faq;
-&fdl;
 
-</book>
+</article>
