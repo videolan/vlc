@@ -66,6 +66,7 @@ typedef struct aout_sys_s
 {
     byte_t  * audio_buf;
     int i_audio_end;
+    boolean_t b_active;
 } aout_sys_t;
 
 
@@ -107,7 +108,10 @@ static int aout_Probe( probedata_t *p_data )
 
     /* Start AudioSDL */
     if( SDL_Init(SDL_INIT_AUDIO) != 0)
-        intf_ErrMsgImm( "aout_Probe: SDL init error: %s", SDL_GetError() );
+    {
+        intf_DbgMsg( "aout_Probe: SDL init error: %s", SDL_GetError() );
+        return( 0 );
+    }
      
     /* asks for a minimum audio spec so that we are sure the dsp exists */
     desired = (SDL_AudioSpec *)malloc( sizeof(SDL_AudioSpec) );
@@ -125,14 +129,17 @@ static int aout_Probe( probedata_t *p_data )
      * the plugin. Return a score of 0. */
     if(SDL_OpenAudio( desired, obtained ) < 0)
     {
-        SDL_CloseAudio();
-       intf_ErrMsgImm( "aout_Probe: aout sdl error : %s", SDL_GetError() );
+        free( desired );
+        free( obtained );
+        intf_DbgMsg( "aout_Probe: aout sdl error : %s", SDL_GetError() );
          return( 0 );
     }
+    free( desired );
+    free( obtained );
 
     /* Otherwise, there are good chances we can use this plugin, return 100. */
     SDL_CloseAudio();
-    return( 100 );
+    return( 50 );
 }
 
 /*****************************************************************************
@@ -144,7 +151,7 @@ static int aout_Probe( probedata_t *p_data )
 static int aout_Open( aout_thread_t *p_aout )
 {
     SDL_AudioSpec *desired;
-    int i_stereo = p_aout->b_stereo?2:1;
+    int i_channels = p_aout->b_stereo?2:1;
 
     /* asks for a minimum audio spec so that we are sure the dsp exists */
     desired = (SDL_AudioSpec *)malloc( sizeof(SDL_AudioSpec) );
@@ -176,7 +183,7 @@ static int aout_Open( aout_thread_t *p_aout )
     /* TODO: write conversion beetween AOUT_FORMAT_DEFAULT 
      * AND AUDIO* from SDL. */
     desired->format     = AUDIO_S16LSB;                    /* stereo 16 bits */
-    desired->channels    = i_stereo;
+    desired->channels    = i_channels;
     desired->callback   = SDL_aout_callback;
     desired->userdata   = p_aout->p_sys; 
     desired->samples    = 2048;
@@ -188,10 +195,13 @@ static int aout_Open( aout_thread_t *p_aout )
      */
     if( SDL_OpenAudio(desired,NULL) < 0 )
     {
-        intf_ErrMsgImm( "aout_Open error: can't open audio device: %s", 
+        free( desired );
+        intf_ErrMsg( "aout_Open error: can't open audio device: %s", 
                         SDL_GetError() );
         return( -1 );
     }
+    p_aout->p_sys->b_active = 1;
+    free( desired );
     SDL_PauseAudio(0);
     return( 0 );
 
@@ -225,7 +235,13 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     SDL_PauseAudio(1);
     SDL_CloseAudio();
     if( SDL_OpenAudio(desired,NULL) < 0 )
+    {
+        free( desired );
+        p_aout->p_sys->b_active = 0;
         return( -1 );
+    }
+    p_aout->p_sys->b_active = 1;
+    free( desired );
     SDL_PauseAudio(0);
     return(0);    
 }
@@ -249,7 +265,7 @@ static void SDL_aout_callback(void *userdata, byte_t *stream, int len)
     
     if(end > OVERFLOWLIMIT)
     {
-        intf_ErrMsgImm("aout SDL_aout_callback: Overflow.");
+        intf_ErrMsg("aout SDL_aout_callback: Overflow.");
         free(p_sys->audio_buf);
         p_sys->audio_buf = NULL;
         p_sys->i_audio_end = 0;
@@ -292,12 +308,15 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
  *****************************************************************************/
 static void aout_Close( aout_thread_t *p_aout )
 {
-    SDL_LockAudio();                                    /* Stop callbacking  */
-    SDL_PauseAudio(1);                                        /* pause audio */
-    
-    if(p_aout->p_sys->audio_buf != NULL)        /* do we have a buffer now ? */
+    if( p_aout->p_sys->b_active )
     {
-        free(p_aout->p_sys->audio_buf);
+        SDL_PauseAudio(1);                                    /* pause audio */
+    
+        if(p_aout->p_sys->audio_buf != NULL)    /* do we have a buffer now ? */
+        {
+            free(p_aout->p_sys->audio_buf);
+        }
+        p_aout->p_sys->b_active = 0;                         /* just for sam */
     }
     free(p_aout->p_sys);                                /* Close the Output. */
     SDL_CloseAudio();

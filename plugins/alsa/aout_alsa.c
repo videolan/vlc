@@ -145,7 +145,7 @@ static int aout_Probe( probedata_t *p_data )
     }
 
     /* And return score */
-    return( 100 );
+    return( 50 );
 }    
 
 /*****************************************************************************
