@@ -2,7 +2,7 @@
  * ogg.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.6 2003/06/23 23:51:31 gbazin Exp $
+ * $Id: ogg.c,v 1.7 2003/06/29 20:58:16 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -649,7 +649,6 @@ static int Mux( sout_mux_t *p_mux )
             p_stream->i_dts = -1;
             p_stream->i_length = 0;
 
-            msg_Dbg( p_mux, "writing data..." );
             sout_AccessOutWrite( p_mux->p_access, p_og );
 
             p_og = NULL;

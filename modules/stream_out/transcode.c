@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.18 2003/06/25 21:47:05 fenrir Exp $
+ * $Id: transcode.c,v 1.19 2003/06/29 20:58:16 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -36,6 +36,11 @@
 #   include <ffmpeg/avcodec.h>
 #else
 #   include <avcodec.h>
+#endif
+
+/* vorbis header */
+#ifdef HAVE_VORBIS_VORBISENC_H
+#   include <vorbis/vorbisenc.h>
 #endif
 
 /*****************************************************************************
@@ -300,10 +305,22 @@ struct sout_stream_id_t
     AVFrame         *p_ff_pic_tmp2; /* to do resample */
 
     ImgReSampleContext *p_vresample;
+
+#ifdef HAVE_VORBIS_VORBISENC_H
+
+    /* Vorbis part */
+    vorbis_info      *p_vi;
+    vorbis_dsp_state *p_vd;
+    vorbis_block     *p_vb;
+    vorbis_comment   *p_vc;
+    int              i_last_block_size;
+    int              i_samples_delay;
+    vlc_bool_t       b_headers_sent;
+#endif
 };
 
 
-static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_fmt )
+static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
 {
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
     sout_stream_id_t    *id;
@@ -412,7 +429,8 @@ static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
     return VLC_SUCCESS;
 }
 
-static int     Send     ( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *p_buffer )
+static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
+                 sout_buffer_t *p_buffer )
 {
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
@@ -462,6 +480,7 @@ static struct
     { VLC_FOURCC( 'a', 'c', '3', ' ' ), CODEC_ID_AC3 },
     { VLC_FOURCC( 'w', 'm', 'a', '1' ), CODEC_ID_WMAV1 },
     { VLC_FOURCC( 'w', 'm', 'a', '2' ), CODEC_ID_WMAV2 },
+    { VLC_FOURCC( 'v', 'o', 'r', 'b' ), CODEC_ID_VORBIS },
 
     /* video */
     { VLC_FOURCC( 'm', 'p', '4', 'v'),  CODEC_ID_MPEG4 },
@@ -525,7 +544,8 @@ static inline int get_ff_chroma( vlc_fourcc_t i_chroma )
     }
 }
 
-static int transcode_audio_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
+                                       sout_stream_id_t *id )
 {
     int i_ff_codec;
 
@@ -575,6 +595,49 @@ static int transcode_audio_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_i
     }
 
     /* find encoder */
+    id->i_buffer_in      = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    id->i_buffer_in_pos = 0;
+    id->p_buffer_in      = malloc( id->i_buffer_in );
+
+    id->i_buffer     = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    id->i_buffer_pos = 0;
+    id->p_buffer     = malloc( id->i_buffer );
+
+    id->i_buffer_out     = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    id->i_buffer_out_pos = 0;
+    id->p_buffer_out     = malloc( id->i_buffer_out );
+
+#ifdef HAVE_VORBIS_VORBISENC_H
+    if( id->f_dst.i_fourcc == VLC_FOURCC('v','o','r','b') )
+    {
+        id->p_vi = (vorbis_info *)malloc( sizeof(vorbis_info) );
+        id->p_vd = (vorbis_dsp_state *)malloc( sizeof(vorbis_dsp_state) );
+        id->p_vb = (vorbis_block *)malloc( sizeof(vorbis_block) );
+        id->p_vc = (vorbis_comment *)malloc( sizeof(vorbis_comment) );
+
+        vorbis_info_init( id->p_vi );
+
+        if( vorbis_encode_setup_managed( id->p_vi, id->f_dst.i_channels,
+              id->f_dst.i_sample_rate, -1, id->f_dst.i_bitrate, -1 ) ||
+            vorbis_encode_ctl( id->p_vi, OV_ECTL_RATEMANAGE_AVG, NULL ) ||
+             vorbis_encode_setup_init( id->p_vi ) ){}
+
+        /* add a comment */
+        vorbis_comment_init( id->p_vc);
+        vorbis_comment_add_tag( id->p_vc, "ENCODER", "VLC media player");
+
+        /* set up the analysis state and auxiliary encoding storage */
+        vorbis_analysis_init( id->p_vd, id->p_vi );
+        vorbis_block_init( id->p_vd, id->p_vb );
+
+        id->b_headers_sent = VLC_FALSE;
+        id->i_last_block_size = 0;
+        id->i_samples_delay = 0;
+
+        return VLC_SUCCESS;
+    }
+#endif
+
     i_ff_codec = get_ff_codec( id->f_dst.i_fourcc );
     if( i_ff_codec == 0 )
     {
@@ -600,65 +663,76 @@ static int transcode_audio_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_i
         return VLC_EGENERIC;
     }
 
-
-    id->i_buffer_in      = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
-    id->i_buffer_in_pos = 0;
-    id->p_buffer_in      = malloc( id->i_buffer_in );
-
-    id->i_buffer     = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
-    id->i_buffer_pos = 0;
-    id->p_buffer     = malloc( id->i_buffer );
-
-    id->i_buffer_out     = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
-    id->i_buffer_out_pos = 0;
-    id->p_buffer_out     = malloc( id->i_buffer_out );
-
     return VLC_SUCCESS;
 }
 
-static void transcode_audio_ffmpeg_close ( sout_stream_t *p_stream, sout_stream_id_t *id )
+static void transcode_audio_ffmpeg_close( sout_stream_t *p_stream,
+                                          sout_stream_id_t *id )
 {
     if( id->ff_dec )
     {
         avcodec_close( id->ff_dec_c );
     }
-    avcodec_close( id->ff_enc_c );
+
+#ifdef HAVE_VORBIS_VORBISENC_H
+    if( id->f_dst.i_fourcc == VLC_FOURCC('v','o','r','b') )
+    {
+        vorbis_block_clear( id->p_vb );
+        vorbis_dsp_clear( id->p_vd );
+        vorbis_comment_clear( id->p_vc );
+        vorbis_info_clear( id->p_vi );  /* must be called last */
+
+        free( id->p_vi );
+        free( id->p_vd );
+        free( id->p_vb );
+        free( id->p_vc );
+    }
+    else
+#endif
+        avcodec_close( id->ff_enc_c );
 
     free( id->ff_dec_c );
-    free( id->ff_enc_c );
+    if( id->f_dst.i_fourcc != VLC_FOURCC('v','o','r','b') )
+        free( id->ff_enc_c );
 
     free( id->p_buffer_in );
     free( id->p_buffer );
     free( id->p_buffer_out );
 }
 
-static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_id_t *id,
-                                           sout_buffer_t *in, sout_buffer_t **out )
+static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
+                                           sout_stream_id_t *id,
+                                           sout_buffer_t *in,
+                                           sout_buffer_t **out )
 {
     vlc_bool_t b_again = VLC_FALSE;
 
     *out = NULL;
 
     /* gather data into p_buffer_in */
+    if( id->f_dst.i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+    id->i_dts = in->i_dts -
+                (mtime_t)1000000 * (mtime_t)id->i_samples_delay /
+                (mtime_t)id->f_dst.i_sample_rate;
+    else
     id->i_dts = in->i_dts -
                 (mtime_t)1000000 *
                 (mtime_t)(id->i_buffer_pos / 2 / id->ff_enc_c->channels )/
                 (mtime_t)id->ff_enc_c->sample_rate;
 
-    if( id->i_buffer_in_pos + in->i_size > id->i_buffer_in )
+    if( id->i_buffer_in_pos + (int)in->i_size > id->i_buffer_in )
     {
         /* extend buffer_in */
         id->i_buffer_in = id->i_buffer_in_pos + in->i_size + 1024;
         id->p_buffer_in = realloc( id->p_buffer_in, id->i_buffer_in );
     }
     memcpy( &id->p_buffer_in[id->i_buffer_in_pos],
-            in->p_buffer,
-            in->i_size );
+            in->p_buffer, in->i_size );
     id->i_buffer_in_pos += in->i_size;
 
     do
     {
-        /* decode as many data as possible */
+        /* decode as much data as possible */
         if( id->ff_dec )
         {
             for( ;; )
@@ -669,10 +743,12 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
                 i_buffer_size = id->i_buffer - id->i_buffer_pos;
 
                 i_used = avcodec_decode_audio( id->ff_dec_c,
-                                               (int16_t*)&id->p_buffer[id->i_buffer_pos], &i_buffer_size,
-                                               id->p_buffer_in, id->i_buffer_in_pos );
+                         (int16_t*)&id->p_buffer[id->i_buffer_pos],
+                         &i_buffer_size, id->p_buffer_in,
+                         id->i_buffer_in_pos );
 
-                /* msg_Warn( p_stream, "avcodec_decode_audio: %d used", i_used ); */
+                /* msg_Warn( p_stream, "avcodec_decode_audio: %d used",
+                             i_used ); */
                 id->i_buffer_pos += i_buffer_size;
 
                 if( i_used < 0 )
@@ -710,7 +786,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
             if( id->f_src.i_fourcc == VLC_FOURCC( 's', '8', ' ', ' ' ) )
             {
                 int8_t *sin = (int8_t*)id->p_buffer_in;
-                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos );
+                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos )
+                                           / 2, id->i_buffer_in_pos );
                 i_used = i_samples;
                 while( i_samples > 0 )
                 {
@@ -721,7 +798,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
             else if( id->f_src.i_fourcc == VLC_FOURCC( 'u', '8', ' ', ' ' ) )
             {
                 int8_t *sin = (int8_t*)id->p_buffer_in;
-                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos );
+                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos )
+                                           / 2, id->i_buffer_in_pos );
                 i_used = i_samples;
                 while( i_samples > 0 )
                 {
@@ -731,7 +809,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
             }
             else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'l' ) )
             {
-                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos / 2);
+                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos )
+                                           / 2, id->i_buffer_in_pos / 2);
 #ifdef WORDS_BIGENDIAN
                 uint8_t *sin = (uint8_t*)id->p_buffer_in;
                 i_used = i_samples * 2;
@@ -753,7 +832,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
             }
             else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'b' ) )
             {
-                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos / 2);
+                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos )
+                                           / 2, id->i_buffer_in_pos / 2);
 #ifdef WORDS_BIGENDIAN
                 memcpy( sout, id->p_buffer_in, i_samples * 2 );
                 sout += i_samples;
@@ -783,10 +863,109 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
             id->i_buffer_in_pos -= i_used;
         }
 
-        /* encode as many data as possible */
+        /* encode as much data as possible */
+
+#ifdef HAVE_VORBIS_VORBISENC_H
+        if( id->i_buffer_pos == 0 );
+        else if( id->f_dst.i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+        {
+            float **buffer;
+            int i, j, i_samples;
+            sout_buffer_t *p_out;
+            ogg_packet op;
+
+            if( id->i_buffer_pos == 0 )
+            {
+                break;
+            }
+
+            if( !id->b_headers_sent )
+            {
+                ogg_packet header[3];
+                vorbis_analysis_headerout( id->p_vd, id->p_vc,
+                                           &header[0], &header[1], &header[2]);
+                for( i = 0; i < 3; i++ )
+                {
+                    p_out = sout_BufferNew( p_stream->p_sout, header[i].bytes);
+                    memcpy( p_out->p_buffer, header[i].packet,
+                            header[i].bytes );
+
+                    p_out->i_size = header[i].bytes;
+                    p_out->i_length = 0;
+
+                    p_out->i_dts = p_out->i_pts = 0;
+
+                    sout_BufferChain( out, p_out );
+                }
+                id->b_headers_sent = VLC_TRUE;
+            }
+
+            i_samples = id->i_buffer_pos / id->f_dst.i_channels / 2;
+            id->i_samples_delay += i_samples;
+            id->i_buffer_pos = 0;
+
+            buffer = vorbis_analysis_buffer( id->p_vd, i_samples );
+
+            /* convert samples to float and uninterleave */
+            for( i = 0; i < id->f_dst.i_channels; i++ )
+            {
+                for( j = 0 ; j < i_samples ; j++ )
+                {
+                    buffer[i][j]= ((float)( ((int16_t *)id->p_buffer)
+                                  [j*id->f_dst.i_channels + i ] ))/ 32768.f;
+                }
+            }
+
+            vorbis_analysis_wrote( id->p_vd, i_samples );
+
+            while( vorbis_analysis_blockout( id->p_vd, id->p_vb ) == 1 )
+            {
+                vorbis_analysis( id->p_vb, NULL );
+                vorbis_bitrate_addblock( id->p_vb );
+
+                while( vorbis_bitrate_flushpacket( id->p_vd, &op ) )
+                {
+                    int i_block_size;
+                    p_out = sout_BufferNew( p_stream->p_sout, op.bytes );
+                    memcpy( p_out->p_buffer, op.packet, op.bytes );
+
+                    i_block_size = vorbis_packet_blocksize( id->p_vi, &op );
+
+                    if( i_block_size < 0 ) i_block_size = 0;
+                    i_samples = ( id->i_last_block_size +
+                                  i_block_size ) >> 2;
+                    id->i_last_block_size = i_block_size;
+
+                    p_out->i_size = op.bytes;
+                    p_out->i_length = (mtime_t)1000000 *
+                      (mtime_t)i_samples /
+                      (mtime_t)id->f_dst.i_sample_rate;
+
+                    //msg_Err( p_stream, "i_dts: %lld", id->i_dts );
+
+                    /* FIXME */
+                    p_out->i_dts = id->i_dts;
+                    p_out->i_pts = id->i_dts;
+
+                    id->i_samples_delay -= i_samples;
+
+                    static mtime_t i_old_dts = 0;
+
+                    /* update dts */
+                    id->i_dts += p_out->i_length;
+                    i_old_dts = id->i_dts;
+                    sout_BufferChain( out, p_out );
+
+                }
+            }
+        }
+        else
+#endif
+
         for( ;; )
         {
-            int i_frame_size = id->ff_enc_c->frame_size * 2 * id->ff_enc_c->channels;
+            int i_frame_size = id->ff_enc_c->frame_size * 2 *
+                                 id->ff_enc_c->channels;
             int i_out_size;
             sout_buffer_t *p_out;
 
@@ -795,10 +974,11 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
                 break;
             }
 
-            /* msg_Warn( p_stream, "avcodec_encode_audio: frame size%d", i_frame_size); */
+            /* msg_Warn( p_stream, "avcodec_encode_audio: frame size%d",
+                         i_frame_size); */
             i_out_size = avcodec_encode_audio( id->ff_enc_c,
-                                               id->p_buffer_out, id->i_buffer_out,
-                                               (int16_t*)id->p_buffer );
+                           id->p_buffer_out, id->i_buffer_out,
+                           (int16_t*)id->p_buffer );
 
             if( i_out_size <= 0 )
             {
@@ -812,7 +992,10 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
             p_out = sout_BufferNew( p_stream->p_sout, i_out_size );
             memcpy( p_out->p_buffer, id->p_buffer_out, i_out_size );
             p_out->i_size = i_out_size;
-            p_out->i_length = (mtime_t)1000000 * (mtime_t)id->ff_enc_c->frame_size / (mtime_t)id->ff_enc_c->sample_rate;
+            p_out->i_length = (mtime_t)1000000 *
+                              (mtime_t)id->ff_enc_c->frame_size /
+                              (mtime_t)id->ff_enc_c->sample_rate;
+
             /* FIXME */
             p_out->i_dts = id->i_dts;
             p_out->i_pts = id->i_dts;
@@ -820,7 +1003,9 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
             /* update dts */
             id->i_dts += p_out->i_length;
 
-           /* msg_Warn( p_stream, "frame dts=%lld len %lld out=%d", p_out->i_dts, p_out->i_length, i_out_size ); */
+           /* msg_Warn( p_stream, "frame dts=%lld len %lld out=%d",
+                        p_out->i_dts, p_out->i_length, i_out_size ); */
+
             sout_BufferChain( out, p_out );
         }
 
@@ -833,7 +1018,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
 /*
  * video
  */
-static int transcode_video_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
+                                       sout_stream_id_t *id )
 {
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
@@ -1196,4 +1382,3 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
 
     return VLC_SUCCESS;
 }
-

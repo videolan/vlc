@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.16 2003/06/28 14:31:40 sam Exp $
+dnl $Id: configure.ac,v 1.17 2003/06/29 20:58:16 gbazin Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -1534,6 +1534,9 @@ then
   AX_ADD_CPPFLAGS([encoder_ffmpeg],[${CPPFLAGS_ffmpeg}])
   dnl XXX: we don't link with -lavcodec blah blah blah
   dnl AX_ADD_LDFLAGS([encoder_ffmpeg],[${LDFLAGS_ffmpeg}])
+
+  AC_CHECK_HEADERS(vorbis/vorbisenc.h vorbis/codec.h,
+    AX_ADD_LDFLAGS([stream_out_transcode],[-lvorbisenc -lvorbis -logg]) )
 fi
 
 dnl
