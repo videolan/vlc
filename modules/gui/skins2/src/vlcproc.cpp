@@ -149,13 +149,16 @@ void VlcProc::manage()
     VarBoolImpl *pVarStopped = (VarBoolImpl*)m_cVarStopped.get();
     VarBoolImpl *pVarPaused = (VarBoolImpl*)m_cVarPaused.get();
     VarBoolImpl *pVarSeekable = (VarBoolImpl*)m_cVarSeekable.get();
+    VarBoolImpl *pVarMute = (VarBoolImpl*)m_cVarMute.get();
     VarBoolImpl *pVarRandom = (VarBoolImpl*)m_cVarRandom.get();
     VarBoolImpl *pVarLoop = (VarBoolImpl*)m_cVarLoop.get();
 
     // Refresh sound volume
     audio_volume_t volume;
-    aout_VolumeGet( getIntf(), &volume);
+    aout_VolumeGet( getIntf(), &volume );
     pVolume->set( (double)volume / AOUT_VOLUME_MAX );
+    // Set the mute variable
+    pVarMute->set( volume == 0 );
 
     // Update the input
     if( getIntf()->p_sys->p_input == NULL )

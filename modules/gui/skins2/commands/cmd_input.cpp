@@ -2,7 +2,7 @@
  * cmd_input.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_input.cpp,v 1.2 2004/01/18 19:54:45 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -22,6 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include <vlc/aout.h>
 #include "cmd_input.hpp"
 
 
@@ -90,5 +91,11 @@ void CmdFaster::execute()
         var_Set( pInput, "rate-faster", val );
         vlc_object_release( pInput );
     }
+}
+
+
+void CmdMute::execute()
+{
+    aout_VolumeMute( getIntf(), NULL );
 }
 
