@@ -64,6 +64,10 @@ ifneq (,$(findstring darwin,$(SYS)))
 C_OBJ +=	src/misc/darwin_specific.o
 endif
 
+ifneq (,$(findstring mingw32,$(SYS)))
+RESOURCE_OBJ :=	share/vlc_win32_rc.o
+endif
+
 #
 # Generated header
 #
@@ -318,11 +322,17 @@ $(CPP_OBJ): %.o: .dep/%.dpp
 $(CPP_OBJ): %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+$(RESOURCE_OBJ): %.o: Makefile.dep Makefile
+ifneq (,(findstring mingw32,$(SYS)))
+$(RESOURCE_OBJ): %.o: %.rc
+	$(WINDRES) -i $< -o $@
+endif
+
 #
 # Main application target
 #
-vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ)
-	$(CC) $(CFLAGS) -o $@ $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(LCFLAGS) $(LIB)
+vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ)
+	$(CC) $(CFLAGS) -o $@ $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ) $(LCFLAGS) $(LIB)
 ifeq ($(SYS),beos)
 	xres -o $@ ./share/vlc_beos.rsrc
 	mimeset -f $@

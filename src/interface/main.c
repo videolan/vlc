@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.105 2001/06/25 11:34:08 sam Exp $
+ * $Id: main.c,v 1.106 2001/06/27 06:29:59 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,6 +59,8 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                  /* getenv(), strtol(),  */
 #include <string.h>                                            /* strerror() */
+#include <fcntl.h>                                       /* open(), O_WRONLY */
+#include <sys/stat.h>                                             /* S_IREAD */
 
 #include "config.h"
 #include "common.h"
@@ -127,6 +129,7 @@
 #define OPT_SYNCHRO             190
 #define OPT_WARNING             191
 #define OPT_VERSION             192
+#define OPT_STDOUT              193
 
 /* Usage fashion */
 #define USAGE                     0
@@ -156,6 +159,7 @@ static const struct option longopts[] =
     /* Interface options */
     {   "intf",             1,          0,      'I' },
     {   "warning",          1,          0,      OPT_WARNING },
+    {   "stdout",           1,          0,      OPT_STDOUT },
 
     /* Audio options */
     {   "noaudio",          0,          0,      OPT_NOAUDIO },
@@ -226,6 +230,10 @@ static void SimpleSignalHandler     ( int i_signal );
 static void FatalSignalHandler      ( int i_signal );
 static void InstructionSignalHandler( int i_signal );
 static int  CPUCapabilities         ( void );
+
+static int  RedirectSTDOUT          ( void );
+static void ShowConsole             ( void );
+
 static jmp_buf env;
 static int  i_illegal;
 
@@ -298,6 +306,12 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         intf_MsgDestroy();
         return( errno );
     }
+
+    /*
+     * Redirect the standard output if required by the user, and on Win32 we
+     * also open a console to display the debug messages.
+     */
+    RedirectSTDOUT();
 
     /*
      * Initialize playlist and get commandline files
@@ -558,15 +572,48 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         {
         /* General/common options */
         case 'h':                                              /* -h, --help */
+            ShowConsole();
+            RedirectSTDOUT();
             Usage( SHORT_HELP );
+#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
+            if( strcmp( "", main_GetPszVariable( INTF_STDOUT_VAR,
+                                                 INTF_STDOUT_DEFAULT ) ) == 0 )
+            {
+                /* No stdout redirection has been asked for */
+                intf_MsgImm( "\nPress the RETURN key to continue..." );
+                getchar();
+            }
+#endif
             return( -1 );
             break;
         case 'H':                                          /* -H, --longhelp */
+            ShowConsole();
+            RedirectSTDOUT();
             Usage( LONG_HELP );
+#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
+            if( strcmp( "", main_GetPszVariable( INTF_STDOUT_VAR,
+                                                 INTF_STDOUT_DEFAULT ) ) == 0 )
+            {
+                /* No stdout redirection has been asked for */
+                intf_MsgImm( "\nPress the RETURN key to continue..." );
+                getchar();
+            }
+#endif
             return( -1 );
             break;
         case OPT_VERSION:                                       /* --version */
+            ShowConsole();
+            RedirectSTDOUT();
             Version();
+#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
+            if( strcmp( "", main_GetPszVariable( INTF_STDOUT_VAR,
+                                                 INTF_STDOUT_DEFAULT ) ) == 0 )
+            {
+                /* No stdout redirection has been asked for */
+                intf_MsgImm( "\nPress the RETURN key to continue..." );
+                getchar();
+            }
+#endif
             return( -1 );
             break;
         case 'v':                                           /* -v, --verbose */
@@ -580,6 +627,10 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_WARNING:                                       /* --warning */
             intf_ErrMsg( "intf error: `--warning' is deprecated, use `-v'" );
             p_main->i_warning_level = atoi(optarg);
+            break;
+
+        case OPT_STDOUT:                                         /* --stdout */
+            main_PutPszVariable( INTF_STDOUT_VAR, optarg );
             break;
 
         /* Audio options */
@@ -598,7 +649,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_SPDIF:                                           /* --spdif */
             main_PutIntVariable( AOUT_SPDIF_VAR, 1 );
             break;
-	case OPT_DOWNMIX:                                       /* --downmix */
+        case OPT_DOWNMIX:                                       /* --downmix */
             main_PutPszVariable( DOWNMIX_METHOD_VAR, optarg );
             break;
         case OPT_IMDCT:                                           /* --imdct */
@@ -696,9 +747,20 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         /* Internal error: unknown option */
         case '?':
         default:
+            ShowConsole();
+            RedirectSTDOUT();
             intf_ErrMsg( "intf error: unknown option `%s'",
                          ppsz_argv[optind - 1] );
             Usage( USAGE );
+#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
+            if( strcmp( "", main_GetPszVariable( INTF_STDOUT_VAR,
+                                                 INTF_STDOUT_DEFAULT ) ) == 0 )
+            {
+                /* No stdout redirection has been asked for */
+                intf_MsgImm( "\nPress the RETURN key to continue..." );
+                getchar();
+            }
+#endif
             return( EINVAL );
             break;
         }
@@ -753,6 +815,7 @@ static void Usage( int i_fashion )
     intf_MsgImm( "\nOptions:"
           "\n  -I, --intf <module>            \tinterface method"
           "\n  -v, --verbose                  \tverbose mode (cumulative)"
+          "\n      --stdout <filename>        \tredirect console stdout"
           "\n"
           "\n      --noaudio                  \tdisable audio"
           "\n  -A, --aout <module>            \taudio output method"
@@ -796,9 +859,10 @@ static void Usage( int i_fashion )
 
     /* Interface parameters */
     intf_MsgImm( "\nInterface parameters:"
-        "\n  " INTF_METHOD_VAR "=<method name>          \tinterface method"
-        "\n  " INTF_INIT_SCRIPT_VAR "=<filename>               \tinitialization script"
-        "\n  " INTF_CHANNELS_VAR "=<filename>            \tchannels list" );
+        "\n  " INTF_METHOD_VAR "=<method name>        \tinterface method"
+        "\n  " INTF_INIT_SCRIPT_VAR "=<filename>      \tinitialization script"
+        "\n  " INTF_CHANNELS_VAR "=<filename>         \tchannels list"
+        "\n  " INTF_STDOUT_VAR "=<filename>       \tredirect console stdout" );
 
     /* Audio parameters */
     intf_MsgImm( "\nAudio parameters:"
@@ -1102,5 +1166,59 @@ static int CPUCapabilities( void )
     return( i_capabilities );
 
 #endif
+}
+
+/*****************************************************************************
+ * RedirectSTDOUT: redirect stdout and stderr to a file
+ *****************************************************************************
+ * This function will redirect stdout and stderr to a file if the user has
+ * specified so.
+ *****************************************************************************/
+static int RedirectSTDOUT( void )
+{
+    int  i_stdout_filedesc;
+    char *psz_stdout_filename;
+
+    psz_stdout_filename = main_GetPszVariable( INTF_STDOUT_VAR,
+                                               INTF_STDOUT_DEFAULT );
+    if( strcmp( "", psz_stdout_filename ) != 0 )
+    {
+        ShowConsole();
+        i_stdout_filedesc = open( psz_stdout_filename,
+                                  O_CREAT | O_TRUNC | O_RDWR,
+                                  S_IREAD | S_IWRITE );
+        if( dup2( i_stdout_filedesc, fileno(stdout) ) == -1 )
+            intf_ErrMsg("Unable to redirect stdout!\n");
+        if( dup2( i_stdout_filedesc, fileno(stderr) ) == -1 )
+            intf_ErrMsg("Unable to redirect stderr!\n");
+        close( i_stdout_filedesc );
+    }
+    else
+    {
+        /* No stdout redirection has been asked so open a console */
+        if( p_main->i_warning_level )
+        {
+            ShowConsole();
+        }
+
+    }
+
+    return 0;
+}
+
+/*****************************************************************************
+ * ShowConsole: On Win32, create an output console for debug messages
+ *****************************************************************************
+ * This function is usefull only on Win32.
+ *****************************************************************************/
+static void ShowConsole( void )
+{
+#ifdef WIN32 /*  */
+    AllocConsole();
+    freopen( "CONOUT$", "w", stdout );
+    freopen( "CONOUT$", "w", stderr );
+    freopen( "CONIN$", "r", stdin );
+#endif
+    return;
 }
 
