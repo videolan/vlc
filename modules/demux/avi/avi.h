@@ -2,7 +2,7 @@
  * avi.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.h,v 1.16 2003/10/19 13:39:11 hartman Exp $
+ * $Id: avi.h,v 1.17 2003/11/13 11:49:27 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -44,19 +44,18 @@ typedef struct AVIIndexEntry_s
 
 } AVIIndexEntry_t;
 
-typedef struct avi_stream_s
+typedef struct
 {
     vlc_bool_t      b_activated;
 
     unsigned int    i_cat; /* AUDIO_ES, VIDEO_ES */
-    vlc_fourcc_t    i_fourcc;
     vlc_fourcc_t    i_codec;
 
     int             i_rate;
     int             i_scale;
     int             i_samplesize;
 
-    es_descriptor_t     *p_es;
+    es_out_id_t     *p_es;
 
     AVIIndexEntry_t     *p_index;
     unsigned int        i_idxnb;
@@ -65,7 +64,7 @@ typedef struct avi_stream_s
     unsigned int        i_idxposc;  /* numero of chunk */
     unsigned int        i_idxposb;  /* byte in the current chunk */
 
-} avi_stream_t;
+} avi_track_t;
 
 struct demux_sys_t
 {
@@ -77,13 +76,12 @@ struct demux_sys_t
     avi_chunk_t ck_root;
 
     vlc_bool_t  b_odml;
-    vlc_bool_t  b_interleaved;      /* for seeking purpose */
 
     off_t   i_movi_begin;
     off_t   i_movi_lastchunk_pos;   /* XXX position of last valid chunk */
 
     /* number of streams and information */
-    unsigned int i_streams;
-    avi_stream_t  **pp_info;
+    unsigned int i_track;
+    avi_track_t  **track;
 };
 
