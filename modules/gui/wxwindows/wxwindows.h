@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.56 2003/08/22 08:06:25 asmax Exp $
+ * $Id: wxwindows.h,v 1.57 2003/08/27 11:53:26 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -20,6 +20,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#ifdef WIN32                                                 /* mingw32 hack */
+#undef Yield
+#undef CreateDialog
+#endif
+
+/* Let vlc take care of the i18n stuff */
+#define WXINTL_NO_GETTEXT_MACRO
+
+#include <wx/wxprec.h>
+#include <wx/wx.h>
 
 #include <wx/listctrl.h>
 #include <wx/textctrl.h>
@@ -572,12 +583,12 @@ public:
     /* Constructor */
     Messages( intf_thread_t *p_intf, wxWindow *p_parent );
     virtual ~Messages();
+    bool Show( bool show = TRUE );
     void UpdateLog();
 
 private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnClose( wxCommandEvent& event );
-    void OnVerbose( wxCommandEvent& event );
     void OnClear( wxCommandEvent& event );
     void OnSaveLog( wxCommandEvent& event );
 

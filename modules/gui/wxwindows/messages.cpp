@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.13 2003/07/20 10:38:49 gbazin Exp $
+ * $Id: messages.cpp,v 1.14 2003/08/27 11:53:26 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -30,26 +30,10 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
-
-#ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield
-#undef CreateDialog
-#endif
-
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-#include <wx/textctrl.h>
-
 #include <vlc/intf.h>
 
-#if defined MODULE_NAME_IS_skins
-#   include "../skins/src/skin_common.h"
-#endif
-
 #include "wxwindows.h"
+#include <wx/textctrl.h>
 
 /*****************************************************************************
  * Event Table.
@@ -59,7 +43,6 @@
 enum
 {
     Close_Event,
-    Verbose_Event,
     Clear_Event,
     Save_Log_Event
 };
@@ -67,7 +50,6 @@ enum
 BEGIN_EVENT_TABLE(Messages, wxFrame)
     /* Button events */
     EVT_BUTTON(wxID_OK, Messages::OnClose)
-    EVT_CHECKBOX(Verbose_Event, Messages::OnVerbose)
     EVT_BUTTON(wxID_CLEAR, Messages::OnClear)
     EVT_BUTTON(wxID_SAVEAS, Messages::OnSaveLog)
 
@@ -116,19 +98,12 @@ Messages::Messages( intf_thread_t *_p_intf, wxWindow *p_parent ):
                                                wxU(_("Save As...")));
      save_log_button->SetDefault();
 
-    /* Create the Verbose checkbox */
-    wxCheckBox *verbose_checkbox =
-        new wxCheckBox( messages_panel, Verbose_Event, wxU(_("Verbose")) );
-    b_verbose = p_intf->p_libvlc->i_verbose > 2;
-    verbose_checkbox->SetValue( b_verbose );
-
     /* Place everything in sizers */
     wxBoxSizer *buttons_sizer = new wxBoxSizer( wxHORIZONTAL );
     buttons_sizer->Add( ok_button, 0, wxEXPAND |wxALIGN_LEFT| wxALL, 5 );
     buttons_sizer->Add( clear_button, 0, wxEXPAND |wxALIGN_LEFT| wxALL, 5 );
     buttons_sizer->Add( save_log_button, 0, wxEXPAND |wxALIGN_LEFT| wxALL, 5 );
     buttons_sizer->Add( new wxPanel( this, -1 ), 1, wxALL, 5 );
-    buttons_sizer->Add( verbose_checkbox, 0, wxEXPAND|wxALIGN_RIGHT|wxALL, 5 );
     buttons_sizer->Layout();
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
@@ -143,8 +118,14 @@ Messages::Messages( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
 Messages::~Messages()
 {
-/* Clean up */
+    /* Clean up */
     if( save_log_dialog ) delete save_log_dialog;
+}
+
+bool Messages::Show( bool show )
+{
+    b_verbose = show;
+    return wxFrame::Show( show );
 }
 
 void Messages::UpdateLog()
@@ -229,9 +210,4 @@ void Messages::OnSaveLog( wxCommandEvent& WXUNUSED(event) )
             // [FIX ME] should print an error message
         }
     }
-}
-
-void Messages::OnVerbose( wxCommandEvent& event )
-{
-    b_verbose = event.IsChecked();
 }

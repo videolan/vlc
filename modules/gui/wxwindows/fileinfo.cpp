@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.17 2003/07/12 13:33:10 gbazin Exp $
+ * $Id: fileinfo.cpp,v 1.18 2003/08/27 11:53:26 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -30,26 +30,10 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
-
-#ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield
-#undef CreateDialog
-#endif
-
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-#include <wx/treectrl.h>
-
 #include <vlc/intf.h>
 
-#if defined MODULE_NAME_IS_skins
-#   include "../skins/src/skin_common.h"
-#endif
-
 #include "wxwindows.h"
+#include <wx/treectrl.h>
 
 /*****************************************************************************
  * Event Table.

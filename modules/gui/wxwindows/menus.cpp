@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.18 2003/08/13 01:45:13 gbazin Exp $
+ * $Id: menus.cpp,v 1.19 2003/08/27 11:53:26 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -30,26 +30,10 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
-
-#ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield
-#undef CreateDialog
-#endif
-
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-#include <wx/listctrl.h>
-
 #include <vlc/intf.h>
 
-#if defined MODULE_NAME_IS_skins
-#   include "../skins/src/skin_common.h"
-#endif
-
 #include "wxwindows.h"
+#include <wx/listctrl.h>
 
 class wxMenuItemExt: public wxMenuItem
 {

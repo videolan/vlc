@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.30 2003/08/11 17:31:15 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.31 2003/08/27 11:53:26 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -30,18 +30,6 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
-
-#ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield
-#undef CreateDialog
-#endif
-
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-
 #include <vlc/intf.h>
 
 #include "wxwindows.h"

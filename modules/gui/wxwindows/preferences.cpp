@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.25 2003/08/14 19:25:56 sigmunau Exp $
+ * $Id: preferences.cpp,v 1.26 2003/08/27 11:53:26 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -30,18 +30,9 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
+#include <vlc/intf.h>
 
-#ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield
-#undef CreateDialog
-#endif
-
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-#include <wx/window.h>
+#include "wxwindows.h"
 #include <wx/notebook.h>
 #include <wx/textctrl.h>
 #include <wx/combobox.h>
@@ -50,14 +41,6 @@
 #include <wx/treectrl.h>
 #include <wx/clntdata.h>
 #include <wx/dynarray.h>
-
-#include <vlc/intf.h>
-
-#if defined MODULE_NAME_IS_skins
-#   include "../skins/src/skin_common.h"
-#endif
-
-#include "wxwindows.h"
 
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0

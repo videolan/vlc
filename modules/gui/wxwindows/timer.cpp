@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.29 2003/07/20 10:38:49 gbazin Exp $
+ * $Id: timer.cpp,v 1.30 2003/08/27 11:53:26 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -31,22 +31,10 @@
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
-
-#ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield
-#undef CreateDialog
-#endif
-
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-#include <wx/timer.h>
-
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
+#include <wx/timer.h>
 
 void DisplayStreamDate( wxControl *, intf_thread_t *, int );
 

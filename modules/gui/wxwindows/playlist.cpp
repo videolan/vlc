@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.15 2003/08/16 21:05:14 zorglub Exp $
+ * $Id: playlist.cpp,v 1.16 2003/08/27 11:53:26 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -30,22 +30,10 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
-
-#ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield
-#undef CreateDialog
-#endif
-
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-#include <wx/listctrl.h>
-
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
+#include <wx/listctrl.h>
 
 /* Callback prototype */
 int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,

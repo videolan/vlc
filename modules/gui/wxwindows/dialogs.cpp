@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dialogs.cpp,v 1.6 2003/07/25 22:50:12 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.7 2003/08/27 11:53:26 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -31,18 +31,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
-
-#ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield
-#undef CreateDialog
-#endif
-
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-
 #include <vlc/intf.h>
 #include "stream_control.h"
 
