@@ -10,6 +10,7 @@ vlc-debug.ct
 config.log
 config.cache
 config.status
+confdefs.h
 Makefile.opts
 Makefile.modules
 build-stamp

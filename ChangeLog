@@ -4,6 +4,8 @@
 
 HEAD
 
+  * ./configure.in: fixed a bug in the libdvdread detection.
+  * ./configure.in: fixed plugin compilation under Win32.
   * ./vlc.spec: imported MandrakeSoft's enhancements.
   * ./doc/developer/decoders.xml: fixed a typo preventing compilation.
   * ./plugins/aa/aa.c: we now parse the AAOPTS environment variable.

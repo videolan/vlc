@@ -3238,7 +3238,7 @@ fi
 fi
 
     save_CFLAGS="${save_CFLAGS} -fnative-struct -D_OFF_T_ -D_off_t=long"
-    save_LDFLAGS="${save_LDFLAGS} -mwindows -Xlinker --force-exe-suffix"
+    vlc_LDFLAGS="${vlc_LDFLAGS} -mwindows -Xlinker --force-exe-suffix"
     vlc_LDFLAGS="${vlc_LDFLAGS} -lws2_32 -lnetapi32"
     ipv4_LDFLAGS="${ipv4_LDFLAGS} -lws2_32"
     rc_LDFLAGS="${rc_LDFLAGS} -lws2_32"
@@ -5869,7 +5869,7 @@ if test "${enable_dvdread+set}" = set; then
   :
 fi
 
-if test "x$enableval" != "xno"
+if test "x$enable_dvdread" != "xno"
 then
   # Check whether --with-dvdread or --without-dvdread was given.
 if test "${with_dvdread+set}" = set; then
@@ -5941,7 +5941,7 @@ else
   cat conftest.$ac_ext >&5
   rm -rf conftest*
   
-          if test "x$enableval" != x
+          if test "x$enable_dvdread" != x
           then
             { echo "configure: error: Cannot find DVD_VIDEO_LB_LEN in dvdread/dvd_reader.h, please install libdvdread version 0.9.2 or later" 1>&2; exit 1; }
           fi
@@ -5951,7 +5951,7 @@ rm -f conftest*
   
 else
   echo "$ac_t""no" 1>&6
-if test "x$enableval" != x
+if test "x$enable_dvdread" != x
     then
       if test "x$withval" != x
       then

@@ -76,7 +76,7 @@ case x"${target_os}" in
     SYS=mingw32
     AC_CHECK_TOOL(WINDRES, windres, :)
     save_CFLAGS="${save_CFLAGS} -fnative-struct -D_OFF_T_ -D_off_t=long"
-    save_LDFLAGS="${save_LDFLAGS} -mwindows -Xlinker --force-exe-suffix"
+    vlc_LDFLAGS="${vlc_LDFLAGS} -mwindows -Xlinker --force-exe-suffix"
     vlc_LDFLAGS="${vlc_LDFLAGS} -lws2_32 -lnetapi32"
     ipv4_LDFLAGS="${ipv4_LDFLAGS} -lws2_32"
     rc_LDFLAGS="${rc_LDFLAGS} -lws2_32"
@@ -641,7 +641,7 @@ dnl dvdread module: check for libdvdread plugin
 dnl
 AC_ARG_ENABLE(dvdread,
 [  --enable-dvdread        dvdread input module (default disabled)])
-if test "x$enableval" != "xno"
+if test "x$enable_dvdread" != "xno"
 then
   AC_ARG_WITH(dvdread, 
   [    --with-dvdread=PATH   libdvdread headers and libraries])
@@ -661,13 +661,13 @@ then
           dvdread_LDFLAGS="${dvdread_LDFLAGS} ${test_LDFLAGS} -ldvdread"
           dvdread_CFLAGS="${dvdread_CFLAGS} ${test_CFLAGS}"
         ],[
-          if test "x$enableval" != x
+          if test "x$enable_dvdread" != x
           then
             AC_MSG_ERROR([Cannot find DVD_VIDEO_LB_LEN in dvdread/dvd_reader.h, please install libdvdread version 0.9.2 or later])
           fi
         ])
   ],[
-    if test "x$enableval" != x
+    if test "x$enable_dvdread" != x
     then
       if test "x$withval" != x
       then
