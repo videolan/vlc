@@ -2,7 +2,7 @@
  * sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: sdl.c,v 1.5 2002/12/23 21:58:33 jpsaman Exp $
+ * $Id: sdl.c,v 1.6 2003/01/09 14:05:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -95,7 +95,8 @@ static void Display   ( vout_thread_t *, picture_t * );
 static int  OpenDisplay     ( vout_thread_t * );
 static void CloseDisplay    ( vout_thread_t * );
 static int  NewPicture      ( vout_thread_t *, picture_t * );
-static void SetPalette      ( vout_thread_t *, u16 *, u16 *, u16 * );
+static void SetPalette      ( vout_thread_t *,
+                              uint16_t *, uint16_t *, uint16_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -114,9 +115,9 @@ vlc_module_end();
  * vout properties to choose the correct mode, and change them according to the
  * mode actually used.
  *****************************************************************************/
-static int Open ( vlc_object_t *p_this )                         
+static int Open ( vlc_object_t *p_this )
 {
-    vout_thread_t * p_vout = (vout_thread_t *)p_this;          
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
 #ifdef HAVE_SETENV
     char *psz_method;
@@ -288,9 +289,9 @@ static void End( vout_thread_t *p_vout )
  *****************************************************************************
  * Terminate an output method created by vout_SDLCreate
  *****************************************************************************/
-static void Close ( vlc_object_t *p_this )                         
+static void Close ( vlc_object_t *p_this )
 {
-    vout_thread_t * p_vout = (vout_thread_t *)p_this;          
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
     CloseDisplay( p_vout );
     SDL_QuitSubSystem( SDL_INIT_VIDEO );
@@ -445,7 +446,7 @@ static int Manage( vout_thread_t *p_vout )
                 p_vout->b_interface = ! p_vout->b_interface;
                 p_vout->i_changes |= VOUT_INTF_CHANGE;
                 break;
-            
+
             case SDLK_MENU:
                 {
                     intf_thread_t *p_intf;
@@ -560,7 +561,7 @@ static int Manage( vout_thread_t *p_vout )
     {
         msg_Dbg( p_vout, "video display resized (%dx%d)",
                  p_vout->p_sys->i_width, p_vout->p_sys->i_height );
- 
+
         CloseDisplay( p_vout );
         OpenDisplay( p_vout );
 
@@ -864,45 +865,45 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         {
         case SDL_YV12_OVERLAY:
             p_pic->p[Y_PLANE].i_pixel_pitch = 1;
-            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
+            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p_sys->p_overlay->w;
 
             p_pic->U_PIXELS = p_pic->p_sys->p_overlay->pixels[2];
             p_pic->p[U_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[2];
             p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
+            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p_sys->p_overlay->w / 2;
 
             p_pic->V_PIXELS = p_pic->p_sys->p_overlay->pixels[1];
             p_pic->p[V_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[1];
             p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
+            p_pic->p[V_PLANE].i_visible_pitch = p_pic->p_sys->p_overlay->w / 2;
 
             p_pic->i_planes = 3;
             break;
 
         case SDL_IYUV_OVERLAY:
             p_pic->p[Y_PLANE].i_pixel_pitch = 1;
-            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
+            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p_sys->p_overlay->w;
 
             p_pic->U_PIXELS = p_pic->p_sys->p_overlay->pixels[1];
             p_pic->p[U_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[1];
             p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
+            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p_sys->p_overlay->w / 2;
 
             p_pic->V_PIXELS = p_pic->p_sys->p_overlay->pixels[2];
             p_pic->p[V_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[2];
             p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
+            p_pic->p[V_PLANE].i_visible_pitch = p_pic->p_sys->p_overlay->w / 2;
 
             p_pic->i_planes = 3;
             break;
 
         default:
             p_pic->p[Y_PLANE].i_pixel_pitch = 2;
-            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
+            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p_sys->p_overlay->w * 2;
 
             p_pic->i_planes = 1;
             break;
@@ -915,11 +916,12 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 /*****************************************************************************
  * SetPalette: sets an 8 bpp palette
  *****************************************************************************/
-static void SetPalette( vout_thread_t *p_vout, u16 *red, u16 *green, u16 *blue )
+static void SetPalette( vout_thread_t *p_vout,
+                        uint16_t *red, uint16_t *green, uint16_t *blue )
 {
     SDL_Color colors[256];
     int i;
-  
+
     /* Fill colors with color information */
     for( i = 0; i < 256; i++ )
     {
