@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.268 2003/11/29 18:36:13 massiot Exp $
+ * $Id: input.c,v 1.269 2003/11/30 16:00:24 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -117,6 +117,9 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     var_Create( p_input, "sout-audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-keep",  VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+
+    /* decoders */
+    var_Create( p_input, "minimize-threads", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* play status */
 

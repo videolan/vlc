@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.110 2003/11/29 18:36:13 massiot Exp $
+ * $Id: libvlc.h,v 1.111 2003/11/30 16:00:23 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -479,6 +479,9 @@ static char *ppsz_language_text[] =
     "slow. You should only activate this if you know what you're " \
     "doing.")
 
+#define MINIMIZE_THREADS_TXT N_("Minimize number of threads needed to run VLC")
+#define MINIMIZE_THREADS_LONGTXT N_("Minimize number of threads needed to run VLC")
+
 #define ONEINSTANCE_TEXT N_("Allow only one running instance of VLC")
 #define ONEINSTANCE_LONGTEXT N_( \
     "Allowing only one running instance of VLC can sometimes be useful, " \
@@ -760,6 +763,8 @@ vlc_module_begin();
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT, VLC_TRUE );
     add_module( "access", "access", NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT, VLC_TRUE );
     add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT, VLC_TRUE );
+
+    add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TXT, MINIMIZE_THREADS_LONGTXT, VLC_TRUE );
 
 #if !defined(SYS_DARWIN) && !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
     add_bool( "rt-priority", 0, NULL, RT_PRIORITY_TEXT, RT_PRIORITY_LONGTEXT, VLC_TRUE );

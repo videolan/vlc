@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.81 2003/11/28 16:06:56 fenrir Exp $
+ * $Id: input_dec.c,v 1.82 2003/11/30 16:00:24 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -43,6 +43,7 @@ static void input_NullPacket( input_thread_t *, es_descriptor_t * );
 
 static decoder_t * CreateDecoder( input_thread_t *, es_descriptor_t *, int );
 static int         DecoderThread( decoder_t * );
+static int         DecoderDecode( decoder_t * p_dec, block_t *p_block );
 static void        DeleteDecoder( decoder_t * );
 
 /* Buffers allocation callbacks for the decoders */
@@ -58,6 +59,8 @@ static es_format_t null_es_format = {0};
 
 struct decoder_owner_sys_t
 {
+    vlc_bool_t      b_own_thread;
+
     aout_instance_t *p_aout;
     aout_input_t    *p_aout_input;
 
@@ -85,7 +88,6 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 {
     decoder_t      *p_dec = NULL;
     vlc_value_t    val;
-    int            i_priority;
 
     /* If we are in sout mode, search for packetizer module */
     var_Get( p_input, "sout", &val );
@@ -144,25 +146,32 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
         return NULL;
     }
 
-    if ( p_es->i_cat == AUDIO_ES )
-    {
-        i_priority = VLC_THREAD_PRIORITY_AUDIO;
-    }
-    else
-    {
-        i_priority = VLC_THREAD_PRIORITY_VIDEO;
-    }
+    var_Get( p_input, "minimize-threads", &val );
+    p_dec->p_owner->b_own_thread = val.b_bool ? VLC_FALSE : VLC_TRUE;
 
-    /* Spawn the decoder thread */
-    if( vlc_thread_create( p_dec, "decoder", DecoderThread,
-                           i_priority, VLC_FALSE ) )
+    if( p_dec->p_owner->b_own_thread )
     {
-        msg_Err( p_dec, "cannot spawn decoder thread \"%s\"",
-                         p_dec->p_module->psz_object_name );
-        module_Unneed( p_dec, p_dec->p_module );
-        DeleteDecoder( p_dec );
-        vlc_object_destroy( p_dec );
-        return NULL;
+        int i_priority;
+        if ( p_es->i_cat == AUDIO_ES )
+        {
+            i_priority = VLC_THREAD_PRIORITY_AUDIO;
+        }
+        else
+        {
+            i_priority = VLC_THREAD_PRIORITY_VIDEO;
+        }
+
+        /* Spawn the decoder thread */
+        if( vlc_thread_create( p_dec, "decoder", DecoderThread,
+                               i_priority, VLC_FALSE ) )
+        {
+            msg_Err( p_dec, "cannot spawn decoder thread \"%s\"",
+                             p_dec->p_module->psz_object_name );
+            module_Unneed( p_dec, p_dec->p_module );
+            DeleteDecoder( p_dec );
+            vlc_object_destroy( p_dec );
+            return NULL;
+        }
     }
 
     p_input->stream.b_changed = 1;
@@ -180,31 +189,37 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 
     p_dec->b_die = VLC_TRUE;
 
-    /* Make sure the thread leaves the NextDataPacket() function by
-     * sending it a few null packets. */
-    for( i_dummy = 0; i_dummy < PADDING_PACKET_NUMBER; i_dummy++ )
+    if( p_dec->p_owner->b_own_thread )
     {
-        input_NullPacket( p_input, p_es );
-    }
+        /* Make sure the thread leaves the NextDataPacket() function by
+         * sending it a few null packets. */
+        for( i_dummy = 0; i_dummy < PADDING_PACKET_NUMBER; i_dummy++ )
+        {
+            input_NullPacket( p_input, p_es );
+        }
 
-    if( p_es->p_pes != NULL )
-    {
-        input_DecodePES( p_es->p_dec, p_es->p_pes );
-    }
+        if( p_es->p_pes != NULL )
+        {
+            input_DecodePES( p_es->p_dec, p_es->p_pes );
+        }
 
-    /* Waiting for the thread to exit */
-    /* I thought that unlocking was better since thread join can be long
-     * but it actually creates late pictures and freezes --stef */
-    /* vlc_mutex_unlock( &p_input->stream.stream_lock ); */
-    vlc_thread_join( p_dec );
-    /* vlc_mutex_lock( &p_input->stream.stream_lock ); */
-
+        /* Waiting for the thread to exit */
+        /* I thought that unlocking was better since thread join can be long
+         * but it actually creates late pictures and freezes --stef */
+        /* vlc_mutex_unlock( &p_input->stream.stream_lock ); */
+        vlc_thread_join( p_dec );
+        /* vlc_mutex_lock( &p_input->stream.stream_lock ); */
 #if 0
-    /* XXX We don't do it here because of dll loader that want close in the
-     * same thread than open/decode */
-    /* Unneed module */
-    module_Unneed( p_dec, p_dec->p_module );
+        /* XXX We don't do it here because of dll loader that want close in the
+         * same thread than open/decode */
+        /* Unneed module */
+        module_Unneed( p_dec, p_dec->p_module );
 #endif
+    }
+    else
+    {
+        module_Unneed( p_dec, p_dec->p_module );
+    }
 
     /* Delete decoder configuration */
     DeleteDecoder( p_dec );
@@ -251,7 +266,7 @@ void input_DecodePES( decoder_t * p_dec, pes_packet_t * p_pes )
             p_block->i_dts = p_pes->i_dts;
             p_block->b_discontinuity = p_pes->b_discontinuity;
 
-            block_FifoPut( p_dec->p_owner->p_fifo, p_block );
+            input_DecodeBlock( p_dec, p_block );
         }
     }
 
@@ -264,7 +279,21 @@ void input_DecodePES( decoder_t * p_dec, pes_packet_t * p_pes )
  *****************************************************************************/
 void input_DecodeBlock( decoder_t * p_dec, block_t *p_block )
 {
-    block_FifoPut( p_dec->p_owner->p_fifo, p_block );
+    if( p_dec->p_owner->b_own_thread )
+    {
+        block_FifoPut( p_dec->p_owner->p_fifo, p_block );
+    }
+    else
+    {
+        if( p_dec->b_error || p_block->i_buffer <= 0 )
+        {
+            block_Release( p_block );
+        }
+        else
+        {
+            DecoderDecode( p_dec, p_block );
+        }
+    }
 }
 
 /*****************************************************************************
@@ -421,6 +450,7 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
         msg_Err( p_dec, "out of memory" );
         return NULL;
     }
+    p_dec->p_owner->b_own_thread = VLC_TRUE;
     p_dec->p_owner->p_aout = NULL;
     p_dec->p_owner->p_aout_input = NULL;
     p_dec->p_owner->p_vout = NULL;
@@ -466,92 +496,8 @@ static int DecoderThread( decoder_t * p_dec )
             block_Release( p_block );
             continue;
         }
-
-        if( p_dec->i_object_type == VLC_OBJECT_PACKETIZER )
+        if( DecoderDecode( p_dec, p_block ) )
         {
-            block_t *p_sout_block;
-
-            while( (p_sout_block = p_dec->pf_packetize( p_dec, &p_block )) )
-            {
-                if( !p_dec->p_owner->p_sout )
-                {
-                    es_format_Copy( &p_dec->p_owner->sout, &p_dec->fmt_out );
-
-                    p_dec->p_owner->p_sout =
-                        sout_InputNew( p_dec, &p_dec->p_owner->sout );
-
-                    if( p_dec->p_owner->p_sout == NULL )
-                    {
-                        msg_Err( p_dec, "cannot create packetizer output" );
-                        p_dec->b_error = VLC_TRUE;
-
-                        while( p_sout_block )
-                        {
-                            block_t       *p_next = p_sout_block->p_next;
-                            block_Release( p_sout_block );
-                            p_sout_block = p_next;
-                        }
-                        break;
-                    }
-                }
-
-                while( p_sout_block )
-                {
-                    block_t       *p_next = p_sout_block->p_next;
-                    sout_buffer_t *p_sout_buffer;
-
-                    p_sout_buffer =
-                        sout_BufferNew( p_dec->p_owner->p_sout->p_sout,
-                                        p_sout_block->i_buffer );
-                    if( p_sout_buffer == NULL )
-                    {
-                        msg_Err( p_dec, "cannot get sout buffer" );
-                        break;
-                    }
-
-                    memcpy( p_sout_buffer->p_buffer, p_sout_block->p_buffer,
-                            p_sout_block->i_buffer );
-
-                    p_sout_buffer->i_pts = p_sout_block->i_pts;
-                    p_sout_buffer->i_dts = p_sout_block->i_dts;
-                    p_sout_buffer->i_length = p_sout_block->i_length;
-
-                    block_Release( p_sout_block );
-
-                    sout_InputSendBuffer( p_dec->p_owner->p_sout, p_sout_buffer );
-
-                    p_sout_block = p_next;
-                }
-            }
-        }
-        else if( p_dec->fmt_in.i_cat == AUDIO_ES )
-        {
-            aout_buffer_t *p_aout_buf;
-
-            while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
-            {
-                aout_DecPlay( p_dec->p_owner->p_aout,
-                              p_dec->p_owner->p_aout_input, p_aout_buf );
-            }
-        }
-        else if( p_dec->fmt_in.i_cat == VIDEO_ES )
-        {
-            picture_t *p_pic;
-
-            while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
-            {
-                vout_DatePicture( p_dec->p_owner->p_vout, p_pic, p_pic->date );
-                vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
-            }
-        }
-        else if( p_dec->fmt_in.i_cat == SPU_ES )
-        {
-            p_dec->pf_decode_sub( p_dec, &p_block );
-        }
-        else
-        {
-            msg_Err( p_dec, "unknown ES format !!" );
-            p_dec->b_error = 1;
             break;
         }
     }
@@ -572,6 +518,107 @@ static int DecoderThread( decoder_t * p_dec )
     module_Unneed( p_dec, p_dec->p_module );
 
     return 0;
+}
+
+/*****************************************************************************
+ * DecoderDecode: decode a block
+ *****************************************************************************/
+static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
+{
+    if( p_block->i_buffer <= 0 )
+    {
+        block_Release( p_block );
+        return VLC_SUCCESS;
+    }
+
+    if( p_dec->i_object_type == VLC_OBJECT_PACKETIZER )
+    {
+        block_t *p_sout_block;
+
+        while( (p_sout_block = p_dec->pf_packetize( p_dec, &p_block )) )
+        {
+            if( !p_dec->p_owner->p_sout )
+            {
+                es_format_Copy( &p_dec->p_owner->sout, &p_dec->fmt_out );
+
+                p_dec->p_owner->p_sout =
+                    sout_InputNew( p_dec, &p_dec->p_owner->sout );
+
+                if( p_dec->p_owner->p_sout == NULL )
+                {
+                    msg_Err( p_dec, "cannot create packetizer output" );
+                    p_dec->b_error = VLC_TRUE;
+
+                    while( p_sout_block )
+                    {
+                        block_t       *p_next = p_sout_block->p_next;
+                        block_Release( p_sout_block );
+                        p_sout_block = p_next;
+                    }
+                    break;
+                }
+            }
+
+            while( p_sout_block )
+            {
+                block_t       *p_next = p_sout_block->p_next;
+                sout_buffer_t *p_sout_buffer;
+
+                p_sout_buffer =
+                    sout_BufferNew( p_dec->p_owner->p_sout->p_sout,
+                                    p_sout_block->i_buffer );
+                if( p_sout_buffer == NULL )
+                {
+                    msg_Err( p_dec, "cannot get sout buffer" );
+                    break;
+                }
+
+                memcpy( p_sout_buffer->p_buffer, p_sout_block->p_buffer,
+                        p_sout_block->i_buffer );
+
+                p_sout_buffer->i_pts = p_sout_block->i_pts;
+                p_sout_buffer->i_dts = p_sout_block->i_dts;
+                p_sout_buffer->i_length = p_sout_block->i_length;
+
+                block_Release( p_sout_block );
+
+                sout_InputSendBuffer( p_dec->p_owner->p_sout, p_sout_buffer );
+
+                p_sout_block = p_next;
+            }
+        }
+    }
+    else if( p_dec->fmt_in.i_cat == AUDIO_ES )
+    {
+        aout_buffer_t *p_aout_buf;
+
+        while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
+        {
+            aout_DecPlay( p_dec->p_owner->p_aout,
+                          p_dec->p_owner->p_aout_input, p_aout_buf );
+        }
+    }
+    else if( p_dec->fmt_in.i_cat == VIDEO_ES )
+    {
+        picture_t *p_pic;
+
+        while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
+        {
+            vout_DatePicture( p_dec->p_owner->p_vout, p_pic, p_pic->date );
+            vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
+        }
+    }
+    else if( p_dec->fmt_in.i_cat == SPU_ES )
+    {
+        p_dec->pf_decode_sub( p_dec, &p_block );
+    }
+    else
+    {
+        msg_Err( p_dec, "unknown ES format !!" );
+        p_dec->b_error = 1;
+    }
+
+    return p_dec->b_error ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 /*****************************************************************************
