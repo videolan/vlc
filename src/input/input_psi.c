@@ -394,7 +394,7 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
           for( i_pgrm_index = 0; i_pgrm_index < i_pgrm_number; i_pgrm_index++ )
           {
             i_pgrm_id = U16_AT(&p_pas[8+4*i_pgrm_index]);
-            i_pgrm_map_pid = U16_AT(&p_pas[8+4*i_pgrm_index+2]) & 0x1FFF;
+            i_pgrm_map_pid = U16_AT(&p_pas[8+4*i_pgrm_index+2]) & 0x1fff;
             intf_DbgMsg("Pgrm %d described on pid %d\n", i_pgrm_id,
                         i_pgrm_map_pid);
 
@@ -550,13 +550,13 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
           intf_DbgMsg("PCR at PID: %d\n", p_pgrm->i_pcr_pid);
 
           /* Compute the length of the section minus the final CRC */
-          i_section_length = (U16_AT(&p_pms[1]) & 0xFFF) + 3 - 4;
+          i_section_length = (U16_AT(&p_pms[1]) & 0xfff) + 3 - 4;
           intf_DbgMsg("Section length (without CRC): %d\n", i_section_length);
 
           /* Read additional info stored in the descriptors if any */
           intf_DbgMsg("Description length for program %d: %d\n",
-                      p_pgrm->i_number, (U16_AT(&p_pms[10]) & 0x0FFF));
-          i_descr_end = (U16_AT(&p_pms[10]) & 0x0FFF) + 12;
+                      p_pgrm->i_number, (U16_AT(&p_pms[10]) & 0x0fff));
+          i_descr_end = (U16_AT(&p_pms[10]) & 0x0fff) + 12;
           intf_DbgMsg("description ends at offset: %d\n",  i_descr_end);
 
           i_offset = 12;
@@ -573,7 +573,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
             intf_DbgMsg("ES Type: %d\n", p_pms[i_offset]);
 
             /* Read PID of that ES */
-            i_es_pid = U16_AT(&p_pms[i_offset+1]) & 0x1FF;
+            i_es_pid = U16_AT(&p_pms[i_offset+1]) & 0x1fff;
             intf_DbgMsg("ES PID: %d\n", i_es_pid);
 
             /* Add the ES to the program description and reserve a slot in the
@@ -602,8 +602,8 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
               /* Read additional info given by the descriptors */
               i_offset += 5;
               intf_DbgMsg("description length for PID %d: %d\n", p_es->i_id,
-                       (U16_AT(&p_pms[i_offset-2]) & 0x0FFF));
-              i_descr_end = (U16_AT(&p_pms[i_offset-2]) & 0x0FFF) + i_offset;
+                       (U16_AT(&p_pms[i_offset-2]) & 0x0fff));
+              i_descr_end = (U16_AT(&p_pms[i_offset-2]) & 0x0fff) + i_offset;
               intf_DbgMsg("description ends at offset: %d\n",  i_descr_end);
               while( i_offset < i_descr_end )
               {
