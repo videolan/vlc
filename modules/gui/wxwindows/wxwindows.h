@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.81 2003/12/16 03:21:47 rocky Exp $
+ * $Id: wxwindows.h,v 1.82 2003/12/22 14:31:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -70,6 +70,14 @@ class FileInfo;
 #endif
 #define ISUTF8 0
 
+#endif
+
+/* wxL2U (locale to unicode) is used to convert ansi strings to unicode
+ * strings (wchar_t) */
+#if wxUSE_UNICODE
+#   define wxL2U(ansi) wxString(ansi, *wxConvCurrent)
+#else
+#   define wxL2U(ansi) ansi
 #endif
 
 #define WRAPCOUNT 80

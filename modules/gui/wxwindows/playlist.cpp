@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: playlist.cpp,v 1.31 2003/12/22 02:24:52 sam Exp $
+ * $Id: playlist.cpp,v 1.32 2003/12/22 14:31:01 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -385,12 +385,12 @@ void Playlist::Rebuild()
     vlc_mutex_lock( &p_playlist->object_lock );
     for( int i = 0; i < p_playlist->i_size; i++ )
     {
-        wxString filename = wxU(p_playlist->pp_items[i]->psz_name);
+        wxString filename = wxL2U(p_playlist->pp_items[i]->psz_name);
         listview->InsertItem( i, filename );
-        listview->SetItem( i, 1, wxU(p_playlist->pp_items[i]->psz_author));
+        listview->SetItem( i, 1, wxL2U(p_playlist->pp_items[i]->psz_author) );
         listview->SetItem( i, 2,
-                 wxU(playlist_FindGroup(p_playlist,p_playlist->
-                                        pp_items[i]->i_group)));
+            wxL2U(playlist_FindGroup( p_playlist,
+                                      p_playlist->pp_items[i]->i_group )) );
         if( p_playlist->pp_items[i]->b_enabled == VLC_FALSE )
         {
             wxListItem listitem;
@@ -398,20 +398,12 @@ void Playlist::Rebuild()
             listitem.SetTextColour( *wxLIGHT_GREY);
             listview->SetItem(listitem);
         }
-        {
-            char psz_duration[MSTRTIME_MAX_SIZE];
-            mtime_t dur = p_playlist->pp_items[i]->i_duration;
-            if ( dur != -1 )
-            {
-                secstotimestr( psz_duration, dur/1000000 );
-            }
-            else
-            {
-                memcpy( psz_duration ,"-:--:--", sizeof("-:--:--"));
-            }
-            listview->SetItem( i, 3, wxU(psz_duration) );
-        }
 
+        char psz_duration[MSTRTIME_MAX_SIZE];
+        mtime_t dur = p_playlist->pp_items[i]->i_duration;
+        if( dur != -1 ) secstotimestr( psz_duration, dur/1000000 );
+        else memcpy( psz_duration , "-:--:--", sizeof("-:--:--") );
+        listview->SetItem( i, 3, wxU(psz_duration) );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 
@@ -592,10 +584,8 @@ void Playlist::OnUp( wxCommandEvent& event)
     }
 
     /* We use the first selected item, so find it */
-    long i_item = -1;
-    i_item = listview->GetNextItem(i_item,
-                     wxLIST_NEXT_ALL,
-                     wxLIST_STATE_SELECTED);
+    long i_item = listview->GetNextItem( i_item, wxLIST_NEXT_ALL,
+                                         wxLIST_STATE_SELECTED);
     if( i_item > 0 && i_item < p_playlist->i_size )
     {
         playlist_Move( p_playlist , i_item, i_item - 1);
@@ -623,10 +613,8 @@ void Playlist::OnDown( wxCommandEvent& event)
     }
 
     /* We use the first selected item, so find it */
-    long i_item = -1;
-    i_item = listview->GetNextItem(i_item,
-                     wxLIST_NEXT_ALL,
-                     wxLIST_STATE_SELECTED);
+    long i_item = listview->GetNextItem( i_item, wxLIST_NEXT_ALL,
+                                         wxLIST_STATE_SELECTED );
     if( i_item >= 0 && i_item < p_playlist->i_size - 1 )
     {
         playlist_Move( p_playlist , i_item, i_item + 2 );
@@ -754,7 +742,7 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
 
     for( i_current = 0 ; i_current <= listview->GetItemCount() ; i_current++ )
     {
-        if( listview->GetItemState( i_current, wxLIST_STATE_SELECTED)
+        if( listview->GetItemState( i_current, wxLIST_STATE_SELECTED )
                    == wxLIST_STATE_SELECTED )
         {
             i_first = i_current;
@@ -948,10 +936,8 @@ void Playlist::OnInfos( wxCommandEvent& WXUNUSED(event) )
     if( iteminfo_dialog == NULL )
     {
         /* We use the first selected item, so find it */
-        long i_item = -1;
-        i_item = listview->GetNextItem(i_item,
-                         wxLIST_NEXT_ALL,
-                         wxLIST_STATE_SELECTED);
+        long i_item = listview->GetNextItem( i_item, wxLIST_NEXT_ALL,
+                                             wxLIST_STATE_SELECTED );
         if( i_item >= 0 && i_item < p_playlist->i_size )
         {
             iteminfo_dialog = new ItemInfoDialog(
@@ -975,10 +961,8 @@ void Playlist::OnEnDis( wxCommandEvent& event )
         return;
     }
 
-    long i_item = -1;
-    i_item = listview->GetNextItem(i_item,
-                       wxLIST_NEXT_ALL,
-                       wxLIST_STATE_SELECTED);
+    long i_item = listview->GetNextItem( i_item, wxLIST_NEXT_ALL,
+                                         wxLIST_STATE_SELECTED );
 
     if( i_item >= 0 && i_item < p_playlist->i_size )
     {
