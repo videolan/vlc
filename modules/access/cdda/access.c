@@ -1,8 +1,8 @@
 /*****************************************************************************
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
- * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.25 2004/02/14 17:36:05 gbazin Exp $
+ * Copyright (C) 2000, 2003, 2004 VideoLAN
+ * $Id: access.c,v 1.26 2004/02/22 10:30:22 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -71,6 +71,11 @@ static int  CDDASetProgram   ( input_thread_t *, pgrm_descriptor_t * );
 static int  CDDAFixupPlayList( input_thread_t *p_input,
                               cdda_data_t *p_cdda, const char *psz_source,
                               bool play_single_track);
+
+static void CDDAUpdateVar( input_thread_t *p_input, int i_entry, int i_action,
+			   const char *p_varname, char *p_label,
+			   const char *p_debug_label );
+
 
 /****************************************************************************
  * Private functions
@@ -260,8 +265,12 @@ static int CDDASetArea( input_thread_t * p_input, input_area_t * p_area )
 {
     cdda_data_t *p_cdda = (cdda_data_t*) p_input->p_access_data;
     vlc_value_t val;
+    vlc_value_t text;
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "");
+
+    text.psz_string = _("Track");
+    var_Change( p_input, "title", VLC_VAR_SETTEXT, &text, NULL );
 
     /* we can't use the interface slider until initilization is complete */
     p_input->stream.b_seekable = 0;
@@ -317,6 +326,25 @@ static void CDDASeek( input_thread_t * p_input, off_t i_off )
                p_input->stream.p_selected_area->i_tell );
 
 }
+
+/****************************************************************************
+ Update the "varname" variable to i_num without triggering a callback.
+****************************************************************************/
+static void
+CDDAUpdateVar( input_thread_t *p_input, int i_num, int i_action,
+              const char *p_varname, char *p_label, 
+	      const char *p_debug_label)
+{
+  vlc_value_t val;
+  val.i_int = i_num;
+  if (p_label) {
+    vlc_value_t text;
+    text.psz_string = p_label;
+    var_Change( p_input, p_varname, VLC_VAR_SETTEXT, &text, NULL );
+  }
+  var_Change( p_input, p_varname, i_action, &val, NULL );
+}
+
 
 #define meta_info_add_str(title, str)                          \
   if ( str ) {                                                 \
@@ -820,7 +848,6 @@ CDDAFixupPlayList( input_thread_t *p_input, cdda_data_t *p_cdda,
         CDDACreatePlayListItem(p_input, p_cdda, p_playlist, i, psz_mrl,
                                psz_mrl_max, psz_source, PLAYLIST_APPEND,
                                PLAYLIST_END);
-
       }
 
     playlist_Command( p_playlist, PLAYLIST_GOTO, 0 );
@@ -1099,6 +1126,7 @@ E_(Close)( vlc_object_t *p_this )
       cddb_disc_destroy(p_cdda->cddb.disc);
 #endif
 
+    free( p_cdda->p_sectors );
     free( p_cdda );
     p_cdda_input = NULL;
 }
