@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.19 2002/05/15 00:02:27 sam Exp $
+ * $Id: modules_inner.h,v 1.20 2002/05/22 11:23:56 lool Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -81,6 +81,7 @@
     {                                                                         \
         int i_shortcut = 1;                                                   \
         struct module_config_s* p_item;                                       \
+        STORE_SYMBOLS;                                                        \
         p_module->psz_name = MODULE_STRING;                                   \
         p_module->psz_longname = MODULE_STRING;                               \
         p_module->psz_program = NULL;                                         \
@@ -144,6 +145,7 @@
 #define MODULE_ACTIVATE_START                                                 \
     int __VLC_SYMBOL( ActivateModule ) ( module_t *p_module )                 \
     {                                                                         \
+        STORE_SYMBOLS;                                                        \
         p_module->p_functions =                                               \
           ( module_functions_t * )malloc( sizeof( module_functions_t ) );     \
         if( p_module->p_functions == NULL )                                   \
