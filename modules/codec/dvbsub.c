@@ -158,6 +158,7 @@ struct decoder_sys_t
     int             i_ancillary_id;
     mtime_t         i_pts;
 
+    vlc_bool_t      b_page;
     dvbsub_page_t   *p_page;
     dvbsub_region_t *p_regions;
     dvbsub_clut_t   *p_cluts;
@@ -229,6 +230,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pts          = 0;
     p_sys->i_id           = p_dec->fmt_in.subs.dvb.i_id & 0xFFFF;
     p_sys->i_ancillary_id = p_dec->fmt_in.subs.dvb.i_id >> 16;
+
     p_sys->p_regions      = NULL;
     p_sys->p_cluts        = NULL;
     p_sys->p_page         = NULL;
@@ -297,6 +299,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     msg_Dbg( p_dec, "subtitle packet received: "I64Fd, p_sys->i_pts );
 #endif
 
+    p_sys->b_page = VLC_FALSE;
     while( bs_show( &p_sys->bs, 8 ) == 0x0f ) /* Sync byte */
     {
         decode_segment( p_dec, &p_sys->bs );
@@ -310,7 +313,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* Check if the page is to be displayed */
-    if( p_sys->p_page ) p_spu = render( p_dec );
+    if( p_sys->p_page && p_sys->b_page ) p_spu = render( p_dec );
 
     block_Release( p_block );
 
@@ -406,6 +409,17 @@ static void decode_segment( decoder_t *p_dec, bs_t *s )
 #ifdef DEBUG_DVBSUB
         msg_Dbg( p_dec, "subtitle skipped (page id: %i, %i)",
                  i_page_id, p_sys->i_id );
+#endif
+        bs_skip( s,  8 * ( 2 + i_size ) );
+        return;
+    }
+
+    if( p_sys->i_ancillary_id != p_sys->i_id &&
+        i_type == DVBSUB_ST_PAGE_COMPOSITION &&
+        i_page_id == p_sys->i_ancillary_id )
+    {
+#ifdef DEBUG_DVBSUB
+        msg_Dbg( p_dec, "skipped invalid ancillary subtitle packet" );
 #endif
         bs_skip( s,  8 * ( 2 + i_size ) );
         return;
@@ -643,6 +657,7 @@ static void decode_page_composition( decoder_t *p_dec, bs_t *s )
 
     p_sys->p_page->i_version = i_version;
     p_sys->p_page->i_timeout = i_timeout;
+    p_sys->b_page = VLC_TRUE;
 
     /* Number of regions */
     p_sys->p_page->i_region_defs = (i_segment_length - 2) / 6;
