@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.1 2003/11/15 01:21:48 massiot Exp $
+# $Id: Makefile,v 1.2 2003/11/15 13:09:02 massiot Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -528,7 +528,7 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
 
 CLEAN_FILE += .ffmpeg
 CLEAN_PKG += ffmpeg
-DISTCLEAN_PKG += ffmpeg-(FFMPEG_VERSION).tar.gz
+DISTCLEAN_PKG += ffmpeg-$(FFMPEG_VERSION).tar.gz
 
 # ***************************************************************************
 # openslp

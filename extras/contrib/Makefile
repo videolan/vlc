@@ -2,7 +2,7 @@
 # Makefile : Build vlc-contrib files
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.1 2003/11/15 01:21:48 massiot Exp $
+# $Id: Makefile,v 1.2 2003/11/15 13:09:02 massiot Exp $
 # 
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 # 
@@ -31,8 +31,10 @@ all: FORCE
 src: FORCE
 	$(MAKE) -C src all
 
-bin: FORCE
+contrib-macosx.tar.bz2: FORCE
 	$(WGET) $(CONTRIB_URL)
+
+bin: contrib-macosx.tar.bz2
 	bunzip2 -c $< | tar xf -
 
 clean-src: FORCE
