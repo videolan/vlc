@@ -2,7 +2,7 @@
  * input_ts.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ts.h,v 1.1 2001/12/09 17:01:36 sam Exp $
+ * $Id: input_ts.h,v 1.2 2001/12/12 15:25:29 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Boris Dorès <babal@via.ecp.fr>
@@ -71,7 +71,7 @@ static __inline__ int read_network( int i_fd, char * p_base,
          i_bytes = p_sys->i_length - p_sys->i_offset;
     }
 
-    pf_fast_memcpy( p_base, p_sys->p_buffer + p_sys->i_offset, i_bytes );
+    p_main->fast_memcpy( p_base, p_sys->p_buffer + p_sys->i_offset, i_bytes );
     p_sys->i_offset += i_bytes;
 
     return i_bytes;
