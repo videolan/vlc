@@ -110,6 +110,12 @@ void playlist_ItemDelete( playlist_item_t *p_item )
         free( p_item->input.pp_categories );
     }
 
+    for( ; p_item->input.i_options > 0; p_item->input.i_options-- )
+    {
+        free( p_item->input.ppsz_options[p_item->input.i_options - 1] );
+        if( p_item->input.i_options == 1 ) free( p_item->input.ppsz_options );
+    }
+
     vlc_mutex_unlock( &p_item->input.lock );
     vlc_mutex_destroy( &p_item->input.lock );
 

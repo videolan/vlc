@@ -57,8 +57,6 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
     playlist_item_t *p_item =
         playlist_ItemNew( p_playlist , psz_uri, psz_name );
 
-    int i;
-
     if( p_item == NULL )
     {
         msg_Err( p_playlist, "unable to add item to playlist" );
@@ -66,22 +64,20 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
     }
 
     p_item->input.i_duration = i_duration;
-
     p_item->input.i_options = i_options;
     p_item->input.ppsz_options = NULL;
-    for( i = 0; i < i_options; i++ )
+
+    for( p_item->input.i_options = 0; p_item->input.i_options < i_options;
+         p_item->input.i_options++ )
     {
-        if( i == 0 )
+        if( !p_item->input.i_options )
         {
             p_item->input.ppsz_options = malloc( i_options * sizeof(char *) );
-            if( !p_item->input.ppsz_options )
-            {
-                p_item->input.i_options = 0;
-                break;
-            }
+            if( !p_item->input.ppsz_options ) break;
         }
 
-        p_item->input.ppsz_options[i] = strdup( ppsz_options[i] );
+        p_item->input.ppsz_options[p_item->input.i_options] =
+            strdup( ppsz_options[p_item->input.i_options] );
     }
 
     return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
@@ -374,57 +370,9 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
 
         msg_Dbg( p_playlist, "deleting playlist item `%s'",
                  p_item->input.psz_name );
-#if 0
-        int i,j;
 
-        vlc_mutex_lock( &p_item->lock );
-
-        if( p_item->psz_name )
-        {
-            free( p_item->psz_name );
-        }
-        if( p_item->psz_uri )
-        {
-            free( p_item->psz_uri );
-        }
-
-        /* Free the info categories. Welcome to the segfault factory */
-        if( p_item->i_categories > 0 )
-        {
-            for( i = 0; i < p_item->i_categories; i++ )
-            {
-                for( j= 0 ; j < p_item->pp_categories[i]->i_infos; j++)
-                {
-                    if( p_item->pp_categories[i]->pp_infos[j]->psz_name)
-                    {
-                        free( p_item->pp_categories[i]->
-                                      pp_infos[j]->psz_name);
-                    }
-                    if( p_item->pp_categories[i]->pp_infos[j]->psz_value)
-                    {
-                        free( p_item->pp_categories[i]->
-                                      pp_infos[j]->psz_value);
-                    }
-                    free( p_item->pp_categories[i]->pp_infos[j] );
-                }
-                if( p_item->pp_categories[i]->i_infos )
-                    free( p_item->pp_categories[i]->pp_infos );
-
-                if( p_item->pp_categories[i]->psz_name)
-                {
-                    free( p_item->pp_categories[i]->psz_name );
-                }
-                free( p_item->pp_categories[i] );
-            }
-            free( p_item->pp_categories );
-        }
-
-        /* XXX: what if the item is still in use? */
-#endif
         playlist_ItemDelete( p_item );
-#if 0
-        free( p_item );
-#endif
+
         if( i_pos <= p_playlist->i_index )
         {
             p_playlist->i_index--;
