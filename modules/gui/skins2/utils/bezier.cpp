@@ -2,7 +2,7 @@
  * bezier.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: bezier.cpp,v 1.4 2004/03/02 21:45:15 ipkiss Exp $
+ * $Id: bezier.cpp,v 1.5 2004/03/03 22:57:15 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -189,10 +189,8 @@ void Bezier::computePoint( float t, int &x, int &y ) const
         yPos += m_pty[i] * coeff;
     }
 
-    // Float cast to avoid strange truncatures
-    // XXX: not very nice...
-    x = (int)(float)xPos;
-    y = (int)(float)yPos;
+    x = lrintf(xPos);
+    y = lrintf(yPos);
 }
 
 

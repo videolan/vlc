@@ -82,7 +82,7 @@
         rightbottom CDATA   "lefttop"
         image       CDATA   #REQUIRED
         onclick     CDATA   "none"
-        help        CDATA   "\0"
+        help        CDATA   ""
     >
 <!ELEMENT Button EMPTY>
     <!ATTLIST Button
@@ -95,8 +95,8 @@
         down        CDATA   "none"
         over        CDATA   "none"
         action      CDATA   "none"
-        tooltiptext CDATA   "\0"
-        help        CDATA   "\0"
+        tooltiptext CDATA   ""
+        help        CDATA   ""
     >
 <!ELEMENT CheckBox EMPTY>
     <!ATTLIST CheckBox
@@ -114,9 +114,9 @@
         state        CDATA   #REQUIRED
         action1      CDATA   "none"
         action2      CDATA   "none"
-        tooltiptext1 CDATA   "\0"
-        tooltiptext2 CDATA   "\0"
-        help         CDATA   "\0"
+        tooltiptext1 CDATA   ""
+        tooltiptext2 CDATA   ""
+        help         CDATA   ""
     >
 <!ELEMENT Slider EMPTY>
     <!ATTLIST Slider
@@ -132,8 +132,8 @@
         points      CDATA   #REQUIRED
         thickness   CDATA   "10"
         value       CDATA   "none"
-        tooltiptext CDATA   "\0"
-        help        CDATA   "\0"
+        tooltiptext CDATA   ""
+        help        CDATA   ""
     >
 <!ELEMENT RadialSlider EMPTY>
     <!ATTLIST RadialSlider
@@ -148,8 +148,8 @@
         minangle    CDATA   "0"
         maxangle    CDATA   "360"
         value       CDATA   "none"
-        tooltiptext CDATA   "\0"
-        help        CDATA   "\0"
+        tooltiptext CDATA   ""
+        help        CDATA   ""
     >
 <!ELEMENT Text EMPTY>
     <!ATTLIST Text
@@ -157,11 +157,11 @@
         visible     CDATA   "true"
         x           CDATA   "0"
         y           CDATA   "0"
-        text        CDATA   "\0"
+        text        CDATA   ""
         font        CDATA   #REQUIRED
         color       CDATA   "#000000"
         width       CDATA   "0"
-        help        CDATA   "\0"
+        help        CDATA   ""
     >
 <!ELEMENT Playlist (Slider)>
     <!ATTLIST Playlist
@@ -180,5 +180,5 @@
         bgcolor1    CDATA   "#FFFFFF"
         bgcolor2    CDATA   "#FFFFFF"
         selcolor    CDATA   "#0000FF"
-        help        CDATA   "\0"
+        help        CDATA   ""
     >
