@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.81 2002/03/02 03:53:54 xav Exp $
+ * $Id: common.h,v 1.82 2002/03/02 09:34:23 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -62,10 +62,9 @@ typedef int                 ptrdiff_t;
 #   endif
 #endif
 
-#ifndef _SSIZE_T
-typedef s64                ssize_t;
+#if defined( WIN32 )
+typedef int                 ssize_t;
 #endif
-
 
 
 /* Counter for statistics and profiling */
@@ -554,7 +553,7 @@ typedef struct module_symbols_s
                                       size_t );
     ssize_t ( * input_FDNetworkRead )   ( struct input_thread_s *, byte_t *,
                                       size_t );
-    
+
     void * ( * input_BuffersInit )( void );
     void ( * input_BuffersEnd )( struct input_buffers_s * );
     struct data_buffer_s * ( * input_NewBuffer )( struct input_buffers_s *, size_t );
