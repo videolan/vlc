@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# $Id: woody-buildpackage,v 1.7 2003/02/17 07:22:05 sam Exp $
+# $Id: woody-buildpackage,v 1.8 2003/03/11 18:57:30 sam Exp $
 # Build VLC for a Woody Debian system
 
 if test ! -d debian
@@ -16,8 +16,10 @@ sed -e 's/^vlc (\([^)]*\)-\([^-)]*\))/vlc (\1-0woody.\2)/' \
 # control: replace liba52-*-dev with a52dec-dev (>=0.7.3)
 #                  libdv*-dev with libdv-dev
 #                  kdelibs4-dev with kdelibs-dev
+#                  libqt3-dev with libqt-dev
 #                  libarts1-dev with libarts-dev
 #          remove libwxgtk2.4-dev
+#                 libflac-dev
 sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
     -e 's/libdv[0-9]*-dev/libdv-dev/' \
     -e 's/kdelibs[0-9]*-dev/kdelibs-dev/' \
@@ -25,6 +27,7 @@ sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
     -e 's/libarts[0-9]*-dev/libarts-dev/' \
     -e 's/, libwx[^,]*//' \
     -e '/Package: wxvlc/,/^ *$/d' \
+    -e 's/, libflac-dev[^,]*//' \
     < debian/control > debian/control.woody
 
 # rules: remove wxwindows stuff
@@ -32,6 +35,7 @@ sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
 sed -e '/# Package: wxvlc/,/^ *$/d' \
     -e 's,^ARCH_EXCLUDE =,& -Nwxvlc,' \
     -e 's,--enable-wxwindows,--disable-wxwindows,' \
+    -e 's,--enable-flac,--disable-flac,' \
     -e 's, debian/changelog , debian/changelog.woody ,' \
     -e 's,dh_gencontrol[^#]*,& -- -ldebian/changelog.woody,' \
     < debian/rules > debian/rules.woody

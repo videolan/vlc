@@ -43,6 +43,7 @@ CONFIG_FLAGS += \
 	--enable-vorbis \
 	--enable-wxwindows \
 	--enable-slp \
+	--enable-flac \
 	$(NULL)
 
 # These ones are currently shipped with VLC
