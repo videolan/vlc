@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.5 2002/11/24 01:29:56 sigmunau Exp $
+ * $Id: m3u.c,v 1.6 2002/11/24 13:02:13 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -245,24 +245,23 @@ static int Demux ( input_thread_t *p_input )
 
 	    /* Check if the line has an absolute or relative path */
 	    psz_name = psz_bol;
-            msg_Dbg( p_input, "this is the current item: <%s>", psz_name );
             while( *psz_name && strncmp( psz_name, "://", sizeof("://") - 1 ) )
 	    {
 	        psz_name++;
 	    }
-	    if( !*psz_name )
+	    if( !*psz_name && *psz_bol != '/' )
 	    {
  	        /* the line doesn't specify a protocol name.
 		 * If this line doesn't begin with a '/' then assume the path
 		 * is relative to the path of the m3u file. */
-	        char *psz_path = strdup( p_input->psz_name );
-
-		psz_name = strrchr( psz_path, '/' );
-		if( psz_name ) *psz_name = '\0';
-		else *psz_path = '\0';
-		psz_name = malloc( strlen(psz_path) + strlen(psz_bol) + 2 );
-	        sprintf( psz_name, "%s/%s", psz_path, psz_bol );
-		free( psz_path );
+                char *psz_path = strdup( p_input->psz_name );
+                
+                psz_name = strrchr( psz_path, '/' );
+                if( psz_name ) *psz_name = '\0';
+                else *psz_path = '\0';
+                psz_name = malloc( strlen(psz_path) + strlen(psz_bol) + 2 );
+                sprintf( psz_name, "%s/%s", psz_path, psz_bol );
+                free( psz_path );
 	    }
 	    else
 	    {
