@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: araw.c,v 1.29 2004/02/14 17:03:32 gbazin Exp $
+ * $Id: araw.c,v 1.30 2004/02/23 23:01:05 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -160,7 +160,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     {
     /* from wav/avi/asf file */
     case VLC_FOURCC('a','r','a','w'):
-    case VLC_FOURCC('f','l','3','2'):
+    case VLC_FOURCC('a','f','l','t'):
     /* _signed_ big endian samples (mov)*/
     case VLC_FOURCC('t','w','o','s'):
     /* _signed_ little endian samples (mov)*/
@@ -202,12 +202,15 @@ static int DecoderOpen( vlc_object_t *p_this )
              p_dec->fmt_in.audio.i_rate, p_dec->fmt_in.audio.i_channels,
              p_dec->fmt_in.audio.i_bitspersample );
 
-    if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'f', 'l', '3', '2' ) )
+    if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'a', 'f', 'l', 't' ) )
     {
         switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
         {
         case 4:
             p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+            break;
+        case 8:
+            p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','6','4');
             break;
         default:
             msg_Err( p_dec, "bad parameters(bits/sample)" );

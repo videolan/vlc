@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: wav.c,v 1.13 2004/02/14 17:03:32 gbazin Exp $
+ * $Id: wav.c,v 1.14 2004/02/23 23:01:05 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -118,7 +118,7 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_input, "invalid 'fmt ' chunk" );
         goto error;
     }
-    stream_Read( p_input->s, NULL, 8 );   /* cannot fail */
+    stream_Read( p_input->s, NULL, 8 );   /* Cannot fail */
 
     /* load waveformatex */
     p_wf = (WAVEFORMATEX *)p_wf_ext = malloc( __EVEN( i_size ) + 2 );
@@ -143,7 +143,7 @@ static int Open( vlc_object_t * p_this )
 
     /* Handle new WAVE_FORMAT_EXTENSIBLE wav files */
     if( GetWLE( &p_wf->wFormatTag ) == WAVE_FORMAT_EXTENSIBLE &&
-        i_size >= sizeof( WAVEFORMATEXTENSIBLE ) - 2 )
+        i_size >= sizeof( WAVEFORMATEXTENSIBLE ) )
     {
         wf_tag_to_fourcc( GetWLE( &p_wf_ext->SubFormat ),
                           &p_sys->fmt.i_codec, &psz_name );
@@ -158,8 +158,8 @@ static int Open( vlc_object_t * p_this )
                 p_sys->fmt.i_extra );
     }
 
-    msg_Dbg( p_input, "format: 0x%4.4x fourcc: %4.4s channels: %d "
-             "freq: %d Hz bitrate: %dKo/s blockalign: %d bits/samples: %d "
+    msg_Dbg( p_input, "format: 0x%4.4x, fourcc: %4.4s, channels: %d, "
+             "freq: %d Hz, bitrate: %dKo/s, blockalign: %d, bits/samples: %d, "
              "extra size: %d",
              GetWLE( &p_wf->wFormatTag ), (char *)&p_sys->fmt.i_codec,
              p_sys->fmt.audio.i_channels, p_sys->fmt.audio.i_rate,
@@ -171,7 +171,7 @@ static int Open( vlc_object_t * p_this )
     switch( p_sys->fmt.i_codec )
     {
     case VLC_FOURCC( 'a', 'r', 'a', 'w' ):
-    case VLC_FOURCC( 'f', 'l', '3', '2' ):
+    case VLC_FOURCC( 'a', 'f', 'l', 't' ):
     case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
     case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
         FrameInfo_PCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
@@ -207,10 +207,8 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_input, "cannot find 'data' chunk" );
         goto error;
     }
-
+    stream_Read( p_input->s, NULL, 8 );   /* Cannot fail */
     p_sys->i_data_pos = stream_Tell( p_input->s );
-
-    stream_Read( p_input->s, NULL, 8 );   /* cannot fail */
 
     /* Create one program */
     vlc_mutex_lock( &p_input->stream.stream_lock );

@@ -2,7 +2,7 @@
  * codecs.h: codec related structures needed by the demuxers and decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: codecs.h,v 1.11 2004/02/14 17:03:33 gbazin Exp $
+ * $Id: codecs.h,v 1.12 2004/02/23 23:01:05 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -126,8 +126,7 @@ typedef struct
     unsigned int i_id;
 } dvb_spuinfo_t;
 
-/* WAVE form wFormatTag IDs */
-
+/* WAVE format wFormatTag IDs */
 #define WAVE_FORMAT_UNKNOWN             0x0000 /* Microsoft Corporation */
 #define WAVE_FORMAT_PCM                 0x0001 /* Microsoft Corporation */
 #define WAVE_FORMAT_ADPCM               0x0002 /* Microsoft Corporation */
@@ -155,6 +154,27 @@ typedef struct
 #define WAVE_FORMAT_EXTENSIBLE          0xFFFE /* Microsoft */
 #endif
 
+/* Microsoft speaker definitions */
+#define WAVE_SPEAKER_FRONT_LEFT             0x1
+#define WAVE_SPEAKER_FRONT_RIGHT            0x2
+#define WAVE_SPEAKER_FRONT_CENTER           0x4
+#define WAVE_SPEAKER_LOW_FREQUENCY          0x8
+#define WAVE_SPEAKER_BACK_LEFT              0x10
+#define WAVE_SPEAKER_BACK_RIGHT             0x20
+#define WAVE_SPEAKER_FRONT_LEFT_OF_CENTER   0x40
+#define WAVE_SPEAKER_FRONT_RIGHT_OF_CENTER  0x80
+#define WAVE_SPEAKER_BACK_CENTER            0x100
+#define WAVE_SPEAKER_SIDE_LEFT              0x200
+#define WAVE_SPEAKER_SIDE_RIGHT             0x400
+#define WAVE_SPEAKER_TOP_CENTER             0x800
+#define WAVE_SPEAKER_TOP_FRONT_LEFT         0x1000
+#define WAVE_SPEAKER_TOP_FRONT_CENTER       0x2000
+#define WAVE_SPEAKER_TOP_FRONT_RIGHT        0x4000
+#define WAVE_SPEAKER_TOP_BACK_LEFT          0x8000
+#define WAVE_SPEAKER_TOP_BACK_CENTER        0x10000
+#define WAVE_SPEAKER_TOP_BACK_RIGHT         0x20000
+#define WAVE_SPEAKER_RESERVED               0x80000000
+
 static struct
 {
     uint16_t     i_tag;
@@ -165,7 +185,7 @@ wave_format_tag_to_fourcc[] =
 {
     { WAVE_FORMAT_PCM,      VLC_FOURCC( 'a', 'r', 'a', 'w' ), "Raw audio" },
     { WAVE_FORMAT_ADPCM,    VLC_FOURCC( 'm', 's', 0x00,0x02), "Adpcm" },
-    { WAVE_FORMAT_IEEE_FLOAT, VLC_FOURCC( 'f', 'l', '3', '2' ), "IEEE Float audio" },
+    { WAVE_FORMAT_IEEE_FLOAT, VLC_FOURCC( 'a', 'f', 'l', 't' ), "IEEE Float audio" },
     { WAVE_FORMAT_ALAW,     VLC_FOURCC( 'a', 'l', 'a', 'w' ), "A-Law" },
     { WAVE_FORMAT_MULAW,    VLC_FOURCC( 'm', 'l', 'a', 'w' ), "Mu-Law" },
     { WAVE_FORMAT_IMA_ADPCM,VLC_FOURCC( 'm', 's', 0x00,0x11), "Ima-Adpcm" },
