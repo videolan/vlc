@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.13 2003/05/13 11:18:25 titer Exp $
+ * $Id: PreferencesWindow.h,v 1.14 2003/05/13 14:11:33 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -24,7 +24,7 @@
 #ifndef BEOS_PREFERENCES_WINDOW_H
 #define BEOS_PREFERENCES_WINDOW_H
 
-#include <Window.h>
+#include <InterfaceKit.h>
 
 #define PREFS_WINDOW_WIDTH   600
 #define PREFS_WINDOW_HEIGHT  400
@@ -34,25 +34,58 @@
 #define PREFS_SAVE           'prsa'
 #define TEXT_HEIGHT 16
 
-class ConfigView : public BView
-{
-  public:
-                            ConfigView( BRect frame, const char * name,
-                                        uint32 resizingMode, uint32 flags );
-
-    /* When we create the view, we have to give it an arbitrary size because
-       it will be the size of the BScrollView. That's why we keep the real size
-       in fRealBounds so we can have a correct BScrollBar later */
-    BRect                   fRealBounds;
-};
-
 class StringItemWithView : public BStringItem
 {
   public:
-                            StringItemWithView( const char * text );
+                            StringItemWithView( const char * text )
+                                : BStringItem( text ) {}
 
-    /* Here we store the ConfigView associated to this module */
-    ConfigView *            fConfigView;
+    /* Here we store the config BView associated to this module */
+    BView *                 fConfigView;
+};
+
+class ConfigTextControl : public BTextControl
+{
+  public:
+                            ConfigTextControl( BRect rect, char * label,
+                                               int type, char * configName )
+                                : BTextControl( rect, "ConfigTextControl", label,
+                                                "", new BMessage() )
+                            {
+                                fConfigType = type;
+                                fConfigName = strdup( configName );
+                            }
+
+    int                     fConfigType;
+    char *                  fConfigName;
+};
+
+class ConfigCheckBox : public BCheckBox
+{
+    public:
+                            ConfigCheckBox( BRect rect, char * label,
+                                            char * configName )
+                               : BCheckBox( rect, "ConfigCheckBox", label,
+                                            new BMessage() )
+                            {
+                                fConfigName = strdup( configName );
+                            }
+
+    char *                  fConfigName;
+};
+
+class ConfigMenuField : public BMenuField
+{
+    public:
+                            ConfigMenuField( BRect rect, char * label,
+                                             BPopUpMenu * popUp, char * configName )
+                               : BMenuField( rect, "ConfigMenuField", label,
+                                             popUp, new BMessage() )
+                            {
+                                fConfigName = strdup( configName );
+                            }
+
+    char *                  fConfigName;
 };
 
 class PreferencesWindow : public BWindow

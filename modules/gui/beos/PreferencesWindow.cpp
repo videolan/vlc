@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.20 2003/05/13 11:18:25 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.21 2003/05/13 14:11:33 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -23,13 +23,16 @@
 
 #include <stdlib.h> /* atoi(), strtod() */
 
-#include <InterfaceKit.h>
-#include <SupportKit.h>
-
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
 #include "PreferencesWindow.h"
+
+/* TODO:
+    - handle CONFIG_HINT_SUBCATEGORY
+    - use BSliders for integer_with_range and float_with_range
+    - add the needed LockLooper()s
+    - fix horizontal window resizing */
 
 /* We use this function to order the items of the BOutlineView */
 int compare_func( const BListItem * _first, const BListItem * _second )
@@ -54,25 +57,6 @@ int compare_func( const BListItem * _first, const BListItem * _second )
 }
 
 /*****************************************************************************
- * StringItemWithView::StringItemWithView
- *****************************************************************************/
-StringItemWithView::StringItemWithView( const char * text )
-    : BStringItem( text )
-{
-    /* We use the default constructor */
-}
-
-/*****************************************************************************
- * ConfigView::ConfigView
- *****************************************************************************/
-ConfigView::ConfigView( BRect frame, const char * name,
-                        uint32 resizingMode, uint32 flags )
-    : BView( frame, name, resizingMode, flags )
-{
-    /* We use the default constructor */
-}
-
-/*****************************************************************************
  * PreferencesWindow::PreferencesWindow
  *****************************************************************************/
 PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
@@ -88,9 +72,8 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     BRect rect;
 
     /* The "background" view */
-    rgb_color background = ui_color( B_PANEL_BACKGROUND_COLOR );
     fPrefsView = new BView( Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW );
-    fPrefsView->SetViewColor( background );
+    fPrefsView->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
     AddChild( fPrefsView );
     
     /* Create the preferences tree */
@@ -122,13 +105,6 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     fOutline->AddItem( modulesItem );
    
     /* Fill the tree */
-    /* TODO:
-        - manage CONFIG_HINT_SUBCATEGORY
-        - use a pop-up for CONFIG_HINT_MODULE
-        - use BSliders for integer_with_range and float_with_range
-        - add the needed LockLooper()s
-        - fix horizontal window resizing
-        - make this intuitive ! */
     vlc_list_t * p_list;
     p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
     if( !p_list )
@@ -158,22 +134,19 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
         /* Build the config view for this module */
         rect = fDummyView->Bounds();
         rect.right -= B_V_SCROLL_BAR_WIDTH;
-        ConfigView * configView;
-        configView = new ConfigView( rect, "config view",
-                                     B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW );
-        configView->SetViewColor( background );
+        BView * configView;
+        configView = new BView( rect, "config view",
+                                B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW );
+        configView->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
         
         rect = configView->Bounds();
         rect.InsetBy( 10, 10 );
         rect.bottom = rect.top + TEXT_HEIGHT;
-        BTextControl * textControl;
-        BCheckBox * checkBox;
+        ConfigTextControl * textControl;
+        ConfigCheckBox * checkBox;
+        ConfigMenuField * menuField;
+        BPopUpMenu * popUp;
 
-        /* FIXME: we use the BControl name to store the VLC variable name.
-           To know what variable type it is, I add one character at the beginning
-           of the name (see ApplyChanges()); it's not pretty, but it works. To
-           be cleaned later. */    
-        char name[128];
         p_item = p_module->p_config;
         bool firstItem = true;
         do
@@ -189,12 +162,25 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
                     else
                         firstItem = false;
                     
-                    memset( name, 0, 128 );
-                    sprintf( name, "s%s", p_item->psz_name );
-                    textControl = new BTextControl( rect, name, p_item->psz_text,
-                                                    "", new BMessage(),
-                                                    B_FOLLOW_NONE );
-                    configView->AddChild( textControl );
+                    if( p_item->ppsz_list && p_item->ppsz_list[0] )
+                    {
+                        popUp = new BPopUpMenu( "" );
+                        menuField = new ConfigMenuField( rect, p_item->psz_text,
+                                                         popUp, p_item->psz_name );
+                        BMenuItem * menuItem;
+                        for( int i = 0; p_item->ppsz_list[i]; i++ )
+                        {
+                            menuItem = new BMenuItem( p_item->ppsz_list[i], new BMessage() );
+                            popUp->AddItem( menuItem );
+                        }
+                        configView->AddChild( menuField );
+                    }
+                    else
+                    {
+                        textControl = new ConfigTextControl( rect, p_item->psz_text,
+                                                             CONFIG_ITEM_STRING, p_item->psz_name );
+                        configView->AddChild( textControl );
+                    }
                     break;
 
                 case CONFIG_ITEM_INTEGER:
@@ -203,11 +189,8 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
                     else
                         firstItem = false;
                         
-                    memset( name, 0, 128 );
-                    sprintf( name, "i%s", p_item->psz_name );
-                    textControl = new BTextControl( rect, name, p_item->psz_text,
-                                                    "", new BMessage(),
-                                                    B_FOLLOW_NONE );
+                    textControl = new ConfigTextControl( rect, p_item->psz_text,
+                                                         CONFIG_ITEM_INTEGER, p_item->psz_name );
                     configView->AddChild( textControl );
                     break;
 
@@ -217,11 +200,8 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
                     else
                         firstItem = false;
                         
-                    memset( name, 0, 128 );
-                    sprintf( name, "f%s", p_item->psz_name );
-                    textControl = new BTextControl( rect, name, p_item->psz_text,
-                                                    "", new BMessage(),
-                                                    B_FOLLOW_NONE );
+                    textControl = new ConfigTextControl( rect, p_item->psz_text,
+                                                         CONFIG_ITEM_FLOAT, p_item->psz_name );
                     configView->AddChild( textControl );
                     break;
             
@@ -231,10 +211,8 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
                     else
                        firstItem = false;
                        
-                    memset( name, 0, 128 );
-                    sprintf( name, "b%s", p_item->psz_name );
-                    checkBox = new BCheckBox( rect, name, p_item->psz_text,
-                                              new BMessage(), B_FOLLOW_NONE );
+                    checkBox = new ConfigCheckBox( rect, p_item->psz_text,
+                                                   p_item->psz_name );
                     configView->AddChild( checkBox );
                     break;
             }
@@ -243,8 +221,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     
         /* Adjust the configView size */
         rect.bottom += 10;
-        configView->fRealBounds = BRect( 0, 0, configView->Bounds().Width(), rect.bottom );
-        configView->ResizeTo( configView->Bounds().Width(), configView->Bounds().Height() );
+        configView->ResizeTo( configView->Bounds().Width(), rect.bottom );
 
         /* Add the item to the tree */
         StringItemWithView * stringItem;
@@ -345,12 +322,9 @@ void PreferencesWindow::FrameResized( float width, float height )
 {
     BWindow::FrameResized( width, height );
     
-    /* Get the current ConfigView */
-    ConfigView * view;
-    view = (ConfigView*) fConfigScroll->ChildAt( 0 );
-
-    view->ResizeTo( fDummyView->Bounds().Width() - B_V_SCROLL_BAR_WIDTH,
-                    fDummyView->Bounds().Height() );
+    /* Get the current config BView */
+    BView * view;
+    view = fConfigScroll->ChildAt( 0 );
 
     UpdateScrollBar();
 }
@@ -372,11 +346,11 @@ void PreferencesWindow::Update()
 
     if( fConfigScroll )
     {
-        /* If we don't do this, the ConfigView will remember a wrong position */
+        /* If we don't do this, the config BView will remember a wrong position */
         BScrollBar * scrollBar = fConfigScroll->ScrollBar( B_VERTICAL );
         scrollBar->SetValue( 0 );
 
-        /* Detach the current ConfigView, remove the BScrollView */
+        /* Detach the current config BView, remove the BScrollView */
         BView * view;
         while( ( view = fConfigScroll->ChildAt( 0 ) ) )
             fConfigScroll->RemoveChild( view );
@@ -384,14 +358,17 @@ void PreferencesWindow::Update()
         delete fConfigScroll;
     }
     
+    /* Create a BScrollView with the new config BView in it */
+    BRect oldBounds = selectedItem->fConfigView->Bounds();
     selectedItem->fConfigView->ResizeTo( fDummyView->Bounds().Width() -
                                              B_V_SCROLL_BAR_WIDTH,
                                          fDummyView->Bounds().Height() );
-    
-    /* Create a BScrollView with the new ConfigView in it */
     fConfigScroll = new BScrollView( "", selectedItem->fConfigView, B_FOLLOW_ALL_SIDES,
                                      0, false, true, B_NO_BORDER );
+    fConfigScroll->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
     fDummyView->AddChild( fConfigScroll );
+    selectedItem->fConfigView->ResizeTo( oldBounds.Width(),
+                                         oldBounds.Height() );
     UpdateScrollBar();
 }
 
@@ -405,8 +382,8 @@ void PreferencesWindow::UpdateScrollBar()
        correctly simple BViews */
        
     /* Get the current config view */
-    ConfigView * view;
-    view = (ConfigView*) fConfigScroll->ChildAt( 0 );
+    BView * view;
+    view = fConfigScroll->ChildAt( 0 );
     
     /* Get the available BRect for display */
     BRect display = fConfigScroll->Bounds();
@@ -415,10 +392,10 @@ void PreferencesWindow::UpdateScrollBar()
     /* Fix the scrollbar */
     BScrollBar * scrollBar;
     long max;
-	BRect visible = display & view->fRealBounds;
-	BRect total = display | view->fRealBounds;
+	BRect visible = display & view->Bounds();
+	BRect total = display | view->Bounds();
     scrollBar = fConfigScroll->ScrollBar( B_VERTICAL );
-    max = (long)( view->fRealBounds.Height() - visible.Height() );
+    max = (long)( view->Bounds().Height() - visible.Height() );
     if( max < 0 ) max = 0;
     scrollBar->SetRange( 0, max );
     scrollBar->SetProportion( visible.Height() / total.Height() );
@@ -432,7 +409,7 @@ void PreferencesWindow::UpdateScrollBar()
 void PreferencesWindow::ApplyChanges( bool doIt )
 {
     StringItemWithView * item;
-    ConfigView * view;
+    BView * view;
     BView * child;
     const char * name;
     BString string;
@@ -444,46 +421,83 @@ void PreferencesWindow::ApplyChanges( bool doIt )
         if( !view )
             /* This must be the "Modules" item */
             continue;
-        
+
         for( int j = 0; j < view->CountChildren(); j++ )
         {
             child = view->ChildAt( j );
             name = child->Name();
-            switch( *name )
+            if( !strcmp( name, "ConfigTextControl" ) )
             {
-                case 's': /* BTextControl, string variable */
-                    if( doIt )
-                        config_PutPsz( p_intf, name + 1, ((BTextControl*)child)->Text() );
-                    else
-                        ((BTextControl*)child)->SetText( config_GetPsz( p_intf, name + 1 ) );
-                    break;
-                case 'i': /* BTextControl, int variable */
-                    if( doIt )
-                        config_PutInt( p_intf, name + 1, atoi( ((BTextControl*)child)->Text() ) );
-                    else
+                ConfigTextControl * textControl;
+                textControl = (ConfigTextControl*) child;
+                switch( textControl->fConfigType )
+                {
+                    case CONFIG_ITEM_STRING:
+                        if( doIt )
+                            config_PutPsz( p_intf, textControl->fConfigName, textControl->Text() );
+                        else
+                            textControl->SetText( config_GetPsz( p_intf, textControl->fConfigName ) );
+                        break;
+                    case CONFIG_ITEM_INTEGER:
+                        if( doIt )
+                            config_PutInt( p_intf, textControl->fConfigName, atoi( textControl->Text() ) );
+                        else
+                        {
+                            string = "";
+                            string << config_GetInt( p_intf, textControl->fConfigName );
+                            textControl->SetText( string.String() );
+                        }
+                        break;
+                    case CONFIG_ITEM_FLOAT:
+                        if( doIt )
+                            config_PutFloat( p_intf, textControl->fConfigName,
+                                             strtod( textControl->Text(), NULL ) );
+                        else
+                        {
+                            string = "";
+                            string << config_GetFloat( p_intf, textControl->fConfigName );
+                            textControl->SetText( string.String() );
+                        }
+                        break;
+                }
+            }
+            else if( !strcmp( name, "ConfigCheckBox" ) )
+            {
+                ConfigCheckBox * checkBox;
+                checkBox = (ConfigCheckBox*) child;
+                if( doIt )
+                    config_PutInt( p_intf, checkBox->fConfigName, checkBox->Value() );
+                else
+                    checkBox->SetValue( config_GetInt( p_intf, checkBox->fConfigName ) );
+            }
+            else if( !strcmp( name, "ConfigMenuField" ) )
+            {
+                ConfigMenuField * menuField;
+                menuField = (ConfigMenuField*) child;
+                BMenu * menu;
+                BMenuItem * menuItem;
+                menu = menuField->Menu();
+                if( doIt )
+                {
+                    menuItem = menu->FindMarked();
+                    if( menuItem )
+                        config_PutPsz( p_intf, menuField->fConfigName, menuItem->Label() );
+                }
+                else
+                {
+                    char * value;
+                    value = config_GetPsz( p_intf, menuField->fConfigName );
+                    if( !value ) value = "";
+                    for( int k = 0; k < menu->CountItems(); k++ )
                     {
-                        string = "";
-                        string << config_GetInt( p_intf, name + 1 );
-                        ((BTextControl*)child)->SetText( string.String() );
+                        menuItem = menu->ItemAt( k );
+                        if( !strcmp( value, menuItem->Label() ) )
+                        {
+                            menuItem->SetMarked( true );
+                            break;
+                        }
                     }
-                    break;
-                case 'f': /* BTextControl, float variable */
-                    if( doIt )
-                        config_PutFloat( p_intf, name + 1,
-                                         strtod( ((BTextControl*)child)->Text(), NULL ) );
-                    else
-                    {
-                        string = "";
-                        string << config_GetFloat( p_intf, name + 1 );
-                        ((BTextControl*)child)->SetText( string.String() );
-                    }
-                    break;
-                case 'b': /* BCheckBox, bool variable */
-                    if( doIt )
-                        config_PutInt( p_intf, name + 1, ((BCheckBox*)child)->Value() );
-                    else
-                        ((BCheckBox*)child)->SetValue( config_GetInt( p_intf, name + 1 ) );
-                    break;
+                }
             }
         }
     }
