@@ -2,7 +2,7 @@
  * picture.c:
  *****************************************************************************
  * Copyright (C) 2004-2005 VideoLAN
- * $Id: $
+ * $Id: picture.c 10081 2005-03-01 15:33:51Z dionoea $
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
  *
@@ -85,7 +85,8 @@ static int Open ( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    if( var_Get( p_libvlc, "p_picture_vout", &val ) != VLC_SUCCESS ){
+    if( var_Get( p_libvlc, "p_picture_vout", &val ) != VLC_SUCCESS )
+    {
         msg_Dbg( p_vout, "p_picture_vout not found" );
         p_picture_vout = malloc( sizeof( struct picture_vout_t ) );
         if( p_vout->p_sys == NULL )
@@ -102,7 +103,9 @@ static int Open ( vlc_object_t *p_this )
 
         p_picture_vout->i_picture_num = 0;
         p_picture_vout->p_pic = NULL;
-    } else {
+    }
+    else
+    {
         p_picture_vout = val.p_address;
         msg_Dbg( p_vout, "p_picture_vout found" );
         vlc_mutex_lock( &p_picture_vout->lock );
@@ -214,7 +217,7 @@ static void Close ( vlc_object_t *p_this )
 
     if( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture )
     {
-    /* FIXME */
+        /* FIXME */
         free( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture );
     }
     p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].i_status
@@ -222,15 +225,19 @@ static void Close ( vlc_object_t *p_this )
 
     for( i = 0; i < p_picture_vout->i_picture_num; i ++)
     {
-        if( p_picture_vout->p_pic[i].i_status == PICTURE_VOUT_E_OCCUPIED ) {
+        if( p_picture_vout->p_pic[i].i_status == PICTURE_VOUT_E_OCCUPIED )
+        {
             i_flag = 1;
             break;
         }
     }
 
-    if( i_flag == 1 ){
+    if( i_flag == 1 )
+    {
         vlc_mutex_unlock( &p_picture_vout->lock );
-    } else {
+    }
+    else
+    {
         free( p_picture_vout->p_pic );
         vlc_mutex_unlock( &p_picture_vout->lock );
         vlc_mutex_destroy( &p_picture_vout->lock );
@@ -256,41 +263,35 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     libvlc_t *p_libvlc = p_vout->p_libvlc;
     vlc_value_t val;
     struct picture_vout_t *p_picture_vout;
+    picture_t *p_new_pic;
 
     var_Get( p_libvlc, "p_picture_vout", &val );
     p_picture_vout = val.p_address;
 
-    /*
-    src : p_pic
-    dest : p_picture_pout->p_pic[p_vout->p_sys.i_picture_pos]->p_picture
-    */
-
-    vlc_mutex_lock( &p_picture_vout->lock );
-    if( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture )
-    {
-      if( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture->p_data_orig )
-      {
-        free( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos]
-                        .p_picture->p_data_orig );
-      }
-      free( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture );
-    }
-
-    p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture
-             = (picture_t*)malloc( sizeof( picture_t )) ;
+    p_new_pic = (picture_t*)malloc( sizeof(picture_t) );
     vout_AllocatePicture( p_vout,
-         p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture,
+         p_new_pic,
          p_pic->format.i_chroma,
          p_pic->format.i_width,
          p_pic->format.i_height,
          VOUT_ASPECT_FACTOR * p_pic->format.i_height / p_pic->format.i_width );
 
-    p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture->i_status = DESTROYED_PICTURE;
-    p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture->i_type   = DIRECT_PICTURE;
+    p_new_pic->i_status = DESTROYED_PICTURE;
+    p_new_pic->i_type   = DIRECT_PICTURE;
 
-    vout_CopyPicture( p_vout,
-        p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture,
-        p_pic);
+    vout_CopyPicture( p_vout, p_new_pic, p_pic );
+
+    vlc_mutex_lock( &p_picture_vout->lock );
+    if( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture )
+    {
+        if( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture->p_data_orig )
+        {
+            free( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos]
+                            .p_picture->p_data_orig );
+        }
+        free( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture );
+    }
+    p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture = p_new_pic;
 
     vlc_mutex_unlock( &p_picture_vout->lock );
 }
