@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.158 2002/02/15 13:32:54 sam Exp $
+ * $Id: video_output.c,v 1.159 2002/02/18 19:02:41 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -708,14 +708,14 @@ static int ReduceHeight( int i_ratio )
         i_pgcd  <<= 1;
     }
 
-    while( !(i_ratio % 3) && !(i_ratio % 3) )
+    while( !(i_ratio % 3) && !(i_dummy % 3) )
     {
         i_ratio /= 3;
         i_dummy /= 3;
         i_pgcd  *= 3;
     }
 
-    while( !(i_ratio % 5) && !(i_ratio % 5) )
+    while( !(i_ratio % 5) && !(i_dummy % 5) )
     {
         i_ratio /= 5;
         i_dummy /= 5;
