@@ -55,7 +55,6 @@
 static int  DirectXCreateWindow( vout_thread_t *p_vout );
 static void DirectXCloseWindow ( vout_thread_t *p_vout );
 static long FAR PASCAL DirectXEventProc( HWND, UINT, WPARAM, LPARAM );
-static long FAR PASCAL DirectXVideoEventProc( HWND, UINT, WPARAM, LPARAM );
 
 static int Control( vout_thread_t *p_vout, int i_query, va_list args );
 
@@ -298,6 +297,10 @@ void DirectXEventThread( event_thread_t *p_event )
 
             if( !val.psz_string || !*val.psz_string ) /* Default video title */
             {
+#ifdef MODULE_NAME_IS_glwin32
+                SetWindowText( p_event->p_vout->p_sys->hwnd,
+                    VOUT_TITLE " (OpenGL output)" );
+#else
                 if( p_event->p_vout->p_sys->b_using_overlay )
                     SetWindowText( p_event->p_vout->p_sys->hwnd,
                         VOUT_TITLE " (hardware YUV overlay DirectX output)" );
@@ -306,6 +309,7 @@ void DirectXEventThread( event_thread_t *p_event )
                         VOUT_TITLE " (hardware YUV DirectX output)" );
                 else SetWindowText( p_event->p_vout->p_sys->hwnd,
                         VOUT_TITLE " (software RGB DirectX output)" );
+#endif
             }
             else
             {
@@ -383,7 +387,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
     /* Fill in the window class structure */
     wc.cbSize        = sizeof(WNDCLASSEX);
-    wc.style         = CS_DBLCLKS;                   /* style: dbl click */
+    wc.style         = CS_OWNDC|CS_DBLCLKS;          /* style: dbl click */
     wc.lpfnWndProc   = (WNDPROC)DirectXEventProc;       /* event handler */
     wc.cbClsExtra    = 0;                         /* no extra class data */
     wc.cbWndExtra    = 0;                        /* no extra window data */
@@ -460,7 +464,6 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
             /* Hmmm, apparently this is a blocking call... */
             SetWindowLong( p_vout->p_sys->hparent, GWL_STYLE,
                            i_style | WS_CLIPCHILDREN );
-
     }
 
     /* Now display the window */
@@ -689,6 +692,9 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         return DefWindowProc(hwnd, message, wParam, lParam);
     }
 
+    if( hwnd == p_vout->p_sys->hvideownd )
+        return DefWindowProc(hwnd, message, wParam, lParam);
+
     switch( message )
     {
 
@@ -746,28 +752,18 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     case WM_VLC_CREATE_VIDEO_WIN:
         /* Create video sub-window */
         p_vout->p_sys->hvideownd =
-            CreateWindow( "STATIC", "",   /* window class and title bar text */
+            CreateWindow( "VLC DirectX", "",  /* window class/title bar text */
                     WS_CHILD | WS_VISIBLE,                   /* window style */
                     CW_USEDEFAULT, CW_USEDEFAULT,     /* default coordinates */
                     CW_USEDEFAULT, CW_USEDEFAULT,
                     hwnd,                                   /* parent window */
-                    NULL, GetModuleHandle(NULL), NULL );
+                    NULL, GetModuleHandle(NULL),
+                    (LPVOID)p_vout );            /* send p_vout to WM_CREATE */
 
         if( !p_vout->p_sys->hvideownd )
-        {
             msg_Warn( p_vout, "Can't create video sub-window" );
-        }
         else
-        {
             msg_Dbg( p_vout, "Created video sub-window" );
-            SetWindowLongPtr( p_vout->p_sys->hvideownd,
-                              GWLP_WNDPROC, (LONG_PTR)DirectXVideoEventProc );
-            /* Store the previous window proc of _this_ window with the video
-             * window so we can use it in DirectXVideoEventProc to pass
-             * messages to the creator of _this_ window */
-            SetWindowLongPtr( p_vout->p_sys->hvideownd, GWLP_USERDATA,
-                              (LONG_PTR)p_vout->p_sys->pf_wndproc );
-        }
         break;
 
     case WM_PAINT:
@@ -784,60 +780,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     }
 
     /* Let windows handle the message */
-    return DefWindowProc(hwnd, message, wParam, lParam);
-}
-
-static long FAR PASCAL DirectXVideoEventProc( HWND hwnd, UINT message,
-                                              WPARAM wParam, LPARAM lParam )
-{
-    WNDPROC pf_parentwndproc;
-    POINT pt;
-
-    switch( message )
-    {
-    case WM_MOUSEMOVE:
-    case WM_LBUTTONDOWN:
-    case WM_LBUTTONUP:
-    case WM_LBUTTONDBLCLK:
-    case WM_MBUTTONDOWN:
-    case WM_MBUTTONUP:
-    case WM_RBUTTONDOWN:
-    case WM_RBUTTONUP:
-        /* Translate mouse cursor position to parent window coordinates. */
-        pt.x = LOWORD( lParam );
-        pt.y = HIWORD( lParam );
-        MapWindowPoints( hwnd, GetParent( hwnd ), &pt, 1 );
-        lParam = MAKELPARAM( pt.x, pt.y );
-        /* Fall through. */
-    case WM_KEYDOWN:
-    case WM_KEYUP:
-    case WM_SYSKEYDOWN:
-    case WM_SYSKEYUP:
-        /* Foward these to the original window proc of the parent so the
-         * creator of the window gets a chance to process them. If we created
-         * the parent window ourself DirectXEventThread will process these
-         * and they will never make it here.
-         * Note that we fake the hwnd to be our parent in order to prevent
-         * confusion in the creator's window proc. */
-        pf_parentwndproc = (WNDPROC)GetWindowLongPtr( hwnd, GWLP_USERDATA );
-
-        if( pf_parentwndproc )
-        {
-            LRESULT i_ret;
-            LONG_PTR p_backup;
-
-            pf_parentwndproc = (WNDPROC)GetWindowLongPtr( hwnd, GWLP_USERDATA);
-
-            p_backup = SetWindowLongPtr( GetParent( hwnd ), GWLP_USERDATA, 0 );
-            i_ret = CallWindowProc( pf_parentwndproc, GetParent( hwnd ),
-                                    message, wParam, lParam );
-            SetWindowLongPtr( GetParent( hwnd ), GWLP_USERDATA, p_backup );
-
-            return i_ret;
-        }
-        break;
-    }
-
     return DefWindowProc(hwnd, message, wParam, lParam);
 }
 

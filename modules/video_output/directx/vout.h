@@ -104,6 +104,11 @@ struct vout_sys_t
     COLORREF        color_bkg;
     COLORREF        color_bkgtxt;
 
+#ifdef MODULE_NAME_IS_glwin32
+    HDC hGLDC;
+    HGLRC hGLRC;
+#endif
+
     event_thread_t *p_event;
     vlc_mutex_t    lock;
 };
