@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: configuration.c,v 1.73 2004/01/09 19:45:46 jlj Exp $
+ * $Id: configuration.c,v 1.74 2004/01/12 23:41:59 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -501,6 +501,9 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
     for( i = 0; i < i_lines ; i++ )
     {
         p_module->p_config[i] = p_orig[i];
+
+        p_module->p_config[i].i_value_orig = p_orig[i].i_value;
+        p_module->p_config[i].f_value_orig = p_orig[i].f_value;
 
         p_module->p_config[i].psz_type = p_orig[i].psz_type ?
                                    strdup( p_orig[i].psz_type ) : NULL;
