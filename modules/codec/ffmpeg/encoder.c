@@ -43,6 +43,9 @@
 #if LIBAVCODEC_BUILD < 4704
 #   define AV_NOPTS_VALUE 0
 #endif
+#if LIBAVCODEC_BUILD < 4684
+#    define FF_QP2LAMBDA 118
+#endif
 
 #include "ffmpeg.h"
 
