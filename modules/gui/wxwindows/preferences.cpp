@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.19 2003/06/09 12:33:17 asmax Exp $
+ * $Id: preferences.cpp,v 1.20 2003/06/16 21:55:58 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -401,8 +401,13 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         if( !strcmp( p_module->psz_object_name, "main" ) )
             continue;
 
-        /* Exclude empty plugins */
-        p_item = p_module->p_config;
+        /* Exclude empty plugins (submodules don't have config options, they
+         * are stored in the parent module) */
+        if( p_module->b_submodule )
+            p_item = ((module_t *)p_module->p_parent)->p_config;
+        else
+            p_item = p_module->p_config;
+
         if( !p_item ) continue;
         do
         {
@@ -655,8 +660,13 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         return;
     }
 
-    /* Enumerate config options and add corresponding config boxes */
-    p_item = p_module->p_config;
+    /* Enumerate config options and add corresponding config boxes
+     * (submodules don't have config options, they are stored in the
+     *  parent module) */
+    if( p_module->b_submodule )
+        p_item = ((module_t *)p_module->p_parent)->p_config;
+    else
+        p_item = p_module->p_config;
 
     /* Find the category if it has been specified */
     if( psz_section && p_item->i_type == CONFIG_HINT_CATEGORY )
