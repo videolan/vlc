@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.33 2003/08/09 14:59:24 gbazin Exp $
+ * $Id: stream_output.c,v 1.34 2003/09/07 22:43:17 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -73,6 +73,42 @@ sout_instance_t * __sout_NewInstance ( vlc_object_t *p_parent,
                                        char * psz_dest )
 {
     sout_instance_t *p_sout;
+    vlc_value_t keep;
+
+    if( var_Get( p_parent, "sout-keep", &keep ) < 0 )
+    {
+        msg_Warn( p_parent, "cannot get sout-keep value" );
+        keep.b_bool = VLC_FALSE;
+    }
+    else if( keep.b_bool )
+    {
+        msg_Warn( p_parent, "sout-keep true" );
+        if( ( p_sout = vlc_object_find( p_parent, VLC_OBJECT_SOUT, FIND_ANYWHERE ) ) )
+        {
+            if( !strcmp( p_sout->psz_sout, psz_dest ) )
+            {
+                msg_Warn( p_parent, "sout keep : reusing sout" );
+                msg_Warn( p_parent, "sout keep : you probably want to use gather stream_out" );
+                vlc_object_detach( p_sout );
+                vlc_object_attach( p_sout, p_parent );
+                vlc_object_release( p_sout );
+                return p_sout;
+            }
+            else
+            {
+                msg_Warn( p_parent, "sout keep : destroying unusable sout" );
+                sout_DeleteInstance( p_sout );
+            }
+        }
+    }
+    else if( !keep.b_bool )
+    {
+        while( ( p_sout = vlc_object_find( p_parent, VLC_OBJECT_SOUT, FIND_PARENT ) ) )
+        {
+            msg_Warn( p_parent, "sout keep : destroying old sout" );
+            sout_DeleteInstance( p_sout );
+        }
+    }
 
     /* *** Allocate descriptor *** */
     p_sout = vlc_object_create( p_parent, VLC_OBJECT_SOUT );
@@ -144,25 +180,12 @@ sout_packetizer_input_t *__sout_InputNew( vlc_object_t  *p_this,
     sout_instance_t         *p_sout = NULL;
     sout_packetizer_input_t *p_input;
 
-    int             i_try;
-
     /* search an stream output */
-    for( i_try = 0; i_try < 12; i_try++ )
+    if( !( p_sout = vlc_object_find( p_this, VLC_OBJECT_SOUT, FIND_ANYWHERE ) ) )
     {
-        p_sout = vlc_object_find( p_this, VLC_OBJECT_SOUT, FIND_ANYWHERE );
-        if( p_sout )
-        {
-            break;
-        }
-
-        msleep( 100*1000 );
-        msg_Dbg( p_this, "waiting for sout" );
-    }
-
-    if( !p_sout )
-    {
+        /* can't happen ... */
         msg_Err( p_this, "cannot find any stream ouput" );
-        return( NULL );
+        return NULL;
     }
 
     msg_Dbg( p_sout, "adding a new input" );
@@ -1200,60 +1223,22 @@ static char *_sout_stream_url_to_chain( vlc_object_t *p_this, char *psz_url )
 {
     mrl_t       mrl;
     char        *psz_chain, *p;
-    char        *psz_vcodec, *psz_acodec;
 
     mrl_Parse( &mrl, psz_url );
-    p = psz_chain = malloc( 500 + strlen( mrl.psz_way ) + strlen( mrl.psz_access ) + strlen( mrl.psz_name ) );
-
-    psz_vcodec = config_GetPsz( p_this, "sout-vcodec" );
-    if( psz_vcodec && *psz_vcodec == '\0')
-    {
-        FREE( psz_vcodec );
-    }
-    psz_acodec = config_GetPsz( p_this, "sout-acodec" );
-    if( psz_acodec && *psz_acodec == '\0' )
-    {
-        FREE( psz_acodec );
-    }
-    /* set transcoding */
-    if( psz_vcodec || psz_acodec )
-    {
-        p += sprintf( p, "transcode{" );
-        if( psz_vcodec )
-        {
-            int br;
-
-            p += sprintf( p, "vcodec=%s,", psz_vcodec );
-
-            if( ( br = config_GetInt( p_this, "sout-vbitrate" ) ) > 0 )
-            {
-                p += sprintf( p, "vb=%d,", br * 1000 );
-            }
-            free( psz_vcodec );
-        }
-        if( psz_acodec )
-        {
-            int br;
-
-            p += sprintf( p, "acodec=%s,", psz_acodec );
-            if( ( br = config_GetInt( p_this, "sout-abitrate" ) ) > 0 )
-            {
-                p += sprintf( p, "ab=%d,", br * 1000 );
-            }
-
-            free( psz_acodec );
-        }
-        p += sprintf( p, "}:" );
-    }
+    p = psz_chain = malloc( 500 + strlen( mrl.psz_way ) +
+                                  strlen( mrl.psz_access ) +
+                                  strlen( mrl.psz_name ) );
 
 
     if( config_GetInt( p_this, "sout-display" ) )
     {
-        p += sprintf( p, "duplicate{dst=display,dst=std{mux=\"%s\",access=\"%s\",url=\"%s\"}}", mrl.psz_way, mrl.psz_access, mrl.psz_name );
+        p += sprintf( p, "duplicate{dst=display,dst=std{mux=\"%s\",access=\"%s\",url=\"%s\"}}",
+                      mrl.psz_way, mrl.psz_access, mrl.psz_name );
     }
     else
     {
-        p += sprintf( p, "std{mux=\"%s\",access=\"%s\",url=\"%s\"}", mrl.psz_way, mrl.psz_access, mrl.psz_name );
+        p += sprintf( p, "std{mux=\"%s\",access=\"%s\",url=\"%s\"}",
+                      mrl.psz_way, mrl.psz_access, mrl.psz_name );
     }
 
     mrl_Clean( &mrl );

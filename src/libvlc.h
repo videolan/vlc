@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.83 2003/08/28 21:11:54 gbazin Exp $
+ * $Id: libvlc.h,v 1.84 2003/09/07 22:43:17 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -25,11 +25,6 @@
 
 #define Nothing here, this is just to prevent update-po from being stupid
 #include "vlc_keys.h"
-
-static char *ppsz_sout_acodec[] = { "", "mpga", "mp3", "vorb", "a52", NULL };
-static char *ppsz_sout_vcodec[] = { "", "mpgv", "mp4v", "DIV1", "DIV2", 
-                                 "DIV3", "h263", "i263", "WMV1", "WMV2",
-                                 "MJPG", NULL };
 
 static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
                                 "nl", "no", "pl", "pt_BR", "ru", "sv", NULL };
@@ -324,26 +319,16 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
     "This allows you to choose if the video stream should be redirected to " \
     "the stream output facility when this last one is enabled.")
 
-#define SOUT_VCODEC_TEXT N_("Video encoding codec" )
-#define SOUT_VCODEC_LONGTEXT N_( \
-    "This allows you to force video encoding")
-
-#define SOUT_VBITRATE_TEXT N_("Video bitrate encoding (kB/s)" )
-#define SOUT_VBITRATE_LONGTEXT N_( \
-    "This allows you to specify video bitrate in kB/s.")
-
 #define SOUT_AUDIO_TEXT N_("Enable audio stream output")
 #define SOUT_AUDIO_LONGTEXT N_( \
     "This allows you to choose if the video stream should be redirected to " \
     "the stream output facility when this last one is enabled.")
 
-#define SOUT_ACODEC_TEXT N_("Audio encoding codec" )
-#define SOUT_ACODEC_LONGTEXT N_( \
-    "This allows you to force audio encoding")
-
-#define SOUT_ABITRATE_TEXT N_("Audio bitrate encoding (kB/s)" )
-#define SOUT_ABITRATE_LONGTEXT N_( \
-    "This allows you to specify audio bitrate in kB/s.")
+#define SOUT_KEEP_TEXT N_("Keep sout open" )
+#define SOUT_KEEP_LONGTEXT N_( \
+    "This allows you to keep an unique sout instance across " \
+    "multiple playlist item (automatically insert gather stream_out " \
+    "if not specified)" )
 
 #define PACKETIZER_TEXT N_("Choose preferred packetizer list")
 #define PACKETIZER_LONGTEXT N_( \
@@ -588,24 +573,15 @@ vlc_module_begin();
     add_category_hint( N_("Decoders"), NULL, VLC_TRUE );
     add_module( "codec", "decoder", NULL, NULL, CODEC_TEXT, CODEC_LONGTEXT, VLC_TRUE );
 
-#if 0 // Encoders have been disabled for now as we are using the stream output transcoder instead
-    add_category_hint( N_("Encoders"), NULL, VLC_TRUE );
-    add_module( "video-encoder", "video encoder", NULL, NULL, ENCODER_VIDEO_TEXT, ENCODER_VIDEO_LONGTEXT, VLC_TRUE );
-    add_module( "audio-encoder", "audio encoder", NULL, NULL, ENCODER_AUDIO_TEXT, ENCODER_AUDIO_LONGTEXT, VLC_TRUE );
-#endif
 
     /* Stream output options */
     add_category_hint( N_("Stream output"), NULL, VLC_TRUE );
     add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT, VLC_TRUE );
     add_bool( "sout-display", VLC_FALSE, NULL, SOUT_DISPLAY_TEXT, SOUT_DISPLAY_LONGTEXT, VLC_TRUE );
+    add_bool( "sout-keep", VLC_FALSE, NULL, SOUT_KEEP_TEXT, SOUT_KEEP_LONGTEXT, VLC_TRUE );
 
     add_bool( "sout-audio", 1, NULL, SOUT_AUDIO_TEXT, SOUT_AUDIO_LONGTEXT, VLC_TRUE );
-    add_string_from_list( "sout-acodec", "", ppsz_sout_acodec, NULL, SOUT_ACODEC_TEXT, SOUT_ACODEC_LONGTEXT, VLC_TRUE );
-    add_bool( "sout-abitrate", 0, NULL, SOUT_ABITRATE_TEXT, SOUT_ABITRATE_LONGTEXT, VLC_TRUE );
-
     add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT, SOUT_VIDEO_LONGTEXT, VLC_TRUE );
-    add_string_from_list( "sout-vcodec", "", ppsz_sout_vcodec, NULL, SOUT_VCODEC_TEXT, SOUT_VCODEC_LONGTEXT, VLC_TRUE );
-    add_bool( "sout-vbitrate", 0, NULL, SOUT_VBITRATE_TEXT, SOUT_VBITRATE_LONGTEXT, VLC_TRUE );
 
     add_module( "packetizer", "packetizer", NULL, NULL,
                 PACKETIZER_TEXT, PACKETIZER_LONGTEXT, VLC_TRUE );
@@ -613,6 +589,7 @@ vlc_module_begin();
     add_module( "access_output", "sout access", NULL, NULL,
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
     add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
+
 
     /* CPU options */
     add_category_hint( N_("CPU"), NULL, VLC_TRUE );

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.232 2003/08/28 21:11:54 gbazin Exp $
+ * $Id: video_output.c,v 1.233 2003/09/07 22:43:17 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -78,21 +78,21 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
         /* Reattach video output to input before bailing out */
         if( p_vout )
         {
-            vlc_object_t *p_input;
+            vlc_object_t *p_playlist;
 
-            p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
+            p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
-            if( p_input )
+            if( p_playlist )
             {
                 vlc_object_detach( p_vout );
-                vlc_object_attach( p_vout, p_input );
+                vlc_object_attach( p_vout, p_playlist );
 
-                vlc_object_release( p_input );
+                vlc_object_release( p_playlist );
             }
             else
             {
+                msg_Dbg( p_this, "cannot find playlist destroying vout" );
                 vlc_object_detach( p_vout );
-                /* vlc_object_release( p_vout ); */
                 vout_Destroy( p_vout );
             }
         }
@@ -110,20 +110,21 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
 
         if( !p_vout )
         {
-            vlc_object_t *p_input;
+            vlc_object_t *p_playlist;
 
-            p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
-            if( p_input )
+            p_playlist = vlc_object_find( p_this,
+                                          VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+            if( p_playlist )
             {
-                p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT,
-                                          FIND_CHILD );
+                p_vout = vlc_object_find( p_playlist,
+                                          VLC_OBJECT_VOUT, FIND_CHILD );
                 /* only first children of p_input for unused vout */
-                if( p_vout && p_vout->p_parent != p_input )
+                if( p_vout && p_vout->p_parent != p_playlist )
                 {
                     vlc_object_release( p_vout );
                     p_vout = NULL;
                 }
-                vlc_object_release( p_input );
+                vlc_object_release( p_playlist );
             }
         }
     }
@@ -970,9 +971,12 @@ static void RunThread( vout_thread_t *p_vout)
             }
 
             /* Need to reinitialise the chroma plugin */
-            if( p_vout->chroma.p_module->pf_deactivate )
-                p_vout->chroma.p_module->pf_deactivate( VLC_OBJECT(p_vout) );
-            p_vout->chroma.p_module->pf_activate( VLC_OBJECT(p_vout) );
+            if( p_vout->chroma.p_module )
+            {
+                if( p_vout->chroma.p_module->pf_deactivate )
+                    p_vout->chroma.p_module->pf_deactivate( VLC_OBJECT(p_vout) );
+                p_vout->chroma.p_module->pf_activate( VLC_OBJECT(p_vout) );
+            }
         }
     }
 
