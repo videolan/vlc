@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: faad.c,v 1.3 2003/11/05 01:47:40 fenrir Exp $
+ * $Id: faad.c,v 1.4 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -34,60 +34,33 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open( vlc_object_t * );
+static void CloseDecoder( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("AAC audio decoder (using libfaad2)") );
     set_capability( "decoder", 60 );
-    set_callbacks( Open, NULL );
+    set_callbacks( Open, CloseDecoder );
 vlc_module_end();
 
 
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static int  InitDecoder   ( decoder_t * );
-static int  RunDecoder    ( decoder_t *, block_t * );
-static int  EndDecoder    ( decoder_t * );
+static aout_buffer_t *DecodeBlock( decoder_t *, block_t ** );
 
 struct decoder_sys_t
 {
     /* faad handler */
     faacDecHandle *hfaad;
 
-    /* audio output */
-    audio_sample_format_t output_format;
-    aout_instance_t *     p_aout;                                  /* opaque */
-    aout_input_t *        p_aout_input;                            /* opaque */
-
     /* samples */
-    audio_date_t          date;
+    audio_date_t date;
 
     /* temporary buffer */
-    uint8_t               *p_buffer;
-    int                   i_buffer;
-    int                   i_buffer_size;
+    uint8_t *p_buffer;
+    int     i_buffer;
+    int     i_buffer_size;
 };
-
-/*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************/
-static int  Open( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t*)p_this;
-
-    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('m','p','4','a') )
-    {
-        return VLC_EGENERIC;
-    }
-
-    p_dec->pf_init = InitDecoder;
-    p_dec->pf_decode = RunDecoder;
-    p_dec->pf_end = EndDecoder;
-
-    p_dec->p_sys  = malloc( sizeof( decoder_sys_t ) );
-
-    return VLC_SUCCESS;
-}
 
 static unsigned int pi_channels_maps[7] =
 {
@@ -95,25 +68,35 @@ static unsigned int pi_channels_maps[7] =
     AOUT_CHAN_CENTER,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
     AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT |
+        AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT |
+        AOUT_CHAN_REARRIGHT,
      /* FIXME */
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_REARCENTER
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT |
+        AOUT_CHAN_REARRIGHT | AOUT_CHAN_REARCENTER
 };
 
 /*****************************************************************************
- * InitDecoder:
+ * OpenDecoder: probe the decoder and return score
  *****************************************************************************/
-static int  InitDecoder   ( decoder_t *p_dec )
+static int Open( vlc_object_t *p_this )
 {
+    decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    WAVEFORMATEX    wf, *p_wf;
     faacDecConfiguration *cfg;
 
-    if( ( p_wf = (WAVEFORMATEX*)p_dec->p_fifo->p_waveformatex ) == NULL )
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','4','a') )
     {
-        p_wf = &wf;
-        memset( p_wf, 0, sizeof( WAVEFORMATEX ) );
+        return VLC_EGENERIC;
+    }
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_dec->p_sys = p_sys =
+          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    {
+        msg_Err( p_dec, "out of memory" );
+        return VLC_EGENERIC;
     }
 
     /* Open a faad context */
@@ -123,37 +106,43 @@ static int  InitDecoder   ( decoder_t *p_dec )
         return VLC_EGENERIC;
     }
 
-    if( p_wf->cbSize > 0 )
+    /* Misc init */
+    aout_DateSet( &p_sys->date, 0 );
+    p_dec->fmt_out.i_cat = AUDIO_ES;
+    p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+    p_dec->pf_decode_audio = DecodeBlock;
+
+    if( p_dec->fmt_in.i_extra > 0 )
     {
         /* We have a decoder config so init the handle */
-        unsigned long   i_rate;
-        unsigned char   i_channels;
+        unsigned long i_rate;
+        unsigned char i_channels;
 
-        if( faacDecInit2( p_sys->hfaad,
-                          (uint8_t*)&p_wf[1], p_wf->cbSize,
+        if( faacDecInit2( p_sys->hfaad, p_dec->fmt_in.p_extra,
+                          p_dec->fmt_in.i_extra,
                           &i_rate, &i_channels ) < 0 )
         {
             return VLC_EGENERIC;
         }
 
-        p_sys->output_format.i_rate = i_rate;
-        p_sys->output_format.i_physical_channels =
-        p_sys->output_format.i_original_channels =
-            pi_channels_maps[i_channels];
+        p_dec->fmt_out.audio.i_rate = i_rate;
+        p_dec->fmt_out.audio.i_channels = i_channels;
+        p_dec->fmt_out.audio.i_physical_channels =
+            p_dec->fmt_out.audio.i_original_channels =
+                pi_channels_maps[i_channels];
+
+        aout_DateInit( &p_sys->date, i_rate );
     }
     else
     {
         /* Will be initalised from first frame */
-        p_sys->output_format.i_rate = 0;
-        p_sys->output_format.i_physical_channels =
-        p_sys->output_format.i_original_channels = 0;
+        p_dec->fmt_out.audio.i_rate = 0;
+        p_dec->fmt_out.audio.i_channels = 0;
+        p_dec->fmt_out.audio.i_physical_channels =
+            p_dec->fmt_out.audio.i_original_channels = 0;
     }
-    p_sys->output_format.i_format = VLC_FOURCC('f','l','3','2');
 
-    p_sys->p_aout = NULL;
-    p_sys->p_aout_input = NULL;
-
-    /* set the faad config */
+    /* Set the faad config */
     cfg = faacDecGetCurrentConfiguration( p_sys->hfaad );
     cfg->outputFormat = FAAD_FMT_FLOAT;
     faacDecSetConfiguration( p_sys->hfaad, cfg );
@@ -167,28 +156,36 @@ static int  InitDecoder   ( decoder_t *p_dec )
 }
 
 /*****************************************************************************
- * InitDecoder:
+ * DecodeBlock:
  *****************************************************************************/
-static int  RunDecoder    ( decoder_t *p_dec, block_t *p_block )
+static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block;
 
-    int          i_used = 0;
-    mtime_t      i_pts = p_block->i_pts;
+    if( !pp_block || !*pp_block ) return NULL;
+
+    p_block = *pp_block;
 
     /* Append the block to the temporary buffer */
     if( p_sys->i_buffer_size < p_sys->i_buffer + p_block->i_buffer )
     {
-        p_sys->i_buffer_size += p_block->i_buffer;
+        p_sys->i_buffer_size = p_sys->i_buffer + p_block->i_buffer;
         p_sys->p_buffer = realloc( p_sys->p_buffer, p_sys->i_buffer_size );
     }
-    memcpy( &p_sys->p_buffer[p_sys->i_buffer], p_block->p_buffer, p_block->i_buffer );
-    p_sys->i_buffer += p_block->i_buffer;
 
-    if( p_sys->output_format.i_rate == 0 )
+    if( p_block->i_buffer )
     {
-        unsigned long   i_rate;
-        unsigned char   i_channels;
+        memcpy( &p_sys->p_buffer[p_sys->i_buffer],
+                p_block->p_buffer, p_block->i_buffer );
+        p_sys->i_buffer += p_block->i_buffer;
+        p_block->i_buffer = 0;
+    }
+
+    if( p_dec->fmt_out.audio.i_rate == 0 && p_sys->i_buffer )
+    {
+        unsigned long i_rate;
+        unsigned char i_channels;
 
         /* Init faad with the first frame */
         if( faacDecInit( p_sys->hfaad,
@@ -196,137 +193,121 @@ static int  RunDecoder    ( decoder_t *p_dec, block_t *p_block )
                          &i_rate, &i_channels ) < 0 )
         {
             block_Release( p_block );
-            return VLC_EGENERIC;
+            return NULL;
         }
-        p_sys->output_format.i_rate = i_rate;
-        p_sys->output_format.i_physical_channels =
-        p_sys->output_format.i_original_channels =
-            pi_channels_maps[i_channels];
+
+        p_dec->fmt_out.audio.i_rate = i_rate;
+        p_dec->fmt_out.audio.i_channels = i_channels;
+        p_dec->fmt_out.audio.i_physical_channels =
+            p_dec->fmt_out.audio.i_original_channels =
+                pi_channels_maps[i_channels];
+
+        aout_DateInit( &p_sys->date, i_rate );
+    }
+
+    if( p_block->i_pts != 0 && p_block->i_pts != aout_DateGet( &p_sys->date ) )
+    {
+        aout_DateSet( &p_sys->date, p_block->i_pts );
+    }
+    else if( !aout_DateGet( &p_sys->date ) )
+    {
+        /* We've just started the stream, wait for the first PTS. */
+        block_Release( p_block );
+        p_sys->i_buffer = 0;
+        return NULL;
     }
 
     /* Decode all data */
-    while( i_used < p_sys->i_buffer )
+    if( p_sys->i_buffer )
     {
         void *samples;
         faacDecFrameInfo frame;
-        aout_buffer_t   *out;
+        aout_buffer_t *p_out;
 
         samples = faacDecDecode( p_sys->hfaad, &frame,
-                                 &p_sys->p_buffer[i_used], p_sys->i_buffer - i_used );
+                                 p_sys->p_buffer, p_sys->i_buffer );
 
         if( frame.error > 0 )
         {
             msg_Warn( p_dec, "%s", faacDecGetErrorMessage( frame.error ) );
-            /* flush the buffer */
+
+            /* Flush the buffer */
             p_sys->i_buffer = 0;
             block_Release( p_block );
-            return VLC_SUCCESS;
+            return NULL;
         }
+
         if( frame.channels <= 0 || frame.channels > 6 )
         {
             msg_Warn( p_dec, "invalid channels count" );
-            /* flush the buffer */
+
+            /* Flush the buffer */
             p_sys->i_buffer = 0;
             block_Release( p_block );
-            return VLC_SUCCESS;
+            return NULL;
         }
+
         if( frame.samples <= 0 )
         {
             msg_Warn( p_dec, "decoded zero samples" );
-            /* flush the buffer */
+
+            /* Flush the buffer */
             p_sys->i_buffer = 0;
             block_Release( p_block );
-            return VLC_SUCCESS;
+            return NULL;
         }
 
-        /* we have decoded a valid frame */
-        /* msg_Dbg( p_dec, "consumed %d for %dHz %dc %lld", frame.bytesconsumed, frame.samplerate, frame.channels, i_pts ); */
-        i_used += frame.bytesconsumed;
-
-
-        /* create/recreate the output */
-        if( p_sys->p_aout_input &&
-            ( p_sys->output_format.i_original_channels != pi_channels_maps[frame.channels] ||
-              p_sys->output_format.i_rate != frame.samplerate ) )
+        /* We decoded a valid frame */
+        if( p_dec->fmt_out.audio.i_rate != frame.samplerate )
         {
-            aout_DecDelete( p_sys->p_aout, p_sys->p_aout_input );
-            p_sys->p_aout_input = NULL;
+            aout_DateInit( &p_sys->date, frame.samplerate );
+            aout_DateSet( &p_sys->date, p_block->i_pts );
         }
+        p_block->i_pts = 0;  /* PTS is valid only once */
 
-        if( p_sys->p_aout_input == NULL )
+        p_dec->fmt_out.audio.i_rate = frame.samplerate;
+        p_dec->fmt_out.audio.i_channels = frame.channels;
+        p_dec->fmt_out.audio.i_physical_channels =
+            p_dec->fmt_out.audio.i_original_channels =
+                pi_channels_maps[frame.channels];
+
+        p_out = p_dec->pf_aout_buffer_new( p_dec,
+                                           frame.samples / frame.channels );
+        if( p_out == NULL )
         {
-            p_sys->output_format.i_physical_channels =
-            p_sys->output_format.i_original_channels = pi_channels_maps[frame.channels];
-            p_sys->output_format.i_rate = frame.samplerate;
-
-            aout_DateInit( &p_sys->date, p_sys->output_format.i_rate );
-            aout_DateSet( &p_sys->date, 0 );
-
-            p_sys->p_aout_input = aout_DecNew( p_dec, &p_sys->p_aout, &p_sys->output_format );
-        }
-
-        if( p_sys->p_aout_input == NULL )
-        {
-            msg_Err( p_dec, "cannot create aout" );
-            block_Release( p_block );
-            return VLC_EGENERIC;
-        }
-
-        if( i_pts != 0 && i_pts != aout_DateGet( &p_sys->date ) )
-        {
-            aout_DateSet( &p_sys->date, i_pts );
-        }
-        else if( !aout_DateGet( &p_sys->date ) )
-        {
-            /* Wait for a dated packet */
-            msg_Dbg( p_dec, "no date" );
             p_sys->i_buffer = 0;
-            return VLC_SUCCESS;
-        }
-        i_pts = 0;  /* PTS is valid only once */
-
-        if( ( out = aout_DecNewBuffer( p_sys->p_aout, p_sys->p_aout_input,
-                                       frame.samples / frame.channels ) ) == NULL )
-        {
-            msg_Err( p_dec, "cannot get a new buffer" );
             block_Release( p_block );
-            return VLC_EGENERIC;
+            return NULL;
         }
-        out->start_date = aout_DateGet( &p_sys->date );
-        out->end_date   = aout_DateIncrement( &p_sys->date,
+
+        p_out->start_date = aout_DateGet( &p_sys->date );
+        p_out->end_date = aout_DateIncrement( &p_sys->date,
                                               frame.samples / frame.channels );
-        memcpy( out->p_buffer, samples, out->i_nb_bytes );
 
-        aout_DecPlay( p_sys->p_aout, p_sys->p_aout_input, out );
-    }
+        memcpy( p_out->p_buffer, samples, p_out->i_nb_bytes );
 
-    p_sys->i_buffer -= i_used;
-    if( p_sys->i_buffer > 0 )
-    {
-        memmove( &p_sys->p_buffer[0], &p_sys->p_buffer[i_used], p_sys->i_buffer );
+        p_sys->i_buffer -= frame.bytesconsumed;
+        if( p_sys->i_buffer > 0 )
+        {
+            memmove( p_sys->p_buffer, &p_sys->p_buffer[frame.bytesconsumed],
+                     p_sys->i_buffer );
+        }
+
+        return p_out;
     }
 
     block_Release( p_block );
-    return VLC_SUCCESS;
+    return NULL;
 }
 
 /*****************************************************************************
- * InitDecoder:
+ * CloseDecoder:
  *****************************************************************************/
-static int  EndDecoder    ( decoder_t *p_dec )
+static void CloseDecoder( vlc_object_t *p_this )
 {
+    decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if( p_sys->p_aout_input )
-    {
-        aout_DecDelete( p_sys->p_aout, p_sys->p_aout_input );
-    }
 
     faacDecClose( p_sys->hfaad );
     free( p_sys );
-
-    return VLC_SUCCESS;
 }
-
-
-

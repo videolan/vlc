@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.17 2003/02/11 11:16:04 massiot Exp $
+ * $Id: common.c,v 1.18 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -65,8 +65,6 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     var_Create( p_aout, "intf-change", VLC_VAR_BOOL );
     val.b_bool = VLC_TRUE;
     var_Set( p_aout, "intf-change", val );
-
-    vlc_object_attach( p_aout, p_parent->p_vlc );
 
     return p_aout;
 }

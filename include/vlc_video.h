@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_video.h,v 1.5 2003/10/24 21:27:06 gbazin Exp $
+ * $Id: vlc_video.h,v 1.6 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -28,7 +28,7 @@
 /**
  * Description of a video frame
  */
-struct video_frame_format_t
+struct video_format_t
 {
     vlc_fourcc_t i_chroma;                               /**< picture chroma */
     unsigned int i_aspect;                                 /**< aspect ratio */
@@ -42,6 +42,8 @@ struct video_frame_format_t
 
     unsigned int i_bits_per_pixel;             /**< number of bits per pixel */
 
+    unsigned int i_frame_rate;                     /**< frame rate numerator */
+    unsigned int i_frame_rate_base;              /**< frame rate denominator */
 };
 
 /**

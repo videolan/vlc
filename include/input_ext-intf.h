@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.97 2003/11/06 16:36:41 nitrox Exp $
+ * $Id: input_ext-intf.h,v 1.98 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -25,6 +25,8 @@
 
 #ifndef _VLC_INPUT_EXT_INTF_H
 #define _VLC_INPUT_EXT_INTF_H 1
+
+#include "ninput.h"
 
 /*
  * Communication input -> interface
@@ -65,6 +67,7 @@ struct es_descriptor_t
     unsigned int            i_pes_real_size;   /* as indicated by the header */
 
     /* Decoder information */
+    es_format_t             fmt;
     decoder_fifo_t *        p_decoder_fifo;
     void *                  p_waveformatex;
     void *                  p_bitmapinfoheader;

@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: wav.c,v 1.8 2003/11/11 02:49:26 fenrir Exp $
+ * $Id: wav.c,v 1.9 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -135,7 +135,7 @@ static int Open( vlc_object_t * p_this )
     es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
     wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_sys->fmt.i_codec, &psz_name );
     p_sys->fmt.audio.i_channels = GetWLE ( &p_wf->nChannels );
-    p_sys->fmt.audio.i_samplerate = GetDWLE( &p_wf->nSamplesPerSec );
+    p_sys->fmt.audio.i_rate = GetDWLE( &p_wf->nSamplesPerSec );
     p_sys->fmt.audio.i_blockalign = GetWLE ( &p_wf->nBlockAlign );
     p_sys->fmt.audio.i_bitrate    = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
     p_sys->fmt.audio.i_bitspersample = GetWLE ( &p_wf->wBitsPerSample );;
@@ -150,7 +150,7 @@ static int Open( vlc_object_t * p_this )
     msg_Dbg( p_input, "format:0x%4.4x channels:%d %dHz %dKo/s blockalign:%d bits/samples:%d extra size:%d",
             GetWLE( &p_wf->wFormatTag ),
             p_sys->fmt.audio.i_channels,
-            p_sys->fmt.audio.i_samplerate,
+            p_sys->fmt.audio.i_rate,
             p_sys->fmt.audio.i_bitrate / 8 / 1024,
             p_sys->fmt.audio.i_blockalign,
             p_sys->fmt.audio.i_bitspersample,
@@ -338,12 +338,12 @@ static void FrameInfo_PCM( input_thread_t *p_input,
     int i_modulo;
 
     /* read samples for 50ms of */
-    i_samples = __MAX( p_sys->fmt.audio.i_samplerate / 20, 1 );
+    i_samples = __MAX( p_sys->fmt.audio.i_rate / 20, 1 );
 
 
     *pi_length = (mtime_t)1000000 *
                  (mtime_t)i_samples /
-                 (mtime_t)p_sys->fmt.audio.i_samplerate;
+                 (mtime_t)p_sys->fmt.audio.i_rate;
 
     i_bytes = i_samples * p_sys->fmt.audio.i_channels * ( (p_sys->fmt.audio.i_bitspersample + 7) / 8 );
 
@@ -370,7 +370,7 @@ static void FrameInfo_MS_ADPCM( input_thread_t *p_input,
 
     *pi_length = (mtime_t)1000000 *
                  (mtime_t)i_samples /
-                 (mtime_t)p_sys->fmt.audio.i_samplerate;
+                 (mtime_t)p_sys->fmt.audio.i_rate;
 
     *pi_size = p_sys->fmt.audio.i_blockalign;
 }
@@ -388,7 +388,7 @@ static void FrameInfo_IMA_ADPCM( input_thread_t *p_input,
 
     *pi_length = (mtime_t)1000000 *
                  (mtime_t)i_samples /
-                 (mtime_t)p_sys->fmt.audio.i_samplerate;
+                 (mtime_t)p_sys->fmt.audio.i_rate;
 
     *pi_size = p_sys->fmt.audio.i_blockalign;
 }

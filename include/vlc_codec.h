@@ -2,7 +2,7 @@
  * vlc_codec.h: codec related structures
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: vlc_codec.h,v 1.3 2003/11/05 18:59:01 gbazin Exp $
+ * $Id: vlc_codec.h,v 1.4 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -23,10 +23,14 @@
 #ifndef _VLC_CODEC_H
 #define _VLC_CODEC_H 1
 
+#include "ninput.h"
+
 /**
  * \file
  * This file defines the structure and types used by decoders and encoders
  */
+
+typedef struct decoder_owner_sys_t decoder_owner_sys_t;
 
 /**
  * \defgroup decoder Decoder
@@ -43,15 +47,39 @@ struct decoder_t
     /* Module properties */
     module_t *          p_module;
     decoder_sys_t *     p_sys;
-    int                 ( * pf_init )  ( decoder_t * );
+
+    /* Deprecated */
     int                 ( * pf_decode )( decoder_t *, block_t * );
-    int                 ( * pf_end )   ( decoder_t * );
-
-    /* Input properties */
-    decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
-
-    /* Tmp field for old decoder api */
+    decoder_fifo_t *    p_fifo;
     int                 ( * pf_run ) ( decoder_fifo_t * );
+    /* End deprecated */
+
+    picture_t *         ( * pf_decode_video )( decoder_t *, block_t ** );
+    aout_buffer_t *     ( * pf_decode_audio )( decoder_t *, block_t ** );
+    void                ( * pf_decode_sub)   ( decoder_t *, block_t ** );
+    block_t *           ( * pf_packetize )   ( decoder_t *, block_t ** );
+
+    /* Input format ie from demuxer (XXX: a lot of field could be invalid) */
+    es_format_t         fmt_in;
+
+    /* Output format of decoder/packetizer */
+    es_format_t         fmt_out;
+
+    /*
+     * Buffers allocation
+     */
+
+    /* Audio output callbacks */
+    aout_buffer_t * ( * pf_aout_buffer_new) ( decoder_t *, int );
+    void            ( * pf_aout_buffer_del) ( decoder_t *, aout_buffer_t * );
+
+    /* Video output callbacks */
+    picture_t     * ( * pf_vout_buffer_new) ( decoder_t * );
+    void            ( * pf_vout_buffer_del) ( decoder_t *, picture_t * );
+
+
+    /* Private structure for the owner of the decoder */
+    decoder_owner_sys_t *p_owner;
 };
 
 /**
@@ -79,22 +107,12 @@ struct encoder_t
     block_t *           ( * pf_encode_audio )( encoder_t *, aout_buffer_t * );
 
     /* Properties of the input data fed to the encoder */
-    union {
-        audio_sample_format_t audio;
-        video_frame_format_t  video;
-    } format;
+    es_format_t         fmt_in;
 
     /* Properties of the output of the encoder */
-    vlc_fourcc_t i_fourcc;
-    int          i_bitrate;
-
-    int          i_extra_data;
-    uint8_t      *p_extra_data;
+    es_format_t         fmt_out;
 
     /* FIXME: move these to the ffmpeg encoder */
-    int i_frame_rate;
-    int i_frame_rate_base;
-    int i_aspect;
     int i_key_int;
     int i_b_frames;
     int i_vtolerance;

@@ -2,7 +2,7 @@
  * tarkin.c: tarkin decoder module making use of libtarkin.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: tarkin.c,v 1.6 2003/10/25 00:49:13 sam Exp $
+ * $Id: tarkin.c,v 1.7 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -105,7 +105,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('t','a','r','k') )
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC('t','a','r','k') )
     {
         return VLC_EGENERIC;
     }

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.106 2003/11/15 00:26:15 hartman Exp $
+ * $Id: libvlc.h,v 1.107 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -345,24 +345,16 @@ static char *ppsz_language_text[] =
     "its codecs (decompression methods). Only advanced users should " \
     "alter this option as it can break playback of all your streams." )
 
-#define CODEC_TEXT N_("Choose preferred codec list")
+#define CODEC_TEXT N_("Choose preferred codecs list")
 #define CODEC_LONGTEXT N_( \
-    "This allows you to select the order in which VLC will choose its " \
-    "codecs. For instance, 'a52old,a52,any' will try the old a52 codec " \
-    "before the new one. Please be aware that VLC does not make any " \
-    "difference between audio or video codecs, so you should always specify " \
-    "'any' at the end of the list to make sure there is a fallback for the " \
-    "types you didn't specify.")
+    "This allows you to select a list of codecs that VLC will use in " \
+    "priority. For instance, 'dummy,a52' will try the dummy and a52 codecs " \
+    "before trying the other ones.")
 
-
-#define ENCODER_VIDEO_TEXT N_("Choose preferred video encoder list")
-#define ENCODER_VIDEO_LONGTEXT N_( \
-    "This allows you to select the order in which VLC will choose its " \
-    "codecs. " )
-#define ENCODER_AUDIO_TEXT N_("Choose preferred audio encoder list")
-#define ENCODER_AUDIO_LONGTEXT N_( \
-    "This allows you to select the order in which VLC will choose its " \
-    "codecs. " )
+#define ENCODER_TEXT N_("Choose preferred encoders list")
+#define ENCODER_LONGTEXT N_( \
+    "This allows you to select a list of encoders that VLC will use in " \
+    "priority")
 
 #define SOUT_CAT_LONGTEXT N_( \
     "These options allow you to set default global options for the " \
@@ -705,6 +697,7 @@ vlc_module_begin();
     /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , VLC_TRUE );
     add_module( "codec", "decoder", NULL, NULL, CODEC_TEXT, CODEC_LONGTEXT, VLC_TRUE );
+    add_module( "encoder", "encoder", NULL, NULL, ENCODER_TEXT, ENCODER_LONGTEXT, VLC_TRUE );
 
 
     /* Stream output options */

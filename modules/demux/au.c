@@ -2,7 +2,7 @@
  * au.c : au file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: au.c,v 1.8 2003/11/11 00:37:59 fenrir Exp $
+ * $Id: au.c,v 1.9 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -170,7 +170,7 @@ static int Open( vlc_object_t * p_this )
     /* Create WAVEFORMATEX structure */
     es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
     p_sys->fmt.audio.i_channels   = p_sys->au.i_channels;
-    p_sys->fmt.audio.i_samplerate = p_sys->au.i_sample_rate;
+    p_sys->fmt.audio.i_rate = p_sys->au.i_sample_rate;
     switch( p_sys->au.i_encoding )
     {
         case AU_ALAW_8:        /* 8-bit ISDN A-law */
@@ -262,7 +262,7 @@ static int Open( vlc_object_t * p_this )
             i_cat                    = AU_CAT_UNKNOWN;
             goto error;
     }
-    p_sys->fmt.audio.i_bitrate = p_sys->fmt.audio.i_samplerate *
+    p_sys->fmt.audio.i_bitrate = p_sys->fmt.audio.i_rate *
                                  p_sys->fmt.audio.i_channels *
                                  p_sys->fmt.audio.i_bitspersample;
 
@@ -279,7 +279,7 @@ static int Open( vlc_object_t * p_this )
         int i_samples, i_modulo;
 
         /* read samples for 50ms of */
-        i_samples = __MAX( p_sys->fmt.audio.i_samplerate / 20, 1 );
+        i_samples = __MAX( p_sys->fmt.audio.i_rate / 20, 1 );
 
         p_sys->i_frame_size = i_samples * p_sys->fmt.audio.i_channels * ( (p_sys->fmt.audio.i_bitspersample + 7) / 8 );
 
@@ -293,7 +293,7 @@ static int Open( vlc_object_t * p_this )
 
         p_sys->i_frame_length = (mtime_t)1000000 *
                                 (mtime_t)i_samples /
-                                (mtime_t)p_sys->fmt.audio.i_samplerate;
+                                (mtime_t)p_sys->fmt.audio.i_rate;
 
         p_input->pf_demux = DemuxPCM;
         p_input->pf_demux_control = demux_vaControlDefault;

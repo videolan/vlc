@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.14 2003/11/13 17:59:34 gbazin Exp $
+ * $Id: ninput.h,v 1.15 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -24,6 +24,9 @@
 #ifndef _NINPUT_H
 #define _NINPUT_H 1
 
+#include "audio_output.h"
+#include "vlc_video.h"
+
 enum es_extra_type_e
 {
     ES_EXTRA_TYPE_UNKNOWN,
@@ -31,6 +34,12 @@ enum es_extra_type_e
     ES_EXTRA_TYPE_BITMAPINFOHEADER,
     ES_EXTRA_TYPE_SUBHEADER
 };
+
+typedef struct subs_format_t
+{
+    char *psz_encoding;
+
+} subs_format_t;
 
 typedef struct
 {
@@ -47,31 +56,16 @@ typedef struct
     char            *psz_language;
     char            *psz_description;
 
-    struct
-    {
-        int i_samplerate;
-        int i_channels;
-        int i_bitrate;
-        int i_blockalign;
-        int i_bitspersample;
-    } audio;
+    audio_format_t audio;
+    video_format_t video;
+    subs_format_t  subs;
 
-    struct
-    {
-        int i_width;
-        int i_height;
-        int i_display_width;
-        int i_display_height;
-    } video;
-
-    struct
-    {
-        char *psz_encoding;
-    } subs;
+    int     i_bitrate;
 
     int     i_extra_type;
     int     i_extra;
     void    *p_extra;
+
 } es_format_t;
 
 static inline void es_format_Init( es_format_t *fmt,
@@ -84,18 +78,9 @@ static inline void es_format_Init( es_format_t *fmt,
     fmt->psz_language           = NULL;
     fmt->psz_description        = NULL;
 
-    fmt->audio.i_samplerate     = 0;
-    fmt->audio.i_channels       = 0;
-    fmt->audio.i_bitrate        = 0;
-    fmt->audio.i_blockalign     = 0;
-    fmt->audio.i_bitspersample  = 0;
-
-    fmt->video.i_width          = 0;
-    fmt->video.i_height         = 0;
-    fmt->video.i_display_width  = 0;
-    fmt->video.i_display_height = 0;
-
-    fmt->subs.psz_encoding      = NULL;
+    memset( &fmt->audio, 0, sizeof(audio_format_t) );
+    memset( &fmt->video, 0, sizeof(video_format_t) );
+    memset( &fmt->subs, 0, sizeof(subs_format_t) );
 
     fmt->i_extra_type           = ES_EXTRA_TYPE_UNKNOWN;
     fmt->i_extra                = 0;

@@ -2,7 +2,7 @@
  * vlc_block_helper.h: Helper functions for data blocks management.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_block_helper.h,v 1.4 2003/10/23 20:51:20 gbazin Exp $
+ * $Id: vlc_block_helper.h,v 1.5 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -29,26 +29,38 @@ typedef struct block_bytestream_t
     block_t             *p_chain;
     block_t             *p_block;
     int                 i_offset;
+
 } block_bytestream_t;
 
-#define block_BytestreamInit( a, b, c ) __block_BytestreamInit( VLC_OBJECT(a), b, c )
+#define block_BytestreamInit( a ) __block_BytestreamInit( VLC_OBJECT(a) )
 
 /*****************************************************************************
  * block_bytestream_t management
  *****************************************************************************/
-static inline block_bytestream_t __block_BytestreamInit( vlc_object_t *p_obj,
-                                           block_t *p_block, int i_offset )
+static inline block_bytestream_t __block_BytestreamInit( vlc_object_t *p_obj )
 {
     block_bytestream_t bytestream;
 
-    bytestream.i_offset = i_offset;
-    bytestream.p_block = p_block;
-    bytestream.p_chain = p_block;
+    bytestream.i_offset = 0;
+    bytestream.p_chain = bytestream.p_block = NULL;
 
     return bytestream;
 }
 
-static inline block_t *block_BytestreamFlush( block_bytestream_t *p_bytestream)
+static inline void block_BytestreamRelease( block_bytestream_t *p_bytestream )
+{
+    while( p_bytestream->p_chain )
+    {
+        block_t *p_next;
+        p_next = p_bytestream->p_chain->p_next;
+        p_bytestream->p_chain->pf_release( p_bytestream->p_chain );
+        p_bytestream->p_chain = p_next;
+    }
+    p_bytestream->i_offset = 0;
+    p_bytestream->p_chain = p_bytestream->p_block = NULL;
+}
+
+static inline void block_BytestreamFlush( block_bytestream_t *p_bytestream )
 {
     while( p_bytestream->p_chain != p_bytestream->p_block )
     {
@@ -57,8 +69,54 @@ static inline block_t *block_BytestreamFlush( block_bytestream_t *p_bytestream)
         p_bytestream->p_chain->pf_release( p_bytestream->p_chain );
         p_bytestream->p_chain = p_next;
     }
+    while( p_bytestream->p_block &&
+           (p_bytestream->p_block->i_buffer - p_bytestream->i_offset) == 0 )
+    {
+        block_t *p_next;
+        p_next = p_bytestream->p_chain->p_next;
+        p_bytestream->p_chain->pf_release( p_bytestream->p_chain );
+        p_bytestream->p_chain = p_bytestream->p_block = p_next;
+        p_bytestream->i_offset = 0;
+    }
+}
 
-    return p_bytestream->p_chain;
+static inline void block_BytestreamPush( block_bytestream_t *p_bytestream,
+                                         block_t *p_block )
+{
+    block_ChainAppend( &p_bytestream->p_chain, p_block );
+    if( !p_bytestream->p_block ) p_bytestream->p_block = p_block;
+}
+
+static inline block_t *block_BytestreamPop( block_bytestream_t *p_bytestream )
+{
+    block_t *p_block;
+
+    block_BytestreamFlush( p_bytestream );
+
+    p_block = p_bytestream->p_block;
+    if( p_block == NULL )
+    {
+        return NULL;
+    }
+    else if( !p_block->p_next )
+    {
+        p_block->p_buffer += p_bytestream->i_offset;
+        p_block->i_buffer -= p_bytestream->i_offset;
+        p_bytestream->i_offset = 0;
+        p_bytestream->p_chain = p_bytestream->p_block = NULL;
+        return p_block;
+    }
+
+    while( p_block->p_next && p_block->p_next->p_next )
+        p_block = p_block->p_next;
+
+    {
+        block_t *p_block_old = p_block;
+        p_block = p_block->p_next;
+        p_block_old->p_next = NULL;
+    }
+
+    return p_block;
 }
 
 static inline int block_SkipByte( block_bytestream_t *p_bytestream )
@@ -149,6 +207,34 @@ static inline int block_GetByte( block_bytestream_t *p_bytestream,
 
     /* Not enough data, bail out */
     return VLC_EGENERIC;
+}
+
+static inline int block_WaitBytes( block_bytestream_t *p_bytestream,
+                                   int i_data )
+{
+    block_t *p_block;
+    int i_offset, i_copy, i_size;
+
+    /* Check we have that much data */
+    i_offset = p_bytestream->i_offset;
+    i_size = i_data;
+    i_copy = 0;
+    for( p_block = p_bytestream->p_block;
+         p_block != NULL; p_block = p_block->p_next )
+    {
+        i_copy = __MIN( i_size, p_block->i_buffer - i_offset );
+        i_size -= i_copy;
+        i_offset = 0;
+
+        if( !i_size ) break;
+    }
+
+    if( i_size )
+    {
+        /* Not enough data, bail out */
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
 }
 
 static inline int block_SkipBytes( block_bytestream_t *p_bytestream,

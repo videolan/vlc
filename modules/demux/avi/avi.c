@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.68 2003/11/16 15:51:59 titer Exp $
+ * $Id: avi.c,v 1.69 2003/11/16 21:07:31 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -274,7 +274,7 @@ static int Open( vlc_object_t * p_this )
                 es_format_Init( &fmt, AUDIO_ES, tk->i_codec );
 
                 fmt.audio.i_channels        = p_auds->p_wf->nChannels;
-                fmt.audio.i_samplerate      = p_auds->p_wf->nSamplesPerSec;
+                fmt.audio.i_rate            = p_auds->p_wf->nSamplesPerSec;
                 fmt.audio.i_bitrate         = p_auds->p_wf->nAvgBytesPerSec * 8;
                 fmt.audio.i_blockalign      = p_auds->p_wf->nBlockAlign;
                 fmt.audio.i_bitspersample   = p_auds->p_wf->wBitsPerSample;

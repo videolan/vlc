@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.120 2003/11/06 16:36:41 nitrox Exp $
+ * $Id: input_programs.c,v 1.121 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -50,6 +50,8 @@ static int NavigationCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 static int ESCallback( vlc_object_t *, char const *,
                        vlc_value_t, vlc_value_t, void * );
+
+static es_format_t null_es_format = {0};
 
 /*****************************************************************************
  * input_InitStream: init the stream descriptor of the given input
@@ -618,6 +620,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     p_es->c_packets = 0;
     p_es->c_invalid_packets = 0;
     p_es->b_force_decoder = VLC_FALSE;
+    p_es->fmt = null_es_format;
 
     if( i_data_len )
     {

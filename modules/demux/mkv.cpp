@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.39 2003/11/13 12:28:34 fenrir Exp $
+ * $Id: mkv.cpp,v 1.40 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -734,7 +734,7 @@ static int Open( vlc_object_t * p_this )
                                     KaxVideoDisplayWidth &vwidth = *(KaxVideoDisplayWidth*)el4;
                                     vwidth.ReadData( p_sys->es->I_O() );
 
-                                    tk.fmt.video.i_display_width = uint16( vwidth );
+                                    tk.fmt.video.i_visible_width = uint16( vwidth );
                                     msg_Dbg( p_input, "|   |   |   |   + display width=%d", uint16( vwidth ) );
                                 }
                                 else if( EbmlId( *el4 ) == KaxVideoDisplayHeight::ClassInfos.GlobalId )
@@ -742,7 +742,7 @@ static int Open( vlc_object_t * p_this )
                                     KaxVideoDisplayWidth &vheight = *(KaxVideoDisplayWidth*)el4;
                                     vheight.ReadData( p_sys->es->I_O() );
 
-                                    tk.fmt.video.i_display_height = uint16( vheight );
+                                    tk.fmt.video.i_visible_height = uint16( vheight );
                                     msg_Dbg( p_input, "|   |   |   |   + display height=%d", uint16( vheight ) );
                                 }
                                 else if( EbmlId( *el4 ) == KaxVideoFrameRate::ClassInfos.GlobalId )
@@ -795,8 +795,8 @@ static int Open( vlc_object_t * p_this )
                                     KaxAudioSamplingFreq &afreq = *(KaxAudioSamplingFreq*)el4;
                                     afreq.ReadData( p_sys->es->I_O() );
 
-                                    tk.fmt.audio.i_samplerate = (int)float( afreq );
-                                    msg_Dbg( p_input, "|   |   |   |   + afreq=%d", tk.fmt.audio.i_samplerate );
+                                    tk.fmt.audio.i_rate = (int)float( afreq );
+                                    msg_Dbg( p_input, "|   |   |   |   + afreq=%d", tk.fmt.audio.i_rate );
                                 }
                                 else if( EbmlId( *el4 ) == KaxAudioChannels::ClassInfos.GlobalId )
                                 {
@@ -1068,7 +1068,7 @@ static int Open( vlc_object_t * p_this )
                 wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &tk.fmt.i_codec, NULL );
 
                 tk.fmt.audio.i_channels   = GetWLE( &p_wf->nChannels );
-                tk.fmt.audio.i_samplerate = GetDWLE( &p_wf->nSamplesPerSec );
+                tk.fmt.audio.i_rate = GetDWLE( &p_wf->nSamplesPerSec );
                 tk.fmt.audio.i_bitrate    = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
                 tk.fmt.audio.i_blockalign = GetWLE( &p_wf->nBlockAlign );;
                 tk.fmt.audio.i_bitspersample = GetWLE( &p_wf->wBitsPerSample );
@@ -1133,7 +1133,7 @@ static int Open( vlc_object_t * p_this )
 
             for( i_srate = 0; i_srate < 13; i_srate++ )
             {
-                if( i_sample_rates[i_srate] == tk.fmt.audio.i_samplerate )
+                if( i_sample_rates[i_srate] == tk.fmt.audio.i_rate )
                 {
                     break;
                 }

@@ -6,6 +6,7 @@ SOURCES_dummy = \
 	interface.c \
 	input.c \
 	decoder.c \
+	encoder.c \
 	renderer.c \
 	$(NULL)
 

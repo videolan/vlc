@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.6 2003/11/05 23:32:31 hartman Exp $
+ * $Id: encoder.c,v 1.7 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -51,11 +51,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-int  E_(OpenVideoEncoder) ( vlc_object_t * );
-void E_(CloseVideoEncoder)( vlc_object_t * );
-
-int  E_(OpenAudioEncoder) ( vlc_object_t * );
-void E_(CloseAudioEncoder)( vlc_object_t * );
+int  E_(OpenEncoder) ( vlc_object_t * );
+void E_(CloseEncoder)( vlc_object_t * );
 
 static block_t *EncodeVideo( encoder_t *, picture_t * );
 static block_t *EncodeAudio( encoder_t *, aout_buffer_t * );
@@ -92,26 +89,32 @@ struct encoder_sys_t
 };
 
 /*****************************************************************************
- * OpenVideoEncoder: probe the encoder
+ * OpenEncoder: probe the encoder
  *****************************************************************************/
-int E_(OpenVideoEncoder)( vlc_object_t *p_this )
+int E_(OpenEncoder)( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
-    AVCodecContext  *p_context;
+    AVCodecContext *p_context;
     AVCodec *p_codec;
     int i_codec_id, i_cat;
     char *psz_namecodec;
 
-    if( !E_(GetFfmpegCodec)( p_enc->i_fourcc, &i_cat, &i_codec_id,
+    if( !E_(GetFfmpegCodec)( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
     {
         return VLC_EGENERIC;
     }
 
-    if( i_cat != VIDEO_ES )
+    if( p_enc->fmt_out.i_cat == VIDEO_ES && i_cat != VIDEO_ES )
     {
         msg_Err( p_enc, "\"%s\" is not a video encoder", psz_namecodec );
+        return VLC_EGENERIC;
+    }
+
+    if( p_enc->fmt_out.i_cat == AUDIO_ES && i_cat != AUDIO_ES )
+    {
+        msg_Err( p_enc, "\"%s\" is not an audio encoder", psz_namecodec );
         return VLC_EGENERIC;
     }
 
@@ -134,41 +137,86 @@ int E_(OpenVideoEncoder)( vlc_object_t *p_this )
     p_enc->p_sys = p_sys;
     p_sys->p_codec = p_codec;
 
-    p_enc->pf_header = NULL;
     p_enc->pf_encode_video = EncodeVideo;
-    p_enc->format.video.i_chroma = VLC_FOURCC('I','4','2','0');
+    p_enc->pf_encode_audio = EncodeAudio;
 
-    if( p_enc->i_fourcc == VLC_FOURCC( 'm','p','1','v' ) ||
-        p_enc->i_fourcc == VLC_FOURCC( 'm','p','2','v' ) )
-    {
-        p_enc->i_fourcc = VLC_FOURCC( 'm','p','g','v' );
-    }
+    p_sys->p_buffer_out = NULL;
+    p_sys->p_buffer = NULL;
 
     p_sys->p_context = p_context = avcodec_alloc_context();
-    p_context->width = p_enc->format.video.i_width;
-    p_context->height = p_enc->format.video.i_height;
-    p_context->bit_rate = p_enc->i_bitrate;
 
-    p_context->frame_rate = p_enc->i_frame_rate;
+    /* Set CPU capabilities */
+#ifdef HAVE_MMX
+    p_context->dsp_mask = 0;
+    if( p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_MMX )
+    {
+        p_context->dsp_mask &= FF_MM_MMX;
+    }
+    if( p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT )
+    {
+        p_context->dsp_mask &= FF_MM_MMXEXT;
+    }
+    if( p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_3DNOW )
+    {
+        p_context->dsp_mask &= FF_MM_3DNOW;
+    }
+    if( p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_SSE )
+    {
+        p_context->dsp_mask &= FF_MM_SSE;
+        p_context->dsp_mask &= FF_MM_SSE2; /* FIXME */
+    }
+    /* Hack to make sure everything can be disabled **/
+    p_context->dsp_mask &= (FF_MM_FORCE >> 1);
+#endif
+
+    /* Make sure we get extradata filled by the encoder */
+    p_context->extradata_size = 0;
+    p_context->extradata = NULL;
+    p_context->flags |= CODEC_FLAG_GLOBAL_HEADER;
+
+    if( p_enc->fmt_in.i_cat == VIDEO_ES )
+    {
+        p_context->width = p_enc->fmt_in.video.i_width;
+        p_context->height = p_enc->fmt_in.video.i_height;
+
+        p_context->frame_rate = p_enc->fmt_in.video.i_frame_rate;
 #if LIBAVCODEC_BUILD >= 4662
-    p_context->frame_rate_base= p_enc->i_frame_rate_base;
+        p_context->frame_rate_base= p_enc->fmt_in.video.i_frame_rate_base;
 #endif
 
 #if LIBAVCODEC_BUILD >= 4687
-    p_context->sample_aspect_ratio =
-        av_d2q( p_enc->i_aspect * p_context->height / p_context->width /
-                VOUT_ASPECT_FACTOR, 255 );
+        p_context->sample_aspect_ratio =
+            av_d2q( p_enc->fmt_in.video.i_aspect * p_context->height /
+                    p_context->width / VOUT_ASPECT_FACTOR, 255 );
 #else
-    p_context->aspect_ratio = ((float)p_enc->i_aspect) / VOUT_ASPECT_FACTOR;
+        p_context->aspect_ratio = ((float)p_enc->fmt_in.video.i_aspect) /
+            VOUT_ASPECT_FACTOR;
 #endif
 
-    p_context->gop_size = p_enc->i_key_int >= 0 ? p_enc->i_key_int : 50;
+        p_sys->p_buffer_out = malloc( AVCODEC_MAX_VIDEO_FRAME_SIZE );
+
+        /* Ffmpeg does handle the conversion itself */
+        //p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
+    }
+    else if( p_enc->fmt_in.i_cat == AUDIO_ES )
+    {
+        p_enc->fmt_in.i_codec  = AOUT_FMT_S16_NE;
+        p_context->bit_rate    = p_enc->fmt_out.i_bitrate;
+        p_context->sample_rate = p_enc->fmt_in.audio.i_rate;
+        p_context->channels    = p_enc->fmt_in.audio.i_channels;
+        p_sys->i_frame_size = p_context->frame_size * 2 * p_context->channels;
+        p_sys->p_buffer = malloc( p_sys->i_frame_size );
+        p_sys->p_buffer_out = malloc( 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
+    }
+
+    /* Misc parameters */
+    p_context->gop_size = p_enc->i_key_int > 0 ? p_enc->i_key_int : 50;
     p_context->max_b_frames =
         __MIN( p_enc->i_b_frames, FF_MAX_B_FRAMES );
     p_context->b_frame_strategy = 0;
     p_context->b_quant_factor = 2.0;
 
-    if( p_enc->i_vtolerance >= 0 )
+    if( p_enc->i_vtolerance > 0 )
     {
         p_context->bit_rate_tolerance = p_enc->i_vtolerance;
     }
@@ -186,7 +234,7 @@ int E_(OpenVideoEncoder)( vlc_object_t *p_this )
 
     if( i_codec_id == CODEC_ID_RAWVIDEO )
     {
-        p_context->pix_fmt = E_(GetFfmpegChroma)( p_enc->i_fourcc );
+        p_context->pix_fmt = E_(GetFfmpegChroma)( p_enc->fmt_in.i_codec );
     }
 
     /* Make sure we get extradata filled by the encoder */
@@ -194,19 +242,40 @@ int E_(OpenVideoEncoder)( vlc_object_t *p_this )
     p_context->extradata = NULL;
     p_context->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
-    if( avcodec_open( p_context, p_sys->p_codec ) )
+    if( avcodec_open( p_context, p_codec ) )
     {
-        msg_Err( p_enc, "cannot open encoder" );
-        return VLC_EGENERIC;
+        if( p_enc->fmt_in.i_cat == AUDIO_ES && p_context->channels > 2 )
+        {
+            p_context->channels = 2;
+            p_enc->fmt_in.audio.i_channels = 2; // FIXME
+            if( avcodec_open( p_context, p_codec ) )
+            {
+                msg_Err( p_enc, "cannot open encoder" );
+                return VLC_EGENERIC;
+            }
+            msg_Warn( p_enc, "stereo mode selected (codec limitation)" );
+        }
+        else
+        {
+            msg_Err( p_enc, "cannot open encoder" );
+            return VLC_EGENERIC;
+        }
     }
 
-    p_enc->i_extra_data = p_context->extradata_size;
-    p_enc->p_extra_data = p_context->extradata;
+    p_enc->fmt_out.i_extra = p_context->extradata_size;
+    p_enc->fmt_out.p_extra = p_context->extradata;
     p_context->flags &= ~CODEC_FLAG_GLOBAL_HEADER;
 
-    p_sys->p_buffer_out = malloc( AVCODEC_MAX_VIDEO_FRAME_SIZE );
+    if( p_enc->fmt_in.i_cat == AUDIO_ES )
+    {
+        p_sys->i_frame_size = p_context->frame_size * 2 * p_context->channels;
+        p_sys->p_buffer = malloc( p_sys->i_frame_size );
+    }
+
     p_sys->i_last_ref_pts = 0;
     p_sys->i_buggy_pts_detect = 0;
+    p_sys->i_samples_delay = 0;
+    p_sys->i_pts = 0;
 
     msg_Dbg( p_enc, "found encoder %s", psz_namecodec );
 
@@ -229,7 +298,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     }
 
     /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
-    if( p_enc->i_fourcc == VLC_FOURCC( 'm', 'p', 'g', 'v' ) )
+    if( p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', 'g', 'v' ) )
         frame.pts = p_pict->date;
     else
         frame.pts = 0;
@@ -250,8 +319,9 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             p_sys->i_buggy_pts_detect = p_sys->p_context->coded_frame->pts;
 
             /* FIXME, 3-2 pulldown is not handled correctly */
-            p_block->i_length = I64C(1000000) * p_enc->i_frame_rate_base /
-                                  p_enc->i_frame_rate;
+            p_block->i_length = I64C(1000000) *
+                p_enc->fmt_in.video.i_frame_rate_base /
+                p_enc->fmt_in.video.i_frame_rate;
             p_block->i_pts    = p_sys->p_context->coded_frame->pts;
 
             if( !p_sys->p_context->delay ||
@@ -279,8 +349,9 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         {
             /* Buggy libavcodec which doesn't update coded_frame->pts
              * correctly */
-            p_block->i_length = I64C(1000000) * p_enc->i_frame_rate_base /
-                                  p_enc->i_frame_rate;
+            p_block->i_length = I64C(1000000) *
+                p_enc->fmt_in.video.i_frame_rate_base /
+                p_enc->fmt_in.video.i_frame_rate;
             p_block->i_dts = p_block->i_pts = p_pict->date;
         }
 
@@ -288,118 +359,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     }
 
     return NULL;
-}
-
-/*****************************************************************************
- * CloseVideoEncoder: ffmpeg video encoder destruction
- *****************************************************************************/
-void E_(CloseVideoEncoder)( vlc_object_t *p_this )
-{
-    encoder_t *p_enc = (encoder_t *)p_this;
-    encoder_sys_t *p_sys = p_enc->p_sys;
-
-    avcodec_close( p_sys->p_context );
-    free( p_sys->p_context );
-    free( p_sys->p_buffer_out );
-    free( p_sys );
-}
-
-/*****************************************************************************
- * OpenAudioEncoder: probe the encoder
- *****************************************************************************/
-int E_(OpenAudioEncoder)( vlc_object_t *p_this )
-{
-    encoder_t *p_enc = (encoder_t *)p_this;
-    encoder_sys_t *p_sys;
-    AVCodecContext *p_context;
-    AVCodec *p_codec;
-    int i_codec_id, i_cat;
-    char *psz_namecodec;
-
-    if( !E_(GetFfmpegCodec)( p_enc->i_fourcc, &i_cat, &i_codec_id,
-                             &psz_namecodec ) )
-    {
-        return VLC_EGENERIC;
-    }
-
-    if( i_cat != AUDIO_ES )
-    {
-        msg_Err( p_enc, "\"%s\" is not an audio encoder", psz_namecodec );
-        return VLC_EGENERIC;
-    }
-
-    /* Initialization must be done before avcodec_find_decoder() */
-    E_(InitLibavcodec)(p_this);
-
-    p_codec = avcodec_find_encoder( i_codec_id );
-    if( !p_codec )
-    {
-        msg_Err( p_enc, "cannot find encoder %s", psz_namecodec );
-        return VLC_EGENERIC;
-    }
-
-    /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
-    {
-        msg_Err( p_enc, "out of memory" );
-        return VLC_EGENERIC;
-    }
-    p_enc->p_sys = p_sys;
-    p_sys->p_codec = p_codec;
-
-    p_enc->pf_header = NULL;
-    p_enc->pf_encode_audio = EncodeAudio;
-    p_enc->format.audio.i_format = VLC_FOURCC('s','1','6','n');
-
-    p_sys->p_context = p_context = avcodec_alloc_context();
-    p_context->bit_rate    = p_enc->i_bitrate;
-    p_context->sample_rate = p_enc->format.audio.i_rate;
-    p_context->channels    =
-        aout_FormatNbChannels( &p_enc->format.audio );
-
-    /* Make sure we get extradata filled by the encoder */
-    p_context->extradata_size = 0;
-    p_context->extradata = NULL;
-    p_context->flags |= CODEC_FLAG_GLOBAL_HEADER;
-
-    if( avcodec_open( p_context, p_codec ) < 0 )
-    {
-        if( p_context->channels > 2 )
-        {
-            p_context->channels = 2;
-            //id->f_dst.i_channels   = 2;
-            if( avcodec_open( p_context, p_codec ) < 0 )
-            {
-                msg_Err( p_enc, "cannot open encoder" );
-                return VLC_EGENERIC;
-            }
-            msg_Warn( p_enc, "stereo mode selected (codec limitation)" );
-        }
-        else
-        {
-            msg_Err( p_enc, "cannot open encoder" );
-            return VLC_EGENERIC;
-        }
-    }
-
-    p_enc->i_extra_data = p_context->extradata_size;
-    p_enc->p_extra_data = p_context->extradata;
-    p_context->flags &= ~CODEC_FLAG_GLOBAL_HEADER;
-
-    p_sys->i_frame_size = p_context->frame_size * 2 * p_context->channels;
-    p_sys->p_buffer = malloc( p_sys->i_frame_size );
-    p_sys->p_buffer_out = malloc( 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
-
-    msg_Warn( p_enc, "avcodec_setup_audio: %d %d %d %d",
-              p_context->frame_size, p_context->bit_rate, p_context->channels,
-              p_context->sample_rate );
-
-    p_sys->i_samples_delay = 0;
-    p_sys->i_pts = 0;
-
-    msg_Dbg( p_enc, "found encoder %s", psz_namecodec );
-
-    return VLC_SUCCESS;
 }
 
 /****************************************************************************
@@ -416,7 +375,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
 
     p_sys->i_pts = p_aout_buf->start_date -
                 (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
-                (mtime_t)p_enc->format.audio.i_rate;
+                (mtime_t)p_enc->fmt_in.audio.i_rate;
 
     p_sys->i_samples_delay += i_samples;
 
@@ -484,16 +443,18 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
 }
 
 /*****************************************************************************
- * CloseAudioEncoder: ffmpeg audio encoder destruction
+ * CloseEncoder: ffmpeg encoder destruction
  *****************************************************************************/
-void E_(CloseAudioEncoder)( vlc_object_t *p_this )
+void E_(CloseEncoder)( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     avcodec_close( p_sys->p_context );
     free( p_sys->p_context );
-    free( p_sys->p_buffer );
-    free( p_sys->p_buffer_out );
+
+    if( p_sys->p_buffer ) free( p_sys->p_buffer );
+    if( p_sys->p_buffer_out ) free( p_sys->p_buffer_out );
+
     free( p_sys );
 }

@@ -2,7 +2,7 @@
  * ffmpeg.h: decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.27 2003/10/27 01:04:38 gbazin Exp $
+ * $Id: ffmpeg.h,v 1.28 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -42,20 +42,20 @@ int E_(GetFfmpegChroma)( vlc_fourcc_t );
 int  E_( InitVideoDec )( decoder_t *, AVCodecContext *, AVCodec *,
                          int, char * );
 void E_( EndVideoDec ) ( decoder_t * );
-int  E_( DecodeVideo ) ( decoder_t *, block_t * );
+picture_t *E_( DecodeVideo ) ( decoder_t *, block_t ** );
 
 /* Audio decoder module */
 int  E_( InitAudioDec )( decoder_t *, AVCodecContext *, AVCodec *,
                          int, char * );
 void E_( EndAudioDec ) ( decoder_t * );
-int  E_( DecodeAudio ) ( decoder_t *, block_t * );
+aout_buffer_t *E_( DecodeAudio ) ( decoder_t *, block_t ** );
 
 /* Chroma conversion module */
 int  E_(OpenChroma)( vlc_object_t * );
 
 /* Video encoder module */
-int  E_(OpenVideoEncoder) ( vlc_object_t * );
-void E_(CloseVideoEncoder)( vlc_object_t * );
+int  E_(OpenEncoder) ( vlc_object_t * );
+void E_(CloseEncoder)( vlc_object_t * );
 
 /* Audio encoder module */
 int  E_(OpenAudioEncoder) ( vlc_object_t * );

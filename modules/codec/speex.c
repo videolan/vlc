@@ -2,7 +2,7 @@
  * speex.c: speex decoder/packetizer module making use of libspeex.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: speex.c,v 1.2 2003/10/22 18:24:08 gbazin Exp $
+ * $Id: speex.c,v 1.3 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -28,12 +28,7 @@
 #include <string.h>                                    /* memcpy(), memset() */
 
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
-#include <vlc/sout.h>
-#include <input_ext-dec.h>
-
 #include <vlc/input.h>
 
 #include <ogg/ogg.h>
@@ -54,6 +49,7 @@ struct decoder_sys_t
      * Input properties
      */
     int i_headers;
+    int i_frame_in_packet;
 
     /*
      * Speex properties
@@ -64,22 +60,9 @@ struct decoder_sys_t
     void *p_state;
 
     /*
-     * Output properties
-     */
-    aout_instance_t        *p_aout;
-    aout_input_t           *p_aout_input;
-    audio_sample_format_t   aout_format;
-
-    /*
-     * Packetizer output properties
-     */
-    sout_packetizer_input_t *p_sout_input;
-    sout_format_t           sout_format;
-
-    /*
      * Common properties
      */
-    audio_date_t          end_date;
+    audio_date_t end_date;
 
 };
 
@@ -97,17 +80,16 @@ static int pi_channels_maps[6] =
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static int OpenDecoder   ( vlc_object_t * );
-static int OpenPacketizer( vlc_object_t * );
+static int  OpenDecoder   ( vlc_object_t * );
+static int  OpenPacketizer( vlc_object_t * );
+static void CloseDecoder  ( vlc_object_t * );
 
-static int InitDecoder   ( decoder_t * );
-static int RunDecoder    ( decoder_t *, block_t * );
-static int EndDecoder    ( decoder_t * );
+static void *DecodeBlock  ( decoder_t *, block_t ** );
+static int  ProcessHeader ( decoder_t *, ogg_packet * );
+static void *ProcessPacket( decoder_t *, ogg_packet *, block_t ** );
 
-static int ProcessHeader ( decoder_t *, ogg_packet * );
-static int ProcessPacket ( decoder_t *, ogg_packet *, mtime_t );
-static int DecodePacket  ( decoder_t *, ogg_packet * );
-static int SendPacket    ( decoder_t *, ogg_packet * );
+static aout_buffer_t *DecodePacket( decoder_t *, ogg_packet * );
+static block_t *SendPacket( decoder_t *, ogg_packet *, block_t * );
 
 static void ParseSpeexComments( decoder_t *, ogg_packet * );
 
@@ -117,12 +99,12 @@ static void ParseSpeexComments( decoder_t *, ogg_packet * );
 vlc_module_begin();
     set_description( _("Speex audio decoder") );
     set_capability( "decoder", 100 );
-    set_callbacks( OpenDecoder, NULL );
+    set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();
     set_description( _("Speex audio packetizer") );
     set_capability( "packetizer", 100 );
-    set_callbacks( OpenPacketizer, NULL );
+    set_callbacks( OpenPacketizer, CloseDecoder );
 vlc_module_end();
 
 /*****************************************************************************
@@ -131,24 +113,38 @@ vlc_module_end();
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('s','p','x',' ') )
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','p','x',' ') )
     {
         return VLC_EGENERIC;
     }
 
-    p_dec->pf_init = InitDecoder;
-    p_dec->pf_decode = RunDecoder;
-    p_dec->pf_end = EndDecoder;
-
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys =
+    if( ( p_dec->p_sys = p_sys =
           (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
     {
         msg_Err( p_dec, "out of memory" );
         return VLC_EGENERIC;
     }
     p_dec->p_sys->b_packetizer = VLC_FALSE;
+
+    aout_DateSet( &p_sys->end_date, 0 );
+
+    /* Set output properties */
+    p_dec->fmt_out.i_cat = AUDIO_ES;
+    p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+
+    /* Set callbacks */
+    p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
+        DecodeBlock;
+    p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
+        DecodeBlock;
+
+    p_sys->i_headers = 0;
+    p_sys->p_state = NULL;
+    p_sys->p_header = NULL;
+    p_sys->i_frame_in_packet = 0;
 
     return VLC_SUCCESS;
 }
@@ -159,53 +155,42 @@ static int OpenPacketizer( vlc_object_t *p_this )
 
     int i_ret = OpenDecoder( p_this );
 
-    if( i_ret == VLC_SUCCESS ) p_dec->p_sys->b_packetizer = VLC_TRUE;
+    if( i_ret == VLC_SUCCESS )
+    {
+        p_dec->p_sys->b_packetizer = VLC_TRUE;
+        p_dec->fmt_out.i_codec = VLC_FOURCC('s','p','x',' ');
+    }
 
     return i_ret;
 }
 
-/*****************************************************************************
- * InitDecoder: Initalize the decoder
- *****************************************************************************/
-static int InitDecoder( decoder_t *p_dec )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    aout_DateSet( &p_sys->end_date, 0 );
-
-    p_sys->p_aout = NULL;
-    p_sys->p_aout_input = NULL;
-    p_sys->aout_format.i_format = VLC_FOURCC('s','p','x',' ');
-
-    p_sys->p_sout_input = NULL;
-    p_sys->sout_format.i_cat = AUDIO_ES;
-    p_sys->sout_format.i_fourcc = VLC_FOURCC( 's', 'p', 'x', ' ' );
-    p_sys->sout_format.i_block_align = 0;
-    p_sys->sout_format.i_bitrate     = 0;
-    p_sys->sout_format.i_extra_data  = 0;
-    p_sys->sout_format.p_extra_data  = NULL;
-
-    p_sys->i_headers = 0;
-    p_sys->p_state = NULL;
-    p_sys->p_header = NULL;
-
-    return VLC_SUCCESS;
-}
-
 /****************************************************************************
- * RunDecoder: the whole thing
+ * DecodeBlock: the whole thing
  ****************************************************************************
  * This function must be fed with ogg packets.
  ****************************************************************************/
-static int RunDecoder( decoder_t *p_dec, block_t *p_block )
+static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     ogg_packet oggpacket;
-    int i_ret;
 
-    /* Block to Ogg packet */
-    oggpacket.packet = p_block->p_buffer;
-    oggpacket.bytes = p_block->i_buffer;
+    if( !pp_block ) return NULL;
+
+    if( *pp_block )
+    {
+        /* Block to Ogg packet */
+        oggpacket.packet = (*pp_block)->p_buffer;
+        oggpacket.bytes = (*pp_block)->i_buffer;
+    }
+    else
+    {
+        if( p_sys->b_packetizer ) return NULL;
+
+        /* Block to Ogg packet */
+        oggpacket.packet = NULL;
+        oggpacket.bytes = 0;
+    }
+
     oggpacket.granulepos = -1;
     oggpacket.b_o_s = 0;
     oggpacket.e_o_s = 0;
@@ -217,23 +202,13 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
         if( ProcessHeader( p_dec, &oggpacket ) != VLC_SUCCESS )
         {
             msg_Err( p_dec, "Initial Speex header is corrupted" );
-            block_Release( p_block );
-            return VLC_EGENERIC;
+            block_Release( *pp_block );
+            return NULL;
         }
 
         p_sys->i_headers++;
 
-        if( p_sys->b_packetizer )
-        {
-            i_ret = ProcessPacket( p_dec, &oggpacket, p_block->i_pts );
-            block_Release( p_block );
-            return i_ret;
-        }
-        else
-        {
-            block_Release( p_block );
-            return VLC_SUCCESS;
-        }
+        return ProcessPacket( p_dec, &oggpacket, pp_block );
     }
 
     if( p_sys->i_headers == 1 )
@@ -242,40 +217,10 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
         ParseSpeexComments( p_dec, &oggpacket );
         p_sys->i_headers++;
 
-        if( p_sys->b_packetizer )
-        {
-            i_ret = ProcessPacket( p_dec, &oggpacket, p_block->i_pts );
-            block_Release( p_block );
-            return i_ret;
-        }
-        else
-        {
-            block_Release( p_block );
-            return VLC_SUCCESS;
-        }
+        return ProcessPacket( p_dec, &oggpacket, pp_block );
     }
 
-    if( p_sys->i_headers < p_sys->p_header->extra_headers + 2 )
-    {
-        /* Skip them for now */
-        p_sys->i_headers++;
-    
-        if( p_sys->b_packetizer )
-        {
-            i_ret = ProcessPacket( p_dec, &oggpacket, p_block->i_pts );
-            block_Release( p_block );
-            return i_ret;
-        }
-        else
-        {
-            block_Release( p_block );
-            return VLC_SUCCESS;
-        }
-    }
-
-    i_ret = ProcessPacket( p_dec, &oggpacket, p_block->i_pts );
-    block_Release( p_block );
-    return i_ret;
+    return ProcessPacket( p_dec, &oggpacket, pp_block );
 }
 
 /*****************************************************************************
@@ -330,27 +275,6 @@ static int ProcessHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
              ( p_header->nb_channels == 1 ) ? " (mono" : " (stereo",
              p_header->vbr ? ", VBR)" : ")" );
 
-    aout_DateInit( &p_sys->end_date, p_header->rate );
-
-    if( p_sys->b_packetizer )
-    {
-        /* add an input for the stream ouput */
-        p_sys->sout_format.i_sample_rate = p_header->rate;
-        p_sys->sout_format.i_channels    = p_header->nb_channels;
-        p_sys->sout_format.i_block_align = 1;
-        p_sys->sout_format.i_bitrate     = 0;
-
-        p_sys->p_sout_input = sout_InputNew( p_dec, &p_sys->sout_format );
-        if( !p_sys->p_sout_input )
-        {
-            msg_Err( p_dec, "cannot add a new stream" );
-            return VLC_EGENERIC;
-        }
-
-        /* We're done */
-        return VLC_SUCCESS;
-    }
-
     /* Take care of speex decoder init */
     speex_bits_init( &p_sys->bits );
     p_sys->p_state = p_state = speex_decoder_init( p_mode );
@@ -370,20 +294,14 @@ static int ProcessHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
         speex_decoder_ctl( p_state, SPEEX_SET_HANDLER, &callback );
     }
 
-    p_sys->aout_format.i_format = AOUT_FMT_S16_NE;
-    p_sys->aout_format.i_physical_channels =
-        p_sys->aout_format.i_original_channels =
+    /* Setup the format */
+    p_dec->fmt_out.audio.i_physical_channels =
+        p_dec->fmt_out.audio.i_original_channels =
             pi_channels_maps[p_header->nb_channels];
-    p_sys->aout_format.i_rate = p_header->rate;
+    p_dec->fmt_out.audio.i_channels = p_header->nb_channels;
+    p_dec->fmt_out.audio.i_rate = p_header->rate;
 
-    p_sys->p_aout = NULL;
-    p_sys->p_aout_input = aout_DecNew( p_dec, &p_sys->p_aout,
-                                       &p_sys->aout_format );
-    if( p_sys->p_aout_input == NULL )
-    {
-        msg_Err( p_dec, "failed to create aout fifo" );
-        return VLC_EGENERIC;
-    }
+    aout_DateInit( &p_sys->end_date, p_header->rate );
 
     return VLC_SUCCESS;
 }
@@ -391,72 +309,89 @@ static int ProcessHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
 /*****************************************************************************
  * ProcessPacket: processes a Speex packet.
  *****************************************************************************/
-static int ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
-                          mtime_t i_pts )
+static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
+                            block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block = *pp_block;
 
     /* Date management */
-    if( i_pts > 0 && i_pts != aout_DateGet( &p_sys->end_date ) )
+    if( p_block && p_block->i_pts > 0 &&
+        p_block->i_pts != aout_DateGet( &p_sys->end_date ) )
     {
-        aout_DateSet( &p_sys->end_date, i_pts );
+        aout_DateSet( &p_sys->end_date, p_block->i_pts );
     }
 
     if( !aout_DateGet( &p_sys->end_date ) )
     {
         /* We've just started the stream, wait for the first PTS. */
-        return VLC_SUCCESS;
+        if( p_block ) block_Release( p_block );
+        return NULL;
     }
+
+    *pp_block = NULL; /* To avoid being fed the same packet again */
 
     if( p_sys->b_packetizer )
     {
-        return SendPacket( p_dec, p_oggpacket );
+         return SendPacket( p_dec, p_oggpacket, p_block );
     }
     else
     {
-        return DecodePacket( p_dec, p_oggpacket );
+        aout_buffer_t *p_aout_buffer;
+
+        if( p_sys->i_headers >= p_sys->p_header->extra_headers + 2 )
+            p_aout_buffer = DecodePacket( p_dec, p_oggpacket );
+        else
+            p_aout_buffer = NULL; /* Skip headers */
+
+        if( p_block )
+        {
+            block_Release( p_block );
+        }
+        return p_aout_buffer;
     }
 }
 
 /*****************************************************************************
  * DecodePacket: decodes a Speex packet.
  *****************************************************************************/
-static int DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
+static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int j;
 
-    /* Copy Ogg packet to Speex bitstream */
-    speex_bits_read_from( &p_sys->bits, p_oggpacket->packet,
-                          p_oggpacket->bytes );
+    if( p_oggpacket->bytes )
+    {
+        /* Copy Ogg packet to Speex bitstream */
+        speex_bits_read_from( &p_sys->bits, p_oggpacket->packet,
+                              p_oggpacket->bytes );
+        p_sys->i_frame_in_packet = 0;
+    }
 
-    /* Decode each frame of the packet */
-    for( j = 0; j != p_sys->p_header->frames_per_packet; j++ )
+    /* Decode one frame at a time */
+    if( p_sys->i_frame_in_packet < p_sys->p_header->frames_per_packet )
     {
         aout_buffer_t *p_aout_buffer;
         int i_ret;
 
-        p_aout_buffer = aout_DecNewBuffer( p_sys->p_aout, p_sys->p_aout_input,
-                                           p_sys->p_header->frame_size );
+        p_aout_buffer =
+            p_dec->pf_aout_buffer_new( p_dec, p_sys->p_header->frame_size );
         if( !p_aout_buffer )
         {
-            msg_Err( p_dec, "cannot get aout buffer" );
-            return VLC_SUCCESS;
+            return NULL;
         }
 
         i_ret = speex_decode( p_sys->p_state, &p_sys->bits,
                               (int16_t *)p_aout_buffer->p_buffer );
-        if( i_ret == -1 ) break; /* End of stream */
+        if( i_ret == -1 ) return NULL; /* End of stream */
         if( i_ret== -2 )
         {
             msg_Warn( p_dec, "Decoding error: corrupted stream?" );
-            break;
+            return NULL;
         }
 
         if( speex_bits_remaining( &p_sys->bits ) < 0 )
         {
             msg_Warn( p_dec, "Decoding overflow: corrupted stream?" );
-            break;
         }
 
         if( p_sys->p_header->nb_channels == 2 )
@@ -468,45 +403,36 @@ static int DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
         p_aout_buffer->end_date =
             aout_DateIncrement( &p_sys->end_date, p_sys->p_header->frame_size);
 
-        aout_DecPlay( p_sys->p_aout, p_sys->p_aout_input, p_aout_buffer );
-    }
+        p_sys->i_frame_in_packet++;
 
-    return VLC_SUCCESS;
+        return p_aout_buffer;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 /*****************************************************************************
  * SendPacket: send an ogg packet to the stream output.
  *****************************************************************************/
-static int SendPacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
+static block_t *SendPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
+                            block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    sout_buffer_t *p_sout_buffer =
-        sout_BufferNew( p_sys->p_sout_input->p_sout, p_oggpacket->bytes );
-
-    if( !p_sout_buffer ) return VLC_EGENERIC;
-
-    p_dec->p_vlc->pf_memcpy( p_sout_buffer->p_buffer,
-                             p_oggpacket->packet,
-                             p_oggpacket->bytes );
-
-    p_sout_buffer->i_bitrate = 0;
-
     /* Date management */
-    p_sout_buffer->i_dts = p_sout_buffer->i_pts =
-        aout_DateGet( &p_sys->end_date );
+    p_block->i_dts = p_block->i_pts = aout_DateGet( &p_sys->end_date );
 
     if( p_sys->i_headers >= p_sys->p_header->extra_headers + 2 )
-        p_sout_buffer->i_length =
+        p_block->i_length =
             aout_DateIncrement( &p_sys->end_date,
                                 p_sys->p_header->frame_size ) -
-            p_sout_buffer->i_pts;
+            p_block->i_pts;
     else
-        p_sout_buffer->i_length = 0;
+        p_block->i_length = 0;
 
-    sout_InputSendBuffer( p_sys->p_sout_input, p_sout_buffer );
-
-    return VLC_SUCCESS;
+    return p_block;
 }
 
 /*****************************************************************************
@@ -552,21 +478,12 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
 }
 
 /*****************************************************************************
- * EndDecoder: speex decoder destruction
+ * CloseDecoder: speex decoder destruction
  *****************************************************************************/
-static int EndDecoder( decoder_t * p_dec )
+static void CloseDecoder( vlc_object_t *p_this )
 {
+    decoder_t * p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if( p_sys->p_aout_input != NULL )
-    {
-        aout_DecDelete( p_sys->p_aout, p_sys->p_aout_input );
-    }
-
-    if( p_sys->p_sout_input != NULL )
-    {
-        sout_InputDelete( p_sys->p_sout_input );
-    }
 
     if( p_sys->p_state )
     {
@@ -576,6 +493,4 @@ static int EndDecoder( decoder_t * p_dec )
 
     if( p_sys->p_header ) free( p_sys->p_header );
     free( p_sys );
-
-    return VLC_SUCCESS;
 }

@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.6 2003/11/08 06:47:34 fenrir Exp $
+ * $Id: livedotcom.cpp,v 1.7 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -453,19 +453,19 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC( 'u', 'n', 'd', 'f' ) );
             tk->fmt.audio.i_channels = sub->numChannels();
-            tk->fmt.audio.i_samplerate = sub->rtpSource()->timestampFrequency();
+            tk->fmt.audio.i_rate = sub->rtpSource()->timestampFrequency();
 
             if( !strcmp( sub->codecName(), "MPA" ) ||
                 !strcmp( sub->codecName(), "MPA-ROBUST" ) ||
                 !strcmp( sub->codecName(), "X-MP3-DRAFT-00" ) )
             {
                 tk->fmt.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'a' );
-                tk->fmt.audio.i_samplerate = 0;
+                tk->fmt.audio.i_rate = 0;
             }
             else if( !strcmp( sub->codecName(), "AC3" ) )
             {
                 tk->fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
-                tk->fmt.audio.i_samplerate = 0;
+                tk->fmt.audio.i_rate = 0;
             }
             else if( !strcmp( sub->codecName(), "L16" ) )
             {

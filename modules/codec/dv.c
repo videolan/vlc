@@ -2,7 +2,7 @@
  * dv.c: a decoder for DV video
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dv.c,v 1.5 2003/09/02 20:19:25 gbazin Exp $
+ * $Id: dv.c,v 1.6 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -59,7 +59,7 @@ static int OpenDecoder ( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('d','v','s','d') )
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC('d','v','s','d') )
     {
         return VLC_EGENERIC;
     }

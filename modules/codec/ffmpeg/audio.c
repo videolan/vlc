@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: audio.c,v 1.21 2003/10/27 10:00:40 gbazin Exp $
+ * $Id: audio.c,v 1.22 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -29,18 +29,8 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/aout.h>
 #include <vlc/decoder.h>
 #include <vlc/input.h>
-
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>                                              /* getpid() */
-#endif
-
-#ifdef HAVE_SYS_TIMES_H
-#   include <sys/times.h>
-#endif
 
 #include "codecs.h"
 #include "aout_internal.h"
@@ -83,8 +73,6 @@ struct decoder_sys_t
     /*
      * Output properties
      */
-    aout_instance_t       *p_aout;
-    aout_input_t          *p_aout_input;
     audio_sample_format_t aout_format;
     audio_date_t          end_date;
 };
@@ -98,7 +86,6 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
                       AVCodec *p_codec, int i_codec_id, char *psz_namecodec )
 {
     decoder_sys_t *p_sys;
-    WAVEFORMATEX wf, *p_wf;
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
@@ -113,25 +100,19 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_dec->p_sys->i_codec_id = i_codec_id;
     p_dec->p_sys->psz_namecodec = psz_namecodec;
 
-    if( ( p_wf = p_dec->p_fifo->p_waveformatex ) == NULL )
-    {
-        msg_Warn( p_dec, "audio informations missing" );
-        p_wf = &wf;
-        memset( p_wf, 0, sizeof( WAVEFORMATEX ) );
-    }
-
     /* ***** Fill p_context with init values ***** */
-    p_sys->p_context->sample_rate = p_wf->nSamplesPerSec;
-    p_sys->p_context->channels = p_wf->nChannels;
-    p_sys->p_context->block_align = p_wf->nBlockAlign;
-    p_sys->p_context->bit_rate = p_wf->nAvgBytesPerSec * 8;
+    p_sys->p_context->sample_rate = p_dec->fmt_in.audio.i_rate;
+    p_sys->p_context->channels = p_dec->fmt_in.audio.i_channels;
+    p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
+    p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
 
-    if( ( p_sys->p_context->extradata_size = p_wf->cbSize ) > 0 )
+    if( ( p_sys->p_context->extradata_size = p_dec->fmt_in.i_extra ) > 0 )
     {
         p_sys->p_context->extradata =
-            malloc( p_wf->cbSize + FF_INPUT_BUFFER_PADDING_SIZE );
-        memcpy( p_sys->p_context->extradata, &p_wf[1], p_wf->cbSize);
-        memset( &((uint8_t*)p_sys->p_context->extradata)[p_wf->cbSize], 0,
+            malloc( p_dec->fmt_in.i_extra + FF_INPUT_BUFFER_PADDING_SIZE );
+        memcpy( p_sys->p_context->extradata,
+                p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
+        memset( p_sys->p_context->extradata + p_dec->fmt_in.i_extra, 0,
                 FF_INPUT_BUFFER_PADDING_SIZE );
     }
 
@@ -148,10 +129,11 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
 
     p_sys->p_output = malloc( 3 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
 
-    p_sys->p_aout = NULL;
-    p_sys->p_aout_input = NULL;
-
     aout_DateSet( &p_sys->end_date, 0 );
+
+    /* Set output properties */
+    p_dec->fmt_out.i_cat = AUDIO_ES;
+    p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
 
     return VLC_SUCCESS;
 }
@@ -159,120 +141,94 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
 /*****************************************************************************
  * DecodeAudio: Called to decode one frame
  *****************************************************************************/
-int E_( DecodeAudio )( decoder_t *p_dec, block_t *p_block )
+aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    aout_buffer_t *p_aout_buffer;
-    mtime_t i_pts;
+    int i_used, i_output, i_samples;
+    uint8_t *p_samples;
+    aout_buffer_t *p_buffer;
+    block_t *p_block;
 
-    uint8_t *p_buffer, *p_samples;
-    int i_buffer, i_samples;
+    if( !pp_block || !*pp_block ) return NULL;
+
+    p_block = *pp_block;
 
     if( !aout_DateGet( &p_sys->end_date ) && !p_block->i_pts )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
-        return VLC_SUCCESS;
+        return NULL;
     }
 
-    i_pts = p_block->i_pts;
-    i_buffer = p_block->i_buffer;
-    p_buffer = p_block->p_buffer;
-
-    while( i_buffer )
+    if( !p_block->i_buffer )
     {
-        int i_used, i_output;
-
-        i_used = avcodec_decode_audio( p_sys->p_context,
-                                       (int16_t*)p_sys->p_output, &i_output,
-                                       p_buffer, i_buffer );
-        if( i_used < 0 )
-        {
-            msg_Warn( p_dec, "cannot decode one frame (%d bytes)", i_buffer );
-            break;
-        }
-
-        i_buffer -= i_used;
-        p_buffer += i_used;
-
-        if( p_sys->p_context->channels <= 0 || p_sys->p_context->channels > 6 )
-        {
-            msg_Warn( p_dec, "invalid channels count %d",
-                      p_sys->p_context->channels );
-            break;
-        }
-
-        /* **** First check if we have a valid output **** */
-        if( p_sys->p_aout_input == NULL ||
-            p_sys->aout_format.i_original_channels !=
-            pi_channels_maps[p_sys->p_context->channels] )
-        {
-            if( p_sys->p_aout_input != NULL )
-            {
-                /* **** Delete the old **** */
-                aout_DecDelete( p_sys->p_aout, p_sys->p_aout_input );
-            }
-
-            /* **** Create a new audio output **** */
-            p_sys->aout_format.i_format = AOUT_FMT_S16_NE;
-            p_sys->aout_format.i_rate = p_sys->p_context->sample_rate;
-            p_sys->aout_format.i_physical_channels =
-                p_sys->aout_format.i_original_channels =
-                    pi_channels_maps[p_sys->p_context->channels];
-
-            aout_DateInit( &p_sys->end_date, p_sys->aout_format.i_rate );
-            p_sys->p_aout_input = aout_DecNew( p_dec, &p_sys->p_aout,
-                                               &p_sys->aout_format );
-        }
-
-        if( !p_sys->p_aout_input )
-        {
-            msg_Err( p_dec, "cannot create audio output" );
-            block_Release( p_block );
-            return VLC_EGENERIC;
-        }
-
-        if( i_pts != 0 && i_pts != aout_DateGet( &p_sys->end_date ) )
-        {
-            aout_DateSet( &p_sys->end_date, i_pts );
-            i_pts = 0;
-        }
-
-        /* **** Now we can output these samples **** */
-        i_samples = i_output / 2 / p_sys->p_context->channels;
-
-        p_samples = p_sys->p_output;
-        while( i_samples > 0 )
-        {
-            int i_smaller_samples;
-
-            i_smaller_samples = __MIN( 8000, i_samples );
-
-            p_aout_buffer = aout_DecNewBuffer( p_sys->p_aout,
-                                               p_sys->p_aout_input,
-                                               i_smaller_samples );
-            if( !p_aout_buffer )
-            {
-                msg_Err( p_dec, "cannot get aout buffer" );
-                block_Release( p_block );
-                return VLC_EGENERIC;
-            }
-
-            p_aout_buffer->start_date = aout_DateGet( &p_sys->end_date );
-            p_aout_buffer->end_date = aout_DateIncrement( &p_sys->end_date,
-                                                          i_smaller_samples );
-            memcpy( p_aout_buffer->p_buffer, p_samples,
-                    p_aout_buffer->i_nb_bytes );
-
-            aout_DecPlay( p_sys->p_aout, p_sys->p_aout_input, p_aout_buffer );
-
-            p_samples += i_smaller_samples * 2 * p_sys->p_context->channels;
-            i_samples -= i_smaller_samples;
-        }
+        block_Release( p_block );
+        return NULL;
     }
 
-    block_Release( p_block );
-    return VLC_SUCCESS;
+    i_used = avcodec_decode_audio( p_sys->p_context,
+                                   (int16_t*)p_sys->p_output, &i_output,
+                                   p_block->p_buffer, p_block->i_buffer );
+
+    if( i_used < 0 )//|| i_output == 0 )
+    {
+        if( i_used < 0 )
+            msg_Warn( p_dec, "cannot decode one frame (%d bytes)",
+                      p_block->i_buffer );
+
+        block_Release( p_block );
+        return NULL;
+    }
+
+    p_block->i_buffer -= i_used;
+    p_block->p_buffer += i_used;
+
+    if( p_sys->p_context->channels <= 0 || p_sys->p_context->channels > 6 )
+    {
+        msg_Warn( p_dec, "invalid channels count %d",
+                  p_sys->p_context->channels );
+        block_Release( p_block );
+        return NULL;
+    }
+
+    if( p_dec->fmt_out.audio.i_rate != p_sys->p_context->sample_rate )
+    {
+        aout_DateInit( &p_sys->end_date, p_sys->p_context->sample_rate );
+        aout_DateSet( &p_sys->end_date, p_block->i_pts );
+    }
+
+    /* **** Set audio output parameters **** */
+    p_dec->fmt_out.audio.i_rate     = p_sys->p_context->sample_rate;
+    p_dec->fmt_out.audio.i_channels = p_sys->p_context->channels;
+    p_dec->fmt_out.audio.i_original_channels =
+        p_dec->fmt_out.audio.i_physical_channels =
+            pi_channels_maps[p_sys->p_context->channels];
+
+    if( p_block->i_pts != 0 &&
+        p_block->i_pts != aout_DateGet( &p_sys->end_date ) )
+    {
+        aout_DateSet( &p_sys->end_date, p_block->i_pts );
+        p_block->i_pts = 0;
+    }
+
+    /* **** Now we can output these samples **** */
+    i_samples = i_output / 2 / p_sys->p_context->channels;
+    p_samples = p_sys->p_output;
+
+    p_buffer = p_dec->pf_aout_buffer_new( p_dec, i_samples );
+    if( !p_buffer )
+    {
+        msg_Err( p_dec, "cannot get aout buffer" );
+        block_Release( p_block );
+        return NULL;
+    }
+
+    p_buffer->start_date = aout_DateGet( &p_sys->end_date );
+    p_buffer->end_date = aout_DateIncrement( &p_sys->end_date, i_samples );
+
+    memcpy( p_buffer->p_buffer, p_samples, p_buffer->i_nb_bytes );
+
+    return p_buffer;
 }
 
 /*****************************************************************************
@@ -283,9 +239,4 @@ void E_(EndAudioDec)( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( p_sys->p_output ) free( p_sys->p_output );
-
-    if( p_sys->p_aout_input )
-    {
-        aout_DecDelete( p_sys->p_aout, p_sys->p_aout_input );
-    }
 }

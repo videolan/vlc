@@ -2,7 +2,7 @@
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpga.c,v 1.7 2003/11/13 12:28:34 fenrir Exp $
+ * $Id: mpga.c,v 1.8 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -311,7 +311,7 @@ static int Open( vlc_object_t * p_this )
                  MPGA_SAMPLE_RATE( header ) );
 
         fmt.audio.i_channels = MPGA_CHANNELS( header );
-        fmt.audio.i_samplerate = MPGA_SAMPLE_RATE( header );
+        fmt.audio.i_rate = MPGA_SAMPLE_RATE( header );
         fmt.audio.i_bitrate = p_sys->i_bitrate_avg;
     }
 

@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.41 2003/10/27 21:54:10 gbazin Exp $
+ * $Id: aout_internal.h,v 1.42 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -97,7 +97,7 @@ struct aout_fifo_t
 /*****************************************************************************
  * aout_filter_t : audio output filter
  *****************************************************************************/
-typedef struct aout_filter_t
+struct aout_filter_t
 {
     VLC_COMMON_MEMBERS
 
@@ -113,7 +113,7 @@ typedef struct aout_filter_t
                                          struct aout_buffer_t * );
     vlc_bool_t              b_in_place;
     vlc_bool_t              b_continuity;
-} aout_filter_t;
+};
 
 /*****************************************************************************
  * aout_mixer_t : audio output mixer
@@ -255,20 +255,10 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                     aout_buffer_t * p_buffer );
 
 /* From filters.c : */
-int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
-                                aout_filter_t ** pp_filters,
-                                int * pi_nb_filters,
-                                const audio_sample_format_t * p_input_format,
-                                const audio_sample_format_t * p_output_format );
-void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
-                                  aout_filter_t ** pp_filters,
-                                  int i_nb_filters );
-void aout_FiltersHintBuffers( aout_instance_t * p_aout,
-                              aout_filter_t ** pp_filters,
-                              int i_nb_filters, aout_alloc_t * p_first_alloc );
-void aout_FiltersPlay( aout_instance_t * p_aout,
-                       aout_filter_t ** pp_filters,
-                       int i_nb_filters, aout_buffer_t ** pp_input_buffer );
+VLC_EXPORT( int, aout_FiltersCreatePipeline, ( aout_instance_t * p_aout, aout_filter_t ** pp_filters, int * pi_nb_filters, const audio_sample_format_t * p_input_format, const audio_sample_format_t * p_output_format ) );
+VLC_EXPORT( void, aout_FiltersDestroyPipeline, ( aout_instance_t * p_aout, aout_filter_t ** pp_filters, int i_nb_filters ) );
+VLC_EXPORT( void, aout_FiltersPlay, ( aout_instance_t * p_aout, aout_filter_t ** pp_filters, int i_nb_filters, aout_buffer_t ** pp_input_buffer ) );
+void aout_FiltersHintBuffers( aout_instance_t * p_aout, aout_filter_t ** pp_filters, int i_nb_filters, aout_alloc_t * p_first_alloc );
 
 /* From mixer.c : */
 int aout_MixerNew( aout_instance_t * p_aout );

@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.9 2003/07/14 21:32:59 sigmunau Exp $
+ * $Id: dummy.c,v 1.10 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -69,7 +69,11 @@ vlc_module_begin();
     add_submodule();
         set_description( _("dummy decoder function") );
         set_capability( "decoder", 0 );
-        set_callbacks( E_(OpenDecoder), NULL );
+        set_callbacks( E_(OpenDecoder), E_(CloseDecoder) );
+    add_submodule();
+        set_description( _("dummy encoder function") );
+        set_capability( "encoder", 0 );
+        set_callbacks( E_(OpenEncoder), E_(CloseEncoder) );
     add_submodule();
         set_description( _("dummy audio output function") );
         set_capability( "audio output", 1 );

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.254 2003/11/13 13:31:12 fenrir Exp $
+ * $Id: input.c,v 1.255 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -981,6 +981,7 @@ struct es_out_sys_t
     vlc_bool_t  i_audio;
     vlc_bool_t  i_video;
 };
+
 struct es_out_id_t
 {
     es_descriptor_t *p_es;
@@ -1008,6 +1009,7 @@ static es_out_t *EsOutCreate( input_thread_t *p_input )
     out->p_sys->i_video = -1;
     return out;
 }
+
 static void      EsOutRelease( es_out_t *out )
 {
     es_out_sys_t *p_sys = out->p_sys;
@@ -1065,11 +1067,12 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     {
         case AUDIO_ES:
         {
-            WAVEFORMATEX *p_wf = malloc( sizeof( WAVEFORMATEX ) + fmt->i_extra);
+            WAVEFORMATEX *p_wf =
+                malloc( sizeof( WAVEFORMATEX ) + fmt->i_extra);
 
             p_wf->wFormatTag        = WAVE_FORMAT_UNKNOWN;
             p_wf->nChannels         = fmt->audio.i_channels;
-            p_wf->nSamplesPerSec    = fmt->audio.i_samplerate;
+            p_wf->nSamplesPerSec    = fmt->audio.i_rate;
             p_wf->nAvgBytesPerSec   = fmt->audio.i_bitrate / 8;
             p_wf->nBlockAlign       = fmt->audio.i_blockalign;
             p_wf->wBitsPerSample    = fmt->audio.i_bitspersample;
@@ -1078,7 +1081,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             {
                 if( fmt->i_extra_type != ES_EXTRA_TYPE_WAVEFORMATEX )
                 {
-                    msg_Warn( p_input, "extra type != WAVEFORMATEX for audio" );
+                    msg_Warn( p_input, "extra type != WAVEFORMATEX for audio");
                 }
                 memcpy( &p_wf[1], fmt->p_extra, fmt->i_extra );
             }
@@ -1095,7 +1098,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             p_bih->biPlanes         = 1;
             p_bih->biBitCount       = 24;
             p_bih->biCompression    = fmt->i_codec;
-            p_bih->biSizeImage      = fmt->video.i_width * fmt->video.i_height;
+            p_bih->biSizeImage      = fmt->video.i_width *
+                                          fmt->video.i_height;
             p_bih->biXPelsPerMeter  = 0;
             p_bih->biYPelsPerMeter  = 0;
             p_bih->biClrUsed        = 0;
@@ -1166,39 +1170,50 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
         {
             case AUDIO_ES:
                 input_AddInfo( p_cat, _("Type"), _("Audio") );
-                input_AddInfo( p_cat, _("Codec"), "%.4s", (char*)&fmt->i_codec );
+                input_AddInfo( p_cat, _("Codec"), "%.4s",
+                               (char*)&fmt->i_codec );
                 if( fmt->audio.i_channels > 0 )
                 {
-                    input_AddInfo( p_cat, _("Channels"), "%d", fmt->audio.i_channels );
+                    input_AddInfo( p_cat, _("Channels"), "%d",
+                                   fmt->audio.i_channels );
                 }
-                if( fmt->audio.i_samplerate > 0 )
+                if( fmt->audio.i_rate > 0 )
                 {
-                    input_AddInfo( p_cat, _("Sample Rate"), "%d", fmt->audio.i_samplerate );
+                    input_AddInfo( p_cat, _("Sample Rate"), "%d",
+                                   fmt->audio.i_rate );
                 }
                 if( fmt->audio.i_bitrate > 0 )
                 {
-                    input_AddInfo( p_cat, _("Bitrate"), "%d", fmt->audio.i_bitrate );
+                    input_AddInfo( p_cat, _("Bitrate"), "%d",
+                                   fmt->audio.i_bitrate );
                 }
                 if( fmt->audio.i_bitspersample )
                 {
-                    input_AddInfo( p_cat, _("Bits Per Sample"), "%d", fmt->audio.i_bitspersample );
+                    input_AddInfo( p_cat, _("Bits Per Sample"), "%d",
+                                   fmt->audio.i_bitspersample );
                 }
                 break;
             case VIDEO_ES:
                 input_AddInfo( p_cat, _("Type"), _("Video") );
-                input_AddInfo( p_cat, _("Codec"), "%.4s", (char*)&fmt->i_codec );
+                input_AddInfo( p_cat, _("Codec"), "%.4s",
+                               (char*)&fmt->i_codec );
                 if( fmt->video.i_width > 0 && fmt->video.i_height > 0 )
                 {
-                    input_AddInfo( p_cat, _("Resolution"), "%dx%d", fmt->video.i_width, fmt->video.i_height );
+                    input_AddInfo( p_cat, _("Resolution"), "%dx%d",
+                                   fmt->video.i_width, fmt->video.i_height );
                 }
-                if( fmt->video.i_display_width > 0 && fmt->video.i_display_height > 0 )
+                if( fmt->video.i_visible_width > 0 &&
+                    fmt->video.i_visible_height > 0 )
                 {
-                    input_AddInfo( p_cat, _("Display Resolution"), "%dx%d", fmt->video.i_display_width, fmt->video.i_display_height);
+                    input_AddInfo( p_cat, _("Display Resolution"), "%dx%d",
+                                   fmt->video.i_visible_width,
+                                   fmt->video.i_visible_height);
                 }
                 break;
             case SPU_ES:
                 input_AddInfo( p_cat, _("Type"), _("Subtitle") );
-                input_AddInfo( p_cat, _("Codec"), "%.4s", (char*)&fmt->i_codec );
+                input_AddInfo( p_cat, _("Codec"), "%.4s",
+                               (char*)&fmt->i_codec );
                 break;
             default:
 
@@ -1207,9 +1222,12 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
+    id->p_es->fmt = *fmt;
+
     TAB_APPEND( out->p_sys->i_id, out->p_sys->id, id );
     return id;
 }
+
 static int EsOutSend( es_out_t *out, es_out_id_t *id, pes_packet_t *p_pes )
 {
     if( id->p_es->p_decoder_fifo )
@@ -1222,6 +1240,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *id, pes_packet_t *p_pes )
     }
     return VLC_SUCCESS;
 }
+
 static void EsOutDel( es_out_t *out, es_out_id_t *id )
 {
     es_out_sys_t *p_sys = out->p_sys;
@@ -1248,6 +1267,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *id )
 
     free( id );
 }
+
 static int EsOutControl( es_out_t *out, int i_query, va_list args )
 {
     es_out_sys_t *p_sys = out->p_sys;
@@ -1306,8 +1326,8 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.p_selected_area->i_seek =
-                    (int64_t)( newval.f_float *
-                               (double)p_input->stream.p_selected_area->i_size );
+        (int64_t)( newval.f_float *
+                   (double)p_input->stream.p_selected_area->i_size );
 
     if( p_input->stream.p_selected_area->i_seek < 0 )
     {

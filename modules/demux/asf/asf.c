@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.40 2003/11/13 12:28:34 fenrir Exp $
+ * $Id: asf.c,v 1.41 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -186,7 +186,7 @@ static int Open( vlc_object_t * p_this )
             es_format_Init( &fmt, AUDIO_ES, 0 );
             wf_tag_to_fourcc( GetWLE( &p_data[0] ), &fmt.i_codec, NULL );
             fmt.audio.i_channels        = GetWLE(  &p_data[2] );
-            fmt.audio.i_samplerate      = GetDWLE( &p_data[4] );
+            fmt.audio.i_rate      = GetDWLE( &p_data[4] );
             fmt.audio.i_bitrate         = GetDWLE( &p_data[8] ) * 8;
             fmt.audio.i_blockalign      = GetWLE(  &p_data[12] );
             fmt.audio.i_bitspersample   = GetWLE(  &p_data[14] );

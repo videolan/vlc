@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.43 2003/10/28 14:17:52 gbazin Exp $
+ * $Id: video.c,v 1.44 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -29,13 +29,8 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
 #include <vlc/decoder.h>
 #include <vlc/input.h>
-
-#ifdef HAVE_SYS_TIMES_H
-#   include <sys/times.h>
-#endif
 
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVCODEC_H
@@ -66,11 +61,8 @@ struct decoder_sys_t
     AVFrame          *p_ff_pic;
     BITMAPINFOHEADER *p_format;
 
-    vout_thread_t    *p_vout;
-
     /* for frame skipping algo */
     int b_hurry_up;
-    int i_frame_error;
     int i_frame_skip;
 
     /* how many decoded frames are late */
@@ -82,11 +74,12 @@ struct decoder_sys_t
 
     vlc_bool_t b_has_b_frames;
 
-    int i_buffer;
-    char *p_buffer;
+    int i_buffer_orig, i_buffer;
+    char *p_buffer_orig, *p_buffer;
 
     /* Postprocessing handle */
     void *p_pp;
+    vlc_bool_t b_pp_init;
 };
 
 /*****************************************************************************
@@ -99,20 +92,31 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
 /*****************************************************************************
  * Local Functions
  *****************************************************************************/
-static inline uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
+static uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
 {
-    /* FIXME FIXME some of them are wrong */
     switch( i_ff_chroma )
     {
     case PIX_FMT_YUV420P:
-    case PIX_FMT_YUV422:
-        return( VLC_FOURCC('I','4','2','0') );
-    case PIX_FMT_RGB24:
-        return( VLC_FOURCC('R','V','2','4') );
+        return VLC_FOURCC('I','4','2','0');
     case PIX_FMT_YUV422P:
-        return( VLC_FOURCC('I','4','2','2') );
+        return VLC_FOURCC('I','4','2','2');
     case PIX_FMT_YUV444P:
-        return( VLC_FOURCC('I','4','4','4') );
+        return VLC_FOURCC('I','4','4','4');
+
+    case PIX_FMT_YUV422:
+        return VLC_FOURCC('Y','U','Y','2');
+
+    case PIX_FMT_RGB555:
+        return VLC_FOURCC('R','V','1','5');
+    case PIX_FMT_RGB565:
+        return VLC_FOURCC('R','V','1','6');
+    case PIX_FMT_RGB24:
+        return VLC_FOURCC('R','V','2','4');
+    case PIX_FMT_RGBA32:
+        return VLC_FOURCC('R','V','3','2');
+    case PIX_FMT_GRAY8:
+        return VLC_FOURCC('G','R','E','Y');
+
     case PIX_FMT_YUV410P:
     case PIX_FMT_YUV411P:
     case PIX_FMT_BGR24:
@@ -121,50 +125,54 @@ static inline uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
     }
 }
 
-/* Return a Vout */
-static vout_thread_t *ffmpeg_CreateVout( decoder_t  *p_dec,
-                                         AVCodecContext *p_context )
+/* Returns a new picture buffer */
+static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
+                                            AVCodecContext *p_context )
 {
-    vout_thread_t *p_vout;
-    unsigned int   i_width = p_context->width;
-    unsigned int   i_height = p_context->height;
-    uint32_t       i_chroma = ffmpeg_PixFmtToChroma( p_context->pix_fmt );
-    unsigned int   i_aspect;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    picture_t *p_pic;
 
-    if( !i_width || !i_height )
+    p_dec->fmt_out.video.i_width = p_context->width;
+    p_dec->fmt_out.video.i_height = p_context->height;
+    p_dec->fmt_out.i_codec = ffmpeg_PixFmtToChroma( p_context->pix_fmt );
+
+    if( !p_context->width || !p_context->height )
     {
-        return( NULL ); /* Can't create a new vout without display size */
+        return NULL; /* invalid display size */
     }
 
-    if( !i_chroma )
+    if( !p_dec->fmt_out.i_codec )
     {
         /* we make conversion if possible*/
-        i_chroma = VLC_FOURCC('I','4','2','0');
+        p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
     }
 
 #if LIBAVCODEC_BUILD >= 4687
-    i_aspect = VOUT_ASPECT_FACTOR * ( av_q2d(p_context->sample_aspect_ratio) *
-        p_context->width / p_context->height );
+    p_dec->fmt_out.video.i_aspect =
+        VOUT_ASPECT_FACTOR * ( av_q2d(p_context->sample_aspect_ratio) *
+            p_context->width / p_context->height );
 #else
-    i_aspect = VOUT_ASPECT_FACTOR * p_context->aspect_ratio;
+    p_dec->fmt_out.video.i_aspect =
+        VOUT_ASPECT_FACTOR * p_context->aspect_ratio;
 #endif
-    if( i_aspect == 0 )
+    if( p_dec->fmt_out.video.i_aspect == 0 )
     {
-        i_aspect = VOUT_ASPECT_FACTOR * i_width / i_height;
+        p_dec->fmt_out.video.i_aspect =
+            VOUT_ASPECT_FACTOR * p_context->width / p_context->height;
     }
 
-    /* Spawn a video output if there is none. First we look for our children,
-     * then we look for any other vout that might be available. */
-    p_vout = vout_Request( p_dec, p_dec->p_sys->p_vout,
-                           i_width, i_height, i_chroma, i_aspect );
+    p_pic = p_dec->pf_vout_buffer_new( p_dec );
 
 #ifdef LIBAVCODEC_PP
-    if( p_dec->p_sys->p_pp )
-        E_(InitPostproc)( p_dec, p_dec->p_sys->p_pp, i_width, i_height,
-                          p_context->pix_fmt );
+    if( p_sys->p_pp && !p_sys->b_pp_init )
+    {
+        E_(InitPostproc)( p_dec, p_sys->p_pp, p_context->width,
+                          p_context->height, p_context->pix_fmt );
+        p_sys->b_pp_init = VLC_TRUE;
+    }
 #endif
 
-    return p_vout;
+    return p_pic;
 }
 
 /*****************************************************************************
@@ -194,18 +202,9 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_dec->p_sys->psz_namecodec = psz_namecodec;
     p_sys->p_ff_pic = avcodec_alloc_frame();
 
-    if( ( p_sys->p_format =
-          (BITMAPINFOHEADER *)p_dec->p_fifo->p_bitmapinfoheader ) != NULL )
-    {
-        /* ***** Fill p_context with init values ***** */
-        p_sys->p_context->width  = p_sys->p_format->biWidth;
-        p_sys->p_context->height = p_sys->p_format->biHeight;
-    }
-    else
-    {
-        msg_Warn( p_dec, "display informations missing" );
-        p_sys->p_format = NULL;
-    }
+    /* ***** Fill p_context with init values ***** */
+    p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
+    p_sys->p_context->height = p_dec->fmt_in.video.i_height;
 
     /*  ***** Get configuration of ffmpeg plugin ***** */
     i_tmp = config_GetInt( p_dec, "ffmpeg-workaround-bugs" );
@@ -258,6 +257,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
 
 #ifdef LIBAVCODEC_PP
     p_sys->p_pp = NULL;
+    p_dec->p_sys->b_pp_init = VLC_FALSE;
     if( E_(OpenPostproc)( p_dec, &p_sys->p_pp ) == VLC_SUCCESS )
     {
         /* for now we cannot do postproc and dr */
@@ -280,16 +280,15 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->opaque = p_dec;
 
     /* ***** init this codec with special data ***** */
-    if( p_sys->p_format && p_sys->p_format->biSize > sizeof(BITMAPINFOHEADER) )
+    if( p_dec->fmt_in.i_extra )
     {
         int b_gotpicture;
-        int i_size = p_sys->p_format->biSize - sizeof(BITMAPINFOHEADER);
+        int i_size = p_dec->fmt_in.i_extra;
 
         if( p_sys->i_codec_id == CODEC_ID_MPEG4 )
         {
             uint8_t *p_vol = malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
-
-            memcpy( p_vol, &p_sys->p_format[1], i_size );
+            memcpy( p_vol, p_dec->fmt_in.p_extra, i_size );
             memset( &p_vol[i_size], 0, FF_INPUT_BUFFER_PADDING_SIZE );
 
             avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
@@ -307,7 +306,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
 
             memcpy( &p[0],  "SVQ3", 4 );
             memset( &p[4], 0, 8 );
-            memcpy( &p[12], &p_sys->p_format[1], i_size );
+            memcpy( &p[12], p_dec->fmt_in.p_extra, i_size );
         }
 #endif
         else
@@ -316,20 +315,24 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
             p_sys->p_context->extradata =
                 malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
             memcpy( p_sys->p_context->extradata,
-                    &p_sys->p_format[1], i_size );
+                    p_dec->fmt_in.p_extra, i_size );
             memset( &((uint8_t*)p_sys->p_context->extradata)[i_size],
                     0, FF_INPUT_BUFFER_PADDING_SIZE );
         }
     }
 
     /* ***** misc init ***** */
-    p_sys->p_vout = NULL;
     p_sys->input_pts = 0;
     p_sys->i_pts = 0;
     p_sys->b_has_b_frames = VLC_FALSE;
     p_sys->i_late_frames = 0;
-    p_sys->i_buffer = 1;
-    p_sys->p_buffer = malloc( p_sys->i_buffer );
+    p_sys->i_buffer = 0;
+    p_sys->i_buffer_orig = 1;
+    p_sys->p_buffer_orig = p_sys->p_buffer = malloc( p_sys->i_buffer );
+
+    /* Set output properties */
+    p_dec->fmt_out.i_cat = VIDEO_ES;
+    p_dec->fmt_out.i_codec = ffmpeg_PixFmtToChroma( p_context->pix_fmt );
 
     return VLC_SUCCESS;
 }
@@ -337,17 +340,22 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
 /*****************************************************************************
  * DecodeVideo: Called to decode one or more frames
  *****************************************************************************/
-int E_(DecodeVideo)( decoder_t *p_dec, block_t *p_block )
+picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_buffer, b_drawpicture;
-    char *p_buffer;
+    int b_drawpicture;
+    block_t *p_block;
+
+    if( !pp_block || !*pp_block ) return NULL;
+
+    p_block = *pp_block;
 
     if( p_block->i_pts > 0 )
     {
         p_sys->input_pts = p_block->i_pts;
     }
 
+#if 0
     /* TODO implement it in a better way */
     /* A good idea could be to decode all I pictures and see for the other */
     if( p_sys->b_hurry_up && p_sys->i_late_frames > 4 )
@@ -364,7 +372,8 @@ int E_(DecodeVideo)( decoder_t *p_dec, block_t *p_block )
 
             p_sys->i_late_frames--; /* needed else it will never be decrease */
             block_Release( p_block );
-            return VLC_SUCCESS;
+            p_sys->i_buffer = 0;
+            return NULL;
         }
     }
     else
@@ -383,6 +392,7 @@ int E_(DecodeVideo)( decoder_t *p_dec, block_t *p_block )
         p_sys->i_late_frames--;
         return VLC_SUCCESS;
     }
+#endif
 
     if( !p_sys->p_context->width || !p_sys->p_context->height )
     {
@@ -395,36 +405,46 @@ int E_(DecodeVideo)( decoder_t *p_dec, block_t *p_block )
 
     /* Don't forget that ffmpeg requires a little more bytes
      * that the real frame size */
-    i_buffer = p_block->i_buffer;
-    if( i_buffer + FF_INPUT_BUFFER_PADDING_SIZE > p_sys->i_buffer )
+    if( p_block->i_buffer )
     {
-        free( p_sys->p_buffer );
-        p_sys->i_buffer = i_buffer + FF_INPUT_BUFFER_PADDING_SIZE;
-        p_sys->p_buffer = malloc( p_sys->i_buffer );
-    }
-    p_buffer = p_sys->p_buffer;
-    p_dec->p_vlc->pf_memcpy( p_buffer, p_block->p_buffer, p_block->i_buffer );
-    memset( p_buffer + i_buffer, 0, FF_INPUT_BUFFER_PADDING_SIZE );
+        p_sys->i_buffer = p_block->i_buffer;
+        if( p_sys->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE >
+            p_sys->i_buffer_orig )
+        {
+            free( p_sys->p_buffer_orig );
+            p_sys->i_buffer_orig =
+                p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE;
+            p_sys->p_buffer_orig = malloc( p_sys->i_buffer_orig );
+        }
+        p_sys->p_buffer = p_sys->p_buffer_orig;
+        p_sys->i_buffer = p_block->i_buffer;
+        p_dec->p_vlc->pf_memcpy( p_sys->p_buffer, p_block->p_buffer,
+                                 p_block->i_buffer );
+        memset( p_sys->p_buffer + p_block->i_buffer, 0,
+                FF_INPUT_BUFFER_PADDING_SIZE );
 
-    while( i_buffer )
+        p_block->i_buffer = 0;
+    }
+
+    while( p_sys->i_buffer )
     {
         int i_used, b_gotpicture;
         picture_t *p_pic;
 
         i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
                                        &b_gotpicture,
-                                       p_buffer, i_buffer );
+                                       p_sys->p_buffer, p_sys->i_buffer );
         if( i_used < 0 )
         {
-            msg_Warn( p_dec, "cannot decode one frame (%d bytes)", i_buffer );
-            p_sys->i_frame_error++;
+            msg_Warn( p_dec, "cannot decode one frame (%d bytes)",
+                      p_sys->i_buffer );
             block_Release( p_block );
-            return VLC_SUCCESS;
+            return NULL;
         }
 
         /* Consumed bytes */
-        i_buffer -= i_used;
-        p_buffer += i_used;
+        p_sys->i_buffer -= i_used;
+        p_sys->p_buffer += i_used;
 
         /* Nothing to display */
         if( !b_gotpicture ) continue;
@@ -449,23 +469,12 @@ int E_(DecodeVideo)( decoder_t *p_dec, block_t *p_block )
 
         if( !p_sys->b_direct_rendering )
         {
-            p_sys->p_vout = ffmpeg_CreateVout( p_dec, p_sys->p_context );
-            if( !p_sys->p_vout )
-            {
-                msg_Err( p_dec, "cannot create vout" );
-                block_Release( p_block );
-                return VLC_EGENERIC;
-            }
-
             /* Get a new picture */
-            while( !(p_pic = vout_CreatePicture( p_sys->p_vout, 0, 0, 0 ) ) )
+            p_pic = ffmpeg_NewPictBuf( p_dec, p_sys->p_context );
+            if( !p_pic )
             {
-                if( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
-                {
-                    block_Release( p_block );
-                    return VLC_EGENERIC;
-                }
-                msleep( VOUT_OUTMEM_SLEEP );
+                block_Release( p_block );
+                return NULL;
             }
 
             /* Fill p_picture_t from AVVideoFrame and do chroma conversion
@@ -493,8 +502,7 @@ int E_(DecodeVideo)( decoder_t *p_dec, block_t *p_block )
         /* Send decoded frame to vout */
         if( p_sys->i_pts )
         {
-            vout_DatePicture( p_sys->p_vout, p_pic, p_sys->i_pts );
-            vout_DisplayPicture( p_sys->p_vout, p_pic );
+            p_pic->date = p_sys->i_pts;
 
             /* interpolate the next PTS */
             if( p_sys->p_context->frame_rate > 0 )
@@ -504,11 +512,16 @@ int E_(DecodeVideo)( decoder_t *p_dec, block_t *p_block )
                     p_sys->p_context->frame_rate_base /
                     (2 * p_sys->p_context->frame_rate);
             }
+            return p_pic;
+        }
+        else
+        {
+            p_dec->pf_vout_buffer_del( p_dec, p_pic );
         }
     }
 
     block_Release( p_block );
-    return VLC_SUCCESS;
+    return NULL;
 }
 
 /*****************************************************************************
@@ -527,10 +540,7 @@ void E_(EndVideoDec)( decoder_t *p_dec )
     E_(ClosePostproc)( p_dec, p_sys->p_pp );
 #endif
 
-    free( p_sys->p_buffer );
-
-    /* We are about to die. Reattach video output to p_vlc. */
-    vout_Request( p_dec, p_sys->p_vout, 0, 0, 0, 0 );
+    free( p_sys->p_buffer_orig );
 }
 
 /*****************************************************************************
@@ -632,27 +642,13 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
         return avcodec_default_get_buffer( p_context, p_ff_pic );
     }
 
-    /* Check and (re)create our vout if needed */
-    p_sys->p_vout = ffmpeg_CreateVout( p_dec, p_sys->p_context );
-    if( !p_sys->p_vout )
+    /* Get a new picture */
+    //p_sys->p_vout->render.b_allow_modify_pics = 0;
+    p_pic = ffmpeg_NewPictBuf( p_dec, p_sys->p_context );
+    if( !p_pic )
     {
-        msg_Err( p_dec, "cannot create vout" );
-        p_dec->p_fifo->b_error = 1; /* abort */
         p_sys->b_direct_rendering = 0;
         return avcodec_default_get_buffer( p_context, p_ff_pic );
-    }
-
-    p_sys->p_vout->render.b_allow_modify_pics = 0;
-
-    /* Get a new picture */
-    while( !(p_pic = vout_CreatePicture( p_sys->p_vout, 0, 0, 0 ) ) )
-    {
-        if( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
-        {
-            p_sys->b_direct_rendering = 0;
-            return avcodec_default_get_buffer( p_context, p_ff_pic );
-        }
-        msleep( VOUT_OUTMEM_SLEEP );
     }
     p_sys->p_context->draw_horiz_band = NULL;
 
@@ -670,20 +666,19 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     if( p_ff_pic->reference != 0 )
     {
-        vout_LinkPicture( p_sys->p_vout, p_pic );
+      //vout_LinkPicture( p_sys->p_vout, p_pic );
     }
 
     /* FIXME what is that, should give good value */
     p_ff_pic->age = 256*256*256*64; // FIXME FIXME from ffmpeg
 
-    return( 0 );
+    return 0;
 }
 
-static void  ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
-                                     AVFrame *p_ff_pic )
+static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
+                                    AVFrame *p_ff_pic )
 {
     decoder_t *p_dec = (decoder_t *)p_context->opaque;
-    decoder_sys_t *p_sys = p_dec->p_sys;
     picture_t *p_pic;
 
     if( p_ff_pic->type != FF_BUFFER_TYPE_USER )
@@ -701,6 +696,6 @@ static void  ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
 
     if( p_ff_pic->reference != 0 )
     {
-        vout_UnlinkPicture( p_sys->p_vout, p_pic );
+      //vout_UnlinkPicture( p_sys->p_vout, p_pic );
     }
 }

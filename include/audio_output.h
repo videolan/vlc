@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.83 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: audio_output.h,v 1.84 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -28,19 +28,24 @@
  *****************************************************************************
  * This structure defines a format for audio samples.
  *****************************************************************************/
-struct audio_sample_format_t
+struct audio_format_t
 {
     vlc_fourcc_t        i_format;
+
     unsigned int        i_rate;
+
     /* Describes the channels configuration of the samples (ie. number of
      * channels which are available in the buffer, and positions). */
     uint32_t            i_physical_channels;
+
     /* Describes from which original channels, before downmixing, the
      * buffer is derived. */
     uint32_t            i_original_channels;
+
     /* Optional - for A/52, SPDIF and DTS types : */
     /* Bytes used by one compressed frame, depends on bitrate. */
     unsigned int        i_bytes_per_frame;
+
     /* Number of sampleframes contained in one compressed frame. */
     unsigned int        i_frame_length;
     /* Please note that it may be completely arbitrary - buffers are not
@@ -48,6 +53,12 @@ struct audio_sample_format_t
      * just here for the division :
      * buffer_size = i_nb_samples * i_bytes_per_frame / i_frame_length
      */
+
+    /* FIXME ? (used by the codecs) */
+    int i_bitrate;
+    int i_channels;
+    int i_blockalign;
+    int i_bitspersample;
 };
 
 #define AOUT_FMTS_IDENTICAL( p_first, p_second ) (                          \

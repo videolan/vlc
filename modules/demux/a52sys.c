@@ -2,7 +2,7 @@
  * a52.c : Raw a52 Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52sys.c,v 1.8 2003/11/13 12:28:34 fenrir Exp $
+ * $Id: a52sys.c,v 1.9 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -144,10 +144,10 @@ static int Open( vlc_object_t * p_this )
     {
         int i_frame_size;
 
-        HeaderInfo( p_peek, &fmt.audio.i_channels, &fmt.audio.i_samplerate, &i_frame_size );
+        HeaderInfo( p_peek, &fmt.audio.i_channels, &fmt.audio.i_rate, &i_frame_size );
 
         msg_Dbg( p_input, "a52 channels=%d sample_rate=%d",
-                 fmt.audio.i_channels, fmt.audio.i_samplerate );
+                 fmt.audio.i_channels, fmt.audio.i_rate );
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * dec_dummy.c: dummy decoder plugin for vlc.
+ * decoder.c: dummy decoder plugin for vlc.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: decoder.c,v 1.7 2003/10/25 00:49:14 sam Exp $
+ * $Id: decoder.c,v 1.8 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,99 +45,95 @@
 #include <stdio.h> /* sprintf() */
 
 /*****************************************************************************
- * Local prototypes
+ * decoder_sys_t : theora decoder descriptor
  *****************************************************************************/
-static int Run ( decoder_fifo_t * );
+struct decoder_sys_t
+{
+    int i_fd;
+};
 
 /*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************
- * Always returns 0 because we are the dummy decoder!
+ * Local prototypes
+ *****************************************************************************/
+static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block );
+
+/*****************************************************************************
+ * OpenDecoder: Open the decoder
  *****************************************************************************/
 int E_(OpenDecoder) ( vlc_object_t *p_this )
 {
-    ((decoder_t*)p_this)->pf_run = Run;
+    decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys;
+    char psz_file[ PATH_MAX ];
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_dec->p_sys = p_sys =
+          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    {
+        msg_Err( p_dec, "out of memory" );
+        return VLC_EGENERIC;
+    }
+
+    sprintf( psz_file, "stream.%i", p_dec->i_object_id );
+
+#ifndef UNDER_CE
+    p_sys->i_fd = open( psz_file, O_WRONLY | O_CREAT | O_TRUNC, 00644 );
+
+    if( p_sys->i_fd == -1 )
+    {
+        msg_Err( p_dec, "cannot create `%s'", psz_file );
+        return VLC_EGENERIC;
+    }
+#endif
+
+    msg_Dbg( p_dec, "dumping stream to file `%s'", psz_file );
+
+    /* Set callbacks */
+    p_dec->pf_decode_video = (picture_t *(*)(decoder_t *, block_t **))
+        DecodeBlock;
+    p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
+        DecodeBlock;
 
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * Run: this function is called just after the thread is created
- *****************************************************************************/
-static int Run ( decoder_fifo_t *p_fifo )
+/****************************************************************************
+ * RunDecoder: the whole thing
+ ****************************************************************************
+ * This function must be fed with ogg packets.
+ ****************************************************************************/
+static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
-    uint8_t p_buffer[1024];
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block;
 
-    bit_stream_t bit_stream;
-    mtime_t      last_date = mdate();
-    size_t       i_bytes = 0;
+    if( !pp_block || !*pp_block ) return NULL;
+    p_block = *pp_block;
 
-    char         psz_file[100];
+    if( p_block->i_buffer )
+    {
 #ifndef UNDER_CE
-    int          i_fd;
+        write( p_sys->i_fd, p_block->p_buffer, p_block->i_buffer );
 #endif
 
-    sprintf( psz_file, "stream.%i", p_fifo->i_object_id );
-#ifndef UNDER_CE
-    i_fd = open( psz_file, O_WRONLY | O_CREAT | O_TRUNC, 00644 );
-
-    if( i_fd == -1 )
-    {
-        msg_Err( p_fifo, "cannot create `%s'", psz_file );
-        p_fifo->b_error = 1;
-        DecoderError( p_fifo );
-        return -1;
-    }
-#endif
-
-    msg_Dbg( p_fifo, "dumping stream to file `%s'", psz_file );
-
-    if( InitBitstream( &bit_stream, p_fifo, NULL, NULL ) != VLC_SUCCESS )
-    {
-        msg_Err( p_fifo, "cannot initialize bitstream" );
-        p_fifo->b_error = 1;
-        DecoderError( p_fifo );
-#ifndef UNDER_CE
-        close( i_fd );
-#endif
-        return -1;
+        msg_Dbg( p_dec, "dumped %i bytes", p_block->i_buffer );
     }
 
-    while( !p_fifo->b_die && !p_fifo->b_error )
-    {
-        GetChunk( &bit_stream, p_buffer, 1024 );
-#ifndef UNDER_CE
-        write( i_fd, p_buffer, 1024 );
+    block_Release( p_block );
+    return NULL;
+}
 
-        i_bytes += 1024;
-#endif
-
-        if( mdate() < last_date + 2000000 )
-        {
-            continue;
-        }
-
-        msg_Dbg( p_fifo, "dumped %i bytes", i_bytes );
-
-        i_bytes = 0;
-        last_date = mdate();
-    }
-
-    if( i_bytes )
-    {
-        msg_Dbg( p_fifo, "dumped %i bytes", i_bytes );
-    }
+/*****************************************************************************
+ * CloseDecoder: decoder destruction
+ *****************************************************************************/
+void E_(CloseDecoder) ( vlc_object_t *p_this )
+{
+    decoder_t *p_dec = (decoder_t *)p_this;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
 #ifndef UNDER_CE
-    close( i_fd );
+    close( p_sys->i_fd );
 #endif
-    CloseBitstream( &bit_stream );
 
-    if( p_fifo->b_error )
-    {
-        DecoderError( p_fifo );
-        return -1;
-    }
-
-    return 0;
+    free( p_sys );
 }

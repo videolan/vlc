@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.58 2003/10/29 20:53:41 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.59 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -29,14 +29,8 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/aout.h>
 #include <vlc/decoder.h>
 #include <vlc/input.h>
-
-#ifdef HAVE_SYS_TIMES_H
-#   include <sys/times.h>
-#endif
 
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVCODEC_H
@@ -77,10 +71,7 @@ struct decoder_sys_t
  * Local prototypes
  ****************************************************************************/
 static int OpenDecoder( vlc_object_t * );
-static int InitDecoder( decoder_t * );
-static int EndDecoder( decoder_t * );
-
-static int b_ffmpeginit = 0;
+static void CloseDecoder( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -90,7 +81,7 @@ vlc_module_begin();
     /* decoder main module */
     add_category_hint( N_("ffmpeg"), NULL, VLC_FALSE );
     set_capability( "decoder", 70 );
-    set_callbacks( OpenDecoder, NULL );
+    set_callbacks( OpenDecoder, CloseDecoder );
     set_description( _("ffmpeg audio/video decoder((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
 
     add_bool( "ffmpeg-dr", 1, NULL, DR_TEXT, DR_TEXT, VLC_TRUE );
@@ -115,18 +106,12 @@ vlc_module_begin();
     set_callbacks( E_(OpenChroma), NULL );
     set_description( _("ffmpeg chroma conversion") );
 
-     /* video encoder submodule */
-     add_submodule();
-     set_description( _("ffmpeg video encoder") );
-     set_capability( "video encoder", 100 );
-     set_callbacks( E_(OpenVideoEncoder), E_(CloseVideoEncoder) );
- 
-     /* audio encoder submodule */
-     add_submodule();
-     set_description( _("ffmpeg audio encoder") );
-     set_capability( "audio encoder", 10 );
-     set_callbacks( E_(OpenAudioEncoder), E_(CloseAudioEncoder) );
- 
+    /* encoder submodule */
+    add_submodule();
+    set_description( _("ffmpeg audio/video encoder") );
+    set_capability( "encoder", 100 );
+    set_callbacks( E_(OpenEncoder), E_(CloseEncoder) );
+
     var_Create( p_module->p_libvlc, "avcodec", VLC_VAR_MUTEX );
 vlc_module_end();
 
@@ -136,10 +121,14 @@ vlc_module_end();
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*) p_this;
-    int i_cat, i_codec_id;
+    int i_cat, i_codec_id, i_result;
     char *psz_namecodec;
 
-    if( !E_(GetFfmpegCodec)( p_dec->p_fifo->i_fourcc, &i_cat, &i_codec_id,
+    AVCodecContext *p_context;
+    AVCodec        *p_codec;
+
+    /* *** determine codec type *** */
+    if( !E_(GetFfmpegCodec)( p_dec->fmt_in.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
     {
         return VLC_EGENERIC;
@@ -148,54 +137,51 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Initialization must be done before avcodec_find_decoder() */
     E_(InitLibavcodec)(p_this);
 
-    if( !avcodec_find_decoder( i_codec_id ) )
-    {
-        msg_Dbg( p_dec, "codec not found (%s)", psz_namecodec );
-        return VLC_EGENERIC;
-    }
-
-    p_dec->pf_init = InitDecoder;
-    p_dec->pf_decode = (i_cat == VIDEO_ES) ? E_(DecodeVideo) : E_(DecodeAudio);
-    p_dec->pf_end = EndDecoder;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * InitDecoder: Initalize the decoder
- *****************************************************************************/
-static int InitDecoder( decoder_t *p_dec )
-{
-    int i_cat, i_codec_id, i_result;
-    char *psz_namecodec;
-    AVCodecContext *p_context;
-    AVCodec        *p_codec;
-
-    /* *** determine codec type *** */
-    E_(GetFfmpegCodec)( p_dec->p_fifo->i_fourcc,
-                        &i_cat, &i_codec_id, &psz_namecodec );
-
     /* *** ask ffmpeg for a decoder *** */
     if( !( p_codec = avcodec_find_decoder( i_codec_id ) ) )
     {
-        msg_Err( p_dec, "codec not found (%s)", psz_namecodec );
+        msg_Dbg( p_dec, "codec not found (%s)", psz_namecodec );
         return VLC_EGENERIC;
     }
 
     /* *** get a p_context *** */
     p_context = avcodec_alloc_context();
 
+    /* Set CPU capabilities */
+#ifdef HAVE_MMX
+    p_context->dsp_mask = 0;
+    if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_MMX )
+    {
+        p_context->dsp_mask &= FF_MM_MMX;
+    }
+    if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT )
+    {
+        p_context->dsp_mask &= FF_MM_MMXEXT;
+    }
+    if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_3DNOW )
+    {
+        p_context->dsp_mask &= FF_MM_3DNOW;
+    }
+    if( p_enc->p_libvlc->i_cpu & CPU_CAPABILITY_SSE )
+    {
+        p_context->dsp_mask &= FF_MM_SSE;
+        p_context->dsp_mask &= FF_MM_SSE2; /* FIXME */
+    }
+    /* Hack to make sure everything can be disabled **/
+    p_context->dsp_mask &= (FF_MM_FORCE >> 1);
+#endif
+
     switch( i_cat )
     {
     case VIDEO_ES:
+        p_dec->pf_decode_video = E_(DecodeVideo);
         i_result = E_( InitVideoDec )( p_dec, p_context, p_codec,
                                        i_codec_id, psz_namecodec );
-        p_dec->pf_decode = E_(DecodeVideo);
         break;
     case AUDIO_ES:
+        p_dec->pf_decode_audio = E_(DecodeAudio);
         i_result = E_( InitAudioDec )( p_dec, p_context, p_codec,
                                        i_codec_id, psz_namecodec );
-        p_dec->pf_decode = E_(DecodeAudio);
         break;
     default:
         i_result = VLC_EGENERIC;
@@ -205,12 +191,13 @@ static int InitDecoder( decoder_t *p_dec )
 
     return i_result;
 }
-  
+
 /*****************************************************************************
- * EndDecoder: decoder destruction
+ * CloseDecoder: decoder destruction
  *****************************************************************************/
-static int EndDecoder( decoder_t *p_dec )
+static void CloseDecoder( vlc_object_t *p_this )
 {
+    decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( !p_sys->p_context )
@@ -234,7 +221,6 @@ static int EndDecoder( decoder_t *p_dec )
     }
 
     free( p_sys );
-    return VLC_SUCCESS;
 }
   
 /*****************************************************************************
@@ -692,12 +678,13 @@ int E_(GetFfmpegChroma)( vlc_fourcc_t i_chroma )
 
 void E_(InitLibavcodec)( vlc_object_t *p_object )
 {
+    static int b_ffmpeginit = 0;
     vlc_value_t lockval;
 
     var_Get( p_object->p_libvlc, "avcodec", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
-     /* *** init ffmpeg library (libavcodec) *** */
+    /* *** init ffmpeg library (libavcodec) *** */
     if( !b_ffmpeginit )
     {
         avcodec_init();

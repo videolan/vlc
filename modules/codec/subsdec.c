@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.6 2003/11/15 15:40:19 hartman Exp $
+ * $Id: subsdec.c,v 1.7 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -56,10 +56,9 @@ struct decoder_sys_t
  * Local prototypes
  *****************************************************************************/
 static int  OpenDecoder   ( vlc_object_t * );
+static void CloseDecoder  ( vlc_object_t * );
 
-static int  InitDecoder   ( decoder_t * );
-static int  RunDecoder    ( decoder_t *, block_t * );
-static int  EndDecoder    ( decoder_t * );
+static void DecodeBlock   ( decoder_t *, block_t ** );
 
 static void ParseText     ( decoder_t *, block_t *, vout_thread_t * );
 
@@ -103,7 +102,7 @@ static char *ppsz_justification_text[] = {N_("Center"),N_("Left"),N_("Right")};
 vlc_module_begin();
     set_description( _("text subtitles decoder") );
     set_capability( "decoder", 50 );
-    set_callbacks( OpenDecoder, NULL );
+    set_callbacks( OpenDecoder, CloseDecoder );
 
     add_category_hint( N_("Subtitles"), NULL, VLC_FALSE );
     add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT,
@@ -125,36 +124,24 @@ vlc_module_end();
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys;
+    vlc_value_t val;
 
-    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('s','u','b','t') && 
-        p_dec->p_fifo->i_fourcc != VLC_FOURCC('s','s','a',' ') )
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','u','b','t') && 
+        p_dec->fmt_in.i_codec != VLC_FOURCC('s','s','a',' ') )
     {
         return VLC_EGENERIC;
     }
 
-    p_dec->pf_init = InitDecoder;
-    p_dec->pf_decode = RunDecoder;
-    p_dec->pf_end = EndDecoder;
+    p_dec->pf_decode_sub = DecodeBlock;
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys =
+    if( ( p_dec->p_sys = p_sys =
           (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
     {
         msg_Err( p_dec, "out of memory" );
         return VLC_EGENERIC;
     }
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * InitDecoder: Initalize the decoder
- *****************************************************************************/
-static int InitDecoder( decoder_t *p_dec )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    subtitle_data_t *p_demux_data = (subtitle_data_t *)p_dec->p_fifo->p_demux_data;
-    vlc_value_t val;
 
     var_Create( p_dec, "subsdec-align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "subsdec-align", &val );
@@ -183,6 +170,7 @@ static int InitDecoder( decoder_t *p_dec )
 
     if( val.psz_string ) free( val.psz_string );
 #else
+
     msg_Dbg( p_dec, "No iconv support available" );
 #endif
 
@@ -195,11 +183,11 @@ static int InitDecoder( decoder_t *p_dec )
 }
 
 /****************************************************************************
- * RunDecoder: the whole thing
+ * DecodeBlock: the whole thing
  ****************************************************************************
  * This function must be fed with complete subtitles units.
  ****************************************************************************/
-static int RunDecoder( decoder_t *p_dec, block_t *p_block )
+static void DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     vout_thread_t *p_vout;
 
@@ -208,20 +196,18 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
     if( !p_vout )
     {
         msg_Warn( p_dec, "couldn't find a video output, trashing subtitle" );
-        return VLC_SUCCESS;
     }
 
-    ParseText( p_dec, p_block, p_vout );
+    ParseText( p_dec, *pp_block, p_vout );
     vlc_object_release( p_vout );
-
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * EndDecoder: clean up the decoder
+ * CloseDecoder: clean up the decoder
  *****************************************************************************/
-static int EndDecoder( decoder_t *p_dec )
+static void CloseDecoder( vlc_object_t *p_this )
 {
+    decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
     vout_thread_t *p_vout;
 
@@ -253,8 +239,6 @@ static int EndDecoder( decoder_t *p_dec )
 #endif
 
     free( p_sys );
-
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

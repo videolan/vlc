@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.21 2003/10/23 21:28:11 gbazin Exp $
+ * $Id: mpeg_audio.c,v 1.22 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -51,32 +51,15 @@ struct decoder_sys_t
      */
     int        i_state;
 
-    block_t *p_chain;
     block_bytestream_t bytestream;
-
-    /*
-     * Decoder output properties
-     */
-    aout_instance_t *     p_aout;                                  /* opaque */
-    aout_input_t *        p_aout_input;                            /* opaque */
-    audio_sample_format_t aout_format;
-    aout_buffer_t *       p_aout_buffer; /* current aout buffer being filled */
-
-    /*
-     * Packetizer output properties
-     */
-    sout_packetizer_input_t *p_sout_input;
-    sout_format_t           sout_format;
-    sout_buffer_t *         p_sout_buffer;            /* current sout buffer */
 
     /*
      * Common properties
      */
-    uint8_t               *p_out_buffer;                    /* output buffer */
     audio_date_t          end_date;
     unsigned int          i_current_layer;
 
-    mtime_t pts;
+    mtime_t i_pts;
 
     int i_frame_size, i_free_frame_size;
     unsigned int i_channels_conf, i_channels;
@@ -90,7 +73,8 @@ enum {
     STATE_SYNC,
     STATE_HEADER,
     STATE_NEXT_SYNC,
-    STATE_DATA
+    STATE_GET_DATA,
+    STATE_SEND_DATA
 };
 
 /* This isn't the place to put mad-specific stuff. However, it makes the
@@ -104,17 +88,14 @@ enum {
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static int OpenDecoder   ( vlc_object_t * );
-static int OpenPacketizer( vlc_object_t * );
+static int  OpenDecoder   ( vlc_object_t * );
+static int  OpenPacketizer( vlc_object_t * );
+static void CloseDecoder  ( vlc_object_t * );
+static void *DecodeBlock  ( decoder_t *, block_t ** );
 
-static int InitDecoder   ( decoder_t * );
-static int RunDecoder    ( decoder_t *, block_t * );
-static int EndDecoder    ( decoder_t * );
-
-static int GetOutBuffer ( decoder_t *, uint8_t ** );
-static int GetAoutBuffer( decoder_t *, aout_buffer_t ** );
-static int GetSoutBuffer( decoder_t *, sout_buffer_t ** );
-static int SendOutBuffer( decoder_t * );
+static uint8_t       *GetOutBuffer ( decoder_t *, void ** );
+static aout_buffer_t *GetAoutBuffer( decoder_t * );
+static block_t       *GetSoutBuffer( decoder_t * );
 
 static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
                      unsigned int * pi_channels_conf,
@@ -129,12 +110,12 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
 vlc_module_begin();
     set_description( _("MPEG audio layer I/II/III parser") );
     set_capability( "decoder", 100 );
-    set_callbacks( OpenDecoder, NULL );
+    set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();
     set_description( _("MPEG audio layer I/II/III packetizer") );
     set_capability( "packetizer", 10 );
-    set_callbacks( OpenPacketizer, NULL );
+    set_callbacks( OpenPacketizer, CloseDecoder );
 vlc_module_end();
 
 /*****************************************************************************
@@ -143,24 +124,39 @@ vlc_module_end();
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys;
 
-    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC( 'm', 'p', 'g', 'a') )
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','a') )
     {
         return VLC_EGENERIC;
     }
 
-    p_dec->pf_init = InitDecoder;
-    p_dec->pf_decode = RunDecoder;
-    p_dec->pf_end = EndDecoder;
-
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys =
+    if( ( p_dec->p_sys = p_sys =
           (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
     {
         msg_Err( p_dec, "out of memory" );
         return VLC_EGENERIC;
     }
-    p_dec->p_sys->b_packetizer = VLC_FALSE;
+
+    /* Misc init */
+    p_sys->b_packetizer = VLC_FALSE;
+    p_sys->i_state = STATE_NOSYNC;
+    aout_DateSet( &p_sys->end_date, 0 );
+    p_sys->bytestream = block_BytestreamInit( p_dec );
+
+    /* Set output properties */
+    p_dec->fmt_out.i_cat = AUDIO_ES;
+    p_dec->fmt_out.i_codec = VLC_FOURCC('m','p','g','a');
+
+    /* Set callback */
+    p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
+        DecodeBlock;
+    p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
+        DecodeBlock;
+
+    /* Start with the minimum size for a free bitrate frame */
+    p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
 
     return VLC_SUCCESS;
 }
@@ -176,66 +172,34 @@ static int OpenPacketizer( vlc_object_t *p_this )
     return i_ret;
 }
 
-/*****************************************************************************
- * InitDecoder: Initalize the decoder
- *****************************************************************************/
-static int InitDecoder( decoder_t *p_dec )
-{
-    p_dec->p_sys->i_state = STATE_NOSYNC;
-
-    p_dec->p_sys->p_out_buffer = NULL;
-    aout_DateSet( &p_dec->p_sys->end_date, 0 );
-
-    p_dec->p_sys->p_aout = NULL;
-    p_dec->p_sys->p_aout_input = NULL;
-    p_dec->p_sys->p_aout_buffer = NULL;
-    p_dec->p_sys->aout_format.i_format = VLC_FOURCC('m','p','g','a');
-
-    p_dec->p_sys->p_sout_input = NULL;
-    p_dec->p_sys->p_sout_buffer = NULL;
-    p_dec->p_sys->sout_format.i_cat = AUDIO_ES;
-    p_dec->p_sys->sout_format.i_fourcc = VLC_FOURCC('m','p','g','a');
-
-    /* Start with the minimum size for a free bitrate frame */
-    p_dec->p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
-
-    p_dec->p_sys->p_chain = NULL;
-
-    return VLC_SUCCESS;
-}
-
 /****************************************************************************
- * RunDecoder: the whole thing
+ * DecodeBlock: the whole thing
  ****************************************************************************
  * This function is called just after the thread is launched.
  ****************************************************************************/
-static int RunDecoder( decoder_t *p_dec, block_t *p_block )
+static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t p_header[MAD_BUFFER_GUARD];
     uint32_t i_header;
+    uint8_t *p_buf;
+    void *p_out_buffer;
 
-    if( !aout_DateGet( &p_sys->end_date ) && !p_block->i_pts )
+    if( !pp_block || !*pp_block ) return NULL;
+
+    if( !aout_DateGet( &p_sys->end_date ) && !(*pp_block)->i_pts )
     {
         /* We've just started the stream, wait for the first PTS. */
-        block_Release( p_block );
-        return VLC_SUCCESS;
+        block_Release( *pp_block );
+        return NULL;
     }
 
-    if( p_block->b_discontinuity )
+    if( (*pp_block)->b_discontinuity )
     {
-        p_sys->i_state = STATE_SYNC;
+        p_sys->i_state = STATE_NOSYNC;
     }
 
-    if( p_sys->p_chain )
-    {
-        block_ChainAppend( &p_sys->p_chain, p_block );
-    }
-    else
-    {
-        block_ChainAppend( &p_sys->p_chain, p_block );
-        p_sys->bytestream = block_BytestreamInit( p_dec, p_sys->p_chain, 0 );
-    }
+    block_BytestreamPush( &p_sys->bytestream, *pp_block );
 
     while( 1 )
     {
@@ -256,30 +220,21 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
             }
             if( p_sys->i_state != STATE_SYNC )
             {
-                if( block_PeekByte( &p_sys->bytestream, p_header )
-                    == VLC_SUCCESS && p_header[0] == 0xff )
-                {
-                    /* Start of a sync word, need more data */
-                    return VLC_SUCCESS;
-                }
-
-                block_ChainRelease( p_sys->p_chain );
-                p_sys->p_chain = NULL;
+                block_BytestreamFlush( &p_sys->bytestream );
 
                 /* Need more data */
-                return VLC_SUCCESS;
+                return NULL;
             }
 
         case STATE_SYNC:
             /* New frame, set the Presentation Time Stamp */
-            p_sys->pts = p_sys->bytestream.p_block->i_pts;
-            if( p_sys->pts != 0 &&
-                p_sys->pts != aout_DateGet( &p_sys->end_date ) )
+            p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
+            if( p_sys->i_pts != 0 &&
+                p_sys->i_pts != aout_DateGet( &p_sys->end_date ) )
             {
-                aout_DateSet( &p_sys->end_date, p_sys->pts );
+                aout_DateSet( &p_sys->end_date, p_sys->i_pts );
             }
             p_sys->i_state = STATE_HEADER;
-            break;
 
         case STATE_HEADER:
             /* Get MPGA frame header (MPGA_HEADER_SIZE bytes) */
@@ -287,7 +242,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                                  MPGA_HEADER_SIZE ) != VLC_SUCCESS )
             {
                 /* Need more data */
-                return VLC_SUCCESS;
+                return NULL;
             }
 
             /* Build frame header */
@@ -334,7 +289,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                                        MAD_BUFFER_GUARD ) != VLC_SUCCESS )
             {
                 /* Need more data */
-                return VLC_SUCCESS;
+                return NULL;
             }
 
             if( p_header[0] == 0xff && (p_header[1] & 0xe0) == 0xe0 )
@@ -359,23 +314,9 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                                               &i_next_max_frame_size,
                                               &i_next_layer );
 
-                if( i_next_frame_size == -1 )
-                {
-                    msg_Dbg( p_dec, "emulated start code on next frame" );
-                    block_SkipByte( &p_sys->bytestream );
-                    p_sys->i_state = STATE_NOSYNC;
-                    break;
-                }
-
                 /* Free bitrate only */
-                if( p_sys->i_bit_rate == 0 )
+                if( p_sys->i_bit_rate == 0 && i_next_frame_size == -1 )
                 {
-                    if( i_next_bit_rate != 0 )
-                    {
-                        p_sys->i_frame_size++;
-                        break;
-                    }
-
                     if( (unsigned int)p_sys->i_frame_size >
                         p_sys->i_max_frame_size )
                     {
@@ -387,6 +328,17 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                         p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
                         break;
                     }
+
+                    p_sys->i_frame_size++;
+                    break;
+                }
+
+                if( i_next_frame_size == -1 )
+                {
+                    msg_Dbg( p_dec, "emulated start code on next frame" );
+                    block_SkipByte( &p_sys->bytestream );
+                    p_sys->i_state = STATE_NOSYNC;
+                    break;
                 }
 
                 /* Check info is in sync with previous one */
@@ -408,12 +360,35 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                     p_sys->i_state = STATE_NOSYNC;
                     break;
                 }
+
+                /* Free bitrate only */
+                if( p_sys->i_bit_rate == 0 )
+                {
+                    if( i_next_bit_rate != 0 )
+                    {
+                        p_sys->i_frame_size++;
+                        break;
+                    }
+                }
+
             }
             else
             {
                 /* Free bitrate only */
                 if( p_sys->i_bit_rate == 0 )
                 {
+                    if( (unsigned int)p_sys->i_frame_size >
+                        p_sys->i_max_frame_size )
+                    {
+                        msg_Dbg( p_dec, "frame too big %d > %d "
+                                 "(emulated startcode ?)", p_sys->i_frame_size,
+                                 p_sys->i_max_frame_size );
+                        block_SkipByte( &p_sys->bytestream );
+                        p_sys->i_state = STATE_NOSYNC;
+                        p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
+                        break;
+                    }
+
                     p_sys->i_frame_size++;
                     break;
                 }
@@ -425,9 +400,25 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                 break;
             }
 
-            if( GetOutBuffer( p_dec, &p_sys->p_out_buffer ) != VLC_SUCCESS )
+            p_sys->i_state = STATE_SEND_DATA;
+            break;
+
+        case STATE_GET_DATA:
+            /* Make sure we have enough data.
+             * (Not useful if we went through NEXT_SYNC) */
+            if( block_WaitBytes( &p_sys->bytestream,
+                                 p_sys->i_frame_size ) != VLC_SUCCESS )
             {
-                return VLC_EGENERIC;
+                /* Need more data */
+                return NULL;
+            }
+            p_sys->i_state = STATE_SEND_DATA;
+
+        case STATE_SEND_DATA:
+            if( !(p_buf = GetOutBuffer( p_dec, &p_out_buffer )) )
+            {
+                //p_dec->b_error = VLC_TRUE;
+                return NULL;
             }
 
             /* Free bitrate only */
@@ -436,243 +427,129 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                 p_sys->i_free_frame_size = p_sys->i_frame_size;
             }
 
-            p_sys->i_state = STATE_DATA;
-
-        case STATE_DATA:
-            /* Copy the whole frame into the buffer */
-            if( block_GetBytes( &p_sys->bytestream, p_sys->p_out_buffer,
-                                p_sys->i_frame_size ) != VLC_SUCCESS )
-            {
-                /* Need more data */
-                return VLC_SUCCESS;
-            }
-
-            p_sys->p_chain = block_BytestreamFlush( &p_sys->bytestream );
+            /* Copy the whole frame into the buffer. When we reach this point
+             * we already know we have enough data available. */
+            block_GetBytes( &p_sys->bytestream, p_buf, p_sys->i_frame_size );
 
             /* Get beginning of next frame for libmad */
             if( !p_sys->b_packetizer )
             {
-                memcpy( p_sys->p_out_buffer + p_sys->i_frame_size,
+                memcpy( p_buf + p_sys->i_frame_size,
                         p_header, MAD_BUFFER_GUARD );
             }
 
-            SendOutBuffer( p_dec );
             p_sys->i_state = STATE_NOSYNC;
 
             /* Make sure we don't reuse the same pts twice */
-            if( p_sys->pts == p_sys->bytestream.p_block->i_pts )
-                p_sys->pts = p_sys->bytestream.p_block->i_pts = 0;
+            if( p_sys->i_pts == p_sys->bytestream.p_block->i_pts )
+                p_sys->i_pts = p_sys->bytestream.p_block->i_pts = 0;
+
+            /* So p_block doesn't get re-added several times */
+            *pp_block = block_BytestreamPop( &p_sys->bytestream );
+
+            return p_out_buffer;
         }
     }
 
-    return VLC_SUCCESS;
+    return NULL;
 }
 
 /*****************************************************************************
  * GetOutBuffer:
  *****************************************************************************/
-static int GetOutBuffer( decoder_t *p_dec, uint8_t **pp_out_buffer )
+static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_ret;
+    uint8_t *p_buf;
+
+    if( p_dec->fmt_out.audio.i_rate != p_sys->i_rate )
+    {
+        msg_Info( p_dec, "MPGA channels:%d samplerate:%d bitrate:%d",
+                  p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
+
+        aout_DateInit( &p_sys->end_date, p_sys->i_rate );
+        aout_DateSet( &p_sys->end_date, p_sys->i_pts );
+    }
+
+    p_dec->fmt_out.audio.i_rate     = p_sys->i_rate;
+    p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
+    p_dec->fmt_out.audio.i_bitrate  = p_sys->i_bit_rate;
+    p_dec->fmt_out.audio.i_frame_length = p_sys->i_frame_length;
+    p_dec->fmt_out.audio.i_bytes_per_frame =
+        p_sys->i_max_frame_size + MAD_BUFFER_GUARD;
+
+    p_dec->fmt_out.audio.i_original_channels = p_sys->i_channels_conf;
+    p_dec->fmt_out.audio.i_physical_channels =
+        p_sys->i_channels_conf & AOUT_CHAN_PHYSMASK;
 
     if( p_sys->b_packetizer )
     {
-        i_ret = GetSoutBuffer( p_dec, &p_sys->p_sout_buffer );
-        *pp_out_buffer =
-            p_sys->p_sout_buffer ? p_sys->p_sout_buffer->p_buffer : NULL;
+        block_t *p_sout_buffer = GetSoutBuffer( p_dec );
+        p_buf = p_sout_buffer ? p_sout_buffer->p_buffer : NULL;
+        *pp_out_buffer = p_sout_buffer;
     }
     else
     {
-        i_ret = GetAoutBuffer( p_dec, &p_sys->p_aout_buffer );
-        *pp_out_buffer =
-            p_sys->p_aout_buffer ? p_sys->p_aout_buffer->p_buffer : NULL;
+        aout_buffer_t *p_aout_buffer = GetAoutBuffer( p_dec );
+        p_buf = p_aout_buffer ? p_aout_buffer->p_buffer : NULL;
+        *pp_out_buffer = p_aout_buffer;
     }
 
-    return i_ret;
+    return p_buf;
 }
 
 /*****************************************************************************
  * GetAoutBuffer:
  *****************************************************************************/
-static int GetAoutBuffer( decoder_t *p_dec, aout_buffer_t **pp_buffer )
+static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    aout_buffer_t *p_buf;
 
-    if( p_sys->p_aout_input != NULL &&
-        ( p_sys->aout_format.i_rate != p_sys->i_rate
-        || p_sys->aout_format.i_original_channels != p_sys->i_channels_conf
-        || p_sys->aout_format.i_bytes_per_frame !=
-           p_sys->i_max_frame_size + MAD_BUFFER_GUARD
-        || p_sys->aout_format.i_frame_length != p_sys->i_frame_length
-        || p_sys->i_current_layer != p_sys->i_layer ) )
-    {
-        /* Parameters changed - this should not happen. */
-        aout_DecDelete( p_sys->p_aout, p_sys->p_aout_input );
-        p_sys->p_aout_input = NULL;
-    }
+    p_buf = p_dec->pf_aout_buffer_new( p_dec, p_sys->i_frame_length );
+    if( p_buf == NULL ) return NULL;
 
-    /* Creating the audio input if not created yet. */
-    if( p_sys->p_aout_input == NULL )
-    {
-        p_sys->i_current_layer = p_sys->i_layer;
-        if( p_sys->i_layer == 3 )
-        {
-            p_sys->aout_format.i_format = VLC_FOURCC('m','p','g','3');
-        }
-        else
-        {
-            p_sys->aout_format.i_format = VLC_FOURCC('m','p','g','a');
-        }
+    p_buf->start_date = aout_DateGet( &p_sys->end_date );
+    p_buf->end_date =
+        aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length );
 
-        p_sys->aout_format.i_rate = p_sys->i_rate;
-        p_sys->aout_format.i_original_channels = p_sys->i_channels_conf;
-        p_sys->aout_format.i_physical_channels
-            = p_sys->i_channels_conf & AOUT_CHAN_PHYSMASK;
-        p_sys->aout_format.i_bytes_per_frame = p_sys->i_max_frame_size
-            + MAD_BUFFER_GUARD;
-        p_sys->aout_format.i_frame_length = p_sys->i_frame_length;
-        aout_DateInit( &p_sys->end_date, p_sys->i_rate );
-        aout_DateSet( &p_sys->end_date, p_sys->pts );
-        p_sys->p_aout_input = aout_DecNew( p_dec,
-                                           &p_sys->p_aout,
-                                           &p_sys->aout_format );
-        if( p_sys->p_aout_input == NULL )
-        {
-            *pp_buffer = NULL;
-            return VLC_EGENERIC;
-        }
-    }
+    /* Hack for libmad filter */
+    p_buf->i_nb_bytes = p_sys->i_frame_size + MAD_BUFFER_GUARD;
 
-    *pp_buffer = aout_DecNewBuffer( p_sys->p_aout, p_sys->p_aout_input,
-                                    p_sys->i_frame_length );
-    if( *pp_buffer == NULL )
-    {
-        return VLC_EGENERIC;
-    }
-
-    (*pp_buffer)->start_date = aout_DateGet( &p_sys->end_date );
-    (*pp_buffer)->end_date =
-         aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length );
-
-    return VLC_SUCCESS;
+    return p_buf;
 }
 
 /*****************************************************************************
  * GetSoutBuffer:
  *****************************************************************************/
-static int GetSoutBuffer( decoder_t *p_dec, sout_buffer_t **pp_buffer )
+static block_t *GetSoutBuffer( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block;
 
-    if( p_sys->p_sout_input != NULL &&
-        ( p_sys->sout_format.i_sample_rate != (int)p_sys->i_rate
-          || p_sys->sout_format.i_channels != (int)p_sys->i_channels ) )
-    {
-        /* Parameters changed - this should not happen. */
-    }
+    p_block = block_New( p_dec, p_sys->i_frame_size );
+    if( p_block == NULL ) return NULL;
 
-    /* Creating the sout input if not created yet. */
-    if( p_sys->p_sout_input == NULL )
-    {
-        p_sys->sout_format.i_sample_rate = p_sys->i_rate;
-        p_sys->sout_format.i_channels    = p_sys->i_channels;
-        p_sys->sout_format.i_block_align = 0;
-        p_sys->sout_format.i_bitrate     = p_sys->i_bit_rate;
-        p_sys->sout_format.i_extra_data  = 0;
-        p_sys->sout_format.p_extra_data  = NULL;
+    p_block->i_pts = p_block->i_dts = aout_DateGet( &p_sys->end_date );
 
-        aout_DateInit( &p_sys->end_date, p_sys->i_rate );
-        aout_DateSet( &p_sys->end_date, p_sys->pts );
+    p_block->i_length =
+        aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length ) -
+            p_block->i_pts;
 
-        p_sys->p_sout_input = sout_InputNew( p_dec, &p_sys->sout_format );
-        if( p_sys->p_sout_input == NULL )
-        {
-            msg_Err( p_dec, "cannot add a new stream" );
-            *pp_buffer = NULL;
-            return VLC_EGENERIC;
-        }
-        msg_Info( p_dec, "MPGA channels:%d samplerate:%d bitrate:%d",
-                  p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
-    }
-
-    *pp_buffer = sout_BufferNew( p_sys->p_sout_input->p_sout,
-                                 p_sys->i_frame_size );
-    if( *pp_buffer == NULL )
-    {
-        return VLC_EGENERIC;
-    }
-
-    (*pp_buffer)->i_pts =
-        (*pp_buffer)->i_dts = aout_DateGet( &p_sys->end_date );
-
-    (*pp_buffer)->i_length =
-        aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length )
-        - (*pp_buffer)->i_pts;
-
-    return VLC_SUCCESS;
+    return p_block;
 }
 
 /*****************************************************************************
- * SendOutBuffer:
+ * CloseDecoder: clean up the decoder
  *****************************************************************************/
-static int SendOutBuffer( decoder_t *p_dec )
+static void CloseDecoder( vlc_object_t *p_this )
 {
+    decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->b_packetizer )
-    {
-        sout_InputSendBuffer( p_sys->p_sout_input, p_sys->p_sout_buffer );
-        p_sys->p_sout_buffer = NULL;
-    }
-    else
-    {
-        /* We have all we need, send the buffer to the aout core. */
-        p_sys->p_aout_buffer->i_nb_bytes =
-            p_sys->i_frame_size + MAD_BUFFER_GUARD;
-        aout_DecPlay( p_sys->p_aout, p_sys->p_aout_input,
-                      p_sys->p_aout_buffer );
-        p_sys->p_aout_buffer = NULL;
-    }
+    block_BytestreamRelease( &p_sys->bytestream );
 
-    p_sys->p_out_buffer = NULL;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * EndDecoder: clean up the decoder
- *****************************************************************************/
-static int EndDecoder( decoder_t *p_dec )
-{
-    if( p_dec->p_sys->p_aout_input != NULL )
-    {
-        if( p_dec->p_sys->p_aout_buffer )
-        {
-            aout_DecDeleteBuffer( p_dec->p_sys->p_aout,
-                                  p_dec->p_sys->p_aout_input,
-                                  p_dec->p_sys->p_aout_buffer );
-        }
-
-        aout_DecDelete( p_dec->p_sys->p_aout, p_dec->p_sys->p_aout_input );
-    }
-
-    if( p_dec->p_sys->p_sout_input != NULL )
-    {
-        if( p_dec->p_sys->p_sout_buffer )
-        {
-            sout_BufferDelete( p_dec->p_sys->p_sout_input->p_sout,
-                               p_dec->p_sys->p_sout_buffer );
-        }
-
-        sout_InputDelete( p_dec->p_sys->p_sout_input );
-    }
-
-    if( p_dec->p_sys->p_chain ) block_ChainRelease( p_dec->p_sys->p_chain );
-
-    free( p_dec->p_sys );
-
-    return VLC_SUCCESS;
+    free( p_sys );
 }
 
 /*****************************************************************************

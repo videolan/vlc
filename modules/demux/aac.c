@@ -2,7 +2,7 @@
  * aac.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aac.c,v 1.6 2003/11/13 12:28:34 fenrir Exp $
+ * $Id: aac.c,v 1.7 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -157,7 +157,7 @@ static int Open( vlc_object_t * p_this )
     if( HeaderCheck( p_peek ) )
     {
         fmt.audio.i_channels = AAC_CHANNELS( p_peek );
-        fmt.audio.i_samplerate = AAC_SAMPLE_RATE( p_peek );
+        fmt.audio.i_rate = AAC_SAMPLE_RATE( p_peek );
 
         msg_Dbg( p_input,
                  "adts header: id=%d channels=%d sample_rate=%d",

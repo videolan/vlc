@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.49 2003/11/05 18:59:01 gbazin Exp $
+ * $Id: transcode.c,v 1.50 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -598,6 +598,39 @@ static inline int get_ff_chroma( vlc_fourcc_t i_chroma )
     }
 }
 
+static inline vlc_fourcc_t get_vlc_chroma( int i_pix_fmt )
+{
+    switch( i_pix_fmt )
+    {
+    case PIX_FMT_YUV420P:
+        return VLC_FOURCC('I','4','2','0');
+    case PIX_FMT_YUV422P:
+        return VLC_FOURCC('I','4','2','2');
+    case PIX_FMT_YUV444P:
+        return VLC_FOURCC('I','4','4','4');
+
+    case PIX_FMT_YUV422:
+        return VLC_FOURCC('Y','U','Y','2');
+
+    case PIX_FMT_RGB555:
+        return VLC_FOURCC('R','V','1','5');
+    case PIX_FMT_RGB565:
+        return VLC_FOURCC('R','V','1','6');
+    case PIX_FMT_RGB24:
+        return VLC_FOURCC('R','V','2','4');
+    case PIX_FMT_RGBA32:
+        return VLC_FOURCC('R','V','3','2');
+    case PIX_FMT_GRAY8:
+        return VLC_FOURCC('G','R','E','Y');
+
+    case PIX_FMT_YUV410P:
+    case PIX_FMT_YUV411P:
+    case PIX_FMT_BGR24:
+    default:
+        return 0;
+    }
+}
+
 static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
                                        sout_stream_id_t *id )
 {
@@ -657,18 +690,22 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
 
     /* find encoder */
     id->p_encoder = vlc_object_create( p_stream, VLC_OBJECT_ENCODER );
-    id->p_encoder->i_fourcc = id->f_dst.i_fourcc;
-    id->p_encoder->format.audio.i_format = AOUT_FMT_S16_NE;
-    id->p_encoder->format.audio.i_rate = id->f_dst.i_sample_rate;
-    id->p_encoder->format.audio.i_physical_channels =
-        id->p_encoder->format.audio.i_original_channels =
+
+    /* Initialization of encoder format structures */
+    es_format_Init( &id->p_encoder->fmt_in, AUDIO_ES, AOUT_FMT_S16_NE );
+    id->p_encoder->fmt_in.audio.i_format = AOUT_FMT_S16_NE;
+    id->p_encoder->fmt_in.audio.i_rate = id->f_dst.i_sample_rate;
+    id->p_encoder->fmt_in.audio.i_physical_channels =
+        id->p_encoder->fmt_in.audio.i_original_channels =
             pi_channels_maps[id->f_dst.i_channels];
-    id->p_encoder->i_bitrate = id->f_dst.i_bitrate;
-    id->p_encoder->i_extra_data = 0;
-    id->p_encoder->p_extra_data = NULL;
+    id->p_encoder->fmt_in.audio.i_channels = id->f_dst.i_channels;
+
+    id->p_encoder->fmt_out = id->p_encoder->fmt_in;
+    id->p_encoder->fmt_out.i_codec = id->f_dst.i_fourcc;
+    id->p_encoder->fmt_out.i_bitrate = id->f_dst.i_bitrate;
 
     id->p_encoder->p_module =
-        module_Need( id->p_encoder, "audio encoder", NULL );
+        module_Need( id->p_encoder, "encoder", NULL );
     if( !id->p_encoder->p_module )
     {
         vlc_object_destroy( id->p_encoder );
@@ -678,8 +715,8 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
 
     id->b_enc_inited = VLC_FALSE;
 
-    id->f_dst.i_extra_data = id->p_encoder->i_extra_data;
-    id->f_dst.p_extra_data = id->p_encoder->p_extra_data;
+    id->f_dst.i_extra_data = id->p_encoder->fmt_out.i_extra;
+    id->f_dst.p_extra_data = id->p_encoder->fmt_out.p_extra;
 
     /* Hack for mp3 transcoding support */
     if( id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','3',' ' ) )
@@ -953,10 +990,49 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
 
     /* Open encoder */
     id->p_encoder = vlc_object_create( p_stream, VLC_OBJECT_ENCODER );
-    id->p_encoder->i_fourcc = id->f_dst.i_fourcc;
-    id->p_encoder->format.video.i_width = p_sys->i_width;
-    id->p_encoder->format.video.i_height = p_sys->i_height;
-    id->p_encoder->i_bitrate = p_sys->i_vbitrate;
+
+    /* Initialization of encoder format structures */
+    es_format_Init( &id->p_encoder->fmt_in,
+		    id->f_src.i_cat, get_vlc_chroma(id->ff_dec_c->pix_fmt) );
+
+    id->p_encoder->fmt_in.video.i_width = id->f_dst.i_width;
+    id->p_encoder->fmt_in.video.i_height = id->f_dst.i_height;
+
+    if( id->p_encoder->fmt_in.video.i_width <= 0 )
+    {
+        id->p_encoder->fmt_in.video.i_width = id->f_dst.i_width =
+            id->ff_dec_c->width - p_sys->i_crop_left - p_sys->i_crop_right;
+    }
+    if( id->p_encoder->fmt_in.video.i_height <= 0 )
+    {
+        id->p_encoder->fmt_in.video.i_height = id->f_dst.i_height =
+            id->ff_dec_c->height - p_sys->i_crop_top - p_sys->i_crop_bottom;
+    }
+
+    id->p_encoder->fmt_in.video.i_frame_rate = 25; /* FIXME as it break mpeg */
+    id->p_encoder->fmt_in.video.i_frame_rate_base= 1;
+    if( id->ff_dec )
+    {
+        id->p_encoder->fmt_in.video.i_frame_rate = id->ff_dec_c->frame_rate;
+#if LIBAVCODEC_BUILD >= 4662
+        id->p_encoder->fmt_in.video.i_frame_rate_base =
+            id->ff_dec_c->frame_rate_base;
+#endif
+
+#if LIBAVCODEC_BUILD >= 4687
+        id->p_encoder->fmt_in.video.i_aspect = VOUT_ASPECT_FACTOR *
+            ( av_q2d(id->ff_dec_c->sample_aspect_ratio) *
+              id->ff_dec_c->width / id->ff_dec_c->height );
+#else
+        id->p_encoder->video.fmt_in.i_aspect = VOUT_ASPECT_FACTOR *
+            id->ff_dec_c->aspect_ratio;
+#endif
+
+    }
+
+    id->p_encoder->fmt_out = id->p_encoder->fmt_in;
+    id->p_encoder->fmt_out.i_codec = id->f_dst.i_fourcc;
+    id->p_encoder->fmt_out.i_bitrate = id->f_dst.i_bitrate;
 
     id->p_encoder->i_vtolerance = p_sys->i_vtolerance;
     id->p_encoder->i_key_int = p_sys->i_key_int;
@@ -965,52 +1041,14 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     id->p_encoder->i_qmax = p_sys->i_qmax;
     id->p_encoder->i_hq = p_sys->i_hq;
 
-    if( id->p_encoder->format.video.i_width <= 0 )
-    {
-        id->p_encoder->format.video.i_width = id->f_dst.i_width =
-            id->ff_dec_c->width - p_sys->i_crop_left - p_sys->i_crop_right;
-    }
-    if( id->p_encoder->format.video.i_height <= 0 )
-    {
-        id->p_encoder->format.video.i_height = id->f_dst.i_height =
-            id->ff_dec_c->height - p_sys->i_crop_top - p_sys->i_crop_bottom;
-    }
-
     id->p_ff_pic         = avcodec_alloc_frame();
     id->p_ff_pic_tmp0    = NULL;
     id->p_ff_pic_tmp1    = NULL;
     id->p_ff_pic_tmp2    = NULL;
     id->p_vresample      = NULL;
 
-    if( id->ff_dec )
-    {
-        id->p_encoder->i_frame_rate = id->ff_dec_c->frame_rate;
-#if LIBAVCODEC_BUILD >= 4662
-        id->p_encoder->i_frame_rate_base= id->ff_dec_c->frame_rate_base;
-#endif
-
-#if LIBAVCODEC_BUILD >= 4687
-        id->p_encoder->i_aspect = VOUT_ASPECT_FACTOR *
-            ( av_q2d(id->ff_dec_c->sample_aspect_ratio) *
-              id->ff_dec_c->width / id->ff_dec_c->height );
-#else
-        id->p_encoder->i_aspect = VOUT_ASPECT_FACTOR *
-            id->ff_dec_c->aspect_ratio;
-#endif
-
-    }
-    else
-    {
-#if LIBAVCODEC_BUILD >= 4662
-        id->p_encoder->i_frame_rate     = 25 ; /* FIXME as it break mpeg */
-        id->p_encoder->i_frame_rate_base= 1;
-#else
-        id->p_encoder->i_frame_rate     = 25 * FRAME_RATE_BASE;
-#endif
-    }
-
     id->p_encoder->p_module =
-        module_Need( id->p_encoder, "video encoder", NULL );
+        module_Need( id->p_encoder, "encoder", NULL );
 
     if( !id->p_encoder->p_module )
     {
@@ -1138,26 +1176,26 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         {
             /* XXX hack because of copy packetizer and mpeg4video that can fail
              * detecting size */
-            if( id->p_encoder->format.video.i_width <= 0 )
+            if( id->p_encoder->fmt_in.video.i_width <= 0 )
             {
-                id->p_encoder->format.video.i_width = id->f_dst.i_width =
+                id->p_encoder->fmt_in.video.i_width =
+                  id->p_encoder->fmt_out.video.i_width = id->f_dst.i_width =
                     id->ff_dec_c->width - p_sys->i_crop_left -
-                    p_sys->i_crop_right;
+                      p_sys->i_crop_right;
             }
-            if( id->p_encoder->format.video.i_height <= 0 )
+            if( id->p_encoder->fmt_in.video.i_height <= 0 )
             {
-                id->p_encoder->format.video.i_height = id->f_dst.i_height =
+                id->p_encoder->fmt_in.video.i_height =
+                  id->p_encoder->fmt_out.video.i_height = id->f_dst.i_height =
                     id->ff_dec_c->height - p_sys->i_crop_top -
-                    p_sys->i_crop_bottom;
+                      p_sys->i_crop_bottom;
             }
 
-            id->p_encoder->i_bitrate = p_sys->i_vbitrate;
-
-            id->p_encoder->i_extra_data = 0;
-            id->p_encoder->p_extra_data = NULL;
+            id->p_encoder->fmt_out.i_extra = 0;
+            id->p_encoder->fmt_out.p_extra = NULL;
 
             id->p_encoder->p_module =
-                module_Need( id->p_encoder, "video encoder", NULL );
+                module_Need( id->p_encoder, "encoder", NULL );
             if( !id->p_encoder->p_module )
             {
                 vlc_object_destroy( id->p_encoder );
@@ -1165,8 +1203,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 return VLC_EGENERIC;
             }
 
-            id->f_dst.i_extra_data = id->p_encoder->i_extra_data;
-            id->f_dst.p_extra_data = id->p_encoder->p_extra_data;
+            id->f_dst.i_extra_data = id->p_encoder->fmt_out.i_extra;
+            id->f_dst.p_extra_data = id->p_encoder->fmt_out.p_extra;
 
             /* Hack for mp2v/mp1v transcoding support */
             if( id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','1','v' ) ||
@@ -1198,7 +1236,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             }
 
             id->i_inter_pixfmt =
-                get_ff_chroma( id->p_encoder->format.video.i_chroma );
+                get_ff_chroma( id->p_encoder->fmt_in.i_codec );
 
             id->b_enc_inited = VLC_TRUE;
         }
@@ -1293,7 +1331,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
         /* Encoding */
         vout_InitPicture( VLC_OBJECT(p_stream), &pic,
-                          id->p_encoder->format.video.i_chroma,
+                          id->p_encoder->fmt_in.i_codec,
                           id->f_dst.i_width, id->f_dst.i_height,
                           id->f_dst.i_width * VOUT_ASPECT_FACTOR /
                           id->f_dst.i_height );

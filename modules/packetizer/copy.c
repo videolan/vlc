@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.17 2003/09/29 22:37:36 gbazin Exp $
+ * $Id: copy.c,v 1.18 2003/11/16 21:07:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -237,35 +237,6 @@ static int Init( packetizer_thread_t *p_pack )
             break;
         case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
             p_pack->output_format.i_fourcc = VLC_FOURCC( 'S', 'V', 'Q', '3' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-
-        case VLC_FOURCC( 'I', '4', '2', '0' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'I', '4', '2', '0' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'I', '4', '2', '2' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'I', '4', '2', '2' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'R', 'V', '1', '5' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'R', 'V', '1', '5' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'R', 'V', '1', '6' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'R', 'V', '1', '6' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'R', 'V', '2', '4' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'R', 'V', '2', '4' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'R', 'V', '3', '2' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'R', 'V', '3', '2' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'G', 'R', 'E', 'Y' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'G', 'R', 'E', 'Y' );
             p_pack->output_format.i_cat = VIDEO_ES;
             break;
 

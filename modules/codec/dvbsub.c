@@ -2,7 +2,7 @@
  * dvbsub.c : DVB subtitles decoder thread
  *****************************************************************************
  * Copyright (C) 2003 ANEVIA
- * $Id: dvbsub.c,v 1.2 2003/11/06 19:35:05 nitrox Exp $
+ * $Id: dvbsub.c,v 1.3 2003/11/16 21:07:30 gbazin Exp $
  *
  * Authors: Damien LUCAS <damien.lucas@anevia.com>
  *
@@ -275,7 +275,7 @@ vlc_module_end();
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*) p_this;
-    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('d','v','b','s') )
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC('d','v','b','s') )
     {
         return VLC_EGENERIC;
     }
