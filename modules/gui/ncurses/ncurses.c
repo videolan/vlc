@@ -491,7 +491,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 return 1;
             case KEY_ENTER:
             case 0x0d:
-                if( p_playlist )
+                if( p_playlist && i_chain_len > 0 )
                 {
                     playlist_Add( p_playlist, p_sys->psz_open_chain,
                                   p_sys->psz_open_chain,
