@@ -519,6 +519,11 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     int i_err;
 
 #ifndef LOADER
+    long (STDCALL *OurDMOEnum)( const GUID *, uint32_t, uint32_t,
+                               const DMO_PARTIAL_MEDIATYPE *,
+                               uint32_t, const DMO_PARTIAL_MEDIATYPE *,
+                               IEnumDMO ** );
+
     IEnumDMO *p_enum_dmo = NULL;
     WCHAR *psz_dmo_name;
     GUID clsid_dmo;
@@ -549,11 +554,6 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     }
 
 #ifndef LOADER
-    long (STDCALL *OurDMOEnum)( const GUID *, uint32_t, uint32_t,
-                               const DMO_PARTIAL_MEDIATYPE *,
-                               uint32_t, const DMO_PARTIAL_MEDIATYPE *,
-                               IEnumDMO ** );
-
     /* Load msdmo DLL */
     *p_hmsdmo_dll = LoadLibrary( "msdmo.dll" );
     if( *p_hmsdmo_dll == NULL )
