@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.22 2002/06/01 18:04:48 sam Exp $
+ * $Id: wall.c,v 1.23 2002/06/11 09:44:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,23 +41,30 @@ static void vout_getfunctions( function_list_t * p_function_list );
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
+#define COLS_TEXT N_("Number of columns")
+#define COLS_LONGTEXT N_("Select the number of horizontal videowindows in " \
+    "which to split the video")
+
+#define ROWS_TEXT N_("Number of rows")
+#define ROWS_LONGTEXT N_("Select the number of vertical videowindows in " \
+    "which to split the video")
+
+#define ACTIVE_TEXT N_("Active windows")
+#define ACTIVE_LONGTEXT N_("comma separated list of active windows, " \
+    "defaults to all")
+
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_INTEGER ( "wall-cols", 3, NULL, N_("Number of columns"),
-              N_("Select the number of horizontal videowindows in which "
-                 "to split the video") )
-ADD_INTEGER ( "wall-rows", 3, NULL, N_("Number of rows"),
-              N_("Select the number of vertical videowindows in which "
-                 "to split the video") )
-ADD_STRING ( "wall-active", NULL, NULL, N_("Active windows"),
-             N_("comma separated list of active windows, defaults to all") )
+ADD_INTEGER ( "wall-cols", 3, NULL, COLS_TEXT, COLS_LONGTEXT )
+ADD_INTEGER ( "wall-rows", 3, NULL, ROWS_TEXT, ROWS_LONGTEXT )
+ADD_STRING ( "wall-active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( _("image wall video module") )
     /* Capability score set to 0 because we don't want to be spawned
      * as a video output unless explicitly requested to */
-    ADD_CAPABILITY( VOUT, 0 )
+    ADD_CAPABILITY( VOUT_FILTER, 0 )
     ADD_SHORTCUT( "wall" )
 MODULE_INIT_STOP
 
@@ -213,7 +220,6 @@ static int vout_Create( vout_thread_t *p_vout )
 static int vout_Init( vout_thread_t *p_vout )
 {
     int i_index, i_row, i_col, i_width, i_height;
-    char *psz_filter;
     picture_t *p_pic;
     
     I_OUTPUTPICTURES = 0;
@@ -225,9 +231,6 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to open the real video output */
-    psz_filter = config_GetPsz( p_vout, "filter" );
-    config_PutPsz( p_vout, "filter", NULL );
-
     msg_Dbg( p_vout, "spawning the real video outputs" );
 
     p_vout->p_sys->i_vout = 0;
@@ -281,17 +284,12 @@ static int vout_Init( vout_thread_t *p_vout )
                 msg_Err( p_vout, "failed to get %ix%i vout threads",
                                  p_vout->p_sys->i_col, p_vout->p_sys->i_row );
                 RemoveAllVout( p_vout );
-                config_PutPsz( p_vout, "filter", psz_filter );
-                if( psz_filter ) free( psz_filter );
                 return 0;
             }
 
             p_vout->p_sys->i_vout++;
         }
     }
-
-    config_PutPsz( p_vout, "filter", psz_filter );
-    if( psz_filter ) free( psz_filter );
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
@@ -467,4 +465,3 @@ static void RemoveAllVout( vout_thread_t *p_vout )
          }
     }
 }
-

@@ -2,7 +2,7 @@
  * transform.c : transform image plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: transform.c,v 1.14 2002/06/01 18:04:48 sam Exp $
+ * $Id: transform.c,v 1.15 2002/06/11 09:44:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -47,17 +47,21 @@ static void vout_getfunctions( function_list_t * p_function_list );
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
+#define TYPE_TEXT N_("Transform type")
+#define TYPE_LONGTEXT N_("One of '90', '180', '270', 'hflip' and 'vflip'")
+
+static char *type_list[] = { "90", "180", "270", "hflip", "vflip", NULL };
+
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING("transform-type", "90", NULL, N_("Transform type"),
-           N_("One of '90', '180', '270', 'hflip' and 'vflip'"))
+ADD_STRING_FROM_LIST("transform-type", "90", type_list, NULL, TYPE_TEXT, TYPE_LONGTEXT)
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( _("image transformation module") )
     /* Capability score set to 0 because we don't want to be spawned
      * as a video output unless explicitly requested to */
-    ADD_CAPABILITY( VOUT, 0 )
+    ADD_CAPABILITY( VOUT_FILTER, 0 )
     ADD_SHORTCUT( "transform" )
 MODULE_INIT_STOP
 
@@ -180,7 +184,6 @@ static int vout_Create( vout_thread_t *p_vout )
 static int vout_Init( vout_thread_t *p_vout )
 {
     int i_index;
-    char *psz_filter;
     picture_t *p_pic;
     
     I_OUTPUTPICTURES = 0;
@@ -192,9 +195,6 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to open the real video output */
-    psz_filter = config_GetPsz( p_vout, "filter" );
-    config_PutPsz( p_vout, "filter", NULL );
-
     msg_Dbg( p_vout, "spawning the real video output" );
 
     if( p_vout->p_sys->b_rotation )
@@ -213,9 +213,6 @@ static int vout_Init( vout_thread_t *p_vout )
                            p_vout->render.i_width, p_vout->render.i_height,
                            p_vout->render.i_chroma, p_vout->render.i_aspect );
     }
-
-    config_PutPsz( p_vout, "filter", psz_filter );
-    if( psz_filter ) free( psz_filter );
 
     /* Everything failed */
     if( p_vout->p_sys->p_vout == NULL )
@@ -431,4 +428,3 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     ;
 }
-

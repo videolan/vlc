@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.54 2002/06/04 00:11:12 sam Exp $
+ * $Id: modules.h,v 1.55 2002/06/11 09:44:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -39,21 +39,23 @@ typedef void *  module_handle_t;
 /*****************************************************************************
  * Module capabilities.
  *****************************************************************************/
-#define MODULE_CAPABILITY_MAIN      0  /* Main */
-#define MODULE_CAPABILITY_INTF      1  /* Interface */
-#define MODULE_CAPABILITY_ACCESS    2  /* Input */
-#define MODULE_CAPABILITY_DEMUX     3  /* Input */
-#define MODULE_CAPABILITY_NETWORK   4  /* Network */
-#define MODULE_CAPABILITY_DECODER   5  /* Audio or video decoder */
-#define MODULE_CAPABILITY_MOTION    6  /* Motion compensation */
-#define MODULE_CAPABILITY_IDCT      7  /* IDCT transformation */
-#define MODULE_CAPABILITY_AOUT      8  /* Audio output */
-#define MODULE_CAPABILITY_VOUT      9  /* Video output */
-#define MODULE_CAPABILITY_CHROMA   10  /* colorspace conversion */
-#define MODULE_CAPABILITY_IMDCT    11  /* IMDCT transformation */
-#define MODULE_CAPABILITY_DOWNMIX  12  /* AC3 downmix */
-#define MODULE_CAPABILITY_MEMCPY   13  /* memcpy */
-#define MODULE_CAPABILITY_MAX      14  /* Total number of capabilities */
+#define MODULE_CAPABILITY_MAIN             0  /* Main */
+#define MODULE_CAPABILITY_INTF             1  /* Interface */
+#define MODULE_CAPABILITY_ACCESS           2  /* Input */
+#define MODULE_CAPABILITY_DEMUX            3  /* Input */
+#define MODULE_CAPABILITY_NETWORK          4  /* Network */
+#define MODULE_CAPABILITY_DECODER          5  /* Audio or video decoder */
+#define MODULE_CAPABILITY_MOTION           6  /* Motion compensation */
+#define MODULE_CAPABILITY_IDCT             7  /* IDCT transformation */
+#define MODULE_CAPABILITY_AOUT             8  /* Audio output */
+#define MODULE_CAPABILITY_AOUT_FILTER      9  /* Audio output filter */
+#define MODULE_CAPABILITY_VOUT            10  /* Video output */
+#define MODULE_CAPABILITY_VOUT_FILTER     11  /* Video output filter */
+#define MODULE_CAPABILITY_CHROMA          12  /* colorspace conversion */
+#define MODULE_CAPABILITY_IMDCT           13  /* IMDCT transformation */
+#define MODULE_CAPABILITY_DOWNMIX         14  /* AC3 downmix */
+#define MODULE_CAPABILITY_MEMCPY          15  /* memcpy */
+#define MODULE_CAPABILITY_MAX             16  /* Total number of capabilities */
 
 #define DECLARE_MODULE_CAPABILITY_TABLE \
     static const char *ppsz_capabilities[] = \
@@ -67,7 +69,9 @@ typedef void *  module_handle_t;
         "motion", \
         "iDCT", \
         "audio output", \
+        "audio output filter", \
         "video output", \
+        "video output filter", \
         "chroma transformation", \
         "iMDCT", \
         "downmix", \

@@ -1158,7 +1158,7 @@ then
   if test x$SYS = xmingw32
   then
     AC_ARG_WITH(directx, 
-    [    --with-directx=PATH   Win32 DirectX headers and libraries])
+    [    --with-directx=PATH   Win32 DirectX headers])
     if test "x$with_directx" = "x"
     then
       AC_CHECK_HEADERS(ddraw.h,
@@ -1169,7 +1169,7 @@ then
       if test -f ${with_directx}/ddraw.h
       then
         PLUGINS="${PLUGINS} directx"
-        directx_LDFLAGS="${directx_LDFLAGS} -L${with_directx}/lib -lgdi32"
+        directx_LDFLAGS="${directx_LDFLAGS} -lgdi32"
         directx_CFLAGS="${directx_CFLAGS} -I${with_directx}"
         AC_MSG_RESULT(yes)
       else

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2002-06-08 00:25+0200\n"
+"POT-Creation-Date: 2002-06-11 11:25+0200\n"
 "PO-Revision-Date: 2002-05-26 18:31+0200\n"
 "Last-Translator: Arkadiusz Lipiec <alipiec@elka.pw.edu.pl>\n"
 "Language-Team: polish <pl@li.org>\n"
@@ -29,55 +29,27 @@ msgstr ""
 "\n"
 
 #. We could also have "=<" here
-#: src/libvlc.c:918 src/misc/configuration.c:798
+#: src/libvlc.c:919 src/misc/configuration.c:813
 msgid "string"
 msgstr "napis"
 
-#: src/libvlc.c:921 src/misc/configuration.c:783
+#: src/libvlc.c:922 src/misc/configuration.c:798
 msgid "integer"
 msgstr "liczba ca³kowita"
 
-#: src/libvlc.c:924 src/misc/configuration.c:790
+#: src/libvlc.c:925 src/misc/configuration.c:805
 msgid "float"
 msgstr "liczba zmiennoprz."
 
-#: src/libvlc.c:930
+#: src/libvlc.c:931
 msgid " (default enabled)"
 msgstr " (domy¶lnie w³±czone)"
 
-#: src/libvlc.c:931
+#: src/libvlc.c:932
 msgid " (default disabled)"
 msgstr " (domy¶lnie wy³±czone)"
 
-#: src/libvlc.c:1013
-msgid ""
-"\n"
-"Playlist items:\n"
-"  *.mpg, *.vob                   plain MPEG-1/2 files\n"
-"  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]\n"
-"                                 DVD device\n"
-"  [vcd:][device][@[title][,[chapter]]\n"
-"                                 VCD device\n"
-"  udpstream:[@[<bind address>][:<bind port>]]\n"
-"                                 UDP stream sent by VLS\n"
-"  vlc:loop                       loop execution of the playlist\n"
-"  vlc:pause                      pause execution of playlist items\n"
-"  vlc:quit                       quit VLC\n"
-msgstr ""
-"\n"
-"Obiekty listy odtwarzania:\n"
-"  *.mpg, *.vob                   zwyk³e pliki MPEG-1/2\n"
-"  [dvd:][urz±dzenie][@urzadzenie_surowe][@[tytu³][,[rozdzia³][,k±t]]]\n"
-"                                 urzadzenie DVD\n"
-"  [vcd:][urz±dzenie][@[tytu³][,[rozdzia³]]\n"
-"                                 urz±dzenie VCD\n"
-"  udpstream:[@[<przypisany adres>][:<przypisany port>]]\n"
-"                                 strumieñ UDP wysy³any przez VLS\n"
-"  vlc:loop                       wykonywanie pêtli listy odtwarzania\n"
-"  vlc:pause                      zatrzymanie odtwarzania obiektów listy\n"
-"  vlc:quit                       wyj¶cie z VLC\n"
-
-#: src/libvlc.c:1034 src/libvlc.c:1083 src/libvlc.c:1107 src/libvlc.c:1126
+#: src/libvlc.c:1014 src/libvlc.c:1063 src/libvlc.c:1087 src/libvlc.c:1106
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -86,7 +58,7 @@ msgstr ""
 "Naci¶nij klawisz ENTER aby kontynuowaæ...\n"
 
 #. Usage
-#: src/libvlc.c:1057
+#: src/libvlc.c:1037
 #, c-format
 msgid ""
 "Usage: %s [options] [parameters] [file]...\n"
@@ -95,11 +67,11 @@ msgstr ""
 "U¿ycie: %s [opcje] [parametry] [plik]...\n"
 "\n"
 
-#: src/libvlc.c:1060
+#: src/libvlc.c:1040
 msgid "[module]              [description]\n"
 msgstr "[modu³]               [opis]\n"
 
-#: src/libvlc.c:1101
+#: src/libvlc.c:1081
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -669,84 +641,112 @@ msgstr ""
 "w±tków pthread, mo¿na tak¿e wybraæ szybsz± implementacjê lecz wówczas mo¿na "
 "napotkaæ problemy."
 
+#: src/libvlc.h:281
+msgid ""
+"\n"
+"Playlist items:\n"
+"  *.mpg, *.vob                   plain MPEG-1/2 files\n"
+"  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]\n"
+"                                 DVD device\n"
+"  [vcd:][device][@[title][,[chapter]]\n"
+"                                 VCD device\n"
+"  udpstream:[@[<bind address>][:<bind port>]]\n"
+"                                 UDP stream sent by VLS\n"
+"  vlc:loop                       loop execution of the playlist\n"
+"  vlc:pause                      pause execution of playlist items\n"
+"  vlc:quit                       quit VLC\n"
+msgstr ""
+"\n"
+"Obiekty listy odtwarzania:\n"
+"  *.mpg, *.vob                   zwyk³e pliki MPEG-1/2\n"
+"  [dvd:][urz±dzenie][@urzadzenie_surowe][@[tytu³][,[rozdzia³][,k±t]]]\n"
+"                                 urzadzenie DVD\n"
+"  [vcd:][urz±dzenie][@[tytu³][,[rozdzia³]]\n"
+"                                 urz±dzenie VCD\n"
+"  udpstream:[@[<przypisany adres>][:<przypisany port>]]\n"
+"                                 strumieñ UDP wysy³any przez VLS\n"
+"  vlc:loop                       wykonywanie pêtli listy odtwarzania\n"
+"  vlc:pause                      zatrzymanie odtwarzania obiektów listy\n"
+"  vlc:quit                       wyj¶cie z VLC\n"
+
 #. Interface options
-#: src/libvlc.h:299
+#: src/libvlc.h:315
 msgid "Interface"
 msgstr "Interfejs"
 
 #. Audio options
-#: src/libvlc.h:307
+#: src/libvlc.h:323
 msgid "Audio"
 msgstr "D¼wiêk"
 
 #. Video options
-#: plugins/directx/directx.c:53 src/libvlc.h:317
+#: plugins/directx/directx.c:53 plugins/dummy/dummy.c:51 src/libvlc.h:333
 msgid "Video"
 msgstr "Obraz"
 
 #. Input options
-#: plugins/satellite/satellite.c:66 src/libvlc.h:330
+#: plugins/satellite/satellite.c:66 src/libvlc.h:346
 msgid "Input"
 msgstr "Wej¶cie"
 
 #. Decoder options
-#: src/libvlc.h:349
+#: src/libvlc.h:365
 msgid "Decoders"
 msgstr "Dekodery"
 
 #. CPU options
-#: src/libvlc.h:354
+#: src/libvlc.h:370
 msgid "CPU"
 msgstr "CPU"
 
 #. Playlist options
 #: plugins/gtk/gnome_interface.c:506 plugins/gtk/gnome_interface.c:1824
 #: plugins/gtk/gnome_interface.c:1848 plugins/gtk/gtk_interface.c:611
-#: plugins/gtk/gtk_interface.c:2105 src/libvlc.h:362
+#: plugins/gtk/gtk_interface.c:2105 src/libvlc.h:378
 msgid "Playlist"
 msgstr "Lista odtwarzania"
 
 #. Misc options
 #: plugins/a52/a52.c:85 plugins/ac3_adec/ac3_adec.c:72 plugins/dsp/dsp.c:81
-#: plugins/dummy/dummy.c:51 plugins/fb/fb.c:70 plugins/filter/deinterlace.c:50
-#: plugins/filter/distort.c:50 plugins/filter/transform.c:51
-#: plugins/filter/wall.c:45 plugins/ggi/ggi.c:64 plugins/gtk/gnome.c:73
+#: plugins/fb/fb.c:70 plugins/filter/deinterlace.c:63
+#: plugins/filter/distort.c:55 plugins/filter/transform.c:56
+#: plugins/filter/wall.c:57 plugins/ggi/ggi.c:64 plugins/gtk/gnome.c:73
 #: plugins/gtk/gtk.c:71 plugins/mad/mad_adec.c:66 plugins/mga/xmga.c:106
 #: plugins/mpeg_vdec/video_parser.c:96 plugins/text/logger.c:86
 #: plugins/win32/win32.cpp:48 plugins/x11/x11.c:55 plugins/x11/xvideo.c:65
-#: src/libvlc.h:368
+#: src/libvlc.h:384
 msgid "Miscellaneous"
 msgstr "Ró¿ne"
 
-#: src/libvlc.h:380
+#: src/libvlc.h:399
 msgid "main program"
 msgstr "g³ówny program"
 
-#: src/libvlc.h:392
+#: src/libvlc.h:411
 msgid "print help"
 msgstr "wy¶wietl pomoc"
 
-#: src/libvlc.h:394
+#: src/libvlc.h:412
 msgid "print detailed help"
 msgstr "wy¶wietl pomoc szczegó³ow±"
 
-#: src/libvlc.h:396
+#: src/libvlc.h:413
 msgid "print a list of available modules"
 msgstr "wy¶wietl listê dostêpnych modu³ów"
 
-#: src/libvlc.h:398
+#: src/libvlc.h:414
 msgid "print help on module"
 msgstr "wy¶wietl pomoc na temat modu³u"
 
-#: src/libvlc.h:401
+#: src/libvlc.h:415
 msgid "print version information"
 msgstr "Wy¶wietl informacje o wersji"
 
-#: src/libvlc.h:403
+#: src/libvlc.h:416
 msgid "print build information"
 msgstr "Wy¶wietl informacje o budowaniu"
 
-#: src/misc/configuration.c:783
+#: src/misc/configuration.c:798
 msgid "boolean"
 msgstr "zm. logiczna"
 
@@ -949,27 +949,34 @@ msgstr "urz±dzenie bufora ramek"
 msgid "Linux console framebuffer module"
 msgstr "modu³ bufora ramek konsoli linuksowej"
 
-#: plugins/filter/deinterlace.c:51
+#. ****************************************************************************
+#. * Build configuration tree.
+#. ****************************************************************************
+#: plugins/filter/deinterlace.c:57
 msgid "Deinterlace mode"
 msgstr "Tryb antyprzeplotowy"
 
-#: plugins/filter/deinterlace.c:52
-msgid "one of 'bob' and 'blend'"
-msgstr "jedna z opcji \"bob\" i \"blend\""
+#: plugins/filter/deinterlace.c:58
+msgid "one of \"discard\", \"blend\", \"mean\", \"bob\" or \"linear\""
+msgstr ""
 
-#: plugins/filter/deinterlace.c:56
+#: plugins/filter/deinterlace.c:69
 msgid "deinterlacing module"
 msgstr "modu³ przeplotu"
 
-#: plugins/filter/distort.c:51
-msgid "distort mode"
+#. ****************************************************************************
+#. * Build configuration tree.
+#. ****************************************************************************
+#: plugins/filter/distort.c:49
+#, fuzzy
+msgid "Distort mode"
 msgstr "Tryb zniekszta³ceñ"
 
-#: plugins/filter/distort.c:52
+#: plugins/filter/distort.c:50
 msgid "one of \"wave\" and \"ripple\""
 msgstr "jedna z opcji \"wave\" i \"ripple\""
 
-#: plugins/filter/distort.c:56
+#: plugins/filter/distort.c:60
 msgid "miscellaneous video effects module"
 msgstr "ró¿ne modu³y efektów obrazu"
 
@@ -977,32 +984,38 @@ msgstr "ró¿ne modu³y efektów obrazu"
 msgid "invert video module"
 msgstr "modu³ odwracania obrazu"
 
-#: plugins/filter/transform.c:52
+#. ****************************************************************************
+#. * Build configuration tree.
+#. ****************************************************************************
+#: plugins/filter/transform.c:50
 msgid "Transform type"
 msgstr "Typ przekszta³cenia"
 
-#: plugins/filter/transform.c:53
+#: plugins/filter/transform.c:51
 msgid "One of '90', '180', '270', 'hflip' and 'vflip'"
 msgstr "Jeden z \"90\", \"180\", \"270\", \"hflip\" i \"vflip\""
 
-#: plugins/filter/transform.c:57
+#: plugins/filter/transform.c:61
 msgid "image transformation module"
 msgstr "modu³ transformacji obrazu"
 
-#: plugins/filter/wall.c:46
+#. ****************************************************************************
+#. * Build configuration tree.
+#. ****************************************************************************
+#: plugins/filter/wall.c:44
 msgid "Number of columns"
 msgstr "Liczba kolumn"
 
-#: plugins/filter/wall.c:47
+#: plugins/filter/wall.c:45
 msgid ""
 "Select the number of horizontal videowindows in which to split the video"
 msgstr "Wybierz liczbê poziomych okien, na które bêdzie on rozdzielony obraz"
 
-#: plugins/filter/wall.c:49
+#: plugins/filter/wall.c:48
 msgid "Number of rows"
 msgstr "Liczba wierszy"
 
-#: plugins/filter/wall.c:50
+#: plugins/filter/wall.c:49
 msgid "Select the number of vertical videowindows in which to split the video"
 msgstr "Wybierz liczbê pionowych okien, na które bêdzie on rozdzielony obraz"
 
@@ -1014,7 +1027,7 @@ msgstr "Aktywne okna"
 msgid "comma separated list of active windows, defaults to all"
 msgstr "rozdzielana przecinkami lista aktywnych okien, domy¶lnie na wszystkie"
 
-#: plugins/filter/wall.c:57
+#: plugins/filter/wall.c:64
 msgid "image wall video module"
 msgstr "modu³ ¶ciany obrazu (image wall)"
 
@@ -1431,7 +1444,7 @@ msgstr ""
 #: plugins/gtk/gtk_interface.c:1386 plugins/gtk/gtk_interface.c:1609
 #: plugins/gtk/gtk_interface.c:1915 plugins/gtk/gtk_interface.c:2046
 #: plugins/gtk/gtk_interface.c:2277 plugins/gtk/gtk_interface.c:2383
-#: plugins/gtk/gtk_interface.c:2589 plugins/gtk/gtk_preferences.c:526
+#: plugins/gtk/gtk_interface.c:2589 plugins/gtk/gtk_preferences.c:540
 msgid "OK"
 msgstr "OK"
 
@@ -1481,7 +1494,7 @@ msgstr "Nazwa urz±dzenia"
 
 #: plugins/gtk/gtk_interface.c:1616 plugins/gtk/gtk_interface.c:1922
 #: plugins/gtk/gtk_interface.c:2053 plugins/gtk/gtk_interface.c:2284
-#: plugins/gtk/gtk_interface.c:2596 plugins/gtk/gtk_preferences.c:538
+#: plugins/gtk/gtk_interface.c:2596 plugins/gtk/gtk_preferences.c:552
 msgid "Cancel"
 msgstr "Anuluj"
 
@@ -1705,7 +1718,7 @@ msgstr "Usuñ"
 msgid "Invert"
 msgstr "Odwróæ"
 
-#: plugins/gtk/gnome_interface.c:1773 plugins/gtk/gtk_preferences.c:364
+#: plugins/gtk/gnome_interface.c:1773 plugins/gtk/gtk_preferences.c:359
 msgid "Select"
 msgstr "Wybierz"
 
@@ -1745,28 +1758,28 @@ msgstr "Kana³y"
 msgid "Channel server"
 msgstr "Serwer kana³ów"
 
-#: plugins/gtk/gtk_preferences.c:310
+#: plugins/gtk/gtk_preferences.c:305
 msgid "Name"
 msgstr "Nazwa"
 
-#: plugins/gtk/gtk_preferences.c:310
+#: plugins/gtk/gtk_preferences.c:305
 msgid "Description"
 msgstr "Opis"
 
-#: plugins/gtk/gtk_preferences.c:353
+#: plugins/gtk/gtk_preferences.c:348
 msgid "Configure"
 msgstr "Skonfiguruj"
 
 #. add new label
-#: plugins/gtk/gtk_preferences.c:376
+#: plugins/gtk/gtk_preferences.c:371
 msgid "Selected:"
 msgstr "Wybrano:"
 
-#: plugins/gtk/gtk_preferences.c:517 plugins/gtk/gtk_preferences.c:534
+#: plugins/gtk/gtk_preferences.c:531 plugins/gtk/gtk_preferences.c:548
 msgid "Save"
 msgstr "Zapisz"
 
-#: plugins/gtk/gtk_preferences.c:530
+#: plugins/gtk/gtk_preferences.c:544
 msgid "Apply"
 msgstr "Zastosuj"
 
@@ -2002,7 +2015,7 @@ msgstr "modu³ dekodera obrazu MPEG I/II"
 msgid "IPv4 network abstraction layer"
 msgstr "sieciowa warstwa abstrakcji IPv4"
 
-#: plugins/network/ipv6.c:78
+#: plugins/network/ipv6.c:79
 msgid "IPv6 network abstraction layer"
 msgstr "sieciowa warstwa abstrakcji IPv6"
 
@@ -2161,3 +2174,6 @@ msgstr ""
 #: plugins/x11/xvideo.c:73
 msgid "XVideo extension module"
 msgstr "modu³ rozszerzenia XVideo"
+
+#~ msgid "one of 'bob' and 'blend'"
+#~ msgstr "jedna z opcji \"bob\" i \"blend\""

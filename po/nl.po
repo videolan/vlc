@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-06-08 00:25+0200\n"
+"POT-Creation-Date: 2002-06-11 11:25+0200\n"
 "PO-Revision-Date: 2002-04-20 16:58GMT\n"
 "Last-Translator: Jean-Paul Saman <jpsaman@wxs.nl>\n"
 "Language-Team: Nederlands <nl@li.org>\n"
@@ -28,56 +28,27 @@ msgid ""
 msgstr "%s module opties:\n"
 
 #. We could also have "=<" here
-#: src/libvlc.c:918 src/misc/configuration.c:798
+#: src/libvlc.c:919 src/misc/configuration.c:813
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:921 src/misc/configuration.c:783
+#: src/libvlc.c:922 src/misc/configuration.c:798
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:924 src/misc/configuration.c:790
+#: src/libvlc.c:925 src/misc/configuration.c:805
 msgid "float"
 msgstr ""
 
-#: src/libvlc.c:930
+#: src/libvlc.c:931
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:931
+#: src/libvlc.c:932
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:1013
-#, fuzzy
-msgid ""
-"\n"
-"Playlist items:\n"
-"  *.mpg, *.vob                   plain MPEG-1/2 files\n"
-"  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]\n"
-"                                 DVD device\n"
-"  [vcd:][device][@[title][,[chapter]]\n"
-"                                 VCD device\n"
-"  udpstream:[@[<bind address>][:<bind port>]]\n"
-"                                 UDP stream sent by VLS\n"
-"  vlc:loop                       loop execution of the playlist\n"
-"  vlc:pause                      pause execution of playlist items\n"
-"  vlc:quit                       quit VLC\n"
-msgstr ""
-"\n"
-"Speellijst items:\n"
-"  *.mpg, *.vob                   \tgewone MPEG-1/2 bestanden\n"
-"  [dvd:][apparaat[@raw_device][@[titel][,[hoofdstuk][,hoek]]]\n"
-"                                 \tDVD apparaat\n"
-"  [vcd:][apparaat][@[titel][,[hoofdstuk]]\n"
-"                                 \tVCD apparaat\n"
-"  udpstream:[@[<bind adres>][:<bind poort>]]\n"
-"                                 \tUDP stream verzonde daar VLS\n"
-"  vlc:loop                       \tspeel de speellijst in een loop\n"
-"  vlc:pause                      \tpauzeer speellijst items\n"
-"  vlc:quit                       \tstop VLC"
-
-#: src/libvlc.c:1034 src/libvlc.c:1083 src/libvlc.c:1107 src/libvlc.c:1126
+#: src/libvlc.c:1014 src/libvlc.c:1063 src/libvlc.c:1087 src/libvlc.c:1106
 #, fuzzy
 msgid ""
 "\n"
@@ -87,19 +58,19 @@ msgstr ""
 "Druk op RETURN om verder te gaan..."
 
 #. Usage
-#: src/libvlc.c:1057
+#: src/libvlc.c:1037
 #, fuzzy, c-format
 msgid ""
 "Usage: %s [options] [parameters] [file]...\n"
 "\n"
 msgstr "Gebruik: %s [opties] [parameters] [file] ...\n"
 
-#: src/libvlc.c:1060
+#: src/libvlc.c:1040
 #, fuzzy
 msgid "[module]              [description]\n"
 msgstr "[module]              [beschrijving]"
 
-#: src/libvlc.c:1101
+#: src/libvlc.c:1081
 #, fuzzy
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
@@ -666,86 +637,115 @@ msgstr ""
 "echter deze is nog experimenteel.Het is dus mogelijk dat er problemen "
 "optreden met deze snellere implementatie."
 
+#: src/libvlc.h:281
+#, fuzzy
+msgid ""
+"\n"
+"Playlist items:\n"
+"  *.mpg, *.vob                   plain MPEG-1/2 files\n"
+"  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]\n"
+"                                 DVD device\n"
+"  [vcd:][device][@[title][,[chapter]]\n"
+"                                 VCD device\n"
+"  udpstream:[@[<bind address>][:<bind port>]]\n"
+"                                 UDP stream sent by VLS\n"
+"  vlc:loop                       loop execution of the playlist\n"
+"  vlc:pause                      pause execution of playlist items\n"
+"  vlc:quit                       quit VLC\n"
+msgstr ""
+"\n"
+"Speellijst items:\n"
+"  *.mpg, *.vob                   \tgewone MPEG-1/2 bestanden\n"
+"  [dvd:][apparaat[@raw_device][@[titel][,[hoofdstuk][,hoek]]]\n"
+"                                 \tDVD apparaat\n"
+"  [vcd:][apparaat][@[titel][,[hoofdstuk]]\n"
+"                                 \tVCD apparaat\n"
+"  udpstream:[@[<bind adres>][:<bind poort>]]\n"
+"                                 \tUDP stream verzonde daar VLS\n"
+"  vlc:loop                       \tspeel de speellijst in een loop\n"
+"  vlc:pause                      \tpauzeer speellijst items\n"
+"  vlc:quit                       \tstop VLC"
+
 #. Interface options
-#: src/libvlc.h:299
+#: src/libvlc.h:315
 msgid "Interface"
 msgstr ""
 
 #. Audio options
-#: src/libvlc.h:307
+#: src/libvlc.h:323
 msgid "Audio"
 msgstr ""
 
 #. Video options
-#: plugins/directx/directx.c:53 src/libvlc.h:317
+#: plugins/directx/directx.c:53 plugins/dummy/dummy.c:51 src/libvlc.h:333
 msgid "Video"
 msgstr ""
 
 #. Input options
-#: plugins/satellite/satellite.c:66 src/libvlc.h:330
+#: plugins/satellite/satellite.c:66 src/libvlc.h:346
 msgid "Input"
 msgstr ""
 
 #. Decoder options
-#: src/libvlc.h:349
+#: src/libvlc.h:365
 msgid "Decoders"
 msgstr ""
 
 #. CPU options
-#: src/libvlc.h:354
+#: src/libvlc.h:370
 msgid "CPU"
 msgstr ""
 
 #. Playlist options
 #: plugins/gtk/gnome_interface.c:506 plugins/gtk/gnome_interface.c:1824
 #: plugins/gtk/gnome_interface.c:1848 plugins/gtk/gtk_interface.c:611
-#: plugins/gtk/gtk_interface.c:2105 src/libvlc.h:362
+#: plugins/gtk/gtk_interface.c:2105 src/libvlc.h:378
 msgid "Playlist"
 msgstr "Speellijst"
 
 #. Misc options
 #: plugins/a52/a52.c:85 plugins/ac3_adec/ac3_adec.c:72 plugins/dsp/dsp.c:81
-#: plugins/dummy/dummy.c:51 plugins/fb/fb.c:70 plugins/filter/deinterlace.c:50
-#: plugins/filter/distort.c:50 plugins/filter/transform.c:51
-#: plugins/filter/wall.c:45 plugins/ggi/ggi.c:64 plugins/gtk/gnome.c:73
+#: plugins/fb/fb.c:70 plugins/filter/deinterlace.c:63
+#: plugins/filter/distort.c:55 plugins/filter/transform.c:56
+#: plugins/filter/wall.c:57 plugins/ggi/ggi.c:64 plugins/gtk/gnome.c:73
 #: plugins/gtk/gtk.c:71 plugins/mad/mad_adec.c:66 plugins/mga/xmga.c:106
 #: plugins/mpeg_vdec/video_parser.c:96 plugins/text/logger.c:86
 #: plugins/win32/win32.cpp:48 plugins/x11/x11.c:55 plugins/x11/xvideo.c:65
-#: src/libvlc.h:368
+#: src/libvlc.h:384
 msgid "Miscellaneous"
 msgstr "Overige"
 
-#: src/libvlc.h:380
+#: src/libvlc.h:399
 msgid "main program"
 msgstr "hoofd programma"
 
-#: src/libvlc.h:392
+#: src/libvlc.h:411
 msgid "print help"
 msgstr "print help"
 
-#: src/libvlc.h:394
+#: src/libvlc.h:412
 msgid "print detailed help"
 msgstr "print gedetailleerde help"
 
-#: src/libvlc.h:396
+#: src/libvlc.h:413
 msgid "print a list of available modules"
 msgstr "print een lijst van beschikbare modules"
 
-#: src/libvlc.h:398
+#: src/libvlc.h:414
 #, fuzzy
 msgid "print help on module"
 msgstr "print help over module <string>"
 
-#: src/libvlc.h:401
+#: src/libvlc.h:415
 msgid "print version information"
 msgstr "print versie informatie"
 
-#: src/libvlc.h:403
+#: src/libvlc.h:416
 #, fuzzy
 msgid "print build information"
 msgstr "print versie informatie"
 
-#: src/misc/configuration.c:783
+#: src/misc/configuration.c:798
 msgid "boolean"
 msgstr ""
 
@@ -934,29 +934,35 @@ msgstr ""
 msgid "Linux console framebuffer module"
 msgstr ""
 
-#: plugins/filter/deinterlace.c:51
+#. ****************************************************************************
+#. * Build configuration tree.
+#. ****************************************************************************
+#: plugins/filter/deinterlace.c:57
 #, fuzzy
 msgid "Deinterlace mode"
 msgstr "interface module"
 
-#: plugins/filter/deinterlace.c:52
-msgid "one of 'bob' and 'blend'"
+#: plugins/filter/deinterlace.c:58
+msgid "one of \"discard\", \"blend\", \"mean\", \"bob\" or \"linear\""
 msgstr ""
 
-#: plugins/filter/deinterlace.c:56
+#: plugins/filter/deinterlace.c:69
 msgid "deinterlacing module"
 msgstr ""
 
-#: plugins/filter/distort.c:51
+#. ****************************************************************************
+#. * Build configuration tree.
+#. ****************************************************************************
+#: plugins/filter/distort.c:49
 #, fuzzy
-msgid "distort mode"
+msgid "Distort mode"
 msgstr "Netwerk"
 
-#: plugins/filter/distort.c:52
+#: plugins/filter/distort.c:50
 msgid "one of \"wave\" and \"ripple\""
 msgstr ""
 
-#: plugins/filter/distort.c:56
+#: plugins/filter/distort.c:60
 msgid "miscellaneous video effects module"
 msgstr "overige video effecten module"
 
@@ -964,32 +970,38 @@ msgstr "overige video effecten module"
 msgid "invert video module"
 msgstr "inverteer video module"
 
-#: plugins/filter/transform.c:52
+#. ****************************************************************************
+#. * Build configuration tree.
+#. ****************************************************************************
+#: plugins/filter/transform.c:50
 msgid "Transform type"
 msgstr ""
 
-#: plugins/filter/transform.c:53
+#: plugins/filter/transform.c:51
 msgid "One of '90', '180', '270', 'hflip' and 'vflip'"
 msgstr ""
 
-#: plugins/filter/transform.c:57
+#: plugins/filter/transform.c:61
 msgid "image transformation module"
 msgstr "image transformatie module"
 
-#: plugins/filter/wall.c:46
+#. ****************************************************************************
+#. * Build configuration tree.
+#. ****************************************************************************
+#: plugins/filter/wall.c:44
 msgid "Number of columns"
 msgstr ""
 
-#: plugins/filter/wall.c:47
+#: plugins/filter/wall.c:45
 msgid ""
 "Select the number of horizontal videowindows in which to split the video"
 msgstr ""
 
-#: plugins/filter/wall.c:49
+#: plugins/filter/wall.c:48
 msgid "Number of rows"
 msgstr ""
 
-#: plugins/filter/wall.c:50
+#: plugins/filter/wall.c:49
 msgid "Select the number of vertical videowindows in which to split the video"
 msgstr ""
 
@@ -1001,7 +1013,7 @@ msgstr ""
 msgid "comma separated list of active windows, defaults to all"
 msgstr ""
 
-#: plugins/filter/wall.c:57
+#: plugins/filter/wall.c:64
 msgid "image wall video module"
 msgstr "image muur video module"
 
@@ -1423,7 +1435,7 @@ msgstr ""
 #: plugins/gtk/gtk_interface.c:1386 plugins/gtk/gtk_interface.c:1609
 #: plugins/gtk/gtk_interface.c:1915 plugins/gtk/gtk_interface.c:2046
 #: plugins/gtk/gtk_interface.c:2277 plugins/gtk/gtk_interface.c:2383
-#: plugins/gtk/gtk_interface.c:2589 plugins/gtk/gtk_preferences.c:526
+#: plugins/gtk/gtk_interface.c:2589 plugins/gtk/gtk_preferences.c:540
 msgid "OK"
 msgstr ""
 
@@ -1473,7 +1485,7 @@ msgstr "Apparaat naam"
 
 #: plugins/gtk/gtk_interface.c:1616 plugins/gtk/gtk_interface.c:1922
 #: plugins/gtk/gtk_interface.c:2053 plugins/gtk/gtk_interface.c:2284
-#: plugins/gtk/gtk_interface.c:2596 plugins/gtk/gtk_preferences.c:538
+#: plugins/gtk/gtk_interface.c:2596 plugins/gtk/gtk_preferences.c:552
 msgid "Cancel"
 msgstr "Annuleer"
 
@@ -1699,7 +1711,7 @@ msgstr "Verklein"
 msgid "Invert"
 msgstr "Inverteer"
 
-#: plugins/gtk/gnome_interface.c:1773 plugins/gtk/gtk_preferences.c:364
+#: plugins/gtk/gnome_interface.c:1773 plugins/gtk/gtk_preferences.c:359
 msgid "Select"
 msgstr "Selecteer"
 
@@ -1739,28 +1751,28 @@ msgstr "Kanalen"
 msgid "Channel server"
 msgstr "Kanaal server"
 
-#: plugins/gtk/gtk_preferences.c:310
+#: plugins/gtk/gtk_preferences.c:305
 msgid "Name"
 msgstr "Naam"
 
-#: plugins/gtk/gtk_preferences.c:310
+#: plugins/gtk/gtk_preferences.c:305
 msgid "Description"
 msgstr "Beschrijving"
 
-#: plugins/gtk/gtk_preferences.c:353
+#: plugins/gtk/gtk_preferences.c:348
 msgid "Configure"
 msgstr "Configureer"
 
 #. add new label
-#: plugins/gtk/gtk_preferences.c:376
+#: plugins/gtk/gtk_preferences.c:371
 msgid "Selected:"
 msgstr "Geselecteerd:"
 
-#: plugins/gtk/gtk_preferences.c:517 plugins/gtk/gtk_preferences.c:534
+#: plugins/gtk/gtk_preferences.c:531 plugins/gtk/gtk_preferences.c:548
 msgid "Save"
 msgstr "Bewaar"
 
-#: plugins/gtk/gtk_preferences.c:530
+#: plugins/gtk/gtk_preferences.c:544
 msgid "Apply"
 msgstr "Voer uit"
 
@@ -1995,7 +2007,7 @@ msgstr ""
 msgid "IPv4 network abstraction layer"
 msgstr "IPv4 network abstractie laag"
 
-#: plugins/network/ipv6.c:78
+#: plugins/network/ipv6.c:79
 msgid "IPv6 network abstraction layer"
 msgstr "IPv6 network abstractie laag"
 

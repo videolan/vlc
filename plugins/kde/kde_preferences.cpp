@@ -51,13 +51,13 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
         switch( p_item->i_type )
         {
 
-        case MODULE_CONFIG_HINT_CATEGORY:
-        case MODULE_CONFIG_HINT_END:
+        case CONFIG_HINT_CATEGORY:
+        case CONFIG_HINT_END:
 
             /*
              * Now we can start taking care of the new category
              */
-            if( p_item->i_type == MODULE_CONFIG_HINT_CATEGORY )
+            if( p_item->i_type == CONFIG_HINT_CATEGORY )
             {
                 category_label = new QString( p_item->psz_text );
                 QFrame *page = addPage( *category_label );
@@ -74,7 +74,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
 
             break;
 
-        case MODULE_CONFIG_ITEM_MODULE:
+        case CONFIG_ITEM_MODULE:
 
             {
                 
@@ -108,8 +108,8 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
             }
             break;
 
-        case MODULE_CONFIG_ITEM_STRING:
-        case MODULE_CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_STRING:
+        case CONFIG_ITEM_FILE:
 
             {
                 QHBox *hb = new QHBox(category_table);
@@ -134,7 +134,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
             }
             break;
 
-        case MODULE_CONFIG_ITEM_INTEGER:
+        case CONFIG_ITEM_INTEGER:
             /* add input box with default value */
             {
                 QHBox *hb = new QHBox(category_table);
@@ -151,7 +151,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
             }
             break;
 
-        case MODULE_CONFIG_ITEM_FLOAT:
+        case CONFIG_ITEM_FLOAT:
             {
                 QHBox *hb = new QHBox(category_table);
                 hb->setSpacing(spacingHint());
@@ -169,7 +169,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
             break;
                                                   
                 
-        case MODULE_CONFIG_ITEM_BOOL:
+        case CONFIG_ITEM_BOOL:
 
             /* add check button */
             {
@@ -190,7 +190,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
 
         p_item++;
     }
-    while( p_item->i_type != MODULE_CONFIG_HINT_END );
+    while( p_item->i_type != CONFIG_HINT_END );
     exec();
     
 }
@@ -236,9 +236,9 @@ void KPreferences::slotApply()
 
         switch( p_config->getType() ) {
 
-        case MODULE_CONFIG_ITEM_STRING:
-        case MODULE_CONFIG_ITEM_FILE:
-        case MODULE_CONFIG_ITEM_MODULE:
+        case CONFIG_ITEM_STRING:
+        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_MODULE:
             if (p_config->sValue()) {
                 config_PutPsz( p_intf, p_config->name(),
                                strdup(p_config->sValue().latin1()));
@@ -247,11 +247,11 @@ void KPreferences::slotApply()
                 config_PutPsz( p_intf, p_config->name(), NULL );
             }
             break;
-        case MODULE_CONFIG_ITEM_INTEGER:
-        case MODULE_CONFIG_ITEM_BOOL:
+        case CONFIG_ITEM_INTEGER:
+        case CONFIG_ITEM_BOOL:
             config_PutInt( p_intf, p_config->name(), p_config->iValue() );
             break;
-        case MODULE_CONFIG_ITEM_FLOAT:
+        case CONFIG_ITEM_FLOAT:
             config_PutFloat( p_intf, p_config->name(), p_config->fValue() );
             break;
         }

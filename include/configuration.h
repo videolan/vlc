@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.13 2002/06/01 18:04:48 sam Exp $
+ * $Id: configuration.h,v 1.14 2002/06/11 09:44:21 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -28,22 +28,23 @@
  *****************************************************************************/
 
 /* Configuration hint types */
-#define MODULE_CONFIG_HINT_END              0x0001  /* End of config */
-#define MODULE_CONFIG_HINT_CATEGORY         0x0002  /* Start of new category */
-#define MODULE_CONFIG_HINT_SUBCATEGORY      0x0003  /* Start of sub-category */
-#define MODULE_CONFIG_HINT_SUBCATEGORY_END  0x0004  /* End of sub-category */
+#define CONFIG_HINT_END                     0x0001  /* End of config */
+#define CONFIG_HINT_CATEGORY                0x0002  /* Start of new category */
+#define CONFIG_HINT_SUBCATEGORY             0x0003  /* Start of sub-category */
+#define CONFIG_HINT_SUBCATEGORY_END         0x0004  /* End of sub-category */
+#define CONFIG_HINT_USAGE                   0x0005  /* Usage information */
 
-#define MODULE_CONFIG_HINT                  0x000F
+#define CONFIG_HINT                         0x000F
 
 /* Configuration item types */
-#define MODULE_CONFIG_ITEM_STRING           0x0010  /* String option */
-#define MODULE_CONFIG_ITEM_FILE             0x0020  /* File option */
-#define MODULE_CONFIG_ITEM_MODULE           0x0030  /* Module option */
-#define MODULE_CONFIG_ITEM_INTEGER          0x0040  /* Integer option */
-#define MODULE_CONFIG_ITEM_BOOL             0x0050  /* Bool option */
-#define MODULE_CONFIG_ITEM_FLOAT            0x0060  /* Float option */
+#define CONFIG_ITEM_STRING                  0x0010  /* String option */
+#define CONFIG_ITEM_FILE                    0x0020  /* File option */
+#define CONFIG_ITEM_MODULE                  0x0030  /* Module option */
+#define CONFIG_ITEM_INTEGER                 0x0040  /* Integer option */
+#define CONFIG_ITEM_BOOL                    0x0050  /* Bool option */
+#define CONFIG_ITEM_FLOAT                   0x0060  /* Float option */
 
-#define MODULE_CONFIG_ITEM                  0x00F0
+#define CONFIG_ITEM                         0x00F0
 
 struct module_config_s
 {
@@ -59,7 +60,9 @@ struct module_config_s
     /* Function to call when commiting a change */
     void ( * pf_callback ) ( vlc_object_t * );
 
-    vlc_mutex_t *p_lock;            /* lock to use when modifying the config */
+    char       **ppsz_list;        /* List of possible values for the option */
+
+    vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
     vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
 };
 
@@ -100,64 +103,71 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
 /*****************************************************************************
  * Macros used to build the configuration structure.
  *
- * Note that internally we support only 2 types of config data: int and string.
- *   The other types declared here just map to one of these 2 basic types but
+ * Note that internally we support only 3 types of config data: int , float
+ *   and string.
+ *   The other types declared here just map to one of these 3 basic types but
  *   have the advantage of also providing very good hints to a configuration
  *   interface so as to make it more user friendly.
  * The configuration structure also includes category hints. These hints can
- *   provide a configuration inteface with some very useful data and also allow
- *   for a more user friendly interface.
+ *   provide a configuration interface with some very useful data and again
+ *   allow for a more user friendly interface.
  *****************************************************************************/
 
 #define MODULE_CONFIG_START \
     static module_config_t p_config[] = {
-
 #define MODULE_CONFIG_STOP \
-    { MODULE_CONFIG_HINT_END, NULL, '\0', NULL, NULL, NULL, 0, 0, NULL, 0 } };
+    { CONFIG_HINT_END, NULL, '\0' } };
 
 #define ADD_CATEGORY_HINT( text, longtext ) \
-    { MODULE_CONFIG_HINT_CATEGORY, NULL, '\0', text, longtext, NULL, 0, 0, \
-      NULL, NULL, 0 },
+    { CONFIG_HINT_CATEGORY, NULL, '\0', text, longtext },
 #define ADD_SUBCATEGORY_HINT( text, longtext ) \
-    { MODULE_CONFIG_HINT_SUBCATEGORY, NULL, '\0', text, longtext, NULL, 0, 0, \
-      NULL, NULL, 0 },
+    { CONFIG_HINT_SUBCATEGORY, NULL, '\0', text, longtext },
 #define END_SUBCATEGORY_HINT \
-    { MODULE_CONFIG_HINT_SUBCATEGORY_END, NULL, '\0', NULL, NULL, NULL, 0, 0, \
-      NULL, NULL, 0 },
-#define ADD_STRING( name, value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_STRING, name, '\0', text, longtext, value, 0, 0, \
-      p_callback, NULL, 0 },
+    { CONFIG_HINT_SUBCATEGORY_END, NULL, '\0' },
+#define ADD_USAGE_HINT( text ) \
+    { CONFIG_HINT_USAGE, NULL, '\0', text },
+
+#define ADD_STRING( name, psz_value, p_callback, text, longtext ) \
+    { CONFIG_ITEM_STRING, name, '\0', text, longtext, psz_value, 0, 0, \
+      p_callback },
+#define ADD_STRING_FROM_LIST( name, psz_value, ppsz_list, p_callback, text, \
+      longtext ) \
+    { CONFIG_ITEM_STRING, name, '\0', text, longtext, psz_value, 0, 0, \
+      p_callback, ppsz_list },
 #define ADD_FILE( name, psz_value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_FILE, name, '\0', text, longtext, psz_value, 0, 0, \
-      p_callback, NULL, 0 },
-#define ADD_MODULE( name, i_capability, psz_value, p_callback, text, longtext)\
-    { MODULE_CONFIG_ITEM_MODULE, name, '\0', text, longtext, psz_value, \
-      i_capability, 0, p_callback, NULL, 0 },
+    { CONFIG_ITEM_FILE, name, '\0', text, longtext, psz_value, 0, 0, \
+      p_callback },
+#define ADD_MODULE( name, i_caps, psz_value, p_callback, text, longtext ) \
+    { CONFIG_ITEM_MODULE, name, '\0', text, longtext, psz_value, i_caps, 0, \
+      p_callback },
 #define ADD_INTEGER( name, i_value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_INTEGER, name, '\0', text, longtext, NULL, i_value, \
-      0, p_callback, NULL, 0 },
+    { CONFIG_ITEM_INTEGER, name, '\0', text, longtext, NULL, i_value, 0, \
+      p_callback },
 #define ADD_FLOAT( name, f_value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_FLOAT, name, '\0', text, longtext, NULL, 0, f_value, \
-      p_callback, NULL, 0 },
+    { CONFIG_ITEM_FLOAT, name, '\0', text, longtext, NULL, 0, f_value, \
+      p_callback },
 #define ADD_BOOL( name, b_value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_BOOL, name, '\0', text, longtext, NULL, b_value, 0, \
-      p_callback, NULL, 0 },
+    { CONFIG_ITEM_BOOL, name, '\0', text, longtext, NULL, b_value, 0, \
+      p_callback },
+
+/* These should be seldom used. They were added just to provide easy shortcuts
+ * for the command line interface */
 #define ADD_STRING_WITH_SHORT( name, ch, psz_value, p_callback, text, ltext ) \
-    { MODULE_CONFIG_ITEM_STRING, name, ch, text, ltext, psz_value, 0, 0, \
-      p_callback, NULL, 0 },
+    { CONFIG_ITEM_STRING, name, ch, text, ltext, psz_value, 0, 0, \
+      p_callback },
 #define ADD_FILE_WITH_SHORT( name, ch, psz_value, p_callback, text, ltext ) \
-    { MODULE_CONFIG_ITEM_FILE, name, ch, text, ltext, psz_value, 0, 0, \
-      p_callback, NULL, 0 },
+    { CONFIG_ITEM_FILE, name, ch, text, ltext, psz_value, 0, 0, \
+      p_callback },
 #define ADD_MODULE_WITH_SHORT( name, ch, i_capability, psz_value, p_callback, \
     text, ltext) \
-    { MODULE_CONFIG_ITEM_MODULE, name, ch, text, ltext, psz_value, \
-      i_capability, 0, p_callback, NULL, 0 },
+    { CONFIG_ITEM_MODULE, name, ch, text, ltext, psz_value, i_capability, 0, \
+      p_callback },
 #define ADD_INTEGER_WITH_SHORT( name, ch, i_value, p_callback, text, ltext ) \
-    { MODULE_CONFIG_ITEM_INTEGER, name, ch, text, ltext, NULL, i_value, 0, \
-      p_callback, NULL, 0 },
+    { CONFIG_ITEM_INTEGER, name, ch, text, ltext, NULL, i_value, 0, \
+      p_callback },
 #define ADD_FLOAT_WITH_SHORT( name, ch, f_value, p_callback, text, ltext ) \
-    { MODULE_CONFIG_ITEM_FLOAT, name, ch, text, ltext, NULL, 0, f_value, \
-      p_callback, NULL, 0 },
+    { CONFIG_ITEM_FLOAT, name, ch, text, ltext, NULL, 0, f_value, \
+      p_callback },
 #define ADD_BOOL_WITH_SHORT( name, ch, b_value, p_callback, text, ltext ) \
-    { MODULE_CONFIG_ITEM_BOOL, name, ch, text, ltext, NULL, b_value, 0, \
-      p_callback, NULL, 0 },
+    { CONFIG_ITEM_BOOL, name, ch, text, ltext, NULL, b_value, 0, \
+      p_callback },

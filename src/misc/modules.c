@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.67 2002/06/07 23:53:44 sam Exp $
+ * $Id: modules.c,v 1.68 2002/06/11 09:44:22 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -461,6 +461,7 @@ module_t * __module_Need( vlc_object_t *p_this,
                 break;
 
             case MODULE_CAPABILITY_VOUT:
+            case MODULE_CAPABILITY_VOUT_FILTER:
                 i_ret = p_tmp->p_module->p_functions->vout.functions.
                               vout.pf_create( (vout_thread_t *)p_data );
                 break;

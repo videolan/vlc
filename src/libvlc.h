@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.3 2002/06/07 14:30:41 sam Exp $
+ * $Id: libvlc.h,v 1.4 2002/06/11 09:44:22 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -278,13 +278,29 @@
     "you can also use this faster implementation but you might experience " \
     "problems with it.")
 
+#define PLAYLIST_USAGE N_("\nPlaylist items:" \
+    "\n  *.mpg, *.vob                   plain MPEG-1/2 files" \
+    "\n  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]" \
+    "\n                                 DVD device" \
+    "\n  [vcd:][device][@[title][,[chapter]]" \
+    "\n                                 VCD device" \
+    "\n  udpstream:[@[<bind address>][:<bind port>]]" \
+    "\n                                 UDP stream sent by VLS" \
+    "\n  vlc:loop                       loop execution of the " \
+    "playlist" \
+    "\n  vlc:pause                      pause execution of " \
+    "playlist items" \
+    "\n  vlc:quit                       quit VLC" \
+    "\n")
+
 /*
  * Quick usage guide for the configuration options:
  *
  * MODULE_CONFIG_START
  * MODULE_CONFIG_STOP
- * ADD_CATEGORY_HINT( N_(text), longtext )
- * ADD_SUBCATEGORY_HINT( N_(text), longtext )
+ * ADD_CATEGORY_HINT( N_(text), N_(longtext) )
+ * ADD_SUBCATEGORY_HINT( N_(text), N_(longtext) )
+ * ADD_USAGE_HINT( N_(text) )
  * ADD_STRING( option_name, value, p_callback, N_(text), N_(longtext) )
  * ADD_FILE( option_name, psz_value, p_callback, N_(text), N_(longtext) )
  * ADD_MODULE( option_name, psz_value, i_capability, p_callback,
@@ -297,7 +313,7 @@ MODULE_CONFIG_START
 
 /* Interface options */
 ADD_CATEGORY_HINT( N_("Interface"), NULL)
-ADD_MODULE_WITH_SHORT  ( "intf", 'I', MODULE_CAPABILITY_INTF, NULL, NULL, INTF_TEXT, INTF_LONGTEXT )
+ADD_MODULE_WITH_SHORT ( "intf", 'I', MODULE_CAPABILITY_INTF, NULL, NULL, INTF_TEXT, INTF_LONGTEXT )
 ADD_BOOL_WITH_SHORT ( "verbose", 'v', 0, NULL, VERBOSE_TEXT, VERBOSE_LONGTEXT )
 ADD_BOOL_WITH_SHORT ( "quiet", 'q', 0, NULL, QUIET_TEXT, QUIET_LONGTEXT )
 ADD_BOOL            ( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT )
@@ -305,7 +321,7 @@ ADD_STRING  ( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT )
 
 /* Audio options */
 ADD_CATEGORY_HINT( N_("Audio"), NULL)
-ADD_MODULE_WITH_SHORT  ( "aout", 'A', MODULE_CAPABILITY_AOUT, NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT )
+ADD_MODULE_WITH_SHORT ( "aout", 'A', MODULE_CAPABILITY_AOUT, NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT )
 ADD_BOOL    ( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT )
 ADD_BOOL    ( "mono", 0, NULL, MONO_TEXT, MONO_LONGTEXT )
 ADD_INTEGER ( "volume", VOLUME_DEFAULT, NULL, VOLUME_TEXT, VOLUME_LONGTEXT )
@@ -315,7 +331,7 @@ ADD_INTEGER ( "audio-format", 0, NULL, FORMAT_TEXT, FORMAT_LONGTEXT )
 
 /* Video options */
 ADD_CATEGORY_HINT( N_("Video"), NULL )
-ADD_MODULE_WITH_SHORT  ( "vout", 'V', MODULE_CAPABILITY_VOUT, NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT )
+ADD_MODULE_WITH_SHORT ( "vout", 'V', MODULE_CAPABILITY_VOUT, NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT )
 ADD_BOOL    ( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT )
 ADD_INTEGER ( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT )
 ADD_INTEGER ( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT )
@@ -324,7 +340,7 @@ ADD_BOOL    ( "grayscale", 0, NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT )
 ADD_BOOL    ( "fullscreen", 0, NULL, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT )
 ADD_BOOL    ( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT )
 ADD_INTEGER ( "spumargin", -1, NULL, SPUMARGIN_TEXT, SPUMARGIN_LONGTEXT )
-ADD_MODULE  ( "filter", MODULE_CAPABILITY_VOUT, NULL, NULL, FILTER_TEXT, FILTER_LONGTEXT )
+ADD_MODULE  ( "filter", MODULE_CAPABILITY_VOUT_FILTER, NULL, NULL, FILTER_TEXT, FILTER_LONGTEXT )
 
 /* Input options */
 ADD_CATEGORY_HINT( N_("Input"), NULL )
@@ -342,8 +358,8 @@ ADD_INTEGER ( "spu-channel", -1, NULL, INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT )
 ADD_STRING  ( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT )
 ADD_STRING  ( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT )
 
-ADD_BOOL_WITH_SHORT    ( "ipv6", '6', 0, NULL, IPV6_TEXT, IPV6_LONGTEXT )
-ADD_BOOL_WITH_SHORT    ( "ipv4", '4', 0, NULL, IPV4_TEXT, IPV4_LONGTEXT )
+ADD_BOOL_WITH_SHORT ( "ipv6", '6', 0, NULL, IPV6_TEXT, IPV6_LONGTEXT )
+ADD_BOOL_WITH_SHORT ( "ipv4", '4', 0, NULL, IPV4_TEXT, IPV4_LONGTEXT )
 
 /* Decoder options */
 ADD_CATEGORY_HINT( N_("Decoders"), NULL )
@@ -374,6 +390,9 @@ ADD_MODULE  ( "demux", MODULE_CAPABILITY_DEMUX, NULL, NULL, DEMUX_TEXT, DEMUX_LO
 ADD_BOOL ( "fast-pthread", 0, NULL, FAST_PTHREAD_TEXT, FAST_PTHREAD_LONGTEXT )
 #endif
 
+/* Usage (mainly useful for cmd line stuff) */
+ADD_USAGE_HINT( PLAYLIST_USAGE )
+
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -389,23 +408,15 @@ MODULE_DEACTIVATE_STOP
 
 static module_config_t p_help_config[] =
 {
-    { MODULE_CONFIG_ITEM_BOOL, "help", 'h', N_("print help"),
-      NULL, NULL, 0, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_BOOL, "longhelp", 'H', N_("print detailed help"),
-      NULL, NULL, 0, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_BOOL, "list", 'l', N_("print a list of available "
-      "modules"), NULL, NULL, 0, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_STRING, "module", 'p', N_("print help on module"),
-      NULL, NULL, 0, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_BOOL, "version", '\0',
-      N_("print version information"), NULL, NULL, 0, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_BOOL, "build", '\0',
-      N_("print build information"), NULL, NULL, 0, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_HINT_END, NULL, '\0', NULL, NULL, NULL, 0, 0,
-      NULL, NULL, 0 }
+    { CONFIG_ITEM_BOOL, "help", 'h', N_("print help") },
+    { CONFIG_ITEM_BOOL, "longhelp", 'H', N_("print detailed help") },
+    { CONFIG_ITEM_BOOL, "list", 'l', N_("print a list of available modules") },
+    { CONFIG_ITEM_STRING, "module", 'p', N_("print help on module") },
+    { CONFIG_ITEM_BOOL, "version", '\0', N_("print version information") },
+    { CONFIG_ITEM_BOOL, "build", '\0', N_("print build information") },
+    { CONFIG_HINT_END, NULL, '\0' }
 };
 
 /*****************************************************************************
  * End configuration.
  *****************************************************************************/
-

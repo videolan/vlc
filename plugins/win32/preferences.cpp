@@ -395,7 +395,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     {
         switch( p_item->i_type )
         {
-        case MODULE_CONFIG_HINT_CATEGORY:
+        case CONFIG_HINT_CATEGORY:
 
             /* create a new tabsheet. */
             TabSheet = new TTabSheet( this );
@@ -413,7 +413,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 
             break;
 
-        case MODULE_CONFIG_ITEM_MODULE:
+        case CONFIG_ITEM_MODULE:
 
             /* add new groupbox for the config option */
             GroupBoxPlugin = new TGroupBoxPlugin( this, p_item );
@@ -437,9 +437,9 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 
             break;
 
-        case MODULE_CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_FILE:
 
-        case MODULE_CONFIG_ITEM_STRING:
+        case CONFIG_ITEM_STRING:
 
             /* add new groupbox for the config option */
             GroupBoxString = new TGroupBoxString( this, p_item );
@@ -450,7 +450,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 
             break;
 
-        case MODULE_CONFIG_ITEM_INTEGER:
+        case CONFIG_ITEM_INTEGER:
 
             /* add new groupbox for the config option */
             GroupBoxInteger = new TGroupBoxInteger( this, p_item );
@@ -461,7 +461,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 
             break;
 
-        case MODULE_CONFIG_ITEM_BOOL:
+        case CONFIG_ITEM_BOOL:
 
             /* add new groupbox for the config option */
             GroupBoxBool = new TGroupBoxBool( this, p_item );
@@ -475,7 +475,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         
         p_item++;
     }
-    while( p_item->i_type != MODULE_CONFIG_HINT_END );
+    while( p_item->i_type != CONFIG_HINT_END );
 
     /* Reorder groupboxes inside the tabsheets */
     for( i_pages = 0; i_pages < PageControlPref->PageCount; i_pages++ )
@@ -541,14 +541,14 @@ void __fastcall TPreferencesDlg::SaveValue( module_config_t *p_config )
 {
     switch( p_config->i_type )
     {
-        case MODULE_CONFIG_ITEM_STRING:
-        case MODULE_CONFIG_ITEM_FILE:
-        case MODULE_CONFIG_ITEM_MODULE:
+        case CONFIG_ITEM_STRING:
+        case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_MODULE:
             config_PutPsz( p_intfGlobal, p_config->psz_name,
                            *p_config->psz_value ? p_config->psz_value : NULL );
             break;
-        case MODULE_CONFIG_ITEM_INTEGER:
-        case MODULE_CONFIG_ITEM_BOOL:
+        case CONFIG_ITEM_INTEGER:
+        case CONFIG_ITEM_BOOL:
             config_PutInt( p_intfGlobal, p_config->psz_name,
                            p_config->i_value );
             break;

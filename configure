@@ -89,7 +89,7 @@ ac_help="$ac_help
 ac_help="$ac_help
   --enable-directx        Win32 DirectX support (default enabled on Win32)"
 ac_help="$ac_help
-    --with-directx=PATH   Win32 DirectX headers and libraries"
+    --with-directx=PATH   Win32 DirectX headers"
 ac_help="$ac_help
   --enable-fb             Linux framebuffer support (default enabled on Linux)"
 ac_help="$ac_help
@@ -7388,7 +7388,7 @@ echo "configure:7388: checking for directX headers in ${with_directx}" >&5
       if test -f ${with_directx}/ddraw.h
       then
         PLUGINS="${PLUGINS} directx"
-        directx_LDFLAGS="${directx_LDFLAGS} -L${with_directx}/lib -lgdi32"
+        directx_LDFLAGS="${directx_LDFLAGS} -lgdi32"
         directx_CFLAGS="${directx_CFLAGS} -I${with_directx}"
         echo "$ac_t""yes" 1>&6
       else

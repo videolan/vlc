@@ -2,7 +2,7 @@
  * crop.c : Crop video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: crop.c,v 1.2 2002/06/02 09:03:54 sam Exp $
+ * $Id: crop.c,v 1.3 2002/06/11 09:44:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,17 +41,23 @@ static void vout_getfunctions( function_list_t * p_function_list );
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
+#define GEOMETRY_TEXT N_("Crop geometry")
+#define GEOMETRY_LONGTEXT N_("Set the geometry of the zone to crop")
+
+#define AUTOCROP_TEXT N_("Automatic cropping")
+#define AUTOCROP_LONGTEXT N_("Activate automatic black border cropping")
+
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING ( "crop-geometry", NULL, NULL, N_("Crop geometry"), N_("Set the geometry of the zone to crop") )
-ADD_BOOL ( "autocrop", 0, NULL, N_("Automatic cropping"), N_("Activate automatic black border cropping") )
+ADD_STRING ( "crop-geometry", NULL, NULL, GEOMETRY_TEXT, GEOMETRY_LONGTEXT )
+ADD_BOOL ( "autocrop", 0, NULL, AUTOCROP_TEXT, AUTOCROP_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( _("image crop video module") )
     /* Capability score set to 0 because we don't want to be spawned
      * as a video output unless explicitly requested to */
-    ADD_CAPABILITY( VOUT, 0 )
+    ADD_CAPABILITY( VOUT_FILTER, 0 )
     ADD_SHORTCUT( "crop" )
 MODULE_INIT_STOP
 
@@ -250,9 +256,6 @@ static int vout_Init( vout_thread_t *p_vout )
                             * p_vout->p_sys->i_width / p_vout->output.i_width;
 
     /* Try to open the real video output */
-    psz_var = config_GetPsz( p_vout, "filter" );
-    config_PutPsz( p_vout, "filter", NULL );
-
     p_vout->p_sys->p_vout =
         vout_CreateThread( p_vout,
                     p_vout->p_sys->i_width, p_vout->p_sys->i_height,
@@ -260,13 +263,8 @@ static int vout_Init( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );
-        config_PutPsz( p_vout, "filter", psz_var );
-        if( psz_var ) free( psz_var );
         return 0;
     }
-
-    config_PutPsz( p_vout, "filter", psz_var );
-    if( psz_var ) free( psz_var );
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
@@ -494,4 +492,3 @@ static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
 
     p_vout->p_sys->b_changed = 1;
 }
-

@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.21 2002/06/01 12:31:58 sam Exp $
+ * $Id: dummy.c,v 1.22 2002/06/11 09:44:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -48,8 +48,8 @@ void _M( intf_getfunctions )  ( function_list_t * p_function_list );
     "efficient one.")
 
 MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( "dummy-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
+ADD_CATEGORY_HINT( N_("Video"), NULL )
+ADD_STRING ( "dummy-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
 MODULE_CONFIG_STOP
 
 

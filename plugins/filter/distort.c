@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.15 2002/06/01 18:04:48 sam Exp $
+ * $Id: distort.c,v 1.16 2002/06/11 09:44:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,17 +46,21 @@ static void vout_getfunctions( function_list_t * p_function_list );
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
+#define MODE_TEXT N_("Distort mode")
+#define MODE_LONGTEXT N_("one of \"wave\" and \"ripple\"")
+
+static char *mode_list[] = { "wave", "ripple", NULL };
+
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( "distort-mode", "wave", NULL, N_("distort mode"),
-              N_("one of \"wave\" and \"ripple\"") )
+ADD_STRING_FROM_LIST( "distort-mode", "wave", mode_list, NULL, MODE_TEXT, MODE_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( _("miscellaneous video effects module") )
     /* Capability score set to 0 because we don't want to be spawned
      * as a video output unless explicitly requested to */
-    ADD_CAPABILITY( VOUT, 0 )
+    ADD_CAPABILITY( VOUT_FILTER, 0 )
     ADD_SHORTCUT( "distort" )
 MODULE_INIT_STOP
 
@@ -190,7 +194,6 @@ static int vout_Create( vout_thread_t *p_vout )
 static int vout_Init( vout_thread_t *p_vout )
 {
     int i_index;
-    char *psz_filter;
     picture_t *p_pic;
 
     I_OUTPUTPICTURES = 0;
@@ -202,18 +205,12 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to open the real video output */
-    psz_filter = config_GetPsz( p_vout, "filter" );
-    config_PutPsz( p_vout, "filter", NULL );
-
     msg_Dbg( p_vout, "spawning the real video output" );
 
     p_vout->p_sys->p_vout =
         vout_CreateThread( p_vout,
                            p_vout->render.i_width, p_vout->render.i_height,
                            p_vout->render.i_chroma, p_vout->render.i_aspect );
-
-    config_PutPsz( p_vout, "filter", psz_filter );
-    if( psz_filter ) free( psz_filter );
 
     /* Everything failed */
     if( p_vout->p_sys->p_vout == NULL )
@@ -466,4 +463,3 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
         }
     }
 }
-

@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.9 2002/06/07 23:53:44 sam Exp $
+ * $Id: libvlc.c,v 1.10 2002/06/11 09:44:22 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -899,7 +899,7 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
                          p_module->psz_object_name );
 
         for( p_item = p_module->p_config;
-             p_item->i_type != MODULE_CONFIG_HINT_END;
+             p_item->i_type != CONFIG_HINT_END;
              p_item++ )
         {
             char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
@@ -908,22 +908,23 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
 
             switch( p_item->i_type )
             {
-            case MODULE_CONFIG_HINT_CATEGORY:
+            case CONFIG_HINT_CATEGORY:
+            case CONFIG_HINT_USAGE:
                 fprintf( stderr, " %s\n", p_item->psz_text );
                 break;
 
-            case MODULE_CONFIG_ITEM_STRING:
-            case MODULE_CONFIG_ITEM_FILE:
-            case MODULE_CONFIG_ITEM_MODULE: /* We could also have "=<" here */
+            case CONFIG_ITEM_STRING:
+            case CONFIG_ITEM_FILE:
+            case CONFIG_ITEM_MODULE: /* We could also have "=<" here */
                 psz_bra = " <"; psz_type = _("string"); psz_ket = ">";
                 break;
-            case MODULE_CONFIG_ITEM_INTEGER:
+            case CONFIG_ITEM_INTEGER:
                 psz_bra = " <"; psz_type = _("integer"); psz_ket = ">";
                 break;
-            case MODULE_CONFIG_ITEM_FLOAT:
+            case CONFIG_ITEM_FLOAT:
                 psz_bra = " <"; psz_type = _("float"); psz_ket = ">";
                 break;
-            case MODULE_CONFIG_ITEM_BOOL:
+            case CONFIG_ITEM_BOOL:
                 psz_bra = ""; psz_type = ""; psz_ket = "";
                 if( !b_help_module )
                 {
@@ -952,7 +953,7 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
                 i = PADDING_SPACES - strlen( p_item->psz_name )
                      - strlen( psz_bra ) - strlen( psz_type )
                      - strlen( psz_ket ) - 1;
-                if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL
+                if( p_item->i_type == CONFIG_ITEM_BOOL
                      && !b_help_module )
                 {
                     vlc_bool_t b_dash = VLC_FALSE;
@@ -988,7 +989,7 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
                     psz_spaces[i] = '\0';
                 }
 
-                if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL &&
+                if( p_item->i_type == CONFIG_ITEM_BOOL &&
                     !b_help_module )
                 {
                     fprintf( stderr, psz_format, p_item->psz_name, psz_prefix,
@@ -1003,27 +1004,6 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
                 }
                 psz_spaces[i] = ' ';
             }
-        }
-
-        /* Yet another nasty hack.
-         * Maybe we could use MODULE_CONFIG_ITEM_END to display tail messages
-         * for each module?? */
-        if( !strcmp( "main", p_module->psz_object_name ) )
-        {
-            fprintf( stderr, _("\nPlaylist items:"
-                "\n  *.mpg, *.vob                   plain MPEG-1/2 files"
-                "\n  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"
-                "\n                                 DVD device"
-                "\n  [vcd:][device][@[title][,[chapter]]"
-                "\n                                 VCD device"
-                "\n  udpstream:[@[<bind address>][:<bind port>]]"
-                "\n                                 UDP stream sent by VLS"
-                "\n  vlc:loop                       loop execution of the "
-                      "playlist"
-                "\n  vlc:pause                      pause execution of "
-                      "playlist items"
-                "\n  vlc:quit                       quit VLC"
-                "\n") );
         }
 
         fprintf( stderr, "\n" );

@@ -2,7 +2,7 @@
  * clone.c : Clone video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: clone.c,v 1.6 2002/06/01 18:04:48 sam Exp $
+ * $Id: clone.c,v 1.7 2002/06/11 09:44:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,17 +41,20 @@ static void vout_getfunctions( function_list_t * p_function_list );
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
+#define COUNT_TEXT N_("Number of clones")
+#define COUNT_LONGTEXT N_("Select the number of video windows in which to "\
+    "clone the video")
+
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_INTEGER ( "clone-count", 2, NULL, N_("Number of clones"),
-              N_("Select the number of videowindows in which to clone the video") )
+ADD_INTEGER ( "clone-count", 2, NULL, COUNT_TEXT, COUNT_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( _("image clone video module") )
     /* Capability score set to 0 because we don't want to be spawned
      * as a video output unless explicitly requested to */
-    ADD_CAPABILITY( VOUT, 0 )
+    ADD_CAPABILITY( VOUT_FILTER, 0 )
     ADD_SHORTCUT( "clone" )
 MODULE_INIT_STOP
 
@@ -143,7 +146,6 @@ static int vout_Create( vout_thread_t *p_vout )
 static int vout_Init( vout_thread_t *p_vout )
 {
     int   i_index, i_vout;
-    char *psz_filter;
     picture_t *p_pic;
     
     I_OUTPUTPICTURES = 0;
@@ -155,9 +157,6 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to open the real video output */
-    psz_filter = config_GetPsz( p_vout, "filter" );
-    config_PutPsz( p_vout, "filter", NULL );
-
     msg_Dbg( p_vout, "spawning the real video outputs" );
 
     for( i_vout = 0; i_vout < p_vout->p_sys->i_clones; i_vout++ )
@@ -172,14 +171,9 @@ static int vout_Init( vout_thread_t *p_vout )
                              p_vout->p_sys->i_clones );
             p_vout->p_sys->i_clones = i_vout;
             RemoveAllVout( p_vout );
-            config_PutPsz( p_vout, "filter", psz_filter );
-            if( psz_filter ) free( psz_filter );
             return 0;
         }
     }
-
-    config_PutPsz( p_vout, "filter", psz_filter );
-    if( psz_filter ) free( psz_filter );
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.184 2002/06/05 18:07:03 stef Exp $
+ * $Id: video_output.c,v 1.185 2002/06/11 09:44:22 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -77,10 +77,40 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
         return( NULL );
     }
 
-    /* Choose the best module */
-    if( !(psz_plugin = config_GetPsz( p_vout, "filter" )) )
+    /* If the parent is not a VOUT object, that means we are at the start of
+     * the video output pipe */
+    if( p_parent->i_object_type != VLC_OBJECT_VOUT )
     {
-        psz_plugin = config_GetPsz( p_vout, "vout" );
+        /* look for the default filter configuration */
+        p_vout->psz_filter_chain = config_GetPsz( p_parent, "filter" );
+    }
+    else
+    {
+        /* continue the parent's filter chain */
+        char *psz_end;
+
+        psz_end = strchr( ((vout_thread_t *)p_parent)->psz_filter_chain, ':' );
+        if( psz_end && *(psz_end+1) )
+            p_vout->psz_filter_chain = strdup( psz_end+1 );
+        else p_vout->psz_filter_chain = NULL;
+    }
+
+    /* Choose the video output module */
+    if( !p_vout->psz_filter_chain )
+    {
+        psz_plugin = config_GetPsz( p_parent, "vout" );
+    }
+    else
+    {
+        /* the filter chain is a string list of filters separated by double
+         * colons */
+        char *psz_end;
+
+        psz_end = strchr( p_vout->psz_filter_chain, ':' );
+        if( psz_end )
+            psz_plugin = strndup( p_vout->psz_filter_chain,
+                                  psz_end - p_vout->psz_filter_chain );
+        else psz_plugin = strdup( p_vout->psz_filter_chain );
     }
 
     /* Initialize pictures and subpictures - translation tables and functions
@@ -148,8 +178,11 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
                     &p_vout->i_window_height );
 
 
-    p_vout->p_module = module_Need( p_vout, MODULE_CAPABILITY_VOUT,
-                                    psz_plugin, (void *)p_vout );
+    p_vout->p_module = module_Need( p_vout,
+                           ( p_vout->psz_filter_chain ) ?
+                           MODULE_CAPABILITY_VOUT_FILTER :
+                           MODULE_CAPABILITY_VOUT,
+                           psz_plugin, (void *)p_vout );
 
     if( psz_plugin ) free( psz_plugin );
     if( p_vout->p_module == NULL )

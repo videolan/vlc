@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.30 2002/06/04 00:11:12 sam Exp $
+ * $Id: configuration.c,v 1.31 2002/06/11 09:44:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -51,8 +51,8 @@
  * config_GetInt: get the value of an int variable
  *****************************************************************************
  * This function is used to get the value of variables which are internally
- * represented by an integer (MODULE_CONFIG_ITEM_INTEGER and
- * MODULE_CONFIG_ITEM_BOOL).
+ * represented by an integer (CONFIG_ITEM_INTEGER and
+ * CONFIG_ITEM_BOOL).
  *****************************************************************************/
 int __config_GetInt( vlc_object_t *p_this, const char *psz_name )
 {
@@ -66,8 +66,8 @@ int __config_GetInt( vlc_object_t *p_this, const char *psz_name )
         msg_Err( p_this, "option %s does not exist", psz_name );
         return -1;
     }
-    if( (p_config->i_type!=MODULE_CONFIG_ITEM_INTEGER) &&
-        (p_config->i_type!=MODULE_CONFIG_ITEM_BOOL) )
+    if( (p_config->i_type!=CONFIG_ITEM_INTEGER) &&
+        (p_config->i_type!=CONFIG_ITEM_BOOL) )
     {
         msg_Err( p_this, "option %s does not refer to an int", psz_name );
         return -1;
@@ -80,7 +80,7 @@ int __config_GetInt( vlc_object_t *p_this, const char *psz_name )
  * config_GetFloat: get the value of a float variable
  *****************************************************************************
  * This function is used to get the value of variables which are internally
- * represented by a float (MODULE_CONFIG_ITEM_FLOAT).
+ * represented by a float (CONFIG_ITEM_FLOAT).
  *****************************************************************************/
 float __config_GetFloat( vlc_object_t *p_this, const char *psz_name )
 {
@@ -94,7 +94,7 @@ float __config_GetFloat( vlc_object_t *p_this, const char *psz_name )
         msg_Err( p_this, "option %s does not exist", psz_name );
         return -1;
     }
-    if( p_config->i_type != MODULE_CONFIG_ITEM_FLOAT )
+    if( p_config->i_type != CONFIG_ITEM_FLOAT )
     {
         msg_Err( p_this, "option %s does not refer to a float", psz_name );
         return -1;
@@ -107,12 +107,12 @@ float __config_GetFloat( vlc_object_t *p_this, const char *psz_name )
  * config_GetPsz: get the string value of a string variable
  *****************************************************************************
  * This function is used to get the value of variables which are internally
- * represented by a string (MODULE_CONFIG_ITEM_STRING, MODULE_CONFIG_ITEM_FILE,
- * and MODULE_CONFIG_ITEM_MODULE).
+ * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_FILE,
+ * and CONFIG_ITEM_MODULE).
  *
- * Important note: remember to free() the returned char* because it a duplicate
- *   of the actual value. It isn't safe to return a pointer to the actual value
- *   as it can be modified at any time.
+ * Important note: remember to free() the returned char* because it's a
+ *   duplicate of the actual value. It isn't safe to return a pointer to the
+ *   actual value as it can be modified at any time.
  *****************************************************************************/
 char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
 {
@@ -127,9 +127,9 @@ char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
         msg_Err( p_this, "option %s does not exist", psz_name );
         return NULL;
     }
-    if( (p_config->i_type!=MODULE_CONFIG_ITEM_STRING) &&
-        (p_config->i_type!=MODULE_CONFIG_ITEM_FILE) &&
-        (p_config->i_type!=MODULE_CONFIG_ITEM_MODULE) )
+    if( (p_config->i_type!=CONFIG_ITEM_STRING) &&
+        (p_config->i_type!=CONFIG_ITEM_FILE) &&
+        (p_config->i_type!=CONFIG_ITEM_MODULE) )
     {
         msg_Err( p_this, "option %s does not refer to a string", psz_name );
         return NULL;
@@ -147,8 +147,8 @@ char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
  * config_PutPsz: set the string value of a string variable
  *****************************************************************************
  * This function is used to set the value of variables which are internally
- * represented by a string (MODULE_CONFIG_ITEM_STRING, MODULE_CONFIG_ITEM_FILE,
- * and MODULE_CONFIG_ITEM_MODULE).
+ * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_FILE,
+ * and CONFIG_ITEM_MODULE).
  *****************************************************************************/
 void __config_PutPsz( vlc_object_t *p_this, 
                       const char *psz_name, char *psz_value )
@@ -163,9 +163,9 @@ void __config_PutPsz( vlc_object_t *p_this,
         msg_Err( p_this, "option %s does not exist", psz_name );
         return;
     }
-    if( (p_config->i_type!=MODULE_CONFIG_ITEM_STRING) &&
-        (p_config->i_type!=MODULE_CONFIG_ITEM_FILE) &&
-        (p_config->i_type!=MODULE_CONFIG_ITEM_MODULE) )
+    if( (p_config->i_type!=CONFIG_ITEM_STRING) &&
+        (p_config->i_type!=CONFIG_ITEM_FILE) &&
+        (p_config->i_type!=CONFIG_ITEM_MODULE) )
     {
         msg_Err( p_this, "option %s does not refer to a string", psz_name );
         return;
@@ -191,8 +191,8 @@ void __config_PutPsz( vlc_object_t *p_this,
  * config_PutInt: set the integer value of an int variable
  *****************************************************************************
  * This function is used to set the value of variables which are internally
- * represented by an integer (MODULE_CONFIG_ITEM_INTEGER and
- * MODULE_CONFIG_ITEM_BOOL).
+ * represented by an integer (CONFIG_ITEM_INTEGER and
+ * CONFIG_ITEM_BOOL).
  *****************************************************************************/
 void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
 {
@@ -206,8 +206,8 @@ void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
         msg_Err( p_this, "option %s does not exist", psz_name );
         return;
     }
-    if( (p_config->i_type!=MODULE_CONFIG_ITEM_INTEGER) &&
-        (p_config->i_type!=MODULE_CONFIG_ITEM_BOOL) )
+    if( (p_config->i_type!=CONFIG_ITEM_INTEGER) &&
+        (p_config->i_type!=CONFIG_ITEM_BOOL) )
     {
         msg_Err( p_this, "option %s does not refer to an int", psz_name );
         return;
@@ -225,7 +225,7 @@ void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
  * config_PutFloat: set the value of a float variable
  *****************************************************************************
  * This function is used to set the value of variables which are internally
- * represented by a float (MODULE_CONFIG_ITEM_FLOAT).
+ * represented by a float (CONFIG_ITEM_FLOAT).
  *****************************************************************************/
 void __config_PutFloat( vlc_object_t *p_this,
                         const char *psz_name, float f_value )
@@ -240,7 +240,7 @@ void __config_PutFloat( vlc_object_t *p_this,
         msg_Err( p_this, "option %s does not exist", psz_name );
         return;
     }
-    if( p_config->i_type != MODULE_CONFIG_ITEM_FLOAT )
+    if( p_config->i_type != CONFIG_ITEM_FLOAT )
     {
         msg_Err( p_this, "option %s does not refer to a float", psz_name );
         return;
@@ -259,7 +259,7 @@ void __config_PutFloat( vlc_object_t *p_this,
  *****************************************************************************
  * FIXME: This function really needs to be optimized.
  *****************************************************************************/
-module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
+module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name)
 {
     module_t *p_module;
     module_config_t *p_item;
@@ -271,10 +271,10 @@ module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
          p_module = p_module->next )
     {
         for( p_item = p_module->p_config;
-             p_item->i_type != MODULE_CONFIG_HINT_END;
+             p_item->i_type != CONFIG_HINT_END;
              p_item++ )
         {
-            if( p_item->i_type & MODULE_CONFIG_HINT )
+            if( p_item->i_type & CONFIG_HINT )
                 /* ignore hints */
                 continue;
             if( !strcmp( psz_name, p_item->psz_name ) )
@@ -294,23 +294,23 @@ module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
  *****************************************************************************/
 void config_Duplicate( module_t *p_module, module_config_t *p_orig )
 {
-    int i, i_lines = 1;
+    int i, j, i_lines = 1;
     module_config_t *p_item;
 
     /* Calculate the structure length */
     p_module->i_config_items = 0;
     p_module->i_bool_items = 0;
 
-    for( p_item = p_orig; p_item->i_type != MODULE_CONFIG_HINT_END; p_item++ )
+    for( p_item = p_orig; p_item->i_type != CONFIG_HINT_END; p_item++ )
     {
         i_lines++;
 
-        if( p_item->i_type & MODULE_CONFIG_ITEM )
+        if( p_item->i_type & CONFIG_ITEM )
         {
             p_module->i_config_items++;
         }
 
-        if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL )
+        if( p_item->i_type == CONFIG_ITEM_BOOL )
         {
             p_module->i_bool_items++;
         }
@@ -344,9 +344,24 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
         p_module->p_config[i].psz_longtext = p_orig[i].psz_longtext ?
                                    strdup( _(p_orig[i].psz_longtext) ) : NULL;
         p_module->p_config[i].psz_value = p_orig[i].psz_value ?
-                                   strdup( _(p_orig[i].psz_value) ) : NULL;
+                                   strdup( p_orig[i].psz_value ) : NULL;
 
         p_module->p_config[i].p_lock = &p_module->object_lock;
+
+        /* duplicate the string list */
+        p_module->p_config[i].ppsz_list = NULL;
+        if( p_orig[i].ppsz_list )
+        {
+            for( j = 0; p_orig[i].ppsz_list[j]; j++ );
+            p_module->p_config[i].ppsz_list = malloc( (j+1) *sizeof(char *) );
+            if( p_module->p_config[i].ppsz_list )
+            {
+                for( j = 0; p_orig[i].ppsz_list[j]; j++ )
+                    p_module->p_config[i].ppsz_list[j] =
+                        strdup( p_orig[i].ppsz_list[j] );
+            }
+            p_module->p_config[i].ppsz_list[j] = NULL;
+        }
 
         /* the callback pointer is only valid when the module is loaded so this
          * value is set in ActivateModule() and reset in DeactivateModule() */
@@ -362,28 +377,28 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
 void config_Free( module_t *p_module )
 {
     module_config_t *p_item = p_module->p_config;
+    int i;
 
-    for( ; p_item->i_type != MODULE_CONFIG_HINT_END ; p_item++ )
+    for( ; p_item->i_type != CONFIG_HINT_END ; p_item++ )
     {
         if( p_item->psz_name )
-        {
             free( p_item->psz_name );
-        }
 
         if( p_item->psz_text )
-        {
             free( p_item->psz_text );
-        }
 
         if( p_item->psz_longtext )
-        {
             free( p_item->psz_longtext );
-        }
 
         if( p_item->psz_value )
-        {
             free( p_item->psz_value );
-        }
+
+        if( p_item->ppsz_list )
+	{
+ 	    for( i = 0; p_item->ppsz_list[i]; i++ )
+	        free(p_item->ppsz_list[i]);
+	    free( p_item->ppsz_list );
+	}
     }
 
     free( p_module->p_config );
@@ -402,7 +417,7 @@ void config_Free( module_t *p_module )
  *****************************************************************************/
 void config_SetCallbacks( module_config_t *p_new, module_config_t *p_orig )
 {
-    while( p_new->i_type != MODULE_CONFIG_HINT_END )
+    while( p_new->i_type != CONFIG_HINT_END )
     {
         p_new->pf_callback = p_orig->pf_callback;
         p_new++;
@@ -417,7 +432,7 @@ void config_SetCallbacks( module_config_t *p_new, module_config_t *p_orig )
  *****************************************************************************/
 void config_UnsetCallbacks( module_config_t *p_new )
 {
-    while( p_new->i_type != MODULE_CONFIG_HINT_END )
+    while( p_new->i_type != CONFIG_HINT_END )
     {
         p_new->pf_callback = NULL;
         p_new++;
@@ -523,10 +538,10 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 
             /* try to match this option with one of the module's options */
             for( p_item = p_module->p_config;
-                 p_item->i_type != MODULE_CONFIG_HINT_END;
+                 p_item->i_type != CONFIG_HINT_END;
                  p_item++ )
             {
-                if( p_item->i_type & MODULE_CONFIG_HINT )
+                if( p_item->i_type & CONFIG_HINT )
                     /* ignore hints */
                     continue;
 
@@ -535,8 +550,8 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     /* We found it */
                     switch( p_item->i_type )
                     {
-                    case MODULE_CONFIG_ITEM_BOOL:
-                    case MODULE_CONFIG_ITEM_INTEGER:
+                    case CONFIG_ITEM_BOOL:
+                    case CONFIG_ITEM_INTEGER:
                         if( !*psz_option_value )
                             break;                    /* ignore empty option */
                         p_item->i_value = atoi( psz_option_value);
@@ -545,7 +560,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                                  p_item->i_value );
                         break;
 
-                    case MODULE_CONFIG_ITEM_FLOAT:
+                    case CONFIG_ITEM_FLOAT:
                         if( !*psz_option_value )
                             break;                    /* ignore empty option */
                         p_item->f_value = (float)atof( psz_option_value);
@@ -766,25 +781,25 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
             fprintf( file, "\n\n" );
 
         for( p_item = p_module->p_config;
-             p_item->i_type != MODULE_CONFIG_HINT_END;
+             p_item->i_type != CONFIG_HINT_END;
              p_item++ )
         {
-            if( p_item->i_type & MODULE_CONFIG_HINT )
+            if( p_item->i_type & CONFIG_HINT )
                 /* ignore hints */
                 continue;
 
             switch( p_item->i_type )
             {
-            case MODULE_CONFIG_ITEM_BOOL:
-            case MODULE_CONFIG_ITEM_INTEGER:
+            case CONFIG_ITEM_BOOL:
+            case CONFIG_ITEM_INTEGER:
                 if( p_item->psz_text )
                     fprintf( file, "# %s (%s)\n", p_item->psz_text,
-                             (p_item->i_type == MODULE_CONFIG_ITEM_BOOL) ?
+                             (p_item->i_type == CONFIG_ITEM_BOOL) ?
                              _("boolean") : _("integer") );
                 fprintf( file, "%s=%i\n", p_item->psz_name, p_item->i_value );
                 break;
 
-            case MODULE_CONFIG_ITEM_FLOAT:
+            case CONFIG_ITEM_FLOAT:
                 if( p_item->psz_text )
                     fprintf( file, "# %s (%s)\n", p_item->psz_text,
                              _("float") );
@@ -925,18 +940,18 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
          p_module = p_module->next )
     {
         for( p_item = p_module->p_config;
-             p_item->i_type != MODULE_CONFIG_HINT_END;
+             p_item->i_type != CONFIG_HINT_END;
              p_item++ )
         {
             /* Ignore hints */
-            if( p_item->i_type & MODULE_CONFIG_HINT )
+            if( p_item->i_type & CONFIG_HINT )
                 continue;
 
             /* Add item to long options */
             p_longopts[i_index].name = strdup( p_item->psz_name );
             if( p_longopts[i_index].name == NULL ) continue;
             p_longopts[i_index].has_arg =
-                (p_item->i_type == MODULE_CONFIG_ITEM_BOOL)?
+                (p_item->i_type == CONFIG_ITEM_BOOL)?
                                                no_argument : required_argument;
             p_longopts[i_index].flag = &flag;
             p_longopts[i_index].val = 0;
@@ -944,7 +959,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
 
             /* When dealing with bools we also need to add the --no-foo
              * option */
-            if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL )
+            if( p_item->i_type == CONFIG_ITEM_BOOL )
             {
                 char *psz_name = malloc( strlen(p_item->psz_name) + 3 );
                 if( psz_name == NULL ) continue;
@@ -975,7 +990,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                 pp_shortopts[(int)p_item->i_short] = p_item;
                 psz_shortopts[i_shortopts] = p_item->i_short;
                 i_shortopts++;
-                if( p_item->i_type != MODULE_CONFIG_ITEM_BOOL )
+                if( p_item->i_type != CONFIG_ITEM_BOOL )
                 {
                     psz_shortopts[i_shortopts] = ':';
                     i_shortopts++;
@@ -1010,18 +1025,18 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
 
             if( p_conf ) switch( p_conf->i_type )
             {
-            case MODULE_CONFIG_ITEM_STRING:
-            case MODULE_CONFIG_ITEM_FILE:
-            case MODULE_CONFIG_ITEM_MODULE:
+            case CONFIG_ITEM_STRING:
+            case CONFIG_ITEM_FILE:
+            case CONFIG_ITEM_MODULE:
                 config_PutPsz( p_this, psz_name, optarg );
                 break;
-            case MODULE_CONFIG_ITEM_INTEGER:
+            case CONFIG_ITEM_INTEGER:
                 config_PutInt( p_this, psz_name, atoi(optarg));
                 break;
-            case MODULE_CONFIG_ITEM_FLOAT:
+            case CONFIG_ITEM_FLOAT:
                 config_PutFloat( p_this, psz_name, (float)atof(optarg) );
                 break;
-            case MODULE_CONFIG_ITEM_BOOL:
+            case CONFIG_ITEM_BOOL:
                 config_PutInt( p_this, psz_name, !flag );
                 break;
             }
@@ -1034,16 +1049,16 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
         {
             switch( pp_shortopts[i_cmd]->i_type )
             {
-            case MODULE_CONFIG_ITEM_STRING:
-            case MODULE_CONFIG_ITEM_FILE:
-            case MODULE_CONFIG_ITEM_MODULE:
+            case CONFIG_ITEM_STRING:
+            case CONFIG_ITEM_FILE:
+            case CONFIG_ITEM_MODULE:
                 config_PutPsz( p_this, pp_shortopts[i_cmd]->psz_name, optarg );
                 break;
-            case MODULE_CONFIG_ITEM_INTEGER:
+            case CONFIG_ITEM_INTEGER:
                 config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name,
                                        atoi(optarg));
                 break;
-            case MODULE_CONFIG_ITEM_BOOL:
+            case CONFIG_ITEM_BOOL:
                 config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name, 1 );
                 break;
             }
