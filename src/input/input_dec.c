@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_dec.c,v 1.88 2004/01/25 17:16:05 zorglub Exp $
+ * $Id: input_dec.c,v 1.89 2004/01/30 17:49:21 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -582,6 +582,10 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                         p_dec->p_owner->p_es_descriptor->p_pgrm->i_number;
                 }
                 p_dec->p_owner->sout.i_id = p_dec->p_owner->p_es_descriptor->i_id - 1;
+                if( p_dec->fmt_in.psz_language )
+                {
+                    p_dec->p_owner->sout.psz_language = strdup( p_dec->fmt_in.psz_language );
+                }
 
                 p_dec->p_owner->p_sout =
                     sout_InputNew( p_dec, &p_dec->p_owner->sout );

@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: es_out.c,v 1.22 2004/01/30 14:25:39 fenrir Exp $
+ * $Id: es_out.c,v 1.23 2004/01/30 17:49:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -525,16 +525,15 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
         if( p_playlist ) vlc_object_release( p_playlist );
     }
 
+    es_format_Copy( &es->p_es->fmt, fmt );
+
     /* Apply mode
      * XXX change that when we do group too */
     if( 1 )
     {
         EsOutSelect( out, es, VLC_FALSE );
     }
-
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    es->p_es->fmt = *fmt;
 
     TAB_APPEND( out->p_sys->i_es, out->p_sys->es, es );
     p_sys->i_id++;  /* always incremented */
