@@ -2,6 +2,7 @@
  * ac3_downmix_c.c: ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * $Id: ac3_downmix_c.c,v 1.3 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>

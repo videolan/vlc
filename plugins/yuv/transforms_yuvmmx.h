@@ -2,13 +2,11 @@
  * transforms_yuvmmx.h: MMX YUV transformation assembly
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: transforms_yuvmmx.h,v 1.3 2001/03/21 13:42:34 sam Exp $
  *
- * Authors:
- * Olie Lho <ollie@sis.com.tw>
- *
- * Adapted to VideoLAN by:
- * Gaël Hendryckx <jimmy@via.ecp.fr>
- * Samuel Hocevar <sam@via.ecp.fr>
+ * Authors: Olie Lho <ollie@sis.com.tw>
+ *          Gaël Hendryckx <jimmy@via.ecp.fr>
+ *          Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

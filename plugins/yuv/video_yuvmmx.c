@@ -3,8 +3,9 @@
  * Provides functions to perform the YUV conversion.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: video_yuvmmx.c,v 1.7 2001/03/21 13:42:34 sam Exp $
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

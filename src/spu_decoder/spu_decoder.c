@@ -2,6 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: spu_decoder.c,v 1.34 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

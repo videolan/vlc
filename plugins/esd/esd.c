@@ -2,6 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
+ * $Id: esd.c,v 1.7 2001/03/21 13:42:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

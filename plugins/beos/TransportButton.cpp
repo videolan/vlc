@@ -2,9 +2,9 @@
  * TransportButton.cpp
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
+ * $Id: TransportButton.cpp,v 1.3 2001/03/21 13:42:33 sam Exp $
  *
- * Authors: 
- *          Tony Castley <tcastley@mail.powerup.com.au>
+ * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

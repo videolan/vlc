@@ -2,6 +2,7 @@
  * ac3_decoder.c: core ac3 decoder
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: ac3_decoder.c,v 1.28 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>

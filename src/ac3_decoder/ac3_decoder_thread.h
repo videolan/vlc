@@ -2,10 +2,9 @@
  * ac3_decoder_thread.h : ac3 decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.h,v 1.3 2001/01/05 14:45:47 sam Exp $
+ * $Id: ac3_decoder_thread.h,v 1.4 2001/03/21 13:42:34 sam Exp $
  *
- * Authors:
- * Michel Kaempf <maxx@via.ecp.fr>
+ * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

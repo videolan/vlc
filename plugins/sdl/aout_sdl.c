@@ -2,6 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: aout_sdl.c,v 1.10 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>

@@ -2,8 +2,9 @@
  * yuvmmx.c : Accelerated MMX YUV module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: yuvmmx.c,v 1.4 2001/03/21 13:42:34 sam Exp $
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

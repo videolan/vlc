@@ -30,6 +30,10 @@ N: Renaud Dartus
 E: reno@via.ecp.fr
 D: AC3 decoder
 
+N: Colin Delacroix
+E: colin@zoy.org
+D: MacOS X sound support
+
 N: Jean-Marc Dressler
 E: polux@via.ecp.fr
 D: BeOS port
@@ -61,6 +65,10 @@ E: sam@zoy.org
 D: playlist and modules system
 D: Gnome and Gtk+ interfaces, Glide and fb video outputs, Esound audio output
 D: DVD subtitles decoder
+
+N: Eugenio Jarosiewicz
+E: ej0@cise.ufl.edu
+D: MacOS X interface and fixes
 
 N: Brieuc Jeunhomme
 E: bbp@via.ecp.fr

@@ -2,6 +2,7 @@
  * modules_core.h : Module management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
+ * $Id: modules_core.h,v 1.5 2001/03/21 13:42:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

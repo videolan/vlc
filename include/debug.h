@@ -3,6 +3,7 @@
  * Stand alone file
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: debug.h,v 1.8 2001/03/21 13:42:33 sam Exp $
  *
  * Authors: Benoît Steiner <benny@via.ecp.fr>
  *

@@ -2,6 +2,7 @@
  * aout_esd.c : Esound functions library
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: aout_esd.c,v 1.11 2001/03/21 13:42:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

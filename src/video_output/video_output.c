@@ -5,8 +5,9 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: video_output.c,v 1.117 2001/03/21 13:42:34 sam Exp $
  *
- * Authors:
+ * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

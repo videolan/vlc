@@ -1,10 +1,10 @@
 /*****************************************************************************
- * input.h: structures of the input not exported to other modules
+ * input_ts.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ts.h,v 1.3 2001/03/18 18:48:27 henri Exp $
+ * $Id: input_ts.h,v 1.4 2001/03/21 13:42:34 sam Exp $
  *
- * Authors:
+ * Authors: Henri Fallon <henri@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

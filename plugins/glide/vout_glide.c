@@ -2,6 +2,7 @@
  * vout_glide.c: 3dfx video output display method for 3dfx cards
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
+ * $Id: vout_glide.c,v 1.6 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

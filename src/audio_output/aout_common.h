@@ -2,6 +2,7 @@
  * aout_common.h: audio output inner functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * $Id: aout_common.h,v 1.2 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *

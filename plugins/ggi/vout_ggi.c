@@ -2,6 +2,7 @@
  * vout_ggi.c: GGI video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
+ * $Id: vout_ggi.c,v 1.8 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>

@@ -2,6 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: aout_dsp.c,v 1.12 2001/03/21 13:42:33 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>

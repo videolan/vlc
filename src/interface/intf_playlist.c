@@ -2,6 +2,7 @@
  * intf_playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: intf_playlist.c,v 1.2 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

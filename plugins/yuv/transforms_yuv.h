@@ -2,8 +2,9 @@
  * transforms_yuv.h: C specific YUV transformation macros
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: transforms_yuv.h,v 1.2 2001/03/21 13:42:34 sam Exp $
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

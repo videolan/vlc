@@ -2,6 +2,7 @@
  * tests.h: several test functions needed by the plugins
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
+ * $Id: tests.h,v 1.9 2001/03/21 13:42:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

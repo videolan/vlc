@@ -2,6 +2,7 @@
  * intf_macosx.c: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
+ * $Id: intf_macosx.c,v 1.2 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: 
  *

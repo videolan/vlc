@@ -2,6 +2,7 @@
  * aout_u8.c: 8 bit unsigned audio output functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * $Id: aout_u8.c,v 1.2 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *

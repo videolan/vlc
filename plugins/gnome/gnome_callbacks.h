@@ -2,6 +2,7 @@
  * gnome_callbacks.h : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
+ * $Id: gnome_callbacks.h,v 1.12 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      

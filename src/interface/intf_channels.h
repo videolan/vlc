@@ -2,8 +2,9 @@
  * intf_channels.h: Channel handling functions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
+ * $Id: intf_channels.h,v 1.2 2001/03/21 13:42:34 sam Exp $
  *
- * Authors:
+ * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

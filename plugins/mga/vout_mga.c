@@ -2,6 +2,7 @@
  * vout_mga.c: MGA video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
+ * $Id: vout_mga.c,v 1.7 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>

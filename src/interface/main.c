@@ -4,8 +4,10 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
+ * $Id: main.c,v 1.80 2001/03/21 13:42:34 sam Exp $
  *
- * Authors:
+ * Authors: Vincent Seguin <seguin@via.ecp.fr>
+ *          Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +37,10 @@
 #endif
 
 #ifdef SYS_DARWIN1_3
-#include <Carbon/Carbon.h>                              /* Altivec detection */
+#include <mach/mach.h>                                  /* Altivec detection */
+#include <mach/mach_error.h>          /* some day the header files||compiler *
+                                                       will define it for us */
+#include <mach/bootstrap.h>
 #endif
 
 #include <unistd.h>
@@ -899,13 +904,30 @@ static int CPUCapabilities( void )
                       | CPU_CAPABILITY_MMX;
 
 #elif defined( SYS_DARWIN1_3 )
-    OSErr err;
-    long l_attributes = 0;
 
-    err = Gestalt( gestaltPowerPCProcessorFeatures, &l_attributes );
+    struct host_basic_info hi;
+    kern_return_t          ret;
+    host_name_port_t       host;
 
-    if( err == noErr &&
-         ( (1 << gestaltPowerPCHasVectorInstructions) & l_attributes ) )
+    int i_size;
+    char *psz_name, *psz_subname;
+
+    /* Should 'never' fail? */
+    host = mach_host_self();
+
+    i_size = sizeof( hi ) / sizeof( int );
+    ret = host_info( host, HOST_BASIC_INFO, ( host_info_t )&hi, &i_size );
+
+    if( ret != KERN_SUCCESS )
+    {
+        intf_ErrMsg( "error: couldn't get CPU information" );
+        return( i_capabilities );
+    }
+
+    slot_name( hi.cpu_type, hi.cpu_subtype, &psz_name, &psz_subname );
+    /* FIXME: need better way to detect newer proccessors.
+     * could do strncmp(a,b,5), but that's real ugly */
+    if( strcmp(psz_name, "ppc7400") || strcmp(psz_name, "ppc7450") )
     {
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
     }

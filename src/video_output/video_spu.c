@@ -2,6 +2,7 @@
  * video_spu.c : DVD subpicture units functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: video_spu.c,v 1.19 2001/03/21 13:42:35 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  * 

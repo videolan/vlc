@@ -2,6 +2,7 @@
  * dsp.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: dsp.c,v 1.8 2001/03/21 13:42:33 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>

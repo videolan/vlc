@@ -2,8 +2,9 @@
  * aout_darwin.c : Darwin audio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
+ * $Id: aout_darwin.c,v 1.3 2001/03/21 13:42:33 sam Exp $
  *
- * Authors: 
+ * Authors: Colin Delacroix <colin@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +21,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/*
+ * 2001/03/21
+ * Status of audio under Darwin
+ * It currently works with 16 bits signed big endian mpeg 1 audio
+ * (and probably mpeg 2). This is the most common case.
+ * Note: ac3 decoder is currently broken under Darwin 
+ *
+ * TODO:
+ * Find little endian files and adapt output
+ * Find unsigned files and adapt output
+ * Find 8 bits files and adapt output
+ */
+ 
 #define MODULE_NAME darwin
 #include "modules_inner.h"
 
@@ -46,6 +60,10 @@
 
 #include <sys/fcntl.h>
 
+/*
+ * Debug: to dump the output of the decoder directly to a file
+ * May disappear when AC3 decoder will work on Darwin
+ */
 #define WRITE_AUDIO_OUTPUT_TO_FILE 0
 
 /*****************************************************************************
@@ -57,16 +75,14 @@
 typedef struct aout_sys_s
 {
 #if WRITE_AUDIO_OUTPUT_TO_FILE
-    int           fd;                 // debug
+    int           fd;                         // debug: fd to dump audio
 #endif
-    // unsigned long sizeOfDataInMemory; // size in bytes of the 32 bit float data stored in memory
-    Ptr		        p_Data;	    // Ptr to the 32 bit float data stored in memory
-    // Ptr		        currentDataLocationPtr;	// location of the next chunk of data to send to the HAL
-    AudioDeviceID device;			            // the default device
-    UInt32	      ui_deviceBufferSize;   // bufferSize returned by kAudioDevicePropertyBufferSize
     AudioStreamBasicDescription	deviceFormat; // info about the default device
-    vlc_mutex_t   mutex_lock;
-    vlc_cond_t    cond_sync;
+    AudioDeviceID device;			                // the default device
+    Ptr		        p_Data;	                    // ptr to the 32 bit float data
+    UInt32	      ui_deviceBufferSize;        // audio device buffer size
+    vlc_mutex_t   mutex_lock;                 // pthread locks for sync of
+    vlc_cond_t    cond_sync;                  // aout_Play and callback
 } aout_sys_t;
 
 /*****************************************************************************
@@ -80,13 +96,18 @@ static void    aout_Play        ( aout_thread_t *p_aout,
                                   byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
 
-OSStatus appIOProc( AudioDeviceID  inDevice, const AudioTimeStamp*  inNow, 
-                    const void*  inInputData, const AudioTimeStamp*  inInputTime, 
-                    AudioBufferList*  outOutputData, const AudioTimeStamp* inOutputTime, 
-                    void* appGlobals );
-void Convert16BitIntegerTo32Float( Ptr in16BitDataPtr, Ptr out32BitDataPtr, UInt32 totalBytes );
-void Convert16BitIntegerTo32FloatWithByteSwap( Ptr in16BitDataPtr, Ptr out32BitDataPtr, UInt32 totalBytes );
-void Convert8BitIntegerTo32Float( Ptr in8BitDataPtr, Ptr out32BitDataPtr, UInt32 totalBytes );
+OSStatus appIOProc( AudioDeviceID inDevice, const AudioTimeStamp* inNow, 
+                    const void* inInputData, const AudioTimeStamp* inInputTime,
+                    AudioBufferList* outOutputData, 
+                    const AudioTimeStamp* inOutputTime, 
+                    void* threadGlobals );
+void Convert16BitIntegerTo32Float( Ptr p_in16BitDataPtr, Ptr p_out32BitDataPtr, 
+                                   UInt32 ui_totalBytes );
+void Convert16BitIntegerTo32FloatWithByteSwap( Ptr p_in16BitDataPtr, 
+                                               Ptr p_out32BitDataPtr, 
+                                               UInt32 p_totalBytes );
+void Convert8BitIntegerTo32Float( Ptr in8BitDataPtr, Ptr p_out32BitDataPtr, 
+                                  UInt32 ui_totalBytes );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -122,7 +143,7 @@ static int aout_Probe( probedata_t *p_data )
 static int aout_Open( aout_thread_t *p_aout )
 {
     OSStatus        err = noErr;
-    UInt32			    count, bufferSize;
+    UInt32			    ui_paramSize, ui_bufferSize;
     AudioDeviceID		device = kAudioDeviceUnknown;
     AudioStreamBasicDescription	format;
 
@@ -135,66 +156,76 @@ static int aout_Open( aout_thread_t *p_aout )
     }
 
     /* Initialize some variables */
-    p_aout->i_format   = AOUT_FORMAT_DEFAULT;
-    p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR,
+    p_aout->i_format      = AOUT_FORMAT_DEFAULT;
+    p_aout->i_channels    = 1 + main_GetIntVariable( AOUT_STEREO_VAR,
                                                   AOUT_STEREO_DEFAULT );
-    p_aout->l_rate     =     main_GetIntVariable( AOUT_RATE_VAR,
+    p_aout->l_rate        =     main_GetIntVariable( AOUT_RATE_VAR,
                                                   AOUT_RATE_DEFAULT );
-    p_aout->p_sys->device                 = kAudioDeviceUnknown;
-    p_aout->p_sys->p_Data         = nil;
-    // p_aout->p_sys->currentDataLocationPtr = nil;
+
+    p_aout->p_sys->device = kAudioDeviceUnknown;
+    p_aout->p_sys->p_Data = nil;
     
-    // get the default output device for the HAL
-    // it is required to pass the size of the data to be returned
-    count = sizeof( p_aout->p_sys->device );	
-    err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice,  
-                                    &count, (void *) &device);
+    /*
+     * get the default output device for the HAL
+     * it is required to pass the size of the data to be returned
+     */
+    ui_paramSize = sizeof( p_aout->p_sys->device );	
+    err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice,
+                                    &ui_paramSize, (void *) &device );
+    
     
     if( err == noErr) 
     {
-        // get the buffersize that the default device uses for IO
-        // it is required to pass the size of the data to be returned
-        count = sizeof(p_aout->p_sys->ui_deviceBufferSize);	
+        /* 
+         * The values we get here are not used. We may find another method for
+         * insuring us that the audio device is working !
+         *
+         * First get the buffersize that the default device uses for IO
+         */
+        ui_paramSize = sizeof( p_aout->p_sys->ui_deviceBufferSize );
         err = AudioDeviceGetProperty( device, 0, false, 
                                       kAudioDevicePropertyBufferSize, 
-                                      &count, &bufferSize);
+                                      &ui_paramSize, &ui_bufferSize);
         if( err == noErr )
         {
-            // get a description of the data format used by the default device
-            // it is required to pass the size of the data to be returned
-            count = sizeof(p_aout->p_sys->deviceFormat); 
+            /* get a description of the data format used by the default device */
+            ui_paramSize = sizeof(p_aout->p_sys->deviceFormat); 
             err = AudioDeviceGetProperty( device, 0, false, 
                                           kAudioDevicePropertyStreamFormat, 
-                                          &count, &format);
+                                          &ui_paramSize, &format);
             if( err == noErr )
             {
                 if( format.mFormatID != kAudioFormatLinearPCM ) return paramErr;
             
-                // everything is ok so fill in p_sys
-                p_aout->p_sys->device           = device;
-                p_aout->p_sys->ui_deviceBufferSize = bufferSize;
-                p_aout->p_sys->deviceFormat     = format;
+                /* everything is ok so fill in p_sys */
+                p_aout->p_sys->device              = device;
+                p_aout->p_sys->ui_deviceBufferSize = ui_bufferSize;
+                p_aout->p_sys->deviceFormat        = format;
             }
         }
     }
 
     if (err != noErr) return err;
 
-    p_aout->p_sys->ui_deviceBufferSize = 2 * 2 * sizeof(s16) 
-                                        * ((s64)p_aout->l_rate * AOUT_BUFFER_DURATION) / 1000000; 
-    // p_aout->p_sys->sizeOfDataInMemory = p_aout->p_sys->ui_deviceBufferSize; 
-
+    /* 
+     * Size calcul taken from audio_output.c we may change that file so we would
+     * not be forced to compute the same value twice
+     */
+    p_aout->p_sys->ui_deviceBufferSize = 
+      2 * 2 * sizeof(s16) * ((s64)p_aout->l_rate * AOUT_BUFFER_DURATION) / 1000000; 
+ 
+    /* Allocate memory for audio */
     p_aout->p_sys->p_Data = NewPtrClear( p_aout->p_sys->ui_deviceBufferSize );
     if( p_aout->p_sys->p_Data == nil ) return paramErr;
 
 #if WRITE_AUDIO_OUTPUT_TO_FILE
     p_aout->p_sys->fd = open( "/Users/bofh/audio-darwin.pcm", O_RDWR|O_CREAT );
-    intf_ErrMsg( "open(...) -> %d", p_aout->p_sys->fd );
+    intf_WarnMsg( "open(...) -> %d", p_aout->p_sys->fd );
 #endif
 
     vlc_cond_init( &p_aout->p_sys->cond_sync );
     vlc_mutex_init( &p_aout->p_sys->mutex_lock );
-    
+
     return( 0 );
 }
 
@@ -204,84 +235,114 @@ static int aout_Open( aout_thread_t *p_aout )
 static int aout_SetFormat( aout_thread_t *p_aout )
 {
     OSStatus err = noErr;
-    UInt32	 count, 
-             bufferSize = p_aout->p_sys->ui_deviceBufferSize;
+    UInt32	 ui_paramSize, 
+             ui_bufferSize = p_aout->p_sys->ui_deviceBufferSize;
     AudioStreamBasicDescription	format;
 
-    // get the buffersize that the default device uses for IO
-    // it is required to pass the size of the data to be returned
-    count = sizeof( bufferSize );	
+    /* set the buffersize that the default device uses for IO */
+    ui_paramSize = sizeof( ui_bufferSize );	
     err = AudioDeviceSetProperty( p_aout->p_sys->device, 0, 0, false, 
                                   kAudioDevicePropertyBufferSize, 
-                                  count, &bufferSize);
-    intf_ErrMsg( "AudioDeviceSetProperty( buffersize = %d ) -> %d", bufferSize, err );
-
-    if( err == noErr )
+                                  ui_paramSize, &ui_bufferSize);
+    if( err != noErr )
     {
-        p_aout->p_sys->ui_deviceBufferSize = bufferSize;
+        /* We have to tell the decoder to use audio device's buffer size  */
+        intf_ErrMsg( "AudioDeviceSetProperty failed ( buffersize = %d ) -> %d",
+                     ui_bufferSize, err );
+        return( -1 );
+    }
+    else
+    {
+        p_aout->p_sys->ui_deviceBufferSize = ui_bufferSize;
     
-        // get a description of the data format used by the default device
-        // it is required to pass the size of the data to be returned
-        count = sizeof( format ); 
-        /*
+        ui_paramSize = sizeof( format ); 
         err = AudioDeviceGetProperty( p_aout->p_sys->device, 0, false, 
                                       kAudioDevicePropertyStreamFormat, 
-                                      &count, &format);
-        */
+                                      &ui_paramSize, &format);
+
         if( err == noErr )
         {
-            // intf_ErrMsg( "audio output format is %i", p_aout->i_format );
-            if( format.mFormatID != kAudioFormatLinearPCM ) return paramErr;
+            intf_DbgMsg( "audio output format is %i", p_aout->i_format );
+            
+            /*
+             * setting format.mFormatFlags to anything but the default value 
+             * doesn't seem to work. Can anybody explain that ??
+             */
 
             switch( p_aout->i_format )
             {
                 case AOUT_FMT_U8:
-                    break;
+                    intf_ErrMsg( "Audio format (Unsigned 8) not supported now,"
+                                 "please report stream" );
+                    return( -1 );
+                    
                 case AOUT_FMT_S16_LE:           /* Little endian signed 16 */
-                    // intf_ErrMsg( "This means Little endian signed 16" );
-                    break; 
-                case AOUT_FMT_S16_BE:              /* Big endian signed 16 */
-                    // intf_ErrMsg( "This means Big endian signed 16" );
-                    // format.mFormatFlags &= ~kLinearPCMFormatFlagIsFloat;
-                    // format.mFormatFlags |= kLinearPCMFormatFlagIsFloat;
-                    // format.mFormatFlags |= kLinearPCMFormatFlagIsBigEndian;
+                    intf_DbgMsg( "This means Little endian signed 16" );
                     // format.mFormatFlags &= ~kLinearPCMFormatFlagIsBigEndian;
-                    // format.mFormatFlags |= kLinearPCMFormatFlagIsSignedInteger;
-                    break; 
+                    intf_ErrMsg( "Audio format (LE Unsigned 16) not supported now,"
+                                 "please report stream" );
+                    return( -1 );
+                    
+                case AOUT_FMT_S16_BE:              /* Big endian signed 16 */
+                    intf_DbgMsg( "This means big endian signed 16" );
+                    // format.mFormatFlags |= kLinearPCMFormatFlagIsBigEndian;
+                    break;
+                    
                 case AOUT_FMT_S8:
-                    break; 
+                    intf_ErrMsg( "Audio format (Signed 8) not supported now,"
+                                 "please report stream" );
+                    return( -1 );
+                    
                 case AOUT_FMT_U16_LE:                 /* Little endian U16 */
-                    // intf_ErrMsg( "This means Little endian U16" );
-                    break; 
+                    // format.mFormatFlags &= ~kLinearPCMFormatFlagIsSignedInteger;
+                    intf_DbgMsg( "This means Little endian U16" );
+                    intf_ErrMsg( "Audio format (LE Unsigned 8) not supported now,"
+                                 "please report stream" );
+                    return( -1 );
+                    
                 case AOUT_FMT_U16_BE:                    /* Big endian U16 */
-                    // intf_ErrMsg( "This means Big endian U16" );
+                    // format.mFormatFlags &= ~kLinearPCMFormatFlagIsSignedInteger;
+                    intf_ErrMsg( "Audio format (BE Unsigned 8) not supported now,"
+                                 "please report stream" );
+                    return( -1 );
+                    
                     break;
                 default:
-                    ; // intf_ErrMsg( "This means Unknown aout format" );
+                    intf_DbgMsg( "This means Unknown aout format" );
+                    return( -1 );
             }
 
-            format.mSampleRate = p_aout->l_rate;
+            /*
+             * It would have been nice to have these work (no more buffer
+             * convertion to float) but I couldn't manage to
+             */
+            // format.mFormatFlags &= ~kLinearPCMFormatFlagIsFloat;
+            // format.mFormatFlags |= kLinearPCMFormatFlagIsFloat;
+            // format.mFormatFlags |= kLinearPCMFormatFlagIsSignedInteger;
+
+            format.mSampleRate       = p_aout->l_rate;
             format.mChannelsPerFrame = p_aout->i_channels;
+
             err = AudioDeviceSetProperty( p_aout->p_sys->device, 0, 0, false, 
                                           kAudioDevicePropertyStreamFormat, 
-                                          count, &format);
-            /*
-            intf_ErrMsg( "AudioDeviceSetProperty( mFormatFlags = %x, " 
-                                                 "mSampleRate = %f, "
-                                                 "mChannelsPerFrame = %d ) " 
-                                                 "-> %d", 
-                                                  format.mFormatFlags, 
-                                                  format.mSampleRate, 
-                                                  format.mChannelsPerFrame, 
-                                                  err );
-            */
+                                          ui_paramSize, &format);
+            if( err != noErr )
+            {
+                intf_ErrMsg( "AudioDeviceSetProperty( mFormatFlags = %x, " 
+                             "mSampleRate = %f, mChannelsPerFrame = %d ) -> %d", 
+                             format.mFormatFlags, format.mSampleRate, 
+                             format.mChannelsPerFrame, err );
+                return( -1 );
+            }
         }
     }
 
+    /* add callback */
     err = AudioDeviceAddIOProc( p_aout->p_sys->device, 
                                 (AudioDeviceIOProc)appIOProc, 
                                 (void *)p_aout->p_sys );
 
+    /* open the output */
     if( err == noErr )
         err = AudioDeviceStart( p_aout->p_sys->device, (AudioDeviceIOProc)appIOProc );			
     
@@ -295,14 +356,14 @@ static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
     return( 0 ); // Send data as soon as possible
 
-/*
- * Tune me ?
- *
-    return (   p_aout->p_sys->p_Data
+    /*
+     * Tune me ?
+     *
+       return (   p_aout->p_sys->p_Data
              + p_aout->p_sys->sizeOfDataInMemory 
              - p_aout->p_sys->currentDataLocationPtr 
              - p_aout->p_sys->ui_deviceBufferSize );
-*/
+     */
 }
 
 /*****************************************************************************
@@ -311,14 +372,15 @@ static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 OSStatus appIOProc( AudioDeviceID  inDevice, const AudioTimeStamp*  inNow, 
                     const void*  inInputData, const AudioTimeStamp*  inInputTime, 
                     AudioBufferList*  outOutputData, const AudioTimeStamp* inOutputTime, 
-                    void* appGlobals )
+                    void* threadGlobals )
 {
-    aout_sys_t*	p_sys    = appGlobals;
+    aout_sys_t*	p_sys = threadGlobals;
 
+    /* see aout_Play below */
     vlc_mutex_lock( &p_sys->mutex_lock );
     vlc_cond_signal( &p_sys->cond_sync );
     
-    // move data into output data buffer
+    /* move data into output data buffer */
     BlockMoveData( p_sys->p_Data,
                    outOutputData->mBuffers[ 0 ].mData, 
                    p_sys->ui_deviceBufferSize );
@@ -335,9 +397,14 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
 #if WRITE_AUDIO_OUTPUT_TO_FILE
     write( p_aout->p_sys->fd, buffer, i_size );
-    // intf_ErrMsg( "write() -> %d", write( p_aout->p_sys->fd, buffer, i_size ) );
+    intf_DbgMsg( "write() -> %d", write( p_aout->p_sys->fd, buffer, i_size ) );
 #else
     Convert16BitIntegerTo32Float( buffer, p_aout->p_sys->p_Data, i_size );
+    
+    /* 
+     * wait for a callback to occur (to flush the buffer), so aout_Play
+     * can't be called twice, losing the data we just wrote. 
+     */
     vlc_cond_wait( &p_aout->p_sys->cond_sync, &p_aout->p_sys->mutex_lock );
 #endif
 }
@@ -349,15 +416,16 @@ static void aout_Close( aout_thread_t *p_aout )
 {
     OSStatus 	err = noErr;
     
-    // stop playing sound through the device
-    err = AudioDeviceStop( p_aout->p_sys->device, (AudioDeviceIOProc)appIOProc );			
-    if (err != noErr) return;
+    /* stop playing sound through the device */
+    err = AudioDeviceStop( p_aout->p_sys->device, 
+                           (AudioDeviceIOProc)appIOProc );			
+    if( err == noErr )
+    {
+        /* remove the callback */
+        err = AudioDeviceRemoveIOProc( p_aout->p_sys->device, 
+                                      (AudioDeviceIOProc)appIOProc );		
+    }
 
-    // remove the IO proc from the device
-    err = AudioDeviceRemoveIOProc( p_aout->p_sys->device, (AudioDeviceIOProc)appIOProc );		
-    if (err != noErr) return;
-
-    // vlc_cond_signal( &p_aout->p_sys->cond_sync );
     DisposePtr( p_aout->p_sys->p_Data );
  
     return;
@@ -366,68 +434,68 @@ static void aout_Close( aout_thread_t *p_aout )
 /*****************************************************************************
  * Convert16BitIntegerTo32Float
  *****************************************************************************/
-void Convert16BitIntegerTo32Float( Ptr in16BitDataPtr, Ptr out32BitDataPtr, 
-                                   UInt32 totalBytes )
+void Convert16BitIntegerTo32Float( Ptr p_in16BitDataPtr, Ptr p_out32BitDataPtr, 
+                                   UInt32 ui_totalBytes )
 {
-    UInt32	i, samples = totalBytes / 2 /* each 16 bit sample is 2 bytes */;
-    SInt16	*inDataPtr = (SInt16 *) in16BitDataPtr;
-    Float32	*outDataPtr = (Float32 *) out32BitDataPtr;
+    UInt32	i, ui_samples = ui_totalBytes / 2 /* each 16 bit sample is 2 bytes */;
+    SInt16	*p_s_inDataPtr = (SInt16 *) p_in16BitDataPtr;
+    Float32	*p_f_outDataPtr = (Float32 *) p_out32BitDataPtr;
     
-    for( i = 0 ; i < samples ; i++ )
+    for( i = 0 ; i < ui_samples ; i++ )
     {
-        *outDataPtr = (Float32)(*inDataPtr);
-        if( *outDataPtr > 0 )
-            *outDataPtr /= 32767.0;
+        *p_f_outDataPtr = (Float32)(*p_s_inDataPtr);
+        if( *p_f_outDataPtr > 0 )
+            *p_f_outDataPtr /= 32767.0;
         else
-            *outDataPtr /= 32768.0;
-        outDataPtr++;
-        inDataPtr++;
+            *p_f_outDataPtr /= 32768.0;
+        p_f_outDataPtr++;
+        p_s_inDataPtr++;
     }
 }
        
 /*****************************************************************************
  * Convert16BitIntegerTo32FloatWithByteSwap
  *****************************************************************************/
-void Convert16BitIntegerTo32FloatWithByteSwap( Ptr in16BitDataPtr, 
-                                               Ptr out32BitDataPtr, 
-                                               UInt32 totalBytes )
+void Convert16BitIntegerTo32FloatWithByteSwap( Ptr p_in16BitDataPtr, 
+                                               Ptr p_out32BitDataPtr, 
+                                               UInt32 ui_totalBytes )
 {
-    UInt32	i, samples = totalBytes / 2 /* each 16 bit sample is 2 bytes */;
-    SInt16	*inDataPtr = (SInt16 *) in16BitDataPtr;
-    Float32	*outDataPtr = (Float32 *) out32BitDataPtr;
+    UInt32	i, ui_samples = ui_totalBytes / 2 /* each 16 bit sample is 2 bytes */;
+    SInt16	*p_s_inDataPtr = (SInt16 *) p_in16BitDataPtr;
+    Float32	*p_f_outDataPtr = (Float32 *) p_out32BitDataPtr;
     
-    for( i = 0 ; i < samples ; i++ )
+    for( i = 0 ; i < ui_samples ; i++ )
     {
-        *outDataPtr = (Float32)CFSwapInt16LittleToHost(*inDataPtr);
-        if( *outDataPtr > 0 )
-            *outDataPtr /= 32767.0;
+        *p_f_outDataPtr = (Float32)CFSwapInt16LittleToHost(*p_s_inDataPtr);
+        if( *p_f_outDataPtr > 0 )
+            *p_f_outDataPtr /= 32767.0;
         else
-            *outDataPtr /= 32768.0;
+            *p_f_outDataPtr /= 32768.0;
 
-        outDataPtr++;
-        inDataPtr++;
+        p_f_outDataPtr++;
+        p_s_inDataPtr++;
     }
 }
        
 /*****************************************************************************
  * Convert8BitIntegerTo32Float
  *****************************************************************************/
-void Convert8BitIntegerTo32Float( Ptr in8BitDataPtr, Ptr out32BitDataPtr, 
-                                  UInt32 totalBytes )
+void Convert8BitIntegerTo32Float( Ptr p_in8BitDataPtr, Ptr p_out32BitDataPtr, 
+                                  UInt32 ui_totalBytes )
 {
-    UInt32	i, samples = totalBytes;
-    SInt8	*inDataPtr = (SInt8 *) in8BitDataPtr;
-    Float32	*outDataPtr = (Float32 *) out32BitDataPtr;
+    UInt32	i, ui_samples = ui_totalBytes;
+    SInt8	*p_c_inDataPtr = (SInt8 *)p_in8BitDataPtr;
+    Float32	*p_f_outDataPtr = (Float32 *)p_out32BitDataPtr;
     
-    for( i = 0 ; i < samples ; i++ )
+    for( i = 0 ; i < ui_samples ; i++ )
     {
-        *outDataPtr = (Float32)(*inDataPtr);
-        if( *outDataPtr > 0 )
-            *outDataPtr /= 32767.0;
+        *p_f_outDataPtr = (Float32)(*p_c_inDataPtr);
+        if( *p_f_outDataPtr > 0 )
+            *p_f_outDataPtr /= 32767.0;
         else
-            *outDataPtr /= 32768.0;
+            *p_f_outDataPtr /= 32768.0;
         
-        outDataPtr++;
-        inDataPtr++;
+        p_f_outDataPtr++;
+        p_c_inDataPtr++;
     }
 }

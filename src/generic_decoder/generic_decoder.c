@@ -10,6 +10,7 @@
  * used as a 'default' decoder by the input thread.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
+ * $Id: generic_decoder.c,v 1.18 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *

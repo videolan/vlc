@@ -2,6 +2,7 @@
  * macosx.c : MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
+ * $Id: macosx.c,v 1.3 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: 
  *

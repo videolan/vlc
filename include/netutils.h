@@ -4,6 +4,7 @@
  * modules.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * $Id: netutils.h,v 1.9 2001/03/21 13:42:33 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Henri Fallon <henri@videolan.org>

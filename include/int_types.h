@@ -2,6 +2,7 @@
  * int_types.h: internal types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: int_types.h,v 1.6 2001/03/21 13:42:33 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *

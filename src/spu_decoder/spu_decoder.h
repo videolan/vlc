@@ -2,6 +2,7 @@
  * spu_decoder.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: spu_decoder.h,v 1.7 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

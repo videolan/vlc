@@ -2,6 +2,7 @@
  * ac3_internals.h: needed by the ac3 decoder
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: ac3_internal.h,v 1.8 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *

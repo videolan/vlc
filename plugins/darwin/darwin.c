@@ -2,8 +2,10 @@
  * darwin.c : Darwin plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
+ * $Id: darwin.c,v 1.3 2001/03/21 13:42:33 sam Exp $
  *
- * Authors: 
+ * Authors: Colin Delacroix <colin@zoy.org>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

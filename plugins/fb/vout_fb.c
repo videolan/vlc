@@ -2,6 +2,7 @@
  * vout_fb.c: framebuffer video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
+ * $Id: vout_fb.c,v 1.10 2001/03/21 13:42:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

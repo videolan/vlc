@@ -2,9 +2,9 @@
  * lpcm_decoder_thread.h : lpcm decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder_thread.h,v 1.3 2001/01/05 14:46:37 sam Exp $
+ * $Id: lpcm_decoder_thread.h,v 1.4 2001/03/21 13:42:34 sam Exp $
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

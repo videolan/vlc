@@ -2,9 +2,9 @@
  * beos_init.h: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: beos_specific.h,v 1.4 2001/03/21 13:42:33 sam Exp $
  *
- * Authors:
- * Jean-Marc Dressler
+ * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

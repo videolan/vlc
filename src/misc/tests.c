@@ -3,6 +3,7 @@
  * Functions are prototyped in tests.h.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: tests.c,v 1.5 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *

@@ -2,6 +2,7 @@
  * input_dvd.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
+ * $Id: input_dvd.h,v 1.13 2001/03/21 13:42:33 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *

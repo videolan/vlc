@@ -2,6 +2,7 @@
  * modules.c : Built-in and dynamic modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
+ * $Id: modules.c,v 1.19 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>

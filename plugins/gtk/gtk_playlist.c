@@ -2,6 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
+ * $Id: gtk_playlist.c,v 1.8 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *      

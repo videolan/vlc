@@ -4,8 +4,9 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: intf_msg.h,v 1.11 2001/03/21 13:42:33 sam Exp $
  *
- * Authors:
+ * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

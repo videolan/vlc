@@ -1,9 +1,11 @@
 /*****************************************************************************
  * vout_mga.h: MGA video output display method headers
  *****************************************************************************
- * Copyright (C) 1999 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  * Copyright (C) 2000, 2001 VideoLAN
+ * $Id: vout_mga.h,v 1.3 2001/03/21 13:42:34 sam Exp $
  *
+ * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
+ *          Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

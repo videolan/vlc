@@ -96,7 +96,7 @@ LIB += -ldl -lsocket -lnsl -lpthread
 endif
 
 ifneq (,$(findstring darwin,$(SYS)))
-LIB += -ldl -framework Carbon
+LIB += -ldl
 endif
 
 ifeq ($(SYS),beos)
@@ -717,7 +717,7 @@ lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT) $(PLUGIN_IDCTCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 lib/idctaltivec.so: $(PLUGIN_IDCTALTIVEC) $(PLUGIN_IDCTCOMMON)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework VecLib
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework vecLib
 
 lib/kde.so: $(PLUGIN_KDE)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lkdeui -lkdecore -lqt -ldl

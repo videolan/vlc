@@ -4,6 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: video.h,v 1.29 2001/03/21 13:42:33 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *

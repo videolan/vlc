@@ -3,6 +3,7 @@
  * These functions set up YUV tables for colorspace conversion
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: video_yuv.c,v 1.47 2001/03/21 13:42:35 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *

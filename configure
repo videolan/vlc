@@ -20,7 +20,7 @@ ac_help="$ac_help
 ac_help="$ac_help
   --disable-mmx           Disable MMX optimizations (default enabled for x86)"
 ac_help="$ac_help
-  --enable-activec        Enable altivec optimizations (default enabled for PPC)"
+  --enable-altivec        Enable altivec optimizations (default enabled for PPC)"
 ac_help="$ac_help
   --disable-css           Disable DVD CSS decryption (default enabled)"
 ac_help="$ac_help

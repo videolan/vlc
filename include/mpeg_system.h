@@ -3,9 +3,9 @@
  * and TS system layers
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: mpeg_system.h,v 1.2 2001/02/21 04:38:59 henri Exp $
+ * $Id: mpeg_system.h,v 1.3 2001/03/21 13:42:33 sam Exp $
  *
- * Authors:
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

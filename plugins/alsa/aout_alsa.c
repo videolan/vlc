@@ -2,9 +2,9 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: aout_alsa.c,v 1.12 2001/03/21 13:42:33 sam Exp $
  *
- * Authors:
- *  Henri Fallon <henri@videolan.org>
+ * Authors: Henri Fallon <henri@videolan.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

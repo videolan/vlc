@@ -2,6 +2,7 @@
  * ac3_bit_stream.h: getbits functions for the ac3 decoder
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
+ * $Id: ac3_bit_stream.h,v 1.9 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Renaud Dartus <reno@videolan.org>

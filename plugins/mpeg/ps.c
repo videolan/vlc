@@ -2,8 +2,9 @@
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: ps.c,v 1.3 2001/03/21 13:42:34 sam Exp $
  *
- * Authors: 
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

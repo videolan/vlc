@@ -4,6 +4,7 @@
  * can be anything, including pictures, audio streams, and so on.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: rsc_files.c,v 1.9 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *

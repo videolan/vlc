@@ -2,8 +2,9 @@
  * yuv.c : C YUV module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: yuv.c,v 1.6 2001/03/21 13:42:34 sam Exp $
  *
- * Authors:
+ * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

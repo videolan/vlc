@@ -2,6 +2,7 @@
  * ac3_rematrix.c: ac3 audio rematrixing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: ac3_rematrix.c,v 1.12 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>

@@ -2,8 +2,9 @@
  * ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
+ * $Id: ts.c,v 1.3 2001/03/21 13:42:34 sam Exp $
  *
- * Authors: 
+ * Authors: Henri Fallon <henri@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

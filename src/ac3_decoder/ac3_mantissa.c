@@ -2,6 +2,7 @@
  * ac3_mantissa.c: ac3 mantissa computation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * $Id: ac3_mantissa.c,v 1.21 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>

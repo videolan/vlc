@@ -5,6 +5,7 @@
  * certain cases by optimized functions.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * $Id: transforms_yuv.c,v 1.4 2001/03/21 13:42:34 sam Exp $
  *
  * Authors: Vincent Seguin <ptyx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
