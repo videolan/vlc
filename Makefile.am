@@ -569,7 +569,7 @@ package-win32-base-exe:
 
 package-win32-base-zip:
 # Create package 
-	zip -r vlc-${VERSION}-win32 vlc-${VERSION}
+	zip -r vlc-${VERSION}-win32.zip vlc-${VERSION}
 
 package-win32-exe: package-win32-base package-win32-base-exe
 # Clean up
