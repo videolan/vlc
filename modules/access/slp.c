@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.1 2003/01/10 04:58:23 lool Exp $
+ * $Id: slp.c,v 1.2 2003/01/10 06:16:55 lool Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -109,7 +109,7 @@ static SLPBoolean SrvUrlCallback( SLPHandle hslp,
                          psz_s,
                          sizeof(psz_item) - strlen(psz_item) - 1 );
         playlist_Add( p_playlist, psz_s,
-                      PLAYLIST_APPEND | PLAYLIST_GO,
+                      PLAYLIST_APPEND,
                       PLAYLIST_END );
         vlc_object_release( (vlc_object_t *)p_playlist );
 
