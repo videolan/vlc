@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.99 2002/04/25 21:52:42 sam Exp $
+ * $Id: common.h,v 1.100 2002/04/26 17:07:14 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -385,7 +385,7 @@ struct intf_subscription_s;
 #   define vlc_memalign(pp_orig,align,size) \
     (( *(pp_orig) = malloc( size + align - 1 )) \
         ? (void *)( (((unsigned long)*(pp_orig)) + (unsigned long)(align-1) ) \
-                       % (unsigned long)align ) \
+                       & (~(unsigned long)align) ) \
         : NULL )
 
 #endif
