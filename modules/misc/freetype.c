@@ -703,6 +703,8 @@ static line_desc_t *NewLine( byte_t *psz_string )
         free( p_line );
         return NULL;
     }
+    p_line->pp_glyphs[0] = NULL;
+    
     p_line->p_glyph_pos = malloc( sizeof( FT_Vector )
                                   * i_count + 1 );
     if( p_line->p_glyph_pos == NULL )
