@@ -33,6 +33,7 @@ struct tls_t
     void *p_sys;
 
     tls_server_t * (*pf_server_create) ( tls_t *, const char *, const char * );
+    tls_session_t * (*pf_client_create) ( tls_t *, const char * );
 };
 
 struct tls_server_t
@@ -95,9 +96,14 @@ VLC_EXPORT( void, tls_ServerDelete, ( tls_server_t * ) );
 
 # define tls_ServerSessionPrepare( a ) (((tls_server_t *)a)->pf_session_prepare (a))
 
+# define __tls_ClientCreate( a, b ) (((tls_t *)a)->pf_client_create (a, b ))
+VLC_EXPORT( tls_session_t *, tls_ClientCreate, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( void, tls_ClientDelete, ( tls_session_t * ) );
+
 # define tls_SessionHandshake( a, b ) (((tls_session_t *)a)->pf_handshake (a, b))
 
 # define tls_SessionClose( a ) (((tls_session_t *)a)->pf_close (a))
+# define __tls_ClientDelete( a ) tls_SessionClose( a )
 
 # define tls_Send( a, b, c ) (((tls_session_t *)a)->pf_send (a, b, c ))
 
