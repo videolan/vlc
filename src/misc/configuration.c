@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.26 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: configuration.c,v 1.26.2.1 2002/06/02 23:01:32 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -824,8 +824,8 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
     {
         /* count the number of exported configuration options (to allocate
          * longopts). We also need to allocate space for too options when
-         * dealing with boolean to allow for --foo and --no-foo */
-        i_opts += (p_module->i_config_items + p_module->i_bool_items);
+         * dealing with boolean to allow for --foo, --nofoo and --no-foo */
+        i_opts += (p_module->i_config_items + 2 * p_module->i_bool_items);
     }
 
     p_longopts = malloc( sizeof(struct option) * (i_opts + 1) );
@@ -890,11 +890,22 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
             p_longopts[i_index].val = 0;
             i_index++;
 
-            /* When dealing with bools we also need to add the --no-foo
-             * option */
+            /* When dealing with bools we also need to add the --nofoo and
+             * --no-foo options */
             if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL )
             {
-                char *psz_name = malloc( strlen(p_item->psz_name) + 4 );
+                char *psz_name = malloc( strlen(p_item->psz_name) + 3 );
+                if( psz_name == NULL ) continue;
+                strcpy( psz_name, "no" );
+                strcat( psz_name, p_item->psz_name );
+
+                p_longopts[i_index].name = psz_name;
+                p_longopts[i_index].has_arg = no_argument;
+                p_longopts[i_index].flag = &flag;
+                p_longopts[i_index].val = 1;
+                i_index++;
+
+                psz_name = malloc( strlen(p_item->psz_name) + 4 );
                 if( psz_name == NULL ) continue;
                 strcpy( psz_name, "no-" );
                 strcat( psz_name, p_item->psz_name );

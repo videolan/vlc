@@ -4,7 +4,11 @@
 
 HEAD
 
-  * ./plugins/macosx: rewrote the net panel for OS X
+  * ./plugins/dvdread/dvdread.c: disabled the dvdread plugin because it
+    currently sucks.
+  * ./src/misc/configuration.c, ./src/interface/main.c: we now accept --nofoo
+    and --no-foo as negations for --foo. Also, the --help output is nicer.
+  * ./plugins/macosx/*: rewrote the net panel for OS X
   * ./plugins/qnx/vout_qnx.c: QNX compilation fix.
   * ./plugins/spudec/spu_decoder.c: fixed a margin bug in the SPU renderer
     which caused subtitles to appear slanted in odd width windows.

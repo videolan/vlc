@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.195 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: main.c,v 1.195.2.1 2002/06/02 23:01:32 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -924,15 +924,14 @@ static int GetFilenames( int i_argc, char *ppsz_argv[] )
  *****************************************************************************/
 static void Usage( const char *psz_module_name )
 {
-#define FORMAT_STRING "      --%s%s%s%s%s%s %s%s"
-    /* option name prefix ------' | | | | |  | |
-     * option name ---------------' | | | |  | |
-     * <bra ------------------------' | | |  | |
-     * option type or "" -------------' | |  | |
-     * ket> ----------------------------' |  | |
-     * padding spaces --------------------'  | |
-     * comment ------------------------------' |
-     * comment suffix -------------------------'
+#define FORMAT_STRING "      --%s%s%s%s%s%s%s %s%s"
+    /* option name -------------'     | | | |  | |
+     * <bra --------------------------' | | |  | |
+     * option type or "" ---------------' | |  | |
+     * ket> ------------------------------' |  | |
+     * padding spaces ----------------------'  | |
+     * comment --------------------------------' |
+     * comment suffix ---------------------------'
      *
      * The purpose of having bra and ket is that we might i18n them as well.
      */
@@ -973,7 +972,7 @@ static void Usage( const char *psz_module_name )
              p_item++ )
         {
             char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
-            char *psz_suf = "";
+            char *psz_suf = "", *psz_prefix = NULL;
             int i;
 
             switch( p_item->i_type )
@@ -996,8 +995,8 @@ static void Usage( const char *psz_module_name )
             case MODULE_CONFIG_ITEM_BOOL:
                 psz_bra = ""; psz_type = ""; psz_ket = "";
                 if( !b_help_module )
-                    psz_suf = p_item->i_value ? _(" (default: enabled)") :
-                                                _(" (default: disabled)");
+                    psz_suf = p_item->i_value ? _(" (default enabled)") :
+                                                _(" (default disabled)");
                 break;
             }
 
@@ -1021,7 +1020,30 @@ static void Usage( const char *psz_module_name )
                      - strlen( psz_bra ) - strlen( psz_type )
                      - strlen( psz_ket ) - 1;
                 if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL &&
-                    !b_help_module ) i -= 5;
+                    !b_help_module )
+                {
+                    boolean_t b_dash = 0;
+                    psz_prefix = p_item->psz_name;
+                    while( *psz_prefix )
+                    {
+                        if( *psz_prefix++ == '-' )
+                        {
+                            b_dash = 1;
+                            break;
+                        }
+                    }
+
+                    if( b_dash )
+                    {
+                        psz_prefix = ", --no-";
+                        i -= strlen( p_item->psz_name ) + strlen( ", --no-" );
+                    }
+                    else
+                    {
+                        psz_prefix = ", --no";
+                        i -= strlen( p_item->psz_name ) + strlen( ", --no" );
+                    }
+                }
 
                 if( i < 0 )
                 {
@@ -1033,11 +1055,19 @@ static void Usage( const char *psz_module_name )
                     psz_spaces[i] = '\0';
                 }
 
-                intf_Msg( psz_format,
-                          ( p_item->i_type == MODULE_CONFIG_ITEM_BOOL &&
-                            !b_help_module ) ? "(no-)" : "",
-                          p_item->psz_name, psz_bra, psz_type, psz_ket,
-                          psz_spaces, p_item->psz_text, psz_suf );
+                if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL &&
+                    !b_help_module )
+                {
+                    intf_Msg( psz_format, p_item->psz_name, psz_prefix,
+                              p_item->psz_name, psz_bra, psz_type, psz_ket,
+                              psz_spaces, p_item->psz_text, psz_suf );
+                }
+                else
+                {
+                    intf_Msg( psz_format, p_item->psz_name, "", "",
+                              psz_bra, psz_type, psz_ket, psz_spaces,
+                              p_item->psz_text, psz_suf );
+                }
                 psz_spaces[i] = ' ';
             }
         }
