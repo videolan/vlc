@@ -1541,7 +1541,7 @@ AC_ARG_ENABLE(cddax,
  
 if test "${enable_cddax}" != "no"
 then
-  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.70,
+  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.71,
    [enable_cddax="no"
     AC_DEFINE(HAVE_CDDAX, [], [Define for the CD-DA plugin using libcdio])
     VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
@@ -1551,7 +1551,7 @@ then
     HAVE_CDDAX=no])
 
   if test "$enable_libcddb" != "no"; then
-    PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.4, [
+    PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.5, [
       HAVE_LIBCDDB=yes 
       AC_DEFINE(HAVE_LIBCDDB, [], [Define this if you have libcddb installed])
       VLC_ADD_LDFLAGS([cddax],[$LIBCDDB_LIBS])
@@ -1563,7 +1563,7 @@ then
  
 dnl   if test "${enable_vcdx}" != "no"
 dnl   then
-dnl     PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.20,
+dnl     PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.21,
 dnl      [enable_vcd="no"
 dnl       AC_DEFINE(HAVE_VCDX, [], 
 dnl       [Define for the VCD plugin using libcdio/libvcdinfo])
