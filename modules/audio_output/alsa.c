@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.17 2002/12/23 17:22:46 bozo Exp $
+ * $Id: alsa.c,v 1.18 2003/01/08 10:50:58 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -71,6 +71,7 @@ struct aout_sys_t
 #define ALSA_SPDIF_BUFFER_SIZE          ( ALSA_SPDIF_PERIOD_SIZE << 4 )
 /* Why << 4 ? --Meuuh */
 /* Why not ? --Bozo */
+/* Right. --Meuuh */
 
 #define DEFAULT_ALSA_DEVICE "default"
 
@@ -86,10 +87,17 @@ static void ALSAFill     ( aout_instance_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define SPDIF_TEXT N_("Try to use S/PDIF output")
+#define SPDIF_LONGTEXT N_( \
+    "Sometimes we attempt to use the S/PDIF output, even if nothing is " \
+    "connected to it. Un-checking this option disables this behaviour, " \
+    "and permanently selects analog PCM output." )
+
 vlc_module_begin();
     add_category_hint( N_("ALSA"), NULL );
     add_string( "alsadev", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,
                 N_("ALSA device name"), NULL );
+    add_bool( "spdif", 1, NULL, SPDIF_TEXT, SPDIF_LONGTEXT );
     set_description( _("ALSA audio module") );
     set_capability( "audio output", 50 );
     set_callbacks( Open, Close );
@@ -111,10 +119,11 @@ static void Probe( aout_instance_t * p_aout,
     if ( psz_iec_device )
     {
         /* Opening the device should be enough */
-        if ( !snd_pcm_open( &p_sys->p_snd_pcm, psz_iec_device,
-                            SND_PCM_STREAM_PLAYBACK, 0 ) )
+        if ( config_GetInt( p_aout, "spdif" )
+              && !snd_pcm_open( &p_sys->p_snd_pcm, psz_iec_device,
+                                SND_PCM_STREAM_PLAYBACK, 0 ) )
         {
-            val.psz_string = N_("S/PDIF");
+            val.psz_string = N_("A/52 over S/PDIF");
             var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
             snd_pcm_close( p_sys->p_snd_pcm );
         }
@@ -300,7 +309,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if ( !strcmp( val.psz_string, N_("S/PDIF") ) )
+    if ( !strcmp( val.psz_string, N_("A/52 over S/PDIF") ) )
     {
         p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
     }
@@ -319,13 +328,13 @@ static int Open( vlc_object_t *p_this )
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
     }
-    else if ( !strcmp( val.psz_string, "Stereo" ) )
+    else if ( !strcmp( val.psz_string, N_("Stereo") ) )
     {
         p_aout->output.output.i_format = i_vlc_pcm_format;
         p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     }
-    else if ( !strcmp( val.psz_string, "Mono" ) )
+    else if ( !strcmp( val.psz_string, N_("Mono") ) )
     {
         p_aout->output.output.i_format = i_vlc_pcm_format;
         p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
@@ -558,6 +567,7 @@ static int ALSAThread( aout_instance_t * p_aout )
         /* Why do we need to sleep ? --Meuuh */
         /* Maybe because I don't want to eat all the cpu by looping
            all the time. --Bozo */
+        /* Shouldn't snd_pcm_wait() make us wait ? --Meuuh */
         msleep( p_sys->i_period_time >> 1 );
     }
 
