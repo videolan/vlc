@@ -217,7 +217,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     wxWindow *p_dummy = new wxWindow( this, 0, wxDefaultPosition,
                                       wxSize(0,0) );
     p_dummy->SetFocus();
-    frame_sizer->Add( p_dummy, 0, wxEXPAND );
+    frame_sizer->Add( p_dummy, 0, 0 );
 
     /* Creation of the menu bar */
     CreateOurMenuBar();
