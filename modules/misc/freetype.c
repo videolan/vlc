@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.12 2003/07/24 19:30:27 sigmunau Exp $
+ * $Id: freetype.c,v 1.13 2003/07/24 21:50:28 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -154,6 +154,10 @@ static int Create( vlc_object_t *p_this )
         strcat( psz_fontfile, "\\fonts\\arial.ttf" );
 #elif SYS_DARWIN
         strcpy( psz_fontfile, DEFAULT_FONT );
+#else
+        msg_Err( p_vout, "user didn't specify a font" );
+        free( p_vout->p_text_renderer_data );
+        return VLC_EGENERIC;
 #endif
     }
 

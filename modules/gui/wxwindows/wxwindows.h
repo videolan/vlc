@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.48 2003/07/24 16:07:10 gbazin Exp $
+ * $Id: wxwindows.h,v 1.49 2003/07/24 21:50:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -65,7 +65,8 @@ class FileInfo;
 
 #endif
 
-#if !defined(MODULE_NAME_IS_skins)
+wxArrayString SeparateEntries( wxString );
+
 /*****************************************************************************
  * intf_sys_t: description and status of wxwindows interface
  *****************************************************************************/
@@ -100,7 +101,6 @@ struct intf_sys_t
     wxMenu              *p_popup_menu;
 
 };
-#endif /* !defined(MODULE_NAME_IS_skins) */
 
 /*****************************************************************************
  * Prototypes
@@ -259,7 +259,6 @@ private:
     wxPanel *SatPanel( wxWindow* parent );
 
     void UpdateMRL( int i_access_method );
-    wxArrayString SeparateEntries( wxString );
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnOk( wxCommandEvent& event );
@@ -347,7 +346,7 @@ public:
     SoutDialog( intf_thread_t *p_intf, wxWindow *p_parent );
     virtual ~SoutDialog();
 
-    wxString mrl;
+    wxArrayString GetOptions();
 
 private:
     void UpdateMRL();

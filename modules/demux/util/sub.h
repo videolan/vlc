@@ -2,7 +2,7 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sub.h,v 1.5 2003/07/23 23:05:25 gbazin Exp $
+ * $Id: sub.h,v 1.6 2003/07/24 21:50:28 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -148,6 +148,7 @@ static inline
     else
     {
         msg_Warn( p_input, "failed to start subtitle demux" );
+        vlc_object_detach( p_sub );
         if( p_sub->p_module )
         {
             module_Unneed( p_sub, p_sub->p_module );
@@ -193,12 +194,13 @@ static inline int subtitle_Seek( subtitle_demux_t *p_sub, mtime_t i_date )
 static inline void subtitle_Close( subtitle_demux_t *p_sub )
 {
     msg_Info( p_sub, "subtitle stopped" );
-    if( p_sub->p_module )
-    {
-        module_Unneed( p_sub, p_sub->p_module );
-    }
     if( p_sub )
     {
+        vlc_object_detach( p_sub );
+        if( p_sub->p_module )
+        {
+            module_Unneed( p_sub, p_sub->p_module );
+        }
         vlc_object_destroy( p_sub );
     }
 }

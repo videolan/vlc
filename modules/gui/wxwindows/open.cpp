@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.31 2003/07/24 17:31:59 gbazin Exp $
+ * $Id: open.cpp,v 1.32 2003/07/24 21:50:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -588,54 +588,6 @@ void OpenDialog::UpdateMRL( int i_access_method )
     mrl_combo->SetValue( mrltemp );
 }
 
-wxArrayString OpenDialog::SeparateEntries( wxString entries )
-{
-    vlc_bool_t b_quotes_mode = VLC_FALSE;
-
-    wxArrayString entries_array;
-    wxString entry;
-
-    wxStringTokenizer token( entries, wxT(" \t\r\n\""), wxTOKEN_RET_DELIMS );
-
-    while( token.HasMoreTokens() )
-    {
-        entry += token.GetNextToken();
-
-        if( entry.IsEmpty() ) continue;
-
-        if( !b_quotes_mode && entry.Last() == wxT('\"') )
-        {
-            /* Enters quotes mode */
-            entry.RemoveLast();
-            b_quotes_mode = VLC_TRUE;
-        }
-        else if( b_quotes_mode && entry.Last() == wxT('\"') )
-        {
-            /* Finished the quotes mode */
-            entry.RemoveLast();
-            if( !entry.IsEmpty() ) entries_array.Add( entry );
-            entry.Empty();
-            b_quotes_mode = VLC_FALSE;
-        }
-        else if( !b_quotes_mode && entry.Last() != wxT('\"') )
-        {
-            /* we found a non-quoted standalone string */
-            if( token.HasMoreTokens() ||
-                entry.Last() == wxT(' ') || entry.Last() == wxT('\t') ||
-                entry.Last() == wxT('\r') || entry.Last() == wxT('\n') )
-                entry.RemoveLast();
-            if( !entry.IsEmpty() ) entries_array.Add( entry );
-            entry.Empty();
-        }
-        else
-        {;}
-    }
-
-    if( !entry.IsEmpty() ) entries_array.Add( entry );
-
-    return entries_array;
-}
-
 /*****************************************************************************
  * Events methods.
  *****************************************************************************/
@@ -900,8 +852,7 @@ void OpenDialog::OnSoutSettings( wxCommandEvent& WXUNUSED(event) )
 
     if( sout_dialog && sout_dialog->ShowModal() == wxID_OK )
     {
-        sout_mrl.Empty();
-        sout_mrl.Add( wxString(wxT("sout=")) + sout_dialog->mrl );
+        sout_mrl = sout_dialog->GetOptions();
     }
 }
 
@@ -944,4 +895,55 @@ void OpenDialog::OnDemuxDumpChange( wxCommandEvent& WXUNUSED(event) )
 {
     config_PutPsz( p_intf, "demuxdump-file",
                    demuxdump_textctrl->GetValue().mb_str() );
+}
+
+/*****************************************************************************
+ * Utility functions.
+ *****************************************************************************/
+wxArrayString SeparateEntries( wxString entries )
+{
+    vlc_bool_t b_quotes_mode = VLC_FALSE;
+
+    wxArrayString entries_array;
+    wxString entry;
+
+    wxStringTokenizer token( entries, wxT(" \t\r\n\""), wxTOKEN_RET_DELIMS );
+
+    while( token.HasMoreTokens() )
+    {
+        entry += token.GetNextToken();
+
+        if( entry.IsEmpty() ) continue;
+
+        if( !b_quotes_mode && entry.Last() == wxT('\"') )
+        {
+            /* Enters quotes mode */
+            entry.RemoveLast();
+            b_quotes_mode = VLC_TRUE;
+        }
+        else if( b_quotes_mode && entry.Last() == wxT('\"') )
+        {
+            /* Finished the quotes mode */
+            entry.RemoveLast();
+            if( !entry.IsEmpty() ) entries_array.Add( entry );
+            entry.Empty();
+            b_quotes_mode = VLC_FALSE;
+        }
+        else if( !b_quotes_mode && entry.Last() != wxT('\"') )
+        {
+            /* we found a non-quoted standalone string */
+            if( token.HasMoreTokens() ||
+                entry.Last() == wxT(' ') || entry.Last() == wxT('\t') ||
+                entry.Last() == wxT('\r') || entry.Last() == wxT('\n') )
+                entry.RemoveLast();
+            if( !entry.IsEmpty() ) entries_array.Add( entry );
+            entry.Empty();
+        }
+        else
+        {;}
+    }
+
+    if( !entry.IsEmpty() ) entries_array.Add( entry );
+
+    return entries_array;
 }

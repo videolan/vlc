@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.26 2003/07/20 21:28:52 gbazin Exp $
+ * $Id: streamout.cpp,v 1.27 2003/07/24 21:50:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -48,10 +48,6 @@
 #include <wx/statline.h>
 
 #include <vlc/intf.h>
-
-#if defined MODULE_NAME_IS_skins
-#   include "../skins/src/skin_common.h"
-#endif
 
 #include "wxwindows.h"
 
@@ -249,6 +245,11 @@ SoutDialog::~SoutDialog()
 {
 }
 
+wxArrayString SoutDialog::GetOptions()
+{
+   return SeparateEntries( mrl_combo->GetValue() );
+}
+
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
@@ -361,7 +362,7 @@ void SoutDialog::UpdateMRL()
     }
 
     if( !transcode.IsEmpty() || !duplicate.IsEmpty() )
-        mrl_combo->SetValue( wxT("#") + transcode + duplicate );
+        mrl_combo->SetValue( wxT(":sout=#") + transcode + duplicate );
     else
         mrl_combo->SetValue( wxT("") );
 }
@@ -710,9 +711,7 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
 void SoutDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
     mrl_combo->Append( mrl_combo->GetValue() );
-    mrl = mrl_combo->GetValue();
     EndModal( wxID_OK );
-    
 }
 
 void SoutDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
