@@ -68,12 +68,12 @@ typedef struct function_list_s
         /* Input plugin */
         struct
         {
-            int  ( * pf_init ) ( struct input_thread_s * );
-            void ( * pf_open )   ( struct input_thread_s * );
-            void ( * pf_close )  ( struct input_thread_s * );
+            void ( * pf_init ) ( struct input_thread_s * );
+            void ( * pf_open ) ( struct input_thread_s * );
+            void ( * pf_close )( struct input_thread_s * );
             void ( * pf_end )  ( struct input_thread_s * );
 
-            void ( * pf_read ) ( struct input_thread_s *,
+            int  ( * pf_read ) ( struct input_thread_s *,
                                  struct data_packet_s *
                                         pp_packets[] );
             void ( * pf_demux )( struct input_thread_s *,
@@ -81,8 +81,8 @@ typedef struct function_list_s
 
             struct data_packet_s * ( * pf_new_packet ) ( void *, size_t );
             struct pes_packet_s *  ( * pf_new_pes )    ( void * );
-            void ( * pf_delete_packet )  ( struct data_packet_s * );
-            void ( * pf_delete_pes )     ( struct pes_packet_s * );
+            void ( * pf_delete_packet )  ( void *, struct data_packet_s * );
+            void ( * pf_delete_pes )     ( void *, struct pes_packet_s * );
 
             int  ( * pf_rewind ) ( struct input_thread_s * );
             int  ( * pf_seek )   ( struct input_thread_s *, off_t );

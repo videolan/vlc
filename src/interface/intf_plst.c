@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,8 @@ playlist_t * playlist_Create ( void )
     p_playlist = malloc( sizeof( playlist_t ) );
     if( !p_playlist )
     {
-        intf_ErrMsg("playlist error: %s", strerror( ENOMEM ) );
+        intf_ErrMsg( "intf error: couldn't create playlist (%s)",
+                     strerror( ENOMEM ) );
         return( NULL );
     }
 
@@ -71,7 +72,7 @@ void playlist_Init ( playlist_t * p_playlist )
     /* The playlist is empty */
     p_playlist->p_item = NULL;
 
-    intf_Msg("playlist: playlist created");
+    intf_Msg("intf: playlist initialized");
 }
 
 int playlist_Add( playlist_t * p_playlist, int i_pos, char * psz_item )
@@ -87,7 +88,7 @@ int playlist_Add( playlist_t * p_playlist, int i_pos, char * psz_item )
     }
     else if( i_pos > p_playlist->i_size )
     {
-        intf_ErrMsg( "playlist error: inserting item beyond playlist size" );
+        intf_ErrMsg( "intf error: inserting item beyond playlist size" );
         vlc_mutex_unlock( &p_playlist->change_lock );
         return( -1 );
     }
@@ -110,7 +111,7 @@ int playlist_Add( playlist_t * p_playlist, int i_pos, char * psz_item )
     p_item->i_status = 0;
     p_item->psz_name = strdup( psz_item );
 
-    intf_Msg( "playlist: added %s", psz_item );
+    intf_WarnMsg( 1, "intf: added %s to playlist", psz_item );
 
     vlc_mutex_unlock( &p_playlist->change_lock );
 
@@ -146,7 +147,7 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
 
     if( !p_playlist->i_size || i_pos >= p_playlist->i_size )
     {
-        intf_ErrMsg( "playlist error: deleting item beyond playlist size" );
+        intf_ErrMsg( "intf error: deleting item beyond playlist size" );
         vlc_mutex_unlock( &p_playlist->change_lock );
         return( -1 );
     }
@@ -165,7 +166,7 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
     p_playlist->p_item = realloc( p_playlist->p_item,
                     p_playlist->i_size * sizeof( playlist_item_t ) );
 
-    intf_Msg( "playlist: removed %s", psz_name );
+    intf_WarnMsg( 1, "intf: removed %s from playlist", psz_name );
 
     /* Delete the item */
     free( psz_name );
@@ -193,7 +194,7 @@ void playlist_Destroy( playlist_t * p_playlist )
 
     free( p_playlist );
 
-    intf_Msg("playlist: playlist destroyed");
+    intf_Msg("intf: playlist destroyed");
 }
 
 static void NextItem( playlist_t * p_playlist )

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.75 2001/02/08 04:43:27 sam Exp $
+ * $Id: input.c,v 1.76 2001/02/08 07:24:25 sam Exp $
  *
  * Authors: 
  *
@@ -62,8 +62,7 @@
  * Local prototypes
  *****************************************************************************/
 static void RunThread   ( input_thread_t *p_input );
-static void InitLoop    ( input_thread_t *p_input );
-static void StopLoop    ( input_thread_t *p_input );
+static void InitThread  ( input_thread_t *p_input );
 static void ErrorThread ( input_thread_t *p_input );
 static void EndThread   ( input_thread_t *p_input );
 
@@ -75,7 +74,7 @@ static void EndThread   ( input_thread_t *p_input );
  * If pi_status is NULL, then the function will block until the thread is ready.
  * If not, it will be updated using one of the THREAD_* constants.
  *****************************************************************************/
-input_thread_t *input_CreateThread ( int *pi_status )
+input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
 {
     input_thread_t *    p_input;                        /* thread descriptor */
     int                 i_status;                           /* thread status */
@@ -92,6 +91,11 @@ input_thread_t *input_CreateThread ( int *pi_status )
     /* Initialize thread properties */
     p_input->b_die              = 0;
     p_input->b_error            = 0;
+    p_input->b_eof              = 0;
+
+    /* Set target */
+    p_input->p_source           = p_item->psz_name;
+
     /* I have never understood that stuff --Meuuh */
     p_input->pi_status          = (pi_status != NULL) ? pi_status : &i_status;
     *p_input->pi_status         = THREAD_CREATE;
@@ -132,7 +136,7 @@ input_thread_t *input_CreateThread ( int *pi_status )
         {
             msleep( THREAD_SLEEP );
         } while( (i_status != THREAD_READY) && (i_status != THREAD_ERROR)
-                && (i_status != THREAD_FATAL) && (i_status != THREAD_OVER) );
+                && (i_status != THREAD_FATAL) );
         if( i_status != THREAD_READY )
         {
             return( NULL );
@@ -178,64 +182,49 @@ static void RunThread( input_thread_t *p_input )
     data_packet_t *         pp_packets[INPUT_READ_ONCE];
     int                     i_error, i;
 
-    *p_input->pi_status = THREAD_READY;
+    InitThread( p_input );
 
-    while( !p_input->b_die && !p_input->b_error )
+    while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
     {
-        InitLoop( p_input );
-
-        if( p_input->b_die || p_input->b_error )
-        {
-            break;
-        }
-
-        while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
-        {
 
 #ifdef STATS
-            p_input->c_loops++;
+        p_input->c_loops++;
 #endif
 
-            vlc_mutex_lock( &p_input->stream.control.control_lock );
-            if( p_input->stream.control.i_status == BACKWARD_S
-                 && p_input->pf_rewind != NULL )
-            {
-                p_input->pf_rewind( p_input );
-                /* FIXME: probably don't do it every loop, but when ? */
-            }
-            vlc_mutex_unlock( &p_input->stream.control.control_lock );
+        vlc_mutex_lock( &p_input->stream.control.control_lock );
+        if( p_input->stream.control.i_status == BACKWARD_S
+             && p_input->pf_rewind != NULL )
+        {
+            p_input->pf_rewind( p_input );
+            /* FIXME: probably don't do it every loop, but when ? */
+        }
+        vlc_mutex_unlock( &p_input->stream.control.control_lock );
 
-            i_error = p_input->pf_read( p_input, pp_packets );
+        i_error = p_input->pf_read( p_input, pp_packets );
 
-            /* Demultiplex read packets. */
-            for( i = 0; i < INPUT_READ_ONCE && pp_packets[i] != NULL; i++ )
-            {
-                p_input->pf_demux( p_input, pp_packets[i] );
-            }
-
-            if( i_error )
-            {
-                if( i_error == 1 )
-                {
-                    /* End of file */
-                    intf_WarnMsg( 1, "End of file reached" );
-                    /* FIXME: don't treat that as an error */
-                    p_input->b_eof = 1;
-                }
-                else
-                {
-                    p_input->b_error = 1;
-                }
-            }
+        /* Demultiplex read packets. */
+        for( i = 0; i < INPUT_READ_ONCE && pp_packets[i] != NULL; i++ )
+        {
+            p_input->pf_demux( p_input, pp_packets[i] );
         }
 
-        /* Free all ES and destroy all decoder threads */
-        input_EndStream( p_input );
-
-        StopLoop( p_input );
+        if( i_error )
+        {
+            if( i_error == 1 )
+            {
+                /* End of file - we do not set b_die because only the
+                 * interface is allowed to do so. */
+                intf_WarnMsg( 1, "End of file reached" );
+                p_input->b_eof = 1;
+            }
+            else
+            {
+                p_input->b_error = 1;
+            }
+        }
     }
 
-    if( p_input->b_error )
+    if( p_input->b_error || p_input->b_eof )
     {
         ErrorThread( p_input );
     }
@@ -245,22 +234,10 @@ static void RunThread( input_thread_t *p_input )
 }
 
 /*****************************************************************************
- * InitLoop: init the input loop
+ * InitThread: init the input Thread
  *****************************************************************************/
-static void InitLoop( input_thread_t * p_input )
+static void InitThread( input_thread_t * p_input )
 {
-    playlist_Next( p_main->p_playlist );
-
-    if( p_main->p_playlist->i_index == -1 )
-    {
-        /*    FIXME: wait for user to add stuff to playlist ? */
-        /* FIXME II: we shouldn't set b_error but rather b_die */
-        intf_Msg( "playlist: end" );
-        p_input->b_error = 1;
-        return;
-    }
-
-    p_input->p_source = p_main->p_playlist->current.psz_name;
 
 #ifdef STATS
     /* Initialize statistics */
@@ -296,40 +273,18 @@ static void InitLoop( input_thread_t * p_input )
     p_input->pf_seek          = f.pf_seek;
 #undef f
 
-    p_input->b_eof = 0;
     p_input->pf_open( p_input );
 
     if( p_input->b_error )
     {
         module_Unneed( p_main->p_module_bank, p_input->p_input_module );
-        return;
     }
-
-    p_input->pf_init( p_input );
-
-    return;
-}
-
-/*****************************************************************************
- * StopLoop: stop the input loop
- *****************************************************************************/
-static void StopLoop( input_thread_t * p_input )
-{
-#ifdef STATS
+    else
     {
-        struct tms cpu_usage;
-        times( &cpu_usage );
-
-        intf_Msg("input stats: cpu usage (user: %d, system: %d)",
-                 cpu_usage.tms_utime, cpu_usage.tms_stime);
+        p_input->pf_init( p_input );
     }
-#endif
 
-    /* Free demultiplexer's data */
-    p_input->pf_end( p_input );
-
-    /* Release modules */
-    module_Unneed( p_main->p_module_bank, p_input->p_input_module );
+    *p_input->pi_status = THREAD_READY;
 }
 
 /*****************************************************************************
@@ -356,6 +311,28 @@ static void EndThread( input_thread_t * p_input )
     /* Store status */
     pi_status = p_input->pi_status;
     *pi_status = THREAD_END;
+
+#ifdef STATS
+    {
+        struct tms cpu_usage;
+        times( &cpu_usage );
+
+        intf_Msg("input stats: cpu usage (user: %d, system: %d)",
+                 cpu_usage.tms_utime, cpu_usage.tms_stime);
+    }
+#endif
+
+    /* Free all ES and destroy all decoder threads */
+    input_EndStream( p_input );
+
+    /* Close stream */
+    p_input->pf_close( p_input );
+
+    /* Free demultiplexer's data */
+    p_input->pf_end( p_input );
+
+    /* Release modules */
+    module_Unneed( p_main->p_module_bank, p_input->p_input_module );
 
     /* Destroy Mutex locks */
     vlc_mutex_destroy( &p_input->stream.control.control_lock );

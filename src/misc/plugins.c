@@ -76,7 +76,6 @@ plugin_bank_t * bank_Create( void )
     }
     p_bank->i_plugin_count = MAX_PLUGIN_COUNT;
 
-    intf_Msg("plugin: bank initialized");
     return( p_bank );
 }
 
@@ -106,8 +105,9 @@ void bank_Init( plugin_bank_t * p_bank )
    
     /* Dummy plugin */
     SEEK_PLUGIN( "dummy" );
-
 #undef SEEK_PLUGIN
+
+    intf_Msg("plugin: plugin bank initialized [41;9;1m[OBSOLETE][m");
 }
 
 void bank_Destroy( plugin_bank_t * p_bank )

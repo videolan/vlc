@@ -182,36 +182,53 @@ void intf_Run( intf_thread_t *p_intf )
     /* Flush messages before spawning input */
     intf_FlushMsg();
 
-    p_intf->p_input = input_CreateThread( NULL );
-
     /* Main loop */
-    while(!p_intf->b_die && (p_intf->p_input != NULL) )
+    while( !p_intf->b_die )
     {
-        /* Flush waiting messages */
-        intf_FlushMsg();
+        /* Select the next playlist item */
+        playlist_Next( p_main->p_playlist );
 
-        /* Manage specific interface */
-        p_intf->p_sys_manage( p_intf );
-
-        /* Manage module bank */
-        module_ManageBank( p_main->p_module_bank );
-
-        /* Check attached threads status */
-        if( (p_intf->p_vout != NULL) && p_intf->p_vout->b_error )
+        if( p_main->p_playlist->i_index == -1 )
         {
-            /* FIXME: add aout error detection ?? */
+            /*    FIXME: wait for user to add stuff to playlist ? */
             p_intf->b_die = 1;
-        }
-        if( (p_intf->p_input != NULL) && p_intf->p_input->b_error )
-        {
-            input_DestroyThread( p_intf->p_input, NULL );
-            p_intf->p_input = NULL;
-            intf_DbgMsg("Input thread destroyed");
+            return;
         }
 
-        /* Sleep to avoid using all CPU - since some interfaces needs to access
-         * keyboard events, a 100ms delay is a good compromise */
-        msleep( INTF_IDLE_SLEEP );
+        p_intf->p_input =
+                    input_CreateThread( &p_main->p_playlist->current, NULL );
+
+        /* Main loop */
+        while( !p_intf->b_die && (p_intf->p_input != NULL) )
+        {
+            /* Flush waiting messages */
+            intf_FlushMsg();
+
+            /* Manage specific interface */
+            p_intf->p_sys_manage( p_intf );
+
+            /* Manage module bank */
+            module_ManageBank( p_main->p_module_bank );
+
+            /* Check attached threads status */
+            if( (p_intf->p_vout != NULL) && p_intf->p_vout->b_error )
+            {
+                /* FIXME: add aout error detection ?? */
+                p_intf->b_die = 1;
+            }
+
+            if( ( p_intf->p_input != NULL ) &&
+                    ( p_intf->p_input->b_error || p_intf->p_input->b_eof ) )
+            {
+                input_DestroyThread( p_intf->p_input, NULL );
+                p_intf->p_input = NULL;
+                intf_DbgMsg("Input thread destroyed");
+            }
+
+            /* Sleep to avoid using all CPU - since some interfaces needs
+             * to access keyboard events, a 100ms delay is a good compromise */
+            msleep( INTF_IDLE_SLEEP );
+        }
     }
 }
 

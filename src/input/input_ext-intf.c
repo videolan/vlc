@@ -43,7 +43,7 @@
  *****************************************************************************/
 void input_Play( input_thread_t * p_input )
 {
-    intf_Msg( "Playing normally" );
+    intf_Msg( "input: playing at normal rate" );
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.i_new_status = PLAYING_S;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -56,12 +56,24 @@ void input_Play( input_thread_t * p_input )
  *****************************************************************************/
 void input_Forward( input_thread_t * p_input, int i_rate )
 {
-    if ( i_rate > 1000 )
-        intf_Msg( "Forward enabled at 1/%d",i_rate/1000 );
+    if ( i_rate > DEFAULT_RATE )
+    {
+        intf_Msg( "input: playing at 1:%i slow motion", i_rate / 1000 );
+    }
+    else if( i_rate < DEFAULT_RATE )
+    {
+        intf_Msg( "input: playing at %i:1 fast forward", 1000 / i_rate );
+    }
     else
-        intf_Msg( "Forward enabled at %d/1",1000/i_rate );
+    {
+        /* Not very joli, but this is going to disappear soon anyway */
+        input_Play( p_input );
+        return;
+    }
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.i_new_status = FORWARD_S;
     p_input->stream.i_new_rate = i_rate;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
+

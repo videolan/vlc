@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.27 2001/02/08 04:43:27 sam Exp $
+ * $Id: common.h,v 1.28 2001/02/08 07:24:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -79,10 +79,12 @@ struct plugin_info_s;
 typedef struct plugin_bank_s *          p_plugin_bank_t;
 typedef struct plugin_info_s *          p_plugin_info_t;
 
-/* Playlist */
+/* Plugins */
 struct playlist_s;
+struct playlist_item_s;
 
 typedef struct playlist_s *             p_playlist_t;
+typedef struct playlist_item_s *        p_playlist_item_t;
 
 /* Interface */
 struct intf_thread_s;
