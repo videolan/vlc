@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.52 2002/04/10 10:08:06 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.53 2002/04/11 09:25:45 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -100,6 +100,8 @@ int32 Draw(void *data)
 {
     VideoWindow* p_win;
     p_win = (VideoWindow *) data;
+    int source_l;
+    int dest_l;
 
     if ( p_win->LockWithTimeout(50000) == B_OK )
     {
@@ -112,10 +114,34 @@ int32 Draw(void *data)
         }
         if (p_win-> mode == OVERLAY)
         {
-            p_win-> overlaybitmap->LockBits();
-	        memcpy(p_win-> overlaybitmap->Bits(), 
-	               p_win-> bitmap[p_win-> i_buffer]->Bits(),
-		           p_win-> bitmap[p_win-> i_buffer]->BitsLength() );
+            p_win->overlaybitmap->LockBits();
+            /* Do the check twist */
+            source_l= p_win-> bitmap[p_win-> i_buffer]->BitsLength();
+            dest_l= p_win-> overlaybitmap->BitsLength();
+
+            BRect bounds= p_win-> bitmap[p_win-> i_buffer]->Bounds();
+            if (dest_l == source_l)
+            {
+                  /* Not used w/ NVIDIA overlay */
+                  memcpy(p_win-> overlaybitmap->Bits(),
+                  p_win-> bitmap[p_win-> i_buffer]->Bits(),
+                  p_win-> bitmap[p_win-> i_buffer]->BitsLength() );
+            }
+            else
+            {
+                  int b_bpr = p_win-> bitmap[p_win-> i_buffer]->BytesPerRow();
+                  int bm_bpr = p_win->overlaybitmap->BytesPerRow();
+                  int bpr = b_bpr < bm_bpr ? b_bpr : bm_bpr;
+                  char * bp = (char*)  p_win-> bitmap[p_win-> i_buffer]->Bits();
+                  char * bmp = (char*) p_win->overlaybitmap->Bits();
+                  int count = int(bounds.bottom - bounds.top) + 1;
+                  while (count-- > 0)
+                  {
+                        memcpy(bmp, bp, bpr);
+                        bmp += bm_bpr;
+                        bp += b_bpr;
+                  }
+            }
             p_win-> overlaybitmap->UnlockBits();
             p_win-> view-> Invalidate();
         }
@@ -125,10 +151,6 @@ int32 Draw(void *data)
                                        p_win-> view->Bounds() );
         }                                
         p_win-> Unlock();
-    }
-    else
-    {
-        intf_Msg("Dropped Frame");
     }
     return B_OK;
 }
@@ -300,13 +322,11 @@ int VideoWindow::SelectDrawingMode(int width, int height)
 			                     B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
 		    view->SetViewColor(key);
             SetTitle(VOUT_TITLE " (Overlay)");
-            intf_Msg("Color index good: %i", colspace_index);
             break;
         }
         else
         {
             delete overlaybitmap;
-            intf_Msg("Color index bad: %i", colspace_index);
         }        
 	}
 
@@ -321,7 +341,6 @@ int VideoWindow::SelectDrawingMode(int width, int height)
     bitmap[1] = new BBitmap( BRect( 0, 0, width, height ), colspace[colspace_index].colspace);
     memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
     memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
-    intf_Msg("Color space: %s", colspace[colspace_index].name);
     return drawingMode;
 }
 
