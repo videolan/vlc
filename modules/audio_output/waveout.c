@@ -494,10 +494,10 @@ static int OpenWaveOut( aout_instance_t *p_aout, int i_format,
 #define waveformat p_aout->output.p_sys->waveformat
 
     waveformat.dwChannelMask = 0;
-    for( i = 0; i < sizeof(pi_channels_in)/sizeof(uint32_t); i++ )
+    for( i = 0; i < sizeof(pi_channels_src)/sizeof(uint32_t); i++ )
     {
-        if( i_channels & pi_channels_in[i] )
-            waveformat.dwChannelMask |= pi_channels_out[i];
+        if( i_channels & pi_channels_src[i] )
+            waveformat.dwChannelMask |= pi_channels_in[i];
     }
 
     switch( i_format )
