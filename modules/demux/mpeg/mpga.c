@@ -2,7 +2,7 @@
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: mpga.c,v 1.18 2004/03/03 20:39:52 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -210,7 +210,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->i_time = 0;
+    p_sys->i_time = 1;
     p_sys->i_bitrate_avg = 0;
 
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', 'g', 'a' ) );
