@@ -597,31 +597,35 @@ static int Demux( demux_t *p_demux )
                                   (uint32_t*)p_block->p_buffer,
                                   p_block->i_buffer );
                 }
-                else if( tk->fmt.i_cat == SPU_ES && p_block->i_buffer >= 2 )
+                else if( tk->fmt.i_cat == SPU_ES )
                 {
-                    uint16_t i_size = GetWBE( p_block->p_buffer );
-
-                    if( i_size + 2 <= p_block->i_buffer )
+                    if( tk->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) && p_block->i_buffer >= 2 )
                     {
-                        char *p;
-                        /* remove the length field, and append a '\0' */
-                        memmove( &p_block->p_buffer[0], &p_block->p_buffer[2], i_size );
-                        p_block->p_buffer[i_size] = '\0';
-                        p_block->i_buffer = i_size + 1;
+                        uint16_t i_size = GetWBE( p_block->p_buffer );
 
-                        /* convert \r -> \n */
-                        while( ( p = strchr( p_block->p_buffer, '\r' ) ) )
+                        if( i_size + 2 <= p_block->i_buffer )
                         {
-                            *p = '\n';
+                            char *p;
+                            /* remove the length field, and append a '\0' */
+                            memmove( &p_block->p_buffer[0], &p_block->p_buffer[2], i_size );
+                            p_block->p_buffer[i_size] = '\0';
+                            p_block->i_buffer = i_size + 1;
+
+                            /* convert \r -> \n */
+                            while( ( p = strchr( p_block->p_buffer, '\r' ) ) )
+                            {
+                                *p = '\n';
+                            }
                         }
-                    }
-                    else
-                    {
-                        /* Invalid */
-                        p_block->i_buffer = 0;
+                        else
+                        {
+                            /* Invalid */
+                            p_block->i_buffer = 0;
+                        }
                     }
                 }
                 p_block->i_dts = MP4_TrackGetPTS( p_demux, tk ) + 1;
+                fprintf( stderr, "dts=%lld\n", p_block->i_dts );
 
                 p_block->i_pts = tk->fmt.i_cat == VIDEO_ES ? 0 : p_block->i_dts + 1;
 
@@ -787,8 +791,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
+        case DEMUX_GET_TITLE_INFO:
+        case DEMUX_SET_NEXT_DEMUX_TIME:
+        case DEMUX_SET_GROUP:
+            return VLC_EGENERIC;
+
         default:
-            msg_Err( p_demux, "control query unimplemented !!!" );
+            msg_Warn( p_demux, "control query unimplemented !!!" );
             return VLC_EGENERIC;
     }
 }
@@ -1048,7 +1057,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     p_sample = MP4_BoxGet(  p_track->p_stsd, "[%d]",
                 p_track->chunk[i_chunk].i_sample_description_index - 1 );
 
-    if( !p_sample || !p_sample->data.p_data )
+    if( !p_sample || ( !p_sample->data.p_data && p_track->fmt.i_cat != SPU_ES ) )
     {
         msg_Warn( p_demux,
                   "cannot find SampleEntry (track[Id 0x%x])",
@@ -1058,7 +1067,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 
     p_track->p_sample = p_sample;
 
-    if( p_track->i_sample_size == 1 )
+    if( p_track->fmt.i_cat == AUDIO_ES && p_track->i_sample_size == 1 )
     {
         MP4_Box_data_sample_soun_t *p_soun;
 
@@ -1175,6 +1184,15 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             case( 0x6c ): /* jpeg */
                 p_track->fmt.i_codec = VLC_FOURCC( 'j','p','e','g' );
                 break;
+
+            /* Private ID */
+            case( 0xe0 ): /* NeroDigital: dvd subs */
+                if( p_track->fmt.i_cat == SPU_ES )
+                {
+                    p_track->fmt.i_codec = VLC_FOURCC( 's','p','u',' ' );
+                    break;
+                }
+            /* Fallback */
             default:
                 /* Unknown entry, but don't touch i_fourcc */
                 msg_Warn( p_demux,
@@ -1597,6 +1615,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
             break;
 
         case( FOURCC_text ):
+        case( FOURCC_subp ):
             p_track->fmt.i_cat = SPU_ES;
             break;
 

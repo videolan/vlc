@@ -409,7 +409,12 @@ static int MP4_NextBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
             return( 0 ); /* out of bound */
         }
     }
-    return( MP4_SeekStream( p_stream, p_box->i_size + p_box->i_pos ) ? 0 : 1 );
+    if( MP4_SeekStream( p_stream, p_box->i_size + p_box->i_pos ) )
+    {
+        return 0;
+    }
+
+    return 1;
 }
 
 /*****************************************************************************
@@ -1390,6 +1395,12 @@ static void MP4_FreeBox_sample_vide( MP4_Box_t *p_box )
     FREE( p_box->data.p_sample_vide->p_qt_image_description );
 }
 
+static int MP4_ReadBox_sample_mp4s( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 8 );
+    MP4_ReadBoxContainerRaw( p_stream, p_box );
+    return 1;
+}
 
 static int MP4_ReadBox_sample_text( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -2322,7 +2333,7 @@ static struct
     { FOURCC_jpeg,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_avc1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
 
-    { FOURCC_mp4s,  MP4_ReadBox_default,        MP4_FreeBox_Common },
+    { FOURCC_mp4s,  MP4_ReadBox_sample_mp4s,    MP4_FreeBox_Common },
 
     /* XXX there is 2 box where we could find this entry stbl and tref*/
     { FOURCC_hint,  MP4_ReadBox_default,        MP4_FreeBox_Common },
