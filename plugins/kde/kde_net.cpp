@@ -39,10 +39,10 @@ KNetDialog::KNetDialog( QWidget *parent, const char *name )
     QVGroupBox *serverVBox = new QVGroupBox( "Starting position", layout );
 
     QHBox *titleHBox = new QHBox( serverVBox );
-    QLabel *titleLabel = new QLabel( "Address ", titleHBox );
+    new QLabel( "Address ", titleHBox );
     fAddress = new KLineEdit( "vls", titleHBox );
     QHBox *portHBox = new QHBox( serverVBox );
-    QLabel *portLabel = new QLabel( "Port ", portHBox );
+    new QLabel( "Port ", portHBox );
     fPort = new QSpinBox( 0, 65535, 1, portHBox );
 }
 

@@ -143,6 +143,8 @@ struct intf_sys_s
     KApplication *p_app;
     KInterface   *p_window;
     KAboutData   *p_about;
+
+    input_thread_t *p_input;
 };
 
 #endif /* _KDE_INTERFACE_H_ */

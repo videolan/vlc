@@ -37,14 +37,14 @@ KDiskDialog::KDiskDialog( QWidget *parent, const char *name )
     QVGroupBox *startVBox = new QVGroupBox( "Starting position", deviceSelectHBox );
 
     QHBox *titleHBox = new QHBox( startVBox );
-    QLabel *titleLabel = new QLabel( "Title ", titleHBox );
+    new QLabel( "Title ", titleHBox );
     fTitle = new QSpinBox( titleHBox );
     QHBox *chapterHBox = new QHBox( startVBox );
-    QLabel *chapterLabel = new QLabel( "Chapter ", chapterHBox );
+    new QLabel( "Chapter ", chapterHBox );
     fChapter = new QSpinBox( chapterHBox );
 
     QHBox *deviceNameHBox = new QHBox( pageVBox );
-    QLabel *deviceNameLabel = new QLabel( "Device name ", deviceNameHBox );
+    new QLabel( "Device name ", deviceNameHBox );
     fLineEdit = new KLineEdit( "/dev/dvd", deviceNameHBox );
 }
 

@@ -6,6 +6,7 @@
     email                : dae@chez.com
  ***************************************************************************/
 
+#include "kde_interface.h"
 #include "kde_menu.h"
 
 #include <kaction.h>
@@ -29,14 +30,14 @@ void KTitleMenu::regenerateSlot()
     fLanguageList = new KActionMenu( "Language", 0, this );
 
     int i_item = 0;
-    vlc_mutex_lock( &fInterfaceThread->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+    vlc_mutex_lock( &fInterfaceThread->p_sys->p_input->stream.stream_lock );
 
-    for( int i = 0 ; i < fInterfaceThread->p_vlc->p_input_bank->pp_input[0]->stream.i_es_number ; i++ )
+    for( int i = 0 ; i < fInterfaceThread->p_sys->p_input->stream.i_es_number ; i++ )
     {
-        if( fInterfaceThread->p_vlc->p_input_bank->pp_input[0]->stream.pp_es[i]->i_cat /* == i_cat */ )
+        if( fInterfaceThread->p_sys->p_input->stream.pp_es[i]->i_cat /* == i_cat */ )
         {
             i_item++;
-            QString language( fInterfaceThread->p_vlc->p_input_bank->pp_input[0]->stream.pp_es[i]->psz_desc );
+            QString language( fInterfaceThread->p_sys->p_input->stream.pp_es[i]->psz_desc );
             if ( QString::null == language )
             {
                 language += i18n( "Language" );
@@ -45,7 +46,7 @@ void KTitleMenu::regenerateSlot()
             KRadioAction *action = new KRadioAction( language, 0, this, "language_action" );
             fLanguageList->insert( action );
 
-            if( /* p_es == */ fInterfaceThread->p_vlc->p_input_bank->pp_input[0]->stream.pp_es[i] )
+            if( /* p_es == */ fInterfaceThread->p_sys->p_input->stream.pp_es[i] )
             {
                 /* don't lose p_item when we append into menu */
                 //p_item_active = p_item;
@@ -53,7 +54,7 @@ void KTitleMenu::regenerateSlot()
         }
     }
 
-    vlc_mutex_unlock( &fInterfaceThread->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+    vlc_mutex_unlock( &fInterfaceThread->p_sys->p_input->stream.stream_lock );
 
 #if 0
     /* link the new menu to the menubar item */

@@ -2,7 +2,7 @@
  * kde.cpp : KDE plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: kde.cpp,v 1.13 2002/06/01 12:31:59 sam Exp $
+ * $Id: kde.cpp,v 1.14 2002/07/01 17:39:27 sam Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -116,9 +116,12 @@ KThread::KThread(intf_thread_t *p_intf)
     this->p_intf = p_intf;
 
     p_intf->p_sys->p_about =
-        new KAboutData( "VideoLAN Client", I18N_NOOP("Kvlc"), VERSION,
-            "This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and MPEG 2 files from a file or from a network source.", KAboutData::License_GPL,
-            "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team", 0, 0, "dae@chez.com");
+      new KAboutData( "VideoLAN Client", I18N_NOOP("Kvlc"), VERSION,
+         _("This is the VideoLAN client, a DVD and MPEG player. It can play "
+           "MPEG and MPEG 2 files from a file or from a network source."),
+         KAboutData::License_GPL,
+         _("(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"),
+         0, 0, "");
 
     char *authors[][2] = {
         { "the VideoLAN Team", "<videolan@videolan.org>" },
@@ -136,6 +139,8 @@ KThread::KThread(intf_thread_t *p_intf)
     p_intf->p_sys->p_app = new KApplication();
     p_intf->p_sys->p_window = new KInterface(p_intf);
     p_intf->p_sys->p_window->setCaption( VOUT_TITLE " (KDE interface)" );
+
+    p_intf->p_sys->p_input = NULL;
 }
 
 /*****************************************************************************
@@ -143,6 +148,11 @@ KThread::KThread(intf_thread_t *p_intf)
  *****************************************************************************/
 KThread::~KThread()
 {
+    if( p_intf->p_sys->p_input )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+    }
+
     /* XXX: can be deleted if the user closed the window ! */
     //delete p_intf->p_sys->p_window;
 

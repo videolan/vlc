@@ -41,7 +41,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
          p_module = p_module->next )
     {
 
-        if( psz_module_name && !strcmp( psz_module_name, p_module->psz_name ) )
+        if( psz_module_name && !strcmp( psz_module_name, p_module->psz_object_name ) )
             break;
     }
     if( !p_module ) return;
@@ -100,7 +100,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                      p_module_bis = p_module_bis->next ) {
                     if( p_module_bis->i_capabilities & (1 << p_item->i_value)){
                         new QListViewItem(item_frame->getListView(),
-                                          p_module_bis->psz_name,
+                                          p_module_bis->psz_object_name,
                                           p_module_bis->psz_longname);
                     }
                 }
@@ -211,7 +211,7 @@ bool KPreferences::isConfigureable(QString module)
     for( p_module = p_intf->p_vlc->module_bank.first ;
          p_module != NULL ;
          p_module = p_module->next ) {
-        if( !module.compare( p_module->psz_name ) ) {
+        if( !module.compare( p_module->psz_object_name ) ) {
             return p_module->i_config_items != 0;
         }
     }

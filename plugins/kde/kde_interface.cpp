@@ -136,14 +136,23 @@ void KInterface::initStatusBar()
 
 void KInterface::slotFileOpen()
 {
+    playlist_t *p_playlist;
+
     slotStatusMsg( i18n( "Opening file..." ) );
     KURL url=KFileDialog::getOpenURL( QString::null,
             i18n( "*|All files" ), this, i18n( "Open File..." ) );
 
     if( !url.isEmpty() )
     {
-        fileOpenRecent->addURL( url );
-        intf_PlaylistAdd( p_intf->p_vlc->p_playlist, PLAYLIST_END, url.path() );
+        p_playlist = (playlist_t *)
+            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        if( p_playlist )
+        {
+            fileOpenRecent->addURL( url );
+            playlist_Add( p_playlist, url.path(),
+                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+            vlc_object_release( p_playlist );
+        }
     }
 
     slotStatusMsg( i18n( "Ready." ) );
@@ -167,7 +176,7 @@ void KInterface::slotFileClose()
 void KInterface::slotFileQuit()
 {
     slotStatusMsg(i18n("Exiting..."));
-    p_intf->p_sys->p_app->quit();
+    p_intf->p_vlc->b_die = 1;
     slotStatusMsg(i18n("Ready."));
 }
 
@@ -223,6 +232,18 @@ void KInterface::slotManage()
 {
     vlc_mutex_lock( &p_intf->change_lock );
 
+    /* Update the input */
+    if( p_intf->p_sys->p_input == NULL )
+    {
+        p_intf->p_sys->p_input = (input_thread_t *)
+                vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    }
+    else if( p_intf->p_sys->p_input->b_dead )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+        p_intf->p_sys->p_input = NULL;
+    }
+
     /* If the "display popup" flag has changed */
     if( p_intf->b_menu_change )
     {
@@ -232,7 +253,7 @@ void KInterface::slotManage()
 
     /* Update language/chapter menus after user request */
 #if 0
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL && p_intf->p_sys->p_window != NULL &&
+    if( p_intf->p_sys->p_input != NULL && p_intf->p_sys->p_window != NULL &&
         p_intf->p_sys->b_menus_update )
     {
 //        GnomeSetupMenu( p_intf );
@@ -240,17 +261,14 @@ void KInterface::slotManage()
 #endif
 
     /* Manage the slider */
-#define p_area p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area
-    if( (p_intf->p_vlc->p_input_bank->pp_input[0] != NULL) && (p_area->i_size != 0 ))
+#define p_area p_intf->p_sys->p_input->stream.p_selected_area
+    if( p_intf->p_sys->p_input && p_area->i_size )
     {
 	fSlider->setValue( ( 10000. * p_area->i_tell ) / p_area->i_size );
     }
 #undef p_area
 
-    /* Manage core vlc functions through the callback */
-    p_intf->pf_manage(p_intf);
-
-    if( p_intf->p_vlc->b_die )
+    if( p_intf->b_die )
     {
         p_intf->p_sys->p_app->quit();
     }
@@ -260,33 +278,37 @@ void KInterface::slotManage()
 
 void KInterface::slotSliderMoved( int position )
 {
-// XXX is this locking really useful ?
-    vlc_mutex_lock( &p_intf->change_lock );
+    if( p_intf->p_sys->p_input )
+    {
+        // XXX is this locking really useful ?
+        vlc_mutex_lock( &p_intf->change_lock );
 
-    off_t i_seek = ( position * p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_size ) / 10000;
-    input_Seek( p_intf->p_vlc->p_input_bank->pp_input[0]->p_this, i_seek, INPUT_SEEK_SET );
+        off_t i_seek = ( position * p_intf->p_sys->p_input->stream.p_selected_area->i_size ) / 10000;
+        input_Seek( p_intf->p_sys->p_input, i_seek, INPUT_SEEK_SET );
 
-    vlc_mutex_unlock( &p_intf->change_lock );
+        vlc_mutex_unlock( &p_intf->change_lock );
+    }
 }
 
 void KInterface::slotSliderChanged( int position )
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input != NULL )
     {
         char psz_time[ OFFSETTOTIME_MAX_SIZE ];
 
-        vlc_mutex_lock( &p_intf->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
 
-#define p_area p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area
-        statusBar()->changeItem( input_OffsetToTime( p_intf->p_vlc->p_input_bank->pp_input[0], psz_time, ( p_area->i_size * position ) / 10000 ), ID_DATE );
+#define p_area p_intf->p_sys->p_input->stream.p_selected_area
+        statusBar()->changeItem( input_OffsetToTime( p_intf->p_sys->p_input, psz_time, ( p_area->i_size * position ) / 10000 ), ID_DATE );
 #undef p_area
 
-        vlc_mutex_unlock( &p_intf->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
      }
 }
 
 void KInterface::slotOpenDisk()
 {
+    playlist_t *p_playlist;
     int r = fDiskDialog->exec();
     if ( r )
     {
@@ -301,20 +323,21 @@ void KInterface::slotOpenDisk()
         source += ',';
         source += fDiskDialog->chapter();
 
-        // add it to playlist
-        intf_PlaylistAdd( p_intf->p_vlc->p_playlist, PLAYLIST_END, source.latin1() );
-
-        // Select added item and switch to disk interface
-        intf_PlaylistJumpto( p_intf->p_vlc->p_playlist, p_intf->p_vlc->p_playlist->i_size-2 );
-        if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+        p_playlist = (playlist_t *)
+            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        if( p_playlist )
         {
-            p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
+            // add it to playlist
+            playlist_Add( p_playlist, source.latin1(),
+                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+            vlc_object_release( p_playlist );
         }
     }
 }
 
 void KInterface::slotOpenStream()
 {
+    playlist_t *p_playlist;
     int r = fNetDialog->exec();
     if ( r )
     {
@@ -326,47 +349,42 @@ void KInterface::slotOpenStream()
         source += ":";
         source += QString().setNum( fNetDialog->port() );
 
-        // add it to playlist
-        intf_PlaylistAdd( p_intf->p_vlc->p_playlist, PLAYLIST_END, source.latin1() );
-        intf_PlaylistJumpto( p_intf->p_vlc->p_playlist, p_intf->p_vlc->p_playlist->i_size-2 );
-
-        if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+        p_playlist = (playlist_t *)
+            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        if( p_playlist )
         {
-            p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
+            // add it to playlist
+            playlist_Add( p_playlist, source.latin1(),
+                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+            vlc_object_release( p_playlist );
         }
     }
 }
 
 void KInterface::slotPlay()
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input )
     {
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
     }
 }
 
 void KInterface::slotPause()
 {
-    if ( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if ( p_intf->p_sys->p_input )
     {
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PAUSE );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
     }
 }
 
 void KInterface::slotStop()
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    playlist_t *p_playlist = (playlist_t *)
+            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist )
     {
-        /* end playing item */
-        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
-
-        /* update playlist */
-        vlc_mutex_lock( &p_intf->p_vlc->p_playlist->change_lock );
-
-        p_intf->p_vlc->p_playlist->i_index--;
-        p_intf->p_vlc->p_playlist->b_stopped = 1;
-
-        vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
+        playlist_Stop( p_playlist );
+        vlc_object_release( p_playlist );
     }
 }
 
@@ -377,37 +395,39 @@ void KInterface::slotBackward()
 
 void KInterface::slotPrev()
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    playlist_t *p_playlist = (playlist_t *)
+            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist )
     {
-        /* FIXME: temporary hack */
-        intf_PlaylistPrev( p_intf->p_vlc->p_playlist );
-        intf_PlaylistPrev( p_intf->p_vlc->p_playlist );
-        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
+        playlist_Prev( p_playlist );
+        vlc_object_release( p_playlist );
     }
 }
 
 void KInterface::slotNext()
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    playlist_t *p_playlist = (playlist_t *)
+            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist )
     {
-        /* FIXME: temporary hack */
-        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
+        playlist_Next( p_playlist );
+        vlc_object_release( p_playlist );
     }
 }
 
 void KInterface::slotSlow()
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_SLOWER );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
     }
 }
 
 void KInterface::slotFast()
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_FASTER );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
     }
 }
 
@@ -420,7 +440,15 @@ void KInterface::dropEvent( QDropEvent *event )
 {
     KURL::List urlList;
 
-    if ( KURLDrag::decode( event, urlList ) ) {
+    playlist_t *p_playlist = (playlist_t *)
+            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    if ( KURLDrag::decode( event, urlList ) )
+    {
         for ( KURL::List::ConstIterator i = urlList.begin(); i != urlList.end(); i++ )
         {
             // XXX add a private function to add a KURL with checking
@@ -428,8 +456,11 @@ void KInterface::dropEvent( QDropEvent *event )
             if( !(*i).isEmpty() )
             {
                 fileOpenRecent->addURL( *i );
-                intf_PlaylistAdd( p_intf->p_vlc->p_playlist, PLAYLIST_END, (*i).path() );
+                playlist_Add( p_playlist, (*i).path(),
+                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
             }
         }
     }
+
+    vlc_object_release( p_playlist );
 }
