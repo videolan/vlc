@@ -3,6 +3,16 @@
 #===================#
 
 HEAD
+  * FreeBSD pthread fixes.
+  * AC3 IMDCT and downmix functions are now in plugins, --imdct and
+    --downmix options added.
+  * Bugfixes, cleanings in gtk.
+  * Initialization bugfixes in input_dvd.
+  * Added a b_stopped flag to interface playlist to have a stop function in
+    interface plugins.
+  * Updated the Gtk+ interface so that it has the same features as the
+    Gnome one.
+  * Beginning of SSE/3DNow! support for imdct and downmix.
   * Ported alsa interface for alsa 0.9beta
   * Fixed a deadlock in spudec.
   * Added SPU cropping.

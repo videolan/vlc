@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.95 2001/05/15 16:19:42 sam Exp $
+ * $Id: main.c,v 1.96 2001/05/15 19:36:27 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -45,6 +45,10 @@
 #   include <mach/mach_error.h>       /* some day the header files||compiler *
                                                        will define it for us */
 #   include <mach/bootstrap.h>
+#endif
+
+#ifndef WIN32
+#include <netinet/in.h>                               /* BSD: struct in_addr */
 #endif
 
 #include <unistd.h>

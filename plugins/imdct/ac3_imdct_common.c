@@ -2,7 +2,7 @@
  * ac3_imdct_common.c: common ac3 DCT functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_common.c,v 1.1 2001/05/15 16:19:42 sam Exp $
+ * $Id: ac3_imdct_common.c,v 1.2 2001/05/15 19:36:27 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -108,6 +108,8 @@ static const int pm64[64] =
     3, 11, 19, 27, 35, 43, 51, 59,
     7, 23, 39, 55, 15, 31, 47, 63
 };
+
+void _M( fft_64p ) ( complex_t *a );
 
 void _M( imdct_do_256 ) (imdct_t * p_imdct, float data[],float delay[])
 {

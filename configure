@@ -2388,26 +2388,9 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-echo $ac_n "checking for old style FreeBSD -pthread flag""... $ac_c" 1>&6
-echo "configure:2393: checking for old style FreeBSD -pthread flag" >&5
-cat > conftest.$ac_ext <<EOF
-#line 2395 "configure"
-#include "confdefs.h"
-#if defined(__FreeBSD_cc_version) && __FreeBSD_cc_version <= 500001
-	  yes
-	#endif
-	
-EOF
-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
-  egrep "yes" >/dev/null 2>&1; then
-  rm -rf conftest*
-  echo "$ac_t""yes" 1>&6
-	DEFINE="${DEFINE} -D_THREAD_SAFE" LIB="${LIB} -pthread"
-else
-  rm -rf conftest*
-  echo "$ac_t""no" 1>&6
-	echo $ac_n "checking for pthread_create in -lpthread""... $ac_c" 1>&6
-echo "configure:2411: checking for pthread_create in -lpthread" >&5
+
+echo $ac_n "checking for pthread_create in -lpthread""... $ac_c" 1>&6
+echo "configure:2394: checking for pthread_create in -lpthread" >&5
 ac_lib_var=`echo pthread'_'pthread_create | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -2415,7 +2398,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lpthread  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 2419 "configure"
+#line 2402 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -2426,7 +2409,7 @@ int main() {
 pthread_create()
 ; return 0; }
 EOF
-if { (eval echo configure:2430: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2413: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -2444,10 +2427,27 @@ if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   LIB="${LIB} -lpthread"
 else
   echo "$ac_t""no" 1>&6
-fi
-
+echo $ac_n "checking for old style FreeBSD -pthread flag""... $ac_c" 1>&6
+echo "configure:2432: checking for old style FreeBSD -pthread flag" >&5
+  cat > conftest.$ac_ext <<EOF
+#line 2434 "configure"
+#include "confdefs.h"
+#if defined(__FreeBSD_cc_version) && __FreeBSD_cc_version <= 500001
+      yes
+     #endif
+EOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  egrep "yes" >/dev/null 2>&1; then
+  rm -rf conftest*
+  echo "$ac_t""yes" 1>&6
+    DEFINE="${DEFINE} -D_THREAD_SAFE" LIB="${LIB} -pthread"
+else
+  rm -rf conftest*
+  echo "$ac_t""no" 1>&6
 fi
 rm -f conftest*
+
+fi
 
 echo $ac_n "checking for thread_create in -lthreads""... $ac_c" 1>&6
 echo "configure:2454: checking for thread_create in -lthreads" >&5
