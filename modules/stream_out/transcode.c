@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.64 2003/12/14 21:03:27 gbazin Exp $
+ * $Id: transcode.c,v 1.65 2004/01/03 00:39:07 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -563,6 +563,7 @@ static struct
     { VLC_FOURCC( 'R', 'V', '2', '4' ), CODEC_ID_RAWVIDEO },
     { VLC_FOURCC( 'R', 'V', '3', '2' ), CODEC_ID_RAWVIDEO },
     { VLC_FOURCC( 'Y', 'U', 'Y', '2' ), CODEC_ID_RAWVIDEO },
+    { VLC_FOURCC( 'Y', 'V', '1', '2' ), CODEC_ID_RAWVIDEO },
 
     { VLC_FOURCC(   0,   0,   0,   0 ), 0 }
 };
@@ -586,6 +587,7 @@ static inline int get_ff_chroma( vlc_fourcc_t i_chroma )
 {
     switch( i_chroma )
     {
+        case VLC_FOURCC( 'Y', 'V', '1', '2' ):
         case VLC_FOURCC( 'I', '4', '2', '0' ):
             return PIX_FMT_YUV420P;
         case VLC_FOURCC( 'I', '4', '2', '2' ):
@@ -963,6 +965,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     if( id->f_src.i_codec == VLC_FOURCC( 'I', '4', '2', '0' ) ||
         id->f_src.i_codec == VLC_FOURCC( 'I', '4', '2', '2' ) ||
         id->f_src.i_codec == VLC_FOURCC( 'I', '4', '4', '4' ) ||
+        id->f_src.i_codec == VLC_FOURCC( 'Y', 'V', '1', '2' ) ||
         id->f_src.i_codec == VLC_FOURCC( 'Y', 'U', 'Y', '2' ) ||
         id->f_src.i_codec == VLC_FOURCC( 'R', 'V', '1', '5' ) ||
         id->f_src.i_codec == VLC_FOURCC( 'R', 'V', '1', '6' ) ||
