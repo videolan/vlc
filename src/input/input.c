@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.156 2001/11/15 18:50:49 sam Exp $
+ * $Id: input.c,v 1.157 2001/11/21 16:47:46 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -731,7 +731,6 @@ static void NetworkOpen( input_thread_t * p_input )
     int                 i_opt;
     int                 i_opt_size;
     struct sockaddr_in  sock;
-    unsigned int        i_mc_group;
 
     /* Get the remote server */
     if( p_input->p_source != NULL )
@@ -895,15 +894,6 @@ static void NetworkOpen( input_thread_t * p_input )
         return;
     }
 
-    /* Required for IP_ADD_MEMBERSHIP */
-    i_mc_group = sock.sin_addr.s_addr;
-
-#if defined( WIN32 )
-    sock.sin_addr.s_addr = INADDR_ANY;
-    
-#define IN_MULTICAST(a)         IN_CLASSD(a)
-#endif
-
     /* Bind it */
     if( bind( p_input->i_handle, (struct sockaddr *)&sock, 
               sizeof( sock ) ) < 0 )
@@ -916,13 +906,18 @@ static void NetworkOpen( input_thread_t * p_input )
 
     /* Join the multicast group if the socket is a multicast address */
 
+#if defined( WIN32 )
+#   define IN_MULTICAST(a)         IN_CLASSD(a)
+#endif
+
+    /* TODO : make this compile under Win32 */
 #ifndef WIN32    
-    if( IN_MULTICAST( ntohl(i_mc_group) ) )
+    if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
     {
         struct ip_mreq imr;
 
-        imr.imr_interface.s_addr = htonl(INADDR_ANY);
-        imr.imr_multiaddr.s_addr = i_mc_group;
+        imr.imr_interface.s_addr = INADDR_ANY;
+        imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
         if( setsockopt( p_input->i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                         (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
         {

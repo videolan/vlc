@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.46 2001/11/16 00:29:52 stef Exp $
+ * $Id: netutils.c,v 1.47 2001/11/21 16:47:46 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -115,54 +115,41 @@ int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
                             char * psz_broadcast )
 {
 #if defined( SYS_BEOS )
-    intf_ErrMsg( "error: channel changing is not yet supported under BeOS" );
+    intf_ErrMsg( "error: networking is not yet supported under BeOS" );
     return( 1 );
 
 #else
-    char                psz_hostname[INPUT_MAX_SOURCE_LENGTH];
-    struct hostent    * p_hostent;
-
     /* Reset struct */
     memset( p_socket, 0, sizeof( struct sockaddr_in ) );
     p_socket->sin_family = AF_INET;                                /* family */
     p_socket->sin_port = htons( i_port );
     if( psz_broadcast == NULL )
     {
-        /* Try to get our own IP */
-        if( gethostname( psz_hostname, sizeof(psz_hostname) ) )
-        {
-            intf_ErrMsg( "BuildLocalAddr : unable to resolve local name : %s",
-                         strerror( errno ) );
-            return( -1 );
-        }
-
+        p_socket->sin_addr.s_addr = INADDR_ANY;
     }
     else
     {
-        /* I didn't manage to make INADDR_ANYT work, even with setsockopt
-         * so, as it's kludgy to try and determine the broadcast addr
-         * it is passed as an argument in the command line */
-        strncpy( psz_hostname, psz_broadcast, INPUT_MAX_SOURCE_LENGTH );
-    }
+        struct hostent    * p_hostent;
 
-    /* Try to convert address directly from in_addr - this will work if
-     * psz_in_addr is dotted decimal. */
+        /* Try to convert address directly from in_addr - this will work if
+         * psz_broadcast is dotted decimal. */
 #ifdef HAVE_ARPA_INET_H
-    if( !inet_aton( psz_hostname, &p_socket->sin_addr) )
+        if( !inet_aton( psz_broadcast, &p_socket->sin_addr) )
 #else
-    if( (p_socket->sin_addr.s_addr = inet_addr( psz_hostname )) == -1 )
+        if( (p_socket->sin_addr.s_addr = inet_addr( psz_broadcast )) == -1 )
 #endif
-    {
-        /* We have a fqdn, try to find its address */
-        if ( (p_hostent = gethostbyname( psz_hostname )) == NULL )
         {
-            intf_ErrMsg( "BuildLocalAddr: unknown host %s", psz_hostname );
-            return( -1 );
-        }
+            /* We have a fqdn, try to find its address */
+            if ( (p_hostent = gethostbyname( psz_broadcast )) == NULL )
+            {
+                intf_ErrMsg( "BuildLocalAddr: unknown host %s", psz_broadcast );
+                return( -1 );
+            }
 
-        /* Copy the first address of the host in the socket address */
-        memcpy( &p_socket->sin_addr, p_hostent->h_addr_list[0],
-                 p_hostent->h_length );
+            /* Copy the first address of the host in the socket address */
+            memcpy( &p_socket->sin_addr, p_hostent->h_addr_list[0],
+                     p_hostent->h_length );
+        }
     }
     return( 0 );
 #endif
@@ -174,7 +161,7 @@ int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
 int network_BuildRemoteAddr( struct sockaddr_in * p_socket, char * psz_server )
 {
 #if defined( SYS_BEOS )
-    intf_ErrMsg( "error: channel changing is not yet supported under BeOS" );
+    intf_ErrMsg( "error: networking is not yet supported under BeOS" );
     return( 1 );
 
 #else
