@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.13 2002/04/02 11:31:36 ipkiss Exp $
+ * $Id: configuration.c,v 1.14 2002/04/17 11:43:31 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -474,9 +474,10 @@ int config_SaveConfigFile( const char *psz_module_name )
 #else
     i = mkdir( psz_filename );
 #endif
-    if( i )
+    if( i && errno != EEXIST )
     {
-        intf_ErrMsg("Couldn't create %s (%s)", psz_filename, strerror(errno));
+        intf_ErrMsg( "config error: couldn't create %s (%s)",
+                     psz_filename, strerror(errno) );
     }
 
     strcat( psz_filename, "/" CONFIG_FILE );

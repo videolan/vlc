@@ -647,7 +647,6 @@ fi
 
 
 
-
 ac_aux_dir=
 for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
   if test -f $ac_dir/install-sh; then
@@ -695,7 +694,7 @@ else { echo "configure: error: can not run $ac_config_sub" 1>&2; exit 1; }
 fi
 
 echo $ac_n "checking host system type""... $ac_c" 1>&6
-echo "configure:699: checking host system type" >&5
+echo "configure:698: checking host system type" >&5
 
 host_alias=$host
 case "$host_alias" in
@@ -716,7 +715,7 @@ host_os=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$host" 1>&6
 
 echo $ac_n "checking target system type""... $ac_c" 1>&6
-echo "configure:720: checking target system type" >&5
+echo "configure:719: checking target system type" >&5
 
 target_alias=$target
 case "$target_alias" in
@@ -734,7 +733,7 @@ target_os=`echo $target | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$target" 1>&6
 
 echo $ac_n "checking build system type""... $ac_c" 1>&6
-echo "configure:738: checking build system type" >&5
+echo "configure:737: checking build system type" >&5
 
 build_alias=$build
 case "$build_alias" in
@@ -757,6 +756,7 @@ test "$host_alias" != "$target_alias" &&
   program_prefix=${target_alias}-
 
 
+PACKAGE="vlc"
 VERSION="0.3.0"
 CODENAME=Ourumov
 
@@ -1295,7 +1295,7 @@ fi
 ALL_LINGUAS="de fr ja no ru nl"
 
 cat >> confdefs.h <<EOF
-#define VLC_PACKAGE "vlc"
+#define VLC_PACKAGE "$PACKAGE"
 EOF
 
 cat >> confdefs.h <<EOF
@@ -4468,7 +4468,7 @@ else
 fi
 done
 
-for ac_hdr in sys/sockio.h fcntl.h sys/time.h sys/times.h
+for ac_hdr in sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
@@ -5498,7 +5498,7 @@ rm -f conftest*
 fi
 
 echo "$ac_t""$ac_cv_sse_inline" 1>&6
-if test x"$ac_cv_sse_inline" != x"no"; then
+if test x"$ac_cv_sse_inline" != x"no" -a x$SYS != xmingw32; then
   cat >> confdefs.h <<\EOF
 #define CAN_COMPILE_SSE 1
 EOF
@@ -7790,7 +7790,7 @@ EOF
         
         if test -f conftest.c
         then 
-          if ${CC-cc} conftest.c -o conftest.o >config.log 2>&1 \
+          if ${CC-cc} -c conftest.c -o conftest.o >config.log 2>&1 \
               && test -f conftest.o
           then
             if test "`strings conftest.o | grep BIGenDianSyS`"
@@ -8010,7 +8010,7 @@ then
 fi
 
 cat >> confdefs.h <<EOF
-#define VERSION_MESSAGE "vlc $VERSION $CODENAME Copyright 1996-2002 VideoLAN\n"
+#define VERSION_MESSAGE "vlc $VERSION $CODENAME Copyright 1996-2002 VideoLAN"
 EOF
 
 cat >> confdefs.h <<EOF
@@ -8325,8 +8325,8 @@ s%@TUNING@%$TUNING%g
 s%@RELEASE@%$RELEASE%g
 s%@MOC@%$MOC%g
 s%@BCBUILDER@%$BCBUILDER%g
-s%@VLC_PACKAGE@%$VLC_PACKAGE%g
-s%@VLC_VERSION@%$VLC_VERSION%g
+s%@PACKAGE@%$PACKAGE%g
+s%@VERSION@%$VERSION%g
 s%@NEED_GETOPT@%$NEED_GETOPT%g
 s%@CFLAGS_OPTIM@%$CFLAGS_OPTIM%g
 s%@CFLAGS_OPTIM_NODEBUG@%$CFLAGS_OPTIM_NODEBUG%g

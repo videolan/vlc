@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.178 2002/04/15 14:06:19 jobi Exp $
+ * $Id: main.c,v 1.179 2002/04/17 11:43:31 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1057,7 +1057,8 @@ static void Version( void )
     ShowConsole();
 #endif
 
-    intf_Msg( VERSION_MESSAGE
+    intf_Msg( VERSION_MESSAGE );
+    intf_Msg(
         "This program comes with NO WARRANTY, to the extent permitted by "
         "law.\nYou may redistribute it under the terms of the GNU General "
         "Public License;\nsee the file named COPYING for details.\n"
@@ -1141,12 +1142,14 @@ static void IllegalSignalHandler( int i_signal )
     sigrelse( i_signal );
 #endif
 
+#if defined( __i386__ )
     fprintf( stderr, "warning: your CPU has %s instructions, but not your "
                      "operating system.\n", psz_capability );
     fprintf( stderr, "         some optimizations will be disabled unless "
                      "you upgrade your OS\n" );
-#ifdef SYS_LINUX
-    fprintf( stderr, "         (for instance Linux kernel 2.4.x or later)" );
+#   if defined( SYS_LINUX )
+    fprintf( stderr, "         (for instance Linux kernel 2.4.x or later)\n" );
+#   endif
 #endif
 
     longjmp( env, 1 );

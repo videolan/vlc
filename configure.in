@@ -1,9 +1,9 @@
 dnl Autoconf settings for vlc
 AC_INIT(include/main.h)
 AC_CONFIG_HEADER(include/defs.h)
-
 AC_CANONICAL_SYSTEM
 
+PACKAGE="vlc"
 VERSION="0.3.0"
 CODENAME=Ourumov
 
@@ -41,7 +41,7 @@ fi
 dnl Gettext stuff
 ALL_LINGUAS="de fr ja no ru nl"
 
-AC_DEFINE_UNQUOTED(VLC_PACKAGE, "vlc", [Package name])
+AC_DEFINE_UNQUOTED(VLC_PACKAGE, "$PACKAGE", [Package name])
 AC_DEFINE_UNQUOTED(VLC_VERSION, "$VERSION", [Package version])
 AM_GNU_GETTEXT
 
@@ -185,7 +185,7 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
 
 dnl Check for headers
 AC_CHECK_HEADERS(getopt.h strings.h)
-AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/time.h sys/times.h)
+AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
 AC_CHECK_HEADERS(machine/param.h sys/shm.h)
@@ -432,7 +432,7 @@ AC_CACHE_CHECK([if \$CC groks SSE inline assembly],
     [ac_cv_sse_inline],
     [AC_TRY_COMPILE(,[void *p;asm volatile("xorps %%xmm1,%%xmm2"::"r"(p));],
                     ac_cv_sse_inline=yes, ac_cv_sse_inline=no)])
-if test x"$ac_cv_sse_inline" != x"no"; then
+if test x"$ac_cv_sse_inline" != x"no" -a x$SYS != xmingw32; then
   AC_DEFINE(CAN_COMPILE_SSE, 1, Define if \$CC groks SSE inline assembly.)
   ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
 fi
@@ -1313,7 +1313,7 @@ EOF
         ]
         if test -f conftest.c
         then 
-          if ${CC-cc} conftest.c -o conftest.o >config.log 2>&1 \
+          if ${CC-cc} -c conftest.c -o conftest.o >config.log 2>&1 \
               && test -f conftest.o
           then
             if test "`strings conftest.o | grep BIGenDianSyS`"
@@ -1411,7 +1411,7 @@ fi
 dnl
 dnl  Stuff used by the program
 dnl
-AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "vlc $VERSION $CODENAME Copyright 1996-2002 VideoLAN\n", [Simple version string])
+AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "vlc $VERSION $CODENAME Copyright 1996-2002 VideoLAN", [Simple version string])
 AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VideoLAN Client - version $VERSION $CODENAME - (c) 1996-2002 VideoLAN", [Copyright string])
 
 VLC_SYMBOL="`echo ${VERSION} | tr .- __`"
@@ -1441,8 +1441,8 @@ AC_SUBST(RELEASE)
 AC_SUBST(MOC)
 AC_SUBST(WINDRES)
 AC_SUBST(BCBUILDER)
-AC_SUBST(VLC_PACKAGE)
-AC_SUBST(VLC_VERSION)
+AC_SUBST(PACKAGE)
+AC_SUBST(VERSION)
 AC_SUBST(NEED_GETOPT)
 
 AC_SUBST(CFLAGS_OPTIM)

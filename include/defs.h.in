@@ -295,6 +295,9 @@
 /* Define if you have the <sys/times.h> header file.  */
 #undef HAVE_SYS_TIMES_H
 
+/* Define if you have the <sys/types.h> header file.  */
+#undef HAVE_SYS_TYPES_H
+
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H
 

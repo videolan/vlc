@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.93 2002/04/05 03:27:27 sam Exp $
+ * $Id: common.h,v 1.94 2002/04/17 11:43:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -27,8 +27,13 @@
 /*****************************************************************************
  * Required system headers
  *****************************************************************************/
-#include <string.h>                                            /* strerror() */
-#include <sys/types.h>
+#ifdef HAVE_STRING_H
+#   include <string.h>                                         /* strerror() */
+#endif
+
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>
+#endif
 
 /*****************************************************************************
  * Basic types definitions
@@ -476,14 +481,21 @@ typedef __int64 off_t;
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
-#ifndef PACKAGE
+#ifndef PACKAGE /* Borland C++ uses this ! */
 #define PACKAGE VLC_PACKAGE
 #endif
 #define VERSION VLC_VERSION
 
-#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT ) && !defined( __BORLANDC__ )
+#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT ) && !defined( __BORLANDC__ ) && !defined( MODULE_NAME_IS_gnome )
 #   include <libintl.h>
-#else
+#   undef _
+#   define _(String) dgettext (PACKAGE, String)
+#   ifdef gettext_noop
+#       define N_(String) gettext_noop (String)
+#   else
+#       define N_(String) (String)
+#   endif
+#elif !defined( MODULE_NAME_IS_gnome )
 #   define _(String) (String)
 #   define N_(String) (String)
 #endif
