@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder_thread.c,v 1.16 2001/06/12 13:50:09 henri Exp $
+ * $Id: lpcm_decoder_thread.c,v 1.17 2001/09/06 04:28:36 henri Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -181,10 +181,14 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
         buffer = ((byte_t *)p_lpcmdec->p_aout_fifo->buffer) + 
                   (p_lpcmdec->p_aout_fifo->l_end_frame * LPCMDEC_FRAME_SIZE);
     
-        byte1 = GetBits(&p_lpcmdec->bit_stream, 8);
-        byte2 = GetBits(&p_lpcmdec->bit_stream, 8);
+        RemoveBits32(&p_lpcmdec->bit_stream);
+        byte1 = GetBits(&p_lpcmdec->bit_stream, 8) ;
+        byte2 = GetBits(&p_lpcmdec->bit_stream, 8) ;
         
-        /* Get the sync word : 0x0180 */
+        /* I only have 2 test streams. As far as I understand
+         * after the RemoveBits and the 2 GetBits, we should be exactly 
+         * where we whant : the sync word : 0x0180.
+         * If not, we got and find it. */
         while( ( byte1 != 0x01 || byte2 != 0x80 ) && (!p_lpcmdec->p_fifo->b_die)
                                            && (!p_lpcmdec->p_fifo->b_error) )
         {
