@@ -2,7 +2,7 @@
  * modules_core.h : Module management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_core.h,v 1.3 2001/06/25 11:34:08 sam Exp $
+ * $Id: modules_core.h,v 1.4 2001/10/22 12:28:53 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,10 +42,14 @@ module_load( char * psz_filename, module_handle_t * handle )
     *handle = LoadLibrary( psz_filename );
     return( *handle == NULL ); 
 
-#else
+#elif defined(RTLD_NOW)
     /* Do not open modules with RTLD_GLOBAL, or we are going to get namespace
      * collisions when two modules have common public symbols */
     *handle = dlopen( psz_filename, RTLD_NOW );
+    return( *handle == NULL );
+
+#else
+    *handle = dlopen( psz_filename, DL_LAZY );
     return( *handle == NULL );
 
 #endif
