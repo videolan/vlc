@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.27 2004/01/03 17:52:15 rocky Exp $
+ * $Id: system.c,v 1.28 2004/01/09 00:30:29 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -34,7 +34,6 @@
 #include <vlc/input.h>
 
 #include "system.h"
-#include "private.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -63,18 +62,11 @@ vlc_module_end();
  *****************************************************************************/
 static int Activate ( vlc_object_t *p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys   = p_input->p_demux_data;
-
     static mpeg_demux_t mpeg_demux =
                     { NULL, ReadPS, ParsePS, DemuxPS, ReadTS, DemuxTS };
-
+    mpeg_demux.cur_scr_time = -1;
     memcpy( p_this->p_private, &mpeg_demux, sizeof( mpeg_demux ) );
 
-    if (!p_sys) return VLC_EGENERIC;
-    
-    p_sys->cur_scr_time = -1;
-    
     return VLC_SUCCESS;
 }
 
@@ -569,15 +561,15 @@ static uint16_t GetID( input_thread_t *p_input, data_packet_t * p_data )
     i_id = p_data->p_demux_start[3];                            /* stream_id */
     if( i_id == 0xBD )
     {
-         demux_sys_t *p_sys = p_input->p_demux_data;
+        mpeg_demux_t *p_mpeg_demux = (mpeg_demux_t *)p_input->p_private;
 
         /* FIXME : this is not valid if the header is split in multiple
          * packets */
         /* stream_private_id */
         i_id |= p_data->p_demux_start[ 9 + p_data->p_demux_start[8] ] << 8;
 
-	/* FIXME: See note about cur_scr_time above. */
-	p_sys->cur_scr_time = -1;
+        /* FIXME: See note about cur_scr_time above. */
+        p_mpeg_demux->cur_scr_time = -1;
     }
     return( i_id );
 }
@@ -983,7 +975,7 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                     /* SVCD OGT subtitles in stream 0x070 */
                     i_fourcc = VLC_FOURCC('o','g','t', ' ');
                     i_cat = SPU_ES;
-		    b_auto_spawn = VLC_TRUE;
+                    b_auto_spawn = VLC_TRUE;
                 }
                 else if( ((i_id >> 8) & 0xFF) <= 0x03 &&
                          (i_id & 0x00FF) == 0x00BD )
@@ -991,7 +983,7 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                     /* CVD subtitles (0x00->0x03) */
                     i_fourcc = VLC_FOURCC('c','v','d', ' ');
                     i_cat = SPU_ES;
-		    b_auto_spawn = VLC_TRUE;
+                    b_auto_spawn = VLC_TRUE;
                 }
                 else
                 {
@@ -1025,7 +1017,7 @@ static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     uint32_t i_code;
     vlc_bool_t b_trash = 0;
     es_descriptor_t * p_es = NULL;
-    demux_sys_t *p_sys = p_input->p_demux_data;
+    mpeg_demux_t *p_mpeg_demux = (mpeg_demux_t *)p_input->p_private;
 
     i_code = ((uint32_t)p_data->p_demux_start[0] << 24)
                 | ((uint32_t)p_data->p_demux_start[1] << 16)
@@ -1096,8 +1088,8 @@ static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                     /* mux_rate */
                     i_mux_rate = (U32_AT(p_header + 8) & 0x7FFFFE) >> 1;
                 }
-		p_sys->cur_scr_time   = scr_time;
-		p_sys->i_cur_mux_rate = i_mux_rate;
+                p_mpeg_demux->cur_scr_time   = scr_time;
+                p_mpeg_demux->i_cur_mux_rate = i_mux_rate;
 
                 b_trash = 1;
             }
@@ -1127,25 +1119,26 @@ static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     {
         p_es = ParsePS( p_input, p_data );
 
-	/* Call the pace control. 
-	   FIXME: see hack note about cur_scr_time above. 
-	*/
-	if (p_sys->cur_scr_time != -1) {
-	  input_ClockManageRef( p_input,
-				p_input->stream.p_selected_program,
-				p_sys->cur_scr_time );
-	  
-	  if( p_sys->i_cur_mux_rate != p_input->stream.i_mux_rate
-	      && p_input->stream.i_mux_rate )
-	    {
-	      msg_Warn( p_input,
-			"mux_rate changed prev: %ud, cur: %ud;"
-			" expect cosmetic errors" , 
-			(unsigned int) p_input->stream.i_mux_rate, 
-			(unsigned int) p_sys->i_cur_mux_rate );
-	    }
-	  p_input->stream.i_mux_rate = p_sys->i_cur_mux_rate;
-	}
+        /* Call the pace control. 
+         * FIXME: see hack note about cur_scr_time above. 
+         */
+        if( p_mpeg_demux->cur_scr_time != -1 )
+        {
+            input_ClockManageRef( p_input,
+                                  p_input->stream.p_selected_program,
+                                  p_mpeg_demux->cur_scr_time );
+          
+            if( p_mpeg_demux->i_cur_mux_rate != p_input->stream.i_mux_rate
+                && p_input->stream.i_mux_rate )
+            {
+                msg_Warn( p_input,
+                          "mux_rate changed prev: %ud, cur: %ud;"
+                          " expect cosmetic errors" , 
+                          (unsigned int) p_input->stream.i_mux_rate, 
+                          (unsigned int) p_mpeg_demux->i_cur_mux_rate );
+            }
+            p_input->stream.i_mux_rate = p_mpeg_demux->i_cur_mux_rate;
+        }
         vlc_mutex_lock( &p_input->stream.control.control_lock );
         if( p_es != NULL && p_es->p_dec != NULL
              && (p_es->i_cat != AUDIO_ES || !p_input->stream.control.b_mute) )

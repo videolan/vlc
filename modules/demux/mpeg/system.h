@@ -2,7 +2,7 @@
  * system.h: MPEG demultiplexing.
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: system.h,v 1.12 2003/11/06 16:36:41 nitrox Exp $
+ * $Id: system.h,v 1.13 2004/01/09 00:30:29 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -104,6 +104,28 @@ typedef struct mpeg_demux_t
     ssize_t           (*pf_read_ts)  ( input_thread_t *, data_packet_t ** );
     void              (*pf_demux_ts) ( input_thread_t *, data_packet_t *,
                                        psi_callback_t );
+
+    /* 
+       rocky:
+     i_cur_mux_rate and cur_scr_time below are a bit of a hack.
+     
+     Background: VLC uses the System Clock Reference (SCR) of a PACK
+     header to read the stream at the right pace (contrary to other
+     players like xine/mplayer which don't use this info and
+     synchronise everything on the audio output clock).
+     
+     The popular SVCD/VCD subtitling WinSubMux does not renumber the
+     SCRs when merging subtitles into the PES. Perhaps other
+     multipliexing tools are equally faulty. Until such time as
+     WinSubMux is fixed or other tools become available and widely
+     used, we will cater to the WinSubMux kind of buggy stream. The
+     hack here delays using the PACK SCR until the first PES that
+     would need it is received. For this we need to temporarily save
+     this information in the variables below.
+    */
+    uint32_t i_cur_mux_rate;
+    mtime_t  cur_scr_time;
+
 } mpeg_demux_t;
 
 /*****************************************************************************

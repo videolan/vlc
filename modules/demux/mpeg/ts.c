@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: ts.c,v 1.43 2004/01/03 17:52:15 rocky Exp $
+ * $Id: ts.c,v 1.44 2004/01/09 00:30:29 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -49,12 +49,21 @@
 
 #include "system.h"
 #include "codecs.h"
-#include "private.h"
 
 /*****************************************************************************
  * Constants
  *****************************************************************************/
 #define TS_READ_ONCE 200
+
+/*****************************************************************************
+ * Private structure
+ *****************************************************************************/
+struct demux_sys_t
+{
+    module_t *   p_module;
+    mpeg_demux_t mpeg;
+};
+
 
 #define local_iso639_getlang(p1, p2)                                         \
 {                                                                           \
