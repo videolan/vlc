@@ -54,7 +54,7 @@ ifeq ($(SYS),DARWIN)
 all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
-	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom .caca .mod \
+	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.cddb .cdio .vcdimager .png
 endif
 ifeq ($(SYS),BEOS)
@@ -772,19 +772,37 @@ DISTCLEAN_PKG += live.$(LIVEDOTCOM_VERSION).tar.gz
 # goom
 # ***************************************************************************
 
-goom-macosx-altivec-bin.tar.gz:
-	$(WGET) $(GOOM_URL)
+#goom-macosx-altivec-bin.tar.gz:
+#	$(WGET) $(GOOM_URL)
 
-goom: goom-macosx-altivec-bin.tar.gz
+#goom: goom-macosx-altivec-bin.tar.gz
+#	$(EXTRACT_GZ)
+
+#.goom: goom
+#	(cd $<;)
+#	touch $@
+
+#CLEAN_FILE += .goom
+#CLEAN_PKG += goom
+#DISTCLEAN_PKG += goom-macosx-altivec-bin.tar.gz
+
+# ***************************************************************************
+# goom2k4
+# ***************************************************************************
+
+goom2k4-$(GOOM2k4_VERSION).tar.gz:
+	$(WGET) $(GOOM2k4_URL)
+
+goom: goom2k4-$(GOOM2k4_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.goom: goom
-	(cd $<;)
+.goom2k4: goom
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -faltivec" && make && make install )
 	touch $@
 
-CLEAN_FILE += .goom
+CLEAN_FILE += .goom2k4
 CLEAN_PKG += goom
-DISTCLEAN_PKG += goom-macosx-altivec-bin.tar.gz
+DISTCLEAN_PKG += goom2k4-$(GOOM2k_VESION).tar.gz
 
 # ***************************************************************************
 # libcaca
