@@ -9,4 +9,9 @@ SOURCES_mux_ts = modules/mux/mpeg/ts.c \
                  modules/mux/mpeg/bits.h \
                  $(NULL)
 
+SOURCES_mux_ts_dvbpsi = modules/mux/mpeg/ts.c \
+                        modules/mux/mpeg/pes.c \
+                        modules/mux/mpeg/pes.h \
+                        modules/mux/mpeg/bits.h \
+                        $(NULL)
 

@@ -2,7 +2,7 @@
  * ps.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ps.c,v 1.3 2002/12/18 14:17:11 sam Exp $
+ * $Id: ps.c,v 1.4 2003/01/08 10:34:58 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -166,22 +166,35 @@ static int AddStream( sout_instance_t *p_sout, sout_input_t *p_input )
     switch( p_input->input_format.i_cat )
     {
         case VIDEO_ES:
-            p_stream->i_stream_id = p_mux->i_stream_id_mpgv;
-            p_mux->i_stream_id_mpgv++;
-            p_mux->i_video_bound++;
+
+            switch( p_input->input_format.i_fourcc )
+            {
+                case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
+                    p_stream->i_stream_id = p_mux->i_stream_id_mpgv;
+                    p_mux->i_stream_id_mpgv++;
+                    p_mux->i_video_bound++;
+                    break;
+                default:
+                    return( -1 );
+            }
             break;
         case AUDIO_ES:
-            if( p_input->input_format.i_fourcc == VLC_FOURCC( 'a', '5', '2', ' ' ) )
+            switch( p_input->input_format.i_fourcc )
             {
-                p_stream->i_stream_id = p_mux->i_stream_id_a52;
-                p_mux->i_stream_id_a52++;
+                case VLC_FOURCC( 'a', '5', '2', ' ' ):
+                case VLC_FOURCC( 'a', '5', '2', 'b' ):
+                    p_stream->i_stream_id = p_mux->i_stream_id_a52 | ( 0xbd << 8 );
+                    p_mux->i_stream_id_a52++;
+                    p_mux->i_audio_bound++;
+                    break;
+                case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+                    p_stream->i_stream_id = p_mux->i_stream_id_mpga;
+                    p_mux->i_stream_id_mpga++;
+                    p_mux->i_audio_bound++;
+                    break;
+                default:
+                    return( -1 );
             }
-            else
-            {
-                p_stream->i_stream_id = p_mux->i_stream_id_mpga;
-                p_mux->i_stream_id_mpga++;
-            }
-            p_mux->i_audio_bound++;
             break;
         default:
             return( -1 );

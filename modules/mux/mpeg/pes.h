@@ -2,7 +2,7 @@
  * pes.h
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.h,v 1.2 2002/12/15 23:39:41 fenrir Exp $
+ * $Id: pes.h,v 1.3 2003/01/08 10:34:58 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -24,6 +24,7 @@
 
 
 #define PES_PROGRAM_STREAM_MAP          0xbc
+#define PES_PRIVATE_STREAM_1            0xbd
 #define PES_PADDING                     0xbe
 #define PES_PRIVATE_STREAM_2            0xbf
 #define PES_ECM                         0xb0

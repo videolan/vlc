@@ -2,7 +2,7 @@
  * bits.h
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: bits.h,v 1.2 2002/12/17 21:58:03 fenrir Exp $
+ * $Id: bits.h,v 1.3 2003/01/08 10:34:58 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -76,13 +76,17 @@ static inline void bits_write( bits_buffer_t *p_buffer,
         {
             p_buffer->p_data[p_buffer->i_data] |= p_buffer->i_mask;
         }
+        else
+        {
+            p_buffer->p_data[p_buffer->i_data] &= ~p_buffer->i_mask;
+        }
         p_buffer->i_mask >>= 1;
         if( p_buffer->i_mask == 0 )
         {
             p_buffer->i_data++;
             if( p_buffer->i_data < p_buffer->i_size )
             {
-                p_buffer->p_data[p_buffer->i_data] = 0;
+//                p_buffer->p_data[p_buffer->i_data] = 0;
                 p_buffer->i_mask = 0x80;
             }
         }

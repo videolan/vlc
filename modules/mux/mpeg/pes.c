@@ -2,7 +2,7 @@
  * pes.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.c,v 1.2 2002/12/15 23:39:41 fenrir Exp $
+ * $Id: pes.c,v 1.3 2003/01/08 10:34:58 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -57,6 +57,19 @@ int E_( EStoPES )( sout_instance_t *p_sout,
     mtime_t i_pts, i_dts;
     uint8_t *p_data;
     int     i_size;
+
+    int     i_private_id;
+
+    /* HACK for private stream 1 in ps */
+    if( ( i_stream_id&0xff00 ) == 0xbd00 )
+    {
+        i_private_id = i_stream_id & 0xff;
+        i_stream_id  = PES_PRIVATE_STREAM_1;
+    }
+    else
+    {
+        i_private_id = -1;
+    }
 
     i_pts = p_es->i_pts * 9 / 100; // 90000 units clock
     i_dts = p_es->i_dts * 9 / 100; // 90000 units clock
@@ -120,15 +133,29 @@ int E_( EStoPES )( sout_instance_t *p_sout,
                 if( b_mpeg2 )
                 {
                     int     i_pts_dts;
+                    int     i_extra;
+
+                    if( i_stream_id == PES_PRIVATE_STREAM_1 )
+                    {
+                        i_extra = 1;
+                        if( ( i_private_id&0xf0 ) == 0x80 )
+                        {
+                            i_extra += 3;
+                        }
+                    }
+                    else
+                    {
+                        i_extra = 0;
+                    }
 
                     if( i_dts > 0 )
                     {
-                        bits_write( &bits, 16, i_copy  + 13 );
+                        bits_write( &bits, 16, i_copy + i_extra+ 13 );
                         i_pts_dts = 0x03;
                     }
                     else
                     {
-                        bits_write( &bits, 16, i_copy  + 8 );
+                        bits_write( &bits, 16, i_copy  + i_extra + 8 );
                         i_pts_dts = 0x02;
                     }
 
@@ -187,6 +214,14 @@ int E_( EStoPES )( sout_instance_t *p_sout,
                 /* and then pes data */
 
                 bits_align( &bits );
+                if( i_stream_id == PES_PRIVATE_STREAM_1 && i_private_id != -1 )
+                {
+                    bits_write( &bits, 8, i_private_id );
+                    if( ( i_private_id&0xf0 ) == 0x80 )
+                    {
+                        bits_write( &bits, 24, 0 ); // ac3
+                    }
+                }
                 break;
         }
 
