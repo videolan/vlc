@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.7 2002/08/21 19:30:03 jpsaman Exp $
+ * $Id: familiar.c,v 1.8 2002/08/25 20:44:40 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -145,6 +145,7 @@ static void Run( intf_thread_t *p_intf )
                          "p_intf", p_intf );
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
+    ReadDirectory(p_intf->p_sys->p_clist, ".");
 
     /* Sleep to avoid using all CPU - since some interfaces need to
      * access keyboard events, a 100ms delay is a good compromise */

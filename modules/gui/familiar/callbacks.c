@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.7 2002/08/21 19:30:03 jpsaman Exp $
+ * $Id: callbacks.c,v 1.8 2002/08/25 20:44:40 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -242,17 +242,19 @@ on_toolbar_open_clicked                (GtkButton       *button,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
-    GtkCList *clistmedia = NULL;
 
     if (p_intf)
     {
         /* Testing routine */
+/*
+        GtkCList *clistmedia = NULL;
         clistmedia = GTK_CLIST( lookup_widget( p_intf->p_sys->p_window,
                                    "clistmedia") );
         if (GTK_CLIST(clistmedia))
         {
             ReadDirectory(clistmedia, ".");
         }
+*/
         gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
         gdk_window_raise( p_intf->p_sys->p_window->window );
     }
