@@ -32,6 +32,7 @@ typedef struct
 {
     vlc_bool_t  b_seen;
     int         i_skip;
+    int         i_id;
     es_out_id_t *es;
     es_format_t fmt;
 
@@ -45,6 +46,7 @@ static inline void ps_track_init( ps_track_t tk[PS_TK_COUNT] )
     {
         tk[i].b_seen = VLC_FALSE;
         tk[i].i_skip = 0;
+        tk[i].i_id   = 0;
         tk[i].es     = NULL;
         es_format_Init( &tk[i].fmt, UNKNOWN_ES, 0 );
     }
@@ -54,6 +56,7 @@ static inline void ps_track_init( ps_track_t tk[PS_TK_COUNT] )
 static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
 {
     tk->i_skip = 0;
+    tk->i_id = i_id;
     if( ( i_id&0xff00 ) == 0xbd00 )
     {
         if( ( i_id&0xf8 ) == 0x88 )
@@ -117,7 +120,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','p','g','a') );
         }
-        else return VLC_EGENERIC;
+        else if( tk->fmt.i_cat == UNKNOWN_ES ) return VLC_EGENERIC;
     }
 
     /* PES packets usually contain truncated frames */
@@ -348,8 +351,6 @@ typedef struct p_es_t
     int i_descriptor;
     uint8_t *p_descriptor;
 
-    struct ps_es_t *p_next;
-
 } ps_es_t;
 
 struct ps_psm_t
@@ -391,11 +392,12 @@ static inline void ps_psm_destroy( ps_psm_t *p_psm )
     p_psm->i_es = 0;
 }
 
-static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt )
+static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
+                               ps_track_t tk[PS_TK_COUNT], es_out_t *out )
 {
     int i_buffer = p_pkt->i_buffer;
     uint8_t *p_buffer = p_pkt->p_buffer;
-    int i_length, i_version, i_info_length, i_esm_length, i_es_base;
+    int i_length, i_version, i_info_length, i_esm_length, i_es_base, i;
 
     if( !p_psm || p_buffer[3] != 0xbc ) return VLC_EGENERIC;
 
@@ -436,7 +438,8 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt )
             memcpy( es.p_descriptor, p_buffer + i_es_base + 4, i_info_length);
         }
 
-        p_psm->es = realloc( &p_psm->es, sizeof(ps_es_t) * (p_psm->i_es+1) );
+        p_psm->es = realloc( p_psm->es, sizeof(ps_es_t *) * (p_psm->i_es+1) );
+        p_psm->es[p_psm->i_es] = malloc( sizeof(ps_es_t) );
         *p_psm->es[p_psm->i_es++] = es;
         i_es_base += 4 + i_info_length; 
     }
@@ -444,6 +447,24 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt )
     /* TODO: CRC */
 
     p_psm->i_version = i_version;
+
+    /* Check/Modify our existing tracks */
+    for( i = 0; i < PS_TK_COUNT; i++ )
+    {
+        ps_track_t tk_tmp;
+
+        if( !tk[i].b_seen || !tk[i].es ) continue;
+
+        if( ps_track_fill( &tk_tmp, p_psm, tk[i].i_id ) != VLC_SUCCESS )
+            continue;
+
+        if( tk_tmp.fmt.i_codec == tk[i].fmt.i_codec ) continue;
+
+        es_out_Del( out, tk[i].es );
+        tk[i] = tk_tmp;
+        tk[i].b_seen = VLC_TRUE;
+        tk[i].es = es_out_Add( out, &tk[i].fmt );
+    }
 
     return VLC_SUCCESS;
 }

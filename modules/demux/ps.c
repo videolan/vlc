@@ -39,14 +39,19 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static int  Open   ( vlc_object_t * );
+static int  OpenAlt( vlc_object_t * );
+static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("PS demuxer") );
     set_capability( "demux2", 1 );
     set_callbacks( Open, Close );
     add_shortcut( "ps" );
+
+    set_description( _("PS demuxer") );
+    set_capability( "demux2", 9 );
+    set_callbacks( OpenAlt, Close );
 vlc_module_end();
 
 /*****************************************************************************
@@ -84,8 +89,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( p_peek[0] != 0 || p_peek[1] != 0 || p_peek[2] != 1 ||
-        p_peek[3] < 0xb9 )
+    if( p_peek[0] != 0 || p_peek[1] != 0 ||
+        p_peek[2] != 1 || p_peek[3] < 0xb9 )
     {
         msg_Warn( p_demux, "this does not look like an MPEG PS stream, "
                   "continuing anyway" );
@@ -106,6 +111,26 @@ static int Open( vlc_object_t *p_this )
     /* TODO prescanning of ES */
 
     return VLC_SUCCESS;
+}
+
+static int OpenAlt( vlc_object_t *p_this )
+{
+    demux_t *p_demux = (demux_t*)p_this;
+    uint8_t *p_peek;
+
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
+    {
+        msg_Err( p_demux, "cannot peek" );
+        return VLC_EGENERIC;
+    }
+
+    if( p_peek[0] != 0 || p_peek[1] != 0 ||
+        p_peek[2] != 1 || p_peek[3] < 0xb9 )
+    {
+        if( !p_demux->b_force ) return VLC_EGENERIC;
+    }
+
+    return Open( p_this );
 }
 
 /*****************************************************************************
@@ -191,8 +216,8 @@ static int Demux( demux_t *p_demux )
         break;
 
     case 0x1bc:
-        msg_Dbg( p_demux, "received PSM");
-        ps_psm_fill( &p_sys->psm, p_pkt );
+        /* msg_Dbg( p_demux, "received PSM"); */
+        ps_psm_fill( &p_sys->psm, p_pkt, p_sys->tk, p_demux->out );
         block_Release( p_pkt );
         break;
 
