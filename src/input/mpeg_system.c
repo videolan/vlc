@@ -69,6 +69,7 @@ void input_DecodePES( input_thread_t * p_input, es_descriptor_t * p_es )
     {
         vlc_mutex_lock( &p_es->p_decoder_fifo->data_lock );
 
+#if 0
         if( p_input->stream.b_pace_control )
         {
             /* FIXME : normally we shouldn't need this... */
@@ -79,6 +80,7 @@ void input_DecodePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 vlc_mutex_lock( &p_es->p_decoder_fifo->data_lock );
             }
         }
+#endif
 
         if( !DECODER_FIFO_ISFULL( *p_es->p_decoder_fifo ) )
         {
@@ -724,16 +726,29 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                 /* Convert the SCR in microseconds. */
                 mtime_t         scr_time;
 
-                /* FIXME : this calculus is broken with MPEG-1 ! */
-                scr_time = (( ((mtime_t)(p_data->p_buffer[4] & 0x38) << 27) |
-                              ((mtime_t)(p_data->p_buffer[4] & 0x3) << 26) |
-                              ((mtime_t)(p_data->p_buffer[5]) << 20) |
-                              ((mtime_t)(p_data->p_buffer[6] & 0xF8) << 12) |
-                              ((mtime_t)(p_data->p_buffer[6] & 0x3) << 13) |
-                              ((mtime_t)(p_data->p_buffer[7]) << 5) |
-                              ((mtime_t)(p_data->p_buffer[8] & 0xF8) >> 3)
-                           ) * 300) / 27;
-
+                if( (p_data->p_buffer[4] & 0xC0) == 0x40 )
+                {
+                    /* MPEG-2 */
+                    scr_time =
+                      (( ((mtime_t)(p_data->p_buffer[4] & 0x38) << 27) |
+                         ((mtime_t)(p_data->p_buffer[4] & 0x3) << 26) |
+                         ((mtime_t)(p_data->p_buffer[5]) << 20) |
+                         ((mtime_t)(p_data->p_buffer[6] & 0xF8) << 12) |
+                         ((mtime_t)(p_data->p_buffer[6] & 0x3) << 13) |
+                         ((mtime_t)(p_data->p_buffer[7]) << 5) |
+                         ((mtime_t)(p_data->p_buffer[8] & 0xF8) >> 3)
+                      ) * 300) / 27;
+                }
+                else
+                {
+                    /* MPEG-1 SCR is like PTS */
+                    scr_time =
+                      (( ((mtime_t)(p_data->p_buffer[4] & 0x0E) << 29) |
+                         (((mtime_t)U16_AT(p_data->p_buffer + 5) << 14)
+                           - (1 << 14)) |
+                         ((mtime_t)U16_AT(p_data->p_buffer + 7) >> 1)
+                      ) * 300) / 27;
+                }
                 /* Call the pace control. */
                 CRDecode( p_input, NULL, scr_time );
             }

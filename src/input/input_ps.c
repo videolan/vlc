@@ -243,14 +243,6 @@ static void PSRead( input_thread_t * p_input,
                        p_method->stream );
             }
         }
-        else
-        {
-            /* FIXME: kludge to avoid SCR to block everything (SCR
-             * calculus appears to be wrong). */
-            p_data->p_buffer[4] = p_data->p_buffer[5] =
-                p_data->p_buffer[6] = p_data->p_buffer[7] =
-                p_data->p_buffer[8] = 0;
-        }
     }
 
     memset( p_packets, 0, sizeof(p_packets) );
