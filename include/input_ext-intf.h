@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.30 2001/04/08 07:24:47 stef Exp $
+ * $Id: input_ext-intf.h,v 1.31 2001/04/10 17:47:05 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -97,7 +97,7 @@ typedef struct es_descriptor_s
 #define LPCM_AUDIO_ES       0x83
 #define UNKNOWN_ES          0xFF
 
-/* ES Categories */
+/* ES Categories to be used by interface plugins */
 #define VIDEO_ES        0x00
 #define AUDIO_ES        0x01
 #define SPU_ES          0x02

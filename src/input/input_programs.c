@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.45 2001/04/08 07:24:47 stef Exp $
+ * $Id: input_programs.c,v 1.46 2001/04/10 17:47:05 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -58,6 +58,8 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     p_input->stream.pp_es = NULL;
     p_input->stream.pp_selected_es = NULL;
     p_input->stream.pp_programs = NULL;
+    p_input->stream.pp_areas = NULL;
+    p_input->stream.p_selected_area = NULL;
 
     if( i_data_len )
     {

@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.17 2001/04/08 07:24:47 stef Exp $
+ * $Id: dvd_ifo.c,v 1.18 2001/04/10 17:47:05 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -69,9 +69,9 @@ static int      FreeTitleSet    ( vts_t * );
 #define GET( p_field , i_len )                                              \
     {                                                                       \
         read( p_ifo->i_fd , (p_field) , (i_len) );                          \
-/*fprintf(stderr, "Pos : %lld Val : %llx\n",                                  \
+/* fprintf(stderr, "Pos : %lld Val : %llx\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
-                                (long long)*(p_field) );    */                \
+                                (long long)*(p_field) );          */          \
         p_ifo->i_pos += i_len;                                              \
     }
 
@@ -80,7 +80,7 @@ static int      FreeTitleSet    ( vts_t * );
         read( p_ifo->i_fd , (p_field) , 1 );                                \
 /*fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
-                                          *(p_field) );*/                     \
+                                          *(p_field) );             */        \
         p_ifo->i_pos += 1;                                                  \
     }
 
@@ -90,7 +90,7 @@ static int      FreeTitleSet    ( vts_t * );
         *(p_field) = ntohs( *(p_field) );                                   \
 /*fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
-                                          *(p_field) );*/                     \
+                                          *(p_field) );               */      \
         p_ifo->i_pos += 2;                                                  \
     }
 
@@ -100,7 +100,7 @@ static int      FreeTitleSet    ( vts_t * );
         *(p_field) = ntohl( *(p_field) );                                   \
 /*fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
-                                          *(p_field) );*/                     \
+                                          *(p_field) );                 */    \
         p_ifo->i_pos += 4;                                                  \
     }
 
@@ -110,7 +110,7 @@ static int      FreeTitleSet    ( vts_t * );
         *(p_field) = ntoh64( *(p_field) );                                  \
 /*fprintf(stderr, "Pos : %lld Value : %lld\n",                                \
                                 (long long)(p_ifo->i_pos - i_start),        \
-                                            *(p_field) );*/                   \
+                                            *(p_field) );                 */  \
         p_ifo->i_pos += 8;                                                  \
     }
 
@@ -126,38 +126,42 @@ static int      FreeTitleSet    ( vts_t * );
 /*
  * IFO Management.
  */
-
 /*****************************************************************************
- * IfoInit : Creates an ifo structure and prepares for parsing directly
- *           on DVD device. Then reads information from the management table.
+ * IfoCreate : Creates an ifo structure and prepares for parsing directly
+ *             on DVD device
  *****************************************************************************/
-int IfoInit( ifo_t ** pp_ifo, int i_fd )
+int IfoCreate( thread_dvd_data_t * p_dvd )
 {
-    ifo_t *             p_ifo;
-    u64                 i_temp;
-    u32                 i_lba;
-    int                 i, j, k;
-    off_t               i_start;
-
-    
-    p_ifo = malloc( sizeof(ifo_t) );
-    if( p_ifo == NULL )
+    p_dvd->p_ifo = malloc( sizeof(ifo_t) );
+    if( p_dvd->p_ifo == NULL )
     {
         intf_ErrMsg( "ifo error: unable to allocate memory. aborting" );
         return -1;
     }
 
-    *pp_ifo = p_ifo;
-
     /* if we are here the dvd device has already been opened */
-    p_ifo->i_fd = i_fd;
+    p_dvd->p_ifo->i_fd = p_dvd->i_fd;
+
+    return 0;
+}
+
+/*****************************************************************************
+ * IfoInit : Reads information from the management table.
+ *****************************************************************************/
+int IfoInit( ifo_t * p_ifo )
+{
+    u64                 i_temp;
+    u32                 i_lba;
+    int                 i, j, k;
+    off_t               i_start;
 
     /* find the start sector of video information on the dvd */
-    i_lba = UDFFindFile( i_fd, "/VIDEO_TS/VIDEO_TS.IFO");
+    i_lba = UDFFindFile( p_ifo->i_fd, "/VIDEO_TS/VIDEO_TS.IFO");
 
     p_ifo->i_off = (off_t)(i_lba) * DVD_LB_SIZE;
     p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off, SEEK_SET );
 
+//i_start = p_ifo->i_pos;
     /*
      * read the video manager information table
      */
@@ -203,7 +207,7 @@ int IfoInit( ifo_t ** pp_ifo, int i_fd )
     }
     FLUSH( 17 );
     GETC( &manager_inf.i_spu_nb );
-//fprintf( stderr, "vmgi subpic nb : %d\n", manager_inf.i_subpic_nb );
+//fprintf( stderr, "vmgi subpic nb : %d\n", manager_inf.i_spu_nb );
     for( i=0 ; i < manager_inf.i_spu_nb ; i++ )
     {
         GET( &i_temp, 6 );
@@ -254,7 +258,7 @@ int IfoInit( ifo_t ** pp_ifo, int i_fd )
             GETC( &title_inf.p_attr[i].i_title_set_num );
             GETC( &title_inf.p_attr[i].i_title_num );
             GETL( &title_inf.p_attr[i].i_start_sector );
-//fprintf( stderr, "title_inf: %d %d %d\n", ptr.p_tts[i].i_ptt_nb, ptr.p_tts[i].i_tts_nb,ptr.p_tts[i].i_vts_ttn );
+//fprintf( stderr, "title_inf: %d %d %d\n",title_inf.p_attr[i].i_chapter_nb ,title_inf.p_attr[i].i_title_set_num,title_inf.p_attr[i].i_title_num );
         }
     }
     else
@@ -391,14 +395,14 @@ int IfoInit( ifo_t ** pp_ifo, int i_fd )
             FLUSH(2);
             FLUSH( 1 );
             GETC( &vts_inf.p_vts_attr[i].i_vts_menu_audio_nb );
-//fprintf( stderr, "m audio nb : %d\n", vts_inf.p_vts_vts_inf[i].i_vtsm_audio_nb );
+//fprintf( stderr, "m audio nb : %d\n", vts_inf.p_vts_attr[i].i_vts_menu_audio_nb );
             for( j = 0 ; j < 8 ; j++ )
             {
                 GETLL( &i_temp );
             }
             FLUSH( 17 );
             GETC( &vts_inf.p_vts_attr[i].i_vts_menu_spu_nb );
-//fprintf( stderr, "m subp nb : %d\n", vts_inf.p_vts_vts_inf[i].i_vtsm_subpic_nb );
+//fprintf( stderr, "m subp nb : %d\n", vts_inf.p_vts_attr[i].i_vts_menu_spu_nb );
             for( j = 0 ; j < 28 ; j++ )
             {
                 GET( &i_temp, 6 );
@@ -409,14 +413,14 @@ int IfoInit( ifo_t ** pp_ifo, int i_fd )
             FLUSH(2);
             FLUSH( 1 );
             GETL( &vts_inf.p_vts_attr[i].i_vts_title_audio_nb );
-//fprintf( stderr, "tt audio nb : %d\n", vts_inf.p_vts_vts_inf[i].i_vtstt_audio_nb );
+//fprintf( stderr, "tt audio nb : %d\n", vts_inf.p_vts_attr[i].i_vts_title_audio_nb );
             for( j = 0 ; j < 8 ; j++ )
             {
                 GETLL( &i_temp );
             }
             FLUSH( 17 );
             GETC( &vts_inf.p_vts_attr[i].i_vts_title_spu_nb );
-//fprintf( stderr, "tt subp nb : %d\n", vts_inf.p_vts_vts_inf[i].i_vtstt_subpic_nb );
+//fprintf( stderr, "tt subp nb : %d\n", vts_inf.p_vts_attr[i].i_vts_title_spu_nb );
             for( j=0 ; j<28/*vts_inf.p_vts_vts_inf[i].i_vtstt_subpic_nb*/ ; j++ )
             {
                 GET( &i_temp, 6 );
@@ -482,8 +486,10 @@ int IfoTitleSet( ifo_t * p_ifo )
                    * DVD_LB_SIZE
                    + p_ifo->i_off;
 
-    p_ifo->i_pos = lseek( p_ifo->i_fd, i_off, SEEK_SET );
+//fprintf(stderr, "offset: %lld\n" , i_off );
 
+    p_ifo->i_pos = lseek( p_ifo->i_fd, i_off, SEEK_SET );
+//i_start = p_ifo->i_pos;
     p_ifo->vts.i_pos = p_ifo->i_pos;
 
 #define manager_inf p_ifo->vts.manager_inf
@@ -566,7 +572,7 @@ FLUSH(2);
     }
     FLUSH( 17 );
     GETC( &manager_inf.i_spu_nb );
-//fprintf( stderr, "vtsi subpic nb : %d\n", manager_inf.i_subpic_nb );
+//fprintf( stderr, "vtsi subpic nb : %d\n", manager_inf.i_spu_nb );
     for( i=0 ; i<manager_inf.i_spu_nb ; i++ )
     {
         GET( &i_temp, 6 );
@@ -759,11 +765,10 @@ FLUSH(2);
             return -1;
         }
     }
-
-    intf_WarnMsg( 2, "ifo info: VTS %d initialized",
-         p_ifo->vmg.title_inf.p_attr[p_ifo->i_title-1].i_title_set_num );
-
 #undef manager_inf
+
+    intf_WarnMsg( 2, "ifo info: vts %d initialized",
+         p_ifo->vmg.title_inf.p_attr[p_ifo->i_title-1].i_title_set_num );
 
     p_ifo->vts.b_initialized = 1;
 
@@ -918,15 +923,26 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title )
 {
     off_t     i_start;
     int       i;
+    u16         i_temp;
 
     i_start = p_ifo->i_pos;
 
-//fprintf( stderr, "PGC\n" );
+    p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_pos, SEEK_SET );
+//fprintf( stderr, "PGC @ %lld\n",p_ifo->i_pos  );
 
     FLUSH(2);
+#if 0
     GETC( &p_title->i_chapter_nb );
+fprintf( stderr, "title: prg %d\n", p_title->i_chapter_nb );
+    FLUSH(0);
     GETC( &p_title->i_cell_nb );
-//fprintf( stderr, "title: Prg: %d Cell: %d\n", pgc.i_prg_nb, pgc.i_cell_nb );
+fprintf( stderr, "title: cell %d\n", p_title->i_cell_nb );
+#endif
+    GETS( &i_temp );
+//fprintf(stderr, "title : temp = %x\n", i_temp );
+    p_title->i_chapter_nb = (i_temp & 0xFF );
+    p_title->i_cell_nb = (i_temp & 0xFF00 ) >> 8;
+//fprintf( stderr, "title: Prg: %d Cell: %d\n",p_title->i_chapter_nb,p_title->i_cell_nb  );
     GETL( &p_title->i_play_time );
     GETL( &p_title->i_prohibited_user_op );
     for( i=0 ; i<8 ; i++ )
@@ -1192,7 +1208,7 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf )
         p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
                               p_unit_inf->p_title[i].i_title_start_byte,
                               SEEK_SET );
-//fprintf( stderr, "Unit: PGC %d\n", i );
+//fprintf( stderr, "Unit: PGC %d @ %lld\n", i, p_ifo->i_pos );
         ReadTitle( p_ifo, &p_unit_inf->p_title[i].title );
     }
 
@@ -1226,6 +1242,8 @@ static int ReadTitleUnit( ifo_t * p_ifo, title_unit_t * p_title_unit )
     GETS( &p_title_unit->i_unit_nb );
     FLUSH( 2 );
     GETL( &p_title_unit->i_end_byte );
+
+//fprintf(stderr, "Unit: nb %d end %d\n", p_title_unit->i_unit_nb, p_title_unit->i_end_byte );
 
     p_title_unit->p_unit = malloc( p_title_unit->i_unit_nb *sizeof(unit_t) );
     if( p_title_unit->p_unit == NULL )
@@ -1299,6 +1317,8 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf )
     p_cell_inf->i_cell_nb =
         ( i_start + p_cell_inf->i_end_byte + 1 - p_ifo->i_pos )
         / sizeof(cell_map_t);
+
+//fprintf( stderr, "Cell inf: vob %d end %d cell %d\n", p_cell_inf->i_vob_nb, p_cell_inf->i_end_byte,  p_cell_inf->i_cell_nb );
 
     p_cell_inf->p_cell_map =
                 malloc( p_cell_inf->i_cell_nb *sizeof(cell_map_t) );

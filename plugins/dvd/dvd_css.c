@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.22 2001/04/08 16:57:47 sam Exp $
+ * $Id: dvd_css.c,v 1.23 2001/04/10 17:47:05 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -275,7 +275,8 @@ int CSSInit( css_t * p_css )
             return 0;
 
         case 0:
-            intf_WarnMsg( 3, "css info: no way to authenticate" );
+            intf_ErrMsg( "css error: no way to authenticate" );
+            return -1;
     }
 
 #else /* HAVE_CSS */
@@ -406,13 +407,13 @@ int CSSGetKey( css_t * p_css )
     if( !b_encrypted )
     {
         intf_WarnMsg( 3, "css warning: this file was _NOT_ encrypted!" );
-        return(0);
+        return 0;
     }
 
     if( b_encrypted && i_registered_keys == 0 )
     {
         intf_ErrMsg( "css error: unable to determine keys from file" );
-        return(1);
+        return -1;
     }
 
     for( i = 0 ; i < i_registered_keys - 1 ; i++ )
@@ -469,10 +470,12 @@ int CSSGetKey( css_t * p_css )
     memcpy( p_css->pi_title_key,
             p_title_key[i_highest].pi_key, KEY_SIZE );
 
+    intf_WarnMsg( 2, "css info: vts key initialized" );
     return 0;
 
 #else /* HAVE_CSS */
-    return 1;
+    intf_ErrMsg( "css error: css decryption unavailable" );
+    return -1;
 
 #endif /* HAVE_CSS */
 }
