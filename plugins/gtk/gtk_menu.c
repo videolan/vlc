@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.4 2001/05/23 23:08:20 stef Exp $
+ * $Id: gtk_menu.c,v 1.5 2001/05/24 01:24:47 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -84,7 +84,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf );
  * user_data to transmit intf_* and we need to refresh the other menu.
  ****************************************************************************/
 
-#define GtkLangToggle( intf, menu, type, callback, b_update )           \
+#define GtkLangToggle( intf, window, menu, type, callback, b_update )   \
     intf_thread_t *         p_intf;                                     \
     GtkWidget *             p_menu;                                     \
     es_descriptor_t *       p_es;                                       \
@@ -94,7 +94,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf );
     if( !p_intf->p_sys->b_update )                                      \
     {                                                                   \
         p_menu = GTK_WIDGET( gtk_object_get_data(                       \
-                   GTK_OBJECT( p_intf->p_sys->p_popup ), (menu) ) );    \
+                   GTK_OBJECT( p_intf->p_sys->window ), (menu) ) );     \
         p_es = (es_descriptor_t*)user_data;                             \
                                                                         \
         input_ToggleES( p_intf->p_input, p_es, menuitem->active );      \
@@ -115,13 +115,13 @@ gint GtkSetupMenus( intf_thread_t * p_intf );
 
 void GtkMenubarAudioToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkLangToggle( "intf_window", "popup_audio", AUDIO_ES,
+    GtkLangToggle( "intf_window", p_popup, "popup_audio", AUDIO_ES,
                    GtkPopupAudioToggle, b_audio_update );
 }
 
 void GtkPopupAudioToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkLangToggle( "intf_popup", "menubar_audio", AUDIO_ES,
+    GtkLangToggle( "intf_popup", p_window, "menubar_audio", AUDIO_ES,
                    GtkMenubarAudioToggle, b_audio_update );
 }
 
@@ -131,13 +131,13 @@ void GtkPopupAudioToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 
 void GtkMenubarSubtitleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkLangToggle( "intf_window", "popup_subpictures", SPU_ES,
+    GtkLangToggle( "intf_window", p_popup, "popup_subpictures", SPU_ES,
                    GtkPopupSubtitleToggle, b_spu_update );
 }
 
 void GtkPopupSubtitleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkLangToggle( "intf_popup", "menubar_subpictures", SPU_ES,
+    GtkLangToggle( "intf_popup", p_window, "menubar_subpictures", SPU_ES,
                    GtkMenubarSubtitleToggle, b_spu_update );
 }
 
