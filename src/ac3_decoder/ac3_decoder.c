@@ -277,6 +277,7 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	downmix( p_ac3dec, ((ac3dec_frame_t *)p_ac3dec->p_aout_fifo->buffer)[ p_ac3dec->p_aout_fifo->l_end_frame ] );
 	vlc_mutex_lock( &p_ac3dec->p_aout_fifo->data_lock );
 	p_ac3dec->p_aout_fifo->l_end_frame = (p_ac3dec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+	vlc_cond_signal( &p_ac3dec->p_aout_fifo->data_wait );
 	vlc_mutex_unlock( &p_ac3dec->p_aout_fifo->data_lock );
 
 	/* frame 2 */
@@ -297,6 +298,7 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = LAST_MDATE;
 	vlc_mutex_lock( &p_ac3dec->p_aout_fifo->data_lock );
 	p_ac3dec->p_aout_fifo->l_end_frame = (p_ac3dec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+	vlc_cond_signal( &p_ac3dec->p_aout_fifo->data_wait );
 	vlc_mutex_unlock( &p_ac3dec->p_aout_fifo->data_lock );
 
 	/* frame 3 */
@@ -317,6 +319,7 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = LAST_MDATE;
 	vlc_mutex_lock( &p_ac3dec->p_aout_fifo->data_lock );
 	p_ac3dec->p_aout_fifo->l_end_frame = (p_ac3dec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+	vlc_cond_signal( &p_ac3dec->p_aout_fifo->data_wait );
 	vlc_mutex_unlock( &p_ac3dec->p_aout_fifo->data_lock );
 
 	/* frame 4 */
@@ -337,6 +340,7 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = LAST_MDATE;
 	vlc_mutex_lock( &p_ac3dec->p_aout_fifo->data_lock );
 	p_ac3dec->p_aout_fifo->l_end_frame = (p_ac3dec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+	vlc_cond_signal( &p_ac3dec->p_aout_fifo->data_wait );
 	vlc_mutex_unlock( &p_ac3dec->p_aout_fifo->data_lock );
 
 	/* frame 5 */
@@ -357,6 +361,7 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = LAST_MDATE;
 	vlc_mutex_lock( &p_ac3dec->p_aout_fifo->data_lock );
 	p_ac3dec->p_aout_fifo->l_end_frame = (p_ac3dec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+	vlc_cond_signal( &p_ac3dec->p_aout_fifo->data_wait );
 	vlc_mutex_unlock( &p_ac3dec->p_aout_fifo->data_lock );
 
 	/* frame 6 */
@@ -377,6 +382,7 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = LAST_MDATE;
 	vlc_mutex_lock( &p_ac3dec->p_aout_fifo->data_lock );
 	p_ac3dec->p_aout_fifo->l_end_frame = (p_ac3dec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+	vlc_cond_signal( &p_ac3dec->p_aout_fifo->data_wait );
 	vlc_mutex_unlock( &p_ac3dec->p_aout_fifo->data_lock );
 
 	parse_auxdata( p_ac3dec );

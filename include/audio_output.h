@@ -176,12 +176,11 @@ typedef struct aout_thread_s
     /* The size of the audio output buffer is kept in audio units, as this is
      * the only unit that is common with every audio decoder and audio fifo */
     long                l_units;
+    long                l_msleep;
 
-    mtime_t             date;
     /* date is the moment where the first audio unit of the output buffer
-     * should be played and is kept up-to-date with the following incremental
-     * structure */
-    aout_increment_t    date_increment;
+     * will be played */
+    mtime_t             date;
 
 } aout_thread_t;
 
