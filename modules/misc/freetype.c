@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.3 2003/07/19 15:15:01 sigmunau Exp $
+ * $Id: freetype.c,v 1.4 2003/07/20 16:26:33 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -45,6 +45,8 @@ static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
 static void Render    ( vout_thread_t *, picture_t *, 
+		        const subpicture_t * );
+static void RenderI420( vout_thread_t *, picture_t *, 
 		        const subpicture_t * );
 static int  AddText   ( vout_thread_t *, byte_t *, text_style_t *, int, 
 			int, int, mtime_t, mtime_t );
@@ -203,6 +205,40 @@ static void Destroy( vlc_object_t *p_this )
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
 static void Render( vout_thread_t *p_vout, picture_t *p_pic, 
+		    const subpicture_t *p_subpic )    
+{
+    switch( p_vout->output.i_chroma )
+    {
+        /* I420 target, no scaling */
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('I','Y','U','V'):
+        case VLC_FOURCC('Y','V','1','2'):
+            RenderI420( p_vout, p_pic, p_subpic );
+            break;
+#if 0
+        /* RV16 target, scaling */
+        case VLC_FOURCC('R','V','1','6'):
+            RenderRV16( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
+            break;
+
+        /* RV32 target, scaling */
+        case VLC_FOURCC('R','V','2','4'):
+        case VLC_FOURCC('R','V','3','2'):
+            RenderRV32( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
+            break;
+
+        /* NVidia overlay, no scaling */
+        case VLC_FOURCC('Y','U','Y','2'):
+            RenderYUY2( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
+            break;
+#endif
+        default:
+            msg_Err( p_vout, "unknown chroma, can't render SPU" );
+            break;
+    }
+}
+
+static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic, 
 		    const subpicture_t *p_subpic )
 {
     subpicture_sys_t *p_string = p_subpic->p_sys;
@@ -252,11 +288,56 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic,
 			    //                                pixel = (pixel^alpha)^pixel;
 			    pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 ) +
                                 ( 255 * alpha >> 8 );
+#undef alpha
+#undef pixel
 			}
 		    }
 		}
 	    }
 	}
+        else
+        {
+	    if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
+	    {
+		pen_y = p_pic->p[i_plane].i_lines - ( p_string->i_height>>1) -
+		    (p_string->i_y_margin>>1);
+	    }
+	    else
+	    {
+		pen_y = p_string->i_y_margin >> 1;
+	    }
+	    if ( p_string->i_flags & OSD_ALIGN_RIGHT )
+	    {
+		pen_x = i_pitch - ( p_string->i_width >> 1 )
+		    - ( p_string->i_x_margin >> 1 );
+	    }
+	    else
+	    {
+		pen_x = p_string->i_x_margin >> 1;
+	    }
+
+	    for( i = 0; p_string->pp_glyphs[i] != NULL; i++ )
+	    {
+		if( p_string->pp_glyphs[i] )
+		{
+		    FT_BitmapGlyph p_glyph = p_string->pp_glyphs[ i ];
+#define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ ( x + y * p_glyph->bitmap.width ) ] ]
+#define pixel p_in[ ( (p_string->p_glyph_pos[ i ].y>>1) + pen_y + (y>>1) -  ( p_glyph->top >> 1 ) ) * i_pitch + ( x >> 1 ) + pen_x + ( p_string->p_glyph_pos[ i ].x >> 1 ) + ( p_glyph->left >>1) ]
+		    for(y = 0; y < p_glyph->bitmap.rows; y+=2 )
+		    {
+			for( x = 0; x < p_glyph->bitmap.width; x+=2 )
+			{
+			    //                                pixel = alpha;
+			    //                                pixel = (pixel^alpha)^pixel;
+			    pixel = ( ( pixel * ( 0xFF - alpha ) ) >> 8 ) +
+                                ( 0x80 * alpha >> 8 );
+#undef alpha
+#undef pixel
+			}
+		    }
+		}
+	    }            
+        }
     }
 }
 
