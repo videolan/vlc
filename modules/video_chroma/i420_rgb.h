@@ -2,7 +2,7 @@
  * i420_rgb.h : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2004 VideoLAN
- * $Id: i420_rgb.h,v 1.5 2004/01/31 05:53:35 rocky Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -186,13 +186,13 @@ void E_(I420_RGB32)        ( vout_thread_t *, picture_t *, picture_t * );
         {                                                                     \
             *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
         }                                                                     \
-        (uint8_t*)p_pic += i_right_margin;                                    \
+        p_pic = (void*)((uint8_t*)p_pic + i_right_margin );                   \
     }                                                                         \
     else                                                                      \
     {                                                                         \
         /* No scaling, conversion has been done directly in picture memory.   \
          * Increment of picture pointer to end of line is still needed */     \
-        (uint8_t*)p_pic += p_dest->p->i_pitch;                                \
+        p_pic = (void*)((uint8_t*)p_pic + p_dest->p->i_pitch );               \
     }                                                                         \
 
 /*****************************************************************************
@@ -224,7 +224,7 @@ void E_(I420_RGB32)        ( vout_thread_t *, picture_t *, picture_t * );
         }                                                                     \
     }                                                                         \
     /* Increment of picture pointer to end of line is still needed */         \
-    (uint8_t*)p_pic += i_right_margin;                                        \
+    p_pic = (void*)((uint8_t*)p_pic + i_right_margin );                       \
                                                                               \
     /* Increment the Y coordinate in the matrix, modulo 4 */                  \
     i_real_y = (i_real_y + 1) & 0x3;                                          \
@@ -278,7 +278,7 @@ void E_(I420_RGB32)        ( vout_thread_t *, picture_t *, picture_t * );
             /* Height increment: copy previous picture line */                \
             p_vout->p_vlc->pf_memcpy( p_pic, p_pic_start,                     \
                                       p_vout->output.i_width * BPP );         \
-            (uint8_t*)p_pic += p_dest->p->i_pitch;                            \
+            p_pic = (void*)((uint8_t*)p_pic + p_dest->p->i_pitch );           \
         }                                                                     \
         i_scale_count += p_vout->output.i_height;                             \
         break;                                                                \
