@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.16 2003/01/08 16:40:44 lool Exp $
+$Id: FAQ,v 1.17 2003/01/09 22:30:44 lool Exp $
 
 1. Using VLC
 
@@ -264,4 +264,11 @@ sources have to share the same media as the products.
 
 They are other ways to conform to the GPL, but this should be the
 simplest because it does not rely on a contract.
+
+There is one additional issue you need to take care of. The VLC
+binary from our website can also read encrypted DVDs with the help of
+the libdvdcss library. Its use is controversial in a few countries
+such as the United States because of a law called the DMCA. If you are
+unsure about the legality of using and distributing this library in
+your country, please consult your lawyer.
 
