@@ -342,8 +342,8 @@ static int FrontendInfo( access_t *p_access )
         msg_Dbg(p_access, "  hierarchy mode auto");
     if( p_frontend->info.caps & FE_CAN_MUTE_TS)
         msg_Dbg(p_access, "  card can mute TS");
-    if( p_frontend->info.caps & FE_CAN_CLEAN_SETUP)
-        msg_Dbg(p_access, "  clean setup");
+    if( p_frontend->info.caps & FE_CAN_RECOVER)
+        msg_Dbg(p_access, "  card can recover from a cable unplug");
     msg_Dbg(p_access, "End of capability list");
 
     return VLC_SUCCESS;
