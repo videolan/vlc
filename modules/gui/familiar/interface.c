@@ -37,7 +37,10 @@ create_familiar (void)
   GtkWidget *notebook;
   GtkWidget *fixedMedia;
   GtkWidget *labelUrl;
-  GtkWidget *listMedia;
+  GtkWidget *scrolledwindow1;
+  GtkWidget *clistmedia;
+  GtkWidget *labelname;
+  GtkWidget *labeltype;
   GtkWidget *comboURL;
   GList *comboURL_items = NULL;
   GtkWidget *comboURL_entry;
@@ -235,17 +238,46 @@ create_familiar (void)
   gtk_widget_set_uposition (labelUrl, 4, 8);
   gtk_widget_set_usize (labelUrl, 38, 18);
 
-  listMedia = gtk_list_new ();
-  gtk_widget_set_name (listMedia, "listMedia");
-  gtk_widget_ref (listMedia);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "listMedia", listMedia,
+  scrolledwindow1 = gtk_scrolled_window_new (NULL, NULL);
+  gtk_widget_set_name (scrolledwindow1, "scrolledwindow1");
+  gtk_widget_ref (scrolledwindow1);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "scrolledwindow1", scrolledwindow1,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (listMedia);
-  gtk_fixed_put (GTK_FIXED (fixedMedia), listMedia, 8, 40);
-  gtk_widget_set_uposition (listMedia, 8, 40);
-  gtk_widget_set_usize (listMedia, 220, 200);
-  gtk_tooltips_set_tip (tooltips, listMedia, _("Select multimedia file."), NULL);
-  gtk_list_set_selection_mode (GTK_LIST (listMedia), GTK_SELECTION_MULTIPLE);
+  gtk_widget_show (scrolledwindow1);
+  gtk_fixed_put (GTK_FIXED (fixedMedia), scrolledwindow1, 0, 32);
+  gtk_widget_set_uposition (scrolledwindow1, 0, 32);
+  gtk_widget_set_usize (scrolledwindow1, 240, 208);
+
+  clistmedia = gtk_clist_new (2);
+  gtk_widget_set_name (clistmedia, "clistmedia");
+  gtk_widget_ref (clistmedia);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "clistmedia", clistmedia,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (clistmedia);
+  gtk_container_add (GTK_CONTAINER (scrolledwindow1), clistmedia);
+  gtk_widget_set_usize (clistmedia, 216, 208);
+  gtk_tooltips_set_tip (tooltips, clistmedia, _("Select files to play"), NULL);
+  gtk_clist_set_column_width (GTK_CLIST (clistmedia), 0, 145);
+  gtk_clist_set_column_width (GTK_CLIST (clistmedia), 1, 54);
+  gtk_clist_column_titles_show (GTK_CLIST (clistmedia));
+
+  labelname = gtk_label_new (_("Name"));
+  gtk_widget_set_name (labelname, "labelname");
+  gtk_widget_ref (labelname);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labelname", labelname,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labelname);
+  gtk_clist_set_column_widget (GTK_CLIST (clistmedia), 0, labelname);
+  gtk_label_set_justify (GTK_LABEL (labelname), GTK_JUSTIFY_LEFT);
+
+  labeltype = gtk_label_new (_("Type"));
+  gtk_widget_set_name (labeltype, "labeltype");
+  gtk_widget_ref (labeltype);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labeltype", labeltype,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labeltype);
+  gtk_clist_set_column_widget (GTK_CLIST (clistmedia), 1, labeltype);
+  gtk_label_set_justify (GTK_LABEL (labeltype), GTK_JUSTIFY_LEFT);
 
   comboURL = gtk_combo_new ();
   gtk_widget_set_name (comboURL, "comboURL");
@@ -253,13 +285,14 @@ create_familiar (void)
   gtk_object_set_data_full (GTK_OBJECT (familiar), "comboURL", comboURL,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (comboURL);
-  gtk_fixed_put (GTK_FIXED (fixedMedia), comboURL, 46, 6);
-  gtk_widget_set_uposition (comboURL, 46, 6);
+  gtk_fixed_put (GTK_FIXED (fixedMedia), comboURL, 40, 4);
+  gtk_widget_set_uposition (comboURL, 40, 4);
   gtk_widget_set_usize (comboURL, 185, 24);
   comboURL_items = g_list_append (comboURL_items, (gpointer) _("file://"));
-  comboURL_items = g_list_append (comboURL_items, (gpointer) _("ftp://localhost"));
-  comboURL_items = g_list_append (comboURL_items, (gpointer) _("http://localhost"));
-  comboURL_items = g_list_append (comboURL_items, (gpointer) _("udpstream://@localhost:1234/"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("ftp://"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("http://"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("udp://:1234"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("udpstream://@:1234"));
   gtk_combo_set_popdown_strings (GTK_COMBO (comboURL), comboURL_items);
   g_list_free (comboURL_items);
 
@@ -345,9 +378,10 @@ create_familiar (void)
   gtk_widget_set_uposition (comboDefaultURL, 8, 8);
   gtk_widget_set_usize (comboDefaultURL, 200, 24);
   comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("file://"));
-  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("ftp://localhost"));
-  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("http://localhost"));
-  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("udpstream://@localhost:1234/"));
+  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("ftp://"));
+  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("http://"));
+  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("udpstream://@:1234"));
+  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("udp://:1234"));
   gtk_combo_set_popdown_strings (GTK_COMBO (comboDefaultURL), comboDefaultURL_items);
   g_list_free (comboDefaultURL_items);
 
@@ -507,6 +541,12 @@ create_familiar (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (toolbar_about), "clicked",
                       GTK_SIGNAL_FUNC (on_toolbar_about_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (clistmedia), "click_column",
+                      GTK_SIGNAL_FUNC (on_clistmedia_click_column),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (clistmedia), "select_row",
+                      GTK_SIGNAL_FUNC (on_clistmedia_select_row),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (comboURL_entry), "changed",
                       GTK_SIGNAL_FUNC (on_comboURL_entry_changed),

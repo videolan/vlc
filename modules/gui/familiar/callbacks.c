@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.3 2002/08/12 20:38:19 jpsaman Exp $
+ * $Id: callbacks.c,v 1.4 2002/08/14 21:50:01 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -46,9 +46,9 @@
 #include "support.h"
 #include "familiar.h"
 
-//#include "netutils.h"
+/*#include "netutils.h"*/
 
-static void MediaURLOpenChanged( GtkEditable *editable, gpointer user_data );
+static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url );
 static void PreferencesURLOpenChanged( GtkEditable *editable, gpointer user_data );
 
 /*****************************************************************************
@@ -88,15 +88,12 @@ void * __GtkGetIntf( GtkWidget * widget )
 /*****************************************************************************
  * Helper functions for URL changes in Media and Preferences notebook pages.
  ****************************************************************************/
-static void MediaURLOpenChanged( GtkEditable *editable, gpointer user_data )
+static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
 {
-    intf_thread_t *p_intf = GtkGetIntf( editable );
+    intf_thread_t *p_intf = GtkGetIntf( widget );
     playlist_t *p_playlist;
-    gchar *       psz_url;
 
-    psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
     g_print( "%s\n",psz_url );
-//    p_url = gtk_editable_get_chars(editable,0,-1);
 
     // Add p_url to playlist .... but how ?
     if (p_intf)
@@ -115,42 +112,46 @@ static void MediaURLOpenChanged( GtkEditable *editable, gpointer user_data )
 static void PreferencesURLOpenChanged( GtkEditable *editable, gpointer user_data )
 {
     gchar *       p_url;
-//    GtkWidget *   item;
 
     p_url = gtk_entry_get_text(GTK_ENTRY(editable) );
     g_print( "%s\n",p_url );
-
-//    p_url = gtk_editable_get_chars(editable,0,-1);
-//    item = gtk_list_item_new();
-//    gtk_widget_show (item);
-//    gtk_combo_set_item_string (GTK_COMBO (combo), GTK_ITEM (item), p_url);
-//    /* Now we simply add the item to the combo's list. */
-//    gtk_container_add (GTK_CONTAINER (GTK_COMBO (combo)->list), item);
 }
 
 /*****************************************************************
  * Read directory helper function.
  ****************************************************************/
-static void ReadDirectory( GtkWidget *widget, char *psz_dir)
+void ReadDirectory( GtkCList *clist, char *psz_dir)
 {
     struct dirent **namelist;
-    int n;
+    int n,i;
 
     if (psz_dir)
-       n = scandir(psz_dir, &namelist, 0, alphasort);
+       n = scandir(psz_dir, &namelist, 0, NULL);
     else
-       n = scandir(".", &namelist, 0, alphasort);
+       n = scandir(".", &namelist, 0, NULL);
+
     if (n<0)
         perror("scandir");
     else
     {
-        while(n--) /* reverse printed list */
+        gchar *ppsz_text[2];
+
+        gtk_clist_freeze( clist );
+        gtk_clist_clear( clist );
+
+        for (i=0; i<n; i++)
         {
-            /* add list to listMedia widget */
-            g_print("%s\n",namelist[n]->d_name);
-            free(namelist[n]);
+            /* This is a list of strings. */
+            ppsz_text[0] = namelist[i]->d_name;
+            if (namelist[i]->d_type)
+                ppsz_text[1] = "dir";
+            else
+                ppsz_text[1] = "file";
+            gtk_clist_insert( clist, i, ppsz_text );
+            free(namelist[i]);
         }
         free(namelist);
+        gtk_clist_thaw( clist );
     }
 }
 
@@ -186,8 +187,17 @@ on_toolbar_open_clicked                (GtkButton       *button,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
+    GtkCList *clistmedia = NULL;
+
     if (p_intf)
     {
+        /* Testing routine */
+        clistmedia = GTK_CLIST( lookup_widget( p_intf->p_sys->p_window,
+                                   "clistmedia") );
+        if (GTK_CLIST(clistmedia))
+        {
+            ReadDirectory(clistmedia, ".");
+        }
         gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
         gdk_window_raise( p_intf->p_sys->p_window->window );
     }
@@ -252,7 +262,7 @@ on_toolbar_play_clicked                (GtkButton       *button,
            gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
            gdk_window_raise( p_intf->p_sys->p_window->window );
         }
-        // Display open page
+        /* Display open page */
     }
 
     /* If the playlist is empty, open a file requester instead */
@@ -268,7 +278,7 @@ on_toolbar_play_clicked                (GtkButton       *button,
     {
         vlc_mutex_unlock( &p_playlist->object_lock );
         vlc_object_release( p_playlist );
-        // Display open page
+        /* Display open page */
     }
 }
 
@@ -314,10 +324,10 @@ on_toolbar_about_clicked               (GtkButton       *button,
     {// Toggle notebook
         if (p_intf->p_sys->p_notebook)
         {
-//        if ( gtk_get_data(  GTK_WIDGET(p_intf->p_sys->p_notebook), "visible" ) )
-//           gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_notebook) );
-//        else
-           gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+/*        if ( gtk_get_data(  GTK_WIDGET(p_intf->p_sys->p_notebook), "visible" ) )
+ *           gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+ *        else
+ */           gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
         }
         gdk_window_raise( p_intf->p_sys->p_window->window );
     }
@@ -329,10 +339,12 @@ on_comboURL_entry_changed              (GtkEditable     *editable,
                                         gpointer         user_data)
 {
     intf_thread_t * p_intf = GtkGetIntf( editable );
+    gchar *       psz_url;
 
     if (p_intf)
     {
-        MediaURLOpenChanged( editable, NULL );
+        psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
+        MediaURLOpenChanged( GTK_WIDGET(editable), psz_url );
     }
 }
 
@@ -346,6 +358,71 @@ on_comboPrefs_entry_changed            (GtkEditable     *editable,
     if (p_intf)
     {
         PreferencesURLOpenChanged( editable, NULL );
+    }
+}
+
+
+void
+on_clistmedia_click_column             (GtkCList        *clist,
+                                        gint             column,
+                                        gpointer         user_data)
+{
+    static GtkSortType sort_type = GTK_SORT_ASCENDING;
+
+    switch(sort_type)
+    {
+        case GTK_SORT_ASCENDING:
+            sort_type = GTK_SORT_DESCENDING;
+            break;
+        case GTK_SORT_DESCENDING:
+            sort_type = GTK_SORT_ASCENDING;
+            break;
+    }
+    gtk_clist_freeze( clist );
+    gtk_clist_set_sort_type( clist, sort_type );
+    gtk_clist_sort( clist );
+    gtk_clist_thaw( clist );
+}
+
+
+void
+on_clistmedia_select_row               (GtkCList        *clist,
+                                        gint             row,
+                                        gint             column,
+                                        GdkEvent        *event,
+                                        gpointer         user_data)
+{
+    gchar *text[2];
+    gint ret;
+
+    ret = gtk_clist_get_text (clist, row, 0, text);
+    if (ret)
+    {
+        MediaURLOpenChanged( GTK_WIDGET(clist), text[0] );
+
+//        /* DO NOT TRY THIS CODE IT SEGFAULTS */
+//        g_print( "dir\n");
+//        /* should be a gchar compare function */
+//        if (strlen(text[1])>0)
+//        {
+//            g_print( "checking dir\n");
+//            /* should be a gchar compare function */
+//            if (strncmp(text[1],"dir",3)==0)
+//            {
+//                g_print( "dir: %s\n", text[0]);
+//                ReadDirectory(clist, text[0]);
+//            }
+//            else
+//            {
+//                g_print( "playing file\n");
+//                MediaURLOpenChanged( GTK_WIDGET(clist), text[0] );
+//            }
+//        }
+//        else
+//        {
+//            g_print( "playing filer\n");
+//            MediaURLOpenChanged( GTK_WIDGET(clist), text[0] );
+//        }
     }
 }
 

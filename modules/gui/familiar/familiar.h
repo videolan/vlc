@@ -2,7 +2,7 @@
  * familiar.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: familiar.h,v 1.2 2002/08/12 20:38:19 jpsaman Exp $
+ * $Id: familiar.h,v 1.3 2002/08/14 21:50:01 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -34,7 +34,6 @@ struct intf_sys_t
 //    GtkWidget *         p_notebook_about;
 //    GtkWidget *         p_notebook_open;
 //    GtkWidget *         p_notebook_preferences;
-    GtkWidget *         p_file_list;
 
     /* The input thread */
     input_thread_t *    p_input;
