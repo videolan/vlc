@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.3 2003/11/07 12:27:30 fenrir Exp $
+ * $Id: livedotcom.cpp,v 1.4 2003/11/07 18:08:54 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -47,23 +47,27 @@ static void DemuxClose( vlc_object_t * );
 static int  AccessOpen ( vlc_object_t * );
 static void AccessClose( vlc_object_t * );
 
+#define CACHING_TEXT N_("Caching value in ms")
+#define CACHING_LONGTEXT N_( \
+    "Allows you to modify the default caching value for rtsp streams. This " \
+    "value should be set in miliseconds units." )
+
 vlc_module_begin();
     set_description( _("live.com (RTSP/RTP/SDP) demuxer" ) );
     set_capability( "demux", 50 );
     set_callbacks( DemuxOpen, DemuxClose );
     add_shortcut( "live" );
-    add_category_hint( N_("live-demuxer"), NULL, VLC_TRUE );
-        add_bool( "rtsp-tcp", 0, NULL,
-                  "Use rtp over rtsp(tcp)",
-                  "Use rtp over rtsp(tcp)", VLC_TRUE );
-
 
     add_submodule();
         set_description( _("RTSP/RTP describe") );
         add_shortcut( "rtsp" );
         set_capability( "access", 0 );
         set_callbacks( AccessOpen, AccessClose );
-
+        add_category_hint( N_("RTSP"), NULL, VLC_TRUE );
+            add_bool( "rtsp-tcp", 0, NULL,
+                      "Use rtp over rtsp(tcp)",
+                      "Use rtp over rtsp(tcp)", VLC_TRUE );
+            add_integer( "rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /* TODO:
@@ -113,12 +117,17 @@ struct demux_sys_t
 
     int              i_track;
     live_track_t     **track;   /* XXX mallocated */
+    mtime_t          i_pcr;
+    mtime_t          i_pcr_start;
 
     char             event;
 };
 
-static ssize_t Read ( input_thread_t *, byte_t *, size_t );
-static int     Demux( input_thread_t * );
+static ssize_t Read   ( input_thread_t *, byte_t *, size_t );
+
+static int     Demux  ( input_thread_t * );
+static int     Control( input_thread_t *, int, va_list );
+
 
 
 /*****************************************************************************
@@ -205,13 +214,16 @@ static int  AccessOpen( vlc_object_t *p_this )
     /* FIXME that's not true but eg over tcp, server send data too fast */
     p_input->stream.b_pace_control = val.b_bool;
     p_input->stream.p_selected_area->i_tell = 0;
-    p_input->stream.b_seekable = 0;
+    p_input->stream.b_seekable = 1; /* Hack to display time */
     p_input->stream.p_selected_area->i_size = 0;
     p_input->stream.i_method = INPUT_METHOD_NETWORK;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* Update default_pts to a suitable value for RTSP access */
-    p_input->i_pts_delay = 4 * DEFAULT_PTS_DELAY;
+    var_Create( p_input, "rtsp-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Get( p_input, "rtsp-caching", &val );
+    p_input->i_pts_delay = val.i_int * 1000;
+
     return VLC_SUCCESS;
 }
 
@@ -279,7 +291,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
     }
 
     p_input->pf_demux = Demux;
-    p_input->pf_demux_control = demux_vaControlDefault;
+    p_input->pf_demux_control = Control;
     p_input->p_demux_data = p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
     p_sys->p_sdp = NULL;
     p_sys->scheduler = NULL;
@@ -288,6 +300,8 @@ static int  DemuxOpen ( vlc_object_t *p_this )
     p_sys->rtsp = NULL;
     p_sys->i_track = 0;
     p_sys->track   = NULL;
+    p_sys->i_pcr   = 0;
+    p_sys->i_pcr_start = 0;
 
     /* Gather the complete sdp file */
     i_sdp = 0;
@@ -390,7 +404,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
             /* Issue the SETUP */
             if( p_sys->rtsp )
             {
-                p_sys->rtsp->setupMediaSubsession( *sub, False, val.i_int ? True : False );
+                p_sys->rtsp->setupMediaSubsession( *sub, False, val.b_bool ? True : False );
             }
         }
     }
@@ -636,7 +650,33 @@ static int  Demux   ( input_thread_t *p_input )
     demux_sys_t    *p_sys = p_input->p_demux_data;
     TaskToken      task;
 
+    mtime_t         i_pcr = 0;
     int             i;
+
+    for( i = 0; i < p_sys->i_track; i++ )
+    {
+        live_track_t *tk = p_sys->track[i];
+
+        if( i_pcr == 0 )
+        {
+            i_pcr = tk->i_pts;
+        }
+        else if( tk->i_pts != 0 && i_pcr > tk->i_pts )
+        {
+            i_pcr = tk->i_pts ;
+        }
+    }
+    if( i_pcr != p_sys->i_pcr )
+    {
+        input_ClockManageRef( p_input,
+                              p_input->stream.p_selected_program,
+                              i_pcr * 9 / 100 );
+        p_sys->i_pcr = i_pcr;
+        if( p_sys->i_pcr_start <= 0 || p_sys->i_pcr_start > i_pcr )
+        {
+            p_sys->i_pcr_start = i_pcr;
+        }
+    }
 
     /* First warm we want to read data */
     p_sys->event = 0;
@@ -664,7 +704,22 @@ static int  Demux   ( input_thread_t *p_input )
     return p_input->b_error ? 0 : 1;
 }
 
+static int    Control( input_thread_t *p_input, int i_query, va_list args )
+{
+    demux_sys_t *p_sys = p_input->p_demux_data;
+    int64_t *pi64;
 
+    switch( i_query )
+    {
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = p_sys->i_pcr - p_sys->i_pcr_start;
+            return VLC_SUCCESS;
+
+        default:
+            return demux_vaControlDefault( p_input, i_query, args );
+    }
+}
 
 /*****************************************************************************
  *
@@ -702,9 +757,6 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
 
     if( i_pts != tk->i_pts )
     {
-        input_ClockManageRef( p_input,
-                              p_input->stream.p_selected_program,
-                              i_pts * 9 / 100 );
         p_pes->i_dts =
         p_pes->i_pts = input_ClockGetTS( p_input,
                                          p_input->stream.p_selected_program,
