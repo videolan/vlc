@@ -2,7 +2,7 @@
  * preferences_widgets.h : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2003 VideoLAN
- * $Id: preferences_widgets.h,v 1.1 2003/10/19 22:41:18 sigmunau Exp $
+ * $Id: preferences_widgets.h,v 1.2 2003/10/20 00:09:27 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -29,7 +29,7 @@ public:
     wxSizer *Sizer();
     virtual int GetIntValue();
     virtual float GetFloatValue();
-    virtual const char * GetPszValue();
+    virtual wxString GetPszValue();
 protected:
     wxBoxSizer *sizer;
     wxStaticText *label;
@@ -58,7 +58,7 @@ public:
     ModuleConfigControl( intf_thread_t *p_intf, module_config_t *p_item,
                       wxWindow *parent );
     ~ModuleConfigControl();
-    virtual const char *GetPszValue();
+    virtual wxString GetPszValue();
 private:
     wxComboBox *combo;
 };
@@ -68,7 +68,7 @@ class StringConfigControl: public ConfigControl
 public:
     StringConfigControl( module_config_t *p_item, wxWindow *parent );
     ~StringConfigControl();
-    virtual const char *GetPszValue();
+    virtual wxString GetPszValue();
 private:
     wxTextCtrl *textctrl;
 };
@@ -78,7 +78,7 @@ class StringListConfigControl: public ConfigControl
 public:
     StringListConfigControl( module_config_t *p_item, wxWindow *parent );
     ~StringListConfigControl();
-    virtual const char *GetPszValue();
+    virtual wxString GetPszValue();
 private:
     wxComboBox *combo;
 };
@@ -89,7 +89,7 @@ public:
     FileConfigControl( module_config_t *p_item, wxWindow *parent );
     ~FileConfigControl();
     void FileConfigControl::OnBrowse( wxCommandEvent& );
-    virtual const char *GetPszValue();
+    virtual wxString GetPszValue();
 private:
     DECLARE_EVENT_TABLE()
     wxTextCtrl *textctrl;

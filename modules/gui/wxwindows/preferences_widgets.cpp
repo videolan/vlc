@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.2 2003/10/19 23:38:09 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.3 2003/10/20 00:09:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -69,9 +69,9 @@ float ConfigControl::GetFloatValue()
     return f_value;
 }
 
-const char *ConfigControl::GetPszValue()
+wxString ConfigControl::GetPszValue()
 {
-    return psz_value;
+    return wxString(psz_value ? wxU(psz_value) : wxT(""));
 }
 
 /*****************************************************************************
@@ -184,9 +184,9 @@ ModuleConfigControl::~ModuleConfigControl()
     ;
 }
 
-const char *ModuleConfigControl::GetPszValue()
+wxString ModuleConfigControl::GetPszValue()
 {
-    return combo->GetStringSelection().mb_str();
+    return combo->GetStringSelection();
 }
 
 /*****************************************************************************
@@ -214,9 +214,9 @@ StringConfigControl::~StringConfigControl()
     ;
 }
 
-const char *StringConfigControl::GetPszValue()
+wxString StringConfigControl::GetPszValue()
 {
-    return textctrl->GetValue().mb_str();
+    return textctrl->GetValue();
 }
 
 /*****************************************************************************
@@ -255,9 +255,9 @@ StringListConfigControl::~StringListConfigControl()
     ;
 }
 
-const char *StringListConfigControl::GetPszValue()
+wxString StringListConfigControl::GetPszValue()
 {
-    return combo->GetStringSelection().mb_str();
+    return combo->GetStringSelection();
 }
 
 /*****************************************************************************
@@ -317,9 +317,9 @@ FileConfigControl::~FileConfigControl()
     ;
 }
     
-const char *FileConfigControl::GetPszValue()
+wxString FileConfigControl::GetPszValue()
 {
-    return textctrl->GetValue().mb_str();
+    return textctrl->GetValue();
 }
 
 /*****************************************************************************

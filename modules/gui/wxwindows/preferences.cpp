@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.36 2003/10/19 22:41:18 sigmunau Exp $
+ * $Id: preferences.cpp,v 1.37 2003/10/20 00:09:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -927,8 +927,8 @@ void PrefsPanel::ApplyChanges()
         case CONFIG_ITEM_FILE:
         case CONFIG_ITEM_DIRECTORY:
         case CONFIG_ITEM_MODULE:
-            config_PutPsz( p_intf, config_data->option_name.mb_str(), (char *)
-                           config_data->control->GetPszValue() );
+            config_PutPsz( p_intf, config_data->option_name.mb_str(),
+                           config_data->control->GetPszValue().mb_str() );
             break;
         case CONFIG_ITEM_INTEGER:
         case CONFIG_ITEM_KEY:
