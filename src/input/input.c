@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.259 2003/11/22 12:41:31 gbazin Exp $
+ * $Id: input.c,v 1.260 2003/11/22 13:19:30 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -805,6 +805,12 @@ static void EndThread( input_thread_t * p_input )
 
     input_DumpStream( p_input );
 
+    /* Free demultiplexer's data */
+    module_Unneed( p_input, p_input->p_demux );
+
+    /* Free all ES and destroy all decoder threads */
+    input_EndStream( p_input );
+
     /* Close optional stream output instance */
     if ( p_input->stream.p_sout != NULL )
     {
@@ -842,12 +848,6 @@ static void EndThread( input_thread_t * p_input )
 
     /* Free input_thread_sys_t */
     free( p_input->p_sys );
-
-    /* Free demultiplexer's data */
-    module_Unneed( p_input, p_input->p_demux );
-
-    /* Free all ES and destroy all decoder threads */
-    input_EndStream( p_input );
 
     /* Destroy the stream_t facilities */
     stream_Release( p_input->s );
