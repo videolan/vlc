@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.28 2002/12/06 22:44:03 gitan Exp $
+ * $Id: playlist.c,v 1.29 2002/12/07 22:15:10 gitan Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -111,10 +111,11 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
         msg_Err( p_playlist, "out of memory" );
     }
 
-    p_item->psz_name = psz_target;
-    p_item->psz_uri  = psz_target ;
+    p_item->psz_name = strdup( psz_target );
+    p_item->psz_uri  = strdup( psz_target );
     p_item->i_type = 0;
     p_item->i_status = 0;
+    p_item->b_autodeletion = VLC_FALSE;
 
     return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
 }
