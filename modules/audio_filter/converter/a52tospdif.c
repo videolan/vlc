@@ -2,7 +2,7 @@
  * a52tospdif.c : encapsulates A/52 frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: a52tospdif.c,v 1.7 2002/08/14 00:23:59 massiot Exp $
+ * $Id: a52tospdif.c,v 1.8 2002/08/17 13:26:57 tcastley Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -82,6 +82,7 @@ static int Create( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
+u16 i;
 #ifdef WORDS_BIGENDIAN
     static const u8 p_sync[6] = { 0xF8, 0x72, 0x4E, 0x1F, 0x00, 0x01 };
 #else
