@@ -81,7 +81,7 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
 
     // Add an entry for the "open skin" dialog
     val.psz_string = (char*)kOpenDialog;
-    text.psz_string = "Open skin...";
+    text.psz_string = _("Open skin...");
     var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
                 &text );
 
