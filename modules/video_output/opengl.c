@@ -87,6 +87,7 @@ static int  Control      ( vout_thread_t *, int, va_list );
 
 static inline int GetAlignedSize( int );
 
+static int InitTextures( vout_thread_t * );
 static int SendEvents( vlc_object_t *, char const *,
                        vlc_value_t, vlc_value_t, void * );
 
@@ -99,7 +100,11 @@ static int SendEvents( vlc_object_t *, char const *,
 
 vlc_module_begin();
     set_description( _("OpenGL video output") );
+#ifdef SYS_DARWIN
+    set_capability( "video output", 200 );
+#else
     set_capability( "video output", 20 );
+#endif
     add_shortcut( "opengl" );
     set_callbacks( CreateVout, DestroyVout );
 
@@ -179,7 +184,7 @@ static int CreateVout( vlc_object_t *p_this )
         module_Need( p_sys->p_vout, "opengl provider", NULL, 0 );
     if( p_sys->p_vout->p_module == NULL )
     {
-        msg_Err( p_vout, "No OpenGL provider found" );
+        msg_Warn( p_vout, "No OpenGL provider found" );
         vlc_object_detach( p_sys->p_vout );
         vlc_object_destroy( p_sys->p_vout );
         return VLC_ENOOBJ;
@@ -191,6 +196,8 @@ static int CreateVout( vlc_object_t *p_this )
     p_vout->pf_render = Render;
     p_vout->pf_display = DisplayVideo;
     p_vout->pf_control = Control;
+
+    var_Create( p_sys->p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* Forward events from the opengl provider */
     var_AddCallback( p_sys->p_vout, "mouse-x", SendEvents, p_vout );
@@ -207,7 +214,7 @@ static int CreateVout( vlc_object_t *p_this )
 static int Init( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
-    int i_pixel_pitch, i_index;
+    int i_pixel_pitch;
     vlc_value_t val;
 
     p_sys->p_vout->pf_init( p_sys->p_vout );
@@ -281,45 +288,7 @@ static int Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES = 1;
 
-    glGenTextures( 2, p_sys->p_textures );
-
-    for( i_index = 0; i_index < 2; i_index++ )
-    {
-        glBindTexture( VLCGL_TARGET, p_sys->p_textures[i_index] );
-    
-        /* Set the texture parameters */
-        glTexParameterf( VLCGL_TARGET, GL_TEXTURE_PRIORITY, 1.0 );
-    
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP );
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP );
-    
-        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-#ifdef SYS_DARWIN
-        /* Tell the driver not to make a copy of the texture but to use
-           our buffer */
-        glEnable( GL_UNPACK_CLIENT_STORAGE_APPLE );
-        glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
-    
-#if 0
-        /* Use VRAM texturing */
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
-                         GL_STORAGE_CACHED_APPLE );
-#else
-        /* Use AGP texturing */
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
-                         GL_STORAGE_SHARED_APPLE );
-#endif
-#endif
-
-        /* Call glTexImage2D only once, and use glTexSubImage2D later */
-        glTexImage2D( VLCGL_TARGET, 0, 3, p_sys->i_tex_width,
-                      p_sys->i_tex_height, 0, VLCGL_FORMAT, VLCGL_TYPE,
-                      p_sys->pp_buffer[i_index] );
-    }
+    InitTextures( p_vout );
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
@@ -410,7 +379,49 @@ static void DestroyVout( vlc_object_t *p_this )
 static int Manage( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
-    return p_sys->p_vout->pf_manage( p_sys->p_vout );
+    int i_ret, i_fullscreen_change;
+
+    i_fullscreen_change = ( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE );
+
+    p_sys->p_vout->i_changes = p_vout->i_changes;
+    i_ret = p_sys->p_vout->pf_manage( p_sys->p_vout );
+    p_vout->i_changes = p_sys->p_vout->i_changes;
+
+#ifdef SYS_DARWIN
+    /* On OS X, we create the window and the GL view when entering
+       fullscreen - the textures have to be inited again */
+    if( i_fullscreen_change )
+    {
+        InitTextures( p_vout );
+
+        switch( p_sys->i_effect )
+        {
+            case OPENGL_EFFECT_CUBE:
+                glEnable( GL_CULL_FACE );
+                break;
+
+            case OPENGL_EFFECT_TRANSPARENT_CUBE:
+                glDisable( GL_DEPTH_TEST );
+                glEnable( GL_BLEND );
+                glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+                break;
+        }
+
+        if( p_sys->i_effect & ( OPENGL_EFFECT_CUBE |
+                    OPENGL_EFFECT_TRANSPARENT_CUBE ) )
+        {
+            /* Set the perpective */
+            glMatrixMode( GL_PROJECTION );
+            glLoadIdentity();
+            glFrustum( -1.0, 1.0, -1.0, 1.0, 3.0, 20.0 );
+            glMatrixMode( GL_MODELVIEW );
+            glLoadIdentity();
+            glTranslatef( 0.0, 0.0, - 5.0 );
+        }
+    }
+#endif
+
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -561,6 +572,55 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
         return p_sys->p_vout->pf_control( p_sys->p_vout, i_query, args );
     else
         return vout_vaControlDefault( p_vout, i_query, args );
+}
+
+static int InitTextures( vout_thread_t *p_vout )
+{
+    vout_sys_t *p_sys = p_vout->p_sys;
+    int i_index;
+
+    glDeleteTextures( 2, p_sys->p_textures );
+    glGenTextures( 2, p_sys->p_textures );
+
+    for( i_index = 0; i_index < 2; i_index++ )
+    {
+        glBindTexture( VLCGL_TARGET, p_sys->p_textures[i_index] );
+    
+        /* Set the texture parameters */
+        glTexParameterf( VLCGL_TARGET, GL_TEXTURE_PRIORITY, 1.0 );
+    
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP );
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP );
+    
+        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+
+#ifdef SYS_DARWIN
+        /* Tell the driver not to make a copy of the texture but to use
+           our buffer */
+        glEnable( GL_UNPACK_CLIENT_STORAGE_APPLE );
+        glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
+    
+#if 0
+        /* Use VRAM texturing */
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
+                         GL_STORAGE_CACHED_APPLE );
+#else
+        /* Use AGP texturing */
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
+                         GL_STORAGE_SHARED_APPLE );
+#endif
+#endif
+
+        /* Call glTexImage2D only once, and use glTexSubImage2D later */
+        glTexImage2D( VLCGL_TARGET, 0, 3, p_sys->i_tex_width,
+                      p_sys->i_tex_height, 0, VLCGL_FORMAT, VLCGL_TYPE,
+                      p_sys->pp_buffer[i_index] );
+    }
+
+    return 0;
 }
 
 /*****************************************************************************

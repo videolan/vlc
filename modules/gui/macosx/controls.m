@@ -291,7 +291,9 @@
                 }
                 else
                 {
-                    [o_window toggleFullscreen];
+                    vlc_value_t val;
+                    var_Get( p_vout, "fullscreen", &val );
+                    var_Set( p_vout, "fullscreen", (vlc_value_t)!val.b_bool );
                 }
                 break;
             }
