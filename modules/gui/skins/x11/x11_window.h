@@ -2,7 +2,7 @@
  * x11_window.h: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.h,v 1.6 2003/06/17 18:13:18 asmax Exp $
+ * $Id: x11_window.h,v 1.7 2003/10/19 20:32:21 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -95,6 +95,7 @@ class X11Window : public SkinWindow
         virtual bool ProcessOSEvent( Event *evt );
 
         // Window graphic aspect
+        virtual void ToggleOnTop();
         virtual void OSShow( bool show );
         virtual void RefreshFromImage( int x, int y, int w, int h );
         virtual void SetTransparency( int Value = -1 );
