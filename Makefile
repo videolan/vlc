@@ -90,6 +90,8 @@ FFILTER = grep -v "intf_.*Msg.*\.\.\."
 # Note that electric fence and accurate profiling are quite uncompatible.
 CCFLAGS += -g
 CCFLAGS += -pg
+LCFLAGS += -g
+LCFLAGS += -pg
 #LIB += -ldmalloc
 #LIB += -lefence
 
