@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.11 2002/02/19 00:50:19 sam Exp $
+ * $Id: vout_events.c,v 1.12 2002/04/01 16:08:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -73,26 +73,23 @@ void DirectXEventThread( vout_thread_t *p_vout )
     /* Create a window for the video */
     /* Creating a window under Windows also initializes the thread's event
      * message qeue */
+    vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
     if( DirectXCreateWindow( p_vout ) )
     {
         intf_ErrMsg( "vout error: can't create window" );
         p_vout->p_sys->i_event_thread_status = THREAD_FATAL;
-        /* signal the creation of the window */
-        vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
-        vlc_cond_signal( &p_vout->p_sys->event_thread_wait );
-        vlc_mutex_unlock( &p_vout->p_sys->event_thread_lock );
-        return;
+        p_vout->p_sys->b_event_thread_die = 1;
     }
+    else p_vout->p_sys->i_event_thread_status = THREAD_READY;
 
     /* signal the creation of the window */
-    p_vout->p_sys->i_event_thread_status = THREAD_READY;
-    vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
     vlc_cond_signal( &p_vout->p_sys->event_thread_wait );
     vlc_mutex_unlock( &p_vout->p_sys->event_thread_lock );
 
     /* Main loop */
     /* GetMessage will sleep if there's no message in the queue */
-    while( GetMessage( &msg, p_vout->p_sys->hwnd, 0, 0 ) )
+    while( !p_vout->p_sys->b_event_thread_die
+           && GetMessage( &msg, p_vout->p_sys->hwnd, 0, 0 ) )
     {
 
         /* Check if we are asked to exit */
@@ -516,7 +513,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         break;
 
     case WM_ACTIVATE:
-        intf_WarnMsg( 4, "vout: WinProc WM_ACTIVE" );
+        intf_WarnMsg( 4, "vout: WinProc WM_ACTIVATE" );
         break;
 
     case WM_CREATE:

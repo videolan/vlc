@@ -2,7 +2,7 @@
  * ac3_downmix_3dn.c: accelerated 3D Now! ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_3dn.c,v 1.9 2001/12/30 07:09:54 sam Exp $
+ * $Id: ac3_downmix_3dn.c,v 1.10 2002/04/01 16:08:23 gbazin Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -28,7 +28,7 @@
 
 #include "ac3_downmix.h"
 
-const float sqrt2_3dn __asm__ ("sqrt2_3dn") = 0.7071068;
+static const float sqrt2_3dn __asm__ ("sqrt2_3dn") = 0.7071068;
 
 void _M( downmix_3f_2r_to_2ch ) (float * samples, dm_par_t * dm_par)
 {

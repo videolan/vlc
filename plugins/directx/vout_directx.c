@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.28 2002/03/28 10:17:06 gbazin Exp $
+ * $Id: vout_directx.c,v 1.29 2002/04/01 16:08:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -168,13 +168,13 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* We need to wait for the actual creation of the thread and window */
+    vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
     if( p_vout->p_sys->i_event_thread_status == THREAD_CREATE )
     {
-        vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
         vlc_cond_wait ( &p_vout->p_sys->event_thread_wait,
                         &p_vout->p_sys->event_thread_lock );
-        vlc_mutex_unlock( &p_vout->p_sys->event_thread_lock );
     }
+    vlc_mutex_unlock( &p_vout->p_sys->event_thread_lock );
     if( p_vout->p_sys->i_event_thread_status != THREAD_READY )
     {
         intf_ErrMsg( "vout error: DirectXEventThread failed" );
