@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.10 2002/06/07 14:30:41 sam Exp $
+ * $Id: mpeg_audio.c,v 1.11 2002/07/11 18:57:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -264,6 +264,58 @@ static int MPEGAudio_DecodedFrameSize( mpegaudio_format_t *p_mpeg )
     return( 0 );
 }
 
+static int MPEGAudio_SkipID3Tag( input_thread_t *p_input )
+{
+    int count;
+    byte_t *p_peek;
+    byte_t version, revision;
+    int b_footer;
+    int i_size;
+
+    msg_Dbg( p_input, "Checking for ID3 tag" );
+    /* get 10 byte id3 header */    
+    if( ( count = input_Peek( p_input, &p_peek, 10 ) ) < 10 )
+    {
+        msg_Err( p_input, "cannot peek()" );
+        return( -1 );
+    }
+/*
+    msg_Info( p_input, "Three first bytes are: %d %d %d",
+              p_peek[0],
+              p_peek[1],
+              p_peek[2]  
+              );
+*/
+    if ( !( (p_peek[0] == 0x49) && (p_peek[1] == 0x44) && (p_peek[2] == 0x33)))
+    {
+        return( 0 );
+    }
+    
+    version = p_peek[3];  /* These may become usfull later, */
+    revision = p_peek[4]; /* but we ignore them for now */
+
+    b_footer = p_peek[5] & 0x10;
+    i_size = (p_peek[6] << 21) +
+             (p_peek[7] << 14) +
+             (p_peek[8] << 7) +
+             p_peek[9];  //Is this safe?
+    if ( b_footer )
+    {
+        i_size += 10;
+    }
+    i_size += 10;
+    msg_Dbg( p_input, "ID3 tag found, skiping %d bytes", i_size );
+    if ( input_Peek( p_input, &p_peek, i_size ) < i_size )
+    {
+        msg_Err( p_input, "cannot peek()" );
+        return( -1 );
+    }
+        
+    p_input->p_current_data += i_size; //seek passed end of ID3 tag
+
+    return (0);
+}
+
 /*****************************************************************************
  * MPEGAudio_FindFrame : Find a header that could be valid. 
  *****************************************************************************
@@ -417,11 +469,17 @@ static int MPEGAudioInit( input_thread_t * p_input )
         b_forced = 0;
     }
 
+    if ( MPEGAudio_SkipID3Tag( p_input ) )
+    {
+        return -1;
+    }
+    
     /* check if it can be a ps stream */
     if( __CheckPS(  p_input ) && !b_forced )
     {
         return( -1 );
     }
+
     /* must be sure that is mpeg audio stream */
     if( MPEGAudio_FindFrame( p_input, 
                              &i_pos, 
