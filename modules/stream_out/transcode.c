@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.2 2003/04/14 03:13:30 fenrir Exp $
+ * $Id: transcode.c,v 1.3 2003/04/16 16:33:35 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -700,8 +700,12 @@ static int transcode_video_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_i
     id->ff_enc_c->width          = id->f_dst.i_width;
     id->ff_enc_c->height         = id->f_dst.i_height;
     id->ff_enc_c->bit_rate       = id->f_dst.i_bitrate;
+#if LIBAVCODEC_BUILD >= 4662
     id->ff_enc_c->frame_rate     = 25 ; // FIXME as it break mpeg
     id->ff_enc_c->frame_rate_base= 1;
+#else
+    id->ff_enc_c->frame_rate     = 25 * FRAME_RATE_BASE;
+#endif
     id->ff_enc_c->gop_size       = 25;
     id->ff_enc_c->qmin           = 2;
     id->ff_enc_c->qmax           = 31;
