@@ -1621,7 +1621,7 @@ dnl  Screen capture module
 dnl
 AC_ARG_ENABLE(screen,
   [  --enable-screen            Screen capture support (default enabled)])
-if test "${enable_screen}" != "no"; then
+if test "${enable_screen}" != "no" && test "${SYS}" != "darwin"; then
   if test "${SYS}" != "mingw32"; then
     CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
     AC_CHECK_HEADERS(X11/Xlib.h, [
