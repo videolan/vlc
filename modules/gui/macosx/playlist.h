@@ -2,7 +2,7 @@
  * playlist.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.h,v 1.13 2003/11/16 11:21:48 bigben Exp $
+ * $Id: playlist.h,v 1.14 2003/11/17 13:05:17 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -54,6 +54,9 @@
     IBOutlet id o_random_ckb;
     IBOutlet id o_loop_ckb;
     IBOutlet id o_repeat_ckb;
+
+    IBOutlet id o_search_keyword;
+
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
@@ -63,6 +66,7 @@
 - (IBAction)playItem:(id)sender;
 - (IBAction)deleteItems:(id)sender;
 - (IBAction)selectAll:(id)sender;
+- (IBAction)searchItem:(id)sender;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 

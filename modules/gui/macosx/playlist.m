@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.39 2003/11/16 11:21:48 bigben Exp $
+ * $Id: playlist.m,v 1.40 2003/11/17 13:05:17 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -30,6 +30,7 @@
 #include <string.h>
 #include <math.h>
 #include <sys/mount.h>
+#include <vlc_keys.h>
 
 #include "intf.h"
 #include "playlist.h"
@@ -143,6 +144,7 @@
     [o_random_ckb setTitle: _NS("Random")];
     [o_loop_ckb setTitle: _NS("Repeat All")];
     [o_repeat_ckb setTitle: _NS("Repeat One")];
+
 }
 
 - (BOOL)tableView:(NSTableView *)o_tv 
@@ -260,6 +262,54 @@
     [o_table_view selectAll: nil];
 }
 
+
+- (IBAction)searchItem:(id)sender
+{
+    int i_start;
+    int i_current;
+    id o_current_name;
+
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                               FIND_ANYWHERE );
+    if ( [o_table_view selectedRow] == [o_table_view numberOfRows]-1 )
+    {
+         i_start = -1;
+    }
+    else 
+    {
+         i_start = [o_table_view selectedRow];
+    }
+
+    for ( i_current = i_start + 1 ; i_current < [o_table_view numberOfRows] ; i_current++ )
+    {
+
+        if( p_playlist == NULL )
+        {
+            o_current_name = nil;
+        }
+
+
+        else 
+        {
+            vlc_mutex_lock( &p_playlist->object_lock );
+            o_current_name = [[NSString stringWithUTF8String: 
+                p_playlist->pp_items[i_current]->psz_name] lastPathComponent]; 
+            vlc_mutex_unlock( &p_playlist->object_lock );
+        }
+
+        if( [o_current_name rangeOfString:[o_search_keyword stringValue] options:NSCaseInsensitiveSearch ].length )
+        {
+             [o_table_view selectRow: i_current byExtendingSelection: NO];
+             [o_table_view scrollRowToVisible: i_current];
+             break;
+        }
+    [o_table_view selectRow: i_current byExtendingSelection: NO];
+    [o_table_view scrollRowToVisible: i_current];
+    }
+    vlc_object_release( p_playlist );
+}
+
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue
 {
     int i_item;
@@ -373,6 +423,7 @@
     [o_table_view selectRow: i_row byExtendingSelection: NO];
     [o_table_view scrollRowToVisible: i_row];
 }
+    
 
 @end
 

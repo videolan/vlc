@@ -324,6 +324,7 @@
                 deleteItems = id; 
                 playItem = id; 
                 savePlaylist = id; 
+                searchItem = id; 
                 selectAll = id; 
                 toggleWindow = id; 
             }; 
@@ -338,6 +339,7 @@
                 "o_mi_selectall" = id; 
                 "o_random_ckb" = id; 
                 "o_repeat_ckb" = id; 
+                "o_search_keyword" = id; 
                 "o_status_field" = id; 
                 "o_table_view" = id; 
                 "o_tc_author" = id; 
