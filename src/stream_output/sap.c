@@ -2,7 +2,7 @@
  * sap.c : SAP announce handler
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: sap.c 7307 2004-04-07 23:13:03Z fenrir $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -436,14 +436,19 @@ static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
 
 static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
 {
+    int64_t i_sdp_id = mdate();
+    int     i_sdp_version = 1 + p_sap->i_sessions + (rand()&0xfff);
+
+    /* see the lists in modules/stream_out/rtp.c for compliance stuff */
     p_session->psz_sdp = (char *)malloc(
-                            sizeof("v=0\n"
-                                   "o=- 12 12 IN IP4 127.0.0.1\n" /* FIXME */
-                                   "s=\n"
-                                   "c=IN IP4 /\n"
-                                   "m=video  udp\n"
-                                   "a=tool:VLC "VERSION"\n"
-                                   "a=type:broadcast")
+                            sizeof("v=0\r\n"
+                                   "o=- 45383436098 45398  IN IP4 127.0.0.1\r\n" /* FIXME */
+                                   "s=\r\n"
+                                   "t=0 0\r\n"
+                                   "c=IN IP4 /\r\n"
+                                   "m=video  udp\r\n"
+                                   "a=tool:"PACKAGE_STRING"\r\n"
+                                   "a=type:broadcast\r\n")
                            + strlen( p_session->psz_name )
                            + strlen( p_session->psz_uri ) + 300 );
     if( !p_session->psz_sdp )
@@ -452,13 +457,15 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
         return VLC_ENOMEM;
     }
     sprintf( p_session->psz_sdp,
-                            "v=0\n"
-                            "o=- 12 12 IN IP4 127.0.0.1\n"
-                            "s=%s\n"
-                            "c=IN IP4 %s/%d\n"
-                            "m=video %d udp %d\n"
-                            "a=tool:VLC "VERSION"\n"
-                            "a=type:broadcast\n",
+                            "v=0\r\n"
+                            "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n"
+                            "s=%s\r\n"
+                            "t=0 0\r\n"
+                            "c=IN IP4 %s/%d\r\n"
+                            "m=video %d udp %d\r\n"
+                            "a=tool:"PACKAGE_STRING"\r\n"
+                            "a=type:broadcast\r\n",
+                            i_sdp_id, i_sdp_version,
                             p_session->psz_name,
                             p_session->psz_uri, p_session->i_ttl,
                             p_session->i_port, p_session->i_payload );
