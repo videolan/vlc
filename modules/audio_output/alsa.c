@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.14 2002/10/20 12:23:47 massiot Exp $
+ * $Id: alsa.c,v 1.15 2002/10/22 20:55:27 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -99,15 +99,13 @@ static int Open( vlc_object_t *p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
     char * psz_device;
-    int i_buffer_size;
+    int i_buffer_size = ALSA_DEFAULT_BUFFER_SIZE;
+    int i_format = SND_PCM_FORMAT_S16;
 
     snd_pcm_hw_params_t *p_hw;
     snd_pcm_sw_params_t *p_sw;
 
     int i_snd_rc = -1;
-
-    int i_format;
-
 
     /* Allocate structures */
     p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
@@ -164,7 +162,7 @@ static int Open( vlc_object_t *p_this )
         else
         {
             i_buffer_size = ALSA_SPDIF_BUFFER_SIZE;
-            i_format = SND_PCM_FORMAT_S16_NE;
+            i_format = SND_PCM_FORMAT_S16;
 
             p_aout->output.i_nb_samples = ALSA_SPDIF_PERIOD_SIZE;
             p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
@@ -195,7 +193,7 @@ static int Open( vlc_object_t *p_this )
         else
         {
             p_aout->output.output.i_format = AOUT_FMT_S16_NE;
-            i_format = SND_PCM_FORMAT_S16_NE;
+            i_format = SND_PCM_FORMAT_S16;
         }
 
         i_buffer_size = ALSA_DEFAULT_BUFFER_SIZE;
@@ -269,7 +267,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Set buffer size. */
     i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm, p_hw,
-                                                       p_sys->i_buffer_size );
+                                                       i_buffer_size );
     if( i_snd_rc < 0 )
     {
         msg_Err( p_aout, "unable to set buffer size" );
