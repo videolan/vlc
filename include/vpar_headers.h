@@ -27,28 +27,41 @@ typedef struct quant_matrix_s
 
 /*****************************************************************************
  * sequence_t : sequence descriptor
+ *****************************************************************************
+ * This structure should only be changed when reading the sequence header,
+ * or exceptionnally some extension structures (like quant_matrix).
  *****************************************************************************/
 typedef struct sequence_s
 {
-    u32                 i_height, i_width, i_size;
+    u32                 i_height, i_width;      /* height and width of the lum
+                                                 * comp of the picture       */
+    u32                 i_size;       /* total number of pel of the lum comp */
     u32                 i_mb_height, i_mb_width, i_mb_size;
-    unsigned int        i_aspect_ratio, i_matrix_coefficients;
-    float               r_frame_rate;
-    boolean_t           b_mpeg2;
-    boolean_t           b_progressive;
-    unsigned int        i_scalable_mode;
+                                            /* the same, in macroblock units */
+    unsigned int        i_aspect_ratio;        /* height/width display ratio */
+    unsigned int        i_matrix_coefficients;/* coeffs of the YUV transform */
+    float               r_frame_rate;       /* theoritical frame rate in fps */
+    boolean_t           b_mpeg2;                                    /* guess */
+    boolean_t           b_progressive;              /* progressive (ie.
+                                                     * non-interlaced) frame */
+    unsigned int        i_scalable_mode; /* scalability ; unsupported, but
+                                          * modifies the syntax of the binary
+                                          * stream.                          */
     quant_matrix_t      intra_quant, nonintra_quant;
     quant_matrix_t      chroma_intra_quant, chroma_nonintra_quant;
+                                            /* current quantization matrices */
 
     /* Chromatic information */
-    unsigned int        i_chroma_format;
-    int                 i_chroma_nb_blocks;
-    u32                 i_chroma_width;
+    unsigned int        i_chroma_format;               /* see CHROMA_* below */
+    int                 i_chroma_nb_blocks;       /* number of chroma blocks */
+    u32                 i_chroma_width;/* width of a line of the chroma comp */
     u32                 i_chroma_mb_width, i_chroma_mb_height;
+                                 /* size of a macroblock in the chroma buffer
+                                  * (eg. 8x8 or 8x16 or 16x16)               */
 
     /* Parser context */
-    picture_t *         p_forward;
-    picture_t *         p_backward;
+    picture_t *         p_forward;        /* current forward reference frame */
+    picture_t *         p_backward;      /* current backward reference frame */
 
     /* Copyright extension */
     boolean_t           b_copyright_flag;     /* Whether the following
@@ -61,12 +74,17 @@ typedef struct sequence_s
 
 /*****************************************************************************
  * picture_parsing_t : parser context descriptor
+ *****************************************************************************
+ * This structure should only be changed when reading the picture header.
  *****************************************************************************/
 typedef struct picture_parsing_s
 {
+    /* ISO/CEI 11172-2 backward compatibility */
     boolean_t           pb_full_pel_vector[2];
     int                 i_forward_f_code, i_backward_f_code;
 
+    /* Values from the picture_coding_extension. Please refer to ISO/IEC
+     * 13818-2. */
     int                 ppi_f_code[2][2];
     int                 i_intra_dc_precision;
     boolean_t           b_frame_pred_frame_dct, b_q_scale_type;
@@ -74,34 +92,23 @@ typedef struct picture_parsing_s
     boolean_t           b_alternate_scan, b_progressive_frame;
     boolean_t           b_top_field_first, b_concealment_mv;
     boolean_t           b_repeat_first_field;
-    int                 i_l_stride, i_c_stride;
-
-    f_parse_mb_t        pf_parse_mb;
-
-    /* Used for second field management */
-    int                 i_current_structure;
-
-    picture_t *         p_picture;
-#ifdef VDEC_SMP
-    macroblock_t *      pp_mb[MAX_MB];
-#endif
-
     /* Relative to the current field */
     int                 i_coding_type, i_structure;
-    boolean_t           b_frame_structure;
+    boolean_t           b_frame_structure; /* i_structure == FRAME_STRUCTURE */
 
-    boolean_t           b_error;
+    picture_t *         p_picture;               /* picture buffer from vout */
+    int                 i_current_structure;   /* current parsed structure of
+                                                * p_picture (second field ?) */
+#ifdef VDEC_SMP
+    macroblock_t *      pp_mb[MAX_MB];         /* macroblock buffer to
+                                                * send to the vdec thread(s) */
+#endif
+    boolean_t           b_error;            /* parsing error, try to recover */
+
+    int                 i_l_stride, i_c_stride;
+                                    /* number of coeffs to jump when changing
+                                     * lines (different with field pictures) */
 } picture_parsing_t;
-
-/*****************************************************************************
- * slice_parsing_t : parser context descriptor #2
- *****************************************************************************/
-typedef struct slice_parsing_s
-{
-    unsigned char       i_quantizer_scale;
-    int                 pi_dc_dct_pred[3];          /* ISO/IEC 13818-2 7.2.1 */
-    int                 pppi_pmv[2][2][2];  /* Motion vect predictors, 7.6.3 */
-} slice_parsing_t;
 
 /*****************************************************************************
  * Standard codes
@@ -133,6 +140,11 @@ typedef struct slice_parsing_s
 #define SC_SPAT     2
 #define SC_SNR      3
 #define SC_TEMP     4
+
+/* Chroma types */
+#define CHROMA_420 1
+#define CHROMA_422 2
+#define CHROMA_444 3
 
 /* Pictures types */
 #define I_CODING_TYPE           1

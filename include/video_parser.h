@@ -96,7 +96,6 @@ typedef struct vpar_thread_s
     /* Parser properties */
     sequence_t              sequence;
     picture_parsing_t       picture;
-    slice_parsing_t         slice;
     macroblock_parsing_t    mb;
     video_synchro_t         synchro;
 
@@ -129,11 +128,6 @@ typedef struct vpar_thread_s
     count_t         c_decoded_b_pictures;    /* number of B pictures decoded */
 #endif
 } vpar_thread_t;
-
-/* Chroma types */
-#define CHROMA_420 1
-#define CHROMA_422 2
-#define CHROMA_444 3
 
 /*****************************************************************************
  * Prototypes
@@ -194,7 +188,7 @@ static __inline__ void LoadQuantizerScale( struct vpar_thread_s * p_vpar )
         }
     };
 
-    p_vpar->slice.i_quantizer_scale = ppi_quantizer_scale
+    p_vpar->mb.i_quantizer_scale = ppi_quantizer_scale
            [(!p_vpar->sequence.b_mpeg2 << 1) | p_vpar->picture.b_q_scale_type]
            [GetBits( &p_vpar->bit_stream, 5 )];
 }

@@ -713,7 +713,7 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
         }
         
         i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
-        i_level = ( ((i_level << 1) + 1) * p_vpar->slice.i_quantizer_scale 
+        i_level = ( ((i_level << 1) + 1) * p_vpar->mb.i_quantizer_scale 
                     * pi_quant[i_pos] ) >> 5;
         p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
     }
@@ -830,11 +830,11 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
     //          p_vpar->pppl_dct_dc_size[i_type][i_select][i_pos].i_length );
     
     /* Read the actual code with the good length */
-    p_vpar->slice.pi_dc_dct_pred[i_cc] += i_dct_dc_diff;
+    p_vpar->mb.pi_dc_dct_pred[i_cc] += i_dct_dc_diff;
 
-    p_mb->ppi_blocks[i_b][0] = ( p_vpar->slice.pi_dc_dct_pred[i_cc] <<
+    p_mb->ppi_blocks[i_b][0] = ( p_vpar->mb.pi_dc_dct_pred[i_cc] <<
                                ( 3 - p_vpar->picture.i_intra_dc_precision ) );
-    i_nc = ( p_vpar->slice.pi_dc_dct_pred[i_cc] != 0 );
+    i_nc = ( p_vpar->mb.pi_dc_dct_pred[i_cc] != 0 );
 
     /* Decoding of the AC coefficients */
     
@@ -955,7 +955,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
 
         i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
         i_level = ( i_level *
-                    p_vpar->slice.i_quantizer_scale *
+                    p_vpar->mb.i_quantizer_scale *
                     pi_quant[i_pos] ) >> 4;
         p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
     }
@@ -1060,9 +1060,9 @@ static __inline__ void MotionVector( vpar_thread_t * p_vpar,
     i_motion_code = MotionCode( p_vpar );
     i_motion_residual = (i_r_size != 0 && i_motion_code != 0) ?
                         GetBits( &p_vpar->bit_stream, i_r_size) : 0;
-    DecodeMotionVector( &p_vpar->slice.pppi_pmv[i_r][i_s][0], i_r_size,
+    DecodeMotionVector( &p_vpar->mb.pppi_pmv[i_r][i_s][0], i_r_size,
                         i_motion_code, i_motion_residual, i_full_pel );
-    p_mb->pppi_motion_vectors[i_r][i_s][0] = p_vpar->slice.pppi_pmv[i_r][i_s][0];
+    p_mb->pppi_motion_vectors[i_r][i_s][0] = p_vpar->mb.pppi_pmv[i_r][i_s][0];
 
     if( p_vpar->mb.b_dmv )
     {
@@ -1085,17 +1085,17 @@ static __inline__ void MotionVector( vpar_thread_t * p_vpar,
     if( (p_vpar->mb.i_mv_format == MOTION_FIELD)
         && (i_structure == FRAME_STRUCTURE) )
     {
-         p_vpar->slice.pppi_pmv[i_r][i_s][1] >>= 1;
+         p_vpar->mb.pppi_pmv[i_r][i_s][1] >>= 1;
     }
     
-    DecodeMotionVector( &p_vpar->slice.pppi_pmv[i_r][i_s][1], i_r_size,
+    DecodeMotionVector( &p_vpar->mb.pppi_pmv[i_r][i_s][1], i_r_size,
                         i_motion_code, i_motion_residual, i_full_pel );
 
     if( (p_vpar->mb.i_mv_format == MOTION_FIELD)
         && (i_structure == FRAME_STRUCTURE) )
-         p_vpar->slice.pppi_pmv[i_r][i_s][1] <<= 1;
+         p_vpar->mb.pppi_pmv[i_r][i_s][1] <<= 1;
      
-    p_mb->pppi_motion_vectors[i_r][i_s][1] = p_vpar->slice.pppi_pmv[i_r][i_s][1];
+    p_mb->pppi_motion_vectors[i_r][i_s][1] = p_vpar->mb.pppi_pmv[i_r][i_s][1];
 
     if( p_vpar->mb.b_dmv )
     {
@@ -1178,10 +1178,10 @@ static __inline__ void DecodeMVMPEG2( vpar_thread_t * p_vpar,
                                             = GetBits( &p_vpar->bit_stream, 1 );
         }
         MotionVector( p_vpar, p_mb, 0, i_s, 0, i_structure );
-        p_vpar->slice.pppi_pmv[1][i_s][0] = p_vpar->slice.pppi_pmv[0][i_s][0];
-        p_vpar->slice.pppi_pmv[1][i_s][1] = p_vpar->slice.pppi_pmv[0][i_s][1];
-        p_mb->pppi_motion_vectors[1][i_s][0] = p_vpar->slice.pppi_pmv[0][i_s][0];
-        p_mb->pppi_motion_vectors[1][i_s][1] = p_vpar->slice.pppi_pmv[0][i_s][1];
+        p_vpar->mb.pppi_pmv[1][i_s][0] = p_vpar->mb.pppi_pmv[0][i_s][0];
+        p_vpar->mb.pppi_pmv[1][i_s][1] = p_vpar->mb.pppi_pmv[0][i_s][1];
+        p_mb->pppi_motion_vectors[1][i_s][0] = p_vpar->mb.pppi_pmv[0][i_s][0];
+        p_mb->pppi_motion_vectors[1][i_s][1] = p_vpar->mb.pppi_pmv[0][i_s][1];
     }
     else
     {
@@ -1622,14 +1622,14 @@ static __inline__ void ParseMacroblock(
         /* Skipped macroblock (ISO/IEC 13818-2 7.6.6). */
 
         /* Reset DC predictors (7.2.1). */
-        p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
-            = p_vpar->slice.pi_dc_dct_pred[2]
+        p_vpar->mb.pi_dc_dct_pred[0] = p_vpar->mb.pi_dc_dct_pred[1]
+            = p_vpar->mb.pi_dc_dct_pred[2]
             = 1 << (7 + p_vpar->picture.i_intra_dc_precision);
 
         if( i_coding_type == P_CODING_TYPE )
         {
             /* Reset motion vector predictors (ISO/IEC 13818-2 7.6.3.4). */
-            memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
+            memset( p_vpar->mb.pppi_pmv, 0, 8*sizeof(int) );
         }
 
         for( i_mb = i_mb_previous + 1; i_mb < *pi_mb_address; i_mb++ )
@@ -1684,7 +1684,7 @@ static __inline__ void ParseMacroblock(
     {
         /* Special No-MC macroblock in P pictures (7.6.3.5). */
         p_mb->i_mb_type |= MB_MOTION_FORWARD;
-        memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
+        memset( p_vpar->mb.pppi_pmv, 0, 8*sizeof(int) );
         memset( p_mb->pppi_motion_vectors, 0, 8*sizeof(int) );
         p_vpar->mb.i_motion_type = 1 + (i_structure == FRAME_STRUCTURE);
         p_mb->ppi_field_select[0][0] = (i_structure == BOTTOM_FIELD);
@@ -1693,8 +1693,8 @@ static __inline__ void ParseMacroblock(
     if( (i_coding_type != I_CODING_TYPE) && !(p_mb->i_mb_type & MB_INTRA) )
     {
         /* Reset DC predictors (7.2.1). */
-        p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
-            = p_vpar->slice.pi_dc_dct_pred[2]
+        p_vpar->mb.pi_dc_dct_pred[0] = p_vpar->mb.pi_dc_dct_pred[1]
+            = p_vpar->mb.pi_dc_dct_pred[2]
             = 1 << (7 + p_vpar->picture.i_intra_dc_precision);
 
         /* Motion function pointer. */
@@ -1731,7 +1731,7 @@ static __inline__ void ParseMacroblock(
         if( !p_vpar->picture.b_concealment_mv )
         {
             /* Reset MV predictors. */
-            memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
+            memset( p_vpar->mb.pppi_pmv, 0, 8*sizeof(int) );
         }
         else
         {
@@ -1830,12 +1830,12 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
     *pi_mb_address = (i_vert_code - 1)*p_vpar->sequence.i_mb_width;
     
     /* Reset DC coefficients predictors (ISO/IEC 13818-2 7.2.1). */
-    p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
-        = p_vpar->slice.pi_dc_dct_pred[2]
+    p_vpar->mb.pi_dc_dct_pred[0] = p_vpar->mb.pi_dc_dct_pred[1]
+        = p_vpar->mb.pi_dc_dct_pred[2]
         = 1 << (7 + p_vpar->picture.i_intra_dc_precision);
 
     /* Reset motion vector predictors (ISO/IEC 13818-2 7.6.3.4). */
-    memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
+    memset( p_vpar->mb.pppi_pmv, 0, 8*sizeof(int) );
 
     do
     {
