@@ -1139,7 +1139,7 @@ AC_ARG_ENABLE(sout,
 if test "${enable_sout}" != "no"
 then
   VLC_ADD_PLUGINS([access_output_dummy access_output_udp access_output_file access_output_http])
-  VLC_ADD_PLUGINS([mux_ps mux_avi mux_mp4 mux_asf mux_dummy mux_wav])
+  VLC_ADD_PLUGINS([mux_ps mux_avi mux_mp4 mux_asf mux_dummy mux_wav mux_mpjpeg])
   VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
   VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
   VLC_ADD_PLUGINS([packetizer_copy])
