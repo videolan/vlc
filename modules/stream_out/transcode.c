@@ -672,8 +672,20 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         if( p_sys->f_fps > 0 )
         {
-            id->p_encoder->fmt_out.video.i_frame_rate = nearbyint(p_sys->f_fps * 1000) ;
-            id->p_encoder->fmt_out.video.i_frame_rate_base = 1000;
+            if( id->p_encoder->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', 'g', 'v' ) ||
+                id->p_encoder->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '1', 'v' ) ||
+                id->p_encoder->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '2', 'v' ) )
+            { /* ffmpeg mpeg1/2 wants integer, 30 not 29.97, for example */
+                p_sys->f_fps = nearbyint(p_sys->f_fps);
+                id->p_encoder->fmt_out.video.i_frame_rate = p_sys->f_fps;
+                id->p_encoder->fmt_out.video.i_frame_rate_base = 1;
+	        }
+            else
+            { /* scale by 1000 so you can get non-integer rates, like 29.97 */
+                id->p_encoder->fmt_out.video.i_frame_rate = 
+                        nearbyint(p_sys->f_fps * 1000) ;
+                id->p_encoder->fmt_out.video.i_frame_rate_base = 1000;
+            }
         }
     }
     else if( p_fmt->i_cat == SPU_ES && (p_sys->i_scodec || p_sys->psz_senc) )
