@@ -151,7 +151,6 @@ int vout_ControlWindow( vout_thread_t *p_vout, void *p_window,
     {
         msg_Err( p_vout, "no pf_control_window");
         vlc_mutex_unlock( &p_intf->object_lock );
-        vlc_object_release( p_intf );
         return VLC_EGENERIC;
     }
 
