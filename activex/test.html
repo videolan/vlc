@@ -1,22 +1,16 @@
 <HTML>
 <TITLE>VLC ActiveX plugin test page</TITLE>
 <BODY>
-<SCRIPT LANGUAGE="JScript">
-<!--
-function go(targetURL)
-{
-	var options = new Array(":input-repeat");
-	document.vlc.addTarget(targetURL, options, 4+8, -666);
-};
-//-->
-</SCRIPT>
 <TABLE>
-<TR><TD>
+<TR><TD colspan="2">
 MRL:
 <INPUT size="80" name="targetTextField" value="">
 <INPUT type=submit value="Go" onClick="go(targetTextField.value);">
 </TD></TR>
-<TR><TD>
+<TR><TD colspan="2">
+<!--
+Insert VideoLAN.VLCPlugin.1 activex control
+-->
 <OBJECT classid="clsid:E23FE9C6-778E-49D4-B537-38FCDE4887D8" codebase="axvlc.cab"
         width="640" height="480" id="vlc" events="True">
 <param name="Src" value="" />
@@ -24,19 +18,121 @@ MRL:
 <param name="Loop" value="False" />
 <param name="AutoPlay" value="False" />
 </OBJECT>
+</TD></TR>
+<TR><TD colspan="2">
+<!--
+Insert MSComctlLib.Slider.2 activex control
+-->
+<OBJECT classid="clsid:F08DF954-8592-11D1-B16A-00C0F0283628"
+        width="640" height="20" id="slider" events="True">
+<param name="TickStyle" value="3" />
+<param name="Min" value="0" />
+<param name="Max" value="0" />
+<param name="Value" value="0" />
+<param name="Enabled" value="False" />
+</OBJECT>
 <SCRIPT LANGUAGE="JScript">
 <!--
+var sliderTimerId = 0;
+var sliderScrolling = false;
+
+function formatTime(timeVal)
+{
+    var timeHour = timeVal;
+    var timeSec = timeHour % 60;
+    timeHour = (timeHour - timeSec)/60;
+    var timeMin = timeHour % 60;
+    timeHour = (timeHour - timeMin)/60;
+    return timeHour+":"+timeMin+":"+timeSec;
+};
+function go(targetURL)
+{
+	var options = new Array(":input-repeat");
+	document.vlc.addTarget(targetURL, options, 4+8, -666);
+    if( ! sliderTimerId )
+    {
+        sliderTimerId = setTimeout("updateSlider()", 1000);
+    }
+};
+function updateSlider()
+{
+    if( ! sliderScrolling )
+    {
+        if( vlc.Length > 0 )
+        {
+            slider.Enabled = true;
+            slider.Max = vlc.Length;
+            slider.Value = vlc.Time;
+            info.innerText = formatTime(vlc.Time)+"/"+formatTime(vlc.Length);
+        }
+        else 
+        {
+            if( slider.Enabled )
+            {
+                slider.Enabled = false;
+                slider.Value = slider.Min;
+            }
+            info.innerText = "---/---";
+        }
+    }
+    if( vlc.Playing )
+    {
+        sliderTimerId = setTimeout("updateSlider()", 1000);
+    }
+    else
+    {
+        sliderTimerId = 0;
+    }
+};
 function vlc::play()
 {
-	alert("VLC is Playing");
+    if( ! sliderTimerId )
+    {
+        sliderTimerId = setTimeout("updateSlider()", 1000);
+    }
 };
 function vlc::pause()
 {
-	alert("VLC has Paused");
+    if( sliderTimerId )
+    {
+        clearTimeout(sliderTimerId)
+        sliderTimerId = 0;
+    }
 };
 function vlc::stop()
 {
-	alert("VLC has Stopped");
+    if( sliderTimerId )
+    {
+        clearTimeout(sliderTimerId)
+        sliderTimerId = 0;
+        if( slider.Enabled )
+        {
+            slider.Value = slider.Min;
+            slider.Enabled = false;
+            info.innerText = "";
+        }
+    }
+};
+function slider::Scroll()
+{
+    slider.Text = formatTime(slider.Value);
+    info.innerText = slider.Text+"/"+formatTime(vlc.Length);
+    if( vlc.Time != slider.Value )
+    {
+        vlc.Time = slider.Value;
+    }
+    sliderScrolling = true;
+};
+function slider::Change()
+{
+    if( sliderScrolling )
+    {
+        sliderScrolling = false;
+    }
+    else if( vlc.Time != slider.Value )
+    {
+        vlc.Time = slider.Value;
+    }
 };
 //-->
 </SCRIPT>
@@ -51,6 +147,8 @@ function vlc::stop()
 <INPUT type=button value="Show" onClick='document.vlc.Visible = true;'>
 <INPUT type=button value="Hide" onClick='document.vlc.Visible = false;'>
 <INPUT type=button value="Version" onClick='alert(document.vlc.VersionInfo);'>
+</TD><TD width="20%">
+<DIV id="info" style="text-align:right"></DIV>
 </TD></TR>
 </TABLE>
 </BODY>
