@@ -173,6 +173,7 @@ struct httpd_file_sys_t
     intf_thread_t    *p_intf;
     httpd_file_t     *p_file;
     httpd_redirect_t *p_redir;
+    httpd_redirect_t *p_redir2;
 
     char          *file;
     char          *name;
@@ -388,9 +389,9 @@ void Close ( vlc_object_t *p_this )
     {
        httpd_FileDelete( p_sys->pp_files[i]->p_file );
        if( p_sys->pp_files[i]->p_redir )
-       {
            httpd_RedirectDelete( p_sys->pp_files[i]->p_redir );
-       }
+       if( p_sys->pp_files[i]->p_redir2 )
+           httpd_RedirectDelete( p_sys->pp_files[i]->p_redir2 );
 
        free( p_sys->pp_files[i]->file );
        free( p_sys->pp_files[i]->name );
@@ -464,7 +465,7 @@ static void Run( intf_thread_t *p_intf )
 /****************************************************************************
  * FileToUrl: create a good name for an url from filename
  ****************************************************************************/
-static char *FileToUrl( char *name )
+static char *FileToUrl( char *name, vlc_bool_t *pb_index )
 {
     char *url, *p;
 
@@ -500,12 +501,14 @@ static char *FileToUrl( char *name )
     }
 #endif
 
+    *pb_index = VLC_FALSE;
     /* index.* -> / */
     if( ( p = strrchr( url, '/' ) ) != NULL )
     {
         if( !strncmp( p, "/index.", 7 ) )
         {
             p[1] = '\0';
+            *pb_index = VLC_TRUE;
         }
     }
     return url;
@@ -594,12 +597,14 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
         if( ParseDirectory( p_intf, psz_root, dir ) )
         {
             httpd_file_sys_t *f = malloc( sizeof( httpd_file_sys_t ) );
+            vlc_bool_t b_index;
 
             f->p_intf  = p_intf;
             f->p_file = NULL;
             f->p_redir = NULL;
+            f->p_redir2 = NULL;
             f->file = strdup( dir );
-            f->name = FileToUrl( &dir[strlen( psz_root )] );
+            f->name = FileToUrl( &dir[strlen( psz_root )], &b_index );
             f->b_html = strstr( &dir[strlen( psz_root )], ".htm" ) ? VLC_TRUE : VLC_FALSE;
 
             if( !f->name )
@@ -621,15 +626,29 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
             {
                 TAB_APPEND( p_sys->i_files, p_sys->pp_files, f );
             }
-            /* For rep/ add a redir from rep to rep/ */
+            /* for url that ends by / add
+             *  - a redirect from rep to rep/
+             *  - in case of index.* rep/index.html to rep/ */
             if( f && f->name[strlen(f->name) - 1] == '/' )
             {
                 char *psz_redir = strdup( f->name );
+                char *p;
                 psz_redir[strlen( psz_redir ) - 1] = '\0';
 
                 msg_Dbg( p_intf, "redir=%s -> %s", psz_redir, f->name );
                 f->p_redir = httpd_RedirectNew( p_sys->p_httpd_host, f->name, psz_redir );
                 free( psz_redir );
+
+                if( b_index && ( p = strstr( f->file, "index." ) ) )
+                {
+                    asprintf( &psz_redir, "%s%s", f->name, p );
+
+                    msg_Dbg( p_intf, "redir=%s -> %s", psz_redir, f->name );
+                    f->p_redir2 = httpd_RedirectNew( p_sys->p_httpd_host,
+                                                     f->name, psz_redir );
+
+                    free( psz_redir );
+                }
             }
         }
     }
