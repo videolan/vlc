@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.28 2003/11/22 19:55:47 fenrir Exp $
+ * $Id: spudec.c,v 1.29 2003/11/22 20:15:34 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -49,7 +49,7 @@ vlc_module_begin();
 
     add_submodule();
     set_description( _("DVD subtitles packetizer") );
-    set_capability( "decoder", 50 );
+    set_capability( "packetizer", 50 );
     set_callbacks( PacketizerOpen, Close );
 vlc_module_end();
 
@@ -193,6 +193,9 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
     if( p_spu )
     {
+        p_spu->i_dts = p_spu->i_pts;
+        p_spu->i_length = 0;
+
         /* reinit context */
         p_sys->i_spu_size = 0;
         p_sys->i_rle_size = 0;
@@ -251,11 +254,10 @@ static block_t *Reassemble( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->i_spu >= p_sys->i_spu_size )
     {
         /* We have a complete sub */
-        block_t *p_ret = p_sys->p_block;
-
         msg_Dbg( p_dec, "SPU packets size=%d should be %d",
                  p_sys->i_spu, p_sys->i_spu_size );
-        return p_ret;
+
+        return p_sys->p_block;
     }
     return NULL;
 }
