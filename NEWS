@@ -1,5 +1,20 @@
 $Id$
 
+Changes between 0.8.0 and 0.8.1-svn:
+-----------------------------------------------------
+
+Core support:
+ * Include TLS/SSL API
+ * SSL support in the HTTP daemon
+
+Windows port:
+ * Fixed multichannel audio support (which was broken in 0.8.0)
+ * Fixed DV and MPEG (WinTV PVR 250/350) support in the dshow input
+
+Stream Output:
+ Encoders:
+  * Fixed aspect ratio and interlaced support in ffmpeg encoder module
+
 Changes between 0.7.2 and 0.8.0:
 -----------------------------------------------------
 
