@@ -1,10 +1,10 @@
 /*****************************************************************************
- * a52sys.c : A/52 input module for vlc
+ * flac.c : FLAC demuc module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: flac.c,v 1.3 2003/05/05 22:23:34 gbazin Exp $
+ * $Id: flac.c,v 1.4 2003/08/17 13:56:26 gbazin Exp $
  *
- * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
 /*****************************************************************************
  * Constants
  *****************************************************************************/
-#define A52_PACKET_SIZE 16384
+#define FLAC_PACKET_SIZE 16384
 #define MAX_PACKETS_IN_FIFO 1
 
 /*****************************************************************************
@@ -88,7 +88,8 @@ static int Init( vlc_object_t * p_this )
         if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "flac", 4 ) )
         {
             /* User forced */
-            msg_Err( p_input, "this doesn't look like an flac stream, continuing" );
+            msg_Err( p_input, "this doesn't look like an flac stream, "
+                     "continuing anyway" );
         }
         else
         {
@@ -104,12 +105,11 @@ static int Init( vlc_object_t * p_this )
     input_AddProgram( p_input, 0, 0 );
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_es = input_AddES( p_input, p_input->stream.p_selected_program, 0xBD,
+    p_es = input_AddES( p_input, p_input->stream.p_selected_program, 1,
                         AUDIO_ES, NULL, 0 );
-    p_es->i_stream_id = 0xBD;
+    p_es->i_stream_id = 1;
     p_es->i_fourcc = VLC_FOURCC('f','l','a','c');
     input_SelectES( p_input, p_es );
-    p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -134,7 +134,7 @@ static int Demux( input_thread_t * p_input )
         return -1;
     }
 
-    i_read = input_SplitBuffer( p_input, &p_data, A52_PACKET_SIZE );
+    i_read = input_SplitBuffer( p_input, &p_data, FLAC_PACKET_SIZE );
 
     if ( i_read <= 0 )
     {
@@ -178,4 +178,3 @@ static int Demux( input_thread_t * p_input )
 
     return 1;
 }
-

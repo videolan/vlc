@@ -2,7 +2,7 @@
  * flac.c: flac decoder module making use of libflac
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: flacdec.c,v 1.2 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: flacdec.c,v 1.3 2003/08/17 13:56:26 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -182,7 +182,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         goto error;
     }
     
-    /* vorbis decoder thread's main loop */
+    /* flac decoder thread's main loop */
     while( (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error) )
     { 
         if ( !FLAC__stream_decoder_process_single( p_dec->p_decoder ) )
@@ -437,6 +437,7 @@ static void decoder_state_error( dec_thread_t *p_dec, FLAC__StreamDecoderState s
         break;
     case FLAC__STREAM_DECODER_UNPARSEABLE_STREAM  : 
         msg_Err( p_dec->p_fifo, "The decoder encountered reserved fields in use in the stream.");
+        FLAC__stream_decoder_flush( p_dec->p_decoder );
         break;
     case FLAC__STREAM_DECODER_MEMORY_ALLOCATION_ERROR  : 
         msg_Err( p_dec->p_fifo, "An error occurred allocating memory.");
