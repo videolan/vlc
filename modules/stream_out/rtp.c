@@ -2,7 +2,7 @@
  * rtp.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: rtp.c,v 1.4 2003/11/01 06:57:51 fenrir Exp $
+ * $Id: rtp.c,v 1.5 2003/11/07 17:43:42 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -30,6 +30,9 @@
 #include <vlc/input.h>
 #include <vlc/sout.h>
 
+#include "httpd.h"
+#include "network.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -56,6 +59,13 @@ struct sout_stream_sys_t
     /* sdp */
     int64_t i_sdp_id;
     int     i_sdp_version;
+    char    *psz_sdp;
+
+    vlc_mutex_t  lock_sdp;
+
+    httpd_t      *p_httpd;
+    httpd_host_t *p_httpd_host;
+    httpd_file_t *p_httpd_file;
 
     /* */
     char *psz_destination;
@@ -78,7 +88,6 @@ struct sout_stream_sys_t
     /* */
     int              i_es;
     sout_stream_id_t **es;
-    char             *psz_sdp;
 };
 
 typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
@@ -107,6 +116,10 @@ struct sout_stream_id_t
     sout_input_t      *p_input;
 };
 static int AccessOutGrabberWrite( sout_access_out_t *, sout_buffer_t * );
+
+static int  HttpCallback( httpd_file_callback_args_t *p_args,
+                          uint8_t *p_request, int i_request,
+                          uint8_t **pp_data, int *pi_data );
 
 /*****************************************************************************
  * Open:
@@ -148,6 +161,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_sdp_id = mdate();
     p_sys->i_sdp_version = 1;
     p_sys->psz_sdp = NULL;
+    p_sys->p_httpd = NULL;
+    p_sys->p_httpd_host = NULL;
+    p_sys->p_httpd_file = NULL;
 
     if( ( val = sout_cfg_find_value( p_stream->p_cfg, "mux" ) ) )
     {
@@ -251,6 +267,43 @@ static int Open( vlc_object_t *p_this )
         p_sys->p_grab   = NULL;
     }
 
+    if( ( val = sout_cfg_find_value( p_stream->p_cfg, "sdp" ) ) )
+    {
+        vlc_url_t url;
+
+        vlc_UrlParse( &url, val, 0 );
+        if( url.psz_protocol && !strcmp( url.psz_protocol, "http" ) )
+        {
+            if( ( p_sys->p_httpd = httpd_Find( VLC_OBJECT(p_stream), VLC_TRUE ) ) )
+            {
+                p_sys->p_httpd_host = p_sys->p_httpd->pf_register_host( p_sys->p_httpd,
+                                                                        url.psz_host,
+                                                                        url.i_port );
+                if( p_sys->p_httpd_host )
+                {
+                    p_sys->p_httpd_file =
+                        p_sys->p_httpd->pf_register_file( p_sys->p_httpd,
+                                                          url.psz_path ? url.psz_path : "/",
+                                                          "application/sdp",
+                                                          NULL, NULL,
+                                                          HttpCallback, HttpCallback,
+                                                          (void*)p_sys );
+                }
+            }
+            if( p_sys->p_httpd_file == NULL )
+            {
+                msg_Err( p_stream, "cannot export sdp as http" );
+            }
+        }
+        else
+        {
+            msg_Warn( p_stream, "unknow protocol for SDP (%s)", url.psz_protocol );
+        }
+        vlc_UrlClean( &url );
+    }
+
+    vlc_mutex_init( p_stream, &p_sys->lock_sdp );
+
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
@@ -279,12 +332,28 @@ static void Close( vlc_object_t * p_this )
         }
     }
 
+    vlc_mutex_destroy( &p_sys->lock_sdp );
+
+    if( p_sys->p_httpd_file )
+    {
+        p_sys->p_httpd->pf_unregister_file( p_sys->p_httpd, p_sys->p_httpd_file );
+    }
+    if( p_sys->p_httpd_host )
+    {
+        p_sys->p_httpd->pf_unregister_host( p_sys->p_httpd, p_sys->p_httpd_host );
+    }
+    if( p_sys->p_httpd )
+    {
+        httpd_Release( p_sys->p_httpd );
+    }
+
     if( p_sys->psz_sdp )
     {
         free( p_sys->psz_sdp );
     }
     free( p_sys );
 }
+
 
 /*****************************************************************************
  * SDPGenerate
@@ -352,13 +421,11 @@ static void SDPGenerate( sout_stream_t *p_stream )
         }
     }
 
-    p = p_sys->psz_sdp;
-    p_sys->psz_sdp = psz_sdp;   /* I hope this avoid a lock (when we export it by http) */
+    vlc_mutex_lock( &p_sys->lock_sdp );
+    free( p_sys->psz_sdp );
+    p_sys->psz_sdp = psz_sdp;
+    vlc_mutex_unlock( &p_sys->lock_sdp );
 
-    if( p )
-    {
-        free( p );
-    }
     p_sys->i_sdp_version++;
 
     fprintf( stderr, "sdp=%s", p_sys->psz_sdp );
@@ -604,6 +671,28 @@ static int     Send     ( sout_stream_t *p_stream, sout_stream_id_t *id, sout_bu
             p_buffer = p_next;
         }
     }
+    return VLC_SUCCESS;
+}
+
+static int  HttpCallback( httpd_file_callback_args_t *p_args,
+                          uint8_t *p_request, int i_request,
+                          uint8_t **pp_data, int *pi_data )
+{
+    sout_stream_sys_t *p_sys = (sout_stream_sys_t*)p_args;
+    vlc_mutex_lock( &p_sys->lock_sdp );
+    if( p_sys->psz_sdp && *p_sys->psz_sdp )
+    {
+        *pi_data = strlen( p_sys->psz_sdp );
+        *pp_data = malloc( *pi_data );
+        memcpy( *pp_data, p_sys->psz_sdp, *pi_data );
+    }
+    else
+    {
+        *pp_data = NULL;
+        *pi_data = 0;
+    }
+    vlc_mutex_unlock( &p_sys->lock_sdp );
+
     return VLC_SUCCESS;
 }
 
