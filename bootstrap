@@ -1,9 +1,16 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.37 2002/12/25 22:36:14 sam Exp $
+##  $Id: bootstrap,v 1.38 2002/12/26 10:55:35 massiot Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
+
+if test x$# != x0; then
+  echo "Usage: ./bootstrap"
+  echo "  Calls automake, autoconf, autoheader, autopoint and other auto* to build"
+  echo "  Makefiles."
+  exit 1
+fi
 
 ###
 ###  Get a sane environment, just in case
