@@ -560,30 +560,28 @@ static int Demux( demux_t *p_demux )
          i_track++ )
     {
         mp4_track_t *tk = &p_sys->track[i_track];
+        vlc_bool_t b;
 
-        if( tk->b_selected && tk->i_sample >= tk->i_sample_count )
+        if( !tk->b_ok ||
+            ( tk->b_selected && tk->i_sample >= tk->i_sample_count ) )
         {
-            msg_Warn( p_demux, "track[0x%x] will be disabled", tk->i_track_ID );
-            MP4_TrackUnselect( p_demux, tk);
+            continue;
         }
-        else if( tk->b_ok )
+
+        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
+
+        if( tk->b_selected && !b )
         {
-            vlc_bool_t b;
-            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
+            MP4_TrackUnselect( p_demux, tk );
+        }
+        else if( !tk->b_selected && b)
+        {
+            MP4_TrackSelect( p_demux, tk, MP4_GetMoviePTS( p_sys ) );
+        }
 
-            if( tk->b_selected && !b )
-            {
-                MP4_TrackUnselect( p_demux, tk );
-            }
-            else if( !tk->b_selected && b)
-            {
-                MP4_TrackSelect( p_demux, tk, MP4_GetMoviePTS( p_sys ) );
-            }
-
-            if( tk->b_selected )
-            {
-                i_track_selected++;
-            }
+        if( tk->b_selected )
+        {
+            i_track_selected++;
         }
     }
 
@@ -616,7 +614,7 @@ static int Demux( demux_t *p_demux )
     {
         mp4_track_t *tk = &p_sys->track[i_track];
 
-        if( !tk->b_ok || !tk->b_selected )
+        if( !tk->b_ok || !tk->b_selected || tk->i_sample >= tk->i_sample_count )
         {
             continue;
         }
@@ -2124,12 +2122,7 @@ static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track )
     }
 
     if( p_track->i_sample >= p_track->i_sample_count )
-    {
-        /* we have reach end of the track so free decoder stuff */
-        msg_Warn( p_demux, "track[0x%x] will be disabled", p_track->i_track_ID );
-        MP4_TrackUnselect( p_demux, p_track );
         return VLC_EGENERIC;
-    }
 
     /* Have we changed chunk ? */
     if( p_track->i_sample >=
