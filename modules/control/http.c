@@ -25,12 +25,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-/*
- * TODO:
- *
+/* TODO:
  * - clean up ?
  * - doc ! (mouarf ;)
- *
  */
 
 #include <stdlib.h>
@@ -41,6 +38,7 @@
 #include <vlc/vout.h> /* for fullscreen */
 
 #include "vlc_httpd.h"
+#include "vlc_vlm.h"
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
@@ -66,8 +64,8 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Activate     ( vlc_object_t * );
-static void Close        ( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 #define HOST_TEXT N_( "Host address" )
 #define HOST_LONGTEXT N_( \
@@ -80,7 +78,7 @@ vlc_module_begin();
         add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
         add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  VLC_TRUE );
     set_capability( "interface", 0 );
-    set_callbacks( Activate, Close );
+    set_callbacks( Open, Close );
 vlc_module_end();
 
 
@@ -121,6 +119,8 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
 
 static char *uri_extract_value( char *psz_uri, char *psz_name,
                                 char *psz_value, int i_value_max );
+static int uri_test_param( char *psz_uri, char *psz_name );
+
 static void uri_decode_url_encoded( char *psz );
 
 static char *Find_end_MRL( char *psz );
@@ -171,6 +171,7 @@ struct intf_sys_t
 
     playlist_t          *p_playlist;
     input_thread_t      *p_input;
+    vlm_t               *p_vlm;
 };
 
 
@@ -178,7 +179,7 @@ struct intf_sys_t
 /*****************************************************************************
  * Activate: initialize and create stuff
  *****************************************************************************/
-static int Activate( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     intf_sys_t    *p_sys;
@@ -213,6 +214,7 @@ static int Activate( vlc_object_t *p_this )
     }
     p_sys->p_playlist = NULL;
     p_sys->p_input    = NULL;
+    p_sys->p_vlm      = NULL;
 
     p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_intf), psz_address, i_port );
     if( p_sys->p_httpd_host == NULL )
@@ -308,6 +310,11 @@ void Close ( vlc_object_t *p_this )
     intf_sys_t    *p_sys = p_intf->p_sys;
 
     int i;
+
+    if( p_sys->p_vlm )
+    {
+        vlm_Delete( p_sys->p_vlm );
+    }
 
     for( i = 0; i < p_sys->i_files; i++ )
     {
@@ -1110,6 +1117,59 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
     return s;
 }
 
+static mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
+{
+    mvar_t        *s = mvar_New( name, "set" );
+    vlm_message_t *msg;
+    int    i;
+
+    fprintf( stderr," mvar_VlmSetNew: name=`%s'\n", name );
+    if( vlm == NULL )
+        return s;
+    if( vlm_ExecuteCommand( vlm, "show", &msg ) )
+    {
+        return s;
+    }
+
+    for( i = 0; i < msg->i_child; i++ )
+    {
+        /* Over media, schedule */
+        vlm_message_t *ch = msg->child[i];
+        int j;
+
+        for( j = 0; j < ch->i_child; j++ )
+        {
+            /* Over name */
+            vlm_message_t *el = ch->child[j];
+            vlm_message_t *inf, *desc;
+            mvar_t        *set;
+            char          psz[500];
+            int k;
+
+            sprintf( psz, "show %s", el->psz_name );
+            if( vlm_ExecuteCommand( vlm, psz, &inf ) )
+                continue;
+            desc = inf->child[0];
+
+            /* Add a node with name and info */
+            set = mvar_New( name, "set" );
+            mvar_AppendNewVar( set, "name", el->psz_name );
+
+            for( k = 0; k < desc->i_child; k++ )
+            {
+                mvar_AppendNewVar( set, desc->child[k]->psz_name, desc->child[k]->psz_value );
+            }
+            vlm_MessageDelete( inf );
+
+            mvar_AppendVar( s, set );
+        }
+    }
+    vlm_MessageDelete( msg );
+
+    return s;
+}
+
+
 static void SSInit( rpn_stack_t * );
 static void SSClean( rpn_stack_t * );
 static void EvaluateRPN( mvar_t  *, rpn_stack_t *, char * );
@@ -1260,6 +1320,15 @@ enum macroType
 
         MVLC_CLOSE,
         MVLC_SHUTDOWN,
+
+        MVLC_VLM_NEW,
+        MVLC_VLM_SETUP,
+        MVLC_VLM_DEL,
+        MVLC_VLM_PLAY,
+        MVLC_VLM_PAUSE,
+        MVLC_VLM_STOP,
+        MVLC_VLM_SEEK,
+
     MVLC_FOREACH,
     MVLC_IF,
     MVLC_RPN,
@@ -1303,6 +1372,15 @@ StrToMacroTypeTab [] =
         /* admin control */
         { "close",          MVLC_CLOSE },
         { "shutdown",       MVLC_SHUTDOWN },
+
+        /* vlm control */
+        { "vlm_new",        MVLC_VLM_NEW },
+        { "vlm_setup",      MVLC_VLM_SETUP },
+        { "vlm_del",        MVLC_VLM_DEL },
+        { "vlm_play",       MVLC_VLM_PLAY },
+        { "vlm_pause",      MVLC_VLM_PAUSE },
+        { "vlm_stop",       MVLC_VLM_STOP },
+        { "vlm_seek",       MVLC_VLM_SEEK },
 
     { "rpn",        MVLC_RPN },
 
@@ -1843,6 +1921,104 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     p_intf->p_vlc->b_die = VLC_TRUE;
                     break;
                 }
+                /* vlm */
+                case MVLC_VLM_NEW:
+                case MVLC_VLM_SETUP:
+                {
+                    static const char *vlm_properties[11] =
+                    {
+                        "input", "output", "option", "enabled", "disabled",
+                        "loop", "unloop", "append", "date", "period", "repeat",
+                    };
+                    vlm_message_t *vlm_answer;
+                    char name[512];
+                    char *psz = malloc( strlen( p_request ) + 1000 );
+                    char *p = psz;
+                    int i;
+
+                    if( p_intf->p_sys->p_vlm == NULL )
+                        p_intf->p_sys->p_vlm = vlm_New( p_intf );
+
+                    uri_extract_value( p_request, "name", name, 512 );
+                    if( StrToMacroType( control ) == MVLC_VLM_NEW )
+                    {
+                        char type[20];
+                        uri_extract_value( p_request, "type", type, 20 );
+                        p += sprintf( psz, "new %s %s", name, type );
+                    }
+                    else
+                    {
+                        p += sprintf( psz, "setup %s", name );
+                    }
+                    /* Parse the request */
+                    for( i = 0; i < 11; i++ )
+                    {
+                        char val[512];
+                        uri_extract_value( p_request, vlm_properties[i], val, 512 );
+                        if( strlen( val ) > 0 )
+                        {
+                            p += sprintf( p, " %s %s", vlm_properties[i], val );
+                        }
+                        else if( uri_test_param( p_request, vlm_properties[i] ) )
+                        {
+                            p += sprintf( p, " %s", vlm_properties[i] );
+                        }
+                    }
+                    vlm_ExecuteCommand( p_intf->p_sys->p_vlm, psz, &vlm_answer );
+                    /* FIXME do a vlm_answer -> var stack conversion */
+                    vlm_MessageDelete( vlm_answer );
+                    free( psz );
+                    break;
+                }
+
+                case MVLC_VLM_DEL:
+                {
+                    vlm_message_t *vlm_answer;
+                    char name[512];
+                    char psz[512+10];
+                    if( p_intf->p_sys->p_vlm == NULL )
+                        p_intf->p_sys->p_vlm = vlm_New( p_intf );
+
+                    uri_extract_value( p_request, "name", name, 512 );
+                    sprintf( psz, "del %s", name );
+
+                    vlm_ExecuteCommand( p_intf->p_sys->p_vlm, psz, &vlm_answer );
+                    /* FIXME do a vlm_answer -> var stack conversion */
+                    vlm_MessageDelete( vlm_answer );
+                    break;
+                }
+
+                case MVLC_VLM_PLAY:
+                case MVLC_VLM_PAUSE:
+                case MVLC_VLM_STOP:
+                case MVLC_VLM_SEEK:
+                {
+                    vlm_message_t *vlm_answer;
+                    char name[512];
+                    char psz[512+10];
+                    if( p_intf->p_sys->p_vlm == NULL )
+                        p_intf->p_sys->p_vlm = vlm_New( p_intf );
+
+                    uri_extract_value( p_request, "name", name, 512 );
+                    if( StrToMacroType( control ) == MVLC_VLM_PLAY )
+                        sprintf( psz, "control %s play", name );
+                    else if( StrToMacroType( control ) == MVLC_VLM_PAUSE )
+                        sprintf( psz, "control %s pause", name );
+                    else if( StrToMacroType( control ) == MVLC_VLM_STOP )
+                        sprintf( psz, "control %s stop", name );
+                    else if( StrToMacroType( control ) == MVLC_VLM_SEEK )
+                    {
+                        char percent[20];
+                        uri_extract_value( p_request, "percent", percent, 512 );
+                        sprintf( psz, "control %s seek %s", name, percent );
+                    }
+
+                    vlm_ExecuteCommand( p_intf->p_sys->p_vlm, psz, &vlm_answer );
+                    /* FIXME do a vlm_answer -> var stack conversion */
+                    vlm_MessageDelete( vlm_answer );
+                    break;
+                }
+
                 default:
                     PRINTS( "<!-- control param(%s) unsuported -->", control );
                     break;
@@ -1939,6 +2115,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
         case MVLC_RPN:
             EvaluateRPN( p_args->vars, &p_args->stack, m->param1 );
             break;
+
         case MVLC_UNKNOWN:
         default:
             PRINTS( "<!-- invalid macro id=`%s' -->", m->id );
@@ -2111,6 +2288,14 @@ static void Execute( httpd_file_sys_t *p_args,
                         else if( !strcmp( m.param2, "informations" ) )
                         {
                             index = mvar_InfoSetNew( m.param1, p_intf->p_sys->p_input );
+                        }
+                        else if( !strcmp( m.param2, "vlm" ) )
+                        {
+                            if( p_intf->p_sys->p_vlm == NULL )
+                            {
+                                p_intf->p_sys->p_vlm = vlm_New( p_intf );
+                            }
+                            index = mvar_VlmSetNew( m.param1, p_intf->p_sys->p_vlm );
                         }
 #if 0
                         else if( !strcmp( m.param2, "hosts" ) )
@@ -2316,6 +2501,22 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
 /****************************************************************************
  * uri parser
  ****************************************************************************/
+static int uri_test_param( char *psz_uri, char *psz_name )
+{
+    char *p = psz_uri;
+
+    while( (p = strstr( p, psz_name )) )
+    {
+        /* Verify that we are dealing with a post/get argument */
+        if( p == psz_uri || *(p - 1) == '&' || *(p - 1) == '\n' )
+        {
+            return VLC_TRUE;
+        }
+        p++;
+    }
+
+    return VLC_FALSE;
+}
 static char *uri_extract_value( char *psz_uri, char *psz_name,
                                 char *psz_value, int i_value_max )
 {

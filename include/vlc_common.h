@@ -311,7 +311,10 @@ typedef struct httpd_redirect_t httpd_redirect_t;
 typedef struct httpd_stream_t httpd_stream_t;
 
 /* divers */
-typedef struct vlc_meta_t vlc_meta_t;
+typedef struct vlc_meta_t    vlc_meta_t;
+
+typedef struct vlm_t         vlm_t;
+typedef struct vlm_message_t vlm_message_t;
 
 
 /*****************************************************************************

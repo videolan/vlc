@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: objects.c,v 1.46 2004/03/03 13:25:24 fenrir Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,6 +52,7 @@
 #include "vlc_codec.h"
 
 #include "vlc_httpd.h"
+#include "vlc_vlm.h"
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -154,6 +155,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_HTTPD:
             i_size = sizeof( httpd_t );
             psz_type = "http daemon";
+            break;
+        case VLC_OBJECT_VLM:
+            i_size = sizeof( vlm_t );
+            psz_type = "vlm dameon";
             break;
         default:
             i_size = i_type > 0

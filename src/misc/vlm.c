@@ -29,40 +29,148 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
-
 #include <vlc/input.h>
 
 #ifdef HAVE_TIME_H
 #   include <time.h>                                              /* ctime() */
 #endif
 
-#include "vlm.h"
+#include "vlc_vlm.h"
 
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static char *vlm_Save( vlm_t * );
-static int   vlm_Load( vlm_t *, char *);
-static vlm_media_t *vlm_MediaNew( vlm_t *, char *, int );
-static int vlm_MediaDelete( vlm_t *, vlm_media_t *, char * );
-static vlm_media_t *vlm_MediaSearch( vlm_t *, char * );
-static int vlm_MediaSetup( vlm_media_t *, char *, char * );
-static int vlm_MediaControl( vlm_t *, vlm_media_t *, char *, char * );
+static char          *vlm_Save( vlm_t * );
+static int            vlm_Load( vlm_t *, char *);
 static vlm_message_t *vlm_Show( vlm_t *, vlm_media_t *, vlm_schedule_t *, char * );
 static vlm_message_t *vlm_Help( vlm_t *, char * );
+
+static vlm_media_t *vlm_MediaNew    ( vlm_t *, char *, int );
+static int          vlm_MediaDelete ( vlm_t *, vlm_media_t *, char * );
+static vlm_media_t *vlm_MediaSearch ( vlm_t *, char * );
+static int          vlm_MediaSetup  ( vlm_media_t *, char *, char * );
+static int          vlm_MediaControl( vlm_t *, vlm_media_t *, char *, char * );
 
 static vlm_message_t* vlm_MessageNew( char * , char * );
 static vlm_message_t* vlm_MessageAdd( vlm_message_t*, vlm_message_t* );
 
 static vlm_schedule_t *vlm_ScheduleNew( vlm_t *, char *);
-static int vlm_ScheduleDelete( vlm_t *, vlm_schedule_t *, char *);
-static int vlm_ScheduleSetup( vlm_schedule_t *, char *, char *);
+static int             vlm_ScheduleDelete( vlm_t *, vlm_schedule_t *, char *);
+static int             vlm_ScheduleSetup( vlm_schedule_t *, char *, char *);
 static vlm_schedule_t *vlm_ScheduleSearch( vlm_t *, char *);
+
 
 static int ExecuteCommand( vlm_t *, char * , vlm_message_t **);
 
 static int Manage( vlc_object_t* );
 
+/*****************************************************************************
+ * vlm_New:
+ *****************************************************************************/
+vlm_t *__vlm_New ( vlc_object_t *p_this )
+{
+    vlc_value_t lockval;
+    vlm_t *vlm = NULL;
+
+    /* to be sure to avoid multiple creation */
+    var_Create( p_this->p_libvlc, "vlm_mutex", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc, "vlm_mutex", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+
+    if( !(vlm = vlc_object_find( p_this, VLC_OBJECT_VLM, FIND_ANYWHERE )) )
+    {
+        msg_Info( p_this, "creating vlm" );
+        if( ( vlm = vlc_object_create( p_this, VLC_OBJECT_VLM ) ) == NULL )
+        {
+            vlc_mutex_unlock( lockval.p_address );
+            return NULL;
+        }
+
+        vlc_mutex_init( p_this->p_vlc, &vlm->lock );
+        vlm->i_media      = 0;
+        vlm->media        = NULL;
+        vlm->i_schedule   = 0;
+        vlm->schedule     = NULL;
+
+        vlc_object_yield( vlm );
+        vlc_object_attach( vlm, p_this->p_vlc );
+    }
+    vlc_mutex_unlock( lockval.p_address );
+
+
+    if( vlc_thread_create( vlm, "vlm thread",
+                           Manage, VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+    {
+        vlc_mutex_destroy( &vlm->lock );
+        vlc_object_destroy( vlm );
+        return NULL;
+    }
+    return vlm;
+}
+
+/*****************************************************************************
+ * vlm_Delete:
+ *****************************************************************************/
+void vlm_Delete( vlm_t *vlm )
+{
+    vlc_value_t lockval;
+    int i;
+
+    var_Get( vlm->p_libvlc, "vlm_mutex", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+
+    vlc_object_release( vlm );
+
+    if( vlm->i_refcount > 0 )
+    {
+        vlc_mutex_unlock( lockval.p_address );
+        return;
+    }
+
+    vlm->b_die = VLC_TRUE;
+    vlc_thread_join( vlm );
+
+    vlc_mutex_destroy( &vlm->lock );
+
+    for( i = 0; i < vlm->i_media; i++ )
+    {
+        vlm_media_t *media = vlm->media[i];
+
+        vlm_MediaDelete( vlm, media, NULL );
+    }
+
+    if( vlm->media ) free( vlm->media );
+
+    for( i = 0; i < vlm->i_schedule; i++ )
+    {
+        vlm_ScheduleDelete( vlm, vlm->schedule[i], NULL );
+    }
+
+    if( vlm->schedule ) free( vlm->schedule );
+
+    vlc_object_detach( vlm );
+    vlc_object_destroy( vlm );
+    vlc_mutex_unlock( lockval.p_address );
+}
+
+/*****************************************************************************
+ * vlm_ExecuteCommand:
+ *****************************************************************************/
+int vlm_ExecuteCommand( vlm_t *vlm, char *command, vlm_message_t **message)
+{
+    int result;
+
+    vlc_mutex_lock( &vlm->lock );
+    result = ExecuteCommand( vlm, command, message );
+    vlc_mutex_unlock( &vlm->lock );
+
+    return result;
+}
+
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
 #if 1
 static char *FindEndCommand( char *psz )
 {
@@ -183,19 +291,8 @@ static char *FindEndCommand( char *psz )
 #endif
 
 
-int vlm_ExecuteCommand( vlm_t *vlm, char *command, vlm_message_t **message)
-{
-    int result;
-
-    vlc_mutex_lock( &vlm->lock );
-    result = ExecuteCommand( vlm, command, message );
-    vlc_mutex_unlock( &vlm->lock );
-
-    return result;
-}
-
 /* Execute a command which ends by '\0' (string) */
-int ExecuteCommand( vlm_t *vlm, char *command , vlm_message_t **p_message)
+static int ExecuteCommand( vlm_t *vlm, char *command , vlm_message_t **p_message)
 {
     int i_return = 0;
     int i_command = 0;
@@ -1009,7 +1106,7 @@ static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_name, cha
     {
         int i;
 
-        if( media->p_input )
+        if( media->p_input );
         {
             input_StopThread( media->p_input );
             input_DestroyThread( media->p_input );
@@ -1690,61 +1787,6 @@ static char *vlm_Save( vlm_t *vlm )
     return save;
 }
 
-/*****************************************************************************
- * vlm_New:
- *****************************************************************************/
-vlm_t *__vlm_New ( vlc_object_t *p_object )
-{
-    vlm_t *vlm = vlc_object_create( p_object , sizeof( vlm_t ) );
-
-    vlc_mutex_init( p_object->p_vlc, &vlm->lock );
-    vlm->i_media      = 0;
-    vlm->media        = NULL;
-    vlm->i_schedule   = 0;
-    vlm->schedule     = NULL;
-
-    if( vlc_thread_create( vlm, "vlm thread",
-                           Manage, VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
-    {
-
-        vlc_mutex_destroy( &vlm->lock );
-        vlc_object_destroy( vlm );
-        return NULL;
-    }
-    return vlm;
-}
-
-/*****************************************************************************
- * vlm_Delete:
- *****************************************************************************/
-void vlm_Delete( vlm_t *vlm )
-{
-    int i;
-
-    vlm->b_die = VLC_TRUE;
-    vlc_thread_join( vlm );
-
-    vlc_mutex_destroy( &vlm->lock );
-
-    for( i = 0; i < vlm->i_media; i++ )
-    {
-        vlm_media_t *media = vlm->media[i];
-
-        vlm_MediaDelete( vlm, media, NULL );
-    }
-
-    if( vlm->media ) free( vlm->media );
-
-    for( i = 0; i < vlm->i_schedule; i++ )
-    {
-        vlm_ScheduleDelete( vlm, vlm->schedule[i], NULL );
-    }
-
-    if( vlm->schedule ) free( vlm->schedule );
-
-    vlc_object_destroy( vlm );
-}
-
 static vlm_schedule_t *vlm_ScheduleNew( vlm_t *vlm , char *psz_name )
 {
     vlm_schedule_t *sched= malloc( sizeof( vlm_schedule_t ));
@@ -1891,7 +1933,9 @@ static int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd, char *psz
     {
         struct tm time;
         char *p;
+        char *psz_time = NULL, *psz_date = NULL;
         time_t date;
+        int i,j,k;
 
         /* First, if date or period are modified, repeat should be equal to -1 */
         schedule->i_repeat = -1;
@@ -1908,36 +1952,39 @@ static int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd, char *psz
 
         /* date should be year/month/day-hour:minutes:seconds */
         p = strchr( psz_value , '-' );
-
-        if( p == NULL && sscanf( psz_value, "%d:%d:%d" , &time.tm_hour, &time.tm_min, &time.tm_sec ) != 3 ) /* it must be a hour:minutes:seconds */
+        if( p )
         {
-            return 1;
+            psz_date = psz_value;
+            psz_time = p + 1;
+
+            *p = '\0';
         }
         else
         {
-            int i,j,k;
+            psz_time = psz_value;
+        }
 
-            switch( sscanf( p + 1, "%d:%d:%d" , &i, &j, &k ) )
-            {
-                case 1:
-                    time.tm_sec = i;
-                    break;
-                case 2:
-                    time.tm_min = i;
-                    time.tm_sec = j;
-                    break;
-                case 3:
-                    time.tm_hour = i;
-                    time.tm_min = j;
-                    time.tm_sec = k;
-                    break;
-                default:
-                    return 1;
-            }
 
-            *p = '\0';
-
-            switch( sscanf( psz_value, "%d/%d/%d" , &i, &j, &k ) )
+        switch( sscanf( psz_time, "%d:%d:%d" , &i, &j, &k ) )
+        {
+            case 1:
+                time.tm_sec = i;
+                break;
+            case 2:
+                time.tm_min = i;
+                time.tm_sec = j;
+                break;
+            case 3:
+                time.tm_hour = i;
+                time.tm_min = j;
+                time.tm_sec = k;
+                break;
+            default:
+                return 1;
+        }
+        if( psz_date )
+        {
+            switch( sscanf( psz_date, "%d/%d/%d" , &i, &j, &k ) )
             {
                 case 1:
                     time.tm_mday = i;
@@ -2086,21 +2133,6 @@ static int Manage( vlc_object_t* p_object )
 }
 
 
-void vlm_MessageDelete( vlm_message_t* message )
-{
-    int i;
-
-    if( message->psz_name ) free( message->psz_name );
-    if( message->psz_value ) free( message->psz_value );
-
-    for( i = 0; i < message->i_child; i++)
-    {
-        vlm_MessageDelete( message->child[i] );
-    }
-
-    free( message );
-}
-
 static vlm_message_t* vlm_MessageNew( char *psz_name , char *psz_value )
 {
     vlm_message_t *message = malloc( sizeof(vlm_message_t) );
@@ -2127,6 +2159,21 @@ static vlm_message_t* vlm_MessageNew( char *psz_name , char *psz_value )
     message->child = NULL;
 
     return message;
+}
+
+void vlm_MessageDelete( vlm_message_t* message )
+{
+    int i;
+
+    if( message->psz_name ) free( message->psz_name );
+    if( message->psz_value ) free( message->psz_value );
+
+    for( i = 0; i < message->i_child; i++)
+    {
+        vlm_MessageDelete( message->child[i] );
+    }
+
+    free( message );
 }
 
 /* add a child */

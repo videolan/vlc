@@ -1,5 +1,5 @@
 /*****************************************************************************
- * .c: VLM interface plugin
+ * vlc_vlm.h: VLM interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
  * $Id$
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,6 +21,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#ifndef _VLC_VLM_H
+#define _VLC_VLM_H 1
 
 /* VLM specific - structures and functions */
 enum
@@ -83,19 +86,17 @@ typedef struct
    The parent node is ( name_of_the_command , NULL ), or
    ( name_of_the_command , message_error ) on error.
    If a node has children, it should not have a value (=NULL).*/
-typedef struct vlm_message
+struct vlm_message_t
 {
     char *psz_name;
     char *psz_value;
 
-    int i_child;
-
-    struct vlm_message **child;
-
-} vlm_message_t;
+    int           i_child;
+    vlm_message_t **child;
+};
 
 
-typedef struct
+struct vlm_t
 {
     VLC_COMMON_MEMBERS
 
@@ -114,12 +115,15 @@ typedef struct
 
     int            i_schedule;
     vlm_schedule_t **schedule;
-} vlm_t;
+};
 
 
 #define vlm_New( a ) __vlm_New( VLC_OBJECT(a) )
-vlm_t *__vlm_New ( vlc_object_t * );
-void   vlm_Delete( vlm_t * );
 
-int vlm_ExecuteCommand( vlm_t *, char *, vlm_message_t **);
-void vlm_MessageDelete( vlm_message_t* );
+VLC_EXPORT( vlm_t *, __vlm_New, ( vlc_object_t * ) );
+VLC_EXPORT( void,    vlm_Delete, ( vlm_t * ) );
+
+VLC_EXPORT( int,     vlm_ExecuteCommand, ( vlm_t *, char *, vlm_message_t **) );
+VLC_EXPORT( void,    vlm_MessageDelete, ( vlm_message_t* ) );
+
+#endif

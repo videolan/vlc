@@ -64,7 +64,7 @@
 
 #include "network.h"
 
-#include "vlm.h"
+#include "vlc_vlm.h"
 
 #if defined( WIN32 ) || defined( UNDER_CE )
 #define SOCKET_CLOSE(a)    closesocket(a)
