@@ -132,6 +132,7 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t        val;
 
     char *psz_effects, *psz_parser;
+    video_format_t fmt = {0};
 
     if( ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2') &&
           p_filter->input.i_format != VLC_FOURCC('f','i','3','2') ) )
@@ -246,12 +247,13 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Open the video output */
-    p_sys->p_vout =
-         vout_Request( p_filter, NULL,
-                       p_sys->i_width, p_sys->i_height,
-                       VLC_FOURCC('I','4','2','0'),
-                       VOUT_ASPECT_FACTOR * p_sys->i_width/p_sys->i_height );
+    fmt.i_width = fmt.i_visible_width = p_sys->i_width;
+    fmt.i_height = fmt.i_visible_height = p_sys->i_height;
+    fmt.i_chroma = VLC_FOURCC('I','4','2','0');
+    fmt.i_aspect = VOUT_ASPECT_FACTOR * p_sys->i_width/p_sys->i_height;
+    fmt.i_sar_num = fmt.i_sar_den = 1;
 
+    p_sys->p_vout = vout_Request( p_filter, NULL, &fmt );
     if( p_sys->p_vout == NULL )
     {
         msg_Err( p_filter, "no suitable vout module" );
@@ -329,7 +331,7 @@ static void Close( vlc_object_t *p_this )
 
     if( p_filter->p_sys->p_vout )
     {
-        vout_Request( p_filter, p_filter->p_sys->p_vout, 0, 0, 0, 0 );
+        vout_Request( p_filter, p_filter->p_sys->p_vout, 0 );
     }
 
     /* Free the list */

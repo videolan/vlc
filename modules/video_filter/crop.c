@@ -134,6 +134,7 @@ static int Init( vout_thread_t *p_vout )
     int   i_index;
     char *psz_var;
     picture_t *p_pic;
+    video_format_t fmt = {0};
 
     I_OUTPUTPICTURES = 0;
 
@@ -247,10 +248,16 @@ static int Init( vout_thread_t *p_vout )
                             * p_vout->output.i_height / p_vout->p_sys->i_height
                             * p_vout->p_sys->i_width / p_vout->output.i_width;
 
+    fmt.i_width = fmt.i_visible_width = p_vout->p_sys->i_width;
+    fmt.i_height = fmt.i_visible_height = p_vout->p_sys->i_height;
+    fmt.i_x_offset = fmt.i_y_offset = 0;
+    fmt.i_chroma = p_vout->render.i_chroma;
+    fmt.i_aspect = p_vout->p_sys->i_aspect;
+    fmt.i_sar_num = p_vout->p_sys->i_aspect * fmt.i_height / fmt.i_width;
+    fmt.i_sar_den = VOUT_ASPECT_FACTOR;
+
     /* Try to open the real video output */
-    p_vout->p_sys->p_vout = vout_Create( p_vout,
-                    p_vout->p_sys->i_width, p_vout->p_sys->i_height,
-                    p_vout->render.i_chroma, p_vout->p_sys->i_aspect );
+    p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );
@@ -310,6 +317,8 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
+    video_format_t fmt = {0};
+
     if( !p_vout->p_sys->b_changed )
     {
         return VLC_SUCCESS;
@@ -317,9 +326,15 @@ static int Manage( vout_thread_t *p_vout )
 
     vout_Destroy( p_vout->p_sys->p_vout );
 
-    p_vout->p_sys->p_vout = vout_Create( p_vout,
-                    p_vout->p_sys->i_width, p_vout->p_sys->i_height,
-                    p_vout->render.i_chroma, p_vout->p_sys->i_aspect );
+    fmt.i_width = fmt.i_visible_width = p_vout->p_sys->i_width;
+    fmt.i_height = fmt.i_visible_height = p_vout->p_sys->i_height;
+    fmt.i_x_offset = fmt.i_y_offset = 0;
+    fmt.i_chroma = p_vout->render.i_chroma;
+    fmt.i_aspect = p_vout->p_sys->i_aspect;
+    fmt.i_sar_num = p_vout->p_sys->i_aspect * fmt.i_height / fmt.i_width;
+    fmt.i_sar_den = VOUT_ASPECT_FACTOR;
+
+    p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );

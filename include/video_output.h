@@ -121,6 +121,10 @@ struct vout_thread_t
     picture_heap_t      output;                          /**< direct buffers */
     vlc_bool_t          b_direct;            /**< rendered are like direct ? */
     vout_chroma_t       chroma;                      /**< translation tables */
+
+    video_format_t      fmt_render;      /* render format (from the decoder) */
+    video_format_t      fmt_in;            /* input (modified render) format */
+    video_format_t      fmt_out;     /* output format (for the video output) */
     /**@}*/
 
     /* Picture heap */
@@ -194,10 +198,10 @@ struct vout_thread_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#define vout_Request(a,b,c,d,e,f) __vout_Request(VLC_OBJECT(a),b,c,d,e,f)
-VLC_EXPORT( vout_thread_t *, __vout_Request,      ( vlc_object_t *, vout_thread_t *, unsigned int, unsigned int, uint32_t, unsigned int ) );
-#define vout_Create(a,b,c,d,e) __vout_Create(VLC_OBJECT(a),b,c,d,e)
-VLC_EXPORT( vout_thread_t *, __vout_Create,       ( vlc_object_t *, unsigned int, unsigned int, uint32_t, unsigned int ) );
+#define vout_Request(a,b,c) __vout_Request(VLC_OBJECT(a),b,c)
+VLC_EXPORT( vout_thread_t *, __vout_Request,    ( vlc_object_t *, vout_thread_t *, video_format_t * ) );
+#define vout_Create(a,b) __vout_Create(VLC_OBJECT(a),b)
+VLC_EXPORT( vout_thread_t *, __vout_Create,       ( vlc_object_t *, video_format_t * ) );
 VLC_EXPORT( void,            vout_Destroy,        ( vout_thread_t * ) );
 VLC_EXPORT( int, vout_VarCallback, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
 

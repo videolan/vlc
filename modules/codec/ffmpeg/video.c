@@ -169,6 +169,8 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         p_dec->fmt_out.video.i_aspect =
             VOUT_ASPECT_FACTOR * ( av_q2d(p_context->sample_aspect_ratio) *
                 p_context->width / p_context->height );
+	p_dec->fmt_out.video.i_sar_num = p_context->sample_aspect_ratio.num;
+	p_dec->fmt_out.video.i_sar_den = p_context->sample_aspect_ratio.den;
 #else
         p_dec->fmt_out.video.i_aspect =
             VOUT_ASPECT_FACTOR * p_context->aspect_ratio;

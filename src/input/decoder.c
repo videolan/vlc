@@ -779,7 +779,7 @@ static void DeleteDecoder( decoder_t * p_dec )
 #undef p_pic
 
         /* We are about to die. Reattach video output to p_vlc. */
-        vout_Request( p_dec, p_dec->p_owner->p_vout, 0, 0, 0, 0 );
+        vout_Request( p_dec, p_dec->p_owner->p_vout, 0 );
     }
 
     if( p_dec->p_owner->p_sout_input )
@@ -885,15 +885,35 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             return NULL;
         }
 
+        if( !p_dec->fmt_out.video.i_sar_num ||
+            !p_dec->fmt_out.video.i_sar_den )
+        {
+            p_dec->fmt_out.video.i_sar_num =
+              p_dec->fmt_out.video.i_aspect * p_dec->fmt_out.video.i_height;
+
+            p_dec->fmt_out.video.i_sar_den = VOUT_ASPECT_FACTOR *
+              p_dec->fmt_out.video.i_width;
+        }
+
+        vlc_reduce( &p_dec->fmt_out.video.i_sar_num,
+                    &p_dec->fmt_out.video.i_sar_den,
+		    p_dec->fmt_out.video.i_sar_num,
+		    p_dec->fmt_out.video.i_sar_den, 0 );
+
+	if( !p_dec->fmt_out.video.i_visible_width ||
+	    !p_dec->fmt_out.video.i_visible_height )
+	{
+	    p_dec->fmt_out.video.i_visible_width =
+	        p_dec->fmt_out.video.i_width;
+	    p_dec->fmt_out.video.i_visible_height =
+	        p_dec->fmt_out.video.i_height;
+	}
+
         p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
         p_sys->video = p_dec->fmt_out.video;
 
         p_sys->p_vout = vout_Request( p_dec, p_sys->p_vout,
-                                      p_sys->video.i_width,
-                                      p_sys->video.i_height,
-                                      p_sys->video.i_chroma,
-                                      p_sys->video.i_aspect );
-
+                                      &p_dec->fmt_out.video );
         if( p_sys->p_vout == NULL )
         {
             msg_Err( p_dec, "failed to create video output" );

@@ -229,6 +229,7 @@ static int Init( vout_thread_t *p_vout )
     int i_index, i_row, i_col, i_width, i_height, i_left, i_top;
     unsigned int i_target_width,i_target_height;
     picture_t *p_pic;
+    video_format_t fmt = {0};
     int i_aspect = 4*VOUT_ASPECT_FACTOR/3;
     int i_align = 0;
     unsigned int i_hstart, i_hend, i_vstart, i_vend;
@@ -268,6 +269,14 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
     var_Create( p_vout, "align", VLC_VAR_INTEGER );
+
+    fmt.i_width = fmt.i_visible_width = p_vout->render.i_width;
+    fmt.i_height = fmt.i_visible_height = p_vout->render.i_height;
+    fmt.i_x_offset = fmt.i_y_offset = 0;
+    fmt.i_chroma = p_vout->render.i_chroma;
+    fmt.i_aspect = p_vout->render.i_aspect;
+    fmt.i_sar_num = p_vout->render.i_aspect * fmt.i_height / fmt.i_width;
+    fmt.i_sar_den = VOUT_ASPECT_FACTOR;
 
     w1 = p_vout->output.i_width / p_vout->p_sys->i_col;
     w1 &= ~1;
@@ -394,12 +403,14 @@ static int Init( vout_thread_t *p_vout )
             var_SetInteger( p_vout, "video-x", i_left + i_xpos - i_width);
             var_SetInteger( p_vout, "video-y", i_top + i_ypos );
 
+            fmt.i_width = fmt.i_visible_width = i_width;
+            fmt.i_height = fmt.i_visible_height = i_height;
+            fmt.i_aspect = i_aspect * i_target_height / i_height *
+                i_width / i_target_width;
+
             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout =
-                vout_Create( p_vout, i_width, i_height,
-                             p_vout->render.i_chroma,
-                             i_aspect * i_target_height / i_height *
-                             i_width / i_target_width );
-            if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout == NULL )
+                vout_Create( p_vout, &fmt );
+            if( !p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout )
             {
                 msg_Err( p_vout, "failed to get %ix%i vout threads",
                                  p_vout->p_sys->i_col, p_vout->p_sys->i_row );

@@ -320,8 +320,17 @@ static int Init( vout_thread_t *p_vout )
 static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout )
 {
     vout_thread_t *p_real_vout = NULL;
+    video_format_t fmt = {0};
 
     msg_Dbg( p_vout, "spawning the real video output" );
+
+    fmt.i_width = fmt.i_visible_width = p_vout->output.i_width;
+    fmt.i_height = fmt.i_visible_height = p_vout->output.i_height;
+    fmt.i_x_offset = fmt.i_y_offset = 0;
+    fmt.i_chroma = p_vout->output.i_chroma;
+    fmt.i_aspect = p_vout->output.i_aspect;
+    fmt.i_sar_num = p_vout->output.i_aspect * fmt.i_height / fmt.i_width;
+    fmt.i_sar_den = VOUT_ASPECT_FACTOR;
 
     switch( p_vout->render.i_chroma )
     {
@@ -332,28 +341,21 @@ static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout )
         {
         case DEINTERLACE_MEAN:
         case DEINTERLACE_DISCARD:
-            p_real_vout =
-                vout_Create( p_vout,
-                       p_vout->output.i_width, p_vout->output.i_height / 2,
-                       p_vout->output.i_chroma, p_vout->output.i_aspect );
+            fmt.i_height = fmt.i_visible_height = p_vout->output.i_height / 2;
+            p_real_vout = vout_Create( p_vout, &fmt );
             break;
 
         case DEINTERLACE_BOB:
         case DEINTERLACE_BLEND:
         case DEINTERLACE_LINEAR:
-            p_real_vout =
-                vout_Create( p_vout,
-                       p_vout->output.i_width, p_vout->output.i_height,
-                       p_vout->output.i_chroma, p_vout->output.i_aspect );
+            p_real_vout = vout_Create( p_vout, &fmt );
             break;
         }
         break;
 
     case VLC_FOURCC('I','4','2','2'):
-        p_real_vout =
-            vout_Create( p_vout,
-                       p_vout->output.i_width, p_vout->output.i_height,
-                       VLC_FOURCC('I','4','2','0'), p_vout->output.i_aspect );
+        fmt.i_chroma = VLC_FOURCC('I','4','2','0');
+        p_real_vout = vout_Create( p_vout, &fmt );
         break;
 
     default:

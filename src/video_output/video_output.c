@@ -9,6 +9,7 @@
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,11 +75,10 @@ int vout_Snapshot( vout_thread_t *, picture_t * );
  * This function looks for a video output thread matching the current
  * properties. If not found, it spawns a new one.
  *****************************************************************************/
-vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
-                                 unsigned int i_width, unsigned int i_height,
-                                 vlc_fourcc_t i_chroma, unsigned int i_aspect )
+vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
+                               video_format_t *p_fmt )
 {
-    if( !i_width || !i_height || !i_chroma )
+    if( !p_fmt )
     {
         /* Reattach video output to input before bailing out */
         if( p_vout )
@@ -168,10 +168,10 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
             if( psz_filter_chain ) free( psz_filter_chain );
         }
 
-        if( ( p_vout->render.i_width != i_width ) ||
-            ( p_vout->render.i_height != i_height ) ||
-            ( p_vout->render.i_chroma != i_chroma ) ||
-            ( p_vout->render.i_aspect != i_aspect
+        if( ( p_vout->fmt_render.i_width != p_fmt->i_width ) ||
+            ( p_vout->fmt_render.i_height != p_fmt->i_height ) ||
+            ( p_vout->fmt_render.i_chroma != p_fmt->i_chroma ) ||
+            ( p_vout->fmt_render.i_aspect != p_fmt->i_aspect
                     && !p_vout->b_override_aspect ) ||
             p_vout->b_filter_change )
         {
@@ -195,7 +195,7 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
     {
         msg_Dbg( p_this, "no usable vout present, spawning one" );
 
-        p_vout = vout_Create( p_this, i_width, i_height, i_chroma, i_aspect );
+        p_vout = vout_Create( p_this, p_fmt );
     }
 
     return p_vout;
@@ -207,15 +207,18 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
  * This function creates a new video output thread, and returns a pointer
  * to its description. On error, it returns NULL.
  *****************************************************************************/
-vout_thread_t * __vout_Create( vlc_object_t *p_parent,
-                               unsigned int i_width, unsigned int i_height,
-                               vlc_fourcc_t i_chroma, unsigned int i_aspect )
+vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 {
     vout_thread_t  * p_vout;                            /* thread descriptor */
     input_thread_t * p_input_thread;
     int              i_index;                               /* loop variable */
     char           * psz_plugin;
     vlc_value_t      val, text;
+
+    unsigned int i_width = p_fmt->i_width;
+    unsigned int i_height = p_fmt->i_height;
+    vlc_fourcc_t i_chroma = p_fmt->i_chroma;
+    unsigned int i_aspect = p_fmt->i_aspect;
 
     /* Allocate descriptor */
     p_vout = vlc_object_create( p_parent, VLC_OBJECT_VOUT );
@@ -241,6 +244,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
 
     /* Initialize the rendering heap */
     I_RENDERPICTURES = 0;
+    p_vout->fmt_render        = *p_fmt;   /* FIXME palette */
+    p_vout->fmt_in            = *p_fmt;   /* FIXME palette */
     p_vout->render.i_width    = i_width;
     p_vout->render.i_height   = i_height;
     p_vout->render.i_chroma   = i_chroma;
@@ -558,19 +563,59 @@ static int InitThread( vout_thread_t *p_vout )
 
     msg_Dbg( p_vout, "got %i direct buffer(s)", I_OUTPUTPICTURES );
 
-    AspectRatio( p_vout->render.i_aspect, &i_aspect_x, &i_aspect_y );
-    msg_Dbg( p_vout,
-             "picture in %ix%i, chroma 0x%.8x (%4.4s), aspect ratio %i:%i",
-             p_vout->render.i_width, p_vout->render.i_height,
-             p_vout->render.i_chroma, (char*)&p_vout->render.i_chroma,
-             i_aspect_x, i_aspect_y );
+    AspectRatio( p_vout->fmt_render.i_aspect, &i_aspect_x, &i_aspect_y );
 
-    AspectRatio( p_vout->output.i_aspect, &i_aspect_x, &i_aspect_y );
-    msg_Dbg( p_vout,
-             "picture out %ix%i, chroma 0x%.8x (%4.4s), aspect ratio %i:%i",
+    msg_Dbg( p_vout, "picture in %ix%i (%i,%i,%ix%i), "
+             "chroma %4.4s, ar %i:%i, sar %i:%i",
+             p_vout->fmt_render.i_width, p_vout->fmt_render.i_height,
+             p_vout->fmt_render.i_x_offset, p_vout->fmt_render.i_y_offset,
+             p_vout->fmt_render.i_visible_width,
+             p_vout->fmt_render.i_visible_height,
+             (char*)&p_vout->fmt_render.i_chroma,
+             i_aspect_x, i_aspect_y,
+             p_vout->fmt_render.i_sar_num, p_vout->fmt_render.i_sar_den );
+
+    AspectRatio( p_vout->fmt_in.i_aspect, &i_aspect_x, &i_aspect_y );
+
+    msg_Dbg( p_vout, "picture user %ix%i (%i,%i,%ix%i), "
+             "chroma %4.4s, ar %i:%i, sar %i:%i",
+             p_vout->fmt_in.i_width, p_vout->fmt_in.i_height,
+             p_vout->fmt_in.i_x_offset, p_vout->fmt_in.i_y_offset,
+             p_vout->fmt_in.i_visible_width,
+             p_vout->fmt_in.i_visible_height,
+             (char*)&p_vout->fmt_in.i_chroma,
+             i_aspect_x, i_aspect_y,
+             p_vout->fmt_in.i_sar_num, p_vout->fmt_in.i_sar_den );
+
+    if( !p_vout->fmt_out.i_width || !p_vout->fmt_out.i_height )
+    {
+        p_vout->fmt_out.i_width = p_vout->fmt_out.i_visible_width =
+            p_vout->output.i_width;
+        p_vout->fmt_out.i_height = p_vout->fmt_out.i_visible_height =
+            p_vout->output.i_height;
+        p_vout->fmt_out.i_x_offset =  p_vout->fmt_out.i_y_offset = 0;
+
+        p_vout->fmt_out.i_aspect = p_vout->output.i_aspect;
+        p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
+    }
+    if( !p_vout->fmt_out.i_sar_num || !p_vout->fmt_out.i_sar_num )
+    {
+        p_vout->fmt_out.i_sar_num = p_vout->fmt_out.i_aspect *
+            p_vout->fmt_out.i_height;
+        p_vout->fmt_out.i_sar_den = VOUT_ASPECT_FACTOR *
+            p_vout->fmt_out.i_width;
+    }
+
+    vlc_reduce( &p_vout->fmt_out.i_sar_num, &p_vout->fmt_out.i_sar_den,
+                p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den, 0 );
+
+    AspectRatio( p_vout->fmt_out.i_aspect, &i_aspect_x, &i_aspect_y );
+
+    msg_Dbg( p_vout, "picture out %ix%i, chroma %4.4s, ar %i:%i, sar %i:%i",
              p_vout->output.i_width, p_vout->output.i_height,
-             p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma,
-             i_aspect_x, i_aspect_y );
+             (char*)&p_vout->output.i_chroma,
+             i_aspect_x, i_aspect_y,
+             p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den );
 
     /* Calculate shifts from system-updated masks */
     MaskToShift( &p_vout->output.i_lrshift, &p_vout->output.i_rrshift,

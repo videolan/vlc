@@ -129,6 +129,7 @@ static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
+    video_format_t fmt = {0};
 
     I_OUTPUTPICTURES = 0;
 
@@ -153,14 +154,20 @@ static int Init( vout_thread_t *p_vout )
 
     msg_Dbg( p_vout, "spawning the real video output" );
 
+    fmt.i_width = fmt.i_visible_width = p_vout->output.i_width;
+    fmt.i_height = fmt.i_visible_height = p_vout->output.i_height;
+    fmt.i_x_offset = fmt.i_y_offset = 0;
+    fmt.i_chroma = p_vout->output.i_chroma;
+    fmt.i_aspect = p_vout->output.i_aspect;
+    fmt.i_sar_num = p_vout->output.i_aspect * fmt.i_height / fmt.i_width;
+    fmt.i_sar_den = VOUT_ASPECT_FACTOR;
+
     switch( p_vout->render.i_chroma )
     {
     case VLC_FOURCC('I','4','2','0'):
     case VLC_FOURCC('I','Y','U','V'):
     case VLC_FOURCC('Y','V','1','2'):
-        p_vout->p_sys->p_vout = vout_Create( p_vout,
-                           p_vout->output.i_width, p_vout->output.i_height,
-                           p_vout->output.i_chroma, p_vout->output.i_aspect );
+        p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
         break;
     default:
         break;
