@@ -61,11 +61,11 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     /* load our nib */
     [NSBundle loadNibNamed:@"Preferences" owner:self];
     
-    /* from "init" > r8571 */
+    /* from "init" =< r8571 */
     o_empty_view = [[NSView alloc] init];
     o_save_prefs = [[NSMutableDictionary alloc] init];
 
-    /* from "awakeFromNib" > r8571 */
+    /* from "awakeFromNib" =< r8571 */
     p_intf = VLCIntf;
     b_advanced = config_GetInt( p_intf, "advanced" );
 

@@ -60,6 +60,8 @@
     IBOutlet id o_advanced_ckb;
 }
 
++ (VLCPrefs *)sharedInstance;
+
 - (void)initStrings;
 - (void)showPrefs;
 - (IBAction)savePrefs: (id)sender;
