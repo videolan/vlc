@@ -2,7 +2,7 @@
  * qte.h : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.h,v 1.1 2002/09/04 21:13:33 jpsaman Exp $
+ * $Id: qte.h,v 1.2 2002/09/15 20:54:12 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -33,7 +33,7 @@
  * This structure is part of the video output thread descriptor.
  * It describes the specific properties of an video output plugin
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_t
 {
     /* Internal settings and properties */
     int                 i_width;
@@ -44,16 +44,16 @@ typedef struct vout_sys_s
 
     QApplication*       pcQApplication;
     QWidget*            pcVoutWidget;
-} vout_sys_t;
+};
 
 
 /*****************************************************************************
  * picture_sys_t: direct buffer method descriptor
  *****************************************************************************/
-typedef struct picture_sys_s
+struct picture_sys_t
 {
     QImage*             pQImage;
-} picture_sys_t;
+};
 
 
 /*****************************************************************************

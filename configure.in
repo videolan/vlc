@@ -1381,29 +1381,30 @@ from http://www.libsdl.org/, or configure with --disable-sdl. Have a nice day.
 fi
 
 dnl
-dnl  QT Embedded module
+dnl  Qt Embedded module
 dnl  (disabled by default)
 dnl
 AC_ARG_ENABLE(qte,
   [  --enable-qte            QT Embedded support (default disabled)])
-if test "x${enable_qte}" = "xyes"
+if test "x${enable_qte}" != "xno"
 then
   AC_ARG_WITH(qte,
   [    --with-qte=PATH    Qt Embedded headers and libraries])
   if test "x${with_qte}" = "x"
   then
     test_LDFLAGS="-L${QTDIR}/lib"
-    test_CFLAGS="-I$(QTDIR)/include/qte"
+    test_CFLAGS="-I$(QTDIR)/include"
+    PLUGINS="${PLUGINS} video_output/qte/qte"
   else
     test_LDFLAGS="-L${with_qte}/lib"
-    test_CFLAGS="-I${with_qte}/include/qte"
+    test_CFLAGS="-I${with_qte}/include"
+    BUILTINS="${BUILTINS} video_output/qte/qte"
   fi
 
-  CPPFLAGS="${save_CPPFLAGS} -I${qte_includes}"
-  AC_CHECK_HEADERS(qte/qte.h, [
-    PLUGINS="${PLUGINS} video_output/qte/qte"
-    qte_CFLAGS ="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
-    qte_LDFLAGS ="${qte_LDFLAGS} ${test_LDFLAGS} -lqpe -lqte"
+  CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
+  AC_CHECK_HEADERS(qt.h, [
+    qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
+    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -lqpe -lqte"
   ])
   CPPFLAGS="${save_CPPFLAGS}"
 fi
@@ -1781,10 +1782,10 @@ AC_ARG_ENABLE(opie,
      if test "x${with_qte}" = "x"
      then
        test_LDFLAGS="-L$(QTDIR)/lib"
-       test_CFLAGS="-I${QTDIR}/include/qte"
+       test_CFLAGS="-I${QTDIR}/include"
      else
        test_LDFLAGS="-L${with_qte}/lib"
-       test_CFLAGS="-I${with_qte}/include/qte"
+       test_CFLAGS="-I${with_qte}/include"
      fi
 
      PLUGINS="${PLUGINS} gui/opie/opie"

@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.cpp,v 1.1 2002/09/04 21:13:33 jpsaman Exp $
+ * $Id: qte.cpp,v 1.2 2002/09/15 20:54:12 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -38,7 +38,9 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                                /* strerror() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
 
 #ifdef HAVE_MACHINE_PARAM_H
     /* BSD */
@@ -64,15 +66,7 @@
 # include <qgfxraster_qws.h>
 #endif
 
-#include "video.h"
-#include "video_output.h"
-
-#include "interface.h"
 #include "netutils.h"                                 /* network_ChannelJoin */
-
-#include "stream_control.h"                 /* needed by input_ext-intf.h... */
-#include "input_ext-intf.h"
-
 #include "qte.h"
 
 /*****************************************************************************
@@ -97,20 +91,6 @@
     "option is DANGEROUS, use with care.")
 
 /*****************************************************************************
-* Exported prototypes
-*****************************************************************************/
-
-vlc_module_begin();
-    add_category_hint( N_("QT Embedded"), NULL );
-    add_string( "qte-display", NULL, NULL, NULL, NULL); //DISPLAY_TEXT, DISPLAY_LONGTEXT );
-    add_bool( "qte-altfullscreen", 0, NULL, NULL, NULL); //ALT_FS_TEXT, ALT_FS_LONGTEXT );
-    add_integer( "qte-drawable", -1, NULL, NULL, NULL); //DRAWABLE_TEXT, DRAWABLE_LONGTEXT );
-    set_description( _("QT Embedded module") );
-    set_capability( "video output", 20 );
-    set_callbacks( Open, Close);
-vlc_module_end();
-
-/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  Open      ( vlc_object_t * );
@@ -129,7 +109,22 @@ static void FreePicture    ( vout_thread_t *, picture_t * );
 
 static void ToggleFullScreen      ( vout_thread_t * );
 
-static void* run_qtapp_exec (void* pVoid);
+static void *RunQtThread( void *pVoid );
+
+/*****************************************************************************
+* Exported prototypes
+*****************************************************************************/
+
+vlc_module_begin();
+    add_category_hint( N_("QT Embedded"), NULL );
+    add_string( "qte-display", NULL, NULL, NULL, NULL); //DISPLAY_TEXT, DISPLAY_LONGTEXT );
+    add_bool( "qte-altfullscreen", 0, NULL, NULL, NULL); //ALT_FS_TEXT, ALT_FS_LONGTEXT );
+    add_integer( "qte-drawable", -1, NULL, NULL, NULL); //DRAWABLE_TEXT, DRAWABLE_LONGTEXT );
+    set_description( _("QT Embedded module") );
+    set_capability( "video output", 20 );
+    set_callbacks( Open, Close);
+vlc_module_end();
+
 
 /*****************************************************************************
  * Seeking function TODO: put this in a generic location !
@@ -143,11 +138,11 @@ static inline void vout_Seek( off_t i_seek )
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    //msg_Err( "+vout_Create::qte" );
+    //msg_Err(p_vout, "+vout_Create::qte" );
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
     /* Allocate structure */
-    p_vout->p_sys = (vout_sys_s*) malloc( sizeof( vout_sys_t ) );
+    p_vout->p_sys = (struct vout_sys_t*) malloc( sizeof( struct vout_sys_t ) );
 
     if( p_vout->p_sys == NULL )
     {
@@ -155,7 +150,7 @@ static int Open( vlc_object_t *p_this )
         return( 1 );
     }
 
-//    memset(p_vout->p_sys, 0, sizeof( vout_sys_t ));
+//    memset(p_vout->p_sys, 0, sizeof( struct vout_sys_t ));
 
     p_vout->pf_init    = Init;
     p_vout->pf_end     = End;
@@ -165,7 +160,7 @@ static int Open( vlc_object_t *p_this )
 
     CreateQtWindow(p_vout);
 
-    //msg_Err( "-vout_Create::qte\n" );
+    //msg_Err(p_vout, "-vout_Create::qte\n" );
     return( 0 );
 }
 
@@ -178,7 +173,7 @@ static void Close ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-    //msg_Err( "+vout_Destroy::qte\n" );
+    //msg_Err( p_vout, "+vout_Destroy::qte\n" );
     DestroyQtWindow(p_vout);
     free(p_vout->p_sys);
 }
@@ -196,11 +191,11 @@ static int Init( vout_thread_t *p_vout )
 
     int         dd = QPixmap::defaultDepth();
 
-    //msg_Err( "+vout_Init::qte\n" );
+    //msg_Err( p_vout,"+vout_Init::qte\n" );
 
     I_OUTPUTPICTURES = 0;
 
-    p_vout->output.i_chroma = (dd == 16) ? FOURCC_RV16 : FOURCC_RV32;
+    p_vout->output.i_chroma = (dd == 16) ? VLC_FOURCC('R','V','1','6'): VLC_FOURCC('R','V','3','2');
     p_vout->output.i_rmask  = 0xf800;
     p_vout->output.i_gmask  = 0x07e0;
     p_vout->output.i_bmask  = 0x001f;
@@ -239,7 +234,7 @@ static int Init( vout_thread_t *p_vout )
         I_OUTPUTPICTURES++;
     }
 
-    //msg_Err( "-vout_Init::qte %d output pictures\n", I_OUTPUTPICTURES);
+    //msg_Err(p_vout, "-vout_Init::qte %d output pictures\n", I_OUTPUTPICTURES);
 
     return( 0 );
 }
@@ -250,7 +245,7 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    //msg_Err( "+vout_Render::qte\n" );
+    //msg_Err(p_vout, "+vout_Render::qte\n" );
     ;
 }
 
@@ -324,7 +319,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
-    //msg_Err( "+vout_Manage::qte\n" );
+    //msg_Err(p_vout, "+vout_Manage::qte\n" );
     return 0;
 }
 
@@ -338,7 +333,7 @@ static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
-    //msg_Err( "+vout_End::qte\n" );
+    //msg_Err(p_vout, "+vout_End::qte\n" );
 
     /* Free the direct buffers we allocated */
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
@@ -358,7 +353,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int dd = QPixmap::defaultDepth();
 
-    //msg_Err( "+NewPicture::dd = %d\n",dd );
+    //msg_Err(p_vout, "+NewPicture::dd = %d\n",dd );
 
     p_pic->p_sys = (picture_sys_t*) malloc( sizeof( picture_sys_t ) );
 
@@ -369,7 +364,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     switch(p_vout->output.i_chroma)
     {
-    case FOURCC_RV16:
+    case VLC_FOURCC('R','V','1','6'):
         if(dd == 16)
         {
             p_pic->p_sys->pQImage = new QImage(p_vout->output.i_width,
@@ -386,16 +381,20 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p->i_pitch = p_pic->p_sys->pQImage->bytesPerLine();
 
             p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_pixel_bytes = 2;
-            p_pic->p->b_margin      = 0;
+            p_pic->p->i_pixel_pitch   = 2;
+            p_pic->p->i_visible_pitch = 0;
+//            p_pic->p->i_pixel_bytes = 2;
+//            p_pic->p->b_margin      = 0;
             p_pic->i_planes         = 1;
+
+
         }
         else
         {
             return -1;
         }
         break;
-    case FOURCC_RV32:
+    case VLC_FOURCC('R','V','3','2'):
         if(dd == 32)
         {
             p_pic->p_sys->pQImage = new QImage(p_vout->output.i_width,
@@ -412,8 +411,10 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p->i_pitch = p_pic->p_sys->pQImage->bytesPerLine();
 
             p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_pixel_bytes = 4;
-            p_pic->p->b_margin      = 0;
+            p_pic->p->i_pixel_pitch   = 4;
+            p_pic->p->i_visible_pitch = 0;
+//            p_pic->p->i_pixel_bytes = 4;
+//            p_pic->p->b_margin      = 0;
             p_pic->i_planes         = 1;
         }
         else
@@ -427,7 +428,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
 /*
-    msg_Err( "NewPicture: %d %d %d\n",p_vout->output.i_width,
+    msg_Err(p_vout, "NewPicture: %d %d %d\n",p_vout->output.i_width,
                                  p_vout->output.i_height,
                                  p_vout->output.i_chroma );
 */
@@ -461,7 +462,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
  *****************************************************************************/
 static int CreateQtWindow( vout_thread_t *p_vout )
 {
-    //msg_Err( "vout_qt: +init qt window");
+    //msg_Err(p_vout, "vout_qt: +init qt window");
 
     /* for displaying the vout in a qt window we need the QtApplication */
     vlc_thread_t    thread_id;
@@ -470,11 +471,13 @@ static int CreateQtWindow( vout_thread_t *p_vout )
     p_vout->p_sys->pcVoutWidget = NULL;
 
     /* create thread to exec the qpe application */
+//    if ( vlc_thread_create( &thread_id, "video output", RunQtThread,
+//                            VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE) )
     if ( vlc_thread_create( &thread_id, "vout qte",
-                            (vlc_thread_func_t)vout_run_qtapp_exec,
+                            (vlc_thread_func_t)RunQtThread,
                             (void *)p_vout) )
     {
-        msg_Err( "input error: can't spawn vout thread");
+        msg_Err( p_vout, "input error: can't spawn video output thread");
         return( -1 );
     }
 
@@ -520,11 +523,9 @@ static void DestroyQtWindow( vout_thread_t *p_vout )
 /*****************************************************************************
  * main loop of qtapplication
  *****************************************************************************/
-static void*
-run_qtapp_exec(void* pVoid)
+static void *RunQtThread( void *pVoid)
 {
     int     argc    = 0;
-    char    arg0[]  = "vout qte";
 
     vout_thread_t* p_vout = (vout_thread_t*) pVoid;
 
@@ -536,18 +537,15 @@ run_qtapp_exec(void* pVoid)
             p_vout->p_sys->pcQApplication = pApp;
             p_vout->p_sys->bOwnsQApp = TRUE;
         }
-        else
-        {
-            return NULL;
-        }
     }
     else
     {
         p_vout->p_sys->pcQApplication = qApp;
     }
 
+    if (p_vout->p_sys->pcQApplication)
     {
-        QWidget vo(0, "vout");
+        QWidget vo(0, "qte");
         vo.showFullScreen();
         vo.show();
         p_vout->p_sys->pcVoutWidget = &vo;
@@ -572,7 +570,5 @@ run_qtapp_exec(void* pVoid)
         delete p_vout->p_sys->pcQApplication;
         p_vout->p_sys->pcQApplication = NULL;
     }
-
-    return 0;
 }
 
