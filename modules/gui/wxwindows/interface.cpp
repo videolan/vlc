@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.33 2003/05/24 17:52:49 gbazin Exp $
+ * $Id: interface.cpp,v 1.34 2003/05/26 16:06:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -164,7 +164,7 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 Interface::Interface( intf_thread_t *_p_intf ):
-    wxFrame( NULL, -1, wxT(VOUT_TITLE),
+    wxFrame( NULL, -1, wxT("VLC media player"),
              wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -266,7 +266,7 @@ void Interface::CreateOurMenuBar()
     wxMenu *view_menu = new wxMenu;
     view_menu->Append( Playlist_Event, wxU(_("&Playlist...")),
                        wxU(_(HELP_PLAYLIST)) );
-    view_menu->Append( Logs_Event, wxU(_("&Logs...")), wxU(_(HELP_LOGS)) );
+    view_menu->Append( Logs_Event, wxU(_("&Messages...")), wxU(_(HELP_LOGS)) );
     view_menu->Append( FileInfo_Event, wxU(_("&File info...")),
                        wxU(_(HELP_FILEINFO)) );
 
@@ -557,7 +557,7 @@ void Interface::OnExit( wxCommandEvent& WXUNUSED(event) )
 void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
 {
     wxString msg;
-    msg.Printf( wxString(wxT(VOUT_TITLE)) +
+    msg.Printf( wxString(wxT("VLC media player")) +
         wxU(_(" (wxWindows interface)\n\n")) +
         wxU(_("(C) 1996-2003 - the VideoLAN Team\n\n")) +
         wxU(_("The VideoLAN team <videolan@videolan.org>\n"
@@ -566,8 +566,8 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
               "\nIt can play MPEG and MPEG2 files from a file or from a "
               "network source.")) );
 
-    wxMessageBox( msg, wxString::Format(wxU(_("About %s")), wxT(VOUT_TITLE)),
-                  wxOK | wxICON_INFORMATION, this );
+    wxMessageBox( msg, wxString::Format(wxU(_("About %s")),
+                  wxT("VLC media player")), wxOK | wxICON_INFORMATION, this );
 }
 
 void Interface::OnPlaylist( wxCommandEvent& WXUNUSED(event) )

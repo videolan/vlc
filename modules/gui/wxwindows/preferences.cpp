@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.16 2003/05/22 21:42:43 gbazin Exp $
+ * $Id: preferences.cpp,v 1.17 2003/05/26 16:06:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -211,7 +211,7 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(PrefsPanel, wxPanel)
     /* Button events */
-    EVT_BUTTON(Advanced_Event, PrefsPanel::OnAdvanced)
+    EVT_CHECKBOX(Advanced_Event, PrefsPanel::OnAdvanced)
 
 END_EVENT_TABLE()
 
@@ -858,12 +858,14 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     b_advanced = !config_GetInt( p_intf, "advanced" );
     OnAdvanced( dummy_event );
 
-    /* Create advanced button */
+    /* Create advanced checkbox */
     if( config_array.GetCount() )
     {
-        wxButton *advanced_button = new wxButton( this, Advanced_Event,
-                                                  wxU(_("Advanced...")) );
-        sizer->Add( advanced_button, 0, wxALL, 5 );
+        wxCheckBox *advanced_checkbox =
+           new wxCheckBox( this, Advanced_Event, wxU(_("Advanced options")) );
+
+        if( b_advanced ) advanced_checkbox->SetValue(TRUE);
+        sizer->Add( advanced_checkbox, 0, wxALL|wxALIGN_RIGHT, 0 );
     }
 
     sizer->Layout();
