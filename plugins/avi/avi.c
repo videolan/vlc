@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.30 2002/07/09 22:18:23 fenrir Exp $
+ * $Id: avi.c,v 1.31 2002/07/15 19:33:02 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -195,56 +195,7 @@ static int AVI_AudioGetType( u32 i_type )
             return( 0 );
     }
 }
-static int AVI_VideoGetType( u32 i_type )
-{
-    switch( i_type )
-    {
-        case( FOURCC_DIV1 ): /* FIXME it is for msmpeg4v1 or old mpeg4 ?? */
-        case( FOURCC_div1 ):
-        case( FOURCC_MPG4 ):
-        case( FOURCC_mpg4 ):
-            return( MSMPEG4v1_VIDEO_ES );
 
-        case( FOURCC_DIV2 ):
-        case( FOURCC_div2 ):
-        case( FOURCC_MP42 ):
-        case( FOURCC_mp42 ):
-            return( MSMPEG4v2_VIDEO_ES );
-         
-        case( FOURCC_MPG3 ):
-        case( FOURCC_mpg3 ):
-        case( FOURCC_div3 ):
-        case( FOURCC_MP43 ):
-        case( FOURCC_mp43 ):
-        case( FOURCC_DIV3 ):
-        case( FOURCC_DIV4 ):
-        case( FOURCC_div4 ):
-        case( FOURCC_DIV5 ):
-        case( FOURCC_div5 ):
-        case( FOURCC_DIV6 ):
-        case( FOURCC_div6 ):
-        case( FOURCC_AP41 ):
-        case( FOURCC_3IV1 ):
-            return( MSMPEG4v3_VIDEO_ES );
-
-        case( FOURCC_DIVX ):
-        case( FOURCC_divx ):
-        case( FOURCC_MP4S ):
-        case( FOURCC_mp4s ):
-        case( FOURCC_M4S2 ):
-        case( FOURCC_m4s2 ):
-        case( FOURCC_xvid ):
-        case( FOURCC_XVID ):
-        case( FOURCC_XviD ):
-        case( FOURCC_DX50 ):
-        case( FOURCC_mp4v ):
-        case( FOURCC_4    ):
-            return( MPEG4_VIDEO_ES );
-
-        default:
-            return( 0 );
-    }
-}
 /* Test if it seems that it's a key frame */
 static int AVI_GetKeyFlag( int i_type, u8 *p_byte )
 {
@@ -606,8 +557,8 @@ static int AVIInit( input_thread_t *p_input )
     riffchunk_t *p_strl,*p_strh,*p_strf;
     demux_data_avi_file_t *p_avi_demux;
     es_descriptor_t *p_es = NULL; /* for not warning */
-
-    int i;
+    char *name;
+    int i, i_codec;
 
     if( !( p_input->p_demux_data = 
                     p_avi_demux = malloc( sizeof(demux_data_avi_file_t) ) ) )
@@ -781,15 +732,21 @@ static int AVIInit( input_thread_t *p_input )
                 p_es->i_cat = VIDEO_ES;
                 AVI_Parse_BitMapInfoHeader( &p_info->video_format,
                                    p_strf->p_data->p_payload_start ); 
+
+                /* XXX quick hack for playing ffmpeg video, I don't know 
+                    who is doing something wrong */
+                p_info->header.i_samplesize = 0;
                 p_es->b_audio = 0;
-                p_es->i_type = 
-                    AVI_VideoGetType( p_info->video_format.i_compression );
-                if( !p_es->i_type )
+                if( !AVI_GetVideoCodec( p_info->video_format.i_compression,
+                                   &i_codec,
+                                   &name ) )
                 {
                     msg_Warn( p_input, "stream(%d,%4.4s) not supported", i,
                               (char*)&p_info->video_format.i_compression);
                     p_es->i_cat = UNKNOWN_ES;
                 }
+
+                p_es->i_type = i_codec;
                 break;
             default:
                 msg_Err( p_input, "unknown stream(%d) type", i );
@@ -827,8 +784,7 @@ static int AVIInit( input_thread_t *p_input )
     p_avi_demux->p_movi = p_movi;
     
     /* get index  XXX need to have p_movi */
-    if( ( p_avi_demux->b_seekable )
-        &&( p_avi_demux->avih.i_flags&AVIF_HASINDEX ) ) 
+    if( p_avi_demux->b_seekable )
     {
         /* get index */
         __AVI_GetIndex( p_input ); 
@@ -864,6 +820,7 @@ static int AVIInit( input_thread_t *p_input )
         switch( p_info->p_es->i_cat )
         {
             case( VIDEO_ES ):
+
                 msg_Dbg( p_input, "video(%4.4s) %dx%d %dbpp %ffps",
                          (char*)&p_info->video_format.i_compression,
                          p_info->video_format.i_width,
@@ -2258,6 +2215,7 @@ static int AVIDemux( input_thread_t *p_input )
         p_avi_demux->i_rate = p_input->stream.control.i_rate;
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );    
+    p_avi_demux->i_rate = DEFAULT_RATE;
     if( p_avi_demux->i_rate != DEFAULT_RATE )
     {
         p_info_slave = NULL;

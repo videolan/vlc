@@ -2,7 +2,7 @@
  * avi.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.h,v 1.8 2002/06/30 15:07:57 fenrir Exp $
+ * $Id: avi.h,v 1.9 2002/07/15 19:33:02 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -182,4 +182,82 @@ typedef struct demux_data_avi_file_s
     AVIStreamInfo_t *p_info_audio;
 
 } demux_data_avi_file_t;
- 
+
+/* current codec */
+static struct
+{
+    int i_fourcc;
+    int i_vlc_codec;
+    char *psz_name;
+
+} AVI_VideoCodecs [] = {
+    { FOURCC_DIV1,  MSMPEG4v1_VIDEO_ES, "MS MPEG-4 v1" },
+    { FOURCC_div1,  MSMPEG4v1_VIDEO_ES, "MS MPEG-4 v1" },
+    { FOURCC_MPG4,  MSMPEG4v1_VIDEO_ES, "MS MPEG-4 v1" },
+    { FOURCC_mpg4,  MSMPEG4v1_VIDEO_ES, "MS MPEG-4 v1" },
+
+    { FOURCC_DIV2,  MSMPEG4v2_VIDEO_ES, "MS MPEG-4 v2" },
+    { FOURCC_div2,  MSMPEG4v2_VIDEO_ES, "MS MPEG-4 v2" },
+    { FOURCC_MP42,  MSMPEG4v2_VIDEO_ES, "MS MPEG-4 v2" },
+    { FOURCC_mp42,  MSMPEG4v2_VIDEO_ES, "MS MPEG-4 v2" },
+    
+    { FOURCC_MPG3,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_mpg3,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_div3,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_MP43,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_mp43,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_DIV3,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_DIV4,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_div4,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_DIV5,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_div5,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_DIV6,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_div6,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_AP41,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
+    { FOURCC_3IV1,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" }, /* wrong */
+
+    { FOURCC_DIVX,  MPEG4_VIDEO_ES, "MPEG-4" },
+    { FOURCC_divx,  MPEG4_VIDEO_ES, "MPEG-4" },
+    { FOURCC_MP4S,  MPEG4_VIDEO_ES, "MPEG-4" },
+    { FOURCC_mp4s,  MPEG4_VIDEO_ES, "MPEG-4" },
+    { FOURCC_M4S2,  MPEG4_VIDEO_ES, "MPEG-4" },
+    { FOURCC_m4s2,  MPEG4_VIDEO_ES, "MPEG-4" },
+    { FOURCC_xvid,  MPEG4_VIDEO_ES, "MPEG-4" },
+    { FOURCC_XVID,  MPEG4_VIDEO_ES, "MPEG-4" },
+    { FOURCC_XviD,  MPEG4_VIDEO_ES, "MPEG-4" },
+    { FOURCC_DX50,  MPEG4_VIDEO_ES, "MPEG-4" },
+    { FOURCC_mp4v,  MPEG4_VIDEO_ES, "MPEG-4" },
+    { FOURCC_4,     MPEG4_VIDEO_ES, "MPEG-4" },
+    
+    { FOURCC_H263,  H263_VIDEO_ES, "H263" },
+    { FOURCC_h263,  H263_VIDEO_ES, "H263" },
+    { FOURCC_U263,  H263_VIDEO_ES, "H263" },
+
+    { FOURCC_I263,  I263_VIDEO_ES, "H263.I" },
+    { FOURCC_i263,  I263_VIDEO_ES, "H263.I" },
+
+    { 0,            UNKNOWN_ES,     "Unknown" }
+};
+
+static int AVI_GetVideoCodec( int i_fourcc,
+                              int *pi_vlc_codec,
+                              char **ppsz_name )
+{
+    int i_codec;
+
+    for( i_codec = 0; ; i_codec++ )
+    {
+        if( ( AVI_VideoCodecs[i_codec].i_fourcc == i_fourcc )||
+            ( AVI_VideoCodecs[i_codec].i_fourcc == 0 ) )
+        {
+            break;
+        }
+    }
+    if( pi_vlc_codec )
+        *pi_vlc_codec = AVI_VideoCodecs[i_codec].i_vlc_codec;
+    if( ppsz_name )
+        *ppsz_name = AVI_VideoCodecs[i_codec].psz_name;
+
+    return( AVI_VideoCodecs[i_codec].i_fourcc == 0 ? 0 : 1 );
+}                        
+

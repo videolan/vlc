@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.3 2002/06/01 12:31:59 sam Exp $
+ * $Id: ffmpeg.h,v 1.4 2002/07/15 19:33:02 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -36,6 +36,57 @@ typedef struct bitmapinfoheader_s
     u32 i_clrused;
     u32 i_clrimportant;
 } bitmapinfoheader_t;
+
+static struct 
+{
+    int i_vlc_codec;
+    int i_ffmpeg_codec;
+    char *psz_name;
+} ffmpeg_Codecs [] = {
+
+#if LIBAVCODEC_BUILD >= 4608 
+    { MSMPEG4v1_VIDEO_ES,   CODEC_ID_MSMPEG4V1, "MS MPEG-4 v1" },
+    { MSMPEG4v2_VIDEO_ES,   CODEC_ID_MSMPEG4V2, "MS MPEG-4 v2" },
+    { MSMPEG4v3_VIDEO_ES,   CODEC_ID_MSMPEG4V3, "MS MPEG-4 v3" },
+#else
+    { MSMPEG4v3_VIDEO_ES,   CODEC_ID_MSMPEG4,   "MS MPEG-4 v3" },
+#endif
+#if LIBAVCODEC_BUILD >= 4615
+    { SVQ1_VIDEO_ES,    CODEC_ID_SVQ1,  "SVQ-1 (Sorenson Video v1)" },
+#endif
+    { MPEG4_VIDEO_ES,   CODEC_ID_MPEG4, "MPEG-4" },
+    { H263_VIDEO_ES,    CODEC_ID_H263,  "H263" },
+    { I263_VIDEO_ES,    CODEC_ID_H263I, "H263.I" },
+/* this entry is to recognize the end */
+    { 0,                CODEC_ID_NONE,  "Unknown" }
+};
+
+
+static int ffmpeg_GetFfmpegCodec( int i_vlc_codec, 
+                                  int *pi_ffmpeg_codec,
+                                  char **ppsz_name )
+{
+    int i_codec;
+
+    for( i_codec = 0; ; i_codec++ )
+    {
+        if( ( ffmpeg_Codecs[i_codec].i_vlc_codec == i_vlc_codec )||
+            ( ffmpeg_Codecs[i_codec].i_ffmpeg_codec == CODEC_ID_NONE ) )
+        {
+            break;
+        }
+    }
+    if( pi_ffmpeg_codec )
+        *pi_ffmpeg_codec = ffmpeg_Codecs[i_codec].i_ffmpeg_codec;
+    if( ppsz_name )
+        *ppsz_name = ffmpeg_Codecs[i_codec].psz_name;
+
+    return( ffmpeg_Codecs[i_codec].i_ffmpeg_codec 
+                == CODEC_ID_NONE ? 0 : 1);
+}
+
+
+
 
 typedef struct videodec_thread_s
 {

@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.60 2002/06/01 12:31:57 sam Exp $
+ * $Id: input_ext-dec.h,v 1.61 2002/07/15 19:33:02 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -38,6 +38,9 @@
 #define MSMPEG4v2_VIDEO_ES  0x41
 #define MSMPEG4v3_VIDEO_ES  0x42
 #define MPEG4_VIDEO_ES      0x50
+#define H263_VIDEO_ES       0x60
+#define I263_VIDEO_ES       0x61
+#define SVQ1_VIDEO_ES       0x62
 
 #define UNKNOWN_ES          0xFF
 

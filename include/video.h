@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.53 2002/06/01 12:31:58 sam Exp $
+ * $Id: video.h,v 1.54 2002/07/15 19:33:02 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -220,6 +220,13 @@ struct picture_heap_s
 
 /* ?? */
 #define FOURCC_3IV1         VLC_FOURCC('3','I','V','1')
+/* H263 and H263i */
+#define FOURCC_H263         VLC_FOURCC('H','2','6','3')
+#define FOURCC_h263         VLC_FOURCC('h','2','6','3')
+#define FOURCC_U263         VLC_FOURCC('U','2','6','3')
+#define FOURCC_I263         VLC_FOURCC('I','2','6','3')
+#define FOURCC_i263         VLC_FOURCC('i','2','6','3')
+
 
 /* Packed RGB for 8bpp */
 #define FOURCC_BI_RGB       VLC_FOURCC( 0 , 0 , 0 , 0 )

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.89 2002/06/01 12:32:01 sam Exp $
+ * $Id: input_programs.c,v 1.90 2002/07/15 19:33:02 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -688,6 +688,9 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case MSMPEG4v1_VIDEO_ES:
     case MSMPEG4v2_VIDEO_ES:
     case MSMPEG4v3_VIDEO_ES:
+    case SVQ1_VIDEO_ES:
+    case H263_VIDEO_ES:
+    case I263_VIDEO_ES:
     case DVD_SPU_ES:
         if( config_GetInt( p_input, "video" ) )
         {
