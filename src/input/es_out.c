@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: es_out.c,v 1.16 2004/01/17 23:50:08 fenrir Exp $
+ * $Id: es_out.c,v 1.17 2004/01/18 04:53:57 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -259,6 +259,12 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             /* create it */
             p_prgm = input_AddProgram( p_input, fmt->i_group, 0 );
 
+            /* XXX welcome to kludge, add a dummy es, if you want to understand
+             * why have a look at input_SetProgram. Basicaly, it assume the first
+             * es to be the PMT, how that is stupide, nevertheless it is needed for
+             * the old ts demuxer */
+            input_AddES( p_input, p_prgm, 0, UNKNOWN_ES, NULL, 0 );
+
             /* Select the first by default */
             if( p_input->stream.p_selected_program == NULL )
             {
@@ -506,21 +512,25 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 {
     es_out_sys_t *p_sys = out->p_sys;
 
-    if( p_sys->b_pcr_set && p_sys->p_input->stream.p_selected_program )
+    if( p_sys->b_pcr_set )
     {
-        input_thread_t *p_input = p_sys->p_input;
+        pgrm_descriptor_t *p_pgrm = es->p_es->p_pgrm;
+        input_thread_t    *p_input = p_sys->p_input;
 
-        if( p_block->i_dts > 0 )
+        if( p_pgrm == NULL )
+        {
+            p_pgrm = p_sys->p_input->stream.p_selected_program;
+        }
+
+        if( p_block->i_dts > 0 && p_pgrm )
         {
             p_block->i_dts =
-                input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                                  p_block->i_dts * 9 / 100 );
+                input_ClockGetTS( p_input, p_pgrm, p_block->i_dts * 9 / 100 );
         }
-        if( p_block->i_pts > 0 )
+        if( p_block->i_pts > 0 && p_pgrm )
         {
             p_block->i_pts =
-                input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                                  p_block->i_pts * 9 / 100 );
+                input_ClockGetTS( p_input, p_pgrm, p_block->i_pts * 9 / 100 );
         }
     }
 
@@ -733,11 +743,9 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
         }
 
         case ES_OUT_RESET_PCR:
-            /* FIXME do it for all program */
-            if( p_sys->p_input->stream.p_selected_program )
+            for( i = 0; i < p_sys->p_input->stream.i_pgrm_number; i++ )
             {
-                p_sys->p_input->stream.p_selected_program->i_synchro_state =
-                    SYNCHRO_REINIT;
+                p_sys->p_input->stream.pp_programs[i]->i_synchro_state = SYNCHRO_REINIT;
             }
             p_sys->b_pcr_set = VLC_TRUE;
             return VLC_SUCCESS;
