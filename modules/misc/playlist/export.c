@@ -2,7 +2,7 @@
  * export.c :  Playlist export module
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: export.c,v 1.2 2004/02/22 15:52:33 zorglub Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -29,7 +29,6 @@
 /***************************************************************************
  * Prototypes
  ***************************************************************************/
-int Export_Native ( vlc_object_t *p_intf );
 int Export_M3U    ( vlc_object_t *p_intf );
 int Export_Old    ( vlc_object_t *p_intf );
 
@@ -38,12 +37,6 @@ int Export_Old    ( vlc_object_t *p_intf );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-
-    add_submodule();
-        set_description( _("Native playlist exporter") );
-        add_shortcut( "export-native" );
-        set_capability( "playlist export" , 0 );
-        set_callbacks( Export_Native , NULL );
 
     add_submodule();
         set_description( _("M3U playlist exporter") );

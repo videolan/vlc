@@ -1,6 +1,6 @@
 dnl Autoconf settings for vlc
 dnl $Id$
-
+ 
 AC_INIT(vlc,0.7.2-cvs)
 
 CONFIGURE_LINE="$0 $*"
@@ -892,7 +892,7 @@ AX_ADD_PLUGINS([trivial_channel_mixer headphone_channel_mixer])
 AX_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
 AX_ADD_PLUGINS([aout_file])
 AX_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
-AX_ADD_PLUGINS([id3 m3u sgimb])
+AX_ADD_PLUGINS([id3 m3u playlist export sgimb])
 AX_ADD_PLUGINS([rawvideo])
 AX_ADD_PLUGINS([wav araw demuxdump demuxsub adpcm a52sys dtssys au])
 AX_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms])
@@ -2903,48 +2903,6 @@ if test "${enable_skins}" != "no"; then
   fi fi
 fi
 
-dnl 
-dnl libxml2
-dnl
-XML2_PATH="${PATH}"
-AC_ARG_WITH(xml2-config-path,
- [    --with-xml2-config-path=PATH xml2-config path (default search in \$PATH)],
- [ if test "${with_xml2_config_path}" != "no"; then
-        XML2_PATH="${with_xml2_config_path}:${PATH}"
-      fi ])
-  AC_PATH_PROG(XML2_CONFIG, xml2-config, no, ${XML2_PATH})
-    AC_MSG_WARN([trucmuche0])
-
-  if test "${XML2_CONFIG}" != "no"; then
-    AC_MSG_WARN([trucmuche2])
-    AX_ADD_CPPFLAGS([skins2],[`${XML2_CONFIG} --cflags`])
-    AX_ADD_CFLAGS([playlist export],[`${XML2_CONFIG} --cflags`])
-    AX_ADD_LDFLAGS([skins2 playlist export],[`${XML2_CONFIG} --libs`])
-    AC_MSG_WARN([trucmuche3])
-    dnl skins2 and playlist depend on the xmlTextReader extension
-    AC_CHECK_LIB(xml2,xmlTextReaderConstName,
-      [   AC_MSG_WARN([trucmuche4])
-AX_ADD_PLUGINS([playlist export])],
-      [
-      skins2_missing_lib="yes"
-    AC_MSG_WARN([trucmuche5])
-      AC_MSG_WARN([libxml2 missing the xmlTextReader extension, you should update your version])
-      AC_MSG_WARN([You will not be able to import/export playlists])
-      if test "${enable_skins2}" = "yes"; then
-        AC_MSG_WARN([trucmuche6])
-        AC_MSG_ERROR([libxml2 missing the xmlTextReader extension (required for skins2)])
-      fi])
-  else
-    skins2_missing_lib="yes"
-    AC_MSG_ERROR([Could not find libxml2. You will not be able to import/export playlists])
-    if test "${enable_skins2}" = "yes"; then
-      AC_MSG_ERROR([Could not find libxml2 (required for skins2)])
-    fi
-  fi
-
-
-
-
 dnl
 dnl Skins2 module
 dnl
@@ -2977,7 +2935,32 @@ if test "${enable_skins2}" = "yes" || (test "${SYS}" != "darwin" && test "${SYS}
     fi
   fi
 
-  LDFLAGS="${LDFLAGS_save} ${LDFLAGS_skins2}"
+  dnl libxml2
+  XML2_PATH="${PATH}"
+  AC_ARG_WITH(xml2-config-path,
+    [    --with-xml2-config-path=PATH xml2-config path (default search in \$PATH)],
+    [ if test "${with_xml2_config_path}" != "no"; then
+        XML2_PATH="${with_xml2_config_path}:${PATH}"
+      fi ])
+  AC_PATH_PROG(XML2_CONFIG, xml2-config, no, ${XML2_PATH})
+  if test "${XML2_CONFIG}" != "no"; then
+    AX_ADD_CPPFLAGS([skins2],[`${XML2_CONFIG} --cflags`])
+    AX_ADD_LDFLAGS([skins2],[`${XML2_CONFIG} --libs`])
+    dnl skins2 depends on the xmlTextReader extension
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_skins2}"
+    AC_CHECK_LIB(xml2,xmlTextReaderConstName,[],[
+      skins2_missing_lib="yes"
+      AC_MSG_WARN([libxml2 missing the xmlTextReader extension, you should update your version])
+      if test "${enable_skins2}" = "yes"; then
+        AC_MSG_ERROR([libxml2 missing the xmlTextReader extension (required for skins2)])
+      fi])
+    LDFLAGS="${LDFLAGS_save}"
+  else
+    skins2_missing_lib="yes"
+    if test "${enable_skins2}" = "yes"; then
+      AC_MSG_ERROR([Could not find libxml2 (required for skins2)])
+    fi
+  fi
 
   if test "${skins2_missing_lib}" = "no" && (test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"); then
     AX_ADD_PLUGINS([skins2])

@@ -41,12 +41,6 @@ vlc_module_begin();
     set_callbacks( Import_Old , NULL );
 
     add_submodule();
-        set_description( _("Native playlist import") );
-    add_shortcut( "playlist" );
-        add_shortcut( "native-open" );
-        set_capability( "demux2" , 10 );
-        set_callbacks( Import_Native , Close_Native );
-    add_submodule();
         set_description( _("M3U playlist import") );
         add_shortcut( "m3u-open" );
         set_capability( "demux2" , 10 );

@@ -2,5 +2,4 @@ SOURCES_playlist = playlist.c \
 		   playlist.h \
 		   old.c \
 		   m3u.c \
-		   native.c \
 		   pls.c
