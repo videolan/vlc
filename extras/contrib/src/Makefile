@@ -472,6 +472,7 @@ libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 
 .theora: libtheora
 	(cd $<; CC="gcc $(CFLAGS)" ./configure --prefix=$(PREFIX) && make && make install)
+	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .theora
