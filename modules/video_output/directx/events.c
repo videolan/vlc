@@ -933,7 +933,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
         SetWindowPos( p_vout->p_sys->hwnd, 0, point.x, point.y, 0, 0,
                       SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
 
-      return VLC_SUCCESS;
+        return vout_vaControlDefault( p_vout, i_query, args );
 
     case VOUT_CLOSE:
         return VLC_SUCCESS;
@@ -947,7 +947,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
         return VLC_SUCCESS;
 
     default:
-        msg_Dbg( p_vout, "control query not supported" );
-        return VLC_EGENERIC;
+        return vout_vaControlDefault( p_vout, i_query, args );
     }
 }

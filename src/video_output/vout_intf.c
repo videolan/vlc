@@ -56,9 +56,11 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
                           unsigned int *pi_width_hint,
                           unsigned int *pi_height_hint )
 {
-    intf_thread_t *p_intf;
+    intf_thread_t *p_intf = NULL;
+    vlc_list_t *p_list;
     void *p_window;
     vlc_value_t val;
+    int i;
 
     /* Get requested coordinates */
     var_Get( p_vout, "video-x", &val );
@@ -73,61 +75,88 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     var_Get( p_vout->p_vlc, "drawable", &val );
     if( val.i_int ) return (void *)val.i_int;
 
-    /* Find the main interface */
-    p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF, FIND_ANYWHERE );
-    if( !p_intf ) return NULL;
+    /* Find the first interface which supports embedding */
+    p_list = vlc_list_find( p_vout, VLC_OBJECT_INTF, FIND_ANYWHERE );
+    if( !p_list ) return NULL;
 
-    if( !p_intf->pf_request_window )
+    for( i = 0; i < p_list->i_count; i++ )
     {
-        vlc_object_release( p_intf );
+        p_intf = (intf_thread_t *)p_list->p_values[i].p_object;
+        if( p_intf->pf_request_window ) break;
+        p_intf = NULL;
+    }
+
+    if( !p_intf )
+    {
+        vlc_list_release( p_list );
         return NULL;
     }
 
+    vlc_object_yield( p_intf );
+    vlc_list_release( p_list );
+
     p_window = p_intf->pf_request_window( p_intf, p_vout, pi_x_hint, pi_y_hint,
                                           pi_width_hint, pi_height_hint );
-    vlc_object_release( p_intf );
+
+    if( !p_window ) vlc_object_release( p_intf );
+    else p_vout->p_parent_intf = p_intf;
 
     return p_window;
 }
 
 void vout_ReleaseWindow( vout_thread_t *p_vout, void *p_window )
 {
-    intf_thread_t *p_intf;
+    intf_thread_t *p_intf = p_vout->p_parent_intf;
 
-    /* Find the main interface */
-    p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF, FIND_ANYWHERE );
     if( !p_intf ) return;
+
+    vlc_mutex_lock( &p_intf->object_lock );
+    if( p_intf->b_dead )
+    {
+        vlc_mutex_unlock( &p_intf->object_lock );
+        return;
+    }
 
     if( !p_intf->pf_release_window )
     {
         msg_Err( p_vout, "no pf_release_window");
+        vlc_mutex_unlock( &p_intf->object_lock );
         vlc_object_release( p_intf );
         return;
     }
 
     p_intf->pf_release_window( p_intf, p_window );
+
+    p_vout->p_parent_intf = NULL;
+    vlc_mutex_unlock( &p_intf->object_lock );
     vlc_object_release( p_intf );
 }
 
 int vout_ControlWindow( vout_thread_t *p_vout, void *p_window,
                         int i_query, va_list args )
 {
-    intf_thread_t *p_intf;
+    intf_thread_t *p_intf = p_vout->p_parent_intf;
     int i_ret;
 
-    /* Find the main interface */
-    p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF, FIND_ANYWHERE );
     if( !p_intf ) return VLC_EGENERIC;
+
+    vlc_mutex_lock( &p_intf->object_lock );
+    if( p_intf->b_dead )
+    {
+        vlc_mutex_unlock( &p_intf->object_lock );
+        return VLC_EGENERIC;
+    }
 
     if( !p_intf->pf_control_window )
     {
         msg_Err( p_vout, "no pf_control_window");
+        vlc_mutex_unlock( &p_intf->object_lock );
         vlc_object_release( p_intf );
         return VLC_EGENERIC;
     }
 
     i_ret = p_intf->pf_control_window( p_intf, p_window, i_query, args );
-    vlc_object_release( p_intf );
+    vlc_mutex_unlock( &p_intf->object_lock );
     return i_ret;
 }
 
@@ -191,6 +220,29 @@ void vout_IntfInit( vout_thread_t *p_vout )
         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
     }
     var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
+}
+
+/*****************************************************************************
+ * vout_ControlDefault: default methods for video output control.
+ *****************************************************************************/
+int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    switch( i_query )
+    {
+    case VOUT_REPARENT:
+    case VOUT_CLOSE:
+        if( p_vout->p_parent_intf )
+        {
+            vlc_object_release( p_vout->p_parent_intf );
+            p_vout->p_parent_intf = NULL;
+        }
+        return VLC_SUCCESS;
+        break;
+
+    default:
+        msg_Dbg( p_vout, "control query not supported" );
+        return VLC_EGENERIC;
+    }
 }
 
 /*****************************************************************************

@@ -2132,7 +2132,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
             XSync( p_vout->p_sys->p_display, False );
             p_vout->p_sys->p_win->owner_window = 0;
             vlc_mutex_unlock( &p_vout->p_sys->lock );
-            return VLC_SUCCESS;
+            return vout_vaControlDefault( p_vout, i_query, args );
 
         case VOUT_SET_STAY_ON_TOP:
             if( p_vout->p_sys->p_win->owner_window )
@@ -2146,8 +2146,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
             return VLC_SUCCESS;
 
        default:
-            msg_Dbg( p_vout, "control query not supported" );
-            return VLC_EGENERIC;
+            return vout_vaControlDefault( p_vout, i_query, args );
     }
 }
 

@@ -177,6 +177,10 @@ static void Close( vlc_object_t *p_this )
         vlc_object_release( p_intf->p_sys->p_input );
     }
 
+    vlc_mutex_lock( &p_intf->object_lock );
+    p_intf->b_dead = VLC_TRUE;
+    vlc_mutex_unlock( &p_intf->object_lock );
+
     if( p_intf->pf_show_dialog )
     {
         /* We must destroy the dialogs thread */

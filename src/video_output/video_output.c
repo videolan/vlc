@@ -291,6 +291,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     p_vout->c_fps_samples = 0;
     p_vout->b_filter_change = 0;
     p_vout->pf_control = 0;
+    p_vout->p_parent_intf = 0;
 
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-x", VLC_VAR_INTEGER );
