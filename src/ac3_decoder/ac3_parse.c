@@ -1,5 +1,6 @@
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <sys/soundcard.h>                               /* "audio_output.h" */
+#include <sys/types.h>
 #include <sys/uio.h>                                            /* "input.h" */
 
 #include "common.h"

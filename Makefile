@@ -26,8 +26,8 @@ ARCH=MMX
 #ARCH=PPC
 
 # Decoder choice - ?? old decoder will be removed soon
-DECODER=old
-#DECODER=new
+#DECODER=old
+DECODER=new
 
 #----------------- do not change anything below this line ----------------------
 
