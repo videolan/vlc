@@ -7,11 +7,11 @@
 # Objects
 #
 
-PLUGIN_GTK = gtk.o intf_gtk.o gtk_interface.o gtk_support.o gtk_callbacks.o
+PLUGIN_GTK = gtk.o intf_gtk.o gtk_interface.o gtk_support.o
 PLUGIN_GNOME = gnome.o intf_gnome.o gnome_interface.o gnome_support.o gnome_callbacks.o
 
-PLUGIN_GTK_SPECIFIC = gtk_display.o gtk_open.o gtk_control.o gtk_menu.o gtk_playlist.o gtk_modules.o gtk_preferences.o
-PLUGIN_GNOME_SPECIFIC = $(PLUGIN_GTK_SPECIFIC:gtk%=gnome%)
+PLUGIN_GTK_SPECIFIC = gtk_display.o gtk_open.o gtk_control.o gtk_menu.o gtk_playlist.o gtk_modules.o gtk_preferences.o gtk_callbacks.o
+PLUGIN_GNOME_SPECIFIC = $(PLUGIN_GTK_SPECIFIC:%.o=%_gnome.o)
 
 BUILTIN_GTK = $(PLUGIN_GTK:%.o=BUILTIN_GTK_%.o) \
         $(PLUGIN_GTK_SPECIFIC:%.o=BUILTIN_GTK_%.o)
@@ -41,8 +41,8 @@ $(PLUGIN_GNOME): %.o: .dep/%.d
 $(PLUGIN_GNOME): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -DPLUGIN -DMODULE_NAME=gnome `gnome-config --cflags gtk gnomeui` -c -o $@ $<
 
-$(PLUGIN_GNOME_SPECIFIC): gnome%.o: .dep/gtk%.d
-$(PLUGIN_GNOME_SPECIFIC): gnome%.o: gtk%.c
+$(PLUGIN_GNOME_SPECIFIC): %_gnome.o: .dep/%.d
+$(PLUGIN_GNOME_SPECIFIC): %_gnome.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -DPLUGIN -DMODULE_NAME=gnome `gnome-config --cflags gtk gnomeui` -c -o $@ $<
 
 $(BUILTIN_GNOME): BUILTIN_GNOME_%.o: .dep/%.d
