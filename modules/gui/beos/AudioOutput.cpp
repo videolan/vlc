@@ -2,7 +2,7 @@
  * aout.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.8 2002/09/18 21:21:23 massiot Exp $
+ * $Id: AudioOutput.cpp,v 1.9 2002/10/09 01:14:18 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -126,19 +126,19 @@ static int SetFormat( aout_instance_t *p_aout )
     
     switch (p_aout->output.output.i_format)
     {
-    case AOUT_FMT_S16_LE:
+    case VLC_FOURCC('s','1','6','l'):
         p_aout->output.p_sys->p_format->format = gs_audio_format::B_GS_S16;
         p_aout->output.p_sys->p_format->byte_order = B_MEDIA_LITTLE_ENDIAN;
         break;
-    case AOUT_FMT_S16_BE:
+    case VLC_FOURCC('s','1','6','b'):
         p_aout->output.p_sys->p_format->format = gs_audio_format::B_GS_S16;
         p_aout->output.p_sys->p_format->byte_order = B_MEDIA_BIG_ENDIAN;
         break;
-    case AOUT_FMT_S8:
+    case VLC_FOURCC('s','8',0,0):
         p_aout->output.p_sys->p_format->format = gs_audio_format::B_GS_U8;
         p_aout->output.p_sys->p_format->byte_order = B_MEDIA_LITTLE_ENDIAN;
         break;
-    case AOUT_FMT_FLOAT32:
+    case VLC_FOURCC('f','1','3','2'):
         p_aout->output.p_sys->p_format->format = gs_audio_format::B_GS_F;
         p_aout->output.p_sys->p_format->byte_order = B_MEDIA_LITTLE_ENDIAN;
         break;

@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.26 2002/09/30 18:30:28 titer Exp $
+ * $Id: beos_specific.cpp,v 1.27 2002/10/09 01:14:18 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -78,11 +78,11 @@ static void AppThread( vlc_object_t *p_appthread );
  *****************************************************************************/
 void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
-    p_this->p_vlc->p_appthread =
+    p_this->p_libvlc->p_appthread =
             (vlc_object_t *)vlc_object_create( p_this, sizeof(vlc_object_t) );
 
     /* Create the BApplication thread and wait for initialization */
-    vlc_thread_create( p_this->p_vlc->p_appthread, "app thread", AppThread,
+    vlc_thread_create( p_this->p_libvlc->p_appthread, "app thread", AppThread,
                        VLC_THREAD_PRIORITY_LOW, VLC_TRUE );
 }
 
@@ -102,8 +102,8 @@ void system_End( vlc_t *p_this )
     /* Tell the BApplication to die */
     be_app->PostMessage( B_QUIT_REQUESTED );
 
-    vlc_thread_join( p_this->p_vlc->p_appthread );
-    vlc_object_destroy( p_this->p_vlc->p_appthread );
+    vlc_thread_join( p_this->p_libvlc->p_appthread );
+    vlc_object_destroy( p_this->p_libvlc->p_appthread );
 
     free( psz_program_path );
 }
