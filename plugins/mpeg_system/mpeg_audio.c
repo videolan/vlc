@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.6 2002/05/14 14:13:00 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.7 2002/05/17 23:01:02 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -24,11 +24,11 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
 
 #include <videolan/vlc.h>
 
 #include <sys/types.h>
-
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
@@ -53,7 +53,7 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( "MPEG I/II Audio stream demux" )
     ADD_CAPABILITY( DEMUX, 110 )
-    ADD_SHORTCUT( "mpeg_audio" )
+    ADD_SHORTCUT( "mpegaudio" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -400,6 +400,7 @@ static int MPEGAudioInit( input_thread_t * p_input )
     mpegaudio_format_t mpeg;
     es_descriptor_t * p_es;
     int i_pos;
+    int b_forced;
 
     /* XXX: i don't know what it's supposed to do, copied from ESInit */
     /* Initialize access plug-in structures. */
@@ -408,13 +409,28 @@ static int MPEGAudioInit( input_thread_t * p_input )
     /* Improve speed. */
         p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
     }
+    if( ( *p_input->psz_demux )
+        &&( !strncmp( p_input->psz_demux, "mpegaudio", 10 ) ) )
+    {
+        b_forced = 1;
+    }
+    else
+    {
+        b_forced = 0;
+    }
+
     /* check if it can be a ps stream */
-    if( __CheckPS(  p_input ) )
+    if( __CheckPS(  p_input ) && !b_forced )
     {
         return( -1 );
     }
     /* must be sure that is mpeg audio stream */
-    if( MPEGAudio_FindFrame( p_input, &i_pos, &mpeg, MPEGAUDIO_MAXTESTPOS)!= 2 )
+    if( MPEGAudio_FindFrame( p_input, 
+                             &i_pos, 
+                             &mpeg, 
+                             (b_forced ? 2 * MPEGAUDIO_MAXFRAMESIZE : 
+                                             MPEGAUDIO_MAXTESTPOS) ) 
+                    < (b_forced ? 1 : 2)  )
     {
         intf_WarnMsg( 2,"input: MPEGAudio plug-in discarded" );
         return( -1 );
@@ -581,11 +597,6 @@ static int MPEGAudioDemux( input_thread_t * p_input )
         p_pes->p_last  = p_data;
         i_toread -= i_read;
     }
-    /* XXX VERY STRANGE need to *90000 and not *1000000 WHYYYY ??? 
-        I know that for mpeg system clock unit is based on 90000 but 
-        pts is not supposed to be in microsec for vlc ? 
-        At least it's welcome to write it somewhere in input_clock.c 
-        i've wasted time because of it :( */
     p_mpegaudio->i_pts = (mtime_t)90000 * 
                                (mtime_t)p_mpegaudio->i_framecount * 
                                (mtime_t)MPEGAudio_DecodedFrameSize( &mpeg ) /
