@@ -5,7 +5,7 @@
 noinst_LIBRARIES = $(noinst_LIBRARIES_activex)
 
 MOSTLYCLEANFILES = $(LIBRARIES_activex)
-EXTRA_DIST = $(SOURCES_activex) $(DIST_rsrc) 
+EXTRA_DIST = $(SOURCES_activex) $(DIST_rsrc) $(DIST_misc)
 BUILT_SOURCES = $(BUILT_SOURCES_activex)
 
 SOURCES_activex = \
@@ -42,6 +42,16 @@ SOURCES_activex = \
 
 DIST_rsrc = \
 	axvlc_rc.rc \
+	$(NULL)
+
+DIST_misc = \
+	README.TXT \
+	axvlc.def \
+	axvlc.idl \
+	axvlc.reg \
+	axvlc.tlb \
+	inplace.bmp \
+	test.html \
 	$(NULL)
 
 LIBRARIES_libvlc = $(top_builddir)/lib/libvlc.a
