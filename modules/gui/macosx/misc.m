@@ -2,7 +2,7 @@
  * misc.m: code not specific to vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: misc.m,v 1.2 2003/03/13 22:24:17 hartman Exp $
+ * $Id: misc.m,v 1.3 2003/11/15 22:42:16 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -24,6 +24,98 @@
 #include <Cocoa/Cocoa.h>
 
 #include "misc.h"
+#include "playlist.h"
+
+/*****************************************************************************
+ * VLCControllerWindow
+ *****************************************************************************/
+
+@implementation VLCControllerWindow
+
+- (id)initWithContentRect:(NSRect)contentRect styleMask:(unsigned int)styleMask
+    backing:(NSBackingStoreType)backingType defer:(BOOL)flag
+{
+    self = [super initWithContentRect:contentRect styleMask:styleMask //& ~NSTitledWindowMask
+    backing:backingType defer:flag];
+
+    return( self );
+}
+@end
+
+
+
+/*****************************************************************************
+ * VLCControllerView
+ *****************************************************************************/
+
+@implementation VLCControllerView
+
+- (void)dealloc
+{
+    [self unregisterDraggedTypes];
+    [super dealloc];
+}
+
+- (void)awakeFromNib
+{
+    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSTIFFPboardType, 
+        NSFilenamesPboardType, nil]];
+}
+
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
+{
+    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) 
+                == NSDragOperationGeneric)
+    {
+        return NSDragOperationGeneric;
+    }
+    else
+    {
+        return NSDragOperationNone;
+    }
+}
+
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
+{
+    return YES;
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+    NSPasteboard *o_paste = [sender draggingPasteboard];
+    NSArray *o_types = [NSArray arrayWithObjects: NSFilenamesPboardType, nil];
+    NSString *o_desired_type = [o_paste availableTypeFromArray:o_types];
+    NSData *o_carried_data = [o_paste dataForType:o_desired_type];
+
+    if( o_carried_data )
+    {
+        if ([o_desired_type isEqualToString:NSFilenamesPboardType])
+        {
+            int i;
+            NSArray *o_array = [NSArray array];
+            NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType]
+                        sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+
+            for( i = 0; i < (int)[o_values count]; i++)
+            {
+                NSDictionary *o_dic;
+                o_dic = [NSDictionary dictionaryWithObject:[o_values objectAtIndex:i] forKey:@"ITEM_URL"];
+                o_array = [o_array arrayByAddingObject: o_dic];
+            }
+            [(VLCPlaylist *)[[NSApp delegate] getPlaylist] appendArray: o_array atPos: -1 enqueue:NO];
+            return YES;
+        }
+    }
+    [self setNeedsDisplay:YES];
+    return YES;
+}
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
+{
+    [self setNeedsDisplay:YES];
+}
+
+@end
 
 /*****************************************************************************
  * VLBrushedMetalImageView
@@ -34,6 +126,71 @@
 - (BOOL)mouseDownCanMoveWindow
 {
     return YES;
+}
+
+- (void)dealloc
+{
+    [self unregisterDraggedTypes];
+    [super dealloc];
+}
+
+- (void)awakeFromNib
+{
+    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSTIFFPboardType, 
+        NSFilenamesPboardType, nil]];
+}
+
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
+{
+    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) 
+                == NSDragOperationGeneric)
+    {
+        return NSDragOperationGeneric;
+    }
+    else
+    {
+        return NSDragOperationNone;
+    }
+}
+
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
+{
+    return YES;
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+    NSPasteboard *o_paste = [sender draggingPasteboard];
+    NSArray *o_types = [NSArray arrayWithObjects: NSFilenamesPboardType, nil];
+    NSString *o_desired_type = [o_paste availableTypeFromArray:o_types];
+    NSData *o_carried_data = [o_paste dataForType:o_desired_type];
+
+    if( o_carried_data )
+    {
+        if ([o_desired_type isEqualToString:NSFilenamesPboardType])
+        {
+            int i;
+            NSArray *o_array = [NSArray array];
+            NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType]
+                        sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+
+            for( i = 0; i < (int)[o_values count]; i++)
+            {
+                NSDictionary *o_dic;
+                o_dic = [NSDictionary dictionaryWithObject:[o_values objectAtIndex:i] forKey:@"ITEM_URL"];
+                o_array = [o_array arrayByAddingObject: o_dic];
+            }
+            [(VLCPlaylist *)[[NSApp delegate] getPlaylist] appendArray: o_array atPos: -1 enqueue:NO];
+            return YES;
+        }
+    }
+    [self setNeedsDisplay:YES];
+    return YES;
+}
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
+{
+    [self setNeedsDisplay:YES];
 }
 
 @end
@@ -65,12 +222,12 @@
     if( self != nil )
     {
         _bgColor = [[NSColor colorWithDeviceRed: 0.8627451
-                                          green: 0.8784314
-                                           blue: 0.7725490
-                                          alpha: 1.0] retain];
+                                                green: 0.8784314
+                                                blue: 0.7725490
+                                                alpha: 1.0] retain];
         _knobColor = [[NSColor blackColor] retain];
     }
-
+        NSLog(@"boe");
     return( self );
 }
 

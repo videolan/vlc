@@ -1,9 +1,8 @@
-
 /*****************************************************************************
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.64 2003/11/11 23:50:41 hartman Exp $
+ * $Id: vout.m,v 1.65 2003/11/15 22:42:16 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -83,9 +82,6 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     OSErr err;
     int i_timeout;
-    vlc_value_t value_drawable;
-
-    var_Get( p_vout->p_vlc, "drawable", &value_drawable );
 
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -96,45 +92,40 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
-    /* We don't need an intf in mozilla plugin */
-    if( value_drawable.i_int == 0 )
+    /* Wait for a MacOS X interface to appear. Timeout is 2 seconds. */
+    for( i_timeout = 20 ; i_timeout-- ; )
     {
-        /* Wait for a MacOS X interface to appear. Timeout is 2 seconds. */
-        for( i_timeout = 20 ; i_timeout-- ; )
+        if( NSApp == NULL )
         {
-            if( NSApp == NULL )
+            msleep( INTF_IDLE_SLEEP );
+        }
+    }
+
+    if( NSApp == NULL )
+    {
+        /* no MacOS X intf, unable to communicate with MT */
+        msg_Err( p_vout, "no MacOS X interface present" );
+        free( p_vout->p_sys );
+        return( 1 );
+    }
+
+    if( [NSApp respondsToSelector: @selector(getIntf)] )
+    {
+        intf_thread_t * p_intf;
+
+        for( i_timeout = 10 ; i_timeout-- ; )
+        {
+            if( ( p_intf = [NSApp getIntf] ) == NULL )
             {
                 msleep( INTF_IDLE_SLEEP );
             }
         }
-    
-        if( NSApp == NULL )
+
+        if( p_intf == NULL )
         {
-            /* no MacOS X intf, unable to communicate with MT */
-            msg_Err( p_vout, "no MacOS X interface present" );
+            msg_Err( p_vout, "MacOS X intf has getIntf, but is NULL" );
             free( p_vout->p_sys );
             return( 1 );
-        }
-    
-    
-        if( [NSApp respondsToSelector: @selector(getIntf)] )
-        {
-            intf_thread_t * p_intf;
-    
-            for( i_timeout = 10 ; i_timeout-- ; )
-            {
-                if( ( p_intf = [NSApp getIntf] ) == NULL )
-                {
-                    msleep( INTF_IDLE_SLEEP );
-                }
-            }
-    
-            if( p_intf == NULL )
-            {
-                msg_Err( p_vout, "MacOS X intf has getIntf, but is NULL" );
-                free( p_vout->p_sys );
-                return( 1 );
-            }
         }
     }
 
@@ -145,22 +136,6 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
 
     p_vout->p_sys->b_mouse_moved = VLC_TRUE;
     p_vout->p_sys->i_time_mouse_last_moved = mdate();
-
-    if( value_drawable.i_int != 0 )
-    {
-        p_vout->p_sys->mask = NewRgn();
-        p_vout->p_sys->rect.left = 0 ;
-        p_vout->p_sys->rect.right = 0 ;
-        p_vout->p_sys->rect.top = 0 ;
-        p_vout->p_sys->rect.bottom = 0 ;
-
-        p_vout->p_sys->isplugin = VLC_TRUE ;
-    
-    } else
-    {
-        p_vout->p_sys->mask = NULL;
-        p_vout->p_sys->isplugin = VLC_FALSE ;
-    }
 
     /* set window size */
     p_vout->p_sys->s_rect.size.width = p_vout->i_window_width;
@@ -246,17 +221,13 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     }
     [o_pool release];
 
-    /* We don't need a window either in the mozilla plugin */
-    if( p_vout->p_sys->isplugin == 0 )
+    if( CoCreateWindow( p_vout ) )
     {
-        if( CoCreateWindow( p_vout ) )
-        {
-            msg_Err( p_vout, "unable to create window" );
-            free( p_vout->p_sys->p_matrix );
-            DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
-            free( p_vout->p_sys ); 
-            return( 1 );
-        }
+        msg_Err( p_vout, "unable to create window" );
+        free( p_vout->p_sys->p_matrix );
+        DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
+        free( p_vout->p_sys ); 
+        return( 1 );
     }
 
     p_vout->pf_init = vout_Init;
@@ -275,7 +246,6 @@ static int vout_Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
-    vlc_value_t val;
 
     I_OUTPUTPICTURES = 0;
 
@@ -285,13 +255,6 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
-
-    var_Get( p_vout->p_vlc, "drawable", &val );
-
-    if( p_vout->p_sys->isplugin )
-    {
-        p_vout->p_sys->p_qdport = val.i_int;
-    }
 
     SetPort( p_vout->p_sys->p_qdport );
     QTScaleMatrix( p_vout );
@@ -356,14 +319,11 @@ static void vout_End( vout_thread_t *p_vout )
  *****************************************************************************/
 void E_(CloseVideo) ( vlc_object_t *p_this )
 {       
-    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;     
 
-    if ( !p_vout->p_sys->isplugin )
+    if( CoDestroyWindow( p_vout ) )
     {
-        if( CoDestroyWindow( p_vout ) )
-        {
-            msg_Err( p_vout, "unable to destroy window" );
-        }
+        msg_Err( p_vout, "unable to destroy window" );
     }
 
     if ( p_vout->p_sys->p_fullscreen_state != NULL )
@@ -385,9 +345,6 @@ void E_(CloseVideo) ( vlc_object_t *p_this )
  *****************************************************************************/
 static int vout_Manage( vout_thread_t *p_vout )
 {
-    vlc_value_t val1;
-    var_Get( p_vout->p_vlc, "drawableredraw", &val1 );
-
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
         if( CoToggleFullscreen( p_vout ) )  
@@ -398,23 +355,13 @@ static int vout_Manage( vout_thread_t *p_vout )
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
 
-    if( (p_vout->i_changes & VOUT_SIZE_CHANGE) ||
-            ( p_vout->p_sys->isplugin && val1.i_int == 1) )
+    if( p_vout->i_changes & VOUT_SIZE_CHANGE ) 
     {
-        if( p_vout->p_sys->isplugin ) 
-        {
-            val1.i_int = 0;
-            var_Set( p_vout->p_vlc, "drawableredraw", val1 );
-            QTScaleMatrix( p_vout );
-            SetDSequenceMask( p_vout->p_sys->i_seq , p_vout->p_sys->mask );
-        }
-        else
-        {
-            QTScaleMatrix( p_vout );
-            SetDSequenceMatrix( p_vout->p_sys->i_seq, 
-                                p_vout->p_sys->p_matrix );
-            p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-        }
+        QTScaleMatrix( p_vout );
+        SetDSequenceMatrix( p_vout->p_sys->i_seq, 
+                            p_vout->p_sys->p_matrix );
+ 
+        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
     }
 
     /* hide/show mouse cursor 
@@ -432,6 +379,9 @@ static int vout_Manage( vout_thread_t *p_vout )
         VLCHideMouse( p_vout, NO );
     }
     
+    /* disable screen saver */
+    UpdateSystemActivity( UsrActivity );
+    
     return( 0 );
 }
 
@@ -444,62 +394,18 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     OSErr err;
     CodecFlags flags;
-    Rect oldrect;
-    RgnHandle oldClip;
 
-    if( p_vout->p_sys->isplugin )
+    if( ( err = DecompressSequenceFrameS( 
+                    p_vout->p_sys->i_seq,
+                    p_pic->p_sys->p_info,
+                    p_pic->p_sys->i_size,                    
+                    codecFlagUseImageBuffer, &flags, nil ) != noErr ) )
     {
-        oldClip = NewRgn();
-
-        /* In mozilla plugin, mozilla browser also draws things in
-         * the windows. So we have to update the port/Origin for each
-         * picture. FIXME : the vout should lock something ! */
-        GetPort( &p_vout->p_sys->p_qdportold );
-	GetPortBounds( p_vout->p_sys->p_qdportold, &oldrect );
-        GetClip( oldClip );
-
-	LockPortBits( p_vout->p_sys->p_qdport );
-
-        SetPort( p_vout->p_sys->p_qdport );
-        SetOrigin( p_vout->p_sys->portx , p_vout->p_sys->porty );
-        ClipRect( &p_vout->p_sys->rect );
-   
-	
-        if( ( err = DecompressSequenceFrameS( 
-                        p_vout->p_sys->i_seq,
-                        p_pic->p_sys->p_info,
-                        p_pic->p_sys->i_size,                    
-                        codecFlagUseImageBuffer, &flags, nil ) != noErr ) )
-        {
-            msg_Warn( p_vout, "DecompressSequenceFrameS failed: %d", err );
-        }
-        else
-        {
-            QDFlushPortBuffer( p_vout->p_sys->p_qdport, p_vout->p_sys->mask );
-        }
-
-
-	SetOrigin( oldrect.left , oldrect.top );
-        SetClip( oldClip );
-        SetPort( p_vout->p_sys->p_qdportold );
-
-	UnlockPortBits( p_vout->p_sys->p_qdport );
-
+        msg_Warn( p_vout, "DecompressSequenceFrameS failed: %d", err );
     }
     else
-    { 
-        if( ( err = DecompressSequenceFrameS(
-                        p_vout->p_sys->i_seq,
-                        p_pic->p_sys->p_info,
-                        p_pic->p_sys->i_size,
-                        codecFlagUseImageBuffer, &flags, nil ) != noErr ) )
-        {
-            msg_Warn( p_vout, "DecompressSequenceFrameS failed: %d", err );
-        }
-        else
-        {
-            QDFlushPortBuffer( p_vout->p_sys->p_qdport, nil );
-        }
+    {
+        QDFlushPortBuffer( p_vout->p_sys->p_qdport, nil );
     }
 }
 
@@ -547,10 +453,8 @@ static int CoCreateWindow( vout_thread_t *p_vout )
  *****************************************************************************/
 static int CoDestroyWindow( vout_thread_t *p_vout )
 {
-    if( [[NSCursor currentCursor] image] == NULL )
-    {
-        VLCHideMouse( p_vout, NO );
-    }
+
+    VLCHideMouse( p_vout, NO );
 
     if( CoSendRequest( p_vout, @selector(destroyWindow:) ) )
     {
@@ -585,6 +489,9 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
         msg_Err( p_vout, "unable to create window" );
         return( 1 );
     }
+
+    SetPort( p_vout->p_sys->p_qdport );
+    QTScaleMatrix( p_vout );
 
     if( QTCreateSequence( p_vout ) )
     {
@@ -635,50 +542,11 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
     Fixed factor_x, factor_y;
     unsigned int i_offset_x = 0;
     unsigned int i_offset_y = 0;
-    vlc_value_t val;
-    vlc_value_t valt;
-    vlc_value_t vall;
-    vlc_value_t valb;
-    vlc_value_t valr;
-    vlc_value_t valx;
-    vlc_value_t valy;
-    vlc_value_t valw;
-    vlc_value_t valh;
-    vlc_value_t valportx;
-    vlc_value_t valporty;
 
     GetPortBounds( p_vout->p_sys->p_qdport, &s_rect );
+
     i_width = s_rect.right - s_rect.left;
     i_height = s_rect.bottom - s_rect.top;
-
-    var_Get( p_vout->p_vlc, "drawable", &val );
-    var_Get( p_vout->p_vlc, "drawablet", &valt );
-    var_Get( p_vout->p_vlc, "drawablel", &vall );
-    var_Get( p_vout->p_vlc, "drawableb", &valb );
-    var_Get( p_vout->p_vlc, "drawabler", &valr );
-    var_Get( p_vout->p_vlc, "drawablex", &valx );
-    var_Get( p_vout->p_vlc, "drawabley", &valy );
-    var_Get( p_vout->p_vlc, "drawablew", &valw );
-    var_Get( p_vout->p_vlc, "drawableh", &valh );
-    var_Get( p_vout->p_vlc, "drawableportx", &valportx );
-    var_Get( p_vout->p_vlc, "drawableporty", &valporty );
-
-    if( p_vout->p_sys->isplugin )
-    {
-        p_vout->p_sys->portx = valportx.i_int;
-        p_vout->p_sys->porty = valporty.i_int;
-        p_vout->p_sys->p_qdport = val.i_int;
-        i_width = valw.i_int;
-        i_height = valh.i_int;
-
-        SetRectRgn( p_vout->p_sys->mask , vall.i_int - valx.i_int ,
-                    valt.i_int - valy.i_int , valr.i_int - valx.i_int ,
-                    valb.i_int - valy.i_int );
-        p_vout->p_sys->rect.top = 0;
-        p_vout->p_sys->rect.left = 0;
-        p_vout->p_sys->rect.bottom = valb.i_int - valt.i_int;
-        p_vout->p_sys->rect.right = valr.i_int - vall.i_int;
-    }
 
     if( i_height * p_vout->output.i_aspect < i_width * VOUT_ASPECT_FACTOR )
     {
@@ -690,7 +558,7 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
         factor_y = FixDiv( Long2Fix( i_height ),
                            Long2Fix( p_vout->output.i_height ) );
 
-        i_offset_x = (i_width - i_adj_width) / 2 + i_offset_x;
+        i_offset_x = (i_width - i_adj_width) / 2;
     }
     else
     {
@@ -702,7 +570,7 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
         factor_y = FixDiv( Long2Fix( i_adj_height ),
                            Long2Fix( p_vout->output.i_height ) );
 
-        i_offset_y = (i_height - i_adj_height) / 2 + i_offset_y;
+        i_offset_y = (i_height - i_adj_height) / 2;
     }
     
     SetIdentityMatrix( p_vout->p_sys->p_matrix );
@@ -745,9 +613,7 @@ static int QTCreateSequence( vout_thread_t *p_vout )
     p_descr->dataSize = 0;
     p_descr->depth = 24;
 
-
     HUnlock( (Handle)p_vout->p_sys->h_img_descr );
-
 
     if( ( err = DecompressSequenceBeginS( 
                               &p_vout->p_sys->i_seq,
@@ -756,7 +622,7 @@ static int QTCreateSequence( vout_thread_t *p_vout )
                               p_vout->p_sys->p_qdport,
                               NULL, NULL,
                               p_vout->p_sys->p_matrix,
-                              0, p_vout->p_sys->mask,
+                              0, NULL,
                               codecFlagUseImageBuffer,
                               codecLosslessQuality,
                               p_vout->p_sys->img_dc ) ) )
@@ -764,7 +630,6 @@ static int QTCreateSequence( vout_thread_t *p_vout )
         msg_Err( p_vout, "DecompressSequenceBeginS failed: %d", err );
         return( 1 );
     }
-
 
     return( 0 );
 }
@@ -916,7 +781,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             newsize.width = (int) ( p_vout->render.i_width * factor );
             newsize.height = (int) ( i_corrected_height * factor );
         }
-
+    
         [self setContentSize: newsize];
         
         [self setFrameTopLeftPoint: topleftscreen];
@@ -1397,7 +1262,6 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     o_view = [[VLCView alloc] init];
-
     /* FIXME: [o_view setMenu:] */
     [p_vout->p_sys->o_window setContentView: o_view];
     [o_view autorelease];

@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.100 2003/11/11 23:50:41 hartman Exp $
+ * $Id: intf.m,v 1.101 2003/11/15 22:42:16 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -376,7 +376,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 {
     unsigned int i_key;
     intf_thread_t * p_intf = [NSApp getIntf];
-    
+
     [self initStrings];
     [o_window setExcludedFromWindowsMenu: TRUE];
     [o_msgs_panel setExcludedFromWindowsMenu: TRUE];
@@ -431,12 +431,12 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     /* button controls */
     [o_btn_playlist setToolTip: _NS("Playlist")];
     [o_btn_prev setToolTip: _NS("Previous")];
-    [o_btn_slower setToolTip: _NS("Slower")];
+    [o_btn_rewind setToolTip: _NS("Rewind")];
     [o_btn_play setToolTip: _NS("Play")];
     [o_btn_stop setToolTip: _NS("Stop")];
-    [o_btn_faster setToolTip: _NS("Faster")];
+    [o_btn_ff setToolTip: _NS("Fast Forward")];
     [o_btn_next setToolTip: _NS("Next")];
-    [o_btn_prefs setToolTip: _NS("Preferences")];
+    [o_btn_fullscreen setToolTip: _NS("Fullscreen")];
     [o_volumeslider setToolTip: _NS("Volume")];
     [o_timeslider setToolTip: _NS("Position")];
 
@@ -556,7 +556,9 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     o_msg_arr = [[NSMutableArray arrayWithCapacity: 200] retain];
 
     o_img_play = [[NSImage imageNamed: @"play"] retain];
+    o_img_play_pressed = [[NSImage imageNamed: @"play_blue"] retain];
     o_img_pause = [[NSImage imageNamed: @"pause"] retain];
+    o_img_pause_pressed = [[NSImage imageNamed: @"pause_blue"] retain];
 
     [p_intf->p_sys->o_sendport setDelegate: self];
     [[NSRunLoop currentRunLoop] 
@@ -587,6 +589,15 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     if ( o_controls )
     {
         return o_controls;
+    }
+    return nil;
+}
+
+- (id)getPlaylist
+{
+    if ( o_playlist )
+    {
+        return o_playlist;
     }
     return nil;
 }
@@ -715,7 +726,6 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         vlc_bool_t b_control = VLC_FALSE;
         vlc_bool_t b_seekable = VLC_FALSE;
         vlc_bool_t b_chapters = VLC_FALSE;
-        vlc_value_t val;
 
         b_plmul = p_playlist->i_size > 1;
 
@@ -733,23 +743,11 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
             b_chapters = p_input->stream.i_area_nb > 1; 
  
             vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-            /* play status */
-            var_Get( p_input, "state", &val );
-            p_intf->p_sys->b_play_status = val.i_int != PAUSE_S;
         }
-        else
-        {
-            /* play status */
-            p_intf->p_sys->b_play_status = FALSE;
-            [self setSubmenusEnabled: FALSE];
-        }
-
-        [self playStatusUpdated: p_intf->p_sys->b_play_status];
 
         [o_btn_stop setEnabled: b_input];
-        [o_btn_faster setEnabled: b_control];
-        [o_btn_slower setEnabled: b_control];
+        [o_btn_ff setEnabled: b_control];
+        [o_btn_rewind setEnabled: b_control];
         [o_btn_prev setEnabled: (b_plmul || b_chapters)];
         [o_btn_next setEnabled: (b_plmul || b_chapters)];
 
@@ -764,19 +762,9 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
     if( p_intf->p_sys->b_playing && p_input != NULL )
     {
-        vlc_value_t time, val;
+        vlc_value_t time;
         NSString * o_time;
         mtime_t i_seconds;
-        var_Get( p_input, "state", &val );
-
-        if( !p_input->b_die && ( p_intf->p_sys->b_play_status !=
-            ( val.i_int != PAUSE_S ) ) ) 
-        {
-            p_intf->p_sys->b_play_status =
-                !p_intf->p_sys->b_play_status;
-
-            [self playStatusUpdated: p_intf->p_sys->b_play_status]; 
-        }
 
         if( p_input->stream.b_seekable )
         {
@@ -800,9 +788,27 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
                         (int) (i_seconds / 60 % 60),
                         (int) (i_seconds % 60)];
         [o_timefield setStringValue: o_time];
+    }
+    if( p_input )
+    {
+        vlc_value_t val;
+        var_Get( p_input, "state", &val );
 
-        /* disable screen saver */
-        UpdateSystemActivity( UsrActivity );
+        if( val.i_int != PAUSE_S )
+        {
+            p_intf->p_sys->b_play_status = TRUE;
+        }
+        else
+        {
+            p_intf->p_sys->b_play_status = FALSE;
+        }
+        [self playStatusUpdated: p_intf->p_sys->b_play_status];
+    }
+    else
+    {
+        p_intf->p_sys->b_play_status = FALSE;
+        [self playStatusUpdated: p_intf->p_sys->b_play_status];
+        [self setSubmenusEnabled: FALSE];
     }
 
 #undef p_input
@@ -964,6 +970,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     if( b_pause )
     {
         [o_btn_play setImage: o_img_pause];
+        [o_btn_play setAlternateImage: o_img_pause_pressed];
         [o_btn_play setToolTip: _NS("Pause")];
         [o_mi_play setTitle: _NS("Pause")];
         [o_dmi_play setTitle: _NS("Pause")];
@@ -971,6 +978,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     else
     {
         [o_btn_play setImage: o_img_play];
+        [o_btn_play setAlternateImage: o_img_play_pressed];
         [o_btn_play setToolTip: _NS("Play")];
         [o_mi_play setTitle: _NS("Play")];
         [o_dmi_play setTitle: _NS("Play")];
@@ -983,6 +991,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     [o_mi_title setEnabled: b_enabled];
     [o_mi_chapter setEnabled: b_enabled];
     [o_mi_audiotrack setEnabled: b_enabled];
+    [o_mi_visual setEnabled: b_enabled];
     [o_mi_videotrack setEnabled: b_enabled];
     [o_mi_subtitle setEnabled: b_enabled];
     [o_mi_channels setEnabled: b_enabled];
@@ -1073,6 +1082,18 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         playlist_Destroy( p_playlist );
     }
 
+    if( o_img_pause_pressed != nil )
+    {
+        [o_img_pause_pressed release];
+        o_img_pause_pressed = nil;
+    }
+    
+    if( o_img_pause_pressed != nil )
+    {
+        [o_img_pause_pressed release];
+        o_img_pause_pressed = nil;
+    }
+    
     if( o_img_pause != nil )
     {
         [o_img_pause release];

@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.37 2003/11/12 02:45:26 hartman Exp $
+ * $Id: playlist.m,v 1.38 2003/11/15 22:42:16 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -305,7 +305,6 @@
             temp = strrchr( psz_dev , 's' );
             psz_dev[temp - psz_dev] = '\0';
             o_url = [NSString stringWithCString: psz_dev ];
-            NSLog(@"%@", o_url);
         }
     
         if (i_item == 0 && !b_enqueue)

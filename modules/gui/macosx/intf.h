@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.48 2003/11/11 23:50:41 hartman Exp $
+ * $Id: intf.h,v 1.49 2003/11/15 22:42:16 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -93,6 +93,7 @@ struct intf_sys_t
     id o_prefs;                 /* VLCPrefs       */
 
     IBOutlet id o_window;       /* main window    */
+    IBOutlet id o_infofield;    /* info field     */
     IBOutlet id o_timefield;    /* time field     */
     IBOutlet id o_timeslider;   /* time slider    */
     float f_slider;             /* slider value   */
@@ -101,15 +102,17 @@ struct intf_sys_t
 
     IBOutlet id o_btn_playlist; /* btn playlist   */
     IBOutlet id o_btn_prev;     /* btn previous   */
-    IBOutlet id o_btn_slower;   /* btn slower     */
+    IBOutlet id o_btn_rewind;   /* btn rewind     */
     IBOutlet id o_btn_play;     /* btn play       */
     IBOutlet id o_btn_stop;     /* btn stop       */
-    IBOutlet id o_btn_faster;   /* btn faster     */
+    IBOutlet id o_btn_ff;       /* btn fast forward     */
     IBOutlet id o_btn_next;     /* btn next       */
-    IBOutlet id o_btn_prefs;    /* btn prefs      */
+    IBOutlet id o_btn_fullscreen;/* btn fullscreen      */
 
     NSImage * o_img_play;       /* btn play img   */
     NSImage * o_img_pause;      /* btn pause img  */
+    NSImage * o_img_play_pressed;       /* btn play img   */
+    NSImage * o_img_pause_pressed;      /* btn pause img  */
 
     IBOutlet id o_controls;     /* VLCControls    */
     IBOutlet id o_playlist;     /* VLCPlaylist    */
@@ -226,6 +229,7 @@ struct intf_sys_t
 }
 
 - (id)getControls;
+- (id)getPlaylist;
 - (void)terminate;
 
 - (void)initStrings;

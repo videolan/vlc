@@ -2,7 +2,7 @@
  * misc.h: code not specific to vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: misc.h,v 1.2 2003/03/13 22:24:17 hartman Exp $
+ * $Id: misc.h,v 1.3 2003/11/15 22:42:16 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -20,6 +20,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/*****************************************************************************
+ * VLCControllerWindow
+ *****************************************************************************/
+
+@interface VLCControllerWindow : NSWindow
+{
+}
+
+@end
+
+/*****************************************************************************
+ * VLCControllerView
+ *****************************************************************************/
+
+@interface VLCControllerView : NSView
+{
+}
+
+@end
 
 /*****************************************************************************
  * VLBrushedMetalImageView

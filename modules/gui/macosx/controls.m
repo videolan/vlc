@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.53 2003/11/11 23:50:41 hartman Exp $
+ * $Id: controls.m,v 1.54 2003/11/15 22:42:16 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -43,35 +43,46 @@
 
 - (IBAction)play:(id)sender
 {
+    vlc_value_t val;
+    playlist_t * p_playlist;
     intf_thread_t * p_intf = [NSApp getIntf];
-
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
 
-    if( playlist_IsPlaying( p_playlist ) )
+    val.i_int = PLAYING_S;
+    if( p_input )
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Pause" ) );
-        playlist_Pause( p_playlist );
-        vlc_object_release( p_playlist );
+        var_Get( p_input, "state", &val );
+    }
+    if( p_input && val.i_int != PAUSE_S )
+    {
+        vout_OSDMessage( VLC_OBJECT(p_intf), _( "Pause" ) );
+        val.i_int = PAUSE_S;
+        var_Set( p_input, "state", val );
     }
     else
     {
-        if( !playlist_IsEmpty( p_playlist ) )
+        p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                        FIND_ANYWHERE );
+        if( p_playlist )
         {
-            playlist_Play( p_playlist );
-            vout_OSDMessage( (vlc_object_t *)p_intf, _( "Play" ) );
-            vlc_object_release( p_playlist );
-        }
-        else
-        {
-            vlc_object_release( p_playlist );
-            [o_open openFileGeneric: nil];
+            vlc_mutex_lock( &p_playlist->object_lock );
+            if( p_playlist->i_size )
+            {
+                vlc_mutex_unlock( &p_playlist->object_lock );
+                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Play" ) );
+                playlist_Play( p_playlist );
+                vlc_object_release( p_playlist );
+            }
+            else
+            {
+                vlc_mutex_unlock( &p_playlist->object_lock );
+                vlc_object_release( p_playlist );
+                [o_open openFileGeneric: nil];
+            }
         }
     }
+    if( p_input ) vlc_object_release( p_input );
 }
 
 - (IBAction)stop:(id)sender
@@ -119,100 +130,28 @@
 
 - (IBAction)prev:(id)sender
 {
-    vlc_value_t val;
     intf_thread_t * p_intf = [NSApp getIntf];
-
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL )
+    if( p_playlist )
     {
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-
-    if( p_playlist->p_input == NULL )
-    {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );  
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
-    val.b_bool = VLC_TRUE;
-
-#define p_area p_playlist->p_input->stream.p_selected_area
-    if( p_area->i_part > 0 && p_area->i_part_nb > 1)
-    {
-        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-        var_Set( p_playlist->p_input, "prev-chapter", val );
-        vlc_mutex_unlock( &p_playlist->object_lock );
-    }
-    else if( p_area->i_id > 1 )
-    {
-        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-        var_Set( p_playlist->p_input, "prev-title", val );
-        vlc_mutex_unlock( &p_playlist->object_lock );
-    }
-    else
-    {
-        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-        vlc_mutex_unlock( &p_playlist->object_lock );
         playlist_Prev( p_playlist );
+        vlc_object_release( p_playlist );
+        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Previous" ) );
     }
-#undef p_area
-
-    vlc_object_release( p_playlist );
-    vout_OSDMessage( (vlc_object_t *)p_intf, _( "Previous" ) );
 }
 
 - (IBAction)next:(id)sender
 {
-    vlc_value_t val;
     intf_thread_t * p_intf = [NSApp getIntf];
-
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL )
+    if( p_playlist )
     {
-        return;
-    }
-    
-    vlc_mutex_lock( &p_playlist->object_lock );
-
-    if( p_playlist->p_input == NULL )
-    {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );  
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
-    val.b_bool = VLC_TRUE;
-
-#define p_area p_playlist->p_input->stream.p_selected_area
-    if( p_area->i_part < p_area->i_part_nb - 1 && p_area->i_part_nb > 1 )
-    {
-        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-        var_Set( p_playlist->p_input, "next-chapter", val );
-        vlc_mutex_unlock( &p_playlist->object_lock );
-    }
-    else if( p_area->i_id < p_playlist->p_input->stream.i_area_nb && p_playlist->p_input->stream.i_area_nb > 1 )
-    {
-        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-        var_Set( p_playlist->p_input, "next-title", val );
-        vlc_mutex_unlock( &p_playlist->object_lock );
-    }
-    else
-    {
-        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-        vlc_mutex_unlock( &p_playlist->object_lock );
         playlist_Next( p_playlist );
+        vlc_object_release( p_playlist );
+        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Next" ) );
     }
-#undef p_area
-
-    vlc_object_release( p_playlist );
-    vout_OSDMessage( (vlc_object_t *)p_intf, _( "Next" ) );
 }
 
 - (IBAction)random:(id)sender
@@ -397,9 +336,7 @@
         {
             if( [[o_window className] isEqualToString: @"VLCWindow"] )
             {
-                if( [o_title isEqualToString: _NS("Fullscreen") ] )
-                    [o_window toggleFullscreen];
-                else if( [o_title isEqualToString: _NS("Half Size") ] )
+                if( [o_title isEqualToString: _NS("Half Size") ] )
                     [o_window scaleWindowWithFactor: 0.5];
                 else if( [o_title isEqualToString: _NS("Normal Size") ] )
                     [o_window scaleWindowWithFactor: 1.0];
@@ -412,6 +349,8 @@
                     if( ![o_window isZoomed] )
                         [o_window performZoom:self];
                 }
+                else
+                    [o_window toggleFullscreen];
                 break;
             }
         }

@@ -1,6 +1,7 @@
 {
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = MPSlider; LANGUAGE = ObjC; SUPERCLASS = NSSlider; }, 
         {
             ACTIONS = {showPanel = id; }; 
             CLASS = VLAboutBox; 
@@ -16,6 +17,8 @@
         }, 
         {CLASS = VLBrushedMetalImageView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
         {CLASS = VLCApplication; LANGUAGE = ObjC; SUPERCLASS = NSApplication; }, 
+        {CLASS = VLCControllerView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = VLCControllerWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
         {
             ACTIONS = {
                 backward = id; 
@@ -66,13 +69,13 @@
             CLASS = VLCMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                "o_btn_faster" = id; 
+                "o_btn_ff" = id; 
+                "o_btn_fullscreen" = id; 
                 "o_btn_next" = id; 
                 "o_btn_play" = id; 
                 "o_btn_playlist" = id; 
-                "o_btn_prefs" = id; 
                 "o_btn_prev" = id; 
-                "o_btn_slower" = id; 
+                "o_btn_rewind" = id; 
                 "o_btn_stop" = id; 
                 "o_controls" = id; 
                 "o_dmi_mute" = id; 
@@ -171,6 +174,7 @@
                 "o_mu_window" = id; 
                 "o_playlist" = id; 
                 "o_prefs" = id; 
+                "o_scrollfield" = id; 
                 "o_timefield" = id; 
                 "o_timeslider" = id; 
                 "o_volumeslider" = id; 

@@ -2,7 +2,7 @@
  * vout.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.h,v 1.15 2003/11/06 16:28:28 hartman Exp $
+ * $Id: vout.h,v 1.16 2003/11/15 22:42:16 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -73,10 +73,6 @@ struct vout_sys_t
     NSRect s_rect;
     int b_pos_saved;
     VLCWindow * o_window;
-    Rect rect;
-    int portx;
-    int porty;
-    int isplugin;
 
     vlc_bool_t b_mouse_moved;
     mtime_t i_time_mouse_last_moved;
@@ -84,12 +80,10 @@ struct vout_sys_t
 #ifdef __QUICKTIME__
     CodecType i_codec;
     CGrafPtr p_qdport;
-    CGrafPtr p_qdportold;
     ImageSequence i_seq;
     MatrixRecordPtr p_matrix;
     DecompressorComponent img_dc;
     ImageDescriptionHandle h_img_descr;
     Ptr p_fullscreen_state;
-    RgnHandle mask;
 #endif
 };
