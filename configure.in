@@ -945,9 +945,9 @@ then
   SDL_PATH=$PATH
   AC_ARG_WITH(sdl-config-path,
     [    --with-sdl-config-path=PATH sdl-config path (default search in \$PATH)],
-    [ if test "x$with_sdl" != "xno"
+    [ if test "x$with_sdl_config_path" != "xno"
       then
-        SDL_PATH="$with_sdl:$PATH"
+        SDL_PATH="$with_sdl_config_path:$PATH"
       fi ])
   AC_PATH_PROG(SDL12_CONFIG, sdl12-config, no, $SDL_PATH)
   SDL_CONFIG=${SDL12_CONFIG}
@@ -1191,9 +1191,9 @@ then
   GTK_PATH=$PATH
   AC_ARG_WITH(gtk-config-path,
     [    --with-gtk-config-path=PATH gtk-config path (default search in \$PATH)],
-    [ if test "x$with_gtk" != "xno"
+    [ if test "x$with_gtk_config_path" != "xno"
       then
-        GTK_PATH="$with_gtk:$PATH"
+        GTK_PATH="$with_gtk_config_path:$PATH"
       fi ])
   # look for gtk-config
   AC_PATH_PROG(GTK12_CONFIG, gtk12-config, no, $GTK_PATH)

@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.6 2002/04/02 23:43:57 gbazin Exp $
+ * $Id: win32_specific.c,v 1.7 2002/04/27 22:11:22 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -40,17 +40,17 @@ void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
     HINSTANCE hInstLib;
 
     /* Allocate structure */
-    p_main_sys = malloc( sizeof( main_sys_t ) );
-    if( p_main_sys == NULL )
+    p_main->p_sys = malloc( sizeof( main_sys_t ) );
+    if( p_main->p_sys == NULL )
     {
-        intf_ErrMsg( "init error: can't create p_main_sys (%s)",
+        intf_ErrMsg( "init error: can't create p_main->p_sys (%s)",
 		     strerror(ENOMEM) );
         exit(-1);
     }
 
     /* dynamically get the address of SignalObjectAndWait */
     hInstLib = LoadLibrary( "kernel32" );
-    p_main_sys->SignalObjectAndWait =
+    p_main->p_sys->SignalObjectAndWait =
         (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib, "SignalObjectAndWait" );
 
     /* WinSock Library Init. */
@@ -69,7 +69,7 @@ void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
  *****************************************************************************/
 void system_Configure( void )
 {
-    p_main_sys->b_fast_pthread = config_GetIntVariable( "fast_pthread" );
+    p_main->p_sys->b_fast_pthread = config_GetIntVariable( "fast_pthread" );
 }
 
 /*****************************************************************************

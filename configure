@@ -6643,9 +6643,9 @@ then
   # Check whether --with-sdl-config-path or --without-sdl-config-path was given.
 if test "${with_sdl_config_path+set}" = set; then
   withval="$with_sdl_config_path"
-   if test "x$with_sdl" != "xno"
+   if test "x$with_sdl_config_path" != "xno"
       then
-        SDL_PATH="$with_sdl:$PATH"
+        SDL_PATH="$with_sdl_config_path:$PATH"
       fi 
 fi
 
@@ -7384,9 +7384,9 @@ then
   # Check whether --with-gtk-config-path or --without-gtk-config-path was given.
 if test "${with_gtk_config_path+set}" = set; then
   withval="$with_gtk_config_path"
-   if test "x$with_gtk" != "xno"
+   if test "x$with_gtk_config_path" != "xno"
       then
-        GTK_PATH="$with_gtk:$PATH"
+        GTK_PATH="$with_gtk_config_path:$PATH"
       fi 
 fi
 

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.101 2002/04/26 18:12:28 jlj Exp $
+ * $Id: common.h,v 1.102 2002/04/27 22:11:22 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -112,11 +112,6 @@ typedef s64 mtime_t;
 /*****************************************************************************
  * Classes declaration
  *****************************************************************************/
-
-/* System */
-struct main_sys_s;
-
-typedef struct main_sys_s *             p_main_sys_t;
 
 /* Plugins */
 struct plugin_bank_s;
@@ -524,7 +519,6 @@ typedef __int64 off_t;
 typedef struct module_symbols_s
 {
     struct main_s* p_main;
-    struct main_sys_s* p_main_sys;
     struct module_bank_s* p_module_bank;
     struct input_bank_s* p_input_bank;
     struct aout_bank_s*  p_aout_bank;

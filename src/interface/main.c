@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.188 2002/04/25 21:52:42 sam Exp $
+ * $Id: main.c,v 1.189 2002/04/27 22:11:22 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -428,7 +428,6 @@ static module_config_t p_help_config[] =
  * Global variables - these are the only ones, see main.h and modules.h
  *****************************************************************************/
 main_t        *p_main;
-p_main_sys_t  p_main_sys;
 module_bank_t *p_module_bank;
 input_bank_t  *p_input_bank;
 aout_bank_t   *p_aout_bank;

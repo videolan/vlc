@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.8 2002/04/25 21:52:42 sam Exp $
+ * $Id: vlc.h,v 1.9 2002/04/27 22:11:22 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -45,7 +45,7 @@
 
 #   include "main.h"
 #   include "configuration.h"
+#   include "threads_funcs.h"
 #endif
 
 int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] );
-

@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.21 2002/04/25 21:52:42 sam Exp $
+ * $Id: modules_plugin.h,v 1.22 2002/04/27 22:11:22 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -183,7 +183,6 @@ module_error( char *psz_buffer )
  *****************************************************************************/
 #define STORE_SYMBOLS( p_symbols ) \
     (p_symbols)->p_main = p_main; \
-    (p_symbols)->p_main_sys = p_main_sys; \
     (p_symbols)->p_module_bank = p_module_bank; \
     (p_symbols)->p_input_bank = p_input_bank; \
     (p_symbols)->p_aout_bank = p_aout_bank; \
