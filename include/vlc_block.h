@@ -60,6 +60,8 @@ typedef struct block_sys_t block_sys_t;
 #define BLOCK_FLAG_HEADER        0x0020
 /** This is the last block of the frame */
 #define BLOCK_FLAG_END_OF_FRAME  0x0040
+/** No keyframes present */
+#define BLOCK_FLAG_NO_KEYFRAME   0x0080
 
 #define BLOCK_FLAG_PRIVATE_MASK  0xffff0000
 #define BLOCK_FLAG_PRIVATE_SHIFT 16
