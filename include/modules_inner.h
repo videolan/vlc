@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.25 2002/07/31 22:54:21 sam Exp $
+ * $Id: modules_inner.h,v 1.26 2002/08/01 11:04:46 tcastley Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -116,24 +116,24 @@
 
 
 #define add_submodule( )                                                      \
-    p_submodule->pp_shortcuts[ i_shortcut ] = NULL;                           \
-    p_submodule = vlc_object_create( p_module, VLC_OBJECT_MODULE );           \
+    p_submodule->pp_shortcuts[ i_shortcut ] = NULL;                   \
+    p_submodule = (module_t *)vlc_object_create( p_module, VLC_OBJECT_MODULE );\
     vlc_object_attach( p_submodule, p_module );                               \
     p_submodule->b_submodule = VLC_TRUE;                                      \
     /* Nuahahaha! Heritage! Polymorphism! Ugliness!! */                       \
     for( i_shortcut = 0; p_module->pp_shortcuts[ i_shortcut ]; i_shortcut++ ) \
     {                                                                         \
         p_submodule->pp_shortcuts[ i_shortcut ] =                             \
-                                p_module->pp_shortcuts[ i_shortcut ];         \
+                                p_module->pp_shortcuts[ i_shortcut ]; \
     }                                                                         \
     p_submodule->psz_object_name = p_module->psz_object_name;                 \
     p_submodule->psz_program = p_module->psz_program;                         \
     p_submodule->psz_capability = p_module->psz_capability;                   \
     p_submodule->i_score = p_module->i_score;                                 \
     p_submodule->i_cpu = p_module->i_cpu;                                     \
-    p_submodule->pf_activate = NULL;                                          \
+    p_submodule->pf_activate = NULL;                         \
     p_submodule->pf_deactivate = NULL
-
+    
 #define add_requirement( cap )                                                \
     p_module->i_cpu |= CPU_CAPABILITY_##cap
 
