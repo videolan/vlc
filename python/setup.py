@@ -4,6 +4,7 @@ FFMPEG_DIR = '/home/cyril/ffmpeg'
 
 vlc = Extension('vlc',
                 sources = ['vlcmodule.c'],
+                include_dirs = ['../include'],
                 libraries = ['vlc', 'rt', 'dl' , 'pthread', 'ffmpeg', 'm',
                              'memcpymmx','stream_out_transcode',
                              'i420_rgb_mmx','i420_yuy2_mmx','i420_ymga_mmx',
