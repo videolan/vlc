@@ -306,7 +306,6 @@ static void RunInterface( intf_thread_t *p_intf )
 {
     static char *ppsz_interfaces[] =
     {
-        "skins", "Skins",
         "skins2", "Skins 2",
         "wxwindows", "wxWindows",
         NULL, NULL
