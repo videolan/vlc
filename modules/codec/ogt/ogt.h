@@ -2,7 +2,7 @@
  * ogt.h : Overlay Graphics Text (SVCD subtitles) decoder thread interface
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ogt.h,v 1.4 2003/12/26 02:47:59 rocky Exp $
+ * $Id: ogt.h,v 1.5 2003/12/27 01:49:59 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -28,7 +28,8 @@
 #define DECODE_DBG_CALL        2 /* all calls */
 #define DECODE_DBG_PACKET      4 /* packet assembly info */
 #define DECODE_DBG_IMAGE       8 /* image bitmaps */
-#define DECODE_DBG_INFO       16
+#define DECODE_DBG_TRANSFORM  16 /* bitmap transformations */
+#define DECODE_DBG_INFO       32
 
 #define DECODE_DEBUG 1
 #if DECODE_DEBUG

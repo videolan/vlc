@@ -2,7 +2,7 @@
  * parse.c: Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: parse.c,v 1.1 2003/12/26 01:39:23 rocky Exp $
+ * $Id: parse.c,v 1.2 2003/12/27 01:49:59 rocky Exp $
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -240,43 +240,73 @@ ExtractField(uint8_t *p, unsigned int i_remaining)
   return ( ( *p >> 2*(i_remaining-1) ) & 0x3 );
 }
 
-#ifdef FINISHED
 /* Scales down (reduces size) of p_dest in the x direction as 
    determined through aspect ratio x_scale by y_scale. Scaling
-   is done in place. i_width, is updated to new ratio.
+   is done in place. p_spu->i_width, is updated to new width
 
-   The aspect ratio is assumed to be between 1 and 2.
+   The aspect ratio is assumed to be between 1/2 and 1.
 */
 static void
-ScaleX( uint8_t *p_dest, /*in out */ u_int16_t *i_width, u_int16_t i_height,
-	unsigned int scale_x, unsigned int scale_y )
+ScaleX( decoder_t *p_dec, subpicture_t *p_spu, 
+	unsigned int i_scale_x, unsigned int i_scale_y )
 {
   int i_row, i_col;
-  uint8_t *p1 = p_dest;
-  uint8_t *p2 = p_dest + PIXEL_SIZE;
-  
-  unsigned int used=0;  /* Number of bytes used up in p1. */
 
-  for ( i_row=0; i_row < i_height - 1; i_row++ ) {
-    for ( i_col=0; i_col <= (*i_width)-2; i_col++ ) {
+  decoder_sys_t *p_sys = p_dec->p_sys;
+  uint8_t *p_src1 = p_spu->p_sys->p_data;
+  uint8_t *p_src2 = p_src1 + PIXEL_SIZE;
+  uint8_t *p_dst  = p_src1;
+  unsigned int i_new_width = (p_spu->i_width * i_scale_x) / i_scale_y ;
+  unsigned int used=0;  /* Number of bytes used up in p_src1. */
+
+  dbg_print( (DECODE_DBG_CALL|DECODE_DBG_TRANSFORM) , 
+	     "Old width: %d, new width: %d", 
+	     p_spu->i_width, i_new_width);
+  
+  for ( i_row=0; i_row <= p_spu->i_height - 1; i_row++ ) {
+
+    if (used != 0) {
+      /* Discard the remaining piece of the colum of the previous line*/
+      used=0;
+      p_src1 = p_src2;
+      p_src2 += PIXEL_SIZE;
+    }
+    
+    for ( i_col=0; i_col <= p_spu->i_width - 2; i_col++ ) {
       unsigned int i;
-      unsigned int w1= scale_x - used;
-      unsigned int w2= scale_y - w1;
+      unsigned int w1= i_scale_x - used;
+      unsigned int w2= i_scale_y - w1;
+
       used = w2;
       for (i = 0; i < PIXEL_SIZE; i++ ) {
-	*p1 = ( (*p1 * w1) + (*p2 * w2) ) / scale_y;
-	p1++; p2++;
+	*p_dst = ( (*p_src1 * w1) + (*p_src2 * w2) ) / i_scale_y;
+	p_src1++; p_src2++; p_dst++;
       }
-      if (scale_x == used) {
-	p1 = p2;
-	p2 += PIXEL_SIZE;
+
+      if (i_scale_x == used) {
+	/* End of last pixel was end of p_src2. */
+	p_src1 = p_src2;
+	p_src2 += PIXEL_SIZE;
+	i_col++;
 	used = 0;
       }
     }
   }
-  /* *i_width = ((*i_width) * scale_y)  / scale_x; */
+  p_spu->i_width = i_new_width;
+
+  if ( p_sys && p_sys->i_debug & DECODE_DBG_TRANSFORM )
+  { 
+    ogt_yuvt_t *p_source = (ogt_yuvt_t *) p_spu->p_sys->p_data;
+    for ( i_row=0; i_row < p_spu->i_height - 1; i_row++ ) {
+      for ( i_col=0; i_col < p_spu->i_width - 1; i_col++ ) {
+	printf("%1x", p_source->t);
+	p_source++;
+      }
+      printf("\n");
+    }
+  }
+
 }
-#endif
 
 /*****************************************************************************
  * ParseImage: parse the image part of the subtitle
@@ -395,14 +425,12 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
       }
     }
 
-#ifdef FINISHED
     /* The video is automatically scaled. However subtitle bitmaps
        assume a 1:1 aspect ratio. So we need to scale to compensate for
        or undo the effects of video output scaling. 
     */
     /* FIXME do the right scaling depending on vout. It may not be 4:3 */
-    ScaleX( p_dest, &(p_sys->i_width), i_height, 3, 4 );
-#endif
+    ScaleX( p_dec, p_spu, 3, 4 );
 
     return VLC_SUCCESS;
 }

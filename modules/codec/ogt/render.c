@@ -2,7 +2,7 @@
  * render.c : Philips OGT (SVCD Subtitle) renderer
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: render.c,v 1.1 2003/12/26 01:39:35 rocky Exp $
+ * $Id: render.c,v 1.2 2003/12/27 01:49:59 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -55,9 +55,9 @@ void E_(RenderSPU)( vout_thread_t *p_vout, picture_t *p_pic,
                     const subpicture_t *p_spu )
 {
 
-#ifndef FINISHED
-    printf("+++%x\n", p_vout->output.i_chroma);
-#endif
+    /*
+      printf("+++%x\n", p_vout->output.i_chroma);
+    */
   
     switch( p_vout->output.i_chroma )
     {
