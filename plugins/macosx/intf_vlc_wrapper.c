@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.c,v 1.8 2002/02/18 01:34:44 jlj Exp $
+ * $Id: intf_vlc_wrapper.c,v 1.9 2002/03/19 03:33:52 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -39,30 +39,36 @@
 #include "macosx.h"
 #include "intf_vlc_wrapper.h"
 
-@implementation Intf_VlcWrapper
+@implementation Intf_VLCWrapper
+
+static Intf_VLCWrapper *o_intf = nil;
 
 /* Initialization */
 
-+ (Intf_VlcWrapper *)instance
+- (id)init
 {
-    static bool b_initialized = 0;
-    static Intf_VlcWrapper* o_vlc = nil;
-    
-    if( !b_initialized )
-    {
-        o_vlc = [[Intf_VlcWrapper alloc] init];
-        b_initialized = TRUE;
-    }
-        
-    return o_vlc;
-}
-    
-- (Intf_VlcWrapper *)initWithDelegate:(id)_o_delegate
-{
+    if( [super init] == nil )
+        return( nil );
+
     e_speed = SPEED_NORMAL;
-    o_delegate = _o_delegate;
-        
-    return self;
+
+    return( self );
+}
+
++ (Intf_VLCWrapper *)instance
+{
+    if( o_intf == nil )
+    {
+        o_intf = [[[Intf_VLCWrapper alloc] init] autorelease];
+    }
+
+    return( o_intf );
+}
+
+- (void)dealloc
+{
+    o_intf = nil;
+    [super dealloc];
 }
 
 - (bool)manage
@@ -86,98 +92,6 @@
 - (void)quit
 {
     p_main->p_intf->b_die = 1;
-}
-
-/* Vout requests */
-- (void)handlePortMessage:(NSPortMessage *)o_msg
-{
-    NSData *o_req;
-    struct vout_req_s *p_req;
-
-    o_req = [[o_msg components] lastObject];
-    p_req = *((struct vout_req_s **)[o_req bytes]);
-
-    [p_req->o_lock lock];
-
-    if( p_req->i_type == VOUT_REQ_CREATE_WINDOW )
-    {
-        VLCView *o_view;
-
-        p_req->p_vout->p_sys->o_window = [VLCWindow alloc];
-        [p_req->p_vout->p_sys->o_window setVout: p_req->p_vout];
-        [p_req->p_vout->p_sys->o_window setReleasedWhenClosed: YES];
-
-        if( p_req->p_vout->b_fullscreen )
-        {
-            [p_req->p_vout->p_sys->o_window 
-                initWithContentRect: [[NSScreen mainScreen] frame] 
-                styleMask: NSBorderlessWindowMask 
-                backing: NSBackingStoreBuffered
-                defer: NO screen: [NSScreen mainScreen]];
-
-            [p_req->p_vout->p_sys->o_window 
-                setLevel: CGShieldingWindowLevel()];
-        }
-        else
-        {
-            unsigned int i_stylemask = NSTitledWindowMask |
-                                       NSMiniaturizableWindowMask |
-                                       NSResizableWindowMask;
-
-            [p_req->p_vout->p_sys->o_window 
-                initWithContentRect: p_req->p_vout->p_sys->s_rect 
-                styleMask: i_stylemask
-                backing: NSBackingStoreBuffered
-                defer: NO screen: [NSScreen mainScreen]];
-
-            if( !p_req->p_vout->p_sys->b_pos_saved )
-            {
-                [p_req->p_vout->p_sys->o_window center];
-            }
-        }
-
-        o_view = [[VLCView alloc] initWithVout: p_req->p_vout];
-        [p_req->p_vout->p_sys->o_window setContentView: o_view];
-
-        [o_view lockFocus];
-        p_req->p_vout->p_sys->p_qdport = [o_view qdPort];
-        [o_view unlockFocus];
-
-        [p_req->p_vout->p_sys->o_window setTitle: [NSString 
-            stringWithCString: VOUT_TITLE]];
-        [p_req->p_vout->p_sys->o_window setAcceptsMouseMovedEvents: YES];
-        [p_req->p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
-
-        p_req->i_result = 1;
-    }
-    else if( p_req->i_type == VOUT_REQ_DESTROY_WINDOW )
-    {
-        if( !p_req->p_vout->b_fullscreen )
-        {
-            NSRect s_rect;
-
-            s_rect = [[p_req->p_vout->p_sys->o_window contentView] frame];
-            p_req->p_vout->p_sys->s_rect.size = s_rect.size;
-
-            s_rect = [p_req->p_vout->p_sys->o_window frame];
-            p_req->p_vout->p_sys->s_rect.origin = s_rect.origin;
-
-            p_req->p_vout->p_sys->b_pos_saved = 1;
-        }
-
-        p_req->p_vout->p_sys->p_qdport = nil;
-        [p_req->p_vout->p_sys->o_window close];
-        p_req->p_vout->p_sys->o_window = nil;
-
-        p_req->i_result = 1;
-    }
-
-    [p_req->o_lock unlockWithCondition: 1];
-}
-
-- (NSPort *)sendPort
-{
-    return( p_main->p_intf->p_sys->o_port );
 }
 
 /* Playback control */
@@ -206,12 +120,18 @@
     
 - (float)getTimeAsFloat
 {
-    if( p_input_bank->pp_input[0] == NULL )
+    float f_time = 0.0;
+
+    vlc_mutex_lock( &p_input_bank->lock );
+
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        return( 0.0 );
+        f_time = (float)p_area->i_tell / (float)p_area->i_size;
     }    
 
-    return( (float)p_area->i_tell / (float)p_area->i_size );
+    vlc_mutex_unlock( &p_input_bank->lock );
+
+    return( f_time );
 }
 
 - (void)setTimeAsFloat:(float)f_position
@@ -400,7 +320,7 @@
 
 - (bool)playlistPlaying
 {
-    return( p_main->p_playlist->b_stopped );
+    return( !p_main->p_playlist->b_stopped );
 }
 
 @end

@@ -1305,13 +1305,13 @@ AC_ARG_ENABLE(macosx,
   [if test x$enable_macosx = xyes
    then
      BUILTINS="${BUILTINS} macosx"
-     LIB_MACOSX="${LIB_MACOSX} -framework CoreAudio -framework Cocoa -framework AGL -framework QuickTime -lobjc"
+     LIB_MACOSX="${LIB_MACOSX} -framework CoreAudio -framework AudioToolbox -framework Cocoa -framework AGL -framework QuickTime -lobjc"
      CFLAGS_MACOSX="${CFLAGS_MACOSX} -ObjC"
      LIB="${LIB} -ObjC"
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
      BUILTINS="${BUILTINS} macosx"
-     LIB_MACOSX="${LIB_MACOSX} -framework CoreAudio -framework Cocoa -framework AGL -framework QuickTime -lobjc"
+     LIB_MACOSX="${LIB_MACOSX} -framework CoreAudio -framework AudioToolbox -framework Cocoa -framework AGL -framework QuickTime -lobjc"
      CFLAGS_MACOSX="${CFLAGS_MACOSX} -ObjC"
      LIB="${LIB} -ObjC"
    )])

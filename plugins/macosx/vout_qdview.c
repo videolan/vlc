@@ -2,7 +2,7 @@
  * vout_qdview.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_qdview.c,v 1.1 2002/02/18 01:34:44 jlj Exp $
+ * $Id: vout_qdview.c,v 1.2 2002/03/19 03:33:52 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -25,36 +25,30 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
-#include <stdlib.h>                                                /* free() */
-#include <string.h>                                            /* strerror() */
+#import <Cocoa/Cocoa.h>
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "macosx.h"
+#import "vout_qdview.h"
 
 /*****************************************************************************
  * VLCView implementation 
  *****************************************************************************/
 @implementation VLCView
 
-- (id)initWithVout:(struct vout_thread_s *)_p_vout
+- (id)initWithWrapper:(Vout_VLCWrapper *)_o_wrapper forVout:(void *)_p_vout
 {
     if( [super init] == nil )
         return nil;
 
     p_vout = _p_vout;
+    o_wrapper = _o_wrapper;
 
-    return self;
+    return( self );
 }
 
 - (void)drawRect:(NSRect)rect
 {
     [super drawRect: rect];
-    p_vout->i_changes |= VOUT_SIZE_CHANGE;
+    [o_wrapper voutDidResize: p_vout];
 }
 
 @end

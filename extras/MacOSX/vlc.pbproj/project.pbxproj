@@ -77,6 +77,8 @@
 				F6799748020DCC2A01A80112,
 				F6799749020DCC2A01A80112,
 				F679974A020DCC2A01A80112,
+				F6EA76F5024171E201A80112,
+				F6EA76F6024171E201A80112,
 			);
 			isa = PBXGroup;
 			name = Files;
@@ -364,6 +366,18 @@
 			isa = PBXFileReference;
 			name = vout_window.h;
 			path = plugins/macosx/vout_window.h;
+			refType = 4;
+		};
+		F6EA76F5024171E201A80112 = {
+			isa = PBXFileReference;
+			name = vout_vlc_wrapper.c;
+			path = plugins/macosx/vout_vlc_wrapper.c;
+			refType = 4;
+		};
+		F6EA76F6024171E201A80112 = {
+			isa = PBXFileReference;
+			name = vout_vlc_wrapper.h;
+			path = plugins/macosx/vout_vlc_wrapper.h;
 			refType = 4;
 		};
 	};

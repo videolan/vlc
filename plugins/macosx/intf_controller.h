@@ -2,7 +2,7 @@
  * intf_controller.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.h,v 1.3 2002/02/18 01:34:44 jlj Exp $
+ * $Id: intf_controller.h,v 1.4 2002/03/19 03:33:52 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *
@@ -22,16 +22,15 @@
  *****************************************************************************/
 
 #include "intf_vlc_wrapper.h"
+#include "vout_vlc_wrapper.h"
 
 @interface Intf_PlaylistDS : NSObject
 {
-    Intf_VlcWrapper      *o_vlc;
     NSMutableArray       *o_playlist;
 
     IBOutlet NSTableView *o_table;
 }
 
-- (void)awakeFromNib;
 - (void)readPlaylist;
 
 - (int)numberOfRowsInTableView:(NSTableView *)o_table;
@@ -42,7 +41,11 @@
 
 @interface Intf_Controller : NSObject
 {
-    Intf_VlcWrapper *o_vlc;
+    Intf_VLCWrapper *o_intf;
+    Vout_VLCWrapper *o_vout;
+
+    NSLock *o_slider_lock;
+    float f_slider, f_slider_old;
 
     IBOutlet NSWindow       *o_window;
     IBOutlet NSButton       *o_play;

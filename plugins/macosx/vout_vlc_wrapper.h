@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vout_window.h: MacOS X plugin for vlc
+ * vout_vlc_wrapper.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_window.h,v 1.2 2002/03/19 03:33:52 jlj Exp $
+ * $Id: vout_vlc_wrapper.h,v 1.1 2002/03/19 03:33:52 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -21,14 +21,25 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#import "vout_vlc_wrapper.h"
+#define MOUSE_MOVED             0x00000001
+#define MOUSE_NOT_MOVED         0x00000002
+#define MOUSE_LAST_MOVED        0x00000004
+#define MOUSE_NOT_LAST_MOVED    0x00000008
 
-@interface VLCWindow : NSWindow
+@interface Vout_VLCWrapper : NSObject
 {
-    void *p_vout;
-    Vout_VLCWrapper *o_wrapper;
+
 }
 
-- (void)setWrapper:(Vout_VLCWrapper *)_o_wrapper forVout:(void *)_p_vout;
++ (Vout_VLCWrapper *)instance;
++ (NSPort *)sendPort;
 
+- (void)voutDidResize:(void *)_p_vout;
+- (void)mouseEvent:(unsigned int)ui_status forVout:(void *)_p_vout;
+- (BOOL)keyDown:(NSEvent *)o_event forVout:(void *)_p_vout;
+
+@end
+
+@interface Vout_VLCWrapper (Internal)
+- (void)handlePortMessage:(NSPortMessage *)o_msg;
 @end

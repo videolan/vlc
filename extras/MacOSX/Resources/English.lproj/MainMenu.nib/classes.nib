@@ -33,7 +33,7 @@
             LANGUAGE = ObjC; 
             OUTLETS = {o_table = id; }; 
             SUPERCLASS = NSObject; 
-        }, 
+        }
     ); 
     IBVersion = 1; 
 }

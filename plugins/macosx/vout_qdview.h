@@ -2,7 +2,7 @@
  * vout_qdview.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_qdview.h,v 1.1 2002/02/18 01:34:44 jlj Exp $
+ * $Id: vout_qdview.h,v 1.2 2002/03/19 03:33:52 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -22,11 +22,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#import "vout_vlc_wrapper.h"
+
 @interface VLCView : NSQuickDrawView
 {
-    struct vout_thread_s *p_vout;
+    void *p_vout;
+    Vout_VLCWrapper *o_wrapper;
 }
 
-- (id)initWithVout:(struct vout_thread_s *)_p_vout;
+- (id)initWithWrapper:(Vout_VLCWrapper *)_o_wrapper forVout:(void *)_p_vout;
 
 @end

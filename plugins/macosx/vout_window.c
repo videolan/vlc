@@ -2,7 +2,7 @@
  * vout_window.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_window.c,v 1.1 2002/02/18 01:34:44 jlj Exp $
+ * $Id: vout_window.c,v 1.2 2002/03/19 03:33:52 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -24,27 +24,19 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
-#include <stdlib.h>                                                /* free() */
-#include <string.h>                                            /* strerror() */
+#import <Cocoa/Cocoa.h>
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "interface.h"
-
-#include "macosx.h"
+#import "vout_window.h"
 
 /*****************************************************************************
  * VLCWindow implementation 
  *****************************************************************************/
 @implementation VLCWindow
 
-- (void)setVout:(struct vout_thread_s *)_p_vout
+- (void)setWrapper:(Vout_VLCWrapper *)_o_wrapper forVout:(void *)_p_vout
 {
     p_vout = _p_vout;
+    o_wrapper = _o_wrapper;
 }
 
 - (BOOL)canBecomeKeyWindow
@@ -55,45 +47,34 @@
 - (void)becomeKeyWindow
 {
     [super becomeKeyWindow];
-    p_vout->p_sys->b_mouse_moved = 0;
-    p_vout->p_sys->i_time_mouse_last_moved = mdate();
+
+    [o_wrapper 
+        mouseEvent: (MOUSE_NOT_MOVED | MOUSE_LAST_MOVED)
+        forVout: p_vout];
 }
 
 - (void)resignKeyWindow
 {
     [super resignKeyWindow];
-    p_vout->p_sys->b_mouse_moved = 1;
-    p_vout->p_sys->i_time_mouse_last_moved = 0;
+
+    [o_wrapper
+        mouseEvent: (MOUSE_MOVED | MOUSE_NOT_LAST_MOVED)
+        forVout: p_vout];
 }
 
-- (void)keyDown:(NSEvent *)theEvent
+- (void)keyDown:(NSEvent *)o_event
 {
-    unichar key = 0;
-
-    if( [[theEvent characters] length] )
+    if( [o_wrapper keyDown: o_event forVout: p_vout] == NO )
     {
-        key = [[theEvent characters] characterAtIndex: 0]; 
-    }
-
-    switch( key )
-    {
-        case 'f': case 'F':
-            p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-            break;
-
-        case 'q': case 'Q':
-            p_main->p_intf->b_die = 1;
-            break;
-
-        default:
-            [super keyDown: theEvent];
-            break;
+        [super keyDown: o_event];
     }
 }
 
-- (void)mouseMoved:(NSEvent *)theEvent
+- (void)mouseMoved:(NSEvent *)o_event
 {
-    p_vout->p_sys->i_time_mouse_last_moved = mdate(); 
+    [o_wrapper
+        mouseEvent: MOUSE_LAST_MOVED
+        forVout: p_vout];
 }
 
 @end

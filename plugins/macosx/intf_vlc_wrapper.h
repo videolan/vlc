@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.h,v 1.3 2002/02/18 01:34:44 jlj Exp $
+ * $Id: intf_vlc_wrapper.h,v 1.4 2002/03/19 03:33:52 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -29,25 +29,19 @@ typedef enum intf_speed_e
     SPEED_FAST
 } intf_speed_t;
 
-/* Intf_VlcWrapper is a singleton class
+/* Intf_VLCWrapper is a singleton class
     (only one instance at any time) */
 
-@interface Intf_VlcWrapper : NSObject
+@interface Intf_VLCWrapper : NSObject
 {    
-    id o_delegate;
     intf_speed_t e_speed;
 }
 
 /* Initialization */
-+ (Intf_VlcWrapper *)instance;
-- (Intf_VlcWrapper *)initWithDelegate:(id)o_delegate;
++ (Intf_VLCWrapper *)instance;
 
 - (bool)manage;
 - (void)quit;
-
-/* Vout requests */
-- (void)handlePortMessage:(NSPortMessage *)o_msg;
-- (NSPort *)sendPort;
 
 /* Playback control */
 - (void)setSpeed:(intf_speed_t)e_speed;
