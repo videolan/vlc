@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.51 2001/11/28 15:08:04 massiot Exp $
+ * $Id: common.h,v 1.52 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -237,6 +237,8 @@ struct decoder_fifo_s;
 
 #define I64C(x)         x##LL
 
+/* Pointer to the fast memcpy plugin function */
+extern void* ( * pf_fast_memcpy ) ( void *, const void *, size_t );
 
 /* The win32 specific stuff was getting really big so it has been moved */
 #if defined( WIN32 )
@@ -281,6 +283,8 @@ typedef struct module_symbols_s
     void ( * intf_PlaylistDestroy ) ( struct playlist_s * );
     void ( * intf_PlaylistJumpto )  ( struct playlist_s *, int );
     void ( * intf_UrlDecode )       ( char * );
+
+    void*   ( * pf_fast_memcpy ) ( void *, const void *, size_t );
 
     void    ( * msleep )         ( mtime_t );
     mtime_t ( * mdate )          ( void );

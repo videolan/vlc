@@ -27,8 +27,8 @@ The input thread spawns the appropriate decoder modules from <filename>
 src/input/input_dec.c</filename>. The <function>Dec_CreateThread</funcion>
 function selects the more accurate decoder module. Each decoder module 
 looks at decoder_config.i_type and returns a score [ see the modules 
-section ]. It then launches <function> module.pf_RunThread()</function>, 
-with an <type>decoder_config_t</type>, described in <filename> 
+section ]. It then launches <function> module.pf_run()</function>, 
+with a <type>decoder_config_t</type>, described in <filename> 
 include/input_ext-dec.h</filename>.
     </para>
 

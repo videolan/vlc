@@ -94,8 +94,7 @@ install: build
 # libdvdcss start
 	mv debian/vlc/usr/include/videolan/dvdcss.h \
 				debian/libdvdcss$(major)-dev/usr/include/videolan
-	rmdir debian/vlc/usr/include/videolan
-	rmdir debian/vlc/usr/include
+	rm -Rf debian/vlc/usr/include
 	mv debian/vlc/usr/lib/*.a debian/libdvdcss$(major)-dev/usr/lib
 	mv debian/vlc/usr/lib/*.so debian/libdvdcss$(major)-dev/usr/lib
 	mv debian/vlc/usr/lib/*.so.* debian/libdvdcss$(major)/usr/lib

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.127 2001/11/28 15:08:06 massiot Exp $
+ * $Id: main.c,v 1.128 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -135,8 +135,9 @@
 #define OPT_YUV                 183
 #define OPT_DOWNMIX             184
 #define OPT_IMDCT               185
-#define OPT_DVDCSS_METHOD       186
-#define OPT_DVDCSS_VERBOSE      187
+#define OPT_MEMCPY              186
+#define OPT_DVDCSS_METHOD       187
+#define OPT_DVDCSS_VERBOSE      188
 
 #define OPT_SYNCHRO             190
 #define OPT_WARNING             191
@@ -216,8 +217,9 @@ static const struct option longopts[] =
     {   "channels",         0,          0,      OPT_CHANNELS },
     {   "channelserver",    1,          0,      OPT_CHANNELSERVER },
 
-    /* Synchro options */
+    /* Misc options */
     {   "synchro",          1,          0,      OPT_SYNCHRO },
+    {   "memcpy",           1,          0,      OPT_MEMCPY },
     {   0,                  0,          0,      0 }
 };
 
@@ -225,13 +227,13 @@ static const struct option longopts[] =
 static const char *psz_shortopts = "hHvgt:T:u:a:s:c:I:A:V:";
 
 /*****************************************************************************
- * Global variable program_data - these are the only ones, see main.h and
- * modules.h
+ * Global variables - these are the only ones, see main.h and modules.h
  *****************************************************************************/
 main_t        *p_main;
 module_bank_t *p_module_bank;
 aout_bank_t   *p_aout_bank;
 vout_bank_t   *p_vout_bank;
+void*       ( *pf_fast_memcpy ) ( void *, const void *, size_t );
 
 /*****************************************************************************
  * Local prototypes
@@ -376,6 +378,24 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     vout_InitBank();
 
     /*
+     * Choose the best memcpy module
+     */
+    p_main->p_memcpy_module = module_Need( MODULE_CAPABILITY_MEMCPY, NULL );
+
+    if( p_main->p_memcpy_module == NULL )
+    {
+        intf_ErrMsg( "intf error: no suitable memcpy module, "
+                     "using libc default" );
+        pf_fast_memcpy = memcpy;
+    }
+    else
+    {
+#define f p_main->p_memcpy_module->p_functions->memcpy.functions.memcpy
+        pf_fast_memcpy = f.pf_fast_memcpy;
+#undef f
+    }
+
+    /*
      * Initialize shared resources and libraries
      */
     if( main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
@@ -422,6 +442,11 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             network_ChannelJoin( COMMON_CHANNEL );
         }
     }
+
+    /*
+     * Free memcpy module
+     */
+    module_Unneed( p_main->p_memcpy_module );
 
     /*
      * Free module, aout and vout banks
@@ -790,9 +815,12 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutPszVariable( INPUT_CHANNEL_SERVER_VAR, optarg );
             break;
 
-        /* Synchro options */
+        /* Misc options */
         case OPT_SYNCHRO:                                      
             main_PutPszVariable( VPAR_SYNCHRO_VAR, optarg );
+            break;
+        case OPT_MEMCPY:                                      
+            main_PutPszVariable( MEMCPY_METHOD_VAR, optarg );
             break;
             
         /* Internal error: unknown option */
@@ -867,6 +895,7 @@ static void Usage( int i_fashion )
           "\n  -I, --intf <module>            \tinterface method"
           "\n  -v, --verbose                  \tverbose mode (cumulative)"
           "\n      --stdout <filename>        \tredirect console stdout"
+          "\n      --memcpy <module>          \tmemcpy method"
           "\n"
           "\n      --noaudio                  \tdisable audio"
           "\n  -A, --aout <module>            \taudio output method"
@@ -916,7 +945,8 @@ static void Usage( int i_fashion )
         "\n  " INTF_METHOD_VAR "=<method name>        \tinterface method"
         "\n  " INTF_INIT_SCRIPT_VAR "=<filename>              \tinitialization script"
         "\n  " INTF_CHANNELS_VAR "=<filename>         \tchannels list"
-        "\n  " INTF_STDOUT_VAR "=<filename>           \tredirect console stdout" );
+        "\n  " INTF_STDOUT_VAR "=<filename>           \tredirect console stdout"
+        "\n  " MEMCPY_METHOD_VAR "=<method name>      \tmemcpy method" );
 
     /* Audio parameters */
     intf_MsgImm( "\nAudio parameters:"
@@ -1164,7 +1194,7 @@ static int CPUCapabilities( void )
     {
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
 
-#ifdef HAVE_SSE
+#ifdef CAN_COMPILE_SSE
         /* We test if OS support the SSE instructions */
         i_illegal = 0;
         if( setjmp( env ) == 0 )
@@ -1201,7 +1231,7 @@ static int CPUCapabilities( void )
     /* list these additional capabilities */
     cpuid( 0x80000001 );
 
-#ifdef HAVE_3DNOW
+#ifdef CAN_COMPILE_3DNOW
     if( i_edx & 0x80000000 )
     {
         i_illegal = 0;
@@ -1231,7 +1261,7 @@ static int CPUCapabilities( void )
     /* Test for Altivec */
     signal( SIGILL, InstructionSignalHandler );
 
-#ifdef HAVE_ALTIVEC
+#ifdef CAN_COMPILE_ALTIVEC
     i_illegal = 0;
     if( setjmp( env ) == 0 )
     {

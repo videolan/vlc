@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.4 2001/11/28 15:08:06 massiot Exp $
+ * $Id: spu_decoder.c,v 1.5 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -76,7 +76,7 @@ static int  ParseRLE             ( spudec_thread_t *, subpicture_t *, u8 * );
 void _M( spu_dec_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = spu_dec_Probe;
-    p_function_list->functions.dec.pf_RunThread = spu_dec_Run;
+    p_function_list->functions.dec.pf_run = spu_dec_Run;
 }
 
 /*****************************************************************************

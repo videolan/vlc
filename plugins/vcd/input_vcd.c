@@ -585,8 +585,8 @@ static int VCDRead( input_thread_t * p_input,
     
             if( U32_AT(p_buffer) != 0x1B9 )
             {
-                memcpy( p_data->p_buffer, p_buffer + i_index,
-                        6 + i_packet_size );
+                pf_fast_memcpy( p_data->p_buffer, p_buffer + i_index,
+                                6 + i_packet_size );
                 i_index += ( 6 + i_packet_size );
     
             }

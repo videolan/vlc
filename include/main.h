@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: main.h,v 1.22 2001/10/01 16:18:48 massiot Exp $
+ * $Id: main.h,v 1.23 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -49,6 +49,9 @@ typedef struct main_s
     boolean_t              b_audio;             /* is audio output allowed ? */
     boolean_t              b_video;             /* is video output allowed ? */
     boolean_t              b_ac3;
+
+    /* memcpy plugin used */
+    struct module_s *      p_memcpy_module;
 
     /* Unique threads */
     p_intf_thread_t        p_intf;                  /* main interface thread */

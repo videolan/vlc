@@ -4,6 +4,79 @@
 
 HEAD
 
+  * Borrowed MPlayer's fast memcpy() routines. Best is autodetected, choose
+    "--memcpy <whatever>" to choose one from c, mmx, mmxext or 3dn.
+  * Added versioned build-dep to libasound2-dev (Closes Debian bug #121057).
+  * Updated Gtk/GNOME interfaces to use "udpstream" instead of "ts".
+  * More checks for GTK headers.
+  * Fixed a crash when pausing.
+  * Fixed numerous bugs in ES selection.
+  * Fixed stupid bug in vout_Manage. It sometimes called SetDSequenceMatrix
+    when there was no valid sequence.
+  * Hopeless fix for the input netlist corruption bug.
+  * Implemented simple BDirectWindow (DMA) support.
+  * DeleteDecoderConfig wasn't freeing (anymore) the packets left in the
+    decoder fifo. This bug was creating an io_vec starving on title change
+    when playing DVDs.
+  * Removed a bug in the Makefile that made the CVS-snapshots building fail.
+  * Added "#include <string.>" to include/threads.h.
+  * Removed the mutex the vout and intf thread (were supposed to use)
+    for syncronizing acces to the p_vout->p_sys structure.
+  * Added error checking in pthread wrapper; as a result, intf_msg.h must
+    now be included *before* threads.h.
+  * Changed all files to include intf_msg.h before threads.h; while I was
+    at it, I update the copyright notices.
+  * Removed the obsolete darwin plug-in.
+  * Fixed a deadlock (bug reported by marcari).
+  * Various (sometimes hopeless) fixes to try to improve xvideo stability.
+  * Documentation updates.
+  * Updated man page.
+  * dvd:<device>[@<raw device>] to avoid device namespace collision under
+    win32.
+  * Fixed a compilation issue under Win32.
+  * Fixed a potential packet corruption in the DVD input.
+  * Changed the protocol version for communication between vlc and vlcs
+    from 12 to 13 (due to change from ts:// to udpstream://)
+  * Big clean-up to allow compiling every module as plugins.
+  * Added bytes_swap.h to provide ntoh() and htol() on Win32. With this
+    change we don't have to link winsock2 with every plugin anymore. This
+    should also give us a slight speed increase.
+  * Added #define WIN32_LEAN_AND_MEAN in threads.h to speed-up compilation
+    on Win32.
+  * Modified ac_downmix_3dn and sse so they compile with the latest gcc for
+    Win32.
+  * Support for libdvdread.
+  * Added "Video" menu hint to debian/*menu (Closes Debian bug #121036).
+  * Major rewrite of the network layer. only supported syntax is:
+    udp[stream]:[//][serveraddr:[serverport]][@[bindaddr][:bindport]]
+  * Don`t use long long, use u64/s64 (int_types.h).
+  * Fixed a stale pointer in mpeg_vdec_Run().
+  * (Hopefully) fixed the network connect() bug under UNIX.
+  * aRts audio output courtesy of Emmanuel Blindauer <manu@agat.net>.
+  * Fix to the esd plugin when esd-config --cflags is nonempty.
+  * --channels puts gtk/gnome in multi-channel network mode.
+  * The network window of the interface reports the values of the environment
+    variables.
+  * Channels mode excludes vls configuration.
+  * The vlc does not try to bind vls.via.ecp.fr by default when you select
+    channels mode.
+  * Fixed MacOS X 10.1 network input, thanks to Mathias Kretschmer
+    <mathias@research.att.com>.
+  * Fixed a few crashes due to race conditions in the decoder spawning.
+  * Removed unused code here and there.
+  * Fixed a bug in altivec detection on MacOS X.
+  * It seems that the 'focus' bug under WinME is solved.
+  * Updated the INSTALL-win32.txt file.
+  * The ./configure script is more friendly for Win32 users.
+  * Moved warning message to debug message in spdif pass-through plugin.
+  * Changed a bit the wait time. It works better here, please test.
+  * The default file-translation mode was not being set under win32.
+  * Fixed heap corruption issues in ac3dec (thanks reno).
+  * Fixed a crash when using `--input dvd /dev/dvd' instead of `dvd:/dev/dvd'.
+  * configure should no longer assume AltiVec is supported when it actually
+    isn't with buggy compilers and/or pre-set $CFLAGS.
+  * Commited my little release-howto (only useful to core vlc developers).
+  * Closing Debian bug #119369 which was fixed a while ago.
   * Decoder modularization.
 
 0.2.91

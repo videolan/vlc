@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.9 2001/11/28 15:08:05 massiot Exp $
+ * $Id: gtk_open.c,v 1.10 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -336,7 +336,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
     if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                           "network_ts" ) )->active )
     {
-        psz_protocol = "ts";
+        psz_protocol = "udpstream";
     }
     else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                                "network_rtp" ) )->active )

@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.4 2001/11/28 15:08:05 massiot Exp $
+ * $Id: ac3_spdif.c,v 1.5 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -75,7 +75,7 @@ static void BitstreamCallback( bit_stream_t *, boolean_t );
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = ac3_spdif_Probe;
-    p_function_list->functions.dec.pf_RunThread = ac3_spdif_Run;
+    p_function_list->functions.dec.pf_run = ac3_spdif_Run;
 }
 
 /*****************************************************************************

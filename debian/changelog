@@ -1,5 +1,6 @@
 vlc (0.2.91-2) unstable; urgency=low
 
+  * Added versioned build-dep to libasound2-dev (Closes: #121057).
   * Added "Video" menu hints (Closes: #121036).
 
  -- Samuel Hocevar <sam@zoy.org>  Sun, 25 Nov 2001 02:25:34 +0100

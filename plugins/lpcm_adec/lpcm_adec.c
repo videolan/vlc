@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
+ * $Id: lpcm_adec.c,v 1.3 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -71,7 +71,7 @@ static void     lpcm_adec_EndThread     ( lpcmdec_thread_t * );
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = lpcm_adec_Probe;
-    p_function_list->functions.dec.pf_RunThread = lpcm_adec_Run;
+    p_function_list->functions.dec.pf_run = lpcm_adec_Run;
 }
 
 /*****************************************************************************

@@ -90,6 +90,9 @@
  * outputting an error message (in second) */
 #define THREAD_COND_TIMEOUT				5
 
+/* Environment variable containing the memcpy method */
+#define MEMCPY_METHOD_VAR               "vlc_memcpy"
+
 /*
  * Decoders FIFO configuration
  */
@@ -326,16 +329,11 @@
 /* Default dimensions for display window - these dimensions are enough for the
  * standard width and height broadcasted MPEG-2 streams or DVDs */
 #define VOUT_WIDTH_VAR                  "vlc_width"
-#define VOUT_HEIGHT_VAR                 "vlc_height"
 #define VOUT_WIDTH_DEFAULT              720
+#define VOUT_HEIGHT_VAR                 "vlc_height"
 #define VOUT_HEIGHT_DEFAULT             576
-
 #define VOUT_DEPTH_VAR                  "vlc_depth"
 #define VOUT_DEPTH_DEFAULT              15
-
-#define VOUT_FULLSCREEN_VAR             "vlc_fullscreen"
-#define VOUT_FULLSCREEN_DEFAULT         0
-
 #define VOUT_FULLSCREEN_DEPTH_VAR       "vlc_fullscreen_depth"
 #define VOUT_FULLSCREEN_DEPTH_DEFAULT   32
 

@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.33 2001/12/03 13:58:59 massiot Exp $
+ * $Id: vout_xvideo.c,v 1.34 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -677,12 +677,12 @@ static void vout_Display( vout_thread_t *p_vout )
         break;
 
     case YUV_420_PICTURE:
-        memcpy( p_vout->p_sys->p_xvimage->data,
-                p_vout->p_rendered_pic->p_y, i_size );
-        memcpy( p_vout->p_sys->p_xvimage->data + ( i_size ),
-                p_vout->p_rendered_pic->p_v, i_size / 4 );
-        memcpy( p_vout->p_sys->p_xvimage->data + ( i_size ) + ( i_size / 4 ),
-                p_vout->p_rendered_pic->p_u, i_size / 4 );
+        pf_fast_memcpy( p_vout->p_sys->p_xvimage->data,
+                        p_vout->p_rendered_pic->p_y, i_size );
+        pf_fast_memcpy( p_vout->p_sys->p_xvimage->data + ( i_size ),
+                        p_vout->p_rendered_pic->p_v, i_size / 4 );
+        pf_fast_memcpy( p_vout->p_sys->p_xvimage->data + ( i_size ) + ( i_size / 4 ),
+                        p_vout->p_rendered_pic->p_u, i_size / 4 );
         break;
     }
 

@@ -97,8 +97,14 @@
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
 
+/* Define if you have the <gdk/gdk.h> header file.  */
+#undef HAVE_GDK_GDK_H
+
 /* Define if you have the <getopt.h> header file.  */
 #undef HAVE_GETOPT_H
+
+/* Define if you have the <glib.h> header file.  */
+#undef HAVE_GLIB_H
 
 /* Define if you have the <gnome.h> header file.  */
 #undef HAVE_GNOME_H
@@ -203,16 +209,16 @@
 #undef BOOLEAN_T_IN_CTHREADS_H
 
 /* Define if $CC groks 3D Now! inline assembly. */
-#undef HAVE_3DNOW
+#undef CAN_COMPILE_3DNOW
 
 /* Define if $CC groks SSE inline assembly. */
-#undef HAVE_SSE
+#undef CAN_COMPILE_SSE
 
 /* Define if $CC groks ALTIVEC inline assembly. */
-#undef HAVE_ALTIVEC
+#undef CAN_COMPILE_ALTIVEC
 
 /* Define if your compiler groks C altivec extensions. */
-#undef HAVE_C_ALTIVEC
+#undef CAN_COMPILE_C_ALTIVEC
 
 /* Define if <sys/cdio.h> defines dvd_struct. */
 #undef DVD_STRUCT_IN_SYS_CDIO_H

@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.3 2001/11/28 15:08:05 massiot Exp $
+ * $Id: mpeg_adec.c,v 1.4 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -69,7 +69,7 @@ static void         adec_Decode( adec_thread_t * );
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = adec_Probe;
-    p_function_list->functions.dec.pf_RunThread = adec_RunThread;
+    p_function_list->functions.dec.pf_run = adec_RunThread;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.18 2001/11/30 22:52:40 gbazin Exp $
+ * $Id: input_dec.c,v 1.19 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -80,7 +80,7 @@ vlc_thread_t input_RunDecoder( input_thread_t * p_input,
     /* Spawn the decoder thread */
     if ( vlc_thread_create( &thread_id, "decoder",
          (vlc_thread_func_t)p_es->p_module->
-             p_functions->dec.functions.dec.pf_RunThread,
+             p_functions->dec.functions.dec.pf_run,
          (void *)p_es->p_config) ) 
     {
         intf_ErrMsg( "input error: can't spawn decoder thread \"%s\"",

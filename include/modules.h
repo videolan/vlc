@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.32 2001/11/13 18:10:38 sam Exp $
+ * $Id: modules.h,v 1.33 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -67,6 +67,7 @@ typedef void *  module_handle_t;
 #define MODULE_CAPABILITY_YUV      1 <<  9  /* YUV colorspace conversion */
 #define MODULE_CAPABILITY_IMDCT    1 << 10  /* IMDCT transformation */
 #define MODULE_CAPABILITY_DOWNMIX  1 << 11  /* AC3 downmix */
+#define MODULE_CAPABILITY_MEMCPY   1 << 12  /* memcpy */
 
 /* FIXME: kludge */
 struct input_area_s;
@@ -219,8 +220,14 @@ typedef struct function_list_s
         /* Decoder plugins */
         struct
         {
-            int  ( * pf_RunThread ) ( struct decoder_config_s * p_config );
+            int  ( * pf_run ) ( struct decoder_config_s * p_config );
         } dec;
+
+        /* memcpy plugins */
+        struct
+        {
+            void* ( * pf_fast_memcpy ) ( void *, const void *, size_t );
+        } memcpy;
 
     } functions;
 
@@ -241,6 +248,7 @@ typedef struct module_functions_s
     function_list_t yuv;
     function_list_t imdct;
     function_list_t downmix;
+    function_list_t memcpy;
 
 } module_functions_t;
 

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.4 2001/11/28 15:08:05 massiot Exp $
+ * $Id: video_parser.c,v 1.5 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -80,7 +80,7 @@ static void     BitstreamCallback       ( bit_stream_t *, boolean_t );
 void _M( vdec_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = mpeg_vdec_Probe;
-    p_function_list->functions.dec.pf_RunThread = mpeg_vdec_Run;
+    p_function_list->functions.dec.pf_run = mpeg_vdec_Run;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.4 2001/11/28 15:08:04 massiot Exp $
+ * $Id: ac3_adec.c,v 1.5 2001/12/03 16:18:37 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -75,7 +75,7 @@ static void     BitstreamCallback    ( bit_stream_t *p_bit_stream,
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = ac3_adec_Probe;
-    p_function_list->functions.dec.pf_RunThread = ac3_adec_Run;
+    p_function_list->functions.dec.pf_run = ac3_adec_Run;
 }
 
 /*****************************************************************************
