@@ -3082,7 +3082,7 @@ AC_ARG_WITH(,[Interface plugins:])
 dnl special case for BeOS
 if test "${SYS}" = "beos"
 then
-    VLC_ADD_PLUGINS([beos])
+    VLC_ADD_BUILTINS([beos])
 fi
 
 dnl
