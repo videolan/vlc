@@ -981,6 +981,35 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, char *psz_cmd,
 
         TAB_APPEND( media->i_input, media->input, input );
     }
+    else if( !strcmp( psz_cmd, "inputdel" ) )
+    {
+        char *input;
+        int i;
+
+        if( psz_value != NULL && strlen(psz_value) > 1 &&
+            ( psz_value[0] == '\'' || psz_value[0] == '\"' ) &&
+            ( psz_value[ strlen(psz_value) - 1 ] == '\'' ||
+              psz_value[ strlen(psz_value) - 1 ] == '\"' )  )
+        {
+            input = malloc( strlen(psz_value) - 1 );
+
+            memcpy( input, psz_value + 1, strlen(psz_value) - 2 );
+            input[ strlen(psz_value) - 2 ] = '\0';
+        }
+        else
+        {
+            input = strdup( psz_value );
+        }
+
+        for( i = 0; i < media->i_input; i++ )
+        {
+            if( !strcmp( input, media->input[i] ) )
+            {
+                TAB_REMOVE( media->i_input, media->input, media->input[i] );
+                break;
+            }
+        }
+    }
     else if( !strcmp( psz_cmd, "output" ) )
     {
         if( media->psz_output != NULL )
@@ -1837,7 +1866,7 @@ static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
         MessageAddChild( "load (config_file)" );
 
         message_child = MessageAdd( "Media Proprieties Syntax:" );
-        MessageAddChild( "input (input_name)" );
+        MessageAddChild( "input|inputdel (input_name)" );
         MessageAddChild( "output (output_name)" );
         MessageAddChild( "enabled|disabled" );
         MessageAddChild( "loop|unloop (broadcast only)" );
