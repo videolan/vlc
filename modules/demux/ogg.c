@@ -1290,10 +1290,12 @@ static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     i_fps_denominator = bs_read( &bitstream, 32 );
     bs_read( &bitstream, 24 ); /* aspect_numerator */
     bs_read( &bitstream, 24 ); /* aspect_denominator */
-    i_keyframe_frequency_force = 1 << bs_read( &bitstream, 5 );
+
     bs_read( &bitstream, 8 ); /* colorspace */
     p_stream->fmt.i_bitrate = bs_read( &bitstream, 24 );
     bs_read( &bitstream, 6 ); /* quality */
+
+    i_keyframe_frequency_force = 1 << bs_read( &bitstream, 5 );
 
     /* granule_shift = i_log( frequency_force -1 ) */
     p_stream->i_theora_keyframe_granule_shift = 0;
