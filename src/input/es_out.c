@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: es_out.c,v 1.6 2003/12/02 12:57:35 gbazin Exp $
+ * $Id: es_out.c,v 1.7 2003/12/03 00:27:52 rocky Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -337,22 +337,32 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
         switch( fmt->i_cat )
         {
             case AUDIO_ES:
-                input_AddInfo( p_cat, _("Type"), _("Audio") );
+		if( fmt->psz_description )
+		  {
+		    input_AddInfo( p_cat, _("Description"), "%s", 
+				   fmt->psz_description );
+		  }
                 input_AddInfo( p_cat, _("Codec"), "%.4s",
                                (char*)&fmt->i_codec );
+                input_AddInfo( p_cat, _("Type"), _("Audio") );
                 if( fmt->audio.i_channels > 0 )
                 {
                     input_AddInfo( p_cat, _("Channels"), "%d",
                                    fmt->audio.i_channels );
                 }
+		if( fmt->psz_language )
+		  {
+		    input_AddInfo( p_cat, _("Language"), "%s", 
+				   fmt->psz_language );
+		  }
                 if( fmt->audio.i_rate > 0 )
                 {
-                    input_AddInfo( p_cat, _("Sample Rate"), "%d",
+		  input_AddInfo( p_cat, _("Sample Rate"), _("%d Hz"),
                                    fmt->audio.i_rate );
                 }
                 if( fmt->i_bitrate > 0 )
                 {
-                    input_AddInfo( p_cat, _("Bitrate"), "%d",
+		  input_AddInfo( p_cat, _("Bitrate"), _("%d bps"), 
                                    fmt->i_bitrate );
                 }
                 if( fmt->audio.i_bitspersample )
@@ -362,6 +372,11 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
                 }
                 break;
             case VIDEO_ES:
+		if( fmt->psz_description )
+		  {
+		    input_AddInfo( p_cat, _("Description"), "%s", 
+				   fmt->psz_description );
+		  }
                 input_AddInfo( p_cat, _("Type"), _("Video") );
                 input_AddInfo( p_cat, _("Codec"), "%.4s",
                                (char*)&fmt->i_codec );

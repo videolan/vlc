@@ -2,7 +2,7 @@
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpga.c,v 1.10 2003/11/21 16:07:20 fenrir Exp $
+ * $Id: mpga.c,v 1.11 2003/12/03 00:27:52 rocky Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -249,6 +249,7 @@ static int Open( vlc_object_t * p_this )
     {
         int     i_xing;
         uint8_t *p_xing;
+	char psz_description[50];
 
         p_sys->i_bitrate_avg = MPGA_BITRATE( header ) * 1000;
         if( ( i_xing = stream_Peek( p_input->s, &p_xing, 1024 ) ) >= 21 )
@@ -305,7 +306,7 @@ static int Open( vlc_object_t * p_this )
         }
 
         msg_Dbg( p_input, "version=%d layer=%d channels=%d samplerate=%d",
-                 MPGA_VERSION( header) + 1,
+                 MPGA_VERSION( header ) + 1,
                  MPGA_LAYER( header ) + 1,
                  MPGA_CHANNELS( header ),
                  MPGA_SAMPLE_RATE( header ) );
@@ -313,6 +314,9 @@ static int Open( vlc_object_t * p_this )
         fmt.audio.i_channels = MPGA_CHANNELS( header );
         fmt.audio.i_rate = MPGA_SAMPLE_RATE( header );
         fmt.i_bitrate = p_sys->i_bitrate_avg;
+	sprintf( psz_description, "MPEG Audio Layer %d, version %d", 
+		 MPGA_LAYER ( header ) + 1, MPGA_VERSION ( header ) + 1 );
+	fmt.psz_description = strdup( psz_description );
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );

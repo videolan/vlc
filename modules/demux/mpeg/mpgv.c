@@ -2,7 +2,7 @@
  * mpgv.c : MPEG-I/II Video demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpgv.c,v 1.2 2003/11/24 00:39:01 fenrir Exp $
+ * $Id: mpgv.c,v 1.3 2003/12/03 00:27:52 rocky Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -75,6 +75,7 @@ static int Open( vlc_object_t * p_this )
     uint8_t        *p_peek;
 
     es_format_t    fmt;
+    char psz_description[50];
 
     if( stream_Peek( p_input->s, &p_peek, 4 ) < 4 )
     {
@@ -151,6 +152,8 @@ static int Open( vlc_object_t * p_this )
      * create the output
      */
     es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', 'g', 'v' ) );
+    sprintf( psz_description, "MPEG-I/II Video" );
+    fmt.psz_description = strdup( psz_description );
     p_sys->p_es = es_out_Add( p_input->p_es_out, &fmt );
 
     return VLC_SUCCESS;
