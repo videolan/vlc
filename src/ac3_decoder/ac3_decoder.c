@@ -123,6 +123,7 @@ void ac3dec_DestroyThread( ac3dec_thread_t * p_ac3dec )
 
     /* Ask thread to kill itself */
     p_ac3dec->b_die = 1;
+
     /* Make sure the decoder thread leaves the GetByte() function */
     vlc_mutex_lock( &(p_ac3dec->fifo.data_lock) );
     vlc_cond_signal( &(p_ac3dec->fifo.data_wait) );
@@ -214,11 +215,9 @@ static int InitThread( ac3dec_thread_t * p_ac3dec )
  *****************************************************************************/
 static void RunThread( ac3dec_thread_t * p_ac3dec )
 {
-    /*
-    mtime_t mdate = 0;
-    */
-
     intf_DbgMsg( "ac3dec debug: running ac3 decoder thread (%p) (pid == %i)\n", p_ac3dec, getpid() );
+
+    msleep( (3 * INPUT_PTS_DELAY) / 4 );
 
     /* Initializing the ac3 decoder thread */
     if ( InitThread(p_ac3dec) )
@@ -227,16 +226,13 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
     }
 
     /* ac3 decoder thread's main loop */
+    /* FIXME : do we have enough room to store the decoded frames ? */
     while ( (!p_ac3dec->b_die) && (!p_ac3dec->b_error) )
     {
         p_ac3dec->b_invalid = 0;
 
 	decode_find_sync( p_ac3dec );
 
-	/*
-	p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = mdate;
-	mdate += 32000;
-	*/
 	if ( DECODER_FIFO_START(p_ac3dec->fifo)->b_has_pts )
 	{
 		p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_ac3dec->fifo)->i_pts;
@@ -445,6 +441,11 @@ static void EndThread( ac3dec_thread_t * p_ac3dec )
     if ( p_ac3dec->p_aout_fifo != NULL )
     {
         aout_DestroyFifo( p_ac3dec->p_aout_fifo );
+
+        /* Make sure the output thread leaves the NextFrame() function */
+        vlc_mutex_lock( &(p_ac3dec->p_aout_fifo->data_lock) );
+        vlc_cond_signal( &(p_ac3dec->p_aout_fifo->data_wait) );
+        vlc_mutex_unlock( &(p_ac3dec->p_aout_fifo->data_lock) );
     }
 
     /* Destroy descriptor */

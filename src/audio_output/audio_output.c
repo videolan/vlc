@@ -457,6 +457,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
             }
             p_fifo->l_start_frame = (p_fifo->l_start_frame + 1) & AOUT_FIFO_SIZE;
         }
+
         if ( p_fifo->l_start_frame == p_fifo->l_end_frame )
         {
             vlc_mutex_unlock( &p_fifo->data_lock );
@@ -465,7 +466,8 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
     }
 
     /* We are looking for the next dated frame */
-    while ( 1 )
+    /* FIXME : is the output fifo full ? */
+    while ( !p_fifo->b_next_frame )
     {
         while ( p_fifo->l_next_frame != p_fifo->l_end_frame )
         {
@@ -474,34 +476,16 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
                 p_fifo->b_next_frame = 1;
                 break;
             }
-            else
-            {
-                p_fifo->l_next_frame = (p_fifo->l_next_frame + 1) & AOUT_FIFO_SIZE;
-            }
+            p_fifo->l_next_frame = (p_fifo->l_next_frame + 1) & AOUT_FIFO_SIZE;
         }
 
-        if ( p_fifo->b_next_frame == 1 )
+        while ( p_fifo->l_next_frame == p_fifo->l_end_frame )
         {
-            break;
-        }
-        else
-        {
-            if ( (((p_fifo->l_end_frame + 1) - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) == 0 )
+            vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
+            if ( p_fifo->b_die )
             {
-                p_fifo->l_start_frame = 0;
-                p_fifo->b_start_frame = 0;
-                /* p_fifo->l_next_frame = 0; */
-                /* p_fifo->b_next_frame = 0; */
-                p_fifo->l_end_frame = 0;
                 vlc_mutex_unlock( &p_fifo->data_lock );
                 return( -1 );
-            }
-            else
-            {
-                while ( p_fifo->l_next_frame == p_fifo->l_end_frame )
-                {
-                    vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-                }
             }
         }
     }
@@ -509,7 +493,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
     l_units = ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) * (p_fifo->l_frame_size >> p_fifo->b_stereo);
 
     l_rate = p_fifo->l_rate + ((aout_date - p_fifo->date[p_fifo->l_start_frame]) / 256);
-//    fprintf( stderr, "aout debug: %lli (%li);\n", aout_date - p_fifo->date[p_fifo->l_start_frame], l_rate );
+    fprintf( stderr, "aout debug: %lli (%li);\n", aout_date - p_fifo->date[p_fifo->l_start_frame], l_rate );
 
     InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->dsp.l_rate );
 

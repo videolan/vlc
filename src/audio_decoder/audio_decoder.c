@@ -143,6 +143,7 @@ void adec_DestroyThread( adec_thread_t * p_adec )
 
     /* Ask thread to kill itself */
     p_adec->b_die = 1;
+
     /* Make sure the decoder thread leaves the GetByte() function */
     vlc_mutex_lock( &(p_adec->fifo.data_lock) );
     vlc_cond_signal( &(p_adec->fifo.data_wait) );
@@ -799,6 +800,8 @@ static void RunThread( adec_thread_t * p_adec )
 
     intf_DbgMsg("adec debug: running audio decoder thread (%p) (pid == %i)\n", p_adec, getpid());
 
+    msleep( (3 * INPUT_PTS_DELAY) / 4 );
+
     /* Initializing the audio decoder thread */
     if ( InitThread(p_adec) )
     {
@@ -861,19 +864,24 @@ static void RunThread( adec_thread_t * p_adec )
 
                         /* Frame 1 */
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-                        /* Frame 2 */
+
+			/* Frame 2 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-                        /* Frame 3 */
+
+			/* Frame 3 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-                        /* Frame 4 */
+
+			/* Frame 4 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-                        /* Frame 5 */
+
+			/* Frame 5 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-                        /* Frame 6 */
+
+			/* Frame 6 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
 
@@ -961,6 +969,11 @@ static void EndThread( adec_thread_t *p_adec )
     if ( p_adec->p_aout_fifo != NULL )
     {
         aout_DestroyFifo( p_adec->p_aout_fifo );
+
+        /* Make sure the output thread leaves the NextFrame() function */
+        vlc_mutex_lock( &(p_adec->p_aout_fifo->data_lock) );
+        vlc_cond_signal( &(p_adec->p_aout_fifo->data_wait) );
+        vlc_mutex_unlock( &(p_adec->p_aout_fifo->data_lock) );
     }
     /* Destroy descriptor */
     free( p_adec );
