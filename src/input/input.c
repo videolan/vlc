@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.124 2001/06/21 07:22:03 sam Exp $
+ * $Id: input.c,v 1.125 2001/06/27 09:53:57 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -407,6 +407,7 @@ static int InitThread( input_thread_t * p_input )
         p_input->pf_close         = f.pf_close;
     }
     p_input->pf_end           = f.pf_end;
+    p_input->pf_init_bit_stream= f.pf_init_bit_stream;
     p_input->pf_read          = f.pf_read;
     p_input->pf_set_area      = f.pf_set_area;
     p_input->pf_demux         = f.pf_demux;

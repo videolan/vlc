@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.76 2001/06/15 05:12:30 sam Exp $
+ * $Id: input_dvd.c,v 1.77 2001/06/27 09:53:56 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -133,6 +133,7 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_open             = DVDOpen;
     input.pf_close            = DVDClose;
     input.pf_end              = DVDEnd;
+    input.pf_init_bit_stream  = InitBitstream;
     input.pf_read             = DVDRead;
     input.pf_set_area         = DVDSetArea;
     input.pf_demux            = input_DemuxPS;

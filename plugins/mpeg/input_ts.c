@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.27 2001/06/21 07:22:03 sam Exp $
+ * $Id: input_ts.c,v 1.28 2001/06/27 09:53:57 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -106,6 +106,7 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_open             = TSFakeOpen;
     input.pf_close            = NULL;              /* Will be set by pf_open */
     input.pf_end              = TSEnd;
+    input.pf_init_bit_stream  = InitBitstream;
     input.pf_set_area         = NULL;
     input.pf_read             = TSRead;
     input.pf_demux            = input_DemuxTS;
@@ -273,7 +274,8 @@ static int TSRead( input_thread_t * p_input,
                    data_packet_t * pp_packets[INPUT_READ_ONCE] )
 {
     thread_ts_data_t    * p_method;
-    unsigned int    i_read, i_loop;
+    unsigned int    i_loop;
+    int             i_read;
     int             i_data = 0;
     struct iovec  * p_iovec;
     struct timeval  timeout;

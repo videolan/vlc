@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.25 2001/05/30 17:03:11 sam Exp $
+ * $Id: modules.h,v 1.26 2001/06/27 09:53:56 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -78,6 +78,8 @@ struct input_area_s;
 struct imdct_s;
 struct complex_s;
 struct dm_par_s;
+struct bit_stream_s;
+struct decoder_fifo_s;
 
 /* FIXME: not yet used */
 typedef struct probedata_s
@@ -110,6 +112,11 @@ typedef struct function_list_s
             void ( * pf_open ) ( struct input_thread_s * );
             void ( * pf_close )( struct input_thread_s * );
             void ( * pf_end )  ( struct input_thread_s * );
+            void ( * pf_init_bit_stream ) ( struct bit_stream_s *,
+                                            struct decoder_fifo_s *,
+                      void (* pf_bitstream_callback)( struct bit_stream_s *,
+                                                      boolean_t ),
+                                           void * );
 
             int  ( * pf_read ) ( struct input_thread_s *,
                                  struct data_packet_s *

@@ -2,7 +2,7 @@
  * input_es.h: thread structure of the ES plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.h,v 1.1 2001/04/20 15:02:48 sam Exp $
+ * $Id: input_es.h,v 1.2 2001/06/27 09:53:56 massiot Exp $
  *
  * Authors: 
  *
@@ -21,12 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * thread_es_data_t: extension of input_thread_t
- *****************************************************************************/
-typedef struct thread_es_data_s
-{
-    /* We're necessarily reading a file. */
-    FILE *                  stream;
-} thread_es_data_t;
-
+#define NB_DATA 8192
+#define NB_PES  4096
+#define ES_PACKET_SIZE 2048
+#define MAX_PACKETS_IN_FIFO 14

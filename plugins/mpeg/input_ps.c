@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.28 2001/06/03 12:47:21 sam Exp $
+ * $Id: input_ps.c,v 1.29 2001/06/27 09:53:56 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -99,6 +99,7 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_open             = NULL; /* Set in PSInit */
     input.pf_close            = NULL;
     input.pf_end              = PSEnd;
+    input.pf_init_bit_stream  = InitBitstream;
     input.pf_set_area         = NULL;
     input.pf_read             = PSRead;
     input.pf_demux            = input_DemuxPS;

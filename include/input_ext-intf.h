@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.39 2001/06/09 17:01:21 stef Exp $
+ * $Id: input_ext-intf.h,v 1.40 2001/06/27 09:53:56 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -255,6 +255,7 @@ typedef struct i_p_config_s
  * This structure includes all the local static variables of an input thread
  *****************************************************************************/
 struct vout_thread_s;
+struct bit_stream_s;
 
 typedef struct input_thread_s
 {
@@ -273,6 +274,11 @@ typedef struct input_thread_s
     void                 (* pf_open)( struct input_thread_s * );
     void                 (* pf_close)( struct input_thread_s * );
     void                 (* pf_end)( struct input_thread_s * );
+    void                 (* pf_init_bit_stream)( struct bit_stream_s *,
+                              struct decoder_fifo_s *,
+                void (* pf_bitstream_callback)( struct bit_stream_s *,
+                                                boolean_t ),
+                              void * );
 
     /* Read & Demultiplex */
     int                  (* pf_read)( struct input_thread_s *,

@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.37 2001/05/30 17:03:11 sam Exp $
+ * $Id: input.h,v 1.38 2001/06/27 09:53:56 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -80,6 +80,8 @@ void input_EscapeAudioDiscontinuity( struct input_thread_s *,
  * Prototypes from input_clock.c
  *****************************************************************************/
 void input_ClockInit( struct pgrm_descriptor_s * );
+int  input_ClockManageControl( struct input_thread_s *,
+                               struct pgrm_descriptor_s *, mtime_t );
 void input_ClockManageRef( struct input_thread_s *,
                            struct pgrm_descriptor_s *, mtime_t );
 mtime_t input_ClockGetTS( struct input_thread_s *,
