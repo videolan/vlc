@@ -32,6 +32,20 @@ public:
     NS_DECL_ISUPPORTS
     NS_DECL_VLCINTF
 
+    // These flags are used by the DOM and security systems to signal that
+    // JavaScript callers are allowed to call this object's scritable methods.
+    NS_IMETHOD GetFlags(PRUint32 *aFlags)
+    {
+        *aFlags = nsIClassInfo::PLUGIN_OBJECT | nsIClassInfo::DOM_OBJECT;
+        return NS_OK;
+    }
+
+    NS_IMETHOD GetImplementationLanguage(PRUint32 *aImplementationLanguage)
+    {
+        *aImplementationLanguage = nsIProgrammingLanguage::CPLUSPLUS;
+        return NS_OK;
+    }
+
              VlcPeer();
              VlcPeer( VlcPlugin * );
     virtual ~VlcPeer();
