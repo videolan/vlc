@@ -1,0 +1,14 @@
+diff -ru goom2k4-0/configure goom/configure
+--- goom2k4-0/configure	Mon Feb  7 14:49:28 2005
++++ goom/configure	Wed Feb 23 16:03:25 2005
+@@ -21069,8 +21069,8 @@
+ 
+ case "$host" in
+ *-apple-darwin*)
+-	MACTARGET="yes"
+-	MACFOLDER="mac"
++	MACTARGET="no"
++	MACFOLDER=""
+ 
+   	CCAS='$(CC)'
+ 
