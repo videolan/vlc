@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.40 2003/12/07 19:01:05 jpsaman Exp $
+ * $Id: sap.c,v 1.41 2003/12/11 20:08:48 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -87,11 +87,14 @@
 #define SAP_ADDR_TEXT N_("SAP multicast address")
 #define SAP_ADDR_LONGTEXT N_("SAP multicast address")
 #define SAP_IPV4_TEXT N_("IPv4-SAP listening")
-#define SAP_IPV4_LONGTEXT N_("Set this if you want the SAP module to listen to IPv4 announces")
-#define SAP_IPV6_TEXT N_("IPv6-SAP listening")
-#define SAP_IPV6_LONGTEXT N_("Set this if you want the SAP module to listen to IPv6 announces")
+#define SAP_IPV4_LONGTEXT N_( \
+      "Set this if you want the SAP module to listen to IPv4 announces")
+#define SAP_IPV6_TEXT N_( "IPv6-SAP listening")
+#define SAP_IPV6_LONGTEXT N_(\
+      "Set this if you want the SAP module to listen to IPv6 announces")
 #define SAP_SCOPE_TEXT N_("IPv6 SAP scope")
-#define SAP_SCOPE_LONGTEXT N_("Sets the scope for IPv6 announces (default is 8)")
+#define SAP_SCOPE_LONGTEXT N_( \
+       "Sets the scope for IPv6 announces (default is 8)")
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
@@ -161,6 +164,12 @@ struct attr_descr_t
     char *psz_value;
 };
 
+struct sap_announce_t
+{
+    char *psz_name;
+    char *psz_uri;
+};
+
 struct intf_sys_t
 {
     /* IPV4 and IPV6 */
@@ -168,6 +177,10 @@ struct intf_sys_t
 
     /* playlist group */
     int i_group;
+
+    /* Table of announces */
+    int i_announces;
+    struct sap_announce_t **pp_announces;
 };
 
 #ifdef HAVE_ZLIB_H
@@ -304,6 +317,9 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_group = p_group->i_id;
         vlc_object_release( p_playlist );
     }
+
+    p_sys->i_announces = 0;
+    p_sys->pp_announces = NULL;
 
     p_intf->pf_run = Run;
     p_intf->p_sys  = p_sys;
@@ -562,6 +578,7 @@ static void mfield_parse( char *psz_mfield, char **ppsz_proto,
 static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 {
     playlist_item_t * p_item;
+    struct sap_announce_t *p_announce;
     char *psz_uri, *psz_proto;
     char *psz_port;
     char *psz_uri_default;
@@ -605,12 +622,32 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
         psz_uri += 6;
         memcpy( psz_uri, p_sd->psz_sdp, strlen( p_sd->psz_sdp ) + 1 );
         /* Enqueueing p_item in the playlist */
+
+        for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
+        {
+            if( !strcmp(p_intf->p_sys->pp_announces[i]->psz_name,
+                                    p_item->psz_name ) &&
+                !strcmp(p_intf->p_sys->pp_announces[i]->psz_uri,
+                                    p_item->psz_uri ) )
+            {
+                return;
+            }
+        }
         p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
         playlist_AddItem ( p_playlist, p_item, PLAYLIST_CHECK_INSERT, PLAYLIST_END );
         vlc_object_release( p_playlist );
+        p_announce = (struct sap_announce_t *)malloc(
+                      sizeof(struct sap_announce_t *) );
+        p_announce->psz_name = strdup( p_item->psz_name );
+        p_announce->psz_uri = strdup( p_item->psz_uri );
+
+        INSERT_ELEM( p_intf->p_sys->pp_announces,
+                     p_intf->p_sys->i_announces,
+                     p_intf->p_sys->i_announces,
+                     p_announce );
         return;
-    }        
-        
+    }
+
     cfield_parse( p_sd->psz_connection, &psz_uri_default );
 
     for( i_count = 0 ; i_count < p_sd->i_media ; i_count++ )
@@ -736,9 +773,29 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             }
         }
 
+         for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
+         {
+            if( !strcmp(p_intf->p_sys->pp_announces[i]->psz_name,
+                                    p_item->psz_name ) &&
+                !strcmp(p_intf->p_sys->pp_announces[i]->psz_uri,
+                                    p_item->psz_uri ) )
+            {
+                return;
+            }
+        }
+
         /* Enqueueing p_item in the playlist */
         p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
         playlist_AddItem ( p_playlist, p_item, PLAYLIST_CHECK_INSERT, PLAYLIST_END );
+        p_announce = (struct sap_announce_t *)malloc(
+                      sizeof(struct sap_announce_t *) );
+        p_announce->psz_name = strdup( p_item->psz_name );
+        p_announce->psz_uri = strdup( p_item->psz_uri );
+
+        INSERT_ELEM( p_intf->p_sys->pp_announces,
+                     p_intf->p_sys->i_announces,
+                     p_intf->p_sys->i_announces,
+                     p_announce );
         vlc_object_release( p_playlist );
     }
 }
