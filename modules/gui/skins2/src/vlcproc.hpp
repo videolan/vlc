@@ -57,21 +57,6 @@ class VlcProc: public SkinObject
         /// Getter for the stream variable
         Stream &getStreamVar() { return *((Stream*)(m_cVarStream.get())); }
 
-        /// Getter for the mute variable
-        VarBool &getIsMuteVar() { return *((VarBool*)(m_cVarMute.get())); }
-
-        /// Getter for the playing variable
-        VarBool &getIsPlayingVar() { return *((VarBool*)(m_cVarPlaying.get())); }
-
-        /// Getter for the stopped variable
-        VarBool &getIsStoppedVar() { return *((VarBool*)(m_cVarStopped.get())); }
-
-        /// Getter for the paused variable
-        VarBool &getIsPausedVar() { return *((VarBool*)(m_cVarPaused.get())); }
-
-        /// Getter for the seekable variable
-        VarBool &getIsSeekableVar() { return *((VarBool*)(m_cVarSeekable.get())); }
-
         /// Set the vout window handle
         void setVoutWindow( void *pVoutWindow );
 

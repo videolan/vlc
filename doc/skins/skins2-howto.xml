@@ -714,7 +714,7 @@ difficulty to understand how VLC skins work.</para>
   </para></listitem>
 <!--  TODO: Enable it for 0.7.3
   <listitem><para>
-    <emphasis>vlc.ontop()</emphasis>: Toggle the "Always on top" status.
+    <emphasis>vlc.onTop()</emphasis>: Toggle the "Always on top" status.
   </para></listitem>
   <listitem><para>
     <emphasis>vlc.minimize()</emphasis>: Minimize VLC.
@@ -825,6 +825,11 @@ difficulty to understand how VLC skins work.</para>
   <listitem><para>
     <emphasis>vlc.isMute</emphasis>: True when the sound is mute (in VLC, not on your OS), false otherwise.
   </para></listitem>
+<!--  TODO: Enable it for 0.7.3
+  <listitem><para>
+    <emphasis>vlc.isOnTop</emphasis>: True when the windows have the "Always on top" status.
+  </para></listitem>
+-->
   <listitem><para>
     <emphasis>playlist.isRandom</emphasis>: True when the playlist items are played in a random order, false otherwise.
   </para></listitem>

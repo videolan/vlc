@@ -29,11 +29,16 @@
 #include "anchor.hpp"
 #include "tooltip.hpp"
 #include "../utils/position.hpp"
+#include "../src/var_manager.hpp"
 
 
 WindowManager::WindowManager( intf_thread_t *pIntf ):
-    SkinObject( pIntf ), m_isOnTop( false ), m_magnet( 0 ), m_pTooltip( NULL )
+    SkinObject( pIntf ), m_magnet( 0 ), m_pTooltip( NULL )
 {
+    // Create and register a variable for the "on top" status
+    VarManager *pVarManager = VarManager::instance( getIntf() );
+    m_cVarOnTop = VariablePtr( new VarBoolImpl( getIntf() ) );
+    pVarManager->registerVar( m_cVarOnTop, "vlc.isOnTop" );
 }
 
 
@@ -203,11 +208,15 @@ void WindowManager::hideAll() const
 
 void WindowManager::toggleOnTop()
 {
-    m_isOnTop = !m_isOnTop;
+    // Update the boolean variable
+    VarBoolImpl *pVarOnTop = (VarBoolImpl*)m_cVarOnTop.get();
+    pVarOnTop->set( !pVarOnTop->get() );
+
+    // Toggle the "on top" status
     WinSet_t::const_iterator it;
     for( it = m_allWindows.begin(); it != m_allWindows.end(); it++ )
     {
-        (*it)->toggleOnTop( m_isOnTop );
+        (*it)->toggleOnTop( pVarOnTop->get() );
     }
 }
 

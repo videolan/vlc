@@ -130,7 +130,7 @@ class WindowManager: public SkinObject
         /// move.
         WinSet_t m_movingWindows;
         /// Indicate whether the windows are currently on top
-        bool m_isOnTop;
+        VariablePtr m_cVarOnTop;
         /// Magnetism of the screen edges (= scope of action)
         int m_magnet;
         /// Alpha value of the static windows

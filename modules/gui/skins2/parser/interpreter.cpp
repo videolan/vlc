@@ -82,7 +82,7 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "vlc.slower()", CmdSlower )
     REGISTER_CMD( "vlc.mute()", CmdMute )
     REGISTER_CMD( "vlc.minimize()", CmdMinimize )
-    REGISTER_CMD( "vlc.ontop()", CmdOnTop )
+    REGISTER_CMD( "vlc.onTop()", CmdOnTop )
     REGISTER_CMD( "vlc.quit()", CmdQuit )
 
     // Register the constant bool variables in the var manager
