@@ -327,6 +327,7 @@
         {
             ACTIONS = {
                 deleteItems = id; 
+                handlePopUp = id; 
                 playItem = id; 
                 savePlaylist = id; 
                 searchItem = id; 
@@ -338,15 +339,12 @@
             OUTLETS = {
                 "o_btn_playlist" = id; 
                 "o_ctx_menu" = id; 
-                "o_loop_ckb" = id; 
+                "o_loop_popup" = id; 
                 "o_mi_delete" = id; 
                 "o_mi_play" = id; 
                 "o_mi_save_playlist" = id; 
                 "o_mi_selectall" = id; 
                 "o_random_ckb" = id; 
-                "o_repeat_ckb" = id; 
-                "o_search_button" = id; 
-                "o_search_keyword" = id; 
                 "o_status_field" = id; 
                 "o_table_view" = id; 
                 "o_tc_author" = id; 

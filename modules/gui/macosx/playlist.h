@@ -2,7 +2,7 @@
  * playlist.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlist.h,v 1.21 2004/02/06 04:51:02 hartman Exp $
+ * $Id: playlist.h,v 1.22 2004/03/03 11:34:19 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -57,11 +57,11 @@
     IBOutlet id o_mi_selectall;
 
     IBOutlet id o_random_ckb;
-    IBOutlet id o_loop_ckb;
-    IBOutlet id o_repeat_ckb;
 
     IBOutlet id o_search_keyword;
     IBOutlet id o_search_button;
+
+    IBOutlet id o_loop_popup;
 
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
@@ -77,6 +77,7 @@
 - (IBAction)deleteItems:(id)sender;
 - (IBAction)selectAll:(id)sender;
 - (IBAction)searchItem:(id)sender;
+- (IBAction)handlePopUp:(id)sender;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 

@@ -2,10 +2,11 @@
  * playlist.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlist.m,v 1.58 2004/02/26 14:40:29 hartman Exp $
+ * $Id: playlist.m,v 1.59 2004/03/03 11:34:19 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
+ *          Benjamin Pracht <bigben at videolab dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +36,7 @@
 #include "intf.h"
 #include "playlist.h"
 #include "controls.h"
+#include <OSD.h>
 
 /*****************************************************************************
  * VLCPlaylistView implementation 
@@ -132,7 +134,7 @@
 
     [o_table_view registerForDraggedTypes: 
         [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
-
+    [o_table_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
     [o_window setExcludedFromWindowsMenu: TRUE];
 
 /* We need to check whether _defaultTableHeaderSortImage exists, since it 
@@ -157,6 +159,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
 
     [self initStrings];
+    [self playlistUpdated];
 }
 
 - (void)initStrings
@@ -170,10 +173,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
     [o_random_ckb setTitle: _NS("Random")];
-    [o_loop_ckb setTitle: _NS("Repeat All")];
-    [o_repeat_ckb setTitle: _NS("Repeat One")];
     [o_search_button setTitle: _NS("Search")];
     [o_btn_playlist setToolTip: _NS("Playlist")];
+    [[o_loop_popup itemAtIndex:0] setTitle: _NS("Standard Play")];
+    [[o_loop_popup itemAtIndex:1] setTitle: _NS("Repeat One")];
+    [[o_loop_popup itemAtIndex:2] setTitle: _NS("Repeat All")];
 }
 
 - (void) tableView:(NSTableView*)o_tv
@@ -418,6 +422,54 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 }
 
 
+- (IBAction)handlePopUp:(id)sender
+
+{
+             intf_thread_t * p_intf = [NSApp getIntf];
+             vlc_value_t val1,val2;
+             playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                        FIND_ANYWHERE );
+             if( p_playlist == NULL )
+             {
+                 return;
+             }
+
+    switch ([o_loop_popup indexOfSelectedItem])
+    {
+        case 1:
+
+             val1.b_bool = 0;
+             var_Set( p_playlist, "loop", val1 );
+             val1.b_bool = 1;
+             var_Set( p_playlist, "repeat", val1 );
+             vout_OSDMessage( p_intf, _( "Repeat One" ) );
+        break;
+
+        case 2:
+             val1.b_bool = 0;
+             var_Set( p_playlist, "repeat", val1 );
+             val1.b_bool = 1;
+             var_Set( p_playlist, "loop", val1 );
+             vout_OSDMessage( p_intf, _( "Repeat All" ) );
+        break;
+
+        default:
+             var_Get( p_playlist, "repeat", &val1 );
+             var_Get( p_playlist, "loop", &val2 );
+             if (val1.b_bool || val2.b_bool)
+             {
+                  val1.b_bool = 0;
+                  var_Set( p_playlist, "repeat", val1 );
+                  var_Set( p_playlist, "loop", val1 );
+                  vout_OSDMessage( p_intf, _( "Repeat Off" ) );
+             }
+         break;
+     }
+     vlc_object_release( p_playlist );
+     [self playlistUpdated];
+}
+
+
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue
 {
     int i_item;
@@ -511,21 +563,29 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (void)playlistUpdated
 {
-    vlc_value_t val;
+    vlc_value_t val1, val2;
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist != NULL )
     {
-        var_Get( p_playlist, "random", &val );
-        [o_random_ckb setState: val.b_bool];
+        var_Get( p_playlist, "random", &val1 );
+        [o_random_ckb setState: val1.b_bool];
 
-        var_Get( p_playlist, "loop", &val );
-        [o_loop_ckb setState: val.b_bool];
-
-        var_Get( p_playlist, "repeat", &val );
-        [o_repeat_ckb setState: val.b_bool];
-
+        var_Get( p_playlist, "repeat", &val1 );
+        var_Get( p_playlist, "loop", &val2 );
+        if(val1.b_bool)
+        {
+            [o_loop_popup selectItemAtIndex:1];
+        }
+        else if(val2.b_bool)
+        {
+            [o_loop_popup selectItemAtIndex:2];
+        }
+        else
+        {
+            [o_loop_popup selectItemAtIndex:0];
+        }
         vlc_object_release( p_playlist );
     }
     [o_table_view reloadData];
@@ -624,6 +684,64 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_object_release( p_playlist );
 
     return( o_value );
+}
+
+- (void)tableView:(NSTableView *)o_tv
+	            willDisplayCell:(id)o_cell
+	            forTableColumn:(NSTableColumn *)o_tc
+	            row:(int)o_rows
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                               FIND_ANYWHERE );
+    if ((p_playlist->i_groups) > 1 )
+    {
+       [o_cell setDrawsBackground: VLC_TRUE];
+       switch ( p_playlist->pp_items[o_rows]->i_group % 8 )
+       {
+            case 1:
+              /*white*/
+              [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:1.0 green:1.0 blue:1.0 alpha:1.0]];
+              break;
+
+            case 2:
+              /*red*/
+             [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:1.0 green:0.76471 blue:0.76471 alpha:1.0]];
+	    break;
+
+	    case 3:
+              /*dark blue*/
+		   [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:0.76471 green:0.76471 blue:1.0 alpha:1.0]];
+            break; 
+
+            case 4:
+               /*orange*/
+                   [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:1.0 green:0.89804 blue:0.76471 alpha:1.0]];
+            break;
+
+            case 5:
+                /*purple*/
+                   [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:1.0 green:0.76471 blue:1.0 alpha:1.0]];
+            break;
+ 
+            case 6:
+                /*green*/
+                   [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:0.76471 green:1.0 blue:0.76471 alpha:1.0]];
+            break; 
+
+            case 7:
+               /*light blue*/
+                   [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:0.76471 green:1.0 blue:1.0 alpha:1.0]];
+            break;
+
+            case 0:
+               /*yellow*/
+                   [o_cell setBackgroundColor: [NSColor colorWithDeviceRed:1.0 green:1.0 blue:0.76471 alpha:1.0]];
+            break;
+	}
+     
+    }
+vlc_object_release( p_playlist );
 }
 
 - (BOOL)tableView:(NSTableView *)o_tv

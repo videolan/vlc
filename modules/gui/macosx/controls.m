@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.61 2004/02/17 03:12:00 hartman Exp $
+ * $Id: controls.m,v 1.62 2004/03/03 11:34:19 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -194,6 +194,10 @@
     }
 
     var_Get( p_playlist, "repeat", &val );
+    if (!val.b_bool)
+    {   
+        var_Set( p_playlist, "loop", val );
+    } 
     val.b_bool = !val.b_bool;
     var_Set( p_playlist, "repeat", val );
     if( val.b_bool )
@@ -222,6 +226,10 @@
     }
 
     var_Get( p_playlist, "loop", &val );
+    if (!val.b_bool)
+    {
+        var_Set( p_playlist, "repeat", val );
+    }
     val.b_bool = !val.b_bool;
     var_Set( p_playlist, "loop", val );
     if( val.b_bool )
