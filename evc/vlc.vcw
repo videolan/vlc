@@ -27,18 +27,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_a52tospdif"=.\plugin_a52tospdif.vcp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "plugin_access_file"=.\plugin_access_file.vcp - Package Owner=<4>
 
 Package=<5>
@@ -63,6 +51,42 @@ Package=<4>
 
 ###############################################################################
 
+Project: "plugin_access_mms"=.\plugin_access_mms.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_access_udp"=.\plugin_access_udp.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_adpcm"=.\plugin_adpcm.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "plugin_araw"=.\plugin_araw.vcp - Package Owner=<4>
 
 Package=<5>
@@ -75,7 +99,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_clone"=.\plugin_clone.vcp - Package Owner=<4>
+Project: "plugin_asf"=.\plugin_asf.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -87,7 +111,31 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_distort"=.\plugin_distort.vcp - Package Owner=<4>
+Project: "plugin_avi"=.\plugin_avi.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_blend"=.\plugin_blend.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_cinepak"=.\plugin_cinepak.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -135,6 +183,30 @@ Package=<4>
 
 ###############################################################################
 
+Project: "plugin_float32_mixer"=.\plugin_float32_mixer.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_float32tos16"=.\plugin_float32tos16.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "plugin_i420_rgb"=.\plugin_i420_rgb.vcp - Package Owner=<4>
 
 Package=<5>
@@ -171,7 +243,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_invert"=.\plugin_invert.vcp - Package Owner=<4>
+Project: "plugin_id3"=.\plugin_id3.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -195,7 +267,43 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_linear_resampler"=.\plugin_linear_resampler.vcp - Package Owner=<4>
+Project: "plugin_logger"=.\plugin_logger.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_m3u"=.\plugin_m3u.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_m4a"=.\plugin_m4a.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_m4v"=.\plugin_m4v.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -219,7 +327,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_motionblur"=.\plugin_motionblur.vcp - Package Owner=<4>
+Project: "plugin_mp4"=.\plugin_mp4.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -243,6 +351,102 @@ Package=<4>
 
 ###############################################################################
 
+Project: "plugin_mpga"=.\plugin_mpga.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_mpgv"=.\plugin_mpgv.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_nsv"=.\plugin_nsv.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_packetizer_h264"=.\plugin_packetizer_h264.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_packetizer_mpeg4audio"=.\plugin_packetizer_mpeg4audio.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_packetizer_mpeg4video"=.\plugin_packetizer_mpeg4video.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_packetizer_mpegvideo"=.\plugin_packetizer_mpegvideo.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_playlist"=.\plugin_playlist.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "plugin_ps"=.\plugin_ps.vcp - Package Owner=<4>
 
 Package=<5>
@@ -255,7 +459,79 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_transform"=.\plugin_transform.vcp - Package Owner=<4>
+Project: "plugin_rawvideo"=.\plugin_rawvideo.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_s16tofixed32"=.\plugin_s16tofixed32.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_s16tofloat32"=.\plugin_s16tofloat32.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_scale"=.\plugin_scale.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_spudec"=.\plugin_spudec.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_subsdec"=.\plugin_subsdec.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_subtitle"=.\plugin_subtitle.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -327,7 +603,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_vout_directx"=.\plugin_vout_directx.vcp - Package Owner=<4>
+Project: "plugin_u8tofloat32"=.\plugin_u8tofloat32.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -339,7 +615,19 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_wall"=.\plugin_wall.vcp - Package Owner=<4>
+Project: "plugin_ugly_resampler"=.\plugin_ugly_resampler.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_vout_directx"=.\plugin_vout_directx.vcp - Package Owner=<4>
 
 Package=<5>
 {{{

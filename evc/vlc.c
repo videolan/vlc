@@ -64,10 +64,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     wchar_t  pwz_title[100];
 
     i_argc = 5;
-    ppsz_argv[4] = "washington.mpeg";
-    ppsz_argv[4] = "shovel.mpeg";
-    ppsz_argv[4] = "11h50.wav";
-    ppsz_argv[4] = "apple_promouse.mpeg";
+    ppsz_argv[4] = "test.wav";
 
     /* Store our instance for future reference */
     hInst = hInstance;
@@ -125,7 +122,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     i_ret = VLC_Play( 0 );
 
     /* Add a non-blocking interface and keep the return value */
-    i_ret = VLC_AddIntf( 0, NULL, VLC_FALSE );
+    i_ret = VLC_AddIntf( 0, NULL, VLC_FALSE, VLC_TRUE );
 
     while( GetMessage( &message, NULL, 0, 0 ) )
     {

@@ -1,7 +1,7 @@
 #ifndef _ERRNO_H_
 #define _ERRNO_H_
 
-static int errno;
+static int errno = 0;
 #define strerror( i_err ) "error message not available"
 
 /* Error Codes */
