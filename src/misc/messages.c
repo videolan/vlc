@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.35 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: messages.c,v 1.36 2003/12/03 23:01:48 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -67,12 +67,12 @@ static void QueueMsg ( vlc_object_t *, int , const char *,
 static void FlushMsg ( msg_bank_t * );
 static void PrintMsg ( vlc_object_t *, msg_item_t * );
 
-/*****************************************************************************
- * msg_Create: initialize messages interface
- *****************************************************************************
+/**
+ * Initialize messages interface
+ *
  * This functions has to be called before any call to other msg_* functions.
  * It set up the locks and the message queue if it is used.
- *****************************************************************************/
+ */
 void __msg_Create( vlc_object_t *p_this )
 {
     /* Message queue initialization */
@@ -96,9 +96,9 @@ void __msg_Create( vlc_object_t *p_this )
 #endif
 }
 
-/*****************************************************************************
- * msg_Flush: flush the message queue
- *****************************************************************************/
+/**
+ * Flush the message queue
+ */
 void __msg_Flush( vlc_object_t *p_this )
 {
     int i_index;
@@ -119,13 +119,13 @@ void __msg_Flush( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_this->p_libvlc->msg_bank.lock );
 }
 
-/*****************************************************************************
- * msg_Destroy: free resources allocated by msg_Create
- *****************************************************************************
+/**
+ * Free resources allocated by msg_Create
+ *
  * This functions prints all messages remaining in queue, then free all the
  * resources allocated by msg_Create.
  * No other messages interface functions should be called after this one.
- *****************************************************************************/
+ */
 void __msg_Destroy( vlc_object_t *p_this )
 {
     if( p_this->p_libvlc->msg_bank.i_sub )
@@ -151,9 +151,9 @@ void __msg_Destroy( vlc_object_t *p_this )
     vlc_mutex_destroy( &p_this->p_libvlc->msg_bank.lock );
 }
 
-/*****************************************************************************
- * msg_Subscribe: subscribe to the message queue.
- *****************************************************************************/
+/**
+ * Subscribe to the message queue.
+ */
 msg_subscription_t *__msg_Subscribe( vlc_object_t *p_this )
 {
     msg_bank_t *p_bank = &p_this->p_libvlc->msg_bank;
@@ -175,9 +175,9 @@ msg_subscription_t *__msg_Subscribe( vlc_object_t *p_this )
     return p_sub;
 }
 
-/*****************************************************************************
- * msg_Unsubscribe: unsubscribe from the message queue.
- *****************************************************************************/
+/**
+ * Unsubscribe from the message queue.
+ */
 void __msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
 {
     msg_bank_t *p_bank = &p_this->p_libvlc->msg_bank;
@@ -231,7 +231,7 @@ void __msg_Generic( vlc_object_t *p_this, int i_type, const char *psz_module,
 
 /* Generic functions used when variadic macros are not available. */
 #define DECLARE_MSG_FN( FN_NAME, FN_TYPE ) \
-    void FN_NAME( void *p_this, const char *psz_format, ... ) \
+    void FN_NAME( vlc_object_t *p_this, const char *psz_format, ... ) \
     { \
         va_list args; \
         va_start( args, psz_format ); \
@@ -240,20 +240,33 @@ void __msg_Generic( vlc_object_t *p_this, int i_type, const char *psz_module,
         va_end( args ); \
     } \
     struct _
-
+/**
+ * Output an informational message.
+ * \note Do not use this for debug messages
+ * \see input_AddInfo
+ */
 DECLARE_MSG_FN( __msg_Info, VLC_MSG_INFO );
+/**
+ * Output an error message.
+ */
 DECLARE_MSG_FN( __msg_Err,  VLC_MSG_ERR );
+/**
+ * Output a waring message
+ */
 DECLARE_MSG_FN( __msg_Warn, VLC_MSG_WARN );
+/**
+ * Output a debug message
+ */
 DECLARE_MSG_FN( __msg_Dbg,  VLC_MSG_DBG );
 
-/*****************************************************************************
- * QueueMsg: add a message to a queue
- *****************************************************************************
+/**
+ * Add a message to a queue
+ *
  * This function provides basic functionnalities to other msg_* functions.
  * It adds a message to a queue (after having printed all stored messages if it
  * is full). If the message can't be converted to string in memory, it issues
  * a warning.
- *****************************************************************************/
+ */
 static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
                       const char *psz_format, va_list _args )
 {

@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_messages.h,v 1.8 2002/12/18 11:47:35 sam Exp $
+ * $Id: vlc_messages.h,v 1.9 2003/12/03 23:01:48 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -25,19 +25,25 @@
  *****************************************************************************/
 
 #include <stdarg.h>
+/**
+ * \defgroup messages Messages
+ * This library provides basic functions for threads to interact with user
+ * interface, such as message output.
+ *
+ * @{
+ */
 
-/*****************************************************************************
- * msg_item_t
- *****************************************************************************
+
+/**
  * Store a single message.
- *****************************************************************************/
+ */
 typedef struct
 {
-    int     i_type;                               /* message type, see below */
+    int     i_type;                             /**< message type, see below */
     int     i_object_id;
     int     i_object_type;
     char *  psz_module;
-    char *  psz_msg;                                   /* the message itself */
+    char *  psz_msg;                                 /**< the message itself */
 
 #if 0
     mtime_t date;                                     /* date of the message */
@@ -48,25 +54,27 @@ typedef struct
 } msg_item_t;
 
 /* Message types */
-#define VLC_MSG_INFO  0                                 /* standard messages */
-#define VLC_MSG_ERR   1                                    /* error messages */
-#define VLC_MSG_WARN  2                                  /* warning messages */
-#define VLC_MSG_DBG   3                                    /* debug messages */
+/** standard messages */
+#define VLC_MSG_INFO  0                               
+/** error messages */
+#define VLC_MSG_ERR   1                                  
+/** warning messages */
+#define VLC_MSG_WARN  2
+/** debug messages */
+#define VLC_MSG_DBG   3
 
-/*****************************************************************************
- * msg_bank_t
- *****************************************************************************
+/**
  * Store all data requiered by messages interfaces.
- *****************************************************************************/
+ */
 struct msg_bank_t
 {
-    /* Message queue lock */
+    /** Message queue lock */
     vlc_mutex_t             lock;
     vlc_bool_t              b_configured;
     vlc_bool_t              b_overflow;
 
     /* Message queue */
-    msg_item_t              msg[VLC_MSG_QSIZE];             /* message queue */
+    msg_item_t              msg[VLC_MSG_QSIZE];           /**< message queue */
     int i_start;
     int i_stop;
 
@@ -80,11 +88,9 @@ struct msg_bank_t
 #endif
 };
 
-/*****************************************************************************
- * msg_subscription_t
- *****************************************************************************
+/**
  * Used by interface plugins which subscribe to the message bank.
- *****************************************************************************/
+ */
 struct msg_subscription_t
 {
     int   i_start;
@@ -98,10 +104,10 @@ struct msg_subscription_t
  * Prototypes
  *****************************************************************************/
 VLC_EXPORT( void, __msg_Generic, ( vlc_object_t *, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 4, 5 ) );
-VLC_EXPORT( void, __msg_Info,    ( void *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
-VLC_EXPORT( void, __msg_Err,     ( void *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
-VLC_EXPORT( void, __msg_Warn,    ( void *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
-VLC_EXPORT( void, __msg_Dbg,    ( void *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
+VLC_EXPORT( void, __msg_Info,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
+VLC_EXPORT( void, __msg_Err,     ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
+VLC_EXPORT( void, __msg_Warn,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
+VLC_EXPORT( void, __msg_Dbg,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 
 #ifdef HAVE_VARIADIC_MACROS
 
@@ -142,3 +148,7 @@ void __msg_Destroy ( vlc_object_t * );
 VLC_EXPORT( msg_subscription_t*, __msg_Subscribe, ( vlc_object_t * ) );
 VLC_EXPORT( void, __msg_Unsubscribe, ( vlc_object_t *, msg_subscription_t * ) );
 
+
+/**
+ * @}
+ */
