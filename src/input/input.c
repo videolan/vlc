@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.273 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: input.c,v 1.274 2004/01/07 17:57:56 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -544,12 +544,13 @@ static int InitThread( input_thread_t * p_input )
     float f_fps;
     playlist_t *p_playlist;
     mtime_t i_length;
-    
+
     /* Parse source string. Syntax : [[<access>][/<demux>]:][<source>] */
     char * psz_parser = p_input->psz_dupsource = strdup(p_input->psz_source);
     vlc_value_t val;
-    subtitle_demux_t *p_sub;
     int64_t i_microsecondperframe;
+
+    subtitle_demux_t *p_sub_toselect = NULL;
 
     /* Skip the plug-in names */
     while( *psz_parser && *psz_parser != ':' )
@@ -824,11 +825,10 @@ static int InitThread( input_thread_t * p_input )
     var_Get( p_input, "sub-file", &val );
     if( val.psz_string && *val.psz_string )
     {
+        subtitle_demux_t *p_sub;
         if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string), i_microsecondperframe, 0 ) ) )
         {
-            /* Select this ES by default */
-            es_out_Control( p_input->p_es_out, ES_OUT_SET_ES_STATE, p_sub->p_es, VLC_TRUE );
-
+            p_sub_toselect = p_sub;
             TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
         }
     }
@@ -837,6 +837,7 @@ static int InitThread( input_thread_t * p_input )
     var_Get( p_input, "sub-autodetect-file", &val );
     if( val.b_bool )
     {
+        subtitle_demux_t *p_sub;
         int i;
         char **tmp = subtitles_Detect( p_input, "", p_input->psz_source );
         char **tmp2 = tmp;
@@ -858,6 +859,10 @@ static int InitThread( input_thread_t * p_input )
     }
     es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE,
                     val.b_bool ? ES_OUT_MODE_ALL : ES_OUT_MODE_AUTO );
+    if( p_sub_toselect )
+    {
+        es_out_Control( p_input->p_es_out, ES_OUT_SET_ES, p_sub_toselect->p_es, VLC_TRUE );
+    }
 
     return VLC_SUCCESS;
 }
