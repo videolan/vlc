@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.48 2002/10/27 16:58:12 gbazin Exp $
+ * $Id: input_dec.c,v 1.49 2002/10/29 13:22:48 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -284,20 +284,10 @@ static decoder_fifo_t * CreateDecoderFifo( input_thread_t * p_input,
     }
 
     /* Select a new ES */
-    p_input->stream.i_selected_es_number++;
-    p_input->stream.pp_selected_es = realloc(
-                                          p_input->stream.pp_selected_es,
-                                          p_input->stream.i_selected_es_number
-                                           * sizeof(es_descriptor_t *) );
-    if( p_input->stream.pp_selected_es == NULL )
-    {
-        msg_Err( p_input, "out of memory" );
-        vlc_object_destroy( p_fifo );
-        return NULL;
-    }
-
-    p_input->stream.pp_selected_es[p_input->stream.i_selected_es_number - 1]
-            = p_es;
+    INSERT_ELEM( p_input->stream.pp_selected_es,
+                 p_input->stream.i_selected_es_number,
+                 p_input->stream.i_selected_es_number,
+                 p_es );
 
     /* Initialize the p_fifo structure */
     vlc_mutex_init( p_input, &p_fifo->data_lock );

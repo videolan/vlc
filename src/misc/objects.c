@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.26 2002/10/17 13:15:31 sam Exp $
+ * $Id: objects.c,v 1.27 2002/10/29 13:22:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -186,11 +186,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 
         /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
          * useless to try and recover anything if pp_objects gets smashed. */
-        p_new->p_libvlc->i_objects++;
-        p_new->p_libvlc->pp_objects =
-                realloc( p_new->p_libvlc->pp_objects,
-                         p_new->p_libvlc->i_objects * sizeof(vlc_object_t *) );
-        p_new->p_libvlc->pp_objects[ p_new->p_libvlc->i_objects - 1 ] = p_new;
+        INSERT_ELEM( p_new->p_libvlc->pp_objects,
+                     p_new->p_libvlc->i_objects,
+                     p_new->p_libvlc->i_objects,
+                     p_new );
 
         vlc_mutex_unlock( &structure_lock );
     }
@@ -282,6 +281,7 @@ void __vlc_object_destroy( vlc_object_t *p_this )
         /* We are the root object ... no need to lock. */
         free( p_this->p_libvlc->pp_objects );
         p_this->p_libvlc->pp_objects = NULL;
+        p_this->p_libvlc->i_objects--;
 
         vlc_mutex_destroy( &structure_lock );
     }
@@ -295,19 +295,11 @@ void __vlc_object_destroy( vlc_object_t *p_this )
          * useless to try and recover anything if pp_objects gets smashed. */
         i_index = FindIndex( p_this, p_this->p_libvlc->pp_objects,
                              p_this->p_libvlc->i_objects );
-        memmove( p_this->p_libvlc->pp_objects + i_index,
-                 p_this->p_libvlc->pp_objects + i_index + 1,
-                 (p_this->p_libvlc->i_objects - i_index - 1)
-                   * sizeof( vlc_object_t *) );
-
-        p_this->p_libvlc->pp_objects =
-            realloc( p_this->p_libvlc->pp_objects,
-                 (p_this->p_libvlc->i_objects - 1) * sizeof(vlc_object_t *) );
+        REMOVE_ELEM( p_this->p_libvlc->pp_objects,
+                     p_this->p_libvlc->i_objects, i_index );
 
         vlc_mutex_unlock( &structure_lock );
     }
-
-    p_this->p_libvlc->i_objects--;
 
     vlc_mutex_destroy( &p_this->object_lock );
     vlc_cond_destroy( &p_this->object_wait );
@@ -445,10 +437,8 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     p_this->p_parent = p_parent;
 
     /* Attach the child to its parent */
-    p_parent->i_children++;
-    p_parent->pp_children = (vlc_object_t **)realloc( p_parent->pp_children,
-                               p_parent->i_children * sizeof(vlc_object_t *) );
-    p_parent->pp_children[p_parent->i_children - 1] = p_this;
+    INSERT_ELEM( p_parent->pp_children, p_parent->i_children,
+                 p_parent->i_children, p_this );
 
     /* Climb up the tree to see whether we are connected with the root */
     if( p_parent->b_attached )

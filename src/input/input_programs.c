@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.94 2002/07/31 20:56:52 sam Exp $
+ * $Id: input_programs.c,v 1.95 2002/10/29 13:22:48 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -138,59 +138,48 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
                                       u16 i_pgrm_id, size_t i_data_len )
 {
     /* Where to add the pgrm */
-    int i_pgrm_index = p_input->stream.i_pgrm_number;
+    pgrm_descriptor_t * p_pgrm = malloc( sizeof(pgrm_descriptor_t) );
 
-    /* Add an entry to the list of program associated with the stream */
-    p_input->stream.i_pgrm_number++;
-    p_input->stream.pp_programs = realloc( p_input->stream.pp_programs,
-                                           p_input->stream.i_pgrm_number
-                                           * sizeof(pgrm_descriptor_t *) );
-    if( p_input->stream.pp_programs == NULL )
+    if( p_pgrm == NULL )
     {
         msg_Err( p_input, "out of memory" );
-        return( NULL );
+        return NULL;
     }
 
-    /* Allocate the structure to store this description */
-    p_input->stream.pp_programs[i_pgrm_index] =
-                                        malloc( sizeof(pgrm_descriptor_t) );
-    if( p_input->stream.pp_programs[i_pgrm_index] == NULL )
-    {
-        msg_Err( p_input, "out of memory" );
-        return( NULL );
-    }
-    
     /* Init this entry */
-    p_input->stream.pp_programs[i_pgrm_index]->i_number = i_pgrm_id;
-    p_input->stream.pp_programs[i_pgrm_index]->b_is_ok = 0;
-    p_input->stream.pp_programs[i_pgrm_index]->i_version = 0;
+    p_pgrm->i_number = i_pgrm_id;
+    p_pgrm->b_is_ok = 0;
+    p_pgrm->i_version = 0;
 
-    p_input->stream.pp_programs[i_pgrm_index]->i_es_number = 0;
-    p_input->stream.pp_programs[i_pgrm_index]->pp_es = NULL;
+    p_pgrm->i_es_number = 0;
+    p_pgrm->pp_es = NULL;
 
-    input_ClockInit( p_input->stream.pp_programs[i_pgrm_index] );
+    input_ClockInit( p_pgrm );
 
-    p_input->stream.pp_programs[i_pgrm_index]->i_synchro_state
-                                                = SYNCHRO_START;
+    p_pgrm->i_synchro_state = SYNCHRO_START;
 
     if( i_data_len )
     {
-        p_input->stream.pp_programs[i_pgrm_index]->p_demux_data =
-            malloc( i_data_len );
-        if( p_input->stream.pp_programs[i_pgrm_index]->p_demux_data == NULL )
+        p_pgrm->p_demux_data = malloc( i_data_len );
+        if( p_pgrm->p_demux_data == NULL )
         {
             msg_Err( p_input, "out of memory" );
-            return( NULL );
+            return NULL;
         }
-        memset( p_input->stream.pp_programs[i_pgrm_index]->p_demux_data, 0,
-                i_data_len );
+        memset( p_pgrm->p_demux_data, 0, i_data_len );
     }
     else
     {
-        p_input->stream.pp_programs[i_pgrm_index]->p_demux_data = NULL;
+        p_pgrm->p_demux_data = NULL;
     }
 
-    return p_input->stream.pp_programs[i_pgrm_index];
+    /* Add an entry to the list of program associated with the stream */
+    INSERT_ELEM( p_input->stream.pp_programs,
+                 p_input->stream.i_pgrm_number,
+                 p_input->stream.i_pgrm_number,
+                 p_pgrm );
+
+    return p_pgrm;
 }
 
 /*****************************************************************************
@@ -230,25 +219,9 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
     }
 
     /* Remove this program from the stream's list of programs */
-    p_input->stream.i_pgrm_number--;
-
-    p_input->stream.pp_programs[i_pgrm_index] =
-        p_input->stream.pp_programs[p_input->stream.i_pgrm_number];
-    if( p_input->stream.i_pgrm_number ) 
-    {
-        p_input->stream.pp_programs = realloc( p_input->stream.pp_programs,
-                                               p_input->stream.i_pgrm_number
-                                               * sizeof(pgrm_descriptor_t *) );
-        if( p_input->stream.pp_programs == NULL )
-        {
-            msg_Err( p_input, "cannot realloc memory" );
-        }
-    }
-    else
-    {
-        free( p_input->stream.pp_programs );
-        p_input->stream.pp_programs = NULL;
-    }
+    REMOVE_ELEM( p_input->stream.pp_programs,
+                 p_input->stream.i_pgrm_number,
+                 i_pgrm_index );
 
     /* Free the description of this program */
     free( p_pgrm );
@@ -262,38 +235,30 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
 input_area_t * input_AddArea( input_thread_t * p_input )
 {
     /* Where to add the pgrm */
-    int i_area_index = p_input->stream.i_area_nb;
+    input_area_t * p_area = malloc( sizeof(input_area_t) );
+
+    if( p_area == NULL )
+    {
+        msg_Err( p_input, "out of memory" );
+        return NULL;
+    }
+
+    /* Init this entry */
+    p_area->i_id = 0;
+    p_area->i_start = 0;
+    p_area->i_size = 0;
+    p_area->i_tell = 0;
+    p_area->i_seek = NO_SEEK;
+    p_area->i_part_nb = 1;
+    p_area->i_part= 0;
 
     /* Add an entry to the list of program associated with the stream */
-    p_input->stream.i_area_nb++;
-    p_input->stream.pp_areas = realloc( p_input->stream.pp_areas,
-                                        p_input->stream.i_area_nb
-                                        * sizeof(input_area_t *) );
-    if( p_input->stream.pp_areas == NULL )
-    {
-        msg_Err( p_input, "out of memory" );
-        return( NULL );
-    }
+    INSERT_ELEM( p_input->stream.pp_areas,
+                 p_input->stream.i_area_nb,
+                 p_input->stream.i_area_nb,
+                 p_area );
 
-    /* Allocate the structure to store this description */
-    p_input->stream.pp_areas[i_area_index] =
-                                        malloc( sizeof(input_area_t) );
-    if( p_input->stream.pp_areas[i_area_index] == NULL )
-    {
-        msg_Err( p_input, "out of memory" );
-        return( NULL );
-    }
-    
-    /* Init this entry */
-    p_input->stream.pp_areas[i_area_index]->i_id = 0;
-    p_input->stream.pp_areas[i_area_index]->i_start = 0;
-    p_input->stream.pp_areas[i_area_index]->i_size = 0;
-    p_input->stream.pp_areas[i_area_index]->i_tell = 0;
-    p_input->stream.pp_areas[i_area_index]->i_seek = NO_SEEK;
-    p_input->stream.pp_areas[i_area_index]->i_part_nb = 1;
-    p_input->stream.pp_areas[i_area_index]->i_part= 0;
-
-    return p_input->stream.pp_areas[i_area_index];
+    return p_area;
 }
 
 /*****************************************************************************
@@ -420,26 +385,9 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
     }
 
     /* Remove this area from the stream's list of areas */
-    p_input->stream.i_area_nb--;
-
-    p_input->stream.pp_areas[i_area_index] =
-        p_input->stream.pp_areas[p_input->stream.i_area_nb];
-    if( p_input->stream.i_area_nb )
-    {
-        p_input->stream.pp_areas = realloc( p_input->stream.pp_areas,
-                                            p_input->stream.i_area_nb
-                                            * sizeof(input_area_t *) );
-
-        if( p_input->stream.pp_areas == NULL )
-        {
-            msg_Err( p_input, "cannot realloc memory" );
-        }
-    }
-    else
-    {
-        free( p_input->stream.pp_areas );
-        p_input->stream.pp_areas = NULL;
-    }
+    REMOVE_ELEM( p_input->stream.pp_areas,
+                 p_input->stream.i_area_nb,
+                 i_area_index );
 
     /* Free the description of this area */
     free( p_area );
@@ -483,17 +431,11 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
         msg_Err( p_input, "out of memory" );
         return( NULL);
     }
-    p_input->stream.i_es_number++;
-    p_input->stream.pp_es = realloc( p_input->stream.pp_es,
-                                     p_input->stream.i_es_number
-                                      * sizeof(es_descriptor_t *) );
-    if( p_input->stream.pp_es == NULL )
-    {
-        msg_Err( p_input, "out of memory" );
-        return( NULL );
-    }
 
-    p_input->stream.pp_es[p_input->stream.i_es_number - 1] = p_es;
+    INSERT_ELEM( p_input->stream.pp_es,
+                 p_input->stream.i_es_number,
+                 p_input->stream.i_es_number,
+                 p_es );
 
     /* Init its values */
     p_es->i_id = i_es_id;
@@ -523,17 +465,10 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     /* Add this ES to the program definition if one is given */
     if( p_pgrm )
     {
-        p_pgrm->i_es_number++;
-        p_pgrm->pp_es = realloc( p_pgrm->pp_es,
-                                 p_pgrm->i_es_number
-                                  * sizeof(es_descriptor_t *) );
-        if( p_pgrm->pp_es == NULL )
-        {
-            msg_Err( p_input, "out of memory" );
-            return( NULL );
-        }
-
-        p_pgrm->pp_es[p_pgrm->i_es_number - 1] = p_es;
+        INSERT_ELEM( p_pgrm->pp_es,
+                     p_pgrm->i_es_number,
+                     p_pgrm->i_es_number,
+                     p_es );
         p_es->p_pgrm = p_pgrm;
     }
     else
@@ -583,23 +518,9 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
         {
             if( p_pgrm->pp_es[i_index] == p_es )
             {
-                p_pgrm->i_es_number--;
-                p_pgrm->pp_es[i_index] = p_pgrm->pp_es[p_pgrm->i_es_number];
-                if( p_pgrm->i_es_number )
-                {
-                    p_pgrm->pp_es = realloc( p_pgrm->pp_es,
-                                             p_pgrm->i_es_number
-                                              * sizeof(es_descriptor_t *));
-                    if( p_pgrm->pp_es == NULL )
-                    {
-                        msg_Err( p_input, "cannot realloc memory" );
-                    }
-                }
-                else
-                {
-                    free( p_pgrm->pp_es );
-                    p_pgrm->pp_es = NULL;
-                }
+                REMOVE_ELEM( p_pgrm->pp_es,
+                             p_pgrm->i_es_number,
+                             i_index );
                 break;
             }
         }
@@ -620,25 +541,10 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     }
 
     /* Remove this ES from the stream's list of ES */
-    p_input->stream.i_es_number--;
-    p_input->stream.pp_es[i_es_index] =
-                    p_input->stream.pp_es[p_input->stream.i_es_number];
-    if( p_input->stream.i_es_number )
-    {
-        p_input->stream.pp_es = realloc( p_input->stream.pp_es,
-                                         p_input->stream.i_es_number
-                                          * sizeof(es_descriptor_t *));
-        if( p_input->stream.pp_es == NULL )
-        {
-            msg_Err( p_input, "cannot realloc memory" );
-        }
-    }
-    else
-    {
-        free( p_input->stream.pp_es );
-        p_input->stream.pp_es = NULL;
-    }
-    
+    REMOVE_ELEM( p_input->stream.pp_es,
+                 p_input->stream.i_es_number,
+                 i_es_index );
+
     /* Free the ES */
     free( p_es );
 }
@@ -707,37 +613,23 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
     if( ( p_es->p_decoder_fifo == NULL ) &&
         ( p_input->stream.i_selected_es_number > 0 ) )
     {
-        p_input->stream.i_selected_es_number--;
-
-        while( ( i_index < p_input->stream.i_selected_es_number ) &&
+        while( ( i_index < p_input->stream.i_selected_es_number - 1 ) &&
                ( p_input->stream.pp_selected_es[i_index] != p_es ) )
         {
             i_index++;
         }
 
-        p_input->stream.pp_selected_es[i_index] = 
-          p_input->stream.pp_selected_es[p_input->stream.i_selected_es_number];
+        /* XXX: no need to memmove, we have unordered data */
+        REMOVE_ELEM( p_input->stream.pp_selected_es,
+                     p_input->stream.i_selected_es_number,
+                     i_index );
 
-        if( p_input->stream.i_selected_es_number )
+        if( p_input->stream.i_selected_es_number == 0 )
         {
-            p_input->stream.pp_selected_es = realloc(
-                                           p_input->stream.pp_selected_es,
-                                           p_input->stream.i_selected_es_number
-                                           * sizeof(es_descriptor_t *) );
-            if( p_input->stream.pp_selected_es == NULL )
-            {
-                msg_Err( p_input, "cannot realloc memory" );
-                return( -1 );
-            }
-        }
-        else
-        {
-            free( p_input->stream.pp_selected_es );   
-            p_input->stream.pp_selected_es = NULL;
             msg_Dbg( p_input, "no more selected ES" );
-            return( 1 );
+            return 1;
         }
     }
 
-    return( 0 );
+    return 0;
 }

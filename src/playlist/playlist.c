@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.14 2002/09/29 18:19:53 sam Exp $
+ * $Id: playlist.c,v 1.15 2002/10/29 13:22:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -138,18 +138,6 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
     {
         int i_index;
 
-        p_playlist->i_size++;
-        p_playlist->pp_items = realloc( p_playlist->pp_items,
-                                        p_playlist->i_size * sizeof(void*) );
-        if( p_playlist->pp_items == NULL )
-        {
-            msg_Err( p_playlist, "out of memory" );
-            free( p_item->psz_name );
-            free( p_item );
-            vlc_mutex_unlock( &p_playlist->object_lock );
-            return -1;
-        }
-
         /* Additional boundary checks */
         if( i_mode & PLAYLIST_APPEND )
         {
@@ -160,16 +148,15 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
         {
             i_pos = 0;
         }
-        else if( i_pos > p_playlist->i_size - 1 )
+        else if( i_pos > p_playlist->i_size )
         {
-            i_pos = p_playlist->i_size - 1;
+            i_pos = p_playlist->i_size;
         }
 
-        /* Now we know exactly where it goes. Just renumber the playlist */
-        for( i_index = p_playlist->i_size - 1; i_index > i_pos ; i_index-- )
-        {
-            p_playlist->pp_items[i_index] = p_playlist->pp_items[i_index - 1];
-        }
+        INSERT_ELEM( p_playlist->pp_items,
+                     p_playlist->i_size,
+                     i_pos,
+                     p_item );
 
         if( p_playlist->i_index >= i_pos )
         {
@@ -180,11 +167,10 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
     {
         /* i_mode == PLAYLIST_REPLACE and 0 <= i_pos < p_playlist->i_size */
         free( p_playlist->pp_items[i_pos]->psz_name );
-        free( p_playlist->pp_items[i_pos] );
         /* XXX: what if the item is still in use? */
+        free( p_playlist->pp_items[i_pos] );
+        p_playlist->pp_items[i_pos] = p_item;
     }
-
-    p_playlist->pp_items[i_pos] = p_item;
 
     if( i_mode & PLAYLIST_GO )
     {
@@ -218,8 +204,8 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
                              p_playlist->pp_items[i_pos]->psz_name );
 
         free( p_playlist->pp_items[i_pos]->psz_name );
-        free( p_playlist->pp_items[i_pos] );
         /* XXX: what if the item is still in use? */
+        free( p_playlist->pp_items[i_pos] );
 
         if( i_pos < p_playlist->i_index )
         {
@@ -227,22 +213,9 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
         }
 
         /* Renumber the playlist */
-        for( i_index = i_pos + 1; i_index < p_playlist->i_size; i_index++ )
-        {
-            p_playlist->pp_items[i_index - 1] = p_playlist->pp_items[i_index];
-        }
-
-        p_playlist->i_size--;
-        if( p_playlist->i_size )
-        {
-            p_playlist->pp_items = realloc( p_playlist->pp_items,
-                                        p_playlist->i_size * sizeof(void*) );
-        }
-        else
-        {
-            free( p_playlist->pp_items );
-            p_playlist->pp_items = NULL;
-        }
+        REMOVE_ELEM( p_playlist->pp_items,
+                     p_playlist->i_size,
+                     i_pos );
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );

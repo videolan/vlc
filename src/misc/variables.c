@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.10 2002/10/28 20:57:02 sam Exp $
+ * $Id: variables.c,v 1.11 2002/10/29 13:22:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,7 +42,7 @@ struct callback_entry_t
 /*****************************************************************************
  * Local comparison functions, returns 0 if v == w, < 0 if v < w, > 0 if v > w
  *****************************************************************************/
-static int CmpBool( vlc_value_t v, vlc_value_t w ) { return v.b_bool != w.b_bool; }
+static int CmpBool( vlc_value_t v, vlc_value_t w ) { return v.b_bool ? w.b_bool ? 0 : 1 : w.b_bool ? -1 : 0; }
 static int CmpInt( vlc_value_t v, vlc_value_t w ) { return v.i_int == w.i_int ? 0 : v.i_int > w.i_int ? 1 : -1; }
 static int CmpString( vlc_value_t v, vlc_value_t w ) { return strcmp( v.psz_string, w.psz_string ); }
 static int CmpFloat( vlc_value_t v, vlc_value_t w ) { return v.f_float == w.f_float ? 0 : v.f_float > w.f_float ? 1 : -1; }
@@ -194,7 +194,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
  *****************************************************************************/
 int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 {
-    int i_var;
+    int i_var, i;
     variable_t *p_var;
 
     vlc_mutex_lock( &p_this->var_lock );
@@ -225,6 +225,16 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
             vlc_mutex_destroy( (vlc_mutex_t*)p_var->val.p_address );
             free( p_var->val.p_address );
             break;
+    }
+
+    /* Free choice list if needed */
+    if( p_var->pp_choices )
+    {
+        for( i = 0 ; i < p_var->i_choices ; i++ )
+        {
+            p_var->pf_free( &p_var->pp_choices[i] );
+        }
+        free( p_var->pp_choices );
     }
 
     /* Free callbacks if needed */
@@ -326,25 +336,9 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                 p_var->i_default++;
             }
 
-            if( p_var->i_choices )
-            {
-                p_var->pp_choices = realloc( p_var->pp_choices,
-                                             (p_var->i_choices + 1)
-                                              * sizeof(vlc_value_t) );
-            }
-            else
-            {
-                p_var->pp_choices = malloc( (p_var->i_choices + 1)
-                                             * sizeof(vlc_value_t) );
-            }
-
-            memmove( p_var->pp_choices + i + 1,
-                     p_var->pp_choices + i,
-                     (p_var->i_choices - i) * sizeof(vlc_value_t) );
-
-            p_var->i_choices++;
-            p_var->pp_choices[i] = *p_val;
+            INSERT_ELEM( p_var->pp_choices, p_var->i_choices, i, *p_val );
             p_var->pf_dup( &p_var->pp_choices[i] );
+
             CheckValue( p_var, &p_var->val );
             break;
         case VLC_VAR_DELCHOICE:
@@ -374,22 +368,8 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             }
 
             p_var->pf_free( &p_var->pp_choices[i] );
+            REMOVE_ELEM( p_var->pp_choices, p_var->i_choices, i );
 
-            memmove( p_var->pp_choices + i,
-                     p_var->pp_choices + i + 1,
-                     (p_var->i_choices - i - 1) * sizeof(vlc_value_t) );
-
-            p_var->i_choices--;
-            if( p_var->i_choices )
-            {
-                p_var->pp_choices = realloc( p_var->pp_choices,
-                                             p_var->i_choices
-                                              * sizeof(vlc_value_t) );
-            }
-            else
-            {
-                free( p_var->pp_choices );
-            }
             CheckValue( p_var, &p_var->val );
             break;
         case VLC_VAR_SETDEFAULT:
@@ -606,9 +586,13 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
 int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
                        vlc_callback_t pf_callback, void *p_data )
 {
-    int i_entry, i_var;
+    int i_var;
     variable_t *p_var;
+    callback_entry_t entry;
 
+    entry.pf_callback = pf_callback;
+    entry.p_data = p_data;
+        
     vlc_mutex_lock( &p_this->var_lock );
 
     i_var = GetUnused( p_this, psz_name );
@@ -619,21 +603,12 @@ int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
     }
 
     p_var = &p_this->p_vars[i_var];
-    i_entry = p_var->i_entries++;
 
-    if( i_entry )
-    {
-        p_var->p_entries = realloc( p_var->p_entries,
-                               sizeof( callback_entry_t ) * p_var->i_entries );
-    }
-    else
-    {
-        p_var->p_entries = malloc( sizeof( callback_entry_t ) );
-    }
+    INSERT_ELEM( p_var->p_entries,
+                 p_var->i_entries,
+                 p_var->i_entries,
+                 entry );
 
-    p_var->p_entries[ i_entry ].pf_callback = pf_callback;
-    p_var->p_entries[ i_entry ].p_data = p_data;
-        
     vlc_mutex_unlock( &p_this->var_lock );
 
     return VLC_SUCCESS;
@@ -677,22 +652,7 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
         return VLC_EGENERIC;
     }
 
-    p_var->i_entries--;
-
-    memmove( p_var->p_entries + i_entry,
-             p_var->p_entries + i_entry + 1,
-             sizeof( callback_entry_t ) * ( p_var->i_entries - i_entry ) );
-
-    if( p_var->i_entries )
-    {
-        p_var->p_entries = realloc( p_var->p_entries,
-                       sizeof( callback_entry_t ) * ( p_var->i_entries ) );
-    }
-    else
-    {
-        free( p_var->p_entries );
-        p_var->p_entries = NULL;
-    }
+    REMOVE_ELEM( p_var->p_entries, p_var->i_entries, i_entry );
 
     vlc_mutex_unlock( &p_this->var_lock );
 

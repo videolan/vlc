@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.17 2002/10/28 16:26:44 sam Exp $
+ * $Id: messages.c,v 1.18 2002/10/29 13:22:48 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -137,11 +137,7 @@ msg_subscription_t *__msg_Subscribe( vlc_object_t *p_this )
     vlc_mutex_lock( &p_bank->lock );
 
     /* Add subscription to the list */
-    p_bank->i_sub++;
-    p_bank->pp_sub = realloc( p_bank->pp_sub,
-                              p_bank->i_sub * sizeof( msg_subscription_t* ) );
-
-    p_bank->pp_sub[ p_bank->i_sub - 1 ] = p_sub;
+    INSERT_ELEM( p_bank->pp_sub, p_bank->i_sub, p_bank->i_sub, p_sub );
 
     p_sub->i_start = p_bank->i_start;
     p_sub->pi_stop = &p_bank->i_stop;
@@ -188,23 +184,7 @@ void __msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
     }
 
     /* Remove this subscription */
-    for( ; i_index < (p_bank->i_sub - 1); i_index++ )
-    {
-        p_bank->pp_sub[ i_index ] = p_bank->pp_sub[ i_index+1 ];
-    }
-
-    p_bank->i_sub--;
-    if( p_bank->i_sub )
-    {
-        p_bank->pp_sub = realloc( p_bank->pp_sub, p_bank->i_sub
-                                   * sizeof( msg_subscription_t* ) );
-    }
-    else
-    {
-        free( p_bank->pp_sub );
-        p_bank->pp_sub = NULL;
-    }
-
+    REMOVE_ELEM( p_bank->pp_sub, p_bank->i_sub, i_index );
 
     vlc_mutex_unlock( &p_bank->lock );
 }

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.32 2002/10/25 09:21:09 sam Exp $
+ * $Id: vlc_common.h,v 1.33 2002/10/29 13:22:47 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -345,6 +345,46 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #ifndef __MIN
 #   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
+
+/* Dynamic array handling: realloc array, move data, increment position */
+#define INSERT_ELEM( p_ar, i_oldsize, i_pos, elem )                           \
+    do                                                                        \
+    {                                                                         \
+        if( i_oldsize )                                                       \
+        {                                                                     \
+            (p_ar) = realloc( p_ar, ((i_oldsize) + 1) * sizeof( *(p_ar) ) );  \
+        }                                                                     \
+        else                                                                  \
+        {                                                                     \
+            (p_ar) = malloc( ((i_oldsize) + 1) * sizeof( *(p_ar) ) );         \
+        }                                                                     \
+        memmove( (p_ar) + (i_pos) + 1,                                        \
+                 (p_ar) + (i_pos),                                            \
+                 ((i_oldsize) - (i_pos)) * sizeof( *(p_ar) ) );               \
+        (p_ar)[i_pos] = elem;                                                 \
+        (i_oldsize)++;                                                        \
+    }                                                                         \
+    while( 0 )
+
+#define REMOVE_ELEM( p_ar, i_oldsize, i_pos )                                 \
+    do                                                                        \
+    {                                                                         \
+        memmove( (p_ar) + (i_pos),                                            \
+                 (p_ar) + (i_pos) + 1,                                        \
+                 ((i_oldsize) - (i_pos) - 1) * sizeof( *(p_ar) ) );           \
+        if( i_oldsize > 1 )                                                   \
+        {                                                                     \
+            (p_ar) = realloc( p_ar, ((i_oldsize) - 1) * sizeof( *(p_ar) ) );  \
+        }                                                                     \
+        else                                                                  \
+        {                                                                     \
+            free( p_ar );                                                     \
+            (p_ar) = NULL;                                                    \
+        }                                                                     \
+        (i_oldsize)--;                                                        \
+    }                                                                         \
+    while( 0 )
+
 
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
  * MSB, and should be used for both network communications and files. Note that
