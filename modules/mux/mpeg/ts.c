@@ -86,6 +86,9 @@ static void    Close  ( vlc_object_t * );
 #define TSID_TEXT N_("TS ID")
 #define TSID_LONGTEXT N_("Assigns a fixed Transport Stream ID.")
 
+#define PID_TEXT N_("Set PID to id of ES")
+#define PID_LONGTEXT N_("set PID to id of es")
+
 #define SHAPING_TEXT N_("Shaping delay (ms)")
 #define SHAPING_LONGTEXT N_("If enabled, the TS muxer will cut the " \
   "stream in slices of the given duration, and ensure a constant bitrate " \
@@ -143,6 +146,8 @@ vlc_module_begin();
                  PMTPID_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "tsid", 0, NULL, TSID_TEXT,
                  TSID_LONGTEXT, VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "es-id-pid", 0, NULL, PID_TEXT, PID_LONGTEXT,
+              VLC_TRUE );
 
     add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL,SHAPING_TEXT,
                  SHAPING_LONGTEXT, VLC_TRUE );
@@ -171,8 +176,9 @@ vlc_module_end();
  * Local data structures
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid", "shaping", "pcr",
-    "bmin", "bmax", "use-key-frames", "dts-delay", "csa-ck", "crypt-audio",
+    "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid", "es-id-pid",
+    "shaping", "pcr", "bmin", "bmax", "use-key-frames", "dts-delay",
+    "csa-ck", "crypt-audio",
     NULL
 };
 
@@ -275,6 +281,7 @@ struct sout_mux_sys_t
     int             i_audio_bound;
     int             i_video_bound;
 
+    vlc_bool_t      b_es_id_pid;
     int             i_pid_video;
     int             i_pid_audio;
     int             i_pid_spu;
@@ -403,6 +410,9 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->i_pid_free = p_sys->pmt.i_pid + 1;
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "es-id-pid", &val );
+    p_sys->b_es_id_pid = val.b_bool;
 
     var_Get( p_mux, SOUT_CFG_PREFIX "pid-video", &val );
     p_sys->i_pid_video = val.i_int;
@@ -585,7 +595,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_input->p_sys = p_stream = malloc( sizeof( ts_stream_t ) );
 
     /* Init this new stream */
-    p_stream->i_pid = AllocatePID( p_sys, p_input->p_fmt->i_cat );
+    if ( p_sys->b_es_id_pid )
+        p_stream->i_pid = p_input->p_fmt->i_id & 0x1fff;
+    else
+        p_stream->i_pid = AllocatePID( p_sys, p_input->p_fmt->i_cat );
     p_stream->i_codec = p_input->p_fmt->i_codec;
     p_stream->i_continuity_counter    = 0;
     p_stream->i_decoder_specific_info = 0;
