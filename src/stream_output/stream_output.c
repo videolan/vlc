@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.10 2003/01/13 04:46:49 fenrir Exp $
+ * $Id: stream_output.c,v 1.11 2003/01/14 04:34:13 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -260,29 +260,35 @@ sout_input_t *__sout_InputNew( vlc_object_t *p_this,
     p_input->p_fifo = sout_FifoCreate( p_sout );
     p_input->p_mux_data = NULL;
 
-    /* add this new one to p_sout */
-    vlc_mutex_lock( &p_sout->lock );
-    if( p_sout->i_nb_inputs == 0 )
+    if( p_input->input_format.i_fourcc != VLC_FOURCC( 'n', 'u', 'l', 'l' ) )
     {
-        p_sout->pp_inputs = malloc( sizeof( sout_input_t * ) );
-    }
-    else
-    {
-        p_sout->pp_inputs = realloc( p_sout->pp_inputs,
-                                    sizeof( sout_input_t * ) *
-                                            ( p_sout->i_nb_inputs + 1 ) );
-    }
-    p_sout->pp_inputs[p_sout->i_nb_inputs] = p_input;
-    p_sout->i_nb_inputs++;
+        /* add this new one to p_sout */
+        vlc_mutex_lock( &p_sout->lock );
+        if( p_sout->i_nb_inputs == 0 )
+        {
+            p_sout->pp_inputs = malloc( sizeof( sout_input_t * ) );
+        }
+        else
+        {
+            p_sout->pp_inputs = realloc( p_sout->pp_inputs,
+                                        sizeof( sout_input_t * ) *
+                                                ( p_sout->i_nb_inputs + 1 ) );
+        }
+        p_sout->pp_inputs[p_sout->i_nb_inputs] = p_input;
+        p_sout->i_nb_inputs++;
 
-    if( p_input->input_format.i_fourcc != VLC_FOURCC( 'n', 'u', 'l', 'l' ) &&
-        p_sout->pf_mux_addstream( p_sout, p_input ) < 0 )
-    {
-        /* vlc_mutex_unlock( &p_sout->lock ); */
-        msg_Err( p_sout, "cannot add this stream" );
-        /* FIXME FIXME */
+        if( p_sout->pf_mux_addstream( p_sout, p_input ) < 0 )
+        {
+            msg_Err( p_sout, "cannot add this stream" );
+
+            vlc_mutex_unlock( &p_sout->lock );
+            sout_InputDelete( p_input );
+            vlc_mutex_lock( &p_sout->lock );
+
+            p_input = NULL;
+        }
+        vlc_mutex_unlock( &p_sout->lock );
     }
-    vlc_mutex_unlock( &p_sout->lock );
 
     vlc_object_release( p_sout );
 
@@ -296,7 +302,13 @@ int sout_InputDelete( sout_input_t *p_input )
     int                 i_input;
 
 
+    msg_Dbg( p_sout, "removing an input" );
+
     vlc_mutex_lock( &p_sout->lock );
+
+    sout_FifoDestroy( p_sout, p_input->p_fifo );
+    vlc_mutex_destroy( &p_input->lock );
+
     for( i_input = 0; i_input < p_sout->i_nb_inputs; i_input++ )
     {
         if( p_sout->pp_inputs[i_input] == p_input )
@@ -304,43 +316,38 @@ int sout_InputDelete( sout_input_t *p_input )
             break;
         }
     }
-
-    if( i_input >= p_sout->i_nb_inputs )
+    if( i_input < p_sout->i_nb_inputs )
     {
-        msg_Err( p_sout, "cannot find input to delete" );
-        return( -1 );
+        if( p_sout->pf_mux_delstream( p_sout, p_input ) < 0 )
+        {
+            msg_Err( p_sout, "cannot del this stream from mux" );
+        }
+
+        /* remove the entry */
+        if( p_sout->i_nb_inputs > 1 )
+        {
+            memmove( &p_sout->pp_inputs[i_input],
+                     &p_sout->pp_inputs[i_input+1],
+                     (p_sout->i_nb_inputs - i_input - 1) * sizeof( sout_input_t*) );
+        }
+        else
+        {
+            free( p_sout->pp_inputs );
+        }
+        p_sout->i_nb_inputs--;
+
+        if( p_sout->i_nb_inputs == 0 )
+        {
+            msg_Warn( p_sout, "no more input stream" );
+        }
+    }
+    else if( p_input->input_format.i_fourcc != VLC_FOURCC( 'n', 'u', 'l', 'l' ) )
+    {
+        msg_Err( p_sout, "cannot find the input to be deleted" );
     }
 
-    msg_Dbg( p_sout, "removing an input" );
-
-    if( p_input->input_format.i_fourcc != VLC_FOURCC( 'n', 'u', 'l', 'l' ) &&
-        p_sout->pf_mux_delstream( p_sout, p_input ) < 0 )
-    {
-        msg_Err( p_sout, "cannot del this stream" );
-        /* FIXME FIXME */
-    }
-
-    /* remove the entry */
-    if( p_sout->i_nb_inputs > 1 )
-    {
-        memmove( &p_sout->pp_inputs[i_input],
-                 &p_sout->pp_inputs[i_input+1],
-                 (p_sout->i_nb_inputs - i_input - 1) * sizeof( sout_input_t*) );
-    }
-    else
-    {
-        free( p_sout->pp_inputs );
-    }
-    p_sout->i_nb_inputs--;
-
-    sout_FifoDestroy( p_sout, p_input->p_fifo );
-    vlc_mutex_destroy( &p_input->lock );
     free( p_input );
 
-    if( p_sout->i_nb_inputs == 0 )
-    {
-        msg_Warn( p_sout, "no more input stream" );
-    }
     vlc_mutex_unlock( &p_sout->lock );
 
     return( 0 );
