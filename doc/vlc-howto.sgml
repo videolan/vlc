@@ -172,8 +172,8 @@
    In order to read CSSsrambled DVDs, you will need libdvdcss. 
    You can find binary
    packages for your distribution here : <htmlurl 
-   name="http://www.videolan.org/libdvdcss/download/index.html" 
-   url="http://www.videolan.org/libdvdcss/download/index.html">
+   name="http://www.videolan.org/libdvdcss/download.html" 
+   url="http://www.videolan.org/libdvdcss/download.html">
   </p>
  </sect1>
  
