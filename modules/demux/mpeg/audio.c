@@ -2,7 +2,7 @@
  * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.16 2003/03/30 18:14:37 gbazin Exp $
+ * $Id: audio.c,v 1.17 2003/04/26 20:51:54 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -487,6 +487,8 @@ static int Activate( vlc_object_t * p_this )
     int b_forced;
     int i_skip;
 
+    int i_max_pos;
+
     /* Set the demux function */
     p_input->pf_demux = Demux;
 
@@ -497,16 +499,27 @@ static int Activate( vlc_object_t * p_this )
         p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
     }
 
+    b_forced = VLC_FALSE;
+    i_max_pos = MPEGAUDIO_MAXTESTPOS;
+
     if( ( *p_input->psz_demux )
         &&( ( !strncmp( p_input->psz_demux, "mpegaudio", 10 ) )||
             ( !strncmp( p_input->psz_demux, "mp3", 3 ) ) ) )
     {
-        b_forced = 1;
+        b_forced = VLC_TRUE;
+        i_max_pos = 4000;
     }
-    else
+    else if( p_input->psz_name )
     {
-        b_forced = 0;
+        char *name = p_input->psz_name;
+        int  i_len = strlen( name );
+
+        if( i_len > 4 && !strcasecmp( &name[i_len - 4], ".mp3" ) )
+        {
+            i_max_pos = 2000;
+        }
     }
+
     p_id3 = module_Need( p_input, "id3", NULL );
     if ( p_id3 ) {
         module_Unneed( p_input, p_id3 );
@@ -531,7 +544,7 @@ static int Activate( vlc_object_t * p_this )
     /* must be sure that is mpeg audio stream unless forced */
     if( !( i_found = GetHeader( p_input,
                                 &p_demux->mpeg,
-                                b_forced ? 4000 : MPEGAUDIO_MAXTESTPOS,
+                                i_max_pos,
                                 &i_skip ) ) )
     {
         if( b_forced )
