@@ -2,7 +2,7 @@
  * vout_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vout_synchro.c,v 1.3 2003/06/09 00:33:34 massiot Exp $
+ * $Id: vout_synchro.c,v 1.4 2003/10/17 18:38:47 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -109,6 +109,7 @@
 
 /* Error margins */
 #define DELTA                   (int)(0.075*CLOCK_FREQ)
+#define MAX_VALID_TAU           (int)(0.3*CLOCK_FREQ)
 
 #define DEFAULT_NB_P            5
 #define DEFAULT_NB_B            1
@@ -318,7 +319,8 @@ void vout_SynchroEnd( vout_synchro_t * p_synchro, int i_coding_type,
         /* If duration too high, something happened (pause ?), so don't
          * take it into account. */
         if( tau < 3 * p_synchro->p_tau[i_coding_type]
-             || !p_synchro->pi_meaningful[i_coding_type] )
+             || ( !p_synchro->pi_meaningful[i_coding_type]
+                   && tau < MAX_VALID_TAU ) )
         {
             /* Mean with average tau, to ensure stability. */
             p_synchro->p_tau[i_coding_type] =
