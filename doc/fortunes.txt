@@ -535,4 +535,14 @@ the Boston strangler is to the woman home alone.
                    timeslice to file2.mpeg
 < sgagers> boggle: zorglubs is an utility of ffmpeg?
 
+  -- #videolan
+%
+<Golf3r_1> hello
+<Golf3r_1> any place where I can get golf videos ?
+<E-bola> lol
+<E-bola> are u serious?
+<Golf3r_1> fuk off
+*** Signoff: Golf3r_1 ("Leaving")
+
+  -- #videolan
 %
