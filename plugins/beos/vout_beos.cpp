@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.42 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: vout_beos.cpp,v 1.43 2002/02/27 03:47:56 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -435,14 +435,6 @@ int vout_Create( vout_thread_t *p_vout )
             * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
     }
 
-    /* Open and initialize device */
-    if( BeosOpenDisplay( p_vout ) )
-    {
-        intf_ErrMsg("vout error: can't open display");
-        free( p_vout->p_sys );
-        return( 1 );
-    }
-
     return( 0 );
 }
 
@@ -451,18 +443,22 @@ int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_Init( vout_thread_t *p_vout )
 {
-    VideoWindow *p_win = p_vout->p_sys->p_window;
-
     int i_index;
     picture_t *p_pic;
 
     I_OUTPUTPICTURES = 0;
 
+    /* Open and initialize device */
+    if( BeosOpenDisplay( p_vout ) )
+    {
+        intf_ErrMsg("vout error: can't open display");
+        return 0;
+    }
+
     p_vout->output.i_width  = p_vout->p_sys->i_width;
     p_vout->output.i_height = p_vout->p_sys->i_height;
     p_vout->output.i_aspect = p_vout->p_sys->i_width
-                               * VOUT_ASPECT_FACTOR
-                               / p_vout->p_sys->i_height;
+                               * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
     p_vout->output.i_chroma = FOURCC_RV32;
 
     p_pic = NULL;
@@ -510,7 +506,7 @@ int vout_Init( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_End( vout_thread_t *p_vout )
 {
-    /* place code here to end the video */
+    BeosCloseDisplay( p_vout );
 }
 
 /*****************************************************************************
@@ -520,7 +516,6 @@ void vout_End( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_Destroy( vout_thread_t *p_vout )
 {
-    BeosCloseDisplay( p_vout );
     free( p_vout->p_sys );
 }
 
@@ -532,7 +527,7 @@ void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_Manage( vout_thread_t *p_vout )
 {
-    VideoWindow * p_win = p_vout->p_sys->p_window;
+//    VideoWindow * p_win = p_vout->p_sys->p_window;
     
 //    p_win->resizeIfRequired(p_vout->p_sys->pp_buffer[p_vout->p_sys->i_index].i_pic_width,
 //                            p_vout->p_sys->pp_buffer[p_vout->p_sys->i_index].i_pic_height);
@@ -575,10 +570,9 @@ void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int BeosOpenDisplay( vout_thread_t *p_vout )
 { 
-    p_vout->p_sys->p_window = new VideoWindow(
-            config_GetIntVariable( VOUT_WIDTH_VAR ) - 1,
-            config_GetIntVariable( VOUT_HEIGHT_VAR ) - 1,
-            p_vout );
+    p_vout->p_sys->p_window = new VideoWindow( p_vout->p_sys->i_width - 1,
+                                               p_vout->p_sys->i_height - 1,
+                                               p_vout );
 
     if( p_vout->p_sys->p_window == NULL )
     {

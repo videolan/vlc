@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.16 2002/02/19 00:50:20 sam Exp $
+ * $Id: vout_pictures.c,v 1.17 2002/02/27 03:47:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -376,8 +376,8 @@ void vout_PlacePicture( vout_thread_t *p_vout, int i_width, int i_height,
     }
     else
     {
-        *pi_width = MIN( i_width, p_vout->render.i_width );
-        *pi_height = MIN( i_height, p_vout->render.i_height );
+        *pi_width = __MIN( i_width, p_vout->render.i_width );
+        *pi_height = __MIN( i_height, p_vout->render.i_height );
     }
 
     if( VOUT_ASPECT_FACTOR * *pi_width / *pi_height < p_vout->render.i_aspect )

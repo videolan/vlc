@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.121 2002/02/24 20:51:09 gbazin Exp $
+ * $Id: input_dvd.c,v 1.122 2002/02/27 03:47:56 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -1072,12 +1072,12 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
      * can be very wide out of such zones */
     if( title.p_cell_play[p_dvd->i_prg_cell].i_category & 0xf000 )
     {
-        p_dvd->i_sector = MAX(
+        p_dvd->i_sector = __MAX(
                 cell.i_start_sector,
                 title.p_cell_play[p_dvd->i_prg_cell].i_start_sector );
     }
 
-    p_dvd->i_end_sector = MIN(
+    p_dvd->i_end_sector = __MIN(
             cell.i_end_sector,
             title.p_cell_play[p_dvd->i_prg_cell].i_end_sector );
 #undef cell
@@ -1193,10 +1193,10 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
     
     /* Find start and end sectors of new cell */
 #if 1
-    p_dvd->i_sector = MAX(
+    p_dvd->i_sector = __MAX(
          p_dvd->p_ifo->vts.cell_inf.p_cell_map[p_dvd->i_cell].i_start_sector,
          title.p_cell_play[p_dvd->i_prg_cell].i_start_sector );
-    p_dvd->i_end_sector = MIN(
+    p_dvd->i_end_sector = __MIN(
          p_dvd->p_ifo->vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector,
          title.p_cell_play[p_dvd->i_prg_cell].i_end_sector );
 #else

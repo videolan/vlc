@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.156 2002/02/26 18:25:40 gbazin Exp $
+ * $Id: main.c,v 1.157 2002/02/27 03:47:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -278,7 +278,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     p_main->i_warning_level = 0;
 
-
 #if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
     /*
      * Support for getext
@@ -376,7 +375,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     module_LoadPlugins();
     intf_WarnMsg( 2, "module: module bank initialized, found %i modules",
                   p_module_bank->i_count );
-
 
     /* Check for help on plugins */
     if( (p_tmp = config_GetPszVariable( "pluginhelp" )) )
@@ -712,12 +710,12 @@ static int GetConfigurationFromCmdLine( int *pi_argc, char *ppsz_argv[],
         {
             /* A long option has been recognized */
 
-            module_config_t *p_config;
+            module_config_t *p_conf;
 
             /* Store the configuration option */
-            p_config = config_FindConfig( p_longopts[i_index].name );
+            p_conf = config_FindConfig( p_longopts[i_index].name );
 
-            switch( p_config->i_type )
+            switch( p_conf->i_type )
             {
             case MODULE_CONFIG_ITEM_STRING:
             case MODULE_CONFIG_ITEM_FILE:

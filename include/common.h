@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.78 2002/02/24 22:06:50 sam Exp $
+ * $Id: common.h,v 1.79 2002/02/27 03:47:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -277,12 +277,12 @@ struct intf_subscription_s;
 /* PAD: PAD(n, d) = CEIL(n ,d) * d */
 #define PAD(n, d)   ( ((n) % (d)) ? ((((n) / (d)) + 1) * (d)) : (n) )
 
-/* MAX and MIN: self explanatory */
-#ifndef MAX
-#   define MAX(a, b)   ( ((a) > (b)) ? (a) : (b) )
+/* __MAX and __MIN: self explanatory */
+#ifndef __MAX
+#   define __MAX(a, b)   ( ((a) > (b)) ? (a) : (b) )
 #endif
-#ifndef MIN
-#   define MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
+#ifndef __MIN
+#   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
 
 /* MSB (big endian)/LSB (little endian) conversions - network order is always

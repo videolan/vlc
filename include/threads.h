@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.35 2002/02/25 23:59:07 sam Exp $
+ * $Id: threads.h,v 1.36 2002/02/27 03:47:56 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -44,8 +44,6 @@ int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 #   include <cthreads.h>
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )                             /* BeOS */
-#   undef MAX
-#   undef MIN
 #   include <kernel/OS.h>
 #   include <kernel/scheduler.h>
 #   include <byteorder.h>
