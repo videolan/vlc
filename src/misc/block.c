@@ -2,7 +2,7 @@
  * block.c: Data blocks management functions
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: block.c,v 1.7 2004/02/25 17:48:52 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -215,12 +215,6 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
 
     p_block = block_NewEmpty();
 
-    p_block->i_buffer       = i_size;
-    if( i_size > 0 )
-    {
-        p_block->p_buffer   = malloc( i_size );
-    }
-
     p_block->pf_release     = BlockRelease;
     p_block->pf_duplicate   = BlockDuplicate;
     p_block->pf_modify      = BlockModify;
@@ -231,8 +225,13 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
 
     p_block->p_sys = p_sys = malloc( sizeof( block_sys_t ) );
     vlc_mutex_init( p_obj, &p_sys->lock );
-    p_sys->p_allocated_buffer = p_block->p_buffer;
-    p_sys->i_allocated_buffer = p_block->i_buffer;
+
+    /* XXX align on 16 and add 32 prebuffer/posbuffer bytes */
+    p_sys->i_allocated_buffer = i_size + 32 + 32 + 16;
+    p_sys->p_allocated_buffer = malloc( p_sys->i_allocated_buffer );
+    p_block->i_buffer         = i_size;
+    p_block->p_buffer         = &p_sys->p_allocated_buffer[32+15-((long)p_sys->p_allocated_buffer % 16 )];
+
     p_sys->i_duplicated = 0;
     p_sys->b_modify = VLC_TRUE;
 
