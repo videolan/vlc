@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.34 2003/10/26 12:46:55 sigmunau Exp $
+ * $Id: xcommon.c,v 1.35 2003/10/26 17:50:23 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -34,7 +34,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
-#include <hotkeys.h>
+#include <vlc_keys.h>
 
 #ifdef HAVE_MACHINE_PARAM_H
     /* BSD */
