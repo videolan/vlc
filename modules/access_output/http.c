@@ -2,7 +2,7 @@
  * http.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: http.c,v 1.8 2003/12/06 22:50:08 jpsaman Exp $
+ * $Id: http.c,v 1.9 2004/01/15 22:58:12 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -191,6 +191,10 @@ static int Open( vlc_object_t *p_this )
         strcpy( psz_file_name, "/" );
         strcat( psz_file_name, p );
     }
+    else
+    {
+        psz_file_name = strdup( psz_file_name );
+    }
 
     p_sys->p_httpd = httpd_Find( VLC_OBJECT(p_access), VLC_TRUE );
     if( !p_sys->p_httpd )
@@ -245,6 +249,9 @@ static int Open( vlc_object_t *p_this )
 
         return( VLC_EGENERIC );
     }
+
+    free( psz_file_name );
+    free( psz_name );
 
     p_sys->i_header_allocated = 1024;
     p_sys->i_header_size      = 0;
