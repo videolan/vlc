@@ -63,10 +63,10 @@ __published:	// IDE-managed Components
     void __fastcall FormHide( TObject *Sender );
     void __fastcall BitBtnCancelClick( TObject *Sender );
     void __fastcall BitBtnOkClick( TObject *Sender );
-    void __fastcall RadioButtonUDPClick( TObject *Sender );
-    void __fastcall RadioButtonMulticastClick( TObject *Sender );
-    void __fastcall RadioButtonCSClick( TObject *Sender );
-    void __fastcall RadioButtonHTTPClick( TObject *Sender );
+    void __fastcall RadioButtonUDPEnter( TObject *Sender );
+    void __fastcall RadioButtonMulticastEnter( TObject *Sender );
+    void __fastcall RadioButtonCSEnter( TObject *Sender );
+    void __fastcall RadioButtonHTTPEnter( TObject *Sender );
 private:	// User declarations
     int OldRadioValue;
     void __fastcall ChangeEnabled( int i_selected );

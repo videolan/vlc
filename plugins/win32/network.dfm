@@ -328,7 +328,7 @@ object NetworkDlg: TNetworkDlg
       Checked = True
       TabOrder = 0
       TabStop = True
-      OnClick = RadioButtonUDPClick
+      OnEnter = RadioButtonUDPEnter
     end
     object RadioButtonMulticast: TRadioButton
       Left = 16
@@ -337,7 +337,7 @@ object NetworkDlg: TNetworkDlg
       Height = 17
       Caption = 'UDP Multicast'
       TabOrder = 1
-      OnClick = RadioButtonMulticastClick
+      OnEnter = RadioButtonMulticastEnter
     end
     object RadioButtonCS: TRadioButton
       Left = 16
@@ -346,7 +346,7 @@ object NetworkDlg: TNetworkDlg
       Height = 17
       Caption = 'Channel Server'
       TabOrder = 2
-      OnClick = RadioButtonCSClick
+      OnEnter = RadioButtonCSEnter
     end
     object RadioButtonHTTP: TRadioButton
       Left = 16
@@ -355,7 +355,7 @@ object NetworkDlg: TNetworkDlg
       Height = 17
       Caption = 'HTTP'
       TabOrder = 3
-      OnClick = RadioButtonHTTPClick
+      OnEnter = RadioButtonHTTPEnter
     end
     object EditUDPPort: TEdit
       Left = 184
@@ -384,7 +384,7 @@ object NetworkDlg: TNetworkDlg
       Width = 41
       Height = 21
       Enabled = False
-      TabOrder = 6
+      TabOrder = 7
       Text = '1234'
     end
     object UpDownMulticastPort: TUpDown
@@ -397,7 +397,7 @@ object NetworkDlg: TNetworkDlg
       Min = 0
       Max = 32767
       Position = 1234
-      TabOrder = 7
+      TabOrder = 8
       Thousands = False
       Wrap = False
     end
@@ -407,7 +407,7 @@ object NetworkDlg: TNetworkDlg
       Width = 41
       Height = 21
       Enabled = False
-      TabOrder = 8
+      TabOrder = 10
       Text = '6010'
     end
     object UpDownCSPort: TUpDown
@@ -420,7 +420,7 @@ object NetworkDlg: TNetworkDlg
       Min = 0
       Max = 32767
       Position = 6010
-      TabOrder = 9
+      TabOrder = 11
       Thousands = False
       Wrap = False
     end
@@ -431,7 +431,7 @@ object NetworkDlg: TNetworkDlg
       Height = 21
       Enabled = False
       ItemHeight = 13
-      TabOrder = 10
+      TabOrder = 6
     end
     object ComboBoxCSAddress: TComboBox
       Left = 184
@@ -440,7 +440,7 @@ object NetworkDlg: TNetworkDlg
       Height = 21
       Enabled = False
       ItemHeight = 13
-      TabOrder = 11
+      TabOrder = 9
       Text = '138.195.156.230'
       Items.Strings = (
         '138.195.159.230')

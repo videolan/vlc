@@ -48,6 +48,8 @@ __fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
 {
         char *psz_channel_server;
 
+        OldRadioValue = 0;
+
         /* server port */
         UpDownUDPPort->Position = config_GetIntVariable( "server-port" );
         UpDownMulticastPort->Position = config_GetIntVariable( "server-port" );
@@ -56,6 +58,7 @@ __fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
         if( config_GetIntVariable( "network-channel" ) )
         {
             RadioButtonCS->Checked = true;
+            RadioButtonCSEnter( RadioButtonCS );
         }
 
         psz_channel_server = config_GetPszVariable( "channel-server" );
@@ -66,8 +69,6 @@ __fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
         }
 
         UpDownCSPort->Position = config_GetIntVariable( "channel-port" );
-
-        OldRadioValue = 0;
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::FormShow( TObject *Sender )
@@ -203,28 +204,28 @@ void __fastcall TNetworkDlg::ChangeEnabled( int i_selected )
     }
 }
 //---------------------------------------------------------------------------
-void __fastcall TNetworkDlg::RadioButtonUDPClick( TObject *Sender )
+void __fastcall TNetworkDlg::RadioButtonUDPEnter( TObject *Sender )
 {
     ChangeEnabled( OldRadioValue );
     OldRadioValue = 0;
     ChangeEnabled( OldRadioValue );
 }
 //---------------------------------------------------------------------------
-void __fastcall TNetworkDlg::RadioButtonMulticastClick( TObject *Sender )
+void __fastcall TNetworkDlg::RadioButtonMulticastEnter( TObject *Sender )
 {
     ChangeEnabled( OldRadioValue );
     OldRadioValue = 1;
     ChangeEnabled( OldRadioValue );
 }
 //---------------------------------------------------------------------------
-void __fastcall TNetworkDlg::RadioButtonCSClick( TObject *Sender )
+void __fastcall TNetworkDlg::RadioButtonCSEnter( TObject *Sender )
 {
     ChangeEnabled( OldRadioValue );
     OldRadioValue = 2;
     ChangeEnabled( OldRadioValue );
 }
 //---------------------------------------------------------------------------
-void __fastcall TNetworkDlg::RadioButtonHTTPClick( TObject *Sender )
+void __fastcall TNetworkDlg::RadioButtonHTTPEnter( TObject *Sender )
 {
     ChangeEnabled( OldRadioValue );
     OldRadioValue = 3;
