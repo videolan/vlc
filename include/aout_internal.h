@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.39 2003/03/04 03:27:40 gbazin Exp $
+ * $Id: aout_internal.h,v 1.40 2003/03/06 23:10:11 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -236,6 +236,8 @@ struct aout_instance_t
 
     /* Output plug-in */
     aout_output_t           output;
+
+    int                     i_pts_delay;                 /* internal caching */
 };
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * dec.c : audio output API towards decoders
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dec.c,v 1.8 2003/02/26 18:15:33 massiot Exp $
+ * $Id: dec.c,v 1.9 2003/03/06 23:10:11 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -35,6 +35,7 @@
 
 #include "audio_output.h"
 #include "aout_internal.h"
+#include <vlc/input.h>                 /* for input_thread_t and i_pts_delay */
 
 /*
  * Creation/Deletion
@@ -43,10 +44,11 @@
 /*****************************************************************************
  * aout_DecNew : create a decoder
  *****************************************************************************/
-static aout_input_t * DecNew( aout_instance_t * p_aout,
+static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
                               audio_sample_format_t * p_format )
 {
     aout_input_t * p_input;
+    input_thread_t * p_input_thread;
 
     /* We can only be called by the decoder, so no need to lock
      * p_input->lock. */
@@ -129,6 +131,18 @@ static aout_input_t * DecNew( aout_instance_t * p_aout,
 
     vlc_mutex_unlock( &p_aout->mixer_lock );
 
+    p_input_thread = (input_thread_t *)vlc_object_find( p_this,
+                                           VLC_OBJECT_INPUT, FIND_PARENT );
+    if( p_input_thread )
+    {
+        p_aout->i_pts_delay = p_input_thread->i_pts_delay;
+        vlc_object_release( p_input_thread );
+    }
+    else
+    {
+        p_aout->i_pts_delay = DEFAULT_PTS_DELAY;
+    }
+
     return p_input;
 }
 
@@ -158,7 +172,7 @@ aout_input_t * __aout_DecNew( vlc_object_t * p_this,
         }
     }
 
-    return DecNew( *pp_aout, p_format );
+    return DecNew( p_this, *pp_aout, p_format );
 }
 
 /*****************************************************************************
@@ -285,7 +299,8 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         return -1;
     }
 
-    if ( p_buffer->start_date > mdate() + AOUT_MAX_ADVANCE_TIME )
+    if ( p_buffer->start_date > mdate() + p_aout->i_pts_delay +
+         AOUT_MAX_ADVANCE_TIME )
     {
         msg_Warn( p_aout, "received buffer in the future ("I64Fd")",
                   p_buffer->start_date - mdate());
@@ -343,4 +358,3 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
     return 0;
 }
-
