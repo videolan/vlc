@@ -402,7 +402,7 @@ dnl
 case ${target_os} in
   linux*)
     SYS=linux
-	;;
+    ;;
   bsdi*)
     SYS=bsdi
     ;;
@@ -1212,6 +1212,16 @@ AC_ARG_ENABLE(plugins,
      PLUGINS=
    fi])
 
+dnl
+dnl  DLLs - used for Win32 package build
+dnl
+DLL_PATH=.
+AC_ARG_WITH(dll-path,
+  [  --with-dll-path=path    Path to Win32 DLLs (default search in \$PWD)],
+  [ if test "x$withval" != "xno"
+    then
+      DLL_PATH=$withval
+    fi ])
 
 dnl 
 dnl  Configuration is finished
@@ -1234,6 +1244,7 @@ AC_SUBST(RELEASE)
 AC_SUBST(NEED_GETOPT)
 AC_SUBST(MOC)
 AC_SUBST(WINDRES)
+AC_SUBST(DLL_PATH)
 
 AC_SUBST(LCFLAGS)
 AC_SUBST(PLCFLAGS)

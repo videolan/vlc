@@ -51,6 +51,7 @@ SHELL = @SHELL@
 RANLIB = @RANLIB@
 WINDRES = @WINDRES@
 MOC = @MOC@
+DLL_PATH = @DLL_PATH@
 
 # 
 # Installation environment

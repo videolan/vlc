@@ -377,7 +377,7 @@ package-win32:
 		README README.libdvdcss FAQ TODO tmp/
 	for file in gtk-1.3.dll gdk-1.3.dll glib-1.3.dll gmodule-1.3.dll \
 		gnu-intl.dll SDL.dll README-SDL.txt ; \
-			do cp ../win32-libs/$$file tmp/ ; done
+			do cp ${DLL_PATH}/$$file tmp/ ; done
 	mkdir tmp/share
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/share/ ; done
