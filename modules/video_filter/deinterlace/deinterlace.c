@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: deinterlace.c,v 1.2 2002/08/26 09:12:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -59,8 +59,8 @@ static void Merge        ( void *, const void *, const void *, size_t );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define MODE_TEXT N_("Deinterlace mode")
-#define MODE_LONGTEXT N_("one of \"discard\", \"blend\", \"mean\", \"bob\" or \"linear\"")
+#define MODE_TEXT N_("deinterlace mode")
+#define MODE_LONGTEXT N_("One of \"discard\", \"blend\", \"mean\", \"bob\" or \"linear\"")
 
 static char *mode_list[] = { "discard", "blend", "mean", "bob", "linear", NULL };
 

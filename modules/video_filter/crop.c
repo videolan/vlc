@@ -2,7 +2,7 @@
  * crop.c : Crop video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: crop.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: crop.c,v 1.2 2002/08/26 09:12:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,10 +49,10 @@ static void UpdateStats    ( vout_thread_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define GEOMETRY_TEXT N_("Crop geometry")
+#define GEOMETRY_TEXT N_("crop geometry")
 #define GEOMETRY_LONGTEXT N_("Set the geometry of the zone to crop")
 
-#define AUTOCROP_TEXT N_("Automatic cropping")
+#define AUTOCROP_TEXT N_("automatic cropping")
 #define AUTOCROP_LONGTEXT N_("Activate automatic black border cropping")
 
 vlc_module_begin();

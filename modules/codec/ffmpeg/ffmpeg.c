@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.5 2002/08/12 09:34:15 sam Exp $
+ * $Id: ffmpeg.c,v 1.6 2002/08/26 09:12:46 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -86,7 +86,7 @@ static int      b_ffmpeginit = 0;
     "Not yet implemented !"
 
 vlc_module_begin();
-    add_category_hint( N_("Miscellaneous"), NULL );
+    add_category_hint( N_("Ffmpeg"), NULL );
 #if LIBAVCODEC_BUILD >= 4611
     add_integer ( "ffmpeg-error-resilience", -1, NULL, 
                   "error resilience", ERROR_RESILIENCE_LONGTEXT );
@@ -99,9 +99,9 @@ vlc_module_begin();
     add_module( "ffmpeg-pp", "postprocessing",NULL, NULL,
                 N_( "ffmpeg postprocessing module" ), NULL ); 
     add_integer( "ffmpeg-pp-q", 0, NULL,
-                 "Post processing quality", POSTPROCESSING_Q_LONGTEXT );
+                 "post processing quality", POSTPROCESSING_Q_LONGTEXT );
     add_bool( "ffmpeg-pp-auto", 0, NULL,
-              "Auto-level Post processing quality", POSTPROCESSING_AQ_LONGTEXT );
+              "auto-level Post processing quality", POSTPROCESSING_AQ_LONGTEXT );
     add_bool( "ffmpeg-db-yv", 0, NULL, 
               "force vertical luminance deblocking", 
               "force vertical luminance deblocking (override other settings)" );

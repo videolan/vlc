@@ -28,6 +28,7 @@ Description: development files for the VideoLAN Client
 Package: gnome-vlc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Recommends: vlc-plugin-esd
 Conflicts: vlc-gnome (<< 0.5.0)
 Replaces: vlc-gnome (<< 0.5.0)
 Provides: vlc-gui
@@ -268,6 +269,7 @@ Description: a multimedia plugin for Mozilla, based on vlc
 Package: kvlc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Recommends: vlc-plugin-arts
 Conflicts: vlc-kde (<< 0.5.0)
 Replaces: vlc-kde (<< 0.5.0)
 Provides: vlc-gui

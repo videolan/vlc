@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_messages.h,v 1.5 2002/07/31 20:56:50 sam Exp $
+ * $Id: vlc_messages.h,v 1.6 2002/08/26 09:12:46 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -35,6 +35,7 @@ typedef struct
 {
     int     i_type;                               /* message type, see below */
     int     i_object_id;
+    int     i_object_type;
     char *  psz_module;
     char *  psz_msg;                                   /* the message itself */
 

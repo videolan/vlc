@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: distort.c,v 1.2 2002/08/26 09:12:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -54,8 +54,8 @@ static void DistortRipple  ( vout_thread_t *, picture_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define MODE_TEXT N_("Distort mode")
-#define MODE_LONGTEXT N_("one of \"wave\" and \"ripple\"")
+#define MODE_TEXT N_("distort mode")
+#define MODE_LONGTEXT N_("Distort mode, one of \"wave\" and \"ripple\"")
 
 static char *mode_list[] = { "wave", "ripple", NULL };
 

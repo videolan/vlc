@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.9 2002/08/20 18:25:42 sam Exp $
+ * $Id: messages.c,v 1.10 2002/08/26 09:12:46 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -326,10 +326,11 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
             p_item = p_bank->msg + p_bank->i_stop;
             p_bank->i_stop = (p_bank->i_stop + 1) % VLC_MSG_QSIZE;
 
-            p_item->i_type =      VLC_MSG_ERR;
-            p_item->i_object_id = p_this->i_object_id;
-            p_item->psz_module =  strdup( "message" );
-            p_item->psz_msg =     strdup( "message queue overflowed" );
+            p_item->i_type =        VLC_MSG_ERR;
+            p_item->i_object_id =   p_this->i_object_id;
+            p_item->i_object_type = p_this->i_object_type;
+            p_item->psz_module =    strdup( "message" );
+            p_item->psz_msg =       strdup( "message queue overflowed" );
 
             PrintMsg( p_this, p_item );
 
@@ -346,10 +347,11 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     }
 
     /* Fill message information fields */
-    p_item->i_type =      i_type;
-    p_item->i_object_id = p_this->i_object_id;
-    p_item->psz_module =  strdup( psz_module );
-    p_item->psz_msg =     psz_str;
+    p_item->i_type =        i_type;
+    p_item->i_object_id =   p_this->i_object_id;
+    p_item->i_object_type = p_this->i_object_type;
+    p_item->psz_module =    strdup( psz_module );
+    p_item->psz_msg =       psz_str;
 
     PrintMsg( p_this, p_item );
 
@@ -428,6 +430,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 
     static const char * ppsz_type[4] = { "", " error", " warning", " debug" };
     static const char *ppsz_color[4] = { WHITE, RED, YELLOW, GRAY };
+    char *psz_object = "private";
     int i_type = p_item->i_type;
 
     if( p_this->p_vlc->b_quiet || !p_this->p_vlc->msg_bank.b_configured )
@@ -441,20 +444,34 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
         return;
     }
 
+    switch( p_item->i_object_type )
+    {
+        case VLC_OBJECT_ROOT: psz_object = "root"; break;
+        case VLC_OBJECT_MODULE: psz_object = "module"; break;
+        case VLC_OBJECT_INTF: psz_object = "interface"; break;
+        case VLC_OBJECT_PLAYLIST: psz_object = "playlist"; break;
+        case VLC_OBJECT_ITEM: psz_object = "item"; break;
+        case VLC_OBJECT_INPUT: psz_object = "input"; break;
+        case VLC_OBJECT_DECODER: psz_object = "decoder"; break;
+        case VLC_OBJECT_VOUT: psz_object = "video output"; break;
+        case VLC_OBJECT_AOUT: psz_object = "audio output"; break;
+        case VLC_OBJECT_SOUT: psz_object = "stream output"; break;
+    }
+
     /* Send the message to stderr */
     if( p_this->p_vlc->b_color )
     {
         fprintf( stderr, "[" GREEN "%.2x" GRAY ":" GREEN "%.6x" GRAY "] "
-                         "%s%s: %s%s" GRAY "\n", p_this->p_vlc->i_instance,
-                         p_item->i_object_id, p_item->psz_module,
+                         "%s %s%s: %s%s" GRAY "\n", p_this->p_vlc->i_instance,
+                         p_item->i_object_id, p_item->psz_module, psz_object,
                          ppsz_type[i_type], ppsz_color[i_type],
                          p_item->psz_msg );
     }
     else
     {
-        fprintf( stderr, "[%.2x:%.6x] %s%s: %s\n",
+        fprintf( stderr, "[%.2x:%.6x] %s %s%s: %s\n",
                          p_this->p_vlc->i_instance, p_item->i_object_id,
-                         p_item->psz_module, ppsz_type[i_type],
+                         p_item->psz_module, psz_object, ppsz_type[i_type],
                          p_item->psz_msg );
     }
 }

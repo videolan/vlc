@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.1 2002/08/04 17:23:44 sam Exp $
+ * $Id: xvideo.c,v 1.2 2002/08/26 09:12:46 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -75,7 +75,7 @@ extern void E_(Deactivate) ( vlc_object_t * );
     "Use shared memory to communicate between vlc and the X server.")
 
 vlc_module_begin();
-    add_category_hint( N_("Miscellaneous"), NULL );
+    add_category_hint( N_("XVideo"), NULL );
     add_string( "xvideo-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT );
     add_integer( "xvideo-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT );
     add_bool( "xvideo-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT );

@@ -234,3 +234,10 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<ArkanumJ> BTW, the CVS version runs well on MacOS X, but the sound is a bit
+           broken. 
+<Dnumgis> ArkanumJ: sound is a bit broken everywhere I think
+<Dnumgis> ArkanumJ: except the places where it is completly broken
+
+  -- #videolan
+%

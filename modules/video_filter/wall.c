@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: wall.c,v 1.2 2002/08/26 09:12:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -48,15 +48,15 @@ static void RemoveAllVout  ( vout_thread_t *p_vout );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define COLS_TEXT N_("Number of columns")
+#define COLS_TEXT N_("number of columns")
 #define COLS_LONGTEXT N_("Select the number of horizontal videowindows in " \
     "which to split the video")
 
-#define ROWS_TEXT N_("Number of rows")
+#define ROWS_TEXT N_("number of rows")
 #define ROWS_LONGTEXT N_("Select the number of vertical videowindows in " \
     "which to split the video")
 
-#define ACTIVE_TEXT N_("Active windows")
+#define ACTIVE_TEXT N_("active windows")
 #define ACTIVE_LONGTEXT N_("comma separated list of active windows, " \
     "defaults to all")
 
