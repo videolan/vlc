@@ -2,7 +2,7 @@
  * subtitle.h : Common SVCD and CVD subtitles header
  *****************************************************************************
  * Copyright (C) 2003,2004 VideoLAN
- * $Id: subtitle.h,v 1.7 2004/01/14 11:47:19 rocky Exp $
+ * $Id: subtitle.h,v 1.8 2004/01/16 04:14:54 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -23,6 +23,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#include "pixmap.h"
 
 #define DECODE_DBG_EXT         1 /* Calls from external routines */
 #define DECODE_DBG_CALL        2 /* all calls */
@@ -92,17 +94,6 @@ typedef enum  {
   SUBTITLE_BLOCK_PARTIAL,
   SUBTITLE_BLOCK_COMPLETE
 } packet_state_t;
-
-/* Color and transparency of a pixel or a palette (CLUT) entry */
-typedef union {
-  uint8_t plane[4];
-  struct {
-    uint8_t y;
-    uint8_t v;
-    uint8_t u;
-    uint8_t t;
-  } s;
-} ogt_yuvt_t;
 
 /* The storage used by one pixel */
 #define PIXEL_SIZE 4

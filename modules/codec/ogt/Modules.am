@@ -1,10 +1,11 @@
 SOURCES_svcdsub = \
 	common.c \
 	common.h \
+	subtitle.h \
 	ogt.c \
 	ogt.h \
-	subtitle.h \
 	ogt_parse.c \
+	pixmap.h \
 	render.c \
 	render.h \
 	write_png.c \
@@ -18,6 +19,7 @@ SOURCES_cvdsub = \
 	cvd.h \
 	subtitle.h \
 	cvd_parse.c \
+	pixmap.h \
 	render.c \
 	render.h \
 	write_png.c \

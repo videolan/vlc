@@ -2,7 +2,7 @@
  * Common SVCD and VCD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: common.c,v 1.6 2004/01/14 11:47:19 rocky Exp $
+ * $Id: common.c,v 1.7 2004/01/16 04:14:54 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -33,6 +33,7 @@
 #include <vlc/decoder.h>
 
 #include "subtitle.h"
+#include "pixmap.h"
 #include "common.h"
 #ifdef HAVE_LIBPNG
 #include "write_png.h"
@@ -346,49 +347,50 @@ VCDSubHandleScaling( subpicture_t *p_spu, decoder_t *p_dec )
   if (p_vout) {
     /* Check for user-configuration override. */
     unsigned int i_new_aspect = VCDSubGetAROverride( p_input, p_vout );
-        if (i_new_aspect == VOUT_ASPECT_FACTOR) {
-          /* For scaling 1:1, nothing needs to be done. Note this means
-             subtitles will get scaled the same way the video does.
-          */
-          ;
-        } else {
-          if (0 == i_new_aspect) {
-            /* Counteract the effects of background video scaling when
-               there is scaling. That's why x and y are reversed from
-               the else branch in the call below.
-            */
-            switch( p_vout->output.i_chroma )
-              {
-                /* chromas which are not scaled: */
-              case VLC_FOURCC('I','4','2','0'):
-              case VLC_FOURCC('I','Y','U','V'):
-              case VLC_FOURCC('Y','V','1','2'):
-              case VLC_FOURCC('Y','U','Y','2'):
-                return;
-                break;
-                
-                /* chromas which are scaled: */
-              case VLC_FOURCC('R','V','1','6'):
-              case VLC_FOURCC('R','V','2','4'):
-              case VLC_FOURCC('R','V','3','2'):
-              case VLC_FOURCC('R','G','B','2'):
-                break;
-                
-              default:
-                msg_Err( p_vout, "unknown chroma %x", 
-                         p_vout->output.i_chroma );
-                return;
-                break;
-              }
-            /* We get here only for scaled chromas. */
-            vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_y, 
-                              &i_aspect_x );
-          } else {
-            /* User knows best? */
-            vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
+
+    if (i_new_aspect == VOUT_ASPECT_FACTOR) {
+      /* For scaling 1:1, nothing needs to be done. Note this means
+         subtitles will get scaled the same way the video does.
+      */
+      ;
+    } else {
+      if (0 == i_new_aspect) {
+        /* Counteract the effects of background video scaling when
+           there is scaling. That's why x and y are reversed from
+           the else branch in the call below.
+        */
+        switch( p_vout->output.i_chroma )
+          {
+            /* chromas which are not scaled: */
+          case VLC_FOURCC('I','4','2','0'):
+          case VLC_FOURCC('I','Y','U','V'):
+          case VLC_FOURCC('Y','V','1','2'):
+          case VLC_FOURCC('Y','U','Y','2'):
+            break;
+            
+            /* chromas which are scaled: */
+          case VLC_FOURCC('R','V','1','6'):
+          case VLC_FOURCC('R','V','2','4'):
+          case VLC_FOURCC('R','V','3','2'):
+          case VLC_FOURCC('R','G','B','2'):
+            return;
+            break;
+            
+          default:
+            msg_Err( p_vout, "unknown chroma %x", 
+                     p_vout->output.i_chroma );
+            return;
+            break;
           }
-          VCDSubScaleX( p_dec, p_spu, i_aspect_x, i_aspect_y );
-        }
+        /* We get here only for scaled chromas. */
+        vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_y, 
+                          &i_aspect_x );
+      } else {
+        /* User knows best? */
+        vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
+      }
+      VCDSubScaleX( p_dec, p_spu, i_aspect_x, i_aspect_y );
+    }
   }
 }
 
@@ -466,20 +468,6 @@ void VCDSubDumpImage( uint8_t *p_image, uint32_t i_height, uint32_t i_width )
   printf("\n-------------------------------------\n");
 }
 
-/* 
-   FIXME: 
-   MOVE clip_8_bit and uuv2rgb TO A MORE GENERIC PLACE.
- */
-
-/* Force v in the range 0.255 */
-static inline uint8_t 
-clip_8_bit(int v)
-{
-  if (v<0)   return 0;
-  if (v>255) return 255;
-  return (uint8_t) v;
-}
-
 /***************************************************
    Color conversion from
     http://www.inforamp.net/~poynton/notes/colour_and_gamma/ColorFAQ.html#RTFToC30
@@ -498,28 +486,6 @@ clip_8_bit(int v)
   two routines.
  
 ***************************************************/
-
-static inline void
-yuv2rgb(ogt_yuvt_t *p_yuv, uint8_t *p_rgb_out )
-{
-  
-  int i_Y  = p_yuv->s.y - 16;
-  int i_Cb = p_yuv->s.v - 128;
-  int i_Cr = p_yuv->s.u - 128;
-  
-  int i_red   = (1.1644 * i_Y) + (1.5960 * i_Cr);
-  int i_green = (1.1644 * i_Y) - (0.3918 * i_Cb) - (0.8130 * i_Cr);
-  int i_blue  = (1.1644 * i_Y) + (2.0172 * i_Cb);
-  
-  i_red   = clip_8_bit( i_red );
-  i_green = clip_8_bit( i_green );
-  i_blue  = clip_8_bit( i_blue );
-  
-  *p_rgb_out++ = i_red;
-  *p_rgb_out++ = i_green;
-  *p_rgb_out++ = i_blue;
-  
-}
 
 #ifdef HAVE_LIBPNG
 
