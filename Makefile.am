@@ -207,7 +207,11 @@ include/vlc_symbols.h: Makefile $(HEADERS_include)
 	echo '#ifdef __PLUGIN__' >> $@.in
 	cat $(HEADERS_include) | grep '^ *VLC_EXPORT.*;' | sed -e 's/VLC_EXPORT( *\([^,]*\), *\([^,]*\), *\(.*\));.*/#   define \2 p_symbols->\2_inner/' >> $@.in
 	echo '#endif /* __PLUGIN__ */' >> $@.in
-	mv -f $@.in $@
+	if ! diff -q $@ $@.in; then \
+		mv -f $@.in $@ ; \
+	else \
+		rm -f $@.in ; \
+	fi
 
 src/misc/modules_plugin.h: Makefile src/misc/modules_plugin.h.in $(HEADERS_include)
 	rm -f $@.tmp && cp $@.in $@.tmp
@@ -215,7 +219,11 @@ src/misc/modules_plugin.h: Makefile src/misc/modules_plugin.h.in $(HEADERS_inclu
 	echo '#define STORE_SYMBOLS( p_symbols ) \' >> $@.tmp
 	cat $(HEADERS_include) | grep '^ *VLC_EXPORT.*;' | sed -e 's/VLC_EXPORT( *\([^,]*\), *\([^,]*\), *\(.*\));.*/    (p_symbols)->\2_inner = \2; \\/' >> $@.tmp
 	echo '' >> $@.tmp
-	mv -f $@.tmp $@
+	if ! diff -q $@ $@.tmp; then \
+		mv -f $@.tmp $@ ; \
+	else \
+		rm -f $@.tmp ; \
+	fi
 
 src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in
 	rm -f $@.tmp && cp $@.in $@.tmp
@@ -231,7 +239,11 @@ if HAVE_BUILTINS
 endif
 	echo "    } while( 0 );" >> $@.tmp
 	echo "" >> $@.tmp
-	mv -f $@.tmp $@
+	if ! diff -q $@ $@.tmp; then \
+		mv -f $@.tmp $@ ; \
+	else \
+		rm -f $@.tmp ; \
+	fi
 
 # These dependencies are mandatory
 $(SOURCES): include/vlc_symbols.h

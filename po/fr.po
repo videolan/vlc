@@ -336,7 +336,7 @@ msgstr "module de filtre vidéo"
 msgid ""
 "This will allow you to add a post-processing filter to enhance the picture "
 "quality, for instance deinterlacing, or to clone or distort the video window."
-msgstr "Cette option vous permet d'ajouter un filter de post-processing pour améliorer la qualité de l'image, par exemple du désentralement, ou pour dupliquer ou déformer la fenêtre video."
+msgstr "Cette option vous permet d'ajouter un filtre de post-processing pour améliorer la qualité de l'image, par exemple du désentralement, ou pour dupliquer ou déformer la fenêtre video."
 
 #: src/libvlc.h:172
 msgid "source aspect ratio"

@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.10 2003/01/31 02:53:52 jlj Exp $
+ * $Id: prefs.m,v 1.11 2003/02/08 22:20:28 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -243,6 +243,7 @@
 
 #define INPUT_FIELD( ctype, cname, label, w, msg, param, tip ) \
     { \
+        char * psz_duptip = strdup(tip); \
         s_rc.size.height = 25; \
         s_rc.size.width = w; \
         s_rc.origin.y += 10; \
@@ -251,7 +252,12 @@
         [o_text_field setAlignment: NSRightTextAlignment]; \
         CONTROL_CONFIG( o_text_field, o_module_name, ctype, cname ); \
         [o_text_field msg: param]; \
-        [o_text_field setToolTip: [NSApp localizedString: tip]]; \
+        if ( psz_duptip != NULL ) \
+        { \
+            [o_text_field setToolTip: [NSApp localizedString: \
+                                       vlc_wraptext(psz_duptip, PREFS_WRAP)]]; \
+            free(psz_duptip);\
+        } \
         [o_view addSubview: [o_text_field autorelease]]; \
         [[NSNotificationCenter defaultCenter] addObserver: self \
             selector: @selector(configChanged:) \
@@ -318,6 +324,7 @@
             NSPopUpButton *o_modules;
             NSButton *o_btn_select;
             NSButton *o_btn_configure;
+            char * psz_duptip = strdup(p_item->psz_longtext);
 
 #define MODULE_BUTTON( button, title, sel ) \
     { \
@@ -353,7 +360,12 @@
             [o_modules setTag: i_module_tag++];
             [o_modules setTarget: self];
             [o_modules setAction: @selector(moduleSelected:)];
-            [o_modules setToolTip: [NSApp localizedString: p_item->psz_longtext]];
+            if ( psz_duptip != NULL )
+            {
+                [o_modules setToolTip: [NSApp localizedString:
+                                        vlc_wraptext(psz_duptip, PREFS_WRAP)]];
+                free( psz_duptip );
+            }
             [o_cview addSubview: [o_modules autorelease]];
 
             MODULE_BUTTON( o_btn_configure, _NS("Configure"),
@@ -430,6 +442,7 @@
             {
                 int i;
                 VLCComboBox *o_combo_box;
+                char * psz_duptip = strdup(p_item->psz_longtext);
 
                 s_rc.size.height = 27;
                 s_rc.size.width = 150;
@@ -440,8 +453,12 @@
                 o_combo_box = [[VLCComboBox alloc] initWithFrame: s_rc];
                 CONTROL_CONFIG( o_combo_box, o_module_name,
                                 CONFIG_ITEM_STRING, p_item->psz_name );
-                [o_combo_box setToolTip:
-                    [NSApp localizedString: p_item->psz_longtext]];
+                if ( psz_duptip != NULL )
+                {
+                    [o_combo_box setToolTip: [NSApp localizedString:
+                                        vlc_wraptext(psz_duptip, PREFS_WRAP)]];
+                    free( psz_duptip );
+                }
                 [o_view addSubview: [o_combo_box autorelease]];
                 [[NSNotificationCenter defaultCenter] addObserver: self
                     selector: @selector(configChanged:)
@@ -484,6 +501,7 @@
         case CONFIG_ITEM_BOOL:
         {
             VLCButton *o_btn_bool;
+            char * psz_duptip = strdup(p_item->psz_longtext);
 
             s_rc.size.height = 27;
             s_rc.size.width = s_vrc.size.width - X_ORIGIN * 2 - 20;
@@ -496,8 +514,12 @@
             [o_btn_bool setIntValue: p_item->i_value];
             [o_btn_bool setTitle:
                 [NSApp localizedString: p_item->psz_text]];
-            [o_btn_bool setToolTip:
-                [NSApp localizedString: p_item->psz_longtext]];
+            if ( psz_duptip != NULL )
+            {
+                [o_btn_bool setToolTip: [NSApp localizedString:
+                                        vlc_wraptext(psz_duptip, PREFS_WRAP)]];
+                free( psz_duptip );
+            }
             [o_btn_bool setTarget: self];
             [o_btn_bool setAction: @selector(configChanged:)];
             CONTROL_CONFIG( o_btn_bool, o_module_name,

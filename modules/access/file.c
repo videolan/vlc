@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.9 2003/01/05 20:45:29 massiot Exp $
+ * $Id: file.c,v 1.10 2003/02/08 22:20:28 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -108,10 +108,10 @@ static int Open( vlc_object_t *p_this )
     if( !b_stdin && (i_stat = stat( psz_name, &stat_info )) == (-1) )
     {
 #   ifdef HAVE_ERRNO_H
-        msg_Err( p_input, "cannot stat() file `%s' (%s)",
-                          psz_name, strerror(errno));
+        msg_Warn( p_input, "cannot stat() file `%s' (%s)",
+                  psz_name, strerror(errno));
 #   else
-        msg_Err( p_input, "cannot stat() file `%s'", psz_name );
+        msg_Warn( p_input, "cannot stat() file `%s'", psz_name );
 #   endif
         return VLC_EGENERIC;
     }

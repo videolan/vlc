@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.52 2003/01/28 17:11:38 sam Exp $
+ * $Id: vlc_common.h,v 1.53 2003/02/08 22:20:28 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -541,6 +541,8 @@ static inline uint64_t U64_AT( void * _p )
 #elif !defined(__PLUGIN__)
 #   define vlc_strncasecmp NULL
 #endif
+
+VLC_EXPORT( char *, vlc_wraptext, ( char *psz_text, size_t i_line ) );
 
 /* Format type specifiers for 64 bits numbers */
 #if !defined(WIN32) && !defined(UNDER_CE)

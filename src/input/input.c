@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.221 2002/12/31 01:54:36 massiot Exp $
+ * $Id: input.c,v 1.222 2003/02/08 22:20:28 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -370,7 +370,7 @@ static int RunThread( input_thread_t *p_input )
 static int InitThread( input_thread_t * p_input )
 {
     /* Parse source string. Syntax : [[<access>][/<demux>]:][<source>] */
-    char * psz_parser = p_input->psz_source;
+    char * psz_parser = p_input->psz_dupsource = strdup(p_input->psz_source);
 
     /* Skip the plug-in names */
     while( *psz_parser && *psz_parser != ':' )
@@ -390,6 +390,8 @@ static int InitThread( input_thread_t * p_input )
     {
         p_input->psz_access = p_input->psz_demux = "";
         p_input->psz_name = p_input->psz_source;
+        free( p_input->psz_dupsource);
+        p_input->psz_dupsource = NULL;
     }
     else
     {
@@ -454,6 +456,20 @@ static int InitThread( input_thread_t * p_input )
     /* Find and open appropriate access module */
     p_input->p_access = module_Need( p_input, "access",
                                      p_input->psz_access );
+
+    if ( p_input->p_access == NULL
+          && (*p_input->psz_demux || *p_input->psz_access) )
+    {
+        /* Maybe we got something like :
+         * /Volumes/toto:titi/gabu.mpg */
+        p_input->psz_access = p_input->psz_demux = "";
+        p_input->psz_name = p_input->psz_source;
+        free( p_input->psz_dupsource);
+        p_input->psz_dupsource = NULL;
+
+        p_input->p_access = module_Need( p_input, "access",
+                                         p_input->psz_access );
+    }
 
     if( p_input->p_access == NULL )
     {
@@ -571,6 +587,7 @@ static void EndThread( input_thread_t * p_input )
     input_AccessEnd( p_input );
 
     free( p_input->psz_source );
+    if ( p_input->psz_dupsource != NULL ) free( p_input->psz_dupsource );
 
     /* Tell we're dead */
     p_input->b_dead = 1;

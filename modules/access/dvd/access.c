@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.9 2003/01/28 22:03:21 sam Exp $
+ * $Id: access.c,v 1.10 2003/02/08 22:20:28 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -816,8 +816,8 @@ static char * DVDParse( input_thread_t * p_input )
     /* check block device */
     if( stat( psz_device, &stat_info ) == -1 )
     {
-        msg_Err( p_input, "cannot stat() device `%s' (%s)",
-                          psz_device, strerror(errno));
+        msg_Warn( p_input, "cannot stat() device `%s' (%s)",
+                  psz_device, strerror(errno));
         free( psz_device );
         return NULL;
     }

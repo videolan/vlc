@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.84 2003/01/16 23:25:54 lool Exp $
+ * $Id: input_ext-intf.h,v 1.85 2003/02/08 22:20:28 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -330,6 +330,7 @@ struct input_thread_t
 
     /* Playlist item */
     char *  psz_source;
+    char *  psz_dupsource;
     char *  psz_access;
     char *  psz_demux;
     char *  psz_name;

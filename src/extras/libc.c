@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.6 2002/12/30 13:34:03 sam Exp $
+ * $Id: libc.c,v 1.7 2003/02/08 22:20:28 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -171,3 +171,55 @@ char *vlc_dgettext( const char *package, const char *msgid )
 #endif
 }
 
+/*****************************************************************************
+ * wraptext: insert \n at convenient places. CAUTION: modifies its argument
+ *****************************************************************************/
+char *vlc_wraptext( char *psz_text, size_t i_line )
+{
+    size_t i_len = strlen(psz_text);
+    char * psz_line = psz_text;
+
+    while ( i_len > i_line )
+    {
+        /* Look if there is a newline somewhere. */
+        char * psz_parser = psz_line;
+        while ( psz_parser <= psz_line + i_line && *psz_parser != '\n' )
+        {
+            psz_parser++;
+        }
+        if ( *psz_parser == '\n' )
+        {
+            i_len -= psz_parser + 1 - psz_line;
+            psz_line = psz_parser + 1;
+            continue;
+        }
+
+        /* Find the furthest space. */
+        psz_parser = psz_line + i_line;
+        while ( psz_parser > psz_line && *psz_parser != ' ' )
+        {
+            psz_parser--;
+        }
+        if ( *psz_parser == ' ' )
+        {
+            *psz_parser = '\n';
+            i_len -= psz_parser + 1 - psz_line;
+            psz_line = psz_parser + 1;
+            continue;
+        }
+
+        /* Wrapping has failed. Find the first space or newline after i_line. */
+        psz_parser = psz_line + i_line + 1;
+        while ( psz_parser < psz_line + i_len
+                 && *psz_parser != ' ' && *psz_parser != '\n' )
+        {
+            psz_parser++;
+        }
+
+        if ( psz_parser < psz_line + i_len ) *psz_parser = '\n';
+        i_len -= psz_parser + 1 - psz_line;
+        psz_line = psz_parser + 1;
+    }
+
+    return psz_text;
+}
