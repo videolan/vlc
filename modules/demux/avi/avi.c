@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.75 2003/11/23 13:15:27 gbazin Exp $
+ * $Id: avi.c,v 1.76 2003/11/24 13:40:03 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1683,8 +1683,9 @@ static int AVI_PacketRead( input_thread_t   *p_input,
 static int AVI_PacketSearch( input_thread_t *p_input )
 {
     demux_sys_t     *p_sys = p_input->p_demux_data;
-
     avi_packet_t    avi_pk;
+    int             i_count = 0;
+
     for( ;; )
     {
         if( stream_Read( p_input->s, NULL, 1 ) != 1 )
@@ -1704,6 +1705,19 @@ static int AVI_PacketSearch( input_thread_t *p_input )
             case AVIFOURCC_RIFF:
             case AVIFOURCC_idx1:
                 return VLC_SUCCESS;
+        }
+
+        /* Prevents from eating all the CPU with broken files.
+         * This value should be low enough so that it doesn't affect the
+         * reading speed too much (not that we care much anyway because
+         * this code is called only on broken files). */
+        if( !(++i_count % 1024) )
+        {
+            if( p_input->b_die ) return VLC_EGENERIC;
+
+            msleep( 10000 );
+            if( !(i_count % (1024 * 10)) )
+                msg_Warn( p_input, "trying to resync..." );
         }
     }
 }

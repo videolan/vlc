@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.25 2003/11/23 20:37:04 gbazin Exp $
+ * $Id: menus.cpp,v 1.26 2003/11/24 13:40:03 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -305,7 +305,6 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "x11-on-top";
         pi_objects[i++] = p_object->i_object_id;
-        vlc_object_release( p_object );
 
         p_dec_obj = (vlc_object_t *)vlc_object_find( p_object,
                                                      VLC_OBJECT_DECODER,
