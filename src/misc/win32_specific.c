@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.13 2002/07/29 19:05:47 gbazin Exp $
+ * $Id: win32_specific.c,v 1.14 2002/08/11 08:30:01 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -58,6 +58,9 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     {
         fprintf( stderr, "error: can't initiate WinSocks, error %i\n", i_err );
     }
+
+    p_this->p_vlc->b_fast_mutex = 0;
+    p_this->p_vlc->i_win9x_cv = 0;
 
     _fmode = _O_BINARY;  /* sets the default file-translation mode */
 }

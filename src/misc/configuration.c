@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.35 2002/08/08 00:35:11 sam Exp $
+ * $Id: configuration.c,v 1.36 2002/08/11 08:30:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -325,9 +325,6 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
         return;
     }
 
-    /* Initialize the global lock */
-    vlc_mutex_init( p_module, &p_module->object_lock );
-
     /* Do the duplication job */
     for( i = 0; i < i_lines ; i++ )
     {
@@ -408,9 +405,6 @@ void config_Free( module_t *p_module )
 
     free( p_module->p_config );
     p_module->p_config = NULL;
-
-    /* Remove the global lock */
-    vlc_mutex_destroy( &p_module->object_lock );
 }
 
 /*****************************************************************************

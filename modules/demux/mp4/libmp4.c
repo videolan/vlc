@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.2 2002/08/10 20:05:21 fenrir Exp $
+ * $Id: libmp4.c,v 1.3 2002/08/11 08:30:01 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -1760,7 +1760,9 @@ int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     
     MP4_Box_t *p_dcom;
     MP4_Box_t *p_cmvd;
+#ifdef HAVE_ZLIB_H
     z_stream  z_data;
+#endif
     u8 *p_data;
     
     int i_result;
