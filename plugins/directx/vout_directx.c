@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.30 2002/04/05 01:05:22 gbazin Exp $
+ * $Id: vout_directx.c,v 1.31 2002/04/23 22:07:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -30,13 +30,8 @@
  *
  * If YUV overlay is not supported this plugin will use RGB offscreen video
  * surfaces that will be blitted onto the primary surface (display) to
- * effectively display the pictures. this fallback method enables us to display
- * video in window mode.
- * Another fallback method (which isn't implemented) would be take the
- * exclusive control of the screen so we could spare the blitting process and
- * decode directly to video memory. This should theoretically allow for better
- * performance (although on my system it is actually slower) but this is
- * restricted to fullscreen video.
+ * effectively display the pictures. This fallback method also enables us to
+ * display video in window mode.
  * 
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
@@ -85,7 +80,7 @@ static void DirectXCloseDDraw     ( vout_thread_t *p_vout );
 static int  DirectXCreateDisplay  ( vout_thread_t *p_vout );
 static void DirectXCloseDisplay   ( vout_thread_t *p_vout );
 static int  DirectXCreateSurface  ( vout_thread_t *p_vout,
-                                    LPDIRECTDRAWSURFACE3 *, int, int );
+                                    LPDIRECTDRAWSURFACE3 *, int, int, int );
 static void DirectXCloseSurface   ( vout_thread_t *p_vout,
                                     LPDIRECTDRAWSURFACE3 );
 static int  DirectXCreateClipper  ( vout_thread_t *p_vout );
@@ -135,9 +130,7 @@ static int vout_Create( vout_thread_t *p_vout )
     SetRectEmpty( &p_vout->p_sys->rect_display );
     p_vout->p_sys->b_using_overlay = !config_GetIntVariable( "nooverlay" );
 
-    p_vout->p_sys->b_cursor = 1;
-
-    p_vout->p_sys->b_cursor_autohidden = 0;
+    p_vout->p_sys->b_cursor_hidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
 
     /* Set main window's size */
@@ -194,7 +187,7 @@ static int vout_Create( vout_thread_t *p_vout )
         p_vout->p_sys->b_event_thread_die = 1;
         /* we need to be sure DirectXEventThread won't stay stuck in
          * GetMessage, so we send a fake message */
-        PostMessage( p_vout->p_sys->hwnd, WM_CHAR, (WPARAM)'^', 0);
+        PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
         vlc_thread_join( p_vout->p_sys->event_thread_id );
 
         return ( 1 );
@@ -210,18 +203,11 @@ static int vout_Create( vout_thread_t *p_vout )
         p_vout->p_sys->b_event_thread_die = 1;
         /* we need to be sure DirectXEventThread won't stay stuck in
          * GetMessage, so we send a fake message */
-        PostMessage( p_vout->p_sys->hwnd, WM_CHAR, (WPARAM)'^', 0);
+        PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
         vlc_thread_join( p_vout->p_sys->event_thread_id );
 
         return ( 1 );
     }
-
-    /* Attach the current thread input queue to the events thread qeue.
-     * This allows us to hide or show the cursor in vout_Manage() */
-    ShowCursor( TRUE ); ShowCursor( FALSE );           /* create input queue */
-    AttachThreadInput( GetCurrentThreadId(),
-                       GetWindowThreadProcessId( p_vout->p_sys->hwnd, NULL ),
-                       1 );
 
     return( 0 );
 }
@@ -284,7 +270,7 @@ static void vout_Destroy( vout_thread_t *p_vout )
     if( p_vout->p_sys->i_event_thread_status == THREAD_READY &&
         p_vout->p_sys->hwnd )
     {
-        PostMessage( p_vout->p_sys->hwnd, WM_CHAR, (WPARAM)'^', 0);
+        PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
         vlc_thread_join( p_vout->p_sys->event_thread_id );
     }
 
@@ -377,27 +363,13 @@ static int vout_Manage( vout_thread_t *p_vout )
     /*
      * Pointer change
      */
-    if( ! p_vout->p_sys->b_cursor_autohidden &&
-        ( mdate() - p_vout->p_sys->i_lastmoved > 5000000 ) )
+    if( (!p_vout->p_sys->b_cursor_hidden) &&
+        ( (mdate() - p_vout->p_sys->i_lastmoved) > 5000000 ) )
     {
         /* Hide the mouse automatically */
-        p_vout->p_sys->b_cursor_autohidden = 1;
-        ShowCursor( FALSE );
+        p_vout->p_sys->b_cursor_hidden = 1;
+        PostMessage( p_vout->p_sys->hwnd, WM_VLC_HIDE_MOUSE, 0, 0 );
     }
-
-#if 0
-    if( p_vout->i_changes & VOUT_CURSOR_CHANGE
-        || p_vout->p_sys->i_changes & VOUT_CURSOR_CHANGE )
-    {
-        p_vout->p_sys->b_cursor = ! p_vout->p_sys->b_cursor;
-
-        ShowCursor( p_vout->p_sys->b_cursor &&
-                     ! p_vout->p_sys->b_cursor_autohidden );
-
-        p_vout->i_changes &= ~VOUT_CURSOR_CHANGE;
-        p_vout->p_sys->i_changes &= ~VOUT_CURSOR_CHANGE;
-    }
-#endif
 
     /* Check if the event thread is still running */
     if( p_vout->p_sys->b_event_thread_die )
@@ -469,8 +441,10 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     else /* using overlay */
     {
 
-#if 0
-        /* Flip the overlay buffers */
+        /* Flip the overlay buffers if we are using back buffers */
+        if( p_pic->p_sys->p_front_surface == p_pic->p_sys->p_surface )
+        return;
+
         dxresult = IDirectDrawSurface3_Flip( p_pic->p_sys->p_front_surface,
                                              NULL, DDFLIP_WAIT );
         if ( dxresult == DDERR_SURFACELOST )
@@ -488,7 +462,6 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( dxresult != DD_OK )
             intf_WarnMsg( 8, "vout: couldn't flip overlay surface" );
-#endif
 
         if( !DirectXGetSurfaceDesc( p_pic ) )
         {
@@ -727,7 +700,8 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
  *****************************************************************************/
 static int DirectXCreateSurface( vout_thread_t *p_vout,
                                  LPDIRECTDRAWSURFACE3 *pp_surface_final,
-                                 int i_chroma, int b_overlay )
+                                 int i_chroma, int b_overlay,
+                                 int i_backbuffers )
 {
     HRESULT dxresult;
     LPDIRECTDRAWSURFACE p_surface;
@@ -754,15 +728,15 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
         ddsd.dwFlags = DDSD_CAPS |
                        DDSD_HEIGHT |
                        DDSD_WIDTH |
-                     //DDSD_BACKBUFFERCOUNT |
                        DDSD_PIXELFORMAT;
+        ddsd.dwFlags |= (i_backbuffers ? DDSD_BACKBUFFERCOUNT : 0);
         ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY |
-                            //DDSCAPS_COMPLEX |
-                            //DDSCAPS_FLIP |
                               DDSCAPS_VIDEOMEMORY;
+        ddsd.ddsCaps.dwCaps |= (i_backbuffers ? DDSCAPS_COMPLEX | DDSCAPS_FLIP
+                                : 0 );
         ddsd.dwHeight = p_vout->render.i_height;
         ddsd.dwWidth = p_vout->render.i_width;
-        ddsd.dwBackBufferCount = 1;                       /* One back buffer */
+        ddsd.dwBackBufferCount = i_backbuffers;
 
         dxresult = IDirectDraw2_CreateSurface( p_vout->p_sys->p_ddobject,
                                                &ddsd,
@@ -942,54 +916,62 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
     int i;
     LPDIRECTDRAWSURFACE3 p_surface;
 
-#if 0
-    /* We couldn't use an YUV overlay so we need to indicate to video_output
-     * which format we are falling back to */
-    switch( )
-    {
-        case 8: /* FIXME: set the palette */
-            p_vout->output.i_chroma = FOURCC_RGB2; break;
-        case 15:
-            p_vout->output.i_chroma = FOURCC_RV15; break;
-        case 16:
-            p_vout->output.i_chroma = FOURCC_RV16; break;
-        case 24:
-            p_vout->output.i_chroma = FOURCC_RV24; break;
-        case 32:
-            p_vout->output.i_chroma = FOURCC_RV32; break;
-        default:
-            intf_ErrMsg( "vout error: unknown screen depth" );
-            return( 0 );
-    }
-#endif
-
     intf_WarnMsg( 3, "vout: NewPictureVec" );
 
     I_OUTPUTPICTURES = 0;
 
-    /* chroma asked for */
-    p_vout->output.i_chroma = p_vout->render.i_chroma;
+    /* Choose the chroma we will try first. */
+    switch( p_vout->render.i_chroma )
+    {
+        case FOURCC_YUY2:
+        case FOURCC_YUNV:
+            p_vout->output.i_chroma = FOURCC_YUY2;
+            break;
+        case FOURCC_UYVY:
+        case FOURCC_UYNV:
+        case FOURCC_Y422:
+            p_vout->output.i_chroma = FOURCC_UYVY;
+            break;
+        case FOURCC_YVYU:
+            p_vout->output.i_chroma = FOURCC_YVYU;
+            break;
+        case FOURCC_YV12:
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        default:
+            p_vout->output.i_chroma = FOURCC_YV12;
+            break;
+    }
 
-    /* hack */
-#if 1
-    if( p_vout->render.i_chroma == FOURCC_I420 )
-        p_vout->output.i_chroma = FOURCC_YV12;
-#endif
-
-    /* First we try to create an overlay surface.
-     * It looks like with most hardware it's not possible to create several
-     * overlay surfaces, and even if it was I bet it would be slower anyway to
-     * use them as direct buffers because they usually reside in video memory
-     * which is quite slow.
-     * So the overlay surface (with a back-buffer) that we create won't be used
-     * to decode directly into it but instead picture buffers in system memory
-     * will be blitted to it. */
+    /* First we try to use an YUV overlay surface.
+     * The overlay surface that we create won't be used to decode directly
+     * into it because accessing video memory directly is way to slow (remember
+     * that pictures are decoded macroblock per macroblock). Instead the video
+     * will be decoded in picture buffers in system memory which will then be
+     * memcpy() to the overlay surface. */
     if( p_vout->p_sys->b_using_overlay )
     {
-        if( DirectXCreateSurface( p_vout, &p_surface, p_vout->output.i_chroma,
-                                  p_vout->p_sys->b_using_overlay ) )
+        boolean_t b_result_ok;
+
+        /* Triple buffering rocks! it doesn't have any processing overhead
+         * (you don't have to wait for the vsync) and provides for a very nice
+         * video quality (no tearing). */
+        b_result_ok = DirectXCreateSurface( p_vout, &p_surface,
+                                            p_vout->output.i_chroma,
+                                            p_vout->p_sys->b_using_overlay,
+                                            2 /* number of backbuffers */ );
+        if( !b_result_ok )
+            b_result_ok = DirectXCreateSurface( p_vout, &p_surface,
+                                                p_vout->output.i_chroma,
+                                                p_vout->p_sys->b_using_overlay,
+                                                0 /* number of backbuffers */);
+
+        if( b_result_ok )
         {
             DDSCAPS dds_caps;
+            picture_t front_pic;
+            picture_sys_t front_pic_sys;
+            front_pic.p_sys = &front_pic_sys;
 
             /* Allocate internal structure */
             p_pic[0].p_sys = malloc( sizeof( picture_sys_t ) );
@@ -1003,7 +985,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic[0].p_sys->p_front_surface = p_surface;
 
             /* Get the back buffer */
-            memset( &dds_caps, 0, sizeof( DDSCAPS ));
+            memset( &dds_caps, 0, sizeof( DDSCAPS ) );
             dds_caps.dwCaps = DDSCAPS_BACKBUFFER;
             if( DD_OK != IDirectDrawSurface3_GetAttachedSurface(
                                                 p_surface, &dds_caps,
@@ -1016,7 +998,21 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             }
 
 
-            p_vout->p_sys->p_current_surface= p_pic[0].p_sys->p_front_surface;
+            p_vout->p_sys->p_current_surface = front_pic.p_sys->p_surface =
+                p_pic[0].p_sys->p_front_surface;
+
+            /* reset the front buffer memory */
+            if( DirectXGetSurfaceDesc( &front_pic ) &&
+                UpdatePictureStruct( p_vout, &front_pic,
+                                     p_vout->output.i_chroma ) )
+            {
+                int j;
+                for( j = 0; j < front_pic.i_planes; j++ )
+                    memset( front_pic.p[j].p_pixels, 127,
+                            front_pic.p[j].i_lines * front_pic.p[j].i_pitch
+                            * front_pic.p[j].i_pixel_bytes );
+            }
+
             DirectXUpdateOverlay( p_vout );
             I_OUTPUTPICTURES = 1;
         }
@@ -1028,17 +1024,14 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
      * surface (display) so they can be displayed */
     if( !p_vout->p_sys->b_using_overlay )
     {
-        /* FixMe */
-        p_vout->output.i_chroma = FOURCC_RV16;
-        p_vout->output.i_rmask  = 0x001f;
-        p_vout->output.i_gmask  = 0x03e0;
-        p_vout->output.i_bmask  = 0x7c00;
+        DDPIXELFORMAT ddpfPixelFormat;
 
         for( i = 0; i < i_num_pics; i++ )
         {
             if( DirectXCreateSurface( p_vout, &p_surface,
                                       p_vout->output.i_chroma,
-                                      p_vout->p_sys->b_using_overlay ) )
+                                      p_vout->p_sys->b_using_overlay,
+                                      0 /* no back buffers */ ) )
             {
                 /* Allocate internal structure */
                 p_pic[i].p_sys = malloc( sizeof( picture_sys_t ) );
@@ -1056,6 +1049,32 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             }
             else break;
         }
+
+        /* We couldn't use an YUV overlay so we need to indicate to
+         * video_output which format we are falling back to */
+        ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+        IDirectDrawSurface3_GetPixelFormat( p_vout->p_sys->p_display,
+                                            &ddpfPixelFormat );
+        switch( ddpfPixelFormat.dwRGBBitCount )
+        {
+            case 8: /* FIXME: set the palette */
+                p_vout->output.i_chroma = FOURCC_RGB2; break;
+            case 15:
+                p_vout->output.i_chroma = FOURCC_RV15; break;
+            case 16:
+                p_vout->output.i_chroma = FOURCC_RV16; break;
+            case 24:
+                p_vout->output.i_chroma = FOURCC_RV24; break;
+            case 32:
+                p_vout->output.i_chroma = FOURCC_RV32; break;
+            default:
+                intf_ErrMsg( "vout error: unknown screen depth" );
+                return( 0 );
+        }
+        p_vout->output.i_rmask = ddpfPixelFormat.dwRBitMask;
+        p_vout->output.i_gmask = ddpfPixelFormat.dwGBitMask;
+        p_vout->output.i_bmask = ddpfPixelFormat.dwBBitMask;
+
     }
 
 
@@ -1131,6 +1150,34 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
     switch( p_vout->output.i_chroma )
     {
 
+        case FOURCC_RGB2:
+        case FOURCC_RV15:
+        case FOURCC_RV16:
+        case FOURCC_RV24:
+        case FOURCC_RV32:
+            p_pic->p->p_pixels = p_pic->p_sys->ddsd.lpSurface;
+            p_pic->p->i_lines = p_vout->output.i_height;
+            p_pic->p->i_pitch = p_pic->p_sys->ddsd.lPitch;
+            p_pic->p->b_margin = 0;
+            p_pic->i_planes = 1;
+            switch( p_vout->output.i_chroma )
+            {
+                case FOURCC_RGB2:
+                    p_pic->p->i_pixel_bytes = 1;
+                    break;
+                case FOURCC_RV15:
+                case FOURCC_RV16:
+                    p_pic->p->i_pixel_bytes = 2;
+                    break;
+                case FOURCC_RV24:
+                case FOURCC_RV32:
+                    p_pic->p->i_pixel_bytes = 4;
+                    break;
+                default:
+                    return( -1 );
+            }
+            break;
+
         case FOURCC_YV12:
 
             p_pic->Y_PIXELS = p_pic->p_sys->ddsd.lpSurface;
@@ -1155,81 +1202,6 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
 
             p_pic->i_planes = 3;
             break;
-
-        case FOURCC_RV16:
-
-            p_pic->p->p_pixels = p_pic->p_sys->ddsd.lpSurface;
-            p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_pitch = p_pic->p_sys->ddsd.lPitch;
-            p_pic->p->i_pixel_bytes = 2;
-            p_pic->p->b_margin = 0;
-
-            p_pic->i_planes = 1;
-            break;
-
-        case FOURCC_RV15:
-
-            p_pic->p->p_pixels = p_pic->p_sys->ddsd.lpSurface;
-            p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_pitch = p_pic->p_sys->ddsd.lPitch;
-            p_pic->p->i_pixel_bytes = 2;
-            p_pic->p->b_margin = 0;
-
-            p_pic->i_planes = 1;
-            break;
-
-        case FOURCC_I420:
-
-            p_pic->Y_PIXELS = p_pic->p_sys->ddsd.lpSurface;
-            p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
-            p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->ddsd.lPitch;
-            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-            p_pic->p[Y_PLANE].b_margin = 0;
-
-            p_pic->U_PIXELS = p_pic->Y_PIXELS
-              + p_pic->p[Y_PLANE].i_lines * p_pic->p[Y_PLANE].i_pitch;
-            p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
-            p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
-            p_pic->p[U_PLANE].i_pixel_bytes = 1;
-            p_pic->p[U_PLANE].b_margin = 0;
-
-            p_pic->V_PIXELS = p_pic->U_PIXELS
-              + p_pic->p[U_PLANE].i_lines * p_pic->p[U_PLANE].i_pitch;
-            p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
-            p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
-            p_pic->p[V_PLANE].i_pixel_bytes = 1;
-            p_pic->p[V_PLANE].b_margin = 0;
-
-            p_pic->i_planes = 3;
-            break;
-
-#if 0
-        case FOURCC_Y211:
-
-            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
-                                  + p_pic->p_sys->p_image->offsets[0];
-            p_pic->p->i_lines = p_vout->output.i_height;
-            /* XXX: this just looks so plain wrong... check it out ! */
-            p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0] / 4;
-            p_pic->p->i_pixel_bytes = 4;
-            p_pic->p->b_margin = 0;
-
-            p_pic->i_planes = 1;
-            break;
-
-        case FOURCC_YUY2:
-        case FOURCC_UYVY:
-
-            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
-                                  + p_pic->p_sys->p_image->offsets[0];
-            p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
-            p_pic->p->i_pixel_bytes = 4;
-            p_pic->p->b_margin = 0;
-
-            p_pic->i_planes = 1;
-            break;
-#endif
 
         default:
             /* Not supported */
@@ -1302,14 +1274,14 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
  *****************************************************************************/
 static int DirectXGetSurfaceDesc( picture_t *p_pic )
 {
-    HRESULT         dxresult;
+    HRESULT dxresult;
 
     /* Lock the surface to get a valid pointer to the picture buffer */
     memset( &p_pic->p_sys->ddsd, 0, sizeof( DDSURFACEDESC ));
     p_pic->p_sys->ddsd.dwSize = sizeof(DDSURFACEDESC);
     dxresult = IDirectDrawSurface3_Lock( p_pic->p_sys->p_surface,
                                          NULL, &p_pic->p_sys->ddsd,
-                                         DDLOCK_NOSYSLOCK,
+                                         DDLOCK_NOSYSLOCK | DDLOCK_WAIT,
                                          NULL );
     if ( dxresult == DDERR_SURFACELOST )
     {

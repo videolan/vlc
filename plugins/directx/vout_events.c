@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.13 2002/04/02 06:31:23 gbazin Exp $
+ * $Id: vout_events.c,v 1.14 2002/04/23 22:07:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -66,7 +66,8 @@ static long FAR PASCAL DirectXEventProc ( HWND hwnd, UINT message,
  *****************************************************************************/
 void DirectXEventThread( vout_thread_t *p_vout )
 {
-    MSG             msg;
+    MSG msg;
+    POINT old_mouse_pos;
 
     /* Initialisation */
 
@@ -99,26 +100,37 @@ void DirectXEventThread( vout_thread_t *p_vout )
         switch( msg.message )
         {
 
+        case WM_NCMOUSEMOVE:
         case WM_MOUSEMOVE:
-            if( p_vout->p_sys->b_cursor )
+            if( (abs(GET_X_LPARAM(msg.lParam) - old_mouse_pos.x) > 2 ||
+                (abs(GET_Y_LPARAM(msg.lParam) - old_mouse_pos.y)) > 2 ) )
             {
-                if( p_vout->p_sys->b_cursor_autohidden )
+                GetCursorPos( &old_mouse_pos );
+                p_vout->p_sys->i_lastmoved = mdate();
+
+                if( p_vout->p_sys->b_cursor_hidden )
                 {
-                    p_vout->p_sys->b_cursor_autohidden = 0;
-                    p_vout->p_sys->i_lastmoved = mdate();
+                    p_vout->p_sys->b_cursor_hidden = 0;
                     ShowCursor( TRUE );
                 }
-                else
-                {
-                    p_vout->p_sys->i_lastmoved = mdate();
-                }
             }
-            DispatchMessage(&msg);
+            break;
+
+        case WM_VLC_HIDE_MOUSE:
+            GetCursorPos( &old_mouse_pos );
+            ShowCursor( FALSE );
             break;
 
         case WM_RBUTTONUP:
-            intf_WarnMsg( 4, "vout: vout_Manage WM_RBUTTONUP" );
             p_main->p_intf->b_menu_change = 1;
+            break;
+
+        case WM_LBUTTONDOWN:
+            p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
+            break;
+
+        case WM_LBUTTONDBLCLK:
+            p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
             break;
 
         case WM_KEYDOWN:
@@ -138,7 +150,6 @@ void DirectXEventThread( vout_thread_t *p_vout )
             break;
 
         case WM_CHAR:
-            intf_WarnMsg( 3, "vout: vout_Manage WM_CHAR" );
             switch( msg.wParam )
             {
             case 'q':
@@ -193,10 +204,6 @@ void DirectXEventThread( vout_thread_t *p_vout )
         default:
             /* Messages we don't handle directly are dispatched to the
              * window procedure */
-#if 0
-            intf_WarnMsg( 5, "vout: vout_Manage unhandled message",
-                          msg.message );
-#endif
             TranslateMessage(&msg);
             DispatchMessage(&msg);
             break;
@@ -291,7 +298,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
     /* fill in the window class structure */
     wc.cbSize        = sizeof(WNDCLASSEX);
-    wc.style         = 0;                               /* no special styles */
+    wc.style         = CS_DBLCLKS;                       /* style: dbl click */
     wc.lpfnWndProc   = (WNDPROC)DirectXEventProc;           /* event handler */
     wc.cbClsExtra    = 0;                             /* no extra class data */
     wc.cbWndExtra    = 0;                            /* no extra window data */
@@ -499,12 +506,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         GetClientRect( hwnd, &rect_window );
         p_vout->p_sys->i_window_width = rect_window.right;
         p_vout->p_sys->i_window_height = rect_window.bottom;
-#if 0
-        intf_WarnMsg( 3, "vout: WinProc WM_WINDOWPOSCHANGED %i,%i,%i,%i",
-                      p_vout->p_sys->i_window_x, p_vout->p_sys->i_window_y,
-                      p_vout->p_sys->i_window_width,
-                      p_vout->p_sys->i_window_height );
-#endif
 
         DirectXUpdateRects( p_vout );
         if( p_vout->p_sys->b_using_overlay &&
@@ -516,14 +517,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
         return 0;
         }
-        break;
-
-    case WM_ACTIVATE:
-        intf_WarnMsg( 4, "vout: WinProc WM_ACTIVATE" );
-        break;
-
-    case WM_CREATE:
-        intf_WarnMsg( 4, "vout: WinProc WM_CREATE" );
         break;
 
     /* the user wants to close the window */
@@ -552,12 +545,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         }
         break;
 
-#if 0
-    case WM_PAINT:
-        intf_WarnMsg( 4, "vout: WinProc WM_PAINT" );
-        break;
-#endif
-
     case WM_ERASEBKGND:
         p_vout = (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
         if( !p_vout->p_sys->b_using_overlay )
@@ -580,11 +567,9 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         }
         break;
 
-#if 0
     default:
-        intf_WarnMsg( 4, "vout: WinProc WM Default %i", message );
+        //intf_WarnMsg( 4, "vout: WinProc WM Default %i", message );
         break;
-#endif
     }
 
     return DefWindowProc(hwnd, message, wParam, lParam);

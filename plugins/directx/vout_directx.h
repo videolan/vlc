@@ -2,7 +2,7 @@
  * vout_directx.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.h,v 1.4 2002/04/02 06:31:23 gbazin Exp $
+ * $Id: vout_directx.h,v 1.5 2002/04/23 22:07:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -62,12 +62,11 @@ typedef struct vout_sys_s
     int          i_rgb_colorkey;      /* colorkey in RGB used by the overlay */
     int          i_colorkey;                 /* colorkey used by the overlay */
  
-    boolean_t    b_cursor;
+    volatile u16 i_changes;             /* changes made to the video display */
 
-    u16          i_changes;             /* changes made to the video display */
-
-    boolean_t    b_cursor_autohidden;
-    mtime_t      i_lastmoved;
+    /* Mouse */
+    volatile boolean_t b_cursor_hidden;
+    volatile mtime_t   i_lastmoved;
 
     vlc_thread_t event_thread_id;                            /* event thread */
     vlc_mutex_t  event_thread_lock;             /* lock for the event thread */
@@ -101,3 +100,8 @@ typedef struct picture_sys_s
  *****************************************************************************/
 void DirectXEventThread ( vout_thread_t *p_vout );
 void DirectXUpdateOverlay( vout_thread_t *p_vout );
+
+/*****************************************************************************
+ * Constants
+ *****************************************************************************/
+#define WM_VLC_HIDE_MOUSE WM_APP
