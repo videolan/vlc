@@ -423,6 +423,10 @@ private:
     void OnSoutEnable( wxCommandEvent& event );
     void OnSoutSettings( wxCommandEvent& WXUNUSED(event) );
 
+    /* Event handlers for the caching option */
+    void OnCachingEnable( wxCommandEvent& event );
+    void OnCachingChange( wxCommandEvent& event );
+
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
@@ -477,6 +481,11 @@ private:
     wxCheckBox *sout_checkbox;
     SoutDialog *sout_dialog;
     wxArrayString sout_mrl;
+
+    /* Controls for the caching options */
+    wxCheckBox *caching_checkbox;
+    wxSpinCtrl *caching_value;
+    int i_caching;
 };
 
 enum
