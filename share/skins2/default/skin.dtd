@@ -24,9 +24,6 @@
         id          CDATA   #REQUIRED
         file        CDATA   #REQUIRED
         size        CDATA   "12"
-        color       CDATA   "#000000"
-        italic      CDATA   "false"
-        underline   CDATA   "false"
     >
 <!ELEMENT BitmapFont EMPTY>
     <!ATTLIST BitmapFont
