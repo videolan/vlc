@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.14 2003/05/12 17:33:19 gbazin Exp $
+ * $Id: events.c,v 1.15 2003/05/17 14:36:19 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -189,23 +189,65 @@ void DirectXEventThread( event_thread_t *p_event )
             switch( msg.wParam )
             {
             case VK_ESCAPE:
-                /* exit application */
-                p_event->p_vlc->b_die = VLC_TRUE;
-                break;
-
-            case VK_SPACE:
-            {
-                vlc_object_t *p_input = vlc_object_find( p_event->p_vout,
-                    VLC_OBJECT_INPUT, FIND_ANYWHERE );
-                if( p_input )
+                if( p_event->p_vout->b_fullscreen )
                 {
-                    input_SetStatus( (input_thread_t *)p_input,
-                                     INPUT_STATUS_PAUSE );
-                    vlc_object_release( p_input );
+                    p_event->p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                }
+                else
+                {
+                    /* exit application */
+                    p_event->p_vout->p_vlc->b_die = VLC_TRUE;
                 }
                 break;
-            }
 
+            case VK_MENU:
+                {
+                    intf_thread_t *p_intf;
+                    p_intf = vlc_object_find( p_event->p_vout, VLC_OBJECT_INTF,
+                                              FIND_ANYWHERE );
+                    if( p_intf )
+                    {
+                        p_intf->b_menu_change = 1;
+                        vlc_object_release( p_intf );
+                    }
+                }
+                break;
+
+            case VK_LEFT:
+                input_Seek( p_event->p_vout, -5,
+                            INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                break;
+            case VK_RIGHT:
+                input_Seek( p_event->p_vout, 5,
+                            INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                break;
+            case VK_UP:
+                input_Seek( p_event->p_vout, 60,
+                            INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                break;
+            case VK_DOWN:
+                input_Seek( p_event->p_vout, -60,
+                            INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                break;
+            case VK_HOME:
+                input_Seek( p_event->p_vout, 0,
+                            INPUT_SEEK_BYTES | INPUT_SEEK_SET );
+                break;
+            case VK_END:
+                input_Seek( p_event->p_vout, 0,
+                            INPUT_SEEK_BYTES | INPUT_SEEK_END );
+                break;
+            case VK_PRIOR:
+                input_Seek( p_event->p_vout, 900,
+                            INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                break;
+            case VK_NEXT:
+                input_Seek( p_event->p_vout, -900,
+                            INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                break;
+            case VK_SPACE:
+                input_SetStatus( p_event->p_vout, INPUT_STATUS_PAUSE );
+                break;
             }
             TranslateMessage(&msg);
             break;
@@ -222,29 +264,6 @@ void DirectXEventThread( event_thread_t *p_event )
             case 'f':                            /* switch to fullscreen */
             case 'F':
                 p_event->p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                break;
-
-            case 'c':                                /* toggle grayscale */
-            case 'C':
-                p_event->p_vout->b_grayscale = ! p_event->p_vout->b_grayscale;
-                p_event->p_vout->p_sys->i_changes |= VOUT_GRAYSCALE_CHANGE;
-                break;
-
-            case 'i':                                     /* toggle info */
-            case 'I':
-                p_event->p_vout->b_info = ! p_event->p_vout->b_info;
-                p_event->p_vout->p_sys->i_changes |= VOUT_INFO_CHANGE;
-                break;
-
-            case 's':                                  /* toggle scaling */
-            case 'S':
-                p_event->p_vout->b_scale = ! p_event->p_vout->b_scale;
-                p_event->p_vout->p_sys->i_changes |= VOUT_SCALE_CHANGE;
-                break;
-
-            case ' ':                                /* toggle interface */
-                p_event->p_vout->b_interface = ! p_event->p_vout->b_interface;
-                p_event->p_vout->p_sys->i_changes |= VOUT_INTF_CHANGE;
                 break;
 
             default:
