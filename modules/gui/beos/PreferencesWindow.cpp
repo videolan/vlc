@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.26 2003/12/21 21:30:43 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.27 2003/12/22 00:06:05 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -701,7 +701,7 @@ ConfigSlider::ConfigSlider( BRect rect, int type, char * label,
                     type, configName )
 {
     fSlider = new BSlider( Bounds(), NULL, label, new BMessage(),
-                           min, max );
+                           min, max, B_TRIANGLE_THUMB );
     AddChild( fSlider );
 }
 
