@@ -145,18 +145,18 @@ OSStatus streamListenerProc (AudioStreamID		inStream,
 
 	// Build a menu
 	NSMenuItem *newItem;
-	newItem = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Sound output" action:NULL keyEquivalent:@""];
-	newMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Sound output"];
-	[newItem setSubmenu:newMenu];
-	[[NSApp mainMenu] addItem:newItem];
-	[newItem release];
+	newItem = [main getMIDevice]; //[[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Sound output" action:NULL keyEquivalent:@""];
+	newMenu = [newItem submenu]; //[[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Sound output"];
+	//[newItem setSubmenu:newMenu];
+	//[[NSApp mainMenu] addItem:newItem];
+	//[newItem release];
 
 	// check which devices can do what class of audio
 	//    struct mosx_AudioDeviceData deviceData;
 	for(i=0; i<devicesAvailable; i++)
 	    [self CheckDevice:deviceList[i] isInput:false];	// only check the output part
 
-	[newMenu release];
+	//[newMenu release];
 	free(deviceList);
     };
     return me;

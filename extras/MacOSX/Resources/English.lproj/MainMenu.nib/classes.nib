@@ -48,6 +48,7 @@
                 "o_mi_copy" = id; 
                 "o_mi_cut" = id; 
                 "o_mi_deinterlace" = id; 
+                "o_mi_device" = id; 
                 "o_mi_faster" = id; 
                 "o_mi_fullscreen" = id; 
                 "o_mi_hide" = id; 
@@ -60,6 +61,7 @@
                 "o_mi_next" = id; 
                 "o_mi_open_disc" = id; 
                 "o_mi_open_file" = id; 
+                "o_mi_open_generic" = id; 
                 "o_mi_open_net" = id; 
                 "o_mi_open_recent" = id; 
                 "o_mi_open_recent_cm" = id; 
@@ -99,8 +101,7 @@
                 openDiscStepperChanged = id; 
                 openDiscTypeChanged = id; 
                 openFile = id; 
-                openFileBrowse = id; 
-                openFilePathChanged = id; 
+                openFileGeneric = id; 
                 openNet = id; 
                 openNetModeChanged = id; 
                 openNetStepperChanged = id; 

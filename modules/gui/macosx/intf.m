@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.8 2002/12/08 05:30:47 jlj Exp $
+ * $Id: intf.m,v 1.9 2002/12/08 23:38:02 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -195,9 +195,10 @@ static void Run( intf_thread_t *p_intf )
     [o_mi_quit setTitle: _NS("Quit vlc")];
 
     [o_mu_file setTitle: _NS("File")];
-    [o_mi_open_file setTitle: _NS("Open File")];
-    [o_mi_open_disc setTitle: _NS("Open Disc")];
-    [o_mi_open_net setTitle: _NS("Open Network")];
+    [o_mi_open_file setTitle: _NS("Open File...")];
+    [o_mi_open_generic setTitle: _NS("Open Generic...")];
+    [o_mi_open_disc setTitle: _NS("Open Disc...")];
+    [o_mi_open_net setTitle: _NS("Open Network...")];
     [o_mi_open_recent setTitle: _NS("Open Recent")];
     [o_mi_open_recent_cm setTitle: _NS("Clear Menu")];
 
@@ -911,6 +912,11 @@ static void Run( intf_thread_t *p_intf )
     }
 
     [o_prefs createPrefPanel: @"main"];
+}
+
+- (id)getMIDevice
+{
+    return o_mi_device;
 }
 
 @end

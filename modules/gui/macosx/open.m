@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.3 2002/10/05 00:10:17 jlj Exp $
+ * $Id: open.m,v 1.4 2002/12/08 23:38:02 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -237,7 +237,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     }  
 }
 
-- (IBAction)openFile:(id)sender
+- (IBAction)openFileGeneric:(id)sender
 {
     [self openFilePathChanged: nil];
     [self openTarget: 0];
@@ -274,13 +274,13 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     
     o_type = [[o_disc_type selectedCell] title];
 
-    if( [o_type isEqualToString: @"DVD"] )
+    if( [o_type isEqualToString: @"VCD"] )
     {
-        psz_class = kIODVDMediaClass;
+        psz_class = kIOCDMediaClass;
     }
     else
     {
-        psz_class = kIOCDMediaClass;
+        psz_class = kIODVDMediaClass;
     }
     
     o_devices = GetEjectableMediaOfClass( psz_class );
@@ -303,7 +303,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         else
         {
             [o_disc_device setStringValue: 
-                [NSString stringWithFormat: @"No %@s found", o_type]];
+                [NSString stringWithFormat: @"No %@ found", o_type]];
         }
     }
 
@@ -337,9 +337,22 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     o_device = [o_disc_device stringValue];
     i_title = [o_disc_title intValue];
     i_chapter = [o_disc_chapter intValue];
+    if( [o_type isEqualToString: @"VCD"] )
+    {
+        o_type = [NSString stringWithCString: "vcd"];
+    }
+    else if ( [o_type isEqualToString: @"DVD"] )
+    {
+        o_type = [NSString stringWithCString: "dvdold"];
+    }
+    else
+    {
+        o_type = [NSString stringWithCString: "dvdplay"];
+    }
+
     
     o_mrl_string = [NSString stringWithFormat: @"%@://%@@%i,%i",
-        [o_type lowercaseString], o_device, i_title, i_chapter]; 
+        o_type, o_device, i_title, i_chapter]; 
 
     [o_mrl setStringValue: o_mrl_string]; 
 }
@@ -470,6 +483,19 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         NSString *o_filename = [[o_open_panel filenames] objectAtIndex: 0];
         [o_file_path setStringValue: o_filename];
         [self openFilePathChanged: nil];
+    }
+}
+
+- (IBAction)openFile:(id)sender
+{
+    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+
+    [o_open_panel setAllowsMultipleSelection: NO];
+
+    if( [o_open_panel runModalForDirectory: nil
+            file: nil types: nil] == NSOKButton )
+    {
+        [o_playlist appendArray: [o_open_panel filenames] atPos: -1];
     }
 }
 

@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.4 2002/12/07 23:50:30 massiot Exp $
+ * $Id: intf.h,v 1.5 2002/12/08 23:38:02 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -106,6 +106,7 @@ struct intf_sys_t
 
     IBOutlet id o_mu_file;
     IBOutlet id o_mi_open_file;
+    IBOutlet id o_mi_open_generic;
     IBOutlet id o_mi_open_disc;
     IBOutlet id o_mi_open_net;
     IBOutlet id o_mi_open_recent;
@@ -135,6 +136,7 @@ struct intf_sys_t
     IBOutlet id o_mi_vol_down;
     IBOutlet id o_mi_mute;
     IBOutlet id o_mi_channels;
+    IBOutlet id o_mi_device;
     IBOutlet id o_mi_fullscreen;
     IBOutlet id o_mi_screen;
     IBOutlet id o_mi_deinterlace;
@@ -177,6 +179,8 @@ struct intf_sys_t
 //- (void)selectAction:(id)sender;
 
 - (IBAction)viewPreferences:(id)sender;
+
+- (id)getMIDevice;
 
 @end
 
