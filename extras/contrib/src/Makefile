@@ -923,7 +923,7 @@ libcddb: libcddb-$(CDDB_VERSION).tar.gz
 	patch -p 0 < Patches/libcddb.patch
 
 .cddb: libcddb
-	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" LDFLAGS="-L$(PREFIX)/lib -liconv" && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" LDFLAGS="$(LDFLAGS) -liconv" && make && make install)
 	touch $@
 
 CLEAN_FILE += .cddb

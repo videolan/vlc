@@ -1720,7 +1720,8 @@ then
   if test "${SYS}" = "darwin"
   then
     VLC_ADD_PLUGINS([vcd cdda])
-    VLC_ADD_LDFLAGS([vcd vcdx cdda],[-framework IOKit -framework CoreFoundation])
+    VLC_ADD_LDFLAGS([vcd vcdx cdda cddax],[-framework IOKit -framework CoreFoundation])
+    VLC_ADD_LDFLAGS([vcdx cddax],[-liconv])
   fi
 fi
 
