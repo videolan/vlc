@@ -67,6 +67,7 @@ static int  OpenPacketizer( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
 static void *DecodeBlock  ( decoder_t *, block_t ** );
+static int  ProcessHeaders( decoder_t * );
 static void *ProcessPacket ( decoder_t *, ogg_packet *, block_t ** );
 
 static picture_t *DecodePacket( decoder_t *, ogg_packet * );
@@ -194,83 +195,166 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     oggpacket.e_o_s = 0;
     oggpacket.packetno = 0;
 
-    if( p_sys->i_headers == 0 )
+    /* Check for headers */
+    if( p_sys->i_headers == 0 && p_dec->fmt_in.i_extra )
     {
-        /* Take care of the initial Theora header */
+        /* Headers already available as extra data */
+        p_sys->i_headers = 3;
+    }
+    else if( oggpacket.bytes && p_sys->i_headers < 3 )
+    {
+        /* Backup headers as extra data */
+        uint8_t *p_extra;
 
-        oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
-        if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
-        {
-            msg_Err( p_dec, "This bitstream does not contain Theora "
-                     "video data." );
-            block_Release( p_block );
-            return NULL;
-        }
+        p_dec->fmt_in.p_extra =
+            realloc( p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra +
+                     oggpacket.bytes + 2 );
+        p_extra = p_dec->fmt_in.p_extra + p_dec->fmt_in.i_extra;
+        *(p_extra++) = oggpacket.bytes >> 8;
+        *(p_extra++) = oggpacket.bytes & 0xFF;
+
+        memcpy( p_extra, oggpacket.packet, oggpacket.bytes );
+        p_dec->fmt_in.i_extra += oggpacket.bytes + 2;
+
+        block_Release( *pp_block );
         p_sys->i_headers++;
-
-        /* Set output properties */
-        p_dec->fmt_out.video.i_width = p_sys->ti.width;
-        p_dec->fmt_out.video.i_height = p_sys->ti.height;
-
-        if( p_sys->ti.aspect_denominator && p_sys->ti.aspect_numerator )
-        {
-            p_dec->fmt_out.video.i_aspect = ((int64_t)VOUT_ASPECT_FACTOR) *
-                ( p_sys->ti.aspect_numerator * p_sys->ti.width ) /
-                ( p_sys->ti.aspect_denominator * p_sys->ti.height );
-        }
-        else
-        {
-            p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
-                p_sys->ti.frame_width / p_sys->ti.frame_height;
-        }
-
-        msg_Dbg( p_dec, "%dx%d %.02f fps video, frame content "
-                 "is %dx%d with offset (%d,%d).",
-                 p_sys->ti.width, p_sys->ti.height,
-                 (double)p_sys->ti.fps_numerator/p_sys->ti.fps_denominator,
-                 p_sys->ti.frame_width, p_sys->ti.frame_height,
-                 p_sys->ti.offset_x, p_sys->ti.offset_y );
-
-        return ProcessPacket( p_dec, &oggpacket, pp_block );
+        return NULL;
     }
 
-    if( p_sys->i_headers == 1 )
+    if( p_sys->i_headers == 3 )
     {
-        /* The next packet in order is the comments header */
-        if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
+        if( ProcessHeaders( p_dec ) != VLC_SUCCESS )
         {
-            msg_Err( p_dec, "2nd Theora header is corrupted." );
+            p_sys->i_headers = 0;
+            p_dec->fmt_in.i_extra = 0;
+            block_Release( *pp_block );
             return NULL;
         }
-        p_sys->i_headers++;
-
-        ParseTheoraComments( p_dec );
-
-        return ProcessPacket( p_dec, &oggpacket, pp_block );
-    }
-
-    if( p_sys->i_headers == 2 )
-    {
-        /* The next packet in order is the codebooks header
-           We need to watch out that this packet is not missing as a
-           missing or corrupted header is fatal. */
-        if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
-        {
-            msg_Err( p_dec, "3rd Theora header is corrupted." );
-            return NULL;
-        }
-        p_sys->i_headers++;
-
-        if( !p_sys->b_packetizer )
-        {
-            /* We have all the headers, initialize decoder */
-            theora_decode_init( &p_sys->td, &p_sys->ti );
-        }
-
-        return ProcessPacket( p_dec, &oggpacket, pp_block );
+        else p_sys->i_headers++;
     }
 
     return ProcessPacket( p_dec, &oggpacket, pp_block );
+}
+
+/*****************************************************************************
+ * ProcessHeaders: process Theora headers.
+ *****************************************************************************/
+static int ProcessHeaders( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    ogg_packet oggpacket;
+    uint8_t *p_extra;
+    int i_extra;
+
+    if( !p_dec->fmt_in.i_extra ) return VLC_EGENERIC;
+
+    oggpacket.granulepos = -1;
+    oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
+    oggpacket.e_o_s = 0;
+    oggpacket.packetno = 0;
+    p_extra = p_dec->fmt_in.p_extra;
+    i_extra = p_dec->fmt_in.i_extra;
+
+    /* Take care of the initial Vorbis header */
+    oggpacket.bytes = *(p_extra++) << 8;
+    oggpacket.bytes |= (*(p_extra++) & 0xFF);
+    oggpacket.packet = p_extra;
+    p_extra += oggpacket.bytes;
+    i_extra -= (oggpacket.bytes + 2);
+    if( i_extra < 0 )
+    {
+        msg_Err( p_dec, "header data corrupted");
+        return VLC_EGENERIC;
+    }
+
+    if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
+    {
+        msg_Err( p_dec, "This bitstream does not contain Theora video data" );
+        return VLC_EGENERIC;
+    }
+
+    /* Set output properties */
+    p_dec->fmt_out.video.i_width = p_sys->ti.width;
+    p_dec->fmt_out.video.i_height = p_sys->ti.height;
+
+    if( p_sys->ti.aspect_denominator && p_sys->ti.aspect_numerator )
+    {
+        p_dec->fmt_out.video.i_aspect = ((int64_t)VOUT_ASPECT_FACTOR) *
+            ( p_sys->ti.aspect_numerator * p_sys->ti.width ) /
+            ( p_sys->ti.aspect_denominator * p_sys->ti.height );
+    }
+    else
+    {
+        p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
+            p_sys->ti.frame_width / p_sys->ti.frame_height;
+    }
+
+    msg_Dbg( p_dec, "%dx%d %.02f fps video, frame content "
+             "is %dx%d with offset (%d,%d)",
+             p_sys->ti.width, p_sys->ti.height,
+             (double)p_sys->ti.fps_numerator/p_sys->ti.fps_denominator,
+             p_sys->ti.frame_width, p_sys->ti.frame_height,
+             p_sys->ti.offset_x, p_sys->ti.offset_y );
+
+    /* The next packet in order is the comments header */
+    oggpacket.b_o_s = 0;
+    oggpacket.bytes = *(p_extra++) << 8;
+    oggpacket.bytes |= (*(p_extra++) & 0xFF);
+    oggpacket.packet = p_extra;
+    p_extra += oggpacket.bytes;
+    i_extra -= (oggpacket.bytes + 2);
+    if( i_extra < 0 )
+    {
+        msg_Err( p_dec, "header data corrupted");
+        return VLC_EGENERIC;
+    }
+
+    /* The next packet in order is the comments header */
+    if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
+    {
+        msg_Err( p_dec, "2nd Theora header is corrupted" );
+        return VLC_EGENERIC;
+    }
+
+    ParseTheoraComments( p_dec );
+
+    /* The next packet in order is the codebooks header
+     * We need to watch out that this packet is not missing as a
+     * missing or corrupted header is fatal. */
+    oggpacket.bytes = *(p_extra++) << 8;
+    oggpacket.bytes |= (*(p_extra++) & 0xFF);
+    oggpacket.packet = p_extra;
+    i_extra -= (oggpacket.bytes + 2);
+    if( i_extra < 0 )
+    {
+        msg_Err( p_dec, "header data corrupted");
+        return VLC_EGENERIC;
+    }
+
+    /* The next packet in order is the codebooks header
+     * We need to watch out that this packet is not missing as a
+     * missing or corrupted header is fatal */
+    if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
+    {
+        msg_Err( p_dec, "3rd Theora header is corrupted" );
+        return VLC_EGENERIC;
+    }
+
+    if( !p_sys->b_packetizer )
+    {
+        /* We have all the headers, initialize decoder */
+        theora_decode_init( &p_sys->td, &p_sys->ti );
+    }
+    else
+    {
+        p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
+        p_dec->fmt_out.p_extra =
+            realloc( p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
+        memcpy( p_dec->fmt_out.p_extra,
+                p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
+    }
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -288,6 +372,8 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     {
         p_sys->i_pts = p_block->i_pts;
     }
+
+    *pp_block = NULL; /* To avoid being fed the same packet again */
 
     if( p_sys->b_packetizer )
     {
@@ -308,11 +394,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
         else
             p_buf = NULL;
 
-        if( p_block )
-        {
-            block_Release( p_block );
-            *pp_block = NULL;
-        }
+        if( p_block ) block_Release( p_block );
     }
 
     /* Date management */
@@ -353,9 +435,11 @@ static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 static void ParseTheoraComments( decoder_t *p_dec )
 {
     input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
-
-    int i = 0;
     char *psz_name, *psz_value, *psz_comment;
+    int i = 0;
+
+    if( p_input->i_object_type != VLC_OBJECT_INPUT ) return;
+
     while ( i < p_dec->p_sys->tc.comments )
     {
         psz_comment = strdup( p_dec->p_sys->tc.user_comments[i] );
@@ -459,7 +543,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
-    ogg_packet header[3];
+    ogg_packet header;
     uint8_t *p_extra;
     vlc_value_t val;
     int i_quality, i;
@@ -549,19 +633,24 @@ static int OpenEncoder( vlc_object_t *p_this )
     theora_comment_init( &p_sys->tc );
 
     /* Create and store headers */
-    theora_encode_header( &p_sys->td, &header[0] );
-    theora_encode_comment( &p_sys->tc, &header[1] );
-    theora_encode_tables( &p_sys->td, &header[2] );
-    p_enc->fmt_out.i_extra = 1 + 3 * 2 + header[0].bytes +
-       header[1].bytes + header[2].bytes;
-    p_extra = p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
-    *(p_extra++) = 3; /* number of headers */
+    p_enc->fmt_out.i_extra = 3 * 2;
     for( i = 0; i < 3; i++ )
     {
-        *(p_extra++) = header[i].bytes >> 8;
-        *(p_extra++) = header[i].bytes & 0xFF;
-        memcpy( p_extra, header[i].packet, header[i].bytes );
-        p_extra += header[i].bytes;
+        if( i == 0 ) theora_encode_header( &p_sys->td, &header );
+        else if( i == 1 ) theora_encode_comment( &p_sys->tc, &header );
+        else if( i == 2 ) theora_encode_tables( &p_sys->td, &header );
+
+        p_enc->fmt_out.p_extra =
+            realloc( p_enc->fmt_out.p_extra,
+                     p_enc->fmt_out.i_extra + header.bytes );
+        p_extra = p_enc->fmt_out.p_extra;
+        p_extra += p_enc->fmt_out.i_extra + (i-3)*2;
+        p_enc->fmt_out.i_extra += header.bytes;
+
+        *(p_extra++) = header.bytes >> 8;
+        *(p_extra++) = header.bytes & 0xFF;
+
+        memcpy( p_extra, header.packet, header.bytes );
     }
 
     return VLC_SUCCESS;

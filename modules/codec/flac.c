@@ -215,14 +215,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->pf_decode_audio = DecodeBlock;
     p_dec->pf_packetize    = PacketizeBlock;
 
-    /* Decode STREAMINFO */
-    msg_Dbg( p_dec, "decode STREAMINFO" );
-    p_sys->p_block = block_New( p_dec, p_dec->fmt_in.i_extra );
-    memcpy( p_sys->p_block->p_buffer, p_dec->fmt_in.p_extra,
-            p_dec->fmt_in.i_extra );
-    FLAC__stream_decoder_process_until_end_of_metadata( p_sys->p_flac );
-    msg_Dbg( p_dec, "STREAMINFO decoded" );
-
     return VLC_SUCCESS;
 }
 
@@ -236,9 +228,41 @@ static int OpenPacketizer( vlc_object_t *p_this )
 
     i_ret = OpenDecoder( p_this );
 
+    /* Set output properties */
+    p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','a','c');
+
     if( i_ret != VLC_SUCCESS ) return i_ret;
 
     return i_ret;
+}
+
+/*****************************************************************************
+ * ProcessHeader: processe Flac header.
+ *****************************************************************************/
+static void ProcessHeader( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( !p_dec->fmt_in.i_extra ) return;
+
+    /* Decode STREAMINFO */
+    msg_Dbg( p_dec, "decode STREAMINFO" );
+    p_sys->p_block = block_New( p_dec, p_dec->fmt_in.i_extra );
+    memcpy( p_sys->p_block->p_buffer, p_dec->fmt_in.p_extra,
+            p_dec->fmt_in.i_extra );
+    FLAC__stream_decoder_process_until_end_of_metadata( p_sys->p_flac );
+    msg_Dbg( p_dec, "STREAMINFO decoded" );
+
+    if( !p_sys->b_stream_info ) return;
+
+    if( p_dec->fmt_out.i_codec == VLC_FOURCC('f','l','a','c') )
+    {
+        p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
+        p_dec->fmt_out.p_extra =
+            realloc( p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
+        memcpy( p_dec->fmt_out.p_extra,
+                p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
+    }
 }
 
 /****************************************************************************
@@ -253,6 +277,8 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
     block_t *p_sout_block;
 
     if( !pp_block || !*pp_block ) return NULL;
+
+    if( !p_sys->b_stream_info ) ProcessHeader( p_dec );
 
     if( !aout_DateGet( &p_sys->end_date ) && !(*pp_block)->i_pts )
     {

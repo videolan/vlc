@@ -82,7 +82,8 @@ static int  OpenPacketizer( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
 static void *DecodeBlock  ( decoder_t *, block_t ** );
-static int  ProcessHeader ( decoder_t *, ogg_packet * );
+static int  ProcessHeaders( decoder_t * );
+static int  ProcessInitialHeader ( decoder_t *, ogg_packet * );
 static void *ProcessPacket( decoder_t *, ogg_packet *, block_t ** );
 
 static aout_buffer_t *DecodePacket( decoder_t *, ogg_packet * );
@@ -202,37 +203,116 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     oggpacket.e_o_s = 0;
     oggpacket.packetno = 0;
 
-    if( p_sys->i_headers == 0 )
+    /* Check for headers */
+    if( p_sys->i_headers == 0 && p_dec->fmt_in.i_extra )
     {
-        /* Take care of the initial Speex header */
-        if( ProcessHeader( p_dec, &oggpacket ) != VLC_SUCCESS )
+        /* Headers already available as extra data */
+        p_sys->i_headers = 2;
+    }
+    else if( oggpacket.bytes && p_sys->i_headers < 2 )
+    {
+        /* Backup headers as extra data */
+        uint8_t *p_extra;
+
+        p_dec->fmt_in.p_extra =
+            realloc( p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra +
+                     oggpacket.bytes + 2 );
+        p_extra = p_dec->fmt_in.p_extra + p_dec->fmt_in.i_extra;
+        *(p_extra++) = oggpacket.bytes >> 8;
+        *(p_extra++) = oggpacket.bytes & 0xFF;
+
+        memcpy( p_extra, oggpacket.packet, oggpacket.bytes );
+        p_dec->fmt_in.i_extra += oggpacket.bytes + 2;
+
+        block_Release( *pp_block );
+        p_sys->i_headers++;
+        return NULL;
+    }
+
+    if( p_sys->i_headers == 2 )
+    {
+        if( ProcessHeaders( p_dec ) != VLC_SUCCESS )
         {
-            msg_Err( p_dec, "initial Speex header is corrupted" );
+            p_sys->i_headers = 0;
+            p_dec->fmt_in.i_extra = 0;
             block_Release( *pp_block );
             return NULL;
         }
-
-        p_sys->i_headers++;
-
-        return ProcessPacket( p_dec, &oggpacket, pp_block );
-    }
-
-    if( p_sys->i_headers == 1 )
-    {
-        /* The next packet in order is the comments header */
-        ParseSpeexComments( p_dec, &oggpacket );
-        p_sys->i_headers++;
-
-        return ProcessPacket( p_dec, &oggpacket, pp_block );
+        else p_sys->i_headers++;
     }
 
     return ProcessPacket( p_dec, &oggpacket, pp_block );
 }
 
 /*****************************************************************************
- * ProcessHeader: processes the inital Speex header packet.
+ * ProcessHeaders: process Speex headers.
  *****************************************************************************/
-static int ProcessHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
+static int ProcessHeaders( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    ogg_packet oggpacket;
+    uint8_t *p_extra;
+    int i_extra;
+
+    if( !p_dec->fmt_in.i_extra ) return VLC_EGENERIC;
+
+    oggpacket.granulepos = -1;
+    oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
+    oggpacket.e_o_s = 0;
+    oggpacket.packetno = 0;
+    p_extra = p_dec->fmt_in.p_extra;
+    i_extra = p_dec->fmt_in.i_extra;
+
+    /* Take care of the initial Vorbis header */
+    oggpacket.bytes = *(p_extra++) << 8;
+    oggpacket.bytes |= (*(p_extra++) & 0xFF);
+    oggpacket.packet = p_extra;
+    p_extra += oggpacket.bytes;
+    i_extra -= (oggpacket.bytes + 2);
+    if( i_extra < 0 )
+    {
+        msg_Err( p_dec, "header data corrupted");
+        return VLC_EGENERIC;
+    }
+
+    /* Take care of the initial Speex header */
+    if( ProcessInitialHeader( p_dec, &oggpacket ) != VLC_SUCCESS )
+    {
+        msg_Err( p_dec, "initial Speex header is corrupted" );
+        return VLC_EGENERIC;
+    }
+
+    /* The next packet in order is the comments header */
+    oggpacket.b_o_s = 0;
+    oggpacket.bytes = *(p_extra++) << 8;
+    oggpacket.bytes |= (*(p_extra++) & 0xFF);
+    oggpacket.packet = p_extra;
+    p_extra += oggpacket.bytes;
+    i_extra -= (oggpacket.bytes + 2);
+    if( i_extra < 0 )
+    {
+        msg_Err( p_dec, "header data corrupted");
+        return VLC_EGENERIC;
+    }
+
+    ParseSpeexComments( p_dec, &oggpacket );
+
+    if( p_sys->b_packetizer )
+    {
+        p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
+        p_dec->fmt_out.p_extra =
+            realloc( p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
+        memcpy( p_dec->fmt_out.p_extra,
+                p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * ProcessInitialHeader: processes the inital Speex header packet.
+ *****************************************************************************/
+static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -350,10 +430,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
         else
             p_aout_buffer = NULL; /* Skip headers */
 
-        if( p_block )
-        {
-            block_Release( p_block );
-        }
+        if( p_block ) block_Release( p_block );
         return p_aout_buffer;
     }
 }
@@ -462,6 +539,8 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
     char *p_buf = (char *)p_oggpacket->packet;
     const SpeexMode *p_mode;
     int i_len;
+
+    if( p_input->i_object_type != VLC_OBJECT_INPUT ) return;
 
     p_mode = speex_mode_list[p_sys->p_header->mode];
 
@@ -603,9 +682,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     pp_header[1] = "ENCODER=VLC media player";
     pi_header[1] = sizeof("ENCODER=VLC media player");
 
-    p_enc->fmt_out.i_extra = 1 + 3 * 2 + pi_header[0] + pi_header[1];
+    p_enc->fmt_out.i_extra = 3 * 2 + pi_header[0] + pi_header[1];
     p_extra = p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
-    *(p_extra++) = 2; /* number of headers */
     for( i = 0; i < 2; i++ )
     {
         *(p_extra++) = pi_header[i] >> 8;

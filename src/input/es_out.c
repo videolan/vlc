@@ -991,6 +991,30 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             return VLC_EGENERIC;
         }
 
+        case ES_OUT_SET_FMT:
+        {
+            /* This ain't pretty but is need by some demuxers (eg. Ogg )
+             * to update the p_extra data */
+            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
+            es_format_t *p_fmt = (es_format_t*) va_arg( args, es_format_t * );
+            if( es == NULL || !es->p_dec ) return VLC_EGENERIC;
+
+            if( p_fmt->i_extra )
+            {
+                es->fmt.i_extra = p_fmt->i_extra;
+                es->fmt.p_extra = realloc( es->fmt.p_extra, p_fmt->i_extra );
+                memcpy( es->fmt.p_extra, p_fmt->p_extra, p_fmt->i_extra );
+
+                es->p_dec->fmt_in.i_extra = p_fmt->i_extra;
+                es->p_dec->fmt_in.p_extra =
+                    realloc( es->p_dec->fmt_in.p_extra, p_fmt->i_extra );
+                memcpy( es->p_dec->fmt_in.p_extra,
+                        p_fmt->p_extra, p_fmt->i_extra );
+            }
+
+            return VLC_SUCCESS;
+        }
+
         default:
             msg_Err( p_sys->p_input, "unknown query in es_out_Control" );
             return VLC_EGENERIC;

@@ -59,14 +59,14 @@ typedef struct logical_stream_s
     double           f_rate;
 
     int              i_serial_no;
-    int              b_activated;
 
     /* the header of some logical streams (eg vorbis) contain essential
      * data for the decoder. We back them up here in case we need to re-feed
      * them to the decoder. */
     int              b_force_backup;
     int              i_packets_backup;
-    ogg_packet       *p_packets_backup;
+    uint8_t          *p_headers;
+    int              i_headers;
 
     /* program clock reference (in units of 90kHz) derived from the previous
      * granulepos */
@@ -163,12 +163,11 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux );
 static void Ogg_EndOfStream( demux_t *p_demux );
 
 /* Logical bitstream headers */
-static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
-                                  ogg_packet *p_oggpacket );
-static void Ogg_ReadVorbisHeader( logical_stream_t *p_stream,
-                                  ogg_packet *p_oggpacket );
-static void Ogg_ReadAnnodexHeader( vlc_object_t *, logical_stream_t *p_stream,
-                                   ogg_packet *p_oggpacket );
+static void Ogg_ReadTheoraHeader( logical_stream_t *, ogg_packet * );
+static void Ogg_ReadVorbisHeader( logical_stream_t *, ogg_packet * );
+static void Ogg_ReadSpeexHeader( logical_stream_t *, ogg_packet * );
+static void Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
+static void Ogg_ReadAnnodexHeader( vlc_object_t *, logical_stream_t *, ogg_packet * );
 
 /*****************************************************************************
  * Open: initializes ogg demux structures
@@ -502,9 +501,15 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         return; 
     }
 
+    /* Check the ES is selected */
+    es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                    p_stream->p_es, &b_selected );
+
     if( p_stream->b_force_backup )
     {
-        ogg_packet *p_packet_backup;
+        uint8_t *p_extra;
+	vlc_bool_t b_store_size = VLC_TRUE;
+
         p_stream->i_packets_backup++;
         switch( p_stream->fmt.i_codec )
         {
@@ -515,59 +520,12 @@ static void Ogg_DecodePacket( demux_t *p_demux,
           break;
 
         case VLC_FOURCC( 'f','l','a','c' ):
-          if( p_stream->i_packets_backup == 1 ) return;
-          else if( p_stream->i_packets_backup == 2 )
+          if( p_stream->i_packets_backup == 2 )
           {
-              /* Parse the STREAMINFO metadata */
-              bs_t s;
-              bs_init( &s, p_oggpacket->packet, p_oggpacket->bytes );
-              bs_read( &s, 1 );
-              if( bs_read( &s, 7 ) == 0 )
-              {
-                  if( bs_read( &s, 24 ) >= 34 /*size STREAMINFO*/ )
-                  {
-                      bs_skip( &s, 80 );
-                      p_stream->f_rate = p_stream->fmt.audio.i_rate =
-                          bs_read( &s, 20 );
-                      p_stream->fmt.audio.i_channels =
-                          bs_read( &s, 3 ) + 1;
-
-                      msg_Dbg( p_demux, "FLAC header, channels: %i, rate: %i",
-                               p_stream->fmt.audio.i_channels,
-                               (int)p_stream->f_rate );
-                  }
-                  else
-                  {
-                      msg_Dbg( p_demux, "FLAC STREAMINFO metadata too short" );
-                  }
-
-                  /* Store STREAMINFO for the decoder and packetizer */
-                  p_stream->fmt.i_extra = p_oggpacket->bytes + 4;
-                  p_stream->fmt.p_extra = malloc( p_stream->fmt.i_extra );
-                  memcpy( p_stream->fmt.p_extra, "fLaC", 4);
-                  memcpy( ((uint8_t *)p_stream->fmt.p_extra) + 4,
-                          p_oggpacket->packet, p_oggpacket->bytes );
-
-                  /* Fake this as the last metadata block */
-                  ((uint8_t*)p_stream->fmt.p_extra)[4] |= 0x80;
-
-                  p_stream->p_es = es_out_Add( p_demux->out,
-                                               &p_stream->fmt );
-              }
-              else
-              {
-                  /* This ain't a STREAMINFO metadata */
-                  msg_Dbg( p_demux, "Invalid FLAC STREAMINFO metadata" );
-              }
+	      Ogg_ReadFlacHeader( p_demux, p_stream, p_oggpacket );
               p_stream->b_force_backup = 0;
-              p_stream->i_packets_backup = 0;
-
-              if( p_oggpacket->granulepos >= 0 )
-                  Ogg_UpdatePCR( p_stream, p_oggpacket );
-
-              p_stream->i_previous_pcr = 0;
-              return;
           }
+          b_store_size = VLC_FALSE;
           break;
 
         default:
@@ -576,53 +534,31 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         }
 
         /* Backup the ogg packet (likely an header packet) */
-        p_stream->p_packets_backup =
-            realloc( p_stream->p_packets_backup, p_stream->i_packets_backup *
-                     sizeof(ogg_packet) );
-
-        p_packet_backup =
-            &p_stream->p_packets_backup[p_stream->i_packets_backup - 1];
-
-        p_packet_backup->bytes = p_oggpacket->bytes;
-        p_packet_backup->granulepos = p_oggpacket->granulepos;
-
-        if( p_oggpacket->granulepos >= 0 )
+        p_stream->p_headers =
+            realloc( p_stream->p_headers, p_stream->i_headers +
+                     p_oggpacket->bytes + (b_store_size ? 2 : 0) );
+        p_extra = p_stream->p_headers + p_stream->i_headers;
+        if( b_store_size )
         {
-            /* Because of vorbis granulepos scheme we must set the pcr for the
-             * 1st header packet so it doesn't get discarded in the
-             * packetizer */
-            Ogg_UpdatePCR( p_stream, p_oggpacket );
+            *(p_extra++) = p_oggpacket->bytes >> 8;
+            *(p_extra++) = p_oggpacket->bytes & 0xFF;
         }
+        memcpy( p_extra, p_oggpacket->packet, p_oggpacket->bytes );
+        p_stream->i_headers += p_oggpacket->bytes + (b_store_size ? 2 : 0);
 
-        p_packet_backup->packet = malloc( p_oggpacket->bytes );
-        if( !p_packet_backup->packet ) return;
-        memcpy( p_packet_backup->packet, p_oggpacket->packet,
-                p_oggpacket->bytes );
-    }
-
-    /* Check the ES is selected */
-    es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                    p_stream->p_es, &b_selected );
-
-    if( b_selected && !p_stream->b_activated )
-    {
-        p_stream->b_activated = VLC_TRUE;
-
-        /* Newly activated stream, feed the backup headers to the decoder */
         if( !p_stream->b_force_backup )
         {
-            int i;
-            for( i = 0; i < p_stream->i_packets_backup; i++ )
-            {
-                /* Set correct starting date in header packets */
-                p_stream->p_packets_backup[i].granulepos =
-                    p_stream->i_interpolated_pcr * p_stream->f_rate /
-                    I64C(1000000);
-
-                Ogg_DecodePacket( p_demux, p_stream,
-                                  &p_stream->p_packets_backup[i] );
-            }
+            /* Last header received, commit changes */
+            p_stream->fmt.i_extra = p_stream->i_headers;
+            p_stream->fmt.p_extra =
+                realloc( p_stream->fmt.p_extra, p_stream->i_headers );
+	    memcpy( p_stream->fmt.p_extra, p_stream->p_headers,
+		    p_stream->i_headers );
+            es_out_Control( p_demux->out, ES_OUT_SET_FMT,
+                            p_stream->p_es, &p_stream->fmt );
         }
+
+        b_selected = VLC_FALSE; /* Discard the header packet */
     }
 
     /* Convert the pcr into a pts */
@@ -683,7 +619,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     {
         /* This stream isn't currently selected so we don't need to decode it,
          * but we did need to store its pcr as it might be selected later on */
-        p_stream->b_activated = VLC_FALSE;
         return;
     }
 
@@ -791,9 +726,9 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
 
                 p_stream = malloc( sizeof(logical_stream_t) );
                 memset( p_stream, 0, sizeof(logical_stream_t) );
+                p_stream->p_headers = 0;
 
                 es_format_Init( &p_stream->fmt, 0, 0 );
-                p_stream->b_activated = VLC_TRUE;
 
                 /* Setup the logical stream */
                 p_stream->i_serial_no = ogg_page_serialno( &oggpage );
@@ -823,28 +758,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 else if( oggpacket.bytes >= 7 &&
                     ! strncmp( &oggpacket.packet[0], "Speex", 5 ) )
                 {
-                    oggpack_buffer opb;
-
-                    p_stream->fmt.i_cat = AUDIO_ES;
-                    p_stream->fmt.i_codec = VLC_FOURCC( 's','p','x',' ' );
-
-                    /* Signal that we want to keep a backup of the vorbis
-                     * stream headers. They will be used when switching between
-                     * audio streams. */
-                    p_stream->b_force_backup = 1;
-
-                    /* Cheat and get additionnal info ;) */
-                    oggpack_readinit( &opb, oggpacket.packet, oggpacket.bytes);
-                    oggpack_adv( &opb, 224 );
-                    oggpack_adv( &opb, 32 ); /* speex_version_id */
-                    oggpack_adv( &opb, 32 ); /* header_size */
-                    p_stream->f_rate = p_stream->fmt.audio.i_rate =
-                        oggpack_read( &opb, 32 );
-                    oggpack_adv( &opb, 32 ); /* mode */
-                    oggpack_adv( &opb, 32 ); /* mode_bitstream_version */
-                    p_stream->fmt.audio.i_channels = oggpack_read( &opb, 32 );
-                    p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
-
+                    Ogg_ReadSpeexHeader( p_stream, &oggpacket );
                     msg_Dbg( p_demux, "found speex header, channels: %i, "
                              "rate: %i,  bitrate: %i",
                              p_stream->fmt.audio.i_channels,
@@ -1174,14 +1088,12 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
     for( i_stream = 0 ; i_stream < p_ogg->i_streams; i_stream++ )
     {
 #define p_stream p_ogg->pp_stream[i_stream]
-        if( p_stream->fmt.i_codec != VLC_FOURCC('f','l','a','c') )
-            p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
+        p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
 
         if( p_stream->fmt.i_codec == VLC_FOURCC('c','m','m','l') )
         {
             /* Set the CMML stream active */
-            es_out_Control( p_demux->out, ES_OUT_SET_ES,
-                            p_stream->p_es );
+            es_out_Control( p_demux->out, ES_OUT_SET_ES, p_stream->p_es );
         }
 
         p_ogg->i_bitrate += p_stream->fmt.i_bitrate;
@@ -1201,7 +1113,7 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
 static void Ogg_EndOfStream( demux_t *p_demux )
 {
     demux_sys_t *p_ogg = p_demux->p_sys  ;
-    int i_stream, j;
+    int i_stream;
 
 #define p_stream p_ogg->pp_stream[i_stream]
     for( i_stream = 0 ; i_stream < p_ogg->i_streams; i_stream++ )
@@ -1212,12 +1124,8 @@ static void Ogg_EndOfStream( demux_t *p_demux )
         p_ogg->i_bitrate -= p_stream->fmt.i_bitrate;
 
         ogg_stream_clear( &p_ogg->pp_stream[i_stream]->os );
-        for( j = 0; j < p_ogg->pp_stream[i_stream]->i_packets_backup; j++ )
-        {
-            free( p_ogg->pp_stream[i_stream]->p_packets_backup[j].packet );
-        }
-        if( p_ogg->pp_stream[i_stream]->p_packets_backup)
-            free( p_ogg->pp_stream[i_stream]->p_packets_backup );
+        if( p_ogg->pp_stream[i_stream]->p_headers)
+            free( p_ogg->pp_stream[i_stream]->p_headers );
 
         es_format_Clean( &p_stream->fmt );
 
@@ -1242,7 +1150,7 @@ static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     p_stream->fmt.i_cat = VIDEO_ES;
     p_stream->fmt.i_codec = VLC_FOURCC( 't','h','e','o' );
 
-    /* Signal that we want to keep a backup of the vorbis
+    /* Signal that we want to keep a backup of the theora
      * stream headers. They will be used when switching between
      * audio streams. */
     p_stream->b_force_backup = 1;
@@ -1281,12 +1189,6 @@ static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     }
 
     p_stream->f_rate = ((float)i_fps_numerator) / i_fps_denominator;
-
-    /* Save this data in p_extra for ffmpeg */
-    p_stream->fmt.i_extra = p_oggpacket->bytes;
-    p_stream->fmt.p_extra = malloc( p_oggpacket->bytes );
-    memcpy( p_stream->fmt.p_extra, p_oggpacket->packet, p_oggpacket->bytes );
-
 }
 
 static void Ogg_ReadVorbisHeader( logical_stream_t *p_stream,
@@ -1310,6 +1212,62 @@ static void Ogg_ReadVorbisHeader( logical_stream_t *p_stream,
         oggpack_read( &opb, 32 );
     oggpack_adv( &opb, 32 );
     p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
+}
+
+static void Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
+                                 ogg_packet *p_oggpacket )
+{
+    oggpack_buffer opb;
+
+    p_stream->fmt.i_cat = AUDIO_ES;
+    p_stream->fmt.i_codec = VLC_FOURCC( 's','p','x',' ' );
+
+    /* Signal that we want to keep a backup of the speex
+     * stream headers. They will be used when switching between
+     * audio streams. */
+    p_stream->b_force_backup = 1;
+
+    /* Cheat and get additionnal info ;) */
+    oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
+    oggpack_adv( &opb, 224 );
+    oggpack_adv( &opb, 32 ); /* speex_version_id */
+    oggpack_adv( &opb, 32 ); /* header_size */
+    p_stream->f_rate = p_stream->fmt.audio.i_rate = oggpack_read( &opb, 32 );
+    oggpack_adv( &opb, 32 ); /* mode */
+    oggpack_adv( &opb, 32 ); /* mode_bitstream_version */
+    p_stream->fmt.audio.i_channels = oggpack_read( &opb, 32 );
+    p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
+}
+
+static void Ogg_ReadFlacHeader( demux_t *p_demux, logical_stream_t *p_stream,
+                                ogg_packet *p_oggpacket )
+{
+    /* Parse the STREAMINFO metadata */
+    bs_t s;
+
+    bs_init( &s, p_oggpacket->packet, p_oggpacket->bytes );
+    bs_read( &s, 1 );
+    if( bs_read( &s, 7 ) == 0 )
+    {
+        if( bs_read( &s, 24 ) >= 34 /*size STREAMINFO*/ )
+	{
+	    bs_skip( &s, 80 );
+	    p_stream->f_rate = p_stream->fmt.audio.i_rate = bs_read( &s, 20 );
+	    p_stream->fmt.audio.i_channels = bs_read( &s, 3 ) + 1;
+
+	    msg_Dbg( p_demux, "FLAC header, channels: %i, rate: %i",
+		     p_stream->fmt.audio.i_channels, (int)p_stream->f_rate );
+	}
+	else msg_Dbg( p_demux, "FLAC STREAMINFO metadata too short" );
+
+	/* Fake this as the last metadata block */
+	*((uint8_t*)p_oggpacket->packet) |= 0x80;
+    }
+    else
+    {
+        /* This ain't a STREAMINFO metadata */
+        msg_Dbg( p_demux, "Invalid FLAC STREAMINFO metadata" );
+    }
 }
 
 static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,

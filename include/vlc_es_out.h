@@ -2,7 +2,7 @@
  * vlc_es_out.h
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: ninput.h 7930 2004-06-07 18:23:15Z fenrir $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -62,6 +62,9 @@ enum es_out_query_e
     ES_OUT_SET_PCR,             /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
     ES_OUT_SET_GROUP_PCR,       /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
     ES_OUT_RESET_PCR,           /* no arg */
+
+    /* Try not to use this one as it is a bit hacky */
+    ES_OUT_SET_FMT      /* arg1= es_out_id_t* arg2=es_format_t* */
 };
 
 struct es_out_t

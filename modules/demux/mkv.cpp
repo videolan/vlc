@@ -535,9 +535,41 @@ static int Open( vlc_object_t * p_this )
         }
         else if( !strcmp( tk.psz_codec, "A_VORBIS" ) )
         {
+            int i, i_offset = 1, i_size[3], i_extra;
+            uint8_t *p_extra;
+
             tk.fmt.i_codec = VLC_FOURCC( 'v', 'o', 'r', 'b' );
-            tk.i_data_init = tk.i_extra_data;
-            tk.p_data_init = tk.p_extra_data;
+
+            /* Split the 3 headers */
+            if( tk.p_extra_data[0] != 0x02 )
+                msg_Err( p_demux, "invalid vorbis header" );
+
+            for( i = 0; i < 2; i++ )
+            {
+                i_size[i] = 0;
+                while( i_offset < tk.i_extra_data )
+                {
+                    i_size[i] += tk.p_extra_data[i_offset];
+                    if( tk.p_extra_data[i_offset++] != 0xff ) break;
+                }
+            }
+
+            i_size[0] = __MIN(i_size[0], tk.i_extra_data - i_offset);
+            i_size[1] = __MIN(i_size[1], tk.i_extra_data -i_offset -i_size[0]);
+            i_size[2] = tk.i_extra_data - i_offset - i_size[0] - i_size[1];
+
+            tk.fmt.i_extra = 3 * 2 + i_size[0] + i_size[1] + i_size[2];
+            tk.fmt.p_extra = malloc( tk.fmt.i_extra );
+            p_extra = (uint8_t *)tk.fmt.p_extra; i_extra = 0;
+            for( i = 0; i < 3; i++ )
+            {
+                *(p_extra++) = i_size[i] >> 8;
+                *(p_extra++) = i_size[i] & 0xFF;
+                memcpy( p_extra, tk.p_extra_data + i_offset + i_extra,
+                        i_size[i] );
+                p_extra += i_size[i];
+                i_extra += i_size[i];
+            }
         }
         else if( !strncmp( tk.psz_codec, "A_AAC/MPEG2/", strlen( "A_AAC/MPEG2/" ) ) ||
                  !strncmp( tk.psz_codec, "A_AAC/MPEG4/", strlen( "A_AAC/MPEG4/" ) ) )
@@ -915,7 +947,8 @@ static block_t *MemToBlock( demux_t *p_demux, uint8_t *p_mem, int i_mem)
     return p_block;
 }
 
-static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts, mtime_t i_duration )
+static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
+                         mtime_t i_duration )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -951,59 +984,8 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts, mtime
         block_t *p_init;
 
         msg_Dbg( p_demux, "sending header (%d bytes)", tk.i_data_init );
-
-        if( tk.fmt.i_codec == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
-        {
-            int i;
-            int i_offset = 1;
-            int i_size[3];
-
-            /* XXX hack split the 3 headers */
-            if( tk.p_data_init[0] != 0x02 )
-            {
-                msg_Err( p_demux, "invalid vorbis header" );
-            }
-
-            for( i = 0; i < 2; i++ )
-            {
-                i_size[i] = 0;
-                while( i_offset < tk.i_data_init )
-                {
-                    i_size[i] += tk.p_data_init[i_offset];
-                    if( tk.p_data_init[i_offset++] != 0xff )
-                    {
-                        break;
-                    }
-                }
-            }
-            i_size[0] = __MIN( i_size[0], tk.i_data_init - i_offset );
-            i_size[1] = __MIN( i_size[1], tk.i_data_init - i_offset - i_size[0] );
-            i_size[2] = tk.i_data_init - i_offset - i_size[0] - i_size[1];
-
-            p_init = MemToBlock( p_demux, &tk.p_data_init[i_offset], i_size[0] );
-            if( p_init )
-            {
-                es_out_Send( p_demux->out, tk.p_es, p_init );
-            }
-            p_init = MemToBlock( p_demux, &tk.p_data_init[i_offset+i_size[0]], i_size[1] );
-            if( p_init )
-            {
-                es_out_Send( p_demux->out, tk.p_es, p_init );
-            }
-            p_init = MemToBlock( p_demux, &tk.p_data_init[i_offset+i_size[0]+i_size[1]], i_size[2] );
-            if( p_init )
-            {
-                es_out_Send( p_demux->out, tk.p_es, p_init );
-            }
-        }
-        else
-        {
-            p_init = MemToBlock( p_demux, tk.p_data_init, tk.i_data_init );
-            if( p_init )
-            {
-                es_out_Send( p_demux->out, tk.p_es, p_init );
-            }
-        }
+        p_init = MemToBlock( p_demux, tk.p_data_init, tk.i_data_init );
+        if( p_init ) es_out_Send( p_demux->out, tk.p_es, p_init );
     }
     tk.b_inited = VLC_TRUE;
 
