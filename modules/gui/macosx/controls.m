@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.12 2003/01/23 22:57:28 hartman Exp $
+ * $Id: controls.m,v 1.13 2003/01/24 00:53:41 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -353,20 +353,11 @@
                                                 FIND_ANYWHERE );
     audio_volume_t i_volume;
 
-    switch( [[NSApp currentEvent] type] )
+    if ( p_aout != NULL )
     {
-        case NSLeftMouseDragged:
-            if ( p_aout != NULL )
-            {
-                i_volume = (int) [sender floatValue];
-                aout_VolumeSet( p_aout, i_volume * AOUT_VOLUME_STEP);
-                vlc_object_release( (vlc_object_t *)p_aout );
-            }
-            break;
-
-        default:
-            if ( p_aout != NULL ) vlc_object_release( (vlc_object_t *)p_aout );
-            break;
+        i_volume = (int) [sender floatValue];
+        aout_VolumeSet( p_aout, i_volume * AOUT_VOLUME_STEP);
+        vlc_object_release( (vlc_object_t *)p_aout );
     }
 }
 
