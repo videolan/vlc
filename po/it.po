@@ -2246,7 +2246,7 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2070 modules/gui/gtk/gtk_interface.c:2385
 msgid "Subtitle"
-msgstr "Sottotitoli"
+msgstr "Sottotitolo"
 
 #: modules/gui/gtk/gnome_interface.c:2112 modules/gui/gtk/gtk_interface.c:2429
 msgid "delay"
@@ -2474,7 +2474,7 @@ msgstr "Autori"
 
 #: modules/gui/gtk/gtk_interface.c:1667 modules/gui/win32/strings.cpp:11
 msgid "the VideoLAN team <videolan@videolan.org>"
-msgstr "il Team VideoLAN <videolan@videolan.org>"
+msgstr "il team VideoLAN <videolan@videolan.org>"
 
 #: modules/gui/gtk/gtk_interface.c:1702 modules/gui/gtk/gtk_interface.c:2503
 #: modules/gui/gtk/gtk_interface.c:2754 modules/gui/gtk/gtk_interface.c:2985
@@ -2606,7 +2606,7 @@ msgstr "Messaggi:"
 
 #: modules/gui/macosx/intf.m:245
 msgid "VLC - Controller"
-msgstr ""
+msgstr "Pannello - VLC"
 
 #: modules/gui/macosx/intf.m:250 modules/gui/macosx/intf.m:294
 #: modules/gui/macosx/controls.m:644
@@ -2735,7 +2735,7 @@ msgstr "Chiudi Finestra"
 
 #: modules/gui/macosx/intf.m:318
 msgid "Controller"
-msgstr "Controllore"
+msgstr "Pannello"
 
 #: modules/gui/macosx/intf.m:322
 msgid "Bring All to Front"
@@ -2880,7 +2880,7 @@ msgstr "Versione x.y.z"
 #.
 #: modules/gui/win32/strings.cpp:19
 msgid "Open Disc"
-msgstr "Apri Disco..."
+msgstr "Apri Disco"
 
 #: modules/gui/win32/strings.cpp:20
 msgid "Device &name:"
@@ -2964,7 +2964,7 @@ msgstr "&Aggiungi interfaccia"
 
 #: modules/gui/win32/strings.cpp:56
 msgid "Spawn a new interface"
-msgstr ""
+msgstr "Una nuova interfaccia"
 
 #: modules/gui/win32/strings.cpp:57
 msgid "&Controls"
@@ -3056,11 +3056,11 @@ msgstr "Riproduci Veloce"
 
 #: modules/gui/win32/strings.cpp:115
 msgid "Next file"
-msgstr "Prossimo File"
+msgstr "File Successivo"
 
 #: modules/gui/win32/strings.cpp:116
 msgid "&Stream output..."
-msgstr "&Sorgente in uscita..."
+msgstr "Uscita &Sorgente..."
 
 #: modules/gui/win32/strings.cpp:117
 msgid "Open the stream output"
@@ -3092,7 +3092,7 @@ msgstr "Info su..."
 
 #: modules/gui/win32/strings.cpp:135
 msgid "Select next title"
-msgstr "Seleziona prossimo titolo"
+msgstr "Seleziona titolo successivo"
 
 #: modules/gui/win32/strings.cpp:140
 msgid "Volume &Up"
@@ -3180,11 +3180,11 @@ msgstr "&Inverti selezione"
 
 #: modules/gui/win32/strings.cpp:192
 msgid "&Crop selection"
-msgstr "&Taglia selezione"
+msgstr "Ri&taglia selezione"
 
 #: modules/gui/win32/strings.cpp:193
 msgid "&Delete selection"
-msgstr "Rimuovi selezione"
+msgstr "&Rimuovi selezione"
 
 #: modules/gui/win32/strings.cpp:194
 msgid "Delete &all"
@@ -3196,7 +3196,7 @@ msgstr "Inverti selezione"
 
 #: modules/gui/win32/strings.cpp:198
 msgid "Crop selection"
-msgstr "Taglia selezione"
+msgstr "Ritaglia selezione"
 
 #: modules/gui/win32/strings.cpp:200
 msgid "Delete selection"
