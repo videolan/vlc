@@ -449,7 +449,7 @@ faad2: faad2-$(FAAD2_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .faad: faad2
-	(cd $<; ./configure --prefix=$(PREFIX) && make -C libfaad && make -C libfaad install)
+	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="-O3" && make -C libfaad && make -C libfaad install)
 	$(INSTALL_NAME)
 	touch $@
 
