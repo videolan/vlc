@@ -2,7 +2,7 @@
  * MediaControlView.h: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.h,v 1.1 2001/06/15 09:07:10 tcastley Exp $
+ * $Id: MediaControlView.h,v 1.2 2001/09/12 01:31:37 tcastley Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *
@@ -36,12 +36,12 @@ public:
     ~MediaControlView();
 
     virtual void    MessageReceived(BMessage *message);
-    void            SetProgress(float position);
+    void            SetProgress(uint64 seek, uint64 size);
 
     void            SetStatus(int status, int rate); 
     void            SetEnabled(bool);
-    int32           GetSeekTo();
-    int32           GetVolume();
+    uint32          GetSeekTo();
+    uint32          GetVolume();
 	sem_id	fScrubSem;
 	bool	fSeeking;
     
@@ -80,7 +80,7 @@ public:
 				thumb_style thumbType = B_TRIANGLE_THUMB);
 
 	~SeekSlider();
-	int32 seekTo;
+	uint32 seekTo;
 	virtual void MouseDown(BPoint);
 	virtual void MouseUp(BPoint pt);
 	virtual void MouseMoved(BPoint pt, uint32 c, const BMessage *m);

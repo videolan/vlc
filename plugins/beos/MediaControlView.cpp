@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.1 2001/06/15 09:07:10 tcastley Exp $
+ * $Id: MediaControlView.cpp,v 1.2 2001/09/12 01:31:37 tcastley Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *
@@ -147,13 +147,34 @@ void MediaControlView::MessageReceived(BMessage *message)
 {
 }
 
-void MediaControlView::SetProgress(float position)
+void MediaControlView::SetProgress(uint64 seek, uint64 size)
 {
-	p_seek->SetValue(position);
+	p_seek->SetPosition((float)seek/size);
 }
 
 void MediaControlView::SetStatus(int status, int rate)
 {
+    switch( status )
+    {
+        case PLAYING_S:
+        case FORWARD_S:
+        case BACKWARD_S:
+        case START_S:
+            p_play->SetPlaying();
+            break;
+        case PAUSE_S:
+            p_play->SetPaused();
+            break;
+        case UNDEF_S:
+        case NOT_STARTED_S:
+        default:
+            p_play->SetStopped();
+            break;
+    }
+    if ( rate < DEFAULT_RATE )
+    {
+       intf_Msg("Fastler Rate: %d", rate);
+    }
 }
 
 void MediaControlView::SetEnabled(bool enabled)
@@ -167,12 +188,12 @@ void MediaControlView::SetEnabled(bool enabled)
 	p_seek->SetEnabled(enabled);
 }
 
-int32 MediaControlView::GetSeekTo()
+uint32 MediaControlView::GetSeekTo()
 {
 	return p_seek->seekTo;
 }
 
-int32 MediaControlView::GetVolume()
+uint32 MediaControlView::GetVolume()
 {
 	return p_vol->Value();
 }
@@ -248,7 +269,9 @@ SeekSlider::~SeekSlider()
 void SeekSlider::MouseDown(BPoint where)
 {
     BSlider::MouseDown(where);
+    seekTo = ValueForPoint(where);
     fOwner->fScrubSem = create_sem(0, "Vlc::fScrubSem");
+    release_sem(fOwner->fScrubSem);
     fMouseDown = true;
 }
 
