@@ -117,15 +117,11 @@ typedef struct notification_thread_t
 static void Probe        ( aout_instance_t * );
 static int OpenWaveOut   ( aout_instance_t *, int, int, int, int, vlc_bool_t );
 static int OpenWaveOutPCM( aout_instance_t *, int*, int, int, int, vlc_bool_t );
-static void CheckReordering( aout_instance_t *, int );
 static int PlayWaveOut   ( aout_instance_t *, HWAVEOUT, WAVEHDR *,
                            aout_buffer_t * );
 
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD, DWORD, DWORD );
 static void WaveOutThread( notification_thread_t * );
-
-static void InterleaveFloat32( float *, int *, int );
-static void InterleaveS16( int16_t *, int *, int );
 
 /*****************************************************************************
  * Module descriptor
@@ -138,7 +134,7 @@ static void InterleaveS16( int16_t *, int *, int );
 vlc_module_begin();
     set_description( _("Win32 waveOut extension output") );
     set_capability( "audio output", 50 );
-    add_bool( "waveout-float32", 1, NULL, FLOAT_TEXT, FLOAT_LONGTEXT, VLC_TRUE );
+    add_bool( "waveout-float32", 1, 0, FLOAT_TEXT, FLOAT_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -164,21 +160,24 @@ struct aout_sys_t
     byte_t *p_silence_buffer;               /* buffer we use to play silence */
 
     vlc_bool_t b_chan_reorder;              /* do we need channel reordering */
-    int *pi_chan_table;
+    int pi_chan_table[AOUT_CHAN_MAX];
 };
 
-static const uint32_t pi_channels_in[] =
+static const uint32_t pi_channels_src[] =
     { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
+      AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
       AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
-      AOUT_CHAN_CENTER, AOUT_CHAN_LFE };
+      AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0 };
+static const uint32_t pi_channels_in[] =
+    { SPEAKER_FRONT_LEFT, SPEAKER_FRONT_RIGHT,
+      SPEAKER_SIDE_LEFT, SPEAKER_SIDE_RIGHT,
+      SPEAKER_BACK_LEFT, SPEAKER_BACK_RIGHT,
+      SPEAKER_FRONT_CENTER, SPEAKER_LOW_FREQUENCY, 0 };
 static const uint32_t pi_channels_out[] =
     { SPEAKER_FRONT_LEFT, SPEAKER_FRONT_RIGHT,
+      SPEAKER_FRONT_CENTER, SPEAKER_LOW_FREQUENCY,
       SPEAKER_BACK_LEFT, SPEAKER_BACK_RIGHT,
-      SPEAKER_FRONT_CENTER, SPEAKER_LOW_FREQUENCY };
-static const uint32_t pi_channels_ordered[] =
-    { SPEAKER_FRONT_LEFT, SPEAKER_FRONT_RIGHT, SPEAKER_FRONT_CENTER,
-      SPEAKER_LOW_FREQUENCY,
-      SPEAKER_BACK_LEFT, SPEAKER_BACK_RIGHT };
+      SPEAKER_SIDE_LEFT, SPEAKER_SIDE_RIGHT, 0 };
 
 /*****************************************************************************
  * Open: open the audio device
@@ -201,7 +200,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_aout->output.pf_play = Play;
-    p_aout->output.p_sys->pi_chan_table = NULL;
     p_aout->b_die = VLC_FALSE;
 
     if( var_Type( p_aout, "audio-device" ) == 0 )
@@ -324,6 +322,7 @@ static int Open( vlc_object_t *p_this )
     for( i = 0; i < FRAMES_NUM; i++ )
     {
         p_aout->output.p_sys->waveheader[i].dwFlags = WHDR_DONE;
+        p_aout->output.p_sys->waveheader[i].dwUser = 0;
     }
     PlayWaveOut( p_aout, p_aout->output.p_sys->h_waveout,
                  &p_aout->output.p_sys->waveheader[0], NULL );
@@ -457,45 +456,27 @@ static void Play( aout_instance_t *_p_aout )
 static void Close( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    aout_sys_t *p_sys = p_aout->output.p_sys;
 
     /* Before calling waveOutClose we must reset the device */
     p_aout->b_die = VLC_TRUE;
 
+    waveOutReset( p_sys->h_waveout );
+
     /* wake up the audio thread */
-    SetEvent( p_aout->output.p_sys->event );
-    vlc_thread_join( p_aout->output.p_sys->p_notif );
-    CloseHandle( p_aout->output.p_sys->event );
-
-    /* Wait for the waveout buffers to be freed */
-    while( VLC_TRUE )
-    {
-        int i;
-        vlc_bool_t b_not_done = VLC_FALSE;
-
-        for( i = 0; i < FRAMES_NUM; i++ )
-        {
-           if( !(p_aout->output.p_sys->waveheader[i].dwFlags & WHDR_DONE) )
-               b_not_done = VLC_TRUE;
-        }
-
-        if( !b_not_done )
-            break;
-
-        msleep( 1000 );
-    }
-
-    waveOutReset( p_aout->output.p_sys->h_waveout );
+    SetEvent( p_sys->event );
+    vlc_thread_join( p_sys->p_notif );
+    vlc_object_destroy( p_sys->p_notif );
+    CloseHandle( p_sys->event );
 
     /* Close the device */
-    if( waveOutClose( p_aout->output.p_sys->h_waveout ) != MMSYSERR_NOERROR )
+    if( waveOutClose( p_sys->h_waveout ) != MMSYSERR_NOERROR )
     {
         msg_Err( p_aout, "waveOutClose failed" );
     }
 
-    free( p_aout->output.p_sys->p_silence_buffer );
-    if( p_aout->output.p_sys->pi_chan_table )
-        free( p_aout->output.p_sys->pi_chan_table );
-    free( p_aout->output.p_sys );
+    free( p_sys->p_silence_buffer );
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -589,7 +570,15 @@ static int OpenWaveOut( aout_instance_t *p_aout, int i_format,
         return VLC_EGENERIC;
     }
 
-    CheckReordering( p_aout, i_nb_channels );
+    p_aout->output.p_sys->b_chan_reorder =
+        aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
+                                  waveformat.dwChannelMask, i_nb_channels,
+                                  p_aout->output.p_sys->pi_chan_table );
+
+    if( p_aout->output.p_sys->b_chan_reorder )
+    {
+        msg_Dbg( p_aout, "channel reordering needed" );
+    }
 
     return VLC_SUCCESS;
 
@@ -632,63 +621,6 @@ static int OpenWaveOutPCM( aout_instance_t *p_aout, int *i_format,
 }
 
 /*****************************************************************************
- * CheckReordering: Check if we need to do some channel re-ordering (the ac3
- *                  channel order is different from the one chosen by
- *                  Microsoft).
- *****************************************************************************/
-static void CheckReordering( aout_instance_t *p_aout, int i_nb_channels )
-{
-    int i, j, k, l;
-
-#define waveformat p_aout->output.p_sys->waveformat
-#define pi_chan_table p_aout->output.p_sys->pi_chan_table
-
-    p_aout->output.p_sys->b_chan_reorder = VLC_FALSE;
-
-    pi_chan_table = malloc( i_nb_channels * sizeof(int) );
-    if( !pi_chan_table )
-    {
-        return;
-    }
-
-    for( i = 0, j = 0;
-         i < (int)(sizeof(pi_channels_out)/sizeof(uint32_t)); i++ )
-    {
-        if( waveformat.dwChannelMask & pi_channels_out[i] )
-        {
-            for( k = 0, l = 0;
-                 pi_channels_out[i] != pi_channels_ordered[k]; k++ )
-            {
-                if( waveformat.dwChannelMask & pi_channels_ordered[k] )
-                {
-                    l++;
-                }
-            }
-
-            pi_chan_table[j] = l;
-
-            j++;
-        }
-    }
-
-    for( i = 0; i < i_nb_channels; i++ )
-    {
-        if( pi_chan_table[i] != i )
-        {
-            p_aout->output.p_sys->b_chan_reorder = VLC_TRUE;
-        }
-    }
-
-    if( p_aout->output.p_sys->b_chan_reorder )
-    {
-        msg_Dbg( p_aout, "channel reordering needed" );
-    }
-
-#undef pi_chan_table
-#undef waveformat
-}
-
-/*****************************************************************************
  * PlayWaveOut: play a buffer through the WaveOut device
  *****************************************************************************/
 static int PlayWaveOut( aout_instance_t *p_aout, HWAVEOUT h_waveout,
@@ -703,7 +635,7 @@ static int PlayWaveOut( aout_instance_t *p_aout, HWAVEOUT h_waveout,
         /* Use silence buffer instead */
         p_waveheader->lpData = p_aout->output.p_sys->p_silence_buffer;
 
-    p_waveheader->dwUser = (DWORD_PTR)p_buffer;
+    p_waveheader->dwUser = p_buffer ? (DWORD_PTR)p_buffer : (DWORD_PTR)1;
     p_waveheader->dwBufferLength = p_aout->output.p_sys->i_buffer_size;
     p_waveheader->dwFlags = 0;
 
@@ -733,15 +665,9 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
                                       DWORD dwParam1, DWORD dwParam2 )
 {
     aout_instance_t *p_aout = (aout_instance_t *)_p_aout;
-    WAVEHDR *p_waveheader = (WAVEHDR *)dwParam1;
     int i, i_queued_frames = 0;
 
     if( uMsg != WOM_DONE ) return;
-
-    /* Unprepare and free the buffer which has just been played */
-    waveOutUnprepareHeader( h_waveout, p_waveheader, sizeof(WAVEHDR) );
-    if( p_waveheader->dwUser )
-        aout_BufferFree( (aout_buffer_t *)p_waveheader->dwUser );
 
     if( p_aout->b_die ) return;
 
@@ -761,45 +687,6 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
 }
 
 /*****************************************************************************
- * InterleaveFloat32/S16: change the channel order to the Microsoft one.
- *****************************************************************************/
-static void InterleaveFloat32( float *p_buf, int *pi_chan_table,
-                               int i_nb_channels )
-{
-    int i, j;
-    float p_tmp[10];
-
-    for( i = 0; i < FRAME_SIZE; i++ )
-    {
-        for( j = 0; j < i_nb_channels; j++ )
-        {
-            p_tmp[pi_chan_table[j]] = p_buf[i*i_nb_channels + j];
-        }
-
-        memcpy( &p_buf[i*i_nb_channels], p_tmp,
-                i_nb_channels * sizeof(float) );
-    }
-}
-
-static void InterleaveS16( int16_t *p_buf, int *pi_chan_table,
-                           int i_nb_channels )
-{
-    int i, j;
-    int16_t p_tmp[10];
-
-    for( i = 0; i < FRAME_SIZE; i++ )
-    {
-        for( j = 0; j < i_nb_channels; j++ )
-        {
-            p_tmp[pi_chan_table[j]] = p_buf[i*i_nb_channels + j];
-        }
-
-        memcpy( &p_buf[i*i_nb_channels], p_tmp,
-                i_nb_channels * sizeof(int16_t) );
-    }
-}
-
-/*****************************************************************************
  * WaveOutThread: this thread will capture play notification events. 
  *****************************************************************************
  * We use this thread to feed new audio samples to the sound card because
@@ -809,34 +696,50 @@ static void InterleaveS16( int16_t *p_buf, int *pi_chan_table,
 static void WaveOutThread( notification_thread_t *p_notif )
 {
     aout_instance_t *p_aout = p_notif->p_aout;
+    aout_sys_t *p_sys = p_aout->output.p_sys;
     aout_buffer_t *p_buffer = NULL;
-    vlc_bool_t b_sleek;
+    WAVEHDR *p_waveheader = p_sys->waveheader;
     int i, i_queued_frames;
+    vlc_bool_t b_sleek;
 
     /* We don't want any resampling when using S/PDIF */
     b_sleek = p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i');
 
     while( 1 )
     {
-        WaitForSingleObject( p_aout->output.p_sys->event, INFINITE );
-        if( p_aout->b_die ) return;
+        WaitForSingleObject( p_sys->event, INFINITE );
 
-        /* Find out the current latency */
+        /* Cleanup and find out the current latency */
         i_queued_frames = 0;
         for( i = 0; i < FRAMES_NUM; i++ )
         {
+            if( (p_waveheader[i].dwFlags & WHDR_DONE) &&
+                p_waveheader[i].dwUser )
+            {
+                /* Unprepare and free the buffers which has just been played */
+                waveOutUnprepareHeader( p_sys->h_waveout, &p_waveheader[i],
+                                        sizeof(WAVEHDR) );
+
+                if( p_waveheader[i].dwUser != 1 )
+                    aout_BufferFree( (aout_buffer_t *)p_waveheader[i].dwUser );
+
+                p_waveheader[i].dwUser = 0;
+            }
+
             /* Check if frame buf is available */
-            if( !(p_aout->output.p_sys->waveheader[i].dwFlags & WHDR_DONE) )
+            if( !(p_waveheader[i].dwFlags & WHDR_DONE) )
             {
                 i_queued_frames++;
             }
         }
 
+        if( p_aout->b_die ) return;
+
         /* Try to fill in as many frame buffers as possible */
         for( i = 0; i < FRAMES_NUM; i++ )
         {
             /* Check if frame buf is available */
-            if( p_aout->output.p_sys->waveheader[i].dwFlags & WHDR_DONE )
+            if( p_waveheader[i].dwFlags & WHDR_DONE )
             {
                 /* Take into account the latency */
                 p_buffer = aout_OutputNextBuffer( p_aout,
@@ -850,22 +753,18 @@ static void WaveOutThread( notification_thread_t *p_notif )
                     break;
                 }
 
-                /* Do the channel reordering here */
-                if( p_buffer && p_aout->output.p_sys->b_chan_reorder )
+                /* Do the channel reordering */
+                if( p_buffer && p_sys->b_chan_reorder )
                 {
-                    if( p_aout->output.output.i_format ==
-                            VLC_FOURCC('s','1','6','l') )
-                        InterleaveS16( (int16_t *)p_buffer->p_buffer,
-                            p_aout->output.p_sys->pi_chan_table,
-                            aout_FormatNbChannels( &p_aout->output.output ) );
-                    else
-                        InterleaveFloat32( (float *)p_buffer->p_buffer,
-                            p_aout->output.p_sys->pi_chan_table,
-                            aout_FormatNbChannels( &p_aout->output.output ) );
+                    aout_ChannelReorder( p_buffer->p_buffer,
+                        p_buffer->i_nb_bytes,
+                        p_sys->waveformat.Format.nChannels,
+                        p_sys->pi_chan_table,
+                        p_sys->waveformat.Format.wBitsPerSample );
                 }
 
-                PlayWaveOut( p_aout, p_aout->output.p_sys->h_waveout,
-                             &p_aout->output.p_sys->waveheader[i] , p_buffer );
+                PlayWaveOut( p_aout, p_sys->h_waveout,
+                             &p_waveheader[i], p_buffer );
 
                 i_queued_frames++;
             }
