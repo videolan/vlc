@@ -127,8 +127,12 @@ VideoWindow::~VideoWindow()
     vlc_mutex_lock( &lock );
     if( p_vout )
     {
-        if( vout_Control( p_vout, VOUT_REPARENT ) != VLC_SUCCESS )
-            vout_Control( p_vout, VOUT_CLOSE );
+        if( !p_intf->psz_switch_intf )
+            if( vout_Control( p_vout, VOUT_CLOSE ) != VLC_SUCCESS )
+                vout_Control( p_vout, VOUT_REPARENT );
+        else
+            if( vout_Control( p_vout, VOUT_REPARENT ) != VLC_SUCCESS )
+                vout_Control( p_vout, VOUT_CLOSE );
     }
 
     p_intf->pf_request_window = NULL;

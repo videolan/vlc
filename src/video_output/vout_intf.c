@@ -75,14 +75,14 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     var_Get( p_vout->p_vlc, "drawable", &val );
     if( val.i_int ) return (void *)val.i_int;
 
-    /* Find the first interface which supports embedding */
+    /* Find if the main interface supports embedding */
     p_list = vlc_list_find( p_vout, VLC_OBJECT_INTF, FIND_ANYWHERE );
     if( !p_list ) return NULL;
 
     for( i = 0; i < p_list->i_count; i++ )
     {
         p_intf = (intf_thread_t *)p_list->p_values[i].p_object;
-        if( p_intf->pf_request_window ) break;
+        if( p_intf->b_block && p_intf->pf_request_window ) break;
         p_intf = NULL;
     }
 
