@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.19 2003/06/09 12:33:17 asmax Exp $
+ * $Id: x11_window.cpp,v 1.20 2003/06/09 14:04:20 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -226,6 +226,8 @@ bool X11Window::ProcessOSEvent( Event *evt )
     int          p2  = evt->GetParam2();
     int          time;
     int          posX, posY;
+    string       type;
+    int          button;
 
     switch( msg )
     {
@@ -256,11 +258,19 @@ bool X11Window::ProcessOSEvent( Event *evt )
                 XRaiseWindow( display, ( (X11Window *)(*win) )->GetHandle() );
                 XUNLOCK;
             }
+            
+            button = 0;
+            if( ((XButtonEvent *)p2 )->state & ControlMask )
+            {
+                // Control key pressed
+                button |= KEY_CTRL;
+            }
 
             switch( ( (XButtonEvent *)p2 )->button )
             {
                 case 1:
                     // Left button
+                    button |= MOUSE_LEFT;
                     time = OSAPI_GetTime();
                     OSAPI_GetMousePos( posX, posY );
                     if( time - ClickedTime < DblClickDelay && 
@@ -269,7 +279,7 @@ bool X11Window::ProcessOSEvent( Event *evt )
                         // Double-click
                         ClickedTime = 0; 
                         MouseDblClick( (int)( (XButtonEvent *)p2 )->x,
-                                       (int)( (XButtonEvent *)p2 )->y, 1 );
+                                       (int)( (XButtonEvent *)p2 )->y, button );
                     }
                     else
                     {
@@ -278,15 +288,16 @@ bool X11Window::ProcessOSEvent( Event *evt )
                         ClickedY = posY;
                         LButtonDown = true;
                         MouseDown( (int)( (XButtonEvent *)p2 )->x,
-                                   (int)( (XButtonEvent *)p2 )->y, 1 );
+                                   (int)( (XButtonEvent *)p2 )->y, button );
                     }
                     break;
 
                 case 3:
                     // Right button
+                    button |= MOUSE_RIGHT;
                     RButtonDown = true;
                     MouseDown( (int)( (XButtonEvent *)p2 )->x,
-                               (int)( (XButtonEvent *)p2 )->y, 2 );
+                               (int)( (XButtonEvent *)p2 )->y, button );
                     break;
 
                 default:
@@ -295,20 +306,28 @@ bool X11Window::ProcessOSEvent( Event *evt )
             return true;
 
         case ButtonRelease:
+            button = 0;
+            if( ((XButtonEvent *)p2 )->state & ControlMask )
+            {
+                // Control key pressed
+                button |= KEY_CTRL;
+            }
             switch( ( (XButtonEvent *)p2 )->button )
             {
                 case 1:
                     // Left button
+                    button |= MOUSE_LEFT;
                     LButtonDown = false;
                     MouseUp( (int)( (XButtonEvent *)p2 )->x,
-                             (int)( (XButtonEvent *)p2 )->y, 1 );
+                             (int)( (XButtonEvent *)p2 )->y, button );
                     break;
 
                 case 3:
+                    button |= MOUSE_RIGHT;
                     // Right button
                     RButtonDown = false;
                     MouseUp( (int)( (XButtonEvent *)p2 )->x,
-                             (int)( (XButtonEvent *)p2 )->y, 2 );
+                             (int)( (XButtonEvent *)p2 )->y, button );
                     break; 
 
                 case 4:
@@ -335,10 +354,9 @@ bool X11Window::ProcessOSEvent( Event *evt )
             return true;
 
         case ClientMessage:
-            {
             XLOCK;
-            string type = XGetAtomName( display, ( (XClientMessageEvent*)
-                                                    p2 )->message_type );
+            type = XGetAtomName( display, ( (XClientMessageEvent*)
+                                             p2 )->message_type );
             XUNLOCK;
             if( type == "XdndEnter" )
             {
@@ -359,7 +377,6 @@ bool X11Window::ProcessOSEvent( Event *evt )
             {
                 DropObject->DndDrop( ((XClientMessageEvent*)p2)->data.l );
                 return true;
-            }
             }
             return false;
             

@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.27 2003/06/09 12:33:16 asmax Exp $
+ * $Id: window.cpp,v 1.28 2003/06/09 14:04:20 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -425,7 +425,7 @@ void SkinWindow::MouseUp( int x, int y, int button )
     }
 
 #ifndef BASIC_SKINS
-    if( i < 0  && button == 2 )
+    if( i < 0  && button == MOUSE_RIGHT )
     {
         p_intf->p_sys->p_dialogs->ShowPopup();
     }

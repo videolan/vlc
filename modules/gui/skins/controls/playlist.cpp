@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.13 2003/06/09 12:33:16 asmax Exp $
+ * $Id: playlist.cpp,v 1.14 2003/06/09 14:04:20 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -433,8 +433,19 @@ bool ControlPlayList::MouseDown( int x, int y, int button )
         {
             for( j = 0; j < NumOfItems; j++ )
             {
-                if( j == i + StartIndex )
-                    Select[j] = !Select[j];
+                if( button & KEY_CTRL )
+                {
+                    // CTRL is pressed
+                    if( j == i + StartIndex )
+                    {
+                        Select[j] = !Select[j];
+                    }
+                }
+                else
+                { 
+                    // CTRL is not pressed
+                    Select[j] = ( j == i + StartIndex );
+                }
             }
             RefreshAll();
             return true;
