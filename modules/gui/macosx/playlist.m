@@ -112,6 +112,8 @@
                                           FIND_ANYWHERE );
     i_current_view = VIEW_CATEGORY;
     playlist_ViewUpdate( p_playlist, i_current_view );
+    vlc_object_release( p_playlist );
+
     [o_outline_view setTarget: self];
     [o_outline_view setDelegate: self];
     [o_outline_view setDataSource: self];
