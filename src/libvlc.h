@@ -626,6 +626,11 @@ static char *ppsz_align_descriptions[] =
     "This option allows you to specify an additional path for VLC to look " \
     "for its modules.")
 
+#define VLM_CONF_TEXT N_("VLM configuration file")
+#define VLM_CONF_LONGTEXT N_( \
+    "This option allows you to specify a VLM configuration file that will " \
+    "be read when VLM is launched.")
+
 #define PLUGINS_CACHE_TEXT N_("Use a plugins cache")
 #define PLUGINS_CACHE_LONGTEXT N_( \
     "This option allows you to use a plugins cache which will greatly " \
@@ -1048,6 +1053,8 @@ vlc_module_begin();
               PLUGINS_CACHE_LONGTEXT, VLC_TRUE );
     add_directory( "plugin-path", NULL, NULL, PLUGIN_PATH_TEXT,
                    PLUGIN_PATH_LONGTEXT, VLC_TRUE );
+    add_string( "vlm-conf", NULL, NULL, VLM_CONF_TEXT,
+                    VLM_CONF_LONGTEXT, VLC_TRUE );
 
 #if !defined(WIN32)
     add_bool( "daemon", 0, NULL, DAEMON_TEXT, DAEMON_LONGTEXT, VLC_TRUE );

@@ -116,7 +116,29 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
         return NULL;
     }
 
-    return p_vlm;
+    /* try loading the vlm conf file given by --vlm-conf */
+    char *psz_vlmconf =  config_GetPsz( p_vlm, "vlm-conf" );
+
+    if( psz_vlmconf && *psz_vlmconf )
+    {
+        vlm_message_t *p_message = NULL;
+        char *psz_buffer = NULL;
+
+        msg_Dbg( p_this, "loading vlm conf ..." );
+        asprintf(&psz_buffer, "load %s", psz_vlmconf );
+        if( psz_buffer )
+        {
+            msg_Dbg( p_this, psz_buffer);
+            if( vlm_ExecuteCommand( p_vlm, psz_buffer, &p_message ) ){
+                msg_Warn( p_this, "error while loading the vlm conf file" );
+            }
+            free(p_message);
+            free(psz_buffer);
+        }
+   }
+   free(psz_vlmconf);
+
+   return p_vlm;
 }
 
 /*****************************************************************************
