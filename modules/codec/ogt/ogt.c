@@ -2,7 +2,7 @@
  * ogt.c : Overlay Graphics Text (SVCD subtitles) decoder thread
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ogt.c,v 1.1 2003/12/07 22:14:26 rocky Exp $
+ * $Id: ogt.c,v 1.2 2003/12/08 06:01:11 rocky Exp $
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -50,7 +50,7 @@ static int  PacketizerOpen( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("SVCD subtitle decoder") );
+    set_description( _("Philips OGT (SVCD subtitle) decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( DecoderOpen, Close );
 
@@ -59,7 +59,7 @@ vlc_module_begin();
                   N_(DEBUG_LONGTEXT), VLC_TRUE );
 
     add_submodule();
-    set_description( _("SVCD subtitle packetizer") );
+    set_description( _("Phlips OGT (SVCD subtitle) packetizer") );
     set_capability( "packetizer", 50 );
     set_callbacks( PacketizerOpen, Close );
 vlc_module_end();
@@ -238,6 +238,112 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     return NULL;
 }
 
+/*
+ The following information is mostly extracted from the SubMux package of
+ unknown author with additional experimentation.
+ 
+ The format is roughly as follows (everything is big-endian):
+ 
+   size     description
+   -------------------------------------------
+   byte     subtitle channel (0..7) in bits 0-3 
+   byte     subtitle packet number of this subtitle image 0-N,
+            if the subtitle packet is complete, the top bit of the byte is 1.
+   u_int16  subtitle image number
+   u_int16  length in bytes of the rest
+   byte     option flags, unknown meaning except bit 3 (0x08) indicates
+ 	    presence of the duration field
+   byte     unknown 
+   u_int32  duration in 1/90000ths of a second (optional), start time
+ 	    is as indicated by the PTS in the PES header
+   u_int32  xpos
+   u_int32  ypos
+   u_int32  width (must be even)
+   u_int32  height (must be even)
+   byte[16] palette, 4 palette entries, each contains values for
+ 	    Y, U, V and transparency, 0 standing for transparent
+   byte     command,
+ 	    cmd>>6==1 indicates shift
+ 	    (cmd>>4)&3 is direction from, (0=top,1=left,2=right,3=bottom)
+   u_int32  shift duration in 1/90000ths of a second
+   u_int16  offset of odd field (subtitle image is presented interlaced)
+   byte[]   bit image
+ 
+  The image is encoded using two bits per pixel that select a palette
+  entry except that value 00 starts a limited rle.  When 00 is seen,
+  the next two bits (00-11) encode the number of pixels (1-4, add one to
+  the indicated value) to fill with the color in palette entry 0).
+  The encoding of each line is padded to a whole number of bytes.  The
+  first field is padded to an even byte lenght and the complete subtitle
+  is padded to a 4-byte multiple that always include one zero byte at
+  the end.
+*/
+
+/* FIXME: do we really need p_buffer and p? 
+   Can't all of thes _offset's and _lengths's get removed? 
+*/
+static void
+ParseHeader( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block  )
+{
+  decoder_sys_t *p_sys = p_dec->p_sys;
+  u_int8_t *p = p_buffer;
+  int i;
+  
+  p_sys->i_pts    = p_block->i_pts;
+  
+  p_sys->i_spu_size = GETINT16(p);
+  p_sys->i_options  = *p++;
+  p_sys->i_options2 = *p++;
+  
+  if ( p_sys->i_options & 0x08 ) {
+    p_sys->i_duration = GETINT32(p);
+  } else {
+    /* 0 means display until next subtitle comes in. */
+    p_sys->i_duration = 0;
+  }
+  p_sys->i_x_start= GETINT16(p);
+  p_sys->i_y_start= GETINT16(p);
+  p_sys->i_width  = GETINT16(p);
+  p_sys->i_height = GETINT16(p);
+  
+  for (i=0; i<4; i++) {
+    p_sys->pi_palette[i].y = *p++;
+    p_sys->pi_palette[i].u = *p++;
+    p_sys->pi_palette[i].v = *p++;
+    /* We have just 4-bit resolution for alpha, but the value for SVCD
+     * has 8 bits so we scale down the values to the acceptable range */
+	p_sys->pi_palette[i].t = (*p++) >> 4;
+  }
+  p_sys->i_cmd = *p++;
+      /* We do not really know this, FIXME */
+  if ( p_sys->i_cmd ) {
+    p_sys->i_cmd_arg = GETINT32(p);
+  }
+  /* Image starts just after skipping next short */
+  p_sys->comp_image_offset = p + 2 - p_buffer;
+  /* There begins the first field, so no correction needed */
+  p_sys->first_field_offset = 0;
+  /* Actually, this is measured against a different origin, so we have to
+     adjust it */
+  p_sys->second_field_offset = GETINT16(p);
+  p_sys->comp_image_offset = p - p_buffer;
+  p_sys->comp_image_length =
+    p_sys->subtitle_data_length - p_sys->comp_image_offset;
+  p_sys->metadata_length   = p_sys->comp_image_offset;
+  
+  /*spuogt_init_subtitle_data(p_sys);*/
+  
+  p_sys->subtitle_data_pos = 0;
+  
+  dbg_print( (DECODE_DBG_PACKET), 
+	     "x-start: %d, y-start: %d, width: %d, height %d, "
+	     "spu size: %d, duration: %u",
+	     p_sys->i_x_start, p_sys->i_y_start, 
+	     p_sys->i_width, p_sys->i_height, 
+	     p_sys->i_spu_size, p_sys->i_duration );
+}
+
+
 #define SPU_HEADER_LEN 5 
 
 /*****************************************************************************
@@ -252,43 +358,15 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
  If everything is complete, we will return a block. Otherwise return
  NULL.
 
- The following information is mostly extracted from the SubMux package of
- unknown author with additional experimentation.
- 
- The format is roughly as follows (everything is big-endian):
- 
-      byte subtitle channel 0-3
- 	byte subtitle packet number in this subtitle image 0-N,
- 	last is XOR'ed 0x80
-        u_int16 subtitle image number
-        u_int16 length in bytes of the rest
-        byte option flags, unknown meaning except bit 3 (0x08) indicates
- 	     presence of the duration field
-        byte unknown meaning
- 	u_int32 duration in 1/90000ths of a second (optional), start time
- 		is as indicated by the PTS in the PES header
- 	u_int32 xpos
- 	u_int32 ypos
- 	u_int32 width (must be even)
- 	u_int32 height (must be even)
- 	byte[16] palette, 4 palette entries, each contains values for
- 		Y, U, V and transparency, 0 standing for transparent
- 	byte command,
- 		cmd>>6==1 indicates shift
- 		(cmd>>4)&3 is direction from, (0=top,1=left,2=right,3=bottom)
- 	u_int32 shift duration in 1/90000ths of a second
- 	u_int16 offset of odd field (subtitle image is presented interlaced)
- 	byte[] image
- 
-  The image is encoded using two bits per pixel that select a palette
-  entry except that value 00 starts a limited rle.  When 00 is seen,
-  the next two bits (00-11) encode the number of pixels (1-4, add one to
-  the indicated value) to fill with the color in palette entry 0).
-  The encoding of each line is padded to a whole number of bytes.  The
-  first field is padded to an even byte lenght and the complete subtitle
-  is padded to a 4-byte multiple that always include one zero byte at
-  the end.
 
+ The format of the beginning of the subtitle packet that is used here.
+
+   size    description
+   -------------------------------------------
+   byte    subtitle channel (0..7) in bits 0-3 
+   byte    subtitle packet number of this subtitle image 0-N,
+           if the subtitle packet is complete, the top bit of the byte is 1.
+   u_int16 subtitle image number
 
  *****************************************************************************/
 static block_t *
@@ -356,64 +434,9 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 
     if ( p_sys->i_packet == 0 ) {
       /* First packet in the subtitle block */
-      /* FIXME: Put all of this into a subroutine. */
-      u_int8_t *p = p_buffer;
-      p = p_buffer;
-      int i;
-
-      p_sys->i_pts    = p_block->i_pts;
-      
-      p_sys->i_spu_size = GETINT16(p);
-      p_sys->i_options  = *p++;
-      p_sys->i_options2 = *p++;
-
-      if ( p_sys->i_options & 0x08 ) {
-	p_sys->duration = GETINT32(p);
-      } else {
-	p_sys->duration = 0;
-      }
-      p_sys->i_x_start= GETINT16(p);
-      p_sys->i_y_start= GETINT16(p);
-      p_sys->i_width  = GETINT16(p);
-      p_sys->i_height = GETINT16(p);
-      
-      for (i=0; i<4; i++) {
-	p_sys->pi_palette[i].y = *p++;
-	p_sys->pi_palette[i].u = *p++;
-	p_sys->pi_palette[i].v = *p++;
-	/* We have just 4-bit resolution for alpha, but the value for SVCD
-	 * has 8 bits so we scale down the values to the acceptable range */
-	p_sys->pi_palette[i].t = (*p++) >> 4;
-      }
-      p_sys->i_cmd = *p++;
-      /* We do not really know this, FIXME */
-      if ( p_sys->i_cmd ) {
-	p_sys->i_cmd_arg = GETINT32(p);
-      }
-      /* Image starts just after skipping next short */
-      p_sys->comp_image_offset = p + 2 - p_buffer;
-      /* There begins the first field, so no correction needed */
-      p_sys->first_field_offset = 0;
-      /* Actually, this is measured against a different origin, so we have to
-	 adjust it */
-      p_sys->second_field_offset = GETINT16(p);
-      p_sys->comp_image_offset = p - p_buffer;
-      p_sys->comp_image_length =
-	p_sys->subtitle_data_length - p_sys->comp_image_offset;
-      p_sys->metadata_length   = p_sys->comp_image_offset;
-      
-      /*spuogt_init_subtitle_data(p_sys);*/
-      
-      p_sys->subtitle_data_pos = 0;
-
-      dbg_print( (DECODE_DBG_PACKET), 
-		 "x-start: %d, y-start: %d, width: %d, height %d, "
-		 "spu size: %d",
-		 p_sys->i_x_start, p_sys->i_y_start, 
-		 p_sys->i_width, p_sys->i_height, 
-		 p_sys->i_spu_size );
+      ParseHeader( p_dec, p_buffer, p_block );
     }
-
+    
     block_ChainAppend( &p_sys->p_block, p_block );
     p_sys->i_spu += p_block->i_buffer - SPU_HEADER_LEN;
 

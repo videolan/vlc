@@ -2,7 +2,7 @@
  * ogt.h : Overlay Graphics Text (SVCD subtitles) decoder thread interface
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ogt.h,v 1.1 2003/12/07 22:14:26 rocky Exp $
+ * $Id: ogt.h,v 1.2 2003/12/08 06:01:11 rocky Exp $
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -62,9 +62,6 @@ typedef struct ogt_yuvt_val_s {
 
 struct decoder_sys_t
 {
-#ifndef FIXED
-  int i_rle_size; /*REMOVE WHEN WE'VE GONE OVER ALL CODE*/
-#endif
   int i_debug;            /* debugging mask */
 
   int b_packetizer;
@@ -98,15 +95,14 @@ struct decoder_sys_t
   int subtitle_data_length;	/* goal for subtitle_data_pos while gathering,
 				   length of used subtitle_data later */
 
-  u_int32_t duration;		/* how long to display the image, 0 stands
-				   for "until next sub" */
+  u_int32_t i_duration;		/* how long to display the image, 0 stands
+				   for "until next subtitle" */
 
   u_int16_t i_x_start, i_y_start; /* position of top leftmost pixel of
 				     image when displayed */
   u_int16_t i_width, i_height;	/* dimensions in pixels of image */
 
   ogt_yuvt_val_t pi_palette[4];
-  ogt_yuvt_val_t pi_palette_highlight[4];
 
   u_int8_t i_options;
   u_int8_t i_options2;
@@ -123,8 +119,12 @@ struct subpicture_sys_t
 
     /* Color information */
     vlc_bool_t b_palette;
+    ogt_yuvt_val_t pi_palette[4];
+
+#ifndef FIXED
     uint8_t    pi_alpha[4];
     uint8_t    pi_yuv[4][3];
+#endif
 
     /* Link to our input */
     vlc_object_t * p_input;
