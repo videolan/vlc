@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.14 2003/04/17 17:45:38 asmax Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.15 2003/04/21 14:26:59 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -47,73 +47,22 @@
 GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
     : Bitmap( p_intf, FileName, AColor )
 {
-/*    HBITMAP HBitmap;
-    HBITMAP HBuf;
-    BITMAP  Bmp;
-    HDC     bufDC;
-
-    // Create image from file if it exists
-    HBitmap = (HBITMAP) LoadImage( NULL, FileName.c_str(), IMAGE_BITMAP,
-                                   0, 0, LR_LOADFROMFILE );
-    if( HBitmap == NULL )
-    {
-        if( FileName != "" )
-            msg_Warn( p_intf, "Couldn't load bitmap: %s", FileName.c_str() );
-
-        HBitmap = CreateBitmap( 0, 0, 1, 32, NULL );
-    }
-
-    // Create device context
-    bmpDC   = CreateCompatibleDC( NULL );
-    SelectObject( bmpDC, HBitmap );
-
-    // Get size of image
-    GetObject( HBitmap, sizeof( Bmp ), &Bmp );
-    Width  = Bmp.bmWidth;
-    Height = Bmp.bmHeight;
-
-    // If alpha color is not 0, then change 0 colors to non black color to avoid
-    // window transparency
-    if( (int)AlphaColor != OSAPI_GetNonTransparentColor( 0 ) )
-    {
-        bufDC = CreateCompatibleDC( bmpDC );
-        HBuf = CreateCompatibleBitmap( bmpDC, Width, Height );
-        SelectObject( bufDC, HBuf );
-
-        LPRECT r = new RECT;
-        HBRUSH Brush = CreateSolidBrush( OSAPI_GetNonTransparentColor( 0 ) );
-        r->left   = 0;
-        r->top    = 0;
-        r->right  = Width;
-        r->bottom = Height;
-        FillRect( bufDC, r, Brush );
-        DeleteObject( Brush );
-        delete r;
-
-        TransparentBlt( bufDC, 0, 0, Width, Height, bmpDC, 0, 0, Width, Height, 0 );
-        BitBlt( bmpDC, 0, 0, Width, Height, bufDC, 0, 0, SRCCOPY );
-        DeleteDC( bufDC );
-        DeleteObject( HBuf );
-    }
-
-    // Delete objects
-    DeleteObject( HBitmap );*/
-
     // Load the bitmap image
     Bmp = gdk_pixbuf_new_from_file( FileName.c_str(), NULL );
     if( Bmp == NULL )
     {
         if( FileName != "" )
             msg_Warn( p_intf, "Couldn't load bitmap: %s", FileName.c_str() );
-
-     //   Bmp = gdk_pixbuf_new( GDK_COLORSPACE_RGB, TRUE, 8, 1, 1);
-        Bmp = NULL;
+        Width = 0;
+        Height = 0;
     }
-
-    Bmp = gdk_pixbuf_add_alpha( Bmp, TRUE, AColor & 0xff, (AColor>>8) & 0xff, 
-            (AColor>>16) & 0xff );
-    Width = gdk_pixbuf_get_width( Bmp );
-    Height = gdk_pixbuf_get_height( Bmp );
+    else
+    {
+        Bmp = gdk_pixbuf_add_alpha( Bmp, TRUE, AColor & 0xff, (AColor>>8) & 0xff, 
+                (AColor>>16) & 0xff );
+        Width = gdk_pixbuf_get_width( Bmp );
+        Height = gdk_pixbuf_get_height( Bmp );
+    }
 }
 //---------------------------------------------------------------------------
 GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, Graphics *from, int x, int y,
@@ -154,17 +103,21 @@ GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, Bitmap *c )
 //---------------------------------------------------------------------------
 GTK2Bitmap::~GTK2Bitmap()
 {
-/*    DeleteDC( bmpDC );*/
+    if( Bmp )
+        g_object_unref( G_OBJECT( Bmp) );
 }
 //---------------------------------------------------------------------------
 void GTK2Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
                               Graphics *dest )
 {
-    GdkDrawable *destImg = ( (GTK2Graphics *)dest )->GetImage();
-    GdkGC *destGC = ( (GTK2Graphics *)dest )->GetGC();
+    if( Bmp )
+    {
+        GdkDrawable *destImg = ( (GTK2Graphics *)dest )->GetImage();
+        GdkGC *destGC = ( (GTK2Graphics *)dest )->GetGC();
 
-    gdk_pixbuf_render_to_drawable( Bmp, destImg, destGC, x, y, xRef, yRef, 
-            w, h, GDK_RGB_DITHER_NORMAL, 0, 0);
+        gdk_pixbuf_render_to_drawable( Bmp, destImg, destGC, x, y, xRef, yRef, 
+                w, h, GDK_RGB_DITHER_NORMAL, 0, 0);
+    }
 }
 //---------------------------------------------------------------------------
 bool GTK2Bitmap::Hit( int x, int y)
@@ -179,7 +132,7 @@ bool GTK2Bitmap::Hit( int x, int y)
 //---------------------------------------------------------------------------
 int GTK2Bitmap::GetBmpPixel( int x, int y )
 {
-    if( x < 0 || x >= Width || y < 0 || y >= Height )
+    if( !Bmp || x < 0 || x >= Width || y < 0 || y >= Height )
         return -1;
 
     guchar *pixels;

@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.18 2003/04/21 03:37:40 asmax Exp $
+ * $Id: gtk2_run.cpp,v 1.19 2003/04/21 14:26:59 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -150,7 +150,6 @@ void GTK2Proc( GdkEvent *event, gpointer data )
     {
         if( !proc->EventProc( evt ) )
         {
-            fprintf( stderr, "Quit\n" );
             wxExit();
             return;      // Exit VLC !
         }
@@ -258,11 +257,6 @@ void OSRun( intf_thread_t *p_intf )
 
     wxTheApp = new Instance( p_intf, callbackobj );
 
-/*    vlc_mutex_lock( &p_intf->p_sys->init_lock );
-    vlc_cond_wait( &p_intf->p_sys->init_cond, &p_intf->p_sys->init_lock );
-    vlc_mutex_unlock( &p_intf->p_sys->init_lock );*/
- 
-    
     wxEntry( 1, p_args );
     
     delete callbackobj;

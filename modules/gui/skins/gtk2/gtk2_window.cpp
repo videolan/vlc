@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.24 2003/04/20 15:00:19 karibu Exp $
+ * $Id: gtk2_window.cpp,v 1.25 2003/04/21 14:26:59 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -47,17 +47,6 @@
 #include "../src/skin_common.h"
 #include "../src/theme.h"
 
-
-//---------------------------------------------------------------------------
-// Fading API
-//---------------------------------------------------------------------------
-/*#define LWA_COLORKEY  0x00000001
-#define LWA_ALPHA     0x00000002
-typedef BOOL (WINAPI *SLWA)(HWND, COLORREF, BYTE, DWORD);
-HMODULE hModule = LoadLibrary( "user32.dll" );
-SLWA SetLayeredWindowAttributes =
-    (SLWA)GetProcAddress( hModule, "SetLayeredWindowAttributes" );
-*/
 
 //---------------------------------------------------------------------------
 // Skinable Window
@@ -169,7 +158,7 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
         case GDK_EXPOSE:
             RefreshFromImage( 0, 0, Width, Height );
             return true;
-
+ 
         case GDK_MOTION_NOTIFY:
             if( LButtonDown )
                 MouseMove( (int)( (GdkEventButton *)p2 )->x,
@@ -185,6 +174,14 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
 
 
         case GDK_BUTTON_PRESS:
+            // Raise all the windows
+            for( list<Window *>::const_iterator win = 
+                    p_intf->p_sys->p_theme->WindowList.begin();
+                    win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+            {
+                gdk_window_raise( ( (GTK2Window *)(*win) )->GetHandle() );
+            }
+          
             switch( ( (GdkEventButton *)p2 )->button )
             {
                 case 1:

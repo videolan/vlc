@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.21 2003/04/21 02:12:06 ipkiss Exp $
+ * $Id: gtk2_theme.cpp,v 1.22 2003/04/21 14:26:59 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -53,40 +53,8 @@ void SkinManage( intf_thread_t *p_intf );
 //---------------------------------------------------------------------------
 GTK2Theme::GTK2Theme( intf_thread_t *_p_intf ) : Theme( _p_intf )
 {
-/*
-    // Get instance handle
-    hinst = GetModuleHandle( NULL );
-
-    // Create window class
-    WNDCLASS SkinWindow;
-
-    SkinWindow.style = CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS;
-    SkinWindow.lpfnWndProc = (WNDPROC) GTK2Proc;
-    SkinWindow.lpszClassName = "SkinWindow";
-    SkinWindow.lpszMenuName = NULL;
-    SkinWindow.cbClsExtra = 0;
-    SkinWindow.cbWndExtra = 0;
-    SkinWindow.hbrBackground = HBRUSH (COLOR_WINDOW);
-    SkinWindow.hCursor = LoadCursor( NULL , IDC_ARROW );
-    SkinWindow.hIcon = LoadIcon( hinst, "VLC_ICON" );
-    SkinWindow.hInstance = hinst;
-
-    if( !RegisterClass( &SkinWindow ) )
-    {
-        WNDCLASS wndclass;
-
-        // Check why it failed. If it's because the class already exists
-        // then fine, otherwise return with an error.
-        if( !GetClassInfo( hinst, "SkinWindow", &wndclass ) )
-        {
-            msg_Err( p_intf, "Cannot register window class" );
-            return;
-        }
-    }
-*/
     //Initialize value
     ParentWindow = NULL;
-
 }
 
 //---------------------------------------------------------------------------
@@ -108,73 +76,17 @@ GTK2Theme::~GTK2Theme()
     {
         Shell_NotifyIcon( NIM_DELETE, &TrayIcon );
     }
-
+*/
     // Destroy parent window
     if( ParentWindow )
     {
-        DestroyWindow( ParentWindow );
-    }*/
+        gdk_window_destroy( ParentWindow );
+    }
 }
 //---------------------------------------------------------------------------
 void GTK2Theme::OnLoadTheme()
-{/*
-    // Create window class
-    WNDCLASS ParentClass;
-    ParentClass.style = CS_VREDRAW|CS_HREDRAW|CS_DBLCLKS;
-    ParentClass.lpfnWndProc = (WNDPROC) GTK2Proc;
-    ParentClass.lpszClassName = "ParentWindow";
-    ParentClass.lpszMenuName = NULL;
-    ParentClass.cbClsExtra = 0;
-    ParentClass.cbWndExtra = 0;
-    ParentClass.hbrBackground = HBRUSH (COLOR_WINDOW);
-    ParentClass.hCursor = LoadCursor( NULL , IDC_ARROW );
-    ParentClass.hIcon = LoadIcon( hinst, "VLC_ICON" );
-    ParentClass.hInstance = hinst;
-
-    // register class and check it
-    if( !RegisterClass( &ParentClass ) )
-    {
-        WNDCLASS wndclass;
-
-        // Check why it failed. If it's because the class already exists
-        // then fine, otherwise return with an error.
-        if( !GetClassInfo( hinst, "ParentWindow", &wndclass ) )
-        {
-            msg_Err( p_intf, "Cannot register window class" );
-            return;
-        }
-    }
-
-    // Create Window
-    ParentWindow = CreateWindowEx( WS_EX_LAYERED|WS_EX_TOOLWINDOW,
-        "ParentWindow", "VLC Media Player",
-        WS_SYSMENU,
-        0, 0, 0, 0, 0, 0, hinst, NULL );
-
-    // Store with it a pointer to the interface thread
-    SetWindowLongPtr( ParentWindow, GWLP_USERDATA, (LONG_PTR)p_intf );
-    ShowWindow( ParentWindow, SW_SHOW );
-
-    // System tray icon
-    TrayIcon.cbSize = sizeof( PNOTIFYICONDATA );
-    TrayIcon.hWnd = ParentWindow;
-    TrayIcon.uID = 42;
-    TrayIcon.uFlags = NIF_ICON|NIF_TIP|NIF_MESSAGE;
-    TrayIcon.uCallbackMessage = WM_RBUTTONDOWN;
-    TrayIcon.hIcon = LoadIcon( hinst, "VLC_ICON" );
-    strcpy( TrayIcon.szTip, "VLC Media Player" );
-
-    // Remove default entries from system menu popup
-    SysMenu = GetSystemMenu( ParentWindow, false );
-    RemoveMenu( SysMenu, SC_RESTORE,  MF_BYCOMMAND );
-    RemoveMenu( SysMenu, SC_MOVE,     MF_BYCOMMAND );
-    RemoveMenu( SysMenu, SC_SIZE,     MF_BYCOMMAND );
-    RemoveMenu( SysMenu, SC_MINIMIZE, MF_BYCOMMAND );
-    RemoveMenu( SysMenu, SC_MAXIMIZE, MF_BYCOMMAND );
-    RemoveMenu( SysMenu, SC_CLOSE,    MF_BYCOMMAND );
-    RemoveMenu( SysMenu, 0,           MF_BYPOSITION );
-
-    // The create menu
+{
+/*    // The create menu
     CreateSystemMenu();
 */
     // Set the parent window attributes
@@ -193,8 +105,11 @@ void GTK2Theme::OnLoadTheme()
     
     // Create the parent window
     ParentWindow = gdk_window_new( NULL, &attr, mask);
-
-//    gdk_window_show( ParentWindow );
+    if( !ParentWindow )
+    {
+        msg_Err( p_intf, "gdk_window_new failed" );
+        return;
+    }
 }
 //---------------------------------------------------------------------------
 void GTK2Theme::AddSystemMenu( string name, Event *event )
@@ -217,24 +132,7 @@ void GTK2Theme::ChangeClientWindowName( string name )
 //---------------------------------------------------------------------------
 void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
     int fadetime, int alpha, int movealpha, bool dragdrop )
-{/*
-    HWND hwnd;
-
-    hwnd = CreateWindowEx( WS_EX_LAYERED|WS_EX_TOOLWINDOW,
-        "SkinWindow", name.c_str(), WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
-        0, 0, ParentWindow, 0, hinst, NULL );
-
-    if( !hwnd )
-    {
-        msg_Err( p_intf, "CreateWindow failed" );
-        return;
-    }
-
-    SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)p_intf );
-
-    WindowList.push_back( (Window *)new OSWindow( p_intf, hwnd, x, y, visible,
-        fadetime, alpha, movealpha, dragdrop ) ) ;*/
-
+{
     GdkWindowAttr attr;
     attr.title = (gchar *)name.c_str();
     attr.event_mask = GDK_ALL_EVENTS_MASK;
@@ -250,7 +148,7 @@ void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
     GdkWindow *gwnd = gdk_window_new( NULL, &attr, mask );
     if( !gwnd )
     {
-        msg_Err( p_intf, "CreateWindow failed" );
+        msg_Err( p_intf, "gdk_window_new failed" );
         return;
     }
 
