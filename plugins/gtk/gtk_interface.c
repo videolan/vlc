@@ -1772,7 +1772,7 @@ create_intf_network (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_server", network_server,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (network_server);
-  gtk_entry_set_text (GTK_ENTRY (network_server), _("vlsppc-02"));
+  gtk_entry_set_text (GTK_ENTRY (network_server), _("vls"));
 
   frame6 = gtk_frame_new (_("Channels"));
   gtk_widget_ref (frame6);
@@ -1808,7 +1808,7 @@ create_intf_network (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel", network_channel,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (network_channel);
-  gtk_entry_set_text (GTK_ENTRY (network_channel), _("138.195.143.220"));
+  gtk_entry_set_text (GTK_ENTRY (network_channel), _("138.195.143.120"));
 
   channel_port = gtk_label_new (_("port:"));
   gtk_widget_ref (channel_port);

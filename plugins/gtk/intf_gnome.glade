@@ -2125,7 +2125,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	      <editable>True</editable>
 	      <text_visible>True</text_visible>
 	      <text_max_length>0</text_max_length>
-	      <text>vlsppc-02</text>
+	      <text>vls</text>
 	    </widget>
 	  </widget>
 	</widget>
@@ -2189,7 +2189,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	    <editable>True</editable>
 	    <text_visible>True</text_visible>
 	    <text_max_length>0</text_max_length>
-	    <text>138.195.143.220</text>
+	    <text>138.195.143.120</text>
 	  </widget>
 	</widget>
 

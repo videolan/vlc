@@ -171,7 +171,7 @@
 
 /* Default remote server */
 #define INPUT_SERVER_VAR                "vlc_server"
-#define INPUT_SERVER_DEFAULT            "138.195.143.224"
+#define INPUT_SERVER_DEFAULT            "138.195.143.220"
 
 /* Default input port */
 #define INPUT_PORT_VAR                  "vlc_server_port"
@@ -199,7 +199,7 @@
 
 /* Default server and port */
 #define INPUT_CHANNEL_SERVER_VAR           "vlc_channel_server"
-#define INPUT_CHANNEL_SERVER_DEFAULT       "138.195.143.220"
+#define INPUT_CHANNEL_SERVER_DEFAULT       "138.195.143.120"
 #define INPUT_CHANNEL_PORT_VAR             "vlc_channel_port"
 #define INPUT_CHANNEL_PORT_DEFAULT         6010
 
