@@ -447,7 +447,6 @@ faad2-$(FAAD2_VERSION).tar.bz2:
 
 faad2: faad2-$(FAAD2_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p 0 < Patches/faad2.patch
 
 .faad: faad2
 	(cd $<; ./configure --prefix=$(PREFIX) && make -C libfaad && make -C libfaad install)
