@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.285 2004/01/31 05:25:36 fenrir Exp $
+ * $Id: input.c,v 1.286 2004/02/02 12:58:29 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -879,8 +879,9 @@ static int InitThread( input_thread_t * p_input )
     var_Get( p_input, "sub-file", &val );
     if( val.psz_string && *val.psz_string )
     {
-        msg_Dbg( p_input, "force subtitle: %s", val.psz_string );
         subtitle_demux_t *p_sub;
+
+        msg_Dbg( p_input, "force subtitle: %s", val.psz_string );
         if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string),
                                     i_microsecondperframe ) ) )
         {
