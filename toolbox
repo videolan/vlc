@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.55 2004/01/21 14:44:56 sam Exp $
+##  $Id: toolbox,v 1.56 2004/02/10 14:33:17 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -628,11 +628,8 @@ then
   #                  ttf-freefont with ttf-thryomanes
   #                  dvb-dev (>= 1.0.1-6) with dvb-dev
   #          remove libwxgtk2.4-dev
-  #                 libflac-dev
   #                 libidl0 (workaround for mozilla-dev's bad deps)
   #                 libglib2.0-0 (workaround for mozilla-dev's bad deps)
-  #                 libmatroska-dev
-  #                 libspeex-dev
   #                 gcc-3.2 (workaround for an ICE in gcc-3.3)
   #          change Section: gnome with Section: graphics
   #                 Section: kde with Section: kde
@@ -650,11 +647,8 @@ then
       -e 's/, dvb-dev[^,]*/, dvb-dev/' \
       -e 's/, libwx[^,]*//' \
       -e '/Package: wxvlc/,/^ *$/d' \
-      -e 's/, libflac-dev[^,]*//' \
       -e 's/, libidl0[^,]*//' \
       -e 's/, libglib2.0-0[^,]*//' \
-      -e 's/, libmatroska-dev[^,]*//' \
-      -e 's/, libspeex-dev[^,]*//' \
       -e 's/, gcc-3.2[^,]*//' \
       -e 's/Section: gnome/Section: graphics/' \
       -e 's/Section: kde/Section: graphics/' \
@@ -663,14 +657,9 @@ then
   mv "$1/debian/control.woody" "$1/debian/control"
 
   # rules: remove wxwindows and skins stuff
-  #        remove flac support
-  #        remove matroska support
   sed -e '/# Package: wxvlc/,/^ *$/d' \
       -e 's,--enable-wxwindows,--disable-wxwindows,' \
       -e 's,--enable-skins,--disable-skins,' \
-      -e 's,--enable-flac,--disable-flac,' \
-      -e 's,--enable-mkv,--disable-mkv,' \
-      -e 's,--enable-speex,--disable-speex,' \
       < "$1/debian/rules" > "$1/debian/rules.woody"
   mv "$1/debian/rules.woody" "$1/debian/rules"
   chmod 0755 "$1/debian/rules"

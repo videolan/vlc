@@ -523,3 +523,8 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+-!- kixx_ changed the topic of #videolan to: VLC 0.7.0 :
+          http://www.videolan.org/ | Fenrir ta cotiz !
+
+  -- #videolan
+%

@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 # debian/rules for the VideoLAN Client - uses debhelper.
-# $Id: rules,v 1.110 2004/01/20 17:45:19 sam Exp $
+# $Id: rules,v 1.111 2004/02/10 14:33:17 sam Exp $
 # based on Joey Hess's one.
 
 # Uncomment this to turn on verbose mode.
@@ -47,12 +47,13 @@ CONFIG_FLAGS += \
 	--enable-pvr \
 	--enable-speex \
 	--enable-caca \
+	--enable-livedotcom \
+	--enable-libmpeg2 \
 	$(NULL)
 
 # These ones are currently shipped with VLC
 CONFIG_FLAGS += --enable-ffmpeg --with-ffmpeg-tree=extras/ffmpeg
 CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad2
-CONFIG_FLAGS += --enable-libmpeg2 --with-libmpeg2-tree=extras/mpeg2dec
 
 # Glide and svgalib are only for x86
 ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
@@ -106,21 +107,6 @@ configure-stamp:
 	  && $(MAKE); \
 	fi
 
-	# Check that we have an mpeg2dec tree in here (can be a symlink)
-	test -d extras/mpeg2dec
-	if test ! -d CVS; then \
-	  cd extras/mpeg2dec \
-	  && touch configure.in \
-	  && touch aclocal.m4 \
-	  && touch acinclude.m4 \
-	  && touch configure \
-	  && touch `find . -name config.h.in` \
-	  && touch `find . -name Makefile.in` \
-	  && ./configure --disable-shared \
-	  && cd libmpeg2 \
-	  && $(MAKE); \
-	fi
-
 	# Configure VLC
 	./configure --mandir=$${prefix}/share/man \
 	  --infodir=$${prefix}/share/info $(CONFIG_FLAGS)
@@ -153,13 +139,6 @@ ifneq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 	  && $(MAKE) clean \
 	  && $(MAKE) AM_CFLAGS=-fPIC; \
 	fi
-
-	# HACK ME PLENTY MORE!!!
-	if test ! -d CVS; then \
-	  cd extras/mpeg2dec/libmpeg2 \
-	  && $(MAKE) clean \
-	  && $(MAKE) LIBMPEG2_CFLAGS=-fPIC; \
-	fi
 endif
 
 	# Build all the rest, with the PIC libs
@@ -178,12 +157,8 @@ clean:
 	# Check that we have an faad2 tree in here (can be a symlink)
 	test -d extras/faad2
 	-if test ! -d CVS; then cd extras/faad2 && $(MAKE) distclean; fi
-	# Check that we have an mpeg2dec tree in here (can be a symlink)
-	test -d extras/mpeg2dec
-	-if test ! -d CVS; then cd extras/mpeg2dec && $(MAKE) distclean; fi
 
 	# Removed ugly cruft
-	rm -f extras/mpeg2dec/include/mpeg2dec
 	rm -f src/misc/modules_builtin.h
 	rm -f mozilla/vlcintf.xpt mozilla/vlcintf.h
 
