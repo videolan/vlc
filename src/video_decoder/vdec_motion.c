@@ -88,13 +88,11 @@ __MotionComponents (8,16)	/* 422 */
 		break;							     \
 	    case 2:							     \
 		MotionComponent_x_Y_copy_##width##_##height (p_src, p_dest,  \
-							     i_stride,	     \
-							     i_step);	     \
+							     i_stride);      \
 		break;							     \
 	    case 3:							     \
 		MotionComponent_X_Y_copy_##width##_##height (p_src, p_dest,  \
-							     i_stride,	     \
-							     i_step);	     \
+							     i_stride);	     \
 		break;							     \
 	    }								     \
 	}								     \
@@ -112,13 +110,11 @@ __MotionComponents (8,16)	/* 422 */
 		break;							     \
 	    case 2:							     \
 		MotionComponent_x_Y_avg_##width##_##height (p_src, p_dest,   \
-							    i_stride,	     \
-							    i_step);	     \
+							    i_stride);       \
 		break;							     \
 	    case 3:							     \
 		MotionComponent_X_Y_avg_##width##_##height (p_src, p_dest,   \
-							    i_stride,	     \
-							    i_step);	     \
+							    i_stride);	     \
 		break;							     \
 	    }								     \
 	}								     \
@@ -134,9 +130,6 @@ static __inline__ void MotionComponent(
                     int i_height,           /* (explicit) height of block */
                     int i_stride,           /* number of coeffs to jump
                                              * between each predicted line */
-                    int i_step,             /* number of coeffs to jump to
-                                             * go to the next line of the
-                                             * field */
                     int i_select,           /* half-pel vectors */
                     boolean_t b_average     /* (explicit) averaging of several
                                              * predictions */ )
@@ -179,7 +172,7 @@ static __inline__ void Motion420(
                        + (p_mb->i_motion_l_y + i_offset
                          + b_source_field)
                        * p_mb->p_picture->i_width
-                       + (i_mv_y >> 1) * p_mb->i_l_stride;
+                       + (i_mv_y >> 1) * i_l_stride;
     if( i_source_offset >= p_source->i_width * p_source->i_height )
     {
         intf_ErrMsg( "vdec error: bad motion vector (lum)\n" );
@@ -192,12 +185,12 @@ static __inline__ void Motion420(
                      /* destination */
                      p_mb->p_picture->p_y
                        + (p_mb->i_l_x)
-                       + (p_mb->i_motion_l_y + b_dest_field)
+                       + (p_mb->i_motion_l_y + b_dest_field + i_offset)
                          * p_mb->p_picture->i_width,
                      /* prediction width and height */
                      16, i_height,
                      /* stride */
-                     i_l_stride, p_mb->i_l_stride,
+                     i_l_stride,
                      /* select */
                      ((i_mv_y & 1) << 1) | (i_mv_x & 1),
                      b_average );
@@ -206,7 +199,7 @@ static __inline__ void Motion420(
                         + (p_mb->i_motion_c_y + (i_offset >> 1)
                            + b_source_field)
                           * p_mb->p_picture->i_chroma_width
-                        + ((i_mv_y/2) >> 1) * p_mb->i_c_stride;
+                        + ((i_mv_y/2) >> 1) * i_c_stride;
     if( i_source_offset >= (p_source->i_width * p_source->i_height) / 4 )
     {
         intf_ErrMsg( "vdec error: bad motion vector (chroma)\n" );
@@ -214,7 +207,8 @@ static __inline__ void Motion420(
     }
 
     i_dest_offset = (p_mb->i_c_x)
-                      + (p_mb->i_motion_c_y + b_dest_field)
+                      + (p_mb->i_motion_c_y + b_dest_field
+                          + (i_offset >> 1))
                         * p_mb->p_picture->i_chroma_width;
     i_c_height = i_height >> 1;
     i_c_select = (((i_mv_y/2) & 1) << 1) | ((i_mv_x/2) & 1);
@@ -224,7 +218,7 @@ static __inline__ void Motion420(
                        + i_source_offset,
                      p_mb->p_picture->p_u
                        + i_dest_offset,
-                     8, i_c_height, i_c_stride, p_mb->i_c_stride,
+                     8, i_c_height, i_c_stride,
                      i_c_select, b_average );
 
     /* Chrominance Cb */
@@ -232,7 +226,7 @@ static __inline__ void Motion420(
                        + i_source_offset,
                      p_mb->p_picture->p_v
                        + i_dest_offset,
-                     8, i_c_height, i_c_stride, p_mb->i_c_stride,
+                     8, i_c_height, i_c_stride,
                      i_c_select, b_average );
 }
 
@@ -277,7 +271,7 @@ static __inline__ void Motion422(
                      /* prediction width and height */
                      16, i_height,
                      /* stride */
-                     i_l_stride, p_mb->i_l_stride,
+                     i_l_stride,
                      /* select */
                      ((i_mv_y & 1) << 1) | (i_mv_x & 1),
                      b_average );
@@ -297,7 +291,7 @@ static __inline__ void Motion422(
                        + i_source_offset,
                      p_mb->p_picture->p_u
                        + i_dest_offset,
-                     8, i_height, i_c_stride, p_mb->i_c_stride,
+                     8, i_height, i_c_stride,
                      i_c_select, b_average );
 
     /* Chrominance Cb */
@@ -305,7 +299,7 @@ static __inline__ void Motion422(
                        + i_source_offset,
                      p_mb->p_picture->p_u
                        + i_dest_offset,
-                     8, i_height, i_c_stride, p_mb->i_c_stride,
+                     8, i_height, i_c_stride,
                      i_c_select, b_average );
 #endif
 }
@@ -351,7 +345,7 @@ static __inline__ void Motion444(
                        + i_source_offset,
                      p_mb->p_picture->p_y
                        + i_dest_offset,
-                     16, i_height, i_l_stride, p_mb->i_l_stride,
+                     16, i_height, i_l_stride,
                      i_select, b_average );
 
     /* Chrominance Cr */
@@ -359,7 +353,7 @@ static __inline__ void Motion444(
                        + i_source_offset,
                      p_mb->p_picture->p_u
                        + i_dest_offset,
-                     16, i_height, i_l_stride, p_mb->i_l_stride,
+                     16, i_height, i_l_stride,
                      i_select, b_average );
 
     /* Chrominance Cb */
@@ -367,7 +361,7 @@ static __inline__ void Motion444(
                        + i_source_offset,
                      p_mb->p_picture->p_v
                        + i_dest_offset,
-                     16, i_height, i_l_stride, p_mb->i_l_stride,
+                     16, i_height, i_l_stride,
                      i_select, b_average );
 #endif
 }
@@ -610,12 +604,12 @@ void vdec_MotionFrameFrame444( macroblock_t * p_mb )
     {                                                                   \
         MOTION( p_mb, p_mb->p_forward, p_mb->ppi_field_select[0][0], 0, \
                 p_mb->pppi_motion_vectors[0][0][0],                     \
-                p_mb->pppi_motion_vectors[0][0][1],                     \
+                p_mb->pppi_motion_vectors[0][0][1] >> 1,                \
                 i_l_stride, i_c_stride, 8, 0, 0 );                      \
                                                                         \
         MOTION( p_mb, p_mb->p_forward, p_mb->ppi_field_select[1][0], 1, \
                 p_mb->pppi_motion_vectors[1][0][0],                     \
-                p_mb->pppi_motion_vectors[1][0][1],                     \
+                p_mb->pppi_motion_vectors[1][0][1] >> 1,                \
                 i_l_stride, i_c_stride, 8, 0, 0 );                      \
                                                                         \
         if( p_mb->i_mb_type & MB_MOTION_BACKWARD )                      \
@@ -623,13 +617,13 @@ void vdec_MotionFrameFrame444( macroblock_t * p_mb )
             MOTION( p_mb, p_mb->p_backward,                             \
                     p_mb->ppi_field_select[0][1], 0,                    \
                     p_mb->pppi_motion_vectors[0][1][0],                 \
-                    p_mb->pppi_motion_vectors[0][1][1],                 \
+                    p_mb->pppi_motion_vectors[0][1][1] >> 1,            \
                     i_l_stride, i_c_stride, 8, 0, 1 );                  \
                                                                         \
             MOTION( p_mb, p_mb->p_backward,                             \
                     p_mb->ppi_field_select[1][1], 1,                    \
                     p_mb->pppi_motion_vectors[1][1][0],                 \
-                    p_mb->pppi_motion_vectors[1][1][1],                 \
+                    p_mb->pppi_motion_vectors[1][1][1] >> 1,            \
                     i_l_stride, i_c_stride, 8, 0, 1 );                  \
         }                                                               \
     }                                                                   \
@@ -638,12 +632,12 @@ void vdec_MotionFrameFrame444( macroblock_t * p_mb )
     {                                                                   \
         MOTION( p_mb, p_mb->p_backward, p_mb->ppi_field_select[0][1], 0,\
                 p_mb->pppi_motion_vectors[0][1][0],                     \
-                p_mb->pppi_motion_vectors[0][1][1],                     \
+                p_mb->pppi_motion_vectors[0][1][1] >> 1,                \
                 i_l_stride, i_c_stride, 8, 0, 0 );                      \
                                                                         \
         MOTION( p_mb, p_mb->p_backward, p_mb->ppi_field_select[1][1], 1,\
                 p_mb->pppi_motion_vectors[1][1][0],                     \
-                p_mb->pppi_motion_vectors[1][1][1],                     \
+                p_mb->pppi_motion_vectors[1][1][1] >> 1,                \
                 i_l_stride, i_c_stride, 8, 0, 0 );                      \
     }                                                                   \
 } /* FRAMEFIELD */
