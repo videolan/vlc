@@ -259,6 +259,7 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     p_region->psz_text = 0;
     p_region->i_font_color = -1; /* default to using freetype-color -opacity */
     p_region->i_font_opacity = -1;
+    p_region->i_font_size = -1; /* and the freetype fontsize */
 
     if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
         p_fmt->p_palette = p_region->fmt.p_palette =
@@ -567,7 +568,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     /*  the actual call  to RenderText in freetype.c: */
                            p_subpic_tmp = p_spu->p_text->pf_render_string(
                             p_spu->p_text, p_new_block, 
-                            p_region->i_font_color, p_region->i_font_opacity);
+                            p_region->i_font_color, p_region->i_font_opacity,
+                            p_region->i_font_size);
 
                         if( p_subpic_tmp )
                         {

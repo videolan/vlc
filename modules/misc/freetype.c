@@ -71,7 +71,7 @@ static int  Create ( vlc_object_t * );
 static void Destroy( vlc_object_t * );
 
 /* The RenderText call maps to pf_render_string, defined in vlc_filter.h */
-static subpicture_t *RenderText( filter_t *, block_t *, int, int );
+static subpicture_t *RenderText( filter_t *, block_t *, int, int, int );
 static line_desc_t *NewLine( byte_t * );
 
 /*****************************************************************************
@@ -171,6 +171,7 @@ struct filter_sys_t
     uint8_t        i_font_opacity; /* freetype-opacity */
     int            i_font_color;  /* freetype-color */
     int            i_red, i_blue, i_green; /* function vars to render */
+    int            i_font_size;
     uint8_t        i_opacity; /*  function var to render */
     uint8_t        pi_gamma[256];
 };
@@ -186,7 +187,6 @@ static int Create( vlc_object_t *p_this )
     filter_sys_t *p_sys;
     char *psz_fontfile = NULL;
     int i, i_error;
-    int i_fontsize = 0;
     vlc_value_t val;
 
     /* Allocate structure */
@@ -198,6 +198,7 @@ static int Create( vlc_object_t *p_this )
     }
     p_sys->p_face = 0;
     p_sys->p_library = 0;
+    p_sys->i_font_size = 0;
     
     for( i = 0; i < 256; i++ )
     {
@@ -272,24 +273,24 @@ static int Create( vlc_object_t *p_this )
     var_Get( p_filter, "freetype-fontsize", &val );
     if( val.i_int )
     {
-        i_fontsize = val.i_int;
+        p_sys->i_font_size = val.i_int;
     }
     else
     {
         var_Get( p_filter, "freetype-rel-fontsize", &val );
-        i_fontsize = (int)p_filter->fmt_out.video.i_height / val.i_int;
+        p_sys->i_font_size = (int)p_filter->fmt_out.video.i_height / val.i_int;
     }
-    if( i_fontsize <= 0 )
+    if( p_sys->i_font_size <= 0 )
     {
         msg_Warn( p_filter, "Invalid fontsize, using 12" );
-        i_fontsize = 12;
+        p_sys->i_font_size = 12;
     }
-    msg_Dbg( p_filter, "Using fontsize: %i", i_fontsize);
+    msg_Dbg( p_filter, "Using fontsize: %i", p_sys->i_font_size);
 
-    i_error = FT_Set_Pixel_Sizes( p_sys->p_face, 0, i_fontsize );
+    i_error = FT_Set_Pixel_Sizes( p_sys->p_face, 0, p_sys->i_font_size );
     if( i_error )
     {
-        msg_Err( p_filter, "couldn't set font size to %d", i_fontsize );
+        msg_Err( p_filter, "couldn't set font size to %d", p_sys->i_font_size );
         goto error;
     }
 
@@ -328,7 +329,7 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 static void Render( filter_t *p_filter, subpicture_t *p_spu,
                     subpicture_data_t *p_string, uint8_t opacity, 
-                    int red, int green, int blue )
+                    int red, int green, int blue)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     line_desc_t *p_line;
@@ -336,7 +337,7 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
     video_format_t fmt;
     int i, x, y, i_pitch;
     uint8_t i_y, i_u, i_v;  /* YUV values, derived from incoming RGB */
-    
+  
     /* calculate text color components: */
     i_y = (uint8_t) ( (  66 * red + 129 * green +  25 * blue + 128) >> 8) +  16;
     i_u = (uint8_t) ( ( -38 * red -  74 * green + 112 * blue + 128) >> 8) + 128;
@@ -440,7 +441,7 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
  * the vout method by this module
  */
 static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block, 
-                                 int font_color, int font_opacity )
+                                 int font_color, int font_opacity, int font_size )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_subpic = 0;
@@ -502,8 +503,26 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block,
 #endif
     if( iconv_handle == (vlc_iconv_t)-1 )
     {
-        msg_Warn( p_filter, "unable to do convertion" );
+        msg_Warn( p_filter, "unable to do conversion" );
         goto error;
+    }
+
+    /* Set up the glyphs for the desired font size.  By definition,
+       p_sys->i_font_size is a valid value, else the initial Create would
+       have failed. Using -1 as a flag to use the freetype-fontsize */
+    if ( font_size < 0 )  
+    {
+	    FT_Set_Pixel_Sizes( p_sys->p_face, 0, p_sys->i_font_size );
+    }
+    else          
+    {
+        i_error = FT_Set_Pixel_Sizes( p_sys->p_face, 0, font_size );
+        if( i_error )
+        {
+	        msg_Warn( p_filter, "Invalid font size to RenderText, using %d", 
+	                  p_sys->i_font_size );
+	        FT_Set_Pixel_Sizes( p_sys->p_face, 0, p_sys->i_font_size );
+        }
     }
 
     {

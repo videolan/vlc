@@ -209,6 +209,7 @@ struct subpicture_region_t
     int             i_x;                             /**< position of region */
     int             i_y;                             /**< position of region */
     int i_font_color, i_font_opacity;     /**< controls for text subpictures */
+    int i_font_size;
     subpicture_region_t *p_next;                /**< next region in the list */
     subpicture_region_t *p_cache;       /**< modified version of this region */
     /**@}*/
