@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.6 2002/11/01 15:06:23 gbazin Exp $
+ * $Id: directx.c,v 1.7 2002/11/01 15:43:55 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -547,12 +547,16 @@ static int DirectxFillBuffer( aout_instance_t *p_aout, int i_frame,
     if( dsresult != DS_OK )
     {
         msg_Warn( p_notif, "cannot lock buffer" );
+        if( p_buffer ) aout_BufferFree( p_buffer );
         return VLC_EGENERIC;
     }
 
     if ( p_buffer != NULL )
+    {
         p_aout->p_vlc->pf_memcpy( p_write_position, p_buffer->p_buffer,
                                   l_bytes1 );
+        aout_BufferFree( p_buffer );
+    }
     else
         memset( p_write_position, 0, l_bytes1 );
 
