@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.48 2003/05/21 15:40:03 hartman Exp $
+ * $Id: vout.m,v 1.49 2003/05/23 00:00:48 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -148,29 +148,21 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         return( 1 );
     } 
 
-    if( vout_ChromaCmp( p_vout->render.i_chroma, VLC_FOURCC('I','4','2','0') ) )
-    {
-        /* Damn QT isn't thread safe. so keep a lock in the p_vlc object */
-        vlc_mutex_lock( &p_vout->p_vlc->quicktime_lock );
+    /* Damn QT isn't thread safe. so keep a lock in the p_vlc object */
+    vlc_mutex_lock( &p_vout->p_vlc->quicktime_lock );
 
-        err = FindCodec( kYUV420CodecType, bestSpeedCodec,
-                         nil, &p_vout->p_sys->img_dc );
-        
-        vlc_mutex_unlock( &p_vout->p_vlc->quicktime_lock );
-        if( err == noErr && p_vout->p_sys->img_dc != 0 )
-        {
-            p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
-            p_vout->p_sys->i_codec = kYUV420CodecType;
-        }
-        else
-        {
-            msg_Err( p_vout, "failed to find an appropriate codec" );
-        }
+    err = FindCodec( kYUV420CodecType, bestSpeedCodec,
+                        nil, &p_vout->p_sys->img_dc );
+    
+    vlc_mutex_unlock( &p_vout->p_vlc->quicktime_lock );
+    if( err == noErr && p_vout->p_sys->img_dc != 0 )
+    {
+        p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
+        p_vout->p_sys->i_codec = kYUV420CodecType;
     }
     else
     {
-        msg_Err( p_vout, "chroma 0x%08x not supported",
-                         p_vout->render.i_chroma );
+        msg_Err( p_vout, "failed to find an appropriate codec" );
     }
 
     if( p_vout->p_sys->img_dc == 0 )
@@ -178,7 +170,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
         free( p_vout->p_sys );
-        return( 1 );        
+        return VLC_EGENERIC;        
     }
 
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];

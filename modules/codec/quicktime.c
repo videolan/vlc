@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.3 2003/05/21 19:55:25 hartman Exp $
+ * $Id: quicktime.c,v 1.4 2003/05/23 00:00:48 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -41,19 +41,28 @@
 #include <QuickTime/ImageCodec.h>
 #endif
 
+/* for windows do we require Quicktime compents header? */
+
+#ifdef LOADER
+#include "w32dll/loader/qtx/qtxsdk/components.h"
+#include "w32dll/loader/wine/windef.h"
+#include "w32dll/loader/ldt_keeper.h"
+#endif
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  OpenDecoder    ( vlc_object_t * );
 
 static int  RunDecoderAudio( decoder_fifo_t * );
+static int  RunDecoderVideo( decoder_fifo_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 
 vlc_module_begin();
-    set_description( _("QT binary library decoder") );
+    set_description( _("QuickTime library decoder") );
     set_capability( "decoder", 10 );
     set_callbacks( OpenDecoder, NULL );
 
@@ -66,7 +75,7 @@ vlc_module_end();
 #define FCC( a, b , c, d ) \
     ((uint32_t)( ((a)<<24)|((b)<<16)|((c)<<8)|(d)))
 
-#ifdef LOADER
+#ifndef SYS_DARWIN
 typedef struct OpaqueSoundConverter*    SoundConverter;
 typedef unsigned long                   UnsignedFixed;
 typedef uint8_t                          Byte;
@@ -80,7 +89,7 @@ typedef struct SoundComponentData {
     Byte *                          buffer;
     long                            reserved;
 } SoundComponentData;
-#endif
+#endif /* SYS_DARWIN */
 
 typedef struct
 {
@@ -88,13 +97,13 @@ typedef struct
     decoder_fifo_t *p_fifo;
 
     /* library */
+#ifndef SYS_DARWIN
 #ifdef LOADER
-    HMODULE     qtml;
     ldt_fs_t    *ldt_fs;
+#endif /* LOADER */
+    HMODULE     qtml;
     OSErr       (*InitializeQTML)         	( long flags );
-#endif
-    OSErr 	(*EnterMovies)			( void );
-    OSErr 	(*ExitMovies)			( void );
+#endif /* SYS_DARWIN */
     int         (*SoundConverterOpen)		( const SoundComponentData *, const SoundComponentData *, SoundConverter* );
     int         (*SoundConverterClose)		( SoundConverter );
     int         (*SoundConverterSetInfo)	( SoundConverter , OSType ,void * );
@@ -127,6 +136,60 @@ typedef struct
     uint8_t             buffer_out[1000000];    /* FIXME */
 } adec_thread_t;
 
+typedef struct
+{
+    /* Input properties */
+    decoder_fifo_t *p_fifo;
+
+    /* library */
+#ifndef SYS_DARWIN
+#ifdef LOADER
+    ldt_fs_t          *ldt_fs;
+#endif /* LOADER */
+    HMODULE           qtml;
+    OSErr             (*InitializeQTML)		( long flags );
+#endif /* SYS_DARWIN */
+    Component         (*FindNextComponent)	( Component prev, ComponentDescription* desc );
+    ComponentInstance (*OpenComponent)		( Component c );
+    ComponentResult   (*ImageCodecInitialize)	( ComponentInstance ci, ImageSubCodecDecompressCapabilities * cap);
+    ComponentResult   (*ImageCodecGetCodecInfo)	( ComponentInstance ci,
+                                                    CodecInfo *info );
+    ComponentResult   (*ImageCodecPreDecompress)( ComponentInstance ci,
+                                                    CodecDecompressParams * params );
+    ComponentResult   (*ImageCodecBandDecompress)( ComponentInstance ci,
+                                                    CodecDecompressParams * params );
+    PixMapHandle      (*GetGWorldPixMap)	( GWorldPtr offscreenGWorld );
+    OSErr             (*QTNewGWorldFromPtr)	( GWorldPtr *gw,
+                                                    OSType pixelFormat,
+                                                    const Rect *boundsRect,
+                                                    CTabHandle cTable,
+                                                    /*GDHandle*/ void *aGDevice, /*unused*/
+                                                    GWorldFlags flags,
+                                                    void *baseAddr,
+                                                    long rowBytes );
+    OSErr             (*NewHandleClear)		( Size byteCount );
+
+    ComponentInstance       ci;
+    Rect                    OutBufferRect;   /* the dimensions of our GWorld */
+    GWorldPtr               OutBufferGWorld; /* a GWorld is some kind of
+                                                description for a drawing
+                                                environment */
+    ImageDescriptionHandle  framedescHandle;
+
+    CodecDecompressParams   decpar;          /* for ImageCodecPreDecompress() */
+    CodecCapabilities       codeccap;        /* for decpar */
+
+
+    /* Output properties */
+    vout_thread_t *     p_vout;
+    uint8_t *           plane;
+    mtime_t             pts;
+
+    /* buffer */
+    unsigned int        i_buffer;
+    uint8_t             *p_buffer;
+
+} vdec_thread_t;
 
 static int pi_channels_maps[6] =
 {
@@ -198,23 +261,33 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     switch( p_fifo->i_fourcc )
     {
+        case VLC_FOURCC('S','V','Q','3'): /* Sorenson v3 */
+        case VLC_FOURCC('S','V','Q','1'): /* Sorenson v1 */
+        case VLC_FOURCC('Z','y','G','o'):
+        case VLC_FOURCC('V','P','3','1'):
+        case VLC_FOURCC('3','I','V','1'):
+        case VLC_FOURCC('r','l','e',' '): /* QuickTime animation (RLE) */
+        case VLC_FOURCC('r','p','z','a'): /* QuickTime Apple Video */
+        case VLC_FOURCC('a','z','p','r'): /* QuickTime animation (RLE) */
+            p_fifo->pf_run = RunDecoderVideo;
+            return VLC_SUCCESS;
+
         case VLC_FOURCC('Q','D','M','C'): /* QDesign */
         case VLC_FOURCC('Q','D','M','2'): /* QDesign* 2 */
         case VLC_FOURCC('Q','c','l','p'): /* Qualcomm Purevoice Codec */
         case VLC_FOURCC('Q','C','L','P'): /* Qualcomm Purevoice Codec */
         case VLC_FOURCC('M','A','C','3'): /* MACE3 audio decoder */
         case VLC_FOURCC('M','A','C','6'): /* MACE6 audio decoder */
-        case VLC_FOURCC('f','l','3','2'): /* 32-bit Floating Point */
-        case VLC_FOURCC('f','l','6','4'): /* 64-bit Floating Point */
-        case VLC_FOURCC('i','n','2','4'): /* 24-bit Interger */
-        case VLC_FOURCC('i','n','3','2'): /* 32-bit Integer */
-        case VLC_FOURCC('m','p','4','a'): /* MPEG-4 Audio */
         case VLC_FOURCC('d','v','c','a'): /* DV Audio */
         case VLC_FOURCC('s','o','w','t'): /* 16-bit Little Endian */
         case VLC_FOURCC('t','w','o','s'): /* 16-bit Big Endian */
         case VLC_FOURCC('a','l','a','w'): /* ALaw 2:1 */
         case VLC_FOURCC('u','l','a','w'): /* mu-Law 2:1 */
         case VLC_FOURCC('r','a','w',' '): /* 8-bit offset binaries */
+        case VLC_FOURCC('f','l','3','2'): /* 32-bit Floating Point */
+        case VLC_FOURCC('f','l','6','4'): /* 64-bit Floating Point */
+        case VLC_FOURCC('i','n','2','4'): /* 24-bit Interger */
+        case VLC_FOURCC('i','n','3','2'): /* 32-bit Integer */
 	case 0x31:				/* MS GSM */
 	case 0x32:				/* MSN Audio */
 	case 0x0011:				/* DVI IMA */
@@ -228,6 +301,12 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 }
 
+#ifdef LOADER
+HMODULE   WINAPI LoadLibraryA(LPCSTR);
+FARPROC   WINAPI GetProcAddress(HMODULE,LPCSTR);
+int       WINAPI FreeLibrary(HMODULE);
+#endif
+
 /****************************************************************************
  ****************************************************************************
  **
@@ -240,7 +319,7 @@ static int  InitThreadAudio     ( adec_thread_t * );
 static void DecodeThreadAudio   ( adec_thread_t * );
 static void EndThreadAudio      ( adec_thread_t * );
 
-static int  RunDecoderAudio( decoder_fifo_t *p_fifo )
+static int RunDecoderAudio( decoder_fifo_t *p_fifo )
 {
     adec_thread_t *p_dec;
     vlc_bool_t    b_error;
@@ -280,7 +359,7 @@ static int  RunDecoderAudio( decoder_fifo_t *p_fifo )
     return VLC_SUCCESS;
 }
 
-static int  InitThreadAudio     ( adec_thread_t *p_dec )
+static int InitThreadAudio( adec_thread_t *p_dec )
 {
     vlc_value_t     lockval;
     int             i_error;
@@ -304,8 +383,9 @@ static int  InitThreadAudio     ( adec_thread_t *p_dec )
 #ifdef SYS_DARWIN
     EnterMovies();
 #else
+#ifdef LOADER
     p_dec->ldt_fs = Setup_LDT_Keeper();
-
+#endif /* LOADER */
     msg_Dbg( p_dec->p_fifo, "trying to load `qtmlClient.dll'" );
     if( !( p_dec->qtml = LoadLibraryA("qtmlClient.dll") ) )
     {
@@ -317,7 +397,7 @@ static int  InitThreadAudio     ( adec_thread_t *p_dec )
 
     /* (void*) to shut up gcc */
     p_dec->InitializeQTML           = (void*)InitializeQTML;
-#endif
+#endif /* SYS_DARWIN */
     p_dec->SoundConverterOpen       = (void*)SoundConverterOpen;
     p_dec->SoundConverterClose      = (void*)SoundConverterClose;
     p_dec->SoundConverterSetInfo    = (void*)SoundConverterSetInfo;
@@ -372,10 +452,6 @@ static int  InitThreadAudio     ( adec_thread_t *p_dec )
     i_error = p_dec->SoundConverterOpen( &p_dec->InputFormatInfo,
                                          &p_dec->OutputFormatInfo,
                                          &p_dec->myConverter );
-#ifdef SYS_DARWIN
-    vlc_mutex_unlock( &p_dec->p_fifo->p_vlc->quicktime_lock );
-#endif
-
     if( i_error )
     {
         msg_Dbg( p_dec->p_fifo, "error while SoundConverterOpen = %d", i_error );
@@ -411,6 +487,10 @@ static int  InitThreadAudio     ( adec_thread_t *p_dec )
         goto exit_error;
     }
 
+#ifdef SYS_DARWIN
+    vlc_mutex_unlock( &p_dec->p_fifo->p_vlc->quicktime_lock );
+#endif
+
     p_dec->output_format.i_format   = AOUT_FMT_S16_NE;
     p_dec->output_format.i_rate     = p_wf->nSamplesPerSec;
     p_dec->output_format.i_physical_channels =
@@ -436,7 +516,7 @@ static int  InitThreadAudio     ( adec_thread_t *p_dec )
     return VLC_SUCCESS;
 
 exit_error:
-#ifndef SYS_DARWIN
+#ifdef LOADER
     Restore_LDT_Keeper( p_dec->ldt_fs );
 #endif
     vlc_mutex_unlock( lockval.p_address );
@@ -481,7 +561,7 @@ static void DecodeThreadAudio   ( adec_thread_t *p_dec )
         {
             int i_frames = p_dec->i_buffer / p_dec->InFrameSize;
             long i_out_frames, i_out_bytes;
-            /* enougth data */
+            /* enough data */
 
             vlc_mutex_lock( lockval.p_address );
             i_error = p_dec->SoundConverterConvertBuffer( p_dec->myConverter,
@@ -560,7 +640,8 @@ static void DecodeThreadAudio   ( adec_thread_t *p_dec )
 
     input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
 }
-static void EndThreadAudio      ( adec_thread_t *p_dec )
+
+static void EndThreadAudio( adec_thread_t *p_dec )
 {
     vlc_value_t             lockval;
     int i_error;
@@ -577,19 +658,371 @@ static void EndThreadAudio      ( adec_thread_t *p_dec )
     i_error = p_dec->SoundConverterClose( p_dec->myConverter );
     msg_Dbg( p_dec->p_fifo, "SoundConverterClose => %d", i_error );
 
-    /*FreeLibrary( p_dec->qtml );
+#ifndef SYS_DARWIN
+    FreeLibrary( p_dec->qtml );
     msg_Dbg( p_dec->p_fifo, "FreeLibrary ok." ); */
-
+#endif
     vlc_mutex_unlock( lockval.p_address );
 
-    /*Restore_LDT_Keeper( p_dec->ldt_fs );
+#ifdef LOADER
+    Restore_LDT_Keeper( p_dec->ldt_fs );
     msg_Dbg( p_dec->p_fifo, "Restore_LDT_Keeper" ); */
+#endif
 #ifdef SYS_DARWIN
     ExitMovies();
 #endif
     aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
 }
 
-/* Video part will follow when the LOADER code arrives */
+
+/****************************************************************************
+ ****************************************************************************
+ **
+ **     video part
+ **
+ **************************************************************************** 
+ ****************************************************************************/
+
+static int  InitThreadVideo     ( vdec_thread_t * );
+static void DecodeThreadVideo   ( vdec_thread_t * );
+static void EndThreadVideo      ( vdec_thread_t * );
+
+static int  RunDecoderVideo( decoder_fifo_t *p_fifo )
+{
+    vdec_thread_t *p_dec;
+    vlc_bool_t    b_error;
+
+    p_dec = malloc( sizeof( vdec_thread_t ) );
+    if( !p_dec )
+    {
+        msg_Err( p_fifo, "out of memory" );
+        DecoderError( p_fifo );
+        return VLC_EGENERIC;
+    }
+    p_dec->p_fifo = p_fifo;
+
+    if( InitThreadVideo( p_dec ) != 0 )
+    {
+        DecoderError( p_fifo );
+        return VLC_EGENERIC;
+    }
+
+    while( !p_dec->p_fifo->b_die && !p_dec->p_fifo->b_error )
+    {
+        DecodeThreadVideo( p_dec );
+    }
 
 
+    if( ( b_error = p_dec->p_fifo->b_error ) )
+    {
+        DecoderError( p_dec->p_fifo );
+    }
+
+    EndThreadVideo( p_dec );
+    if( b_error )
+    {
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*
+ * InitThreadVideo: load and init library
+ *
+ */
+static int InitThreadVideo( vdec_thread_t *p_dec )
+{
+    vlc_value_t				lockval;
+    long				i_result;
+    ComponentDescription		desc;
+    Component				prev;
+    ComponentResult			cres;
+    ImageSubCodecDecompressCapabilities	icap;	/* for ImageCodecInitialize() */
+    CodecInfo				cinfo;	/* for ImageCodecGetCodecInfo() */
+    ImageDescription			*id;
+
+    BITMAPINFOHEADER    *p_bih;
+    int                 i_vide;
+    uint8_t             *p_vide;
+    char                fcc[4];
+
+    if( !( p_bih  = (BITMAPINFOHEADER*)p_dec->p_fifo->p_bitmapinfoheader ) )
+    {
+        msg_Err( p_dec->p_fifo, "missing BITMAPINFOHEADER !!" );
+        return VLC_EGENERIC;
+    }
+    i_vide = p_bih->biSize - sizeof( BITMAPINFOHEADER );
+    p_vide = (uint8_t*)&p_bih[1];
+    if( i_vide <= 0 || p_vide == NULL )
+    {
+        msg_Err( p_dec->p_fifo, "invalid BITMAPINFOHEADER !!" );
+        return VLC_EGENERIC;
+    }
+    memcpy( fcc, &p_dec->p_fifo->i_fourcc, 4 );
+    msg_Dbg( p_dec->p_fifo, "quicktime_video %4.4s %dx%d", fcc, p_bih->biWidth, p_bih->biHeight );
+
+    /* get lock, avoid segfault */
+    var_Get( p_dec->p_fifo->p_libvlc, "qt_mutex", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+#ifdef SYS_DARWIN
+    EnterMovies();
+#else
+#ifdef LOADER
+    p_dec->ldt_fs = Setup_LDT_Keeper();
+#endif /* LOADER */
+    msg_Dbg( p_dec->p_fifo, "trying to load `qtmlClient.dll'" );
+    if( !( p_dec->qtml = LoadLibraryA("qtmlClient.dll") ) )
+    {
+        msg_Err( p_dec->p_fifo, "cannot load qtmlClient.dll");
+        goto exit_error;
+    }
+
+    msg_Dbg( p_dec->p_fifo, "qtmlClient.dll loaded" );
+
+    /* (void*) to shut up gcc */
+    p_dec->InitializeQTML           = (void*)InitializeQTML;
+#endif /* SYS_DARWIN */
+    p_dec->FindNextComponent        = (void*)FindNextComponent;
+    p_dec->OpenComponent            = (void*)OpenComponent;
+    p_dec->ImageCodecInitialize     = (void*)ImageCodecInitialize;
+    p_dec->ImageCodecGetCodecInfo   = (void*)ImageCodecGetCodecInfo;
+    p_dec->ImageCodecPreDecompress  = (void*)ImageCodecPreDecompress;
+    p_dec->ImageCodecBandDecompress = (void*)ImageCodecBandDecompress;
+    p_dec->GetGWorldPixMap          = (void*)GetGWorldPixMap;
+    p_dec->QTNewGWorldFromPtr       = (void*)QTNewGWorldFromPtr;
+    p_dec->NewHandleClear           = (void*)NewHandleClear;
+
+#ifndef SYS_DARWIN
+    /* some sanity check */
+    if( !p_dec->InitializeQTML ||
+        !p_dec->FindNextComponent ||
+        !p_dec->OpenComponent ||
+        !p_dec->ImageCodecBandDecompress )
+    {
+        msg_Err( p_dec->p_fifo, "error getting qtmlClient.dll symbols");
+        goto exit_error;
+    }
+
+    if( ( i_result = p_dec->InitializeQTML( 6 + 16 ) ) )
+    {
+        msg_Dbg( p_dec->p_fifo, "error while InitializeQTML = %d", i_result );
+        goto exit_error;
+    }
+#endif
+
+    /* init ComponentDescription */
+    memset( &desc, 0, sizeof( ComponentDescription ) );
+    desc.componentType      = FCC( 'i', 'm', 'd', 'c' );
+    desc.componentSubType   = FCC( fcc[0], fcc[1], fcc[2], fcc[3] );
+    desc.componentManufacturer = 0;
+    desc.componentFlags        = 0;
+    desc.componentFlagsMask    = 0;
+
+    if( !( prev = p_dec->FindNextComponent( NULL, &desc ) ) )
+    {
+        msg_Err( p_dec->p_fifo, "cannot find requested component" );
+        goto exit_error;
+    }
+    msg_Dbg( p_dec->p_fifo, "component id=0x%p", prev );
+
+    p_dec->ci =  p_dec->OpenComponent( prev );
+    msg_Dbg( p_dec->p_fifo, "component instance p=0x%p", p_dec->ci );
+
+    memset( &icap, 0, sizeof( ImageSubCodecDecompressCapabilities ) );
+    cres =  p_dec->ImageCodecInitialize( p_dec->ci, &icap );
+/*    msg_Dbg( p_dec->p_fifo, "ImageCodecInitialize->%p  size=%d (%d)\n",cres,icap.recordSize,icap.decompressRecordSize); */
+
+
+    memset( &cinfo, 0, sizeof( CodecInfo ) );
+    cres =  p_dec->ImageCodecGetCodecInfo( p_dec->ci,&cinfo);
+    msg_Dbg( p_dec->p_fifo, "Flags: compr: 0x%lx  decomp: 0x%lx format: 0x%lx\n",
+                cinfo.compressFlags, cinfo.decompressFlags, cinfo.formatFlags);
+    msg_Dbg( p_dec->p_fifo, "quicktime_video: Codec name: %.*s\n", ((unsigned char*)&cinfo.typeName)[0],
+                  ((unsigned char*)&cinfo.typeName)+1);
+
+    /* make a yuy2 gworld */
+    p_dec->OutBufferRect.top    = 0;
+    p_dec->OutBufferRect.left   = 0;
+    p_dec->OutBufferRect.right  = p_bih->biWidth;
+    p_dec->OutBufferRect.bottom = p_bih->biHeight;
+
+
+    /* codec data FIXME use codec not SVQ3 */
+    msg_Dbg( p_dec->p_fifo, "vide = %d", i_vide );
+    id = malloc( sizeof( ImageDescription ) + ( i_vide - 70 ) );
+    id->idSize          = sizeof( ImageDescription ) + ( i_vide - 70 );
+    id->cType           = FCC( fcc[0], fcc[1], fcc[2], fcc[3] );
+    id->version         = GetWBE ( p_vide +  0 );
+    id->revisionLevel   = GetWBE ( p_vide +  2 );
+    id->vendor          = GetDWBE( p_vide +  4 );
+    id->temporalQuality = GetDWBE( p_vide +  8 );
+    id->spatialQuality  = GetDWBE( p_vide + 12 );
+    id->width           = GetWBE ( p_vide + 16 );
+    id->height          = GetWBE ( p_vide + 18 );
+    id->hRes            = GetDWBE( p_vide + 20 );
+    id->vRes            = GetDWBE( p_vide + 24 );
+    id->dataSize        = GetDWBE( p_vide + 28 );
+    id->frameCount      = GetWBE ( p_vide + 32 );
+    memcpy( &id->name, p_vide + 34, 32 );
+    id->depth           = GetWBE ( p_vide + 66 );
+    id->clutID          = GetWBE ( p_vide + 68 );
+    if( i_vide > 70 )
+    {
+        memcpy( ((char*)&id->clutID) + 2, p_vide + 70, i_vide - 70 );
+    }
+
+    msg_Dbg( p_dec->p_fifo, "idSize=%ld ver=%d rev=%d vendor=%ld tempQ=%d spaQ=%d w=%d h=%d dpi=%d%d dataSize=%d frameCount=%d clutID=%d",
+             id->idSize, id->version, id->revisionLevel, id->vendor,
+             (int)id->temporalQuality, (int)id->spatialQuality,
+             id->width, id->height,
+             (int)id->hRes, (int)id->vRes,
+             (int)id->dataSize,
+             id->frameCount,
+             id->clutID );
+
+    p_dec->framedescHandle = (ImageDescriptionHandle) p_dec->NewHandleClear (id->idSize);
+    memcpy (*p_dec->framedescHandle, id, id->idSize);
+
+    p_dec->plane = malloc( p_bih->biWidth * p_bih->biHeight * 3 );
+
+    i_result =  p_dec->QTNewGWorldFromPtr(&p_dec->OutBufferGWorld,
+                                         kYUVSPixelFormat, /*pixel format of new GWorld==YUY2 */
+                                         &p_dec->OutBufferRect,   /*we should benchmark if yvu9 is faster for svq3, too */
+                                         0,
+                                         0,
+                                         0,
+                                         p_dec->plane,
+                                         p_bih->biWidth * 2 );
+
+    msg_Dbg( p_dec->p_fifo, "NewGWorldFromPtr returned:%ld\n",65536-(i_result&0xffff));
+
+    memset( &p_dec->decpar, 0, sizeof( CodecDecompressParams ) );
+    p_dec->decpar.imageDescription = p_dec->framedescHandle;
+    p_dec->decpar.startLine        = 0;
+    p_dec->decpar.stopLine         = (**p_dec->framedescHandle).height;
+    p_dec->decpar.frameNumber      = 1;
+    p_dec->decpar.matrixFlags      = 0;
+    p_dec->decpar.matrixType       = 0;
+    p_dec->decpar.matrix           = 0;
+    p_dec->decpar.capabilities     = &p_dec->codeccap;
+    p_dec->decpar.accuracy         = codecNormalQuality;
+    p_dec->decpar.srcRect          = p_dec->OutBufferRect;
+    p_dec->decpar.transferMode     = srcCopy;
+    p_dec->decpar.dstPixMap        = ** p_dec->GetGWorldPixMap (p_dec->OutBufferGWorld);/*destPixmap;  */
+
+    msg_Dbg( p_dec->p_fifo, "will call: ImageCodecPreDecompress");
+    cres =  p_dec->ImageCodecPreDecompress (p_dec->ci, &p_dec->decpar);
+    msg_Dbg( p_dec->p_fifo, "quicktime_video: ImageCodecPreDecompress cres=0x%X\n", (int)cres);
+
+    p_dec->p_vout = vout_Request( p_dec->p_fifo, NULL,
+                                  p_bih->biWidth, p_bih->biHeight,
+                                  VLC_FOURCC( 'Y', 'U', 'Y', '2' ),
+                                  VOUT_ASPECT_FACTOR * p_bih->biWidth / p_bih->biHeight );
+
+    if( !p_dec->p_vout )
+    {
+        msg_Err( p_dec->p_fifo, "cannot get a vout" );
+        goto exit_error;
+    }
+
+    p_dec->i_buffer = 1000*1000;
+    p_dec->p_buffer = malloc( p_dec->i_buffer );
+
+    vlc_mutex_unlock( lockval.p_address );
+    return VLC_SUCCESS;
+
+exit_error:
+#ifdef LOADER
+    Restore_LDT_Keeper( p_dec->ldt_fs );
+#endif
+    vlc_mutex_unlock( lockval.p_address );
+    return VLC_EGENERIC;
+
+}
+
+static void DecodeThreadVideo   ( vdec_thread_t *p_dec )
+{
+    BITMAPINFOHEADER    *p_bih = (BITMAPINFOHEADER*)p_dec->p_fifo->p_bitmapinfoheader;
+    pes_packet_t    *p_pes;
+    vlc_value_t     lockval;
+    picture_t       *p_pic;
+    ComponentResult     cres;
+
+    var_Get( p_dec->p_fifo->p_libvlc, "qt_mutex", &lockval );
+
+    input_ExtractPES( p_dec->p_fifo, &p_pes );
+    if( !p_pes )
+    {
+        msg_Err( p_dec->p_fifo, "cannot get PES" );
+        p_dec->p_fifo->b_error = 1;
+        return;
+    }
+
+    if( p_pes->i_pes_size > p_dec->i_buffer )
+    {
+        p_dec->i_buffer = 3 * p_pes->i_pes_size / 2;
+        free( p_dec->p_buffer );
+        p_dec->p_buffer = malloc( p_dec->i_buffer );
+    }
+
+    if( p_pes->i_pes_size > 0 && p_pes->i_pts > mdate() )
+    {
+        GetPESData( p_dec->p_buffer, p_dec->i_buffer, p_pes );
+
+        while( !(p_pic = vout_CreatePicture( p_dec->p_vout, 0, 0, 0 ) ) )
+        {
+            if( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
+            {
+                break;
+            }
+            msleep( VOUT_OUTMEM_SLEEP );
+        }
+
+        p_dec->decpar.data                  = p_dec->p_buffer;
+        p_dec->decpar.bufferSize            = p_pes->i_pes_size;
+        (**p_dec->framedescHandle).dataSize = p_pes->i_pes_size;
+
+        vlc_mutex_lock( lockval.p_address );
+        cres = p_dec->ImageCodecBandDecompress( p_dec->ci, &p_dec->decpar );
+        vlc_mutex_unlock( lockval.p_address );
+
+        ++p_dec->decpar.frameNumber;
+
+        if( cres &0xFFFF )
+        {
+            msg_Dbg( p_dec->p_fifo,
+                     "quicktime_video: ImageCodecBandDecompress cres=0x%X (-0x%X) %d :(\n",
+                     (int)cres,(int)-cres, (int)cres );
+        }
+
+        memcpy( p_pic->p[0].p_pixels,
+                p_dec->plane,
+                p_bih->biWidth * p_bih->biHeight * 2 );
+
+        vout_DatePicture( p_dec->p_vout, p_pic, p_pes->i_pts );
+        vout_DisplayPicture( p_dec->p_vout, p_pic );
+    }
+
+    input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
+}
+
+static void EndThreadVideo      ( vdec_thread_t *p_dec )
+{
+    msg_Dbg( p_dec->p_fifo, "QuickTime library video decoder closing" );
+    free( p_dec->plane );
+    vout_Request( p_dec->p_fifo, p_dec->p_vout, 0, 0, 0, 0 );
+
+#ifndef SYS_DARWIN
+    FreeLibrary( p_dec->qtml );
+    msg_Dbg( p_dec->p_fifo, "FreeLibrary ok." );
+#endif
+
+#ifdef LOADER
+    Restore_LDT_Keeper( p_dec->ldt_fs );
+    msg_Dbg( p_dec->p_fifo, "Restore_LDT_Keeper" );
+#endif
+#ifdef SYS_DARWIN
+    ExitMovies();
+#endif
+}
