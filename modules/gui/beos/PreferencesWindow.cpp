@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.11 2003/01/28 10:05:15 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.12 2003/01/29 00:02:09 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -229,6 +229,8 @@ void PreferencesWindow::SetDefaults()
  *****************************************************************************/
 void PreferencesWindow::ApplyChanges()
 {
+    VlcWrapper * p_wrapper = p_intf->p_sys->p_wrapper;
+
     if( fDvdMenusCheck->Value() )
         p_intf->p_sys->b_dvdmenus = true;
     else
@@ -248,10 +250,19 @@ void PreferencesWindow::ApplyChanges()
         config_GetInt( p_intf, "hue" ) != 0 ||
         config_GetFloat( p_intf, "saturation" ) != 1 )
     {
-        config_PutPsz( p_intf, "filter", "adjust" );
+        if( !config_GetPsz( p_intf, "filter" ) ||
+            strcmp( config_GetPsz( p_intf, "filter" ), "adjust" ) )
+        {
+            config_PutPsz( p_intf, "filter", "adjust" );
+            p_wrapper->FilterChange();
+        }
     }
     else
     {
-        config_PutPsz( p_intf, "filter", NULL );
+        if( config_GetPsz( p_intf, "filter" ) )
+        {
+            config_PutPsz( p_intf, "filter", NULL );
+            p_wrapper->FilterChange();
+        }
     }
 }

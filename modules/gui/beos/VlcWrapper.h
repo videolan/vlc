@@ -2,7 +2,7 @@
  * VlcWrapper.h: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.17 2003/01/27 10:29:22 titer Exp $
+ * $Id: VlcWrapper.h,v 1.18 2003/01/29 00:02:09 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -123,7 +123,8 @@ public:
     void    ChapterInfo( int32& currentIndex, int32& maxIndex );
     
     /* Miscellanous */
-    void         LoadSubFile( char * psz_file );
+    void LoadSubFile( char * psz_file );
+    void FilterChange();
     
 private:
     intf_thread_t *   p_intf;

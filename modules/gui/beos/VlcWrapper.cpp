@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.22 2003/01/27 10:29:22 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.23 2003/01/29 00:02:09 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -30,9 +30,11 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
-extern "C" {
-#include <audio_output.h>
-#include <aout_internal.h>
+#include <vlc/vout.h>
+extern "C"
+{
+  #include <audio_output.h>
+  #include <aout_internal.h>
 }
 
 #include "VlcWrapper.h"
@@ -854,4 +856,34 @@ void VlcWrapper::ChapterInfo( int32 &currentIndex, int32 &maxIndex )
 void VlcWrapper::LoadSubFile( char * psz_file )
 {
     config_PutPsz( p_intf, "sub-file", strdup( psz_file ) );
+}
+
+void VlcWrapper::FilterChange()
+{
+    if( !p_input )
+        return;
+    
+    vout_thread_t * p_vout;
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    /* Warn the vout we are about to change the filter chain */
+    p_vout = (vout_thread_t*)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                              FIND_ANYWHERE );
+    if( p_vout )
+    {
+        p_vout->b_filter_change = VLC_TRUE;
+        vlc_object_release( p_vout );
+    }
+
+    /* restart all video stream */
+    for( unsigned int i = 0; i < p_input->stream.i_es_number; i++ )
+    {
+        if( ( p_input->stream.pp_es[i]->i_cat == VIDEO_ES ) &&
+            ( p_input->stream.pp_es[i]->p_decoder_fifo != NULL ) )
+        {
+            input_UnselectES( p_input, p_input->stream.pp_es[i] );
+            input_SelectES( p_input, p_input->stream.pp_es[i] );
+        }
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
