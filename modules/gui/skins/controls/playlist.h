@@ -2,7 +2,7 @@
  * playlist.h: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: playlist.h,v 1.2 2003/04/20 13:14:14 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -121,6 +121,7 @@ class ControlPlayList : public GenericControl
         virtual bool MouseMove( int x, int y, int button );
         virtual bool MouseOver( int x, int y );
         virtual bool MouseDblClick( int x, int y, int button );
+        virtual bool MouseScroll( int x, int y, int direction );
         virtual bool ToolTipTest( int x, int y );
 
         // Translate control

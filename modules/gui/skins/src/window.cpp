@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.16 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: window.cpp,v 1.17 2003/04/20 13:14:14 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -401,6 +401,18 @@ void Window::MouseDblClick( int x, int y, int button )
     {
         if( ControlList[i]->MouseDblClick( x, y, button ) )
             return;
+    }
+}
+//---------------------------------------------------------------------------
+void Window::MouseScroll( int x, int y, int direction )
+{    
+    // Checking event in controls
+    for( int i = ControlList.size() - 1; i >= 0 ; i-- )
+    {
+        if( ControlList[i]->MouseScroll( x, y, direction ) )
+        {
+            return;
+        }
     }
 }
 //---------------------------------------------------------------------------

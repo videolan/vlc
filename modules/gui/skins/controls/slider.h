@@ -2,7 +2,7 @@
  * slider.h: Slider control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: slider.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: slider.h,v 1.2 2003/04/20 13:14:14 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -69,7 +69,7 @@ class ControlSlider : public GenericControl
 
         int FindNearestPoint( int x, int y );
 
-        // Move cursor (wether SLIDER_MAX in skin_common.h)
+        // Move cursor (whether SLIDER_MAX in skin_common.h)
         void MoveCursor( int newValue );
 
 

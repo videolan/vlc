@@ -2,7 +2,7 @@
  * generic.cpp: Generic control, parent of the others
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic.cpp,v 1.2 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: generic.cpp,v 1.3 2003/04/20 13:14:14 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -141,6 +141,11 @@ bool GenericControl::MouseOver( int x, int y )
 }
 //---------------------------------------------------------------------------
 bool GenericControl::MouseDblClick( int x, int y, int button )
+{
+    return false;
+}
+//---------------------------------------------------------------------------
+bool GenericControl::MouseScroll( int x, int y, int direction )
 {
     return false;
 }

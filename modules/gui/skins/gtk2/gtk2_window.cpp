@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.22 2003/04/19 11:46:11 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.23 2003/04/20 13:14:14 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -239,6 +239,22 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
 
         case GDK_DROP_START:
             DropObject->HandleDropStart( ( (GdkEventDND *)p2 )->context );
+            return true;
+            
+        case GDK_SCROLL:
+            switch( ( (GdkEventScroll *)p2 )->direction )
+            {
+                case GDK_SCROLL_UP:
+                    MouseScroll( ( (GdkEventScroll *)p2 )->x,
+                                 ( (GdkEventScroll *)p2 )->y,
+                                 MOUSE_SCROLL_UP);
+                    break;
+                case GDK_SCROLL_DOWN:
+                    MouseScroll( ( (GdkEventScroll *)p2 )->x,
+                                 ( (GdkEventScroll *)p2 )->y,
+                                 MOUSE_SCROLL_DOWN);
+                    break;
+            }
             return true;
             
         default:

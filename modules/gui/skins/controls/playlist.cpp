@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.3 2003/04/17 19:56:31 karibu Exp $
+ * $Id: playlist.cpp,v 1.4 2003/04/20 13:14:14 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -449,6 +449,29 @@ bool ControlPlayList::MouseMove( int x, int y, int button )
     }
 
     return false;
+}
+//---------------------------------------------------------------------------
+bool ControlPlayList::MouseScroll( int x, int y, int direction )
+{
+    if( !Enabled )
+        return false;
+
+    //long pos = Slider->GetCursorPosition();
+    long pos = StartIndex;
+fprintf(stderr," scroll %d %d\n", pos, StartIndex);
+    switch( direction )
+    {
+        case MOUSE_SCROLL_UP:
+            if( pos > 0 ) pos--;
+            break;
+        case MOUSE_SCROLL_DOWN:
+            if( pos + Line  < NumOfItems ) pos++;
+            break;
+    }
+    StartIndex = pos;
+    Slider->SetCursorPosition( pos );
+    RefreshAll();
+    return true;
 }
 //---------------------------------------------------------------------------
 bool ControlPlayList::MouseOver( int x, int y )

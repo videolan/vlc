@@ -2,7 +2,7 @@
  * generic.h: Generic control, parent of the others
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: generic.h,v 1.2 2003/04/20 13:14:14 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -73,6 +73,7 @@ class GenericControl               // This is the generic control class
         virtual bool MouseMove( int x, int y, int button );
         virtual bool MouseOver( int x, int y );
         virtual bool MouseDblClick( int x, int y, int button );
+        virtual bool MouseScroll( int x, int y, int direction );
         virtual bool ToolTipTest( int x, int y );
         virtual bool SendNewHelpText();
 

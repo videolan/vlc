@@ -2,7 +2,7 @@
  * window.h: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: window.h,v 1.2 2003/04/20 13:14:14 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -39,6 +39,11 @@ class Graphics;
 class GenericControl;
 class Anchor;
 class Event;
+
+//---------------------------------------------------------------------------
+// Constants for scrolling
+#define MOUSE_SCROLL_UP 0
+#define MOUSE_SCROLL_DOWN 1
 
 //---------------------------------------------------------------------------
 class Window
@@ -96,6 +101,7 @@ class Window
         void MouseDown(     int x, int y, int button );
         void MouseMove(     int x, int y, int button );
         void MouseDblClick( int x, int y, int button );
+        void Window::MouseScroll( int x, int y, int direction );
 
         // Window graphic aspect
         bool OnStartThemeVisible;
