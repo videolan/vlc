@@ -202,15 +202,16 @@ static int Open( vlc_object_t *p_this )
                    msg_Err( p_filter, "Unable to parse effect list. Aborting");
                    break;
                 }
-                p_effect->psz_args = strndup( psz_parser, psz_eoa - psz_parser);
+                p_effect->psz_args =
+                    strndup( psz_parser, psz_eoa - psz_parser);
             }
+            TAB_APPEND( p_sys->i_effect, p_sys->effect, p_effect );
         }
         else
         {
-            msg_Err( p_filter, "unknown visual effect" );
+            msg_Err( p_filter, "unknown visual effect: %s", psz_parser );
+            free( p_effect );
         }
-
-        TAB_APPEND( p_sys->i_effect, p_sys->effect, p_effect );
 
         if( strchr( psz_parser, ',' ) )
         {
@@ -231,6 +232,12 @@ static int Open( vlc_object_t *p_this )
         free( psz_effects );
     }
 
+    if( !p_sys->i_effect )
+    {
+        msg_Err( p_filter, "no effects found" );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     /* Open the video output */
     p_sys->p_vout =
