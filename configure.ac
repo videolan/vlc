@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.46 2003/07/29 17:42:58 gbazin Exp $
+dnl $Id: configure.ac,v 1.47 2003/07/29 22:20:53 gbazin Exp $
 
 AC_INIT(vlc,0.6.1)
 
@@ -1418,8 +1418,6 @@ AC_LANG_PUSH(C++)
     ],[
       AX_ADD_LDFLAGS([mkv],[-lmatroska -lebml])
     ])
-  ],[
-    AC_MSG_ERROR([libebml or libmatroska include files not found])
   ])
   CPPFLAGS="${CPPFLAGS_save}"
 AC_LANG_POP(C++)
