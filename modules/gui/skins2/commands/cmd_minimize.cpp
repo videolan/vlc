@@ -4,8 +4,7 @@
  * Copyright (C) 2003 VideoLAN
  * $Id: cmd_fullscreen.cpp 6961 2004-03-05 17:34:23Z sam $
  *
- * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
+ * Authors: Mohammed Adnène Trojette     <adn@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
