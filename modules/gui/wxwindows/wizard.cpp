@@ -1087,7 +1087,7 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
         }
     }
     p_parent->SetStream( methods_array[i_method].psz_access ,
-                         (char *)address_txtctrl->GetValue().c_str() );
+                         (char *)address_txtctrl->GetValue().mb_str() );
 
     /* Set the action for the muxer page */
     ((wizEncapPage*)GetNext())->SetAction( p_parent->GetAction() );
