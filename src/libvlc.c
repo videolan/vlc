@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.61 2003/02/01 18:53:03 sam Exp $
+ * $Id: libvlc.c,v 1.62 2003/02/01 23:39:02 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -167,17 +167,8 @@ int VLC_Create( void )
         msg_Dbg( &libvlc, COPYRIGHT_MESSAGE );
         msg_Dbg( &libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
 
-        /* Set language now, otherwise the main module's strings will not
-         * be translated. FIXME: this is a hack, the correct way is to have
-         * SetLanguage dynamically retranslate all module strings. */
-        SetLanguage( "" );
-
-        /* Initialize the module bank and load the configuration of the
-         * main module. We need to do this at this stage to be able to display
-         * a short help if required by the user. (short help == main module
-         * options) */
-        module_InitBank( &libvlc );
-        module_LoadMain( &libvlc );
+        /* The module bank will be initialized later */
+        libvlc.p_module_bank = NULL;
 
         libvlc.b_ready = VLC_TRUE;
     }
@@ -220,10 +211,11 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     char *       p_tmp;
     char *       psz_modules;
     char *       psz_parser;
-    vlc_bool_t   b_exit;
+    vlc_bool_t   b_exit = VLC_FALSE;
     vlc_t *      p_vlc;
     module_t    *p_help_module;
     playlist_t  *p_playlist;
+    vlc_value_t  lockval;
 
     p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
@@ -260,6 +252,21 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
     msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
 
+    /* Initialize the module bank and load the configuration of the
+     * main module. We need to do this at this stage to be able to display
+     * a short help if required by the user. (short help == main module
+     * options) */
+    var_Create( &libvlc, "libvlc", VLC_VAR_MUTEX );
+    var_Get( &libvlc, "libvlc", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+    if( libvlc.p_module_bank == NULL )
+    {
+        module_InitBank( &libvlc );
+        module_LoadMain( &libvlc );
+    }
+    vlc_mutex_unlock( lockval.p_address );
+    var_Destroy( &libvlc, "libvlc" );
+
     /* Hack: insert the help module here */
     p_help_module = vlc_object_create( p_vlc, VLC_OBJECT_MODULE );
     if( p_help_module == NULL )
@@ -282,8 +289,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
-
-    b_exit = VLC_FALSE;
 
     /* Check for short help option */
     if( config_GetInt( p_vlc, "help" ) )
