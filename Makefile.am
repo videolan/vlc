@@ -8,7 +8,7 @@
 SUBDIRS = po intl m4 share
 DIST_SUBDIRS = $(SUBDIRS) modules src debian doc ipkg lib
 
-EXTRA_DIST = FAQ HACKING MAINTAINERS THANKS src/extras/COPYING \
+EXTRA_DIST = HACKING MAINTAINERS src/extras/COPYING \
              INSTALL.win32 README.MacOSX.rtf vlc.spec install-win32 \
              Modules.am macosx-dmg \
              configure.ac.in mkinstalldirs bootstrap
@@ -512,7 +512,7 @@ package-win32:
 	cp vlc.exe tmp/ 
 	$(STRIP) tmp/vlc.exe
 	cp INSTALL.win32 tmp/INSTALL.txt ; unix2dos tmp/INSTALL.txt
-	for file in AUTHORS COPYING ChangeLog README FAQ ; \
+	for file in AUTHORS COPYING ChangeLog README THANKS NEWS ; \
 			do cp $$file tmp/$${file}.txt ; \
 			unix2dos tmp/$${file}.txt ; done
 	mkdir tmp/plugins
@@ -544,7 +544,7 @@ package-beos:
 	cp vlc tmp/vlc/
 	$(STRIP) tmp/vlc/vlc
 	xres -o tmp/vlc/vlc ./share/vlc_beos.rsrc
-	cp AUTHORS COPYING ChangeLog README FAQ tmp/vlc/
+	cp AUTHORS COPYING ChangeLog README THANKS NEWS tmp/vlc/
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/vlc/share/ ; done
 	mkdir tmp/vlc/plugins
@@ -570,7 +570,7 @@ package-macosx:
 
 # Copy relevant files 
 	cp -R vlc.app tmp/
-	cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf FAQ tmp/
+	cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS tmp/
 
 # Create disk image 
 	./macosx-dmg 18 "vlc-${VERSION}" tmp/* 

@@ -1,8 +1,78 @@
-$Id: NEWS,v 1.3 2003/02/01 18:41:09 sam Exp $
-                                                                                
+$Id: NEWS,v 1.4 2003/02/01 20:34:55 massiot Exp $
+
 Changes between 0.4.6 and 0.5.0:
 --------------------------------
-                                                                                
-  * add stuff here
 
+Core structure:
+  * object structure which allows for full re-entrancy, known as libvlc
+  * new audio output architecture based on filter pipelines, providing
+    S/PDIF and multi-channel support
+  * localization support via gettext on most architectures
+  * new stream output architecture, allowing, using VLC to unicast,
+    multicast or broadcast a stream to another VLC (only MPEG 1, 2 and 4
+    and A/52 streams are supported)
+  * build system now uses autoconf/automake/autopoint
+
+Input access:
+  * mms:// support
+  * ftp:// support
+  * stability fixes in the HTTP access
+  * auto-detection of RTP encapsulation
+
+Input demux:
+  * support for *.asf format
+  * improved support for *.avi, especially over an HTTP connection
+  * support for *.mp4 and *.mov format
+  * support for ogg encapsulation
+  * support for raw DV format
+  * support for *.wav format
+  * support for *.mp3 format
+  * new demuxdump demux allowing to save a stream to a file
+  * raw AAC support
+
+Stream discovery & playlists:
+  * support for the SAP/SDP and SLP protocols
+  * support for .m3u file format
+
+Codecs:
+  * support for the microdvd, subrip, ssa1, ssa2-4 subtitles file formats
+    (only available with the .avi demux)
+  * support for ADPCM audio codec
+  * support for raw PCM data
+  * support for Cinepak video codec
+  * support for DV video codec via libdv
+  * support for AAC audio codec via libfaad2
+  * support for Xvid codec
+  * support for Xiph.org's Vorbis audio codec
+  * support for Xiph.org's Tarkin and Theora video codecs
+  * new codecs supported by latest ffmpeg versions: WMV, WMA, SVQ 1, H263,
+    H263i, MJPEG A/B
+  * fixed an endianness bug in LPCM codec
+
+DVD support:
+  * experimental preliminary support for DVD menus via libdvdplay
+
+Miscellaneous:
+  * new WxWindows interface
+  * all interfaces allow to dynamically change the volume, the audio
+    device and the channels configuration
+
+GNU/Linux, *BSD & misc. UNIX ports:
+  * OSS and ALSA audio output modules support A/52 over S/PDIF output
+  * OSS support for multi-channel (up to 6) analog sound cards
+
+Mac OS X port:
+  * localization support via GNU gettext software
+  * completely revamped Cocoa interface
+  * new preferences panel
+  * new open panel with full features
+  * video output screen can be chosen in the Video menu
+  * audio device and channels configuration can be chosen in the Audio menu
+  * new playlist and messages windows
+
+Win32 port:
+  * waveout modules supports multi-channel audio output
+  * support for VCDs
+
+BeOS port:
 

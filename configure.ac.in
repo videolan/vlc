@@ -95,6 +95,7 @@ case "x${target_os}" in
     CXXFLAGS_save="${CXXFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; OBJCFLAGS="${OBJCFLAGS_save}"
     LDFLAGS_vlc="${LDFLAGS_vlc} -all_load"
+    LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -all_load"
     LIBEXT=".dylib"
     ;;
   x*mingw32* | x*cygwin*)
