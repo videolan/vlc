@@ -360,15 +360,15 @@
             if( [o_sap_chkbox state] == NSOnState )
             {
                 if ( ![[o_channel_name stringValue] isEqualToString: @""] )
-                    o_announce = [NSString stringWithFormat:@",sap=%@", [o_channel_name stringValue]];
+                    o_announce = [NSString stringWithFormat:@",sap,name=%@", [o_channel_name stringValue]];
                 else
                     o_announce = @",sap";
             }
             if( [o_slp_chkbox state] == NSOnState )
             {
-                if ( ![[o_channel_name stringValue] isEqualToString: @""] )
-                    o_announce = [o_announce stringByAppendingFormat:@",slp=%@",
-                        [o_channel_name stringValue]];
+               if ( ![[o_channel_name stringValue] isEqualToString: @""] )
+                    o_announce = [o_announce stringByAppendingFormat:@",
+                            slp,name==%@",[o_channel_name stringValue]];
                 else
                     o_announce = [o_announce stringByAppendingString: @",slp"];
             }
