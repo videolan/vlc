@@ -537,7 +537,7 @@ static void RecursiveDestroy( wxMenu *menu )
         {
             RecursiveDestroy( submenu );
         }
-        menu->Destroy( item );
+        menu->Delete( item );
     }
 }
 
