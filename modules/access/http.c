@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.33 2003/04/30 04:13:12 hartman Exp $
+ * $Id: http.c,v 1.34 2003/04/30 09:11:13 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -307,19 +307,11 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
             i_size = i_tell + atoll( psz_value );
 #else
             int sign = 1;
-            psz_parser = psz_value;
-            
-            while( *psz_value == ' ' || *psz_value == '\t' )
-                psz_value++;
 
-            if( *psz_value == '-' )
-                sign = -1;
-            while( *psz_value != '\0')
+            if( *psz_value == '-' ) sign = -1;
+            while( *psz_value >= '0' && *psz_value <= '9' )
             {
-                if( *psz_value >= '0' && *psz_value <= '9' )
-                    i_size = i_size * 10 + *psz_value++ - '0';
-                else
-                    psz_value++;
+                i_size = i_size * 10 + *psz_value++ - '0';
             }
             i_size = i_tell + ( i_size * sign );
 #endif

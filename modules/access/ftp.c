@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.15 2003/04/30 04:13:12 hartman Exp $
+ * $Id: ftp.c,v 1.16 2003/04/30 09:11:13 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -340,18 +340,14 @@ static int Open( vlc_object_t *p_this )
     {
         int64_t i_size = 0;
         char    *psz_parser = psz_arg + 4;
-	int     sign = 1;
+        int     sign = 1;
 
         while( *psz_parser == ' ' || *psz_parser == '\t' ) psz_parser++;
 
-        if( *psz_parser == '-' )
-            sign = -1;
-        while( *psz_parser != '\0' )
+        if( *psz_parser == '-' ) sign = -1;
+        while( *psz_parser >= '0' && *psz_parser <= '9' )
         {
-            if( *psz_parser >= '0' && *psz_parser <= '9' )
-                i_size = i_size *10 + *psz_parser++ - '0';
-            else
-                psz_parser++;
+            i_size = i_size * 10 + *psz_parser++ - '0';
         }
         p_access->i_filesize = i_size * sign;
     }
