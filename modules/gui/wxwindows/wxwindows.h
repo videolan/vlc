@@ -913,6 +913,8 @@ public:
     virtual ~FileInfo();
     void UpdateFileInfo();
 
+    vlc_bool_t b_need_update;
+
 private:
     void OnClose( wxCommandEvent& event );
 
@@ -922,6 +924,7 @@ private:
     wxTreeCtrl *fileinfo_tree;
     wxTreeItemId fileinfo_root;
     wxString fileinfo_root_label;
+
 
 };
 

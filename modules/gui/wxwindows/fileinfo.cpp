@@ -33,6 +33,10 @@
  * Event Table.
  *****************************************************************************/
 
+static int ItemChanged( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
+
+
 /* IDs for the controls and the menu commands */
 enum
 {
@@ -55,6 +59,8 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxFrame( p_parent, -1, wxU(_("Stream and media info")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
+    playlist_t *p_playlist;
+
     /* Initializations */
     p_intf = _p_intf;
     SetIcon( *p_intf->p_sys->p_icon );
@@ -80,6 +86,16 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
     main_sizer->Layout();
     SetSizerAndFit( main_sizer );
 
+    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                FIND_ANYWHERE );
+
+    if( p_playlist )
+    {
+        var_AddCallback( p_playlist, "item-change", ItemChanged, this );
+        vlc_object_release( p_playlist );
+    }
+
+    b_need_update = VLC_TRUE;
     UpdateFileInfo();
 }
 
@@ -107,7 +123,8 @@ void FileInfo::UpdateFileInfo()
             fileinfo_tree->AddRoot( wxL2U(p_input->input.p_item->psz_name) );
         fileinfo_root_label = wxL2U(p_input->input.p_item->psz_name);
     }
-    else if( fileinfo_root_label == wxL2U(p_input->input.p_item->psz_name) )
+    else if( fileinfo_root_label == wxL2U(p_input->input.p_item->psz_name) &&
+             b_need_update == VLC_FALSE )
     {
         return;
     }
@@ -134,6 +151,8 @@ void FileInfo::UpdateFileInfo()
     }
     vlc_mutex_unlock( &p_input->input.p_item->lock );
 
+    b_need_update = VLC_FALSE;
+
     return;
 }
 
@@ -144,4 +163,12 @@ FileInfo::~FileInfo()
 void FileInfo::OnClose( wxCommandEvent& event )
 {
     Hide();
+}
+
+static int ItemChanged( vlc_object_t *p_this, const char *psz_var, 
+                        vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    FileInfo *p_fileinfo = (FileInfo *)param;
+    p_fileinfo->b_need_update = VLC_TRUE;
+    return VLC_SUCCESS;
 }
