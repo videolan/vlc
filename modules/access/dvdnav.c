@@ -56,6 +56,10 @@
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for DVDnav streams. This "\
     "value should be set in millisecond units." )
+#define MENU_TEXT N_("Start directly in menu")
+#define MENU_LONGTEXT N_( \
+    "Allows you to start the DVD directly in the main menu. This "\
+    "will try to skip all the useless warnings introductions." )
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
@@ -64,6 +68,8 @@ vlc_module_begin();
     set_description( _("DVDnav Input") );
     add_integer( "dvdnav-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    add_bool( "dvdnav-menu", VLC_TRUE, NULL,
+        MENU_TEXT, MENU_LONGTEXT, VLC_FALSE );
     set_capability( "access_demux", 5 );
     add_shortcut( "dvd" );
     add_shortcut( "dvdnav" );
@@ -142,6 +148,7 @@ static int Open( vlc_object_t *p_this )
     dvdnav_t    *p_dvdnav;
     int         i_title, i_chapter, i_angle;
     char        *psz_name;
+    vlc_value_t val;
 
     psz_name = ParseCL( VLC_OBJECT(p_demux), p_demux->psz_path, VLC_TRUE,
                         &i_title, &i_chapter, &i_angle );
@@ -221,7 +228,7 @@ static int Open( vlc_object_t *p_this )
     DemuxTitles( p_demux );
 
     /* Set forced title/chapter */
-    if( i_title != 0 )
+    if( i_title > 0 )
     {
         if( dvdnav_title_play( p_sys->dvdnav, i_title ) != DVDNAV_STATUS_OK )
         {
@@ -235,7 +242,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    if( i_chapter != 1 && i_title != 0 )
+    if( i_chapter > 1 && i_title > 0 )
     {
         if( dvdnav_part_play( p_sys->dvdnav, i_title, i_chapter ) !=
             DVDNAV_STATUS_OK )
@@ -247,6 +254,31 @@ static int Open( vlc_object_t *p_this )
         {
             p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
             p_demux->info.i_seekpoint = i_chapter;
+        }
+    }
+
+    var_Create( p_demux, "dvdnav-menu", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "dvdnav-menu", &val );
+    if( i_title == 0 || val.b_bool )
+    {
+        msg_Dbg( p_demux, "trying to go to dvd menu" );
+
+        if( dvdnav_title_play( p_sys->dvdnav, 1 ) != DVDNAV_STATUS_OK )
+        {
+            msg_Warn( p_demux, "cannot set title" );
+        }
+
+        if( dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Title ) !=
+            DVDNAV_STATUS_OK )
+        {
+            msg_Warn( p_demux, "cannot go to dvd menu" );
+        }
+        else
+        {
+            p_demux->info.i_update |=
+                INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+            p_demux->info.i_title = 0;
+            p_demux->info.i_seekpoint = 0;
         }
     }
 
@@ -712,7 +744,7 @@ static char *ParseCL( vlc_object_t *p_this, char *psz_name, vlc_bool_t b_force,
     psz_source = strdup( psz_name );
     if( psz_source == NULL ) return NULL;
 
-    *i_title = 0;
+    *i_title = -1;
     *i_chapter = 1;
     *i_angle = 1;
 
@@ -741,7 +773,7 @@ static char *ParseCL( vlc_object_t *p_this, char *psz_name, vlc_bool_t b_force,
         }
     }
 
-    *i_title   = *i_title >= 0 ? *i_title : 0;
+    *i_title   = *i_title >= 0 ? *i_title : -1;
     *i_chapter = *i_chapter > 0 ? *i_chapter : 1;
     *i_angle   = *i_angle > 0 ? *i_angle : 1;
 
