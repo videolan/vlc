@@ -506,7 +506,7 @@ lib/dsp.so: $(PLUGIN_DSP)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
 
 lib/alsa.so: $(PLUGIN_ALSA)
-	$(CC) $(PCFLAGS) -shared -o $@ $^
+	$(CC) $(PCFLAGS) -shared -o $@ $^ -lasound
 
 lib/null.so: $(PLUGIN_NULL)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
