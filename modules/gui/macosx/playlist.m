@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.46 2003/11/20 02:39:09 hartman Exp $
+ * $Id: playlist.m,v 1.47 2003/12/10 12:57:12 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -265,7 +265,7 @@
 
 - (IBAction)searchItem:(id)sender
 {
-    int i_current = 0;
+    int i_current = -1;
     NSString *o_current_name;
     NSString *o_current_author;
 
@@ -280,15 +280,17 @@
 
     if ([o_table_view selectedRow] == [o_table_view numberOfRows]-1 )
     {
-        i_current = 0;
+        i_current =-1;
     }
     else
     {
-        i_current = [o_table_view selectedRow]+1; 
+        i_current = [o_table_view selectedRow]; 
     }
 
-    while (i_current != [o_table_view selectedRow])
+    do
     {
+        i_current++;
+
         vlc_mutex_lock( &p_playlist->object_lock );
         o_current_name = [NSString stringWithUTF8String: 
             p_playlist->pp_items[i_current]->psz_name];
@@ -304,15 +306,12 @@
              [o_table_view scrollRowToVisible: i_current];
              break;
         }
-        if ( i_current == [o_table_view numberOfRows] - 1 )
+    if ( i_current == [o_table_view numberOfRows] - 1 )
         {
-             i_current = 0;
-        }
-        else
-        {
-             i_current++;
+             i_current = -1;
         }
     }
+    while (i_current != [o_table_view selectedRow]);
     vlc_object_release( p_playlist );
 }
 
