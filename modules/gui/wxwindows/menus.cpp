@@ -892,7 +892,9 @@ void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
                                        p_menuitemext->i_object_id );
         if( p_object == NULL ) return;
 
+        wxMutexGuiLeave(); // We don't want deadlocks
         var_Set( p_object, p_menuitemext->psz_var, p_menuitemext->val );
+        wxMutexGuiEnter();
 
         vlc_object_release( p_object );
     }
