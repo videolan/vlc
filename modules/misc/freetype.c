@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.25 2003/10/23 23:00:37 sigmunau Exp $
+ * $Id: freetype.c,v 1.26 2003/10/24 11:28:57 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -41,7 +41,7 @@
 #elif defined( SYS_BEOS )
 #define DEFAULT_FONT "/boot/beos/etc/fonts/ttfonts/Swiss721.ttf"
 #else
-#define DEFAULT_FONT ""
+#define DEFAULT_FONT "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
 #endif
 
 #if defined(HAVE_ICONV)
