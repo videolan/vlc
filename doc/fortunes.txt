@@ -490,3 +490,9 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+17:07 < JediMaster> sh-2.03# reboot
+17:07 < JediMaster> Segmentation fault
+17:07 < JediMaster> that's not good
+
+  -- #videolan
+%

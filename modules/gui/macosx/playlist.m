@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.25 2003/06/02 12:42:15 hartman Exp $
+ * $Id: playlist.m,v 1.26 2003/06/29 00:14:50 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -28,9 +28,12 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
+#include <math.h>
 
 #include "intf.h"
 #include "playlist.h"
+
+int MacVersion102 = -1;
 
 /*****************************************************************************
  * VLCPlaylistView implementation 
@@ -126,18 +129,24 @@
     o_new_rect.size.height = f_height;
     o_new_rect.origin.x = o_rect.origin.x;
     o_new_rect.origin.y = i_row * f_height;
-    
-    if ( o_striped_row_color == nil )
+   
+    if( ( MacVersion102 < 0 ) && ( floor( NSAppKitVersionNumber ) > NSAppKitVersionNumber10_1 ) )
+    {
+        MacVersion102 = 102;
+    }
+ 
+    if ( MacVersion102 == 102 && o_striped_row_color == nil )
     {
         o_striped_row_color = [[[NSColor alternateSelectedControlColor]
                                 highlightWithLevel: 0.90] retain];
         
-        if ( o_striped_row_color == nil )
-        {
-            /* OSX 10.1 and before ain't that smart ;) */
-            o_striped_row_color = [[NSColor whiteColor] retain];
-        }
     }
+    else if ( o_striped_row_color == nil )
+    {
+        /* OSX 10.1 and before ain't that smart ;) */
+        o_striped_row_color = [[NSColor whiteColor] retain];
+    }
+
     [o_striped_row_color set];
     
     while ( o_new_rect.origin.y < f_origin_y ) {
