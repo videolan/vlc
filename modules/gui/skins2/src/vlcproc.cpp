@@ -192,21 +192,9 @@ void VlcProc::manage()
     if( pInput && !pInput->b_die )
     {
         // Refresh time variables
-#warning "FIXME!"
-        if( true /* pInput->stream.b_seekable */ )
-        {
-            // Refresh position in the stream
-            vlc_value_t pos;
-            var_Get( pInput, "position", &pos );
-            if( pos.f_float >= 0.0 )
-            {
-                pTime->set( pos.f_float, false );
-            }
-        }
-        else
-        {
-            pTime->set( 0, false );
-        }
+        vlc_value_t pos;
+        var_Get( pInput, "position", &pos );
+        pTime->set( pos.f_float, false );
 
         // Get the status of the playlist
         playlist_status_t status = getIntf()->p_sys->p_playlist->i_status;
@@ -215,8 +203,7 @@ void VlcProc::manage()
         pVarStopped->set( status == PLAYLIST_STOPPED );
         pVarPaused->set( status == PLAYLIST_PAUSED );
 
-#warning "FIXME!"
-        pVarSeekable->set( true /* pInput->stream.b_seekable */ );
+        pVarSeekable->set( pos.f_float != 0.0 );
     }
     else
     {

@@ -58,9 +58,14 @@ const string StreamTime::getAsStringPercent() const
 
 const string StreamTime::getAsStringCurrTime() const
 {
-#warning "FIXME!"
-    if( getIntf()->p_sys->p_input == NULL ||
-        /* !getIntf()->p_sys->p_input->stream.b_seekable */ 0 )
+    if( getIntf()->p_sys->p_input == NULL )
+    {
+        return "-:--:--";
+    }
+
+    vlc_value_t pos;
+    var_Get( getIntf()->p_sys->p_input, "position", &pos );
+    if( pos.f_float == 0.0 )
     {
         return "-:--:--";
     }
@@ -74,9 +79,14 @@ const string StreamTime::getAsStringCurrTime() const
 
 const string StreamTime::getAsStringTimeLeft() const
 {
-#warning "FIXME!"
-    if( getIntf()->p_sys->p_input == NULL ||
-        /* !getIntf()->p_sys->p_input->stream.b_seekable */ 0 )
+    if( getIntf()->p_sys->p_input == NULL )
+    {
+        return "-:--:--";
+    }
+
+    vlc_value_t pos;
+    var_Get( getIntf()->p_sys->p_input, "position", &pos );
+    if( pos.f_float == 0.0 )
     {
         return "-:--:--";
     }
@@ -91,9 +101,14 @@ const string StreamTime::getAsStringTimeLeft() const
 
 const string StreamTime::getAsStringDuration() const
 {
-#warning "FIXME!"
-    if( getIntf()->p_sys->p_input == NULL ||
-        /* !getIntf()->p_sys->p_input->stream.b_seekable */ 0 )
+    if( getIntf()->p_sys->p_input == NULL )
+    {
+        return "-:--:--";
+    }
+
+    vlc_value_t pos;
+    var_Get( getIntf()->p_sys->p_input, "position", &pos );
+    if( pos.f_float == 0.0 )
     {
         return "-:--:--";
     }
