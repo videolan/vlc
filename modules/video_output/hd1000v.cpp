@@ -141,7 +141,7 @@ static int Create( vlc_object_t *p_this )
             (u32) p_vout->p_sys->i_width,
             (u32) p_vout->p_sys->i_height,
             (u8) p_vout->p_sys->i_screen_depth,
-            b_double_buffered);
+            b_double_buffered );
     p_vout->p_sys->b_double_buffered = (vlc_bool_t) b_double_buffered;
     msg_Dbg( p_vout, "using screen index = %u, width = %u, height = %u, depth = %u, double buffered = %d",
             p_vout->p_sys->u_current, /* Current screen. */
