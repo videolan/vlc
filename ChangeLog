@@ -3,8 +3,9 @@
 #===================#
 
 0.4.4
-Wed,  7 Aug 2002 22:31:26 +0200
+Sun, 11 Aug 2002 01:18:13 +0200
 
+  * ./src/misc/messages.c: fixed an extremely old buffer overflow.
   * ./plugins/spudec/spu_decoder.c: fixed a moronic endianness bug.
   * ./plugins/dvd/dvd.c: added a --dvd-css-method config option to the dvd
     plugin.
