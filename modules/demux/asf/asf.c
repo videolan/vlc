@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.44 2003/11/21 00:38:01 gbazin Exp $
+ * $Id: asf.c,v 1.45 2003/11/21 16:02:36 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -61,7 +61,7 @@ typedef struct asf_stream_s
 
     mtime_t i_time;
 
-    pes_packet_t    *p_pes;     /* used to keep uncomplete frames */
+    block_t         *p_frame; /* use to gather complete frame */
 
 } asf_stream_t;
 
@@ -176,6 +176,7 @@ static int Open( vlc_object_t * p_this )
         p_stream->i_time = -1;
         p_stream->p_sp = p_sp;
         p_stream->p_es = NULL;
+        p_stream->p_frame = NULL;
 
         if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) &&
             p_sp->i_type_specific_data_length >= sizeof( WAVEFORMATEX ) - 2 )
@@ -443,16 +444,16 @@ static void Close( vlc_object_t * p_this )
     ASF_FreeObjectRoot( p_input->s, p_sys->p_root );
     for( i_stream = 0; i_stream < 128; i_stream++ )
     {
-#define p_stream p_sys->stream[i_stream]
+        asf_stream_t *p_stream = p_sys->stream[i_stream];
+
         if( p_stream )
         {
-            if( p_stream->p_pes )
+            if( p_stream->p_frame )
             {
-                input_DeletePES( p_input->p_method_data, p_stream->p_pes );
+                block_ChainRelease( p_stream->p_frame );
             }
             free( p_stream );
         }
-#undef p_stream
     }
     free( p_sys );
 }
@@ -469,7 +470,8 @@ static mtime_t GetMoviePTS( demux_sys_t *p_sys )
     i_time = -1;
     for( i_stream = 0; i_stream < 128 ; i_stream++ )
     {
-#define p_stream p_sys->stream[i_stream]
+        asf_stream_t *p_stream = p_sys->stream[i_stream];
+
         if( p_stream && p_stream->p_es && p_stream->i_time > 0)
         {
             if( i_time < 0 )
@@ -481,7 +483,6 @@ static mtime_t GetMoviePTS( demux_sys_t *p_sys )
                 i_time = __MIN( i_time, p_stream->i_time );
             }
         }
-#undef p_stream
     }
 
     return( i_time );
@@ -697,8 +698,9 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
                     i_packet_size_left > 0;
              i_payload_data_pos += i_sub_payload_data_length )
         {
-            data_packet_t  *p_data;
+            block_t *p_frag;
             int i_read;
+
             // read sub payload length
             if( i_replicated_data_length == 1 )
             {
@@ -711,55 +713,40 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
             }
 
             /* FIXME I don't use i_media_object_number, sould I ? */
-            if( p_stream->p_pes && i_media_object_offset == 0 )
+            if( p_stream->p_frame && i_media_object_offset == 0 )
             {
                 /* send complete packet to decoder */
-                if( p_stream->p_pes->i_pes_size > 0 )
-                {
-                    es_out_SendPES( p_input->p_es_out, p_stream->p_es, p_stream->p_pes );
-                    p_stream->p_pes = NULL;
-                }
-            }
+                block_t *p_gather = block_ChainGather( p_stream->p_frame );
 
-            if( !p_stream->p_pes )  // add a new PES
-            {
-                p_stream->i_time =
-                    ( (mtime_t)i_pts + i_payload * (mtime_t)i_pts_delta );
+                es_out_Send( p_input->p_es_out, p_stream->p_es, p_gather );
 
-                p_stream->p_pes = input_NewPES( p_input->p_method_data );
-                p_stream->p_pes->i_dts =
-                    p_stream->p_pes->i_pts =
-                        input_ClockGetTS( p_input,
-                                          p_input->stream.p_selected_program,
-                                          p_stream->i_time * 9 /100 );
-
-                //msg_Err( p_input, "stream[0x%2x] pts=%lld", i_stream_number, p_stream->p_pes->i_pts );
-                p_stream->p_pes->p_next = NULL;
-                p_stream->p_pes->i_nb_data = 0;
-                p_stream->p_pes->i_pes_size = 0;
+                p_stream->p_frame = NULL;
             }
 
             i_read = i_sub_payload_data_length + i_skip;
-            if((p_data = stream_DataPacket( p_input->s,i_read,VLC_TRUE))==NULL)
+            if( ( p_frag = stream_Block( p_input->s, i_read ) ) == NULL )
             {
                 msg_Warn( p_input, "cannot read data" );
                 return( 0 );
             }
-            p_data->p_payload_start += i_skip;
             i_packet_size_left -= i_read;
 
+            p_frag->p_buffer += i_skip;
+            p_frag->i_buffer -= i_skip;
 
-            if( !p_stream->p_pes->p_first )
+            if( p_stream->p_frame == NULL )
             {
-                p_stream->p_pes->p_first = p_stream->p_pes->p_last = p_data;
+                p_stream->i_time =
+                    ( (mtime_t)i_pts + i_payload * (mtime_t)i_pts_delta );
+
+                p_frag->i_dts =
+                p_frag->i_pts =
+                    input_ClockGetTS( p_input,
+                                      p_input->stream.p_selected_program,
+                                      p_stream->i_time * 9 /100 );
             }
-            else
-            {
-                p_stream->p_pes->p_last->p_next = p_data;
-                p_stream->p_pes->p_last = p_data;
-            }
-            p_stream->p_pes->i_pes_size += i_sub_payload_data_length;
-            p_stream->p_pes->i_nb_data++;
+
+            block_ChainAppend( &p_stream->p_frame, p_frag );
 
             i_skip = 0;
             if( i_packet_size_left > 0 )
