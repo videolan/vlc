@@ -89,10 +89,6 @@
  * General limitations
  */
 
-/* Maximum number of input threads - this value is used exclusively by
- * interface, and is in fact an interface limitation */
-#define INPUT_MAX_THREADS               10
-
 /* Maximum size of a data packet (128 kB) */
 #define INPUT_MAX_PACKET_SIZE           131072
 
@@ -104,14 +100,6 @@
 
 /* Maximum memory the input is allowed to use (20 MB) */
 #define INPUT_MAX_ALLOCATION            20971520
-
-/*
- * Channel method
- */
-
-/* Delay between channel changes - this is required to avoid flooding the
- * channel server */
-#define INPUT_CHANNEL_CHANGE_DELAY      (mtime_t)(5*CLOCK_FREQ)
 
 /* Duration between the time we receive the data packet, and the time we will
  * mark it to be presented */
@@ -131,9 +119,6 @@
 /*****************************************************************************
  * Audio configuration
  *****************************************************************************/
-
-/* Maximum number of audio output threads */
-#define AOUT_MAX_THREADS                10
 
 /* Volume */
 #define AOUT_VOLUME_DEFAULT             256
@@ -170,9 +155,6 @@
  * Video configuration
  *****************************************************************************/
 
-/* Maximum number of video output threads */
-#define VOUT_MAX_THREADS                256
-
 /*
  * Default settings for video output threads
  */
@@ -189,7 +171,11 @@
 
 /* Video heap size - remember that a decompressed picture is big
  * (~1 Mbyte) before using huge values */
-#define VOUT_MAX_PICTURES               8
+#ifdef UNDER_CE
+#   define VOUT_MAX_PICTURES               5
+#else
+#   define VOUT_MAX_PICTURES               8
+#endif
 
 /* Minimum number of direct pictures the video output will accept without
  * creating additional pictures in system memory */
@@ -244,38 +230,6 @@
 
 /* The default video output window title */
 #define VOUT_TITLE                      "VLC"
-
-/*****************************************************************************
- * Video parser configuration
- *****************************************************************************/
-
-#define VPAR_IDLE_SLEEP                 ((mtime_t)(0.010*CLOCK_FREQ))
-
-/* Optimization level, from 0 to 2 - 1 is generally a good compromise. Remember
- * that raising this level dramatically lengthens the compilation time. */
-#if defined( HAVE_RELEASE )
-#   define VPAR_OPTIM_LEVEL             2
-#else
-#   define VPAR_OPTIM_LEVEL             1
-#endif
-
-/* Maximum number of macroblocks in a picture. */
-#define MAX_MB                          2048
-
-/*****************************************************************************
- * Video decoder configuration
- *****************************************************************************/
-
-#define VDEC_IDLE_SLEEP                 ((mtime_t)(0.100*CLOCK_FREQ))
-
-/* Maximum range of values out of the IDCT + motion compensation. */
-#define VDEC_CROPRANGE                  2048
-
-/* No SMP by default, since it slows down things on non-smp machines. */
-#define VDEC_SMP_DEFAULT                0
-
-/* Nice increments for decoders -- necessary for x11 scheduling */
-#define VDEC_NICE                       3
 
 /*****************************************************************************
  * Messages and console interfaces configuration
