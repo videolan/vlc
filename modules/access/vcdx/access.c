@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000, 2003 VideoLAN
- * $Id: access.c,v 1.11 2003/12/13 12:56:14 rocky Exp $
+ * $Id: access.c,v 1.12 2003/12/22 00:13:52 sam Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -1121,8 +1121,8 @@ VCDFormatStr(const input_thread_t *p_input, thread_vcd_data_t *p_vcd,
 
     case 'L':
       if (vcdplayer_pbc_is_on(p_vcd)) {
-        char num_str[10];
-        sprintf(num_str, _(" List ID %d"), p_vcd->cur_lid);
+        char num_str[40];
+        sprintf(num_str, "%s %d", _("List ID"), p_vcd->cur_lid);
         strncat(tp, num_str, TEMP_STR_LEN-(tp-temp_str));
         tp += strlen(num_str);
       }
