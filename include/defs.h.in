@@ -380,6 +380,9 @@
 /* Define if your compiler groks C altivec extensions. */
 #undef CAN_COMPILE_C_ALTIVEC
 
+/* For FreeBSD VCD support */
+#undef HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H
+
 /* Indicate whether we should use SDL/SDL.h or SDL11/SDL.h */
 #undef SDL_INCLUDE_FILE
 

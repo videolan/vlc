@@ -2,7 +2,7 @@
  * cdrom_tools.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom_tools.c,v 1.3 2002/04/26 23:32:23 jobi Exp $
+ * $Id: cdrom_tools.c,v 1.4 2002/04/27 02:20:32 jobi Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *         Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -49,7 +49,7 @@
 #   include <IOKit/storage/IOCDTypes.h>
 #   include <IOKit/storage/IOCDMedia.h>
 #   include <IOKit/storage/IOCDMediaBSDClient.h>
-#elif defined( SYS_FREEBSD4_5 )
+#elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H )
 #   include <sys/cdio.h>
 #   include <sys/cdrio.h>
 #else
@@ -92,7 +92,7 @@ int ioctl_GetTrackCount( int i_fd, const char *psz_dev )
 
     freeTOC( pTOC );
 
-#elif defined( SYS_FREEBSD4_5 )
+#elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H )
     struct ioc_toc_header tochdr;
     
     if( ioctl( i_fd, CDIOREADTOCHEADER, &tochdr ) == -1 )
@@ -181,7 +181,7 @@ int * ioctl_GetSectors( int i_fd, const char *psz_dev )
 
     freeTOC( pTOC );
 
-#elif defined( SYS_FREEBSD4_5 )
+#elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H )
     struct ioc_read_toc_entry toc_entries;
 
     i_tracks = ioctl_GetTrackCount( i_fd, psz_dev );
@@ -285,7 +285,7 @@ int ioctl_ReadSector( int i_fd, int i_sector, byte_t * p_buffer )
         return( -1 );
     }
 
-#elif defined( SYS_FREEBSD4_5 )
+#elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H )
     
     int i_size = VCD_SECTOR_SIZE;
 

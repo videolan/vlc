@@ -715,18 +715,18 @@ dnl
 dnl  VCD module
 dnl
 AC_ARG_ENABLE(vcd,
-  [  --enable-vcd            VCD support for Linux and MacOS X (default enabled)])
+  [  --enable-vcd            VCD support for Linux, FreeBSD and MacOS X (default enabled)])
 
 if test x$enable_vcd != xno
 then
   AC_EGREP_HEADER(cdrom_msf0,linux/cdrom.h,[
     PLUGINS="${PLUGINS} vcd"
   ])
-
-  if test "x${SYS}" = "xfreebsd4.5"
-  then
+  
+  AC_EGREP_HEADER(ioc_toc_header ,sys/cdio.h,[
     PLUGINS="${PLUGINS} vcd"
-  fi
+    AC_DEFINE(HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H, 1, For FreeBSD VCD support)
+  ])
   
   if test "x${SYS}" = "xbsdi"
   then
