@@ -152,11 +152,6 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         return NULL; /* invalid display size */
     }
 
-#if LIBAVCODEC_BUILD >= 4723
-    p_dec->fmt_out.video.i_width >>= p_context->lowres;
-    p_dec->fmt_out.video.i_height >>= p_context->lowres;
-#endif
-
     if( !p_dec->fmt_out.i_codec )
     {
         /* we make conversion if possible*/
