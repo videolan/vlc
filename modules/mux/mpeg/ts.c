@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.23 2003/08/01 19:38:25 fenrir Exp $
+ * $Id: ts.c,v 1.24 2003/08/04 22:49:02 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -330,7 +330,8 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    msg_Dbg( p_mux, "pcr_delay=%lld pcr_soft_delay=%lld", p_sys->i_pcr_delay, p_sys->i_pcr_soft_delay );
+    msg_Dbg( p_mux, "pcr_delay=%lld pcr_soft_delay=%lld",
+             p_sys->i_pcr_delay, p_sys->i_pcr_soft_delay );
     /* for TS génération */
     p_sys->i_pcr    = 0;
     p_sys->i_dts    = 0;
@@ -512,7 +513,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         p_sys->i_pcr_pid   = p_stream->i_pid;
         p_sys->p_pcr_input = p_input;
 
-        /* Empty TS buffer (avoid broken data or problem with pcr stream changement ) */
+        /* Empty TS buffer (avoid broken data/problems with pcr stream changement ) */
         while( ( p_data = BufferChainGet( &p_sys->chain_ts ) ) )
         {
             sout_BufferDelete( p_mux->p_sout, p_data );
@@ -540,6 +541,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
         /* Find a new pcr stream (Prefer Video Stream) */
         p_sys->i_pcr_pid = 0x1fff;
+        p_sys->p_pcr_input = NULL;
         for( i = 0; i < p_mux->i_nb_inputs; i++ )
         {
             if( p_mux->pp_inputs[i] == p_input )
@@ -549,13 +551,16 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
             if( p_mux->pp_inputs[i]->p_fmt->i_cat == VIDEO_ES )
             {
-                p_sys->i_pcr_pid  = ((ts_stream_t*)p_mux->pp_inputs[i]->p_sys)->i_pid;
+                p_sys->i_pcr_pid  =
+                    ((ts_stream_t*)p_mux->pp_inputs[i]->p_sys)->i_pid;
                 p_sys->p_pcr_input= p_mux->pp_inputs[i];
                 break;
             }
-            else if( p_mux->pp_inputs[i]->p_fmt->i_cat != SPU_ES && p_sys->i_pcr_pid == 0x1fff )
+            else if( p_mux->pp_inputs[i]->p_fmt->i_cat != SPU_ES &&
+                     p_sys->i_pcr_pid == 0x1fff )
             {
-                p_sys->i_pcr_pid  = ((ts_stream_t*)p_mux->pp_inputs[i]->p_sys)->i_pid;
+                p_sys->i_pcr_pid  =
+                    ((ts_stream_t*)p_mux->pp_inputs[i]->p_sys)->i_pid;
                 p_sys->p_pcr_input= p_mux->pp_inputs[i];
             }
         }
@@ -587,7 +592,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     /* We only change PMT version (PAT isn't changed) */
     p_sys->i_pmt_version_number++; p_sys->i_pmt_version_number %= 32;
 
-    /* Empty TS buffer (avoid broken data or problem with pcr stream changement ) */
+    /*Empty TS buffer (avoid broken data/problems with pcr stream changement) */
     while( ( p_data = BufferChainGet( &p_sys->chain_ts ) ) )
     {
         sout_BufferDelete( p_mux->p_sout, p_data );
@@ -724,7 +729,8 @@ static int TSFill( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         if( p_input->p_fifo->i_depth <= 0 )
         {
-            if( p_input->p_fmt->i_cat == AUDIO_ES || p_input->p_fmt->i_cat == VIDEO_ES )
+            if( p_input->p_fmt->i_cat == AUDIO_ES ||
+                p_input->p_fmt->i_cat == VIDEO_ES )
             {
                 /* We need more data */
                 return VLC_EGENERIC;
@@ -796,7 +802,7 @@ static int TSFill( sout_mux_t *p_mux, sout_input_t *p_input )
 
     if( b_pcr_soft && p_stream->chain_ts.p_first )
     {
-        p_stream->chain_ts.p_first->i_flags = SOUT_BUFFER_FLAGS_PRIVATE_PCR_SOFT;
+        p_stream->chain_ts.p_first->i_flags=SOUT_BUFFER_FLAGS_PRIVATE_PCR_SOFT;
     }
 
     return VLC_SUCCESS;
