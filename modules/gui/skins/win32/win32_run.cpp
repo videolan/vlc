@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.14 2003/05/02 15:53:32 gbazin Exp $
+ * $Id: win32_run.cpp,v 1.15 2003/05/05 12:15:25 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -31,8 +31,15 @@
 
 //--- GENERAL ---------------------------------------------------------------
 #ifndef BASIC_SKINS
+#ifdef WIN32                                               /* mingw32 hack */
+#   undef Yield
+#   undef CreateDialog
+#endif
+/* Let vlc take care of the i18n stuff */
+#define WXINTL_NO_GETTEXT_MACRO
 #include <wx/wx.h>
 #endif
+
 #include <windows.h>
 
 //--- SKIN ------------------------------------------------------------------
