@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.17 2003/01/24 00:17:20 hartman Exp $
+ * $Id: vout.m,v 1.18 2003/01/24 06:21:03 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -363,32 +363,28 @@ static int vout_Manage( vout_thread_t *p_vout )
     }
 
     /* hide/show mouse cursor */
-    if( p_vout->p_sys->b_mouse_moved ||
-        p_vout->p_sys->i_time_mouse_last_moved )
+    if( p_vout->p_sys->b_mouse_moved && p_vout->b_fullscreen )
     {
         vlc_bool_t b_change = 0;
 
         if( !p_vout->p_sys->b_mouse_pointer_visible )
         {
             CGDisplayShowCursor( kCGDirectMainDisplay );
+            p_vout->p_sys->b_mouse_pointer_visible = 1;
             b_change = 1;
         }
-#if 0
-        else if( !p_vout->p_sys->b_mouse_moved && 
-            mdate() - p_vout->p_sys->i_time_mouse_last_moved > 2000000 &&
-            p_vout->p_sys->b_mouse_pointer_visible )
+        else if( mdate() - p_vout->p_sys->i_time_mouse_last_moved > 2000000 && 
+                   p_vout->p_sys->b_mouse_pointer_visible )
         {
             CGDisplayHideCursor( kCGDirectMainDisplay );
+            p_vout->p_sys->b_mouse_pointer_visible = 0;
             b_change = 1;
         }
-#endif
 
         if( b_change )
         {
-            p_vout->p_sys->i_time_mouse_last_moved = 0;
             p_vout->p_sys->b_mouse_moved = 0;
-            p_vout->p_sys->b_mouse_pointer_visible =
-                !p_vout->p_sys->b_mouse_pointer_visible;
+            p_vout->p_sys->i_time_mouse_last_moved = 0;
         }
     }
 
@@ -937,7 +933,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
         vlc_value_t val;
         int i_width, i_height, i_x, i_y;
-
+        
         vout_PlacePicture( p_vout, (unsigned int)s_rect.size.width,
                                    (unsigned int)s_rect.size.height,
                                    &i_x, &i_y, &i_width, &i_height );
@@ -949,9 +945,12 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         val.i_int = ( ((int)ml.y) - i_y ) * 
                     p_vout->render.i_height / i_height;
         var_Set( p_vout, "mouse-y", val );
-
+            
         val.b_bool = VLC_TRUE;
         var_Set( p_vout, "mouse-moved", val );
+        
+        p_vout->p_sys->i_time_mouse_last_moved = mdate();
+        p_vout->p_sys->b_mouse_moved = 1;
     }
     else
     {
@@ -1019,7 +1018,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
         if ( b_main_screen && p_vout->p_sys->p_fullscreen_state == NULL )
             BeginFullScreen( &p_vout->p_sys->p_fullscreen_state, NULL, 0, 0,
-                             NULL, NULL, fullScreenHideCursor | fullScreenAllowEvents );
+                             NULL, NULL, fullScreenAllowEvents );
 
         [p_vout->p_sys->o_window 
             initWithContentRect: screen_rect
@@ -1028,6 +1027,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             defer: NO screen: o_screen];
 
         [p_vout->p_sys->o_window setLevel: NSModalPanelWindowLevel];
+        p_vout->p_sys->b_mouse_moved = 1;
+        p_vout->p_sys->i_time_mouse_last_moved = mdate();
     }
     else
     {
