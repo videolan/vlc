@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.31 2001/02/14 15:58:29 henri Exp $
+ * $Id: input_netlist.c,v 1.32 2001/03/10 11:23:10 henri Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -68,6 +68,23 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
     p_netlist = (netlist_t *) p_input->p_method_data;
     
     p_netlist->i_read_once = i_read_once;
+    
+    /* In order to optimize netlist, we are taking i_nb_data a 2^i 
+     * so that modulo is an "&".
+     * This is not changing i_nb data outside this function except in 
+     * the netlist_t struct */
+    /* As i_loop is unsigned int, and i_ns_data int, this shouldn't be a 
+     * problem */
+    for( i_loop=1; i_loop < i_nb_data; i_loop*=2 )
+        ;
+    intf_DbgMsg( "Netlist : Required %i byte, got %u",i_nb_data,i_loop );
+    i_nb_data = i_loop;
+
+    /* Same thing for i_nb_pes */
+    for( i_loop=1; i_loop < i_nb_data; i_loop*=2 )
+        ;
+    intf_DbgMsg( "Netlist : Required %i byte, got %u",i_nb_data,i_loop );
+    i_nb_data = i_loop;
     
     /* allocate the buffers */ 
     p_netlist->p_buffers = 
@@ -179,8 +196,8 @@ struct iovec * input_NetlistGetiovec( void * p_method_data )
     
     /* check */
     if( 
-     (p_netlist->i_data_end - p_netlist->i_data_start + p_netlist->i_nb_data)
-     %p_netlist->i_nb_data < p_netlist->i_read_once )
+     ( (p_netlist->i_data_end - p_netlist->i_data_start + p_netlist->i_nb_data)
+     & ( p_netlist->i_nb_data -1 ) ) < p_netlist->i_read_once )
     {
         intf_ErrMsg("Empty iovec FIFO. Unable to allocate memory");
         return (NULL);
@@ -238,7 +255,7 @@ while (i_loop < i_nb_iovec )
     }
 
     p_netlist->i_data_start += i_nb_iovec;
-    p_netlist->i_data_start %= p_netlist->i_nb_data;
+    p_netlist->i_data_start &= ( p_netlist->i_nb_data - 1 );
 
     /* unlock */
     vlc_mutex_unlock (&p_netlist->lock);
@@ -278,7 +295,7 @@ struct data_packet_s * input_NetlistNewPacket( void * p_method_data,
     
     p_return = (p_netlist->pp_free_data[p_netlist->i_data_start]);
     p_netlist->i_data_start++;
-    p_netlist->i_data_start %= p_netlist->i_nb_data;
+    p_netlist->i_data_start &= ( p_netlist->i_nb_data - 1 );
 
     /* unlock */
     vlc_mutex_unlock (&p_netlist->lock);
@@ -318,7 +335,7 @@ struct pes_packet_s * input_NetlistNewPES( void * p_method_data )
     /* allocate */
     p_return = p_netlist->pp_free_pes[p_netlist->i_pes_start];
     p_netlist->i_pes_start++;
-    p_netlist->i_pes_start %= p_netlist->i_nb_pes; 
+    p_netlist->i_pes_start &= ( p_netlist->i_nb_pes - 1 ); 
    
     /* unlock */
     vlc_mutex_unlock (&p_netlist->lock);
@@ -349,7 +366,7 @@ void input_NetlistDeletePacket( void * p_method_data, data_packet_t * p_data )
 
    /* Delete data_packet */
     p_netlist->i_data_end ++;
-    p_netlist->i_data_end %= p_netlist->i_nb_data;
+    p_netlist->i_data_end &= ( p_netlist->i_nb_data - 1 );
     
     p_netlist->pp_free_data[p_netlist->i_data_end] = p_data;
     p_netlist->p_free_iovec[p_netlist->i_data_end].iov_base = p_data->p_buffer;
@@ -383,7 +400,7 @@ void input_NetlistDeletePES( void * p_method_data, pes_packet_t * p_pes )
         /* copy of NetListDeletePacket, duplicate code avoid many locks */
 
         p_netlist->i_data_end ++;
-        p_netlist->i_data_end %= p_netlist->i_nb_data;
+        p_netlist->i_data_end &= ( p_netlist->i_nb_data - 1 );
 
         /* re initialize*/
         p_current_packet->p_payload_start = p_current_packet->p_buffer;
@@ -400,7 +417,7 @@ void input_NetlistDeletePES( void * p_method_data, pes_packet_t * p_pes )
  
     /* delete our current PES packet */
     p_netlist->i_pes_end ++;
-    p_netlist->i_pes_end %= p_netlist->i_nb_pes;
+    p_netlist->i_pes_end &= ( p_netlist->i_nb_pes - 1 );
     p_netlist->pp_free_pes[p_netlist->i_pes_end] = p_pes;
     
     /* unlock */
