@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vlcshell.c: a VideoLAN Client plugin for Mozilla
+ * vlcshell.c: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.9 2003/02/01 18:54:10 sam Exp $
+ * $Id: vlcshell.cpp,v 1.10 2003/02/18 13:13:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

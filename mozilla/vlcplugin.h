@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vlcplugin.h: a VideoLAN plugin for Mozilla
+ * vlcplugin.h: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.h,v 1.9 2002/11/28 23:53:03 sigmunau Exp $
+ * $Id: vlcplugin.h,v 1.10 2003/02/18 13:13:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -67,9 +67,9 @@ private:
 /*******************************************************************************
  * Plugin properties.
  ******************************************************************************/
-#define PLUGIN_NAME         "VideoLAN Client Plugin"
+#define PLUGIN_NAME         "VLC multimedia plugin"
 #define PLUGIN_DESCRIPTION \
-    "VideoLAN Client Multimedia Player Plugin <br>" \
+    "VLC multimedia plugin <br>" \
     " <br>" \
     "version %s <br>" \
     "VideoLAN WWW: <a href=\"http://www.videolan.org/\">http://www.videolan.org/</a>"
