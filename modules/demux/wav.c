@@ -1,8 +1,8 @@
 /*****************************************************************************
  * wav.c : wav file input module for vlc
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.7 2003/09/12 16:26:40 fenrir Exp $
+ * Copyright (C) 2001-2003 VideoLAN
+ * $Id: wav.c,v 1.8 2003/11/11 02:49:26 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -52,8 +52,8 @@ static int  Demux       ( input_thread_t * );
 
 struct demux_sys_t
 {
-    WAVEFORMATEX    *p_wf;
-    es_descriptor_t *p_es;
+    es_format_t     fmt;
+    es_out_id_t     *p_es;
 
     int64_t         i_data_pos;
     unsigned int    i_data_size;
@@ -84,8 +84,8 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t    *p_sys;
 
     uint8_t        *p_peek;
+    WAVEFORMATEX   *p_wf;
     unsigned int   i_size;
-    vlc_fourcc_t   i_fourcc;
     char *psz_name;
 
     /* Is it a wav file ? */
@@ -103,7 +103,6 @@ static int Open( vlc_object_t * p_this )
     p_input->pf_demux     = Demux;
     p_input->pf_demux_control = demux_vaControlDefault;
     p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->p_wf           = NULL;
     p_sys->p_es           = NULL;
     p_sys->i_time         = 0;
 
@@ -124,52 +123,41 @@ static int Open( vlc_object_t * p_this )
     stream_Read( p_input->s, NULL, 8 );   /* cannot fail */
 
     /* load waveformatex */
-    p_sys->p_wf = malloc( __EVEN( i_size ) + 2 ); /* +2, for raw audio -> no cbSize */
-    p_sys->p_wf->cbSize = 0;
+    p_wf = malloc( __EVEN( i_size ) + 2 ); /* +2, for raw audio -> no cbSize */
+    p_wf->cbSize = 0;
     if( stream_Read( p_input->s,
-                     p_sys->p_wf, __EVEN( i_size ) ) < (int)__EVEN( i_size ) )
+                     p_wf, __EVEN( i_size ) ) < (int)__EVEN( i_size ) )
     {
         msg_Err( p_input, "cannot load 'fmt ' chunk" );
         goto error;
     }
 
-    /* le->me */
-    p_sys->p_wf->wFormatTag      = GetWLE ( &p_sys->p_wf->wFormatTag );
-    p_sys->p_wf->nChannels       = GetWLE ( &p_sys->p_wf->nChannels );
-    p_sys->p_wf->nSamplesPerSec  = GetDWLE( &p_sys->p_wf->nSamplesPerSec );
-    p_sys->p_wf->nAvgBytesPerSec = GetDWLE( &p_sys->p_wf->nAvgBytesPerSec );
-    p_sys->p_wf->nBlockAlign     = GetWLE ( &p_sys->p_wf->nBlockAlign );
-    p_sys->p_wf->wBitsPerSample  = GetWLE ( &p_sys->p_wf->wBitsPerSample );
-    p_sys->p_wf->cbSize          = GetWLE ( &p_sys->p_wf->cbSize );
+    es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
+    wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &p_sys->fmt.i_codec, &psz_name );
+    p_sys->fmt.audio.i_channels = GetWLE ( &p_wf->nChannels );
+    p_sys->fmt.audio.i_samplerate = GetDWLE( &p_wf->nSamplesPerSec );
+    p_sys->fmt.audio.i_blockalign = GetWLE ( &p_wf->nBlockAlign );
+    p_sys->fmt.audio.i_bitrate    = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
+    p_sys->fmt.audio.i_bitspersample = GetWLE ( &p_wf->wBitsPerSample );;
+
+    p_sys->fmt.i_extra = GetWLE ( &p_wf->cbSize );
+    if( p_sys->fmt.i_extra > 0 )
+    {
+        p_sys->fmt.p_extra = malloc( p_sys->fmt.i_extra );
+        memcpy( p_sys->fmt.p_extra, &p_wf[1], p_sys->fmt.i_extra );
+    }
 
     msg_Dbg( p_input, "format:0x%4.4x channels:%d %dHz %dKo/s blockalign:%d bits/samples:%d extra size:%d",
-            p_sys->p_wf->wFormatTag,
-            p_sys->p_wf->nChannels,
-            p_sys->p_wf->nSamplesPerSec,
-            p_sys->p_wf->nAvgBytesPerSec / 1024,
-            p_sys->p_wf->nBlockAlign,
-            p_sys->p_wf->wBitsPerSample,
-            p_sys->p_wf->cbSize );
+            GetWLE( &p_wf->wFormatTag ),
+            p_sys->fmt.audio.i_channels,
+            p_sys->fmt.audio.i_samplerate,
+            p_sys->fmt.audio.i_bitrate / 8 / 1024,
+            p_sys->fmt.audio.i_blockalign,
+            p_sys->fmt.audio.i_bitspersample,
+            p_sys->fmt.i_extra );
+    free( p_wf );
 
-    if( ChunkFind( p_input, "data", &p_sys->i_data_size ) )
-    {
-        msg_Err( p_input, "cannot find 'data' chunk" );
-        goto error;
-    }
-
-    p_sys->i_data_pos = stream_Tell( p_input->s );
-
-    stream_Read( p_input->s, NULL, 8 );   /* cannot fail */
-
-    wf_tag_to_fourcc( p_sys->p_wf->wFormatTag, &i_fourcc, &psz_name );
-    if( i_fourcc == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
-    {
-        msg_Err( p_input,"unrecognize audio format(0x%x)",
-                 p_sys->p_wf->wFormatTag );
-        goto error;
-    }
-
-    switch( i_fourcc )
+    switch( p_sys->fmt.i_codec )
     {
         case VLC_FOURCC( 'a', 'r', 'a', 'w' ):
         case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
@@ -192,11 +180,21 @@ static int Open( vlc_object_t * p_this )
             /* FIXME set end of area FIXME */
             goto relay;
         default:
-            msg_Err( p_input, "unsupported codec (%4.4s)", (char*)&i_fourcc );
+            msg_Err( p_input, "unsupported codec (%4.4s)", (char*)&p_sys->fmt.i_codec );
             goto error;
     }
+
     msg_Dbg( p_input, "found %s audio format", psz_name );
 
+    if( ChunkFind( p_input, "data", &p_sys->i_data_size ) )
+    {
+        msg_Err( p_input, "cannot find 'data' chunk" );
+        goto error;
+    }
+
+    p_sys->i_data_pos = stream_Tell( p_input->s );
+
+    stream_Read( p_input->s, NULL, 8 );   /* cannot fail */
 
     /*  create one program */
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -206,49 +204,20 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_input, "cannot init stream" );
         goto error;
     }
-    if( input_AddProgram( p_input, 0, 0) == NULL )
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot add program" );
-        goto error;
-    }
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-
+    p_input->stream.i_mux_rate = 0;
     if( p_sys->i_data_size > 0 )
     {
         p_input->stream.i_mux_rate = (mtime_t)p_sys->i_frame_size *
                                      (mtime_t)1000000 / 50 / p_sys->i_frame_length;
     }
-    else
-    {
-        p_input->stream.i_mux_rate = 0;
-    }
-
-    p_sys->p_es = input_AddES( p_input,
-                                 p_input->stream.p_selected_program,
-                                 1, AUDIO_ES, NULL, 0 );
-    p_sys->p_es->i_stream_id = 1;
-    p_sys->p_es->i_fourcc = i_fourcc;
-    p_sys->p_es->p_waveformatex = malloc( sizeof( WAVEFORMATEX ) + p_sys->p_wf->cbSize );
-    memcpy( p_sys->p_es->p_waveformatex,
-            p_sys->p_wf,
-            sizeof( WAVEFORMATEX ) + p_sys->p_wf->cbSize );
-
-    input_SelectES( p_input, p_sys->p_es );
-
-    p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
+    p_sys->p_es = es_out_Add( p_input->p_es_out, &p_sys->fmt );
     return VLC_SUCCESS;
 
 error:
 relay:
-    if( p_sys->p_wf )
-    {
-        free( p_sys->p_wf );
-    }
     free( p_sys );
-
     return VLC_EGENERIC;
 }
 
@@ -266,9 +235,9 @@ static int Demux( input_thread_t *p_input )
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
         i_pos = stream_Tell( p_input->s );
-        if( p_sys->p_wf->nBlockAlign != 0 )
+        if( p_sys->fmt.audio.i_blockalign != 0 )
         {
-            i_pos += p_sys->p_wf->nBlockAlign - i_pos % p_sys->p_wf->nBlockAlign;
+            i_pos += p_sys->fmt.audio.i_blockalign - i_pos % p_sys->fmt.audio.i_blockalign;
             if( stream_Seek( p_input->s, i_pos ) )
             {
                 msg_Err( p_input, "stream_Sekk failed (cannot resync)" );
@@ -299,15 +268,10 @@ static int Demux( input_thread_t *p_input )
                                      p_input->stream.p_selected_program,
                                      p_sys->i_time * 9 / 100 );
 
-    if( !p_sys->p_es->p_decoder_fifo )
-    {
-        msg_Err( p_input, "no audio decoder" );
-        input_DeletePES( p_input->p_method_data, p_pes );
-        return( -1 );
-    }
+    es_out_Send( p_input->p_es_out, p_sys->p_es, p_pes );
 
-    input_DecodePES( p_sys->p_es->p_decoder_fifo, p_pes );
     p_sys->i_time += p_sys->i_frame_length;
+
     return( 1 );
 }
 
@@ -319,7 +283,6 @@ static void Close ( vlc_object_t * p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys = p_input->p_demux_data;
 
-    free( p_sys->p_wf );
     free( p_sys );
 }
 
@@ -367,27 +330,28 @@ static void FrameInfo_PCM( input_thread_t *p_input,
                            unsigned int   *pi_size,
                            mtime_t        *pi_length )
 {
-    WAVEFORMATEX *p_wf = p_input->p_demux_data->p_wf;
+    demux_sys_t    *p_sys = p_input->p_demux_data;
+
     int i_samples;
 
     int i_bytes;
     int i_modulo;
 
     /* read samples for 50ms of */
-    i_samples = __MAX( p_wf->nSamplesPerSec / 20, 1 );
+    i_samples = __MAX( p_sys->fmt.audio.i_samplerate / 20, 1 );
 
 
     *pi_length = (mtime_t)1000000 *
                  (mtime_t)i_samples /
-                 (mtime_t)p_wf->nSamplesPerSec;
+                 (mtime_t)p_sys->fmt.audio.i_samplerate;
 
-    i_bytes = i_samples * p_wf->nChannels * ( (p_wf->wBitsPerSample + 7) / 8 );
+    i_bytes = i_samples * p_sys->fmt.audio.i_channels * ( (p_sys->fmt.audio.i_bitspersample + 7) / 8 );
 
-    if( p_wf->nBlockAlign > 0 )
+    if( p_sys->fmt.audio.i_blockalign > 0 )
     {
-        if( ( i_modulo = i_bytes % p_wf->nBlockAlign ) != 0 )
+        if( ( i_modulo = i_bytes % p_sys->fmt.audio.i_blockalign ) != 0 )
         {
-            i_bytes += p_wf->nBlockAlign - i_modulo;
+            i_bytes += p_sys->fmt.audio.i_blockalign - i_modulo;
         }
     }
     *pi_size = i_bytes;
@@ -397,33 +361,35 @@ static void FrameInfo_MS_ADPCM( input_thread_t *p_input,
                               unsigned int   *pi_size,
                               mtime_t        *pi_length )
 {
-    WAVEFORMATEX *p_wf = p_input->p_demux_data->p_wf;
+    demux_sys_t    *p_sys = p_input->p_demux_data;
+
     int i_samples;
 
-    i_samples = 2 + 2 * ( p_wf->nBlockAlign -
-                                7 * p_wf->nChannels ) / p_wf->nChannels;
+    i_samples = 2 + 2 * ( p_sys->fmt.audio.i_blockalign -
+                                7 * p_sys->fmt.audio.i_channels ) / p_sys->fmt.audio.i_channels;
 
     *pi_length = (mtime_t)1000000 *
                  (mtime_t)i_samples /
-                 (mtime_t)p_wf->nSamplesPerSec;
+                 (mtime_t)p_sys->fmt.audio.i_samplerate;
 
-    *pi_size = p_wf->nBlockAlign;
+    *pi_size = p_sys->fmt.audio.i_blockalign;
 }
 
 static void FrameInfo_IMA_ADPCM( input_thread_t *p_input,
                                unsigned int   *pi_size,
                                mtime_t        *pi_length )
 {
-    WAVEFORMATEX *p_wf = p_input->p_demux_data->p_wf;
+    demux_sys_t    *p_sys = p_input->p_demux_data;
+
     int i_samples;
 
-    i_samples = 2 * ( p_wf->nBlockAlign -
-                        4 * p_wf->nChannels ) / p_wf->nChannels;
+    i_samples = 2 * ( p_sys->fmt.audio.i_blockalign -
+                        4 * p_sys->fmt.audio.i_channels ) / p_sys->fmt.audio.i_channels;
 
     *pi_length = (mtime_t)1000000 *
                  (mtime_t)i_samples /
-                 (mtime_t)p_wf->nSamplesPerSec;
+                 (mtime_t)p_sys->fmt.audio.i_samplerate;
 
-    *pi_size = p_wf->nBlockAlign;
+    *pi_size = p_sys->fmt.audio.i_blockalign;
 }
 
