@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.29 2002/02/15 13:32:53 sam Exp $
+ * $Id: gtk_playlist.c,v 1.30 2002/02/15 20:02:21 gbazin Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -32,7 +32,8 @@
 
 #include <sys/types.h>          /* for readdir  and stat stuff */
 
-#if !defined( WIN32 )
+#if (!defined( WIN32 ) || defined(__MINGW32__))
+/* Mingw has its own version of dirent */
 #   include <dirent.h>
 #endif
 

@@ -1178,12 +1178,12 @@ then
     [  --with-directx-path=path Win32 DirectX headers and libraries])
     if test "x$with_directx_path" = "x"
     then
-      AC_CHECK_HEADERS(directx.h,
+      AC_CHECK_HEADERS(ddraw.h,
       [ PLUGINS="${PLUGINS} directx"
         LIB_DIRECTX="${LIB_DIRECTX} -lgdi32" ])
     else
       AC_MSG_CHECKING(for directX headers in ${withval})
-      if test -f ${withval}/include/directx.h
+      if test -f ${withval}/include/ddraw.h
       then
         PLUGINS="${PLUGINS} directx"
         LIB_DIRECTX="${LIB_DIRECTX} -L${withval}/lib -lgdi32"

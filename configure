@@ -7238,7 +7238,7 @@ fi
 
     if test "x$with_directx_path" = "x"
     then
-      for ac_hdr in directx.h
+      for ac_hdr in ddraw.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
@@ -7282,7 +7282,7 @@ done
     else
       echo $ac_n "checking for directX headers in ${withval}""... $ac_c" 1>&6
 echo "configure:7285: checking for directX headers in ${withval}" >&5
-      if test -f ${withval}/include/directx.h
+      if test -f ${withval}/include/ddraw.h
       then
         PLUGINS="${PLUGINS} directx"
         LIB_DIRECTX="${LIB_DIRECTX} -L${withval}/lib -lgdi32"
