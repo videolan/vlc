@@ -2,7 +2,7 @@
  * subtitle.h : Common SVCD and CVD subtitles header
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: subtitle.h,v 1.1 2003/12/28 02:01:11 rocky Exp $
+ * $Id: subtitle.h,v 1.2 2003/12/28 11:26:52 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -44,7 +44,7 @@
 #define LOG_ERR(args...)  msg_Err( p_input, args )
 #define LOG_WARN(args...) msg_Warn( p_input, args )
 
-#define GETINT16(p) ( (p[0] <<  8) +  p[1] ); p +=2;
+#define GETINT16(p) ( (p[0] <<  8) +   p[1] )  ; p +=2;
 
 #define GETINT32(p) ( (p[0] << 24) +  (p[1] << 16) +    \
                       (p[2] <<  8) +  (p[3]) ) ; p += 4;
@@ -108,6 +108,9 @@ struct decoder_sys_t
   uint16_t comp_image_offset;	/* offset from subtitle_data to compressed
 				   image data */
   int comp_image_length;	/* size of the compressed image data */
+  int first_field_offset;       /* offset of even raster lines. Used
+				   only for CVD.
+				 */
   int second_field_offset;      /* offset of odd raster lines */
   int metadata_offset;          /* offset to data describing the image */
   int metadata_length;          /* length of metadata */
@@ -121,7 +124,12 @@ struct decoder_sys_t
 				     image when displayed */
   uint16_t i_width, i_height;	/* dimensions in pixels of image */
 
-  ogt_yuvt_t pi_palette[NUM_SUBTITLE_COLORS];
+  ogt_yuvt_t pi_palette[NUM_SUBTITLE_COLORS];  /* Palette of colors used
+						  in subtitle */
+
+
+  ogt_yuvt_t pi_palette_highlight[NUM_SUBTITLE_COLORS]; /* Only used
+							   for CVD */
 
   uint8_t i_options;
   uint8_t i_options2;

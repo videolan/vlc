@@ -2,7 +2,7 @@
  * parse.c: Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cvd_parse.c,v 1.1 2003/12/28 04:51:52 rocky Exp $
+ * $Id: cvd_parse.c,v 1.2 2003/12/28 11:26:52 rocky Exp $
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -35,6 +35,7 @@
 #include "subtitle.h"
 #include "render.h"
 #include "cvd.h"
+#include "common.h"
 
 /* An image color is a two-bit palette entry: 0..3 */ 
 typedef uint8_t ogt_color_t;
@@ -83,11 +84,29 @@ static int  ParseImage         ( decoder_t *, subpicture_t * );
 void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
 {
   decoder_sys_t *p_sys = p_dec->p_sys;
+  u_int8_t *p = p_buffer+1;
 
+  dbg_print( (DECODE_DBG_CALL|DECODE_DBG_PACKET), 
+	     "header: 0x%02x 0x%02x 0x%02x 0x%02x, 0x%02x, 0x%02x, size: %i",
+	     p_buffer[0], p_buffer[1], p_buffer[2], p_buffer[3],
+	     p_buffer[4], p_buffer[5],
+	     p_block->i_buffer);
+  
   dbg_print( (DECODE_DBG_CALL|DECODE_DBG_EXT) , "");
 
-  /* To be finished...*/
-  return;
+  p_sys->i_pts    = p_block->i_pts;
+  p_sys->i_spu_size = (p[0] << 8) + p[1] + 4; p += 2;
+
+  /* FIXME: check data sanity */
+  p_sys->metadata_offset = GETINT16(p);
+  p_sys->metadata_length = p_sys->i_spu_size - p_sys->metadata_offset;
+
+  p_sys->comp_image_offset = 4;
+  p_sys->comp_image_length = p_sys->metadata_offset - p_sys->comp_image_offset;
+  
+  dbg_print(DECODE_DBG_PACKET, "total size: %d  image size: %d\n",
+	    p_sys->i_spu_size, p_sys->comp_image_length);
+
 }
 
 
@@ -102,10 +121,63 @@ E_(ParsePacket)( decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    subpicture_t  *p_spu;
+
     dbg_print( (DECODE_DBG_CALL|DECODE_DBG_EXT) , "");
 
-    /* To be completed... */
-    return;
+    /* Allocate the subpicture internal data. */
+    p_spu = vout_CreateSubPicture( p_sys->p_vout, MEMORY_SUBPICTURE );
+    if( p_spu == NULL )
+    {
+        return;
+    }
+
+    /* In ParseImage we expand the run-length encoded color 0's; also
+       we expand pixels and remove the color palette. This should
+       facilitate scaling and antialiasing and speed up rendering.
+    */
+    p_spu->p_sys = malloc( sizeof( subpicture_sys_t ) 
+			   + PIXEL_SIZE * (p_sys->i_width * p_sys->i_height) );
+
+    /* Fill the p_spu structure */
+    vlc_mutex_init( p_dec, &p_spu->p_sys->lock );
+
+    p_spu->pf_render  = VCDSubRender;
+    p_spu->pf_destroy = VCDSubDestroySPU;
+    p_spu->p_sys->p_data = (uint8_t*)p_spu->p_sys + sizeof( subpicture_sys_t );
+
+    p_spu->p_sys->i_x_end        = p_sys->i_x_start + p_sys->i_width - 1;
+    p_spu->p_sys->i_y_end        = p_sys->i_y_start + p_sys->i_height - 1;
+
+    /* FIXME: use aspect ratio for x? */
+    p_spu->i_x        = p_sys->i_x_start * 3 / 4; 
+    p_spu->i_y        = p_sys->i_y_start;
+    p_spu->i_width    = p_sys->i_width;
+    p_spu->i_height   = p_sys->i_height;
+
+    p_spu->i_start    = p_sys->i_pts;
+    p_spu->i_stop     = p_sys->i_pts + (p_sys->i_duration * 10);
+    
+    p_spu->p_sys->b_crop  = VLC_FALSE;
+    p_spu->p_sys->i_debug = p_sys->i_debug;
+
+    /* Get display time now. If we do it later, we may miss the PTS. */
+    p_spu->p_sys->i_pts = p_sys->i_pts;
+
+    /* Attach to our input thread */
+    p_spu->p_sys->p_input = vlc_object_find( p_dec,
+                                             VLC_OBJECT_INPUT, FIND_PARENT );
+
+    /* We try to display it */
+    if( ParseImage( p_dec, p_spu ) )
+    {
+        /* There was a parse error, delete the subpicture */
+        vout_DestroySubPicture( p_sys->p_vout, p_spu );
+        return;
+    }
+
+    /* SPU is finished - we can ask the video output to display it */
+    vout_DisplaySubPicture( p_sys->p_vout, p_spu );
 
 }
 

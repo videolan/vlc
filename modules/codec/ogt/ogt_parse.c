@@ -2,7 +2,7 @@
  * Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ogt_parse.c,v 1.1 2003/12/28 04:51:52 rocky Exp $
+ * $Id: ogt_parse.c,v 1.2 2003/12/28 11:26:52 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -85,6 +85,8 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
   u_int8_t *p = p_buffer;
   int i;
   
+  dbg_print( (DECODE_DBG_CALL|DECODE_DBG_EXT) , "");
+
   p_sys->i_pts    = p_block->i_pts;
   p_sys->i_spu_size = GETINT16(p);
   p_sys->i_options  = *p++;

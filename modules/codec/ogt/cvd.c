@@ -2,7 +2,7 @@
  * cvd.c : CVD Subtitle decoder thread
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cvd.c,v 1.1 2003/12/28 04:51:52 rocky Exp $
+ * $Id: cvd.c,v 1.2 2003/12/28 11:26:52 rocky Exp $
  *
  * Authors: Rocky Bernstein
  *   based on code from:
@@ -186,7 +186,7 @@ Packetize( decoder_t *p_dec, block_t **pp_block )
 
 /* following functions are local */
 
-#define SPU_HEADER_LEN 5
+#define SPU_HEADER_LEN 1
 
 /*****************************************************************************
  Reassemble:
@@ -200,16 +200,6 @@ Packetize( decoder_t *p_dec, block_t **pp_block )
  If everything is complete, we will return a block. Otherwise return
  NULL.
 
-
- The format of the beginning of the subtitle packet that is used here.
-
-   size    description
-   -------------------------------------------
-   byte    subtitle channel (0..7) in bits 0-3
-   byte    subtitle packet number of this subtitle image 0-N,
-           if the subtitle packet is complete, the top bit of the byte is 1.
-   uint16  subtitle image number
-
  *****************************************************************************/
 static block_t *
 Reassemble( decoder_t *p_dec, block_t **pp_block )
@@ -217,8 +207,6 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block;
     uint8_t *p_buffer;
-    uint16_t i_expected_image;
-    uint8_t  i_packet, i_expected_packet;
 
     if( pp_block == NULL || *pp_block == NULL )
     {
@@ -238,70 +226,187 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
     p_buffer = p_block->p_buffer;
 
     dbg_print( (DECODE_DBG_CALL|DECODE_DBG_PACKET), 
-	       "header: 0x%02x 0x%02x 0x%02x 0x%02x, size: %i",
+	       "header: 0x%02x 0x%02x 0x%02x 0x%02x, 0x%02x, 0x%02x, size: %i",
 	       p_buffer[1], p_buffer[2], p_buffer[3], p_buffer[4],
+	       p_buffer[5], p_buffer[6],
 	       p_block->i_buffer);
 
-    if( config_GetInt( p_dec, "spu-channel" ) != p_buffer[1] )
+    /* There is little data on the format, but it does not seem to have a
+       good way to detect the first packet in the subtitle.  It seems,
+       however, that it has a valid pts while later packets for the same
+       image don't */
+
+    if ( p_sys->state == SUBTITLE_BLOCK_EMPTY && p_block->i_pts == 0 ) {
+      msg_Warn( p_dec, 
+		"first packet expected but no PTS present -- skipped\n");
       return NULL;
-
-    if ( p_sys->state == SUBTITLE_BLOCK_EMPTY ) {
-      i_expected_image  = p_sys->i_image+1;
-      i_expected_packet = 0;
-    } else {
-      i_expected_image  = p_sys->i_image;
-      i_expected_packet = p_sys->i_packet+1;
     }
 
-    p_buffer += 2;
-
-    if ( *p_buffer & 0x80 ) {
-      p_sys->state = SUBTITLE_BLOCK_COMPLETE;
-      i_packet     = ( *p_buffer++ & 0x7F );
-    } else {
-      p_sys->state = SUBTITLE_BLOCK_PARTIAL;
-      i_packet     = *p_buffer++;
-    }
-
-    p_sys->i_image = GETINT16(p_buffer);
-
-    if ( p_sys->i_image != i_expected_image ) {
-      msg_Warn( p_dec, "expecting subtitle image %u but found %u",
-                i_expected_image, p_sys->i_image );
-    }
-
-    if ( i_packet != i_expected_packet ) {
-      msg_Warn( p_dec, "expecting subtitle image packet %u but found %u",
-                i_expected_packet, i_packet);
-    }
-
-    p_sys->i_packet = i_packet;
-
-    if ( p_sys->i_packet == 0 ) {
+    if ( p_sys->subtitle_data_pos == 0 ) {
       /* First packet in the subtitle block */
       E_(ParseHeader)( p_dec, p_buffer, p_block );
       VCDSubInitSubtitleData(p_sys);
     }
 
     /* FIXME - remove append_data and use chainappend */
-    VCDSubAppendData( p_dec, p_buffer, p_block->i_buffer - 5 );
+    VCDSubAppendData( p_dec, p_buffer, p_block->i_buffer - 1 );
 
     block_ChainAppend( &p_sys->p_block, p_block );
 
     p_sys->i_spu += p_block->i_buffer - SPU_HEADER_LEN;
 
-    if (p_sys->state == SUBTITLE_BLOCK_COMPLETE)
-    {
-      if( p_sys->i_spu != p_sys->i_spu_size )
-        {
-          msg_Warn( p_dec, "SPU packets size=%d should be %d",
-                   p_sys->i_spu, p_sys->i_spu_size );
-        }
+    if ( p_sys->subtitle_data_pos == p_sys->i_spu_size ) {
+      /* last packet in subtitle block. */
+
+      uint8_t *p     = p_sys->subtitle_data + p_sys->metadata_offset+1;
+      uint8_t *p_end = p + p_sys->metadata_length;
 
       dbg_print( (DECODE_DBG_PACKET),
                  "subtitle packet complete, size=%d", p_sys->i_spu );
 
+      p_sys->state = SUBTITLE_BLOCK_COMPLETE;
+      p_sys->i_image++;
+
+
+      for ( ; p < p_end; p += 4 ) {
+
+	switch ( p[0] ) {
+	  
+	case 0x04:	/* Display duration in 1/90000ths of a second */
+
+	  p_sys->i_duration = (p[1]<<16) + (p[2]<<8) + p[3];
+	  
+	  dbg_print( DECODE_DBG_PACKET, 
+		     "subtitle display duration %u", p_sys->i_duration);
+	  break;
+	  
+	case 0x0c:	/* Unknown */
+	  dbg_print( DECODE_DBG_PACKET, 
+		     "subtitle command unknown 0x%0x 0x%0x 0x%0x 0x%0x\n",
+		    p[0], p[1], p[2], p[3]);
+	  break;
+	  
+	case 0x17:	/* Position */
+	  p_sys->i_x_start = ((p[1]&0x0f)<<6) + (p[2]>>2);
+	  p_sys->i_y_start = ((p[2]&0x03)<<8) + p[3];
+	  dbg_print( DECODE_DBG_PACKET, 
+		     "start position (%d,%d): %.2x %.2x %.2x", 
+		     p_sys->i_x_start, p_sys->i_y_start,
+		     p[1], p[2], p[3] );
+	  break;
+	  
+	case 0x1f:	/* Coordinates of the image bottom right */
+	  {
+	    int lastx = ((p[1]&0x0f)<<6) + (p[2]>>2);
+	    int lasty = ((p[2]&0x03)<<8) + p[3];
+	    p_sys->i_width  = lastx - p_sys->i_x_start + 1;
+	    p_sys->i_height = lasty - p_sys->i_y_start + 1;
+	    dbg_print( DECODE_DBG_PACKET, 
+		       "end position: (%d,%d): %.2x %.2x %.2x, w x h: %d x %d",
+		       lastx, lasty, p[1], p[2], p[3], 
+		       p_sys->i_width, p_sys->i_height );
+	    break;
+	  }
+	  
+	  
+	case 0x24:
+	case 0x25:
+	case 0x26:
+	case 0x27: 
+	  {
+	    uint8_t v = p[0]-0x24;
+	    
+	    /* Primary Palette */
+	    dbg_print( DECODE_DBG_PACKET,
+		       "primary palette %d (y,u,v): (0x%0x,0x%0x,0x%0x)",
+		       v, p[1], p[2], p[3]);
+	    
+	    p_sys->pi_palette[v].s.y = p[1];
+	    p_sys->pi_palette[v].s.u = p[2];
+	    p_sys->pi_palette[v].s.v = p[3];
+	    break;
+	  }
+	  
+	  
+	case 0x2c:
+	case 0x2d:
+	case 0x2e:
+	case 0x2f:
+	  {
+	    uint8_t v = p[0]-0x2c;
+	    
+	    dbg_print( DECODE_DBG_PACKET,
+		       "highlight palette %d (y,u,v): (0x%0x,0x%0x,0x%0x)",
+		       v, p[1], p[2], p[3]);
+	    
+	    /* Highlight Palette */
+	    p_sys->pi_palette_highlight[v].s.y = p[1];
+	    p_sys->pi_palette_highlight[v].s.u = p[2];
+	    p_sys->pi_palette_highlight[v].s.v = p[3];
+	    break;
+	  }
+
+	case 0x37:
+	  /* transparency for primary palette */
+	  p_sys->pi_palette[0].s.t = p[3] & 0x0f;
+	  p_sys->pi_palette[1].s.t = p[3] >> 4;
+	  p_sys->pi_palette[2].s.t = p[2] & 0x0f;
+	  p_sys->pi_palette[3].s.t = p[2] >> 4;
+
+	  dbg_print( DECODE_DBG_PACKET,
+		     "transparancy for primary palette (y,u,v): "
+		     "0x%0x 0x%0x 0x%0x",
+		     p[1], p[2], p[3]);
+
+	  break;
+
+	case 0x3f:
+	  /* transparency for highlight palette */
+	  p_sys->pi_palette_highlight[0].s.t = p[2] & 0x0f;
+	  p_sys->pi_palette_highlight[1].s.t = p[2] >> 4;
+	  p_sys->pi_palette_highlight[2].s.t = p[1] & 0x0f;
+	  p_sys->pi_palette_highlight[3].s.t = p[1] >> 4;
+
+	  dbg_print( DECODE_DBG_PACKET,
+		     "transparancy for highlight palette (y,u,v): "
+		     "0x%0x 0x%0x 0x%0x",
+		     p[1], p[2], p[3]);
+
+	  break;
+	  
+	case 0x47:
+	  /* offset to first field data, we correct to make it relative
+	     to comp_image_offset (usually 4) */
+	  p_sys->first_field_offset =
+	    (p[2] << 8) + p[3] - p_sys->comp_image_offset;
+	  dbg_print( DECODE_DBG_PACKET, 
+		     "first_field_offset %d", p_sys->first_field_offset);
+	  break;
+	  
+	case 0x4f:
+	  /* offset to second field data, we correct to make it relative to
+	     comp_image_offset (usually 4) */
+	  p_sys->second_field_offset =
+	    (p[2] << 8) + p[3] - p_sys->comp_image_offset;
+	  dbg_print( DECODE_DBG_PACKET, 
+		     "second_field_offset %d", p_sys->second_field_offset);
+	  break;
+	  
+	default:
+	  msg_Warn( p_dec, 
+		    "unknown sequence in control header " 
+		    "0x%0x 0x%0x 0x%0x 0x%0x",
+		    p[0], p[1], p[2], p[3]);
+	  
+	  p_sys->subtitle_data_pos = 0;
+	}
+      }
       return p_sys->p_block;
+    } else {
+      /* Not last block in subtitle, so wait for another. */
+      p_sys->state = SUBTITLE_BLOCK_PARTIAL;
     }
+
+    
     return NULL;
 }
