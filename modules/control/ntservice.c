@@ -2,7 +2,7 @@
  * ntservice.c: Windows NT/2K/XP service interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ntservice.c,v 1.3 2003/11/15 10:38:01 ipkiss Exp $
+ * $Id: ntservice.c,v 1.4 2003/12/22 02:24:51 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -50,7 +50,7 @@ static void Close   ( vlc_object_t * );
     "This option allows you to select additional interfaces spawned by the " \
     "service. It should be specified at install time so the service is " \
     "properly configured. Use a comma separated list of interface modules. " \
-    "(common values are: logger,sap,rc,http)")
+    "(common values are: logger, sap, rc, http)")
 
 vlc_module_begin();
     set_description( _("Windows NT/2K/XP service interface") );

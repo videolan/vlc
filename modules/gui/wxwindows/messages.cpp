@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.17 2003/11/25 00:58:41 gbazin Exp $
+ * $Id: messages.cpp,v 1.18 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -206,9 +206,9 @@ void Messages::OnSaveLog( wxCommandEvent& WXUNUSED(event) )
 {
     if( save_log_dialog == NULL )
         save_log_dialog = new wxFileDialog( this,
-            wxU(_("Save Messages As a file...")),
+            wxU(_("Save Messages As...")),
             wxT(""), wxT("messages"), wxT("*"), wxSAVE | wxOVERWRITE_PROMPT );
-    
+
     if( save_log_dialog && save_log_dialog->ShowModal() == wxID_OK )
     {
         if( !textctrl->SaveFile( save_log_dialog->GetPath() ) )

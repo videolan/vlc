@@ -2,9 +2,9 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: vcd.c,v 1.12 2003/12/13 12:56:14 rocky Exp $
+ * $Id: vcd.c,v 1.13 2003/12/22 02:24:51 sam Exp $
  *
- * Authors: Rocky Bernstein <rocky@panix.com> 
+ * Authors: Rocky Bernstein <rocky@panix.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,8 +42,8 @@ int  E_(InitVCD)      ( vlc_object_t * );
 void E_(EndVCD)       ( vlc_object_t * );
 
 int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
-			 vlc_value_t oldval, vlc_value_t val, 
-			 void *p_data );
+                         vlc_value_t oldval, vlc_value_t val,
+                         void *p_data );
 
 /*****************************************************************************
  * Option help text
@@ -68,16 +68,16 @@ int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
 "Format used in the GUI Playlist Title. Similar to the Unix date \n" \
 "Format specifiers that start with a percent sign. Specifiers are: \n" \
 "   %A : The album information\n" \
-"   %C : The VCD volume count - the number of CD's in the collection\n" \
+"   %C : The VCD volume count - the number of CDs in the collection\n" \
 "   %c : The VCD volume num - the number of the CD in the collection.\n" \
 "   %F : The VCD Format, e.g. VCD 1.0, VCD 1.1, VCD 2.0, or SVC\n" \
-"   %I : The current entry/segment/playback type, e.g. ENTRY, TRACK, SEGMENT..\n" \
-"   %L : The playlist ID prefixed with ' LID' if it exists\n" \
+"   %I : The current entry/segment/playback type, e.g. ENTRY, TRACK, SEGMENT...\n" \
+"   %L : The playlist ID prefixed with \" LID\" if it exists\n" \
 "   %N : The current number of the %I - a decimal number\n" \
 "   %P : The publisher ID\n" \
 "   %p : The preparer I\n" \
 "   %S : If we are in a segment (menu), the kind of segment\n" \
-"   %T : The track numbe\n" \
+"   %T : The track number\n" \
 "   %V : The volume set I\n" \
 "   %v : The volume I\n" \
 "       A number between 1 and the volume count.\n" \
@@ -98,26 +98,26 @@ vlc_module_begin();
     /* Configuration options */
     add_category_hint( N_("VCDX"), NULL, VLC_TRUE );
 
-    add_integer ( MODULE_STRING "-debug", 0, E_(DebugCallback), 
-		  N_("set debug mask for additional debugging."),
+    add_integer ( MODULE_STRING "-debug", 0, E_(DebugCallback),
+                  N_("set debug mask for additional debugging."),
                   DEBUG_LONGTEXT, VLC_TRUE );
 
     add_bool( MODULE_STRING "-PBC", 0, NULL,
-	      N_("Use playback control?"),
-	      N_("If VCD is authored with playback control, use it. "
-		 "Otherwise we play by tracks."), 
-	      VLC_TRUE );
+              N_("Use playback control?"),
+              N_("If VCD is authored with playback control, use it. "
+                 "Otherwise we play by tracks."),
+              VLC_TRUE );
 
-    add_string( MODULE_STRING "-author-format", 
-		"%v - %F disc %c of %C",
-		NULL, 
-		N_("Format to use in playlist 'author'"),
+    add_string( MODULE_STRING "-author-format",
+                "%v - %F disc %c of %C",
+                NULL,
+                N_("Format to use in playlist \"author\""),
                 VCD_TITLE_FMT_LONGTEXT, VLC_TRUE );
 
-    add_string( MODULE_STRING "-title-format", 
-		"%I %N%L%S - %M",
-		NULL, 
-		N_("Format to use in playlist 'title' field"),
+    add_string( MODULE_STRING "-title-format",
+                "%I %N%L%S - %M",
+                NULL,
+                N_("Format to use in playlist \"title\" field"),
                 VCD_TITLE_FMT_LONGTEXT, VLC_TRUE );
 
 #ifdef FIXED

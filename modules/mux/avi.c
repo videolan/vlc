@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.16 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: avi.c,v 1.17 2003/12/22 02:24:53 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -41,7 +41,7 @@ static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("Avi muxer") );
+    set_description( _("AVI muxer") );
     set_capability( "sout mux", 5 );
     add_shortcut( "avi" );
     set_callbacks( Open, Close );

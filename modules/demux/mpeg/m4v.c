@@ -2,7 +2,7 @@
  * m4v.c : MPEG-4 Video demuxer
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: m4v.c,v 1.10 2003/11/24 17:34:21 fenrir Exp $
+ * $Id: m4v.c,v 1.11 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -37,7 +37,7 @@ static int  Open    ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("MPEG-4 Video demuxer" ) );
+    set_description( _("MPEG-4 video demuxer" ) );
     set_capability( "demux", 0 );
     set_callbacks( Open, Close );
     add_shortcut( "m4v" );

@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: interface.cpp,v 1.79 2003/12/16 13:22:51 gbazin Exp $
+ * $Id: interface.cpp,v 1.80 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -868,7 +868,7 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
     wxString msg;
     msg.Printf( wxString(wxT("VLC media player " VERSION)) +
         wxU(_(" (wxWindows interface)\n\n")) +
-        wxU(_("(C) 1996-2003 - the VideoLAN Team\n\n")) +
+        wxU(_("(c) 1996-2003 - the VideoLAN Team\n\n")) +
         wxU( vlc_wraptext(INTF_ABOUT_MSG,WRAPCOUNT,ISUTF8) ) + wxT("\n\n") +
         wxU(_("The VideoLAN team <videolan@videolan.org>\n"
               "http://www.videolan.org/\n\n")) );
@@ -1192,10 +1192,10 @@ void Interface::OnPrevStream( wxCommandEvent& WXUNUSED(event) )
         if( p_playlist->p_input->stream.p_selected_area->i_id > 1 )
         {
             vlc_value_t val; val.b_bool = VLC_TRUE;
-	    vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+            vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
             var_Set( p_playlist->p_input, "prev-title", val );
-        } else 
-	    vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+        } else
+            vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 
@@ -1222,10 +1222,10 @@ void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
               p_playlist->p_input->stream.i_area_nb - 1 )
         {
             vlc_value_t val; val.b_bool = VLC_TRUE;
-	    vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+            vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
             var_Set( p_playlist->p_input, "next-title", val );
-        } else 
-	    vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+        } else
+            vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 

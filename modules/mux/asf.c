@@ -2,7 +2,7 @@
  * asf.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: asf.c,v 1.8 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: asf.c,v 1.9 2003/12/22 02:24:53 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -39,7 +39,7 @@ static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("Asf muxer") );
+    set_description( _("ASF muxer") );
     set_capability( "sout mux", 5 );
     add_shortcut( "asf" );
     add_shortcut( "asfh" );

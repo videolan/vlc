@@ -2,7 +2,7 @@
  * cdda.c : CD digital audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2003 VideoLAN
- * $Id: cdda.c,v 1.10 2003/12/11 05:30:11 rocky Exp $
+ * $Id: cdda.c,v 1.11 2003/12/22 02:24:51 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -44,17 +44,17 @@ static void DemuxClose ( vlc_object_t * );
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for cdda streams. This " \
-    "value should be set in miliseconds units." )
+    "value should be set in milliseconds units." )
 
 vlc_module_begin();
-    set_description( _("CD Audio input") );
+    set_description( _("Audio CD input") );
     set_capability( "access", 70 );
     add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     set_callbacks( AccessOpen, AccessClose );
     add_shortcut( "cdda" );
 
     add_submodule();
-        set_description( _("CD Audio demux") );
+        set_description( _("Audio CD demux") );
         set_capability( "demux", 0 );
         set_callbacks( DemuxOpen, DemuxClose );
         add_shortcut( "cdda" );

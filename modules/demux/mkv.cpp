@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.49 2003/12/04 16:02:54 sam Exp $
+ * $Id: mkv.cpp,v 1.50 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -91,7 +91,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    add_category_hint( N_("mkv-demuxer"), NULL, VLC_TRUE );
+    add_category_hint( N_("mkv demuxer"), NULL, VLC_TRUE );
         add_bool( "mkv-seek-percent", 1, NULL,
                   N_("Seek based on percent not time"),
                   N_("Seek based on percent not time"), VLC_TRUE );
@@ -2182,19 +2182,19 @@ static void InformationsCreate( input_thread_t *p_input )
     }
     if( p_sys->psz_date_utc )
     {
-        input_AddInfo( p_cat, _("Date UTC"), "%s" ,p_sys->psz_date_utc );
+        input_AddInfo( p_cat, _("UTC date"), "%s" ,p_sys->psz_date_utc );
     }
     if( p_sys->psz_segment_filename )
     {
-        input_AddInfo( p_cat, _("Segment Filename"), "%s" ,p_sys->psz_segment_filename );
+        input_AddInfo( p_cat, _("Segment filename"), "%s" ,p_sys->psz_segment_filename );
     }
     if( p_sys->psz_muxing_application )
     {
-        input_AddInfo( p_cat, _("Muxing Application"), "%s" ,p_sys->psz_muxing_application );
+        input_AddInfo( p_cat, _("Muxing application"), "%s" ,p_sys->psz_muxing_application );
     }
     if( p_sys->psz_writing_application )
     {
-        input_AddInfo( p_cat, _("Writing Application"), "%s" ,p_sys->psz_writing_application );
+        input_AddInfo( p_cat, _("Writing application"), "%s" ,p_sys->psz_writing_application );
     }
     input_AddInfo( p_cat, _("Number of streams"), "%d" , p_sys->i_track );
 
@@ -2215,19 +2215,19 @@ static void InformationsCreate( input_thread_t *p_input )
         }
         if( tk.psz_codec_name )
         {
-            input_AddInfo( p_cat, _("Codec Name"), "%s", tk.psz_codec_name );
+            input_AddInfo( p_cat, _("Codec name"), "%s", tk.psz_codec_name );
         }
         if( tk.psz_codec_settings )
         {
-            input_AddInfo( p_cat, _("Codec Setting"), "%s", tk.psz_codec_settings );
+            input_AddInfo( p_cat, _("Codec setting"), "%s", tk.psz_codec_settings );
         }
         if( tk.psz_codec_info_url )
         {
-            input_AddInfo( p_cat, _("Codec Info"), "%s", tk.psz_codec_info_url );
+            input_AddInfo( p_cat, _("Codec info"), "%s", tk.psz_codec_info_url );
         }
         if( tk.psz_codec_download_url )
         {
-            input_AddInfo( p_cat, _("Codec Download"), "%s", tk.psz_codec_download_url );
+            input_AddInfo( p_cat, _("Codec download"), "%s", tk.psz_codec_download_url );
         }
 #undef  tk
     }

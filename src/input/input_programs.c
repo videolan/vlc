@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.126 2003/11/30 16:00:24 fenrir Exp $
+ * $Id: input_programs.c,v 1.127 2003/12/22 02:24:50 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -395,10 +395,10 @@ input_area_t * input_AddArea( input_thread_t * p_input,
         var_AddCallback( p_input, "prev-title", TitleCallback, NULL );
 
         var_Create( p_input, "next-chapter", VLC_VAR_VOID );
-        text.psz_string = _("Next Chapter");
+        text.psz_string = _("Next chapter");
         var_Change( p_input, "next-chapter", VLC_VAR_SETTEXT, &text, NULL );
         var_Create( p_input, "prev-chapter", VLC_VAR_VOID );
-        text.psz_string = _("Previous Chapter");
+        text.psz_string = _("Previous chapter");
         var_Change( p_input, "prev-chapter", VLC_VAR_SETTEXT, &text, NULL );
         var_AddCallback( p_input, "next-chapter", ChapterCallback, NULL );
         var_AddCallback( p_input, "prev-chapter", ChapterCallback, NULL );

@@ -2,7 +2,7 @@
  * rawvideo.c: Pseudo video decoder/packetizer for raw video data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rawvideo.c,v 1.9 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: rawvideo.c,v 1.10 2003/12/22 02:24:51 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -63,12 +63,12 @@ static block_t   *SendFrame  ( decoder_t *, block_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Pseudo Raw Video decoder") );
+    set_description( _("Pseudo raw video decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();
-    set_description( _("Pseudo Raw Video packetizer") );
+    set_description( _("Pseudo raw video packetizer") );
     set_capability( "packetizer", 100 );
     set_callbacks( OpenPacketizer, CloseDecoder );
 vlc_module_end();

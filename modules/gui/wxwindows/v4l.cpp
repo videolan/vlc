@@ -2,7 +2,7 @@
  * v4l.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: v4l.cpp,v 1.5 2003/12/04 16:49:43 sam Exp $
+ * $Id: v4l.cpp,v 1.6 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Mohammed Adnène Trojette <adn@via.ecp.fr>
  *
@@ -104,7 +104,7 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 V4LDialog::V4LDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
-    wxDialog( _p_parent, -1, wxU(_("Video Device Advanced Options")),
+    wxDialog( _p_parent, -1, wxU(_("Advanced video device options")),
              wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -119,11 +119,11 @@ V4LDialog::V4LDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     /* Create MRL combobox */
     wxBoxSizer *mrl_sizer_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticBox *mrl_box = new wxStaticBox( panel, -1,
-                               wxU(_("Video Device MRL")) );
+                               wxU(_("Video device MRL")) );
     wxStaticBoxSizer *mrl_sizer = new wxStaticBoxSizer( mrl_box,
                                                         wxHORIZONTAL );
     wxStaticText *mrl_label = new wxStaticText( panel, -1,
-                                                wxU(_("Destination Target:")));
+                                                wxU(_("Destination target:")));
     mrl_combo = new wxComboBox( panel, MRL_Event, wxT(""),
                                 wxPoint(20,25), wxSize(200, -1), 0, NULL );
     mrl_combo->SetToolTip( wxU(_("You can use this field directly by typing "
@@ -245,7 +245,7 @@ wxPanel *V4LDialog::CommonPanel( wxWindow* parent )
                                   wxSize(200, 200) );
 
     wxStaticBox *panel_box = new wxStaticBox( panel, -1,
-                                   wxU(_("Common Options")) );
+                                   wxU(_("Common options")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxVERTICAL );
 
@@ -334,7 +334,7 @@ wxPanel *V4LDialog::AudioPanel( wxWindow* parent )
                                   wxSize(200, 200) );
 
     wxStaticBox *panel_box = new wxStaticBox( panel, -1,
-                                   wxU(_("Audio Options")) );
+                                   wxU(_("Audio options")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxVERTICAL );
 
@@ -347,7 +347,7 @@ wxPanel *V4LDialog::AudioPanel( wxWindow* parent )
 
     audio_checkbox = new wxCheckBox( audio_subpanel,
                                      AudioDevice_Event,
-                                     wxU(_("Audio Device")) );
+                                     wxU(_("Audio device")) );
     audio_device = new wxTextCtrl( audio_subpanel, ADevLocation,
                                    wxT("/dev/dsp"),
                                    wxDefaultPosition, wxSize( 120, -1 ),
@@ -386,7 +386,7 @@ wxPanel *V4LDialog::BitratePanel( wxWindow* parent )
                                   wxSize(200, 200) );
 
     wxStaticBox *panel_box = new wxStaticBox( panel, -1,
-                                   wxU(_("Bitrate Options")) );
+                                   wxU(_("Bitrate options")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxVERTICAL );
 
@@ -408,7 +408,7 @@ wxPanel *V4LDialog::BitratePanel( wxWindow* parent )
 
     maxbitrate_checkbox = new wxCheckBox( bitrate_subpanel,
                                           MaxBitrateEnable_Event,
-                                          wxU(_("Maximum Bitrate")) );
+                                          wxU(_("Maximum bitrate")) );
     maxbitrate = new wxSpinCtrl( bitrate_subpanel, MaxBitrate_Event, wxT("3000") );
 
     subpanel_sizer->Add( maxbitrate_checkbox, 0, wxALIGN_LEFT |

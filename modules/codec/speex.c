@@ -2,7 +2,7 @@
  * speex.c: speex decoder/packetizer/encoder module making use of libspeex.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: speex.c,v 1.7 2003/12/04 23:15:01 gbazin Exp $
+ * $Id: speex.c,v 1.8 2003/12/22 02:24:51 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -270,13 +270,13 @@ static int ProcessHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
         msg_Err( p_dec, "File encoded with a newer version of Speex" );
         return VLC_EGENERIC;
     }
-    if( p_mode->bitstream_version > p_header->mode_bitstream_version ) 
+    if( p_mode->bitstream_version > p_header->mode_bitstream_version )
     {
         msg_Err( p_dec, "File encoded with an older version of Speex" );
         return VLC_EGENERIC;
     }
-   
-    msg_Dbg( p_dec, "Speex %d Hz audio using %s mode %s%s", 
+
+    msg_Dbg( p_dec, "Speex %d Hz audio using %s mode %s%s",
              p_header->rate, p_mode->modeName,
              ( p_header->nb_channels == 1 ) ? " (mono" : " (stereo",
              p_header->vbr ? ", VBR)" : ")" );
@@ -460,7 +460,7 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     input_info_category_t *p_cat =
-        input_InfoCategory( p_input, _("Speex Comment") );
+        input_InfoCategory( p_input, _("Speex comment") );
 
     char *p_buf = (char *)p_oggpacket->packet;
     SpeexMode *p_mode;
@@ -634,7 +634,7 @@ static block_t *Headers( encoder_t *p_enc )
                 p_block->i_buffer );
         p_block->i_dts = p_block->i_pts = p_block->i_length = 0;
         block_ChainAppend( &p_chain, p_block );
-      
+
         p_sys->i_headers = 2;
     }
 

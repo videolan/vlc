@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.43 2003/11/25 00:58:41 gbazin Exp $
+ * $Id: preferences.cpp,v 1.44 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -367,7 +367,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     config_data->i_object_id = GENERAL_ID;
     config_data->psz_help = wraptext( GENERAL_HELP, 72 , ISUTF8 );
     config_data->psz_section = strdup( GENERAL_TITLE );
-    general_item = AppendItem( root_item, wxU(_("General Settings")),
+    general_item = AppendItem( root_item, wxU(_("General settings")),
                                 -1, -1, config_data );
 
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
@@ -737,7 +737,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     wxArrayString array;
 
     module_t *p_module = NULL;
-    
+
     /* Initializations */
     p_intf = _p_intf;
     p_prefs_dialog =_p_prefs_dialog,
@@ -849,7 +849,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             sizer->Add( help ,0 ,wxEXPAND | wxALL, 5 );
         }
 
-    } 
+    }
     sizer->Layout();
     SetSizer( sizer );
 }
@@ -910,5 +910,5 @@ void PrefsPanel::SwitchAdvanced( vlc_bool_t b_new_advanced )
         config_window->FitInside();
         config_window->Refresh();
     }
-    return;     
+    return;
 }

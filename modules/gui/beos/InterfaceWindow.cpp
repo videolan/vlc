@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.43 2003/09/07 22:53:09 fenrir Exp $
+ * $Id: InterfaceWindow.cpp,v 1.44 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -263,8 +263,8 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
 
     fPrevTitleMI = new BMenuItem( _("Prev Title"), new BMessage( PREV_TITLE ) );
     fNextTitleMI = new BMenuItem( _("Next Title"), new BMessage( NEXT_TITLE ) );
-    fPrevChapterMI = new BMenuItem( _("Prev Chapter"), new BMessage( PREV_CHAPTER ) );
-    fNextChapterMI = new BMenuItem( _("Next Chapter"), new BMessage( NEXT_CHAPTER ) );
+    fPrevChapterMI = new BMenuItem( _("Previous chapter"), new BMessage( PREV_CHAPTER ) );
+    fNextChapterMI = new BMenuItem( _("Next chapter"), new BMessage( NEXT_CHAPTER ) );
     fGotoMenuMI = new BMenuItem( _("Goto Menu"), new BMessage( NAVIGATE_MENU ) );
 
     /* Add the Navigation menu */
@@ -369,11 +369,11 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             break;
             
         case OPEN_FILE:
-        	_ShowFilePanel( B_REFS_RECEIVED, _("VideoLAN Client: Open Media Files") );
+        	_ShowFilePanel( B_REFS_RECEIVED, _("VLC Media Player: Open Media Files") );
             break;
 
         case LOAD_SUBFILE:
-        	_ShowFilePanel( SUBFILE_RECEIVED, _("VideoLAN Client: Open Subtitle File") );
+        	_ShowFilePanel( SUBFILE_RECEIVED, _("VLC Media Player: Open Subtitle File") );
             break;
 
         case OPEN_PLAYLIST:

@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder/encoder/packetizer module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vorbis.c,v 1.27 2003/12/15 21:54:55 gbazin Exp $
+ * $Id: vorbis.c,v 1.28 2003/12/22 02:24:51 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -283,7 +283,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             return NULL;
         }
         p_sys->i_headers++;
-    
+
         ParseVorbisComments( p_dec );
 
         return ProcessPacket( p_dec, &oggpacket, pp_block );
@@ -302,7 +302,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             return NULL;
         }
         p_sys->i_headers++;
-    
+
         if( !p_sys->b_packetizer )
         {
             /* Initialize the Vorbis packet->PCM decoder */
@@ -452,7 +452,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
 {
     input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
     input_info_category_t *p_cat =
-        input_InfoCategory( p_input, _("Vorbis Comment") );
+        input_InfoCategory( p_input, _("Vorbis comment") );
     int i = 0;
     char *psz_name, *psz_value, *psz_comment;
     while ( i < p_dec->p_sys->vc.comments )
@@ -479,10 +479,11 @@ static void ParseVorbisComments( decoder_t *p_dec )
 /*****************************************************************************
  * Interleave: helper function to interleave channels
  *****************************************************************************/
+static void Interleave(
 #ifdef MODULE_NAME_IS_tremor
-static void Interleave( int32_t *p_out, const int32_t **pp_in,
+                        int32_t *p_out, const int32_t **pp_in,
 #else
-static void Interleave( float *p_out, const float **pp_in,
+                        float *p_out, const float **pp_in,
 #endif
                         int i_nb_channels, int i_samples )
 {
@@ -579,10 +580,13 @@ static int OpenEncoder( vlc_object_t *p_this )
     vorbis_info_init( &p_sys->vi );
 
     if( vorbis_encode_setup_managed( &p_sys->vi,
-	    p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.audio.i_rate,
+            p_enc->fmt_in.audio.i_channels, p_enc->fmt_in.audio.i_rate,
             -1, p_enc->fmt_out.i_bitrate, -1 ) ||
         vorbis_encode_ctl( &p_sys->vi, OV_ECTL_RATEMANAGE_AVG, NULL ) ||
-        vorbis_encode_setup_init( &p_sys->vi ) ){}
+        vorbis_encode_setup_init( &p_sys->vi ) )
+    {
+        ;
+    }
 
     /* add a comment */
     vorbis_comment_init( &p_sys->vc);

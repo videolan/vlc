@@ -2,7 +2,7 @@
  * iteminfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: iteminfo.cpp,v 1.4 2003/10/29 18:54:45 gbazin Exp $
+ * $Id: iteminfo.cpp,v 1.5 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -84,7 +84,7 @@ END_EVENT_TABLE()
 ItemInfoDialog::ItemInfoDialog( intf_thread_t *_p_intf,
                                 playlist_item_t *_p_item,
                                 wxWindow* _p_parent ):
-    wxDialog( _p_parent, -1, wxU(_("Playlist Item options")),
+    wxDialog( _p_parent, -1, wxU(_("Playlist item options")),
              wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -215,7 +215,7 @@ wxPanel *ItemInfoDialog::GroupPanel( wxWindow* parent )
     wxPanel *panel = new wxPanel( parent, -1, wxDefaultPosition,
                                   wxDefaultSize );
     wxStaticBox *panel_box = new wxStaticBox( panel, -1,
-                                   wxU(_("Group Info")) );
+                                   wxU(_("Group info")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
                                                          wxVERTICAL);
     wxBoxSizer *subpanel_sizer;

@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.16 2003/12/05 14:48:46 asmax Exp $
+ * $Id: preferences_widgets.cpp,v 1.17 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -107,11 +107,11 @@ ConfigControl *CreateConfigControl( vlc_object_t *p_this,
  *****************************************************************************/
 ConfigControl::ConfigControl( vlc_object_t *_p_this,
                               module_config_t *p_item, wxWindow *parent )
-  : wxPanel( parent ), p_this( _p_this ), 
+  : wxPanel( parent ), p_this( _p_this ),
     pf_update_callback( NULL ), p_update_data( NULL ),
     name( wxU(p_item->psz_name) ), i_type( p_item->i_type ),
     b_advanced( p_item->b_advanced )
-    
+
 {
     sizer = new wxBoxSizer( wxHORIZONTAL );
 }
@@ -320,7 +320,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
         {
             combo->Append( wxU(p_parser->psz_longname),
                            p_parser->psz_object_name );
-            if( p_item->psz_value && !strcmp(p_item->psz_value, 
+            if( p_item->psz_value && !strcmp(p_item->psz_value,
                                              p_parser->psz_object_name) )
                 combo->SetValue( wxU(p_parser->psz_longname) );
         }
@@ -354,7 +354,7 @@ StringConfigControl::StringConfigControl( vlc_object_t *p_this,
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-    textctrl = new wxTextCtrl( this, -1, 
+    textctrl = new wxTextCtrl( this, -1,
                                wxU(p_item->psz_value),
                                wxDefaultPosition,
                                wxDefaultSize,
@@ -396,7 +396,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
     UpdateCombo( p_item );
 
     combo->SetToolTip( wxU(p_item->psz_longtext) );
-    sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );    
+    sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
 
     if( p_item->pf_list_update )
     {
@@ -484,7 +484,7 @@ FileConfigControl::FileConfigControl( vlc_object_t *p_this,
     directory = p_item->i_type == CONFIG_ITEM_DIRECTORY;
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-    textctrl = new wxTextCtrl( this, -1, 
+    textctrl = new wxTextCtrl( this, -1,
                                wxU(p_item->psz_value),
                                wxDefaultPosition,
                                wxDefaultSize,
@@ -506,16 +506,16 @@ void FileConfigControl::OnBrowse( wxCommandEvent& event )
 {
     if( directory )
     {
-        wxDirDialog dialog( this, wxU(_("Choose Directory")) );
+        wxDirDialog dialog( this, wxU(_("Choose directory")) );
 
         if( dialog.ShowModal() == wxID_OK )
         {
-            textctrl->SetValue( dialog.GetPath() );      
+            textctrl->SetValue( dialog.GetPath() );
         }
     }
     else
     {
-        wxFileDialog dialog( this, wxU(_("Choose File")),
+        wxFileDialog dialog( this, wxU(_("Choose file")),
                              wxT(""), wxT(""), wxT("*.*"),
 #if defined( __WXMSW__ )
                              wxOPEN
@@ -530,7 +530,7 @@ FileConfigControl::~FileConfigControl()
 {
     ;
 }
-    
+
 wxString FileConfigControl::GetPszValue()
 {
     return textctrl->GetValue();
@@ -553,7 +553,7 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *p_this,
                            -16000, 16000, p_item->i_value);
     spin->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-    sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );    
+    sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     sizer->Layout();
     this->SetSizerAndFit( sizer );
 }
@@ -585,7 +585,7 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *p_this,
     UpdateCombo( p_item );
 
     combo->SetToolTip( wxU(p_item->psz_longtext) );
-    sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );    
+    sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
 
     if( p_item->pf_list_update )
     {
@@ -681,7 +681,7 @@ RangedIntConfigControl::RangedIntConfigControl( vlc_object_t *p_this,
                            wxSL_LABELS | wxSL_HORIZONTAL );
     slider->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-    sizer->Add( slider, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );    
+    sizer->Add( slider, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     sizer->Layout();
     this->SetSizerAndFit( sizer );
 }

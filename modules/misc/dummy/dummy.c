@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.11 2003/12/08 18:42:08 gbazin Exp $
+ * $Id: dummy.c,v 1.12 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -46,12 +46,12 @@
     "selected/forced the dummy decoder in the main options." )
 
 #ifdef WIN32
-#define QUIET_TEXT N_("Don't open a dos command box interface")
+#define QUIET_TEXT N_("Do not open a DOS command box interface")
 #define QUIET_LONGTEXT N_( \
-    "By default the dummy interface plugin will start a dos command box. " \
+    "By default the dummy interface plugin will start a DOS command box. " \
     "Enabling the quiet mode will not bring this command box but can also " \
-    "be pretty annoying when you want to stop vlc and no video window is " \
-    "opened." )
+    "be pretty annoying when you want to stop VLC and no video window is " \
+    "open." )
 #endif
 
 vlc_module_begin();

@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: es_out.c,v 1.9 2003/12/08 18:42:08 gbazin Exp $
+ * $Id: es_out.c,v 1.10 2003/12/22 02:24:50 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -344,7 +344,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             case AUDIO_ES:
                 if( fmt->psz_description )
                 {
-                    input_AddInfo( p_cat, _("Description"), "%s", 
+                    input_AddInfo( p_cat, _("Description"), "%s",
                                    fmt->psz_description );
                 }
                 input_AddInfo( p_cat, _("Codec"), "%.4s",
@@ -357,29 +357,29 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
                 }
                 if( fmt->psz_language )
                 {
-                    input_AddInfo( p_cat, _("Language"), "%s", 
+                    input_AddInfo( p_cat, _("Language"), "%s",
                                    fmt->psz_language );
                 }
                 if( fmt->audio.i_rate > 0 )
                 {
-                  input_AddInfo( p_cat, _("Sample Rate"), _("%d Hz"),
+                  input_AddInfo( p_cat, _("Sample rate"), _("%d Hz"),
                                    fmt->audio.i_rate );
                 }
                 if( fmt->i_bitrate > 0 )
                 {
-                  input_AddInfo( p_cat, _("Bitrate"), _("%d bps"), 
+                  input_AddInfo( p_cat, _("Bitrate"), _("%d bps"),
                                    fmt->i_bitrate );
                 }
                 if( fmt->audio.i_bitspersample )
                 {
-                    input_AddInfo( p_cat, _("Bits Per Sample"), "%d",
+                    input_AddInfo( p_cat, _("Bits per sample"), "%d",
                                    fmt->audio.i_bitspersample );
                 }
                 break;
             case VIDEO_ES:
                 if( fmt->psz_description )
                 {
-                    input_AddInfo( p_cat, _("Description"), "%s", 
+                    input_AddInfo( p_cat, _("Description"), "%s",
                                    fmt->psz_description );
                 }
                 input_AddInfo( p_cat, _("Type"), _("Video") );
@@ -393,7 +393,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
                 if( fmt->video.i_visible_width > 0 &&
                     fmt->video.i_visible_height > 0 )
                 {
-                    input_AddInfo( p_cat, _("Display Resolution"), "%dx%d",
+                    input_AddInfo( p_cat, _("Display resolution"), "%dx%d",
                                    fmt->video.i_visible_width,
                                    fmt->video.i_visible_height);
                 }

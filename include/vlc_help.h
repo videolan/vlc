@@ -2,7 +2,7 @@
  * vlc_help.h: Help strings
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_help.h,v 1.5 2003/12/03 12:33:21 sam Exp $
+ * $Id: vlc_help.h,v 1.6 2003/12/22 02:24:53 sam Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Anil Daoud <anil@videolan.org>
@@ -29,13 +29,13 @@
  *  First, we need help strings for the General Settings and for the
  *  Plugins screen
  */
-#define GENERAL_TITLE N_( "VLC Preferences" )
+#define GENERAL_TITLE N_( "VLC preferences" )
 #define GENERAL_HELP N_( \
     "Configure some global options in General Settings " \
      "and configure each VLC plugin in the Plugins section.\n" \
      "Click on \"Advanced Options\" to see all options." )
 
-#define PLUGIN_TITLE N_( "VLC Plugins Preferences" )
+#define PLUGIN_TITLE N_( "VLC plugins preferences" )
 #define PLUGIN_HELP N_( \
     "In this tree, you can set options for every plugin used by VLC.\n" \
     "Plugins are sorted by type.\nHave fun tuning VLC!" )
@@ -62,7 +62,7 @@
 #define AOUT_ENC_HELP N_("These are general settings for audio encoding modules.")
 
 #define CHROMA_TITLE N_("Chroma modules settings")
-#define CHROMA_HELP N_(" ")
+#define CHROMA_HELP N_("These settings affect chroma transformation modules.")
 
 #define DECODER_TITLE  N_("Decoder modules settings" )
 #define DECODER_HELP N_( \
@@ -70,7 +70,7 @@
     "preferred subtitles.")
 
 #define DEMUX_TITLE N_("Demuxers settings")
-#define DEMUX_HELP N_( " ")
+#define DEMUX_HELP N_( "These settings affect demuxer modules.")
 
 #define INTERFACE_TITLE N_("Interface plugins settings")
 #define INTERFACE_HELP  N_( \

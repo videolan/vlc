@@ -2,7 +2,7 @@
  * mpeg4audio.c: parse and packetize an MPEG 4 audio stream
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4audio.c,v 1.13 2003/12/15 22:55:01 gbazin Exp $
+ * $Id: mpeg4audio.c,v 1.14 2003/12/22 02:24:53 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -83,9 +83,9 @@ enum {
     STATE_SEND_DATA
 };
 
-static int i_sample_rates[] = 
+static int i_sample_rates[] =
 {
-    96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 
+    96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
     16000, 12000, 11025, 8000,  7350,  0,     0,     0
 };
 
@@ -113,7 +113,7 @@ static int ADTSSyncInfo( decoder_t *, const byte_t * p_buf,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("MPEG4 Audio packetizer") );
+    set_description( _("MPEG4 audio packetizer") );
     set_capability( "packetizer", 50 );
     set_callbacks( OpenPacketizer, ClosePacketizer );
 vlc_module_end();

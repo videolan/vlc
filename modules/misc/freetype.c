@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.38 2003/12/08 17:48:13 yoann Exp $
+ * $Id: freetype.c,v 1.39 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -92,10 +92,11 @@ static line_desc_t *NewLine( byte_t * );
  * Module descriptor
  *****************************************************************************/
 #define FONT_TEXT N_("Font")
-#define FONT_LONGTEXT N_("Filename of Font")
+#define FONT_LONGTEXT N_("Font filename")
 #define FONTSIZE_TEXT N_("Font size in pixels")
-#define FONTSIZE_LONGTEXT N_("The size of the fonts used by the osd module. If \
- set to something different than 0 this option will override the relative font size " )
+#define FONTSIZE_LONGTEXT N_("The size of the fonts used by the osd module. " \
+    "If set to something different than 0 this option will override the " \
+    "relative font size " )
 #define FONTSIZER_TEXT N_("Font size")
 #define FONTSIZER_LONGTEXT N_("The size of the fonts used by the osd module" )
 

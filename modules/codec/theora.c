@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.20 2003/12/14 16:08:32 titer Exp $
+ * $Id: theora.c,v 1.21 2003/12/22 02:24:51 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -336,7 +336,7 @@ static void ParseTheoraComments( decoder_t *p_dec )
 {
     input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
     input_info_category_t *p_cat =
-        input_InfoCategory( p_input, _("Theora Comment") );
+        input_InfoCategory( p_input, _("Theora comment") );
     int i = 0;
     char *psz_name, *psz_value, *psz_comment;
     while ( i < p_dec->p_sys->tc.comments )

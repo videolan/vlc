@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.81 2003/12/02 13:31:23 gbazin Exp $
+ * $Id: avi.c,v 1.82 2003/12/22 02:24:52 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -39,7 +39,7 @@ static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
-    add_category_hint( N_("avi-demuxer"), NULL, VLC_TRUE );
+    add_category_hint( N_("AVI demuxer"), NULL, VLC_TRUE );
         add_bool( "avi-interleaved", 0, NULL,
                   N_("force interleaved method"),
                   N_("force interleaved method"), VLC_TRUE );
@@ -225,8 +225,8 @@ static int Open( vlc_object_t * p_this )
              p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
              p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
     {
-        input_info_category_t *p_cat = input_InfoCategory( p_input, _("Avi") );
-        input_AddInfo( p_cat, _("Number of Streams"), "%d", i_track );
+        input_info_category_t *p_cat = input_InfoCategory( p_input, _("AVI") );
+        input_AddInfo( p_cat, _("Number of streams"), "%d", i_track );
         input_AddInfo( p_cat, _("Flags"), "%s%s%s%s",
                        p_avih->i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
                        p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
@@ -1782,7 +1782,7 @@ static int AVI_IndexLoad_idx1( input_thread_t *p_input )
     }
 
     /* *** calculate offset *** */
-    /* Well, avi is __SHIT__ so test more than one entry 
+    /* Well, avi is __SHIT__ so test more than one entry
      * (needed for some avi files) */
     i_offset = 0;
     for( i = 0; i < __MIN( p_idx1->i_entry_count, 10 ); i++ )

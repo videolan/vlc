@@ -2,7 +2,7 @@
  * logo.c : logo video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: logo.c,v 1.5 2003/11/23 18:31:54 alexis Exp $
+ * $Id: logo.c,v 1.6 2003/12/22 02:24:53 sam Exp $
  *
  * Authors: Simon Latapie <garf@videolan.org>
  *
@@ -55,11 +55,11 @@ static int MouseEvent( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 
-#define FILE_TEXT N_("Logo File")
-#define FILE_LONGTEXT N_("The file must in PNG RGBA 8bits format (for now)")
-#define POSX_TEXT N_("x postion of the logo")
+#define FILE_TEXT N_("Logo filename")
+#define FILE_LONGTEXT N_("The file must be in PNG RGBA 8bits format (for now)")
+#define POSX_TEXT N_("X coordinate of the logo")
 #define POSX_LONGTEXT N_("You can move the logo by left-clicking on it" )
-#define POSY_TEXT N_("y position of the logo")
+#define POSY_TEXT N_("Y coordinate of the logo")
 #define POSY_LONGTEXT N_("You can move the logo by left-clicking on it" )
 #define TRANS_TEXT N_("transparency of the logo")
 #define TRANS_LONGTEXT N_("You can change it by middle-clicking and moving mouse left or right")
@@ -154,7 +154,7 @@ static int Init( vout_thread_t *p_vout )
     fp = fopen( filename , "rb");
     png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL , NULL , NULL);
     info_ptr = png_create_info_struct(png_ptr);
-    
+
     if (fp == NULL)
     {
         p_vout->p_sys->error=1;
@@ -181,7 +181,7 @@ static int Init( vout_thread_t *p_vout )
         /* initialize yuv plans of the image */
         i_parity_width = p_vout->p_sys->width % 2;
         i_parity_height = p_vout->p_sys->height % 2;
-        
+
         p_vout->p_sys->height = p_vout->p_sys->height
                              + (p_vout->p_sys->height % 2);
         p_vout->p_sys->width = p_vout->p_sys->width
@@ -203,7 +203,7 @@ static int Init( vout_thread_t *p_vout )
                 uint8_t (*p)[4];
                 int idx;
                 int idxc;
-                 
+
                 /* FIXME FIXME */
                 p = (void*)row_pointers[y];
                 idx = x + y * p_vout->p_sys->width;
@@ -219,7 +219,7 @@ static int Init( vout_thread_t *p_vout )
 
                     if( ( x % 2 == 0 ) && ( y % 2 == 0 ) )
                     {
-                
+
                         temp = (p[x][2] * 439
                               - p[x][0] * 148
                               - p[x][1] * 291)/1000 + 128;
@@ -235,7 +235,7 @@ static int Init( vout_thread_t *p_vout )
                         p_vout->p_sys->png_image_a[1][idxc] = p_vout->p_sys->png_image_a[0][idx];
 
                     }
-                    
+
                 } else
                 {
                     p_vout->p_sys->png_image_a[0][idx]= 0;
@@ -245,7 +245,7 @@ static int Init( vout_thread_t *p_vout )
         /* now we can free row_pointers*/
         free(row_pointers);
     }
-    
+
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure */
@@ -362,13 +362,13 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
     vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
-    
+
     tr = p_vout->p_sys->trans;
-    
+
     for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {
         memcpy( p_outpic->p[i_index].p_pixels,
-                p_pic->p[i_index].p_pixels, 
+                p_pic->p[i_index].p_pixels,
                 p_pic->p[i_index].i_lines * p_pic->p[i_index].i_pitch);
 
 
@@ -397,11 +397,11 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                 j_max = p_vout->p_sys->width / 2;
             }
             i_delta = p_outpic->p[i_index].i_pitch - j_max;
-            
+
             p_in_a = p_vout->p_sys->png_image_a[i_index];
             p_in   = p_vout->p_sys->png_image[i_index];
 
-            
+
             for( i = 0; i < i_max ; i++ )
             {
                 for( j = 0 ; j < j_max ; j++)
@@ -448,7 +448,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     #define width p_vout->p_sys->width
     #define height p_vout->p_sys->height
     #define trans p_vout->p_sys->trans
-        
+
     var_Get( p_vout->p_sys->p_vout, "mouse-button-down", &valb );
 
     i_delta = newval.i_int - oldval.i_int;
@@ -471,7 +471,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
         {
             posx = __MIN( __MAX( posx + i_delta , 0 ) , p_vout->output.i_width - width );
         }
-        
+
     }
     else if( psz_var[6] == 'y' )
     {

@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.cpp,v 1.59 2003/12/16 19:02:44 gbazin Exp $
+ * $Id: open.cpp,v 1.60 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -237,7 +237,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     SetIcon( *p_intf->p_sys->p_icon );
     file_dialog = NULL;
     i_disc_type_selection = 0;
-    
+
 #ifndef WIN32
     v4l_dialog = NULL;
 #endif
@@ -325,7 +325,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     notebook->AddPage( NetPanel( notebook ), wxU(_("Network")),
                        i_access_method == NET_ACCESS );
 #ifndef WIN32
-    notebook->AddPage( V4LPanel( notebook ), wxU(_("Video For Linux")),
+    notebook->AddPage( V4LPanel( notebook ), wxU(_("Video for Linux")),
                        i_access_method == V4L_ACCESS );
 #endif
 
@@ -472,7 +472,7 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
         wxU(_("DVD (menus support)")),
         wxU(_("DVD")),
         wxU(_("VCD")),
-        wxU(_("CD Audio"))
+        wxU(_("Audio CD"))
 
     };
 
@@ -480,7 +480,7 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
                                 wxDefaultPosition, wxDefaultSize,
                                 WXSIZEOF(disc_type_array), disc_type_array,
                                 WXSIZEOF(disc_type_array), wxRA_SPECIFY_COLS );
-    
+
     sizer_row->Add( disc_type, i_disc_type_selection, wxEXPAND | wxALL, 5 );
 
     wxStaticText *label = new wxStaticText( panel, -1, wxU(_("Device name")) );
@@ -499,8 +499,8 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
 
     disc_chapter_label = new wxStaticText( panel, -1, wxU(_("Chapter")) );
     disc_chapter = new wxSpinCtrl( panel, DiscChapter_Event );
-    sizer->Add( disc_chapter_label, 0, 
-		wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
+    sizer->Add( disc_chapter_label, 0,
+                wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer->Add( disc_chapter, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer_row->Add( sizer, 0, wxEXPAND | wxALL, 5 );
 
@@ -622,14 +622,14 @@ wxPanel *OpenDialog::V4LPanel( wxWindow* parent )
 
     static const wxString video_type_array[] =
     {
-        wxU(_("WebCam")),
-        wxU(_("TV Card")),
+        wxU(_("Webcam")),
+        wxU(_("TV card")),
         wxU(_("PVR")),
         wxU(_("Kfir")),
     };
 
     video_type = new wxRadioBox( panel, VideoType_Event,
-            wxU(_("Video Device Type")),
+            wxU(_("Video device type")),
             wxDefaultPosition, wxDefaultSize,
             WXSIZEOF(video_type_array), video_type_array,
             WXSIZEOF(video_type_array), wxRA_SPECIFY_COLS );
@@ -639,7 +639,7 @@ wxPanel *OpenDialog::V4LPanel( wxWindow* parent )
 
     /* Video Options */
     wxFlexGridSizer *video_sizer = new wxFlexGridSizer( 4, 2, 20 );
-    wxStaticText *label = new wxStaticText( panel, -1, wxU(_("Video Device")) );
+    wxStaticText *label = new wxStaticText( panel, -1, wxU(_("Video device")) );
     video_device = new wxTextCtrl( panel, VideoDevice_Event, wxT(""),
                                   wxDefaultPosition, wxDefaultSize,
                                   wxTE_PROCESS_ENTER);
@@ -658,7 +658,7 @@ wxPanel *OpenDialog::V4LPanel( wxWindow* parent )
 
     wxBoxSizer *v4lbutton_sizer = new wxBoxSizer( wxHORIZONTAL );
     v4l_button = new wxButton( panel, V4LSettings_Event,
-                            wxU(_("Advanced Settings...")) );
+                            wxU(_("Advanced settings...")) );
 
     v4lbutton_sizer->Add( v4l_button, 0, wxALIGN_RIGHT, 5 );
 
@@ -691,71 +691,71 @@ void OpenDialog::UpdateMRL( int i_access_method )
       i_disc_type_selection = disc_type->GetSelection();
 
       switch ( i_disc_type_selection )
-	{
-	case 0:
-	  disc_chapter->Enable();
-	  disc_chapter_label->Enable();
+        {
+        case 0:
+          disc_chapter->Enable();
+          disc_chapter_label->Enable();
           mrltemp = wxT("dvd://")
                   + disc_device->GetValue()
                   + wxString::Format( wxT("@%d:%d"),
                                       disc_title->GetValue(),
                                       disc_chapter->GetValue() );
-	  break;
-	case 1:
-	  disc_chapter->Enable();
-	  disc_chapter_label->Enable();
-	  mrltemp = wxT("dvdsimple://")
+          break;
+        case 1:
+          disc_chapter->Enable();
+          disc_chapter_label->Enable();
+          mrltemp = wxT("dvdsimple://")
                   + disc_device->GetValue()
                   + wxString::Format( wxT("@%d:%d"),
                                       disc_title->GetValue(),
                                       disc_chapter->GetValue() );
-	  break;
-	case 2:
-	  disc_chapter->Disable();
-	  disc_chapter_label->Disable();
+          break;
+        case 2:
+          disc_chapter->Disable();
+          disc_chapter_label->Disable();
 #ifdef HAVE_VCDX
-	  if ( disc_title->GetValue() )
-	    mrltemp = wxT("vcdx://")
-	      + disc_device->GetValue()
-	      + wxString::Format( wxT("@%c%d"),
-				  config_GetInt( p_intf, "vcdx-PBC"  )
-				  ? 'P' : 'E',
-				  disc_title->GetValue()
-				  );
-	  else
-	    mrltemp = wxT("vcdx://")
+          if ( disc_title->GetValue() )
+            mrltemp = wxT("vcdx://")
+              + disc_device->GetValue()
+              + wxString::Format( wxT("@%c%d"),
+                                  config_GetInt( p_intf, "vcdx-PBC"  )
+                                  ? 'P' : 'E',
+                                  disc_title->GetValue()
+                                  );
+          else
+            mrltemp = wxT("vcdx://")
                   + disc_device->GetValue();
 #else
-	  mrltemp = wxT("vcd://")
+          mrltemp = wxT("vcd://")
                   + disc_device->GetValue()
                   + wxString::Format( wxT("@%d"),
                                       disc_title->GetValue() );
 #endif
-	  break;
-	case 3:
-	  disc_chapter->Disable();
-	  disc_chapter_label->Disable();
+          break;
+        case 3:
+          disc_chapter->Disable();
+          disc_chapter_label->Disable();
 #ifdef HAVE_CDDAX
-	  if ( disc_title->GetValue() )
-	    mrltemp =  wxT("cddax://")
-	          + disc_device->GetValue()
+          if ( disc_title->GetValue() )
+            mrltemp =  wxT("cddax://")
+                  + disc_device->GetValue()
                   + wxString::Format( wxT("@T%d"),
                                       disc_title->GetValue() );
-	  else
-	    mrltemp = wxT("cddax://")
-	          + disc_device->GetValue();
+          else
+            mrltemp = wxT("cddax://")
+                  + disc_device->GetValue();
 
 #else
-	  mrltemp =  wxT("cdda://")
+          mrltemp =  wxT("cdda://")
                   + disc_device->GetValue()
                   + wxString::Format( wxT("@%d"),
                                       disc_title->GetValue() );
 #endif
-	  break;
-	default: ;
-	  msg_Err( p_intf, "invalid selection (%d)",
-		   disc_type->GetSelection() );
-	}
+          break;
+        default: ;
+          msg_Err( p_intf, "invalid selection (%d)",
+                   disc_type->GetSelection() );
+        }
 
         break;
     case NET_ACCESS:
@@ -1050,7 +1050,7 @@ void OpenDialog::OnDiscDeviceChange( wxCommandEvent& event )
             psz_device = config_GetPsz( p_intf, "dvd" );
             break;
     }
-    
+
     if ( !psz_device ) psz_device = "";
 
     if( disc_device->GetValue().Cmp( wxU( psz_device ) ) )
@@ -1079,13 +1079,13 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         if( !b_disc_device_changed )
         {
             disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
-	    disc_title_label->SetLabel ( wxT("Title") );
-	}
-	disc_title->SetRange( i_selection, 255 );
-	disc_title->SetValue( i_selection );
-	break;
+            disc_title_label->SetLabel ( wxT("Title") );
+        }
+        disc_title->SetRange( i_selection, 255 );
+        disc_title->SetValue( i_selection );
+        break;
       }
-	
+
     case 2:  /* VCD of some sort */
         psz_device = config_GetPsz( p_intf, "vcd" );
         if( !b_disc_device_changed )
@@ -1093,21 +1093,21 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
             disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
         }
 
-	/* There are at most 98, tracks in a VCD, 999 Segments, 500 entries
-	   I don't know what the limit is for LIDs, 999 is probably safe
-	   though. 
+        /* There are at most 98, tracks in a VCD, 999 Segments, 500 entries
+           I don't know what the limit is for LIDs, 999 is probably safe
+           though.
 
-	   FIXME: it would be better however to get the information for
-	   this particular Media possibly from the General Info area.
-	*/
+           FIXME: it would be better however to get the information for
+           this particular Media possibly from the General Info area.
+        */
 #ifdef HAVE_VCDX
-	disc_title_label->SetLabel ( config_GetInt( p_intf, "vcdx-PBC"  )
-				     ? wxT("PBC LID") : wxT("Entry") );
-        disc_title->SetRange( 0, 999 ); 
+        disc_title_label->SetLabel ( config_GetInt( p_intf, "vcdx-PBC"  )
+                                     ? wxT("PBC LID") : wxT("Entry") );
+        disc_title->SetRange( 0, 999 );
         i_selection = 0;
 #else
-	disc_title_label->SetLabel ( wxT("Track") );
-        disc_title->SetRange( 1, 98 ); 
+        disc_title_label->SetLabel ( wxT("Track") );
+        disc_title->SetRange( 1, 98 );
 #endif
         disc_title->SetValue( i_selection );
         break;
@@ -1118,17 +1118,17 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         {
             disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
         }
-	disc_title_label->SetLabel ( wxT("Track") );
+        disc_title_label->SetLabel ( wxT("Track") );
 #ifdef HAVE_CDDAX
         i_selection = 0;
 #endif
        /* There are at most 99 tracks in a CD-DA */
-        disc_title->SetRange( i_selection, 99 ); 
+        disc_title->SetRange( i_selection, 99 );
         disc_title->SetValue( i_selection );
         break;
-    default: 
-        msg_Err( p_intf, "invalid Disc type selection (%d)", 
-	       disc_type->GetSelection() );
+    default:
+        msg_Err( p_intf, "invalid Disc type selection (%d)",
+               disc_type->GetSelection() );
         break;
     }
 

@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.54 2003/12/15 22:04:25 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.55 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -110,7 +110,7 @@ static int Open ( vlc_object_t *p_this )
     vlc_mutex_init( p_intf, &p_intf->p_sys->xlock );
     // Fake window to receive broadcast events
     Window root = DefaultRootWindow( display );
-    p_intf->p_sys->mainWin = XCreateSimpleWindow( display, root, 0, 0, 
+    p_intf->p_sys->mainWin = XCreateSimpleWindow( display, root, 0, 0,
                                                   1, 1, 0, 0, 0 );
     XStoreName( display, p_intf->p_sys->mainWin, "VLC Media Player" );
 
@@ -322,7 +322,7 @@ vlc_module_begin();
               VLC_FALSE );
     add_bool( "show_in_taskbar", VLC_TRUE, NULL, SKIN_TASKBAR,
               SKIN_TASKBAR_LONG, VLC_FALSE );
-    set_description( _("Skinnable Interface") );
+    set_description( _("Skinnable interface") );
     set_capability( "interface", 30 );
     set_callbacks( Open, Close );
     set_program( "svlc" );

@@ -2,9 +2,9 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: cdda.c,v 1.14 2003/12/20 11:56:56 rocky Exp $
+ * $Id: cdda.c,v 1.15 2003/12/22 02:24:51 sam Exp $
  *
- * Authors: Rocky Bernstein <rocky@panix.com> 
+ * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -42,12 +42,12 @@ int  E_(DemuxOpen)    ( vlc_object_t * p_this);
 void E_(DemuxClose)   ( vlc_object_t * p_this);
 
 int  E_(DebugCB)      ( vlc_object_t *p_this, const char *psz_name,
-			vlc_value_t oldval, vlc_value_t val, 
-			void *p_data );
+                        vlc_value_t oldval, vlc_value_t val,
+                        void *p_data );
 
 int  E_(CDDBEnabledCB)( vlc_object_t *p_this, const char *psz_name,
-			vlc_value_t oldval, vlc_value_t val, 
-			void *p_data );
+                        vlc_value_t oldval, vlc_value_t val,
+                        void *p_data );
 
 /*****************************************************************************
  * Module descriptor
@@ -116,78 +116,78 @@ vlc_module_begin();
     /* Configuration options */
     add_category_hint( N_("CDX"), NULL, VLC_TRUE );
 
-    add_integer ( MODULE_STRING "-debug", 0, E_(DebugCB), 
-		  N_("set debug mask for additional debugging."),
+    add_integer ( MODULE_STRING "-debug", 0, E_(DebugCB),
+                  N_("set debug mask for additional debugging."),
                   DEBUG_LONGTEXT, VLC_TRUE );
 
-    add_integer( MODULE_STRING "-caching", 
-		 DEFAULT_PTS_DELAY / 1000, NULL, 
-		 N_("Caching value in ms"), 
-		 CACHING_LONGTEXT, VLC_TRUE );
+    add_integer( MODULE_STRING "-caching",
+                 DEFAULT_PTS_DELAY / 1000, NULL,
+                 N_("Caching value in ms"),
+                 CACHING_LONGTEXT, VLC_TRUE );
 
-    add_string( MODULE_STRING "-author-format", 
-		"%A - %a %C %I", NULL, 
-		N_("Format to use in playlist 'author' field"),
+    add_string( MODULE_STRING "-author-format",
+                "%A - %a %C %I", NULL,
+                N_("Format to use in playlist \"author\" field"),
                 TITLE_FMT_LONGTEXT, VLC_TRUE );
 
-    add_string( MODULE_STRING "-title-format", 
-		"%T %M", NULL, 
-		N_("Format to use in playlist 'title' field when no CDDB"),
+    add_string( MODULE_STRING "-title-format",
+                "%T %M", NULL,
+                N_("Format to use in playlist \"title\" field when no CDDB"),
                 TITLE_FMT_LONGTEXT, VLC_TRUE );
 
 #ifdef HAVE_LIBCDDB
-    add_string( MODULE_STRING "-cddb-title-format", 
-		"Track %T. %t - %p", NULL, 
-		N_("Format to use in playlist 'title' field when using CDDB"),
+    add_string( MODULE_STRING "-cddb-title-format",
+                "Track %T. %t - %p", NULL,
+                N_("Format to use in playlist \"title\" field when using CDDB"),
                 CDDB_TITLE_FMT_LONGTEXT, VLC_TRUE );
 
     add_bool( MODULE_STRING "-cddb-enabled", 1, E_(CDDBEnabledCB),
-	      N_("Do CDDB lookups?"),
-	      N_("If set, lookup CD-DA track information using the CDDB "
-		 "protocol"),
-	      VLC_FALSE );
+              N_("Do CDDB lookups?"),
+              N_("If set, lookup CD-DA track information using the CDDB "
+                 "protocol"),
+              VLC_FALSE );
 
-    add_string( MODULE_STRING "-cddb-server", "freedb.freedb.org", NULL, 
-		N_("CDDB server"), 
-		N_( "Contact this CDDB server look up CD-DA information"),
-		 VLC_TRUE );
+    add_string( MODULE_STRING "-cddb-server", "freedb.freedb.org", NULL,
+                N_("CDDB server"),
+                N_( "Contact this CDDB server look up CD-DA information"),
+                 VLC_TRUE );
 
-    add_integer( MODULE_STRING "-cddb-port", 8880, NULL, 
-		 N_("CDDB server port"), 
-		 N_("CDDB server uses this port number to communicate on"), 
-		 VLC_TRUE );
+    add_integer( MODULE_STRING "-cddb-port", 8880, NULL,
+                 N_("CDDB server port"),
+                 N_("CDDB server uses this port number to communicate on"),
+                 VLC_TRUE );
 
-    add_string( MODULE_STRING "-cddb-email", "me@home", NULL, 
-		N_("email address reported to CDDB server"), 
-		N_("email address reported to CDDB server"), 
-		 VLC_TRUE );
+    add_string( MODULE_STRING "-cddb-email", "me@home", NULL,
+                N_("email address reported to CDDB server"),
+                N_("email address reported to CDDB server"),
+                 VLC_TRUE );
 
     add_bool( MODULE_STRING "-cddb-enable-cache", 1, NULL,
-	      N_("Cache CDDB lookups?"),
-	      N_("If set cache CDDB information about this CD"),
-	      VLC_FALSE );
+              N_("Cache CDDB lookups?"),
+              N_("If set cache CDDB information about this CD"),
+              VLC_FALSE );
 
     add_bool( MODULE_STRING "-cddb-httpd", 0, NULL,
-	      N_("Contact CDDB via the HTTP protocol?"),
-	      N_("If set, the CDDB server gets information via the CDDB HTTP "
-		 "protocol"),
-	      VLC_TRUE );
+              N_("Contact CDDB via the HTTP protocol?"),
+              N_("If set, the CDDB server gets information via the CDDB HTTP "
+                 "protocol"),
+              VLC_TRUE );
 
-    add_integer( MODULE_STRING "-cddb-timeout", 10, NULL, 
-		 N_("CDDB server timeout"), 
-		 N_("Time (in seconds) to wait for a response from the "
-		    "CDDB server"), 
-		 VLC_FALSE );
+    add_integer( MODULE_STRING "-cddb-timeout", 10, NULL,
+                 N_("CDDB server timeout"),
+                 N_("Time (in seconds) to wait for a response from the "
+                    "CDDB server"),
+                 VLC_FALSE );
 
-    add_string( MODULE_STRING "-cddb-cachedir", "~/.cddbslave", NULL, 
-		N_("Directory to cache CDDB requests"), 
-		N_("Directory to cache CDDB requests"), 
-		 VLC_TRUE );
+    add_string( MODULE_STRING "-cddb-cachedir", "~/.cddbslave", NULL,
+                N_("Directory to cache CDDB requests"),
+                N_("Directory to cache CDDB requests"),
+                 VLC_TRUE );
 
 #endif
 
     add_submodule();
-        set_description( _("CD Audio demux") );
+        set_description( _("Audio CD demux") );
         set_capability( "demux", 0 );
         set_callbacks( E_(DemuxOpen), E_(DemuxClose) );
         add_shortcut( "cdda" );

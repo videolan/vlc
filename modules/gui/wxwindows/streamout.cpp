@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.40 2003/12/14 22:49:28 gbazin Exp $
+ * $Id: streamout.cpp,v 1.41 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -406,7 +406,7 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
                                   wxSize(200, 200) );
 
     wxStaticBox *panel_box = new wxStaticBox( panel, -1,
-                                              wxU(_("Output Methods")) );
+                                              wxU(_("Output methods")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxVERTICAL );
 
@@ -520,7 +520,7 @@ wxPanel *SoutDialog::MiscPanel( wxWindow* parent )
                                   wxSize(200, 200) );
 
     wxStaticBox *panel_box = new wxStaticBox( panel, -1,
-                                   wxU(_("Miscellaneous Options")) );
+                                   wxU(_("Miscellaneous options")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxVERTICAL );
 
@@ -529,12 +529,12 @@ wxPanel *SoutDialog::MiscPanel( wxWindow* parent )
     wxFlexGridSizer *subpanel_sizer = new wxFlexGridSizer( 4, 4, 20 );
 
     sap_checkbox = new wxCheckBox( misc_subpanels[ANN_MISC_SOUT],SAPMisc_Event,
-                                   wxU(_("SAP Announce")) );
+                                   wxU(_("SAP announce")) );
     slp_checkbox = new wxCheckBox( misc_subpanels[ANN_MISC_SOUT],SLPMisc_Event,
-                                   wxU(_("SLP Announce")) );
+                                   wxU(_("SLP announce")) );
 
     wxStaticText *label = new wxStaticText( misc_subpanels[ANN_MISC_SOUT], -1,
-                                            wxU(_("Channel Name")) );
+                                            wxU(_("Channel name")) );
     announce_addr = new wxTextCtrl( misc_subpanels[ANN_MISC_SOUT],
                                     AnnounceAddr_Event,
                                     wxT(""), wxDefaultPosition,

@@ -2,7 +2,7 @@
  * qte_main.c : QT Embedded wrapper for gte_main
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: qte_main.cpp,v 1.7 2003/06/09 19:56:26 jpsaman Exp $
+ * $Id: qte_main.cpp,v 1.8 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -42,7 +42,7 @@ typedef struct qte_thread_t
 
     QApplication*       p_qte_application;
     QWidget*            p_qte_widget;
-    bool		b_gui_server;
+    bool                b_gui_server;
 
 } qte_thread_t;
 
@@ -63,9 +63,10 @@ static qte_thread_t * p_qte_main = NULL;
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define STANDALONE_TEXT N_("Run as standalone Qt/Embedded Gui Server")
-#define STANDALONE_LONGTEXT N_("Use this option to run as standalone Qt/Embedded Gui Server. " \
-	"This option is equivalent to the -qws option from normal Qt.")
+#define STANDALONE_TEXT N_("Run as standalone Qt/Embedded GUI Server")
+#define STANDALONE_LONGTEXT N_("Use this option to run as standalone " \
+    "Qt/Embedded GUI Server. This option is equivalent to the -qws option " \
+    "from normal Qt.")
 
 vlc_module_begin();
     set_description( _("Qt Embedded GUI helper") );
@@ -164,7 +165,7 @@ static void QteMain( qte_thread_t *p_this )
     p_this->b_gui_server = VLC_FALSE;
     if( config_GetInt( p_this, "qte-guiserver" ) )
     {
-	msg_Dbg( p_this, "Running as Qt Embedded standalone GuiServer" );
+        msg_Dbg( p_this, "Running as Qt Embedded standalone GuiServer" );
         p_this->b_gui_server = VLC_TRUE;
     }
 

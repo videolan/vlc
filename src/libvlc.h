@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.125 2003/12/20 22:57:36 babal Exp $
+ * $Id: libvlc.h,v 1.126 2003/12/22 02:24:50 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -31,9 +31,9 @@ static char *ppsz_language[] =
   "fr", "hu", "it", "ja", "nl", "no",
   "pl", "pt_BR", "ru", "sv" };
 static char *ppsz_language_text[] =
-{ N_("Auto"), N_("English US"), N_("English GB"), N_("Spanish"), N_("German"),
+{ N_("Auto"), N_("American"), N_("British"), N_("Spanish"), N_("German"),
   N_("French"), N_("Hungarian"), N_("Italian"), N_("Japanese"), N_("Dutch"), N_("Norwegian"),
-  N_("Polish"), N_("Portuguese BR"), N_("Russian"), N_("Swedish") };
+  N_("Polish"), N_("Brazilian"), N_("Russian"), N_("Swedish") };
 
 /*****************************************************************************
  * Configuration options for the main program. Each module will also separatly
@@ -142,7 +142,7 @@ static char *ppsz_language_text[] =
     "This option allows you to delay the audio output. This can be handy if " \
     "you notice a lag between the video and the audio.")
 
-#define MULTICHA_TEXT N_("Choose prefered audio output channels mode")
+#define MULTICHA_TEXT N_("Choose preferred audio output channels mode")
 #define MULTICHA_LONGTEXT N_( \
     "This option allows you to set the audio output channels mode that will " \
     "be used by default when possible (ie. if your hardware supports it as " \
@@ -257,7 +257,10 @@ static char *ppsz_language_text[] =
     "1.3333, etc.) expressing pixel squareness.")
 #endif
 
-#define INPUT_CAT_LONGTEXT N_( " " )
+#define INPUT_CAT_LONGTEXT N_( \
+    "These options allow you to modify options related to the input " \
+    "modules, such as the DVD or VCD device, the network interface " \
+    "settings or the subtitle channel.")
 
 #define CR_AVERAGE_TEXT N_("Clock reference average counter")
 #define CR_AVERAGE_LONGTEXT N_( \
@@ -343,14 +346,14 @@ static char *ppsz_language_text[] =
     "This is the default VCD device to use." )
 #endif
 
-#define CDAUDIO_DEV_TEXT N_("CD Audio device")
+#define CDAUDIO_DEV_TEXT N_("Audio CD device")
 #ifdef HAVE_CDDAX
 #define CDAUDIO_DEV_LONGTEXT N_( \
-    "This is the default CD Audio device to use. " \
+    "This is the default Audio CD device to use. " \
     "If you don't specify anything, we'll scan for a suitable CD-ROM device." )
 #else
 #define CDAUDIO_DEV_LONGTEXT N_( \
-    "This is the default CD Audio device to use." )
+    "This is the default Audio CD device to use." )
 #endif
 
 #define IPV6_TEXT N_("Force IPv6")
@@ -535,7 +538,8 @@ static char *ppsz_language_text[] =
     "Currently you can choose between implementation 0 (which is the " \
     "default and the fastest), 1 and 2.")
 
-#define HOTKEY_CAT_LONGTEXT N_( " " )
+#define HOTKEY_CAT_LONGTEXT N_( "These settings are the global VLC key " \
+    "bindings, known as \"hotkeys\"." )
 
 #define FULLSCREEN_KEY_TEXT N_("Fullscreen")
 #define FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to swap fullscreen state")
@@ -558,21 +562,21 @@ static char *ppsz_language_text[] =
 #define POSITION_KEY_TEXT N_("Position")
 #define POSITION_KEY_LONGTEXT N_("Select the hotkey to display the position")
 
-#define JB10SEC_KEY_TEXT N_("Jump backward 10 seconds")
-#define JB10SEC_KEY_LONGTEXT N_("Select the hotkey to jump backward by 10 seconds")
+#define JB10SEC_KEY_TEXT N_("Jump 10 seconds backwards")
+#define JB10SEC_KEY_LONGTEXT N_("Select the hotkey to jump 10 seconds backwards")
 
-#define JB1MIN_KEY_TEXT N_("Jump backward 1 minute")
-#define JB1MIN_KEY_LONGTEXT N_("Select the hotkey to jump backward by 1 minute")
-#define JB5MIN_KEY_TEXT N_("Jump backward 5 minutes")
-#define JB5MIN_KEY_LONGTEXT N_("Select the hotkey to jump backward by 5 minutes")
-#define JF10SEC_KEY_TEXT N_("Jump forward 10 seconds")
-#define JF10SEC_KEY_LONGTEXT N_("Select the hotkey to jump forward by 10 seconds")
+#define JB1MIN_KEY_TEXT N_("Jump 1 minute backwards")
+#define JB1MIN_KEY_LONGTEXT N_("Select the hotkey to jump 1 minute backwards")
+#define JB5MIN_KEY_TEXT N_("Jump 5 minutes backwards")
+#define JB5MIN_KEY_LONGTEXT N_("Select the hotkey to jump 5 minutes backwards")
+#define JF10SEC_KEY_TEXT N_("Jump 10 seconds forward")
+#define JF10SEC_KEY_LONGTEXT N_("Select the hotkey to jump 10 seconds forward")
 
-#define JF1MIN_KEY_TEXT N_("Jump forward 1 minute")
-#define JF1MIN_KEY_LONGTEXT N_("Select the hotkey to jump forward by 1 minute")
+#define JF1MIN_KEY_TEXT N_("Jump 1 minute forward")
+#define JF1MIN_KEY_LONGTEXT N_("Select the hotkey to jump 1 minute forward")
 
-#define JF5MIN_KEY_TEXT N_("Jump forward 5 minutes")
-#define JF5MIN_KEY_LONGTEXT N_("Select the hotkey to jump forward by 5 minutes")
+#define JF5MIN_KEY_TEXT N_("Jump 5 minutes forward")
+#define JF5MIN_KEY_LONGTEXT N_("Select the hotkey to jump 5 minutes forward")
 
 #define QUIT_KEY_TEXT N_("Quit")
 #define QUIT_KEY_LONGTEXT N_("Select the hotkey to quit the application")
@@ -688,8 +692,8 @@ vlc_module_begin();
     add_string("audio-filter",0,NULL,AUDIO_FILTER_TEXT,
                     AUDIO_FILTER_LONGTEXT,VLC_FALSE);
     add_module( "audio-channel-mixer", "audio filter", NULL, NULL,
-		    AUDIO_CHANNEL_MIXER, AUDIO_CHANNEL_MIXER_LONGTEXT,
-		    VLC_FALSE );
+                    AUDIO_CHANNEL_MIXER, AUDIO_CHANNEL_MIXER_LONGTEXT,
+                    VLC_FALSE );
 
     /* Video options */
     add_category_hint( N_("Video"), VOUT_CAT_LONGTEXT , VLC_FALSE );

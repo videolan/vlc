@@ -2,10 +2,10 @@
  * ogt.c : Overlay Graphics Text (SVCD subtitles) decoder thread
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ogt.c,v 1.2 2003/12/08 06:01:11 rocky Exp $
+ * $Id: ogt.c,v 1.3 2003/12/22 02:24:51 sam Exp $
  *
- * Authors: Rocky Bernstein 
- *   based on code from: 
+ * Authors: Rocky Bernstein
+ *   based on code from:
  *       Julio Sanchez Fernandez (http://subhandler.sourceforge.net)
  *       Samuel Hocevar <sam@zoy.org>
  *       Laurent Aimar <fenrir@via.ecp.fr>
@@ -54,12 +54,12 @@ vlc_module_begin();
     set_capability( "decoder", 50 );
     set_callbacks( DecoderOpen, Close );
 
-    add_integer ( MODULE_STRING "-debug", 0, NULL, 
-		  N_("set debug mask for additional debugging."),
+    add_integer ( MODULE_STRING "-debug", 0, NULL,
+                  N_("set debug mask for additional debugging."),
                   N_(DEBUG_LONGTEXT), VLC_TRUE );
 
     add_submodule();
-    set_description( _("Phlips OGT (SVCD subtitle) packetizer") );
+    set_description( _("Philips OGT (SVCD subtitle) packetizer") );
     set_capability( "packetizer", 50 );
     set_callbacks( PacketizerOpen, Close );
 vlc_module_end();
@@ -81,8 +81,8 @@ static block_t *Packetize( decoder_t *, block_t ** );
 Initialize so the next packet will start off a new one.
 
  *****************************************************************************/
-static void 
-InitSubtitleBlock( decoder_sys_t * p_sys ) 
+static void
+InitSubtitleBlock( decoder_sys_t * p_sys )
 {
   p_sys->i_spu_size = 0;
   p_sys->state      = SUBTITLE_BLOCK_EMPTY;
@@ -98,7 +98,7 @@ InitSubtitleBlock( decoder_sys_t * p_sys )
  * Tries to launch a decoder and return score so that the interface is able
  * to chose.
  *****************************************************************************/
-static int 
+static int
 DecoderOpen( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
@@ -109,7 +109,7 @@ DecoderOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    
+
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
 
     p_sys->i_debug      = config_GetInt( p_this, MODULE_STRING "-debug" );
@@ -214,7 +214,7 @@ Decode ( decoder_t *p_dec, block_t **pp_block )
             vlc_object_release( p_sys->p_vout );
         }
 
-	InitSubtitleBlock ( p_sys );
+        InitSubtitleBlock ( p_sys );
     }
 }
 
@@ -241,34 +241,34 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 /*
  The following information is mostly extracted from the SubMux package of
  unknown author with additional experimentation.
- 
+
  The format is roughly as follows (everything is big-endian):
- 
+
    size     description
    -------------------------------------------
-   byte     subtitle channel (0..7) in bits 0-3 
+   byte     subtitle channel (0..7) in bits 0-3
    byte     subtitle packet number of this subtitle image 0-N,
             if the subtitle packet is complete, the top bit of the byte is 1.
-   u_int16  subtitle image number
-   u_int16  length in bytes of the rest
+   uint16   subtitle image number
+   uint16   length in bytes of the rest
    byte     option flags, unknown meaning except bit 3 (0x08) indicates
- 	    presence of the duration field
-   byte     unknown 
-   u_int32  duration in 1/90000ths of a second (optional), start time
- 	    is as indicated by the PTS in the PES header
-   u_int32  xpos
-   u_int32  ypos
-   u_int32  width (must be even)
-   u_int32  height (must be even)
+            presence of the duration field
+   byte     unknown
+   uint32   duration in 1/90000ths of a second (optional), start time
+            is as indicated by the PTS in the PES header
+   uint32   xpos
+   uint32   ypos
+   uint32   width (must be even)
+   uint32   height (must be even)
    byte[16] palette, 4 palette entries, each contains values for
- 	    Y, U, V and transparency, 0 standing for transparent
+            Y, U, V and transparency, 0 standing for transparent
    byte     command,
- 	    cmd>>6==1 indicates shift
- 	    (cmd>>4)&3 is direction from, (0=top,1=left,2=right,3=bottom)
-   u_int32  shift duration in 1/90000ths of a second
-   u_int16  offset of odd field (subtitle image is presented interlaced)
+            cmd>>6==1 indicates shift
+            (cmd>>4)&3 is direction from, (0=top,1=left,2=right,3=bottom)
+   uint32   shift duration in 1/90000ths of a second
+   uint16   offset of odd field (subtitle image is presented interlaced)
    byte[]   bit image
- 
+
   The image is encoded using two bits per pixel that select a palette
   entry except that value 00 starts a limited rle.  When 00 is seen,
   the next two bits (00-11) encode the number of pixels (1-4, add one to
@@ -279,22 +279,22 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
   the end.
 */
 
-/* FIXME: do we really need p_buffer and p? 
-   Can't all of thes _offset's and _lengths's get removed? 
+/* FIXME: do we really need p_buffer and p?
+   Can't all of thes _offset's and _lengths's get removed?
 */
 static void
 ParseHeader( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block  )
 {
   decoder_sys_t *p_sys = p_dec->p_sys;
-  u_int8_t *p = p_buffer;
+  uint8_t *p = p_buffer;
   int i;
-  
+
   p_sys->i_pts    = p_block->i_pts;
-  
+
   p_sys->i_spu_size = GETINT16(p);
   p_sys->i_options  = *p++;
   p_sys->i_options2 = *p++;
-  
+
   if ( p_sys->i_options & 0x08 ) {
     p_sys->i_duration = GETINT32(p);
   } else {
@@ -305,14 +305,14 @@ ParseHeader( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block  )
   p_sys->i_y_start= GETINT16(p);
   p_sys->i_width  = GETINT16(p);
   p_sys->i_height = GETINT16(p);
-  
+
   for (i=0; i<4; i++) {
     p_sys->pi_palette[i].y = *p++;
     p_sys->pi_palette[i].u = *p++;
     p_sys->pi_palette[i].v = *p++;
     /* We have just 4-bit resolution for alpha, but the value for SVCD
      * has 8 bits so we scale down the values to the acceptable range */
-	p_sys->pi_palette[i].t = (*p++) >> 4;
+    p_sys->pi_palette[i].t = (*p++) >> 4;
   }
   p_sys->i_cmd = *p++;
       /* We do not really know this, FIXME */
@@ -330,25 +330,25 @@ ParseHeader( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block  )
   p_sys->comp_image_length =
     p_sys->subtitle_data_length - p_sys->comp_image_offset;
   p_sys->metadata_length   = p_sys->comp_image_offset;
-  
+
   /*spuogt_init_subtitle_data(p_sys);*/
-  
+
   p_sys->subtitle_data_pos = 0;
-  
-  dbg_print( (DECODE_DBG_PACKET), 
-	     "x-start: %d, y-start: %d, width: %d, height %d, "
-	     "spu size: %d, duration: %u",
-	     p_sys->i_x_start, p_sys->i_y_start, 
-	     p_sys->i_width, p_sys->i_height, 
-	     p_sys->i_spu_size, p_sys->i_duration );
+
+  dbg_print( (DECODE_DBG_PACKET),
+             "x-start: %d, y-start: %d, width: %d, height %d, "
+             "spu size: %d, duration: %u",
+             p_sys->i_x_start, p_sys->i_y_start,
+             p_sys->i_width, p_sys->i_height,
+             p_sys->i_spu_size, p_sys->i_duration );
 }
 
 
-#define SPU_HEADER_LEN 5 
+#define SPU_HEADER_LEN 5
 
 /*****************************************************************************
  Reassemble:
- 
+
  The data for single screen subtitle may come in one of many
  non-contiguous packets of a stream. This routine is called when the
  next packet in the stream comes in. The job of this routine is to
@@ -363,10 +363,10 @@ ParseHeader( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block  )
 
    size    description
    -------------------------------------------
-   byte    subtitle channel (0..7) in bits 0-3 
+   byte    subtitle channel (0..7) in bits 0-3
    byte    subtitle packet number of this subtitle image 0-N,
            if the subtitle packet is complete, the top bit of the byte is 1.
-   u_int16 subtitle image number
+   uint16  subtitle image number
 
  *****************************************************************************/
 static block_t *
@@ -375,8 +375,8 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block;
     uint8_t *p_buffer;
-    u_int16_t i_expected_image;
-    u_int8_t  i_packet, i_expected_packet;
+    uint16_t i_expected_image;
+    uint8_t  i_packet, i_expected_packet;
 
     if( pp_block == NULL || *pp_block == NULL )
     {
@@ -388,16 +388,16 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
     if( p_block->i_buffer < SPU_HEADER_LEN )
     {
       msg_Dbg( p_dec, "invalid packet header (size %d < %d)" ,
-	       p_block->i_buffer, SPU_HEADER_LEN );
+               p_block->i_buffer, SPU_HEADER_LEN );
       block_Release( p_block );
       return NULL;
     }
 
     p_buffer = p_block->p_buffer;
 
-    dbg_print( (DECODE_DBG_CALL|DECODE_DBG_PACKET), 
-	       "header: 0x%02x 0x%02x 0x%02x 0x%02x\n",
-	       p_buffer[1], p_buffer[2], p_buffer[3], p_buffer[4] );
+    dbg_print( (DECODE_DBG_CALL|DECODE_DBG_PACKET),
+               "header: 0x%02x 0x%02x 0x%02x 0x%02x\n",
+               p_buffer[1], p_buffer[2], p_buffer[3], p_buffer[4] );
 
 
     if ( p_sys->state == SUBTITLE_BLOCK_EMPTY ) {
@@ -422,12 +422,12 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 
     if ( p_sys->i_image != i_expected_image ) {
       msg_Warn( p_dec, "expecting subtitle image %u but found %u\n",
-		i_expected_image, p_sys->i_image );
+                i_expected_image, p_sys->i_image );
     }
 
     if ( i_packet != i_expected_packet ) {
       msg_Warn( p_dec, "expecting subtitle image packet %u but found %u",
-		i_expected_packet, i_packet);
+                i_expected_packet, i_packet);
     }
 
     p_sys->i_packet = i_packet;
@@ -436,21 +436,21 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
       /* First packet in the subtitle block */
       ParseHeader( p_dec, p_buffer, p_block );
     }
-    
+
     block_ChainAppend( &p_sys->p_block, p_block );
     p_sys->i_spu += p_block->i_buffer - SPU_HEADER_LEN;
 
-    if (p_sys->state == SUBTITLE_BLOCK_COMPLETE) 
+    if (p_sys->state == SUBTITLE_BLOCK_COMPLETE)
     {
       if( p_sys->i_spu != p_sys->i_spu_size )
-	{
-	  msg_Warn( p_dec, "SPU packets size=%d should be %d",
-		   p_sys->i_spu, p_sys->i_spu_size );
-	}
-      
-      dbg_print( (DECODE_DBG_PACKET), 
-		 "subtitle packet complete, size=%d", p_sys->i_spu );
-      
+        {
+          msg_Warn( p_dec, "SPU packets size=%d should be %d",
+                   p_sys->i_spu, p_sys->i_spu_size );
+        }
+
+      dbg_print( (DECODE_DBG_PACKET),
+                 "subtitle packet complete, size=%d", p_sys->i_spu );
+
       return p_sys->p_block;
     }
     return NULL;

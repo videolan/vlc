@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: playlist.cpp,v 1.30 2003/12/04 18:26:53 gbazin Exp $
+ * $Id: playlist.cpp,v 1.31 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -276,7 +276,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Create the iteminfo button */
     wxButton *iteminfo_button =
-        new wxButton( playlist_panel, Infos_Event, wxU(_("Item Infos") ) );
+        new wxButton( playlist_panel, Infos_Event, wxU(_("Item info") ) );
 
     /* Place everything in sizers */
     wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -398,20 +398,20 @@ void Playlist::Rebuild()
             listitem.SetTextColour( *wxLIGHT_GREY);
             listview->SetItem(listitem);
         }
-	{
+        {
             char psz_duration[MSTRTIME_MAX_SIZE];
             mtime_t dur = p_playlist->pp_items[i]->i_duration;
             if ( dur != -1 )
-	    {
+            {
                 secstotimestr( psz_duration, dur/1000000 );
-	    }
+            }
             else
-	    {
+            {
                 memcpy( psz_duration ,"-:--:--", sizeof("-:--:--"));
-	    }
+            }
             listview->SetItem( i, 3, wxU(psz_duration) );
-	}
-	
+        }
+
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 
@@ -1033,7 +1033,7 @@ NewGroup::NewGroup( intf_thread_t *_p_intf, wxWindow *_p_parent ):
 
     wxStaticText *group_label =
             new wxStaticText( panel , -1,
-                wxU(_("Enter the name for the new group")));
+                wxU(_("Enter a name for the new group")));
 
     groupname = new wxTextCtrl(panel, -1, wxU(""),wxDefaultPosition,
                                wxSize(80,27),wxTE_PROCESS_ENTER);

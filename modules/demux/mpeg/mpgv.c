@@ -2,7 +2,7 @@
  * mpgv.c : MPEG-I/II Video demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpgv.c,v 1.3 2003/12/03 00:27:52 rocky Exp $
+ * $Id: mpgv.c,v 1.4 2003/12/22 02:24:52 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -37,7 +37,7 @@ static int  Open    ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("MPEG-I/II Video demuxer" ) );
+    set_description( _("MPEG-I/II video demuxer" ) );
     set_capability( "demux", 100 );
     set_callbacks( Open, Close );
     add_shortcut( "mpgv" );
