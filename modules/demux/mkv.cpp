@@ -1613,7 +1613,8 @@ bool virtual_segment_t::Select( input_title_t & title )
             editions[j].Append( p_segment->stored_editions[j] );
     }
 
-    Edition()->PublishChapters( title );
+    if ( Edition() != NULL )
+        Edition()->PublishChapters( title );
 
     return true;
 }
