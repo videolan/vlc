@@ -2,7 +2,7 @@
  * gtk2_font.cpp: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.cpp,v 1.6 2003/04/17 10:42:41 asmax Exp $
+ * $Id: gtk2_font.cpp,v 1.7 2003/04/17 13:46:55 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -45,12 +45,6 @@ GTK2Font::GTK2Font( intf_thread_t *_p_intf, string fontname, int size,
     int color, int weight, bool italic, bool underline )
     : Font( _p_intf, fontname, size, color, weight, italic, underline )
 {
-/* FIXME */
-/*    GFont = gdk_font_load( "-adobe-helvetica-bold-r-normal--12-120-75-75-p-70-iso8859-1" );
-    if( GFont == NULL )
-    {
-        msg_Err( _p_intf, "Could not load font %s", fontname.c_str());
-    }*/
     Context = gdk_pango_context_get();
     Layout = pango_layout_new( Context );
 }
@@ -96,25 +90,8 @@ void GTK2Font::AssignFont( Graphics *dest )
 //---------------------------------------------------------------------------
 void GTK2Font::GetSize( string text, int &w, int &h )
 {
-/*    // Get device context of screen
-    HDC DeskDC = GetWindowDC( GetDesktopWindow() );
-
-    // Get size
-    LPRECT rect = new RECT;;
-    rect->left   = 0;
-    rect->top    = 0;
-    AssignGTK2Font( DeskDC );
-    DrawText( DeskDC, text.c_str(), text.length(), rect, DT_CALCRECT);
-    w = rect->right - rect->left;
-    h = rect->bottom - rect->top;
-
-    // Release screen device context
-    ReleaseDC( GetDesktopWindow(), DeskDC );*/
-    /*FIXME*/
-/*    w = gdk_text_width( GFont, text.c_str(), text.length() );
-    h = gdk_text_height( GFont, text.c_str(), text.length() );*/
-    w = 100;
-    h = 50;
+    pango_layout_set_text( Layout, text.c_str(), text.length() );
+    pango_layout_get_pixel_size( Layout, &w, &h );
 }
 //---------------------------------------------------------------------------
 void GTK2Font::GenericPrint( Graphics *dest, string text, int x, int y,
