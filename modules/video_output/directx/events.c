@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.16 2003/05/26 19:06:47 gbazin Exp $
+ * $Id: events.c,v 1.17 2003/05/26 19:26:53 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -171,7 +171,7 @@ void DirectXEventThread( event_thread_t *p_event )
             var_Set( p_event->p_vout, "mouse-button-down", val );
             {
                 playlist_t *p_playlist =
-                    vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                    vlc_object_find( p_event, VLC_OBJECT_PLAYLIST,
                                      FIND_ANYWHERE );
                 if( p_playlist != NULL )
                 {
@@ -204,7 +204,7 @@ void DirectXEventThread( event_thread_t *p_event )
             case VK_MENU:
                 {
                     playlist_t *p_playlist =
-                        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                        vlc_object_find( p_event, VLC_OBJECT_PLAYLIST,
                                          FIND_ANYWHERE );
                     if( p_playlist != NULL )
                     {
