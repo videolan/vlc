@@ -18,6 +18,8 @@
   * the YUV transformations are now plugins as well
   * alternative symlinks like gvlc, fbvlc are now created at compile time
   * borrowed libmpeg2's GPLed MMX YUV transformations (16 and 32 bits)
+  * fixed an endianness problem which occured on iMacs
+  * fixed the build for the Mandrake distribution
 
 Sun Jun 18 18:54:48 CEST 2000
 0.1.99c :
