@@ -55,5 +55,6 @@ void CmdLayout::execute()
 
     // XXX TODO: check that the layout isn't a layout of another window
 
-    pWindow->setActiveLayout( pLayout );
+    getIntf()->p_sys->p_theme->getWindowManager().setActiveLayout( *pWindow,
+                                                                   *pLayout );
 }

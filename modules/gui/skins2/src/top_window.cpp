@@ -301,6 +301,12 @@ void TopWindow::setActiveLayout( GenericLayout *pLayout )
 }
 
 
+const GenericLayout& TopWindow::getActiveLayout() const
+{
+    return *m_pActiveLayout;
+}
+
+
 void TopWindow::innerShow()
 {
     // First, refresh the layout and update the shape of the window
@@ -325,18 +331,6 @@ void TopWindow::updateShape()
             pImage->applyMaskToWindow( *getOSWindow() );
         }
     }
-}
-
-
-const list<Anchor*> TopWindow::getAnchorList() const
-{
-    return m_anchorList;
-}
-
-
-void TopWindow::addAnchor( Anchor *pAnchor )
-{
-    m_anchorList.push_back( pAnchor );
 }
 
 

@@ -26,12 +26,13 @@
 #define GENERIC_LAYOUT_HPP
 
 #include "skin_common.hpp"
+#include "top_window.hpp"
 #include "../utils/pointer.hpp"
 #include "../utils/position.hpp"
 
 #include <list>
 
-class TopWindow;
+class Anchor;
 class OSGraphics;
 class CtrlGeneric;
 
@@ -77,6 +78,10 @@ class GenericLayout: public SkinObject, public Box
         /// Get the image of the layout
         virtual OSGraphics *getImage() const { return m_pImage; }
 
+        /// Get the position of the layout (relative to the screen)
+        virtual int getLeft() const { return m_pWindow->getLeft(); }
+        virtual int getTop() const { return m_pWindow->getTop(); }
+
         /// Get the size of the layout
         virtual int getWidth() const { return m_width; }
         virtual int getHeight() const { return m_height; }
@@ -102,6 +107,12 @@ class GenericLayout: public SkinObject, public Box
         /// Called by a control when its image has changed
         virtual void onControlUpdate( const CtrlGeneric &rCtrl );
 
+        /// Get the list of the anchors of this layout
+        virtual const list<Anchor*>& getAnchorList() const;
+
+        /// Add an anchor to this layout
+        virtual void addAnchor( Anchor *pAnchor );
+
     private:
         /// Parent window of the layout
         TopWindow *m_pWindow;
@@ -113,6 +124,8 @@ class GenericLayout: public SkinObject, public Box
         OSGraphics *m_pImage;
         /// List of the controls in the layout
         list<LayeredControl> m_controlList;
+        /// List of the anchors in the layout
+        list<Anchor*> m_anchorList;
 };
 
 

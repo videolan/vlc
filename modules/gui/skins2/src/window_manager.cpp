@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include "window_manager.hpp"
+#include "generic_layout.hpp"
 #include "generic_window.hpp"
 #include "os_factory.hpp"
 #include "anchor.hpp"
@@ -92,8 +93,9 @@ void WindowManager::stopMove()
     // Iterate through all the windows
     for( itWin1 = m_allWindows.begin(); itWin1 != m_allWindows.end(); itWin1++ )
     {
-        // Get the anchors of the window
-        const AncList_t &ancList1 = (*itWin1)->getAnchorList();
+        // Get the anchors of the layout associated to the window
+        const AncList_t &ancList1 =
+            (*itWin1)->getActiveLayout().getAnchorList();
 
         // Iterate through all the windows, starting with (*itWin1)
         for( itWin2 = itWin1; itWin2 != m_allWindows.end(); itWin2++ )
@@ -103,7 +105,8 @@ void WindowManager::stopMove()
                 continue;
 
             // Now, check for anchoring between the 2 windows
-            const AncList_t &ancList2 = (*itWin2)->getAnchorList();
+            const AncList_t &ancList2 =
+                (*itWin2)->getActiveLayout().getAnchorList();
             for( itAnc1 = ancList1.begin(); itAnc1 != ancList1.end(); itAnc1++ )
             {
                 for( itAnc2 = ancList2.begin();
@@ -261,8 +264,9 @@ void WindowManager::checkAnchors( TopWindow *pWindow,
             continue;
         }
 
-        // Get the anchors of this moving window
-        const AncList_t &movAnchors = (*itMov)->getAnchorList();
+        // Get the anchors in the main layout of this moving window
+        const AncList_t &movAnchors =
+            (*itMov)->getActiveLayout().getAnchorList();
 
         // Iterate through the static windows
         for( itSta = m_allWindows.begin();
@@ -275,8 +279,9 @@ void WindowManager::checkAnchors( TopWindow *pWindow,
                 continue;
             }
 
-            // Get the anchors of this static window
-            const AncList_t &staAnchors = (*itSta)->getAnchorList();
+            // Get the anchors in the main layout of this static window
+            const AncList_t &staAnchors =
+                (*itSta)->getActiveLayout().getAnchorList();
 
             // Check if there is an anchoring between one of the movAnchors
             // and one of the staAnchors
@@ -349,4 +354,19 @@ void WindowManager::hideTooltip()
     {
         m_pTooltip->hide();
     }
+}
+
+
+void WindowManager::addLayout( TopWindow &rWindow, GenericLayout &rLayout )
+{
+    rWindow.setActiveLayout( &rLayout );
+}
+
+
+void WindowManager::setActiveLayout( TopWindow &rWindow,
+                                     GenericLayout &rLayout )
+{
+    rWindow.setActiveLayout( &rLayout );
+    // Rebuild the dependencies
+    stopMove();
 }

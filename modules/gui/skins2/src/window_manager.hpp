@@ -34,6 +34,7 @@
 
 
 class GenericFont;
+class GenericLayout;
 class Anchor;
 class Tooltip;
 
@@ -101,6 +102,13 @@ class WindowManager: public SkinObject
 
         /// Hide the tooltip window
         void hideTooltip();
+
+        /// Add a layout of the given window. This new layout will be the
+        /// active one.
+        void addLayout( TopWindow &rWindow, GenericLayout &rLayout );
+
+        /// Change the active layout of the given window
+        void setActiveLayout( TopWindow &rWindow, GenericLayout &rLayout );
 
     private:
         /// Some useful typedefs for lazy people like me

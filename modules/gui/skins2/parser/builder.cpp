@@ -204,16 +204,16 @@ void Builder::addLayout( const BuilderData::Layout &rData )
     m_pTheme->m_layouts[rData.m_id] = GenericLayoutPtr( pLayout );
 
     // Attach the layout to its window
-    pWin->setActiveLayout( pLayout );
+    m_pTheme->getWindowManager().addLayout( *pWin, *pLayout );
 }
 
 
 void Builder::addAnchor( const BuilderData::Anchor &rData )
 {
-    TopWindow *pWin = m_pTheme->m_windows[rData.m_windowId].get();
-    if( pWin == NULL )
+    GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
+    if( pLayout == NULL )
     {
-        msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
+        msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
         return;
     }
 
@@ -228,8 +228,8 @@ void Builder::addAnchor( const BuilderData::Anchor &rData )
 
     Anchor *pAnc = new Anchor( getIntf(), rData.m_xPos, rData.m_yPos,
                                rData.m_range, rData.m_priority,
-                               *pCurve, *pWin );
-    pWin->addAnchor( pAnc );
+                               *pCurve, *pLayout );
+    pLayout->addAnchor( pAnc );
 }
 
 

@@ -198,3 +198,15 @@ void GenericLayout::refreshAll()
     }
 }
 
+
+const list<Anchor*>& GenericLayout::getAnchorList() const
+{
+    return m_anchorList;
+}
+
+
+void GenericLayout::addAnchor( Anchor *pAnchor )
+{
+    m_anchorList.push_back( pAnchor );
+}
+

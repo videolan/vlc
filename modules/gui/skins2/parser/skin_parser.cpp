@@ -40,7 +40,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
     {
         const BuilderData::Anchor anchor( atoi( attr["x"] ) + m_xOffset,
                 atoi( attr["y"] ) + m_yOffset, atoi( attr["range"] ),
-                atoi( attr["priority"] ), attr["points"], m_curWindowId );
+                atoi( attr["priority"] ), attr["points"], m_curLayoutId );
         m_data.m_listAnchor.push_back( anchor );
     }
 

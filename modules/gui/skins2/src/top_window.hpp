@@ -29,7 +29,6 @@
 #include "../utils/pointer.hpp"
 #include <list>
 
-class Anchor;
 class OSWindow;
 class OSGraphics;
 class GenericLayout;
@@ -63,6 +62,9 @@ class TopWindow: public GenericWindow
         /// Change the active layout
         virtual void setActiveLayout( GenericLayout *pLayout );
 
+        /// Get the active layout
+        virtual const GenericLayout& getActiveLayout() const;
+
         /// Update the shape of the window from the active layout
         virtual void updateShape();
 
@@ -74,12 +76,6 @@ class TopWindow: public GenericWindow
 
         /// Called by a control when its tooltip changed
         virtual void onTooltipChange( const CtrlGeneric &rCtrl );
-
-        /// Get the list of the anchors of this window
-        virtual const list<Anchor*> getAnchorList() const;
-
-        /// Add an anchor to this window
-        virtual void addAnchor( Anchor *pAnchor );
 
     protected:
         /// Actually show the window
@@ -96,8 +92,6 @@ class TopWindow: public GenericWindow
         CtrlGeneric *m_pCapturingControl;
         /// Control that has the focus
         CtrlGeneric *m_pFocusControl;
-        /// List of the anchors of this window
-        list<Anchor*> m_anchorList;
         /// Current key modifier (also used for mouse)
         int m_currModifier;
 
