@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.62 2003/09/13 17:42:15 fenrir Exp $
+ * $Id: avi.c,v 1.63 2003/10/19 13:39:11 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -576,9 +576,9 @@ typedef struct avi_stream_toread_s
 
     int i_toread;
 
-    off_t i_posf; // where we will read :
-                  // if i_idxposb == 0 : begining of chunk (+8 to acces data)
-                  // else : point on data directly
+    off_t i_posf; /* where we will read :
+                   if i_idxposb == 0 : begining of chunk (+8 to acces data)
+                   else : point on data directly */
 } avi_stream_toread_t;
 
 static int Demux_Seekable( input_thread_t *p_input )
@@ -588,7 +588,7 @@ static int Demux_Seekable( input_thread_t *p_input )
     vlc_bool_t b_stream;
     vlc_bool_t b_play_audio;
     vlc_bool_t b_video; /* is there some video track selected */
-    // cannot be more than 100 stream (dcXX or wbXX)
+    /* cannot be more than 100 stream (dcXX or wbXX) */
     avi_stream_toread_t toread[100];
 
     demux_sys_t *p_avi = p_input->p_demux_data;
@@ -707,7 +707,7 @@ static int Demux_Seekable( input_thread_t *p_input )
 
             if( toread[i].i_toread > 0 )
             {
-                b_done = VLC_FALSE; // not yet finished
+                b_done = VLC_FALSE; /* not yet finished */
             }
 
             if( toread[i].i_posf > 0 )
@@ -722,7 +722,7 @@ static int Demux_Seekable( input_thread_t *p_input )
 
         if( b_done )
         {
-//            return( b_stream ? 1 : 0 );
+/*            return( b_stream ? 1 : 0 );*/
             return( 1 );
         }
 
@@ -829,7 +829,7 @@ static int Demux_Seekable( input_thread_t *p_input )
 
         if( p_stream->i_idxposb == 0 )
         {
-            i_size += 8; // need to read and skip header
+            i_size += 8; /* need to read and skip header */
         }
 
         if( ( p_pes = stream_PesPacket( p_input->s, __EVEN( i_size ) ) )==NULL )
@@ -839,12 +839,12 @@ static int Demux_Seekable( input_thread_t *p_input )
             toread[i_stream].b_ok = VLC_FALSE;
             continue;
         }
-        if( i_size % 2 )    // read was padded on word boundary
+        if( i_size % 2 )    /* read was padded on word boundary */
         {
             p_pes->p_last->p_payload_end--;
             p_pes->i_pes_size--;
         }
-        // skip header
+        /* skip header */
         if( p_stream->i_idxposb == 0 )
         {
             p_pes->p_first->p_payload_start += 8;
@@ -898,7 +898,7 @@ static int Demux_Seekable( input_thread_t *p_input )
             toread[i_stream].i_posf = -1;
         }
 
-        b_stream = VLC_TRUE; // at least one read succeed
+        b_stream = VLC_TRUE; /* at least one read succeed */
 
         if( p_stream->p_es && p_stream->p_es->p_decoder_fifo &&
             ( b_play_audio || p_stream->i_cat != AUDIO_ES ) )
@@ -998,7 +998,7 @@ static int Demux_UnSeekable( input_thread_t *p_input )
                     {
                         return( !AVI_PacketNext( p_input ) ? 1 : 0 );
                     }
-                    return( 0 );    // eof
+                    return( 0 );    /* eof */
                 default:
                     msg_Warn( p_input,
                               "seems to have lost position, resync" );
@@ -1158,7 +1158,7 @@ static int Seek( input_thread_t *p_input, mtime_t i_date, int i_percent )
         for( i_stream = 0; i_stream < p_avi->i_streams; i_stream++ )
         {
             if( p_stream->b_activated && !p_stream->i_samplesize )
-//            if( p_stream->b_activated )
+/*            if( p_stream->b_activated ) */
             {
                 AVI_StreamSeek( p_input, i_stream, i_date );
                 p_avi->i_time = __MAX( AVI_GetPTS( p_stream ),
@@ -1176,7 +1176,7 @@ static int Seek( input_thread_t *p_input, mtime_t i_date, int i_percent )
             if( p_stream->b_activated && p_stream->i_samplesize )
             {
                 AVI_StreamSeek( p_input, i_stream, i_date );
-//                p_avi->i_time = __MAX( AVI_GetPTS( p_stream ), p_avi->i_time );
+/*                p_avi->i_time = __MAX( AVI_GetPTS( p_stream ), p_avi->i_time );*/
             }
         }
         msg_Dbg( p_input, "seek: "I64Fd" secondes", p_avi->i_time /1000000 );
@@ -1722,7 +1722,7 @@ static int AVI_GetKeyFlag( vlc_fourcc_t i_fourcc, uint8_t *p_byte )
                 return p_byte[4] & 0x06 ? 0 : AVIIF_KEYFRAME;
             }
         case FOURCC_DIV2:
-        case FOURCC_DIV3:   // wmv1 also
+        case FOURCC_DIV3:   /* wmv1 also */
             /* we have
              *  picture type    0(I),1(P)     2bits
              */
@@ -1756,7 +1756,7 @@ vlc_fourcc_t AVI_FourccGetCodec( unsigned int i_cat, vlc_fourcc_t i_codec )
             return i_codec;
 
         case VIDEO_ES:
-            // XXX DIV1 <- msmpeg4v1, DIV2 <- msmpeg4v2, DIV3 <- msmpeg4v3, mp4v for mpeg4
+            /* XXX DIV1 <- msmpeg4v1, DIV2 <- msmpeg4v2, DIV3 <- msmpeg4v3, mp4v for mpeg4 */
             switch( i_codec )
             {
                 case FOURCC_DIV1:

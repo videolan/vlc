@@ -2,7 +2,7 @@
  * info.m: MacOS X info panel
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: info.m,v 1.7 2003/09/20 13:46:00 hartman Exp $
+ * $Id: info.m,v 1.8 2003/10/19 13:39:12 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -105,7 +105,7 @@
     }
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-    vlc_object_release( p_input );
+    if( p_input ) vlc_object_release( p_input );
 
     int i_select = [o_selector indexOfItemWithTitle:o_selectedPane];
     if ( i_select < 0 )
@@ -160,11 +160,8 @@
         {
             bEnabled = FALSE;
         }
-        else
-        {
-            vlc_object_release( p_input );
-        }
     }
+    if( p_input ) vlc_object_release( p_input );
 
     return( bEnabled );
 }

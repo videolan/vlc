@@ -2,7 +2,7 @@
  * libavi.h : LibAVI library
  ******************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.h,v 1.11 2003/08/22 20:31:47 fenrir Exp $
+ * $Id: libavi.h,v 1.12 2003/10/19 13:39:12 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,9 +33,9 @@
 #define AVIIF_NOTIME        0x00000100L /* this frame doesn't take any time */
 #define AVIIF_COMPUSE       0x0FFF0000L /* these bits are for compressor use */
 
-#define AVIIF_FIXKEYFRAME   0x00001000L /* invented; used to say that 
-                                           the keyframe flag isn't a true flag
-                                           but have to be verified */
+#define AVIIF_FIXKEYFRAME   0x00001000L /* invented; used to say that */
+                                        /* the keyframe flag isn't a true flag */
+                                        /* but have to be verified */
 
 #define AVI_CHUNK_COMMON            \
     vlc_fourcc_t i_chunk_fourcc;    \
