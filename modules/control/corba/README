@@ -1,8 +1,8 @@
-$Id: README,v 1.1 2003/07/07 16:59:00 sam Exp $
+$Id: README,v 1.2 2004/01/25 16:17:03 anil Exp $
 * Module (server) side
 ** Dependencies
 
-To compile the CORBA plugin, you need the orbit2 developpement files
+To compile the CORBA module, you need the orbit2 developpement files
 (for Debian, install the package liborbi2-dev)
 
 ** How to run it ?

@@ -16,7 +16,7 @@ from session import SessionList
 PORT = 1554
 
 if len(sys.argv) == 1:
-    print "usage: vlrs <playlist>\n"
+    print "Usage: vlrs <playlist>\n"
     sys.exit()
 
 cfg.playlist = PlayList()

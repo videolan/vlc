@@ -18,12 +18,12 @@ class RtspServerHandler(SocketServer.StreamRequestHandler):
     
     version = "RTSP/1.0"
     ok = "200 OK"
-    badRequest = "400 Bad Request"
+    badRequest = "400 Bad request"
     uriNotFound = "404 Not found"
-    sessionNotFound = "454 Session Not Found"
-    invalidHeader = "456 Header Field Not Valid for Resource"
-    internalError = "500 Internal Server Error"
-    notImplemented = "501 Not Implemented"
+    sessionNotFound = "454 Session not found"
+    invalidHeader = "456 Header field not valid for resource"
+    internalError = "500 Internal server error"
+    notImplemented = "501 Not implemented"
     
     def error(self, message, cseq):
         self.wfile.write(self.version + " " + message + "\r\n" + \
@@ -48,7 +48,7 @@ class RtspServerHandler(SocketServer.StreamRequestHandler):
         return response
 
     def pingMethod(self, msg):
-        "Handle an PING request"
+        "Handle a PING request"
         cseq = msg.getheader('cseq')
         id = msg.getheader('Session')
         if id is None:

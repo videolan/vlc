@@ -1,8 +1,8 @@
 /*****************************************************************************
- * rc.c : remote control stdin/stdout plugin for vlc
+ * rc.c : remote control stdin/stdout module for vlc
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.41 2004/01/05 13:07:02 zorglub Exp $
+ * Copyright (C) 2004 VideoLAN
+ * $Id: rc.c,v 1.42 2004/01/25 16:17:03 anil Exp $
  *
  * Author: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -78,7 +78,7 @@ static int  AudioConfig  ( vlc_object_t *, char const *,
 #define POS_LONGTEXT N_("Show the current position in seconds within the stream from time to time.")
 
 #define TTY_TEXT N_("Fake TTY")
-#define TTY_LONGTEXT N_("Force the rc plugin to use stdin as if it was a TTY.")
+#define TTY_LONGTEXT N_("Force the rc module to use stdin as if it was a TTY.")
 
 vlc_module_begin();
     add_category_hint( N_("Remote control"), NULL, VLC_TRUE );
@@ -86,7 +86,7 @@ vlc_module_begin();
 #ifdef HAVE_ISATTY
     add_bool( "fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT, VLC_TRUE );
 #endif
-    set_description( _("remote control interface") );
+    set_description( _("Remote control interface") );
     set_capability( "interface", 20 );
     set_callbacks( Activate, NULL );
 vlc_module_end();
@@ -114,7 +114,7 @@ static int Activate( vlc_object_t *p_this )
 
     CONSOLE_INTRO_MSG;
 
-    printf( "remote control interface initialized, `h' for help\n" );
+    printf( "Remote control interface initialized, `h' for help\n" );
     return VLC_SUCCESS;
 }
 
@@ -452,7 +452,7 @@ static void Run( intf_thread_t *p_intf )
             case '?':
             case 'h':
             case 'H':
-                printf("+----[ remote control commands ]\n");
+                printf("+----[ Remote control commands ]\n");
                 printf("| \n");
                 printf("| add XYZ  . . . . . . . . . . add XYZ to playlist\n");
                 printf("| playlist . . .  show items currently in playlist\n");

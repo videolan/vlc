@@ -1,8 +1,8 @@
 /*****************************************************************************
- * geatures.c: control vlc with mouse gestures
+ * gestures.c: control vlc with mouse gestures
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: gestures.c,v 1.6 2003/11/05 00:39:16 gbazin Exp $
+ * Copyright (C) 2004 VideoLAN
+ * $Id: gestures.c,v 1.7 2004/01/25 16:17:03 anil Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -74,25 +74,24 @@ static void RunIntf        ( intf_thread_t *p_intf );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define THRESHOLD_TEXT N_( "Motion threshold" )
+#define THRESHOLD_TEXT N_( "Motion threshold (10-100)" )
 #define THRESHOLD_LONGTEXT N_( \
-    "the amount of movement required for a mouse" \
-    " gesture to be recorded" )
+    "Amount of movement required for a mouse" \
+    " gesture to be recorded." )
 
-#define BUTTON_TEXT N_( "Mouse button" )
+#define BUTTON_TEXT N_( "Trigger button" )
 #define BUTTON_LONGTEXT N_( \
-    "the mouse button to be held down during mouse gestures" )
+    "You can set the trigger button for mouse gestures here." )
 
 static char *button_list[] = { "left", "middle", "right" };
 static char *button_list_text[] = { N_("Left"), N_("Middle"), N_("Right") };
 
 vlc_module_begin();
-    add_category_hint( N_( "Gestures" ), NULL, VLC_FALSE );
     add_integer( "gestures-threshold", 30, NULL, THRESHOLD_TEXT, THRESHOLD_LONGTEXT, VLC_TRUE );
     add_string( "gestures-button", "right", NULL,
                 BUTTON_TEXT, BUTTON_LONGTEXT, VLC_FALSE );
         change_string_list( button_list, button_list_text, 0 );
-    set_description( _("mouse gestures control interface") );
+    set_description( _("Mouse gestures control interface") );
 
     set_capability( "interface", 0 );
     set_callbacks( E_(Open), E_(Close) );
@@ -199,7 +198,7 @@ static void RunIntf( intf_thread_t *p_intf )
                 p_intf->p_vlc->b_die = VLC_TRUE;
                 break;
             case GESTURE(DOWN,LEFT,UP,RIGHT):
-                msg_Dbg(p_intf, "A square!" );
+                msg_Dbg(p_intf, "a square!" );
                 break;
             default:
                 break;

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * ntservice.c: Windows NT/2K/XP service interface
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: ntservice.c,v 1.4 2003/12/22 02:24:51 sam Exp $
+ * Copyright (C) 2004 VideoLAN
+ * $Id: ntservice.c,v 1.5 2004/01/25 16:17:03 anil Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -54,7 +54,6 @@ static void Close   ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Windows NT/2K/XP service interface") );
-    add_category_hint( N_("NT service"), NULL, VLC_TRUE );
     add_bool( "ntservice-install", 0, NULL,
               INSTALL_TEXT, INSTALL_LONGTEXT, VLC_TRUE );
     add_bool( "ntservice-uninstall", 0, NULL,
@@ -158,7 +157,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     SC_HANDLE handle = OpenSCManager( NULL, NULL, SC_MANAGER_ALL_ACCESS );
     if( handle == NULL )
     {
-        msg_Err( p_intf, "Could not connect to SCM database" );
+        msg_Err( p_intf, "could not connect to SCM database" );
         return VLC_EGENERIC;
     }
 
@@ -185,20 +184,20 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     {
         if( GetLastError() != ERROR_SERVICE_EXISTS )
         {
-            msg_Err( p_intf, "Could not create new service: \"%s\" (%s)",
+            msg_Err( p_intf, "could not create new service: \"%s\" (%s)",
                      p_sys->psz_service ,psz_path );
             CloseServiceHandle( handle );
             return VLC_EGENERIC;
         }
         else
         {
-            msg_Warn( p_intf, "Service \"%s\" already exists",
+            msg_Warn( p_intf, "service \"%s\" already exists",
                       p_sys->psz_service );
         }
     }
     else
     {
-        msg_Warn( p_intf, "Service successfuly created" );
+        msg_Warn( p_intf, "service successfuly created" );
     }
 
     if( service ) CloseServiceHandle( service );
@@ -214,7 +213,7 @@ static int NTServiceUninstall( intf_thread_t *p_intf )
     SC_HANDLE handle = OpenSCManager( NULL, NULL, SC_MANAGER_ALL_ACCESS );
     if( handle == NULL )
     {
-        msg_Err( p_intf, "Could not connect to SCM database" );
+        msg_Err( p_intf, "could not connect to SCM database" );
         return VLC_EGENERIC;
     }
 
@@ -222,7 +221,7 @@ static int NTServiceUninstall( intf_thread_t *p_intf )
     SC_HANDLE service = OpenService( handle, p_sys->psz_service, DELETE );
     if( service == NULL )
     {
-        msg_Err( p_intf, "Could not open service" );
+        msg_Err( p_intf, "could not open service" );
         CloseServiceHandle( handle );
         return VLC_EGENERIC;
     }
@@ -230,12 +229,12 @@ static int NTServiceUninstall( intf_thread_t *p_intf )
     /* Remove the service */
     if( !DeleteService( service ) )
     {
-        msg_Err( p_intf, "Could not delete service \"%s\"",
+        msg_Err( p_intf, "could not delete service \"%s\"",
                  p_sys->psz_service );
     }
     else
     {
-        msg_Dbg( p_intf, "Service deleted successfuly" );
+        msg_Dbg( p_intf, "service deleted successfuly" );
     }
 
     CloseServiceHandle( service );
@@ -260,7 +259,7 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
         RegisterServiceCtrlHandler( p_sys->psz_service, &ServiceCtrlHandler );
     if( p_sys->hStatus == (SERVICE_STATUS_HANDLE)0 )
     {
-        msg_Err( p_intf, "Failed to register service control handler" );
+        msg_Err( p_intf, "failed to register service control handler" );
         return;
     }
 

@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.49 2004/01/18 07:35:31 fenrir Exp $
+ * $Id: http.c,v 1.50 2004/01/25 16:17:03 anil Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -71,13 +71,12 @@ static void Close        ( vlc_object_t * );
 
 #define HOST_TEXT N_( "Host address" )
 #define HOST_LONGTEXT N_( \
-    "You can set the address and port on which the http interface will bind" )
+    "You can set the address and port the http interface will bind to." )
 #define SRC_TEXT N_( "Source directory" )
 #define SRC_LONGTEXT N_( "Source directory" )
 
 vlc_module_begin();
     set_description( _("HTTP remote control interface") );
-    add_category_hint( N_("HTTP remote control"), NULL, VLC_TRUE );
         add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
         add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  VLC_TRUE );
     set_capability( "interface", 0 );
@@ -586,7 +585,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
             f = malloc( sizeof( httpd_file_callback_args_t ) );
             if( !f )
             {
-                msg_Err( p_intf, "Out of memory" );
+                msg_Err( p_intf, "out of memory" );
                 closedir( p_dir );
                 return( VLC_ENOMEM );
             }
@@ -597,7 +596,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
 
             if( !f->name || !f->mime )
             {
-                msg_Err( p_intf , "Unable to parse directory" );
+                msg_Err( p_intf , "unable to parse directory" );
                 closedir( p_dir );
                 free( f );
                 return( VLC_ENOMEM );
@@ -626,7 +625,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                 f = malloc( sizeof( httpd_file_callback_args_t ) );
                 if( !f )
                 {
-                    msg_Err( p_intf, "Out of memory" );
+                    msg_Err( p_intf, "out of memory" );
                     closedir( p_dir );
                     return( VLC_ENOMEM );
                 }

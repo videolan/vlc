@@ -1,8 +1,8 @@
 /*****************************************************************************
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.15 2003/12/15 13:38:27 hartman Exp $
+ * Copyright (C) 2004 VideoLAN
+ * $Id: hotkeys.c,v 1.16 2004/01/25 16:17:03 anil Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -80,10 +80,10 @@ static void SetBookmark ( intf_thread_t *, int );
 #define BOOKMARK9_TEXT N_("Playlist bookmark 9")
 #define BOOKMARK10_TEXT N_("Playlist bookmark 10")
 #define BOOKMARK_LONGTEXT N_( \
-    "This option allows you to define playlist bookmarks")
+    "This option allows you to define playlist bookmarks.")
 
 vlc_module_begin();
-    set_description( _("hotkey interface") );
+    set_description( _("Hotkeys management interface") );
     add_string( "bookmark1", NULL, NULL,
                 BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
     add_string( "bookmark2", NULL, NULL,
@@ -232,7 +232,7 @@ static void Run( intf_thread_t *p_intf )
         if( i_action == ACTIONID_QUIT )
         {
             p_intf->p_vlc->b_die = VLC_TRUE;
-            vout_OSDMessage( VLC_OBJECT(p_intf), _("Quit" ) );
+            vout_OSDMessage( VLC_OBJECT(p_intf), _( "Quit" ) );
             continue;
         }
         else if( i_action == ACTIONID_VOL_UP )
@@ -257,7 +257,7 @@ static void Run( intf_thread_t *p_intf )
             aout_VolumeMute( p_intf, &i_newvol );
             if( i_newvol == 0 )
             {
-                vout_OSDMessage( VLC_OBJECT(p_intf), "Mute" );
+                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Mute" ) );
             }
             else
             {
@@ -483,7 +483,7 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     vlc_mutex_lock( &p_intf->p_sys->change_lock );
     if ( p_intf->p_sys->i_size == BUFFER_SIZE )
     {
-        msg_Warn( p_intf, "Event buffer full, dropping keypress" );
+        msg_Warn( p_intf, "event buffer full, dropping keypress" );
         vlc_mutex_unlock( &p_intf->p_sys->change_lock );
         return VLC_EGENERIC;
     }
@@ -554,7 +554,7 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
         var_Create( p_intf, psz_bookmark_name, VLC_VAR_STRING|VLC_VAR_DOINHERIT );
         val.psz_string = strdup( p_playlist->pp_items[p_playlist->i_index]->psz_uri );
         var_Set( p_intf, psz_bookmark_name, val );
-        msg_Info( p_intf, "Setting playlist bookmark %i to %s", i_num, val.psz_string );
+        msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num, val.psz_string );
         vlc_object_release( p_playlist );
     }
 }

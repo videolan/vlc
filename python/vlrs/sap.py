@@ -9,7 +9,7 @@ import cfg,socket,struct,time,threading
 
 
 def ntpTime():
-    "return the current time in NTP decimal format"
+    "Return the current time in NTP decimal format"
     return "%d" % (int(time.time()) + 2208988800L)
 
 

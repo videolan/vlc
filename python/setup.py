@@ -18,6 +18,6 @@ vlc = Extension('vlc',
 
 setup (name = 'PackageName',
        version = '1.0',
-       description = 'This is a demo package',
+       description = 'This is a demonstration package',
        ext_modules = [vlc])
 

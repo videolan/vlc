@@ -1,8 +1,8 @@
 /*****************************************************************************
- * corba.c : CORBA (ORBit) remote control plugin for vlc
+ * corba.c : CORBA (ORBit) remote control module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: corba.c,v 1.3 2004/01/05 13:07:02 zorglub Exp $
+ * $Id: corba.c,v 1.4 2004/01/25 16:17:03 anil Exp $
  *
  * Authors: Olivier Aubert <oaubert at lisi dot univ-lyon1 dot fr>
  *
@@ -337,7 +337,7 @@ impl_VLC_MediaControl_get_media_position(impl_POA_VLC_MediaControl * servant,
     }
 
   /* We are asked for an AbsolutePosition. */
-  /* Cf plugins/gtk/gtk_display.c */
+  /* Cf modules/gui/gtk/gtk_display.c */
 
   /* The lock is taken by the currentOffset function */
   l_offset = currentOffset (p_input);
@@ -459,7 +459,7 @@ impl_VLC_MediaControl_start(impl_POA_VLC_MediaControl * servant,
     {
       /* FIXME: we should raise an appropriate exception, but we must
          define it in the IDL first */
-      msg_Err (servant->p_intf, "Error: no playlist available.");
+      msg_Err (servant->p_intf, "no playlist available");
       return;
     }
 
@@ -474,7 +474,7 @@ impl_VLC_MediaControl_start(impl_POA_VLC_MediaControl * servant,
     {
         vlc_mutex_unlock( &p_playlist->object_lock );
         vlc_object_release( p_playlist );
-        msg_Err (servant->p_intf, "Error: playlist empty.");
+        msg_Err (servant->p_intf, "playlist empty");
     }
 
   return;
@@ -486,7 +486,7 @@ impl_VLC_MediaControl_pause(impl_POA_VLC_MediaControl * servant,
 {
   input_thread_t *p_input = servant->p_intf->p_sys->p_input;
 
-  msg_Warn (servant->p_intf, "Calling MediaControl::pause");
+  msg_Warn (servant->p_intf, "calling MediaControl::pause");
 
   if( p_input != NULL )
     {
@@ -502,7 +502,7 @@ impl_VLC_MediaControl_resume(impl_POA_VLC_MediaControl * servant,
 {
   input_thread_t *p_input = servant->p_intf->p_sys->p_input;
 
-  msg_Warn (servant->p_intf, "Calling MediaControl::resume");
+  msg_Warn (servant->p_intf, "calling MediaControl::resume");
 
   if( p_input != NULL )
     {
@@ -520,7 +520,7 @@ impl_VLC_MediaControl_stop(impl_POA_VLC_MediaControl * servant,
   playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                              FIND_ANYWHERE );
 
-  msg_Warn (servant->p_intf, "Calling MediaControl::stop");
+  msg_Warn (servant->p_intf, "calling MediaControl::stop");
 
   if( p_playlist != NULL )
     {
@@ -535,7 +535,7 @@ static void
 impl_VLC_MediaControl_exit(impl_POA_VLC_MediaControl * servant,
                            CORBA_Environment * ev)
 {
-  msg_Warn (servant->p_intf, "Calling MediaControl::exit");
+  msg_Warn (servant->p_intf, "calling MediaControl::exit");
 
   vlc_mutex_lock( &servant->p_intf->change_lock );
   servant->p_intf->b_die = TRUE;
@@ -551,11 +551,11 @@ impl_VLC_MediaControl_add_to_playlist(impl_POA_VLC_MediaControl * servant,
   playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                              FIND_ANYWHERE );
 
-  msg_Warn (servant->p_intf, "Calling MediaControl::add_to_playlist %s", psz_file);
+  msg_Warn (servant->p_intf, "calling MediaControl::add_to_playlist %s", psz_file);
 
   if ( p_playlist == NULL )
     {
-      msg_Err (servant->p_intf, "Error: no playlist defined");
+      msg_Err (servant->p_intf, "no playlist defined");
       /* FIXME: should return an exception */
       return;
     }
@@ -577,7 +577,7 @@ impl_VLC_MediaControl_get_playlist(impl_POA_VLC_MediaControl * servant,
                                               FIND_ANYWHERE );
    int i_playlist_size;
 
-   msg_Warn (servant->p_intf, "Calling MediaControl::get_playlist");
+   msg_Warn (servant->p_intf, "calling MediaControl::get_playlist");
 
    vlc_mutex_lock( &p_playlist->object_lock );
    i_playlist_size = p_playlist->i_size;
@@ -611,8 +611,7 @@ static void Run          ( intf_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    add_category_hint( N_("Corba control"), NULL, VLC_FALSE );
-    set_description( _("corba control module") );
+    set_description( _("Corba control module") );
     set_capability( "interface", 10 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -658,7 +657,7 @@ static void Close( vlc_object_t *p_this )
 
   ev = CORBA_exception__alloc ();
   CORBA_ORB_shutdown (p_intf->p_sys->orb, FALSE, ev);
-  handle_exception_no_servant (p_intf, "Erreur dans Close");
+  handle_exception_no_servant (p_intf, "erreur dans Close");
 
   if( p_intf->p_sys->p_input )
     {
@@ -684,7 +683,7 @@ static gboolean Manage (gpointer p_interface)
   b_work_pending = CORBA_ORB_work_pending (p_intf->p_sys->orb, ev);
   if(ev->_major != CORBA_NO_EXCEPTION)
     {
-      msg_Err (p_intf, "Exception dans la vérif d'événements CORBA");
+      msg_Err (p_intf, "exception in the CORBA events check");
       return FALSE;
     }
 
@@ -775,21 +774,21 @@ static void Run ( intf_thread_t *p_intf )
      cleaning it */
   /* p_intf->p_sys->orb = gnome_CORBA_init ("VLC", NULL, &argc, &argv, 0, NULL, ev); */
 
-  handle_exception_no_servant (p_intf, "Exception during CORBA_ORB_init");
+  handle_exception_no_servant (p_intf, "exception during CORBA_ORB_init");
 
   p_intf->p_sys->root_poa = (PortableServer_POA)CORBA_ORB_resolve_initial_references(p_intf->p_sys->orb, "RootPOA", ev);
-  handle_exception ("Exception during RootPOA initialization");
+  handle_exception ("exception during RootPOA initialization");
 
   p_intf->p_sys->mc = impl_VLC_MediaControl__create(p_intf->p_sys->root_poa, ev);
-  handle_exception ("Exception during MediaControl initialization");
+  handle_exception ("exception during MediaControl initialization");
 
   servant = (impl_POA_VLC_MediaControl*)PortableServer_POA_reference_to_servant(p_intf->p_sys->root_poa, p_intf->p_sys->mc, ev);
-  handle_exception ("Exception during MediaControl access");
+  handle_exception ("exception during MediaControl access");
 
   servant->p_intf = p_intf;
 
   psz_objref = CORBA_ORB_object_to_string(p_intf->p_sys->orb, p_intf->p_sys->mc, ev);
-  handle_exception ("Exception during IOR generation");
+  handle_exception ("exception during IOR generation");
 
   msg_Warn (p_intf, "MediaControl IOR :");
   msg_Warn (p_intf, psz_objref);
@@ -800,7 +799,7 @@ static void Run ( intf_thread_t *p_intf )
     fp = fopen (VLC_IOR_FILE, "w");
     if (fp == NULL)
       {
-        msg_Err (servant->p_intf, "Cannot write the IOR to %s (%d).", VLC_IOR_FILE, errno);
+        msg_Err (servant->p_intf, "cannot write the IOR to %s (%d).", VLC_IOR_FILE, errno);
       }
     else
       {
@@ -812,11 +811,11 @@ static void Run ( intf_thread_t *p_intf )
 
   msg_Warn (p_intf, "get_the_POAManager (state  %s)", p_intf->p_sys->root_poa);
   p_intf->p_sys->root_poa_manager = PortableServer_POA__get_the_POAManager(p_intf->p_sys->root_poa, ev);
-  handle_exception ("Exception during POAManager resolution");
+  handle_exception ("exception during POAManager resolution");
 
-  msg_Warn (p_intf, "Activating POAManager");
+  msg_Warn (p_intf, "activating POAManager");
   PortableServer_POAManager_activate(p_intf->p_sys->root_poa_manager, ev);
-  handle_exception ("Exception during POAManager activation");
+  handle_exception ("exception during POAManager activation");
 
   msg_Info(p_intf, "corba remote control interface initialized" );
 
@@ -832,12 +831,12 @@ static void Run ( intf_thread_t *p_intf )
     name_service = CORBA_ORB_resolve_initial_references (p_intf->p_sys->orb,
                                                          "NameService",
                                                          ev);
-    handle_exception ("Error: could not get name service: %s\n",
+    handle_exception ("could not get name service: %s\n",
                    CORBA_exception_id(ev));
     msg_Warn (p_intf, "Name service OK");
 
     CosNaming_NamingContext_bind (name_service, &name, p_intf->p_sys->mc, ev);
-      handle_exception ("Error: could not register object: %s\n",
+      handle_exception ("could not register object: %s\n",
       CORBA_exception_id(ev));
   }
     */
@@ -847,7 +846,7 @@ static void Run ( intf_thread_t *p_intf )
   i_event_source = g_timeout_add (INTF_IDLE_SLEEP / 10000,
                                 Manage,
                                 p_intf);
-  msg_Warn (p_intf, "Entering mainloop");
+  msg_Warn (p_intf, "entering mainloop");
 
   p_intf->p_sys->corbaloop = g_main_loop_new (NULL, FALSE);
   g_main_loop_run (p_intf->p_sys->corbaloop);
@@ -856,6 +855,6 @@ static void Run ( intf_thread_t *p_intf )
   g_source_remove( i_event_source );
   unlink (VLC_IOR_FILE);
 
-  msg_Warn (p_intf, "Normal termination of VLC corba plugin");
+  msg_Warn (p_intf, "normal termination of VLC corba module");
   return;
 }

@@ -77,12 +77,12 @@ static PyObject *vlc_pause(PyObject *self, PyObject *args)
 
 
 static PyMethodDef VlcMethods[] = {
-    {"create", vlc_create, METH_VARARGS, "Create a vlc thread."},
-    {"init", vlc_init, METH_VARARGS, "Initialize a vlc thread."},
-    {"addTarget", vlc_addTarget, METH_VARARGS, "Add a target in the playlist."},
-    {"play", vlc_play, METH_VARARGS, "Play"},
-    {"stop", vlc_stop, METH_VARARGS, "Stop"},
-    {"pause", vlc_pause, METH_VARARGS, "Pause"},
+    {"create", vlc_create, METH_VARARGS, _("Create a vlc thread.")},
+    {"init", vlc_init, METH_VARARGS, _("Initialize a vlc thread.")},
+    {"addTarget", vlc_addTarget, METH_VARARGS, _("Add a target in the playlist.")},
+    {"play", vlc_play, METH_VARARGS, _("Play")},
+    {"stop", vlc_stop, METH_VARARGS, _("Stop")},
+    {"pause", vlc_pause, METH_VARARGS, _("Pause")},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 

@@ -72,7 +72,7 @@ class DVDControl (Connect):
         self.gui.get_widget ("win").set_title (title)
         
     def launch_player (self):
-        """Launch the VLC corba plugin"""
+        """Launch the VLC corba module"""
         #print "Launching vlc server..."
         # FIXME: spawn is portable, but how can we make sure that
         # launch-vlc-corba launches the application in the background ?

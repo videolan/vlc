@@ -1,8 +1,8 @@
 /*****************************************************************************
- * lirc.c : lirc plugin for vlc
+ * lirc.c : lirc module for vlc
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.9 2003/12/22 14:32:55 sam Exp $
+ * Copyright (C) 2004 VideoLAN
+ * $Id: lirc.c,v 1.10 2004/01/25 16:17:03 anil Exp $
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -61,7 +61,7 @@ static void Feedback( intf_thread_t *, char * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("infrared remote control interface") );
+    set_description( _("Infrared remote control interface") );
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
