@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.3 2003/11/09 00:52:32 rocky Exp $
+ * $Id: vcd.c,v 1.4 2003/11/09 17:45:41 rocky Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Rocky Bernstein <rocky@panix.com> 
@@ -57,7 +57,6 @@
 /* First those which are accessed from outside (via pointers). */
 static int  VCDOpen         ( vlc_object_t * );
 static void VCDClose        ( vlc_object_t * );
-static int  VCDRead         ( input_thread_t *, byte_t *, size_t );
 static int  VCDRead         ( input_thread_t *, byte_t *, size_t );
 static int  VCDSetProgram   ( input_thread_t *, pgrm_descriptor_t * );
 
@@ -402,6 +401,8 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 
     i_read = 0;
 
+    dbg_print( (INPUT_DBG_CALL), "lsn: %u", p_vcd->cur_lsn );
+
     /* Compute the number of blocks we have to read */
 
     i_blocks = i_len / M2F2_SECTOR_SIZE;
@@ -529,8 +530,10 @@ VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
     unsigned int i_nb    = p_area->i_plugin_data + p_area->i_part_nb;
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT),
-               "track: %d, entry %d, seekable %d",
-               i_track, i_entry, old_seekable );
+               "track: %d, entry %d, seekable %d, area %lx, select area %lx ",
+               i_track, i_entry, old_seekable, 
+	       (long unsigned int) p_area, 
+	       (long unsigned int) p_input->stream.p_selected_area );
 
     /* we can't use the interface slider until initilization is complete */
     p_input->stream.b_seekable = 0;
@@ -632,6 +635,9 @@ VCDPlay( input_thread_t *p_input, vcdinfo_itemid_t itemid )
     input_area_t *          p_area;
     
     p_vcd->in_still = 0;
+
+    dbg_print(INPUT_DBG_CALL, "itemid.num: %d, itemid.type: %d\n", 
+	      itemid.num, itemid.type);
 
 #define area p_input->stream.pp_areas
 
@@ -846,8 +852,9 @@ VCDSegments( input_thread_t * p_input )
 
     area[0]->i_part_nb = 0;
     
-    dbg_print( INPUT_DBG_MRL, "area id %d, for segment track %d", 
-               area[0]->i_id, 0 );
+    dbg_print( INPUT_DBG_MRL, 
+	       "area[0] id: %d, i_start: %lld, i_size: %lld", 
+               area[0]->i_id, area[0]->i_start, area[0]->i_size );
 
     if (num_segments == 0) return 0;
 
