@@ -121,7 +121,7 @@ int E_(Open) ( vlc_object_t *p_this )
     u_lnb_lof2 = config_GetInt( p_input, "lnb-lof2" );
     u_lnb_slof = config_GetInt( p_input, "lnb-slof" );
 
-    /*Get modulation parametters*/
+    /*Get modulation parameters*/
     i_bandwidth = config_GetInt( p_input, "bandwidth");
     i_code_rate_HP = config_GetInt(p_input, "code-rate-hp");
     i_code_rate_LP = config_GetInt(p_input, "code-rate-lp");
@@ -162,7 +162,7 @@ int E_(Open) ( vlc_object_t *p_this )
         else if (strncmp( p_input->psz_access, "terrestrial",11) ==0)
             frontend_info.type = FE_OFDM;
 
-        frontend_info.frequency_max =   12999000;
+        frontend_info.frequency_max =   12999000; /* KHz */
         frontend_info.frequency_min =    9750000;
         frontend_info.symbol_rate_max = 30000000;
         frontend_info.symbol_rate_min =  1000000;
@@ -416,7 +416,7 @@ int E_(Open) ( vlc_object_t *p_this )
     {
         /* DVB-S: satellite and budget cards (nova) */
         case FE_QPSK:
-            fep.frequency = u_freq;
+            fep.frequency = u_freq; /* KHz */
             fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
             fep.u.qpsk.symbol_rate = u_srate;
             fep.u.qpsk.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
@@ -425,7 +425,7 @@ int E_(Open) ( vlc_object_t *p_this )
             
         /* DVB-C */
         case FE_QAM:
-            fep.frequency = u_freq;
+            fep.frequency = u_freq; /* KHz */
             fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
             fep.u.qam.symbol_rate = u_srate;
             fep.u.qam.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
@@ -435,7 +435,7 @@ int E_(Open) ( vlc_object_t *p_this )
 
         /* DVB-T */
         case FE_OFDM:
-            fep.frequency = u_freq;
+            fep.frequency = u_freq; /* KHz */
             fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
             fep.u.ofdm.bandwidth = dvb_DecodeBandwidth(p_input, i_bandwidth);
             fep.u.ofdm.code_rate_HP = dvb_DecodeFEC(p_input, i_code_rate_HP); 
@@ -520,6 +520,7 @@ int E_(Open) ( vlc_object_t *p_this )
 
     msg_Dbg( p_input, "setting filter on PAT" );
 
+    /* Set Filter on PAT packet */
     if ( ioctl_SetDMXFilter(p_input, 0, &i_fd, 21, u_adapter, u_device ) < 0 )
     {
 #   ifdef HAVE_ERRNO_H

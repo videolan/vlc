@@ -42,12 +42,12 @@ void E_(Close)   ( vlc_object_t * );
 
 /* Satellite options */
 #define ADAPTER_TEXT N_("adapter card to tune")
-#define ADAPTER_LONGTEXT N_("adapter cards have a device file named /dev/dvb/adapter[n] with n>=0")
+#define ADAPTER_LONGTEXT N_("adapter cards have a device file in directory named /dev/dvb/adapter[n] with n>=0")
 
 #define DEVICE_TEXT N_("device nummer to use on adapter")
 #define DEVICE_LONGTEXT ""
 
-#define FREQ_TEXT N_("satellite default transponder frequency in Hz")
+#define FREQ_TEXT N_("satellite default transponder frequency in KHz")
 #define FREQ_LONGTEXT ""
 
 #define POL_TEXT N_("satellite default transponder polarization")
@@ -56,19 +56,19 @@ void E_(Close)   ( vlc_object_t * );
 #define FEC_TEXT N_("satellite default transponder FEC")
 #define FEC_LONGTEXT N_("FEC=Forward Error Correction mode")
 
-#define SRATE_TEXT N_("satellite default transponder symbol rate in Hz")
+#define SRATE_TEXT N_("satellite default transponder symbol rate in KHz")
 #define SRATE_LONGTEXT ""
 
 #define DISEQC_TEXT N_("use diseqc with antenna")
 #define DISEQC_LONGTEXT ""
 
-#define LNB_LOF1_TEXT N_("antenna lnb_lof1 (Hz)")
+#define LNB_LOF1_TEXT N_("antenna lnb_lof1 (KHz)")
 #define LNB_LOF1_LONGTEXT ""
 
-#define LNB_LOF2_TEXT N_("antenna lnb_lof2 (Hz)")
+#define LNB_LOF2_TEXT N_("antenna lnb_lof2 (KHz)")
 #define LNB_LOF2_LONGTEXT ""
 
-#define LNB_SLOF_TEXT N_("antenna lnb_slof (Hz)")
+#define LNB_SLOF_TEXT N_("antenna lnb_slof (KHz)")
 #define LNB_SLOF_LONGTEXT ""
 
 #define PROBE_TEXT	N_("probe the dvb card for capabilities (default disabled)")
@@ -98,6 +98,8 @@ void E_(Close)   ( vlc_object_t * );
 #define HIERARCHY_LONGTEXT ""
 
 vlc_module_begin();
+    set_description( _("DVB input module with v4l2 support") );
+    set_capability( "access", 0 );
     add_category_hint( N_("Input"), NULL, VLC_FALSE );
         add_integer( "adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT, VLC_FALSE );
         add_integer( "device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT, VLC_FALSE );
@@ -117,8 +119,6 @@ vlc_module_begin();
         add_integer( "guard", 0, NULL, GUARD_TEXT, GUARD_LONGTEXT, VLC_TRUE );
         add_integer( "transmission", 0, NULL, TRANSMISSION_TEXT, TRANSMISSION_LONGTEXT, VLC_TRUE );
         add_integer( "hierarchy", 0, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT, VLC_TRUE );
-    set_description( _("DVB input module with v4l2 support") );
-    set_capability( "access", 0 );
     add_shortcut( "qpsk" );
     add_shortcut( "cable" );
     add_shortcut( "terrestrial" );

@@ -294,9 +294,9 @@ int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters 
                        unsigned int u_lnb_lof1, unsigned int u_lnb_lof2, unsigned int u_lnb_slof,
                        unsigned int u_adapter, unsigned int u_device  )
 {
-    int front;
     int ret;
     int i;
+    int front;
     int hiband;
     char frontend[] = FRONTEND;
     int i_len;
@@ -310,7 +310,7 @@ int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters 
     
     /* Open the frontend device */
     msg_Dbg(p_input, "Opening frontend %s", frontend);
-    if((front = open(frontend,O_RDWR)) < 0)
+    if(( front = open(frontend,O_RDWR)) < 0)
     {
 #   ifdef HAVE_ERRNO_H
         msg_Err(p_input, "failed to open frontend (%s)", strerror(errno));
@@ -375,7 +375,8 @@ int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters 
         usleep( 500000 );
     }
 
-    /* Close front end device */
+    /* Fixme: Return this instead of closing it.
+       Close front end device */
     close(front);
     return ret;
 }
@@ -473,7 +474,7 @@ int ioctl_SetDMXFilter(input_thread_t * p_input, int i_pid, int * pi_fd , int i_
     }
 
     msg_Dbg(p_input, "Opening demux device %s", dmx);
-    if ((*pi_fd = open(dmx, O_RDWR|O_NONBLOCK))  < 0)
+    if (( (*pi_fd) = open(dmx, O_RDWR|O_NONBLOCK))  < 0)
     {
 #   ifdef HAVE_ERRNO_H
         msg_Err(p_input, "ioctl_SetDMXFilter: opening device failed (%s)", strerror(errno));
@@ -600,21 +601,21 @@ int ioctl_SetDMXFilter(input_thread_t * p_input, int i_pid, int * pi_fd , int i_
 /*****************************************************************************
  * ioctl_UnsetDMXFilter : removes a filter
  *****************************************************************************/
-int ioctl_UnsetDMXFilter(input_thread_t * p_input, int demux)
+int ioctl_UnsetDMXFilter(input_thread_t * p_input, int pi_fd)
 {
     int ret;
     
-    if ((ret=ioctl(demux, DMX_STOP))<0)
+    if ((ret=ioctl( pi_fd, DMX_STOP))<0)
     {
 #   ifdef HAVE_ERRNO_H
-        msg_Err(p_input, "ioctl DMX_STOP failed for demux %d (%d) %s", demux, ret, strerror(errno));
+        msg_Err(p_input, "ioctl DMX_STOP failed for demux %d (%d) %s", pi_fd, ret, strerror(errno));
 #   else
-        msg_Err(p_input, "ioctl DMX_STOP failed for demux %d (%d)", demux, ret);
+        msg_Err(p_input, "ioctl DMX_STOP failed for demux %d (%d)", pi_fd, ret);
 #   endif
         return -1;
     }
-    msg_Dbg( p_input, "ioctl_UnsetDMXFilter closing demux %d", demux);
-    close(demux);
+    msg_Dbg( p_input, "ioctl_UnsetDMXFilter closing demux %d", pi_fd);
+    close(pi_fd);
     return 0;
 }
 
