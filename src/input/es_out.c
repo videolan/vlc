@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: es_out.c,v 1.21 2004/01/25 17:16:05 zorglub Exp $
+ * $Id: es_out.c,v 1.22 2004/01/30 14:25:39 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -32,6 +32,7 @@
 
 #include "vlc_playlist.h"
 #include "codecs.h"
+#include "iso_lang.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -77,6 +78,7 @@ static int          EsOutSend   ( es_out_t *, es_out_id_t *, block_t * );
 static void         EsOutDel    ( es_out_t *, es_out_id_t * );
 static int          EsOutControl( es_out_t *, int i_query, va_list );
 
+static char *LanguageGetName( const char *psz_code );
 
 /**
  * Create a new es_out structure
@@ -299,6 +301,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     pgrm_descriptor_t *p_prgm = NULL;
     char              psz_cat[sizeof( _("Stream ") ) + 10];
     input_info_category_t *p_cat;
+    char              *psz_description;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( fmt->i_group >= 0 )
@@ -317,13 +320,15 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
         fmt->i_id = out->p_sys->i_id - 1;
     }
 
+    psz_description = LanguageGetName( fmt->psz_language );
     es->p_es = input_AddES( p_input,
                             p_prgm,
                             fmt->i_id + 1,
                             fmt->i_cat,
-                            fmt->psz_language, 0 );
+                            psz_description, 0 );
     es->p_es->i_stream_id = fmt->i_id;
     es->p_es->i_fourcc = fmt->i_codec;
+    free( psz_description );
 
     switch( fmt->i_cat )
     {
@@ -811,5 +816,48 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
         default:
             msg_Err( p_sys->p_input, "unknown query in es_out_Control" );
             return VLC_EGENERIC;
+    }
+}
+
+/****************************************************************************
+ * LanguageGetName: try to expend iso639 into plain name
+ ****************************************************************************/
+static char *LanguageGetName( const char *psz_code )
+{
+    const iso639_lang_t *pl;
+
+    if( psz_code == NULL )
+    {
+        return strdup( "" );
+    }
+
+    if( strlen( psz_code ) == 2 )
+    {
+        pl = GetLang_1( psz_code );
+    }
+    else if( strlen( psz_code ) == 3 )
+    {
+        pl = GetLang_2B( psz_code );
+        if( !strcmp( pl->psz_iso639_1, "??" ) )
+        {
+            pl = GetLang_2T( psz_code );
+        }
+    }
+    else
+    {
+        return strdup( psz_code );
+    }
+
+    if( !strcmp( pl->psz_iso639_1, "??" ) )
+    {
+       return strdup( psz_code );
+    }
+    else
+    {
+        if( *pl->psz_native_name )
+        {
+            return strdup( pl->psz_native_name );
+        }
+        return strdup( pl->psz_eng_name );
     }
 }
