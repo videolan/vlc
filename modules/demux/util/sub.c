@@ -2,7 +2,7 @@
  * sub.c: subtitle demux for external subtitle files
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sub.c,v 1.45 2004/01/27 07:05:10 hartman Exp $
+ * $Id: sub.c,v 1.46 2004/01/27 11:57:05 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -97,8 +97,6 @@ static int Open ( vlc_object_t *p_this )
     p_sub->pf_seek  = sub_seek;
     p_sub->pf_close = sub_close;
     
-    ps_track_init( p_sub->tk );
-
     /* Initialize the variables */
     var_Create( p_this, "sub-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_this, "sub-delay", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -397,6 +395,7 @@ static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
             else if( local_stristr( s, "# VobSub index file" ) )
             {
                 i_sub_type = SUB_TYPE_VOBSUB;
+                ps_track_init( p_sub->tk );
                 break;
             }
         }
@@ -1184,4 +1183,3 @@ static int DemuxVobSub( subtitle_demux_t *p_demux, uint8_t *pkt, int i_pkt )
 
     return VLC_SUCCESS;
 }
-

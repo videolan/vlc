@@ -2,7 +2,7 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: sub.h,v 1.17 2004/01/27 07:05:10 hartman Exp $
+ * $Id: sub.h,v 1.18 2004/01/27 11:57:05 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -67,7 +67,7 @@ typedef struct subtitle_demux_s
     es_out_id_t         *p_es;
     int                 i_previously_selected; /* to make pf_seek */
     FILE                *p_vobsub_file;
-    ps_track_t          *tk[PS_TK_COUNT];
+    ps_track_t          tk[PS_TK_COUNT];
 
 } subtitle_demux_t;
 
