@@ -9,7 +9,7 @@
 export DH_COMPAT=3
 
 # Compilation options
-export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-kde"
+export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-kde --enable-aa"
 export LIBDVDCSS_FLAGS="--with-dvdcss=local-shared"
 export VIDDIR="usr/share/videolan"
 export PIXDIR="usr/share/pixmaps"
@@ -57,9 +57,9 @@ install: build
 	# make symlinks for packages and install plugins
 	case $(DEB_BUILD_ARCH) in \
 	i386) \
-		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa a52 lirc kde glide" ;; \
+		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa a52 lirc kde aa glide" ;; \
 	*) \
-		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa a52 lirc kde" ;; \
+		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa a52 lirc kde aa" ;; \
 	esac ;\
 	for alias in $$ARCH_ALIASES ; do \
 		ln -s vlc debian/vlc-$$alias/usr/share/doc/vlc-$$alias ; \
@@ -121,9 +121,9 @@ binary-arch: build install
 	dh_installman doc/vlc.1
 #	dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad -Nvlc-lirc -Nvlc-a52 -Nvlc-kde ChangeLog
+	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad -Nvlc-lirc -Nvlc-a52 -Nvlc-kde -Nvlc-aa ChangeLog
 # libdvdcss start
-	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad -Nvlc-lirc -Nvlc-a52 -Nvlc-kde ChangeLog.libdvdcss
+	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad -Nvlc-lirc -Nvlc-a52 -Nvlc-kde -Nvlc-aa ChangeLog.libdvdcss
 # libdvdcss stop
 	dh_link
 	dh_strip

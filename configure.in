@@ -84,8 +84,10 @@ esac
 dnl Check for system libs needed
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty)
 AC_CHECK_FUNC(connect,,[
-  AC_CHECK_LIB(socket,connect,LIB_IPV4="${LIB_IPV4} -lsocket")
-])
+  AC_CHECK_LIB(socket,connect,
+    LIB_IPV4="${LIB_IPV4} -lsocket"
+    LIB_VLC="${LIB_VLC} -lsocket"
+)])
 AC_CHECK_FUNC(gethostbyname,,[
   AC_CHECK_LIB(nsl,gethostbyname,LIB_IPV4="${LIB_IPV4} -lnsl")
 ])
@@ -93,13 +95,13 @@ AC_CHECK_FUNC(gethostbyname,,[
   AC_CHECK_LIB(bind,gethostbyname,LIB_IPV4="${LIB_IPV4} -lbind")
 ])
 AC_CHECK_FUNC(nanosleep,,[
-  AC_CHECK_LIB(rt,nanosleep,LIB="${LIB} -lrt",[
-    AC_CHECK_LIB(posix4,nanosleep,LIB="${LIB} -lposix4")
+  AC_CHECK_LIB(rt,nanosleep,LIB_VLC="${LIB_VLC} -lrt",[
+    AC_CHECK_LIB(posix4,nanosleep,LIB_VLC="${LIB_VLC} -lposix4")
   ])
 ])
 AC_CHECK_FUNCS(usleep)
 AC_CHECK_FUNC(inet_aton,,[
-  AC_CHECK_LIB(resolv,inet_aton,LIB="${LIB} -lresolv")
+  AC_CHECK_LIB(resolv,inet_aton,LIB_VLC="${LIB_VLC} -lresolv")
 ])
 AC_CHECK_FUNCS(vasprintf)
 AC_CHECK_FUNCS(swab)
@@ -113,11 +115,11 @@ NEED_GETOPT=0
 AC_CHECK_FUNC(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
 [ # FreeBSD has a gnugetopt library for this:
   AC_CHECK_LIB([gnugetopt],[getopt_long],
-    [AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support) LIB="${LIB} -lgnugetopt"],
+    [AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support) LIB_VLC="${LIB_VLC} -lgnugetopt"],
     [NEED_GETOPT=1])])
 
 AC_TYPE_SIGNAL
-AC_CHECK_LIB(dl,dlopen,LIB="${LIB} -ldl")
+AC_CHECK_LIB(dl,dlopen,LIB_VLC="${LIB_VLC} -ldl")
 AC_CHECK_LIB(m,cos,
   LIB_IMDCT="${LIB_IMDCT} -lm"
   LIB_FILTER_DISTORT="${LIB_FILTER_DISTORT} -lm")
@@ -490,7 +492,7 @@ AC_CACHE_CHECK([if linker needs -framework vecLib],
 if test x"$ac_cv_ld_altivec" != x"no"; then
   LIB_IDCTALTIVEC="${LIB_IDCTALTIVEC} -framework vecLib"
   LIB_MOTIONALTIVEC="${LIB_MOTIONALTIVEC} -framework vecLib"
-  LIB="${LIB} -framework vecLib"
+  LIB_VLC="${LIB_VLC} -framework vecLib"
 fi
 fi # end if mingw32
 
@@ -847,7 +849,7 @@ dnl  mad plugin
 dnl
 AC_ARG_ENABLE(mad,
   [  --enable-mad            libmad module (default disabled)])
-if test x$enable_mad == xyes
+if test x$enable_mad = xyes
 then
   PLUGINS="${PLUGINS} mad"
   LIB_MAD="${LIB_MAD} -lmad"
@@ -1073,7 +1075,7 @@ dnl  GGI module
 dnl
 AC_ARG_ENABLE(ggi,
   [  --enable-ggi            GGI support (default disabled)])
-if test x$enable_ggi == xyes
+if test x$enable_ggi = xyes
 then
   PLUGINS="${PLUGINS} ggi"
   LIB_GGI="${LIB_GGI} -lggi"
@@ -1091,7 +1093,7 @@ dnl  Glide module
 dnl
 AC_ARG_ENABLE(glide,
   [  --enable-glide          Glide (3dfx) support (default disabled)])
-if test x$enable_glide == xyes
+if test x$enable_glide = xyes
 then
   PLUGINS="${PLUGINS} glide"
   LIB_GLIDE="${LIB_GLIDE} -lglide2x -lm"
@@ -1103,6 +1105,21 @@ then
         CFLAGS_GLIDE="${CFLAGS_GLIDE} -I$with_val/include"
         LIB_GLIDE="${LIB_GLIDE} -L$with_val/lib"
       fi ])
+fi
+
+dnl
+dnl  AA plugin
+dnl
+AC_ARG_ENABLE(aa,
+  [  --enable-aa             aalib output (default disabled)])
+if test x$enable_aa = xyes
+then
+  AC_CHECK_HEADER(aalib.h,have_aa="true",have_aa="false")
+  if test x$have_aa = xtrue
+  then
+    PLUGINS="${PLUGINS} aa"
+    LIB_AA="${LIB_AA} -laa"
+  fi
 fi
 
 dnl
@@ -1310,13 +1327,13 @@ AC_ARG_ENABLE(macosx,
      BUILTINS="${BUILTINS} macosx"
      LIB_MACOSX="${LIB_MACOSX} -framework CoreAudio -framework AudioToolbox -framework Cocoa -framework AGL -framework QuickTime -lobjc"
      CFLAGS_MACOSX="${CFLAGS_MACOSX} -ObjC"
-     LIB="${LIB} -ObjC"
+     LIB_COMMON="${LIB_COMMON} -ObjC"
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
      BUILTINS="${BUILTINS} macosx"
      LIB_MACOSX="${LIB_MACOSX} -framework CoreAudio -framework AudioToolbox -framework Cocoa -framework AGL -framework QuickTime -lobjc"
      CFLAGS_MACOSX="${CFLAGS_MACOSX} -ObjC"
-     LIB="${LIB} -ObjC"
+     LIB_COMMON="${LIB_COMMON} -ObjC"
    )])
 
 dnl
@@ -1455,7 +1472,7 @@ AC_ARG_ENABLE(cprof,
 [  --enable-cprof          cprof profiling (default disabled)],
 [ if test x$enableval = xyes;
   then
-    LIB="${LIB} -lcprof"
+    LIB_COMMON="${LIB_COMMON} -lcprof"
     CPROF=1
   fi
 ])
@@ -1488,7 +1505,7 @@ AC_ARG_ENABLE(st,
     fi])
 ])
 
-LIB="${LIB} ${THREAD_LIB}"
+LIB_COMMON="${LIB_COMMON} ${THREAD_LIB}"
 
 dnl
 dnl  Plug-ins - this must be AT THE END
@@ -1544,7 +1561,11 @@ AC_SUBST(LDFLAGS)
 AC_SUBST(PLDFLAGS)
 AC_SUBST(SOFLAGS)
 
-AC_SUBST(LIB)
+AC_SUBST(LIB_COMMON)
+AC_SUBST(LIB_VLC)
+
+AC_SUBST(LIB_A52)
+AC_SUBST(LIB_AA)
 AC_SUBST(LIB_ALSA)
 AC_SUBST(LIB_ARTS)
 AC_SUBST(LIB_BEOS)
@@ -1566,7 +1587,6 @@ AC_SUBST(LIB_IMDCTSSE)
 AC_SUBST(LIB_IPV4)
 AC_SUBST(LIB_IPV6)
 AC_SUBST(LIB_KDE)
-AC_SUBST(LIB_A52)
 AC_SUBST(LIB_LIBDVDCSS)
 AC_SUBST(LIB_LIBDVDREAD)
 AC_SUBST(LIB_LIRC)
@@ -1585,7 +1605,9 @@ AC_SUBST(LIB_WIN32)
 AC_SUBST(LIB_X11)
 AC_SUBST(LIB_XVIDEO)
 
+AC_SUBST(CFLAGS_COMMON)
 AC_SUBST(CFLAGS_VLC)
+
 AC_SUBST(CFLAGS_ARTS)
 AC_SUBST(CFLAGS_DVD)
 AC_SUBST(CFLAGS_DVDREAD)

@@ -74,7 +74,7 @@ $(SRC_CPP:%.cpp=%.$(suff).$(module_name)): %.$(suff).$(module_name): %.cpp
 	$(CC) $(CFLAGS) $(CFLAGS_EXTRA) -c $< -o $@
 
 ../$(module_name).so: $(EXTRA_DEP) $(OBJ_ALL)
-	$(CC) $(OBJ_ALL) $(PLDFLAGS) $(LIB_$(MODULE_NAME)) -o $@ && chmod a-x $@
+	$(CC) $(OBJ_ALL) $(PLDFLAGS) $(LIB_$(MODULE_NAME)) $(LIB_COMMON) -o $@ && chmod a-x $@
 
 ../$(module_name).a: $(EXTRA_DEP) $(OBJ_ALL)
 	rm -f $@ && ar rc $@ $(OBJ_ALL) && $(RANLIB) $@

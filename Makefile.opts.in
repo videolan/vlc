@@ -65,6 +65,11 @@ includedir = @includedir@
 #
 # Libraries for special cases
 #
+LIB_COMMON = @LIB_COMMON@
+LIB_VLC = @LIB_VLC@
+
+LIB_A52 = @LIB_A52@
+LIB_AA = @LIB_AA@
 LIB_ALSA = @LIB_ALSA@
 LIB_ARTS = @LIB_ARTS@
 LIB_BEOS = @LIB_BEOS@
@@ -86,7 +91,6 @@ LIB_IMDCTSSE = @LIB_IMDCTSSE@
 LIB_IPV4 = @LIB_IPV4@
 LIB_IPV6 = @LIB_IPV6@
 LIB_KDE = @LIB_KDE@
-LIB_A52 = @LIB_A52@
 LIB_LIBDVDCSS = @LIB_LIBDVDCSS@
 LIB_LIBDVDREAD = @LIB_LIBDVDREAD@
 LIB_LIRC = @LIB_LIRC@
@@ -108,7 +112,9 @@ LIB_XVIDEO = @LIB_XVIDEO@
 #
 # CFLAGS for special cases
 #
+CFLAGS_COMMON = @CFLAGS_COMMON@
 CFLAGS_VLC = @CFLAGS_VLC@
+
 CFLAGS_ARTS = @CFLAGS_ARTS@
 CFLAGS_DVD = @CFLAGS_DVD@
 CFLAGS_DVDREAD = @CFLAGS_DVDREAD@
@@ -203,16 +209,13 @@ INCLUDE += -Iinclude -Iextras
 # Libraries needed by built-in modules
 #
 LIB_BUILTINS := $(patsubst %,$$LIB_%,$(shell echo $(BUILTINS) | tr '[a-z]' '[A-Z]'))
-LIB += $(LIB_BUILTINS)
 
 #
-# Libraries
+# Libraries needed by the vlc executable
 #
 ifneq (,$(findstring mingw32,$(SYS)))
-LIB += -lws2_32 -lnetapi32
+LIB_VLC += -lws2_32 -lnetapi32
 endif
-
-LIB += @LIB@
 
 #
 # C compiler flags: mainstream compilation

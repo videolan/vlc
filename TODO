@@ -31,7 +31,7 @@ Description: Infrared support
  Write a plugin which listens to the infrared port and sends appropriate
  commands to the application. This can either be an interface plugin, or,
  preferably, a new kind of interface-agnostic "command" plugin.
-Status: Todo
+Status: Done 6 Feb 2002 (Sigmund Augdal)
 
 Task: 0x5b
 Difficulty: Hard
@@ -88,7 +88,7 @@ Description: Video output IV
  The new video output should support subtitles both in software and hardware
  YUV (see item 0x4d). One should also care about XVideo buffers, there is a
  way to directly decode into them, which would improve performances.
-Status: Todo
+Status: Done 9 Dec 2001 (sam)
 
 Task: 0x54
 Difficulty: Hard
@@ -120,7 +120,7 @@ Description: Better subtitle color handling
  The subtitle palette is pretty ugly for the moment, since we don't parse
  the color information. Find it in the IFO file and pass the information to
  the video output.
-Status: Todo
+Status: Done 15 Mar 2002 (sam)
 
 Task: 0x50
 Difficulty: Hard
@@ -469,7 +469,7 @@ Description: Support for unencapsulated streams
  vlc currently requires to properly decode a stream. Adding support for
  this would require to rewrite the input code, and probably make it a
  plugin.
-Status: Todo
+Status: Done 1 Mar 2002 (Meuuh)
 
 Task: 0x24
 Difficulty: Guru
@@ -532,7 +532,7 @@ Urgency: Wishlist
 Description: ASCII-art output
  For the ones who don't know how to waste their time, they can
  try to do an ASCII-art output plugin.
-Status: Todo
+Status: Done 19 Mar 2002 (Sigmund Augdal)
 
 Task: 0x1d
 Difficulty: Hard
@@ -593,7 +593,7 @@ Urgency: Normal
 Description: Add 24bpp YUV
  There is no 24bpp support yet. Add it, either in MMX
  or in C.
-Status: Todo
+Status: Done 17 Mar 2002 (sam)
 
 Task: 0x16
 Difficulty: Medium
@@ -789,7 +789,7 @@ Urgency: Wishlist
 Description: MGA YUV
  The Matrox acceleration for the vlc does not work yet,
  though there are initialization routines in the code.
-Status: Todo
+Status: Done 15 Jan 2002 (sam)
 
 Task: 0x00
 Difficulty: Medium

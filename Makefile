@@ -13,7 +13,9 @@ endif
 # 
 # All possible plugin directories, needed for make clean
 #
-PLUGINS_DIR :=	ac3_adec \
+PLUGINS_DIR :=	a52 \
+		aa \
+		ac3_adec \
 		ac3_spdif \
 		access \
 		alsa \
@@ -36,7 +38,6 @@ PLUGINS_DIR :=	ac3_adec \
 		idct \
 		imdct \
 		kde \
-		a52 \
 		lirc \
 		lpcm_adec \
 		macosx \
@@ -57,7 +58,9 @@ PLUGINS_DIR :=	ac3_adec \
 		win32 \
 		x11
 
-PLUGINS_TARGETS := ac3_adec/ac3_adec \
+PLUGINS_TARGETS := a52/a52 \
+		aa/aa \
+		ac3_adec/ac3_adec \
 		ac3_spdif/ac3_spdif \
 		access/file \
 		access/udp \
@@ -103,7 +106,6 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		imdct/imdct3dn \
 		imdct/imdctsse \
 		kde/kde \
-		a52/a52 \
 		lirc/lirc \
 		lpcm_adec/lpcm_adec \
 		macosx/macosx \
@@ -602,7 +604,7 @@ endif
 # Main application target
 #
 vlc: Makefile.opts Makefile.dep Makefile $(VLC_OBJ) $(BUILTIN_OBJ)
-	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) $(BUILTIN_OBJ) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) $(BUILTIN_OBJ) $(LDFLAGS) $(LIB_VLC) $(LIB_BUILTINS) $(LIB_COMMON)
 ifeq ($(SYS),beos)
 	xres -o $@ ./share/vlc_beos.rsrc
 	mimeset -f $@

@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.6 2002/03/17 11:12:08 gbazin Exp $
+ * $Id: configuration.c,v 1.7 2002/03/19 14:00:50 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -643,7 +643,9 @@ static char *GetHomeDir( void )
     struct passwd *p_pw = NULL;
 #endif
 
-#if defined(HAVE_GETPWUID_R)
+#if defined(HAVE_GETPWUID)
+    if( ( p_pw = getpwuid( getuid() ) ) == NULL )
+#elif defined(HAVE_GETPWUID_R)
     int ret;
     struct passwd pwd;
     char *p_buffer = NULL;
@@ -652,8 +654,6 @@ static char *GetHomeDir( void )
     p_buffer = (char *)malloc( bufsize );
 
     if( ( ret = getpwuid_r( getuid(), &pwd, p_buffer, bufsize, &p_pw ) ) < 0 )
-#elif defined(HAVE_GETPWUID)
-    if( ( p_pw = getpwuid( getuid() ) ) == NULL )
 #endif
     {
         if( ( p_tmp = getenv( "HOME" ) ) == NULL )
@@ -671,7 +671,7 @@ static char *GetHomeDir( void )
     }
 #endif
 
-#if defined(HAVE_GETPWUID_R)
+#if !defined(HAVE_GETPWUID) && defined(HAVE_GETPWUID_R)
     if( p_buffer ) free( p_buffer );
 #endif
 
