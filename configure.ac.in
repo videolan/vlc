@@ -218,7 +218,7 @@ AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab 
 
 dnl Check for strndup
 need_strndup=false
-AC_CHECK_FUNC(strndup,,[need_strndup=:])
+AC_CHECK_FUNCS(strndup,,[need_strndup=:])
 AM_CONDITIONAL(BUILD_STRNDUP, ${need_strndup})
 
 AC_CHECK_FUNC(connect,,[
@@ -327,7 +327,7 @@ AC_HEADER_TIME
 
 dnl Check for dirent
 need_dirent=false
-AC_CHECK_HEADER(dirent.h,,[need_dirent=:])
+AC_CHECK_HEADERS(dirent.h,,[need_dirent=:])
 AM_CONDITIONAL(BUILD_DIRENT, ${need_dirent})
 
 dnl Mac OS X and other OSes don't have declaration for nanosleep

@@ -9,9 +9,9 @@
  * Significantly revised and rewinddir, seekdir and telldir added by Colin
  * Peters <colin@fu.is.saga-u.ac.jp>
  *	
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  * $Author: sam $
- * $Date: 2002/11/09 16:34:52 $
+ * $Date: 2002/11/09 17:44:09 $
  *
  */
 
@@ -20,7 +20,7 @@
 #include <string.h>
 #include <io.h>
 #include <direct.h>
-#include <dirent.h>
+#include "dirent.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h> /* for GetFileAttributes */

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.100 2002/10/31 11:16:30 sam Exp $
+ * $Id: modules.c,v 1.101 2002/11/09 17:44:09 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -35,7 +35,12 @@
 
 #include <vlc/vlc.h>
 
-#include <dirent.h>
+#ifdef HAVE_DIRENT_H
+#   include <dirent.h>
+#else
+#   include "../extras/dirent.h"
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifdef HAVE_UNISTD_H
@@ -616,7 +621,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
     while( (file = readdir( dir )) )
     {
         struct stat statbuf;
-        int i_len;
+        unsigned int i_len;
 
         /* Skip ".", ".." and anything starting with "." */
         if( !*file->d_name || *file->d_name == '.' )

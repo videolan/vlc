@@ -284,8 +284,9 @@ EXTRA_DIST += \
 # rule to rebuild vlc.dsp - not for the faint of heart
 #
 update-vlc.dsp: FORCE
+	rm -f msvc/vlc.dsp
 #	Top of the project file
-	cat msvc/vlc.dsp.in >| msvc/vlc.dsp
+	cat msvc/vlc.dsp.in > msvc/vlc.dsp
 #	The source files
 	echo '# Begin Group "Source Files"' >> msvc/vlc.dsp
 	echo '# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"' >> msvc/vlc.dsp
@@ -297,15 +298,15 @@ update-vlc.dsp: FORCE
 	done ; \
 	echo '# End Group' >> msvc/vlc.dsp
 	echo '# Begin Group "libvlc"' >> msvc/vlc.dsp
-	for file in `for i in $(SOURCES_libvlc) $(OPT_SOURCES_libvlc_win32) $(OPT_SOURCES_libvlc_direntt) $(OPT_SOURCES_libvlc_getopt) ; do echo $$i ; done | grep -v "/.*/"` ; do \
+	for file in `for i in $(SOURCES_libvlc) $(OPT_SOURCES_libvlc_win32) $(OPT_SOURCES_libvlc_dirent) $(OPT_SOURCES_libvlc_getopt) ; do echo $$i ; done | grep -v "/.*/"` ; do \
 		echo '# Begin Source File' >> msvc/vlc.dsp ; \
 		echo $$file | sed -e 's%/%\\%g' -e 's%.*%SOURCE="..\\&"%' >> msvc/vlc.dsp ; \
 		echo '# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"' >> msvc/vlc.dsp ; \
 		echo '# End Source File' >> msvc/vlc.dsp ; \
 	done ; \
-	for subdir in `for i in $(SOURCES_libvlc) $(OPT_SOURCES_libvlc_win32) $(OPT_SOURCES_libvlc_direntt) $(OPT_SOURCES_libvlc_getopt) ; do echo $$i ; done | grep "/.*/" | cut -f2 -d/ | sort | uniq` ; do \
+	for subdir in `for i in $(SOURCES_libvlc) $(OPT_SOURCES_libvlc_win32) $(OPT_SOURCES_libvlc_dirent) $(OPT_SOURCES_libvlc_getopt) ; do echo $$i ; done | grep "/.*/" | cut -f2 -d/ | sort | uniq` ; do \
 		echo '# Begin Group "'$$subdir'"' >> msvc/vlc.dsp ; \
-		for file in `for i in $(SOURCES_libvlc) $(OPT_SOURCES_libvlc_win32) $(OPT_SOURCES_libvlc_direntt) $(OPT_SOURCES_libvlc_getopt) ; do echo $$i ; done | grep "/$$subdir/"` ; do \
+		for file in `for i in $(SOURCES_libvlc) $(OPT_SOURCES_libvlc_win32) $(OPT_SOURCES_libvlc_dirent) $(OPT_SOURCES_libvlc_getopt) ; do echo $$i ; done | grep "/$$subdir/"` ; do \
 			echo '# Begin Source File' >> msvc/vlc.dsp ; \
 			echo $$file | sed -e 's%/%\\%g' -e 's%.*%SOURCE="..\\&"%' >> msvc/vlc.dsp ; \
 			echo '# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"' >> msvc/vlc.dsp ; \
