@@ -2,7 +2,7 @@
 # src/packages.mak : Archives locations
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN   
-# $Id: packages.mak,v 1.2 2003/11/15 22:02:15 hartman Exp $
+# $Id: packages.mak,v 1.3 2003/11/17 13:14:25 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -63,10 +63,10 @@ FAAD2_URL=$(VIDEOLAN)/faad2-$(FAAD2_VERSION).tar.gz
 FAAD2_CVSROOT=:pserver:anonymous@cvs.audiocoding.com:/cvsroot/faac
 LAME_VERSION=3.93.1
 LAME_URL=$(SF)/lame/lame-$(LAME_VERSION).tar.gz
-LIBEBML_VERSION=20031021
-LIBEBML_URL=$(VIDEOLAN)/libebml-$(LIBEBML_VERSION).tar.bz2
-LIBMATROSKA_VERSION=20031021
-LIBMATROSKA_URL=$(VIDEOLAN)/libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
+LIBEBML_VERSION=0.6.2
+LIBEBML_URL=http://matroska.free.fr/downloads/libebml/libebml-$(LIBEBML_VERSION).tar.gz
+LIBMATROSKA_VERSION=0.6.1
+LIBMATROSKA_URL=http://matroska.free.fr/downloads/libmatroska/libmatroska-$(LIBMATROSKA_VERSION).tar.gz
 FFMPEG_VERSION=0.4.8
 FFMPEG_URL=$(SF)/ffmpeg/ffmpeg-$(FFMPEG_VERSION).tar.gz
 FFMPEG_CVSOOT=:pserver:anonymous@mplayerhq.hu:/cvsroot/ffmpeg

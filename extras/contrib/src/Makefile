@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.3 2003/11/15 22:02:15 hartman Exp $
+# $Id: Makefile,v 1.4 2003/11/17 13:14:25 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -475,11 +475,11 @@ DISTCLEAN_PKG += lame-$(LAME_VERSION).tar.gz
 # libebml
 # ***************************************************************************
 
-libebml-$(LIBEBML_VERSION).tar.bz2:
+libebml-$(LIBEBML_VERSION).tar.gz:
 	$(WGET) $(LIBEBML_URL)
 
-libebml: libebml-$(LIBEBML_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
+libebml: libebml-$(LIBEBML_VERSION).tar.gz
+	$(EXTRACT_GZ)
 	-rm -rf $@/CVS
 
 .ebml: libebml
@@ -495,11 +495,11 @@ DISTCLEAN_PKG += libebml-$(LIBEBML_VERSION).tar.bz2
 # libmatroska
 # ***************************************************************************
 
-libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
+libmatroska-$(LIBMATROSKA_VERSION).tar.gz:
 	$(WGET) $(LIBMATROSKA_URL)
 
-libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
+libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.gz
+	$(EXTRACT_GZ)
 	-rm -rf $@/CVS
 
 .matroska: libmatroska
