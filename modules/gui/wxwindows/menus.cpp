@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.7 2003/05/13 22:59:16 gbazin Exp $
+ * $Id: menus.cpp,v 1.8 2003/05/13 23:41:17 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -163,12 +163,11 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
     ppsz_varnames[i++] = _("Close");
 
     /* Build menu */
-    wxMenu *popupmenu = new Menu( _p_intf, _p_main_interface, i,
-                                  ppsz_varnames, pi_objects,
-                                  PopupMenu_Events );
+    Menu popupmenu( _p_intf, _p_main_interface, i,
+                     ppsz_varnames, pi_objects, PopupMenu_Events );
 
-    _p_main_interface->p_popup_menu = popupmenu;
-    _p_main_interface->PopupMenu( popupmenu, pos.x, pos.y );
+    _p_main_interface->p_popup_menu = &popupmenu;
+    _p_main_interface->PopupMenu( &popupmenu, pos.x, pos.y );
 }
 
 wxMenu *AudioMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
@@ -261,6 +260,7 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "navigation";
         pi_objects[i++] = p_object->i_object_id;
+        vlc_object_release( p_object );
     }
 
     /* Build menu */
