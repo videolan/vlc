@@ -1008,7 +1008,7 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
     if( !event.GetDirection() ) return;
 
     /* Check valid address */
-    if( i_method == 1 && !ismult((char *) address_txtctrl->GetValue().mb_str()) )
+    if( i_method == 1 && !ismult((char *) address_txtctrl->GetValue().c_str()) )
     {
         wxMessageBox( wxU( INVALID_MCAST_ADDRESS ) , wxU( ERROR_MSG ),
                       wxICON_WARNING | wxOK, this->p_parent );
@@ -1033,7 +1033,7 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
         }
     }
     p_parent->SetStream( methods_array[i_method].psz_access ,
-                         (char *)address_txtctrl->GetValue().mb_str() );
+                         (char *)address_txtctrl->GetValue().c_str() );
 
     /* Set the action for the muxer page */
     ((wizEncapPage*)GetNext())->SetAction( p_parent->GetAction() );
@@ -1181,7 +1181,7 @@ void wizTranscodeExtraPage::OnSelectFile( wxCommandEvent &event)
         if( file_dialog->GetFilename().mb_str() )
         {
             p_parent->SetTranscodeOut( (char*)file_dialog->GetFilename().
-                                                  mb_str() );
+                                                  c_str() );
         }
     }
 
