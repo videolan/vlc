@@ -170,6 +170,7 @@
 #define FOURCC_0xa9cpy VLC_FOURCC( 0xa9, 'c', 'p', 'y' )
 #define FOURCC_0xa9inf VLC_FOURCC( 0xa9, 'i', 'n', 'f' )
 #define FOURCC_0xa9ART VLC_FOURCC( 0xa9, 'A', 'R', 'T' )
+#define FOURCC_0xa9des VLC_FOURCC( 0xa9, 'd', 'e', 's' )
 #define FOURCC_0xa9dir VLC_FOURCC( 0xa9, 'd', 'i', 'r' )
 #define FOURCC_0xa9cmt VLC_FOURCC( 0xa9, 'c', 'm', 't' )
 #define FOURCC_0xa9req VLC_FOURCC( 0xa9, 'r', 'e', 'q' )

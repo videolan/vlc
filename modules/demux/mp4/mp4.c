@@ -47,10 +47,6 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 vlc_module_end();
 
-/* TODO:
- *  - DEMUX_GET_META and meta parsing
- */
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -651,40 +647,50 @@ static int Control( input_thread_t *p_input, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
             *pp_meta = meta = vlc_meta_New();
-            for( p_0xa9xxx = p_udta->p_first; p_0xa9xxx != NULL; p_0xa9xxx = p_0xa9xxx->p_next )
+            for( p_0xa9xxx = p_udta->p_first; p_0xa9xxx != NULL;
+                 p_0xa9xxx = p_0xa9xxx->p_next )
             {
                 switch( p_0xa9xxx->i_type )
                 {
-                    case FOURCC_0xa9nam:
-                        vlc_meta_Add( meta, VLC_META_TITLE, p_0xa9xxx->data.p_0xa9xxx->psz_text );
-                        break;
-                    case FOURCC_0xa9aut:
-                        vlc_meta_Add( meta, VLC_META_AUTHOR, p_0xa9xxx->data.p_0xa9xxx->psz_text );
-                        break;
-                    case FOURCC_0xa9ART:
-                        vlc_meta_Add( meta, VLC_META_ARTIST, p_0xa9xxx->data.p_0xa9xxx->psz_text );
-                        break;
-                    case FOURCC_0xa9cpy:
-                        vlc_meta_Add( meta, VLC_META_COPYRIGHT, p_0xa9xxx->data.p_0xa9xxx->psz_text );
-                        break;
-                    case FOURCC_0xa9day:
-                        vlc_meta_Add( meta, VLC_META_DATE, p_0xa9xxx->data.p_0xa9xxx->psz_text );
-                        break;
+                case FOURCC_0xa9nam:
+                    vlc_meta_Add( meta, VLC_META_TITLE,
+                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    break;
+                case FOURCC_0xa9aut:
+                    vlc_meta_Add( meta, VLC_META_AUTHOR,
+                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    break;
+                case FOURCC_0xa9ART:
+                    vlc_meta_Add( meta, VLC_META_ARTIST,
+                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    break;
+                case FOURCC_0xa9cpy:
+                    vlc_meta_Add( meta, VLC_META_COPYRIGHT,
+                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    break;
+                case FOURCC_0xa9day:
+                    vlc_meta_Add( meta, VLC_META_DATE,
+                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    break;
+                case FOURCC_0xa9des:
+                    vlc_meta_Add( meta, VLC_META_DESCRIPTION,
+                                  p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                    break;
 
-                    case FOURCC_0xa9swr:
-                    case FOURCC_0xa9inf:
-                    case FOURCC_0xa9dir:
-                    case FOURCC_0xa9cmt:
-                    case FOURCC_0xa9req:
-                    case FOURCC_0xa9fmt:
-                    case FOURCC_0xa9prd:
-                    case FOURCC_0xa9prf:
-                    case FOURCC_0xa9src:
-                        /* TODO one day, but they aren't really meaningfull */
-                        break;
+                case FOURCC_0xa9swr:
+                case FOURCC_0xa9inf:
+                case FOURCC_0xa9dir:
+                case FOURCC_0xa9cmt:
+                case FOURCC_0xa9req:
+                case FOURCC_0xa9fmt:
+                case FOURCC_0xa9prd:
+                case FOURCC_0xa9prf:
+                case FOURCC_0xa9src:
+                    /* TODO one day, but they aren't really meaningfull */
+                    break;
 
-                    default:
-                        break;
+                default:
+                    break;
                 }
             }
             return VLC_SUCCESS;

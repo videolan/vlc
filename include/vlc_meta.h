@@ -64,6 +64,7 @@ static inline vlc_meta_t *vlc_meta_New( void )
 
     return m;
 }
+
 static inline void vlc_meta_Delete( vlc_meta_t *m )
 {
     int i;
@@ -82,6 +83,7 @@ static inline void vlc_meta_Delete( vlc_meta_t *m )
     if( m->track ) free( m->track );
     free( m );
 }
+
 static inline void vlc_meta_Add( vlc_meta_t *m, char *name, char *value )
 {
     int i_meta = m->i_meta;
@@ -109,5 +111,23 @@ static inline vlc_meta_t *vlc_meta_Duplicate( vlc_meta_t *src )
     return dst;
 }
 
-#endif
+static inline void vlc_meta_Merge( vlc_meta_t *dst, vlc_meta_t *src )
+{
+    int i, j;
+    for( i = 0; i < src->i_meta; i++ )
+    {
+        /* Check if dst contains the entry */
+        for( j = 0; j < dst->i_meta; j++ )
+	{
+	    if( !strcmp( src->name[i], dst->name[j] ) ) break;
+	}
+	if( j < dst->i_meta )
+	{
+	    if( dst->value[j] ) free( dst->value[j] );
+	    dst->value[j] = strdup( src->value[i] );
+	}
+	else vlc_meta_Add( dst, src->name[i], src->value[i] );
+    }
+}
 
+#endif

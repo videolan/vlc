@@ -560,7 +560,7 @@ static int RunThread( input_thread_t *p_input )
  *****************************************************************************/
 static int InitThread( input_thread_t * p_input )
 {
-    vlc_meta_t *meta;
+    vlc_meta_t *p_meta = NULL, *p_meta_user = NULL;
     float f_fps;
     playlist_t *p_playlist;
     mtime_t i_length;
@@ -824,14 +824,66 @@ static int InitThread( input_thread_t * p_input )
 
     p_input->p_sys->i_stop_time = 0;
 
-    /* get meta informations */
-    if( !demux_Control( p_input, DEMUX_GET_META, &meta ) )
+    /* Get meta information from user */
+    var_Create( p_input, "meta-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "meta-author", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "meta-artist", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "meta-genre", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "meta-copyright", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Create( p_input, "meta-description", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
+    var_Create( p_input, "meta-date", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "meta-url", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    if( (p_meta_user = vlc_meta_New()) )
+    {
+        vlc_value_t val;
+
+        var_Get( p_input, "meta-title", &val );
+        if( val.psz_string && *val.psz_string )
+            vlc_meta_Add( p_meta_user, VLC_META_TITLE, val.psz_string );
+        if( val.psz_string ) free( val.psz_string );
+        var_Get( p_input, "meta-author", &val );
+        if( val.psz_string && *val.psz_string )
+            vlc_meta_Add( p_meta_user, VLC_META_AUTHOR, val.psz_string );
+        if( val.psz_string ) free( val.psz_string );
+        var_Get( p_input, "meta-artist", &val );
+        if( val.psz_string && *val.psz_string )
+            vlc_meta_Add( p_meta_user, VLC_META_ARTIST, val.psz_string );
+        if( val.psz_string ) free( val.psz_string );
+        var_Get( p_input, "meta-genre", &val );
+        if( val.psz_string && *val.psz_string )
+            vlc_meta_Add( p_meta_user, VLC_META_GENRE, val.psz_string );
+        if( val.psz_string ) free( val.psz_string );
+        var_Get( p_input, "meta-copyright", &val );
+        if( val.psz_string && *val.psz_string )
+            vlc_meta_Add( p_meta_user, VLC_META_COPYRIGHT, val.psz_string );
+        if( val.psz_string ) free( val.psz_string );
+        var_Get( p_input, "meta-description", &val );
+        if( val.psz_string && *val.psz_string )
+            vlc_meta_Add( p_meta_user, VLC_META_DESCRIPTION, val.psz_string );
+        if( val.psz_string ) free( val.psz_string );
+        var_Get( p_input, "meta-date", &val );
+        if( val.psz_string && *val.psz_string )
+            vlc_meta_Add( p_meta_user, VLC_META_DATE, val.psz_string );
+        if( val.psz_string ) free( val.psz_string );
+        var_Get( p_input, "meta-url", &val );
+        if( val.psz_string && *val.psz_string )
+            vlc_meta_Add( p_meta_user, VLC_META_URL, val.psz_string );
+        if( val.psz_string ) free( val.psz_string );
+    }
+
+    /* Get meta informations from demuxer */
+    if( !demux_Control( p_input, DEMUX_GET_META, &p_meta ) ||
+        ( p_meta_user && p_meta_user->i_meta ) )
     {
         playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_input,
                                          VLC_OBJECT_PLAYLIST,  FIND_PARENT);
         playlist_item_t *p_item = NULL;
         input_info_category_t *p_cat;
         int i;
+
+        /* Merge demux and user metadata */
+        if( !p_meta ){ p_meta = p_meta_user; p_meta_user = NULL; }
+        else if( p_meta && p_meta_user ) vlc_meta_Merge( p_meta, p_meta_user );
 
         if( p_playlist )
         {
@@ -845,32 +897,35 @@ static int InitThread( input_thread_t * p_input )
         }
 
         msg_Dbg( p_input, "meta informations:" );
-        if( meta->i_meta > 0 )
+        if( p_meta->i_meta > 0 )
         {
             p_cat = input_InfoCategory( p_input, _("File") );
-            for( i = 0; i < meta->i_meta; i++ )
+            for( i = 0; i < p_meta->i_meta; i++ )
             {
-                msg_Dbg( p_input, "  - '%s' = '%s'", _(meta->name[i]), meta->value[i] );
-                if( !strcmp( meta->name[i], VLC_META_TITLE ) )
+                msg_Dbg( p_input, "  - '%s' = '%s'", _(p_meta->name[i]),
+                         p_meta->value[i] );
+                if( !strcmp( p_meta->name[i], VLC_META_TITLE ) )
                 {
-                    playlist_ItemSetName( p_item, meta->value[i] );
+                    playlist_ItemSetName( p_item, p_meta->value[i] );
                 }
-                if( !strcmp( meta->name[i], VLC_META_AUTHOR ) )
+                if( !strcmp( p_meta->name[i], VLC_META_AUTHOR ) )
                 {
                     playlist_ItemAddInfo( p_item, _("General"), _("Author"),
-                                            meta->value[i] );
+                                          p_meta->value[i] );
                 }
-                input_AddInfo( p_cat, _(meta->name[i]), "%s", meta->value[i] );
+                input_AddInfo( p_cat, _(p_meta->name[i]), "%s",
+                               p_meta->value[i] );
                 if( p_item )
                 {
                     playlist_ItemAddInfo( p_item, _("File"),
-                                          _(meta->name[i]), "%s", meta->value[i] );
+                                          _(p_meta->name[i]), "%s",
+                                          p_meta->value[i] );
                 }
             }
         }
-        for( i = 0; i < meta->i_track; i++ )
+        for( i = 0; i < p_meta->i_track; i++ )
         {
-            vlc_meta_t *tk = meta->track[i];
+            vlc_meta_t *tk = p_meta->track[i];
             int j;
 
             msg_Dbg( p_input, "  - track[%d]:", i );
@@ -882,12 +937,13 @@ static int InitThread( input_thread_t * p_input )
 
                 for( j = 0; j < tk->i_meta; j++ )
                 {
-                    msg_Dbg( p_input, "     - '%s' = '%s'", _(tk->name[j]), tk->value[j] );
+                    msg_Dbg( p_input, "     - '%s' = '%s'", _(tk->name[j]),
+                             tk->value[j] );
                     input_AddInfo( p_cat, _(tk->name[j]), "%s", tk->value[j] );
                     if( p_item )
                     {
-                        playlist_ItemAddInfo( p_item, psz_cat,
-                                              _(tk->name[j]), "%s", tk->value[j] );
+                        playlist_ItemAddInfo( p_item, psz_cat, _(tk->name[j]),
+                                              "%s", tk->value[j] );
                     }
                 }
             }
@@ -901,21 +957,24 @@ static int InitThread( input_thread_t * p_input )
 
         if( p_input->stream.p_sout && p_input->stream.p_sout->p_meta == NULL )
         {
-            p_input->stream.p_sout->p_meta = meta;
+            p_input->stream.p_sout->p_meta = p_meta;
         }
         else
         {
-            vlc_meta_Delete( meta );
+            vlc_meta_Delete( p_meta );
         }
     }
+    if( p_meta_user ) vlc_meta_Delete( p_meta_user );
 
-    /* get length */
-    if( !demux_Control( p_input, DEMUX_GET_LENGTH, &i_length ) && i_length > 0 )
+    /* Get length */
+    if( !demux_Control( p_input, DEMUX_GET_LENGTH, &i_length ) &&
+        i_length > 0 )
     {
-        input_info_category_t *p_cat = input_InfoCategory( p_input, _("File") );
-        p_playlist = (playlist_t*)vlc_object_find( p_input,
-                                                   VLC_OBJECT_PLAYLIST,
-                                                   FIND_PARENT );
+        input_info_category_t *p_cat =
+            input_InfoCategory( p_input, _("File") );
+        p_playlist =
+            (playlist_t*)vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+                                          FIND_PARENT );
         if( p_playlist )
         {
             playlist_SetDuration( p_playlist, -1 , i_length );
@@ -934,11 +993,12 @@ static int InitThread( input_thread_t * p_input )
         var_Get( p_input, "start-time", &val );
         if(  val.i_int > 0 )
         {
-            double f_pos = (double)( (int64_t)val.i_int * I64C(1000000) ) / (double)i_length;
+            double f_pos = val.i_int * I64C(1000000) / (double)i_length;
 
             if( f_pos >= 1.0 )
             {
-                msg_Warn( p_input, "invalid start-time, ignored (start-time >= media length)" );
+                msg_Warn( p_input, "invalid start-time, ignored (start-time "
+                          ">= media length)" );
             }
             else
             {
@@ -949,6 +1009,7 @@ static int InitThread( input_thread_t * p_input )
             }
         }
     }
+
     /* Set stop-time and check validity */
     var_Get( p_input, "stop-time", &val );
     if( val.i_int > 0 )
@@ -958,7 +1019,8 @@ static int InitThread( input_thread_t * p_input )
         var_Get( p_input, "start-time", &start );
         if( start.i_int >= val.i_int )
         {
-            msg_Warn( p_input, "invalid stop-time, ignored (stop-time < start-time)" );
+            msg_Warn( p_input, "invalid stop-time, ignored (stop-time < "
+                      "start-time)" );
         }
         else
         {
@@ -967,7 +1029,7 @@ static int InitThread( input_thread_t * p_input )
         }
     }
 
-    /* get fps */
+    /* Get fps */
     if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
     {
         i_microsecondperframe = 0;
@@ -1007,7 +1069,8 @@ static int InitThread( input_thread_t * p_input )
                 if( ( p_sub = subtitle_New( p_input, *tmp2,
                                             i_microsecondperframe ) ) )
                 {
-                    TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
+                    TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub,
+                                p_sub );
                 }
             }
             free( *tmp2++ );

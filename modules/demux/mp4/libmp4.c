@@ -1105,9 +1105,17 @@ static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     /*
      * XXX hack -> produce a copy of the nearly complete chunk
      */
-    p_box->data.p_sample_soun->i_qt_description = i_read;
-    p_box->data.p_sample_soun->p_qt_description = malloc( i_read );
-    memcpy( p_box->data.p_sample_soun->p_qt_description, p_peek, i_read );
+    if( i_read > 0 )
+    {
+        p_box->data.p_sample_soun->i_qt_description = i_read;
+        p_box->data.p_sample_soun->p_qt_description = malloc( i_read );
+        memcpy( p_box->data.p_sample_soun->p_qt_description, p_peek, i_read );
+    }
+    else
+    {
+        p_box->data.p_sample_soun->i_qt_description = 0;
+        p_box->data.p_sample_soun->p_qt_description = NULL;
+    }
 
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_qt_version );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_qt_revision_level );
@@ -1175,6 +1183,8 @@ static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 static void MP4_FreeBox_sample_soun( MP4_Box_t *p_box )
 {
+    FREE( p_box->data.p_sample_soun->p_qt_description );
+
     if( p_box->i_type == FOURCC_drms )
     {
         if( p_box->data.p_sample_soun->p_drms )
@@ -1206,8 +1216,7 @@ static int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
         p_box->data.p_sample_vide->i_qt_image_description = i_read;
         p_box->data.p_sample_vide->p_qt_image_description = malloc( i_read );
         memcpy( p_box->data.p_sample_vide->p_qt_image_description,
-                p_peek,
-                i_read );
+                p_peek, i_read );
     }
     else
     {
@@ -1248,6 +1257,12 @@ static int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 #endif
     MP4_READBOX_EXIT( 1 );
+}
+
+
+static void MP4_FreeBox_sample_vide( MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_sample_vide->p_qt_image_description );
 }
 
 
@@ -2034,56 +2049,56 @@ static struct
     { FOURCC_wide,  MP4_ReadBoxSkip,        MP4_FreeBox_Common },
 
     /* for codecs */
-    { FOURCC_soun,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_ms02,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_ms11,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_ms55,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC__mp3,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_mp4a,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_twos,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_sowt,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_QDMC,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_QDM2,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_ima4,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_IMA4,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_dvi,   MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_alaw,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_ulaw,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_raw,   MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_MAC3,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_MAC6,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_Qclp,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_samr,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC_OggS,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_soun,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_ms02,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_ms11,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_ms55,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC__mp3,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_mp4a,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_twos,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_sowt,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_QDMC,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_QDM2,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_ima4,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_IMA4,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_dvi,   MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_alaw,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_ulaw,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_raw,   MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_MAC3,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_MAC6,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_Qclp,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_samr,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_OggS,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
 
-    { FOURCC_vide,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_mp4v,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_SVQ1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_SVQ3,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_ZyGo,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_DIVX,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_h263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_s263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_cvid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_3IV1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_3iv1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_3IV2,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_3iv2,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_3IVD,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_3ivd,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_3VID,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_3vid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_mjpa,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_mjpb,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_vide,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_mp4v,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_SVQ1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_SVQ3,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_ZyGo,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_DIVX,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_h263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_s263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_cvid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_3IV1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_3iv1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_3IV2,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_3iv2,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_3IVD,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_3ivd,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_3VID,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_3vid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_mjpa,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_mjpb,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_mjqt,  NULL,                       NULL }, /* found in mjpa/b */
     { FOURCC_mjht,  NULL,                       NULL },
-    { FOURCC_dvc,   MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_dvp,   MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_VP31,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_vp31,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_h264,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_dvc,   MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_dvp,   MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_VP31,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_vp31,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_h264,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
 
-    { FOURCC_jpeg,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_jpeg,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
 
     { FOURCC_mp4s,  NULL,                       MP4_FreeBox_Common },
 
@@ -2124,6 +2139,7 @@ static struct
     { FOURCC_0xa9cmt,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9req,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9day,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+    { FOURCC_0xa9des,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9fmt,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9prd,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9prf,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
@@ -2580,4 +2596,3 @@ int MP4_BoxCount( MP4_Box_t *p_box, char *psz_fmt, ... )
     }
     return( i_count );
 }
-

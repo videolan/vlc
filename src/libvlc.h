@@ -32,8 +32,9 @@ static char *ppsz_language[] =
   "pl", "pt_BR", "ru", "sv" };
 static char *ppsz_language_text[] =
 { N_("Auto"), N_("American"), N_("British"), N_("Spanish"), N_("German"),
-  N_("French"), N_("Hungarian"), N_("Italian"), N_("Japanese"), N_("Dutch"), N_("Norwegian"),
-  N_("Polish"), N_("Brazilian"), N_("Russian"), N_("Swedish") };
+  N_("French"), N_("Hungarian"), N_("Italian"), N_("Japanese"), N_("Dutch"),
+  N_("Norwegian"), N_("Polish"), N_("Brazilian"), N_("Russian"),
+  N_("Swedish") };
 
 /*****************************************************************************
  * Configuration options for the main program. Each module will also separatly
@@ -161,14 +162,6 @@ static char *ppsz_language_text[] =
     "the sound, or audio visualization modules (spectrum analyzer, ...).")
 
 #define AUDIO_CHANNEL_MIXER N_("Channel mixer")
-#if 0
-#define AUDIO_CHANNEL_MIXER_LONGTEXT N_( \
-     "This allows you to choose a specific audio channel mixer. For instance " \
-     "the headphone channel mixer will downmix any audio source to a stereo " \
-     "output and give the feeling that you are standing in a room with a " \
-     "complete 5.1 speaker set when using only a headphone.")
-#endif
-
 #define AUDIO_CHANNEL_MIXER_LONGTEXT N_( \
      "This allows you to choose a specific audio channel mixer. For " \
      "instance, you can use the \"headphone\" mixer that gives 5.1 feeling " \
@@ -208,11 +201,9 @@ static char *ppsz_language_text[] =
     "will be centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
     "also use combinations of these values).")
 static int pi_align_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static char *ppsz_align_descriptions[] = { N_("Center"),
-                                           N_("Left"), N_("Right"),
-                                           N_("Top"), N_("Bottom"),
-                                           N_("Top-Left"), N_("Top-Right"),
-                                           N_("Bottom-Left"), N_("Bottom-Right")};
+static char *ppsz_align_descriptions[] =
+{ N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
+  N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
 #define ZOOM_TEXT N_("Zoom video")
 #define ZOOM_LONGTEXT N_( \
@@ -261,16 +252,6 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
     "Accepted formats are x:y (4:3, 16:9, etc.) expressing the global image " \
     "aspect, or a float value (1.25, 1.3333, etc.) expressing pixel " \
     "squareness.")
-
-#if 0
-#define PIXEL_RATIO_TEXT N_("Destination aspect ratio")
-#define PIXEL_RATIO_LONGTEXT N_( \
-    "This will force the destination pixel size. By default VLC assumes " \
-    "your pixels are square, unless your hardware has a way to tell it " \
-    "otherwise. This may be used when you output VLC's signal to another " \
-    "device such as a TV set. Accepted format is a float value (1, 1.25, " \
-    "1.3333, etc.) expressing pixel squareness.")
-#endif
 
 #define INPUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behaviour of the input " \
@@ -389,6 +370,38 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
 #define IPV4_LONGTEXT N_( \
     "If you check this box, IPv4 will be used by default for all UDP and " \
     "HTTP connections.")
+
+#define META_TITLE_TEXT N_("Title metadata")
+#define META_TITLE_LONGTEXT N_( \
+     "Allows you to specify a \"title\" metadata for an input.")
+
+#define META_AUTHOR_TEXT N_("Author metadata")
+#define META_AUTHOR_LONGTEXT N_( \
+     "Allows you to specify an \"author\" metadata for an input.")
+
+#define META_ARTIST_TEXT N_("Artist metadata")
+#define META_ARTIST_LONGTEXT N_( \
+     "Allows you to specify an \"artist\" metadata for an input.")
+
+#define META_GENRE_TEXT N_("Genre metadata")
+#define META_GENRE_LONGTEXT N_( \
+     "Allows you to specify a \"genre\" metadata for an input.")
+
+#define META_CPYR_TEXT N_("Copyright metadata")
+#define META_CPYR_LONGTEXT N_( \
+     "Allows you to specify a \"copyright\" metadata for an input.")
+
+#define META_DESCR_TEXT N_("Description metadata")
+#define META_DESCR_LONGTEXT N_( \
+     "Allows you to specify a \"description\" metadata for an input.")
+
+#define META_DATE_TEXT N_("Date metadata")
+#define META_DATE_LONGTEXT N_( \
+     "Allows you to specify a \"date\" metadata for an input.")
+
+#define META_URL_TEXT N_("URL metadata")
+#define META_URL_LONGTEXT N_( \
+     "Allows you to specify a \"url\" metadata for an input.")
 
 #define CODEC_CAT_LONGTEXT N_( \
     "This option can be used to alter the way VLC selects " \
@@ -794,14 +807,34 @@ vlc_module_begin();
     add_integer( "stop-time", 0, NULL,
                  STOP_TIME_TEXT, STOP_TIME_LONGTEXT, VLC_TRUE );
 
-    add_file( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT, VLC_FALSE );
-    add_file( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT, VLC_FALSE );
-    add_file( "cd-audio", CDAUDIO_DEVICE, NULL, CDAUDIO_DEV_TEXT, CDAUDIO_DEV_LONGTEXT, VLC_FALSE );
+    add_file( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT,
+              VLC_FALSE );
+    add_file( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT,
+              VLC_FALSE );
+    add_file( "cd-audio", CDAUDIO_DEVICE, NULL, CDAUDIO_DEV_TEXT,
+              CDAUDIO_DEV_LONGTEXT, VLC_FALSE );
 
     add_bool( "ipv6", 0, NULL, IPV6_TEXT, IPV6_LONGTEXT, VLC_FALSE );
         change_short('6');
     add_bool( "ipv4", 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, VLC_FALSE );
         change_short('4');
+
+    add_string( "meta-title", NULL, NULL, META_TITLE_TEXT,
+                META_TITLE_LONGTEXT, VLC_TRUE );
+    add_string( "meta-author", NULL, NULL, META_AUTHOR_TEXT,
+                META_AUTHOR_LONGTEXT, VLC_TRUE );
+    add_string( "meta-artist", NULL, NULL, META_ARTIST_TEXT,
+                META_ARTIST_LONGTEXT, VLC_TRUE );
+    add_string( "meta-genre", NULL, NULL, META_GENRE_TEXT,
+                META_GENRE_LONGTEXT, VLC_TRUE );
+    add_string( "meta-copyright", NULL, NULL, META_CPYR_TEXT,
+                META_CPYR_LONGTEXT, VLC_TRUE );
+    add_string( "meta-description", NULL, NULL, META_DESCR_TEXT,
+                META_DESCR_LONGTEXT, VLC_TRUE );
+    add_string( "meta-date", NULL, NULL, META_DATE_TEXT,
+                META_DATE_LONGTEXT, VLC_TRUE );
+    add_string( "meta-url", NULL, NULL, META_URL_TEXT,
+                META_URL_LONGTEXT, VLC_TRUE );
 
     /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , VLC_TRUE );
