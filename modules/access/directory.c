@@ -401,7 +401,7 @@ static int ReadDir( playlist_t *p_playlist,
     /* Change the item to a node */
     if( p_parent->i_children == -1 )
     {
-        playlist_ItemToNode( p_playlist,p_parent );
+        playlist_LockItemToNode( p_playlist,p_parent );
     }
 
     /* get the first directory entry */

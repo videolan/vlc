@@ -60,7 +60,6 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
 static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
                       vlc_value_t oval, vlc_value_t nval, void *param );
 
-
 /*****************************************************************************
  * Event Table.
  *****************************************************************************/
@@ -405,6 +404,7 @@ Playlist::~Playlist()
     var_DelCallback( p_playlist, "item-change", ItemChanged, this );
     var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
+    var_DelCallback( p_playlist, "item-append", ItemAppended, this );
     var_DelCallback( p_playlist, "item-deleted", ItemDeleted, this );
     vlc_object_release( p_playlist );
 }
@@ -1476,13 +1476,17 @@ void Playlist::OnPopupPreparse( wxMenuEvent& event )
     {
         return;
     }
+    Preparse( p_playlist );
+    vlc_object_release( p_playlist );
+}
+
+void Playlist::Preparse( playlist_t *p_playlist )
+{
     if( p_popup_item != NULL )
     {
         if( p_popup_item->i_children == -1 )
         {
-            wxMutexGuiLeave();
             playlist_PreparseEnqueue( p_playlist, &p_popup_item->input );
-            wxMutexGuiEnter();
         }
         else
         {
@@ -1494,11 +1498,10 @@ void Playlist::OnPopupPreparse( wxMenuEvent& event )
                 i_popup_item = FindItem( treectrl->GetRootItem(),
                                          p_parent->pp_children[i] );
                 p_popup_item = p_parent->pp_children[i];
-                OnPopupPreparse( dummy );
+                Preparse( p_playlist );
             }
         }
     }
-    vlc_object_release( p_playlist );
 }
 
 void Playlist::OnPopupDel( wxMenuEvent& event )

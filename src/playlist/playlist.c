@@ -701,10 +701,13 @@ static void RunPreparse ( playlist_preparse_t *p_obj )
 
         if( p_obj->i_waiting > 0 )
         {
-            input_Preparse( p_playlist, p_obj->pp_waiting[0] );
-            var_SetInteger( p_playlist, "item-change",
-                            p_obj->pp_waiting[0]->i_id );
+            input_item_t *p_current = p_obj->pp_waiting[0];
             REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
+            vlc_mutex_unlock( &p_obj->object_lock );
+            input_Preparse( p_playlist, p_current );
+            var_SetInteger( p_playlist, "item-change", p_current->i_id );
+            vlc_mutex_lock( &p_obj->object_lock );
+            fprintf(stderr, "END\n");
         }
         b_sleep = ( p_obj->i_waiting == 0 );
 

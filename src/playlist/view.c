@@ -54,6 +54,11 @@ playlist_item_t *playlist_RecursiveFindPrev( playlist_t *p_playlist,
 void playlist_NodeDump( playlist_t *p_playlist, playlist_item_t *p_item,
                         int i_level );
 
+int playlist_NodeDeleteInternal( playlist_t *p_playlist,
+                                 playlist_item_t *p_root,
+                                 vlc_bool_t b_delete_items, vlc_bool_t b_force );
+
+
 /**********************************************************************
  * Exported View management functions
  **********************************************************************/
@@ -122,6 +127,8 @@ int playlist_ViewInsert( playlist_t *p_playlist, int i_id, char *psz_name )
  */
 int playlist_ViewDelete( playlist_t *p_playlist,playlist_view_t *p_view )
 {
+    playlist_NodeDeleteInternal( p_playlist, p_view->p_root, VLC_TRUE,
+                                 VLC_TRUE );
     REMOVE_ELEM( p_playlist->pp_views, p_playlist->i_views, 0 );
     return VLC_SUCCESS;
 }
@@ -307,6 +314,8 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, int i_view,
 /**
  * Remove all the children of a node
  *
+ * This function must be entered with the playlist lock
+ *
  * \param p_playlist the playlist
  * \param p_root the node
  * \param b_delete_items do we have to delete the children items ?
@@ -349,6 +358,14 @@ int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
 int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
                          vlc_bool_t b_delete_items )
 {
+    return playlist_NodeDeleteInternal( p_playlist, p_root,
+                                        b_delete_items, VLC_FALSE );
+}
+
+int playlist_NodeDeleteInternal( playlist_t *p_playlist,
+                                 playlist_item_t *p_root,
+                                 vlc_bool_t b_delete_items, vlc_bool_t b_force )
+{
     int i;
     if( p_root->i_children == -1 )
     {
@@ -370,9 +387,8 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
         }
     }
     /* Delete the node */
-    if( p_root->i_flags & PLAYLIST_RO_FLAG )
+    if( p_root->i_flags & PLAYLIST_RO_FLAG && !b_force )
     {
-        msg_Dbg( p_playlist, "unable to remove node, write-protected" );
     }
     else
     {

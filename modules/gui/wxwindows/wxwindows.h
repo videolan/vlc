@@ -855,6 +855,8 @@ private:
     void OnPopupInfo( wxMenuEvent& event );
     void Rebuild();
 
+    void Preparse( playlist_t *p_playlist );
+
     /* Update */
     void UpdateNode( playlist_t *, playlist_item_t*, wxTreeItemId );
     void UpdateNodeChildren( playlist_t *, playlist_item_t*, wxTreeItemId );

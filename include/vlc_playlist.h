@@ -290,7 +290,6 @@ VLC_EXPORT( playlist_item_t *, playlist_ChildSearchName, (playlist_item_t*, cons
 VLC_EXPORT( int, playlist_NodeDelete, ( playlist_t *, playlist_item_t *, vlc_bool_t ) );
 VLC_EXPORT( int, playlist_NodeEmpty, ( playlist_t *, playlist_item_t *, vlc_bool_t ) );
 
-
 /* Tree walking */
 playlist_item_t *playlist_FindNextFromParent( playlist_t *p_playlist,
                 int i_view,
@@ -394,6 +393,8 @@ static inline vlc_bool_t playlist_IsEmpty( playlist_t * p_playlist )
 
     return( b_empty );
 }
+
+
 
 /**
  * @}

@@ -623,6 +623,11 @@ int playlist_Replace( playlist_t *p_playlist, playlist_item_t *p_olditem,
  */
 int playlist_Delete( playlist_t * p_playlist, int i_id )
 {
+    return playlist_DeleteInternal( p_playlist, i_id );
+}
+int playlist_DeleteInternal( playlist_t * p_playlist, int i_id,
+                             vlc_bool_t b_force )
+{
     vlc_value_t     val;
     int             i;
 

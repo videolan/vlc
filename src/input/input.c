@@ -304,6 +304,7 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
 
     /* Create Object Variables for private use only */
     input_ConfigVarInit( p_input );
+    input_ControlVarInit( p_input );
 
     p_input->input.i_cr_average = var_GetInteger( p_input, "cr-average" );
 
