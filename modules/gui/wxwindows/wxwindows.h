@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.63 2003/10/06 16:23:30 zorglub Exp $
+ * $Id: wxwindows.h,v 1.64 2003/10/08 19:40:42 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -59,6 +59,7 @@ class FileInfo;
 #else
 #   define wxU(utf8) wxString(wxConvUTF8.cMB2WC(utf8), *wxConvCurrent)
 #endif
+#define ISUTF8 1
 
 #else // ENABLE_NLS && HAVE_GETTEXT && WIN32 && !HAVE_INCLUDED_GETTEXT
 #if wxUSE_UNICODE
@@ -66,8 +67,11 @@ class FileInfo;
 #else
 #   define wxU(ansi) ansi
 #endif
+#define ISUTF8 0
 
 #endif
+
+#define WRAPCOUNT 80
 
 wxArrayString SeparateEntries( wxString );
 

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.93 2003/10/03 23:31:43 sigmunau Exp $
+ * $Id: libvlc.h,v 1.94 2003/10/08 19:40:42 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -38,12 +38,12 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
 
 #define INTF_CAT_LONGTEXT N_( \
     "These options allow you to configure the interfaces used by VLC.\n" \
-    "You can select the main interface, additional\n" \
+    "You can select the main interface, additional " \
     "interface modules, and define various related options." )
 
 #define INTF_TEXT N_("Interface module")
 #define INTF_LONGTEXT N_( \
-    "This option allows you to select the interface used by VLC. \n" \
+    "This option allows you to select the interface used by VLC.\n" \
     "The default behavior is to automatically select the best module " \
     "available.")
 
@@ -90,10 +90,10 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
     "for its plugins.")
 
 #define AOUT_CAT_LONGTEXT N_( \
-    "These options allow you to tune VLC's audio subsystem, \n" \
-    "and to add audio filters which can be used for \n" \
-    "postprocessing or visual effects (spectrum analyser,...) \n" \
-    "To tune these filters, have a look at the \"audio filter\"\n" \
+    "These options allow you to tune VLC's audio subsystem, " \
+    "and to add audio filters which can be used for " \
+    "postprocessing or visual effects (spectrum analyser,...).\n" \
+    "To tune these filters, have a look at the \"audio filter\" " \
     "plugin options.")
 
 #define AOUT_TEXT N_("Audio output module")
@@ -162,11 +162,11 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
     "to 5.1.")
 
 #define VOUT_CAT_LONGTEXT N_( \
-    "These options allow you to modify options related to \n" \
-    "the video output subsystem. You can for example enable \n" \
-    "video filters, like deinterlacing, constrast / hue / \n " \
-    "saturation adjusting, ... \n" \
-    "Enable these filters here and configure them in the video \n" \
+    "These options allow you to modify options related to " \
+    "the video output subsystem. You can for example enable " \
+    "video filters, like deinterlacing, constrast / hue / " \
+    "saturation adjusting, ...\n" \
+    "Enable these filters here and configure them in the video " \
     "filters plugins section." )
 
 #define VOUT_TEXT N_("Video output module")
@@ -321,8 +321,8 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
     "HTTP connections.")
 
 #define CODEC_CAT_LONGTEXT N_( \
-    "This option can be used to alter the way VLC selects \n" \
-    "its codecs (decompression methods). Only advanced users should \n" \
+    "This option can be used to alter the way VLC selects " \
+    "its codecs (decompression methods). Only advanced users should " \
     "alter this option as it can break playback of all your streams." )
 
 #define CODEC_TEXT N_("Choose preferred codec list")
@@ -345,7 +345,7 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
     "codecs. " )
 
 #define SOUT_CAT_LONGTEXT N_( \
-    "These options allow you to set default global options for the\n " \
+    "These options allow you to set default global options for the " \
     "stream output subsystem." )
 
 #define SOUT_TEXT N_("Choose a stream output")
@@ -386,8 +386,8 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
     "This is a legacy entry to let you configure access output modules")
 
 #define CPU_CAT_LONGTEXT N_( \
-    "These options allow you to enable special CPU \n " \
-    "optimizations. You should always leave all these enabled." )
+    "These options allow you to enable special CPU optimizations.\n" \
+    "You should always leave all these enabled." )
 
 #define MMX_TEXT N_("Enable CPU MMX support")
 #define MMX_LONGTEXT N_( \
@@ -415,7 +415,7 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
     "advantage of them.")
 
 #define PLAYLIST_CAT_LONGTEXT N_( \
-     "These options define the behaviour of the playlist. Some \n" \
+     "These options define the behaviour of the playlist. Some " \
      "of them can be overriden in the playlist dialog box." ) 
 
 #define RANDOM_TEXT N_("Play files randomly forever")
@@ -434,7 +434,7 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
     "over and over again.")
 
 #define MISC_CAT_LONGTEXT N_( \
-    "These options allow you to select default modules. Leave these \n" \
+    "These options allow you to select default modules. Leave these " \
     "alone unless you really know what you are doing." )
 
 #define MEMCPY_TEXT N_("Memory copy module")

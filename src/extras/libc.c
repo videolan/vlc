@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.9 2003/08/14 11:47:31 gbazin Exp $
+ * $Id: libc.c,v 1.10 2003/10/08 19:40:42 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -194,3 +194,89 @@ char *vlc_dgettext( const char *package, const char *msgid )
 #endif
 }
 
+/*****************************************************************************
+ * count_utf8_string: returns the number of characters in the string.
+ *****************************************************************************/
+static int count_utf8_string( const char *psz_string )
+{
+    int i = 0, i_count = 0;
+    while( psz_string[ i ] != 0 )
+    {
+        if( ((unsigned char *)psz_string)[ i ] <  0x80UL ) i_count++;
+        i++;
+    }
+    return i_count;
+}
+
+/*****************************************************************************
+ * wraptext: inserts \n at convenient places to wrap the text.
+ *           Returns the modified string in a new buffer.
+ *****************************************************************************/
+char *vlc_wraptext( const char *psz_text, int i_line, vlc_bool_t b_utf8 )
+{
+    int i_len;
+    char *psz_line, *psz_new_text;
+
+    psz_line = psz_new_text = strdup( psz_text );
+
+    if( b_utf8 )
+        i_len = count_utf8_string( psz_text );
+    else
+        i_len = strlen( psz_text );
+
+    while( i_len > i_line )
+    {
+        /* Look if there is a newline somewhere. */
+        char *psz_parser = psz_line;
+        int i_count = 0;
+        while( i_count <= i_line && *psz_parser != '\n' )
+        {
+            if( b_utf8 )
+            {
+                while( *((unsigned char *)psz_parser) >= 0x80UL ) psz_parser++;
+            }
+            psz_parser++;
+            i_count++;
+        }
+        if( *psz_parser == '\n' )
+        {
+            i_len -= (i_count + 1);
+            psz_line = psz_parser + 1;
+            continue;
+        }
+
+        /* Find the furthest space. */
+        while( psz_parser > psz_line && *psz_parser != ' ' )
+        {
+            if( b_utf8 )
+            {
+                while( *((unsigned char *)psz_parser) >= 0x80UL ) psz_parser--;
+            }
+            psz_parser--;
+            i_count--;
+        }
+        if( *psz_parser == ' ' )
+        {
+            *psz_parser = '\n';
+            i_len -= (i_count + 1);
+            psz_line = psz_parser + 1;
+            continue;
+        }
+
+        /* Wrapping has failed. Find the first space or newline */
+        while( i_count < i_len && *psz_parser != ' ' && *psz_parser != '\n' )
+        {
+            if( b_utf8 )
+            {
+                while( *((unsigned char *)psz_parser) >= 0x80UL ) psz_parser++;
+            }
+            psz_parser++;
+            i_count++;
+        }
+        if( i_count < i_len ) *psz_parser = '\n';
+        i_len -= (i_count + 1);
+        psz_line = psz_parser + 1;
+    }
+
+    return psz_new_text;
+}
