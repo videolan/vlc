@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.24 2003/11/17 00:06:19 sigmunau Exp $
+ * $Id: playlist.cpp,v 1.25 2003/11/21 13:20:41 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -155,6 +155,11 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     b_need_update = VLC_FALSE;
     vlc_mutex_init( p_intf, &lock );
     SetIcon( *p_intf->p_sys->p_icon );
+
+    i_title_sorted = 0;
+    i_author_sorted = 0;
+    i_group_sorted = 0;
+
 
     var_Create( p_intf, "random", VLC_VAR_BOOL );
     var_Change( p_intf, "random", VLC_VAR_INHERITVALUE, & val, NULL );
@@ -676,13 +681,40 @@ void Playlist::OnColSelect( wxListEvent& event )
     switch( event.GetColumn() )
     {
         case 0:
-            playlist_SortTitle( p_playlist, 0 );
+            if( i_title_sorted != 1 )
+            {
+                playlist_SortTitle( p_playlist, 0 );
+                i_title_sorted = 1;
+            }
+            else
+            {
+                playlist_SortTitle( p_playlist, 1 );
+                i_title_sorted = -1;
+            }
             break;
         case 1:
-            playlist_SortAuthor( p_playlist, 0 );
+            if( i_author_sorted != 1 )
+            {
+                playlist_SortAuthor( p_playlist, 0 );
+                i_author_sorted = 1;
+            }
+            else
+            {
+                playlist_SortAuthor( p_playlist, 1 );
+                i_author_sorted = -1;
+            }
             break;
         case 2:
-            playlist_SortGroup( p_playlist, 0 );
+            if( i_group_sorted != 1 )
+            {
+                playlist_SortGroup( p_playlist, 0 );
+                i_group_sorted = 1;
+            }
+            else
+            {
+                playlist_SortGroup( p_playlist, 1 );
+                i_group_sorted = -1;
+            }
             break;
         default:
             break;

@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.70 2003/11/17 00:06:19 sigmunau Exp $
+ * $Id: wxwindows.h,v 1.71 2003/11/21 13:20:41 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -778,6 +778,10 @@ private:
     wxTreeCtrl *treeview;
     int i_update_counter;
     int i_sort_mode;
+
+    int i_title_sorted;
+    int i_author_sorted;
+    int i_group_sorted;
 };
 
 
