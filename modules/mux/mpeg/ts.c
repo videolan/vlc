@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.2 2002/12/15 23:39:41 fenrir Exp $
+ * $Id: ts.c,v 1.3 2002/12/17 21:58:03 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -539,7 +539,6 @@ static void SetTSDate( sout_buffer_t *p_ts, mtime_t i_dts, mtime_t i_length )
 static int Mux( sout_instance_t *p_sout )
 {
     sout_mux_t          *p_mux = (sout_mux_t*)p_sout->p_mux_data;
-    mtime_t i_dts;
     int     i_stream;
 
     sout_buffer_t *p_pat, *p_pmt, *p_ts;
@@ -587,7 +586,6 @@ static int Mux( sout_instance_t *p_sout )
         }
 
         p_mux->i_ts_packet++;
-
         SetTSDate( p_ts, i_dts, i_length );
 
         p_sout->pf_write( p_sout, p_ts );
