@@ -76,7 +76,7 @@
 #define OPT_COLOR               165
 #define OPT_YUV                 166
 
-#define OPT_NOVLANS             170
+#define OPT_VLANS               170
 #define OPT_SERVER              171
 #define OPT_PORT                172
 #define OPT_BROADCAST           173
@@ -120,7 +120,7 @@ static const struct option longopts[] =
     {   "dvdsubtitle",      1,          0,      's' },
     
     /* Input options */
-    {   "novlans",          0,          0,      OPT_NOVLANS },
+    {   "vlans",            0,          0,      OPT_VLANS },
     {   "server",           1,          0,      OPT_SERVER },
     {   "port",             1,          0,      OPT_PORT },
     {   "broadcast",        0,          0,      OPT_BROADCAST },
@@ -415,7 +415,7 @@ static void SetDefaultConfiguration( void )
      */
     p_main->b_audio  = 1;
     p_main->b_video  = 1;
-    p_main->b_vlans  = 1;
+    p_main->b_vlans  = 0;
 }
 
 /*****************************************************************************
@@ -534,8 +534,8 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
 
         /* Input options */
-        case OPT_NOVLANS:                                       /* --novlans */
-            p_main->b_vlans = 0;
+        case OPT_VLANS:                                       /* --vlans */
+            p_main->b_vlans = 1;
             break;
         case OPT_SERVER:                                         /* --server */
             main_PutPszVariable( INPUT_SERVER_VAR, optarg );
@@ -606,7 +606,7 @@ static void Usage( int i_fashion )
               "  -c, --dvdchannel <channel>     \tchoose DVD audio channel\n"
               "  -s, --dvdsubtitle <channel>    \tchoose DVD subtitle channel\n"
               "\n"
-              "      --novlans                  \tdisable vlans\n"
+              "      --vlans                    \tenable vlans\n"
               "      --server <host>            \tvideo server address\n"
               "      --port <port>              \tvideo server port\n"
               "      --broadcast                \tlisten to a broadcast\n"

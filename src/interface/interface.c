@@ -411,7 +411,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
     case INTF_KEY_SET_CHANNEL:
         /* Change channel - return code is ignored since SelectChannel displays
          * its own error messages */
-        intf_SelectChannel( p_intf, k_reply.param - '0' );
+        intf_SelectChannel( p_intf, k_reply.param );
         break;
     case INTF_KEY_INC_VOLUME:                                                    /* volume + */
         if( (p_main->p_aout != NULL) && (p_main->p_aout->vol < VOLMAX) )
@@ -521,7 +521,7 @@ static int LoadChannels( intf_thread_t *p_intf, char *psz_filename )
     p_intf->p_channel = NULL;
 
     /* FIXME: channels are disabled */
-    return( 0 );
+    //return( 0 );
 
     /* Open file */
     p_file = fopen( psz_filename, "r" );
