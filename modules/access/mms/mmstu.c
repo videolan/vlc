@@ -110,6 +110,10 @@ static int  mms_ReceivePacket( input_thread_t * );
  * écrire ce genre de trucs :p), et écrire en anglais, bordel de
  * merde :p.
  */
+/*
+ * Alors la ouai ç'est fou les gens qui écrivent des commentaires sans les
+ * signer. Ca mériterait un coup de pied dans le cul ça :)
+ */
 
 int  E_(MMSTUOpen)( input_thread_t *p_input )
 {
@@ -936,24 +940,22 @@ static int mms_CommandSend( input_thread_t *p_input,
     return VLC_SUCCESS;
 }
 
-static int  NetFillBuffer( input_thread_t *p_input )
+static int NetFillBuffer( input_thread_t *p_input )
 {
 #ifdef UNDER_CE
     return -1;
+
 #else
-    access_sys_t        *p_sys = p_input->p_access_data;
+    access_sys_t    *p_sys = p_input->p_access_data;
     struct timeval  timeout;
-    fd_set          fds;
+    fd_set          fds_r, fds_e;
     int             i_ret;
 
     /* FIXME when using udp */
     ssize_t i_tcp, i_udp;
     ssize_t i_tcp_read, i_udp_read;
     int i_handle_max;
-    int i_try;
-
-    /* Initialize file descriptor set */
-    FD_ZERO( &fds );
+    int i_try = 0;
 
     i_tcp = MMS_BUFFER_SIZE/2 - p_sys->i_buffer_tcp;
 
@@ -967,53 +969,57 @@ static int  NetFillBuffer( input_thread_t *p_input )
     }
 
     i_handle_max = 0;
+
     if( i_tcp > 0 )
-    {
-        FD_SET( p_sys->socket_tcp.i_handle, &fds );
         i_handle_max = __MAX( i_handle_max, p_sys->socket_tcp.i_handle );
-    }
     if( i_udp > 0 )
-    {
-        FD_SET( p_sys->socket_udp.i_handle, &fds );
         i_handle_max = __MAX( i_handle_max, p_sys->socket_udp.i_handle );
-    }
 
     if( i_handle_max == 0 )
     {
         msg_Warn( p_input, "nothing to read %d:%d", i_tcp, i_udp );
-        return( 0 );
+        return 0;
     }
     else
     {
-//        msg_Warn( p_input, "ask for tcp:%d udp:%d", i_tcp, i_udp );
+        /* msg_Warn( p_input, "ask for tcp:%d udp:%d", i_tcp, i_udp ); */
     }
 
-    /* We'll wait 0.5 second if nothing happens */
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 500000;
-    i_try = 0;
     /* Find if some data is available */
-    while( (i_ret = select( i_handle_max + 1, &fds,
-                            NULL, NULL, &timeout )) == 0
-           || (i_ret < 0 && errno == EINTR) )
+    do
     {
         i_try++;
-        FD_ZERO( &fds );
-        if( i_tcp > 0 ) FD_SET( p_sys->socket_tcp.i_handle, &fds );
-        if( i_udp > 0 ) FD_SET( p_sys->socket_udp.i_handle, &fds );
+
+        /* Initialize file descriptor set */
+        FD_ZERO( &fds_r );
+        FD_ZERO( &fds_e );
+
+        if( i_tcp > 0 )
+        {
+            FD_SET( p_sys->socket_tcp.i_handle, &fds_r );
+            FD_SET( p_sys->socket_tcp.i_handle, &fds_e );
+        }
+        if( i_udp > 0 )
+        {
+            FD_SET( p_sys->socket_udp.i_handle, &fds_r );
+            FD_SET( p_sys->socket_udp.i_handle, &fds_e );
+        }
+
+        /* We'll wait 0.5 second if nothing happens */
         timeout.tv_sec = 0;
         timeout.tv_usec = 500000;
 
-        if( i_try > 2 && ( p_sys->i_buffer_tcp > 0 || p_sys->i_buffer_udp > 0 ) )
+        if( i_try > 3 && (p_sys->i_buffer_tcp > 0 || p_sys->i_buffer_udp > 0) )
         {
-            return 0;
+            return -1;
         }
-        if( p_input->b_die || p_input->b_error )
-        {
-            return 0;
-        }
-        msg_Dbg( p_input, "NetFillBuffer: trying again (select)" );
-    }
+
+        if( p_input->b_die || p_input->b_error ) return -1;
+
+        //msg_Dbg( p_input, "NetFillBuffer: trying again (select)" );
+
+    } while( !(i_ret = select(i_handle_max +1, &fds_r, 0, &fds_e, &timeout)) ||
+             (i_ret < 0 && errno == EINTR) );
 
     if( i_ret < 0 )
     {
@@ -1021,57 +1027,41 @@ static int  NetFillBuffer( input_thread_t *p_input )
         return -1;
     }
 
-    if( i_tcp > 0 && FD_ISSET( p_sys->socket_tcp.i_handle, &fds ) )
+    i_tcp_read = i_udp_read = 0;
+
+    if( i_tcp > 0 && FD_ISSET( p_sys->socket_tcp.i_handle, &fds_r ) )
     {
         i_tcp_read =
             recv( p_sys->socket_tcp.i_handle,
                   p_sys->buffer_tcp + p_sys->i_buffer_tcp,
                   i_tcp + MMS_BUFFER_SIZE/2, 0 );
     }
-    else
-    {
-        i_tcp_read = 0;
-    }
 
-    if( i_udp > 0 && FD_ISSET( p_sys->socket_udp.i_handle, &fds ) )
+    if( i_udp > 0 && FD_ISSET( p_sys->socket_udp.i_handle, &fds_r ) )
     {
         i_udp_read = recv( p_sys->socket_udp.i_handle,
                            p_sys->buffer_udp + p_sys->i_buffer_udp,
                            i_udp + MMS_BUFFER_SIZE/2, 0 );
     }
-    else
-    {
-        i_udp_read = 0;
-    }
 
 #if MMS_DEBUG
     if( p_sys->i_proto == MMS_PROTO_UDP )
     {
-        msg_Dbg( p_input,
-                 "filling buffer TCP:%d+%d UDP:%d+%d",
-                 p_sys->i_buffer_tcp,
-                 i_tcp_read,
-                 p_sys->i_buffer_udp,
-                 i_udp_read );
+        msg_Dbg( p_input, "filling buffer TCP:%d+%d UDP:%d+%d",
+                 p_sys->i_buffer_tcp, i_tcp_read,
+                 p_sys->i_buffer_udp, i_udp_read );
     }
     else
     {
-        msg_Dbg( p_input,
-                 "filling buffer TCP:%d+%d",
-                 p_sys->i_buffer_tcp,
-                 i_tcp_read );
+        msg_Dbg( p_input, "filling buffer TCP:%d+%d",
+                 p_sys->i_buffer_tcp, i_tcp_read );
     }
 #endif
-    if( i_tcp_read > 0 )
-    {
-        p_sys->i_buffer_tcp += i_tcp_read;
-    }
-    if( i_udp_read > 0 )
-    {
-        p_sys->i_buffer_udp += i_udp_read;
-    }
 
-    return( i_tcp_read + i_udp_read);
+    if( i_tcp_read > 0 ) p_sys->i_buffer_tcp += i_tcp_read;
+    if( i_udp_read > 0 ) p_sys->i_buffer_udp += i_udp_read;
+
+    return i_tcp_read + i_udp_read;
 #endif
 }
 
@@ -1258,7 +1248,7 @@ static int  mms_ParsePacket( input_thread_t *p_input,
 
 static int mms_ReceivePacket( input_thread_t *p_input )
 {
-    access_sys_t        *p_sys = p_input->p_access_data;
+    access_sys_t *p_sys = p_input->p_access_data;
     int i_packet_tcp_type;
     int i_packet_udp_type;
 
@@ -1271,7 +1261,8 @@ static int mms_ReceivePacket( input_thread_t *p_input )
         {
             if( GetDWLE( p_sys->buffer_tcp + 4 ) == 0xb00bface  )
             {
-                if( GetDWLE( p_sys->buffer_tcp + 8 ) + 16 <= p_sys->i_buffer_tcp )
+                if( GetDWLE( p_sys->buffer_tcp + 8 ) + 16 <=
+                    p_sys->i_buffer_tcp )
                 {
                     b_refill = VLC_FALSE;
                 }
@@ -1290,7 +1281,7 @@ static int mms_ReceivePacket( input_thread_t *p_input )
         if( b_refill && NetFillBuffer( p_input ) < 0 )
         {
             msg_Warn( p_input, "cannot fill buffer" );
-            continue;
+            return -1;
         }
 
         i_packet_tcp_type = -1;
@@ -1303,24 +1294,19 @@ static int mms_ReceivePacket( input_thread_t *p_input )
             if( GetDWLE( p_sys->buffer_tcp + 4 ) == 0xb00bface )
             {
                 i_packet_tcp_type =
-                    mms_ParseCommand( p_input,
-                                      p_sys->buffer_tcp,
-                                      p_sys->i_buffer_tcp,
-                                      &i_used );
+                    mms_ParseCommand( p_input, p_sys->buffer_tcp,
+                                      p_sys->i_buffer_tcp, &i_used );
 
             }
             else
             {
                 i_packet_tcp_type =
-                    mms_ParsePacket( p_input,
-                                     p_sys->buffer_tcp,
-                                     p_sys->i_buffer_tcp,
-                                     &i_used );
+                    mms_ParsePacket( p_input, p_sys->buffer_tcp,
+                                     p_sys->i_buffer_tcp, &i_used );
             }
             if( i_used > 0 && i_used < MMS_BUFFER_SIZE )
             {
-                memmove( p_sys->buffer_tcp,
-                         p_sys->buffer_tcp + i_used,
+                memmove( p_sys->buffer_tcp, p_sys->buffer_tcp + i_used,
                          MMS_BUFFER_SIZE - i_used );
             }
             p_sys->i_buffer_tcp -= i_used;
@@ -1330,22 +1316,18 @@ static int mms_ReceivePacket( input_thread_t *p_input )
             int i_used;
 
             i_packet_udp_type =
-                mms_ParsePacket( p_input,
-                                 p_sys->buffer_udp,
-                                 p_sys->i_buffer_udp,
-                                 &i_used );
+                mms_ParsePacket( p_input, p_sys->buffer_udp,
+                                 p_sys->i_buffer_udp, &i_used );
 
             if( i_used > 0 && i_used < MMS_BUFFER_SIZE )
             {
-                memmove( p_sys->buffer_udp,
-                         p_sys->buffer_udp + i_used,
+                memmove( p_sys->buffer_udp, p_sys->buffer_udp + i_used,
                          MMS_BUFFER_SIZE - i_used );
             }
             p_sys->i_buffer_udp -= i_used;
         }
 
-        if( i_packet_tcp_type == MMS_PACKET_CMD &&
-                p_sys->i_command == 0x1b )
+        if( i_packet_tcp_type == MMS_PACKET_CMD && p_sys->i_command == 0x1b )
         {
             mms_CommandSend( p_input, 0x1b, 0, 0, NULL, 0 );
             i_packet_tcp_type = -1;
@@ -1353,18 +1335,18 @@ static int mms_ReceivePacket( input_thread_t *p_input )
 
         if( i_packet_tcp_type != -1 )
         {
-            return( i_packet_tcp_type );
+            return i_packet_tcp_type;
         }
         else if( i_packet_udp_type != -1 )
         {
-            return( i_packet_udp_type );
+            return i_packet_udp_type;
         }
     }
 }
 
-static int  mms_ReceiveCommand( input_thread_t *p_input )
+static int mms_ReceiveCommand( input_thread_t *p_input )
 {
-    access_sys_t        *p_sys = p_input->p_access_data;
+    access_sys_t *p_sys = p_input->p_access_data;
 
     for( ;; )
     {
@@ -1374,18 +1356,15 @@ static int  mms_ReceiveCommand( input_thread_t *p_input )
         if( NetFillBuffer( p_input ) < 0 )
         {
             msg_Warn( p_input, "cannot fill buffer" );
-            continue;
+            return VLC_EGENERIC;
         }
         if( p_sys->i_buffer_tcp > 0 )
         {
-            i_status = mms_ParseCommand( p_input,
-                                  p_sys->buffer_tcp,
-                                  p_sys->i_buffer_tcp,
-                                  &i_used );
+            i_status = mms_ParseCommand( p_input, p_sys->buffer_tcp,
+                                         p_sys->i_buffer_tcp, &i_used );
             if( i_used < MMS_BUFFER_SIZE )
             {
-                memmove( p_sys->buffer_tcp,
-                         p_sys->buffer_tcp + i_used,
+                memmove( p_sys->buffer_tcp, p_sys->buffer_tcp + i_used,
                          MMS_BUFFER_SIZE - i_used );
             }
             p_sys->i_buffer_tcp -= i_used;
@@ -1416,9 +1395,10 @@ static int  mms_ReceiveCommand( input_thread_t *p_input )
 #define MMS_RETRY_MAX       10
 #define MMS_RETRY_SLEEP     50000
 
-static int mms_CommandRead( input_thread_t *p_input, int i_command1, int i_command2 )
+static int mms_CommandRead( input_thread_t *p_input, int i_command1,
+                            int i_command2 )
 {
-    access_sys_t        *p_sys = p_input->p_access_data;
+    access_sys_t *p_sys = p_input->p_access_data;
     int i_count;
     int i_status;
 
@@ -1434,7 +1414,8 @@ static int mms_CommandRead( input_thread_t *p_input, int i_command1, int i_comma
         {
             return VLC_SUCCESS;
         }
-        else if( p_sys->i_command == i_command1 || p_sys->i_command == i_command2 )
+        else if( p_sys->i_command == i_command1 ||
+                 p_sys->i_command == i_command2 )
         {
             return VLC_SUCCESS;
         }
@@ -1455,7 +1436,7 @@ static int mms_CommandRead( input_thread_t *p_input, int i_command1, int i_comma
             }
         }
     }
-    msg_Warn( p_input, "failed to receive command (abording)" );
+    msg_Warn( p_input, "failed to receive command (aborting)" );
 
     return VLC_EGENERIC;
 }
@@ -1463,7 +1444,7 @@ static int mms_CommandRead( input_thread_t *p_input, int i_command1, int i_comma
 
 static int mms_HeaderMediaRead( input_thread_t *p_input, int i_type )
 {
-    access_sys_t        *p_sys = p_input->p_access_data;
+    access_sys_t *p_sys = p_input->p_access_data;
     int          i_count;
 
     for( i_count = 0; i_count < MMS_RETRY_MAX; )
@@ -1474,8 +1455,8 @@ static int mms_HeaderMediaRead( input_thread_t *p_input, int i_type )
         if( i_status < 0 )
         {
             i_count++;
-            msg_Warn( p_input,
-                      "cannot receive header (%d/%d)", i_count, MMS_RETRY_MAX );
+            msg_Warn( p_input, "cannot receive header (%d/%d)",
+                      i_count, MMS_RETRY_MAX );
             msleep( MMS_RETRY_SLEEP );
         }
         else if( i_status == i_type || i_type == MMS_PACKET_ANY )
@@ -1507,9 +1488,10 @@ static int mms_HeaderMediaRead( input_thread_t *p_input, int i_type )
             }
         }
     }
-    msg_Err( p_input,
-             "cannot receive %s (abording)",
-               ( i_type == MMS_PACKET_HEADER ) ? "header" : "media data" );
+
+    msg_Err( p_input, "cannot receive %s (aborting)",
+             ( i_type == MMS_PACKET_HEADER ) ? "header" : "media data" );
+
     return -1;
 }
 
