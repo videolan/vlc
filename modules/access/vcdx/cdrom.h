@@ -2,7 +2,7 @@
  * cdrom.h: cdrom tools header
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.h,v 1.1 2003/10/04 18:55:13 gbazin Exp $
+ * $Id: cdrom.h,v 1.2 2003/11/26 03:34:22 rocky Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -21,6 +21,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#ifndef VCDX_CDROM_H
+#define VCDX_CDROM_H
 
 #include <cdio/cdio.h>
 #include <cdio/logging.h>
@@ -43,3 +46,4 @@ void      ioctl_Close        ( cddev_t * );
 track_t   ioctl_GetTracksMap ( vlc_object_t *, const CdIo *, lsn_t ** );
 int       ioctl_ReadSector   ( vlc_object_t *, const cddev_t *,
                                int, byte_t * );
+#endif /*VCDX_CDROM_H*/
