@@ -3492,6 +3492,17 @@ then
       AC_MSG_ERROR([Your development package for wxWindows is too old, you need at least version 2.3.0. Please upgrade and try again. Alternatively you can also configure with --disable-wxwindows.])
     fi
     AC_LANG_PUSH(C++)
+    # Turn this error:
+    #   playlist.cpp:1351: error: ISO C++ forbids cast to non-reference type
+    # into a warning. However better would be to fix playlist.cpp
+    AC_CACHE_CHECK([if \$CXX accepts -fpermissive],
+        [ac_cv_cxx_fpermissive],
+        [CXXFLAGS="${CXXFLAGS_save} -fpermissive"
+         AC_TRY_COMPILE([],,ac_cv_cxx_fpermissive=yes,
+                        ac_cv_cxx_fpermissive=no)])
+    if test "${ac_cv_cxx_fpermissive}" = "yes"; then
+      VLC_ADD_CXXFLAGS([wxwindows],-fpermissive)
+    fi
     VLC_ADD_CXXFLAGS([wxwindows],[`${WX_CONFIG} --cxxflags`])
     VLC_ADD_LDFLAGS([wxwindows],[`${WX_CONFIG} --libs`])
     # now look for the wxprec.h header
