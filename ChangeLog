@@ -4,6 +4,8 @@
 
 HEAD
 
+  * Added proper Conflicts: rules in debian/control.
+  * configure.in fixes for BSD/OS.
   * Added BSD/OS libdvd by Steven M. Schultz <sms@TO.GD-ES.COM> in
     extras/BSDI_dvdioctl after he suggested us to do so. License is GPL.
   * ./configure now checks for an installed libdvd under BSD/OS and

@@ -30,7 +30,7 @@ $(BUILTIN_DVD): BUILTIN_%.o: %.c
 # Real targets
 #
 
-ifeq (1,$(LOCAL_LIBDVDCSS))
+ifeq (1,$(NEED_LIBDVDCSS))
 ../dvd.so: libdvdcss $(PLUGIN_DVD)
 	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
 

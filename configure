@@ -3573,10 +3573,8 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 #define DVD_STRUCT_IN_DVD_H 1
 EOF
 
-    LINUX_DVD_STRUCT=1
-    OBJ_LIBDVDCSS="${OBJ_LIBDVDCSS} bsdi_dvdioctl.o"
     LIB_LIBDVDCSS="${LIB_LIBDVDCSS} -ldvd"
-    CFLAGS_LIBDVDCSS="${CFLAGS_LIBDVDCSS} -I../BSDI_ioctl"
+    LINUX_DVD_STRUCT=1
   
 else
   rm -rf conftest*
@@ -3585,17 +3583,17 @@ else
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3589: checking for $ac_hdr" >&5
+echo "configure:3587: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3594 "configure"
+#line 3592 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3599: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3597: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3617,6 +3615,8 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
 EOF
  
       NEED_BSDI_LIBDVD=1
+      OBJ_LIBDVDCSS="${OBJ_LIBDVDCSS} bsdi_dvdioctl.o"
+      CFLAGS_LIBDVDCSS="${CFLAGS_LIBDVDCSS} -I../BSDI_ioctl"
       LINUX_DVD_STRUCT=1
     
 else
@@ -3880,7 +3880,7 @@ fi
 
 LIB="${LIB} ${THREAD_LIB}"
 
-LOCAL_LIBDVDCSS=0
+NEED_LIBDVDCSS=0
 STATIC_LIBDVDCSS=0
 DUMMY_LIBDVDCSS=0
 # Check whether --with-dvdcss or --without-dvdcss was given.
@@ -3891,7 +3891,7 @@ if test "${with_dvdcss+set}" = set; then
       # local libdvdcss, statically linked
       if test x${CAN_BUILD_LIBDVDCSS} = x1
       then
-        LOCAL_LIBDVDCSS=1
+        NEED_LIBDVDCSS=1
         STATIC_LIBDVDCSS=1
         BUILTINS="${BUILTINS} dvd"
         CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
@@ -3903,7 +3903,7 @@ if test "${with_dvdcss+set}" = set; then
       # local libdvdcss, dynamically linked
       if test x${CAN_BUILD_LIBDVDCSS} = x1
       then
-        LOCAL_LIBDVDCSS=1
+        NEED_LIBDVDCSS=1
         BUILTINS="${BUILTINS} dvd"
         CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
         LIB_DVD="${LIB_DVD} -Llib -ldvdcss"
@@ -3936,7 +3936,7 @@ else
   # if libdvdcss is in the archive, or to use the dummy replacement otherwise.
    if test x${CAN_BUILD_LIBDVDCSS} = x1
     then
-      LOCAL_LIBDVDCSS=1
+      NEED_LIBDVDCSS=1
       STATIC_LIBDVDCSS=1
       BUILTINS="${BUILTINS} dvd"
       CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
@@ -4946,7 +4946,6 @@ fi
 
 
 
-
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -5114,7 +5113,6 @@ s%@TRACE@%$TRACE%g
 s%@PROFILING@%$PROFILING%g
 s%@OPTIMS@%$OPTIMS%g
 s%@NEED_GETOPT@%$NEED_GETOPT%g
-s%@NEED_BSDI_LIBDVD@%$NEED_BSDI_LIBDVD%g
 s%@MOC@%$MOC%g
 s%@WINDRES@%$WINDRES%g
 s%@LCFLAGS@%$LCFLAGS%g
@@ -5152,7 +5150,7 @@ s%@CFLAGS_SDL@%$CFLAGS_SDL%g
 s%@CFLAGS_X11@%$CFLAGS_X11%g
 s%@OBJ_DVD@%$OBJ_DVD%g
 s%@OBJ_LIBDVDCSS@%$OBJ_LIBDVDCSS%g
-s%@LOCAL_LIBDVDCSS@%$LOCAL_LIBDVDCSS%g
+s%@NEED_LIBDVDCSS@%$NEED_LIBDVDCSS%g
 
 CEOF
 EOF
@@ -5400,8 +5398,8 @@ echo "
 libdvdcss configuration
 -----------------------
 can be built          : ${CAN_BUILD_LIBDVDCSS}
-will be built         : ${LOCAL_LIBDVDCSS}"
-if test x${LOCAL_LIBDVDCSS} = x1
+will be built         : ${NEED_LIBDVDCSS}"
+if test x${NEED_LIBDVDCSS} = x1
 then
   echo "need BSDI libdvd      : ${NEED_BSDI_LIBDVD}"
   echo "link statically       : ${STATIC_LIBDVDCSS}"

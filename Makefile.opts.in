@@ -106,8 +106,7 @@ OBJ_LIBDVDCSS = @OBJ_LIBDVDCSS@
 # Other special cases
 #
 NEED_GETOPT = @NEED_GETOPT@
-NEED_BSDI_LIBDVD = @NEED_BSDI_LIBDVD@
-LOCAL_LIBDVDCSS = @LOCAL_LIBDVDCSS@
+NEED_LIBDVDCSS = @NEED_LIBDVDCSS@
 
 ###############################################################################
 # Configuration pre-processing

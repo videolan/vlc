@@ -18,6 +18,7 @@ Description: a free MPEG and DVD player
 Package: libdvdcss0.0.3
 Architecture: any
 Depends: ${shlibs:Depends}
+Conflicts: libdvdcss0.0.2
 Description: a portable abstraction library for DVD decryption
  libdvdcss is a portable abstraction library for DVD decryption, it
  provides a simple API to access a DVD device as a block device.
@@ -27,6 +28,7 @@ Description: a portable abstraction library for DVD decryption
 Package: libdvdcss0.0.3-dev
 Architecture: any
 Depends: libdvdcss0.0.3 (= ${Source-Version}), libc6-dev
+Conflicts: libdvdcss0.0.2-dev
 Description: development files for libdvdcss0
  libdvdcss is a portable abstraction library for DVD decryption, it
  provides a simple API to access a DVD device as a block device.

@@ -253,16 +253,16 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
   AC_EGREP_HEADER(dvd_struct,dvd.h,[
     AC_DEFINE(DVD_STRUCT_IN_DVD_H, 1,
               Define if <dvd.h> defines DVD_STRUCT.)
-    LINUX_DVD_STRUCT=1
-    OBJ_LIBDVDCSS="${OBJ_LIBDVDCSS} bsdi_dvdioctl.o"
     LIB_LIBDVDCSS="${LIB_LIBDVDCSS} -ldvd"
-    CFLAGS_LIBDVDCSS="${CFLAGS_LIBDVDCSS} -I../BSDI_ioctl"
+    LINUX_DVD_STRUCT=1
   ],[
     dnl
     dnl BSDI: /sys/dev/scsi/scsi_ioctl.h, using our own libdvd
     dnl
     AC_CHECK_HEADERS(/sys/dev/scsi/scsi_ioctl.h,[
       NEED_BSDI_LIBDVD=1
+      OBJ_LIBDVDCSS="${OBJ_LIBDVDCSS} bsdi_dvdioctl.o"
+      CFLAGS_LIBDVDCSS="${CFLAGS_LIBDVDCSS} -I../BSDI_ioctl"
       LINUX_DVD_STRUCT=1
     ])
   ])
@@ -392,7 +392,7 @@ LIB="${LIB} ${THREAD_LIB}"
 dnl
 dnl  DVD module: check for installed libdvdcss or local libdvdcss
 dnl
-LOCAL_LIBDVDCSS=0
+NEED_LIBDVDCSS=0
 STATIC_LIBDVDCSS=0
 DUMMY_LIBDVDCSS=0
 AC_ARG_WITH(dvdcss,
@@ -402,7 +402,7 @@ AC_ARG_WITH(dvdcss,
       # local libdvdcss, statically linked
       if test x${CAN_BUILD_LIBDVDCSS} = x1
       then
-        LOCAL_LIBDVDCSS=1
+        NEED_LIBDVDCSS=1
         STATIC_LIBDVDCSS=1
         BUILTINS="${BUILTINS} dvd"
         CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
@@ -414,7 +414,7 @@ AC_ARG_WITH(dvdcss,
       # local libdvdcss, dynamically linked
       if test x${CAN_BUILD_LIBDVDCSS} = x1
       then
-        LOCAL_LIBDVDCSS=1
+        NEED_LIBDVDCSS=1
         BUILTINS="${BUILTINS} dvd"
         CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
         LIB_DVD="${LIB_DVD} -Llib -ldvdcss"
@@ -446,7 +446,7 @@ AC_ARG_WITH(dvdcss,
   # if libdvdcss is in the archive, or to use the dummy replacement otherwise.
   [ if test x${CAN_BUILD_LIBDVDCSS} = x1
     then
-      LOCAL_LIBDVDCSS=1
+      NEED_LIBDVDCSS=1
       STATIC_LIBDVDCSS=1
       BUILTINS="${BUILTINS} dvd"
       CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
@@ -849,7 +849,6 @@ AC_SUBST(TRACE)
 AC_SUBST(PROFILING)
 AC_SUBST(OPTIMS)
 AC_SUBST(NEED_GETOPT)
-AC_SUBST(NEED_BSDI_LIBDVD)
 AC_SUBST(MOC)
 AC_SUBST(WINDRES)
 
@@ -892,7 +891,7 @@ AC_SUBST(CFLAGS_X11)
 AC_SUBST(OBJ_DVD)
 AC_SUBST(OBJ_LIBDVDCSS)
 
-AC_SUBST(LOCAL_LIBDVDCSS)
+AC_SUBST(NEED_LIBDVDCSS)
 
 AC_OUTPUT([Makefile.opts include/config.h])
 
@@ -923,8 +922,8 @@ echo "
 libdvdcss configuration
 -----------------------
 can be built          : ${CAN_BUILD_LIBDVDCSS}
-will be built         : ${LOCAL_LIBDVDCSS}"
-if test x${LOCAL_LIBDVDCSS} = x1
+will be built         : ${NEED_LIBDVDCSS}"
+if test x${NEED_LIBDVDCSS} = x1
 then
   echo "need BSDI libdvd      : ${NEED_BSDI_LIBDVD}"
   echo "link statically       : ${STATIC_LIBDVDCSS}"
