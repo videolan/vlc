@@ -2,7 +2,7 @@
  * sdp.c: SDP parser and builtin UDP/RTP/RTSP
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sdp.c,v 1.4 2003/08/04 18:50:36 fenrir Exp $
+ * $Id: sdp.c,v 1.5 2003/08/05 01:27:45 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -219,7 +219,11 @@ static void NetClose  ( vlc_object_t *, int );
  * RTP handler
  */
 typedef struct rtp_stream_sys_t rtp_stream_sys_t;
-typedef struct
+typedef struct rtp_stream_t rtp_stream_t;
+
+typedef int  (*rtp_pf_payload_parse)( rtp_stream_t * );
+
+struct rtp_stream_t
 {
     struct
     {
@@ -247,12 +251,20 @@ typedef struct
     {
         int  i_data;
         void *p_data;
+
+        int  i_payload;
+        void *p_payload;
+
+        /* Do not touch that */
+        rtp_pf_payload_parse pf_payload_parse;
     } frame;
+
+    int i_clock_rate;
 
     /* User private */
     rtp_stream_sys_t *p_sys;
 
-} rtp_stream_t;
+};
 
 typedef struct
 {
@@ -280,6 +292,11 @@ static void   rtp_Release( rtp_t *rtp );
 /*
  * Module specific
  */
+
+struct rtp_stream_sys_t
+{
+    es_descriptor_t *p_es;
+};
 
 struct demux_sys_t
 {
@@ -384,6 +401,26 @@ static int Open( vlc_object_t * p_this )
     }
     p_session = &p_sys->p_sdp->session[p_sys->i_session];
 
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    if( input_InitStream( p_input, 0 ) == -1)
+    {
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        msg_Err( p_input, "cannot init stream" );
+        goto error;
+    }
+    if( input_AddProgram( p_input, 0, 0) == NULL )
+    {
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        msg_Err( p_input, "cannot add program" );
+        goto error;
+    }
+    p_input->stream.pp_programs[0]->b_is_ok = 0;
+    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
+
+    p_input->stream.i_mux_rate = 0 / 50;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+
     /* Create a RTP handler */
     p_sys->rtp = rtp_New( p_input );
 
@@ -431,10 +468,28 @@ static int Open( vlc_object_t * p_this )
         if( rtp_Add( p_sys->rtp, tk, &rs ) )
         {
             msg_Err( p_input, "cannot add media[%d]", i );
+            sdp_TrackRelease( tk );
+            continue;
         }
+
+        rs->p_sys = malloc( sizeof( rtp_stream_sys_t ) );
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        rs->p_sys->p_es = input_AddES( p_input,
+                                       p_input->stream.p_selected_program,
+                                       1 , AUDIO_ES, NULL, 0 );
+        rs->p_sys->p_es->i_stream_id = 1;
+        rs->p_sys->p_es->i_fourcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+        input_SelectES( p_input, rs->p_sys->p_es );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
 
         sdp_TrackRelease( tk );
     }
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.p_selected_program->b_is_ok = 1;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
     return VLC_SUCCESS;
 
 error:
@@ -473,6 +528,9 @@ static int Demux ( input_thread_t *p_input )
     {
         rtp_stream_t *rs;
 
+        pes_packet_t  *p_pes;
+        data_packet_t *p_data;
+
         if( rtp_Read( p_sys->rtp, &rs ) )
         {
             /* FIXME */
@@ -483,7 +541,37 @@ static int Demux ( input_thread_t *p_input )
             continue;
         }
 
-        msg_Dbg( p_input, "rs[%p] frame.size=%d", rs, rs->frame.i_data );
+        msg_Dbg( p_input, "rs[%p] frame.size=%d frame.payload=%d",
+                 rs, rs->frame.i_data, rs->frame.i_payload );
+
+        if( rs->p_sys->p_es->p_decoder_fifo == NULL )
+        {
+            return 1;
+        }
+
+        /* Put the complete data in a PES */
+        if( ( p_pes = input_NewPES( p_input->p_method_data ) ) == NULL )
+        {
+            return 0;
+        }
+        p_data = input_NewPacket( p_input->p_method_data, rs->frame.i_payload );
+        if( p_data == NULL )
+        {
+            input_DeletePES( p_input->p_method_data, p_pes );
+            return 0;
+        }
+        p_data->p_payload_end = p_data->p_payload_start + rs->frame.i_payload;
+
+        p_pes->i_rate = p_input->stream.control.i_rate;
+        p_pes->p_first = p_pes->p_last = p_data;
+        p_pes->i_nb_data = 1;
+        p_pes->i_dts = mdate() + p_input->i_pts_delay;
+        p_pes->i_pes_size = rs->frame.i_payload;
+
+        memcpy( p_pes->p_first->p_payload_start,
+                rs->frame.p_payload, rs->frame.i_payload );
+
+        input_DecodePES( rs->p_sys->p_es->p_decoder_fifo, p_pes );
     }
 
     return 1;
@@ -678,6 +766,10 @@ static sdp_t *sdp_Parse  ( char *psz_sdp )
                 if( p )
                 {
                     *p++ = '\0';
+                    while( *p == ' ' )
+                    {
+                        p++;
+                    }
                     value= strdup( p);
                 }
                 name = strdup( psz );
@@ -921,6 +1013,10 @@ static sdp_track_t *sdp_TrackCreate( sdp_t *p_sdp, int i_session, int i_media,
 
                 if( i_type == tk->payload[tk->i_payload_count].i_type )
                 {
+                    while( *p == ' ' )
+                    {
+                        p++;
+                    }
                     tk->payload[tk->i_payload_count].psz_rtpmap = strdup( p );
                 }
             }
@@ -932,10 +1028,13 @@ static sdp_track_t *sdp_TrackCreate( sdp_t *p_sdp, int i_session, int i_media,
 
                 if( i_type == tk->payload[tk->i_payload_count].i_type )
                 {
+                    while( *p == ' ' )
+                    {
+                        p++;
+                    }
                     tk->payload[tk->i_payload_count].psz_fmtp = strdup( p );
                 }
             }
-
         }
         tk->i_payload_count++;
         if( *p == '\0' || tk->i_payload_count >= RTP_PAYLOAD_MAX )
@@ -1039,6 +1138,17 @@ static void         sdp_TrackRelease( sdp_track_t *tk )
  * RTP/RTCP/RTSP handler
  *****************************************************************************/
 
+static int  rtp_MPAPayloadParse( rtp_stream_t * );
+
+static int rtp_PayloadToInfos( int i_type,
+                               char **ppsz_name, vlc_fourcc_t *p_fcc,
+                               int  *pi_clock_rate, int *pi_channels,
+                               int  *pi_samplesize );
+
+static rtp_pf_payload_parse rtp_PayloadToFunction( char * );
+
+static int rtp_PacketParse( rtp_t *, rtp_stream_t * );
+
 static rtp_t *rtp_New( input_thread_t *p_input )
 {
     rtp_t *rtp = vlc_object_create( p_input, sizeof( rtp_t ) );
@@ -1053,6 +1163,7 @@ static int    rtp_Add( rtp_t *rtp, sdp_track_t *tk, rtp_stream_t **pp_stream )
 {
     rtp_source_t *rs = malloc( sizeof( rtp_source_t ) );
 
+    *pp_stream = NULL;
 
     if( tk->psz_control )
     {
@@ -1061,30 +1172,146 @@ static int    rtp_Add( rtp_t *rtp, sdp_track_t *tk, rtp_stream_t **pp_stream )
         return VLC_EGENERIC;
     }
 
-    *pp_stream = &rs->stream;
-
     /* no data unread */
     rs->b_data = VLC_FALSE;
+
+    /* Clock rate */
+    rs->stream.i_clock_rate = 0;
 
     /* Init stream properties */
     rs->stream.es.i_cat   = tk->i_cat;
     rs->stream.es.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
-    if( rs->stream.es.i_cat == AUDIO_ES )
-    {
-        rs->stream.es.audio.i_channels = 0;
-        rs->stream.es.audio.i_samplerate = 0;
-        rs->stream.es.audio.i_samplesize = 0;
-    }
-    else if( rs->stream.es.i_cat == VIDEO_ES )
-    {
-        rs->stream.es.video.i_width = 0;
-        rs->stream.es.video.i_height = 0;
-    }
+    rs->stream.es.audio.i_channels = 0;
+    rs->stream.es.audio.i_samplerate = 0;
+    rs->stream.es.audio.i_samplesize = 0;
+    rs->stream.es.video.i_width = 0;
+    rs->stream.es.video.i_height = 0;
     rs->stream.es.i_extra_data = 0;
     rs->stream.es.p_extra_data = NULL;
     rs->stream.frame.i_data = 0;
     rs->stream.frame.p_data = malloc( 65535 );  /* Max size of a UDP packet */
+    rs->stream.frame.pf_payload_parse = NULL;
     rs->stream.p_sys = NULL;
+    if( tk->payload[0].i_type < 33 )
+    {
+        char *psz_name;
+        int  i_ret;
+
+        i_ret  = rtp_PayloadToInfos( tk->payload[0].i_type,
+                                     &psz_name,
+                                     &rs->stream.es.i_codec,
+                                     &rs->stream.i_clock_rate,
+                                     &rs->stream.es.audio.i_channels,
+                                     &rs->stream.es.audio.i_samplesize );
+        if( i_ret )
+        {
+            msg_Err( rtp, "unknown/unhandled payload type" );
+            free( rs );
+            return VLC_EGENERIC;
+        }
+        msg_Dbg( rtp, "payload type=%d name=%s",
+                 tk->payload[0].i_type, psz_name );
+
+        if( rs->stream.es.i_cat == AUDIO_ES )
+        {
+            rs->stream.es.audio.i_samplerate = rs->stream.i_clock_rate;
+        }
+        rs->stream.frame.pf_payload_parse = rtp_PayloadToFunction( psz_name );
+    }
+    else if( tk->payload[0].i_type >= 34 && tk->payload[0].i_type < 96 )
+    {
+        msg_Err( rtp, "invalid payload type" );
+        free( rs );
+        return VLC_EGENERIC;
+    }
+    else if( tk->payload[0].psz_rtpmap && *tk->payload[0].psz_rtpmap != '\0' )
+    {
+        char *psz_payload = strdup( tk->payload[0].psz_rtpmap );
+        char *p;
+        int  i_clock_rate = 0;
+        int  i_ret;
+
+        p = strchr( psz_payload, '/' );
+        if( p )
+        {
+            *p++ = '\0';
+            i_clock_rate = strtol( p, &p, 0 );
+            if( tk->i_cat == AUDIO_ES )
+            {
+                rs->stream.es.audio.i_samplerate = rs->stream.i_clock_rate;
+                if( *p  == '/' )
+                {
+                    rs->stream.es.audio.i_channels = strtol( p + 1, &p, 0 );
+                }
+            }
+        }
+
+        msg_Dbg( rtp, "dynamique payload type (type=%s, clock_rate=%d)",
+                 psz_payload, i_clock_rate );
+
+        i_ret  = rtp_PayloadToInfos( -1,
+                                     &psz_payload,
+                                     &rs->stream.es.i_codec,
+                                     &rs->stream.i_clock_rate,
+                                     &rs->stream.es.audio.i_channels,
+                                     &rs->stream.es.audio.i_samplesize );
+        if( i_ret )
+        {
+            msg_Dbg( rtp, "no assigned payload name" );
+            if( !strcmp( psz_payload, "MP4V-ES" ) )
+            {
+                rs->stream.es.i_codec = VLC_FOURCC( 'm', 'p', '4', 'v' );
+
+                /* TODO */
+                /* Parse fmtp, extract config and put it into p_extra_data (VOL) */
+            }
+#if 0
+            else if( !strcmp( psz_payload, "MP4A-LATM" ) )
+            {
+                /* for mpeg4 audio rfc=3016 */
+            }
+
+            else if( !strcmp( psz_payload, "mpeg4-generic" ) )
+            {
+                /* for AAC and ??? */
+                msg_Err( rtp, "what's that : mpeg4-generic" );
+            }
+#endif
+            else
+            {
+                msg_Err( rtp, "what's that : %s", psz_payload );
+                free( rs );
+                return VLC_EGENERIC;
+            }
+        }
+        else
+        {
+            rs->stream.frame.pf_payload_parse = rtp_PayloadToFunction( psz_payload );
+        }
+
+        if( i_clock_rate > 0 )
+        {
+            rs->stream.i_clock_rate = i_clock_rate;
+        }
+    }
+    else
+    {
+        msg_Err( rtp, "dynamique payload type without rtpmap" );
+        free( rs );
+        return VLC_EGENERIC;
+    }
+
+    if( rs->stream.i_clock_rate == 0 )
+    {
+        if( rs->stream.es.i_cat == AUDIO_ES )
+        {
+            rs->stream.i_clock_rate = rs->stream.es.audio.i_samplerate;
+        }
+        else if( rs->stream.es.i_cat == VIDEO_ES )
+        {
+            rs->stream.i_clock_rate = 90000;
+        }
+    }
 
     /* Open the handle */
     rs->i_handle = NetOpenUDP( VLC_OBJECT( rtp ),
@@ -1099,6 +1326,7 @@ static int    rtp_Add( rtp_t *rtp, sdp_track_t *tk, rtp_stream_t **pp_stream )
 
     TAB_APPEND( rtp->i_rtp, rtp->rtp, rs );
 
+    *pp_stream = &rs->stream;
     return VLC_SUCCESS;
 }
 
@@ -1154,7 +1382,7 @@ static int    rtp_Read( rtp_t *rtp, rtp_stream_t **pp_stream )
     {
         if( rtp->rtp[i]->i_handle > 0 && FD_ISSET( rtp->rtp[i]->i_handle, &fds_read ) )
         {
-            int i_recv;
+            int         i_recv;
             i_recv = recv( rtp->rtp[i]->i_handle,
                            rtp->rtp[i]->stream.frame.p_data,
                            65535,
@@ -1170,10 +1398,20 @@ static int    rtp_Read( rtp_t *rtp, rtp_stream_t **pp_stream )
                 rtp->rtp[i]->i_handle = -1;
                 continue;
             }
+            rtp->rtp[i]->stream.frame.i_data = i_recv;
 
             msg_Dbg( rtp, "con[%d] read %d bytes", i, i_recv );
-            rtp->rtp[i]->stream.frame.i_data = i_recv;
-            rtp->rtp[i]->b_data = VLC_TRUE;
+
+#if 0
+            /* Now parse generic header header */
+            rtp->rtp[i]->stream.frame.i_payload = rtp->rtp[i]->stream.frame.i_data;
+            rtp->rtp[i]->stream.frame.p_payload = rtp->rtp[i]->stream.frame.p_data;
+#endif
+
+            if( !rtp_PacketParse( rtp, &rtp->rtp[i]->stream ) )
+            {
+                rtp->rtp[i]->b_data = VLC_TRUE;
+            }
         }
     }
 
@@ -1211,7 +1449,171 @@ static void   rtp_Release( rtp_t *rtp )
     vlc_object_destroy( rtp );
 }
 
+/* RTP helpers */
+struct
+{
+    int          i_type;
+    char         *psz_name;
+    vlc_fourcc_t i_fourcc;
+    int          i_clock_rate;
+    int          i_channels;
+    int          i_samplesize;
+} rtp_payload_name_fcc[] =
+{
+    {  0, "PCMU",   VLC_FOURCC( 'u', 'l', 'a', 'w' ),  8000, 1, 8 },
+    {  1, "1016",   VLC_FOURCC( '1', '0', '1', '6' ),  8000, 1, 0 },
+    {  2, "G721",   VLC_FOURCC( 'g', '7', '2', '1' ),  8000, 1, 0 },
+    {  3, "GSM",    VLC_FOURCC( 'g', 's', 'm', ' ' ),  8000, 1, 0 },
+    /* FIXME ID4 == ima4 ? FIXME */
+    {  5, "ID4",    VLC_FOURCC( 'i', 'm', 'a', '4' ),  8000, 1, 0 },
+    {  6, "ID4",    VLC_FOURCC( 'i', 'm', 'a', '4' ), 16000, 1, 0 },
+    {  7, "LPC",    VLC_FOURCC( 'l', 'p', 'c', ' ' ),  8000, 1, 0 },
+    {  8, "PCMA",   VLC_FOURCC( 'a', 'l', 'a', 'w' ),  8000, 1, 8 },
+    {  9, "G722",   VLC_FOURCC( 'g', '7', '2', '2' ),  8000, 1, 0 },
+    { 10, "L16",    VLC_FOURCC( 't', 'w', 'o', 's' ), 44100, 2, 16 },
+    { 11, "L16",    VLC_FOURCC( 't', 'w', 'o', 's' ), 44100, 1, 16 },
+    { 14, "MPA",    VLC_FOURCC( 'm', 'p', 'g', 'a' ), 90000, 0, 0 },
+    { 15, "G728",   VLC_FOURCC( 'g', '7', '2', '8' ),  8000, 1, 0 },
+    { 25, "CelB",   VLC_FOURCC( 'C', 'e', 'l', 'B' ), 90000, 0, 0 },
+    { 26, "JPEG",   VLC_FOURCC( 'J', 'P', 'E', 'G' ), 90000, 0, 0 },
+    { 26, "nv",     VLC_FOURCC( 'n', 'v', ' ', ' ' ), 90000, 0, 0 },
+    { 31, "H261",   VLC_FOURCC( 'h', '2', '6', '1' ), 90000, 0, 0 },
+    { 32, "MPV",    VLC_FOURCC( 'm', 'p', 'g', 'a' ), 90000, 0, 0 },
+    { 33, "TS",     VLC_FOURCC( 't', 's', ' ', ' ' ), 90000, 0, 0 },
 
+    /* Unassigned : 4, 12, 13, 16-24, 27, 29, 30 */
+
+    { -1, NULL,     VLC_FOURCC( 0, 0, 0, 0 ), 0, 0, 0 }
+};
+
+static int rtp_PayloadToInfos( int i_type,
+                               char **ppsz_name, vlc_fourcc_t *p_fcc,
+                               int  *pi_clock_rate, int *pi_channels,
+                               int  *pi_samplesize )
+{
+    int i;
+
+    for( i = 0; rtp_payload_name_fcc[i].psz_name != NULL; i++ )
+    {
+        if( ( i_type >= 0 && i_type == rtp_payload_name_fcc[i].i_type ) ||
+            !strcasecmp( *ppsz_name, rtp_payload_name_fcc[i].psz_name ) )
+        {
+            if( i_type >= 0 )
+            {
+                *ppsz_name     = rtp_payload_name_fcc[i].psz_name;
+            }
+            *p_fcc         = rtp_payload_name_fcc[i].i_fourcc;
+            *pi_clock_rate = rtp_payload_name_fcc[i].i_clock_rate;
+            *pi_channels   = rtp_payload_name_fcc[i].i_channels;
+            *pi_samplesize = rtp_payload_name_fcc[i].i_samplesize;
+            return VLC_SUCCESS;
+        }
+    }
+    return VLC_EGENERIC;
+}
+
+struct
+{
+    char                 *psz_name;
+    rtp_pf_payload_parse pf_function;
+} rtp_payload_function[] =
+{
+    {  "MPA",   rtp_MPAPayloadParse },
+    {  NULL,    NULL },
+};
+
+static rtp_pf_payload_parse rtp_PayloadToFunction( char *psz_name )
+{
+    int i;
+
+    for( i = 0; rtp_payload_function[i].psz_name != NULL; i++ )
+    {
+        if( !strcasecmp( psz_name, rtp_payload_function[i].psz_name ) )
+        {
+            return rtp_payload_function[i].pf_function;
+        }
+    }
+    return NULL;
+}
+
+static int rtp_PacketParse( rtp_t *rtp, rtp_stream_t *rs )
+{
+    int        i_data = rs->frame.i_data;
+    uint8_t    *p     = rs->frame.p_data;
+    int        i_header;
+    vlc_bool_t b_padding;
+    vlc_bool_t b_extention;
+    int        i_csrc;
+    vlc_bool_t b_marker;
+    int        i_payload;
+    int        i_sequence;
+    uint32_t   i_timestamp;
+    uint32_t   i_ssrc;
+
+    if( i_data < 12 )
+    {
+        msg_Warn( rtp, "invalid packet size" );
+        return VLC_EGENERIC;
+    }
+    if( ( p[0]&0xc0 ) != 0x80 )
+    {
+        msg_Warn( rtp, "invalid packet size" );
+        return VLC_EGENERIC;
+    }
+
+    b_padding   = p[0]&0x20;
+    b_extention = p[0]&0x10;
+    i_csrc      = p[0]&0x0f;
+
+    b_marker    = p[1]&0x80;
+    i_payload   = p[1]&0x7f;
+
+    i_sequence  = ( p[2] << 8 )|p[3];
+    i_timestamp = ( p[4] << 24 )|( p[5] << 16 )|( p[6] << 8 )|p[7];
+
+    i_ssrc      = ( p[8] << 24 )|( p[9] << 16 )|( p[10] << 8 )|p[11];
+
+    i_header = 12 + i_csrc * 4;
+
+    if( i_data < i_header + ( b_extention ? 4 : 0 ) )
+    {
+        msg_Warn( rtp, "invalid packet size" );
+        return VLC_EGENERIC;
+    }
+    if( b_extention )
+    {
+        i_header += 4 + ( (p[i_header + 2] << 8)|p[i_header + 3] );
+    }
+
+    rs->frame.p_payload = (void*)&p[i_header];
+    rs->frame.i_payload = i_data - i_header - ( b_padding ? p[i_data -1] : 0 );
+
+    if( rs->frame.i_payload <= 0 )
+    {
+        return VLC_EGENERIC;
+    }
+
+    if( rs->frame.pf_payload_parse )
+    {
+        return rs->frame.pf_payload_parse( rs );
+    }
+    return VLC_SUCCESS;
+}
+
+static int rtp_MPAPayloadParse( rtp_stream_t *rs )
+{
+    if( rs->frame.i_payload > 4 )
+    {
+        rs->frame.i_payload -= 4;
+        ((uint8_t*)rs->frame.p_payload) += 4;
+        return VLC_SUCCESS;
+    }
+    return VLC_EGENERIC;
+}
+
+/****************************************************************************
+ *
+ ****************************************************************************/
 static int  NetOpenUDP( vlc_object_t *p_this,
                         char *psz_local, int i_local_port,
                         char *psz_server, int i_server_port )
@@ -1258,4 +1660,6 @@ static void NetClose( vlc_object_t *p_this, int i_handle )
     close( i_handle );
 #endif
 }
+
+
 
