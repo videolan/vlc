@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.1 2003/01/15 10:58:47 massiot Exp $
+ * $Id: mpeg_audio.c,v 1.2 2003/01/15 13:14:50 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -183,6 +183,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         if( !i_current_frame_size )
         {
             msg_Warn( p_dec->p_fifo, "syncinfo failed" );
+            /* This is probably an emulated startcode, drop the first byte
+             * to force looking for the next startcode. */
+            RemoveBits( &p_dec->bit_stream, 8 );
             continue;
         }
 
@@ -348,7 +351,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
     i_emphasis  = i_header & 0x3;
 
     if( *pi_layer != 4 &&
-        i_bitrate_index > 0x00 && i_bitrate_index < 0x0f &&
+        i_bitrate_index < 0x0f &&
         i_samplerate_index != 0x03 &&
         i_emphasis != 0x02 )
     {
@@ -374,9 +377,9 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
             *pi_sample_rate >>= 1;
         }
 
-        switch( *pi_layer -1 )
+        switch( *pi_layer )
         {
-        case 0:
+        case 1:
             i_current_frame_size = ( ( i_version ? 6000 : 12000 ) *
                                         *pi_bit_rate / *pi_sample_rate
                                         + b_padding ) * 4;
@@ -385,7 +388,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
             *pi_frame_length = 384;
             break;
 
-        case 1:
+        case 2:
             i_current_frame_size = ( i_version ? 72000 : 144000 ) *
                                       *pi_bit_rate / *pi_sample_rate
                                       + b_padding;
@@ -394,7 +397,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
             *pi_frame_length = 1152;
             break;
 
-        case 2:
+        case 3:
             i_current_frame_size = ( i_version ? 72000 : 144000 ) *
                                       *pi_bit_rate / *pi_sample_rate
                                       + b_padding;
