@@ -3421,9 +3421,18 @@ then
       AX_ADD_LDFLAGS([goom],[-L${real_goom_tree}/src/.libs -lgoom2])
       AX_ADD_CPPFLAGS([goom],[-I${real_goom_tree}/src -DUSE_GOOM_TREE])
     else
-      dnl  The given libgoom wasn't built
+      dnl  The given libgoom2 wasn't built, try to look for the old goom
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_goom_tree}/src/.libs/libgoom2.a, make sure you compiled goom in ${with_goom_tree}])
+      AC_MSG_CHECKING(for libgoom.a in ${with_goom_tree})
+      if test -f "${real_goom_tree}/libgoom.a"; then
+        AC_MSG_RESULT(${real_goom_tree}/libgoom.a)
+        AX_ADD_LDFLAGS([goom],[-L${real_goom_tree} -lgoom])
+        AX_ADD_CPPFLAGS([goom],[-I${real_goom_tree} -DUSE_GOOM_TREE -DOLD_GOOM])
+      else
+        dnl  The given libgoom wasn't built
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot find ${real_goom_tree}/src/.libs/libgoom2.a, make sure you compiled goom in ${with_goom_tree}])
+      fi
     fi
   else
     AC_CHECK_HEADERS(goom/goom.h, [

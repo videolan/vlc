@@ -36,7 +36,15 @@
 #include "aout_internal.h"
 
 #ifdef USE_GOOM_TREE
-#   include "goom.h"
+#   ifdef OLD_GOOM
+#       include "goom_core.h"
+#       define PluginInfo void
+#       define goom_update(a,b,c,d,e,f) goom_update(b,c,d,e,f)
+#       define goom_close(a) goom_close()
+#       define goom_init(a,b) NULL; goom_init(a,b,0); goom_set_font(0,0,0)
+#   else
+#       include "goom.h"
+#   endif
 #else
 #   include <goom/goom.h>
 #endif
