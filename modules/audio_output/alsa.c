@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.32 2003/07/27 16:14:20 gbazin Exp $
+ * $Id: alsa.c,v 1.33 2003/07/27 16:20:53 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -54,7 +54,7 @@ struct aout_sys_t
     snd_pcm_t         * p_snd_pcm;
     int                 i_period_time;
 
-#ifdef DEBUG
+#ifdef ALSA_DEBUG
     snd_output_t      * p_snd_stderr;
 #endif
 
@@ -388,7 +388,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-#ifdef DEBUG
+#ifdef ALSA_DEBUG
     snd_output_stdio_attach( &p_sys->p_snd_stderr, stderr, 0 );
 #endif
 
@@ -555,7 +555,7 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-#ifdef DEBUG
+#ifdef ALSA_DEBUG
     snd_output_printf( p_sys->p_snd_stderr, "\nALSA hardware setup:\n\n" );
     snd_pcm_dump_hw_setup( p_sys->p_snd_pcm, p_sys->p_snd_stderr );
     snd_output_printf( p_sys->p_snd_stderr, "\nALSA software setup:\n\n" );
@@ -575,7 +575,7 @@ static int Open( vlc_object_t *p_this )
 
 error:
     snd_pcm_close( p_sys->p_snd_pcm );
-#ifdef DEBUG
+#ifdef ALSA_DEBUG
     snd_output_close( p_sys->p_snd_stderr );
 #endif
     free( p_sys );
@@ -628,7 +628,7 @@ static void Close( vlc_object_t *p_this )
                          snd_strerror( i_snd_rc ) );
     }
 
-#ifdef DEBUG
+#ifdef ALSA_DEBUG
     snd_output_close( p_sys->p_snd_stderr );
 #endif
 
