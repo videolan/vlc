@@ -566,6 +566,7 @@ package-win32-base:
 
 	mkdir -p "$(srcdir)/vlc-${VERSION}/http/admin"
 	cp $(srcdir)/share/http/*.html $(srcdir)/vlc-${VERSION}/http/ ;
+	cp $(srcdir)/share/http/*.css $(srcdir)/vlc-${VERSION}/http/ ;
 	cp $(srcdir)/share/http/admin/*.html \
            $(srcdir)/vlc-${VERSION}/http/admin/ ;
 	cp $(srcdir)/share/http/admin/.access \
