@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.70 2001/12/09 17:01:37 sam Exp $
+ * $Id: mpeg_system.c,v 1.71 2001/12/11 13:55:55 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1282,7 +1282,7 @@ void input_DemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
         else
         {
             memcpy( p_psi->buffer, p, p_data->p_payload_end - p );
-            p_psi->i_read_in_section+= p_data->p_payload_end - p;
+            p_psi->i_read_in_section += p_data->p_payload_end - p;
 
             p_psi->p_current += p_data->p_payload_end - p;
         }
@@ -1335,15 +1335,15 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
         
         do
         {
-            i_section_length = ((p_current_data[1] & 0xF) << 8) |
+            i_section_length = (((u32)p_current_data[1] & 0xF) << 8) |
                                  p_current_data[2];
             i_current_section = (u8)p_current_data[6];
     
-            for( i_loop = 0; i_loop < (i_section_length-9)/4 ; i_loop++ )
+            for( i_loop = 0; i_loop < (i_section_length - 9) / 4 ; i_loop++ )
             {
-                i_program_id = ( *(p_current_data + i_loop * 4 + 8) << 8 ) |
+                i_program_id = ( *(u32 *)(p_current_data + i_loop * 4 + 8) << 8 ) |
                                  *(p_current_data + i_loop * 4 + 9);
-                i_pmt_pid = ( (*( p_current_data + i_loop * 4 + 10) & 0x1F)
+                i_pmt_pid = ( (*(u32 *)( p_current_data + i_loop * 4 + 10) & 0x1F)
                                     << 8 ) |
                                *( p_current_data + i_loop * 4 + 11);
     
@@ -1371,7 +1371,7 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
                 }
             }
             
-            p_current_data+=3+i_section_length;
+            p_current_data += 3 + i_section_length;
             
         } while( i_current_section < p_psi->i_last_section_number );
         
@@ -1417,7 +1417,7 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         p_current_section = p_psi->buffer;
         p_current_data = p_psi->buffer;
 
-        p_pgrm_data->i_pcr_pid = ( (*(p_current_section + 8) & 0x1F) << 8 ) |
+        p_pgrm_data->i_pcr_pid = ( (*(u32 *)(p_current_section + 8) & 0x1F) << 8 ) |
                                     *(p_current_section + 9);
 
         i_audio_es = 0;
@@ -1470,10 +1470,10 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         /* Then add what we received in this PMT */
         do
         {
-            i_section_length = ( (*(p_current_data + 1) & 0xF) << 8 ) |
+            i_section_length = ( (*(u32 *)(p_current_data + 1) & 0xF) << 8 ) |
                                   *(p_current_data + 2);
             i_current_section = (u8)p_current_data[6];
-            i_prog_info_length = ( (*(p_current_data + 10) & 0xF) << 8 ) |
+            i_prog_info_length = ( (*(u32 *)(p_current_data + 10) & 0xF) << 8 ) |
                                     *(p_current_data + 11);
 
             /* For the moment we ignore program descriptors */
@@ -1484,9 +1484,9 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
             while( p_current_data < p_current_section + i_section_length -1 )
             {
                 i_stream_type = (int)p_current_data[0];
-                i_pid = ( (*(p_current_data + 1) & 0x1F) << 8 ) |
+                i_pid = ( (*(u32 *)(p_current_data + 1) & 0x1F) << 8 ) |
                            *(p_current_data + 2);
-                i_es_info_length = ( (*(p_current_data + 3) & 0xF) << 8 ) |
+                i_es_info_length = ( (*(u32 *)(p_current_data + 3) & 0xF) << 8 ) |
                                       *(p_current_data + 4);
                 
                 /* Add this ES to the program */
