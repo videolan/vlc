@@ -1,11 +1,10 @@
 /*****************************************************************************
- * ft2_font.hpp
+ * bitmap_font.hpp
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2004 VideoLAN
  * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,56 +21,34 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef FT2_FONT_HPP
-#define FT2_FONT_HPP
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_GLYPH_H
-#include <string>
+#ifndef BITMAP_FONT_HPP
+#define BITMAP_FONT_HPP
 
 #include "generic_font.hpp"
 
-class UString;
+class GenericBitmap;
 
 
-/// Freetype2 font
-class FT2Font: public GenericFont
+/// Class to handle bitmap fonts
+class BitmapFont: public GenericFont
 {
     public:
-        FT2Font( intf_thread_t *pIntf, const string &rName, int size );
-        virtual ~FT2Font();
+        BitmapFont( intf_thread_t *pIntf, const GenericBitmap &rBitmap );
+        virtual ~BitmapFont() {}
 
-        /// Initalize the object. Returns false if it failed
-        virtual bool init();
+        virtual bool init() { return true; }
 
         /// Render a string on a bitmap.
         /// If maxWidth != -1, the text is truncated with '...'
         virtual GenericBitmap *drawString( const UString &rString,
             uint32_t color, int maxWidth = -1 ) const;
 
-        /// Get the text height
-        virtual int getSize() const { return m_height; }
+        /// Get the font size
+        virtual int getSize() const { return 12; }
 
     private:
-        /// File name
-        const string m_name;
-        /// Buffer to store the font
-        void *m_buffer;
-        /// Pixel size of the font
-        int m_size;
-        /// Handle to FT library
-        FT_Library m_lib;
-        /// Font face
-        FT_Face m_face;
-        /// Font metrics
-        int m_height, m_ascender, m_descender;
-        /// Index, glyph, width and advance of the dot symbol
-        int m_dotIndex;
-        FT_Glyph m_dotGlyph;
-        int m_dotWidth;
-        int m_dotAdvance;
+        /// Bitmap
+        const GenericBitmap &m_rBitmap;
 };
-
 
 #endif

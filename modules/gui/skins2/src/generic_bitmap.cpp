@@ -1,11 +1,10 @@
 /*****************************************************************************
- * generic_font.hpp
+ * generic_bitmap.cpp
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2004 VideoLAN
  * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,37 +21,30 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef GENERIC_FONT_HPP
-#define GENERIC_FONT_HPP
+#include "generic_bitmap.hpp"
 
-#include "skin_common.hpp"
-#include "../utils/pointer.hpp"
 
-class GenericBitmap;
-class UString;
-
-/// Base class for fonts
-class GenericFont: public SkinObject
+SubBitmap::SubBitmap( intf_thread_t *pIntf, const GenericBitmap &rSource,
+                      int left, int top, int width, int height ):
+    GenericBitmap( pIntf ), m_width( width ), m_height( height ),
+    m_pData( NULL )
 {
-    public:
-        virtual ~GenericFont() {}
+    m_pData = new uint8_t[width * height * 4];
 
-        virtual bool init() = 0;
-
-        /// Render a string on a bitmap.
-        /// If maxWidth != -1, the text is truncated with '...'
-        /// The Bitmap is _not_ owned by this object
-        virtual GenericBitmap *drawString( const UString &rString,
-            uint32_t color, int maxWidth = -1 ) const = 0;
-
-        /// Get the font size
-        virtual int getSize() const = 0;
-
-    protected:
-        GenericFont( intf_thread_t *pIntf ): SkinObject( pIntf ) {}
-};
-
-typedef CountedPtr<GenericFont> GenericFontPtr;
+    uint32_t *pSrc = (uint32_t*)rSource.getData();
+    uint32_t *pDest = (uint32_t*)m_pData;
+    int srcWidth = rSource.getWidth();
+    for( int y = top; y < top + height; y++ )
+    {
+        memcpy( pDest, pSrc, 4 * width );
+        pSrc += srcWidth;
+        pDest += width;
+    }
+}
 
 
-#endif
+SubBitmap::~SubBitmap()
+{
+    delete[] m_pData;
+}
+

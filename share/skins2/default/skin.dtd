@@ -28,6 +28,12 @@
         italic      CDATA   "false"
         underline   CDATA   "false"
     >
+<!ELEMENT BitmapFont EMPTY>
+    <!ATTLIST Font
+        id          CDATA   #REQUIRED
+        file        CDATA   #REQUIRED
+        type        CDATA   "digits"
+    >
 <!ELEMENT ThemeInfo EMPTY>
     <!ATTLIST ThemeInfo
         name        CDATA   #IMPLIED

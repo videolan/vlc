@@ -1,11 +1,10 @@
 /*****************************************************************************
- * generic_font.hpp
+ * bitmap_font.cpp
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2004 VideoLAN
  * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,37 +21,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef GENERIC_FONT_HPP
-#define GENERIC_FONT_HPP
+#include "bitmap_font.hpp"
+#include "generic_bitmap.hpp"
 
-#include "skin_common.hpp"
-#include "../utils/pointer.hpp"
 
-class GenericBitmap;
-class UString;
-
-/// Base class for fonts
-class GenericFont: public SkinObject
+BitmapFont::BitmapFont( intf_thread_t *pIntf, const GenericBitmap &rBitmap ):
+    GenericFont( pIntf ), m_rBitmap( rBitmap )
 {
-    public:
-        virtual ~GenericFont() {}
-
-        virtual bool init() = 0;
-
-        /// Render a string on a bitmap.
-        /// If maxWidth != -1, the text is truncated with '...'
-        /// The Bitmap is _not_ owned by this object
-        virtual GenericBitmap *drawString( const UString &rString,
-            uint32_t color, int maxWidth = -1 ) const = 0;
-
-        /// Get the font size
-        virtual int getSize() const = 0;
-
-    protected:
-        GenericFont( intf_thread_t *pIntf ): SkinObject( pIntf ) {}
-};
-
-typedef CountedPtr<GenericFont> GenericFontPtr;
+}
 
 
-#endif
+GenericBitmap *BitmapFont::drawString( const UString &rString,
+                                       uint32_t color, int maxWidth ) const
+{
+    return NULL;
+}
+
