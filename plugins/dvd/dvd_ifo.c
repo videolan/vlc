@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.11 2001/02/20 02:53:13 stef Exp $
+ * $Id: dvd_ifo.c,v 1.12 2001/02/20 02:56:50 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -224,12 +224,12 @@ static pgc_t ReadPGC( ifo_t* p_ifo )
     int     i;
     off_t   i_start = p_ifo->i_pos;
 
-fprintf( stderr, "PGC\n" );
+//fprintf( stderr, "PGC\n" );
 
     FLUSH(2);
     GETC( &pgc.i_prg_nb );
     GETC( &pgc.i_cell_nb );
-fprintf( stderr, "PGC: Prg: %d Cell: %d\n", pgc.i_prg_nb, pgc.i_cell_nb );
+//fprintf( stderr, "PGC: Prg: %d Cell: %d\n", pgc.i_prg_nb, pgc.i_cell_nb );
     GETL( &pgc.i_play_time );
     GETL( &pgc.i_prohibited_user_op );
     for( i=0 ; i<8 ; i++ )
@@ -243,7 +243,7 @@ fprintf( stderr, "PGC: Prg: %d Cell: %d\n", pgc.i_prg_nb, pgc.i_cell_nb );
     GETS( &pgc.i_next_pgc_nb );
     GETS( &pgc.i_prev_pgc_nb );
     GETS( &pgc.i_goup_pgc_nb );
-fprintf( stderr, "PGC: Prev: %d Next: %d Up: %d\n",pgc.i_prev_pgc_nb ,pgc.i_next_pgc_nb, pgc.i_goup_pgc_nb );
+//fprintf( stderr, "PGC: Prev: %d Next: %d Up: %d\n",pgc.i_prev_pgc_nb ,pgc.i_next_pgc_nb, pgc.i_goup_pgc_nb );
     GETC( &pgc.i_still_time );
     GETC( &pgc.i_play_mode );
     for( i=0 ; i<16 ; i++ )
@@ -382,7 +382,7 @@ static pgci_inf_t ReadUnit( ifo_t* p_ifo )
     int             i;
     off_t           i_start = p_ifo->i_pos;
 
-fprintf( stderr, "Unit\n" );
+//fprintf( stderr, "Unit\n" );
 
     GETS( &inf.i_srp_nb );
     FLUSH( 2 );
@@ -406,7 +406,7 @@ fprintf( stderr, "Unit\n" );
         p_ifo->i_pos = lseek( p_ifo->i_fd,
                          i_start + inf.p_srp[i].i_pgci_sbyte,
                          SEEK_SET );
-fprintf( stderr, "Unit: PGC %d\n", i );
+//fprintf( stderr, "Unit: PGC %d\n", i );
         inf.p_srp[i].pgc = ReadPGC( p_ifo );
     }
 
@@ -422,7 +422,7 @@ static pgci_ut_t ReadUnitTable( ifo_t* p_ifo )
     int             i;
     off_t           i_start = p_ifo->i_pos;
 
-fprintf( stderr, "Unit Table\n" );
+//fprintf( stderr, "Unit Table\n" );
 
     GETS( &pgci.i_lu_nb );
     FLUSH( 2 );
@@ -589,10 +589,10 @@ static vmg_ptt_srpt_t ReadVMGTitlePointer( ifo_t* p_ifo )
     int             i;
 //    off_t           i_start = p_ifo->i_pos;
 
-fprintf( stderr, "PTR\n" );
+//fprintf( stderr, "PTR\n" );
 
     GETS( &ptr.i_ttu_nb );
-fprintf( stderr, "PTR: TTU nb %d\n", ptr.i_ttu_nb );
+//fprintf( stderr, "PTR: TTU nb %d\n", ptr.i_ttu_nb );
     FLUSH( 2 );
     GETL( &ptr.i_ebyte );
     /* Parsing of tts */
@@ -612,7 +612,7 @@ fprintf( stderr, "PTR: TTU nb %d\n", ptr.i_ttu_nb );
         GETC( &ptr.p_tts[i].i_tts_nb );
         GETC( &ptr.p_tts[i].i_vts_ttn );
         GETL( &ptr.p_tts[i].i_ssector );
-fprintf( stderr, "PTR: %d %d %d\n", ptr.p_tts[i].i_ptt_nb, ptr.p_tts[i].i_tts_nb,ptr.p_tts[i].i_vts_ttn );
+//fprintf( stderr, "PTR: %d %d %d\n", ptr.p_tts[i].i_ptt_nb, ptr.p_tts[i].i_tts_nb,ptr.p_tts[i].i_vts_ttn );
     }
 
     return ptr;
@@ -686,10 +686,10 @@ static vmg_vts_atrt_t ReadVTSAttr( ifo_t* p_ifo )
     int             i, j;
     off_t           i_start = p_ifo->i_pos;
 
-fprintf( stderr, "VTS ATTR\n" );
+//fprintf( stderr, "VTS ATTR\n" );
 
     GETS( &atrt.i_vts_nb );
-fprintf( stderr, "VTS ATTR Nb: %d\n", atrt.i_vts_nb );
+//fprintf( stderr, "VTS ATTR Nb: %d\n", atrt.i_vts_nb );
     FLUSH( 2 );
     GETL( &atrt.i_ebyte );
     atrt.pi_vts_atrt_sbyte = malloc( atrt.i_vts_nb *sizeof(u32) );
@@ -894,10 +894,10 @@ static vts_ptt_srpt_t ReadVTSTitlePointer( ifo_t* p_ifo )
     int             i;
     off_t           i_start = p_ifo->i_pos;
 
-fprintf( stderr, "VTS PTR\n" );
+//fprintf( stderr, "VTS PTR\n" );
 
     GETS( &ptr.i_ttu_nb );
-fprintf( stderr, "VTS PTR nb: %d\n", ptr.i_ttu_nb );
+//fprintf( stderr, "VTS PTR nb: %d\n", ptr.i_ttu_nb );
     FLUSH( 2 );
     GETL( &ptr.i_ebyte );
     ptr.pi_ttu_sbyte = malloc( ptr.i_ttu_nb *sizeof(u32) );
@@ -925,7 +925,7 @@ fprintf( stderr, "VTS PTR nb: %d\n", ptr.i_ttu_nb );
                         ptr.pi_ttu_sbyte[i], SEEK_SET );
         GETS( &ptr.p_ttu[i].i_pgc_nb );
         GETS( &ptr.p_ttu[i].i_prg_nb );
-fprintf( stderr, "VTS %d PTR Pgc: %d Prg: %d\n", i,ptr.p_ttu[i].i_pgc_nb, ptr.p_ttu[i].i_prg_nb );
+//fprintf( stderr, "VTS %d PTR Pgc: %d Prg: %d\n", i,ptr.p_ttu[i].i_pgc_nb, ptr.p_ttu[i].i_prg_nb );
     }
 
     return ptr;
