@@ -121,22 +121,14 @@ static int VCDOpen( struct input_thread_s *p_input )
     char *                  psz_parser;
     char *                  psz_source;
     char *                  psz_next;
+    struct stat             stat_info;
     thread_vcd_data_t *     p_vcd;
     int                     i;
     input_area_t *          p_area;
     int                     i_title = 1;
     int                     i_chapter = 1;
 
-    p_vcd = malloc( sizeof(thread_vcd_data_t) );
-
-    if( p_vcd == NULL )
-    {
-        intf_ErrMsg( "vcd error: out of memory" );
-        return -1;
-    }
-
-    p_input->i_mtu = VCD_DATA_ONCE;
-    p_input->p_access_data = (void *)p_vcd;
+    
 
     /* parse the options passed in command line : */
     psz_orig = psz_parser = psz_source = strdup( p_input->psz_name );
@@ -177,10 +169,38 @@ static int VCDOpen( struct input_thread_s *p_input )
         }
         psz_source = config_GetPszVariable( INPUT_VCD_DEVICE_VAR );
     }
- 
+
+    /* test the type of file given */
+    
+    if( stat( psz_source, &stat_info ) == -1 )
+    {
+        intf_ErrMsg( "input: vcd: cannot stat() source `%s' (%s)",
+                     psz_source, strerror(errno));
+        return( -1 );
+    }
+    
+    if( !S_ISBLK(stat_info.st_mode) )
+    {
+        intf_WarnMsg( 3, "input : VCD plugin discarded"
+                         " (not a valid drive)" );
+        return -1;
+    }
+    
+    
+    p_vcd = malloc( sizeof(thread_vcd_data_t) );
+
+    if( p_vcd == NULL )
+    {
+        intf_ErrMsg( "vcd error: out of memory" );
+        return -1;
+    }
+    
+    p_input->p_access_data = (void *)p_vcd;
+    
+    p_input->i_mtu = VCD_DATA_ONCE;
+   
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    /* If we are here we can control the pace... */
     p_input->stream.b_pace_control = 1;
 
     p_input->stream.b_seekable = 1;
@@ -204,12 +224,14 @@ static int VCDOpen( struct input_thread_s *p_input )
     if( p_vcd->nb_tracks < 0 )
     {
         intf_ErrMsg( "input: vcd: was unable to count tracks" );
+        close( p_vcd->i_handle );
         free( p_vcd );
         return -1;
     }
     else if( p_vcd->nb_tracks <= 1 )
     {
         intf_ErrMsg( "input: vcd: no movie tracks found" );
+        close( p_vcd->i_handle );
         free( p_vcd );
         return -1;
     }
@@ -218,6 +240,7 @@ static int VCDOpen( struct input_thread_s *p_input )
                                          psz_source );
     if ( p_vcd->p_sectors == NULL )
     {
+        close( p_vcd->i_handle );
         free( p_vcd );
         return -1;
     }
