@@ -474,7 +474,7 @@ AC_CACHE_CHECK([if \$CC accepts -mdynamic-no-pic],
     [CFLAGS="${CFLAGS_save} -mdynamic-no-pic"
      AC_TRY_COMPILE([],,ac_cv_c_dynamic_no_pic=yes, ac_cv_c_dynamic_no_pic=no)])
 if test "x${ac_cv_c_dynamic_no_pic}" != "xno"; then
-    CFLAGS_OPTIM="${CFLAGS_OPTIM} -mdynamic-no-pic"
+    CFLAGS_builtins="${CFLAGS_OPTIM} -mdynamic-no-pic"
 fi
 
 dnl Check for Darwin plugin linking flags
