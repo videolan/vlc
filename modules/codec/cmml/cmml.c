@@ -37,7 +37,7 @@
 
 #include "xtag.h"
 
-#undef CMML_DEBUG
+#undef  CMML_DEBUG
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
@@ -50,12 +50,12 @@ struct decoder_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  OpenDecoder   ( vlc_object_t * );
-static void CloseDecoder  ( vlc_object_t * );
+static int           OpenDecoder   ( vlc_object_t * );
+static void          CloseDecoder  ( vlc_object_t * );
 
-static void DecodeBlock   ( decoder_t *, block_t ** );
+static subpicture_t *DecodeBlock   ( decoder_t *, block_t ** );
 
-static void ParseText     ( decoder_t *, block_t * );
+static void          ParseText     ( decoder_t *, block_t * );
 
 /*****************************************************************************
  * Exported prototypes
@@ -140,17 +140,32 @@ static int OpenDecoder( vlc_object_t *p_this )
  ****************************************************************************
  * This function must be fed with complete subtitles units.
  ****************************************************************************/
-static void DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
+    subpicture_t *p_spu;
+
     if( !pp_block || *pp_block == NULL )
     {
-        return;
+        return NULL;
     }
 
     ParseText( p_dec, *pp_block );
 
     block_Release( *pp_block );
     *pp_block = NULL;
+
+    /* allocate an empty subpicture to return.  the actual subpicture
+     * displaying is done in the DisplayAnchor function in intf.c (called from
+     * DisplayPendingAnchor, which in turn is called from the main RunIntf
+     * loop). */
+    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    if( !p_spu )
+    {
+        msg_Dbg( p_dec, "couldn't allocate new subpicture" );
+        return NULL;
+    }
+
+    return p_spu;
 }
 
 /*****************************************************************************

@@ -1338,6 +1338,13 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
 
             p_stream->b_force_backup = 1;
         }
+        else if( !strncmp(content_type_string, "audio/x-speex", 14) )
+        {
+            p_stream->fmt.i_cat = AUDIO_ES;
+            p_stream->fmt.i_codec = VLC_FOURCC( 's','p','x',' ' );
+
+            p_stream->b_force_backup = 1;
+        }
         else if( !strncmp(content_type_string, "video/x-theora", 14) )
         {
             p_stream->fmt.i_cat = VIDEO_ES;

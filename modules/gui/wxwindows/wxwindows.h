@@ -785,40 +785,52 @@ public:
 
 private:
     void DeleteItem( int item );
-    void ShowInfos( int item );
+    void DeleteNode( playlist_item_t *node );
 
     /* Event handlers (these functions should _not_ be virtual) */
-
-    void OnSize( wxSizeEvent &event );
 
     /* Menu Handlers */
     void OnAddFile( wxCommandEvent& event );
     void OnAddDir( wxCommandEvent& event );
     void OnAddMRL( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
-    void OnSearch( wxCommandEvent& event );
-    void OnEnDis( wxCommandEvent& event );
-    void OnInfos( wxCommandEvent& event );
-    void OnSearchTextChange( wxCommandEvent& event );
-    void OnOpen( wxCommandEvent& event );
-    void OnSave( wxCommandEvent& event );
-
-    void OnSort( wxCommandEvent& event );
-
-    void OnMenuEvent( wxCommandEvent& event );
-    void OnMenuOpen( wxMenuEvent& event );
-
-    wxMenu *ViewMenu();
-    wxMenu *SDMenu();
-
-    void OnUp( wxCommandEvent& event);
-    void OnDown( wxCommandEvent& event);
 
     void OnEnableSelection( wxCommandEvent& event );
     void OnDisableSelection( wxCommandEvent& event );
     void OnInvertSelection( wxCommandEvent& event );
     void OnDeleteSelection( wxCommandEvent& event );
     void OnSelectAll( wxCommandEvent& event );
+
+    void OnOpen( wxCommandEvent& event );
+    void OnSave( wxCommandEvent& event );
+
+    /* Search (user) */
+    void OnSearch( wxCommandEvent& event );
+    void OnSearchTextChange( wxCommandEvent& event );
+    wxTextCtrl *search_text;
+    wxButton *search_button;
+    wxTreeItemId search_current;
+
+    void OnEnDis( wxCommandEvent& event );
+
+    /* Sort */
+    int i_sort_mode;
+    void OnSort( wxCommandEvent& event );
+    int i_title_sorted;
+    int i_group_sorted;
+    int i_duration_sorted;
+
+    /* Dynamic menus */
+    void OnMenuEvent( wxCommandEvent& event );
+    void OnMenuOpen( wxMenuEvent& event );
+    wxMenu *p_view_menu;
+    wxMenu *p_sd_menu;
+    wxMenu *ViewMenu();
+    wxMenu *SDMenu();
+
+    void OnUp( wxCommandEvent& event);
+    void OnDown( wxCommandEvent& event);
+
     void OnRandom( wxCommandEvent& event );
     void OnRepeat( wxCommandEvent& event );
     void OnLoop ( wxCommandEvent& event );
@@ -827,7 +839,11 @@ private:
     void OnKeyDown( wxTreeEvent& event );
     void OnNewGroup( wxCommandEvent& event );
 
-    /* Popup functions */
+    /* Popup  */
+    wxMenu *popup_menu;
+    wxTreeItemId i_popup_item;
+    playlist_item_t *p_popup_item;
+    playlist_item_t *p_popup_parent;
     void OnPopup( wxContextMenuEvent& event );
     void OnPopupPlay( wxMenuEvent& event );
     void OnPopupSort( wxMenuEvent& event );
@@ -840,46 +856,34 @@ private:
     void UpdateNode( playlist_t *, playlist_item_t*, wxTreeItemId );
     void UpdateNodeChildren( playlist_t *, playlist_item_t*, wxTreeItemId );
     void CreateNode( playlist_t *, playlist_item_t*, wxTreeItemId );
-
-    wxTreeItemId FindItem( wxTreeItemId, playlist_item_t * );
-    wxTreeItemId FindItemByName( wxTreeItemId, wxString, wxTreeItemId, vlc_bool_t *);
-    void SetCurrentItem( wxTreeItemId );
     void UpdateTreeItem( playlist_t *, wxTreeItemId );
+    void SetCurrentItem( wxTreeItemId );
+
+    /* Search (internal) */
+    int CountItems( wxTreeItemId);
+    wxTreeItemId FindItem( wxTreeItemId, playlist_item_t * );
+    wxTreeItemId FindItemByName( wxTreeItemId, wxString,
+                                 wxTreeItemId, vlc_bool_t *);
 
     /* Custom events */
     void OnPlaylistEvent( wxCommandEvent& event );
 
-    wxTextCtrl *search_text;
-    wxButton *search_button;
     DECLARE_EVENT_TABLE();
 
-    wxMenu *popup_menu;
 
-    wxMenu *p_view_menu;
-    wxMenu *p_sd_menu;
-
-    char **pp_sds;
-
+    /* Global widgets */
     wxStatusBar *statusbar;
-
     ItemInfoDialog *iteminfo_dialog;
+
+    int i_update_counter;
 
     intf_thread_t *p_intf;
     wxTreeCtrl *treectrl;
-    int i_update_counter;
-    int i_sort_mode;
-
     int i_current_view;
+    vlc_bool_t b_changed_view;
+    char **pp_sds;
 
-    wxTreeItemId i_popup_item;
-    wxTreeItemId search_current;
-    playlist_item_t *p_popup_item;
-    playlist_item_t *p_popup_parent;
 
-    int i_title_sorted;
-    int i_author_sorted;
-    int i_group_sorted;
-    int i_duration_sorted;
 };
 
 /* ItemInfo Dialog */
@@ -923,7 +927,6 @@ private:
     wxTreeCtrl *info_tree;
     wxTreeItemId info_root;
 
-    wxCheckBox *enabled_checkbox;
 };
 
 

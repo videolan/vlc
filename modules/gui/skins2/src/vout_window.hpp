@@ -30,24 +30,18 @@ class OSGraphics;
 
 
 /// Class to handle a video output window
-class VoutWindow: public GenericWindow
+class VoutWindow: private GenericWindow
 {
     public:
         VoutWindow( intf_thread_t *pIntf, int xPos, int yPos,
                     bool dragDrop, bool playOnDrop, GenericWindow &rParent );
         virtual ~VoutWindow();
 
-        /// These methods are redefined here to make them public
+        /// Make some functions public
         //@{
-        /// Show the window
-        virtual void show() { GenericWindow::show(); }
-
-        /// Hide the window
-        virtual void hide() { GenericWindow::hide(); }
-
-        /// Move the window
-        virtual void move( int left, int top )
-            { GenericWindow::move( left, top ); }
+        using GenericWindow::show;
+        using GenericWindow::hide;
+        using GenericWindow::move;
         //@}
 
         /// Resize the window

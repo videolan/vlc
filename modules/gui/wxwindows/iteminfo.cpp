@@ -223,22 +223,6 @@ void ItemInfoDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     p_item->input.psz_uri = strdup( uri_text->GetLineText(0).mb_str() );
     playlist_ItemAddInfo( p_item,"General","Author",
                             author_text->GetLineText(0).mb_str() );
-    vlc_bool_t b_old_enabled = p_item->b_enabled;
-
-    playlist_t * p_playlist =
-          (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
-    if( p_playlist != NULL )
-    {
-        if( b_old_enabled == VLC_FALSE && enabled_checkbox->IsChecked() )
-            p_playlist->i_enabled ++;
-        else if( b_old_enabled == VLC_TRUE && !enabled_checkbox->IsChecked() )
-            p_playlist->i_enabled --;
-
-        vlc_object_release( p_playlist );
-    }
-
-    p_item->b_enabled = enabled_checkbox->IsChecked() ? VLC_TRUE : VLC_FALSE ;
     vlc_mutex_unlock( &p_item->input.lock );
     EndModal( wxID_OK );
 }

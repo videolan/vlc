@@ -67,6 +67,10 @@ static void Close( vlc_object_t * );
 #define RECONNECT_LONGTEXT N_("Will automatically attempt a re-connection " \
     "in case it was untimely closed.")
 
+#define CONTINUOUS_TEXT N_("Continuous stream")
+#define CONTINUOUS_LONGTEXT N_("Enable this option to read a file that is " \
+    "being constantly updated (for example, a JPG file on a server)")
+
 vlc_module_begin();
     set_description( _("HTTP input") );
     set_capability( "access2", 0 );
@@ -81,10 +85,13 @@ vlc_module_begin();
                 AGENT_LONGTEXT, VLC_FALSE );
     add_bool( "http-reconnect", 0, NULL, RECONNECT_TEXT,
               RECONNECT_LONGTEXT, VLC_TRUE );
+    add_bool( "http-continuous", 0, NULL, CONTINUOUS_TEXT,
+              CONTINUOUS_LONGTEXT, VLC_TRUE );
 
     add_shortcut( "http" );
     add_shortcut( "http4" );
     add_shortcut( "http6" );
+    add_shortcut( "unsv" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -124,8 +131,11 @@ struct access_sys_t
     char       *psz_icy_genre;
     char       *psz_icy_title;
 
+    int i_remaining;
+
     vlc_bool_t b_seekable;
     vlc_bool_t b_reconnect;
+    vlc_bool_t b_continuous;
     vlc_bool_t b_pace_control;
 };
 
@@ -137,6 +147,7 @@ static int Control( access_t *, int, va_list );
 /* */
 static void ParseURL( access_sys_t *, char *psz_url );
 static int  Connect( access_t *, int64_t );
+static int Request( access_t *p_access, int64_t i_tell );
 
 /*****************************************************************************
  * Open:
@@ -201,6 +212,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_icy_name = NULL;
     p_sys->psz_icy_genre = NULL;
     p_sys->psz_icy_title = NULL;
+    p_sys->i_remaining = 0;
 
     /* Parse URI */
     ParseURL( p_sys, p_access->psz_path );
@@ -269,6 +281,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->b_reconnect = var_CreateGetBool( p_access, "http-reconnect" );
+    p_sys->b_continuous = var_CreateGetBool( p_access, "http-continuous" );
 
     /* Connect */
     if( Connect( p_access, 0 ) )
@@ -420,6 +433,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
             return 0;
         }
     }
+
     if( p_sys->b_chunked )
     {
         if( p_sys->i_chunk < 0 )
@@ -454,11 +468,24 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
         }
     }
 
+    if( p_sys->b_continuous && i_len > p_sys->i_remaining )
+    {
+        /* Only ask for the remaining length */
+        int i_new_len = p_sys->i_remaining;
+        if( i_new_len == 0 )
+        {
+            Request( p_access, 0 );
+            i_read = Read( p_access, p_buffer, i_len );
+            return i_read;
+        }
+        i_len = i_new_len;
+    }
+
     if( p_sys->i_icy_meta > 0 && p_access->info.i_pos > 0 )
     {
-        int64_t i_next = p_sys->i_icy_meta - 
+        int64_t i_next = p_sys->i_icy_meta -
                                     p_access->info.i_pos % p_sys->i_icy_meta;
-        
+
         if( i_next == p_sys->i_icy_meta )
         {
             if( ReadICYMeta( p_access ) )
@@ -472,6 +499,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     }
 
     i_read = net_Read( p_access, p_sys->fd, NULL, p_buffer, i_len, VLC_FALSE );
+
     if( i_read > 0 )
     {
         p_access->info.i_pos += i_read;
@@ -489,6 +517,13 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     }
     else if( i_read == 0 )
     {
+        if( p_sys->b_continuous )
+        {
+            Request( p_access, 0 );
+            p_sys->b_continuous = VLC_FALSE;
+            i_read = Read( p_access, p_buffer, i_len );
+            p_sys->b_continuous = VLC_TRUE;
+        }
         if( p_sys->b_reconnect )
         {
             msg_Dbg( p_access, "got disconnected, trying to reconnect" );
@@ -506,6 +541,11 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
         }
 
         if( i_read == 0 ) p_access->info.b_eof = VLC_TRUE;
+    }
+
+    if( p_sys->b_continuous )
+    {
+        p_sys->i_remaining -= i_read;
     }
 
     return i_read;
@@ -760,6 +800,14 @@ static int Connect( access_t *p_access, int64_t i_tell )
         return VLC_EGENERIC;
     }
 
+    return Request( p_access,i_tell );
+}
+
+
+static int Request( access_t *p_access, int64_t i_tell )
+{
+    access_sys_t   *p_sys = p_access->p_sys;
+    char           *psz;
     if( p_sys->b_proxy )
     {
         if( p_sys->url.psz_path )
@@ -792,7 +840,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
                         p_sys->url.i_port );
         }
         else
-        {        
+        {
             net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                         "GET %s HTTP/1.%d\r\nHost: %s\r\n",
                         psz_path, p_sys->i_version, p_sys->url.psz_host );
@@ -807,6 +855,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
         net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                     "Range: bytes="I64Fd"-\r\n", i_tell );
     }
+
     /* Authentification */
     if( p_sys->psz_user && *p_sys->psz_user )
     {
@@ -827,7 +876,17 @@ static int Connect( access_t *p_access, int64_t i_tell )
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "Icy-MetaData: 1\r\n" );
 
 
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "Connection: Close\r\n");
+    if( p_sys->b_continuous && p_sys->i_version == 1 )
+    {
+        net_Printf( VLC_OBJECT( p_access ), p_sys->fd, NULL,
+                    "Connection: keep-alive\r\n" );
+    }
+    else
+    {
+        net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+                    "Connection: Close\r\n");
+        p_sys->b_continuous = VLC_FALSE;
+    }
 
     if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "\r\n" ) < 0 )
     {
@@ -907,8 +966,17 @@ static int Connect( access_t *p_access, int64_t i_tell )
 
         if( !strcasecmp( psz, "Content-Length" ) )
         {
-            p_access->info.i_size = i_tell + atoll( p );
-            msg_Dbg( p_access, "stream size="I64Fd, p_access->info.i_size );
+            if( p_sys->b_continuous )
+            {
+                p_access->info.i_size = -1;
+                msg_Dbg( p_access, "this frame size="I64Fd, atoll(p ) );
+                p_sys->i_remaining = atoll( p );
+            }
+            else
+            {
+                p_access->info.i_size = i_tell + atoll( p );
+                msg_Dbg( p_access, "stream size="I64Fd, p_access->info.i_size );
+            }
         }
         else if( !strcasecmp( psz, "Location" ) )
         {
@@ -924,7 +992,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
         else if( !strcasecmp( psz, "Pragma" ) )
         {
             if( !strcasecmp( psz, "Pragma: features" ) )
-            	p_sys->b_mms = VLC_TRUE;
+                p_sys->b_mms = VLC_TRUE;
             if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
             p_sys->psz_pragma = strdup( p );
             msg_Dbg( p_access, "Pragma: %s", p_sys->psz_pragma );
@@ -935,11 +1003,12 @@ static int Connect( access_t *p_access, int64_t i_tell )
             if( !strncasecmp( p, "Icecast", 7 ) ||
                 !strncasecmp( p, "Nanocaster", 10 ) )
             {
-                /* Remember if this is Icecast 
-                 * we need to force mp3 in some cases without breaking autodetection */
+                /* Remember if this is Icecast
+                 * we need to force mp3 in some cases without breaking
+                 *  autodetection */
 
-                /* Let live365 streams (nanocaster) piggyback on the icecast routine. 
-                 * They look very similar */
+                /* Let live 65 streams (nanocaster) piggyback on the icecast
+                 * routine. They look very similar */
 
                 p_sys->b_reconnect = VLC_TRUE;
                 p_sys->b_pace_control = VLC_FALSE;

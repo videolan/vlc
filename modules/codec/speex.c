@@ -463,8 +463,8 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
             return NULL;
         }
 
-        i_ret = speex_decode( p_sys->p_state, &p_sys->bits,
-                              (int16_t *)p_aout_buffer->p_buffer );
+        i_ret = speex_decode_int( p_sys->p_state, &p_sys->bits,
+                                  (int16_t *)p_aout_buffer->p_buffer );
         if( i_ret == -1 )
         {
             /* End of stream */
@@ -483,8 +483,9 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
         }
 
         if( p_sys->p_header->nb_channels == 2 )
-            speex_decode_stereo( (int16_t *)p_aout_buffer->p_buffer,
-                                 p_sys->p_header->frame_size, &p_sys->stereo );
+            speex_decode_stereo_int( (int16_t *)p_aout_buffer->p_buffer,
+                                     p_sys->p_header->frame_size,
+                                     &p_sys->stereo );
 
         /* Date management */
         p_aout_buffer->start_date = aout_DateGet( &p_sys->end_date );
@@ -744,15 +745,15 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
 
         /* Encode current frame */
         if( p_enc->fmt_in.audio.i_channels == 2 )
-            speex_encode_stereo( p_samples, p_sys->i_frame_length,
-                                 &p_sys->bits );
+            speex_encode_stereo_int( p_samples, p_sys->i_frame_length,
+                                     &p_sys->bits );
 
 #if 0
         if( p_sys->preprocess )
             speex_preprocess( p_sys->preprocess, p_samples, NULL );
 #endif
 
-        speex_encode( p_sys->p_state, p_samples, &p_sys->bits );
+        speex_encode_int( p_sys->p_state, p_samples, &p_sys->bits );
 
         p_buffer += p_sys->i_frame_size;
         p_sys->i_samples_delay -= p_sys->i_frame_length;

@@ -65,6 +65,7 @@ struct demux_sys_t
 
     vlc_bool_t      b_still;
     mtime_t         i_still_end;
+    mtime_t         i_still_length;
 
     mtime_t         i_time;
     mtime_t         i_frame_length;
@@ -75,7 +76,7 @@ struct demux_sys_t
 };
 
 /*****************************************************************************
- * Peek: Helper function to peek data with incremental size. 
+ * Peek: Helper function to peek data with incremental size.
  * \return VLC_FALSE if peek no more data, VLC_TRUE otherwise.
  *****************************************************************************/
 static vlc_bool_t Peek( demux_t *p_demux, vlc_bool_t b_first )
@@ -277,7 +278,7 @@ static int SendBlock( demux_t *p_demux, int i )
 
     if( p_sys->b_still )
     {
-        p_sys->i_still_end = mdate() + I64C(5000000);
+        p_sys->i_still_end = mdate() + p_sys->i_still_length;
     }
 
     return 1;
@@ -327,6 +328,11 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
+
+    var_Create( p_demux, "mjpeg-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "mjpeg-fps", &val );
+    p_sys->i_frame_length = 0;
+
     /* Check for jpeg file extension */
     p_sys->b_still = VLC_FALSE;
     p_sys->i_still_end = 0;
@@ -335,12 +341,17 @@ static int Open( vlc_object_t * p_this )
                      !strcasecmp( psz_ext, ".jpg" ) ) )
     {
         p_sys->b_still = VLC_TRUE;
+        if( val.f_float)
+        {
+            p_sys->i_still_length =1000000.0 / val.f_float;
+        }
+        else
+        {
+            /* Defaults to 1fps */
+            p_sys->i_still_length = 1000000;
+        }
     }
-
-    var_Create( p_demux, "mjpeg-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "mjpeg-fps", &val );
-    p_sys->i_frame_length = 0;
-    if( val.f_float )
+    else if ( val.f_float )
     {
         p_sys->i_frame_length = 1000000.0 / val.f_float;
     }
@@ -373,7 +384,7 @@ static int MjpgDemux( demux_t *p_demux )
     }
     else if( p_sys->b_still && p_sys->i_still_end )
     {
-        msleep( 40000 );
+        msleep( 400 );
         return 1;
     }
 
