@@ -2,7 +2,7 @@
  * playlist.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: playlist.cpp,v 1.2 2004/01/04 22:38:49 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -20,6 +20,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#include <vlc/vlc.h>
 
 #if defined(HAVE_ICONV)
 #include <iconv.h>

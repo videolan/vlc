@@ -2,7 +2,7 @@
  * playlist.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: playlist.hpp,v 1.2 2004/01/04 22:38:49 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -27,6 +27,10 @@
 
 #include "../utils/var_list.hpp"
 
+#ifndef iconv_t
+#  define iconv_t libiconv_t
+   typedef void* iconv_t;
+#endif
 
 /// Variable for VLC playlist
 class Playlist: public VarList
