@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.37 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: ts.c,v 1.38 2003/11/22 16:48:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -664,7 +664,7 @@ static int Mux( sout_mux_t *p_mux )
                 sout_input_t *p_input = p_mux->pp_inputs[i];
                 ts_stream_t *p_stream = (ts_stream_t*)p_input->p_sys;
 
-                if( p_stream->i_pes_length <= p_sys->i_caching_delay ||
+                if( ( p_stream == p_pcr_stream && p_stream->i_pes_length <= p_sys->i_caching_delay ) ||
                     p_stream->i_pes_dts + p_stream->i_pes_length < p_pcr_stream->i_pes_dts + p_pcr_stream->i_pes_length )
                 {
                     /* Need more data */
@@ -685,6 +685,12 @@ static int Mux( sout_mux_t *p_mux )
                     b_ok = VLC_FALSE;
 
                     p_data = sout_FifoGet( p_input->p_fifo );
+                    if( p_input->p_fifo->i_depth > 0 )
+                    {
+                        sout_buffer_t *p_next = sout_FifoShow( p_input->p_fifo );
+
+                        p_data->i_length = p_next->i_dts - p_data->i_dts;
+                    }
 
                     if( ( p_pcr_stream->i_pes_dts > 0 && p_data->i_dts - 2000000 > p_pcr_stream->i_pes_dts + p_pcr_stream->i_pes_length ) ||
                         p_data->i_dts < p_stream->i_pes_dts ||
