@@ -676,8 +676,11 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
 static void AllocateAllPlugins( vlc_object_t *p_this )
 {
     /* Yes, there are two NULLs because we replace one with "plugin-path". */
-    char *          path[] = { "modules", PLUGIN_PATH, "plugins", NULL,
-                               NULL };
+#ifdef WIN32
+    char *          path[] = { "modules", "", "plugins", 0, 0 };
+#else
+    char *          path[] = { "modules", PLUGIN_PATH, "plugins", 0, 0 };
+#endif
 
     char **         ppsz_path = path;
     char *          psz_fullpath;
@@ -688,12 +691,14 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 
     for( ; *ppsz_path != NULL ; ppsz_path++ )
     {
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN ) \
-     || ( defined( WIN32 ) && !defined( UNDER_CE ) )
+        if( !(*ppsz_path)[0] ) continue;
+
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN ) || defined( WIN32 )
 
         /* Handle relative as well as absolute paths */
 #ifdef WIN32
-        if( !(*ppsz_path)[0] || (*ppsz_path)[1] != ':' )
+        if( (*ppsz_path)[0] != '\\' && (*ppsz_path)[0] != '/' &&
+            (*ppsz_path)[1] != ':' )
 #else
         if( (*ppsz_path)[0] != '/' )
 #endif
@@ -742,11 +747,10 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
 {
 #if defined( UNDER_CE ) || defined( _MSC_VER )
 #ifdef UNDER_CE
-    wchar_t psz_path[MAX_PATH + 256];
+    wchar_t psz_wpath[MAX_PATH + 256];
     wchar_t psz_wdir[MAX_PATH];
-#else
-    char psz_path[MAX_PATH + 256];
 #endif
+    char psz_path[MAX_PATH + 256];
     WIN32_FIND_DATA finddata;
     HANDLE handle;
     unsigned int rc;
@@ -770,17 +774,20 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
     if( !(rc & FILE_ATTRIBUTE_DIRECTORY) ) return; /* Not a directory */
 
     /* Parse all files in the directory */
-    swprintf( psz_path, L"%s\\*.*", psz_dir );
-
+    swprintf( psz_wpath, L"%ls\\*", psz_wdir );
 #else
     rc = GetFileAttributes( psz_dir );
     if( !(rc & FILE_ATTRIBUTE_DIRECTORY) ) return; /* Not a directory */
-
-    /* Parse all files in the directory */
-    sprintf( psz_path, "%s\\*.*", psz_dir );
 #endif
 
+    /* Parse all files in the directory */
+    sprintf( psz_path, "%s\\*", psz_dir );
+
+#ifdef UNDER_CE
+    handle = FindFirstFile( psz_wpath, &finddata );
+#else
     handle = FindFirstFile( psz_path, &finddata );
+#endif
     if( handle == INVALID_HANDLE_VALUE )
     {
         /* Empty directory */
@@ -792,40 +799,35 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
     {
 #ifdef UNDER_CE
         unsigned int i_len = wcslen( finddata.cFileName );
-        swprintf( psz_path, L"%s\\%s", psz_dir, finddata.cFileName );
+        swprintf( psz_wpath, L"%ls\\%ls", psz_wdir, finddata.cFileName );
+        sprintf( psz_path, "%s\\%ls", psz_dir, finddata.cFileName );
 #else
         unsigned int i_len = strlen( finddata.cFileName );
+        sprintf( psz_path, "%s\\%s", psz_dir, finddata.cFileName );
+#endif
+
         /* Skip ".", ".." and anything starting with "." */
         if( !*finddata.cFileName || *finddata.cFileName == '.' )
         {
             if( !FindNextFile( handle, &finddata ) ) break;
             continue;
         }
-        sprintf( psz_path, "%s\\%s", psz_dir, finddata.cFileName );
-#endif
 
+#ifdef UNDER_CE
+        if( GetFileAttributes( psz_wpath ) & FILE_ATTRIBUTE_DIRECTORY )
+#else
         if( GetFileAttributes( psz_path ) & FILE_ATTRIBUTE_DIRECTORY )
+#endif
         {
             AllocatePluginDir( p_this, psz_path, i_maxdepth - 1 );
         }
         else if( i_len > strlen( LIBEXT )
-#ifdef UNDER_CE
-                )
-#else
                   /* We only load files ending with LIBEXT */
                   && !strncasecmp( psz_path + strlen( psz_path)
                                    - strlen( LIBEXT ),
                                    LIBEXT, strlen( LIBEXT ) ) )
-#endif
         {
-#ifdef UNDER_CE
-            char psz_filename[MAX_PATH];
-            WideCharToMultiByte( CP_ACP, WC_DEFAULTCHAR, psz_path, -1,
-                                 psz_filename, MAX_PATH, NULL, NULL );
-            psz_file = psz_filename;
-#else
             psz_file = psz_path;
-#endif
 
             AllocatePluginFile( p_this, psz_file, 0, 0 );
         }
@@ -1266,12 +1268,21 @@ static int LoadModule( vlc_object_t *p_this, char *psz_file,
     }
 
 #elif defined(HAVE_DL_WINDOWS)
+#ifdef UNDER_CE
+    {
+        wchar_t psz_wfile[MAX_PATH];
+        MultiByteToWideChar( CP_ACP, 0, psz_file, -1, psz_wfile, MAX_PATH );
+        handle = LoadLibrary( psz_wfile );
+    }
+#else
     handle = LoadLibrary( psz_file );
+#endif
     if( handle == NULL )
     {
         char *psz_err = GetWindowsError();
         msg_Warn( p_this, "cannot load module `%s' (%s)", psz_file, psz_err );
         free( psz_err );
+        return -1;
     }
 
 #elif defined(HAVE_DL_DLOPEN) && defined(RTLD_NOW)
@@ -1528,13 +1539,17 @@ static void CacheLoad( vlc_object_t *p_this )
     if( p_this->p_libvlc->p_module_bank->b_cache_delete )
     {
         msg_Dbg( p_this, "removing plugins cache file %s", psz_filename );
+#if !defined( UNDER_CE )
         unlink( psz_filename );
+#else
+        msg_Err( p_this, "FIXME, unlink not implemented" );
+#endif
         return;
     }
 
     msg_Dbg( p_this, "loading plugins cache file %s", psz_filename );
 
-    file = fopen( psz_filename, "r" );
+    file = fopen( psz_filename, "rb" );
     if( !file )
     {
         msg_Warn( p_this, "could not open plugins cache file %s for reading",
@@ -1808,7 +1823,7 @@ static void CacheSave( vlc_object_t *p_this )
 
     msg_Dbg( p_this, "saving plugins cache file %s", psz_filename );
 
-    file = fopen( psz_filename, "w" );
+    file = fopen( psz_filename, "wb" );
     if( !file )
     {
         msg_Warn( p_this, "could not open plugins cache file %s for writing",

@@ -917,10 +917,23 @@ int config_CreateDir( vlc_object_t *p_this, char *psz_dirname )
 #if defined( UNDER_CE )
     {
         wchar_t psz_new[ MAX_PATH ];
-        MultiByteToWideChar( CP_ACP, 0, psz_dirname, -1, psz_new, MAX_PATH );
+        char psz_mod[MAX_PATH];
+        int i = 0;
+
+        /* Convert '/' into '\' */
+        while( *psz_dirname )
+        {
+            if( *psz_dirname == '/' ) psz_mod[i] = '\\';
+            else psz_mod[i] = *psz_dirname;
+            psz_dirname++;
+            i++;
+        }
+        psz_mod[i] = 0;
+
+        MultiByteToWideChar( CP_ACP, 0, psz_mod, -1, psz_new, MAX_PATH );
         if( CreateDirectory( psz_new, NULL ) )
         {
-            msg_Err( p_this, "could not create %s", psz_dirname );
+            msg_Err( p_this, "could not create %s", psz_mod );
         }
     }
 
@@ -1543,7 +1556,7 @@ char *config_GetHomeDir( void )
     struct passwd *p_pw = NULL;
 #endif
 
-#if defined(WIN32) || defined(UNDER_CE)
+#if defined(WIN32) && !defined(UNDER_CE)
     typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
                                                LPSTR );
 #ifndef CSIDL_FLAG_CREATE
@@ -1567,10 +1580,7 @@ char *config_GetHomeDir( void )
         if ( SHGetFolderPath != NULL )
         {
             p_homedir = (char *)malloc( MAX_PATH );
-            if( !p_homedir )
-            {
-                return NULL;
-            }
+            if( !p_homedir ) return NULL;
 
             /* get the "Application Data" folder for the current user */
             if( S_OK == SHGetFolderPath( NULL,
@@ -1582,8 +1592,23 @@ char *config_GetHomeDir( void )
                 return p_homedir;
             }
             free( p_homedir );
+            p_homedir = NULL;
         }
         FreeLibrary( shfolder_dll );
+    }
+
+#elif defined(UNDER_CE)
+
+    wchar_t p_whomedir[MAX_PATH];
+
+    /* get the "Application Data" folder for the current user */
+    if( SHGetSpecialFolderPath( NULL, p_whomedir, CSIDL_APPDATA, 1 ) )
+    {
+        p_homedir = (char *)malloc( MAX_PATH );
+        if( !p_homedir ) return NULL;
+
+        sprintf( p_homedir, "%ls", p_whomedir );
+        return p_homedir;
     }
 #endif
 

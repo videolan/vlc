@@ -47,13 +47,18 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     WSADATA Data;
 
     /* Get our full path */
-#if !defined( UNDER_CE )
     if( ppsz_argv[0] )
     {
         char psz_path[MAX_PATH];
         char *psz_vlc;
 
+#if defined( UNDER_CE )
+        strcpy( psz_path, ppsz_argv[0] );
+        psz_vlc = strrchr( psz_path, '\\' );
+        if( psz_vlc ) psz_vlc++;
+#else
         GetFullPathName( ppsz_argv[0], MAX_PATH, psz_path, &psz_vlc );
+#endif
 
         if( psz_vlc > psz_path && psz_vlc[-1] == '\\' )
         {
@@ -66,7 +71,6 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
         }
     }
     else
-#endif
     {
         p_this->p_libvlc->psz_vlcpath = strdup( "" );
     }

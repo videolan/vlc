@@ -87,6 +87,7 @@ char *vlc_strndup( const char *string, size_t n )
 int vlc_strcasecmp( const char *s1, const char *s2 )
 {
     int i_delta = 0;
+    if( !s1 || !s2 ) return  -1;
 
     while( !i_delta && *s1 && *s2 )
     {
@@ -94,16 +95,18 @@ int vlc_strcasecmp( const char *s1, const char *s2 )
 
         if( *s1 >= 'A' && *s1 <= 'Z' )
         {
-            i_delta -= 'A' - 'a';
+            i_delta -= ('A' - 'a');
         }
 
         if( *s2 >= 'A' && *s2 <= 'Z' )
         {
-            i_delta += 'A' - 'a';
+            i_delta += ('A' - 'a');
         }
 
         s1++; s2++;
     }
+
+    if( !i_delta && (*s1 || *s2) ) i_delta = *s1 ? 1 : -1;
 
     return i_delta;
 }
@@ -116,8 +119,9 @@ int vlc_strcasecmp( const char *s1, const char *s2 )
 int vlc_strncasecmp( const char *s1, const char *s2, size_t n )
 {
     int i_delta = 0;
+    if( !s1 || !s2 ) return  -1;
 
-    while( n-- && !i_delta && *s1 )
+    while( n-- && !i_delta && *s1 && *s2 )
     {
         i_delta = *s1 - *s2;
 
@@ -133,6 +137,8 @@ int vlc_strncasecmp( const char *s1, const char *s2, size_t n )
 
         s1++; s2++;
     }
+
+    if( !n && !i_delta && (*s1 || *s2) ) i_delta = *s1 ? 1 : -1;
 
     return i_delta;
 }
