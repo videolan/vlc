@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.38 2003/11/22 12:33:04 sigmunau Exp $
+ * $Id: sap.c,v 1.39 2003/11/23 18:31:54 alexis Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -87,9 +87,9 @@
 #define SAP_ADDR_TEXT N_("SAP multicast address")
 #define SAP_ADDR_LONGTEXT N_("SAP multicast address")
 #define SAP_IPV4_TEXT N_("IPv4-SAP listening")
-#define SAP_IPV4_LONGTEXT N_("Set this if you want SAP to listen for IPv4 announces")
+#define SAP_IPV4_LONGTEXT N_("Set this if you want the SAP module to listen to IPv4 announces")
 #define SAP_IPV6_TEXT N_("IPv6-SAP listening")
-#define SAP_IPV6_LONGTEXT N_("Set this if you want SAP to listen for IPv6 announces")
+#define SAP_IPV6_LONGTEXT N_("Set this if you want the SAP module to listen to IPv6 announces")
 #define SAP_SCOPE_TEXT N_("IPv6 SAP scope")
 #define SAP_SCOPE_LONGTEXT N_("Sets the scope for IPv6 announces (default is 8)")
 

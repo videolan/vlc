@@ -2,7 +2,7 @@
  * logo.c : logo video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: logo.c,v 1.4 2003/10/15 22:49:48 gbazin Exp $
+ * $Id: logo.c,v 1.5 2003/11/23 18:31:54 alexis Exp $
  *
  * Authors: Simon Latapie <garf@videolan.org>
  *
@@ -56,7 +56,7 @@ static int MouseEvent( vlc_object_t *, char const *,
  *****************************************************************************/
 
 #define FILE_TEXT N_("Logo File")
-#define FILE_LONGTEXT N_("It must be a PNG in RGBA 8bits (for now)")
+#define FILE_LONGTEXT N_("The file must in PNG RGBA 8bits format (for now)")
 #define POSX_TEXT N_("x postion of the logo")
 #define POSX_LONGTEXT N_("You can move the logo by left-clicking on it" )
 #define POSY_TEXT N_("y position of the logo")

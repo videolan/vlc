@@ -2,7 +2,7 @@
  * pvr.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pvr.c,v 1.9 2003/10/24 09:32:32 bigben Exp $
+ * $Id: pvr.c,v 1.10 2003/11/23 18:31:54 alexis Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -74,7 +74,7 @@ static ssize_t Read   ( input_thread_t *, byte_t *, size_t );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Hauppauge PVR cards input") );
+    set_description( _("input for encoding cards supported by the ivtv drivers") );
     set_capability( "access", 0 );
     add_shortcut( "pvr" );
     set_callbacks( Open, Close );

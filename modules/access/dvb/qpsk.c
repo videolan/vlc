@@ -44,10 +44,10 @@ void E_(Close)   ( vlc_object_t * );
 #define ADAPTER_TEXT N_("adapter card to tune")
 #define ADAPTER_LONGTEXT N_("adapter cards have a device file in directory named /dev/dvb/adapter[n] with n>=0")
 
-#define DEVICE_TEXT N_("device nummer to use on adapter")
+#define DEVICE_TEXT N_("device number to use on adapter")
 #define DEVICE_LONGTEXT ""
 
-#define FREQ_TEXT N_("satellite default transponder frequency in KHz")
+#define FREQ_TEXT N_("satellite default transponder frequency in kHz")
 #define FREQ_LONGTEXT ""
 
 #define POL_TEXT N_("satellite default transponder polarization")
@@ -56,19 +56,19 @@ void E_(Close)   ( vlc_object_t * );
 #define FEC_TEXT N_("satellite default transponder FEC")
 #define FEC_LONGTEXT N_("FEC=Forward Error Correction mode")
 
-#define SRATE_TEXT N_("satellite default transponder symbol rate in KHz")
+#define SRATE_TEXT N_("satellite default transponder symbol rate in kHz")
 #define SRATE_LONGTEXT ""
 
 #define DISEQC_TEXT N_("use diseqc with antenna")
 #define DISEQC_LONGTEXT ""
 
-#define LNB_LOF1_TEXT N_("antenna lnb_lof1 (KHz)")
+#define LNB_LOF1_TEXT N_("antenna lnb_lof1 (kHz)")
 #define LNB_LOF1_LONGTEXT ""
 
-#define LNB_LOF2_TEXT N_("antenna lnb_lof2 (KHz)")
+#define LNB_LOF2_TEXT N_("antenna lnb_lof2 (kHz)")
 #define LNB_LOF2_LONGTEXT ""
 
-#define LNB_SLOF_TEXT N_("antenna lnb_slof (KHz)")
+#define LNB_SLOF_TEXT N_("antenna lnb_slof (kHz)")
 #define LNB_SLOF_LONGTEXT ""
 
 #define PROBE_TEXT	N_("probe the dvb card for capabilities (default disabled)")

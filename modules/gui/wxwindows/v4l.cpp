@@ -2,7 +2,7 @@
  * v4l.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: v4l.cpp,v 1.2 2003/08/20 19:17:29 adn Exp $
+ * $Id: v4l.cpp,v 1.3 2003/11/23 18:31:54 alexis Exp $
  *
  * Authors: Mohammed Adnène Trojette <adn@via.ecp.fr>
  *
@@ -303,7 +303,7 @@ wxPanel *V4LDialog::CommonPanel( wxWindow* parent )
                                          Frequency_Event,
                                          wxU(_("Frequency")) );
     frequency = new wxSpinCtrl( common_subpanel, Frequency_Event );
-    frequency->SetToolTip( wxU(_("The frequency in KHz" )) );
+    frequency->SetToolTip( wxU(_("The frequency in kHz" )) );
 
     subpanel_sizer->Add( frequency_checkbox, 0, wxALIGN_LEFT |
                          wxALIGN_CENTER_VERTICAL );

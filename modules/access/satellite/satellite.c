@@ -44,7 +44,7 @@ void E_(Close)   ( vlc_object_t * );
 #define TUNER_TEXT N_("Tuner number")
 #define TUNER_LONGTEXT ""
 
-#define FREQ_TEXT N_("Satellite default transponder frequency (KHz)")
+#define FREQ_TEXT N_("Satellite default transponder frequency (kHz)")
 #define FREQ_LONGTEXT ""
 
 #define POL_TEXT N_("Satellite default transponder polarization")
@@ -53,19 +53,19 @@ void E_(Close)   ( vlc_object_t * );
 #define FEC_TEXT N_("Satellite default transponder FEC")
 #define FEC_LONGTEXT ""
 
-#define SRATE_TEXT N_("Satellite default transponder symbol rate (KHz)")
+#define SRATE_TEXT N_("Satellite default transponder symbol rate (kHz)")
 #define SRATE_LONGTEXT ""
 
 #define DISEQC_TEXT N_("Use diseqc with antenna")
 #define DISEQC_LONGTEXT ""
 
-#define LNB_LOF1_TEXT N_("Antenna lnb_lof1 (KHz)")
+#define LNB_LOF1_TEXT N_("Antenna lnb_lof1 (kHz)")
 #define LNB_LOF1_LONGTEXT ""
 
-#define LNB_LOF2_TEXT N_("Antenna lnb_lof2 (KHz)")
+#define LNB_LOF2_TEXT N_("Antenna lnb_lof2 (kHz)")
 #define LNB_LOF2_LONGTEXT ""
 
-#define LNB_SLOF_TEXT N_("Antenna lnb_slof (KHz)")
+#define LNB_SLOF_TEXT N_("Antenna lnb_slof (kHz)")
 #define LNB_SLOF_LONGTEXT ""
 
 vlc_module_begin();

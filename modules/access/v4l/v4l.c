@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.30 2003/11/15 23:21:35 fenrir Exp $
+ * $Id: v4l.c,v 1.31 2003/11/23 18:31:54 alexis Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -92,7 +92,7 @@ static int  Demux      ( input_thread_t * );
 #define ADEV_TEXT N_("Audio device name")
 #define ADEV_LONGTEXT N_( \
     "Specify the name of the audio device that will be used. " \
-    "If you don't specify anything, no video device will be used.")
+    "If you don't specify anything, no audio device will be used.")
 
 vlc_module_begin();
     set_description( _("Video4Linux input") );

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.101 2003/10/29 01:33:27 gbazin Exp $
+ * $Id: libvlc.c,v 1.102 2003/11/23 18:31:55 alexis Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1475,7 +1475,7 @@ static void Version( void )
       _("This program comes with NO WARRANTY, to the extent permitted by "
         "law.\nYou may redistribute it under the terms of the GNU General "
         "Public License;\nsee the file named COPYING for details.\n"
-        "Written by the VideoLAN team at Ecole Centrale, Paris.\n") );
+        "Written by the VideoLAN team; see AUTHORS file.\n") );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
     fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
