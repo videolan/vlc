@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: cdda.c,v 1.15 2003/12/22 02:24:51 sam Exp $
+ * $Id: cdda.c,v 1.16 2004/01/25 14:42:05 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -117,12 +117,12 @@ vlc_module_begin();
     add_category_hint( N_("CDX"), NULL, VLC_TRUE );
 
     add_integer ( MODULE_STRING "-debug", 0, E_(DebugCB),
-                  N_("set debug mask for additional debugging."),
+                  N_("If nonzero, this gives additional debug information."),
                   DEBUG_LONGTEXT, VLC_TRUE );
 
     add_integer( MODULE_STRING "-caching",
                  DEFAULT_PTS_DELAY / 1000, NULL,
-                 N_("Caching value in ms"),
+                 N_("Caching value in microseconds"),
                  CACHING_LONGTEXT, VLC_TRUE );
 
     add_string( MODULE_STRING "-author-format",
