@@ -27,8 +27,8 @@ ARCH=MMX
 #ARCH=SPARC
 
 # Decoder choice - ?? old decoder will be removed soon
-#DECODER=old
-DECODER=new
+DECODER=old
+#DECODER=new
 # !!! don't forget to run this command after changing decoder type !!!
 # touch input/input.c input/input_ctrl.c include/vlc.h include/video_decoder.h
 
@@ -90,7 +90,7 @@ CCFLAGS += -D_REENTRANT
 CCFLAGS += -D_GNU_SOURCE
 
 # Optimizations : don't compile debug versions with them
-#CCFLAGS += -g
+CCFLAGS += -g
 CCFLAGS += -O6
 CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 CCFLAGS += -fomit-frame-pointer

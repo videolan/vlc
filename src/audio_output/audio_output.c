@@ -12,7 +12,6 @@
  *     à chaque boucle
  *   = Utiliser des tables pour les gros calculs
  * - Faire une structure différente pour intf/adec fifo
- * - Rajouter des vlc_cond_signal ?
  *
  */
 
@@ -158,7 +157,7 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
      * AOUT_BUFFER_DURATION is given in microseconds, the output rate is given
      * in Hz, that's why we need to divide by 10^6 microseconds (1 second) */
     p_aout->l_units = (long)( ((s64)p_aout->dsp.l_rate * AOUT_BUFFER_DURATION) / 1000000 );
-    p_aout->l_msleep = ((s64)p_aout->l_units * 1000000) / (s64)p_aout->dsp.l_rate;
+    p_aout->l_msleep = (long)( ((s64)p_aout->l_units * 1000000) / (s64)p_aout->dsp.l_rate );
 
     /* Make aout_thread point to the right thread function, and compute the
      * byte size of the audio output buffer */
@@ -465,134 +464,52 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
         }
     }
 
-#if 0
-    if ( aout_date < p_fifo->date[p_fifo->l_start_frame] - 100000 )
-    {
-        fprintf( stderr, "-" );
-	p_fifo->l_dr = 0;
-        vlc_mutex_unlock( &p_fifo->data_lock );
-        return( -1 );
-    }
-#endif
-
     /* We are looking for the next dated frame */
     while ( 1 )
     {
-    while ( p_fifo->l_next_frame != p_fifo->l_end_frame )
-    {
-        if ( p_fifo->date[p_fifo->l_next_frame] != LAST_MDATE )
+        while ( p_fifo->l_next_frame != p_fifo->l_end_frame )
         {
-#if 0
-		if ( p_fifo->date[p_fifo->l_start_frame] >= p_fifo->date[p_fifo->l_next_frame] )
-		{
-			fprintf( stderr, "aout debug: %lli >= %lli\n", p_fifo->date[p_fifo->l_start_frame], p_fifo->date[p_fifo->l_next_frame] );
-			p_fifo->date[p_fifo->l_start_frame] = p_fifo->date[p_fifo->l_next_frame] - ((1000000 * ((mtime_t)(p_fifo->l_frame_size * ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE))) >> p_fifo->b_stereo) / ((mtime_t)p_fifo->l_rate));
-			
-		}
-		else if ( (p_fifo->date[p_fifo->l_next_frame] - p_fifo->date[p_fifo->l_start_frame]) > 1000000 )
-		{
-			fprintf( stderr, "aout debug: (%lli - %lli) > 1000000\n", p_fifo->date[p_fifo->l_next_frame], p_fifo->date[p_fifo->l_start_frame] );
-			p_fifo->date[p_fifo->l_start_frame] = p_fifo->date[p_fifo->l_next_frame] - ((1000000 * ((mtime_t)(p_fifo->l_frame_size * ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE))) >> p_fifo->b_stereo) / ((mtime_t)p_fifo->l_rate));
-		}
-#endif
-#if 0
-            if ( aout_date < p_fifo->date[p_fifo->l_next_frame] + 100000 )
+            if ( p_fifo->date[p_fifo->l_next_frame] != LAST_MDATE )
             {
-#endif
                 p_fifo->b_next_frame = 1;
                 break;
-#if 0
             }
             else
             {
-                fprintf( stderr, "+" );
-//                p_fifo->b_next_frame = 1;
-//                break;
-                p_fifo->l_start_frame = p_fifo->l_next_frame;
-                p_fifo->l_unit = p_fifo->l_start_frame * (p_fifo->l_frame_size >> p_fifo->b_stereo);
-                p_fifo->l_dr = 0;
+                p_fifo->l_next_frame = (p_fifo->l_next_frame + 1) & AOUT_FIFO_SIZE;
             }
-#endif
         }
-        p_fifo->l_next_frame = (p_fifo->l_next_frame + 1) & AOUT_FIFO_SIZE;
-    }
-        if ( p_fifo->l_next_frame == p_fifo->l_end_frame )
-	{
-        if ( (((p_fifo->l_end_frame + 1) - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) == 0 )
+
+        if ( p_fifo->b_next_frame == 1 )
         {
-        fprintf( stderr, "aout debug: synkro suxx rocks;\n" );
-            p_fifo->l_start_frame = 0;
-            p_fifo->b_start_frame = 0;
-            /* p_fifo->l_next_frame = 0; */
-            /* p_fifo->b_next_frame = 0; */
-            p_fifo->l_end_frame = 0;
-        vlc_mutex_unlock( &p_fifo->data_lock );
-        return( -1 );
-	}
-	while ( p_fifo->l_next_frame == p_fifo->l_end_frame )
-	{
-		vlc_cond_wait(&p_fifo->data_wait, &p_fifo->data_lock);
-	}
-	}
-	else
-	{
-		break;
-	}
-    }
-#if 0
-    if ( p_fifo->l_next_frame == p_fifo->l_end_frame )
-    {
-        fprintf( stderr, "aout debug: synkro suxx rocks (%li);\n", p_fifo->l_dr );
-        if ( (((p_fifo->l_end_frame + 1) - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) == 0 )
-        {
-            p_fifo->l_start_frame = 0;
-            p_fifo->b_start_frame = 0;
-            /* p_fifo->l_next_frame = 0; */
-            /* p_fifo->b_next_frame = 0; */
-            p_fifo->l_end_frame = 0;
+            break;
         }
-        vlc_mutex_unlock( &p_fifo->data_lock );
-        return( -1 );
+        else
+        {
+            if ( (((p_fifo->l_end_frame + 1) - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) == 0 )
+            {
+                p_fifo->l_start_frame = 0;
+                p_fifo->b_start_frame = 0;
+                /* p_fifo->l_next_frame = 0; */
+                /* p_fifo->b_next_frame = 0; */
+                p_fifo->l_end_frame = 0;
+                vlc_mutex_unlock( &p_fifo->data_lock );
+                return( -1 );
+            }
+            else
+            {
+                while ( p_fifo->l_next_frame == p_fifo->l_end_frame )
+                {
+                    vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
+                }
+            }
+        }
     }
-#endif
 
     l_units = ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) * (p_fifo->l_frame_size >> p_fifo->b_stereo);
-//    fprintf( stderr, "%li", p_fifo->l_unit - (p_fifo->l_start_frame * (p_fifo->l_frame_size >> p_fifo->b_stereo)) );
 
-#if 0
-//    fprintf( stderr, "aout debug: %lli;\n", aout_date - p_fifo->date[p_fifo->l_start_frame] );
-    if ( /*(p_fifo->date[p_fifo->l_start_frame] < aout_date) &&*/ (aout_date < p_fifo->date[p_fifo->l_next_frame]) )
-    {
-        fprintf( stderr, "*" );
-        l_rate = (long)(((mtime_t)l_units * 1000000) / (p_fifo->date[p_fifo->l_next_frame] - aout_date));
-    }
-    else
-    {
-        l_rate = (long)(((mtime_t)l_units * 1000000) / (p_fifo->date[p_fifo->l_next_frame] - p_fifo->date[p_fifo->l_start_frame]));
-    }
-#endif
-//    l_rate = (long)( ((mtime_t)l_units * 1000000) / (p_fifo->date[p_fifo->l_next_frame] - ((p_fifo->date[p_fifo->l_start_frame] + aout_date) / 2)) );
-//    fprintf( stderr, "aout debug: l_rate == %li;\n", l_rate );
-//    fprintf( stderr, "aout debug: %li;\n", l_rate );
-//    fprintf( stderr, "aout debug: %lli, %li, %lli;\n", aout_date - p_fifo->date[p_fifo->l_start_frame], p_fifo->l_unit - (p_fifo->l_start_frame * (p_fifo->l_frame_size >> p_fifo->b_stereo)), p_fifo->date[p_fifo->l_next_frame] - aout_date );
-
-    /*
-    if ( aout_date < p_fifo->date[p_fifo->l_start_frame] )
-    {
-	    p_fifo->l_dr -= 1;
-    }
-    else if ( p_fifo->date[p_fifo->l_start_frame] < aout_date )
-    {
-	    p_fifo->l_dr += 1;
-    }
-    */
     l_rate = p_fifo->l_rate + ((aout_date - p_fifo->date[p_fifo->l_start_frame]) / 8);
-//    l_rate = (long)(((mtime_t)l_units * 1000000) / (p_fifo->date[p_fifo->l_next_frame] - p_fifo->date[p_fifo->l_start_frame])) + p_fifo->l_dr;
-//    fprintf( stderr, "aout debug: l_rate == %li (%lli);\n", l_rate /*+ p_fifo->l_dr*/, aout_date - p_fifo->date[p_fifo->l_start_frame] );
-
-//    p_fifo->delta += aout_date - p_fifo->date[p_fifo->l_start_frame];
-//    p_fifo->n += 1;
-//    fprintf( stderr, "aout debug: %lli, %lli, %li;\n", aout_date - p_fifo->date[p_fifo->l_start_frame], p_fifo->delta/p_fifo->n, l_rate );
+//    fprintf( stderr, "aout debug: %lli;\n", aout_date - p_fifo->date[p_fifo->l_start_frame] );
 
     InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->dsp.l_rate );
 
@@ -884,28 +801,6 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
         {
             msleep( p_aout->l_msleep );
         }
-#if 0
-        if ( p_aout->dsp.buf_info.fragments == p_aout->dsp.buf_info.fragstotal ) /* ?? */
-	{
-            p_aout->date = mdate();
-            aout_dspPlaySamples( &p_aout->dsp, (byte_t *)p_aout->buffer, sizeof(s16) * l_buffer_limit );
-        }
-        else if ( p_aout->dsp.buf_info.bytes >=
-            ((p_aout->dsp.buf_info.fragsize * p_aout->dsp.buf_info.fragstotal) -
-            (sizeof(s16) * l_buffer_limit)) )
-	{
-            aout_dspPlaySamples( &p_aout->dsp, (byte_t *)p_aout->buffer, sizeof(s16) * l_buffer_limit );
-        }
-        else
-	{
-            fprintf( stderr, "%lli\n", mdate() - date );
-	    date = mdate();
-            aout_dspPlaySamples( &p_aout->dsp, (byte_t *)p_aout->buffer, sizeof(s16) * l_buffer_limit );
-//            fprintf( stderr, "%lli\n", (date + ((((mtime_t)((p_aout->dsp.buf_info.fragstotal * p_aout->dsp.buf_info.fragsize - p_aout->dsp.buf_info.bytes) / 4)) * 1000000)/((mtime_t)p_aout->dsp.l_rate))) - p_aout->date );
-            msleep( p_aout->date_increment.l_euclidean_integer );
-        }
-        UPDATE_INCREMENT( p_aout->date_increment, p_aout->date )
-#endif
     }
 
     vlc_mutex_lock( &p_aout->fifos_lock );

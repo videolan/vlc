@@ -5,7 +5,10 @@
 
 /*
  * TODO :
- * - Optimiser les NeedBits() et les GetBits() du code là où c'est possible
+ *
+ * - optimiser les NeedBits() et les GetBits() du code là où c'est possible ;
+ * - vlc_cond_signal() / vlc_cond_wait() ;
+ *
  */
 
 /******************************************************************************
@@ -855,6 +858,7 @@ static void RunThread( adec_thread_t * p_adec )
                     if ( adec_Layer2_Stereo(p_adec) )
                     {
                         vlc_mutex_lock( &p_adec->p_aout_fifo->data_lock );
+
                         /* Frame 1 */
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         /* Frame 2 */
@@ -872,6 +876,9 @@ static void RunThread( adec_thread_t * p_adec )
                         /* Frame 6 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+
+                        vlc_cond_signal( &p_adec->p_aout_fifo->data_wait );
+
                         vlc_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
                     }
                 }

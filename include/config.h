@@ -73,7 +73,7 @@
  *******************************************************************************/
 
 /* General debugging support */
-#define DEBUG
+//#define DEBUG
 
 /* Modules specific debugging - this will produce a lot of output, but can be
  * usefull to track a bug */
@@ -85,8 +85,8 @@
 /* Debugging log file - if defined, a file can be used to store all messages. If
  * DEBUG_LOG_ONLY is defined, debug messages will only be printed to the log and
  * will not appear on the screen */
-#define DEBUG_LOG                       "vlc-debug.log"
-#define DEBUG_LOG_ONLY
+//#define DEBUG_LOG                       "vlc-debug.log"
+//#define DEBUG_LOG_ONLY
 
 /*******************************************************************************
  * General configuration
@@ -359,4 +359,3 @@
 
 /* Maximal number of commands which can be saved in history list */
 #define INTF_CONSOLE_MAX_HISTORY        20
-
