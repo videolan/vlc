@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.45 2003/11/27 04:11:40 fenrir Exp $
+ * $Id: mkv.cpp,v 1.46 2003/11/28 17:30:31 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -197,7 +197,6 @@ typedef struct
     vlc_bool_t      b_search_keyframe;
 
     /* informative */
-    char         *psz_name;
     char         *psz_codec_name;
     char         *psz_codec_settings;
     char         *psz_codec_info_url;
@@ -475,6 +474,7 @@ static int Open( vlc_object_t * p_this )
 
                     es_format_Init( &tk.fmt, UNKNOWN_ES, 0 );
                     tk.fmt.psz_language = strdup("English");
+                    tk.fmt.psz_description = NULL;
 
                     tk.b_default = VLC_TRUE;
                     tk.b_enabled = VLC_TRUE;
@@ -489,7 +489,6 @@ static int Open( vlc_object_t * p_this )
                     tk.i_data_init = 0;
                     tk.p_data_init = NULL;
 
-                    tk.psz_name = NULL;
                     tk.psz_codec_name = NULL;
                     tk.psz_codec_settings = NULL;
                     tk.psz_codec_info_url = NULL;
@@ -607,9 +606,9 @@ static int Open( vlc_object_t * p_this )
                             KaxTrackName &tname = *(KaxTrackName*)el3;
                             tname.ReadData( p_sys->es->I_O() );
 
-                            tk.psz_name = UTF8ToStr( UTFstring( tname ) );
+                            tk.fmt.psz_description = UTF8ToStr( UTFstring( tname ) );
                             msg_Dbg( p_input, "|   |   |   + Track Name=%s",
-                                     tk.psz_name );
+                                     tk.fmt.psz_description );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackLanguage::ClassInfos.GlobalId )
                         {
@@ -1213,6 +1212,10 @@ static void Close( vlc_object_t *p_this )
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
     {
 #define tk  p_sys->track[i_track]
+        if( tk.fmt.psz_description )
+        {
+            free( tk.fmt.psz_language );
+        }
         if( tk.psz_codec )
         {
             free( tk.psz_codec );
@@ -1508,7 +1511,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
 
             if( p_block->i_buffer > 0 )
             {
-                p_block->p_buffer[p_block->i_buffer-1] = '\0';
+                p_block->p_buffer[p_block->i_buffer] = '\0';
             }
         }
         es_out_Send( p_input->p_es_out, tk.p_es, p_block );
@@ -2212,9 +2215,13 @@ static void InformationsCreate( input_thread_t *p_input )
 
         sprintf( psz_cat, "Stream %d", i_track );
         p_cat = input_InfoCategory( p_input, psz_cat);
-        if( tk.psz_name )
+        if( tk.fmt.psz_description )
         {
-            input_AddInfo( p_cat, _("Name"), "%s", tk.psz_name );
+            input_AddInfo( p_cat, _("Name"), "%s", tk.fmt.psz_description );
+        }
+        if( tk.fmt.psz_language )
+        {
+            input_AddInfo( p_cat, _("Language"), "%s", tk.fmt.psz_language );
         }
         if( tk.psz_codec_name )
         {
