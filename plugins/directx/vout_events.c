@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.18.2.3 2002/07/29 16:22:14 gbazin Exp $
+ * $Id: vout_events.c,v 1.18.2.4 2002/10/01 20:17:01 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -245,6 +245,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     COLORREF   colorkey; 
     HDC        hdc;
     HICON      vlc_icon = NULL;
+    HMENU      hMenu;
     char       vlc_path[_MAX_PATH+1];
 
     intf_WarnMsg( 3, "vout: DirectXCreateWindow" );
@@ -365,6 +366,11 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
      * in DirectXEventProc).
      * We need to use SetWindowLongPtr when it is available in mingw */
     SetWindowLong( p_vout->p_sys->hwnd, GWL_USERDATA, (LONG)p_vout );
+
+    /* append a "Always On Top" entry in the system menu */
+    hMenu = GetSystemMenu( p_vout->p_sys->hwnd, FALSE );
+    AppendMenu( hMenu, MF_SEPARATOR, 0, "" );
+    AppendMenu( hMenu, MF_STRING | MF_UNCHECKED, IDM_TOGGLE_ON_TOP, "Always on &Top");
 
     /* now display the window */
     ShowWindow(p_vout->p_sys->hwnd, SW_SHOW);
@@ -544,8 +550,32 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         {
             case SC_SCREENSAVE:                     /* catch the screensaver */
             case SC_MONITORPOWER:              /* catch the monitor turn-off */
-            intf_WarnMsg( 3, "vout: WinProc WM_SYSCOMMAND" );
-            return 0;                      /* this stops them from happening */
+                intf_WarnMsg( 3, "vout: WinProc WM_SYSCOMMAND" );
+                return 0;                  /* this stops them from happening */
+            case IDM_TOGGLE_ON_TOP:            /* toggle the "on top" status */
+            {
+                HMENU hMenu = GetSystemMenu( hwnd , FALSE );
+
+                // Check if the window is already on top
+                if( GetWindowLong( hwnd, GWL_EXSTYLE ) & WS_EX_TOPMOST )
+                {
+                    CheckMenuItem( hMenu, IDM_TOGGLE_ON_TOP,
+                                   MF_BYCOMMAND | MFS_UNCHECKED );
+                    SetWindowPos( hwnd, HWND_NOTOPMOST,
+                                  0, 0, 0, 0,
+                                  SWP_NOSIZE | SWP_NOMOVE );
+                }
+                else
+                {
+                    CheckMenuItem( hMenu, IDM_TOGGLE_ON_TOP,
+                                   MF_BYCOMMAND | MFS_CHECKED );
+                    SetWindowPos( hwnd, HWND_TOPMOST,
+                                  0, 0, 0, 0,
+                                  SWP_NOSIZE | SWP_NOMOVE );
+                }
+                return 0;
+                break;
+            }
         }
         break;
 
