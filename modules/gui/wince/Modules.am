@@ -1,0 +1,24 @@
+SOURCES_wince = \
+	wince.cpp \
+	wince.h \
+	interface.cpp \
+	menus.cpp \
+	open.cpp \
+	playlist.cpp \
+	fileinfo.cpp \
+	iteminfo.cpp \
+	messages.cpp \
+	preferences.cpp \
+	preferences_widgets.cpp \
+	preferences_widgets.h \
+	subtitles.cpp \
+	timer.cpp \
+	video.cpp \
+	wince.rc \
+	$(NULL)
+
+EXTRA_DIST += \
+	bitmaps/vlc16x16.ico \
+	bitmaps/toolbar1.bmp \
+	bitmaps/toolbar2.bmp \
+	bitmaps/toolbar3.bmp
