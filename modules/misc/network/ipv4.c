@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.15 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: ipv4.c,v 1.16 2003/03/11 13:52:25 titer Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -338,7 +338,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
             return( -1 );
         }
     }
-#endif /* UNDER_CE */
+#endif /* UNDER_CE, SYS_BEOS */
 
     if( *psz_server_addr )
     {
@@ -371,6 +371,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
             return( -1 );
         }
 
+#if !defined( UNDER_CE ) && !defined( SYS_BEOS )
 #ifndef WIN32
         if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
 #else
@@ -399,6 +400,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
                 return( -1 );
             }
         }
+#endif /* UNDER_CE, SYS_BEOS */
     }
 
     p_socket->i_handle = i_handle;
