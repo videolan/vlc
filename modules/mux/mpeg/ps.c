@@ -724,7 +724,7 @@ static void MuxWritePSM( sout_mux_t *p_mux, block_t **p_buf, mtime_t i_dts )
     memset( p_hdr->p_buffer, 0, p_hdr->i_buffer );
     bits_initwrite( &bits, i_psm_size, p_hdr->p_buffer );
     bits_write( &bits, 32, 0x01bc );
-    bits_write( &bits, 16, i_psm_size - 3 );
+    bits_write( &bits, 16, i_psm_size - 6 );
     bits_write( &bits, 1, 1 ); /* current_next_indicator */
     bits_write( &bits, 2, 0xF ); /* reserved */
     bits_write( &bits, 5, p_sys->i_psm_version );
