@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.280 2004/01/26 20:48:10 fenrir Exp $
+ * $Id: input.c,v 1.281 2004/01/26 22:42:50 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -820,7 +820,7 @@ static int InitThread( input_thread_t * p_input )
     {
         subtitle_demux_t *p_sub;
         if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string),
-                                    i_microsecondperframe, 0 ) ) )
+                                    i_microsecondperframe ) ) )
         {
             p_sub_toselect = p_sub;
             TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
@@ -838,7 +838,7 @@ static int InitThread( input_thread_t * p_input )
         for( i = 0; *tmp2 != NULL; i++ )
         {
             if( ( p_sub = subtitle_New( p_input, *tmp2,
-                                        i_microsecondperframe, i ) ) )
+                                        i_microsecondperframe ) ) )
             {
                 TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
             }

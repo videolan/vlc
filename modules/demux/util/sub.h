@@ -2,7 +2,7 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: sub.h,v 1.15 2004/01/26 22:32:51 hartman Exp $
+ * $Id: sub.h,v 1.16 2004/01/26 22:42:50 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -49,8 +49,7 @@ typedef struct subtitle_demux_s
     int     (*pf_open) ( struct subtitle_demux_s *p_sub,
                          input_thread_t*p_input,
                          char *psz_name,
-                         mtime_t i_microsecperframe,
-                         int i_track_id );
+                         mtime_t i_microsecperframe );
     int     (*pf_demux)( struct subtitle_demux_s *p_sub, mtime_t i_maxdate );
     int     (*pf_seek) ( struct subtitle_demux_s *p_sub, mtime_t i_date );
     void    (*pf_close)( struct subtitle_demux_s *p_sub );
