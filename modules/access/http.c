@@ -454,7 +454,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
     vlc_bool_t   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
-    vlc_value_t  val;
 
     switch( i_query )
     {
@@ -484,7 +483,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            var_Get( p_access, "http-caching", &val );
             *pi_64 = (int64_t)var_GetInteger( p_access, "http-caching" ) * 1000;
             break;
 
