@@ -276,6 +276,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, int i_view,
     p_item->input.i_options = 0;
     p_item->input.i_categories = 0;
     p_item->input.pp_categories = NULL;
+    p_item->input.i_id = ++p_playlist->i_last_id;
 
     p_item->pp_parents = NULL;
     p_item->i_parents = 0;
@@ -365,6 +366,7 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
             playlist_Delete( p_playlist, p_root->pp_children[i]->input.i_id );
         }
     }
+    var_SetInteger( p_playlist, "item-deleted", p_root->input.i_id );    
     /* Delete the node */
     for( i = 0 ; i< p_root->i_parents; i++ )
     {

@@ -83,6 +83,10 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     val.i_int = -1;
     var_Set( p_playlist, "item-change", val );
 
+    var_Create( p_playlist, "item-deleted", VLC_VAR_INTEGER );
+    val.i_int = -1;
+    var_Set( p_playlist, "item-deleted", val );
+
     var_Create( p_playlist, "item-append", VLC_VAR_ADDRESS );
 
     var_Create( p_playlist, "playlist-current", VLC_VAR_INTEGER );

@@ -516,6 +516,7 @@ int playlist_ItemToNode( playlist_t *p_playlist,playlist_item_t *p_item )
         }
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
+    var_SetInteger( p_playlist, "item-change", p_item->input.i_id );
 
     return VLC_SUCCESS;
 }
@@ -598,6 +599,7 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
     {
         return VLC_EGENERIC;
     }
+    var_SetInteger( p_playlist, "item-deleted", i_id );
 
     /* Check if it is the current item */
     if( p_playlist->status.p_item == p_item )
@@ -627,9 +629,6 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
     playlist_ItemDelete( p_item );
 
     vlc_mutex_unlock( &p_playlist->object_lock );
-
-    val.b_bool = VLC_TRUE;
-    var_Set( p_playlist, "intf-change", val );
 
     return VLC_SUCCESS;
 }

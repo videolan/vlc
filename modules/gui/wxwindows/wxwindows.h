@@ -784,6 +784,7 @@ public:
     bool b_need_update;
 
 private:
+    void RemoveItem( int );
     void DeleteItem( int item );
     void DeleteNode( playlist_item_t *node );
 
@@ -864,6 +865,7 @@ private:
     /* Search (internal) */
     int CountItems( wxTreeItemId);
     wxTreeItemId FindItem( wxTreeItemId, playlist_item_t * );
+    wxTreeItemId FindItem( wxTreeItemId, int );
     wxTreeItemId FindItemByName( wxTreeItemId, wxString,
                                  wxTreeItemId, vlc_bool_t *);
 

@@ -57,6 +57,8 @@ static int ItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
                       vlc_value_t oval, vlc_value_t nval, void *param );
+static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
+                      vlc_value_t oval, vlc_value_t nval, void *param );
 
 
 /*****************************************************************************
@@ -103,6 +105,7 @@ enum
     /* custom events */
     UpdateItem_Event,
     AppendItem_Event,
+    RemoveItem_Event,
 
     MenuDummy_Event = wxID_HIGHEST + 999,
 
@@ -178,9 +181,11 @@ public:
     PlaylistItem( playlist_item_t *_p_item ) : wxTreeItemData()
     {
         p_item = _p_item;
+        i_id = p_item->input.i_id;
     }
 protected:
     playlist_item_t *p_item;
+    int i_id;
 friend class Playlist;
 };
 
@@ -378,6 +383,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     var_AddCallback( p_playlist, "item-change", ItemChanged, this );
 
     var_AddCallback( p_playlist, "item-append", ItemAppended, this );
+    var_AddCallback( p_playlist, "item-deleted", ItemDeleted, this );
 
     vlc_object_release( p_playlist );
 
@@ -399,6 +405,7 @@ Playlist::~Playlist()
     var_DelCallback( p_playlist, "item-change", ItemChanged, this );
     var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
+    var_DelCallback( p_playlist, "item-deleted", ItemDeleted, this );
     vlc_object_release( p_playlist );
 }
 
@@ -625,6 +632,17 @@ void Playlist::UpdateItem( int i )
     vlc_object_release(p_playlist);
 }
 
+void Playlist::RemoveItem( int i )
+{
+    if( i <= 0 ) return; /* Sanity check */
+
+    wxTreeItemId item = FindItem( treectrl->GetRootItem(), i );
+
+    if( item.IsOk() )
+    {
+        treectrl->Delete( item );
+    }    
+}
 
 
 /**********************************************************************
@@ -642,15 +660,15 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, playlist_item_t *p_item )
 
     p_wxcurrent = (PlaylistItem *)treectrl->GetItemData( root );
 
-    if( p_wxcurrent->p_item == p_item )
-    {
-        return root;
-    }
-
     if( !p_item )
     {
         wxTreeItemId dummy;
         return dummy;
+    }
+
+    if( p_wxcurrent->p_item == p_item )
+    {
+        return root;
     }
 
     while( item.IsOk() )
@@ -663,6 +681,55 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, playlist_item_t *p_item )
         if( treectrl->ItemHasChildren( item ) )
         {
             wxTreeItemId search = FindItem( item, p_item );
+            if( search.IsOk() )
+            {
+                return search;
+            }
+        }
+        item = treectrl->GetNextChild( root, cookie );
+    }
+    /* Not found */
+    wxTreeItemId dummy;
+    return dummy;
+}
+/* Find a wxItem from a playlist id */
+wxTreeItemId Playlist::FindItem( wxTreeItemId root, int i_id )
+{
+    long cookie;
+    PlaylistItem *p_wxcurrent;
+    wxTreeItemId search;
+    wxTreeItemId item = treectrl->GetFirstChild( root, cookie );
+    wxTreeItemId child;
+
+    p_wxcurrent = (PlaylistItem *)treectrl->GetItemData( root );
+
+    if( i_id < 0 )
+    {
+        wxTreeItemId dummy;
+        return dummy;
+    }
+
+    if( !p_wxcurrent )
+    {
+        wxTreeItemId dummy;
+        return dummy;
+    }        
+
+    if( p_wxcurrent->i_id == i_id )
+    {
+        return root;
+    }
+
+    while( item.IsOk() )
+    {
+        p_wxcurrent = (PlaylistItem *)treectrl->GetItemData( item );
+        if( p_wxcurrent->i_id == i_id )
+        {
+            return item;
+        }
+        if( treectrl->ItemHasChildren( item ) )
+        {
+            wxTreeItemId search = FindItem( item, i_id );
             if( search.IsOk() )
             {
                 return search;
@@ -1502,6 +1569,9 @@ void Playlist::OnPlaylistEvent( wxCommandEvent& event )
         case AppendItem_Event:
             AppendItem( event );
             break;
+        case RemoveItem_Event:
+            RemoveItem( event.GetInt() );
+            break;
     }
 }
 
@@ -1544,6 +1614,17 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
     Playlist *p_playlist_dialog = (Playlist *)param;
 
     wxCommandEvent event( wxEVT_PLAYLIST, UpdateItem_Event );
+    event.SetInt( new_val.i_int );
+    p_playlist_dialog->AddPendingEvent( event );
+
+    return 0;
+}
+static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
+                        vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    Playlist *p_playlist_dialog = (Playlist *)param;
+
+    wxCommandEvent event( wxEVT_PLAYLIST, RemoveItem_Event );
     event.SetInt( new_val.i_int );
     p_playlist_dialog->AddPendingEvent( event );
 
