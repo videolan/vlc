@@ -1,5 +1,5 @@
 /*****************************************************************************
- * .c: VLM interface plugin
+ * vlm.c: VLM interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
  * $Id$
@@ -32,8 +32,15 @@
 
 #include <vlc/input.h>
 
+#ifdef HAVE_TIME_H
+#   include <time.h>                                              /* ctime() */
+#endif
+
 #include "vlm.h"
 
+/*****************************************************************************
+ * Local prototypes.
+ *****************************************************************************/
 static char *vlm_Save( vlm_t * );
 static int   vlm_Load( vlm_t *, char *);
 static vlm_media_t *vlm_MediaNew( vlm_t *, char *, int );
