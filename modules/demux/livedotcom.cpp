@@ -679,7 +679,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t *pi64;
     double  *pf, f;
-    vlc_bool_t *pb;
+    vlc_bool_t *pb, b_bool;
+    int i;
 
     switch( i_query )
     {
@@ -738,13 +739,49 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         /* Special for access_demux */
         case DEMUX_CAN_PAUSE:
+            pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            if( p_sys->rtsp )
+                *pb = VLC_TRUE; /* Not always true, but will be handled in SET_PAUSE_STATE */
+            else
+                *pb = VLC_FALSE;
+            return VLC_SUCCESS;
+
         case DEMUX_CAN_CONTROL_PACE:
-            /* TODO */
             pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
             *pb = VLC_FALSE;
             return VLC_SUCCESS;
 
         case DEMUX_SET_PAUSE_STATE:
+            MediaSubsessionIterator *iter;
+            MediaSubsession *sub;
+
+            b_bool = (vlc_bool_t)va_arg( args, vlc_bool_t );
+            if( p_sys->rtsp == NULL )
+                return VLC_EGENERIC;
+
+            iter = new MediaSubsessionIterator( *p_sys->ms );
+            while( ( sub = iter->next() ) != NULL )
+            {
+                if( ( b_bool && !p_sys->rtsp->pauseMediaSubsession( *sub ) ) ||
+                    ( !b_bool && !p_sys->rtsp->playMediaSubsession( *sub, -1 ) ) )
+                {
+                    delete iter;
+                    return VLC_EGENERIC;
+                }
+            }
+            delete iter;
+
+            /* reset PCR and PCR start, mmh won't work well for multi-stream I fear */
+            for( i = 0; i < p_sys->i_track; i++ )
+            {
+                live_track_t *tk = p_sys->track[i];
+                tk->i_pts = 0;
+            }
+            p_sys->i_pcr_start = 0; /* FIXME Wrong */
+            p_sys->i_pcr = 0;
+
+            return VLC_SUCCESS;
+
         case DEMUX_GET_TITLE_INFO:
         case DEMUX_SET_TITLE:
         case DEMUX_SET_SEEKPOINT:
