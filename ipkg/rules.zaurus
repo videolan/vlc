@@ -36,7 +36,7 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--enable-ffmpeg \
 	--disable-familiar \
 	--with-tuning=strongarm1100 \
-	--with-mad-tree=/home/jpsaman/iPaq/src/mad-0.14.2b \
+	--with-mad-tree=/home/jpsaman/iPaq/src/mad-0.15.0b \
 	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/bin \
 	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
 	--with-qte=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \

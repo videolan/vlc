@@ -13,42 +13,58 @@ export STRIP=arm-linux-strip
 export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-plugins \
 	--disable-gtk \
+	--disable-gtk2 \
 	--disable-gnome \
+	--disable-gnome2 \
 	--disable-qt \
 	--disable-kde \
 	--disable-qte \
 	--disable-xosd \
+	--disable-ogg \
+	--disable-tarkin \
+	--disable-tremor \
+	--disable-theorea \
+	--enable-v4l \
 	--enable-dummy \
 	--enable-fb \
 	--enable-sdl \
 	--enable-oss \
 	--disable-alsa \
 	--enable-x11 \
-	--disable-xvideo \
+	--enable-xvideo \
 	--disable-dvd \
 	--disable-dvdread \
 	--disable-vcd \
 	--disable-maxosx \
 	--disable-xosd \
 	--disable-freetype \
+	--enable-a52 \
+	--enable-faad2 \
 	--enable-flac \
 	--enable-libmpeg2 \
+	--enable-libdvbpsi \
+	--disable-mkv \
 	--enable-mad \
 	--enable-ffmpeg \
 	--enable-familiar \
 	--with-tuning=strongarm1100 \
 	--x-includes=/skiff/local/arm-linux/include \
 	--x-libraries=/usr/local/arm/2.95.3/arm-linux/usr/X11R6/lib \
-	--with-mad-tree=/home/jpsaman/iPaq/src/mad-0.14.2b \
+	--with-libiconv-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
+	--with-mad-tree=/home/jpsaman/iPaq/src/libmad-0.15.0b \
+	--with-a52-tree=/home/jpsaman/iPaq/src/a52dec-0.7.4 \
+	--with-faad2-tree=/home/jpsaman/iPaq/src/faad2-20030612 \
+	--with-flac-tree=/home/jpsaman/iPaq/src/flac-1.1.0 \
+	--with-libmpeg2-tree=/home/jpsaman/iPaq/src/mpeg2dec-20030612 \
+	--with-libdvbpsi-tree=/home/jpsaman/iPaq/src/libdvbpsi-0.1.2 \
 	--with-gtk-config-path=/usr/local/arm/2.95.3/arm-linux/usr/bin \
 	--with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/usr/bin \
 	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
-	--with-ffmpeg-tree=/home/jpsaman/svn/tmp/ffmpeg-20030517"
+	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg-20030622"
 
 export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
-#export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
 export PKGDIR=/home/jpsaman/iPaq/packages/vlc-0.6.0
 
@@ -59,7 +75,7 @@ config:
 		--target=arm-linux \
 		$(shell echo $(CONFIG_FLAGS)) \
 	LDFLAGS="-L/usr/local/arm/2.95.3/arm-linux/lib -L/usr/local/arm/2.95.3/arm-linux/usr/lib" \
-	CPPFLAGS="-I/usr/local/arm/2.95.3/arm-linux/usr/include"
+	CPPFLAGS="-I/usr/local/arm/2.95.3/arm-linux/include -I/usr/local/arm/2.95.3/arm-linux/usr/include"
 
 #patch:
 # This is ugly -- I know
