@@ -325,7 +325,8 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->p_video = mmap(0, p_vout->p_sys->i_page_size * 2,
                           PROT_READ | PROT_WRITE, MAP_SHARED,
                           p_vout->p_sys->i_fb_dev, 0 );
-    if( (int)p_vout->p_sys->p_video == -1 ) /* XXX?? according to man, it is -1. What about NULL ? */
+    memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size * 2 );
+    if( (int)p_vout->p_sys->p_video == -1 ) /* according to man, it is -1. What about NULL ? */
     {
         intf_ErrMsg("vout error: can't map video memory (%s)\n", strerror(errno) );
         /* FIXME: restore fb config ?? */
@@ -349,6 +350,9 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void FBCloseDisplay( vout_thread_t *p_vout )
 {
+    /* Clear display */
+    memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size * 2 );
+
     /* Restore palette */
     if( p_vout->i_screen_depth == 8 );
     {

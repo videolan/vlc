@@ -1778,7 +1778,7 @@ int RenderSplash( vout_thread_t *p_vout )
 {
     int         i_x = 0, i_y = 0;                           /* text position */
     int         i_width, i_height;                              /* text size */
-    char *psz_text =    "VideoLan Client (" VERSION ")";            /* text to display */
+    char *psz_text =    "VideoLAN Client (" VERSION ")";  /* text to display */
 
     memset( p_vout->p_buffer[ p_vout->i_buffer_index ].p_data,
                   p_vout->i_bytes_per_line * p_vout->i_height, 12);

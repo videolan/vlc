@@ -6,6 +6,8 @@
   * Fixed a 100% cpu usage bug, in the dummy aout.
   * Added a 'f' shortcut to switch between Windowed and Fullscreen
     mode.
+  * Added --broadcast option for network input.
+  * Screen is now emptied when framebuffer output exits.
 
 Mon, 28 Aug 2000 02:34:18 +0200
 0.1.99i :
