@@ -2,7 +2,7 @@
  * item.c : Playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: item.c,v 1.1 2003/10/29 18:00:46 zorglub Exp $
+ * $Id: item.c,v 1.2 2003/11/22 12:35:17 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -138,6 +138,19 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
                       if( p_item->psz_uri )
                       {
                           free( p_item->psz_uri );
+                      }
+                      if( p_item->i_options )
+                      {
+                          int i_opt;
+                          for( i_opt = 0; i_opt < p_item->i_options; i_opt++ )
+                          {
+                              free( p_item->ppsz_options[i_opt] );
+                          }
+                          free( p_item->ppsz_options );
+                      }
+                      if( p_item->psz_author )
+                      {
+                          free( p_item->psz_author );
                       }
                       free( p_item );
                       vlc_mutex_unlock( &p_playlist->object_lock );
