@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.25 2003/07/20 15:33:53 gbazin Exp $
+ * $Id: streamout.cpp,v 1.26 2003/07/20 21:28:52 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -652,7 +652,11 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
                         wxPoint(10,25), wxDefaultSize, WXSIZEOF(acodecs_array),
                         acodecs_array, wxCB_READONLY );
     audio_codec_combo->SetSelection(0);
+#if defined( __WXMSW__ )
+    wxFlexGridSizer *audio_sub_sizer = new wxFlexGridSizer( 4, 5, 20 );
+#else
     wxFlexGridSizer *audio_sub_sizer = new wxFlexGridSizer( 2, 5, 20 );
+#endif
     bitrate_label =
         new wxStaticText( panel, -1, wxU(_("Bitrate (kb/s)")));
     audio_bitrate_combo =
