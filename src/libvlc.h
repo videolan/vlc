@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.45 2003/02/20 16:07:38 gbazin Exp $
+ * $Id: libvlc.h,v 1.46 2003/03/04 23:36:57 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -574,6 +574,10 @@ vlc_module_begin();
 #if defined(WIN32)
     add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT, VLC_TRUE );
     add_integer( "win9x-cv-method", 0, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT, VLC_TRUE );
+#endif
+
+#if defined(SYS_DARWIN)
+    add_integer( "rt-priority", 1, NULL, NULL, NULL, VLC_TRUE );
 #endif
 
     /* Usage (mainly useful for cmd line stuff) */

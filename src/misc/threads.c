@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.38 2003/03/02 01:35:30 gbazin Exp $
+ * $Id: threads.c,v 1.39 2003/03/04 23:36:57 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -611,12 +611,13 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_ret = pthread_create( &p_this->thread_id, NULL, func, p_data );
 
+#ifdef SYS_DARWIN
     if ( i_priority )
     {
         int i_error;
         struct sched_param param;
         memset( &param, 0, sizeof(struct sched_param) );
-        param.sched_priority = i_priority;
+        param.sched_priority = config_GetInt( p_this, "rt-priority" );
         if ( (i_error = pthread_setschedparam( p_this->thread_id,
                                                SCHED_RR, &param )) )
         {
@@ -626,6 +627,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
         }
 
     }
+#endif
 
 #elif defined( HAVE_CTHREADS_H )
     p_this->thread_id = cthread_fork( (cthread_fn_t)func, (any_t)p_data );
@@ -696,12 +698,14 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
     }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+
+#ifdef SYS_DARWIN
     if ( i_priority )
     {
         int i_error;
         struct sched_param param;
         memset( &param, 0, sizeof(struct sched_param) );
-        param.sched_priority = i_priority;
+        param.sched_priority = config_GetInt( p_this, "rt-priority" );
         if ( (i_error = pthread_setschedparam( pthread_self(),
                                                SCHED_RR, &param )) )
         {
@@ -710,6 +714,7 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
             i_priority = 0;
         }
     }
+#endif
 
 #endif
 

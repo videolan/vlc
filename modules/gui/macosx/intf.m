@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.64 2003/03/04 22:36:18 hartman Exp $
+ * $Id: intf.m,v 1.65 2003/03/04 23:36:57 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -402,7 +402,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
     [NSTimer scheduledTimerWithTimeInterval: 0.5
         target: self selector: @selector(manageIntf:)
-        userInfo: nil repeats: TRUE];
+        userInfo: nil repeats: FALSE];
 
     [NSThread detachNewThreadSelector: @selector(manage)
         toTarget: self withObject: nil];
@@ -767,6 +767,10 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     vlc_object_release( p_playlist );
 
     [self updateMessageArray];
+
+    [NSTimer scheduledTimerWithTimeInterval: 0.5
+        target: self selector: @selector(manageIntf:)
+        userInfo: nil repeats: FALSE];
 }
 
 - (void)updateMessageArray

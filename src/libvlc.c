@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.69 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: libvlc.c,v 1.70 2003/03/04 23:36:57 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -138,7 +138,6 @@ int VLC_Create( void )
     {
         return i_ret;
     }
-    vlc_thread_set_priority( p_vlc, VLC_THREAD_PRIORITY_LOW );
 
     /* Now that the thread system is initialized, we don't have much, but
      * at least we have var_Create */
@@ -183,6 +182,7 @@ int VLC_Create( void )
     {
         return VLC_EGENERIC;
     }
+    vlc_thread_set_priority( p_vlc, VLC_THREAD_PRIORITY_LOW );
 
     p_vlc->psz_object_name = "root";
 
