@@ -129,6 +129,7 @@ Todo:<br />
    - **  Fix MP4, LIVE.COM<br />
 - *** Implement in MacOS X and Skins 2 interfaces<br />
 - wx implementation :<br />
+   - **  Add Directory<br />
    - **  Support item move/copy<br />
    - *   Explorer view<br />
    - *** Fix search<br />
