@@ -1,6 +1,6 @@
-vlc (0.6.1+cvs-20030731-1) unstable; urgency=low
+vlc (0.6.2-1) unstable; urgency=low
 
-  * New CVS snapshot, based on the 0.6.1 release.
+  * New upstream release.
   * debian/control:
     + Added a build-dependency on freetype6-dev.
     + Added a build-dependency on libdvbpsi2-dev.
@@ -9,8 +9,15 @@ vlc (0.6.1+cvs-20030731-1) unstable; urgency=low
   * This release now uses libfreetype to render subtitles, and we recommend
     ttf-freefont | ttf-thryomanes, so that the old .rle font is no longer
     needed (Closes: #203013).
+  * extras/faad:
+    + aclocal-1.6 && autoconf && automake-1.6 -a -c -f && libtoolize -c -f
+  * extras/faad/common/mp4v2:
+    + aclocal-1.4 && autoconf && autoheader && automake-1.4 --foreign -a -c \
+      && libtoolize -c -f
+  * extras/mpeg2dec:
+    + aclocal-1.7 && autoconf && automake-1.7 -a -c && libtoolize -c -f
 
- -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Thu, 31 Jul 2003 13:57:14 +0200
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Tue,  2 Sep 2003 10:45:24 +0200
 
 vlc (0.6.0+cvs-20030716-2) unstable; urgency=low
 

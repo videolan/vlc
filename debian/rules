@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 # debian/rules for the VideoLAN Client - uses debhelper.
-# $Id: rules,v 1.103 2003/08/01 08:24:53 sam Exp $
+# $Id: rules,v 1.104 2003/09/02 13:44:23 sam Exp $
 # based on Joey Hess's one.
 
 # Uncomment this to turn on verbose mode.
@@ -14,7 +14,7 @@ CONFIG_FLAGS = --enable-release --prefix=/usr
 CONFIG_FLAGS += \
 	--enable-gnome \
 	--enable-gtk \
-	--enable-familiar \
+	--disable-familiar \
 	--enable-fb \
 	--enable-ggi \
 	--enable-sdl \
@@ -233,8 +233,8 @@ install: build
 	  debian/gvlc/usr/lib/vlc/gui/
 	mv debian/vlc/usr/lib/vlc/gui/libgtk_plugin.so \
 	  debian/gvlc/usr/lib/vlc/gui/
-	mv debian/vlc/usr/lib/vlc/gui/libfamiliar_plugin.so \
-	  debian/gvlc/usr/lib/vlc/gui/
+	#mv debian/vlc/usr/lib/vlc/gui/libfamiliar_plugin.so \
+	#  debian/gvlc/usr/lib/vlc/gui/
 	ln -s vlc.1.gz debian/gvlc/usr/share/man/man1/gvlc.1.gz
 	mv debian/vlc/$(VIDDIR)/gvlc32x32.xpm debian/gvlc/$(VIDDIR)/gvlc.xpm
 	mv debian/vlc/$(VIDDIR)/gvlc48x48.png debian/gvlc/$(PIXDIR)/gvlc.png
