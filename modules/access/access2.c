@@ -123,8 +123,7 @@ static int Access2Open( vlc_object_t * p_this )
     /* Init p_input->stream.* */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     /* size */
-    access2_Control( p_access, ACCESS_GET_SIZE, &i_64 );
-    p_input->stream.p_selected_area->i_size  = i_64;
+    p_input->stream.p_selected_area->i_size  = p_access->info.i_size;
     /* seek */
     access2_Control( p_access, ACCESS_CAN_SEEK, &b_bool );
     p_input->stream.b_seekable = b_bool;
@@ -137,7 +136,7 @@ static int Access2Open( vlc_object_t * p_this )
         p_input->stream.i_method = INPUT_METHOD_FILE;   /* FIXME */
     else
         p_input->stream.i_method = INPUT_METHOD_NETWORK;/* FIXME */
-    p_input->stream.p_selected_area->i_tell = 0;
+    p_input->stream.p_selected_area->i_tell = p_access->info.i_pos;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
 
@@ -177,11 +176,17 @@ static int  Access2Read( input_thread_t *p_input, byte_t *p_buffer, size_t i_len
     /* TODO update i_size (ex: when read more than half current size and only every 100 times or ...) */
 
     if( p_access->pf_read )
-        return p_access->pf_read( p_access, (uint8_t*)p_buffer, (int)i_len );
+    {
+        i_total = p_access->pf_read( p_access, (uint8_t*)p_buffer, (int)i_len );
+        goto update;
+    }
 
     /* Should never occur */
     if( p_access->pf_block == NULL )
-        return 0;
+    {
+        i_total = 0;
+        goto update;
+    }
 
     /* Emulate the read */
     while( i_total < i_len )
@@ -193,13 +198,9 @@ static int  Access2Read( input_thread_t *p_input, byte_t *p_buffer, size_t i_len
         }
         if( p_sys->p_block == NULL )
         {
-            vlc_bool_t b_eof;
-
-            access2_Control( p_access, ACCESS_GET_EOF, &b_eof );
-            if( b_eof || i_total > 0 )
-                return i_total;
-            else
-                return -1;
+            if( !p_access->info.b_eof && i_total <= 0 )
+                i_total = -1;
+            goto update;
         }
 
         i_copy = __MIN( i_len - i_total, p_sys->p_block->i_buffer );
@@ -215,6 +216,27 @@ static int  Access2Read( input_thread_t *p_input, byte_t *p_buffer, size_t i_len
 
         i_total += i_copy;
     }
+update:
+    if( p_access->info.i_update & INPUT_UPDATE_SIZE )
+    {
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        p_input->stream.p_selected_area->i_size  = p_access->info.i_size;
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        p_access->info.i_update &= ~INPUT_UPDATE_SIZE;
+    }
+
+    if( p_access->info.i_update & INPUT_UPDATE_TITLE )
+    {
+        /* TODO */
+        msg_Err( p_input, "INPUT_UPDATE_TITLE to do" );
+    }
+    if( p_access->info.i_update & INPUT_UPDATE_SEEKPOINT )
+    {
+        /* TODO */
+        msg_Err( p_input, "INPUT_UPDATE_SEEKPOINT to do" );
+    }
+
     return i_total;
 }
 
@@ -239,7 +261,7 @@ static void Access2Seek( input_thread_t *p_input, off_t i_pos )
             }
 
             vlc_mutex_lock( &p_input->stream.stream_lock );
-            p_input->stream.p_selected_area->i_tell = i_pos;
+            p_input->stream.p_selected_area->i_tell = p_access->info.i_pos;
             vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
     }
