@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.36 2003/11/12 01:22:40 hartman Exp $
+ * $Id: playlist.m,v 1.37 2003/11/12 02:45:26 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -130,6 +130,8 @@
 
     [o_table_view registerForDraggedTypes: 
         [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
+
+    [o_window setExcludedFromWindowsMenu: TRUE];
 
     [o_window setTitle: _NS("Playlist")];
     [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
