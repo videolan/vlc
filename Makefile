@@ -22,7 +22,7 @@ VIDEO=X11
 
 # Target architecture and optimization
 #ARCH=
-#ARCH=MMX
+ARCH=MMX
 #ARCH=PPC
 
 # Decoder choice - ?? old decoder will be removed soon

@@ -25,6 +25,7 @@
 #include "vlc_thread.h"
 #include "video.h"
 #include "video_output.h"
+#include "video_yuv.h"
 #include "intf_msg.h"
 
 /*******************************************************************************
@@ -276,8 +277,26 @@ int vout_InitTables( vout_thread_t *p_vout )
     size_t      tables_size;                          /* tables size, in bytes */
     
     /* Computes tables size */
-    //??
-    tables_size = 4 * 4 * 1024;    
+    switch( p_vout->i_screen_depth )
+    {
+    case 15:
+    case 16:
+        tables_size = sizeof( u16 ) * 1024 * (p_vout->b_grayscale ? 1 : 3);
+        break;        
+    case 24:        
+    case 32:
+#ifndef DEBUG
+    default:        
+#endif
+        tables_size = sizeof( u32 ) * 1024 * (p_vout->b_grayscale ? 1 : 3);        
+        break;        
+#ifdef DEBUG
+    default:
+        intf_DbgMsg("error: invalid screen depth %d\n", p_vout->i_screen_depth );
+        tables_size = 0;
+        break;        
+#endif      
+    }
     
     /* Allocate memory */
     p_vout->tables.p_base = malloc( tables_size );
@@ -300,7 +319,7 @@ int vout_InitTables( vout_thread_t *p_vout )
  *******************************************************************************/
 int vout_ResetTables( vout_thread_t *p_vout )
 {
-    // ?? realloc ?
+    // ?? realloc if b_grayscale or i_screen_depth changed
     SetTables( p_vout );
     return( 0 );    
 }
@@ -597,6 +616,17 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic,
                                 int i_width, int i_height, int i_eol, int i_pic_eol,
                                 int i_scale, int i_matrix_coefficients )
 {
+#ifdef HAVE_MMX
+    int         i_chroma_width, i_chroma_eol;      /* width and eol for chroma */
+
+    i_chroma_width =    i_width / 2;
+    i_chroma_eol =      i_eol / 2;
+    ConvertYUV420RGB16MMX( p_y, p_u, p_v, i_width, i_height, 
+                           (i_width + i_eol) * sizeof( yuv_data_t ), 
+                           (i_chroma_width + i_chroma_eol) * sizeof( yuv_data_t),
+                           i_scale, (u8 *)p_pic, 0, 0, (i_width + i_pic_eol) * sizeof( u16 ),
+                           p_vout->i_screen_depth == 15 );    
+#else
     u16 *       p_pic_src;                   /* source pointer in case of copy */
     u16 *       p_red;                                            /* red table */
     u16 *       p_green;                                        /* green table */
@@ -616,6 +646,7 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic,
     i_chroma_width =    i_width / 2;
     i_chroma_eol =      i_eol / 2;
     CONVERT_YUV_RGB( 420 )
+#endif
 }
 
 /*******************************************************************************
@@ -823,34 +854,7 @@ static void Scale32( p_vout_thread_t p_vout, void *p_pic, void *p_buffer,
     //???
 }
 
-//-------------------------
-
-/*******************************************************************************
- * External prototypes
- *******************************************************************************/
-#ifdef HAVE_MMX
-/* YUV transformations for MMX - in video_yuv_mmx.S 
- *      p_y, p_u, p_v:          Y U and V planes
- *      i_width, i_height:      frames dimensions (pixels)
- *      i_ypitch, i_vpitch:     Y and V lines sizes (bytes)
- *      i_aspect:               vertical aspect factor
- *      p_pic:                  RGB frame
- *      i_dci_offset:           ?? x offset for left image border
- *      i_offset_to_line_0:     ?? x offset for left image border
- *      i_pitch:                RGB line size (bytes)
- *      i_colortype:            0 for 565, 1 for 555 */
-static YUV420_16_MMX( u8* p_y, u8* p_u, u8 *p_v, 
-                         unsigned int i_width, unsigned int i_height,
-                         unsigned int i_ypitch, unsigned int i_vpitch,
-                         unsigned int i_aspect, u8 *p_pic, 
-                         u32 i_dci_offset, u32 i_offset_to_line_0,
-                         int CCOPitch, int i_colortype );
-#endif
-
 //-------------------- walken code follow --------------------------------
-
-
-
 
 /*
  * YUV to RGB routines.

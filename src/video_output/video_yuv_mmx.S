@@ -90,7 +90,7 @@ sixbitu:            .quad 0xc0c0c0c0c0c0c0c0
 #define BUpperLimit      148
 
 /*
- * extern void C vout_YUV420_16_MMX (
+ * extern void C ConvertYUV420RGB16MMX (
  *                                     U8* YPlane,
  *                                     U8* UPlane,
  *                                     U8* VPlane,
@@ -116,8 +116,8 @@ sixbitu:            .quad 0xc0c0c0c0c0c0c0c0
  *    RGB655 = 3
  */
 
-.globl vout_YUV420_16_MMX
-vout_YUV420_16_MMX: 
+.globl ConvertYUV420RGB16MMX
+ConvertYUV420RGB16MMX: 
   pushl      %esi
   pushl      %edi
 
