@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.13 2001/12/30 07:09:54 sam Exp $
+ * $Id: alsa.c,v 1.14 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -38,7 +38,7 @@ void _M( aout_getfunctions )( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-    ADD_COMMENT( "Yeah, alsa rocks !" )
+
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

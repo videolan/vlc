@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.6 2001/12/30 07:09:56 sam Exp $
+ * $Id: xvideo.c,v 1.7 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -38,8 +38,8 @@
  * Building configuration tree
  *****************************************************************************/
 MODULE_CONFIG_START
-    ADD_WINDOW( "Configuration for xvideo module" )
-        ADD_COMMENT( "For now, the xvideo module cannot be configured" )
+ADD_CATEGORY_HINT( "Misc Options", NULL )
+ADD_INTEGER ( XVADAPTOR_VAR, -1, NULL, "XVideo adaptor number", NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.3 2002/01/04 14:01:34 sam Exp $
+ * $Id: vlc.h,v 1.4 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -52,4 +52,4 @@
 #include "modules.h"
 
 #include "main.h"
-
+#include "configuration.h"

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.75 2002/02/20 23:23:53 sam Exp $
+ * $Id: common.h,v 1.76 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -98,9 +98,12 @@ typedef struct plugin_info_s *          p_plugin_info_t;
 struct playlist_s;
 struct playlist_item_s;
 struct module_s;
+struct module_config_s;
 
 typedef struct playlist_s *             p_playlist_t;
 typedef struct playlist_item_s *        p_playlist_item_t;
+typedef struct module_s *               p_module_t;
+typedef struct module_config_s *        p_module_config_t;
 
 /* Interface */
 struct intf_thread_s;
@@ -441,10 +444,13 @@ typedef struct module_symbols_s
     struct aout_bank_s*  p_aout_bank;
     struct vout_bank_s*  p_vout_bank;
 
-    int    ( * main_GetIntVariable ) ( char *, int );
-    char * ( * main_GetPszVariable ) ( char *, char * );
-    void   ( * main_PutIntVariable ) ( char *, int );
-    void   ( * main_PutPszVariable ) ( char *, char * );
+    int    ( * config_GetIntVariable ) ( const char * );
+    char * ( * config_GetPszVariable ) ( const char * );
+    void   ( * config_PutIntVariable ) ( const char *, int );
+    void   ( * config_PutPszVariable ) ( const char *, char * );
+    struct module_config_s * ( * config_FindConfig ) ( const char * );
+    struct module_config_s * ( * config_Duplicate ) ( struct module_config_s *,
+                                                      int );
 
     struct intf_subscription_s * ( * intf_MsgSub ) ( void );
     void ( * intf_MsgUnsub )   ( struct intf_subscription_s * );
@@ -463,9 +469,9 @@ typedef struct module_symbols_s
     void ( * intf_UrlDecode )       ( char * );
     int  ( * intf_Eject )           ( const char * );
 
-    void    ( * msleep )         ( mtime_t );
-    mtime_t ( * mdate )          ( void );
-    char  * ( * mstrtime )        ( char *, mtime_t );
+    void    ( * msleep )            ( mtime_t );
+    mtime_t ( * mdate )             ( void );
+    char  * ( * mstrtime )          ( char *, mtime_t );
 
     int  ( * network_ChannelCreate )( void );
     int  ( * network_ChannelJoin )  ( int );
@@ -574,8 +580,8 @@ typedef struct module_symbols_s
 
     char * ( * DecodeLanguage ) ( u16 );
 
-    struct module_s * ( * module_Need ) ( int, char *, void * );
-    void ( * module_Unneed )            ( struct module_s * );
+    struct module_s * ( * module_Need )   ( int, char *, void * );
+    void              ( * module_Unneed ) ( struct module_s * );
 
 } module_symbols_t;
 

@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.10 2002/02/21 23:56:08 sam Exp $
+ * $Id: modules_plugin.h,v 1.11 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -157,10 +157,12 @@ module_error( void )
     (p_symbols)->p_input_bank = p_input_bank; \
     (p_symbols)->p_aout_bank = p_aout_bank; \
     (p_symbols)->p_vout_bank = p_vout_bank; \
-    (p_symbols)->main_GetIntVariable = main_GetIntVariable; \
-    (p_symbols)->main_GetPszVariable = main_GetPszVariable; \
-    (p_symbols)->main_PutIntVariable = main_PutIntVariable; \
-    (p_symbols)->main_PutPszVariable = main_PutPszVariable; \
+    (p_symbols)->config_GetIntVariable = config_GetIntVariable; \
+    (p_symbols)->config_GetPszVariable = config_GetPszVariable; \
+    (p_symbols)->config_PutIntVariable = config_PutIntVariable; \
+    (p_symbols)->config_PutPszVariable = config_PutPszVariable; \
+    (p_symbols)->config_Duplicate = config_Duplicate; \
+    (p_symbols)->config_FindConfig = config_FindConfig; \
     (p_symbols)->intf_MsgSub = intf_MsgSub; \
     (p_symbols)->intf_MsgUnsub = intf_MsgUnsub; \
     (p_symbols)->intf_Msg = intf_Msg; \
@@ -233,5 +235,3 @@ module_error( void )
     (p_symbols)->DecodeLanguage = DecodeLanguage; \
     (p_symbols)->module_Need = module_Need; \
     (p_symbols)->module_Unneed = module_Unneed;
-    
-

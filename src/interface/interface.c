@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.89 2002/02/19 00:50:19 sam Exp $
+ * $Id: interface.c,v 1.90 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -59,6 +59,7 @@ static void intf_Manage( intf_thread_t *p_intf );
 intf_thread_t* intf_Create( void )
 {
     intf_thread_t * p_intf;
+    char *psz_name;
 
     /* Allocate structure */
     p_intf = malloc( sizeof( intf_thread_t ) );
@@ -70,10 +71,11 @@ intf_thread_t* intf_Create( void )
     }
 
     /* Choose the best module */
-    p_intf->p_module = module_Need( MODULE_CAPABILITY_INTF,
-                           main_GetPszVariable( INTF_METHOD_VAR, NULL ),
-                           (void *)p_intf );
+    psz_name = config_GetPszVariable( INTF_METHOD_VAR );
+    p_intf->p_module = module_Need( MODULE_CAPABILITY_INTF, psz_name,
+                                    (void *)p_intf );
 
+    if( psz_name ) free( psz_name );
     if( p_intf->p_module == NULL )
     {
         intf_ErrMsg( "intf error: no suitable intf module" );
@@ -163,8 +165,7 @@ static void intf_Manage( intf_thread_t *p_intf )
 
                 p_main->p_playlist->b_stopped = 0;
                 p_main->p_playlist->i_mode = PLAYLIST_FORWARD + 
-                    main_GetIntVariable( PLAYLIST_LOOP_VAR,
-                                         PLAYLIST_LOOP_DEFAULT );
+                    config_GetIntVariable( PLAYLIST_LOOP_VAR );
                 intf_WarnMsg( 3, "intf: creating new input thread" );
                 p_input = input_CreateThread( &p_main->p_playlist->current,
                                               NULL );

@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_directx.c,v 1.18 2002/02/15 20:02:21 gbazin Exp $
+ * $Id: aout_directx.c,v 1.19 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -145,8 +145,6 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys->l_data_played_from_beginning = 0;
     vlc_mutex_init( &p_aout->p_sys->buffer_lock );
 
-
-    p_aout->psz_device = 0;
 
     /* Initialise DirectSound */
     if( DirectxInitDSound( p_aout ) )

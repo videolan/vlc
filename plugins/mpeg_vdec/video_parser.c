@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.14 2002/02/19 00:50:19 sam Exp $
+ * $Id: video_parser.c,v 1.15 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -71,7 +71,17 @@ void _M( vdec_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
+/* Variable containing the motion compensation method */
+#define MOTION_METHOD_VAR               "mpeg_vdec_motion"
+/* Variable containing the IDCT method */
+#define IDCT_METHOD_VAR                 "mpeg_vdec_idct"
+
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( "Misc Options", NULL)
+ADD_PLUGIN( IDCT_METHOD_VAR, MODULE_CAPABILITY_IDCT, NULL, NULL,
+	    "IDCT method", NULL )
+ADD_PLUGIN( MOTION_METHOD_VAR, MODULE_CAPABILITY_MOTION, NULL, NULL,
+	    "motion compensation method", NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -179,12 +189,15 @@ static int decoder_Run ( decoder_config_t * p_config )
  *****************************************************************************/
 static int InitThread( vpar_thread_t *p_vpar )
 {
+    char *psz_name;
+
     /*
      * Choose the best motion compensation module
      */
-    p_vpar->p_motion_module = module_Need( MODULE_CAPABILITY_MOTION,
-                                main_GetPszVariable( MOTION_METHOD_VAR, NULL ),
-                                NULL );
+    psz_name = config_GetPszVariable( MOTION_METHOD_VAR );
+    p_vpar->p_motion_module = module_Need( MODULE_CAPABILITY_MOTION, psz_name,
+                                           NULL );
+    if( psz_name ) free( psz_name );
 
     if( p_vpar->p_motion_module == NULL )
     {
@@ -200,9 +213,10 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Choose the best IDCT module
      */
-    p_vpar->p_idct_module = module_Need( MODULE_CAPABILITY_IDCT,
-                                  main_GetPszVariable( IDCT_METHOD_VAR, NULL ),
-                                  NULL );
+    psz_name = config_GetPszVariable( IDCT_METHOD_VAR );
+    p_vpar->p_idct_module = module_Need( MODULE_CAPABILITY_IDCT, psz_name,
+                                         NULL );
+    if( psz_name ) free( psz_name );
 
     if( p_vpar->p_idct_module == NULL )
     {

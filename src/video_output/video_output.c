@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.160 2002/02/19 00:50:20 sam Exp $
+ * $Id: video_output.c,v 1.161 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -106,10 +106,9 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     }
 
     /* Choose the best module */
-    psz_plugin = main_GetPszVariable( VOUT_FILTER_VAR, "" );
-    if( psz_plugin[0] == '\0' )
+    if( !(psz_plugin = config_GetPszVariable( VOUT_FILTER_VAR )) )
     {
-        psz_plugin = main_GetPszVariable( VOUT_METHOD_VAR, "" );
+        psz_plugin = config_GetPszVariable( VOUT_METHOD_VAR );
     }
 
     /* Initialize thread properties - thread id and locks will be initialized
@@ -154,12 +153,13 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     p_vout->render_time  = 10;
 
     /* user requested fullscreen? */
-    if( main_GetIntVariable( VOUT_FULLSCREEN_VAR, VOUT_FULLSCREEN_DEFAULT ) )
+    if( config_GetIntVariable( VOUT_FULLSCREEN_VAR ) )
         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
     p_vout->p_module
         = module_Need( MODULE_CAPABILITY_VOUT, psz_plugin, (void *)p_vout );
 
+    if( psz_plugin ) free( psz_plugin );
     if( p_vout->p_module == NULL )
     {
         intf_ErrMsg( "vout error: no suitable vout module" );

@@ -2,7 +2,7 @@
  * qt.cpp : Qt plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: qt.cpp,v 1.6 2001/12/30 07:09:56 sam Exp $
+ * $Id: qt.cpp,v 1.7 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -40,8 +40,6 @@ void _M( intf_getfunctions )( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-    ADD_WINDOW( "Configuration for Qt module" )
-        ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

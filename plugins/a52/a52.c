@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.3 2002/02/15 13:32:52 sam Exp $
+ * $Id: a52.c,v 1.4 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -28,7 +28,7 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
-#include <stdint.h>
+#include <stdint.h>                                            /* int16_t .. */
 
 #include <videolan/vlc.h>
 
@@ -67,7 +67,7 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
 }
 
 /*****************************************************************************
- * Build configuration tree.
+ * Build configuration structure.
  *****************************************************************************/
 MODULE_CONFIG_START
 MODULE_CONFIG_STOP

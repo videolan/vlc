@@ -2,7 +2,7 @@
  * logger.c : file logging plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: logger.c,v 1.3 2002/02/20 05:56:18 sam Exp $
+ * $Id: logger.c,v 1.4 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -92,7 +92,7 @@ static void intf_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int intf_Open( intf_thread_t *p_intf )
 {
-    char *psz_filename;
+    char *psz_filename_tmp, *psz_filename;
 
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
@@ -102,7 +102,13 @@ static int intf_Open( intf_thread_t *p_intf )
         return -1;
     }
 
-    psz_filename = main_GetPszVariable( INTF_METHOD_VAR, NULL );
+    if( !(psz_filename = psz_filename_tmp
+          = config_GetPszVariable( INTF_METHOD_VAR )) )
+    {
+        intf_ErrMsg( "intf error: configuration variable %s empty",
+                     INTF_METHOD_VAR );
+        return -1;
+    }
 
     while( *psz_filename && *psz_filename != ':' )
     {
@@ -131,8 +137,11 @@ static int intf_Open( intf_thread_t *p_intf )
         intf_ErrMsg( "intf error: error opening logfile `%s'", psz_filename );
         free( p_intf->p_sys );
         intf_MsgUnsub( p_intf->p_sys->p_sub );
+        free( psz_filename_tmp );
         return -1;
     }
+
+    free( psz_filename_tmp );
 
     LOG_STRING( "-- log plugin started --\n", p_intf->p_sys->p_file );
 

@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.20 2002/02/19 00:50:19 sam Exp $
+ * $Id: ac3_adec.c,v 1.21 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -68,7 +68,17 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
+/* Variable containing the AC3 downmix method */
+#define DOWNMIX_METHOD_VAR              "ac3_downmix"
+/* Variable containing the AC3 IMDCT method */
+#define IMDCT_METHOD_VAR                "ac3_imdct"
+
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( "Misc Options", NULL)
+ADD_PLUGIN  ( DOWNMIX_METHOD_VAR, MODULE_CAPABILITY_DOWNMIX, NULL, NULL,
+              "AC3 downmix method", NULL )
+ADD_PLUGIN  ( IMDCT_METHOD_VAR, MODULE_CAPABILITY_IMDCT, NULL, NULL,
+              "AC3 IMDCT method", NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -101,6 +111,8 @@ static int decoder_Probe( u8 *pi_type )
  *****************************************************************************/
 static int InitThread( ac3dec_thread_t * p_ac3thread )
 {
+    char *psz_name;
+
     /*
      * Thread properties 
      */
@@ -111,9 +123,10 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
      * Choose the best downmix module
      */
 #define DOWNMIX p_ac3thread->ac3_decoder->downmix
-    DOWNMIX.p_module = module_Need( MODULE_CAPABILITY_DOWNMIX,
-                               main_GetPszVariable( DOWNMIX_METHOD_VAR, NULL ),
-                               NULL );
+    psz_name = config_GetPszVariable( DOWNMIX_METHOD_VAR );
+    DOWNMIX.p_module = module_Need( MODULE_CAPABILITY_DOWNMIX, psz_name,
+                                    NULL );
+    if( psz_name ) free( psz_name );
 
     if( DOWNMIX.p_module == NULL )
     {
@@ -139,9 +152,10 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
     p_ac3thread->ac3_decoder->imdct = memalign(16, sizeof(imdct_t));
     
 #define IMDCT p_ac3thread->ac3_decoder->imdct
-    IMDCT->p_module = module_Need( MODULE_CAPABILITY_IMDCT,
-                               main_GetPszVariable( IMDCT_METHOD_VAR, NULL ),
-                               NULL );
+    psz_name = config_GetPszVariable( IMDCT_METHOD_VAR );
+    IMDCT->p_module = module_Need( MODULE_CAPABILITY_IMDCT, psz_name,
+                                   NULL );
+    if( psz_name ) free( psz_name );
 
     if( IMDCT->p_module == NULL )
     {
@@ -161,15 +175,7 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
 #undef F
 
     /* Initialize the ac3 decoder structures */
-#define p_dec p_ac3thread->ac3_decoder
-#if defined( __MINGW32__ )
-    p_dec->samples_back = memalign( 16, 6 * 256 * sizeof(float) + 15 );
-    p_dec->samples = (float *)
-                     (((unsigned long) p_dec->samples_back + 15 ) & ~0xFUL);
-#else
-    p_dec->samples = memalign( 16, 6 * 256 * sizeof(float) );
-#endif
-#undef p_dec
+    p_ac3thread->ac3_decoder->samples = memalign( 16, 6 * 256 * sizeof(float) );
 
     IMDCT->buf    = memalign( 16, N/4 * sizeof(complex_t) );
     IMDCT->delay  = memalign( 16, 6 * 256 * sizeof(float) );
@@ -222,7 +228,7 @@ static int decoder_Run ( decoder_config_t * p_config )
         DecoderError( p_config->p_decoder_fifo );
         return( -1 );
     }
-   
+
     /*
      * Initialize the thread properties
      */
@@ -264,7 +270,7 @@ static int decoder_Run ( decoder_config_t * p_config )
              AlignWord( p_bit_stream );
              b_sync = 1;
 #undef p_bit_stream
-         }
+        }
 
         if (ac3_sync_frame (p_ac3thread->ac3_decoder, &sync_info))
         {
@@ -275,16 +281,15 @@ static int decoder_Run ( decoder_config_t * p_config )
         if( ( p_ac3thread->p_aout_fifo != NULL ) &&
             ( p_ac3thread->p_aout_fifo->l_rate != sync_info.sample_rate ) )
         {
-            aout_DestroyFifo (p_ac3thread->p_aout_fifo);
-
             /* Make sure the output thread leaves the NextFrame() function */
             vlc_mutex_lock (&(p_ac3thread->p_aout_fifo->data_lock));
+            aout_DestroyFifo (p_ac3thread->p_aout_fifo);
             vlc_cond_signal (&(p_ac3thread->p_aout_fifo->data_wait));
             vlc_mutex_unlock (&(p_ac3thread->p_aout_fifo->data_lock));
 
             p_ac3thread->p_aout_fifo = NULL;
         }
-        
+
         /* Creating the audio output fifo if not created yet */
         if (p_ac3thread->p_aout_fifo == NULL ) {
             p_ac3thread->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_STEREO_FIFO, 
@@ -307,12 +312,8 @@ static int decoder_Run ( decoder_config_t * p_config )
                 free( IMDCT->delay );
                 free( IMDCT->buf );
         #undef IMDCT
-        
-        #if defined( __MINGW32__ )
-                free( p_ac3thread->ac3_decoder->samples_back );
-        #else
+
                 free( p_ac3thread->ac3_decoder->samples );
-        #endif
         
                 module_Unneed( p_ac3thread->ac3_decoder->imdct->p_module );
                 module_Unneed( p_ac3thread->ac3_decoder->downmix.p_module );
@@ -402,11 +403,7 @@ static void EndThread (ac3dec_thread_t * p_ac3thread)
     free( IMDCT->buf );
 #undef IMDCT
 
-#if defined( __MINGW32__ )
-    free( p_ac3thread->ac3_decoder->samples_back );
-#else
     free( p_ac3thread->ac3_decoder->samples );
-#endif
 
     /* Unlock the modules */
     module_Unneed( p_ac3thread->ac3_decoder->downmix.p_module );

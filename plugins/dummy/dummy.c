@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.14 2002/01/09 02:01:14 sam Exp $
+ * $Id: dummy.c,v 1.15 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,8 +41,6 @@ void _M( intf_getfunctions )  ( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-    ADD_WINDOW( "Configuration for dummy module" )
-        ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 

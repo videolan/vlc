@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.15 2002/01/31 23:18:27 massiot Exp $
+ * $Id: gtk_open.c,v 1.16 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -66,13 +66,16 @@ gboolean GtkFileOpenShow( GtkWidget       *widget,
     /* If we have never used the file selector, open it */
     if( !GTK_IS_WIDGET( p_intf->p_sys->p_fileopen ) )
     {
+        char *psz_path;
+
         p_intf->p_sys->p_fileopen = create_intf_fileopen();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
                              "p_intf", p_intf );
 
-        gtk_file_selection_set_filename( GTK_FILE_SELECTION(
-            p_intf->p_sys->p_fileopen ),
-            main_GetPszVariable( INTF_PATH_VAR, INTF_PATH_DEFAULT ) );
+        if( (psz_path = config_GetPszVariable( INTF_PATH_VAR )) )
+            gtk_file_selection_set_filename( GTK_FILE_SELECTION(
+                p_intf->p_sys->p_fileopen ), psz_path );
+        if( psz_path ) free( psz_path );
     }
 
     gtk_widget_show( p_intf->p_sys->p_fileopen );
@@ -148,10 +151,13 @@ void GtkDiscOpenDvd( GtkToggleButton * togglebutton, gpointer user_data )
 {
     if( togglebutton->active )
     {
-        gtk_entry_set_text(
-          GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton), "disc_name" ) ),
-          main_GetPszVariable( INPUT_DVD_DEVICE_VAR, DVD_DEVICE )
-        );
+        char *psz_dvd_device;
+
+        if( (psz_dvd_device = config_GetPszVariable( INPUT_DVD_DEVICE_VAR )) )
+            gtk_entry_set_text(
+                GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
+                                          "disc_name" ) ), psz_dvd_device );
+        if( psz_dvd_device ) free( psz_dvd_device );
     }
 }
 
@@ -159,10 +165,13 @@ void GtkDiscOpenVcd( GtkToggleButton * togglebutton, gpointer user_data )
 {
     if( togglebutton->active )
     {
-        gtk_entry_set_text(
-          GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton), "disc_name" ) ),
-          main_GetPszVariable( INPUT_VCD_DEVICE_VAR, VCD_DEVICE )
-        );
+        char *psz_vcd_device;
+
+        if( (psz_vcd_device = config_GetPszVariable( INPUT_VCD_DEVICE_VAR )) )
+            gtk_entry_set_text(
+                GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
+                                          "disc_name" ) ), psz_vcd_device );
+        if( psz_vcd_device ) free( psz_vcd_device );
     }
 }
 
@@ -204,11 +213,11 @@ void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
     }
     
     /* Select title and chapter */
-    main_PutIntVariable( INPUT_TITLE_VAR, gtk_spin_button_get_value_as_int(
+    config_PutIntVariable( INPUT_TITLE_VAR, gtk_spin_button_get_value_as_int(
                               GTK_SPIN_BUTTON( lookup_widget(
                                   GTK_WIDGET(button), "disc_title" ) ) ) );
 
-    main_PutIntVariable( INPUT_CHAPTER_VAR, gtk_spin_button_get_value_as_int(
+    config_PutIntVariable( INPUT_CHAPTER_VAR, gtk_spin_button_get_value_as_int(
                               GTK_SPIN_BUTTON( lookup_widget(
                                   GTK_WIDGET(button), "disc_chapter" ) ) ) );
 
@@ -253,44 +262,30 @@ gboolean GtkNetworkOpenShow( GtkWidget       *widget,
 
     if( !GTK_IS_WIDGET( p_intf->p_sys->p_network ) )
     {
+        char *psz_channel_server;
+
         p_intf->p_sys->p_network = create_intf_network();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_network ),
                              "p_intf", p_intf );
 
-        gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
-            GTK_OBJECT( p_intf->p_sys->p_network ), "network_server" ) ),
-            main_GetPszVariable( INPUT_SERVER_VAR,
-                                 INPUT_SERVER_DEFAULT ) );
-
         gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(
             GTK_OBJECT( p_intf->p_sys->p_network ), "network_port" ) ),
-            main_GetIntVariable( INPUT_PORT_VAR,
-                                 INPUT_PORT_DEFAULT ) );
+            config_GetIntVariable( INPUT_PORT_VAR ) );
 
-        gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
-            GTK_OBJECT( p_intf->p_sys->p_network ), "network_broadcast" ) ),
-            main_GetPszVariable( INPUT_BCAST_ADDR_VAR,
-                                 INPUT_BCAST_ADDR_DEFAULT ) );
-
-        gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
-            GTK_OBJECT( p_intf->p_sys->p_network ), "network_channel" ) ),
-            main_GetPszVariable( INPUT_CHANNEL_SERVER_VAR,
-                                 INPUT_CHANNEL_SERVER_DEFAULT ) );
+        psz_channel_server = config_GetPszVariable( INPUT_CHANNEL_SERVER_VAR );
+        if( psz_channel_server )
+            gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
+                GTK_OBJECT( p_intf->p_sys->p_network ), "network_channel" ) ),
+                psz_channel_server );
+        if( psz_channel_server ) free( psz_channel_server );
 
         gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(
             GTK_OBJECT( p_intf->p_sys->p_network ), "network_channel_port" ) ),
-            main_GetIntVariable( INPUT_CHANNEL_PORT_VAR,
-                                 INPUT_CHANNEL_PORT_DEFAULT ) );
+            config_GetIntVariable( INPUT_CHANNEL_PORT_VAR ) );
 
         gtk_toggle_button_set_active( gtk_object_get_data( GTK_OBJECT(
             p_intf->p_sys->p_network ), "network_channel_check" ),
-            main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
-                                 INPUT_NETWORK_CHANNEL_DEFAULT ) );
-            
-        gtk_toggle_button_set_active( gtk_object_get_data( GTK_OBJECT(
-            p_intf->p_sys->p_network ), "network_broadcast_check" ),
-            main_GetIntVariable( INPUT_BROADCAST_VAR,
-                                 INPUT_BROADCAST_DEFAULT ) );
+            config_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR ) );
     }
 
     gtk_widget_show( p_intf->p_sys->p_network );
@@ -340,7 +335,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
     /* Manage channel server */
     b_channel = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(
         lookup_widget( GTK_WIDGET(button), "network_channel_check" ) ) );
-    main_PutIntVariable( INPUT_NETWORK_CHANNEL_VAR, b_channel );
+    config_PutIntVariable( INPUT_NETWORK_CHANNEL_VAR, b_channel );
     if( b_channel )
     {
         char *          psz_channel;
@@ -356,10 +351,10 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         i_channel_port = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON(
             lookup_widget( GTK_WIDGET(button), "network_channel_port" ) ) );
 
-        main_PutPszVariable( INPUT_CHANNEL_SERVER_VAR, psz_channel );
+        config_PutPszVariable( INPUT_CHANNEL_SERVER_VAR, psz_channel );
         if( i_channel_port < 65536 )
         {
-            main_PutIntVariable( INPUT_CHANNEL_PORT_VAR, i_channel_port );
+            config_PutIntVariable( INPUT_CHANNEL_PORT_VAR, i_channel_port );
         }
 
         p_intf->p_sys->b_playing = 1;

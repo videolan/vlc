@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.41 2002/02/15 13:32:52 sam Exp $
+ * $Id: modules.h,v 1.42 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,34 +46,36 @@ static __inline__ char *GetCapabilityName( unsigned int i_capa )
      * new capability. */
     static char *pp_capa[] =
     {
+        "main",
+#define MODULE_CAPABILITY_MAIN      0  /* Main */
         "interface",
-#define MODULE_CAPABILITY_INTF      0  /* Interface */
+#define MODULE_CAPABILITY_INTF      1  /* Interface */
         "access",
-#define MODULE_CAPABILITY_ACCESS    1  /* Input */
+#define MODULE_CAPABILITY_ACCESS    2  /* Input */
         "input",
-#define MODULE_CAPABILITY_INPUT     2  /* Input */
+#define MODULE_CAPABILITY_INPUT     3  /* Input */
         "decaps",
-#define MODULE_CAPABILITY_DECAPS    3  /* Decaps */
+#define MODULE_CAPABILITY_DECAPS    4  /* Decaps */
         "decoder",
-#define MODULE_CAPABILITY_DECODER   4  /* Audio or video decoder */
+#define MODULE_CAPABILITY_DECODER   5  /* Audio or video decoder */
         "motion",
-#define MODULE_CAPABILITY_MOTION    5  /* Motion compensation */
+#define MODULE_CAPABILITY_MOTION    6  /* Motion compensation */
         "iDCT",
-#define MODULE_CAPABILITY_IDCT      6  /* IDCT transformation */
+#define MODULE_CAPABILITY_IDCT      7  /* IDCT transformation */
         "audio output",
-#define MODULE_CAPABILITY_AOUT      7  /* Audio output */
+#define MODULE_CAPABILITY_AOUT      8  /* Audio output */
         "video output",
-#define MODULE_CAPABILITY_VOUT      8  /* Video output */
+#define MODULE_CAPABILITY_VOUT      9  /* Video output */
         "chroma transformation",
-#define MODULE_CAPABILITY_CHROMA    9  /* colorspace conversion */
+#define MODULE_CAPABILITY_CHROMA   10  /* colorspace conversion */
         "iMDCT",
-#define MODULE_CAPABILITY_IMDCT    10  /* IMDCT transformation */
+#define MODULE_CAPABILITY_IMDCT    11  /* IMDCT transformation */
         "downmix",
-#define MODULE_CAPABILITY_DOWNMIX  11  /* AC3 downmix */
+#define MODULE_CAPABILITY_DOWNMIX  12  /* AC3 downmix */
         "memcpy",
-#define MODULE_CAPABILITY_MEMCPY   12  /* memcpy */
+#define MODULE_CAPABILITY_MEMCPY   13  /* memcpy */
         "unknown"
-#define MODULE_CAPABILITY_MAX      13  /* Total number of capabilities */
+#define MODULE_CAPABILITY_MAX      14  /* Total number of capabilities */
     };
 
     return pp_capa[ (i_capa) > MODULE_CAPABILITY_MAX ? MODULE_CAPABILITY_MAX :
@@ -120,6 +122,7 @@ typedef struct module_s
 
     struct module_functions_s *p_functions;          /* Capability functions */
     struct module_config_s  *p_config;     /* Module configuration structure */
+    int i_config_options;                 /* number of configuration options */
 
     /*
      * Variables used internally by the module manager
@@ -326,40 +329,13 @@ typedef struct module_functions_s
 typedef struct module_functions_s * p_module_functions_t;
 
 /*****************************************************************************
- * Macros used to build the configuration structure.
- *****************************************************************************/
-
-/* Mandatory first and last parts of the structure */
-#define MODULE_CONFIG_ITEM_START       0xdead  /* The main window */
-#define MODULE_CONFIG_ITEM_END         0xbeef  /* End of the window */
-
-/* Configuration widgets */
-#define MODULE_CONFIG_ITEM_WINDOW      0x0001  /* The main window */
-#define MODULE_CONFIG_ITEM_PANE        0x0002  /* A notebook pane */
-#define MODULE_CONFIG_ITEM_FRAME       0x0003  /* A frame */
-#define MODULE_CONFIG_ITEM_COMMENT     0x0004  /* A comment text */
-#define MODULE_CONFIG_ITEM_STRING      0x0005  /* A string */
-#define MODULE_CONFIG_ITEM_FILE        0x0006  /* A file selector */
-#define MODULE_CONFIG_ITEM_CHECK       0x0007  /* A checkbox */
-#define MODULE_CONFIG_ITEM_CHOOSE      0x0008  /* A choose box */
-#define MODULE_CONFIG_ITEM_RADIO       0x0009  /* A radio box */
-#define MODULE_CONFIG_ITEM_SCALE       0x000a  /* A horizontal ruler */
-#define MODULE_CONFIG_ITEM_SPIN        0x000b  /* A numerical selector */
-
-typedef struct module_config_s
-{
-    int         i_type;                         /* Configuration widget type */
-    char *      psz_text;        /* Text commenting or describing the widget */
-    char *      psz_name;                                   /* Variable name */
-    void *      p_getlist;          /* Function to call to get a choice list */
-    void *      p_change;        /* Function to call when commiting a change */
-} module_config_t;
-
-/*****************************************************************************
  * Exported functions.
  *****************************************************************************/
 #ifndef PLUGIN
 void            module_InitBank     ( void );
+void            module_LoadMain     ( void );
+void            module_LoadBuiltins ( void );
+void            module_LoadPlugins  ( void );
 void            module_EndBank      ( void );
 void            module_ResetBank    ( void );
 void            module_ManageBank   ( void );
@@ -370,4 +346,3 @@ void            module_Unneed       ( module_t * p_module );
 #   define module_Need p_symbols->module_Need
 #   define module_Unneed p_symbols->module_Unneed
 #endif
-

@@ -41,8 +41,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list );
  * Building configuration tree
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for QNX RTOS module" )
-    ADD_COMMENT( "For now, the QNX RTOS module cannot be configured" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

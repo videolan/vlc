@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_synchro.c,v 1.6 2002/02/19 00:50:19 sam Exp $
+ * $Id: vpar_synchro.c,v 1.7 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -94,6 +94,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <stdlib.h>                                                /* free() */
 #include <string.h>                                    /* memcpy(), memset() */
 
 #include <videolan/vlc.h>
@@ -532,12 +533,17 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
  *****************************************************************************/
 static int SynchroType( void )
 {
-    char * psz_synchro = main_GetPszVariable( VPAR_SYNCHRO_VAR, NULL );
+    char psz_synchro_tmp[5];
+    char * psz_synchro = config_GetPszVariable( VPAR_SYNCHRO_VAR );
 
     if( psz_synchro == NULL )
     {
         return VPAR_SYNCHRO_DEFAULT;
     }
+
+    strncpy( psz_synchro_tmp, psz_synchro, 5);
+    free( psz_synchro );
+    psz_synchro = psz_synchro_tmp;
 
     switch( *psz_synchro++ )
     {

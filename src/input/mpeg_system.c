@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.79 2002/02/19 00:50:19 sam Exp $
+ * $Id: mpeg_system.c,v 1.80 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -708,13 +708,13 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
-                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
-                                == (p_es->i_id & 0x1F) )
-                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
+                        if( config_GetIntVariable( INPUT_CHANNEL_VAR )
+                                == (p_es->i_id & 0x1F) ||
+                            ( config_GetIntVariable( INPUT_CHANNEL_VAR ) < 0
+                              && !(p_es->i_id & 0x1F) ) )
+                        switch( config_GetIntVariable( INPUT_AUDIO_VAR ) )
                         {
-                        case 0:
-                            main_PutIntVariable( INPUT_CHANNEL_VAR,
-                                                 REQUESTED_MPEG );
+                        case -1:
                         case REQUESTED_MPEG:
                             input_SelectES( p_input, p_es );
                         }
@@ -728,13 +728,13 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
-                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
-                                == ((p_es->i_id & 0xF00) >> 8) )
-                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
+                        if( config_GetIntVariable( INPUT_CHANNEL_VAR )
+                                == ((p_es->i_id & 0xF00) >> 8) ||
+                            ( config_GetIntVariable( INPUT_CHANNEL_VAR ) < 0
+                              && !((p_es->i_id & 0xF00) >> 8)) )
+                        switch( config_GetIntVariable( INPUT_AUDIO_VAR ) )
                         {
-                        case 0:
-                            main_PutIntVariable( INPUT_CHANNEL_VAR,
-                                                 REQUESTED_AC3 );
+                        case -1:
                         case REQUESTED_AC3:
                             input_SelectES( p_input, p_es );
                         }
@@ -746,7 +746,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_type = DVD_SPU_ES;
                         p_es->i_cat = SPU_ES;
 #ifdef AUTO_SPAWN
-                        if( main_GetIntVariable( INPUT_SUBTITLE_VAR, -1 )
+                        if( config_GetIntVariable( INPUT_SUBTITLE_VAR )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
                         {
                             if( !p_input->stream.b_seekable )
@@ -1476,10 +1476,9 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         if( p_main->b_audio )
         {
             /* Default is the first one */
-            i_required_audio_es = main_GetIntVariable( INPUT_CHANNEL_VAR, 1 );
+            i_required_audio_es = config_GetIntVariable( INPUT_CHANNEL_VAR );
             if( i_required_audio_es < 0 )
             {
-                main_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
                 i_required_audio_es = 1;
             }
         }
@@ -1492,10 +1491,9 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         if( p_main->b_video )
         {
             /* for spu, default is none */
-            i_required_spu_es = main_GetIntVariable( INPUT_SUBTITLE_VAR, 0 );
+            i_required_spu_es = config_GetIntVariable( INPUT_SUBTITLE_VAR );
             if( i_required_spu_es < 0 )
             {
-                main_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
                 i_required_spu_es = 0;
             }
         }

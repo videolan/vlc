@@ -77,9 +77,6 @@ void _M( aout_getfunctions )( function_list_t * p_function_list )
 static int aout_Open( aout_thread_t *p_aout )
 {
     int i_err = 0;
-    p_aout->i_format = AOUT_FORMAT_DEFAULT;
-    p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR, AOUT_STEREO_DEFAULT );
-    p_aout->l_rate = AOUT_RATE_DEFAULT;
 
     /* Allocate structure */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );

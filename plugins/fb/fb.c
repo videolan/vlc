@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.13 2002/02/15 13:32:53 sam Exp $
+ * $Id: fb.c,v 1.14 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -66,7 +66,11 @@ static void GfxMode        ( int i_tty );
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
+#define FB_DEV_VAR "fb_dev"
+
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( "Misc Options", NULL )
+ADD_STRING  ( FB_DEV_VAR, "/dev/fb0", NULL,"framebuffer device",NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -485,13 +489,22 @@ static int OpenDisplay( vout_thread_t *p_vout )
     struct fb_fix_screeninfo    fix_info;     /* framebuffer fix information */
 
     /* Open framebuffer device */
-    psz_device = main_GetPszVariable( VOUT_FB_DEV_VAR, VOUT_FB_DEV_DEFAULT );
-    p_vout->p_sys->i_fd = open( psz_device, O_RDWR);
-    if( p_vout->p_sys->i_fd == -1 )
+    if( !(psz_device = config_GetPszVariable( FB_DEV_VAR )) )
     {
-        intf_ErrMsg("vout error: can't open %s (%s)", psz_device, strerror(errno) );
+        intf_ErrMsg( "vout error: don't know which fb device to open" );
         return( 1 );
     }
+
+    p_vout->p_sys->i_fd = open( psz_device, O_RDWR);
+
+    if( p_vout->p_sys->i_fd == -1 )
+    {
+        intf_ErrMsg("vout error: can't open %s (%s)",
+                    psz_device, strerror(errno) );
+        free( psz_device );
+        return( 1 );
+    }
+    free( psz_device );
 
     /* Get framebuffer device informations */
     if( ioctl( p_vout->p_sys->i_fd,

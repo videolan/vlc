@@ -37,9 +37,6 @@ void _M( aout_getfunctions )( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-    ADD_WINDOW( "Configuration for arts module" )
-        ADD_FRAME( "aRts" )
-            ADD_COMMENT( "This module does not need configuration" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

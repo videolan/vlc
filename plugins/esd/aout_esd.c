@@ -2,7 +2,7 @@
  * aout_esd.c : Esound functions library
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: aout_esd.c,v 1.19 2002/02/15 13:32:53 sam Exp $
+ * $Id: aout_esd.c,v 1.20 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,6 +52,7 @@
 typedef struct aout_sys_s
 {
     esd_format_t esd_format;
+    int          i_fd;
 
 } aout_sys_t;
 
@@ -97,7 +98,8 @@ static int aout_Open( aout_thread_t *p_aout )
     }
 
     /* Initialize some variables */
-    p_aout->l_rate = esd_audio_rate; /* We use actual esd rate value, not AOUT_RATE_DEFAULT */
+    p_aout->l_rate = esd_audio_rate; /* We use actual esd rate value, not
+				      * initial value */
 
     i_bits = ESD_BITS16;
     i_mode = ESD_STREAM;
@@ -115,7 +117,7 @@ static int aout_Open( aout_thread_t *p_aout )
 
     /* open a socket for playing a stream
      * and try to open /dev/dsp if there's no EsounD */
-    if ( (p_aout->i_fd
+    if ( (p_aout->p_sys->i_fd
             = esd_play_stream_fallback(p_aout->p_sys->esd_format,
                 p_aout->l_rate, NULL, "vlc")) < 0 )
     {
@@ -184,7 +186,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
         }
     }
 
-    write( p_aout->i_fd, buffer, i_size );
+    write( p_aout->p_sys->i_fd, buffer, i_size );
 }
 
 /*****************************************************************************
@@ -192,6 +194,6 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
  *****************************************************************************/
 static void aout_Close( aout_thread_t *p_aout )
 {
-    close( p_aout->i_fd );
+    close( p_aout->p_sys->i_fd );
 }
 

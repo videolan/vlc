@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: main.h,v 1.29 2002/02/15 13:32:52 sam Exp $
+ * $Id: main.h,v 1.30 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -38,7 +38,6 @@ typedef struct main_s
     /* Global properties */
     int                    i_argc;           /* command line arguments count */
     char **                ppsz_argv;              /* command line arguments */
-    char **                ppsz_env;                /* environment variables */
     char *                 psz_arg0;         /* program name (whithout path) */
 
     u32                    i_cpu_capabilities;             /* CPU extensions */
@@ -49,6 +48,7 @@ typedef struct main_s
     boolean_t              b_audio;             /* is audio output allowed ? */
     boolean_t              b_video;             /* is video output allowed ? */
     boolean_t              b_ac3;
+    boolean_t              b_stereo;
     mtime_t                i_desync;   /* relative desync of the audio ouput */
 
     /* Fast memcpy plugin used */
@@ -77,20 +77,3 @@ extern main_t *p_main;
  *****************************************************************************/
 #define FAST_MEMCPY p_main->pf_memcpy
 #define FAST_MEMSET p_main->pf_memset
-
-/*****************************************************************************
- * Prototypes - these methods are used to get default values for some threads
- * and modules.
- *****************************************************************************/
-#ifndef PLUGIN
-int    main_GetIntVariable( char *psz_name, int i_default );
-char * main_GetPszVariable( char *psz_name, char *psz_default );
-void   main_PutIntVariable( char *psz_name, int i_value );
-void   main_PutPszVariable( char *psz_name, char *psz_value );
-#else
-#   define main_GetIntVariable p_symbols->main_GetIntVariable
-#   define main_PutIntVariable p_symbols->main_PutIntVariable
-#   define main_GetPszVariable p_symbols->main_GetPszVariable
-#   define main_PutPszVariable p_symbols->main_PutPszVariable
-#endif
-

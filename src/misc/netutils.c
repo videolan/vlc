@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.56 2002/02/20 23:23:53 sam Exp $
+ * $Id: netutils.c,v 1.57 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -211,8 +211,7 @@ int network_ChannelJoin( int i_channel )
     struct timeval delay;
     fd_set fds;
 
-    if( !main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
-                              INPUT_NETWORK_CHANNEL_DEFAULT  ) )
+    if( !config_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR ) )
     {
         intf_ErrMsg( "network: channels disabled, to enable them, use the"
                      "--channels option" );
@@ -247,10 +246,14 @@ int network_ChannelJoin( int i_channel )
     }
 
     /* Getting information about the channel server */
-    psz_vlcs = main_GetPszVariable( INPUT_CHANNEL_SERVER_VAR,
-                                    INPUT_CHANNEL_SERVER_DEFAULT );
-    i_port = main_GetIntVariable( INPUT_CHANNEL_PORT_VAR,
-                                  INPUT_CHANNEL_PORT_DEFAULT );
+    if( !(psz_vlcs = config_GetPszVariable( INPUT_CHANNEL_SERVER_VAR )) )
+    {
+        intf_ErrMsg( "network: configuration variable %s empty",
+                     INPUT_CHANNEL_SERVER_VAR );
+        return -1;
+    }
+
+    i_port = config_GetIntVariable( INPUT_CHANNEL_PORT_VAR );
 
     intf_WarnMsg( 5, "network: socket %i, vlcs '%s', port %d",
                      i_fd, psz_vlcs, i_port );
@@ -267,6 +270,7 @@ int network_ChannelJoin( int i_channel )
 #else
     sa_server.sin_addr.s_addr = inet_addr( psz_vlcs );
 #endif
+    free( psz_vlcs );
 
     /* Bind the socket */
     if( bind( i_fd, (struct sockaddr*)(&sa_client), sizeof(sa_client) ) )
@@ -380,13 +384,20 @@ static int GetMacAddress( int i_fd, char *psz_mac )
 #if defined( SYS_LINUX )
     struct ifreq interface;
     int i_ret;
+    char *psz_interface;
 
     /*
      * Looking for information about the eth0 interface
      */
     interface.ifr_addr.sa_family = AF_INET;
-    strcpy( interface.ifr_name, 
-            main_GetPszVariable( INPUT_IFACE_VAR, INPUT_IFACE_DEFAULT ) );
+    if( !(psz_interface = config_GetPszVariable( INPUT_IFACE_VAR )) )
+    {
+        intf_ErrMsg( "network error: configuration variable %s empty",
+                     INPUT_IFACE_VAR );
+        return -1;
+    }
+    strcpy( interface.ifr_name, psz_interface );
+    free( psz_interface );
 
     i_ret = ioctl( i_fd, SIOCGIFHWADDR, &interface );
 

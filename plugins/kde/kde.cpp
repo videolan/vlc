@@ -2,7 +2,7 @@
  * kde.cpp : KDE plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: kde.cpp,v 1.6 2002/01/02 14:37:42 sam Exp $
+ * $Id: kde.cpp,v 1.7 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -48,8 +48,6 @@ extern "C"
 {
 
 MODULE_CONFIG_START
-    ADD_WINDOW( "Configuration for KDE module" )
-        ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

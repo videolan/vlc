@@ -137,7 +137,7 @@ INTERFACE := main interface intf_msg intf_playlist intf_eject
 INPUT := input input_ext-dec input_ext-intf input_dec input_programs input_clock mpeg_system
 VIDEO_OUTPUT := video_output video_text vout_pictures vout_subpictures
 AUDIO_OUTPUT := audio_output aout_common aout_ext-dec aout_spdif
-MISC := mtime modules netutils iso_lang
+MISC := mtime modules configuration netutils iso_lang
 
 C_OBJ :=	$(INTERFACE:%=src/interface/%.o) \
 		$(INPUT:%=src/input/%.o) \

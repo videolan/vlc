@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctclassic.c,v 1.20 2002/02/15 13:32:53 sam Exp $
+ * $Id: idctclassic.c,v 1.21 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -41,8 +41,6 @@ static void idct_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-    ADD_WINDOW( "Configuration for classic IDCT module" )
-        ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

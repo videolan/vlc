@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.18 2002/02/20 23:23:53 sam Exp $
+ * $Id: xcommon.c,v 1.19 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -295,16 +295,21 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    /* Open display, unsing 'vlc_display' or DISPLAY environment variable */
-    psz_display = XDisplayName( main_GetPszVariable( VOUT_DISPLAY_VAR, NULL ) );
+    /* Open display, unsing the VOUT_DISPLAY_VAR config variable or the DISPLAY
+     * environment variable */
+    psz_display = config_GetPszVariable( VOUT_DISPLAY_VAR );
     p_vout->p_sys->p_display = XOpenDisplay( psz_display );
 
     if( p_vout->p_sys->p_display == NULL )                          /* error */
     {
-        intf_ErrMsg( "vout error: cannot open display %s", psz_display );
+        intf_ErrMsg( "vout error: cannot open display %s",
+                     XDisplayName( psz_display ) );
         free( p_vout->p_sys );
+        if( psz_display ) free( psz_display );
         return( 1 );
     }
+    if( psz_display ) free( psz_display );
+
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
 #ifdef MODULE_NAME_IS_xvideo
@@ -1829,7 +1834,7 @@ static int XVideoGetPort( Display *dpy, u32 i_chroma, u32 *pi_newchroma )
     }
 
     i_selected_port = -1;
-    i_requested_adaptor = main_GetIntVariable( VOUT_XVADAPTOR_VAR, -1 );
+    i_requested_adaptor = config_GetIntVariable( XVADAPTOR_VAR );
 
     for( i_adaptor = 0; i_adaptor < i_num_adaptors; ++i_adaptor )
     {

@@ -2,7 +2,7 @@
  * null.c : NULL module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: null.c,v 1.4 2001/12/30 07:09:55 sam Exp $
+ * $Id: null.c,v 1.5 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -33,19 +33,18 @@
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-    ADD_WINDOW( "Configuration for null module" )
-        ADD_PANE( "First pane" )
-            ADD_FRAME( "First frame" )
-                ADD_COMMENT( "You can put whatever you want here." )
+     /*        ADD_PANE( "First pane" )
+            ADD_SUBCATEGORY_HINT( "First frame" )
+
                 ADD_STRING( "Random text: ", MODULE_VAR(text), NULL )
-            ADD_FRAME( "Second frame" )
-                ADD_COMMENT( "The file below is not used." )
+            ADD_SUBCATEGORY_HINT( "Second frame" )
+
                 ADD_FILE( "Select file: ", MODULE_VAR(file), NULL )
-            ADD_FRAME( "Third frame" )
-                ADD_COMMENT( "This space intentionally left blank." )
+            ADD_SUBCATEGORY_HINT( "Third frame" )
+
         ADD_PANE( "Second pane" )
-            ADD_FRAME( "Frame" )
-                ADD_COMMENT( "There is nothing in this frame." )
+            ADD_SUBCATEGORY_HINT( "Frame" )
+     */
 MODULE_CONFIG_STOP
 
 

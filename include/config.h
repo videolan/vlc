@@ -27,13 +27,6 @@
  *
  * - Symbols should begin with a prefix indicating in which module they are
  *   used, such as INTF_, VOUT_ or ADEC_.
- *
- * - Regarding environment variables, which are used as initialization
- *  parameters for threads :
- *   + variable names should end with '_VAR'
- *   + environment variable default value should end with '_DEFAULT'
- *   + values having a special meaning with '_VAL'
- *
  */
 
 /*****************************************************************************
@@ -54,30 +47,9 @@
  * outputting an error message (in second) */
 #define THREAD_COND_TIMEOUT             5
 
-/* Environment variable containing the memcpy method */
-#define MEMCPY_METHOD_VAR               "vlc_memcpy"
-
-/*
- * Paths
- */
-
-#define MAX_PLUGIN_COUNT                32
-
 /*****************************************************************************
  * Interface configuration
  *****************************************************************************/
-
-/* Environment variable containing the display method */
-#define INTF_METHOD_VAR                 "vlc_intf"
-#define INTF_METHOD_DEFAULT             "gtk"
-
-/* Environment variable used to store startup script name and default value */
-#define INTF_INIT_SCRIPT_VAR            "vlcrc"
-#define INTF_INIT_SCRIPT_DEFAULT        ".vlcrc"
-
-/* Environment variable used to store channels file and default value */
-#define INTF_CHANNELS_VAR               "vlc_channels"
-#define INTF_CHANNELS_DEFAULT           "vlc.channels"
 
 /* Base delay in micro second for interface sleeps */
 #define INTF_IDLE_SLEEP                 ((int)(0.050*CLOCK_FREQ))
@@ -86,20 +58,9 @@
 #define INTF_GAMMA_STEP                 .1
 #define INTF_GAMMA_LIMIT                3
 
-/* Maximum number of channels */
-#define INTF_MAX_CHANNELS               10
-
-/* Default search path for interface file browser */
-#define INTF_PATH_VAR                   "vlc_search_path"
-#define INTF_PATH_DEFAULT               ""
-
 /*****************************************************************************
  * Input thread configuration
  *****************************************************************************/
-
-/* Environment variable containing the input method */
-#define INPUT_METHOD_VAR                "vlc_input"
-#define INPUT_METHOD_DEFAULT            "ps"
 
 /* XXX?? */
 #define INPUT_IDLE_SLEEP                ((int)(0.100*CLOCK_FREQ))
@@ -124,44 +85,9 @@
 /* Maximum memory the input is allowed to use (20 MB) */
 #define INPUT_MAX_ALLOCATION            20971520
 
-/* Default network protocol */
-#define INPUT_NETWORK_PROTOCOL_VAR      "vlc_network_protocol"
-#define INPUT_NETWORK_PROTOCOL_DEFAULT  "ts"
-
-/* Default input port */
-#define INPUT_PORT_VAR                  "vlc_server_port"
-#define INPUT_PORT_DEFAULT              1234
-
-/* FIXME : Delete those ! */
-/* Default remote server */
-#define INPUT_SERVER_VAR                "vlc_server"
-#define INPUT_SERVER_DEFAULT            "138.195.143.220"
-
-/* Broadcast mode */
-#define INPUT_BROADCAST_VAR             "vlc_broadcast"
-#define INPUT_BROADCAST_DEFAULT         0
-
-/* Default broadcast address */
-#define INPUT_BCAST_ADDR_VAR            "vlc_broadcast_addr"
-#define INPUT_BCAST_ADDR_DEFAULT        "138.195.143.255"
-
-/* Channels mode */
-#define INPUT_NETWORK_CHANNEL_VAR       "vlc_channel"
-#define INPUT_NETWORK_CHANNEL_DEFAULT   0
-
 /*
  * Channel method
  */
-
-/* Default network interface and environment variable */
-#define INPUT_IFACE_VAR                 "vlc_iface"
-#define INPUT_IFACE_DEFAULT             "eth0"
-
-/* Default server and port */
-#define INPUT_CHANNEL_SERVER_VAR           "vlc_channel_server"
-#define INPUT_CHANNEL_SERVER_DEFAULT       "138.195.143.120"
-#define INPUT_CHANNEL_PORT_VAR             "vlc_channel_port"
-#define INPUT_CHANNEL_PORT_DEFAULT         6010
 
 /* Delay between channel changes - this is required to avoid flooding the 
  * channel server */
@@ -171,33 +97,12 @@
  * mark it to be presented */
 #define DEFAULT_PTS_DELAY               (mtime_t)(.2*CLOCK_FREQ)
 
-/* DVD defaults */
-#define INPUT_DVD_DEVICE_VAR            "vlc_dvd_device"
-
-#define INPUT_TITLE_VAR                 "vlc_input_title"
-#define INPUT_CHAPTER_VAR               "vlc_input_chapter"
-#define INPUT_ANGLE_VAR                 "vlc_input_angle"
-#define INPUT_AUDIO_VAR                 "vlc_input_audio"
-#define INPUT_CHANNEL_VAR               "vlc_input_channel"
-#define INPUT_SUBTITLE_VAR              "vlc_input_subtitle"
-
-/* VCD defaults */
-#define INPUT_VCD_DEVICE_VAR            "vlc_vcd_device"
-
 /*****************************************************************************
  * Audio configuration
  *****************************************************************************/
 
 /* Maximum number of audio output threads */
 #define AOUT_MAX_THREADS                10
-
-/* Environment variable containing the audio output method */
-#define AOUT_METHOD_VAR                 "vlc_aout"
-#define AOUT_METHOD_DEFAULT             "dsp"
-
-/* Environment variable used to store dsp device name, and default value */
-#define AOUT_DSP_VAR                    "vlc_dsp"
-#define AOUT_DSP_DEFAULT                "/dev/dsp"
 
 /* Default audio output format (AOUT_FMT_S16_NE = Native Endianess) */
 #define AOUT_FORMAT_DEFAULT             AOUT_FMT_S16_NE
@@ -208,31 +113,10 @@
 /* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_U16_BE */
 /* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_U16_LE */
 
-/* Environment variable for stereo, and default value */
-#define AOUT_STEREO_VAR                 "vlc_stereo"
-#define AOUT_STEREO_DEFAULT             1
-
-/* Environment variable for spdif mode */
-#define AOUT_SPDIF_VAR                  "vlc_spdif"
-#define AOUT_SPDIF_DEFAULT              0
-
-/* Environment variable containing the AC3 downmix method */
-#define DOWNMIX_METHOD_VAR              "vlc_downmix"
-
-/* Environment variable containing the AC3 IMDCT method */
-#define IMDCT_METHOD_VAR                "vlc_imdct"
-
 /* Volume */
 #define VOLUME_DEFAULT                  512
 #define VOLUME_STEP                     128
 #define VOLUME_MAX                      1024
-
-/* Environment variable for volume */
-#define AOUT_VOLUME_VAR                 "vlc_volume"
-
-/* Environment variable for output rate, and default value */
-#define AOUT_RATE_VAR                   "vlc_audio_rate"
-#define AOUT_RATE_DEFAULT               44100
 
 /* Number of audio output frames contained in an audio output fifo.
  * (AOUT_FIFO_SIZE + 1) must be a power of 2, in order to optimise the
@@ -251,10 +135,6 @@
  * - long, in order to perform the buffer calculations as few as possible */
 #define AOUT_BUFFER_DURATION            100000
 
-/* Environment variable for audio decoders */
-#define ADEC_MPEG_VAR                   "vlc_mpeg_adec"
-#define ADEC_AC3_VAR                   "vlc_ac3_adec"
-
 /*****************************************************************************
  * Video configuration
  *****************************************************************************/
@@ -265,39 +145,6 @@
 /*
  * Default settings for video output threads
  */
-
-/* Environment variable containing the display method */
-#define VOUT_METHOD_VAR                 "vlc_vout"
-#define VOUT_METHOD_DEFAULT             "x11"
-
-/* Environment variable containing the display method */
-#define VOUT_FILTER_VAR                 "vlc_filter"
-#define VOUT_FILTER_DEFAULT             "x11"
-
-/* Environment variable containing the motion compensation method */
-#define MOTION_METHOD_VAR               "vlc_motion"
-
-/* Environment variable containing the IDCT method */
-#define IDCT_METHOD_VAR                 "vlc_idct"
-
-/* Environment variable containing the YUV method */
-#define YUV_METHOD_VAR                  "vlc_yuv"
-
-/* Environment variable used in place of DISPLAY if available */
-#define VOUT_DISPLAY_VAR                "vlc_display"
-
-/* Default dimensions for display window - these dimensions are enough for the
- * standard width and height broadcasted MPEG-2 streams or DVDs */
-#define VOUT_WIDTH_VAR                  "vlc_width"
-#define VOUT_WIDTH_DEFAULT              720
-#define VOUT_HEIGHT_VAR                 "vlc_height"
-#define VOUT_HEIGHT_DEFAULT             576
-#define VOUT_DEPTH_VAR                  "vlc_depth"
-#define VOUT_DEPTH_DEFAULT              15
-
-/* Default SPU margin is -1, which means we don't force their position */
-#define VOUT_SPUMARGIN_VAR              "vlc_spumargin"
-#define VOUT_SPUMARGIN_DEFAULT          -1
 
 /* Multiplier value for aspect ratio calculation (2^7 * 3^3 * 5^3) */
 #define VOUT_ASPECT_FACTOR              432000
@@ -322,22 +169,6 @@
  * informations and interface, has too many active areas, some of them are
  * joined. */
 #define VOUT_MAX_AREAS                  5
-
-/* Environment variable for grayscale output mode, and default value */
-#define VOUT_GRAYSCALE_VAR              "vlc_grayscale"
-#define VOUT_GRAYSCALE_DEFAULT          0
-
-/* Environment variable for fullscreen mode, and default value */
-#define VOUT_FULLSCREEN_VAR             "vlc_fullscreen"
-#define VOUT_FULLSCREEN_DEFAULT         0
-
-/* Environment variable for overlay mode, and default value */
-#define VOUT_NOOVERLAY_VAR              "vlc_nooverlay"
-#define VOUT_NOOVERLAY_DEFAULT          0
-
-/* Default gamma */
-#define VOUT_GAMMA_VAR                  "vlc_gamma"
-#define VOUT_GAMMA_DEFAULT              0.
 
 /* Default fonts */
 #define VOUT_DEFAULT_FONT               "default8x9.psf"
@@ -379,13 +210,6 @@
 /* The default video output window title */
 #define VOUT_TITLE                      "VideoLAN Client " VERSION
 
-/* Environment variable for framebuffer device, and default value */
-#define VOUT_FB_DEV_VAR                 "vlc_fb_dev"
-#define VOUT_FB_DEV_DEFAULT             "/dev/fb0"
-
-/* Environment variable for XVideo adaptor, and default value */
-#define VOUT_XVADAPTOR_VAR              "vlc_xv_adaptor"
-
 /*****************************************************************************
  * Video parser configuration
  *****************************************************************************/
@@ -403,9 +227,6 @@
 /* Maximum number of macroblocks in a picture. */
 #define MAX_MB                          2048
 
-/* The synchro variable name */
-#define VPAR_SYNCHRO_VAR                "vlc_synchro"
-
 /*****************************************************************************
  * Video decoder configuration
  *****************************************************************************/
@@ -414,9 +235,6 @@
 
 /* Maximum range of values out of the IDCT + motion compensation. */
 #define VDEC_CROPRANGE                  2048
-
-/* Environment variable containing the SMP value. */
-#define VDEC_SMP_VAR                   "vlc_smp"
 
 /* No SMP by default, since it slows down things on non-smp machines. */
 #define VDEC_SMP_DEFAULT                0
@@ -436,23 +254,137 @@
  * queue are printed, but not sent to the threads */
 #define INTF_MSG_QSIZE                  256
 
-/* Interface warnig message level */
-#define INTF_WARNING_VAR                "vlc_warning_level"
-#define INTF_WARNING_DEFAULT            0
 
 /****************************************************************************
- * Playlist defaults
+ * Macros for the names of the main options
+ * Instead of directly manipulating the option names, we define macros for
+ * them. This makes sense only for the main options (ie. only the ones defined
+ * in main.c) because they are widely used.
+ * We won't bother doing this for plugins as plugin specific options should
+ * by definition be restricted in useage to the plugin that defines them.
+ *
  ****************************************************************************/
 
+/*
+ * Interface option names
+ */
+
+/* Variable containing the display method */
+#define INTF_METHOD_VAR                 "intf"
+/* Variable used to store startup script */
+#define INTF_INIT_SCRIPT_VAR            "vlcrc"
+/* Default search path for interface file browser */
+#define INTF_PATH_VAR                   "search_path"
+/* Interface warnig message level */
+#define INTF_WARNING_VAR                "warning"
+/* Variable to enable stats mode */
+#define INTF_STATS_VAR                  "stats"
+
+/*
+ * Audio output option names
+ */
+
+/* Variable to disable the audio output */
+#define AOUT_NOAUDIO_VAR                "noaudio"
+/* Variable containing the audio output method */
+#define AOUT_METHOD_VAR                 "aout"
+/* Variable for spdif mode */
+#define AOUT_SPDIF_VAR                  "spdif"
+/* Variable for volume */
+#define AOUT_VOLUME_VAR                 "volume"
+/* Variable for mono */
+#define AOUT_MONO_VAR                   "audio_mono"
+/* Variable for output rate */
+#define AOUT_RATE_VAR                   "audio_rate"
+/* Variable for output rate */
+#define AOUT_DESYNC_VAR                 "audio_desync"
+
+/*
+ * Video output option names
+ */
+
+/* Variable to disable the video output */
+#define VOUT_NOVIDEO_VAR                "novideo"
+/* Variable containing the display method */
+#define VOUT_METHOD_VAR                 "vout"
+/* Variable used in place of DISPLAY if available */
+#define VOUT_DISPLAY_VAR                "display"
+/* Dimensions for display window */
+#define VOUT_WIDTH_VAR                  "width"
+#define VOUT_HEIGHT_VAR                 "height"
+/* Variable for grayscale output mode */
+#define VOUT_GRAYSCALE_VAR              "grayscale"
+/* Variable for fullscreen mode */
+#define VOUT_FULLSCREEN_VAR             "fullscreen"
+/* Variable for overlay mode */
+#define VOUT_NOOVERLAY_VAR              "nooverlay"
+/* Variable containing the filter method */
+#define VOUT_FILTER_VAR                 "filter"
+/* Variable containing the SPU margin */
+#define VOUT_SPUMARGIN_VAR              "spumargin"
+
+/*
+ * Input option names
+ */
+
+/* Variable containing the input method */
+#define INPUT_METHOD_VAR                "input"
+/* Input port */
+#define INPUT_PORT_VAR                  "server_port"
+/* Channels mode */
+#define INPUT_NETWORK_CHANNEL_VAR       "network_channel"
+/* Variable containing channel server and port */
+#define INPUT_CHANNEL_SERVER_VAR        "channel_server"
+#define INPUT_CHANNEL_PORT_VAR          "channel_port"
+/* Variable containing network interface */
+#define INPUT_IFACE_VAR                 "iface"
+
+#define INPUT_TITLE_VAR                 "input_title"
+#define INPUT_CHAPTER_VAR               "input_chapter"
+#define INPUT_ANGLE_VAR                 "input_angle"
+#define INPUT_AUDIO_VAR                 "input_audio"
+#define INPUT_CHANNEL_VAR               "input_channel"
+#define INPUT_SUBTITLE_VAR              "input_subtitle"
+/* DVD defaults */
+#define INPUT_DVD_DEVICE_VAR            "dvd_device"
+/* VCD defaults */
+#define INPUT_VCD_DEVICE_VAR            "vcd_device"
+
+/*
+ * Decoders option names
+ */
+
+/* Variables for audio decoders */
+#define ADEC_MPEG_VAR                   "mpeg_adec"
+#define ADEC_AC3_VAR                    "ac3_adec"
+/* The synchro variable name */
+#define VPAR_SYNCHRO_VAR                "vpar_synchro"
+/* Variable containing the SMP value */
+#define VDEC_SMP_VAR                    "vdec_smp"
+
+/*
+ * Playlist option names
+ */
+
 /* Launch on start-up */
-#define PLAYLIST_STARTUP_VAR            "vlc_playlist_on_start_up"
-#define PLAYLIST_STARTUP_DEFAULT        0
-
+#define PLAYLIST_STARTUP_VAR            "playlist_on_startup"
 /* Enqueue drag'n dropped item */
-#define PLAYLIST_ENQUEUE_VAR            "vlc_playlist_enqueue"
-#define PLAYLIST_ENQUEUE_DEFAULT        0
-
+#define PLAYLIST_ENQUEUE_VAR            "playlist_enqueue"
 /* Loop on playlist end */
-#define PLAYLIST_LOOP_VAR               "vlc_playlist_loop"
-#define PLAYLIST_LOOP_DEFAULT           0
+#define PLAYLIST_LOOP_VAR               "playlist_loop"
 
+/*
+ * CPU options
+ */
+#define NOMMX_VAR                       "nommx"
+#define NO3DN_VAR                       "no3dn"
+#define NOMMXEXT_VAR                    "nommxext"
+#define NOSSE_VAR                       "nosse"
+#define NOALTIVEC_VAR                   "noaltivec"
+
+/*
+ * Misc option names
+ */
+
+/* Variable containing the memcpy method */
+#define MEMCPY_METHOD_VAR               "memcpy"

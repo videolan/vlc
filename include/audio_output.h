@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.41 2002/01/14 12:15:10 asmax Exp $
+ * $Id: audio_output.h,v 1.42 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -157,10 +157,6 @@ typedef struct aout_thread_s
     /* date is the moment where the first audio unit of the output buffer
      * will be played */
     mtime_t             date;
-
-    /* Path to the audio output device (default is set to "/dev/dsp") */
-    char *              psz_device;
-    int                 i_fd;
 
     /* The current volume */
     int                 i_volume;

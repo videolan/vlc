@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.53 2002/02/19 00:50:20 sam Exp $
+ * $Id: modules.c,v 1.54 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -51,6 +51,7 @@
 #   undef HAVE_DYNAMIC_PLUGINS
 #endif
 
+
 #include "netutils.h"
 
 #include "interface.h"
@@ -81,7 +82,6 @@
 static void AllocateAllPlugins   ( void );
 static int  AllocatePluginModule ( char * );
 #endif
-static void AllocateAllBuiltins  ( void );
 static int  AllocateBuiltinModule( int ( * ) ( module_t * ),
                                    int ( * ) ( module_t * ),
                                    int ( * ) ( module_t * ) );
@@ -100,8 +100,8 @@ static module_symbols_t symbols;
 /*****************************************************************************
  * module_InitBank: create the module bank.
  *****************************************************************************
- * This function creates a module bank structure and fills it with the
- * built-in modules, as well as all the plugin modules it can find.
+ * This function creates a module bank structure which will be filled later
+ * on with all the modules found.
  *****************************************************************************/
 void module_InitBank( void )
 {
@@ -116,24 +116,46 @@ void module_InitBank( void )
     STORE_SYMBOLS( &symbols );
 #endif
 
-    /*
-     * Check all the built-in modules
-     */
-    intf_WarnMsg( 2, "module: checking built-in modules" );
-    AllocateAllBuiltins();
+    return;
+}
 
-    /*
-     * Check all the plugin modules we can find
-     */
+/*****************************************************************************
+ * module_LoadMain: load the main program info into the module bank.
+ *****************************************************************************
+ * This function fills the module bank structure with the main module infos.
+ * This is very useful as it will allow us to consider the main program just
+ * as another module, and for instance the configuration options of main will
+ * be available in the module bank structure just as for every other module.
+ *****************************************************************************/
+void module_LoadMain( void )
+{
+    AllocateBuiltinModule( InitModule__MODULE_main,
+                           ActivateModule__MODULE_main,
+                           DeactivateModule__MODULE_main );
+}
+
+/*****************************************************************************
+ * module_LoadBuiltins: load all modules which we built with.
+ *****************************************************************************
+ * This function fills the module bank structure with the built-in modules.
+ *****************************************************************************/
+void module_LoadBuiltins( void )
+{
+    intf_WarnMsg( 2, "module: checking built-in modules" );
+    ALLOCATE_ALL_BUILTINS();
+}
+
+/*****************************************************************************
+ * module_LoadPlugins: load all plugin modules we can find.
+ *****************************************************************************
+ * This function fills the module bank structure with the plugin modules.
+ *****************************************************************************/
+void module_LoadPlugins( void )
+{
 #ifdef HAVE_DYNAMIC_PLUGINS
     intf_WarnMsg( 2, "module: checking plugin modules" );
     AllocateAllPlugins();
 #endif
-
-    intf_WarnMsg( 2, "module: module bank initialized, found %i modules",
-                     p_module_bank->i_count );
-
-    return;
 }
 
 /*****************************************************************************
@@ -615,7 +637,7 @@ static int AllocatePluginModule( char * psz_filename )
     p_module->is.plugin.handle = handle;
     p_module->p_symbols = &symbols;
 
-    /* Initialize the module : fill p_module->psz_name, etc. */
+    /* Initialize the module : fill p_module->psz_name, default config, etc. */
     if( CallSymbol( p_module, "InitModule" MODULE_SUFFIX ) != 0 )
     {
         /* We couldn't call InitModule() */
@@ -705,14 +727,6 @@ static int AllocatePluginModule( char * psz_filename )
     return( 0 );
 }
 #endif /* HAVE_DYNAMIC_PLUGINS */
-
-/*****************************************************************************
- * AllocateAllBuiltins: load all modules we were built with.
- *****************************************************************************/
-static void AllocateAllBuiltins( void )
-{
-    ALLOCATE_ALL_BUILTINS();
-}
 
 /*****************************************************************************
  * AllocateBuiltinModule: initialize a built-in module.

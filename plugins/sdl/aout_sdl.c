@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.25 2002/02/15 13:32:53 sam Exp $
+ * $Id: aout_sdl.c,v 1.26 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -130,7 +130,6 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys->audio_buf = malloc( OVERFLOWLIMIT );
 
     /* Initialize some variables */
-    p_aout->psz_device = 0;
     desired.freq =     p_aout->l_rate;
 
     /* TODO: write conversion beetween AOUT_FORMAT_DEFAULT

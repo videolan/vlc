@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.5 2002/02/15 13:32:53 sam Exp $
+ * $Id: deinterlace.c,v 1.6 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -113,7 +113,7 @@ static void vout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Create( vout_thread_t *p_vout )
 {
-    char *psz_method;
+    char *psz_method, *psz_method_tmp;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -124,7 +124,13 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Look what method was requested */
-    psz_method = main_GetPszVariable( VOUT_FILTER_VAR, "" );
+    if( !(psz_method = psz_method_tmp
+          = config_GetPszVariable( VOUT_FILTER_VAR )) )
+    {
+        intf_ErrMsg( "vout error: configuration variable %s empty",
+                     VOUT_FILTER_VAR );
+        return( 1 );
+    }
 
     while( *psz_method && *psz_method != ':' )
     {
@@ -145,6 +151,8 @@ static int vout_Create( vout_thread_t *p_vout )
                      "using deinterlace:bob" );
         p_vout->p_sys->i_mode = DEINTERLACE_MODE_BOB;
     }
+
+    free( psz_method_tmp );
 
     return( 0 );
 }
@@ -180,8 +188,8 @@ static int vout_Init( vout_thread_t *p_vout )
     }
 
     /* Try to open the real video output, with half the height our images */
-    psz_filter = main_GetPszVariable( VOUT_FILTER_VAR, "" );
-    main_PutPszVariable( VOUT_FILTER_VAR, "" );
+    psz_filter = config_GetPszVariable( VOUT_FILTER_VAR );
+    config_PutPszVariable( VOUT_FILTER_VAR, NULL );
 
     intf_WarnMsg( 1, "filter: spawning the real video output" );
 
@@ -219,6 +227,9 @@ static int vout_Init( vout_thread_t *p_vout )
         break;
     }
 
+    config_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
+    if( psz_filter ) free( psz_filter );
+
     /* Everything failed */
     if( p_vout->p_sys->p_vout == NULL )
     {
@@ -228,8 +239,6 @@ static int vout_Init( vout_thread_t *p_vout )
     }
  
     p_vout->p_sys->last_date = 0;
-
-    main_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 

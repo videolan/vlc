@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.11 2002/01/09 02:01:14 sam Exp $
+ * $Id: modules_inner.h,v 1.12 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -72,9 +72,12 @@
 /*
  * InitModule: this function is called once and only once, when the module
  * is looked at for the first time. We get the useful data from it, for
- * instance the module name, its shortcuts, its capabilities...
+ * instance the module name, its shortcuts, its capabilities... we also create
+ * a copy of its config because the module can be unloaded at any time.
  */
 #define MODULE_INIT_START                                                     \
+    DECLARE_SYMBOLS;                                                          \
+                                                                              \
     int __VLC_SYMBOL( InitModule ) ( module_t *p_module )                     \
     {                                                                         \
         int i_shortcut = 0;                                                   \
@@ -85,7 +88,17 @@
         p_module->i_cpu_capabilities = 0;
 
 #define MODULE_INIT_STOP                                                      \
+        STORE_SYMBOLS;                                                        \
         p_module->pp_shortcuts[ i_shortcut ] = NULL;                          \
+        p_module->i_config_options = sizeof(p_config)/sizeof(module_config_t);\
+        p_module->p_config = config_Duplicate( p_config,                      \
+					       p_module->i_config_options );  \
+        if( p_module->p_config == NULL )                                      \
+        {                                                                     \
+            intf_ErrMsg( MODULE_STRING                                        \
+                         " InitModule error: can't duplicate p_config" );     \
+            return( -1 );                                                     \
+        }                                                                     \
         return( 0 );                                                          \
     }
 
@@ -113,8 +126,6 @@
  * module will be used.
  */
 #define MODULE_ACTIVATE_START                                                 \
-    DECLARE_SYMBOLS;                                                          \
-                                                                              \
     int __VLC_SYMBOL( ActivateModule ) ( module_t *p_module )                 \
     {                                                                         \
         p_module->p_functions =                                               \
@@ -123,7 +134,6 @@
         {                                                                     \
             return( -1 );                                                     \
         }                                                                     \
-        p_module->p_config = p_config;                                        \
         STORE_SYMBOLS;
 
 #define MODULE_ACTIVATE_STOP                                                  \
@@ -143,38 +153,3 @@
 #define MODULE_DEACTIVATE_STOP                                                \
         return( 0 );                                                          \
     }
-
-/*****************************************************************************
- * Macros used to build the configuration structure.
- *****************************************************************************/
-
-#define MODULE_CONFIG_START \
-    static module_config_t p_config[] = { \
-    { MODULE_CONFIG_ITEM_START, NULL, NULL, NULL, NULL },
-
-#define MODULE_CONFIG_STOP \
-    { MODULE_CONFIG_ITEM_END, NULL, NULL, NULL, NULL } };
-
-#define ADD_WINDOW( text ) \
-    { MODULE_CONFIG_ITEM_WINDOW, text, NULL, NULL, NULL },
-#define ADD_FRAME( text ) \
-    { MODULE_CONFIG_ITEM_FRAME, text, NULL, NULL, NULL },
-#define ADD_PANE( text ) \
-    { MODULE_CONFIG_ITEM_PANE, text, NULL, NULL, NULL },
-#define ADD_COMMENT( text ) \
-    { MODULE_CONFIG_ITEM_COMMENT, text, NULL, NULL, NULL },
-#define ADD_STRING( text, name, p_update ) \
-    { MODULE_CONFIG_ITEM_STRING, text, name, NULL, p_update },
-#define ADD_FILE( text, name, p_update ) \
-    { MODULE_CONFIG_ITEM_FILE, text, name, NULL, p_update },
-#define ADD_CHECK( text, name, p_update ) \
-    { MODULE_CONFIG_ITEM_CHECK, text, name, NULL, p_update },
-#define ADD_CHOOSE( text, name, p_getlist, p_update ) \
-    { MODULE_CONFIG_ITEM_CHOOSE, text, name, p_getlist, p_update },
-#define ADD_RADIO( text, name, p_getlist, p_update ) \
-    { MODULE_CONFIG_ITEM_RADIO, text, name, p_getlist, p_update },
-#define ADD_SCALE( text, name, p_getlist, p_update ) \
-    { MODULE_CONFIG_ITEM_SCALE, text, name, p_getlist, p_update },
-#define ADD_SPIN( text, name, p_getlist, p_update ) \
-    { MODULE_CONFIG_ITEM_SPIN, text, name, p_getlist, p_update },
-

@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_dsp.c,v 1.21 2002/02/15 13:32:53 sam Exp $
+ * $Id: aout_dsp.c,v 1.22 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -53,6 +53,7 @@
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
+#define DSP_DEV_VAR "dsp_dev"
 /*****************************************************************************
  * aout_sys_t: dsp audio output method descriptor
  *****************************************************************************
@@ -62,6 +63,10 @@
 typedef struct aout_sys_s
 {
     audio_buf_info        audio_buf;
+
+    /* Path to the audio output device */
+    char *                psz_device;
+    int                   i_fd;
 
 } aout_sys_t;
 
@@ -92,7 +97,7 @@ void _M( aout_getfunctions )( function_list_t * p_function_list )
  * aout_Open: opens the audio device (the digital sound processor)
  *****************************************************************************
  * This function opens the dsp as a usual non-blocking write-only file, and
- * modifies the p_aout->i_fd with the file's descriptor.
+ * modifies the p_aout->p_sys->i_fd with the file's descriptor.
  *****************************************************************************/
 static int aout_Open( aout_thread_t *p_aout )
 {
@@ -105,13 +110,21 @@ static int aout_Open( aout_thread_t *p_aout )
     }
 
     /* Initialize some variables */
-    p_aout->psz_device = main_GetPszVariable( AOUT_DSP_VAR, AOUT_DSP_DEFAULT );
+    if( !(p_aout->p_sys->psz_device = config_GetPszVariable( DSP_DEV_VAR )) )
+    {
+        intf_ErrMsg( "aout error: don't know which audio device to open" );
+        free( p_aout->p_sys );
+        return( -1 );
+    }
 
     /* Open the sound device */
-    if( (p_aout->i_fd = open( p_aout->psz_device, O_WRONLY )) < 0 )
+    if( (p_aout->p_sys->i_fd = open( p_aout->p_sys->psz_device, O_WRONLY ))
+        < 0 )
     {
         intf_ErrMsg( "aout error: can't open audio device (%s)",
-                     p_aout->psz_device );
+                     p_aout->p_sys->psz_device );
+        free( p_aout->p_sys->psz_device );
+        free( p_aout->p_sys );
         return( -1 );
     }
 
@@ -133,16 +146,16 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     boolean_t b_stereo = p_aout->b_stereo;
 
     /* Reset the DSP device */
-    if( ioctl( p_aout->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
+    if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
     {
         intf_ErrMsg( "aout error: can't reset audio device (%s)",
-                     p_aout->psz_device );
+                     p_aout->p_sys->psz_device );
         return( -1 );
     }
 
     /* Set the output format */
     i_format = p_aout->i_format;
-    if( ioctl( p_aout->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0 )
+    if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0 )
     {
         intf_ErrMsg( "aout error: can't set audio output format (%i)",
                      p_aout->i_format );
@@ -151,13 +164,13 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 
     if( i_format != p_aout->i_format )
     {
-        intf_WarnMsg( 2, "aout warning: audio output format not supported (%i)",
-                      p_aout->i_format );
+        intf_WarnMsg( 2, "aout warning: audio output format not supported (%i)"
+                      ,p_aout->i_format );
         p_aout->i_format = i_format;
     }
 
     /* Set the number of channels */
-    if( ioctl( p_aout->i_fd, SNDCTL_DSP_STEREO, &b_stereo ) < 0 )
+    if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_STEREO, &b_stereo ) < 0 )
     {
         intf_ErrMsg( "aout error: can't set number of audio channels (%i)",
                      p_aout->i_channels );
@@ -166,15 +179,15 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 
     if( b_stereo != p_aout->b_stereo )
     {
-        intf_WarnMsg( 2, "aout warning: number of audio channels not supported (%i)",
-                      p_aout->i_channels );
+        intf_WarnMsg( 2, "aout warning: number of audio channels not supported"
+                      " (%i)", p_aout->i_channels );
         p_aout->b_stereo = b_stereo;
         p_aout->i_channels = 1 + b_stereo;
     }
 
     /* Set the output rate */
     l_rate = p_aout->l_rate;
-    if( ioctl( p_aout->i_fd, SNDCTL_DSP_SPEED, &l_rate ) < 0 )
+    if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_SPEED, &l_rate ) < 0 )
     {
         intf_ErrMsg( "aout error: can't set audio output rate (%li)",
                      p_aout->l_rate );
@@ -204,7 +217,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
  *****************************************************************************/
 static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
-    ioctl( p_aout->i_fd, SNDCTL_DSP_GETOSPACE, &p_aout->p_sys->audio_buf );
+    ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_GETOSPACE,
+           &p_aout->p_sys->audio_buf );
 
     /* returns the allocated space in bytes */
     return ( (p_aout->p_sys->audio_buf.fragstotal
@@ -221,7 +235,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     if( p_aout->b_active )
     {
-        write( p_aout->i_fd, buffer, i_size );
+        write( p_aout->p_sys->i_fd, buffer, i_size );
     }
 }
 
@@ -230,6 +244,6 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
  *****************************************************************************/
 static void aout_Close( aout_thread_t *p_aout )
 {
-    close( p_aout->i_fd );
+    close( p_aout->p_sys->i_fd );
+    free( p_aout->p_sys->psz_device );
 }
-

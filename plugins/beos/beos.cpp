@@ -2,7 +2,7 @@
  * beos.cpp : BeOS plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: beos.cpp,v 1.16 2002/01/05 18:25:48 sam Exp $
+ * $Id: beos.cpp,v 1.17 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,8 +43,6 @@ void _M( intf_getfunctions )( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for BeOS module" )
-    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ncurses.c,v 1.11 2002/02/15 13:32:53 sam Exp $
+ * $Id: ncurses.c,v 1.12 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -50,8 +50,6 @@ static void intf_Run          ( intf_thread_t *p_intf );
  * Building configuration tree
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for NCurses module" )
-    ADD_COMMENT( "For now, the NCurses module cannot be configured" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.14 2002/02/19 00:50:19 sam Exp $
+ * $Id: ac3_spdif.c,v 1.15 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -91,7 +91,7 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int decoder_Probe( u8 *pi_type )
 {
-    return( ( main_GetIntVariable( AOUT_SPDIF_VAR, 0 )
+    return( ( config_GetIntVariable( AOUT_SPDIF_VAR )
                && *pi_type == AC3_AUDIO_ES ) ? 0 : -1 );
 }
 

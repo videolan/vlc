@@ -280,7 +280,7 @@ static void VCDInit( input_thread_t * p_input )
 #undef area
 
     /* Get requested title - if none try the first title */
-    i_title = main_GetIntVariable( INPUT_TITLE_VAR, 1 );
+    i_title = config_GetIntVariable( INPUT_TITLE_VAR );
     if( i_title <= 0 )
     {
         i_title = 1;
@@ -289,7 +289,7 @@ static void VCDInit( input_thread_t * p_input )
     // p_vcd->i_track = i_title-1;
 
     /* Get requested chapter - if none defaults to first one */
-    i_chapter = main_GetIntVariable( INPUT_CHAPTER_VAR, 1 );
+    i_chapter = config_GetIntVariable( INPUT_CHAPTER_VAR );
     if( i_chapter <= 0 )
     {
         i_chapter = 1;

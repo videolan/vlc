@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.76 2002/02/15 13:32:54 sam Exp $
+ * $Id: audio_output.c,v 1.77 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -93,9 +93,8 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
     }
 
     p_aout->i_latency = 0;
-    p_aout->l_rate = main_GetIntVariable( AOUT_RATE_VAR, l_rate );
-    p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR,
-                                                  i_channels - 1 );
+    p_aout->l_rate = config_GetIntVariable( AOUT_RATE_VAR );
+    p_aout->i_channels = config_GetIntVariable( AOUT_MONO_VAR ) ? 1 : 2;
 
     intf_WarnMsg( 3, "aout info: thread created, channels %d, rate %d",
                   p_aout->i_channels, p_aout->l_rate );
@@ -105,7 +104,7 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
 
     /* special setting for ac3 pass-through mode */
     /* FIXME is it necessary ? (cf ac3_adec.c) */
-    if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) && p_main->b_ac3 )
+    if( config_GetIntVariable( AOUT_SPDIF_VAR ) && p_main->b_ac3 )
     {
         intf_WarnMsg( 4, "aout info: setting ac3 spdif" );
         p_aout->i_format = AOUT_FMT_AC3;
@@ -123,7 +122,7 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
 
     /* Choose the best module */
     p_aout->p_module = module_Need( MODULE_CAPABILITY_AOUT,
-                           main_GetPszVariable( AOUT_METHOD_VAR, NULL ), 
+                           config_GetPszVariable( AOUT_METHOD_VAR ), 
                            (void *)p_aout );
 
     if( p_aout->p_module == NULL )
@@ -153,7 +152,7 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
     }
 
     /* Initialize the volume level */
-    p_aout->i_volume = main_GetIntVariable( AOUT_VOLUME_VAR, VOLUME_DEFAULT );
+    p_aout->i_volume = config_GetIntVariable( AOUT_VOLUME_VAR );
     p_aout->i_savedvolume = 0;
     
     /* FIXME: maybe it would be cleaner to change SpawnThread prototype

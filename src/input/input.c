@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.175 2002/02/19 00:50:19 sam Exp $
+ * $Id: input.c,v 1.176 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -199,10 +199,9 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.control.i_status = PLAYING_S;
     p_input->stream.control.i_rate = DEFAULT_RATE;
     p_input->stream.control.b_mute = 0;
-    p_input->stream.control.b_grayscale = main_GetIntVariable(
-                            VOUT_GRAYSCALE_VAR, VOUT_GRAYSCALE_DEFAULT );
-    p_input->stream.control.i_smp = main_GetIntVariable(
-                            VDEC_SMP_VAR, VDEC_SMP_DEFAULT );
+    p_input->stream.control.b_grayscale = config_GetIntVariable(
+			                      VOUT_GRAYSCALE_VAR );
+    p_input->stream.control.i_smp = config_GetIntVariable( VDEC_SMP_VAR );
 
     intf_WarnMsg( 1, "input: playlist item `%s'", p_input->p_source );
 
@@ -448,11 +447,14 @@ static void RunThread( input_thread_t *p_input )
  *****************************************************************************/
 static int InitThread( input_thread_t * p_input )
 {
-    /* Find appropriate module. */
-    p_input->p_input_module = module_Need( MODULE_CAPABILITY_INPUT,
-                                 main_GetPszVariable( INPUT_METHOD_VAR, NULL ),
-                                 (void *)p_input );
+    char *psz_name;
 
+    /* Find appropriate module. */
+    psz_name = config_GetPszVariable( INPUT_METHOD_VAR );
+    p_input->p_input_module = module_Need( MODULE_CAPABILITY_INPUT, psz_name,
+                                           (void *)p_input );
+
+    if( psz_name ) free( psz_name );
     if( p_input->p_input_module == NULL )
     {
         intf_ErrMsg( "input error: no suitable input module for `%s'",
@@ -871,7 +873,7 @@ static void NetworkOpen( input_thread_t * p_input )
     /* Check that we got a valid port */
     if( i_bind_port == 0 )
     {
-        i_bind_port = main_GetIntVariable( INPUT_PORT_VAR, INPUT_PORT_DEFAULT );
+        i_bind_port = config_GetIntVariable( INPUT_PORT_VAR );
     }
 
     intf_WarnMsg( 2, "input: server=%s:%d local=%s:%d",
@@ -1138,7 +1140,7 @@ static void HTTPOpen( input_thread_t * p_input )
     }
 
     /* Check proxy */
-    if( (psz_proxy = main_GetPszVariable( "http_proxy", NULL )) != NULL )
+    if( (psz_proxy = getenv( "http_proxy" )) != NULL )
     {
         /* http://myproxy.mydomain:myport/ */
         int                 i_proxy_port = 0;

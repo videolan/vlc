@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.20 2002/02/15 13:32:53 sam Exp $
+ * $Id: input_dvdread.c,v 1.21 2002/02/24 20:51:09 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -243,7 +243,7 @@ static void DvdReadInit( input_thread_t * p_input )
 #undef area
 
     /* Get requested title - if none try the first title */
-    i_title = main_GetIntVariable( INPUT_TITLE_VAR, 1 );
+    i_title = config_GetIntVariable( INPUT_TITLE_VAR );
     if( i_title <= 0 || i_title > tt_srpt->nr_of_srpts )
     {
         i_title = 1;
@@ -252,7 +252,7 @@ static void DvdReadInit( input_thread_t * p_input )
 #undef tt_srpt
 
     /* Get requested chapter - if none defaults to first one */
-    i_chapter = main_GetIntVariable( INPUT_CHAPTER_VAR, 1 );
+    i_chapter = config_GetIntVariable( INPUT_CHAPTER_VAR );
     if( i_chapter <= 0 )
     {
         i_chapter = 1;
@@ -473,7 +473,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
          * Angle management
          */
         p_area->i_angle_nb = p_vmg->tt_srpt->title[p_area->i_id-1].nr_of_angles;
-        p_area->i_angle = main_GetIntVariable( INPUT_ANGLE_VAR, 1 );
+        p_area->i_angle = config_GetIntVariable( INPUT_ANGLE_VAR );
 
         if( ( p_area->i_angle <= 0 ) || p_area->i_angle > p_area->i_angle_nb )
         {
@@ -667,16 +667,15 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
         if( p_main->b_audio )
         {
             /* For audio: first one if none or a not existing one specified */
-            int i_audio = main_GetIntVariable( INPUT_CHANNEL_VAR, 1 );
+            int i_audio = config_GetIntVariable( INPUT_CHANNEL_VAR );
             if( i_audio < 0 || i_audio > i_audio_nb )
             {
-                main_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
                 i_audio = 1;
             }
             if( i_audio > 0 && i_audio_nb > 0 )
             {
-                if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) ||
-                    ( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) ==
+                if( config_GetIntVariable( AOUT_SPDIF_VAR ) ||
+                    ( config_GetIntVariable( INPUT_AUDIO_VAR ) ==
                       REQUESTED_AC3 ) )
                 {
                     int     i_ac3 = i_audio;
@@ -703,10 +702,9 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
         if( p_main->b_video )
         {
             /* for spu, default is none */
-            int i_spu = main_GetIntVariable( INPUT_SUBTITLE_VAR, 0 );
+            int i_spu = config_GetIntVariable( INPUT_SUBTITLE_VAR );
             if( i_spu < 0 || i_spu > i_spu_nb )
             {
-                main_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
                 i_spu = 0;
             }
             if( i_spu > 0 && i_spu_nb > 0 )

@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.12 2001/12/31 04:53:33 sam Exp $
+ * $Id: esd.c,v 1.13 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -38,9 +38,6 @@ void _M( aout_getfunctions )( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-    ADD_WINDOW( "Configuration for esd module" )
-        ADD_FRAME( "EsounD" )
-            ADD_COMMENT( "This module does not need configuration" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

@@ -2,7 +2,7 @@
  * gtk_control.c : functions to handle stream control buttons.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.10 2002/01/02 14:37:42 sam Exp $
+ * $Id: gtk_preferences.c,v 1.11 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -56,20 +56,20 @@
  ****************************************************************************/
 
 /* macros to create preference box */
-#define ASSIGN_PSZ_ENTRY( var, default, name )                               \
+#define ASSIGN_PSZ_ENTRY( var, name )                                        \
     gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data( GTK_OBJECT(          \
         p_intf->p_sys->p_preferences ), name ) ),                            \
-                        main_GetPszVariable( var, default ) )
+                        config_GetPszVariable( var ) )
 
-#define ASSIGN_INT_VALUE( var, default, name )                                        \
+#define ASSIGN_INT_VALUE( var, name )                                        \
     gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(         \
         GTK_OBJECT( p_intf->p_sys->p_preferences ), name ) ),                \
-                               main_GetIntVariable( var, default ) )
+                               config_GetIntVariable( var ) )
 
-#define ASSIGN_INT_TOGGLE( var, default, name )                                       \
+#define ASSIGN_INT_TOGGLE( var, name )                                       \
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( gtk_object_get_data(    \
         GTK_OBJECT( p_intf->p_sys->p_preferences ), name ) ),                \
-                               main_GetIntVariable( var, default ) )
+                               config_GetIntVariable( var ) )
 
 gboolean GtkPreferencesShow( GtkWidget       *widget,
                              GdkEventButton  *event,
@@ -85,49 +85,37 @@ gboolean GtkPreferencesShow( GtkWidget       *widget,
                              "p_intf", p_intf );
 
         /* Default path */
-        ASSIGN_PSZ_ENTRY( INTF_PATH_VAR, INTF_PATH_DEFAULT,
+        ASSIGN_PSZ_ENTRY( INTF_PATH_VAR,
                           "preferences_file_path_entry" );
     
         /* Default DVD */
-        ASSIGN_PSZ_ENTRY( INPUT_DVD_DEVICE_VAR,DVD_DEVICE,
+        ASSIGN_PSZ_ENTRY( INPUT_DVD_DEVICE_VAR,
                           "preferences_disc_dvd_entry" );
     
         /* Default VCD */
-        ASSIGN_PSZ_ENTRY( INPUT_VCD_DEVICE_VAR, VCD_DEVICE,
+        ASSIGN_PSZ_ENTRY( INPUT_VCD_DEVICE_VAR,
                           "preferences_disc_vcd_entry" );
     
-        /* Default server */
-        ASSIGN_PSZ_ENTRY( INPUT_SERVER_VAR, INPUT_SERVER_DEFAULT,
-                          "preferences_network_server_entry" );
-    
         /* Default port */
-        ASSIGN_INT_VALUE( INPUT_PORT_VAR, INPUT_PORT_DEFAULT,
+        ASSIGN_INT_VALUE( INPUT_PORT_VAR,
                           "preferences_network_port_spinbutton" );
-    
-        /* Broadcast address */
-        ASSIGN_PSZ_ENTRY( INPUT_BCAST_ADDR_VAR, INPUT_BCAST_ADDR_DEFAULT,
-                          "preferences_network_broadcast_entry" );
-    
-        /* Broadcast stream by default ? */
-        ASSIGN_INT_TOGGLE( INPUT_BROADCAST_VAR, INPUT_BROADCAST_DEFAULT,
-                           "preferences_network_broadcast_checkbutton" );
     
         /* XXX Protocol */
     
         /* Default interface */
-        ASSIGN_PSZ_ENTRY( INTF_METHOD_VAR, INTF_METHOD_DEFAULT,
+        ASSIGN_PSZ_ENTRY( INTF_METHOD_VAR,
                           "preferences_interface_entry" );
     
         /* Default video output */
-        ASSIGN_PSZ_ENTRY( VOUT_METHOD_VAR, VOUT_METHOD_DEFAULT,
+        ASSIGN_PSZ_ENTRY( VOUT_METHOD_VAR,
                           "preferences_video_output_entry" );
     
         /* Default output width */
-        ASSIGN_INT_VALUE( VOUT_WIDTH_VAR, VOUT_WIDTH_DEFAULT,
+        ASSIGN_INT_VALUE( VOUT_WIDTH_VAR,
                           "preferences_video_width_spinbutton" );
     
         /* Default output height */
-        ASSIGN_INT_VALUE( VOUT_HEIGHT_VAR, VOUT_HEIGHT_DEFAULT,
+        ASSIGN_INT_VALUE( VOUT_HEIGHT_VAR,
                           "preferences_video_height_spinbutton" );
     
         /* XXX Default screen depth */
@@ -137,20 +125,17 @@ gboolean GtkPreferencesShow( GtkWidget       *widget,
         /* XXX Default gamma */
         
         /* Fullscreen on play */
-        ASSIGN_INT_TOGGLE( VOUT_FULLSCREEN_VAR, VOUT_FULLSCREEN_DEFAULT,
+        ASSIGN_INT_TOGGLE( VOUT_FULLSCREEN_VAR,
                            "preferences_video_fullscreen_checkbutton" );
     
         /* Grayscale display */
-        ASSIGN_INT_TOGGLE( VOUT_GRAYSCALE_VAR, VOUT_GRAYSCALE_DEFAULT,
+        ASSIGN_INT_TOGGLE( VOUT_GRAYSCALE_VAR,
                            "preferences_video_grayscale_checkbutton" );
     
         /* Default audio output */
-        ASSIGN_PSZ_ENTRY( AOUT_METHOD_VAR, AOUT_METHOD_DEFAULT,
+        ASSIGN_PSZ_ENTRY( AOUT_METHOD_VAR,
                           "preferences_audio_output_entry" );
-    
-        /* Default audio device */
-        ASSIGN_PSZ_ENTRY( AOUT_DSP_VAR, AOUT_DSP_DEFAULT,
-                          "preferences_audio_device_entry" );
+
     
         /* XXX Default frequency */
     
@@ -159,23 +144,23 @@ gboolean GtkPreferencesShow( GtkWidget       *widget,
         /* XXX Default number of channels */
     
         /* Use spdif output ? */
-        ASSIGN_INT_TOGGLE( AOUT_SPDIF_VAR, AOUT_SPDIF_DEFAULT,
+        ASSIGN_INT_TOGGLE( AOUT_SPDIF_VAR,
                            "preferences_audio_spdif_checkbutton" );
     
         /* Launch playlist on startup */
-        ASSIGN_INT_TOGGLE( PLAYLIST_STARTUP_VAR, PLAYLIST_STARTUP_DEFAULT,
+        ASSIGN_INT_TOGGLE( PLAYLIST_STARTUP_VAR,
                         "preferences_playlist_startup_checkbutton" );
     
         /* Enqueue drag'n dropped item as default */
-        ASSIGN_INT_TOGGLE( PLAYLIST_ENQUEUE_VAR, PLAYLIST_ENQUEUE_DEFAULT,
+        ASSIGN_INT_TOGGLE( PLAYLIST_ENQUEUE_VAR,
                            "preferences_playlist_enqueue_checkbutton" );
     
         /* Loop on playlist end */
-        ASSIGN_INT_TOGGLE( PLAYLIST_LOOP_VAR, PLAYLIST_LOOP_DEFAULT,
+        ASSIGN_INT_TOGGLE( PLAYLIST_LOOP_VAR,
                            "preferences_playlist_loop_checkbutton" );
     
         /* Verbosity of warning messages */
-        ASSIGN_INT_VALUE( INTF_WARNING_VAR, INTF_WARNING_DEFAULT,
+        ASSIGN_INT_VALUE( INTF_WARNING_VAR,
                           "preferences_misc_messages_spinbutton" );
 #undef ASSIGN_PSZ_ENTRY
 #undef ASSIGN_INT_VALUE
@@ -193,18 +178,18 @@ gboolean GtkPreferencesShow( GtkWidget       *widget,
  ****************************************************************************/
 
 /* macros to read value frfom preference box */
-#define ASSIGN_PSZ_ENTRY( var, name )                                        \
-    main_PutPszVariable( var, gtk_entry_get_text(                            \
+#define ASSIGN_PSZ_ENTRY( var, name )                                         \
+    config_PutPszVariable( var, gtk_entry_get_text(                           \
     GTK_ENTRY( gtk_object_get_data( GTK_OBJECT( p_preferences ), name ) ) ) )
 
-#define ASSIGN_INT_VALUE( var, name )                                        \
-    main_PutIntVariable( var, gtk_spin_button_get_value_as_int(              \
-        GTK_SPIN_BUTTON( gtk_object_get_data( GTK_OBJECT( p_preferences ),   \
+#define ASSIGN_INT_VALUE( var, name )                                         \
+    config_PutIntVariable( var, gtk_spin_button_get_value_as_int(             \
+        GTK_SPIN_BUTTON( gtk_object_get_data( GTK_OBJECT( p_preferences ),    \
         name ) ) ) )
 
-#define ASSIGN_INT_TOGGLE( var, name )                                       \
-    main_PutIntVariable( var, gtk_toggle_button_get_active(                  \
-        GTK_TOGGLE_BUTTON( gtk_object_get_data( GTK_OBJECT( p_preferences ), \
+#define ASSIGN_INT_TOGGLE( var, name )                                        \
+    config_PutIntVariable( var, gtk_toggle_button_get_active(                 \
+        GTK_TOGGLE_BUTTON( gtk_object_get_data( GTK_OBJECT( p_preferences ),  \
         name ) ) ) )
 
 void GtkPreferencesApply( GtkButton * button, gpointer user_data )
@@ -223,19 +208,8 @@ void GtkPreferencesApply( GtkButton * button, gpointer user_data )
     /* Default VCD */
     ASSIGN_PSZ_ENTRY( INPUT_VCD_DEVICE_VAR, "preferences_disc_vcd_entry" );
 
-    /* Default server */
-    ASSIGN_PSZ_ENTRY( INPUT_SERVER_VAR, "preferences_network_server_entry" );
-
     /* Default port */
     ASSIGN_INT_VALUE( INPUT_PORT_VAR, "preferences_network_port_spinbutton" );
-
-    /* Broadcast address */
-    ASSIGN_PSZ_ENTRY( INPUT_BCAST_ADDR_VAR,
-                      "preferences_network_broadcast_entry" );
-
-    /* Broadcast stream by default ? */
-    ASSIGN_INT_TOGGLE( INPUT_BROADCAST_VAR,
-                       "preferences_network_broadcast_checkbutton" );
 
     /* XXX Protocol */
 
@@ -267,9 +241,6 @@ void GtkPreferencesApply( GtkButton * button, gpointer user_data )
 
     /* Default audio output */
     ASSIGN_PSZ_ENTRY( AOUT_METHOD_VAR, "preferences_audio_output_entry" );
-
-    /* Default audio device */
-    ASSIGN_PSZ_ENTRY( AOUT_DSP_VAR, "preferences_audio_device_entry" );
 
     /* XXX Default frequency */
 

@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.5 2002/02/19 00:50:19 sam Exp $
+ * $Id: xmga.c,v 1.6 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -267,16 +267,21 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    /* Open display, unsing 'vlc_display' or DISPLAY environment variable */
-    psz_display = XDisplayName( main_GetPszVariable( VOUT_DISPLAY_VAR, NULL ) );
+    /* Open display, unsing the VOUT_DISPLAY_VAR config variable or the DISPLAY
+     * environment variable */
+    psz_display = config_GetPszVariable( VOUT_DISPLAY_VAR );
     p_vout->p_sys->p_display = XOpenDisplay( psz_display );
 
     if( p_vout->p_sys->p_display == NULL )                          /* error */
     {
-        intf_ErrMsg( "vout error: cannot open display %s", psz_display );
+        intf_ErrMsg( "vout error: cannot open display %s",
+                     XDisplayName( psz_display ) );
         free( p_vout->p_sys );
+        if( psz_display ) free( psz_display );
         return( 1 );
     }
+    if( psz_display ) free( psz_display );
+
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
     /* Create blank cursor (for mouse cursor autohiding) */

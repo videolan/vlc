@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.2 2002/02/15 20:02:21 gbazin Exp $
+ * $Id: waveout.c,v 1.3 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -45,8 +45,6 @@ void _M( aout_getfunctions )( function_list_t * p_function_list );
  * Building configuration tree
  *****************************************************************************/
 MODULE_CONFIG_START
-    ADD_WINDOW( "Configuration for Windows waveOut module" )
-    ADD_COMMENT( "For now, the Windows WaveOut module cannot be configured" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -136,8 +134,6 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys->i_current_buffer = 0;
     for( i=0; i<NUMBUF; i++)
         p_aout->p_sys->waveheader[i].lpData = malloc( 1 );
-
-    p_aout->psz_device = 0;
 
     return OpenWaveOutDevice( p_aout );
 

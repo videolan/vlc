@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.11 2002/02/19 00:50:19 sam Exp $
+ * $Id: x11.c,v 1.12 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -37,8 +37,6 @@
  * Building configuration tree
  *****************************************************************************/
 MODULE_CONFIG_START
-    ADD_WINDOW( "Configuration for X11 module" )
-        ADD_COMMENT( "For now, the X11 module cannot be configured" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START

@@ -4,10 +4,11 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.152 2002/02/19 00:50:19 sam Exp $
+ * $Id: main.c,v 1.153 2002/02/24 20:51:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
+ *          Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -84,145 +85,137 @@
 #include "debug.h"
 
 /*****************************************************************************
- * Command line options constants. If something is changed here, be sure that
- * GetConfiguration and Usage are also changed.
+ * Configuration options for the main program. Each plugin will also separatly
+ * define its own configuration options.
+ * Look into configuration.h if you need to know more about the following
+ * macros.
+ * 
  *****************************************************************************/
+#define BUILTIN
+#define MODULE_NAME main
+#include "modules_inner.h"                        /* for configuration stuff */
 
-/* Long options return values - note that values corresponding to short options
- * chars, and in general any regular char, should be avoided */
-#define OPT_NOAUDIO             150
-#define OPT_STEREO              151
-#define OPT_MONO                152
-#define OPT_SPDIF               153
-#define OPT_VOLUME              154
-#define OPT_DESYNC              155
+/* Quick usage guide
+MODULE_CONFIG_START
+MODULE_CONFIG_STOP
+ADD_CATEGORY_HINT( text, longtext )
+ADD_SUBCATEGORY_HINT( text, longtext )
+ADD_STRING( option_name, value, p_callback, text, longtext )
+ADD_FILE( option_name, psz_value, p_callback, text, longtext )
+ADD_PLUGIN( option_name, psz_value, i_capability, p_callback, text, longtext )
+ADD_INTEGER( option_name, i_value, p_callback, text, longtext )
+ADD_BOOL( option_name, p_callback, text, longtext )
+*/
 
-#define OPT_NOVIDEO             160
-#define OPT_DISPLAY             161
-#define OPT_WIDTH               162
-#define OPT_HEIGHT              163
-#define OPT_COLOR               164
-#define OPT_FULLSCREEN          165
-#define OPT_NOOVERLAY           166
-#define OPT_XVADAPTOR           167
-#define OPT_SMP                 168
-#define OPT_SPUMARGIN           169
+MODULE_CONFIG_START
 
-#define OPT_CHANNELS            170
-#define OPT_SERVER              171
-#define OPT_PORT                172
-#define OPT_BROADCAST           173
-#define OPT_CHANNELSERVER       174
+/* Help options */
+ADD_CATEGORY_HINT( "Help Options", NULL )
+ADD_BOOL    ( "help", NULL,"print help and exit (or use -h)", NULL )
+ADD_BOOL    ( "longhelp", NULL, "print long help version and exit (or use -H)",
+              NULL )
+ADD_BOOL    ( "list", NULL, "list available plugins (or use -l)", NULL )
+ADD_STRING  ( "pluginhelp", NULL, NULL,"print help on a plugin and exit",NULL )
+ADD_BOOL    ( "version", NULL, "output version information and exit", NULL )
 
-#define OPT_INPUT               180
-#define OPT_MOTION              181
-#define OPT_IDCT                182
-#define OPT_YUV                 183
-#define OPT_DOWNMIX             184
-#define OPT_IMDCT               185
-#define OPT_MEMCPY              186
-#define OPT_FILTER              187
-#define OPT_DVDCSS_METHOD       188
-#define OPT_DVDCSS_VERBOSE      189
+/* Interface options */
+ADD_CATEGORY_HINT( "Interface Options", NULL)
+ADD_PLUGIN  ( INTF_METHOD_VAR, MODULE_CAPABILITY_INTF, NULL, NULL,
+              "interface method", NULL )
+ADD_INTEGER ( INTF_WARNING_VAR, 0, NULL, "warning level (or use -v)", NULL )
+ADD_BOOL    ( INTF_STATS_VAR, NULL, "output statistics", NULL )
+ADD_STRING  ( INTF_PATH_VAR, NULL, NULL, "interface default search path", NULL)
 
-#define OPT_SYNCHRO             190
-#define OPT_WARNING             191
-#define OPT_VERSION             192
-#define OPT_STATS               193
+/* Audio Options */
+ADD_CATEGORY_HINT( "Audio Options", NULL)
+ADD_BOOL    ( AOUT_NOAUDIO_VAR, NULL, "disable audio", NULL )
+ADD_PLUGIN  ( AOUT_METHOD_VAR, MODULE_CAPABILITY_AOUT, NULL, NULL,
+              "audio output method", NULL )
+ADD_BOOL    ( AOUT_MONO_VAR, NULL, "mono audio", NULL )
+ADD_BOOL    ( AOUT_SPDIF_VAR, NULL, "AC3 pass-through mode", NULL )
+ADD_INTEGER ( AOUT_VOLUME_VAR, VOLUME_DEFAULT, NULL, "VLC output volume", NULL)
+ADD_INTEGER ( AOUT_RATE_VAR, 44100, NULL, "VLC output frequency", NULL )
+ADD_INTEGER ( AOUT_DESYNC_VAR, 0, NULL, "Compensate desynchronization of the "
+                                        "audio (in ms)", NULL )
 
-#define OPT_MPEG_ADEC           200
-#define OPT_AC3_ADEC            201
+/* Video options */
+ADD_CATEGORY_HINT( "Video Options", NULL )
+ADD_BOOL    ( VOUT_NOVIDEO_VAR, NULL, "disable video", NULL )
+ADD_PLUGIN  ( VOUT_METHOD_VAR, MODULE_CAPABILITY_VOUT, NULL, NULL,
+              "video output method", NULL )
+ADD_STRING  ( VOUT_DISPLAY_VAR, NULL, NULL, "display string", NULL )
+ADD_INTEGER ( VOUT_WIDTH_VAR, 720, NULL, "display width", NULL )
+ADD_INTEGER ( VOUT_HEIGHT_VAR, 576, NULL, "display height", NULL )
+ADD_BOOL    ( VOUT_GRAYSCALE_VAR, NULL, "grayscale output", NULL )
+ADD_BOOL    ( VOUT_FULLSCREEN_VAR, NULL, "fullscreen output", NULL )
+ADD_BOOL    ( VOUT_NOOVERLAY_VAR, NULL, "disable accelerated display", NULL )
+ADD_PLUGIN  ( VOUT_FILTER_VAR, MODULE_CAPABILITY_VOUT, NULL, NULL,
+              "video filter module", NULL )
+ADD_INTEGER ( VOUT_SPUMARGIN_VAR, -1, NULL, "force SPU position", NULL )
 
-#define OPT_NOMMX               210
-#define OPT_NO3DNOW             211
-#define OPT_NOMMXEXT            212
-#define OPT_NOSSE               213
-#define OPT_NOALTIVEC           214
+/* Input options */
+ADD_CATEGORY_HINT( "Input Options", NULL )
+ADD_STRING  ( INPUT_METHOD_VAR, NULL, NULL, "input method", NULL )
+ADD_BOOL    ( INPUT_NETWORK_CHANNEL_VAR, NULL, "enable network channel mode",
+              NULL )
+ADD_STRING  ( INPUT_CHANNEL_SERVER_VAR, "localhost", NULL,
+              "channel server address", NULL )
+ADD_INTEGER ( INPUT_CHANNEL_PORT_VAR, 6010, NULL, "channel server port", NULL )
+ADD_STRING  ( INPUT_IFACE_VAR, "eth0", NULL, "network interface", NULL )
 
-/* Usage fashion */
-#define USAGE                     0
-#define SHORT_HELP                1
-#define LONG_HELP                 2
+ADD_INTEGER ( INPUT_TITLE_VAR, -1, NULL, "choose title", NULL )
+ADD_INTEGER ( INPUT_CHAPTER_VAR, -1, NULL, "choose chapter", NULL )
+ADD_INTEGER ( INPUT_ANGLE_VAR, -1, NULL, "chosse angle", NULL )
+ADD_INTEGER ( INPUT_AUDIO_VAR, -1, NULL, "choose audio", NULL )
+ADD_INTEGER ( INPUT_CHANNEL_VAR, -1, NULL, "choose channel", NULL )
+ADD_INTEGER ( INPUT_SUBTITLE_VAR, -1, NULL, "choose subtitles", NULL )
 
-/* Long options */
-static const struct option longopts[] =
-{
-    /*  name,               has_arg,    flag,   val */
+ADD_STRING  ( INPUT_DVD_DEVICE_VAR, "/dev/dvd", NULL, "DVD device", NULL )
+ADD_STRING  ( INPUT_VCD_DEVICE_VAR, "/dev/cdrom", NULL, "VCD device", NULL )
 
-    /* General/common options */
-    {   "help",             0,          0,      'h' },
-    {   "longhelp",         0,          0,      'H' },
-    {   "version",          0,          0,      OPT_VERSION },
+/* Decoder options */
+ADD_CATEGORY_HINT( "Decoders Options", NULL )
+ADD_PLUGIN  ( ADEC_MPEG_VAR, MODULE_CAPABILITY_DECODER, NULL, NULL,
+              "choose MPEG audio decoder", NULL )
+ADD_PLUGIN  ( ADEC_AC3_VAR, MODULE_CAPABILITY_DECODER, NULL, NULL,
+              "choose AC3 audio decoder", NULL )
+ADD_INTEGER ( VDEC_SMP_VAR, 0, NULL, "use additional processors", NULL )
+ADD_STRING  ( VPAR_SYNCHRO_VAR, NULL, NULL, "force synchro algorithm "
+                                            "{I|I+|IP|IP+|IPB}", NULL )
 
-    /* Interface options */
-    {   "intf",             1,          0,      'I' },
-    {   "warning",          1,          0,      OPT_WARNING },
-    {   "stats",            0,          0,      OPT_STATS },
+/* CPU options */
+ADD_CATEGORY_HINT( "CPU Options Options", NULL )
+ADD_BOOL    ( NOMMX_VAR, NULL, "disable CPU's MMX support", NULL )
+ADD_BOOL    ( NO3DN_VAR, NULL, "disable CPU's 3D Now! support", NULL )
+ADD_BOOL    ( NOMMXEXT_VAR, NULL, "disable CPU's MMX EXT support", NULL )
+ADD_BOOL    ( NOSSE_VAR, NULL, "disable CPU's SSE support", NULL )
+ADD_BOOL    ( NOALTIVEC_VAR, NULL, "disable CPU's AltiVec support", NULL )
 
-    /* Audio options */
-    {   "noaudio",          0,          0,      OPT_NOAUDIO },
-    {   "aout",             1,          0,      'A' },
-    {   "stereo",           0,          0,      OPT_STEREO },
-    {   "mono",             0,          0,      OPT_MONO },
-    {   "spdif",            0,          0,      OPT_SPDIF },
-    {   "downmix",          1,          0,      OPT_DOWNMIX },
-    {   "imdct",            1,          0,      OPT_IMDCT },
-    {   "volume",           1,          0,      OPT_VOLUME },
-    {   "desync",           1,          0,      OPT_DESYNC },
+/* Playlist options */
+ADD_BOOL    ( PLAYLIST_STARTUP_VAR, NULL, "launch playlist on startup", NULL )
+ADD_BOOL    ( PLAYLIST_ENQUEUE_VAR, NULL, "enqueue playlist as default", NULL )
+ADD_BOOL    ( PLAYLIST_LOOP_VAR, NULL, "loop on playlist end", NULL )
 
-    /* Video options */
-    {   "novideo",          0,          0,      OPT_NOVIDEO },
-    {   "vout",             1,          0,      'V' },
-    {   "display",          1,          0,      OPT_DISPLAY },
-    {   "width",            1,          0,      OPT_WIDTH },
-    {   "height",           1,          0,      OPT_HEIGHT },
-    {   "grayscale",        0,          0,      'g' },
-    {   "color",            0,          0,      OPT_COLOR },
-    {   "motion",           1,          0,      OPT_MOTION },
-    {   "idct",             1,          0,      OPT_IDCT },
-    {   "yuv",              1,          0,      OPT_YUV },
-    {   "fullscreen",       0,          0,      OPT_FULLSCREEN },
-    {   "nooverlay",        0,          0,      OPT_NOOVERLAY },
-    {   "xvadaptor",        1,          0,      OPT_XVADAPTOR },
-    {   "smp",              1,          0,      OPT_SMP },
-    {   "spumargin",        1,          0,      OPT_SPUMARGIN },
+/* Misc options */
+ADD_CATEGORY_HINT( "Miscellaneous Options", NULL )
+ADD_PLUGIN  ( MEMCPY_METHOD_VAR, MODULE_CAPABILITY_MEMCPY, NULL, NULL,
+              "memory copy method", NULL )
 
-    /* DVD options */
-    {   "dvdtitle",         1,          0,      't' },
-    {   "dvdchapter",       1,          0,      'T' },
-    {   "dvdangle",         1,          0,      'u' },
-    {   "dvdaudio",         1,          0,      'a' },
-    {   "dvdchannel",       1,          0,      'c' },
-    {   "dvdsubtitle",      1,          0,      's' },
-    {   "dvdcss-method",    1,          0,      OPT_DVDCSS_METHOD },
-    {   "dvdcss-verbose",   1,          0,      OPT_DVDCSS_VERBOSE },
+MODULE_CONFIG_STOP
 
-    /* Input options */
-    {   "input",            1,          0,      OPT_INPUT },
-    {   "channels",         0,          0,      OPT_CHANNELS },
-    {   "channelserver",    1,          0,      OPT_CHANNELSERVER },
+MODULE_INIT_START
+    SET_DESCRIPTION( "Main program" )
+    ADD_CAPABILITY( MAIN, 100/*whatever*/ )
+MODULE_INIT_STOP
 
-    /* Misc options */
-    {   "synchro",          1,          0,      OPT_SYNCHRO },
-    {   "memcpy",           1,          0,      OPT_MEMCPY },
-    {   "filter",           1,          0,      OPT_FILTER },
+MODULE_ACTIVATE_START
+MODULE_ACTIVATE_STOP
 
-    /* Decoder options */
-    {   "mpeg_adec",        1,          0,      OPT_MPEG_ADEC },
-    {   "ac3_adec",         1,          0,      OPT_AC3_ADEC },
-
-    /* CPU options */
-    {   "nommx",            0,          0,      OPT_NOMMX },
-    {   "no3dnow",          0,          0,      OPT_NO3DNOW },
-    {   "nommxext",         0,          0,      OPT_NOMMXEXT },
-    {   "nosse",            0,          0,      OPT_NOSSE },
-    {   "noaltivec",        0,          0,      OPT_NOALTIVEC },
-
-    {   0,                  0,          0,      0 }
-};
-
-/* Short options */
-static const char *psz_shortopts = "hHvgt:T:u:a:s:c:I:A:V:";
+MODULE_DEACTIVATE_START
+MODULE_DEACTIVATE_STOP
+/*****************************************************************************
+ * End configuration.
+ *****************************************************************************/
 
 /*****************************************************************************
  * Global variables - these are the only ones, see main.h and modules.h
@@ -236,19 +229,23 @@ vout_bank_t   *p_vout_bank;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  GetConfiguration        ( int *pi_argc, char *ppsz_argv[],
-                                      char *ppsz_env[] );
-static int  GetFilenames            ( int i_argc, char *ppsz_argv[] );
-static void Usage                   ( int i_fashion );
-static void Version                 ( void );
+static int  GetConfigurationFromFile    ( void ){return 0;};
+static int  GetConfigurationFromCmdLine ( int *pi_argc, char *ppsz_argv[],
+                                          boolean_t b_ignore_errors );
+static int  GetFilenames                ( int i_argc, char *ppsz_argv[] );
+static void Usage                       ( const char *psz_module_name );
+static void ListModules                 ( void );
+static void Version                     ( void );
 
-static void InitSignalHandler       ( void );
-static void SimpleSignalHandler     ( int i_signal );
-static void FatalSignalHandler      ( int i_signal );
-static void IllegalSignalHandler    ( int i_signal );
-static u32  CPUCapabilities         ( void );
+static void InitSignalHandler           ( void );
+static void SimpleSignalHandler         ( int i_signal );
+static void FatalSignalHandler          ( int i_signal );
+static void IllegalSignalHandler        ( int i_signal );
+static u32  CPUCapabilities             ( void );
 
-static void ShowConsole             ( void );
+#ifdef WIN32
+static void ShowConsole                 ( void );
+#endif
 
 static jmp_buf env;
 static int     i_illegal;
@@ -271,12 +268,16 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     input_bank_t  input_bank;
     aout_bank_t   aout_bank;
     vout_bank_t   vout_bank;
+    char *p_tmp;
 
     p_main        = &main_data;               /* set up the global variables */
     p_module_bank = &module_bank;
     p_input_bank  = &input_bank;
     p_aout_bank   = &aout_bank;
     p_vout_bank   = &vout_bank;
+
+    p_main->i_warning_level = 0;
+
 
 #if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
     /*
@@ -317,7 +318,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 #elif defined( SYS_LINUX )
 #   ifdef DEBUG
     /* Activate malloc checking routines to detect heap corruptions. */
-    main_PutIntVariable( "MALLOC_CHECK_", 2 );
+    putenv( "MALLOC_CHECK_=2" );
 #   endif
 #endif
 
@@ -328,19 +329,114 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     intf_Msg( COPYRIGHT_MESSAGE "\n" );
 
+
+    /* Get the executable name (similar to the basename command) */
+    p_main->psz_arg0 = p_tmp = ppsz_argv[ 0 ];
+    while( *p_tmp )
+    {
+        if( *p_tmp == '/' ) p_main->psz_arg0 = ++p_tmp;
+        else ++p_tmp;
+    }
+
     /*
-     * Read configuration
+     * Initialize the module bank and and load the configuration of the main
+     * module. We need to do this at this stage to be able to display a short
+     * help if required by the user. (short help == main module options)
      */
-    if( GetConfiguration( &i_argc, ppsz_argv, ppsz_env ) ) /* parse cmd line */
+    module_InitBank();
+    module_LoadMain();
+
+    if( GetConfigurationFromCmdLine( &i_argc, ppsz_argv, 1 ) )
+    {
+        intf_MsgDestroy();
+        return( errno );
+    }
+
+    /* Check for short help option */
+    if( config_GetIntVariable( "help" ) )
+    {
+        Usage( "main" );
+        return( -1 );
+    }
+
+    /* Check for version option */
+    if( config_GetIntVariable( "version" ) )
+    {
+        Version();
+        return( -1 );
+    }
+
+    /*
+     * Load the builtins and plugins into the module_bank.
+     * We have to do it before GetConfiguration() because this also gets the
+     * list of configuration options exported by each plugin and loads their
+     * default values.
+     */
+    module_LoadBuiltins();
+    module_LoadPlugins();
+    intf_WarnMsg( 2, "module: module bank initialized, found %i modules",
+                  p_module_bank->i_count );
+
+
+    /* Check for help on plugins */
+    if( (p_tmp = config_GetPszVariable( "pluginhelp" )) )
+    {
+        Usage( p_tmp );
+        free( p_tmp );
+        return( -1 );
+    }
+
+    /* Check for long help option */
+    if( config_GetIntVariable( "longhelp" ) )
+    {
+        Usage( NULL );
+        return( -1 );
+    }
+
+    /* Check for plugin list option */
+    if( config_GetIntVariable( "list" ) )
+    {
+        ListModules();
+        return( -1 );
+    }
+
+    /*
+     * Override default configuration with config file settings
+     */
+    if( GetConfigurationFromFile() )
     {
         intf_MsgDestroy();
         return( errno );
     }
 
     /*
-     * Redirect the standard output if required by the user, and on Win32 we
-     * also open a console to display the debug messages.
+     * Override configuration with command line settings
      */
+    if( GetConfigurationFromCmdLine( &i_argc, ppsz_argv, 0 ) )
+    {
+        intf_MsgDestroy();
+        return( errno );
+    }
+
+    /* p_main inititalization. FIXME ? */
+    p_main->i_desync = (mtime_t)config_GetIntVariable( AOUT_DESYNC_VAR )
+      * (mtime_t)1000;
+    p_main->b_stats = config_GetIntVariable( INTF_STATS_VAR );
+    p_main->b_audio = !config_GetIntVariable( AOUT_NOAUDIO_VAR );
+    p_main->b_stereo= !config_GetIntVariable( AOUT_MONO_VAR );
+    p_main->b_video = !config_GetIntVariable( VOUT_NOVIDEO_VAR );
+    if( config_GetIntVariable( NOMMX_VAR ) )
+        p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_MMX;
+    if( config_GetIntVariable( NO3DN_VAR ) )
+        p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_3DNOW;
+    if( config_GetIntVariable( NOMMXEXT_VAR ) )
+        p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_MMXEXT;
+    if( config_GetIntVariable( NOSSE_VAR ) )
+        p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_SSE;
+    if( config_GetIntVariable( NOALTIVEC_VAR ) )
+        p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_ALTIVEC;
+
+
     if( p_main->b_stats )
     {
         char          p_capabilities[200];
@@ -384,9 +480,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     GetFilenames( i_argc, ppsz_argv );
 
     /*
-     * Initialize module, input, aout and vout banks
+     * Initialize input, aout and vout banks
      */
-    module_InitBank();
     input_InitBank();
     aout_InitBank();
     vout_InitBank();
@@ -411,14 +506,13 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Initialize shared resources and libraries
      */
-    if( main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
-                             INPUT_NETWORK_CHANNEL_DEFAULT ) &&
+    if( config_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR ) &&
         network_ChannelCreate() )
     {
         /* On error during Channels initialization, switch off channels */
         intf_ErrMsg( "intf error: channels initialization failed, " 
                                  "deactivating channels" );
-        main_PutIntVariable( INPUT_NETWORK_CHANNEL_VAR, 0 );
+        config_PutIntVariable( INPUT_NETWORK_CHANNEL_VAR, 0 );
     }
 
     /*
@@ -449,8 +543,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         /*
          * Go back into channel 0 which is the network
          */
-        if( main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
-                                 INPUT_NETWORK_CHANNEL_DEFAULT ) )
+        if( config_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR ) )
         {
             network_ChannelJoin( COMMON_CHANNEL );
         }
@@ -503,131 +596,36 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     return 0;
 }
 
-/*****************************************************************************
- * main_GetIntVariable: get the int value of an environment variable
- *****************************************************************************
- * This function is used to read some default parameters in modules.
- *****************************************************************************/
-int main_GetIntVariable( char *psz_name, int i_default )
-{
-    char *      psz_env;                                /* environment value */
-    char *      psz_end;                             /* end of parsing index */
-    long int    i_value;                                            /* value */
-
-    psz_env = getenv( psz_name );
-    if( psz_env )
-    {
-        i_value = strtol( psz_env, &psz_end, 0 );
-        if( (*psz_env != '\0') && (*psz_end == '\0') )
-        {
-            return( i_value );
-        }
-    }
-    return( i_default );
-}
-
-/*****************************************************************************
- * main_GetPszVariable: get the string value of an environment variable
- *****************************************************************************
- * This function is used to read some default parameters in modules.
- *****************************************************************************/
-char * main_GetPszVariable( char *psz_name, char *psz_default )
-{
-    char *psz_env;
-
-    psz_env = getenv( psz_name );
-    if( psz_env )
-    {
-        return( psz_env );
-    }
-    return( psz_default );
-}
-
-/*****************************************************************************
- * main_PutPszVariable: set the string value of an environment variable
- *****************************************************************************
- * This function is used to set some default parameters in modules. The use of
- * this function will cause some memory leak: since some systems use the pointer
- * passed to putenv to store the environment string, it can't be freed.
- *****************************************************************************/
-void main_PutPszVariable( char *psz_name, char *psz_value )
-{
-    char *psz_env;
-
-    psz_env = malloc( strlen(psz_name) + strlen(psz_value) + 2 );
-    if( psz_env == NULL )
-    {
-        intf_ErrMsg( "intf error: cannot create psz_env (%s)",
-                     strerror(ENOMEM) );
-    }
-    else
-    {
-        sprintf( psz_env, "%s=%s", psz_name, psz_value );
-        if( putenv( psz_env ) )
-        {
-            intf_ErrMsg( "intf error: cannot putenv (%s)", strerror(errno) );
-        }
-    }
-}
-
-/*****************************************************************************
- * main_PutIntVariable: set the integer value of an environment variable
- *****************************************************************************
- * This function is used to set some default parameters in modules. The use of
- * this function will cause some memory leak: since some systems use the pointer
- * passed to putenv to store the environment string, it can't be freed.
- *****************************************************************************/
-void main_PutIntVariable( char *psz_name, int i_value )
-{
-    char psz_value[ 256 ];                               /* buffer for value */
-
-    sprintf( psz_value, "%d", i_value );
-    main_PutPszVariable( psz_name, psz_value );
-}
 
 /* following functions are local */
 
 /*****************************************************************************
- * GetConfiguration: parse command line
+ * GetConfigurationFromCmdLine: parse command line
  *****************************************************************************
- * Parse command line and configuration file for configuration. If the inline
- * help is requested, the function Usage() is called and the function returns
- * -1 (causing main() to exit). The messages interface is initialized at this
- * stage, but most structures are not allocated, so only environment should
- * be used.
+ * Parse command line for configuration. If the inline help is requested, the
+ * function Usage() is called and the function returns -1 (causing main() to
+ * exit).
+ * Now that the module_bank has been initialized, we can dynamically
+ * generate the longopts structure used by getops. We have to do it this way
+ * because we don't know (and don't want to know) in advance the configuration
+ * options used (ie. exported) by each module.
  *****************************************************************************/
-static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
+static int GetConfigurationFromCmdLine( int *pi_argc, char *ppsz_argv[],
+                                        boolean_t b_ignore_errors )
 {
-    int   i_cmd;
-    char *p_tmp;
+    int i_cmd, i, i_index, i_longopts_size;
+    module_t *p_module;
+    struct option *p_longopts;
+
+    /* Short options */
+    const char *psz_shortopts = "hHvl";
+
 
     /* Set default configuration and copy arguments */
     p_main->i_argc    = *pi_argc;
     p_main->ppsz_argv = ppsz_argv;
-    p_main->ppsz_env  = ppsz_env;
-
-    p_main->b_audio     = 1;
-    p_main->b_video     = 1;
-
-    p_main->i_warning_level = 0;
-    p_main->b_stats = 0;
-    p_main->i_desync = 0; /* No desynchronization by default */
 
     p_main->p_channel = NULL;
-
-    /* Get the executable name (similar to the basename command) */
-    p_main->psz_arg0 = p_tmp = ppsz_argv[ 0 ];
-    while( *p_tmp )
-    {
-        if( *p_tmp == '/' )
-        {
-            p_main->psz_arg0 = ++p_tmp;
-        }
-        else
-        {
-            ++p_tmp;
-        }
-    }
 
 #ifdef SYS_DARWIN
     /* When vlc.app is run by double clicking in Mac OS X, the 2nd arg
@@ -649,233 +647,132 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 #endif
 
-    /* Parse command line options */
-    opterr = 0;
-    while( ( i_cmd = getopt_long( *pi_argc, ppsz_argv,
-                                   psz_shortopts, longopts, 0 ) ) != EOF )
+
+    /*
+     * Generate the longopts structure used by getopt_long
+     */
+    i_longopts_size = 0;
+    for( p_module = p_module_bank->first ;
+         p_module != NULL ;
+         p_module = p_module->next )
     {
+        /* count the number of exported configuration options (to allocate
+         * longopts). The i_config_options we use is an approximation of the
+         * real number of options (it also includes markers like: category ...)
+         * but it is enough for our purpose */
+        i_longopts_size += p_module->i_config_options -1;
+    }
+
+    p_longopts = (struct option *)malloc( sizeof(struct option)
+                                          * (i_longopts_size + 1) );
+    if( p_longopts == NULL )
+    {
+        intf_ErrMsg( "GetConfigurationFromCmdLine error: "
+                     "can't allocate p_longopts" );
+        return( -1 );
+    }
+
+    /* Fill the longopts structure */
+    i_index = 0;
+    for( p_module = p_module_bank->first ;
+         p_module != NULL ;
+         p_module = p_module->next )
+    {
+        for( i = 1; i < (p_module->i_config_options -1); i++ )
+        {
+            if( (p_module->p_config[i].i_type == MODULE_CONFIG_ITEM_CATEGORY)||
+                (p_module->p_config[i].i_type ==
+                     MODULE_CONFIG_ITEM_SUBCATEGORY)||
+                (p_module->p_config[i].i_type ==
+                     MODULE_CONFIG_ITEM_SUBCATEGORY_END) )
+                 continue;
+            p_longopts[i_index].name = p_module->p_config[i].psz_name;
+            p_longopts[i_index].has_arg =
+                (p_module->p_config[i].i_type == MODULE_CONFIG_ITEM_BOOL)?
+                                               no_argument : required_argument;
+            p_longopts[i_index].flag = 0;
+            p_longopts[i_index].val = 0;
+            i_index++;
+        }
+    }
+    /* Close the longopts structure */
+    memset( &p_longopts[i_index], 0, sizeof(struct option) );
+
+
+    /*
+     * Parse the command line options
+     */
+    opterr = 0;
+    optind = 1;
+    while( ( i_cmd = getopt_long( *pi_argc, ppsz_argv, psz_shortopts,
+                                  p_longopts, &i_index ) ) != EOF )
+    {
+
+        if( i_cmd == 0 )
+        {
+            /* A long option has been recognized */
+
+            module_config_t *p_config;
+
+            /* Store the configuration option */
+            p_config = config_FindConfig( p_longopts[i_index].name );
+
+            switch( p_config->i_type )
+            {
+            case MODULE_CONFIG_ITEM_STRING:
+            case MODULE_CONFIG_ITEM_FILE:
+            case MODULE_CONFIG_ITEM_PLUGIN:
+                config_PutPszVariable( p_longopts[i_index].name, optarg );
+                break;
+            case MODULE_CONFIG_ITEM_INTEGER:
+                config_PutIntVariable( p_longopts[i_index].name, atoi(optarg));
+                break;
+            case MODULE_CONFIG_ITEM_BOOL:
+                config_PutIntVariable( p_longopts[i_index].name, 1 );
+                break;
+            }
+
+            continue;
+        }
+
+        /* short options handled here for now */
         switch( i_cmd )
         {
+
         /* General/common options */
         case 'h':                                              /* -h, --help */
-            ShowConsole();
-            Usage( SHORT_HELP );
-#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-            intf_Msg( "\nPress the RETURN key to continue..." );
-            getchar();
-#endif
-            return( -1 );
+            config_PutIntVariable( "help", 1 );
             break;
         case 'H':                                          /* -H, --longhelp */
-            ShowConsole();
-            Usage( LONG_HELP );
-#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-            intf_Msg( "\nPress the RETURN key to continue..." );
-            getchar();
-#endif
-            return( -1 );
+            config_PutIntVariable( "longhelp", 1 );
             break;
-        case OPT_VERSION:                                       /* --version */
-            ShowConsole();
-            Version();
-#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-            intf_Msg( "\nPress the RETURN key to continue..." );
-            getchar();
-#endif
-            return( -1 );
+        case 'l':                                              /* -l, --list */
+            config_PutIntVariable( "list", 1 );
             break;
         case 'v':                                           /* -v, --verbose */
             p_main->i_warning_level++;
             break;
 
-        /* Interface warning messages level */
-        case 'I':                                              /* -I, --intf */
-            main_PutPszVariable( INTF_METHOD_VAR, optarg );
-            break;
-        case OPT_WARNING:                                       /* --warning */
-            intf_ErrMsg( "intf error: `--warning' is deprecated, use `-v'" );
-            p_main->i_warning_level = atoi(optarg);
-            break;
-
-        case OPT_STATS:
-            p_main->b_stats = 1;
-            break;
-
-        /* Audio options */
-        case OPT_NOAUDIO:                                       /* --noaudio */
-            p_main->b_audio = 0;
-            break;
-        case 'A':                                              /* -A, --aout */
-            main_PutPszVariable( AOUT_METHOD_VAR, optarg );
-            break;
-        case OPT_STEREO:                                         /* --stereo */
-            main_PutIntVariable( AOUT_STEREO_VAR, 1 );
-            break;
-        case OPT_MONO:                                             /* --mono */
-            main_PutIntVariable( AOUT_STEREO_VAR, 0 );
-            break;
-        case OPT_SPDIF:                                           /* --spdif */
-            main_PutIntVariable( AOUT_SPDIF_VAR, 1 );
-            break;
-        case OPT_DOWNMIX:                                       /* --downmix */
-            main_PutPszVariable( DOWNMIX_METHOD_VAR, optarg );
-            break;
-        case OPT_IMDCT:                                           /* --imdct */
-            main_PutPszVariable( IMDCT_METHOD_VAR, optarg );
-            break;
-        case OPT_VOLUME:                                         /* --volume */
-            main_PutIntVariable( AOUT_VOLUME_VAR, atoi(optarg) );
-            break;
-        case OPT_DESYNC:                                         /* --desync */
-            p_main->i_desync = (mtime_t)atoi(optarg) * (mtime_t)1000;
-            break;
-
-        /* Video options */
-        case OPT_NOVIDEO:                                       /* --novideo */
-            p_main->b_video = 0;
-            break;
-        case 'V':                                              /* -V, --vout */
-            main_PutPszVariable( VOUT_METHOD_VAR, optarg );
-            break;
-        case OPT_DISPLAY:                                       /* --display */
-            main_PutPszVariable( VOUT_DISPLAY_VAR, optarg );
-            break;
-        case OPT_WIDTH:                                           /* --width */
-            main_PutPszVariable( VOUT_WIDTH_VAR, optarg );
-            break;
-        case OPT_HEIGHT:                                         /* --height */
-            main_PutPszVariable( VOUT_HEIGHT_VAR, optarg );
-            break;
-        case 'g':                                         /* -g, --grayscale */
-            main_PutIntVariable( VOUT_GRAYSCALE_VAR, 1 );
-            break;
-        case OPT_COLOR:                                           /* --color */
-            main_PutIntVariable( VOUT_GRAYSCALE_VAR, 0 );
-            break;
-        case OPT_FULLSCREEN:                                 /* --fullscreen */
-            main_PutIntVariable( VOUT_FULLSCREEN_VAR, 1 );
-            break;
-        case OPT_NOOVERLAY:                                   /* --nooverlay */
-            main_PutIntVariable( VOUT_NOOVERLAY_VAR, 1 );
-            break;
-        case OPT_XVADAPTOR:                                   /* --xvadaptor */
-            main_PutIntVariable( VOUT_XVADAPTOR_VAR, atoi(optarg) );
-            break;
-        case OPT_MOTION:                                         /* --motion */
-            main_PutPszVariable( MOTION_METHOD_VAR, optarg );
-            break;
-        case OPT_IDCT:                                             /* --idct */
-            main_PutPszVariable( IDCT_METHOD_VAR, optarg );
-            break;
-        case OPT_YUV:                                               /* --yuv */
-            main_PutPszVariable( YUV_METHOD_VAR, optarg );
-            break;
-        case OPT_SMP:                                               /* --smp */
-            main_PutIntVariable( VDEC_SMP_VAR, atoi(optarg) );
-            break;
-        case OPT_SPUMARGIN:                                   /* --spumargin */
-            main_PutIntVariable( VOUT_SPUMARGIN_VAR, atoi(optarg) );
-            break;
-
-        /* DVD options */
-        case 't':                                              /* --dvdtitle */
-            main_PutIntVariable( INPUT_TITLE_VAR, atoi(optarg) );
-            break;
-        case 'T':                                            /* --dvdchapter */
-            main_PutIntVariable( INPUT_CHAPTER_VAR, atoi(optarg) );
-            break;
-        case 'u':                                              /* --dvdangle */
-            main_PutIntVariable( INPUT_ANGLE_VAR, atoi(optarg) );
-            break;
-        case 'a':                                              /* --dvdaudio */
-            if ( ! strcmp(optarg, "ac3") )
-                main_PutIntVariable( INPUT_AUDIO_VAR, REQUESTED_AC3 );
-            else if ( ! strcmp(optarg, "lpcm") )
-                main_PutIntVariable( INPUT_AUDIO_VAR, REQUESTED_LPCM );
-            else if ( ! strcmp(optarg, "mpeg") )
-                main_PutIntVariable( INPUT_AUDIO_VAR, REQUESTED_MPEG );
-            else
-                main_PutIntVariable( INPUT_AUDIO_VAR, REQUESTED_NOAUDIO );
-            break;
-        case 'c':                                            /* --dvdchannel */
-            main_PutIntVariable( INPUT_CHANNEL_VAR, atoi(optarg) );
-            break;
-        case 's':                                           /* --dvdsubtitle */
-            main_PutIntVariable( INPUT_SUBTITLE_VAR, atoi(optarg) );
-            break;
-        case OPT_DVDCSS_METHOD:                           /* --dvdcss-method */
-            main_PutPszVariable( "DVDCSS_METHOD", optarg );
-            break;
-        case OPT_DVDCSS_VERBOSE:                         /* --dvdcss-verbose */
-            main_PutPszVariable( "DVDCSS_VERBOSE", optarg );
-            break;
-
-        /* Input options */
-        case OPT_INPUT:                                           /* --input */
-            main_PutPszVariable( INPUT_METHOD_VAR, optarg );
-            break;
-        case OPT_CHANNELS:                                     /* --channels */
-            main_PutIntVariable( INPUT_NETWORK_CHANNEL_VAR, 1 );
-            break;
-        case OPT_CHANNELSERVER:                           /* --channelserver */
-            main_PutPszVariable( INPUT_CHANNEL_SERVER_VAR, optarg );
-            break;
-
-        /* Misc options */
-        case OPT_SYNCHRO:
-            main_PutPszVariable( VPAR_SYNCHRO_VAR, optarg );
-            break;
-        case OPT_MEMCPY:
-            main_PutPszVariable( MEMCPY_METHOD_VAR, optarg );
-            break;
-        case OPT_FILTER:                                         /* --filter */
-            main_PutPszVariable( VOUT_FILTER_VAR, optarg );
-            break;
-
-        /* Decoder options */
-        case OPT_MPEG_ADEC:
-            main_PutPszVariable( ADEC_MPEG_VAR, optarg );
-            break;
-
-        case OPT_AC3_ADEC:
-            main_PutPszVariable( ADEC_AC3_VAR, optarg );
-            break;
-
-        /* CPU options */
-        case OPT_NOMMX:
-            p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_MMX;
-            break;
-
-        case OPT_NO3DNOW:
-            p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_3DNOW;
-            break;
-
-        case OPT_NOMMXEXT:
-            p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_MMXEXT;
-            break;
-
-        case OPT_NOSSE:
-            p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_SSE;
-            break;
-
-        case OPT_NOALTIVEC:
-            p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_ALTIVEC;
-            break;
-
         /* Internal error: unknown option */
         case '?':
         default:
-            ShowConsole();
-            intf_ErrMsg( "intf error: unknown option `%s'",
-                         ppsz_argv[optind] );
-            Usage( USAGE );
+            if( !b_ignore_errors )
+            {
+                intf_ErrMsg( "intf error: unknown option `%s'",
+                             ppsz_argv[optind] );
+                intf_Msg( "Try `%s --help' for more information.\n",
+                          p_main->psz_arg0 );
+
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-            intf_Msg( "\nPress the RETURN key to continue..." );
-            getchar();
+                intf_Msg( "\nPress the RETURN key to continue..." );
+                getchar();
 #endif
-            return( EINVAL );
-            break;
+                free( p_longopts );
+                return( EINVAL );
+                break;
+            }
         }
+
     }
 
     if( p_main->i_warning_level < 0 )
@@ -883,6 +780,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         p_main->i_warning_level = 0;
     }
 
+    free( p_longopts );
     return( 0 );
 }
 
@@ -910,146 +808,158 @@ static int GetFilenames( int i_argc, char *ppsz_argv[] )
  *****************************************************************************
  * Print a short inline help. Message interface is initialized at this stage.
  *****************************************************************************/
-static void Usage( int i_fashion )
+static void Usage( const char *psz_module_name )
 {
-    /* Usage */
-    intf_Msg( "Usage: %s [options] [parameters] [file]...",
-                 p_main->psz_arg0 );
+    int i;
+    module_t *p_module;
+    char psz_spaces[30];
 
-    if( i_fashion == USAGE )
+    memset( psz_spaces, 32, 30 );
+
+#ifdef WIN32
+    ShowConsole();
+#endif
+
+    /* Usage */
+    intf_Msg( "Usage: %s [options] [parameters] [file]...\n",
+              p_main->psz_arg0 );
+
+    /* Enumerate the config of each module */
+    for( p_module = p_module_bank->first ;
+         p_module != NULL ;
+         p_module = p_module->next )
     {
-        intf_Msg( "Try `%s --help' for more information.",
-                     p_main->psz_arg0 );
-        return;
+
+        if( psz_module_name && strcmp( psz_module_name, p_module->psz_name ) )
+            continue;
+
+        /* print module name */
+        intf_Msg( "%s configuration:\n", p_module->psz_name );
+
+        for( i = 0; i < (p_module->i_config_options -1); i++ )
+        {
+            int j;
+
+            switch( p_module->p_config[i].i_type )
+            {
+            case MODULE_CONFIG_ITEM_CATEGORY:
+                intf_Msg( " %s", p_module->p_config[i].psz_text );
+                break;
+
+            case MODULE_CONFIG_ITEM_STRING:
+            case MODULE_CONFIG_ITEM_FILE:
+            case MODULE_CONFIG_ITEM_PLUGIN:
+                /* Nasty hack, but right now I'm too tired to think about
+                 * a nice solution */
+                j = 25 - strlen( p_module->p_config[i].psz_name )
+                    - strlen(" <string>") - 1;
+                if( j < 0 ) j = 0; psz_spaces[j] = 0;
+
+                intf_Msg( "  --%s <string>%s %s",
+                          p_module->p_config[i].psz_name, psz_spaces,
+                          p_module->p_config[i].psz_text );
+                psz_spaces[j] = 32;
+                break;
+            case MODULE_CONFIG_ITEM_INTEGER:
+                /* Nasty hack, but right now I'm too tired to think about
+                 * a nice solution */
+                j = 25 - strlen( p_module->p_config[i].psz_name )
+                    - strlen(" <integer>") - 1;
+                if( j < 0 ) j = 0; psz_spaces[j] = 0;
+
+                intf_Msg( "  --%s <integer>%s %s",
+                          p_module->p_config[i].psz_name, psz_spaces,
+                          p_module->p_config[i].psz_text );
+                psz_spaces[j] = 32;
+                break;
+            default:
+                /* Nasty hack, but right now I'm too tired to think about
+                 * a nice solution */
+                j = 25 - strlen( p_module->p_config[i].psz_name ) - 1;
+                if( j < 0 ) j = 0; psz_spaces[j] = 0;
+
+                intf_Msg( "  --%s%s %s",
+                          p_module->p_config[i].psz_name, psz_spaces,
+                          p_module->p_config[i].psz_text );
+                psz_spaces[j] = 32;
+                break;
+            }
+        }
+
+        /* Yet another nasty hack.
+         * Maybe we could use MODULE_CONFIG_ITEM_END to display tail messages
+         * for each module?? */
+        if( !strcmp( "main", p_module->psz_name ) )
+            intf_Msg( "\nPlaylist items:"
+                "\n  *.mpg, *.vob                   \tPlain MPEG-1/2 files"
+                "\n  dvd:<device>[@<raw device>]    \tDVD device"
+                "\n  vcd:<device>                   \tVCD device"
+                "\n  udpstream:[<server>[:<server port>]][@[<bind address>]"
+                      "[:<bind port>]]"
+                "\n                                 \tUDP stream sent by VLS"
+                "\n  vlc:loop                       \tLoop execution of the "
+                      "playlist"
+                "\n  vlc:pause                      \tPause execution of "
+                      "playlist items"
+                "\n  vlc:quit                       \tQuit VLC" );
+
+        intf_Msg( "" );
+
     }
 
-    /* Options */
-    intf_Msg( "\nOptions:"
-          "\n  -I, --intf <module>            \tinterface method"
-          "\n  -v, --verbose                  \tverbose mode (cumulative)"
-          "\n      --memcpy <module>          \tmemcpy method"
-          "\n"
-          "\n      --noaudio                  \tdisable audio"
-          "\n  -A, --aout <module>            \taudio output method"
-          "\n      --stereo, --mono           \tstereo/mono audio"
-          "\n      --spdif                    \tAC3 pass-through mode"
-          "\n      --downmix <module>         \tAC3 downmix method"
-          "\n      --imdct <module>           \tAC3 IMDCT method"
-          "\n      --volume [0..1024]         \tVLC output volume"
-          "\n      --desync <time in ms>      \tCompensate desynchronization of the audio"
-          "\n"
-          "\n      --novideo                  \tdisable video"
-          "\n  -V, --vout <module>            \tvideo output method"
-          "\n      --display <display>        \tdisplay string"
-          "\n      --width <w>, --height <h>  \tdisplay dimensions"
-          "\n  -g, --grayscale                \tgrayscale output"
-          "\n      --fullscreen               \tfullscreen output"
-          "\n      --nooverlay                \tdisable accelerated display"
-          "\n      --xvadaptor <adaptor>      \tXVideo adaptor"
-          "\n      --color                    \tcolor output"
-          "\n      --motion <module>          \tmotion compensation method"
-          "\n      --idct <module>            \tIDCT method"
-          "\n      --yuv <module>             \tYUV method"
-          "\n      --synchro <type>           \tforce synchro algorithm"
-          "\n      --smp <number of threads>  \tuse several processors"
-          "\n      --spumargin <m>            \tforce SPU position"
-          "\n      --filter <module>          \tvideo filter module"
-          "\n"
-          "\n  -t, --dvdtitle <num>           \tchoose DVD title"
-          "\n  -T, --dvdchapter <num>         \tchoose DVD chapter"
-          "\n  -u, --dvdangle <num>           \tchoose DVD angle"
-          "\n  -a, --dvdaudio <type>          \tchoose DVD audio type"
-          "\n  -c, --dvdchannel <channel>     \tchoose DVD audio channel"
-          "\n  -s, --dvdsubtitle <channel>    \tchoose DVD subtitle channel"
-          "\n      --dvdcss-method <method>   \tselect dvdcss decryption method"
-          "\n      --dvdcss-verbose <level>   \tselect dvdcss verbose level"
-          "\n"
-          "\n      --input                    \tinput method"
-          "\n      --channels                 \tenable channels"
-          "\n      --channelserver <host>     \tchannel server address"
-          "\n"
-          "\n      --mpeg_adec <builtin|mad>  \tchoose MPEG audio decoder"
-          "\n      --ac3_adec <builtin|a52>   \tchoose AC3 audio decoder"
-          "\n"
-          "\n      --nommx                    \tdisable CPU's MMX support"
-          "\n      --no3dnow                  \tdisable CPU's 3D Now! support"
-          "\n      --nommxext                 \tdisable CPU's MMX EXT support"
-          "\n      --nosse                    \tdisable CPU's SSE support"
-          "\n      --noaltivec                \tdisable CPU's AltiVec support"
-          "\n"
-          "\n  -h, --help                     \tprint help and exit"
-          "\n  -H, --longhelp                 \tprint long help and exit"
-          "\n      --version                  \toutput version information and exit"
-          "\n\nPlaylist items:"
-          "\n  *.mpg, *.vob                   \tPlain MPEG-1/2 files"
-          "\n  dvd:<device>[@<raw device>]    \tDVD device"
-          "\n  vcd:<device>                   \tVCD device"
-          "\n  udpstream:[<server>[:<server port>]][@[<bind address>][:<bind port>]]"
-          "\n                                 \tUDP stream sent by VLS"
-          "\n  vlc:loop                       \tLoop execution of the playlist"
-          "\n  vlc:pause                      \tPause execution of playlist items"
-          "\n  vlc:quit                       \tQuit VLC");
+#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
+        intf_Msg( "\nPress the RETURN key to continue..." );
+        getchar();
+#endif
+}
 
-    if( i_fashion == SHORT_HELP )
-        return;
+/*****************************************************************************
+ * ListModules: list the available modules with their description
+ *****************************************************************************
+ * Print a list of all available modules (builtins and plugins) and a short
+ * description for each one.
+ *****************************************************************************/
+static void ListModules( void )
+{
+    module_t *p_module;
+    char psz_spaces[20];
 
-    /* Interface parameters */
-    intf_Msg( "\nInterface parameters:"
-        "\n  " INTF_METHOD_VAR "=<method name>        \tinterface method"
-        "\n  " INTF_INIT_SCRIPT_VAR "=<filename>              \tinitialization script"
-        "\n  " INTF_CHANNELS_VAR "=<filename>         \tchannels list"
-        "\n  " MEMCPY_METHOD_VAR "=<method name>      \tmemcpy method" );
+    memset( psz_spaces, 32, 20 );
 
-    /* Audio parameters */
-    intf_Msg( "\nAudio parameters:"
-        "\n  " AOUT_METHOD_VAR "=<method name>        \taudio method"
-        "\n  " AOUT_DSP_VAR "=<filename>              \tdsp device path"
-        "\n  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output"
-        "\n  " AOUT_SPDIF_VAR "={1|0}                 \tAC3 pass-through mode"
-        "\n  " DOWNMIX_METHOD_VAR "=<method name>     \tAC3 downmix method"
-        "\n  " IMDCT_METHOD_VAR "=<method name>       \tAC3 IMDCT method"
-        "\n  " AOUT_VOLUME_VAR "=[0..1024]            \tVLC output volume"
-        "\n  " AOUT_RATE_VAR "=<rate>                 \toutput rate" );
+#ifdef WIN32
+    ShowConsole();
+#endif
 
-    /* Video parameters */
-    intf_Msg( "\nVideo parameters:"
-        "\n  " VOUT_METHOD_VAR "=<method name>        \tdisplay method"
-        "\n  " VOUT_DISPLAY_VAR "=<display name>      \tdisplay used"
-        "\n  " VOUT_WIDTH_VAR "=<width>               \tdisplay width"
-        "\n  " VOUT_HEIGHT_VAR "=<height>             \tdislay height"
-        "\n  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path"
-        "\n  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output"
-        "\n  " VOUT_FULLSCREEN_VAR "={1|0}            \tfullscreen"
-        "\n  " VOUT_NOOVERLAY_VAR "={1|0}             \tnooverlay"
-        "\n  " VOUT_XVADAPTOR_VAR "=<adaptor>         \tXVideo adaptor"
-        "\n  " MOTION_METHOD_VAR "=<method name>      \tmotion compensation method"
-        "\n  " IDCT_METHOD_VAR "=<method name>        \tIDCT method"
-        "\n  " YUV_METHOD_VAR "=<method name>         \tYUV method"
-        "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm"
-        "\n  " VDEC_SMP_VAR "=<number of threads>     \tuse several processors"
-        "\n  " VOUT_FILTER_VAR "=<method name>        \tvideo filter method"
-        "\n  " VOUT_SPUMARGIN_VAR "=<margin>          \tforce SPU margin" );
+    /* Usage */
+    intf_Msg( "Usage: %s [options] [parameters] [file]...\n",
+              p_main->psz_arg0 );
 
-    /* DVD parameters */
-    intf_Msg( "\nDVD parameters:"
-        "\n  " INPUT_DVD_DEVICE_VAR "=<device>        \tDVD device"
-        "\n  " INPUT_TITLE_VAR "=<title>              \ttitle number"
-        "\n  " INPUT_CHAPTER_VAR "=<chapter>          \tchapter number"
-        "\n  " INPUT_ANGLE_VAR "=<angle>              \tangle number"
-        "\n  " INPUT_AUDIO_VAR "={ac3|lpcm|mpeg|off}  \taudio type"
-        "\n  " INPUT_CHANNEL_VAR "=[0-15]             \taudio channel"
-        "\n  " INPUT_SUBTITLE_VAR "=[0-31]            \tsubtitle channel" );
+    intf_Msg( "[plugin]              [description]" );
 
-    /* Input parameters */
-    intf_Msg( "\nInput parameters:"
-        "\n  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface"
-        "\n  " INPUT_CHANNEL_SERVER_VAR "=<hostname>  \tchannel server"
-        "\n  " INPUT_CHANNEL_PORT_VAR "=<port>        \tchannel server port" );
+    /* Enumerate each module */
+    for( p_module = p_module_bank->first ;
+         p_module != NULL ;
+         p_module = p_module->next )
+    {
+        int i;
 
-    /* Decoder parameters */
-    intf_Msg( "\nDecoder parameters:"
-        "\n  " ADEC_MPEG_VAR "=<builtin|mad>          \tMPEG audio decoder"
-        "\n  " ADEC_AC3_VAR "=<builtin|a52>           \tAC3 audio decoder" );
+        /* Nasty hack, but right now I'm too tired to think about a nice
+         * solution */
+        i = 20 - strlen( p_module->psz_name ) - 1;
+        if( i < 0 ) i = 0;
+        psz_spaces[i] = 0;
+
+        intf_Msg( "  %s%s %s", p_module->psz_name, psz_spaces,
+                  p_module->psz_longname );
+
+        psz_spaces[i] = 32;
+
+    }
+
+#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
+        intf_Msg( "\nPress the RETURN key to continue..." );
+        getchar();
+#endif
 }
 
 /*****************************************************************************
@@ -1059,11 +969,18 @@ static void Usage( int i_fashion )
  *****************************************************************************/
 static void Version( void )
 {
+#ifdef WIN32
+    ShowConsole();
+#endif
     intf_Msg( VERSION_MESSAGE
         "This program comes with NO WARRANTY, to the extent permitted by law.\n"
         "You may redistribute it under the terms of the GNU General Public License;\n"
         "see the file named COPYING for details.\n"
         "Written by the VideoLAN team at Ecole Centrale, Paris." );
+#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
+        intf_Msg( "\nPress the RETURN key to continue..." );
+        getchar();
+#endif
 }
 
 /*****************************************************************************
@@ -1126,7 +1043,7 @@ static void FatalSignalHandler( int i_signal )
 /*****************************************************************************
  * IllegalSignalHandler: system signal handler
  *****************************************************************************
- * This function is called when a illegal instruction signal is received by
+ * This function is called when an illegal instruction signal is received by
  * the program. We use this function to test OS and CPU capabilities
  *****************************************************************************/
 static void IllegalSignalHandler( int i_signal )
@@ -1373,13 +1290,13 @@ static u32 CPUCapabilities( void )
  *****************************************************************************
  * This function is usefull only on Win32.
  *****************************************************************************/
+#ifdef WIN32 /*  */
 static void ShowConsole( void )
 {
-#ifdef WIN32 /*  */
     AllocConsole();
     freopen( "CONOUT$", "w", stdout );
     freopen( "CONOUT$", "w", stderr );
     freopen( "CONIN$", "r", stdin );
-#endif
     return;
 }
+#endif

@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.7 2002/02/15 13:32:53 sam Exp $
+ * $Id: distort.c,v 1.8 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -121,7 +121,7 @@ static void vout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Create( vout_thread_t *p_vout )
 {
-    char *psz_method;
+    char *psz_method, *psz_method_tmp;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -132,7 +132,13 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Look what method was requested */
-    psz_method = main_GetPszVariable( VOUT_FILTER_VAR, "" );
+    if( !(psz_method = psz_method_tmp
+          = config_GetPszVariable( VOUT_FILTER_VAR )) )
+    {
+        intf_ErrMsg( "vout error: configuration variable %s empty",
+                     VOUT_FILTER_VAR );
+        return( 1 );
+    }
 
     while( *psz_method && *psz_method != ':' )
     {
@@ -153,6 +159,8 @@ static int vout_Create( vout_thread_t *p_vout )
                      "using distort:wave" );
         p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
     }
+
+    free( psz_method_tmp );
 
     return( 0 );
 }
@@ -175,8 +183,8 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to open the real video output */
-    psz_filter = main_GetPszVariable( VOUT_FILTER_VAR, "" );
-    main_PutPszVariable( VOUT_FILTER_VAR, "" );
+    psz_filter = config_GetPszVariable( VOUT_FILTER_VAR );
+    config_PutPszVariable( VOUT_FILTER_VAR, NULL );
 
     intf_WarnMsg( 1, "filter: spawning the real video output" );
 
@@ -184,6 +192,9 @@ static int vout_Init( vout_thread_t *p_vout )
         vout_CreateThread( NULL,
                            p_vout->render.i_width, p_vout->render.i_height,
                            p_vout->render.i_chroma, p_vout->render.i_aspect );
+
+    config_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
+    if( psz_filter ) free( psz_filter );
 
     /* Everything failed */
     if( p_vout->p_sys->p_vout == NULL )
@@ -193,8 +204,6 @@ static int vout_Init( vout_thread_t *p_vout )
         return( 0 );
     }
  
-    main_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
-
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
     p_vout->p_sys->f_angle = 0.0;

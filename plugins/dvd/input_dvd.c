@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.120 2002/02/19 00:50:19 sam Exp $
+ * $Id: input_dvd.c,v 1.121 2002/02/24 20:51:09 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -263,7 +263,7 @@ static void DVDInit( input_thread_t * p_input )
 #undef area
 
     /* Get requested title - if none try the first title */
-    i_title = main_GetIntVariable( INPUT_TITLE_VAR, 1 );
+    i_title = config_GetIntVariable( INPUT_TITLE_VAR );
     if( i_title <= 0 || i_title > title_inf.i_title_nb )
     {
         i_title = 1;
@@ -272,7 +272,7 @@ static void DVDInit( input_thread_t * p_input )
 #undef title_inf
 
     /* Get requested chapter - if none defaults to first one */
-    i_chapter = main_GetIntVariable( INPUT_CHAPTER_VAR, 1 );
+    i_chapter = config_GetIntVariable( INPUT_CHAPTER_VAR );
     if( i_chapter <= 0 )
     {
         i_chapter = 1;
@@ -334,7 +334,7 @@ static void DVDOpen( struct input_thread_s *p_input )
         *psz_parser = '\0';
         psz_parser++;
 
-        main_PutPszVariable( "DVDCSS_RAW_DEVICE", psz_parser );
+        config_PutPszVariable( "DVDCSS_RAW_DEVICE", psz_parser );
     }
 
     intf_WarnMsg( 2, "input: dvd=%s raw=%s", psz_device, psz_parser );
@@ -452,7 +452,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
          * Angle management
          */
         p_dvd->i_angle_nb = vmg.title_inf.p_attr[p_dvd->i_title-1].i_angle_nb;
-        p_dvd->i_angle = main_GetIntVariable( INPUT_ANGLE_VAR, 1 );
+        p_dvd->i_angle = config_GetIntVariable( INPUT_ANGLE_VAR );
         if( ( p_dvd->i_angle <= 0 ) || p_dvd->i_angle > p_dvd->i_angle_nb )
         {
             p_dvd->i_angle = 1;
@@ -688,16 +688,15 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         if( p_main->b_audio )
         {
             /* For audio: first one if none or a not existing one specified */
-            i_audio = main_GetIntVariable( INPUT_CHANNEL_VAR, 1 );
+            i_audio = config_GetIntVariable( INPUT_CHANNEL_VAR );
             if( i_audio < 0 || i_audio > i_audio_nb )
             {
-                main_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
                 i_audio = 1;
             }
             if( i_audio > 0 && i_audio_nb > 0 )
             {
-                if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) ||
-                    ( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) ==
+                if( config_GetIntVariable( AOUT_SPDIF_VAR ) ||
+                    ( config_GetIntVariable( INPUT_AUDIO_VAR ) ==
                       REQUESTED_AC3 ) )
                 {
                     int     i_ac3 = i_audio;
@@ -724,10 +723,9 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         if( p_main->b_video )
         {
             /* for spu, default is none */
-            i_spu = main_GetIntVariable( INPUT_SUBTITLE_VAR, 0 );
+            i_spu = config_GetIntVariable( INPUT_SUBTITLE_VAR );
             if( i_spu < 0 || i_spu > i_spu_nb )
             {
-                main_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
                 i_spu = 0;
             }
             if( i_spu > 0 && i_spu_nb > 0 )

@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.41 2002/02/15 13:32:52 sam Exp $
+ * $Id: vout_beos.cpp,v 1.42 2002/02/24 20:51:09 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -576,8 +576,8 @@ void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 static int BeosOpenDisplay( vout_thread_t *p_vout )
 { 
     p_vout->p_sys->p_window = new VideoWindow(
-            main_GetIntVariable( VOUT_WIDTH_VAR, VOUT_WIDTH_DEFAULT ) - 1,
-            main_GetIntVariable( VOUT_HEIGHT_VAR, VOUT_HEIGHT_DEFAULT ) - 1,
+            config_GetIntVariable( VOUT_WIDTH_VAR ) - 1,
+            config_GetIntVariable( VOUT_HEIGHT_VAR ) - 1,
             p_vout );
 
     if( p_vout->p_sys->p_window == NULL )
