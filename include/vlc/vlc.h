@@ -155,7 +155,7 @@ char const * VLC_Error ( int i_err );
  *
  * \return vlc object id or an error code
  */
-int     VLC_Create       ( void );
+int     VLC_Create( void );
 
 /**
  * Initialize a vlc_t structure
@@ -171,7 +171,7 @@ int     VLC_Create       ( void );
  *  \param ppsz_argv an array of arguments
  *  \return VLC_SUCCESS on success
  */
-int     VLC_Init         ( int, int, char *[] );
+int     VLC_Init( int, int, char *[] );
 
 /**
  * Add an interface
@@ -187,7 +187,7 @@ int     VLC_Init         ( int, int, char *[] );
  * \param b_play start playing when the interface is done loading
  * \return VLC_SUCCESS on success
  */
-int     VLC_AddIntf      ( int, char const *, vlc_bool_t, vlc_bool_t );
+int     VLC_AddIntf( int, char const *, vlc_bool_t, vlc_bool_t );
 
 /**
  * Ask vlc to die
@@ -198,7 +198,7 @@ int     VLC_AddIntf      ( int, char const *, vlc_bool_t, vlc_bool_t );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_Die          ( int );
+int     VLC_Die( int );
 
 /**
  * Clean up all the intf, playlist, vout and aout
@@ -206,10 +206,12 @@ int     VLC_Die          ( int );
  * This function requests all intf, playlist, vout and aout objects to finish
  * and CleanUp. Only a blank VLC object should remain after this.
  *
+ * \note This function was previously called VLC_Stop
+ *
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_CleanUp      ( int );
+int     VLC_CleanUp( int );
 
 /**
  * Destroy all threads and the VLC object
@@ -221,19 +223,21 @@ int     VLC_CleanUp      ( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_Destroy      ( int );
+int     VLC_Destroy( int );
 
 /**
  * Set a VLC variable
  *
  * This function sets a variable of VLC
  *
+ * \note Was previously called VLC_Set
+ *
  * \param i_object a vlc object id
  * \param psz_var a vlc variable name
  * \param value a vlc_value_t structure
  * \return VLC_SUCCESS on success
  */
-int     VLC_Set          ( int, char const *, vlc_value_t );
+int     VLC_VariableSet( int, char const *, vlc_value_t );
 
 /**
  * Get a VLC variable
@@ -241,12 +245,14 @@ int     VLC_Set          ( int, char const *, vlc_value_t );
  * This function gets the value of a variable of VLC
  * It stores it in the p_value argument
  *
+ * \note Was previously called VLC_Get
+ *
  * \param i_object a vlc object id
  * \param psz_var a vlc variable name
  * \param p_value a pointer to a vlc_value_t structure
  * \return VLC_SUCCESS on success
  */
-int     VLC_Get          ( int, char const *, vlc_value_t * );
+int     VLC_VariableGet( int, char const *, vlc_value_t * );
 
 /**
  * Add a target to the current playlist
@@ -262,7 +268,7 @@ int     VLC_Get          ( int, char const *, vlc_value_t * );
  * \param i_pos the position at which to add the new target (PLAYLIST_END for end)
  * \return VLC_SUCCESS on success
  */
-int     VLC_AddTarget    ( int, char const *, const char **, int, int, int );
+int     VLC_AddTarget( int, char const *, const char **, int, int, int );
 
 /**
  * Start the playlist and play the currently selected playlist item
@@ -274,7 +280,7 @@ int     VLC_AddTarget    ( int, char const *, const char **, int, int, int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_Play         ( int );
+int     VLC_Play( int );
 
 /**
  * Pause the currently playing item. Resume it if already paused
@@ -285,7 +291,20 @@ int     VLC_Play         ( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_Pause        ( int );
+int     VLC_Pause( int );
+
+/**
+ * Stop the playlist
+ *
+ * If an item is currently playing then stop it.
+ * Set the playlist to a stopped state.
+ *
+ * \note This function is new. The old VLC_Stop is now called VLC_CleanUp
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
+int             VLC_Stop( int );
 
 /**
  * Stop the playlist
@@ -296,28 +315,166 @@ int     VLC_Pause        ( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_Stop         ( int );
+vlc_bool_t      VLC_IsPlaying( int );
 
 /**
- * Stop the playlist
+ * Get the current position in a input
  *
- * If an item is currently playing then stop it.
- * Set the playlist to a stopped state.
+ * Return the current position as a float
+ * This method should be used for time sliders etc
+ * \note For some inputs, this will be unknown.
+ *
+ * \param i_object a vlc object id
+ * \return a float in the range of 0.0 - 1.0
+ */
+float           VLC_PositionGet( int );
+
+/**
+ * Set the current position in a input
+ *
+ * Set the current position as a float
+ * This method should be used for time sliders etc
+ * \note For some inputs, this will be unknown.
+ *
+ * \param i_object a vlc object id
+ * \param i_position a float in the range of 0.0 - 1.0
+ * \return a float in the range of 0.0 - 1.0
+ */
+float           VLC_PositionSet( int, float );
+
+/**
+ * Get the current position in a input
+ *
+ * Return the current position in seconds from the start.
+ * \note For some inputs, this will be unknown.
+ *
+ * \param i_object a vlc object id
+ * \return the offset from 0:00 in seconds
+ */
+int             VLC_TimeGet( int );
+
+/**
+ * Seek to a position in the current input
+ *
+ * Seek i_seconds in the current input. If b_relative is set,
+ * then the seek will be relative to the current position, otherwise
+ * it will seek to i_seconds from the beginning of the input.
+ * \note For some inputs, this will be unknown.
+ *
+ * \param i_object a vlc object id
+ * \param i_seconds seconds from current position or from beginning of input
+ * \param b_relative seek relative from current position
+ * \return VLC_SUCCESS on success
+ */
+int             VLC_TimeSet( int, int, vlc_bool_t );
+
+/**
+ * Get the total length of a input
+ *
+ * Return the total length in seconds from the current input.
+ * \note For some inputs, this will be unknown.
+ *
+ * \param i_object a vlc object id
+ * \return the length in seconds
+ */
+int             VLC_LengthGet( int );
+
+/**
+ * Play the input faster than realtime
+ *
+ * 2x, 4x, 8x faster than realtime
+ * \note For some inputs, this will be impossible.
+ *
+ * \param i_object a vlc object id
+ * \return the current speedrate
+ */
+float           VLC_SpeedFaster( int );
+
+/**
+ * Play the input slower than realtime
+ *
+ * 1/2x, 1/4x, 1/8x slower than realtime
+ * \note For some inputs, this will be impossible.
+ *
+ * \param i_object a vlc object id
+ * \return the current speedrate
+ */
+float           VLC_SpeedSlower( int );
+
+/**
+ * Return the current playlist item
+ *
+ * \param i_object a vlc object id
+ * \return the index of the playlistitem that is currently selected for play
+ */
+int             VLC_PlaylistIndex( int );
+
+/**
+ * Total amount of items in the playlist
+ *
+ * \param i_object a vlc object id
+ * \return amount of playlist items
+ */
+int             VLC_PlaylistNumberOfItems( int );
+
+/**
+ * Next playlist item
+ *
+ * Skip to the next playlistitem and play it.
  *
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-vlc_bool_t VLC_IsPlaying ( int );
+int             VLC_PlaylistNext( int );
+
+/**
+ * Previous playlist item
+ *
+ * Skip to the previous playlistitem and play it.
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
+int             VLC_PlaylistPrev( int );
 
 /**
  * Clear the contents of the playlist
  *
  * Completly empty the entire playlist.
  *
+ * \note Was previously called VLC_ClearPlaylist
+ *
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_ClearPlaylist( int );
+int             VLC_PlaylistClear( int );
+
+/**
+ * Change the volume
+ *
+ * \param i_object a vlc object id
+ * \param i_volume something in a range from 0-200
+ * \return the new volume (range 0-200 %)
+ */
+int             VLC_VolumeSet( int );
+
+/**
+ * Get the current volume
+ *
+ * Retrieve the current volume.
+ *
+ * \param i_object a vlc object id
+ * \return the current volume (range 0-200 %)
+ */
+int             VLC_VolumeGet( int );
+
+/**
+ * Mute/Unmute the volume
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
+int            VLC_VolumeMute( int );
 
 /**
  * Toggle Fullscreen mode
@@ -327,7 +484,7 @@ int     VLC_ClearPlaylist( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_FullScreen   ( int );
+int             VLC_FullScreen( int );
 
 
 # ifdef __cplusplus

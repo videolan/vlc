@@ -7,6 +7,7 @@
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -874,9 +875,9 @@ int VLC_Destroy( int i_object )
 }
 
 /*****************************************************************************
- * VLC_Set: set a vlc variable
+ * VLC_VariableSet: set a vlc variable
  *****************************************************************************/
-int VLC_Set( int i_object, char const *psz_var, vlc_value_t value )
+int VLC_VariableSet( int i_object, char const *psz_var, vlc_value_t value )
 {
     vlc_t *p_vlc = vlc_current_object( i_object );
     int i_ret;
@@ -924,7 +925,7 @@ int VLC_Set( int i_object, char const *psz_var, vlc_value_t value )
 }
 
 /*****************************************************************************
- * VLC_Get: get a vlc variable
+ * VLC_VariableGet: get a vlc variable
  *****************************************************************************/
 int VLC_Get( int i_object, char const *psz_var, vlc_value_t *p_value )
 {
@@ -1098,18 +1099,427 @@ vlc_bool_t VLC_IsPlaying( int i_object )
     }
 
     b_playing = playlist_IsPlaying( p_playlist );
-
     vlc_object_release( p_playlist );
 
     if( i_object ) vlc_object_release( p_vlc );
-
     return b_playing;
 }
 
+/**
+ * Get the current position in a input
+ *
+ * Return the current position as a float
+ * \note For some inputs, this will be unknown.
+ *
+ * \param i_object a vlc object id
+ * \return a float in the range of 0.0 - 1.0
+ */
+float VLC_PositionGet( int i_object )
+{
+    input_thread_t *p_input;
+    vlc_value_t val;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_input = vlc_object_find( p_vlc, VLC_OBJECT_INPUT, FIND_CHILD );
+
+    if( !p_input )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    var_Get( p_input, "position", &val );
+    vlc_object_release( p_input );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return val.f_float;
+}
+
+/**
+ * Set the current position in a input
+ *
+ * Set the current position in a input and then return
+ * the current position as a float.
+ * \note For some inputs, this will be unknown.
+ *
+ * \param i_object a vlc object id
+ * \param i_position a float in the range of 0.0 - 1.0
+ * \return a float in the range of 0.0 - 1.0
+ */
+float VLC_PositionSet( int i_object, float i_position )
+{
+    input_thread_t *p_input;
+    vlc_value_t val;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_input = vlc_object_find( p_vlc, VLC_OBJECT_INPUT, FIND_CHILD );
+
+    if( !p_input )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    val.f_float = i_position;
+    var_Set( p_input, "position", val );
+    var_Get( p_input, "position", &val );
+    vlc_object_release( p_input );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return val.f_float;
+}
+
+/**
+ * Get the current position in a input
+ *
+ * Return the current position in seconds from the start.
+ * \note For some inputs, this will be unknown.
+ *
+ * \param i_object a vlc object id
+ * \return the offset from 0:00 in seconds
+ */
+int VLC_TimeGet( int i_object )
+{
+    input_thread_t *p_input;
+    vlc_value_t val;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_input = vlc_object_find( p_vlc, VLC_OBJECT_INPUT, FIND_CHILD );
+
+    if( !p_input )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    var_Get( p_input, "time", &val );
+    vlc_object_release( p_input );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return val.i_time  / 1000000;
+}
+
+/**
+ * Seek to a position in the current input
+ *
+ * Seek i_seconds in the current input. If b_relative is set,
+ * then the seek will be relative to the current position, otherwise
+ * it will seek to i_seconds from the beginning of the input.
+ * \note For some inputs, this will be unknown.
+ *
+ * \param i_object a vlc object id
+ * \param i_seconds seconds from current position or from beginning of input
+ * \param b_relative seek relative from current position
+ * \return VLC_SUCCESS on success
+ */
+int VLC_TimeSet( int i_object, int i_seconds, vlc_bool_t b_relative )
+{
+    input_thread_t *p_input;
+    vlc_value_t val;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_input = vlc_object_find( p_vlc, VLC_OBJECT_INPUT, FIND_CHILD );
+
+    if( !p_input )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    if( b_relative )
+    {
+        val.i_time = i_seconds * 1000000;
+        var_Set( p_input, "time-offset", val );
+    }
+    else
+    {
+        val.i_time = i_seconds * 1000000;
+        var_Set( p_input, "time", val );
+    }
+    vlc_object_release( p_input );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return VLC_SUCCESS;
+}
+
+/**
+ * Get the total length of a input
+ *
+ * Return the total length in seconds from the current input.
+ * \note For some inputs, this will be unknown.
+ *
+ * \param i_object a vlc object id
+ * \return the length in seconds
+ */
+int VLC_LengthGet( int i_object )
+{
+    input_thread_t *p_input;
+    vlc_value_t val;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_input = vlc_object_find( p_vlc, VLC_OBJECT_INPUT, FIND_CHILD );
+
+    if( !p_input )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    var_Get( p_input, "length", &val );
+    vlc_object_release( p_input );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return val.i_time  / 1000000;
+}
+
+/**
+ * Play the input faster than realtime
+ *
+ * 2x, 4x, 8x faster than realtime
+ * \note For some inputs, this will be impossible.
+ *
+ * \param i_object a vlc object id
+ * \return the current speedrate
+ */
+float VLC_SpeedFaster( int i_object )
+{
+    input_thread_t *p_input;
+    vlc_value_t val;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_input = vlc_object_find( p_vlc, VLC_OBJECT_INPUT, FIND_CHILD );
+
+    if( !p_input )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    val.b_bool = VLC_TRUE;
+    var_Set( p_input, "rate-faster", val );
+    var_Get( p_input, "rate", &val );
+    vlc_object_release( p_input );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return val.f_float / DEFAULT_RATE;
+}
+
+/**
+ * Play the input slower than realtime
+ *
+ * 1/2x, 1/4x, 1/8x slower than realtime
+ * \note For some inputs, this will be impossible.
+ *
+ * \param i_object a vlc object id
+ * \return the current speedrate
+ */
+float VLC_SpeedSlower( int i_object )
+{
+    input_thread_t *p_input;
+    vlc_value_t val;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_input = vlc_object_find( p_vlc, VLC_OBJECT_INPUT, FIND_CHILD );
+
+    if( !p_input )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    val.b_bool = VLC_TRUE;
+    var_Set( p_input, "rate-slower", val );
+    var_Get( p_input, "rate", &val );
+    vlc_object_release( p_input );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return val.f_float / DEFAULT_RATE;
+}
+
+/**
+ * Return the current playlist item
+ *
+ * Returns the index of the playlistitem that is currently selected for play.
+ * This is valid even if nothing is currently playing.
+ *
+ * \param i_object a vlc object id
+ * \return the current index
+ */
+int VLC_PlaylistIndex( int i_object )
+{
+    int i_index;
+    playlist_t * p_playlist;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( !p_playlist )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    i_index = p_playlist->i_index;
+    vlc_object_release( p_playlist );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return i_index;
+}
+
+/**
+ * Total amount of items in the playlist
+ *
+ * \param i_object a vlc object id
+ * \return amount of playlist items
+ */
+int VLC_PlaylistNumberOfItems( int i_object )
+{
+    int i_size;
+    playlist_t * p_playlist;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( !p_playlist )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    i_size = p_playlist->i_size;
+    vlc_object_release( p_playlist );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return i_size;
+}
+
+/**
+ * Next playlist item
+ *
+ * Skip to the next playlistitem and play it.
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
+int VLC_PlaylistNext( int i_object )
+{
+    playlist_t * p_playlist;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( !p_playlist )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    playlist_Next( p_playlist );
+    vlc_object_release( p_playlist );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return VLC_SUCCESS;
+}
+
+/**
+ * Previous playlist item
+ *
+ * Skip to the previous playlistitem and play it.
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
+int VLC_PlaylistPrev( int i_object )
+{
+    playlist_t * p_playlist;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( !p_playlist )
+    {
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_ENOOBJ;
+    }
+
+    playlist_Prev( p_playlist );
+    vlc_object_release( p_playlist );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return VLC_SUCCESS;
+}
+
+
 /*****************************************************************************
- * VLC_ClearPlaylist: Empty the playlist
+ * VLC_PlaylistClear: Empty the playlist
  *****************************************************************************/
-int VLC_ClearPlaylist( int i_object )
+int VLC_PlaylistClear( int i_object )
 {
     int i_err;
     playlist_t * p_playlist;
@@ -1129,12 +1539,87 @@ int VLC_ClearPlaylist( int i_object )
         return VLC_ENOOBJ;
     }
 
-    i_err = playlist_Clear(p_playlist);
+    i_err = playlist_Clear( p_playlist );
 
     vlc_object_release( p_playlist );
 
     if( i_object ) vlc_object_release( p_vlc );
     return i_err;
+}
+
+/**
+ * Change the volume
+ *
+ * \param i_object a vlc object id
+ * \param i_volume something in a range from 0-200
+ * \return the new volume (range 0-200 %)
+ */
+int VLC_VolumeSet( int i_object, int i_volume )
+{
+    audio_volume_t i_vol;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    if( 0 >= i_volume && i_volume <= 200 )
+    {
+        i_vol = i_volume * AOUT_VOLUME_MAX / 200;
+        aout_VolumeSet( p_vlc, i_vol );
+    }
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return i_vol * 200 / AOUT_VOLUME_MAX;
+}
+
+/**
+ * Get the current volume
+ *
+ * Retrieve the current volume.
+ *
+ * \param i_object a vlc object id
+ * \return the current volume (range 0-200 %)
+ */
+int VLC_VolumeGet( int i_object )
+{
+    audio_volume_t i_volume;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    aout_VolumeGet( p_vlc, &i_volume );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return i_volume*200/AOUT_VOLUME_MAX;
+}
+
+/**
+ * Mute/Unmute the volume
+ *
+ * \param i_object a vlc object id
+ * \return VLC_SUCCESS on success
+ */
+int VLC_VolumeMute( int i_object )
+{
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    /* Check that the handle is valid */
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    aout_VolumeMute( p_vlc, NULL );
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

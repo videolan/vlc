@@ -196,7 +196,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
     if (pouetEvent->what == 6)
     {
         value.i_int = 1;
-        VLC_Set( p_plugin->i_vlc, "drawableredraw", value );
+        VLC_VariableSet( p_plugin->i_vlc, "drawableredraw", value );
         return true;
     }
 
@@ -342,11 +342,11 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
     }
 
     value.psz_string = "dummy";
-    VLC_Set( p_plugin->i_vlc, "conf::intf", value );
+    VLC_VariableSet( p_plugin->i_vlc, "conf::intf", value );
     value.psz_string = VOUT_PLUGINS;
-    VLC_Set( p_plugin->i_vlc, "conf::vout", value );
+    VLC_VariableSet( p_plugin->i_vlc, "conf::vout", value );
     value.psz_string = AOUT_PLUGINS;
-    VLC_Set( p_plugin->i_vlc, "conf::aout", value );
+    VLC_VariableSet( p_plugin->i_vlc, "conf::aout", value );
 
 #else
     p_plugin->i_vlc = 1;
@@ -392,7 +392,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
             if( !strcmp( argv[i], "yes" ) )
             {
                 value.b_bool = VLC_TRUE;
-                VLC_Set( p_plugin->i_vlc, "conf::loop", value );
+                VLC_VariableSet( p_plugin->i_vlc, "conf::loop", value );
             }
         }
         else if( !strcmp( argn[i], "fullscreen" ) )
@@ -400,7 +400,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
             if( !strcmp( argv[i], "yes" ) )
             {
                 value.b_bool = VLC_TRUE;
-                VLC_Set( p_plugin->i_vlc, "conf::fullscreen", value );
+                VLC_VariableSet( p_plugin->i_vlc, "conf::fullscreen", value );
             }
         }
 #endif
@@ -478,12 +478,12 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 
 #ifdef XP_MACOSX
     value.i_int = ((NP_Port*) (window->window))->port;
-    VLC_Set( p_plugin->i_vlc, "drawable", value );
+    VLC_VariableSet( p_plugin->i_vlc, "drawable", value );
 
     valueportx.i_int = ((NP_Port*) (window->window))->portx;
     valueporty.i_int = ((NP_Port*) (window->window))->porty;
-    VLC_Set( p_plugin->i_vlc, "drawableportx", valueportx );
-    VLC_Set( p_plugin->i_vlc, "drawableporty", valueporty );
+    VLC_VariableSet( p_plugin->i_vlc, "drawableportx", valueportx );
+    VLC_VariableSet( p_plugin->i_vlc, "drawableporty", valueporty );
 
     valuex.i_int = window->x;
     valuey.i_int = window->y;
@@ -494,14 +494,14 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     valueb.i_int = window->clipRect.bottom;
     valuer.i_int = window->clipRect.right;
 
-    VLC_Set( p_plugin->i_vlc, "drawablet", valuet );
-    VLC_Set( p_plugin->i_vlc, "drawablel", valuel );
-    VLC_Set( p_plugin->i_vlc, "drawableb", valueb );
-    VLC_Set( p_plugin->i_vlc, "drawabler", valuer );
-    VLC_Set( p_plugin->i_vlc, "drawablex", valuex );
-    VLC_Set( p_plugin->i_vlc, "drawabley", valuey );
-    VLC_Set( p_plugin->i_vlc, "drawablew", valuew );
-    VLC_Set( p_plugin->i_vlc, "drawableh", valueh );
+    VLC_VariableSet( p_plugin->i_vlc, "drawablet", valuet );
+    VLC_VariableSet( p_plugin->i_vlc, "drawablel", valuel );
+    VLC_VariableSet( p_plugin->i_vlc, "drawableb", valueb );
+    VLC_VarialbeSet( p_plugin->i_vlc, "drawabler", valuer );
+    VLC_VariableSet( p_plugin->i_vlc, "drawablex", valuex );
+    VLC_VariableSet( p_plugin->i_vlc, "drawabley", valuey );
+    VLC_VariableSet( p_plugin->i_vlc, "drawablew", valuew );
+    VLC_VariableSet( p_plugin->i_vlc, "drawableh", valueh );
 
     p_plugin->window = window;
 
@@ -527,7 +527,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 #else
     /* FIXME: this cast sucks */
     value.i_int = (int) (ptrdiff_t) (void *) window->window;
-    VLC_Set( p_plugin->i_vlc, "drawable", value );
+    VLC_VariableSet( p_plugin->i_vlc, "drawable", value );
 #endif
 
 #endif
