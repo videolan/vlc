@@ -100,6 +100,8 @@ configure-stamp:
 	  cd extras/ffmpeg \
 	  && CC=$(CC) ./configure --enable-pp --enable-gpl --enable-zlib --disable-debug --disable-mmx --disable-altivec \
 	  && cd libavcodec \
+	  && $(MAKE) \
+	  && cd ../libavformat \
 	  && $(MAKE); \
 	fi
 
@@ -142,6 +144,12 @@ build-stamp: patch configure-stamp
 	# Hackety hackety hack
 	if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/ffmpeg/libavcodec \
+	  && $(MAKE) clean \
+	  && rm -f Makefile.pic \
+	  && sed 's/^CFLAGS *=/&-fPIC -DPIC /' <Makefile >Makefile.pic \
+	  && $(MAKE) -f Makefile.pic \
+	  && rm -f Makefile.pic \
+	  && ../libavformat \
 	  && $(MAKE) clean \
 	  && rm -f Makefile.pic \
 	  && sed 's/^CFLAGS *=/&-fPIC -DPIC /' <Makefile >Makefile.pic \

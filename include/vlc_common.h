@@ -38,10 +38,12 @@
 
 #include "config.h"
 
-#if !defined(PACKAGE_NAME)
+#if defined(PACKAGE)
+#   undef PACKAGE_NAME
 #   define PACKAGE_NAME PACKAGE
 #endif
-#if !defined(PACKAGE_VERSION)
+#if defined(VERSION)
+#   undef PACKAGE_VERSION
 #   define PACKAGE_VERSION VERSION
 #endif
 
