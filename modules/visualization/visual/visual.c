@@ -85,16 +85,16 @@ vlc_module_begin();
              HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_FALSE );
     set_section( N_("Spectrum analyser") , NULL );
     add_integer("visual-nbbands", 80, NULL,
-             NBBANDS_TEXT, NBBANDS_LONGTEXT, VLC_FALSE );
+             NBBANDS_TEXT, NBBANDS_LONGTEXT, VLC_TRUE );
     add_integer("visual-separ", 1, NULL,
-             SEPAR_TEXT, SEPAR_LONGTEXT, VLC_FALSE );
+             SEPAR_TEXT, SEPAR_LONGTEXT, VLC_TRUE );
     add_integer("visual-amp", 3, NULL,
-             AMP_TEXT, AMP_LONGTEXT, VLC_FALSE );
+             AMP_TEXT, AMP_LONGTEXT, VLC_TRUE );
     add_bool("visual-peaks", VLC_TRUE, NULL,
-             PEAKS_TEXT, PEAKS_LONGTEXT, VLC_FALSE );
+             PEAKS_TEXT, PEAKS_LONGTEXT, VLC_TRUE );
     set_section( N_( "Random effect") , NULL );
     add_integer("visual-stars", 200, NULL,
-             STARS_TEXT, STARS_LONGTEXT, VLC_FALSE );
+             STARS_TEXT, STARS_LONGTEXT, VLC_TRUE );
     set_capability( "visualization", 0 );
     set_callbacks( Open, Close );
     add_shortcut( "visualizer");

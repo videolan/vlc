@@ -69,7 +69,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AFILTER );
 
     add_string( "equalizer-preset", "flat", NULL, PRESET_TEXT,
-                PRESET_LONGTEXT, VLC_TRUE );
+                PRESET_LONGTEXT, VLC_FALSE );
         change_string_list( preset_list, preset_list_text, 0 );
     add_string( "equalizer-bands", NULL, NULL, BANDS_TEXT,
                 BANDS_LONGTEXT, VLC_TRUE );

@@ -60,7 +60,7 @@ static char *psz_format_list[] = { "png" };
 static char *psz_format_list_text[] = { N_("PNG") };
 
 vlc_module_begin( );
-    set_shortname( _( "Image" ) );
+    set_shortname( _( "Image file" ) );
     set_description( _( "Image video output" ) );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );

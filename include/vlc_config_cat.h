@@ -175,7 +175,7 @@
 #define AADVANCED_HELP N_( "Advanced settings. Use with care.")
 
 #define CPU_TITLE N_( "CPU features" )
-#define CPU_HELP N_( "From here you can choose to disable some CPU accelearations. You should probably not touch that." )
+#define CPU_HELP N_( "From here you can choose to disable some CPU accelerations. You should probably not touch that." )
 
 #define MISC_TITLE N_( "Other" )
 #define MISC_HELP N_( "Other advanced settings")

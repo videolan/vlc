@@ -105,8 +105,6 @@ static void Display ( vout_thread_t *, picture_t * );
 vlc_module_begin();
     set_shortname( _( "Picture" ) );
     set_description(_("VLC internal picture video output") );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
     set_capability( "video output", 0 );
 
     add_string( "picture-id", "Id", NULL, ID_TEXT, ID_LONGTEXT, VLC_FALSE );

@@ -526,9 +526,11 @@ static char *ppsz_clock_descriptions[] =
     "These options allow you to set default global options for the " \
     "stream output subsystem." )
 
-#define SOUT_TEXT N_("Choose a stream output")
+#define SOUT_TEXT N_("Default stream output chain")
 #define SOUT_LONGTEXT N_( \
-    "Empty if no stream output.")
+    "You can enter here a default stream output chain. Refer to "\
+    "the documentation to learn how to build such chains." \
+    "Warning: this chain will be enabled for all streams." )
 
 #define SOUT_ALL_TEXT N_("Enable streaming of all ES")
 #define SOUT_ALL_LONGTEXT N_( \
@@ -624,20 +626,19 @@ static char *ppsz_clock_descriptions[] =
     "When selected, VLC will randomly play files in the playlist until " \
     "interrupted.")
 
-#define LOOP_TEXT N_("Loop playlist on end")
+#define LOOP_TEXT N_("Repeat all")
 #define LOOP_LONGTEXT N_( \
     "If you want VLC to keep playing the playlist indefinitely then enable " \
     "this option.")
 
-#define REPEAT_TEXT N_("Repeat the current item")
+#define REPEAT_TEXT N_("Repeat current item")
 #define REPEAT_LONGTEXT N_( \
     "When this is active, VLC will keep playing the current playlist item " \
     "over and over again.")
 
 #define PAS_TEXT N_("Play and stop")
 #define PAS_LONGTEXT N_( \
-    "Stop the playlist after each played playlist item. " \
-    "Does advance the playlist index.")
+    "Stop the playlist after each played playlist item. " )
 
 #define MISC_CAT_LONGTEXT N_( \
     "These options allow you to select default modules. Leave these " \
@@ -875,9 +876,6 @@ vlc_module_begin();
     add_integer_with_range( "volume", AOUT_VOLUME_DEFAULT, AOUT_VOLUME_MIN,
                             AOUT_VOLUME_MAX, NULL, VOLUME_TEXT,
                             VOLUME_LONGTEXT, VLC_FALSE );
-    add_integer_with_range( "saved-volume", AOUT_VOLUME_DEFAULT,
-                            AOUT_VOLUME_MIN, AOUT_VOLUME_MAX, NULL,
-                            VOLUME_SAVE_TEXT, VOLUME_SAVE_LONGTEXT, VLC_TRUE );
     add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT,
                  AOUT_RATE_LONGTEXT, VLC_TRUE );
 #if !defined( SYS_DARWIN )
@@ -897,19 +895,38 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_VISUAL );
     add_module( "audio-visual", "visualization",NULL, NULL,AUDIO_VISUAL_TEXT,
                 AUDIO_VISUAL_LONGTEXT, VLC_FALSE );
-    set_subcategory( SUBCAT_AUDIO_MISC );
-    add_module_cat( "audio-channel-mixer", SUBCAT_AUDIO_MISC, NULL, NULL,
-                AUDIO_CHANNEL_MIXER, AUDIO_CHANNEL_MIXER_LONGTEXT, VLC_FALSE );
-        change_short('A');
 
     /* Video options */
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_GENERAL );
     add_bool( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT, VLC_TRUE );
+    add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT,
+              GRAYSCALE_LONGTEXT, VLC_FALSE );
+    add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT,
+              FULLSCREEN_LONGTEXT, VLC_FALSE );
+        change_short('f');
+    add_bool( "skip-frames", 1, NULL, SKIP_FRAMES_TEXT,
+              SKIP_FRAMES_LONGTEXT, VLC_TRUE );
+#ifndef SYS_DARWIN
+    add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, VLC_TRUE );
+#endif
+    add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT,
+              VIDEO_ON_TOP_LONGTEXT, VLC_FALSE );
+
+    set_section( N_("Snapshot") , NULL );
+    add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
+                   SNAP_PATH_LONGTEXT, VLC_FALSE );
+    add_string( "snapshot-format", "png", NULL, SNAP_FORMAT_TEXT,
+                   SNAP_FORMAT_LONGTEXT, VLC_TRUE );
+        change_string_list( ppsz_snap_formats, NULL, 0 );
+
+    set_section( N_("Window properties" ), NULL );
     add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
     add_integer( "video-x", -1, NULL, VIDEOX_TEXT, VIDEOX_LONGTEXT, VLC_TRUE );
     add_integer( "video-y", -1, NULL, VIDEOY_TEXT, VIDEOY_LONGTEXT, VLC_TRUE );
+    add_string( "aspect-ratio", "", NULL,
+               ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
     add_bool( "video-deco", 1, NULL, VIDEO_DECO_TEXT,
               VIDEO_DECO_LONGTEXT, VLC_TRUE );
     add_string( "video-title", NULL, NULL, VIDEO_TITLE_TEXT,
@@ -917,25 +934,7 @@ vlc_module_begin();
     add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_align_values, ppsz_align_descriptions, 0 );
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, VLC_TRUE );
-    add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT,
-              GRAYSCALE_LONGTEXT, VLC_TRUE );
-    add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT,
-              FULLSCREEN_LONGTEXT, VLC_FALSE );
-        change_short('f');
-    add_bool( "skip-frames", 1, NULL, SKIP_FRAMES_TEXT,
-              SKIP_FRAMES_LONGTEXT, VLC_FALSE );
-#ifndef SYS_DARWIN
-    add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, VLC_TRUE );
-#endif
-    add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT,
-              VIDEO_ON_TOP_LONGTEXT, VLC_FALSE );
-    add_string( "aspect-ratio", "", NULL,
-                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
-    add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
-                   SNAP_PATH_LONGTEXT, VLC_FALSE );
-    add_string( "snapshot-format", "png", NULL, SNAP_FORMAT_TEXT,
-                   SNAP_FORMAT_LONGTEXT, VLC_FALSE );
-        change_string_list( ppsz_snap_formats, NULL, 0 );
+
 
     set_subcategory( SUBCAT_VIDEO_VOUT );
     add_module( "vout", "video output", NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT,
@@ -956,6 +955,8 @@ vlc_module_begin();
     add_bool( "osd", 1, NULL, OSD_TEXT, OSD_LONGTEXT, VLC_FALSE );
 
     set_section( N_("Subtitles") , NULL );
+    add_file( "sub-file", NULL, NULL, SUB_FILE_TEXT,
+              SUB_FILE_LONGTEXT, VLC_FALSE );
     add_bool( "sub-autodetect-file", VLC_TRUE, NULL,
                  SUB_AUTO_TEXT, SUB_AUTO_LONGTEXT, VLC_FALSE );
     add_integer( "sub-autodetect-fuzzy", 3, NULL,
@@ -967,16 +968,12 @@ vlc_module_begin();
 #endif
     add_string( "sub-autodetect-path", SUB_PATH, NULL,
                  SUB_PATH_TEXT, SUB_PATH_LONGTEXT, VLC_TRUE );
-    add_file( "sub-file", NULL, NULL, SUB_FILE_TEXT,
-              SUB_FILE_LONGTEXT, VLC_TRUE );
     add_integer( "sub-margin", -1, NULL, SUB_MARGIN_TEXT,
                  SUB_MARGIN_LONGTEXT, VLC_TRUE );
 
     set_section( N_( "Overlays" ) , NULL );
     add_module_list_cat( "sub-filter", SUBCAT_VIDEO_SUBPIC, NULL, NULL,
                 SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, VLC_TRUE );
-
-//    set_subcategory( SUBCAT_VIDEO_TEXT );
 
     /* Input options */
     set_category( CAT_INPUT );
@@ -1136,21 +1133,22 @@ vlc_module_begin();
 #endif
     /* Misc options */
     set_subcategory( SUBCAT_ADVANCED_MISC );
+    set_section( N_("Special modules"), NULL );
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT,
                 MEMCPY_LONGTEXT, VLC_TRUE );
-    add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
-              MINIMIZE_THREADS_LONGTEXT, VLC_TRUE );
+    add_module( "audio-channel-mixer", "audio mixer", NULL, NULL,
+                AUDIO_CHANNEL_MIXER, AUDIO_CHANNEL_MIXER_LONGTEXT, VLC_TRUE );
+        change_short('A');
+
+    set_section( N_("Plugins" ), NULL );
     add_bool( "plugins-cache", VLC_TRUE, NULL, PLUGINS_CACHE_TEXT,
               PLUGINS_CACHE_LONGTEXT, VLC_TRUE );
     add_directory( "plugin-path", NULL, NULL, PLUGIN_PATH_TEXT,
                    PLUGIN_PATH_LONGTEXT, VLC_TRUE );
-    add_string( "vlm-conf", NULL, NULL, VLM_CONF_TEXT,
-                    VLM_CONF_LONGTEXT, VLC_TRUE );
 
-#if !defined(WIN32)
-    add_bool( "daemon", 0, NULL, DAEMON_TEXT, DAEMON_LONGTEXT, VLC_TRUE );
-        change_short('d');
-#endif
+    set_section( N_("Performance options"), NULL );
+    add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
+              MINIMIZE_THREADS_LONGTEXT, VLC_TRUE );
 
 #if !defined(SYS_DARWIN) && !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
     add_bool( "rt-priority", 0, NULL, RT_PRIORITY_TEXT,
@@ -1173,6 +1171,15 @@ vlc_module_begin();
                   WIN9X_CV_LONGTEXT, VLC_TRUE );
 #endif
 
+    set_section( N_("Miscellaneous" ), NULL );
+    add_string( "vlm-conf", NULL, NULL, VLM_CONF_TEXT,
+                    VLM_CONF_LONGTEXT, VLC_TRUE );
+
+#if !defined(WIN32)
+    add_bool( "daemon", 0, NULL, DAEMON_TEXT, DAEMON_LONGTEXT, VLC_TRUE );
+        change_short('d');
+#endif
+
     /* Playlist options */
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_GENERAL );
@@ -1181,9 +1188,9 @@ vlc_module_begin();
         change_short('Z');
     add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, VLC_FALSE );
         change_short('L');
-    add_bool( "repeat", 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
+    add_bool( "repeat", 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_FALSE );
         change_short('R');
-    add_bool( "play-and-stop", 0, NULL, PAS_TEXT, PAS_LONGTEXT, VLC_TRUE );
+    add_bool( "play-and-stop", 0, NULL, PAS_TEXT, PAS_LONGTEXT, VLC_FALSE );
 
     set_subcategory( SUBCAT_PLAYLIST_SD );
     add_module_list_cat( "services-discovery", SUBCAT_PLAYLIST_SD, NULL,
