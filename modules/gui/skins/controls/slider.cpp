@@ -2,7 +2,7 @@
  * slider.cpp: Slider control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: slider.cpp,v 1.5 2003/04/17 10:53:00 karibu Exp $
+ * $Id: slider.cpp,v 1.6 2003/04/20 15:00:19 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -313,6 +313,28 @@ bool ControlSlider::MouseOver( int x, int y )
         return true;
     else
         return false;
+}
+//---------------------------------------------------------------------------
+bool ControlSlider::MouseScroll( int x, int y, int direction )
+{
+    if( !Enabled || !MouseOver( x, y ) )
+        return false;
+
+    int val = Value;
+
+    switch( direction )
+    {
+        case MOUSE_SCROLL_DOWN:
+            if( val > 0 ) val--;
+            break;
+
+        case MOUSE_SCROLL_UP:
+            if( val < MaxValue ) val++;
+            break;
+    }
+
+    MoveCursor( val );
+    return true;
 }
 //---------------------------------------------------------------------------
 bool ControlSlider::ToolTipTest( int x, int y )

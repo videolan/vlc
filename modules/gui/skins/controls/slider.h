@@ -2,7 +2,7 @@
  * slider.h: Slider control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: slider.h,v 1.2 2003/04/20 13:14:14 asmax Exp $
+ * $Id: slider.h,v 1.3 2003/04/20 15:00:19 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -95,6 +95,7 @@ class ControlSlider : public GenericControl
         virtual bool MouseMove( int x, int y, int button );
         virtual bool MouseOver( int x, int y );
         virtual bool ToolTipTest( int x, int y );
+        virtual bool MouseScroll( int x, int y, int direction );
 
         // Slider calls
         void SetCursorPosition( long Pos );
