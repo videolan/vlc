@@ -2,7 +2,7 @@
  * i420_rgb16.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb16.c,v 1.2 2002/11/20 13:37:36 sam Exp $
+ * $Id: i420_rgb16.c,v 1.3 2002/11/22 12:11:38 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -323,7 +323,7 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
-    int         i_chroma_width = p_vout->render.i_width / 4; /* chroma width */
+    int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
     u32 *       p_pic_start;       /* beginning of the current line for copy */
 #if defined (MODULE_NAME_IS_i420_rgb)
     int         i_uval, i_vval;                           /* U and V samples */
