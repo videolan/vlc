@@ -2169,7 +2169,7 @@ if ${plugin_support}
 then
   for plugin in `echo ${PLUGINS}`
   do
-    typeset ${plugin}_plugin=yes
+    eval "${plugin}_plugin=yes"
   done
 else
   BUILTINS="${BUILTINS} ${PLUGINS}"
@@ -2182,7 +2182,7 @@ then
   builtin_support=:
   for builtin in `echo ${BUILTINS}`
   do
-    typeset ${builtin}_builtin=yes
+    eval "${builtin}_builtin=yes"
   done
 fi]
 AM_CONDITIONAL(HAVE_BUILTINS, ${builtin_support})
