@@ -35,8 +35,8 @@
   Caption = _( "VideoLAN Client" );
     Caption = _( "ToolBar" );
       Caption = _( "ToolButtonSep1" );
-      Caption = _( "ToolButton1" );
       Caption = _( "ToolButtonSep2" );
+      Caption = _( "ToolButtonSep3" );
       Caption = _( "File read" );
       Caption = _( "Channel:" );
       Caption = _( "No server" );
@@ -53,6 +53,8 @@
         Caption = _( "&Hide interface" );
         Hint = _( "Hide the main interface window" );
         Caption = _( "&Playlist..." );
+        Caption = _( "&Add interface" );
+        Hint = _( "Spawn a new interface" );
       Caption = _( "&Controls" );
         Caption = _( "Audio device" );
         Caption = _( "C&hannels" );
@@ -111,6 +113,10 @@
       Hint = _( "Previous file" );
       Caption = _( "Next" );
       Hint = _( "Next file" );
+      Caption = _( "&Stream output..." );
+      Hint = _( "Open the stream output" );
+      Caption = _( "&Add subtitles..." );
+      Hint = _( "Add a subtitle file" );
       Caption = _( "Playlist" );
       Hint = _( "Open the playlist window" );
       Caption = _( "Exit" );
@@ -203,3 +209,34 @@
     Caption = _( "Save" );
     Caption = _( "OK" );
     Caption = _( "Cancel" );
+
+/*
+ * from modules/gui/win32/sout.dfm:
+ */
+
+  Caption = _( "Stream output" );
+    Caption = _( "Stream output MRL (Media Resource Locator)" );
+      Caption = _( "Port:" );
+      Caption = _( "Address:" );
+      Text = _( "file/ts://" );
+        Caption = _( "File" );
+        Caption = _( "UDP" );
+        Caption = _( "RTP" );
+      Caption = _( "Browse..." );
+      Text = _( "239.239.0.1" );
+        Caption = _( "PS" );
+        Caption = _( "TS" );
+
+/*
+ * from modules/gui/win32/subtitles.dfm:
+ */
+
+  Caption = _( "Add subtitles" );
+    Caption = _( "Select a subtitles file" );
+      Caption = _( "Delay:" );
+      Caption = _( "FPS:" );
+      Hint = _( "Set the delay (in seconds)" );
+      Text = _( "0.0" );
+      Hint = _( "Set the number of Frames Per Second" );
+      Text = _( "0.0" );
+      Caption = _( "Browse..." );

@@ -108,6 +108,7 @@ modules/gui/macosx/prefs.m
 modules/gui/macosx/open.m
 modules/gui/macosx/playlist.m
 modules/gui/macosx/controls.m
+modules/gui/macosx/vout.m
 modules/gui/ncurses/ncurses.c
 modules/gui/qnx/qnx.c
 modules/gui/qt/qt.cpp

@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.15 2003/01/22 01:48:06 hartman Exp $
+ * $Id: vout.m,v 1.16 2003/01/23 23:51:13 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -542,18 +542,6 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
     
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
-    if( p_vout->b_fullscreen )
-    {
-        if ( p_vout->p_sys->p_fullscreen_state == NULL )
-            BeginFullScreen( &p_vout->p_sys->p_fullscreen_state, NULL, 0, 0,
-                             NULL, NULL, fullScreenHideCursor | fullScreenAllowEvents );
-    }
-    else
-    {
-        if ( p_vout->p_sys->p_fullscreen_state != NULL )
-            EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
-        p_vout->p_sys->p_fullscreen_state = NULL;
-    }
     config_PutInt( p_vout, "fullscreen", p_vout->b_fullscreen );
 
     if( CoCreateWindow( p_vout ) )
@@ -977,6 +965,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     NSScreen * o_screen;
     vout_thread_t * p_vout;
     id o_title;
+    vlc_bool_t b_main_screen;
 
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -991,22 +980,25 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     if( var_Get( p_vout, "video-device", &val ) < 0 )
     {
         o_screen = [NSScreen mainScreen];
+        b_main_screen = 1;
     }
     else
     {
         unsigned int i_index = 0;
         NSArray *o_screens = [NSScreen screens];
 
-        if( !sscanf( val.psz_string, "Screen %d", &i_index ) ||
+        if( !sscanf( val.psz_string, _("Screen %d"), &i_index ) ||
             [o_screens count] < i_index )
         {
             o_screen = [NSScreen mainScreen];
+            b_main_screen = 1;
         }
         else
         {
             i_index--;
             o_screen = [o_screens objectAtIndex: i_index];
             config_PutInt( p_vout, "macosx-vdev", i_index );
+            b_main_screen = (i_index == 0);
         } 
 
         free( val.psz_string );
@@ -1016,6 +1008,10 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
         NSRect screen_rect = [o_screen frame];
         screen_rect.origin.x = screen_rect.origin.y = 0;
+
+        if ( b_main_screen && p_vout->p_sys->p_fullscreen_state == NULL )
+            BeginFullScreen( &p_vout->p_sys->p_fullscreen_state, NULL, 0, 0,
+                             NULL, NULL, fullScreenHideCursor | fullScreenAllowEvents );
 
         [p_vout->p_sys->o_window 
             initWithContentRect: screen_rect
@@ -1032,6 +1028,10 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
                                    NSClosableWindowMask |
                                    NSResizableWindowMask |
                                    NSTexturedBackgroundWindowMask;
+
+        if ( p_vout->p_sys->p_fullscreen_state != NULL )
+            EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
+        p_vout->p_sys->p_fullscreen_state = NULL;
 
         [p_vout->p_sys->o_window 
             initWithContentRect: p_vout->p_sys->s_rect
