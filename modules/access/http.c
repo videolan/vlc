@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.20 2002/12/31 01:54:35 massiot Exp $
+ * $Id: http.c,v 1.21 2003/02/04 10:07:40 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -34,6 +34,10 @@
 #endif
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
+#endif
+
+#ifdef HAVE_SYS_TIME_H
+#    include <sys/time.h>
 #endif
 
 #ifdef HAVE_UNISTD_H

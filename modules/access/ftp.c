@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.5 2002/12/31 01:54:35 massiot Exp $
+ * $Id: ftp.c,v 1.6 2003/02/04 10:07:40 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -33,6 +33,10 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+
+#ifdef HAVE_SYS_TIME_H
+#    include <sys/time.h>
+#endif
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>

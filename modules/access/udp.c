@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.10 2002/12/31 01:54:35 massiot Exp $
+ * $Id: udp.c,v 1.11 2003/02/04 10:07:40 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -34,6 +34,10 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+
+#ifdef HAVE_SYS_TIME_H
+#    include <sys/time.h>
+#endif
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
