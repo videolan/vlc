@@ -1,0 +1,80 @@
+<!doctype linuxdoc system>
+<linuxdoc><article>
+<titlepag>
+  <title>Cross compiling VLC for ARM based platforms</title>
+  <author>Marc Ariberti <tt><htmlurl url="mailto:marcari@videolan.org" name="<marcari@videolan.org>"></tt></author>
+  <date>v0.0.1, 13 march 2003</date>
+  <abstract>
+    This document describes all the steps to cross compile vlc for ARM based
+    platforms. It describes how to build a cross compilation toolchain, how to
+    build the libraries needed by vlc and the compilation of the vlc itself.
+  </abstract>
+</titlepag>
+
+<toc>
+
+<sect>
+  <heading>Introduction</heading>
+  <sect1>
+    <heading>Which platforms ar targeted ?</heading>
+  </sect1> 
+  <sect1>
+    <heading>Requirements for cross-compilation</heading>
+  </sect1>
+  <sect1>
+    <heading>Why not compiling directly on the target platform ?</heading>
+  </sect1>
+</sect>
+
+<sect>
+  <heading>Building the toolchain</heading>
+  <sect1>
+    <heading>The cross compiler (gcc)</heading>
+  </sect1>
+  <sect1>
+    <heading>Binutils</heading>
+  </sect1>
+  <sect1>
+    <heading>Compiling glibc</heading>
+  </sect1>
+  <sect1>
+    <heading>Misc</heading>
+  </sect1>
+</sect>
+
+<sect>
+  <heading>Cross compiling libraries needed by vlc</heading>
+  <sect1>
+    <heading>SDL</heading>
+  </sect1>
+  <sect1>
+    <heading>Glib/GTK+</heading>
+  </sect1>
+  <sect1>
+    <heading>ffmpeg</heading>
+  </sect1>
+  <sect1>
+    <heading>mad</heading>
+  </sect1>
+  <sect1>
+    <heading>tremor</heading>
+  </sect1>
+  <sect1>
+    <heading>ogg</heading>
+  </sect1>
+  <sect1>
+    <heading>flac</heading>
+  </sect1>
+  <sect1>
+    <heading>libdvbpsi</heading>
+  </sect1>
+  <sect1>
+    <heading>a52</heading>
+  </sect1>
+</sect>
+
+<sect>
+  <heading>Cross compiling vlc itself</heading>
+</sect>
+
+</article></linuxdoc>
