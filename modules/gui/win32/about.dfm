@@ -246,6 +246,7 @@ object AboutDlg: TAboutDlg
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
+    Tag = 3
     Left = 114
     Top = 18
     Width = 132
@@ -259,6 +260,7 @@ object AboutDlg: TAboutDlg
     ParentFont = False
   end
   object Label2: TLabel
+    Tag = 3
     Left = 10
     Top = 64
     Width = 267
@@ -266,6 +268,7 @@ object AboutDlg: TAboutDlg
     Caption = '(C) Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002'
   end
   object Label4: TLabel
+    Tag = 3
     Left = 15
     Top = 123
     Width = 253
@@ -277,6 +280,7 @@ object AboutDlg: TAboutDlg
     WordWrap = True
   end
   object Label3: TLabel
+    Tag = 3
     Left = 30
     Top = 80
     Width = 227
@@ -290,6 +294,7 @@ object AboutDlg: TAboutDlg
     Height = 49
   end
   object Label5: TLabel
+    Tag = 3
     Left = 83
     Top = 96
     Width = 121
@@ -297,6 +302,7 @@ object AboutDlg: TAboutDlg
     Caption = 'http://www.videolan.org/'
   end
   object LabelVersion: TLabel
+    Tag = 3
     Left = 114
     Top = 40
     Width = 59
@@ -304,6 +310,7 @@ object AboutDlg: TAboutDlg
     Caption = 'Version x.y.z'
   end
   object BitBtnOk: TBitBtn
+    Tag = 3
     Left = 64
     Top = 178
     Width = 145

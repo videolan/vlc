@@ -178,15 +178,15 @@ __published:	// IDE-managed Components
     void __fastcall StopActionExecute( TObject *Sender );
     void __fastcall SlowActionExecute( TObject *Sender );
     void __fastcall FastActionExecute( TObject *Sender );
+    void __fastcall EjectActionExecute( TObject *Sender );
     void __fastcall PlaylistActionExecute( TObject *Sender );
-    void __fastcall ExitActionExecute( TObject *Sender );
     void __fastcall PreviousActionExecute( TObject *Sender );
     void __fastcall NextActionExecute( TObject *Sender );
     void __fastcall FullscreenActionExecute( TObject *Sender );
     void __fastcall PreferencesActionExecute( TObject *Sender );
     void __fastcall MessagesActionExecute( TObject *Sender );
     void __fastcall AboutActionExecute( TObject *Sender );
-    void __fastcall EjectActionExecute( TObject *Sender );
+    void __fastcall ExitActionExecute( TObject *Sender );
     void __fastcall PrevTitleActionExecute( TObject *Sender );
     void __fastcall NextTitleActionExecute( TObject *Sender );
     void __fastcall PrevChapterActionExecute( TObject *Sender );

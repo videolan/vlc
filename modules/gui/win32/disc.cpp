@@ -27,6 +27,7 @@
 #include <vlc/intf.h>
 
 #include "disc.h"
+#include "misc.h";
 #include "win32_common.h"
 
 //---------------------------------------------------------------------------
@@ -42,6 +43,7 @@ __fastcall TDiscDlg::TDiscDlg( TComponent* Owner )
 {
     /* Simulate a click to get the correct device name */
     RadioGroupTypeClick( RadioGroupType );
+    Translate( this );
 }
 //---------------------------------------------------------------------------
 void __fastcall TDiscDlg::FormShow( TObject *Sender )

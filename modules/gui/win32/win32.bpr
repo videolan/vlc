@@ -4,8 +4,8 @@
   <MACROS>
     <VERSION value="BCB.05.03"/>
     <PROJECT value="win32.so"/>
-    <OBJFILES value="win32.obj mainframe.obj network.obj playlist.obj 
-      preferences.obj about.obj disc.obj control.obj menu.obj messages.obj"/>
+    <OBJFILES value="win32.obj mainframe.obj network.obj playlist.obj preferences.obj about.obj 
+      disc.obj control.obj menu.obj messages.obj misc.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES) mainframe.dfm network.dfm playlist.dfm preferences.dfm 
@@ -23,7 +23,7 @@
     <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
     <RELEASELIBPATH value="$(BCB)\lib\release"/>
     <LINKER value="tlink32"/>
-    <USERDEFINES value="_DEBUG"/>
+    <USERDEFINES value="_DEBUG;WIN32;__VLC__;__PLUGIN__;MODULE_NAME_IS_win32"/>
     <SYSDEFINES value="NO_STRICT"/>
     <MAINSOURCE value="win32.bpf"/>
     <INCLUDEPATH value="..\..\win32;$(BCB)\include;$(BCB)\include\vcl;..\..\..\include;..\..\.."/>
@@ -72,20 +72,25 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count1=
-Item0=..\win32;..\..\win32;$(BCB)\include;$(BCB)\include\vcl;..\..\include;..\..\src\misc
+Count=1
+Item0=..\..\win32;$(BCB)\include;$(BCB)\include\vcl;..\..\..\include;..\..\src\misc
 
 [HistoryLists\hlLibraryPath]
-Count=1
-Item0=..\win32;..\..\win32;$(BCB)\lib\obj;$(BCB)\lib
+Count=2
+Item0=..\..\win32;$(BCB)\lib\obj;$(BCB)\lib
+Item1=..\win32;..\..\win32;$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]
 Count=1
 Item0=$(BCB)\source\vcl
 
 [HistoryLists\hlConditionals]
-Count=1
-Item0=_DEBUG
+Count=5
+Item0=_DEBUG;WIN32;__VLC__;__PLUGIN__;MODULE_NAME_IS_win32
+Item1=_DEBUG;WIN32;__VLC__;__PLUGIN__;MODULE_NAME_IS_win32;MODULE_NAME=win32;MODULE_PATH=modules_gui_win32_win32
+Item2=_DEBUG;__VLC__;__PLUGIN__;MODULE_NAME_IS_win32;MODULE_NAME=win32;MODULE_PATH=modules_gui_win32_win32
+Item3=_DEBUG;__VLC__;__PLUGIN__
+Item4=_DEBUG
 
 [Debugging]
 DebugSourceDirs=$(BCB)\source\vcl

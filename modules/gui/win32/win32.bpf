@@ -1,5 +1,4 @@
 USEUNIT("win32.cpp");
-USEUNIT("intf_win32.cpp");
 USEFORM("mainframe.cpp", MainFrameDlg);
 USEFORM("network.cpp", NetworkDlg);
 USEFORM("playlist.cpp", PlaylistDlg);
@@ -10,6 +9,7 @@ USEUNIT("control.cpp");
 USE("win32_common.h", File);
 USEUNIT("menu.cpp");
 USEFORM("messages.cpp", MessagesDlg);
+USEUNIT("misc.cpp");
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 

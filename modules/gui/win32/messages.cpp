@@ -26,8 +26,9 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
-#include "win32_common.h"
 #include "messages.h"
+#include "misc.h"
+#include "win32_common.h"
 
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
@@ -40,6 +41,7 @@ __fastcall TMessagesDlg::TMessagesDlg( TComponent* Owner )
     : TForm( Owner )
 {
     Icon = p_intfGlobal->p_sys->p_window->Icon;
+    Translate( this );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMessagesDlg::ButtonOKClick( TObject *Sender )

@@ -1,6 +1,6 @@
 object MainFrameDlg: TMainFrameDlg
-  Left = 179
-  Top = 442
+  Left = 285
+  Top = 170
   Width = 541
   Height = 306
   BorderIcons = [biSystemMenu, biMinimize]
@@ -151,16 +151,19 @@ object MainFrameDlg: TMainFrameDlg
     ShowCaptions = True
     TabOrder = 0
     object ToolButtonFile: TToolButton
+      Tag = 3
       Left = 0
       Top = 0
       Action = OpenFileAction
     end
     object ToolButtonDisc: TToolButton
+      Tag = 3
       Left = 39
       Top = 0
       Action = OpenDiscAction
     end
     object ToolButtonNet: TToolButton
+      Tag = 3
       Left = 78
       Top = 0
       Action = NetworkStreamAction
@@ -174,26 +177,31 @@ object MainFrameDlg: TMainFrameDlg
       Style = tbsSeparator
     end
     object ToolButtonBack: TToolButton
+      Tag = 3
       Left = 125
       Top = 0
       Action = BackAction
     end
     object ToolButtonPlay: TToolButton
+      Tag = 3
       Left = 164
       Top = 0
       Action = PlayAction
     end
     object ToolButtonPause: TToolButton
+      Tag = 3
       Left = 203
       Top = 0
       Action = PauseAction
     end
     object ToolButtonStop: TToolButton
+      Tag = 3
       Left = 242
       Top = 0
       Action = StopAction
     end
     object ToolButtonEject: TToolButton
+      Tag = 3
       Left = 281
       Top = 0
       Action = EjectAction
@@ -207,11 +215,13 @@ object MainFrameDlg: TMainFrameDlg
       Style = tbsSeparator
     end
     object ToolButtonSlow: TToolButton
+      Tag = 3
       Left = 328
       Top = 0
       Action = SlowAction
     end
     object ToolButtonFast: TToolButton
+      Tag = 3
       Left = 367
       Top = 0
       Action = FastAction
@@ -225,17 +235,20 @@ object MainFrameDlg: TMainFrameDlg
       Style = tbsSeparator
     end
     object ToolButtonPlaylist: TToolButton
+      Tag = 3
       Left = 414
       Top = 0
       Action = PlaylistAction
       Style = tbsCheck
     end
     object ToolButtonPrev: TToolButton
+      Tag = 3
       Left = 453
       Top = 0
       Action = PreviousAction
     end
     object ToolButtonNext: TToolButton
+      Tag = 3
       Left = 492
       Top = 0
       Action = NextAction
@@ -252,6 +265,7 @@ object MainFrameDlg: TMainFrameDlg
     SimplePanel = True
   end
   object GroupBoxFile: TGroupBox
+    Tag = 3
     Left = 0
     Top = 90
     Width = 533
@@ -260,6 +274,7 @@ object MainFrameDlg: TMainFrameDlg
     TabOrder = 2
     Visible = False
     object LabelFileName: TLabel
+      Tag = 3
       Left = 2
       Top = 15
       Width = 529
@@ -278,6 +293,7 @@ object MainFrameDlg: TMainFrameDlg
     TabOrder = 3
     Visible = False
     object LabelChannel: TLabel
+      Tag = 3
       Left = 288
       Top = 16
       Width = 42
@@ -285,6 +301,7 @@ object MainFrameDlg: TMainFrameDlg
       Caption = 'Channel:'
     end
     object LabelServer: TLabel
+      Tag = 3
       Left = 64
       Top = 16
       Width = 49
@@ -292,6 +309,7 @@ object MainFrameDlg: TMainFrameDlg
       Caption = 'No server!'
     end
     object ButtonGo: TButton
+      Tag = 3
       Left = 384
       Top = 10
       Width = 25
@@ -320,6 +338,7 @@ object MainFrameDlg: TMainFrameDlg
     TabOrder = 4
     Visible = False
     object LabelDisc: TLabel
+      Tag = 3
       Left = 32
       Top = 11
       Width = 21
@@ -327,6 +346,7 @@ object MainFrameDlg: TMainFrameDlg
       Caption = 'Disc'
     end
     object LabelTitle: TLabel
+      Tag = 3
       Left = 96
       Top = 11
       Width = 23
@@ -334,6 +354,7 @@ object MainFrameDlg: TMainFrameDlg
       Caption = 'Title:'
     end
     object LabelChapter: TLabel
+      Tag = 3
       Left = 296
       Top = 11
       Width = 40
@@ -355,6 +376,7 @@ object MainFrameDlg: TMainFrameDlg
       Caption = '---'
     end
     object ButtonTitlePrev: TButton
+      Tag = 3
       Left = 152
       Top = 8
       Width = 33
@@ -363,6 +385,7 @@ object MainFrameDlg: TMainFrameDlg
       TabOrder = 0
     end
     object ButtonTitleNext: TButton
+      Tag = 3
       Left = 184
       Top = 8
       Width = 33
@@ -371,6 +394,7 @@ object MainFrameDlg: TMainFrameDlg
       TabOrder = 1
     end
     object ButtonChapterPrev: TButton
+      Tag = 3
       Left = 368
       Top = 8
       Width = 33
@@ -379,6 +403,7 @@ object MainFrameDlg: TMainFrameDlg
       TabOrder = 2
     end
     object ButtonChapterNext: TButton
+      Tag = 3
       Left = 400
       Top = 8
       Width = 33
@@ -388,6 +413,7 @@ object MainFrameDlg: TMainFrameDlg
     end
   end
   object GroupBoxSlider: TGroupBox
+    Tag = 3
     Left = 0
     Top = 50
     Width = 533
@@ -417,16 +443,20 @@ object MainFrameDlg: TMainFrameDlg
     Left = 40
     Top = 208
     object MenuFile: TMenuItem
+      Tag = 3
       Caption = '&File'
       object MenuOpenFile: TMenuItem
+        Tag = 3
         Action = OpenFileAction
         Caption = 'Open &file...'
       end
       object MenuOpenDisc: TMenuItem
+        Tag = 3
         Action = OpenDiscAction
         Caption = 'Open &disc...'
       end
       object MenuNetworkStream: TMenuItem
+        Tag = 3
         Action = NetworkStreamAction
         Caption = '&Network stream...'
       end
@@ -435,6 +465,7 @@ object MainFrameDlg: TMainFrameDlg
         Visible = False
       end
       object MenuEjectDisc: TMenuItem
+        Tag = 3
         Action = EjectAction
         Caption = '&Eject disc'
       end
@@ -442,38 +473,46 @@ object MainFrameDlg: TMainFrameDlg
         Caption = '-'
       end
       object MenuExit: TMenuItem
+        Tag = 3
         Action = ExitAction
       end
     end
     object MenuView: TMenuItem
+      Tag = 3
       Caption = '&View'
       object MenuHideinterface: TMenuItem
+        Tag = 3
         Caption = '&Hide interface'
         Hint = 'Hide the main interface window'
         OnClick = MenuHideinterfaceClick
       end
       object MenuFullscreen: TMenuItem
+        Tag = 3
         Action = FullscreenAction
       end
       object N2: TMenuItem
         Caption = '-'
       end
       object MenuProgram: TMenuItem
+        Tag = 3
         Caption = 'Progr&am'
         Enabled = False
         Hint = 'Select program'
       end
       object MenuTitle: TMenuItem
+        Tag = 3
         Caption = '&Title'
         Enabled = False
         Hint = 'Select title'
       end
       object MenuChapter: TMenuItem
+        Tag = 3
         Caption = '&Chapter'
         Enabled = False
         Hint = 'Select chapter'
       end
       object MenuAngle: TMenuItem
+        Tag = 3
         Caption = 'An&gle'
         Enabled = False
         Hint = 'Select angle'
@@ -482,21 +521,26 @@ object MainFrameDlg: TMainFrameDlg
         Caption = '-'
       end
       object MenuPlaylist: TMenuItem
+        Tag = 3
         Action = PlaylistAction
         Caption = '&Playlist...'
       end
       object MenuMessages: TMenuItem
+        Tag = 3
         Action = MessagesAction
       end
     end
     object MenuSettings: TMenuItem
+      Tag = 3
       Caption = '&Settings'
       object MenuAudio: TMenuItem
+        Tag = 3
         Caption = '&Audio'
         Enabled = False
         Hint = 'Select audio language'
       end
       object MenuSubtitles: TMenuItem
+        Tag = 3
         Caption = '&Subtitles'
         Enabled = False
         Hint = 'Select subtitles language'
@@ -505,12 +549,15 @@ object MainFrameDlg: TMainFrameDlg
         Caption = '-'
       end
       object MenuPreferences: TMenuItem
+        Tag = 3
         Action = PreferencesAction
       end
     end
     object MenuHelp: TMenuItem
+      Tag = 3
       Caption = '&Help'
       object MenuAbout: TMenuItem
+        Tag = 3
         Action = AboutAction
       end
     end
@@ -2254,10 +2301,12 @@ object MainFrameDlg: TMainFrameDlg
     Left = 72
     Top = 208
     object PopupClose: TMenuItem
+      Tag = 3
       Caption = '&Close this popup'
       OnClick = PopupCloseClick
     end
     object PopupToggleInterface: TMenuItem
+      Tag = 3
       Caption = '&Toggle interface'
       OnClick = PopupToggleInterfaceClick
     end
@@ -2265,35 +2314,45 @@ object MainFrameDlg: TMainFrameDlg
       Caption = '-'
     end
     object Control1: TMenuItem
+      Tag = 3
       Caption = 'Control'
       object PopupBack: TMenuItem
+        Tag = 3
         Action = BackAction
       end
       object PopupPlay: TMenuItem
+        Tag = 3
         Action = PlayAction
       end
       object PopupPause: TMenuItem
+        Tag = 3
         Action = PauseAction
       end
       object PopupStop: TMenuItem
+        Tag = 3
         Action = StopAction
       end
       object PopupSlow: TMenuItem
+        Tag = 3
         Action = SlowAction
       end
       object PopupFast: TMenuItem
+        Tag = 3
         Action = FastAction
       end
       object N5: TMenuItem
         Caption = '-'
       end
       object PopupPrev: TMenuItem
+        Tag = 3
         Action = PreviousAction
       end
       object PopupNext: TMenuItem
+        Tag = 3
         Action = NextAction
       end
       object PopupJump: TMenuItem
+        Tag = 3
         Caption = '&Jump...'
         OnClick = PopupJumpClick
       end
@@ -2301,43 +2360,54 @@ object MainFrameDlg: TMainFrameDlg
         Caption = '-'
       end
       object PopupFullscreen: TMenuItem
+        Tag = 3
         Action = FullscreenAction
         ShortCut = 70
       end
     end
     object PopupNavigation: TMenuItem
+      Tag = 3
       Caption = 'Navigation'
     end
     object PopupProgram: TMenuItem
+      Tag = 3
       Caption = 'Program'
     end
     object PopupAudio: TMenuItem
+      Tag = 3
       Caption = 'Audio'
     end
     object PopupSubtitles: TMenuItem
+      Tag = 3
       Caption = 'Subtitles'
     end
     object N10: TMenuItem
       Caption = '-'
     end
     object PopupPlaylist: TMenuItem
+      Tag = 3
       Action = PlaylistAction
       Caption = 'Playlist...'
     end
     object PopupPreferences: TMenuItem
+      Tag = 3
       Action = PreferencesAction
     end
     object PopupFile: TMenuItem
+      Tag = 3
       Caption = 'New stream'
       object PopupOpenFile: TMenuItem
+        Tag = 3
         Action = OpenFileAction
         Caption = 'Open file...'
       end
       object PopupOpenDisc: TMenuItem
+        Tag = 3
         Action = OpenDiscAction
         Caption = 'Open disc...'
       end
       object PopupNetworkStream: TMenuItem
+        Tag = 3
         Action = NetworkStreamAction
         Caption = 'Network stream...'
       end
@@ -2346,6 +2416,7 @@ object MainFrameDlg: TMainFrameDlg
       Caption = '-'
     end
     object PopupExit: TMenuItem
+      Tag = 3
       Action = ExitAction
     end
   end
@@ -2358,6 +2429,7 @@ object MainFrameDlg: TMainFrameDlg
     Left = 168
     Top = 208
     object OpenFileAction: TAction
+      Tag = 3
       Category = 'Menu'
       Caption = 'File'
       Hint = 'Open a file'
@@ -2366,6 +2438,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = OpenFileActionExecute
     end
     object OpenDiscAction: TAction
+      Tag = 3
       Category = 'Menu'
       Caption = 'Disc'
       Hint = 'Open a DVD or VCD'
@@ -2374,6 +2447,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = OpenDiscActionExecute
     end
     object NetworkStreamAction: TAction
+      Tag = 3
       Category = 'Menu'
       Caption = 'Net'
       Hint = 'Open a network stream'
@@ -2382,6 +2456,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = NetworkStreamActionExecute
     end
     object BackAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Back'
       Enabled = False
@@ -2389,6 +2464,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = BackActionExecute
     end
     object PlayAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Play'
       Hint = 'Play stream'
@@ -2396,6 +2472,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = PlayActionExecute
     end
     object PauseAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Pause'
       Enabled = False
@@ -2404,6 +2481,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = PauseActionExecute
     end
     object StopAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Stop'
       Enabled = False
@@ -2412,6 +2490,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = StopActionExecute
     end
     object EjectAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Eject'
       Enabled = False
@@ -2420,6 +2499,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = EjectActionExecute
     end
     object SlowAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Slow'
       Enabled = False
@@ -2428,6 +2508,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = SlowActionExecute
     end
     object FastAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Fast'
       Enabled = False
@@ -2436,6 +2517,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = FastActionExecute
     end
     object PreviousAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Prev'
       Hint = 'Previous file'
@@ -2443,6 +2525,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = PreviousActionExecute
     end
     object NextAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Next'
       Hint = 'Next file'
@@ -2450,6 +2533,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = NextActionExecute
     end
     object PlaylistAction: TAction
+      Tag = 3
       Category = 'Menu'
       Caption = 'Playlist'
       Hint = 'Open the playlist window'
@@ -2458,6 +2542,7 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = PlaylistActionExecute
     end
     object ExitAction: TAction
+      Tag = 3
       Category = 'Menu'
       Caption = 'Exit'
       Hint = 'Exit the program'
@@ -2465,18 +2550,21 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = ExitActionExecute
     end
     object FullscreenAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Fullscreen'
       Hint = 'Toggle fullscreen'
       OnExecute = FullscreenActionExecute
     end
     object PreferencesAction: TAction
+      Tag = 3
       Category = 'Menu'
       Caption = 'Preferences...'
       Hint = 'Configure the application'
       OnExecute = PreferencesActionExecute
     end
     object MessagesAction: TAction
+      Tag = 3
       Category = 'Menu'
       Caption = 'Messages...'
       Hint = 'Open the messages window'
@@ -2484,30 +2572,35 @@ object MainFrameDlg: TMainFrameDlg
       OnExecute = MessagesActionExecute
     end
     object AboutAction: TAction
+      Tag = 3
       Category = 'Menu'
       Caption = 'About...'
       Hint = 'About this application'
       OnExecute = AboutActionExecute
     end
     object PrevTitleAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Prev'
       Hint = 'Jump to previous title'
       OnExecute = PrevTitleActionExecute
     end
     object NextTitleAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Next'
       Hint = 'Jump to next title'
       OnExecute = NextTitleActionExecute
     end
     object PrevChapterAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Prev'
       Hint = 'Jump to previous chapter'
       OnExecute = PrevChapterActionExecute
     end
     object NextChapterAction: TAction
+      Tag = 3
       Category = 'Control'
       Caption = 'Next'
       Hint = 'Jump to next chapter'

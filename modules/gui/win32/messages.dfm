@@ -34,6 +34,7 @@ object MessagesDlg: TMessagesDlg
     WantReturns = False
   end
   object ButtonOK: TButton
+    Tag = 3
     Left = 144
     Top = 437
     Width = 145

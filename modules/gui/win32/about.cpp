@@ -27,6 +27,7 @@
 #include <vlc/intf.h>
 
 #include "about.h"
+#include "misc.h"
 #include "win32_common.h"
 
 //---------------------------------------------------------------------------
@@ -41,7 +42,7 @@ __fastcall TAboutDlg::TAboutDlg( TComponent* Owner )
 {
     Image1->Picture->Icon = p_intfGlobal->p_sys->p_window->Icon;
     LabelVersion->Caption = "Version " VERSION;
+    Translate( this );
 }
 //---------------------------------------------------------------------------
-
 

@@ -248,6 +248,7 @@ object DiscDlg: TDiscDlg
   PixelsPerInch = 96
   TextHeight = 13
   object LabelDevice: TLabel
+    Tag = 3
     Left = 8
     Top = 105
     Width = 63
@@ -255,6 +256,7 @@ object DiscDlg: TDiscDlg
     Caption = 'Device name'
   end
   object GroupBoxPosition: TGroupBox
+    Tag = 3
     Left = 96
     Top = 8
     Width = 153
@@ -262,6 +264,7 @@ object DiscDlg: TDiscDlg
     Caption = 'Starting position'
     TabOrder = 1
     object LabelTitle: TLabel
+      Tag = 3
       Left = 16
       Top = 24
       Width = 20
@@ -269,6 +272,7 @@ object DiscDlg: TDiscDlg
       Caption = 'Title'
     end
     object LabelChapter: TLabel
+      Tag = 3
       Left = 16
       Top = 52
       Width = 37
@@ -301,6 +305,7 @@ object DiscDlg: TDiscDlg
     end
   end
   object RadioGroupType: TRadioGroup
+    Tag = 3
     Left = 8
     Top = 8
     Width = 81
@@ -314,6 +319,7 @@ object DiscDlg: TDiscDlg
     OnClick = RadioGroupTypeClick
   end
   object BitBtnOk: TBitBtn
+    Tag = 3
     Left = 8
     Top = 136
     Width = 113
@@ -325,6 +331,7 @@ object DiscDlg: TDiscDlg
     OnClick = BitBtnOkClick
   end
   object BitBtnCancel: TBitBtn
+    Tag = 3
     Left = 136
     Top = 136
     Width = 113
@@ -335,6 +342,7 @@ object DiscDlg: TDiscDlg
     OnClick = BitBtnCancelClick
   end
   object EditDevice: TEdit
+    Tag = 5
     Left = 88
     Top = 101
     Width = 161

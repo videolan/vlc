@@ -248,6 +248,7 @@ object NetworkDlg: TNetworkDlg
   PixelsPerInch = 96
   TextHeight = 13
   object BitBtnOk: TBitBtn
+    Tag = 3
     Left = 40
     Top = 168
     Width = 177
@@ -257,6 +258,7 @@ object NetworkDlg: TNetworkDlg
     Kind = bkOK
   end
   object BitBtnCancel: TBitBtn
+    Tag = 3
     Left = 256
     Top = 168
     Width = 177
@@ -266,6 +268,7 @@ object NetworkDlg: TNetworkDlg
     Kind = bkCancel
   end
   object GroupBoxMode: TGroupBox
+    Tag = 3
     Left = 8
     Top = 8
     Width = 465
@@ -273,6 +276,7 @@ object NetworkDlg: TNetworkDlg
     Caption = 'Network mode'
     TabOrder = 2
     object LabelUDPPort: TLabel
+      Tag = 3
       Left = 148
       Top = 26
       Width = 22
@@ -280,6 +284,7 @@ object NetworkDlg: TNetworkDlg
       Caption = 'Port:'
     end
     object LabelMulticastPort: TLabel
+      Tag = 3
       Left = 364
       Top = 54
       Width = 22
@@ -288,6 +293,7 @@ object NetworkDlg: TNetworkDlg
       Enabled = False
     end
     object LabelCSPort: TLabel
+      Tag = 3
       Left = 364
       Top = 82
       Width = 22
@@ -296,6 +302,7 @@ object NetworkDlg: TNetworkDlg
       Enabled = False
     end
     object LabelMulticastAddress: TLabel
+      Tag = 3
       Left = 139
       Top = 54
       Width = 41
@@ -304,6 +311,7 @@ object NetworkDlg: TNetworkDlg
       Enabled = False
     end
     object LabelCSAddress: TLabel
+      Tag = 3
       Left = 139
       Top = 82
       Width = 41
@@ -312,6 +320,7 @@ object NetworkDlg: TNetworkDlg
       Enabled = False
     end
     object LabelHTTPURL: TLabel
+      Tag = 3
       Left = 147
       Top = 110
       Width = 25
@@ -320,6 +329,7 @@ object NetworkDlg: TNetworkDlg
       Enabled = False
     end
     object RadioButtonUDP: TRadioButton
+      Tag = 3
       Left = 16
       Top = 24
       Width = 97
@@ -331,6 +341,7 @@ object NetworkDlg: TNetworkDlg
       OnEnter = RadioButtonUDPEnter
     end
     object RadioButtonMulticast: TRadioButton
+      Tag = 3
       Left = 16
       Top = 52
       Width = 97
@@ -340,6 +351,7 @@ object NetworkDlg: TNetworkDlg
       OnEnter = RadioButtonMulticastEnter
     end
     object RadioButtonCS: TRadioButton
+      Tag = 3
       Left = 16
       Top = 80
       Width = 97
@@ -349,6 +361,7 @@ object NetworkDlg: TNetworkDlg
       OnEnter = RadioButtonCSEnter
     end
     object RadioButtonHTTP: TRadioButton
+      Tag = 3
       Left = 16
       Top = 108
       Width = 97
@@ -358,6 +371,7 @@ object NetworkDlg: TNetworkDlg
       OnEnter = RadioButtonHTTPEnter
     end
     object ComboBoxMulticastAddress: TComboBox
+      Tag = 5
       Left = 184
       Top = 50
       Width = 161
@@ -367,6 +381,7 @@ object NetworkDlg: TNetworkDlg
       TabOrder = 5
     end
     object ComboBoxCSAddress: TComboBox
+      Tag = 5
       Left = 184
       Top = 78
       Width = 161
@@ -379,6 +394,7 @@ object NetworkDlg: TNetworkDlg
         'vlcs')
     end
     object EditHTTPURL: TEdit
+      Tag = 5
       Left = 184
       Top = 106
       Width = 265

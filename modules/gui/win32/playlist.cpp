@@ -27,6 +27,7 @@
 #include <vlc/intf.h>
 
 #include "playlist.h"
+#include "misc.h"
 #include "win32_common.h"
 
 //---------------------------------------------------------------------------
@@ -40,6 +41,7 @@ __fastcall TPlaylistDlg::TPlaylistDlg( TComponent* Owner )
         : TForm( Owner )
 {
     Icon = p_intfGlobal->p_sys->p_window->Icon;
+    Translate( this );
 }
 //---------------------------------------------------------------------------
 char * __fastcall TPlaylistDlg::rindex( char *s, char c )

@@ -27,6 +27,7 @@
 #include <vlc/intf.h>
 
 #include "network.h"
+#include "misc.h"
 #include "win32_common.h"
 
 #include "netutils.h"
@@ -65,6 +66,8 @@ __fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
         }
 
         SpinEditCSPort->Value = config_GetInt( p_intfGlobal, "channel-port" );
+
+        Translate( this );
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::FormShow( TObject *Sender )

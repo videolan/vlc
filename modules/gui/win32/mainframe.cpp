@@ -36,6 +36,7 @@
 #include "preferences.h"
 #include "messages.h"
 #include "playlist.h"
+#include "misc.h"
 #include "win32_common.h"
 
 #include "netutils.h"
@@ -64,6 +65,8 @@ __fastcall TMainFrameDlg::TMainFrameDlg( TComponent* Owner )
     Caption = VOUT_TITLE " (Win32 interface)";
 
     StringListPref = new TStringList();
+    
+    Translate( this );
 }
 //---------------------------------------------------------------------------
 __fastcall TMainFrameDlg::~TMainFrameDlg()
