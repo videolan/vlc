@@ -24,6 +24,7 @@ VIDEO=FB
 #ARCH=
 ARCH=MMX
 #ARCH=PPC
+#ARCH=SPARC
 
 # Decoder choice - ?? old decoder will be removed soon
 DECODER=old
@@ -110,6 +111,11 @@ endif
 # Optimizations for PowerPC
 ifeq ($(ARCH),PPC)
 CCFLAGS += -mcpu=604e -mmultiple -mhard-float -mstring
+endif
+
+# Optimizations for Sparc
+ifeq ($(ARCH),SPARC)
+CCFLAGS += -mhard-float
 endif
 
 #
