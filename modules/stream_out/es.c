@@ -2,7 +2,7 @@
  * es.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: es.c,v 1.2 2003/04/29 22:44:08 fenrir Exp $
+ * $Id: es.c,v 1.3 2003/07/05 21:31:02 alexis Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -89,7 +89,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_count_video    = 0;
 
     p_sys->psz_access       = sout_cfg_find_value( p_stream->p_cfg, "access" );
-    p_sys->psz_access_audio = sout_cfg_find_value( p_stream->p_cfg, "acesss_audio" );
+    p_sys->psz_access_audio = sout_cfg_find_value( p_stream->p_cfg, "access_audio" );
     p_sys->psz_access_video = sout_cfg_find_value( p_stream->p_cfg, "access_video" );
 
 
