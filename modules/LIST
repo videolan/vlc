@@ -1,5 +1,5 @@
 List of vlc plugins (221)
-$Id: LIST,v 1.11 2003/08/29 16:56:43 zorglub Exp $
+$Id: LIST,v 1.12 2003/09/18 16:46:02 lool Exp $
 
  * a52: A/52 basic parser
 
@@ -424,8 +424,6 @@ $Id: LIST,v 1.11 2003/08/29 16:56:43 zorglub Exp $
  * vorbis: a vorbis audio decoder using the libvorbis library.
 
  * vout_directx: video output module using the DirectX API.
-
- * vout_encoder: Encoder plugin
 
  * vout_sdl: video output module using the SDL library.
 
