@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.9 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: theora.c,v 1.10 2003/10/08 23:00:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -616,6 +616,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     theora_encode_init( &p_sys->td, &p_sys->ti );
     theora_info_clear( &p_sys->ti );
+    theora_comment_init( &p_sys->tc );
 
     p_sys->i_headers = 0;
 
@@ -640,13 +641,13 @@ static block_t *Headers( encoder_t *p_enc )
         theora_encode_header( &p_sys->td, &oggpacket );
         break;
     case 1:
-        theora_comment_init( &p_sys->tc );
         theora_encode_comment( &p_sys->tc, &oggpacket );
         break;
     case 2:
         theora_encode_tables( &p_sys->td, &oggpacket );
         break;
     default:
+        break;
     }
 
     p_sys->i_headers++;
@@ -672,7 +673,6 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     ogg_packet oggpacket;
     block_t *p_block;
     yuv_buffer yuv;
-    int i_ret;
 
     /* Theora is a one-frame-in, one-frame-out system. Submit a frame
      * for compression and pull out the packet. */
@@ -695,9 +695,8 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 
     /* Ogg packet to block */
     p_block = block_New( p_enc, oggpacket.bytes );
-    p_block->p_buffer = oggpacket.packet;
-    p_block->i_buffer = oggpacket.bytes;
-    p_block->i_dts = oggpacket.granulepos;
+    memcpy( p_block->p_buffer, oggpacket.packet, oggpacket.bytes );
+    p_block->i_dts = p_pict->date;//oggpacket.granulepos;
 
     return p_block;
 }
@@ -711,7 +710,7 @@ static void CloseEncoder( vlc_object_t *p_this )
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     theora_info_clear( &p_sys->ti );
-    theora_comment_clear( &p_sys->tc );
+    //theora_comment_clear( &p_sys->tc );
 
     free( p_sys );
 }

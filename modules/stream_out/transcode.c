@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.35 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: transcode.c,v 1.36 2003/10/08 23:00:40 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -318,6 +318,7 @@ struct sout_stream_id_t
     vlc_fourcc_t  b_transcode;
     sout_format_t f_src;        /* only if transcoding */
     sout_format_t f_dst;        /*  "   "      " */
+    unsigned int  i_inter_pixfmt; /* intermediary format when transcoding */
 
     /* id of the out stream */
     void *id;
@@ -1498,6 +1499,9 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 sout_BufferChain( out, p_out );
             }
 
+            id->i_inter_pixfmt =
+                get_ff_chroma( id->p_encoder->format.video.i_chroma );
+
             id->b_enc_inited = VLC_TRUE;
         }
         else if( !id->b_enc_inited )
@@ -1537,6 +1541,9 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 id->b_transcode = VLC_FALSE;
                 return VLC_EGENERIC;
             }
+
+            id->i_inter_pixfmt = id->ff_enc_c->pix_fmt;
+
             id->b_enc_inited = VLC_TRUE;
         }
 
@@ -1555,7 +1562,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 buf = malloc( i_size );
 
                 avpicture_fill( (AVPicture*)id->p_ff_pic_tmp0, buf,
-                                id->ff_enc_c->pix_fmt,
+                                id->i_inter_pixfmt,
                                 id->ff_dec_c->width, id->ff_dec_c->height );
             }
 
@@ -1567,26 +1574,26 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         }
 
         /* convert pix format */
-        if( !id->p_encoder )
-        if( id->ff_dec_c->pix_fmt != id->ff_enc_c->pix_fmt )
+        if( id->ff_dec_c->pix_fmt != id->i_inter_pixfmt )
         {
             if( id->p_ff_pic_tmp1 == NULL )
             {
                 int     i_size;
                 uint8_t *buf;
                 id->p_ff_pic_tmp1 = avcodec_alloc_frame();
-                i_size = avpicture_get_size( id->ff_enc_c->pix_fmt,
-                                             id->ff_dec_c->width, id->ff_dec_c->height );
+                i_size = avpicture_get_size( id->i_inter_pixfmt,
+                                             id->ff_dec_c->width,
+                                             id->ff_dec_c->height );
 
                 buf = malloc( i_size );
 
                 avpicture_fill( (AVPicture*)id->p_ff_pic_tmp1, buf,
-                                id->ff_enc_c->pix_fmt,
+                                id->i_inter_pixfmt,
                                 id->ff_dec_c->width, id->ff_dec_c->height );
             }
 
-            img_convert( (AVPicture*)id->p_ff_pic_tmp1, id->ff_enc_c->pix_fmt,
-                         (AVPicture*)frame,             id->ff_dec_c->pix_fmt,
+            img_convert( (AVPicture*)id->p_ff_pic_tmp1, id->i_inter_pixfmt,
+                         (AVPicture*)frame, id->ff_dec_c->pix_fmt,
                          id->ff_dec_c->width, id->ff_dec_c->height );
 
             frame = id->p_ff_pic_tmp1;
@@ -1594,8 +1601,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
         /* convert size and crop */
         if( !id->p_encoder )
-        if( id->ff_dec_c->width  != id->ff_enc_c->width ||
-            id->ff_dec_c->height != id->ff_enc_c->height ||
+        if( id->ff_dec_c->width  != id->f_dst.i_width ||
+            id->ff_dec_c->height != id->f_dst.i_height ||
             p_sys->i_crop_top > 0 || p_sys->i_crop_bottom > 0 ||
             p_sys->i_crop_left > 0 || p_sys->i_crop_right )
         {
@@ -1604,17 +1611,19 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 int     i_size;
                 uint8_t *buf;
                 id->p_ff_pic_tmp2 = avcodec_alloc_frame();
-                i_size = avpicture_get_size( id->ff_enc_c->pix_fmt,
-                                             id->ff_enc_c->width, id->ff_enc_c->height );
+                i_size = avpicture_get_size( id->i_inter_pixfmt,
+                                             id->f_dst.i_width,
+                                             id->f_dst.i_height );
 
                 buf = malloc( i_size );
 
                 avpicture_fill( (AVPicture*)id->p_ff_pic_tmp2, buf,
-                                id->ff_enc_c->pix_fmt,
-                                id->ff_enc_c->width, id->ff_enc_c->height );
+                                id->i_inter_pixfmt,
+                                id->f_dst.i_width, id->f_dst.i_height );
 
                 id->p_vresample =
-                    img_resample_full_init( id->ff_enc_c->width, id->ff_enc_c->height,
+                    img_resample_full_init( id->f_dst.i_width,
+                                            id->f_dst.i_height,
                                             id->ff_dec_c->width, id->ff_dec_c->height,
                                             p_stream->p_sys->i_crop_top,
                                             p_stream->p_sys->i_crop_bottom,
@@ -1650,8 +1659,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             int i_plane;
 
             vout_InitPicture( VLC_OBJECT(p_stream), &pic,
-                              id->ff_dec_c->width, id->ff_dec_c->height,
-                              VLC_FOURCC('I','4','2','0') );
+                              id->f_dst.i_width, id->f_dst.i_height,
+                              id->p_encoder->format.video.i_chroma );
 
             for( i_plane = 0; i_plane < pic.i_planes; i_plane++ )
             {
@@ -1668,6 +1677,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
                 memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
                 sout_BufferChain( out, p_out );
+                block_Release( p_block );
             }
 
             return VLC_SUCCESS;
