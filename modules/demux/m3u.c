@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse pls, m3u, asx et b4s playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.20 2003/06/27 10:31:02 zorglub Exp $
+ * $Id: m3u.c,v 1.21 2003/06/28 19:19:55 fenrir Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -27,14 +27,10 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
-#include <errno.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc_playlist.h>
-
-#include <sys/types.h>
 
 /*****************************************************************************
  * Constants and structures
@@ -47,13 +43,6 @@
 #define TYPE_HTML 3
 #define TYPE_PLS 4
 #define TYPE_B4S 5
-
-struct item_t
-{
-    char *psz_name;
-    char *psz_uri;
-};
-
 
 struct demux_sys_t
 {
@@ -88,9 +77,8 @@ static int Activate( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     char           *psz_ext;
-    demux_sys_t    *p_m3u;
-    int             i_type = 0;
-    int             i_type2 = 0;
+    int             i_type  = TYPE_UNKNOWN;
+    int             i_type2 = TYPE_UNKNOWN;
 
     /* Initialize access plug-in structures. */
     if( p_input->i_mtu == 0 )
@@ -135,6 +123,7 @@ static int Activate( vlc_object_t * p_this )
      * at the content. This is useful for .asp, .php and similar files
      * that are actually html. Also useful for som asx files that have
      * another extention */
+    /* XXX we double check for file != m3u as some asx ... are just m3u file */
     if( i_type != TYPE_M3U )
     {
         byte_t *p_peek;
@@ -144,7 +133,7 @@ static int Activate( vlc_object_t * p_this )
             while ( i_size
                     && strncasecmp( p_peek, "[playlist]", sizeof("[playlist]") - 1 )
                     && strncasecmp( p_peek, "<html>", sizeof("<html>") - 1 )
-                    && strncasecmp( p_peek, "<asx", sizeof("<asx") - 1 ) 
+                    && strncasecmp( p_peek, "<asx", sizeof("<asx") - 1 )
                     && strncasecmp( p_peek, "<?xml", sizeof("<?xml") -1 ) )
             {
                 p_peek++;
@@ -170,14 +159,13 @@ static int Activate( vlc_object_t * p_this )
             {
                 i_type2 = TYPE_B4S;
             }
-            
         }
     }
-    if ( !i_type && !i_type2 )
+    if ( i_type == TYPE_UNKNOWN && i_type2 == TYPE_UNKNOWN)
     {
-        return -1;
+        return VLC_EGENERIC;
     }
-    if ( i_type  && !i_type2 )
+    if ( i_type  != TYPE_UNKNOWN && i_type2 == TYPE_UNKNOWN )
     {
         i_type = TYPE_M3U;
     }
@@ -187,16 +175,10 @@ static int Activate( vlc_object_t * p_this )
     }
 
     /* Allocate p_m3u */
-    if( !( p_m3u = malloc( sizeof( demux_sys_t ) ) ) )
-    {
-        msg_Err( p_input, "out of memory" );
-        return -1;
-    }
-    p_input->p_demux_data = p_m3u;
+    p_input->p_demux_data = malloc( sizeof( demux_sys_t ) );
+    p_input->p_demux_data->i_type = i_type;
 
-    p_m3u->i_type = i_type;
-
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -205,63 +187,71 @@ static int Activate( vlc_object_t * p_this )
 static void Deactivate( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t *p_m3u = (demux_sys_t *)p_input->p_demux_data  ; 
 
-    free( p_m3u );
+    free( p_input->p_demux_data );
 }
 
 /*****************************************************************************
- * XMLSpecialChars: Handle the special chars in a XML file. 
- * Returns 0 if successful
+ * XMLSpecialChars: Handle the special chars in a XML file.
  * ***************************************************************************/
-static int XMLSpecialChars ( char *psz_src , char *psz_dst )
+static void XMLSpecialChars ( char *str )
 {
-    unsigned int i;
-    unsigned int j=0;
-    char c_rplc=0;    
-    
-    for( i=0 ; i < strlen(psz_src) ; i++ )
+    char *src = str;
+    char *dst = str;
+
+    while( *src )
     {
-        if( psz_src[i]  == '&')
+        if( *src == '&' )
         {
-            if( !strncasecmp( &psz_src[i], "&#xe0;", 6) ) c_rplc = 'à';
-            else if( !strncasecmp( &psz_src[i], "&#xe9;", 6) ) c_rplc = 'é';
-            else if( !strncasecmp( &psz_src[i], "&#xee;", 6) ) c_rplc = 'î';
-            else if( !strncasecmp( &psz_src[i], "&apos;", 6) ) c_rplc = '\'';
-            else if( !strncasecmp( &psz_src[i], "&#xe8;", 6) ) c_rplc = 'è';
-            else if( !strncasecmp( &psz_src[i], "&#xea;", 6) ) c_rplc = 'ê';
-            else if( !strncasecmp( &psz_src[i], "&#xea;", 6) ) c_rplc = 'ê';
-            psz_dst[j]=c_rplc;
-            j++;
-            i = i+6;
+            if( !strncasecmp( src, "&#xe0;", 6 ) ) *dst++ = 'à';
+            else if( !strncasecmp( src, "&#xee;", 6 ) ) *dst++ = 'î';
+            else if( !strncasecmp( src, "&apos;", 6 ) ) *dst++ = '\'';
+            else if( !strncasecmp( src, "&#xe8;", 6 ) ) *dst++ = 'è';
+            else if( !strncasecmp( src, "&#xe9;", 6 ) ) *dst++ = 'é';
+            else if( !strncasecmp( src, "&#xea;", 6 ) ) *dst++ = 'ê';
+            else
+            {
+                *dst++ = '?';
+            }
+            src += 6;
         }
-        psz_dst[j] = psz_src[i];
-        j++;
-    }        
-    psz_dst[j]='\0';
-    return 0;
+        else
+        {
+            *dst++ = *src++;
+        }
+    }
+
+    *dst = '\0';
 }
 
 
 /*****************************************************************************
- * ProcessLine: read a "line" from the file and add any entries found
+ * ParseLine: read a "line" from the file and add any entries found
  * to the playlist. Returns:
  * 0 if nothing was found
  * 1 if a URI was found (it is then copied in psz_data)
  * 2 if a name was found (  "  )
+ *
+ * XXX psz_data has the same length that psz_line so no problem if you don't
+ * expand it
+ *    psz_line is \0 terminated
  ******************************************************************************/
-static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
-        , playlist_t *p_playlist , char psz_line[MAX_LINE], int i_position,
-          char *psz_data )
+static int ParseLine ( input_thread_t *p_input, char *psz_line, char *psz_data, vlc_bool_t *pb_next )
 {
+    demux_sys_t   *p_m3u = p_input->p_demux_data;
+
     char          *psz_bol, *psz_name;
-    
+
     psz_bol = psz_line;
+
+    *pb_next = VLC_FALSE;
 
     /* Remove unnecessary tabs or spaces at the beginning of line */
     while( *psz_bol == ' ' || *psz_bol == '\t' ||
            *psz_bol == '\n' || *psz_bol == '\r' )
+    {
         psz_bol++;
+    }
 
     if( p_m3u->i_type == TYPE_M3U )
     {
@@ -277,8 +267,8 @@ static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
             if ( !psz_bol ) return 0;
             psz_bol++;
             /* From now, we have a name line */
-            
-            strncpy(psz_data , psz_bol , strlen(psz_bol) );
+
+            strcpy( psz_data , psz_bol );
             return 2;
         }
         /* If we don't have a comment, the line is directly the URI */
@@ -375,62 +365,68 @@ static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
     else if ( p_m3u->i_type == TYPE_B4S )
     {
 
-         char *psz_eol;
-         
-         /* We are dealing with a B4S file from Winamp 3 */
-            
-         /* First, search for name *
-          * <Name>Blabla</Name> */
+        char *psz_eol;
 
-         if( strstr ( psz_bol, "<Name>" ) )
-         {
-             /* We have a name */
+        msg_Dbg( p_input, "b4s line=%s", psz_line );
+        /* We are dealing with a B4S file from Winamp 3 */
+
+        /* First, search for name *
+         * <Name>Blabla</Name> */
+
+        if( strstr ( psz_bol, "<Name>" ) )
+        {
+            msg_Dbg( p_input, "###########<Name>");
+            /* We have a name */
             while ( *psz_bol &&
-             strncasecmp( psz_bol,"Name",sizeof("Name") -1 ) )
-                    psz_bol++;
+                    strncasecmp( psz_bol,"Name",sizeof("Name") -1 ) )
+                psz_bol++;
 
-             if( !*psz_bol ) return 0;
-                            
-                psz_bol = psz_bol + 5 ;
-               /* We are now at the beginning of the name */
+            if( !*psz_bol ) return 0;
 
-             if( !psz_bol ) return 0;
+            psz_bol = psz_bol + 5 ;
+            /* We are now at the beginning of the name */
 
-             
-             psz_eol = strchr(psz_bol, '<' );   
-             if( !psz_eol) return 0;
-             
-             *psz_eol='\0';
+            if( !psz_bol ) return 0;
 
-             if( XMLSpecialChars( psz_bol , psz_bol ) )
-                return 0;
-             
-             strncpy( psz_data, psz_bol, strlen( psz_bol ) );
-             return 2;
-          }
-   
+
+            psz_eol = strchr(psz_bol, '<' );
+            if( !psz_eol) return 0;
+
+            *psz_eol='\0';
+
+            XMLSpecialChars( psz_bol );
+
+            strcpy( psz_data, psz_bol );
+            return 2;
+        }
+        else if( strstr( psz_bol, "</entry>" ) || strstr( psz_bol, "</Entry>" ))
+        {
+            msg_Dbg( p_input, "###########<Entry>");
+            *pb_next = VLC_TRUE;
+            return 0;
+        }
+
          /* We are looking for <entry Playstring="blabla"> */
 
-            
-         while ( *psz_bol &&
-         strncasecmp( psz_bol,"Playstring",sizeof("Playstring") -1 ) )
-               psz_bol++;
 
-       if( !*psz_bol ) return 0;
+        while ( *psz_bol &&
+                strncasecmp( psz_bol,"Playstring",sizeof("Playstring") -1 ) )
+            psz_bol++;
+
+        if( !*psz_bol ) return 0;
 
         psz_bol = strchr( psz_bol, '=' );
         if ( !psz_bol ) return 0;
-              psz_bol++;
-              psz_bol++;
+
+        psz_bol += 2;
 
         psz_eol= strchr(psz_bol, '"');
         if( !psz_eol ) return 0;
 
         *psz_eol= '\0';
 
-        /* Handle the XML special characters */    
-        if( XMLSpecialChars( psz_bol , psz_bol ) )
-                return 0;
+        /* Handle the XML special characters */
+        XMLSpecialChars( psz_bol );
     }
     else
     {
@@ -441,6 +437,7 @@ static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
     /* empty line */
     if ( !*psz_bol ) return 0;
 
+    msg_Dbg( p_input, "############Line=%s", psz_bol );
     /*
      * From now on, we know we've got a meaningful line
      */
@@ -514,10 +511,63 @@ static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
         psz_name = strdup( psz_bol );
     }
 
-    strncpy(psz_data, psz_name , strlen(psz_name) ) ;
-    
+    strcpy(psz_data, psz_name ) ;
+
     free( psz_name );
+
+    if( p_m3u->i_type != TYPE_B4S )
+    {
+       *pb_next = VLC_TRUE;
+    }
+
     return 1;
+}
+
+static void ProcessLine ( input_thread_t *p_input, playlist_t *p_playlist,
+                          char *psz_line,
+                          char **ppsz_uri, char **ppsz_name )
+{
+    char          psz_data[MAX_LINE];
+    vlc_bool_t    b_next;
+
+    msg_Dbg( p_input, "ProcessLine(0): name=%s uri=%s ", *ppsz_name, *ppsz_uri );
+
+    switch( ParseLine( p_input, psz_line, psz_data, &b_next ) )
+    {
+        case 1:
+            if( *ppsz_uri )
+            {
+                free( *ppsz_uri );
+            }
+            *ppsz_uri = strdup( psz_data );
+            break;
+        case 2:
+            if( *ppsz_name )
+            {
+                free( *ppsz_name );
+            }
+            *ppsz_name = strdup( psz_data );
+            break;
+        case 0:
+        default:
+            break;
+    }
+    msg_Dbg( p_input, "name=%s uri=%s next=%d", *ppsz_name, *ppsz_uri, b_next );
+    if( b_next && *ppsz_uri )
+    {
+        playlist_AddName( p_playlist,
+                          *ppsz_name ? *ppsz_name : *ppsz_uri,
+                          *ppsz_uri,
+                          PLAYLIST_INSERT, PLAYLIST_END );
+        if( *ppsz_name )
+        {
+            free( *ppsz_name );
+        }
+        free( *ppsz_uri );
+        *ppsz_name = NULL;
+        *ppsz_uri  = NULL;
+    }
+    msg_Dbg( p_input, "ProcessLine(1:: name=%s uri=%s ", *ppsz_name, *ppsz_uri );
 }
 
 /*****************************************************************************
@@ -527,18 +577,18 @@ static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
  *****************************************************************************/
 static int Demux ( input_thread_t *p_input )
 {
+    demux_sys_t   *p_m3u = p_input->p_demux_data;
+
     data_packet_t *p_data;
-    char          *psz_data=NULL;
-    char          *p_buf, psz_line[MAX_LINE], eol_tok;
+    char          psz_line[MAX_LINE];
+    char          *p_buf, eol_tok;
     int           i_size, i_bufpos, i_linepos = 0;
-    int           i_return=0;
     playlist_t    *p_playlist;
-    int           i_position;
     vlc_bool_t    b_discard = VLC_FALSE;
- 
-    struct item_t *p_item;
-    
-    demux_sys_t   *p_m3u = (demux_sys_t *)p_input->p_demux_data;
+
+
+    char          *psz_name = NULL;
+    char          *psz_uri  = NULL;
 
     p_playlist = (playlist_t *) vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
                                                  FIND_ANYWHERE );
@@ -548,31 +598,11 @@ static int Demux ( input_thread_t *p_input )
         return -1;
     }
 
-    p_item = (struct item_t *) malloc (sizeof(struct item_t));
-    
-    if( !p_item )
-    {
-        msg_Err( p_input , "No memory left") ;
-        return VLC_EGENERIC;
-    }
-    p_item->psz_uri   = NULL;
-    p_item->psz_name  = NULL;
-
-    psz_data = (char*) malloc( MAX_LINE * sizeof(char) );
-   
-    if( ! psz_data )
-    {
-        msg_Err( p_input, "No memory left" );
-        return VLC_EGENERIC;
-    }     
-    
     p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
-    i_position = p_playlist->i_index + 1;
 
     /* Depending on wether we are dealing with an m3u/asf file, the end of
      * line token will be different */
     if( p_m3u->i_type == TYPE_ASX || p_m3u->i_type == TYPE_HTML )
-                 //  || p_m3u->i_type == TYPE_B4S )
         eol_tok = '>';
     else
         eol_tok = '\n';
@@ -615,78 +645,8 @@ static int Demux ( input_thread_t *p_input )
 
             psz_line[i_linepos] = '\0';
             i_linepos = 0;
-         
-            memset( psz_data, 0 , MAX_LINE ) ;
 
-            i_return= ProcessLine ( p_input, p_m3u , p_playlist ,
-                                    psz_line, i_position, psz_data );
-            
-            i_position += i_return;
-            
-            if(i_return == 1) /* We got a URI */
-            {
-                if( !p_item->psz_uri ) 
-                {
-                        p_item->psz_uri = strdup( psz_data );
-                }
-                else /* We already have the URI ! 
-                        We have started a new item, so we add this one */
-                {
-                    if( !p_item->psz_name) 
-                        p_item->psz_name = strdup( p_item->psz_uri);
-                    playlist_AddName( p_playlist, p_item->psz_name,
-                                    p_item->psz_uri, 
-                                    PLAYLIST_INSERT, 
-                                    PLAYLIST_END);
-                    
-                    p_item->psz_name = NULL;
-                    p_item->psz_uri  = NULL;
-                }
-                p_item ->psz_uri = strdup(psz_data);
-            }       
-            else if(i_return == 2) /* We got a name */
-            {
-
-                /* M3U: if I already have the URI, I can't have a name *
-                 * So we add it now */
-                if( p_m3u->i_type == TYPE_M3U && p_item->psz_uri && !p_item->psz_name)
-                {
-                     p_item->psz_name = strdup(p_item->psz_uri);
-                    playlist_AddName( p_playlist, p_item->psz_name,
-                                      p_item->psz_uri,
-                                      PLAYLIST_INSERT,
-                                      PLAYLIST_END);
-
-                   p_item->psz_uri  = NULL;
-                   p_item->psz_name = NULL;
-                } 
-                   
-                if( ! p_item->psz_name) 
-                {
-                    p_item->psz_name = strdup( psz_data );
-                }
-                else /* We already have the name ! */
-                {
-                    if( !p_item->psz_uri) 
-                    {
-                       /* We can't add ! We have no URI */
-                       msg_Info( p_input, "Unable to add: no URI");
-                    }
-                    else
-                    {
-                     
-                     playlist_AddName( p_playlist, p_item->psz_name, 
-                                      p_item->psz_uri, 
-                                      PLAYLIST_INSERT, 
-                                      PLAYLIST_END);
-                    
-                        p_item->psz_uri  = NULL;
-                        p_item->psz_name = NULL;
-                    }
-                    p_item->psz_name= strdup (psz_data);
-                }
-            }
-                    
+            ProcessLine( p_input, p_playlist, psz_line, &psz_uri, &psz_name );
         }
 
         input_DeletePacket( p_input->p_method_data, p_data );
@@ -695,78 +655,25 @@ static int Demux ( input_thread_t *p_input )
     if ( i_linepos && b_discard != VLC_TRUE && eol_tok == '\n' )
     {
         psz_line[i_linepos] = '\0';
-        i_linepos = 0;
-        i_return = ProcessLine ( p_input, p_m3u , p_playlist , psz_line,
-                                    i_position, psz_data );
 
-        /* FIXME: This copy / past is UGLY */
-
-        if(i_return == 1) /* We got a URI */
+        ProcessLine( p_input, p_playlist, psz_line, &psz_uri, &psz_name );
+        /* is there a pendding uri without b_next */
+        if( psz_uri )
         {
-            if( !p_item->psz_uri ) 
-            {
-                p_item->psz_uri = strdup( psz_data );
-            }
-            else /* We already have the URI ! 
-                    We have started a new item, so we add this one */
-            {
-                if( !p_item->psz_name) 
-                    p_item->psz_name = strdup( p_item->psz_uri);
-                playlist_AddName( p_playlist, p_item->psz_name,
-                                p_item->psz_uri, 
-                                PLAYLIST_INSERT, 
-                                 PLAYLIST_END);
-                
-                p_item->psz_name = NULL;
-                p_item->psz_uri  = NULL;
-            }
-            p_item->psz_uri = strdup(psz_data);
-        }       
-        else if(i_return == 2) /* We got a name */
-        {
-            if( ! p_item->psz_name ) 
-            {
-                p_item->psz_name = strdup( psz_data );
-            }
-            else /* We already have the name ! */
-            {
-                if( !p_item->psz_uri) 
-                {
-                   /* We can't add ! We have no URI */
-                   msg_Info(p_input,"Unable to add: no URI");
-                }
-                else
-                {
-                    playlist_AddName( p_playlist, p_item->psz_name, 
-                                  p_item->psz_uri, 
-                                  PLAYLIST_INSERT, 
-                                  PLAYLIST_END);
-                   
-                    p_item->psz_uri  = NULL;
-                    p_item->psz_name = NULL;
-                }
-                p_item->psz_name = strdup(psz_data);
-            }
+            playlist_Add( p_playlist, psz_uri, PLAYLIST_INSERT, PLAYLIST_END );
         }
     }
-   
-    /* Check if we have something left */
 
-    if(p_item->psz_uri)
+    if( psz_uri )
     {
-        if( !p_item->psz_name) 
-            p_item->psz_name = strdup(p_item->psz_uri);
-        
-        playlist_AddName( p_playlist, p_item->psz_name, 
-                                  p_item->psz_uri, 
-                                  PLAYLIST_INSERT, 
-                                  PLAYLIST_END);
+        free( psz_uri );
     }
-        
+    if( psz_name )
+    {
+        free( psz_name );
+    }
+
     vlc_object_release( p_playlist );
 
-    if(p_item) free(p_item);
-    if(psz_data) free(psz_data);
-    
     return 0;
 }
