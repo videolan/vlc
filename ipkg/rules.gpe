@@ -32,8 +32,8 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-maxosx \
 	--disable-xosd \
 	--disable-freetype \
+	--enable-flac \
 	--enable-libmpeg2 \
-	--with-libmpeg2-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 	--enable-mad \
 	--enable-ffmpeg \
 	--enable-familiar \
@@ -46,7 +46,7 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--with-gpe-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/usr/bin \
 	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
-	--with-ffmpeg-tree=/home/jpsaman/svn/ipaq/Work/ffmpeg"
+	--with-ffmpeg-tree=/home/jpsaman/svn/tmp/ffmpeg-20030517"
 
 export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
@@ -60,7 +60,8 @@ config:
 		--host=arm-linux \
 		--target=arm-linux \
 		$(shell echo $(CONFIG_FLAGS)) \
-		LDFLAGS="-L/usr/local/arm/2.95.3/arm-linux/lib"
+		LDFLAGS="-L/usr/local/arm/2.95.3/arm-linux/lib -L/usr/local/arm/2.95.3/arm-linux/usr/lib" \
+CPPFLAGS="-I/usr/local/arm/2.95.3/arm-linux/usr/include"
 
 build:
 # This is ugly -- I know

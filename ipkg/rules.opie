@@ -30,8 +30,8 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-maxosx \
 	--disable-xosd \
 	--disable-freetype \
+	--enable-flac \
 	--enable-libmpeg2 \
-	--with-libmpeg2-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 	--enable-mad \
 	--enable-ffmpeg \
 	--disable-familiar \
@@ -40,8 +40,7 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/bin \
 	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
 	--with-qte=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
-	--with-ffmpeg-tree=/home/jpsaman/svn/ipaq/Work/ffmpeg"
-#	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg
+	--with-ffmpeg-tree=/home/jpsaman/svn/tmp/ffmpeg-20030517"
 
 export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
@@ -56,7 +55,9 @@ config:
 		--infodir=$${prefix}/share/info \
 		--host=arm-linux \
 		--target=arm-linux \
-		$(shell echo $(CONFIG_FLAGS))
+		$(shell echo $(CONFIG_FLAGS)) \
+	LDFLAGS="-L/usr/local/arm/2.95.3/arm-linux/lib -L/usr/local/arm/2.95.3/arm-linux/lib -L/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/lib" \
+	CPPFLAGS="-IL/usr/local/arm/2.95.3/arm-linux/include -I/usr/local/arm/2.95.3/arm-linux/usr/include -I/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/include"
 
 build-stamp:
 # This is ugly -- I know
