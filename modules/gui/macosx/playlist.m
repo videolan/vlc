@@ -65,6 +65,43 @@
     return( [[self delegate] menuForEvent: o_event] );
 }
 
+- reloadPlaylist
+{
+    [[self delegate] initDict];
+    [self reloadData];
+}
+
+- (bool)isItem:(playlist_item_t *)p_item inNode:(playlist_item_t *)p_node
+{
+    int i;
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    if ( p_playlist == NULL )
+    {
+        return NO;
+    }
+
+    for (i = 0 ; i < p_node->i_children ; i++)
+    {
+        if (p_node->pp_children[i]->i_children > 0)
+        {
+            if ([self isItem: p_item inNode:p_node->pp_children[i]] == YES)
+            {
+                vlc_object_release(p_playlist);
+                return YES;
+            }
+        }
+        else if (p_node->pp_children[i] == p_item)
+        {
+            vlc_object_release(p_playlist);
+            return YES;
+        }
+    }
+
+    vlc_object_release(p_playlist);
+    return NO;
+}
+
 - (void)keyDown:(NSEvent *)o_event
 {
     unichar key = 0;
@@ -102,15 +139,28 @@ msg_Dbg( p_intf, "KEYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
                 o_number = [o_to_delete lastObject];
                 i_row = [o_number intValue];
 
-                if( p_playlist->status.p_item == [[self itemAtRow: i_row] pointerValue] && p_playlist->status.i_status )
-                {
-                    playlist_Stop( p_playlist );
-                }
                 [o_to_delete removeObject: o_number];
                 [self deselectRow: i_row];
                 p_item = (playlist_item_t *)[[self itemAtRow: i_row]pointerValue];
-                playlist_Delete( p_playlist, p_item->input.i_id );
-                [self reloadData];
+                if (p_item->i_children > -1)
+                {
+                    if ([self isItem:p_playlist->status.p_item inNode: p_item]
+                                        == YES && p_playlist->status.i_status)
+                    {
+                        playlist_Stop( p_playlist );
+                    }
+                    playlist_NodeDelete( p_playlist, p_item, VLC_TRUE);
+                }
+                else
+                {
+                    if( p_playlist->status.p_item == [[self itemAtRow: i_row]
+                                pointerValue] && p_playlist->status.i_status )
+                    {
+                        playlist_Stop( p_playlist );
+                    }
+                    playlist_Delete( p_playlist, p_item->input.i_id );
+                }
+                [self reloadPlaylist];
             }
             break;
 
@@ -124,7 +174,6 @@ msg_Dbg( p_intf, "KEYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
         vlc_object_release( p_playlist );
     }
 }
-
 
 @end
 
@@ -224,12 +273,43 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     if( p_playlist != NULL )
     {
         playlist_item_t *p_item;
-        playlist_view_t *p_view;
-        p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
+        playlist_item_t *p_node = NULL;
+        int i;
+
         p_item = [[o_outline_view itemAtRow:[o_outline_view selectedRow]] pointerValue];
-        
+
         if( p_item )
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VIEW_SIMPLE, p_view ? p_view->p_root : NULL, p_item );
+        {
+            if (p_item->i_children == -1)
+            {
+                for (i = 0 ; i < p_item->i_parents ; i++)
+                {
+                    if (p_item->pp_parents[i]->i_view == VIEW_SIMPLE)
+                    {
+                        p_node = p_item->pp_parents[i]->p_parent;
+                    }
+                }
+            }
+            else
+            {
+                p_node = p_item;
+                if (p_node->pp_children[0]->i_children == -1 &&
+                    p_node->i_children > 0)
+                {
+                    p_item = p_node->pp_children[0];
+                }
+                else
+                {
+                    p_item = NULL;
+                }
+            }
+
+//        p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
+
+
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VIEW_SIMPLE, p_node, p_item );
+//            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VIEW_SIMPLE, p_view ? p_view->p_root : NULL, p_item );
+        }
         vlc_object_release( p_playlist );
     }
 }
@@ -490,6 +570,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
     vlc_object_release(p_playlist);
 
+}
+
+- (void)initDict
+{
+    [o_outline_dict removeAllObjects];
 }
 
 @end
