@@ -40,10 +40,11 @@ export LDFLAGS = -L$(PREFIX)/lib
 # Standard rules
 # ***************************************************************************
 
-all: .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
+all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
-	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom .caca .dts .mod
+	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom .caca .dts .mod \
+	.cddb .cdio .vcdimager
 FORCE:
 
 # ***************************************************************************
@@ -175,6 +176,23 @@ CLEAN_FILE += .iconv
 CLEAN_PKG += libiconv
 DISTCLEAN_PKG += libiconv-$(LIBICONV_VERSION).tar.gz
 
+# ***************************************************************************
+# pkgconfig
+# ***************************************************************************
+
+pkgconfig-$(PKGCFG_VERSION).tar.gz:
+	$(WGET) $(PKGCFG_URL)
+
+pkgconfig: pkgconfig-$(PKGCFG_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.pkgcfg: pkgconfig
+	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	touch $@
+
+CLEAN_FILE += .pkgcfg
+CLEAN_PKG += pkgconfig
+DISTCLEAN_PKG += pkgconfig-$(PKGCFG_VERSION).tar.gz
 # ***************************************************************************
 # gettext
 # ***************************************************************************
@@ -744,6 +762,62 @@ libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz
 CLEAN_FILE += .mod
 CLEAN_PKG += libmodplug
 DISTCLEAN_PKG += libmodplug-$(MODPLUG_VERSION).tar.gz
+
+# ***************************************************************************
+# libcddb
+# ***************************************************************************
+
+libcddb-$(CDDB_VERSION).tar.gz:
+	$(WGET) $(CDDB_URL)
+
+libcddb: libcddb-$(CDDB_VERSION).tar.gz
+	$(EXTRACT_GZ)
+	patch -p 0 < Patches/libcddb.patch
+
+.cddb: libcddb
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	touch $@
+
+CLEAN_FILE += .cddb
+CLEAN_PKG += libcddb
+DISTCLEAN_PKG += libcddb-$(CDDB_VERSION).tar.gz
+
+# ***************************************************************************
+# vcdimager
+# ***************************************************************************
+
+vcdimager-$(VCDIMAGER_VERSION).tar.gz:
+	$(WGET) $(VCDIMAGER_URL)
+
+vcdimager: vcdimager-$(VCDIMAGER_VERSION).tar.gz
+	$(EXTRACT_GZ)
+	patch -p 0 < Patches/vcdimager.patch
+
+.vcdimager: vcdimager
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	touch $@
+
+CLEAN_FILE += .vcdimager
+CLEAN_PKG += vcdimager
+DISTCLEAN_PKG += vcdimager-$(VCDIMAGER_VERSION).tar.gz
+
+# ***************************************************************************
+# libcdio
+# ***************************************************************************
+
+libcdio-$(CDIO_VERSION).tar.gz:
+	$(WGET) $(CDIO_URL)
+
+libcdio: libcdio-$(CDIO_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.cdio: libcdio
+	(cd $<; ./configure --prefix=$(PREFIX) --without-libcddb --without-vcdinfo && make && make install)
+	touch $@
+
+CLEAN_FILE += .cdio
+CLEAN_PKG += libcdio
+DISTCLEAN_PKG += libcdio-$(CDIO_VERSION).tar.gz
 
 # ***************************************************************************
 # OpenMash

@@ -360,7 +360,7 @@ fi
 
 # Do the rest
 ${autopoint} -f
-${aclocal} -I m4
+${aclocal} -I m4 -I extras/contrib/share/aclocal
 ${autoconf}
 ${autoheader}
 ${automake} --add-missing --copy

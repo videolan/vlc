@@ -1,0 +1,11 @@
+--- vcdimager.orig/lib/image.c	Mon Jul  5 02:17:50 2004
++++ vcdimager/lib/image.c	Sun Jul  4 23:08:26 2004
+@@ -76,7 +76,7 @@
+ }
+ 
+ int
+-vcd_image_sink_write (VcdImageSink *obj, void *buf, uint32_t lsn)
++vcd_image_sink_write (VcdImageSink *obj, void *buf, lsn_t lsn)
+ {
+   vcd_assert (obj != NULL);
+ 

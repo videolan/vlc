@@ -1,0 +1,10 @@
+--- libcddb.orig/include/cddb/cddb_regex.h	Mon Jul  5 02:12:12 2004
++++ libcddb/include/cddb/cddb_regex.h	Sun Jul  4 22:05:44 2004
+@@ -28,6 +28,7 @@
+ 
+ 
+ #include <stdlib.h>
++#include <unistd.h>
+ #include <regex.h>
+ 
+ 
