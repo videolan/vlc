@@ -2,7 +2,7 @@
  * drms.c: DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.c,v 1.7 2004/01/18 04:45:32 rocky Exp $
+ * $Id: drms.c,v 1.8 2004/01/19 16:40:28 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Sam Hocevar <sam@zoy.org>
@@ -123,7 +123,7 @@ static void DecryptAES    ( struct aes_s *, uint32_t *, const uint32_t * );
 static void InitMD5       ( struct md5_s * );
 static void AddMD5        ( struct md5_s *, const uint8_t *, uint32_t );
 static void EndMD5        ( struct md5_s * );
-static void Digest        ( struct md5_s *, const uint32_t * );
+static void Digest        ( struct md5_s *, uint32_t * );
 
 static void InitShuffle   ( struct shuffle_s *, uint32_t * );
 static void DoShuffle     ( struct shuffle_s *, uint8_t *, uint32_t );
@@ -135,6 +135,24 @@ static int GetUserKey     ( void *, uint32_t * );
 
 static int GetSCIData     ( uint32_t **, uint32_t * );
 static int HashSystemInfo ( uint32_t * );
+
+#ifdef WORDS_BIGENDIAN
+/*****************************************************************************
+ * Reverse: reverse byte order
+ *****************************************************************************/
+static inline void Reverse( uint32_t *p_buffer, int n )
+{
+    int i;
+
+    for( i = 0; i < n; i++ )
+    {
+        p_buffer[ i ] = GetDWLE(&p_buffer[ i ]);
+    }
+}
+#    define REVERSE( p, n ) Reverse( p, n )
+#else
+#    define REVERSE( p, n )
+#endif
 
 /*****************************************************************************
  * BlockXOR: XOR two 128 bit blocks
@@ -207,6 +225,7 @@ void drms_decrypt( void *_p_drms, uint32_t *p_buffer, uint32_t i_bytes )
     {
         uint32_t p_tmp[ 4 ];
 
+        REVERSE( p_buffer, 4 );
         DecryptAES( &p_drms->aes, p_tmp, p_buffer );
         BlockXOR( p_tmp, p_key, p_tmp );
 
@@ -215,6 +234,7 @@ void drms_decrypt( void *_p_drms, uint32_t *p_buffer, uint32_t i_bytes )
 
         /* Copy unscrambled data back to the buffer */
         memcpy( p_buffer, p_tmp, 16 );
+        REVERSE( p_buffer, 4 );
 
         p_buffer += 4;
     }
@@ -297,6 +317,13 @@ int drms_init( void *_p_drms, uint32_t i_type,
             memcpy( p_priv, p_info, 64 );
             memcpy( p_drms->p_key, md5.p_digest, 16 );
             drms_decrypt( p_drms, p_priv, 64 );
+            REVERSE( p_priv, 64 );
+
+            if( p_priv[ 0 ] != 0x6e757469 ) /* itun */
+            {
+                i_ret = -1;
+                break;
+            }
 
             InitAES( &p_drms->aes, p_priv + 6 );
             memcpy( p_drms->p_key, p_priv + 12, 16 );
@@ -502,6 +529,7 @@ static void EndMD5( struct md5_s *p_md5 )
     memset( ((uint8_t *)p_md5->p_data) + i_current, 0, (56 - i_current) );
     p_md5->p_data[ 14 ] = p_md5->i_bits & 0xffffffff;
     p_md5->p_data[ 15 ] = (p_md5->i_bits >> 32);
+    REVERSE( &p_md5->p_data[ 14 ], 2 );
 
     Digest( p_md5, p_md5->p_data );
 }
@@ -517,9 +545,11 @@ static void EndMD5( struct md5_s *p_md5 )
 /*****************************************************************************
  * Digest: update the MD5 digest with 64 bytes of data
  *****************************************************************************/
-static void Digest( struct md5_s *p_md5, const uint32_t *p_input )
+static void Digest( struct md5_s *p_md5, uint32_t *p_input )
 {
     uint32_t a, b, c, d;
+
+    REVERSE( p_input, 16 );
 
     a = p_md5->p_digest[ 0 ];
     b = p_md5->p_digest[ 1 ];
@@ -841,6 +871,7 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
 
     if( !ReadUserKey( p_drms, p_user_key ) )
     {
+        REVERSE( p_user_key, 4 );
         return 0;
     }
 
@@ -872,6 +903,7 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
     {
         uint32_t p_tmp[ 4 ];
 
+        REVERSE( p_buffer, 4 );
         DecryptAES( &aes, p_tmp, p_buffer );
         BlockXOR( p_tmp, p_sci_key, p_tmp );
 
