@@ -4,6 +4,11 @@
 
 HEAD
 
+  * Nothing yet
+
+0.2.73
+Sat, 28 Apr 2001 07:02:35 +0200
+
   * Removed debug instructions in the audio output.
   * Coding style fixes here and there.
   * Miscellaneous QNX compile fixes.
