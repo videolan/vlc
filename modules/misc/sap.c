@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.2 2002/12/03 23:36:41 gitan Exp $
+ * $Id: sap.c,v 1.3 2002/12/04 06:23:08 titer Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *
@@ -55,7 +55,11 @@
 #else
 #   include <sys/socket.h>
 #   include <netinet/in.h>
-#   include <arpa/inet.h>
+#   if HAVE_ARPA_INET_H
+#      include <arpa/inet.h>
+#   elif defined( SYS_BEOS )
+#      include <net/netdb.h>
+#   endif
 #endif
 
 #include "network.h"
@@ -364,7 +368,13 @@ static sess_descr_t *  parse_sdp( char *  psz_pct, intf_thread_t * p_intf )
       if( ppsz_fill != NULL )
       {
          *ppsz_fill= malloc( sizeof(char) * (k+1) );
-         memccpy(*ppsz_fill, &(psz_pct[j-k+1]),'\n',  k ); 
+#if defined( SYS_BEOS )
+         /* BeOS doesn't have memccpy. This line probably won't work
+            properly, but BeOS has no multicast support anyway */
+         memcpy(*ppsz_fill, &(psz_pct[j-k+1]), k );
+#else
+         memccpy(*ppsz_fill, &(psz_pct[j-k+1]),'\n',  k );
+#endif
          (*ppsz_fill)[k]='\0';
       }
       ppsz_fill = NULL;

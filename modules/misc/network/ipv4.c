@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.7 2002/11/28 23:24:15 massiot Exp $
+ * $Id: ipv4.c,v 1.8 2002/12/04 06:23:08 titer Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -187,7 +187,11 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s) to avoid
      * packet loss caused by scheduling problems */
     i_opt = 0x80000;
+#if defined( SYS_BEOS )
+    if( setsockopt( i_handle, SOL_SOCKET, SO_NONBLOCK,
+#else
     if( setsockopt( i_handle, SOL_SOCKET, SO_RCVBUF,
+#endif
                     (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
 #ifdef HAVE_ERRNO_H
@@ -203,7 +207,11 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
      * is typically only 65535 bytes */
     i_opt = 0;
     i_opt_size = sizeof( i_opt );
+#if defined( SYS_BEOS )
+    if( getsockopt( i_handle, SOL_SOCKET, SO_NONBLOCK,
+#else
     if( getsockopt( i_handle, SOL_SOCKET, SO_RCVBUF,
+#endif
                     (void*) &i_opt, &i_opt_size ) == -1 )
     {
 #ifdef HAVE_ERRNO_H
@@ -266,7 +274,11 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     if( !*psz_bind_addr )
     {
         i_opt = 1;
+#if defined( SYS_BEOS )
+        if( setsockopt( i_handle, SOL_SOCKET, SO_NONBLOCK,
+#else
         if( setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST,
+#endif
                         (void*) &i_opt, sizeof( i_opt ) ) == -1 )
         {
 #ifdef HAVE_ERRNO_H
@@ -278,7 +290,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         }
     }
  
-#ifndef UNDER_CE
+#if !defined( UNDER_CE ) && !defined( SYS_BEOS )
     /* Join the multicast group if the socket is a multicast address */
 #ifndef IN_MULTICAST
 #   define IN_MULTICAST(a)         IN_CLASSD(a)

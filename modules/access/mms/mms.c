@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.10 2002/12/02 21:13:25 jlj Exp $
+ * $Id: mms.c,v 1.11 2002/12/04 06:23:08 titer Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -57,7 +57,11 @@
 #else
 #   include <sys/socket.h>
 #   include <netinet/in.h>
-#   include <arpa/inet.h>
+#   if HAVE_ARPA_INET_H
+#      include <arpa/inet.h>
+#   elif defined( SYS_BEOS )
+#      include <net/netdb.h>
+#   endif
 #endif
 
 #include "network.h"

@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.7 2002/12/03 02:00:37 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.8 2002/12/04 06:23:08 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -900,7 +900,6 @@ VLCView::MouseDown(BPoint where)
 {
 	VideoWindow* videoWindow = dynamic_cast<VideoWindow*>(Window());
 	BMessage* msg = Window()->CurrentMessage();
-	msg->PrintToStream();
 	int32 clicks;
 	uint32 buttons;
 	msg->FindInt32("clicks", &clicks);

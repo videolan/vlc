@@ -154,7 +154,11 @@ case "x${target_os}" in
     LDFLAGS_vlc="${LDFLAGS_vlc} -lbe"
     LDFLAGS_plugins="${LDFLAGS_plugins} -nostart"
     LDFLAGS_beos="${LDFLAGS_beos} -lbe -lmedia -lroot -ltracker -lstdc++.r4 -ltranslation"
-    LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind"
+    dnl BONE or not BONE ?
+    AC_CHECK_LIB( bind, inet_ntoa,
+        [ LDFLAGS_access_mms="${LDFLAGS_access_mms} -lbind"
+          LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind"],
+        [])
     ;;
   x*)
     SYS="${target_os}"
@@ -621,11 +625,7 @@ PLUGINS="${PLUGINS} aout_file"
 PLUGINS="${PLUGINS} i420_rgb i420_yuy2 i422_yuy2 i420_ymga"
 PLUGINS="${PLUGINS} id3 m3u"
 PLUGINS="${PLUGINS} wav araw demuxdump demuxsub adpcm"
-
-dnl
-dnl  Network modules
-dnl
-NETWORK_MODULES="access_udp access_http access_rtp ipv4 access_mms sap"
+PLUGINS="${PLUGINS} access_udp access_http access_rtp ipv4 access_mms sap"
 
 dnl
 dnl  Accelerated modules
@@ -635,11 +635,6 @@ MMXEXT_MODULES="memcpymmxext idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn imdct3dn downmix3dn"
 SSE_MODULES="imdctsse downmixsse"
 ALTIVEC_MODULES="idctaltivec motionaltivec memcpyaltivec"
-
-if test x${SYS} != xbeos
-then
-  PLUGINS="${PLUGINS} ${NETWORK_MODULES}"
-fi
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [ac_cv_mmx_inline],
