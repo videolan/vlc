@@ -2,7 +2,7 @@
  * real.c: Real demuxer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: real.c,v 1.1 2004/01/04 14:35:12 fenrir Exp $
+ * $Id: real.c,v 1.2 2004/01/07 15:31:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -314,7 +314,7 @@ static int Demux( demux_t *p_demux )
                 {
                     p_sys->i_pcr = tk->p_frame->i_dts;
 
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int)0, (int64_t)p_sys->i_pcr );
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_pcr );
                 }
                 es_out_Send( p_demux->out, tk->p_es, tk->p_frame );
 
@@ -383,7 +383,7 @@ static int Demux( demux_t *p_demux )
                     if( p_sys->i_pcr < tk->p_frame->i_dts )
                     {
                         p_sys->i_pcr = tk->p_frame->i_dts;
-                        es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int)0, (int64_t)p_sys->i_pcr );
+                        es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_pcr );
                     }
                     es_out_Send( p_demux->out, tk->p_es, tk->p_frame );
 
@@ -420,7 +420,7 @@ static int Demux( demux_t *p_demux )
                 if( p_sys->i_pcr < p_frame->i_dts )
                 {
                     p_sys->i_pcr = p_frame->i_dts;
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int)0, (int64_t)p_sys->i_pcr );
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_pcr );
                 }
                 es_out_Send( p_demux->out, tk->p_es, p_frame );
             }
@@ -475,7 +475,7 @@ static int Demux( demux_t *p_demux )
         {
             p_sys->i_pcr = i_pts;
 
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int)0, (int64_t)p_sys->i_pcr );
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_pcr );
         }
         es_out_Send( p_demux->out, tk->p_es, p_block );
     }

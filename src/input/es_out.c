@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: es_out.c,v 1.14 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: es_out.c,v 1.15 2004/01/07 15:31:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -588,8 +588,6 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
     es_out_sys_t *p_sys = out->p_sys;
     vlc_bool_t  b, *pb;
     int         i, *pi;
-    int         i_group;
-    int64_t     i_pcr;
 
     es_out_id_t *es;
 
@@ -699,14 +697,24 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case ES_OUT_SET_PCR:
+        case ES_OUT_SET_GROUP_PCR:
         {
             pgrm_descriptor_t *p_prgm = NULL;
+            int64_t           i_pcr;
 
-            i_group = (int)va_arg( args, int );
+            if( i_query == ES_OUT_SET_PCR )
+            {
+                p_prgm = p_sys->p_input->stream.p_selected_program;
+            }
+            else
+            {
+                int i_group = (int)va_arg( args, int );
+                p_prgm = input_FindProgram( p_sys->p_input, i_group );
+            }
             i_pcr   = (int64_t)va_arg( args, int64_t );
 
             /* search program */
-            if( ( p_prgm = input_FindProgram( p_sys->p_input, i_group ) ) )
+            if( p_prgm )
             {
                 input_ClockManageRef( p_sys->p_input, p_prgm, i_pcr * 9 / 100);
             }

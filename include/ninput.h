@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.22 2004/01/06 21:42:43 sigmunau Exp $
+ * $Id: ninput.h,v 1.23 2004/01/07 15:31:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -52,7 +52,8 @@ enum es_out_query_e
     ES_OUT_GET_ES_STATE,/* arg1= es_out_id_t* arg2=vlc_bool_t*  */
 
     /* XXX XXX XXX Don't use them YET !!! */
-    ES_OUT_SET_PCR,     /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
+    ES_OUT_SET_PCR,             /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
+    ES_OUT_SET_GROUP_PCR,       /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
     ES_OUT_RESET_PCR,   /* no arg */
 };
 
