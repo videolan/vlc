@@ -1,0 +1,11 @@
+--- libpng/scripts/makefile.macosx	Sun Sep 26 18:18:04 2004
++++ libpng/scripts/makefile.macosx.orig	Thu Oct  3 13:32:34 2002
+@@ -6,7 +6,7 @@
+ # For conditions of distribution and use, see copyright notice in png.h
+ 
+ # where make install puts libpng.a and png.h
+-prefix=/usr/local
++prefix=PREFIX
+
+ # Where the zlib library and include files are located
+ #ZLIBLIB=/usr/local/lib

@@ -107,4 +107,5 @@ CDIO_VERSION=0.70
 CDIO_URL=$(GNU)/libcdio/libcdio-$(CDIO_VERSION).tar.gz
 TOOLAME_VERSION=02m-beta8
 TOOLAME_URL=$(VIDEOLAN)/testing/contrib/toolame-$(TOOLAME_VERSION).tar.bz2
-
+PNG_VERSION=1.2.5
+PNG_URL=$(VIDEOLAN)/testing/contrib/libpng-$(PNG_VERSION).tar.bz2

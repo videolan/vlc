@@ -55,7 +55,7 @@ all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom .caca .mod \
-	.cddb .cdio .vcdimager
+	.cddb .cdio .vcdimager .png
 endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
@@ -949,6 +949,25 @@ toolame: toolame-$(TOOLAME_VERSION).tar.bz2
 CLEAN_FILE += .toolame
 CLEAN_PKG += toolame
 DISTCLEAN_PKG += toolame-$(TOOLAME_VERSION).tar.bz2
+
+# ***************************************************************************
+# libpng
+# ***************************************************************************
+
+libpng-$(PNG_VERSION).tar.bz2:
+	$(WGET) $(PNG_URL)
+
+libpng: libpng-$(PNG_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+	cat Patches/libpng.patch | sed s,PREFIX,$(PREFIX), | patch -p0
+
+.png: libpng
+	(cd $<; cp scripts/makefile.macosx Makefile && make shared && make install)
+	touch $@
+
+CLEAN_FILE += .png
+CLEAN_PKG += libpng
+DISCLEAN_PKG += libpng-$(PNG_VERSION).tar.bz2
 
 # ***************************************************************************
 # Some cleansing
