@@ -3270,7 +3270,7 @@ fi
 
 save_CFLAGS="${save_CFLAGS} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcdefghijklmnopqrstuvwxyz.' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`"
 
-for ac_func in gettimeofday select strerror strtod strtol isatty usleep vasprintf swab sigrelse getpwuid memalign posix_memalign
+for ac_func in gettimeofday select strerror strtod strtol isatty usleep vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
 echo "configure:3277: checking for $ac_func" >&5

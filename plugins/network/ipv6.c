@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.3 2002/03/15 04:41:54 sam Exp $
+ * $Id: ipv6.c,v 1.4 2002/04/18 04:34:37 sam Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -108,18 +108,34 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
     {
         p_socket->sin6_addr = in6addr_any;
     }
-    else if( *psz_address != '['
-              || psz_address[strlen(psz_address) - 1] != ']' )
-    {
-        intf_ErrMsg( "ipv6: IPv6 address is invalid, discarding" );
-        return( -1 );
-    } 
-    else
+    else if( psz_address[0] == '['
+              && psz_address[strlen(psz_address) - 1] == ']' )
     {
         psz_address++;
         psz_address[strlen(psz_address) - 1] = '\0' ;
         inet_pton(AF_INET6, psz_address, &p_socket->sin6_addr.s6_addr); 
     }
+    else
+    {
+#ifdef HAVE_GETHOSTBYNAME2
+        struct hostent    * p_hostent;
+
+        /* We have a fqdn, try to find its address */
+        if ( (p_hostent = gethostbyname2( psz_address, AF_INET6 )) == NULL )
+        {
+            intf_ErrMsg( "ipv6 error: unknown host %s", psz_address );
+            return( -1 );
+        }
+
+        /* Copy the first address of the host in the socket address */
+        memcpy( &p_socket->sin6_addr, p_hostent->h_addr_list[0],
+                 p_hostent->h_length );
+#else
+        intf_ErrMsg( "ipv6 error: IPv6 address %s is invalid", psz_address );
+        return( -1 );
+#endif
+    }
+
     return( 0 );
 }
 

@@ -76,6 +76,9 @@
 /* Define if you have the getgid function.  */
 #undef HAVE_GETGID
 
+/* Define if you have the gethostbyname2 function.  */
+#undef HAVE_GETHOSTBYNAME2
+
 /* Define if you have the getpagesize function.  */
 #undef HAVE_GETPAGESIZE
 

@@ -111,7 +111,7 @@ dnl The -DSYS_FOO flag
 save_CFLAGS="${save_CFLAGS} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcdefghijklmnopqrstuvwxyz.' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`"
 
 dnl Check for system libs needed
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty usleep vasprintf swab sigrelse getpwuid memalign posix_memalign)
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty usleep vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2)
 
 AC_CHECK_FUNC(connect,,[
   AC_CHECK_LIB(socket,connect,
