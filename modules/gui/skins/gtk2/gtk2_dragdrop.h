@@ -2,7 +2,7 @@
  * gtk2_dragdrop.h: GTK2 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_dragdrop.h,v 1.2 2003/04/19 11:16:17 asmax Exp $
+ * $Id: gtk2_dragdrop.h,v 1.3 2003/04/19 11:46:11 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -34,8 +34,8 @@
 //---------------------------------------------------------------------------
 class GTK2DropObject
 {
-
-    intf_thread_t *p_intf;
+    private:
+        intf_thread_t *p_intf;
 
     public:
        GTK2DropObject( intf_thread_t *_p_intf );

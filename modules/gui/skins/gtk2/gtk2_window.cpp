@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.21 2003/04/19 11:16:17 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.22 2003/04/19 11:46:11 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -106,7 +106,7 @@ GTK2Window::GTK2Window( intf_thread_t *p_intf, GdkWindow *gwnd, int x, int y,
     if( DragDrop )
     {
         // register the listview as a drop target
-        GTK2DropObject *DropDrop = new GTK2DropObject( p_intf );
+        DropObject = new GTK2DropObject( p_intf );
         gdk_window_register_dnd( gwnd );
     }
 

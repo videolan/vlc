@@ -2,7 +2,7 @@
  * gtk2_dragdrop.cpp: GTK2 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_dragdrop.cpp,v 1.4 2003/04/19 11:16:17 asmax Exp $
+ * $Id: gtk2_dragdrop.cpp,v 1.5 2003/04/19 11:46:11 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -66,11 +66,15 @@ void GTK2DropObject::HandleDropStart( GdkDragContext *context )
     for( int i = 0; i < len / sizeof(GdkAtom); i++ )
     {
         GdkAtom atom = ( (GdkAtom*)buffer )[i];
-        string name = gdk_atom_name( atom );
-        if( name == "text/plain" || name == "STRING" )
+        gchar *name = gdk_atom_name( atom );
+        if( name )
         {
-            target = name;
-            break;
+            string curTarget = name;
+            if( (curTarget == "text/plain" || curTarget == "STRING") )
+            {
+                target = curTarget;
+                break;
+            }
         }
     }
 
