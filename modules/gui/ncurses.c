@@ -85,7 +85,7 @@ static void ReadDir        ( intf_thread_t * );
 
 #define BROWSE_TEXT N_("Filebrowser starting point")
 #define BROWSE_LONGTEXT N_( \
-    "This option allows you to specify directory the ncurses filebrowser " \
+    "This option allows you to specify the directory the ncurses filebrowser " \
     "will show you initially.")
 
 vlc_module_begin();

@@ -44,16 +44,16 @@ static void Display   ( vout_thread_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 #define WIDTH_TEXT N_( "snapshot width" )
-#define WIDTH_LONGTEXT N_( "Set the width of the snapshot image" )
+#define WIDTH_LONGTEXT N_( "Set the width of the snapshot image." )
 
 #define HEIGHT_TEXT N_( "snapshot height" )
-#define HEIGHT_LONGTEXT N_( "Set the height of the snapshot image" )
+#define HEIGHT_LONGTEXT N_( "Set the height of the snapshot image." )
 
 #define CHROMA_TEXT N_( "chroma" )
-#define CHROMA_LONGTEXT N_( "Set the desired chroma for the snapshot image (a 4 character string)" )
+#define CHROMA_LONGTEXT N_( "Set the desired chroma for the snapshot image (a 4 character string)." )
 
 #define CACHE_TEXT N_( "cache size (number of images)" )
-#define CACHE_LONGTEXT N_( "Set the cache size (number of images to keep)" )
+#define CACHE_LONGTEXT N_( "Set the cache size (number of images to keep)." )
 
 
 vlc_module_begin( );

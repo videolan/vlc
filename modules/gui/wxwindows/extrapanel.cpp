@@ -394,7 +394,7 @@ wxPanel *ExtraPanel::AudioPanel( wxWindow *parent )
     wxCheckBox * normvol_check = new wxCheckBox( panel, NormVol_Event,
                                     wxU(_("Volume normalization")));
     normvol_check->SetToolTip( wxU(_("This filter prevents the audio output "
-                         "power from going over a defined value" ) ) );
+                         "power from going over a defined value." ) ) );
 
     wxStaticText *normvol_label = new wxStaticText( panel, -1,
                                    wxU( _("Maximum level") ) );
@@ -465,7 +465,7 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
                             wxU(_("2 Pass") ) );
 
     eq_2p_chkbox->SetToolTip( wxU(_("If you enable this settting, the "
-     "equalizer filter will be applied twice. The effect will be sharper") ) );
+     "equalizer filter will be applied twice. The effect will be sharper.") ) );
 
     top_sizer->Add( eq_2p_chkbox, 0, wxALL, 2 );
 
@@ -916,7 +916,7 @@ void ExtraPanel::OnFiltersInfo(wxCommandEvent& event)
                   "You can then configure each filter.\n"
                   "If you want fine control over the filters ( to choose "
                   "the order in which they are applied ), you need to enter "
-                  "manually a filters string (Preferences / General / Video."
+                  "manually a filters string (Preferences / General / Video.)"
                   ) ),
                     wxU( _("More information" ) ), wxOK | wxICON_INFORMATION,
                     this->p_parent );

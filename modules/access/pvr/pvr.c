@@ -51,7 +51,7 @@ static void Close( vlc_object_t * );
 static int i_norm_list[] = { V4L2_STD_UNKNOWN, V4L2_STD_SECAM, V4L2_STD_PAL,
                              V4L2_STD_NTSC };
 static char *psz_norm_list_text[] = { N_("Automatic"), N_("SECAM"),
-                                      N_("PAL"),  N_("NSTC") };
+                                      N_("PAL"),  N_("NTSC") };
 
 #define WIDTH_TEXT N_( "Width" )
 #define WIDTH_LONGTEXT N_( "Width of the stream to capture (-1 for " \
@@ -68,7 +68,7 @@ static char *psz_norm_list_text[] = { N_("Automatic"), N_("SECAM"),
 #define KEYINT_LONGTEXT N_( "Interval between keyframes (-1 for " \
                                 " auto)" )
 #define BFRAMES_TEXT N_( "B Frames" )
-#define BFRAMES_LONGTEXT N_("If this option is set, B-Frames will be used." \
+#define BFRAMES_LONGTEXT N_("If this option is set, B-Frames will be used. " \
                             "Use this option to set the number of B-Frames.")
 #define BITRATE_TEXT N_( "Bitrate" )
 #define BITRATE_LONGTEXT N_( "Bitrate to use (-1 for default)" )
@@ -80,7 +80,7 @@ static char *psz_norm_list_text[] = { N_("Automatic"), N_("SECAM"),
 #define BITMASK_LONGTEXT N_("This option allows setting of bitmask that will get used by the audio part of the card." )
 #define CHAN_TEXT N_( "Channel" )
 #define CHAN_LONGTEXT N_( "Channel of the card to use (Usually, 0 = tuner, " \
-                          "1 = composite, 2 = svideo )" )
+                          "1 = composite, 2 = svideo)" )
 
 static int i_bitrates[] = { 0, 1 };
 static char *psz_bitrates_list_text[] = { N_("vbr"), N_("cbr") };

@@ -118,7 +118,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         p_module = config_FindModule( VLC_OBJECT(p_aout), "goom" );
         if( p_module )
         {
-            val.psz_string = "goom"; text.psz_string = _("Goom");
+            val.psz_string = "goom"; text.psz_string = "Goom";
             var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         }
 
@@ -126,7 +126,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         p_module = config_FindModule( VLC_OBJECT(p_aout), "galaktos" );
         if( p_module )
         {
-            val.psz_string = "galaktos"; text.psz_string = _("GaLaktos");
+            val.psz_string = "galaktos"; text.psz_string = "GaLaktos";
             var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         }
 

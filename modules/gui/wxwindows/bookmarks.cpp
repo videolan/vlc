@@ -499,7 +499,7 @@ void BookmarksDialog::OnEdit( wxCommandEvent& event )
            if( !p_input )
            {
                 wxMessageBox( wxU( _("No input found. The stream must be "
-                                  "playing or paused for bookmarks to work") ),
+                                  "playing or paused for bookmarks to work.") ),
                                wxU( _("No input") ), wxICON_WARNING | wxOK,
                                this );
                 return;
