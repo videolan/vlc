@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.171 2004/02/08 20:19:03 jpsaman Exp $
+dnl $Id: configure.ac,v 1.172 2004/02/08 21:00:19 jpsaman Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -1803,7 +1803,8 @@ then
   if test "${with_ffmpeg_tree}" = "no" -o -z "${with_ffmpeg_tree}"; then
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
-    AC_CHECK_HEADERS(ffmpeg/avcodec.h postproc/postprocess.h)
+    AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
+    AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
     AC_CHECK_LIB(avcodec, avcodec_init, [
       AX_ADD_BUILTINS([ffmpeg stream_out_transcode])
       AX_ADD_LDFLAGS([ffmpeg],[-lavcodec])
