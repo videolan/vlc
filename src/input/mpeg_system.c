@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.16 2000/12/22 13:04:45 sam Exp $
+ * $Id: mpeg_system.c,v 1.17 2000/12/22 15:00:42 sam Exp $
  *
  * Authors: 
  *
@@ -202,6 +202,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 if( (*p_byte & 0xC0) == 0x40 )
                 {
                     /* Don't ask why... --Meuuh */
+                    /* Erm... why ? --Sam */
                     p_byte += 2;
                     i_pes_header_size += 2;
                     if( p_byte >= p_data->p_payload_end )
@@ -287,7 +288,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             break;
         }
 
-        if( p_es->i_stream_id == 0xBC )
+        if( p_es->i_stream_id == 0xbd )
         {
             /* With private stream 1, the first byte of the payload
              * is a stream_private_id, so skip it. */
@@ -358,7 +359,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
 
     //intf_DbgMsg("PES-demultiplexing %p (%p)", p_ts_packet, p_pes);
 
-    /* If we lost data, insert an NULL data packet (philosophy : 0 is quite
+    /* If we lost data, insert a NULL data packet (philosophy : 0 is quite
      * often an escape sequence in decoders, so that should make them wait
      * for the next start code). */
     if( b_packet_lost || p_es->b_discontinuity )
@@ -986,8 +987,8 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                     if( p[5] & 0x80 )
                     {
                         intf_WarnMsg( 2,
-                            "discontinuity_indicator"                       \
-                            " encountered by TS demux (position read: %d,"  \
+                            "discontinuity_indicator"
+                            " encountered by TS demux (position read: %d,"
                             " saved: %d)",
                             p[5] & 0x80, p_es_demux->i_continuity_counter );
     
@@ -1037,9 +1038,10 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
         {
             if( !b_payload && i_dummy == 0 )
             {
-                /* This is a packet without payload, this is allowed by the draft.
-                 * As there is nothing interesting in this packet (except PCR that
-                 * have already been handled), we can trash the packet. */
+                /* This is a packet without payload, this is allowed by the
+                 * draft. As there is nothing interesting in this packet
+                 * (except PCR that have already been handled), we can trash
+                 * the packet. */
                 intf_WarnMsg( 1,
                               "Packet without payload received by TS demux" );
                 b_trash = 1;
@@ -1053,10 +1055,10 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
             }
             else if( p_es_demux->i_continuity_counter == 0xFF )
             {
-                /* This means that the packet is the first one we receive for this
-                 * ES since the continuity counter ranges between 0 and 0x0F
-                 * excepts when it has been initialized by the input: Init the
-                 * counter to the correct value. */
+                /* This means that the packet is the first one we receive for
+                 * this ES since the continuity counter ranges between 0 and
+                 * 0x0F excepts when it has been initialized by the input:
+                 * init the counter to the correct value. */
                 intf_DbgMsg( "First packet for PID %d received by TS demux",
                              p_es->i_id );
                 p_es_demux->i_continuity_counter = (p[3] & 0x0f);
@@ -1064,9 +1066,9 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
             else
             {
                 /* This can indicate that we missed a packet or that the
-                 * continuity_counter wrapped and we received a dup packet: as we
-                 * don't know, do as if we missed a packet to be sure to recover
-                 * from this situation */
+                 * continuity_counter wrapped and we received a dup packet:
+                 * as we don't know, do as if we missed a packet to be sure
+                 * to recover from this situation */
                 intf_WarnMsg( 2,
                            "Packet lost by TS demux: current %d, packet %d",
                            p_es_demux->i_continuity_counter & 0x0f,
