@@ -2,7 +2,7 @@
  * x11_tooltip.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_tooltip.cpp,v 1.2 2004/01/25 18:41:08 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>

@@ -2,7 +2,7 @@
  * cmd_on_top.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_on_top.hpp,v 1.2 2004/01/05 22:17:32 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>

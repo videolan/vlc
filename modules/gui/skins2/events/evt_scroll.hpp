@@ -2,7 +2,7 @@
  * evt_scroll.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: evt_scroll.hpp,v 1.2 2004/02/14 12:49:35 gbazin Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
