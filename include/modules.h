@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.35 2001/12/07 18:33:07 sam Exp $
+ * $Id: modules.h,v 1.36 2001/12/09 17:01:35 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -64,7 +64,7 @@ typedef void *  module_handle_t;
 #define MODULE_CAPABILITY_IDCT     1 <<  6  /* IDCT transformation */
 #define MODULE_CAPABILITY_AOUT     1 <<  7  /* Audio output */
 #define MODULE_CAPABILITY_VOUT     1 <<  8  /* Video output */
-#define MODULE_CAPABILITY_YUV      1 <<  9  /* YUV colorspace conversion */
+#define MODULE_CAPABILITY_CHROMA   1 <<  9  /* colorspace conversion */
 #define MODULE_CAPABILITY_IMDCT    1 << 10  /* IMDCT transformation */
 #define MODULE_CAPABILITY_DOWNMIX  1 << 11  /* AC3 downmix */
 #define MODULE_CAPABILITY_MEMCPY   1 << 12  /* memcpy */
@@ -87,6 +87,13 @@ typedef struct probedata_s
     {
         char * psz_data;
     } aout;
+
+    struct
+    {
+        struct { int i_chroma; int i_width; int i_height; } source;
+        struct { int i_chroma; int i_width; int i_height; } dest;
+    } chroma;
+
 } probedata_t;
 
 /* FIXME: find a nicer way to do this. */
@@ -155,9 +162,10 @@ typedef struct function_list_s
             void ( * pf_end )        ( struct vout_thread_s * );
             void ( * pf_destroy )    ( struct vout_thread_s * );
             int  ( * pf_manage )     ( struct vout_thread_s * );
-            void ( * pf_display )    ( struct vout_thread_s * );
-            void ( * pf_setpalette ) ( struct vout_thread_s *, u16 *red,
-                                       u16 *green, u16 *blue, u16 *transp );
+            void ( * pf_display )    ( struct vout_thread_s *,
+                                       struct picture_s * );
+            void ( * pf_setpalette ) ( struct vout_thread_s *,
+                                       u16 *, u16 *, u16 * );
         } vout;
 
         /* Motion compensation plugin */
@@ -182,13 +190,13 @@ typedef struct function_list_s
             void ( * pf_norm_scan )    ( u8 ppi_scan[2][64] );
         } idct;
 
-        /* YUV transformation plugin */
+        /* Chroma transformation plugin */
         struct
         {
             int  ( * pf_init )         ( struct vout_thread_s * );
             int  ( * pf_reset )        ( struct vout_thread_s * );
             void ( * pf_end )          ( struct vout_thread_s * );
-        } yuv;
+        } chroma;
 
         /* IMDCT plugin */
         struct
@@ -247,7 +255,7 @@ typedef struct module_functions_s
     function_list_t idct;
     function_list_t aout;
     function_list_t vout;
-    function_list_t yuv;
+    function_list_t chroma;
     function_list_t imdct;
     function_list_t downmix;
     function_list_t memcpy;

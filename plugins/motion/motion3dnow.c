@@ -2,7 +2,7 @@
  * motion3dnow.c : 3DNow! motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motion3dnow.c,v 1.4 2001/11/28 15:08:05 massiot Exp $
+ * $Id: motion3dnow.c,v 1.5 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -33,7 +33,6 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "intf_msg.h"
 #include "threads.h"

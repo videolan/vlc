@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.3 2001/12/03 16:18:37 sam Exp $
+ * $Id: lpcm_adec.c,v 1.4 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -38,7 +38,6 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"

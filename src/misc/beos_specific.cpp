@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.12 2001/11/28 15:08:06 massiot Exp $
+ * $Id: beos_specific.cpp,v 1.13 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -32,7 +32,6 @@
 
 extern "C"
 {
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"

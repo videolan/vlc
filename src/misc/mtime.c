@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.25 2001/11/28 15:08:06 massiot Exp $
+ * $Id: mtime.c,v 1.26 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -52,7 +52,6 @@
 #   include <sys/time.h>
 #endif
 
-#include "config.h"
 #include "common.h"
 #include "mtime.h"
 
@@ -97,11 +96,9 @@ mtime_t mdate( void )
         QueryPerformanceCounter( (LARGE_INTEGER *)&usec_time );
         return ( usec_time * 1000000 ) / freq;
     }
-    else
-    {
-        /* Milisecond resolution */
-        return 1000 * GetTickCount();
-    }
+
+    /* Milisecond resolution */
+    return 1000 * GetTickCount();
 
 #else
     struct timeval tv_date;

@@ -2,7 +2,7 @@
  * ac3_exponent.c: ac3 exponent calculations
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_exponent.c,v 1.3 2001/11/28 15:08:04 massiot Exp $
+ * $Id: ac3_exponent.c,v 1.4 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -30,7 +30,6 @@
 
 #include <string.h>                                    /* memcpy(), memset() */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"

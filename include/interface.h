@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.22 2001/03/21 13:42:33 sam Exp $
+ * $Id: interface.h,v 1.23 2001/12/09 17:01:35 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -44,21 +44,6 @@
  * This structe describes all interface-specific data of the main (interface)
  * thread.
  *****************************************************************************/
-typedef struct _keyparam
-{
-    int key;
-    int param;
-} keyparm;
-
-typedef struct _key
-{
-    int received_key;
-    keyparm forwarded;
-    struct _key *  next;
-} intf_key;
-
-typedef intf_key * p_intf_key;
-
 typedef struct intf_thread_s
 {
     boolean_t           b_die;                                 /* `die' flag */
@@ -66,7 +51,6 @@ typedef struct intf_thread_s
     /* Specific interfaces */
     p_intf_console_t    p_console;                                /* console */
     p_intf_sys_t        p_sys;                           /* system interface */
-    p_intf_key          p_keys;
     
     /* Plugin used and shortcuts to access its capabilities */
     struct module_s *   p_module;
@@ -83,11 +67,8 @@ typedef struct intf_thread_s
     /* Channels array - NULL if not used */
     p_intf_channel_t    p_channel;                /* description of channels */
 
-    /* Main threads - NULL if not active */
+    /* Input thread - NULL if not active */
     p_input_thread_t    p_input;
-
-    /* Specific functions */
-    keyparm (*p_intf_get_key)(struct intf_thread_s *p_intf, int r_key) ;
 
     /* XXX: new message passing stuff will go here */
     vlc_mutex_t         change_lock;
@@ -101,10 +82,4 @@ typedef struct intf_thread_s
  *****************************************************************************/
 intf_thread_t * intf_Create             ( void );
 void            intf_Destroy            ( intf_thread_t * p_intf );
-
-int             intf_ProcessKey         ( intf_thread_t * p_intf, int i_key );
-
-void intf_AssignKey( intf_thread_t *p_intf, int r_key, int f_key, int param);
-keyparm intf_GetKey( intf_thread_t *p_intf, int r_key);
-void intf_AssignNormalKeys( intf_thread_t *p_intf);
 

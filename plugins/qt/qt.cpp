@@ -2,7 +2,7 @@
  * qt.cpp : Qt plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: qt.cpp,v 1.4 2001/11/28 15:08:05 massiot Exp $
+ * $Id: qt.cpp,v 1.5 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,7 +34,6 @@
 
 extern "C"
 {
-#include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "intf_msg.h"
 #include "threads.h"

@@ -1,0 +1,20 @@
+bug #09/11/2001-1: (FIXED 20/11/2001, by JP Saman)
+	Makefile.opts.in and Makefile.opts static libmad.a library is not filled in automatically by configure.
+	It should say in Makefile.opts LIB_MAD=lib/libmad.a
+
+bug #09/11/2001-2:
+	libmad/mad.h is not created automatically. Fix compile step and dependencies for mad_adec to automatically
+	configure and or build libmad when not build yet. This means integration of configure.in scripts.
+
+bug #12/11/2001-1 (WORKING, by JP Saman)
+	smoothen out audio in libmad_output callback function, by optimizing conversion routines. After investigation
+	and experimenting I found out that my input routine and output routine were not balanced correctly with
+	respect to buffer sizes. A lot of data got lost. I fixed that, but still need a bater scaling/smoothing routine
+	for the audio.
+
+bug #20/11/2001-1 (FIXED 25/11/2001, by JP Saman)
+	synchronization between audio and video output is lost. In libmad_output a timestamp is set on the audio data, but
+	it points to a later video frame, then when the audio data was read. How can I set the correct timestamp on the
+        audio fifo at the time it was read from the bitstream, so that it matches the video frame it belongs to?
+        Solution: Do it in two steps, in the input function save i_pts of fifo and in output function pass saved i_pts to
+        aout_fifo.

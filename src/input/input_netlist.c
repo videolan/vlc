@@ -6,7 +6,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_netlist.c,v 1.47 2001/12/03 17:34:08 stef Exp $
+ * $Id: input_netlist.c,v 1.48 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -45,7 +45,6 @@
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"                                           /* intf_*Msg */
 #include "threads.h"                                                /* mutex */

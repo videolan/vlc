@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.5 2001/12/03 16:18:37 sam Exp $
+ * $Id: ac3_adec.c,v 1.6 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -36,7 +36,6 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* memset() */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"

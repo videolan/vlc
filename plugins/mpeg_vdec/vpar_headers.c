@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
+ * $Id: vpar_headers.c,v 1.3 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -30,7 +30,6 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                    /* memcpy(), memset() */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -438,8 +437,11 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     {
         intf_WarnMsg( 1, "vpar: no vout present, spawning one" );
 
-        p_vpar->p_vout = vout_CreateThread( NULL, p_vpar->sequence.i_width,
-                                            p_vpar->sequence.i_height );
+        p_vpar->p_vout =
+            vout_CreateThread( NULL, p_vpar->sequence.i_width,
+                                     p_vpar->sequence.i_height,
+                                     99 + p_vpar->sequence.i_chroma_format,
+                                     p_vpar->sequence.i_aspect_ratio );
 
         /* Everything failed */
         if( p_vpar->p_vout == NULL )
@@ -447,6 +449,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
             intf_ErrMsg( "vpar error: can't open vout, aborting" );
             vlc_mutex_unlock( &p_vout_bank->lock );
 
+            p_vpar->p_fifo->b_error = 1;
             /* XXX ! XXX ! XXX ! what to do here ? */
             return;
         }
@@ -641,7 +644,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                      * but will prevent us from segfaulting in the slice
                      * parsing. */
                     static picture_t    fake_picture;
-                    fake_picture.p_data = NULL; /* We will use it later */
+                    fake_picture.i_planes = 0; /* We will use it later */
                     p_vpar->sequence.p_forward = &fake_picture;
                 }
             }
@@ -735,12 +738,13 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     {
         /* This is a new frame. Get a structure from the video_output. */
         while( ( P_picture = vout_CreatePicture( p_vpar->p_vout,
-                              /* XXX */ 99+p_vpar->sequence.i_chroma_format,
                                         p_vpar->sequence.i_width,
-                                        p_vpar->sequence.i_height ) )
+                                        p_vpar->sequence.i_height,
+                         /* XXX */ 99 + p_vpar->sequence.i_chroma_format,
+                                        p_vpar->sequence.i_aspect_ratio ) )
              == NULL )
         {
-            intf_DbgMsg("vpar debug: allocation error in vout_CreatePicture, delaying");
+            intf_DbgMsg("vpar debug: vout_CreatePicture failed, delaying");
             if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
             {
                 return;
@@ -754,9 +758,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         P_picture->i_matrix_coefficients = p_vpar->sequence.i_matrix_coefficients;
         p_vpar->picture.i_field_width = ( p_vpar->sequence.i_width
                     << ( 1 - p_vpar->picture.b_frame_structure ) );
-
-/* FIXME ! remove asap ?? */
-//memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
 
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, P_picture );
@@ -859,7 +860,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     }
 
     if( p_vpar->sequence.p_forward != NULL &&
-        p_vpar->sequence.p_forward->p_data == NULL )
+        p_vpar->sequence.p_forward->i_planes == 0 )
     {
         /* This can only happen with the fake picture created for section
          * 7.6.3.5. Clean up our mess. */

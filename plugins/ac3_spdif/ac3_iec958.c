@@ -2,7 +2,7 @@
  * ac3_iec958.c: ac3 to spdif converter
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_iec958.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
+ * $Id: ac3_iec958.c,v 1.3 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -37,7 +37,6 @@
 #include <unistd.h>
 #endif
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"

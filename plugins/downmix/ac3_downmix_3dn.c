@@ -2,7 +2,7 @@
  * ac3_downmix_3dn.c: accelerated 3D Now! ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_3dn.c,v 1.6 2001/11/28 15:08:05 massiot Exp $
+ * $Id: ac3_downmix_3dn.c,v 1.7 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -29,7 +29,6 @@
  *****************************************************************************/
 #include "defs.h"
 
-#include "config.h"
 #include "common.h"
 
 #include "ac3_downmix.h"

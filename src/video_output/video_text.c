@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.31 2001/11/28 15:08:06 massiot Exp $
+ * $Id: video_text.c,v 1.32 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -51,7 +51,6 @@
 #   include <io.h>
 #endif
 
-#include "config.h"
 #include "common.h"
 #include "video_text.h"
 

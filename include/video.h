@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.32 2001/08/22 17:21:45 massiot Exp $
+ * $Id: video.h,v 1.33 2001/12/09 17:01:35 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -31,6 +31,17 @@
  *****************************************************************************/
 
 /*****************************************************************************
+ * plane_t: description of a planar graphic field
+ *****************************************************************************/
+typedef u8 pixel_data_t;
+
+typedef struct plane_s
+{
+    pixel_data_t *p_data;
+    int           i_bytes;
+} plane_t;
+
+/*****************************************************************************
  * picture_t: video picture
  *****************************************************************************
  * Any picture destined to be displayed by a video output thread should be
@@ -40,47 +51,67 @@
  *****************************************************************************/
 typedef struct picture_s
 {
+    /* Picture data - data can always be freely modified, but no pointer
+     * may EVER be modified. A direct buffer can be handled as the plugin
+     * wishes, but for internal video output pictures the allocated pointer
+     * MUST be planes[0].p_data */
+    plane_t         planes[ VOUT_MAX_PLANES ];  /* description of the planes */
+    int             i_planes;                  /* number of allocated planes */
+
     /* Type and flags - should NOT be modified except by the vout thread */
-    int             i_type;                                  /* picture type */
     int             i_status;                               /* picture flags */
     int             i_matrix_coefficients;     /* in YUV type, encoding type */
 
     /* Picture management properties - these properties can be modified using
-     * the video output thread API, but should ne be written directly */
+     * the video output thread API, but should never be written directly */
     int             i_refcount;                    /* link reference counter */
     mtime_t         date;                                    /* display date */
 
     /* Picture static properties - those properties are fixed at initialization
      * and should NOT be modified */
     int             i_width;                                /* picture width */
-    int             i_chroma_width;                          /* chroma width */
     int             i_height;                              /* picture height */
-    int             i_size;                                /* number of pels */
-    int             i_chroma_size;                  /* number of chroma pels */
+    int             i_chroma;                              /* picture chroma */
+    int             i_aspect_ratio;                          /* aspect ratio */
+    boolean_t       b_directbuffer;               /* is it a direct buffer ? */
+
+    /* These values can be calculated from i_chroma, i_width and i_height
+     * but we leave them to prevent unnecessary calculation */
+    int             i_size;
+    int             i_chroma_width;
+    int             i_chroma_size;
+
+    /* Picture margins - needed because of possible padding issues */
+    int             i_left_margin;
+    int             i_right_margin;
+    int             i_top_margin;
+    int             i_bottom_margin;
 
     /* Picture dynamic properties - those properties can be changed by the
      * decoder */
-    int             i_display_horizontal_offset;   /* ISO/IEC 13818-2 6.3.12 */
-    int             i_display_vertical_offset;     /* ISO/IEC 13818-2 6.3.12 */
-    int             i_display_width;                 /* useful picture width */
-    int             i_display_height;               /* useful picture height */
-    int             i_aspect_ratio;                          /* aspect ratio */
+    boolean_t       b_progressive_frame;      /* is it a progressive frame ? */
+    boolean_t       b_repeat_first_field;                         /* RFF bit */
+    boolean_t       b_top_field_first;               /* which field is first */
 
-    /* Picture data - data can always be freely modified. p_data itself
-     * (the pointer) should NEVER be modified. In YUV format, the p_y, p_u and
-     * p_v data pointers refers to different areas of p_data, and should not
-     * be freed */
-    void *          p_data;                                  /* picture data */
-    yuv_data_t *    p_y;        /* pointer to beginning of Y image in p_data */
-    yuv_data_t *    p_u;        /* pointer to beginning of U image in p_data */
-    yuv_data_t *    p_v;        /* pointer to beginning of V image in p_data */
+    /* Macroblock counter - the decoder use it to verify if it has
+     * decoded all the macroblocks of the picture */
+    int             i_deccount;
+    vlc_mutex_t     lock_deccount;
+
+    /* Private data - the video output plugin might want to put stuff here to
+     * keep track of the picture */
+    struct picture_sys_s *p_sys;
+
 } picture_t;
 
-/* Pictures types */
+/* Pictures chromas */
 #define EMPTY_PICTURE           0     /* picture slot is empty and available */
 #define YUV_420_PICTURE         100                     /* 4:2:0 YUV picture */
 #define YUV_422_PICTURE         101                     /* 4:2:2 YUV picture */
 #define YUV_444_PICTURE         102                     /* 4:4:4 YUV picture */
+#define RGB_8BPP_PICTURE        200                      /* RGB 8bpp picture */
+#define RGB_16BPP_PICTURE       201                     /* RGB 16bpp picture */
+#define RGB_32BPP_PICTURE       202                     /* RGB 32bpp picture */
 
 /* Pictures status */
 #define FREE_PICTURE            0                  /* free and not allocated */
@@ -96,6 +127,23 @@ typedef struct picture_s
 #define AR_3_4_PICTURE          2                        /* 3:4 picture (TV) */
 #define AR_16_9_PICTURE         3              /* 16:9 picture (wide screen) */
 #define AR_221_1_PICTURE        4                  /* 2.21:1 picture (movie) */
+
+/* Plane indices */
+#define YUV_PLANE               0
+#define RGB_PLANE               0
+#define Y_PLANE                 0
+#define U_PLANE                 1
+#define V_PLANE                 2
+#define Cb_PLANE                1
+#define Cr_PLANE                2
+#define R_PLANE                 0
+#define G_PLANE                 1
+#define B_PLANE                 2
+
+/* Shortcuts */
+#define P_Y planes[ Y_PLANE ].p_data
+#define P_U planes[ U_PLANE ].p_data
+#define P_V planes[ V_PLANE ].p_data
 
 /*****************************************************************************
  * subpicture_t: video subtitle

@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.11 2001/11/28 15:08:05 massiot Exp $
+ * $Id: alsa.c,v 1.12 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -33,7 +33,6 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "intf_msg.h"
 #include "threads.h"

@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.2 2001/05/30 17:03:12 sam Exp $
+ * $Id: gnome.c,v 1.3 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -29,10 +29,11 @@
  *****************************************************************************/
 #include "defs.h"
 
+#include <string.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 

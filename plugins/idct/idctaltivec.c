@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: idctaltivec.c,v 1.20 2001/12/06 13:46:23 massiot Exp $
+ * $Id: idctaltivec.c,v 1.21 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -35,7 +35,6 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"

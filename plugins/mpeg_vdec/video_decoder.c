@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_decoder.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
+ * $Id: video_decoder.c,v 1.3 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -35,7 +35,6 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <errno.h>                                                  /* errno */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"

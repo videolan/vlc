@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_x11.c,v 1.33 2001/12/07 18:33:08 sam Exp $
+ * $Id: vout_x11.c,v 1.34 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -60,71 +60,13 @@
 
 #include "video.h"
 #include "video_output.h"
+#include "vout_common.h"
 
 #include "interface.h"
-
 #include "netutils.h"                                 /* network_ChannelJoin */
 
 #include "modules.h"
 #include "modules_export.h"
-
-/*****************************************************************************
- * vout_sys_t: video output X11 method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the X11 specific properties of an output thread. X11 video
- * output is performed through regular resizable windows. Windows can be
- * dynamically resized to adapt to the size of the streams.
- *****************************************************************************/
-typedef struct vout_sys_s
-{
-    /* User settings */
-    boolean_t           b_shm;               /* shared memory extension flag */
-
-    /* Internal settings and properties */
-    Display *           p_display;                        /* display pointer */
-    Visual *            p_visual;                          /* visual pointer */
-    int                 i_screen;                           /* screen number */
-    Window              window;                               /* root window */
-    GC                  gc;              /* graphic context instance handler */
-    Colormap            colormap;               /* colormap used (8bpp only) */
-
-    /* Display buffers and shared memory information */
-    XImage *            p_ximage[2];                       /* XImage pointer */
-    XShmSegmentInfo     shm_info[2];       /* shared memory zone information */
-
-    /* X11 generic properties */
-    Atom                wm_protocols;
-    Atom                wm_delete_window;
-
-    int                 i_width;                     /* width of main window */
-    int                 i_height;                   /* height of main window */
-
-    /* Screen saver properties */
-    int                 i_ss_timeout;                             /* timeout */
-    int                 i_ss_interval;           /* interval between changes */
-    int                 i_ss_blanking;                      /* blanking mode */
-    int                 i_ss_exposure;                      /* exposure mode */
-
-    /* Mouse pointer properties */
-    mtime_t             i_lastmoved;                     /* Auto-hide cursor */
-    boolean_t           b_mouse_pointer_visible;
-    Cursor              blank_cursor;                   /* the hidden cursor */
-    Pixmap              cursor_pixmap;
-
-} vout_sys_t;
-
-/* Fullscreen needs to be able to hide the wm decorations */
-#define MWM_HINTS_DECORATIONS   (1L << 1)
-#define PROP_MWM_HINTS_ELEMENTS 5
-typedef struct mwmhints_s
-{
-    u32 flags;
-    u32 functions;
-    u32 decorations;
-    s32 input_mode;
-    u32 status;
-} mwmhints_t;
 
 /*****************************************************************************
  * Local prototypes
@@ -134,11 +76,9 @@ static int  vout_Create    ( struct vout_thread_s * );
 static int  vout_Init      ( struct vout_thread_s * );
 static void vout_End       ( struct vout_thread_s * );
 static void vout_Destroy   ( struct vout_thread_s * );
-static int  vout_Manage    ( struct vout_thread_s * );
 static void vout_Display   ( struct vout_thread_s * );
 static void vout_SetPalette( struct vout_thread_s *, u16*, u16*, u16*, u16* );
 
-static int  X11CreateWindow     ( vout_thread_t *p_vout );
 static int  X11InitDisplay      ( vout_thread_t *p_vout, char *psz_display );
 
 static int  X11CreateImage      ( vout_thread_t *p_vout, XImage **pp_ximage );
@@ -147,10 +87,6 @@ static int  X11CreateShmImage   ( vout_thread_t *p_vout, XImage **pp_ximage,
                                   XShmSegmentInfo *p_shm_info );
 static void X11DestroyShmImage  ( vout_thread_t *p_vout, XImage *p_ximage,
                                   XShmSegmentInfo *p_shm_info );
-
-static void X11ToggleMousePointer       ( vout_thread_t *p_vout );
-static void X11EnableScreenSaver        ( vout_thread_t *p_vout );
-static void X11DisableScreenSaver       ( vout_thread_t *p_vout );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -163,7 +99,7 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_init       = vout_Init;
     p_function_list->functions.vout.pf_end        = vout_End;
     p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
+    p_function_list->functions.vout.pf_manage     = _M( vout_Manage );
     p_function_list->functions.vout.pf_display    = vout_Display;
     p_function_list->functions.vout.pf_setpalette = vout_SetPalette;
 }
@@ -216,13 +152,10 @@ static int vout_Create( vout_thread_t *p_vout )
     }
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
-    p_vout->b_fullscreen
-        = main_GetIntVariable( VOUT_FULLSCREEN_VAR, VOUT_FULLSCREEN_DEFAULT );
-
     /* Spawn base window - this window will include the video output window,
      * but also command buttons, subtitles and other indicators */
 
-    if( X11CreateWindow( p_vout ) )
+    if( _M( XCommonCreateWindow ) ( p_vout ) )
     {
         intf_ErrMsg( "vout error: cannot create X11 window" );
         XCloseDisplay( p_vout->p_sys->p_display );
@@ -267,7 +200,7 @@ static int vout_Create( vout_thread_t *p_vout )
                                       &cursor_color, 1, 1 );    
 
     /* Disable screen saver and return */
-    X11DisableScreenSaver( p_vout );
+    _M( XCommonDisableScreenSaver ) ( p_vout );
 
     return( 0 );
 }
@@ -373,11 +306,13 @@ static void vout_End( vout_thread_t *p_vout )
 static void vout_Destroy( vout_thread_t *p_vout )
 {
     /* Enable screen saver */
-    X11EnableScreenSaver( p_vout );
+    _M( XCommonEnableScreenSaver ) ( p_vout );
 
     /* Restore cursor if it was blanked */
     if( !p_vout->p_sys->b_mouse_pointer_visible )
-        X11ToggleMousePointer( p_vout );
+    {
+        _M( XCommonToggleMousePointer ) ( p_vout );
+    }
 
     /* Destroy blank cursor pixmap */
     XFreePixmap( p_vout->p_sys->p_display, p_vout->p_sys->cursor_pixmap );
@@ -397,302 +332,6 @@ static void vout_Destroy( vout_thread_t *p_vout )
 
     /* Destroy structure */
     free( p_vout->p_sys );
-}
-
-/*****************************************************************************
- * vout_Manage: handle X11 events
- *****************************************************************************
- * This function should be called regularly by video output thread. It manages
- * X11 events and allows window resizing. It returns a non null value on
- * error.
- *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
-{
-    XEvent      xevent;                                         /* X11 event */
-    boolean_t   b_resized;                        /* window has been resized */
-    char        i_key;                                    /* ISO Latin-1 key */
-    KeySym      x_key_symbol;
-
-    /* Handle X11 events: ConfigureNotify events are parsed to know if the
-     * output window's size changed, MapNotify and UnmapNotify to know if the
-     * window is mapped (and if the display is useful), and ClientMessages
-     * to intercept window destruction requests */
-
-    b_resized = 0;
-    while( XCheckWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                              StructureNotifyMask | KeyPressMask |
-                              ButtonPressMask | ButtonReleaseMask | 
-                              PointerMotionMask | Button1MotionMask , &xevent )
-           == True )
-    {
-        /* ConfigureNotify event: prepare  */
-        if( (xevent.type == ConfigureNotify)
-            && ((xevent.xconfigure.width != p_vout->p_sys->i_width)
-                || (xevent.xconfigure.height != p_vout->p_sys->i_height)) )
-        {
-            /* Update dimensions */
-            b_resized = 1;
-            p_vout->p_sys->i_width = xevent.xconfigure.width;
-            p_vout->p_sys->i_height = xevent.xconfigure.height;
-        }
-        /* MapNotify event: change window status and disable screen saver */
-        else if( xevent.type == MapNotify)
-        {
-            if( (p_vout != NULL) && !p_vout->b_active )
-            {
-                X11DisableScreenSaver( p_vout );
-                p_vout->b_active = 1;
-            }
-        }
-        /* UnmapNotify event: change window status and enable screen saver */
-        else if( xevent.type == UnmapNotify )
-        {
-            if( (p_vout != NULL) && p_vout->b_active )
-            {
-                X11EnableScreenSaver( p_vout );
-                p_vout->b_active = 0;
-            }
-        }
-        /* Keyboard event */
-        else if( xevent.type == KeyPress )
-        {
-            /* We may have keys like F1 trough F12, ESC ... */
-            x_key_symbol = XKeycodeToKeysym( p_vout->p_sys->p_display,
-                                             xevent.xkey.keycode, 0 );
-            switch( x_key_symbol )
-            {
-                 case XK_Escape:
-                     p_main->p_intf->b_die = 1;
-                     break;
-                 case XK_Menu:
-                     p_main->p_intf->b_menu_change = 1;
-                     break;
-                 default:
-                     /* "Normal Keys"
-                      * The reason why I use this instead of XK_0 is that 
-                      * with XLookupString, we don't have to care about
-                      * keymaps. */
-
-                    if( XLookupString( &xevent.xkey, &i_key, 1, NULL, NULL ) )
-                    {
-                        /* FIXME: handle stuff here */
-                        switch( i_key )
-                        {
-                        case 'q':
-                        case 'Q':
-                            p_main->p_intf->b_die = 1;
-                            break;
-                        case 'f':
-                        case 'F':
-                            p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                            break;
-                        case '0':
-                            network_ChannelJoin( 0 );
-                            break;
-                        case '1':
-                            network_ChannelJoin( 1 );
-                            break;
-                        case '2':
-                            network_ChannelJoin( 2 );
-                            break;
-                        case '3':
-                            network_ChannelJoin( 3 );
-                            break;
-                        case '4':
-                            network_ChannelJoin( 4 );
-                            break;
-                        case '5':
-                            network_ChannelJoin( 5 );
-                            break;
-                        case '6':
-                            network_ChannelJoin( 6 );
-                            break;
-                        case '7':
-                            network_ChannelJoin( 7 );
-                            break;
-                        case '8':
-                            network_ChannelJoin( 8 );
-                            break;
-                        case '9':
-                            network_ChannelJoin( 9 );
-                            break;
-                        default:
-                            if( intf_ProcessKey( p_main->p_intf, 
-                                                 (char )i_key ) )
-                            {
-                               intf_DbgMsg( "vout: unhandled key '%c' (%i)", 
-                                            (char)i_key, i_key );
-                            }
-                            break;
-                        }
-                    }
-                break;
-            }
-        }
-        /* Mouse click */
-        else if( xevent.type == ButtonPress )
-        {
-            switch( ((XButtonEvent *)&xevent)->button )
-            {
-                case Button1:
-                    /* in this part we will eventually manage
-                     * clicks for DVD navigation for instance */
-                    break;
-            }
-        }
-        /* Mouse release */
-        else if( xevent.type == ButtonRelease )
-        {
-            switch( ((XButtonEvent *)&xevent)->button )
-            {
-                case Button3:
-                    /* FIXME: need locking ! */
-                    p_main->p_intf->b_menu_change = 1;
-                    break;
-            }
-        }
-        /* Mouse move */
-        else if( xevent.type == MotionNotify )
-        {
-            p_vout->p_sys->i_lastmoved = mdate();
-            if( ! p_vout->p_sys->b_mouse_pointer_visible )
-            {
-                X11ToggleMousePointer( p_vout ); 
-            }
-        }
-        /* Other event */
-        else
-        {
-            intf_WarnMsg( 3, "vout: unhandled event %d received", xevent.type );
-        }
-    }
-
-    /* ClientMessage event - only WM_PROTOCOLS with WM_DELETE_WINDOW data
-     * are handled - according to the man pages, the format is always 32
-     * in this case */
-    while( XCheckTypedEvent( p_vout->p_sys->p_display,
-                             ClientMessage, &xevent ) )
-    {
-        if( (xevent.xclient.message_type == p_vout->p_sys->wm_protocols)
-            && (xevent.xclient.data.l[0] == p_vout->p_sys->wm_delete_window ) )
-        {
-            p_main->p_intf->b_die = 1;
-        }
-        else
-        {
-            intf_DbgMsg( "vout: unhandled ClientMessage received" );
-        }
-    }
-
-    if ( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
-    {
-        char *psz_display;
-        /* Open display, unsing 'vlc_display' or the DISPLAY
-         * environment variable */
-        psz_display = XDisplayName( main_GetPszVariable( VOUT_DISPLAY_VAR, NULL ) );
-
-        intf_DbgMsg( "vout: changing full-screen status" );
-
-        p_vout->b_fullscreen = !p_vout->b_fullscreen;
-        p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
-
-        /* Get rid of the old window */
-        XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
-        XFreeGC( p_vout->p_sys->p_display, p_vout->p_sys->gc );
-
-        /* And create a new one */
-        if( X11CreateWindow( p_vout ) )
-        {
-            intf_ErrMsg( "vout error: cannot create X11 window" );
-            XCloseDisplay( p_vout->p_sys->p_display );
-
-            free( p_vout->p_sys );
-            return( 1 );
-        }
-
-        if( X11InitDisplay( p_vout, psz_display ) )
-        {
-            intf_ErrMsg( "vout error: cannot initialize X11 display" );
-            XCloseDisplay( p_vout->p_sys->p_display );
-            free( p_vout->p_sys );
-            return( 1 );
-        }
-        /* We've changed the size, update it */
-        p_vout->i_changes |= VOUT_SIZE_CHANGE;
-    }
-
-    /*
-     * Handle vout window resizing
-     */
-    if( b_resized )
-    {
-        /* If interface window has been resized, change vout size */
-        intf_DbgMsg( "vout: resizing output window" );
-        p_vout->i_width =  p_vout->p_sys->i_width;
-        p_vout->i_height = p_vout->p_sys->i_height;
-        p_vout->i_changes |= VOUT_SIZE_CHANGE;
-    }
-    else if( (p_vout->i_width  != p_vout->p_sys->i_width) ||
-             (p_vout->i_height != p_vout->p_sys->i_height) )
-    {
-        /* If video output size has changed, change interface window size */
-        intf_DbgMsg( "vout: resizing output window" );
-        p_vout->p_sys->i_width =    p_vout->i_width;
-        p_vout->p_sys->i_height =   p_vout->i_height;
-        XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                       p_vout->p_sys->i_width, p_vout->p_sys->i_height );
-    }
-    /*
-     * Color/Grayscale or gamma change: in 8bpp, just change the colormap
-     */
-    if( (p_vout->i_changes & VOUT_GRAYSCALE_CHANGE)
-        && (p_vout->i_screen_depth == 8) )
-    {
-        /* FIXME: clear flags ?? */
-    }
-
-    /*
-     * Size change
-     */
-    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
-    {
-        intf_DbgMsg( "vout info: resizing window" );
-        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-
-        /* Resize window */
-        XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                       p_vout->i_width, p_vout->i_height );
-
-        /* Destroy XImages to change their size */
-        vout_End( p_vout );
-
-        /* Recreate XImages. If SysInit failed, the thread can't go on. */
-        if( vout_Init( p_vout ) )
-        {
-            intf_ErrMsg( "vout error: cannot resize display" );
-            return( 1 );
-       }
-
-        /* Tell the video output thread that it will need to rebuild YUV
-         * tables. This is needed since conversion buffer size may have
-         * changed */
-        p_vout->i_changes |= VOUT_YUV_CHANGE;
-        intf_Msg( "vout: video display resized (%dx%d)",
-                  p_vout->i_width, p_vout->i_height);
-    }
-
-    /* Autohide Cursour */
-    if( mdate() - p_vout->p_sys->i_lastmoved > 2000000 )
-    {
-        /* Hide the mouse automatically */
-        if( p_vout->p_sys->b_mouse_pointer_visible )
-        {
-            X11ToggleMousePointer( p_vout ); 
-        }
-    }
-
-    
-    return 0;
 }
 
 /*****************************************************************************
@@ -761,171 +400,6 @@ static void vout_SetPalette( p_vout_thread_t p_vout,
 }
 
 /* following functions are local */
-
-/*****************************************************************************
- * X11CreateWindow: open and set-up X11 main window
- *****************************************************************************/
-static int X11CreateWindow( vout_thread_t *p_vout )
-{
-    XSizeHints              xsize_hints;
-    XSetWindowAttributes    xwindow_attributes;
-    XGCValues               xgcvalues;
-    XEvent                  xevent;
-    Atom                    prop;
-    mwmhints_t              mwmhints;
-
-    boolean_t               b_expose;
-    boolean_t               b_configure_notify;
-    boolean_t               b_map_notify;
-
-    /* If we're full screen, we're full screen! */
-    if( p_vout->b_fullscreen ) 
-    {
-        p_vout->p_sys->i_width = DisplayWidth( p_vout->p_sys->p_display, 
-                                               p_vout->p_sys->i_screen );
-        p_vout->p_sys->i_height =  DisplayHeight( p_vout->p_sys->p_display, 
-                                                  p_vout->p_sys->i_screen ); 
-        p_vout->i_width =  p_vout->p_sys->i_width;
-        p_vout->i_height = p_vout->p_sys->i_height;
-    }
-    else
-    {
-        /* Set main window's size */
-        p_vout->p_sys->i_width = p_vout->i_width;
-        p_vout->p_sys->i_height = p_vout->i_height;
-    }
-
-    /* Prepare window manager hints and properties */
-    xsize_hints.base_width          = p_vout->p_sys->i_width;
-    xsize_hints.base_height         = p_vout->p_sys->i_height;
-    xsize_hints.flags               = PSize;
-    p_vout->p_sys->wm_protocols     = XInternAtom( p_vout->p_sys->p_display,
-                                                   "WM_PROTOCOLS", True );
-    p_vout->p_sys->wm_delete_window = XInternAtom( p_vout->p_sys->p_display,
-                                                   "WM_DELETE_WINDOW", True );
-
-    /* Prepare window attributes */
-    xwindow_attributes.backing_store = Always;       /* save the hidden part */
-    xwindow_attributes.background_pixel = BlackPixel( p_vout->p_sys->p_display,
-                                                      p_vout->p_sys->i_screen );
-    xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask;
-    
-
-    /* Create the window and set hints - the window must receive ConfigureNotify
-     * events, and, until it is displayed, Expose and MapNotify events. */
-
-    p_vout->p_sys->window =
-        XCreateWindow( p_vout->p_sys->p_display,
-                       DefaultRootWindow( p_vout->p_sys->p_display ),
-                       0, 0,
-                       p_vout->p_sys->i_width, p_vout->p_sys->i_height, 0,
-                       0, InputOutput, 0,
-                       CWBackingStore | CWBackPixel | CWEventMask,
-                       &xwindow_attributes );
-
-    if ( p_vout->b_fullscreen )
-    {
-        prop = XInternAtom(p_vout->p_sys->p_display, "_MOTIF_WM_HINTS", False);
-        mwmhints.flags = MWM_HINTS_DECORATIONS;
-        mwmhints.decorations = 0;
-        XChangeProperty( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                         prop, prop, 32, PropModeReplace,
-                         (unsigned char *)&mwmhints, PROP_MWM_HINTS_ELEMENTS );
-
-        XSetTransientForHint( p_vout->p_sys->p_display,
-                              p_vout->p_sys->window, None );
-        XRaiseWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
-    }
-
-    /* Set window manager hints and properties: size hints, command,
-     * window's name, and accepted protocols */
-    XSetWMNormalHints( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                       &xsize_hints );
-    XSetCommand( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                 p_main->ppsz_argv, p_main->i_argc );
-    XStoreName( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                VOUT_TITLE " (X11 output)" );
-
-    if( (p_vout->p_sys->wm_protocols == None)        /* use WM_DELETE_WINDOW */
-        || (p_vout->p_sys->wm_delete_window == None)
-        || !XSetWMProtocols( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                             &p_vout->p_sys->wm_delete_window, 1 ) )
-    {
-        /* WM_DELETE_WINDOW is not supported by window manager */
-        intf_Msg( "vout error: missing or bad window manager" );
-    }
-
-    /* Creation of a graphic context that doesn't generate a GraphicsExpose
-     * event when using functions like XCopyArea */
-    xgcvalues.graphics_exposures = False;
-    p_vout->p_sys->gc = XCreateGC( p_vout->p_sys->p_display,
-                                   p_vout->p_sys->window,
-                                   GCGraphicsExposures, &xgcvalues);
-
-    /* Send orders to server, and wait until window is displayed - three
-     * events must be received: a MapNotify event, an Expose event allowing
-     * drawing in the window, and a ConfigureNotify to get the window
-     * dimensions. Once those events have been received, only ConfigureNotify
-     * events need to be received. */
-    b_expose = 0;
-    b_configure_notify = 0;
-    b_map_notify = 0;
-    XMapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window);
-    do
-    {
-        XNextEvent( p_vout->p_sys->p_display, &xevent);
-        if( (xevent.type == Expose)
-            && (xevent.xexpose.window == p_vout->p_sys->window) )
-        {
-            b_expose = 1;
-        }
-        else if( (xevent.type == MapNotify)
-                 && (xevent.xmap.window == p_vout->p_sys->window) )
-        {
-            b_map_notify = 1;
-        }
-        else if( (xevent.type == ConfigureNotify)
-                 && (xevent.xconfigure.window == p_vout->p_sys->window) )
-        {
-            b_configure_notify = 1;
-            p_vout->p_sys->i_width = xevent.xconfigure.width;
-            p_vout->p_sys->i_height = xevent.xconfigure.height;
-        }
-    } while( !( b_expose && b_configure_notify && b_map_notify ) );
-
-    XSelectInput( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                  StructureNotifyMask | KeyPressMask |
-                  ButtonPressMask | ButtonReleaseMask | 
-                  PointerMotionMask );
-
-    if( XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
-    {
-        /* Allocate a new palette */
-        p_vout->p_sys->colormap =
-            XCreateColormap( p_vout->p_sys->p_display,
-                             DefaultRootWindow( p_vout->p_sys->p_display ),
-                             DefaultVisual( p_vout->p_sys->p_display,
-                                            p_vout->p_sys->i_screen ),
-                             AllocAll );
-
-        xwindow_attributes.colormap = p_vout->p_sys->colormap;
-        XChangeWindowAttributes( p_vout->p_sys->p_display,
-                                 p_vout->p_sys->window,
-                                 CWColormap, &xwindow_attributes );
-    }
-
-    if( p_vout->b_fullscreen )
-    {
-        XSetInputFocus( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                        RevertToNone, CurrentTime );
-        XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->window, 0, 0 );
-    }
-
-    /* At this stage, the window is open, displayed, and ready to
-     * receive data */
-
-    return( 0 );
-}
 
 /*****************************************************************************
  * X11InitDisplay: open and initialize X11 device
@@ -1182,72 +656,6 @@ static void X11DestroyShmImage( vout_thread_t *p_vout, XImage *p_ximage,
     {
         intf_ErrMsg( "vout error: cannot detach shared memory (%s)",
                      strerror(errno) );
-    }
-}
-
-
-/* WAZAAAAAAAAAAA */
-
-/*****************************************************************************
- * X11EnableScreenSaver: enable screen saver
- *****************************************************************************
- * This function enable the screen saver on a display after it had been
- * disabled by XDisableScreenSaver. Both functions use a counter mechanism to
- * know wether the screen saver can be activated or not: if n successive calls
- * are made to XDisableScreenSaver, n successive calls to XEnableScreenSaver
- * will be required before the screen saver could effectively be activated.
- *****************************************************************************/
-void X11EnableScreenSaver( vout_thread_t *p_vout )
-{
-    intf_DbgMsg( "vout: enabling screen saver" );
-    XSetScreenSaver( p_vout->p_sys->p_display, p_vout->p_sys->i_ss_timeout,
-                     p_vout->p_sys->i_ss_interval,
-                     p_vout->p_sys->i_ss_blanking,
-                     p_vout->p_sys->i_ss_exposure );
-}
-
-/*****************************************************************************
- * X11DisableScreenSaver: disable screen saver
- *****************************************************************************
- * See XEnableScreenSaver
- *****************************************************************************/
-void X11DisableScreenSaver( vout_thread_t *p_vout )
-{
-    /* Save screen saver informations */
-    XGetScreenSaver( p_vout->p_sys->p_display, &p_vout->p_sys->i_ss_timeout,
-                     &p_vout->p_sys->i_ss_interval,
-                     &p_vout->p_sys->i_ss_blanking,
-                     &p_vout->p_sys->i_ss_exposure );
-
-    /* Disable screen saver */
-    intf_DbgMsg( "vout: disabling screen saver" );
-    XSetScreenSaver( p_vout->p_sys->p_display, 0,
-                     p_vout->p_sys->i_ss_interval,
-                     p_vout->p_sys->i_ss_blanking,
-                     p_vout->p_sys->i_ss_exposure );
-}
-
-/*****************************************************************************
- * X11ToggleMousePointer: hide or show the mouse pointer
- *****************************************************************************
- * This function hides the X pointer if it is visible by putting it at
- * coordinates (32,32) and setting the pointer sprite to a blank one. To
- * show it again, we disable the sprite and restore the original coordinates.
- *****************************************************************************/
-void X11ToggleMousePointer( vout_thread_t *p_vout )
-{
-    if( p_vout->p_sys->b_mouse_pointer_visible )
-    {
-        p_vout->p_sys->b_mouse_pointer_visible = 0;
-
-        XDefineCursor( p_vout->p_sys->p_display,
-                       p_vout->p_sys->window, p_vout->p_sys->blank_cursor );
-    }
-    else
-    {
-        p_vout->p_sys->b_mouse_pointer_visible = 1;
-
-        XUndefineCursor( p_vout->p_sys->p_display, p_vout->p_sys->window );
     }
 }
 

@@ -31,8 +31,6 @@
     (p_symbols)->TestProgram = TestProgram; \
     (p_symbols)->TestMethod = TestMethod; \
     (p_symbols)->TestCPU = TestCPU; \
-    (p_symbols)->intf_AssignKey = intf_AssignKey; \
-    (p_symbols)->intf_ProcessKey = intf_ProcessKey; \
     (p_symbols)->intf_Msg = intf_Msg; \
     (p_symbols)->intf_ErrMsg = intf_ErrMsg; \
     (p_symbols)->intf_StatMsg = intf_StatMsg;\
@@ -121,9 +119,6 @@
 #   define TestProgram(a) p_symbols->TestProgram(a)
 #   define TestMethod(a,b) p_symbols->TestMethod(a,b)
 #   define TestCPU(a) p_symbols->TestCPU(a)
-
-#   define intf_AssignKey(a,b,c,d) p_symbols->intf_AssignKey(a,b,c,d)
-#   define intf_ProcessKey(a,b) p_symbols->intf_ProcessKey(a,b)
 
 #   define intf_Msg p_symbols->intf_Msg
 #   define intf_ErrMsg p_symbols->intf_ErrMsg

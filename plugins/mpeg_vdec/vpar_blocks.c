@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_blocks.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.3 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -30,7 +30,6 @@
 
 #include <string.h>                                                /* memset */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -1822,20 +1821,20 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
         if( i_coding_type != I_CODING_TYPE || p_vpar->picture.b_concealment_mv )
         {
             p_f_motion->pppi_ref[1][0] =
-                pp_forward_ref[1]->p_y + i_offset * 4 + i_width;
+                pp_forward_ref[1]->P_Y + i_offset * 4 + i_width;
             p_f_motion->pppi_ref[1][1] =
-                pp_forward_ref[1]->p_u + i_chroma_tmp;
+                pp_forward_ref[1]->P_U + i_chroma_tmp;
             p_f_motion->pppi_ref[1][2] =
-                pp_forward_ref[1]->p_v + i_chroma_tmp;
+                pp_forward_ref[1]->P_V + i_chroma_tmp;
         }
         if( i_coding_type == B_CODING_TYPE )
         {
             p_b_motion->pppi_ref[1][0] =
-                p_vpar->sequence.p_backward->p_y + i_offset * 4 + i_width;
+                p_vpar->sequence.p_backward->P_Y + i_offset * 4 + i_width;
             p_b_motion->pppi_ref[1][1] =
-                p_vpar->sequence.p_backward->p_u + i_chroma_tmp;
+                p_vpar->sequence.p_backward->P_U + i_chroma_tmp;
             p_b_motion->pppi_ref[1][2] =
-                p_vpar->sequence.p_backward->p_v + i_chroma_tmp;
+                p_vpar->sequence.p_backward->P_V + i_chroma_tmp;
         }
     }
 
@@ -1844,9 +1843,9 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
                         * (2 - p_vpar->sequence.b_chroma_h_subsampled);
     if( i_coding_type != I_CODING_TYPE || p_vpar->picture.b_concealment_mv )
     {
-        p_f_motion->pppi_ref[0][0] = pp_forward_ref[0]->p_y + i_offset * 4;
-        p_f_motion->pppi_ref[0][1] = pp_forward_ref[0]->p_u + i_chroma_tmp;
-        p_f_motion->pppi_ref[0][2] = pp_forward_ref[0]->p_v + i_chroma_tmp;
+        p_f_motion->pppi_ref[0][0] = pp_forward_ref[0]->P_Y + i_offset * 4;
+        p_f_motion->pppi_ref[0][1] = pp_forward_ref[0]->P_U + i_chroma_tmp;
+        p_f_motion->pppi_ref[0][2] = pp_forward_ref[0]->P_V + i_chroma_tmp;
         p_f_motion->pi_f_code[0] = p_vpar->picture.ppi_f_code[0][0];
         p_f_motion->pi_f_code[1] = p_vpar->picture.ppi_f_code[0][1];
         p_f_motion->ppi_pmv[0][0] = p_f_motion->ppi_pmv[0][1] = 0;
@@ -1855,11 +1854,11 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
 
     if( i_coding_type == B_CODING_TYPE )
     {
-        p_b_motion->pppi_ref[0][0] = p_vpar->sequence.p_backward->p_y
+        p_b_motion->pppi_ref[0][0] = p_vpar->sequence.p_backward->P_Y
                                         + i_offset * 4;
-        p_b_motion->pppi_ref[0][1] = p_vpar->sequence.p_backward->p_u
+        p_b_motion->pppi_ref[0][1] = p_vpar->sequence.p_backward->P_U
             + i_chroma_tmp;
-        p_b_motion->pppi_ref[0][2] = p_vpar->sequence.p_backward->p_v
+        p_b_motion->pppi_ref[0][2] = p_vpar->sequence.p_backward->P_V
             + i_chroma_tmp;
         p_b_motion->pi_f_code[0] = p_vpar->picture.ppi_f_code[1][0];
         p_b_motion->pi_f_code[1] = p_vpar->picture.ppi_f_code[1][1];
@@ -1868,9 +1867,9 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
     }
 
     /* Initialize destination pointers. */
-    p_dest[0] = p_vpar->picture.p_picture->p_y + i_offset * 4;
-    p_dest[1] = p_vpar->picture.p_picture->p_u + i_chroma_tmp;
-    p_dest[2] = p_vpar->picture.p_picture->p_v + i_chroma_tmp;
+    p_dest[0] = p_vpar->picture.p_picture->P_Y + i_offset * 4;
+    p_dest[1] = p_vpar->picture.p_picture->P_U + i_chroma_tmp;
+    p_dest[2] = p_vpar->picture.p_picture->P_V + i_chroma_tmp;
 
     if( i_structure == BOTTOM_FIELD )
     {

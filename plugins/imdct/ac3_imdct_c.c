@@ -2,7 +2,7 @@
  * ac3_imdct_c.c: ac3 DCT in C
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_imdct_c.c,v 1.3 2001/11/28 15:08:05 massiot Exp $
+ * $Id: ac3_imdct_c.c,v 1.4 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -35,7 +35,6 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "config.h"
 #include "common.h"
 
 #include "ac3_imdct.h"

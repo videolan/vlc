@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: xvideo.c,v 1.4 2001/11/28 15:08:06 massiot Exp $
+ * $Id: xvideo.c,v 1.5 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *      
@@ -32,7 +32,6 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "intf_msg.h"
 #include "threads.h"

@@ -2,7 +2,7 @@
  * ac3_imdct_3dn.c: accelerated 3D Now! ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_3dn.c,v 1.7 2001/11/28 15:08:05 massiot Exp $
+ * $Id: ac3_imdct_3dn.c,v 1.8 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -32,7 +32,6 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "config.h"
 #include "common.h"
 
 #include "ac3_imdct.h"

@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.14 2001/10/18 23:13:46 ej Exp $
+ * $Id: ioctl.c,v 1.15 2001/12/09 17:01:35 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -69,7 +69,6 @@
 #   include <sys/scsi/impl/uscsi.h>
 #endif
 
-#include "config.h"
 #include "common.h"
 
 #ifdef SYS_DARWIN

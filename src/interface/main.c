@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.132 2001/12/07 18:33:08 sam Exp $
+ * $Id: main.c,v 1.133 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1330,29 +1330,27 @@ static int CPUCapabilities( void )
  *****************************************************************************/
 static int RedirectSTDOUT( void )
 {
-    int  i_stdout_filedesc;
-    char *psz_stdout_filename;
+    int  i_fd;
+    char *psz_filename;
 
-    psz_stdout_filename = main_GetPszVariable( INTF_STDOUT_VAR,
-                                               INTF_STDOUT_DEFAULT );
-    if( strcmp( "", psz_stdout_filename ) != 0 )
+    psz_filename = main_GetPszVariable( INTF_STDOUT_VAR, INTF_STDOUT_DEFAULT );
+
+    if( *psz_filename )
     {
         ShowConsole();
-        i_stdout_filedesc = open( psz_stdout_filename,
-                                  O_CREAT | O_TRUNC | O_RDWR,
-                                  S_IREAD | S_IWRITE );
-
-        if( dup2( i_stdout_filedesc, fileno(stdout) ) == -1 )
+        i_fd = open( psz_filename, O_CREAT | O_TRUNC | O_RDWR,
+                                   S_IREAD | S_IWRITE );
+        if( dup2( i_fd, fileno(stdout) ) == -1 )
         {
             intf_ErrMsg( "warning: unable to redirect stdout" );
         }
 
-        if( dup2( i_stdout_filedesc, fileno(stderr) ) == -1 )
+        if( dup2( i_fd, fileno(stderr) ) == -1 )
         {
             intf_ErrMsg( "warning: unable to redirect stderr" );
         }
 
-        close( i_stdout_filedesc );
+        close( i_fd );
     }
     else
     {

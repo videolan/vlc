@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.19 2001/11/28 15:08:06 massiot Exp $
+ * $Id: aout_spdif.c,v 1.20 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -31,7 +31,6 @@
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>                                              /* memset() */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"

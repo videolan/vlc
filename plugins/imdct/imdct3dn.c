@@ -2,7 +2,7 @@
  * imdct3dn.c : accelerated 3D Now! IMDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: imdct3dn.c,v 1.7 2001/11/28 15:08:05 massiot Exp $
+ * $Id: imdct3dn.c,v 1.8 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Renaud Dartus <reno@via.ecp.fr>
  *
@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"

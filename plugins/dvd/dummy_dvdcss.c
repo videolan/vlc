@@ -2,7 +2,7 @@
  * dummy_dvdcss.c: Dummy libdvdcss with minimal DVD access.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dummy_dvdcss.c,v 1.3 2001/11/12 20:16:33 sam Exp $
+ * $Id: dummy_dvdcss.c,v 1.4 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -43,7 +43,6 @@
 #   error "building dummy libdvdcss on this system does not make sense !"
 #endif
 
-#include "config.h"
 #include "common.h"
 
 #include "dummy_dvdcss.h"

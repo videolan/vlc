@@ -42,7 +42,6 @@
 #include <winsock2.h>                                            /* select() */
 #endif
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"

@@ -2,7 +2,7 @@
  * adec_generic.c: MPEG audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec_generic.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
+ * $Id: mpeg_adec_generic.c,v 1.3 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -26,7 +26,6 @@
 
 #include <string.h>                                    /* memcpy(), memset() */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"

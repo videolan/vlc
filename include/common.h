@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.53 2001/12/07 18:33:07 sam Exp $
+ * $Id: common.h,v 1.54 2001/12/09 17:01:35 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -119,10 +119,12 @@ typedef struct intf_channel_s *         p_intf_channel_t;
 struct input_thread_s;
 struct input_channel_s;
 struct input_cfg_s;
+struct input_area_s;
 
 typedef struct input_thread_s *         p_input_thread_t;
 typedef struct input_channel_s *        p_input_channel_t;
 typedef struct input_cfg_s *            p_input_cfg_t;
+typedef struct input_area_s *           p_input_area_t;
 
 /* Audio */
 struct aout_thread_s;
@@ -142,6 +144,7 @@ struct video_parser_s;
 typedef struct vout_thread_s *          p_vout_thread_t;
 typedef struct vout_font_s *            p_vout_font_t;
 typedef struct vout_sys_s *             p_vout_sys_t;
+typedef struct chroma_sys_s *           p_chroma_sys_t;
 typedef struct vdec_thread_s *          p_vdec_thread_t;
 typedef struct vpar_thread_s *          p_vpar_thread_t;
 typedef struct video_parser_s *         p_video_parser_t;
@@ -149,6 +152,11 @@ typedef struct video_parser_s *         p_video_parser_t;
 /* Misc */
 struct macroblock_s;
 struct data_packet_s;
+struct imdct_s;
+struct complex_s;
+struct dm_par_s;
+struct picture_s;
+struct picture_sys_s;
 struct es_descriptor_s;
 struct pgrm_descriptor_s;
 struct pes_packet_s;
@@ -362,11 +370,11 @@ typedef struct module_symbols_s
                                        ( int, int, long, long, long, void * );
     void ( * aout_DestroyFifo )     ( struct aout_fifo_s * );
 
-    struct vout_thread_s * (* vout_CreateThread) ( int *, int, int );
+    struct vout_thread_s * (* vout_CreateThread) ( int *, int, int, int, int );
     struct subpicture_s * (* vout_CreateSubPicture) ( struct vout_thread_s *, 
                                                       int, int );
     struct picture_s * ( * vout_CreatePicture ) ( struct vout_thread_s *, 
-                                                  int, int, int );
+                                                  int, int, int, int );
 
     void  ( * vout_DestroySubPicture )  ( struct vout_thread_s *, 
                                           struct subpicture_s * );

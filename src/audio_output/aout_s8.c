@@ -2,7 +2,7 @@
  * aout_s8.c: 8 bit signed audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_s8.c,v 1.3 2001/11/28 15:08:06 massiot Exp $
+ * $Id: aout_s8.c,v 1.4 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -30,7 +30,6 @@
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"

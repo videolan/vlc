@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.67 2001/12/07 18:33:08 sam Exp $
+ * $Id: vout_sdl.c,v 1.68 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -52,24 +52,12 @@
 #include "video_output.h"
 
 #include "interface.h"
-/* FIXME: get rid of this */
-#include "keystrokes.h"
-#include "netutils.h"
 
 #include "modules.h"
 #include "modules_export.h"
 
-/*****************************************************************************
- * FIXME: this file is ...                                                   *
- *                                                                           *
- *              XXX   XXX     FIXME     XXX     XXX   XXX   XXX              *
- *              XXX   XXX   XXX   XXX   XXX     XXX   XXX   XXX              *
- *              XXX   XXX   XXX         XXX       FIXME     XXX              *
- *              XXX   XXX   XXX  TODO   XXX        XXX      XXX              *
- *              XXX   XXX   XXX   XXX   XXX        XXX                       *
- *                FIXME       FIXME       FIXME    XXX      XXX              *
- *                                                                           *
- *****************************************************************************/
+#define SDL_MAX_DIRECTBUFFERS 5
+#define SDL_DEFAULT_BPP 16
 
 /*****************************************************************************
  * vout_sys_t: video output SDL method descriptor
@@ -79,41 +67,43 @@
  *****************************************************************************/
 typedef struct vout_sys_s
 {
+    SDL_Surface *   p_display;                             /* display device */
+
     int i_width;
     int i_height;
 
-    SDL_Surface *   p_display;                             /* display device */
-    SDL_Overlay *   p_overlay;                             /* overlay device */
-
-    boolean_t   b_overlay;
     boolean_t   b_cursor;
-    boolean_t   b_reopen_display;
-
     boolean_t   b_cursor_autohidden;
     mtime_t     i_lastmoved;
-
-    Uint8   *   p_sdl_buf[2];                          /* Buffer information */
 
 } vout_sys_t;
 
 /*****************************************************************************
+ * picture_sys_t: direct buffer method descriptor
+ *****************************************************************************
+ * This structure is part of the picture descriptor, it describes the
+ * SDL specific properties of a direct buffer.
+ *****************************************************************************/
+typedef struct picture_sys_s
+{
+    SDL_Overlay *p_overlay;
+
+} picture_sys_t;
+
+/*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  vout_Probe     ( probedata_t *p_data );
-static int  vout_Create    ( struct vout_thread_s * );
-static int  vout_Init      ( struct vout_thread_s * );
-static void vout_End       ( struct vout_thread_s * );
-static void vout_Destroy   ( struct vout_thread_s * );
-static int  vout_Manage    ( struct vout_thread_s * );
-static void vout_Display   ( struct vout_thread_s * );
-static void vout_SetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
-                             u16 *blue, u16 *transp );
+static int  vout_Probe      ( probedata_t *p_data );
+static int  vout_Create     ( struct vout_thread_s * );
+static int  vout_Init       ( struct vout_thread_s * );
+static void vout_End        ( struct vout_thread_s * );
+static void vout_Destroy    ( struct vout_thread_s * );
+static int  vout_Manage     ( struct vout_thread_s * );
+static void vout_Display    ( struct vout_thread_s *, struct picture_s * );
 
-static int  SDLOpenDisplay     ( vout_thread_t *p_vout );
-static void SDLCloseDisplay    ( vout_thread_t *p_vout );
-static void OutputCoords       ( const picture_t *p_pic, const boolean_t scale,
-                                 const int win_w, const int win_h,
-                                 int *dx, int *dy, int *w, int *h );
+static int  SDLOpenDisplay      ( vout_thread_t *p_vout );
+static void SDLCloseDisplay     ( vout_thread_t *p_vout );
+static int  SDLNewPicture       ( vout_thread_t *p_vout, picture_t *p_pic );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -128,7 +118,7 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_destroy    = vout_Destroy;
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_display    = vout_Display;
-    p_function_list->functions.vout.pf_setpalette = vout_SetPalette;
+    p_function_list->functions.vout.pf_setpalette = NULL;
 }
 
 /*****************************************************************************
@@ -183,53 +173,18 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     p_vout->p_sys->b_cursor = 1; /* TODO should be done with a main_GetInt.. */
-
     p_vout->p_sys->b_cursor_autohidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
 
-    p_vout->b_fullscreen = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
-                                VOUT_FULLSCREEN_DEFAULT );
-    p_vout->p_sys->b_overlay = main_GetIntVariable( VOUT_OVERLAY_VAR,
-                                VOUT_OVERLAY_DEFAULT );
     p_vout->p_sys->i_width = p_vout->i_width;
     p_vout->p_sys->i_height = p_vout->i_height;
 
-    p_vout->p_sys->p_display = NULL;
-    p_vout->p_sys->p_overlay = NULL;
-
-    if( SDLOpenDisplay(p_vout) )
+    if( SDLOpenDisplay( p_vout ) )
     {
         intf_ErrMsg( "vout error: can't set up SDL (%s)", SDL_GetError() );
         free( p_vout->p_sys );
         return( 1 );
     }
-
-    /* FIXME: get rid of this ASAP, it's FUCKING UGLY */
-    { intf_thread_t * p_intf = p_main->p_intf;
-    intf_AssignKey(p_intf, SDLK_q,      INTF_KEY_QUIT, 0);
-    intf_AssignKey(p_intf, SDLK_ESCAPE, INTF_KEY_QUIT, 0);
-    /* intf_AssignKey(p_intf,3,'Q'); */
-    intf_AssignKey(p_intf, SDLK_0,      INTF_KEY_SET_CHANNEL,0);
-    intf_AssignKey(p_intf, SDLK_1,      INTF_KEY_SET_CHANNEL,1);
-    intf_AssignKey(p_intf, SDLK_2,      INTF_KEY_SET_CHANNEL,2);
-    intf_AssignKey(p_intf, SDLK_3,      INTF_KEY_SET_CHANNEL,3);
-    intf_AssignKey(p_intf, SDLK_4,      INTF_KEY_SET_CHANNEL,4);
-    intf_AssignKey(p_intf, SDLK_5,      INTF_KEY_SET_CHANNEL,5);
-    intf_AssignKey(p_intf, SDLK_6,      INTF_KEY_SET_CHANNEL,6);
-    intf_AssignKey(p_intf, SDLK_7,      INTF_KEY_SET_CHANNEL,7);
-    intf_AssignKey(p_intf, SDLK_8,      INTF_KEY_SET_CHANNEL,8);
-    intf_AssignKey(p_intf, SDLK_9,      INTF_KEY_SET_CHANNEL,9);
-    intf_AssignKey(p_intf, SDLK_PLUS,   INTF_KEY_INC_VOLUME, 0);
-    intf_AssignKey(p_intf, SDLK_MINUS,  INTF_KEY_DEC_VOLUME, 0);
-    intf_AssignKey(p_intf, SDLK_m,      INTF_KEY_TOGGLE_VOLUME, 0);
-    /* intf_AssignKey(p_intf,'M','M'); */
-    intf_AssignKey(p_intf, SDLK_g,      INTF_KEY_DEC_GAMMA, 0);
-    /* intf_AssignKey(p_intf,'G','G'); */
-    intf_AssignKey(p_intf, SDLK_c,      INTF_KEY_TOGGLE_GRAYSCALE, 0);
-    intf_AssignKey(p_intf, SDLK_SPACE,  INTF_KEY_TOGGLE_INTERFACE, 0);
-    intf_AssignKey(p_intf, SDLK_i,      INTF_KEY_TOGGLE_INFO, 0);
-    intf_AssignKey(p_intf, SDLK_s,      INTF_KEY_TOGGLE_SCALING, 0);
-    intf_AssignKey(p_intf, SDLK_d,      INTF_KEY_DUMP_STREAM, 0); }
 
     return( 0 );
 }
@@ -241,28 +196,33 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
-    /* This hack is hugly, but hey, you are, too. */
+    picture_t *p_pic;
+    int        i_index = 0;
 
-    SDL_Overlay *   p_overlay;
-    
-    p_overlay = SDL_CreateYUVOverlay( 
-           main_GetIntVariable( VOUT_WIDTH_VAR,VOUT_WIDTH_DEFAULT ),
-           main_GetIntVariable( VOUT_HEIGHT_VAR,VOUT_HEIGHT_DEFAULT ),
-                                      SDL_YV12_OVERLAY, 
-                                      p_vout->p_sys->p_display );
-
-    if( p_overlay == NULL )
+    /* Try to initialize SDL_MAX_DIRECTBUFFERS direct buffers */
+    while( i_index < SDL_MAX_DIRECTBUFFERS )
     {
-        intf_ErrMsg( "vout error: could not create SDL overlay" );
-        p_vout->b_need_render = 1;
-        return( 0 );
+        p_pic = &p_vout->p_picture[ i_index ];
+
+        if( SDLNewPicture( p_vout, p_pic ) )
+        {
+            break;
+        }
+
+        p_pic->i_status        = DESTROYED_PICTURE;
+
+        p_pic->b_directbuffer  = 1;
+
+        p_pic->i_left_margin   =
+        p_pic->i_right_margin  =
+        p_pic->i_top_margin    =
+        p_pic->i_bottom_margin = 0;
+
+        i_index++;
     }
 
-    intf_WarnMsg( 2, "vout: YUV acceleration %s",
-              p_overlay->hw_overlay ? "activated" : "unavailable !" ); 
-    p_vout->b_need_render = !p_overlay->hw_overlay;
-
-    SDL_FreeYUVOverlay( p_overlay );
+    /* How many directbuffers did we create ? */
+    p_vout->i_directbuffers = i_index;
 
     return( 0 );
 }
@@ -274,8 +234,16 @@ static int vout_Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_End( vout_thread_t *p_vout )
 {
-    SDLCloseDisplay( p_vout );
-    SDL_QuitSubSystem( SDL_INIT_VIDEO );
+    int i_index;
+
+    /* Free the direct buffers we allocated */
+    for( i_index = p_vout->i_directbuffers ; i_index ; )
+    {
+        i_index--;
+        SDL_UnlockYUVOverlay( p_vout->p_picture[ i_index ].p_sys->p_overlay );
+        SDL_FreeYUVOverlay( p_vout->p_picture[ i_index ].p_sys->p_overlay );
+        free( p_vout->p_picture[ i_index ].p_sys );
+    }
 }
 
 /*****************************************************************************
@@ -285,6 +253,10 @@ static void vout_End( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
+    SDLCloseDisplay( p_vout );
+
+    SDL_QuitSubSystem( SDL_INIT_VIDEO );
+
     free( p_vout->p_sys );
 }
 
@@ -297,7 +269,6 @@ static void vout_Destroy( vout_thread_t *p_vout )
 static int vout_Manage( vout_thread_t *p_vout )
 {
     SDL_Event event;                                            /* SDL event */
-    char *    p_key;
 
     /* Process events */
     while( SDL_PollEvent(&event) )
@@ -305,9 +276,10 @@ static int vout_Manage( vout_thread_t *p_vout )
         switch( event.type )
         {
         case SDL_VIDEORESIZE:                          /* Resizing of window */
-            p_vout->i_width = event.resize.w;
-            p_vout->i_height = event.resize.h;
-            p_vout->i_changes |= VOUT_SIZE_CHANGE;
+            p_vout->p_sys->i_width = event.resize.w;
+            p_vout->p_sys->i_height = event.resize.h;
+            SDLCloseDisplay( p_vout );
+            SDLOpenDisplay( p_vout );
             break;
 
         case SDL_MOUSEMOTION:
@@ -338,26 +310,27 @@ static int vout_Manage( vout_thread_t *p_vout )
         case SDL_MOUSEBUTTONDOWN:
             switch( event.button.button )
             {
-            case SDL_BUTTON_MIDDLE:
-                p_vout->i_changes |= VOUT_CURSOR_CHANGE;
+            case SDL_BUTTON_LEFT:
+                /* Handle clicks */
                 break;
             }
             break;
 
         case SDL_QUIT:
-            intf_ProcessKey( p_main->p_intf, SDLK_q );
+            p_main->p_intf->b_die = 1;
             break;
 
         case SDL_KEYDOWN:                             /* if a key is pressed */
 
             switch( event.key.keysym.sym )
             {
-            case SDLK_f:                             /* switch to fullscreen */
-                p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+            case SDLK_q:                                             /* quit */
+	    case SDLK_ESCAPE:
+                p_main->p_intf->b_die = 1;
                 break;
 
-            case SDLK_y:                               /* switch to hard YUV */
-                p_vout->i_changes |= VOUT_YUV_CHANGE;
+            case SDLK_f:                             /* switch to fullscreen */
+                p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
                 break;
 
             case SDLK_c:                                 /* toggle grayscale */
@@ -380,50 +353,23 @@ static int vout_Manage( vout_thread_t *p_vout )
                 p_vout->i_changes |= VOUT_INTF_CHANGE;
                 break;
             
-            case SDLK_F10:
-                network_ChannelJoin( 0 );
-                break;
-            case SDLK_F1:
-                network_ChannelJoin( 1 );
-                break;
-            case SDLK_F2:
-                network_ChannelJoin( 2 );
-                break;
-            case SDLK_F3:
-                network_ChannelJoin( 3 );
-                break;
-            case SDLK_F4:
-                network_ChannelJoin( 4 );
-                break;
-            case SDLK_F5:
-                network_ChannelJoin( 5 );
-                break;
-            case SDLK_F6:
-                network_ChannelJoin( 6 );
-                break;
-            case SDLK_F7:
-                network_ChannelJoin( 7 );
-                break;
-            case SDLK_F8:
-                network_ChannelJoin( 8 );
-                break;
-            case SDLK_F9:
-                network_ChannelJoin( 9 );
-                break;
-
             case SDLK_MENU:
                 p_main->p_intf->b_menu_change = 1;
                 break;
                 
+            case SDLK_F10: network_ChannelJoin( 0 ); break;
+            case SDLK_F1:  network_ChannelJoin( 1 ); break;
+            case SDLK_F2:  network_ChannelJoin( 2 ); break;
+            case SDLK_F3:  network_ChannelJoin( 3 ); break;
+            case SDLK_F4:  network_ChannelJoin( 4 ); break;
+            case SDLK_F5:  network_ChannelJoin( 5 ); break;
+            case SDLK_F6:  network_ChannelJoin( 6 ); break;
+            case SDLK_F7:  network_ChannelJoin( 7 ); break;
+            case SDLK_F8:  network_ChannelJoin( 8 ); break;
+            case SDLK_F9:  network_ChannelJoin( 9 ); break;
+
             default:
-                p_key = SDL_GetKeyName( event.key.keysym.sym ) ;
-                if( intf_ProcessKey( p_main->p_intf, 
-                                     (char )event.key.keysym.sym ) )
-                {
-                   intf_DbgMsg( "unhandled key '%c' (%i)", 
-                                (char)event.key.keysym.sym, 
-                                event.key.keysym.sym );                
-                }
+                intf_DbgMsg( "unhandled key %i", event.key.keysym.sym );
                 break;
             }
             break;
@@ -433,44 +379,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         }
     }
 
-    /*
-     * Size Change 
-     */
-    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
-    {
-        p_vout->p_sys->i_width = p_vout->i_width;
-        p_vout->p_sys->i_height = p_vout->i_height;
-
-        /* Need to reopen display */
-        SDLCloseDisplay( p_vout );
-        if( SDLOpenDisplay( p_vout ) )
-        {
-          intf_ErrMsg( "vout error: can't reopen display after resize" );
-          return( 1 );
-        }
-        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-    }
-    
-    /*
-     * YUV Change 
-     */
-    if( p_vout->i_changes & VOUT_YUV_CHANGE )
-    {
-        p_vout->b_need_render = ! p_vout->b_need_render;
-        
-        /* Need to reopen display */
-        SDLCloseDisplay( p_vout );
-        if( SDLOpenDisplay( p_vout ) )
-        {
-          intf_ErrMsg( "error: can't reopen display after YUV change" );
-          return( 1 );
-        }
-        p_vout->i_changes &= ~VOUT_YUV_CHANGE;
-    }
-
-    /*
-     * Fullscreen change
-     */
+    /* Fullscreen change */
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
         p_vout->b_fullscreen = ! p_vout->b_fullscreen;
@@ -484,9 +393,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
 
-    /*
-     * Pointer change
-     */
+    /* Pointer change */
     if( ! p_vout->p_sys->b_cursor_autohidden &&
         ( mdate() - p_vout->p_sys->i_lastmoved > 2000000 ) )
     {
@@ -495,137 +402,33 @@ static int vout_Manage( vout_thread_t *p_vout )
         SDL_ShowCursor( 0 );
     }
 
-    if( p_vout->i_changes & VOUT_CURSOR_CHANGE )
-    {
-        p_vout->p_sys->b_cursor = ! p_vout->p_sys->b_cursor;
-
-        SDL_ShowCursor( p_vout->p_sys->b_cursor &&
-                        ! p_vout->p_sys->b_cursor_autohidden );
-
-        p_vout->i_changes &= ~VOUT_CURSOR_CHANGE;
-    }
-    
     return( 0 );
-}
-
-/*****************************************************************************
- * vout_SetPalette: sets an 8 bpp palette
- *****************************************************************************
- * This function sets the palette given as an argument. It does not return
- * anything, but could later send information on which colors it was unable
- * to set.
- *****************************************************************************/
-static void vout_SetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
-                         u16 *blue, u16 *transp)
-{
-     /* Create a display surface with a grayscale palette */
-    SDL_Color colors[256];
-    int i;
-  
-    /* Fill colors with color information */
-    for( i = 0; i < 256; i++ )
-    {
-        colors[ i ].r = red[ i ] >> 8;
-        colors[ i ].g = green[ i ] >> 8;
-        colors[ i ].b = blue[ i ] >> 8;
-    }
-
-    /* Set palette */
-    if( SDL_SetColors( p_vout->p_sys->p_display, colors, 0, 256 ) == 0 )
-    {
-        intf_ErrMsg( "vout error: failed setting palette" );
-    }
-
 }
 
 /*****************************************************************************
  * vout_Display: displays previously rendered output
  *****************************************************************************
- * This function send the currently rendered image to the display, wait until
- * it is displayed and switch the two rendering buffer, preparing next frame.
+ * This function sends the currently rendered image to the display.
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout )
+static void vout_Display( vout_thread_t *p_vout, picture_t *p_picture )
 {
-    SDL_Rect    disp;
+    SDL_Rect disp;
 
-    if((p_vout->p_sys->p_display != NULL) && !p_vout->p_sys->b_reopen_display)
+    /* We'll need to deal with aspect ratio later */
+    disp.w = p_vout->p_sys->i_width;
+    disp.h = p_vout->p_sys->i_height;
+    disp.x = 0;
+    disp.y = 0;
+
+    if( p_picture->b_directbuffer )
     {
-        if( !p_vout->b_need_render )
-        {
-            /*
-             * p_vout->p_rendered_pic->p_y/u/v contains the YUV buffers to
-             * render 
-             */
-            /* TODO: support for streams other than 4:2:0 */
-            if( p_vout->p_rendered_pic->i_type != YUV_420_PICTURE )
-            {
-                intf_ErrMsg("sdl vout error: no support for that kind of pictures");
-                return;
-            }
-            /* create the overlay if necessary */
-            if( p_vout->p_sys->p_overlay == NULL )
-            {
-                p_vout->p_sys->p_overlay = SDL_CreateYUVOverlay( 
-                                             p_vout->p_rendered_pic->i_width, 
-                                             p_vout->p_rendered_pic->i_height,
-                                             SDL_YV12_OVERLAY, 
-                                             p_vout->p_sys->p_display );
-
-                if( p_vout->p_sys->p_overlay != NULL )
-                {
-                    intf_WarnMsg( 2, "vout: YUV acceleration %s",
-                                  p_vout->p_sys->p_overlay->hw_overlay
-                                   ? "activated" : "unavailable !" ); 
-                }
-            }
-
-            if( p_vout->p_sys->p_overlay == NULL )
-            {
-                /* Overlay allocation failed, switch back to software mode */
-                intf_ErrMsg( "vout error: could not create SDL overlay" );
-                p_vout->b_need_render = 1;
-            }
-            else
-            {
-                int i_x, i_y, i_w, i_h;
-
-                SDL_LockYUVOverlay( p_vout->p_sys->p_overlay );
-                /* copy the data into video buffers */
-                /* Y first */
-                p_main->fast_memcpy( p_vout->p_sys->p_overlay->pixels[0],
-                                     p_vout->p_rendered_pic->p_y,
-                                     p_vout->p_sys->p_overlay->h *
-                                     p_vout->p_sys->p_overlay->pitches[0] );
-                /* then V */
-                p_main->fast_memcpy( p_vout->p_sys->p_overlay->pixels[1],
-                                     p_vout->p_rendered_pic->p_v,
-                                     p_vout->p_sys->p_overlay->h *
-                                     p_vout->p_sys->p_overlay->pitches[1] / 2 );
-                /* and U */
-                p_main->fast_memcpy( p_vout->p_sys->p_overlay->pixels[2],
-                                     p_vout->p_rendered_pic->p_u,
-                                     p_vout->p_sys->p_overlay->h *
-                                     p_vout->p_sys->p_overlay->pitches[2] / 2 );
-
-                OutputCoords( p_vout->p_rendered_pic, 1,
-                              p_vout->p_sys->i_width,
-                              p_vout->p_sys->i_height,
-                              &i_x, &i_y,
-                              &i_w, &i_h);
-                disp.x = i_x;
-                disp.y = i_y;
-                disp.w = i_w;
-                disp.h = i_h;
-
-                SDL_DisplayYUVOverlay( p_vout->p_sys->p_overlay , &disp );
-                SDL_UnlockYUVOverlay(p_vout->p_sys->p_overlay);
-
-                return;
-            }
-        }
-    
-        /* Software YUV: change display frame */
-        SDL_Flip( p_vout->p_sys->p_display );
+        SDL_UnlockYUVOverlay( p_picture->p_sys->p_overlay);
+        SDL_DisplayYUVOverlay( p_picture->p_sys->p_overlay , &disp );
+        SDL_LockYUVOverlay( p_picture->p_sys->p_overlay);
+    }
+    else
+    {
+        intf_ErrMsg( "vout error: main thread passed a virtual buffer" );
     }
 }
 
@@ -639,47 +442,24 @@ static void vout_Display( vout_thread_t *p_vout )
  *****************************************************************************/
 static int SDLOpenDisplay( vout_thread_t *p_vout )
 {
-    SDL_Rect    clipping_rect;
-    Uint32      flags;
-    int bpp;
-    /* Open display 
-     * TODO: Check that we can request for a DOUBLEBUF HWSURFACE display
-     */
+    Uint32 i_flags;
+    int    i_bpp;
 
-    /* init flags and cursor */
-    flags = SDL_ANYFORMAT | SDL_HWPALETTE;
+    /* Initialize flags and cursor */
+    i_flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE;
+    i_flags |= p_vout->b_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE;
 
-    if( p_vout->b_fullscreen )
-    {
-        flags |= SDL_FULLSCREEN;
-    }
-    else
-    {
-        flags |= SDL_RESIZABLE;
-    }
-
-    if( p_vout->b_need_render )
-    {
-        flags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
-    }
-    else
-    {
-        flags |= SDL_SWSURFACE; /* save video memory */
-    }
-
-    bpp = SDL_VideoModeOK( p_vout->p_sys->i_width,
-                           p_vout->p_sys->i_height,
-                           p_vout->i_screen_depth, flags );
-
-    if( bpp == 0 )
+    i_bpp = SDL_VideoModeOK( p_vout->p_sys->i_width, p_vout->p_sys->i_height,
+                             SDL_DEFAULT_BPP, i_flags );
+    if( i_bpp == 0 )
     {
         intf_ErrMsg( "vout error: no video mode available" );
         return( 1 );
     }
 
-    p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->p_sys->i_width,
-                                                p_vout->p_sys->i_height,
-                                                bpp, flags);
+    p_vout->p_sys->p_display = SDL_SetVideoMode( p_vout->p_sys->i_width,
+                                                 p_vout->p_sys->i_height,
+                                                 i_bpp, i_flags );
 
     if( p_vout->p_sys->p_display == NULL )
     {
@@ -691,56 +471,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 
     SDL_WM_SetCaption( VOUT_TITLE " (SDL output)",
                        VOUT_TITLE " (SDL output)" );
-    SDL_EventState(SDL_KEYUP , SDL_IGNORE);                /* ignore keys up */
-
-    if( p_vout->b_need_render )
-    {
-        p_vout->p_sys->p_sdl_buf[ 0 ] = p_vout->p_sys->p_display->pixels;
-        SDL_Flip(p_vout->p_sys->p_display);
-        p_vout->p_sys->p_sdl_buf[ 1 ] = p_vout->p_sys->p_display->pixels;
-        SDL_Flip(p_vout->p_sys->p_display);
-
-        /* Set clipping for text */
-        clipping_rect.x = 0;
-        clipping_rect.y = 0;
-        clipping_rect.w = p_vout->p_sys->p_display->w;
-        clipping_rect.h = p_vout->p_sys->p_display->h;
-        SDL_SetClipRect(p_vout->p_sys->p_display, &clipping_rect);
-
-        /* Set thread information */
-        p_vout->i_width =           p_vout->p_sys->p_display->w;
-        p_vout->i_height =          p_vout->p_sys->p_display->h;
-        p_vout->i_bytes_per_line =  p_vout->p_sys->p_display->pitch;
-
-        p_vout->i_screen_depth =
-            p_vout->p_sys->p_display->format->BitsPerPixel;
-        p_vout->i_bytes_per_pixel =
-            p_vout->p_sys->p_display->format->BytesPerPixel;
-
-        p_vout->i_red_mask =        p_vout->p_sys->p_display->format->Rmask;
-        p_vout->i_green_mask =      p_vout->p_sys->p_display->format->Gmask;
-        p_vout->i_blue_mask =       p_vout->p_sys->p_display->format->Bmask;
-
-        /* FIXME: palette in 8bpp ?? */
-        /* Set and initialize buffers */
-        p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_sdl_buf[ 0 ],
-                                       p_vout->p_sys->p_sdl_buf[ 1 ] );
-    }
-    else
-    {
-        p_vout->p_sys->p_sdl_buf[ 0 ] = p_vout->p_sys->p_display->pixels;
-        p_vout->p_sys->p_sdl_buf[ 1 ] = p_vout->p_sys->p_display->pixels;
-
-        /* Set thread information */
-        p_vout->i_width =           p_vout->p_sys->p_display->w;
-        p_vout->i_height =          p_vout->p_sys->p_display->h;
-        p_vout->i_bytes_per_line =  p_vout->p_sys->p_display->pitch;
-
-        p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_sdl_buf[ 0 ],
-                                       p_vout->p_sys->p_sdl_buf[ 1 ] );
-    }
-
-    p_vout->p_sys->b_reopen_display = 0;
+    SDL_EventState( SDL_KEYUP, SDL_IGNORE );               /* ignore keys up */
 
     return( 0 );
 }
@@ -753,84 +484,68 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void SDLCloseDisplay( vout_thread_t *p_vout )
 {
-    if( p_vout->p_sys->p_display != NULL )
-    {
-        if( p_vout->p_sys->p_overlay != NULL )
-        {            
-            SDL_FreeYUVOverlay( p_vout->p_sys->p_overlay );
-            p_vout->p_sys->p_overlay = NULL;
-        }
-
-        SDL_UnlockSurface ( p_vout->p_sys->p_display );
-        SDL_FreeSurface( p_vout->p_sys->p_display );
-        p_vout->p_sys->p_display = NULL;
-    }
+    SDL_UnlockSurface ( p_vout->p_sys->p_display );
+    SDL_FreeSurface( p_vout->p_sys->p_display );
 }
 
 /*****************************************************************************
- * OutputCoords: compute the dimensions of the destination image
+ * SDLNewPicture: allocate a picture
  *****************************************************************************
- * This based on some code in SetBufferPicture... , it is also in use in the
- * the xvideo plugin. Maybe we should think about putting standard video
- * processing functions in a common library ?
+ * Returns 0 on success, -1 otherwise
  *****************************************************************************/
-static void OutputCoords( const picture_t *p_pic, const boolean_t scale,
-                          const int win_w, const int win_h,
-                          int *dx, int *dy, int *w, int *h )
+static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    if( !scale )
+    switch( p_vout->i_chroma )
     {
-        *w = p_pic->i_width; *h = p_pic->i_height;
-    }
-    else
-    {
-        *w = win_w;
-        switch( p_pic->i_aspect_ratio )
-        {
-            case AR_3_4_PICTURE:
-                *h = win_w * 3 / 4;
-                break;
+        case YUV_420_PICTURE:
+            /* We know this chroma, allocate a buffer which will be used
+             * directly by the decoder */
+            p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
 
-            case AR_16_9_PICTURE:
-                *h = win_w * 9 / 16;
-                break;
-
-            case AR_221_1_PICTURE:
-                *h = win_w * 100 / 221;
-                break;
-
-            case AR_SQUARE_PICTURE:
-            default:
-                *h = win_w * p_pic->i_height / p_pic->i_width;
-                break;
-        }
-
-        if( *h > win_h )
-        {
-            *h = win_h;
-            switch( p_pic->i_aspect_ratio )
+            if( p_pic->p_sys == NULL )
             {
-                case AR_3_4_PICTURE:
-                    *w = win_h * 4 / 3;
-                    break;
-
-                case AR_16_9_PICTURE:
-                    *w = win_h * 16 / 9;
-                    break;
-
-                case AR_221_1_PICTURE:
-                    *w = win_h * 221 / 100;
-                    break;
-
-                case AR_SQUARE_PICTURE:
-                default:
-                    *w = win_h * p_pic->i_width / p_pic->i_height;
-                    break;
+                return -1;
             }
-        }
-    }
 
-    /* Set picture position */
-    *dx = (win_w - *w) / 2;
-    *dy = (win_h - *h) / 2;
+            p_pic->p_sys->p_overlay =
+                SDL_CreateYUVOverlay( p_vout->i_width, p_vout->i_height,
+                                      SDL_YV12_OVERLAY,
+                                      p_vout->p_sys->p_display );
+
+            if( p_pic->p_sys->p_overlay == NULL )
+            {
+                free( p_pic->p_sys );
+                return -1;
+            }
+
+            SDL_LockYUVOverlay( p_pic->p_sys->p_overlay );
+
+            p_pic->i_chroma = p_vout->i_chroma; /* YUV_420_PICTURE */
+            p_pic->i_width  = p_vout->i_width;
+            p_pic->i_height = p_vout->i_height;
+
+            /* Precalculate some values */
+            p_pic->i_size         = p_vout->i_width * p_vout->i_height;
+            p_pic->i_chroma_width = p_vout->i_width / 2;
+            p_pic->i_chroma_size  = p_vout->i_height * p_pic->i_chroma_width;
+
+            /* FIXME: try to get the right i_bytes value from p_overlay */
+            p_pic->planes[ Y_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[0];
+            p_pic->planes[ Y_PLANE ].i_bytes = p_pic->i_size * sizeof( u8 );
+            p_pic->planes[ U_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[2];
+            p_pic->planes[ U_PLANE ].i_bytes = p_pic->i_size * sizeof( u8 ) / 4;
+            p_pic->planes[ V_PLANE ].p_data = p_pic->p_sys->p_overlay->pixels[1];
+            p_pic->planes[ V_PLANE ].i_bytes = p_pic->i_size * sizeof( u8 ) / 4;
+
+            p_pic->i_planes = 3;
+
+            return 0;
+
+        default:
+            /* Unknown chroma, tell the guy to get lost */
+            p_pic->i_planes = 0;
+
+            return 0;
+    }
 }
+

@@ -9,14 +9,14 @@
 export DH_COMPAT=3
 
 # Compilation options
-export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --with-ggi --enable-sdl --enable-esd --enable-qt"
+export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --with-ggi --enable-sdl --enable-esd --enable-qt --with-mad"
 export LIBDVDCSS_FLAGS="--with-dvdcss=local-shared"
 export VIDDIR="usr/share/videolan"
 export PIXDIR="usr/share/pixmaps"
 export GNOMEDIR="usr/share/gnome/apps/Multimedia"
 
 # Library options
-version=$(shell grep '^ *LIBDVDCSS_VERSION=[0-9]' configure.in | head -1 | cut -f2 -d=)
+version=$(shell grep '^ *LIBDVDCSS_VERSION=' configure.in | head -1 | sed 's/"//g' | cut -f2 -d=)
 major=$(shell echo "$(version)" | cut -f1 -d.)
 
 build: build-stamp

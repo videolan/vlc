@@ -2,7 +2,7 @@
  * vout_mga.c: MGA video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_mga.c,v 1.9 2001/11/28 15:08:05 massiot Exp $
+ * $Id: vout_mga.c,v 1.10 2001/12/09 17:01:36 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -42,7 +42,6 @@
 #include <sys/types.h>                                     /* typedef ushort */
 #endif
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"

@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.3 2001/11/28 15:08:06 massiot Exp $
+ * $Id: win32_specific.c,v 1.4 2001/12/09 17:01:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,7 +28,6 @@
 
 #include <winsock2.h>
 
-#include "config.h"
 #include "common.h"
 
 #include "win32_specific.h"

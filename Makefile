@@ -16,8 +16,9 @@ endif
 PLUGINS_DIR :=	ac3_adec \
 		ac3_spdif \
 		alsa \
- 		arts \
+		arts \
 		beos \
+		chroma \
 		directx \
 		dsp \
 		dummy \
@@ -34,26 +35,26 @@ PLUGINS_DIR :=	ac3_adec \
 		kde \
 		lpcm_adec \
 		macosx \
-		mad_adec \
+		mad \
 		memcpy \
 		mga \
 		motion \
-		mpeg \
+		mpeg_system \
 		mpeg_adec \
 		mpeg_vdec \
 		qt \
 		sdl \
-		spu_dec \
+		spudec \
 		text \
 		vcd \
-		x11 \
-		yuv
+		x11
 
 PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		ac3_spdif/ac3_spdif \
 		alsa/alsa \
- 		arts/arts \
+		arts/arts \
 		beos/beos \
+		chroma/yuv2rgb8 \
 		directx/directx \
 		dsp/dsp \
 		dummy/dummy \
@@ -80,7 +81,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		kde/kde \
 		lpcm_adec/lpcm_adec \
 		macosx/macosx \
-		mad_adec/mad_adec \
+		mad/mad \
 		memcpy/memcpy \
 		memcpy/memcpymmx \
 		memcpy/memcpymmxext \
@@ -91,14 +92,14 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		motion/motionmmxext \
 		motion/motion3dnow \
 		motion/motionaltivec \
+		mpeg_system/mpeg_es \
+		mpeg_system/mpeg_ps \
+		mpeg_system/mpeg_ts \
 		mpeg_adec/mpeg_adec \
 		mpeg_vdec/mpeg_vdec \
-		mpeg/es \
-		mpeg/ps \
-		mpeg/ts \
 		qt/qt \
 		sdl/sdl \
-		spu_dec/spu_dec \
+		spudec/spudec \
 		text/ncurses \
 		text/rc \
 		vcd/vcd \
@@ -106,12 +107,13 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		x11/xvideo \
 		yuv/yuv \
 		yuv/yuvmmx
+
 #
 # C Objects
 # 
 INTERFACE := main interface intf_msg intf_playlist intf_channels
 INPUT := input input_ext-dec input_ext-intf input_dec input_programs input_netlist input_clock mpeg_system
-VIDEO_OUTPUT := video_output video_text video_spu video_yuv
+VIDEO_OUTPUT := video_output video_text vout_pictures vout_subpictures
 AUDIO_OUTPUT := audio_output aout_ext-dec aout_u8 aout_s8 aout_u16 aout_s16 aout_spdif
 MISC := mtime tests modules netutils iso_lang
 
