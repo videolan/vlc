@@ -186,6 +186,10 @@ static int Demux( demux_t *p_demux )
         }
         else if( *psz_parse )
         {
+            if( !psz_name || !*psz_name )
+            {
+                psz_name = strdup( psz_parse ); /* Use filename as name for relative entries */
+            }
             char *psz_mrl =
                 ProcessMRL( psz_parse, p_demux->p_sys->psz_prefix );
 
