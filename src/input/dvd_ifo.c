@@ -52,14 +52,14 @@ static int IfoFindStart( ifo_t* p_ifo )
     while( strncmp( psz_test, psz_ifo_start, 12 ) != 0 )
     {
         /* The start of ifo file is on a sector boundary */
-        p_ifo->i_pos = lseek( p_ifo->i_fd,
+        p_ifo->i_pos = lseek64( p_ifo->i_fd,
                               p_ifo->i_pos + DVD_LB_SIZE,
                               SEEK_SET );
         read( p_ifo->i_fd, psz_test, 12 );
     }
     p_ifo->i_off = p_ifo->i_pos;
 
-fprintf( stderr, "VMG Off : %d\n", p_ifo->i_off );
+fprintf( stderr, "VMG Off : %lld\n", (long long)(p_ifo->i_off) );
 
     return 0;
 }
@@ -77,14 +77,14 @@ static int IfoFindVTS( ifo_t* p_ifo )
     while( strncmp( psz_test, psz_ifo_start, 12 ) != 0 )
     {
         /* The start of ifo file is on a sector boundary */
-        p_ifo->i_pos = lseek( p_ifo->i_fd,
+        p_ifo->i_pos = lseek64( p_ifo->i_fd,
                               p_ifo->i_pos + DVD_LB_SIZE,
                               SEEK_SET );
         read( p_ifo->i_fd, psz_test, 12 );
     }
     p_ifo->i_off = p_ifo->i_pos;
 
-fprintf( stderr, "VTS Off : %d\n", p_ifo->i_off );
+fprintf( stderr, "VTS Off : %lld\n", (long long)(p_ifo->i_off) );
 
     return 0;
 }
@@ -101,7 +101,7 @@ ifo_t IfoInit( int i_fd )
     ifo.i_fd = i_fd;
     /* No data at the beginning of the disk
      * 512000 bytes is just another value :) */
-    ifo.i_pos = lseek( ifo.i_fd, 250 *DVD_LB_SIZE, SEEK_SET );
+    ifo.i_pos = lseek64( ifo.i_fd, 250 *DVD_LB_SIZE, SEEK_SET );
     /* FIXME : use udf filesystem to find the beginning of the file */
     IfoFindStart( &ifo );
     
@@ -173,51 +173,56 @@ void IfoEnd( ifo_t* p_ifo )
 #define GET( p_field , i_len )                                              \
     {                                                                       \
         read( p_ifo->i_fd , (p_field) , (i_len) );                          \
-fprintf(stderr, "Pos : %d Val : %llx\n", p_ifo->i_pos - i_start,            \
-                                        (long long int) *(p_field) );       \
+fprintf(stderr, "Pos : %lld Val : %llx\n",                                  \
+                                (long long)(p_ifo->i_pos - i_start),        \
+                                (long long)*(p_field) );                    \
         p_ifo->i_pos =                                                      \
-                   lseek( p_ifo->i_fd, p_ifo->i_pos + (i_len), SEEK_SET );  \
+                   lseek64( p_ifo->i_fd, p_ifo->i_pos + (i_len), SEEK_SET );  \
     }
 
 #define GETC( p_field )                                                     \
     {                                                                       \
         read( p_ifo->i_fd , (p_field) , 1 );                                \
-fprintf(stderr, "Pos : %d Value : %d\n", p_ifo->i_pos - i_start,            \
+fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
+                                (long long)(p_ifo->i_pos - i_start),        \
                                           *(p_field) );                     \
-        p_ifo->i_pos = lseek( p_ifo->i_fd , p_ifo->i_pos + 1 , SEEK_SET );  \
+        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 1 , SEEK_SET );  \
     }
 
 #define GETS( p_field )                                                     \
     {                                                                       \
         read( p_ifo->i_fd , (p_field) , 2 );                                \
         *(p_field) = ntohs( *(p_field) );                                   \
-fprintf(stderr, "Pos : %d Value : %d\n", p_ifo->i_pos - i_start,            \
+fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
+                                (long long)(p_ifo->i_pos - i_start),        \
                                           *(p_field) );                     \
-        p_ifo->i_pos = lseek( p_ifo->i_fd , p_ifo->i_pos + 2 , SEEK_SET );  \
+        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 2 , SEEK_SET );  \
     }
 
 #define GETL( p_field )                                                     \
     {                                                                       \
         read( p_ifo->i_fd , (p_field) , 4 );                                \
         *(p_field) = ntohl( *(p_field) );                                   \
-fprintf(stderr, "Pos : %d Value : %d\n", p_ifo->i_pos - i_start,            \
+fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
+                                (long long)(p_ifo->i_pos - i_start),        \
                                           *(p_field) );                     \
-        p_ifo->i_pos = lseek( p_ifo->i_fd , p_ifo->i_pos + 4 , SEEK_SET );  \
+        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 4 , SEEK_SET );  \
     }
 
 #define GETLL( p_field )                                                    \
     {                                                                       \
         read( p_ifo->i_fd , (p_field) , 8 );                                \
         *(p_field) = ntoh64( *(p_field) );                                  \
-fprintf(stderr, "Pos : %d Value : %lld\n", p_ifo->i_pos - i_start,          \
+fprintf(stderr, "Pos : %lld Value : %lld\n",                                \
+                                (long long)(p_ifo->i_pos - i_start),        \
                                             *(p_field) );                   \
-        p_ifo->i_pos = lseek( p_ifo->i_fd , p_ifo->i_pos + 8 , SEEK_SET );  \
+        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 8 , SEEK_SET );  \
     }
 
 #define FLUSH( i_len )                                                      \
     {                                                                       \
-fprintf(stderr, "Pos : %d\n", p_ifo->i_pos - i_start );                     \
-        p_ifo->i_pos = lseek( p_ifo->i_fd ,                                 \
+fprintf(stderr, "Pos : %lld\n", (long long)(p_ifo->i_pos - i_start));       \
+        p_ifo->i_pos = lseek64( p_ifo->i_fd ,                                 \
                               p_ifo->i_pos + (i_len), SEEK_SET );           \
     }
 
@@ -232,7 +237,7 @@ static pgc_t ReadPGC( ifo_t* p_ifo )
 {
     pgc_t   pgc;
     int     i;
-    int     i_start = p_ifo->i_pos;
+    off64_t   i_start = p_ifo->i_pos;
 
 fprintf( stderr, "PGC\n" );
 
@@ -267,7 +272,7 @@ fprintf( stderr, "PGC\n" );
     /* Parsing of pgc_com_tab_t */
     if( pgc.i_com_tab_sbyte )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, i_start
                             + pgc.i_com_tab_sbyte, SEEK_SET );
         GETS( &pgc.com_tab.i_pre_com_nb );
         GETS( &pgc.com_tab.i_post_com_nb );
@@ -313,7 +318,7 @@ fprintf( stderr, "PGC\n" );
     /* Parsing of pgc_prg_map_t */
     if( pgc.i_prg_map_sbyte )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, i_start
                             + pgc.i_prg_map_sbyte, SEEK_SET );
         pgc.prg_map.pi_entry_cell = malloc( pgc.i_prg_nb *sizeof(u8) );
         if( pgc.prg_map.pi_entry_cell == NULL )
@@ -328,7 +333,7 @@ fprintf( stderr, "PGC\n" );
     /* Parsing of cell_play_inf_t */
     if( pgc.i_cell_play_inf_sbyte )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, i_start
                             + pgc.i_cell_play_inf_sbyte, SEEK_SET );
         pgc.p_cell_play_inf = malloc( pgc.i_cell_nb *sizeof(cell_play_inf_t) );
         if( pgc.p_cell_play_inf == NULL )
@@ -352,7 +357,7 @@ fprintf( stderr, "PGC\n" );
     /* Parsing of cell_pos_inf_map */
     if( pgc.i_cell_pos_inf_sbyte )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, i_start
                             + pgc.i_cell_pos_inf_sbyte, SEEK_SET );
         pgc.p_cell_pos_inf = malloc( pgc.i_cell_nb *sizeof(cell_pos_inf_t) );
         if( pgc.p_cell_play_inf == NULL )
@@ -379,7 +384,7 @@ static pgci_inf_t ReadUnit( ifo_t* p_ifo )
 {
     pgci_inf_t      inf;
     int             i;
-    int             i_start = p_ifo->i_pos;
+    off64_t           i_start = p_ifo->i_pos;
 
 fprintf( stderr, "Unit\n" );
 
@@ -402,7 +407,7 @@ fprintf( stderr, "Unit\n" );
     }
     for( i=0 ; i<inf.i_srp_nb ; i++ )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd,
+        p_ifo->i_pos = lseek64( p_ifo->i_fd,
                          i_start + inf.p_srp[i].i_pgci_sbyte,
                          SEEK_SET );
         inf.p_srp[i].pgc = ReadPGC( p_ifo );
@@ -418,7 +423,7 @@ static pgci_ut_t ReadUnitTable( ifo_t* p_ifo )
 {
     pgci_ut_t       pgci;
     int             i;
-    int             i_start = p_ifo->i_pos;
+    off64_t           i_start = p_ifo->i_pos;
 
 fprintf( stderr, "Unit Table\n" );
 
@@ -448,7 +453,7 @@ fprintf( stderr, "Unit Table\n" );
     }
     for( i=0 ; i<pgci.i_lu_nb ; i++ )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, i_start +
                                 pgci.p_lu[i].i_lu_sbyte,
                                 SEEK_SET );
         pgci.p_pgci_inf[i] = ReadUnit( p_ifo );
@@ -464,7 +469,7 @@ static c_adt_t ReadCellInf( ifo_t* p_ifo )
 {
     c_adt_t         c_adt;
     int             i, i_max;
-    int             i_start = p_ifo->i_pos;
+    off64_t           i_start = p_ifo->i_pos;
 
 fprintf( stderr, "CELL ADD\n" );
 
@@ -498,7 +503,7 @@ static vobu_admap_t ReadMap( ifo_t* p_ifo )
 {
     vobu_admap_t        map;
     int                 i, i_max;
-    int                 i_start = p_ifo->i_pos;
+    off64_t               i_start = p_ifo->i_pos;
     
 fprintf( stderr, "VOBU ADMAP\n" );
 
@@ -525,7 +530,7 @@ static vmgi_mat_t ReadVMGInfMat( ifo_t* p_ifo )
 {
     vmgi_mat_t  mat;
     int         i;
-    int         i_start = p_ifo->i_pos;
+    off64_t       i_start = p_ifo->i_pos;
 
 fprintf( stderr, "VMGI\n" );
 
@@ -582,7 +587,7 @@ static vmg_ptt_srpt_t ReadVMGTitlePointer( ifo_t* p_ifo )
 {
     vmg_ptt_srpt_t  ptr;
     int             i;
-    int             i_start = p_ifo->i_pos;
+    off64_t             i_start = p_ifo->i_pos;
 
 fprintf( stderr, "PTR\n" );
 
@@ -618,7 +623,7 @@ static vmg_ptl_mait_t ReadParentalInf( ifo_t* p_ifo )
 {
     vmg_ptl_mait_t  par;
     int             i, j, k;
-    int             i_start = p_ifo->i_pos;
+    off64_t           i_start = p_ifo->i_pos;
 
 fprintf( stderr, "PTL\n" );
 
@@ -648,7 +653,7 @@ fprintf( stderr, "PTL\n" );
     }
     for( i=0 ; i<par.i_country_nb ; i++ )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, i_start +
                          par.p_ptl_desc[i].i_ptl_mai_sbyte, SEEK_SET );
         for( j=1 ; j<=8 ; j++ )
         {
@@ -677,7 +682,7 @@ static vmg_vts_atrt_t ReadVTSAttr( ifo_t* p_ifo )
 {
     vmg_vts_atrt_t  atrt;
     int             i, j;
-    int             i_start = p_ifo->i_pos;
+    off64_t           i_start = p_ifo->i_pos;
 
 fprintf( stderr, "VTS ATTR\n" );
 
@@ -704,32 +709,34 @@ fprintf( stderr, "VTS ATTR\n" );
     }
     for( i=0 ; i<atrt.i_vts_nb ; i++ )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start + atrt.pi_vts_atrt_sbyte[i],
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, i_start +
+                                atrt.pi_vts_atrt_sbyte[i],
                                 SEEK_SET );
         GETL( &atrt.p_vts_atrt[i].i_ebyte );
         GETL( &atrt.p_vts_atrt[i].i_cat_app_type );
         GETS( &atrt.p_vts_atrt[i].i_vtsm_video_atrt );
         FLUSH( 1 );
         GETC( &atrt.p_vts_atrt[i].i_vtsm_audio_nb );
-        for( j=0 ; j<atrt.p_vts_atrt[i].i_vtsm_audio_nb ; j++ )
+        for( j=0 ; j<8 ; j++ )
         {
             GETLL( &atrt.p_vts_atrt[i].pi_vtsm_audio_atrt[j] );
         }
-        FLUSH( 1 );
+        FLUSH( 17 );
         GETC( &atrt.p_vts_atrt[i].i_vtsm_subpic_nb );
-        for( j=0 ; j<atrt.p_vts_atrt[i].i_vtsm_subpic_nb ; j++ )
+        for( j=0 ; j<28 ; j++ )
         {
             GET( &atrt.p_vts_atrt[i].pi_vtsm_subpic_atrt[j], 6 );
             /* FIXME : Fix endianness issue here */
         }
+        FLUSH( 2 );
         GETS( &atrt.p_vts_atrt[i].i_vtstt_video_atrt );
         FLUSH( 1 );
         GETL( &atrt.p_vts_atrt[i].i_vtstt_audio_nb );
-        for( j=0 ; j<atrt.p_vts_atrt[i].i_vtstt_audio_nb ; j++ )
+        for( j=0 ; j<8 ; j++ )
         {
             GETLL( &atrt.p_vts_atrt[i].pi_vtstt_audio_atrt[j] );
         }
-        FLUSH( 1 );
+        FLUSH( 17 );
         GETC( &atrt.p_vts_atrt[i].i_vtstt_subpic_nb );
         for( j=0 ; j<atrt.p_vts_atrt[i].i_vtstt_subpic_nb ; j++ )
         {
@@ -748,49 +755,49 @@ static vmg_t ReadVMG( ifo_t* p_ifo )
 {
     vmg_t       vmg;
 
-    p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off, SEEK_SET);
+    p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off, SEEK_SET);
     vmg.mat = ReadVMGInfMat( p_ifo );
-    p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off + 
+    p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off + 
                               vmg.mat.i_fp_pgc_sbyte, SEEK_SET );
     vmg.pgc = ReadPGC( p_ifo );
     if( vmg.mat.i_ptt_srpt_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vmg.mat.i_ptt_srpt_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vmg.ptt_srpt = ReadVMGTitlePointer( p_ifo );
     }
     if( vmg.mat.i_pgci_ut_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vmg.mat.i_pgci_ut_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vmg.pgci_ut = ReadUnitTable( p_ifo );
     }
     if( vmg.mat.i_ptl_mait_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vmg.mat.i_ptl_mait_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vmg.ptl_mait = ReadParentalInf( p_ifo );
     }
     if( vmg.mat.i_vts_atrt_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vmg.mat.i_vts_atrt_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vmg.vts_atrt = ReadVTSAttr( p_ifo );
     }
     if( vmg.mat.i_c_adt_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vmg.mat.i_c_adt_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vmg.c_adt = ReadCellInf( p_ifo );
     }
     if( vmg.mat.i_vobu_admap_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vmg.mat.i_vobu_admap_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vmg.vobu_admap = ReadMap( p_ifo );
@@ -810,7 +817,7 @@ static vtsi_mat_t ReadVTSInfMat( ifo_t* p_ifo )
 {
     vtsi_mat_t  mat;
     int         i;
-    int         i_start = p_ifo->i_pos;
+    off64_t       i_start = p_ifo->i_pos;
 
 fprintf( stderr, "VTSI\n" );
 
@@ -876,7 +883,7 @@ static vts_ptt_srpt_t ReadVTSTitlePointer( ifo_t* p_ifo )
 {
     vts_ptt_srpt_t  ptr;
     int             i;
-    int             i_start = p_ifo->i_pos;
+    off64_t           i_start = p_ifo->i_pos;
 
 fprintf( stderr, "PTR\n" );
 
@@ -904,7 +911,7 @@ fprintf( stderr, "PTR\n" );
     }
     for( i=0 ; i<ptr.i_ttu_nb ; i++ )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_start +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, i_start +
                         ptr.pi_ttu_sbyte[i], SEEK_SET );
         GETS( &ptr.p_ttu[i].i_pgc_nb );
         GETS( &ptr.p_ttu[i].i_prg_nb );
@@ -920,7 +927,7 @@ static vts_tmap_ti_t ReadVTSTimeMap( ifo_t* p_ifo )
 {
     vts_tmap_ti_t   tmap;
     int             i,j;
-    int             i_start = p_ifo->i_pos;
+    off64_t           i_start = p_ifo->i_pos;
 
 fprintf( stderr, "TMAP\n" );
 
@@ -980,56 +987,56 @@ static vts_t ReadVTS( ifo_t* p_ifo )
     vts.mat = ReadVTSInfMat( p_ifo );
     if( vts.mat.i_ptt_srpt_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vts.mat.i_ptt_srpt_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.ptt_srpt = ReadVTSTitlePointer( p_ifo );
     }
     if( vts.mat.i_m_pgci_ut_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vts.mat.i_m_pgci_ut_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.pgci_ut = ReadUnitTable( p_ifo );
     }
     if( vts.mat.i_pgcit_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vts.mat.i_pgcit_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.pgci_ti = ReadUnit( p_ifo );
     }
     if( vts.mat.i_tmap_ti_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vts.mat.i_tmap_ti_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.tmap_ti = ReadVTSTimeMap( p_ifo );
     }
     if( vts.mat.i_m_c_adt_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vts.mat.i_m_c_adt_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.m_c_adt = ReadCellInf( p_ifo );
     }
     if( vts.mat.i_m_vobu_admap_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vts.mat.i_m_vobu_admap_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.m_vobu_admap = ReadMap( p_ifo );
     }
     if( vts.mat.i_c_adt_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vts.mat.i_c_adt_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.c_adt = ReadCellInf( p_ifo );
     }
     if( vts.mat.i_vobu_admap_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, p_ifo->i_off +
                         vts.mat.i_vobu_admap_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.vobu_admap = ReadMap( p_ifo );
@@ -1049,6 +1056,8 @@ static vts_t ReadVTS( ifo_t* p_ifo )
 void IfoRead( ifo_t* p_ifo )
 {
     int     i;
+    off64_t i_off;
+
     p_ifo->vmg = ReadVMG( p_ifo );
     p_ifo->p_vts = malloc( p_ifo->vmg.mat.i_tts_nb *sizeof(vts_t) );
     if( p_ifo->p_vts == NULL )
@@ -1057,11 +1066,13 @@ void IfoRead( ifo_t* p_ifo )
         p_ifo->b_error = 1;
         return;
     }
-    for( i=0 ; i<1/*p_ifo->vmg.mat.i_tts_nb*/ ; i++ )
+    for( i=0 ; i<p_ifo->vmg.mat.i_tts_nb ; i++ )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd,
-                     p_ifo->vmg.ptt_srpt.p_tts[i].i_ssector *DVD_LB_SIZE,
-                     SEEK_SET );
+
+fprintf( stderr, "######### VTS %d #############\n", i );
+
+        i_off = p_ifo->vmg.ptt_srpt.p_tts[i].i_ssector *DVD_LB_SIZE;
+        p_ifo->i_pos = lseek64( p_ifo->i_fd, i_off, SEEK_SET );
         /* FIXME : use udf filesystem to avoid this */
         IfoFindVTS( p_ifo );
         p_ifo->p_vts[i] = ReadVTS( p_ifo );

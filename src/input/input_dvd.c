@@ -2,6 +2,7 @@
  * input_dvd.c: DVD reading
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
+ * $Id: input_dvd.c,v 1.3 2001/01/16 04:41:20 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -57,13 +58,14 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  DVDProbe     ( struct input_thread_s * );
-static int  DVDRead      ( struct input_thread_s *,
+static int  DVDProbe    ( struct input_thread_s * );
+static int  DVDRead     ( struct input_thread_s *,
                           data_packet_t * p_packets[INPUT_READ_ONCE] );
-static void DVDInit      ( struct input_thread_s * );
-static void DVDEnd       ( struct input_thread_s * );
-static int  DVDSeek      ( struct input_thread_s *, off_t );
-static int  DVDRewind    ( struct input_thread_s * );
+static void DVDInit     ( struct input_thread_s * );
+static void DVDEnd      ( struct input_thread_s * );
+/* FIXME : DVDSeek should be on 64 bits ? Is it possible in input ? */
+static int  DVDSeek     ( struct input_thread_s *, off_t );
+static int  DVDRewind   ( struct input_thread_s * );
 static struct data_packet_s * NewPacket ( void *, size_t );
 static void DeletePacket( void *, struct data_packet_s * );
 static void DeletePES   ( void *, struct pes_packet_s * );
@@ -88,7 +90,7 @@ static int DVDProbe( input_thread_t * p_input )
 static void DVDInit( input_thread_t * p_input )
 {
     thread_dvd_data_t *  p_method;
-    u32                  i_start;
+    off64_t              i_start;
 
     if( (p_method = malloc( sizeof(thread_dvd_data_t) )) == NULL )
     {
@@ -98,8 +100,9 @@ static void DVDInit( input_thread_t * p_input )
     }
 
     p_input->p_plugin_data = (void *)p_method;
+    p_input->p_method_data = NULL;
 
-    lseek( p_input->i_handle, 0, SEEK_SET );
+    lseek64( p_input->i_handle, 0, SEEK_SET );
 
     /* Ifo initialisation */
     p_method->ifo = IfoInit( p_input->i_handle );
@@ -107,8 +110,9 @@ static void DVDInit( input_thread_t * p_input )
 
     i_start = p_method->ifo.p_vts[0].i_pos +
               p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
-    fprintf(stderr, "Begin at : %d\n", i_start );
-    lseek( p_input->i_handle, i_start, SEEK_SET );
+
+    i_start = lseek64( p_input->i_handle, i_start, SEEK_SET );
+    fprintf(stderr, "Begin at : %lld\n", (long long)i_start );
 
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
@@ -156,7 +160,7 @@ static void DVDInit( input_thread_t * p_input )
                 break;
             }
         }
-        lseek( p_input->i_handle, i_start, SEEK_SET );
+        lseek64( p_input->i_handle, i_start, SEEK_SET );
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.i_tell = 0;
         if( p_demux_data->b_has_PSM )
@@ -319,11 +323,9 @@ static int DVDRead( input_thread_t * p_input,
                 if( (i_nb = read( p_input->i_handle, &i_dummy, 1 )) != 0 )
                 {
                     i_startcode |= i_dummy;
-fprintf(stderr, "tut :%d %d\n", i_dummy, i_nb );
                 }
                 else
                 {
-fprintf(stderr, "poc\n" );
                     return( 1 );
                 }
             }
@@ -410,7 +412,9 @@ static int DVDRewind( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * DVDSeek : Goes to a given position on the stream
+ * DVDSeek : Goes to a given position on the stream ; this one is used by the 
+ * input and translate chronological position from input to logical postion
+ * on the device
  *****************************************************************************/
 static int DVDSeek( input_thread_t * p_input, off_t i_off )
 {

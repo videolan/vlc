@@ -302,14 +302,15 @@ typedef struct vts_atrt_s
     u64             pi_vtsm_audio_atrt[8];      // i_vtsm_audio_nb * 8 bytes
 //    char            ???
     u8              i_vtsm_subpic_nb;           // 1 byte
-    u64             pi_vtsm_subpic_atrt[32];    // i_vtsm_subpic_nb * 6 bytes
+    u64             pi_vtsm_subpic_atrt[28];    // i_vtsm_subpic_nb * 6 bytes
+//    char[2]         ???
     u16             i_vtstt_video_atrt;         // 2 bytes
 //    char            ???
     u8              i_vtstt_audio_nb;           // 1 byte
     u64             pi_vtstt_audio_atrt[8];     // i_vtstt_audio_nb * 8 bytes
-//    char            ???
+//    char[17]        ???
     u8              i_vtstt_subpic_nb;          // 1 byte
-    u64             pi_vtstt_subpic_atrt[32];   // i_vtstt_subpic_nb * 6 bytes
+    u64             pi_vtstt_subpic_atrt[28];   // i_vtstt_subpic_nb * 6 bytes
 } vts_atrt_t;
 
 /* Main struct for vts attributes
@@ -445,7 +446,7 @@ typedef struct vts_s
     /* Video Title Set Menu PGCI Unit Table */
     pgci_ut_t       pgci_ut;
     /* Video Title Set Program Chain Info Table */
-    pgci_inf_t       pgci_ti;
+    pgci_inf_t      pgci_ti;
     /* Video Title Set Time Map Table */
     vts_tmap_ti_t   tmap_ti;
     /* VTSM Cell Adress Table Information */
@@ -466,9 +467,9 @@ typedef struct ifo_s
     /* File descriptor for the device */
     int             i_fd;
     /* Offset to video_ts.ifo on the device */
-    u32             i_off;
+    off64_t           i_off;
     /* Position of stream pointer */
-    u32             i_pos;
+    off64_t           i_pos;
     /* Error Management */
     boolean_t       b_error;
     /* Structure described in video_ts */
@@ -478,7 +479,12 @@ typedef struct ifo_s
 } ifo_t;
 
 /*****************************************************************************
- * Prototypes in ifo.c
+ * Prototypes in dvd_ifo.c
  *****************************************************************************/
 ifo_t   IfoInit( int );
 void    IfoRead( ifo_t* );
+
+/*****************************************************************************
+ * Prototypes in input_dvd.c
+ *****************************************************************************/
+off64_t Seek64( int, off64_t, int);

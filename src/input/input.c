@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.69 2001/01/15 06:18:23 sam Exp $
+ * $Id: input.c,v 1.70 2001/01/16 04:41:20 stef Exp $
  *
  * Authors: 
  *
@@ -278,7 +278,10 @@ static void InitThread( input_thread_t * p_input )
 
     free( p_input->p_config );
 
-    p_input->p_plugin->pf_init( p_input );
+    if( !p_input->b_error )
+    {
+        p_input->p_plugin->pf_init( p_input );
+    }
 
     *p_input->pi_status = THREAD_READY;
 }
