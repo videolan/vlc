@@ -974,6 +974,8 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
             XStoreName( p_vout->p_sys->p_display, p_win->base_window,
 #ifdef MODULE_NAME_IS_x11
                         VOUT_TITLE " (X11 output)"
+#elif defined(MODULE_NAME_IS_glx)
+                        VOUT_TITLE " (GLX output)"
 #else
                         VOUT_TITLE " (XVideo output)"
 #endif
@@ -1127,7 +1129,9 @@ static void DestroyWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     /* Do NOT use XFlush here ! */
     XSync( p_vout->p_sys->p_display, False );
 
-    XDestroyWindow( p_vout->p_sys->p_display, p_win->video_window );
+    if( p_win->video_window != None )
+        XDestroyWindow( p_vout->p_sys->p_display, p_win->video_window );
+
     XFreeGC( p_vout->p_sys->p_display, p_win->gc );
 
     XUnmapWindow( p_vout->p_sys->p_display, p_win->base_window );
@@ -1332,11 +1336,18 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
             config_GetInt( p_vout, MODULE_STRING "-altfullscreen" );
 
         XUnmapWindow( p_vout->p_sys->p_display,
-                      p_vout->p_sys->p_win->base_window);
+                      p_vout->p_sys->p_win->base_window );
 
         p_vout->p_sys->p_win = &p_vout->p_sys->fullscreen_window;
 
         CreateWindow( p_vout, p_vout->p_sys->p_win );
+        XDestroyWindow( p_vout->p_sys->p_display,
+                        p_vout->p_sys->fullscreen_window.video_window );
+        XReparentWindow( p_vout->p_sys->p_display,
+                         p_vout->p_sys->original_window.video_window,
+                         p_vout->p_sys->fullscreen_window.base_window, 0, 0 );
+        p_vout->p_sys->fullscreen_window.video_window =
+            p_vout->p_sys->original_window.video_window;
 
         /* To my knowledge there are two ways to create a borderless window.
          * There's the generic way which is to tell x to bypass the window
@@ -1450,11 +1461,17 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     else
     {
         msg_Dbg( p_vout, "leaving fullscreen mode" );
+
+	XReparentWindow( p_vout->p_sys->p_display,
+			 p_vout->p_sys->original_window.video_window,
+			 p_vout->p_sys->original_window.base_window, 0, 0 );
+
+        p_vout->p_sys->fullscreen_window.video_window = None;
         DestroyWindow( p_vout, &p_vout->p_sys->fullscreen_window );
         p_vout->p_sys->p_win = &p_vout->p_sys->original_window;
 
         XMapWindow( p_vout->p_sys->p_display,
-                    p_vout->p_sys->p_win->base_window);
+                    p_vout->p_sys->p_win->base_window );
     }
 
     /* Unfortunately, using XSync() here is not enough to ensure the
@@ -2132,18 +2149,18 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
        case VOUT_CLOSE:
             vlc_mutex_lock( &p_vout->p_sys->lock );
             XUnmapWindow( p_vout->p_sys->p_display,
-                          p_vout->p_sys->p_win->base_window );
+                          p_vout->p_sys->original_window.base_window );
             vlc_mutex_unlock( &p_vout->p_sys->lock );
             /* Fall through */
 
        case VOUT_REPARENT:
             vlc_mutex_lock( &p_vout->p_sys->lock );
             XReparentWindow( p_vout->p_sys->p_display,
-                             p_vout->p_sys->p_win->base_window,
+                             p_vout->p_sys->original_window.base_window,
                              DefaultRootWindow( p_vout->p_sys->p_display ),
                              0, 0 );
             XSync( p_vout->p_sys->p_display, False );
-            p_vout->p_sys->p_win->owner_window = 0;
+            p_vout->p_sys->original_window.owner_window = 0;
             vlc_mutex_unlock( &p_vout->p_sys->lock );
             return vout_vaControlDefault( p_vout, i_query, args );
 

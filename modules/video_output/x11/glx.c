@@ -84,10 +84,41 @@ static void SwitchContext( vout_thread_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define ADAPTOR_TEXT N_("XVideo adaptor number")
+#define ADAPTOR_LONGTEXT N_( \
+    "If you graphics card provides several adaptors, this option allows you " \
+    "to choose which one will be used (you shouldn't have to change this).")
+
+#define ALT_FS_TEXT N_("Alternate fullscreen method")
+#define ALT_FS_LONGTEXT N_( \
+    "There are two ways to make a fullscreen window, unfortunately each one " \
+    "has its drawbacks.\n" \
+    "1) Let the window manager handle your fullscreen window (default), but " \
+    "things like taskbars will likely show on top of the video.\n" \
+    "2) Completely bypass the window manager, but then nothing will be able " \
+    "to show on top of the video.")
+
+#define DISPLAY_TEXT N_("X11 display name")
+#define DISPLAY_LONGTEXT N_( \
+    "Specify the X11 hardware display you want to use. By default VLC will " \
+    "use the value of the DISPLAY environment variable.")
+
+#define SCREEN_TEXT N_("Screen to be used for fullscreen mode.")
+#define SCREEN_LONGTEXT N_( \
+    "Choose the screen you want to use in fullscreen mode. For instance " \
+    "set it to 0 for first screen, 1 for the second.")
+
 vlc_module_begin();
     set_description( _("X11 OpenGL provider") );
     set_capability( "opengl provider", 50 );
     set_callbacks( CreateOpenGL, DestroyOpenGL );
+
+    add_string( "glx-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
+    add_integer( "glx-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, VLC_TRUE );
+    add_bool( "glx-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, VLC_TRUE );
+#ifdef HAVE_XINERAMA
+    add_integer ( "glx-xineramascreen", 0, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, VLC_TRUE );
+#endif
 vlc_module_end();
 
 /*****************************************************************************
