@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.17 2003/05/12 17:33:19 gbazin Exp $
+ * $Id: timer.cpp,v 1.18 2003/05/18 19:46:35 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -57,6 +57,7 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
     i_old_playing_status = PAUSE_S;
+    i_old_rate = DEFAULT_RATE;
 
     Start( 100 /*milliseconds*/, wxTIMER_CONTINUOUS );
 }
@@ -130,7 +131,7 @@ void Timer::Notify()
         /* Show slider */
         if( p_intf->p_sys->p_input )
         {
-	    //if( p_intf->p_sys->p_input->stream.b_seekable )
+            //if( p_intf->p_sys->p_input->stream.b_seekable )
             {
                 p_main_interface->slider_frame->Show();
                 p_main_interface->frame_sizer->Show(
@@ -140,7 +141,7 @@ void Timer::Notify()
             }
 
             p_main_interface->statusbar->SetStatusText(
-                wxU(p_intf->p_sys->p_input->psz_source), 1 );
+                wxU(p_intf->p_sys->p_input->psz_source), 2 );
 
             p_main_interface->TogglePlayButton( PLAYING_S );
             i_old_playing_status = PLAYING_S;
@@ -165,7 +166,7 @@ void Timer::Notify()
             i_old_playing_status = PAUSE_S;
         }
 
-        p_main_interface->statusbar->SetStatusText( wxT(""), 1 );
+        p_main_interface->statusbar->SetStatusText( wxT(""), 2 );
 
         vlc_object_release( p_intf->p_sys->p_input );
         p_intf->p_sys->p_input = NULL;
@@ -240,6 +241,15 @@ void Timer::Notify()
                     p_main_interface->TogglePlayButton( PLAYING_S );
                 }
                 i_old_playing_status = p_input->stream.control.i_status;
+            }
+
+            /* Manage Speed status */
+            if( i_old_rate != p_input->stream.control.i_rate )
+            {
+                p_main_interface->statusbar->SetStatusText(
+                    wxString::Format(wxT("x%.2f"),
+                    1000.0 / p_input->stream.control.i_rate), 1 );
+                i_old_rate = p_input->stream.control.i_rate;
             }
         }
 

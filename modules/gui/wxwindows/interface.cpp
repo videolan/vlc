@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.29 2003/05/18 16:27:18 gbazin Exp $
+ * $Id: interface.cpp,v 1.30 2003/05/18 19:46:35 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -60,8 +60,11 @@
 #include "bitmaps/previous.xpm"
 #include "bitmaps/next.xpm"
 #include "bitmaps/playlist.xpm"
-#define TOOLBAR_BMP_WIDTH 24
-#define TOOLBAR_BMP_HEIGHT 24
+#include "bitmaps/fast.xpm"
+#include "bitmaps/slow.xpm"
+
+#define TOOLBAR_BMP_WIDTH 36
+#define TOOLBAR_BMP_HEIGHT 36
 
 /* include the icon graphic */
 #include "share/vlc32x32.xpm"
@@ -115,6 +118,8 @@ enum
     PlayStream_Event,
     PrevStream_Event,
     NextStream_Event,
+    SlowStream_Event,
+    FastStream_Event,
 
     /* it is important for the id corresponding to the "About" command to have
      * this standard value as otherwise it won't be handled properly under Mac
@@ -148,6 +153,8 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(PlayStream_Event, Interface::OnPlayStream)
     EVT_MENU(PrevStream_Event, Interface::OnPrevStream)
     EVT_MENU(NextStream_Event, Interface::OnNextStream)
+    EVT_MENU(SlowStream_Event, Interface::OnSlowStream)
+    EVT_MENU(FastStream_Event, Interface::OnFastStream)
 
     /* Slider events */
     EVT_COMMAND_SCROLL(SliderScroll_Event, Interface::OnSliderUpdate)
@@ -188,9 +195,11 @@ Interface::Interface( intf_thread_t *_p_intf ):
     /* Creation of the status bar
      * Helptext for menu items and toolbar tools will automatically get
      * displayed here. */
-    int i_status_width[2] = {-2,-3};
-    statusbar = CreateStatusBar( 2 );                            /* 2 fields */
-    statusbar->SetStatusWidths( 2, i_status_width );
+    int i_status_width[3] = {-6, -2, -9};
+    statusbar = CreateStatusBar( 3 );                            /* 2 fields */
+    statusbar->SetStatusWidths( 3, i_status_width );
+    statusbar->SetStatusText( wxString::Format(wxT("x%.2f"), 1.0), 1 );
+
 
     /* Make sure we've got the right background colour */
     SetBackgroundColour( slider_frame->GetBackgroundColour() );
@@ -312,12 +321,14 @@ void Interface::CreateOurToolBar()
 #define HELP_PLO N_("Open playlist")
 #define HELP_PLP N_("Previous playlist item")
 #define HELP_PLN N_("Next playlist item")
+#define HELP_SLOW N_("Play slower")
+#define HELP_FAST N_("Play faster")
 
     wxLogNull LogDummy; /* Hack to suppress annoying log message on the win32
                          * version because we don't include wx.rc */
 
     wxToolBar *toolbar = CreateToolBar(
-        wxTB_HORIZONTAL | wxTB_TEXT | wxTB_FLAT | wxTB_DOCKABLE );
+        wxTB_HORIZONTAL | wxTB_FLAT | wxTB_DOCKABLE );
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
@@ -343,6 +354,10 @@ void Interface::CreateOurToolBar()
                       wxBitmap( previous_xpm ), wxU(_(HELP_PLP)) );
     toolbar->AddTool( NextStream_Event, wxU(_("Next")), wxBitmap( next_xpm ),
                       wxU(_(HELP_PLN)) );
+    toolbar->AddTool( SlowStream_Event, wxU(_("Slower")), wxBitmap( slow_xpm ),
+                      wxU(_(HELP_SLOW)) );
+    toolbar->AddTool( FastStream_Event, wxU(_("Faster")), wxBitmap( fast_xpm ),
+                      wxU(_(HELP_FAST)) );
 
     toolbar->Realize();
 
@@ -427,15 +442,15 @@ void RecursiveDestroy( wxMenu *menu )
     for( ; node; )
     {
         wxMenuItem *item = node->GetData();
-	node = node->GetNext();
+        node = node->GetNext();
 
-	/* Delete the submenus */
-	wxMenu *submenu = item->GetSubMenu();
-	if( submenu )
-	{
-	    RecursiveDestroy( submenu );
-	}
-	menu->Delete( item );
+        /* Delete the submenus */
+        wxMenu *submenu = item->GetSubMenu();
+        if( submenu )
+        {
+            RecursiveDestroy( submenu );
+        }
+        menu->Delete( item );
     }
 }
 
@@ -753,6 +768,30 @@ void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
 
     playlist_Next( p_playlist );
     vlc_object_release( p_playlist );
+}
+
+void Interface::OnSlowStream( wxCommandEvent& WXUNUSED(event) )
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( p_input )
+    {
+        input_SetStatus( p_input, INPUT_STATUS_SLOWER );
+        vlc_object_release( p_input );
+    }
+}
+
+void Interface::OnFastStream( wxCommandEvent& WXUNUSED(event) )
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( p_input )
+    {
+        input_SetStatus( p_input, INPUT_STATUS_FASTER );
+        vlc_object_release( p_input );
+    }
 }
 
 void Interface::TogglePlayButton( int i_playing_status )

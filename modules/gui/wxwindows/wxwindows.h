@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.28 2003/05/18 16:27:18 gbazin Exp $
+ * $Id: wxwindows.h,v 1.29 2003/05/18 19:46:35 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -115,6 +115,7 @@ private:
     intf_thread_t *p_intf;
     Interface *p_main_interface;
     int i_old_playing_status;
+    int i_old_rate;
 };
 
 /* Main Interface */
@@ -167,6 +168,8 @@ private:
     void OnSliderUpdate( wxScrollEvent& event );
     void OnPrevStream( wxCommandEvent& event );
     void OnNextStream( wxCommandEvent& event );
+    void OnSlowStream( wxCommandEvent& event );
+    void OnFastStream( wxCommandEvent& event );
 
     void OnMenuOpen( wxMenuEvent& event );
 
