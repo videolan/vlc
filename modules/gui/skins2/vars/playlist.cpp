@@ -64,7 +64,9 @@ void Playlist::delSelected()
     {
         if( (*it).m_selected )
         {
-            playlist_Delete( m_pPlaylist, index );
+            playlist_item_t *p_item = playlist_ItemGetByPos( m_pPlaylist,
+                                                             index );
+            playlist_Delete( m_pPlaylist, p_item->input.i_id );
         }
         else
         {
