@@ -2,7 +2,7 @@
  * vout_directx.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.h,v 1.3 2002/01/27 22:14:52 gbazin Exp $
+ * $Id: vout_directx.h,v 1.4 2002/04/02 06:31:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -73,7 +73,7 @@ typedef struct vout_sys_s
     vlc_mutex_t  event_thread_lock;             /* lock for the event thread */
     vlc_cond_t   event_thread_wait;
 
-    int          i_event_thread_status;         /* DirectXEventThread status */
+    volatile int i_event_thread_status;         /* DirectXEventThread status */
     boolean_t    b_event_thread_die;        /* flag to kill the event thread */
 
 } vout_sys_t;

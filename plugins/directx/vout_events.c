@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.12 2002/04/01 16:08:23 gbazin Exp $
+ * $Id: vout_events.c,v 1.13 2002/04/02 06:31:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -415,10 +415,12 @@ static void DirectXUpdateRects( vout_thread_t *p_vout )
     /* Clip the destination window */
     IntersectRect( &rect_dest_clipped, &rect_dest, &rect_display );
 
+#if 0
     intf_WarnMsg( 3, "vout: DirectXUpdateRects image_dst_clipped coords:"
                   " %i,%i,%i,%i",
                   rect_dest_clipped.left, rect_dest_clipped.top,
                   rect_dest_clipped.right, rect_dest_clipped.bottom);
+#endif
 
     /* the 2 following lines are to fix a bug when clicking on the desktop */
     if( (rect_dest_clipped.right - rect_dest_clipped.left)==0 ||
@@ -446,10 +448,12 @@ static void DirectXUpdateRects( vout_thread_t *p_vout )
       (rect_dest.bottom - rect_dest_clipped.bottom) * p_vout->render.i_height /
       (rect_dest.bottom - rect_dest.top);
 
+#if 0
     intf_WarnMsg( 3, "vout: DirectXUpdateRects image_src_clipped"
                   " coords: %i,%i,%i,%i",
                   rect_src_clipped.left, rect_src_clipped.top,
                   rect_src_clipped.right, rect_src_clipped.bottom);
+#endif
 
 #undef rect_src
 #undef rect_src_clipped
@@ -495,10 +499,12 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         GetClientRect( hwnd, &rect_window );
         p_vout->p_sys->i_window_width = rect_window.right;
         p_vout->p_sys->i_window_height = rect_window.bottom;
+#if 0
         intf_WarnMsg( 3, "vout: WinProc WM_WINDOWPOSCHANGED %i,%i,%i,%i",
                       p_vout->p_sys->i_window_x, p_vout->p_sys->i_window_y,
                       p_vout->p_sys->i_window_width,
                       p_vout->p_sys->i_window_height );
+#endif
 
         DirectXUpdateRects( p_vout );
         if( p_vout->p_sys->b_using_overlay &&
