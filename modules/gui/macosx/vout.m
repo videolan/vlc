@@ -460,13 +460,14 @@ void E_(CloseVideo) ( vlc_object_t *p_this )
         msg_Err( p_vout, "unable to destroy window" );
     }
 
+    if ( p_vout->p_sys->p_fullscreen_state != NULL )
+    {
+        EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
+    }
+
     if( !p_vout->p_sys->i_opengl )
     {
-        if ( p_vout->p_sys->p_fullscreen_state != NULL )
-            EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
-
         ExitMovies();
-
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
     }
