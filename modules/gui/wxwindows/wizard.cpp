@@ -88,7 +88,7 @@ END_EVENT_TABLE()
  * Wizard strings
  *****************************************************************************/
 
-#define ERROR _("Error")
+#define ERROR_MSG _("Error")
 #define ITEM_NAME _("Streaming/Transcoding Wizard")
 
 /* Hello page */
@@ -759,7 +759,7 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
         if( mrl_text->GetValue().IsSameAs( wxT(""), TRUE ) &&
                         event.GetDirection() )
         {
-            wxMessageBox( wxU( CHOOSE_STREAM ), wxU( ERROR ),
+            wxMessageBox( wxU( CHOOSE_STREAM ), wxU( ERROR_MSG ),
                           wxICON_WARNING | wxOK, this );
             event.Veto();
         }
@@ -1080,7 +1080,7 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
     /* Check valid multicast address */
     if( i_method == 1 && !ismult((char *) address_txtctrl->GetValue().c_str()) )
     {
-        wxMessageBox( wxU( INVALID_MCAST_ADDRESS ) , wxU( ERROR ),
+        wxMessageBox( wxU( INVALID_MCAST_ADDRESS ) , wxU( ERROR_MSG ),
                       wxICON_WARNING | wxOK, this );
         event.Veto();
 
@@ -1444,7 +1444,6 @@ void WizardDialog::Run()
             sprintf( psz_opt, ":sout=#%sstandard{mux=%s,url=%s,"
                                "access=file}",
                                psz_transcode, mux, address );
-            msg_Dbg( p_intf,"");
         }
         else
         {
@@ -1481,7 +1480,7 @@ void WizardDialog::Run()
         }
         else
         {
-            wxMessageBox( wxU( NO_PLAYLIST ), wxU( ERROR ),
+            wxMessageBox( wxU( NO_PLAYLIST ), wxU( ERROR_MSG ),
                           wxICON_WARNING | wxOK, this );
         }
     }
