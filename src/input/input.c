@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.183 2002/03/02 03:51:23 sam Exp $
+ * $Id: input.c,v 1.184 2002/03/03 17:34:27 xav Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Alexis Guillard <alexis.guillard@bt.com>
@@ -433,7 +433,10 @@ static int InitThread( input_thread_t * p_input )
 {
     /* Parse source string. Syntax : [[<access>][/<demux>]:][<source>] */
     char * psz_parser = p_input->psz_source;
-
+#ifdef WIN32
+    struct stat		stat_info ;
+    int i_Win32_Access = 0 ;	
+#endif
     /* Skip the plug-in names */
     while( *psz_parser && *psz_parser != ':' )
     {
@@ -447,13 +450,33 @@ static int InitThread( input_thread_t * p_input )
     }
     else
     {
+#ifdef WIN32
+	if ( (	psz_parser-p_input->psz_source == 1) && 
+	     (  stat( p_input->psz_source, &stat_info ) != -1 ) )
+	{
+	    intf_WarnMsg (2, "Okay, found a valid device in p_input->psz_source") ;
+	    psz_parser = p_input->psz_source ;
+	    p_input->psz_access = NULL ;
+	    p_input->psz_demux = NULL ;
+	    i_Win32_Access = 1 ;
+	}
+	else
+	{
+	    *psz_parser++ = '\0';
+	}
+#else
         *psz_parser++ = '\0';
+#endif
 
         p_input->psz_name = psz_parser;
 
         /* Come back to parse the access and demux plug-ins */
         psz_parser = p_input->psz_source;
-        if( !*psz_parser )
+#ifdef WIN32
+        if( (!*psz_parser) || (i_Win32_Access == 1))
+#else
+	if (!*psz_parser)
+#endif
         {
             /* No access */
             p_input->psz_access = NULL;
@@ -478,8 +501,11 @@ static int InitThread( input_thread_t * p_input )
                 *psz_parser++ = '\0';
             }
         }
-
+#ifndef WIN32
         if( !*psz_parser )
+#else
+        if( (!*psz_parser) || (i_Win32_Access == 1))
+#endif		
         {
             /* No demux */
             p_input->psz_demux = NULL;

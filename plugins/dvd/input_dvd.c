@@ -1,5 +1,4 @@
-/*****************************************************************************
- * input_dvd.c: DVD raw reading plugin.
+/* input_dvd.c: DVD raw reading plugin.
  *****************************************************************************
  * This plugins should handle all the known specificities of the DVD format,
  * especially the 2048 bytes logical block size.
@@ -9,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.125 2002/03/02 03:29:13 stef Exp $
+ * $Id: input_dvd.c,v 1.126 2002/03/03 17:34:27 xav Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -280,12 +279,15 @@ static int DVDOpen( struct input_thread_s *p_input )
                      psz_device, strerror(errno));
         return( -1 );                    
     }
+    
+#ifndef WIN32    
     if( !S_ISBLK(stat_info.st_mode) && !S_ISCHR(stat_info.st_mode) )
     {
         intf_WarnMsg( 3, "input : DVD plugin discarded"
                          " (not a valid block device)" );
         return -1;
     }
+#endif
 
     intf_WarnMsg( 2, "input: dvd=%s raw=%s", psz_device, psz_parser );
     
