@@ -59,6 +59,8 @@ static void GLSwapBuffers( vout_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_VOUT );
     set_description( _("Win32 OpenGL provider") );
     set_capability( "opengl provider", 100 );
     add_shortcut( "glwin32" );

@@ -109,6 +109,9 @@ static void SwitchContext( vout_thread_t * );
     "set it to 0 for first screen, 1 for the second.")
 
 vlc_module_begin();
+    set_name( N_("OpenGL") );
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_VOUT );
     set_description( _("X11 OpenGL provider") );
     set_capability( "opengl provider", 50 );
     set_callbacks( CreateOpenGL, DestroyOpenGL );
