@@ -168,7 +168,7 @@ static int Open( vlc_object_t * p_this )
     if( GetWLE( &p_wf->wFormatTag ) == WAVE_FORMAT_EXTENSIBLE &&
         i_size >= sizeof( WAVEFORMATEXTENSIBLE ) )
     {
-        int i, i_channel_mask;
+        unsigned i, i_channel_mask;
         GUID guid_subformat;
 
         guid_subformat = p_wf_ext->SubFormat;
