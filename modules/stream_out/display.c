@@ -142,38 +142,22 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     id = malloc( sizeof( sout_stream_id_t ) );
 
-    vlc_mutex_lock( &p_sys->p_input->stream.stream_lock );
-    id->p_es = input_AddES( p_sys->p_input,
-                            NULL,           /* no program */
-                            12,             /* es_id */
-                            p_fmt->i_cat,   /* es category */
-                            NULL,           /* description */
-                            0 );            /* no extra data */
-
-    if( !id->p_es )
-    {
-        vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
-
-        msg_Err( p_stream, "cannot create es" );
-        free( id );
-        return NULL;
-    }
-    id->p_es->i_stream_id   = 1;
+    id->p_es = malloc( sizeof( es_descriptor_t ) );
+    memset( id->p_es, 0, sizeof( es_descriptor_t ) );
+    id->p_es->i_cat         = p_fmt->i_cat;
     id->p_es->i_fourcc      = p_fmt->i_codec;
     id->p_es->b_force_decoder = VLC_TRUE;
-
     es_format_Copy( &id->p_es->fmt, p_fmt );
 
-    if( input_SelectES( p_sys->p_input, id->p_es ) )
+    id->p_es->p_dec = input_RunDecoder( p_sys->p_input, id->p_es );
+    if( id->p_es->p_dec == NULL )
     {
-        input_DelES( p_sys->p_input, id->p_es );
-        vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
-
-        msg_Err( p_stream, "cannot select es" );
+        msg_Err( p_stream, "cannot create decoder for fcc=`%4.4s'",
+                 (char*)&p_fmt->i_codec );
+        free( id->p_es );
         free( id );
         return NULL;
     }
-    vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
 
     return id;
 }
@@ -182,8 +166,9 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    input_DelES( p_sys->p_input, id->p_es );
+    input_EndDecoder( p_sys->p_input, id->p_es );
 
+    free( id->p_es );
     free( id );
 
     return VLC_SUCCESS;
@@ -199,7 +184,6 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         sout_buffer_t *p_next;
         block_t *p_block;
 
-        vlc_mutex_lock( &p_sys->p_input->stream.stream_lock );
         if( id->p_es->p_dec && p_buffer->i_size > 0 &&
             (p_block = block_New( p_stream, p_buffer->i_size )) )
         {
@@ -213,7 +197,6 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
             input_DecodeBlock( id->p_es->p_dec, p_block );
         }
-        vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
 
         /* *** go to next buffer *** */
         p_next = p_buffer->p_next;
