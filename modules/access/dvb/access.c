@@ -370,6 +370,12 @@ static block_t *Block( access_t *p_access )
             E_(FrontendPoll)( p_access );
         }
 
+        if ( p_sys->i_frontend_timeout && mdate() > p_sys->i_frontend_timeout )
+        {
+            msg_Warn( p_access, "no lock, tuning again" );
+            E_(FrontendSet)( p_access );
+        }
+
         if ( FD_ISSET( p_sys->i_handle, &fds ) )
         {
             break;

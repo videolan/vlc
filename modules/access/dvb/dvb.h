@@ -72,7 +72,7 @@ struct access_sys_t
     vlc_bool_t pb_active_slot[MAX_CI_SLOTS];
     vlc_bool_t pb_tc_has_data[MAX_CI_SLOTS];
     en50221_session_t p_sessions[MAX_SESSIONS];
-    mtime_t i_ca_timeout, i_ca_next_event;
+    mtime_t i_ca_timeout, i_ca_next_event, i_frontend_timeout;
     dvbpsi_pmt_t *pp_selected_programs[MAX_PROGRAMS];
 };
 

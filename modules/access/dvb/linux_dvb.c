@@ -72,6 +72,8 @@ struct frontend_t
     struct dvb_frontend_info info;
 };
 
+#define FRONTEND_LOCK_TIMEOUT 10000000 /* 10 s */
+
 /* Local prototypes */
 static int FrontendInfo( access_t * );
 static int FrontendSetQPSK( access_t * );
@@ -245,6 +247,7 @@ int E_(FrontendSet)( access_t *p_access )
         return VLC_EGENERIC;
     }
     p_sys->p_frontend->i_last_status = 0;
+    p_sys->i_frontend_timeout = mdate() + FRONTEND_LOCK_TIMEOUT;
     return VLC_SUCCESS;
 }
 
@@ -302,6 +305,7 @@ void E_(FrontendPoll)( access_t *p_access )
         {
             int32_t i_value;
             msg_Dbg( p_access, "frontend has acquired lock" );
+            p_sys->i_frontend_timeout = 0;
 
             /* Read some statistics */
             if( ioctl( p_sys->i_frontend_handle, FE_READ_BER, &i_value ) >= 0 )
@@ -314,6 +318,7 @@ void E_(FrontendPoll)( access_t *p_access )
         else
         {
             msg_Dbg( p_access, "frontend has lost lock" );
+            p_sys->i_frontend_timeout = mdate() + FRONTEND_LOCK_TIMEOUT;
         }
 
         IF_UP( FE_REINIT )
