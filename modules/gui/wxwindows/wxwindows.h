@@ -838,6 +838,7 @@ private:
 
     /* Update */
     void UpdateNode( playlist_t *, playlist_item_t*, wxTreeItemId );
+    void UpdateNodeChildren( playlist_t *, playlist_item_t*, wxTreeItemId );
     void CreateNode( playlist_t *, playlist_item_t*, wxTreeItemId );
 
     wxTreeItemId FindItem( wxTreeItemId, playlist_item_t * );

@@ -468,6 +468,14 @@ void Playlist::CreateNode( playlist_t *p_playlist, playlist_item_t *p_node,
                               -1,-1, new PlaylistItem( p_node ) );
     treectrl->SetItemImage( node, p_node->input.i_type );
 
+    UpdateNodeChildren( p_playlist, p_node, node );
+}
+
+void Playlist::UpdateNodeChildren( playlist_t *p_playlist,
+                                   playlist_item_t *p_node,
+                                   wxTreeItemId node )
+{
+
     for( int i = 0; i< p_node->i_children ; i++ )
     {
         /* Append the item */
@@ -1507,7 +1515,10 @@ void Playlist::OnPopupSort( wxMenuEvent& event )
             playlist_RecursiveNodeSort( p_playlist, p_wxitem->p_item,
                                         SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
             vlc_mutex_unlock( &p_playlist->object_lock );
-            b_need_update = VLC_TRUE;
+
+            treectrl->DeleteChildren( i_popup_item );
+            UpdateNodeChildren( p_playlist, p_wxitem->p_item, i_popup_item );
+
             vlc_object_release( p_playlist );
         }
     }
