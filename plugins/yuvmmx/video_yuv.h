@@ -34,21 +34,15 @@
 #define PALETTE_TABLE_SIZE 2176          /* YUV -> 8bpp palette lookup table */
 
 /* argument lists for YUV functions */
-#define YUV_ARGS_8BPP p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_y, \
-yuv_data_t *p_u, yuv_data_t *p_v, int i_width, int i_height, int i_pic_width, \
-int i_pic_height, int i_pic_line_width, int i_matrix_coefficients
+#define YUV_ARGS( word_size ) p_vout_thread_t p_vout, word_size *p_pic, \
+yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v, int i_width, int i_height, \
+int i_pic_width, int i_pic_height, int i_pic_line_width, \
+int i_matrix_coefficients
 
-#define YUV_ARGS_16BPP p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y, \
-yuv_data_t *p_u, yuv_data_t *p_v, int i_width, int i_height, int i_pic_width, \
-int i_pic_height, int i_pic_line_width, int i_matrix_coefficients
-
-#define YUV_ARGS_24BPP p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y, \
-yuv_data_t *p_u, yuv_data_t *p_v, int i_width, int i_height, int i_pic_width, \
-int i_pic_height, int i_pic_line_width, int i_matrix_coefficients
-
-#define YUV_ARGS_32BPP p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y, \
-yuv_data_t *p_u, yuv_data_t *p_v, int i_width, int i_height, int i_pic_width, \
-int i_pic_height, int i_pic_line_width, int i_matrix_coefficients
+#define YUV_ARGS_8BPP    YUV_ARGS( u8 )
+#define YUV_ARGS_16BPP   YUV_ARGS( u16 )
+#define YUV_ARGS_24BPP   YUV_ARGS( u32 )
+#define YUV_ARGS_32BPP   YUV_ARGS( u32 )
 
 /*****************************************************************************
  * Local prototypes
@@ -56,7 +50,8 @@ int i_pic_height, int i_pic_line_width, int i_matrix_coefficients
 void SetYUV               ( vout_thread_t *p_vout );
 void SetOffset            ( int i_width, int i_height, int i_pic_width,
                             int i_pic_height, boolean_t *pb_h_scaling,
-                            int *pi_v_scaling, int *p_offset );
+                            int *pi_v_scaling, int *p_offset,
+                            boolean_t b_double );
 
 void ConvertY4Gray8       ( YUV_ARGS_8BPP );
 void ConvertYUV420RGB8    ( YUV_ARGS_8BPP );

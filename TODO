@@ -140,7 +140,7 @@ Difficulty: Medium
 Urgency: Important
 Description: Fix 32bpp MMX YUV
  The MMX 32bpp YUV function is buggy.
-Status: Todo
+Status: Done 13 Aug 2000 (sam)
 
 Task: 0x11
 Difficulty: Hard

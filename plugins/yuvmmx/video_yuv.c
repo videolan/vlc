@@ -343,7 +343,8 @@ void SetYUV( vout_thread_t *p_vout )
  * It will also set horizontal and vertical scaling indicators.
  *****************************************************************************/
 void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
-                boolean_t *pb_h_scaling, int *pi_v_scaling, int *p_offset )
+                boolean_t *pb_h_scaling, int *pi_v_scaling, int *p_offset,
+                boolean_t b_double )
 {
     int i_x;                                    /* x position in destination */
     int i_scale_count;                                     /* modulo counter */

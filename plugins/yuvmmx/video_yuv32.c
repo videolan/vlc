@@ -65,7 +65,6 @@ void ConvertYUV420RGB32( YUV_ARGS_32BPP )
     int         i_x, i_y;                 /* horizontal and vertical indexes */
     int         i_scale_count;                       /* scale modulo counter */
     int         i_chroma_width;                              /* chroma width */
-    u32 *       p_yuv;                              /* base conversion table */
     u32 *       p_pic_start;       /* beginning of the current line for copy */
     u32 *       p_buffer_start;                   /* conversion buffer start */
     u32 *       p_buffer;                       /* conversion buffer pointer */
@@ -77,11 +76,10 @@ void ConvertYUV420RGB32( YUV_ARGS_32BPP )
      */
     i_pic_line_width -= i_pic_width;
     i_chroma_width =    i_width / 2;
-    p_yuv =             p_vout->yuv.yuv.p_rgb32;
     p_buffer_start =    p_vout->yuv.p_buffer;
     p_offset_start =    p_vout->yuv.p_offset;
     SetOffset( i_width, i_height, i_pic_width, i_pic_height,
-               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start, 0 );
 
     /*
      * Perform conversion
@@ -96,10 +94,14 @@ void ConvertYUV420RGB32( YUV_ARGS_32BPP )
 
         for ( i_x = i_width / 8; i_x--; )
         {
-            __asm__( ".align 8" MMX_INIT_32
+            __asm__( ".align 8"
+                     MMX_INIT_32
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
-            __asm__( ".align 8" MMX_YUV_ADD MMX_YUV_MUL MMX_UNPACK_32
+            __asm__( ".align 8"
+                     MMX_YUV_MUL
+                     MMX_YUV_ADD
+                     MMX_UNPACK_32
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
             p_y += 8;
@@ -109,9 +111,8 @@ void ConvertYUV420RGB32( YUV_ARGS_32BPP )
         }
 
         SCALE_WIDTH;
-        SCALE_HEIGHT( 420, 2 );
+        SCALE_HEIGHT( 420, 4 );
     }
-    __asm__( "emms" );
 }
 
 /*****************************************************************************

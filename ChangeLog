@@ -2,6 +2,8 @@
 
   * removed all "*vlc" aliases except "gvlc" and "fbvlc". The other sucked.
   * new --synchro flag which lets you force which images are decoded.
+  * removed an unused variable in the MMX YUVs.
+  * fixed 32bpp MMX YUV, made the comments clearer, removed an emms.
 
 Tue Aug  8 11:24:01 CEST 2000
 0.1.99f :

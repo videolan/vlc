@@ -65,7 +65,6 @@ void ConvertYUV420RGB16( YUV_ARGS_16BPP )
     int         i_x, i_y;                 /* horizontal and vertical indexes */
     int         i_scale_count;                       /* scale modulo counter */
     int         i_chroma_width;                              /* chroma width */
-    u16 *       p_yuv;                              /* base conversion table */
     u16 *       p_pic_start;       /* beginning of the current line for copy */
     u16 *       p_buffer_start;                   /* conversion buffer start */
     u16 *       p_buffer;                       /* conversion buffer pointer */
@@ -77,11 +76,10 @@ void ConvertYUV420RGB16( YUV_ARGS_16BPP )
      */
     i_pic_line_width -= i_pic_width;
     i_chroma_width =    i_width / 2;
-    p_yuv =             p_vout->yuv.yuv.p_rgb16;
     p_buffer_start =    p_vout->yuv.p_buffer;
     p_offset_start =    p_vout->yuv.p_offset;
     SetOffset( i_width, i_height, i_pic_width, i_pic_height,
-               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start, 0 );
 
     /*
      * Perform conversion
@@ -114,7 +112,6 @@ void ConvertYUV420RGB16( YUV_ARGS_16BPP )
         SCALE_WIDTH;
         SCALE_HEIGHT( 420, 2 );
     }
-    __asm__( "emms" );
 }
 
 /*****************************************************************************
