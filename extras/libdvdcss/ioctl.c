@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.17 2001/12/16 18:00:18 sam Exp $
+ * $Id: ioctl.c,v 1.18 2001/12/18 02:44:34 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -533,7 +533,8 @@ int ioctl_ReadTitleKey( int i_fd, int *pi_agid, int i_pos, u8 *p_key )
         key->SessionId  = *pi_agid;
         key->KeyType    = DvdTitleKey;
         key->KeyFlags   = 0;
-        key->Parameters.TitleOffset = i_pos; // is this ok?
+#warning "Fix ReadTitleKey for WIN32!"
+        //key->Parameters.TitleOffset = i_pos; // is this ok?
 
         i_ret = DeviceIoControl( (HANDLE) i_fd, IOCTL_DVD_READ_KEY, key, 
                 key->KeyLength, key, key->KeyLength, &tmp, NULL ) ? 0 : -1;
@@ -1461,7 +1462,6 @@ int ioctl_ReportRPC( int i_fd, int *p_type, int *p_mask, int *p_scheme )
         memset( &buffer, 0, sizeof( buffer ) );
 
         key->KeyLength  = DVD_ASF_LENGTH; /* correct this */
-        key->SessionId  = *pi_agid;
         key->KeyType    = DvdGetRpcKey;
         key->KeyFlags   = 0;
 
