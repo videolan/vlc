@@ -251,6 +251,20 @@ static inline int __var_SetInteger( vlc_object_t *p_obj, const char *psz_name, i
 }
 
 /**
+ * Set the value of an boolean variable
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ * \param i The new integer value of this variable
+ */
+static inline int __var_SetBool( vlc_object_t *p_obj, const char *psz_name, vlc_bool_t b )
+{
+    vlc_value_t val;
+    val.b_bool = b;
+    return __var_Set( p_obj, psz_name, val );
+}
+
+/**
  * Set the value of a time variable
  *
  * \param p_obj The object that holds the variable
@@ -310,6 +324,11 @@ static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
  */
 #define var_SetInteger(a,b,c)   __var_SetInteger( VLC_OBJECT(a),b,c)
 /**
+ * __var_SetBool() with automatic casting
+ */
+#define var_SetBool(a,b,c)   __var_SetBool( VLC_OBJECT(a),b,c)
+
+/**
  * __var_SetTime() with automatic casting
  */
 #define var_SetTime(a,b,c)      __var_SetTime( VLC_OBJECT(a),b,c)
@@ -339,6 +358,21 @@ static inline int __var_GetInteger( vlc_object_t *p_obj, const char *psz_name )
         return val.i_int;
     else
         return 0;
+}
+
+/**
+ * Get a boolean value
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
+static inline int __var_GetBool( vlc_object_t *p_obj, const char *psz_name )
+{
+    vlc_value_t val;
+    if( !__var_Get( p_obj, psz_name, &val ) )
+        return val.b_bool;
+    else
+        return VLC_FALSE;
 }
 
 /**
@@ -391,6 +425,10 @@ static inline char *__var_GetString( vlc_object_t *p_obj, const char *psz_name )
  */
 #define var_GetInteger(a,b)   __var_GetInteger( VLC_OBJECT(a),b)
 /**
+ * __var_GetBool() with automatic casting
+ */
+#define var_GetBool(a,b)   __var_GetBool( VLC_OBJECT(a),b)
+/**
  * __var_GetTime() with automatic casting
  */
 #define var_GetTime(a,b)   __var_GetTime( VLC_OBJECT(a),b)
@@ -419,6 +457,23 @@ static inline int __var_CreateGetInteger( vlc_object_t *p_obj, const char *psz_n
         return val.i_int;
     else
         return 0;
+}
+
+/**
+ * Create a boolean variable with inherit and get its value.
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
+static inline int __var_CreateGetBool( vlc_object_t *p_obj, const char *psz_name )
+{
+    vlc_value_t val;
+
+    __var_Create( p_obj, psz_name, VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    if( !__var_Get( p_obj, psz_name, &val ) )
+        return val.b_bool;
+    else
+        return VLC_FALSE;
 }
 
 /**
@@ -476,6 +531,10 @@ static inline char *__var_CreateGetString( vlc_object_t *p_obj, const char *psz_
  * __var_CreateGetInteger() with automatic casting
  */
 #define var_CreateGetInteger(a,b)   __var_CreateGetInteger( VLC_OBJECT(a),b)
+/**
+ * __var_CreateGetBool() with automatic casting
+ */
+#define var_CreateGetBool(a,b)   __var_CreateGetBool( VLC_OBJECT(a),b)
 /**
  * __var_CreateGetTime() with automatic casting
  */
