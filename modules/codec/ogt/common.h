@@ -2,7 +2,7 @@
  * Header for Common SVCD and VCD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: common.h,v 1.3 2004/01/03 12:54:56 rocky Exp $
+ * $Id: common.h,v 1.4 2004/01/11 01:54:20 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -48,6 +48,9 @@ void           VCDInlinePalette ( /*inout*/ uint8_t *p_dest,
 
 void           VCDSubDumpImage( uint8_t *p_image, uint32_t i_height, 
 				uint32_t i_width );
+
+unsigned int   VCDSubGetAROverride(vlc_object_t * p_input, 
+				   vout_thread_t *p_vout);
 
 #ifdef HAVE_LIBPNG
 #include <png.h>

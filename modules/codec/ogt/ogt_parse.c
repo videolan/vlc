@@ -2,7 +2,7 @@
  * Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: ogt_parse.c,v 1.7 2004/01/10 13:59:25 rocky Exp $
+ * $Id: ogt_parse.c,v 1.8 2004/01/11 01:54:20 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -126,9 +126,9 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
   /* Actually, this is measured against a different origin, so we have to
      adjust it */
   p_sys->second_field_offset = GETINT16(p);
-  p_sys->comp_image_offset = p - p_buffer;
-  p_sys->comp_image_length = p_sys->i_spu_size - p_sys->comp_image_offset;
-  p_sys->metadata_length   = p_sys->comp_image_offset;
+  p_sys->i_image_offset  = p - p_buffer;
+  p_sys->i_image_length  = p_sys->i_spu_size - p_sys->i_image_offset;
+  p_sys->metadata_length = p_sys->i_image_offset;
 
   if (p_sys && p_sys->i_debug & DECODE_DBG_PACKET) {
     msg_Dbg( p_dec, "x-start: %d, y-start: %d, width: %d, height %d, "
@@ -136,7 +136,7 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
 	     p_sys->i_x_start, p_sys->i_y_start, 
 	     p_sys->i_width, p_sys->i_height, 
 	     p_sys->i_spu_size, p_sys->i_duration,
-	     p_sys->comp_image_length, p_sys->comp_image_offset);
+	     p_sys->i_image_length, p_sys->i_image_offset);
     
     for (i=0; i<4; i++) {
       msg_Dbg( p_dec, "palette[%d]= T: %2x, Y: %2x, u: %2x, v: %2x", i,
@@ -292,8 +292,8 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
     uint8_t i_pending_zero = 0;    /* number of pixels to fill with 
 				      color zero 0..3 */
     ogt_color_t i_color;           /* current pixel color: 0..3 */
-    uint8_t *p = p_sys->subtitle_data  + p_sys->comp_image_offset;
-    uint8_t *maxp = p + p_sys->comp_image_length;
+    uint8_t *p = p_sys->subtitle_data  + p_sys->i_image_offset;
+    uint8_t *maxp = p + p_sys->i_image_length;
 
     dbg_print( (DECODE_DBG_CALL) , "width x height: %dx%d ",
 	       i_width, i_height);
@@ -337,7 +337,7 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 	  advance_color_pointer_byte;
 	}
       }
-      p = p_sys->subtitle_data + p_sys->comp_image_offset 
+      p = p_sys->subtitle_data + p_sys->i_image_offset 
 	+ p_sys->second_field_offset;
     }
 
@@ -368,10 +368,10 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
     
     VCDInlinePalette( p_dest, p_sys, i_height, i_width );
     
-
-    /* The video is automatically scaled. However subtitle bitmaps
-       assume a 1:1 aspect ratio. So we need to scale to compensate for
-       or undo the effects of video output scaling. 
+    /* The video may be scaled. However subtitle bitmaps assume an 1:1
+       aspect ratio. So unless the user has specified otherwise, we
+       need to scale to compensate for or undo the effects of video
+       output scaling.
 
        Perhaps this should go in the Render routine? The advantage would
        be that it will deal with a dynamically changing aspect ratio.
@@ -379,17 +379,43 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
     */
     
     {
-      vout_thread_t *p_vout = vlc_object_find( p_spu->p_sys->p_input,
-					       VLC_OBJECT_VOUT, 
+      vlc_object_t * p_input = p_spu->p_sys->p_input;
+      vout_thread_t *p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, 
 					       FIND_CHILD );
       unsigned int i_aspect_x, i_aspect_y;
       if (p_vout) {
-	vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_x, &i_aspect_y );
-	VCDSubScaleX( p_dec, p_spu, 3, 4 );
+        /* Check for user-configuration override. */
+        unsigned int i_new_aspect = VCDSubGetAROverride( p_input, p_vout );
+        if (i_new_aspect == VOUT_ASPECT_FACTOR) {
+          /* For scaling 1:1, nothing needs to be done. Note this means
+             subtitles will get scaled the same way the video does.
+           */
+          ;
+        } else {
+          if (0 == i_new_aspect) {
+            /* Counteract the effects of background video
+               scaling. That's why x and y are reversed from the 
+	       else branch in the call below.
+             */
+            vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_y, 
+                              &i_aspect_x );
+          } else {
+            /* User knows best? */
+            vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
+          }
+          VCDSubScaleX( p_dec, p_spu, i_aspect_x, i_aspect_y );
+        }
       }
     }
-
 
     return VLC_SUCCESS;
 }
 
+
+/* 
+ * Local variables:
+ *  c-file-style: "gnu"
+ *  tab-width: 8
+ *  indent-tabs-mode: nil
+ * End:
+ */

@@ -2,7 +2,7 @@
  * Common SVCD and VCD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: common.c,v 1.4 2004/01/10 13:59:25 rocky Exp $
+ * $Id: common.c,v 1.5 2004/01/11 01:54:20 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -173,10 +173,11 @@ vout_thread_t *VCDSubFindVout( decoder_t *p_dec )
 
 
 
-/* Remove color palette by expanding pixel entries to contain the
+/**
+   Remove color palette by expanding pixel entries to contain the
    palette values. We work from the free space at the end to the
    beginning so we can expand inline.
-    */
+*/
 void
 VCDInlinePalette ( /*inout*/ uint8_t *p_dest, decoder_sys_t *p_sys,
 		   unsigned int i_height, unsigned int i_width ) 
@@ -190,12 +191,50 @@ VCDInlinePalette ( /*inout*/ uint8_t *p_dest, decoder_sys_t *p_sys,
   }
 }
 
+/**
+   Check to see if user has overridden subtitle aspect ratio. 
+   0 is returned for no override which means just counteract any
+   scaling effects.
+*/
+unsigned int 
+VCDSubGetAROverride(vlc_object_t * p_input, vout_thread_t *p_vout)
+{
+  char *psz_string = config_GetPsz( p_input, "sub-aspect-ratio" );
 
-/* Scales down (reduces size) of p_dest in the x direction as 
+  /* Check whether the user tried to override aspect ratio */
+  if( !psz_string ) return 0;
+
+  {
+    unsigned int i_new_aspect = 0;
+    char *psz_parser = strchr( psz_string, ':' );
+    
+    if( psz_parser )
+      {
+	*psz_parser++ = '\0';
+	i_new_aspect = atoi( psz_string ) * VOUT_ASPECT_FACTOR
+	  / atoi( psz_parser );
+      }
+    else
+      {
+	i_new_aspect = p_vout->output.i_width * VOUT_ASPECT_FACTOR
+	  * atof( psz_string )
+	  / p_vout->output.i_height;
+      }
+    
+    return i_new_aspect;
+  }
+}
+
+
+/**
+   Scales down (reduces size) of p_dest in the x direction as 
    determined through aspect ratio x_scale by y_scale. Scaling
    is done in place. p_spu->i_width, is updated to new width
 
    The aspect ratio is assumed to be between 1/2 and 1.
+
+   Note: the scaling truncates the new width rather than rounds it.
+   Perhaps something one might want to address.
 */
 void
 VCDSubScaleX( decoder_t *p_dec, subpicture_t *p_spu, 
@@ -208,38 +247,65 @@ VCDSubScaleX( decoder_t *p_dec, subpicture_t *p_spu,
   uint8_t *p_src2 = p_src1 + PIXEL_SIZE;
   uint8_t *p_dst  = p_src1;
   unsigned int i_new_width = (p_spu->i_width * i_scale_x) / i_scale_y ;
-  unsigned int used=0;  /* Number of bytes used up in p_src1. */
+  unsigned int i_used=0;  /* Number of bytes used up in p_src1. */
 
   dbg_print( (DECODE_DBG_CALL|DECODE_DBG_TRANSFORM) , 
 	     "aspect ratio %i:%i, Old width: %d, new width: %d", 
 	     i_scale_x, i_scale_y, p_spu->i_width, i_new_width);
+
+  if (! (i_scale_x < i_scale_y && i_scale_y < i_scale_x+i_scale_x) )
+    {
+      msg_Warn( p_dec, "Need x < y < 2x. x: %i, y: %i", i_scale_x, i_scale_y );
+      return;
+    }
   
   for ( i_row=0; i_row <= p_spu->i_height - 1; i_row++ ) {
 
-    if (used != 0) {
+    if (i_used != 0) {
       /* Discard the remaining piece of the column of the previous line*/
-      used=0;
+      i_used=0;
       p_src1 = p_src2;
       p_src2 += PIXEL_SIZE;
     }
     
     for ( i_col=0; i_col <= p_spu->i_width - 2; i_col++ ) {
       unsigned int i;
-      unsigned int w1= i_scale_x - used;
-      unsigned int w2= i_scale_y - w1;
+      unsigned int w1= i_scale_x - i_used;
+      unsigned int w2;
+      
+      if ( i_scale_y - w1 <= i_scale_x ) {
+	/* Average spans 2 pixels. */
+	w2 = i_scale_y - w1;
 
-      used = w2;
-      for (i = 0; i < PIXEL_SIZE; i++ ) {
-	*p_dst = ( (*p_src1 * w1) + (*p_src2 * w2) ) / i_scale_y;
-	p_src1++; p_src2++; p_dst++;
+	for (i = 0; i < PIXEL_SIZE; i++ ) {
+	  *p_dst = ( (*p_src1 * w1) + (*p_src2 * w2) ) / i_scale_y;
+	  p_src1++; p_src2++; p_dst++;
+	}
+      } else {
+	/* Average spans 3 pixels. */
+	unsigned int w0 = w1;
+	unsigned int w1 = i_scale_x;
+	uint8_t *p_src0 = p_src1;
+	w2 = i_scale_y - w0 - w1;
+	p_src1 = p_src2;
+	p_src2 += PIXEL_SIZE;
+	
+	for (i = 0; i < PIXEL_SIZE; i++ ) {
+	  *p_dst = ( (*p_src0 * w0) + (*p_src1 * w1) + (*p_src2 * w2) ) 
+		     / i_scale_y;
+	  p_src0++; p_src1++; p_src2++; p_dst++;
+	}
+	i_col++;
       }
 
-      if (i_scale_x == used) {
+      i_used = w2;
+
+      if (i_scale_x == i_used) {
 	/* End of last pixel was end of p_src2. */
 	p_src1 = p_src2;
 	p_src2 += PIXEL_SIZE;
 	i_col++;
-	used = 0;
+	i_used = 0;
       }
     }
   }
@@ -248,8 +314,8 @@ VCDSubScaleX( decoder_t *p_dec, subpicture_t *p_spu,
   if ( p_sys && p_sys->i_debug & DECODE_DBG_TRANSFORM )
   { 
     ogt_yuvt_t *p_source = (ogt_yuvt_t *) p_spu->p_sys->p_data;
-    for ( i_row=0; i_row < p_spu->i_height - 1; i_row++ ) {
-      for ( i_col=0; i_col < p_spu->i_width - 1; i_col++ ) {
+    for ( i_row=0; i_row < p_spu->i_height; i_row++ ) {
+      for ( i_col=0; i_col < p_spu->i_width; i_col++ ) {
 	printf("%1x", p_source->s.t);
 	p_source++;
       }
@@ -259,9 +325,9 @@ VCDSubScaleX( decoder_t *p_dec, subpicture_t *p_spu,
 
 }
 
-/*****************************************************************************
+/**
  * DestroySPU: subpicture destructor
- *****************************************************************************/
+ */
 void VCDSubDestroySPU( subpicture_t *p_spu )
 {
     if( p_spu->p_sys->p_input )
@@ -302,14 +368,14 @@ void VCDSubUpdateSPU( subpicture_t *p_spu, vlc_object_t *p_object )
         return;
     }
 
-    var_Get( p_object, "x-start", &val );
-    p_spu->p_sys->i_x_start = val.i_int;
-    var_Get( p_object, "y-start", &val );
-    p_spu->p_sys->i_y_start = val.i_int;
-    var_Get( p_object, "x-end", &val );
-    p_spu->p_sys->i_x_end = val.i_int;
-    var_Get( p_object, "y-end", &val );
-    p_spu->p_sys->i_y_end = val.i_int;
+    if ( VLC_SUCCESS == var_Get( p_object, "x-start", &val ) )
+      p_spu->p_sys->i_x_start = val.i_int;
+    if ( VLC_SUCCESS == var_Get( p_object, "y-start", &val ) )
+      p_spu->p_sys->i_y_start = val.i_int;
+    if ( VLC_SUCCESS == var_Get( p_object, "x-end", &val ) )
+      p_spu->p_sys->i_x_end = val.i_int;
+    if ( VLC_SUCCESS == var_Get( p_object, "y-end", &val ) )
+      p_spu->p_sys->i_y_end = val.i_int;
 
 }
 
@@ -441,3 +507,12 @@ VCDSubDumpPNG( uint8_t *p_image, decoder_t *p_dec,
   free(image_data);
 }
 #endif /*HAVE_LIBPNG*/
+
+
+/* 
+ * Local variables:
+ *  c-file-style: "gnu"
+ *  tab-width: 8
+ *  indent-tabs-mode: nil
+ * End:
+ */

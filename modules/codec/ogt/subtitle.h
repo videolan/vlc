@@ -2,7 +2,7 @@
  * subtitle.h : Common SVCD and CVD subtitles header
  *****************************************************************************
  * Copyright (C) 2003,2004 VideoLAN
- * $Id: subtitle.h,v 1.5 2004/01/04 22:22:10 gbazin Exp $
+ * $Id: subtitle.h,v 1.6 2004/01/11 01:54:20 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -43,6 +43,21 @@
     "rendering information 32\n" \
     "extract subtitles     64\n" \
     "misc info            128\n" )
+
+#define SUB_ASPECT_RATIO_TEXT N_("Subtitle aspect-ratio correction")
+#define SUB_ASPECT_RATIO_LONGTEXT N_(					\
+    "Use this to force the subtitle aspect ratio. If you give a null string " \
+    "the right value will be determined automatically. Usually this is what " \
+    "you want. For OGT and CVD subtitles this undoes the effect " \
+    "of the underlying video scaling. And using a value of 1 will cause " \
+    "no correction; subtitles will be scaled with the same aspect " \
+    "ratio as as the underlying video (which not correct for OGT or " \
+    "CVD subtitles). You can also force another ratio by giving a pair of " \
+    "integers x:y where y should between x and twice x. For example 4:3, or " \
+    "16:9. Alternatively, you can give a float value expressing pixel " \
+    "squareness. For example 1.25 or 1.3333 which mean the same thing as " \
+    "4:3 and 16:9 respectively." \
+    )
 
 #define DECODE_DEBUG 1
 #if DECODE_DEBUG
@@ -117,9 +132,9 @@ struct decoder_sys_t
   int subtitle_data_size;	/* size of the allocated subtitle_data */
 
   /* Move into subpicture_sys_t? */
-  uint16_t comp_image_offset;	/* offset from subtitle_data to compressed
+  uint16_t i_image_offset;	/* offset from subtitle_data to compressed
 				   image data */
-  int comp_image_length;	/* size of the compressed image data */
+  int i_image_length;	        /* size of the compressed image data */
   int first_field_offset;       /* offset of even raster lines. Used
 				   only for CVD.
 				 */
