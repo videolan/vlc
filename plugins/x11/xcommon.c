@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.13 2002/01/21 00:52:07 sam Exp $
+ * $Id: xcommon.c,v 1.14 2002/01/25 17:18:37 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -49,7 +49,9 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/extensions/XShm.h>
-#include <X11/extensions/dpms.h>
+#ifdef DPMSINFO_IN_DPMS_H
+#   include <X11/extensions/dpms.h>
+#endif
 
 #ifdef MODULE_NAME_IS_xvideo
 #   include <X11/extensions/Xv.h>
@@ -172,7 +174,9 @@ typedef struct vout_sys_s
     int                 i_ss_interval;           /* interval between changes */
     int                 i_ss_blanking;                      /* blanking mode */
     int                 i_ss_exposure;                      /* exposure mode */
+#ifdef DPMSINFO_IN_DPMS_H
     BOOL                b_ss_dpms;                              /* DPMS mode */
+#endif
 
     /* Mouse pointer properties */
     boolean_t           b_mouse_pointer_visible;
@@ -1709,7 +1713,9 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
  *****************************************************************************/
 static void EnableXScreenSaver( vout_thread_t *p_vout )
 {
+#ifdef DPMSINFO_IN_DPMS_H
     int dummy;
+#endif
 
     intf_DbgMsg( "vout: enabling screen saver" );
     XSetScreenSaver( p_vout->p_sys->p_display, p_vout->p_sys->i_ss_timeout,
@@ -1718,6 +1724,7 @@ static void EnableXScreenSaver( vout_thread_t *p_vout )
                      p_vout->p_sys->i_ss_exposure );
 
     /* Restore DPMS settings */
+#ifdef DPMSINFO_IN_DPMS_H
     if( DPMSQueryExtension( p_vout->p_sys->p_display, &dummy, &dummy ) )
     {
         if( p_vout->p_sys->b_ss_dpms )
@@ -1725,6 +1732,7 @@ static void EnableXScreenSaver( vout_thread_t *p_vout )
             DPMSEnable( p_vout->p_sys->p_display );
         }
     }
+#endif
 }
 
 /*****************************************************************************
@@ -1734,7 +1742,9 @@ static void EnableXScreenSaver( vout_thread_t *p_vout )
  *****************************************************************************/
 static void DisableXScreenSaver( vout_thread_t *p_vout )
 {
+#ifdef DPMSINFO_IN_DPMS_H
     int dummy;
+#endif
 
     /* Save screen saver informations */
     XGetScreenSaver( p_vout->p_sys->p_display, &p_vout->p_sys->i_ss_timeout,
@@ -1750,15 +1760,17 @@ static void DisableXScreenSaver( vout_thread_t *p_vout )
                      p_vout->p_sys->i_ss_exposure );
 
     /* Disable DPMS */
+#ifdef DPMSINFO_IN_DPMS_H
     if( DPMSQueryExtension( p_vout->p_sys->p_display, &dummy, &dummy ) )
     {
-        CARD16 dummy;
+        CARD16 unused;
         /* Save DPMS current state */
-        DPMSInfo( p_vout->p_sys->p_display, &dummy,
+        DPMSInfo( p_vout->p_sys->p_display, &unused,
                   &p_vout->p_sys->b_ss_dpms );
         intf_DbgMsg( "vout: disabling DPMS" );
         DPMSDisable( p_vout->p_sys->p_display );
    }
+#endif
 }
 
 /*****************************************************************************
