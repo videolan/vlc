@@ -35,7 +35,7 @@
 typedef GUID guid_t;
 
 #define MAX_ASF_TRACKS 128
-#define ASF_DATA_PACKET_SIZE 4096
+#define ASF_DATA_PACKET_SIZE 4096  // deprecated -- added sout-asf-packet-size
 
 /*****************************************************************************
  * Module descriptor
@@ -60,6 +60,8 @@ static void Close  ( vlc_object_t * );
 #define RATING_TEXT N_("Rating")
 #define RATING_LONGTEXT N_("Allows you to define the \"rating\" that will " \
                            "be put in ASF comments.")
+#define PACKETSIZE_TEXT N_("Packet Size")
+#define PACKETSIZE_LONGTEXT N_("The ASF packet size -- default is 4096 bytes")
 
 vlc_module_begin();
     set_description( _("ASF muxer") );
@@ -82,6 +84,8 @@ vlc_module_begin();
                                  COMMENT_LONGTEXT, VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "rating",  "", NULL, RATING_TEXT,
                                  RATING_LONGTEXT, VLC_TRUE );
+    add_integer( "sout-asf-packet-size", 4096, NULL, PACKETSIZE_TEXT, PACKETSIZE_LONGTEXT, VLC_TRUE );
+
 vlc_module_end();
 
 /*****************************************************************************
@@ -207,7 +211,8 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_write_header = VLC_TRUE;
     p_sys->i_track = 0;
-    p_sys->i_packet_size = ASF_DATA_PACKET_SIZE;
+    p_sys->i_packet_size = config_GetInt( p_mux, "sout-asf-packet-size" );
+    msg_Dbg( p_mux, "Packet size %d", p_sys->i_packet_size);
     p_sys->i_packet_count= 0;
 
     /* Generate a random fid */
