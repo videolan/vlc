@@ -788,6 +788,9 @@ void IntegerListConfigControl::UpdateCombo( module_config_t *p_item )
 BEGIN_EVENT_TABLE(IntegerListConfigControl, wxPanel)
     /* Button events */
     EVT_BUTTON(-1, IntegerListConfigControl::OnAction)
+
+    /* Update events */
+    EVT_TEXT(-1, IntegerListConfigControl::OnUpdate)
 END_EVENT_TABLE()
 
 void IntegerListConfigControl::OnAction( wxCommandEvent& event )
