@@ -4,6 +4,10 @@
 
 HEAD
 
+  * ./Makefile.modules: modules now depend on Makefile.opts.
+  * ./configure.in: added (hopefully) explicit messages on how to get
+    libdvdcss and link vlc with it.
+  * ./plugins/dvdread/input_dvdread.c: removed inclusion of dvd_udf.h.
   * ./plugins/ogg/*: added preliminary files for an Ogg/Vorbis decoder a
     contributor is currently working on.
   * ALL: removed libdvdcss from the vlc tree.

@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.34 2002/03/18 19:14:52 sam Exp $
+ * $Id: input_dvdread.c,v 1.35 2002/04/03 16:22:23 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -60,6 +60,12 @@
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
+
+#include <dvdread/dvd_reader.h>
+#include <dvdread/ifo_types.h>
+#include <dvdread/ifo_read.h>
+#include <dvdread/nav_read.h>
+#include <dvdread/nav_print.h>
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
