@@ -56,13 +56,14 @@ struct input_thread_sys_t
     int64_t          i_stop_time;
 };
 
-static  int RunThread       ( input_thread_t *p_input );
-static  int InitThread      ( input_thread_t *p_input );
-static void ErrorThread     ( input_thread_t *p_input );
-static void EndThread       ( input_thread_t *p_input );
+static  int RunThread  ( input_thread_t *p_input );
+static  int InitThread ( input_thread_t *p_input );
+static void ErrorThread( input_thread_t *p_input );
+static void EndThread  ( input_thread_t *p_input );
 
-static void ParseOption     ( input_thread_t *p_input,
-                              const char *psz_option );
+static void ParseOption( input_thread_t *p_input, const char *psz_option );
+
+static void DecodeUrl  ( char * );
 
 /*****************************************************************************
  * Callbacks
@@ -753,6 +754,15 @@ static int InitThread( input_thread_t * p_input )
     p_input->p_access = module_Need( p_input, "access",
                                      p_input->psz_access, VLC_TRUE );
 
+    /* Maybe we had an encoded url */
+    if( !p_input->p_access && strchr( p_input->psz_name, '%' ) )
+    {
+        DecodeUrl( p_input->psz_name );
+
+        msg_Dbg( p_input, "retying with %s", p_input->psz_name );
+        p_input->p_access = module_Need( p_input, "access",
+                                         p_input->psz_access, VLC_TRUE );
+    }
 #ifndef WIN32      /* Remove this gross hack from the win32 build as colons
                     * are forbidden in filenames on Win32. */
 
@@ -769,7 +779,6 @@ static int InitThread( input_thread_t * p_input )
                                          p_input->psz_access, VLC_TRUE );
     }
 #endif
-
     if( p_input->p_access == NULL )
     {
         msg_Err( p_input, "no suitable access module for `%s/%s://%s'",
@@ -1230,6 +1239,44 @@ static void EndThread( input_thread_t * p_input )
 
     /* Tell we're dead */
     p_input->b_dead = 1;
+}
+/*****************************************************************************
+ * DecodeUrl: decode a given encoded url
+ *****************************************************************************/
+static void DecodeUrl( char *psz )
+{
+    char *dup = strdup( psz );
+    char *p = dup;
+
+    while( *p )
+    {
+        if( *p == '%' )
+        {
+            char val[3];
+            p++;
+            if( !*p )
+            {
+                break;
+            }
+
+            val[0] = *p++;
+            val[1] = *p++;
+            val[2] = '\0';
+
+            *psz++ = strtol( val, NULL, 16 );
+        }
+        else if( *p == '+' )
+        {
+            *psz++ = ' ';
+            p++;
+        }
+        else
+        {
+            *psz++ = *p++;
+        }
+    }
+    *psz++  ='\0';
+    free( dup );
 }
 
 /*****************************************************************************
