@@ -2,7 +2,7 @@
  * display.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: display.c,v 1.9 2003/11/26 22:56:04 gbazin Exp $
+ * $Id: display.c,v 1.10 2003/11/30 22:47:55 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -125,7 +125,7 @@ struct sout_stream_id_t
 };
 
 
-static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t *id;
@@ -142,7 +142,7 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt
     id->p_es = input_AddES( p_sys->p_input,
                             NULL,           /* no program */
                             12,             /* es_id */
-                            p_fmt->i_cat, /* UNKNOWN_ES,*/    /* es category */
+                            p_fmt->i_cat,   /* es category */
                             NULL,           /* description */
                             0 );            /* no extra data */
 
@@ -157,56 +157,8 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt
     id->p_es->i_stream_id   = 1;
     id->p_es->i_fourcc      = p_fmt->i_codec;
     id->p_es->b_force_decoder = VLC_TRUE;
-    switch( p_fmt->i_cat )
-    {
-        case AUDIO_ES:
-            id->p_es->p_bitmapinfoheader = NULL;
-            id->p_es->p_waveformatex =
-                malloc( sizeof( WAVEFORMATEX ) + p_fmt->i_extra );
-#define p_wf    ((WAVEFORMATEX*)id->p_es->p_waveformatex)
-            p_wf->wFormatTag     = WAVE_FORMAT_UNKNOWN;
-            p_wf->nChannels      = p_fmt->audio.i_channels;
-            p_wf->nSamplesPerSec = p_fmt->audio.i_rate;
-            p_wf->nAvgBytesPerSec= p_fmt->i_bitrate / 8;
-            p_wf->nBlockAlign    = p_fmt->audio.i_blockalign;
-            p_wf->wBitsPerSample = 0;
-            p_wf->cbSize         = p_fmt->i_extra;
-            if( p_fmt->i_extra > 0 )
-            {
-                memcpy( &p_wf[1],
-                        p_fmt->p_extra,
-                        p_fmt->i_extra );
-            }
-#undef p_wf
-            break;
-        case VIDEO_ES:
-            id->p_es->p_waveformatex = NULL;
-            id->p_es->p_bitmapinfoheader = malloc( sizeof( BITMAPINFOHEADER ) + p_fmt->i_extra );
-#define p_bih ((BITMAPINFOHEADER*)id->p_es->p_bitmapinfoheader)
-            p_bih->biSize   = sizeof( BITMAPINFOHEADER ) + p_fmt->i_extra;
-            p_bih->biWidth  = p_fmt->video.i_width;
-            p_bih->biHeight = p_fmt->video.i_height;
-            p_bih->biPlanes   = 0;
-            p_bih->biBitCount = 0;
-            p_bih->biCompression = 0;
-            p_bih->biSizeImage   = 0;
-            p_bih->biXPelsPerMeter = 0;
-            p_bih->biYPelsPerMeter = 0;
-            p_bih->biClrUsed       = 0;
-            p_bih->biClrImportant  = 0;
-            if( p_fmt->i_extra > 0 )
-            {
-                memcpy( &p_bih[1],
-                        p_fmt->p_extra,
-                        p_fmt->i_extra );
-            }
-#undef p_bih
-            break;
-        default:
-            msg_Err( p_stream, "unknown es type" );
-            free( id );
-            return NULL;
-    }
+
+    es_format_Copy( &id->p_es->fmt, p_fmt );
 
     if( input_SelectES( p_sys->p_input, id->p_es ) )
     {
@@ -222,7 +174,7 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt
     return id;
 }
 
-static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -241,44 +193,20 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     while( p_buffer )
     {
         sout_buffer_t *p_next;
-        pes_packet_t *p_pes;
-        data_packet_t   *p_data;
+        block_t *p_block;
 
-        if( p_buffer->i_size > 0 )
+        if( p_buffer->i_size > 0 &&
+            (p_block = block_New( p_stream, p_buffer->i_size )) )
         {
-            if( !( p_pes = input_NewPES( p_sys->p_input->p_method_data ) ) )
-            {
-                msg_Err( p_stream, "cannot allocate new PES" );
-                return VLC_EGENERIC;
-            }
-            if( !( p_data = input_NewPacket( p_sys->p_input->p_method_data,
-                                             p_buffer->i_size ) ) )
-            {
-                msg_Err( p_stream, "cannot allocate new data_packet" );
-                return VLC_EGENERIC;
-            }
-            p_data->p_payload_end = p_data->p_payload_start + p_buffer->i_size;
+            p_block->i_dts = p_buffer->i_dts <= 0 ? 0 :
+                             p_buffer->i_dts + p_sys->i_delay;
+            p_block->i_pts = p_buffer->i_pts <= 0 ? 0 :
+                             p_buffer->i_pts + p_sys->i_delay;
 
-            p_pes->i_dts = p_buffer->i_dts <= 0 ? 0 :
-                           p_buffer->i_dts + p_sys->i_delay;
-            p_pes->i_pts = p_buffer->i_pts <= 0 ? 0 :
-                           p_buffer->i_pts + p_sys->i_delay;
-            p_pes->p_first = p_pes->p_last = p_data;
-            p_pes->i_nb_data = 1;
-            p_pes->i_pes_size = p_buffer->i_size;
+            p_stream->p_vlc->pf_memcpy( p_block->p_buffer,
+                                        p_buffer->p_buffer, p_buffer->i_size );
 
-            p_stream->p_vlc->pf_memcpy( p_data->p_payload_start,
-                                        p_buffer->p_buffer,
-                                        p_buffer->i_size );
-
-            if( id->p_es->p_dec )
-            {
-                input_DecodePES( id->p_es->p_dec, p_pes );
-            }
-            else
-            {
-                input_DeletePES( p_sys->p_input->p_method_data, p_pes );
-            }
+            input_DecodeBlock( id->p_es->p_dec, p_block );
         }
 
         /* *** go to next buffer *** */
@@ -289,4 +217,3 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     return VLC_SUCCESS;
 }
-

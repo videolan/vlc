@@ -2,7 +2,7 @@
  * mpeg4video.c: mpeg 4 video packetizer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.18 2003/11/30 22:14:39 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.19 2003/11/30 22:47:55 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -282,7 +282,17 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         else if( p_start[3] == 0xb6 )
         {
             p_sys->b_vop = VLC_TRUE;
-            p_sys->i_pts = p_block->i_pts;
+
+            /* The pts information is not available in all the containers.
+             * FIXME: calculate the pts correctly */
+            if( p_sys->i_pts )
+            {
+                p_sys->i_pts = p_block->i_pts;
+            }
+            else
+            {
+                p_sys->i_pts = p_block->i_dts;
+            }
             p_sys->i_dts = p_block->i_dts;
         }
         p_start += 4; /* Next */

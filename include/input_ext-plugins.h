@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.45 2003/11/24 20:50:45 fenrir Exp $
+ * $Id: input_ext-plugins.h,v 1.46 2003/11/30 22:47:55 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -59,7 +59,7 @@ decoder_t * input_RunDecoder( input_thread_t *, es_descriptor_t * );
 void input_EndDecoder( input_thread_t *, es_descriptor_t * );
 
 VLC_EXPORT( void, input_DecodePES, ( decoder_t *, pes_packet_t * ) );
-void input_DecodeBlock( decoder_t *, block_t * );
+VLC_EXPORT( void, input_DecodeBlock,( decoder_t *, block_t * ) );
 
 void input_EscapeDiscontinuity( input_thread_t * );
 void input_EscapeAudioDiscontinuity( input_thread_t * );

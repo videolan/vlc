@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.56 2003/11/29 18:36:13 massiot Exp $
+ * $Id: transcode.c,v 1.57 2003/11/30 22:47:55 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -125,20 +125,11 @@ static int Open( vlc_object_t *p_this )
     char *codec;
 
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
+    memset( p_sys, 0, sizeof(struct sout_stream_sys_t) );
     p_sys->p_out = sout_stream_new( p_stream->p_sout, p_stream->psz_next );
 
-    p_sys->i_acodec      = 0;
-    p_sys->i_sample_rate = 0;
-    p_sys->i_channels    = 0;
-    p_sys->i_abitrate    = 0;
-
-    p_sys->i_vcodec     = 0;
-    p_sys->i_vbitrate   = 0;
     p_sys->i_vtolerance = -1;
-    p_sys->i_width      = 0;
-    p_sys->i_height     = 0;
     p_sys->i_key_int    = -1;
-    p_sys->i_b_frames   = 0;
     p_sys->i_qmin       = 2;
     p_sys->i_qmax       = 31;
 #if LIBAVCODEC_BUILD >= 4673
@@ -146,12 +137,6 @@ static int Open( vlc_object_t *p_this )
 #else
     p_sys->i_hq         = VLC_FALSE;
 #endif
-    p_sys->b_deinterlace= VLC_FALSE;
-
-    p_sys->i_crop_top   = 0;
-    p_sys->i_crop_bottom= 0;
-    p_sys->i_crop_right = 0;
-    p_sys->i_crop_left  = 0;
 
     if( ( codec = sout_cfg_find_value( p_stream->p_cfg, "acodec" ) ) )
     {
@@ -909,7 +894,7 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
             /* dumb downmixing */
             for( i = 0; i < aout_buf.i_nb_samples; i++ )
             {
-                uint16_t *p_buffer = aout_buf.p_buffer;
+                uint16_t *p_buffer = (uint16_t *)aout_buf.p_buffer;
                 for( j = 0 ; j < id->p_encoder->fmt_in.audio.i_channels; j++ )
                 {
                     p_buffer[i*id->p_encoder->fmt_in.audio.i_channels+j] =
@@ -1168,7 +1153,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         /* decode frame */
         frame = id->p_ff_pic;
         p_sys->i_input_pts = in->i_pts;
-       if( id->ff_dec )
+        if( id->ff_dec )
         {
             i_used = avcodec_decode_video( id->ff_dec_c, frame,
                                            &b_gotpicture,
@@ -1177,8 +1162,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         else
         {
             /* raw video */
-            avpicture_fill( (AVPicture*)frame,
-                            p_data,
+            avpicture_fill( (AVPicture*)frame, p_data,
                             id->ff_dec_c->pix_fmt,
                             id->ff_dec_c->width, id->ff_dec_c->height );
             i_used = i_data;
