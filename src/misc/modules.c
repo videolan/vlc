@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.72 2002/07/20 18:01:43 sam Exp $
+ * $Id: modules.c,v 1.73 2002/07/22 22:19:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -285,13 +285,16 @@ module_t * __module_Need( vlc_object_t *p_this, int i_capability,
     msg_Dbg( p_this, "looking for %s module",
                      MODULE_CAPABILITY( i_capability ) );
 
-    /* We take the global lock */
-    vlc_mutex_lock( &p_this->p_vlc->module_bank.lock );
-
     /* Count how many different shortcuts were asked for */
     if( psz_name && *psz_name )
     {
         char *psz_parser;
+
+        /* If the user wants none, give him none. */
+        if( !strcmp( psz_name, "none" ) )
+        {
+            return NULL;
+        }
 
         i_shortcuts++;
         psz_shortcuts = strdup( psz_name );
@@ -305,6 +308,9 @@ module_t * __module_Need( vlc_object_t *p_this, int i_capability,
             }
         }
     }
+
+    /* We take the global lock */
+    vlc_mutex_lock( &p_this->p_vlc->module_bank.lock );
 
     /* Sort the modules and test them */
     p_list = malloc( p_this->p_vlc->module_bank.i_count
@@ -345,8 +351,8 @@ module_t * __module_Need( vlc_object_t *p_this, int i_capability,
                      b_trash && p_module->pp_shortcuts[i_dummy];
                      i_dummy++ )
                 {
-                    b_trash = strcmp( psz_name,
-                                      p_module->pp_shortcuts[i_dummy] );
+                    b_trash = strcmp( psz_name, "any" )
+                        && strcmp( psz_name, p_module->pp_shortcuts[i_dummy] );
                 }
 
                 if( !b_trash )
@@ -355,6 +361,7 @@ module_t * __module_Need( vlc_object_t *p_this, int i_capability,
                     break;
                 }
 
+                /* Go to the next shortcut... This is so lame! */
                 while( *psz_name )
                 {
                     psz_name++;
