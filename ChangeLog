@@ -1,0 +1,7 @@
+Sat Jun 17 03:35:02 CEST 2000
+0.1.99b :
+
+ * fixed a bug preventing to quit when run with no arguments
+ * new VLAN changing code
+ * created the ChangeLog file :)
+

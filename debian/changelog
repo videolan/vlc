@@ -1,3 +1,11 @@
+vlc (0.1.99b) unstable; urgency=low
+
+  * Added a ChangeLog file
+  * Updated the VLAN code
+  * Fixed a bug preventing to quit
+
+ -- Samuel Hocevar <sam@via.ecp.fr>  Sat, 17 Jun 2000 03:46:16 +0200
+
 vlc (0.1.99a) unstable; urgency=low
 
   * Fixed some compile flag errors
