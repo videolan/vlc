@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.24 2003/10/17 16:40:09 gbazin Exp $
+ * $Id: events.c,v 1.25 2003/10/28 17:02:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -41,6 +41,7 @@
 
 #include <ddraw.h>
 
+#include "vlc_keys.h"
 #include "vout.h"
 
 /*****************************************************************************
@@ -63,6 +64,8 @@ static void DirectXPopupMenu( event_thread_t *p_event, vlc_bool_t b_open )
         vlc_object_release( p_playlist );
     }
 }
+
+static int DirectXConvertKey( int i_key );
 
 /*****************************************************************************
  * DirectXEventThread: Create video window & handle its messages
@@ -194,111 +197,40 @@ void DirectXEventThread( event_thread_t *p_event )
             /* the key events are first processed here. The next
              * message processed by this main message loop will be the
              * char translation of the key event */
-            msg_Dbg( p_event, "WM_KEYDOWN" );
-            switch( msg.wParam )
-            {
-            case VK_ESCAPE:
-                if( p_event->p_vout->b_fullscreen )
-                {
-                    p_event->p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                }
-                else
-                {
-                    /* close video window */
-                    PostMessage( msg.hwnd, WM_CLOSE, 0, 0 );
-                }
-                break;
-
-            case VK_MENU:
-                {
-                    playlist_t *p_playlist =
-                        vlc_object_find( p_event, VLC_OBJECT_PLAYLIST,
-                                         FIND_ANYWHERE );
-                    if( p_playlist != NULL )
-                    {
-                        vlc_value_t val;
-                        var_Set( p_playlist, "intf-popupmenu", val );
-                        vlc_object_release( p_playlist );
-                    }
-                }
-                break;
-
-            case VK_LEFT:
-                if( GetKeyState(VK_CONTROL) & 0x8000 )
-                {
-                    input_Seek( p_event->p_vout, -60,
-                                INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
-                }
-                else
-                {
-                    val.psz_string = "LEFT";
-                    var_Set( p_event->p_vout, "key-pressed", val );
-                }
-                break;
-            case VK_RIGHT:
-                if( GetKeyState(VK_CONTROL) & 0x8000 )
-                {
-                   input_Seek( p_event->p_vout, 60,
-                               INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
-                }
-                else
-                {
-                    val.psz_string = "RIGHT";
-                    var_Set( p_event->p_vout, "key-pressed", val );
-                }
-                break;
-            case VK_UP:
-                val.psz_string = "UP";
-                var_Set( p_event->p_vout, "key-pressed", val );
-                break;
-            case VK_DOWN:
-                val.psz_string = "DOWN";
-                var_Set( p_event->p_vout, "key-pressed", val );
-                break;
-            case VK_RETURN:
-                val.psz_string = "ENTER";
-                var_Set( p_event->p_vout, "key-pressed", val );
-                break;
-            case VK_HOME:
-                input_Seek( p_event->p_vout, 0,
-                            INPUT_SEEK_BYTES | INPUT_SEEK_SET );
-                break;
-            case VK_END:
-                input_Seek( p_event->p_vout, 0,
-                            INPUT_SEEK_BYTES | INPUT_SEEK_END );
-                break;
-            case VK_PRIOR:
-                input_Seek( p_event->p_vout, 10,
-                            INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
-                break;
-            case VK_NEXT:
-                input_Seek( p_event->p_vout, -10,
-                            INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
-                break;
-            case VK_SPACE:
-                input_SetStatus( p_event->p_vout, INPUT_STATUS_PAUSE );
-                break;
-            }
-            TranslateMessage(&msg);
-            break;
-
         case WM_CHAR:
-            switch( msg.wParam )
+            if( msg.message == WM_KEYDOWN )
             {
-            case 'q':
-            case 'Q':
-                /* exit application */
-                p_event->p_vlc->b_die = VLC_TRUE;
-                break;
-
-            case 'f':                            /* switch to fullscreen */
-            case 'F':
-                p_event->p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                break;
-
-            default:
-                break;
+                val.i_int = DirectXConvertKey( msg.wParam );
+                TranslateMessage(&msg);
             }
+            else val.i_int = msg.wParam;
+
+            if( val.i_int )
+            {
+                if( GetKeyState(VK_CONTROL) & 0x8000 )
+                {
+                    val.i_int |= KEY_MODIFIER_CTRL;
+                }
+                else if( GetKeyState(VK_SHIFT) & 0x8000 )
+                {
+                    val.i_int |= KEY_MODIFIER_SHIFT;
+                }
+                else if( GetKeyState(VK_MENU) & 0x8000 )
+                {
+                    val.i_int |= KEY_MODIFIER_ALT;
+                }
+
+                if( val.i_int == config_GetInt( p_event, "fullscreen-key" ) )
+                {
+                    p_event->p_vout->p_sys->i_changes |=
+                        VOUT_FULLSCREEN_CHANGE;
+                }
+                else
+                {
+                    var_Set( p_event->p_vlc, "key-pressed", val );
+                }
+            }
+            break;
 
         default:
             /* Messages we don't handle directly are dispatched to the
@@ -769,4 +701,48 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     }
 
     return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
+static struct
+{
+    int i_dxkey;
+    int i_vlckey;
+
+} dxkeys_to_vlckeys[] =
+{
+    { VK_F1, KEY_F1 }, { VK_F2, KEY_F2 }, { VK_F3, KEY_F3 }, { VK_F4, KEY_F4 },
+    { VK_F5, KEY_F5 }, { VK_F6, KEY_F6 }, { VK_F7, KEY_F7 }, { VK_F8, KEY_F8 },
+    { VK_F9, KEY_F9 }, { VK_F10, KEY_F10 }, { VK_F11, KEY_F11 },
+    { VK_F12, KEY_F12 },
+
+    { VK_RETURN, KEY_ENTER },
+    { VK_SPACE, KEY_SPACE },
+    { VK_ESCAPE, KEY_ESC },
+
+    { VK_MENU, KEY_MENU },
+    { VK_LEFT, KEY_LEFT },
+    { VK_RIGHT, KEY_RIGHT },
+    { VK_UP, KEY_UP },
+    { VK_DOWN, KEY_DOWN },
+
+    { VK_HOME, KEY_HOME },
+    { VK_END, KEY_END },
+    { VK_PRIOR, KEY_PAGEUP },
+    { VK_NEXT, KEY_PAGEDOWN },
+    { 0, 0 }
+};
+
+static int DirectXConvertKey( int i_key )
+{
+    int i;
+
+    for( i = 0; dxkeys_to_vlckeys[i].i_dxkey != 0; i++ )
+    {
+        if( dxkeys_to_vlckeys[i].i_dxkey == i_key )
+        {
+            return dxkeys_to_vlckeys[i].i_vlckey;
+        }
+    }
+
+    return 0;
 }

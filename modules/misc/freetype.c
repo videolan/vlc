@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.27 2003/10/24 14:13:59 sam Exp $
+ * $Id: freetype.c,v 1.28 2003/10/28 17:02:14 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -44,6 +44,8 @@
 #define DEFAULT_FONT "/System/Library/Fonts/LucidaGrande.dfont"
 #elif defined( SYS_BEOS )
 #define DEFAULT_FONT "/boot/beos/etc/fonts/ttfonts/Swiss721.ttf"
+#elif defined( WIN32 )
+#define DEFAULT_FONT "" /* Default font found at run-time */
 #else
 #define DEFAULT_FONT "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
 #endif
