@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.38 2003/05/04 22:42:17 gbazin Exp $
+ * $Id: output.c,v 1.39 2003/05/04 23:39:02 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -142,7 +142,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
             text.psz_string = _("Stereo");
         }
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = AOUT_VAR_CHAN_LEFT; text.i_int = _("Left");
+        val.i_int = AOUT_VAR_CHAN_LEFT; text.psz_string = _("Left");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
         val.i_int = AOUT_VAR_CHAN_RIGHT; text.psz_string = _("Right");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
