@@ -1009,20 +1009,23 @@ static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_name, cha
     {
         int i;
 
-        input_StopThread( media->p_input );
-        input_DestroyThread( media->p_input );
-        vlc_object_detach( media->p_input );
-        vlc_object_destroy( media->p_input );
-        media->p_input = NULL;
-
-        for( i=0 ; i < media->i_input_option ; i++ )
+        if( media->p_input )
         {
-            free( media->input_option[i] );
-        }
-        if( media->input_option) free( media->input_option );
+            input_StopThread( media->p_input );
+            input_DestroyThread( media->p_input );
+            vlc_object_detach( media->p_input );
+            vlc_object_destroy( media->p_input );
+            media->p_input = NULL;
 
-        media->input_option = NULL;
-        media->i_input_option = 0;
+            for( i=0 ; i < media->i_input_option ; i++ )
+            {
+                free( media->input_option[i] );
+            }
+            if( media->input_option) free( media->input_option );
+
+            media->input_option = NULL;
+            media->i_input_option = 0;
+        }
 
         return 0;
     }
