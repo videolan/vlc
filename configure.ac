@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.127 2003/12/04 15:54:58 sam Exp $
+dnl $Id: configure.ac,v 1.128 2003/12/06 22:45:02 jpsaman Exp $
 
 AC_INIT(vlc,0.7.0-test1)
 
@@ -3349,8 +3349,8 @@ fi
 if test "${NEED_GNOME_MAIN}" != "no"
 then
     AX_ADD_PLUGINS([gnome_main])
-    AX_ADD_CFLAGS([gnome_main],[${CFLAGS_gtk} ${CFLAGS_pda} ${CFLAGS_gnome}])
-    AX_ADD_LDFLAGS([gnome_main],[${LDFLAGS_gtk} ${LDFLAGS_pda} ${LDFLAGS_gnome}])
+    AX_ADD_CFLAGS([gnome_main],[${CFLAGS_gtk} ${CFLAGS_gnome}])
+    AX_ADD_LDFLAGS([gnome_main],[${LDFLAGS_gtk} ${LDFLAGS_gnome}])
 fi
 
 if test "${NEED_GTK2_MAIN}" != "no"
