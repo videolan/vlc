@@ -254,7 +254,7 @@ int ReadDir( playlist_t *p_playlist, char *psz_name , int i_mode, int *pi_positi
             stat( psz_uri, &stat_data );
             if( S_ISDIR(stat_data.st_mode) && i_mode != MODE_COLLAPSE )
 #elif defined( DT_DIR )
-            if( p_dir_content->d_type == DT_DIR && i_mode != MODE_COLLAPSE )
+            if( ( p_dir_content->d_type & DT_DIR ) && i_mode != MODE_COLLAPSE )
 #else
             if( 0 )
 #endif
