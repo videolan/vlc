@@ -2,7 +2,7 @@
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004, 2004 VideoLAN
- * $Id: ps.c,v 1.18 2004/03/03 20:39:52 gbazin Exp $
+ * $Id$
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -264,6 +264,14 @@ static int Activate( vlc_object_t * p_this )
                         break;
 
                     case VLC_FOURCC('o','g','t',' '):
+                        if( config_GetInt( p_input, "spu-channel" )
+			    == (p_es->i_id & 0x0003) )
+                        {
+                            input_SelectES( p_input, p_es );
+                        }
+                        break;
+
+                    case VLC_FOURCC('c','v','d',' '):
                         if( config_GetInt( p_input, "spu-channel" )
 			    == (p_es->i_id & 0x0003) )
                         {
