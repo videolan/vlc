@@ -2,7 +2,7 @@
  * TransportButton.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: TransportButton.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: TransportButton.h,v 1.2 2002/09/30 18:30:27 titer Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *
@@ -180,4 +180,4 @@ private:
 	typedef TransportButton _inherited;
 };
 
-#endif
+#endif	// __MEDIA_BUTTON__

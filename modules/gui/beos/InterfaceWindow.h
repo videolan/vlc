@@ -2,11 +2,12 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: InterfaceWindow.h,v 1.2 2002/09/30 18:30:27 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
  *          Richard Shepherd <richard@rshepherd.demon.co.uk>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,56 +23,134 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-/*****************************************************************************
- * intf_sys_t: description and status of FB interface
- *****************************************************************************/
+
+#ifndef BEOS_INTERFACE_WINDOW_H
+#define BEOS_INTERFACE_WINDOW_H
+
+#include <Menu.h>
+#include <Window.h>
+
+class BMenuBar;
 class MediaControlView;
 class PlayListWindow;
+class BFilePanel;
 
 class CDMenu : public BMenu
 {
-public:
-	CDMenu(const char *name);
-	~CDMenu();
-	void AttachedToWindow(void);
-private:
-	int GetCD(const char *directory);
+ public:
+							CDMenu( const char* name );
+	virtual					~CDMenu();
+
+	virtual	void			AttachedToWindow();
+
+ private:
+	int						GetCD( const char* directory );
 };
 
 class LanguageMenu : public BMenu
 {
-public:
-	LanguageMenu(const char *name, int menu_kind, 
-	             intf_thread_t  *p_interface);
-	~LanguageMenu();
-	void AttachedToWindow(void);
-private:
-	intf_thread_t  *p_intf;
-	int kind;
-	int GetChannels();
+ public:
+							LanguageMenu( const char* name,
+										  int menu_kind,
+										  intf_thread_t* p_interface );
+	virtual					~LanguageMenu();
+
+	virtual	void			AttachedToWindow();
+
+ private:
+			void			_GetChannels();
+
+	intf_thread_t*			p_intf;
+	int						kind;
 };
+
+class TitleMenu : public BMenu
+{
+ public:
+							TitleMenu( const char* name, intf_thread_t  *p_interface );
+	virtual					~TitleMenu();
+
+	virtual	void			AttachedToWindow();
+	
+	intf_thread_t  *p_intf;
+};
+
+class ChapterMenu : public BMenu
+{
+ public:
+							ChapterMenu( const char* name, intf_thread_t  *p_interface );
+	virtual					~ChapterMenu();
+
+	virtual	void			AttachedToWindow();
+
+	intf_thread_t  *p_intf;
+};
+
 
 class InterfaceWindow : public BWindow
 {
-public:
-    InterfaceWindow( BRect frame, const char *name, 
-                     intf_thread_t  *p_interface );
-    ~InterfaceWindow();
+ public:
+							InterfaceWindow( BRect frame,
+											 const char* name,
+											 intf_thread_t* p_interface );
+	virtual					~InterfaceWindow();
 
-    // standard window member
-    virtual bool    QuitRequested();
-    virtual void    MessageReceived(BMessage *message);
-	void 			updateInterface();
+							// BWindow
+	virtual	void			FrameResized( float width, float height );
+	virtual	void			MessageReceived( BMessage* message );
+	virtual	bool			QuitRequested();
+
+							// InterfaceWindow
+			void 			updateInterface();
+			bool			IsStopped() const;
 	    
-	MediaControlView *p_mediaControl;
+	MediaControlView*		p_mediaControl;
 
-private:	
-    intf_thread_t  *p_intf;
-    bool            b_empty_playlist;
-    bool            b_mute;
-	BFilePanel *file_panel;
-	PlayListWindow* playlist_window;
-    BMenuItem      *miOnTop;
-    Intf_VLCWrapper *  p_vlc_wrapper;
+ private:	
+			void			_UpdatePlaylist();
+			void			_SetMenusEnabled( bool hasFile,
+											  bool hasChapters = false,
+											  bool hasTitles = false );
+			void			_UpdateSpeedMenu( int rate );
+			void			_InputStreamChanged();
+			status_t		_LoadSettings( BMessage* message,
+										   const char* fileName,
+										   const char* subFolder = NULL );
+			status_t		_SaveSettings( BMessage* message,
+										   const char* fileName,
+										   const char* subFolder = NULL );
+			void			_RestoreSettings();
+			void			_StoreSettings();
+
+	intf_thread_t*			p_intf;
+	es_descriptor_t*		p_audio_es;
+	es_descriptor_t*		p_spu_es;
+	input_thread_t*			fInputThread;
+
+	bool					fPlaylistIsEmpty;
+	BFilePanel*				fFilePanel;
+	PlayListWindow*			fPlaylistWindow;
+	BMenuBar*				fMenuBar;
+	BMenuItem*				fNextTitleMI;
+	BMenuItem*				fPrevTitleMI;
+	BMenuItem*				fNextChapterMI;
+	BMenuItem*				fPrevChapterMI;
+	BMenuItem*				fOnTopMI;
+	BMenuItem*				fSlowerMI;
+	BMenuItem*				fNormalMI;
+	BMenuItem*				fFasterMI;
+	BMenu*					fAudioMenu;
+	BMenu*					fNavigationMenu;
+	BMenu*					fTitleMenu;
+	BMenu*					fChapterMenu;
+	BMenu*					fLanguageMenu;
+	BMenu*					fSubtitlesMenu;
+	BMenu*					fSpeedMenu;
+	bigtime_t				fLastUpdateTime;
+	BMessage*				fSettings;	// we keep the message arround
+										// for forward compatibility
+	
+	Intf_VLCWrapper *  p_vlc_wrapper;
 };
 
+#endif	// BEOS_INTERFACE_WINDOW_H

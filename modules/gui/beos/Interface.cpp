@@ -1,13 +1,14 @@
 /*****************************************************************************
- * intf.cpp: beos interface
+ * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: Interface.cpp,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: Interface.cpp,v 1.2 2002/09/30 18:30:27 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Tony Castley <tony@castley.net>
  *          Richard Shepherd <richard@rshepherd.demon.co.uk>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +31,8 @@
 #include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <InterfaceKit.h>
+#include <Application.h>
+#include <Message.h>
 #include <string.h>
 
 #include <vlc/vlc.h>
@@ -37,6 +40,7 @@
 
 #include "VlcWrapper.h"
 #include "InterfaceWindow.h"
+#include "MsgVals.h"
 
 /*****************************************************************************
  * Local prototype
@@ -44,11 +48,11 @@
 static void Run       ( intf_thread_t *p_intf );
 
 /*****************************************************************************
- * OpenIntf: initialize interface
+ * intf_Open: initialize interface
  *****************************************************************************/
 int E_(OpenIntf) ( vlc_object_t *p_this )
-{   
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;     
+{
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
     BScreen *screen;
     screen = new BScreen();
     BRect rect = screen->Frame();
@@ -65,7 +69,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
         msg_Err( p_intf, "out of memory" );
         return( 1 );
     }
-//    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
+    
     p_intf->p_sys->p_input = NULL;
 
     p_intf->pf_run = Run;
@@ -79,13 +83,21 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
         free( p_intf->p_sys );
         msg_Err( p_intf, "cannot allocate InterfaceWindow" );
         return( 1 );
+    } else {
+    	BMessage message(INTERFACE_CREATED);
+    	message.AddPointer("window", p_intf->p_sys->p_window);
+    	be_app->PostMessage(&message);
     }
-
+    p_intf->p_sys->b_disabled_menus = 0;
+    p_intf->p_sys->i_saved_volume = AOUT_VOLUME_DEFAULT;
+    p_intf->p_sys->b_loop = 0;
+    p_intf->p_sys->b_mute = 0;
+    
     return( 0 );
 }
 
 /*****************************************************************************
- * CloseIntf: destroy interface
+ * intf_Close: destroy dummy interface
  *****************************************************************************/
 void E_(CloseIntf) ( vlc_object_t *p_this )
 {
@@ -95,9 +107,7 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
     {
         vlc_object_release( p_intf->p_sys->p_input );
     }
-
-//    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-
+    
     /* Destroy the interface window */
     p_intf->p_sys->p_window->Lock();
     p_intf->p_sys->p_window->Quit();
@@ -108,7 +118,7 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
 
 
 /*****************************************************************************
- * Run: event loop
+ * intf_Run: event loop
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
@@ -133,11 +143,7 @@ static void Run( intf_thread_t *p_intf )
                                                           FIND_ANYWHERE );
         }
 
-
-
         /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );
     }
-    
 }
-

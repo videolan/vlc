@@ -2,9 +2,10 @@
  * MediaControlView.h: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: MediaControlView.h,v 1.2 2002/09/30 18:30:27 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,73 +21,148 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#define HORZ_SPACE 5.0
-#define VERT_SPACE 5.0
 
+#ifndef BEOS_MEDIA_CONTROL_VIEW_H
+#define BEOS_MEDIA_CONTROL_VIEW_H
 
-class TransportButton;
+#include <Box.h>
+#include <Control.h>
+
+class BBitmap;
 class PlayPauseButton;
-class MediaSlider;
 class SeekSlider;
+class TransportButton;
+class VolumeSlider;
 
 class MediaControlView : public BBox
 {
-public:
-    MediaControlView( BRect frame );
-    ~MediaControlView();
+ public:
+								MediaControlView( BRect frame );
+	virtual						~MediaControlView();
 
-    virtual void    MessageReceived(BMessage *message);
-    void            SetProgress(uint64 seek, uint64 size);
+								// BBox
+	virtual	void				AttachedToWindow();
+	virtual	void				FrameResized(float width, float height);
+	virtual	void				GetPreferredSize(float* width, float* height);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				Pulse(); // detect stopped stream
 
-    void            SetStatus(int status, int rate); 
-    void            SetEnabled(bool);
-    uint32          GetSeekTo();
-    uint32          GetVolume();
-	sem_id	fScrubSem;
-	bool	fSeeking;
+								// MediaControlView
+			void				SetProgress(uint64 seek, uint64 size);
+
+			void				SetStatus(int status, int rate); 
+			void				SetEnabled(bool enable);
+			void				SetAudioEnabled(bool enable);
+			uint32				GetSeekTo() const;
+			uint32				GetVolume() const;
+			void				SetSkippable(bool backward,
+											 bool forward);
+			void				SetMuted(bool mute);
+
+			sem_id				fScrubSem;
     
-private:
-	MediaSlider * p_vol;
-	SeekSlider * p_seek;
-	TransportButton* p_slow;
-	PlayPauseButton* p_play;
-	TransportButton* p_fast;
-	TransportButton* p_stop;
-	TransportButton* p_mute;
-	
-	int current_rate;
-	int current_status;
+ private:
+			void				_LayoutControls(BRect frame) const;
+			BRect				_MinFrame() const;
+			void				_LayoutControl(BView* view,
+											   BRect frame,
+											   bool resize = false) const;
+
+
+			VolumeSlider*		fVolumeSlider;
+			SeekSlider*			fSeekSlider;
+			TransportButton*	fSkipBack;
+			TransportButton*	fSkipForward;
+			TransportButton*	fRewind;
+			TransportButton*	fForward;
+			PlayPauseButton*	fPlayPause;
+			TransportButton*	fStop;
+			TransportButton*	fMute;
+
+			int					fCurrentRate;
+			int					fCurrentStatus;
+			float				fBottomControlHeight;
+			BRect				fOldBounds;
 };
 
-class MediaSlider : public BSlider
+class SeekSlider : public BControl
 {
-public:
-	MediaSlider(BRect frame,
-				BMessage *message,
-				int32 minValue,
-				int32 maxValue);
-	~MediaSlider();
-	virtual void DrawThumb(void);
-};
-				
+ public:
+								SeekSlider(BRect frame,
+										   const char* name,
+										   MediaControlView* owner,
+										   int32 minValue,
+										   int32 maxValue);
 
-class SeekSlider : public MediaSlider
-{
-public:
-	SeekSlider(BRect frame,
-				MediaControlView *owner,
-				int32 minValue,
-				int32 maxValue,
-				thumb_style thumbType = B_TRIANGLE_THUMB);
+	virtual						~SeekSlider();
 
-	~SeekSlider();
-	uint32 seekTo;
-	virtual void MouseDown(BPoint);
-	virtual void MouseUp(BPoint pt);
-	virtual void MouseMoved(BPoint pt, uint32 c, const BMessage *m);
+								// BControl
+	virtual	void				AttachedToWindow();
+	virtual void				Draw(BRect updateRect);
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 transit,
+										   const BMessage* dragMessage);
+	virtual	void				MouseUp(BPoint where);
+	virtual	void				ResizeToPreferred();
+
+								// SeekSlider
+			void				SetPosition(float position);
+
 private:
-	MediaControlView*	fOwner;	
-	bool fMouseDown;
+			int32				_ValueFor(float x) const;
+			void				_StrokeFrame(BRect frame,
+											 rgb_color left,
+											 rgb_color top,
+											 rgb_color right,
+											 rgb_color bottom);
+			void				_BeginSeek();
+			void				_Seek();
+			void				_EndSeek();
+
+			MediaControlView*	fOwner;	
+			bool				fTracking;
+			int32				fMinValue;
+			int32				fMaxValue;
 };
 
+class VolumeSlider : public BControl
+{
+ public:
+								VolumeSlider(BRect frame,
+											 const char* name,
+											 int32 minValue,
+											 int32 maxValue,
+											 BMessage* message = NULL,
+											 BHandler* target = NULL);
 
+	virtual						~VolumeSlider();
+
+								// BControl
+	virtual	void				AttachedToWindow();
+	virtual	void				SetValue(int32 value);
+	virtual void				SetEnabled(bool enable);
+	virtual void				Draw(BRect updateRect);
+	virtual void				MouseDown(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 transit,
+										   const BMessage* dragMessage);
+	virtual	void				MouseUp(BPoint where);
+
+								// VolumeSlider
+			bool				IsValid() const;
+			void				SetMuted(bool mute);
+
+ private:
+			void				_MakeBitmaps();
+			void				_DimBitmap(BBitmap* bitmap);
+			int32				_ValueFor(float xPos) const;
+
+			BBitmap*			fLeftSideBits;
+			BBitmap*			fRightSideBits;
+			BBitmap*			fKnobBits;
+			bool				fTracking;
+			bool				fMuted;
+			int32				fMinValue;
+			int32				fMaxValue;
+};
+
+#endif	// BEOS_MEDIA_CONTROL_VIEW_H

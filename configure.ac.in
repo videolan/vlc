@@ -128,7 +128,7 @@ case "x${target_os}" in
     CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"; CXXFLAGS="${CXXFLAGS_save}"
     LDFLAGS_vlc="${LDFLAGS_vlc} -lbe"
     LDFLAGS_plugins="${LDFLAGS_plugins} -nostart"
-    LDFLAGS_beos="${LDFLAGS_beos} -lbe -lgame -lroot -ltracker -lstdc++.r4"
+    LDFLAGS_beos="${LDFLAGS_beos} -lbe -lgame -lroot -ltracker -lstdc++.r4 -ltranslation"
     LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind"
     ;;
   x*)

@@ -2,9 +2,10 @@
  * DrawingTidbits.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: DrawingTidbits.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: DrawingTidbits.h,v 1.2 2002/09/30 18:30:27 titer Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,4 +53,37 @@ const float kDimLevel = 0.6;
 void ReplaceColor(BBitmap *bitmap, rgb_color from, rgb_color to);
 void ReplaceTransparentColor(BBitmap *bitmap, rgb_color with);
 
-#endif
+// function can be used to scale the upper left part of
+// a bitmap to fill the entire bitmap, ie fromWidth
+// and fromHeight must be smaller or equal to the bitmaps size!
+// only supported colorspaces are B_RGB32 and B_RGBA32
+status_t scale_bitmap( BBitmap* bitmap,
+					   uint32 fromWidth, uint32 fromHeight );
+
+// bitmaps need to be the same size, or this function will fail
+// currently supported conversions:
+//   B_YCbCr422	-> B_RGB32
+//   B_RGB32	-> B_RGB32
+//   B_RGB16	-> B_RGB32
+// not yet implemented conversions:
+//   B_YCbCr420	-> B_RGB32
+//   B_YUV422	-> B_RGB32
+status_t convert_bitmap(BBitmap* inBitmap, BBitmap* outBitmap);
+
+// dims bitmap (in place) by finding the distance of
+// the color at each pixel to the provided "center" color
+// and shortens that distance by dimLevel
+//   (dimLevel < 1 -> less contrast)
+//   (dimLevel > 1 -> more contrast)
+//   (dimLevel < 0 -> inverted colors)
+// currently supported colorspaces:
+//   B_RGB32
+//   B_RGBA32
+//   B_CMAP8
+status_t dim_bitmap(BBitmap* bitmap, rgb_color center,
+					float dimLevel);
+
+rgb_color dimmed_color_cmap8(rgb_color color, rgb_color center,
+							 float dimLevel);
+
+#endif	// __DRAWING_TIBITS__

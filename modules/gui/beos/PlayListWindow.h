@@ -2,11 +2,12 @@
  * PlayListWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: PlayListWindow.h,v 1.2 2002/09/30 18:30:27 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
  *          Richard Shepherd <richard@rshepherd.demon.co.uk>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,24 +23,43 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#ifndef BEOS_PLAY_LIST_WINDOW_H
+#define BEOS_PLAY_LIST_WINDOW_H
+
+#include <Window.h>
+
+class BListView;
 class CDMenu;
+class InterfaceWindow;
+class PlaylistView;
+
 class PlayListWindow : public BWindow
 {
-public:
-    static PlayListWindow *getPlayList(BRect frame, const char *name, 
-                                      playlist_t *p_pl);
-    ~PlayListWindow();
-    bool QuitRequested();
-    void ReallyQuit();
+ public:
+								PlayListWindow(BRect frame,
+											   const char* name,
+											   playlist_t* playlist,
+											   InterfaceWindow* mainWindow );
+	virtual						~PlayListWindow();
 
-    // standard window member
-    virtual void    MessageReceived(BMessage *message);
-    
-private:	
-    PlayListWindow( BRect frame, const char *name, playlist_t *p_pl);
-    playlist_t  *p_playlist;
-    BListView  *p_listview;
-    BFilePanel *file_panel;
+								// BWindow
+	virtual	bool				QuitRequested();
+	virtual	void				MessageReceived(BMessage *message);
+	virtual	void				FrameResized(float width, float height);
+
+								// PlayListWindow
+			void				ReallyQuit();
+			void				UpdatePlaylist( bool rebuild = false );
+
+ private:	
+
+			playlist_t*			fPlaylist;
+			PlaylistView*		fListView;
+			BView*				fBackgroundView;
+			BMenuBar*			fMenuBar;
+			InterfaceWindow*	fMainWindow;
 };
 
+#endif	// BEOS_PLAY_LIST_WINDOW_H
 

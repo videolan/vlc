@@ -2,7 +2,7 @@
  * render.c : SPU renderer
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: render.c,v 1.1 2002/08/16 03:07:56 sam Exp $
+ * $Id: render.c,v 1.2 2002/09/30 18:30:26 titer Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -356,12 +356,12 @@ void E_(RenderSPU)( vout_thread_t *p_vout, picture_t *p_pic,
     case VLC_FOURCC('Y','U','Y','2'):
 
     p_dest = p_pic->p->p_pixels +
-              (p_spu->i_x + p_spu->i_width +
-               p_vout->output.i_width * ( p_spu->i_y + p_spu->i_height )) * 2;
+              + ( p_spu->i_y + p_spu->i_height ) * p_pic->p->i_pitch  // * bytes per line
+              + ( p_spu->i_x + p_spu->i_width ) * 2;  // * bytes per pixel
     /* Draw until we reach the bottom of the subtitle */
-    for( i_y = p_spu->i_height * p_vout->output.i_width;
+    for( i_y = p_spu->i_height * p_pic->p->i_pitch / 2;
          i_y ;
-         i_y -= p_vout->output.i_width )
+         i_y -= p_pic->p->i_pitch / 2 )
     {
         /* Draw until we reach the end of the line */
         for( i_x = p_spu->i_width ; i_x ; )

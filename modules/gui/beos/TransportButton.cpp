@@ -2,9 +2,10 @@
  * TransportButton.cpp
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: TransportButton.cpp,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: TransportButton.cpp,v 1.2 2002/09/30 18:30:27 titer Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -246,10 +247,8 @@ TransportButton::AttachedToWindow()
 void 
 TransportButton::DetachedFromWindow()
 {
-	if (keyPressFilter) {
+	if (keyPressFilter)
 		Window()->RemoveCommonFilter(keyPressFilter);
-		delete keyPressFilter;
-	}
 	_inherited::DetachedFromWindow();
 }
 
@@ -260,6 +259,7 @@ TransportButton::~TransportButton()
 	delete pressingMessage;
 	delete donePressingMessage;
 	delete bitmaps;
+	delete keyPressFilter;
 }
 
 void 
@@ -274,9 +274,11 @@ TransportButton::WindowActivated(bool state)
 void 
 TransportButton::SetEnabled(bool on)
 {
-	_inherited::SetEnabled(on);
-	if (!on)
-		ShortcutKeyUp();	
+	if (on != IsEnabled()) {
+		_inherited::SetEnabled(on);
+		if (!on)
+			ShortcutKeyUp();
+	}	
 }
 
 const unsigned char *
@@ -300,11 +302,31 @@ TransportButton::BitsForMask(uint32 mask) const
 BBitmap *
 TransportButton::MakeBitmap(uint32 mask)
 {
-	BBitmap *result = new BBitmap(Bounds(), B_COLOR_8_BIT);
-	result->SetBits(BitsForMask(mask), (Bounds().Width() + 1) * (Bounds().Height() + 1),
-		0, B_COLOR_8_BIT);
+	BRect r(Bounds());
+	BBitmap *result = new BBitmap(r, B_CMAP8);
 
-	ReplaceTransparentColor(result, Parent()->ViewColor());
+	uint8* src = (uint8*)BitsForMask(mask);
+
+	if (src && result && result->IsValid()) {
+		int32 width = r.IntegerWidth() + 1;
+		int32 height = r.IntegerHeight() + 1;
+		int32 bpr = result->BytesPerRow();
+		uint8* dst = (uint8*)result->Bits();
+		// copy source bits into bitmap line by line,
+		// taking possible alignment into account
+		// since the source data has been generated
+		// by QuickRes, it still contains aligment too
+		// (hence skipping bpr and not width bytes)
+		for (int32 y = 0; y < height; y++) {
+			memcpy(dst, src, bpr);
+			src += bpr;
+			dst += bpr;
+		}
+		ReplaceTransparentColor(result, Parent()->ViewColor());
+	} else {
+		delete result;
+		result = NULL;
+	}
 	
 	return result;
 }

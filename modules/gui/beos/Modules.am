@@ -4,6 +4,7 @@ SOURCES_beos = \
 	modules/gui/beos/VideoOutput.cpp \
 	modules/gui/beos/Interface.cpp \
 	modules/gui/beos/InterfaceWindow.cpp \
+	modules/gui/beos/ListViews.cpp \
 	modules/gui/beos/DrawingTidbits.cpp \
 	modules/gui/beos/TransportButton.cpp \
 	modules/gui/beos/PlayListWindow.cpp \
@@ -14,6 +15,7 @@ noinst_HEADERS += \
 	modules/gui/beos/Bitmaps.h \
 	modules/gui/beos/DrawingTidbits.h \
 	modules/gui/beos/InterfaceWindow.h \
+	modules/gui/beos/ListViews.h \
 	modules/gui/beos/MediaControlView.h \
 	modules/gui/beos/MsgVals.h \
 	modules/gui/beos/PlayListWindow.h \
