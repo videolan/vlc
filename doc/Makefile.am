@@ -15,9 +15,6 @@ EXTRA_DIST = \
 	arm-crosscompile-howto.sgml \
 	Configure.help \
 	lirc/example.lircrc \
-	subtitles/readme \
-	subtitles/vlc-gimp.pl \
-	subtitles/vlc-font.pl \
 	skins/skins-howto.txt \
 	skins/events-howto.txt \
 	skins/curve_maker \
