@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.13 2003/11/29 00:41:35 gbazin Exp $
+ * $Id: encoder.c,v 1.14 2003/11/29 12:03:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -296,6 +296,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     int i_out, i_plane;
     vlc_bool_t b_hurry_up = 0;
 
+    memset( &frame, 0, sizeof( AVFrame ) );
     for( i_plane = 0; i_plane < p_pict->i_planes; i_plane++ )
     {
         frame.data[i_plane] = p_pict->p[i_plane].p_pixels;
