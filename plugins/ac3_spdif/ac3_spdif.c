@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.23 2002/04/23 14:16:20 sam Exp $
+ * $Id: ac3_spdif.c,v 1.24 2002/05/17 18:01:25 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -223,9 +223,13 @@ static int decoder_Run( decoder_config_t * p_config )
          * Therefore a non-zero value after a call to GetBits() means the PES
          * has changed. */
         b_sync = 0;
-        while( !b_sync )
+        while( !p_spdif->p_fifo->b_die
+            && !p_spdif->p_fifo->b_error
+            && !b_sync )
         {
-            while( GetBits( &p_spdif->bit_stream, 8 ) != 0x0b );
+            while( !p_spdif->p_fifo->b_die
+                && !p_spdif->p_fifo->b_error
+                && GetBits( &p_spdif->bit_stream, 8 ) != 0x0b );
             p_spdif->i_real_pts = p_spdif->i_pts;
             p_spdif->i_pts = 0;
             b_sync = ( ShowBits( &p_spdif->bit_stream, 8 ) == 0x77 );
@@ -273,13 +277,23 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
                    BitstreamCallback, (void*)p_spdif );
 
     /* Find syncword */
-    while( !b_sync )
+    while( !p_spdif->p_fifo->b_die
+        && !p_spdif->p_fifo->b_error
+        && !b_sync )
     {
-        while( GetBits( &p_spdif->bit_stream, 8 ) != 0x0b );
+        while( !p_spdif->p_fifo->b_die
+            && !p_spdif->p_fifo->b_error
+            && GetBits( &p_spdif->bit_stream, 8 ) != 0x0b );
         p_spdif->i_real_pts = p_spdif->i_pts;
         p_spdif->i_pts = 0;
         b_sync = ( ShowBits( &p_spdif->bit_stream, 8 ) == 0x77 );
     }
+
+    if( p_spdif->p_fifo->b_die || p_spdif->p_fifo->b_error )
+    {
+        return -1;
+    }
+
     RemoveBits( &p_spdif->bit_stream, 8 );
 
     /* Check stream properties */
@@ -362,8 +376,8 @@ static void EndThread( ac3_spdif_thread_t * p_spdif )
  *****************************************************************************
  * This function is called by input's NextDataPacket.
  *****************************************************************************/
-static void BitstreamCallback ( bit_stream_t * p_bit_stream,
-                                        boolean_t b_new_pes)
+static void BitstreamCallback( bit_stream_t * p_bit_stream,
+                               boolean_t      b_new_pes )
 {
     ac3_spdif_thread_t *    p_spdif;
 

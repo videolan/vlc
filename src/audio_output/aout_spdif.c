@@ -2,7 +2,7 @@
  * aout_spdif.c: AC3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.26 2002/03/15 01:47:16 stef Exp $
+ * $Id: aout_spdif.c,v 1.27 2002/05/17 18:01:25 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -93,16 +93,19 @@ void aout_SpdifThread( aout_thread_t * p_aout )
     int         i_fifo;
     mtime_t     m_frame_time = 0;
     mtime_t     m_play;
+    mtime_t     m_old;
 
     while( !p_aout->b_die )
     {
         i_fifo = 0;
         /* Find spdif fifo */
         while( ( p_aout->fifo[i_fifo].i_format != AOUT_FIFO_SPDIF ) &&
-               ( i_fifo < AOUT_MAX_FIFOS ) )
+               ( i_fifo < AOUT_MAX_FIFOS ) && !p_aout->b_die )
         {
             i_fifo++;
         }
+
+        m_old = 0;
 
         while( !p_aout->b_die && 
                !p_aout->fifo[i_fifo].b_die )
@@ -133,7 +136,6 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                  * dsp buffer is empty enough to accept the data */
                 if( m_play > ( mdate() - m_frame_time ) )
                 {
-#if 0
                     /* check continuity */
                     if( (m_play - m_old) != m_frame_time )
                     {
@@ -144,9 +146,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                         mwait( m_play - 2 * m_frame_time );
                     }
                     m_old = m_play;
-#else
-                    mwait( m_play - m_frame_time );
-#endif
+                    
                     p_aout->pf_getbufinfo( p_aout, 0 );
 
                     p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer,
@@ -155,9 +155,16 @@ void aout_SpdifThread( aout_thread_t * p_aout )
             }
             else
             {
-                vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
-                msleep( m_frame_time );
                 intf_WarnMsg( 3, "aout warning: empty spdif fifo" );
+                while( AOUT_FIFO_ISEMPTY( p_aout->fifo[i_fifo] ) &&
+                       !p_aout->b_die && 
+                       !p_aout->fifo[i_fifo].b_die )
+
+                {
+                    vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
+                    msleep( m_frame_time );
+                    vlc_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
+                }
             }
         }
 
