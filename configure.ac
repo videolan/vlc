@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.35 2003/07/18 23:41:09 hartman Exp $
+dnl $Id: configure.ac,v 1.36 2003/07/19 14:14:22 sigmunau Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -1949,9 +1949,9 @@ fi
 dnl
 dnl   spudec support
 dnl
-AC_CHECK_HEADERS(iconv.h, [
-    AX_ADD_LDFLAGS([spudec],[-liconv])
-    AX_ADD_PLUGINS([spudec])])
+AX_ADD_LDFLAGS([spudec],[${LIBICONV}])
+AX_ADD_CPPFLAGS([spudec],[${INCICONV}])
+AX_ADD_PLUGINS([spudec])
 
 
 dnl
