@@ -70,7 +70,7 @@
 #include "modules.h"
 #include "modules_export.h"
 
-#include "../mpeg_system/input_ps.h"
+#include "../mpeg/input_ps.h"
 #include "input_vcd.h"
 #include "linux_cdrom_tools.h"
 
