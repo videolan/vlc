@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.22 2003/07/10 18:29:41 zorglub Exp $
+ * $Id: httpd.c,v 1.23 2003/07/10 22:24:09 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -25,15 +25,13 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
+#include <vlc/vlc.h>
 
-#include <sys/types.h>
 #include <sys/stat.h>
 
-#include <string.h>
 #include <errno.h>
 #include <fcntl.h>
 
-#include <vlc/vlc.h>
 #include "httpd.h"
 
 #ifdef HAVE_SYS_TIME_H
@@ -75,10 +73,6 @@
 #define HTTPD_CONNECTION_MAX_UNUSED 10000000
 
 
-#define HTTP_ADMIN_DEFAULT_USERNAME "admin"
-#define HTTP_ADMIN_DEFAULT_PASSWORD "admin"
-
-
 #define FREE( p ) if( p ) { free( p); (p) = NULL; }
 
 #if defined( WIN32 ) || defined( UNDER_CE )
@@ -96,24 +90,11 @@ static void             Close  ( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ADMIN_USER_TEXT N_( "Admin page's username" )
-#define ADMIN_USER_LONGTEXT N_( \
-    "You can set the username for the administration page \
-     If you do not set it, the default username is \"admin\"" )
-#define ADMIN_PASS_TEXT N_( "Admin page's password" )
-#define ADMIN_PASS_LONGTEXT N_( \
-    "You can set the password for the administration page \
-     If you do not set it, the default password is \"admin\"" )
-
-
 vlc_module_begin();
     set_description( _("HTTP 1.0 daemon") );
     set_capability( "httpd", 42 );
-    add_string( "http-admin-user", NULL, NULL, 
-                   ADMIN_USER_TEXT, ADMIN_USER_LONGTEXT, VLC_TRUE );
-    add_string( "http-admin-pass", NULL, NULL, 
-                    ADMIN_PASS_TEXT, ADMIN_PASS_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
+    var_Create( p_module->p_libvlc, "httpd", VLC_VAR_MUTEX );
 vlc_module_end();
 
 /*****************************************************************************
@@ -137,7 +118,7 @@ static httpd_stream_t   *RegisterStream ( httpd_t *,
 static int              SendStream      ( httpd_t *, httpd_stream_t *, uint8_t *, int );
 static int              HeaderStream    ( httpd_t *, httpd_stream_t *, uint8_t *, int );
 static void             UnregisterStream( httpd_t *, httpd_stream_t* );
-
+static int              Control         ( httpd_t *, int , void*, void* );
 /*****************************************************************************
  * Internal definitions
  *****************************************************************************/
@@ -268,6 +249,7 @@ static void httpd_ConnnectionClose( httpd_sys_t *, httpd_connection_t * );
 static int httpd_UnbanIP( httpd_sys_t *, httpd_banned_ip_t *);
 static int httpd_BanIP( httpd_sys_t *, char *);
 static httpd_banned_ip_t *httpd_GetbannedIP( httpd_sys_t *, char * );
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -330,6 +312,7 @@ static int Open( vlc_object_t *p_this )
     p_httpd->pf_header_stream   = HeaderStream;
     p_httpd->pf_send_stream     = SendStream;
     p_httpd->pf_unregister_stream=UnregisterStream;
+    p_httpd->pf_control         = Control;
 
     return( VLC_SUCCESS );
 }
@@ -957,6 +940,133 @@ static int             HeaderStream( httpd_t *p_httpd, httpd_stream_t *p_stream,
     return( VLC_SUCCESS );
 }
 
+static void httpd_info_add_ss( httpd_info_t *p_info, char *name, char *value )
+{
+    if( p_info->i_count == 0 )
+    {
+        p_info->info = malloc( sizeof( httpd_val_t ) );
+    }
+    else
+    {
+        p_info->info =
+            realloc( p_info->info,
+                     sizeof( httpd_val_t ) * ( p_info->i_count + 1 ) );
+    }
+    p_info->info[p_info->i_count].psz_name  = strdup( name );
+    p_info->info[p_info->i_count].psz_value = strdup( value );
+    p_info->i_count++;
+}
+
+static void httpd_info_add_si( httpd_info_t *p_info, char *name, int i_value )
+{
+    char v[40];
+
+    sprintf( v, "%d", i_value );
+    httpd_info_add_ss( p_info, name, v );
+}
+
+static void httpd_info_add_sp( httpd_info_t *p_info, char *name, void *value )
+{
+    char v[40];
+
+    sprintf( v, "%p", value );
+    httpd_info_add_ss( p_info, name, v );
+}
+
+
+static int Control( httpd_t *p_httpd,
+                    int i_query, void *arg1, void *arg2 )
+{
+    httpd_sys_t  *p_httpt = p_httpd->p_sys;
+    httpd_info_t *p_info;
+    httpd_connection_t *p_con;
+    int i;
+    void *id;
+
+    switch( i_query )
+    {
+        case HTTPD_GET_HOSTS:
+            p_info = arg1;
+            p_info->i_count = 0;
+            vlc_mutex_lock( &p_httpt->host_lock );
+            for( i = 0; i < p_httpt->i_host_count; i++ )
+            {
+                httpd_info_add_sp( p_info,
+                                   "id", p_httpt->host[i] );
+                httpd_info_add_ss( p_info,
+                                   "host", p_httpt->host[i]->psz_host_addr );
+                httpd_info_add_ss( p_info,
+                                   "ip",
+                                   inet_ntoa(p_httpt->host[i]->sock.sin_addr));
+                httpd_info_add_si( p_info,
+                                   "port", p_httpt->host[i]->i_port );
+            }
+            vlc_mutex_unlock( &p_httpt->host_lock );
+            return VLC_SUCCESS;
+        case HTTPD_GET_URLS:
+            p_info = arg1;
+            p_info->i_count = 0;
+            /* we can't take file_lock */
+            for( i = 0; i < p_httpt->i_file_count; i++ )
+            {
+                httpd_info_add_sp( p_info,
+                                   "id", p_httpt->file[i] );
+                httpd_info_add_si( p_info,
+                                   "stream", p_httpt->file[i]->b_stream ? 1 : 0 );
+                httpd_info_add_ss( p_info,
+                                   "url", p_httpt->file[i]->psz_file );
+                httpd_info_add_ss( p_info,
+                                   "mime", p_httpt->file[i]->psz_mime );
+                httpd_info_add_si( p_info,
+                                   "protected", p_httpt->file[i]->psz_user ? 1 : 0 );
+                httpd_info_add_si( p_info,
+                                   "used", p_httpt->file[i]->i_ref );
+            }
+            return VLC_SUCCESS;
+        case HTTPD_GET_CONNECTIONS:
+            p_info = arg1;
+            p_info->i_count = 0;
+            /* we can't take lock */
+            for( p_con = p_httpt->p_first_connection;p_con != NULL; p_con = p_con->p_next )
+            {
+                httpd_info_add_sp( p_info,
+                                   "id", p_con );
+                httpd_info_add_ss( p_info,
+                                   "ip", inet_ntoa( p_con->sock.sin_addr ) );
+                httpd_info_add_ss( p_info,
+                                   "url", p_con->psz_file );
+                httpd_info_add_si( p_info,
+                                   "status", p_con->i_http_error );
+            }
+            return VLC_SUCCESS;
+        case HTTPD_GET_ACL:
+            p_info = arg1;
+            p_info->i_count = 0;
+            return VLC_EGENERIC;
+
+        case HTTPD_SET_CLOSE:
+            sscanf( arg1, "%p", &id );
+            fprintf( stderr, "Control: HTTPD_SET_CLOSE: id=%p", id );
+
+            for( p_con = p_httpt->p_first_connection;p_con != NULL; p_con = p_con->p_next )
+            {
+                if( (void*)p_con == id )
+                {
+                    /* XXX don't free p_con as it could be the one that it is sending ... */
+                    p_con->i_state = HTTPD_CONNECTION_TO_BE_CLOSED;
+                    return VLC_SUCCESS;
+                }
+            }
+            return VLC_EGENERIC;
+
+        case HTTPD_SET_ACL:
+            sscanf( arg1, "%p", &id );
+            fprintf( stderr, "Control: %p", id );
+        default:
+            return VLC_EGENERIC;
+    }
+}
+
 /****************************************************************************/
 /****************************************************************************/
 /****************************************************************************/
@@ -1010,353 +1120,6 @@ static int  httpd_page_404_get( httpd_file_callback_args_t *p_args,
     return VLC_SUCCESS;
 }
 
-
-static int _httpd_page_admin_get_status( httpd_file_callback_args_t *p_args,
-                                         uint8_t **pp_data, int *pi_data )
-{
-    httpd_sys_t *p_httpt = (httpd_sys_t*)p_args;
-    httpd_connection_t *p_con;
-    httpd_banned_ip_t *p_ip;
-
-    int i;
-    char *p;
-
-    /* FIXME FIXME do not use static size FIXME FIXME*/
-    p = *pp_data = malloc( 8096 );
-
-    p += sprintf( p, "<html>\n" );
-    p += sprintf( p, "<head>\n" );
-    p += sprintf( p, "<title>VideoLAN Client Stream Output</title>\n" );
-    p += sprintf( p, "</head>\n" );
-    p += sprintf( p, "<body>\n" );
-    p += sprintf( p, "<h1><center>VideoLAN Client Stream Output</center></h1>\n" );
-    p += sprintf( p, "<h2><center>Admin page</center></h2>\n" );
-
-    /* general */
-    p += sprintf( p, "<h3>General state</h3>\n" );
-    p += sprintf( p, "<ul>\n" );
-    p += sprintf( p, "<li>Connection count: %d</li>\n", p_httpt->i_connection_count );
-    //p += sprintf( p, "<li>Total bandwith: %d</li>\n", -1 );
-    /*p += sprintf( p, "<li></li>\n" );*/
-    p += sprintf( p, "<li>Ban count: %d</li>\n", p_httpt->i_banned_ip_count );
-    p += sprintf( p, "</ul>\n" );
-
-    /* ban list */
-    /* XXX do not lock on ban_lock */
-    p += sprintf( p, "<h3>Ban list</h3>\n" );
-    p += sprintf( p, "<table border=\"1\" cellspacing=\"0\" >\n" );
-    p += sprintf( p, "<tr>\n<th>IP</th>\n<th>Action</th></tr>\n" );
-    for( p_ip = p_httpt->p_first_banned_ip;p_ip != NULL; p_ip = p_ip->p_next )
-    {
-        p += sprintf( p, "<tr>\n" );
-        p += sprintf( p, "<td>%s</td>\n", p_ip->psz_ip );
-        p += sprintf( p, "<td><form method=\"get\" action=\"\">"
-                         "<select name=\"action\">"
-                         "<option selected>unban_ip</option>"
-                         "</select>"
-                         "<input type=\"hidden\" name=\"id\" value=\"%s\"/>"
-                         "<input type=\"submit\" value=\"Do it\" />"
-                         "</form></td>\n", p_ip->psz_ip);
-        p += sprintf( p, "</tr>\n" );
-    }
-    p += sprintf( p, "</table>\n" );
-
-
-
-    /* host list */
-    vlc_mutex_lock( &p_httpt->host_lock );
-    p += sprintf( p, "<h3>Host list</h3>\n" );
-    p += sprintf( p, "<table border=\"1\" cellspacing=\"0\" >\n" );
-    p += sprintf( p, "<tr>\n<th>Host</th><th>Port</th><th>IP</th>\n</tr>\n" );
-
-    for( i = 0; i < p_httpt->i_host_count; i++ )
-    {
-        p += sprintf( p, "<tr>\n" );
-        p += sprintf( p, "<td>%s</td>\n", p_httpt->host[i]->psz_host_addr );
-        p += sprintf( p, "<td>%d</td>\n", p_httpt->host[i]->i_port );
-        p += sprintf( p, "<td>%s</td>\n", inet_ntoa( p_httpt->host[i]->sock.sin_addr ) );
-        p += sprintf( p, "</tr>\n" );
-    }
-    p += sprintf( p, "</table>\n" );
-    vlc_mutex_unlock( &p_httpt->host_lock );
-
-    /* file list */
-    /* XXX do not take lock on file_lock */
-    p += sprintf( p, "<h3>File list</h3>\n" );
-    p += sprintf( p, "<table border=\"1\" cellspacing=\"0\" >\n" );
-    p += sprintf( p, "<tr>\n<th>Name</th><th>Mime</th><th>Protected</th><th>Used</th>\n</tr>\n" );
-
-    for( i = 0; i < p_httpt->i_file_count; i++ )
-    {
-        if( !p_httpt->file[i]->b_stream )
-        {
-            p += sprintf( p, "<tr>\n" );
-            p += sprintf( p, "<td>%s</td>\n", p_httpt->file[i]->psz_file );
-            p += sprintf( p, "<td>%s</td>\n", p_httpt->file[i]->psz_mime );
-            p += sprintf( p, "<td>%s</td>\n", p_httpt->file[i]->psz_user ? "Yes" : "No" );
-            p += sprintf( p, "<td>%d</td>\n", p_httpt->file[i]->i_ref);
-            p += sprintf( p, "</tr>\n" );
-        }
-    }
-    p += sprintf( p, "</table>\n" );
-
-    /* stream list */
-    /* XXX do not take lock on file_lock */
-    p += sprintf( p, "<h3>Stream list</h3>\n" );
-    p += sprintf( p, "<table border=\"1\" cellspacing=\"0\" >\n" );
-    p += sprintf( p, "<tr>\n<th>Name</th><th>Mime</th><th>Protected</th><th>Used</th>\n</tr>\n" );
-
-    for( i = 0; i < p_httpt->i_file_count; i++ )
-    {
-        if( p_httpt->file[i]->b_stream )
-        {
-            p += sprintf( p, "<tr>\n" );
-            p += sprintf( p, "<td>%s</td>\n", p_httpt->file[i]->psz_file );
-            p += sprintf( p, "<td>%s</td>\n", p_httpt->file[i]->psz_mime );
-            p += sprintf( p, "<td>%s</td>\n", p_httpt->file[i]->psz_user ? "Yes" : "No" );
-            p += sprintf( p, "<td>%d</td>\n", p_httpt->file[i]->i_ref);
-            p += sprintf( p, "</tr>\n" );
-        }
-    }
-    p += sprintf( p, "</table>\n" );
-
-    /* connection list */
-    /* XXX do not take lock on connection_lock */
-    p += sprintf( p, "<h3>Connection list</h3>\n" );
-    p += sprintf( p, "<table border=\"1\" cellspacing=\"0\" >\n" );
-    p += sprintf( p, "<tr>\n<th>IP</th><th>Requested File</th><th>Status</th><th>Action</th>\n</tr>\n" );
-
-    for( p_con = p_httpt->p_first_connection;p_con != NULL; p_con = p_con->p_next )
-    {
-        p += sprintf( p, "<tr>\n" );
-        p += sprintf( p, "<td>%s</td>\n", inet_ntoa( p_con->sock.sin_addr ) );
-        p += sprintf( p, "<td>%s</td>\n", p_con->psz_file );
-        p += sprintf( p, "<td>%d</td>\n", p_con->i_http_error );
-        p += sprintf( p, "<td><form method=\"get\" action=\"\">"
-                         "<select name=\"action\">"
-                         "<option selected>close_connection</option>"
-                         "<option>ban_ip</option>"
-                         "<option>close_connection_and_ban_ip</option>"
-                         "</select>"
-                         "<input type=\"hidden\" name=\"id\" value=\"%p\"/>"
-                         "<input type=\"submit\" value=\"Do it\" />"
-                              "</form></td>\n", p_con);
-        p += sprintf( p, "</tr>\n" );
-    }
-    p += sprintf( p, "</table>\n" );
-
-
-    /* www.videolan.org */
-    p += sprintf( p, "<hr />\n" );
-    p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
-    p += sprintf( p, "</body>\n" );
-    p += sprintf( p, "</html>\n" );
-
-    *pi_data = strlen( *pp_data ) + 1;
-
-    return( VLC_SUCCESS );
-}
-
-static int _httpd_page_admin_get_success( httpd_file_callback_args_t *p_args,
-                                          uint8_t **pp_data, int *pi_data,
-                                          char *psz_msg )
-{
-    char *p;
-
-    p = *pp_data = malloc( 8096 );
-
-    p += sprintf( p, "<html>\n" );
-    p += sprintf( p, "<head>\n" );
-    p += sprintf( p, "<title>VideoLAN Client Stream Output</title>\n" );
-    p += sprintf( p, "</head>\n" );
-    p += sprintf( p, "<body>\n" );
-    p += sprintf( p, "<h1><center>VideoLAN Client Stream Output</center></h1>\n" );
-
-    p += sprintf( p, "<p>Success=`%s'</p>", psz_msg );
-    p += sprintf( p, "<a href=\"admin.html\">Back to admin page</a>\n" );
-
-    p += sprintf( p, "<hr />\n" );
-    p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
-    p += sprintf( p, "</body>\n" );
-    p += sprintf( p, "</html>\n" );
-
-    *pi_data = strlen( *pp_data ) + 1;
-
-    return( VLC_SUCCESS );
-}
-
-static int _httpd_page_admin_get_error( httpd_file_callback_args_t *p_args,
-                                        uint8_t **pp_data, int *pi_data,
-                                        char *psz_error )
-{
-    char *p;
-
-    p = *pp_data = malloc( 8096 );
-
-    p += sprintf( p, "<html>\n" );
-    p += sprintf( p, "<head>\n" );
-    p += sprintf( p, "<title>VideoLAN Client Stream Output</title>\n" );
-    p += sprintf( p, "</head>\n" );
-    p += sprintf( p, "<body>\n" );
-    p += sprintf( p, "<h1><center>VideoLAN Client Stream Output</center></h1>\n" );
-
-    p += sprintf( p, "<p>Error=`%s'</p>", psz_error );
-    p += sprintf( p, "<a href=\"admin.html\">Back to admin page</a>\n" );
-
-    p += sprintf( p, "<hr />\n" );
-    p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
-    p += sprintf( p, "</body>\n" );
-    p += sprintf( p, "</html>\n" );
-
-    *pi_data = strlen( *pp_data ) + 1;
-
-    return( VLC_SUCCESS );
-}
-
-static void _httpd_uri_extract_value( char *psz_uri, char *psz_name, char *psz_value, int i_value_max )
-{
-    char *p;
-
-    p = strstr( psz_uri, psz_name );
-    if( p )
-    {
-        int i_len;
-
-        p += strlen( psz_name );
-        if( *p == '=' ) p++;
-
-        if( strchr( p, '&' ) )
-        {
-            i_len = strchr( p, '&' ) - p;
-        }
-        else
-        {
-            i_len = strlen( p );
-        }
-        i_len = __MIN( i_value_max - 1, i_len );
-        if( i_len > 0 )
-        {
-            strncpy( psz_value, p, i_len );
-            psz_value[i_len] = '\0';
-        }
-        else
-        {
-            strncpy( psz_value, "", i_value_max );
-        }
-    }
-    else
-    {
-        strncpy( psz_value, "", i_value_max );
-    }
-}
-
-
-static int  httpd_page_admin_get( httpd_file_callback_args_t *p_args,
-                                  uint8_t *p_request, int i_request,
-                                  uint8_t **pp_data, int *pi_data )
-{
-    httpd_sys_t *p_httpt = (httpd_sys_t*)p_args;
-    httpd_connection_t *p_con;
-
-    if( i_request > 0)
-    {
-        char action[512];
-
-        _httpd_uri_extract_value( p_request, "action", action, 512 );
-
-        if( !strcmp( action, "close_connection" ) )
-        {
-            char id[128];
-            void *i_id;
-
-            _httpd_uri_extract_value( p_request, "id", id, 512 );
-            i_id = (void*)strtol( id, NULL, 0 );
-            msg_Dbg( p_httpt, "requested closing connection id=%s %p", id, i_id );
-            for( p_con = p_httpt->p_first_connection;p_con != NULL; p_con = p_con->p_next )
-            {
-                if( (void*)p_con == i_id )
-                {
-                    /* XXX don't free p_con as it could be the one that it is sending ... */
-                    p_con->i_state = HTTPD_CONNECTION_TO_BE_CLOSED;
-                    return( _httpd_page_admin_get_success( p_args, pp_data, pi_data, "connection closed" ) );
-                }
-            }
-            return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, "invalid id" ) );
-        }
-        else if( !strcmp( action, "ban_ip" ) )
-        {
-            char id[128];
-            void *i_id;
-
-            _httpd_uri_extract_value( p_request, "id", id, 512 );
-            i_id = (void*)strtol( id, NULL, 0 );
-
-            msg_Dbg( p_httpt, "requested banning ip id=%s %p", id, i_id );
-
-            for( p_con = p_httpt->p_first_connection;p_con != NULL; p_con = p_con->p_next )
-            {
-                if( (void*)p_con == i_id )
-                {
-                    if( httpd_BanIP( p_httpt,inet_ntoa( p_con->sock.sin_addr ) ) == 0)
-                        return( _httpd_page_admin_get_success( p_args, pp_data, pi_data, "IP banned" ) );
-                    else
-                        break;
-                }
-            }
-
-            return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, action ) );
-        }
-        else if( !strcmp( action, "unban_ip" ) )
-        {
-            char id[128];
-
-            _httpd_uri_extract_value( p_request, "id", id, 512 );
-            msg_Dbg( p_httpt, "requested unbanning ip %s", id);
-
-            if( httpd_UnbanIP( p_httpt, httpd_GetbannedIP ( p_httpt, id ) ) == 0)
-                return( _httpd_page_admin_get_success( p_args, pp_data, pi_data, "IP Unbanned" ) );
-            else
-                return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, action ) );
-        }
-        else if( !strcmp( action, "close_connection_and_ban_ip" ) )
-        {
-            char id[128];
-            void *i_id;
-
-            _httpd_uri_extract_value( p_request, "id", id, 512 );
-            i_id = (void*)strtol( id, NULL, 0 );
-            msg_Dbg( p_httpt, "requested closing connection and banning ip id=%s %p", id, i_id );
-            for( p_con = p_httpt->p_first_connection;p_con != NULL; p_con = p_con->p_next )
-            {
-                if( (void*)p_con == i_id )
-                {
-                    /* XXX don't free p_con as it could be the one that it is sending ... */
-                    p_con->i_state = HTTPD_CONNECTION_TO_BE_CLOSED;
-
-                    if( httpd_BanIP( p_httpt,inet_ntoa( p_con->sock.sin_addr ) ) == 0)
-                        return( _httpd_page_admin_get_success( p_args, pp_data, pi_data, "Connection closed and IP banned" ) );
-                    else
-                        break;
-                }
-
-            }
-            return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, "invalid id" ) );
-
-
-            return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, action ) );
-        }
-        else
-        {
-            return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, action ) );
-        }
-    }
-    else
-    {
-        return( _httpd_page_admin_get_status( p_args, pp_data, pi_data ) );
-    }
-
-    return VLC_SUCCESS;
-}
 
 static int httpd_BanIP( httpd_sys_t *p_httpt, char * psz_new_banned_ip)
 {
@@ -1883,24 +1646,10 @@ search_file:
 #define HTTPD_STREAM_PACKET 10000
 static void httpd_Thread( httpd_sys_t *p_httpt )
 {
-    httpd_file_t    *p_page_admin;
     httpd_file_t    *p_page_401;
     httpd_file_t    *p_page_404;
 
     httpd_connection_t *p_con;
-
-    char *psz_user = config_GetPsz (p_httpt, "http-admin-user" );
-    char *psz_pass = config_GetPsz (p_httpt, "http-admin-pass" );
-
-    if( !psz_user )
-    {
-        psz_user = strdup(HTTP_ADMIN_DEFAULT_USERNAME);
-    }
-    
-    if( !psz_pass )
-    {
-        psz_pass = strdup(HTTP_ADMIN_DEFAULT_PASSWORD);
-    }
 
     msg_Info( p_httpt, "httpd started" );
 
@@ -1916,12 +1665,6 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                                 httpd_page_404_get,
                                 NULL,
                                 (httpd_file_callback_args_t*)NULL );
-    p_page_admin = _RegisterFile( p_httpt,
-                                  "/admin.html", "text/html",
-                                  psz_user , psz_pass ,
-                                  httpd_page_admin_get,
-                                  NULL,
-                                  (httpd_file_callback_args_t*)p_httpt );
 
     while( !p_httpt->b_die )
     {
@@ -1998,9 +1741,9 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
             msleep( 1000 );
             continue;
         }
+
         if( i_ret <= 0 )
         {
-//            msg_Dbg( p_httpt, "waiting..." );
             continue;
         }
 
@@ -2184,7 +1927,8 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                     /* check if this p_con aren't to late */
                     if( p_con->i_stream_pos + p_stream->i_buffer_size < p_stream->i_buffer_pos )
                     {
-                        fprintf(stderr, "fixing i_stream_pos (old=%lld i_buffer_pos=%lld\n", p_con->i_stream_pos, p_stream->i_buffer_pos  );
+                        fprintf( stderr, "fixing i_stream_pos (old=%lld i_buffer_pos=%lld\n",
+                                 p_con->i_stream_pos, p_stream->i_buffer_pos  );
                         p_con->i_stream_pos = p_stream->i_buffer_last_pos;
                     }
 
@@ -2238,8 +1982,4 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
 
     _UnregisterFile( p_httpt, p_page_401 );
     _UnregisterFile( p_httpt, p_page_404 );
-    _UnregisterFile( p_httpt, p_page_admin );
-
-    FREE( psz_user );
-    FREE( psz_pass );
 }

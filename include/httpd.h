@@ -2,7 +2,7 @@
  * httpd.h
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.h,v 1.5 2003/06/25 15:50:52 fenrir Exp $
+ * $Id: httpd.h,v 1.6 2003/07/10 22:24:09 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -21,8 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-typedef struct httpd_t          httpd_t;
-
 typedef struct httpd_host_t     httpd_host_t;
 
 typedef struct httpd_file_t     httpd_file_t;
@@ -33,6 +31,30 @@ typedef struct httpd_file_callback_args_t httpd_file_callback_args_t;
 typedef int (*httpd_file_callback)( httpd_file_callback_args_t *p_args, uint8_t *p_request, int i_request, uint8_t **pp_data, int *pi_data );
 
 typedef struct httpd_sys_t httpd_sys_t;
+
+enum httpdControl_e
+{
+    HTTPD_GET_HOSTS,
+    HTTPD_GET_URLS,
+    HTTPD_GET_CONNECTIONS,
+    HTTPD_GET_ACL,          /* not implemented */
+
+    HTTPD_SET_CLOSE,
+    HTTPD_SET_ACL           /* not implemented */
+};
+
+typedef struct
+{
+    char *psz_name;
+    char *psz_value;
+} httpd_val_t;
+
+typedef struct
+{
+    int         i_count;
+    httpd_val_t *info;
+} httpd_info_t;
+
 
 struct httpd_t
 {
@@ -62,31 +84,36 @@ struct httpd_t
                                               httpd_stream_t *,
                                               uint8_t *, int );
     void            (*pf_unregister_stream) ( httpd_t *, httpd_stream_t * );
+    int             (*pf_control)           ( httpd_t *,
+                                              int i_query,
+                                              void *arg1, void *arg2 );
 };
 
-/*
+
+/*****************************************************************************
  * httpd_Find:
- *
- *      Return the running httpd instance
- *      (if none and b_create then a new one is created)
- */
+ *  Return the running httpd instance (if none and b_create then a new one is created)
+ * httpd_release:
+ *****************************************************************************/
+
 static inline httpd_t* httpd_Find( vlc_object_t *p_this, vlc_bool_t b_create )
 {
     httpd_t *p_httpd = NULL;
+    vlc_value_t lockval;
+
+    var_Get( p_this->p_libvlc, "httpd", &lockval );
+    vlc_mutex_lock( lockval.p_address );
 
     p_httpd = vlc_object_find( p_this, VLC_OBJECT_HTTPD, FIND_ANYWHERE );
-    if( !p_httpd )
+    if( !p_httpd && b_create)
     {
         msg_Info(p_this, "creating new http daemon" );
-        if( !b_create )
-        {
-            return( NULL );
-        }
 
         p_httpd = vlc_object_create( p_this, VLC_OBJECT_HTTPD );
         if( !p_httpd )
         {
             msg_Err( p_this, "out of memory" );
+            vlc_mutex_unlock( lockval.p_address );
             return( NULL );
         }
 
@@ -96,12 +123,14 @@ static inline httpd_t* httpd_Find( vlc_object_t *p_this, vlc_bool_t b_create )
         {
             msg_Err( p_this, "no suitable httpd module" );
             vlc_object_destroy( p_httpd );
+            vlc_mutex_unlock( lockval.p_address );
             return( NULL );
         }
 
         vlc_object_yield( p_httpd );
         vlc_object_attach( p_httpd, p_this->p_vlc );
     }
+    vlc_mutex_unlock( lockval.p_address );
 
     return( p_httpd );
 }
@@ -118,4 +147,3 @@ static inline void  httpd_Release( httpd_t *p_httpd )
         vlc_object_destroy( p_httpd );
     }
 }
-
