@@ -1697,31 +1697,34 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         /* handler reference */
         hdlr = box_full_new( "hdlr", 0, 0 );
 
-        bo_add_fourcc( hdlr, "mhlr" );         // media handler
+        if( p_sys->b_mov )
+            bo_add_fourcc( hdlr, "mhlr" );         // media handler
+        else
+            bo_add_32be( hdlr, 0 );
+
         if( p_stream->fmt.i_cat == AUDIO_ES )
-        {
             bo_add_fourcc( hdlr, "soun" );
-        }
         else if( p_stream->fmt.i_cat == VIDEO_ES )
-        {
             bo_add_fourcc( hdlr, "vide" );
-        }
         else if( p_stream->fmt.i_cat == SPU_ES )
-        {
             bo_add_fourcc( hdlr, "text" );
-        }
 
         bo_add_32be( hdlr, 0 );         // reserved
         bo_add_32be( hdlr, 0 );         // reserved
         bo_add_32be( hdlr, 0 );         // reserved
 
-        bo_add_8( hdlr, 12 );
+        if( p_sys->b_mov )
+            bo_add_8( hdlr, 12 );   /* Pascal string for .mov */
+
         if( p_stream->fmt.i_cat == AUDIO_ES )
             bo_add_mem( hdlr, 12, "SoundHandler" );
         else if( p_stream->fmt.i_cat == VIDEO_ES )
             bo_add_mem( hdlr, 12, "VideoHandler" );
         else
             bo_add_mem( hdlr, 12, "Text Handler" );
+
+        if( !p_sys->b_mov )
+            bo_add_8( hdlr, 0 );   /* asciiz string for .mp4, yes that's BRAIN DAMAGED F**K MP4 */
 
         box_fix( hdlr );
         box_gather( mdia, hdlr );
