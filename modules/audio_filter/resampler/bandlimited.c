@@ -2,7 +2,7 @@
  * bandlimited.c : bandlimited interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: bandlimited.c,v 1.1 2003/03/04 03:27:40 gbazin Exp $
+ * $Id: bandlimited.c,v 1.2 2003/03/04 19:28:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -67,7 +67,7 @@ struct aout_filter_sys_t
     int i_buf_size;
 
     int i_old_rate;
-    int d_old_factor;
+    double d_old_factor;
     int i_old_wing;
 
     unsigned int i_remainder;                /* remainder of previous sample */
@@ -80,7 +80,7 @@ struct aout_filter_sys_t
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("audio filter for bandlimited interpolation resampling") );
-    set_capability( "audio filter", 4 );
+    set_capability( "audio filter", 20 );
     set_callbacks( Create, Close );
 vlc_module_end();
 
@@ -158,10 +158,11 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
     int i_in_nb = p_in_buf->i_nb_samples;
     int i_in, i_out = 0;
-
-    double d_factor = (double)p_aout->mixer.mixer.i_rate
-                        / p_filter->input.i_rate;
-    int i_filter_wing, i_left_over;
+    double d_factor, d_scale_factor, d_old_scale_factor;
+    int i_filter_wing;
+#if 0
+    int i;
+#endif
 
     /* Check if we really need to run the resampler */
     if( p_aout->mixer.mixer.i_rate == p_filter->input.i_rate )
@@ -213,17 +214,10 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
 #if 0
-    msg_Err( p_filter, "old rate: %i, old factor: %i, old wing: %i, i_in: %i",
+    msg_Err( p_filter, "old rate: %i, old factor: %f, old wing: %i, i_in: %i",
              p_filter->p_sys->i_old_rate, p_filter->p_sys->d_old_factor,
              p_filter->p_sys->i_old_wing, i_in_nb );
 #endif
-
-    /* Calculate the length of the filter wing */
-    d_factor = (double)p_aout->mixer.mixer.i_rate / p_filter->input.i_rate;
-    i_filter_wing = ((SMALL_FILTER_NMULT+1)/2.0) * __MAX(1.0,1.0/d_factor) + 1;
-
-    /* Check if we have enough buffered data to start with the new rate. */
-    i_left_over = i_filter_wing - p_filter->p_sys->i_old_wing;
 
     /* Prepare the source buffer */
     i_in_nb += (p_filter->p_sys->i_old_wing * 2);
@@ -254,16 +248,20 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* Make sure the output buffer is reset */
     memset( p_out, 0, p_out_buf->i_size );
 
-#if 0
+    /* Calculate the new length of the filter wing */
+    d_factor = (double)p_aout->mixer.mixer.i_rate / p_filter->input.i_rate;
+    i_filter_wing = ((SMALL_FILTER_NMULT+1)/2.0) * __MAX(1.0,1.0/d_factor) + 1;
+
     /* Account for increased filter gain when using factors less than 1 */
-    if( d_factor < 1 )
-    {
-        LpScl = SMALL_FILTER_SCALE * d_factor + 0.5;
-    }
-#endif
+    d_old_scale_factor = SMALL_FILTER_SCALE *
+        p_filter->p_sys->d_old_factor + 0.5;
+    d_scale_factor = SMALL_FILTER_SCALE * d_factor + 0.5;
 
     /* Apply the old rate until we have enough samples for the new one */
-    for( i_in = p_filter->p_sys->i_old_wing; i_in < i_left_over; i_in++ )
+    /* TODO: Check we have enough samples */
+    i_in = p_filter->p_sys->i_old_wing;
+    p_in += p_filter->p_sys->i_old_wing * i_nb_channels;
+    for( ; i_in < i_filter_wing; i_in++ )
     {
         if( p_filter->p_sys->d_old_factor == 1 )
         {
@@ -297,6 +295,13 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                                p_filter->output.i_rate,
                                1, i_nb_channels );
 
+#if 0
+                /* Normalize for unity filter gain */
+                for( i = 0; i < i_nb_channels; i++ )
+                {
+                    *(p_out+i) *= d_old_scale_factor;
+                }
+#endif
             }
             else
             {
@@ -315,10 +320,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                                1, i_nb_channels );
             }
 
-#if 0
-            v *= LpScl;             /* Normalize for unity filter gain */
-#endif
-
             p_out += i_nb_channels;
             i_out++;
 
@@ -330,6 +331,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     /* Apply the new rate for the rest of the samples */
+    /* TODO: Check we have enough future samples for the new rate */
     if( i_in < i_in_nb - i_filter_wing )
     {
         p_filter->p_sys->i_old_rate   = p_filter->input.i_rate;
@@ -359,6 +361,14 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                                p_filter->p_sys->i_remainder,
                                p_filter->output.i_rate,
                                1, i_nb_channels );
+
+#if 0
+                /* Normalize for unity filter gain */
+                for( i = 0; i < i_nb_channels; i++ )
+                {
+                    *(p_out+i) *= d_old_scale_factor;
+                }
+#endif
             }
             else
             {
@@ -376,10 +386,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                                p_filter->output.i_rate, p_filter->input.i_rate,
                                1, i_nb_channels );
             }
-
-#if 0
-            v *= LpScl;             /* Normalize for unity filter gain */
-#endif
 
             p_out += i_nb_channels;
             i_out++;
@@ -401,7 +407,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
 #if 0
-    msg_Err( p_filter, "pout size: %i, nb_samples out: %i", p_out_buf->i_size,
+    msg_Err( p_filter, "p_out size: %i, nb bytes out: %i", p_out_buf->i_size,
              i_out * p_filter->input.i_bytes_per_frame );
 #endif
 
@@ -506,8 +512,6 @@ void FilterFloatUD( float Imp[], float ImpD[], uint16_t Nwing, float *p_in,
           ((ui_output_rate * ui_counter + ui_remainder)<< Nhc) -
           ((ui_output_rate * ui_counter + ui_remainder)<< Nhc) /
           ui_input_rate * ui_input_rate;
-          //(ui_remainder<<Nhc)* ui_output_rate/ui_input_rate -
-          //(ui_remainder<<Nhc) / ui_input_rate * ui_output_rate;
         t += *Hdp * ui_linear_remainder / ui_input_rate / Npc;
         for( i = 0; i < i_nb_channels; i++ )
         {
