@@ -1,7 +1,6 @@
 NULL =
 EXTRA_DIST = \
 	patch \
-	control \
 	control.gpe \
 	control.opie \
 	control.zaurus \
@@ -9,11 +8,9 @@ EXTRA_DIST = \
 	rules.gpe \
 	rules.opie \
 	rules.zaurus \
-	postinst \
 	postinst.gpe \
 	postinst.opie \
 	postinst.zaurus \
-	postrm \
 	postrm.gpe \
 	postrm.opie \
 	postrm.zaurus \
