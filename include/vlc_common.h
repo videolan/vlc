@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.90 2003/11/24 00:39:00 fenrir Exp $
+ * $Id: vlc_common.h,v 1.91 2003/11/24 20:45:23 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -448,11 +448,11 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #define TAB_APPEND( count, tab, p )             \
     if( (count) > 0 )                           \
     {                                           \
-        (tab) = realloc( (tab), sizeof( void ** ) * ( (count) + 1 ) ); \
+        (void *)(tab) = realloc( (tab), sizeof( void ** ) * ( (count) + 1 ) );\
     }                                           \
     else                                        \
     {                                           \
-        (tab) = malloc( sizeof( void ** ) );    \
+        (void *)(tab) = malloc( sizeof( void ** ) );    \
     }                                           \
     (void**)(tab)[(count)] = (void*)(p);        \
     (count)++

@@ -2,7 +2,7 @@
  * filter.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filter.cpp,v 1.7 2003/11/03 20:22:21 gbazin Exp $
+ * $Id: filter.cpp,v 1.8 2003/11/24 20:45:23 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -570,28 +570,30 @@ STDMETHODIMP CaptureFilter::GetSyncSource(IReferenceClock **pClock)
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::GetSyncSource" );
 #endif
-    return E_NOTIMPL;
+
+    *pClock = NULL;
+    return NOERROR;
 };
 STDMETHODIMP CaptureFilter::Stop()
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::Stop" );
 #endif
-    return E_NOTIMPL;
+    return S_OK;
 };
 STDMETHODIMP CaptureFilter::Pause()
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::Pause" );
 #endif
-    return E_NOTIMPL;
+    return S_OK;
 };
 STDMETHODIMP CaptureFilter::Run(REFERENCE_TIME tStart)
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::Run" );
 #endif
-    return E_NOTIMPL;
+    return S_OK;
 };
 
 /* IBaseFilter methods */

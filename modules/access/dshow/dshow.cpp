@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.15 2003/11/24 19:30:54 fenrir Exp $
+ * $Id: dshow.cpp,v 1.16 2003/11/24 20:45:23 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -33,6 +33,63 @@
 #include <vlc/vout.h>
 
 #include "filter.h"
+
+/*****************************************************************************
+ * Access: local prototypes
+ *****************************************************************************/
+static ssize_t Read        ( input_thread_t *, byte_t *, size_t );
+static ssize_t ReadDV      ( input_thread_t *, byte_t *, size_t );
+
+static int OpenDevice( input_thread_t *, string, vlc_bool_t );
+static IBaseFilter *FindCaptureDevice( vlc_object_t *, string *,
+                                       list<string> *, vlc_bool_t );
+static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
+                                     int, int, int, int, int, int );
+static bool ConnectFilters( IFilterGraph *, IBaseFilter *, IPin * );
+
+static int FindDevicesCallback( vlc_object_t *, char const *,
+                                vlc_value_t, vlc_value_t, void * );
+#if 0
+    /* Debug only, use this to find out GUIDs */
+    unsigned char p_st[];
+    UuidToString( (IID *)&IID_IAMBufferNegotiation, &p_st );
+    msg_Err( p_input, "BufferNegotiation: %s" , p_st );
+#endif
+
+/*
+ * header:
+ *  fcc  ".dsh"
+ *  u32    stream count
+ *      fcc "auds"|"vids"       0
+ *      fcc codec               4
+ *      if vids
+ *          u32 width           8
+ *          u32 height          12
+ *          u32 padding         16
+ *      if auds
+ *          u32 channels        12
+ *          u32 samplerate      8
+ *          u32 samplesize      16
+ *
+ * data:
+ *  u32     stream number
+ *  u32     data size
+ *  u8      data
+ */
+
+static void SetDWBE( uint8_t *p, uint32_t dw )
+{
+    p[0] = (dw >> 24)&0xff;
+    p[1] = (dw >> 16)&0xff;
+    p[2] = (dw >>  8)&0xff;
+    p[3] = (dw      )&0xff;
+}
+
+static void SetQWBE( uint8_t *p, uint64_t qw )
+{
+    SetDWBE( p, (qw >> 32)&0xffffffff );
+    SetDWBE( &p[4], qw&0xffffffff );
+}
 
 /*****************************************************************************
  * Module descriptor
@@ -99,64 +156,6 @@ vlc_module_begin();
     set_callbacks( DemuxOpen, DemuxClose );
 
 vlc_module_end();
-
-
-/*****************************************************************************
- * Access: local prototypes
- *****************************************************************************/
-static ssize_t Read        ( input_thread_t *, byte_t *, size_t );
-static ssize_t ReadDV      ( input_thread_t *, byte_t *, size_t );
-
-static int OpenDevice( input_thread_t *, string, vlc_bool_t );
-static IBaseFilter *FindCaptureDevice( vlc_object_t *, string *,
-                                       list<string> *, vlc_bool_t );
-static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
-                                     int, int, int, int, int, int );
-static bool ConnectFilters( IFilterGraph *, IBaseFilter *, IPin * );
-
-static int FindDevicesCallback( vlc_object_t *, char const *,
-                                vlc_value_t, vlc_value_t, void * );
-#if 0
-    /* Debug only, use this to find out GUIDs */
-    unsigned char p_st[];
-    UuidToString( (IID *)&IID_IAMBufferNegotiation, &p_st );
-    msg_Err( p_input, "BufferNegotiation: %s" , p_st );
-#endif
-
-/*
- * header:
- *  fcc  ".dsh"
- *  u32    stream count
- *      fcc "auds"|"vids"       0
- *      fcc codec               4
- *      if vids
- *          u32 width           8
- *          u32 height          12
- *          u32 padding         16
- *      if auds
- *          u32 channels        12
- *          u32 samplerate      8
- *          u32 samplesize      16
- *
- * data:
- *  u32     stream number
- *  u32     data size
- *  u8      data
- */
-
-static void SetDWBE( uint8_t *p, uint32_t dw )
-{
-    p[0] = (dw >> 24)&0xff;
-    p[1] = (dw >> 16)&0xff;
-    p[2] = (dw >>  8)&0xff;
-    p[3] = (dw      )&0xff;
-}
-
-static void SetQWBE( uint8_t *p, uint64_t qw )
-{
-    SetDWBE( p, (qw >> 32)&0xffffffff );
-    SetDWBE( &p[4], qw&0xffffffff );
-}
 
 /****************************************************************************
  * DirectShow elementary stream descriptor
@@ -584,8 +583,8 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
 
             /* Greatly simplifies the reading routine */
             int i_mtu = dshow_stream.header.video.bmiHeader.biWidth *
-                dshow_stream.header.video.bmiHeader.biHeight * 4;
-            p_input->i_mtu = __MAX(p_input->i_mtu,i_mtu);
+                i_height * 4;
+            p_input->i_mtu = __MAX( p_input->i_mtu, (unsigned int)i_mtu );
         }
 
         else if( dshow_stream.mt.majortype == MEDIATYPE_Audio &&
@@ -640,7 +639,7 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
                         dshow_stream.header.audio.wBitsPerSample / 8;
             }
             p_pin->Release();
-            p_input->i_mtu = __MAX( p_input->i_mtu, i_mtu );
+            p_input->i_mtu = __MAX( p_input->i_mtu, (unsigned int)i_mtu );
         }
         else goto fail;
 
@@ -825,6 +824,8 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
                         ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biWidth : 0;
                     int i_current_height = p_mt->pbFormat ?
                         ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biHeight : 0;
+                    if( i_current_height < 0 )
+                        i_current_height = -i_current_height; 
 
                     msg_Dbg( p_this, "EnumDeviceCaps: input pin "
                              "accepts chroma: %4.4s, width:%i, height:%i",
@@ -1024,6 +1025,7 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
         {
             int i_width = p_stream->header.video.bmiHeader.biWidth;
             int i_height = p_stream->header.video.bmiHeader.biHeight;
+            if( i_height < 0 ) i_height = - i_height;
 
             switch( p_stream->i_fourcc )
             {
@@ -1161,7 +1163,7 @@ static int DemuxOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( strncmp( p_peek, ".dsh", 4 ) ||
+    if( memcmp( p_peek, ".dsh", 4 ) ||
         ( i_es = GetDWBE( &p_peek[4] ) ) <= 0 )
     {
         msg_Warn( p_input, "dshow plugin discarded (not a valid stream)" );
@@ -1173,14 +1175,15 @@ static int DemuxOpen( vlc_object_t *p_this )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot init stream" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
     p_input->stream.i_mux_rate =  0 / 50;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     p_input->pf_demux = Demux;
     p_input->pf_demux_control = demux_vaControlDefault;
-    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_input->p_demux_data = p_sys =
+        (demux_sys_t *)malloc( sizeof( demux_sys_t ) );
     p_sys->i_es = 0;
     p_sys->es   = NULL;
 
@@ -1195,7 +1198,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     {
         es_format_t fmt;
 
-        if( !strncmp( p_peek, "auds", 4 ) )
+        if( !memcmp( p_peek, "auds", 4 ) )
         {
             es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( p_peek[4], p_peek[5],
                                                         p_peek[6], p_peek[7] ) );
@@ -1215,9 +1218,9 @@ static int DemuxOpen( vlc_object_t *p_this )
             TAB_APPEND( p_sys->i_es, p_sys->es,
                         es_out_Add( p_input->p_es_out, &fmt ) );
         }
-        else if( !strncmp( p_peek, "vids", 4 ) )
+        else if( !memcmp( p_peek, "vids", 4 ) )
         {
-            es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( p_peek[4], p_peek[5],
+            es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( p_peek[4], p_peek[5],
                                                         p_peek[6], p_peek[7] ) );
             fmt.video.i_width  = GetDWBE( &p_peek[8] );
             fmt.video.i_height = GetDWBE( &p_peek[12] );
@@ -1265,7 +1268,7 @@ static int Demux( input_thread_t *p_input )
     int i_size;
 
     uint8_t *p_peek;
-    mtime_t i_pts;
+    mtime_t i_pcr;
 
     if( stream_Peek( p_input->s, &p_peek, 16 ) < 16 )
     {
@@ -1281,7 +1284,7 @@ static int Demux( input_thread_t *p_input )
     }
 
     i_size = GetDWBE( &p_peek[4] );
-    i_pts  = GetQWBE( &p_peek[8] );
+    i_pcr  = GetQWBE( &p_peek[8] );
 
     if( ( p_block = stream_Block( p_input->s, 16 + i_size ) ) == NULL )
     {
@@ -1293,12 +1296,11 @@ static int Demux( input_thread_t *p_input )
     p_block->i_buffer -= 16;
 
     /* Call the pace control. */
-    input_ClockManageRef( p_input, p_input->stream.p_selected_program,
-                          i_pts );
+    input_ClockManageRef( p_input, p_input->stream.p_selected_program, i_pcr );
 
     p_block->i_dts =
     p_block->i_pts = i_pcr <= 0 ? 0 :
-        input_ClockGetTS( p_input, p_input->stream.p_selected_program, i_pts );
+        input_ClockGetTS( p_input, p_input->stream.p_selected_program, i_pcr );
 
     es_out_Send( p_input->p_es_out, p_sys->es[i_es], p_block );
 
@@ -1312,7 +1314,6 @@ static int Demux( input_thread_t *p_input )
 static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
                                vlc_value_t newval, vlc_value_t oldval, void * )
 {
-    module_t *p_module;
     module_config_t *p_item;
     vlc_bool_t b_audio = VLC_FALSE;
     int i;
