@@ -1,7 +1,8 @@
 /****************************************************************************
- * linux_cdrom_tools.h: linux cdrom tools header
+ * cdrom_tools.h: cdrom tools header
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
+ * $Id: cdrom_tools.h,v 1.1 2002/02/20 05:50:00 jlj Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -20,12 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#if defined(HAVE_BSD_DVD_STRUCT) || defined(DVD_STRUCT_IN_BSDI_DVDIOCTL_DVD_H) || defined(DVD_STRUCT_IN_DVD_H)
-#   include <dvd.h>
-#else
-#   include <linux/cdrom.h>
-#endif
-
 /* where the data start on a VCD sector */
 #define VCD_DATA_START 24
 /* size of the availablr data on a VCD sector */
@@ -36,7 +31,7 @@
 /******************************************************************************
 * Prototypes                                                                  *
 ******************************************************************************/
-int ioctl_GetTrackCount ( int );
-int * ioctl_GetSectors  ( int );
+int ioctl_GetTrackCount ( int, const char *psz_dev );
+int * ioctl_GetSectors  ( int, const char *psz_dev );
 int ioctl_ReadSector    ( int, int, byte_t * );
 

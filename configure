@@ -6494,6 +6494,12 @@ then
   BUILTINS="${BUILTINS} vcd"
 fi
 
+if test x$enable_vcd != xno -a "${SYS}" = "darwin"
+then
+  BUILTINS="${BUILTINS} vcd"
+  LIB_VCD="${LIB_VCD} -framework IOKit"
+fi
+
 # Check whether --enable-dummy or --disable-dummy was given.
 if test "${enable_dummy+set}" = set; then
   enableval="$enable_dummy"
@@ -8331,6 +8337,7 @@ s%@LIB_QNX@%$LIB_QNX%g
 s%@LIB_QT@%$LIB_QT%g
 s%@LIB_RC@%$LIB_RC%g
 s%@LIB_SDL@%$LIB_SDL%g
+s%@LIB_VCD@%$LIB_VCD%g
 s%@LIB_WAVEOUT@%$LIB_WAVEOUT%g
 s%@LIB_WIN32@%$LIB_WIN32%g
 s%@LIB_X11@%$LIB_X11%g

@@ -903,6 +903,12 @@ then
   BUILTINS="${BUILTINS} vcd"
 fi
 
+if test x$enable_vcd != xno -a "${SYS}" = "darwin"
+then
+  BUILTINS="${BUILTINS} vcd"
+  LIB_VCD="${LIB_VCD} -framework IOKit" 
+fi
+
 dnl
 dnl  dummy plugin
 dnl
@@ -1541,6 +1547,7 @@ AC_SUBST(LIB_QNX)
 AC_SUBST(LIB_QT)
 AC_SUBST(LIB_RC)
 AC_SUBST(LIB_SDL)
+AC_SUBST(LIB_VCD)
 AC_SUBST(LIB_WAVEOUT)
 AC_SUBST(LIB_WIN32)
 AC_SUBST(LIB_X11)

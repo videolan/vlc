@@ -59,7 +59,7 @@
 #include "debug.h"
 
 #include "input_vcd.h"
-#include "linux_cdrom_tools.h"
+#include "cdrom_tools.h"
 
 /* how many blocks VCDRead will read in each loop */
 #define VCD_BLOCKS_ONCE 4
@@ -217,7 +217,8 @@ static void VCDInit( input_thread_t * p_input )
     p_vcd->i_handle = p_input->i_handle;
 
     /* We read the Table Of Content information */
-    p_vcd->nb_tracks = ioctl_GetTrackCount( p_input->i_handle );
+    p_vcd->nb_tracks = ioctl_GetTrackCount( p_input->i_handle,
+                                            p_input->p_source );
     if( p_vcd->nb_tracks < 0 )
     {
         input_BuffersEnd( p_input->p_method_data );
@@ -234,7 +235,8 @@ static void VCDInit( input_thread_t * p_input )
         return;
     }
 
-    p_vcd->p_sectors = ioctl_GetSectors( p_input->i_handle );
+    p_vcd->p_sectors = ioctl_GetSectors( p_input->i_handle,
+                                         p_input->p_source );
     if ( p_vcd->p_sectors == NULL )
     {
         input_BuffersEnd( p_input->p_method_data );
