@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.22 2003/11/21 20:49:14 gbazin Exp $
+ * $Id: ogg.c,v 1.23 2003/11/24 00:01:42 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -352,6 +352,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     case VIDEO_ES:
         switch( p_stream->i_fourcc )
         {
+        case VLC_FOURCC( 'm', 'p','g', 'v' ):
         case VLC_FOURCC( 'm', 'p','4', 'v' ):
         case VLC_FOURCC( 'D', 'I','V', '3' ):
             memcpy( p_stream->oggds_header.stream_type, "video", 5 );
@@ -362,6 +363,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             else if( p_stream->i_fourcc == VLC_FOURCC( 'D', 'I','V', '3' ) )
             {
                 memcpy( p_stream->oggds_header.sub_type, "DIV3", 4 );
+            }
+            else
+            {
+                memcpy(p_stream->oggds_header.sub_type,&p_stream->i_fourcc,4);
             }
             SetDWLE( &p_stream->oggds_header.i_size,
                      sizeof( oggds_header_t ) - 1);
