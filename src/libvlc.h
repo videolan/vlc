@@ -1499,6 +1499,8 @@ static module_config_t p_help_config[] =
       N_("print help (can be combined with --advanced)") },
     { CONFIG_ITEM_BOOL, NULL, "longhelp", 'H',
       N_("print detailed help (can be combined with --advanced)") },
+    { CONFIG_ITEM_BOOL, NULL, "help-verbose", '\0',
+      N_("ask for extra verbosity when displaying help") },
     { CONFIG_ITEM_BOOL, NULL, "list", 'l',
       N_("print a list of available modules") },
     { CONFIG_ITEM_STRING, NULL, "module", 'p',

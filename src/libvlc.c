@@ -1861,16 +1861,20 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
     vlc_list_t *p_list;
     module_t *p_parser;
     module_config_t *p_item;
-    char psz_spaces[PADDING_SPACES+LINE_START+1];
+    char psz_spaces_text[PADDING_SPACES+LINE_START+1];
+    char psz_spaces_longtext[LINE_START+3];
     char psz_format[sizeof(FORMAT_STRING)];
-    char psz_buffer[1000];
+    char psz_buffer[10000];
     char psz_short[4];
     int i_index;
     int i_width = ConsoleWidth() - (PADDING_SPACES+LINE_START+1);
     vlc_bool_t b_advanced = config_GetInt( p_this, "advanced" );
+    vlc_bool_t b_description;
 
-    memset( psz_spaces, ' ', PADDING_SPACES+LINE_START );
-    psz_spaces[PADDING_SPACES+LINE_START] = '\0';
+    memset( psz_spaces_text, ' ', PADDING_SPACES+LINE_START );
+    psz_spaces_text[PADDING_SPACES+LINE_START] = '\0';
+    memset( psz_spaces_longtext, ' ', LINE_START+2 );
+    psz_spaces_longtext[LINE_START+2] = '\0';
 
     strcpy( psz_format, FORMAT_STRING );
 
@@ -1924,7 +1928,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
              p_item->i_type != CONFIG_HINT_END;
              p_item++ )
         {
-            char *psz_text;
+            char *psz_text, *psz_spaces = psz_spaces_text;
             char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
             char *psz_suf = "", *psz_prefix = NULL;
             int i;
@@ -2053,6 +2057,9 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
 
             /* We wrap the rest of the output */
             sprintf( psz_buffer, "%s%s", p_item->psz_text, psz_suf );
+            b_description = config_GetInt( p_this, "help-verbose" );
+
+ description:
             psz_text = psz_buffer;
             while( *psz_text )
             {
@@ -2100,6 +2107,15 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
                     fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
                     psz_text = psz_word;
                 }
+            }
+
+            if( b_description && p_item->psz_longtext )
+            {
+                sprintf( psz_buffer, "%s%s", p_item->psz_longtext, psz_suf );
+                b_description = VLC_FALSE;
+                psz_spaces = psz_spaces_longtext;
+                fprintf( stdout, "%s", psz_spaces );
+                goto description;
             }
         }
     }
