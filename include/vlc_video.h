@@ -290,6 +290,12 @@ struct subpicture_t
 #define RESERVED_SUBPICTURE    1                   /* allocated and reserved */
 #define READY_SUBPICTURE       2                        /* ready for display */
 
+/* Subpicture position flags */
+#define SUBPICTURE_ALIGN_LEFT 0x1
+#define SUBPICTURE_ALIGN_RIGHT 0x2
+#define SUBPICTURE_ALIGN_TOP 0x4
+#define SUBPICTURE_ALIGN_BOTTOM 0x8
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/

@@ -67,6 +67,16 @@ static void DestroyFilter( vlc_object_t * );
 #define TRANS_TEXT N_("Transparency of the logo")
 #define TRANS_LONGTEXT N_("You can set the logo transparency value here " \
   "(from 0 for full transparency to 255 for full opacity)." )
+#define POS_TEXT N_("Logo position")
+#define POS_LONGTEXT N_( \
+  "You can enforce the logo position on the video " \
+  "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
+  "also use combinations of these values).")
+
+static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static char *ppsz_pos_descriptions[] =
+{ N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
+  N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
 vlc_module_begin();
     set_description( _("Logo video filter") );
@@ -75,10 +85,12 @@ vlc_module_begin();
     set_callbacks( Create, Destroy );
 
     add_file( "logo-file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, VLC_FALSE );
-    add_integer( "logo-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
-    add_integer( "logo-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
+    add_integer( "logo-x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
+    add_integer( "logo-y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
     add_integer_with_range( "logo-transparency", 255, 0, 255, NULL,
         TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
+    add_integer( "logo-position", 6, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     /* subpicture filter submodule */
     add_submodule();
@@ -243,10 +255,10 @@ static int Create( vlc_object_t *p_this )
 
     var_Create( p_this, "logo-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, "logo-x", &val );
-    p_sys->posx = val.i_int;
+    p_sys->posx = val.i_int >= 0 ? val.i_int : 0;
     var_Create( p_this, "logo-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, "logo-y", &val );
-    p_sys->posy = val.i_int;
+    p_sys->posy = val.i_int >= 0 ? val.i_int : 0;
 
     p_sys->p_pic = LoadPNG( p_this );
     if( !p_sys->p_pic )
@@ -495,7 +507,9 @@ struct filter_sys_t
     picture_t *p_pic;
 
     int i_width, i_height;
-    int posx, posy;
+    int pos, posx, posy;
+
+    vlc_bool_t b_absolute;
 
     mtime_t i_last_date;
 };
@@ -519,12 +533,22 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
+    var_Create( p_this, "logo-position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "logo-position", &val );
+    p_sys->pos = val.i_int;
     var_Create( p_this, "logo-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, "logo-x", &val );
     p_sys->posx = val.i_int;
     var_Create( p_this, "logo-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, "logo-y", &val );
     p_sys->posy = val.i_int;
+
+    p_sys->b_absolute = VLC_TRUE;
+    if( p_sys->posx < 0 || p_sys->posy < 0 )
+    {
+        p_sys->b_absolute = VLC_FALSE;
+        p_sys->posx = 0; p_sys->posy = 0;
+    }
 
     p_sys->p_pic = LoadPNG( p_this );
     if( !p_sys->p_pic )
@@ -596,6 +620,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_region->i_y = 0;
     p_spu->i_x = p_sys->posx;
     p_spu->i_y = p_sys->posy;
+    p_spu->i_flags = p_sys->pos;
+    p_spu->b_absolute = p_sys->b_absolute;
+
     p_spu->p_region = p_region;
 
     p_spu->i_start = p_sys->i_last_date = date;
