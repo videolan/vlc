@@ -151,7 +151,7 @@ static block_t *BlockRealloc( block_t *p_block, int i_prebody, int i_body )
         i_body = 0;
     }
 
-    if( !i_body || !i_prebody )
+    if( i_body > 0 || i_prebody > 0 )
     {
         block_t *p_rea = block_New( p_block->p_manager, i_buffer_size );
 
