@@ -41,13 +41,13 @@
  *****************************************************************************/
 static void CopyPicture( vout_thread_t *, picture_t *, picture_t * );
 
-/*****************************************************************************
- * vout_DisplayPicture: display a picture
- *****************************************************************************
+/**
+ * Display a picture
+ *
  * Remove the reservation flag of a picture, which will cause it to be ready
  * for display. The picture won't be displayed until vout_DatePicture has been
  * called.
- *****************************************************************************/
+ */
 void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
@@ -68,13 +68,16 @@ void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
-/*****************************************************************************
- * vout_DatePicture: date a picture
- *****************************************************************************
+/**
+ * Date a picture
+ *
  * Remove the reservation flag of a picture, which will cause it to be ready
  * for display. The picture won't be displayed until vout_DisplayPicture has
  * been called.
- *****************************************************************************/
+ * \param p_vout The vout in question
+ * \param p_pic The picture to date
+ * \param date The date to display the picture
+ */
 void vout_DatePicture( vout_thread_t *p_vout,
                        picture_t *p_pic, mtime_t date )
 {
@@ -97,15 +100,15 @@ void vout_DatePicture( vout_thread_t *p_vout,
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
-/*****************************************************************************
- * vout_CreatePicture: allocate a picture in the video output heap.
- *****************************************************************************
+/**
+ * Allocate a picture in the video output heap.
+ *
  * This function creates a reserved image in the video output heap.
  * A null pointer is returned if the function fails. This method provides an
  * already allocated zone of memory in the picture data fields.
  * It needs locking since several pictures can be created by several producers
  * threads.
- *****************************************************************************/
+ */
 picture_t *vout_CreatePicture( vout_thread_t *p_vout,
                                vlc_bool_t b_progressive,
                                vlc_bool_t b_top_field_first,
@@ -208,13 +211,13 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
     return( NULL );
 }
 
-/*****************************************************************************
- * vout_DestroyPicture: remove a permanent or reserved picture from the heap
- *****************************************************************************
+/**
+ * Remove a permanent or reserved picture from the heap
+ *
  * This function frees a previously reserved picture or a permanent
  * picture. It is meant to be used when the construction of a picture aborted.
  * Note that the picture will be destroyed even if it is linked !
- *****************************************************************************/
+ */
 void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
@@ -236,12 +239,12 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
-/*****************************************************************************
- * vout_LinkPicture: increment reference counter of a picture
- *****************************************************************************
+/**
+ * Increment reference counter of a picture
+ *
  * This function increments the reference counter of a picture in the video
  * heap. It needs a lock since several producer threads can access the picture.
- *****************************************************************************/
+ */
 void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
@@ -249,11 +252,11 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
-/*****************************************************************************
- * vout_UnlinkPicture: decrement reference counter of a picture
- *****************************************************************************
+/**
+ * Decrement reference counter of a picture
+ *
  * This function decrement the reference counter of a picture in the video heap
- *****************************************************************************/
+ */
 void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
@@ -276,13 +279,13 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
-/*****************************************************************************
- * vout_RenderPicture: render a picture
- *****************************************************************************
+/**
+ * Render a picture
+ *
  * This function chooses whether the current picture needs to be copied
  * before rendering, does the subpicture magic, and tells the video output
  * thread which direct buffer needs to be displayed.
- *****************************************************************************/
+ */
 picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                                                        subpicture_t *p_subpic )
 {
@@ -374,12 +377,12 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
     return &p_vout->p_picture[0];
 }
 
-/*****************************************************************************
- * vout_PlacePicture: calculate image window coordinates
- *****************************************************************************
+/**
+ * Calculate image window coordinates
+ *
  * This function will be accessed by plugins. It calculates the relative
  * position of the output window and the image window.
- *****************************************************************************/
+ */
 void vout_PlacePicture( vout_thread_t *p_vout,
                         unsigned int i_width, unsigned int i_height,
                         unsigned int *pi_x, unsigned int *pi_y,
@@ -449,13 +452,13 @@ void vout_PlacePicture( vout_thread_t *p_vout,
     }
 }
 
-/*****************************************************************************
- * vout_AllocatePicture: allocate a new picture in the heap.
- *****************************************************************************
+/**
+ * Allocate a new picture in the heap.
+ *
  * This function allocates a fake direct buffer in memory, which can be
  * used exactly like a video buffer. The video output thread then manages
  * how it gets displayed.
- *****************************************************************************/
+ */
 void vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
                            vlc_fourcc_t i_chroma,
                            int i_width, int i_height, int i_aspect )
@@ -488,12 +491,17 @@ void vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
     }
 }
 
-/*****************************************************************************
- * vout_InitFormat: initialise the video format fields given chroma/size.
- *****************************************************************************
+/**
+ * Initialise the video format fields given chroma/size.
+ *
  * This function initializes all the video_frame_format_t fields given the
  * static properties of a picture (chroma and size).
- *****************************************************************************/
+ * \param p_format Pointer to the format structure to initialize
+ * \param i_chroma Chroma to set
+ * \param i_width Width to set
+ * \param i_height Height to set
+ * \param i_aspect Aspect ratio
+ */
 void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
                       int i_width, int i_height, int i_aspect )
 {
@@ -560,12 +568,18 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
     }
 }
 
-/*****************************************************************************
- * vout_InitPicture: initialise the picture_t fields given chroma/size.
- *****************************************************************************
+/**
+ * Initialise the picture_t fields given chroma/size.
+ *
  * This function initializes most of the picture_t fields given a chroma and
  * size. It makes the assumption that stride == width.
- *****************************************************************************/
+ * \param p_this The calling object
+ * \param p_pic Pointer to the picture to initialize
+ * \param i_chroma The chroma fourcc to set
+ * \param i_width The width of the picture
+ * \param i_height The height of the picture
+ * \param i_aspect The aspect ratio of the picture
+ */
 void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
                        vlc_fourcc_t i_chroma,
                        int i_width, int i_height, int i_aspect )
@@ -732,6 +746,20 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->p_heap->i_bmask = 0x0000ff; */
             p_pic->i_planes = 1;
             break;
+        case FOURCC_YUVA:
+            p_pic->p[ Y_PLANE ].i_lines = i_height;
+            p_pic->p[ Y_PLANE ].i_pitch = i_width;
+            p_pic->p[ Y_PLANE ].i_visible_pitch = p_pic->p[ Y_PLANE ].i_pitch;
+            p_pic->p[ U_PLANE ].i_lines = i_height;
+            p_pic->p[ U_PLANE ].i_pitch = i_width;
+            p_pic->p[ U_PLANE ].i_visible_pitch = p_pic->p[ U_PLANE ].i_pitch;
+            p_pic->p[ V_PLANE ].i_lines = i_height;
+            p_pic->p[ V_PLANE ].i_pitch = i_width;
+            p_pic->p[ V_PLANE ].i_visible_pitch = p_pic->p[ V_PLANE ].i_pitch;
+            p_pic->p[ A_PLANE ].i_lines = i_height;
+            p_pic->p[ A_PLANE ].i_pitch = i_width;
+            p_pic->p[ A_PLANE ].i_visible_pitch = p_pic->p[ A_PLANE ].i_pitch;
+            p_pic->i_planes = 4;
 
         default:
             msg_Err( p_this, "unknown chroma type 0x%.8x (%4.4s)",
@@ -741,12 +769,12 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
     }
 }
 
-/*****************************************************************************
- * vout_ChromaCmp: compare two chroma values
- *****************************************************************************
+/**
+ * Compare two chroma values
+ *
  * This function returns 1 if the two fourcc values given as argument are
  * the same format (eg. UYVY/UYNV) or almost the same format (eg. I420/YV12)
- *****************************************************************************/
+ */
 int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
 {
     /* If they are the same, they are the same ! */

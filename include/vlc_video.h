@@ -165,6 +165,7 @@ struct picture_heap_t
 #define Y_PLANE      0
 #define U_PLANE      1
 #define V_PLANE      2
+#define A_PLANE      3
 
 /* Shortcuts */
 #define Y_PIXELS     p[Y_PLANE].p_pixels
