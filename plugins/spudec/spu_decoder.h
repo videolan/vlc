@@ -2,7 +2,7 @@
  * spu_decoder.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spu_decoder.h,v 1.2 2002/03/15 04:41:54 sam Exp $
+ * $Id: spu_decoder.h,v 1.3 2002/03/15 18:20:27 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,6 +29,7 @@ typedef struct subpicture_sys_s
     void *p_data;
 
     /* Color information */
+    boolean_t b_palette;
     u8    pi_alpha[4];
     u8    pi_yuv[4][3];
 

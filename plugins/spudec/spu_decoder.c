@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.12 2002/03/15 04:41:54 sam Exp $
+ * $Id: spu_decoder.c,v 1.13 2002/03/15 18:20:27 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -279,6 +279,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
     p_spu->pf_render = RenderSPU;
     p_spu->p_sys->p_data = (void*)p_spu->p_sys
                             + sizeof( struct subpicture_sys_s );
+    p_spu->p_sys->b_palette = 0;
 
     /* Get display time now. If we do it later, we may miss the PTS. */
     p_spu->p_sys->i_pts = p_spudec->p_fifo->p_first->i_pts;
@@ -425,23 +426,21 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 case SPU_CMD_SET_PALETTE:
  
                     /* 03xxxx (palette) */
-                    for( i = 0; i < 4 ; i++ )
+                    if( p_spudec->p_config->p_demux_data )
                     {
-                        pi_color = (u8*)p_spudec->p_config->p_demux_data
-                                + 4 * GetBits( &p_spudec->bit_stream, 4 );
-                        if( p_spudec->p_config->p_demux_data )
+                        p_spu->p_sys->b_palette = 1;
+                        for( i = 0; i < 4 ; i++ )
                         {
+                            pi_color = (u8*)p_spudec->p_config->p_demux_data
+                                    + 4 * GetBits( &p_spudec->bit_stream, 4 );
                             p_spu->p_sys->pi_yuv[3-i][0] = pi_color[2];
                             p_spu->p_sys->pi_yuv[3-i][1] = pi_color[0];
                             p_spu->p_sys->pi_yuv[3-i][2] = pi_color[1];
                         }
-                        else
-                        {
-                            /* No data was available from the IFO file */
-                            p_spu->p_sys->pi_yuv[i][0] = 0x50 * i;
-                            p_spu->p_sys->pi_yuv[i][1] = 0x80;
-                            p_spu->p_sys->pi_yuv[i][2] = 0x80;
-                        }
+                    }
+                    else
+                    {
+                        RemoveBits( &p_spudec->bit_stream, 16 );
                     }
                     i_index += 2;
  
@@ -602,6 +601,10 @@ static int ParseRLE( spudec_thread_t *p_spudec,
     unsigned int i_skipped_top = 0,
                  i_skipped_bottom = 0;
 
+    /* Colormap statistics */
+    int i_border = -1;
+    int stats[4]; stats[0] = stats[1] = stats[2] = stats[3] = 0;
+
     pi_table[ 0 ] = p_spu->p_sys->pi_offset[ 0 ] << 1;
     pi_table[ 1 ] = p_spu->p_sys->pi_offset[ 1 ] << 1;
 
@@ -653,8 +656,15 @@ static int ParseRLE( spudec_thread_t *p_spudec,
                 return( 1 );
             }
 
+            /* Try to find the border color */
+            if( p_spu->p_sys->pi_alpha[ i_code & 0x3 ] != 0x00 )
+            {
+                i_border = i_code & 0x3;
+                stats[i_border] += i_code >> 2;
+            }
+
             if( (i_code >> 2) == i_width
-                 && !p_spu->p_sys->pi_alpha[ i_code & 0x3 ] )
+                 && p_spu->p_sys->pi_alpha[ i_code & 0x3 ] == 0x00 )
             {
                 if( b_empty_top )
                 {
@@ -729,6 +739,62 @@ static int ParseRLE( spudec_thread_t *p_spudec,
 
         intf_WarnMsg( 3, "spudec: cropped to: %ix%i, position: %i,%i",
                       p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
+    }
+
+    /* Handle color if no palette was found */
+    if( !p_spu->p_sys->b_palette )
+    {
+        int i, i_inner = -1, i_shade = -1;
+
+        /* Set the border color */
+        p_spu->p_sys->pi_yuv[i_border][0] = 0x00;
+        p_spu->p_sys->pi_yuv[i_border][1] = 0x80;
+        p_spu->p_sys->pi_yuv[i_border][2] = 0x80;
+        stats[i_border] = 0;
+
+        /* Find the inner colors */
+        for( i = 0 ; i < 4 && i_inner == -1 ; i++ )
+        {
+            if( stats[i] )
+            {
+                i_inner = i;
+            }
+        }
+
+        for(       ; i < 4 && i_shade == -1 ; i++ )
+        {
+            if( stats[i] )
+            {
+                if( stats[i] > stats[i_inner] )
+                {
+                    i_shade = i_inner;
+                    i_inner = i;
+                }
+                else
+                {
+                    i_shade = i;
+                }
+            }
+        }
+
+        /* Set the inner color */
+        if( i_inner != -1 )
+        {
+            p_spu->p_sys->pi_yuv[i_inner][0] = 0xff;
+            p_spu->p_sys->pi_yuv[i_inner][1] = 0x80;
+            p_spu->p_sys->pi_yuv[i_inner][2] = 0x80;
+        }
+
+        /* Set the anti-aliasing color */
+        if( i_shade != -1 )
+        {
+            p_spu->p_sys->pi_yuv[i_shade][0] = 0x80;
+            p_spu->p_sys->pi_yuv[i_shade][1] = 0x80;
+            p_spu->p_sys->pi_yuv[i_shade][2] = 0x80;
+        }
+
+        intf_WarnMsg( 3, "spudec: using custom palette (border %i, inner %i, "
+                         "shade %i)", i_border, i_inner, i_shade );
     }
 
     return( 0 );
