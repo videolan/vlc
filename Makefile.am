@@ -546,6 +546,9 @@ package-win32:
 		cp po/$${i}.gmo tmp/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	done
 
+	cd doc/faq ; $(MAKE) html ; cd ../.. ;
+	cp doc/faq/index.html tmp/faq.htm ;
+
 # Create package 
 	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} tmp/nsi
 # Clean up
