@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.11 2003/03/26 00:56:22 gbazin Exp $
+ * $Id: wxwindows.h,v 1.12 2003/03/29 01:50:12 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -205,10 +205,16 @@ private:
     void OnSoutEnable( wxCommandEvent& event );
     void OnSoutSettings( wxCommandEvent& WXUNUSED(event) );
 
+    /* Event handlers for the demux dump */
+    void OnDemuxDumpEnable( wxCommandEvent& event );
+    void OnDemuxDumpBrowse( wxCommandEvent& event );
+    void OnDemuxDumpChange( wxCommandEvent& event );
+
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
     Interface *p_main_interface;
+    int i_current_access_method;
 
     wxComboBox *mrl_combo;
 
@@ -231,6 +237,12 @@ private:
 
     /* Controls for the stream output */
     wxButton *sout_button;
+    wxCheckBox *sout_checkbox;
+
+    /* Controls for the demux dump */
+    wxTextCtrl *demuxdump_textctrl;
+    wxButton *demuxdump_button;
+    wxCheckBox *demuxdump_checkbox;
 };
 
 enum

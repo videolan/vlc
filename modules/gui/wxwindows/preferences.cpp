@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.1 2003/03/26 00:56:22 gbazin Exp $
+ * $Id: preferences.cpp,v 1.2 2003/03/29 01:50:12 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -41,12 +41,15 @@
 
 #include <wx/wxprec.h>
 #include <wx/wx.h>
+#include <wx/window.h>
 #include <wx/notebook.h>
 #include <wx/textctrl.h>
 #include <wx/combobox.h>
 #include <wx/spinctrl.h>
 #include <wx/statline.h>
 #include <wx/treectrl.h>
+#include <wx/clntdata.h>
+#include <wx/dynarray.h>
 
 #include <vlc/intf.h>
 
@@ -80,6 +83,8 @@ private:
     wxWindow *p_parent;
 };
 
+WX_DEFINE_ARRAY(wxEvtHandler *, ArrayOfControls);
+
 class PrefsPanel : public wxScrolledWindow
 {
 public:
@@ -95,17 +100,31 @@ private:
     DECLARE_EVENT_TABLE()
 
     intf_thread_t *p_intf;
+    ArrayOfControls controls_array;
 };
 
-class ConfigData : public wxTreeItemData
+class ConfigTreeData : public wxTreeItemData
 {
 public:
 
-    ConfigData() { panel == NULL; }
-    virtual ~ConfigData() { if( panel ) delete panel; }
+    ConfigTreeData() { panel == NULL; }
+    virtual ~ConfigTreeData() { if( panel ) delete panel; }
 
     wxWindow *panel;
     wxBoxSizer *sizer;
+};
+
+class ConfigData : public wxClientData
+{
+public:
+    ConfigData() { b_advanced = VLC_FALSE; }
+    ConfigData( vlc_bool_t _b_advanced ) { b_advanced = _b_advanced; }
+    virtual ~ConfigData() { }
+
+    vlc_bool_t IsAdvanced() { return b_advanced; }
+
+private:
+    vlc_bool_t b_advanced;
 };
 
 /*****************************************************************************
@@ -222,16 +241,16 @@ void PrefsDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
 
 void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
 {
-    ConfigData *config_data;
+    ConfigTreeData *config_data;
 
-    config_data = (ConfigData *)GetItemData( event.GetOldItem() );
+    config_data = (ConfigTreeData *)GetItemData( event.GetOldItem() );
     if( config_data && config_data->panel )
     {
         config_data->panel->Hide();
         p_sizer->Remove( config_data->panel );
     }
 
-    config_data = (ConfigData *)GetItemData( event.GetItem() );
+    config_data = (ConfigTreeData *)GetItemData( event.GetItem() );
     if( config_data && config_data->panel )
     {
         config_data->panel->Show();
@@ -320,7 +339,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
             switch( p_item->i_type )
             {
             case CONFIG_HINT_CATEGORY:
-                ConfigData *config_data = new ConfigData;
+                ConfigTreeData *config_data = new ConfigTreeData;
                 config_data->panel =
                     new PrefsPanel( p_parent, p_intf,
                                     p_module, p_item->psz_text );
@@ -368,7 +387,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         }
 
         /* Add the plugin to the tree */
-        ConfigData *config_data = new ConfigData;
+        ConfigTreeData *config_data = new ConfigTreeData;
         config_data->panel =
             new PrefsPanel( p_parent, p_intf, p_module, NULL );
         config_data->panel->Hide();
@@ -408,6 +427,9 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
   :  wxScrolledWindow( parent, -1, wxDefaultPosition, wxDefaultSize )
 {
     module_config_t *p_item;
+    vlc_list_t      *p_list;
+    module_t        *p_parser;
+
     wxStaticText *label;
     wxComboBox *combo;
     wxRadioButton *radio;
@@ -417,6 +439,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     wxButton *button;
     wxStaticLine *static_line;
     wxBoxSizer *horizontal_sizer;
+    wxSortedArrayString sorted_array;
+    wxArrayString array;
 
     /* Initializations */
     p_intf = _p_intf;
@@ -473,11 +497,24 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             break;
 
         case CONFIG_ITEM_MODULE:
-            /* build a list of available modules */
-
             label = new wxStaticText(this, -1, p_item->psz_text);
-            combo = new wxComboBox( this, -1, "", wxPoint(20,25),
-                                    wxSize(120, -1), 0, NULL );
+            combo = new wxComboBox( this, -1, p_item->psz_value,
+                                    wxDefaultPosition, wxSize(200,-1),
+                                    0, NULL );
+
+            /* build a list of available modules */
+            p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+            for( int i_index = 0; i_index < p_list->i_count; i_index++ )
+            {
+                p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+
+                if( !strcmp( p_parser->psz_capability,
+                             p_item->psz_type ) )
+                {
+                    combo->Append( p_parser->psz_longname );
+                }
+            }
+
             combo->SetToolTip( p_item->psz_longtext );
             horizontal_sizer = new wxBoxSizer( wxHORIZONTAL );
             horizontal_sizer->Add( label, 0, wxALL, 5 );
@@ -488,13 +525,9 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         case CONFIG_ITEM_STRING:
         case CONFIG_ITEM_FILE:
             label = new wxStaticText(this, -1, p_item->psz_text);
-            textctrl = new wxTextCtrl( this, -1, "",
+            textctrl = new wxTextCtrl( this, -1, p_item->psz_value,
                                        wxDefaultPosition, wxDefaultSize,
                                        wxTE_PROCESS_ENTER);
-#if 0
-            combo = new wxComboBox( this, -1, "", wxPoint(20,25),
-                                    wxSize(120, -1), 0, NULL );
-#endif
             textctrl->SetToolTip( p_item->psz_longtext );
             horizontal_sizer = new wxBoxSizer( wxHORIZONTAL );
             horizontal_sizer->Add( label, 0, wxALL, 5 );
@@ -509,10 +542,11 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
         case CONFIG_ITEM_INTEGER:
             label = new wxStaticText(this, -1, p_item->psz_text);
-            spin = new wxSpinCtrl( this, -1, p_item->psz_text,
+            spin = new wxSpinCtrl( this, -1,
+                                   wxString::Format(_("%d"), p_item->i_value),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
-                                   0, 16000, 8);
+                                   0, 16000, p_item->i_value);
             spin->SetToolTip( p_item->psz_longtext );
             horizontal_sizer = new wxBoxSizer( wxHORIZONTAL );
             horizontal_sizer->Add( label, 0, wxALL, 5 );
@@ -522,10 +556,11 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
         case CONFIG_ITEM_FLOAT:
             label = new wxStaticText(this, -1, p_item->psz_text);
-            spin = new wxSpinCtrl( this, -1, p_item->psz_text,
+            spin = new wxSpinCtrl( this, -1,
+                                   wxString::Format(_("%d"), p_item->i_value),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
-                                   0, 16000, 8);
+                                   0, 16000, p_item->i_value);
             spin->SetToolTip( p_item->psz_longtext );
             horizontal_sizer = new wxBoxSizer( wxHORIZONTAL );
             horizontal_sizer->Add( label, 0, wxALL, 5 );
@@ -535,6 +570,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
         case CONFIG_ITEM_BOOL:
             checkbox = new wxCheckBox( this, -1, p_item->psz_text );
+            if( p_item->i_value ) checkbox->SetValue(TRUE);
             checkbox->SetToolTip( p_item->psz_longtext );
             horizontal_sizer = new wxBoxSizer( wxHORIZONTAL );
             horizontal_sizer->Add( checkbox, 0, wxALL, 5 );
