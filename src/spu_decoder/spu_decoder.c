@@ -67,12 +67,12 @@ vlc_thread_t spudec_CreateThread( vdec_config_t * p_config )
 {
     spudec_thread_t *     p_spudec;
 
-    intf_DbgMsg("spudec debug: creating spu decoder thread\n");
+    intf_DbgMsg("spudec debug: creating spu decoder thread");
 
     /* Allocate the memory needed to store the thread's structure */
     if ( (p_spudec = (spudec_thread_t *)malloc( sizeof(spudec_thread_t) )) == NULL )
     {
-        intf_ErrMsg("spudec error: not enough memory for spudec_CreateThread() to create the new thread\n");
+        intf_ErrMsg("spudec error: not enough memory for spudec_CreateThread() to create the new thread");
         return( 0 );
     }
 
@@ -91,12 +91,12 @@ vlc_thread_t spudec_CreateThread( vdec_config_t * p_config )
     if ( vlc_thread_create(&p_spudec->thread_id, "spu decoder",
          (vlc_thread_func_t)RunThread, (void *)p_spudec) )
     {
-        intf_ErrMsg("spudec error: can't spawn spu decoder thread\n");
+        intf_ErrMsg("spudec error: can't spawn spu decoder thread");
         free( p_spudec );
         return( 0 );
     }
 
-    intf_DbgMsg("spudec debug: spu decoder thread (%p) created\n", p_spudec);
+    intf_DbgMsg("spudec debug: spu decoder thread (%p) created", p_spudec);
     return( p_spudec->thread_id );
 }
 
@@ -111,13 +111,13 @@ vlc_thread_t spudec_CreateThread( vdec_config_t * p_config )
  *****************************************************************************/
 static int InitThread( spudec_thread_t *p_spudec )
 {
-    intf_DbgMsg("spudec debug: initializing spu decoder thread %p\n", p_spudec);
+    intf_DbgMsg("spudec debug: initializing spu decoder thread %p", p_spudec);
 
     p_spudec->p_config->decoder_config.pf_init_bit_stream( &p_spudec->bit_stream,
             p_spudec->p_config->decoder_config.p_decoder_fifo );
 
     /* Mark thread as running and return */
-    intf_DbgMsg( "spudec debug: InitThread(%p) succeeded\n", p_spudec );
+    intf_DbgMsg( "spudec debug: InitThread(%p) succeeded", p_spudec );
     return( 0 );
 }
 
@@ -129,7 +129,7 @@ static int InitThread( spudec_thread_t *p_spudec )
  *****************************************************************************/
 static void RunThread( spudec_thread_t *p_spudec )
 {
-    intf_DbgMsg("spudec debug: running spu decoder thread (%p) (pid == %i)\n",
+    intf_DbgMsg("spudec debug: running spu decoder thread (%p) (pid == %i)",
         p_spudec, getpid());
 
     /*
@@ -281,7 +281,7 @@ static void RunThread( spudec_thread_t *p_spudec )
                                 break;
                             default:
                                 /* ?? (unknown command) */
-                                intf_ErrMsg( "spudec: unknown command 0x%.2x\n",
+                                intf_ErrMsg( "spudec: unknown command 0x%.2x",
                                              i_cmd );
                                 break;
                         }
@@ -297,7 +297,7 @@ static void RunThread( spudec_thread_t *p_spudec )
             else 
             {
                 /* Unexpected PES packet - trash it */
-                intf_ErrMsg( "spudec: trying to recover from bad packet\n" );
+                intf_ErrMsg( "spudec: trying to recover from bad packet" );
                 vlc_mutex_lock( &p_spudec->p_fifo->data_lock );
                 p_spudec->p_fifo->pf_delete_pes( p_spudec->p_fifo->p_packets_mgt,
                                       DECODER_FIFO_START(*p_spudec->p_fifo) );
@@ -360,9 +360,9 @@ static void ErrorThread( spudec_thread_t *p_spudec )
  *****************************************************************************/
 static void EndThread( spudec_thread_t *p_spudec )
 {
-    intf_DbgMsg( "spudec debug: destroying spu decoder thread %p\n", p_spudec );
+    intf_DbgMsg( "spudec debug: destroying spu decoder thread %p", p_spudec );
     free( p_spudec->p_config );
     free( p_spudec );
-    intf_DbgMsg( "spudec debug: spu decoder thread %p destroyed\n", p_spudec);
+    intf_DbgMsg( "spudec debug: spu decoder thread %p destroyed", p_spudec);
 }
 

@@ -220,7 +220,7 @@ int adec_decode_frame (audiodec_t * p_adec, s16 * buffer)
     /* XXX rewrite the byte counting system to reduce overhead */
 
 #if 0
-    intf_DbgMsg ( "skip %d\n",
+    intf_DbgMsg ( "skip %d",
             p_adec->frame_size - p_adec->bit_stream.total_bytes_read );
 #endif
 

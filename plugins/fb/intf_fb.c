@@ -97,7 +97,6 @@ int intf_FBCreate( intf_thread_t *p_intf )
     {
         return( 1 );
     };
-    intf_DbgMsg("0x%x\n", p_intf );
 
     /* Set tty and fb devices */
     p_intf->p_sys->i_tty_dev = 0;       /* 0 == /dev/tty0 == current console */
@@ -135,7 +134,7 @@ int intf_FBCreate( intf_thread_t *p_intf )
     if( sigaction( SIGUSR1, &sig_tty, &p_intf->p_sys->sig_usr1 ) ||
         sigaction( SIGUSR2, &sig_tty, &p_intf->p_sys->sig_usr2 ) )
     {
-        intf_ErrMsg( "intf error: can't set up signal handler (%s)\n",
+        intf_ErrMsg( "intf error: can't set up signal handler (%s)",
                      strerror(errno) );
         tcsetattr(0, 0, &p_intf->p_sys->old_termios);
         FBTextMode( p_intf->p_sys->i_tty_dev );
@@ -146,7 +145,7 @@ int intf_FBCreate( intf_thread_t *p_intf )
     if( ioctl(p_intf->p_sys->i_tty_dev, VT_GETMODE, &p_intf->p_sys->vt_mode)
         == -1 )
     {
-        intf_ErrMsg( "intf error: cant get terminal mode (%s)\n",
+        intf_ErrMsg( "intf error: cant get terminal mode (%s)",
                      strerror(errno) );
         sigaction( SIGUSR1, &p_intf->p_sys->sig_usr1, NULL );
         sigaction( SIGUSR2, &p_intf->p_sys->sig_usr2, NULL );
@@ -162,7 +161,7 @@ int intf_FBCreate( intf_thread_t *p_intf )
 
     if( ioctl(p_intf->p_sys->i_tty_dev, VT_SETMODE, &vt_mode) == -1 )
     {
-        intf_ErrMsg( "intf error: can't set terminal mode (%s)\n",
+        intf_ErrMsg( "intf error: can't set terminal mode (%s)",
                      strerror(errno) );
         sigaction( SIGUSR1, &p_intf->p_sys->sig_usr1, NULL );
         sigaction( SIGUSR2, &p_intf->p_sys->sig_usr2, NULL );
@@ -180,7 +179,7 @@ int intf_FBCreate( intf_thread_t *p_intf )
                                             NULL, 0, NULL );
         if( p_intf->p_vout == NULL )                          /* XXX?? error */
         {
-            intf_ErrMsg("intf error: can't create output thread\n" );
+            intf_ErrMsg("intf error: can't create output thread" );
             ioctl( p_intf->p_sys->i_tty_dev, VT_SETMODE,
                    &p_intf->p_sys->vt_mode );
             sigaction( SIGUSR1, &p_intf->p_sys->sig_usr1, NULL );
@@ -238,7 +237,7 @@ void intf_FBManage( intf_thread_t *p_intf )
     {
         if( intf_ProcessKey(p_intf, (int)buf[0]) )
         {
-            intf_ErrMsg("unhandled key '%c' (%i)\n", (char) buf[0], buf[0] );
+            intf_ErrMsg("unhandled key '%c' (%i)", (char) buf[0], buf[0] );
         }
     }
 }
@@ -281,7 +280,7 @@ static void FBTextMode( int i_tty_dev )
     /* return to text mode */
     if (-1 == ioctl(i_tty_dev, KDSETMODE, KD_TEXT))
     {
-        intf_ErrMsg("intf error: ioctl KDSETMODE\n");
+        intf_ErrMsg("intf error: ioctl KDSETMODE");
     }
 }
 
@@ -290,7 +289,7 @@ static void FBGfxMode( int i_tty_dev )
     /* switch to graphic mode */
     if (-1 == ioctl(i_tty_dev, KDSETMODE, KD_GRAPHICS))
     {
-        intf_ErrMsg("intf error: ioctl KDSETMODE\n");
+        intf_ErrMsg("intf error: ioctl KDSETMODE");
     }
 }
 

@@ -133,7 +133,7 @@ int intf_BeCreate( intf_thread_t *p_intf )
     p_intf->p_sys = (intf_sys_t*) malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        intf_ErrMsg("error: %s", strerror(ENOMEM));
         return( 1 );
     }
     p_intf->p_sys->i_key = -1;
@@ -144,7 +144,7 @@ int intf_BeCreate( intf_thread_t *p_intf )
     if( p_intf->p_sys->p_window == 0 )
     {
         free( p_intf->p_sys );
-        intf_ErrMsg( "error: cannot allocate memory for InterfaceWindow\n" );
+        intf_ErrMsg( "error: cannot allocate memory for InterfaceWindow" );
         return( 1 );
     }
     
@@ -154,7 +154,7 @@ int intf_BeCreate( intf_thread_t *p_intf )
         p_intf->p_vout = vout_CreateThread( NULL, 0, 0, 0, NULL, 0, NULL );
         if( p_intf->p_vout == NULL )                                /* error */
         {
-            intf_ErrMsg("intf error: can't create output thread\n" );
+            intf_ErrMsg("intf error: can't create output thread" );
             return( 1 );
         }
     }

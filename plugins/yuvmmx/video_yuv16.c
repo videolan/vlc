@@ -169,7 +169,7 @@ void ConvertYUV420RGB16( YUV_ARGS_16BPP )
  *****************************************************************************/
 void ConvertYUV422RGB16( YUV_ARGS_16BPP )
 {
-    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 422, bpp = 16\n" );
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 422, bpp = 16" );
 }
 
 /*****************************************************************************
@@ -177,6 +177,6 @@ void ConvertYUV422RGB16( YUV_ARGS_16BPP )
  *****************************************************************************/
 void ConvertYUV444RGB16( YUV_ARGS_16BPP )
 {
-    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 444, bpp = 16\n" );
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 444, bpp = 16" );
 }
 

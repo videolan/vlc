@@ -100,7 +100,7 @@ intf_thread_t* intf_Create( void )
     p_intf = malloc( sizeof( intf_thread_t ) );
     if( !p_intf )
     {
-        intf_ErrMsg("error: %s\n", strerror( ENOMEM ) );
+        intf_ErrMsg("error: %s", strerror( ENOMEM ) );
         return( NULL );
     }
 
@@ -127,7 +127,7 @@ intf_thread_t* intf_Create( void )
     if( i_best_score == 0 )
     {
         free( p_intf );
-        intf_ErrMsg( "error: no suitable plugin to create interface\n" );
+        intf_ErrMsg( "error: no suitable plugin to create interface" );
         return( NULL );
     }
 
@@ -153,19 +153,19 @@ intf_thread_t* intf_Create( void )
     p_intf->p_console = intf_ConsoleCreate();
     if( p_intf->p_console == NULL )
     {
-        intf_ErrMsg("error: can't create control console\n");
+        intf_ErrMsg("error: can't create control console");
         free( p_intf );
         return( NULL );
     }
     if( p_intf->p_sys_create( p_intf ) )
     {
-        intf_ErrMsg("error: can't create interface\n");
+        intf_ErrMsg("error: can't create interface");
         intf_ConsoleDestroy( p_intf->p_console );
         free( p_intf );
         return( NULL );
     }
 
-    intf_Msg("Interface initialized\n");
+    intf_Msg("Interface initialized");
     return( p_intf );
 }
 
@@ -219,7 +219,7 @@ void intf_Run( intf_thread_t *p_intf )
      * the script could be executed but failed */
     else if( intf_ExecScript( main_GetPszVariable( INTF_INIT_SCRIPT_VAR, INTF_INIT_SCRIPT_DEFAULT ) ) > 0 )
     {
-        intf_ErrMsg("warning: error(s) during startup script\n");
+        intf_ErrMsg("warning: error(s) during startup script");
     }
 
     /* Main loop */
@@ -241,7 +241,7 @@ void intf_Run( intf_thread_t *p_intf )
         {
             input_DestroyThread( p_intf->p_input, NULL );
             p_intf->p_input = NULL;
-            intf_DbgMsg("Input thread destroyed\n");
+            intf_DbgMsg("Input thread destroyed");
         }
 
         /* Sleep to avoid using all CPU - since some interfaces needs to access
@@ -309,7 +309,7 @@ int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
                 input_DestroyThread( p_intf->p_input, NULL );
             }
 
-            intf_Msg("Channel %d: %s\n", i_channel, p_channel->psz_description );
+            intf_Msg("Channel %d: %s", i_channel, p_channel->psz_description );
 
             /* Open a new input */
             p_intf->p_input = input_CreateThread( p_channel->i_input_method, p_channel->psz_input_source,
@@ -321,7 +321,7 @@ int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
     }
 
     /* Channel does not exist */
-    intf_Msg("Channel %d does not exist\n", i_channel );
+    intf_Msg("Channel %d does not exist", i_channel );
 #endif
     return( 1 );
 }
@@ -559,7 +559,7 @@ static int LoadChannels( intf_thread_t *p_intf, char *psz_filename )
     p_file = fopen( psz_filename, "r" );
     if( p_file == NULL )
     {
-        intf_ErrMsg("error: can't open %s (%s)\n", psz_filename, strerror(errno));
+        intf_ErrMsg("error: can't open %s (%s)", psz_filename, strerror(errno));
         return( 1 );
     }
 
@@ -577,7 +577,7 @@ static int LoadChannels( intf_thread_t *p_intf, char *psz_filename )
         p_intf->p_channel = malloc( sizeof( intf_channel_t ) * i_index );
         if( p_intf->p_channel == NULL )
         {
-            intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+            intf_ErrMsg("error: %s", strerror(ENOMEM));
             fclose( p_file );
             return( 1 );
         }
@@ -589,7 +589,7 @@ static int LoadChannels( intf_thread_t *p_intf, char *psz_filename )
         {
             if( !ParseChannel( p_channel, psz_line ) )
             {
-                intf_DbgMsg( "channel [%d] %s : method %d (%s:%d vlan id %d)\n",
+                intf_DbgMsg( "channel [%d] %s : method %d (%s:%d vlan id %d)",
                          p_channel->i_channel, p_channel->psz_description,
                          p_channel->i_input_method,
                          p_channel->psz_input_source,
@@ -686,7 +686,7 @@ static int ParseChannel( intf_channel_t *p_channel, char *psz_str )
                     p_channel->psz_description = malloc( i_field_length + 1 );
                     if( p_channel->psz_description == NULL )
                     {
-                        intf_ErrMsg("error: %s\n", strerror( ENOMEM ));
+                        intf_ErrMsg("error: %s", strerror( ENOMEM ));
                         i_field = -1;
                     }
                     else
@@ -709,7 +709,7 @@ static int ParseChannel( intf_channel_t *p_channel, char *psz_str )
                     p_channel->psz_input_source = malloc( i_field_length + 1 );
                     if( p_channel->psz_input_source == NULL )
                     {
-                        intf_ErrMsg("error: %s\n", strerror( ENOMEM ));
+                        intf_ErrMsg("error: %s", strerror( ENOMEM ));
                         i_field = -1;
                     }
                     else

@@ -91,10 +91,10 @@ int BuildInetAddr( struct sockaddr_in *p_sa_in, char *psz_in_addr, int i_port )
     {
         /* The convertion failed: the address is an host name, which needs
          * to be resolved */
-        intf_DbgMsg("debug: resolving internet address %s...\n", psz_in_addr);
+        intf_DbgMsg("debug: resolving internet address %s...", psz_in_addr);
         if ( (p_hostent = gethostbyname(psz_in_addr)) == NULL)
         {
-            intf_ErrMsg("error: unknown host %s\n", psz_in_addr);
+            intf_ErrMsg("error: unknown host %s", psz_in_addr);
             return( -1 );
         }
 
@@ -154,11 +154,11 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
     if( !i_rc )
     {
         p_ifdescr->i_flags = ifr_config.ifr_flags;
-        intf_DbgMsg("%s flags: 0x%x\n", psz_name, p_ifdescr->i_flags);
+        intf_DbgMsg("%s flags: 0x%x", psz_name, p_ifdescr->i_flags);
     }
     else
     {
-        intf_ErrMsg("Cannot read flags for interface %s: %s\n", psz_name,
+        intf_ErrMsg("Cannot read flags for interface %s: %s", psz_name,
                     strerror(errno));
         return -1;
     }
@@ -172,7 +172,7 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
     if( !i_rc )
     {
         memcpy(&p_ifdescr->sa_phys_addr, &ifr_config.ifr_addr, sizeof(struct sockaddr));
-        intf_DbgMsg("%s MAC address: %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n", psz_name,
+        intf_DbgMsg("%s MAC address: %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x", psz_name,
                     p_ifdescr->sa_phys_addr.sa_data[0]&0xff,
                     p_ifdescr->sa_phys_addr.sa_data[1]&0xff,
                     p_ifdescr->sa_phys_addr.sa_data[2]&0xff,
@@ -182,7 +182,7 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
     }
     else
     {
-        intf_ErrMsg("Cannot read hardware address for interface %s: %s\n",
+        intf_ErrMsg("Cannot read hardware address for interface %s: %s",
                     psz_name, strerror(errno));
         return -1;
     }
@@ -192,12 +192,12 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
     if( !i_rc )
     {
         memcpy(&p_ifdescr->sa_net_addr, &ifr_config.ifr_addr, sizeof(struct sockaddr));
-        intf_DbgMsg("%s IP address: %s\n", psz_name,
+        intf_DbgMsg("%s IP address: %s", psz_name,
                     inet_ntoa(p_ifdescr->sa_net_addr.sin_addr));
     }
     else
     {
-        intf_ErrMsg("Cannot read network address for interface %s: %s\n",
+        intf_ErrMsg("Cannot read network address for interface %s: %s",
                     psz_name, strerror(errno));
         return -1;
     }
@@ -205,23 +205,23 @@ int ReadIfConf(int i_sockfd, if_descr_t* p_ifdescr, char* psz_name)
   /* Read broadcast address of the interface and store it in our description */
     if(p_ifdescr->i_flags & IFF_POINTOPOINT)
     {
-        intf_DbgMsg("%s doen't not support broadcast\n", psz_name);
+        intf_DbgMsg("%s doen't not support broadcast", psz_name);
         i_rc = ioctl(i_sockfd, SIOCGIFDSTADDR, (byte_t *)&ifr_config);
     }
     else
     {
-        intf_DbgMsg("%s supports broadcast\n", psz_name);
+        intf_DbgMsg("%s supports broadcast", psz_name);
         i_rc = ioctl(i_sockfd, SIOCGIFBRDADDR, (byte_t *)&ifr_config);
     }
     if( !i_rc )
     {
         memcpy(&p_ifdescr->sa_bcast_addr, &ifr_config.ifr_addr, sizeof(struct sockaddr));
-        intf_DbgMsg("%s broadcast address: %s\n", psz_name,
+        intf_DbgMsg("%s broadcast address: %s", psz_name,
                     inet_ntoa(p_ifdescr->sa_bcast_addr.sin_addr));
     }
     else
     {
-        intf_ErrMsg("Cannot read broadcast address for interface %s: %s\n",
+        intf_ErrMsg("Cannot read broadcast address for interface %s: %s",
                     psz_name, strerror(errno));
         return -1;
     }
@@ -267,7 +267,7 @@ int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
         i_rc = ioctl(i_sockfd, SIOCGIFCONF, (byte_t*)&ifc_netconf);
         if( i_rc )
         {
-            intf_ErrMsg("Cannot read network configuration: %s\n",
+            intf_ErrMsg("Cannot read network configuration: %s",
                         strerror(errno));
             break;
         }
@@ -289,7 +289,7 @@ int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
         for( i_remaining = ifc_netconf.ifc_len / sizeof (struct ifreq);
              i_remaining-- > 0; p_ifr_current_if++ )
         {
-            intf_DbgMsg("Found interface %s\n", p_ifr_current_if->ifr_name);
+            intf_DbgMsg("Found interface %s", p_ifr_current_if->ifr_name);
 
             /* Don't use an interface devoted to an address family other than IP */
             if(p_ifr_current_if->ifr_addr.sa_family != AF_INET)
@@ -298,7 +298,7 @@ int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
             /* Read the status of this interface */
             if( ioctl(i_sockfd, SIOCGIFFLAGS, (byte_t *)p_ifr_current_if) < 0 )
             {
-                intf_ErrMsg("Cannot access interface %s: %s\n",
+                intf_ErrMsg("Cannot access interface %s: %s",
                             p_ifr_current_if->ifr_name, strerror(errno));
                 i_rc = -1;
                 break;

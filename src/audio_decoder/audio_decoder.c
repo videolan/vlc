@@ -2,7 +2,7 @@
  * audio_decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_decoder.c,v 1.41 2000/12/21 14:18:15 massiot Exp $
+ * $Id: audio_decoder.c,v 1.42 2000/12/22 13:04:44 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -82,12 +82,12 @@ vlc_thread_t adec_CreateThread ( adec_config_t * p_config )
 {
     adec_thread_t *     p_adec;
 
-    intf_DbgMsg ( "adec debug: creating audio decoder thread\n" );
+    intf_DbgMsg ( "adec debug: creating audio decoder thread" );
 
     /* Allocate the memory needed to store the thread's structure */
     if ( (p_adec = (adec_thread_t *)malloc (sizeof(adec_thread_t))) == NULL ) 
     {
-        intf_ErrMsg ( "adec error: not enough memory for adec_CreateThread() to create the new thread\n" );
+        intf_ErrMsg ( "adec error: not enough memory for adec_CreateThread() to create the new thread" );
         return 0;
     }
 
@@ -112,12 +112,12 @@ vlc_thread_t adec_CreateThread ( adec_config_t * p_config )
     /* Spawn the audio decoder thread */
     if ( vlc_thread_create(&p_adec->thread_id, "audio decoder", (vlc_thread_func_t)RunThread, (void *)p_adec) ) 
     {
-        intf_ErrMsg ("adec error: can't spawn audio decoder thread\n");
+        intf_ErrMsg ("adec error: can't spawn audio decoder thread");
         free (p_adec);
         return 0;
     }
 
-    intf_DbgMsg ("adec debug: audio decoder thread (%p) created\n", p_adec);
+    intf_DbgMsg ("adec debug: audio decoder thread (%p) created", p_adec);
     return p_adec->thread_id;
 }
 
@@ -132,7 +132,7 @@ static int InitThread (adec_thread_t * p_adec)
     aout_fifo_t          aout_fifo;
     adec_byte_stream_t * byte_stream;
 
-    intf_DbgMsg ("adec debug: initializing audio decoder thread %p\n", p_adec);
+    intf_DbgMsg ("adec debug: initializing audio decoder thread %p", p_adec);
 
     /* Our first job is to initialize the bit stream structure with the
      * beginning of the input stream */
@@ -164,7 +164,7 @@ static int InitThread (adec_thread_t * p_adec)
         return -1;
     }
 
-    intf_DbgMsg ( "adec debug: audio decoder thread %p initialized\n", p_adec );
+    intf_DbgMsg ( "adec debug: audio decoder thread %p initialized", p_adec );
     return 0;
 }
 
@@ -178,7 +178,7 @@ static void RunThread (adec_thread_t * p_adec)
 {
     int sync;
 
-    intf_DbgMsg ( "adec debug: running audio decoder thread (%p) (pid == %i)\n", p_adec, getpid() );
+    intf_DbgMsg ( "adec debug: running audio decoder thread (%p) (pid == %i)", p_adec, getpid() );
 
     /* You really suck */
     //msleep ( INPUT_PTS_DELAY );
@@ -202,7 +202,7 @@ static void RunThread (adec_thread_t * p_adec)
             /* have to find a synchro point */
             adec_byte_stream_t * p_byte_stream;
             
-            intf_DbgMsg ( "adec: sync\n" );
+            intf_DbgMsg ( "adec: sync" );
             
             p_byte_stream = adec_byte_stream ( &p_adec->audio_decoder );
             /* FIXME: the check will be done later, am I right ? */
@@ -307,7 +307,7 @@ static void ErrorThread ( adec_thread_t *p_adec )
  *****************************************************************************/
 static void EndThread ( adec_thread_t *p_adec )
 {
-    intf_DbgMsg ( "adec debug: destroying audio decoder thread %p\n", p_adec );
+    intf_DbgMsg ( "adec debug: destroying audio decoder thread %p", p_adec );
 
     /* If the audio output fifo was created, we destroy it */
     if ( p_adec->p_aout_fifo != NULL ) 
@@ -323,7 +323,7 @@ static void EndThread ( adec_thread_t *p_adec )
     free( p_adec->p_config );
     free( p_adec );
 
-    intf_DbgMsg ("adec debug: audio decoder thread %p destroyed\n", p_adec);
+    intf_DbgMsg ("adec debug: audio decoder thread %p destroyed", p_adec);
 }
 
 void adec_byte_stream_next ( adec_byte_stream_t * p_byte_stream )

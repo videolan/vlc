@@ -65,7 +65,7 @@ plugin_bank_t * bank_Create( void )
     p_bank = malloc( sizeof( plugin_bank_t ) );
     if( !p_bank )
     {
-        intf_ErrMsg("plugin bank error: %s\n", strerror( ENOMEM ) );
+        intf_ErrMsg("plugin bank error: %s", strerror( ENOMEM ) );
         return( NULL );
     }
 
@@ -76,7 +76,7 @@ plugin_bank_t * bank_Create( void )
     }
     p_bank->i_plugin_count = MAX_PLUGIN_COUNT;
 
-    intf_Msg("Plugin bank initialized\n");
+    intf_Msg("Plugin bank initialized");
     return( p_bank );
 }
 
@@ -190,7 +190,7 @@ char * TestPlugin ( plugin_id_t *p_plugin_id, char * psz_name )
         }
 
 #ifndef SYS_BEOS
-        intf_WarnMsg( 1, "Plugin %s failed: %s\n", psz_plugin, dlerror() );
+        intf_WarnMsg( 1, "Plugin %s failed: %s", psz_plugin, dlerror() );
 #endif
 
         free( psz_plugin );
@@ -219,7 +219,7 @@ int AllocatePlugin( plugin_id_t plugin_id, plugin_bank_t * p_bank,
     if( i == p_bank->i_plugin_count )
     {
         intf_ErrMsg( "plugin bank error: reached max plugin count (%i), "
-                     "increase MAX_PLUGIN_COUNT\n", p_bank->i_plugin_count );
+                     "increase MAX_PLUGIN_COUNT", p_bank->i_plugin_count );
         return( -1 );
     }
 
@@ -239,7 +239,7 @@ int AllocatePlugin( plugin_id_t plugin_id, plugin_bank_t * p_bank,
 
 
     /* Tell the world we found it */
-    intf_Msg( "Plugin %i: %s %s [0x%x]\n", i,
+    intf_Msg( "Plugin %i: %s %s [0x%x]", i,
               p_bank->p_info[ i ]->psz_name,
               p_bank->p_info[ i ]->psz_version,
               p_bank->p_info[ i ]->i_score );

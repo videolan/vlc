@@ -145,7 +145,7 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
                 if( ((i_code >> 2) + vspu.i_x + vspu.i_y * vspu.i_width)
                         > vspu.i_height * vspu.i_width )
                 {
-                    intf_DbgMsg ( "video_spu: invalid draw request ! %d %d\n",
+                    intf_DbgMsg ( "video_spu: invalid draw request ! %d %d",
                                   i_code >> 2, vspu.i_height * vspu.i_width
                                    - ( (i_code >> 2) + vspu.i_x
                                        + vspu.i_y * vspu.i_width ) );
@@ -210,7 +210,7 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
             {
                 /* we have a boo boo ! */
                 intf_DbgMsg( "video_spu: unknown code 0x%x "
-                             "(dest %x side %x, x=%d, y=%d)\n",
+                             "(dest %x side %x, x=%d, y=%d)",
                              i_code, p_from[i_id], i_id, vspu.i_x, vspu.i_y );
                 if( NewLine( &vspu, &i_id ) < 0 )
                     return;
@@ -232,7 +232,7 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
                 if( ((i_code >> 2) + vspu.i_x + vspu.i_y * vspu.i_width)
                         > vspu.i_height * vspu.i_width )
                 {
-                    intf_DbgMsg ( "video_spu: invalid draw request ! %d %d\n",
+                    intf_DbgMsg ( "video_spu: invalid draw request ! %d %d",
                                   i_code >> 2, vspu.i_height * vspu.i_width
                                    - ( (i_code >> 2) + vspu.i_x
                                        + vspu.i_y * vspu.i_width ) );
@@ -288,7 +288,7 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
             {
                 /* we have a boo boo ! */
                 intf_DbgMsg( "video_spu: unknown code 0x%x "
-                             "(dest %x side %x, x=%d, y=%d)\n",
+                             "(dest %x side %x, x=%d, y=%d)",
                              i_code, p_from[i_id], i_id, vspu.i_x, vspu.i_y );
                 if( NewLine( &vspu, &i_id ) < 0 )
                     return;

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.57 2000/12/21 17:19:54 massiot Exp $
+ * $Id: video_parser.c,v 1.58 2000/12/22 13:04:45 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -82,13 +82,13 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
 {
     vpar_thread_t *     p_vpar;
 
-    intf_DbgMsg( "vpar debug: creating video parser thread\n" );
+    intf_DbgMsg( "vpar debug: creating video parser thread" );
 
     /* Allocate the memory needed to store the thread's structure */
     if ( (p_vpar = (vpar_thread_t *)malloc( sizeof(vpar_thread_t) )) == NULL )
     {
         intf_ErrMsg( "vpar error: not enough memory "
-                     "for vpar_CreateThread() to create the new thread\n");
+                     "for vpar_CreateThread() to create the new thread");
         return( 0 );
     }
 
@@ -104,12 +104,12 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
     if ( vlc_thread_create( &p_vpar->thread_id, "video parser",
                             (vlc_thread_func_t)RunThread, (void *)p_vpar ) )
     {
-        intf_ErrMsg("vpar error: can't spawn video parser thread\n");
+        intf_ErrMsg("vpar error: can't spawn video parser thread");
         free( p_vpar );
         return( 0 );
     }
 
-    intf_DbgMsg("vpar debug: video parser thread (%p) created\n", p_vpar);
+    intf_DbgMsg("vpar debug: video parser thread (%p) created", p_vpar);
     return( p_vpar->thread_id );
 }
 
@@ -128,7 +128,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     int i_dummy;
 #endif
 
-    intf_DbgMsg("vpar debug: initializing video parser thread %p\n", p_vpar);
+    intf_DbgMsg("vpar debug: initializing video parser thread %p", p_vpar);
 
     p_vpar->p_config->decoder_config.pf_init_bit_stream( &p_vpar->bit_stream,
         p_vpar->p_config->decoder_config.p_decoder_fifo );
@@ -189,7 +189,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     /* Re-nice ourself */
     if( nice(VDEC_NICE) == -1 )
     {
-        intf_WarnMsg( 2, "vpar warning : couldn't nice() (%s)\n",
+        intf_WarnMsg( 2, "vpar warning : couldn't nice() (%s)",
                       strerror(errno) );
     }
 #endif
@@ -210,7 +210,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     vpar_SynchroInit( p_vpar );
 
     /* Mark thread as running and return */
-    intf_DbgMsg("vpar debug: InitThread(%p) succeeded\n", p_vpar);
+    intf_DbgMsg("vpar debug: InitThread(%p) succeeded", p_vpar);
     return( 0 );
 }
 
@@ -222,7 +222,7 @@ static int InitThread( vpar_thread_t *p_vpar )
  *****************************************************************************/
 static void RunThread( vpar_thread_t *p_vpar )
 {
-    intf_DbgMsg("vpar debug: running video parser thread (%p) (pid == %i)\n", p_vpar, getpid());
+    intf_DbgMsg("vpar debug: running video parser thread (%p) (pid == %i)", p_vpar, getpid());
 
     /*
      * Initialize thread
@@ -308,35 +308,35 @@ static void EndThread( vpar_thread_t *p_vpar )
     int i_dummy;
 #endif
 
-    intf_DbgMsg("vpar debug: destroying video parser thread %p\n", p_vpar);
+    intf_DbgMsg("vpar debug: destroying video parser thread %p", p_vpar);
 
 #ifdef STATS
-    intf_Msg("vpar stats: %d loops among %d sequence(s)\n",
+    intf_Msg("vpar stats: %d loops among %d sequence(s)",
              p_vpar->c_loops, p_vpar->c_sequences);
 
     {
         struct tms cpu_usage;
         times( &cpu_usage );
 
-        intf_Msg("vpar stats: cpu usage (user: %d, system: %d)\n",
+        intf_Msg("vpar stats: cpu usage (user: %d, system: %d)",
                  cpu_usage.tms_utime, cpu_usage.tms_stime);
     }
 
-    intf_Msg("vpar stats: Read %d frames/fields (I %d/P %d/B %d)\n",
+    intf_Msg("vpar stats: Read %d frames/fields (I %d/P %d/B %d)",
              p_vpar->pc_pictures[I_CODING_TYPE]
              + p_vpar->pc_pictures[P_CODING_TYPE]
              + p_vpar->pc_pictures[B_CODING_TYPE],
              p_vpar->pc_pictures[I_CODING_TYPE],
              p_vpar->pc_pictures[P_CODING_TYPE],
              p_vpar->pc_pictures[B_CODING_TYPE]);
-    intf_Msg("vpar stats: Decoded %d frames/fields (I %d/P %d/B %d)\n",
+    intf_Msg("vpar stats: Decoded %d frames/fields (I %d/P %d/B %d)",
              p_vpar->pc_decoded_pictures[I_CODING_TYPE]
              + p_vpar->pc_decoded_pictures[P_CODING_TYPE]
              + p_vpar->pc_decoded_pictures[B_CODING_TYPE],
              p_vpar->pc_decoded_pictures[I_CODING_TYPE],
              p_vpar->pc_decoded_pictures[P_CODING_TYPE],
              p_vpar->pc_decoded_pictures[B_CODING_TYPE]);
-    intf_Msg("vpar stats: Read %d malformed frames/fields (I %d/P %d/B %d)\n",
+    intf_Msg("vpar stats: Read %d malformed frames/fields (I %d/P %d/B %d)",
              p_vpar->pc_malformed_pictures[I_CODING_TYPE]
              + p_vpar->pc_malformed_pictures[P_CODING_TYPE]
              + p_vpar->pc_malformed_pictures[B_CODING_TYPE],
@@ -344,10 +344,10 @@ static void EndThread( vpar_thread_t *p_vpar )
              p_vpar->pc_malformed_pictures[P_CODING_TYPE],
              p_vpar->pc_malformed_pictures[B_CODING_TYPE]);
 #define S   p_vpar->sequence
-    intf_Msg("vpar info: %s stream (%dx%d), %d pi/s\n",
+    intf_Msg("vpar info: %s stream (%dx%d), %d pi/s",
              S.b_mpeg2 ? "MPEG-2" : "MPEG-1",
              S.i_width, S.i_height, S.i_frame_rate/1001);
-    intf_Msg("vpar info: %s, %s, matrix_coeff: %d\n",
+    intf_Msg("vpar info: %s, %s, matrix_coeff: %d",
              S.b_progressive ? "Progressive" : "Non-progressive",
              S.i_scalable_mode ? "scalable" : "non-scalable",
              S.i_matrix_coefficients);
@@ -387,5 +387,5 @@ static void EndThread( vpar_thread_t *p_vpar )
     free( p_vpar->p_config );
     free( p_vpar );
 
-    intf_DbgMsg("vpar debug: EndThread(%p)\n", p_vpar);
+    intf_DbgMsg("vpar debug: EndThread(%p)", p_vpar);
 }

@@ -101,11 +101,10 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     int             i_best_index = 0, i_best_score = 0;
 
     /* Allocate descriptor */
-    intf_DbgMsg("\n");
     p_vout = (vout_thread_t *) malloc( sizeof(vout_thread_t) );
     if( p_vout == NULL )
     {
-        intf_ErrMsg( "vout error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg( "vout error: %s", strerror(ENOMEM) );
         return( NULL );
     }
 
@@ -167,7 +166,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     p_vout->b_interface           = 0;
     p_vout->b_scale               = 1;
 
-    intf_DbgMsg( "wished configuration: %dx%d, %d/%d bpp (%d Bpl)\n",
+    intf_DbgMsg( "wished configuration: %dx%d, %d/%d bpp (%d Bpl)",
                  p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                  p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line );
 
@@ -205,7 +204,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         return( NULL );
     }
     intf_DbgMsg( "actual configuration: %dx%d, %d/%d bpp (%d Bpl), "
-                 "masks: 0x%x/0x%x/0x%x\n",
+                 "masks: 0x%x/0x%x/0x%x",
                  p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                  p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line,
                  p_vout->i_red_mask, p_vout->i_green_mask,
@@ -234,7 +233,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     }
     if( p_vout->p_default_font == NULL )
     {
-        intf_ErrMsg( "vout error: could not load default font\n" );
+        intf_ErrMsg( "vout error: could not load default font" );
         p_vout->p_sys_destroy( p_vout );
         free( p_vout );
         return( NULL );
@@ -246,7 +245,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     }
     if( p_vout->p_large_font == NULL )
     {
-        intf_ErrMsg( "vout error: could not load large font\n" );
+        intf_ErrMsg( "vout error: could not load large font" );
         vout_UnloadFont( p_vout->p_default_font );
         p_vout->p_sys_destroy( p_vout );
         free( p_vout );
@@ -261,7 +260,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     if( vlc_thread_create( &p_vout->thread_id, "video output",
                            (void *) RunThread, (void *) p_vout) )
     {
-        intf_ErrMsg("vout error: %s\n", strerror(ENOMEM));
+        intf_ErrMsg("vout error: %s", strerror(ENOMEM));
         vout_UnloadFont( p_vout->p_default_font );
         vout_UnloadFont( p_vout->p_large_font );
         p_vout->p_sys_destroy( p_vout );
@@ -269,7 +268,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         return( NULL );
     }
 
-    intf_Msg( "Video display initialized (%dx%d, %d/%d bpp)\n", p_vout->i_width,
+    intf_Msg( "Video display initialized (%dx%d, %d/%d bpp)", p_vout->i_width,
               p_vout->i_height, p_vout->i_screen_depth,
               p_vout->i_bytes_per_pixel * 8 );
 
@@ -302,7 +301,7 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
     int     i_status;                                       /* thread status */
 
     /* Set status */
-    intf_DbgMsg("\n");
+    intf_DbgMsg("");
     p_vout->pi_status = (pi_status != NULL) ? pi_status : &i_status;
     *p_vout->pi_status = THREAD_DESTROY;
 
@@ -338,7 +337,7 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     /* Check if status is valid */
     if( p_subpic->i_status != RESERVED_SUBPICTURE )
     {
-        intf_DbgMsg("error: subpicture %p has invalid status %d\n", p_subpic,
+        intf_DbgMsg("error: subpicture %p has invalid status %d", p_subpic,
                     p_subpic->i_status );
     }
 #endif
@@ -348,7 +347,7 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 
 #ifdef DEBUG_VOUT
     /* Send subpicture information */
-    intf_DbgMsg("subpicture %p: type=%d, begin date=%s, end date=%s\n",
+    intf_DbgMsg("subpicture %p: type=%d, begin date=%s, end date=%s",
                 p_subpic, p_subpic->i_type,
                 mstrtime( psz_begin_date, p_subpic->begin_date ),
                 mstrtime( psz_end_date, p_subpic->end_date ) );
@@ -390,7 +389,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
                  * to be done */
                 p_vout->p_subpicture[i_subpic].i_status = RESERVED_SUBPICTURE;
 #ifdef DEBUG_VOUT
-                intf_DbgMsg("subpicture %p (in destroyed subpicture slot)\n",
+                intf_DbgMsg("subpicture %p (in destroyed subpicture slot)",
                             &p_vout->p_subpicture[i_subpic] );
 #endif
                 vlc_mutex_unlock( &p_vout->subpicture_lock );
@@ -436,7 +435,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
             break;
 #ifdef DEBUG
         default:
-            intf_DbgMsg("error: unknown subpicture type %d\n", i_type );
+            intf_DbgMsg("error: unknown subpicture type %d", i_type );
             p_free_subpic->p_data   =  NULL;
             break;
 #endif
@@ -461,18 +460,18 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
             p_free_subpic->i_type   =  EMPTY_SUBPICTURE;
             p_free_subpic->i_status =  FREE_SUBPICTURE;
             p_free_subpic =            NULL;
-            intf_ErrMsg("spu warning: %s\n", strerror( ENOMEM ) );
+            intf_ErrMsg("spu warning: %s", strerror( ENOMEM ) );
         }
 
 #ifdef DEBUG_VOUT
-        intf_DbgMsg("subpicture %p (in free subpicture slot)\n", p_free_subpic );
+        intf_DbgMsg("subpicture %p (in free subpicture slot)", p_free_subpic );
 #endif
         vlc_mutex_unlock( &p_vout->subpicture_lock );
         return( p_free_subpic );
     }
 
     /* No free or destroyed subpicture could be found */
-    intf_DbgMsg( "warning: subpicture heap is full\n" );
+    intf_DbgMsg( "warning: subpicture heap is full" );
     vlc_mutex_unlock( &p_vout->subpicture_lock );
     return( NULL );
 }
@@ -491,7 +490,7 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
    /* Check if status is valid */
    if( p_subpic->i_status != RESERVED_SUBPICTURE )
    {
-       intf_DbgMsg("error: subpicture %p has invalid status %d\n",
+       intf_DbgMsg("error: subpicture %p has invalid status %d",
                    p_subpic, p_subpic->i_status );
    }
 #endif
@@ -499,7 +498,7 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     p_subpic->i_status = DESTROYED_SUBPICTURE;
 
 #ifdef DEBUG_VOUT
-    intf_DbgMsg("subpicture %p\n", p_subpic);
+    intf_DbgMsg("subpicture %p", p_subpic);
 #endif
 }
 
@@ -523,13 +522,13 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
         break;
 #ifdef DEBUG
     default:
-        intf_DbgMsg("error: picture %p has invalid status %d\n", p_pic, p_pic->i_status );
+        intf_DbgMsg("error: picture %p has invalid status %d", p_pic, p_pic->i_status );
         break;
 #endif
     }
 
 #ifdef DEBUG_VOUT
-    intf_DbgMsg("picture %p\n", p_pic);
+    intf_DbgMsg("picture %p", p_pic);
 #endif
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
@@ -559,13 +558,13 @@ void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
         break;
 #ifdef DEBUG
     default:
-        intf_DbgMsg("error: picture %p has invalid status %d\n", p_pic, p_pic->i_status );
+        intf_DbgMsg("error: picture %p has invalid status %d", p_pic, p_pic->i_status );
         break;
 #endif
     }
 
 #ifdef DEBUG_VOUT
-    intf_DbgMsg("picture %p, display date: %s\n", p_pic, mstrtime( psz_date, p_pic->date) );
+    intf_DbgMsg("picture %p, display date: %s", p_pic, mstrtime( psz_date, p_pic->date) );
 #endif
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
@@ -609,7 +608,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
                 p_vout->p_picture[i_picture].i_status = RESERVED_PICTURE;
                 p_vout->i_pictures++;
 #ifdef DEBUG_VOUT
-                intf_DbgMsg("picture %p (in destroyed picture slot)\n",
+                intf_DbgMsg("picture %p (in destroyed picture slot)",
                             &p_vout->p_picture[i_picture] );
 #endif
                 vlc_mutex_unlock( &p_vout->picture_lock );
@@ -670,7 +669,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
             break;
 #ifdef DEBUG
         default:
-            intf_DbgMsg("error: unknown picture type %d\n", i_type );
+            intf_DbgMsg("error: unknown picture type %d", i_type );
             p_free_picture->p_data   =  NULL;
             break;
 #endif
@@ -699,18 +698,18 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
             p_free_picture->i_type   =  EMPTY_PICTURE;
             p_free_picture->i_status =  FREE_PICTURE;
             p_free_picture =            NULL;
-            intf_ErrMsg( "vout warning: %s\n", strerror( ENOMEM ) );
+            intf_ErrMsg( "vout warning: %s", strerror( ENOMEM ) );
         }
 
 #ifdef DEBUG_VOUT
-        intf_DbgMsg("picture %p (in free picture slot)\n", p_free_picture );
+        intf_DbgMsg("picture %p (in free picture slot)", p_free_picture );
 #endif
         vlc_mutex_unlock( &p_vout->picture_lock );
         return( p_free_picture );
     }
 
     /* No free or destroyed picture could be found */
-    intf_DbgMsg( "warning: picture heap is full\n" );
+    intf_DbgMsg( "warning: picture heap is full" );
     vlc_mutex_unlock( &p_vout->picture_lock );
     return( NULL );
 }
@@ -732,7 +731,7 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
        (p_pic->i_status != RESERVED_DATED_PICTURE) &&
        (p_pic->i_status != RESERVED_DISP_PICTURE) )
    {
-       intf_DbgMsg("error: picture %p has invalid status %d\n", p_pic, p_pic->i_status );
+       intf_DbgMsg("error: picture %p has invalid status %d", p_pic, p_pic->i_status );
    }
 #endif
 
@@ -740,7 +739,7 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
    p_vout->i_pictures--;
 
 #ifdef DEBUG_VOUT
-   intf_DbgMsg("picture %p\n", p_pic);
+   intf_DbgMsg("picture %p", p_pic);
 #endif
    vlc_mutex_unlock( &p_vout->picture_lock );
 }
@@ -757,7 +756,7 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_pic->i_refcount++;
 
 #ifdef DEBUG_VOUT
-    intf_DbgMsg("picture %p refcount=%d\n", p_pic, p_pic->i_refcount );
+    intf_DbgMsg("picture %p refcount=%d", p_pic, p_pic->i_refcount );
 #endif
 
     vlc_mutex_unlock( &p_vout->picture_lock );
@@ -776,7 +775,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #ifdef DEBUG_VOUT
     if( p_pic->i_refcount < 0 )
     {
-        intf_DbgMsg("error: refcount < 0\n");
+        intf_DbgMsg("error: refcount < 0");
         p_pic->i_refcount = 0;
     }
 #endif
@@ -788,7 +787,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
 #ifdef DEBUG_VOUT
-    intf_DbgMsg("picture %p refcount=%d\n", p_pic, p_pic->i_refcount );
+    intf_DbgMsg("picture %p refcount=%d", p_pic, p_pic->i_refcount );
 #endif
 
     vlc_mutex_unlock( &p_vout->picture_lock );
@@ -873,7 +872,7 @@ static int BinaryLog(u32 i)
     }
     if (i != ((u32)1 << i_log))
     {
-        intf_DbgMsg("internal error: binary log overflow\n");
+        intf_DbgMsg("internal error: binary log overflow");
     }
 
     return( i_log );
@@ -911,7 +910,6 @@ static void MaskToShift( int *pi_left, int *pi_right, u32 i_mask )
 static int InitThread( vout_thread_t *p_vout )
 {
     /* Update status */
-    intf_DbgMsg("\n");
     *p_vout->pi_status = THREAD_START;
 
 #ifdef STATS
@@ -929,7 +927,7 @@ static int InitThread( vout_thread_t *p_vout )
         /* Initialize convertion tables and functions */
         if( vout_InitYUV( p_vout ) )
         {
-            intf_ErrMsg("error: can't allocate YUV translation tables\n");
+            intf_ErrMsg("error: can't allocate YUV translation tables");
             return( 1 );
         }
     }
@@ -939,7 +937,7 @@ static int InitThread( vout_thread_t *p_vout )
     *p_vout->pi_status =        THREAD_READY;
 
     
-    intf_DbgMsg("thread ready\n");
+    intf_DbgMsg("thread ready");
     return( 0 );
 }
 
@@ -968,7 +966,6 @@ static void RunThread( vout_thread_t *p_vout)
         DestroyThread( p_vout, THREAD_ERROR );
         return;
     }
-    intf_DbgMsg("\n");
 
     /*
      * Main loop - it is not executed if an error occured during
@@ -985,7 +982,7 @@ static void RunThread( vout_thread_t *p_vout)
         p_vout->c_loops++;
         if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
         {
-            intf_Msg("vout stats: picture heap: %d/%d\n",
+            intf_Msg("vout stats: picture heap: %d/%d",
                      p_vout->i_pictures, VOUT_MAX_PICTURES);
         }
 #endif
@@ -1026,7 +1023,7 @@ static void RunThread( vout_thread_t *p_vout)
                     p_vout->i_pictures--;
                 }
                 intf_WarnMsg( 3,
-                        "warning: late picture skipped (%p)\n", p_pic );
+                        "warning: late picture skipped (%p)", p_pic );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
                 continue;
@@ -1142,7 +1139,7 @@ static void RunThread( vout_thread_t *p_vout)
                 
             } else {
                 /* no splash screen ! */
-                intf_ErrMsgImm("End of splash screen\n");  
+                intf_ErrMsgImm("End of splash screen");  
                 p_vout->init_display_date=0;
             }
         }
@@ -1176,7 +1173,7 @@ static void RunThread( vout_thread_t *p_vout)
          * then swap buffers */
         vlc_mutex_lock( &p_vout->change_lock );
 #ifdef DEBUG_VOUT
-        intf_DbgMsg( "picture %p, subpicture %p in buffer %d, display=%d\n", p_pic, p_subpic,
+        intf_DbgMsg( "picture %p, subpicture %p in buffer %d, display=%d", p_pic, p_subpic,
                      p_vout->i_buffer_index, b_display /* && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) */ );
 #endif
         if( b_display /* && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) */ )
@@ -1227,7 +1224,7 @@ static void RunThread( vout_thread_t *p_vout)
     /* End of thread */
     EndThread( p_vout );
     DestroyThread( p_vout, THREAD_OVER );
-    intf_DbgMsg( "thread end\n" );
+    intf_DbgMsg( "thread end" );
 }
 
 /*****************************************************************************
@@ -1240,7 +1237,6 @@ static void RunThread( vout_thread_t *p_vout)
 static void ErrorThread( vout_thread_t *p_vout )
 {
     /* Wait until a `die' order */
-    intf_DbgMsg("\n");
     while( !p_vout->b_die )
     {
         /* Sleep a while */
@@ -1259,7 +1255,6 @@ static void EndThread( vout_thread_t *p_vout )
     int     i_index;                                        /* index in heap */
 
     /* Store status */
-    intf_DbgMsg("\n");
     *p_vout->pi_status = THREAD_END;
 
 #ifdef STATS
@@ -1267,7 +1262,7 @@ static void EndThread( vout_thread_t *p_vout )
         struct tms cpu_usage;
         times( &cpu_usage );
 
-        intf_Msg("vout stats: cpu usage (user: %d, system: %d)\n",
+        intf_Msg("vout stats: cpu usage (user: %d, system: %d)",
                  cpu_usage.tms_utime, cpu_usage.tms_stime);
     }
 #endif
@@ -1304,7 +1299,6 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     int *pi_status;                                         /* status adress */
 
     /* Store status adress */
-    intf_DbgMsg("\n");
     pi_status = p_vout->pi_status;
 
     /* Destroy thread structures allocated by Create and InitThread */
@@ -1410,7 +1404,7 @@ static void SetBufferArea( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int
         else
         {
 #ifdef DEBUG_VOUT
-            intf_DbgMsg("area overflow\n");
+            intf_DbgMsg("area overflow");
 #endif
             p_buffer->pi_area_end[VOUT_MAX_AREAS - 1] = i_h;
         }
@@ -1434,7 +1428,7 @@ static void SetBufferArea( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int
                 if( p_buffer->i_areas == VOUT_MAX_AREAS )
                 {
 #ifdef DEBUG_VOUT
-                    intf_DbgMsg("areas overflow\n");
+                    intf_DbgMsg("areas overflow");
 #endif
                     p_buffer->pi_area_end[VOUT_MAX_AREAS - 2] = p_buffer->pi_area_end[VOUT_MAX_AREAS - 1];
                 }
@@ -1609,7 +1603,7 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
     for( i_area = 0; i_area < p_buffer->i_areas; i_area++ )
     {
 #ifdef DEBUG_VOUT
-        intf_DbgMsg("clearing picture %p area in buffer %d: %d-%d\n", p_pic,
+        intf_DbgMsg("clearing picture %p area in buffer %d: %d-%d", p_pic,
                     p_vout->i_buffer_index, p_buffer->pi_area_begin[i_area], p_buffer->pi_area_end[i_area] );
 #endif
         i_data_size = (p_buffer->pi_area_end[i_area] - p_buffer->pi_area_begin[i_area] + 1) * p_vout->i_bytes_per_line;
@@ -1704,14 +1698,14 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
         break;
 #ifdef DEBUG
     default:
-        intf_DbgMsg("error: unknown picture type %d\n", p_pic->i_type );
+        intf_DbgMsg("error: unknown picture type %d", p_pic->i_type );
         break;
 #endif
     }
 
 #ifdef DEBUG_VOUT
     /* Print picture date and rendering time */
-    intf_DbgMsg("picture %p rendered in buffer %d (%ld us), display date: %s\n", p_pic,
+    intf_DbgMsg("picture %p rendered in buffer %d (%ld us), display date: %s", p_pic,
                 p_vout->i_buffer_index, (long) (mdate() - render_time),
                 mstrtime( psz_date, p_pic->date ));
 #endif
@@ -1966,7 +1960,7 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 
 #ifdef DEBUG
         default:
-            intf_DbgMsg( "error: unknown subpicture %p type %d\n",
+            intf_DbgMsg( "error: unknown subpicture %p type %d",
                          p_subpic, p_subpic->i_type );
 #endif
         }
@@ -2034,7 +2028,7 @@ static int Manage( vout_thread_t *p_vout )
 #ifdef DEBUG_VOUT
     if( p_vout->i_changes )
     {
-        intf_DbgMsg("changes: 0x%x (no display: 0x%x)\n", p_vout->i_changes,
+        intf_DbgMsg("changes: 0x%x (no display: 0x%x)", p_vout->i_changes,
                     0 /* p_vout->i_changes & VOUT_NODISPLAY_CHANGE */ );
     }
 #endif
@@ -2045,7 +2039,7 @@ static int Manage( vout_thread_t *p_vout )
     {
         if( vout_ResetYUV( p_vout ) )
         {
-            intf_ErrMsg("error: can't rebuild convertion tables\n");
+            intf_ErrMsg("error: can't rebuild convertion tables");
             return( 1 );
         }
     }
@@ -2061,7 +2055,7 @@ static int Manage( vout_thread_t *p_vout )
     {
         /* Some changes were not acknowledged by p_vout->p_sys_manage or this
          * function, it means they should not be authorized */
-        intf_ErrMsg( "error: unauthorized changes in the video output thread\n" );
+        intf_ErrMsg( "error: unauthorized changes in the video output thread" );
         return( 1 );
     }
 
@@ -2130,6 +2124,6 @@ static int Align( vout_thread_t *p_vout, int *pi_x, int *pi_y,
 static void     SetPalette        ( p_vout_thread_t p_vout, u16 *red,
                                     u16 *green, u16 *blue, u16 *transp )
 {
-    intf_ErrMsg( "SetPalette: method does not support palette changing\n" );
+    intf_ErrMsg( "SetPalette: method does not support palette changing" );
 }
 

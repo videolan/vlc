@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.63 2000/12/21 19:24:26 massiot Exp $
+ * $Id: input.c,v 1.64 2000/12/22 13:04:44 sam Exp $
  *
  * Authors: 
  *
@@ -77,11 +77,10 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
     int                 i_status;                           /* thread status */
 
     /* Allocate descriptor */
-    intf_DbgMsg("\n");
     p_input = (input_thread_t *)malloc( sizeof(input_thread_t) );
     if( p_input == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(errno));
+        intf_ErrMsg("error: %s", strerror(errno));
         free( p_config );
         return( NULL );
     }
@@ -113,7 +112,7 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
     if( vlc_thread_create( &p_input->thread_id, "input", (void *) RunThread,
                            (void *) p_input ) )
     {
-        intf_ErrMsg("error: %s\n", strerror(errno) );
+        intf_ErrMsg("error: %s", strerror(errno) );
         free( p_input );
         free( p_config );
         return( NULL );
@@ -246,7 +245,7 @@ static void InitThread( input_thread_t * p_input )
     case INPUT_METHOD_VLAN_BCAST:                     /* vlan network method */
 /*        if( !p_main->b_vlans )
         {
-            intf_ErrMsg("error: vlans are not activated\n");
+            intf_ErrMsg("error: vlans are not activated");
             free( p_input );
             return( NULL );
         } */ /* la-lala */
@@ -304,7 +303,7 @@ static void EndThread( input_thread_t * p_input )
         struct tms cpu_usage;
         times( &cpu_usage );
 
-        intf_Msg("input stats: cpu usage (user: %d, system: %d)\n",
+        intf_Msg("input stats: cpu usage (user: %d, system: %d)",
                  cpu_usage.tms_utime, cpu_usage.tms_stime);
     }
 #endif

@@ -83,7 +83,7 @@ int aout_BeOpen( aout_thread_t *p_aout )
     p_aout->p_sys = (aout_sys_t*) malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg("error: %s", strerror(ENOMEM) );
         return( 1 );
     }
 
@@ -92,7 +92,7 @@ int aout_BeOpen( aout_thread_t *p_aout )
     if( p_aout->p_sys->p_format == NULL )
     {
         free( p_aout->p_sys );
-        intf_ErrMsg("error: cannot allocate memory for gs_audio_format\n" );
+        intf_ErrMsg("error: cannot allocate memory for gs_audio_format" );
         return( 1 );
     }
 
@@ -117,7 +117,7 @@ int aout_BeOpen( aout_thread_t *p_aout )
     {
         free( p_aout->p_sys->p_format );
         free( p_aout->p_sys );
-        intf_ErrMsg("error: cannot allocate memory for BPushGameSound\n" );
+        intf_ErrMsg("error: cannot allocate memory for BPushGameSound" );
         return( 1 );
     }
 
@@ -125,7 +125,7 @@ int aout_BeOpen( aout_thread_t *p_aout )
     {
         free( p_aout->p_sys->p_format );
         free( p_aout->p_sys );
-        intf_ErrMsg("error: cannot allocate memory for BPushGameSound\n" );
+        intf_ErrMsg("error: cannot allocate memory for BPushGameSound" );
         return( 1 );
     }
 

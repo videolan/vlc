@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.41 2000/12/21 17:19:52 massiot Exp $
+ * $Id: video_decoder.c,v 1.42 2000/12/22 13:04:45 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -78,12 +78,12 @@ vdec_thread_t * vdec_CreateThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
 {
     vdec_thread_t *     p_vdec;
 
-    intf_DbgMsg("vdec debug: creating video decoder thread\n");
+    intf_DbgMsg("vdec debug: creating video decoder thread");
 
     /* Allocate the memory needed to store the thread's structure */
     if ( (p_vdec = (vdec_thread_t *)malloc( sizeof(vdec_thread_t) )) == NULL )
     {
-        intf_ErrMsg("vdec error: not enough memory for vdec_CreateThread() to create the new thread\n");
+        intf_ErrMsg("vdec error: not enough memory for vdec_CreateThread() to create the new thread");
         return( NULL );
     }
 
@@ -102,12 +102,12 @@ vdec_thread_t * vdec_CreateThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
     if ( vlc_thread_create(&p_vdec->thread_id, "video decoder",
          (vlc_thread_func_t)RunThread, (void *)p_vdec) )
     {
-        intf_ErrMsg("vdec error: can't spawn video decoder thread\n");
+        intf_ErrMsg("vdec error: can't spawn video decoder thread");
         free( p_vdec );
         return( NULL );
     }
 
-    intf_DbgMsg("vdec debug: video decoder thread (%p) created\n", p_vdec);
+    intf_DbgMsg("vdec debug: video decoder thread (%p) created", p_vdec);
     return( p_vdec );
 }
 
@@ -120,7 +120,7 @@ vdec_thread_t * vdec_CreateThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
  *****************************************************************************/
 void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
 {
-    intf_DbgMsg("vdec debug: requesting termination of video decoder thread %p\n", p_vdec);
+    intf_DbgMsg("vdec debug: requesting termination of video decoder thread %p", p_vdec);
 
     /* Ask thread to kill itself */
     p_vdec->b_die = 1;
@@ -156,7 +156,7 @@ int vdec_InitThread( vdec_thread_t *p_vdec )
     int i_dummy;
 #endif
 
-    intf_DbgMsg("vdec debug: initializing video decoder thread %p\n", p_vdec);
+    intf_DbgMsg("vdec debug: initializing video decoder thread %p", p_vdec);
 
 #ifndef HAVE_MMX
     /* Init crop table */
@@ -179,13 +179,13 @@ int vdec_InitThread( vdec_thread_t *p_vdec )
     /* Re-nice ourself */
     if( nice(VDEC_NICE) == -1 )
     {
-        intf_WarnMsg( 2, "vdec warning : couldn't nice() (%s)\n",
+        intf_WarnMsg( 2, "vdec warning : couldn't nice() (%s)",
                       strerror(errno) );
     }
 #endif
 
     /* Mark thread as running and return */
-    intf_DbgMsg("vdec debug: InitThread(%p) succeeded\n", p_vdec);
+    intf_DbgMsg("vdec debug: InitThread(%p) succeeded", p_vdec);
     return( 0 );
 }
 
@@ -216,7 +216,7 @@ static void ErrorThread( vdec_thread_t *p_vdec )
  *****************************************************************************/
 static void EndThread( vdec_thread_t *p_vdec )
 {
-    intf_DbgMsg("vdec debug: EndThread(%p)\n", p_vdec);
+    intf_DbgMsg("vdec debug: EndThread(%p)", p_vdec);
 }
 
 /*****************************************************************************
@@ -484,7 +484,7 @@ void vdec_DecodeMacroblockC ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
          */
         if( p_mb->pf_motion == 0 )
         {
-            intf_ErrMsg( "vdec error: pf_motion set to NULL\n" );
+            intf_ErrMsg( "vdec error: pf_motion set to NULL" );
         }
         else
         {
@@ -514,7 +514,7 @@ void vdec_DecodeMacroblockBW ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
          */
         if( p_mb->pf_motion == 0 )
         {
-            intf_ErrMsg( "vdec error: pf_motion set to NULL\n" );
+            intf_ErrMsg( "vdec error: pf_motion set to NULL" );
         }
         else
         {
@@ -545,7 +545,7 @@ void vdec_DecodeMacroblockBW ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
  *****************************************************************************/
 static void RunThread( vdec_thread_t *p_vdec )
 {
-    intf_DbgMsg("vdec debug: running video decoder thread (%p) (pid == %i)\n",
+    intf_DbgMsg("vdec debug: running video decoder thread (%p) (pid == %i)",
                 p_vdec, getpid());
 
     /*

@@ -77,14 +77,14 @@ int vout_DummyCreate( vout_thread_t *p_vout, char *psz_display,
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg("error: %s", strerror(ENOMEM) );
         return( 1 );
     }
 
     /* Open and initialize device */
     if( DummyOpenDisplay( p_vout ) )
     {
-        intf_ErrMsg("vout error: can't open display\n");
+        intf_ErrMsg("vout error: can't open display");
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -166,7 +166,7 @@ static int DummyOpenDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->p_video = malloc( p_vout->p_sys->i_page_size * 2 );
     if( (int)p_vout->p_sys->p_video == -1 )
     {
-        intf_ErrMsg("vout error: can't map video memory (%s)\n", strerror(errno) );
+        intf_ErrMsg("vout error: can't map video memory (%s)", strerror(errno) );
         return( 1 );
     }
 

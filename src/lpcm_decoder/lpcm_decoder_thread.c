@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder_thread.c,v 1.5 2000/12/21 13:25:51 massiot Exp $
+ * $Id: lpcm_decoder_thread.c,v 1.6 2000/12/22 13:04:45 sam Exp $
  *
  * Authors:
  *
@@ -66,11 +66,11 @@ static void     EndThread               (lpcmdec_thread_t * p_adec);
 vlc_thread_t lpcmdec_CreateThread (adec_config_t * p_config)
 {
     lpcmdec_thread_t *   p_lpcmdec;
-    intf_DbgMsg ( "LPCM Debug: creating lpcm decoder thread\n" );
+    intf_DbgMsg ( "LPCM Debug: creating lpcm decoder thread" );
 
     /* Allocate the memory needed to store the thread's structure */
     if ((p_lpcmdec = (lpcmdec_thread_t *)malloc (sizeof(lpcmdec_thread_t))) == NULL) {
-        intf_ErrMsg ( "LPCM Error: not enough memory for lpcmdec_CreateThread() to create the new thread\n" );
+        intf_ErrMsg ( "LPCM Error: not enough memory for lpcmdec_CreateThread() to create the new thread" );
         return 0;
     }
 
@@ -92,12 +92,12 @@ vlc_thread_t lpcmdec_CreateThread (adec_config_t * p_config)
 
     /* Spawn the lpcm decoder thread */
     if (vlc_thread_create(&p_lpcmdec->thread_id, "lpcm decoder", (vlc_thread_func_t)RunThread, (void *)p_lpcmdec)) {
-        intf_ErrMsg  ( "LPCM Error: can't spawn lpcm decoder thread\n" );
+        intf_ErrMsg  ( "LPCM Error: can't spawn lpcm decoder thread" );
         free (p_lpcmdec);
         return 0;
     }
 
-    intf_DbgMsg ( "LPCM Debug: lpcm decoder thread (%p) created\n", p_lpcmdec );
+    intf_DbgMsg ( "LPCM Debug: lpcm decoder thread (%p) created", p_lpcmdec );
     return p_lpcmdec->thread_id;
 }
 
@@ -111,7 +111,7 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
     aout_fifo_t         aout_fifo;
     lpcm_byte_stream_t * byte_stream;
 
-    intf_DbgMsg ( "LPCM Debug: initializing lpcm decoder thread %p\n", p_lpcmdec );
+    intf_DbgMsg ( "LPCM Debug: initializing lpcm decoder thread %p", p_lpcmdec );
 
     /* Our first job is to initialize the bit stream structure with the
      * beginning of the input stream */
@@ -141,7 +141,7 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
         return -1;
     }
 
-    intf_DbgMsg ( "LPCM Debug: lpcm decoder thread %p initialized\n", p_lpcmdec );
+    intf_DbgMsg ( "LPCM Debug: lpcm decoder thread %p initialized", p_lpcmdec );
     return 0;
 }
 
@@ -152,7 +152,7 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
 {
     int sync;
 
-    intf_DbgMsg( "LPCM Debug: running lpcm decoder thread (%p) (pid== %i)\n", p_lpcmdec, getpid() );
+    intf_DbgMsg( "LPCM Debug: running lpcm decoder thread (%p) (pid== %i)", p_lpcmdec, getpid() );
 
     /* Fucking holy piece of shit ! */
     //msleep (INPUT_PTS_DELAY);
@@ -204,7 +204,7 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
 	    vlc_cond_signal (&p_lpcmdec->p_aout_fifo->data_wait);
 	    vlc_mutex_unlock (&p_lpcmdec->p_aout_fifo->data_lock);
 
-        intf_DbgMsg( "LPCM Debug: %x\n", *buffer );
+        intf_DbgMsg( "LPCM Debug: %x", *buffer );
         bad_frame:
     }
 
@@ -249,7 +249,7 @@ static void ErrorThread (lpcmdec_thread_t * p_lpcmdec)
  *****************************************************************************/
 static void EndThread (lpcmdec_thread_t * p_lpcmdec)
 {
-    intf_DbgMsg( "LPCM Debug: destroying lpcm decoder thread %p\n", p_lpcmdec );
+    intf_DbgMsg( "LPCM Debug: destroying lpcm decoder thread %p", p_lpcmdec );
 
     /* If the audio output fifo was created, we destroy it */
     if (p_lpcmdec->p_aout_fifo != NULL) {
@@ -264,7 +264,7 @@ static void EndThread (lpcmdec_thread_t * p_lpcmdec)
     /* Destroy descriptor */
     free (p_lpcmdec);
 
-    intf_DbgMsg( "LPCM Debug: lpcm decoder thread %p destroyed\n", p_lpcmdec );
+    intf_DbgMsg( "LPCM Debug: lpcm decoder thread %p destroyed", p_lpcmdec );
 }
 
 void lpcm_byte_stream_next (lpcm_byte_stream_t * p_byte_stream)

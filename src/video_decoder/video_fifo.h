@@ -2,7 +2,7 @@
  * video_fifo.h : FIFO for the pool of video_decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_fifo.h,v 1.1 2000/12/21 17:19:52 massiot Exp $
+ * $Id: video_fifo.h,v 1.2 2000/12/22 13:04:45 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -91,7 +91,7 @@ static __inline__ macroblock_t * vpar_NewMacroblock( video_fifo_t * p_fifo )
     while( P_buffer.i_index == -1 )
     {
         /* No more structures available. This should not happen ! */
-        intf_DbgMsg("vpar debug: macroblock list is empty, delaying\n");
+        intf_DbgMsg("vpar debug: macroblock list is empty, delaying");
         vlc_mutex_unlock( &P_buffer.lock );
         if( p_fifo->p_vpar->b_die )
         {
@@ -150,7 +150,7 @@ static __inline__ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo,
     /* Test if it was the last block of the picture */
     if( b_finished )
     {
-//intf_DbgMsg( "Image decodee\n" );
+//intf_DbgMsg( "Image decodee" );
         /* Mark the picture to be displayed */
         vout_DisplayPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
 
@@ -206,7 +206,7 @@ static __inline__ void vpar_DestroyMacroblock( video_fifo_t * p_fifo,
     /* Test if it was the last block of the picture */
     if( b_finished )
     {
-        intf_DbgMsg( "Image trashee\n" );
+        intf_DbgMsg( "Image trashee" );
         /* Mark the picture to be trashed */
         vout_DestroyPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
 

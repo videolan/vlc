@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.20 2000/12/21 13:07:45 massiot Exp $
+ * $Id: input_netlist.c,v 1.21 2000/12/22 13:04:45 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -59,7 +59,7 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
     p_input->p_method_data = malloc(sizeof(netlist_t));
     if ( p_input->p_method_data == NULL )
     {
-        intf_ErrMsg("Unable to malloc the netlist struct\n");
+        intf_ErrMsg("Unable to malloc the netlist struct");
         return (-1);
     }
     
@@ -70,7 +70,7 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
         (byte_t *) malloc(i_buffer_size* i_nb_data );
     if ( p_netlist->p_buffers == NULL )
     {
-        intf_ErrMsg ("Unable to malloc in netlist initialization (1)\n");
+        intf_ErrMsg ("Unable to malloc in netlist initialization (1)");
         return (-1);
     }
     
@@ -78,7 +78,7 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
         (data_packet_t *) malloc(sizeof(data_packet_t)*(i_nb_data));
     if ( p_netlist->p_data == NULL )
     {
-        intf_ErrMsg ("Unable to malloc in netlist initialization (2)\n");
+        intf_ErrMsg ("Unable to malloc in netlist initialization (2)");
         return (-1);
     }
     
@@ -86,7 +86,7 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
         (pes_packet_t *) malloc(sizeof(pes_packet_t)*(i_nb_pes));
     if ( p_netlist->p_pes == NULL )
     {
-        intf_ErrMsg ("Unable to malloc in netlist initialization (3)\n");
+        intf_ErrMsg ("Unable to malloc in netlist initialization (3)");
         return (-1);
     }
     
@@ -95,20 +95,20 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
         (data_packet_t **) malloc (i_nb_data * sizeof(data_packet_t *) );
     if ( p_netlist->pp_free_data == NULL )
     {
-        intf_ErrMsg ("Unable to malloc in netlist initialization (4)\n");
+        intf_ErrMsg ("Unable to malloc in netlist initialization (4)");
     }
     p_netlist->pp_free_pes = 
         (pes_packet_t **) malloc (i_nb_pes * sizeof(pes_packet_t *) );
     if ( p_netlist->pp_free_pes == NULL )
     {
-        intf_ErrMsg ("Unable to malloc in netlist initialization (5)\n");
+        intf_ErrMsg ("Unable to malloc in netlist initialization (5)");
     }
     
     p_netlist->p_free_iovec = ( struct iovec * )
         malloc( (i_nb_data + INPUT_READ_ONCE) * sizeof(struct iovec) );
     if ( p_netlist->p_free_iovec == NULL )
     {
-        intf_ErrMsg ("Unable to malloc in netlist initialization (6)\n");
+        intf_ErrMsg ("Unable to malloc in netlist initialization (6)");
     }
     
     /* Fill the data FIFO */
@@ -184,7 +184,7 @@ struct iovec * input_NetlistGetiovec( void * p_method_data )
      (p_netlist->i_iovec_end - p_netlist->i_iovec_start)%p_netlist->i_nb_data 
      < INPUT_READ_ONCE )
     {
-        intf_ErrMsg("Empty iovec FIFO. Unable to allocate memory\n");
+        intf_ErrMsg("Empty iovec FIFO. Unable to allocate memory");
         return (NULL);
     }
 
@@ -251,7 +251,7 @@ struct data_packet_s * input_NetlistNewPacket( void * p_method_data,
     /* check */
     if ( p_netlist->i_data_start == p_netlist->i_data_end )
     {
-        intf_ErrMsg("Empty Data FIFO in netlist. Unable to allocate memory\n");
+        intf_ErrMsg("Empty Data FIFO in netlist. Unable to allocate memory");
         return ( NULL );
     }
     
@@ -297,7 +297,7 @@ struct pes_packet_s * input_NetlistNewPES( void * p_method_data )
     /* check */
     if ( p_netlist->i_pes_start == p_netlist->i_pes_end )
     {
-        intf_ErrMsg("Empty PES FIFO in netlist - Unable to allocate memory\n");
+        intf_ErrMsg("Empty PES FIFO in netlist - Unable to allocate memory");
         return ( NULL );
     }
 

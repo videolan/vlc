@@ -65,7 +65,7 @@ int yuv_MMXInit( vout_thread_t *p_vout )
         p_vout->yuv.p_base = malloc( tables_size );
         if( p_vout->yuv.p_base == NULL )
         {
-            intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+            intf_ErrMsg("error: %s", strerror(ENOMEM));
             return( 1 );
         }
     }
@@ -78,14 +78,14 @@ int yuv_MMXInit( vout_thread_t *p_vout )
     p_vout->yuv.p_buffer = malloc( VOUT_MAX_WIDTH * p_vout->i_bytes_per_pixel );
     if( p_vout->yuv.p_buffer == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        intf_ErrMsg("error: %s", strerror(ENOMEM));
         free( p_vout->yuv.p_base );
         return( 1 );
     }
     p_vout->yuv.p_offset = malloc( p_vout->i_width * sizeof( int ) );
     if( p_vout->yuv.p_offset == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        intf_ErrMsg("error: %s", strerror(ENOMEM));
         free( p_vout->yuv.p_base );
         free( p_vout->yuv.p_buffer );
         return( 1 );
@@ -197,7 +197,7 @@ void SetYUV( vout_thread_t *p_vout )
                             && r <= RGB_MAX && g <= RGB_MAX && b <= RGB_MAX )
                     {
                         /* this one should never happen unless someone fscked up my code */
-                        if(j == 256) { intf_ErrMsg( "vout error: no colors left to build palette\n" ); break; }
+                        if(j == 256) { intf_ErrMsg( "vout error: no colors left to build palette" ); break; }
 
                         /* clip the colors */
                         red[j] = CLIP( r );

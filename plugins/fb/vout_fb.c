@@ -86,14 +86,14 @@ int vout_FBCreate( vout_thread_t *p_vout, char *psz_display,
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg("error: %s", strerror(ENOMEM) );
         return( 1 );
     }
 
     /* Open and initialize device */
     if( FBOpenDisplay( p_vout ) )
     {
-        intf_ErrMsg("vout error: can't open display\n");
+        intf_ErrMsg("vout error: can't open display");
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -141,7 +141,7 @@ int vout_FBManage( vout_thread_t *p_vout )
      */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_DbgMsg("resizing window\n");
+        intf_DbgMsg("resizing window");
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         /* Destroy XImages to change their size */
@@ -150,7 +150,7 @@ int vout_FBManage( vout_thread_t *p_vout )
         /* Recreate XImages. If SysInit failed, the thread can't go on. */
         if( vout_FBInit( p_vout ) )
         {
-            intf_ErrMsg("error: can't resize display\n");
+            intf_ErrMsg("error: can't resize display");
             return( 1 );
         }
 
@@ -158,7 +158,7 @@ int vout_FBManage( vout_thread_t *p_vout )
         /* Tell the video output thread that it will need to rebuild YUV
          * tables. This is needed since conversion buffer size may have changed */
         p_vout->i_changes |= VOUT_YUV_CHANGE;
-        intf_Msg("Video display resized (%dx%d)\n", p_vout->i_width, p_vout->i_height);
+        intf_Msg("Video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
 #endif
     }
 
@@ -226,14 +226,14 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->i_fb_dev = open( psz_device, O_RDWR);
     if( p_vout->p_sys->i_fb_dev == -1 )
     {
-        intf_ErrMsg("vout error: can't open %s (%s)\n", psz_device, strerror(errno) );
+        intf_ErrMsg("vout error: can't open %s (%s)", psz_device, strerror(errno) );
         return( 1 );
     }
 
     /* Get framebuffer device informations */
     if( ioctl( p_vout->p_sys->i_fb_dev, FBIOGET_VSCREENINFO, &p_vout->p_sys->var_info ) )
     {
-        intf_ErrMsg( "vout error: can't get framebuffer informations (%s)\n", strerror(errno) );
+        intf_ErrMsg( "vout error: can't get framebuffer informations (%s)", strerror(errno) );
         close( p_vout->p_sys->i_fb_dev );
         return( 1 );
     }
@@ -245,12 +245,12 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->var_info.activate = FB_ACTIVATE_NXTOPEN;
     p_vout->p_sys->var_info.xoffset =  0;
     p_vout->p_sys->var_info.yoffset =  0;
-    intf_ErrMsg( "vout: ypanstep is %i\n", fix_info.ypanstep );
+    intf_ErrMsg( "vout: ypanstep is %i", fix_info.ypanstep );
     /* XXX?? ask sam p_vout->p_sys->mode_info.sync = FB_SYNC_VERT_HIGH_ACT; */
 
     if( ioctl( p_vout->p_sys->i_fb_dev, FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info ) )
     {
-        intf_ErrMsg("vout error: can't set framebuffer informations (%s)\n", strerror(errno) );
+        intf_ErrMsg("vout error: can't set framebuffer informations (%s)", strerror(errno) );
         close( p_vout->p_sys->i_fb_dev );
         return( 1 );
     }
@@ -259,7 +259,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
     if( ioctl( p_vout->p_sys->i_fb_dev, FBIOGET_FSCREENINFO, &fix_info ) ||
         ioctl( p_vout->p_sys->i_fb_dev, FBIOGET_VSCREENINFO, &p_vout->p_sys->var_info ) )
     {
-        intf_ErrMsg("vout error: can't get framebuffer informations (%s)\n", strerror(errno) );
+        intf_ErrMsg("vout error: can't get framebuffer informations (%s)", strerror(errno) );
         /* FIXME: restore fb config ?? */
         close( p_vout->p_sys->i_fb_dev );
         return( 1 );
@@ -267,7 +267,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
 
     /* FIXME: if the image is full-size, it gets cropped on the left
      * because of the xres / xres_virtual slight difference */
-    intf_Msg( "%ix%i (virtual %ix%i)\n", p_vout->p_sys->var_info.xres, p_vout->p_sys->var_info.yres, p_vout->p_sys->var_info.xres_virtual, p_vout->p_sys->var_info.yres_virtual );
+    intf_Msg( "%ix%i (virtual %ix%i)", p_vout->p_sys->var_info.xres, p_vout->p_sys->var_info.yres, p_vout->p_sys->var_info.xres_virtual, p_vout->p_sys->var_info.yres_virtual );
     p_vout->i_width =                   p_vout->p_sys->var_info.xres_virtual ? p_vout->p_sys->var_info.xres_virtual : p_vout->p_sys->var_info.xres;
     p_vout->i_height =                  p_vout->p_sys->var_info.yres;
     p_vout->i_screen_depth =            p_vout->p_sys->var_info.bits_per_pixel;
@@ -306,7 +306,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
         break;
 
     default:                                     /* unsupported screen depth */
-        intf_ErrMsg( "vout error: screen depth %d is not supported\n",
+        intf_ErrMsg( "vout error: screen depth %d is not supported",
                      p_vout->i_screen_depth);
         return( 1 );
         break;
@@ -336,7 +336,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
     memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size * 2 );
     if( (int)p_vout->p_sys->p_video == -1 ) /* according to man, it is -1. What about NULL ? */
     {
-        intf_ErrMsg("vout error: can't map video memory (%s)\n", strerror(errno) );
+        intf_ErrMsg("vout error: can't map video memory (%s)", strerror(errno) );
         /* FIXME: restore fb config ?? */
         close( p_vout->p_sys->i_fb_dev );
         return( 1 );
@@ -353,7 +353,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
 #endif
                 );
     
-    intf_DbgMsg("framebuffer type=%d, visual=%d, ypanstep=%d, ywrap=%d, accel=%d\n",
+    intf_DbgMsg("framebuffer type=%d, visual=%d, ypanstep=%d, ywrap=%d, accel=%d",
                 fix_info.type, fix_info.visual, fix_info.ypanstep, fix_info.ywrapstep, fix_info.accel );
     return( 0 );
 }

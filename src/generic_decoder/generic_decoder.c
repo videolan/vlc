@@ -117,8 +117,8 @@ gdec_thread_t * gdec_CreateThread( gdec_cfg_t *p_cfg, input_thread_t *p_input,
     /* Create thread */
     if( vlc_thread_create( &p_gdec->thread_id, "generic decoder", (vlc_thread_func)RunThread, (void *) p_gdec) )
     {
-        intf_ErrMsg("gdec error: %s\n", strerror(ENOMEM));
-        intf_DbgMsg("failed\n");
+        intf_ErrMsg("gdec error: %s", strerror(ENOMEM));
+        intf_DbgMsg("failed");
         free( p_gdec );
         return( NULL );
     }
@@ -133,12 +133,12 @@ gdec_thread_t * gdec_CreateThread( gdec_cfg_t *p_cfg, input_thread_t *p_input,
                 && (i_status != THREAD_FATAL) );
         if( i_status != THREAD_READY )
         {
-            intf_DbgMsg("failed\n");
+            intf_DbgMsg("failed");
             return( NULL );
         }
     }
 
-    intf_DbgMsg("succeeded -> %p\n", p_gdec);
+    intf_DbgMsg("succeeded -> %p", p_gdec);
     return( p_gdec );
 }
 
@@ -174,7 +174,7 @@ void gdec_DestroyThread( gdec_thread_t *p_gdec, int *pi_status )
                 && (i_status != THREAD_FATAL) );
     }
 
-    intf_DbgMsg("%p -> succeeded\n", p_gdec);
+    intf_DbgMsg("%p -> succeeded", p_gdec);
 }
 
 /* following functions are local */
@@ -221,7 +221,7 @@ static int InitThread( gdec_thread_t *p_gdec )
 
     /* Mark thread as running and return */
     *p_gdec->pi_status = THREAD_READY;
-    intf_DbgMsg("%p -> succeeded\n", p_gdec);
+    intf_DbgMsg("%p -> succeeded", p_gdec);
     return(0);
 }
 
@@ -364,7 +364,7 @@ static void EndThread( gdec_thread_t *p_gdec )
     free( p_gdec );                                    /* destroy descriptor */
 
     *pi_status = THREAD_OVER;
-    intf_DbgMsg("%p\n", p_gdec);
+    intf_DbgMsg("%p", p_gdec);
 }
 
 /*****************************************************************************
@@ -393,7 +393,7 @@ static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_strea
 
 #ifdef DEBUG
     default:                                            /* unknown id origin */
-        intf_DbgMsg("unable to identify PES using input method %d\n",
+        intf_DbgMsg("unable to identify PES using input method %d",
                     p_gdec->p_input->i_method );
         break;
 #endif
@@ -404,7 +404,7 @@ static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_strea
     {
         /* Dolby AC-3 stream - might be specific to DVD PS streams */
         i_type = MPEG2_AUDIO_ES;
-        intf_DbgMsg("PES %p identified as AUDIO AC3\n", p_pes);
+        intf_DbgMsg("PES %p identified as AUDIO AC3", p_pes);
     }
     else if( (i_stream_id & 0xe0) == 0xc0 )
     {
@@ -413,7 +413,7 @@ static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_strea
          * an ISO/IEC 13818-3 is capable of decoding an ISO/IEC 11172-3 stream,
          * the first one is used */
         i_type = MPEG2_AUDIO_ES;
-        intf_DbgMsg("PES %p identified as AUDIO MPEG\n", p_pes);
+        intf_DbgMsg("PES %p identified as AUDIO MPEG", p_pes);
     }
     else if( (i_stream_id & 0xf0) == 0xe0 )
     {
@@ -422,12 +422,12 @@ static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_strea
          * an ISO/IEC 13818-2 is capable of decoding an ISO/IEC 11172-2 stream,
          * the first one is used */
         i_type = MPEG2_VIDEO_ES;
-        intf_DbgMsg("PES %p identified as VIDEO\n", p_pes);
+        intf_DbgMsg("PES %p identified as VIDEO", p_pes);
     }
     else
     {
         /* The stream could not be identified - just return */
-        intf_DbgMsg("PES %p could not be identified\n", p_pes);
+        intf_DbgMsg("PES %p could not be identified", p_pes);
         return;
     }
 
@@ -460,5 +460,5 @@ static void PrintPES( pes_packet_t *p_pes, int i_stream_id )
     sprintf(psz_pes, "id 0x%x, %d bytes",
             i_stream_id, p_pes->i_pes_size );
 #endif
-    intf_Msg("gdec: PES %s\n", psz_pes );
+    intf_Msg("gdec: PES %s", psz_pes );
 }

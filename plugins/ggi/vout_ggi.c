@@ -77,14 +77,14 @@ int vout_GGICreate( vout_thread_t *p_vout, char *psz_display, int i_root_window,
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg("error: %s", strerror(ENOMEM) );
         return( 1 );
     }
 
     /* Open and initialize device */
     if( GGIOpenDisplay( p_vout, psz_display, p_data ) )
     {
-        intf_ErrMsg("error: can't initialize GGI display\n");
+        intf_ErrMsg("error: can't initialize GGI display");
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -189,7 +189,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
     /* Initialize library */
     if( ggiInit() )
     {
-        intf_ErrMsg("error: can't initialize GGI library\n");
+        intf_ErrMsg("error: can't initialize GGI library");
         return( 1 );
     }
 
@@ -197,7 +197,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
     p_vout->p_sys->p_display = ggiOpen( psz_display, NULL );
     if( p_vout->p_sys->p_display == NULL )
     {
-        intf_ErrMsg("error: can't open GGI default display\n");
+        intf_ErrMsg("error: can't open GGI default display");
         ggiExit();
         return( 1 );
     }
@@ -224,7 +224,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
     /* Set mode */
     if( ggiSetMode( p_vout->p_sys->p_display, &mode ) )
     {
-        intf_ErrMsg("error: can't set GGI mode\n");
+        intf_ErrMsg("error: can't set GGI mode");
         ggiClose( p_vout->p_sys->p_display );
         ggiExit();
         return( 1 );
@@ -239,7 +239,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
             (ggi_directbuffer *)ggiDBGetBuffer( p_vout->p_sys->p_display, i_index );
         if( p_vout->p_sys->p_buffer[ i_index ] == NULL )
         {
-            intf_ErrMsg("error: double buffering is not possible\n");
+            intf_ErrMsg("error: double buffering is not possible");
             ggiClose( p_vout->p_sys->p_display );
             ggiExit();
             return( 1 );
@@ -252,7 +252,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
             (p_vout->p_sys->p_buffer[ i_index ]->noaccess != 0) ||
             (p_vout->p_sys->p_buffer[ i_index ]->align != 0) )
         {
-            intf_ErrMsg("error: incorrect video memory type\n");
+            intf_ErrMsg("error: incorrect video memory type");
             ggiClose( p_vout->p_sys->p_display );
             ggiExit();
             return( 1 );
@@ -267,7 +267,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
 #ifdef DEBUG
     if( p_vout->p_sys->b_must_acquire )
     {
-        intf_DbgMsg("buffers must be acquired\n");
+        intf_DbgMsg("buffers must be acquired");
     }
 #endif
 
@@ -279,7 +279,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
         ggiSetGCBackground(p_vout->p_sys->p_display,
                            ggiMapColor(p_vout->p_sys->p_display,&col_bg)) )
     {
-        intf_ErrMsg("error: can't set colors\n");
+        intf_ErrMsg("error: can't set colors");
         ggiClose( p_vout->p_sys->p_display );
         ggiExit();
         return( 1 );
@@ -289,7 +289,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
     if( ggiSetGCClipping(p_vout->p_sys->p_display, 0, 0,
                          mode.visible.x, mode.visible.y ) )
     {
-        intf_ErrMsg("error: can't set clipping\n");
+        intf_ErrMsg("error: can't set clipping");
         ggiClose( p_vout->p_sys->p_display );
         ggiExit();
         return( 1 );

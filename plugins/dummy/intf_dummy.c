@@ -70,7 +70,7 @@ int intf_DummyCreate( intf_thread_t *p_intf )
         p_intf->p_vout = vout_CreateThread( NULL, 0, 0, 0, NULL, 0, NULL );
         if( p_intf->p_vout == NULL )                                /* error */
         {
-            intf_ErrMsg("intf error: can't create output thread\n" );
+            intf_ErrMsg("intf error: can't create output thread" );
             return( 1 );
         }
     }

@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.20 2000/12/21 14:18:15 massiot Exp $
+ * $Id: ac3_decoder_thread.c,v 1.21 2000/12/22 13:04:44 sam Exp $
  *
  * Authors:
  *
@@ -76,13 +76,13 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
 {
     ac3dec_thread_t *   p_ac3dec;
 
-    intf_DbgMsg( "ac3dec debug: creating ac3 decoder thread\n" );
+    intf_DbgMsg( "ac3dec debug: creating ac3 decoder thread" );
 
     /* Allocate the memory needed to store the thread's structure */
     if ((p_ac3dec = (ac3dec_thread_t *)malloc (sizeof(ac3dec_thread_t))) == NULL)
     {
         intf_ErrMsg ( "ac3dec error: not enough memory "
-                      "for ac3dec_CreateThread() to create the new thread\n");
+                      "for ac3dec_CreateThread() to create the new thread");
         return 0;
     }
 
@@ -104,12 +104,12 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
     /* Spawn the ac3 decoder thread */
     if (vlc_thread_create(&p_ac3dec->thread_id, "ac3 decoder", (vlc_thread_func_t)RunThread, (void *)p_ac3dec))
     {
-        intf_ErrMsg( "ac3dec error: can't spawn ac3 decoder thread\n" );
+        intf_ErrMsg( "ac3dec error: can't spawn ac3 decoder thread" );
         free (p_ac3dec);
         return 0;
     }
 
-    intf_DbgMsg ("ac3dec debug: ac3 decoder thread (%p) created\n", p_ac3dec);
+    intf_DbgMsg ("ac3dec debug: ac3 decoder thread (%p) created", p_ac3dec);
     return p_ac3dec->thread_id;
 }
 
@@ -123,7 +123,7 @@ static int InitThread (ac3dec_thread_t * p_ac3dec)
     aout_fifo_t         aout_fifo;
     ac3_byte_stream_t * byte_stream;
 
-    intf_DbgMsg ("ac3dec debug: initializing ac3 decoder thread %p\n", p_ac3dec);
+    intf_DbgMsg ("ac3dec debug: initializing ac3 decoder thread %p", p_ac3dec);
 
     /* Get the first data packet. */
     vlc_mutex_lock( &p_ac3dec->p_fifo->data_lock );
@@ -155,7 +155,7 @@ static int InitThread (ac3dec_thread_t * p_ac3dec)
         return -1;
     }
 
-    intf_DbgMsg ("ac3dec debug: ac3 decoder thread %p initialized\n", p_ac3dec);
+    intf_DbgMsg ("ac3dec debug: ac3 decoder thread %p initialized", p_ac3dec);
     return 0;
 }
 
@@ -166,7 +166,7 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
 {
     int sync;
 
-    intf_DbgMsg ("ac3dec debug: running ac3 decoder thread (%p) (pid == %i)\n", p_ac3dec, getpid());
+    intf_DbgMsg ("ac3dec debug: running ac3 decoder thread (%p) (pid == %i)", p_ac3dec, getpid());
 
     /* FIXME ! Qu'est-ce que c'est que ce bordel !?!?!?!? --Meuuh */
     //msleep (INPUT_PTS_DELAY);
@@ -191,7 +191,7 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
             int ptr;
             ac3_byte_stream_t * p_byte_stream;
 
-            intf_DbgMsg ("ac3dec: sync\n");
+            intf_DbgMsg ("ac3dec: sync");
 
             p_byte_stream = ac3_byte_stream (&p_ac3dec->ac3_decoder);
 
@@ -307,7 +307,7 @@ static void ErrorThread (ac3dec_thread_t * p_ac3dec)
  *****************************************************************************/
 static void EndThread (ac3dec_thread_t * p_ac3dec)
 {
-    intf_DbgMsg ("ac3dec debug: destroying ac3 decoder thread %p\n", p_ac3dec);
+    intf_DbgMsg ("ac3dec debug: destroying ac3 decoder thread %p", p_ac3dec);
 
     /* If the audio output fifo was created, we destroy it */
     if (p_ac3dec->p_aout_fifo != NULL)
@@ -324,7 +324,7 @@ static void EndThread (ac3dec_thread_t * p_ac3dec)
     free( p_ac3dec->p_config );
     free( p_ac3dec );
 
-    intf_DbgMsg ("ac3dec debug: ac3 decoder thread %p destroyed\n", p_ac3dec);
+    intf_DbgMsg ("ac3dec debug: ac3 decoder thread %p destroyed", p_ac3dec);
 }
 
 void ac3_byte_stream_next (ac3_byte_stream_t * p_byte_stream)

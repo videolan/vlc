@@ -212,14 +212,14 @@ vout_font_t *vout_LoadFont( const char *psz_name )
     i_file = open( psz_name, O_RDONLY );
     if( i_file == -1 )
     {
-        intf_DbgMsg("vout: can't open file '%s' (%s)\n", psz_name, strerror(errno));
+        intf_DbgMsg("vout: can't open file '%s' (%s)", psz_name, strerror(errno));
         return( NULL );
     }
 
     /* Read magick number */
     if( read( i_file, pi_buffer, 2 ) != 2 )
     {
-        intf_ErrMsg("vout error: unexpected end of file '%s'\n", psz_name );
+        intf_ErrMsg("vout error: unexpected end of file '%s'", psz_name );
         close( i_file );
         return( NULL );
     }
@@ -228,7 +228,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
     p_font = malloc( sizeof( vout_font_t ) );
     if( p_font == NULL )
     {
-        intf_ErrMsg("vout error: %s\n", strerror(ENOMEM));
+        intf_ErrMsg("vout error: %s", strerror(ENOMEM));
         close( i_file );
         return( NULL );
     }
@@ -245,7 +245,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
         /* Read font header - two bytes indicate the font properties */
         if( read( i_file, pi_buffer, 2 ) != 2)
         {
-            intf_ErrMsg("error: unexpected end of file '%s'\n", psz_name );
+            intf_ErrMsg("error: unexpected end of file '%s'", psz_name );
             free( p_font );
             close( i_file );
             return( NULL );
@@ -265,7 +265,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
         p_font->p_data = malloc( 2 * 256 * pi_buffer[1] );
         if( p_font->p_data == NULL )
         {
-            intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+            intf_ErrMsg("error: %s", strerror(ENOMEM));
             free( p_font );
             close( i_file );
             return( NULL );
@@ -274,7 +274,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
         /* Copy raw data */
         if( read( i_file, p_font->p_data, 256 * pi_buffer[1] ) != 256 * pi_buffer[1] )
         {
-            intf_ErrMsg("error: unexpected end of file '%s'\n", psz_name );
+            intf_ErrMsg("error: unexpected end of file '%s'", psz_name );
             free( p_font->p_data );
             free( p_font );
             close( i_file );
@@ -300,7 +300,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
 
         break;
     default:
-        intf_ErrMsg("error: file '%s' has an unknown format\n", psz_name );
+        intf_ErrMsg("error: file '%s' has an unknown format", psz_name );
         free( p_font );
         close( i_file );
         return( NULL );
@@ -308,7 +308,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
     }
 
 
-    intf_DbgMsg( "loaded %s: type %d, %d-%dx%d\n", psz_name, p_font->i_type,
+    intf_DbgMsg( "loaded %s: type %d, %d-%dx%d", psz_name, p_font->i_type,
                  p_font->i_width, p_font->i_interspacing, p_font->i_height );
     return( p_font );
 }
@@ -320,7 +320,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
  *****************************************************************************/
 void vout_UnloadFont( vout_font_t *p_font )
 {
-    intf_DbgMsg( "vout: unloading font %p\n", p_font );
+    intf_DbgMsg( "vout: unloading font %p", p_font );
     free( p_font->p_data );
     free( p_font );
 }
@@ -346,7 +346,7 @@ void vout_TextSize( vout_font_t *p_font, int i_style, const char *psz_text, int 
         break;
 #ifdef DEBUG
     default:
-        intf_DbgMsg("error: unknown font type %d\n", p_font->i_type );
+        intf_DbgMsg("error: unknown font type %d", p_font->i_type );
         break;
 #endif
     }
@@ -455,7 +455,7 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
                 break;
 #ifdef DEBUG
             default:
-                intf_DbgMsg("error: unknown font type %d\n", p_font->i_type );
+                intf_DbgMsg("error: unknown font type %d", p_font->i_type );
                 break;
 #endif
             }

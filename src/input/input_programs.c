@@ -3,7 +3,7 @@
  * FIXME : check the return value of realloc() and malloc() !
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.14 2000/12/22 10:58:27 massiot Exp $
+ * $Id: input_programs.c,v 1.15 2000/12/22 13:04:45 sam Exp $
  *
  * Authors:
  *
@@ -354,28 +354,28 @@ void input_DumpStream( input_thread_t * p_input )
 {
     int i, j;
 #define S   p_input->stream
-    intf_Msg( "input info: Dumping stream ID 0x%x\n", S.i_stream_id );
+    intf_Msg( "input info: Dumping stream ID 0x%x", S.i_stream_id );
     if( S.b_seekable )
-        intf_Msg( "input info: seekable stream, position: %d/%d\n",
+        intf_Msg( "input info: seekable stream, position: %d/%d",
                   S.i_tell, S.i_size );
     else
-        intf_Msg( "input info: %s\n", S.b_pace_control ? "pace controlled" :
+        intf_Msg( "input info: %s", S.b_pace_control ? "pace controlled" :
                   "pace un-controlled" );
 #undef S
     for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
     {
 #define P   p_input->stream.pp_programs[i]
-        intf_Msg( "input info: Dumping program 0x%x, version %d (%s)\n",
+        intf_Msg( "input info: Dumping program 0x%x, version %d (%s)",
                   P->i_number, P->i_version,
                   P->b_is_ok ? "complete" : "partial" );
         if( P->i_synchro_state == SYNCHRO_OK )
-            intf_Msg( "input info: synchro absolute delta : %lld (jitter : %lld)\n",
+            intf_Msg( "input info: synchro absolute delta : %lld (jitter : %lld)",
                       P->delta_absolute, P->delta_cr );
 #undef P
         for( j = 0; j < p_input->stream.pp_programs[i]->i_es_number; j++ )
         {
 #define ES  p_input->stream.pp_programs[i]->pp_es[j]
-            intf_Msg( "input info: ES 0x%x, stream 0x%x, type 0x%x, %s\n",
+            intf_Msg( "input info: ES 0x%x, stream 0x%x, type 0x%x, %s",
                       ES->i_id, ES->i_stream_id, ES->i_type,
                       ES->p_decoder_fifo != NULL ? "selected" : "not selected");
 #undef ES

@@ -47,14 +47,14 @@ playlist_t * playlist_Create ( void )
     p_playlist = malloc( sizeof( playlist_t ) );
     if( !p_playlist )
     {
-        intf_ErrMsg("playlist error: %s\n", strerror( ENOMEM ) );
+        intf_ErrMsg("playlist error: %s", strerror( ENOMEM ) );
         return( NULL );
     }
 
     p_playlist->i_index = 0;
     p_playlist->p_list = NULL;
 
-    intf_Msg("Playlist initialized\n");
+    intf_Msg("Playlist initialized");
     return( p_playlist );
 }
 

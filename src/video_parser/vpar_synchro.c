@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.62 2000/12/21 17:19:54 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.63 2000/12/22 13:04:45 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -263,7 +263,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                 b_decode = (pts - now) > (TAU_PRIME(I_CODING_TYPE) + DELTA);
             }
             if( !b_decode )
-                intf_WarnMsg( 3, "vpar synchro warning: trashing I\n" );
+                intf_WarnMsg( 3, "vpar synchro warning: trashing I" );
             break;
 
         case P_CODING_TYPE:
@@ -333,7 +333,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 
         vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
 #ifdef DEBUG_VPAR
-        intf_DbgMsg("vpar synchro debug: %s picture scheduled for %s, %s (%lld)\n",
+        intf_DbgMsg("vpar synchro debug: %s picture scheduled for %s, %s (%lld)",
                     i_coding_type == B_CODING_TYPE ? "B" :
                     (i_coding_type == P_CODING_TYPE ? "P" : "I"),
                     mstrtime(p_date, pts), b_decode ? "decoding" : "trashed",
@@ -376,7 +376,7 @@ void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
     else
     {
         /* FIFO full, panic() */
-        intf_ErrMsg("vpar error: synchro fifo full, estimations will be biased\n");
+        intf_ErrMsg("vpar error: synchro fifo full, estimations will be biased");
     }
     vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
 
@@ -408,7 +408,7 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_garbage )
             p_vpar->synchro.pi_meaningful[i_coding_type]++;
         }
 #ifdef DEBUG_VPAR
-        intf_DbgMsg("vpar synchro debug: finished decoding %s (%lld)\n",
+        intf_DbgMsg("vpar synchro debug: finished decoding %s (%lld)",
                     i_coding_type == B_CODING_TYPE ? "B" :
                     (i_coding_type == P_CODING_TYPE ? "P" : "I"), tau);
 #endif
@@ -498,7 +498,7 @@ static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
 #ifdef STATS
         if( p_vpar->synchro.i_type == VPAR_SYNCHRO_DEFAULT )
         {
-            intf_Msg( "vpar synchro stats: I(%lld) P(%lld)[%d] B(%lld)[%d] YUV(%lld) : %d/%d\n",
+            intf_Msg( "vpar synchro stats: I(%lld) P(%lld)[%d] B(%lld)[%d] YUV(%lld) : %d/%d",
                   p_vpar->synchro.p_tau[I_CODING_TYPE],
                   p_vpar->synchro.p_tau[P_CODING_TYPE],
                   p_vpar->synchro.i_n_p,
@@ -530,7 +530,7 @@ static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
             if( p_pes->i_pts < p_vpar->synchro.current_pts )
             {
                 intf_WarnMsg( 2,
-                        "vpar synchro warning: pts_date < current_date\n" );
+                        "vpar synchro warning: pts_date < current_date" );
             }
             p_vpar->synchro.current_pts = p_pes->i_pts;
             p_pes->b_has_pts = 0;
@@ -551,7 +551,7 @@ static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
             if( p_vpar->synchro.backward_pts < p_vpar->synchro.current_pts )
             {
                 intf_WarnMsg( 2,
-                        "vpar warning: backward_date < current_date\n" );
+                        "vpar warning: backward_date < current_date" );
             }
             p_vpar->synchro.current_pts = p_vpar->synchro.backward_pts;
             p_vpar->synchro.backward_pts = 0;

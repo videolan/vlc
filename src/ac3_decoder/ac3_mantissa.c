@@ -202,7 +202,7 @@ static __inline__ float float_get (ac3dec_t * p_ac3dec, u16 bap, u16 exp)
 	group_code = p_ac3dec->bit_stream.buffer >> (32 - 5);
 	DumpBits (&(p_ac3dec->bit_stream), 5);
 	if (group_code >= 27) {
-	    intf_ErrMsg ( "ac3dec error: invalid mantissa\n" );
+	    intf_ErrMsg ( "ac3dec error: invalid mantissa" );
 	}
 
 	q_1[ 1 ] = q_1_1[ group_code ];
@@ -221,7 +221,7 @@ static __inline__ float float_get (ac3dec_t * p_ac3dec, u16 bap, u16 exp)
 	DumpBits (&(p_ac3dec->bit_stream), 7);
 
 	if (group_code >= 125) {
-	    intf_ErrMsg ( "ac3dec error: invalid mantissa\n" );
+	    intf_ErrMsg ( "ac3dec error: invalid mantissa" );
 	}
 
 	q_2[ 1 ] = q_2_1[ group_code ];
@@ -237,7 +237,7 @@ static __inline__ float float_get (ac3dec_t * p_ac3dec, u16 bap, u16 exp)
 	DumpBits (&(p_ac3dec->bit_stream), 3);
 
 	if (group_code >= 7) {
-	    intf_ErrMsg ( "ac3dec error: invalid mantissa\n" );
+	    intf_ErrMsg ( "ac3dec error: invalid mantissa" );
 	}
 
 	return (q_3[group_code] * exp_lut[exp]);
@@ -251,7 +251,7 @@ static __inline__ float float_get (ac3dec_t * p_ac3dec, u16 bap, u16 exp)
 	DumpBits (&(p_ac3dec->bit_stream), 7);
 
 	if (group_code >= 121) {
-	    intf_ErrMsg ( "ac3dec error: invalid mantissa\n" );
+	    intf_ErrMsg ( "ac3dec error: invalid mantissa" );
 	}
 
 	q_4[ 0 ] = q_4_1[ group_code ];
@@ -266,7 +266,7 @@ static __inline__ float float_get (ac3dec_t * p_ac3dec, u16 bap, u16 exp)
 	DumpBits (&(p_ac3dec->bit_stream), 4);
 
 	if (group_code >= 15) {
-	    intf_ErrMsg ( "ac3dec error: invalid mantissa\n" );
+	    intf_ErrMsg ( "ac3dec error: invalid mantissa" );
 	}
 
 	return (q_5[group_code] * exp_lut[exp]);

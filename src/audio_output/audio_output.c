@@ -205,7 +205,7 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
     long            l_bytes;
     void *          aout_thread = NULL;
 
-    intf_DbgMsg("aout debug: spawning audio output thread (%p)\n", p_aout);
+    intf_DbgMsg("aout debug: spawning audio output thread (%p)", p_aout);
 
     /* We want the audio output thread to live */
     p_aout->b_die = 0;
@@ -258,7 +258,7 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
                     break;
 
                 default:
-                    intf_ErrMsg( "aout error: unknown audio output format (%i)\n",
+                    intf_ErrMsg( "aout error: unknown audio output format (%i)",
                                  p_aout->i_format );
                     return( -1 );
             }
@@ -291,14 +291,14 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
                     break;
 
                 default:
-                    intf_ErrMsg("aout error: unknown audio output format (%i)\n",
+                    intf_ErrMsg("aout error: unknown audio output format (%i)",
                         p_aout->i_format);
                     return( -1 );
             }
             break;
 
         default:
-            intf_ErrMsg("aout error: unknown number of audio channels (%i)\n",
+            intf_ErrMsg("aout error: unknown number of audio channels (%i)",
                 p_aout->i_channels );
             return( -1 );
     }
@@ -307,12 +307,12 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
      * the s32 buffer's memory */
     if ( (p_aout->buffer = malloc(l_bytes)) == NULL )
     {
-        intf_ErrMsg("aout error: not enough memory to create the output buffer\n");
+        intf_ErrMsg("aout error: not enough memory to create the output buffer");
         return( -1 );
     }
     if ( (p_aout->s32_buffer = (s32 *)calloc(p_aout->l_units, sizeof(s32) << ( p_aout->b_stereo))) == NULL )
     {
-        intf_ErrMsg("aout error: not enough memory to create the s32 output buffer\n");
+        intf_ErrMsg("aout error: not enough memory to create the s32 output buffer");
         free( p_aout->buffer );
         return( -1 );
     }
@@ -324,13 +324,13 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
     /* Launch the thread */
     if ( vlc_thread_create( &p_aout->thread_id, "audio output", (vlc_thread_func_t)aout_thread, p_aout ) )
     {
-        intf_ErrMsg("aout error: can't spawn audio output thread (%p)\n", p_aout);
+        intf_ErrMsg("aout error: can't spawn audio output thread (%p)", p_aout);
         free( p_aout->buffer );
         free( p_aout->s32_buffer );
         return( -1 );
     }
 
-    intf_DbgMsg("aout debug: audio output thread (%p) spawned\n", p_aout);
+    intf_DbgMsg("aout debug: audio output thread (%p) spawned", p_aout);
     return( 0 );
 }
 
@@ -341,7 +341,7 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
 {
     /* FIXME: pi_status is not handled correctly: check vout how to do!?? */
 
-    intf_DbgMsg("aout debug: requesting termination of audio output thread (%p)\n", p_aout);
+    intf_DbgMsg("aout debug: requesting termination of audio output thread (%p)", p_aout);
 
     /* Ask thread to kill itself and wait until it's done */
     p_aout->b_die = 1;
@@ -353,7 +353,7 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
 
     /* Free the structure */
     p_aout->p_sys_close( p_aout );
-    intf_DbgMsg("aout debug: audio device (%s) closed\n", p_aout->psz_device);
+    intf_DbgMsg("aout debug: audio device (%s) closed", p_aout->psz_device);
 
     /* Free structure */
     free( p_aout );
@@ -379,7 +379,7 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
     }
     if ( i_fifo == AOUT_MAX_FIFOS )
     {
-        intf_ErrMsg("aout error: no empty fifo available\n");
+        intf_ErrMsg("aout error: no empty fifo available");
         vlc_mutex_unlock( &p_aout->fifos_lock );
         return( NULL );
     }
@@ -417,7 +417,7 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
              * for (AOUT_FIFO_SIZE+1) audio frames. */
             if ( (p_aout->fifo[i_fifo].buffer = malloc( sizeof(s16)*(AOUT_FIFO_SIZE+1)*p_fifo->l_frame_size )) == NULL )
             {
-                intf_ErrMsg("aout error: not enough memory to create the frames buffer\n");
+                intf_ErrMsg("aout error: not enough memory to create the frames buffer");
                 p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO;
                 vlc_mutex_unlock( &p_aout->fifos_lock );
                 return( NULL );
@@ -426,7 +426,7 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
             /* Allocate the memory needed to store the dates of the frames */
             if ( (p_aout->fifo[i_fifo].date = (mtime_t *)malloc( sizeof(mtime_t)*(AOUT_FIFO_SIZE+1) )) == NULL )
             {
-                intf_ErrMsg("aout error: not enough memory to create the dates buffer\n");
+                intf_ErrMsg("aout error: not enough memory to create the dates buffer");
                 free( p_aout->fifo[i_fifo].buffer );
                 p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO;
                 vlc_mutex_unlock( &p_aout->fifos_lock );
@@ -448,7 +448,7 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
             break;
 
         default:
-            intf_ErrMsg("aout error: unknown fifo type (%i)\n", p_aout->fifo[i_fifo].i_type);
+            intf_ErrMsg("aout error: unknown fifo type (%i)", p_aout->fifo[i_fifo].i_type);
             p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO;
             vlc_mutex_unlock( &p_aout->fifos_lock );
             return( NULL );
@@ -458,7 +458,7 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
     vlc_mutex_unlock( &p_aout->fifos_lock );
 
     /* Return the pointer to the fifo structure */
-    intf_DbgMsg("aout debug: audio output fifo (%p) allocated\n", &p_aout->fifo[i_fifo]);
+    intf_DbgMsg("aout debug: audio output fifo (%p) allocated", &p_aout->fifo[i_fifo]);
     return( &p_aout->fifo[i_fifo] );
 }
 
@@ -467,7 +467,7 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
  *****************************************************************************/
 void aout_DestroyFifo( aout_fifo_t * p_fifo )
 {
-    intf_DbgMsg("aout debug: requesting destruction of audio output fifo (%p)\n", p_fifo);
+    intf_DbgMsg("aout debug: requesting destruction of audio output fifo (%p)", p_fifo);
     p_fifo->b_die = 1;
 }
 
@@ -546,7 +546,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
     l_units = ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) * (p_fifo->l_frame_size >> (p_fifo->b_stereo));
 
     l_rate = p_fifo->l_rate + ((aout_date - p_fifo->date[p_fifo->l_start_frame]) / 256);
-    intf_DbgMsg( "aout debug: %lli (%li);\n", aout_date - p_fifo->date[p_fifo->l_start_frame], l_rate );
+    intf_DbgMsg( "aout debug: %lli (%li);", aout_date - p_fifo->date[p_fifo->l_start_frame], l_rate );
 
     InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->l_rate );
 
@@ -573,7 +573,7 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
     long l_buffer, l_buffer_limit;
     long l_units, l_bytes;
 
-    intf_DbgMsg("adec debug: running audio output U8_M_thread (%p) (pid == %i)\n", p_aout, getpid());
+    intf_DbgMsg("adec debug: running audio output U8_M_thread (%p) (pid == %i)", p_aout, getpid());
 
     /* As the s32_buffer was created with calloc(), we don't have to set this
      * memory to zero and we can immediately jump into the thread's loop */
@@ -612,7 +612,7 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                         }
                         free( p_aout->fifo[i_fifo].buffer ); /* !! */
                         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]); /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]); /* !! */
                     }
                     break;
 
@@ -643,7 +643,7 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                         }
                         free( p_aout->fifo[i_fifo].buffer ); /* !! */
                         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]); /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]); /* !! */
                     }
                     break;
 
@@ -653,7 +653,7 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                         free( p_aout->fifo[i_fifo].buffer );
                         free( p_aout->fifo[i_fifo].date );
                         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]);
                         continue;
                     }
 
@@ -726,7 +726,7 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                         free( p_aout->fifo[i_fifo].buffer );
                         free( p_aout->fifo[i_fifo].date );
                         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]);
                         continue;
                     }
 
@@ -798,7 +798,7 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                     break;
 
             default:
-                    intf_DbgMsg("aout debug: unknown fifo type (%i)\n", p_aout->fifo[i_fifo].i_type);
+                    intf_DbgMsg("aout debug: unknown fifo type (%i)", p_aout->fifo[i_fifo].i_type);
                     break;
             }
         }
@@ -832,7 +832,7 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
             case AOUT_INTF_STEREO_FIFO:
                 free( p_aout->fifo[i_fifo].buffer ); /* !! */
                 p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]);
                 break;
 
             case AOUT_ADEC_MONO_FIFO:
@@ -840,7 +840,7 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                 free( p_aout->fifo[i_fifo].buffer );
                 free( p_aout->fifo[i_fifo].date );
                 p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]);
                 break;
 
             default:
@@ -858,7 +858,7 @@ void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
     long l_buffer, l_buffer_limit;
     long l_units, l_bytes;
 
-    intf_DbgMsg("adec debug: running audio output U8_S_thread (%p) (pid == %i)\n", p_aout, getpid());
+    intf_DbgMsg("adec debug: running audio output U8_S_thread (%p) (pid == %i)", p_aout, getpid());
 
     /* As the s32_buffer was created with calloc(), we don't have to set this
      * memory to zero and we can immediately jump into the thread's loop */
@@ -899,7 +899,7 @@ void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
                         }
                         free( p_aout->fifo[i_fifo].buffer ); /* !! */
                         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]); /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]); /* !! */
                     }
                     break;
 
@@ -930,7 +930,7 @@ void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
                         }
                         free( p_aout->fifo[i_fifo].buffer ); /* !! */
                         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]); /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]); /* !! */
                     }
                     break;
 
@@ -940,7 +940,7 @@ void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
                         free( p_aout->fifo[i_fifo].buffer );
                         free( p_aout->fifo[i_fifo].date );
                         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]);
                         continue;
                     }
 
@@ -1017,7 +1017,7 @@ void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
                         free( p_aout->fifo[i_fifo].buffer );
                         free( p_aout->fifo[i_fifo].date );
                         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]);
                         continue;
                     }
 
@@ -1089,7 +1089,7 @@ void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
                     break;
 
             default:
-                    intf_DbgMsg("aout debug: unknown fifo type (%i)\n", p_aout->fifo[i_fifo].i_type);
+                    intf_DbgMsg("aout debug: unknown fifo type (%i)", p_aout->fifo[i_fifo].i_type);
                     break;
             }
         }
@@ -1123,7 +1123,7 @@ void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
             case AOUT_INTF_STEREO_FIFO:
                 free( p_aout->fifo[i_fifo].buffer ); /* !! */
                 p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]);
                 break;
 
             case AOUT_ADEC_MONO_FIFO:
@@ -1131,7 +1131,7 @@ void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
                 free( p_aout->fifo[i_fifo].buffer );
                 free( p_aout->fifo[i_fifo].date );
                 p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]);
                 break;
 
             default:
@@ -1152,7 +1152,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
     long l_buffer, l_buffer_limit;
     long l_units, l_bytes;
 
-    intf_DbgMsg("adec debug: running audio output S16_S_thread (%p) (pid == %i)\n", p_aout, getpid());
+    intf_DbgMsg("adec debug: running audio output S16_S_thread (%p) (pid == %i)", p_aout, getpid());
 
     /* As the s32_buffer was created with calloc(), we don't have to set this
      * memory to zero and we can immediately jump into the thread's loop */
@@ -1193,7 +1193,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                         }
                         free( p_aout->fifo[i_fifo].buffer ); /* !! */
                         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]); /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]); /* !! */
                     }
                     break;
 
@@ -1224,7 +1224,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                         }
                         free( p_aout->fifo[i_fifo].buffer ); /* !! */
                         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]); /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]); /* !! */
                     }
                     break;
 
@@ -1234,7 +1234,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                         free( p_aout->fifo[i_fifo].buffer );
                         free( p_aout->fifo[i_fifo].date );
                         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]);
                         continue;
                     }
 
@@ -1311,7 +1311,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                         free( p_aout->fifo[i_fifo].buffer );
                         free( p_aout->fifo[i_fifo].date );
                         p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]);
                         continue;
                     }
 
@@ -1383,7 +1383,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     break;
 
             default:
-                    intf_DbgMsg("aout debug: unknown fifo type (%i)\n", p_aout->fifo[i_fifo].i_type);
+                    intf_DbgMsg("aout debug: unknown fifo type (%i)", p_aout->fifo[i_fifo].i_type);
                     break;
             }
         }
@@ -1418,7 +1418,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
             case AOUT_INTF_STEREO_FIFO:
                 free( p_aout->fifo[i_fifo].buffer ); /* !! */
                 p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]);
                 break;
 
             case AOUT_ADEC_MONO_FIFO:
@@ -1426,7 +1426,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                 free( p_aout->fifo[i_fifo].buffer );
                 free( p_aout->fifo[i_fifo].date );
                 p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
-                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                intf_DbgMsg("aout debug: audio output fifo (%p) destroyed", &p_aout->fifo[i_fifo]);
                 break;
 
             default:

@@ -52,7 +52,7 @@ void downmix (ac3dec_t * p_ac3dec, s16 * out_buf)
 
     /*
     if (p_ac3dec->bsi.acmod > 7)
-        intf_ErrMsg( "ac3dec: (downmix) invalid acmod number\n" );
+        intf_ErrMsg( "ac3dec: (downmix) invalid acmod number" );
     */
 
     /* There are two main cases, with or without Dolby Surround */

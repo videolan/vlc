@@ -35,7 +35,7 @@
 
 int lpcm_init (lpcmdec_t * p_lpcmdec)
 {
-    intf_DbgMsg( "LPCM Debug: lpmcm init called\n" );
+    intf_DbgMsg( "LPCM Debug: lpmcm init called" );
     return 0;
 }
 

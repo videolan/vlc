@@ -444,7 +444,7 @@ static int SelectPID( int i_argc, intf_arg_t *p_argv )
 
 
     /* Find to which input this command is destinated */
-    intf_IntfMsg( "Adding PID %d to input %d\n", i_pid, i_input );
+    intf_IntfMsg( "Adding PID %d to input %d", i_pid, i_input );
     //XXX?? input_AddPgrmElem( p_main->p_intf->p_x11->p_input,
     //XXX??                    i_pid );
     return( INTF_NO_ERROR );
@@ -582,7 +582,7 @@ static int Psi( int i_argc, intf_arg_t *p_argv )
 {
     int i_index = p_argv[1].i_num;
 
-    intf_IntfMsg("Reading PSI table for input %d\n", i_index);
+    intf_IntfMsg("Reading PSI table for input %d", i_index);
     //XXX?? input_PsiRead(p_main->p_intf->p_x11->p_input );
     return( INTF_NO_ERROR );
 }

@@ -79,7 +79,7 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg( "error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg( "error: %s", strerror(ENOMEM) );
         return( 1 );
     }
 
@@ -90,7 +90,7 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
     /* Initialize library */
     if( SDL_Init(SDL_INIT_VIDEO) < 0 )
     {
-        intf_ErrMsg( "error: can't initialize SDL library: %s\n",
+        intf_ErrMsg( "error: can't initialize SDL library: %s",
                      SDL_GetError() );
         free( p_vout->p_sys );
         return( 1 );
@@ -114,7 +114,7 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
 
     if( SDLOpenDisplay(p_vout) )
     {
-        intf_ErrMsg( "error: can't initialize SDL library: %s\n",
+        intf_ErrMsg( "error: can't initialize SDL library: %s",
                      SDL_GetError() );
         free( p_vout->p_sys );
         return( 1 );
@@ -190,7 +190,7 @@ int vout_SDLManage( vout_thread_t *p_vout )
 
         if( SDLOpenDisplay(p_vout) )
         {
-            intf_ErrMsg( "error: can't open DISPLAY default display\n" );
+            intf_ErrMsg( "error: can't open DISPLAY default display" );
             return( 1 );
         }
         p_vout->p_sys->b_reopen_display = 0;
@@ -237,7 +237,7 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
                                              SDL_YV12_OVERLAY, 
                                              p_vout->p_sys->p_display
                                            );
-                intf_Msg("[YUV acceleration] : %d,\n",
+                intf_Msg("[YUV acceleration] : %d,",
                             p_vout->p_sys->p_overlay->hw_overlay); 
             }
 
@@ -302,7 +302,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 	
     if( p_vout->p_sys->p_display == NULL )
     {
-        intf_ErrMsg( "error: can't open DISPLAY default display\n" );
+        intf_ErrMsg( "error: can't open DISPLAY default display" );
         return( 1 );
     }
     SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
@@ -328,7 +328,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         ggiSetGCBackground(p_vout->p_sys->p_display,
                            ggiMapColor(p_vout->p_sys->p_display,&col_bg)) )
     {
-        intf_ErrMsg("error: can't set colors\n");
+        intf_ErrMsg("error: can't set colors");
         ggiClose( p_vout->p_sys->p_display );
         ggiExit();
         return( 1 );

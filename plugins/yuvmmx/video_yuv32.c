@@ -52,7 +52,7 @@
  *****************************************************************************/
 void ConvertY4Gray32( YUV_ARGS_32BPP )
 {
-    intf_ErrMsg( "yuvmmx error: unhandled function, grayscale, bpp = 32\n" );
+    intf_ErrMsg( "yuvmmx error: unhandled function, grayscale, bpp = 32" );
 }
 
 /*****************************************************************************
@@ -120,7 +120,7 @@ void ConvertYUV420RGB32( YUV_ARGS_32BPP )
  *****************************************************************************/
 void ConvertYUV422RGB32( YUV_ARGS_32BPP )
 {
-    intf_ErrMsg( "yuv error: unhandled function, chroma = 422, bpp = 32\n" );
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 422, bpp = 32" );
 }
 
 /*****************************************************************************
@@ -128,6 +128,6 @@ void ConvertYUV422RGB32( YUV_ARGS_32BPP )
  *****************************************************************************/
 void ConvertYUV444RGB32( YUV_ARGS_32BPP )
 {
-    intf_ErrMsg( "yuv error: unhandled function, chroma = 444, bpp = 32\n" );
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 444, bpp = 32" );
 }
 

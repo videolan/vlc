@@ -75,13 +75,13 @@ resource_file_t *CreateResourceFile( char *psz_filename, int i_type, int i_size,
     p_file = malloc( sizeof(resource_file_t) );
     if( p_file == NULL )
     {
-        intf_ErrMsg("rsc error 101-1: %s\n", strerror(errno));
+        intf_ErrMsg("rsc error 101-1: %s", strerror(errno));
         return( NULL );
     }
     p_file->p_resource = malloc( sizeof(resource_descriptor_t) * i_size );
     if( p_file->p_resource == NULL )
     {
-        intf_ErrMsg("rsc error 101-2: %s\n", strerror(errno));
+        intf_ErrMsg("rsc error 101-2: %s", strerror(errno));
         free( p_file );
         return( NULL );
     }
@@ -90,7 +90,7 @@ resource_file_t *CreateResourceFile( char *psz_filename, int i_type, int i_size,
     p_file->i_file = open( psz_filename, O_CREAT | O_RDWR, i_mode );
     if( p_file->i_file == -1 )                                      /* error */
     {
-        intf_ErrMsg("rsc error 101-3: %s: %s\n", psz_filename, strerror(errno) );
+        intf_ErrMsg("rsc error 101-3: %s: %s", psz_filename, strerror(errno) );
         free( p_file->p_resource );
         free( p_file );
     }
@@ -125,7 +125,7 @@ resource_file_t *OpenResourceFile( char *psz_filename, int i_type, int i_flags )
     p_file = malloc( sizeof(resource_file_t) );
     if( p_file == NULL )
     {
-        intf_ErrMsg("rsc error 102-1: %s\n", strerror(errno));
+        intf_ErrMsg("rsc error 102-1: %s", strerror(errno));
         return( NULL );
     }
 
@@ -133,7 +133,7 @@ resource_file_t *OpenResourceFile( char *psz_filename, int i_type, int i_flags )
     p_file->i_file = open( psz_filename, i_flags );
     if( p_file->i_file == -1 )                                      /* error */
     {
-        intf_ErrMsg("rsc error 102-2: %s: %s\n", psz_filename, strerror(errno) );
+        intf_ErrMsg("rsc error 102-2: %s: %s", psz_filename, strerror(errno) );
         free( p_file );
         return( NULL );
     }
@@ -141,27 +141,27 @@ resource_file_t *OpenResourceFile( char *psz_filename, int i_type, int i_flags )
     /* Read header */
     if( read( p_file->i_file, p_buffer, 8 ) != 8)
     {
-        intf_ErrMsg("rsc error 102-3: %s: unexpected end of file (not a resource file ?)\n");
+        intf_ErrMsg("rsc error 102-3: %s: unexpected end of file (not a resource file ?)");
         close( p_file->i_file );
         free( p_file);
         return( NULL );
     }
     if( (p_buffer[0] != 'R') || (p_buffer[0] != 'F') || (*(u16 *)(p_buffer + 4) != i_type) )
     {
-        intf_ErrMsg("rsc error 102-4: %s is not a valid resource file or has incorrect type\n", psz_filename);
+        intf_ErrMsg("rsc error 102-4: %s is not a valid resource file or has incorrect type", psz_filename);
         close( p_file->i_file );
         free( p_file );
         return( NULL );
     }
     p_file->i_type = i_type;
     p_file->i_size = *(u16 *)(p_buffer + 6);
-    intf_DbgMsg("rsc debug 102-1: %s opened, %d resources\n", psz_filename, p_file->i_size);
+    intf_DbgMsg("rsc debug 102-1: %s opened, %d resources", psz_filename, p_file->i_size);
 
     /* Allocate tables */
     p_file->p_resource = malloc( sizeof(resource_descriptor_t) * p_file->i_size );
     if( p_file->p_resource == NULL )
     {
-        intf_ErrMsg("rsc error 102-5: %s\n", strerror(errno));
+        intf_ErrMsg("rsc error 102-5: %s", strerror(errno));
         close( p_file->i_file );
         free( p_file );
         return( NULL );
@@ -174,7 +174,7 @@ resource_file_t *OpenResourceFile( char *psz_filename, int i_type, int i_flags )
     {
         if( read( p_file->i_file, p_buffer, 50 ) != 50 )
         {
-            intf_ErrMsg("rsc error 102-6: %s: unexpected end of file\n", psz_filename);
+            intf_ErrMsg("rsc error 102-6: %s: unexpected end of file", psz_filename);
             close( p_file->i_file );
             free( p_file->p_resource );
             free( p_file );
@@ -206,7 +206,7 @@ int UpdateResourceFile( resource_file_t *p_file )
 #ifdef DEBUG
     if( p_file->b_read_only )
     {
-        intf_DbgMsg("rsc debug 103-1: can't update a read-only file\n");
+        intf_DbgMsg("rsc debug 103-1: can't update a read-only file");
         return( -1 );
     }
 #endif
@@ -214,7 +214,7 @@ int UpdateResourceFile( resource_file_t *p_file )
     /* Seek beginning of file */
     if( lseek( p_file->i_file, 0, SEEK_SET ) )
     {
-        intf_ErrMsg("rsc error 103-1: %s\n", strerror(errno));
+        intf_ErrMsg("rsc error 103-1: %s", strerror(errno));
         return( -2 );
     }
 
@@ -227,7 +227,7 @@ int UpdateResourceFile( resource_file_t *p_file )
     *(u16 *)(p_buffer + 6) =    p_file->i_size;
     if( write( p_file->i_file, p_buffer, 8 ) != 8 )
     {
-        intf_ErrMsg("rsc error 103-2: %s\n", strerror(errno));
+        intf_ErrMsg("rsc error 103-2: %s", strerror(errno));
         return( -3 );
     }
 
@@ -240,7 +240,7 @@ int UpdateResourceFile( resource_file_t *p_file )
         *(u64 *)(p_buffer + 42) =   p_file->p_resource[i_index].i_size;
         if( write( p_file->i_file, p_buffer, 8 ) != 8 )
         {
-            intf_ErrMsg("rsc error 103-3: %s\n", strerror(errno));
+            intf_ErrMsg("rsc error 103-3: %s", strerror(errno));
             return( -4 );
         }
     }
@@ -270,7 +270,7 @@ int CloseResourceFile( resource_file_t *p_file )
     /* Close and destroy descriptor */
     if( close( p_file->i_file ) )
     {
-        intf_ErrMsg("rsc error 104-1: %s\n", strerror(errno));
+        intf_ErrMsg("rsc error 104-1: %s", strerror(errno));
         return( -2 );
     }
     free( p_file->p_resource );
@@ -303,14 +303,14 @@ int SeekResource( resource_file_t *p_file, char *psz_name, int i_type )
     }
     if( i_index == p_file->i_size )
     {
-        intf_ErrMsg("rsc error 105-1: unknown resource %s.%d\n", psz_name, i_type);
+        intf_ErrMsg("rsc error 105-1: unknown resource %s.%d", psz_name, i_type);
         return( -1 );
     }
 
     /* Seek */
     if( lseek( p_file->i_file, p_file->p_resource[i_index].i_offset, SEEK_SET ) )
     {
-        intf_ErrMsg("rsc error 105-2: can not reach %s.%d: %s\n", psz_name,
+        intf_ErrMsg("rsc error 105-2: can not reach %s.%d: %s", psz_name,
                     i_type, strerror(errno));
         return( -2 );
     }
@@ -341,7 +341,7 @@ int ReadResource( resource_file_t *p_file, char *psz_name, int i_type,
     /* Check if buffer is large enough */
     if( max_size < p_file->p_resource[i_index].i_size )
     {
-        intf_ErrMsg("rsc error 106-1: buffer is too small\n");
+        intf_ErrMsg("rsc error 106-1: buffer is too small");
         return( -2 );
     }
 
@@ -349,7 +349,7 @@ int ReadResource( resource_file_t *p_file, char *psz_name, int i_type,
     if( read( p_file->i_file, p_data, p_file->p_resource[i_index].i_size )
         != p_file->p_resource[i_index].i_size )
     {
-        intf_ErrMsg("rsc error 106-2: can not read %s.%d: %s\n",
+        intf_ErrMsg("rsc error 106-2: can not read %s.%d: %s",
                     p_file->p_resource[i_index].psz_name,
                     p_file->p_resource[i_index].i_type,
                     strerror(errno));
@@ -376,7 +376,7 @@ int WriteResource( resource_file_t *p_file, char *psz_name, int i_type,
 #ifdef DEBUG
     if( p_file->b_read_only )
     {
-        intf_DbgMsg("rsc debug 107-1: can not write to a read-only resource file\n");
+        intf_DbgMsg("rsc debug 107-1: can not write to a read-only resource file");
         return( -1 );
     }
 #endif
@@ -398,21 +398,21 @@ int WriteResource( resource_file_t *p_file, char *psz_name, int i_type,
     }
     if( i_index == -1 )
     {
-        intf_ErrMsg("rsc error 107-1: resources table is full\n");
+        intf_ErrMsg("rsc error 107-1: resources table is full");
         return( -1 );
     }
 
     /* Seek end of file */
     if( lseek( p_file->i_file, i_offset, SEEK_SET ) )
     {
-        intf_ErrMsg("rsc error 107-2: %s\n", strerror(errno));
+        intf_ErrMsg("rsc error 107-2: %s", strerror(errno));
         return( -2 );
     }
 
     /* Write data */
     if( write( p_file->i_file, p_data, size ) != size )
     {
-        intf_ErrMsg("rsc error 107-3: %s\n", strerror(errno));
+        intf_ErrMsg("rsc error 107-3: %s", strerror(errno));
         return( -3 );
     }
 

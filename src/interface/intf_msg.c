@@ -394,6 +394,7 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
         fprintf(stderr, "warning: can't store following message (%s): ",
                 strerror(errno) );
         vfprintf(stderr, psz_format, ap );
+        fprintf(stderr, "\n" );
         exit( errno );
     }
 
@@ -459,6 +460,7 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
                 strerror(errno) );
         fprintf(stderr, INTF_MSG_DBG_FORMAT, psz_file, psz_function, i_line );
         vfprintf(stderr, psz_format, ap );
+        fprintf(stderr, "\n" );
         exit( errno );
     }
 
@@ -571,14 +573,14 @@ static void PrintMsg( intf_msg_item_t *p_msg )
     switch( p_msg->i_type )
     {
     case INTF_MSG_STD:                                  /* standard messages */
-        fprintf( stdout, psz_msg );
+        fprintf( stdout, "%s\n", psz_msg );
         break;
     case INTF_MSG_ERR:                                     /* error messages */
     case INTF_MSG_WARN:
 #ifndef DEBUG_LOG_ONLY
     case INTF_MSG_DBG:                                 /* debugging messages */
 #endif
-        fprintf( stderr, psz_msg );
+        fprintf( stderr, "%s\n", psz_msg );
         break;
     case INTF_MSG_INTF:                                /* interface messages */
         intf_ConsolePrint( p_main->p_intf->p_console, psz_msg );
@@ -590,6 +592,7 @@ static void PrintMsg( intf_msg_item_t *p_msg )
     if( p_main->p_msg->p_log_file != NULL )
     {
         fwrite( psz_msg, strlen( psz_msg ), 1, p_main->p_msg->p_log_file );
+        fwrite( "\n", 1, 1, p_main->p_msg->p_log_file );
     }
 #endif
 
@@ -608,11 +611,11 @@ static void PrintMsg( intf_msg_item_t *p_msg )
     {
     case INTF_MSG_STD:                                  /* standard messages */
     case INTF_MSG_DBG:                                     /* debug messages */
-        fprintf( stdout, p_msg->psz_msg );
+        fprintf( stdout, "%s\n", p_msg->psz_msg );
         break;
     case INTF_MSG_ERR:                                     /* error messages */
     case INTF_MSG_WARN:
-        fprintf( stderr, p_msg->psz_msg );                /* warning message */
+        fprintf( stderr, "%s\n", p_msg->psz_msg );        /* warning message */
         break;
     case INTF_MSG_INTF:                                /* interface messages */
         intf_ConsolePrint( p_main->p_intf->p_console, p_msg->psz_msg );

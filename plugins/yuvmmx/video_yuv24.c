@@ -50,7 +50,7 @@
  *****************************************************************************/
 void ConvertY4Gray24( YUV_ARGS_24BPP )
 {
-    intf_ErrMsg( "yuvmmx error: unhandled function, grayscale, bpp = 24\n" );
+    intf_ErrMsg( "yuvmmx error: unhandled function, grayscale, bpp = 24" );
 }
 
 /*****************************************************************************
@@ -58,7 +58,7 @@ void ConvertY4Gray24( YUV_ARGS_24BPP )
  *****************************************************************************/
 void ConvertYUV420RGB24( YUV_ARGS_24BPP )
 {
-    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 420, bpp = 24\n" );
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 420, bpp = 24" );
 }
 
 /*****************************************************************************
@@ -66,7 +66,7 @@ void ConvertYUV420RGB24( YUV_ARGS_24BPP )
  *****************************************************************************/
 void ConvertYUV422RGB24( YUV_ARGS_24BPP )
 {
-    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 422, bpp = 24\n" );
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 422, bpp = 24" );
 }
 
 /*****************************************************************************
@@ -74,6 +74,6 @@ void ConvertYUV422RGB24( YUV_ARGS_24BPP )
  *****************************************************************************/
 void ConvertYUV444RGB24( YUV_ARGS_24BPP )
 {
-    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 444, bpp = 24\n" );
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 444, bpp = 24" );
 }
 

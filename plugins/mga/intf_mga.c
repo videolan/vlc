@@ -102,7 +102,7 @@ int intf_MGACreate( intf_thread_t *p_intf )
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        intf_ErrMsg("error: %s", strerror(ENOMEM));
         return( 1 );
     }
 
@@ -111,7 +111,7 @@ int intf_MGACreate( intf_thread_t *p_intf )
     p_intf->p_sys->p_display = XOpenDisplay( psz_display );
     if( !p_intf->p_sys->p_display )                                 /* error */
     {
-        intf_ErrMsg("error: can't open display %s\n", psz_display );
+        intf_ErrMsg("error: can't open display %s", psz_display );
         free( p_intf->p_sys );
         return( 1 );
     }
@@ -121,7 +121,7 @@ int intf_MGACreate( intf_thread_t *p_intf )
      * but also command buttons, subtitles and other indicators */
     if( X11CreateWindow( p_intf ) )
     {
-        intf_ErrMsg("error: can't create interface window\n" );
+        intf_ErrMsg("error: can't create interface window" );
         XCloseDisplay( p_intf->p_sys->p_display );
         free( p_intf->p_sys );
         return( 1 );
@@ -135,7 +135,7 @@ int intf_MGACreate( intf_thread_t *p_intf )
                                             p_intf->p_sys->i_height, NULL, 0, NULL );
         if( p_intf->p_vout == NULL )                                /* error */
         {
-            intf_ErrMsg("error: can't create video output thread\n" );
+            intf_ErrMsg("error: can't create video output thread" );
             X11DestroyWindow( p_intf );
             XCloseDisplay( p_intf->p_sys->p_display );
             free( p_intf->p_sys );
@@ -250,7 +250,7 @@ static int X11CreateWindow( intf_thread_t *p_intf )
                              &p_intf->p_sys->wm_delete_window, 1 ) )
     {
         /* WM_DELETE_WINDOW is not supported by window manager */
-        intf_Msg("error: missing or bad window manager - please exit program kindly.\n");
+        intf_Msg("error: missing or bad window manager - please exit program kindly.");
     }
 
     /* Creation of a graphic context that doesn't generate a GraphicsExpose event
@@ -355,7 +355,7 @@ static void X11ManageWindow( intf_thread_t *p_intf )
         /* DestroyNotify event: window has been destroyed */
         else if( xevent.type == DestroyNotify )
         {
-            intf_ErrMsg( "vout: window destroyed !\n");
+            intf_ErrMsg( "vout: window destroyed !");
         }
         /* Keyboard event */
         else if( xevent.type == KeyPress )
@@ -364,7 +364,7 @@ static void X11ManageWindow( intf_thread_t *p_intf )
             {
                 if( intf_ProcessKey( p_intf, i_key ) )
                 {
-                    intf_DbgMsg("unhandled key '%c' (%i)\n", (char) i_key, i_key );
+                    intf_DbgMsg("unhandled key '%c' (%i)", (char) i_key, i_key );
                 }
             }
         }
@@ -398,13 +398,13 @@ static void X11ManageWindow( intf_thread_t *p_intf )
                  && (xevent.xclient.data.l[0] == p_intf->p_sys->wm_delete_window ) )
         {
             /* FIXME: this never happens :( how to receive wm messages ?? */
-            intf_DbgMsg("ClientMessage received\n");
+            intf_DbgMsg("ClientMessage received");
         }
 #ifdef DEBUG
         /* Other event */
         else
         {
-            intf_DbgMsg("%p -> unhandled event type %d received\n", p_intf, xevent.type );
+            intf_DbgMsg("%p -> unhandled event type %d received", p_intf, xevent.type );
         }
 #endif
     }
@@ -417,7 +417,7 @@ static void X11ManageWindow( intf_thread_t *p_intf )
         if( b_resized )
         {
             /* If interface window has been resized, change vout size */
-            intf_DbgMsg("resizing output window\n");
+            intf_DbgMsg("resizing output window");
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
             p_intf->p_vout->i_width =  p_intf->p_sys->i_width;
             p_intf->p_vout->i_height = p_intf->p_sys->i_height;
@@ -428,7 +428,7 @@ static void X11ManageWindow( intf_thread_t *p_intf )
                  (p_intf->p_vout->i_height != p_intf->p_sys->i_height) )
         {
            /* If video output size has changed, change interface window size */
-            intf_DbgMsg("resizing interface window\n");
+            intf_DbgMsg("resizing interface window");
             p_intf->p_sys->i_width =    p_intf->p_vout->i_width;
             p_intf->p_sys->i_height =   p_intf->p_vout->i_height;
             XResizeWindow( p_intf->p_sys->p_display, p_intf->p_sys->window,
@@ -450,7 +450,7 @@ void X11EnableScreenSaver( intf_thread_t *p_intf )
 {
     if( p_intf->p_sys->i_ss_count++ == 0 )
     {
-        intf_Msg("Enabling screen saver\n");
+        intf_Msg("Enabling screen saver");
         XSetScreenSaver( p_intf->p_sys->p_display, p_intf->p_sys->i_ss_timeout,
                          p_intf->p_sys->i_ss_interval, p_intf->p_sys->i_ss_blanking,
                          p_intf->p_sys->i_ss_exposure );
@@ -472,7 +472,7 @@ void X11DisableScreenSaver( intf_thread_t *p_intf )
                          &p_intf->p_sys->i_ss_exposure );
 
         /* Disable screen saver */
-        intf_Msg("Disabling screen saver\n");
+        intf_Msg("Disabling screen saver");
         XSetScreenSaver( p_intf->p_sys->p_display, 0,
                          p_intf->p_sys->i_ss_interval, p_intf->p_sys->i_ss_blanking,
                          p_intf->p_sys->i_ss_exposure );

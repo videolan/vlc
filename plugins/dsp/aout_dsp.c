@@ -85,7 +85,7 @@ int aout_DspOpen( aout_thread_t *p_aout )
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg("error: %s", strerror(ENOMEM) );
         return( 1 );
     }
 
@@ -98,7 +98,7 @@ int aout_DspOpen( aout_thread_t *p_aout )
     /* Open the sound device */
     if ( (p_aout->i_fd = open( p_aout->psz_device, O_WRONLY|O_NONBLOCK )) < 0 )
     {
-        intf_ErrMsg( "aout error: can't open audio device (%s)\n", p_aout->psz_device );
+        intf_ErrMsg( "aout error: can't open audio device (%s)", p_aout->psz_device );
         return( -1 );
     }
 
@@ -112,7 +112,7 @@ int aout_DspReset( aout_thread_t *p_aout )
 {
     if ( ioctl( p_aout->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
     {
-        intf_ErrMsg( "aout error: can't reset audio device (%s)\n", p_aout->psz_device );
+        intf_ErrMsg( "aout error: can't reset audio device (%s)", p_aout->psz_device );
     return( -1 );
     }
 
@@ -133,13 +133,13 @@ int aout_DspSetFormat( aout_thread_t *p_aout )
     i_format = p_aout->i_format;
     if ( ioctl( p_aout->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0 )
     {
-        intf_ErrMsg( "aout error: can't set audio output format (%i)\n", p_aout->i_format );
+        intf_ErrMsg( "aout error: can't set audio output format (%i)", p_aout->i_format );
         return( -1 );
     }
 
     if ( i_format != p_aout->i_format )
     {
-        intf_DbgMsg( "aout debug: audio output format not supported (%i)\n", p_aout->i_format );
+        intf_DbgMsg( "aout debug: audio output format not supported (%i)", p_aout->i_format );
         p_aout->i_format = i_format;
     }
 
@@ -157,13 +157,13 @@ int aout_DspSetChannels( aout_thread_t *p_aout )
 
     if ( ioctl( p_aout->i_fd, SNDCTL_DSP_STEREO, &b_stereo ) < 0 )
     {
-        intf_ErrMsg( "aout error: can't set number of audio channels (%i)\n", p_aout->i_channels );
+        intf_ErrMsg( "aout error: can't set number of audio channels (%i)", p_aout->i_channels );
         return( -1 );
     }
 
     if ( b_stereo != p_aout->b_stereo )
     {
-        intf_DbgMsg( "aout debug: number of audio channels not supported (%i)\n", p_aout->i_channels );
+        intf_DbgMsg( "aout debug: number of audio channels not supported (%i)", p_aout->i_channels );
         p_aout->b_stereo = b_stereo;
         p_aout->i_channels = 1 + b_stereo;
     }
@@ -185,13 +185,13 @@ int aout_DspSetRate( aout_thread_t *p_aout )
     l_rate = p_aout->l_rate;
     if ( ioctl( p_aout->i_fd, SNDCTL_DSP_SPEED, &l_rate ) < 0 )
     {
-        intf_ErrMsg( "aout error: can't set audio output rate (%li)\n", p_aout->l_rate );
+        intf_ErrMsg( "aout error: can't set audio output rate (%li)", p_aout->l_rate );
         return( -1 );
     }
 
     if ( l_rate != p_aout->l_rate )
     {
-        intf_DbgMsg( "aout debug: audio output rate not supported (%li)\n", p_aout->l_rate );
+        intf_DbgMsg( "aout debug: audio output rate not supported (%li)", p_aout->l_rate );
         p_aout->l_rate = l_rate;
     }
 

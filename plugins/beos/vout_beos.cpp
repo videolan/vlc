@@ -351,7 +351,7 @@ int vout_BeCreate( vout_thread_t *p_vout, char *psz_display,
     p_vout->p_sys = (vout_sys_t*) malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg( "error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg( "error: %s", strerror(ENOMEM) );
         return( 1 );
     }
     
@@ -362,7 +362,7 @@ int vout_BeCreate( vout_thread_t *p_vout, char *psz_display,
     /* Open and initialize device */
     if( BeosOpenDisplay( p_vout ) )
     {
-        intf_ErrMsg("vout error: can't open display\n");
+        intf_ErrMsg("vout error: can't open display");
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -390,7 +390,7 @@ int vout_BeInit( vout_thread_t *p_vout )
     p_vout->p_sys->pp_buffer[1] = (byte_t*) malloc( i_page_size );
     if( p_vout->p_sys->pp_buffer[0] == NULL  || p_vout->p_sys->pp_buffer[0] == NULL )
     {
-        intf_ErrMsg("vout error: can't allocate video memory (%s)\n", strerror(errno) );
+        intf_ErrMsg("vout error: can't allocate video memory (%s)", strerror(errno) );
         if( p_vout->p_sys->pp_buffer[0] != NULL ) free( p_vout->p_sys->pp_buffer[0] );
         if( p_vout->p_sys->pp_buffer[1] != NULL ) free( p_vout->p_sys->pp_buffer[1] );
         p_win->locker->Unlock();
@@ -443,7 +443,7 @@ int vout_BeManage( vout_thread_t *p_vout )
 {
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_DbgMsg("resizing window\n");
+        intf_DbgMsg("resizing window");
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         /* Resize window */
@@ -455,14 +455,14 @@ int vout_BeManage( vout_thread_t *p_vout )
         /* Recreate XImages. If SysInit failed, the thread can't go on. */
         if( vout_BeInit( p_vout ) )
         {
-            intf_ErrMsg("error: can't resize display\n");
+            intf_ErrMsg("error: can't resize display");
             return( 1 );
         }
 
         /* Tell the video output thread that it will need to rebuild YUV
          * tables. This is needed since convertion buffer size may have changed */
         p_vout->i_changes |= VOUT_YUV_CHANGE;
-        intf_Msg("Video display resized (%dx%d)\n", p_vout->i_width, p_vout->i_height);
+        intf_Msg("Video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
     }
     return( 0 );
 }
@@ -503,7 +503,7 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_window == 0 )
     {
         free( p_vout->p_sys );
-        intf_ErrMsg( "error: cannot allocate memory for VideoWindow\n" );
+        intf_ErrMsg( "error: cannot allocate memory for VideoWindow" );
         return( 1 );
     }   
     VideoWindow * p_win = p_vout->p_sys->p_window;
@@ -519,7 +519,7 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
     switch( p_vout->i_screen_depth )
     {
     case 8:
-        intf_ErrMsg( "vout error: 8 bit mode not fully supported\n" );
+        intf_ErrMsg( "vout error: 8 bit mode not fully supported" );
         break;
     case 15:
         p_vout->i_red_mask =        0x7c00;

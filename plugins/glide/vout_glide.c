@@ -85,14 +85,14 @@ int vout_GlideCreate( vout_thread_t *p_vout, char *psz_display,
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg("error: %s", strerror(ENOMEM) );
         return( 1 );
     }
 
     /* Open and initialize device */
     if( GlideOpenDisplay( p_vout ) )
     {
-        intf_ErrMsg("vout error: can't open display\n");
+        intf_ErrMsg("vout error: can't open display");
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -154,7 +154,7 @@ void vout_GlideDisplay( vout_thread_t *p_vout )
                    GR_LFBWRITEMODE_565, GR_ORIGIN_UPPER_LEFT, FXFALSE,
                    &p_vout->p_sys->p_buffer_info) == FXFALSE )
     {
-        intf_ErrMsg( "vout error: can't take 3dfx back buffer lock\n" );
+        intf_ErrMsg( "vout error: can't take 3dfx back buffer lock" );
     }
 }
 
@@ -188,7 +188,7 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->p_video = malloc( p_vout->p_sys->i_page_size * 2 );
     if( (int)p_vout->p_sys->p_video == -1 )
     {
-        intf_ErrMsg( "vout error: can't map video memory (%s)\n",
+        intf_ErrMsg( "vout error: can't map video memory (%s)",
                      strerror(errno) );
         return( 1 );
     }
@@ -198,7 +198,7 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
 
     if( !grSstQueryHardware(&hwconfig) )
     {
-        intf_ErrMsg( "vout error: can't get 3dfx hardware config\n" );
+        intf_ErrMsg( "vout error: can't get 3dfx hardware config" );
         return( 1 );
     }
 
@@ -206,7 +206,7 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
     if( !grSstWinOpen(0, resolution, GR_REFRESH_60Hz,
                         GR_COLORFORMAT_ABGR, GR_ORIGIN_UPPER_LEFT, 2, 1) )
     {
-        intf_ErrMsg( "vout error: can't open 3dfx screen\n" );
+        intf_ErrMsg( "vout error: can't open 3dfx screen" );
         return( 1 );
     }
 
@@ -228,7 +228,7 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
                    GR_LFBWRITEMODE_565, GR_ORIGIN_UPPER_LEFT, FXFALSE,
                    &p_front_buffer_info) == FXFALSE )
     {
-        intf_ErrMsg( "vout error: can't take 3dfx front buffer lock\n" );
+        intf_ErrMsg( "vout error: can't take 3dfx front buffer lock" );
         grGlideShutdown();
         return( 1 );
     }
@@ -238,7 +238,7 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
                    GR_LFBWRITEMODE_565, GR_ORIGIN_UPPER_LEFT, FXFALSE,
                    &p_vout->p_sys->p_buffer_info) == FXFALSE )
     {
-        intf_ErrMsg( "vout error: can't take 3dfx back buffer lock\n" );
+        intf_ErrMsg( "vout error: can't take 3dfx back buffer lock" );
         grGlideShutdown();
         return( 1 );
     }

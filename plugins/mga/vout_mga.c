@@ -68,7 +68,7 @@ int vout_MGACreate( vout_thread_t *p_vout, char *psz_display,
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg("error: %s", strerror(ENOMEM) );
         return( 1 );
     }
 
@@ -76,14 +76,14 @@ int vout_MGACreate( vout_thread_t *p_vout, char *psz_display,
     p_vout->p_sys->p_mga = malloc( sizeof( mga_vid_config_t ) );
     if( p_vout->p_sys->p_mga == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg("error: %s", strerror(ENOMEM) );
         free( p_vout->p_sys );
         return( 1 );
     }
 
     if( (p_vout->p_sys->i_fd = open("/dev/mga_vid",O_RDWR)) == -1 )
     {
-        intf_ErrMsg("error: can't open MGA driver /dev/mga_vid\n" );
+        intf_ErrMsg("error: can't open MGA driver /dev/mga_vid" );
         free( p_vout->p_sys->p_mga );
         free( p_vout->p_sys );
         return( 1 );
@@ -95,7 +95,7 @@ int vout_MGACreate( vout_thread_t *p_vout, char *psz_display,
      * id is still valid. */
     if( X11OpenDisplay( p_vout, psz_display, i_root_window ) )
     {
-        intf_ErrMsg("error: can't initialize X11 display\n" );
+        intf_ErrMsg("error: can't initialize X11 display" );
         free( p_vout->p_sys->p_mga );
         free( p_vout->p_sys );
         return( 1 );
@@ -128,18 +128,18 @@ int vout_MGAInit( vout_thread_t *p_vout )
 
     if( ioctl(p_vout->p_sys->i_fd, MGA_VID_CONFIG, p_vout->p_sys->p_mga) )
     {
-        intf_ErrMsg("error in config ioctl\n");
+        intf_ErrMsg("error in config ioctl");
     }
 
     if (p_vout->p_sys->p_mga->card_type == MGA_G200)
     {
-        intf_Msg( "detected MGA G200 (%d MB Ram)\n",
+        intf_Msg( "detected MGA G200 (%d MB Ram)",
                   p_vout->p_sys->p_mga->ram_size );
         p_vout->p_sys->b_g400 = 0;
     }
     else
     {
-        intf_Msg( "detected MGA G400 (%d MB Ram)\n",
+        intf_Msg( "detected MGA G400 (%d MB Ram)",
                   p_vout->p_sys->p_mga->ram_size );
         p_vout->p_sys->b_g400 = 1;
     }
@@ -180,7 +180,7 @@ int vout_MGAInit( vout_thread_t *p_vout )
         }
         if( i_err )                                      /* an error occured */
         {
-            intf_Msg("XShm video sextension deactivated\n" );
+            intf_Msg("XShm video sextension deactivated" );
             p_vout->p_sys->b_shm = 0;
         }
     }
@@ -190,14 +190,14 @@ int vout_MGAInit( vout_thread_t *p_vout )
     {
         if( X11CreateImage( p_vout, &p_vout->p_sys->p_ximage[0] ) )
         {
-            intf_ErrMsg("error: can't create images\n");
+            intf_ErrMsg("error: can't create images");
             p_vout->p_sys->p_ximage[0] = NULL;
             p_vout->p_sys->p_ximage[1] = NULL;
             return( 1 );
         }
         if( X11CreateImage( p_vout, &p_vout->p_sys->p_ximage[1] ) )
         {
-            intf_ErrMsg("error: can't create images\n");
+            intf_ErrMsg("error: can't create images");
             X11DestroyImage( p_vout->p_sys->p_ximage[0] );
             p_vout->p_sys->p_ximage[0] = NULL;
             p_vout->p_sys->p_ximage[1] = NULL;
@@ -272,7 +272,7 @@ int vout_MGAManage( vout_thread_t *p_vout )
      */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_DbgMsg("resizing window\n");
+        intf_DbgMsg("resizing window");
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         /* Resize window */
@@ -285,14 +285,14 @@ int vout_MGAManage( vout_thread_t *p_vout )
         /* Recreate XImages. If SysInit failed, the thread can't go on. */
         if( vout_MGAInit( p_vout ) )
         {
-            intf_ErrMsg("error: can't resize display\n");
+            intf_ErrMsg("error: can't resize display");
             return( 1 );
         }
 
         /* Tell the video output thread that it will need to rebuild YUV
          * tables. This is needed since convertion buffer size may have changed */
         p_vout->i_changes |= VOUT_YUV_CHANGE;
-        intf_Msg("Video display resized (%dx%d)\n", p_vout->i_width, p_vout->i_height);
+        intf_Msg("Video display resized (%dx%d)", p_vout->i_width, p_vout->i_height);
     }
 
     return 0;
@@ -350,7 +350,7 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
     p_vout->p_sys->p_display = XOpenDisplay( psz_display );
     if( p_vout->p_sys->p_display == NULL )
     {
-        intf_ErrMsg("error: can't open display %s\n", psz_display );
+        intf_ErrMsg("error: can't open display %s", psz_display );
         return( 1 );
     }
 
@@ -360,7 +360,7 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
     p_vout->p_sys->i_screen     = DefaultScreen( p_vout->p_sys->p_display );
     if( !p_vout->p_sys->b_shm )
     {
-        intf_Msg("XShm video extension is not available\n");
+        intf_Msg("XShm video extension is not available");
     }
 
     /* Get screen depth */
@@ -377,7 +377,7 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
                                     &xvisual_template, &i_count );
         if( p_xvisual == NULL )
         {
-            intf_ErrMsg("error: no PseudoColor visual available\n");
+            intf_ErrMsg("error: no PseudoColor visual available");
             XCloseDisplay( p_vout->p_sys->p_display );
             return( 1 );
         }
@@ -397,7 +397,7 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
                                     &xvisual_template, &i_count );
         if( p_xvisual == NULL )
         {
-            intf_ErrMsg("error: no TrueColor visual available\n");
+            intf_ErrMsg("error: no TrueColor visual available");
             XCloseDisplay( p_vout->p_sys->p_display );
             return( 1 );
         }
@@ -425,7 +425,7 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
     /* Create a window */
     if( X11CreateWindow( p_vout ) )
     {
-        intf_ErrMsg("error: can't open a window\n");
+        intf_ErrMsg("error: can't open a window");
         XCloseDisplay( p_vout->p_sys->p_display );
         return( 1 );
     }
@@ -542,7 +542,7 @@ static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
     pb_data = (byte_t *) malloc( p_vout->i_bytes_per_line * p_vout->i_height );
     if( !pb_data )                                                  /* error */
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        intf_ErrMsg("error: %s", strerror(ENOMEM));
         return( 1 );
     }
 
@@ -570,7 +570,7 @@ static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
                                p_vout->i_width, p_vout->i_height, i_quantum, 0);
     if(! *pp_ximage )                                               /* error */
     {
-        intf_ErrMsg( "error: XCreateImage() failed\n" );
+        intf_ErrMsg( "error: XCreateImage() failed" );
         free( pb_data );
         return( 1 );
     }
@@ -595,7 +595,7 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
                                   p_shm_info, p_vout->i_width, p_vout->i_height );
     if(! *pp_ximage )                                               /* error */
     {
-        intf_ErrMsg("error: XShmCreateImage() failed\n");
+        intf_ErrMsg("error: XShmCreateImage() failed");
         return( 1 );
     }
 
@@ -606,7 +606,7 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
                                 IPC_CREAT | 0777);
     if( p_shm_info->shmid < 0)                                      /* error */
     {
-        intf_ErrMsg("error: can't allocate shared image data (%s)\n",
+        intf_ErrMsg("error: can't allocate shared image data (%s)",
                     strerror(errno));
         XDestroyImage( *pp_ximage );
         return( 1 );
@@ -616,7 +616,7 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
     p_shm_info->shmaddr = (*pp_ximage)->data = shmat(p_shm_info->shmid, 0, 0);
     if(! p_shm_info->shmaddr )
     {                                                               /* error */
-        intf_ErrMsg("error: can't attach shared memory (%s)\n",
+        intf_ErrMsg("error: can't attach shared memory (%s)",
                     strerror(errno));
         shmctl( p_shm_info->shmid, IPC_RMID, 0 );      /* free shared memory */
         XDestroyImage( *pp_ximage );
@@ -631,7 +631,7 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
     p_shm_info->readOnly = True;
     if( XShmAttach( p_vout->p_sys->p_display, p_shm_info ) == False )    /* error */
     {
-        intf_ErrMsg("error: can't attach shared memory to X11 server\n");
+        intf_ErrMsg("error: can't attach shared memory to X11 server");
         shmdt( p_shm_info->shmaddr );     /* detach shared memory from process
                                            * and automatic free                */
         XDestroyImage( *pp_ximage );
@@ -678,7 +678,7 @@ static void X11DestroyShmImage( vout_thread_t *p_vout, XImage *p_ximage,
     XDestroyImage( p_ximage );
     if( shmdt( p_shm_info->shmaddr ) )  /* detach shared memory from process */
     {                                   /* also automatic freeing...         */
-        intf_ErrMsg("error: can't detach shared memory (%s)\n",
+        intf_ErrMsg("error: can't detach shared memory (%s)",
                     strerror(errno));
     }
 }

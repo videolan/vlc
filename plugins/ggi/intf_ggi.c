@@ -80,7 +80,7 @@ int intf_GGICreate( intf_thread_t *p_intf )
     /* Check that b_video is set */
     if( !p_main->b_video )
     {
-        intf_ErrMsg("error: GGI interface require a video output thread\n");
+        intf_ErrMsg("error: GGI interface require a video output thread");
         return( 1 );
     }
 
@@ -88,7 +88,7 @@ int intf_GGICreate( intf_thread_t *p_intf )
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg("error: %s", strerror(ENOMEM) );
         return( 1 );
     }
 
@@ -104,7 +104,7 @@ int intf_GGICreate( intf_thread_t *p_intf )
 
     if( p_intf->p_vout == NULL )                                  /* error */
     {
-        intf_ErrMsg("error: can't create video output thread\n" );
+        intf_ErrMsg("error: can't create video output thread" );
         free( p_intf->p_sys );
         return( 1 );
     }
@@ -151,7 +151,7 @@ void intf_GGIManage( intf_thread_t *p_intf )
         i_key = ggiGetc( p_intf->p_sys->p_display );
         if( intf_ProcessKey( p_intf, i_key ) )
         {
-            intf_DbgMsg("unhandled key '%c' (%i)\n", (char) i_key, i_key );
+            intf_DbgMsg("unhandled key '%c' (%i)", (char) i_key, i_key );
         }
     }
 }

@@ -77,7 +77,7 @@ int aout_EsdOpen( aout_thread_t *p_aout )
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg("error: %s", strerror(ENOMEM) );
         return( 1 );
     }
 
@@ -103,7 +103,7 @@ int aout_EsdOpen( aout_thread_t *p_aout )
                 p_aout->l_rate, NULL, "vlc")) < 0 )
     {
         intf_ErrMsg( "aout error: can't open esound socket"
-                     " (format 0x%08x at %ld Hz)\n",
+                     " (format 0x%08x at %ld Hz)",
                      p_aout->p_sys->esd_format, p_aout->l_rate );
         return( -1 );
     }
@@ -176,7 +176,7 @@ void aout_EsdPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
             amount = (2 * 44100 * (ESD_BUF_SIZE + 256)) / p_aout->l_rate;
     }
 
-    intf_DbgMsg( "aout: latency is %i\n", amount );
+    intf_DbgMsg( "aout: latency is %i", amount );
 
     write( p_aout->i_fd, buffer, i_size );
 }

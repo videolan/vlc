@@ -208,7 +208,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     if( !p_main->p_msg )                         /* start messages interface */
     {
         fprintf( stderr, "error: can't initialize messages interface (%s)\n",
-                strerror(errno) );
+                 strerror(errno) );
         return( errno );
     }
 
@@ -232,7 +232,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->p_playlist = playlist_Create( );
     if( !p_main->p_playlist )
     {
-        intf_Msg( "Playlist initialization failed\n" );
+        intf_Msg( "Playlist initialization failed" );
         intf_MsgDestroy();
         return( errno );
     }
@@ -244,7 +244,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->p_bank = bank_Create( );
     if( !p_main->p_bank )
     {
-        intf_Msg( "Plugin bank initialization failed\n" );
+        intf_Msg( "Plugin bank initialization failed" );
         playlist_Destroy( p_main->p_playlist );
         intf_MsgDestroy();
         return( errno );
@@ -260,7 +260,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     {
         /* On error during vlans initialization, switch off vlans */
         intf_Msg( "Virtual LANs initialization failed : "
-                  "vlans management is deactivated\n" );
+                  "vlans management is deactivated" );
         p_main->b_vlans = 0;
     }
 #endif
@@ -274,7 +274,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         if( p_main->p_aout == NULL )
         {
             /* On error during audio initialization, switch off audio */
-            intf_Msg( "Audio initialization failed : audio is deactivated\n" );
+            intf_Msg( "Audio initialization failed : audio is deactivated" );
             p_main->b_audio = 0;
         }
     }
@@ -332,7 +332,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Terminate messages interface and program
      */
-    intf_Msg( "Program terminated.\n" );
+    intf_Msg( "Program terminated." );
     intf_MsgDestroy();
 
     return( 0 );
@@ -392,14 +392,14 @@ void main_PutPszVariable( char *psz_name, char *psz_value )
     psz_env = malloc( strlen(psz_name) + strlen(psz_value) + 2 );
     if( psz_env == NULL )
     {
-        intf_ErrMsg( "error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg( "error: %s", strerror(ENOMEM) );
     }
     else
     {
         sprintf( psz_env, "%s=%s", psz_name, psz_value );
         if( putenv( psz_env ) )
         {
-            intf_ErrMsg( "error: %s\n", strerror(errno) );
+            intf_ErrMsg( "error: %s", strerror(errno) );
         }
     }
 }
@@ -462,7 +462,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->ppsz_env  = ppsz_env;
     SetDefaultConfiguration();
 
-    intf_MsgImm( COPYRIGHT_MESSAGE "\n" );
+    intf_MsgImm( COPYRIGHT_MESSAGE );
 
     /* Get the executable name (similar to the basename command) */
     p_main->psz_arg0 = p_pointer = ppsz_argv[ 0 ];
@@ -585,7 +585,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         /* Internal error: unknown option */
         case '?':
         default:
-            intf_ErrMsg( "intf error: unknown option `%s'\n", ppsz_argv[optind - 1] );
+            intf_ErrMsg( "intf error: unknown option `%s'", ppsz_argv[optind - 1] );
             Usage( USAGE );
             return( EINVAL );
             break;
@@ -609,96 +609,89 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 static void Usage( int i_fashion )
 {
     /* Usage */
-    intf_Msg( "Usage: %s [options] [parameters] [file]...\n",
+    intf_Msg( "Usage: %s [options] [parameters] [file]...",
               p_main->psz_arg0 );
 
     if( i_fashion == USAGE )
     {
-        intf_Msg( "Try `%s --help' for more information.\n",
+        intf_Msg( "Try `%s --help' for more information.",
                   p_main->psz_arg0 );
         return;
     }
 
     /* Options */
-    intf_Msg( "\n"
-              "Options:\n"
-              "      --noaudio                  \tdisable audio\n"
-              "      --aout <plugin>            \taudio output method\n"
-              "      --stereo, --mono           \tstereo/mono audio\n"
+    intf_Msg( "\nOptions:"
+              "\n      --noaudio                  \tdisable audio"
+              "\n      --aout <plugin>            \taudio output method"
+              "\n      --stereo, --mono           \tstereo/mono audio"
               "\n"
-              "      --novideo                  \tdisable video\n"
-              "      --vout <plugin>            \tvideo output method\n"
-              "      --display <display>        \tdisplay string\n"
-              "      --width <w>, --height <h>  \tdisplay dimensions\n"
-              "  -g, --grayscale                \tgrayscale output\n"
-              "      --color                    \tcolor output\n"
+              "\n      --novideo                  \tdisable video"
+              "\n      --vout <plugin>            \tvideo output method"
+              "\n      --display <display>        \tdisplay string"
+              "\n      --width <w>, --height <h>  \tdisplay dimensions"
+              "\n  -g, --grayscale                \tgrayscale output"
+              "\n      --color                    \tcolor output"
               "\n"
-              "  -a, --dvdaudio <type>          \tchoose DVD audio type\n"
-              "  -c, --dvdchannel <channel>     \tchoose DVD audio channel\n"
-              "  -s, --dvdsubtitle <channel>    \tchoose DVD subtitle channel\n"
+              "\n  -a, --dvdaudio <type>          \tchoose DVD audio type"
+              "\n  -c, --dvdchannel <channel>     \tchoose DVD audio channel"
+              "\n  -s, --dvdsubtitle <channel>    \tchoose DVD subtitle channel"
               "\n"
-              "      --vlans                    \tenable vlans\n"
-              "      --server <host>            \tvideo server address\n"
-              "      --port <port>              \tvideo server port\n"
-              "      --broadcast                \tlisten to a broadcast\n"
+              "\n      --vlans                    \tenable vlans"
+              "\n      --server <host>            \tvideo server address"
+              "\n      --port <port>              \tvideo server port"
+              "\n      --broadcast                \tlisten to a broadcast"
               "\n"
-              "      --synchro <type>           \tforce synchro algorithm\n"
+              "\n      --synchro <type>           \tforce synchro algorithm"
               "\n"
-              "      --warning <level>          \tdisplay warning messages\n"
+              "\n      --warning <level>          \tdisplay warning messages"
               "\n"
-              "  -h, --help                     \tprint help and exit\n"
-              "  -H, --longhelp                 \tprint long help and exit\n"
-              "  -v, --version                  \toutput version information and exit\n" );
+              "\n  -h, --help                     \tprint help and exit"
+              "\n  -H, --longhelp                 \tprint long help and exit"
+              "\n  -v, --version                  \toutput version information and exit" );
 
     if( i_fashion == SHORT_HELP )
         return;
 
     /* Interface parameters */
-    intf_Msg( "\n"
-              "Interface parameters:\n"
-              "  " INTF_INIT_SCRIPT_VAR "=<filename>               \tinitialization script\n"
-              "  " INTF_CHANNELS_VAR "=<filename>            \tchannels list\n"
-              "  " INTF_WARNING_VAR "=<level>                \twarning level\n" );
+    intf_Msg( "\nInterface parameters:\n"
+              "\n  " INTF_INIT_SCRIPT_VAR "=<filename>               \tinitialization script"
+              "\n  " INTF_CHANNELS_VAR "=<filename>            \tchannels list"
+              "\n  " INTF_WARNING_VAR "=<level>                \twarning level" );
 
     /* Audio parameters */
-    intf_Msg( "\n"
-              "Audio parameters:\n"
-              "  " AOUT_METHOD_VAR "=<method name>        \taudio method\n"
-              "  " AOUT_DSP_VAR "=<filename>              \tdsp device path\n"
-              "  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output\n"
-              "  " AOUT_RATE_VAR "=<rate>             \toutput rate\n" );
+    intf_Msg( "\nAudio parameters:"
+              "\n  " AOUT_METHOD_VAR "=<method name>        \taudio method"
+              "\n  " AOUT_DSP_VAR "=<filename>              \tdsp device path"
+              "\n  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output"
+              "\n  " AOUT_RATE_VAR "=<rate>             \toutput rate" );
 
     /* Video parameters */
-    intf_Msg( "\n"
-              "Video parameters:\n"
-              "  " VOUT_METHOD_VAR "=<method name>        \tdisplay method\n"
-              "  " VOUT_DISPLAY_VAR "=<display name>      \tdisplay used\n"
-              "  " VOUT_WIDTH_VAR "=<width>               \tdisplay width\n"
-              "  " VOUT_HEIGHT_VAR "=<height>             \tdislay height\n"
-              "  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path\n"
-              "  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output\n" );
+    intf_Msg( "\nVideo parameters:"
+              "\n  " VOUT_METHOD_VAR "=<method name>        \tdisplay method"
+              "\n  " VOUT_DISPLAY_VAR "=<display name>      \tdisplay used"
+              "\n  " VOUT_WIDTH_VAR "=<width>               \tdisplay width"
+              "\n  " VOUT_HEIGHT_VAR "=<height>             \tdislay height"
+              "\n  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path"
+              "\n  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output" );
 
     /* DVD parameters */
-    intf_Msg( "\n"
-              "DVD parameters:\n"
-              "  " INPUT_DVD_AUDIO_VAR "={ac3|lpcm|mpeg|off} \taudio type\n"
-              "  " INPUT_DVD_CHANNEL_VAR "=[0-15]            \taudio channel\n"
-              "  " INPUT_DVD_SUBTITLE_VAR "=[0-31]           \tsubtitle channel\n" );
+    intf_Msg( "\nDVD parameters:"
+              "\n  " INPUT_DVD_AUDIO_VAR "={ac3|lpcm|mpeg|off} \taudio type"
+              "\n  " INPUT_DVD_CHANNEL_VAR "=[0-15]            \taudio channel"
+              "\n  " INPUT_DVD_SUBTITLE_VAR "=[0-31]           \tsubtitle channel" );
 
     /* Input parameters */
-    intf_Msg( "\n"
-              "Input parameters:\n"
-              "  " INPUT_SERVER_VAR "=<hostname>          \tvideo server\n"
-              "  " INPUT_PORT_VAR "=<port>            \tvideo server port\n"
-              "  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface\n"
-              "  " INPUT_BROADCAST_VAR "={1|0}            \tbroadcast mode\n"
-              "  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server\n"
-              "  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port\n" );
+    intf_Msg( "\nInput parameters:\n"
+              "\n  " INPUT_SERVER_VAR "=<hostname>          \tvideo server"
+              "\n  " INPUT_PORT_VAR "=<port>            \tvideo server port"
+              "\n  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface"
+              "\n  " INPUT_BROADCAST_VAR "={1|0}            \tbroadcast mode"
+              "\n  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server"
+              "\n  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port" );
 
     /* Synchro parameters */
-    intf_Msg( "\n"
-              "Synchro parameters:\n"
-              "  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm\n");
+    intf_Msg( "\nSynchro parameters:"
+              "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm");
 }
 
 /*****************************************************************************
@@ -712,7 +705,7 @@ static void Version( void )
               "This program comes with NO WARRANTY, to the extent permitted by law.\n"
               "You may redistribute it under the terms of the GNU General Public License;\n"
               "see the file named COPYING for details.\n"
-              "Written by the VideoLAN team at Ecole Centrale, Paris.\n" );
+              "Written by the VideoLAN team at Ecole Centrale, Paris." );
 
 }
 
@@ -744,7 +737,7 @@ static void InitSignalHandler( void )
 static void SimpleSignalHandler( int i_signal )
 {
     /* Acknowledge the signal received */
-    intf_WarnMsg(0, "intf: ignoring signal %d\n", i_signal );
+    intf_WarnMsg(0, "intf: ignoring signal %d", i_signal );
 }
 
 
@@ -764,7 +757,7 @@ static void FatalSignalHandler( int i_signal )
     signal( SIGQUIT, SIG_IGN );
 
     /* Acknowledge the signal received */
-    intf_ErrMsgImm("intf: signal %d received, exiting\n", i_signal );
+    intf_ErrMsgImm("intf: signal %d received, exiting", i_signal );
 
     /* Try to terminate everything - this is done by requesting the end of the
      * interface thread */

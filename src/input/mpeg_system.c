@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.15 2000/12/22 10:58:27 massiot Exp $
+ * $Id: mpeg_system.c,v 1.16 2000/12/22 13:04:45 sam Exp $
  *
  * Authors: 
  *
@@ -69,7 +69,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
 
 #define p_pes (p_es->p_pes)
 
-    //intf_DbgMsg("End of PES packet %p\n", p_pes);
+    //intf_DbgMsg("End of PES packet %p", p_pes);
 
     /* Parse the header. The header has a variable length, but in order
      * to improve the algorithm, we will read the 14 bytes we may be
@@ -264,7 +264,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             /* PTS management */
             if( p_pes->b_has_pts )
             {
-                //intf_Msg("%lld\n", p_pes->i_pts);
+                //intf_Msg("%lld", p_pes->i_pts);
                 switch( p_es->p_pgrm->i_synchro_state )
                 {
                 case SYNCHRO_NOT_STARTED:
@@ -356,7 +356,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
 {
 #define p_pes (p_es->p_pes)
 
-    //intf_DbgMsg("PES-demultiplexing %p (%p)\n", p_ts_packet, p_pes);
+    //intf_DbgMsg("PES-demultiplexing %p (%p)", p_ts_packet, p_pes);
 
     /* If we lost data, insert an NULL data packet (philosophy : 0 is quite
      * often an escape sequence in decoders, so that should make them wait
@@ -369,7 +369,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
                                             p_input->p_method_data,
                                             PADDING_PACKET_SIZE )) == NULL )
         {
-            intf_ErrMsg("Out of memory\n");
+            intf_ErrMsg("Out of memory");
             p_input->b_error = 1;
             return;
         }
@@ -386,7 +386,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
             if( (p_pes = p_input->p_plugin->pf_new_pes(
                                             p_input->p_method_data )) == NULL )
             {
-                intf_ErrMsg("Out of memory\n");
+                intf_ErrMsg("Out of memory");
                 p_input->b_error = 1;
                 return;
             }
@@ -427,7 +427,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
                 p_input->b_error = 1;
                 return;
             }
-            //intf_DbgMsg("New PES packet %p (first data: %p)\n", p_pes, p_data);
+            //intf_DbgMsg("New PES packet %p (first data: %p)", p_pes, p_data);
             p_pes->p_first = p_data;
 
             /* If the PES header fits in the first data packet, we can
@@ -844,7 +844,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                       ) * 300) / 27;
                 }
                 /* Call the pace control. */
-                //intf_Msg("+%lld\n", scr_time);
+                //intf_Msg("+%lld", scr_time);
                 CRDecode( p_input, p_input->stream.pp_programs[0],
                           scr_time );
                 b_trash = 1;
@@ -920,7 +920,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
 
 #define p (p_data->p_buffer)
 
-    //intf_DbgMsg("input debug: TS-demultiplexing packet %p, pid %d\n",
+    //intf_DbgMsg("input debug: TS-demultiplexing packet %p, pid %d",
     //            p_ts_packet, U16_AT(&p[1]) & 0x1fff);
 
     /* Extract flags values from TS common header. */
@@ -1068,7 +1068,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                  * don't know, do as if we missed a packet to be sure to recover
                  * from this situation */
                 intf_WarnMsg( 2,
-                           "Packet lost by TS demux: current %d, packet %d\n",
+                           "Packet lost by TS demux: current %d, packet %d",
                            p_es_demux->i_continuity_counter & 0x0f,
                            p[3] & 0x0f );
                 b_lost = 1;

@@ -78,7 +78,7 @@ int intf_ExecCommand( char *psz_cmd )
     int             i_index;                         /* multi-purposes index */
     int             i_return;                        /* command return value */
 
-    intf_DbgMsg("command `%s'\n", psz_cmd);
+    intf_DbgMsg("command `%s'", psz_cmd);
 
     /* Parse command line (separate arguments). If nothing has been found,
      * the function returns without error */
@@ -121,7 +121,7 @@ int intf_ExecCommand( char *psz_cmd )
     {
     case INTF_FATAL_ERROR:                                    /* fatal error */
         /* Print message and terminates the interface thread */
-        intf_ErrMsg( "fatal error in command `%s'\n", psz_argv[0] );
+        intf_ErrMsg( "fatal error in command `%s'", psz_argv[0] );
         p_main->p_intf->b_die = 1;
         break;
 
@@ -130,7 +130,7 @@ int intf_ExecCommand( char *psz_cmd )
          * error should be very rare since it does not even try to cancel
          * other threads... */
         intf_ErrMsg( "critical error in command `%s', "
-                     "please report this error !\n", psz_argv[0] );
+                     "please report this error !", psz_argv[0] );
         intf_FlushMsg();
         exit( INTF_CRITICAL_ERROR );
         break;
@@ -174,7 +174,7 @@ int intf_ExecScript( char *psz_filename )
     p_file = fopen( psz_vlcrc, "r" );
     if( p_file == NULL )
     {
-        intf_DbgMsg("intf warning: %s: %s\n", psz_vlcrc, strerror(errno));
+        intf_DbgMsg("intf warning: %s: %s", psz_vlcrc, strerror(errno));
         return( -1 );
     }
 
@@ -203,7 +203,7 @@ int intf_ExecScript( char *psz_filename )
     }
     if( !feof( p_file ) )
     {
-        intf_ErrMsg("error: %s: %s\n", psz_vlcrc, strerror(errno));
+        intf_ErrMsg("error: %s: %s", psz_vlcrc, strerror(errno));
         return( -1 );
     }
 
@@ -432,7 +432,7 @@ static int CheckCommandArguments( intf_arg_t argv[INTF_MAX_ARGS], int i_argc,
         }
 
         intf_DbgMsg(
-            "argument flags=0x%x (index=%d) name=%s str=%s int=%d float=%f\n",
+            "argument flags=0x%x (index=%d) name=%s str=%s int=%d float=%f",
             argv[i_arg].i_flags, argv[i_arg].i_index,
             (argv[i_arg].i_flags & INTF_NAMED_ARG) ? argv[i_arg].ps_name : "NA",
             (argv[i_arg].i_flags & INTF_STR_ARG) ? argv[i_arg].psz_str : "NA",
@@ -448,7 +448,7 @@ static int CheckCommandArguments( intf_arg_t argv[INTF_MAX_ARGS], int i_argc,
         {
             /* Format has not been used and is neither optionnal nor multiple
              * and present */
-            intf_IntfMsg("error: missing argument(s)\n");
+            intf_IntfMsg("error: missing argument(s)");
             return( 1 );
         }
     }
@@ -500,7 +500,7 @@ static int ConvertArgument( intf_arg_t *p_arg, int i_flags, char *psz_str )
 #ifdef DEBUG
     else                                    /* error: missing type specifier */
     {
-        intf_ErrMsg("error: missing type specifier for `%s' (0x%x)\n", psz_str, i_flags);
+        intf_ErrMsg("error: missing type specifier for `%s' (0x%x)", psz_str, i_flags);
         return( 1 );
     }
 #endif
@@ -569,7 +569,7 @@ static void ParseFormatString( intf_arg_t format[INTF_MAX_ARGS], char *psz_forma
                     break;
 #ifdef DEBUG
                 default:/* error which should never happen: incorrect format */
-                    intf_DbgMsg("error: incorrect format string `%s'\n", psz_format);
+                    intf_DbgMsg("error: incorrect format string `%s'", psz_format);
                     break;
 #endif
                 }
