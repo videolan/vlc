@@ -2,15 +2,15 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.19 2003/01/25 16:59:49 fenrir Exp $
+ * $Id: decoder.c,v 1.20 2003/01/25 18:09:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -66,9 +66,9 @@ vlc_module_end();
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
-    
+
     if( p_fifo->i_fourcc != VLC_FOURCC('m','p','4','a') )
-    {   
+    {
         return VLC_EGENERIC;
     }
 
@@ -91,7 +91,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         return( -1 );
     }
     memset( p_adec, 0, sizeof( adec_thread_t ) );
-    
+
     p_adec->p_fifo = p_fifo;
 
     if( InitThread( p_adec ) != 0 )
@@ -132,37 +132,16 @@ static unsigned int pi_channels_maps[6] =
 
 #define FREE( p ) if( p != NULL ) free( p ); p = NULL
 #define GetWLE( p ) \
-    ( *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) )
+    ( *(uint8_t*)(p) + ( *((uint8_t*)(p)+1) << 8 ) )
 
 #define GetDWLE( p ) \
-    (  *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) + \
-        ( *((u8*)(p)+2) << 16 ) + ( *((u8*)(p)+3) << 24 ) )
-    
-static void faac_GetWaveFormatEx( waveformatex_t *p_wh,
-                                          u8 *p_data )
+    (  *(uint8_t*)(p) + ( *((uint8_t*)(p)+1) << 8 ) + \
+        ( *((uint8_t*)(p)+2) << 16 ) + ( *((uint8_t*)(p)+3) << 24 ) )
+
+
+static void GetPESData( uint8_t *p_buf, int i_max, pes_packet_t *p_pes )
 {
-    WAVEFORMATEX *p_wfdata = (WAVEFORMATEX*)p_data;
-    
-    p_wh->i_formattag     = p_wfdata->wFormatTag;
-    p_wh->i_nb_channels   = p_wfdata->nChannels;
-    p_wh->i_samplespersec = p_wfdata->nSamplesPerSec;
-    p_wh->i_avgbytespersec= p_wfdata->nAvgBytesPerSec;
-    p_wh->i_blockalign    = p_wfdata->nBlockAlign;
-    p_wh->i_bitspersample = p_wfdata->wBitsPerSample;
-    p_wh->i_size          = p_wfdata->cbSize;
-
-    if( p_wh->i_size )
-    {
-        p_wh->p_data = malloc( p_wh->i_size );
-        memcpy( p_wh->p_data, 
-                p_data + sizeof(WAVEFORMATEX) , 
-                p_wh->i_size );
-    }
-}
-
-static void GetPESData( u8 *p_buf, int i_max, pes_packet_t *p_pes )
-{   
-    int i_copy; 
+    int i_copy;
     int i_count;
 
     data_packet_t   *p_data;
@@ -172,7 +151,7 @@ static void GetPESData( u8 *p_buf, int i_max, pes_packet_t *p_pes )
     while( p_data != NULL && i_count < i_max )
     {
 
-        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start, 
+        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start,
                         i_max - i_count );
 
         if( i_copy > 0 )
@@ -198,7 +177,7 @@ static void GetPESData( u8 *p_buf, int i_max, pes_packet_t *p_pes )
  *****************************************************************************/
 static int InitThread( adec_thread_t * p_adec )
 {
-    WAVEFORMATEX    *p_wf;
+    WAVEFORMATEX    wf, *p_wf;
     int i_status;
     unsigned long   i_rate;
     unsigned char   i_nb_channels;
@@ -209,12 +188,8 @@ static int InitThread( adec_thread_t * p_adec )
     {
         msg_Warn( p_adec->p_fifo,
                   "cannot load stream informations" );
-        memset( &p_adec->format, 0, sizeof( waveformatex_t ) );
-    }
-    else
-    {
-        faac_GetWaveFormatEx( &p_adec->format,
-                              (uint8_t*)p_wf );
+        p_wf = &wf;
+        memset( p_wf, 0, sizeof( WAVEFORMATEX ) );
     }
 
     p_adec->p_buffer = NULL;
@@ -225,11 +200,10 @@ static int InitThread( adec_thread_t * p_adec )
     {
         msg_Err( p_adec->p_fifo,
                  "cannot initialize faad" );
-        FREE( p_adec->format.p_data );
         return( -1 );
     }
 
-    if( p_adec->format.p_data == NULL )
+    if( p_wf->cbSize <= 0 )
     {
         int i_frame_size;
         pes_packet_t *p_pes;
@@ -273,8 +247,8 @@ static int InitThread( adec_thread_t * p_adec )
     else
     {
         i_status = faacDecInit2( p_adec->p_handle,
-                                 p_adec->format.p_data,
-                                 p_adec->format.i_size,
+                                 (uint8_t*)&p_wf[1],
+                                 p_wf->cbSize,
                                  &i_rate,
                                  &i_nb_channels );
     }
@@ -366,7 +340,7 @@ static void DecodeThread( adec_thread_t *p_adec )
     /* **** some sanity checks to see if we have samples to out **** */
     if( faad_frame.error > 0 )
     {
-        msg_Warn( p_adec->p_fifo, "%s", 
+        msg_Warn( p_adec->p_fifo, "%s",
                   faacDecGetErrorMessage(faad_frame.error) );
         return;
     }
@@ -421,7 +395,7 @@ static void DecodeThread( adec_thread_t *p_adec )
         msg_Err( p_adec->p_fifo, "cannot create aout" );
         return;
     }
-    
+
     if( p_adec->pts != 0 && p_adec->pts != aout_DateGet( &p_adec->date ) )
     {
         aout_DateSet( &p_adec->date, p_adec->pts );
@@ -431,7 +405,7 @@ static void DecodeThread( adec_thread_t *p_adec )
         return;
     }
 
-    p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout, 
+    p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout,
                                        p_adec->p_aout_input,
                                        faad_frame.samples / faad_frame.channels );
     if( !p_aout_buffer )
@@ -467,7 +441,6 @@ static void EndThread (adec_thread_t *p_adec)
         faacDecClose( p_adec->p_handle );
     }
 
-    FREE( p_adec->format.p_data );
     FREE( p_adec->p_buffer );
 
     msg_Dbg( p_adec->p_fifo, "faad decoder closed" );
