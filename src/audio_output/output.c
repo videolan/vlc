@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: output.c,v 1.44 2004/03/03 20:39:52 gbazin Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -245,6 +245,12 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
     aout_FiltersPlay( p_aout, p_aout->output.pp_filters,
                       p_aout->output.i_nb_filters,
                       &p_buffer );
+
+    if( p_buffer->i_nb_bytes == 0 )
+    {
+        aout_BufferFree( p_buffer );
+        return;
+    }
 
     vlc_mutex_lock( &p_aout->output_fifo_lock );
     aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
