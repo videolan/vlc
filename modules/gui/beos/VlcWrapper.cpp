@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.18 2003/01/14 14:48:55 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.19 2003/01/14 22:03:38 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -222,13 +222,31 @@ BList * VlcWrapper::InputGetChannels( int i_cat )
 void VlcWrapper::openFiles( BList* o_files, bool replace )
 {
     BString *o_file;
+    int size = PlaylistSize();
+	bool wasEmpty = ( size < 1 );
 
+    /* delete current playlist */
+    if( replace )
+    {
+        for( int i = 0; i < size; i++ )
+        {
+            playlist_Delete( p_playlist, 0 );
+        }
+    }
+
+    /* append files */
     while( ( o_file = (BString *)o_files->LastItem() ) )
     {
-        o_files->RemoveItem(o_files->CountItems() - 1);
         playlist_Add( p_playlist, o_file->String(),
-                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-        delete o_file;
+                      PLAYLIST_APPEND, PLAYLIST_END );
+        o_files->RemoveItem(o_files->CountItems() - 1);
+    }
+    
+    /* eventually restart playing */
+    if( replace || wasEmpty )
+    {
+        playlist_Stop( p_playlist );
+        playlist_Play( p_playlist );
     }
 }
 

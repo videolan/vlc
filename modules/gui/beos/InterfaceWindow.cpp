@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.16 2003/01/14 14:48:55 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.17 2003/01/14 22:03:38 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -443,10 +443,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 		case B_REFS_RECEIVED:
 		case B_SIMPLE_DATA:
 			{
-				// figure out if user wants files replaced or added
+				/* file(s) opened by the File menu -> append to the playlist;
+				 * file(s) opened by drag & drop -> replace playlist;
+				 * file(s) opened by 'shift' + drag & drop -> append */
 				bool replace = false;
 				if ( p_message->WasDropped() )
 					replace = !( modifiers() & B_SHIFT_KEY );
+					
 				// build list of files to be played from message contents
 				entry_ref ref;
 				BList files;
@@ -454,8 +457,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				{
 					BPath path( &ref );
 					if ( path.InitCheck() == B_OK )
-						// the BString objects will be deleted
-						// by the wrapper function further down
 						files.AddItem( new BString( (char*)path.Path() ) );
 				}
 				// give the list to VLC
