@@ -1,11 +1,13 @@
 /*****************************************************************************
- * ps.c
+ * ps.c: MPEG PS (ISO/IEC 13818-1) / MPEG SYSTEM (ISO/IEC 1172-1)
+ *       multiplexer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ps.c,v 1.12 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: ps.c,v 1.13 2003/07/15 13:12:00 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
+ *          Gildas Bazin <gbazin@netcourrier.com>
  *
  *
  * This program is free software; you can redistribute it and/or modify
@@ -77,6 +79,7 @@ vlc_module_begin();
     set_description( _("PS muxer") );
     set_capability( "sout mux", 50 );
     add_shortcut( "ps" );
+    add_shortcut( "mpeg1" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -90,7 +93,6 @@ typedef struct ps_stream_s
 
 struct sout_mux_sys_t
 {
-
     int         i_stream_id_mpga;
     int         i_stream_id_mpgv;
     int         i_stream_id_a52;
@@ -101,6 +103,8 @@ struct sout_mux_sys_t
     int         i_pes_count;
 
     int         i_system_header;
+
+    vlc_bool_t  b_mpeg2;
 };
 
 /*****************************************************************************
@@ -130,6 +134,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_system_header = 0;
     p_sys->i_pes_count = 0;
 
+    p_sys->b_mpeg2 = !(p_mux->psz_mux && !strcmp( p_mux->psz_mux, "mpeg1" ));
+
     return VLC_SUCCESS;
 }
 
@@ -142,7 +148,7 @@ static void Close( vlc_object_t * p_this )
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
 
-    sout_buffer_t       *p_end;
+    sout_buffer_t   *p_end;
 
     msg_Info( p_mux, "Close" );
 
@@ -154,7 +160,8 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
-static int Capability( sout_mux_t *p_mux, int i_query, void *p_args, void *p_answer )
+static int Capability( sout_mux_t *p_mux, int i_query, void *p_args,
+                       void *p_answer )
 {
    switch( i_query )
    {
@@ -177,7 +184,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     switch( p_input->p_fmt->i_cat )
     {
         case VIDEO_ES:
-
             switch( p_input->p_fmt->i_fourcc )
             {
                 case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
@@ -189,12 +195,14 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     return( -1 );
             }
             break;
+
         case AUDIO_ES:
             switch( p_input->p_fmt->i_fourcc )
             {
                 case VLC_FOURCC( 'a', '5', '2', ' ' ):
                 case VLC_FOURCC( 'a', '5', '2', 'b' ):
-                    p_stream->i_stream_id = p_sys->i_stream_id_a52 | ( 0xbd << 8 );
+                    p_stream->i_stream_id = p_sys->i_stream_id_a52 |
+                                            ( 0xbd << 8 );
                     p_sys->i_stream_id_a52++;
                     p_sys->i_audio_bound++;
                     break;
@@ -212,13 +220,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     p_stream->i_ok = 1;
-    msg_Dbg( p_mux, "adding input stream_id:0x%x [OK]", p_stream->i_stream_id );
+    msg_Dbg( p_mux, "adding input stream_id:0x%x [OK]",
+             p_stream->i_stream_id );
+
     return( 0 );
 }
 
 static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
-    ps_stream_t         *p_stream =(ps_stream_t*)p_input->p_sys;
+    ps_stream_t *p_stream =(ps_stream_t*)p_input->p_sys;
 
     msg_Dbg( p_mux, "removing input" );
     if( p_stream )
@@ -228,8 +238,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     return( VLC_SUCCESS );
 }
 
-static int MuxWritePackHeader( sout_mux_t *p_mux,
-                               mtime_t         i_dts )
+static int MuxWritePackHeader( sout_mux_t *p_mux, mtime_t i_dts )
 {
     sout_buffer_t   *p_hdr;
     bits_buffer_t   bits;
@@ -240,7 +249,12 @@ static int MuxWritePackHeader( sout_mux_t *p_mux,
     p_hdr = sout_BufferNew( p_mux->p_sout, 18 );
     bits_initwrite( &bits, 14, p_hdr->p_buffer );
     bits_write( &bits, 32, 0x01ba );
-    bits_write( &bits, 2, 0x01 );       // FIXME ??
+
+    if( p_mux->p_sys->b_mpeg2 )
+        bits_write( &bits, 2, 0x01 );
+    else
+        bits_write( &bits, 4, 0x02 );
+
     bits_write( &bits, 3, ( i_src >> 30 )&0x07 );
     bits_write( &bits, 1,  1 );
     bits_write( &bits, 15, ( i_src >> 15 )&0x7fff );
@@ -248,15 +262,27 @@ static int MuxWritePackHeader( sout_mux_t *p_mux,
     bits_write( &bits, 15, i_src&0x7fff );
     bits_write( &bits, 1,  1 );
 
-    bits_write( &bits, 9,  0 ); // src extention
+    if( p_mux->p_sys->b_mpeg2 )
+    {
+        bits_write( &bits, 9,  0 ); // src extention
+    }
     bits_write( &bits, 1,  1 );
 
-    bits_write( &bits, 22,  0/8/50); // FIXME
+    bits_write( &bits, 22,  1000/8/50); // FIXME mux rate
     bits_write( &bits, 1,  1 );
-    bits_write( &bits, 1,  1 );
-    bits_write( &bits, 5,  0x1f );  // FIXME reserved
-    bits_write( &bits, 3,  0 );     // stuffing bytes
-    p_hdr->i_size = 14;
+
+    if( p_mux->p_sys->b_mpeg2 )
+    {
+        bits_write( &bits, 1,  1 );
+        bits_write( &bits, 5,  0x1f );  // FIXME reserved
+        bits_write( &bits, 3,  0 );     // stuffing bytes
+    }
+
+    if( p_mux->p_sys->b_mpeg2 )
+        p_hdr->i_size = 14;
+    else
+        p_hdr->i_size = 12;
+
     sout_AccessOutWrite( p_mux->p_access, p_hdr );
 
     return( 0 );
@@ -267,12 +293,13 @@ static int MuxWriteSystemHeader( sout_mux_t *p_mux )
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     sout_buffer_t   *p_hdr;
     bits_buffer_t   bits;
+    int i;
 
-    p_hdr = sout_BufferNew( p_mux->p_sout, 12 );
+    p_hdr = sout_BufferNew( p_mux->p_sout, 12 + p_mux->i_nb_inputs * 3 );
 
-    bits_initwrite( &bits, 12, p_hdr->p_buffer );
+    bits_initwrite( &bits, 12 + p_mux->i_nb_inputs * 3, p_hdr->p_buffer );
     bits_write( &bits, 32, 0x01bb );
-    bits_write( &bits, 16, 12 - 6);
+    bits_write( &bits, 16, 12 - 6 + p_mux->i_nb_inputs * 3 );
     bits_write( &bits, 1,  1 );
     bits_write( &bits, 22, 0 ); // FIXME rate bound
     bits_write( &bits, 1,  1 );
@@ -286,10 +313,31 @@ static int MuxWriteSystemHeader( sout_mux_t *p_mux )
     bits_write( &bits, 1,  1 ); // marker bit
 
     bits_write( &bits, 5,  p_sys->i_video_bound );
-    bits_write( &bits, 1,  0 ); // packet rate restriction flag
-    bits_write( &bits, 7,  0x7f ); // reserved bits
+    bits_write( &bits, 1,  1 ); // packet rate restriction flag (1 for mpeg1)
+    bits_write( &bits, 7,  0xff ); // reserved bits
 
-    /* FIXME missing stream_id ... */
+    /* stream_id table */
+    for( i = 0; i < p_mux->i_nb_inputs; i++ )
+    {
+        ps_stream_t *p_stream = (ps_stream_t *)p_mux->pp_inputs[i]->p_sys;
+
+        if( p_stream->i_stream_id < 0xc0 )
+        {
+            /* FIXME */
+        }
+        bits_write( &bits, 8, p_stream->i_stream_id ); // stream ID
+        bits_write( &bits, 2, 0x03 );
+        if( p_stream->i_stream_id < 0xe0 ) /* FIXME */
+        {
+            /* audio */
+            bits_write( &bits, 1, 0 );
+            bits_write( &bits, 13, /* stream->max_buffer_size */ 0 / 128 );
+        } else {
+            /* video */
+            bits_write( &bits, 1, 1 );
+            bits_write( &bits, 13, /* stream->max_buffer_size */ 0 / 1024 );
+        }
+    }
 
     sout_AccessOutWrite( p_mux->p_access, p_hdr );
 
@@ -340,8 +388,7 @@ static int MuxGetStream( sout_mux_t *p_mux,
     return( i_stream );
 }
 
-
-static int Mux      ( sout_mux_t *p_mux )
+static int Mux( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     mtime_t        i_dts;
@@ -370,11 +417,12 @@ static int Mux      ( sout_mux_t *p_mux )
 
         if( p_sys->i_pes_count % 300 == 0 )
         {
-//            MuxWriteSystemHeader( p_sout );
+            MuxWriteSystemHeader( p_mux );
         }
 
         p_data = sout_FifoGet( p_fifo );
-        E_( EStoPES )( p_mux->p_sout, &p_data, p_data, p_stream->i_stream_id, 1);
+        E_( EStoPES )( p_mux->p_sout, &p_data, p_data, p_stream->i_stream_id,
+                       p_mux->p_sys->b_mpeg2 );
         sout_AccessOutWrite( p_mux->p_access, p_data );
 
         p_sys->i_pes_count++;
@@ -382,4 +430,3 @@ static int Mux      ( sout_mux_t *p_mux )
     }
     return( 0 );
 }
-

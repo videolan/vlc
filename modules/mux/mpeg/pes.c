@@ -1,8 +1,8 @@
 /*****************************************************************************
- * pes.c
+ * pes.c: PES packetizer used by the MPEG multiplexers
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.c,v 1.7 2003/06/10 22:42:59 gbazin Exp $
+ * $Id: pes.c,v 1.8 2003/07/15 13:12:00 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -47,7 +47,8 @@
 #define PES_PAYLOAD_SIZE_MAX 65500
 
 static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
-                             int i_es_size, int i_stream_id, int i_private_id )
+                             int i_es_size, int i_stream_id, int i_private_id,
+                             vlc_bool_t b_mpeg2 )
 {
     bits_buffer_t bits;
 
@@ -73,7 +74,7 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
 
         default:
             /* arg, a little more difficult */
-//            if( b_mpeg2 ) // FIXME unsupported
+            if( b_mpeg2 )
             {
                 int     i_pts_dts;
                 int     i_extra = 0;
@@ -155,6 +156,59 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
                     bits_write( &bits, 1, 0x01 ); // marker
                 }
             }
+	    else /* MPEG1 */
+	    {
+                int i_pts_dts;
+
+                if( i_pts >= 0 && i_dts >= 0 )
+                {
+		    bits_write( &bits, 16, i_es_size + 10 /* + stuffing */ );
+                    i_pts_dts = 0x03;
+                }
+                else if( i_pts >= 0 )
+                {
+		     bits_write( &bits, 16, i_es_size + 5 /* + stuffing */ );
+                    i_pts_dts = 0x02;
+                }
+                else
+                {
+                    bits_write( &bits, 16, i_es_size + 1 /* + stuffing */);
+                    i_pts_dts = 0x00;
+                }
+
+                /* FIXME: Now should be stuffing */
+
+                /* No STD_buffer_scale and STD_buffer_size */
+
+                /* write pts */
+                if( i_pts_dts & 0x02 )
+                {
+                    bits_write( &bits, 4, i_pts_dts ); // '0010' or '0011'
+                    bits_write( &bits, 3, i_pts >> 30 );
+                    bits_write( &bits, 1, 0x01 ); // marker
+                    bits_write( &bits, 15, i_pts >> 15 );
+                    bits_write( &bits, 1, 0x01 ); // marker
+                    bits_write( &bits, 15, i_pts );
+                    bits_write( &bits, 1, 0x01 ); // marker
+                }
+                /* write i_dts */
+                if( i_pts_dts & 0x01 )
+                {
+                    bits_write( &bits, 4, 0x01 ); // '0001'
+                    bits_write( &bits, 3, i_dts >> 30 );
+                    bits_write( &bits, 1, 0x01 ); // marker
+                    bits_write( &bits, 15, i_dts >> 15 );
+                    bits_write( &bits, 1, 0x01 ); // marker
+                    bits_write( &bits, 15, i_dts );
+                    bits_write( &bits, 1, 0x01 ); // marker
+                }
+		if( !i_pts_dts )
+                {
+                    bits_write( &bits, 8, 0x0F );
+                }
+
+	    }
+
             /* now should be stuffing */
             /* and then pes data */
 
@@ -210,7 +264,7 @@ int E_( EStoPES )( sout_instance_t *p_sout,
     {
         i_pes_payload = __MIN( i_size, PES_PAYLOAD_SIZE_MAX );
         i_pes_header  = PESHeader( header, i_pts, i_dts, i_pes_payload,
-                                   i_stream_id, i_private_id );
+                                   i_stream_id, i_private_id, b_mpeg2 );
         i_dts = -1; // only first PES has a dts/pts
         i_pts = -1;
 
