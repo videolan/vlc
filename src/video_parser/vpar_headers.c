@@ -67,14 +67,15 @@ static void ExtensionAndUserData( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * vpar_NextSequenceHeader : Find the next sequence header
  *****************************************************************************/
-void vpar_NextSequenceHeader( vpar_thread_t * p_vpar )
+int vpar_NextSequenceHeader( vpar_thread_t * p_vpar )
 {
     while( !p_vpar->b_die )
     {
         NextStartCode( p_vpar );
         if( ShowBits( &p_vpar->bit_stream, 32 ) == SEQUENCE_START_CODE )
-            return;
+            return 0;
     }
+    return 1;
 }
 
 /*****************************************************************************
@@ -123,7 +124,7 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
 static __inline__ void NextStartCode( vpar_thread_t * p_vpar )
 {
     /* Re-align the buffer on an 8-bit boundary */
-    DumpBits( &p_vpar->bit_stream, p_vpar->bit_stream.fifo.i_available & 7 );
+    RealignBits( &p_vpar->bit_stream );
 
     while( ShowBits( &p_vpar->bit_stream, 24 ) != 0x01L && !p_vpar->b_die )
     {
@@ -461,7 +462,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         /* Initialize values. */
         P_picture->date = vpar_SynchroDecode( p_vpar, i_coding_type,
                                               i_structure );
-        bzero( p_vpar->picture.pp_mb, MAX_MB*sizeof( macroblock_t * ) );
         p_vpar->picture.i_lum_incr = - 8 + ( p_vpar->sequence.i_width
                     << ( i_structure != FRAME_STRUCTURE ) );
         p_vpar->picture.i_chroma_incr = -8 + ( p_vpar->sequence.i_width
@@ -469,7 +469,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                         ( 3 - p_vpar->sequence.i_chroma_format )) );
 
         /* Update the reference pointers. */
-        ReferenceUpdate( p_vpar, i_coding_type, p_undec_p );
+        ReferenceUpdate( p_vpar, i_coding_type, p_picture );
     }
     p_vpar->picture.i_current_structure |= i_structure;
     p_vpar->picture.i_structure = i_structure;

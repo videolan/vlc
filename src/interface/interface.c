@@ -111,11 +111,13 @@ static int StartInterface( intf_thread_t *p_intf )
     int fd;
 #endif
 
+#if 0
     /* Empty all threads array */
     for( i_thread = 0; i_thread < VOUT_MAX_THREADS; i_thread++ )
     {
         p_intf->pp_vout[i_thread] = NULL;        
     }
+#endif
     for( i_thread = 0; i_thread < INPUT_MAX_THREADS; i_thread++ )
     {
         p_intf->pp_input[i_thread] = NULL;        
@@ -171,6 +173,7 @@ static void EndInterface( intf_thread_t *p_intf )
         }        
     }
 
+#if 0
     /* Destroy all remaining video output threads - all destruction orders are send,
      * then all THREAD_OVER status are received */
     for( i_thread = 0, b_thread = 0; i_thread < VOUT_MAX_THREADS; i_thread++ )
@@ -194,6 +197,6 @@ static void EndInterface( intf_thread_t *p_intf )
             }     
         }
     }
-    
+#endif
 
 }

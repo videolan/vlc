@@ -87,3 +87,38 @@ void            vpar_DestroyThread      ( vpar_thread_t *p_vpar /*, int *pi_stat
 
 /* Dynamic thread settings */
 /* ?? */
+
+/*****************************************************************************
+ * LoadQuantizerScale
+ *****************************************************************************
+ * Quantizer scale factor (ISO/IEC 13818-2 7.4.2.2)
+ *****************************************************************************/
+static __inline__ void LoadQuantizerScale( struct vpar_thread_s * p_vpar )
+{
+    /* Quantization coefficient table */
+    static unsigned char    ppi_quantizer_scale[3][32] =
+    {
+        /* MPEG-2 */
+        {
+            /* q_scale_type */
+            /* linear */
+            0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,
+            32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62
+        },
+        {
+            /* non-linear */
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 10,12,14,16,18,20, 22,
+            24,28,32,36,40,44,48,52,56,64,72,80,88,96,104,112
+        },
+        /* MPEG-1 */
+        {
+            0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
+            16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
+        }
+    };
+
+    p_vpar->slice.i_quantizer_scale = ppi_quantizer_scale
+           [(!p_vpar->sequence.b_mpeg2 << 1) | p_vpar->picture.b_q_scale_type]
+           [GetBits( &p_vpar->bit_stream, 5 )];
+}
+

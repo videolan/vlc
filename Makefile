@@ -135,9 +135,9 @@ input_obj =         		input/input_vlan.o \
 audio_output_obj = 		audio_output/audio_output.o \
 						audio_output/audio_dsp.o
 
-video_output_obj = 		video_output/video_output.o \
-						video_output/video_x11.o \
-						video_output/video_graphics.o 
+#video_output_obj = 		video_output/video_output.o \
+#						video_output/video_x11.o \
+#						video_output/video_graphics.o 
 
 audio_decoder_obj =		audio_decoder/audio_decoder.o \
 						audio_decoder/audio_math.o
@@ -156,6 +156,17 @@ video_decoder_obj =		video_decoder_ref/video_decoder.o \
 						video_decoder_ref/recon.o \
 						video_decoder_ref/spatscal.o
 
+#video_parser_obj = 		video_parser/video_parser.o \
+#						video_parser/vpar_headers.o \
+#						video_parser/vpar_blocks.o \
+#						video_parser/vpar_motion.o \
+#						video_parser/vpar_synchro.o \
+#						video_parser/video_fifo.o
+
+#video_decoder_obj =		video_decoder/video_decoder.o \
+#						video_decoder/vdec_idct.o \
+#						video_decoder/vdec_motion.o
+
 misc_obj =			misc/mtime.o \
 						misc/xutils.o \
 						misc/rsc_files.o \
@@ -167,6 +178,7 @@ C_OBJ = $(interface_obj) \
 		$(video_output_obj) \
 		$(audio_decoder_obj) \
 		$(generic_decoder_obj) \
+		$(video_parser_obj) \
 		$(video_decoder_obj) \
 		$(vlan_obj) \
 		$(misc_obj) \

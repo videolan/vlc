@@ -18,14 +18,16 @@
 /*****************************************************************************
  * Function pointers
  *****************************************************************************/
-typedef (void *)    f_slice_header_t( vpar_thread_t*, int*, int, elem_t*, u32);
+struct vpar_thread_s;
+
+typedef void    (*f_slice_header_t)( struct vpar_thread_s*, int*, int, elem_t*, u32);
 
 /*****************************************************************************
  * quant_matrix_t : Quantization Matrix
  *****************************************************************************/
 typedef struct quant_matrix_s
 {
-    int         pi_matrix[64];
+    int *       pi_matrix;
     boolean_t   b_allocated;
                           /* Has the matrix been allocated by vpar_headers ? */
 } quant_matrix_t;
@@ -50,11 +52,12 @@ typedef struct sequence_s
     f_slice_header_t    pf_slice_header;
     quant_matrix_t      intra_quant, nonintra_quant;
     quant_matrix_t      chroma_intra_quant, chroma_nonintra_quant;
-    (void *)            pf_decode_mv( vpar_thread_t *, int );
-    (void *)            pf_decode_pattern( vpar_thread_t * );
+    void                (*pf_decode_mv)( struct vpar_thread_s *, int );
+    void                (*pf_decode_pattern)( struct vpar_thread_s * );
 
     /* Parser context */
-    picture_t *         p_forward, p_backward;
+    picture_t *         p_forward;
+    picture_t *         p_backward;
 
     /* Copyright extension */
     boolean_t               b_copyright_flag;     /* Whether the following
@@ -90,7 +93,7 @@ typedef struct picture_parsing_s
     /* Relative to the current field */
     int                 i_coding_type, i_structure;
     boolean_t           b_frame_structure;
-    (int *)             pf_macroblock_type( vpar_thread_t * );
+    int                 (*pf_macroblock_type)( struct vpar_thread_s * );
 
     boolean_t           b_error;
 } picture_parsing_t;
@@ -147,3 +150,10 @@ typedef struct slice_parsing_s
 #define TOP_FIELD               1
 #define BOTTOM_FIELD            2
 #define FRAME_STRUCTURE         3
+
+
+/*****************************************************************************
+ * Prototypes
+ *****************************************************************************/
+int vpar_NextSequenceHeader( struct vpar_thread_s * p_vpar );
+int vpar_ParseHeader( struct vpar_thread_s * p_vpar );

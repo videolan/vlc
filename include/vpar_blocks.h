@@ -25,7 +25,6 @@ typedef struct macroblock_s
     int                     i_structure;
     int                     i_l_x, i_l_y;    /* position of macroblock (lum) */
     int                     i_c_x, i_c_y; /* position of macroblock (chroma) */
-    int                     i_structure;
     int                     i_chroma_nb_blocks;  /* nb of bks for a chr comp */
 
     /* IDCT information */
@@ -36,8 +35,10 @@ typedef struct macroblock_s
     /* Motion compensation information */
     f_motion_t              pf_motion;    /* function to use for motion comp */
     f_chroma_motion_t       pf_chroma_motion;
-    picture_t *             p_backw_top, p_backw_bot;
-    picture_t *             p_forw_top, p_forw_bot;
+    picture_t *             p_backw_top;
+    picture_t *             p_backw_bot;
+    picture_t *             p_forw_top;
+    picture_t *             p_forw_bot;
     int                     i_field_select_backw_top, i_field_select_backw_bot;
     int                     i_field_select_forw_top, i_field_select_forw_bot;
     int                     pi_motion_vectors_backw_top[2];
@@ -60,40 +61,6 @@ typedef struct
     int                     i_coded_block_pattern;
     boolean_t               b_dct_type;
 } macroblock_parsing_t;
-
-/*****************************************************************************
- * LoadQuantizerScale
- *****************************************************************************
- * Quantizer scale factor (ISO/IEC 13818-2 7.4.2.2)
- *****************************************************************************/
-static __inline__ void LoadQuantizerScale( vpar_thread_t * p_vpar )
-{
-    /* Quantization coefficient table */
-    static unsigned char    ppi_quantizer_scale[3][32] =
-    {
-        /* MPEG-2 */
-        {
-            /* q_scale_type */
-            /* linear */
-            0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,
-            32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62
-        },
-        {
-            /* non-linear */
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 10,12,14,16,18,20, 22,
-            24,28,32,36,40,44,48,52,56,64,72,80,88,96,104,112
-        },
-        /* MPEG-1 */
-        {
-            0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
-            16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
-        }
-    };
-
-    p_vpar->slice.i_quantizer_scale = ppi_quantizer_scale
-           [(!p_vpar->sequence.b_mpeg2 << 1) | p_vpar->picture.b_q_scale_type]
-           [GetBits( &p_vpar->bit_stream, 5 )];
-}
 
 /*****************************************************************************
  * Standard codes

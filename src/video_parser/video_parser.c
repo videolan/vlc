@@ -30,9 +30,15 @@
 #include "decoder_fifo.h"
 #include "video.h"
 #include "video_output.h"
+
+#include "vdec_idct.h"
 #include "video_decoder.h"
+#include "vdec_motion.h"
+
+#include "vpar_blocks.h"
+#include "vpar_headers.h"
+#include "video_fifo.h"
 #include "video_parser.h"
-#include "parser_fifo.h"
 
 /*
  * Local prototypes
@@ -81,7 +87,7 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     p_vpar->fifo.i_end = 0;
     /* Initialize the bit stream structure */
     p_vpar->bit_stream.p_input = p_input;
-    p_vpar->bit_stream.p_parser_fifo = &p_vpar->fifo;
+    p_vpar->bit_stream.p_decoder_fifo = &p_vpar->fifo;
     p_vpar->bit_stream.fifo.buffer = 0;
     p_vpar->bit_stream.fifo.i_available = 0;
 
@@ -172,12 +178,12 @@ static int InitThread( vpar_thread_t *p_vpar )
 #endif
 
     /* Initialize parsing data */
-    p_vpar->sequence.p_forward = p_vpar->sequence.p_backward = NULL;
-    p_vpar->sequence.intra_quant.b_allocated = FALSE;
-    p_vpar->sequence.nonintra_quant.b_allocated = FALSE;
-    p_vpar->sequence.chroma_intra_quant.b_allocated = FALSE;
-    p_vpar->sequence.chroma_nonintra_quant.b_allocated = FALSE;
-    p_vpar->sequence.i_frame_number = 0;
+    p_vpar->sequence.p_forward = NULL;
+    p_vpar->sequence.p_backward = NULL;
+    p_vpar->sequence.intra_quant.b_allocated = 0;
+    p_vpar->sequence.nonintra_quant.b_allocated = 0;
+    p_vpar->sequence.chroma_intra_quant.b_allocated = 0;
+    p_vpar->sequence.chroma_nonintra_quant.b_allocated = 0;
     /* Initialize copyright information */
     p_vpar->sequence.b_copyright_flag = 0;
     p_vpar->sequence.b_original = 0;
@@ -201,7 +207,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     /* Initialize video FIFO */
     vpar_InitFIFO( p_vpar );
     
-    bzero( p_vpar->p_vdec, MAX_VDEC*sizeof(vdec_thread_t *) );
+    bzero( p_vpar->p_vdec, NB_VDEC*sizeof(vdec_thread_t *) );
     
     /* Spawn video_decoder threads */
     /* ??? modify the number of vdecs at runtime ? */
@@ -226,8 +232,6 @@ static int InitThread( vpar_thread_t *p_vpar )
  *******************************************************************************/
 static void RunThread( vpar_thread_t *p_vpar )
 {
-    int i_dummy;
-
     intf_DbgMsg("vpar debug: running video parser thread (%p) (pid == %i)\n", p_vpar, getpid());
 
     /* 

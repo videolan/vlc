@@ -31,6 +31,8 @@
  *****************************************************************************
  * This rotative FIFO contains undecoded macroblocks that are to be decoded
  *****************************************************************************/
+struct video_parser_s;
+
 typedef struct video_fifo_s
 {
     vlc_mutex_t         lock;                              /* fifo data lock */
@@ -62,6 +64,7 @@ typedef struct video_buffer_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+void vpar_InitFIFO( struct vpar_thread_s * p_vpar );
 macroblock_t * vpar_GetMacroblock( video_fifo_t * p_fifo );
 macroblock_t * vpar_NewMacroblock( video_fifo_t * p_fifo );
 void vpar_DecodeMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb );

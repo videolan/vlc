@@ -49,6 +49,7 @@
  *******************************************************************************/
 int intf_CreateVoutThread( intf_thread_t *p_intf, char *psz_title, int i_width, int i_height )
 {
+#if 0
     int             i_thread;                                  /* thread index */
     video_cfg_t     cfg;                               /* thread configuration */    
 
@@ -92,6 +93,7 @@ int intf_CreateVoutThread( intf_thread_t *p_intf, char *psz_title, int i_width, 
 
     /* No empty place has been found */
     return( -1 );
+#endif
 }
 
 
@@ -103,6 +105,7 @@ int intf_CreateVoutThread( intf_thread_t *p_intf, char *psz_title, int i_width, 
  *******************************************************************************/
 void intf_DestroyVoutThread( intf_thread_t *p_intf, int i_thread )
 {
+#if 0
 #ifdef DEBUG
     /* Check if thread still exists */
     if( p_intf->pp_vout[i_thread] == NULL )
@@ -115,6 +118,7 @@ void intf_DestroyVoutThread( intf_thread_t *p_intf, int i_thread )
     /* Destroy thread and marks its place as empty */
     vout_DestroyThread( p_intf->pp_vout[i_thread], NULL );
     p_intf->pp_vout[i_thread] = NULL;
+#endif
 }
 
 

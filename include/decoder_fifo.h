@@ -96,12 +96,6 @@ typedef struct bit_stream_s
  *****************************************************************************/
 static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
 {
-    /* Is the input thread dying ? */
-    if ( p_bit_stream->p_input->b_die )
-    {
-        return( 0 );
-    }
-
     /* Are there some bytes left in the current TS packet ? */
     if ( p_bit_stream->i_byte < p_bit_stream->p_ts->i_payload_end )
     {
@@ -117,6 +111,12 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
              * time to jump to the next PES packet */
             if ( p_bit_stream->p_ts->p_next_ts == NULL )
             {
+                /* Is the input thread dying ? */
+                if ( p_bit_stream->p_input->b_die )
+                {
+                    return( 0 );
+                }
+			
                 /* We are going to read/write the start and end indexes of the
                  * decoder fifo and to use the fifo's conditional variable,
                  * that's why we need to take the lock before */
@@ -164,7 +164,7 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
 
 /******************************************************************************
  * NeedBits : reads i_bits new bits in the bit stream and stores them in the
- *            bit buffer
+ *  <F4>          bit buffer
  ******************************************************************************
  * - i_bits must be less or equal 32 !
  * - There is something important to notice with that function : if the number
@@ -193,4 +193,66 @@ static __inline__ void DumpBits( bit_stream_t * p_bit_stream, int i_bits )
 {
     p_bit_stream->fifo.buffer <<= i_bits;
     p_bit_stream->fifo.i_available -= i_bits;
+}
+
+/******************************************************************************
+ * DumpBits32 : removes 32 bits from the bit buffer
+ ******************************************************************************
+ * This function actually believes that you have already put 32 bits in the
+ * bit buffer, so you can't you use it anytime.
+ ******************************************************************************/
+static __inline__ void DumpBits32( bit_stream_t * p_bit_stream )
+{
+    p_bit_stream->fifo.buffer = 0;
+    p_bit_stream->fifo.i_available = 0;
+}
+
+/*
+ * For the following functions, please read VERY CAREFULLY the warning in
+ * NeedBits(). If i_bits > 24, the stream parser must be already aligned
+ * on an 8-bit boundary, or you will get curious results (that is, you
+ * need to call RealignBits() before).
+ */
+
+/******************************************************************************
+ * ShowBits : return i_bits bits from the bit stream
+ ******************************************************************************/
+static __inline__ u32 ShowBits( bit_stream_t * p_bit_stream, int i_bits )
+{
+    NeedBits( p_bit_stream, i_bits );
+    return( p_bit_stream->fifo.buffer >> (32 - i_bits) );
+}
+
+/******************************************************************************
+ * GetBits : returns i_bits bits from the bit stream and removes them
+ ******************************************************************************/
+static __inline__ u32 GetBits( bit_stream_t * p_bit_stream, int i_bits )
+{
+    u32 i_buffer;
+
+    NeedBits( p_bit_stream, i_bits );
+    i_buffer = p_bit_stream->fifo.buffer >> (32 - i_bits);
+    DumpBits( p_bit_stream, i_bits );
+    return( i_buffer );
+}
+
+/******************************************************************************
+ * GetBits32 : returns 32 bits from the bit stream and removes them
+ ******************************************************************************/
+static __inline__ u32 GetBits32( bit_stream_t * p_bit_stream )
+{
+    u32 i_buffer;
+
+    NeedBits( p_bit_stream, 32 );
+    i_buffer = p_bit_stream->fifo.buffer;
+    DumpBits32( p_bit_stream );
+    return( i_buffer );
+}
+
+/******************************************************************************
+ * RealignBits : realigns the bit buffer on an 8-bit boundary
+ ******************************************************************************/
+static __inline__ void RealignBits( bit_stream_t * p_bit_stream )
+{
+    DumpBits( p_bit_stream, p_bit_stream->fifo.i_available & 7 );
 }

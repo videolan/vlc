@@ -25,6 +25,11 @@
 //#define DVB_EXTENSIONS
 //#define DVB_RESTRICTIONS
 
+/* Define to disable some obscure heuristics behind the video_parser and the
+ * video_decoder that improve performance but are not fully MPEG2 compliant
+ * and might cause problems with some very weird streams. */
+//#define MPEG2_COMPLIANT
+
 /* Define for profiling support */
 //#define STATS
 
@@ -220,10 +225,29 @@
 #define VOUT_DISPLAY_TOLERANCE          150000
 
 /*******************************************************************************
+ * Video parser configuration
+ *******************************************************************************/
+
+#define VPAR_IDLE_SLEEP                 100000
+
+/* Number of macroblock buffers available. It should be always greater than
+ * twice the number of macroblocks in a picture. VFIFO_SIZE + 1 should also
+ * be a power of two. */
+#define VFIFO_SIZE                      4095
+
+/* Maximum number of macroblocks in a picture. */
+#define MAX_MB                          2048
+
+/*******************************************************************************
  * Video decoder configuration
  *******************************************************************************/
 
 #define VDEC_IDLE_SLEEP                 100000
+
+/* Number of video_decoder threads to launch on startup of the video_parser.
+ * It should always be less than half the number of macroblocks of a
+ * picture. */
+#define NB_VDEC                         1
 
 /*******************************************************************************
  * Generic decoder configuration
