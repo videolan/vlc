@@ -19,11 +19,15 @@ MAX_TEX_RECURSION=4
 #JADE=openjade
 
 JADE=openjade
+LYNX=/usr/bin/lynx
+DVIPS=/usr/bin/dvips
+JADETEX=/usr/bin/jadetex
 
 XML_DECL=/usr/share/sgml/docbook/dsssl-stylesheets-1.76/dtds/decls/xml.dcl
 HTML_SS=/usr/share/sgml/docbook/dsssl-stylesheets-1.76/html/docbook.dsl
 PRINT_SS=/usr/share/sgml/docbook/dsssl-stylesheets-1.76/print/docbook.dsl
 
+DOCS=manual.html manual.txt manual.ps
 
 all: manual
 
@@ -40,16 +44,16 @@ manual.html: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml h
          -d $(HTML_SS) $(XML_DECL) manual.xml > $@
 
 manual.dvi: manual.tex modules.eps ps.eps stream.eps ts.eps
-	jadetex manual.tex
-	jadetex manual.tex
-	jadetex manual.tex
+	$(JADETEX) manual.tex
+	$(JADETEX) manual.tex
+	$(JADETEX) manual.tex
 
 manual.ps: manual.dvi
-	dvips -f $< > $@
+	$(DVIPS) -f $< > $@
 
 manual.txt: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
 	$(JADE) -t sgml -V nochunks -d $(HTML_SS) $(XML_DECL) manual.xml > dump.html
-	lynx -force_html -dump dump.html > $@
+	$(LYNX) -force_html -dump dump.html > $@
 	-rm -f dump.html
 
 clean:
