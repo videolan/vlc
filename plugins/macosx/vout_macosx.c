@@ -513,44 +513,50 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
 static void QTScaleMatrix( vout_thread_t *p_vout )
 {
     Rect s_rect;
+    int i_width, i_height;
     Fixed factor_x, factor_y;
-    Fixed offset_x, offset_y;
+    int i_offset_x = 0;
+    int i_offset_y = 0;
 
     GetPortBounds( p_vout->p_sys->p_qdport, &s_rect );
 
-    if( (s_rect.bottom - s_rect.top) * p_vout->output.i_aspect
-        < (s_rect.right - s_rect.left) * VOUT_ASPECT_FACTOR )
+    i_width = s_rect.right - s_rect.left;
+    i_height = s_rect.bottom - s_rect.top;
+
+    if( i_height * p_vout->output.i_aspect < i_width * VOUT_ASPECT_FACTOR )
     {
-        factor_x = FixDiv( Long2Fix( (s_rect.bottom - s_rect.top)
-                            * p_vout->output.i_aspect / VOUT_ASPECT_FACTOR ),
+        int i_adj_width = i_height * p_vout->output.i_aspect /
+                          VOUT_ASPECT_FACTOR;
+
+        factor_x = FixDiv( Long2Fix( i_adj_width ),
                            Long2Fix( p_vout->output.i_width ) );
-        factor_y = FixDiv( Long2Fix( s_rect.bottom - s_rect.top ),
+        factor_y = FixDiv( Long2Fix( i_height ),
                            Long2Fix( p_vout->output.i_height ) );
-        offset_x = FixDiv( Long2Fix( s_rect.right - s_rect.left
-                            - (s_rect.bottom - s_rect.top)
-                            * p_vout->output.i_aspect / VOUT_ASPECT_FACTOR ),
-                           Long2Fix( 2 ) );
-        offset_y = Long2Fix( 0 );
+
+        i_offset_x = (i_width - i_adj_width) / 2;
     }
     else
     {
-        factor_x = FixDiv( Long2Fix( s_rect.right - s_rect.left ),
+        int i_adj_height = i_width * VOUT_ASPECT_FACTOR /
+                           p_vout->output.i_aspect;
+
+        factor_x = FixDiv( Long2Fix( i_width ),
                            Long2Fix( p_vout->output.i_width ) );
-        factor_y = FixDiv( Long2Fix( (s_rect.right - s_rect.left)
-                            * VOUT_ASPECT_FACTOR / p_vout->output.i_aspect ),
+        factor_y = FixDiv( Long2Fix( i_adj_height ),
                            Long2Fix( p_vout->output.i_height ) );
-        offset_x = Long2Fix( 0 );
-        offset_y = FixDiv( Long2Fix( s_rect.bottom - s_rect.top
-                            - (s_rect.right - s_rect.left)
-                            * VOUT_ASPECT_FACTOR / p_vout->output.i_aspect ),
-                           Long2Fix( 2 ) );
+
+        i_offset_y = (i_height - i_adj_height) / 2;
     }
 
     SetIdentityMatrix( p_vout->p_sys->p_matrix );
+
     ScaleMatrix( p_vout->p_sys->p_matrix,
                  factor_x, factor_y,
                  Long2Fix(0), Long2Fix(0) );            
-    TranslateMatrix( p_vout->p_sys->p_matrix, offset_x, offset_y );
+
+    TranslateMatrix( p_vout->p_sys->p_matrix, 
+                     Long2Fix(i_offset_x), 
+                     Long2Fix(i_offset_y) );
 }
 
 /*****************************************************************************
