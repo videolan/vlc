@@ -58,6 +58,7 @@ static int Control( demux_t *, int, va_list );
 struct demux_sys_t
 {
     mtime_t         i_time;
+    mtime_t         i_time_offset;
 
     int             i_bitrate_avg;  /* extracted from Xing header */
 
@@ -171,6 +172,7 @@ static int Open( vlc_object_t * p_this )
 
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->i_time = 1;
+    p_sys->i_time_offset = 0;
     p_sys->i_bitrate_avg = 0;
     p_sys->meta = NULL;
 
@@ -399,8 +401,9 @@ static void Close( vlc_object_t * p_this )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
-
+    int64_t *pi64;
     vlc_meta_t **pp_meta;
+    int i_ret;
 
     switch( i_query )
     {
@@ -409,11 +412,29 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pp_meta = vlc_meta_Duplicate( p_sys->meta );
             return VLC_SUCCESS;
 
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = p_sys->i_time + p_sys->i_time_offset;
+            return VLC_SUCCESS;
+
+        case DEMUX_SET_TIME:
+            /* FIXME TODO: implement a high precision seek (with mp3 parsing)
+             * needed for multi-input */
         default:
-            return demux2_vaControlHelper( p_demux->s,
-                                           0, -1,
-                                           p_sys->i_bitrate_avg, 1, i_query,
-                                           args );
+            i_ret = demux2_vaControlHelper( p_demux->s,
+                                            0, -1,
+                                            p_sys->i_bitrate_avg, 1, i_query,
+                                            args );
+            if( !i_ret && p_sys->i_bitrate_avg > 0 &&
+                ( i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME ) )
+            {
+                int64_t i_time = I64C(8000000) * stream_Tell(p_demux->s) / p_sys->i_bitrate_avg;
+
+                /* fix time_offset */
+                if( i_time >= 0 )
+                    p_sys->i_time_offset = i_time - p_sys->i_time;
+            }
+            return i_ret;
     }
 }
 
