@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.16 2004/02/19 18:55:34 courmisch Exp $
+$Id$
 
 VLC makes extensive use of the following persons' code:
 
@@ -14,12 +14,15 @@ Andy Lindsay <andy_vl@ananam.com> - fixes in the TS demux
 Arkadiusz Lipiec <A.Lipiec@elka.pw.edu.pl> - Polish translation
 Arkadiusz Miskiewicz <misiek@pld.ORG.PL> - autoconf and Makefile patches
 Arnaud Gomes-do-Vale <arnaud@carrosse.frmug.org> - autoconf patches
+Arwed v. Merkatz <v.merkatz at gmx dot net> - Gamma correction for adjust filter
 Benjamin Mironer <bmironer@noos.fr> - Mac OS X fixes
 Benoit Steiner <benny@via.ecp.fr> - MPEG system input, network input
 Bill Eldridge <bill@rfa.org> - documentation
 Brieuc Jeunhomme <bbp@via.ecp.fr> - bug fixes
 Bruno Vella <allevb@tin.it> - Italian localization
 Carlo Calabrò <murray@via.ecp.fr> - Italian localization
+Carsten Gottbehüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fixüt <gottbehuet at active-elements dot de> - v4l hotplug fix
+Christof Baumgaertner - dbox web intf
 Christopher Johnson <cjohnson@mint.net> - Qt fix in vlc.spec
 Colin Simmonds <colin_simmonds@Mac.lover.org> - compile fix for Mac OS X
 Damian Ivereigh <damian@cisco.com> - ac3dec uninitialized data structure fix
@@ -32,24 +35,31 @@ Espen Skoglund <esk@ira.uka.de> - FreeBSD autoconf and Makefile patches
 Ethan C. Baldridge <BaldridgeE@cadmus.com> - directory browsing code
 Felix Kühne <fk@aenneburghardt.de> - German translation
 Fumio Nakayama <endymion@ca2.so-net.ne.jp> - Japanese translation
+Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
 Haakon Meland Eriksen - Norwegian translation
 Hans-Peter Jansen <hpj@urpla.net> - patch for module options handling
 Jean-Philippe Grimaldi <jeanphi@via.ecp.fr> - bug fixes
 Jean-Pierre Kuypers <Kuypers@sri.ucl.ac.be> - French translation
 Jeffrey Baker <jwbaker@acm.org> - port of the ALSA plugin to the ALSA 1.0 API
+Jeroen Massar <jeroen at unfix dot org> - IPv6 hostname resolution fix
+Jérôme Guilbaud - Update of the WinAmp 5 VLC skin
 Joel Arvidsson <dogai@privat.utfors.se> - Swedish translation
 Joeri van Dooren <joeri@van.dooren.be> - OS X icon (v0.4.0)
 Johen Michael Zorko <zorko@att.net> - fix for delay issues in udp sout
 John Paul Lorenti <jpl31@columbia.edu> - ALSA device selection patch
 Julien Blache <jb@technologeek.org> - disc ejection code
+kty0ne - WinAmp 5 skin for VLC
 Marc Nolette <nolette at videotron.ca> - PVR support in DirectShow input
 Mark Gritter <mgritter@kealia.com> - fix for netlist packet leak in demuxPSI
+Markus Kern <markus-kern at gmx dot net> - video output window fixes (win32)
 Markus Kuespert <ltlBeBoy@beosmail.com> - BeOS CSS support
 Mathias Kretschmer <mathias@research.att.com> - IP Multicast support
 Matthieu Lochegnies <lochegm1@cti.ecp.fr> - MPEG audio emphasis fix
 Max Rudberg <max_08 at mac.com> - Mac OS X controller art (v0.7.0)
 Michael Mondragon <mammon@lokmail.net> - ncurses compilation fix
+Mike Schrag <mschrag at pobox dot com> - directx device selection
 Michel Lanners <mlan@cpu.lu> - fixed typos and AltiVec detection
+Moritz Bunkus <moritz at bunkus dot org> - Matroska patches
 Nilmoni Deb <ndeb@ece.cmu.edu> - autoconf and Makefile fixes
 Olivier Aubert <oaubert@bat710.univ-lyon1.fr> - clone list patch
 Olivier Pomel <pomel@via.ecp.fr> - original VLC code
@@ -63,10 +73,13 @@ Rudolf Cornelissen <rag.cornelissen@inter.nl.net> - BeOS fixes
 Sebastien Chaumat <Sebastien.Chaumat@ens-lyon.fr> - YOPY port tests
 Steve Brown <sbrown@cortland.com> - fix for optional PES size bug
 Steven M. Schultz <sms@TO.GD-ES.COM> - BSD/OS port
+Tim 'O Callaghan <tim.ocallaghan at limestudios dot com> - pvr input cleaning patch
 Thomas Graf <tgraf@europe.com> - gettext support, German translation
 Thomas L. Wood <twood@lucent.com> - fixed a bug in QuantMatrixExtension
+Tong Ka Man <kmtong at cwbase dot com> - playlist_Clear addition
 Valek Filippov <frob@df.ru> - Russian translation
 Vicente Jimenez Aguilar <vice@v1ce.net> - Spanish translation
+Vitalijus Slavinskas <Vitalijus.Slavinskas at stud.ktu dot lt> - nsv patches
 Vladimir Chernyshov - MMX motion optimizations
 Wade Majors <guru@startrek.com> - BeOS icon integration, debugging and fixes
 Watanabe Go <go@dsl.gr.jp> - fix for non-ASCII filenames
