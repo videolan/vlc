@@ -870,8 +870,8 @@ static mvar_t *mvar_IntegerSetNew( char *name, char *arg )
         {
             int i;
 
-            if( ( i_start < i_stop && i_step > 0 ) ||
-                ( i_start > i_stop && i_step < 0 ) )
+            if( ( i_start <= i_stop && i_step > 0 ) ||
+                ( i_start >= i_stop && i_step < 0 ) )
             {
                 for( i = i_start; ; i += i_step )
                 {
@@ -897,31 +897,79 @@ static mvar_t *mvar_IntegerSetNew( char *name, char *arg )
     return s;
 }
 
+void PlaylistListNode( playlist_t *p_pl, playlist_item_t *p_node,
+                       char *name, mvar_t *s, int i_depth )
+{
+    if( p_node != NULL )
+    {
+        if (p_node->i_children == -1)
+        {
+            char value[512];
+            mvar_t *itm = mvar_New( name, "set" );
+
+            sprintf( value, "%d", ( p_pl->status.p_item == p_node )? 1 : 0 );
+            mvar_AppendNewVar( itm, "current", value );
+
+            sprintf( value, "%d", p_node->input.i_id );
+            mvar_AppendNewVar( itm, "index", value );
+
+            mvar_AppendNewVar( itm, "name", p_node->input.psz_name );
+
+            mvar_AppendNewVar( itm, "uri", p_node->input.psz_uri );
+
+            sprintf( value, "Item");
+            mvar_AppendNewVar( itm, "type", value );
+
+            sprintf( value, "%d", i_depth );
+            mvar_AppendNewVar( itm, "depth", value );
+
+            mvar_AppendVar( s, itm );
+        }
+        else
+        {
+            char value[512];
+            int i_child;
+            mvar_t *itm = mvar_New( name, "set" );
+            mvar_t *itm_end = mvar_New( name, "set" );
+
+            mvar_AppendNewVar( itm, "name", p_node->input.psz_name );
+            mvar_AppendNewVar( itm, "uri", p_node->input.psz_name );
+
+            sprintf( value, "Node" );
+            mvar_AppendNewVar( itm, "type", value );
+
+            sprintf( value, "%d", p_node->input.i_id );
+            mvar_AppendNewVar( itm, "index", value );
+
+            sprintf( value, "%d", p_node->i_children);
+            mvar_AppendNewVar( itm, "i_children", value );
+
+            sprintf( value, "%d", i_depth );
+            mvar_AppendNewVar( itm, "depth", value );
+
+            mvar_AppendVar( s, itm );
+
+            for (i_child = 0 ; i_child < p_node->i_children ; i_child++)
+                PlaylistListNode( p_pl, p_node->pp_children[i_child], name, s, i_depth + 1);
+
+        }
+    }
+}
+
 static mvar_t *mvar_PlaylistSetNew( char *name, playlist_t *p_pl )
 {
     mvar_t *s = mvar_New( name, "set" );
-    int    i;
 
     fprintf( stderr," mvar_PlaylistSetNew: name=`%s'\n", name );
 
     vlc_mutex_lock( &p_pl->object_lock );
-    for( i = 0; i < p_pl->i_size; i++ )
-    {
-        mvar_t *itm = mvar_New( name, "set" );
-        char   value[512];
 
-        sprintf( value, "%d", i == p_pl->i_index ? 1 : 0 );
-        mvar_AppendNewVar( itm, "current", value );
+    playlist_view_t *p_view;
+    p_view = playlist_ViewFind( p_pl, VIEW_CATEGORY ); /* FIXME */
 
-        sprintf( value, "%d", i );
-        mvar_AppendNewVar( itm, "index", value );
+    if( p_view != NULL )
+        PlaylistListNode( p_pl, p_view->p_root, name, s, 0 );
 
-        mvar_AppendNewVar( itm, "name", p_pl->pp_items[i]->input.psz_name );
-
-        mvar_AppendNewVar( itm, "uri", p_pl->pp_items[i]->input.psz_uri );
-
-        mvar_AppendVar( s, itm );
-    }
     vlc_mutex_unlock( &p_pl->object_lock );
 
     return s;
@@ -1416,6 +1464,7 @@ enum macroType
     MVLC_FOREACH,
     MVLC_IF,
     MVLC_RPN,
+    MVLC_STACK,
     MVLC_ELSE,
     MVLC_END,
     MVLC_GET,
@@ -1469,6 +1518,7 @@ StrToMacroTypeTab [] =
         { "vlm_save",       MVLC_VLM_SAVE },
 
     { "rpn",        MVLC_RPN },
+    { "stack",        MVLC_STACK },
 
     { "foreach",    MVLC_FOREACH },
     { "value",      MVLC_VALUE },
@@ -1561,8 +1611,9 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                     uri_extract_value( p_request, "item", item, 512 );
                     i_item = atoi( item );
-                    playlist_Control( p_sys->p_playlist, PLAYLIST_GOTO,
-                                                         i_item );
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_ITEMPLAY,
+                                      playlist_ItemGetById( p_sys->p_playlist,
+                                      i_item ) );
                     msg_Dbg( p_intf, "requested playlist item: %i", i_item );
                     break;
                 }
@@ -1877,24 +1928,15 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         i_nb_items++;
                     }
 
-                    /* The items need to be deleted from in reversed order */
                     if( i_nb_items )
                     {
                         int i;
                         for( i = 0; i < i_nb_items; i++ )
                         {
-                            int j, i_index = 0;
-                            for( j = 0; j < i_nb_items; j++ )
-                            {
-                                if( p_items[j] > p_items[i_index] )
-                                    i_index = j;
-                            }
-
-                            playlist_LockDelete( p_sys->p_playlist,
-                                             p_items[i_index] );
+                            playlist_LockDelete( p_sys->p_playlist, p_items[i] );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
-                                     p_items[i_index] );
-                            p_items[i_index] = -1;
+                                     p_items[i] );
+                            p_items[i] = -1;
                         }
                     }
 
@@ -1920,17 +1962,17 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         i_nb_items++;
                     }
 
-                    /* The items need to be deleted from in reversed order */
-                    for( i = p_sys->p_playlist->i_size - 1; i >= 0 ; i-- )
+                    for( i = p_sys->p_playlist->i_size - 1 ; i >= 0; i-- )
                     {
                         /* Check if the item is in the keep list */
                         for( j = 0 ; j < i_nb_items ; j++ )
                         {
-                            if( p_items[j] == i ) break;
+                            if( p_items[j] ==
+                                p_sys->p_playlist->pp_items[i]->input.i_id ) break;
                         }
                         if( j == i_nb_items )
                         {
-                            playlist_LockDelete( p_sys->p_playlist, i );
+                            playlist_LockDelete( p_sys->p_playlist, p_sys->p_playlist->pp_items[i]->input.i_id );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                      i );
                         }
@@ -1949,25 +1991,38 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 {
                     char type[12];
                     char order[2];
+                    char item[512];
                     int i_order;
+                    int i_item;
 
                     uri_extract_value( p_request, "type", type, 12 );
                     uri_extract_value( p_request, "order", order, 2 );
+                    uri_extract_value( p_request, "item", item, 512 );
+                    i_item = atoi( item );
 
                     if( order[0] == '0' ) i_order = ORDER_NORMAL;
                     else i_order = ORDER_REVERSE;
 
                     if( !strcmp( type , "title" ) )
                     {
-                        playlist_SortTitle( p_sys->p_playlist , i_order );
+                        playlist_RecursiveNodeSort( p_sys->p_playlist, /*playlist_ItemGetById( p_sys->p_playlist, i_item ),*/
+                                                    p_sys->p_playlist->pp_views[0]->p_root,
+                                                    SORT_TITLE_NODES_FIRST,
+                                                    ( i_order == 0 ) ? ORDER_NORMAL : ORDER_REVERSE );
                         msg_Dbg( p_intf, "requested playlist sort by title (%d)" , i_order );
                     } else if( !strcmp( type , "author" ) )
                     {
-                        playlist_SortAuthor( p_sys->p_playlist , i_order );
+                        playlist_RecursiveNodeSort( p_sys->p_playlist, /*playlist_ItemGetById( p_sys->p_playlist, i_item ),*/
+                                                    p_sys->p_playlist->pp_views[0]->p_root,
+                                                    SORT_AUTHOR,
+                                                    ( i_order == 0 ) ? ORDER_NORMAL : ORDER_REVERSE );
                         msg_Dbg( p_intf, "requested playlist sort by author (%d)" , i_order );
                     } else if( !strcmp( type , "shuffle" ) )
                     {
-                        playlist_Sort( p_sys->p_playlist , SORT_RANDOM, ORDER_NORMAL );
+                        playlist_RecursiveNodeSort( p_sys->p_playlist, /*playlist_ItemGetById( p_sys->p_playlist, i_item ),*/
+                                                    p_sys->p_playlist->pp_views[0]->p_root,
+                                                    SORT_RANDOM,
+                                                    ( i_order == 0 ) ? ORDER_NORMAL : ORDER_REVERSE );
                         msg_Dbg( p_intf, "requested playlist shuffle");
                     }
 
@@ -2261,6 +2316,16 @@ static void MacroDo( httpd_file_sys_t *p_args,
         case MVLC_RPN:
             EvaluateRPN( p_args->vars, &p_args->stack, m->param1 );
             break;
+
+/* Usefull for learning stack management */
+        case MVLC_STACK:
+        {
+            int i;
+            msg_Dbg( p_intf, "stack" );
+            for (i=0;i<(&p_args->stack)->i_stack;i++)
+                msg_Dbg( p_intf, "%d -> %s", i, (&p_args->stack)->stack[i] );
+            break;
+        }
 
         case MVLC_UNKNOWN:
         default:
@@ -2920,6 +2985,10 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
         else if( !strcmp( s, "=" ) )
         {
             SSPushN( st, SSPopN( st, vars ) == SSPopN( st, vars ) ? -1 : 0 );
+        }
+        else if( !strcmp( s, "!=" ) )
+        {
+            SSPushN( st, SSPopN( st, vars ) != SSPopN( st, vars ) ? -1 : 0 );
         }
         else if( !strcmp( s, "<" ) )
         {

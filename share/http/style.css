@@ -88,3 +88,7 @@ form {
     margin: 0pt;
     padding: 0pt;
 }
+
+ul#playlist, ul#playlist ul{
+    list-style-type: none;
+}
