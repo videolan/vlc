@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: vout_pictures.c,v 1.45 2004/01/25 17:16:06 zorglub Exp $
+ * $Id: vout_pictures.c,v 1.46 2004/02/22 00:15:33 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -165,7 +165,8 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
      */
     if( p_freepic != NULL )
     {
-        vout_AllocatePicture( p_vout, p_freepic, p_vout->render.i_chroma,
+        vout_AllocatePicture( VLC_OBJECT(p_vout),
+                              p_freepic, p_vout->render.i_chroma,
                               p_vout->render.i_width, p_vout->render.i_height,
                               p_vout->render.i_aspect );
 
@@ -455,13 +456,13 @@ void vout_PlacePicture( vout_thread_t *p_vout,
  * used exactly like a video buffer. The video output thread then manages
  * how it gets displayed.
  *****************************************************************************/
-void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
+void vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
                            vlc_fourcc_t i_chroma,
                            int i_width, int i_height, int i_aspect )
 {
     int i_bytes, i_index;
 
-    vout_InitPicture( VLC_OBJECT(p_vout), p_pic, i_chroma,
+    vout_InitPicture( p_this, p_pic, i_chroma,
                       i_width, i_height, i_aspect );
 
     /* Calculate how big the new image should be */

@@ -1,3 +1,463 @@
+2004-02-21 Saturday 23:50  gbazin
+
+ * modules/stream_out/transcode.c: fixed memleak. Set aspect ratio info even for raw video input.
+
+2004-02-21 Saturday 23:15  gbazin
+
+ * include/charset.h: added "extern "C" {" for c++ modules.
+ * modules/mux/mp4.c, modules/demux/ts.c: fixed memleaks.
+
+2004-02-21 Saturday 22:41  gbazin
+
+ * modules/codec/ffmpeg/encoder.c: make it ffmpeg-0.4.8 friendly.
+
+2004-02-20 Friday 22:07  gbazin
+
+ * configure.ac: what about checking for the c++ preprocessor.
+
+2004-02-20 Friday 19:21  massiot
+
+ * modules/stream_out/transcode.c : don't lock when quitting.
+
+2004-02-20 Friday 19:21  gbazin
+
+ * modules/demux/a52sys.c: forgot to remove this file.
+ * modules/audio_output/alsa.c: kind of a work-around for a strange bug that trashes the stack. Doesn't solve it but should be easier to track down now.
+
+2004-02-20 Friday 19:03  massiot
+
+ * modules/stream_out/transcode.c: fixed a segfault when quitting.
+
+2004-02-20 Friday 18:34  massiot
+
+ * modules/codec/ffmpeg/encoder.c, modules/stream_out/transcode.c :
+   - new ffmpeg options available from the command-line : interleaved video,
+     noise reduction, rate control parameters, i_quant_factor, trellis
+     quantification, mpeg4 matrix, and thread count
+   - portable functions to use ffmpeg multithreading capabilities on all
+     platforms
+   - hurry up mode now turns off rd and trellis, and also raises the noise
+     reduction parameter (thus noise reduction is mandatory with hurry up)
+   - if threads=1, no ffmpeg thread is launched, but the ffmpeg encoding
+     will be done in a separate thread than the packetizer and decoder
+   - fixed a bug with mp3 decoding and weird ffmpeg return code
+
+2004-02-20 Friday 18:24  massiot
+
+ * modules/packetizer/mpegvideo.c: display the picture size and frame rate
+   exactly once.
+
+2004-02-20 Friday 17:20  massiot
+
+ * src/misc/threads.c: made vlc_set_thread_priority usable on non-Darwin
+   OSes, and added an rt-offset configuration variable to tune the priority
+   of VLC against other programs without recompiling everything.
+
+2004-02-20 Friday 17:16  massiot
+
+ * modules/demux/mpeg/system.c: check for scrambled packets.
+
+2004-02-20 Friday 17:13  massiot
+
+ * modules/access_output/udp.c: do not send out packets which are too much
+   in the past, to avoid flooding the client.
+
+2004-02-20 Friday 16:29  bigben
+
+ coding style
+
+2004-02-20 Friday 15:38  bigben
+
+ cleaning of pvr input  : settings are only set if  given on command line
+ (no more default values).
+
+ Patch from Tim O Callaghan (tim.ocallaghan - AT - limestudios - DOT - com)
+
+2004-02-19 Thursday 19:38  hartman
+
+ * Revert back to old prefs.
+   - fixed the bug with the modules not setting up their prefs.
+   - bugs: int with strings items are broken (see relfontsize)
+   - hotkeys elements don't really work
+
+2004-02-19 Thursday 18:55  courmisch
+
+ Removed Vladimir Chernyshov's email address (kept his name).
+
+2004-02-19 Thursday 17:42  jpsaman
+
+ Correct fix for iPAQ. (do not mix watching your kids and coding, it doesn't mix ;-))
+
+2004-02-19 Thursday 16:19  gbazin
+
+ * modules/codec/faad.c: compilation fix and proper 16bits pcm support.
+
+2004-02-19 Thursday 15:42  jpsaman
+
+ Tell FAAD2 to produce FAAD_FMT_16BIT (16bits PCM values) and VLC so that it doesn't need to do a conversion filter for it.
+
+2004-02-19 Thursday 15:13  jpsaman
+
+ Fix for iPAQ choose fixed point arithmic in FAAD decoder.
+
+2004-02-19 Thursday 02:05  rocky
+
+ Structure not big enough and was writing past buffer boundary.
+ Thanks to Marco Zühlke for finding this problem.
+
+2004-02-18 Wednesday 13:21  fenrir
+
+  * transcode: fixed s16b <-> s16l conversion.
+
+2004-02-17 Tuesday 13:13  gbazin
+
+ * ALL: portability fixes.
+
+2004-02-17 Tuesday 03:12  hartman
+
+ * vout_OSDMessage doxygen doc update
+ * fix broken vout_OSDMessage in other files
+
+2004-02-16 Monday 17:16  zorglub
+
+ Added an option "recursive"
+ 	- none: subdirectories are skipped
+ 	- collapse: former behaviour, subdirectories are not expanded
+ 	- expand: all subdirectories are fully expanded
+
+ I dislike these strings, please find other ones :)
+
+2004-02-16 Monday 17:14  zorglub
+
+ * Swap duration and group columns
+ * Introduce duration sort
+
+2004-02-16 Monday 17:14  zorglub
+
+ Fix setting the name and the author with DEMUX_GET_META
+
+2004-02-16 Monday 13:33  gbazin
+
+ * modules/access/dshow/filter.cpp: work-around a bug in w32api-2.5.
+
+2004-02-15 Sunday 22:20  gbazin
+
+ * modules/misc/network/ipv6.c: fix for ipv6 name resolution, courtesy of Jeroen Massar (jeroen at unfix dot org).
+
+2004-02-15 Sunday 21:52  gbazin
+
+ * modules/audio_filter/converter/dtstospdif.c: fixed the swab() replacement.
+
+2004-02-15 Sunday 19:40  sigmunau
+
+ modules/control/lirc/lirc.c:
+  * backported some changes from the hotkeys module
+  * implemented buttons to cycle audio and subtitle tracks.
+  * implemented a mute button
+ doc/lirc/example.lircrc:
+  * example for the new buttons
+
+2004-02-15 Sunday 18:58  ipkiss
+
+  * modules/gui/skins/*:
+     Added 'slow' and 'fast' events to play a stream slower/faster
+
+2004-02-15 Sunday 18:22  sigmunau
+
+ include/osd.h, src/video_output/video_text.c:
+  * turned vout_OSDMessage into __vout_OSDMessage
+  * __vout_OSDMessage now takes printf style parameters
+  * added a macro vout_OSDMessage that calls __vout_OSDMessage with the first
+    parameter passed through VLC_OBJECT()
+
+2004-02-15 Sunday 16:59  fenrir
+
+  * nsv: display sub stream and skip extention data (initial patch from
+  Vitalijus dot Slavinskas at stud dot ktu dot lt).
+
+2004-02-15 Sunday 13:16  gbazin
+
+ * modules/demux/ogg.c: fixed recent breakage (what a shameful bug).
+
+2004-02-14 Saturday 17:36  gbazin
+
+ * modules/access/cdda/*: forgot to remove demux in module declaration.
+    fixed deadlock with CDDAFixupPlayList().
+
+2004-02-14 Saturday 17:25  gbazin
+
+ * modules/access/cdda*: removed definition of WAVEHEADER.
+ * modules/access/cdda.c: small bug fix.
+
+2004-02-14 Saturday 17:03  gbazin
+
+ * modules/demux/wav.c: started support for WAVEFORMATEXTENSIBLE (aka multichannel).
+    support for float32 format.
+ * include/codecs.h: added WAVEFORMATEXTENSIBLE structure.
+ * modules/codec/araw.c: fixes.
+
+2004-02-14 Saturday 12:49  gbazin
+
+ * modules/gui/skins2/events/evt_scroll.hpp: small portability fix.
+
+2004-02-14 Saturday 12:36  gbazin
+
+ * modules/gui/wxwindows/*: make gcc-2.95 happy.
+
+2004-02-14 Saturday 01:53  gbazin
+
+ * ALL: small portability fixes.
+
+2004-02-13 Friday 23:54  gbazin
+
+ * modules/demux/playlist/playlist.c: compilation fix.
+
+2004-02-13 Friday 22:37  gbazin
+
+ * modules/demux/a52.c: better detection code.
+
+2004-02-13 Friday 22:14  gbazin
+
+ * modules/demux/a52.c: grmbl.
+
+2004-02-13 Friday 22:10  gbazin
+
+ * modules/demux/a52.c: fixed alignment when seeking.
+
+2004-02-13 Friday 21:48  gbazin
+
+ * modules/demux/a52.c: rewritten from scratch to use the a52 packetizer and to handle a52 wav files and audio CD's.
+ * modules/codec/a52.c: a52 wav files and audio CD's use padding so don't always check for next sync code.
+
+2004-02-13 Friday 11:58  rocky
+
+ Better worded.
+
+2004-02-13 Friday 11:33  rocky
+
+ More checking: for programs and XML-related files.  If some programs
+ aren't around (e.g. lynx) don't build the corresponding piece that
+ needs that.
+
+2004-02-13 Friday 10:42  titer
+
+  deinterlace.c : missing 'else' that prevented MergeAltivec from being used.
+
+2004-02-13 Friday 10:09  jpsaman
+
+ Disabled the preference menu, it is not filled in anyway.
+
+2004-02-13 Friday 04:22  rocky
+
+ Do better about being able to build developer documentation on many
+ platforms.  This still sucks, but it sucks less. Hopefully I can shame
+ someone to go further.
+
+2004-02-13 Friday 00:57  rocky
+
+ Call for help.
+
+2004-02-12 Thursday 23:51  gbazin
+
+ * modules/stream_out/transcode.c: fixed color inversion when transcoding from raw RV24.
+
+2004-02-12 Thursday 20:09  fenrir
+
+  * all: use the data_packet_count from the asf header when the server
+ gives an invalid one. (I hope it doesn't break anything)
+
+2004-02-12 Thursday 17:52  fenrir
+
+  * v4l: patch from Carsten Gottbehüt (gottbehuet at active-elements dot de)
+  -> Untested.
+
+  Original message:
+     Hi there,
+
+     I have done another small modification. If you remove a hot-pluggable video
+     device, like an usb web cam, during capturing, vlc floods the driver with
+     ioctls. This leads to Kernel Ooops in some drivers.
+
+     The modified v4l.c module does the following now:
+     "GrabVideo" returns "VLC_ETIMEOUT" if the question "Did we wait long enough"
+     can be answered with yes. If there is a real error in "GrabCapture" or
+     "GrabMJPEG", the code "VLC_EGENERIC" is returned. So the calling function
+     can distinguish between these two situations. "VLC_EGENERIC" was always
+     returned before.
+     The function "Read" uses this information to leave the while-loop in case of
+     an error, and it returns a "-1" to the calling function. "Read" calls
+     "msleep", as it was before, in case of a VLC_ETIMEOUT.
+
+     The brightness-control stuff described below is still in the code. Please
+     feel free to use, modify or ignore this file. A short feedback would be
+     nice.
+
+     Bye,
+
+2004-02-12 Thursday 17:35  titer
+
+  macosx/vout.m : GL cleaning (probably fixes depth issues)
+
+2004-02-11 Wednesday 19:17  fenrir
+
+  * all: added a "input-repeat" option that allow repeating the same entry
+  without destroying/recreating a new input. (Will be usefull for streaming).
+  ( A value of -1 means repeat for ever).
+  --> Not tested with dvd.
+
+2004-02-11 Wednesday 18:08  gbazin
+
+ * modules/access/cdda/*: got rid of the demux. The access plugin will now build a WAV header which will allow this plugin to work with the dts/a52 demuxers as well as the wav demuxer.
+
+2004-02-11 Wednesday 12:37  rocky
+
+ And one other piece of information...
+
+2004-02-11 Wednesday 12:26  rocky
+
+ Spell out general information that should be used in reporting
+ problems. Sigh.
+
+2004-02-11 Wednesday 12:23  rocky
+
+ Spell out general information that should be used in reporting
+ problems. Sigh.
+
+2004-02-11 Wednesday 08:50  zorglub
+
+ Enable the playlist import/export modules
+
+2004-02-11 Wednesday 08:22  jpsaman
+
+ Added some whitespace for alignment.
+
+2004-02-10 Tuesday 20:30  jpsaman
+
+ Enabled PDA GUI again, use --enable-pda. Question why was it disabled without notifying the maintainer? ????
+
+2004-02-10 Tuesday 20:28  jpsaman
+
+ Missed the deadline again ;-(
+
+ - Fixed the playlist_AddExt() call
+ - Fixed a compiler warning
+
+2004-02-10 Tuesday 17:59  gbazin
+
+ * configure.ac: check for the xmlTextReader extension if libxml2 (required for skins2).
+
+2004-02-10 Tuesday 17:36  gbazin
+
+ * configure.ac, NEWS: added mod and pva plugins.
+
+2004-02-10 Tuesday 16:39  bigben
+
+ typos
+
+2004-02-10 Tuesday 14:57  jpsaman
+
+ Fixes for DVB-C:
+ - Make sure that lnb-lof1 and lnb-lof2 can be overriden by the commandline syntax frequency=xx:lnb-lof1=xx:lnb-lof2=xx
+ - Added value {A,a} to polarization=xx to force INVERSION_AUTO
+ - Sanatized a few error messages
+
+2004-02-10 Tuesday 14:33  sam
+
+   * debian/rules debian/control:
+     + No longer build a local libmpeg2 since it entered sid.
+     + Build the livedotcom plugin.
+   * toolbox:
+     + No longer remove flac, speex and matroska from the woody build; I will
+       provide clean backports.
+
+2004-02-10 Tuesday 14:04  sam
+
+   * configure.ac:
+     + Allow to use --enable-livedotcom without --with-livedotcom-tree so that
+       we can use an installed version of libliveMedia et al.
+
+2004-02-10 Tuesday 13:29  sam
+
+   * configure.ac:
+     + Only activate the Matroska plugin if -lebml_pic or -lebml were found.
+
+2004-02-10 Tuesday 02:57  hartman
+
+ * Fixed the ogm subs. Thanx to Mosu who pointed me to the fact that the
+   duration for subs is stored in byte1 of the data packet and who
+   directed me to the mkvtoolnix code.
+
+2004-02-09 Monday 23:30  garf
+
+  * http.c: made strsub a bit clean.
+
+2004-02-09 Monday 23:28  garf
+
+  * intf-http.txt: update doc (strsub)
+
+2004-02-09 Monday 23:03  garf
+
+  * http.c: add strsub function: extract substring (doc update will
+            follow soon).
+
+2004-02-09 Monday 20:40  sam
+
+   * debian/README.Debian:
+     + Updated Debian-specific build notes.
+
+2004-02-09 Monday 19:32  jpsaman
+
+ Updated version number to vlc-0.7.1
+
+2004-02-09 Monday 17:42  titer
+
+  macosx/* : macosx-opengl-effect now accept cube and transparent-cube
+
+2004-02-09 Monday 16:12  sigmunau
+
+ src/extra/libc.c:
+  * fixed a nasty bug in vlc_atoll.(closes #1763)
+
+2004-02-09 Monday 14:02  titer
+
+  macosx/vout.m : oops, fixed broken ratio from my last commit
+
+2004-02-09 Monday 13:28  titer
+
+  macosx/* : added --macosx-opengl-effect, current possible values are
+    "none" and "cube". Sorry, couldn't resist ;)
+
+2004-02-09 Monday 12:54  hartman
+
+ * added dtsdec, 're' upgrade of libmad
+
+2004-02-09 Monday 10:44  sigmunau
+
+ share/http/admin/dboxfiles.html:
+  * Updated for bookmark support.
+    See http://www.giggo.de/dbox2/movieplayer.html for details
+    (patch by Christof Baumgaertner)
+
+2004-02-08 Sunday 23:49  gbazin
+
+ * modules/gui/skins2/Modules.am: added missing file for make dist.
+
+2004-02-08 Sunday 23:39  gbazin
+
+ * ALL: I am a morron.
+
+2004-02-08 Sunday 22:37  gbazin
+
+ * modules/codec/ffmpeg/video.c: another fix for switching postproc on the fly.
+
+2004-02-08 Sunday 22:06  gbazin
+
+ * configure.ac: forgot one version number and added the aiff demux.
+
+2004-02-08 Sunday 21:36  gbazin
+
+ * ALL: bumped version number to 0.7.1 in preparation for the release.
+
 2004-02-08 Sunday 21:00  jpsaman
 
  Fail ./configure when ffmpeg/avcodec.h or postproc/postproc.h are not found and --disable-ffmpeg is not used.
