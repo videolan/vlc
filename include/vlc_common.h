@@ -122,7 +122,7 @@ typedef int                 ptrdiff_t;
 #   endif
 #endif
 
-#if defined( WIN32 )
+#if defined( WIN32 ) || defined( UNDER_CE )
 #   include <malloc.h>
 #   ifndef PATH_MAX
 #       define PATH_MAX MAX_PATH
