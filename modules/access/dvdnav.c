@@ -29,6 +29,9 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
 #endif
@@ -64,7 +67,6 @@ vlc_module_begin();
     set_capability( "access_demux", 5 );
     add_shortcut( "dvd" );
     add_shortcut( "dvdnav" );
-    add_shortcut( "dvdnavsimple" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -115,22 +117,19 @@ struct demux_sys_t
     /* */
     int i_aspect;
 
-    /* */
-    vlc_bool_t  b_es_out_ok;
-    vlc_bool_t  b_simple;
-
     int           i_title;
     input_title_t **title;
 };
 
 static int Control( demux_t *, int, va_list );
-static int Demux  ( demux_t * );
-static int DemuxBlock  ( demux_t *, uint8_t *pkt, int i_pkt );
+static int Demux( demux_t * );
+static int DemuxBlock( demux_t *, uint8_t *, int );
 
-static void DemuxTitles( demux_t *p_demux );
+static void DemuxTitles( demux_t * );
 static void ESSubtitleUpdate( demux_t * );
 static void ButtonUpdate( demux_t * );
 
+static void ESNew( demux_t *, int );
 static int ProbeDVD( demux_t *, char * );
 
 /*****************************************************************************
@@ -177,17 +176,8 @@ static int Open( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->dvdnav = p_dvdnav;
 
-    p_sys->b_simple =
-        strcmp( p_demux->psz_access, "dvdnavsimple" ) ? VLC_FALSE : VLC_TRUE;
-    if( p_sys->b_simple && i_title < 1 )
-    {
-        /* Skip menu part */
-        i_title = 1;
-    }
-
     ps_track_init( p_sys->tk );
     p_sys->i_aspect = -1;
-    p_sys->b_es_out_ok = VLC_FALSE;
     p_sys->i_mux_rate = 0;
 
     if( 1 )
@@ -263,9 +253,6 @@ static int Open( vlc_object_t *p_this )
     /* Update default_pts to a suitable value for dvdnav access */
     var_Create( p_demux, "dvdnav-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
-    /* For simple mode (no menus), we're done */
-    if( p_sys->b_simple ) return VLC_SUCCESS;
-
     /* FIXME hack hack hack hack FIXME */
     /* Get p_input and create variable */
     p_sys->p_input = vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
@@ -296,24 +283,21 @@ static void Close( vlc_object_t *p_this )
     demux_sys_t *p_sys = p_demux->p_sys;
     int i;
 
-    if( !p_sys->b_simple )
-    {
-        /* stop the event handler */
-        p_sys->p_ev->b_die = VLC_TRUE;
-        vlc_thread_join( p_sys->p_ev );
-        vlc_object_destroy( p_sys->p_ev );
+    /* stop the event handler */
+    p_sys->p_ev->b_die = VLC_TRUE;
+    vlc_thread_join( p_sys->p_ev );
+    vlc_object_destroy( p_sys->p_ev );
 
-        var_Destroy( p_sys->p_input, "highlight-mutex" );
-        var_Destroy( p_sys->p_input, "highlight" );
-        var_Destroy( p_sys->p_input, "x-start" );
-        var_Destroy( p_sys->p_input, "x-end" );
-        var_Destroy( p_sys->p_input, "y-start" );
-        var_Destroy( p_sys->p_input, "y-end" );
-        var_Destroy( p_sys->p_input, "color" );
-        var_Destroy( p_sys->p_input, "contrast" );
+    var_Destroy( p_sys->p_input, "highlight-mutex" );
+    var_Destroy( p_sys->p_input, "highlight" );
+    var_Destroy( p_sys->p_input, "x-start" );
+    var_Destroy( p_sys->p_input, "x-end" );
+    var_Destroy( p_sys->p_input, "y-start" );
+    var_Destroy( p_sys->p_input, "y-end" );
+    var_Destroy( p_sys->p_input, "color" );
+    var_Destroy( p_sys->p_input, "contrast" );
 
-        vlc_object_release( p_sys->p_input );
-    }
+    vlc_object_release( p_sys->p_input );
 
     for( i = 0; i < PS_TK_COUNT; i++ )
     {
@@ -506,20 +490,6 @@ static int Demux( demux_t *p_demux )
     int i_event;
     int i_len;
 
-    if( !p_sys->b_es_out_ok )
-    {
-        if( !p_sys->b_simple )
-        {
-            /* We do ourself the selection/unselection
-             * Problem: bypass --audio-channel and --spu-channel
-             * Solution: call ourself dvdnav_??set_channel -> TODO
-             */
-            es_out_Control( p_demux->out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
-        }
-
-        p_sys->b_es_out_ok = VLC_TRUE;
-    }
-
 #if DVD_READ_CACHE
     if( dvdnav_get_next_cache_block( p_sys->dvdnav, &packet, &i_event, &i_len )
         == DVDNAV_STATUS_ERR )
@@ -546,31 +516,24 @@ static int Demux( demux_t *p_demux )
     case DVDNAV_STILL_FRAME:
     {
         dvdnav_still_event_t *event = (dvdnav_still_event_t*)packet;
-        if( !p_sys->b_simple )
+        vlc_mutex_lock( &p_sys->p_ev->lock );
+        if( !p_sys->p_ev->b_still )
         {
-            vlc_mutex_lock( &p_sys->p_ev->lock );
-            if( !p_sys->p_ev->b_still )
+            msg_Dbg( p_demux, "DVDNAV_STILL_FRAME" );
+            msg_Dbg( p_demux, "     - length=0x%x", event->length );
+            p_sys->p_ev->b_still = VLC_TRUE;
+            if( event->length == 0xff )
             {
-                msg_Dbg( p_demux, "DVDNAV_STILL_FRAME" );
-                msg_Dbg( p_demux, "     - length=0x%x", event->length );
-                p_sys->p_ev->b_still = VLC_TRUE;
-                if( event->length == 0xff )
-                {
-                    p_sys->p_ev->i_still_end = 0;
-                }
-                else
-                {
-                    p_sys->p_ev->i_still_end = (int64_t)event->length *
-                        1000000 + mdate() + p_sys->p_input->i_pts_delay;
-                }
+                p_sys->p_ev->i_still_end = 0;
             }
-            vlc_mutex_unlock( &p_sys->p_ev->lock );
-            msleep( 40000 );
+            else
+            {
+                p_sys->p_ev->i_still_end = (int64_t)event->length *
+                    1000000 + mdate() + p_sys->p_input->i_pts_delay;
+            }
         }
-        else
-        {
-            dvdnav_still_skip( p_sys->dvdnav );
-        }
+        vlc_mutex_unlock( &p_sys->p_ev->lock );
+        msleep( 40000 );
         break;
     }
     case DVDNAV_SPU_STREAM_CHANGE:
@@ -585,10 +548,7 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "     - physical_pan_scan=%d",
                  event->physical_pan_scan );
 
-        if( !p_sys->b_simple )
-        {
-            ESSubtitleUpdate( p_demux );
-        }
+        ESSubtitleUpdate( p_demux );
         break;
     }
     case DVDNAV_AUDIO_STREAM_CHANGE:
@@ -632,12 +592,6 @@ static int Demux( demux_t *p_demux )
         if( dvdnav_current_title_info( p_sys->dvdnav, &i_title,
                                        &i_part ) == DVDNAV_STATUS_OK )
         {
-            if( p_sys->b_simple && i_title == 0 )
-            {
-                /* we have returned in menu, stop dvd */
-                /* FIXME is it the right way ? */
-                return 0;
-            }
             if( i_title >= 0 && i_title < p_sys->i_title &&
                 p_demux->info.i_title != i_title )
             {
@@ -701,18 +655,27 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "DVDNAV_HIGHLIGHT" );
         msg_Dbg( p_demux, "     - display=%d", event->display );
         msg_Dbg( p_demux, "     - buttonN=%d", event->buttonN );
-        if( !p_sys->b_simple )
-        {
-            ButtonUpdate( p_demux );
-        }
+        ButtonUpdate( p_demux );
         break;
     }
 
     case DVDNAV_SPU_CLUT_CHANGE:
+    {
+        int i;
+
         msg_Dbg( p_demux, "DVDNAV_SPU_CLUT_CHANGE" );
         /* Update color lookup table (16 *uint32_t in packet) */
         memcpy( p_sys->clut, packet, 16 * sizeof( uint32_t ) );
+
+        /* HACK to get the SPU tracks registered in the right order */
+        for( i = 0; i < 0x1f; i++ )
+        {
+            if( dvdnav_spu_stream_to_lang( p_sys->dvdnav, i ) != 0xffff )
+                ESNew( p_demux, 0xbd20 + i );
+        }
+        /* END HACK */
         break;
+    }
 
     case DVDNAV_HOP_CHANNEL:
         msg_Dbg( p_demux, "DVDNAV_HOP_CHANNEL" );
@@ -933,8 +896,6 @@ static void ButtonUpdate( demux_t *p_demux )
         }
     }
 }
-
-static void ESNew( demux_t *p_demux, int i_id );
 
 static void ESSubtitleUpdate( demux_t *p_demux )
 {
