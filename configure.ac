@@ -1066,7 +1066,7 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
        [vec_ld(0, (unsigned char *)0);],
        [ac_cv_c_altivec="-faltivec"],
        [# Linux/PPC test (no flags)
-        CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec}"
+        CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec} -Werror"
         AC_TRY_COMPILE([#ifdef HAVE_ALTIVEC_H
                         #include <altivec.h>
                         #endif],
