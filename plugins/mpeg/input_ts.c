@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.31 2001/07/30 00:53:05 sam Exp $
+ * $Id: input_ts.c,v 1.32 2001/08/27 16:13:20 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -331,13 +331,20 @@ static int TSRead( input_thread_t * p_input,
         }
 #else
         i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
+
+        /* Shouldn't happen, but it does - at least under Linux */
+        if( (i_read == -1) && ( (errno == EAGAIN) || (errno = EWOULDBLOCK) ) )
+        {
+            /* just ignore that error */
+            i_read = 0;
+        }
 #endif
         if( i_read == -1 )
         {
             intf_ErrMsg( "input error: TS readv error" );
             return( -1 );
         }
-
+	
         input_NetlistMviovec( p_input->p_method_data,
                 (int)(i_read/TS_PACKET_SIZE) , pp_packets );
 

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.129 2001/08/09 08:20:26 sam Exp $
+ * $Id: input.c,v 1.130 2001/08/27 16:13:20 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -637,7 +637,10 @@ static void NetworkOpen( input_thread_t * p_input )
     char                *psz_broadcast = NULL;
     int                 i_port = 0;
     int                 i_opt;
+    int                 i_opt_size;
     struct sockaddr_in  sock;
+    unsigned int        i_mc_group;
+
 #ifdef WIN32
     WSADATA Data;
     int i_err;
@@ -766,7 +769,7 @@ static void NetworkOpen( input_thread_t * p_input )
     /* We may want to reuse an already used socket */
     i_opt = 1;
     if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_REUSEADDR,
-                    (void*) &i_opt, sizeof( i_opt ) ) == -1 )
+                    (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
         intf_ErrMsg( "input error: can't configure socket (SO_REUSEADDR: %s)",
                      strerror(errno));
@@ -779,13 +782,34 @@ static void NetworkOpen( input_thread_t * p_input )
      * packet loss caused by scheduling problems */
     i_opt = 0x80000;
     if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_RCVBUF,
-                    (void*) &i_opt, sizeof( i_opt ) ) == -1 )
+                    (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
         intf_ErrMsg( "input error: can't configure socket (SO_RCVBUF: %s)", 
                      strerror(errno));
         close( p_input->i_handle );
         p_input->b_error = 1;
         return;
+    }
+
+    /* Check if we really got what we have asked for, because Linux, etc.
+     * will silently limit the max buffer size to net.core.rmem_max which
+     * is typically only 65535 bytes */
+    i_opt = 0;
+    i_opt_size = sizeof( i_opt );
+    if( getsockopt( p_input->i_handle, SOL_SOCKET, SO_RCVBUF,
+                    (void*) &i_opt, &i_opt_size ) == -1 )
+    {
+        intf_ErrMsg( "input error: can't configure socket (SO_RCVBUF: %s)", 
+                     strerror(errno));
+        close( p_input->i_handle );
+        p_input->b_error = 1;
+        return;
+    }
+    
+    if( i_opt < 0x80000 )
+    {
+        intf_ErrMsg( "input warning: socket receive buffer size just %d instead of %d bytes.\n",
+                     i_opt, 0x80000 );
     }
 
     /* Build the local socket */
@@ -797,11 +821,15 @@ static void NetworkOpen( input_thread_t * p_input )
         return;
     }
 
+    /* Required for IP_ADD_MEMBERSHIP */
+    i_mc_group = sock.sin_addr.s_addr;
+
 #if defined( WIN32 )
     if ( psz_broadcast != NULL )
     {
         sock.sin_addr.s_addr = INADDR_ANY;
     }
+#define IN_MULTICAST(a)         IN_CLASSD(a)
 #endif
     
     /* Bind it */
@@ -814,6 +842,24 @@ static void NetworkOpen( input_thread_t * p_input )
         return;
     }
 
+    /* Join the m/c group if sock is a multicast address */
+    if( IN_MULTICAST( ntohl(i_mc_group) ) )
+    {
+        struct ip_mreq imr;
+
+        imr.imr_interface.s_addr = htonl(INADDR_ANY);
+        imr.imr_multiaddr.s_addr = i_mc_group;
+        if( setsockopt( p_input->i_handle, IPPROTO_IP,IP_ADD_MEMBERSHIP,
+                        (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
+        {
+            intf_ErrMsg( "input error: failed to join IP multicast group (%s)",
+                         strerror(errno) );
+            close( p_input->i_handle);
+            p_input->b_error = 1;
+            return;
+        }
+    }
+
     /* Build socket for remote connection */
     if ( network_BuildRemoteAddr( &sock, psz_server ) == -1 )
     {
@@ -823,7 +869,7 @@ static void NetworkOpen( input_thread_t * p_input )
         return;
     }
 
-    /* And connect it ... should we really connect ? */
+    /* And connect it */
     if( connect( p_input->i_handle, (struct sockaddr *) &sock,
                  sizeof( sock ) ) == (-1) )
     {
@@ -834,8 +880,6 @@ static void NetworkOpen( input_thread_t * p_input )
         return;
     }
 
-    /* We can't pace control, but FIXME : bug in meuuh's code to sync PCR
-     * with the server. */
     p_input->stream.b_pace_control = 0;
     p_input->stream.b_seekable = 0;
 

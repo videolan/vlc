@@ -160,6 +160,10 @@ C: dae
 D: FreeBSD port and tests
 D: KDE interface
 
+N: Mathias Kretschmer
+E: mathias@research.att.com
+D: IP Multicast support
+
 N: Markus Kuespert
 E: ltlBeBoy@beosmail.com
 D: BeOS port of the DVD ioctls
