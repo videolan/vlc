@@ -86,6 +86,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     val.b_bool = VLC_FALSE;
     var_Set( p_playlist, "prevent-skip", val );
 
+    var_Create( p_playlist, "play-and-stop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "random", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "repeat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "loop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -137,6 +138,7 @@ void playlist_Destroy( playlist_t * p_playlist )
     var_Destroy( p_playlist, "intf-popmenu" );
     var_Destroy( p_playlist, "intf-show" );
     var_Destroy( p_playlist, "prevent-skip" );
+    var_Destroy( p_playlist, "play-and-stop" );
     var_Destroy( p_playlist, "random" );
     var_Destroy( p_playlist, "repeat" );
     var_Destroy( p_playlist, "loop" );
@@ -398,14 +400,18 @@ static void RunThread ( playlist_t *p_playlist )
         }
         else if( p_playlist->i_status != PLAYLIST_STOPPED )
         {
-            var_Get( p_playlist, "prevent-skip", &val);
-            if( val.b_bool == VLC_FALSE)
+            var_Get( p_playlist, "prevent-skip", &val );
+            if( val.b_bool == VLC_FALSE )
             {
                 SkipItem( p_playlist, 0 );
             }
             val.b_bool = VLC_TRUE;
-            var_Set( p_playlist, "prevent-skip", val);
-            PlayItem( p_playlist );
+            var_Set( p_playlist, "prevent-skip", val );
+            var_Get( p_playlist, "play-and-stop", &val );
+            if( val.b_bool == VLC_FALSE )
+            {
+                PlayItem( p_playlist );
+            }
         }
         else if( p_playlist->i_status == PLAYLIST_STOPPED )
         {

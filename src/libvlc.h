@@ -550,6 +550,11 @@ static char *ppsz_align_descriptions[] =
     "When this is active, VLC will keep playing the current playlist item " \
     "over and over again.")
 
+#define PAS_TEXT N_("Play and stop")
+#define PAS_LONGTEXT N_( \
+    "Stop the playlist after each played playlistitem." \
+    "Does advance the playlistindex.")
+
 #define MISC_CAT_LONGTEXT N_( \
     "These options allow you to select default modules. Leave these " \
     "alone unless you really know what you are doing." )
@@ -947,6 +952,7 @@ vlc_module_begin();
         change_short('L');
     add_bool( "repeat", 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
         change_short('R');
+    add_bool( "play-and-stop", 0, NULL, PAS_TEXT, PAS_LONGTEXT, VLC_TRUE );
 
     /* Misc options */
     add_category_hint( N_("Miscellaneous"), MISC_CAT_LONGTEXT, VLC_TRUE );
