@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.5 2003/02/16 14:10:44 fenrir Exp $
+ * $Id: avi.c,v 1.6 2003/02/24 10:45:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -170,6 +170,7 @@ static int Open( vlc_object_t *p_this )
 
     msg_Info( p_sout, "Open" );
 
+    p_sout->pf_mux_capacity  = NULL;
     p_sout->pf_mux_addstream = AddStream;
     p_sout->pf_mux_delstream = DelStream;
     p_sout->pf_mux           = Mux;
@@ -179,7 +180,7 @@ static int Open( vlc_object_t *p_this )
     /* room to add header at the end */
     p_hdr = sout_BufferNew( p_sout, HDR_SIZE );
     memset( p_hdr->p_buffer, 0, HDR_SIZE );
-    sout_AccessWrite( p_sout->p_access, p_hdr );
+    sout_AccessOutWrite( p_sout->p_access, p_hdr );
 
     return VLC_SUCCESS;
 }
@@ -200,7 +201,7 @@ static void Close( vlc_object_t * p_this )
     /* first create idx1 chunk (write at the end of the stream */
     p_idx1 = avi_HeaderCreateidx1( p_sout );
     p_mux->i_idx1_size = p_idx1->i_size;
-    sout_AccessWrite( p_sout->p_access, p_idx1 );
+    sout_AccessOutWrite( p_sout->p_access, p_idx1 );
 
     /* calculate some value for headers creations */
     for( i_stream = 0; i_stream < p_mux->i_streams; i_stream++ )
@@ -232,8 +233,8 @@ static void Close( vlc_object_t * p_this )
     }
 
     p_hdr = avi_HeaderCreateRIFF( p_sout );
-    sout_AccessSeek( p_sout->p_access, 0 );
-    sout_AccessWrite( p_sout->p_access, p_hdr );
+    sout_AccessOutSeek( p_sout->p_access, 0 );
+    sout_AccessOutWrite( p_sout->p_access, p_hdr );
 }
 
 
@@ -374,7 +375,7 @@ static int Mux      ( sout_instance_t *p_sout )
                 SetFCC( p_hdr->p_buffer, p_stream->fcc );
                 SetDWLE( p_hdr->p_buffer + 4, p_data->i_size );
 
-                sout_AccessWrite( p_sout->p_access, p_hdr );
+                sout_AccessOutWrite( p_sout->p_access, p_hdr );
                 p_mux->i_movi_size += p_hdr->i_size;
 
             }
@@ -390,7 +391,7 @@ static int Mux      ( sout_instance_t *p_sout )
                 p_data->i_size += 1;
             }
 
-            sout_AccessWrite( p_sout->p_access, p_data );
+            sout_AccessOutWrite( p_sout->p_access, p_data );
             p_mux->i_movi_size += p_data->i_size;
 
             i_count--;

@@ -2,7 +2,7 @@
  * dummy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: dummy.c,v 1.2 2003/02/16 14:10:44 fenrir Exp $
+ * $Id: dummy.c,v 1.3 2003/02/24 10:45:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -73,6 +73,7 @@ static int Open( vlc_object_t *p_this )
 
     msg_Info( p_sout, "Open" );
 
+    p_sout->pf_mux_capacity  = NULL;
     p_sout->pf_mux_addstream = AddStream;
     p_sout->pf_mux_delstream = DelStream;
     p_sout->pf_mux           = Mux;
@@ -120,7 +121,7 @@ static int Mux      ( sout_instance_t *p_sout )
 
             p_data = sout_FifoGet( p_fifo );
 
-            sout_AccessWrite( p_sout->p_access, p_data );
+            sout_AccessOutWrite( p_sout->p_access, p_data );
 
             i_count--;
         }

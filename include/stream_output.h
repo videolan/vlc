@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.5 2003/02/16 14:10:44 fenrir Exp $
+ * $Id: stream_output.h,v 1.6 2003/02/24 10:45:55 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -107,6 +107,19 @@ struct sout_access_out_t
     int                     (* pf_write )( sout_access_out_t *,
                                            sout_buffer_t * );
 };
+/*
+ * i_query parameter of pf_mux_capacity
+ */
+/* SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME:    p_args=NULL, p_answer=&boolean */
+#define SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME    0x01
+/* SOUT_MUX_CAP_GET_STREAMABLE:             p_args=NULL, p_answer=&boolean */
+#define SOUT_MUX_CAP_GET_STREAMABLE             0x02
+/*
+ * return error code
+ */
+#define SOUT_MUX_CAP_ERR_OK                 0x00
+#define SOUT_MUX_CAP_ERR_UNKNOWN            0x01
+#define SOUT_MUX_CAP_ERR_UNIMPLEMENTED      0x02
 
 struct sout_instance_t
 {
@@ -124,6 +137,8 @@ struct sout_instance_t
     module_t                *p_mux;
     void                    *p_mux_data;
     int                     i_mux_preheader;
+    int                     (* pf_mux_capacity)  ( sout_instance_t *,
+                                                   int, void *, void *);
     int                     (* pf_mux_addstream )( sout_instance_t *,
                                                    sout_input_t * );
     int                     (* pf_mux_delstream )( sout_instance_t *,
@@ -169,7 +184,7 @@ VLC_EXPORT( sout_buffer_t*, sout_BufferDuplicate,(sout_instance_t *, sout_buffer
 VLC_EXPORT( void,           sout_BufferChain,  ( sout_buffer_t **, sout_buffer_t * ) );
 
 VLC_EXPORT( sout_access_out_t *, sout_AccessOutNew, ( sout_instance_t *, char *psz_access, char *psz_name ) );
-VLC_EXPORT( void,                sout_AccessDelete, ( sout_access_out_t * ) );
-VLC_EXPORT( int,                 sout_AccessSeek,   ( sout_access_out_t *, off_t ) );
-VLC_EXPORT( int,                 sout_AccessWrite,  ( sout_access_out_t *, sout_buffer_t * ) );
+VLC_EXPORT( void,                sout_AccessOutDelete, ( sout_access_out_t * ) );
+VLC_EXPORT( int,                 sout_AccessOutSeek,   ( sout_access_out_t *, off_t ) );
+VLC_EXPORT( int,                 sout_AccessOutWrite,  ( sout_access_out_t *, sout_buffer_t * ) );
 

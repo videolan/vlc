@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.9 2003/02/23 18:07:30 fenrir Exp $
+ * $Id: ts.c,v 1.10 2003/02/24 10:45:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -158,6 +158,7 @@ static int Open( vlc_object_t *p_this )
 
     p_mux = malloc( sizeof( sout_mux_t ) );
 
+    p_sout->pf_mux_capacity  = NULL;
     p_sout->pf_mux_addstream = AddStream;
     p_sout->pf_mux_delstream = DelStream;
     p_sout->pf_mux           = Mux;
@@ -603,7 +604,7 @@ static int Mux( sout_instance_t *p_sout )
         p_mux->i_ts_packet++;
         SetTSDate( p_ts, i_dts, i_length );
 
-        sout_AccessWrite( p_sout->p_access, p_ts );
+        sout_AccessOutWrite( p_sout->p_access, p_ts );
     }
 
     return( 0 );

@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.11 2003/02/24 09:18:07 fenrir Exp $
+ * $Id: wav.c,v 1.12 2003/02/24 10:45:55 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -164,6 +164,7 @@ static int SeekAbsolute( input_thread_t *p_input,
     {
             input_AccessReinit( p_input );
             p_input->pf_seek( p_input, i_pos );
+            return( VLC_SUCCESS );
     }
 }
 
