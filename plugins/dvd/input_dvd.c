@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.52 2001/04/29 02:48:51 stef Exp $
+ * $Id: input_dvd.c,v 1.53 2001/04/29 14:52:42 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -581,7 +581,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         /* uodate title environnement variable so that we don't
          * loop on the same title forever */
-        main_PutIntVariable( INPUT_TITLE_VAR, p_dvd->i_title + 1 );
+//        main_PutIntVariable( INPUT_TITLE_VAR, p_dvd->i_title + 1 );
 
         /* ifo vts */
         if( IfoTitleSet( p_dvd->p_ifo ) < 0 )

@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.12 2001/04/28 23:19:19 henri Exp $
+ * $Id: input_clock.c,v 1.13 2001/04/29 14:52:42 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -150,6 +150,13 @@ void input_ClockManageRef( input_thread_t * p_input,
         /* Feed synchro with a new reference point. */
         ClockNewRef( p_input, p_pgrm, i_clock, mdate() );
         p_pgrm->i_synchro_state = SYNCHRO_OK;
+
+        if( p_input->stream.b_pace_control
+             && p_input->stream.pp_programs[0] == p_pgrm )
+        {
+            p_pgrm->last_cr = i_clock;
+            mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
+        }
     }
     else
     {
