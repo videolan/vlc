@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 # debian/rules for the VideoLAN Client - uses debhelper.
-# $Id: rules,v 1.108 2003/11/01 10:07:09 sam Exp $
+# $Id: rules,v 1.109 2004/01/04 04:53:07 sam Exp $
 # based on Joey Hess's one.
 
 # Uncomment this to turn on verbose mode.
@@ -46,11 +46,12 @@ CONFIG_FLAGS += \
 	--enable-v4l \
 	--enable-pvr \
 	--enable-speex \
+	--enable-caca \
 	$(NULL)
 
 # These ones are currently shipped with VLC
 CONFIG_FLAGS += --enable-ffmpeg --with-ffmpeg-tree=extras/ffmpeg
-CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad
+CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad2
 CONFIG_FLAGS += --enable-libmpeg2 --with-libmpeg2-tree=extras/mpeg2dec
 
 # Glide and svgalib are only for x86
@@ -86,15 +87,15 @@ configure-stamp:
 	test -d extras/ffmpeg
 	if test ! -d CVS; then \
 	  cd extras/ffmpeg \
-	  && ./configure \
+	  && ./configure --enable-pp \
 	  && cd libavcodec \
 	  && $(MAKE); \
 	fi
 
-	# Check that we have an faad tree in here (can be a symlink)
-	test -d extras/faad
+	# Check that we have an faad2 tree in here (can be a symlink)
+	test -d extras/faad2
 	if test ! -d CVS; then \
-	  cd extras/faad \
+	  cd extras/faad2 \
 	  && touch `find . -name configure.in` \
 	  && touch `find . -name aclocal.m4` \
 	  && touch `find . -name configure` \
@@ -148,7 +149,7 @@ ifneq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 
 	# HACKETY HACKETY HACK
 	if test ! -d CVS; then \
-	  cd extras/faad/libfaad \
+	  cd extras/faad2/libfaad \
 	  && $(MAKE) clean \
 	  && $(MAKE) AM_CFLAGS=-fPIC; \
 	fi
@@ -174,12 +175,17 @@ clean:
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
 	-if test ! -d CVS; then cd extras/ffmpeg && $(MAKE) distclean; fi
-	# Check that we have an faad tree in here (can be a symlink)
-	test -d extras/faad
-	-if test ! -d CVS; then cd extras/faad && $(MAKE) distclean; fi
+	# Check that we have an faad2 tree in here (can be a symlink)
+	test -d extras/faad2
+	-if test ! -d CVS; then cd extras/faad2 && $(MAKE) distclean; fi
 	# Check that we have an mpeg2dec tree in here (can be a symlink)
 	test -d extras/mpeg2dec
 	-if test ! -d CVS; then cd extras/mpeg2dec && $(MAKE) distclean; fi
+
+	# Removed ugly cruft
+	rm -f extras/mpeg2dec/include/mpeg2dec
+	rm -f src/misc/modules_builtin.h
+	rm -f mozilla/vlcintf.xpt mozilla/vlcintf.h
 
 	# Remove spurious autotools stuff
 	rm -f config.log confdefs.h

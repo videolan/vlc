@@ -513,3 +513,13 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<sam> 16K     ChangeLog-1999
+<sam> 96K     ChangeLog-2000
+<sam> 168K    ChangeLog-2001
+<sam> 304K    ChangeLog-2002
+<sam> 488K    ChangeLog-2003
+<zorglub> conclusion: les dévs pipotent de plus en plus dans les messages de
+          commit
+
+  -- #videolan
+%

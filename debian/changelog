@@ -1,9 +1,17 @@
-vlc (XXX) unstable; urgency=low
+vlc (0.7.0-1) unstable; urgency=low
 
+  * New upstream release.
   * debian/control:
     + Build-depend on fixed dvb-dev packages.
+    + Build-depend on fixed linux-kernel-headers packages.
+  * debian/rules:
+    + Look for faad in extras/faad2, not extras/faad.
+    + Enable postprocessing in the ffmpeg configuration.
+    + Activated libcaca video output.
+  * doc/vlc.1:
+    + Fixed a minor typo (Closes: #223605).
 
- -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  XXX
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sun,  4 Jan 2004 03:29:22 +0100
 
 vlc (0.6.2+cvs20031030-2) unstable; urgency=low
 
