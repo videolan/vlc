@@ -330,7 +330,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     if ( (i_flags & A52_CHANNEL_MASK) != (p_sys->i_flags & A52_CHANNEL_MASK)
           && !p_sys->b_dontwarn )
     {
-        msg_Warn( p_filter,
+        msg_Warn( VLC_OBJECT(p_aout),
                   "liba52 couldn't do the requested downmix 0x%x->0x%x",
                   p_sys->i_flags  & A52_CHANNEL_MASK,
                   i_flags & A52_CHANNEL_MASK );
@@ -349,7 +349,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
         if( a52_block( p_sys->p_liba52 ) )
         {
-            msg_Warn( p_filter, "a52_block failed for block %d", i );
+            msg_Warn( VLC_OBJECT(p_aout), "a52_block failed for block %d", i );
         }
 
         p_samples = a52_samples( p_sys->p_liba52 );
