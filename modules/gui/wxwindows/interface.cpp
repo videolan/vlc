@@ -462,12 +462,11 @@ void Interface::CreateOurToolBar()
     toolbar->AddTool( OpenFile_Event, wxT(""),
                       wxBitmap( eject_xpm ), wxU(_(HELP_OPEN)) );
     toolbar->AddSeparator();
-    toolbar->AddTool( PlayStream_Event, wxT(""), wxBitmap( play_xpm ),
-                      wxU(_(HELP_PLAY)) );
-#if 0
-    toolbar->AddTool( PlayStream_Event, wxT(""), wxBitmap( pause_xpm ),
-                      wxU(_(HELP_PAUSE)) );
-#endif
+
+    wxToolBarToolBase *p_tool = toolbar->AddTool( PlayStream_Event, wxT(""),
+                      wxBitmap( play_xpm ), wxU(_(HELP_PLAY)) );
+    p_tool->SetClientData( p_tool );
+
     toolbar->AddTool( StopStream_Event, wxT(""), wxBitmap( stop_xpm ),
                       wxU(_(HELP_STOP)) );
     toolbar->AddSeparator();
@@ -969,15 +968,17 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
             /* Update stream date */
             char psz_time[ MSTRTIME_MAX_SIZE ], psz_total[ MSTRTIME_MAX_SIZE ];
             mtime_t i_seconds;
-            vlc_value_t val;
 
-            i_seconds = var_GetTime( p_intf->p_sys->p_input, "length" ) / I64C(1000000 );
+            i_seconds = var_GetTime( p_intf->p_sys->p_input, "length" ) /
+                        I64C(1000000 );
             secstotimestr( psz_total, i_seconds );
 
-            i_seconds = var_GetTime( p_intf->p_sys->p_input, "time" ) / I64C(1000000 );
+            i_seconds = var_GetTime( p_intf->p_sys->p_input, "time" ) /
+                        I64C(1000000 );
             secstotimestr( psz_time, i_seconds );
 
-            statusbar->SetStatusText( wxU(psz_time)+ wxString(wxT(" / ")) + wxU(psz_total), 0 );
+            statusbar->SetStatusText( wxU(psz_time) + wxString(wxT(" / ") ) +
+                                      wxU(psz_total), 0 );
         }
     }
 #endif
@@ -1082,7 +1083,8 @@ void Interface::TogglePlayButton( int i_playing_status )
     if( i_playing_status == i_old_playing_status )
         return;
 
-    wxToolBarToolBase *p_tool = GetToolBar()->FindById( PlayStream_Event );
+    wxToolBarToolBase *p_tool = (wxToolBarToolBase *)
+        GetToolBar()->GetToolClientData( PlayStream_Event );
     if( !p_tool ) return;
 
     if( i_playing_status == PLAYING_S )

@@ -197,7 +197,7 @@ friend class Playlist;
  *****************************************************************************/
 Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxFrame( p_parent, -1, wxU(_("Playlist")), wxDefaultPosition,
-             wxSize(345,400), wxDEFAULT_FRAME_STYLE )
+             wxSize(500,300), wxDEFAULT_FRAME_STYLE )
 {
     vlc_value_t val;
 
