@@ -1459,20 +1459,23 @@ static void UpdateCurrentChapter( demux_t & demux, mtime_t i_pts )
         /* 1st, we need to know in which chapter we are */
         psz_curr_chapter = sys.editions[sys.i_current_edition].FindTimecode( i_pts );
 
-        if (sys.psz_current_chapter != NULL && psz_curr_chapter != NULL && sys.psz_current_chapter->i_seekpoint_num != psz_curr_chapter->i_seekpoint_num)
+        /* we have moved to a new chapter */
+        if (sys.psz_current_chapter != NULL && psz_curr_chapter != NULL && sys.psz_current_chapter != psz_curr_chapter)
         {
-            demux.info.i_update |= INPUT_UPDATE_SEEKPOINT;
-            demux.info.i_seekpoint = psz_curr_chapter->i_seekpoint_num - 1;
-        }
+            if (sys.psz_current_chapter->i_seekpoint_num != psz_curr_chapter->i_seekpoint_num && psz_curr_chapter->i_seekpoint_num > 0)
+            {
+                demux.info.i_update |= INPUT_UPDATE_SEEKPOINT;
+                demux.info.i_seekpoint = psz_curr_chapter->i_seekpoint_num - 1;
+            }
 
+            if (sys.editions[sys.i_current_edition].b_ordered )
+            {
+                /* TODO check if we need to silently seek to a new location in the stream (switch to another chapter) */
+                /* count the last duration time found for each track in a table (-1 not found, -2 silent) */
+                /* only seek after each duration >= end timecode of the current chapter */
+            }
+        }
         sys.psz_current_chapter = psz_curr_chapter;
-
-        if (sys.editions[sys.i_current_edition].b_ordered )
-        {
-            /* TODO check if we need to silently seek to a new location in the stream (switch to another chapter) */
-            /* count the last duration time found for each track in a table (-1 not found, -2 silent) */
-            /* only seek after each duration >= end timecode of the current chapter */
-        }
     }
 }
 
@@ -3074,8 +3077,6 @@ int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
         i_user_end_time = i_end_time;
     }
 
-    i_seekpoint_num = title.i_seekpoint;
-
     if (b_display_seekpoint)
     {
         seekpoint_t *sk = vlc_seekpoint_New();
@@ -3089,6 +3090,8 @@ int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
         title.seekpoint = (seekpoint_t**)realloc( title.seekpoint, title.i_seekpoint * sizeof( seekpoint_t* ) );
         title.seekpoint[title.i_seekpoint-1] = sk;
     }
+
+    i_seekpoint_num = title.i_seekpoint;
 
     return i_user_end_time;
 }
