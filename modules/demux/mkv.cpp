@@ -488,6 +488,7 @@ public:
 
     bool Preload( demux_t *p_demux );
     bool PreloadFamily( demux_t *p_demux, const matroska_segment_t & segment );
+    size_t PreloadLinked( demux_t *p_demux, const demux_sys_t & of_sys );
 };
 
 class matroska_stream_t
@@ -523,9 +524,10 @@ public:
         return NULL;
     }
     
-    matroska_segment_t *FindSegment( KaxSegmentUID & i_uid ) const;
+    matroska_segment_t *FindSegment( EbmlBinary & uid ) const;
 
     void PreloadFamily( demux_t *p_demux, const matroska_segment_t & segment );
+    size_t PreloadLinked( demux_t *p_demux, const demux_sys_t & of_sys );
 };
 
 class demux_sys_t
@@ -565,7 +567,7 @@ public:
         return NULL;
     }
 
-    matroska_segment_t *FindSegment( KaxSegmentUID & i_uid ) const;
+    matroska_segment_t *FindSegment( EbmlBinary & uid ) const;
     void PreloadFamily( demux_t *p_demux );
     void PreloadLinked( demux_t *p_demux );
 };
@@ -3305,10 +3307,6 @@ void matroska_stream_t::PreloadFamily( demux_t *p_demux, const matroska_segment_
     }
 }
 
-void demux_sys_t::PreloadLinked( demux_t *p_demux )
-{
-}
-
 bool matroska_segment_t::PreloadFamily( demux_t *p_demux, const matroska_segment_t & of_segment )
 {
     if ( b_preloaded )
@@ -3324,6 +3322,51 @@ bool matroska_segment_t::PreloadFamily( demux_t *p_demux, const matroska_segment
     }
 
     return false;
+}
+
+// preload all the linked segments for all preloaded segments
+void demux_sys_t::PreloadLinked( demux_t *p_demux )
+{
+    size_t i_prealoaded;
+    do {
+        i_prealoaded = 0;
+        for (size_t i=0; i<streams.size(); i++)
+        {
+            i_prealoaded += streams[i]->PreloadLinked( p_demux, *this );
+        }
+    } while ( i_prealoaded ); // worst case: will stop when all segments are preloaded
+}
+
+size_t matroska_stream_t::PreloadLinked( demux_t *p_demux, const demux_sys_t & of_sys )
+{
+    size_t i_result = 0;
+    for (size_t i=0; i<segments.size(); i++)
+    {
+        i_result += segments[i]->PreloadLinked( p_demux, of_sys );
+    }
+    return i_result;
+}
+
+size_t matroska_segment_t::PreloadLinked( demux_t *p_demux, const demux_sys_t & of_sys )
+{
+    size_t i_result = 0;
+    if ( prev_segment_uid.GetBuffer() )
+    {
+        matroska_segment_t *p_segment = of_sys.FindSegment( prev_segment_uid );
+        if ( p_segment )
+        {
+            i_result += p_segment->Preload( p_demux ) ? 1 : 0;
+        }
+    }
+    if ( next_segment_uid.GetBuffer() )
+    {
+        matroska_segment_t *p_segment = of_sys.FindSegment( next_segment_uid );
+        if ( p_segment )
+        {
+            i_result += p_segment->Preload( p_demux ) ? 1 : 0;
+        }
+    }
+    return i_result;
 }
 
 bool matroska_segment_t::Preload( demux_t *p_demux )
@@ -3383,4 +3426,24 @@ bool matroska_segment_t::Preload( demux_t *p_demux )
     b_preloaded = true;
 
     return true;
+}
+
+matroska_segment_t *demux_sys_t::FindSegment( EbmlBinary & uid ) const
+{
+    matroska_segment_t *p_segment = NULL;
+    for (size_t i=0; i<streams.size() && p_segment == NULL; i++)
+    {
+        p_segment = streams[i]->FindSegment( uid );
+    }
+    return p_segment;
+}
+
+matroska_segment_t *matroska_stream_t::FindSegment( EbmlBinary & uid ) const
+{
+    for (size_t i=0; i<segments.size(); i++)
+    {
+        if ( segments[i]->segment_uid == uid )
+            return segments[i];
+    }
+    return NULL;
 }
