@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.75 2001/02/18 03:32:02 polux Exp $
+ * $Id: video_parser.c,v 1.76 2001/02/20 15:03:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -300,9 +300,6 @@ static int InitThread( vpar_thread_t *p_vpar )
 #endif
 
     /* Initialize lookup tables */
-#if defined(MPEG2_COMPLIANT) && !defined(VDEC_DFT)
-    vpar_InitCrop( p_vpar );
-#endif
     vpar_InitMbAddrInc( p_vpar );
     vpar_InitDCTTables( p_vpar );
     vpar_InitPMBType( p_vpar );

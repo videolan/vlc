@@ -674,6 +674,9 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
             p_free_picture->i_width                     = i_width;
             p_free_picture->i_height                    = i_height;
             p_free_picture->i_chroma_width              = i_chroma_width;
+            p_free_picture->i_size                      = i_width * i_height;
+            p_free_picture->i_chroma_size               = i_chroma_width
+                                                            * i_height;
             p_free_picture->i_display_horizontal_offset = 0;
             p_free_picture->i_display_vertical_offset   = 0;
             p_free_picture->i_display_width             = i_width;

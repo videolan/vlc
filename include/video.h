@@ -57,8 +57,10 @@ typedef struct picture_s
     /* Picture static properties - those properties are fixed at initialization
      * and should NOT be modified */
     int             i_width;                                /* picture width */
-    int             i_height;                              /* picture height */
     int             i_chroma_width;                          /* chroma width */
+    int             i_height;                              /* picture height */
+    int             i_size;                                /* number of pels */
+    int             i_chroma_size;                  /* number of chroma pels */
 
     /* Picture dynamic properties - those properties can be changed by the
      * decoder */
