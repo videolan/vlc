@@ -35,6 +35,7 @@
 #include <string.h>                                              /* strdup() */
 
 #include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>
@@ -54,7 +55,7 @@
 #   include <unistd.h>
 #endif
 
-#define HAVE_DYNAMIC_PLUGINS
+//#define HAVE_DYNAMIC_PLUGINS
 #if defined(HAVE_DL_DYLD)
 #   if defined(HAVE_MACH_O_DYLD_H)
 #       include <mach-o/dyld.h>
@@ -84,12 +85,6 @@
 
 #include "vlc_interface.h"
 #include "intf_eject.h"
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
-#include "ninput.h"
 
 #include "vlc_playlist.h"
 

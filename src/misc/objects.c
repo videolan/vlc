@@ -31,14 +31,11 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_STDLIB_H
 #   include <stdlib.h>                                          /* realloc() */
 #endif
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
 
 #include "vlc_video.h"
 #include "video_output.h"
@@ -131,6 +128,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_DEMUX:
             i_size = sizeof(demux_t);
             psz_type = "demux";
+            break;
+        case VLC_OBJECT_STREAM:
+            i_size = sizeof(stream_t);
+            psz_type = "stream";
             break;
         case VLC_OBJECT_ACCESS:
             i_size = sizeof(access_t);
