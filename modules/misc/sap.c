@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.32 2003/11/08 12:25:59 sigmunau Exp $
+ * $Id: sap.c,v 1.33 2003/11/08 23:02:38 sigmunau Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -393,16 +393,28 @@ static void mfield_parse( char *psz_mfield, char **ppsz_proto,
                char **ppsz_port )
 {
     char *psz_pos;
+    char *psz_media;
     if( psz_mfield )
     {
         psz_pos = psz_mfield;
+        psz_media = psz_mfield;
         while( *psz_pos != '\0' && *psz_pos != ' ' )
         {
             psz_pos++;
         }
+        if( *psz_pos != '\0' )
+        {
+            *psz_pos = '\0';
+            if( strcmp( psz_media, "video" ) && strcmp( psz_media, "audio" ) )
+            {
+                *ppsz_proto = NULL;
+                *ppsz_port = NULL;
+                return;
+            }
+        }
         psz_pos++;
         *ppsz_port = psz_pos;
-        while( *psz_pos != '\0' && *psz_pos && *psz_pos !=' ' && *psz_pos!='/' )
+        while( *psz_pos != '\0' && *psz_pos !=' ' && *psz_pos!='/' )
         {
             psz_pos++;
         }
