@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.18 2002/08/25 09:40:00 sam Exp $
+ * $Id: oss.c,v 1.19 2002/08/25 16:55:55 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -277,24 +277,31 @@ static void Close( vlc_object_t * p_this )
 
 
 /*****************************************************************************
- * GetBufInfo: buffer status query
+ * BufferDuration: buffer status query
  *****************************************************************************
- * This function fills in the audio_buf_info structure :
- * - returns : number of available fragments (not partially used ones)
- * - int fragstotal : total number of fragments allocated
- * - int fragsize : size of a fragment in bytes
- * - int bytes : available space in bytes (includes partially used fragments)
- * Note! 'bytes' could be more than fragments*fragsize
+ * This function returns the duration in microseconfs of the current buffer.
  *****************************************************************************/
-static int GetBufInfo( aout_instance_t * p_aout )
+static mtime_t BufferDuration( aout_instance_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     audio_buf_info audio_buf;
+    int i_bytes;
 
+    /* Fill the audio_buf_info structure:
+     * - fragstotal: total number of fragments allocated
+     * - fragsize: size of a fragment in bytes
+     * - bytes: available space in bytes (includes partially used fragments)
+     * Note! 'bytes' could be more than fragments*fragsize */
     ioctl( p_sys->i_fd, SNDCTL_DSP_GETOSPACE, &audio_buf );
 
-    /* returns the allocated space in bytes */
-    return ( (audio_buf.fragstotal * audio_buf.fragsize) - audio_buf.bytes );
+    /* calculate number of available fragments (not partially used ones) */
+    i_bytes = (audio_buf.fragstotal * audio_buf.fragsize) - audio_buf.bytes;
+
+    /* Return the fragment duration */
+    return (mtime_t)i_bytes * 1000000
+            / p_aout->output.output.i_bytes_per_frame
+            / p_aout->output.output.i_rate
+            * p_aout->output.output.i_frame_length;
 }
 
 /*****************************************************************************
@@ -303,6 +310,7 @@ static int GetBufInfo( aout_instance_t * p_aout )
 static int OSSThread( aout_instance_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    mtime_t next_date = 0;
 
     while ( !p_aout->b_die )
     {
@@ -318,25 +326,30 @@ static int OSSThread( aout_instance_t * p_aout )
 
         if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
         {
-            mtime_t buffered;
+            mtime_t buffered = BufferDuration( p_aout );
 
-            do
+            /* Wait a bit - we don't want our buffer to be full */
+            while( buffered > AOUT_PTS_TOLERANCE * 2 )
             {
-                buffered = (mtime_t)GetBufInfo( p_aout ) * 1000000
-                            / p_aout->output.output.i_bytes_per_frame
-                            / p_aout->output.output.i_rate
-                            * p_aout->output.output.i_frame_length;
-                if( buffered < 50000 )
-                {
-                    break;
-                }
                 msleep( buffered / 2 - 10000 );
+                buffered = BufferDuration( p_aout );
+            }
 
-            } while( VLC_TRUE );
+            if( !next_date )
+            {
+                /* This is the _real_ presentation date */
+                next_date = mdate() + buffered;
+            }
+            else
+            {
+                /* Give a hint to the audio output about our drift, but
+                 * not too much because we want to make it happy with our
+                 * nicely calculated dates. */
+                next_date = ( (next_date * 7) + (mdate() + buffered) ) / 8;
+            }
 
             /* Next buffer will be played at mdate()+buffered */
-            p_buffer = aout_OutputNextBuffer( p_aout, mdate() + buffered,
-                                              VLC_FALSE );
+            p_buffer = aout_OutputNextBuffer( p_aout, next_date, VLC_FALSE );
         }
         else
         {
@@ -347,6 +360,9 @@ static int OSSThread( aout_instance_t * p_aout )
         {
             p_bytes = p_buffer->p_buffer;
             i_size = p_buffer->i_nb_bytes;
+            /* This is theoretical ... we'll see next iteration whether
+             * we're drifting */
+            next_date += p_buffer->end_date - p_buffer->start_date;
         }
         else
         {
@@ -354,6 +370,7 @@ static int OSSThread( aout_instance_t * p_aout )
                       * p_aout->output.output.i_bytes_per_frame;
             p_bytes = malloc( i_size );
             memset( p_bytes, 0, i_size );
+            next_date = 0;
         }
 
         i_tmp = write( p_sys->i_fd, p_bytes, i_size );

@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.11 2002/08/25 09:40:00 sam Exp $
+ * $Id: output.c,v 1.12 2002/08/25 16:55:55 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -171,7 +171,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     vlc_mutex_lock( &p_aout->mixer_lock );
 
     p_buffer = p_aout->output.fifo.p_first;
-    while ( p_buffer && p_buffer->start_date < start_date && p_buffer->p_next )
+    while ( p_buffer && p_buffer->start_date < start_date )
     {
         msg_Dbg( p_aout, "audio output is too slow (%lld), trashing %lldus",
                  start_date - p_buffer->start_date,
