@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: faad.c,v 1.12 2004/02/19 16:19:41 gbazin Exp $
+ * $Id: faad.c,v 1.13 2004/02/19 17:42:43 jpsaman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -116,7 +116,7 @@ static int Open( vlc_object_t *p_this )
     aout_DateSet( &p_sys->date, 0 );
     p_dec->fmt_out.i_cat = AUDIO_ES;
 
-    if (p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
+    if (p_this->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
         p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
     else
         p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
@@ -151,7 +151,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Set the faad config */
     cfg = faacDecGetCurrentConfiguration( p_sys->hfaad );
-    if (p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
+    if (p_this->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
         cfg->outputFormat = FAAD_FMT_FLOAT;
     else
         cfg->outputFormat = FAAD_FMT_16BIT;
