@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.191 2002/08/29 23:53:22 massiot Exp $
+ * $Id: video_output.c,v 1.192 2002/10/17 08:24:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -29,8 +29,6 @@
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
-#include <stdio.h>                                              /* sprintf() */
-#include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
 
@@ -78,7 +76,7 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
     if( p_vout == NULL )
     {
         msg_Err( p_parent, "out of memory" );
-        return( NULL );
+        return NULL;
     }
 
     /* If the parent is not a VOUT object, that means we are at the start of
@@ -192,7 +190,7 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
     {
         msg_Err( p_vout, "no suitable vout module" );
         vlc_object_destroy( p_vout );
-        return( NULL );
+        return NULL;
     }
 
     /* Create thread and set locks */
@@ -205,7 +203,7 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
     if( vlc_thread_create( p_vout, "video output", RunThread,
                            VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
-        msg_Err( p_vout, "%s", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         module_Unneed( p_vout, p_vout->p_module );
         vlc_object_destroy( p_vout );
         return NULL;
@@ -253,7 +251,7 @@ static int InitThread( vout_thread_t *p_vout )
     if( p_vout->pf_init( p_vout ) )
     {
         vlc_mutex_unlock( &p_vout->change_lock );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     if( !I_OUTPUTPICTURES )
@@ -262,7 +260,7 @@ static int InitThread( vout_thread_t *p_vout )
                          "one direct buffer" );
         p_vout->pf_end( p_vout );
         vlc_mutex_unlock( &p_vout->change_lock );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     msg_Dbg( p_vout, "got %i direct buffer(s)", I_OUTPUTPICTURES );
@@ -328,7 +326,7 @@ static int InitThread( vout_thread_t *p_vout )
                      &p_vout->render.i_chroma, &p_vout->output.i_chroma );
             p_vout->pf_end( p_vout );
             vlc_mutex_unlock( &p_vout->change_lock );
-            return( 1 );
+            return VLC_EGENERIC;
         }
 
         if( I_OUTPUTPICTURES < 2 * VOUT_MAX_PICTURES )
@@ -366,7 +364,7 @@ static int InitThread( vout_thread_t *p_vout )
     }
 
 /* XXX XXX mark thread ready */
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -407,6 +405,7 @@ static void RunThread( vout_thread_t *p_vout)
     while( (!p_vout->b_die) && (!p_vout->b_error) )
     {
         /* Initialize loop variables */
+        p_picture = NULL;
         display_date = 0;
         current_date = mdate();
 
@@ -420,11 +419,9 @@ static void RunThread( vout_thread_t *p_vout)
 #endif
 
         /*
-         * Find the picture to display - this operation does not need lock,
-         * since only READY_PICTUREs are handled
-         */
-        p_picture = NULL;
-
+         * Find the picture to display (the one with the earliest date).
+         * This operation does not need lock, since only READY_PICTUREs
+         * are handled. */
         for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
         {
             if( (PP_RENDERPICTURE[i_index]->i_status == READY_PICTURE)
@@ -436,7 +433,7 @@ static void RunThread( vout_thread_t *p_vout)
             }
         }
 
-        if( p_picture != NULL )
+        if( p_picture )
         {
             /* If we met the last picture, parse again to see whether there is
              * a more appropriate one. */
@@ -546,7 +543,9 @@ static void RunThread( vout_thread_t *p_vout)
                 }
                 else
                 {
-                    /*intf_WarnMsg( 6, "vout info: duplicating picture" );*/
+                    /* We set the display date to something high, otherwise
+                     * we'll have lots of problems with late pictures */
+                    display_date = current_date + p_vout->render_time;
                 }
             }
         }
@@ -580,7 +579,7 @@ static void RunThread( vout_thread_t *p_vout)
          */
         if( display_date != 0 )
         {
-            /* Store render time using Bresenham algorithm */
+            /* Store render time using a sliding mean */
             p_vout->render_time += mdate() - current_date;
             p_vout->render_time >>= 1;
         }
@@ -659,7 +658,6 @@ static void RunThread( vout_thread_t *p_vout)
             p_vout->chroma.p_module->pf_deactivate( VLC_OBJECT(p_vout) );
             p_vout->chroma.p_module->pf_activate( VLC_OBJECT(p_vout) );
         }
-
     }
 
     /*
@@ -816,7 +814,7 @@ static int BinaryLog(u32 i)
     if( i & 0xcccccccc ) i_log += 2;
     if( i & 0xaaaaaaaa ) i_log += 1;
 
-    return( i_log );
+    return i_log;
 }
 
 /*****************************************************************************

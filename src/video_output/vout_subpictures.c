@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.14 2002/06/01 12:32:02 sam Exp $
+ * $Id: vout_subpictures.c,v 1.15 2002/10/17 08:24:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -104,7 +104,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
                  * to be done */
                 p_vout->p_subpicture[i_subpic].i_status = RESERVED_SUBPICTURE;
                 vlc_mutex_unlock( &p_vout->subpicture_lock );
-                return( &p_vout->p_subpicture[i_subpic] );
+                return &p_vout->p_subpicture[i_subpic];
             }
             else if( p_destroyed_subpic == NULL )
             {
@@ -135,7 +135,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
     {
         msg_Err( p_vout, "subpicture heap is full" );
         vlc_mutex_unlock( &p_vout->subpicture_lock );
-        return( NULL );
+        return NULL;
     }
 
     p_free_subpic->p_sys =
@@ -163,7 +163,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
 
     vlc_mutex_unlock( &p_vout->subpicture_lock );
 
-    return( p_free_subpic );
+    return p_free_subpic;
 }
 
 /*****************************************************************************
@@ -230,7 +230,8 @@ subpicture_t *vout_SortSubPictures( vout_thread_t *p_vout,
             /* If it is a DVD subpicture, check its date */
             if( p_vout->p_subpicture[i_index].i_type == MEMORY_SUBPICTURE )
             {
-                if( display_date > p_vout->p_subpicture[i_index].i_stop )
+                if( !p_vout->p_subpicture[i_index].b_ephemer
+                     && display_date > p_vout->p_subpicture[i_index].i_stop )
                 {
                     /* Too late, destroy the subpic */
                     vout_DestroySubPicture( p_vout,
@@ -238,7 +239,8 @@ subpicture_t *vout_SortSubPictures( vout_thread_t *p_vout,
                     continue;
                 }
 
-                if( display_date < p_vout->p_subpicture[i_index].i_start )
+                if( display_date
+                     && display_date < p_vout->p_subpicture[i_index].i_start )
                 {
                     /* Too early, come back next monday */
                     continue;
