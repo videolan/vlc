@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.20 2003/04/15 14:05:13 hartman Exp $
+ * $Id: playlist.m,v 1.21 2003/04/29 20:17:12 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -250,6 +250,7 @@
      * when the playlist changes. we do this on purpose, because else there is a 
      * delay of .5 sec or so when we delete an item */
     [self playlistUpdated];
+    [self updateRowSelection];
 }
 
 - (IBAction)selectAll:(id)sender
