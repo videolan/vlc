@@ -65,14 +65,12 @@ private:
     vout_thread_t *p_vout;
     wxWindow *p_parent;
     vlc_mutex_t lock;
-    mtime_t i_release_time;
 
     wxWindow *p_child_window;
 
     void UpdateSize( wxSizeEvent & );
     void UpdateHide( wxSizeEvent & );
     void OnControlEvent( wxCommandEvent & );
-    void OnIdle( wxIdleEvent& event );
 
     DECLARE_EVENT_TABLE();
 };
@@ -80,8 +78,6 @@ private:
 DEFINE_LOCAL_EVENT_TYPE( wxEVT_VLC_VIDEO );
 
 BEGIN_EVENT_TABLE(VideoWindow, wxWindow)
-    EVT_IDLE( VideoWindow::OnIdle )
-
     EVT_CUSTOM( wxEVT_SIZE, UpdateSize_Event, VideoWindow::UpdateSize )
     EVT_CUSTOM( wxEVT_SIZE, UpdateHide_Event, VideoWindow::UpdateHide )
     EVT_COMMAND( SetStayOnTop_Event, wxEVT_VLC_VIDEO,
@@ -109,7 +105,6 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     vlc_mutex_init( p_intf, &lock );
 
     p_vout = NULL;
-    i_release_time = 0;
 
     p_intf->pf_request_window = ::GetWindow;
     p_intf->pf_release_window = ::ReleaseWindow;
@@ -192,15 +187,9 @@ void *VideoWindow::GetWindow( vout_thread_t *_p_vout,
 
     p_vout = _p_vout;
 
-    /* Re-use window if possible */
-    if( i_release_time <= 0 );
-    {
-        wxSizeEvent event( wxSize(*pi_width_hint, *pi_height_hint),
-                           UpdateSize_Event );
-        AddPendingEvent( event );
-    }
-    i_release_time = 0;
-
+    wxSizeEvent event( wxSize(*pi_width_hint, *pi_height_hint),
+                       UpdateSize_Event );
+    AddPendingEvent( event );
     vlc_mutex_unlock( &lock );
 
 #ifdef __WXGTK__
@@ -235,7 +224,11 @@ void VideoWindow::ReleaseWindow( void *p_window )
     vlc_mutex_lock( &lock );
 
     p_vout = NULL;
-    i_release_time = mdate();
+
+#if defined(__WXGTK__) || defined(WIN32)
+    wxSizeEvent event( wxSize(0, 0), UpdateHide_Event );
+    AddPendingEvent( event );
+#endif
 
     vlc_mutex_unlock( &lock );
 }
@@ -276,28 +269,6 @@ void VideoWindow::OnControlEvent( wxCommandEvent &event )
         intf_event.SetInt( event.GetInt() );
         p_parent->AddPendingEvent( intf_event );
         break;
-    }
-}
-
-void VideoWindow::OnIdle( wxIdleEvent& WXUNUSED(event) )
-{
-    vlc_bool_t b_cleanup = VLC_FALSE;
-
-    /* Cleanup the video window if needed */
-    vlc_mutex_lock( &lock );
-    if( i_release_time && i_release_time + 100000 < mdate() )
-    {
-        b_cleanup = VLC_TRUE;
-        i_release_time = 0;
-    }
-    vlc_mutex_unlock( &lock );
-
-    if( b_cleanup )
-    {
-#if defined(__WXGTK__) || defined(WIN32)
-        wxSizeEvent event( wxSize(0, 0), UpdateHide_Event );
-        AddPendingEvent( event );
-#endif
     }
 }
 
