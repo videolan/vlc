@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.52 2003/03/30 13:23:27 gbazin Exp $
+ * $Id: configuration.c,v 1.53 2003/04/06 01:00:07 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -170,7 +170,7 @@ void __config_PutPsz( vlc_object_t *p_this,
     /* sanity checks */
     if( !p_config )
     {
-        msg_Err( p_this, "option %s does not exist", psz_name );
+        msg_Warn( p_this, "option %s does not exist", psz_name );
         return;
     }
     if( (p_config->i_type!=CONFIG_ITEM_STRING) &&
@@ -214,7 +214,7 @@ void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
     /* sanity checks */
     if( !p_config )
     {
-        msg_Err( p_this, "option %s does not exist", psz_name );
+        msg_Warn( p_this, "option %s does not exist", psz_name );
         return;
     }
     if( (p_config->i_type!=CONFIG_ITEM_INTEGER) &&
@@ -264,7 +264,7 @@ void __config_PutFloat( vlc_object_t *p_this,
     /* sanity checks */
     if( !p_config )
     {
-        msg_Err( p_this, "option %s does not exist", psz_name );
+        msg_Warn( p_this, "option %s does not exist", psz_name );
         return;
     }
     if( p_config->i_type != CONFIG_ITEM_FLOAT )

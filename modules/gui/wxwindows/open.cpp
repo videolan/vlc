@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.12 2003/04/01 16:11:43 gbazin Exp $
+ * $Id: open.cpp,v 1.13 2003/04/06 01:00:07 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -175,7 +175,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
     wxFlexGridSizer *sout_sizer = new wxFlexGridSizer( 2, 1, 20 );
     sout_checkbox = new wxCheckBox( panel, SoutEnable_Event,
                                            _("Stream output") );
-    sout_checkbox->SetToolTip( _("Use VLC has a stream server") );
+    sout_checkbox->SetToolTip( _("Use VLC as a stream server") );
     sout_sizer->Add( sout_checkbox, 0,
                      wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     sout_button = new wxButton( panel, SoutSettings_Event, _("Settings...") );

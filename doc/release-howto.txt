@@ -15,6 +15,7 @@
      · ipkg/control
      · debian/changelog
      · extras/MacOSX/vlc.pbprj/project.pbxproj
+     · extras/MacOSX/Resources/English.lproj/InfoPlist.string
   - mettre à jour les ChangeLog et la TODO list pour ceux qui auraient
     étourdiment oublié de l'updater à chaque commit
   - updater le numéro de version et le timestamp dans :

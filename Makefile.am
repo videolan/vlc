@@ -469,8 +469,12 @@ VLC.app: vlc $(PLUGIN_FILES)
 	$(INSTALL) -m 644 share/*.psf share/*.rle VLC.app/Contents/MacOS/share
 	$(INSTALL) -d VLC.app/Contents/MacOS/locale
 	for i in $(ALL_LINGUAS); do \
-		mkdir -p VLC.app/Contents/MacOS/locale/$${i%}/LC_MESSAGES ; \
+		mkdir -p VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
 		cp po/$${i}.gmo VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+		mkdir -p VLC.app/Contents/Resources/$${i}.lproj ; \
+		ln -sf ../English.lproj/InfoPlist.strings VLC.app/Contents/Resources/$${i}.lproj ; \
+		ln -sf ../English.lproj/MainMenu.nib VLC.app/Contents/Resources/$${i}.lproj ; \
+		ln -sf ../English.lproj/vlc.scriptTerminology VLC.app/Contents/Resources/$${i}.lproj ; \
 	done
 	echo -n "APPLVLC#" >| VLC.app/Contents/PkgInfo
 endif
