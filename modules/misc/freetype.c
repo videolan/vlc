@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.5 2003/07/20 16:56:58 ipkiss Exp $
+ * $Id: freetype.c,v 1.6 2003/07/20 21:41:13 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -36,6 +36,12 @@
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 
+#ifdef SYS_DARWIN
+#define DEFAULT_FONT "/System/Library/Fonts/LucidaGrande.dfont"
+#else
+#define DEFAULT_FONT ""
+#endif
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -60,7 +66,7 @@ static int GetUnicodeCharFromUTF8( byte_t ** );
 
 vlc_module_begin();
     add_category_hint( N_("Fonts"), NULL, VLC_FALSE );
-    add_file( "freetype-font", "", NULL, FONT_TEXT, FONT_LONGTEXT, VLC_FALSE );
+    add_file( "freetype-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT, VLC_FALSE );
     add_integer( "freetype-fontsize", 16, NULL, FONTSIZE_TEXT, FONTSIZE_LONGTEXT, VLC_FALSE );
     set_description( _("freetype2 font renderer") );
     set_capability( "text renderer", 100 );
