@@ -899,7 +899,14 @@ static int InitThread( input_thread_t * p_input )
         }
         if( p_playlist ) vlc_object_release( p_playlist );
 
-        vlc_meta_Delete( meta );
+        if( p_input->stream.p_sout && p_input->stream.p_sout->p_meta == NULL )
+        {
+            p_input->stream.p_sout->p_meta = meta;
+        }
+        else
+        {
+            vlc_meta_Delete( meta );
+        }
     }
 
     /* get length */

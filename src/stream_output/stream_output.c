@@ -31,8 +31,10 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-
 #include <vlc/sout.h>
+
+#include "vlc_meta.h"
+
 #undef DEBUG_BUFFER
 /*****************************************************************************
  * Local prototypes
@@ -117,6 +119,7 @@ sout_instance_t * __sout_NewInstance ( vlc_object_t *p_parent,
 
     /* *** init descriptor *** */
     p_sout->psz_sout    = strdup( psz_dest );
+    p_sout->p_meta      = NULL;
     p_sout->i_preheader = 0;
     p_sout->i_padding   = 0;
     p_sout->i_out_pace_nocontrol = 0;
@@ -161,6 +164,11 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
     /* *** free all string *** */
     FREE( p_sout->psz_sout );
     FREE( p_sout->psz_chain );
+
+    if( p_sout->p_meta )
+    {
+        vlc_meta_Delete( p_sout->p_meta );
+    }
 
     sout_stream_delete( p_sout->p_stream );
     vlc_mutex_destroy( &p_sout->lock );
