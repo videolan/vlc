@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.8 2001/11/30 09:49:48 tcastley Exp $
+ * $Id: InterfaceWindow.cpp,v 1.9 2001/12/06 10:29:40 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -428,7 +428,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             i_id = p_intf->p_input->stream.p_selected_area->i_id - 1;
 
             /* Disallow area 0 since it is used for video_ts.vob */
-            if( i_id < 0 )
+            if( i_id > 0 )
             {
                 p_area = p_intf->p_input->stream.pp_areas[i_id];
                 input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );

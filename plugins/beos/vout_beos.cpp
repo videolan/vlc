@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.33 2001/12/01 06:38:53 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.34 2001/12/06 10:29:40 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -108,21 +108,53 @@ BWindow *beos_GetAppWindow(char *name)
     return window; 
 }
 
-/*****************************************************************************
- * DrawingThread : thread that really does the drawing
- *****************************************************************************/
-int32 Draw(void *data)
-{
-    VideoWindow* p_win;
-    p_win = (VideoWindow *) data;
-    if ( p_win->voutWindow->LockLooper() )
-    {
-        p_win->view->DrawBitmap( p_win->bitmap[p_win->i_buffer],
-                                 p_win->bitmap[p_win->i_buffer]->Bounds(),
-                                 p_win->voutWindow->Bounds() );  
-        p_win->voutWindow->UnlockLooper();
-    }
-    return B_OK;
+/**************************************************************************** 
+* 
+ * DrawingThread : thread that really does the drawing 
+ **************************************************************************** 
+*/ 
+int32 Draw(void *data) 
+{ 
+    //rudolf: sync init: 
+    BScreen *screen; 
+    display_mode disp_mode; 
+    static uint32 refresh, oldrefresh = 0; 
+
+    screen = new BScreen(); 
+    screen-> GetMode(&disp_mode); 
+    refresh = 
+         (disp_mode.timing.pixel_clock * 1000)/((disp_mode.timing.h_total)* 
+         (disp_mode.timing.v_total)); 
+    if (!(refresh == oldrefresh)) 
+    { 
+        printf("\nNew refreshrate is %d:Hz\n",refresh); 
+        oldrefresh = refresh; 
+        if (refresh  < 61) 
+        { 
+            printf("Enabling retrace sync.\n"); 
+        } 
+        else 
+        { 
+            printf("Disabling retrace sync.\n"); 
+        } 
+    } 
+
+    VideoWindow* p_win; 
+    p_win = (VideoWindow *) data; 
+    if ( p_win-> voutWindow-> LockLooper() ) 
+    { 
+        //rudolf: sync: 
+        if (refresh  < 61) 
+        { 
+            screen-> WaitForRetrace(22000);//set timeout for  < 45 Hz... 
+        } 
+
+        p_win-> view-> DrawBitmap( p_win-> bitmap[p_win-> i_buffer], 
+                                 p_win-> bitmap[p_win-> i_buffer]-> Bounds(), 
+                                 p_win-> voutWindow-> Bounds() );  
+        p_win-> voutWindow-> UnlockLooper(); 
+    } 
+    return B_OK; 
 }
 
 /*****************************************************************************
