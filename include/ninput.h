@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.13 2003/10/01 22:44:58 hartman Exp $
+ * $Id: ninput.h,v 1.14 2003/11/13 17:59:34 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -28,7 +28,8 @@ enum es_extra_type_e
 {
     ES_EXTRA_TYPE_UNKNOWN,
     ES_EXTRA_TYPE_WAVEFORMATEX,
-    ES_EXTRA_TYPE_BITMAPINFOHEADER
+    ES_EXTRA_TYPE_BITMAPINFOHEADER,
+    ES_EXTRA_TYPE_SUBHEADER
 };
 
 typedef struct
