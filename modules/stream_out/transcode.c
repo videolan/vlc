@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.19 2003/06/29 20:58:16 gbazin Exp $
+ * $Id: transcode.c,v 1.20 2003/06/30 20:08:21 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -710,11 +710,13 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
     *out = NULL;
 
     /* gather data into p_buffer_in */
+#ifdef HAVE_VORBIS_VORBISENC_H
     if( id->f_dst.i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
     id->i_dts = in->i_dts -
                 (mtime_t)1000000 * (mtime_t)id->i_samples_delay /
                 (mtime_t)id->f_dst.i_sample_rate;
     else
+#endif
     id->i_dts = in->i_dts -
                 (mtime_t)1000000 *
                 (mtime_t)(id->i_buffer_pos / 2 / id->ff_enc_c->channels )/
