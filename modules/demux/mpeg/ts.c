@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.27 2003/05/31 21:49:12 fenrir Exp $
+ * $Id: ts.c,v 1.28 2003/06/25 19:28:10 fenrir Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -218,6 +218,7 @@ static int Activate( vlc_object_t * p_this )
      * The PAT es is indepedent of any program. */
     p_pat_es = input_AddES( p_input, NULL, 0x00,
                             UNKNOWN_ES, NULL, sizeof( es_ts_data_t ) );
+    p_pat_es->i_fourcc = VLC_FOURCC( 'p', 'a', 't', ' ' );
     p_demux_data = (es_ts_data_t *)p_pat_es->p_demux_data;
     p_demux_data->b_psi = 1;
     p_demux_data->i_psi_type = PSI_IS_PAT;
@@ -533,6 +534,7 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
                     /* Add the PMT ES to this program */
                     p_current_es = input_AddES( p_input, p_pgrm,(u16)i_pmt_pid,
                         UNKNOWN_ES, NULL, sizeof( es_ts_data_t) );
+                    p_current_es->i_fourcc = VLC_FOURCC( 'p', 'm', 't', ' ' );
                     p_es_demux = (es_ts_data_t *)p_current_es->p_demux_data;
                     p_es_demux->b_psi = 1;
                     p_es_demux->i_psi_type = PSI_IS_PMT;
@@ -1210,6 +1212,7 @@ static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
                 p_current_es = input_AddES( p_input, p_new_pgrm,
                                             (u16)p_pgrm->i_pid, UNKNOWN_ES,
                                             NULL, sizeof(es_ts_data_t) );
+                p_current_es->i_fourcc = VLC_FOURCC( 'p', 'm', 't', ' ' );
                 p_es_demux = (es_ts_data_t *)p_current_es->p_demux_data;
                 p_es_demux->b_psi = 1;
                 p_es_demux->i_psi_type = PSI_IS_PMT;
