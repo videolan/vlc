@@ -71,7 +71,8 @@ static int  Create ( vlc_object_t * );
 static void Destroy( vlc_object_t * );
 
 /* The RenderText call maps to pf_render_string, defined in vlc_filter.h */
-static subpicture_region_t *RenderText( filter_t *, subpicture_t *, subpicture_region_t* );
+static subpicture_region_t *RenderText( filter_t *, subpicture_t *,
+                                        subpicture_region_t* );
 static line_desc_t *NewLine( byte_t * );
 
 /*****************************************************************************
@@ -206,14 +207,8 @@ static int Create( vlc_object_t *p_this )
     p_sys->p_library = 0;
     p_sys->i_font_size = 0;
     
-    for( i = 0; i < 256; i++ )
-    {
-        double f_i_norm, f_pow, f_res;
-        f_i_norm = (double)i/ 255.0;
-        f_pow = pow( f_i_norm, 0.5f );
-        f_res = f_pow * 255.0;
-        p_sys->pi_gamma[i] = (uint8_t)f_res;
-    }
+    for( i = 0; i < 256; i++ ) p_sys->pi_gamma[i] = i + (256 - i) / 16;
+    p_sys->pi_gamma[0] = 0;
 
     var_Create( p_filter, "freetype-font",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -352,10 +347,10 @@ static subpicture_region_t *Render( filter_t *p_filter, subpicture_t *p_spu,
     uint8_t i_y, i_u, i_v;  /* YUV values, derived from incoming RGB */
     subpicture_region_t *p_region;
   
-    /* calculate text color components: */
-    i_y = (uint8_t) ( (  66 * red + 129 * green +  25 * blue + 128) >> 8) +  16;
-    i_u = (uint8_t) ( ( -38 * red -  74 * green + 112 * blue + 128) >> 8) + 128;
-    i_v = (uint8_t) ( ( 112 * red -  94 * green -  18 * blue + 128) >> 8) + 128;
+    /* Calculate text color components */
+    i_y = (uint8_t)((  66 * red + 129 * green +  25 * blue + 128) >> 8) +  16;
+    i_u = (uint8_t)(( -38 * red -  74 * green + 112 * blue + 128) >> 8) + 128;
+    i_v = (uint8_t)(( 112 * red -  94 * green -  18 * blue + 128) >> 8) + 128;
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
