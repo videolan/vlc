@@ -2,15 +2,15 @@
  * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.11 2003/02/07 01:22:55 fenrir Exp $
+ * $Id: audio.c,v 1.12 2003/02/16 08:56:24 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -52,7 +52,7 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * Definitions of structures  and functions used by this plugins 
+ * Definitions of structures  and functions used by this plugins
  *****************************************************************************/
 
 /* XXX set this to 0 to avoid problem with PS XXX */
@@ -62,7 +62,7 @@ vlc_module_end();
 
 typedef struct mpeg_header_s
 {
-    u32 i_header;
+    uint32_t i_header;
     int i_version;
     int i_layer;
     int i_crc;
@@ -85,12 +85,12 @@ typedef struct mpeg_header_s
 #define VBR_SCALE_FLAG  0x0008
 typedef struct xing_header_s
 {
-    int i_flags;      /* from Xing header data */
-    int i_frames;     /* total bit stream frames from Xing header data */
-    int i_bytes;      /* total bit stream bytes from Xing header data */
-    int i_vbr_scale;  /* encoded vbr scale from Xing header data */
-    u8  i_toc[100];   /* for seek */
-    int i_avgbitrate; /* calculated, XXX: bits/sec not Kb */
+    int     i_flags;      /* from Xing header data */
+    int     i_frames;     /* total bit stream frames from Xing header data */
+    int     i_bytes;      /* total bit stream bytes from Xing header data */
+    int     i_vbr_scale;  /* encoded vbr scale from Xing header data */
+    uint8_t i_toc[100];   /* for seek */
+    int     i_avgbitrate; /* calculated, XXX: bits/sec not Kb */
 } xing_header_t;
 
 struct demux_sys_t
@@ -116,16 +116,16 @@ static int mpegaudio_bitrate[2][3][16] =
     /* v1 l2 */
     { 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384, 0},
     /* v1 l3 */
-    { 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 0} 
+    { 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 0}
   },
-    
+
   {
      /* v2 l1 */
     { 0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256, 0},
     /* v2 l2 */
     { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0},
     /* v2 l3 */
-    { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0} 
+    { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0}
   }
 
 };
@@ -141,7 +141,7 @@ static char* mpegaudio_mode[4] =
     "stereo", "joint stereo", "dual channel", "mono"
 };
 
-static inline u32 GetDWBE( u8 *p_buff )
+static inline uint32_t GetDWBE( uint8_t *p_buff )
 {
     return( ( p_buff[0] << 24 )|( p_buff[1] << 16 )|
             ( p_buff[2] <<  8 )|( p_buff[3] ) );
@@ -154,7 +154,7 @@ static inline u32 GetDWBE( u8 *p_buff )
  * SkipBytes : skip bytes, not yet optimised, read bytes to be skipped :P
  *
  * ReadPes : read data and make a PES
- * 
+ *
  *****************************************************************************/
 static int SkipBytes( input_thread_t *p_input, int i_size )
 {
@@ -174,14 +174,14 @@ static int SkipBytes( input_thread_t *p_input, int i_size )
     return( 1 );
 }
 
-static int ReadPES( input_thread_t *p_input, 
-                    pes_packet_t **pp_pes, 
+static int ReadPES( input_thread_t *p_input,
+                    pes_packet_t **pp_pes,
                     int i_size )
 {
     pes_packet_t *p_pes;
 
     *pp_pes = NULL;
-        
+
     if( !(p_pes = input_NewPES( p_input->p_method_data )) )
     {
         msg_Err( p_input, "cannot allocate new PES" );
@@ -193,8 +193,8 @@ static int ReadPES( input_thread_t *p_input,
         data_packet_t   *p_data;
         int i_read;
 
-        if( (i_read = input_SplitBuffer( p_input, 
-                                         &p_data, 
+        if( (i_read = input_SplitBuffer( p_input,
+                                         &p_data,
                                          __MIN( i_size, 1024 ) ) ) <= 0 )
         {
             input_DeletePES( p_input->p_method_data, p_pes );
@@ -220,9 +220,9 @@ static int ReadPES( input_thread_t *p_input,
 }
 
 /*****************************************************************************
- * CheckHeader : Test the validity of the header 
+ * CheckHeader : Test the validity of the header
  *****************************************************************************/
-static int CheckHeader( u32 i_header )
+static int CheckHeader( uint32_t i_header )
 {
     if( ((( i_header >> 20 )&0x0FFF) != 0x0FFF )  /* header sync */
         || (((i_header >> 17)&0x03) == 0 )  /* valid layer ?*/
@@ -248,22 +248,22 @@ static int DecodedFrameSize( mpeg_header_t *p_mpeg )
         case( 1 ): /* layer 2 */
             return( 1152 );
         case( 2 ): /* layer 3 */
-            return( !p_mpeg->i_version ? 1152 : 576 ); 
+            return( !p_mpeg->i_version ? 1152 : 576 );
             /* XXX: perhaps we have to /2 for all layer but i'm not sure */
     }
     return( 0 );
 }
 
 /****************************************************************************
- * GetHeader : find an mpeg header and load it 
+ * GetHeader : find an mpeg header and load it
  ****************************************************************************/
 static int GetHeader( input_thread_t  *p_input,
                       mpeg_header_t   *p_mpeg,
                       int             i_max_pos,
                       int             *pi_skip )
 {
-    u32 i_header;
-    u8  *p_peek;
+    uint32_t i_header;
+    uint8_t  *p_peek;
     int i_size;
 
     *pi_skip = 0;
@@ -290,7 +290,7 @@ static int GetHeader( input_thread_t  *p_input,
     p_mpeg->i_version =  1 - ( ( i_header >> 19 ) & 0x01 );
     p_mpeg->i_layer =  3 - ( ( i_header >> 17 ) & 0x03 );
     p_mpeg->i_crc = 1 - (( i_header >> 16 ) & 0x01);
-    p_mpeg->i_bitrate = 
+    p_mpeg->i_bitrate =
         mpegaudio_bitrate[p_mpeg->i_version][p_mpeg->i_layer][(i_header>>12)&0x0F];
     p_mpeg->i_samplerate = mpegaudio_samplerate[p_mpeg->i_version][(i_header>>10)&0x03];
     p_mpeg->i_padding = (( i_header >> 9 ) & 0x01);
@@ -315,9 +315,9 @@ static void ExtractXingHeader( input_thread_t *p_input,
 {
     int i_skip;
     int i_size;
-    u8  *p_peek;
+    uint8_t  *p_peek;
     mpeg_header_t mpeg;
-    
+
     p_xh->i_flags = 0;  /* nothing present */
     if( !( GetHeader( p_input,
                       &mpeg,
@@ -370,7 +370,7 @@ static void ExtractXingHeader( input_thread_t *p_input,
     }
     else
     {
-        p_xh->i_flags = GetDWBE( p_peek ); 
+        p_xh->i_flags = GetDWBE( p_peek );
         p_peek += 4;
         i_size -= 4;
     }
@@ -405,9 +405,11 @@ static void ExtractXingHeader( input_thread_t *p_input,
 
     if( ( p_xh->i_flags&FRAMES_FLAG )&&( p_xh->i_flags&BYTES_FLAG ) )
     {
-        p_xh->i_avgbitrate = 
-              ((u64)p_xh->i_bytes * (u64)8 * (u64)mpeg.i_samplerate) / 
-               ((u64)p_xh->i_frames * (u64)DecodedFrameSize( &mpeg ) );
+        p_xh->i_avgbitrate =
+              ( (uint64_t)p_xh->i_bytes *
+                (uint64_t)8 *
+                (uint64_t)mpeg.i_samplerate) /
+               ((uint64_t)p_xh->i_frames * (uint64_t)DecodedFrameSize( &mpeg ) );
     }
 }
 
@@ -417,34 +419,32 @@ static void ExtractXingHeader( input_thread_t *p_input,
 static void ExtractConfiguration( demux_sys_t *p_demux )
 {
     p_demux->i_samplerate   = p_demux->mpeg.i_samplerate;
-    
-    p_demux->i_samplelength = DecodedFrameSize( &p_demux->mpeg );    
+
+    p_demux->i_samplelength = DecodedFrameSize( &p_demux->mpeg );
 
     /* XXX if crc do i need to add 2 bytes or not? */
     switch( p_demux->mpeg.i_layer )
     {
         case( 0 ):
-            p_demux->i_framelength = 
-                ( ( ( !p_demux->mpeg.i_version ? 12000 : 6000 ) *
-                           p_demux->mpeg.i_bitrate ) / 
+            p_demux->i_framelength =
+                ( ( 12000 * p_demux->mpeg.i_bitrate ) /
                        p_demux->mpeg.i_samplerate + p_demux->mpeg.i_padding ) * 4;
         case( 1 ):
         case( 2 ):
-            p_demux->i_framelength = 
-                  ( ( !p_demux->mpeg.i_version ? 144000 : 72000 ) *
-                           p_demux->mpeg.i_bitrate ) / 
+            p_demux->i_framelength =
+                  ( 144000 * p_demux->mpeg.i_bitrate ) /
                        p_demux->mpeg.i_samplerate + p_demux->mpeg.i_padding;
     }
 }
 
 /****************************************************************************
- * CheckPS : check if this stream could be some ps, 
+ * CheckPS : check if this stream could be some ps,
  *           yes it's ugly ...  but another idea ?
  *
  ****************************************************************************/
 static int CheckPS( input_thread_t *p_input )
 {
-    u8  *p_peek;
+    uint8_t  *p_peek;
     int i_startcode = 0;
     int i_size = input_Peek( p_input, &p_peek, 8196 );
 
@@ -472,7 +472,7 @@ static int Activate( vlc_object_t * p_this )
     demux_sys_t * p_demux;
     input_info_category_t * p_category;
     module_t * p_id3;
-    
+
     int i_found;
     int b_forced;
     int i_skip;
@@ -501,7 +501,7 @@ static int Activate( vlc_object_t * p_this )
     if ( p_id3 ) {
         module_Unneed( p_input, p_id3 );
     }
-    
+
     /* create p_demux and init it */
     if( !( p_demux = p_input->p_demux_data = malloc( sizeof(demux_sys_t) ) ) )
     {
@@ -509,7 +509,7 @@ static int Activate( vlc_object_t * p_this )
         return( -1 );
     }
     memset( p_demux, 0, sizeof(demux_sys_t) );
-   
+
     /* check if it could be a ps stream */
     if( !b_forced && CheckPS(  p_input ))
     {
@@ -526,7 +526,7 @@ static int Activate( vlc_object_t * p_this )
     {
         if( b_forced )
         {
-            msg_Warn( p_input, 
+            msg_Warn( p_input,
                       "this does not look like an MPEG audio stream, "
                       "but continuing anyway" );
         }
@@ -542,14 +542,14 @@ static int Activate( vlc_object_t * p_this )
         ExtractConfiguration( p_demux );
     }
 
-    
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( input_InitStream( p_input, 0 ) == -1)
     {
         msg_Err( p_input, "cannot init stream" );
         free( p_input->p_demux_data );
         return( -1 );
-    }    
+    }
     if( input_AddProgram( p_input, 0, 0) == NULL )
     {
         msg_Err( p_input, "cannot add program" );
@@ -558,9 +558,9 @@ static int Activate( vlc_object_t * p_this )
     }
     p_input->stream.pp_programs[0]->b_is_ok = 0;
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-    
-    /* create our ES */ 
-    p_demux->p_es = input_AddES( p_input, 
+
+    /* create our ES */
+    p_demux->p_es = input_AddES( p_input,
                                  p_input->stream.p_selected_program,
                                  1, /* id */
                                  0 );
@@ -585,7 +585,7 @@ static int Activate( vlc_object_t * p_this )
     {
         /* parse Xing Header if present */
         ExtractXingHeader( p_input, &p_demux->xingheader );
-    
+
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.i_mux_rate = p_demux->xingheader.i_avgbitrate / 50 / 8;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -599,7 +599,7 @@ static int Activate( vlc_object_t * p_this )
                 p_demux->mpeg.i_samplerate,
                 p_demux->xingheader.i_avgbitrate / 1000,
                 p_demux->xingheader.i_flags ?
-                        "VBR (Xing)" : "" 
+                        "VBR (Xing)" : ""
                     );
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -607,7 +607,7 @@ static int Activate( vlc_object_t * p_this )
         input_AddInfo( p_category, "input type", "audio MPEG-%d",
                        p_demux->mpeg.i_version +1 );
         input_AddInfo( p_category, "layer", "%d", p_demux->mpeg.i_layer + 1 );
-        input_AddInfo( p_category, "mode", 
+        input_AddInfo( p_category, "mode",
                        mpegaudio_mode[p_demux->mpeg.i_mode] );
         input_AddInfo( p_category, "sample rate", "%dHz",
                        p_demux->mpeg.i_samplerate );
@@ -617,7 +617,7 @@ static int Activate( vlc_object_t * p_this )
     }
     else
     {
-        msg_Dbg( p_input, 
+        msg_Dbg( p_input,
                  "assuming audio MPEG, but not frame header yet found" );
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_category = input_InfoCategory( p_input, "mpeg" );
@@ -625,20 +625,6 @@ static int Activate( vlc_object_t * p_this )
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     }
-#if 0
-    /* seems now to be ok */
-
-    /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME */
-    /* if i don't do that, it don't work correctly but why ??? */
-
-    /* XXX Sigmund : if you want to seek use this :) 
-       but it work only with file .... ( http doesn't like seeking */
-    if( p_input->stream.b_seekable )
-    {
-        p_input->pf_seek( p_input, 0 ); // 0 -> seek at position 0
-        input_AccessReinit( p_input );
-    }
-#endif
 
     return( 0 );
 }
@@ -653,8 +639,8 @@ static int Demux( input_thread_t * p_input )
     demux_sys_t  *p_demux = p_input->p_demux_data;
     pes_packet_t *p_pes;
     int          i_skip;
-    
-    if( !GetHeader( p_input, 
+
+    if( !GetHeader( p_input,
                     &p_demux->mpeg,
                     8192,
                     &i_skip ) )
@@ -676,11 +662,11 @@ static int Demux( input_thread_t * p_input )
     }
 
     ExtractConfiguration( p_demux );
-     
+
     input_ClockManageRef( p_input,
                           p_input->stream.p_selected_program,
                           p_demux->i_pts );
-   
+
     /*
      * For layer 1 and 2 i_skip is garbage but for layer 3 it is not.
      * Since mad accept without to much trouble garbage I don't skip
@@ -710,11 +696,11 @@ static int Demux( input_thread_t * p_input )
     {
         input_DecodePES( p_demux->p_es->p_decoder_fifo, p_pes );
     }
-    p_demux->i_pts += (mtime_t)90000 * 
+    p_demux->i_pts += (mtime_t)90000 *
                       (mtime_t)p_demux->i_samplelength /
                       (mtime_t)p_demux->i_samplerate;
     return( 1 );
-   
+
 }
 
 

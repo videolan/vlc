@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.9 2003/01/28 23:55:57 massiot Exp $
+ * $Id: mpeg_audio.c,v 1.10 2003/02/16 08:56:24 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -436,7 +436,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
               320, 384, 0},
             /* v1 l3 */
             { 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224,
-              256, 320, 0} 
+              256, 320, 0}
         },
 
         {
@@ -448,7 +448,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
               144, 160, 0},
             /* v2 l3 */
             { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128,
-              144, 160, 0} 
+              144, 160, 0}
         }
     };
 
@@ -507,29 +507,27 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
         switch( *pi_layer )
         {
         case 1:
-            i_current_frame_size = ( ( i_version ? 6000 : 12000 ) *
+            i_current_frame_size = ( 12000 *
                                         *pi_bit_rate / *pi_sample_rate
                                         + b_padding ) * 4;
-            *pi_frame_size = ( ( i_version ? 6000 : 12000 ) *
+            *pi_frame_size = ( 12000 *
                                   i_max_bit_rate / *pi_sample_rate + 1 ) * 4;
             *pi_frame_length = 384;
             break;
 
         case 2:
-            i_current_frame_size = ( i_version ? 72000 : 144000 ) *
+            i_current_frame_size = 144000 *
                                       *pi_bit_rate / *pi_sample_rate
                                       + b_padding;
-            *pi_frame_size = ( i_version ? 72000 : 144000 ) *
-                                      i_max_bit_rate / *pi_sample_rate + 1;
+            *pi_frame_size = 144000 * i_max_bit_rate / *pi_sample_rate + 1;
             *pi_frame_length = 1152;
             break;
 
         case 3:
-            i_current_frame_size = ( i_version ? 72000 : 144000 ) *
+            i_current_frame_size = 144000 *
                                       *pi_bit_rate / *pi_sample_rate
                                       + b_padding;
-            *pi_frame_size = ( i_version ? 72000 : 144000 ) *
-                                      i_max_bit_rate / *pi_sample_rate + 1;
+            *pi_frame_size = 144000 * i_max_bit_rate / *pi_sample_rate + 1;
             *pi_frame_length = i_version ? 576 : 1152;
             break;
 
@@ -541,7 +539,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
     {
         return -1;
     }
-    
+
     return i_current_frame_size;
 }
 
