@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.37 2003/11/05 00:39:16 gbazin Exp $
+ * $Id: mkv.cpp,v 1.38 2003/11/11 01:33:18 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -171,7 +171,6 @@ static vlc_fourcc_t __GetFOURCC( uint8_t *p )
  *****************************************************************************/
 typedef struct
 {
-    int         i_cat;
     vlc_bool_t  b_default;
     vlc_bool_t  b_enabled;
     int         i_number;
@@ -179,29 +178,15 @@ typedef struct
     int         i_extra_data;
     uint8_t     *p_extra_data;
 
-    char         *psz_language;
-
     char         *psz_codec;
-    vlc_fourcc_t i_codec;
 
     uint64_t     i_default_duration;
     float        f_timecodescale;
+
     /* video */
-    int         i_width;
-    int         i_height;
-    int         i_display_width;
-    int         i_display_height;
+    es_format_t fmt;
     float       f_fps;
-
-
-    /* audio */
-    int         i_channels;
-    int         i_samplerate;
-    int         i_bitspersample;
-
-    es_descriptor_t *p_es;
-
-
+    es_out_id_t *p_es;
 
     vlc_bool_t      b_inited;
     /* data to be send first */
@@ -290,8 +275,6 @@ static int Open( vlc_object_t * p_this )
     uint8_t        *p_peek;
 
     int             i_track;
-    vlc_bool_t      b_audio_selected;
-    int             i_spu_channel, i_audio_channel;
 
     EbmlElement     *el = NULL, *el1 = NULL, *el2 = NULL, *el3 = NULL, *el4 = NULL;
 
@@ -489,15 +472,16 @@ static int Open( vlc_object_t * p_this )
                     p_sys->track = (mkv_track_t*)realloc( p_sys->track, sizeof( mkv_track_t ) * (p_sys->i_track + 1 ) );
 #define tk  p_sys->track[p_sys->i_track - 1]
                     memset( &tk, 0, sizeof( mkv_track_t ) );
-                    tk.i_cat = UNKNOWN_ES;
+
+                    es_format_Init( &tk.fmt, UNKNOWN_ES, 0 );
+                    tk.fmt.psz_language = strdup("English");
+
                     tk.b_default = VLC_TRUE;
                     tk.b_enabled = VLC_TRUE;
                     tk.i_number = p_sys->i_track - 1;
                     tk.i_extra_data = 0;
                     tk.p_extra_data = NULL;
-                    tk.i_codec = 0;
                     tk.psz_codec = NULL;
-                    tk.psz_language = strdup("English");
                     tk.i_default_duration = 0;
                     tk.f_timecodescale = 1.0;
 
@@ -541,19 +525,19 @@ static int Open( vlc_object_t * p_this )
                             {
                                 case track_audio:
                                     psz_type = "audio";
-                                    tk.i_cat = AUDIO_ES;
+                                    tk.fmt.i_cat = AUDIO_ES;
                                     break;
                                 case track_video:
                                     psz_type = "video";
-                                    tk.i_cat = VIDEO_ES;
+                                    tk.fmt.i_cat = VIDEO_ES;
                                     break;
                                 case track_subtitle:
                                     psz_type = "subtitle";
-                                    tk.i_cat = SPU_ES;
+                                    tk.fmt.i_cat = SPU_ES;
                                     break;
                                 default:
                                     psz_type = "unknown";
-                                    tk.i_cat = UNKNOWN_ES;
+                                    tk.fmt.i_cat = UNKNOWN_ES;
                                     break;
                             }
 
@@ -632,11 +616,11 @@ static int Open( vlc_object_t * p_this )
                             KaxTrackLanguage &lang = *(KaxTrackLanguage*)el3;
                             lang.ReadData( p_sys->es->I_O() );
 
-                            tk.psz_language =
+                            tk.fmt.psz_language =
                                 LanguageGetName( string( lang ).c_str() );
                             msg_Dbg( p_input,
                                      "|   |   |   + Track Language=`%s'(%s) ",
-                                     tk.psz_language, string( lang ).c_str() );
+                                     tk.fmt.psz_language, string( lang ).c_str() );
                         }
                         else  if( EbmlId( *el3 ) == KaxCodecID::ClassInfos.GlobalId )
                         {
@@ -709,10 +693,6 @@ static int Open( vlc_object_t * p_this )
                         else  if( EbmlId( *el3 ) == KaxTrackVideo::ClassInfos.GlobalId )
                         {
                             msg_Dbg( p_input, "|   |   |   + Track Video" );
-                            tk.i_width  = 0;
-                            tk.i_height = 0;
-                            tk.i_display_width  = 0;
-                            tk.i_display_height = 0;
                             tk.f_fps = 0.0;
 
                             p_sys->ep->Down();
@@ -738,7 +718,7 @@ static int Open( vlc_object_t * p_this )
                                     KaxVideoPixelWidth &vwidth = *(KaxVideoPixelWidth*)el4;
                                     vwidth.ReadData( p_sys->es->I_O() );
 
-                                    tk.i_width = uint16( vwidth );
+                                    tk.fmt.video.i_width = uint16( vwidth );
                                     msg_Dbg( p_input, "|   |   |   |   + width=%d", uint16( vwidth ) );
                                 }
                                 else if( EbmlId( *el4 ) == KaxVideoPixelHeight::ClassInfos.GlobalId )
@@ -746,7 +726,7 @@ static int Open( vlc_object_t * p_this )
                                     KaxVideoPixelWidth &vheight = *(KaxVideoPixelWidth*)el4;
                                     vheight.ReadData( p_sys->es->I_O() );
 
-                                    tk.i_height = uint16( vheight );
+                                    tk.fmt.video.i_height = uint16( vheight );
                                     msg_Dbg( p_input, "|   |   |   |   + height=%d", uint16( vheight ) );
                                 }
                                 else if( EbmlId( *el4 ) == KaxVideoDisplayWidth::ClassInfos.GlobalId )
@@ -754,7 +734,7 @@ static int Open( vlc_object_t * p_this )
                                     KaxVideoDisplayWidth &vwidth = *(KaxVideoDisplayWidth*)el4;
                                     vwidth.ReadData( p_sys->es->I_O() );
 
-                                    tk.i_display_width = uint16( vwidth );
+                                    tk.fmt.video.i_display_width = uint16( vwidth );
                                     msg_Dbg( p_input, "|   |   |   |   + display width=%d", uint16( vwidth ) );
                                 }
                                 else if( EbmlId( *el4 ) == KaxVideoDisplayHeight::ClassInfos.GlobalId )
@@ -762,7 +742,7 @@ static int Open( vlc_object_t * p_this )
                                     KaxVideoDisplayWidth &vheight = *(KaxVideoDisplayWidth*)el4;
                                     vheight.ReadData( p_sys->es->I_O() );
 
-                                    tk.i_display_height = uint16( vheight );
+                                    tk.fmt.video.i_display_height = uint16( vheight );
                                     msg_Dbg( p_input, "|   |   |   |   + display height=%d", uint16( vheight ) );
                                 }
                                 else if( EbmlId( *el4 ) == KaxVideoFrameRate::ClassInfos.GlobalId )
@@ -805,9 +785,6 @@ static int Open( vlc_object_t * p_this )
                         else  if( EbmlId( *el3 ) == KaxTrackAudio::ClassInfos.GlobalId )
                         {
                             msg_Dbg( p_input, "|   |   |   + Track Audio" );
-                            tk.i_channels = 0;
-                            tk.i_samplerate = 0;
-                            tk.i_bitspersample = 0;
 
                             p_sys->ep->Down();
 
@@ -818,15 +795,15 @@ static int Open( vlc_object_t * p_this )
                                     KaxAudioSamplingFreq &afreq = *(KaxAudioSamplingFreq*)el4;
                                     afreq.ReadData( p_sys->es->I_O() );
 
-                                    tk.i_samplerate = (int)float( afreq );
-                                    msg_Dbg( p_input, "|   |   |   |   + afreq=%d", tk.i_samplerate );
+                                    tk.fmt.audio.i_samplerate = (int)float( afreq );
+                                    msg_Dbg( p_input, "|   |   |   |   + afreq=%d", tk.fmt.audio.i_samplerate );
                                 }
                                 else if( EbmlId( *el4 ) == KaxAudioChannels::ClassInfos.GlobalId )
                                 {
                                     KaxAudioChannels &achan = *(KaxAudioChannels*)el4;
                                     achan.ReadData( p_sys->es->I_O() );
 
-                                    tk.i_channels = uint8( achan );
+                                    tk.fmt.audio.i_channels = uint8( achan );
                                     msg_Dbg( p_input, "|   |   |   |   + achan=%u", uint8( achan ) );
                                 }
                                 else if( EbmlId( *el4 ) == KaxAudioBitDepth::ClassInfos.GlobalId )
@@ -834,7 +811,7 @@ static int Open( vlc_object_t * p_this )
                                     KaxAudioBitDepth &abits = *(KaxAudioBitDepth*)el4;
                                     abits.ReadData( p_sys->es->I_O() );
 
-                                    tk.i_bitspersample = uint8( abits );
+                                    tk.fmt.audio.i_bitspersample = uint8( abits );
                                     msg_Dbg( p_input, "|   |   |   |   + abits=%u", uint8( abits ) );
                                 }
                                 else
@@ -1007,13 +984,6 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_input, "cannot init stream" );
         goto error;
     }
-    if( input_AddProgram( p_input, 0, 0) == NULL )
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot add program" );
-        goto error;
-    }
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
     p_input->stream.i_mux_rate = 0;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -1028,18 +998,14 @@ static int Open( vlc_object_t * p_this )
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
     {
 #define tk  p_sys->track[i_track]
-        if( tk.i_cat == UNKNOWN_ES )
+        if( tk.fmt.i_cat == UNKNOWN_ES )
         {
             msg_Warn( p_input, "invalid track[%d, n=%d]", i_track, tk.i_number );
             tk.p_es = NULL;
             continue;
         }
-        tk.p_es = input_AddES( p_input,
-                               p_input->stream.p_selected_program,
-                               i_track + 1,
-                               tk.i_cat,
-                               tk.psz_language, 0 );
-        if( tk.i_cat == SPU_ES )
+
+        if( tk.fmt.i_cat == SPU_ES )
         {
             vlc_value_t val;
             val.psz_string = "UTF-8";
@@ -1053,54 +1019,39 @@ static int Open( vlc_object_t * p_this )
             if( tk.i_extra_data < (int)sizeof( BITMAPINFOHEADER ) )
             {
                 msg_Err( p_input, "missing/invalid BITMAPINFOHEADER" );
-                tk.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+                tk.fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
             }
             else
             {
                 BITMAPINFOHEADER *p_bih = (BITMAPINFOHEADER*)tk.p_extra_data;
 
-                p_bih->biSize           = GetDWLE( &p_bih->biSize );
-                p_bih->biWidth          = GetDWLE( &p_bih->biWidth );
-                p_bih->biHeight         = GetDWLE( &p_bih->biHeight );
-                p_bih->biPlanes         = GetWLE( &p_bih->biPlanes );
-                p_bih->biBitCount       = GetWLE( &p_bih->biBitCount );
-                p_bih->biCompression    = GetFOURCC( &p_bih->biCompression );
-                p_bih->biSizeImage      = GetDWLE( &p_bih->biSizeImage );
-                p_bih->biXPelsPerMeter  = GetDWLE( &p_bih->biXPelsPerMeter );
-                p_bih->biYPelsPerMeter  = GetDWLE( &p_bih->biYPelsPerMeter );
-                p_bih->biClrUsed        = GetDWLE( &p_bih->biClrUsed );
-                p_bih->biClrImportant   = GetDWLE( &p_bih->biClrImportant );
+                tk.fmt.video.i_width = GetDWLE( &p_bih->biWidth );
+                tk.fmt.video.i_height= GetDWLE( &p_bih->biHeight );
+                tk.fmt.i_codec       = GetFOURCC( &p_bih->biCompression );
 
-
-                tk.i_codec = p_bih->biCompression;
-                tk.p_es->p_bitmapinfoheader = p_bih;
+                tk.fmt.i_extra_type  = ES_EXTRA_TYPE_BITMAPINFOHEADER;
+                tk.fmt.i_extra       = GetDWLE( &p_bih->biSize ) - sizeof( BITMAPINFOHEADER );
+                if( tk.fmt.i_extra > 0 )
+                {
+                    tk.fmt.p_extra = malloc( tk.fmt.i_extra );
+                    memcpy( tk.fmt.p_extra, &p_bih[1], tk.fmt.i_extra );
+                }
             }
         }
         else if( !strcmp( tk.psz_codec, "V_MPEG1" ) ||
                  !strcmp( tk.psz_codec, "V_MPEG2" ) )
         {
-            tk.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'v' );
+            tk.fmt.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'v' );
         }
         else if( !strncmp( tk.psz_codec, "V_MPEG4", 7 ) )
         {
-            BITMAPINFOHEADER *p_bih;
-
-            tk.i_extra_data = sizeof( BITMAPINFOHEADER );
-            tk.p_extra_data = (uint8_t*)malloc( tk.i_extra_data );
-
-            p_bih = (BITMAPINFOHEADER*)tk.p_extra_data;
-            memset( p_bih, 0, sizeof( BITMAPINFOHEADER ) );
-            p_bih->biSize  = sizeof( BITMAPINFOHEADER );
-            p_bih->biWidth = tk.i_width;
-            p_bih->biHeight= tk.i_height;
-
             if( !strcmp( tk.psz_codec, "V_MPEG4/MS/V3" ) )
             {
-                tk.i_codec = VLC_FOURCC( 'D', 'I', 'V', '3' );
+                tk.fmt.i_codec = VLC_FOURCC( 'D', 'I', 'V', '3' );
             }
             else
             {
-                tk.i_codec = VLC_FOURCC( 'm', 'p', '4', 'v' );
+                tk.fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'v' );
             }
         }
         else if( !strcmp( tk.psz_codec, "A_MS/ACM" ) )
@@ -1108,41 +1059,45 @@ static int Open( vlc_object_t * p_this )
             if( tk.i_extra_data < (int)sizeof( WAVEFORMATEX ) )
             {
                 msg_Err( p_input, "missing/invalid WAVEFORMATEX" );
-                tk.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+                tk.fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
             }
             else
             {
                 WAVEFORMATEX *p_wf = (WAVEFORMATEX*)tk.p_extra_data;
 
-                p_wf->wFormatTag        = GetWLE( &p_wf->wFormatTag );
-                p_wf->nChannels         = GetWLE( &p_wf->nChannels );
-                p_wf->nSamplesPerSec    = GetDWLE( &p_wf->nSamplesPerSec );
-                p_wf->nAvgBytesPerSec   = GetDWLE( &p_wf->nAvgBytesPerSec );
-                p_wf->nBlockAlign       = GetWLE( &p_wf->nBlockAlign );
-                p_wf->wBitsPerSample    = GetWLE( &p_wf->wBitsPerSample );
-                p_wf->cbSize            = GetWLE( &p_wf->cbSize );
+                wf_tag_to_fourcc( GetWLE( &p_wf->wFormatTag ), &tk.fmt.i_codec, NULL );
 
-                wf_tag_to_fourcc( p_wf->wFormatTag, &tk.i_codec, NULL );
-                tk.p_es->p_waveformatex = p_wf;
+                tk.fmt.audio.i_channels   = GetWLE( &p_wf->nChannels );
+                tk.fmt.audio.i_samplerate = GetDWLE( &p_wf->nSamplesPerSec );
+                tk.fmt.audio.i_bitrate    = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
+                tk.fmt.audio.i_blockalign = GetWLE( &p_wf->nBlockAlign );;
+                tk.fmt.audio.i_bitspersample = GetWLE( &p_wf->wBitsPerSample );
+
+                tk.fmt.i_extra            = GetWLE( &p_wf->cbSize );
+                if( tk.fmt.i_extra > 0 )
+                {
+                    tk.fmt.p_extra = malloc( tk.fmt.i_extra );
+                    memcpy( tk.fmt.p_extra, &p_wf[1], tk.fmt.i_extra );
+                }
             }
         }
         else if( !strcmp( tk.psz_codec, "A_MPEG/L3" ) ||
                  !strcmp( tk.psz_codec, "A_MPEG/L2" ) ||
                  !strcmp( tk.psz_codec, "A_MPEG/L1" ) )
         {
-            tk.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'a' );
+            tk.fmt.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'a' );
         }
         else if( !strcmp( tk.psz_codec, "A_AC3" ) )
         {
-            tk.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
+            tk.fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
         }
         else if( !strcmp( tk.psz_codec, "A_DTS" ) )
         {
-            tk.i_codec = VLC_FOURCC( 'd', 't', 's', ' ' );
+            tk.fmt.i_codec = VLC_FOURCC( 'd', 't', 's', ' ' );
         }
         else if( !strcmp( tk.psz_codec, "A_VORBIS" ) )
         {
-            tk.i_codec = VLC_FOURCC( 'v', 'o', 'r', 'b' );
+            tk.fmt.i_codec = VLC_FOURCC( 'v', 'o', 'r', 'b' );
             tk.i_data_init = tk.i_extra_data;
             tk.p_data_init = tk.p_extra_data;
         }
@@ -1155,9 +1110,8 @@ static int Open( vlc_object_t * p_this )
                     96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
                         16000, 12000, 11025, 8000,  7350,  0,     0,     0
             };
-            WAVEFORMATEX *p_wf;
 
-            tk.i_codec = VLC_FOURCC( 'm', 'p', '4', 'a' );
+            tk.fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'a' );
             /* create data for faad (MP4DecSpecificDescrTag)*/
 
             if( !strcmp( &tk.psz_codec[12], "MAIN" ) )
@@ -1179,136 +1133,60 @@ static int Open( vlc_object_t * p_this )
 
             for( i_srate = 0; i_srate < 13; i_srate++ )
             {
-                if( i_sample_rates[i_srate] == tk.i_samplerate )
+                if( i_sample_rates[i_srate] == tk.fmt.audio.i_samplerate )
                 {
                     break;
                 }
             }
             msg_Dbg( p_input, "profile=%d srate=%d", i_profile, i_srate );
 
-            tk.i_extra_data = sizeof( WAVEFORMATEX ) + 2;
-            tk.p_extra_data = (uint8_t*)malloc( tk.i_extra_data );
-            p_wf = (WAVEFORMATEX*)tk.p_extra_data;
-
-            p_wf->wFormatTag = WAVE_FORMAT_UNKNOWN;
-            p_wf->nChannels  = tk.i_channels;
-            p_wf->nSamplesPerSec = tk.i_samplerate;
-            p_wf->nAvgBytesPerSec = 0;
-            p_wf->nBlockAlign = 0;
-            p_wf->wBitsPerSample = 0;
-            p_wf->cbSize = 2;
-
-            tk.p_extra_data[sizeof( WAVEFORMATEX )+ 0] = ((i_profile + 1) << 3) | ((i_srate&0xe) >> 1);
-            tk.p_extra_data[sizeof( WAVEFORMATEX )+ 1] = ((i_srate & 0x1) << 7) | (tk.i_channels << 3);
-
-            tk.p_es->p_waveformatex = p_wf;
+            tk.fmt.i_extra = 2;
+            tk.fmt.p_extra = malloc( tk.fmt.i_extra );
+            ((uint8_t*)tk.fmt.p_extra)[0] = ((i_profile + 1) << 3) | ((i_srate&0xe) >> 1);
+            ((uint8_t*)tk.fmt.p_extra)[1] = ((i_srate & 0x1) << 7) | (tk.fmt.audio.i_channels << 3);
         }
         else if( !strcmp( tk.psz_codec, "A_PCM/INT/BIG" ) ||
                  !strcmp( tk.psz_codec, "A_PCM/INT/LIT" ) ||
                  !strcmp( tk.psz_codec, "A_PCM/FLOAT/IEEE" ) )
         {
-            WAVEFORMATEX *p_wf;
-
-            tk.i_extra_data = sizeof( WAVEFORMATEX );
-            tk.p_extra_data = (uint8_t*)malloc( tk.i_extra_data );
-
-            p_wf = (WAVEFORMATEX*)tk.p_extra_data;
-
-            if( !strncmp( &tk.psz_codec[6], "INT", 3 ) )
-            {
-                p_wf->wFormatTag = WAVE_FORMAT_PCM;
-            }
-            else
-            {
-                p_wf->wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
-            }
-            p_wf->nChannels  = tk.i_channels;
-            p_wf->nSamplesPerSec = tk.i_samplerate;
-            p_wf->nAvgBytesPerSec = 0;
-            p_wf->nBlockAlign = ( tk.i_bitspersample + 7 ) / 8 * tk.i_channels;
-            p_wf->wBitsPerSample = tk.i_bitspersample;
-            p_wf->cbSize = 0;
-
-            tk.p_es->p_waveformatex = p_wf;
-
             if( !strcmp( tk.psz_codec, "A_PCM/INT/BIG" ) )
             {
-                tk.i_codec = VLC_FOURCC( 't', 'w', 'o', 's' );
+                tk.fmt.i_codec = VLC_FOURCC( 't', 'w', 'o', 's' );
             }
             else
             {
-                tk.i_codec = VLC_FOURCC( 'a', 'r', 'a', 'w' );
+                tk.fmt.i_codec = VLC_FOURCC( 'a', 'r', 'a', 'w' );
             }
+            tk.fmt.audio.i_blockalign = ( tk.fmt.audio.i_bitspersample + 7 ) / 8 * tk.fmt.audio.i_channels;
         }
         else if( !strcmp( tk.psz_codec, "S_TEXT/UTF8" ) )
         {
-            tk.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
+            tk.fmt.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
         }
         else if( !strcmp( tk.psz_codec, "S_TEXT/SSA" ) ||
                  !strcmp( tk.psz_codec, "S_SSA" ) ||
                  !strcmp( tk.psz_codec, "S_ASS" ))
         {
-            tk.i_codec = VLC_FOURCC( 's', 's', 'a', ' ' );
-            tk.p_es->p_demux_data = (es_sys_t *)malloc( sizeof( subtitle_data_t ) );
-            tk.p_es->p_demux_data->psz_header = strdup( (char *)tk.p_extra_data );
+            tk.fmt.i_codec = VLC_FOURCC( 's', 's', 'a', ' ' );
+#if 0
+            /* FIXME */
+            tk.fmt.i_extra = sizeof( subtitle_data_t );
+            tk.fmt.p_extra = malloc( tk.fmt.i_extra );
+            ((es_sys_t*)tk->fmt.p_extra)->psz_header = strdup( (char *)tk.p_extra_data );
+#endif
         }
         else if( !strcmp( tk.psz_codec, "S_VOBSUB" ) )
         {
-            tk.i_codec = VLC_FOURCC( 's','p','u',' ' );
+            tk.fmt.i_codec = VLC_FOURCC( 's','p','u',' ' );
         }
         else
         {
             msg_Err( p_input, "unknow codec id=`%s'", tk.psz_codec );
-            tk.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+            tk.fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
         }
 
-        tk.p_es->i_fourcc = tk.i_codec;
+        tk.p_es = es_out_Add( p_input->p_es_out, &tk.fmt );
 #undef tk
-    }
-
-    /* select track all video, one audio, no spu TODO : improve */
-    b_audio_selected = VLC_FALSE;
-    i_audio_channel = 0;
-    i_spu_channel = 0;
-    for( i_track = 0; i_track < p_sys->i_track; i_track++ )
-    {
-#define tk  p_sys->track[i_track]
-        switch( tk.i_cat )
-        {
-            case VIDEO_ES:
-                vlc_mutex_lock( &p_input->stream.stream_lock );
-                input_SelectES( p_input, tk.p_es );
-                vlc_mutex_unlock( &p_input->stream.stream_lock );
-                break;
-
-            case AUDIO_ES:
-                if( ( !b_audio_selected && config_GetInt( p_input, "audio-channel" ) < 0 ) ||
-                    i_audio_channel == config_GetInt( p_input, "audio-channel" ) )
-                {
-                    vlc_mutex_lock( &p_input->stream.stream_lock );
-                    input_SelectES( p_input, tk.p_es );
-                    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-                    b_audio_selected = tk.p_es->p_decoder_fifo ? VLC_TRUE : VLC_FALSE;
-                }
-                i_audio_channel++;
-                break;
-            case SPU_ES:
-                if( i_spu_channel == config_GetInt( p_input, "spu-channel" ) )
-                {
-                    vlc_mutex_lock( &p_input->stream.stream_lock );
-                    input_SelectES( p_input, tk.p_es );
-                    vlc_mutex_unlock( &p_input->stream.stream_lock );
-                }
-                i_spu_channel++;
-                break;
-        }
-#undef tk
-    }
-
-    if( !b_audio_selected )
-    {
-        msg_Warn( p_input, "cannot find/select audio track" );
     }
 
     /* add informations */
@@ -1340,9 +1218,9 @@ static void Close( vlc_object_t *p_this )
         {
             free( tk.psz_codec );
         }
-        if( tk.psz_language )
+        if( tk.fmt.psz_language )
         {
-            free( tk.psz_language );
+            free( tk.fmt.psz_language );
         }
 #undef tk
     }
@@ -1521,6 +1399,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
 
     int             i_track;
     unsigned int    i;
+    vlc_bool_t      b;
 
 #define tk  p_sys->track[i_track]
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
@@ -1537,13 +1416,14 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
         return;
     }
 
-    if( tk.p_es->p_decoder_fifo == NULL )
+    es_out_Control( p_input->p_es_out, ES_OUT_GET_SELECT, tk.p_es, &b );
+    if( !b )
     {
         tk.b_inited = VLC_FALSE;
         return;
     }
 
-    if( tk.i_cat == AUDIO_ES && p_input->stream.control.b_mute )
+    if( tk.fmt.i_cat == AUDIO_ES && p_input->stream.control.b_mute )
     {
         return;
     }
@@ -1555,7 +1435,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
 
         msg_Dbg( p_input, "sending header (%d bytes)", tk.i_data_init );
 
-        if( tk.i_codec == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+        if( tk.fmt.i_codec == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
         {
             int i;
             int i_offset = 1;
@@ -1586,17 +1466,17 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
             p_init = MemToPES( p_input, &tk.p_data_init[i_offset], i_size[0] );
             if( p_init )
             {
-                input_DecodePES( tk.p_es->p_decoder_fifo, p_init );
+                es_out_Send( p_input->p_es_out, tk.p_es, p_init );
             }
             p_init = MemToPES( p_input, &tk.p_data_init[i_offset+i_size[0]], i_size[1] );
             if( p_init )
             {
-                input_DecodePES( tk.p_es->p_decoder_fifo, p_init );
+                es_out_Send( p_input->p_es_out, tk.p_es, p_init );
             }
             p_init = MemToPES( p_input, &tk.p_data_init[i_offset+i_size[0]+i_size[1]], i_size[2] );
             if( p_init )
             {
-                input_DecodePES( tk.p_es->p_decoder_fifo, p_init );
+                es_out_Send( p_input->p_es_out, tk.p_es, p_init );
             }
         }
         else
@@ -1604,7 +1484,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
             p_init = MemToPES( p_input, tk.p_data_init, tk.i_data_init );
             if( p_init )
             {
-                input_DecodePES( tk.p_es->p_decoder_fifo, p_init );
+                es_out_Send( p_input->p_es_out, tk.p_es, p_init );
             }
         }
     }
@@ -1625,7 +1505,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
         p_pes->i_pts = i_pts;
         p_pes->i_dts = i_pts;
 
-        if( tk.i_cat == SPU_ES && strcmp( tk.psz_codec, "S_VOBSUB" ) )
+        if( tk.fmt.i_cat == SPU_ES && strcmp( tk.psz_codec, "S_VOBSUB" ) )
         {
             if( i_duration > 0 )
             {
@@ -1641,8 +1521,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
                 p_pes->p_first->p_payload_end[0] = '\0';
             }
         }
-
-        input_DecodePES( tk.p_es->p_decoder_fifo, p_pes );
+        es_out_Send( p_input->p_es_out, tk.p_es, p_pes );
 
         /* use time stamp only for first block */
         i_pts = 0;
@@ -1750,7 +1629,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
     i_track_skipping = 0;
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
     {
-        if( tk.i_cat == VIDEO_ES )
+        if( tk.fmt.i_cat == VIDEO_ES )
         {
             tk.b_search_keyframe = VLC_TRUE;
             i_track_skipping++;
@@ -1778,12 +1657,12 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
 
         if( i_track < p_sys->i_track )
         {
-            if( tk.i_cat == VIDEO_ES && i_block_ref1 == -1 && tk.b_search_keyframe )
+            if( tk.fmt.i_cat == VIDEO_ES && i_block_ref1 == -1 && tk.b_search_keyframe )
             {
                 tk.b_search_keyframe = VLC_FALSE;
                 i_track_skipping--;
             }
-            if( tk.i_cat == VIDEO_ES && !tk.b_search_keyframe )
+            if( tk.fmt.i_cat == VIDEO_ES && !tk.b_search_keyframe )
             {
                 BlockDecode( p_input, block, 0, 0 );
             }
@@ -2364,34 +2243,34 @@ static void InformationsCreate( input_thread_t *p_input )
             input_AddInfo( p_cat, _("Codec Download"), "%s", tk.psz_codec_download_url );
         }
 
-        switch( tk.i_cat )
+        switch( tk.fmt.i_cat )
         {
             case AUDIO_ES:
                 input_AddInfo( p_cat, _("Type"), _("Audio") );
-                input_AddInfo( p_cat, _("Codec"), "%.4s (%s)", (char*)&tk.i_codec, tk.psz_codec );
-                if( tk.i_channels > 0 )
+                input_AddInfo( p_cat, _("Codec"), "%.4s (%s)", (char*)&tk.fmt.i_codec, tk.psz_codec );
+                if( tk.fmt.audio.i_channels > 0 )
                 {
-                    input_AddInfo( p_cat, _("Channels"), "%d", tk.i_channels );
+                    input_AddInfo( p_cat, _("Channels"), "%d", tk.fmt.audio.i_channels );
                 }
-                if( tk.i_samplerate > 0 )
+                if( tk.fmt.audio.i_samplerate > 0 )
                 {
-                    input_AddInfo( p_cat, _("Sample Rate"), "%d", tk.i_samplerate );
+                    input_AddInfo( p_cat, _("Sample Rate"), "%d", tk.fmt.audio.i_samplerate );
                 }
-                if( tk.i_bitspersample )
+                if( tk.fmt.audio.i_bitspersample )
                 {
-                    input_AddInfo( p_cat, _("Bits Per Sample"), "%d", tk.i_bitspersample );
+                    input_AddInfo( p_cat, _("Bits Per Sample"), "%d", tk.fmt.audio.i_bitspersample );
                 }
                 break;
             case VIDEO_ES:
                 input_AddInfo( p_cat, _("Type"), _("Video") );
-                input_AddInfo( p_cat, _("Codec"), "%.4s (%s)", (char*)&tk.i_codec, tk.psz_codec );
-                if( tk.i_width > 0 && tk.i_height )
+                input_AddInfo( p_cat, _("Codec"), "%.4s (%s)", (char*)&tk.fmt.i_codec, tk.psz_codec );
+                if( tk.fmt.video.i_width > 0 && tk.fmt.video.i_height )
                 {
-                    input_AddInfo( p_cat, _("Resolution"), "%dx%d", tk.i_width, tk.i_height );
+                    input_AddInfo( p_cat, _("Resolution"), "%dx%d", tk.fmt.video.i_width, tk.fmt.video.i_height );
                 }
-                if( tk.i_display_width > 0 && tk.i_display_height )
+                if( tk.fmt.video.i_display_width > 0 && tk.fmt.video.i_display_height )
                 {
-                    input_AddInfo( p_cat, _("Display Resolution"), "%dx%d", tk.i_display_width, tk.i_display_height );
+                    input_AddInfo( p_cat, _("Display Resolution"), "%dx%d", tk.fmt.video.i_display_width, tk.fmt.video.i_display_height );
                 }
                 if( tk.f_fps > 0.1 )
                 {
