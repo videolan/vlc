@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.23 2002/09/02 23:17:05 massiot Exp $
+ * $Id: oss.c,v 1.24 2002/09/11 23:10:30 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -351,7 +351,28 @@ static int OSSThread( aout_instance_t * p_aout )
         }
         else
         {
-            p_buffer = aout_OutputNextBuffer( p_aout, 0, VLC_TRUE );
+            /* emu10k1 driver does not report Buffer Duration correctly in
+             * passthrough mode so we have to cheat */
+            if( !next_date )
+            {
+                next_date = mdate();
+            }
+            else
+            {
+                mtime_t delay = next_date - mdate();
+                if( delay > AOUT_PTS_TOLERANCE )
+                {
+                    msleep( delay / 2 );
+                }
+            }
+            
+            while( ! ( p_buffer =
+                aout_OutputNextBuffer( p_aout, next_date, VLC_TRUE ) ) )
+            {
+                msleep( 10000 );
+                next_date = mdate();
+            }
+
         }
 
         if ( p_buffer != NULL )
