@@ -1,7 +1,7 @@
 /*****************************************************************************
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2003 VideoLAN
+ * Copyright (C) 2000-2005 VideoLAN
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -120,11 +120,11 @@ void Timer::Notify()
                                            FIND_ANYWHERE );
         if( p_playlist != NULL )
         {
-            vlc_mutex_lock( &p_playlist->object_lock );
+            LockPlaylist( p_intf->p_sys, p_playlist );
             p_intf->p_sys->p_input = p_playlist->p_input;
             if( p_intf->p_sys->p_input )
                 vlc_object_yield( p_intf->p_sys->p_input );
-            vlc_mutex_unlock( &p_playlist->object_lock );
+            UnlockPlaylist( p_intf->p_sys, p_playlist );
             vlc_object_release( p_playlist );
         }
 

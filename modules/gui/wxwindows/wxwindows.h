@@ -124,6 +124,7 @@ struct intf_sys_t
 
     /* Playlist management */
     int                 i_playing;                 /* playlist selected item */
+    unsigned            i_playlist_usage;
 
     /* Send an event to show a dialog */
     void (*pf_show_dialog) ( intf_thread_t *p_intf, int i_dialog, int i_arg,
@@ -1083,5 +1084,24 @@ private:
 };
 
 } // end of wxvlc namespace
+
+
+/*
+ * wxWindows keeps dead locking because the timer tries to lock the playlist
+ * when it's already locked somewhere else in the very wxWindows interface
+ * module. Unless someone implements a "vlc_mutex_trylock", we need that.
+ */
+inline void LockPlaylist( intf_sys_t *p_sys, playlist_t *p_pl )
+{
+    if( p_sys->i_playlist_usage++ == 0)
+        vlc_mutex_lock( &p_pl->object_lock );
+}
+
+inline void UnlockPlaylist( intf_sys_t *p_sys, playlist_t *p_pl )
+{
+    if( --p_sys->i_playlist_usage == 0)
+        vlc_mutex_unlock( &p_pl->object_lock );
+}
+
 using namespace wxvlc;
 

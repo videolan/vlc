@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2004 VideoLAN
+ * Copyright (C) 2000-2005 VideoLAN
  * $Id$
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
@@ -838,7 +838,7 @@ void Playlist::Rebuild( vlc_bool_t b_root )
         var_DelCallback( p_playlist, "item-deleted", ItemDeleted, this );
 
         /* ...and rebuild it */
-        vlc_mutex_lock( &p_playlist->object_lock );
+        LockPlaylist( p_intf->p_sys, p_playlist );
     }
 
     p_view = playlist_ViewFind( p_playlist, i_current_view ); /* FIXME */
@@ -882,7 +882,7 @@ void Playlist::Rebuild( vlc_bool_t b_root )
         var_AddCallback( p_playlist, "item-append", ItemAppended, this );
         var_AddCallback( p_playlist, "item-deleted", ItemDeleted, this );
 
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        UnlockPlaylist( p_intf->p_sys, p_playlist );
     }
     vlc_object_release( p_playlist );
 }
@@ -1066,7 +1066,7 @@ void Playlist::OnSort( wxCommandEvent& event )
     {
         return;
     }
-    vlc_mutex_lock( &p_playlist->object_lock );
+    LockPlaylist( p_intf->p_sys, p_playlist );
     switch( event.GetId() )
     {
         case SortTitle_Event:
@@ -1077,7 +1077,7 @@ void Playlist::OnSort( wxCommandEvent& event )
             playlist_RecursiveNodeSort( p_playlist, p_wxitem->p_item,
                                         SORT_TITLE_NODES_FIRST, ORDER_REVERSE );
     }
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    UnlockPlaylist( p_intf->p_sys, p_playlist );
 
     vlc_object_release( p_playlist );
     Rebuild( VLC_TRUE );
@@ -1557,10 +1557,10 @@ void Playlist::OnPopupSort( wxMenuEvent& event )
 
         if( p_playlist )
         {
-            vlc_mutex_lock( &p_playlist->object_lock );
+            LockPlaylist( p_intf->p_sys, p_playlist );
             playlist_RecursiveNodeSort( p_playlist, p_wxitem->p_item,
                                         SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
-            vlc_mutex_unlock( &p_playlist->object_lock );
+            UnlockPlaylist( p_intf->p_sys, p_playlist );
 
             treectrl->DeleteChildren( i_popup_item );
             UpdateNodeChildren( p_playlist, p_wxitem->p_item, i_popup_item );
