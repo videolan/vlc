@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.41 2003/11/09 20:13:46 gbazin Exp $
+ * $Id: open.cpp,v 1.42 2003/11/10 00:14:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -151,6 +151,65 @@ BEGIN_EVENT_TABLE(OpenDialog, wxFrame)
 END_EVENT_TABLE()
 
 /*****************************************************************************
+ * AutoBuiltPanel.
+ *****************************************************************************/
+WX_DEFINE_ARRAY(ConfigControl *, ArrayOfConfigControls);
+
+class AutoBuiltPanel : public wxPanel
+{
+public:
+
+    AutoBuiltPanel() { }
+    AutoBuiltPanel( wxWindow *, OpenDialog *, intf_thread_t *,
+                    const module_t * );
+
+    virtual ~AutoBuiltPanel() {}
+
+    wxString name;
+    ArrayOfConfigControls config_array;
+
+private:
+    intf_thread_t *p_intf;
+};
+
+void AutoBuildCallback( void *p_data )
+{
+    ((OpenDialog *)p_data)->UpdateMRL();
+}
+
+AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
+                                intf_thread_t *_p_intf,
+                                const module_t *p_module )
+  : wxPanel( parent, -1, wxDefaultPosition, wxSize(200, 200) ),
+    name( wxU(p_module->psz_object_name) ), p_intf( _p_intf )
+{
+    wxBoxSizer *sizer = new wxBoxSizer( wxVERTICAL );
+
+    module_config_t *p_item = p_module->p_config;
+
+    if( p_item ) do
+    {
+        if( p_item->i_type & CONFIG_HINT || p_item->b_advanced )
+            continue;
+
+        ConfigControl *control =
+            CreateConfigControl( VLC_OBJECT(p_intf), p_item, this );
+
+        config_array.Add( control );
+
+        /* Don't add items that were not recognized */
+        if( control == NULL ) continue;
+
+        control->SetUpdateCallback( AutoBuildCallback, (void *)dialog );
+
+        sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
+    }
+    while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+
+    this->SetSizerAndFit( sizer );
+}
+
+/*****************************************************************************
  * Constructor.
  *****************************************************************************/
 OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
@@ -265,8 +324,10 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     module_t *p_module = config_FindModule( VLC_OBJECT(p_intf), "dshow" );
     if( p_module )
     {
-        notebook->AddPage( AutoBuildPanel( notebook, p_module ),
-                           wxU( p_module->psz_longname ) );
+        AutoBuiltPanel *autopanel =
+            new AutoBuiltPanel( notebook, this, p_intf, p_module );
+        input_tab_array.Add( autopanel );
+        notebook->AddPage( autopanel, wxU( p_module->psz_longname ) );
     }
 
     /* Update Disc panel */
@@ -588,33 +649,9 @@ wxPanel *OpenDialog::V4LPanel( wxWindow* parent )
 }
 #endif
 
-wxPanel *OpenDialog::AutoBuildPanel( wxWindow* parent,
-                                     const module_t *p_module )
+void OpenDialog::UpdateMRL()
 {
-    wxPanel *panel = new wxPanel( parent, -1, wxDefaultPosition,
-                                  wxSize(200, 200) );
-
-    wxBoxSizer *sizer = new wxBoxSizer( wxVERTICAL );
-
-    module_config_t *p_item = p_module->p_config;
-
-    if( p_item ) do
-    {
-        if( p_item->i_type & CONFIG_HINT || p_item->b_advanced )
-            continue;
-
-        ConfigControl *control =
-            CreateConfigControl( VLC_OBJECT(p_intf), p_item, panel );
-
-        /* Don't add items that were not recognized */
-        if( control == NULL ) continue;
-
-        sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
-    }
-    while( p_item->i_type != CONFIG_HINT_END && p_item++ );
-
-    panel->SetSizerAndFit( sizer );
-    return panel;
+    UpdateMRL( i_current_access_method );
 }
 
 void OpenDialog::UpdateMRL( int i_access_method )
@@ -673,9 +710,6 @@ void OpenDialog::UpdateMRL( int i_access_method )
             break;
         }
         break;
-    case SAT_ACCESS:
-        mrltemp = wxT("satellite") + demux + wxT("://");
-        break;
 
 #ifndef WIN32
     case V4L_ACCESS:
@@ -701,6 +735,41 @@ void OpenDialog::UpdateMRL( int i_access_method )
 #endif
 
     default:
+        {
+            int i_item = i_access_method - MAX_ACCESS;
+
+            if( i_item < 0 || i_item >= (int)input_tab_array.GetCount() )
+                break;
+
+            AutoBuiltPanel *input_panel = input_tab_array.Item( i_item );
+
+            mrltemp = input_panel->name + wxT("://");
+
+            for( int i=0; i < (int)input_panel->config_array.GetCount(); i++ )
+            {
+                ConfigControl *control = input_panel->config_array.Item(i);
+                mrltemp += wxT(" :") + control->GetName() + wxT("=");
+
+                switch( control->GetType() )
+                {
+                case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_FILE:
+                case CONFIG_ITEM_DIRECTORY:
+                case CONFIG_ITEM_MODULE:
+                    mrltemp += wxT("\"") + control->GetPszValue() + wxT("\"");
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                case CONFIG_ITEM_BOOL:
+                    mrltemp +=
+                        wxString::Format( "%i", control->GetIntValue() );
+                    break;
+                case CONFIG_ITEM_FLOAT:
+                    mrltemp +=
+                        wxString::Format( "%f", control->GetFloatValue() );
+                    break;
+                }
+            }
+        }
         break;
     }
 
@@ -793,7 +862,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         if( ppsz_options ) free( ppsz_options );
 
         i += i_options;
-   }
+    }
 
     //TogglePlayButton( PLAYING_S );
 

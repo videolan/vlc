@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dialogs.cpp,v 1.10 2003/10/29 17:32:54 zorglub Exp $
+ * $Id: dialogs.cpp,v 1.11 2003/11/10 00:14:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -312,11 +312,6 @@ void DialogsProvider::OnOpenDisc( wxCommandEvent& event )
 void DialogsProvider::OnOpenNet( wxCommandEvent& event )
 {
     Open( NET_ACCESS, event.GetInt() );
-}
-
-void DialogsProvider::OnOpenSat( wxCommandEvent& event )
-{
-    Open( SAT_ACCESS, event.GetInt() );
 }
 
 void DialogsProvider::Open( int i_access_method, int i_arg )

@@ -2,7 +2,7 @@
  * preferences_widgets.h : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2003 VideoLAN
- * $Id: preferences_widgets.h,v 1.6 2003/11/05 17:46:21 gbazin Exp $
+ * $Id: preferences_widgets.h,v 1.7 2003/11/10 00:14:05 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -36,10 +36,17 @@ public:
     int GetType();
     vlc_bool_t IsAdvanced();
 
+    void SetUpdateCallback( void (*)( void * ), void * );
+
 protected:
     wxBoxSizer *sizer;
     wxStaticText *label;
     vlc_object_t *p_this;
+
+    void (*pf_update_callback)( void * );
+    void *p_update_data;
+
+    void OnUpdate( wxCommandEvent& );
 
 private:
     wxString name;
@@ -81,6 +88,8 @@ public:
     virtual wxString GetPszValue();
 private:
     wxTextCtrl *textctrl;
+
+    DECLARE_EVENT_TABLE()
 };
 
 class StringListConfigControl: public ConfigControl

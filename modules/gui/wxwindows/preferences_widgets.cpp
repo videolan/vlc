@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.14 2003/11/09 13:20:32 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.15 2003/11/10 00:14:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -107,8 +107,11 @@ ConfigControl *CreateConfigControl( vlc_object_t *p_this,
  *****************************************************************************/
 ConfigControl::ConfigControl( vlc_object_t *_p_this,
                               module_config_t *p_item, wxWindow *parent )
-  : wxPanel( parent ), p_this( _p_this ), name( wxU(p_item->psz_name) ),
-    i_type( p_item->i_type ), b_advanced( p_item->b_advanced )
+  : wxPanel( parent ), p_this( _p_this ), 
+    pf_update_callback( NULL ), p_update_data( NULL ),
+    name( wxU(p_item->psz_name) ), i_type( p_item->i_type ),
+    b_advanced( p_item->b_advanced )
+    
 {
     sizer = new wxBoxSizer( wxHORIZONTAL );
 }
@@ -135,6 +138,21 @@ int ConfigControl::GetType()
 vlc_bool_t ConfigControl::IsAdvanced()
 {
     return b_advanced;
+}
+
+void ConfigControl::SetUpdateCallback( void (*p_callback)( void * ),
+                                             void *p_data )
+{
+    pf_update_callback = p_callback;
+    p_update_data = p_data;
+}
+
+void ConfigControl::OnUpdate( wxCommandEvent& WXUNUSED(event) )
+{
+    if( pf_update_callback )
+    {
+        pf_update_callback( p_update_data );
+    }
 }
 
 /*****************************************************************************
@@ -229,7 +247,7 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
     for( unsigned int i = 0; i < WXSIZEOF(KeysList); i++ )
     {
         combo->SetClientData( i, (void*)vlc_keys[i].i_key_code );
-        if( vlc_keys[i].i_key_code ==
+        if( (unsigned int)vlc_keys[i].i_key_code ==
             ( ((unsigned int)p_item->i_value) & ~KEY_MODIFIER ) )
         {
             combo->SetSelection( i );
@@ -357,6 +375,11 @@ wxString StringConfigControl::GetPszValue()
     return textctrl->GetValue();
 }
 
+BEGIN_EVENT_TABLE(StringConfigControl, wxPanel)
+    /* Text events */
+    EVT_TEXT(-1, StringConfigControl::OnUpdate)
+END_EVENT_TABLE()
+
 /*****************************************************************************
  * StringListConfigControl implementation
  *****************************************************************************/
@@ -420,6 +443,9 @@ void StringListConfigControl::UpdateCombo( module_config_t *p_item )
 BEGIN_EVENT_TABLE(StringListConfigControl, wxPanel)
     /* Button events */
     EVT_BUTTON(wxID_HIGHEST, StringListConfigControl::OnRefresh)
+
+    /* Text events */
+    EVT_TEXT(-1, StringListConfigControl::OnUpdate)
 END_EVENT_TABLE()
 
 void StringListConfigControl::OnRefresh( wxCommandEvent& event )

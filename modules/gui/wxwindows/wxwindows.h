@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.68 2003/11/09 20:13:46 gbazin Exp $
+ * $Id: wxwindows.h,v 1.69 2003/11/10 00:14:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -290,6 +290,8 @@ public:
 };
 
 /* Open Dialog */
+class AutoBuiltPanel;
+WX_DEFINE_ARRAY(AutoBuiltPanel *, ArrayOfAutoBuiltPanel);
 class V4LDialog;
 class SoutDialog;
 class SubsFileDialog;
@@ -308,6 +310,9 @@ public:
     int Show();
     int Show( int i_access_method, int i_arg = 0 );
 
+    void UpdateMRL();
+    void UpdateMRL( int i_access_method );
+
     wxArrayString mrl;
 
 private:
@@ -315,9 +320,8 @@ private:
     wxPanel *DiscPanel( wxWindow* parent );
     wxPanel *NetPanel( wxWindow* parent );
     wxPanel *V4LPanel( wxWindow* parent );
-    wxPanel *AutoBuildPanel( wxWindow* parent, const module_t * );
 
-    void UpdateMRL( int i_access_method );
+    ArrayOfAutoBuiltPanel input_tab_array;
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnOk( wxCommandEvent& event );
@@ -408,8 +412,10 @@ enum
     FILE_ACCESS = 0,
     DISC_ACCESS,
     NET_ACCESS,
-    SAT_ACCESS,
+#ifndef WIN32
     V4L_ACCESS,
+#endif
+    MAX_ACCESS,
     FILE_SIMPLE_ACCESS
 };
 
