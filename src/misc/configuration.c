@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.9 2002/03/26 22:02:32 gbazin Exp $
+ * $Id: configuration.c,v 1.10 2002/03/26 22:30:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -384,17 +384,14 @@ int config_LoadConfigFile( const char *psz_module_name )
                         break;
 
                     default:
-                        if( !*psz_option_value )
-                            break;                    /* ignore empty option */
-
                         vlc_mutex_lock( p_module->p_config[i].p_lock );
 
                         /* free old string */
                         if( p_module->p_config[i].psz_value )
                             free( p_module->p_config[i].psz_value );
 
-                        p_module->p_config[i].psz_value =
-                            strdup( psz_option_value );
+                        p_module->p_config[i].psz_value = *psz_option_value ?
+                            strdup( psz_option_value ) : NULL;
 
                         vlc_mutex_unlock( p_module->p_config[i].p_lock );
 
@@ -641,7 +638,7 @@ int config_SaveConfigFile( const char *psz_module_name )
  * options used (ie. exported) by each module.
  *****************************************************************************/
 int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
-			boolean_t b_ignore_errors )
+                        boolean_t b_ignore_errors )
 {
     int i_cmd, i, i_index, i_longopts_size;
     module_t *p_module;
@@ -830,7 +827,7 @@ char *config_GetHomeDir( void )
             if( ( p_tmp = getenv( "TMP" ) ) == NULL )
             {
                 p_homedir = strdup( "/tmp" );
-	    }
+            }
             else p_homedir = strdup( p_tmp );
 
             intf_ErrMsg( "config error: unable to get home directory, "

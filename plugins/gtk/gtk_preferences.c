@@ -2,9 +2,10 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.17 2002/03/26 17:33:37 lool Exp $
+ * $Id: gtk_preferences.c,v 1.18 2002/03/26 22:30:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ *          Loïc Minier <lool@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -684,7 +685,8 @@ static void GtkSaveHashValue( gpointer key, gpointer value, gpointer user_data)
     case MODULE_CONFIG_ITEM_STRING:
     case MODULE_CONFIG_ITEM_FILE:
     case MODULE_CONFIG_ITEM_PLUGIN:
-        config_PutPszVariable( p_config->psz_name, p_config->psz_value );
+        config_PutPszVariable( p_config->psz_name,
+            *p_config->psz_value? p_config->psz_value : NULL );
         break;
     case MODULE_CONFIG_ITEM_INTEGER:
     case MODULE_CONFIG_ITEM_BOOL:
