@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.13 2003/03/04 13:21:19 massiot Exp $
+ * $Id: lpcm.c,v 1.14 2003/03/18 01:22:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -161,7 +161,7 @@ static void DecodeFrame( dec_thread_t * p_dec )
     void *             p_dest;
     mtime_t            i_pts;
     uint8_t            i_header;
-    unsigned int       i_rate, i_original_channels, i_size;
+    unsigned int       i_rate = 0, i_original_channels = 0, i_size;
     int                i;
 
     input_ExtractPES( p_dec->p_fifo, &p_pes );
