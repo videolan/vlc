@@ -91,21 +91,67 @@ vlc_module_begin();
     add_shortcut( "ts" );
     add_shortcut( "ts_dvbpsi" );
 #endif
-    add_integer( SOUT_CFG_PREFIX "pid-video", 0, NULL, "Video PID", "",  VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "pid-audio", 0, NULL, "Audio PID", "",  VLC_TRUE );
 
-    add_integer( SOUT_CFG_PREFIX "bmin", 0, NULL, "Minimum bitrate", "",  VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "bmax", 0, NULL, "Maximum bitrate", "",  VLC_TRUE );
+#define VPID_TEXT N_("Video PID")
+#define VPID_LONGTEXT N_("Assign a fixed PID to the video stream")
+#define APID_TEXT N_("Audio PID")
+#define APID_LONGTEXT N_("Assign a fixed PID to the audio stream")
 
-    add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL, "Shapping delay(ms)", "",  VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "pcr", 30, NULL, "PCR delay(ms)", "",  VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "dts-delay", 200, NULL, "DTS delay(ms)", "",  VLC_TRUE );
+#define BMIN_TEXT N_("Minimum bitrate warning")
+#define BMIN_LONGTEXT N_("A warning will be emitted if the bitrate drops below this limit. THIS OPTION IS NO MORE SUPPORTED.")
+#define BMAX_TEXT N_("Maximum bitrate warning")
+#define BMAX_LONGTEXT N_("A warning will be emitted if the bitrate exceeds this limit. THIS OPTION IS NO MORE SUPPORTED.")
 
-    add_bool( SOUT_CFG_PREFIX "use-key-frames", VLC_FALSE, NULL, "Use key frame for shaping", "",  VLC_TRUE );
+#define SHAPING_TEXT N_("Shaping delay (ms)")
+#define SHAPING_LONGTEXT N_("")
 
-    add_bool( SOUT_CFG_PREFIX "crypt-audio", VLC_TRUE, NULL, "Crypt audio with CSA", "",  VLC_TRUE );
+#define PCR_TEXT N_("PCR delay (ms)")
+#define PCR_LONGTEXT N_("This options sets the interval between two PCR " \
+                        "sendings. PCR is the synchronisation clock. " \
+                        "This value should be below 100ms. (default is 30)")
 
-    add_string( SOUT_CFG_PREFIX "csa-ck", "", NULL, "CSA Key", "CSA Key", VLC_TRUE );
+#define DTS_TEXT N_("DTS delay (ms)")
+#define DTS_LONGTEXT N_("This option will delay the DTS and PTS of the " \
+                        "stream, compared to the PCR. (DTS and PTS are two" \
+                        " timestamps that give the time at which a packet " \
+                        "must be decoded and displayed). This allows for " \
+                        "some buffering inside the client decoder.")
+
+#define KEYF_TEXT N_("Use keyframes")
+#define KEYF_LONGTEXT N_("")
+
+#define ACRYPT_TEXT N_("Crypt audio")
+#define ACRYPT_LONGTEXT N_("Crypt audio using CSA")
+
+#define CK_TEXT N_("CSA Key")
+#define CK_LONGTEXT N_("Defines the CSA encryption key. This must be a " \
+                        "16 char string (8 hexadecimal bytes).")
+
+    add_integer( SOUT_CFG_PREFIX "pid-video", 0, NULL,VPID_TEXT, VPID_LONGTEXT,
+                                  VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "pid-audio", 0, NULL, APID_TEXT, APID_LONGTEXT,
+                                  VLC_TRUE );
+
+    add_integer( SOUT_CFG_PREFIX "bmin", 0, NULL, BMIN_TEXT, BMIN_LONGTEXT,
+                                 VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "bmax", 0, NULL, BMAX_TEXT, BMAX_LONGTEXT,
+                                 VLC_TRUE );
+
+    add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL,SHAPING_TEXT,
+                                 SHAPING_LONGTEXT,  VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "pcr", 30, NULL, PCR_TEXT, PCR_LONGTEXT,
+                                 VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "dts-delay", 200, NULL, DTS_TEXT, DTS_LONGTEXT
+                               ,  VLC_TRUE );
+
+    add_bool( SOUT_CFG_PREFIX "use-key-frames", VLC_FALSE, NULL, KEYF_TEXT,
+                             KEYF_LONGTEXT,  VLC_TRUE );
+
+    add_bool( SOUT_CFG_PREFIX "crypt-audio", VLC_TRUE, NULL, ACRYPT_TEXT,
+                               ACRYPT_LONGTEXT,  VLC_TRUE );
+
+    add_string( SOUT_CFG_PREFIX "csa-ck", "", NULL, CK_TEXT, CK_LONGTEXT,
+                               VLC_TRUE );
 
     set_callbacks( Open, Close );
 vlc_module_end();
