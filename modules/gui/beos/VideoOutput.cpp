@@ -334,7 +334,7 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
     {
        overlay_restrictions r;
 
-       bitmap[1]->GetOverlayRestrictions(&r);
+       bitmap[0]->GetOverlayRestrictions(&r);
        SetSizeLimits((i_width * r.min_width_scale), i_width * r.max_width_scale,
                      (i_height * r.min_height_scale), i_height * r.max_height_scale);
     }
@@ -724,12 +724,13 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
     int noOverlay = !config_GetInt( p_vout, "overlay" );
 
     /* Test for overlay capability: for every chroma in colspace,
-       we try to do double-buffered overlay, or we fallback on
-       single-buffered overlay. In nothing worked, we then have
-       to work with a non-overlay BBitmap. */
+       we try to do double-buffered overlay, single-buffered overlay
+       or basic overlay. If nothing worked, we then have to work with
+       a non-overlay BBitmap. */
     for( int i = 0; i < COLOR_COUNT; i++ )
     {
-        if (noOverlay) break;
+        if( noOverlay )
+            break;
 
         bitmap[0] = new BBitmap( bitmapFrame,
                                  B_BITMAP_WILL_OVERLAY |
@@ -739,18 +740,19 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
         {
             colspace_index = i;
 
+            *mode = OVERLAY;
+            rgb_color key;
+            view->SetViewOverlay( bitmap[0], bitmap[0]->Bounds(),
+                                  view->Bounds(), &key, B_FOLLOW_ALL,
+                                  B_OVERLAY_FILTER_HORIZONTAL |
+                                  B_OVERLAY_FILTER_VERTICAL );
+            view->SetViewColor( key );
+            SetTitle( "VLC " PACKAGE_VERSION " (Overlay)" );
+
             bitmap[1] = new BBitmap( bitmapFrame, B_BITMAP_WILL_OVERLAY,
                                      colspace[colspace_index].colspace);
             if( bitmap[1] && bitmap[1]->InitCheck() == B_OK )
             {
-                *mode = OVERLAY;
-                rgb_color key;
-                view->SetViewOverlay( bitmap[0], bitmap[0]->Bounds(),
-                                      view->Bounds(), &key, B_FOLLOW_ALL,
-                                      B_OVERLAY_FILTER_HORIZONTAL |
-                                      B_OVERLAY_FILTER_VERTICAL );
-                view->SetViewColor( key );
-                SetTitle( "VLC " PACKAGE_VERSION " (Overlay)" );
 
                 bitmap[2] = new BBitmap( bitmapFrame, B_BITMAP_WILL_OVERLAY,
                                          colspace[colspace_index].colspace);
@@ -764,17 +766,18 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
                     bitmap_count = 2;
                     if( bitmap[2] ) { delete bitmap[2]; bitmap[2] = NULL; }
                 }
-                break;
             }
             else
             {
-                *mode = BITMAP;
-                _FreeBuffers();
+                msg_Dbg( p_vout, "using simple overlay" );
+                bitmap_count = 1;
+                if( bitmap[1] ) { delete bitmap[1]; bitmap[1] = NULL; }
             }
+            break;
         }
         else
         {
-            delete bitmap[0];
+            if( bitmap[0] ) { delete bitmap[0]; bitmap[0] = NULL; }
         }
     }
 
