@@ -98,6 +98,7 @@ msg_Dbg( p_intf, "KEYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
             c = [o_to_delete count];
 
             for( i = 0; i < c; i++ ) {
+                playlist_item_t * p_item;
                 o_number = [o_to_delete lastObject];
                 i_row = [o_number intValue];
 
@@ -107,7 +108,9 @@ msg_Dbg( p_intf, "KEYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
                 }
                 [o_to_delete removeObject: o_number];
                 [self deselectRow: i_row];
-                playlist_ItemDelete( [[self itemAtRow: i_row] pointerValue] );
+                p_item = (playlist_item_t *)[[self itemAtRow: i_row]pointerValue];
+                playlist_Delete( p_playlist, p_item->input.i_id );
+                [self reloadData];
             }
             break;
 

@@ -6,7 +6,6 @@
             ACTIONS = {showPanel = id; }; 
             CLASS = VLAboutBox; 
             LANGUAGE = ObjC; 
-            OUTLETS = {}; 
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = VLBrushedMetalImageView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
@@ -413,7 +412,7 @@
             }; 
             SUPERCLASS = NSObject; 
         }, 
-        {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
+        {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
         {
             ACTIONS = {advancedToggle = id; closePrefs = id; resetAll = id; savePrefs = id; }; 
             CLASS = VLCPrefs; 
