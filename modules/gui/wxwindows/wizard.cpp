@@ -613,7 +613,7 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
     enable_checkbox = new wxCheckBox( this, PartialEnable_Event,
                                                 wxU(_("Enable") ) );
     enable_checkbox->SetToolTip(wxU(_(PARTIAL) ) ) ;
-    partial_sizer->Add( enable_checkbox, 0 , wxLEFT , 5 );
+    partial_sizer->Add( enable_checkbox, 0 , wxALIGN_CENTER_VERTICAL|wxALL, 5 ); //wxLEFT
 
     wxFlexGridSizer *partial_sizer2 = new wxFlexGridSizer( 4 , 1 , 20 );
     partial_sizer2->Add( new wxStaticText(this, -1, wxU(_( "From" ) ) ),
@@ -798,7 +798,7 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
     /* Line 1 : only the checkbox */
     wxFlexGridSizer *video_sizer1 = new wxFlexGridSizer( 2,3,20 );
     video_sizer1->Add( new wxCheckBox( this, VideoEnable_Event,
-                       wxU(_("Transcode video") ) ), 0 , 0 , 5 );
+                       wxU(_("Transcode video") ) ), 0 , wxALIGN_CENTER_VERTICAL|wxALL , 5 );
     video_sizer1->Add( 0,0,1);
     /* Line 2 : codec */
     video_sizer1->Add( new wxStaticText(this, -1, wxU(_("Codec"))),0,wxLEFT ,5);
@@ -836,7 +836,7 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
     /* Line1: enabler */
     wxFlexGridSizer *audio_sizer1 = new wxFlexGridSizer( 2,3,20);
     audio_sizer1->Add( new wxCheckBox( this, AudioEnable_Event,
-                            wxU(_("Transcode audio") ) ), 0 , wxLEFT, 5 );
+                            wxU(_("Transcode audio") ) ), 0 , wxALIGN_CENTER_VERTICAL|wxALL, 5 );
     audio_sizer1->Add( 0, 0, 1 );
 
     /* Line 2 : codec */
