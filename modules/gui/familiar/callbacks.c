@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.8 2002/08/25 20:44:40 jpsaman Exp $
+ * $Id: callbacks.c,v 1.9 2002/09/04 21:18:29 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -98,16 +98,13 @@ static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
     g_print( "%s\n",psz_url );
 
     // Add p_url to playlist .... but how ?
-    if (p_intf)
+    p_playlist = (playlist_t *)
+             vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist )
     {
-        p_playlist = (playlist_t *)
-                 vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-        if( p_playlist )
-        {
-           playlist_Add( p_playlist, (char*)psz_url,
-                         PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-           vlc_object_release( p_playlist );
-        }
+       playlist_Add( p_playlist, (char*)psz_url,
+                     PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+       vlc_object_release( p_playlist );
     }
 }
 
@@ -243,21 +240,18 @@ on_toolbar_open_clicked                (GtkButton       *button,
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
 
-    if (p_intf)
-    {
-        /* Testing routine */
+    /* Testing routine */
 /*
-        GtkCList *clistmedia = NULL;
-        clistmedia = GTK_CLIST( lookup_widget( p_intf->p_sys->p_window,
-                                   "clistmedia") );
-        if (GTK_CLIST(clistmedia))
-        {
-            ReadDirectory(clistmedia, ".");
-        }
-*/
-        gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
-        gdk_window_raise( p_intf->p_sys->p_window->window );
+    GtkCList *clistmedia = NULL;
+    clistmedia = GTK_CLIST( lookup_widget( p_intf->p_sys->p_window,
+                               "clistmedia") );
+    if (GTK_CLIST(clistmedia))
+    {
+        ReadDirectory(clistmedia, ".");
     }
+*/
+    gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+    gdk_window_raise( p_intf->p_sys->p_window->window );
 }
 
 
@@ -266,10 +260,9 @@ on_toolbar_preferences_clicked         (GtkButton       *button,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
-    if (p_intf) {
-        gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
-        gdk_window_raise( p_intf->p_sys->p_window->window );
-    }
+
+    gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+    gdk_window_raise( p_intf->p_sys->p_window->window );
 }
 
 
@@ -279,12 +272,9 @@ on_toolbar_rewind_clicked              (GtkButton       *button,
 {
     intf_thread_t *  p_intf = GtkGetIntf( button );
 
-    if( p_intf )
+    if( p_intf->p_sys->p_input )
     {
-        if( p_intf->p_sys->p_input )
-        {
-            input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
-        }
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
     }
 }
 
@@ -295,12 +285,9 @@ on_toolbar_pause_clicked               (GtkButton       *button,
 {
     intf_thread_t *  p_intf = GtkGetIntf( button );
 
-    if( p_intf )
+    if( p_intf->p_sys->p_input )
     {
-        if( p_intf->p_sys->p_input )
-        {
-            input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
-        }
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
     }
 }
 
@@ -314,11 +301,8 @@ on_toolbar_play_clicked                (GtkButton       *button,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
-        if( p_intf )
-        {
-           gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
-           gdk_window_raise( p_intf->p_sys->p_window->window );
-        }
+        gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+        gdk_window_raise( p_intf->p_sys->p_window->window );
         /* Display open page */
     }
 
@@ -362,12 +346,9 @@ on_toolbar_forward_clicked             (GtkButton       *button,
 {
     intf_thread_t *  p_intf = GtkGetIntf( button );
 
-    if( p_intf )
+    if( p_intf->p_sys->p_input )
     {
-        if( p_intf->p_sys->p_input )
-        {
-            input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
-        }
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
     }
 }
 
@@ -377,17 +358,16 @@ on_toolbar_about_clicked               (GtkButton       *button,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
-    if (p_intf)
-    {// Toggle notebook
-        if (p_intf->p_sys->p_notebook)
-        {
-/*        if ( gtk_get_data(  GTK_WIDGET(p_intf->p_sys->p_notebook), "visible" ) )
- *           gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_notebook) );
- *        else
- */           gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
-        }
-        gdk_window_raise( p_intf->p_sys->p_window->window );
+
+    // Toggle notebook
+    if (p_intf->p_sys->p_notebook)
+    {
+/*     if ( gtk_get_data(  GTK_WIDGET(p_intf->p_sys->p_notebook), "visible" ) )
+ *         gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+ *     else
+ */      gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
     }
+    gdk_window_raise( p_intf->p_sys->p_window->window );
 }
 
 
@@ -398,13 +378,10 @@ on_comboURL_entry_changed              (GtkEditable     *editable,
     intf_thread_t * p_intf = GtkGetIntf( editable );
     gchar *       psz_url;
 
-    if (p_intf)
+    if (p_intf->p_sys->b_autoplayfile == 1)
     {
-        if (p_intf->p_sys->b_autoplayfile == 1)
-        {
-            psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
-            MediaURLOpenChanged( GTK_WIDGET(editable), psz_url );
-        }
+        psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
+        MediaURLOpenChanged( GTK_WIDGET(editable), psz_url );
     }
 }
 
@@ -463,13 +440,10 @@ on_cbautoplay_toggled                  (GtkToggleButton *togglebutton,
 {
     intf_thread_t * p_intf = GtkGetIntf( togglebutton );
 
-    if (p_intf)
-    {
-        if (p_intf->p_sys->b_autoplayfile == 1)
-           p_intf->p_sys->b_autoplayfile = 0;
-        else
-           p_intf->p_sys->b_autoplayfile = 1;
-    }
+    if (p_intf->p_sys->b_autoplayfile == 1)
+       p_intf->p_sys->b_autoplayfile = 0;
+    else
+       p_intf->p_sys->b_autoplayfile = 1;
 }
 
 
