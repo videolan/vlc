@@ -443,7 +443,8 @@ void Interface::CreateOurToolBar()
     toolbar_sizer->Add( toolbar, 1, 0, 0 );
     toolbar_sizer->Layout();
 
-    frame_sizer->SetMinSize( toolbar_sizer->GetMinSize().GetWidth()*2, -1 );
+    // '7' is the number of buttons on the toolbar, '3' is arbitrary :)
+    frame_sizer->SetMinSize( TOOLBAR_BMP_WIDTH * 7 * 3, -1 );
 
 #if !defined(__WXX11__)
     /* Associate drop targets with the toolbar */
