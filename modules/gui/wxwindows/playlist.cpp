@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: playlist.cpp,v 1.33 2004/01/05 13:00:39 zorglub Exp $
+ * $Id: playlist.cpp,v 1.34 2004/01/08 00:52:08 sigmunau Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -1148,6 +1148,7 @@ int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
 {
     Playlist *p_playlist_dialog = (Playlist *)param;
     p_playlist_dialog->UpdateItem( new_val.i_int );
+    return 0;
 }
 
 
