@@ -37,7 +37,7 @@ struct spu_t
     VLC_COMMON_MEMBERS
 
     vlc_mutex_t  subpicture_lock;                  /**< subpicture heap lock */
-    subpicture_t p_subpicture[VOUT_MAX_PICTURES];           /**< subpictures */
+    subpicture_t p_subpicture[VOUT_MAX_SUBPICTURES];        /**< subpictures */
     int i_channel;             /**< number of subpicture channels registered */
 
     filter_t *p_blend;                            /**< alpha blending module */
