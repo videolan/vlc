@@ -2,7 +2,7 @@
  * tools.c: tools for dvd plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: tools.c,v 1.4 2003/01/28 15:05:52 massiot Exp $
+ * $Id$
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -106,6 +106,12 @@ char * dvdplay_ParseCL( input_thread_t * p_input,
     if( psz_source[0] && psz_source[1] == ':' && psz_source[2] == '\0' )
     {
         /* Don't try to stat the file */
+    }
+    else if( psz_source[0] && psz_source[1] == ':' &&
+             psz_source[2] == '\\' && psz_source[3] == '\0' )
+    {
+        /* Don't try to stat the file */
+        psz_source[2] = '\0';
     }
     else
 #endif

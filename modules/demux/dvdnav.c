@@ -291,6 +291,14 @@ static char *ParseCL( vlc_object_t *p_this, char *psz_name, vlc_bool_t b_force,
         if( !psz_source ) return NULL;
     }
 
+#ifdef WIN32
+    if( psz_source[0] && psz_source[1] == ':' &&
+        psz_source[2] == '\\' && psz_source[3] == '\0' )
+    {
+        psz_source[2] = '\0';
+    }
+#endif
+
     msg_Dbg( p_this, "dvdroot=%s title=%d chapter=%d angle=%d",
              psz_source, *i_title, *i_chapter, *i_angle );
 

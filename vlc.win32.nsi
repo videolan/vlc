@@ -142,6 +142,13 @@ Section "Media player (required)" SEC01
   WriteRegStr HKCR Applications\vlc.exe\shell\Play\command "" \
     '$INSTDIR\vlc.exe "%1"'
 
+  WriteRegStr HKCR "AudioCD\shell\PlayWithVLC" "" "Play with VLC media player"
+  WriteRegStr HKCR "AudioCD\shell\PlayWithVLC\command" "" \
+    '$INSTDIR\vlc.exe cdda:%1'
+  WriteRegStr HKCR "DVD\shell\PlayWithVLC" "" "Play with VLC media player"
+  WriteRegStr HKCR "DVD\shell\PlayWithVLC\command" "" \
+    '$INSTDIR\vlc.exe dvd:%1'
+
 SectionEnd
 
 Section "Start Menu + Desktop Shortcut" SEC02
@@ -299,6 +306,8 @@ Section Uninstall
   DeleteRegKey HKLM Software\VideoLAN
 
   DeleteRegKey HKCR Applications\vlc.exe
+  DeleteRegKey HKCR AudioCD\shell\PlayWithVLC
+  DeleteRegKey HKCR DVD\shell\PlayWithVLC
 
   DeleteRegKey HKLM \
     SOFTWARE\MozillaPlugins\@videolan.org/vlc,version=${VERSION}
