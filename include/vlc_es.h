@@ -102,7 +102,7 @@ struct video_format_t
     unsigned int i_frame_rate;                     /**< frame rate numerator */
     unsigned int i_frame_rate_base;              /**< frame rate denominator */
 
-    int i_rmask, i_rgmask, i_bmask;          /**< color masks for RGB chroma */
+    int i_rmask, i_gmask, i_bmask;          /**< color masks for RGB chroma */
     video_palette_t *p_palette;              /**< video palette from demuxer */
 };
 

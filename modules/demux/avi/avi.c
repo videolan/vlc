@@ -415,11 +415,20 @@ static int Open( vlc_object_t * p_this )
                             break;
                     }
                     es_format_Init( &fmt, VIDEO_ES, tk->i_codec );
+
+                    if( p_vids->p_bih->biBitCount == 24 )
+                    {
+                        /* This is in BGR format */
+                        fmt.video.i_bmask = 0x00ff0000;
+                        fmt.video.i_gmask = 0x0000ff00;
+                        fmt.video.i_rmask = 0x000000ff;
+                    }
                 }
                 else
                 {
                     es_format_Init( &fmt, VIDEO_ES, p_vids->p_bih->biCompression );
-                    if( tk->i_codec == FOURCC_mp4v && !strncasecmp( (char*)&p_strh->i_handler, "XVID", 4 ) )
+                    if( tk->i_codec == FOURCC_mp4v &&
+                        !strncasecmp( (char*)&p_strh->i_handler, "XVID", 4 ) )
                     {
                         fmt.i_codec = VLC_FOURCC( 'X', 'V', 'I', 'D' );
                     }

@@ -195,6 +195,9 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
         dest_pic.data[1] = p_pic_dst->p[2].p_pixels;
         dest_pic.data[2] = p_pic_dst->p[1].p_pixels;
     }
+    if( p_sys->i_src_ffmpeg_chroma == PIX_FMT_RGB24 )
+        if( p_filter->fmt_in.video.i_bmask == 0x00ff0000 )
+            p_sys->i_src_ffmpeg_chroma = PIX_FMT_BGR24;
 
 #if 0
     if( p_sys->b_resize &&

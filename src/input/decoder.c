@@ -235,9 +235,9 @@ void input_DecoderDecode( decoder_t * p_dec, block_t *p_block )
     }
     else
     {
-        if( p_dec->b_error || p_block->i_buffer <= 0 )
+        if( p_dec->b_error || (p_block && p_block->i_buffer <= 0) )
         {
-            block_Release( p_block );
+            if( p_block ) block_Release( p_block );
         }
         else
         {
@@ -503,9 +503,9 @@ static int DecoderThread( decoder_t * p_dec )
  */
 static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 {
-    int i_rate = p_block->i_rate;
+    int i_rate = p_block ? p_block->i_rate : 1000;
 
-    if( p_block->i_buffer <= 0 )
+    if( p_block && p_block->i_buffer <= 0 )
     {
         block_Release( p_block );
         return VLC_SUCCESS;
@@ -515,7 +515,8 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
     {
         block_t *p_sout_block;
 
-        while( (p_sout_block = p_dec->pf_packetize( p_dec, &p_block )) )
+        while( ( p_sout_block =
+                     p_dec->pf_packetize( p_dec, p_block ? &p_block : 0 ) ) )
         {
             if( !p_dec->p_owner->p_sout_input )
             {
@@ -828,6 +829,13 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             p_dec->b_error = VLC_TRUE;
             return NULL;
         }
+
+        if( p_sys->video.i_rmask )
+            p_sys->p_vout->render.i_rmask = p_sys->video.i_rmask;
+        if( p_sys->video.i_gmask )
+            p_sys->p_vout->render.i_gmask = p_sys->video.i_gmask;
+        if( p_sys->video.i_bmask )
+            p_sys->p_vout->render.i_bmask = p_sys->video.i_bmask;
     }
 
     /* Get a new picture */

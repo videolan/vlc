@@ -88,6 +88,7 @@ int E_(OpenChroma)( vlc_object_t *p_this )
     p_vout->chroma.p_sys->i_dst_vlc_chroma = p_vout->output.i_chroma;
     p_vout->chroma.p_sys->i_src_ffmpeg_chroma = i_ffmpeg_chroma[0];
     p_vout->chroma.p_sys->i_dst_ffmpeg_chroma = i_ffmpeg_chroma[1];
+
     if( ( p_vout->render.i_height != p_vout->output.i_height ||
           p_vout->render.i_width != p_vout->output.i_width ) &&
         ( p_vout->chroma.p_sys->i_dst_vlc_chroma == VLC_FOURCC('I','4','2','0')  ||
@@ -95,10 +96,9 @@ int E_(OpenChroma)( vlc_object_t *p_this )
         
     {
         msg_Dbg( p_vout, "preparing to resample picture" );
-        p_vout->chroma.p_sys->p_rsc = img_resample_init( p_vout->output.i_width,
-                                                         p_vout->output.i_height,
-                                                         p_vout->render.i_width,
-                                                         p_vout->render.i_height );
+        p_vout->chroma.p_sys->p_rsc =
+            img_resample_init( p_vout->output.i_width, p_vout->output.i_height,
+                               p_vout->render.i_width, p_vout->render.i_height );
         avpicture_alloc( &p_vout->chroma.p_sys->tmp_pic,
                          p_vout->chroma.p_sys->i_dst_ffmpeg_chroma,
                          p_vout->render.i_width, p_vout->render.i_height );
@@ -152,6 +152,10 @@ static void ChromaConversion( vout_thread_t *p_vout,
         dest_pic.data[1] = p_dest->p[2].p_pixels;
         dest_pic.data[2] = p_dest->p[1].p_pixels;
     }
+    if( p_vout->chroma.p_sys->i_src_ffmpeg_chroma == PIX_FMT_RGB24 )
+        if( p_vout->render.i_bmask == 0x00ff0000 )
+            p_vout->chroma.p_sys->i_src_ffmpeg_chroma = PIX_FMT_BGR24;
+
     if( p_vout->chroma.p_sys->p_rsc )
     {
         img_convert( &p_vout->chroma.p_sys->tmp_pic,

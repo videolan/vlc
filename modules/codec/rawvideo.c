@@ -139,11 +139,19 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
     p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
-    //if( !p_dec->fmt_in.video.i_aspect )
+    if( !p_dec->fmt_in.video.i_aspect )
     {
         p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
             p_dec->fmt_out.video.i_width / p_dec->fmt_out.video.i_height;
     }
+    else p_dec->fmt_out.video.i_aspect = p_dec->fmt_in.video.i_aspect;
+
+    if( p_dec->fmt_in.video.i_rmask )
+        p_dec->fmt_out.video.i_rmask = p_dec->fmt_in.video.i_rmask;
+    if( p_dec->fmt_in.video.i_gmask )
+        p_dec->fmt_out.video.i_gmask = p_dec->fmt_in.video.i_gmask;
+    if( p_dec->fmt_in.video.i_bmask )
+        p_dec->fmt_out.video.i_bmask = p_dec->fmt_in.video.i_bmask;
 
     /* Set callbacks */
     p_dec->pf_decode_video = (picture_t *(*)(decoder_t *, block_t **))
