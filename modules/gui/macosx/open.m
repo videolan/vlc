@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.31 2003/05/05 16:09:39 gbazin Exp $
+ * $Id: open.m,v 1.32 2003/05/08 17:13:22 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -149,7 +149,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_disc_title_lbl setStringValue: _NS("Title")];
     [o_disc_chapter_lbl setStringValue: _NS("Chapter")];
     [o_disc_videots_btn_browse setTitle: _NS("Browse...")];
-    [o_disc_dvd_menus setTitle: _NS("Use DVD menus (EXPERIMENTAL)")];
+    [o_disc_dvd_menus setTitle: _NS("Use DVD menus")];
 
     [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("VIDEO_TS folder")];
     [[o_disc_type cellAtRow:1 column:0] setTitle: _NS("DVD")];

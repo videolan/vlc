@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.76 2003/05/08 01:16:57 hartman Exp $
+ * $Id: intf.m,v 1.77 2003/05/08 17:13:22 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -329,16 +329,22 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_mi_fwd setTitle: _NS("Step Forward")];
     [o_mi_bwd setTitle: _NS("Step Backward")];
     [o_mi_program setTitle: _NS("Program")];
+    [o_mu_program setTitle: _NS("Program")];
     [o_mi_title setTitle: _NS("Title")];
+    [o_mu_title setTitle: _NS("Title")];
     [o_mi_chapter setTitle: _NS("Chapter")];
+    [o_mu_chapter setTitle: _NS("Chapter")];
     
     [o_mu_audio setTitle: _NS("Audio")];
     [o_mi_vol_up setTitle: _NS("Volume Up")];
     [o_mi_vol_down setTitle: _NS("Volume Down")];
     [o_mi_mute setTitle: _NS("Mute")];
     [o_mi_audiotrack setTitle: _NS("Audio Track")];
+    [o_mu_audiotrack setTitle: _NS("Audio Track")];
     [o_mi_channels setTitle: _NS("Channels")];
+    [o_mu_channels setTitle: _NS("Channels")];
     [o_mi_device setTitle: _NS("Device")];
+    [o_mu_device setTitle: _NS("Device")];
     
     [o_mu_video setTitle: _NS("Video")];
     [o_mi_half_window setTitle: _NS("Half Size")];
@@ -348,8 +354,11 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_mi_fullscreen setTitle: _NS("Fullscreen")];
     [o_mi_floatontop setTitle: _NS("Float On Top")];
     [o_mi_videotrack setTitle: _NS("Video Track")];
+    [o_mu_videotrack setTitle: _NS("Video Track")];
     [o_mi_screen setTitle: _NS("Screen")];
+    [o_mu_screen setTitle: _NS("Screen")];
     [o_mi_subtitle setTitle: _NS("Subtitles")];
+    [o_mu_subtitle setTitle: _NS("Subtitles")];
     [o_mi_deinterlace setTitle: _NS("Deinterlace")];
     [o_mu_deinterlace setTitle: _NS("Deinterlace")];
 

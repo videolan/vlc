@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.35 2003/05/08 01:16:57 hartman Exp $
+ * $Id: intf.h,v 1.36 2003/05/08 17:13:22 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -172,16 +172,22 @@ struct intf_sys_t
     IBOutlet id o_mi_fwd;
     IBOutlet id o_mi_bwd;
     IBOutlet id o_mi_program;
+    IBOutlet id o_mu_program;
     IBOutlet id o_mi_title;
+    IBOutlet id o_mu_title;
     IBOutlet id o_mi_chapter;
+    IBOutlet id o_mu_chapter;
 
     IBOutlet id o_mu_audio;
     IBOutlet id o_mi_vol_up;
     IBOutlet id o_mi_vol_down;
     IBOutlet id o_mi_mute;
     IBOutlet id o_mi_audiotrack;
+    IBOutlet id o_mu_audiotrack;
     IBOutlet id o_mi_channels;
+    IBOutlet id o_mu_channels;
     IBOutlet id o_mi_device;
+    IBOutlet id o_mu_device;
 
     IBOutlet id o_mu_video;
     IBOutlet id o_mi_half_window;
@@ -191,8 +197,11 @@ struct intf_sys_t
     IBOutlet id o_mi_fullscreen;
     IBOutlet id o_mi_floatontop;
     IBOutlet id o_mi_videotrack;
+    IBOutlet id o_mu_videotrack;
     IBOutlet id o_mi_screen;
+    IBOutlet id o_mu_screen;
     IBOutlet id o_mi_subtitle;
+    IBOutlet id o_mu_subtitle;
     IBOutlet id o_mi_deinterlace;
     IBOutlet id o_mu_deinterlace;
 
