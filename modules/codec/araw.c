@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.18 2003/10/25 00:49:13 sam Exp $
+ * $Id: araw.c,v 1.19 2003/11/01 06:27:45 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -24,19 +24,44 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/decoder.h>
 #include <vlc/input.h>
 
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
+#include <vlc/sout.h>
+#include "aout_internal.h"
+
 #include "codecs.h"
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  DecoderOpen    ( vlc_object_t * );
+
+static int  EncoderOpen  ( vlc_object_t *p_this );
+static void EncoderClose ( vlc_object_t *p_this );
+
+vlc_module_begin();
+    /* audio decoder module */
+    set_description( _("Pseudo Raw/Log Audio decoder") );
+    set_capability( "decoder", 50 );
+    set_callbacks( DecoderOpen, NULL );
+
+    /* audio encoder submodule */
+    add_submodule();
+    set_description( _("Raw audio encoder") );
+    set_capability( "audio encoder", 10 );
+    set_callbacks( EncoderOpen, EncoderClose );
+vlc_module_end();
+
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 
-typedef struct adec_thread_s
+typedef struct
 {
     WAVEFORMATEX    *p_wf;
 
@@ -54,31 +79,22 @@ typedef struct adec_thread_s
 
 } adec_thread_t;
 
-static int  OpenDecoder    ( vlc_object_t * );
 
 static int  RunDecoder     ( decoder_fifo_t * );
 static int  InitThread     ( adec_thread_t * );
 static void DecodeThread   ( adec_thread_t * );
 static void EndThread      ( adec_thread_t * );
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 
-vlc_module_begin();
-    set_description( _("Pseudo Raw/Log Audio decoder") );
-    set_capability( "decoder", 50 );
-    set_callbacks( OpenDecoder, NULL );
-vlc_module_end();
-
+static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf );
 
 /*****************************************************************************
- * OpenDecoder: probe the decoder and return score
+ * DecoderOpen: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able
  * to choose.
  *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+static int DecoderOpen( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
@@ -525,3 +541,134 @@ static void EndThread (adec_thread_t *p_adec)
 
     free( p_adec );
 }
+
+/*****************************************************************************
+ * EncoderOpen:
+ *****************************************************************************/
+static int  EncoderOpen  ( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+
+    if( p_enc->format.audio.i_format != VLC_FOURCC( 's', '1', '6', 'b' ) &&
+        p_enc->format.audio.i_format != VLC_FOURCC( 's', '1', '6', 'l' ) )
+    {
+        msg_Warn( p_enc, "unhandled input format" );
+        return VLC_EGENERIC;
+    }
+
+    switch( p_enc->i_fourcc )
+    {
+        case VLC_FOURCC( 's', '1', '6', 'b' ):
+        case VLC_FOURCC( 's', '1', '6', 'l' ):
+        case VLC_FOURCC( 'u', '8', ' ', ' ' ):
+        case VLC_FOURCC( 's', '8', ' ', ' ' ):
+#if 0
+        -> could be easyly done with table look up
+        case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
+        case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
+#endif
+            break;
+        default:
+            return VLC_EGENERIC;
+    }
+
+    p_enc->p_sys = NULL;
+    p_enc->pf_header = NULL;
+    p_enc->pf_encode_audio = EncoderEncode;
+    p_enc->pf_encode_video = NULL;
+    p_enc->i_extra_data = 0;
+    p_enc->p_extra_data = NULL;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * EncoderClose:
+ *****************************************************************************/
+static void EncoderClose ( vlc_object_t *p_this )
+{
+    return;
+}
+
+/*****************************************************************************
+ * EncoderEncode:
+ *****************************************************************************/
+static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
+{
+    block_t *p_block = NULL;
+    unsigned int i;
+
+    if( p_enc->i_fourcc == p_enc->format.audio.i_format )
+    {
+        if( ( p_block = block_New( p_enc, p_aout_buf->i_nb_bytes ) ) )
+        {
+            memcpy( p_block->p_buffer, p_aout_buf->p_buffer, p_aout_buf->i_nb_bytes );
+        }
+    }
+    else if( p_enc->i_fourcc == VLC_FOURCC( 'u', '8', ' ', ' ' ) )
+    {
+        if( ( p_block = block_New( p_enc, p_aout_buf->i_nb_samples ) ) )
+        {
+            uint8_t *p_dst = (uint8_t*)p_block->p_buffer;
+            int8_t  *p_src = (int8_t*) p_aout_buf->p_buffer;
+
+            if( p_enc->format.audio.i_format == VLC_FOURCC( 's', '1', '6', 'l' ) )
+            {
+                p_src++;
+            }
+
+            for( i = 0; i < p_aout_buf->i_nb_samples; i++ )
+            {
+                *p_dst++ = *p_src + 128; p_src += 2;
+            }
+        }
+    }
+    else if( p_enc->i_fourcc == VLC_FOURCC( 's', '8', ' ', ' ' ) )
+    {
+        if( ( p_block = block_New( p_enc, p_aout_buf->i_nb_samples ) ) )
+        {
+            int8_t *p_dst = (int8_t*)p_block->p_buffer;
+            int8_t *p_src = (int8_t*)p_aout_buf->p_buffer;
+
+            if( p_enc->format.audio.i_format == VLC_FOURCC( 's', '1', '6', 'l' ) )
+            {
+                p_src++;
+            }
+
+            for( i = 0; i < p_aout_buf->i_nb_samples; i++ )
+            {
+                *p_dst++ = *p_src; p_src += 2;
+            }
+        }
+    }
+    else
+    {
+        /* endian swapping */
+        if( ( p_block = block_New( p_enc, p_aout_buf->i_nb_bytes ) ) )
+        {
+            uint8_t *p_dst = (uint8_t*)p_block->p_buffer;
+            uint8_t *p_src = (uint8_t*)p_aout_buf->p_buffer;
+
+            for( i = 0; i < p_aout_buf->i_nb_samples; i++ )
+            {
+                p_dst[0] = p_src[1];
+                p_dst[1] = p_src[0];
+
+                p_dst += 2;
+                p_src += 2;
+            }
+        }
+    }
+
+    if( p_block )
+    {
+        p_block->i_dts = p_block->i_pts = p_aout_buf->start_date;
+        p_block->i_length = (int64_t)p_aout_buf->i_nb_samples * (int64_t)1000000 /
+                            p_enc->format.audio.i_rate /
+                            aout_FormatNbChannels( &p_enc->format.audio );
+    }
+
+    return p_block;
+}
+
+
