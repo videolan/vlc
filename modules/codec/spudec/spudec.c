@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.31 2004/01/27 22:51:39 hartman Exp $
+ * $Id: spudec.c,v 1.32 2004/01/30 16:46:33 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -235,8 +235,8 @@ static block_t *Reassemble( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_spu_size = ( p_block->p_buffer[0] << 8 )| p_block->p_buffer[1];
         p_sys->i_rle_size = ( ( p_block->p_buffer[2] << 8 )| p_block->p_buffer[3] ) - 4;
 
-        msg_Dbg( p_dec, "i_spu_size=%d i_rle=%d", p_sys->i_spu_size, p_sys->i_rle_size );
-
+        /* msg_Dbg( p_dec, "i_spu_size=%d i_rle=%d",
+                    p_sys->i_spu_size, p_sys->i_rle_size ); */
         if( p_sys->i_spu_size <= 0 || p_sys->i_rle_size >= p_sys->i_spu_size )
         {
             p_sys->i_spu_size = 0;
