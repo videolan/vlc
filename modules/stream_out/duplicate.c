@@ -2,7 +2,7 @@
  * duplicate.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: duplicate.c,v 1.6 2003/12/14 17:56:25 gbazin Exp $
+ * $Id: duplicate.c,v 1.7 2003/12/14 17:58:37 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -197,7 +197,6 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     while( p_buffer )
     {
         sout_buffer_t *p_next = p_buffer->p_next;
-        block_t *p_block;
 
         p_buffer->p_next = NULL;
 
