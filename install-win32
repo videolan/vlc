@@ -54,15 +54,6 @@ Section "Install"
 	File  *.dll
 	File  *.txt
 
-	File  AUTHORS
-	File  COPYING
-	File  ChangeLog
-	File  ChangeLog.libdvdcss
-	File  README
-	File  README.libdvdcss
-	File  FAQ
-	File  TODO
-
 	File  /r share
 
 	CreateDirectory "$SMPROGRAMS\VideoLAN"

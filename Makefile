@@ -435,8 +435,11 @@ package-win32:
 	sed -e 's#@VERSION@#'${VLC_QUICKVERSION}'#' < install-win32 > tmp/nsi
 	# Copy relevant files
 	cp vlc.exe $(PLUGINS:%=plugins/%.so) tmp/ 
-	cp INSTALL-win32.txt AUTHORS COPYING ChangeLog ChangeLog.libdvdcss \
-		README README.libdvdcss FAQ TODO tmp/
+	cp INSTALL.win32 tmp/INSTALL.txt ; unix2dos tmp/INSTALL.txt
+	for file in AUTHORS COPYING ChangeLog ChangeLog.libdvdcss \
+		README README.libdvdcss FAQ TODO ; \
+			do cp $$file tmp/$${file}.txt ; \
+			unix2dos tmp/$${file}.txt ; done
 	for file in iconv.dll libgmodule-1.3-12.dll libgtk-0.dll libgdk-0.dll \
 		libgobject-1.3-12.dll libintl-1.dll libglib-1.3-12.dll \
 		libgthread-1.3-12.dll SDL.dll README-SDL.txt ; \
