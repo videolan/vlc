@@ -2,7 +2,7 @@
  * vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: VlcWrapper.cpp,v 1.2 2002/08/06 10:54:34 tcastley Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -28,7 +28,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
-#include "vlc_wrapper.h"
+#include "VlcWrapper.h"
 
 Intf_VLCWrapper *Intf_VLCWrapper::getVLCWrapper(intf_thread_t *p_if)
 {
