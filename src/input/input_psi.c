@@ -566,7 +566,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
             intf_DbgMsg("ES Type: %d\n", p_pms[i_offset]);
 
             /* Read PID of that ES */
-            i_es_pid = U16_AT(&p_pms[i_offset+1]) & 0x1FF;
+            i_es_pid = U16_AT(&p_pms[i_offset+1]) & 0x1FFF;
             intf_DbgMsg("ES PID: %d\n", i_es_pid);
 
             /* Add the ES to the program description and reserve a slot in the
