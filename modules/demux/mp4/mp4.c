@@ -1715,7 +1715,6 @@ static int  MP4_TrackSelect ( demux_t    *p_demux,
 static void MP4_TrackUnselect(demux_t    *p_demux,
                               mp4_track_t  *p_track )
 {
-    fprintf( stderr, "MP4_TrackUnselect: id=%d\n", p_track->i_track_ID );
     if( !p_track->b_ok )
     {
         return;
