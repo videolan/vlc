@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.38 2003/05/21 19:55:25 hartman Exp $
+ * $Id: ffmpeg.c,v 1.39 2003/05/25 00:16:47 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -83,28 +83,17 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define DR_TEXT N_("Direct rendering")
 
-#define ERROR_RESILIENCE_LONGTEXT \
+#define ERROR_TEXT N_("Error resilience")
+#define ERROR_LONGTEXT N_( \
     "ffmpeg can make errors resiliences.          \n" \
     "Nevertheless, with buggy encoder (like ISO MPEG-4 encoder from M$) " \
     "this will produce a lot of errors.\n" \
-    "Valid range is -1 to 99 (-1 disable all errors resiliences)."
+    "Valid range is -1 to 99 (-1 disable all errors resiliences).")
 
-#define HURRY_UP_LONGTEXT \
-    "Allow the decoder to partially decode or skip frame(s) " \
-    "when there not enough time.\n It's usefull with low CPU power " \
-    "but it could produce broken pictures."
-
-#define POSTPROCESSING_Q_LONGTEXT \
-    "Quality of post processing\n"\
-    "Valid range is 0 to 6"
-
-#define POSTPROCESSING_AQ_LONGTEXT \
-    "Post processing quality is selected upon time left " \
-    "but no more than requested quality\n" \
-    "Not yet implemented !"
-
-#define WORKAROUND_BUGS_LONGTEXT \
+#define BUGS_TEXT N_("Workaround bugs")
+#define BUGS_LONGTEXT N_( \
     "Try to fix some bugs\n" \
     "1  autodetect\n" \
     "2  old msmpeg4\n" \
@@ -112,10 +101,25 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
     "8  ump4 \n" \
     "16 no padding\n" \
     "32 ac vlc" \
-    "64 Qpel chroma"
+    "64 Qpel chroma")
 
+#define HURRYUP_TEXT N_("Hurry up")
+#define HURRYUP_LONGTEXT N_( \
+    "Allow the decoder to partially decode or skip frame(s) " \
+    "when there not enough time.\n It's usefull with low CPU power " \
+    "but it could produce broken pictures.")
+
+#define TRUNC_TEXT N_("Truncated stream")
+#define TRUNC_LONGTEXT N_("truncated stream -1:auto,0:disable,:1:enable")
+
+#define PP_Q_TEXT N_("Post processing quality")
+#define PP_Q_LONGTEXT N_( \
+    "Quality of post processing\n"\
+    "Valid range is 0 to 6" )
+
+#define LIBAVCODEC_PP_TEXT N_("Ffmpeg postproc filter chains")
 /* FIXME (cut/past from ffmpeg */
-#define LIBAVCODEC_PP_LONGHELP \
+#define LIBAVCODEC_PP_LONGTEXT \
 "<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...\n" \
 "long form example:\n" \
 "vdeblock:autoq/hdeblock:autoq/linblenddeint    default,-vdeblock\n" \
@@ -150,51 +154,58 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
 "                       1. <= 2. <= 3.          larger -> stronger filtering\n" \
 "fq     forceQuant      <quantizer>             Force quantizer\n"
 
+#define FFMPEG_PP_TEXT N_( "Ffmpeg postprocessing module" )
+
+#define PP_AQ_TEXT N_("Auto-level Post processing quality")
+#define POSTPROCESSING_AQ_LONGTEXT N_( \
+    "Post processing quality is selected upon time left " \
+    "but no more than requested quality\n" \
+    "Not yet implemented !")
+
+#define FFMPEG_YV_TEXT N_("Force vertical luminance deblocking")
+#define FFMPEG_YV_LONGTEXT N_("Force vertical luminance deblocking (override other settings)")
+
+#define FFMPEG_YH_TEXT N_("Force horizontal luminance deblocking")
+#define FFMPEG_YH_LONGTEXT N_("Force horizontal luminance deblocking (override other settings)")
+
+#define FFMPEG_CV_TEXT N_("Force vertical chrominance deblocking")
+#define FFMPEG_CV_LONGTEXT N_("Force vertical chrominance deblocking (override other settings)")
+
+#define FFMPEG_CH_TEXT N_("Force horizontal chrominance deblocking")
+#define FFMPEG_CH_LONGTEXT N_("Force horizontal chrominance deblocking (override other settings)")
+
+#define FFMPEG_Y_DR_TEXT N_("Force luminance deringing")
+#define FFMPEG_Y_DR_LONGTEXT N_("Force luminance deringing (override other settings)")
+
+#define FFMPEG_C_DR_TEXT N_("Force chrominance deringing")
+#define FFMPEG_C_DR_LONGTEXT N_("Force chrominance deringing (override other settings)")
+
 vlc_module_begin();
     add_category_hint( N_("ffmpeg"), NULL, VLC_FALSE );
     set_capability( "decoder", 70 );
     set_callbacks( OpenDecoder, NULL );
     set_description( _("ffmpeg audio/video decoder((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
 
-    add_bool( "ffmpeg-dr", 0, NULL,
-              "direct rendering",
-              "direct rendering", VLC_TRUE );
-    add_integer ( "ffmpeg-error-resilience", -1, NULL,
-                  "error resilience", ERROR_RESILIENCE_LONGTEXT, VLC_TRUE );
-    add_integer ( "ffmpeg-workaround-bugs", 1, NULL,
-                  "workaround bugs", WORKAROUND_BUGS_LONGTEXT, VLC_FALSE );
-    add_bool( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT, VLC_FALSE );
-    add_integer( "ffmpeg-truncated", -1, NULL, "truncated stream", "truncated stream -1:auto,0:disable,:1:enable", VLC_FALSE );
+    add_bool( "ffmpeg-dr", 0, NULL, DR_TEXT, DR_TEXT, VLC_TRUE );
+    add_integer ( "ffmpeg-error-resilience", -1, NULL, ERROR_TEXT, ERROR_LONGTEXT, VLC_TRUE );
+    add_integer ( "ffmpeg-workaround-bugs", 1, NULL, BUGS_TEXT, BUGS_LONGTEXT, VLC_FALSE );
+    add_bool( "ffmpeg-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT, VLC_FALSE );
+    add_integer( "ffmpeg-truncated", -1, NULL, TRUNC_TEXT, TRUNC_LONGTEXT, VLC_FALSE );
+
     add_category_hint( N_("Post processing"), NULL, VLC_FALSE );
 
-    add_integer( "ffmpeg-pp-q", 0, NULL,
-                 "post processing quality", POSTPROCESSING_Q_LONGTEXT, VLC_FALSE );
+    add_integer( "ffmpeg-pp-q", 0, NULL, PP_Q_TEXT, PP_Q_LONGTEXT, VLC_FALSE );
 #ifdef LIBAVCODEC_PP
-    add_string( "ffmpeg-pp-name", "default", NULL,
-                "ffmpeg postproc filter chains", LIBAVCODEC_PP_LONGHELP, VLC_TRUE );
+    add_string( "ffmpeg-pp-name", "default", NULL, LIBAVCODEC_PP_TEXT, LIBAVCODEC_PP_LONGTEXT, VLC_TRUE );
 #else
-    add_module( "ffmpeg-pp", "postprocessing",NULL, NULL,
-                N_( "ffmpeg postprocessing module" ), NULL, VLC_FALSE );
-    add_bool( "ffmpeg-pp-auto", 0, NULL,
-              "auto-level Post processing quality", POSTPROCESSING_AQ_LONGTEXT, VLC_FALSE );
-    add_bool( "ffmpeg-db-yv", 0, NULL,
-              "force vertical luminance deblocking",
-              "force vertical luminance deblocking (override other settings)", VLC_TRUE );
-    add_bool( "ffmpeg-db-yh", 0, NULL,
-              "force horizontal luminance deblocking",
-              "force horizontal luminance deblocking (override other settings)", VLC_TRUE );
-    add_bool( "ffmpeg-db-cv", 0, NULL,
-              "force vertical chrominance deblocking",
-              "force vertical chrominance deblocking (override other settings)", VLC_TRUE );
-    add_bool( "ffmpeg-db-ch", 0, NULL,
-              "force horizontal chrominance deblocking",
-              "force horizontal chrominance deblocking (override other settings) ", VLC_TRUE );
-    add_bool( "ffmpeg-dr-y", 0, NULL,
-              "force luminance deringing",
-              "force luminance deringing (override other settings)", VLC_TRUE );
-    add_bool( "ffmpeg-dr-c", 0, NULL,
-              "force chrominance deringing",
-              "force chrominance deringing (override other settings)", VLC_TRUE );
+    add_module( "ffmpeg-pp", "postprocessing",NULL, NULL, FFMPEG_PP_TEXT, NULL, VLC_FALSE );
+    add_bool( "ffmpeg-pp-auto", 0, NULL, PP_AQ_TEXT, PP_AQ_LONGTEXT, VLC_FALSE );
+    add_bool( "ffmpeg-db-yv", 0, NULL, FFMPEG_YV_TEXT, FFMPEG_YV_LONGTEXT, VLC_TRUE );
+    add_bool( "ffmpeg-db-yh", 0, NULL, FFMPEG_YH_TEXT, FFMPEG_YH_LONGTEXT, VLC_TRUE );
+    add_bool( "ffmpeg-db-cv", 0, NULL, FFMPEG_CV_TEXT, FFMPEG_CV_LONGTEXT, VLC_TRUE );
+    add_bool( "ffmpeg-db-ch", 0, NULL, FFMPEG_CH_TEXT, FFMPEG_CH_LONGTEXT, VLC_TRUE );
+    add_bool( "ffmpeg-dr-y", 0, NULL, FFMPEG_Y_DR_TEXT, FFMPEG_Y_DR_LONGTEXT, VLC_TRUE );
+    add_bool( "ffmpeg-dr-c", 0, NULL, FFMPEG_C_DR_TEXT, FFMPEG_C_DR_LONGTEXT, VLC_TRUE );
 #endif
 
     /* chroma conversion submodule */
