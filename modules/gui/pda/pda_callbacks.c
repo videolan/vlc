@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.14 2003/11/18 20:36:40 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.15 2003/11/21 09:23:49 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -51,7 +51,7 @@
 
 #define VLC_MAX_MRL     256
 
-static char *get_file_stat(const char *path, off_t *size);
+static char *get_file_perms(struct stat st);
 
 /*****************************************************************************
  * Useful function to retrieve p_intf
@@ -174,8 +174,11 @@ void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
  ****************************************************************/
 void ReadDirectory(intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir )
 {
-    GtkTreeIter iter;
+    GtkTreeIter    iter;
     struct dirent **namelist;
+    struct passwd *pw;
+    struct group  *grp;
+    struct stat    st;
     int n=-1, status=-1;
 
     msg_Dbg(p_intf, "Changing to dir %s", psz_dir);
@@ -192,45 +195,55 @@ void ReadDirectory(intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir )
     else
     {
         int i;
-        off_t  size;
         gchar *ppsz_text[4];
 
-        /* XXX : kludge temporaire pour yopy */
-        ppsz_text[0] = "..";
-        ppsz_text[1] = get_file_stat("..", &size);
-        ppsz_text[2] = "?";
-        ppsz_text[3] = "?";        
-
-        /* Add a new row to the model */
-        gtk_list_store_append (p_list, &iter);
-        gtk_list_store_set (p_list, &iter,
-                            0, ppsz_text[0],
-                            1, ppsz_text[1],
-                            2, size,
-                            3, ppsz_text[2],
-                            4, ppsz_text[3],
-                            -1);
-
-        if (ppsz_text[1]) free(ppsz_text[1]);
-
-        /* kludge */
-        for (i=0; i<n; i++)
+        if (lstat("..", &st)==0)
         {
-            if (namelist[i]->d_name[0] != '.')
+            /* user, group  */
+            pw  = getpwuid(st.st_uid);
+            grp = getgrgid(st.st_gid);
+
+            /* XXX : kludge temporaire pour yopy */
+            ppsz_text[0] = "..";
+            ppsz_text[1] = get_file_perms(st);
+            ppsz_text[2] = pw->pw_name;
+            ppsz_text[3] = grp->gr_name;
+
+            /* Add a new row to the model */
+            gtk_list_store_append (p_list, &iter);
+            gtk_list_store_set (p_list, &iter,
+                                0, ppsz_text[0],
+                                1, ppsz_text[1],
+                                2, st.st_size,
+                                3, ppsz_text[2],
+                                4, ppsz_text[3],
+                                -1);
+
+            if (ppsz_text[1]) free(ppsz_text[1]);
+        }
+            /* kludge */
+        for (i=0; i<n; i++)
+        {           
+            if ((namelist[i]->d_name[0] != '.') &&
+                (lstat(namelist[i]->d_name, &st)==0))
             {
+                /* user, group  */
+                pw  = getpwuid(st.st_uid);
+                grp = getgrgid(st.st_gid);
+
                 /* This is a list of strings. */
                 ppsz_text[0] = namelist[i]->d_name;
-                ppsz_text[1] = get_file_stat(namelist[i]->d_name, &size);
-                ppsz_text[2] = "?";
-                ppsz_text[3] = "?";
-#if 1
-                msg_Dbg(p_intf, "(%d) file: %s permission: %s user: %s group: %s size: %ull", i, ppsz_text[0], ppsz_text[1], ppsz_text[2], ppsz_text[3], (unsigned long long) size );
+                ppsz_text[1] = get_file_perms(st);
+                ppsz_text[2] = pw->pw_name;
+                ppsz_text[3] = grp->gr_name;
+#if 0
+                msg_Dbg(p_intf, "(%d) file: %s permission: %s user: %s group: %s", i, ppsz_text[0], ppsz_text[1], ppsz_text[2], ppsz_text[3] );
 #endif
                 gtk_list_store_append (p_list, &iter);
                 gtk_list_store_set (p_list, &iter,
                                     0, ppsz_text[0],
                                     1, ppsz_text[1],
-                                    2, size,
+                                    2, st.st_size,
                                     3, ppsz_text[2],
                                     4, ppsz_text[3],
                                     -1);
@@ -242,98 +255,75 @@ void ReadDirectory(intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir )
     }
 }
 
-static char *get_file_stat(const char *path, off_t *size)
+static char *get_file_perms(const struct stat st)
 {
-    struct passwd *pw  = NULL;
-    struct group  *grp = NULL;
-    struct stat    st;
     char  *perm;
-    int    ret = -1;
 
     perm = (char *) malloc(sizeof(char)*10);
     strncpy( perm, "----------", sizeof("----------"));
-    if (lstat(path, &st)==0)
+
+    /* determine permission modes */
+    if (S_ISLNK(st.st_mode))
+        perm[0]= 'l';
+    else if (S_ISDIR(st.st_mode))
+        perm[0]= 'd';
+    else if (S_ISCHR(st.st_mode))
+        perm[0]= 'c';
+    else if (S_ISBLK(st.st_mode))
+        perm[0]= 'b';
+    else if (S_ISFIFO(st.st_mode))
+        perm[0]= 'f';
+    else if (S_ISSOCK(st.st_mode))
+        perm[0]= 's';
+    else if (S_ISREG(st.st_mode))
+        perm[0]= '-';
+    else /* Unknown type is an error */
+        perm[0]= '?';
+    /* Get file permissions */
+    /* User */
+    if (st.st_mode & S_IRUSR)
+        perm[1]= 'r';
+    if (st.st_mode & S_IWUSR)
+        perm[2]= 'w';
+    if (st.st_mode & S_IXUSR)
     {
-        /* determine permission modes */
-        if (S_ISLNK(st.st_mode))
-            perm[0]= 'l';
-        else if (S_ISDIR(st.st_mode))
-            perm[0]= 'd';
-        else if (S_ISCHR(st.st_mode))
-            perm[0]= 'c';
-        else if (S_ISBLK(st.st_mode))
-            perm[0]= 'b';
-        else if (S_ISFIFO(st.st_mode))
-            perm[0]= 'f';
-        else if (S_ISSOCK(st.st_mode))
-            perm[0]= 's';
-        else if (S_ISREG(st.st_mode))
-            perm[0]= '-';
-        else /* Unknown type is an error */
-            perm[0]= '?';
-        /* Get file permissions */
-        /* User */
-        if (st.st_mode & S_IRUSR)
-            perm[1]= 'r';
-        if (st.st_mode & S_IWUSR)
-            perm[2]= 'w';
-        if (st.st_mode & S_IXUSR)
-        {
-            if (st.st_mode & S_ISUID)
-                perm[3] = 's';
-            else
-                perm[3]= 'x';
-        }
-        else if (st.st_mode & S_ISUID)
-            perm[3] = 'S';
-        /* Group */
-        if (st.st_mode & S_IRGRP)
-            perm[4]= 'r';
-        if (st.st_mode & S_IWGRP)
-            perm[5]= 'w';
-        if (st.st_mode & S_IXGRP)
-        {
-            if (st.st_mode & S_ISGID)
-                perm[6] = 's';
-            else
-                perm[6]= 'x';
-        }
-        else if (st.st_mode & S_ISGID)
-            perm[6] = 'S';
-        /* Other */
-        if (st.st_mode & S_IROTH)
-            perm[7]= 'r';
-        if (st.st_mode & S_IWOTH)
-            perm[8]= 'w';
-        if (st.st_mode & S_IXOTH)
-        {
-            // 'sticky' bit
-            if (st.st_mode &S_ISVTX)
-                perm[9] = 't';
-            else
-                perm[9]= 'x';
-        }
-        else if (st.st_mode &S_ISVTX)
-            perm[9]= 'T';
-
-#if 0
-        *permission = perm;
-
-        /* user, group, filesize */
-        pw  = getpwuid(st.st_uid);
-        grp = getgrgid(st.st_gid);
-        if (NULL == pw)
-            return -1;
-        *uid = (char*) malloc( sizeof(char) * strlen(pw->pw_name) );
-        strcpy(path[2],pw->pw_name);
-        if (NULL == grp)
-            return -1;
-        *gid = (char*) malloc( sizeof(char) * strlen(grp->gr_name) );
-        strcpy(path[3], grp->gr_name);
-#endif
-        *size = st.st_size;
-        ret = 0;
+        if (st.st_mode & S_ISUID)
+            perm[3] = 's';
+        else
+            perm[3]= 'x';
     }
+    else if (st.st_mode & S_ISUID)
+        perm[3] = 'S';
+    /* Group */
+    if (st.st_mode & S_IRGRP)
+        perm[4]= 'r';
+    if (st.st_mode & S_IWGRP)
+        perm[5]= 'w';
+    if (st.st_mode & S_IXGRP)
+    {
+        if (st.st_mode & S_ISGID)
+            perm[6] = 's';
+        else
+            perm[6]= 'x';
+    }
+    else if (st.st_mode & S_ISGID)
+        perm[6] = 'S';
+    /* Other */
+    if (st.st_mode & S_IROTH)
+        perm[7]= 'r';
+    if (st.st_mode & S_IWOTH)
+        perm[8]= 'w';
+    if (st.st_mode & S_IXOTH)
+    {
+        // 'sticky' bit
+        if (st.st_mode &S_ISVTX)
+            perm[9] = 't';
+        else
+            perm[9]= 'x';
+    }
+    else if (st.st_mode &S_ISVTX)
+        perm[9]= 'T';
+
     return perm;
 }
 

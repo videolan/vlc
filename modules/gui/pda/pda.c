@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.9 2003/11/18 20:36:40 jpsaman Exp $
+ * $Id: pda.c,v 1.10 2003/11/21 09:23:49 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -177,6 +177,12 @@ static void Run( intf_thread_t *p_intf )
         msg_Err( p_intf, "unable to create pda interface" );
     }
 
+    /* Store p_intf to keep an eye on it */
+    msg_Dbg( p_intf, "trying to store p_intf pointer ... " );
+    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
+                         "p_intf", p_intf );
+    msg_Dbg( p_intf, "trying to store p_intf pointer ... done" );
+
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
                           VOUT_TITLE " (PDA Linux interface)");
@@ -302,12 +308,6 @@ static void Run( intf_thread_t *p_intf )
     gtk_tree_view_set_headers_clickable(p_intf->p_sys->p_tvplaylist, TRUE);
     /* END OF PLAYLIST GTK_TREE_VIEW */
 
-    /* Store p_intf to keep an eye on it */
-    msg_Dbg( p_intf, "trying to store p_intf pointer ... " );
-    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
-                         "p_intf", p_intf );
-    msg_Dbg( p_intf, "trying to store p_intf pointer ... done" );
-    
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
 
