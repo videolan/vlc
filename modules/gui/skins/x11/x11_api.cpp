@@ -2,7 +2,7 @@
  * x11_api.cpp: Various x11-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_api.cpp,v 1.5 2003/06/01 22:11:24 asmax Exp $
+ * $Id: x11_api.cpp,v 1.6 2003/06/04 17:44:57 gbazin Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -37,30 +37,30 @@
 #include "../os_api.h"
 #include "../src/event.h"       // for MAX_PARAM_SIZE
 
+#include <sys/types.h>
+#include <sys/stat.h>                                               // stat()
+#include <sys/time.h>                                       // gettimeofday()
+#include <dirent.h>                                  // opendir() and friends
+
 extern intf_thread_t *g_pIntf;  // ugly, but it's not my fault ;)
 
 //---------------------------------------------------------------------------
 // Event API
 //---------------------------------------------------------------------------
-void OSAPI_SendMessage( SkinWindow *win, unsigned int message, unsigned int param1,
-                        long param2 )
+void OSAPI_SendMessage( SkinWindow *win, unsigned int message,
+                        unsigned int param1, long param2 )
 {
-/*    if( win == NULL )
-        SendMessage( NULL, message, param1, param2 );
-    else
-        SendMessage( ( (Win32Window *)win )->GetHandle(), message, param1,
-                     param2 );*/
 }
 //---------------------------------------------------------------------------
-void OSAPI_PostMessage( SkinWindow *win, unsigned int message, unsigned int param1,
-                        long param2 )
+void OSAPI_PostMessage( SkinWindow *win, unsigned int message,
+			unsigned int param1, long param2 )
 {
     XEvent event;
 
     event.type = ClientMessage;
     event.xclient.display = g_pIntf->p_sys->display;
     event.xclient.send_event = 0;
-    event.xclient.message_type = NULL;
+    event.xclient.message_type = 0;
     event.xclient.format = 32;
     event.xclient.data.l[0] = message;
     event.xclient.data.l[1] = param1;
@@ -90,19 +90,7 @@ void OSAPI_PostMessage( SkinWindow *win, unsigned int message, unsigned int para
 //---------------------------------------------------------------------------
 int OSAPI_GetNonTransparentColor( int c )
 {
-/*    // Get desktop device context
-    HDC DeskDC = GetWindowDC( GetDesktopWindow() );
-
-    // If color is black or color is same as black wether pixel color depth
-    if( c == 0 || SetPixel( DeskDC, 0, 0, c ) == 0 )
-    {
-        if( GetDeviceCaps( DeskDC, BITSPIXEL ) < 24 )
-            c = RGB(8, 0, 0);
-        else
-            c = RGB(1, 0, 0);
-    }
-    ReleaseDC( GetDesktopWindow(), DeskDC );
-    return c;*/
+    return 0;
 }
 //---------------------------------------------------------------------------
 
@@ -114,9 +102,9 @@ int OSAPI_GetNonTransparentColor( int c )
 //---------------------------------------------------------------------------
 int OSAPI_GetTime()
 {
-/*    GTimeVal time;
-    g_get_current_time( &time );
-    return ( time.tv_sec * 1000 + time.tv_usec / 1000 );*/
+    struct timeval time;
+    gettimeofday( &time, NULL );
+    return( time.tv_sec * 1000 + time.tv_usec / 1000 );
 }
 //---------------------------------------------------------------------------
 void OSAPI_GetScreenSize( int &w, int &h )
@@ -150,41 +138,45 @@ string OSAPI_GetWindowTitle( SkinWindow *win )
 //---------------------------------------------------------------------------
 bool OSAPI_RmDir( string path )
 {
-/*    WIN32_FIND_DATA find;
-    string File;
-    string FindFiles = path + "\\*.*";
-    HANDLE handle    = FindFirstFile( (char *)FindFiles.c_str(), &find );
+    struct dirent *file;
+    DIR *dir;
 
-    while( handle != INVALID_HANDLE_VALUE )
+    dir = opendir( path.c_str() );
+    if( !dir ) return false;
+
+    /* Parse the directory and remove everything it contains. */
+    while( (file = readdir( dir )) )
     {
-        // If file is neither "." nor ".."
-        if( strcmp( find.cFileName, "." ) && strcmp( find.cFileName, ".." ) )
-        {
-            // Set file name
-            File = path + "\\" + (string)find.cFileName;
+        struct stat statbuf;
+        string filename;
 
-            // If file is a directory, delete it recursively
-            if( find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-            {
-                OSAPI_RmDir( File );
-            }
-            // Else, it is a file so simply delete it
-            else
-            {
-                DeleteFile( (char *)File.c_str() );
-            }
+        /* Skip "." and ".." */
+        if( !*file->d_name || *file->d_name == '.' ||
+	    (!*(file->d_name+1) && *file->d_name == '.' &&
+	     *(file->d_name+1) == '.') )
+        {
+            continue;
         }
 
-        // If no more file in directory, exit while
-        if( !FindNextFile( handle, &find ) )
-            break;
+        filename += path + "/";
+        filename += file->d_name;
+
+        if( !stat( filename.c_str(), &statbuf ) && statbuf.st_mode & S_IFDIR )
+        {
+            OSAPI_RmDir( filename );
+        }
+        else
+        {
+            unlink( filename.c_str() );
+        }
     }
 
-    // Now directory is empty so can be removed
-    FindClose( handle );
-    RemoveDirectory( (char *)path.c_str() );
+    /* Close the directory */
+    closedir( dir );
 
-    return true;*/
+    rmdir( path.c_str() );
+
+    return true;
 }
 //---------------------------------------------------------------------------
 
