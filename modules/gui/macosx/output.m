@@ -4,15 +4,16 @@
  * Copyright (C) 2002-2003 VideoLAN
  * $Id$
  *
- * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
+ * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
+ *          Benjamin Pracht <bigben AT videolan DOT org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -172,9 +173,10 @@
     [o_slp_chkbox setTitle: _NS("SLP announce")];
     [o_rtsp_chkbox setTitle: _NS("RTSP announce")];
     [o_http_chkbox setTitle:_NS("HTTP announce")];
+    [o_file_chkbox setTitle:_NS("Export SDP as file")];
 
     [o_channel_name_lbl setStringValue: _NS("Channel Name")];
-    [o_sdp_url_lbl setStringValue: _NS("SDP file address")];
+    [o_sdp_url_lbl setStringValue: _NS("SDP URL")];
 }
 
 - (IBAction)outputChanged:(id)sender;
@@ -213,6 +215,7 @@
     [o_slp_chkbox setEnabled: NO];
     [o_http_chkbox setEnabled: NO];
     [o_rtsp_chkbox setEnabled: NO];
+    [o_file_chkbox setEnabled: NO];
     [o_channel_name setEnabled: NO];
     [o_sdp_url setEnabled: NO];
     [[o_mux_selector itemAtIndex: 0] setEnabled: YES];
@@ -316,6 +319,7 @@
             [o_slp_chkbox setEnabled: NO];
             [o_rtsp_chkbox setEnabled: YES];
             [o_http_chkbox setEnabled: YES];
+            [o_file_chkbox setEnabled: YES];
             [o_channel_name setEnabled: YES];
         }
     }
@@ -333,7 +337,8 @@
 
 - (void)outputInfoChanged:(NSNotification *)o_notification
 {
-    NSString *o_mode, *o_mux, *o_mux_string, *o_announce;
+    NSString *o_mode, *o_mux, *o_mux_string;
+    NSMutableString *o_announce = [NSMutableString stringWithString:@""];
     NSMutableString *o_mrl_string = [NSMutableString stringWithString:@":sout=#"];
 
     [o_mrl_string appendString: o_transcode];
@@ -375,7 +380,6 @@
     else if( [o_mode isEqualToString: _NS("Stream")] )
     {
         o_mode = [o_stream_type titleOfSelectedItem];
-        o_announce = @"";
 
         if ( [o_mode isEqualToString: @"HTTP"] )
             o_mode = @"http";
@@ -390,18 +394,18 @@
             if( [o_sap_chkbox state] == NSOnState )
             {
                 if ( ![[o_channel_name stringValue] isEqualToString: @""] )
-                    o_announce = [NSString stringWithFormat:@",sap,name=%@", 
-                        [o_channel_name stringValue]];
+                    [o_announce appendFormat:
+                        @",sap,name=%@", [o_channel_name stringValue]];
                 else
-                    o_announce = @",sap";
+                    [o_announce appendFormat:@",sap"];
             }
             if( [o_slp_chkbox state] == NSOnState )
             {
                if ( ![[o_channel_name stringValue] isEqualToString: @""] )
-                    o_announce = [o_announce stringByAppendingFormat:@
+                    [o_announce appendFormat:@
                             "slp,name=%@",[o_channel_name stringValue]];
                 else
-                    o_announce = [o_announce stringByAppendingString: @",slp"];
+                    [o_announce appendString: @",slp"];
             }
         }
         if ( ![o_mode isEqualToString: @"RTP"] )
@@ -415,6 +419,7 @@
         else
         {
             NSString * o_stream_name;
+
             if (![[o_channel_name stringValue] isEqualToString: @""] )
             {
                 o_stream_name = [NSString stringWithFormat:@",name=%@",
@@ -427,16 +432,20 @@
 
             if ( [o_sap_chkbox state] == NSOnState )
             {
-                o_announce = @",sdp=sap";
+                [o_announce appendString: @",sdp=sap"];
             }
-            else if ([o_rtsp_chkbox state] == NSOnState )
+            if ([o_rtsp_chkbox state] == NSOnState )
             {
-                o_announce = [NSString stringWithFormat:@",sdp=\"rtsp://%@\"",[o_sdp_url stringValue]];
+                [o_announce appendFormat:@",sdp=\"rtsp://%@\"",[o_sdp_url stringValue]];
 
             }
-            else if ([o_http_chkbox state] == NSOnState )
+            if ([o_http_chkbox state] == NSOnState )
             {
-                o_announce = [NSString stringWithFormat:@",sdp=\"http://%@\"",[o_sdp_url stringValue]];
+                [o_announce appendFormat:@",sdp=\"http://%@\"",[o_sdp_url stringValue]];
+            }
+            if ([o_file_chkbox state] == NSOnState )
+            {
+                [o_announce appendFormat:@",sdp=\"file://%@\"",[o_sdp_url stringValue]];
             }
             [o_mrl_string appendFormat:
                         @"rtp{dst=\"%@\",port=%@%@%@}",[o_stream_address stringValue],
@@ -584,24 +593,32 @@
 
     if ([o_mode isEqualToString: @"RTP"])
     {
-        if ([[sender title] isEqualToString: _NS("SAP announce")])
+/*        if ([[sender title] isEqualToString: _NS("SAP announce")])
         {
             [o_rtsp_chkbox setState:NSOffState];
             [o_http_chkbox setState:NSOffState];
-        }
-        else if ([[sender title] isEqualToString:_NS("RTSP announce")])
+        }*/
+        if ([[sender title] isEqualToString:_NS("RTSP announce")])
         {
-            [o_sap_chkbox setState:NSOffState];
+//            [o_sap_chkbox setState:NSOffState];
             [o_http_chkbox setState:NSOffState];
+            [o_file_chkbox setState:NSOffState];
         }
         else if ([[sender title] isEqualToString:_NS("HTTP announce")])
         {
-            [o_sap_chkbox setState:NSOffState];
+//            [o_sap_chkbox setState:NSOffState];
             [o_rtsp_chkbox setState:NSOffState];
+            [o_file_chkbox setState:NSOffState];
+        }
+        else if ([[sender title] isEqualToString:_NS("Export SDP as file")])
+        {
+            [o_rtsp_chkbox setState:NSOffState];
+            [o_http_chkbox setState:NSOffState];
         }
 
         if ( [o_rtsp_chkbox state] == NSOnState ||
-                                    [o_http_chkbox state] == NSOnState)
+                            [o_http_chkbox state] == NSOnState ||
+                            [o_file_chkbox state] == NSOnState )
         {
             [o_sdp_url setEnabled: YES];
         }

@@ -76,6 +76,7 @@
     IBOutlet id o_sdp_url_lbl;
     IBOutlet id o_rtsp_chkbox;
     IBOutlet id o_http_chkbox;
+    IBOutlet id o_file_chkbox;
     
     NSString *o_mrl;
     NSString *o_transcode;

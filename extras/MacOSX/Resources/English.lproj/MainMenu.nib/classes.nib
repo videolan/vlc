@@ -315,6 +315,7 @@
                 "o_channel_name_lbl" = id; 
                 "o_display" = id; 
                 "o_dump_chkbox" = id; 
+                "o_file_chkbox" = id; 
                 "o_file_field" = id; 
                 "o_http_chkbox" = id; 
                 "o_method" = id; 
