@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ncurses.c,v 1.16 2002/06/01 12:32:00 sam Exp $
+ * $Id: ncurses.c,v 1.17 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -426,7 +426,7 @@ static void Eject ( intf_thread_t *p_intf )
     {
 //X        msg_Dbg( p_input, "ejecting %s", psz_device );
 
-        intf_Eject( p_intf->p_this, psz_device );
+        intf_Eject( p_intf, psz_device );
     }
 
     free(psz_device);

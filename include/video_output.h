@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.76 2002/06/01 12:31:58 sam Exp $
+ * $Id: video_output.h,v 1.77 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -163,8 +163,9 @@ struct vout_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( vout_thread_t *, vout_CreateThread,   ( vlc_object_t *, int, int, u32, int ) );
-VLC_EXPORT( void,            vout_DestroyThread,  ( vout_thread_t * ) );
+#define vout_CreateThread(a,b,c,d,e) __vout_CreateThread(CAST_TO_VLC_OBJECT(a),b,c,d,e)
+VLC_EXPORT( vout_thread_t *, __vout_CreateThread,   ( vlc_object_t *, int, int, u32, int ) );
+VLC_EXPORT( void,              vout_DestroyThread,  ( vout_thread_t * ) );
 
 vout_fifo_t *   vout_CreateFifo     ( void );
 void            vout_DestroyFifo    ( vout_fifo_t * );

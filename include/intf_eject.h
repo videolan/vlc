@@ -2,7 +2,7 @@
  * intf_eject.h: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.h,v 1.3 2002/06/01 12:31:57 sam Exp $
+ * $Id: intf_eject.h,v 1.4 2002/06/01 18:04:48 sam Exp $
  *
  * Author: Julien Blache <jb@technologeek.org>
  *
@@ -21,5 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-VLC_EXPORT( int, intf_Eject, ( vlc_object_t *, const char * ) );
+#define intf_Eject(a,b) __intf_Eject(CAST_TO_VLC_OBJECT(a),b)
+VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
 

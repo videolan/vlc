@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.27 2002/06/01 12:31:58 sam Exp $
+ * $Id: ac3_spdif.c,v 1.28 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -315,7 +315,7 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
     
     /* Creating the audio output fifo */
     p_spdif->p_aout_fifo =
-                    aout_CreateFifo( p_spdif->p_fifo->p_this, AOUT_FIFO_SPDIF,
+                    aout_CreateFifo( p_spdif->p_fifo, AOUT_FIFO_SPDIF,
                                      1, p_spdif->ac3_info.i_sample_rate,
                                      p_spdif->ac3_info.i_frame_size, NULL );
 

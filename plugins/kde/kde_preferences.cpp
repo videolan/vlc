@@ -274,5 +274,5 @@ void KPreferences::slotOk()
 void KPreferences::slotUser1()
 {
     slotApply();
-    config_SaveConfigFile( p_intf->p_this, NULL );
+    config_SaveConfigFile( p_intf, NULL );
 }

@@ -2,7 +2,7 @@
  * scope.c : Scope effect module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: scope.c,v 1.7 2002/06/01 12:31:59 sam Exp $
+ * $Id: scope.c,v 1.8 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -125,7 +125,7 @@ static int aout_Open( aout_thread_t *p_aout )
 
     /* Open video output */
     p_aout->p_sys->p_vout =
-        vout_CreateThread( p_aout->p_this, SCOPE_WIDTH, SCOPE_HEIGHT,
+        vout_CreateThread( p_aout, SCOPE_WIDTH, SCOPE_HEIGHT,
                            FOURCC_I420, SCOPE_ASPECT );
 
     if( p_aout->p_sys->p_vout == NULL )

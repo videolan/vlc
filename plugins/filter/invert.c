@@ -2,7 +2,7 @@
  * invert.c : Invert video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: invert.c,v 1.12 2002/06/01 12:31:59 sam Exp $
+ * $Id: invert.c,v 1.13 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -138,7 +138,7 @@ static int vout_Init( vout_thread_t *p_vout )
     msg_Dbg( p_vout, "spawning the real video output" );
 
     p_vout->p_sys->p_vout =
-        vout_CreateThread( p_vout->p_this,
+        vout_CreateThread( p_vout,
                            p_vout->render.i_width, p_vout->render.i_height,
                            p_vout->render.i_chroma, p_vout->render.i_aspect );
 

@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.13 2002/06/01 12:31:59 sam Exp $
+ * $Id: deinterlace.c,v 1.14 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -201,14 +201,14 @@ static int vout_Init( vout_thread_t *p_vout )
         {
         case DEINTERLACE_MODE_BOB:
             p_vout->p_sys->p_vout =
-                vout_CreateThread( p_vout->p_this,
+                vout_CreateThread( p_vout,
                        p_vout->output.i_width, p_vout->output.i_height / 2,
                        p_vout->output.i_chroma, p_vout->output.i_aspect );
             break;
 
         case DEINTERLACE_MODE_BLEND:
             p_vout->p_sys->p_vout =
-                vout_CreateThread( p_vout->p_this,
+                vout_CreateThread( p_vout,
                        p_vout->output.i_width, p_vout->output.i_height,
                        p_vout->output.i_chroma, p_vout->output.i_aspect );
             break;
@@ -217,7 +217,7 @@ static int vout_Init( vout_thread_t *p_vout )
 
     case FOURCC_I422:
         p_vout->p_sys->p_vout =
-            vout_CreateThread( p_vout->p_this,
+            vout_CreateThread( p_vout,
                        p_vout->output.i_width, p_vout->output.i_height,
                        FOURCC_I420, p_vout->output.i_aspect );
         break;

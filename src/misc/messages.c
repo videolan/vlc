@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.1 2002/06/01 12:32:01 sam Exp $
+ * $Id: messages.c,v 1.2 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,7 +59,7 @@ static char *ConvertPrintfFormatString ( const char *psz_format );
  * This functions has to be called before any call to other msg_* functions.
  * It set up the locks and the message queue if it is used.
  *****************************************************************************/
-void msg_Create( vlc_object_t *p_this )
+void __msg_Create( vlc_object_t *p_this )
 {
     /* Message queue initialization */
     vlc_mutex_init( p_this, &p_this->p_vlc->msg_bank.lock );
@@ -77,7 +77,7 @@ void msg_Create( vlc_object_t *p_this )
  * resources allocated by msg_Create.
  * No other messages interface functions should be called after this one.
  *****************************************************************************/
-void msg_Destroy( vlc_object_t *p_this )
+void __msg_Destroy( vlc_object_t *p_this )
 {
     /* Destroy lock */
     vlc_mutex_destroy( &p_this->p_vlc->msg_bank.lock );
@@ -94,7 +94,7 @@ void msg_Destroy( vlc_object_t *p_this )
 /*****************************************************************************
  * msg_Subscribe: subscribe to the message queue.
  *****************************************************************************/
-msg_subscription_t *msg_Subscribe( vlc_object_t *p_this )
+msg_subscription_t *__msg_Subscribe( vlc_object_t *p_this )
 {
     msg_subscription_t *p_sub = malloc( sizeof( msg_subscription_t ) );
 
@@ -121,7 +121,7 @@ msg_subscription_t *msg_Subscribe( vlc_object_t *p_this )
 /*****************************************************************************
  * msg_Unsubscribe: unsubscribe from the message queue.
  *****************************************************************************/
-void msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
+void __msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
 {
     int i_index;
 

@@ -555,7 +555,7 @@ void __fastcall TMainFrameDlg::ButtonGoClick( TObject *Sender )
         p_intf->pf_manage( p_intf );
     }
 
-    network_ChannelJoin( p_intf->p_this, i_channel );
+    network_ChannelJoin( p_intf, i_channel );
 
     /* FIXME 2 */
     p_intf->p_vlc->p_playlist->b_stopped = 0;

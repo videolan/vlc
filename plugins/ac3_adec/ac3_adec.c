@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.32 2002/06/01 12:31:58 sam Exp $
+ * $Id: ac3_adec.c,v 1.33 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -185,7 +185,7 @@ static int decoder_Run ( decoder_fifo_t * p_fifo )
         /* Creating the audio output fifo if not created yet */
         if (p_ac3dec->p_aout_fifo == NULL ) {
             p_ac3dec->p_aout_fifo =
-                aout_CreateFifo( p_ac3dec->p_fifo->p_this, AOUT_FIFO_PCM, 2,
+                aout_CreateFifo( p_ac3dec->p_fifo, AOUT_FIFO_PCM, 2,
                          sync_info.sample_rate, AC3DEC_FRAME_SIZE, NULL  );
             if ( p_ac3dec->p_aout_fifo == NULL )
             {

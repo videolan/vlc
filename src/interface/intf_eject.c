@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.14 2002/06/01 16:45:35 sam Exp $
+ * $Id: intf_eject.c,v 1.15 2002/06/01 18:04:49 sam Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -107,7 +107,7 @@ static int EjectSCSI ( int i_fd );
  * returns 1 on failure
  * returns -1 if not implemented
  *****************************************************************************/
-int intf_Eject( vlc_object_t *p_this, const char *psz_device )
+int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
 {
     int i_ret;
 

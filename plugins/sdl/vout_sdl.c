@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.92 2002/06/01 12:32:00 sam Exp $
+ * $Id: vout_sdl.c,v 1.93 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -451,16 +451,16 @@ static int vout_Manage( vout_thread_t *p_vout )
                 input_Seek( p_vout, -60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
 
-            case SDLK_F10: network_ChannelJoin( p_vout->p_this, 0 ); break;
-            case SDLK_F1:  network_ChannelJoin( p_vout->p_this, 1 ); break;
-            case SDLK_F2:  network_ChannelJoin( p_vout->p_this, 2 ); break;
-            case SDLK_F3:  network_ChannelJoin( p_vout->p_this, 3 ); break;
-            case SDLK_F4:  network_ChannelJoin( p_vout->p_this, 4 ); break;
-            case SDLK_F5:  network_ChannelJoin( p_vout->p_this, 5 ); break;
-            case SDLK_F6:  network_ChannelJoin( p_vout->p_this, 6 ); break;
-            case SDLK_F7:  network_ChannelJoin( p_vout->p_this, 7 ); break;
-            case SDLK_F8:  network_ChannelJoin( p_vout->p_this, 8 ); break;
-            case SDLK_F9:  network_ChannelJoin( p_vout->p_this, 9 ); break;
+            case SDLK_F10: network_ChannelJoin( p_vout, 0 ); break;
+            case SDLK_F1:  network_ChannelJoin( p_vout, 1 ); break;
+            case SDLK_F2:  network_ChannelJoin( p_vout, 2 ); break;
+            case SDLK_F3:  network_ChannelJoin( p_vout, 3 ); break;
+            case SDLK_F4:  network_ChannelJoin( p_vout, 4 ); break;
+            case SDLK_F5:  network_ChannelJoin( p_vout, 5 ); break;
+            case SDLK_F6:  network_ChannelJoin( p_vout, 6 ); break;
+            case SDLK_F7:  network_ChannelJoin( p_vout, 7 ); break;
+            case SDLK_F8:  network_ChannelJoin( p_vout, 8 ); break;
+            case SDLK_F9:  network_ChannelJoin( p_vout, 9 ); break;
 
             default:
                 break;

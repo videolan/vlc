@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.94 2002/06/01 12:32:01 sam Exp $
+ * $Id: interface.c,v 1.95 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -55,7 +55,7 @@ static void Manager( intf_thread_t *p_intf );
  * This function opens output devices and creates specific interfaces. It sends
  * its own error messages.
  *****************************************************************************/
-intf_thread_t* intf_Create( vlc_object_t *p_this )
+intf_thread_t* __intf_Create( vlc_object_t *p_this )
 {
     intf_thread_t * p_intf;
     char *psz_name;

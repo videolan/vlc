@@ -2,7 +2,7 @@
 
 struct module_symbols_s
 {
-    aout_fifo_t * (* aout_CreateFifo_inner) ( vlc_object_t *, int, int, int, int, void * ) ;
+    aout_fifo_t * (* __aout_CreateFifo_inner) ( vlc_object_t *, int, int, int, int, void * ) ;
     void (* aout_DestroyFifo_inner) ( aout_fifo_t *p_fifo ) ;
     int (* __config_GetInt_inner) (vlc_object_t *, const char *) ;
     void (* __config_PutInt_inner) (vlc_object_t *, const char *, int) ;
@@ -10,10 +10,10 @@ struct module_symbols_s
     void (* __config_PutFloat_inner) (vlc_object_t *, const char *, float) ;
     char * (* __config_GetPsz_inner) (vlc_object_t *, const char *) ;
     void (* __config_PutPsz_inner) (vlc_object_t *, const char *, char *) ;
-    int (* config_LoadCmdLine_inner) ( vlc_object_t *, int *, char *[], vlc_bool_t ) ;
+    int (* __config_LoadCmdLine_inner) ( vlc_object_t *, int *, char *[], vlc_bool_t ) ;
     char * (* config_GetHomeDir_inner) ( void ) ;
-    int (* config_LoadConfigFile_inner) ( vlc_object_t *, const char * ) ;
-    int (* config_SaveConfigFile_inner) ( vlc_object_t *, const char * ) ;
+    int (* __config_LoadConfigFile_inner) ( vlc_object_t *, const char * ) ;
+    int (* __config_SaveConfigFile_inner) ( vlc_object_t *, const char * ) ;
     module_config_t * (* config_FindConfig_inner) ( vlc_object_t *, const char *psz_name ) ;
     void (* config_Duplicate_inner) ( module_t *, module_config_t * ) ;
     void (* config_SetCallbacks_inner) ( module_config_t *, module_config_t * ) ;
@@ -52,7 +52,6 @@ struct module_symbols_s
     int (* input_ClockManageControl_inner) ( input_thread_t *, pgrm_descriptor_t *, mtime_t ) ;
     void (* input_ClockManageRef_inner) ( input_thread_t *, pgrm_descriptor_t *, mtime_t ) ;
     mtime_t (* input_ClockGetTS_inner) ( input_thread_t *, pgrm_descriptor_t *, mtime_t ) ;
-    void * (* input_BuffersInit_inner) ( vlc_object_t * ) ;
     void (* input_BuffersEnd_inner) ( input_thread_t *, input_buffers_t * ) ;
     data_buffer_t * (* input_NewBuffer_inner) ( input_buffers_t *, size_t ) ;
     void (* input_ReleaseBuffer_inner) ( input_buffers_t *, data_buffer_t * ) ;
@@ -79,9 +78,7 @@ struct module_symbols_s
     ssize_t (* input_FDRead_inner) ( input_thread_t *, byte_t *, size_t ) ;
     ssize_t (* input_FDNetworkRead_inner) ( input_thread_t *, byte_t *, size_t ) ;
     void (* input_FDSeek_inner) ( input_thread_t *, off_t ) ;
-    msg_subscription_t* (* msg_Subscribe_inner) ( vlc_object_t * ) ;
-    void (* msg_Unsubscribe_inner) ( vlc_object_t *, msg_subscription_t * ) ;
-    int (* intf_Eject_inner) ( vlc_object_t *, const char * ) ;
+    int (* __intf_Eject_inner) ( vlc_object_t *, const char * ) ;
     const iso639_lang_t * (* GetLang_1_inner) ( const char * ) ;
     const iso639_lang_t * (* GetLang_2T_inner) ( const char * ) ;
     const iso639_lang_t * (* GetLang_2B_inner) ( const char * ) ;
@@ -92,10 +89,10 @@ struct module_symbols_s
     mtime_t (* mdate_inner) ( void ) ;
     void (* mwait_inner) ( mtime_t date ) ;
     void (* msleep_inner) ( mtime_t delay ) ;
-    int (* network_ChannelJoin_inner) ( vlc_object_t *, int ) ;
-    int (* network_ChannelCreate_inner) ( vlc_object_t * ) ;
+    int (* __network_ChannelJoin_inner) ( vlc_object_t *, int ) ;
+    int (* __network_ChannelCreate_inner) ( vlc_object_t * ) ;
     void (* playlist_Command_inner) ( playlist_t *, int, int ) ;
-    int (* playlist_Add_inner) ( vlc_object_t *, int, const char * ) ;
+    int (* __playlist_Add_inner) ( vlc_object_t *, int, const char * ) ;
     int (* playlist_Delete_inner) ( playlist_t *, int ) ;
     int (* __vlc_threads_init_inner) ( vlc_object_t * ) ;
     int (* vlc_threads_end_inner) ( void ) ;
@@ -106,7 +103,7 @@ struct module_symbols_s
     int (* __vlc_thread_create_inner) ( vlc_object_t *, char *, int, char *, void * ( * ) ( void * ), vlc_bool_t ) ;
     void (* __vlc_thread_ready_inner) ( vlc_object_t * ) ;
     void (* __vlc_thread_join_inner) ( vlc_object_t *, char *, int ) ;
-    vout_thread_t * (* vout_CreateThread_inner) ( vlc_object_t *, int, int, u32, int ) ;
+    vout_thread_t * (* __vout_CreateThread_inner) ( vlc_object_t *, int, int, u32, int ) ;
     void (* vout_DestroyThread_inner) ( vout_thread_t * ) ;
     int (* vout_ChromaCmp_inner) ( u32, u32 ) ;
     picture_t * (* vout_CreatePicture_inner) ( vout_thread_t *, vlc_bool_t, vlc_bool_t, vlc_bool_t ) ;
@@ -125,6 +122,8 @@ struct module_symbols_s
     void (* __msg_Err_inner) ( void *, const char *, ... ) ;
     void (* __msg_Warn_inner) ( void *, const char *, ... ) ;
     void (* __msg_Dbg_inner) ( void *, const char *, ... ) ;
+    msg_subscription_t* (* __msg_Subscribe_inner) ( vlc_object_t * ) ;
+    void (* __msg_Unsubscribe_inner) ( vlc_object_t *, msg_subscription_t * ) ;
     void * (* __vlc_object_create_inner) ( vlc_object_t *, int ) ;
     void (* __vlc_object_destroy_inner) ( vlc_object_t * ) ;
     void * (* __vlc_object_find_inner) ( vlc_object_t *, int, int ) ;
@@ -137,7 +136,7 @@ struct module_symbols_s
 };
 
 #ifdef __PLUGIN__
-#   define aout_CreateFifo p_symbols->aout_CreateFifo_inner
+#   define __aout_CreateFifo p_symbols->__aout_CreateFifo_inner
 #   define aout_DestroyFifo p_symbols->aout_DestroyFifo_inner
 #   define __config_GetInt p_symbols->__config_GetInt_inner
 #   define __config_PutInt p_symbols->__config_PutInt_inner
@@ -145,10 +144,10 @@ struct module_symbols_s
 #   define __config_PutFloat p_symbols->__config_PutFloat_inner
 #   define __config_GetPsz p_symbols->__config_GetPsz_inner
 #   define __config_PutPsz p_symbols->__config_PutPsz_inner
-#   define config_LoadCmdLine p_symbols->config_LoadCmdLine_inner
+#   define __config_LoadCmdLine p_symbols->__config_LoadCmdLine_inner
 #   define config_GetHomeDir p_symbols->config_GetHomeDir_inner
-#   define config_LoadConfigFile p_symbols->config_LoadConfigFile_inner
-#   define config_SaveConfigFile p_symbols->config_SaveConfigFile_inner
+#   define __config_LoadConfigFile p_symbols->__config_LoadConfigFile_inner
+#   define __config_SaveConfigFile p_symbols->__config_SaveConfigFile_inner
 #   define config_FindConfig p_symbols->config_FindConfig_inner
 #   define config_Duplicate p_symbols->config_Duplicate_inner
 #   define config_SetCallbacks p_symbols->config_SetCallbacks_inner
@@ -187,7 +186,6 @@ struct module_symbols_s
 #   define input_ClockManageControl p_symbols->input_ClockManageControl_inner
 #   define input_ClockManageRef p_symbols->input_ClockManageRef_inner
 #   define input_ClockGetTS p_symbols->input_ClockGetTS_inner
-#   define input_BuffersInit p_symbols->input_BuffersInit_inner
 #   define input_BuffersEnd p_symbols->input_BuffersEnd_inner
 #   define input_NewBuffer p_symbols->input_NewBuffer_inner
 #   define input_ReleaseBuffer p_symbols->input_ReleaseBuffer_inner
@@ -214,9 +212,7 @@ struct module_symbols_s
 #   define input_FDRead p_symbols->input_FDRead_inner
 #   define input_FDNetworkRead p_symbols->input_FDNetworkRead_inner
 #   define input_FDSeek p_symbols->input_FDSeek_inner
-#   define msg_Subscribe p_symbols->msg_Subscribe_inner
-#   define msg_Unsubscribe p_symbols->msg_Unsubscribe_inner
-#   define intf_Eject p_symbols->intf_Eject_inner
+#   define __intf_Eject p_symbols->__intf_Eject_inner
 #   define GetLang_1 p_symbols->GetLang_1_inner
 #   define GetLang_2T p_symbols->GetLang_2T_inner
 #   define GetLang_2B p_symbols->GetLang_2B_inner
@@ -227,10 +223,10 @@ struct module_symbols_s
 #   define mdate p_symbols->mdate_inner
 #   define mwait p_symbols->mwait_inner
 #   define msleep p_symbols->msleep_inner
-#   define network_ChannelJoin p_symbols->network_ChannelJoin_inner
-#   define network_ChannelCreate p_symbols->network_ChannelCreate_inner
+#   define __network_ChannelJoin p_symbols->__network_ChannelJoin_inner
+#   define __network_ChannelCreate p_symbols->__network_ChannelCreate_inner
 #   define playlist_Command p_symbols->playlist_Command_inner
-#   define playlist_Add p_symbols->playlist_Add_inner
+#   define __playlist_Add p_symbols->__playlist_Add_inner
 #   define playlist_Delete p_symbols->playlist_Delete_inner
 #   define __vlc_threads_init p_symbols->__vlc_threads_init_inner
 #   define vlc_threads_end p_symbols->vlc_threads_end_inner
@@ -241,7 +237,7 @@ struct module_symbols_s
 #   define __vlc_thread_create p_symbols->__vlc_thread_create_inner
 #   define __vlc_thread_ready p_symbols->__vlc_thread_ready_inner
 #   define __vlc_thread_join p_symbols->__vlc_thread_join_inner
-#   define vout_CreateThread p_symbols->vout_CreateThread_inner
+#   define __vout_CreateThread p_symbols->__vout_CreateThread_inner
 #   define vout_DestroyThread p_symbols->vout_DestroyThread_inner
 #   define vout_ChromaCmp p_symbols->vout_ChromaCmp_inner
 #   define vout_CreatePicture p_symbols->vout_CreatePicture_inner
@@ -260,6 +256,8 @@ struct module_symbols_s
 #   define __msg_Err p_symbols->__msg_Err_inner
 #   define __msg_Warn p_symbols->__msg_Warn_inner
 #   define __msg_Dbg p_symbols->__msg_Dbg_inner
+#   define __msg_Subscribe p_symbols->__msg_Subscribe_inner
+#   define __msg_Unsubscribe p_symbols->__msg_Unsubscribe_inner
 #   define __vlc_object_create p_symbols->__vlc_object_create_inner
 #   define __vlc_object_destroy p_symbols->__vlc_object_destroy_inner
 #   define __vlc_object_find p_symbols->__vlc_object_find_inner

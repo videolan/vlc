@@ -2,7 +2,7 @@
  * logger.c : file logging plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: logger.c,v 1.10 2002/06/01 12:32:00 sam Exp $
+ * $Id: logger.c,v 1.11 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -182,13 +182,13 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys->p_file = fopen( psz_file, "wt" );
     setvbuf( p_intf->p_sys->p_file, NULL, _IONBF, 0 );
 
-    p_intf->p_sys->p_sub = msg_Subscribe( p_intf->p_this );
+    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
     if( p_intf->p_sys->p_file == NULL )
     {
         msg_Err( p_intf, "error opening logfile `%s'", psz_file );
         free( p_intf->p_sys );
-        msg_Unsubscribe( p_intf->p_this, p_intf->p_sys->p_sub );
+        msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
         free( psz_file );
         return -1;
     }
@@ -217,7 +217,7 @@ static void intf_Close( intf_thread_t *p_intf )
     /* Flush the queue and unsubscribe from the message queue */
     FlushQueue( p_intf->p_sys->p_sub, p_intf->p_sys->p_file,
                 p_intf->p_sys->i_mode );
-    msg_Unsubscribe( p_intf->p_this, p_intf->p_sys->p_sub );
+    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     switch( p_intf->p_sys->i_mode )
     {

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.11 2002/06/01 12:31:59 sam Exp $
+ * $Id: ffmpeg.c,v 1.12 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -376,7 +376,7 @@ static int InitThread( videodec_thread_t *p_vdec )
     }
 
     /* create vout */
-    p_vdec->p_vout = vout_CreateThread( p_vdec->p_fifo->p_this,
+    p_vdec->p_vout = vout_CreateThread( p_vdec->p_fifo,
                                 p_vdec->format.i_width,
                                 p_vdec->format.i_height,
                                 FOURCC_I420,

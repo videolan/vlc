@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.11 2002/06/01 12:32:01 sam Exp $
+ * $Id: input_ext-plugins.c,v 1.12 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -126,7 +126,7 @@ struct input_buffers_s
 /*****************************************************************************
  * input_BuffersInit: initialize the cache structures, return a pointer to it
  *****************************************************************************/
-void * input_BuffersInit( vlc_object_t *p_this )
+void * __input_BuffersInit( vlc_object_t *p_this )
 {
     input_buffers_t * p_buffers = malloc( sizeof( input_buffers_t ) );
 
@@ -619,7 +619,7 @@ ssize_t input_SplitBuffer( input_thread_t * p_input,
  *****************************************************************************/
 int input_AccessInit( input_thread_t * p_input )
 {
-    p_input->p_method_data = input_BuffersInit( p_input->p_this );
+    p_input->p_method_data = input_BuffersInit( p_input );
     if( p_input->p_method_data == NULL ) return( -1 );
     p_input->p_data_buffer = NULL;
     p_input->p_current_data = NULL;

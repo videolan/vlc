@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.47 2002/06/01 12:31:57 sam Exp $
+ * $Id: audio_output.h,v 1.48 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -185,7 +185,8 @@ struct aout_thread_s
 aout_thread_t * aout_CreateThread       ( vlc_object_t *, int, int );
 void            aout_DestroyThread      ( aout_thread_t * );
 
-VLC_EXPORT( aout_fifo_t *, aout_CreateFifo,  ( vlc_object_t *, int, int, int, int, void * ) );
-VLC_EXPORT( void,          aout_DestroyFifo, ( aout_fifo_t *p_fifo ) );
-void            aout_FreeFifo           ( aout_fifo_t *p_fifo );
+#define aout_CreateFifo(a,b,c,d,e,f) __aout_CreateFifo(CAST_TO_VLC_OBJECT(a),b,c,d,e,f)
+VLC_EXPORT( aout_fifo_t *, __aout_CreateFifo,  ( vlc_object_t *, int, int, int, int, void * ) );
+VLC_EXPORT( void,            aout_DestroyFifo, ( aout_fifo_t *p_fifo ) );
+            void             aout_FreeFifo     ( aout_fifo_t *p_fifo );
 

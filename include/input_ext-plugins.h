@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.29 2002/06/01 12:31:57 sam Exp $
+ * $Id: input_ext-plugins.h,v 1.30 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -73,8 +73,10 @@ VLC_EXPORT( mtime_t, input_ClockGetTS, ( input_thread_t *, pgrm_descriptor_t *, 
 /*****************************************************************************
  * Prototypes from input_ext-plugins.h (buffers management)
  *****************************************************************************/
-VLC_EXPORT( void *, input_BuffersInit, ( vlc_object_t * ) );
-VLC_EXPORT( void, input_BuffersEnd,    ( input_thread_t *, input_buffers_t * ) );
+#define input_BuffersInit(a) __input_BuffersInit(CAST_TO_VLC_OBJECT(a))
+void * __input_BuffersInit( vlc_object_t * );
+VLC_EXPORT( void, input_BuffersEnd, ( input_thread_t *, input_buffers_t * ) );
+
 VLC_EXPORT( data_buffer_t *, input_NewBuffer,   ( input_buffers_t *, size_t ) );
 VLC_EXPORT( void, input_ReleaseBuffer,          ( input_buffers_t *, data_buffer_t * ) );
 VLC_EXPORT( data_packet_t *, input_ShareBuffer, ( input_buffers_t *, data_buffer_t * ) );

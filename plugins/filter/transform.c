@@ -2,7 +2,7 @@
  * transform.c : transform image plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: transform.c,v 1.13 2002/06/01 12:31:59 sam Exp $
+ * $Id: transform.c,v 1.14 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -200,7 +200,7 @@ static int vout_Init( vout_thread_t *p_vout )
     if( p_vout->p_sys->b_rotation )
     {
         p_vout->p_sys->p_vout =
-            vout_CreateThread( p_vout->p_this,
+            vout_CreateThread( p_vout,
                            p_vout->render.i_height, p_vout->render.i_width,
                            p_vout->render.i_chroma,
                            (u64)VOUT_ASPECT_FACTOR * (u64)VOUT_ASPECT_FACTOR
@@ -209,7 +209,7 @@ static int vout_Init( vout_thread_t *p_vout )
     else
     {
         p_vout->p_sys->p_vout =
-            vout_CreateThread( p_vout->p_this,
+            vout_CreateThread( p_vout,
                            p_vout->render.i_width, p_vout->render.i_height,
                            p_vout->render.i_chroma, p_vout->render.i_aspect );
     }

@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.1 2002/06/01 12:32:02 sam Exp $
+ * $Id: playlist.c,v 1.2 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,7 +45,7 @@ static void RunThread ( playlist_t * );
  *****************************************************************************
  * Create a playlist structure.
  *****************************************************************************/
-playlist_t * playlist_Create ( vlc_object_t *p_parent )
+playlist_t * __playlist_Create ( vlc_object_t *p_parent )
 {
     playlist_t *p_playlist;
 
@@ -99,7 +99,7 @@ void playlist_Destroy( playlist_t * p_playlist )
  * Add an item to the playlist at position i_pos. If i_pos is PLAYLIST_END,
  * add it at the end regardless of the playlist current size.
  *****************************************************************************/
-int playlist_Add( vlc_object_t *p_this, int i_pos, const char * psz_item )
+int __playlist_Add( vlc_object_t *p_this, int i_pos, const char * psz_item )
 {
     playlist_t *p_playlist;
 
@@ -109,7 +109,7 @@ int playlist_Add( vlc_object_t *p_this, int i_pos, const char * psz_item )
     if( p_playlist == NULL )
     {
         msg_Dbg( p_this, "no playlist present, creating one" );
-        p_playlist = playlist_Create( p_this->p_vlc->p_this );
+        p_playlist = playlist_Create( p_this->p_vlc );
 
         if( p_playlist == NULL )
         {
@@ -240,7 +240,7 @@ static void RunThread ( playlist_t *p_playlist )
                 //p_playlist->i_mode = PLAYLIST_FORWARD +
                 //    config_GetInt( p_playlist, "loop-playlist" );
                 msg_Dbg( p_playlist, "creating new input thread" );
-                p_input = input_CreateThread( p_playlist->p_this,
+                p_input = input_CreateThread( p_playlist,
                             p_playlist->pp_items[p_playlist->i_index], NULL );
                 if( p_input != NULL )
                 {

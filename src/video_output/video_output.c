@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.181 2002/06/01 12:32:02 sam Exp $
+ * $Id: video_output.c,v 1.182 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -61,7 +61,7 @@ static void     InitWindowSize    ( vout_thread_t *, int *, int * );
  * This function creates a new video output thread, and returns a pointer
  * to its description. On error, it returns NULL.
  *****************************************************************************/
-vout_thread_t * vout_CreateThread   ( vlc_object_t *p_parent,
+vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
                                       int i_width, int i_height,
                                       u32 i_chroma, int i_aspect )
 {

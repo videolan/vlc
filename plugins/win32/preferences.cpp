@@ -529,7 +529,7 @@ void __fastcall TPreferencesDlg::ButtonApplyClick( TObject *Sender )
 void __fastcall TPreferencesDlg::ButtonSaveClick( TObject *Sender )
 {
     ButtonApplyClick( Sender );
-    config_SaveConfigFile( p_intfGlobal->p_this, NULL );
+    config_SaveConfigFile( p_intfGlobal, NULL );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPreferencesDlg::ButtonCancelClick( TObject *Sender )

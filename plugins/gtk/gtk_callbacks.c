@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.40 2002/06/01 12:31:59 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.41 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -319,7 +319,7 @@ void GtkChannelGo( GtkButton * button, gpointer user_data )
 #endif
     }
 
-    network_ChannelJoin( p_intf->p_this, i_channel );
+    network_ChannelJoin( p_intf, i_channel );
 
     /* FIXME 2 */
 #if 0 /* PLAYLIST TARASS */
@@ -536,7 +536,7 @@ gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
     {
         msg_Dbg( p_intf, "ejecting %s", psz_device );
 
-        intf_Eject( p_intf->p_this, psz_device );
+        intf_Eject( p_intf, psz_device );
     }
 
     free(psz_device);

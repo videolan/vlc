@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.67 2002/06/01 12:32:01 sam Exp $
+ * $Id: netutils.c,v 1.68 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -107,7 +107,7 @@ static int GetAdapterInfo  ( int i_adapter, char *psz_string );
  * once before any input thread is created or any call to other
  * input_Channel*() function is attempted.
  *****************************************************************************/
-int network_ChannelCreate( vlc_object_t *p_this )
+int __network_ChannelCreate( vlc_object_t *p_this )
 {
 #if !defined( SYS_LINUX ) && !defined( WIN32 )
     msg_Err( p_this, "VLAN-based channels are not supported "
@@ -141,7 +141,7 @@ int network_ChannelCreate( vlc_object_t *p_this )
  * should be unlocked using input_ChannelLeave().
  * Non 0 will be returned in case of error.
  *****************************************************************************/
-int network_ChannelJoin( vlc_object_t *p_this, int i_channel )
+int __network_ChannelJoin( vlc_object_t *p_this, int i_channel )
 {
 #define VLCS_VERSION 13
 #define MESSAGE_LENGTH 256

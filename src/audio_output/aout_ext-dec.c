@@ -2,7 +2,7 @@
  * aout_ext-dec.c : exported fifo management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_ext-dec.c,v 1.16 2002/06/01 12:32:01 sam Exp $
+ * $Id: aout_ext-dec.c,v 1.17 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -35,9 +35,9 @@
 /*****************************************************************************
  * aout_CreateFifo
  *****************************************************************************/
-aout_fifo_t * aout_CreateFifo( vlc_object_t *p_this, int i_format,
-                               int i_channels, int i_rate, int i_frame_size,
-                               void *p_buffer )
+aout_fifo_t * __aout_CreateFifo( vlc_object_t *p_this, int i_format,
+                                 int i_channels, int i_rate, int i_frame_size,
+                                 void *p_buffer )
 {
     aout_thread_t *p_aout;
     aout_fifo_t   *p_fifo = NULL;

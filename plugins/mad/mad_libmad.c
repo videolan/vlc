@@ -288,7 +288,7 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
     if (p_mad_adec->p_aout_fifo==NULL)
     {
     	p_mad_adec->p_aout_fifo = aout_CreateFifo(
-                p_mad_adec->p_fifo->p_this,
+                p_mad_adec->p_fifo,
                 AOUT_FIFO_PCM,              /* fifo type */
                 2, /*p_libmad_pcm->channels,*/     /* nr. of channels */
                 p_libmad_pcm->samplerate,   /* frame rate in Hz ?*/

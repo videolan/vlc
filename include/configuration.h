@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.12 2002/06/01 12:31:57 sam Exp $
+ * $Id: configuration.h,v 1.13 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -74,10 +74,10 @@ VLC_EXPORT( void,   __config_PutFloat, (vlc_object_t *, const char *, float) );
 VLC_EXPORT( char *, __config_GetPsz,   (vlc_object_t *, const char *) );
 VLC_EXPORT( void,   __config_PutPsz,   (vlc_object_t *, const char *, char *) );
 
-VLC_EXPORT( int,    config_LoadCmdLine,    ( vlc_object_t *, int *, char *[], vlc_bool_t ) );
-VLC_EXPORT( char *, config_GetHomeDir,     ( void ) );
-VLC_EXPORT( int,    config_LoadConfigFile, ( vlc_object_t *, const char * ) );
-VLC_EXPORT( int,    config_SaveConfigFile, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( int,    __config_LoadCmdLine,  ( vlc_object_t *, int *, char *[], vlc_bool_t ) );
+VLC_EXPORT( char *,   config_GetHomeDir,     ( void ) );
+VLC_EXPORT( int,    __config_LoadConfigFile, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( int,    __config_SaveConfigFile, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char *psz_name ) );
 
 VLC_EXPORT( void, config_Duplicate, ( module_t *, module_config_t * ) );
@@ -92,6 +92,10 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
 #define config_PutFloat(a,b,c) __config_PutFloat(CAST_TO_VLC_OBJECT(a),b,c)
 #define config_GetPsz(a,b) __config_GetPsz(CAST_TO_VLC_OBJECT(a),b)
 #define config_PutPsz(a,b,c) __config_PutPsz(CAST_TO_VLC_OBJECT(a),b,c)
+
+#define config_LoadCmdLine(a,b,c,d) __config_LoadCmdLine(CAST_TO_VLC_OBJECT(a),b,c,d)
+#define config_LoadConfigFile(a,b) __config_LoadConfigFile(CAST_TO_VLC_OBJECT(a),b)
+#define config_SaveConfigFile(a,b) __config_SaveConfigFile(CAST_TO_VLC_OBJECT(a),b)
 
 /*****************************************************************************
  * Macros used to build the configuration structure.

@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.21 2002/06/01 12:31:59 sam Exp $
+ * $Id: wall.c,v 1.22 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -271,7 +271,7 @@ static int vout_Init( vout_thread_t *p_vout )
             }
 
             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout =
-                vout_CreateThread( p_vout->p_this, i_width, i_height,
+                vout_CreateThread( p_vout, i_width, i_height,
                                    p_vout->render.i_chroma,
                                    p_vout->render.i_aspect
                                     * p_vout->render.i_height / i_height

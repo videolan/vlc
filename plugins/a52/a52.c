@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.17 2002/06/01 16:45:34 sam Exp $
+ * $Id: a52.c,v 1.18 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -236,7 +236,7 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
     /* Creating the audio output fifo if not created yet */
     if( p_a52_adec->p_aout_fifo == NULL )
     {
-        p_a52_adec->p_aout_fifo = aout_CreateFifo( p_a52_adec->p_fifo->p_this,
+        p_a52_adec->p_aout_fifo = aout_CreateFifo( p_a52_adec->p_fifo,
                                     AOUT_FIFO_PCM, p_a52_adec->i_channels,
                                     p_a52_adec->sample_rate,
                                     AC3DEC_FRAME_SIZE * p_a52_adec->i_channels,

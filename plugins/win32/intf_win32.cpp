@@ -72,7 +72,7 @@ static int intf_Open( intf_thread_t *p_intf )
 
     p_intfGlobal = p_intf;
 
-    p_intf->p_sys->p_sub = msg_Subscribe( p_intf->p_this );
+    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
     /* Initialize Win32 thread */
     p_intf->p_sys->b_playing = 0;
@@ -88,7 +88,7 @@ static int intf_Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Close( intf_thread_t *p_intf )
 {
-    msg_Unsubscribe( p_intf->p_this, p_intf->p_sys->p_sub );
+    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     /* Destroy structure */
     free( p_intf->p_sys );

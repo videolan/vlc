@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.14 2002/06/01 12:31:59 sam Exp $
+ * $Id: distort.c,v 1.15 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -208,7 +208,7 @@ static int vout_Init( vout_thread_t *p_vout )
     msg_Dbg( p_vout, "spawning the real video output" );
 
     p_vout->p_sys->p_vout =
-        vout_CreateThread( p_vout->p_this,
+        vout_CreateThread( p_vout,
                            p_vout->render.i_width, p_vout->render.i_height,
                            p_vout->render.i_chroma, p_vout->render.i_aspect );
 

@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.3 2002/06/01 16:45:34 sam Exp $
+ * $Id: libvlc.c,v 1.4 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -98,8 +98,8 @@ static volatile vlc_t **pp_vlc = NULL;
  * Local prototypes
  *****************************************************************************/
 static int  GetFilenames  ( vlc_t *, int, char *[] );
-static void Usage         ( vlc_object_t *, const char *psz_module_name );
-static void ListModules   ( vlc_object_t * );
+static void Usage         ( vlc_t *, const char *psz_module_name );
+static void ListModules   ( vlc_t * );
 static void Version       ( void );
 static void Build         ( void );
 
@@ -139,11 +139,11 @@ vlc_t * vlc_create( void )
     p_vlc->b_quiet = 0; /* FIXME: delay message queue output! */
 
     /* Initialize the threads system */
-    vlc_threads_init( p_vlc->p_this );
+    vlc_threads_init( p_vlc );
 
     /* Initialize mutexes */
-    vlc_mutex_init( p_vlc->p_this, &p_vlc->config_lock );
-    vlc_mutex_init( p_vlc->p_this, &p_vlc->structure_lock );
+    vlc_mutex_init( p_vlc, &p_vlc->config_lock );
+    vlc_mutex_init( p_vlc, &p_vlc->structure_lock );
 
     /* Set signal handling policy for all threads */
 #ifndef WIN32
@@ -190,7 +190,7 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     fprintf( stderr, COPYRIGHT_MESSAGE "\n" );
 
     /* Guess what CPU we have */
-    p_vlc->i_cpu_capabilities = CPUCapabilities( p_vlc->p_this );
+    p_vlc->i_cpu_capabilities = CPUCapabilities( p_vlc );
 
     /*
      * Support for gettext
@@ -217,12 +217,12 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /*
      * System specific initialization code
      */
-    system_Init( p_vlc->p_this, &i_argc, ppsz_argv );
+    system_Init( p_vlc, &i_argc, ppsz_argv );
 
     /*
      * Initialize message queue
      */
-    msg_Create( p_vlc->p_this );
+    msg_Create( p_vlc );
 
     /* Get the executable name (similar to the basename command) */
     if( i_argc > 0 )
@@ -244,15 +244,15 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
      * module. We need to do this at this stage to be able to display a short
      * help if required by the user. (short help == main module options)
      */
-    module_InitBank( p_vlc->p_this );
-    module_LoadMain( p_vlc->p_this );
+    module_InitBank( p_vlc );
+    module_LoadMain( p_vlc );
 
     /* Hack: insert the help module here */
     p_help_module = vlc_object_create( p_vlc, VLC_OBJECT_MODULE );
     if( p_help_module == NULL )
     {
-        module_EndBank( p_vlc->p_this );
-        msg_Destroy( p_vlc->p_this );
+        module_EndBank( p_vlc );
+        msg_Destroy( p_vlc );
         return VLC_EGENERIC;
     }
     p_help_module->psz_object_name = "help";
@@ -261,13 +261,13 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     p_vlc->module_bank.first = p_help_module;
     /* End hack */
 
-    if( config_LoadCmdLine( p_vlc->p_this, &i_argc, ppsz_argv, 1 ) )
+    if( config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, 1 ) )
     {
         p_vlc->module_bank.first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc->p_this );
-        msg_Destroy( p_vlc->p_this );
+        module_EndBank( p_vlc );
+        msg_Destroy( p_vlc );
         return VLC_EGENERIC;
     }
 
@@ -277,13 +277,13 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         fprintf( stderr, _("Usage: %s [options] [parameters] [file]...\n"),
                          p_vlc->psz_object_name );
 
-        Usage( p_vlc->p_this, "help" );
-        Usage( p_vlc->p_this, "main" );
+        Usage( p_vlc, "help" );
+        Usage( p_vlc, "main" );
         p_vlc->module_bank.first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc->p_this );
-        msg_Destroy( p_vlc->p_this );
+        module_EndBank( p_vlc );
+        msg_Destroy( p_vlc );
         return VLC_EEXIT;
     }
 
@@ -294,8 +294,8 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         p_vlc->module_bank.first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc->p_this );
-        msg_Destroy( p_vlc->p_this );
+        module_EndBank( p_vlc );
+        msg_Destroy( p_vlc );
         return VLC_EEXIT;
     }
 
@@ -306,8 +306,8 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         p_vlc->module_bank.first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc->p_this );
-        msg_Destroy( p_vlc->p_this );
+        module_EndBank( p_vlc );
+        msg_Destroy( p_vlc );
         return VLC_EEXIT;
     }
 
@@ -321,8 +321,8 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
      * list of configuration options exported by each module and loads their
      * default values.
      */
-    module_LoadBuiltins( p_vlc->p_this );
-    module_LoadPlugins( p_vlc->p_this );
+    module_LoadBuiltins( p_vlc );
+    module_LoadPlugins( p_vlc );
     msg_Dbg( p_vlc, "module bank initialized, found %i modules",
                     p_vlc->module_bank.i_count );
 
@@ -334,37 +334,37 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /* Check for help on modules */
     if( (p_tmp = config_GetPsz( p_vlc, "module" )) )
     {
-        Usage( p_vlc->p_this, p_tmp );
+        Usage( p_vlc, p_tmp );
         free( p_tmp );
         p_vlc->module_bank.first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc->p_this );
-        msg_Destroy( p_vlc->p_this );
+        module_EndBank( p_vlc );
+        msg_Destroy( p_vlc );
         return VLC_EGENERIC;
     }
 
     /* Check for long help option */
     if( config_GetInt( p_vlc, "longhelp" ) )
     {
-        Usage( p_vlc->p_this, NULL );
+        Usage( p_vlc, NULL );
         p_vlc->module_bank.first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc->p_this );
-        msg_Destroy( p_vlc->p_this );
+        module_EndBank( p_vlc );
+        msg_Destroy( p_vlc );
         return VLC_EEXIT;
     }
 
     /* Check for module list option */
     if( config_GetInt( p_vlc, "list" ) )
     {
-        ListModules( p_vlc->p_this );
+        ListModules( p_vlc );
         p_vlc->module_bank.first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc->p_this );
-        msg_Destroy( p_vlc->p_this );
+        module_EndBank( p_vlc );
+        msg_Destroy( p_vlc );
         return VLC_EEXIT;
     }
 
@@ -378,12 +378,12 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
      * Override default configuration with config file settings
      */
     p_vlc->psz_homedir = config_GetHomeDir();
-    config_LoadConfigFile( p_vlc->p_this, NULL );
+    config_LoadConfigFile( p_vlc, NULL );
 
     /*
      * Override configuration with command line settings
      */
-    if( config_LoadCmdLine( p_vlc->p_this, &i_argc, ppsz_argv, 0 ) )
+    if( config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, 0 ) )
     {
 #ifdef WIN32
         ShowConsole();
@@ -392,8 +392,8 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
                  "that they are valid.\nPress the RETURN key to continue..." );
         getchar();
 #endif
-        module_EndBank( p_vlc->p_this );
-        msg_Destroy( p_vlc->p_this );
+        module_EndBank( p_vlc );
+        msg_Destroy( p_vlc );
         return VLC_EGENERIC;
     }
 
@@ -401,7 +401,7 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /*
      * System specific configuration
      */
-    system_Configure( p_vlc->p_this );
+    system_Configure( p_vlc );
 
     /* p_vlc inititalization. FIXME ? */
     p_vlc->i_desync = config_GetInt( p_vlc, "desync" ) * (mtime_t)1000;
@@ -461,7 +461,7 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
      * Initialize shared resources and libraries
      */
     if( config_GetInt( p_vlc, "network-channel" )
-         && network_ChannelCreate( p_vlc->p_this ) )
+         && network_ChannelCreate( p_vlc ) )
     {
         /* On error during Channels initialization, switch off channels */
         msg_Err( p_vlc,
@@ -478,12 +478,12 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /*
      * Initialize playlist and get commandline files
      */
-    p_playlist = playlist_Create( p_vlc->p_this );
+    p_playlist = playlist_Create( p_vlc );
     if( !p_playlist )
     {
         msg_Err( p_vlc, "playlist initialization failed" );
-        module_EndBank( p_vlc->p_this );
-        msg_Destroy( p_vlc->p_this );
+        module_EndBank( p_vlc );
+        msg_Destroy( p_vlc );
         return VLC_EGENERIC;
     }
 
@@ -549,7 +549,7 @@ vlc_error_t vlc_add_intf( vlc_t *p_vlc, char *psz_module, vlc_bool_t b_block )
     }
 
     /* Try to create the interface */
-    p_intf = intf_Create( p_vlc->p_this );
+    p_intf = intf_Create( p_vlc );
 
     if( psz_module )
     {
@@ -670,7 +670,7 @@ vlc_error_t vlc_end( vlc_t *p_vlc )
      */
     if( config_GetInt( p_vlc, "network-channel" ) && p_vlc->p_channel )
     {
-        network_ChannelJoin( p_vlc->p_this, COMMON_CHANNEL );
+        network_ChannelJoin( p_vlc, COMMON_CHANNEL );
     }
 
     /*
@@ -686,17 +686,17 @@ vlc_error_t vlc_end( vlc_t *p_vlc )
     /*
      * Free module bank
      */
-    module_EndBank( p_vlc->p_this );
+    module_EndBank( p_vlc );
 
     /*
      * System specific cleaning code
      */
-    system_End( p_vlc->p_this );
+    system_End( p_vlc );
 
     /*
      * Terminate messages interface and program
      */
-    msg_Destroy( p_vlc->p_this );
+    msg_Destroy( p_vlc );
 
     /* Update the handle status */
     p_vlc->i_status = VLC_STATUS_CREATED;
@@ -790,7 +790,7 @@ vlc_error_t vlc_add_target( vlc_t *p_vlc, char *psz_target )
         return VLC_ESTATUS;
     }
 
-    playlist_Add( p_vlc->p_this, PLAYLIST_END, psz_target );
+    playlist_Add( p_vlc, PLAYLIST_END, psz_target );
 
     return VLC_SUCCESS;
 }
@@ -809,7 +809,7 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /* We assume that the remaining parameters are filenames */
     for( i_opt = optind; i_opt < i_argc; i_opt++ )
     {
-        playlist_Add( p_vlc->p_this, PLAYLIST_END, ppsz_argv[ i_opt ] );
+        playlist_Add( p_vlc, PLAYLIST_END, ppsz_argv[ i_opt ] );
     }
 
     return VLC_SUCCESS;
@@ -820,7 +820,7 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
  *****************************************************************************
  * Print a short inline help. Message interface is initialized at this stage.
  *****************************************************************************/
-static void Usage( vlc_object_t *p_this, const char *psz_module_name )
+static void Usage( vlc_t *p_this, const char *psz_module_name )
 {
 #define FORMAT_STRING "      --%s%s%s%s%s%s %s%s\n"
     /* option name prefix ------' | | | | |  | |
@@ -984,7 +984,7 @@ static void Usage( vlc_object_t *p_this, const char *psz_module_name )
  * Print a list of all available modules (builtins and plugins) and a short
  * description for each one.
  *****************************************************************************/
-static void ListModules( vlc_object_t *p_this )
+static void ListModules( vlc_t *p_this )
 {
     module_t *p_module;
     char psz_spaces[22];

@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.24 2002/06/01 12:32:00 sam Exp $
+ * $Id: mpeg_adec.c,v 1.25 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -178,8 +178,7 @@ static void DecodeThread( adec_thread_t * p_adec )
                 i_channels = 1;
             }
             p_adec->p_aout_fifo =
-               aout_CreateFifo( p_adec->p_fifo->p_this,
-                                AOUT_FIFO_PCM, i_channels,
+               aout_CreateFifo( p_adec->p_fifo, AOUT_FIFO_PCM, i_channels,
                                 sync_info.sample_rate, ADEC_FRAME_SIZE, NULL );
             if( p_adec->p_aout_fifo == NULL)
             {

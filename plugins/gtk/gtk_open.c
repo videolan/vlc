@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.25 2002/06/01 12:31:59 sam Exp $
+ * $Id: gtk_open.c,v 1.26 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -107,7 +107,7 @@ void GtkFileOpenOk( GtkButton * button, gpointer user_data )
     /* add the new file to the interface playlist */
     psz_filename =
         gtk_file_selection_get_filename( GTK_FILE_SELECTION( p_filesel ) );
-    playlist_Add( p_playlist->p_this, 0, (char*)psz_filename );
+    playlist_Add( p_playlist, 0, (char*)psz_filename );
 
     /* catch the GTK CList */
     p_playlist_clist = GTK_CLIST( gtk_object_get_data(
@@ -241,7 +241,7 @@ void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
     /* Build source name and add it to playlist */
     sprintf( psz_source, "%s:%s@%d,%d",
              psz_method, psz_device, i_title, i_chapter );
-    playlist_Add( p_playlist->p_this, 0, psz_source );
+    playlist_Add( p_playlist, 0, psz_source );
     free( psz_source );
 
     /* catch the GTK CList */
@@ -378,7 +378,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         /* Build source name and add it to playlist */
         sprintf( psz_source, "udp:@:%i", i_port );
 
-        playlist_Add( p_playlist->p_this, 0, psz_source );
+        playlist_Add( p_playlist, 0, psz_source );
         free( psz_source );
 
         /* catch the GTK CList */
@@ -421,7 +421,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         /* Build source name and add it to playlist */
         sprintf( psz_source, "udp:@%s:%i", psz_address, i_port );
 
-        playlist_Add( p_playlist->p_this, 0, psz_source );
+        playlist_Add( p_playlist, 0, psz_source );
         free( psz_source );
 
         /* catch the GTK CList */
@@ -444,7 +444,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
 
         if( p_intf->p_vlc->p_channel == NULL )
         {
-            network_ChannelCreate( p_intf->p_this );
+            network_ChannelCreate( p_intf );
         }
 
         psz_channel = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
@@ -480,7 +480,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         /* Build source name and add it to playlist */
         sprintf( psz_source, "http://%s", psz_address );
 
-        playlist_Add( p_playlist->p_this, 0, psz_source );
+        playlist_Add( p_playlist, 0, psz_source );
         free( psz_source );
 
         /* catch the GTK CList */
@@ -666,7 +666,7 @@ void GtkSatOpenOk( GtkButton * button, gpointer user_data )
     /* Build source name and add it to playlist */
     sprintf( psz_source, "%s:%d,%d,%d,%d",
              "satellite", i_freq, b_pol, i_fec, i_srate );
-    playlist_Add( p_playlist->p_this, 0, psz_source );
+    playlist_Add( p_playlist, 0, psz_source );
     free( psz_source );
 
     /* catch the GTK CList */

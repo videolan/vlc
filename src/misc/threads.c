@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.3 2002/06/01 16:45:35 sam Exp $
+ * $Id: threads.c,v 1.4 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -444,6 +444,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
                          p_this->thread_id, psz_name, psz_file, i_line );
 
         p_this->b_thread = 1;
+        p_this->i_thread = p_this->thread_id;   /* We hope the cast will work */
 
         if( b_wait )
         {

@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.15 2002/06/01 12:32:00 sam Exp $
+ * $Id: rc.c,v 1.16 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -222,7 +222,7 @@ static void intf_Run( intf_thread_t *p_intf )
             case 'A':
                 if( p_cmd[1] == ' ' )
                 {
-//                    playlist_Add( p_intf->p_this, PLAYLIST_END, p_cmd + 2 );
+//                    playlist_Add( p_intf, PLAYLIST_END, p_cmd + 2 );
 //                    playlist_Jumpto( p_intf->p_vlc->p_playlist,
 //                                     p_intf->p_vlc->p_playlist->i_size-2 );
                 }

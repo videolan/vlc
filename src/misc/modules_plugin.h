@@ -179,7 +179,7 @@ static inline const char * module_error( char *psz_buffer )
  * STORE_SYMBOLS: store known symbols into p_symbols for plugin access.
  *****************************************************************************/
 #define STORE_SYMBOLS( p_symbols ) \
-    (p_symbols)->aout_CreateFifo_inner = aout_CreateFifo; \
+    (p_symbols)->__aout_CreateFifo_inner = __aout_CreateFifo; \
     (p_symbols)->aout_DestroyFifo_inner = aout_DestroyFifo; \
     (p_symbols)->__config_GetInt_inner = __config_GetInt; \
     (p_symbols)->__config_PutInt_inner = __config_PutInt; \
@@ -187,10 +187,10 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->__config_PutFloat_inner = __config_PutFloat; \
     (p_symbols)->__config_GetPsz_inner = __config_GetPsz; \
     (p_symbols)->__config_PutPsz_inner = __config_PutPsz; \
-    (p_symbols)->config_LoadCmdLine_inner = config_LoadCmdLine; \
+    (p_symbols)->__config_LoadCmdLine_inner = __config_LoadCmdLine; \
     (p_symbols)->config_GetHomeDir_inner = config_GetHomeDir; \
-    (p_symbols)->config_LoadConfigFile_inner = config_LoadConfigFile; \
-    (p_symbols)->config_SaveConfigFile_inner = config_SaveConfigFile; \
+    (p_symbols)->__config_LoadConfigFile_inner = __config_LoadConfigFile; \
+    (p_symbols)->__config_SaveConfigFile_inner = __config_SaveConfigFile; \
     (p_symbols)->config_FindConfig_inner = config_FindConfig; \
     (p_symbols)->config_Duplicate_inner = config_Duplicate; \
     (p_symbols)->config_SetCallbacks_inner = config_SetCallbacks; \
@@ -229,7 +229,6 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->input_ClockManageControl_inner = input_ClockManageControl; \
     (p_symbols)->input_ClockManageRef_inner = input_ClockManageRef; \
     (p_symbols)->input_ClockGetTS_inner = input_ClockGetTS; \
-    (p_symbols)->input_BuffersInit_inner = input_BuffersInit; \
     (p_symbols)->input_BuffersEnd_inner = input_BuffersEnd; \
     (p_symbols)->input_NewBuffer_inner = input_NewBuffer; \
     (p_symbols)->input_ReleaseBuffer_inner = input_ReleaseBuffer; \
@@ -256,9 +255,7 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->input_FDRead_inner = input_FDRead; \
     (p_symbols)->input_FDNetworkRead_inner = input_FDNetworkRead; \
     (p_symbols)->input_FDSeek_inner = input_FDSeek; \
-    (p_symbols)->msg_Subscribe_inner = msg_Subscribe; \
-    (p_symbols)->msg_Unsubscribe_inner = msg_Unsubscribe; \
-    (p_symbols)->intf_Eject_inner = intf_Eject; \
+    (p_symbols)->__intf_Eject_inner = __intf_Eject; \
     (p_symbols)->GetLang_1_inner = GetLang_1; \
     (p_symbols)->GetLang_2T_inner = GetLang_2T; \
     (p_symbols)->GetLang_2B_inner = GetLang_2B; \
@@ -269,10 +266,10 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->mdate_inner = mdate; \
     (p_symbols)->mwait_inner = mwait; \
     (p_symbols)->msleep_inner = msleep; \
-    (p_symbols)->network_ChannelJoin_inner = network_ChannelJoin; \
-    (p_symbols)->network_ChannelCreate_inner = network_ChannelCreate; \
+    (p_symbols)->__network_ChannelJoin_inner = __network_ChannelJoin; \
+    (p_symbols)->__network_ChannelCreate_inner = __network_ChannelCreate; \
     (p_symbols)->playlist_Command_inner = playlist_Command; \
-    (p_symbols)->playlist_Add_inner = playlist_Add; \
+    (p_symbols)->__playlist_Add_inner = __playlist_Add; \
     (p_symbols)->playlist_Delete_inner = playlist_Delete; \
     (p_symbols)->__vlc_threads_init_inner = __vlc_threads_init; \
     (p_symbols)->vlc_threads_end_inner = vlc_threads_end; \
@@ -283,7 +280,7 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->__vlc_thread_create_inner = __vlc_thread_create; \
     (p_symbols)->__vlc_thread_ready_inner = __vlc_thread_ready; \
     (p_symbols)->__vlc_thread_join_inner = __vlc_thread_join; \
-    (p_symbols)->vout_CreateThread_inner = vout_CreateThread; \
+    (p_symbols)->__vout_CreateThread_inner = __vout_CreateThread; \
     (p_symbols)->vout_DestroyThread_inner = vout_DestroyThread; \
     (p_symbols)->vout_ChromaCmp_inner = vout_ChromaCmp; \
     (p_symbols)->vout_CreatePicture_inner = vout_CreatePicture; \
@@ -302,6 +299,8 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->__msg_Err_inner = __msg_Err; \
     (p_symbols)->__msg_Warn_inner = __msg_Warn; \
     (p_symbols)->__msg_Dbg_inner = __msg_Dbg; \
+    (p_symbols)->__msg_Subscribe_inner = __msg_Subscribe; \
+    (p_symbols)->__msg_Unsubscribe_inner = __msg_Unsubscribe; \
     (p_symbols)->__vlc_object_create_inner = __vlc_object_create; \
     (p_symbols)->__vlc_object_destroy_inner = __vlc_object_destroy; \
     (p_symbols)->__vlc_object_find_inner = __vlc_object_find; \

@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_synchro.c,v 1.11 2002/06/01 13:52:24 sam Exp $
+ * $Id: vpar_synchro.c,v 1.12 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -109,7 +109,7 @@
 /*
  * Local prototypes
  */
-static int  SynchroType( vlc_object_t * );
+static int  SynchroType( decoder_fifo_t * );
 
 /* Error margins */
 #define DELTA                   (int)(0.075*CLOCK_FREQ)
@@ -122,7 +122,7 @@ static int  SynchroType( vlc_object_t * );
  *****************************************************************************/
 void vpar_SynchroInit( vpar_thread_t * p_vpar )
 {
-    p_vpar->synchro.i_type = SynchroType( p_vpar->p_fifo->p_this );
+    p_vpar->synchro.i_type = SynchroType( p_vpar->p_fifo );
 
     /* We use a fake stream pattern, which is often right. */
     p_vpar->synchro.i_n_p = p_vpar->synchro.i_eta_p = DEFAULT_NB_P;
@@ -527,7 +527,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
  *****************************************************************************
  * This function is called at initialization.
  *****************************************************************************/
-static int SynchroType( vlc_object_t *p_this )
+static int SynchroType( decoder_fifo_t *p_this )
 {
     char psz_synchro_tmp[5];
     char * psz_synchro = config_GetPsz( p_this, "vpar-synchro" );

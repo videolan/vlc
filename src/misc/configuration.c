@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.27 2002/06/01 12:32:01 sam Exp $
+ * $Id: configuration.c,v 1.28 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -326,7 +326,7 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
     }
 
     /* Initialize the global lock */
-    vlc_mutex_init( p_module->p_this, &p_module->config_lock );
+    vlc_mutex_init( p_module, &p_module->config_lock );
 
     /* Do the duplication job */
     for( i = 0; i < i_lines ; i++ )
@@ -430,7 +430,7 @@ void config_UnsetCallbacks( module_config_t *p_new )
  * This function is called to load the config options stored in the config
  * file.
  *****************************************************************************/
-int config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
+int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
     module_t *p_module;
     module_config_t *p_item;
@@ -605,7 +605,7 @@ int config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
  * save.
  * Really stupid no ?
  *****************************************************************************/
-int config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
+int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
     module_t *p_module;
     module_config_t *p_item;
@@ -827,8 +827,8 @@ int config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
  * because we don't know (and don't want to know) in advance the configuration
  * options used (ie. exported) by each module.
  *****************************************************************************/
-int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
-                        vlc_bool_t b_ignore_errors )
+int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
+                          vlc_bool_t b_ignore_errors )
 {
     int i_cmd, i_index, i_opts, i_shortopts, flag;
     module_t *p_module;

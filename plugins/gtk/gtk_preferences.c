@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.30 2002/06/01 12:31:59 sam Exp $
+ * $Id: gtk_preferences.c,v 1.31 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -616,7 +616,7 @@ void GtkConfigSave( GtkButton * button, gpointer user_data )
     p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                    "p_intf" );
     GtkConfigApply( button, user_data );
-    config_SaveConfigFile( p_intf->p_this, NULL );
+    config_SaveConfigFile( p_intf, NULL );
 }
 
 /****************************************************************************

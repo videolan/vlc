@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.63 2002/06/01 12:32:01 sam Exp $
+ * $Id: modules.c,v 1.64 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -112,7 +112,7 @@ static module_symbols_t symbols;
  * This function creates a module bank structure which will be filled later
  * on with all the modules found.
  *****************************************************************************/
-void module_InitBank( vlc_object_t *p_this )
+void __module_InitBank( vlc_object_t *p_this )
 {
     p_this->p_vlc->module_bank.first = NULL;
     p_this->p_vlc->module_bank.i_count = 0;
@@ -134,7 +134,7 @@ void module_InitBank( vlc_object_t *p_this )
  * This function resets the module bank by unloading all unused plugin
  * modules.
  *****************************************************************************/
-void module_ResetBank( vlc_object_t *p_this )
+void __module_ResetBank( vlc_object_t *p_this )
 {
     msg_Err( p_this, "FIXME: module_ResetBank unimplemented" );
     return;
@@ -146,7 +146,7 @@ void module_ResetBank( vlc_object_t *p_this )
  * This function unloads all unused plugin modules and empties the module
  * bank in case of success.
  *****************************************************************************/
-void module_EndBank( vlc_object_t *p_this )
+void __module_EndBank( vlc_object_t *p_this )
 {
     module_t * p_next;
 
@@ -179,7 +179,7 @@ void module_EndBank( vlc_object_t *p_this )
  * as another module, and for instance the configuration options of main will
  * be available in the module bank structure just as for every other module.
  *****************************************************************************/
-void module_LoadMain( vlc_object_t *p_this )
+void __module_LoadMain( vlc_object_t *p_this )
 {
     AllocateBuiltinModule( p_this, InitModule__MODULE_main,
                                    ActivateModule__MODULE_main,
@@ -191,7 +191,7 @@ void module_LoadMain( vlc_object_t *p_this )
  *****************************************************************************
  * This function fills the module bank structure with the builtin modules.
  *****************************************************************************/
-void module_LoadBuiltins( vlc_object_t * p_this )
+void __module_LoadBuiltins( vlc_object_t * p_this )
 {
     msg_Dbg( p_this, "checking builtin modules" );
     ALLOCATE_ALL_BUILTINS();
@@ -202,7 +202,7 @@ void module_LoadBuiltins( vlc_object_t * p_this )
  *****************************************************************************
  * This function fills the module bank structure with the plugin modules.
  *****************************************************************************/
-void module_LoadPlugins( vlc_object_t * p_this )
+void __module_LoadPlugins( vlc_object_t * p_this )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
     msg_Dbg( p_this, "checking plugin modules" );
@@ -216,7 +216,7 @@ void module_LoadPlugins( vlc_object_t * p_this )
  * This function parses the module bank and hides modules that have been
  * unused for a while.
  *****************************************************************************/
-void module_ManageBank( vlc_object_t *p_this )
+void __module_ManageBank( vlc_object_t *p_this )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
     module_t * p_module;

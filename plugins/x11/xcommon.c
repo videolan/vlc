@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.36 2002/06/01 12:32:00 sam Exp $
+ * $Id: xcommon.c,v 1.37 2002/06/01 18:04:49 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -698,16 +698,16 @@ static int vout_Manage( vout_thread_t *p_vout )
                         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
                         break;
 
-                    case '0': network_ChannelJoin(p_vout->p_this,0); break;
-                    case '1': network_ChannelJoin(p_vout->p_this,1); break;
-                    case '2': network_ChannelJoin(p_vout->p_this,2); break;
-                    case '3': network_ChannelJoin(p_vout->p_this,3); break;
-                    case '4': network_ChannelJoin(p_vout->p_this,4); break;
-                    case '5': network_ChannelJoin(p_vout->p_this,5); break;
-                    case '6': network_ChannelJoin(p_vout->p_this,6); break;
-                    case '7': network_ChannelJoin(p_vout->p_this,7); break;
-                    case '8': network_ChannelJoin(p_vout->p_this,8); break;
-                    case '9': network_ChannelJoin(p_vout->p_this,9); break;
+                    case '0': network_ChannelJoin( p_vout, 0 ); break;
+                    case '1': network_ChannelJoin( p_vout, 1 ); break;
+                    case '2': network_ChannelJoin( p_vout, 2 ); break;
+                    case '3': network_ChannelJoin( p_vout, 3 ); break;
+                    case '4': network_ChannelJoin( p_vout, 4 ); break;
+                    case '5': network_ChannelJoin( p_vout, 5 ); break;
+                    case '6': network_ChannelJoin( p_vout, 6 ); break;
+                    case '7': network_ChannelJoin( p_vout, 7 ); break;
+                    case '8': network_ChannelJoin( p_vout, 8 ); break;
+                    case '9': network_ChannelJoin( p_vout, 9 ); break;
 
                     default:
                         break;

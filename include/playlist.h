@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: playlist.h,v 1.3 2002/06/01 12:31:58 sam Exp $
+ * $Id: playlist.h,v 1.4 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -78,10 +78,9 @@ struct playlist_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-playlist_t * playlist_Create   ( vlc_object_t * );
-void         playlist_Destroy  ( playlist_t * );
-
-VLC_EXPORT( void, playlist_Command, ( playlist_t *, int, int ) );
+#define playlist_Create(a) __playlist_Create(CAST_TO_VLC_OBJECT(a))
+playlist_t * __playlist_Create   ( vlc_object_t * );
+void           playlist_Destroy  ( playlist_t * );
 
 #define playlist_Play(p) playlist_Command(p,PLAYLIST_PLAY,0)
 #define playlist_Pause(p) playlist_Command(p,PLAYLIST_PAUSE,0)
@@ -90,7 +89,9 @@ VLC_EXPORT( void, playlist_Command, ( playlist_t *, int, int ) );
 #define playlist_Prev(p) playlist_Command(p,PLAYLIST_SKIP,-1)
 #define playlist_Skip(p,i) playlist_Command(p,PLAYLIST_SKIP,i)
 #define playlist_Goto(p,i) playlist_Command(p,PLAYLIST_GOTO,i)
+VLC_EXPORT( void, playlist_Command, ( playlist_t *, int, int ) );
 
-VLC_EXPORT( int, playlist_Add, ( vlc_object_t *, int, const char * ) );
-VLC_EXPORT( int, playlist_Delete, ( playlist_t *, int ) );
+#define playlist_Add(a,b,c) __playlist_Add(CAST_TO_VLC_OBJECT(a),b,c)
+VLC_EXPORT( int, __playlist_Add,    ( vlc_object_t *, int, const char * ) );
+VLC_EXPORT( int,   playlist_Delete, ( playlist_t *, int ) );
 

@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.24 2002/06/01 12:31:59 sam Exp $
+ * $Id: gtk.c,v 1.25 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -150,7 +150,7 @@ static int intf_Open( intf_thread_t *p_intf )
         return( 1 );
     }
 
-    p_intf->p_sys->p_sub = msg_Subscribe( p_intf->p_this );
+    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
     /* Initialize Gtk+ thread */
     p_intf->p_sys->b_playing = 0;
@@ -174,7 +174,7 @@ static int intf_Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Close( intf_thread_t *p_intf )
 {
-    msg_Unsubscribe( p_intf->p_this, p_intf->p_sys->p_sub );
+    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     /* Destroy structure */
     free( p_intf->p_sys );

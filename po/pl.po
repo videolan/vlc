@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2002-06-01 19:02+0200\n"
+"POT-Creation-Date: 2002-06-01 19:57+0200\n"
 "PO-Revision-Date: 2002-05-26 18:31+0200\n"
 "Last-Translator: Arkadiusz Lipiec <alipiec@elka.pw.edu.pl>\n"
 "Language-Team: polish <pl@li.org>\n"

@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.52 2002/06/01 12:31:57 sam Exp $
+ * $Id: modules.h,v 1.53 2002/06/01 18:04:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -316,16 +316,22 @@ struct module_functions_s
 /*****************************************************************************
  * Exported functions.
  *****************************************************************************/
-void            module_InitBank     ( vlc_object_t * );
-void            module_LoadMain     ( vlc_object_t * );
-void            module_LoadBuiltins ( vlc_object_t * );
-void            module_LoadPlugins  ( vlc_object_t * );
-void            module_EndBank      ( vlc_object_t * );
-void            module_ResetBank    ( vlc_object_t * );
-void            module_ManageBank   ( vlc_object_t * );
-
-VLC_EXPORT( module_t *, __module_Need, ( vlc_object_t *, int, char *, void * ) );
-VLC_EXPORT( void, module_Unneed, ( module_t * ) );
+#define module_InitBank(a)     __module_InitBank(CAST_TO_VLC_OBJECT(a))
+void  __module_InitBank        ( vlc_object_t * );
+#define module_LoadMain(a)     __module_LoadMain(CAST_TO_VLC_OBJECT(a))
+void  __module_LoadMain        ( vlc_object_t * );
+#define module_LoadBuiltins(a) __module_LoadBuiltins(CAST_TO_VLC_OBJECT(a))
+void  __module_LoadBuiltins    ( vlc_object_t * );
+#define module_LoadPlugins(a)  __module_LoadPlugins(CAST_TO_VLC_OBJECT(a))
+void  __module_LoadPlugins     ( vlc_object_t * );
+#define module_EndBank(a)      __module_EndBank(CAST_TO_VLC_OBJECT(a))
+void  __module_EndBank         ( vlc_object_t * );
+#define module_ResetBank(a)    __module_ResetBank(CAST_TO_VLC_OBJECT(a))
+void  __module_ResetBank       ( vlc_object_t * );
+#define module_ManageBank(a)   __module_ManageBank(CAST_TO_VLC_OBJECT(a))
+void  __module_ManageBank      ( vlc_object_t * );
 
 #define module_Need(a,b,c,d) __module_Need(CAST_TO_VLC_OBJECT(a),b,c,d)
+VLC_EXPORT( module_t *, __module_Need, ( vlc_object_t *, int, char *, void * ) );
+VLC_EXPORT( void, module_Unneed, ( module_t * ) );
 
