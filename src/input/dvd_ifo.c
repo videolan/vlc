@@ -159,9 +159,9 @@ void IfoEnd( ifo_t* p_ifo )
     free( p_ifo->vmg.pgc.p_cell_pos_inf );
     free( p_ifo->vmg.pgc.p_cell_play_inf );
     free( p_ifo->vmg.pgc.prg_map.pi_entry_cell );
-    free( p_ifo->vmg.pgc.com_tab.psz_cell_com );
-    free( p_ifo->vmg.pgc.com_tab.psz_post_com );
-    free( p_ifo->vmg.pgc.com_tab.psz_pre_com );
+    free( p_ifo->vmg.pgc.com_tab.ps_cell_com );
+    free( p_ifo->vmg.pgc.com_tab.ps_post_com );
+    free( p_ifo->vmg.pgc.com_tab.ps_pre_com );
 
     return;
 }
@@ -280,39 +280,42 @@ fprintf( stderr, "PGC\n" );
         FLUSH( 2 );
         if( pgc.com_tab.i_pre_com_nb )
         {
-            pgc.com_tab.psz_pre_com =
-                                malloc(8*pgc.com_tab.i_pre_com_nb);
-            if( pgc.com_tab.psz_pre_com == NULL )
+            pgc.com_tab.ps_pre_com =
+                            malloc(pgc.com_tab.i_pre_com_nb *COMMAND_SIZE);
+            if( pgc.com_tab.ps_pre_com == NULL )
             {
                 intf_ErrMsg( "Out of memory" );
                 p_ifo->b_error = 1;
                 return pgc;
             }
-            GET( pgc.com_tab.psz_pre_com, (8*pgc.com_tab.i_pre_com_nb) );
+            GET( pgc.com_tab.ps_pre_com,
+                 pgc.com_tab.i_pre_com_nb *COMMAND_SIZE );
         }
         if( pgc.com_tab.i_post_com_nb )
         {
-            pgc.com_tab.psz_post_com =
-                                malloc(8*pgc.com_tab.i_post_com_nb);
-            if( pgc.com_tab.psz_post_com == NULL )
+            pgc.com_tab.ps_post_com =
+                            malloc(pgc.com_tab.i_post_com_nb *COMMAND_SIZE);
+            if( pgc.com_tab.ps_post_com == NULL )
             {
                 intf_ErrMsg( "Out of memory" );
                 p_ifo->b_error = 1;
                 return pgc;
             }
-            GET( pgc.com_tab.psz_post_com, 8*pgc.com_tab.i_post_com_nb );
+            GET( pgc.com_tab.ps_post_com,
+                 pgc.com_tab.i_post_com_nb *COMMAND_SIZE );
         }
         if( pgc.com_tab.i_cell_com_nb )
         {
-            pgc.com_tab.psz_cell_com =
-                                malloc(8*pgc.com_tab.i_cell_com_nb);
-            if( pgc.com_tab.psz_cell_com == NULL )
+            pgc.com_tab.ps_cell_com =
+                            malloc(pgc.com_tab.i_cell_com_nb *COMMAND_SIZE);
+            if( pgc.com_tab.ps_cell_com == NULL )
             {
                 intf_ErrMsg( "Out of memory" );
                 p_ifo->b_error = 1;
                 return pgc;
             }
-            GET( pgc.com_tab.psz_cell_com, 8*pgc.com_tab.i_cell_com_nb );
+            GET( pgc.com_tab.ps_cell_com,
+                 pgc.com_tab.i_cell_com_nb *COMMAND_SIZE );
         }
     }
     /* Parsing of pgc_prg_map_t */
@@ -384,7 +387,7 @@ static pgci_inf_t ReadUnit( ifo_t* p_ifo )
 {
     pgci_inf_t      inf;
     int             i;
-    off64_t           i_start = p_ifo->i_pos;
+    off64_t         i_start = p_ifo->i_pos;
 
 fprintf( stderr, "Unit\n" );
 
@@ -423,7 +426,7 @@ static pgci_ut_t ReadUnitTable( ifo_t* p_ifo )
 {
     pgci_ut_t       pgci;
     int             i;
-    off64_t           i_start = p_ifo->i_pos;
+    off64_t         i_start = p_ifo->i_pos;
 
 fprintf( stderr, "Unit Table\n" );
 
@@ -439,7 +442,7 @@ fprintf( stderr, "Unit Table\n" );
     }
     for( i=0 ; i<pgci.i_lu_nb ; i++ )
     {
-        GETS( &pgci.p_lu[i].i_lang_code );
+        GET( pgci.p_lu[i].ps_lang_code, 2 );
         FLUSH( 1 );
         GETC( &pgci.p_lu[i].i_existence_mask );
         GETL( &pgci.p_lu[i].i_lu_sbyte );
@@ -469,7 +472,7 @@ static c_adt_t ReadCellInf( ifo_t* p_ifo )
 {
     c_adt_t         c_adt;
     int             i, i_max;
-    off64_t           i_start = p_ifo->i_pos;
+    off64_t         i_start = p_ifo->i_pos;
 
 fprintf( stderr, "CELL ADD\n" );
 
@@ -503,7 +506,7 @@ static vobu_admap_t ReadMap( ifo_t* p_ifo )
 {
     vobu_admap_t        map;
     int                 i, i_max;
-    off64_t               i_start = p_ifo->i_pos;
+    off64_t             i_start = p_ifo->i_pos;
     
 fprintf( stderr, "VOBU ADMAP\n" );
 
@@ -530,7 +533,7 @@ static vmgi_mat_t ReadVMGInfMat( ifo_t* p_ifo )
 {
     vmgi_mat_t  mat;
     int         i;
-    off64_t       i_start = p_ifo->i_pos;
+    off64_t     i_start = p_ifo->i_pos;
 
 fprintf( stderr, "VMGI\n" );
 
@@ -547,7 +550,7 @@ fprintf( stderr, "VMGI\n" );
     GETC( &mat.i_disc_side );
     FLUSH( 19 );
     GETS( &mat.i_tts_nb );
-    GET( mat.psz_provider_id, 32 );
+    GET( mat.ps_provider_id, 32 );
     GETLL( &mat.i_pos_code );
     FLUSH( 24 );
     GETL( &mat.i_i_mat_ebyte );
@@ -587,7 +590,7 @@ static vmg_ptt_srpt_t ReadVMGTitlePointer( ifo_t* p_ifo )
 {
     vmg_ptt_srpt_t  ptr;
     int             i;
-    off64_t             i_start = p_ifo->i_pos;
+    off64_t         i_start = p_ifo->i_pos;
 
 fprintf( stderr, "PTR\n" );
 
@@ -623,7 +626,7 @@ static vmg_ptl_mait_t ReadParentalInf( ifo_t* p_ifo )
 {
     vmg_ptl_mait_t  par;
     int             i, j, k;
-    off64_t           i_start = p_ifo->i_pos;
+    off64_t         i_start = p_ifo->i_pos;
 
 fprintf( stderr, "PTL\n" );
 
@@ -639,7 +642,7 @@ fprintf( stderr, "PTL\n" );
     }
     for( i=0 ; i<par.i_country_nb ; i++ )
     {
-        GETS( &par.p_ptl_desc[i].i_country_code );
+        GET( par.p_ptl_desc[i].ps_country_code, 2 );
         FLUSH( 2 );
         GETS( &par.p_ptl_desc[i].i_ptl_mai_sbyte );
         FLUSH( 2 );
@@ -682,7 +685,7 @@ static vmg_vts_atrt_t ReadVTSAttr( ifo_t* p_ifo )
 {
     vmg_vts_atrt_t  atrt;
     int             i, j;
-    off64_t           i_start = p_ifo->i_pos;
+    off64_t         i_start = p_ifo->i_pos;
 
 fprintf( stderr, "VTS ATTR\n" );
 
@@ -817,7 +820,7 @@ static vtsi_mat_t ReadVTSInfMat( ifo_t* p_ifo )
 {
     vtsi_mat_t  mat;
     int         i;
-    off64_t       i_start = p_ifo->i_pos;
+    off64_t     i_start = p_ifo->i_pos;
 
 fprintf( stderr, "VTSI\n" );
 
@@ -883,7 +886,7 @@ static vts_ptt_srpt_t ReadVTSTitlePointer( ifo_t* p_ifo )
 {
     vts_ptt_srpt_t  ptr;
     int             i;
-    off64_t           i_start = p_ifo->i_pos;
+    off64_t         i_start = p_ifo->i_pos;
 
 fprintf( stderr, "PTR\n" );
 
@@ -927,7 +930,7 @@ static vts_tmap_ti_t ReadVTSTimeMap( ifo_t* p_ifo )
 {
     vts_tmap_ti_t   tmap;
     int             i,j;
-    off64_t           i_start = p_ifo->i_pos;
+    off64_t         i_start = p_ifo->i_pos;
 
 fprintf( stderr, "TMAP\n" );
 

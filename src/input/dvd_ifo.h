@@ -41,10 +41,11 @@ typedef struct pgc_com_tab_s
     u16             i_post_com_nb;              // 2 bytes
     u16             i_cell_com_nb;              // 2 bytes
 //    char[2]         ???
-    char*           psz_pre_com;                // i_pre_com_nb * 8 bytes
-    char*           psz_post_com;               // i_post_com_nb * 8 bytes
-    char*           psz_cell_com;               // i_cell_com_nb * 8 bytes
+    char*           ps_pre_com;                 // i_pre_com_nb * 8 bytes
+    char*           ps_post_com;                // i_post_com_nb * 8 bytes
+    char*           ps_cell_com;                // i_cell_com_nb * 8 bytes
 } pgc_com_tab_t;
+#define COMMAND_SIZE    8
 
 /* Program Chain Map Table
  * - start at "i_pgc_prg_map_sbyte" */
@@ -120,7 +121,7 @@ typedef struct pgc_s
 /* Menu PGCI Language unit Descriptor */
 typedef struct pgci_lu_s
 {
-    u16             i_lang_code;                // 2 bytes (ISO-xx)
+    char            ps_lang_code[2];            // 2 bytes (ISO-xx)
 //    char            ???
     u8              i_existence_mask;           // 1 byte
     u32             i_lu_sbyte;                 // 4 bytes
@@ -207,7 +208,7 @@ typedef struct vmgi_mat_s
     u8              i_disc_side;                // 1 bytes
 //    char[20]        ???
     u16             i_tts_nb;                   // 2 bytes
-    char            psz_provider_id[32];        // 32 bytes
+    char            ps_provider_id[32];         // 32 bytes
     u64             i_pos_code;                 // 8 bytes
 //    char[24]        ???
     u32             i_i_mat_ebyte;              // 4 bytes
@@ -264,7 +265,7 @@ typedef struct vmg_ptt_srpt_s
  */
 typedef struct vmg_ptl_mai_desc_s
 {
-    u16             i_country_code;             // 2 bytes
+    char            ps_country_code[2];         // 2 bytes
 //    char[2]         ???
     u16             i_ptl_mai_sbyte;            // 2 bytes
 //    char[2]         ???
@@ -299,15 +300,15 @@ typedef struct vts_atrt_s
     u16             i_vtsm_video_atrt;          // 2 bytes
 //    char            ???
     u8              i_vtsm_audio_nb;            // 1 byte
-    u64             pi_vtsm_audio_atrt[8];      // i_vtsm_audio_nb * 8 bytes
-//    char            ???
+    u64             pi_vtsm_audio_atrt[8];      // 8 * 8 bytes
+//    char[17]        ???
     u8              i_vtsm_subpic_nb;           // 1 byte
     u64             pi_vtsm_subpic_atrt[28];    // i_vtsm_subpic_nb * 6 bytes
 //    char[2]         ???
     u16             i_vtstt_video_atrt;         // 2 bytes
 //    char            ???
     u8              i_vtstt_audio_nb;           // 1 byte
-    u64             pi_vtstt_audio_atrt[8];     // i_vtstt_audio_nb * 8 bytes
+    u64             pi_vtstt_audio_atrt[8];     // 8 * 8 bytes
 //    char[17]        ???
     u8              i_vtstt_subpic_nb;          // 1 byte
     u64             pi_vtstt_subpic_atrt[28];   // i_vtstt_subpic_nb * 6 bytes
