@@ -55,6 +55,14 @@ typedef struct sequence_s
 
     /* Parser context */
     picture_t *         p_forward, p_backward;
+
+    /* Copyright extension */
+    boolean_t               b_copyright_flag;     /* Whether the following
+                                                     information is significant
+                                                     or not. */
+    u8                      i_copyright_identifier;
+    boolean_t               b_original_or_copy;
+    u64                     i_copyright_number;
 } sequence_t;
 
 /*****************************************************************************
@@ -70,7 +78,7 @@ typedef struct picture_parsing_s
     boolean_t           b_frame_pred_frame_dct, b_q_scale_type;
     boolean_t           b_alternate_scan, b_progressive_frame;
     boolean_t           b_top_field_first, b_concealment_mv;
-
+    boolean-t           b_repeat_first_field;
     int                 i_lum_incr, i_chroma_incr;
 
     /* Used for second field management */

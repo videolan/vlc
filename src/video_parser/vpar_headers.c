@@ -357,10 +357,11 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         p_vpar->picture.b_q_scale_type = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->picture.b_intra_vlc_format = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->picture.b_alternate_scan = GetBits( &p_vpar->bit_stream, 1 );
-        /* repeat_first_field (ISO/IEC 13818-2 6.3.10 is cryptic and
-         * apparently the reference decoder doesn't use it, so trash it),
+        p_vpar->picture.b_repeat_first_field = GetBits( &vpar->bit_stream, 1 );
+        /* repeat_first_field (ISO/IEC 13818-2 6.3.10 is necessary to know
+         * the length of the picture_display_extension structure.
          * chroma_420_type (obsolete) */
-        DumpBits( &p_vpar->bit_stream, 2 );
+        DumpBits( &p_vpar->bit_stream, 1 );
         p_vpar->picture.b_progressive_frame = GetBits( &p_vpar->bit_stream, 1 );
         
         /* composite_display_flag */
@@ -705,13 +706,176 @@ static void ExtensionAndUserData( vpar_thread_t * p_vpar )
     }
 }
 
+
 /*****************************************************************************
- * SequenceDisplayExtension : Parse the sequence_display_extension structure
+ * SequenceDisplayExtension : Parse the sequence_display_extension structure *
  *****************************************************************************/
+
 static void SequenceDisplayExtension( vpar_thread_t * p_vpar )
 {
+    /* We don't care sequence_display_extension. */
+    DumpBits32( &p_vpar->bit_stream );
+    DumpBits( &p_vpar->bit_stream, 25 );
+}
+
+
+/*****************************************************************************
+ * QuantMatrixExtension : Load quantization matrices for luminance           *
+ *                        and chrominance                                    *
+ *****************************************************************************/
+
+static void QuantMatrixExtension( vpar_thread_t * p_vpar )
+{
+    if( GetBits( &p_vpar->bit_stream, 1 ) )
+    {
+        /* Load intra_quantiser_matrix for luminance. */
+        LoadMatrix( p_vpar, &p_vpar->sequence.intra_quant );
+    }
+    else
+    {
+        /* Use the default matrix. */
+        LinkMatrix( &p_vpar->sequence.intra_quant,
+                    pi_default_intra_quant );
+    }
+    if( GetBits( &p_vpar->bit_stream, 1 ) )
+    {
+        /* Load non_intra_quantiser_matrix for luminance. */
+        LoadMatrix( p_vpar, &p_vpar->sequence.non_intra_quant );
+    }
+    else
+    {
+        /* Use the default matrix. */
+        LinkMatrix( &p_vpar->sequence.nonintra_quant,
+                    pi_default_nonintra_quant );
+    }
+    if( GetBits( &p_vpar->bit_stream, 1 ) )
+    {
+        /* Load intra_quantiser_matrix for chrominance. */
+        LoadMatrix( p_vpar, &p_vpar->sequence.chroma_intra_quant );
+    }
+    else
+    {
+        /* Link the chrominance intra matrix to the luminance one. */
+        LinkMatrix( &p_vpar->sequence.chroma_intra_quant,
+                    &p_vpar->sequence.intra_quant );
+    }
+    if( GetBits( &p_vpar->bit_stream, 1 ) )
+    {
+        /* Load non_intra_quantiser_matrix for chrominance. */
+        LoadMatrix( p_vpar, &p_vpar->sequence.chroma_nonintra_quant );
+    }
+    else
+    {
+        /* Link the chrominance intra matrix to the luminance one. */
+        LinkMatrix( &p_vpar->sequence.chroma_intra_quant,
+                    &p_vpar->sequence.intra_quant );
+    }
+    if( GetBits( &p_vpar->bit_stream, 1 ) )
+    {
+        /* Load non_intra_quantiser_matrix for chrominance. */
+        LoadMatrix( p_vpar, &p_vpar->sequence.chroma_nonintra_quant );
+    }
+    else
+    {
+        /* Link the chrominance nonintra matrix to the luminance one. */
+        LinkMatrix( &p_vpar->sequence.chroma_nonintra_quant,
+                    &p_vpar->sequence.nonintra_quant );
+    }
+}
+
+
+/*****************************************************************************
+ * SequenceScalableExtension : Parse the sequence_scalable_extension         *
+ *                             structure to handle scalable coding           *
+ *****************************************************************************/
+
+static void SequenceScalableExtension( vpar_thread_t * p_vpar )
+{
+    /* We don't care about anything scalable. */
+    switch( GetBits( &p_vpar->bit_stream, 2 ) )
+    /* The length of the structure depends on the value of the scalable_mode */
+    {
+        case 1:
+            DumpBits32( &p_vpar->bit_stream );
+            DumpBits( &p_vpar->bit_stream, 21 );
+            break;
+        case 2:
+            DumpBits( &p_vpar->bit_stream, 12 );
+            break;
+        default:
+            DumpBits( &p_vpar->bit_stream, 4 );
+    }
 
 }
+/*****************************************************************************
+ * PictureDisplayExtension : Parse the picture_display_extension structure   *
+ *****************************************************************************/
+
+static void PictureDisplayExtension( vpar_thread_t * p_vpar )
+{
+    /* Number of frame center offset */
+    int nb;
+    /* I am not sure it works but it should
+        (fewer tests than shown in §6.3.12) */
+    nb = p_vpar->sequence.b_progressive ? p_vpar->sequence.b_progressive +
+                                          p_vpar->picture.b_repeat_first_field +
+                                          p_vpar->picture.b_top_field_first
+                         : ( (p_vpar->picture.i_structure + 1 ) / 2 ) +
+                           p_vpar->picture.b_repeat_first_field;
+    DumpBits( &p_vpar->bit_stream, 34 * nb );
+}
+
+
+/*****************************************************************************
+ * PictureSpatialScalableExtension                                           *
+ *****************************************************************************/
+
+static void PictureScalablePictureExtension( vpar_thread_t * p_vpar )
+{
+    /* That's scalable, so we trash it */
+    DumpBits32( &p_vpar->bit_stream );
+    DumpBits( &p_vpar->bit_stream, 14 );
+}
+
+
+/*****************************************************************************
+ * PictureTemporalScalableExtension                                          *
+ *****************************************************************************/
+
+static void PictureTemporalScalableExtension( vpar_thread_t * p_vpar )
+{
+    /* Scalable again, trashed again */
+    DumpBits( &p_vpar->bit_stream, 23 );
+}
+
+
+/*****************************************************************************
+ * CopyrightExtension : Keeps some legal informations                        *
+ *****************************************************************************/
+
+static void CopytrightExtension( vpar_thread_t * p_vpar )
+{
+    u32 copyright_number_1, copyright_number_2;
+    p_vpar->sequence.copyright_flag = GetBits( &p_vpar->bit_stream, 1 );
+        /* A flag that says whether the copyright information is significant */
+    p_vpar->sequence.copyright_identifier = GetBits( &p_vpar->bit_stream, 8 );
+        /* An identifier compliant with ISO/CEI JTC 1/SC 29 */
+    p_vpar->sequence.original_or_copy = GetBits( &p_vpar->bit_stream, 1 );
+        /* Reserved bits */
+    DumpBits( &p_vpar->bit_stream, 8 );
+        /* The copyright_number is split in three parts */
+        /* first part */
+    copyright_number_1 = GetBits( &p_vpar->bit_stream, 20 );
+    DumpBits( &p_vpar->bit_stream, 1 );
+        /* second part */
+    copyright_number_2 = GetBits( &p_vpar->bit_stream, 22 );
+    DumpBits( &p_vpar->bit_stream, 1 );
+        /* third part and sum */
+    p_vpar->sequence.copyright_number = ( copyright_number_1 << 44 ) +
+                                        ( copyright_number_2 << 22 ) +
+                                        ( GetBits( &p_vpar->bit_stream, 22 ) );
+}
+
 
 /*****************************************************************************
  * LoadMatrix : Load a quantization matrix
