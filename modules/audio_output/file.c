@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.4 2002/08/12 22:12:51 massiot Exp $
+ * $Id: file.c,v 1.5 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -34,6 +34,7 @@
 #include "aout_internal.h"
 
 #define FRAME_SIZE 2048
+#define A52_FRAME_NB 1536
 
 /*****************************************************************************
  * Local prototypes.
@@ -57,7 +58,7 @@ static char *format_list[] = { "u8", "s8", "u16", "s16", "u16_le", "s16_le",
 static int format_int[] = { AOUT_FMT_U8, AOUT_FMT_S8, AOUT_FMT_U16_NE,
                             AOUT_FMT_S16_NE, AOUT_FMT_U16_LE, AOUT_FMT_S16_LE,
                             AOUT_FMT_U16_BE, AOUT_FMT_S16_BE, AOUT_FMT_FIXED32,
-                            AOUT_FMT_FLOAT32, AOUT_FMT_A52 };
+                            AOUT_FMT_FLOAT32, AOUT_FMT_SPDIF };
 
 #define PATH_TEXT N_("Path of the output file")
 #define PATH_LONGTEXT N_("By default samples.raw")
@@ -82,7 +83,8 @@ static int Open( vlc_object_t * p_this )
     FILE * p_file;
     char * psz_name = config_GetPsz( p_this, "path" );
 
-    (FILE *)p_aout->output.p_sys = p_file = fopen( psz_name, "wb" );
+    p_file = fopen( psz_name, "wb" );
+    p_aout->output.p_sys = (void *)p_file;
     free( psz_name );
     if ( p_file == NULL ) return -1;
 
@@ -128,7 +130,16 @@ static int SetFormat( aout_instance_t * p_aout )
     }
 
     p_aout->output.output.i_format = format_int[i];
-    p_aout->output.i_nb_samples = FRAME_SIZE;
+    if ( p_aout->output.output.i_format == AOUT_FMT_SPDIF )
+    {
+        p_aout->output.i_nb_samples = A52_FRAME_NB;
+        p_aout->output.output.i_bytes_per_sec = p_aout->output.output.i_rate
+                                     * AOUT_SPDIF_SIZE / A52_FRAME_NB;
+    }
+    else
+    {
+        p_aout->output.i_nb_samples = FRAME_SIZE;
+    }
     return 0;
 }
 
@@ -137,9 +148,7 @@ static int SetFormat( aout_instance_t * p_aout )
  *****************************************************************************/
 static void Play( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
-    if( fwrite( p_buffer->p_buffer,
-                aout_FormatToSize( &p_aout->output.output,
-                                   p_buffer->i_nb_samples ), 1,
+    if( fwrite( p_buffer->p_buffer, p_buffer->i_nb_bytes, 1,
                 (FILE *)p_aout->output.p_sys ) != 1 )
     {
         msg_Err( p_aout, "write error (%s)", strerror(errno) );

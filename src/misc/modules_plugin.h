@@ -184,7 +184,7 @@ static const char * module_error( char *psz_buffer )
     (p_symbols)->aout_BufferNew_inner = aout_BufferNew; \
     (p_symbols)->aout_BufferDelete_inner = aout_BufferDelete; \
     (p_symbols)->aout_BufferPlay_inner = aout_BufferPlay; \
-    (p_symbols)->aout_FormatTo_inner = aout_FormatTo; \
+    (p_symbols)->aout_FormatToByterate_inner = aout_FormatToByterate; \
     (p_symbols)->__aout_InputNew_inner = __aout_InputNew; \
     (p_symbols)->aout_InputDelete_inner = aout_InputDelete; \
     (p_symbols)->aout_OutputNextBuffer_inner = aout_OutputNextBuffer; \

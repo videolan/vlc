@@ -210,13 +210,13 @@ static int aRtsThread( aout_instance_t * p_aout )
         if ( p_buffer != NULL )
         {
             p_bytes = p_buffer->p_buffer;
-            i_size = aout_FormatToSize( &p_aout->output.output,
-                                        p_buffer->i_nb_samples );
+            i_size = p_buffer->i_nb_bytes;
         }
         else
         {
-            i_size = aout_FormatToSize( &p_aout->output.output,
-                                        p_sys->i_size );
+            i_size = aout_FormatToByterate( &p_aout->output.output )
+                      * p_sys->i_size
+                      / p_aout->output.output.i_rate;
             p_bytes = alloca( i_size );
             memset( p_bytes, 0, i_size );
         }

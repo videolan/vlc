@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.57 2002/08/11 23:26:28 massiot Exp $
+ * $Id: audio_output.h,v 1.58 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -31,6 +31,8 @@ struct audio_sample_format_t
     int                 i_format;
     int                 i_rate;
     int                 i_channels;
+    /* Optional - for A52, SPDIF and DTS types */
+    int                 i_bytes_per_sec;
 };
 
 #define AOUT_FMT_MU_LAW     0x00000001
@@ -62,7 +64,7 @@ struct audio_sample_format_t
 #   define AOUT_FMT_U16_NE AOUT_FMT_U16_LE
 #endif
 
-#define AOUT_FMT_IS_SPDIF( p_format )                                      \
+#define AOUT_FMT_NON_LINEAR( p_format )                                    \
     ( ((p_format)->i_format == AOUT_FMT_SPDIF)                             \
        || ((p_format)->i_format == AOUT_FMT_A52)                           \
        || ((p_format)->i_format == AOUT_FMT_DTS) )
@@ -94,7 +96,6 @@ typedef s32 vlc_fixed_t;
 #define FIXED32_ONE ((vlc_fixed_t) 0x10000000)
 
 
-
 /*****************************************************************************
  * aout_buffer_t : audio output buffer
  *****************************************************************************/
@@ -102,7 +103,9 @@ struct aout_buffer_t
 {
     byte_t *                p_buffer;
     int                     i_alloc_type;
-    size_t                  i_size;
+    /* i_size is the real size of the buffer (normally unused), i_nb_bytes
+     * is the number of significative bytes in it. */
+    size_t                  i_size, i_nb_bytes;
     int                     i_nb_samples;
     mtime_t                 start_date, end_date;
 
@@ -122,9 +125,7 @@ VLC_EXPORT( void,              aout_DeleteInstance, ( aout_instance_t * ) );
 VLC_EXPORT( aout_buffer_t *, aout_BufferNew, ( aout_instance_t *, aout_input_t *, size_t ) );
 VLC_EXPORT( void, aout_BufferDelete, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
 VLC_EXPORT( void, aout_BufferPlay, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
-VLC_EXPORT( int, aout_FormatTo, ( audio_sample_format_t * p_format, int ) );
-#define aout_FormatToByterate(a,b) aout_FormatTo(a,b)
-#define aout_FormatToSize(a,b) aout_FormatTo(a,b)
+VLC_EXPORT( int, aout_FormatToByterate, ( audio_sample_format_t * p_format ) );
 
 /* From input.c : */
 #define aout_InputNew(a,b,c) __aout_InputNew(VLC_OBJECT(a),b,c)

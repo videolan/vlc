@@ -2,7 +2,7 @@
  * audio_output.c : audio output instance
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.94 2002/08/12 09:34:15 sam Exp $
+ * $Id: audio_output.c,v 1.95 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -88,12 +88,15 @@ aout_buffer_t * aout_BufferNew( aout_instance_t * p_aout,
                                 size_t i_nb_samples )
 {
     aout_buffer_t * p_buffer;
+    mtime_t duration = (1000000 * (mtime_t)i_nb_samples)
+                        / p_input->input.i_rate;
 
     /* This necessarily allocates in the heap. */
-    aout_BufferAlloc( &p_input->input_alloc, (u64)(1000000 * i_nb_samples)
-                                         / p_input->input.i_rate,
-                      NULL, p_buffer );
+    aout_BufferAlloc( &p_input->input_alloc, duration, NULL, p_buffer );
     p_buffer->i_nb_samples = i_nb_samples;
+    p_buffer->i_nb_bytes = duration
+                              * aout_FormatToByterate( &p_input->input )
+                              / 1000000;
 
     if ( p_buffer == NULL )
     {
@@ -161,10 +164,9 @@ void aout_BufferPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 }
 
 /*****************************************************************************
- * aout_FormatTo : compute the number of bytes/sample for format (used for
- * aout_FormatToByterate and aout_FormatToSize)
+ * aout_FormatToByterate : compute the number of bytes per second
  *****************************************************************************/
-int aout_FormatTo( audio_sample_format_t * p_format, int i_multiplier )
+int aout_FormatToByterate( audio_sample_format_t * p_format )
 {
     int i_result;
 
@@ -188,17 +190,16 @@ int aout_FormatTo( audio_sample_format_t * p_format, int i_multiplier )
         break;
 
     case AOUT_FMT_SPDIF:
-    case AOUT_FMT_A52: /* Actually smaller and variable, but who cares ? */
-    case AOUT_FMT_DTS: /* Unimplemented and untested */
-        /* Please note that we don't multiply by multiplier, because i_rate
-         * and i_nb_samples do not have any sense for S/PDIF (yes, it
-         * _is_ kludgy). --Meuuh */
-        return AOUT_SPDIF_SIZE;
+    case AOUT_FMT_A52:
+    case AOUT_FMT_DTS:
+        /* For these formats the caller has to indicate the number of bytes
+         * per second it evaluates. */
+        return p_format->i_bytes_per_sec;
 
     default:
         return 0; /* will segfault much sooner... */
     }
 
-    return i_result * p_format->i_channels * i_multiplier;
+    return i_result * p_format->i_channels * p_format->i_rate;
 }
 

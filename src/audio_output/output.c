@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.4 2002/08/12 22:12:51 massiot Exp $
+ * $Id: output.c,v 1.5 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -61,7 +61,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     memcpy( &p_aout->output.output, p_format, sizeof(audio_sample_format_t) );
     if ( i_rate != -1 ) p_aout->output.output.i_rate = i_rate;
     if ( i_channels != -1 ) p_aout->output.output.i_channels = i_channels;
-    if ( AOUT_FMT_IS_SPDIF(&p_aout->output.output) )
+    if ( AOUT_FMT_NON_LINEAR(&p_aout->output.output) )
     {
         p_aout->output.output.i_format = AOUT_FMT_SPDIF;
     }
@@ -88,22 +88,30 @@ int aout_OutputNew( aout_instance_t * p_aout,
     /* Calculate the resulting mixer output format. */
     p_aout->mixer.output.i_channels = p_aout->output.output.i_channels;
     p_aout->mixer.output.i_rate = p_aout->output.output.i_rate;
-    if ( AOUT_FMT_IS_SPDIF(&p_aout->output.output) )
-    {
-        p_aout->mixer.output.i_format = AOUT_FMT_SPDIF;
-    }
-    else
+    if ( !AOUT_FMT_NON_LINEAR(&p_aout->output.output) )
     {
         /* Non-S/PDIF mixer only deals with float32 or fixed32. */
         p_aout->mixer.output.i_format
                      = (p_aout->p_vlc->i_cpu & CPU_CAPABILITY_FPU) ?
                         AOUT_FMT_FLOAT32 : AOUT_FMT_FIXED32;
+        p_aout->mixer.output.i_bytes_per_sec
+                     = aout_FormatToByterate( &p_aout->mixer.output );
     }
+    else
+    {
+        p_aout->mixer.output.i_format = p_format->i_format;
+        p_aout->mixer.output.i_bytes_per_sec = p_format->i_bytes_per_sec;
+    }
+
+    msg_Dbg( p_aout, "mixer format=%d rate=%d channels=%d",
+             p_aout->mixer.output.i_format, p_aout->mixer.output.i_rate,
+             p_aout->mixer.output.i_channels );
 
     /* Calculate the resulting mixer input format. */
     p_aout->mixer.input.i_channels = -1; /* unchanged */
     p_aout->mixer.input.i_rate = p_aout->mixer.output.i_rate;
     p_aout->mixer.input.i_format = p_aout->mixer.output.i_format;
+    p_aout->mixer.input.i_bytes_per_sec = p_aout->mixer.output.i_bytes_per_sec;
 
     /* Create filters. */
     if ( aout_FiltersCreatePipeline( p_aout, p_aout->output.pp_filters,
@@ -119,8 +127,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     /* Prepare hints for the buffer allocator. */
     p_aout->mixer.output_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
     p_aout->mixer.output_alloc.i_bytes_per_sec
-         = aout_FormatToByterate( &p_aout->output.output,
-                                  p_aout->output.output.i_rate );
+         = aout_FormatToByterate( &p_aout->output.output );
 
     aout_FiltersHintBuffers( p_aout, p_aout->output.pp_filters,
                              p_aout->output.i_nb_filters,

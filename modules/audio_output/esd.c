@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.3 2002/08/13 14:53:46 sam Exp $
+ * $Id: esd.c,v 1.4 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -150,8 +150,7 @@ static int SetFormat( aout_instance_t *p_aout )
                     * p_aout->output.output.i_rate / ESD_DEFAULT_RATE
                     * aout_FormatTo( &p_aout->output.output, 1 ) )
       * (mtime_t)1000000
-      / (mtime_t)aout_FormatToByterate( &p_aout->output.output,
-                                        p_aout->output.output.i_rate );
+      / (mtime_t)aout_FormatToByterate( &p_aout->output.output );
 
     p_sys->b_initialized = VLC_TRUE;
 
@@ -207,13 +206,13 @@ static int ESDThread( aout_instance_t * p_aout )
         if ( p_buffer != NULL )
         {
             p_bytes = p_buffer->p_buffer;
-            i_size = aout_FormatToSize( &p_aout->output.output,
-                                        p_buffer->i_nb_samples );
+            i_size = p_buffer->i_nb_bytes;
         }
         else
         {
-            i_size = aout_FormatToSize( &p_aout->output.output,
-                                        ESD_BUF_SIZE * 2 );
+            i_size = aout_FormatToByterate( &p_aout->output.output )
+                      * ESD_BUF_SIZE * 2
+                      / p_aout->output.output.i_rate;
             p_bytes = alloca( i_size );
             memset( p_bytes, 0, i_size );
         }

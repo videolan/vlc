@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.3 2002/08/12 09:34:15 sam Exp $
+ * $Id: filters.c,v 1.4 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -161,10 +161,8 @@ void aout_FiltersHintBuffers( aout_instance_t * p_aout,
     {
         aout_filter_t * p_filter = pp_filters[i];
 
-        int i_output_size = aout_FormatToByterate( &p_filter->output,
-                                                   p_filter->output.i_rate );
-        int i_input_size = aout_FormatToByterate( &p_filter->input,
-                                                  p_filter->input.i_rate );
+        int i_output_size = aout_FormatToByterate( &p_filter->output );
+        int i_input_size = aout_FormatToByterate( &p_filter->input );
 
         p_first_alloc->i_bytes_per_sec = __MAX( p_first_alloc->i_bytes_per_sec,
                                                 i_output_size );
@@ -209,8 +207,8 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
             msg_Err( p_aout, "out of memory" );
             return;
         }
-        /* Please note that p_output_buffer->i_nb_samples shall be set by
-         * the filter plug-in. */
+        /* Please note that p_output_buffer->i_nb_samples & i_nb_bytes
+         * shall be set by the filter plug-in. */
 
         p_filter->pf_do_work( p_aout, p_filter, *pp_input_buffer,
                               p_output_buffer );

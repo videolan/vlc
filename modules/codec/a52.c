@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52.c,v 1.3 2002/08/13 11:59:36 sam Exp $
+ * $Id: a52.c,v 1.4 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -49,7 +49,7 @@
 #   include "a52dec/a52.h"
 #endif
 
-#define A52_FRAME_SIZE 1536 
+#define A52_FRAME_NB 1536 
 
 /*****************************************************************************
  * a52_thread_t : a52 decoder thread descriptor
@@ -301,10 +301,10 @@ static int DecodeFrame( a52_thread_t * p_dec, byte_t * p_frame_buffer )
     }
 
     p_buffer = aout_BufferNew( p_dec->p_aout, p_dec->p_aout_input,
-                               A52_FRAME_SIZE );
+                               A52_FRAME_NB );
     if ( p_buffer == NULL ) return -1;
     p_buffer->start_date = p_dec->last_date;
-    p_dec->last_date += (mtime_t)(A52_FRAME_SIZE * 1000000)
+    p_dec->last_date += (mtime_t)(A52_FRAME_NB * 1000000)
                           / p_dec->output_format.i_rate;
     p_buffer->end_date = p_dec->last_date;
 

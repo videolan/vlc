@@ -2,7 +2,7 @@
  * spdif.c: A52 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: spdif.c,v 1.4 2002/08/12 22:12:51 massiot Exp $
+ * $Id: spdif.c,v 1.5 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -40,7 +40,7 @@
 #   include <unistd.h>
 #endif
 
-#define A52_FRAME_SIZE 1536 
+#define A52_FRAME_NB 1536 
 
 /*****************************************************************************
  * spdif_thread_t : A52 pass-through thread descriptor
@@ -137,8 +137,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         return -1;
     }
 
-    /* liba52 decoder thread's main loop */
-    while( !p_dec->p_fifo->b_die && !p_dec->p_fifo->b_error )
+    /* decoder thread's main loop */
+    while ( !p_dec->p_fifo->b_die && !p_dec->p_fifo->b_error )
     {
         int i_frame_size, i_flags, i_rate, i_bit_rate;
         mtime_t pts;
@@ -148,8 +148,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
         /* Look for sync word - should be 0x0b77 */
         RealignBits( &p_dec->bit_stream );
-        while( (ShowBits( &p_dec->bit_stream, 16 ) ) != 0x0b77 && 
-               (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error))
+        while ( (ShowBits( &p_dec->bit_stream, 16 ) ) != 0x0b77 && 
+                (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error))
         {
             RemoveBits( &p_dec->bit_stream, 8 );
         }
@@ -169,7 +169,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         }
 
         if( (p_dec->p_aout_input != NULL) &&
-            ( (p_dec->output_format.i_rate != i_rate) ) )
+            ( (p_dec->output_format.i_rate != i_rate)
+                || (p_dec->output_format.i_bytes_per_sec != i_bit_rate * 1000 / 8) ) )
         {
             /* Parameters changed - this should not happen. */
             aout_InputDelete( p_dec->p_aout, p_dec->p_aout_input );
@@ -180,6 +181,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         if( p_dec->p_aout_input == NULL )
         {
             p_dec->output_format.i_rate = i_rate;
+            p_dec->output_format.i_bytes_per_sec = i_bit_rate * 1000 / 8;
             /* p_dec->output_format.i_channels = i_channels; */
             p_dec->p_aout_input = aout_InputNew( p_dec->p_fifo,
                                                  &p_dec->p_aout,
@@ -209,10 +211,10 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         }
 
         p_buffer = aout_BufferNew( p_dec->p_aout, p_dec->p_aout_input,
-                                   i_frame_size );
+                                   A52_FRAME_NB );
         if ( p_buffer == NULL ) return -1;
         p_buffer->start_date = last_date;
-        last_date += (mtime_t)(A52_FRAME_SIZE * 1000000)
+        last_date += (mtime_t)(A52_FRAME_NB * 1000000)
                        / p_dec->output_format.i_rate;
         p_buffer->end_date = last_date;
 

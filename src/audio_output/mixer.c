@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.3 2002/08/12 22:12:51 massiot Exp $
+ * $Id: mixer.c,v 1.4 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -122,6 +122,9 @@ void aout_MixerRun( aout_instance_t * p_aout )
         return;
     }
     p_output_buffer->i_nb_samples = p_aout->output.i_nb_samples;
+    p_output_buffer->i_nb_bytes = (wanted_date - first_date)
+                              * aout_FormatToByterate( &p_aout->mixer.output )
+                              / 1000000;
     p_output_buffer->start_date = first_date;
     p_output_buffer->end_date = wanted_date;
     p_aout->output.last_date = wanted_date;

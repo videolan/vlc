@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.3 2002/08/12 22:12:50 massiot Exp $
+ * $Id: aout_internal.h,v 1.4 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -35,30 +35,29 @@ typedef struct aout_alloc_t
 #define AOUT_ALLOC_STACK    1
 #define AOUT_ALLOC_HEAP     2
 
-#define aout_BufferAlloc( p_alloc, i_nb_usec, p_previous_buffer, p_new_buffer ) \
+#define aout_BufferAlloc( p_alloc, i_nb_usec, p_previous_buffer,            \
+                          p_new_buffer )                                    \
     if ( (p_alloc)->i_alloc_type == AOUT_ALLOC_NONE )                       \
     {                                                                       \
         (p_new_buffer) = p_previous_buffer;                                 \
     }                                                                       \
     else                                                                    \
     {                                                                       \
+        int i_alloc_size;                                                   \
+        i_alloc_size = (u64)(p_alloc)->i_bytes_per_sec                      \
+                                            * (i_nb_usec) / 1000000 + 1;    \
         if ( (p_alloc)->i_alloc_type == AOUT_ALLOC_STACK )                  \
         {                                                                   \
-            (p_new_buffer) = alloca( (u64)(p_alloc)->i_bytes_per_sec        \
-                                 * (i_nb_usec)                              \
-                                 / 1000000 + 1 + sizeof(aout_buffer_t) );   \
+            (p_new_buffer) = alloca( i_alloc_size + sizeof(aout_buffer_t) );\
         }                                                                   \
         else                                                                \
         {                                                                   \
-            (p_new_buffer) = malloc( (u64)(p_alloc)->i_bytes_per_sec        \
-                                 * (i_nb_usec)                              \
-                                 / 1000000 + 1 + sizeof(aout_buffer_t) );   \
+            (p_new_buffer) = malloc( i_alloc_size + sizeof(aout_buffer_t) );\
         }                                                                   \
         if ( p_new_buffer != NULL )                                         \
         {                                                                   \
             (p_new_buffer)->i_alloc_type = (p_alloc)->i_alloc_type;         \
-            (p_new_buffer)->i_size = (u64)(p_alloc)->i_bytes_per_sec        \
-                                            * (i_nb_usec) / 1000000 + 1;    \
+            (p_new_buffer)->i_size = i_alloc_size;                          \
             (p_new_buffer)->p_buffer = (byte_t *)(p_new_buffer)             \
                                          + sizeof(aout_buffer_t);           \
             if ( (p_previous_buffer) != NULL )                              \

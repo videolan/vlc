@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.8 2002/08/13 11:59:36 sam Exp $
+ * $Id: oss.c,v 1.9 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,7 +65,8 @@ struct aout_sys_t
     volatile vlc_bool_t   b_initialized;
 };
 
-#define DEFAULT_FRAME_SIZE 2048
+#define FRAME_SIZE 2048
+#define A52_FRAME_NB 1536
 
 /*****************************************************************************
  * Local prototypes
@@ -167,15 +168,16 @@ static int SetFormat( aout_instance_t *p_aout )
     }
 
     /* Set the output format */
-    if ( AOUT_FMT_IS_SPDIF( &p_aout->output.output ) )
+    if ( p_aout->output.output.i_format == AOUT_FMT_SPDIF )
     {
-        p_aout->output.output.i_format = i_format = AOUT_FMT_SPDIF;
-        p_aout->output.i_nb_samples = 1;
+        p_aout->output.i_nb_samples = A52_FRAME_NB;
+        p_aout->output.output.i_bytes_per_sec = p_aout->output.output.i_rate
+                                     * AOUT_SPDIF_SIZE / A52_FRAME_NB;
     }
     else
     {
         p_aout->output.output.i_format = i_format = AOUT_FMT_S16_NE;
-        p_aout->output.i_nb_samples = DEFAULT_FRAME_SIZE;
+        p_aout->output.i_nb_samples = FRAME_SIZE;
     }
 
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
@@ -186,7 +188,7 @@ static int SetFormat( aout_instance_t *p_aout )
         return -1;
     }
 
-    if ( !AOUT_FMT_IS_SPDIF( &p_aout->output.output ) )
+    if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
     {
         /* FIXME */
         if ( p_aout->output.output.i_channels > 2 )
@@ -308,8 +310,7 @@ static int OSSThread( aout_instance_t * p_aout )
              * Order is important here, since GetBufInfo is believed to take
              * more time than mdate(). */
             next_date = (mtime_t)GetBufInfo( p_aout ) * 1000000
-                      / aout_FormatToByterate( &p_aout->output.output,
-                                               p_aout->output.output.i_rate );
+                      / aout_FormatToByterate( &p_aout->output.output );
             next_date += mdate();
         }
 
@@ -318,13 +319,13 @@ static int OSSThread( aout_instance_t * p_aout )
         if ( p_buffer != NULL )
         {
             p_bytes = p_buffer->p_buffer;
-            i_size = aout_FormatToSize( &p_aout->output.output,
-                                        p_buffer->i_nb_samples );
+            i_size = p_buffer->i_nb_bytes;
         }
         else
         {
-            i_size = aout_FormatToSize( &p_aout->output.output,
-                                        DEFAULT_FRAME_SIZE );
+            i_size = aout_FormatToByterate( &p_aout->output.output )
+                      * FRAME_SIZE
+                      / p_aout->output.output.i_rate;
             p_bytes = alloca( i_size );
             memset( p_bytes, 0, i_size );
         }

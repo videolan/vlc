@@ -2,7 +2,7 @@
  * float32tos16.c : converter from float32 to signed 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tos16.c,v 1.6 2002/08/13 22:42:23 massiot Exp $
+ * $Id: float32tos16.c,v 1.7 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -107,5 +107,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes / 2;
 }
 

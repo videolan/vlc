@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.3 2002/08/12 22:12:51 massiot Exp $
+ * $Id: input.c,v 1.4 2002/08/14 00:23:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -64,6 +64,8 @@ static aout_input_t * InputNew( aout_instance_t * p_aout,
 
     memcpy( &p_input->input, p_format,
             sizeof(audio_sample_format_t) );
+    p_input->input.i_bytes_per_sec =
+                            aout_FormatToByterate( &p_input->input );
 
     /* Prepare FIFO. */
     aout_FifoInit( p_aout, &p_input->fifo );
@@ -117,8 +119,7 @@ static aout_input_t * InputNew( aout_instance_t * p_aout,
     /* i_bytes_per_sec is still == -1 if no filters */
     p_input->input_alloc.i_bytes_per_sec = __MAX(
                                     p_input->input_alloc.i_bytes_per_sec,
-                                    aout_FormatToByterate( &p_input->input,
-                                                   p_input->input.i_rate ) );
+                                    p_input->input.i_bytes_per_sec );
     /* Allocate in the heap, it is more convenient for the decoder. */
     p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
 
