@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.11 2003/04/16 14:38:04 asmax Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.12 2003/04/16 19:22:53 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -50,7 +50,6 @@ GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
     HBITMAP HBuf;
     BITMAP  Bmp;
     HDC     bufDC;
-    AlphaColor = AColor;
 
     // Create image from file if it exists
     HBitmap = (HBITMAP) LoadImage( NULL, FileName.c_str(), IMAGE_BITMAP,
@@ -169,28 +168,9 @@ void GTK2Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
 //---------------------------------------------------------------------------
 bool GTK2Bitmap::Hit( int x, int y)
 {
-    if( x < 0 || x >= Width || y < 0 || y >= Height )
-        return false;
+    unsigned int c = (unsigned int)GetBmpPixel( x, y );
 
-/* FIXME */
-    guchar *pixels;
-    int rowstride, offset;
-    gboolean has_alpha;
-
-    rowstride = gdk_pixbuf_get_rowstride( Bmp );
-    pixels    = gdk_pixbuf_get_pixels( Bmp );
-    has_alpha = gdk_pixbuf_get_has_alpha( Bmp );
-
-    offset = y * rowstride + ( x * (has_alpha ? 4 : 3) );
-
-    int r = pixels [offset];
-    int g = pixels [offset + 1];
-    int b = pixels [offset + 2];
-    unsigned int c = r + g * 256 + b * 65536;
-    /* If has_alpha == TRUE, then the alpha component is in
-       pixels [offset + 3] */
-
-    if( c == AlphaColor )
+    if( c == -1 || c == AlphaColor )
         return false;
     else
         return true;
@@ -198,7 +178,24 @@ bool GTK2Bitmap::Hit( int x, int y)
 //---------------------------------------------------------------------------
 int GTK2Bitmap::GetBmpPixel( int x, int y )
 {
-//    return GetPixel( bmpDC, x, y );
+    if( x < 0 || x >= Width || y < 0 || y >= Height )
+        return -1;
+
+    guchar *pixels;
+    int rowstride, offset;
+    gboolean has_alpha;
+
+    rowstride = gdk_pixbuf_get_rowstride( Bmp );
+    pixels    = gdk_pixbuf_get_pixels( Bmp ); 
+    has_alpha = gdk_pixbuf_get_has_alpha( Bmp );
+
+    offset = y * rowstride + ( x * (has_alpha ? 4 : 3) );
+
+    int r = pixels [offset];
+    int g = pixels [offset + 1] << 8;
+    int b = pixels [offset + 2] << 16;
+
+    return r + g + b;
 }
 //---------------------------------------------------------------------------
 void GTK2Bitmap::SetBmpPixel( int x, int y, int color )

@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.8 2003/04/15 20:42:04 karibu Exp $
+ * $Id: gtk2_run.cpp,v 1.9 2003/04/16 19:22:53 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -95,10 +95,15 @@ void GTK2Proc( GdkEvent *event, gpointer data )
             ((GdkEventAny *)event)->window, msg, 0, (long)event );
     }
 
+    // Send event
     if( IsVLCEvent( msg ) )
     {
         if( !proc->EventProc( evt ) )
+        {
+            fprintf( stderr, "Quit\n" );
+            g_main_context_unref( g_main_context_default() );
             return;      // Exit VLC !
+        }
     }
     else if( gwnd == NULL )
     {
@@ -131,7 +136,11 @@ void GTK2Proc( GdkEvent *event, gpointer data )
         }
     }
 
+    evt->DestructParameters();
     delete (OSEvent *)evt;
+
+    // Check if vlc is closing
+    proc->IsClosing();
 
 #if 0
     // If Window is parent window

@@ -2,7 +2,7 @@
  * gtk2_event.cpp: GTK2 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_event.cpp,v 1.7 2003/04/15 20:54:58 karibu Exp $
+ * $Id: gtk2_event.cpp,v 1.8 2003/04/16 19:22:53 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -92,9 +92,9 @@ bool GTK2Event::SendEvent()
 //---------------------------------------------------------------------------
 bool GTK2Event::IsEqual( Event *evt )
 {
-/*    GTK2Event *WinEvt = (GTK2Event *)evt;
-    return( WinEvt->GetWindow() == hWnd   && WinEvt->GetMessage() == Message &&
-            WinEvt->GetParam1() == Param1 && WinEvt->GetParam2()  == Param2 );*/
+    GTK2Event *GTKEvt = (GTK2Event *)evt;
+    return( GTKEvt->GetWindow() == gWnd   && GTKEvt->GetMessage() == Message &&
+            GTKEvt->GetParam1() == Param1 && GTKEvt->GetParam2()  == Param2 );
 }
 //---------------------------------------------------------------------------
 void GTK2Event::CreateOSEvent( string para1, string para2, string para3 )

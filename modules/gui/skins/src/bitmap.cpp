@@ -2,7 +2,7 @@
  * bitmap.cpp: Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: bitmap.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: bitmap.cpp,v 1.2 2003/04/16 19:22:53 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -37,13 +37,15 @@
 //---------------------------------------------------------------------------
 Bitmap::Bitmap( intf_thread_t *_p_intf, string FileName, int AColor )
 {
-    p_intf = _p_intf;
+    p_intf     = _p_intf;
+    AlphaColor = AColor;
 }
 //---------------------------------------------------------------------------
 Bitmap::Bitmap( intf_thread_t *_p_intf, Graphics *from, int x, int y,
                 int w, int h, int AColor )
 {
-    p_intf = _p_intf;
+    p_intf     = _p_intf;
+    AlphaColor = AColor;
 }
 //---------------------------------------------------------------------------
 Bitmap::Bitmap( intf_thread_t *_p_intf, Bitmap *c )

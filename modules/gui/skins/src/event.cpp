@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.9 2003/04/16 14:38:04 asmax Exp $
+ * $Id: event.cpp,v 1.10 2003/04/16 19:22:53 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -103,9 +103,7 @@ void Event::PostTextMessage( string text )
 {
     char *txt = new char[text.size()+1];
     strcpy( txt, text.c_str() );
-   // OSAPI_PostMessage( NULL, CTRL_SET_TEXT, (unsigned int)this, (long)txt );
-/* FIXME */   
-   fprintf(stderr, "posttext %s\n", text.c_str());
+    OSAPI_PostMessage( NULL, CTRL_SET_TEXT, (unsigned int)this, (long)txt );
 }
 //---------------------------------------------------------------------------
 unsigned int Event::GetMessageType( string Desc )
