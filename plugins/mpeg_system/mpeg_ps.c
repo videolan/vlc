@@ -2,7 +2,7 @@
  * mpeg_ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ps.c,v 1.9 2002/04/04 22:51:01 massiot Exp $
+ * $Id: mpeg_ps.c,v 1.10 2002/04/10 17:47:58 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -140,8 +140,6 @@ static int PSInit( input_thread_t * p_input )
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
     
     p_input->stream.p_selected_program = 
-            p_input->stream.pp_programs[0] ;
-    p_input->stream.p_new_program = 
             p_input->stream.pp_programs[0] ;
     
     if( p_input->stream.b_seekable )
