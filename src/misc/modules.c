@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.116 2003/03/12 05:26:46 sam Exp $
+ * $Id: modules.c,v 1.117 2003/03/25 15:38:14 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -340,23 +340,40 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         /* If we required a shortcut, check this plugin provides it. */
         if( i_shortcuts )
         {
-            vlc_bool_t b_trash = VLC_TRUE;
+            vlc_bool_t b_trash;
             int i_dummy, i_short = i_shortcuts;
             char *psz_name = psz_shortcuts;
 
+            /* Let's drop modules with a 0 score (unless they are
+             * explicitly requested) */
+            b_trash = !p_module->i_score;
+
             while( i_short )
             {
-                for( i_dummy = 0;
-                     b_trash && p_module->pp_shortcuts[i_dummy];
-                     i_dummy++ )
+                /* If the last given shortcut is "none" and we couldn't
+                 * find the module in the list of provided shortcuts,
+                 * then kick the bastard out of here!!! */
+                if( (i_short == 1) && !strcmp(psz_name, "none") )
                 {
-                    b_trash = ( strcmp(psz_name, "any") || !p_module->i_score )
-                        && strcmp( psz_name, p_module->pp_shortcuts[i_dummy] );
+                    b_trash = VLC_TRUE;
+                    break;
                 }
 
-                if( !b_trash )
+                for( i_dummy = 0; p_module->pp_shortcuts[i_dummy]; i_dummy++ )
                 {
-                    i_shortcut_bonus = i_short * 10000;
+                    if( !strcmp( psz_name,
+                                 p_module->pp_shortcuts[i_dummy] ) )
+                    {
+                        /* Found it */
+                        b_trash = VLC_FALSE;
+                        i_shortcut_bonus = i_short * 10000;
+                        break;
+                    }
+                }
+
+                if( i_shortcut_bonus )
+                {
+                    /* We found it... remember ? */
                     break;
                 }
 
