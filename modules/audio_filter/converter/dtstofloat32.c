@@ -4,7 +4,7 @@
  *   (http://www.videolan.org/dtsdec/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: dtstofloat32.c,v 1.1 2004/02/05 22:56:12 gbazin Exp $
+ * $Id: dtstofloat32.c,v 1.2 2004/02/29 13:05:22 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -31,11 +31,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#ifdef USE_DTSDEC_TREE                                 /* libdts header file */
-#   include "include/dts.h"
-#else
-#   include "dtsdec/dts.h"
-#endif
+#include <dts.h>                                       /* libdts header file */
 
 #include "audio_output.h"
 #include "aout_internal.h"

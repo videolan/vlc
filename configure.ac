@@ -1,7 +1,7 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.184 2004/02/22 15:03:33 gbazin Exp $
+dnl $Id: configure.ac,v 1.185 2004/02/29 13:05:21 gbazin Exp $
 
-AC_INIT(vlc,0.7.1-test2)
+AC_INIT(vlc,0.7.1)
 
 CONFIGURE_LINE="$0 $*"
 CODENAME="Bond"
@@ -13,7 +13,7 @@ AC_CANONICAL_SYSTEM
 
 dnl XXX: we don't put any flags here, because automake 1.5 doesn't support
 dnl them. And we need the comma otherwize automake will choke on it.
-AM_INIT_AUTOMAKE(vlc,0.7.1-test2)
+AM_INIT_AUTOMAKE(vlc,0.7.1)
 AM_CONFIG_HEADER(config.h)
 
 dnl
@@ -2120,7 +2120,7 @@ AC_ARG_ENABLE(dts,
   [  --enable-dts            DTS Coherent Acoustics support with libdts (default enabled)])
 if test "${enable_dts}" != "no"; then
   AC_ARG_WITH(dts-tree,
-    [    --with-dts-tree=PATH  dtsdec tree for static linking ],[],[])
+    [    --with-dts-tree=PATH  libdts tree for static linking ],[],[])
   if test "${with_dts_tree}" != "no" -a -n "${with_dts_tree}"
   then
     real_dts_tree="`cd ${with_dts_tree} 2>/dev/null && pwd`"
@@ -2130,22 +2130,21 @@ if test "${enable_dts}" != "no"; then
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([${with_dts_tree} directory doesn't exist])
     fi
-    dnl  Use a custom dtsdec
+    dnl  Use a custom libdts
     AC_MSG_CHECKING(for dts.h in ${real_dts_tree}/include)
     if test -f ${real_dts_tree}/include/dts.h
     then
       AC_MSG_RESULT(yes)
-      AX_ADD_CPPFLAGS([dtstofloat32],[-I${real_dts_tree}])
+      AX_ADD_CPPFLAGS([dtstofloat32],[-I${real_dts_tree}/include])
       AX_ADD_LDFLAGS([dtstofloat32],[-L${real_dts_tree}/libdts/.libs])
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_dtstofloat32}"
       AC_CHECK_LIB(dts, dts_free, [
         AX_ADD_BUILTINS([dtstofloat32])
-        AX_ADD_CPPFLAGS([dtstofloat32],[-DUSE_DTSDEC_TREE])
         AX_ADD_LDFLAGS([dtstofloat32],[-ldts])
         ],[
         if test -f ${real_dts_tree}/libdts/.libs/libdts.a
         then
-          AC_MSG_ERROR([make sure you have at least dtsdec-0.1.0])
+          AC_MSG_ERROR([make sure you have at least libdts-0.0.2])
         else
           AC_MSG_ERROR([the specified tree hasn't been compiled])
         fi
@@ -2156,7 +2155,7 @@ if test "${enable_dts}" != "no"; then
       AC_MSG_ERROR([the specified tree doesn't have dts.h])
     fi
   else
-    AC_CHECK_HEADERS(dtsdec/dts.h, [
+    AC_CHECK_HEADERS(dts.h, [
       AC_CHECK_LIB(dts, dts_free, [
         AX_ADD_PLUGINS([dtstofloat32])
         AX_ADD_LDFLAGS([dtstofloat32],[-ldts])
