@@ -2,7 +2,7 @@
  * sdp.c: SDP parser and builtin UDP/RTP/RTSP
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sdp.c,v 1.7 2003/09/08 07:38:30 fenrir Exp $
+ * $Id: sdp.c,v 1.8 2003/09/08 13:09:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -74,6 +74,10 @@ struct demux_sys_t
     stream_t       *s;
 
     media_client_t *mc;
+
+    /* try to detect end of stream */
+    vlc_bool_t     b_received_data;
+    int            i_no_data;
 };
 
 struct media_client_sys_t
@@ -245,6 +249,8 @@ static int SDPOpen( vlc_object_t * p_this )
         msg_Err( p_input, "cannot create stream" );
         goto error;
     }
+    p_sys->i_no_data = 0;
+    p_sys->b_received_data = VLC_FALSE;
 
     /* Read the complete SDP file */
     i_sdp = 0;
@@ -382,8 +388,15 @@ static int SDPDemux( input_thread_t * p_input )
         if( media_client_read( p_sys->mc, &p_es, &p_frame, 500 ) )
         {
             msg_Dbg( p_input, "no data" );
+            p_sys->i_no_data++;
+            if( p_sys->b_received_data && p_sys->i_no_data > 5 )
+            {
+                return 0;
+            }
             return 1;
         }
+        p_sys->b_received_data = VLC_TRUE;
+        p_sys->i_no_data = 0;
 
         if( p_es == NULL )
         {
@@ -554,11 +567,11 @@ static int  EsDecoderSend  ( input_thread_t * p_input,
                                   p_input->stream.p_selected_program,
                                   tk->i_timestamp * 9 / 100 );
         }
-
+#if 0
         msg_Dbg( p_input, "codec=%s frame pts=%lld dts=%lld",
                  p_es->psz_codec,
                  tk->p_pes->i_pts, tk->p_pes->i_dts );
-
+#endif
 
         input_DecodePES( tk->es->p_decoder_fifo, tk->p_pes );
         tk->p_pes = NULL;
