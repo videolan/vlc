@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.32 2001/05/01 12:22:18 sam Exp $
+ * $Id: input_ext-dec.h,v 1.33 2001/07/16 12:10:32 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -401,7 +401,7 @@ static __inline__ void RealignBits( bit_stream_t * p_bit_stream )
  * GetChunk : reads a large chunk of data
  *****************************************************************************
  * The position in the stream must be byte-aligned, if unsure call
- * RealignBits(). p_buffer must to a buffer at least as big as i_buf_len
+ * RealignBits(). p_buffer must point to a buffer at least as big as i_buf_len
  * otherwise your code will crash.
  *****************************************************************************/
 static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
@@ -409,13 +409,14 @@ static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
 {
     ptrdiff_t           i_available;
 
-    if( p_bit_stream->fifo.i_available )
+    /* We need to take care because i_buf_len may be < 4. */
+    while( p_bit_stream->fifo.i_available > 0 && i_buf_len )
     {
-        *((WORD_TYPE *)p_buffer) = WORD_AT( &p_bit_stream->fifo.buffer );
-        p_buffer += p_bit_stream->fifo.i_available >> 3;
-        i_buf_len -= p_bit_stream->fifo.i_available >> 3;
-        p_bit_stream->fifo.buffer = 0;
-        p_bit_stream->fifo.i_available = 0;
+        *p_buffer = p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - 8);
+        p_buffer++;
+        i_buf_len--;
+        p_bit_stream->fifo.buffer <<= 8;
+        p_bit_stream->fifo.i_available -= 8;
     }
 
     if( (i_available = p_bit_stream->p_end - p_bit_stream->p_byte)
