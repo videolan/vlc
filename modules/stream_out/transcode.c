@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.32 2003/10/01 12:01:46 gbazin Exp $
+ * $Id: transcode.c,v 1.33 2003/10/03 18:17:55 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -735,6 +735,11 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     id->ff_enc_c->sample_rate = id->f_dst.i_sample_rate;
     id->ff_enc_c->channels    = id->f_dst.i_channels;
 
+    /* Make sure we get extradata filled by the encoder */
+    id->ff_enc_c->extradata_size = 0;
+    id->ff_enc_c->extradata = NULL;
+    id->ff_enc_c->flags |= CODEC_FLAG_GLOBAL_HEADER;
+
     if( avcodec_open( id->ff_enc_c, id->ff_enc ) )
     {
         if( id->ff_enc_c->channels > 2 )
@@ -754,6 +759,10 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
             return VLC_EGENERIC;
         }
     }
+
+    id->f_dst.i_extra_data = id->ff_enc_c->extradata_size;
+    id->f_dst.p_extra_data = id->ff_enc_c->extradata;
+    id->ff_enc_c->flags &= ~CODEC_FLAG_GLOBAL_HEADER;
 
     return VLC_SUCCESS;
 }
