@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.38 2003/11/22 16:48:49 fenrir Exp $
+ * $Id: ts.c,v 1.39 2003/11/22 20:25:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -474,6 +474,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     p_stream->i_stream_type = 0x81;
                     p_stream->i_stream_id = 0xbd;
                     break;
+                case VLC_FOURCC( 'l', 'p','c', 'm' ):
+                    p_stream->i_stream_type = 0x83;
+                    p_stream->i_stream_id = 0xbd;
+                    break;
+                case VLC_FOURCC( 'd', 't','s', ' ' ):
+                    p_stream->i_stream_type = 0x85;
+                    p_stream->i_stream_id = 0xbd;
+                    break;
+
                 case VLC_FOURCC( 'm', 'p','4', 'a' ):
                     p_stream->i_stream_type = 0x11;
                     p_stream->i_stream_id = 0xfa;
@@ -492,7 +501,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             {
                 case VLC_FOURCC( 's', 'p','u', ' ' ):
                     p_stream->i_stream_type = 0x82;
-                    p_stream->i_stream_id = 0x82;
+                    p_stream->i_stream_id = 0xbd;
                     break;
                 default:
                     free( p_stream );
