@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_text.c,v 1.22 2001/04/11 13:30:30 ej Exp $
+ * $Id: video_text.c,v 1.23 2001/04/12 01:52:45 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -35,18 +35,16 @@
 #include <unistd.h>                                       /* read(), close() */
 
 #ifdef SYS_BEOS
-#include "beos_specific.h"
+#   include "beos_specific.h"
+#endif
+
+#ifdef SYS_DARWIN1_3
+#   include "darwin_specific.h"
 #endif
 
 #include "config.h"
 #include "common.h"
 #include "video_text.h"
-
-#ifdef SYS_DARWIN1_3
-#include <sys/param.h>                                    /* for MAXPATHLEN */
-#include "main.h"
-extern main_t *p_main;
-#endif
 
 #include "intf_msg.h"
 
@@ -220,33 +218,18 @@ vout_font_t *vout_LoadFont( const char *psz_name )
 
     char **             ppsz_path = path;
     char *              psz_file;
-#ifdef SYS_BEOS
-    char *              psz_vlcpath = beos_GetProgramPath();
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
+    char *              psz_vlcpath = system_GetProgramPath();
     int                 i_vlclen = strlen( psz_vlcpath );
-#elif defined SYS_DARWIN1_3
-    static char         once = 0;
-    static char         app_path[ MAXPATHLEN ];
-    /* HACK TO CUT OUT trailing 'vlc' */
-    int                 i_pathlen = strlen( p_main->ppsz_argv[ 0 ] ) - 3;
 #endif
     int                 i_char, i_line;        /* character and line indexes */
     int                 i_file = -1;                          /* source file */
     byte_t              pi_buffer[2];                         /* file buffer */
     vout_font_t *       p_font;                           /* the font itself */
 
-#ifdef SYS_DARWIN1_3
-    if( !once )
-    {
-        once = 1;
-        strncpy( app_path, p_main->ppsz_argv[ 0 ], i_pathlen );
-        strcat( app_path, "share" );
-        path[ 2 ] = app_path ;
-    }
-#endif
-
     for( ; *ppsz_path != NULL ; ppsz_path++ )
     {
-#ifdef SYS_BEOS
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
         /* Under BeOS, we need to add beos_GetProgramPath() to access
          * files under the current directory */
         if( strncmp( *ppsz_path, "/", 1 ) )

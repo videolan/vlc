@@ -1,10 +1,10 @@
 /*****************************************************************************
- * beos_specific.h: BeOS specific features 
+ * darwin_specific.h: Darwin specific features 
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: beos_specific.h,v 1.5 2001/04/12 01:52:45 sam Exp $
+ * Copyright (C) 2001 VideoLAN
+ * $Id: darwin_specific.h,v 1.1 2001/04/12 01:52:45 sam Exp $
  *
- * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,15 +24,7 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void    system_Create ( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] );
 void    system_Destroy( void );
 char  * system_GetProgramPath( void );
 
-#ifdef __cplusplus
-}
-#endif

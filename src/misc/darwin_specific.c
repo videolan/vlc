@@ -1,10 +1,10 @@
 /*****************************************************************************
- * beos_specific.h: BeOS specific features 
+ * darwin_specific.c: Darwin specific features 
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: beos_specific.h,v 1.5 2001/04/12 01:52:45 sam Exp $
+ * Copyright (C) 2001 VideoLAN
+ * $Id: darwin_specific.c,v 1.1 2001/04/12 01:52:45 sam Exp $
  *
- * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,19 +20,52 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+#include "defs.h"
+
+#include <string.h>                                              /* strdup() */
+#include <stdlib.h>                                                /* free() */
+
+#include "common.h"
+#include "threads.h"
+#include "mtime.h"
+
+#include "darwin_specific.h"
 
 /*****************************************************************************
- * Prototypes
+ * Static vars
  *****************************************************************************/
+static char * psz_program_path;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+void system_Create( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
+{
+    char *p_char, *p_oldchar;
 
-void    system_Create ( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] );
-void    system_Destroy( void );
-char  * system_GetProgramPath( void );
+    /* Get the full program path and name */
+    p_char = p_oldchar = psz_program_path = strdup( ppsz_argv[ 0 ] );
 
-#ifdef __cplusplus
+    /* Remove trailing program name */
+    for( ; *p_char ; )
+    {
+        if( *p_char == '/' )
+	{
+            *p_oldchar = '/';
+	    *p_char = '\0';
+	    p_oldchar = p_char;
+	}
+
+	p_char++;
+    }
+    
+    return;
 }
-#endif
+
+void system_Destroy( void )
+{
+    free( psz_program_path );
+}
+
+char * system_GetProgramPath( void )
+{
+    return( psz_program_path );
+}
+

@@ -2,7 +2,7 @@
  * modules.c : Built-in and dynamic modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.21 2001/04/11 13:30:30 ej Exp $
+ * $Id: modules.c,v 1.22 2001/04/12 01:52:45 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -37,28 +37,26 @@
 #include <dirent.h>
 
 #if defined(HAVE_DLFCN_H)                                /* Linux, BSD, Hurd */
-#include <dlfcn.h>                           /* dlopen(), dlsym(), dlclose() */
+#   include <dlfcn.h>                        /* dlopen(), dlsym(), dlclose() */
 
 #elif defined(HAVE_IMAGE_H)                                          /* BeOS */
-#include <image.h>
+#   include <image.h>
 
 #else
-/* FIXME: this isn't supposed to be an error */
-#error no dynamic plugins available on your system !
+    /* FIXME: this isn't supposed to be an error */
+#   error no dynamic plugins available on your system !
 #endif
 
 #ifdef SYS_BEOS
-#include "beos_specific.h"
+#   include "beos_specific.h"
+#endif
+
+#ifdef SYS_DARWIN1_3
+#   include "darwin_specific.h"
 #endif
 
 #include "common.h"
 #include "threads.h"
-
-#ifdef SYS_DARWIN1_3
-#include <sys/param.h>                                    /* for MAXPATHLEN */
-#include "main.h"
-extern main_t *p_main;
-#endif
 
 #include "intf_msg.h"
 #include "modules.h"
@@ -99,15 +97,10 @@ void module_InitBank( module_bank_t * p_bank )
     char **         ppsz_path = path;
     char *          psz_fullpath;
     char *          psz_file;
-#ifdef SYS_BEOS
-    char *          psz_vlcpath = beos_GetProgramPath();
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
+    char *          psz_vlcpath = system_GetProgramPath();
     int             i_vlclen = strlen( psz_vlcpath );
     boolean_t       b_notinroot;
-#elif defined SYS_DARWIN1_3
-    static char     once = 0;
-    static char     app_path[ MAXPATHLEN ];
-    // HACK TO CUT OUT trailing 'vlc'
-    int             i_pathlen = strlen( p_main->ppsz_argv[0] ) - 3;
 #endif
     DIR *           dir;
     struct dirent * file;
@@ -117,22 +110,12 @@ void module_InitBank( module_bank_t * p_bank )
 
     intf_WarnMsg( 1, "module: module bank initialized" );
 
-#ifdef SYS_DARWIN1_3
-    if ( !once )
-    {
-        once = 1;
-        strncpy( app_path, p_main->ppsz_argv[ 0 ], i_pathlen );
-        strcat( app_path, "lib" );
-        path[ 3 ] = app_path ;
-    }
-#endif
-
     for( ; *ppsz_path != NULL ; ppsz_path++ )
     {
         /* Store strlen(*ppsz_path) for later use. */
         int i_dirlen = strlen( *ppsz_path );
 
-#ifdef SYS_BEOS
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
         b_notinroot = 0;
         /* Under BeOS, we need to add beos_GetProgramPath() to access
          * files under the current directory */
@@ -187,7 +170,7 @@ void module_InitBank( module_bank_t * p_bank )
             closedir( dir );
         }
 
-#ifdef SYS_BEOS
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
         if( b_notinroot )
         {
             free( psz_fullpath );

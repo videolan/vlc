@@ -281,10 +281,14 @@ C_OBJ =		$(INTERFACE) \
 
 
 #
-# CPP Objects
+# Misc Objects
 # 
 ifeq ($(SYS),beos)
 CPP_OBJ =	src/misc/beos_specific.o
+endif
+
+ifneq (,$(findstring darwin,$(SYS)))
+C_OBJ +=	src/misc/darwin_specific.o
 endif
 
 #
@@ -561,9 +565,9 @@ snapshot:
 		changelog changelog-css rules rules-css vlc.dirs \
 		vlc.menu ; do \
 			cp debian/$$file /tmp/vlc-@VLC_VERSION@/debian/ ; done
-	for file in default8x16.psf default8x9.psf ; do \
+	for file in default8x16.psf default8x9.psf vlc_beos.rsrc ; do \
 		cp share/$$file /tmp/vlc-@VLC_VERSION@/share/ ; done
-	for icon in vlc gvlc qvlc gnome-vlc ; do \
+	for icon in vlc gvlc qvlc gnome-vlc kvlc ; do \
 		cp share/$$icon.xpm share/$$icon.png \
 			/tmp/vlc-@VLC_VERSION@/share/ ; done
 
@@ -683,6 +687,8 @@ vlc: $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
 ifeq ($(SYS),beos)
 	rm -f ./plugins/_APP_
 	ln -s ../vlc ./plugins/_APP_
+	xres -o $@ ./share/vlc_beos.rsrc
+	mimeset -f $@
 endif
 
 vlc.app:

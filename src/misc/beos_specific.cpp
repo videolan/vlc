@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: beos_specific.cpp,v 1.6 2001/03/25 17:09:14 richards Exp $
+ * $Id: beos_specific.cpp,v 1.7 2001/04/12 01:52:45 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -42,20 +42,20 @@ extern "C"
  * Static vars
  *****************************************************************************/
 static vlc_thread_t beos_app_thread;
-static char * psz_beos_program_path;
+static char * psz_program_path;
 
 
 extern "C"
 {
 
-void beos_AppThread( void * args )
+void system_AppThread( void * args )
 {
     BApplication * BeApp = new BApplication("application/x-VLC");
     BeApp->Run();
     delete BeApp;
 }
 
-void beos_Create( void )
+void system_Create( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
     int i_lenght;
     BPath path;
@@ -71,20 +71,20 @@ void beos_Create( void )
     entry.GetPath(&path); 
     path.GetParent(&path);
     i_lenght = strlen( path.Path() );
-    psz_beos_program_path = (char*) malloc( i_lenght+1 ); /* XXX */
-    strcpy( psz_beos_program_path, path.Path() );
+    psz_program_path = (char*) malloc( i_lenght+1 ); /* XXX */
+    strcpy( psz_program_path, path.Path() );
 }
 
-void beos_Destroy( void )
+void system_Destroy( void )
 {
-    free( psz_beos_program_path ); /* XXX */
+    free( psz_program_path ); /* XXX */
     be_app->PostMessage( B_QUIT_REQUESTED );
     vlc_thread_join( beos_app_thread );
 }
 
-char * beos_GetProgramPath( void )
+char * system_GetProgramPath( void )
 {
-    return( psz_beos_program_path );
+    return( psz_program_path );
 }
 
 } /* extern "C" */

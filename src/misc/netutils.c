@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.23 2001/04/11 02:01:24 henri Exp $
+ * $Id: netutils.c,v 1.24 2001/04/12 01:52:45 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -202,6 +202,7 @@ int network_ChannelCreate( void )
     return( 0 );
 #else
     intf_ErrMsg( "error : channel changing only works with linux yest" );
+    return( 1 );
 #endif /* SYS_LINUX */   
 #endif /* SYS_BEOS */
 }
