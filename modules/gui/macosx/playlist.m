@@ -73,28 +73,33 @@
 
 - (bool)isItem:(playlist_item_t *)p_item inNode:(playlist_item_t *)p_node
 {
-    int i;
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
+    playlist_item_t * p_temp_item = p_item;
+
     if ( p_playlist == NULL )
     {
         return NO;
     }
 
-    for (i = 0 ; i < p_node->i_children ; i++)
+    while ( p_temp_item->i_parents > 0 )
     {
-        if (p_node->pp_children[i]->i_children > 0)
+        int i;
+        for (i = 0; i < p_temp_item->i_parents ; i++)
         {
-            if ([self isItem: p_item inNode:p_node->pp_children[i]] == YES)
+            if (p_temp_item->pp_parents[i]->i_view == VIEW_SIMPLE)
             {
-                vlc_object_release(p_playlist);
-                return YES;
+                if (p_temp_item->pp_parents[i]->p_parent == p_node)
+                {
+                    vlc_object_release(p_playlist);
+                    return YES;
+                }
+                else
+                {
+                    p_temp_item = p_temp_item->pp_parents[i]->p_parent;
+                    break;
+                }
             }
-        }
-        else if (p_node->pp_children[i] == p_item)
-        {
-            vlc_object_release(p_playlist);
-            return YES;
         }
     }
 
@@ -572,6 +577,45 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 }
 
+#if 0
+- (NSMenu *)menuForEvent:(NSEvent *)o_event
+{
+    intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                            FIND_ANYWHERE );
+
+    bool b_itemstate = FALSE;
+
+    NSPoint pt;
+    vlc_bool_t b_rows;
+    vlc_bool_t b_item_sel;
+
+    pt = [o_table_view convertPoint: [o_event locationInWindow]
+                                                 fromView: nil];
+    b_item_sel = ( [o_table_view rowAtPoint: pt] != -1 &&
+                   [o_table_view selectedRow] != -1 );
+    b_rows = [o_table_view numberOfRows] != 0;
+
+    [o_mi_play setEnabled: b_item_sel];
+    [o_mi_delete setEnabled: b_item_sel];
+    [o_mi_selectall setEnabled: b_rows];
+    [o_mi_info setEnabled: b_item_sel];
+    [o_mi_toggleItemsEnabled setEnabled: b_item_sel];
+    [o_mi_enableGroup setEnabled: b_item_sel];
+    [o_mi_disableGroup setEnabled: b_item_sel];
+
+    if (p_playlist)
+    {
+        b_itemstate = ([o_table_view selectedRow] > -1) ?
+            p_playlist->pp_items[[o_table_view selectedRow]]->b_enabled : FALSE;
+        vlc_object_release(p_playlist);
+    }
+
+    [o_mi_toggleItemsEnabled setState: b_itemstate];
+
+    return( o_ctx_menu );
+}
+#endif
 - (void)initDict
 {
     [o_outline_dict removeAllObjects];

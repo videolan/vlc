@@ -59,6 +59,7 @@
 - (IBAction)searchItem:(id)sender;
 
 - (void)initStrings;
+- (NSMenu *)menuForEvent:(NSEvent *)o_event;
 
 - (void)playlistUpdated;
 - (void)playItem:(id)sender;
