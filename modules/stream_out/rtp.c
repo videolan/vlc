@@ -39,16 +39,30 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define SOUT_CFG_PREFIX "sout-rtp-"
+
 vlc_module_begin();
     set_description( _("RTP stream output") );
     set_capability( "sout stream", 0 );
     add_shortcut( "rtp" );
+    add_string( SOUT_CFG_PREFIX "dst", "", NULL, "destination", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "name", "", NULL, "name", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "sdp", "", NULL, "sdp", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "mux", "", NULL, "mux", "", VLC_TRUE );
+
+    add_integer( SOUT_CFG_PREFIX "port", 1234, NULL, "port", "", VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, "port", "", VLC_TRUE );
+
     set_callbacks( Open, Close );
 vlc_module_end();
 
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
+static const char *ppsz_sout_options[] = {
+    "dst", "name", "port", "sdp", "ttl", "mux", NULL
+};
+
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *,
@@ -182,43 +196,42 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_instance_t     *p_sout = p_stream->p_sout;
     sout_stream_sys_t   *p_sys;
+    vlc_value_t         val;
 
-    char *val;
+    sout_ParseCfg( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
 
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
-    p_sys->psz_destination = sout_cfg_find_value( p_stream->p_cfg, "dst" );
-    p_sys->psz_session_name = sout_cfg_find_value( p_stream->p_cfg, "name" );
-    if( ( val = sout_cfg_find_value( p_stream->p_cfg, "port" ) ) )
-    {
-        p_sys->i_port = atoi( val );
-    }
-    else
-    {
-        p_sys->i_port = 1234;
-    }
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "dst", &val );
+    p_sys->psz_destination = *val.psz_string ? val.psz_string : NULL;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "name", &val );
+    p_sys->psz_session_name = *val.psz_string ? val.psz_string : NULL;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "port", &val );
+    p_sys->i_port = val.i_int;
+
 
     if( !p_sys->psz_session_name )
     {
         if( p_sys->psz_destination )
-        {
             p_sys->psz_session_name = strdup( p_sys->psz_destination );
-        }
         else
-        {
            p_sys->psz_session_name = strdup( "NONE" );
-        }
     }
 
     if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' )
     {
-        val = sout_cfg_find_value( p_stream->p_cfg, "sdp" );
-        if( val == NULL || strncasecmp( val, "rtsp", 4 ) )
+        var_Get( p_stream, SOUT_CFG_PREFIX "sdp", &val );
+
+        if( strncasecmp( val.psz_string, "rtsp", 4 ) )
         {
             msg_Err( p_stream, "missing destination and not in rtsp mode" );
             free( p_sys );
             return VLC_EGENERIC;
         }
         p_sys->psz_destination = NULL;
+        free( val.psz_string );
     }
     else if( p_sys->i_port <= 0 )
     {
@@ -227,14 +240,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( ( val = sout_cfg_find_value( p_stream->p_cfg, "ttl" ) ) )
-    {
-        p_sys->i_ttl = atoi( val );
-    }
-    else
-    {
-        p_sys->i_ttl = config_GetInt( p_stream, "ttl" );
-    }
+    var_Get( p_stream, SOUT_CFG_PREFIX "ttl", &val );
+    p_sys->i_ttl = val.i_int;
 
     p_sys->i_payload_type = 96;
     p_sys->i_es = 0;
@@ -266,7 +273,8 @@ static int Open( vlc_object_t *p_this )
 
     p_stream->p_sys     = p_sys;
 
-    if( ( val = sout_cfg_find_value( p_stream->p_cfg, "mux" ) ) )
+    var_Get( p_stream, SOUT_CFG_PREFIX "mux", &val );
+    if( *val.psz_string )
     {
         sout_access_out_t *p_grab;
 
@@ -275,11 +283,11 @@ static int Open( vlc_object_t *p_this )
         char url[strlen( p_sys->psz_destination ) + 1 + 12 + 1];
 
         /* Check muxer type */
-        if( !strncasecmp( val, "ps", 2 ) || !strncasecmp( val, "mpeg1", 5 ) )
+        if( !strncasecmp( val.psz_string, "ps", 2 ) || !strncasecmp( val.psz_string, "mpeg1", 5 ) )
         {
             psz_rtpmap = "MP2P/90000";
         }
-        else if( !strncasecmp( val, "ts", 2 ) )
+        else if( !strncasecmp( val.psz_string, "ts", 2 ) )
         {
             psz_rtpmap = "MP2T/90000";
             p_sys->i_payload_type = 33;
@@ -327,9 +335,9 @@ static int Open( vlc_object_t *p_this )
         p_grab->pf_write    = AccessOutGrabberWrite;
 
         /* the muxer */
-        if( !( p_sys->p_mux = sout_MuxNew( p_sout, val, p_sys->p_grab ) ) )
+        if( !( p_sys->p_mux = sout_MuxNew( p_sout, val.psz_string, p_sys->p_grab ) ) )
         {
-            msg_Err( p_stream, "cannot create the muxer (%s)", val );
+            msg_Err( p_stream, "cannot create the muxer (%s)", val.psz_string );
             sout_AccessOutDelete( p_sys->p_grab );
             sout_AccessOutDelete( p_sys->p_access );
             free( p_sys );
@@ -369,12 +377,15 @@ static int Open( vlc_object_t *p_this )
         p_sys->p_access = NULL;
         p_sys->p_grab   = NULL;
     }
+    free( val.psz_string );
 
-    if( ( val = sout_cfg_find_value( p_stream->p_cfg, "sdp" ) ) )
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "sdp", &val );
+    if( *val.psz_string )
     {
         vlc_url_t url;
 
-        vlc_UrlParse( &url, val, 0 );
+        vlc_UrlParse( &url, val.psz_string, 0 );
         if( url.psz_protocol && !strcasecmp( url.psz_protocol, "http" ) )
         {
             if( HttpSetup( p_stream, &url ) )
@@ -402,6 +413,7 @@ static int Open( vlc_object_t *p_this )
         }
         vlc_UrlClean( &url );
     }
+    free( val.psz_string );
 
     /* update p_sout->i_out_pace_nocontrol */
     p_stream->p_sout->i_out_pace_nocontrol++;

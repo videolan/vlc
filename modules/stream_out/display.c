@@ -37,10 +37,15 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define SOUT_CFG_PREFIX "sout-display-"
+
 vlc_module_begin();
     set_description( _("Display stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "display" );
+    add_bool( SOUT_CFG_PREFIX "audio", 1, NULL, "audio", "", VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "video", 1, NULL, "video", "", VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "delay", 100, NULL, "delay", "", VLC_TRUE );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -48,6 +53,10 @@ vlc_module_end();
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
+static const char *ppsz_sout_options[] = {
+    "audio", "video", "delay", NULL
+};
+
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
@@ -69,7 +78,10 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
-    char              *val;
+    vlc_value_t val;
+
+    sout_ParseCfg( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
+
     p_sys           = malloc( sizeof( sout_stream_sys_t ) );
     p_sys->p_input  = vlc_object_find( p_stream, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( !p_sys->p_input )
@@ -79,21 +91,14 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->b_audio = VLC_TRUE;
-    p_sys->b_video = VLC_TRUE;
-    p_sys->i_delay = 100*1000;
-    if( sout_cfg_find( p_stream->p_cfg, "noaudio" ) )
-    {
-        p_sys->b_audio = VLC_FALSE;
-    }
-    if( sout_cfg_find( p_stream->p_cfg, "novideo" ) )
-    {
-        p_sys->b_video = VLC_FALSE;
-    }
-    if( ( val = sout_cfg_find_value( p_stream->p_cfg, "delay" ) ) )
-    {
-        p_sys->i_delay = (mtime_t)atoi( val ) * (mtime_t)1000;
-    }
+    var_Get( p_stream, SOUT_CFG_PREFIX "audio", &val );
+    p_sys->b_audio = val.b_bool;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "video", &val );
+    p_sys->b_video = val.b_bool;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "delay", &val );
+    p_sys->i_delay = (int64_t)val.i_int * 1000;
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;

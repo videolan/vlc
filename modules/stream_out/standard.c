@@ -34,29 +34,41 @@
 #include "announce.h"
 #include "network.h"
 
-#define DEFAULT_IPV6_SCOPE '8'
-#define DEFAULT_PORT 1234
-
 /*****************************************************************************
- * Exported prototypes
+ * Module descriptor
  *****************************************************************************/
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
-static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
-static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
+#define SOUT_CFG_PREFIX "sout-standard-"
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 vlc_module_begin();
     set_description( _("Standard stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "standard" );
     add_shortcut( "std" );
+
+    add_string( SOUT_CFG_PREFIX "access", "", NULL, "access", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "mux", "", NULL, "mux", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "url", "", NULL, "url", "", VLC_TRUE );
+
     set_callbacks( Open, Close );
 vlc_module_end();
+
+
+/*****************************************************************************
+ * Exported prototypes
+ *****************************************************************************/
+static const char *ppsz_sout_options[] = {
+    "access", "mux", "url", NULL
+};
+
+#define DEFAULT_IPV6_SCOPE '8'
+#define DEFAULT_PORT 1234
+
+static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
+static int               Del ( sout_stream_t *, sout_stream_id_t * );
+static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
 
 struct sout_stream_sys_t
 {
@@ -73,23 +85,33 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_instance_t     *p_sout = p_stream->p_sout;
     slp_session_t       *p_slp = NULL;
-    session_descriptor_t *p_session = NULL;
 
-    char *psz_mux      = sout_cfg_find_value( p_stream->p_cfg, "mux" );
-    char *psz_access   = sout_cfg_find_value( p_stream->p_cfg, "access" );
-    char *psz_url      = sout_cfg_find_value( p_stream->p_cfg, "url" );
-    char *psz_sdp      = NULL;
+    char *psz_mux;
+    char *psz_access;
+    char *psz_url;
 
-    vlc_url_t      *p_url;
     sout_cfg_t *p_sap_cfg = sout_cfg_find( p_stream->p_cfg, "sap" );
 #ifdef HAVE_SLP_H
     sout_cfg_t *p_slp_cfg = sout_cfg_find( p_stream->p_cfg, "slp" );
 #endif
 
+    vlc_value_t val;
+
     sout_access_out_t   *p_access;
     sout_mux_t          *p_mux;
 
     char                *psz_mux_byext = NULL;
+
+    sout_ParseCfg( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "access", &val );
+    psz_access = *val.psz_string ? val.psz_string : NULL;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "mux", &val );
+    psz_mux = *val.psz_string ? val.psz_string : NULL;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "url", &val );
+    psz_url = *val.psz_string ? val.psz_string : NULL;
 
     p_stream->p_sys        = malloc( sizeof( sout_stream_sys_t) );
     p_stream->p_sys->p_session = NULL;
@@ -137,8 +159,7 @@ static int Open( vlc_object_t *p_this )
 
     /* We fix access/mux to valid couple */
 
-    if( ( psz_access == NULL || *psz_access == '\0' )&&
-        ( psz_mux == NULL ||  *psz_mux == '\0' ) )
+    if( psz_access == NULL && psz_mux == NULL )
     {
         if( psz_mux_byext )
         {
@@ -155,8 +176,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    if( psz_access && *psz_access &&
-        ( psz_mux == NULL || *psz_mux == '\0' ) )
+    if( psz_access && psz_mux == NULL )
     {
         /* access given, no mux */
         if( !strncmp( psz_access, "mmsh", 4 ) )
@@ -172,8 +192,7 @@ static int Open( vlc_object_t *p_this )
             psz_mux = psz_mux_byext;
         }
     }
-    else if( psz_mux && *psz_mux &&
-             ( psz_access == NULL || *psz_access == '\0' ) )
+    else if( psz_mux && psz_access == NULL )
     {
         /* mux given, no access */
         if( !strncmp( psz_mux, "asfh", 4 ) )
@@ -188,7 +207,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* fix or warm of incompatible couple */
-    if( psz_mux && *psz_mux && psz_access && *psz_access )
+    if( psz_mux && psz_access )
     {
         if( !strncmp( psz_access, "mmsh", 4 ) && strncmp( psz_mux, "asfh", 4 ) )
         {
@@ -245,12 +264,13 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_stream, "mux opened" );
 
     /*  *** Create the SAP Session structure *** */
-    if( psz_access &&  p_sap_cfg && ( strstr( psz_access, "udp" ) ||
-                    strstr( psz_access ,  "rtp" ) ) )
+    if( psz_access &&  p_sap_cfg &&
+        ( strstr( psz_access, "udp" ) || strstr( psz_access ,  "rtp" ) ) )
     {
-        session_descriptor_t *p_session=  sout_AnnounceSessionCreate();
-        announce_method_t *p_method = sout_AnnounceMethodCreate(
-                                                  METHOD_TYPE_SAP);
+        session_descriptor_t *p_session = sout_AnnounceSessionCreate();
+        announce_method_t *p_method =
+            sout_AnnounceMethodCreate( METHOD_TYPE_SAP );
+        vlc_url_t url;
 
         /* Parse user input */
         if( p_sap_cfg->psz_value )
@@ -276,9 +296,8 @@ static int Open( vlc_object_t *p_this )
                 psz_curr = sout_cfg_find_value( p_cfg,"ip_version");
                 if( psz_curr != NULL)
                 {
-                    p_method->i_ip_version = atoi( psz_curr ) != 0 ?
-                                                     atoi(psz_curr) :
-                                                     4;
+                    p_method->i_ip_version =
+                        atoi( psz_curr ) != 0 ? atoi(psz_curr) : 4;
                 }
             }
             else
@@ -292,45 +311,31 @@ static int Open( vlc_object_t *p_this )
         }
 
         /* Now, parse the URL to extract host and port */
-        p_url = (vlc_url_t *)malloc( sizeof(vlc_url_t ) );
-        if ( ! p_url )
+        vlc_UrlParse( &url, psz_url , 0);
+
+        if( url.psz_host )
         {
-            return NULL;
+            if( url.i_port == 0 )
+            {
+                url.i_port = DEFAULT_PORT;
+            }
+
+            p_session->psz_uri = url.psz_host;
+            p_session->i_port = url.i_port;
+            p_session->psz_sdp = NULL;
+
+            p_session->i_ttl = config_GetInt( p_sout, "ttl" );
+            p_session->i_payload = 33;
+
+            msg_Info( p_this, "SAP Enabled");
+
+            sout_AnnounceRegister( p_sout, p_session, p_method );
+
+            /* FIXME: Free p_method */
+
+            p_stream->p_sys->p_session = p_session;
         }
-
-        vlc_UrlParse( p_url, psz_url , 0);
-
-        if (!p_url->psz_host)
-        {
-            return NULL;
-        }
-
-        if(p_url->i_port == 0)
-        {
-                p_url->i_port = DEFAULT_PORT;
-        }
-
-        p_session->psz_uri = p_url->psz_host;
-        p_session->i_port = p_url->i_port;
-        p_session->psz_sdp = NULL;
-
-        p_session->i_ttl = config_GetInt( p_sout,"ttl" );
-        p_session->i_payload = 33;
-
-        msg_Info( p_this, "SAP Enabled");
-
-        sout_AnnounceRegister( p_sout, p_session, p_method );
-
-        /* FIXME: Free p_method */
-
-        p_stream->p_sys->p_session = p_session;
-
-        if( p_url )
-        {
-            vlc_UrlClean( p_url );
-            free( p_url );
-            p_url = NULL;
-        }
+        vlc_UrlClean( &url );
     }
 
     /* *** Register with slp *** */
@@ -346,13 +351,7 @@ static int Open( vlc_object_t *p_this )
         }
         else
         {
-            p_slp = (slp_session_t*)malloc(sizeof(slp_session_t));
-            if(!p_slp)
-            {
-                msg_Warn(p_sout,"out of memory");
-//                if( p_sap ) free( p_sap );
-                return -1;
-            }
+            p_slp = malloc(sizeof(slp_session_t));
             p_slp->psz_url= strdup(psz_url);
             p_slp->psz_name = strdup(
                     p_slp_cfg->psz_value ? p_slp_cfg->psz_value : psz_url);
@@ -438,7 +437,6 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                  block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    sout_instance_t   *p_sout = p_stream->p_sout;
 
     sout_MuxSendBuffer( p_sys->p_mux, id->p_input, p_buffer );
 
