@@ -2,7 +2,7 @@
  * libioRIFF.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.h,v 1.1 2002/06/26 23:11:12 fenrir Exp $
+ * $Id: libioRIFF.h,v 1.2 2002/06/30 15:07:57 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,8 @@ typedef struct riffchunk_s
     u32 i_type;
     u32 i_pos;
     data_packet_t *p_data;
+    u64 i_8bytes; /* it's the first 8 bytes after header 
+                     used for key frame generation */
 } riffchunk_t;
 
 int  __RIFF_TellPos( input_thread_t *p_input, u32 *pos );
@@ -41,9 +43,10 @@ int	RIFF_FindChunk(input_thread_t * p_input,
 int  RIFF_GoToChunkData(input_thread_t * p_input);
 int	RIFF_LoadChunkData(input_thread_t * p_input,
                                riffchunk_t *p_riff );
-int	RIFF_LoadChunkDataInPES(input_thread_t * p_input,
-                                    pes_packet_t **pp_pes,
-                                    int i_size_index);
+int RIFF_LoadChunkDataInPES(input_thread_t * p_input,
+                            pes_packet_t **pp_pes,
+                            int i_size_index);
+
 int  RIFF_GoToChunk(input_thread_t * p_input, 
                            riffchunk_t *p_riff);
 int  RIFF_TestFileHeader( input_thread_t * p_input, 
