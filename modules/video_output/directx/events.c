@@ -81,7 +81,7 @@ static int DirectXConvertKey( int i_key );
  * The main goal of this thread is to isolate the Win32 PeekMessage function
  * because this one can block for a long time.
  *****************************************************************************/
-void DirectXEventThread( event_thread_t *p_event )
+void E_(DirectXEventThread)( event_thread_t *p_event )
 {
     MSG msg;
     POINT old_mouse_pos = {0,0}, mouse_pos;
@@ -109,7 +109,7 @@ void DirectXEventThread( event_thread_t *p_event )
     {
         ULONG (WINAPI* OurSetThreadExecutionState)( ULONG );
 
-        OurSetThreadExecutionState =
+        OurSetThreadExecutionState = (ULONG (WINAPI*)( ULONG ))
             GetProcAddress( hkernel32, _T("SetThreadExecutionState") );
 
         if( OurSetThreadExecutionState )
@@ -538,7 +538,7 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
  * its job is to update the source and destination RECTs used to display the
  * picture.
  *****************************************************************************/
-void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
+void E_(DirectXUpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
 {
 #define rect_src p_vout->p_sys->rect_src
 #define rect_src_clipped p_vout->p_sys->rect_src_clipped
@@ -674,7 +674,7 @@ void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
     rect_dest_clipped.bottom -= p_vout->p_sys->rect_display.top;
 
     if( p_vout->p_sys->b_using_overlay )
-        DirectXUpdateOverlay( p_vout );
+        E_(DirectXUpdateOverlay)( p_vout );
 
     /* Signal the change in size/position */
     p_vout->p_sys->i_changes |= DX_POSITION_CHANGE;
@@ -734,7 +734,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     {
 
     case WM_WINDOWPOSCHANGED:
-        DirectXUpdateRects( p_vout, VLC_TRUE );
+        E_(DirectXUpdateRects)( p_vout, VLC_TRUE );
         return 0;
 
     /* the user wants to close the window */

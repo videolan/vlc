@@ -254,7 +254,7 @@ static int OpenVideo( vlc_object_t *p_this )
         vlc_object_create( p_vout, sizeof(event_thread_t) );
     p_vout->p_sys->p_event->p_vout = p_vout;
     if( vlc_thread_create( p_vout->p_sys->p_event, "DirectX Events Thread",
-                           DirectXEventThread, 0, 1 ) )
+                           E_(DirectXEventThread), 0, 1 ) )
     {
         msg_Err( p_vout, "cannot create DirectXEventThread" );
         vlc_object_destroy( p_vout->p_sys->p_event );
@@ -541,7 +541,7 @@ static int Manage( vout_thread_t *p_vout )
     {
         SwitchWallpaperMode( p_vout, !p_vout->p_sys->b_wallpaper );
         p_vout->p_sys->i_changes &= ~DX_WALLPAPER_CHANGE;
-        DirectXUpdateOverlay( p_vout );
+        E_(DirectXUpdateOverlay)( p_vout );
     }
 
     /*
@@ -722,7 +722,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     {
         if( IDirectDrawSurface2_Restore( p_vout->p_sys->p_display ) == DD_OK &&
             p_vout->p_sys->b_using_overlay )
-            DirectXUpdateOverlay( p_vout );
+            E_(DirectXUpdateOverlay)( p_vout );
     }
 
     if( !p_vout->p_sys->b_using_overlay )
@@ -1025,7 +1025,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     SetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND,
                   (LONG)CreateSolidBrush( p_vout->p_sys->i_rgb_colorkey ) );
     InvalidateRect( p_vout->p_sys->hvideownd, NULL, TRUE );
-    DirectXUpdateRects( p_vout, VLC_TRUE );
+    E_(DirectXUpdateRects)( p_vout, VLC_TRUE );
 
     return VLC_SUCCESS;
 }
@@ -1193,7 +1193,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
         /* Check the overlay is useable as some graphics cards allow creating
          * several overlays but only one can be used at one time. */
         p_vout->p_sys->p_current_surface = *pp_surface_final;
-        if( DirectXUpdateOverlay( p_vout ) != VLC_SUCCESS )
+        if( E_(DirectXUpdateOverlay)( p_vout ) != VLC_SUCCESS )
         {
             IDirectDrawSurface2_Release( *pp_surface_final );
             *pp_surface_final = NULL;
@@ -1212,7 +1212,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
  * Ususally the overlay is moved by the user and thus, by a move or resize
  * event (in Manage).
  *****************************************************************************/
-int DirectXUpdateOverlay( vout_thread_t *p_vout )
+int E_(DirectXUpdateOverlay)( vout_thread_t *p_vout )
 {
     DDOVERLAYFX     ddofx;
     DWORD           dwFlags;
@@ -1433,7 +1433,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                 DirectXUnlockSurface( p_vout, &front_pic );
             }
 
-            DirectXUpdateOverlay( p_vout );
+            E_(DirectXUpdateOverlay)( p_vout );
             I_OUTPUTPICTURES = 1;
             msg_Dbg( p_vout, "YUV overlay created successfully" );
         }

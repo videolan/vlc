@@ -134,7 +134,7 @@ static int OpenVideo( vlc_object_t *p_this )
         vlc_object_create( p_vout, sizeof(event_thread_t) );
     p_vout->p_sys->p_event->p_vout = p_vout;
     if( vlc_thread_create( p_vout->p_sys->p_event, "DirectX Events Thread",
-                           DirectXEventThread, 0, 1 ) )
+                           E_(DirectXEventThread), 0, 1 ) )
     {
         msg_Err( p_vout, "cannot create DirectXEventThread" );
         vlc_object_destroy( p_vout->p_sys->p_event );
@@ -467,7 +467,7 @@ static void GLSwapBuffers( vout_thread_t *p_vout )
     SwapBuffers( p_vout->p_sys->hGLDC );
 }
 
-int DirectXUpdateOverlay( vout_thread_t *p_vout )
+int E_(DirectXUpdateOverlay)( vout_thread_t *p_vout )
 {
     return 1;
 }

@@ -130,13 +130,13 @@ struct picture_sys_t
 /*****************************************************************************
  * Prototypes from vout.c
  *****************************************************************************/
-int DirectXUpdateOverlay( vout_thread_t *p_vout );
+int E_(DirectXUpdateOverlay)( vout_thread_t *p_vout );
 
 /*****************************************************************************
  * Prototypes from events.c
  *****************************************************************************/
-void DirectXEventThread ( event_thread_t *p_event );
-void DirectXUpdateRects ( vout_thread_t *p_vout, vlc_bool_t b_force );
+void E_(DirectXEventThread) ( event_thread_t *p_event );
+void E_(DirectXUpdateRects) ( vout_thread_t *p_vout, vlc_bool_t b_force );
 
 /*****************************************************************************
  * Constants
