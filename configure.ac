@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.116 2003/11/22 17:03:57 fenrir Exp $
+dnl $Id: configure.ac,v 1.117 2003/11/22 18:11:22 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1608,8 +1608,6 @@ if test "${enable_ogg}" != "no"
 then
   AC_CHECK_HEADERS(ogg/ogg.h, [
     AC_CHECK_LIB( ogg, oggpack_read, [
-      AC_CHECK_LIB( ogg, oggpackB_read, [
-        AX_ADD_CPPFLAGS([ogg],[-DHAVE_OGGPACKB])])
       AX_ADD_PLUGINS([ogg mux_ogg])
       AX_ADD_LDFLAGS([ogg mux_ogg],[-logg])])
    ],[])
