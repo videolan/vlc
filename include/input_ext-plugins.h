@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.44 2003/11/24 03:30:38 fenrir Exp $
+ * $Id: input_ext-plugins.h,v 1.45 2003/11/24 20:50:45 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -65,6 +65,13 @@ void input_EscapeDiscontinuity( input_thread_t * );
 void input_EscapeAudioDiscontinuity( input_thread_t * );
 
 /*****************************************************************************
+ * Prototypes from es_out.c
+ *****************************************************************************/
+/* input internal use only */
+es_out_t *input_EsOutNew( input_thread_t * );
+void      input_EsOutDelete( es_out_t * );
+
+/*****************************************************************************
  * Prototypes from input_clock.c
  *****************************************************************************/
 void input_ClockInit( pgrm_descriptor_t * );
@@ -78,6 +85,7 @@ VLC_EXPORT( mtime_t, input_ClockGetTS, ( input_thread_t *, pgrm_descriptor_t *, 
 VLC_EXPORT( input_info_category_t *, input_InfoCategory, ( input_thread_t *, char * ) );
 VLC_EXPORT( int, input_AddInfo, ( input_info_category_t *, char *, char *, ... ) );
 int input_DelInfo( input_thread_t * p_input ); /* no need to export this */
+
 /*****************************************************************************
  * Prototypes from input_ext-plugins.h (buffers management)
  *****************************************************************************/
