@@ -2,7 +2,7 @@
 # Makefile : Build vlc-contrib files
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.5 2003/11/23 14:00:25 massiot Exp $
+# $Id$
 # 
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 # 
@@ -47,6 +47,7 @@ bin: contrib-macosx.tar.bz2
 	ranlib lib/*\.a
 
 clean-src: FORCE
+    rm -rf $(BUILDDIRS)
 	$(MAKE) -C src clean-src
 
 clean-bin: FORCE
@@ -62,7 +63,7 @@ package: FORCE
 		exit 1 ; \
 	fi
 	mkdir tmp
-	tar cf - bin include lib vlc-lib share/aclocal* share/autoconf* \
+	tar cf - bin sbin include lib vlc-lib share/aclocal* share/autoconf* \
 		share/automake* share/gettext* \
 		| (cd tmp; tar xf -)
 	./change_prefix.sh tmp $(PREFIX) @@CONTRIB_PREFIX@@

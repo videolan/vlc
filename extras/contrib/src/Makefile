@@ -1,7 +1,7 @@
 # ***************************************************************************
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
-# Copyright (C) 2003, 2004 VideoLAN
+# Copyright (C) 2003, 2004, 2005 VideoLAN
 # $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -924,7 +924,7 @@ libcdio: libcdio-$(CDIO_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .cdio: libcdio
-	(cd $<; ./configure --prefix=$(PREFIX) --without-libcddb --without-vcdinfo && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) --without-vcdinfo && make && make install)
 	touch $@
 
 CLEAN_FILE += .cdio
@@ -1080,12 +1080,13 @@ DISCLEAN_PKG += libopendaap-$(DAAP_VERSION).tar.bz2
 
 # ***************************************************************************
 # Copy aclocal files
-# This is neceserry for --missing aclocal to succeed after a
+# This is necessary for --missing aclocal to succeed after a
 # configure.ac/Makefile.am change in the vlc root dir
 # **************************************************************************
 
 .aclocal:
 	cp -R $(PREFIX)/share/aclocal/* $(PREFIX)/../../m4/
+	touch $@
 
 
 # ***************************************************************************
