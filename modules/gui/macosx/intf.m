@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: intf.m,v 1.114 2004/01/25 17:01:57 murray Exp $
+ * $Id: intf.m,v 1.115 2004/01/30 12:44:21 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -286,8 +286,8 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = [NSApp getIntf];
-    p_intf->p_sys->b_playlist_update = VLC_TRUE;
-    p_intf->p_sys->b_intf_update = VLC_TRUE;
+    p_intf->p_sys->b_playlist_update = TRUE;
+    p_intf->p_sys->b_intf_update = TRUE;
     return VLC_SUCCESS;
 }
 
@@ -435,7 +435,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
 }
 
-    - (void)initStrings
+- (void)initStrings
 {
     [o_window setTitle: _NS("VLC - Controller")];
     [o_scrollfield setStringValue: _NS("VLC media player")];
@@ -636,6 +636,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         {
             var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
             var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
+            var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, self );
 
 #define p_input p_playlist->p_input
         
