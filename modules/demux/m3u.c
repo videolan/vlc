@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.4 2002/11/18 13:08:35 gbazin Exp $
+ * $Id: m3u.c,v 1.5 2002/11/24 01:29:56 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -211,7 +211,7 @@ static int Demux ( input_thread_t *p_input )
             {
                 /* We are dealing with ASX files.
                  * We are looking for "href" or "param" html markups that
-                 * begins with "mms://" */
+                 * begins with "mms://", "http://" or "file://" */
                 char *psz_eol;
 
                 while( *psz_bol &&
@@ -221,8 +221,13 @@ static int Demux ( input_thread_t *p_input )
 
                 if( !*psz_bol ) continue;
 
-                while( *psz_bol && strncasecmp( psz_bol, "mms://",
-                                               sizeof("mms://") - 1 )  )
+                while( *psz_bol &&
+                       strncasecmp( psz_bol, "mms://",
+                                    sizeof("mms://") - 1 ) &&
+                       strncasecmp( psz_bol, "http://",
+                                    sizeof("http://") - 1 ) &&
+                       strncasecmp( psz_bol, "file://",
+                                    sizeof("file://") - 1 ) )
                     psz_bol++;
 
                 if( !*psz_bol ) continue;
@@ -240,11 +245,11 @@ static int Demux ( input_thread_t *p_input )
 
 	    /* Check if the line has an absolute or relative path */
 	    psz_name = psz_bol;
-            while( *psz_name && strncmp( psz_bol, "://", sizeof("://") - 1 ) )
+            msg_Dbg( p_input, "this is the current item: <%s>", psz_name );
+            while( *psz_name && strncmp( psz_name, "://", sizeof("://") - 1 ) )
 	    {
 	        psz_name++;
 	    }
-
 	    if( !*psz_name )
 	    {
  	        /* the line doesn't specify a protocol name.
