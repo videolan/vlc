@@ -34,6 +34,10 @@
 #include <getopt.h>                                              /* getopt() */
 #endif
 
+#ifdef SYS_DARWIN1_3
+#include <Carbon/Carbon.h>                              /* Altivec detection */
+#endif
+
 #include <unistd.h>
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                  /* getenv(), strtol(),  */
@@ -179,6 +183,8 @@ static void Version                 ( void );
 static void InitSignalHandler       ( void );
 static void SimpleSignalHandler     ( int i_signal );
 static void FatalSignalHandler      ( int i_signal );
+
+static int  CPUCapabilities         ( void );
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads
@@ -876,5 +882,123 @@ static void FatalSignalHandler( int i_signal )
     /* Try to terminate everything - this is done by requesting the end of the
      * interface thread */
     p_main->p_intf->b_die = 1;
+}
+
+/*****************************************************************************
+ * CPUCapabilities: list the processors MMX support and other capabilities
+ *****************************************************************************
+ * This function is called to list extensions the CPU may have.
+ *****************************************************************************/
+static int CPUCapabilities( void )
+{
+    int i_capabilities = CPU_CAPABILITY_NONE;
+
+#if defined( SYS_BEOS )
+    i_capabilities |= CPU_CAPABILITY_486
+                      | CPU_CAPABILITY_586
+                      | CPU_CAPABILITY_MMX;
+
+#elif defined( SYS_DARWIN1_3 )
+    OSErr err;
+    long l_attributes = 0;
+
+    err = Gestalt( gestaltPowerPCProcessorFeatures, &l_attributes );
+
+    if( err == noErr &&
+         ( (1 << gestaltPowerPCHasVectorInstructions) & l_attributes ) )
+    {
+        i_capabilities |= CPU_CAPABILITY_ALTIVEC;
+    }
+
+#elif defined( __i386__ )
+    unsigned int  i_eax, i_ebx, i_ecx, i_edx;
+    boolean_t     b_amd;
+
+#   define cpuid( a )              \
+    asm volatile ( "cpuid"         \
+                 : "=a" ( i_eax ), \
+                   "=b" ( i_ebx ), \
+                   "=c" ( i_ecx ), \
+                   "=d" ( i_edx )  \
+                 : "a"  ( a )      \
+                 : "cc" );         \
+
+    /* test for a 486 CPU */
+    asm volatile ( "pushfl
+                    popl %%eax
+                    movl %%eax, %%ebx
+                    xorl $0x200000, %%eax
+                    pushl %%eax
+                    popfl
+                    pushfl
+                    popl %%eax"
+                 : "=a" ( i_eax ),
+                   "=b" ( i_ebx )
+                 :
+                 : "cc" );
+
+    if( i_eax == i_ebx )
+    {
+        return( i_capabilities );
+    }
+
+    i_capabilities |= CPU_CAPABILITY_486;
+
+    /* the CPU supports the CPUID instruction - get its level */
+    cpuid( 0x00000000 );
+
+    if( !i_eax )
+    {
+        return( i_capabilities );
+    }
+
+    /* FIXME: this isn't correct, since some 486s have cpuid */
+    i_capabilities |= CPU_CAPABILITY_586;
+
+    /* borrowed from mpeg2dec */
+    b_amd = ( i_ebx == 0x68747541 ) && ( i_ecx == 0x444d4163 )
+                    && ( i_edx == 0x69746e65 );
+
+    /* test for the MMX flag */
+    cpuid( 0x00000001 );
+
+    if( ! (i_edx & 0x00800000) )
+    {
+        return( i_capabilities );
+    }
+
+    i_capabilities |= CPU_CAPABILITY_MMX;
+
+    if( i_edx & 0x02000000 )
+    {
+        i_capabilities |= CPU_CAPABILITY_MMXEXT;
+    }
+    
+    /* test for additional capabilities */
+    cpuid( 0x80000000 );
+
+    if( i_eax < 0x80000001 )
+    {
+        return( i_capabilities );
+    }
+
+    /* list these additional capabilities */
+    cpuid( 0x80000001 );
+
+    if( i_edx & 0x80000000 )
+    {
+        i_capabilities |= CPU_CAPABILITY_3DNOW;
+    }
+
+    if( b_amd && ( i_edx & 0x00400000 ) )
+    {
+        i_capabilities |= CPU_CAPABILITY_MMXEXT;
+    }
+
+#else
+    /* default behaviour */
+
+#endif
+    return( i_capabilities );
 }
 
