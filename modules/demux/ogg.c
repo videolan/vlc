@@ -41,7 +41,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Ogg stream demuxer" ) );
-    set_capability( "demux", 50 );
+    set_capability( "demux2", 50 );
     set_callbacks( Open, Close );
     add_shortcut( "ogg" );
 vlc_module_end();
@@ -96,6 +96,9 @@ struct demux_sys_t
 
     /* stream state */
     int     i_eos;
+
+    /* bitrate */
+    int     i_bitrate;
 };
 
 /* OggDS headers for the new header format (used in ogm files) */
@@ -147,17 +150,17 @@ typedef struct stream_header
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Demux  ( input_thread_t * );
-static int  Control( input_thread_t *, int, va_list );
+static int  Demux  ( demux_t * );
+static int  Control( demux_t *, int, va_list );
 
 /* Bitstream manipulation */
-static int  Ogg_ReadPage     ( input_thread_t *, ogg_page * );
+static int  Ogg_ReadPage     ( demux_t *, ogg_page * );
 static void Ogg_UpdatePCR    ( logical_stream_t *, ogg_packet * );
-static void Ogg_DecodePacket ( input_thread_t *, logical_stream_t *, ogg_packet * );
+static void Ogg_DecodePacket ( demux_t *, logical_stream_t *, ogg_packet * );
 
-static int Ogg_BeginningOfStream( input_thread_t *p_input );
-static int Ogg_FindLogicalStreams( input_thread_t *p_input );
-static void Ogg_EndOfStream( input_thread_t *p_input );
+static int Ogg_BeginningOfStream( demux_t *p_demux );
+static int Ogg_FindLogicalStreams( demux_t *p_demux );
+static void Ogg_EndOfStream( demux_t *p_demux );
 
 /* Logical bitstream headers */
 static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
@@ -172,39 +175,30 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *, logical_stream_t *p_stream,
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
+    demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t    *p_sys;
     uint8_t        *p_peek;
 
 
     /* Check if we are dealing with an ogg stream */
-    if( stream_Peek( p_input->s, &p_peek, 4 ) < 4 )
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
-        msg_Err( p_input, "cannot peek" );
+        msg_Err( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
-    if( strcmp( p_input->psz_demux, "ogg" ) && strncmp( p_peek, "OggS", 4 ) )
+    if( strcmp( p_demux->psz_demux, "ogg" ) && strncmp( p_peek, "OggS", 4 ) )
     {
-        msg_Warn( p_input, "ogg module discarded (invalid header)" );
+        msg_Warn( p_demux, "ogg module discarded (invalid header)" );
         return VLC_EGENERIC;
     }
-
-    /* Create one program */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_InitStream( p_input, 0 ) == -1)
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot init stream" );
-        return VLC_EGENERIC;
-    }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* Set exported functions */
-    p_input->pf_demux = Demux;
-    p_input->pf_demux_control = Control;
-    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
 
     memset( p_sys, 0, sizeof( demux_sys_t ) );
+    p_sys->i_bitrate = 0;
     p_sys->pp_stream = NULL;
 
     /* Begnning of stream, tell the demux to look for elementary streams. */
@@ -221,13 +215,13 @@ static int Open( vlc_object_t * p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t *p_sys = p_input->p_demux_data  ;
+    demux_t *p_demux = (demux_t *)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys  ;
 
     /* Cleanup the bitstream parser */
     ogg_sync_clear( &p_sys->oy );
 
-    Ogg_EndOfStream( p_input );
+    Ogg_EndOfStream( p_demux );
 
     free( p_sys );
 }
@@ -237,9 +231,9 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int Demux( input_thread_t * p_input )
+static int Demux( demux_t * p_demux )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
     ogg_page    oggpage;
     ogg_packet  oggpacket;
     int         i_stream;
@@ -249,21 +243,21 @@ static int Demux( input_thread_t * p_input )
     {
         if( p_sys->i_eos )
         {
-            msg_Dbg( p_input, "end of a group of logical streams" );
-            Ogg_EndOfStream( p_input );
+            msg_Dbg( p_demux, "end of a group of logical streams" );
+            Ogg_EndOfStream( p_demux );
         }
 
-        if( Ogg_BeginningOfStream( p_input ) != VLC_SUCCESS ) return 0;
+        if( Ogg_BeginningOfStream( p_demux ) != VLC_SUCCESS ) return 0;
         p_sys->i_eos = 0;
 
-        msg_Dbg( p_input, "beginning of a group of logical streams" );
-        es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
+        msg_Dbg( p_demux, "beginning of a group of logical streams" );
+        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
     }
 
     /*
      * Demux an ogg page from the stream
      */
-    if( Ogg_ReadPage( p_input, &oggpage ) != VLC_SUCCESS )
+    if( Ogg_ReadPage( p_demux, &oggpage ) != VLC_SUCCESS )
     {
         return 0; /* EOF */
     }
@@ -329,17 +323,17 @@ static int Demux( input_thread_t * p_input )
                 {
                     if( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
                     {
-                        Ogg_DecodePacket( p_input, p_stream, &oggpacket );
+                        Ogg_DecodePacket( p_demux, p_stream, &oggpacket );
                     }
                     else
                     {
-                        es_out_Control( p_input->p_es_out, ES_OUT_SET_PCR, p_stream->i_pcr );
+                        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_stream->i_pcr );
                     }
                     continue;
                 }
             }
 
-            Ogg_DecodePacket( p_input, p_stream, &oggpacket );
+            Ogg_DecodePacket( p_demux, p_stream, &oggpacket );
         }
         break;
     }
@@ -360,7 +354,7 @@ static int Demux( input_thread_t * p_input )
 
     if( p_sys->i_pcr >= 0 )
     {
-        es_out_Control( p_input->p_es_out, ES_OUT_SET_PCR, p_sys->i_pcr );
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
     }
 
 
@@ -370,9 +364,9 @@ static int Demux( input_thread_t * p_input )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( input_thread_t *p_input, int i_query, va_list args )
+static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t *p_sys  = p_input->p_demux_data;
+    demux_sys_t *p_sys  = p_demux->p_sys;
     int64_t *pi64;
     int i;
 
@@ -400,7 +394,9 @@ static int Control( input_thread_t *p_input, int i_query, va_list args )
             ogg_sync_reset( &p_sys->oy );
 
         default:
-            return demux_vaControlDefault( p_input, i_query, args );
+            return demux2_vaControlHelper( p_demux->s,
+                                           0, -1,
+                                           p_sys->i_bitrate, 1, i_query, args );
     }
 }
 
@@ -410,23 +406,21 @@ static int Control( input_thread_t *p_input, int i_query, va_list args )
  * Returns VLC_SUCCESS if a page has been read. An error might happen if we
  * are at the end of stream.
  ****************************************************************************/
-static int Ogg_ReadPage( input_thread_t *p_input, ogg_page *p_oggpage )
+static int Ogg_ReadPage( demux_t *p_demux, ogg_page *p_oggpage )
 {
-    demux_sys_t *p_ogg = (demux_sys_t *)p_input->p_demux_data  ;
+    demux_sys_t *p_ogg = p_demux->p_sys  ;
     int i_read = 0;
-    data_packet_t *p_data;
     byte_t *p_buffer;
 
     while( ogg_sync_pageout( &p_ogg->oy, p_oggpage ) != 1 )
     {
-        i_read = input_SplitBuffer( p_input, &p_data, OGG_BLOCK_SIZE );
+        p_buffer = ogg_sync_buffer( &p_ogg->oy, OGG_BLOCK_SIZE );
+
+        i_read = stream_Read( p_demux->s, p_buffer, OGG_BLOCK_SIZE );
         if( i_read <= 0 )
             return VLC_EGENERIC;
 
-        p_buffer = ogg_sync_buffer( &p_ogg->oy, i_read );
-        p_input->p_vlc->pf_memcpy( p_buffer, p_data->p_payload_start, i_read );
         ogg_sync_wrote( &p_ogg->oy, i_read );
-        input_DeletePacket( p_input->p_method_data, p_data );
     }
 
     return VLC_SUCCESS;
@@ -478,7 +472,7 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
 /****************************************************************************
  * Ogg_DecodePacket: Decode an Ogg packet.
  ****************************************************************************/
-static void Ogg_DecodePacket( input_thread_t *p_input,
+static void Ogg_DecodePacket( demux_t *p_demux,
                               logical_stream_t *p_stream,
                               ogg_packet *p_oggpacket )
 {
@@ -490,7 +484,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     /* Sanity check */
     if( !p_oggpacket->bytes )
     {
-        msg_Dbg( p_input, "discarding 0 sized packet" );
+        msg_Dbg( p_demux, "discarding 0 sized packet" );
         return;
     }
 
@@ -537,13 +531,13 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
                       p_stream->fmt.audio.i_channels =
                           bs_read( &s, 3 ) + 1;
 
-                      msg_Dbg( p_input, "FLAC header, channels: %i, rate: %i",
+                      msg_Dbg( p_demux, "FLAC header, channels: %i, rate: %i",
                                p_stream->fmt.audio.i_channels,
                                (int)p_stream->f_rate );
                   }
                   else
                   {
-                      msg_Dbg( p_input, "FLAC STREAMINFO metadata too short" );
+                      msg_Dbg( p_demux, "FLAC STREAMINFO metadata too short" );
                   }
 
                   /* Store STREAMINFO for the decoder and packetizer */
@@ -556,13 +550,13 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
                   /* Fake this as the last metadata block */
                   ((uint8_t*)p_stream->fmt.p_extra)[4] |= 0x80;
 
-                  p_stream->p_es = es_out_Add( p_input->p_es_out,
+                  p_stream->p_es = es_out_Add( p_demux->out,
                                                &p_stream->fmt );
               }
               else
               {
                   /* This ain't a STREAMINFO metadata */
-                  msg_Dbg( p_input, "Invalid FLAC STREAMINFO metadata" );
+                  msg_Dbg( p_demux, "Invalid FLAC STREAMINFO metadata" );
               }
               p_stream->b_force_backup = 0;
               p_stream->i_packets_backup = 0;
@@ -606,7 +600,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     }
 
     /* Check the ES is selected */
-    es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE,
+    es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
                     p_stream->p_es, &b_selected );
 
     if( b_selected && !p_stream->b_activated )
@@ -623,7 +617,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
                 p_stream->p_packets_backup[i].granulepos =
                     p_stream->i_interpolated_pcr * p_stream->f_rate / I64C(1000000);
 
-                Ogg_DecodePacket( p_input, p_stream,
+                Ogg_DecodePacket( p_demux, p_stream,
                                   &p_stream->p_packets_backup[i] );
             }
         }
@@ -641,10 +635,10 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
             if( p_stream->i_previous_pcr == 0 &&
                 p_stream->i_pcr  > 3 * DEFAULT_PTS_DELAY )
             {
-                es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
+                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
                 /* Call the pace control */
-                es_out_Control( p_input->p_es_out, ES_OUT_SET_PCR, p_stream->i_pcr );
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_stream->i_pcr );
             }
 
             p_stream->i_previous_pcr = p_stream->i_pcr;
@@ -664,10 +658,10 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         if( p_stream->i_previous_pcr == 0 &&
             p_stream->i_pcr  > 3 * DEFAULT_PTS_DELAY )
         {
-            es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             /* Call the pace control */
-            es_out_Control( p_input->p_es_out, ES_OUT_SET_PCR, p_stream->i_pcr );
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_stream->i_pcr );
         }
     }
 
@@ -690,7 +684,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         return;
     }
 
-    if( !( p_block = block_New( p_input, p_oggpacket->bytes ) ) ) return;
+    if( !( p_block = block_New( p_demux, p_oggpacket->bytes ) ) ) return;
 
     if( p_stream->fmt.i_cat == AUDIO_ES )
         p_block->i_dts = p_block->i_pts = i_pts;
@@ -748,7 +742,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     if( p_stream->fmt.i_codec == VLC_FOURCC( 't','a','r','k' ) )
     {
         /* FIXME: the biggest hack I've ever done */
-        msg_Warn( p_input, "tarkin pts: "I64Fd", granule: "I64Fd,
+        msg_Warn( p_demux, "tarkin pts: "I64Fd", granule: "I64Fd,
                   p_block->i_pts, p_block->i_dts );
         msleep(10000);
     }
@@ -756,7 +750,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     memcpy( p_block->p_buffer, p_oggpacket->packet + i_header_len,
             p_oggpacket->bytes - i_header_len );
 
-    es_out_Send( p_input->p_es_out, p_stream->p_es, p_block );
+    es_out_Send( p_demux->out, p_stream->p_es, p_block );
 }
 
 /****************************************************************************
@@ -769,16 +763,16 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
  *
  * On success this function returns VLC_SUCCESS.
  ****************************************************************************/
-static int Ogg_FindLogicalStreams( input_thread_t *p_input )
+static int Ogg_FindLogicalStreams( demux_t *p_demux )
 {
-    demux_sys_t *p_ogg = (demux_sys_t *)p_input->p_demux_data  ;
+    demux_sys_t *p_ogg = p_demux->p_sys  ;
     ogg_packet oggpacket;
     ogg_page oggpage;
     int i_stream;
 
 #define p_stream p_ogg->pp_stream[p_ogg->i_streams - 1]
 
-    while( Ogg_ReadPage( p_input, &oggpage ) == VLC_SUCCESS )
+    while( Ogg_ReadPage( p_demux, &oggpage ) == VLC_SUCCESS )
     {
         if( ogg_page_bos( &oggpage ) )
         {
@@ -807,7 +801,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                 if( ogg_stream_pagein( &p_stream->os, &oggpage ) < 0 )
                 {
                     /* error. stream version mismatch perhaps */
-                    msg_Err( p_input, "error reading first page of "
+                    msg_Err( p_demux, "error reading first page of "
                              "Ogg bitstream data" );
                     return VLC_EGENERIC;
                 }
@@ -820,7 +814,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                     ! strncmp( &oggpacket.packet[1], "vorbis", 6 ) )
                 {
                     Ogg_ReadVorbisHeader( p_stream, &oggpacket );
-                    msg_Dbg( p_input, "found vorbis header" );
+                    msg_Dbg( p_demux, "found vorbis header" );
                 }
                 /* Check for Speex header */
                 else if( oggpacket.bytes >= 7 &&
@@ -848,7 +842,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                     p_stream->fmt.audio.i_channels = oggpack_read( &opb, 32 );
                     p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
 
-                    msg_Dbg( p_input, "found speex header, channels: %i, "
+                    msg_Dbg( p_demux, "found speex header, channels: %i, "
                              "rate: %i,  bitrate: %i",
                              p_stream->fmt.audio.i_channels,
                              (int)p_stream->f_rate, p_stream->fmt.i_bitrate );
@@ -857,7 +851,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                 else if( oggpacket.bytes >= 4 &&
                     ! strncmp( &oggpacket.packet[0], "fLaC", 4 ) )
                 {
-                    msg_Dbg( p_input, "found FLAC header" );
+                    msg_Dbg( p_demux, "found FLAC header" );
 
                     /* Grrrr!!!! Did they really have to put all the
                      * important info in the second header packet!!!
@@ -873,7 +867,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                 {
                     Ogg_ReadTheoraHeader( p_stream, &oggpacket );
 
-                    msg_Dbg( p_input,
+                    msg_Dbg( p_demux,
                              "found theora header, bitrate: %i, rate: %f",
                              p_stream->fmt.i_bitrate, p_stream->f_rate );
                 }
@@ -883,7 +877,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                 {
                     oggpack_buffer opb;
 
-                    msg_Dbg( p_input, "found tarkin header" );
+                    msg_Dbg( p_demux, "found tarkin header" );
                     p_stream->fmt.i_cat = VIDEO_ES;
                     p_stream->fmt.i_codec = VLC_FOURCC( 't','a','r','k' );
 
@@ -893,7 +887,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                     oggpack_adv( &opb, 104 );
                     p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
                     p_stream->f_rate = 2; /* FIXME */
-                    msg_Dbg( p_input,
+                    msg_Dbg( p_demux,
                              "found tarkin header, bitrate: %i, rate: %f",
                              p_stream->fmt.i_bitrate, p_stream->f_rate );
                 }
@@ -901,7 +895,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                 else if( oggpacket.bytes >= 7 &&
                          ! strncmp( &oggpacket.packet[0], "Annodex", 7 ) )
                 {
-                    Ogg_ReadAnnodexHeader( VLC_OBJECT(p_input), p_stream,
+                    Ogg_ReadAnnodexHeader( VLC_OBJECT(p_demux), p_stream,
                                            &oggpacket );
                     /* kill annodex track */
                     free( p_stream );
@@ -911,7 +905,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                 else if( oggpacket.bytes >= 7 &&
                          ! strncmp( &oggpacket.packet[0], "AnxData", 7 ) )
                 {
-                    Ogg_ReadAnnodexHeader( VLC_OBJECT(p_input), p_stream,
+                    Ogg_ReadAnnodexHeader( VLC_OBJECT(p_demux), p_stream,
                                            &oggpacket );
                 }
                 else if( oggpacket.bytes >= 142 &&
@@ -930,7 +924,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                                         oggpacket.packet[69],
                                         oggpacket.packet[70],
                                         oggpacket.packet[71] );
-                        msg_Dbg( p_input, "found video header of type: %.4s",
+                        msg_Dbg( p_demux, "found video header of type: %.4s",
                                  (char *)&p_stream->fmt.i_codec );
 
                         p_stream->f_rate = 10000000.0 /
@@ -945,7 +939,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                         p_stream->fmt.video.i_height =
                             GetDWLE((oggpacket.packet+180));
 
-                        msg_Dbg( p_input,
+                        msg_Dbg( p_demux,
                                  "fps: %f, width:%i; height:%i, bitcount:%i",
                                  p_stream->f_rate,
                                  p_stream->fmt.video.i_width,
@@ -1011,9 +1005,9 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                                 i_format_tag & 0xff );
                         }
 
-                        msg_Dbg( p_input, "found audio header of type: %.4s",
+                        msg_Dbg( p_demux, "found audio header of type: %.4s",
                                  (char *)&p_stream->fmt.i_codec );
-                        msg_Dbg( p_input, "audio:0x%4.4x channels:%d %dHz "
+                        msg_Dbg( p_demux, "audio:0x%4.4x channels:%d %dHz "
                                  "%dbits/sample %dkb/s",
                                  i_format_tag,
                                  p_stream->fmt.audio.i_channels,
@@ -1024,7 +1018,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                     }
                     else
                     {
-                        msg_Dbg( p_input, "stream %d has an old header "
+                        msg_Dbg( p_demux, "stream %d has an old header "
                             "but is of an unknown type", p_ogg->i_streams-1 );
                         free( p_stream );
                         p_ogg->i_streams--;
@@ -1047,7 +1041,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                         p_stream->fmt.i_codec =
                             VLC_FOURCC( st->subtype[0], st->subtype[1],
                                         st->subtype[2], st->subtype[3] );
-                        msg_Dbg( p_input, "found video header of type: %.4s",
+                        msg_Dbg( p_demux, "found video header of type: %.4s",
                                  (char *)&p_stream->fmt.i_codec );
 
                         p_stream->f_rate = 10000000.0 /
@@ -1059,7 +1053,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                         p_stream->fmt.video.i_height =
                             GetDWLE(&st->sh.video.height);
 
-                        msg_Dbg( p_input,
+                        msg_Dbg( p_demux,
                                  "fps: %f, width:%i; height:%i, bitcount:%i",
                                  p_stream->f_rate,
                                  p_stream->fmt.video.i_width,
@@ -1120,9 +1114,9 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                                 i_format_tag & 0xff );
                         }
 
-                        msg_Dbg( p_input, "found audio header of type: %.4s",
+                        msg_Dbg( p_demux, "found audio header of type: %.4s",
                                  (char *)&p_stream->fmt.i_codec );
-                        msg_Dbg( p_input, "audio:0x%4.4x channels:%d %dHz "
+                        msg_Dbg( p_demux, "audio:0x%4.4x channels:%d %dHz "
                                  "%dbits/sample %dkb/s",
                                  i_format_tag,
                                  p_stream->fmt.audio.i_channels,
@@ -1136,14 +1130,14 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                         /* We need to get rid of the header packet */
                         ogg_stream_packetout( &p_stream->os, &oggpacket );
 
-                        msg_Dbg( p_input, "found text subtitles header" );
+                        msg_Dbg( p_demux, "found text subtitles header" );
                         p_stream->fmt.i_cat = SPU_ES;
                         p_stream->fmt.i_codec = VLC_FOURCC('s','u','b','t');
                         p_stream->f_rate = 1000; /* granulepos is in milisec */
                     }
                     else
                     {
-                        msg_Dbg( p_input, "stream %d has a header marker "
+                        msg_Dbg( p_demux, "stream %d has a header marker "
                             "but is of an unknown type", p_ogg->i_streams-1 );
                         free( p_stream );
                         p_ogg->i_streams--;
@@ -1151,13 +1145,13 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
                 }
                 else
                 {
-                    msg_Dbg( p_input, "stream %d is of unknown type",
+                    msg_Dbg( p_demux, "stream %d is of unknown type",
                              p_ogg->i_streams-1 );
                     free( p_stream );
                     p_ogg->i_streams--;
                 }
 
-                if( Ogg_ReadPage( p_input, &oggpage ) != VLC_SUCCESS )
+                if( Ogg_ReadPage( p_demux, &oggpage ) != VLC_SUCCESS )
                     return VLC_EGENERIC;
             }
 
@@ -1185,40 +1179,35 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input )
  * Ogg_BeginningOfStream: Look for Beginning of Stream ogg pages and add
  *                        Elementary streams.
  ****************************************************************************/
-static int Ogg_BeginningOfStream( input_thread_t *p_input )
+static int Ogg_BeginningOfStream( demux_t *p_demux )
 {
-    demux_sys_t *p_ogg = (demux_sys_t *)p_input->p_demux_data  ;
+    demux_sys_t *p_ogg = p_demux->p_sys  ;
     int i_stream;
 
     /* Find the logical streams embedded in the physical stream and
      * initialize our p_ogg structure. */
-    if( Ogg_FindLogicalStreams( p_input ) != VLC_SUCCESS )
+    if( Ogg_FindLogicalStreams( p_demux ) != VLC_SUCCESS )
     {
-        msg_Warn( p_input, "couldn't find any ogg logical stream" );
+        msg_Warn( p_demux, "couldn't find any ogg logical stream" );
         return VLC_EGENERIC;
     }
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.i_mux_rate = 0;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    p_ogg->i_bitrate = 0;
 
     for( i_stream = 0 ; i_stream < p_ogg->i_streams; i_stream++ )
     {
 #define p_stream p_ogg->pp_stream[i_stream]
         if( p_stream->fmt.i_codec != VLC_FOURCC('f','l','a','c') )
-            p_stream->p_es = es_out_Add( p_input->p_es_out, &p_stream->fmt );
+            p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
 
         if( p_stream->fmt.i_codec == VLC_FOURCC('c','m','m','l') )
         {
             /* Set the CMML stream active */
-            es_out_Control( p_input->p_es_out, ES_OUT_SET_ES,
+            es_out_Control( p_demux->out, ES_OUT_SET_ES,
                             p_stream->p_es );
         }
 
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.i_mux_rate += (p_stream->fmt.i_bitrate / ( 8 * 50 ));
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        p_ogg->i_bitrate += p_stream->fmt.i_bitrate;
 
         p_stream->i_pcr = p_stream->i_previous_pcr =
             p_stream->i_interpolated_pcr = -1;
@@ -1232,20 +1221,18 @@ static int Ogg_BeginningOfStream( input_thread_t *p_input )
 /****************************************************************************
  * Ogg_EndOfStream: clean up the ES when an End of Stream is detected.
  ****************************************************************************/
-static void Ogg_EndOfStream( input_thread_t *p_input )
+static void Ogg_EndOfStream( demux_t *p_demux )
 {
-    demux_sys_t *p_ogg = (demux_sys_t *)p_input->p_demux_data  ;
+    demux_sys_t *p_ogg = p_demux->p_sys  ;
     int i_stream, j;
 
 #define p_stream p_ogg->pp_stream[i_stream]
     for( i_stream = 0 ; i_stream < p_ogg->i_streams; i_stream++ )
     {
         if( p_stream->p_es )
-            es_out_Del( p_input->p_es_out, p_stream->p_es );
+            es_out_Del( p_demux->out, p_stream->p_es );
 
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.i_mux_rate -= (p_stream->fmt.i_bitrate / ( 8 * 50 ));
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        p_ogg->i_bitrate -= p_stream->fmt.i_bitrate;
 
         ogg_stream_clear( &p_ogg->pp_stream[i_stream]->os );
         for( j = 0; j < p_ogg->pp_stream[i_stream]->i_packets_backup; j++ )
