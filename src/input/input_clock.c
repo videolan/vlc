@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.20 2001/07/18 14:21:00 massiot Exp $
+ * $Id: input_clock.c,v 1.21 2001/07/20 16:20:25 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -160,6 +160,7 @@ int input_ClockManageControl( input_thread_t * p_input,
         p_input->stream.control.i_status = PAUSE_S;
         vlc_cond_wait( &p_input->stream.stream_wait,
                        &p_input->stream.stream_lock );
+        p_pgrm->last_syscr = 0;
         ClockNewRef( p_input, p_pgrm, i_clock, mdate() );
 
         if( p_input->stream.i_new_status == PAUSE_S )
