@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.36 2003/02/10 16:53:34 sam Exp $
+ * $Id: threads.c,v 1.37 2003/03/01 23:26:08 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -92,7 +92,6 @@ int __vlc_threads_init( vlc_object_t *p_this )
         i_status = VLC_THREADS_PENDING;
 
         /* We should be safe now. Do all the initialization stuff we want. */
-        vlc_object_create( p_libvlc, VLC_OBJECT_ROOT );
         p_libvlc->b_ready = VLC_FALSE;
 
 #if defined( PTH_INIT_IN_PTH_H )
@@ -129,6 +128,8 @@ int __vlc_threads_init( vlc_object_t *p_this )
 #elif defined( HAVE_CTHREADS_H )
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #endif
+
+        vlc_object_create( p_libvlc, VLC_OBJECT_ROOT );
 
         if( i_ret )
         {
@@ -686,7 +687,8 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
                                int i_line, int i_priority )
 {
-#if defined( WIN32 ) || defined( UNDER_CE )
+#if defined( PTH_INIT_IN_PTH_H ) || defined( ST_INIT_IN_ST_H )
+#elif defined( WIN32 ) || defined( UNDER_CE )
     if ( !SetThreadPriority(GetCurrentThread(), i_priority) )
     {
         msg_Warn( p_this, "couldn't set a faster priority" );

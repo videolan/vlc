@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.13 2003/01/22 15:16:02 massiot Exp $
+ * $Id: vlc_threads_funcs.h,v 1.14 2003/03/01 23:26:08 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -73,7 +73,7 @@ static inline int __vlc_mutex_lock( char * psz_file, int i_line,
     const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
-    i_result = pth_mutex_acquire( &p_mutex->mutex, TRUE, NULL );
+    i_result = pth_mutex_acquire( &p_mutex->mutex, FALSE, NULL );
 
 #elif defined( ST_INIT_IN_ST_H )
     i_result = st_mutex_lock( p_mutex->mutex );
