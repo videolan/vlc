@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.38 2003/06/11 21:46:57 asmax Exp $
+ * $Id: skin_main.cpp,v 1.39 2003/06/13 21:18:53 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -57,6 +57,7 @@
 
 #ifdef X11_SKINS
 #include <X11/Xlib.h>
+#include <Imlib2.h>
 #endif
 
 //---------------------------------------------------------------------------
@@ -129,13 +130,45 @@ static int Open ( vlc_object_t *p_this )
 
 #elif defined X11_SKINS
     // Initialize X11
-    p_intf->p_sys->display = XOpenDisplay( NULL );
+    Display *display = XOpenDisplay( NULL );
+    p_intf->p_sys->display = display;
     vlc_mutex_init( p_intf, &p_intf->p_sys->xlock );
     // Fake window to receive broadcast events
-    Window root = DefaultRootWindow( p_intf->p_sys->display );
-    p_intf->p_sys->mainWin = XCreateSimpleWindow( p_intf->p_sys->display, root, 0, 0, 
+    Window root = DefaultRootWindow( display );
+    p_intf->p_sys->mainWin = XCreateSimpleWindow( display, root, 0, 0, 
                                                   1, 1, 0, 0, 0 );
-    XStoreName( p_intf->p_sys->display, p_intf->p_sys->mainWin, "VLC Media Player" );
+    XStoreName( display, p_intf->p_sys->mainWin, "VLC Media Player" );
+
+    // Load the vlc icon
+    int screen = DefaultScreen( display );
+    Screen *screenptr = DefaultScreenOfDisplay( display );
+    Visual *visual = DefaultVisualOfScreen( screenptr );
+    imlib_context_set_display( display );
+    imlib_context_set_visual( visual );
+    imlib_context_set_drawable( root );
+    imlib_context_set_colormap( DefaultColormap( display, screen ) );
+    imlib_context_set_dither( 1 );
+    imlib_context_set_blend( 1 );
+    Imlib_Image img = imlib_load_image_immediately( DATA_PATH "vlc32x32.png" );
+    if( img == NULL )
+    {
+        // for developers ;)
+        img = imlib_load_image_immediately( "./share/vlc32x32.png" );
+    }
+    if( img == NULL )
+    {
+        msg_Err( p_intf, "loading vlc icon failed" );
+        p_intf->p_sys->iconPixmap = None;
+        p_intf->p_sys->iconMask = None;
+    }
+    else
+    {
+        imlib_context_set_image( img );
+        imlib_render_pixmaps_for_whole_image( &p_intf->p_sys->iconPixmap,
+                                              &p_intf->p_sys->iconMask );
+        imlib_free_image();
+    }                                     
+
 
 #elif defined WIN32
     // Interface thread id used to post broadcast messages

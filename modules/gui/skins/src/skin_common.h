@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.20 2003/06/11 10:42:34 gbazin Exp $
+ * $Id: skin_common.h,v 1.21 2003/06/13 21:18:53 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -87,6 +87,8 @@ struct intf_sys_t
     Display *display;
     Window mainWin;    // Window which receives "broadcast" events
     vlc_mutex_t xlock;
+    Pixmap iconPixmap; // vlc icon
+    Pixmap iconMask;
 #endif
 
 #ifdef WIN32

@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.21 2003/06/09 19:08:33 asmax Exp $
+ * $Id: x11_window.cpp,v 1.22 2003/06/13 21:18:54 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -94,6 +94,27 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
                          PropModeReplace, (unsigned char *)&xdndVersion, 1);
         XUNLOCK;
     }
+
+    // Associate vlc icon to the window
+    XLOCK;
+    XWMHints *hints = XGetWMHints( display, Wnd );
+    if( !hints)
+    {
+        hints = XAllocWMHints();
+    }
+    if( hints->icon_pixmap != None )
+    {
+        hints->icon_pixmap = p_intf->p_sys->iconPixmap;
+        hints->flags |= IconPixmapHint;
+    }
+    if( hints->icon_mask != None )
+    {
+        hints->icon_mask = p_intf->p_sys->iconMask;
+        hints->flags |= IconMaskHint;
+    }
+    XSetWMHints( display, Wnd, hints );
+    XFree( hints );
+    XUNLOCK;
 
     // Create Tool Tip window
     XColor color;
