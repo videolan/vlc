@@ -2,7 +2,7 @@
  * render.c : Philips OGT (SVCD Subtitle) renderer
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.10 2004/01/12 04:03:19 rocky Exp $
+ * $Id: render.c,v 1.11 2004/01/12 13:12:07 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -104,7 +104,7 @@ void VCDSubRender( vout_thread_t *p_vout, picture_t *p_pic,
 
         /* Used in ASCII art */
         case VLC_FOURCC('R','G','B','2'):
-            msg_Err( p_vout, "RGB2 not implimented yet" );
+            msg_Err( p_vout, "RGB2 not implemented yet" );
 	    break;
 
         default:
@@ -217,7 +217,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
 	      
 	    default:
 	      {
-		/* Blend in underlying pixel subtitle pixel. */
+		/* Blend in underlying subtitle pixel. */
 		
 		/* This is the location that's going to get changed.*/
 		uint8_t *p_pixel_Y = p_pixel_base_Y_y + i_x;
@@ -282,16 +282,14 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
 
   YUY2 Format:
 
-  Data is found in memory as an array of bytess in which the first
-  byte contains the first sample of Y, the second byte contains the
-  first sample of Cb (=U), the third byte contains the second sample
-  of Y, the fourth byte contains the first sample of Cr (=V); and so
-  on. If data is addressed as an array of two little-endian WORD type
-  variables, the first WORD contains Y0 in the least significant bits
-  and Cb in the most significant bits, and the second WORD contains Y1
-  in the least significant bits and Cr in the most significant bits.
+  Data is found in memory as an array of bytes in which the first byte
+  contains the first sample of Y, the second byte contains the first
+  sample of Cb (=U), the third byte contains the second sample of Y,
+  the fourth byte contains the first sample of Cr (=V); and so
+  on. Each 32-bit word then contains information for two contiguous
+  horizontal pixels, two 8-bit Y values plus a single Cb and Cr which
+  spans the two pixels.
 */
-
 
 static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop )
@@ -301,7 +299,6 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
   ogt_yuvt_t *p_source;
 
   int i_x, i_y;
-  vlc_bool_t even_scanline = VLC_FALSE;
 
   /* Crop-specific */
   int i_x_start, i_y_start, i_x_end, i_y_end;
@@ -315,9 +312,8 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 	     p_pic->p->i_pitch );
 
   
-  p_pixel_base = p_pic->p->p_pixels +
-              + ( p_spu->i_y + p_spu->i_height ) * p_pic->p->i_pitch 
-              + ( p_spu->i_x + p_spu->i_width );
+  p_pixel_base = p_pic->p->p_pixels + 
+               + ( p_spu->i_y * p_pic->p->i_pitch ) + p_spu->i_x * 2;
   
   i_x_start = p_sys->i_x_start;
   i_y_start = p_sys->i_y_start * p_pic->p->i_pitch;
@@ -333,8 +329,6 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
        i_y += p_pic->p->i_pitch )
     {
       uint8_t *p_pixel_base_y = p_pixel_base + i_y;
-
-      even_scanline = !even_scanline;
 
       /* printf("+++begin line: %d,\n", i++); */
       /* Draw until we reach the end of the line */
@@ -362,47 +356,66 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		   pixel with subtitle pixel. */
 		
 		/* This is the location that's going to get changed.*/
-		uint8_t *p_pixel = p_pixel_base_y + i_x;
+		uint8_t *p_pixel = p_pixel_base_y + i_x * 2;
 		
-		/* draw a pixel */
-                    /* Y */
+		/* draw a two contiguous pixels: 2 Y values, 1 U, and 1 V. */
 		*p_pixel++ = p_source->plane[Y_PLANE];
+		*p_pixel++ = p_source->plane[V_PLANE];
+		*p_pixel++ = (p_source+1)->plane[Y_PLANE];
+		*p_pixel++ = p_source->plane[U_PLANE];
 
-		if ( even_scanline ) {
-		  *p_pixel++ = p_source->plane[U_PLANE];
-		  *p_pixel++ = p_source->plane[Y_PLANE];
-		  *p_pixel++ = p_source->plane[V_PLANE];
-		}
-		
 		break;
 	      }
-	      
+
 	    default:
 	      {
-		/* Blend in underlying pixel subtitle pixel. */
+		/* Blend in underlying subtitle pixels. */
 		
 		/* This is the location that's going to get changed.*/
-		uint8_t *p_pixel = p_pixel_base_y + i_x;
+		uint8_t *p_pixel = p_pixel_base_y + i_x * 2;
 
 
-		/* This is the weighted part of the subtitle. The
-		   color plane is 8 bits and transparancy is 4 bits so
-		   when multiplied we get up to 12 bits.
+		/* This is the weighted part of the two subtitle
+		   pixels. The color plane is 8 bits and transparancy
+		   is 4 bits so when multiplied we get up to 12 bits.
 		 */
-		uint16_t i_sub_color_Y = 
+		uint16_t i_sub_color_Y1 = 
 		  (uint16_t) ( p_source->plane[Y_PLANE] *
 			       (uint16_t) (p_source->s.t) );
 
-		/* This is the weighted part of the underlying pixel.
+		uint16_t i_sub_color_Y2 = 
+		  (uint16_t) ( p_source->plane[Y_PLANE] *
+			       (uint16_t) ((p_source+1)->s.t) );
+
+		/* This is the weighted part of the underlying pixels.
 		   For the same reasons above, the result is up to 12
 		   bits.  However since the transparancies are
 		   inverses, the sum of i_sub_color and i_pixel_color
 		   will not exceed 12 bits.
 		*/
-		uint16_t i_pixel_color_Y = 
-		  (uint16_t) ( *p_pixel * 
-			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
+		uint16_t i_sub_color_U = 
+		  (uint16_t) ( p_source->plane[U_PLANE] *
+			       (uint16_t) (p_source->s.t) );
 		
+		uint16_t i_sub_color_V = 
+		  (uint16_t) ( p_source->plane[V_PLANE] *
+			       (uint16_t) (p_source->s.t) );
+
+		uint16_t i_pixel_color_Y1 = 
+		  (uint16_t) ( *(p_pixel) * 
+			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
+		uint16_t i_pixel_color_U = 
+		  (uint16_t) ( *(p_pixel+1) * 
+			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
+		uint16_t i_pixel_color_Y2 = 
+		  (uint16_t) ( *(p_pixel+2) * 
+			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
+		uint16_t i_pixel_color_V = 
+		  (uint16_t) ( *(p_pixel+3) * 
+			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
+
+		/* draw a two contiguous pixels: 2 Y values, 1 U, and 1 V. */
+
 		/* Scale the 12-bit result back down to 8 bits. A
 		   precise scaling after adding the two components,
 		   would divide by one less than a power of 2. However
@@ -411,29 +424,12 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		   transparent and all opaque) aren't handled properly.
 		   But we deal with them in special cases above. */
 
-		*p_pixel++ = ( i_sub_color_Y + i_pixel_color_Y ) >> 4;
-
-		if ( even_scanline ) {
-		  uint16_t i_sub_color_U = 
-		    (uint16_t) ( p_source->plane[U_PLANE] *
-				 (uint16_t) (p_source->s.t) );
-		  
-		  uint16_t i_sub_color_V = 
-		    (uint16_t) ( p_source->plane[V_PLANE] *
-				 (uint16_t) (p_source->s.t) );
-		  uint16_t i_pixel_color_U = 
-		    (uint16_t) ( *(p_pixel+1) * 
-				 (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
-		  uint16_t i_pixel_color_V = 
-		    (uint16_t) ( *(p_pixel+3) * 
-				 (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
-		  *p_pixel++ = ( i_sub_color_U + i_pixel_color_U ) >> 4;
-		  *p_pixel++ = ( i_sub_color_Y + i_pixel_color_Y ) >> 4;
-		  *p_pixel++ = ( i_sub_color_V + i_pixel_color_V ) >> 4;
-		}
+		*p_pixel++ = ( i_sub_color_Y1 + i_pixel_color_Y1 ) >> 4;
+		*p_pixel++ = ( i_sub_color_U + i_pixel_color_U ) >> 4;
+		*p_pixel++ = ( i_sub_color_Y2 + i_pixel_color_Y2 ) >> 4;
+		*p_pixel++ = ( i_sub_color_V + i_pixel_color_V ) >> 4;
 		break;
 	      }
-	      
 	    }
 	}
     }
