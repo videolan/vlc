@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.61 2003/08/03 23:11:21 gbazin Exp $
+ * $Id: configuration.c,v 1.62 2003/08/14 19:25:56 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
+#include "vlc_keys.h"
 
 #include <stdio.h>                                              /* sprintf() */
 #include <stdlib.h>                                      /* free(), strtol() */
@@ -55,6 +56,9 @@
 #if defined( WIN32 ) && !defined( UNDER_CE )
 #   include <direct.h>
 #endif
+
+
+static int ConfigStringToKey( char * );
 
 /*****************************************************************************
  * config_GetType: get the type of a variable (bool, int, float, string)
@@ -130,6 +134,7 @@ int __config_GetInt( vlc_object_t *p_this, const char *psz_name )
         return -1;
     }
     if( (p_config->i_type!=CONFIG_ITEM_INTEGER) &&
+        (p_config->i_type!=CONFIG_ITEM_KEY) &&
         (p_config->i_type!=CONFIG_ITEM_BOOL) )
     {
         msg_Err( p_this, "option %s does not refer to an int", psz_name );
@@ -280,6 +285,7 @@ void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
         return;
     }
     if( (p_config->i_type!=CONFIG_ITEM_INTEGER) &&
+        (p_config->i_type!=CONFIG_ITEM_KEY) &&
         (p_config->i_type!=CONFIG_ITEM_BOOL) )
     {
         msg_Err( p_this, "option %s does not refer to an int", psz_name );
@@ -761,6 +767,11 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                                  p_item->psz_name, (double)p_item->f_value );
 #endif
                         break;
+                    case CONFIG_ITEM_KEY:
+                        if( !*psz_option_value )
+                            break;                    /* ignore empty option */
+                        p_item->i_value = ConfigStringToKey( psz_option_value );
+                        break;
 
                     default:
                         vlc_mutex_lock( p_item->p_lock );
@@ -1007,6 +1018,7 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
              p_item->i_type != CONFIG_HINT_END;
              p_item++ )
         {
+            char *psz_key;
             if( p_item->i_type & CONFIG_HINT )
                 /* ignore hints */
                 continue;
@@ -1023,7 +1035,16 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     fprintf( file, "#" );
                 fprintf( file, "%s=%i\n", p_item->psz_name, p_item->i_value );
                 break;
-
+            case CONFIG_ITEM_KEY:
+                if( p_item->psz_text )
+                    fprintf( file, "# %s (%s)\n", p_item->psz_text,
+                             _("key") );
+                psz_key = ConfigKeyToString( p_item->i_value );
+                fprintf( file, "%s=%s\n", p_item->psz_name,
+                         psz_key ? psz_key : "" );
+                if ( psz_key ) free( psz_key );
+                break;
+                
             case CONFIG_ITEM_FLOAT:
                 if( p_item->psz_text )
                     fprintf( file, "# %s (%s)\n", p_item->psz_text,
@@ -1292,6 +1313,9 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
             case CONFIG_ITEM_FLOAT:
                 config_PutFloat( p_this, psz_name, (float)atof(optarg) );
                 break;
+            case CONFIG_ITEM_KEY:
+                config_PutInt( p_this, psz_name, ConfigStringToKey( optarg ) );
+                break;
             case CONFIG_ITEM_BOOL:
                 config_PutInt( p_this, psz_name, !flag );
                 break;
@@ -1458,4 +1482,64 @@ char *config_GetHomeDir( void )
 #endif
 
     return p_homedir;
+}
+
+
+
+static int ConfigStringToKey( char *psz_key )
+{
+    int i_key = 0;
+    unsigned int i;
+    char *psz_parser = strchr( psz_key, '-' );
+    while( psz_parser && psz_parser != psz_key )
+    {
+        for ( i = 0; i < sizeof(modifiers) / sizeof(key_descriptor_t); i++ )
+        {
+            if ( !strncasecmp( modifiers[i].psz_key_string, psz_key, strlen( modifiers[i].psz_key_string ) ) )
+            {
+                i_key |= modifiers[i].i_key_code;
+            }
+        }
+        psz_key = psz_parser + 1;
+        psz_parser = strchr( psz_key, '-' );
+    }
+    for ( i = 0; i < sizeof(keys) / sizeof( key_descriptor_t ); i++ )
+    {
+        if ( !strcasecmp( keys[i].psz_key_string, psz_key ) )
+        {
+            i_key |= keys[i].i_key_code;
+            break;
+        }
+    }
+    return i_key;
+}
+
+
+static char *ConfigKeyToString( int i_key )
+{
+    char *psz_key = malloc( 100 );
+    char *p;
+    int i;
+    if ( !psz_key )
+    {
+        return NULL;
+    }
+    *psz_key = '\0';
+    p = psz_key;
+    for( i = 0; i < sizeof(modifiers) / sizeof(key_descriptor_t); i++ )
+    {
+        if ( i_key & modifiers[i].i_key_code )
+        {
+            p += sprintf( p, "%s-", modifiers[i].psz_key_string );
+        }
+    }
+    for( i = 0; i < sizeof(keys) / sizeof( key_descriptor_t); i++)
+    {
+        if ( ( i_key & ~KEY_MODIFIER ) == keys[i].i_key_code )
+        {
+            p += sprintf( p, "%s", keys[i].psz_key_string );
+            break;
+        }
+    }
+    return psz_key;
 }

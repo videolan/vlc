@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.54 2003/07/29 21:14:10 gbazin Exp $
+ * $Id: interface.cpp,v 1.55 2003/08/14 19:25:56 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -205,6 +205,12 @@ Interface::Interface( intf_thread_t *_p_intf ):
     frame_sizer = new wxBoxSizer( wxHORIZONTAL );
     SetSizer( frame_sizer );
 
+    /* Create a dummy widget that can get the keyboard focus */
+    wxWindow *p_dummy = new wxWindow( this, 0, wxDefaultPosition,
+                                      wxSize(0,0) );
+    p_dummy->SetFocus();
+    frame_sizer->Add( p_dummy );
+                
     /* Creation of the menu bar */
     CreateOurMenuBar();
 
@@ -236,6 +242,8 @@ Interface::Interface( intf_thread_t *_p_intf ):
     /* Associate drop targets with the main interface */
     SetDropTarget( new DragAndDrop( p_intf ) );
 #endif
+
+    UpdateAcceleratorTable();
 }
 
 Interface::~Interface()
@@ -440,6 +448,43 @@ void Interface::CreateOurSlider()
 
     /* Hide the slider by default */
     slider_frame->Hide();
+}
+
+void Interface::UpdateAcceleratorTable()
+{
+    /* Set some hotkeys */
+    wxAcceleratorEntry entries[6];
+    int i_key = config_GetInt( p_intf, "quit-key" );
+    int i = 0;
+    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
+                    Exit_Event );
+    i_key = config_GetInt( p_intf, "stop-key" );
+    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
+                    StopStream_Event );
+    i_key = config_GetInt( p_intf, "play-pause-key" );
+    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
+                    PlayStream_Event );
+    i_key = config_GetInt( p_intf, "next-key" );
+    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
+                    NextStream_Event );
+    i_key = config_GetInt( p_intf, "prev-key" );
+    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
+                    PrevStream_Event );
+    i_key = config_GetInt( p_intf, "faster-key" );
+    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
+                    FastStream_Event );
+    i_key = config_GetInt( p_intf, "slower-key" );
+    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
+                    SlowStream_Event );
+
+    wxAcceleratorTable accel( 6, entries );
+
+    if( !accel.Ok() )
+        msg_Err( p_intf, "invalid accelerator table" );
+    
+    SetAcceleratorTable( accel );
+    msg_Dbg( p_intf, "accelerator table loaded" );
+    
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.24 2003/07/24 16:07:10 gbazin Exp $
+ * $Id: preferences.cpp,v 1.25 2003/08/14 19:25:56 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -851,7 +851,29 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             spin->SetClientData((void *)config_data);
             if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
             break;
-
+        case CONFIG_ITEM_KEY:
+        {
+            label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
+            wxCheckBox *alt = new wxCheckBox( panel, -1, wxU(_("Alt")) );
+            alt->SetValue( p_item->i_value & KEY_MODIFIER_ALT );
+            wxCheckBox *ctrl = new wxCheckBox( panel, -1, wxU(_("Ctrl")) );
+            ctrl->SetValue( p_item->i_value & KEY_MODIFIER_CTRL );
+            wxCheckBox *shift = new wxCheckBox( panel, -1, wxU(_("Shift")) );
+            shift->SetValue( p_item->i_value & KEY_MODIFIER_SHIFT );
+            combo = new wxComboBox( panel, -1, wxU("f"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY | wxCB_SORT );            
+            for( int i = 0; i < sizeof(keys)/sizeof(key_descriptor_s); i++ )
+            {
+                combo->Append( wxU(_(keys[i].psz_key_string)), (void*)&keys[i].i_key_code );
+            }
+            combo->SetValue( wxU( KeyToString( p_item->i_value&~KEY_MODIFIER )));
+            config_data->control.combobox = combo;
+            panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+            panel_sizer->Add( alt, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+            panel_sizer->Add( ctrl, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+            panel_sizer->Add( shift, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+            panel_sizer->Add( combo, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+        }
+            break;
         case CONFIG_ITEM_FLOAT:
             label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
             textctrl = new wxTextCtrl( panel, -1,

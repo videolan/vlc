@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.77 2003/07/20 19:48:30 hartman Exp $
+ * $Id: libvlc.h,v 1.78 2003/08/14 19:25:56 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #define Nothing here, this is just to prevent update-po from being stupid
+#include "vlc_keys.h"
 
 static char *ppsz_sout_acodec[] = { "", "mpga", "mp3", "vorb", "a52", NULL };
 static char *ppsz_sout_vcodec[] = { "", "mpgv", "mp4v", "DIV1", "DIV2", 
@@ -426,6 +427,41 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
     "Currently you can choose between implementation 0 (which is the " \
     "default and the fastest), 1 and 2.")
 
+#define FULLSCREEN_KEY_TEXT N_("Fullscreen")
+#define FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to swap fullscreen state")
+#define PLAY_PAUSE_KEY_TEXT N_("Pause")
+#define PLAY_PAUSE_KEY_LONGTEXT N_("Select the hotkey to use to swap paused state")
+#define PAUSE_KEY_TEXT N_("Pause only")
+#define PAUSE_KEY_LONGTEXT N_("Select the hotkey to use to pause")
+#define PLAY_KEY_TEXT N_("Play only")
+#define PLAY_KEY_LONGTEXT N_("Select the hotkey to use to play")
+#define FASTER_KEY_TEXT N_("Faster")
+#define FASTER_KEY_LONGTEXT N_("Select the hotkey to use for fast forward playback")
+#define SLOWER_KEY_TEXT N_("Slower")
+#define SLOWER_KEY_LONGTEXT N_("Select the hotkey to use for slow motion playback")
+#define NEXT_KEY_TEXT N_("Next")
+#define NEXT_KEY_LONGTEXT N_("Select the hotkey to use to skip to the next item in the playlist")
+#define PREV_KEY_TEXT N_("Previous")
+#define PREV_KEY_LONGTEXT N_("Select the hotkey to use to skip to the previous item in the playlist")
+#define STOP_KEY_TEXT N_("Stop")
+#define STOP_KEY_LONGTEXT N_("Select the hotkey to stop the playback")
+#define QUIT_KEY_TEXT N_("Quit")
+#define QUIT_KEY_LONGTEXT N_("Select the hotkey to quit the application")
+#define NAV_UP_KEY_TEXT N_("Navigate up")
+#define NAV_UP_KEY_LONGTEXT N_("Select the key to move the selector up in dvd menus")
+#define NAV_DOWN_KEY_TEXT N_("Navigate down")
+#define NAV_DOWN_KEY_LONGTEXT N_("Select the key to move the selector down in dvd menus")
+#define NAV_LEFT_KEY_TEXT N_("Navigate left")
+#define NAV_LEFT_KEY_LONGTEXT N_("Select the key to move the selector left in dvd menus")
+#define NAV_RIGHT_KEY_TEXT N_("Navigate right")
+#define NAV_RIGHT_KEY_LONGTEXT N_("Select the key to move the selector right in dvd menus")
+#define NAV_ACTIVATE_KEY_TEXT N_("Activate")
+#define NAV_ACTIVATE_KEY_LONGTEXT N_("Select the key to activate selected item in dvd menus")
+#define VOL_UP_KEY_TEXT N_("Volume up")
+#define VOL_UP_KEY_LONGTEXT N_("Select the key to turn up audio volume")
+#define VOL_DOWN_KEY_TEXT N_("Volume down")
+#define VOL_DOWN_KEY_LONGTEXT N_("Select the key to turn down audio volume")
+
 #define PLAYLIST_USAGE N_("\nPlaylist items:" \
     "\n  *.mpg, *.vob                   plain MPEG-1/2 files" \
     "\n  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]" \
@@ -592,6 +628,26 @@ vlc_module_begin();
     add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT, VLC_TRUE );
     add_integer( "win9x-cv-method", 0, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT, VLC_TRUE );
 #endif
+
+    /* Hotkey options*/
+    add_category_hint( N_("Hot keys"), NULL, VLC_FALSE );
+    add_key( "fullscreen-key", 'f', NULL, FULLSCREEN_KEY_TEXT, FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "play-pause-key", KEY_SPACE, NULL, PLAY_PAUSE_KEY_TEXT, PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "pause-key", 0, NULL, PAUSE_KEY_TEXT, PAUSE_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "play-key", 0, NULL, PLAY_KEY_TEXT, PLAY_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "faster-key", '+', NULL, FASTER_KEY_TEXT, FASTER_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "slower-key", '-', NULL, SLOWER_KEY_TEXT, SLOWER_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "next-key", 'n', NULL, NEXT_KEY_TEXT, NEXT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "prev-key", 'p', NULL, PREV_KEY_TEXT, PREV_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "stop-key", 's', NULL, STOP_KEY_TEXT, STOP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "nav-activate-key", KEY_ENTER, NULL, NAV_ACTIVATE_KEY_TEXT, NAV_ACTIVATE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "nav-up-key", KEY_UP, NULL, NAV_UP_KEY_TEXT, NAV_UP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "nav-down-key", KEY_DOWN, NULL, NAV_DOWN_KEY_TEXT, NAV_DOWN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "nav-left-key", KEY_LEFT, NULL, NAV_LEFT_KEY_TEXT, NAV_LEFT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "nav-right-key", KEY_RIGHT, NULL, NAV_RIGHT_KEY_TEXT, NAV_RIGHT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "quit-key", KEY_MODIFIER_CTRL|KEY_SPACE, NULL, QUIT_KEY_TEXT, QUIT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "vol-up-key", 'a', NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "vol-down-key", 'z', NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
 
     /* Usage (mainly useful for cmd line stuff) */
     add_usage_hint( PLAYLIST_USAGE );

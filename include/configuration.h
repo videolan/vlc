@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.30 2003/08/10 09:22:07 gbazin Exp $
+ * $Id: configuration.h,v 1.31 2003/08/14 19:25:55 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -44,6 +44,7 @@
 #define CONFIG_ITEM_BOOL                    0x0050  /* Bool option */
 #define CONFIG_ITEM_FLOAT                   0x0060  /* Float option */
 #define CONFIG_ITEM_DIRECTORY               0x0070  /* Directory option */
+#define CONFIG_ITEM_KEY                     0x0080  /* Hot key option */
 
 #define CONFIG_ITEM                         0x00F0
 
@@ -153,6 +154,8 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
     { static module_config_t tmp = { CONFIG_ITEM_MODULE, psz_caps, name, '\0', text, longtext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
 #define add_integer( name, i_value, p_callback, text, longtext, advc ) \
     { static module_config_t tmp = { CONFIG_ITEM_INTEGER, NULL, name, '\0', text, longtext, NULL, i_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
+#define add_key( name, i_value, p_callback, text, longtext, advc ) \
+    { static module_config_t tmp = { CONFIG_ITEM_KEY, NULL, name, '\0', text, longtext, NULL, i_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
 #define add_integer_with_range( name, i_value, i_min, i_max, p_callback, text, longtext, advc ) \
     { static module_config_t tmp = { CONFIG_ITEM_INTEGER, NULL, name, '\0', text, longtext, NULL, i_value, 0, i_min, i_max }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
 #define add_float( name, f_value, p_callback, text, longtext, advc ) \
