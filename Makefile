@@ -45,6 +45,7 @@ PLUGINS_DIR :=	ac3_adec \
 		mpeg_system \
 		mpeg_adec \
 		mpeg_vdec \
+		qnx \
 		qt \
 		sdl \
 		spudec \
@@ -116,6 +117,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		mpeg_system/mpeg_ts \
 		mpeg_adec/mpeg_adec \
 		mpeg_vdec/mpeg_vdec \
+		qnx/qnx \
 		qt/qt \
 		sdl/sdl \
 		spudec/spudec \

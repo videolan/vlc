@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.74 2002/02/19 00:50:18 sam Exp $
+ * $Id: common.h,v 1.75 2002/02/20 23:23:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -28,6 +28,7 @@
  * Required system headers
  *****************************************************************************/
 #include <string.h>                                            /* strerror() */
+#include <sys/types.h>
 
 /*****************************************************************************
  * Basic types definitions
@@ -37,7 +38,7 @@ typedef u8                  byte_t;
 
 /* Boolean type */
 #ifdef BOOLEAN_T_IN_SYS_TYPES_H
-#   include <sys/types.h>
+#   /* <sys/types.h> already included */
 #elif defined(BOOLEAN_T_IN_PTHREAD_H)
 #   include <pthread.h>
 #elif defined(BOOLEAN_T_IN_CTHREADS_H)

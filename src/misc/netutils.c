@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.55 2002/01/13 18:13:07 gbazin Exp $
+ * $Id: netutils.c,v 1.56 2002/02/20 23:23:53 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -51,7 +51,7 @@
 
 #ifdef WIN32
 #   include <winsock2.h>
-#elif !defined( SYS_BEOS ) && !defined( SYS_NTO )
+#elif !defined( SYS_BEOS )
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>                           /* BSD: struct sockaddr */
 #   include <netinet/in.h>                            /* BSD: struct in_addr */

@@ -177,7 +177,7 @@ AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/time.h sys/times.h)
 AC_CHECK_HEADERS(sys/soundcard.h machine/soundcard.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
-AC_CHECK_HEADERS(machine/param.h)
+AC_CHECK_HEADERS(machine/param.h sys/shm.h)
 
 AC_HEADER_TIME
 
@@ -1074,7 +1074,7 @@ dnl  a52 AC3 decoder plugin
 dnl
 AC_ARG_ENABLE(a52,
   [  --disable-a52           AC3 support with liba52 (default enabled)])
-if ((test "x$enableval" != "xno") && (test x$SYS != xmingw32))
+if test "x$enableval" != "xno" -a x$SYS != xmingw32
   then
     AC_CHECK_HEADERS(a52dec/a52.h, [
       BUILTINS="${BUILTINS} a52"
@@ -1211,7 +1211,7 @@ dnl  win32 waveOut plugin
 dnl
 AC_ARG_ENABLE(waveout,
   [  --disable-waveout       Win32 waveOut module (default enabled on Win32)])
-if ((test "x$enableval" != "xno") && (test x$SYS = xmingw32))
+if test "x$enableval" != "xno" -a x$SYS = xmingw32
   then
     PLUGINS="${PLUGINS} waveout"
     LIB_WAVEOUT="-lwinmm"

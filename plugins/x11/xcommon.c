@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.17 2002/02/19 00:50:19 sam Exp $
+ * $Id: xcommon.c,v 1.18 2002/02/20 23:23:53 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -34,21 +34,26 @@
 #include <videolan/vlc.h>
 
 #ifdef HAVE_MACHINE_PARAM_H
-/* BSD */
-#include <machine/param.h>
-#include <sys/types.h>                                     /* typedef ushort */
-#include <sys/ipc.h>
+    /* BSD */
+#   include <machine/param.h>
+#   include <sys/types.h>                                  /* typedef ushort */
+#   include <sys/ipc.h>
 #endif
 
 #ifndef WIN32
-#include <netinet/in.h>                               /* BSD: struct in_addr */
+#   include <netinet/in.h>                            /* BSD: struct in_addr */
 #endif
 
-#include <sys/shm.h>                                   /* shmget(), shmctl() */
+#ifdef HAVE_SYS_SHM_H
+#   include <sys/shm.h>                                /* shmget(), shmctl() */
+#endif
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
-#include <X11/extensions/XShm.h>
+#ifdef HAVE_SYS_SHM_H
+#   include <X11/extensions/XShm.h>
+#endif
 #ifdef DPMSINFO_IN_DPMS_H
 #   include <X11/extensions/dpms.h>
 #endif
@@ -102,7 +107,9 @@ static int  NewPicture     ( vout_thread_t *, picture_t * );
 static void FreePicture    ( vout_thread_t *, picture_t * );
 
 static IMAGE_TYPE *CreateImage    ( Display *, EXTRA_ARGS, int, int );
+#ifdef HAVE_SYS_SHM_H
 static IMAGE_TYPE *CreateShmImage ( Display *, EXTRA_ARGS_SHM, int, int );
+#endif
 
 static void ToggleFullScreen      ( vout_thread_t * );
 
@@ -134,7 +141,9 @@ typedef struct vout_sys_s
     Window              window;                               /* root window */
     GC                  gc;              /* graphic context instance handler */
 
+#ifdef HAVE_SYS_SHM_H
     boolean_t           b_shm;               /* shared memory extension flag */
+#endif
 
 #ifdef MODULE_NAME_IS_xvideo
     Window              yuv_window;   /* sub-window for displaying yuv video
@@ -195,7 +204,9 @@ typedef struct picture_sys_s
 {
     IMAGE_TYPE *        p_image;
 
+#ifdef HAVE_SYS_SHM_H
     XShmSegmentInfo     shminfo;       /* shared memory zone information */
+#endif
 
 } picture_sys_t;
 
@@ -496,25 +507,27 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     vout_PlacePicture( p_vout, p_vout->p_sys->i_width, p_vout->p_sys->i_height,
                        &i_x, &i_y, &i_width, &i_height );
 
+#ifdef HAVE_SYS_SHM_H
     if( p_vout->p_sys->b_shm )
     {
         /* Display rendered image using shared memory extension */
-#ifdef MODULE_NAME_IS_xvideo
+#   ifdef MODULE_NAME_IS_xvideo
         XvShmPutImage( p_vout->p_sys->p_display, p_vout->p_sys->i_xvport,
                        p_vout->p_sys->yuv_window, p_vout->p_sys->gc,
                        p_pic->p_sys->p_image, 0 /*src_x*/, 0 /*src_y*/,
                        p_vout->output.i_width, p_vout->output.i_height,
                        0 /*dest_x*/, 0 /*dest_y*/, i_width, i_height,
                        False /* Don't put True here or you'll waste your CPU */ );
-#else
+#   else
         XShmPutImage( p_vout->p_sys->p_display, p_vout->p_sys->window,
                       p_vout->p_sys->gc, p_pic->p_sys->p_image,
                       0 /*src_x*/, 0 /*src_y*/, 0 /*dest_x*/, 0 /*dest_y*/,
                       p_vout->output.i_width, p_vout->output.i_height,
                       False /* Don't put True here ! */ );
-#endif
+#   endif
     }
     else
+#endif /* HAVE_SYS_SHM_H */
     {
         /* Use standard XPutImage -- this is gonna be slow ! */
 #ifdef MODULE_NAME_IS_xvideo
@@ -1128,22 +1141,24 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         return -1;
     }
 
+#ifdef HAVE_SYS_SHM_H
     if( p_vout->p_sys->b_shm )
     {
         /* Create image using XShm extension */
         p_pic->p_sys->p_image =
             CreateShmImage( p_vout->p_sys->p_display,
-#ifdef MODULE_NAME_IS_xvideo
+#   ifdef MODULE_NAME_IS_xvideo
                             p_vout->p_sys->i_xvport,
                             p_vout->output.i_chroma,
-#else
+#   else
                             p_vout->p_sys->p_visual,
                             p_vout->p_sys->i_screen_depth,
-#endif
+#   endif
                             &p_pic->p_sys->shminfo,
                             p_vout->output.i_width, p_vout->output.i_height );
     }
     else
+#endif /* HAVE_SYS_SHM_H */
     {
         /* Create image without XShm extension */
         p_pic->p_sys->p_image =
@@ -1360,6 +1375,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /* The order of operations is correct */
+#ifdef HAVE_SYS_SHM_H
     if( p_vout->p_sys->b_shm )
     {
         XShmDetach( p_vout->p_sys->p_display, &p_pic->p_sys->shminfo );
@@ -1373,6 +1389,7 @@ static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         }
     }
     else
+#endif
     {
         IMAGE_FREE( p_pic->p_sys->p_image );
     }
@@ -1986,14 +2003,16 @@ static int InitDisplay( vout_thread_t *p_vout )
     int                         i_count;                       /* array size */
 #endif
 
-#ifdef SYS_DARWIN
+#ifdef HAVE_SYS_SHM_H
+#   ifdef SYS_DARWIN
     /* FIXME : As of 2001-03-16, XFree4 for MacOS X does not support Xshm. */
     p_vout->p_sys->b_shm = 0;
-#else
+#   else
     p_vout->p_sys->b_shm = ( XShmQueryExtension( p_vout->p_sys->p_display )
                               == True );
-#endif
+#   endif
     if( !p_vout->p_sys->b_shm )
+#endif
     {
         intf_WarnMsg( 1, "vout warning: XShm video extension is unavailable" );
     }
@@ -2082,6 +2101,7 @@ static int InitDisplay( vout_thread_t *p_vout )
     return( 0 );
 }
 
+#ifdef HAVE_SYS_SHM_H
 /*****************************************************************************
  * CreateShmImage: create an XImage or XvImage using shared memory extension
  *****************************************************************************
@@ -2157,6 +2177,7 @@ static IMAGE_TYPE * CreateShmImage( Display* p_display, EXTRA_ARGS_SHM,
 
     return( p_image );
 }
+#endif
 
 /*****************************************************************************
  * CreateImage: create an XImage or XvImage
