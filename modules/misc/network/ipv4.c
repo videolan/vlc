@@ -83,10 +83,18 @@ static int NetOpen( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define TIMEOUT_TEXT N_("TCP connection timeout in ms")
+#define TIMEOUT_LONGTEXT N_( \
+    "Allows you to modify the default TCP connection timeout. This " \
+    "value should be set in millisecond units." )
+
 vlc_module_begin();
     set_description( _("IPv4 network abstraction layer") );
     set_capability( "network", 50 );
     set_callbacks( NetOpen, NULL );
+
+    add_integer( "ipv4-timeout", 5 * 1000, NULL, TIMEOUT_TEXT,
+                 TIMEOUT_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -499,20 +507,29 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
         if( 0 )
 #endif
         {
-            int i_ret;
-            int i_opt;
-            int i_opt_size = sizeof( i_opt );
-            struct timeval  timeout;
-            fd_set          fds;
+            int i_ret, i_opt, i_opt_size = sizeof( i_opt ), i_max_count;
+            struct timeval timeout;
+            vlc_value_t val;
+            fd_set fds;
+
+            if( !var_Type( p_this, "ipv4-timeout" ) )
+            {
+                var_Create( p_this, "ipv4-timeout",
+                            VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+            }
+            var_Get( p_this, "ipv4-timeout", &val );
+            i_max_count = val.i_int * 1000 / 100000 /* timeout.tv_usec */;
 
             msg_Dbg( p_this, "connection in progress" );
             do
             {
-                if( p_this->b_die )
+                if( p_this->b_die || i_max_count <= 0 )
                 {
                     msg_Dbg( p_this, "connection aborted" );
                     goto error;
                 }
+
+                i_max_count--;
 
                 /* Initialize file descriptor set */
                 FD_ZERO( &fds );
