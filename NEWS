@@ -1,28 +1,37 @@
-$Id: NEWS,v 1.39 2003/05/05 13:15:06 titer Exp $
+$Id: NEWS,v 1.40 2003/05/15 02:02:13 hartman Exp $
 
-Changes between 0.5.3 and 0.5.4:
+Changes between 0.5.3 and 0.6.0:
 ---------------------------------
 
 Core Support:
- *
+ * Channel Server support was removed
 
 Input access:
  * fixed a big bug in ftp and http access that prevented many platforms (OSX most prominently) to view ftp and http streams.
+ * fixed large file support on Windows
+ * Video 4 Linux support
 
 Input demux:
- *
+ * Better detection of AAC and mp3 files
+ * Support for OpenDML avi files
+ * More complete .mp4/.mov support
 
 Codecs:
- *
+ * VLC's own MPEG1/2 decoder has been replace with libmpeg2
+ * Support for Sorenson 3 (SVQ3 or Quicktime content) via ffmpeg
+ * Fixed a bug which was causing artefacts in DivX video (ffmpeg)
+ * If ffmpeg cannot keep up, skip and try to recover instead of stopping altogether
 
 Interfaces:
- *
+ * The wxWindows interface is now Unicode safe
+ * New http interface
 
 Stream output:
  *
 
 Miscellaneous:
- *
+ * New reset all option for preferences
+ * You can set your language in the prefences
 
 UNIX ports:
  *
@@ -30,22 +39,24 @@ UNIX ports:
 Mac OS X port:
  * When you add several items to the playlist, they are sorted alphabetically.
  * New about panel
- * subs are removed more often now.
- * transparency option for video out.
- * float on top option for video out.
- * new output dialog for transcode and display while stream capabilities
+ * Subtitles are less permanent now.
+ * Fixed the deinterlace menu.
+ * Transparency option for video out.
+ * Float on top option for video out.
+ * New output dialog for transcode and display while stream capabilities
+ * New icons
+ * New audio resampler. Should make VLC much faster.
+ * Fixed disappearing and crackling sound (PTS is out of range bug)
+ * We no longer automatically save the preferences when you quit the application
 
 Win32 port:
- *
+ * the wxWindows interface is now the default interface
 
 BeOS port:
  * Interface localization
  * Screensaver disabled if playing in fullscreen
  * A few new keyboard shortcuts
  * New full-featured Preferences window
-
-iPAQ familiar Linux port:
- *
 
 Changes between 0.5.2 and 0.5.3:
 ---------------------------------
