@@ -12,12 +12,9 @@ export DH_COMPAT=3
 # Compilation options
 #
 
-FFMPEG_VERSION = cvs
-FAAD_VERSION = cvs
-
 CONFIG_FLAGS = --enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-familiar --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-mp4 --enable-dvb --enable-dv --enable-svgalib
-CONFIG_FLAGS += --enable-ffmpeg --with-ffmpeg-tree=ffmpeg-$(FFMPEG_VERSION)
-CONFIG_FLAGS += --enable-faad --with-faad-tree=faad-$(FAAD_VERSION)
+CONFIG_FLAGS += --enable-ffmpeg --with-ffmpeg-tree=extras/ffmpeg
+CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad
 ifeq ($(DEB_BUILD_ARCH),i386)
 CONFIG_FLAGS += --enable-glide
 else
@@ -40,8 +37,12 @@ build-stamp:
 	dh_testdir
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
-	test -d ffmpeg-$(FFMPEG_VERSION)
-	(cd ffmpeg-$(FFMPEG_VERSION) ; ./configure ; make)
+	test -d extras/ffmpeg
+	(cd extras/ffmpeg ; ./configure ; make)
+
+	# Check that we have an faad tree in here (can be a symlink)
+	test -d extras/faad
+	(cd extras/faad ; ./configure ; make)
 
 	./configure --mandir=$${prefix}/share/man \
 		--infodir=$${prefix}/share/info $(CONFIG_FLAGS)
@@ -56,8 +57,11 @@ clean:
 	rm -f build-stamp
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
-	test -d ffmpeg-$(FFMPEG_VERSION)
-	-(cd ffmpeg-$(FFMPEG_VERSION) ; make distclean)
+	test -d ffmpeg
+	-(cd ffmpeg ; make distclean)
+	# Check that we have an faad tree in here (can be a symlink)
+	test -d faad
+	-(cd faad ; make distclean)
 	-$(MAKE) distclean
 
 	dh_clean

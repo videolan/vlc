@@ -5645,7 +5645,7 @@ ALTIVEC_MODULES="codec/mpeg_video/idct/idctaltivec codec/mpeg_video/motion/motio
 
 if test x$SYS != xbeos
 then
-  PLUGINS="${PLUGINS} ${NETWORK}"
+  PLUGINS="${PLUGINS} ${NETWORK_MODULES}"
 fi
 
 echo $ac_n "checking if \$CC groks MMX inline assembly""... $ac_c" 1>&6

@@ -222,3 +222,15 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<ArkanumJ> meuuh: How's the 0.5 coming along? 
+<Meuuh> ArkanumJ : about 5 seconds
+<ArkanumJ> meuuh: huh? its going to be released soon?
+<Meuuh> ArkanumJ : no, it works for five seconds, before crashing
+
+  -- #videolan
+%
+<Meuuh> mais non henri, si on t'appréciait à la qualité de ton code, y'aurait
+        longtemps qu'on t'aurait fait bouffer de la strychnine
+
+  -- #videolan
+%
