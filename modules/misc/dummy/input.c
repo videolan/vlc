@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input.c,v 1.4 2003/09/07 22:53:09 fenrir Exp $
+ * $Id: input.c,v 1.5 2003/11/28 22:16:30 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -63,7 +63,7 @@ int E_(OpenAccess) ( vlc_object_t *p_this )
     p_input->stream.i_method = INPUT_METHOD_NONE;
 
     /* Force dummy demux plug-in */
-    p_input->psz_demux = "vlc";
+    p_input->psz_demux = "vlc,none";
 
     return VLC_SUCCESS;
 }
@@ -88,7 +88,7 @@ int E_(OpenDemux) ( vlc_object_t *p_this )
     if( p_method == NULL )
     {
         msg_Err( p_input, "out of memory" );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_input->p_demux_data = p_method;
@@ -99,7 +99,7 @@ int E_(OpenDemux) ( vlc_object_t *p_this )
     {
         msg_Info( p_input, "command `nop'" );
         p_method->i_command = COMMAND_NOP;
-        return 0;
+        return VLC_SUCCESS;
     }
 
     /* Check for a "vlc:quit" command */
@@ -107,7 +107,7 @@ int E_(OpenDemux) ( vlc_object_t *p_this )
     {
         msg_Info( p_input, "command `quit'" );
         p_method->i_command = COMMAND_QUIT;
-        return 0;
+        return VLC_SUCCESS;
     }
 
     /* Check for a "vlc:loop" command */
@@ -115,7 +115,7 @@ int E_(OpenDemux) ( vlc_object_t *p_this )
     {
         msg_Info( p_input, "command `loop'" );
         p_method->i_command = COMMAND_LOOP;
-        return 0;
+        return VLC_SUCCESS;
     }
 
     /* Check for a "vlc:pause:***" command */
@@ -125,14 +125,14 @@ int E_(OpenDemux) ( vlc_object_t *p_this )
         msg_Info( p_input, "command `pause %i'", i_arg );
         p_method->i_command = COMMAND_PAUSE;
         p_method->expiration = mdate() + (mtime_t)i_arg * (mtime_t)1000000;
-        return 0;
+        return VLC_SUCCESS;
     }
 
     msg_Err( p_input, "unknown command `%s'", psz_name );
     free( p_input->p_demux_data );
     p_input->b_error = 1;
 
-    return -1;
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
