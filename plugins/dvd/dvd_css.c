@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.18 2001/03/03 11:01:07 sam Exp $
+ * $Id: dvd_css.c,v 1.19 2001/04/02 23:30:41 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -38,17 +38,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <fcntl.h>
-#include <netinet/in.h>
-#ifdef HAVE_SYS_IOCTL_H
-# include <sys/ioctl.h>
-#endif
-#ifdef HAVE_SYS_DVDIO_H
-# include <sys/dvdio.h>
-#endif
-#ifdef LINUX_DVD
-# include <linux/cdrom.h>
-#endif
 
 #include "common.h"
 
@@ -67,7 +56,7 @@
  * Local prototypes
  *****************************************************************************/
 #ifdef HAVE_CSS
-static int  CSSGetASF    ( int i_fd );
+static int  CSSGetASF    ( css_t *p_css );
 static void CSSCryptKey  ( int i_key_type, int i_varient,
                            u8 const * pi_challenge, u8* pi_key );
 static int  CSSCracker   ( int i_start, unsigned char * p_crypted,
@@ -80,18 +69,16 @@ static int  CSSCracker   ( int i_start, unsigned char * p_crypted,
  *****************************************************************************/
 int CSSTest( int i_fd )
 {
-    dvd_struct dvd;
+    int i_ret, i_copyright;
 
-    dvd.type = DVD_STRUCT_COPYRIGHT;
-    dvd.copyright.layer_num = 0;
+    i_ret = dvd_ReadCopyright( i_fd, 0 /* i_layer */, &i_copyright );
 
-    if( dvd_ioctl( i_fd, DVD_READ_STRUCT, &dvd ) < 0 )
+    if( i_ret < 0 )
     {
-        intf_ErrMsg( "css error: DVD ioctl failed" );
-        return -1;
+        return i_ret;
     }
 
-    return dvd.copyright.cpst;
+    return i_copyright;
 }
 
 /*****************************************************************************
@@ -101,65 +88,53 @@ int CSSTest( int i_fd )
  * Since we don't need the disc key to find the title key, we just run the
  * basic unavoidable commands to authenticate device and disc.
  *****************************************************************************/
-css_t * CSSInit( int i_fd )
+int CSSInit( css_t * p_css )
 {
 #ifdef HAVE_CSS
     /* structures defined in cdrom.h or dvdio.h */
-    dvd_struct      dvd;
-    dvd_authinfo    auth_info;
-    css_t *         p_css;
+    char p_buffer[2048 + 4 + 1];
+    int  i_ret = -1;
+    int  i;
 
-    int             i_error = -1;
-    int             i;
-
-    p_css = malloc( sizeof(css_t) );
-    if( p_css == NULL )
-    {
-        return NULL;
-    }
-
-    p_css->i_fd = i_fd;
-
-    memset( &auth_info, 0, sizeof(auth_info) );
+    p_css->i_agid = 0;
 
     /* Test authentication success */
-    switch( CSSGetASF( i_fd ) )
+    switch( CSSGetASF( p_css ) )
     {
-    case -1:
-        free( p_css );
-        return NULL;
-    case 1:
-        return p_css;
-    case 0:
-        intf_WarnMsg( 3, "css info: authenticating" );
+        case -1:
+            return -1;
+
+        case 1:
+            return 0;
+
+        case 0:
+            intf_WarnMsg( 3, "css info: authenticating" );
     }
 
     /* Init sequence, request AGID */
     for( i = 1; i < 4 ; ++i )
     {
-        intf_WarnMsg( 3, "css info: request AGID %d", i );
-        auth_info.type = DVD_LU_SEND_AGID;
-        auth_info.lsa.agid = 0;
-        i_error =  dvd_ioctl( i_fd, DVD_AUTH, &auth_info );
-        if( i_error != -1 )
+        intf_WarnMsg( 3, "css info: requesting AGID %d", i );
+
+        i_ret = dvd_LUSendAgid( p_css );
+
+        if( i_ret != -1 )
         {
-            /* No error during ioctl: we know if device
-             * is authenticated */
+            /* No error during ioctl: we know the device is authenticated */
             break;
         }
 
         intf_ErrMsg( "css error: AGID N/A, invalidating" );
-        auth_info.type = DVD_INVALIDATE_AGID;
-        auth_info.lsa.agid = 0;
-        dvd_ioctl( i_fd, DVD_AUTH, &auth_info );
+
+        p_css->i_agid = 0;
+        dvd_InvalidateAgid( p_css );
     }
 
     /* Unable to authenticate without AGID */
-    if( i_error == -1 )
+    if( i_ret == -1 )
     {
         intf_ErrMsg( "css error: could not get AGID" );
-        free( p_css );
-        return NULL;
+        return -1;
     }
 
     for( i = 0 ; i < 10; ++i )
@@ -167,37 +142,30 @@ css_t * CSSInit( int i_fd )
         p_css->disc.pi_challenge[i] = i;
     }
 
-    /* Send AGID to host */
-    auth_info.type = DVD_HOST_SEND_CHALLENGE;
-
     /* Get challenge from host */
     for( i = 0 ; i < 10 ; ++i )
     {
-        auth_info.hsc.chal[9-i] = p_css->disc.pi_challenge[i];
+        p_buffer[9-i] = p_css->disc.pi_challenge[i];
     }
-    /* Returning data, let LU change state */
-    p_css->i_agid = auth_info.lsa.agid;
 
     /* Send challenge to LU */
-    if( dvd_ioctl( i_fd, DVD_AUTH, &auth_info )<0 )
+    if( dvd_HostSendChallenge( p_css, p_buffer ) < 0 )
     {
         intf_ErrMsg( "css error: failed sending challenge to LU" );
-        free( p_css );
-        return NULL;
+        return -1;
     }
 
     /* Get key1 from LU */
-    if( dvd_ioctl( i_fd, DVD_AUTH, &auth_info ) < 0)
+    if( dvd_LUSendKey1( p_css, p_buffer ) < 0)
     {
         intf_ErrMsg( "css error: failed getting key1 from LU" );
-        free( p_css );
-        return NULL;
+        return -1;
     }
 
     /* Send key1 to host */
     for( i = 0 ; i < KEY_SIZE ; i++ )
     {
-        p_css->disc.pi_key1[i] = auth_info.lsk.key[4-i];
+        p_css->disc.pi_key1[i] = p_buffer[4-i];
     }
 
     for( i = 0 ; i < 32 ; ++i )
@@ -210,7 +178,6 @@ css_t * CSSInit( int i_fd )
         {
             intf_WarnMsg( 3, "css info: drive authentic, using variant %d", i);
             p_css->disc.i_varient = i;
-            auth_info.type = DVD_LU_SEND_CHALLENGE;
             break;
         }
     }
@@ -218,117 +185,97 @@ css_t * CSSInit( int i_fd )
     if( i == 32 )
     {
         intf_ErrMsg( "css error: drive would not authenticate" );
-        auth_info.type = DVD_AUTH_FAILURE;
-        free( p_css );
-        return NULL;
+        return -1;
     }
 
     /* Get challenge from LU */
-    if( dvd_ioctl( i_fd, DVD_AUTH, &auth_info ) < 0 )
+    if( dvd_LUSendChallenge( p_css, p_buffer ) < 0 )
     {
         intf_ErrMsg( "css error: failed getting challenge from LU" );
-        free( p_css );
-        return NULL;
+        return -1;
     }
 
     /* Send challenge to host */
     for( i = 0 ; i < 10 ; ++i )
     {
-        p_css->disc.pi_challenge[i] = auth_info.hsc.chal[9-i];
+        p_css->disc.pi_challenge[i] = p_buffer[9-i];
     }
 
     CSSCryptKey( 1, p_css->disc.i_varient, p_css->disc.pi_challenge,
-                                                    p_css->disc.pi_key2 );
-    auth_info.type = DVD_HOST_SEND_KEY2;
+                                               p_css->disc.pi_key2 );
 
     /* Get key2 from host */
     for( i = 0 ; i < KEY_SIZE ; ++i )
     {
-        auth_info.hsk.key[4-i] = p_css->disc.pi_key2[i];
+        p_buffer[4-i] = p_css->disc.pi_key2[i];
     }
-    /* Returning data, let LU change state */
 
     /* Send key2 to LU */
-    if( dvd_ioctl( i_fd, DVD_AUTH, &auth_info ) < 0 )
+    if( dvd_HostSendKey2( p_css, p_buffer ) < 0 )
     {
-        intf_ErrMsg( "css error: failed sending key2 to LU (expected)" );
-        free( p_css );
-        return NULL;
+        intf_ErrMsg( "css error: failed sending key2 to LU" );
+        return -1;
     }
 
-    if( auth_info.type == DVD_AUTH_ESTABLISHED )
-    {
-        intf_WarnMsg( 3, "css info: authentication established" );
-    }
-    else if( auth_info.type == DVD_AUTH_FAILURE )
-    {
-        intf_ErrMsg( "css error: DVD authentication failed" );
-        free( p_css );
-        return NULL;
-    }
+    intf_WarnMsg( 3, "css info: authentication established" );
 
     memcpy( p_css->disc.pi_challenge, p_css->disc.pi_key1, KEY_SIZE );
     memcpy( p_css->disc.pi_challenge+KEY_SIZE, p_css->disc.pi_key2, KEY_SIZE );
-    CSSCryptKey( 2, p_css->disc.i_varient,
-                    p_css->disc.pi_challenge,
-                    p_css->disc.pi_key_check );
+    CSSCryptKey( 2, p_css->disc.i_varient, p_css->disc.pi_challenge,
+                                               p_css->disc.pi_key_check );
 
     intf_WarnMsg( 1, "css info: received Session Key" );
 
     if( p_css->i_agid < 0 )
     {
-        free( p_css );
-        return NULL;
+        return -1;
     }
 
     /* Test authentication success */
-    switch( CSSGetASF( i_fd ) )
+    switch( CSSGetASF( p_css ) )
     {
-    case -1:
-        free( p_css );
-        return NULL;
-    case 1:
-        return p_css;
-    case 0:
-        intf_WarnMsg( 3, "css info: getting disc key" );
+        case -1:
+            return -1;
+
+        case 1:
+            return 0;
+
+        case 0:
+            intf_WarnMsg( 3, "css info: getting disc key" );
     }
 
     /* Get encrypted disc key */
-    dvd.type = DVD_STRUCT_DISCKEY;
-    dvd.disckey.agid = p_css->i_agid;
-    memset( dvd.disckey.value, 0, 2048 );
-
-    if( dvd_ioctl( i_fd, DVD_READ_STRUCT, &dvd ) < 0 )
+    if( dvd_ReadKey( p_css, p_buffer ) < 0 )
     {
         intf_ErrMsg( "css error: could not read Disc Key" );
-        free( p_css );
-        return NULL;
-    }
-#if 1
-    /* Unencrypt disc key using bus key */
-    for( i = 0 ; i < sizeof(dvd.disckey.value) ; i++ )
-    {
-        dvd.disckey.value[i] ^= p_css->disc.pi_key_check[4 - (i % KEY_SIZE)];
-    }
-    memcpy( p_css->disc.pi_key_check, dvd.disckey.value, 2048 );
-#endif
-    /* Test authentication success */
-    switch( CSSGetASF( i_fd ) )
-    {
-    case -1:
-    case 0:
-        free( p_css );
-        return NULL;
-    case 1:
-        return p_css;
+        return -1;
     }
 
-    return p_css;
+    /* Unencrypt disc key using bus key */
+    for( i = 0 ; i < 2048 ; i++ )
+    {
+        p_buffer[ i ] ^= p_css->disc.pi_key_check[ 4 - (i % KEY_SIZE) ];
+    }
+    memcpy( p_css->disc.pi_key_check, p_buffer, 2048 );
+
+    /* Test authentication success */
+    switch( CSSGetASF( p_css ) )
+    {
+        case -1:
+        case 0:
+            return -1;
+
+        case 1:
+            return 0;
+    }
+
+    return 0;
 
 #else /* HAVE_CSS */
     intf_ErrMsg( "css error: CSS decryption is disabled in this module" );
 
-    return NULL;
+    return -1;
+
 #endif /* HAVE_CSS */
 }
 
@@ -442,7 +389,7 @@ int CSSGetKey( css_t * p_css )
                     (dvd_key_t*)&pi_buf[0x54], &pi_key);
             }
 
-            /* Stop search if we find one occurance of the key 
+            /* Stop search if we find one occurence of the key 
              * I have never found a DVD for which it is not enough
              * but we should take care of that */
             if( i_registered_keys == 1 && p_title_key[0].i_occ >= 1 )
@@ -593,26 +540,25 @@ int CSSDescrambleSector( dvd_key_t pi_key, u8* pi_sec )
  *  0 if the device needs to be authenticated,
  *  1 either.
  *****************************************************************************/
-static int CSSGetASF( int i_fd )
+static int CSSGetASF( css_t *p_css )
 {
-    dvd_authinfo    auth_info;
+    int i_oldagid = p_css->i_agid, i_asf = 0;
 
-    auth_info.type = DVD_LU_SEND_ASF;
-    auth_info.lsasf.asf = 0;
-
-    for( auth_info.lsasf.agid = 0 ; auth_info.lsasf.agid < 4 ;
-                                                    auth_info.lsasf.agid++ )
+    for( p_css->i_agid = 0 ; p_css->i_agid < 4 ; p_css->i_agid++ )
     {
-        if( !( dvd_ioctl( i_fd, DVD_AUTH, &auth_info ) ) )
+        if( dvd_LUSendASF( p_css, &i_asf ) == 0 )
         {
-            intf_WarnMsg( 3, "css info: %sauthenticated",
-                          auth_info.lsasf.asf ? "" : "not " );
-            return auth_info.lsasf.asf;
+            intf_WarnMsg( 3, "css info: %sauthenticated", i_asf ? "":"not " );
+
+            p_css->i_agid = i_oldagid;
+            return i_asf;
         }
     }
 
     /* The ioctl process has failed */
     intf_ErrMsg( "css error: GetASF fatal error" );
+
+    p_css->i_agid = i_oldagid;
     return -1;
 }
 

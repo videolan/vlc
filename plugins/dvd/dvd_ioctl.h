@@ -2,7 +2,7 @@
  * dvd_ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.h,v 1.3 2001/03/06 10:21:59 massiot Exp $
+ * $Id: dvd_ioctl.h,v 1.4 2001/04/02 23:30:41 sam Exp $
  *
  * Authors: David Giller <rafetmad@oxy.edu>
  *          Eberhard Moenkeberg <emoenke@gwdg.de>
@@ -24,6 +24,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+int dvd_ReadCopyright     ( int i_fd, int i_layer, int *pi_copyright );
+
+int dvd_ReadKey           ( css_t *p_css, u8 *p_key );
+int dvd_LUSendAgid        ( css_t *p_css );
+int dvd_LUSendChallenge   ( css_t *p_css, u8 *p_challenge );
+int dvd_LUSendKey1        ( css_t *p_css, u8 *p_key );
+int dvd_LUSendASF         ( css_t *p_css, int *pi_asf );
+int dvd_InvalidateAgid    ( css_t *p_css );
+int dvd_HostSendChallenge ( css_t *p_css, u8 *p_challenge );
+int dvd_HostSendKey2      ( css_t *p_css, u8 *p_key );
 
 int dvd_ioctl( int i_fd, unsigned long i_op, void *p_arg );
 

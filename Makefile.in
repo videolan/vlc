@@ -70,7 +70,7 @@ endif
 # C headers directories
 #
 INCLUDE += @INCLUDE@
-INCLUDE += -Iinclude -I/usr/local/include
+INCLUDE += -Iinclude -Iextras -I/usr/local/include
 
 #
 # Libraries
@@ -636,7 +636,7 @@ $(PLUGIN_GLIDE): %.o: %.c
 $(PLUGIN_QT): %.o: Makefile.dep
 $(PLUGIN_QT): %.o: .dep/%.dpp
 $(PLUGIN_QT): %.o: %.moc
-	$(CC) $(CFLAGS) $(PCFLAGS) -I${QTDIR}/include -c -o $@ $(<:%.moc=%.cpp)
+	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/qt -I${QTDIR}/include -c -o $@ $(<:%.moc=%.cpp)
 $(PLUGIN_QT:%.o=%.moc): %.moc: %.cpp
 	moc -i $< -o $@
 

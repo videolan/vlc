@@ -78,7 +78,7 @@
  * in the Makefile */
 
 /* Modules specific debugging - this will produce a lot of output, but can be
- * usefull to track a bug */
+ * useful to track a bug */
 //#define DEBUG_INTF
 //#define DEBUG_INPUT
 //#define DEBUG_AUDIO
@@ -445,9 +445,9 @@
 #define INTF_WARNING_VAR                "warning_level"
 #define INTF_WARNING_DEFAULT            12
 
-/* Define to enable messages queues - disabling messages queue can be usefull
- * when debugging, since it allows messages which would not otherwise be printed,
- * due to a crash, to be printed anyway */
+/* Define to enable messages queues - disabling messages queue can be useful
+ * when debugging, since it allows messages which would not be printed
+ * due to a crash to be printed anyway */
 #ifndef DEBUG
 #define INTF_MSG_QUEUE
 #endif

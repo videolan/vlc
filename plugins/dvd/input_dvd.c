@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.35 2001/04/01 07:31:38 stef Exp $
+ * $Id: input_dvd.c,v 1.36 2001/04/02 23:30:41 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -243,7 +243,6 @@ lang_tbl[] =
  * Local prototypes
  *****************************************************************************/
 static int  DVDProbe    ( probedata_t *p_data );
-static int  DVDCheckCSS ( struct input_thread_s * );
 static int  DVDRead     ( struct input_thread_s *, data_packet_t ** );
 static void DVDInit     ( struct input_thread_s * );
 static void DVDEnd      ( struct input_thread_s * );
@@ -339,15 +338,6 @@ static int DVDProbe( probedata_t *p_data )
 
     return( i_score );
 }
-
-/*****************************************************************************
- * DVDCheckCSS: check the stream
- *****************************************************************************/
-static int DVDCheckCSS( input_thread_t * p_input )
-{
-    return CSSTest( p_input->i_handle );
-}
-
 
 /*****************************************************************************
  * DVDFindCell: adjust the title cell index with the program cell
@@ -744,7 +734,8 @@ static void DVDInit( input_thread_t * p_input )
     int                  i_chapter;
     int                  i;
 
-    if( (p_dvd = malloc( sizeof(thread_dvd_data_t) )) == NULL )
+    p_dvd = malloc( sizeof(thread_dvd_data_t) );
+    if( p_dvd == NULL )
     {
         intf_ErrMsg( "Out of memory" );
         p_input->b_error = 1;
@@ -759,7 +750,17 @@ static void DVDInit( input_thread_t * p_input )
     p_dvd->i_block_once = 32;
     p_input->i_read_once = 128;
 
-    p_dvd->b_encrypted = DVDCheckCSS( p_input );
+    i = CSSTest( p_input->i_handle );
+
+    if( i < 0 )
+    {
+        intf_ErrMsg( "css error: could not get copyright bit" );
+        free( p_dvd );
+        p_input->b_error = 1;
+        return;
+    }
+
+    p_dvd->b_encrypted = i;
 
     lseek( p_input->i_handle, 0, SEEK_SET );
 
@@ -771,20 +772,31 @@ static void DVDInit( input_thread_t * p_input )
     /* Ifo initialisation */
     if( IfoInit( &p_dvd->p_ifo, p_input->i_handle ) < 0 )
     {
-            intf_ErrMsg( "ifo error: fatal failure" );
-            free( p_dvd );
-            p_input->b_error = 1;
-            return;
+        intf_ErrMsg( "ifo error: fatal failure" );
+        free( p_dvd );
+        p_input->b_error = 1;
+        return;
     }
 
     /* CSS initialisation */
     if( p_dvd->b_encrypted )
     {
-        p_dvd->p_css = CSSInit( p_input->i_handle );
-
+        p_dvd->p_css = malloc( sizeof(css_t) );
         if( p_dvd->p_css == NULL )
         {
+            intf_ErrMsg( "css error: couldn't create CSS structure" );
+            free( p_dvd );
+            p_input->b_error = 1;
+            return;
+        }
+
+        p_dvd->p_css->i_fd = p_input->i_handle;
+        p_dvd->p_css->i_agid = 0;
+
+        if( CSSInit( p_dvd->p_css ) )
+        {
             intf_ErrMsg( "css error: fatal failure" );
+            free( p_dvd->p_css );
             free( p_dvd );
             p_input->b_error = 1;
             return;
@@ -865,6 +877,7 @@ static void DVDEnd( input_thread_t * p_input )
     if( p_dvd->b_encrypted )
     {
         CSSEnd( p_dvd->p_css );
+        free( p_dvd->p_css );
     }
 
     IfoEnd( p_dvd->p_ifo );

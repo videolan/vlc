@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder_thread.c,v 1.11 2001/03/21 13:42:34 sam Exp $
+ * $Id: lpcm_decoder_thread.c,v 1.12 2001/04/02 23:30:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,7 +46,7 @@
 #include "lpcm_decoder.h"
 #include "lpcm_decoder_thread.h"
 
-#define LPCMDEC_FRAME_SIZE (2*1536)                    /* May not be usefull */
+#define LPCMDEC_FRAME_SIZE (2*1536)                        /* May be useless */
 
 /*****************************************************************************
  * Local prototypes

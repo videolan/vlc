@@ -2,7 +2,7 @@
  * input_dvd.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dvd.h,v 1.14 2001/04/01 07:31:38 stef Exp $
+ * $Id: input_dvd.h,v 1.15 2001/04/02 23:30:41 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -74,9 +74,9 @@ void  IfoEnd      ( struct ifo_s * );
 /*****************************************************************************
  * Prototypes in dvd_css.c
  *****************************************************************************/
-int             CSSTest             ( int );
-struct css_s *  CSSInit             ( int );
-void            CSSEnd              ( struct css_s * );
-int             CSSGetKey           ( struct css_s * );
-int             CSSDescrambleSector ( u8 * , u8 * );
+int   CSSTest             ( int );
+int   CSSInit             ( struct css_s * );
+void  CSSEnd              ( struct css_s * );
+int   CSSGetKey           ( struct css_s * );
+int   CSSDescrambleSector ( u8 * , u8 * );
 

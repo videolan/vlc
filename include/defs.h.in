@@ -52,6 +52,9 @@
 /* Define if you have the vasprintf function.  */
 #undef HAVE_VASPRINTF
 
+/* Define if you have the <CoreAudio/AudioHardware.h> header file.  */
+#undef HAVE_COREAUDIO_AUDIOHARDWARE_H
+
 /* Define if you have the <SDL/SDL.h> header file.  */
 #undef HAVE_SDL_SDL_H
 
