@@ -2,7 +2,7 @@
  * fixed32float32.c : converter from fixed32 to float32 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: fixed32tofloat32.c,v 1.1 2002/08/12 20:35:18 jpsaman Exp $
+ * $Id: fixed32tofloat32.c,v 1.2 2002/08/12 21:40:40 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -90,10 +90,24 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     for ( i = 0; i < p_in_buf->i_nb_samples * p_filter->input.i_channels; i++ )
     {
-//        if ( *p_in >= 1.0 ) *p_out = 32767;
-//        else if ( *p_in < -1.0 ) *p_out = -32768;
-//        else *p_out = *p_in * 32768.0;
-        *p_out = (float) *p_in;
+        /* convert vlc_fixed_t into s32 */
+//        s32 temp;
+//        if ( *p_in >= 8 ) temp = 32767;
+//        else if ( *p_in < -8 ) temp = -32768;
+//        else temp = *p_in * (s32) 4096; // (32768/8);
+
+        /* convert s32 into float */
+//        if (temp >= 32768)
+//            *p_out = (float) 1.0;
+//        else if (temp <= -32768)
+//            *p_out = (float) -1.0;
+//        else *p_out = (float) (temp/32768.0);
+
+        /* combined conversion */
+        if ( *p_in >= 8 ) *p_out = (float) 1.0;
+        else if ( *p_in < -8 ) *p_out = (float) -1.0;
+        else *p_out =(float) (*p_in/8.0);
+
         p_in++; p_out++;
     }
 
