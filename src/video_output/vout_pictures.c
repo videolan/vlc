@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.25 2002/05/20 19:34:58 sam Exp $
+ * $Id: vout_pictures.c,v 1.26 2002/05/28 18:34:42 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -142,6 +142,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
                  * memory allocation needs to be done */
                 p_pic->i_status   = RESERVED_PICTURE;
                 p_pic->i_refcount = 0;
+                p_pic->b_force    = 0;
 
                 p_pic->b_progressive        = b_progressive;
                 p_pic->b_repeat_first_field = b_repeat_first_field;
@@ -177,6 +178,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
             p_freepic->i_type     = MEMORY_PICTURE;
 
             p_freepic->i_refcount = 0;
+            p_freepic->b_force = 0;
 
             p_freepic->b_progressive        = b_progressive;
             p_freepic->b_repeat_first_field = b_repeat_first_field;

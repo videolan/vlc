@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.178 2002/05/23 22:21:14 sam Exp $
+ * $Id: video_output.c,v 1.179 2002/05/28 18:34:42 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -549,7 +549,8 @@ static void RunThread( vout_thread_t *p_vout)
             p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ]
                 = display_date;
 
-            if( display_date < current_date + p_vout->render_time )
+            if( !p_picture->b_force &&
+                display_date < current_date + p_vout->render_time )
             {
                 /* Picture is late: it will be destroyed and the thread
                  * will directly choose the next picture */

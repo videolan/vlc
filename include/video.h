@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.51 2002/05/13 21:55:30 fenrir Exp $
+ * $Id: video.h,v 1.52 2002/05/28 18:34:42 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -73,6 +73,7 @@ typedef struct picture_s
      * the video output thread API, but should never be written directly */
     int             i_refcount;                    /* link reference counter */
     mtime_t         date;                                    /* display date */
+    boolean_t       b_force;
 
     /* Picture dynamic properties - those properties can be changed by the
      * decoder */
