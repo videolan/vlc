@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.128 2003/08/14 20:02:55 zorglub Exp $
+ * $Id: modules.c,v 1.129 2003/08/23 14:14:01 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -91,6 +91,7 @@
 #include "osd.h"
 
 #include "iso_lang.h"
+#include "charset.h"
 
 #if defined( UNDER_CE )
 #   define MYCHAR wchar_t
