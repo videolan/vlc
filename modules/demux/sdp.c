@@ -2,7 +2,7 @@
  * sdp.c: SDP parser and builtin UDP/RTP/RTSP
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sdp.c,v 1.3 2003/08/04 00:48:11 fenrir Exp $
+ * $Id: sdp.c,v 1.4 2003/08/04 18:50:36 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -31,6 +31,29 @@
 
 #include <ninput.h>
 
+#ifdef HAVE_SYS_TIME_H
+#    include <sys/time.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
+
+#if defined( UNDER_CE )
+#   include <winsock.h>
+#elif defined( WIN32 )
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
+#   ifndef IN_MULTICAST
+#       define IN_MULTICAST(a) IN_CLASSD(a)
+#   endif
+#else
+#   include <sys/socket.h>
+#endif
+
+
+#include "network.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -55,6 +78,53 @@ vlc_module_end();
 static int  Demux ( input_thread_t * );
 
 #define FREE( p ) if( p ) { free( p ) ; (p) = NULL; }
+
+#define TAB_APPEND( count, tab, p )             \
+    if( (count) > 0 )                           \
+    {                                           \
+        (tab) = realloc( (tab), sizeof( void ** ) * ( (count) + 1 ) ); \
+    }                                           \
+    else                                        \
+    {                                           \
+        (tab) = malloc( sizeof( void ** ) );    \
+    }                                           \
+    (void**)(tab)[(count)] = (void*)(p);        \
+    (count)++
+
+#define TAB_FIND( count, tab, p, index )        \
+    {                                           \
+        int _i_;                                \
+        (index) = -1;                           \
+        for( _i_ = 0; _i_ < (count); _i_++ )    \
+        {                                       \
+            if((void**)(tab)[_i_]==(void*)(p))  \
+            {                                   \
+                (index) = _i_;                  \
+                break;                          \
+            }                                   \
+        }                                       \
+    }
+
+#define TAB_REMOVE( count, tab, p )             \
+    {                                           \
+        int i_index;                            \
+        TAB_FIND( count, tab, p, i_index );     \
+        if( i_index >= 0 )                      \
+        {                                       \
+            if( count > 1 )                     \
+            {                                   \
+                memmove( ((void**)tab + i_index),    \
+                         ((void**)tab + i_index+1),  \
+                         ( (count) - i_index - 1 ) * sizeof( void* ) );\
+            }                                   \
+            else                                \
+            {                                   \
+                free( tab );                    \
+                (tab) = NULL;                   \
+            }                                   \
+            (count)--;                          \
+        }                                       \
+    }
 
 /*
  * SDP definitions
@@ -141,10 +211,75 @@ typedef struct
 static sdp_track_t *sdp_TrackCreate ( sdp_t *, int , int , char * );
 static void         sdp_TrackRelease( sdp_track_t * );
 
+static int  NetOpenUDP( vlc_object_t *, char *, int , char *, int );
+static void NetClose  ( vlc_object_t *, int );
+
+
+/*
+ * RTP handler
+ */
+typedef struct rtp_stream_sys_t rtp_stream_sys_t;
+typedef struct
+{
+    struct
+    {
+        int          i_cat;     /* AUDIO_ES/VIDEO_ES */
+        vlc_fourcc_t i_codec;
+
+        struct
+        {
+            int i_width;
+            int i_height;
+        } video;
+
+        struct
+        {
+            int i_channels;
+            int i_samplerate;
+            int i_samplesize;
+        } audio;
+
+        int  i_extra_data;
+        void *p_extra_data;
+    } es;
+
+    struct
+    {
+        int  i_data;
+        void *p_data;
+    } frame;
+
+    /* User private */
+    rtp_stream_sys_t *p_sys;
+
+} rtp_stream_t;
+
+typedef struct
+{
+    vlc_bool_t   b_data;
+    rtp_stream_t stream;
+
+    int i_handle;
+} rtp_source_t;
+
+typedef struct
+{
+    VLC_COMMON_MEMBERS
+
+    int          i_rtp;
+    rtp_source_t **rtp;
+
+} rtp_t;
+
+static rtp_t *rtp_New( input_thread_t *p_input );
+static int    rtp_Add( rtp_t *rtp, sdp_track_t *tk, rtp_stream_t **pp_stream );
+static int    rtp_Read( rtp_t *rtp, rtp_stream_t **pp_stream );
+static int    rtp_Control( rtp_t *rtp, int i_query );
+static void   rtp_Release( rtp_t *rtp );
+
 /*
  * Module specific
  */
-
 
 struct demux_sys_t
 {
@@ -153,6 +288,7 @@ struct demux_sys_t
     int      i_session;
     sdp_t    *p_sdp;
 
+    rtp_t    *rtp;
 };
 
 /*****************************************************************************
@@ -248,13 +384,18 @@ static int Open( vlc_object_t * p_this )
     }
     p_session = &p_sys->p_sdp->session[p_sys->i_session];
 
+    /* Create a RTP handler */
+    p_sys->rtp = rtp_New( p_input );
+
     /* Now create a track for each media */
     for( i = 0; i < p_session->i_media; i++ )
     {
-        sdp_track_t *tk;
+        sdp_track_t     *tk;
+        rtp_stream_t    *rs;
         int j;
 
-        tk = sdp_TrackCreate( p_sys->p_sdp, p_sys->i_session, i, p_input->psz_source );
+        tk = sdp_TrackCreate( p_sys->p_sdp, p_sys->i_session, i,
+                              p_input->psz_source );
         if( tk == NULL )
         {
             msg_Warn( p_input, "media[%d] invalid", i );
@@ -268,14 +409,28 @@ static int Open( vlc_object_t * p_this )
         msg_Dbg( p_input, "    - control : %s", tk->psz_control );
         msg_Dbg( p_input, "    - address : %s ttl : %d count : %d",
                  tk->psz_address, tk->i_address_ttl, tk->i_address_count );
-        msg_Dbg( p_input, "    - port : %d count : %d", tk->i_port, tk->i_port_count );
+        msg_Dbg( p_input, "    - port : %d count : %d",
+                 tk->i_port, tk->i_port_count );
         msg_Dbg( p_input, "    - transport : %s", tk->psz_transport );
         for( j = 0; j < tk->i_payload_count; j++ )
         {
-            msg_Dbg( p_input, "    - payload[%d] : type : %d rtpmap : %s fmtp : %s",
+            msg_Dbg( p_input,
+                     "    - payload[%d] : type : %d rtpmap : %s fmtp : %s",
                      j, tk->payload[j].i_type,
                      tk->payload[j].psz_rtpmap,
                      tk->payload[j].psz_fmtp );
+        }
+
+        if( tk->psz_control )
+        {
+            msg_Err( p_input, " -> Need control : Unsuported" );
+            sdp_TrackRelease( tk );
+            continue;
+        }
+
+        if( rtp_Add( p_sys->rtp, tk, &rs ) )
+        {
+            msg_Err( p_input, "cannot add media[%d]", i );
         }
 
         sdp_TrackRelease( tk );
@@ -299,6 +454,7 @@ static void Close( vlc_object_t *p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys = p_input->p_demux_data;
 
+    rtp_Release( p_sys->rtp );
     sdp_Release( p_sys->p_sdp );
     free( p_sys );
 }
@@ -310,8 +466,27 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Demux ( input_thread_t *p_input )
 {
+    demux_sys_t    *p_sys = p_input->p_demux_data;
+    int i;
 
-    return 0;
+    for( i = 0; i < 10; i++ )
+    {
+        rtp_stream_t *rs;
+
+        if( rtp_Read( p_sys->rtp, &rs ) )
+        {
+            /* FIXME */
+            return 1;
+        }
+        if( !rs )
+        {
+            continue;
+        }
+
+        msg_Dbg( p_input, "rs[%p] frame.size=%d", rs, rs->frame.i_data );
+    }
+
+    return 1;
 }
 
 /*****************************************************************************
@@ -321,6 +496,10 @@ static int Demux ( input_thread_t *p_input )
 /*****************************************************************************
  *  SDP Parser
  *****************************************************************************/
+/* TODO:
+ * - implement parsing of all fields
+ * - ?
+ */
 static int   sdp_GetLine( char **ppsz_sdp, char *p_com, char **pp_arg )
 {
     char *p = *ppsz_sdp;
@@ -408,7 +587,7 @@ static sdp_t *sdp_Parse  ( char *psz_sdp )
                 p_session->i_media        = -1;
                 p_session->media          = NULL;
                 p_session->i_attribute    = 0;
-                p_session->attribute      = 0;
+                p_session->attribute      = NULL;
 
                 break;
             case 'm':
@@ -423,7 +602,7 @@ static sdp_t *sdp_Parse  ( char *psz_sdp )
                 p_media->psz_bandwith   = NULL;
                 p_media->psz_key        = NULL;
                 p_media->i_attribute    = 0;
-                p_media->attribute      = 0;
+                p_media->attribute      = NULL;
                 break;
             case 'o':
                 p_session->psz_origin = strdup( psz );
@@ -457,7 +636,8 @@ static sdp_t *sdp_Parse  ( char *psz_sdp )
                 }
                 else
                 {
-                    /* FIXME could be multiple address FIXME */
+                    /* FIXME could be multiple addresses ( but only at session
+                     * level FIXME */
                     /* For instance
                            c=IN IP4 224.2.1.1/127
                            c=IN IP4 224.2.1.2/127
@@ -530,7 +710,6 @@ static sdp_t *sdp_Parse  ( char *psz_sdp )
                 fprintf( stderr, "unhandled com=%c\n", com );
                 break;
         }
-
 #undef p_media
 #undef p_session
     }
@@ -662,8 +841,20 @@ static sdp_track_t *sdp_TrackCreate( sdp_t *p_sdp, int i_session, int i_media,
     sdp_session_t *p_session = &p_sdp->session[i_session];
     sdp_media_t   *p_media = &p_session->media[i_media];
 
+    char *psz_url = NULL;
     char *p;
     char *psz;
+
+    /* Be sure there is a terminating '/' */
+    if( psz_url_base && *psz_url_base != '\0' )
+    {
+        psz_url = malloc( strlen( psz_url_base ) + 2);
+        strcpy( psz_url, psz_url_base );
+        if( psz_url[strlen( psz_url ) -1] != '/' )
+        {
+            strcat( psz_url, "/" );
+        }
+    }
 
     /* Get track type */
     if( !strncmp( p_media->psz_media, "audio", 5 ) )
@@ -754,23 +945,24 @@ static sdp_track_t *sdp_TrackCreate( sdp_t *p_sdp, int i_session, int i_media,
     }
 
     /* Get control */
-    psz = sdp_AttributeValue( p_media->i_attribute, p_media->attribute, "control" );
+    psz = sdp_AttributeValue( p_media->i_attribute, p_media->attribute,
+                              "control" );
     if( !psz || *psz == '\0' )
     {
         psz = sdp_AttributeValue( p_session->i_attribute, p_session->attribute,
                                   "control" );
     }
 
-    if( psz )
+    if( psz && *psz != '\0')
     {
-        if( strstr( psz, "://" ) || psz_url_base == NULL )
+        if( strstr( psz, "://" ) || psz_url == NULL )
         {
             tk->psz_control = strdup( psz );
         }
         else
         {
-            tk->psz_control = malloc( strlen( psz_url_base ) + strlen( psz ) + 1 );
-            strcpy( tk->psz_control, psz_url_base );
+            tk->psz_control = malloc( strlen( psz_url ) + strlen( psz ) + 1 );
+            strcpy( tk->psz_control, psz_url );
             strcat( tk->psz_control, psz );
         }
     }
@@ -785,7 +977,7 @@ static sdp_track_t *sdp_TrackCreate( sdp_t *p_sdp, int i_session, int i_media,
     {
         psz = p_session->psz_connection;
     }
-    if( psz )
+    if( psz && *psz != '\0' )
     {
         tk->i_address_count = 0;
         tk->i_address_ttl   = 0;
@@ -843,5 +1035,227 @@ static void         sdp_TrackRelease( sdp_track_t *tk )
     free( tk );
 }
 
+/*****************************************************************************
+ * RTP/RTCP/RTSP handler
+ *****************************************************************************/
 
+static rtp_t *rtp_New( input_thread_t *p_input )
+{
+    rtp_t *rtp = vlc_object_create( p_input, sizeof( rtp_t ) );
+
+    rtp->i_rtp = 0;
+    rtp->rtp   = NULL;
+
+    return rtp;
+}
+
+static int    rtp_Add( rtp_t *rtp, sdp_track_t *tk, rtp_stream_t **pp_stream )
+{
+    rtp_source_t *rs = malloc( sizeof( rtp_source_t ) );
+
+
+    if( tk->psz_control )
+    {
+        msg_Err( rtp, "RTP using control unsupported" );
+        free( rs );
+        return VLC_EGENERIC;
+    }
+
+    *pp_stream = &rs->stream;
+
+    /* no data unread */
+    rs->b_data = VLC_FALSE;
+
+    /* Init stream properties */
+    rs->stream.es.i_cat   = tk->i_cat;
+    rs->stream.es.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+    if( rs->stream.es.i_cat == AUDIO_ES )
+    {
+        rs->stream.es.audio.i_channels = 0;
+        rs->stream.es.audio.i_samplerate = 0;
+        rs->stream.es.audio.i_samplesize = 0;
+    }
+    else if( rs->stream.es.i_cat == VIDEO_ES )
+    {
+        rs->stream.es.video.i_width = 0;
+        rs->stream.es.video.i_height = 0;
+    }
+    rs->stream.es.i_extra_data = 0;
+    rs->stream.es.p_extra_data = NULL;
+    rs->stream.frame.i_data = 0;
+    rs->stream.frame.p_data = malloc( 65535 );  /* Max size of a UDP packet */
+    rs->stream.p_sys = NULL;
+
+    /* Open the handle */
+    rs->i_handle = NetOpenUDP( VLC_OBJECT( rtp ),
+                               tk->psz_address, tk->i_port,
+                               "", 0 );
+
+    if( rs->i_handle < 0 )
+    {
+        msg_Err( rtp, "cannot connect at %s:%d", tk->psz_address, tk->i_port );
+        free( rs );
+    }
+
+    TAB_APPEND( rtp->i_rtp, rtp->rtp, rs );
+
+    return VLC_SUCCESS;
+}
+
+static int    rtp_Read( rtp_t *rtp, rtp_stream_t **pp_stream )
+{
+    int             i;
+    struct timeval  timeout;
+    fd_set          fds_read;
+    int             i_handle_max = 0;
+    int             i_ret;
+
+    *pp_stream = NULL;
+
+    /* return already buffered data */
+    for( i = 0; i < rtp->i_rtp; i++ )
+    {
+        if( rtp->rtp[i]->b_data && rtp->rtp[i]->stream.frame.i_data > 0 )
+        {
+            rtp->rtp[i]->b_data = VLC_FALSE;
+            *pp_stream = &rtp->rtp[i]->stream;
+            return VLC_SUCCESS;
+        }
+    }
+
+    /* aquire new data */
+    FD_ZERO( &fds_read );
+    for( i = 0; i < rtp->i_rtp; i++ )
+    {
+        if( rtp->rtp[i]->i_handle > 0 )
+        {
+            FD_SET( rtp->rtp[i]->i_handle, &fds_read );
+            i_handle_max = __MAX( i_handle_max, rtp->rtp[i]->i_handle );
+        }
+    }
+
+    /* we will wait 0.5s */
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 500*1000;
+
+    i_ret = select( i_handle_max + 1, &fds_read, NULL, NULL, &timeout );
+    if( i_ret == -1 && errno != EINTR )
+    {
+        msg_Warn( rtp, "cannot select sockets" );
+        msleep( 1000 );
+        return VLC_EGENERIC;
+    }
+    if( i_ret <= 0 )
+    {
+        return VLC_EGENERIC;
+    }
+
+    for( i = 0; i < rtp->i_rtp; i++ )
+    {
+        if( rtp->rtp[i]->i_handle > 0 && FD_ISSET( rtp->rtp[i]->i_handle, &fds_read ) )
+        {
+            int i_recv;
+            i_recv = recv( rtp->rtp[i]->i_handle,
+                           rtp->rtp[i]->stream.frame.p_data,
+                           65535,
+                           0 );
+#if defined( WIN32 ) || defined( UNDER_CE )
+            if( ( i_recv < 0 && WSAGetLastError() != WSAEWOULDBLOCK )||( i_recv == 0 ) )
+#else
+            if( ( i_recv < 0 && errno != EAGAIN && errno != EINTR )||( i_recv == 0 ) )
+#endif
+            {
+                msg_Warn( rtp, "error reading con[%d] -> closed", i );
+                NetClose( VLC_OBJECT( rtp ), rtp->rtp[i]->i_handle );
+                rtp->rtp[i]->i_handle = -1;
+                continue;
+            }
+
+            msg_Dbg( rtp, "con[%d] read %d bytes", i, i_recv );
+            rtp->rtp[i]->stream.frame.i_data = i_recv;
+            rtp->rtp[i]->b_data = VLC_TRUE;
+        }
+    }
+
+    /* return buffered data */
+    for( i = 0; i < rtp->i_rtp; i++ )
+    {
+        if( rtp->rtp[i]->b_data && rtp->rtp[i]->stream.frame.i_data > 0 )
+        {
+            rtp->rtp[i]->b_data = VLC_FALSE;
+            *pp_stream = &rtp->rtp[i]->stream;
+            return VLC_SUCCESS;
+        }
+    }
+
+    return VLC_EGENERIC;
+}
+
+static int    rtp_Control( rtp_t *rtp, int i_query )
+{
+    return VLC_EGENERIC;
+}
+
+static void   rtp_Release( rtp_t *rtp )
+{
+    int i;
+
+    for( i = 0; i < rtp->i_rtp; i++ )
+    {
+        if( rtp->rtp[i]->i_handle > 0 )
+        {
+            msg_Dbg( rtp, "closing connection[%d]", i );
+            NetClose( VLC_OBJECT( rtp ), rtp->rtp[i]->i_handle );
+        }
+    }
+    vlc_object_destroy( rtp );
+}
+
+
+static int  NetOpenUDP( vlc_object_t *p_this,
+                        char *psz_local, int i_local_port,
+                        char *psz_server, int i_server_port )
+{
+    char             *psz_network;
+    module_t         *p_network;
+    network_socket_t socket_desc;
+
+    psz_network = "";
+    if( config_GetInt( p_this, "ipv4" ) )
+    {
+        psz_network = "ipv4";
+    }
+    else if( config_GetInt( p_this, "ipv6" ) )
+    {
+        psz_network = "ipv6";
+    }
+
+    msg_Dbg( p_this, "waiting for connection..." );
+
+    socket_desc.i_type = NETWORK_UDP;
+    socket_desc.psz_server_addr = psz_server;
+    socket_desc.i_server_port   = i_server_port;
+    socket_desc.psz_bind_addr   = psz_local;
+    socket_desc.i_bind_port     = i_local_port;
+    socket_desc.i_ttl           = 0;
+    p_this->p_private = (void*)&socket_desc;
+    if( !( p_network = module_Need( p_this, "network", psz_network ) ) )
+    {
+        msg_Err( p_this, "failed to connect with server" );
+        return -1;
+    }
+    module_Unneed( p_this, p_network );
+
+    return socket_desc.i_handle;
+}
+
+
+static void NetClose( vlc_object_t *p_this, int i_handle )
+{
+#if defined( WIN32 ) || defined( UNDER_CE )
+    closesocket( i_handle );
+#else
+    close( i_handle );
+#endif
+}
 
