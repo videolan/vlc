@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.34 2003/05/01 01:11:17 hartman Exp $
+ * $Id: intf.h,v 1.35 2003/05/08 01:16:57 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -80,6 +80,7 @@ struct intf_sys_t
     vlc_bool_t b_program_update;
     vlc_bool_t b_title_update;
     vlc_bool_t b_audio_update;
+    vlc_bool_t b_video_update;
     vlc_bool_t b_spu_update;
     vlc_bool_t b_aout_update;
     vlc_bool_t b_vout_update;
@@ -173,13 +174,12 @@ struct intf_sys_t
     IBOutlet id o_mi_program;
     IBOutlet id o_mi_title;
     IBOutlet id o_mi_chapter;
-    IBOutlet id o_mi_language;
-    IBOutlet id o_mi_subtitle;
 
     IBOutlet id o_mu_audio;
     IBOutlet id o_mi_vol_up;
     IBOutlet id o_mi_vol_down;
     IBOutlet id o_mi_mute;
+    IBOutlet id o_mi_audiotrack;
     IBOutlet id o_mi_channels;
     IBOutlet id o_mi_device;
 
@@ -187,9 +187,12 @@ struct intf_sys_t
     IBOutlet id o_mi_half_window;
     IBOutlet id o_mi_normal_window;
     IBOutlet id o_mi_double_window;
+    IBOutlet id o_mi_fittoscreen;
     IBOutlet id o_mi_fullscreen;
     IBOutlet id o_mi_floatontop;
+    IBOutlet id o_mi_videotrack;
     IBOutlet id o_mi_screen;
+    IBOutlet id o_mi_subtitle;
     IBOutlet id o_mi_deinterlace;
     IBOutlet id o_mu_deinterlace;
 
@@ -230,11 +233,6 @@ struct intf_sys_t
 - (void)manageVolumeSlider;
 
 - (void)setupMenus:(input_thread_t *)p_input;
-- (void)setupLangMenu:(input_thread_t *)p_input
-                      mi:(NSMenuItem *)o_mi
-                      es:(es_descriptor_t *)p_es
-                      category:(int)i_cat
-                      selector:(SEL)pf_callback;
 - (void)setupVarMenu:(NSMenuItem *)o_mi
                      target:(vlc_object_t *)p_object
                      var:(const char *)psz_var

@@ -30,11 +30,6 @@
                 prev = id; 
                 slower = id; 
                 stop = id; 
-                toggleChapter = id; 
-                toggleLanguage = id; 
-                toggleProgram = id; 
-                toggleSubtitle = id; 
-                toggleTitle = id; 
                 toggleVar = id; 
                 volumeDown = id; 
                 volumeSliderUpdated = id; 
@@ -92,6 +87,7 @@
                 "o_info_window" = id; 
                 "o_messages" = id; 
                 "o_mi_about" = id; 
+                "o_mi_audiotrack" = id; 
                 "o_mi_bring_atf" = id; 
                 "o_mi_bwd" = id; 
                 "o_mi_channels" = id; 
@@ -105,6 +101,7 @@
                 "o_mi_device" = id; 
                 "o_mi_double_window" = id; 
                 "o_mi_faster" = id; 
+                "o_mi_fittoscreen" = id; 
                 "o_mi_floatontop" = id; 
                 "o_mi_fullscreen" = id; 
                 "o_mi_fwd" = id; 
@@ -112,7 +109,6 @@
                 "o_mi_hide" = id; 
                 "o_mi_hide_others" = id; 
                 "o_mi_info" = id; 
-                "o_mi_language" = id; 
                 "o_mi_license" = id; 
                 "o_mi_loop" = id; 
                 "o_mi_messages" = id; 
@@ -142,6 +138,7 @@
                 "o_mi_stop" = id; 
                 "o_mi_subtitle" = id; 
                 "o_mi_title" = id; 
+                "o_mi_videotrack" = id; 
                 "o_mi_vol_down" = id; 
                 "o_mi_vol_up" = id; 
                 "o_mi_website" = id; 

@@ -2,7 +2,7 @@
  * controls.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.h,v 1.3 2003/05/06 20:12:28 hartman Exp $
+ * $Id: controls.h,v 1.4 2003/05/08 01:16:57 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -55,10 +55,6 @@
 - (IBAction)windowAction:(id)sender;
 - (IBAction)deinterlace:(id)sender;
 
-- (IBAction)toggleProgram:(id)sender;
-- (IBAction)toggleTitle:(id)sender;
-- (IBAction)toggleChapter:(id)sender;
-- (IBAction)toggleLanguage:(id)sender;
 - (IBAction)toggleVar:(id)sender;
 
 @end

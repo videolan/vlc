@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.75 2003/05/06 20:12:28 hartman Exp $
+ * $Id: intf.m,v 1.76 2003/05/08 01:16:57 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -331,13 +331,12 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_mi_program setTitle: _NS("Program")];
     [o_mi_title setTitle: _NS("Title")];
     [o_mi_chapter setTitle: _NS("Chapter")];
-    [o_mi_language setTitle: _NS("Language")];
-    [o_mi_subtitle setTitle: _NS("Subtitles")];
     
     [o_mu_audio setTitle: _NS("Audio")];
     [o_mi_vol_up setTitle: _NS("Volume Up")];
     [o_mi_vol_down setTitle: _NS("Volume Down")];
     [o_mi_mute setTitle: _NS("Mute")];
+    [o_mi_audiotrack setTitle: _NS("Audio Track")];
     [o_mi_channels setTitle: _NS("Channels")];
     [o_mi_device setTitle: _NS("Device")];
     
@@ -345,9 +344,12 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_mi_half_window setTitle: _NS("Half Size")];
     [o_mi_normal_window setTitle: _NS("Normal Size")];
     [o_mi_double_window setTitle: _NS("Double Size")];
+    [o_mi_fittoscreen setTitle: _NS("Fit To Screen")];
     [o_mi_fullscreen setTitle: _NS("Fullscreen")];
     [o_mi_floatontop setTitle: _NS("Float On Top")];
+    [o_mi_videotrack setTitle: _NS("Video Track")];
     [o_mi_screen setTitle: _NS("Screen")];
+    [o_mi_subtitle setTitle: _NS("Subtitles")];
     [o_mi_deinterlace setTitle: _NS("Deinterlace")];
     [o_mu_deinterlace setTitle: _NS("Deinterlace")];
 
@@ -578,6 +580,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         p_intf->p_sys->b_title_update = 1;
         p_intf->p_sys->b_chapter_update = 1;
         p_intf->p_sys->b_audio_update = 1;
+        p_intf->p_sys->b_video_update = 1;
         p_intf->p_sys->b_spu_update = 1;
         p_intf->p_sys->b_current_title_update = 1;
         p_intf->p_sys->i_part = 0;
@@ -897,7 +900,8 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_mi_program setEnabled: b_enabled];
     [o_mi_title setEnabled: b_enabled];
     [o_mi_chapter setEnabled: b_enabled];
-    [o_mi_language setEnabled: b_enabled];
+    [o_mi_audiotrack setEnabled: b_enabled];
+    [o_mi_videotrack setEnabled: b_enabled];
     [o_mi_subtitle setEnabled: b_enabled];
     [o_mi_channels setEnabled: b_enabled];
     [o_mi_device setEnabled: b_enabled];
@@ -995,14 +999,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
 - (void)setupMenus:(input_thread_t *)p_input
 {
-    unsigned int i, i_nb_items;
-    NSMenuItem * o_item;
-    NSString * o_menu_title;
-    char psz_title[ 256 ];
-
-    es_descriptor_t * p_audio_es = NULL;
-    es_descriptor_t * p_spu_es = NULL;
-
     intf_thread_t * p_intf = [NSApp getIntf];
 
     p_intf->p_sys->b_chapter_update |= p_intf->p_sys->b_title_update;
@@ -1010,170 +1006,54 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
                                      p_intf->p_sys->b_program_update;
     p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_title_update |
                                    p_intf->p_sys->b_program_update;
+    p_intf->p_sys->b_video_update |= p_intf->p_sys->b_program_update |
+                                     p_intf->p_sys->b_program_update;
 
     if( p_intf->p_sys->b_program_update )
     {
-        NSMenu * o_program;
-        SEL pf_toggle_program;
-        pgrm_descriptor_t * p_pgrm;
-
-        if( p_input->stream.p_new_program )
-        {
-            p_pgrm = p_input->stream.p_new_program;
-        }
-        else
-        {
-            p_pgrm = p_input->stream.p_selected_program;
-        }
-
-        o_program = [o_mi_program submenu];
-        pf_toggle_program = @selector(toggleProgram:);
-
-        /* remove previous program items */
-        i_nb_items = [o_program numberOfItems];
-        for( i = 0; i < i_nb_items; i++ )
-        {
-            [o_program removeItemAtIndex: 0];
-        }
-
-        /* make (un)sensitive */
-        [o_mi_program setEnabled: 
-            p_input->stream.i_pgrm_number > 1];
-
-        /* add program items */
-        for( i = 0 ; i < p_input->stream.i_pgrm_number ; i++ )
-        {
-            snprintf( psz_title, sizeof(psz_title), "id %d",
-                p_input->stream.pp_programs[i]->i_number );
-            psz_title[sizeof(psz_title) - 1] = '\0';
-
-            o_menu_title = [NSApp localizedString: psz_title];
-
-            o_item = [o_program addItemWithTitle: o_menu_title
-                action: pf_toggle_program keyEquivalent: @""];
-            [o_item setTag: p_input->stream.pp_programs[i]->i_number];
-            [o_item setTarget: o_controls];
-
-            if( p_pgrm == p_input->stream.pp_programs[i] )
-            {
-                [o_item setState: NSOnState];
-            }
-        }
+        [self setupVarMenu: o_mi_program target: (vlc_object_t *)p_input
+            var: "program" selector: @selector(toggleVar:)];
 
         p_intf->p_sys->b_program_update = 0;
     }
 
     if( p_intf->p_sys->b_title_update )
     {
-        NSMenu * o_title;
-        SEL pf_toggle_title;
-
-        o_title = [o_mi_title submenu];
-        pf_toggle_title = @selector(toggleTitle:);
-
-        /* remove previous title items */
-        i_nb_items = [o_title numberOfItems];
-        for( i = 0; i < i_nb_items; i++ )
-        {
-            [o_title removeItemAtIndex: 0];
-        }
-
-        /* make (un)sensitive */
-        [o_mi_title setEnabled: 
-            p_input->stream.i_area_nb > 1];
-
-        /* add title items */
-        for( i = 1 ; i < p_input->stream.i_area_nb ; i++ )
-        {
-            snprintf( psz_title, sizeof(psz_title), "Title %d (%d)", i,
-                p_input->stream.pp_areas[i]->i_part_nb );
-            psz_title[sizeof(psz_title) - 1] = '\0';
-
-            o_menu_title = [NSApp localizedString: psz_title];
-
-            o_item = [o_title addItemWithTitle: o_menu_title
-                action: pf_toggle_title keyEquivalent: @""];
-            [o_item setTag: i];
-            [o_item setTarget: o_controls];
-
-            if( ( p_input->stream.pp_areas[i] ==
-                p_input->stream.p_selected_area ) )
-            {
-                [o_item setState: NSOnState];
-            }
-        }
+        [self setupVarMenu: o_mi_title target: (vlc_object_t *)p_input
+            var: "title" selector: @selector(toggleVar:)];
 
         p_intf->p_sys->b_title_update = 0;
     }
 
     if( p_intf->p_sys->b_chapter_update )
     {
-        NSMenu * o_chapter;
-        SEL pf_toggle_chapter;
-
-        o_chapter = [o_mi_chapter submenu];
-        pf_toggle_chapter = @selector(toggleChapter:);
-
-        /* remove previous chapter items */
-        i_nb_items = [o_chapter numberOfItems];
-        for( i = 0; i < i_nb_items; i++ )
-        {
-            [o_chapter removeItemAtIndex: 0];
-        }
-
-        /* make (un)sensitive */
-        [o_mi_chapter setEnabled: 
-            p_input->stream.p_selected_area->i_part_nb > 1];
-
-        /* add chapter items */
-        for( i = 0 ; i < p_input->stream.p_selected_area->i_part_nb ; i++ )
-        {
-            snprintf( psz_title, sizeof(psz_title), "Chapter %d", i + 1 );
-            psz_title[sizeof(psz_title) - 1] = '\0';
-
-            o_menu_title = [NSApp localizedString: psz_title];
-
-            o_item = [o_chapter addItemWithTitle: o_menu_title
-                action: pf_toggle_chapter keyEquivalent: @""];
-            [o_item setTag: i + 1];
-            [o_item setTarget: o_controls];
-
-            if( ( p_input->stream.p_selected_area->i_part == i + 1 ) )
-            {
-                [o_item setState: NSOnState];
-            }
-        }
-
-        p_intf->p_sys->i_part =
-                p_input->stream.p_selected_area->i_part;
-
+        [self setupVarMenu: o_mi_chapter target: (vlc_object_t *)p_input
+            var: "chapter" selector: @selector(toggleVar:)];\
+        
+        p_intf->p_sys->i_part = p_input->stream.p_selected_area->i_part;
         p_intf->p_sys->b_chapter_update = 0;
-    }
-
-    for( i = 0 ; i < p_input->stream.i_selected_es_number ; i++ )
-    {
-        if( p_input->stream.pp_selected_es[i]->i_cat == AUDIO_ES )
-        {
-            p_audio_es = p_input->stream.pp_selected_es[i];
-        }
-        else if( p_input->stream.pp_selected_es[i]->i_cat == SPU_ES )
-        {
-            p_spu_es = p_input->stream.pp_selected_es[i];
-        }
     }
 
     if( p_intf->p_sys->b_audio_update )
     {
-        [self setupLangMenu: p_input mi: o_mi_language es: p_audio_es
-            category: AUDIO_ES selector: @selector(toggleLanguage:)];
+        [self setupVarMenu: o_mi_audiotrack target: (vlc_object_t *)p_input
+            var: "audio-es" selector: @selector(toggleVar:)];
 
         p_intf->p_sys->b_audio_update = 0;
     }
 
+    if( p_intf->p_sys->b_video_update )
+    {
+        [self setupVarMenu: o_mi_videotrack target: (vlc_object_t *)p_input
+            var: "video-es" selector: @selector(toggleVar:)];
+
+        p_intf->p_sys->b_video_update = 0;
+    }
+
     if( p_intf->p_sys->b_spu_update )
     {
-        [self setupLangMenu: p_input mi: o_mi_subtitle es: p_spu_es
-            category: SPU_ES selector: @selector(toggleLanguage:)];
+        [self setupVarMenu: o_mi_subtitle target: (vlc_object_t *)p_input
+            var: "spu-es" selector: @selector(toggleVar:)];
 
         p_intf->p_sys->b_spu_update = 0;
     }
@@ -1187,18 +1067,16 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         {
             vlc_value_t val;
             val.b_bool = 0;
-
-            var_Set( (vlc_object_t *)p_aout, "intf-change", val );
-
+            
             [self setupVarMenu: o_mi_channels target: (vlc_object_t *)p_aout
                 var: "audio-channels" selector: @selector(toggleVar:)];
 
             [self setupVarMenu: o_mi_device target: (vlc_object_t *)p_aout
                 var: "audio-device" selector: @selector(toggleVar:)];
-
+            var_Set( (vlc_object_t *)p_aout, "intf-change", val );
+            
             vlc_object_release( (vlc_object_t *)p_aout );
         }
-
         p_intf->p_sys->b_aout_update = 0;
     }
 
@@ -1212,99 +1090,16 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
             vlc_value_t val;
             val.b_bool = 0;
 
-            var_Set( (vlc_object_t *)p_vout, "intf-change", val );
-
             [self setupVarMenu: o_mi_screen target: (vlc_object_t *)p_vout
                 var: "video-device" selector: @selector(toggleVar:)];
-
+            var_Set( (vlc_object_t *)p_vout, "intf-change", val );
+            
             vlc_object_release( (vlc_object_t *)p_vout );
-
             [o_mi_close_window setEnabled: TRUE];
         }
-
+        
         p_intf->p_sys->b_vout_update = 0;
     }
-
-#undef p_input
-}
-
-- (void)setupLangMenu:(input_thread_t *)p_input
-                      mi:(NSMenuItem *)o_mi
-                      es:(es_descriptor_t *)p_es
-                      category:(int)i_cat
-                      selector:(SEL)pf_callback
-{
-    unsigned int i, i_nb_items;
-    NSMenu * o_menu = [o_mi submenu];
-
-    /* remove previous language items */
-    i_nb_items = [o_menu numberOfItems];
-    for( i = 0; i < i_nb_items; i++ )
-    {
-        [o_menu removeItemAtIndex: 0];
-    }
-
-    /* make sensitive : we can't change it after we build the menu, and
-     * before, we don't yet how many items we will have. So make it
-     * always sensitive. --Meuuh */
-    [o_mi setEnabled: TRUE];
-
-#if 0
-    /* We do not use this code, because you need to start stop .avi for
-     * it to work, so not very useful now  --hartman */
-    if ( o_mi == o_mi_subtitle ) {
-        NSLog(@"testing");
-        [o_mi setEnabled: TRUE ];
-        NSMenuItem * o_lmi;
-        NSString * o_title;
-        o_title = _NS("Load from file..");
-        o_lmi = [o_menu addItemWithTitle: o_title
-                 action: pf_callback keyEquivalent: @""];
-        [o_lmi setTag: 2000];
-        [o_lmi setTarget: o_controls];
-    }
-#endif
-
-#define ES p_input->stream.pp_es[i]
-    for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
-    {
-        if( ( ES->i_cat == i_cat ) &&
-            ( !ES->p_pgrm ||
-              ES->p_pgrm ==
-                 p_input->stream.p_selected_program ) )
-        {
-            NSMenuItem * o_lmi;
-            NSString * o_title;
-
-            if( !ES->psz_desc || !*ES->psz_desc )
-            {
-                char psz_title[ 256 ];
-
-                snprintf( psz_title, sizeof(psz_title), _("Language 0x%x"),
-                          ES->i_id );
-                psz_title[sizeof(psz_title) - 1] = '\0';
-
-                o_title = [NSApp localizedString: psz_title];
-            }
-            else
-            {
-                o_title = [NSApp localizedString: ES->psz_desc];
-            }
-
-            o_lmi = [o_menu addItemWithTitle: o_title
-                action: pf_callback keyEquivalent: @""];
-            [o_lmi setRepresentedObject: 
-                [NSValue valueWithPointer: ES]];
-            [o_lmi setTarget: o_controls];
-            [o_lmi setTag: i_cat];
-
-            if( /*p_es == ES*/ ES->p_decoder_fifo != NULL )
-            {
-                [o_lmi setState: NSOnState];
-            }
-        }
-    }
-#undef ES
 }
 
 - (void)setupVarMenu:(NSMenuItem *)o_mi
@@ -1338,17 +1133,25 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     }
 
     /* make (un)sensitive */
-    [o_mi setEnabled: ( val.p_list->i_count > 0 )];
+    [o_mi setEnabled: ( val.p_list->i_count > 1 )];
 
     for ( i = 0; i < val.p_list->i_count; i++ )
     {
         NSMenuItem * o_lmi;
         NSString * o_title;
+NSLog(@"%d, %s", i_value, psz_variable);
 
-        o_title = [NSApp localizedString: text.p_list->p_values[i].psz_string];
-
+        if ( text.p_list->p_values[i].psz_string )
+        {
+            o_title = [NSApp localizedString: text.p_list->p_values[i].psz_string];
+        }
+        else
+        {
+            o_title = [NSString stringWithFormat: @"%s - %d",
+                        strdup(psz_variable), val.p_list->p_values[i].i_int ];
+        }
         o_lmi = [o_menu addItemWithTitle: [o_title copy]
-                 action: pf_callback keyEquivalent: @""];
+                action: pf_callback keyEquivalent: @""];
         
         /* FIXME: this isn't 64-bit clean ! */
         [o_lmi setTag: val.p_list->p_values[i].i_int];

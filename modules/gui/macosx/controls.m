@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.36 2003/05/06 20:12:28 hartman Exp $
+ * $Id: controls.m,v 1.37 2003/05/08 01:16:57 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -349,6 +349,11 @@
                     [o_window scaleWindowWithFactor: 2.0];
                 else if( [o_title isEqualToString: _NS("Float On Top") ] )
                     [o_window toggleFloatOnTop];
+                else if( [o_title isEqualToString: _NS("Fit To Screen") ] )
+                {
+                    if( ![o_window isZoomed] )
+                        [o_window performZoom:self];
+                }
             }
         }
         vlc_object_release( (vlc_object_t *)p_vout );
@@ -372,198 +377,6 @@
     }
 }
 
-- (IBAction)toggleProgram:(id)sender
-{
-    NSMenuItem * o_mi = (NSMenuItem *)sender;
-    intf_thread_t * p_intf = [NSApp getIntf];
-
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-
-    if( p_playlist->p_input == NULL )
-    {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );
-        return;
-    }
-
-    if( [o_mi state] == NSOffState )
-    {
-        u16 i_program_id = [o_mi tag];
-
-        input_ChangeProgram( p_playlist->p_input, i_program_id );
-        input_SetStatus( p_playlist->p_input, INPUT_STATUS_PLAY );
-    }
-
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    vlc_object_release( p_playlist );
-}
-
-- (IBAction)toggleTitle:(id)sender
-{
-    NSMenuItem * o_mi = (NSMenuItem *)sender;
-    intf_thread_t * p_intf = [NSApp getIntf];
-
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-
-    if( p_playlist->p_input == NULL )
-    {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );
-        return;
-    }
-
-    if( [o_mi state] == NSOffState )
-    {
-        int i_title = [o_mi tag];
-
-#define p_input p_playlist->p_input
-        input_ChangeArea( p_input, p_input->stream.pp_areas[i_title] );
-        input_SetStatus( p_input, INPUT_STATUS_PLAY );
-#undef p_input
-    }
-
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    vlc_object_release( p_playlist );
-}
-
-- (IBAction)toggleChapter:(id)sender
-{
-    NSMenuItem * o_mi = (NSMenuItem *)sender;
-    intf_thread_t * p_intf = [NSApp getIntf];
-
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-
-    if( p_playlist->p_input == NULL )
-    {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );
-        return;
-    }
-
-    if( [o_mi state] == NSOffState )
-    {
-        int i_chapter = [o_mi tag];
-
-#define p_input p_playlist->p_input
-        p_input->stream.p_selected_area->i_part = i_chapter;
-        input_ChangeArea( p_input, p_input->stream.p_selected_area );
-        input_SetStatus( p_input, INPUT_STATUS_PLAY );
-#undef p_input
-    }
-
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    vlc_object_release( p_playlist );
-}
-
-- (IBAction)toggleLanguage:(id)sender
-{
-    NSMenuItem * o_mi = (NSMenuItem *)sender;
-    intf_thread_t * p_intf = [NSApp getIntf];
-
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
-
-    if( p_playlist->p_input == NULL )
-    {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );
-        return;
-    }
-
-#if 0
-    /* We do not use this code, because you need to start stop .avi for
-     * it to work, so not very useful now  --hartman */
-    if ( [o_mi state] == NSOffState && [o_mi tag] == 2000 )
-    {
-        NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
-        
-        [o_open_panel setAllowsMultipleSelection: NO];
-        [o_open_panel setTitle: _NS("Open subtitle file")];
-        [o_open_panel setPrompt: _NS("Open")];
-    
-        if( [o_open_panel runModalForDirectory: nil 
-                file: nil types: nil] == NSOKButton )
-        {
-            NSString *o_filename = [[o_open_panel filenames] objectAtIndex: 0];
-            config_PutPsz( p_intf, "sub-file", strdup( [o_filename cString] ));
-        }
-    }
-#endif
-
-#define p_input p_playlist->p_input
-
-    if( !p_intf->p_sys->b_audio_update )
-    {
-        NSValue * o_value = [o_mi representedObject];
-        es_descriptor_t * p_es = [o_value pointerValue];
-
-        if( [o_mi state] == NSOnState )
-        {
-            /* we just have one ES to disable */
-            input_ToggleES( p_input, p_es, 0 );
-        }
-        else
-        {
-            unsigned int i;
-            int i_cat = [o_mi tag];
-
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-
-#define ES p_input->stream.pp_selected_es[i]
-
-            /* unselect the selected ES in the same class */
-            for( i = 0; i < p_input->stream.i_selected_es_number; i++ )
-            {
-                if( ES->i_cat == i_cat )
-                {
-                    vlc_mutex_unlock( &p_input->stream.stream_lock );
-                    input_ToggleES( p_input, ES, 0 );
-                    vlc_mutex_lock( &p_input->stream.stream_lock );
-                    break;
-                }
-            }
-
-#undef ES
-
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-            input_ToggleES( p_input, p_es, 1 );
-        }
-    }
-
-#undef p_input
-
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    vlc_object_release( p_playlist );
-}
-
 - (IBAction)toggleVar:(id)sender
 {
     NSMenuItem *o_mi = (NSMenuItem *)sender;
@@ -582,7 +395,6 @@
         {
             msg_Warn( p_object, "cannot set variable %s: with %d", psz_variable, val.i_int );
         }
-        if (psz_variable) free(psz_variable);
     }
 }
 
@@ -675,6 +487,7 @@
                 [[o_mi title] isEqualToString: _NS("Half Size")] ||
                 [[o_mi title] isEqualToString: _NS("Normal Size")] ||
                 [[o_mi title] isEqualToString: _NS("Double Size")] ||
+                [[o_mi title] isEqualToString: _NS("Fit To Screen")] ||
                 [[o_mi title] isEqualToString: _NS("Float On Top")] )
     {
         id o_window;

@@ -2,7 +2,7 @@
  * applescript.m: MacOS X AppleScript support
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: applescript.m,v 1.1 2003/03/06 11:43:07 hartman Exp $
+ * $Id: applescript.m,v 1.2 2003/05/08 01:16:57 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -119,7 +119,7 @@
         }
         else if ( [o_command isEqualToString:@"fullscreen"] )
         {
-            [o_controls fullscreen:self];
+/*FIXME*/            [o_controls fullscreen:self];
             return nil;
         }
         else if ( [o_command isEqualToString:@"mute"] )
