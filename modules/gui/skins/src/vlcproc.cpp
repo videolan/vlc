@@ -573,7 +573,7 @@ void VlcProc::MoveStream( long Pos )
     if( p_intf->p_sys->p_input == NULL )
         return;
 
-    var_SetFloat( p_intf->p_input, "position", (double)Pos / SLIDER_RANGE );
+    var_SetFloat( p_intf->p_sys->p_input, "position", (double)Pos / SLIDER_RANGE );
 
     // Refresh interface
     InterfaceRefresh();
