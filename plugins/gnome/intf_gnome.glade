@@ -124,6 +124,7 @@
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
 	      <name>menubar_playlist</name>
+	      <sensitive>False</sensitive>
 	      <tooltip>Open the playlist window</tooltip>
 	      <signal>
 		<name>activate</name>
@@ -138,6 +139,7 @@
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
 	      <name>menubar_modules</name>
+	      <sensitive>False</sensitive>
 	      <tooltip>Open the plugin manager</tooltip>
 	      <signal>
 		<name>activate</name>
@@ -163,6 +165,7 @@
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
 	      <name>menubar_preferences</name>
+	      <sensitive>False</sensitive>
 	      <signal>
 		<name>activate</name>
 		<handler>on_menubar_preferences_activate</handler>
@@ -241,6 +244,7 @@
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_back</name>
+	  <sensitive>False</sensitive>
 	  <tooltip>Go Backwards</tooltip>
 	  <signal>
 	    <name>clicked</name>
@@ -258,6 +262,7 @@
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_stop</name>
+	  <sensitive>False</sensitive>
 	  <tooltip>Stop Stream</tooltip>
 	  <signal>
 	    <name>clicked</name>
@@ -328,6 +333,7 @@
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_playlist</name>
+	  <sensitive>False</sensitive>
 	  <tooltip>Open Playlist</tooltip>
 	  <signal>
 	    <name>clicked</name>
@@ -428,7 +434,7 @@
 	<value_pos>GTK_POS_BOTTOM</value_pos>
 	<digits>1</digits>
 	<policy>GTK_UPDATE_DELAYED</policy>
-	<value>43.75</value>
+	<value>0</value>
 	<lower>0</lower>
 	<upper>100</upper>
 	<step>1</step>

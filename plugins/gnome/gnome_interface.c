@@ -129,11 +129,13 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_playlist",
                             menubar_view_menu_uiinfo[0].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[0].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[1].widget);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_modules",
                             menubar_view_menu_uiinfo[1].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[1].widget, FALSE);
 
   gtk_widget_ref (menubar_uiinfo[2].widget);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_settings",
@@ -144,6 +146,7 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_preferences",
                             menubar_settings_menu_uiinfo[0].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (menubar_settings_menu_uiinfo[0].widget, FALSE);
 
   gtk_widget_ref (menubar_uiinfo[3].widget);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_help",
@@ -193,6 +196,7 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_back", toolbar_back,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_back);
+  gtk_widget_set_sensitive (toolbar_back, FALSE);
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_STOP);
   toolbar_stop = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
@@ -205,6 +209,7 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_stop", toolbar_stop,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_stop);
+  gtk_widget_set_sensitive (toolbar_stop, FALSE);
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_FORWARD);
   toolbar_play = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
@@ -267,6 +272,7 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_playlist", toolbar_playlist,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_playlist);
+  gtk_widget_set_sensitive (toolbar_playlist, FALSE);
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_FIRST);
   toolbar_prev = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
@@ -317,7 +323,7 @@ create_intf_window (void)
   gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
   gtk_misc_set_padding (GTK_MISC (label6), 5, 0);
 
-  hscale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (43.75, 0, 100, 1, 6.25, 0)));
+  hscale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 6.25, 0)));
   gtk_widget_ref (hscale);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "hscale", hscale,
                             (GtkDestroyNotify) gtk_widget_unref);

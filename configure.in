@@ -171,14 +171,14 @@ AC_ARG_WITH(sdl,
   [ PLUGINS=${PLUGINS}"sdl ";
     if test "x$withval" != "xyes";
     then
-      LIB_SDL="-l"$withval
+      LIB_SDL="L /usr/X11R6/lib -l"$withval
     else
-      LIB_SDL="-lSDL"
+      LIB_SDL="-L/usr/X11R6/lib -lSDL"
     fi ])
     if test "x$withval" == "x";
     then
       PLUGINS=${PLUGINS}"sdl "
-      LIB_SDL="-lSDL"
+      LIB_SDL="-L/usr/X11R6/lib -lSDL"
     fi
 AC_ARG_WITH(glide,
   [  --with-glide[=name]     Glide (3dfx) support (default disabled)],
