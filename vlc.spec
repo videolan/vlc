@@ -11,6 +11,9 @@ Buildroot: /tmp/vlc-build
 Summary: VideoLAN Client.
 
 %changelog
+* Sun Apr 8 2001 Christophe Massiot <massiot@via.ecp.fr>
+New upstream release (0.2.70)
+
 * Fri Feb 16 2001 Samuel Hocevar <sam@via.ecp.fr>
 New upstream release
 
@@ -25,7 +28,7 @@ Initial package
 
 %description
 a free network-aware MPEG and DVD player
- VideoLAN is a free MPEG2 software solution.
+ VideoLAN is a free MPEG1/2 software solution.
  .
  The VideoLAN Client allows to play MPEG2 Transport Streams from the
  network or from a file, as well as direct DVD playback.
@@ -34,7 +37,7 @@ a free network-aware MPEG and DVD player
 %setup 
 
 %build
-./configure --prefix=/usr --enable-mmx --with-sdl --enable-esd
+./configure --prefix=/usr --with-sdl --enable-esd --enable-gnome --enable-qt
 make
 %install
 mkdir -p $RPM_BUILD_ROOT/usr/lib
