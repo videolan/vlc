@@ -615,7 +615,7 @@ static int VCDRead( input_thread_t * p_input,
             break;
     }
 
-
+    pp_packets[i_packet] = NULL;
     
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -632,8 +632,8 @@ static int VCDRead( input_thread_t * p_input,
     }*/
 
     
-    b_eof = p_vcd->b_end_of_track; 
-        /*FIXME&& ( ( p_vcd->current_track ) >= p_vcd->nb_tracks - 1);*/
+    b_eof = p_vcd->b_end_of_track
+               && ( ( p_vcd->current_track ) >= p_vcd->nb_tracks - 1);
 
     if( b_eof )
     {

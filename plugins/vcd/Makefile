@@ -7,7 +7,7 @@
 # Objects
 #
 
-PLUGIN_VCD = vcd.o input_vcd.o linux_cdrom_tools.o $(OBJ_VCD)
+PLUGIN_VCD = vcd.o input_vcd.o linux_cdrom_tools.o
 BUILTIN_VCD = $(PLUGIN_VCD:%.o=BUILTIN_%.o)
 
 ALL_OBJ = $(PLUGIN_VCD) $(BUILTIN_VCD)
