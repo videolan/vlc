@@ -486,16 +486,18 @@ VLC.app: vlc
 	if test -d $(top_builddir)/extras/contrib/vlc-lib; then \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/lib ; \
 	  for i in $(top_builddir)/extras/contrib/vlc-lib/*.dylib ; do \
-	    install -c $${i} $(top_builddir)/VLC.app/Contents/MacOS/lib/vlc_`basename $${i}` ; \
+	    $(INSTALL) -m 644 $${i} $(top_builddir)/VLC.app/Contents/MacOS/lib/vlc_`basename $${i}` ; \
 	  done ; \
 	fi
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share/http
-	$(INSTALL) -m 644 $(srcdir)/share/http/*.html \
-	    $(top_builddir)/VLC.app/Contents/MacOS/share/http
+	for i in $(srcdir)/share/http/* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC.app/Contents/MacOS/share/http/`basename $${i}` ; \
+	done ; \
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share/http/admin
-	$(INSTALL) -m 644 $(srcdir)/share/http/admin/*.html \
-	    $(top_builddir)/VLC.app/Contents/MacOS/share/http/admin
+	for i in $(srcdir)/share/http/admin/* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC.app/Contents/MacOS/share/http/admin/`basename $${i}` ; \
+	done ; \
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/locale
 	for i in $(ALL_LINGUAS); do \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
