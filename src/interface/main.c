@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.193 2002/05/19 12:57:32 gbazin Exp $
+ * $Id: main.c,v 1.194 2002/05/20 22:39:36 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -861,12 +861,14 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     intf_PlaylistDestroy( p_main->p_playlist );
 
     /*
-     * Free memcpy module if it was allocated
+     * Free allocated memory
      */
     if( p_main->p_memcpy_module != NULL )
     {
         module_Unneed( p_main->p_memcpy_module );
     }
+
+    free( p_main->psz_homedir );
 
     /*
      * Free module bank

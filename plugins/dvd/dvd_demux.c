@@ -1,7 +1,7 @@
 /* dvd_demux.c: DVD demux functions.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_demux.c,v 1.5 2002/04/25 21:52:42 sam Exp $
+ * $Id: dvd_demux.c,v 1.6 2002/05/20 22:39:36 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -119,9 +119,15 @@ static int DVDDemux( input_thread_t * p_input )
     /* Read headers to compute payload length */
     for( i = 0 ; i < DVD_READ_ONCE ; i++ )
     {
-        if( ( i_result = input_ReadPS( p_input, &p_data ) ) <= 0)
+        i_result = input_ReadPS( p_input, &p_data );
+
+        if( i_result < 0 )
         {
             return i_result;
+        }
+        else if( i_result == 0 )
+        {
+            return i;
         }
 
         input_DemuxPS( p_input, p_data );

@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.21 2002/05/04 02:05:03 lool Exp $
+ * $Id: gtk.c,v 1.22 2002/05/20 22:39:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -167,6 +167,8 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys->b_slider_free = 1;
 
     p_intf->p_sys->pf_callback[0] = NULL;
+
+    p_intf->p_sys->i_part = 0;
 
     return( 0 );
 }

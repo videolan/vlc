@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.195 2002/05/14 21:23:44 massiot Exp $
+ * $Id: input.c,v 1.196 2002/05/20 22:39:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -165,6 +165,7 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.i_new_status = p_input->stream.i_new_rate = 0;
     p_input->stream.b_new_mute = MUTE_NO_CHANGE;
     p_input->stream.i_mux_rate = 0;
+    p_input->stream.b_seekable = 0;
 
     /* no stream, no program, no area, no es */
     p_input->stream.p_new_program = NULL;
