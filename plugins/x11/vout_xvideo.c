@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.36.2.2 2001/12/17 03:48:12 sam Exp $
+ * $Id: vout_xvideo.c,v 1.36.2.3 2001/12/20 16:46:40 massiot Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -403,7 +403,7 @@ static void vout_Destroy( vout_thread_t *p_vout )
  * XXX  Should "factor-out" common code in this and the "same" fn in the x11
  * XXX  plugin!
  *****************************************************************************/
-static __inline__ void vout_Seek( int i_seek )
+static __inline__ void vout_Seek( off_t i_seek )
 {
     int i_tell = p_main->p_intf->p_input->stream.p_selected_area->i_tell;
 
@@ -581,6 +581,14 @@ static int vout_Manage( vout_thread_t *p_vout )
                      * moment just pause the stream. */
                     input_SetStatus( p_main->p_intf->p_input,
                                      INPUT_STATUS_PAUSE );
+                    break;
+
+                case Button4:
+                    vout_Seek( 15 );
+                    break;
+
+                case Button5:
+                    vout_Seek( -15 );
                     break;
             }
         }
