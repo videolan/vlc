@@ -1,4 +1,28 @@
 /*****************************************************************************
+ * mpeg_system.h: structures of the input used to parse MPEG-1, MPEG-2 PS
+ * and TS system layers
+ *****************************************************************************
+ * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: mpeg_system.h,v 1.2 2000/12/20 16:04:31 massiot Exp $
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+/*****************************************************************************
  * Constants
  *****************************************************************************/
 #define TS_PACKET_SIZE      188                       /* Size of a TS packet */
@@ -91,5 +115,7 @@ void input_DecodePES( struct input_thread_s *, struct es_descriptor_s * );
 void input_ParsePES( struct input_thread_s *, struct es_descriptor_s * );
 void input_GatherPES( struct input_thread_s *, struct data_packet_s *,
                       struct es_descriptor_s *, boolean_t, boolean_t );
+es_descriptor_t * input_ParsePS( struct input_thread_s *,
+                                 struct data_packet_s * );
 void input_DemuxPS( struct input_thread_s *, struct data_packet_s * );
 void input_DemuxTS( struct input_thread_s *, struct data_packet_s * );

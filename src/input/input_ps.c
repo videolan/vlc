@@ -2,6 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
+ * $Id: input_ps.c,v 1.7 2000/12/20 16:04:31 massiot Exp $
  *
  * Authors: 
  *
@@ -52,7 +53,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  PSProbe     ( struct input_thread_s * );
-static void PSRead      ( struct input_thread_s *,
+static int  PSRead      ( struct input_thread_s *,
                           data_packet_t * p_packets[INPUT_READ_ONCE] );
 static void PSInit      ( struct input_thread_s * );
 static void PSEnd       ( struct input_thread_s * );
@@ -100,10 +101,49 @@ static void PSInit( input_thread_t * p_input )
     }
     fseek( p_method->stream, 0, SEEK_SET );
 
-    /* Pre-parse the stream to gather stream_descriptor_t. */
-
     input_InitStream( p_input, 0 );
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
+
+    if( p_input->stream.b_seekable )
+    {
+        /* Pre-parse the stream to gather stream_descriptor_t. */
+        p_input->stream.pp_programs[0]->b_is_ok = 0;
+        /* FIXME: don't read all stream (it can be long !) */
+        while( !p_input->b_die && !p_input->b_error )
+        {
+            int                 i_result, i;
+            data_packet_t *     pp_packets[INPUT_READ_ONCE];
+
+            i_result = PSRead( p_input, pp_packets );
+            if( i_result == 1 ) break;
+            if( i_result == -1 )
+            {
+                p_input->b_error = 1;
+                break;
+            }
+
+            for( i = 0; i < INPUT_READ_ONCE && pp_packets[i] != NULL; i++ )
+            {
+                /* FIXME: use i_p_config_t */
+                input_ParsePS( p_input, pp_packets[i] );
+            }
+        }
+        fseek( p_method->stream, 0, SEEK_SET );
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        p_input->stream.pp_programs[0]->b_is_ok = 1;
+        p_input->stream.i_tell = 0;
+#ifdef STATS
+        input_DumpStream( p_input );
+#endif
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+    }
+    else
+    {
+        /* The programs will be added when we read them. */
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        p_input->stream.pp_programs[0]->b_is_ok = 0;
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+    }
 }
 
 /*****************************************************************************
@@ -116,125 +156,157 @@ static void PSEnd( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * PSRead: reads a data packet
+ * SafeRead: reads a chunk of stream and correctly detects errors
  *****************************************************************************/
-/* FIXME: read INPUT_READ_ONCE packet at once */
-static void PSRead( input_thread_t * p_input,
-                    data_packet_t * p_packets[INPUT_READ_ONCE] )
+static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
+                                size_t i_len )
+{
+    thread_ps_data_t *  p_method;
+    int                 i_error;
+
+    p_method = (thread_ps_data_t *)p_input->p_method_data;
+    while( fread( p_buffer, i_len, 1, p_method->stream ) != 1 )
+    {
+        if( feof( p_method->stream ) )
+        {
+            return( 1 );
+        }
+
+        if( (i_error = ferror( p_method->stream )) )
+        {
+            intf_ErrMsg( "Read failed (%s)", strerror(i_error) );
+            return( -1 );
+        }
+    }
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.i_tell += i_len;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    return( 0 );
+}
+
+/*****************************************************************************
+ * PSRead: reads a data packet
+ *****************************************************************************
+ * Returns -1 in case of error, 0 if everything went well, and 1 in case of
+ * EOF.
+ *****************************************************************************/
+static int PSRead( input_thread_t * p_input,
+                   data_packet_t * pp_packets[INPUT_READ_ONCE] )
 {
     byte_t              p_header[6];
     data_packet_t *     p_data;
-    int                 i_packet_size;
+    size_t              i_packet_size;
+    int                 i_packet, i_error;
     thread_ps_data_t *  p_method;
 
     p_method = (thread_ps_data_t *)p_input->p_method_data;
 
-    while( fread( p_header, 6, 1, p_method->stream ) != 1 )
+    memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
+    for( i_packet = 0; i_packet < INPUT_READ_ONCE; i_packet++ )
     {
-        int             i_error;
-        if( (i_error = ferror( p_method->stream )) )
+        /* Read what we believe to be a packet header. */
+        if( (i_error = SafeRead( p_input, p_header, 6 )) )
         {
-            intf_ErrMsg( "Read 1 failed (%s)", strerror(i_error) );
-            p_input->b_error = 1;
-            return;
+            return( i_error );
         }
 
-        if( feof( p_method->stream ) )
+        if( (U32_AT(p_header) & 0xFFFFFF00) != 0x100L )
         {
-            intf_ErrMsg( "EOF reached" );
-            p_input->b_error = 1;
-            return;
-        }
-    }
+            /* This is not the startcode of a packet. Read the stream
+             * until we find one. */
+            u32         i_startcode = U32_AT(p_header);
+            int         i_dummy;
 
-    if( (U32_AT(p_header) & 0xFFFFFF00) != 0x100L )
-    {
-        u32         i_buffer = U32_AT(p_header);
-        intf_WarnMsg( 1, "Garbage at input (%x)\n", i_buffer );
-        while( (i_buffer & 0xFFFFFF00) != 0x100L )
-        {
-            i_buffer <<= 8;
-            i_buffer |= getc( p_method->stream );
-            if( feof(p_method->stream) || ferror(p_method->stream) )
+            if( i_startcode )
             {
-                p_input->b_error = 1;
-                return;
+                /* It is common for MPEG-1 streams to pad with zeros
+                 * (although it is forbidden by the recommendation), so
+                 * don't bother everybody in this case. */
+                intf_WarnMsg( 1, "Garbage at input (%x)\n", i_startcode );
+            }
+
+            while( (i_startcode & 0xFFFFFF00) != 0x100L )
+            {
+                i_startcode <<= 8;
+                if( (i_dummy = getc( p_method->stream )) != EOF )
+                {
+                    i_startcode |= i_dummy;
+                }
+                else
+                {
+                    return( 1 );
+                }
+            }
+            /* Packet found. */
+            *(u32 *)p_header = U32_AT(&i_startcode);
+            if( (i_error = SafeRead( p_input, p_header + 4, 2 )) )
+            {
+                return( i_error );
             }
         }
-        *(u32 *)p_header = U32_AT(&i_buffer);
-        fread( p_header + 4, 2, 1, p_method->stream );
-    }
 
-    if( U32_AT(p_header) != 0x1BA )
-    {
-        i_packet_size = U16_AT(&p_header[4]);
-    }
-    else
-    {
-        if( (p_header[4] & 0xC0) == 0x40 )
+        if( U32_AT(p_header) != 0x1BA )
         {
-            /* MPEG-2 */
-            i_packet_size = 8;
-        }
-        else if( (p_header[4] & 0xF0) == 0x20 )
-        {
-            /* MPEG-1 */
-            i_packet_size = 6;
+            /* That's the case for all packets, except pack header. */
+            i_packet_size = U16_AT(&p_header[4]);
         }
         else
         {
-            intf_ErrMsg( "Unable to determine stream type" );
-            p_input->b_error = 1;
-            return;
-        }
-    }
-
-    if( (p_data = NewPacket( p_input, i_packet_size + 6 )) == NULL )
-    {
-        p_input->b_error = 1;
-        intf_ErrMsg( "Out of memory" );
-        return;
-    }
-
-    memcpy( p_data->p_buffer, p_header, 6 );
-
-    /* FIXME: catch EINTR ! */
-    while( fread( p_data->p_buffer + 6, i_packet_size,
-               1, p_method->stream ) != 1 )
-    {
-        int             i_error;
-        if( (i_error = ferror( p_method->stream)) )
-        {
-            intf_ErrMsg( "Read 1 failed (%s)", strerror(i_error) );
-            p_input->b_error = 1;
-            return;
-        }
-
-        if( feof( p_method->stream ) )
-        {
-            intf_ErrMsg( "EOF reached" );
-            p_input->b_error = 1;
-            return;
-        }
-    }
-
-    if( U32_AT(p_header) == 0x1BA )
-    {
-        if( i_packet_size == 8 )
-        {
-            /* MPEG-2 stuffing bytes */
-            byte_t      p_garbage[8];
-            if( (p_data->p_buffer[13] & 0x7) != 0 )
+            /* Pack header. */
+            if( (p_header[4] & 0xC0) == 0x40 )
             {
-                /* FIXME: catch EINTR ! */
-                fread( p_garbage, p_garbage[0] & 0x7, 1,
-                       p_method->stream );
+                /* MPEG-2 */
+                i_packet_size = 8;
+            }
+            else if( (p_header[4] & 0xF0) == 0x20 )
+            {
+                /* MPEG-1 */
+                i_packet_size = 6;
+            }
+            else
+            {
+                intf_ErrMsg( "Unable to determine stream type" );
+                return( -1 );
             }
         }
+
+        /* Fetch a packet of the appropriate size. */
+        if( (p_data = NewPacket( p_input, i_packet_size + 6 )) == NULL )
+        {
+            intf_ErrMsg( "Out of memory" );
+            return( -1 );
+        }
+
+        /* Copy the header we already read. */
+        memcpy( p_data->p_buffer, p_header, 6 );
+
+        /* Read the remaining of the packet. */
+        if( (i_error =
+                SafeRead( p_input, p_data->p_buffer + 6, i_packet_size )) )
+        {
+            return( i_error );
+        }
+
+        /* In MPEG-2 pack headers we still have to read stuffing bytes. */
+        if( U32_AT(p_header) == 0x1BA )
+        {
+            if( i_packet_size == 8 && (p_data->p_buffer[13] & 0x7) != 0 )
+            {
+                /* MPEG-2 stuffing bytes */
+                byte_t      p_garbage[8];
+                if( (i_error = SafeRead( p_input, p_garbage,
+                                         p_data->p_buffer[13] & 0x7)) )
+                {
+                    return( i_error );
+                }
+            }
+        }
+
+        /* Give the packet to the other input stages. */
+        pp_packets[i_packet] = p_data;
     }
 
-    memset( p_packets, 0, sizeof(p_packets) );
-    p_packets[0] = p_data;
+    return( 0 );
 }
 
 
@@ -249,6 +321,13 @@ static struct data_packet_s * NewPacket( void * p_garbage,
                                          size_t i_size )
 {
     data_packet_t * p_data;
+
+    /* Safety check */
+    if( i_size > INPUT_MAX_PACKET_SIZE )
+    {
+        intf_ErrMsg( "Packet too big (%d)", i_size );
+        return NULL;
+    }
 
     if( (p_data = (data_packet_t *)malloc( sizeof(data_packet_t) )) == NULL )
     {

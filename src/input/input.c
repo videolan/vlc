@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.59 2000/12/19 19:08:51 massiot Exp $
+ * $Id: input.c,v 1.60 2000/12/20 16:04:31 massiot Exp $
  *
  * Authors: 
  *
@@ -176,7 +176,8 @@ void input_DestroyThread( input_thread_t *p_input, int *pi_status )
  *****************************************************************************/
 static void RunThread( input_thread_t *p_input )
 {
-    data_packet_t *      pp_packets[INPUT_READ_ONCE];
+    data_packet_t *         pp_packets[INPUT_READ_ONCE];
+    int                     i_error, i;
 
     InitThread( p_input );
 
@@ -195,15 +196,23 @@ static void RunThread( input_thread_t *p_input )
         }
         vlc_mutex_unlock( &p_input->stream.control.control_lock );
 
-        p_input->p_plugin->pf_read( p_input, pp_packets );
-        if( !p_input->b_error )
-        {
-            int     i;
+        i_error = p_input->p_plugin->pf_read( p_input, pp_packets );
 
-            for( i = 0; i < INPUT_READ_ONCE && pp_packets[i] != NULL; i++ )
+        /* Demultiplex read packets. */
+        for( i = 0; i < INPUT_READ_ONCE && pp_packets[i] != NULL; i++ )
+        {
+            p_input->p_plugin->pf_demux( p_input, pp_packets[i] );
+        }
+
+        if( i_error )
+        {
+            if( i_error == 1 )
             {
-                p_input->p_plugin->pf_demux( p_input, pp_packets[i] );
+                /* End of file */
+                intf_WarnMsg( 1, "End of file reached" );
+                /* FIXME: don't treat that as an error */
             }
+            p_input->b_error = 1;
         }
     }
 

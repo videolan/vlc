@@ -183,6 +183,9 @@
 /* Maximum number of selected ES in an input thread */
 #define INPUT_MAX_SELECTED_ES           10
 
+/* Maximum size of a data packet (128 kB) */
+#define INPUT_MAX_PACKET_SIZE			131072
+
 /* Maximum number of TS packets in the client at any time
  * INPUT_MAX_TS + 1 must be a power of 2, to optimize the %(INPUT_MAX_TS+1)
  * operation with a &INPUT_MAX_TS in the case of a fifo netlist.

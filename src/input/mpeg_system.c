@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.9 2000/12/19 19:08:51 massiot Exp $
+ * $Id: mpeg_system.c,v 1.10 2000/12/20 16:04:31 massiot Exp $
  *
  * Authors: 
  *
@@ -749,6 +749,105 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
 }
 
 /*****************************************************************************
+ * input_ParsePS: read the PS header
+ *****************************************************************************/
+es_descriptor_t * input_ParsePS( input_thread_t * p_input,
+                                 data_packet_t * p_data )
+{
+    u32                 i_code;
+    es_descriptor_t *   p_es = NULL;
+
+    i_code = U32_AT( p_data->p_buffer );
+    if( i_code > 0x1BC ) /* ES start code */
+    {
+        u16                 i_id;
+        int                 i_dummy;
+
+        /* This is a PES packet. Find out if we want it or not. */
+        i_id = GetID( p_data );
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        if( p_input->stream.pp_programs[0]->b_is_ok )
+        {
+            /* Look only at the selected ES. */
+            for( i_dummy = 0; i_dummy < INPUT_MAX_SELECTED_ES; i_dummy++ )
+            {
+                if( p_input->pp_selected_es[i_dummy] != NULL
+                    && p_input->pp_selected_es[i_dummy]->i_id == i_id )
+                {
+                    p_es = p_input->pp_selected_es[i_dummy];
+                    break;
+                }
+            }
+        }
+        else
+        {
+            /* Search all ES ; if not found -> AddES */
+            for( i_dummy = 0; i_dummy < INPUT_MAX_ES; i_dummy++ )
+            {
+                if( p_input->p_es[i_dummy].i_id != EMPTY_ID 
+                    && p_input->p_es[i_dummy].i_id == i_id )
+                {
+                    p_es = &p_input->p_es[i_dummy];
+                    break;
+                }
+            }
+
+            if( p_es == NULL )
+            {
+                p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
+                                    i_id, 0 );
+                if( p_es != NULL )
+                {
+                    p_es->i_stream_id = p_data->p_buffer[3];
+
+                    /* Set stream type and auto-spawn. */
+                    if( (i_id & 0xF0) == 0xE0 )
+                    {
+                        /* MPEG video */
+                        p_es->i_type = MPEG2_VIDEO_ES;
+#ifdef AUTO_SPAWN
+                        input_SelectES( p_input, p_es );
+#endif
+                    }
+                    else if( (i_id & 0xE0) == 0xC0 )
+                    {
+                        /* MPEG audio */
+                        p_es->i_type = MPEG2_AUDIO_ES;
+#ifdef AUTO_SPAWN
+                        input_SelectES( p_input, p_es );
+#endif
+                    }
+                    else if( (i_id & 0xF0FF) == 0x80BD )
+                    {
+                        /* AC3 audio */
+                        p_es->i_type = AC3_AUDIO_ES;
+#ifdef AUTO_SPAWN
+                        input_SelectES( p_input, p_es );
+#endif
+                    }
+                    else if( (i_id & 0xF0FF) == 0x20BD )
+                    {
+                        /* Subtitles video */
+                        p_es->i_type = DVD_SPU_ES;
+#ifdef AUTO_SPAWN
+                        input_SelectES( p_input, p_es );
+#endif
+                    }
+                    else
+                    {
+                        p_es->i_type = UNKNOWN_ES;
+                    }
+                }
+            }
+        } /* stream.b_is_ok */
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+    } /* i_code > 0xBC */
+
+    return( p_es );
+}
+
+/*****************************************************************************
  * input_DemuxPS: first step of demultiplexing: the PS header
  *****************************************************************************/
 void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
@@ -758,7 +857,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     es_descriptor_t *   p_es = NULL;
 
     i_code = U32_AT( p_data->p_buffer );
-    if( i_code >= 0x1B9 && i_code <= 0x1BC )
+    if( i_code <= 0x1BC )
     {
         switch( i_code )
         {
@@ -819,99 +918,9 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     }
     else
     {
-        u16                 i_id;
-        int                 i_dummy;
+        p_es = input_ParsePS( p_input, p_data );
 
-        /* This is a PES packet. Find out if we want it or not. */
-        i_id = GetID( p_data );
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-#if 1
-        for( i_dummy = 0; i_dummy < INPUT_MAX_ES; i_dummy++ )
-        {
-            if( p_input->p_es[i_dummy].i_id != EMPTY_ID 
-                && p_input->p_es[i_dummy].i_id == i_id )
-            {
-                p_es = &p_input->p_es[i_dummy];
-                break;
-            }
-        }
-#else
-        for( i_dummy = 0; i_dummy < INPUT_MAX_SELECTED_ES; i_dummy++ )
-        {
-            if( p_input->pp_selected_es[i_dummy] != NULL
-                && p_input->pp_selected_es[i_dummy]->i_id == i_id )
-            {
-                p_es = p_input->pp_selected_es[i_dummy];
-                break;
-            }
-        }
-#endif
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-        if( p_es == NULL )
-        {
-#if 1
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
-                                i_id, 0 );
-
-            if( p_es != NULL )
-            {
-                if( (i_id & 0xF0) == 0xE0 )
-                {
-                    /* MPEG video */
-                    p_es->i_stream_id = i_id;
-                    p_es->i_type = MPEG2_VIDEO_ES;
-
-#ifdef AUTO_SPAWN
-                    input_SelectES( p_input, p_es );
-#endif
-                }
-                else if( (i_id & 0xE0) == 0xC0 )
-                {
-                    /* MPEG audio */
-                    p_es->i_stream_id = i_id;
-                    p_es->i_type = MPEG2_AUDIO_ES;
-
-#ifdef AUTO_SPAWN
-                    input_SelectES( p_input, p_es );
-#endif
-                }
-                else if( (i_id & 0xF0FF) == 0x80BD )
-                {
-                    /* AC3 audio */
-                    p_es->i_stream_id = 0xBD;
-                    p_es->i_type = AC3_AUDIO_ES;
-
-#ifdef AUTO_SPAWN
-                    input_SelectES( p_input, p_es );
-#endif
-                }
-                else if( (i_id & 0xF0FF) == 0x20BD )
-                {
-                    /* Subtitles video */
-                    p_es->i_stream_id = 0xBD;
-                    p_es->i_type = DVD_SPU_ES;
-
-#ifdef AUTO_SPAWN
-                    input_SelectES( p_input, p_es );
-#endif
-                }
-                else
-                {
-                    b_trash = 1;
-                }
-                vlc_mutex_unlock( &p_input->stream.stream_lock );
-            }
-            else
-                b_trash = 1;
-#else
-            b_trash = 1;
-#endif
-        }
-
-        if( p_es->p_decoder_fifo != NULL && !b_trash )
+        if( p_es != NULL && p_es->p_decoder_fifo != NULL && !b_trash )
         {
 #ifdef STATS
             p_es->c_packets++;

@@ -126,6 +126,17 @@ static int InitThread (ac3dec_thread_t * p_ac3dec)
 
     intf_DbgMsg ("ac3dec debug: initializing ac3 decoder thread %p\n", p_ac3dec);
 
+    /* Get the first data packet. */
+    vlc_mutex_lock( &p_ac3dec->p_fifo->data_lock );
+    while ( DECODER_FIFO_ISEMPTY( *p_ac3dec->p_fifo ) )
+    {
+        if ( p_ac3dec->p_fifo->b_die )
+        {
+            vlc_mutex_unlock( &p_ac3dec->p_fifo->data_lock );
+            return -1;
+        }
+        vlc_cond_wait( &p_ac3dec->p_fifo->data_wait, &p_ac3dec->p_fifo->data_lock );
+    }
     p_ac3dec->p_data = DECODER_FIFO_START(*p_ac3dec->p_fifo)->p_first;
     byte_stream = ac3_byte_stream (&p_ac3dec->ac3_decoder);
     byte_stream->p_byte = p_ac3dec->p_data->p_payload_start;
