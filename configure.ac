@@ -2425,7 +2425,7 @@ AC_ARG_ENABLE(theora,
 if test "${enable_theora}" = "yes"
 then
   AC_CHECK_HEADERS(theora/theora.h, [
-    AC_CHECK_LIB(theora, theora_granule_time, [
+    AC_CHECK_LIB(theora, theora_packet_iskeyframe, [
       if test "${SYS}" = "mingw32"; then
         VLC_ADD_PLUGINS([theora])
       else
@@ -2433,7 +2433,7 @@ then
       fi
       theora_libs="-ltheora -logg"
       VLC_ADD_LDFLAGS([theora],[${theora_libs}]) ],[
-      AC_MSG_ERROR([libtheora doesn't appear to be installed on you system.
+      AC_MSG_ERROR([libtheora >= 1.0alpha4 doesn't appear to be installed on your system.
 You also need to check that you have a libogg posterior to the 1.0 release.])],
       [-logg])
   ])
