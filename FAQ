@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.20 2003/01/14 18:56:52 sam Exp $
+$Id: FAQ,v 1.21 2003/01/22 10:03:17 massiot Exp $
 
 1. Using VLC
 ============
@@ -110,6 +110,12 @@ you are running:
  * Windows: "Application Data\vlc\vlcrc"
 
  * BeOS: "config/settings/vlcrc"
+
+
+1.12 How do I join an IPv6 multicast stream?
+--------------------------------------------
+You often have to indicate the interface name on your system, for instance :
+ udp:@[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210%eth0]:1234
 
 
 2. Troubleshooting
