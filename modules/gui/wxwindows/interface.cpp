@@ -372,13 +372,17 @@ void Interface::CreateOurMenuBar()
 
     /* Find out size of menu bar */
     int i_size = 0;
-    for( int i = 0; i < menubar->GetMenuCount(); i++ )
+    for( unsigned int i = 0; i < menubar->GetMenuCount(); i++ )
     {
         int i_width, i_height;
         menubar->GetTextExtent( menubar->GetLabelTop(i), &i_width, &i_height );
-        i_size += i_width + 4 /* approximate margin */;
+        i_size += i_width +
+#if defined(__WXGTK__)
+            20 /* approximate margin */;
+#else
+            4 /* approximate margin */;
+#endif
     }
-
     frame_sizer->SetMinSize( i_size, -1 );
 
     /* Intercept all menu events in our custom event handler */
