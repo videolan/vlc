@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.4 2003/02/27 15:07:48 fenrir Exp $
+ * $Id: httpd.c,v 1.5 2003/03/02 17:12:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1202,7 +1202,7 @@ static void b64_decode( char *dest, char *src )
         -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1   /* F0-FF */
         };
 
-    for( i_level = 0; *src != '\0' > 0; src++ )
+    for( i_level = 0; *src != '\0'; src++ )
     {
         int  c;
 
