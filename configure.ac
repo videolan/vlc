@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.105 2003/11/06 16:36:40 nitrox Exp $
+dnl $Id: configure.ac,v 1.106 2003/11/07 21:30:52 massiot Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -353,7 +353,7 @@ AC_CHECK_LIB(m,cos,[
   AX_ADD_LDFLAGS([adjust distort a52tofloat32],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  AX_ADD_LDFLAGS([ffmpeg stream_out_transcode i420_rgb faad],[-lm])
+  AX_ADD_LDFLAGS([ffmpeg stream_out_transcode stream_out_transrate i420_rgb faad],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   AX_ADD_LDFLAGS([headphone_channel_mixer],[-lm])
@@ -1064,6 +1064,7 @@ then
 
   AX_ADD_PLUGINS([stream_out_dummy stream_out_standard stream_out_es stream_out_rtp])
   AX_ADD_PLUGINS([stream_out_duplicate stream_out_display stream_out_gather])
+  AX_ADD_PLUGINS([stream_out_transrate])
 
   dnl Ogg and vorbis are handled in their respective section
 fi
@@ -3443,6 +3444,7 @@ AC_OUTPUT([
   modules/mux/mpeg/Makefile
   modules/packetizer/Makefile
   modules/stream_out/Makefile
+  modules/stream_out/transrate/Makefile
   modules/video_chroma/Makefile
   modules/video_filter/Makefile
   modules/video_filter/deinterlace/Makefile
