@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.37 2003/05/10 11:05:52 hartman Exp $
+ * $Id: ffmpeg.c,v 1.38 2003/05/21 19:55:25 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -615,8 +615,8 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             psz_name ="Windows Media Audio 2";
             break;
 
-#if LIBAVCODEC_BUILD >= 4663
-        /* Quality of both decoders is not good enough yet
+#if( ( LIBAVCODEC_BUILD >= 4663 ) && ( defined( WORDS_BIGENDIAN ) ) )
+        /* Quality of this decoder on ppc is not gooed */
 	case FOURCC_IV31:
         case FOURCC_iv31:
         case FOURCC_IV32:
@@ -625,13 +625,25 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             i_codec  = CODEC_ID_INDEO3;
             psz_name = "Indeo v3";
             break;
-	case FOURCC_vp31:
+#endif
+
+#if LIBAVCODEC_BUILD >= 4668
+	/* Not yet finished 
+        case FOURCC_vp31:
 	case FOURCC_VP31:
 	    i_cat    = VIDEO_ES;
 	    i_codec  = CODEC_ID_VP3;
 	    psz_name = "On2's VP3 Video";
-	    break; */
+	    break;
+
+        case FOURCC_asv1:
+        case FOURCC_ASV1:
+            i_cat    = VIDEO_ES;
+            i_codec  = CODEC_ID_ASV1;
+            psz_name = "Asus V1";
+            break;*/
 #endif
+
         default:
             i_cat = UNKNOWN_ES;
             i_codec = CODEC_ID_NONE;

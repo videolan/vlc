@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.2 2003/05/21 15:40:03 hartman Exp $
+ * $Id: quicktime.c,v 1.3 2003/05/21 19:55:25 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -204,10 +204,22 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('Q','C','L','P'): /* Qualcomm Purevoice Codec */
         case VLC_FOURCC('M','A','C','3'): /* MACE3 audio decoder */
         case VLC_FOURCC('M','A','C','6'): /* MACE6 audio decoder */
-        case VLC_FOURCC('i','m','a','4'): /* IMA ADPCM */
+        case VLC_FOURCC('f','l','3','2'): /* 32-bit Floating Point */
+        case VLC_FOURCC('f','l','6','4'): /* 64-bit Floating Point */
+        case VLC_FOURCC('i','n','2','4'): /* 24-bit Interger */
+        case VLC_FOURCC('i','n','3','2'): /* 32-bit Integer */
+        case VLC_FOURCC('m','p','4','a'): /* MPEG-4 Audio */
+        case VLC_FOURCC('d','v','c','a'): /* DV Audio */
+        case VLC_FOURCC('s','o','w','t'): /* 16-bit Little Endian */
+        case VLC_FOURCC('t','w','o','s'): /* 16-bit Big Endian */
+        case VLC_FOURCC('a','l','a','w'): /* ALaw 2:1 */
+        case VLC_FOURCC('u','l','a','w'): /* mu-Law 2:1 */
+        case VLC_FOURCC('r','a','w',' '): /* 8-bit offset binaries */
 	case 0x31:				/* MS GSM */
 	case 0x32:				/* MSN Audio */
 	case 0x0011:				/* DVI IMA */
+	case 0x6D730002:			/* Microsoft ADPCM-ACM */
+	case 0x6D730011:			/* DVI Intel IMAADPCM-ACM */
 
             p_fifo->pf_run = RunDecoderAudio;
             return VLC_SUCCESS;
