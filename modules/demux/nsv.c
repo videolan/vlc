@@ -2,7 +2,7 @@
  * nsv.c: NullSoft Video demuxer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: nsv.c,v 1.2 2004/01/05 03:19:00 fenrir Exp $
+ * $Id: nsv.c,v 1.3 2004/01/07 14:59:37 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -107,7 +107,7 @@ static int Open( vlc_object_t *p_this )
     es_format_Init( &p_sys->fmt_audio, AUDIO_ES, 0 );
     p_sys->p_audio = NULL;
 
-    es_format_Init( &p_sys->fmt_audio, VIDEO_ES, 0 );
+    es_format_Init( &p_sys->fmt_video, VIDEO_ES, 0 );
     p_sys->p_video = NULL;
 
     p_sys->i_pcr   = 1;

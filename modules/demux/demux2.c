@@ -2,7 +2,7 @@
  * demux2 adaptation layer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: demux2.c,v 1.2 2004/01/04 15:32:13 fenrir Exp $
+ * $Id: demux2.c,v 1.3 2004/01/07 14:59:37 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -40,6 +40,11 @@ vlc_module_begin();
     set_capability( "demux", 2 );
     set_callbacks( Demux2Open, Demux2Close );
     add_shortcut( "demux2" );
+
+    /* Hack */
+    add_shortcut( "nsv" );
+    add_shortcut( "real" );
+    add_shortcut( "rm" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -62,12 +67,30 @@ static int Demux2Open( vlc_object_t * p_this )
     demux2_sys_t   *p_sys   = malloc( sizeof( demux2_sys_t ) );
     demux_t        *p_demux;
 
+    char           *psz_uri;
+
     if( input_InitStream( p_input, 0 ) )
     {
         return VLC_EGENERIC;
     }
 
-    p_demux = demux2_New( p_input, p_input->psz_source, p_input->s, p_input->p_es_out );
+    psz_uri = malloc( strlen( p_input->psz_access ) + strlen( p_input->psz_demux ) + strlen( p_input->psz_name  ) + 1 + 3 + 1 );
+    if( p_input->psz_demux && *p_input->psz_demux )
+    {
+        sprintf( psz_uri, "%s/%s://%s", p_input->psz_access, p_input->psz_demux, p_input->psz_name );
+    }
+    else if( p_input->psz_access && *p_input->psz_access )
+    {
+        sprintf( psz_uri, "%s://%s", p_input->psz_access, p_input->psz_name );
+    }
+    else
+    {
+        sprintf( psz_uri, "%s", p_input->psz_name );
+    }
+
+    p_demux = demux2_New( p_input, psz_uri, p_input->s, p_input->p_es_out );
+
+    free( psz_uri );
 
     if( !p_demux )
     {
