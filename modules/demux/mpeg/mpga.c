@@ -2,7 +2,7 @@
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: mpga.c,v 1.16 2004/01/25 20:05:28 hartman Exp $
+ * $Id: mpga.c,v 1.17 2004/03/03 11:41:04 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -32,12 +32,12 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open    ( vlc_object_t * );
-static void Close  ( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("MPEG-I/II audio demuxer" ) );
-    set_capability( "demux", 100 );
+    set_capability( "demux2", 100 );
     set_callbacks( Open, Close );
     add_shortcut( "mpga" );
     add_shortcut( "mp3" );
@@ -50,7 +50,8 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Demux       ( input_thread_t * );
+static int Demux  ( demux_t * );
+static int Control( demux_t *, int, va_list );
 
 struct demux_sys_t
 {
@@ -135,74 +136,44 @@ static int mpga_frame_samples( uint32_t h )
     }
 }
 
-#if 0
-static int CheckPS( input_thread_t *p_input )
-{
-    uint8_t  *p_peek;
-    int i_startcode = 0;
-    int i_size = input_Peek( p_input, &p_peek, 8196 );
-
-    while( i_size > 4 )
-    {
-        if( ( p_peek[0] == 0 ) && ( p_peek[1] == 0 ) &&
-            ( p_peek[2] == 1 ) && ( p_peek[3] >= 0xb9 ) &&
-            ++i_startcode >= 3 )
-        {
-            return 1;
-        }
-        p_peek++;
-        i_size--;
-    }
-
-    return 0;
-}
-#endif
-
 /*****************************************************************************
  * Open: initializes demux structures
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys;
-    vlc_bool_t     b_forced = VLC_FALSE;
-    vlc_bool_t     b_extention = VLC_FALSE;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
+    vlc_bool_t   b_forced = VLC_FALSE;
+    vlc_bool_t   b_extention = VLC_FALSE;
 
-    uint32_t       header;
+    uint32_t     header;
+    uint8_t     *p_peek;
+    module_t    *p_id3;
+    es_format_t   fmt;
 
-    uint8_t        *p_peek;
-
-    module_t       *p_id3;
-
-    es_format_t    fmt;
-
-
-    if( p_input->psz_demux &&
-        ( !strncmp( p_input->psz_demux, "mpga", 4 ) ||
-          !strncmp( p_input->psz_demux, "mp3", 3 ) ) )
+    if( !strncmp( p_demux->psz_demux, "mpga", 4 ) ||
+        !strncmp( p_demux->psz_demux, "mp3", 3 ) )
     {
         b_forced = VLC_TRUE;
     }
-    if( p_input->psz_name )
+    if( p_demux->psz_path )
     {
-        int  i_len = strlen( p_input->psz_name );
-
-        if( i_len > 4 && !strcasecmp( &p_input->psz_name[i_len - 4], ".mp3" ) )
+        int  i_len = strlen( p_demux->psz_path );
+        if( i_len > 4 && !strcasecmp( &p_demux->psz_path[i_len - 4], ".mp3" ) )
         {
             b_extention = VLC_TRUE;
         }
     }
 
     /* skip possible id3 header */
-    p_id3 = module_Need( p_input, "id3", NULL );
-    if ( p_id3 )
+    if( ( p_id3 = module_Need( p_demux, "id3", NULL ) ) )
     {
-        module_Unneed( p_input, p_id3 );
+        module_Unneed( p_demux, p_id3 );
     }
 
-    if( input_Peek( p_input, &p_peek, 4 ) < 4 )
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
-        msg_Err( p_input, "cannot peek" );
+        msg_Err( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
 
@@ -213,11 +184,11 @@ static int Open( vlc_object_t * p_this )
 
         if( !b_forced && !b_extention )
         {
-            msg_Warn( p_input, "mpga module discarded" );
+            msg_Warn( p_demux, "mpga module discarded" );
             return VLC_EGENERIC;
         }
 
-        i_peek = input_Peek( p_input, &p_peek, 8096 );
+        i_peek = stream_Peek( p_demux->s, &p_peek, 8096 );
 
         while( i_peek > 4 )
         {
@@ -231,15 +202,14 @@ static int Open( vlc_object_t * p_this )
         }
         if( !b_ok && !b_forced )
         {
-            msg_Warn( p_input, "mpga module discarded" );
+            msg_Warn( p_demux, "mpga module discarded" );
             return VLC_EGENERIC;
         }
     }
 
-    p_input->pf_demux = Demux;
-    p_input->pf_demux_control = demux_vaControlDefault;
-
-    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_demux->pf_demux   = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->i_time = 0;
     p_sys->i_bitrate_avg = 0;
 
@@ -252,7 +222,7 @@ static int Open( vlc_object_t * p_this )
         char psz_description[50];
 
         p_sys->i_bitrate_avg = MPGA_BITRATE( header ) * 1000;
-        if( ( i_xing = stream_Peek( p_input->s, &p_xing, 1024 ) ) >= 21 )
+        if( ( i_xing = stream_Peek( p_demux->s, &p_xing, 1024 ) ) >= 21 )
         {
             int i_skip;
 
@@ -305,12 +275,12 @@ static int Open( vlc_object_t * p_this )
                                            (int64_t)MPGA_SAMPLE_RATE( header ) /
                                            (int64_t)i_frames /
                                            (int64_t)mpga_frame_samples( header );
-                    msg_Dbg( p_input, "xing frames&bytes value present (%db/s)", p_sys->i_bitrate_avg );
+                    msg_Dbg( p_demux, "xing frames&bytes value present (%db/s)", p_sys->i_bitrate_avg );
                 }
             }
         }
 
-        msg_Dbg( p_input, "version=%d layer=%d channels=%d samplerate=%d",
+        msg_Dbg( p_demux, "version=%d layer=%d channels=%d samplerate=%d",
                  MPGA_VERSION( header ) + 1,
                  MPGA_LAYER( header ) + 1,
                  MPGA_CHANNELS( header ),
@@ -324,24 +294,10 @@ static int Open( vlc_object_t * p_this )
         fmt.psz_description = strdup( psz_description );
     }
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_InitStream( p_input, 0 ) == -1)
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot init stream" );
-        if( fmt.psz_description ) free( fmt.psz_description );
-        goto error;
-    }
-    p_input->stream.i_mux_rate = p_sys->i_bitrate_avg / 8 / 50;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    p_sys->p_es = es_out_Add( p_input->p_es_out, &fmt );
+    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
     if( fmt.psz_description ) free( fmt.psz_description );
-    return VLC_SUCCESS;
 
-error:
-    free( p_sys );
-    return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 
@@ -350,17 +306,17 @@ error:
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int Demux( input_thread_t * p_input )
+static int Demux( demux_t *p_demux )
 {
-    demux_sys_t  *p_sys = p_input->p_demux_data;
-    block_t      *p_frame;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    block_t     *p_frame;
 
     uint32_t     header;
-    uint8_t      *p_peek;
+    uint8_t     *p_peek;
 
-    if( stream_Peek( p_input->s, &p_peek, 4 ) < 4 )
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
-        msg_Warn( p_input, "cannot peek" );
+        msg_Warn( p_demux, "cannot peek" );
         return 0;
     }
 
@@ -371,10 +327,10 @@ static int Demux( input_thread_t * p_input )
         int         i_skip = 0;
         int         i_peek;
 
-        i_peek = stream_Peek( p_input->s, &p_peek, 8096 );
+        i_peek = stream_Peek( p_demux->s, &p_peek, 8096 );
         if( i_peek < 4 )
         {
-            msg_Warn( p_input, "cannot peek" );
+            msg_Warn( p_demux, "cannot peek" );
             return 0;
         }
 
@@ -391,28 +347,23 @@ static int Demux( input_thread_t * p_input )
             i_skip++;
         }
 
-        msg_Warn( p_input, "garbage=%d bytes", i_skip );
-        stream_Read( p_input->s, NULL, i_skip );
+        msg_Warn( p_demux, "garbage=%d bytes", i_skip );
+        stream_Read( p_demux->s, NULL, i_skip );
         return 1;
     }
 
-    input_ClockManageRef( p_input,
-                          p_input->stream.p_selected_program,
-                          p_sys->i_time * 9 / 100 );
-
-    if( ( p_frame = stream_Block( p_input->s, mpga_frame_size( header ) ) ) == NULL )
+    if( ( p_frame = stream_Block( p_demux->s,
+                                  mpga_frame_size( header ) ) ) == NULL )
     {
-        msg_Warn( p_input, "cannot read data" );
+        msg_Warn( p_demux, "cannot read data" );
         return 0;
     }
+    p_frame->i_dts = p_frame->i_pts = p_sys->i_time;
 
-    p_frame->i_dts =
-    p_frame->i_pts =
-        input_ClockGetTS( p_input,
-                          p_input->stream.p_selected_program,
-                          p_sys->i_time * 9 / 100 );
+    /* set PCR */
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time );
 
-    es_out_Send( p_input->p_es_out, p_sys->p_es, p_frame );
+    es_out_Send( p_demux->out, p_sys->p_es, p_frame );
 
     p_sys->i_time += (mtime_t)1000000 *
                      (mtime_t)mpga_frame_samples( header ) /
@@ -425,9 +376,20 @@ static int Demux( input_thread_t * p_input )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t*)p_this;
-    demux_sys_t    *p_sys = p_input->p_demux_data;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     free( p_sys );
+}
+
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( demux_t *p_demux, int i_query, va_list args )
+{
+    demux_sys_t *p_sys  = p_demux->p_sys;
+    return demux2_vaControlHelper( p_demux->s,
+                                   0, -1,
+                                   p_sys->i_bitrate_avg, 1, i_query, args );
 }
 
