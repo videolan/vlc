@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.13 2003/04/19 02:34:47 karibu Exp $
+ * $Id: gtk2_graphics.cpp,v 1.14 2003/04/19 12:39:14 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -50,7 +50,8 @@ GTK2Graphics::GTK2Graphics( int w, int h, Window *from ) : Graphics( w, h )
     }
     else
     {
-        Image = (GdkDrawable*) gdk_pixmap_new( NULL, w, h, 8 );
+        // FIXME: 8 -> screen depth
+        Image = (GdkDrawable*) gdk_pixmap_new( NULL, w, h, 16 );
         gdk_drawable_set_colormap( Image, gdk_colormap_get_system() );
         Gc = gdk_gc_new( Image );
     }
@@ -74,6 +75,7 @@ void GTK2Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
 //---------------------------------------------------------------------------
 void GTK2Graphics::DrawRect( int x, int y, int w, int h, int color )
 {
+    gdk_rgb_gc_set_foreground( Gc, color );
     gdk_draw_rectangle( Image, Gc, TRUE, x, y, w, h);
 }
 //---------------------------------------------------------------------------

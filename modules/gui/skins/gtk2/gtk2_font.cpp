@@ -2,7 +2,7 @@
  * gtk2_font.cpp: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.cpp,v 1.10 2003/04/19 02:34:47 karibu Exp $
+ * $Id: gtk2_font.cpp,v 1.11 2003/04/19 12:39:14 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -50,22 +50,29 @@ GTK2Font::GTK2Font( intf_thread_t *_p_intf, string fontname, int size,
     Layout = pango_layout_new( Context );
 
     // Text properties setting
-    FontDesc = pango_font_description_new();
+    FontDesc    = pango_font_description_new();
 
     pango_font_description_set_family( FontDesc, fontname.c_str() );
 
     pango_font_description_set_size( FontDesc, size * PANGO_SCALE );
 
     if( italic )
+    {
         pango_font_description_set_style( FontDesc, PANGO_STYLE_ITALIC );
+    }
     else
+    {
         pango_font_description_set_style( FontDesc, PANGO_STYLE_NORMAL );
+    }
 
     pango_font_description_set_weight( FontDesc, (PangoWeight)weight );
 
     /* FIXME: underline parameter */
 
     // Set attributes
+    //PangoFont* font = pango_context_load_font( Context, FontDesc );
+
+    //pango_context_set_font_description( Context, FontDesc );
     pango_layout_set_font_description( Layout, FontDesc );
 }
 //---------------------------------------------------------------------------
@@ -86,43 +93,36 @@ void GTK2Font::GetSize( string text, int &w, int &h )
 void GTK2Font::GenericPrint( Graphics *dest, string text, int x, int y,
                                  int w, int h, int align, int color )
 {
-    // Get handles
-    GdkDrawable *drawable = ( (GTK2Graphics *)dest )->GetImage();
-    GdkGC *gc = ( (GTK2Graphics *)dest )->GetGC();
-
     // Set text
-    pango_layout_set_text( Layout, text.c_str(), text.length() );
+    pango_layout_set_text( Layout, text.c_str(), -1 );
 
     // Set size
+    pango_layout_set_width( Layout, -1 );
     int real_w, real_h;
-    GetSize( text, real_w, real_h );
-    if( real_w > w )
-    {
-        // Change clipping region
-        Region *TextClipRgn = (Region *)new OSRegion( x, y, w, h );
-        dest->SetClipRegion( TextClipRgn );
-        delete TextClipRgn;
 
-        w = real_w;
-        if( align == VLC_FONT_ALIGN_RIGHT )
-            x += w - real_w;
-        else if( align == VLC_FONT_ALIGN_CENTER )
-            x += ( w - real_w ) / 2;
+    // Create buffer image
+    Graphics* cov = (Graphics *)new OSGraphics( w, h );
+    cov->CopyFrom( 0, 0, w, h, dest, x, y, SRC_COPY );
 
-        // Put old clip region
-        dest->ResetClipRegion();
-    }
-    else
-    {
-        pango_layout_set_width( Layout, w * PANGO_SCALE );
-    }
+    // Get handles
+    GdkDrawable *drawable = ( (GTK2Graphics *)cov )->GetImage();
+    GdkGC *gc = ( (GTK2Graphics *)cov )->GetGC();
+
+    // Set width of text
+    pango_layout_set_width( Layout, w * PANGO_SCALE );
 
     // Set attributes
     pango_layout_set_alignment( Layout, (PangoAlignment)align );
     gdk_rgb_gc_set_foreground( gc, color );
 
-    // Render text
-    gdk_draw_layout( drawable, gc, x, y, Layout );
+    // Render text on buffer
+    gdk_draw_layout( drawable, gc, 0, 0, Layout );
+
+    // Copy buffer on dest graphics
+    dest->CopyFrom( x, y, w, h, cov, 0, 0, SRC_COPY );
+
+    // Free memory
+    delete (OSGraphics *)cov;
 }
 
 //---------------------------------------------------------------------------
