@@ -340,7 +340,8 @@ static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename )
     dvd_file->dvd = dvd;
     dvd_file->lb_start = start;
     dvd_file->seek_pos = 0;
-    //memset( dvd_file->title_devs, -1, sizeof( dvd_file->title_devs ) );
+    memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
+    memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
     dvd_file->filesize = len / DVD_VIDEO_LB_LEN;
 
     return dvd_file;
@@ -425,7 +426,7 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
     dvd_file->lb_start = 0;
     dvd_file->seek_pos = 0;
     memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-    memset( dvd_file->title_devs, -1, sizeof( dvd_file->title_devs ) );
+    memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
     dvd_file->filesize = 0;
 
     if( stat( full_path, &fileinfo ) < 0 ) {
@@ -460,7 +461,7 @@ static dvd_file_t *DVDOpenVOBUDF( dvd_reader_t *dvd, int title, int menu )
     dvd_file->lb_start = start;
     dvd_file->seek_pos = 0;
     memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-    memset( dvd_file->title_devs, -1, sizeof( dvd_file->title_devs ) );
+    memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
     dvd_file->filesize = len / DVD_VIDEO_LB_LEN;
 
     /* Calculate the complete file size for every file in the VOBS */
@@ -496,7 +497,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
     dvd_file->lb_start = 0;
     dvd_file->seek_pos = 0;
     memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-    memset( dvd_file->title_devs, -1, sizeof( dvd_file->title_devs ) );
+    memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
     dvd_file->filesize = 0;
 
     if( menu ) {
