@@ -159,7 +159,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
     [o_status_field setStringValue: [NSString stringWithFormat:
-                        _NS("0 items in playlist")]];
+                        _NS("no items in playlist")]];
 
     [o_random_ckb setTitle: _NS("Random")];
 #if 0
@@ -922,9 +922,21 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             p_return = p_item->pp_children[index];
         }
     }
-
-    [o_status_field setStringValue: [NSString stringWithFormat:
+    
+    if( p_playlist->i_size >= 2 )
+        {
+            [o_status_field setStringValue: [NSString stringWithFormat:
                         _NS("%i items in playlist"), p_playlist->i_size]];
+        } else {
+            if( p_playlist->i_size == 0 )
+            {
+                [o_status_field setStringValue: [NSString stringWithFormat:
+                        _NS("no items in playlist"), p_playlist->i_size]];
+            } else {
+                [o_status_field setStringValue: [NSString stringWithFormat:
+                        _NS("1 item in playlist"), p_playlist->i_size]];
+            }
+    }
 
     vlc_object_release( p_playlist );
     msg_Dbg( p_playlist, "childitem with index %d", index );
