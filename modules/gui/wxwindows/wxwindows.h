@@ -340,7 +340,8 @@ public:
     vlc_bool_t b_extra;
     vlc_bool_t b_undock;
 
-    wxGauge     *volctrl;
+    wxControl  *volctrl;
+
 #ifdef wxHAS_TASK_BAR_ICON
     Systray     *p_systray;
 #endif
@@ -376,7 +377,6 @@ private:
     void OnNextStream( wxCommandEvent& event );
     void OnSlowStream( wxCommandEvent& event );
     void OnFastStream( wxCommandEvent& event );
-    void OnMute( wxCommandEvent& event );
 
     void OnDiscMenu( wxCommandEvent& event );
     void OnDiscPrev( wxCommandEvent& event );

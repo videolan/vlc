@@ -78,28 +78,31 @@ private:
 
 };
 
-class wxVolCtrl: public wxGauge
+class wxVolCtrl;
+class VLCVolCtrl : public wxControl
 {
 public:
-    /* Constructor */
-    wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id,
-               wxPoint = wxDefaultPosition, wxSize = wxSize( 20, -1 ) );
-    virtual ~wxVolCtrl() {};
+    VLCVolCtrl( intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~VLCVolCtrl() {};
 
+    virtual void OnPaint( wxPaintEvent &event );
+    void OnChange( wxMouseEvent& event );
     void UpdateVolume();
 
-    void OnChange( wxMouseEvent& event );
+  private:
+    DECLARE_EVENT_TABLE()
 
-private:
+    wxVolCtrl *gauge;
+    int i_y_offset;
+    vlc_bool_t b_mute;
     intf_thread_t *p_intf;
-
-    DECLARE_EVENT_TABLE();
 };
 
-BEGIN_EVENT_TABLE(wxVolCtrl, wxWindow)
+BEGIN_EVENT_TABLE(VLCVolCtrl, wxControl)
+   EVT_PAINT(VLCVolCtrl::OnPaint)
+
     /* Mouse events */
-    EVT_LEFT_DOWN(wxVolCtrl::OnChange)
-    EVT_MOTION(wxVolCtrl::OnChange)
+    EVT_LEFT_UP(VLCVolCtrl::OnChange)
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -143,7 +146,6 @@ enum
     NextStream_Event,
     SlowStream_Event,
     FastStream_Event,
-    Mute_Event,
 
     DiscMenu_Event,
     DiscPrev_Event,
@@ -194,7 +196,6 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(NextStream_Event, Interface::OnNextStream)
     EVT_MENU(SlowStream_Event, Interface::OnSlowStream)
     EVT_MENU(FastStream_Event, Interface::OnFastStream)
-    EVT_MENU(Mute_Event, Interface::OnMute)
 
     /* Disc Buttons events */
     EVT_BUTTON(DiscMenu_Event, Interface::OnDiscMenu)
@@ -328,7 +329,7 @@ void Interface::Init()
 void Interface::Update()
 {
     /* Misc updates */
-    ((wxVolCtrl *)volctrl)->UpdateVolume();
+    ((VLCVolCtrl *)volctrl)->UpdateVolume();
 }
 
 void Interface::OnControlEvent( wxCommandEvent& event )
@@ -430,35 +431,6 @@ void Interface::CreateOurMenuBar()
 #endif
 }
 
-class VLCVolCtrl : public wxControl
-{
-public:
-    VLCVolCtrl( intf_thread_t *p_intf, wxWindow *p_parent, wxGauge ** );
-    virtual ~VLCVolCtrl() {};
-
-  private:
-    DECLARE_EVENT_TABLE()
-    int i_y_offset;
-};
-
-BEGIN_EVENT_TABLE(VLCVolCtrl, wxControl)
-END_EVENT_TABLE()
-
-#if defined(__WXGTK__)
-#define VLCVOL_HEIGHT p_parent->GetSize().GetHeight()
-#else
-#define VLCVOL_HEIGHT TOOLBAR_BMP_HEIGHT
-#endif
-VLCVolCtrl::VLCVolCtrl( intf_thread_t *p_intf, wxWindow *p_parent,
-                        wxGauge **pp_volctrl )
-  :wxControl( p_parent, -1, wxDefaultPosition, wxSize(64, VLCVOL_HEIGHT ),
-              wxBORDER_NONE ),
-   i_y_offset((VLCVOL_HEIGHT - TOOLBAR_BMP_HEIGHT) / 2)
-{
-    *pp_volctrl = new wxVolCtrl( p_intf, this, -1, wxPoint( 0 , i_y_offset ),
-                                 wxSize( 44, TOOLBAR_BMP_HEIGHT ) );
-}
-
 void Interface::CreateOurToolBar()
 {
 #define HELP_OPEN N_("Open")
@@ -470,7 +442,6 @@ void Interface::CreateOurToolBar()
 #define HELP_PLN N_("Next playlist item")
 #define HELP_SLOW N_("Play slower")
 #define HELP_FAST N_("Play faster")
-#define HELP_MUTE N_("Toggle mute")
 
     wxLogNull LogDummy; /* Hack to suppress annoying log message on the win32
                          * version because we don't include wx.rc */
@@ -509,12 +480,8 @@ void Interface::CreateOurToolBar()
 
     toolbar->AddControl( p_dummy_ctrl );
 
-    wxToolBarToolBase *p_tool2 = toolbar->AddTool( Mute_Event, wxT(""),
-                    wxBitmap( speaker_xpm ), wxU(_(HELP_MUTE)) );
-    p_tool2->SetClientData( p_tool2 );
-
-    VLCVolCtrl *sound_control = new VLCVolCtrl( p_intf, toolbar, &volctrl );
-    toolbar->AddControl( sound_control );
+    volctrl = new VLCVolCtrl( p_intf, toolbar );
+    toolbar->AddControl( volctrl );
 
     toolbar->Realize();
 
@@ -1199,31 +1166,6 @@ void Interface::OnDiscNext( wxCommandEvent& WXUNUSED(event) )
     }
 }
 
-void Interface::OnMute( wxCommandEvent& WXUNUSED(event) )
-{
-    int i_volume = 1;
-    aout_VolumeMute( p_intf, (audio_volume_t *)&i_volume );
-
-    wxToolBarToolBase *p_tool = (wxToolBarToolBase *)
-        GetToolBar()->GetToolClientData( Mute_Event );
-    if( !p_tool ) return;
-
-    if( i_volume != 0 )
-    {
-        p_tool->SetNormalBitmap( wxBitmap( speaker_xpm ) );
-        p_tool->SetLabel( wxU(_("")) );
-        p_tool->SetShortHelp( wxU(_(HELP_MUTE)) );
-    }
-    else
-    {
-        p_tool->SetNormalBitmap( wxBitmap( speaker_mute_xpm ) );
-        p_tool->SetLabel( wxU(_("")) );
-        p_tool->SetShortHelp( wxU(_(HELP_MUTE)) );
-    }
-
-    GetToolBar()->Realize();
-}
-
 #if wxUSE_DRAG_AND_DROP
 /*****************************************************************************
  * Definition of DragAndDrop class.
@@ -1262,6 +1204,30 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 /*****************************************************************************
  * Definition of VolCtrl class.
  *****************************************************************************/
+class wxVolCtrl: public wxGauge
+{
+public:
+    /* Constructor */
+    wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id,
+               wxPoint = wxDefaultPosition, wxSize = wxSize( 20, -1 ) );
+    virtual ~wxVolCtrl() {};
+
+    void UpdateVolume();
+
+    void OnChange( wxMouseEvent& event );
+
+private:
+    intf_thread_t *p_intf;
+
+    DECLARE_EVENT_TABLE();
+};
+
+BEGIN_EVENT_TABLE(wxVolCtrl, wxWindow)
+    /* Mouse events */
+    EVT_LEFT_DOWN(wxVolCtrl::OnChange)
+    EVT_MOTION(wxVolCtrl::OnChange)
+END_EVENT_TABLE()
+
 wxVolCtrl::wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id,
                       wxPoint point, wxSize size )
   : wxGauge( parent, id, 200, point, size, wxGA_HORIZONTAL | wxGA_SMOOTH )
@@ -1290,6 +1256,45 @@ void wxVolCtrl::UpdateVolume()
     SetValue( i_gauge_volume );
     SetToolTip( wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
                 i_gauge_volume / 2 ) );
+}
+
+#if defined(__WXGTK__)
+#define VLCVOL_HEIGHT p_parent->GetSize().GetHeight()
+#else
+#define VLCVOL_HEIGHT TOOLBAR_BMP_HEIGHT
+#endif
+VLCVolCtrl::VLCVolCtrl( intf_thread_t *_p_intf, wxWindow *p_parent )
+  :wxControl( p_parent, -1, wxDefaultPosition, wxSize(64, VLCVOL_HEIGHT ),
+              wxBORDER_NONE ),
+   i_y_offset((VLCVOL_HEIGHT - TOOLBAR_BMP_HEIGHT) / 2),
+   b_mute(0), p_intf(_p_intf)
+{
+    gauge = new wxVolCtrl( p_intf, this, -1, wxPoint( 18, i_y_offset ),
+                           wxSize( 44, TOOLBAR_BMP_HEIGHT ) );
+}
+
+void VLCVolCtrl::OnPaint( wxPaintEvent &evt )
+{
+    wxPaintDC dc( this );
+    wxBitmap mPlayBitmap( b_mute ? speaker_mute_xpm : speaker_xpm );
+    dc.DrawBitmap( mPlayBitmap, 0, i_y_offset, TRUE );
+}
+
+void VLCVolCtrl::OnChange( wxMouseEvent& event )
+{
+    if( event.GetX() < TOOLBAR_BMP_WIDTH )
+    {
+        int i_volume;
+        aout_VolumeMute( p_intf, (audio_volume_t *)&i_volume );
+
+        b_mute = !b_mute;
+        Refresh();
+    }
+}
+
+void VLCVolCtrl::UpdateVolume()
+{
+    gauge->UpdateVolume();
 }
 
 /*****************************************************************************
@@ -1371,4 +1376,3 @@ void Systray::UpdateTooltip( const wxChar* tooltip )
     SetIcon( wxIcon( vlc16x16_xpm ), tooltip );
 }
 #endif
-
