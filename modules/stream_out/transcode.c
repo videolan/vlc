@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.34 2003/10/04 10:54:45 gbazin Exp $
+ * $Id: transcode.c,v 1.35 2003/10/08 21:01:07 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -30,6 +30,8 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc/sout.h>
+#include <vlc/vout.h>
+#include <vlc/decoder.h>
 
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVCODEC_H
@@ -320,6 +322,9 @@ struct sout_stream_id_t
     /* id of the out stream */
     void *id;
 
+    /* Encoder */
+    encoder_t *p_encoder;
+
     /* ffmpeg part */
     AVCodec         *ff_dec;
     AVCodecContext  *ff_dec_c;
@@ -373,6 +378,8 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
     id = malloc( sizeof( sout_stream_id_t ) );
     id->i_dts = 0;
     id->id = NULL;
+    id->p_encoder = NULL;
+
     if( p_fmt->i_cat == AUDIO_ES && p_sys->i_acodec != 0 )
     {
         msg_Dbg( p_stream,
@@ -1215,19 +1222,77 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
 
 
     /* find encoder */
+    id->ff_enc = NULL;
     i_ff_codec = get_ff_codec( id->f_dst.i_fourcc );
-    if( i_ff_codec == 0 )
+    if( i_ff_codec != 0 )
+    {
+        id->ff_enc = avcodec_find_encoder( i_ff_codec );
+    }
+
+    /* Hack for external encoders */
+    if( !id->ff_enc )
+    {
+        id->p_encoder = vlc_object_create( p_stream, VLC_OBJECT_ENCODER );
+        id->p_encoder->i_fourcc = id->f_dst.i_fourcc;
+        id->p_encoder->format.video.i_width = p_sys->i_width;
+        id->p_encoder->format.video.i_height = p_sys->i_height;
+        id->p_encoder->i_bitrate = p_sys->i_vbitrate;
+
+            if( id->p_encoder->format.video.i_width <= 0 )
+            {
+                id->p_encoder->format.video.i_width = id->f_dst.i_width =
+                    id->ff_dec_c->width - p_sys->i_crop_left -
+                    p_sys->i_crop_right;
+            }
+            if( id->p_encoder->format.video.i_height <= 0 )
+            {
+                id->p_encoder->format.video.i_height = id->f_dst.i_height =
+                    id->ff_dec_c->height - p_sys->i_crop_top -
+                    p_sys->i_crop_bottom;
+            }
+
+        id->p_encoder->p_module =
+            module_Need( id->p_encoder, "video encoder", NULL );
+
+        if( !id->p_encoder->p_module )
+        {
+            free( id->p_encoder );
+            id->p_encoder = NULL;
+        }
+    }
+    /* End hack for external encoders */
+
+    if( !id->ff_enc && !id->p_encoder )
     {
         msg_Err( p_stream, "cannot find encoder" );
         return VLC_EGENERIC;
     }
 
-    id->ff_enc = avcodec_find_encoder( i_ff_codec );
-    if( !id->ff_enc )
-    {
-        msg_Err( p_stream, "cannot find encoder" );
-        return VLC_EGENERIC;
-    }
+    /* XXX open it only when we have the first frame */
+    id->b_enc_inited     = VLC_FALSE;
+    id->i_buffer_in      = 0;
+    id->i_buffer_in_pos  = 0;
+    id->p_buffer_in      = NULL;
+
+    id->i_buffer     = 3*1024*1024;
+    id->i_buffer_pos = 0;
+    id->p_buffer     = malloc( id->i_buffer );
+
+    id->i_buffer_out     = 0;
+    id->i_buffer_out_pos = 0;
+    id->p_buffer_out     = NULL;
+
+    id->p_ff_pic         = avcodec_alloc_frame();
+    id->p_ff_pic_tmp0    = NULL;
+    id->p_ff_pic_tmp1    = NULL;
+    id->p_ff_pic_tmp2    = NULL;
+    id->p_vresample      = NULL;
+
+    p_sys->i_last_ref_pts = 0;
+    p_sys->i_buggy_pts_detect = 0;
+
+    /* This is enough for external encoders */
+    if( id->p_encoder->p_module ) return VLC_SUCCESS;
 
     if( id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','1','v' )||
         id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','2','v' ) )
@@ -1282,28 +1347,6 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     {
         id->ff_enc_c->pix_fmt = get_ff_chroma( id->f_dst.i_fourcc );
     }
-    /* XXX open it only when we have the first frame */
-    id->b_enc_inited     = VLC_FALSE;
-    id->i_buffer_in      = 0;
-    id->i_buffer_in_pos  = 0;
-    id->p_buffer_in      = NULL;
-
-    id->i_buffer     = 3*1024*1024;
-    id->i_buffer_pos = 0;
-    id->p_buffer     = malloc( id->i_buffer );
-
-    id->i_buffer_out     = 0;
-    id->i_buffer_out_pos = 0;
-    id->p_buffer_out     = NULL;
-
-    id->p_ff_pic         = avcodec_alloc_frame();
-    id->p_ff_pic_tmp0    = NULL;
-    id->p_ff_pic_tmp1    = NULL;
-    id->p_ff_pic_tmp2    = NULL;
-    id->p_vresample      = NULL;
-
-    p_sys->i_last_ref_pts = 0;
-    p_sys->i_buggy_pts_detect = 0;
 
     return VLC_SUCCESS;
 }
@@ -1314,7 +1357,13 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream, sout_stream_
     {
         avcodec_close( id->ff_dec_c );
     }
-    if( id->b_enc_inited )
+    if( id->p_encoder )
+    {
+        /* External encoding */
+        module_Unneed( p_stream, id->p_encoder->p_module );
+        vlc_object_destroy( id->p_encoder->p_module );
+    }
+    else if( id->b_enc_inited )
     {
         avcodec_close( id->ff_enc_c );
     }
@@ -1346,7 +1395,6 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream, sout_stream_
 
     free( id->ff_dec_c );
     free( id->ff_enc_c );
-
     free( id->p_buffer );
 }
 
@@ -1412,10 +1460,50 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             p_sys->i_output_pts = frame->pts;
         }
 
-        if( !id->b_enc_inited )
+        if( !id->b_enc_inited && id->p_encoder )
         {
-            /* XXX hack because of copy packetizer and mpeg4video that can failed
-               detecting size */
+            block_t *p_block;
+
+            /* XXX hack because of copy packetizer and mpeg4video that can fail
+             * detecting size */
+#if 0
+            if( id->p_encoder->i_width <= 0 )
+            {
+                id->p_encoder->i_width = id->f_dst.i_width =
+                    id->ff_dec_c->width - p_sys->i_crop_left -
+                    p_sys->i_crop_right;
+            }
+            if( id->p_encoder->i_height <= 0 )
+            {
+                id->p_encoder->i_height = id->f_dst.i_height =
+                    id->ff_dec_c->height - p_sys->i_crop_top -
+                    p_sys->i_crop_bottom;
+            }
+#endif
+
+            id->p_encoder->i_bitrate = p_sys->i_vbitrate;
+
+            if( !( id->id = p_stream->p_sys->p_out->pf_add( p_stream->p_sys->p_out, &id->f_dst ) ) )
+            {
+                msg_Err( p_stream, "cannot add this stream" );
+                id->b_transcode = VLC_FALSE;
+                return VLC_EGENERIC;
+            }
+
+            while( (p_block = id->p_encoder->pf_header( id->p_encoder )) )
+            {
+                sout_buffer_t *p_out;
+                p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
+                memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
+                sout_BufferChain( out, p_out );
+            }
+
+            id->b_enc_inited = VLC_TRUE;
+        }
+        else if( !id->b_enc_inited )
+        {
+            /* XXX hack because of copy packetizer and mpeg4video that can fail
+             * detecting size */
             if( id->ff_enc_c->width <= 0 )
             {
                 id->ff_enc_c->width    =
@@ -1479,6 +1567,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         }
 
         /* convert pix format */
+        if( !id->p_encoder )
         if( id->ff_dec_c->pix_fmt != id->ff_enc_c->pix_fmt )
         {
             if( id->p_ff_pic_tmp1 == NULL )
@@ -1504,6 +1593,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         }
 
         /* convert size and crop */
+        if( !id->p_encoder )
         if( id->ff_dec_c->width  != id->ff_enc_c->width ||
             id->ff_dec_c->height != id->ff_enc_c->height ||
             p_sys->i_crop_top > 0 || p_sys->i_crop_bottom > 0 ||
@@ -1550,6 +1640,37 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         {
             p_sys->i_output_pts += I64C(1000000) * (2 + frame->repeat_pict) *
               id->ff_dec_c->frame_rate_base / (2 * id->ff_dec_c->frame_rate);
+        }
+
+        if( id->p_encoder )
+        {
+            /* External encoding */
+            block_t *p_block;
+            picture_t pic;
+            int i_plane;
+
+            vout_InitPicture( VLC_OBJECT(p_stream), &pic,
+                              id->ff_dec_c->width, id->ff_dec_c->height,
+                              VLC_FOURCC('I','4','2','0') );
+
+            for( i_plane = 0; i_plane < pic.i_planes; i_plane++ )
+            {
+                pic.p[i_plane].p_pixels = frame->data[i_plane];
+                pic.p[i_plane].i_pitch = frame->linesize[i_plane];
+            }
+
+            pic.date = frame->pts;
+
+            p_block = id->p_encoder->pf_encode_video( id->p_encoder, &pic );
+            if( p_block )
+            {
+                sout_buffer_t *p_out;
+                p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
+                memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
+                sout_BufferChain( out, p_out );
+            }
+
+            return VLC_SUCCESS;
         }
 
         /* Let ffmpeg select the frame type */

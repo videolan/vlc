@@ -2,7 +2,7 @@
  * vlc_objects.h: vlc_object_t definition.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc_objects.h,v 1.18 2003/09/18 17:54:02 zorglub Exp $
+ * $Id: vlc_objects.h,v 1.19 2003/10/08 21:01:07 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,6 +46,8 @@
 #define VLC_OBJECT_AOUT      (-10)
 #define VLC_OBJECT_SOUT      (-11)
 #define VLC_OBJECT_HTTPD     (-12)
+#define VLC_OBJECT_PACKETIZER (-13)
+#define VLC_OBJECT_ENCODER   (-14)
 
 #define VLC_OBJECT_GENERIC  (-666)
 

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_video.h,v 1.3 2003/10/04 15:51:22 sigmunau Exp $
+ * $Id: vlc_video.h,v 1.4 2003/10/08 21:01:07 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -22,6 +22,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+#ifndef _VLC_VIDEO_H
+#define _VLC_VIDEO_H 1
+
+/**
+ * Description of a video frame
+ */
+typedef struct video_frame_format_t
+{
+    unsigned int i_width;                                 /**< picture width */
+    unsigned int i_height;                               /**< picture height */
+    vlc_fourcc_t i_chroma;                               /**< picture chroma */
+    unsigned int i_aspect;                                 /**< aspect ratio */
+
+} video_frame_format_t;
 
 /**
  * Description of a planar graphic field
@@ -247,3 +261,5 @@ struct subpicture_t
 #define READY_SUBPICTURE       2                        /* ready for display */
 
 /**@}*/
+
+#endif /* _VLC_VIDEO_H */

@@ -2,7 +2,7 @@
  * block.c: Data blocks management functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: block.c,v 1.2 2003/09/02 20:19:26 gbazin Exp $
+ * $Id: block.c,v 1.3 2003/10/08 21:01:07 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -181,7 +181,7 @@ static block_t *BlockRealloc( block_t *p_block, int i_prebody, int i_body )
  * Standard block management
  *
  *****************************************************************************/
-/* to be used by other block managment */
+/* to be used by other block management */
 block_t *block_NewEmpty( void )
 {
     block_t *p_block;
@@ -322,9 +322,8 @@ block_t *block_ChainGather( block_t *p_list )
     return g;
 }
 
-
 /*****************************************************************************
- * block_fifo_t managment
+ * block_fifo_t management
  *****************************************************************************/
 block_fifo_t *__block_FifoNew( vlc_object_t *p_obj )
 {

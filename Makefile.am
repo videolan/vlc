@@ -91,6 +91,7 @@ HEADERS_include = \
 	include/video_output.h \
 	include/vlc_block.h \
 	include/vlc_block_helper.h \
+	include/vlc_codec.h \
 	include/vlc_common.h \
 	include/vlc_config.h \
 	include/vlc_cpu.h \

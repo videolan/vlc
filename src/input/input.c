@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.245 2003/09/30 16:09:58 hartman Exp $
+ * $Id: input.c,v 1.246 2003/10/08 21:01:07 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -1204,14 +1204,14 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
  * Callbacks  (position, time, state, rate )
  *****************************************************************************/
 static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                             vlc_value_t oldval, vlc_value_t newval,
+                             void *p_data )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     int64_t i_offset;
 
-    msg_Warn( p_input, "cmd=%s old=%f new=%f",
-              psz_cmd,
-              oldval.f_float, newval.f_float );
+    msg_Dbg( p_input, "cmd=%s old=%f new=%f", psz_cmd,
+             oldval.f_float, newval.f_float );
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     i_offset = (int64_t)( newval.f_float *
@@ -1233,16 +1233,15 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static int TimeCallback    ( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     int64_t i_offset;
 
     /* FIXME TODO FIXME */
-    msg_Warn( p_input, "cmd=%s old=%lld new=%lld",
-              psz_cmd,
-              oldval.i_time, newval.i_time );
+    msg_Dbg( p_input, "cmd=%s old=%lld new=%lld", psz_cmd,
+             oldval.i_time, newval.i_time );
 
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -1264,12 +1263,14 @@ static int TimeCallback    ( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static int StateCallback   ( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
+                          vlc_value_t oldval, vlc_value_t newval,
+                          void *p_data )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    msg_Warn( p_input, "cmd=%s old=%d new=%d",
-              psz_cmd, oldval.i_int, newval.i_int );
+
+    msg_Dbg( p_input, "cmd=%s old=%d new=%d",
+             psz_cmd, oldval.i_int, newval.i_int );
 
     switch( newval.i_int )
     {
@@ -1288,8 +1289,8 @@ static int StateCallback   ( vlc_object_t *p_this, char const *psz_cmd,
     }
 }
 
-static int RateCallback    ( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
 
@@ -1303,8 +1304,8 @@ static int RateCallback    ( vlc_object_t *p_this, char const *psz_cmd,
     }
     else
     {
-        msg_Warn( p_input, "cmd=%s old=%d new=%d",
-                  psz_cmd, oldval.i_int, newval.i_int );
+        msg_Dbg( p_input, "cmd=%s old=%d new=%d",
+                 psz_cmd, oldval.i_int, newval.i_int );
         input_SetRate( p_input, newval.i_int );
     }
     return VLC_SUCCESS;

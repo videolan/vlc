@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.8 2003/09/28 21:54:20 gbazin Exp $
+ * $Id: theora.c,v 1.9 2003/10/08 21:01:07 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -90,8 +90,12 @@ static int DecodePacket  ( decoder_t *, ogg_packet * );
 static int SendPacket    ( decoder_t *, ogg_packet * );
 
 static void ParseTheoraComments( decoder_t * );
-
 static void theora_CopyPicture( decoder_t *, picture_t *, yuv_buffer * );
+
+static int  OpenEncoder( vlc_object_t *p_this );
+static void CloseEncoder( vlc_object_t *p_this );
+static block_t *Headers( encoder_t *p_enc );
+static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
 
 /*****************************************************************************
  * Module descriptor
@@ -106,6 +110,12 @@ vlc_module_begin();
     set_description( _("Theora video packetizer") );
     set_capability( "packetizer", 100 );
     set_callbacks( OpenPacketizer, NULL );
+    add_shortcut( "theora" );
+
+    add_submodule();
+    set_description( _("Theora video encoder") );
+    set_capability( "video encoder", 100 );
+    set_callbacks( OpenEncoder, CloseEncoder );
     add_shortcut( "theora" );
 vlc_module_end();
 
@@ -514,4 +524,194 @@ static void theora_CopyPicture( decoder_t *p_dec, picture_t *p_pic,
             p_dst += i_dst_stride;
         }
     }
+}
+
+/*****************************************************************************
+ * encoder_sys_t : theora encoder descriptor
+ *****************************************************************************/
+struct encoder_sys_t
+{
+    /*
+     * Input properties
+     */
+    int i_headers;
+
+    /*
+     * Theora properties
+     */
+    theora_info      ti;                        /* theora bitstream settings */
+    theora_comment   tc;                            /* theora comment header */
+    theora_state     td;                   /* theora bitstream user comments */
+
+    /*
+     * Packetizer output properties
+     */
+    sout_packetizer_input_t *p_sout_input;
+    sout_format_t           sout_format;
+
+    /*
+     * Common properties
+     */
+    mtime_t i_pts;
+};
+
+/*****************************************************************************
+ * OpenEncoder: probe the encoder and return score
+ *****************************************************************************/
+static int OpenEncoder( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys = p_enc->p_sys;
+
+    if( p_enc->i_fourcc != VLC_FOURCC('t','h','e','o') )
+    {
+        return VLC_EGENERIC;
+    }
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
+    {
+        msg_Err( p_enc, "out of memory" );
+        return VLC_EGENERIC;
+    }
+    p_enc->p_sys = p_sys;
+
+    p_enc->pf_header = Headers;
+    p_enc->pf_encode_video = Encode;
+    p_enc->format.video.i_chroma = VLC_FOURCC('I','4','2','0');
+
+#define frame_x_offset 0
+#define frame_y_offset 0
+#define video_hzn 25
+#define video_hzd 1
+#define video_an 4
+#define video_ad 3
+#define video_q 5
+
+    theora_info_init( &p_sys->ti );
+
+    p_sys->ti.width = p_enc->format.video.i_width;
+    p_sys->ti.height = p_enc->format.video.i_height;
+    p_sys->ti.frame_width = p_enc->format.video.i_width;
+    p_sys->ti.frame_height = p_enc->format.video.i_height;
+    p_sys->ti.offset_x = frame_x_offset;
+    p_sys->ti.offset_y = frame_y_offset;
+    p_sys->ti.fps_numerator = video_hzn;
+    p_sys->ti.fps_denominator = video_hzd;
+    p_sys->ti.aspect_numerator = video_an;
+    p_sys->ti.aspect_denominator = video_ad;
+    p_sys->ti.colorspace = not_specified;
+    p_sys->ti.target_bitrate = p_enc->i_bitrate;
+    p_sys->ti.quality = video_q;
+
+    p_sys->ti.dropframes_p = 0;
+    p_sys->ti.quick_p = 1;
+    p_sys->ti.keyframe_auto_p = 1;
+    p_sys->ti.keyframe_frequency = 64;
+    p_sys->ti.keyframe_frequency_force = 64;
+    p_sys->ti.keyframe_data_target_bitrate = p_enc->i_bitrate * 1.5;
+    p_sys->ti.keyframe_auto_threshold = 80;
+    p_sys->ti.keyframe_mindistance = 8;
+    p_sys->ti.noise_sensitivity = 1;
+
+    theora_encode_init( &p_sys->td, &p_sys->ti );
+    theora_info_clear( &p_sys->ti );
+
+    p_sys->i_headers = 0;
+
+    return VLC_SUCCESS;
+}
+
+/****************************************************************************
+ * Encode: the whole thing
+ ****************************************************************************
+ * This function spits out ogg packets.
+ ****************************************************************************/
+static block_t *Headers( encoder_t *p_enc )
+{
+    encoder_sys_t *p_sys = p_enc->p_sys;
+    ogg_packet oggpacket;
+    block_t *p_block;
+
+    /* Create theora headers */
+    switch( p_sys->i_headers )
+    {
+    case 0:
+        theora_encode_header( &p_sys->td, &oggpacket );
+        break;
+    case 1:
+        theora_comment_init( &p_sys->tc );
+        theora_encode_comment( &p_sys->tc, &oggpacket );
+        break;
+    case 2:
+        theora_encode_tables( &p_sys->td, &oggpacket );
+        break;
+    default:
+    }
+
+    p_sys->i_headers++;
+    if( p_sys->i_headers > 3 ) return NULL;
+
+    /* Ogg packet to block */
+    p_block = block_New( p_enc, oggpacket.bytes );
+    p_block->p_buffer = oggpacket.packet;
+    p_block->i_buffer = oggpacket.bytes;
+    p_block->i_dts = oggpacket.granulepos;
+
+    return p_block;
+}
+
+/****************************************************************************
+ * Encode: the whole thing
+ ****************************************************************************
+ * This function spits out ogg packets.
+ ****************************************************************************/
+static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
+{
+    encoder_sys_t *p_sys = p_enc->p_sys;
+    ogg_packet oggpacket;
+    block_t *p_block;
+    yuv_buffer yuv;
+    int i_ret;
+
+    /* Theora is a one-frame-in, one-frame-out system. Submit a frame
+     * for compression and pull out the packet. */
+
+    yuv.y_width  = p_pict->p[0].i_visible_pitch;
+    yuv.y_height = p_pict->p[0].i_lines;
+    yuv.y_stride = p_pict->p[0].i_pitch;
+
+    yuv.uv_width  = p_pict->p[1].i_visible_pitch;
+    yuv.uv_height = p_pict->p[1].i_lines;
+    yuv.uv_stride = p_pict->p[1].i_pitch;
+
+    yuv.y = p_pict->p[0].p_pixels;
+    yuv.u = p_pict->p[1].p_pixels;
+    yuv.v = p_pict->p[2].p_pixels;
+
+    theora_encode_YUVin( &p_sys->td, &yuv );
+
+    theora_encode_packetout( &p_sys->td, 0, &oggpacket );
+
+    /* Ogg packet to block */
+    p_block = block_New( p_enc, oggpacket.bytes );
+    p_block->p_buffer = oggpacket.packet;
+    p_block->i_buffer = oggpacket.bytes;
+    p_block->i_dts = oggpacket.granulepos;
+
+    return p_block;
+}
+
+/*****************************************************************************
+ * CloseEncoder: theora encoder destruction
+ *****************************************************************************/
+static void CloseEncoder( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys = p_enc->p_sys;
+
+    theora_info_clear( &p_sys->ti );
+    theora_comment_clear( &p_sys->tc );
+
+    free( p_sys );
 }

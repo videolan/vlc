@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.63 2003/10/06 15:22:53 gbazin Exp $
+ * $Id: input_dec.c,v 1.64 2003/10/08 21:01:07 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -28,10 +28,8 @@
 #include <string.h>                                    /* memcpy(), memset() */
 
 #include <vlc/vlc.h>
+#include <vlc/decoder.h>
 
-#include "vlc_block.h"
-#include "stream_control.h"
-#include "input_ext-dec.h"
 #include "input_ext-intf.h"
 #include "input_ext-plugins.h"
 

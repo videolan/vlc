@@ -2,7 +2,7 @@
  * hotkeys.h: keycode defines
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_keys.h,v 1.1 2003/08/14 19:25:55 sigmunau Exp $
+ * $Id: vlc_keys.h,v 1.2 2003/10/08 21:01:07 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -58,12 +58,15 @@
 
 #define KEY_ASCII            0x0000007F
 #define KEY_UNSET            0
+
 typedef struct key_descriptor_s
 {
     char *psz_key_string;
     int i_key_code;
 } key_descriptor_t;
+
 #define ADD_KEY(a) { a, *a }
+
 static const struct key_descriptor_s modifiers[] =
 {
     { "Alt", KEY_MODIFIER_ALT },

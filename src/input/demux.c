@@ -2,7 +2,7 @@
  * demux.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: demux.c,v 1.3 2003/09/13 17:42:16 fenrir Exp $
+ * $Id: demux.c,v 1.4 2003/10/08 21:01:07 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -27,7 +27,7 @@
 
 #include "ninput.h"
 
-int  demux_vaControl( input_thread_t *p_input, int i_query, va_list args )
+int demux_vaControl( input_thread_t *p_input, int i_query, va_list args )
 {
     if( p_input->pf_demux_control )
     {
@@ -36,7 +36,7 @@ int  demux_vaControl( input_thread_t *p_input, int i_query, va_list args )
     return VLC_EGENERIC;
 }
 
-int  demux_Control  ( input_thread_t *p_input, int i_query, ...  )
+int demux_Control( input_thread_t *p_input, int i_query, ...  )
 {
     va_list args;
     int     i_result;
@@ -50,7 +50,8 @@ int  demux_Control  ( input_thread_t *p_input, int i_query, ...  )
 
 static void SeekOffset( input_thread_t *p_input, int64_t i_pos );
 
-int  demux_vaControlDefault( input_thread_t *p_input, int i_query, va_list args )
+int demux_vaControlDefault( input_thread_t *p_input, int i_query,
+                            va_list args )
 {
     int     i_ret;
     double  f, *pf;
@@ -75,9 +76,11 @@ int  demux_vaControlDefault( input_thread_t *p_input, int i_query, va_list args 
 
         case DEMUX_SET_POSITION:
             f = (double)va_arg( args, double );
-            if( p_input->stream.b_seekable && p_input->pf_seek != NULL && f >= 0.0 && f <= 1.0 )
+            if( p_input->stream.b_seekable && p_input->pf_seek != NULL &&
+		f >= 0.0 && f <= 1.0 )
             {
-                SeekOffset( p_input, (int64_t)(f * (double)p_input->stream.p_selected_area->i_size) );
+                SeekOffset( p_input, (int64_t)(f *
+                            (double)p_input->stream.p_selected_area->i_size) );
                 i_ret = VLC_SUCCESS;
             }
             else
@@ -105,7 +108,8 @@ int  demux_vaControlDefault( input_thread_t *p_input, int i_query, va_list args 
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
             if( p_input->stream.i_mux_rate > 0 &&
-                p_input->stream.b_seekable && p_input->pf_seek != NULL && i64 >= 0 )
+                p_input->stream.b_seekable &&
+		p_input->pf_seek != NULL && i64 >= 0 )
             {
                 SeekOffset( p_input, i64 * 50 *
                                      (int64_t)p_input->stream.i_mux_rate /
@@ -146,7 +150,6 @@ int  demux_vaControlDefault( input_thread_t *p_input, int i_query, va_list args 
 
     return i_ret;
 }
-
 
 static void SeekOffset( input_thread_t *p_input, int64_t i_pos )
 {

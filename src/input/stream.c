@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: stream.c,v 1.5 2003/09/08 00:36:26 fenrir Exp $
+ * $Id: stream.c,v 1.6 2003/10/08 21:01:07 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -48,7 +48,7 @@ struct stream_t
 /**
  * Create a "stream_t *" from an "input_thread_t *".
  */
-stream_t    *stream_OpenInput( input_thread_t *p_input )
+stream_t *stream_OpenInput( input_thread_t *p_input )
 {
     stream_t *s;
 
@@ -64,15 +64,16 @@ stream_t    *stream_OpenInput( input_thread_t *p_input )
 /**
  * Destroy a previously created "stream_t *" instance.
  */
-void        stream_Release( stream_t *s )
+void stream_Release( stream_t *s )
 {
     vlc_object_destroy( s );
 }
 
 /**
- * Similar to #stream_Control(), but takes a va_list and not variable arguments.
+ * Similar to #stream_Control(), but takes a va_list and not variable
+ * arguments.
  */
-int         stream_vaControl( stream_t *s, int i_query, va_list args )
+int stream_vaControl( stream_t *s, int i_query, va_list args )
 {
     vlc_bool_t *p_b;
     int64_t    *p_i64, i64;
@@ -99,7 +100,8 @@ int         stream_vaControl( stream_t *s, int i_query, va_list args )
             p_b = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
 
             vlc_mutex_lock( &s->p_input->stream.stream_lock );
-            *p_b = s->p_input->stream.b_seekable && s->p_input->stream.i_method == INPUT_METHOD_FILE;
+            *p_b = s->p_input->stream.b_seekable &&
+                   s->p_input->stream.i_method == INPUT_METHOD_FILE;
             vlc_mutex_unlock( &s->p_input->stream.stream_lock );
             return VLC_SUCCESS;
 
@@ -142,8 +144,8 @@ int         stream_vaControl( stream_t *s, int i_query, va_list args )
 
             if( i64 - s->p_input->stream.p_selected_area->i_tell > 0 )
             {
-                data_packet_t   *p_data;
-                int             i_skip = i64 - s->p_input->stream.p_selected_area->i_tell;
+                data_packet_t *p_data;
+                int i_skip = i64 - s->p_input->stream.p_selected_area->i_tell;
 
                 if( i_skip > 1000 )
                 {
@@ -155,7 +157,7 @@ int         stream_vaControl( stream_t *s, int i_query, va_list args )
                     int i_read;
 
                     i_read = input_SplitBuffer( s->p_input, &p_data,
-                                                __MIN( (int)s->p_input->i_bufsize, i_skip ) );
+                                 __MIN( (int)s->p_input->i_bufsize, i_skip ) );
                     if( i_read < 0 )
                     {
                         return VLC_EGENERIC;
@@ -183,7 +185,7 @@ int         stream_vaControl( stream_t *s, int i_query, va_list args )
  * possible "i_query" value and format arguments.  Return VLC_SUCCESS
  * if ... succeed ;) and VLC_EGENERIC if failed or unimplemented
  */
-int         stream_Control( stream_t *s, int i_query, ... )
+int stream_Control( stream_t *s, int i_query, ... )
 {
     va_list args;
     int     i_result;
@@ -201,7 +203,7 @@ int         stream_Control( stream_t *s, int i_query, ... )
  * value is the real numbers of bytes read/skip. If this value is less
  * than i_read that means that it's the end of the stream.
  */
-int         stream_Read( stream_t *s, void *p_data, int i_data )
+int stream_Read( stream_t *s, void *p_data, int i_data )
 {
     uint8_t       *p = (uint8_t*)p_data;
     data_packet_t *p_packet;
@@ -227,7 +229,7 @@ int         stream_Read( stream_t *s, void *p_data, int i_data )
         int i_count;
 
         i_count = input_SplitBuffer( s->p_input, &p_packet,
-                                     __MIN( i_data, (int)s->p_input->i_bufsize ) );
+                      __MIN( i_data, (int)s->p_input->i_bufsize ) );
         if( i_count <= 0 )
         {
             return i_read;
@@ -258,7 +260,7 @@ int         stream_Read( stream_t *s, void *p_data, int i_data )
  * the end of the stream (but only when you have i_peek >=
  * p_input->i_bufsize)
  */
-int         stream_Peek( stream_t *s, uint8_t **pp_peek, int i_data )
+int stream_Peek( stream_t *s, uint8_t **pp_peek, int i_data )
 {
     return input_Peek( s->p_input, pp_peek, i_data );
 }
@@ -269,7 +271,7 @@ int         stream_Peek( stream_t *s, uint8_t **pp_peek, int i_data )
  * you need to fill i_dts, i_pts, ... ) If only less than "i_size"
  * bytes are available NULL is returned.
  */
-pes_packet_t    *stream_PesPacket( stream_t *s, int i_data )
+pes_packet_t *stream_PesPacket( stream_t *s, int i_data )
 {
     pes_packet_t  *p_pes;
     data_packet_t *p_packet;
@@ -283,8 +285,7 @@ pes_packet_t    *stream_PesPacket( stream_t *s, int i_data )
     if( i_data <= 0 )
     {
         p_pes->p_first =
-            p_pes->p_last  =
-                input_NewPacket( s->p_input->p_method_data, 0 );
+            p_pes->p_last = input_NewPacket( s->p_input->p_method_data, 0 );
         p_pes->i_nb_data = 1;
         return p_pes;
     }
@@ -294,7 +295,7 @@ pes_packet_t    *stream_PesPacket( stream_t *s, int i_data )
         int i_read;
 
         i_read = input_SplitBuffer( s->p_input, &p_packet,
-                                    __MIN( i_data, (int)s->p_input->i_bufsize ) );
+                     __MIN( i_data, (int)s->p_input->i_bufsize ) );
         if( i_read <= 0 )
         {
             /* should occur only with EOF and max allocation reached 
@@ -315,7 +316,7 @@ pes_packet_t    *stream_PesPacket( stream_t *s, int i_data )
         p_pes->p_last = p_packet;
         p_pes->i_nb_data++;
         p_pes->i_pes_size += i_read;
-        i_data            -= i_read;
+        i_data -= i_read;
     }
 
     return p_pes;
@@ -363,7 +364,8 @@ data_packet_t *stream_DataPacket( stream_t *s, int i_size, vlc_bool_t b_force )
         memcpy( p_pk->p_payload_start, p_old->p_payload_start, i_read );
         input_DeletePacket( s->p_input->p_method_data, p_old );
 
-        if( stream_Read( s, &p_pk->p_payload_start[i_read], i_missing ) < i_missing )
+        if( stream_Read( s, &p_pk->p_payload_start[i_read], i_missing )
+            < i_missing )
         {
             input_DeletePacket( s->p_input->p_method_data, p_pk );
             return NULL;
@@ -372,6 +374,3 @@ data_packet_t *stream_DataPacket( stream_t *s, int i_size, vlc_bool_t b_force )
 
     return p_pk;
 }
-
-
-
