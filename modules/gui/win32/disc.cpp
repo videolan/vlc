@@ -70,7 +70,7 @@ void __fastcall TDiscDlg::ButtonOkClick( TObject *Sender )
 
     /* Check which method was activated */
     if( RadioGroupType->ItemIndex == 0 )
-        Method = "dvd";
+        Method = "dvdold";
     else
         Method = "vcd";
 
