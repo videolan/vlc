@@ -2,7 +2,7 @@
  * duplicate.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: duplicate.c,v 1.1 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: duplicate.c,v 1.2 2003/05/19 11:38:05 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -38,7 +38,8 @@ static void     Close   ( vlc_object_t * );
 
 static sout_stream_id_t *Add ( sout_stream_t *, sout_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
+static int               Send( sout_stream_t *, sout_stream_id_t *,
+                               sout_buffer_t* );
 
 /*****************************************************************************
  * Module descriptor
@@ -88,7 +89,10 @@ static int Open( vlc_object_t *p_this )
             msg_Dbg( p_stream, " * adding `%s'", p_cfg->psz_value );
             s = sout_stream_new( p_stream->p_sout, p_cfg->psz_value );
 
-            TAB_APPEND( p_sys->i_nb_streams, p_sys->pp_streams, s );
+            if( s )
+            {
+                TAB_APPEND( p_sys->i_nb_streams, p_sys->pp_streams, s );
+            }
         }
     }
 
@@ -120,7 +124,7 @@ static void Close( vlc_object_t * p_this )
 
     int i;
 
-    msg_Dbg( p_stream, "closing a duplication" );
+    msg_Dbg( p_stream, "closing a duplication");
     for( i = 0; i < p_sys->i_nb_streams; i++ )
     {
         sout_stream_delete( p_sys->pp_streams[i] );
@@ -130,9 +134,7 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
-
-
-static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_fmt )
+static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t  *id;
@@ -147,8 +149,12 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
         void *id_new;
 
         /* XXX not the same sout_stream_id_t definition ... */
-        id_new = (void*)p_sys->pp_streams[i_stream]->pf_add( p_sys->pp_streams[i_stream], p_fmt );
-        TAB_APPEND( id->i_nb_ids, id->pp_ids, id_new );
+        id_new = (void*)p_sys->pp_streams[i_stream]->pf_add(
+                            p_sys->pp_streams[i_stream], p_fmt );
+        if( id_new )
+        {
+            TAB_APPEND( id->i_nb_ids, id->pp_ids, id_new );
+        }
     }
 
     if( id->i_nb_ids <= 0 )
@@ -160,7 +166,7 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
     return id;
 }
 
-static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     int               i_stream;
@@ -179,7 +185,8 @@ static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
     return VLC_SUCCESS;
 }
 
-static int     Send     ( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *p_buffer )
+static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
+                 sout_buffer_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     int               i_stream;
@@ -208,4 +215,3 @@ static int     Send     ( sout_stream_t *p_stream, sout_stream_id_t *id, sout_bu
 
     return VLC_SUCCESS;
 }
-

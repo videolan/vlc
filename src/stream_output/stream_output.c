@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.28 2003/04/29 22:38:56 fenrir Exp $
+ * $Id: stream_output.c,v 1.29 2003/05/19 11:38:05 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1109,7 +1109,9 @@ sout_stream_t *sout_stream_new( sout_instance_t *p_sout,
     p_stream->p_sout   = p_sout;
     p_stream->p_sys    = NULL;
 
-    p_stream->psz_next = sout_cfg_parser( &p_stream->psz_name, &p_stream->p_cfg, psz_chain);
+    p_stream->psz_next =
+        sout_cfg_parser( &p_stream->psz_name, &p_stream->p_cfg, psz_chain);
+
     msg_Dbg( p_sout, "stream=`%s'", p_stream->psz_name );
 
     p_stream->p_module =
@@ -1117,8 +1119,7 @@ sout_stream_t *sout_stream_new( sout_instance_t *p_sout,
 
     if( !p_stream->p_module )
     {
-        /* FIXME */
-        vlc_object_destroy( p_stream );
+        sout_stream_delete( p_stream );
         return NULL;
     }
 
@@ -1130,7 +1131,7 @@ void sout_stream_delete( sout_stream_t *p_stream )
     sout_cfg_t *p_cfg;
 
     msg_Dbg( p_stream, "destroying chain... (name=%s)", p_stream->psz_name );
-    module_Unneed( p_stream, p_stream->p_module );
+    if( p_stream->p_module ) module_Unneed( p_stream, p_stream->p_module );
 
     FREE( p_stream->psz_name );
     FREE( p_stream->psz_next );
