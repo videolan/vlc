@@ -160,33 +160,16 @@ void GtkPopupNavigationToggle( GtkCheckMenuItem * menuitem,
         guint i_title   = DATA2TITLE( user_data );
         guint i_chapter = DATA2CHAPTER( user_data );
 
-        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        p_area = p_intf->p_sys->p_input->stream.p_selected_area;
+        /* FIXME use "navigation" variable */
+        var_SetInteger( p_intf->p_sys->p_input, "title", i_title );
+        var_SetInteger( p_intf->p_sys->p_input, "chapter", i_chapter );
 
-        i_title = __MIN( i_title,
-                         p_intf->p_sys->p_input->stream.i_area_nb - 1 );
-        i_title = __MAX( i_title, 1 );
-
-        if( p_area != p_intf->p_sys->p_input->stream.pp_areas[i_title] )
-        {
-            p_area = p_intf->p_sys->p_input->stream.pp_areas[i_title];
-            p_intf->p_sys->b_title_update = VLC_TRUE;
-        }
-
-        i_chapter = __MIN( i_chapter, p_area->i_part_nb - 1 );
-        i_chapter = __MAX( i_chapter, 1 );
-        p_area->i_part = i_chapter;
-
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-
-        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
-
+        p_intf->p_sys->b_title_update = VLC_TRUE;
         p_intf->p_sys->b_chapter_update = VLC_TRUE;
+
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-
-        var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
     }
 }
 
@@ -235,22 +218,12 @@ void GtkMenubarTitleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
     {
         guint i_title = (ptrdiff_t)user_data;
 
-        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        i_title = __MIN( i_title,
-                         p_intf->p_sys->p_input->stream.i_area_nb - 1 );
-        i_title = __MAX( i_title, 1 );
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-
-        input_ChangeArea( p_intf->p_sys->p_input,
-                          p_intf->p_sys->p_input->stream.pp_areas[i_title] );
+        var_SetInteger( p_intf->p_sys->p_input, "title", i_title );
 
         p_intf->p_sys->b_title_update = VLC_TRUE;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-        p_intf->p_sys->b_title_update = VLC_FALSE;
-
-        var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
     }
 }
 
@@ -271,13 +244,7 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 
     if( menuitem->active && !p_intf->p_sys->b_chapter_update )
     {
-        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        i_chapter = __MIN( i_chapter, p_area->i_part_nb - 1 );
-        i_chapter = __MAX( i_chapter, 1 );
-        p_area->i_part = i_chapter;
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-
-        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
+        var_SetInteger( p_intf->p_sys->p_input, "chapter", i_chapter );
 
         p_intf->p_sys->b_chapter_update = VLC_TRUE;
         p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
@@ -288,8 +255,6 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
         p_intf->p_sys->b_chapter_update = VLC_FALSE;
-
-        var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
     }
 }
 

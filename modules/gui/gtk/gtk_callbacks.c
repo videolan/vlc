@@ -231,106 +231,52 @@ gboolean GtkSliderPress( GtkWidget       *widget,
 
 void GtkTitlePrev( GtkButton * button, gpointer user_data )
 {
-    intf_thread_t *  p_intf;
-    input_area_t *   p_area;
-    int              i_id;
+    intf_thread_t *  p_intf = GtkGetIntf( button );
 
-    p_intf = GtkGetIntf( button );
+    var_SetVoid( p_intf->p_sys->p_input, "prev-title" );
+
+    p_intf->p_sys->b_title_update = VLC_TRUE;
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-    i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id - 1;
-
-    if( i_id > 0 )
-    {
-        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-
-        input_ChangeArea( p_intf->p_sys->p_input, p_area );
-        var_SetInteger( p_intf->p_sys->p_input, PLAYING_S );
-
-        p_intf->p_sys->b_title_update = VLC_TRUE;
-        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        GtkSetupMenus( p_intf );
-    }
-
+    GtkSetupMenus( p_intf );
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 }
 
 
 void GtkTitleNext( GtkButton * button, gpointer user_data )
 {
-    intf_thread_t * p_intf;
-    input_area_t *  p_area;
-    unsigned int    i_id;
+    intf_thread_t * p_intf = GtkGetIntf( button );
 
-    p_intf = GtkGetIntf( button );
+    var_SetVoid( p_intf->p_sys->p_input, "next-title" );
+
+    p_intf->p_sys->b_title_update = VLC_TRUE;
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-    i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id + 1;
-
-    if( i_id < p_intf->p_sys->p_input->stream.i_area_nb )
-    {
-        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-
-        input_ChangeArea( p_intf->p_sys->p_input, p_area );
-        var_SetInteger( p_intf->p_sys->p_input, PLAYING_S );
-
-        p_intf->p_sys->b_title_update = VLC_TRUE;
-        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        GtkSetupMenus( p_intf );
-    }
-
+    GtkSetupMenus( p_intf );
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 }
 
 
 void GtkChapterPrev( GtkButton * button, gpointer user_data )
 {
-    intf_thread_t * p_intf;
-    input_area_t *  p_area;
+    intf_thread_t *  p_intf = GtkGetIntf( button );
 
-    p_intf = GtkGetIntf( button );
+    var_SetVoid( p_intf->p_sys->p_input, "prev-chapter" );
+
+    p_intf->p_sys->b_chapter_update = VLC_TRUE;
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-    p_area = p_intf->p_sys->p_input->stream.p_selected_area;
-
-    if( p_area->i_part - 1 > 0 )
-    {
-        p_area->i_part--;
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-
-        input_ChangeArea( p_intf->p_sys->p_input, p_area );
-        var_SetInteger( p_intf->p_sys->p_input, PLAYING_S );
-
-        p_intf->p_sys->b_chapter_update = VLC_TRUE;
-        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        GtkSetupMenus( p_intf );
-    }
-
+    GtkSetupMenus( p_intf );
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 }
 
 
 void GtkChapterNext( GtkButton * button, gpointer user_data )
 {
-    intf_thread_t * p_intf;
-    input_area_t *  p_area;
+    intf_thread_t *  p_intf = GtkGetIntf( button );
 
-    p_intf = GtkGetIntf( button );
+    var_SetVoid( p_intf->p_sys->p_input, "next-chapter" );
+
+    p_intf->p_sys->b_chapter_update = VLC_TRUE;
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-    p_area = p_intf->p_sys->p_input->stream.p_selected_area;
-
-    if( p_area->i_part + 1 < p_area->i_part_nb )
-    {
-        p_area->i_part++;
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-
-        input_ChangeArea( p_intf->p_sys->p_input, p_area );
-        var_SetInteger( p_intf->p_sys->p_input, PLAYING_S );
-
-        p_intf->p_sys->b_chapter_update = VLC_TRUE;
-        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        GtkSetupMenus( p_intf );
-    }
-
+    GtkSetupMenus( p_intf );
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 }
 
