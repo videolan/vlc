@@ -28,6 +28,8 @@
 #include "../x11/x11_factory.hpp"
 #elif defined WIN32_SKINS
 #include "../win32/win32_factory.hpp"
+#elif defined MACOSX_SKINS
+#include "../macosx/macosx_factory.hpp"
 #endif
 
 OSFactory *OSFactory::instance( intf_thread_t *pIntf )
@@ -39,6 +41,8 @@ OSFactory *OSFactory::instance( intf_thread_t *pIntf )
         pOsFactory = new X11Factory( pIntf );
 #elif defined WIN32_SKINS
         pOsFactory = new Win32Factory( pIntf );
+#elif defined MACOSX_SKINS
+        pOsFactory = new MacOSXFactory( pIntf );
 #else
 #error "No OSFactory implementation !"
 #endif
