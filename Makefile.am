@@ -535,7 +535,7 @@ package-win32:
 	fi ; done
 
 	for i in dummy tmp/plugins/*$(LIBEXT) ; \
-		do if test $$i != tmp/plugins/libwin32_plugin.$(LIBEXT) \
+		do if test $$i != tmp/plugins/libwin32_plugin$(LIBEXT) \
 		-a $$i != dummy ; then $(STRIP) $$i ; fi ; done
 	mkdir tmp/share
 	cp share/*.rle tmp/share/ ;
