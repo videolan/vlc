@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.11 2003/01/19 03:16:24 sam Exp $
+ * $Id: spudec.c,v 1.12 2003/01/20 02:45:25 titer Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -53,11 +53,11 @@ static void EndThread     ( spudec_thread_t * );
 
 vlc_module_begin();
     add_category_hint( N_("subtitles"), NULL );
-#ifndef SYS_DARWIN
-    add_file( "spudec-font", "./share/" DEFAULT_FONT, NULL,
+#if defined(SYS_DARWIN) || defined(SYS_BEOS)
+    add_file( "spudec-font", NULL, NULL,
               FONT_TEXT, FONT_LONGTEXT );
 #else
-    add_file( "spudec-font", NULL, NULL,
+    add_file( "spudec-font", "./share/" DEFAULT_FONT, NULL,
               FONT_TEXT, FONT_LONGTEXT );
 #endif
     set_description( _("subtitles decoder module") );
@@ -125,7 +125,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     {
         /* Here we are dealing with text subtitles */
 
-#ifdef SYS_DARWIN
+#if defined(SYS_DARWIN) || defined(SYS_BEOS)
         if ( (psz_font = config_GetPsz( p_fifo, "spudec-font" )) == NULL )
         {
             char * psz_vlcpath = p_fifo->p_libvlc->psz_vlcpath;
