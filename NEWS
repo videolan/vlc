@@ -14,23 +14,32 @@ Core support:
  * XML parsers
  * Core image manipulation support
  * Client-side SSL/TLS support
+ * SSL Client certificates checking support (allows for secure VoD)
  * Renamed --spu-channel to --sub-track
  * Renamed --spumargin to --sub-margin
  * Renamed --audio-channel to --audio-track
  * Track selection based on preferred language
+ * Many bugfixes...
 
-Input:
+Input/Demuxers:
  * Support for SOCKS proxy
  * Support for Shoutcast Meta-data
  * Support for (HE-)AAC raw-audio streams
  * Support for images on a HTTP server that get refreshed on the server
  * Better support for Kasenna streams
+ * RTSP UDP->TCP rollover support
+ * Massive Matroska improvements
+ * Support for XA and VOC audio files
+ * Samba (Windows shares) access module
  * Improved CDDAX module (uses several playlist items)
  * Fixes to Linux DVB support
+ * Fix the "negative subtitles delay" bug
 
 Decoders / Encoders:
  * Dirac decoder and encoder
  * PNG decoder/encoder
+ * Improvements to DVB subtitles encoder
+ * Support for Apple Lossless Audio Codec
 
 Services discovery
  * New type of modules, that add items to the playlist
@@ -38,10 +47,16 @@ Services discovery
  * HAL (Hardware Abstraction Layer) discovery
  * DAAP (iTunes shares) support
 
+Audio output:
+ * Support for 20/24 bits LPCM
+
 Video output:
  * Video snapshot support
  * Image file video output (png or jpg)
  * Motion detection filter (can trigger playlist actions)
+ * Improvements to wall video filter
+ * Mosaic (picture-in-picture system)
+ * Support for font color and opacity
 
 Stream output:
  * Muxers
@@ -54,6 +69,7 @@ Interfaces:
  * wxWidgets 
     - Redesigned playlist : add playlist, add directory, ...
     - Improved preferences
+    - Improvements to the wizard
     - DVD, VCD and Audio CD navigation buttons
  * MacOS X
     - Redesigned playlist
@@ -75,9 +91,11 @@ BeOS port:
 Pocket PC port :
  * Many fixes
  * New interface
+ * New video output 
 
 Mozilla Plugin:
  * Javascript fixes
+ * Mozilla plugin for MacOS X is back
 
 IE Plugin:
  * Brand new Internet Explorer ActiveX plugin
