@@ -200,7 +200,7 @@ struct playlist_t
 /* Helper to add an item */
 struct playlist_add_t
 {
-    playlist_item_t *p_parent;
+    playlist_item_t *p_node;
     playlist_item_t *p_item;
     int i_view;
     int i_position;

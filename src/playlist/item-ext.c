@@ -120,6 +120,8 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
     vlc_bool_t b_end = VLC_FALSE;
     playlist_view_t *p_view = NULL;
 
+    playlist_add_t *p_add = (playlist_add_t *)malloc(sizeof( playlist_add_t));
+
     vlc_mutex_lock( &p_playlist->object_lock );
 
     /*
@@ -196,12 +198,19 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
         {
             playlist_NodeAppend( p_playlist, VIEW_CATEGORY, p_item,
                                  p_playlist->p_general );
+            p_add->p_item = p_item;
+            p_add->p_node = p_playlist->p_general;
+            p_add->i_view = VIEW_CATEGORY;
+            val.p_address = p_add;
+            var_Set( p_playlist, "item-append", val );
         }
         else
         {
             playlist_NodeInsert( p_playlist, VIEW_CATEGORY, p_item,
                                  p_playlist->p_general, i_pos );
         }
+
+
         p_view = playlist_ViewFind( p_playlist, VIEW_ALL );
         playlist_ItemAddParent( p_item, VIEW_ALL, p_view->p_root );
 
@@ -212,12 +221,19 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
         {
             playlist_NodeAppend( p_playlist, VIEW_SIMPLE,p_item,
                                   p_view->p_root );
+            p_add->p_item = p_item;
+            p_add->p_node = p_view->p_root;
+            p_add->i_view = VIEW_SIMPLE;
+            val.p_address = p_add;
+            var_Set( p_playlist, "item-append", val );
+
         }
         else
         {
             playlist_NodeInsert( p_playlist, VIEW_SIMPLE,p_item,
                                   p_view->p_root, i_pos );
         }
+
 
         /* FIXME : Update sorted views */
 
@@ -248,8 +264,11 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
 
     vlc_mutex_unlock( &p_playlist->object_lock );
 
-    val.b_bool = VLC_TRUE;
-    var_Set( p_playlist, "intf-change", val );
+    if( b_end == VLC_FALSE )
+    {
+        val.b_bool = VLC_TRUE;
+        var_Set( p_playlist, "intf-change", val );
+    }
 
     return p_item->input.i_id;
 }
@@ -274,6 +293,8 @@ int playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
     vlc_value_t val;
     int i_position;
     playlist_view_t *p_view;
+
+    playlist_add_t *p_add = (playlist_add_t *)malloc(sizeof( playlist_add_t));
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
@@ -327,6 +348,12 @@ int playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
     /* TODO: Handle modes */
     playlist_NodeAppend( p_playlist, i_view, p_item, p_parent );
 
+    p_add->p_item = p_item;
+    p_add->p_node = p_parent;
+    p_add->i_view = i_view;
+    val.p_address = p_add;
+    var_Set( p_playlist, "item-append", val );
+
     /* We update the ALL view directly */
     p_view = playlist_ViewFind( p_playlist, VIEW_ALL );
     playlist_ItemAddParent( p_item, VIEW_ALL, p_view->p_root );
@@ -350,7 +377,7 @@ int playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
     vlc_mutex_unlock( &p_playlist->object_lock );
 
     val.b_bool = VLC_TRUE;
-    var_Set( p_playlist, "intf-change", val );
+//    var_Set( p_playlist, "intf-change", val );
 
     return p_item->input.i_id;
 }

@@ -779,6 +779,7 @@ public:
     void UpdatePlaylist();
     void ShowPlaylist( bool show );
     void UpdateItem( int );
+    void AppendItem( wxCommandEvent& );
 
     bool b_need_update;
 

@@ -55,6 +55,9 @@ static int PlaylistNext( vlc_object_t *, const char *,
                          vlc_value_t, vlc_value_t, void * );
 static int ItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
+static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
+                      vlc_value_t oval, vlc_value_t nval, void *param );
+
 
 /*****************************************************************************
  * Event Table.
@@ -108,6 +111,7 @@ enum
 
     /* custom events */
     UpdateItem_Event,
+    AppendItem_Event,
 
     MenuDummy_Event = wxID_HIGHEST + 999,
 
@@ -363,26 +367,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     font.SetPointSize(8);
     treectrl->SetFont( font );
 
-    /* Create the Up-Down buttons */
-#if 0
-    wxButton *up_button =
-        new wxButton( playlist_panel, Up_Event, wxU(_("Up") ) );
-    wxButton *down_button =
-        new wxButton( playlist_panel, Down_Event, wxU(_("Down") ) );
-
-    wxBoxSizer *updown_sizer = new wxBoxSizer( wxHORIZONTAL );
-    updown_sizer->Layout();
-    /* The top and bottom sizers */
-    wxBoxSizer *bottom_sizer = new wxBoxSizer( wxHORIZONTAL );
-    bottom_sizer->Add( up_button, 0, wxALIGN_LEFT | wxRIGHT, 3);
-    bottom_sizer->Add( down_button, 0, wxALIGN_LEFT | wxLEFT, 3);
-    bottom_sizer->Layout();
-#endif
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer->Add( treectrl, 1, wxEXPAND | wxALL, 5 );
-#if 0
-    panel_sizer->Add( bottom_sizer, 0, wxALL, 5);
-#endif
     panel_sizer->Layout();
 
     playlist_panel->SetSizerAndFit( panel_sizer );
@@ -411,6 +397,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     /* One item has been updated */
     var_AddCallback( p_playlist, "item-change", ItemChanged, this );
 
+    var_AddCallback( p_playlist, "item-append", ItemAppended, this );
+
     vlc_object_release( p_playlist );
 
     /* Update the playlist */
@@ -419,12 +407,6 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
 void Playlist::OnSize( wxSizeEvent& event)
 {
-#if 0
-    wxSize size = GetClientSize();
-    if( listview )
-        listview->SetColumnWidth( 0, size.x - listview->GetColumnWidth(1)
-                        - 15 /* margins */ );
-#endif
     event.Skip();
 }
 
@@ -517,6 +499,12 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, playlist_item_t *p_item )
     wxTreeItemId item = treectrl->GetFirstChild( root, cookie );
     wxTreeItemId child;
 
+    if( !p_item )
+    {
+        wxTreeItemId dummy;
+        return dummy;
+    }
+
     while( item.IsOk() )
     {
         p_wxcurrent = (PlaylistItem *)treectrl->GetItemData( item );
@@ -580,6 +568,46 @@ void Playlist::SetCurrentItem( wxTreeItemId item )
     }
 }
 
+void Playlist::AppendItem( wxCommandEvent& event )
+{
+    playlist_add_t *p_add = (playlist_add_t *)event.GetClientData();
+
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        event.Skip();
+        return;
+    }
+
+    if( p_add->i_view != i_current_view )
+    {
+        vlc_object_release( p_playlist );
+        event.Skip();
+        return;
+    }
+
+    wxTreeItemId node = FindItem( treectrl->GetRootItem(), p_add->p_node );
+    if( !node.IsOk() )
+    {
+        vlc_object_release( p_playlist );
+        event.Skip();
+        return;
+    }
+
+    wxTreeItemId item = treectrl->AppendItem( node,
+                           wxL2U( p_add->p_item->input.psz_name ), -1,-1,
+                           new PlaylistItem( p_add->p_item ) );
+    treectrl->SetItemImage( item, p_add->p_item->input.i_type );
+
+    if( item.IsOk() && p_add->p_item->i_children == -1 )
+    {
+        UpdateTreeItem( p_playlist, item );
+    }
+    vlc_object_release( p_playlist );
+}
+
 void Playlist::UpdateItem( int i )
 {
     if( i < 0 ) return; /* Sanity check */
@@ -606,7 +634,7 @@ void Playlist::UpdateItem( int i )
     vlc_object_release(p_playlist);
 }
 
-void Playlist::UpdateTreeItem( playlist_t *p_playlist ,wxTreeItemId item )
+void Playlist::UpdateTreeItem( playlist_t *p_playlist, wxTreeItemId item )
 {
     playlist_item_t *p_item  =
             ((PlaylistItem *)treectrl->GetItemData( item ))->p_item;
@@ -1512,9 +1540,12 @@ void Playlist::OnPlaylistEvent( wxCommandEvent& event )
 {
     switch( event.GetId() )
     {
-    case UpdateItem_Event:
-        UpdateItem( event.GetInt() );
-        break;
+        case UpdateItem_Event:
+            UpdateItem( event.GetInt() );
+            break;
+        case AppendItem_Event:
+            AppendItem( event );
+            break;
     }
 }
 
@@ -1561,4 +1592,19 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
     p_playlist_dialog->AddPendingEvent( event );
 
     return 0;
+}
+
+static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
+                         vlc_value_t oval, vlc_value_t nval, void *param )
+{
+    Playlist *p_playlist_dialog = (Playlist *)param;
+
+    playlist_add_t *p_add = (playlist_add_t *)malloc(sizeof( playlist_add_t));
+    memcpy( p_add, nval.p_address, sizeof( playlist_add_t ) );
+
+    wxCommandEvent event( wxEVT_PLAYLIST, AppendItem_Event );
+    event.SetClientData( (void *)p_add );
+    p_playlist_dialog->AddPendingEvent( event );
+
+    return VLC_SUCCESS;
 }

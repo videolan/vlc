@@ -242,6 +242,8 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, int i_view,
     /* Create the item */
     playlist_item_t *p_item = (playlist_item_t *)malloc(
                                         sizeof( playlist_item_t ) );
+    vlc_value_t val;
+    playlist_add_t *p_add = (playlist_add_t*)malloc( sizeof(playlist_add_t));
 
     vlc_input_item_Init( VLC_OBJECT(p_playlist), &p_item->input );
     if( p_item == NULL )
@@ -285,6 +287,12 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, int i_view,
     {
         playlist_NodeAppend( p_playlist, i_view, p_item, p_parent );
     }
+
+    p_add->p_node = p_parent;
+    p_add->p_item = p_item;
+    p_add->i_view = i_view;
+    val.p_address = p_add;
+    var_Set( p_playlist, "item-append", val);
 
     return p_item;
 }

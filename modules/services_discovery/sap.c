@@ -255,6 +255,7 @@ static int Open( vlc_object_t *p_this )
     playlist_t          *p_playlist;
     playlist_view_t     *p_view;
     char                *psz_addr;
+    vlc_value_t         val;
 
     p_sys->i_timeout = config_GetInt( p_sd,"sap-timeout" );
 
@@ -320,6 +321,8 @@ static int Open( vlc_object_t *p_this )
     p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
     p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
                                          _("SAP"), p_view->p_root );
+    val.b_bool = VLC_TRUE;
+    var_Set( p_playlist, "intf-change", val );
 
     vlc_object_release( p_playlist );
 

@@ -82,6 +82,8 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     val.i_int = -1;
     var_Set( p_playlist, "item-change", val );
 
+    var_Create( p_playlist, "item-append", VLC_VAR_ADDRESS );
+
     var_Create( p_playlist, "playlist-current", VLC_VAR_INTEGER );
     val.i_int = -1;
     var_Set( p_playlist, "playlist-current", val );
@@ -363,7 +365,6 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
-    fprintf(stderr,"control done, request is %i\n", p_playlist->request.b_request);
     return VLC_SUCCESS;
 }
 
