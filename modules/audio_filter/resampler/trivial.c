@@ -2,7 +2,7 @@
  * trivial.c : trivial resampler (skips samples or pads with zeroes)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.5 2002/08/24 16:07:48 sam Exp $
+ * $Id: trivial.c,v 1.6 2002/09/30 21:32:32 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -59,8 +59,8 @@ static int Create( vlc_object_t *p_this )
     if ( p_filter->input.i_rate == p_filter->output.i_rate
           || p_filter->input.i_format != p_filter->output.i_format
           || p_filter->input.i_channels != p_filter->output.i_channels
-          || (p_filter->input.i_format != AOUT_FMT_FLOAT32
-               && p_filter->input.i_format != AOUT_FMT_FIXED32) )
+          || (p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
+               && p_filter->input.i_format != VLC_FOURCC('f','i','3','2')) )
     {
         return -1;
     }

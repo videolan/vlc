@@ -3,7 +3,7 @@
  *                      with endianness change
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: s16tofloat32swab.c,v 1.5 2002/09/27 23:38:04 massiot Exp $
+ * $Id: s16tofloat32swab.c,v 1.6 2002/09/30 21:32:32 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -75,9 +75,9 @@ static int Create( vlc_object_t *p_this )
         return -1;
     }
 
-    if ( (p_filter->input.i_format == AOUT_FMT_S16_LE ||
-         p_filter->input.i_format == AOUT_FMT_S16_BE)
-         && p_filter->output.i_format == AOUT_FMT_FLOAT32
+    if ( (p_filter->input.i_format == VLC_FOURCC('s','1','6','l') ||
+         p_filter->input.i_format == VLC_FOURCC('s','1','6','b'))
+         && p_filter->output.i_format == VLC_FOURCC('f','l','3','2')
          && p_filter->input.i_format != AOUT_FMT_S16_NE )
     {
         p_filter->pf_do_work = DoWork;

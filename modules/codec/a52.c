@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.13 2002/09/26 22:40:20 massiot Exp $
+ * $Id: a52.c,v 1.14 2002/09/30 21:32:32 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -125,7 +125,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     p_dec->p_aout = NULL;
     p_dec->p_aout_input = NULL;
     p_dec->p_fifo = p_fifo;
-    p_dec->output_format.i_format = AOUT_FMT_A52;
+    p_dec->output_format.i_format = VLC_FOURCC('a','5','2',' ');
 
     /* Init the bitstream */
     InitBitstream( &p_dec->bit_stream, p_dec->p_fifo,

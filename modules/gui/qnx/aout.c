@@ -266,7 +266,7 @@ static int QNXaoutThread( aout_instance_t * p_aout )
         int i_tmp, i_size;
         byte_t * p_bytes;
 
-        if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
+        if ( p_aout->output.output.i_format != VLC_FOURCC('s','p','d','i') )
         {
             mtime_t next_date = 0;
 

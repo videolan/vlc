@@ -2,7 +2,7 @@
  * trivial.c : trivial mixer plug-in (1 input, no downmixing)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.8 2002/09/28 13:05:16 massiot Exp $
+ * $Id: trivial.c,v 1.9 2002/09/30 21:32:32 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -55,8 +55,8 @@ static int Create( vlc_object_t *p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
 
-    if ( p_aout->mixer.mixer.i_format != AOUT_FMT_FLOAT32
-          && p_aout->mixer.mixer.i_format != AOUT_FMT_FIXED32 )
+    if ( p_aout->mixer.mixer.i_format != VLC_FOURCC('f','l','3','2')
+          && p_aout->mixer.mixer.i_format != VLC_FOURCC('f','i','3','2') )
     {
         return -1;
     }

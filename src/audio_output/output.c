@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.15 2002/09/26 22:40:25 massiot Exp $
+ * $Id: output.c,v 1.16 2002/09/30 21:32:33 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -50,14 +50,15 @@ int aout_OutputNew( aout_instance_t * p_aout,
     if ( i_channels != -1 ) p_aout->output.output.i_channels = i_channels;
     if ( AOUT_FMT_NON_LINEAR(&p_aout->output.output) )
     {
-        p_aout->output.output.i_format = AOUT_FMT_SPDIF;
+        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
     }
     else
     {
         /* Non-S/PDIF mixer only deals with float32 or fixed32. */
         p_aout->output.output.i_format
                      = (p_aout->p_vlc->i_cpu & CPU_CAPABILITY_FPU) ?
-                        AOUT_FMT_FLOAT32 : AOUT_FMT_FIXED32;
+                        VLC_FOURCC('f','l','3','2') :
+                        VLC_FOURCC('f','i','3','2');
     }
     aout_FormatPrepare( &p_aout->output.output );
 
@@ -80,8 +81,9 @@ int aout_OutputNew( aout_instance_t * p_aout,
 
     vlc_mutex_unlock( &p_aout->output_fifo_lock );
 
-    msg_Dbg( p_aout, "output format=%d rate=%d channels=%d",
-             p_aout->output.output.i_format, p_aout->output.output.i_rate,
+    msg_Dbg( p_aout, "output format=%4.4s rate=%d channels=%d",
+             (char *)&p_aout->output.output.i_format,
+             p_aout->output.output.i_rate,
              p_aout->output.output.i_channels );
 
     /* Calculate the resulting mixer output format. */
@@ -92,7 +94,8 @@ int aout_OutputNew( aout_instance_t * p_aout,
         /* Non-S/PDIF mixer only deals with float32 or fixed32. */
         p_aout->mixer.mixer.i_format
                      = (p_aout->p_vlc->i_cpu & CPU_CAPABILITY_FPU) ?
-                        AOUT_FMT_FLOAT32 : AOUT_FMT_FIXED32;
+                        VLC_FOURCC('f','l','3','2') :
+                        VLC_FOURCC('f','i','3','2');
         aout_FormatPrepare( &p_aout->mixer.mixer );
     }
     else
@@ -100,8 +103,8 @@ int aout_OutputNew( aout_instance_t * p_aout,
         p_aout->mixer.mixer.i_format = p_format->i_format;
     }
 
-    msg_Dbg( p_aout, "mixer format=%d rate=%d channels=%d",
-             p_aout->mixer.mixer.i_format, p_aout->mixer.mixer.i_rate,
+    msg_Dbg( p_aout, "mixer format=%4.4s rate=%d channels=%d",
+             (char *)&p_aout->mixer.mixer.i_format, p_aout->mixer.mixer.i_rate,
              p_aout->mixer.mixer.i_channels );
 
     /* Create filters. */

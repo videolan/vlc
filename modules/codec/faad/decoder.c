@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.4 2002/09/28 13:05:16 massiot Exp $
+ * $Id: decoder.c,v 1.5 2002/09/30 21:32:32 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -326,7 +326,7 @@ static int InitThread( adec_thread_t * p_adec )
         
 
     /* Initialize the thread properties */
-    p_adec->output_format.i_format = AOUT_FMT_FLOAT32;
+    p_adec->output_format.i_format = VLC_FOURCC('f','l','3','2');
     p_adec->output_format.i_rate = i_rate;
     p_adec->output_format.i_channels = i_channels;
     p_adec->p_aout = NULL;

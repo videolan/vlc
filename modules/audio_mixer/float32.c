@@ -2,7 +2,7 @@
  * float32.c : precise float32 audio mixer implementation
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32.c,v 1.4 2002/09/20 23:27:03 massiot Exp $
+ * $Id: float32.c,v 1.5 2002/09/30 21:32:32 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -55,7 +55,7 @@ static int Create( vlc_object_t *p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
 
-    if ( p_aout->mixer.mixer.i_format != AOUT_FMT_FLOAT32 )
+    if ( p_aout->mixer.mixer.i_format != VLC_FOURCC('f','l','3','2') )
     {
         return -1;
     }

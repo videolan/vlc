@@ -141,7 +141,7 @@ static int InitThread( mad_adec_thread_t * p_dec )
     /* Initialize the thread properties */
     p_dec->p_aout = NULL;
     p_dec->p_aout_input = NULL;
-    p_dec->output_format.i_format = AOUT_FMT_FIXED32;
+    p_dec->output_format.i_format = VLC_FOURCC('f','i','3','2');
 
     /*
      * Properties of audio for libmad

@@ -2,7 +2,7 @@
  * trivial.c : trivial channel mixer plug-in (drops unwanted channels)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.3 2002/09/02 23:21:40 massiot Exp $
+ * $Id: trivial.c,v 1.4 2002/09/30 21:32:31 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -59,8 +59,8 @@ static int Create( vlc_object_t *p_this )
     if ( p_filter->input.i_channels == p_filter->output.i_channels
           || p_filter->input.i_format != p_filter->output.i_format
           || p_filter->input.i_rate != p_filter->output.i_rate
-          || (p_filter->input.i_format != AOUT_FMT_FLOAT32
-               && p_filter->input.i_format != AOUT_FMT_FIXED32) )
+          || (p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
+               && p_filter->input.i_format != VLC_FOURCC('f','i','3','2')) )
     {
         return -1;
     }

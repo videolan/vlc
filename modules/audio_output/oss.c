@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.26 2002/09/18 21:21:23 massiot Exp $
+ * $Id: oss.c,v 1.27 2002/09/30 21:32:32 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -158,9 +158,9 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Set the output format */
-    if ( p_aout->output.output.i_format == AOUT_FMT_SPDIF )
+    if ( p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i') )
     {
-        i_format = AOUT_FMT_SPDIF;
+        i_format = VLC_FOURCC('s','p','d','i');
         p_aout->output.i_nb_samples = A52_FRAME_NB;
         p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->output.output.i_frame_length = A52_FRAME_NB;
@@ -178,7 +178,7 @@ static int Open( vlc_object_t *p_this )
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
          || i_format != p_aout->output.output.i_format )
     {
-        if ( i_format == AOUT_FMT_SPDIF )
+        if ( i_format == VLC_FOURCC('s','p','d','i') )
         {
             /* Retry with S16 */
             msg_Warn( p_aout, "cannot set audio output format (%i)", i_format );
@@ -199,7 +199,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
+    if ( p_aout->output.output.i_format != VLC_FOURCC('s','p','d','i') )
     {
         /* FIXME */
         if ( p_aout->output.output.i_channels > 2 )
@@ -326,7 +326,7 @@ static int OSSThread( aout_instance_t * p_aout )
         int i_tmp, i_size;
         byte_t * p_bytes;
 
-        if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
+        if ( p_aout->output.output.i_format != VLC_FOURCC('s','p','d','i') )
         {
             mtime_t buffered = BufferDuration( p_aout );
 

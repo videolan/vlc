@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.10 2002/09/22 14:53:52 massiot Exp $
+ * $Id: filters.c,v 1.11 2002/09/30 21:32:33 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -128,8 +128,9 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
         return 0;
     }
 
-    msg_Dbg( p_aout, "filter(s) format=%d->%d rate=%d->%d channels=%d->%d",
-             p_input_format->i_format, p_output_format->i_format,
+    msg_Dbg( p_aout, "filter(s) format=%4.4s->%4.4s rate=%d->%d channels=%d->%d",
+             (char *)&p_input_format->i_format,
+             (char *)&p_output_format->i_format,
              p_input_format->i_rate, p_output_format->i_rate,
              p_input_format->i_channels, p_output_format->i_channels );
 

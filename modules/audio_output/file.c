@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.11 2002/09/18 21:21:23 massiot Exp $
+ * $Id: file.c,v 1.12 2002/09/30 21:32:32 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -54,10 +54,16 @@ static void    Play        ( aout_instance_t * );
 static char *format_list[] = { "u8", "s8", "u16", "s16", "u16_le", "s16_le",
                                "u16_be", "s16_be", "fixed32", "float32",
                                "spdif", NULL };
-static int format_int[] = { AOUT_FMT_U8, AOUT_FMT_S8, AOUT_FMT_U16_NE,
-                            AOUT_FMT_S16_NE, AOUT_FMT_U16_LE, AOUT_FMT_S16_LE,
-                            AOUT_FMT_U16_BE, AOUT_FMT_S16_BE, AOUT_FMT_FIXED32,
-                            AOUT_FMT_FLOAT32, AOUT_FMT_SPDIF };
+static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
+                            VLC_FOURCC('s','8',' ',' '),
+                            AOUT_FMT_U16_NE, AOUT_FMT_S16_NE,
+                            VLC_FOURCC('u','1','6','l'),
+                            VLC_FOURCC('s','1','6','l'),
+                            VLC_FOURCC('u','1','6','b'),
+                            VLC_FOURCC('s','1','6','b'),
+                            VLC_FOURCC('f','i','3','2'),
+                            VLC_FOURCC('f','l','3','2'),
+                            VLC_FOURCC('s','p','i','f') };
 
 #define PATH_TEXT N_("path of the output file")
 #define PATH_LONGTEXT N_("By default samples.raw")
@@ -111,7 +117,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_aout->output.output.i_format = format_int[i];
-    if ( p_aout->output.output.i_format == AOUT_FMT_SPDIF )
+    if ( p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i') )
     {
         p_aout->output.i_nb_samples = A52_FRAME_NB;
         p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;

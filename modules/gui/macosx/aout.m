@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.10 2002/09/18 21:21:24 massiot Exp $
+ * $Id: aout.m,v 1.11 2002/09/30 21:32:33 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -120,7 +120,7 @@ int E_(OpenAudio)( vlc_object_t * p_this )
     }
 
     /* We only deal with floats. FIXME : this is where we should do S/PDIF. */
-    p_aout->output.output.i_format = AOUT_FMT_FLOAT32;
+    p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
 
     /* Set sample rate and channels per frame */
     p_aout->output.output.i_rate = p_sys->stream_format.mSampleRate;

@@ -2,7 +2,7 @@
  * decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: decoder.c,v 1.4 2002/09/26 22:40:23 massiot Exp $
+ * $Id: decoder.c,v 1.5 2002/09/30 21:32:32 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -178,7 +178,7 @@ static void DecodeThread( adec_thread_t * p_dec )
             }
 
             /* Set output configuration */
-            p_dec->output_format.i_format   = AOUT_FMT_FLOAT32;
+            p_dec->output_format.i_format   = VLC_FOURCC('f','l','3','2');
             p_dec->output_format.i_channels = ( sync_info.b_stereo ? 2 : 1 );
             p_dec->output_format.i_rate     = sync_info.sample_rate;
             aout_DateInit( &p_dec->end_date, sync_info.sample_rate );

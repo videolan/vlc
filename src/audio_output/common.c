@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.1 2002/09/26 22:40:25 massiot Exp $
+ * $Id: common.c,v 1.2 2002/09/30 21:32:33 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -136,32 +136,30 @@ void aout_FormatPrepare( audio_sample_format_t * p_format )
 
     switch ( p_format->i_format )
     {
-    case AOUT_FMT_U8:
-    case AOUT_FMT_S8:
+    case VLC_FOURCC('u','8',' ',' '):
+    case VLC_FOURCC('s','8',' ',' '):
         i_result = 1;
         break;
 
-    case AOUT_FMT_U16_LE:
-    case AOUT_FMT_U16_BE:
-    case AOUT_FMT_S16_LE:
-    case AOUT_FMT_S16_BE:
+    case VLC_FOURCC('u','1','6','l'):
+    case VLC_FOURCC('s','1','6','l'):
+    case VLC_FOURCC('u','1','6','b'):
+    case VLC_FOURCC('s','1','6','b'):
         i_result = 2;
         break;
 
-    case AOUT_FMT_FLOAT32:
-    case AOUT_FMT_FIXED32:
+    case VLC_FOURCC('f','l','3','2'):
+    case VLC_FOURCC('f','i','3','2'):
         i_result = 4;
         break;
 
-    case AOUT_FMT_SPDIF:
-    case AOUT_FMT_A52:
-    case AOUT_FMT_DTS:
+    case VLC_FOURCC('s','p','d','i'):
+    case VLC_FOURCC('a','5','2',' '):
+    case VLC_FOURCC('d','t','s',' '):
+    default:
         /* For these formats the caller has to indicate the parameters
          * by hand. */
         return;
-
-    default:
-        i_result = 0; /* will segfault much sooner... */
     }
 
     p_format->i_bytes_per_frame = i_result * aout_FormatNbChannels( p_format );

@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.67 2002/09/26 22:40:18 massiot Exp $
+ * $Id: audio_output.h,v 1.68 2002/09/30 21:32:31 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -40,21 +40,6 @@ struct audio_sample_format_t
      * i_nb_samples * i_bytes_per_frame / i_frame_length */
 };
 
-#define AOUT_FMT_MU_LAW     0x00000001
-#define AOUT_FMT_A_LAW      0x00000002
-#define AOUT_FMT_IMA_ADPCM  0x00000004
-#define AOUT_FMT_U8         0x00000008
-#define AOUT_FMT_S16_LE     0x00000010            /* Little endian signed 16 */
-#define AOUT_FMT_S16_BE     0x00000020               /* Big endian signed 16 */
-#define AOUT_FMT_S8         0x00000040
-#define AOUT_FMT_U16_LE     0x00000080                  /* Little endian U16 */
-#define AOUT_FMT_U16_BE     0x00000100                     /* Big endian U16 */
-#define AOUT_FMT_SPDIF      0x00000400            /* S/PDIF hardware support */
-#define AOUT_FMT_FLOAT32    0x00010000
-#define AOUT_FMT_FIXED32    0x00020000
-#define AOUT_FMT_A52        0x00100000
-#define AOUT_FMT_DTS        0x00200000
-
 #define AOUT_FMTS_IDENTICAL( p_first, p_second ) (                          \
     ((p_first)->i_format == (p_second)->i_format)                           \
       && ((p_first)->i_rate == (p_second)->i_rate)                          \
@@ -68,17 +53,17 @@ struct audio_sample_format_t
            || (p_first)->i_channels == -1 || (p_second)->i_channels == -1) )
 
 #ifdef WORDS_BIGENDIAN
-#   define AOUT_FMT_S16_NE AOUT_FMT_S16_BE
-#   define AOUT_FMT_U16_NE AOUT_FMT_U16_BE
+#   define AOUT_FMT_S16_NE VLC_FOURCC('s','1','6','b')
+#   define AOUT_FMT_U16_NE VLC_FOURCC('u','1','6','b')
 #else
-#   define AOUT_FMT_S16_NE AOUT_FMT_S16_LE
-#   define AOUT_FMT_U16_NE AOUT_FMT_U16_LE
+#   define AOUT_FMT_S16_NE VLC_FOURCC('s','1','6','l')
+#   define AOUT_FMT_U16_NE VLC_FOURCC('u','1','6','l')
 #endif
 
 #define AOUT_FMT_NON_LINEAR( p_format )                                    \
-    ( ((p_format)->i_format == AOUT_FMT_SPDIF)                             \
-       || ((p_format)->i_format == AOUT_FMT_A52)                           \
-       || ((p_format)->i_format == AOUT_FMT_DTS) )
+    ( ((p_format)->i_format == VLC_FOURCC('s','p','d','i'))                \
+       || ((p_format)->i_format == VLC_FOURCC('a','5','2',' '))            \
+       || ((p_format)->i_format == VLC_FOURCC('d','t','s',' ')) )
 
 /* This is heavily borrowed from libmad, by Robert Leslie <rob@mars.org> */
 /*

@@ -2,7 +2,7 @@
  * float32tos8.c : converter from float32 to signed 8 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tos8.c,v 1.4 2002/08/21 22:41:59 massiot Exp $
+ * $Id: float32tos8.c,v 1.5 2002/09/30 21:32:32 massiot Exp $
  *
  * Authors: Xavier Maillard <zedek@fxgsproject.org>
  *
@@ -58,8 +58,8 @@ static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != AOUT_FMT_FLOAT32
-          || p_filter->output.i_format != AOUT_FMT_S8 )
+    if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
+          || p_filter->output.i_format != VLC_FOURCC('s','8',' ',' ') )
     {
         return -1;
     }

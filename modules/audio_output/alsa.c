@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.11 2002/09/18 21:21:23 massiot Exp $
+ * $Id: alsa.c,v 1.12 2002/09/30 21:32:32 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -136,7 +136,7 @@ static int Open( vlc_object_t *p_this )
     else
     {
         /* Use the internal logic to decide on the device name */
-        if ( p_aout->output.output.i_format == AOUT_FMT_SPDIF )
+        if ( p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i') )
         {
             /* Will probably need some little modification in the case
                we want to send some data at a different rate
@@ -180,7 +180,7 @@ static int Open( vlc_object_t *p_this )
     /* Default settings */
     p_sys->b_can_sleek = VLC_FALSE;
     i_channels = p_aout->output.output.i_channels;
-    if ( p_aout->output.output.i_format == AOUT_FMT_SPDIF )
+    if ( p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i') )
     {
         p_sys->i_buffer_size = ALSA_SPDIF_BUFFER_SIZE;
         p_aout->output.i_nb_samples = ALSA_SPDIF_PERIOD_SIZE;
@@ -195,17 +195,11 @@ static int Open( vlc_object_t *p_this )
     /* Compute the settings */
     switch (p_aout->output.output.i_format)
     {
-        case AOUT_FMT_MU_LAW:    i_format = SND_PCM_FORMAT_MU_LAW; break;
-        case AOUT_FMT_A_LAW:     i_format = SND_PCM_FORMAT_A_LAW; break;
-        case AOUT_FMT_IMA_ADPCM: i_format = SND_PCM_FORMAT_IMA_ADPCM; break;
-        case AOUT_FMT_U8:        i_format = SND_PCM_FORMAT_U8; break;
-        case AOUT_FMT_S16_LE:    i_format = SND_PCM_FORMAT_S16_LE; break;
-        case AOUT_FMT_S16_BE:    i_format = SND_PCM_FORMAT_S16_BE; break;
-        case AOUT_FMT_S8:        i_format = SND_PCM_FORMAT_S8; break;
-        case AOUT_FMT_U16_LE:    i_format = SND_PCM_FORMAT_U16_LE; break;
-        case AOUT_FMT_U16_BE:    i_format = SND_PCM_FORMAT_U16_BE; break;
-        case AOUT_FMT_FLOAT32:   i_format = SND_PCM_FORMAT_FLOAT; break;
-        case AOUT_FMT_SPDIF:
+        case VLC_FOURCC('f','l','3','2'):
+            i_format = SND_PCM_FORMAT_FLOAT;
+            break;
+
+        case VLC_FOURCC('s','p','d','i'):
             /* Override some settings to make S/PDIF work */
             p_sys->b_can_sleek = VLC_TRUE;
             i_format = SND_PCM_FORMAT_S16_LE;
@@ -213,7 +207,6 @@ static int Open( vlc_object_t *p_this )
             p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
             p_aout->output.output.i_frame_length = ALSA_SPDIF_PERIOD_SIZE;
             break;
-        case AOUT_FMT_FIXED32:
         default:
             msg_Err( p_aout, "audio output format 0x%x not supported",
                      p_aout->output.output.i_format );
