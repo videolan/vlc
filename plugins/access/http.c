@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.6 2002/03/26 23:39:43 massiot Exp $
+ * $Id: http.c,v 1.7 2002/04/03 23:24:42 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -151,7 +151,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     /* Prepare the input thread for reading. */ 
     p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
     /* FIXME: we shouldn't have to do that ! */
-    p_input->pf_read = input_FDRead;
+    p_input->pf_read = input_FDNetworkRead;
 
     while( !input_FillBuffer( p_input ) )
     {
@@ -419,7 +419,6 @@ static int HTTPOpen( input_thread_t * p_input )
  *****************************************************************************/
 static void HTTPClose( input_thread_t * p_input )
 {
-    free( p_input->psz_name );
     input_FDClose( p_input );
 }
 

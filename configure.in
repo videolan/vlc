@@ -170,6 +170,7 @@ AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/time.h sys/times.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
 AC_CHECK_HEADERS(machine/param.h sys/shm.h)
+AC_CHECK_HEADERS(scsi/scsi_ioctl.h)
 
 AC_HEADER_TIME
 

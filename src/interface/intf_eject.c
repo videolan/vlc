@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.5 2002/03/26 23:08:40 gbazin Exp $
+ * $Id: intf_eject.c,v 1.6 2002/04/03 23:24:42 massiot Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -61,13 +61,15 @@
 #   include <sys/mount.h>
 #   include <scsi/scsi.h>
 #   include <scsi/sg.h>
-#   include <scsi/scsi_ioctl.h>
+#   ifdef HAVE_SCSI_SCSI_IOCTL_H
+#      include <scsi/scsi_ioctl.h>
+#   endif
 #endif
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#ifdef SYS_LINUX
+#if defined(SYS_LINUX) && defined(HAVE_SCSI_SCSI_IOCTL_H)
 static int EjectSCSI ( int i_fd );
 #endif
 
@@ -138,10 +140,12 @@ int intf_Eject( const char *psz_device )
     /* Try a simple ATAPI eject */
     i_ret = ioctl( i_fd, CDROMEJECT, 0 );
 
+#ifdef HAVE_SCSI_SCSI_IOCTL_H
     if( i_ret != 0 )
     {
         i_ret = EjectSCSI( i_fd );
     }
+#endif
 
     if( i_ret != 0 )
     {
@@ -163,7 +167,7 @@ int intf_Eject( const char *psz_device )
 
 /* The following functions are local */
 
-#ifdef SYS_LINUX
+#if defined(SYS_LINUX) && defined(HAVE_SCSI_SCSI_IOCTL_H)
 /*****************************************************************************
  * Eject using SCSI commands. Return 0 if successful
  *****************************************************************************/
