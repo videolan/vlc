@@ -1,11 +1,11 @@
-# polish translation of vlc.
+# polish translation of VLC.
 # Copyright (C) 2002 Free Software Foundation, Inc.
 # Arkadiusz Lipiec <alipiec@elka.pw.edu.pl>, 2002.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-01-31 12:35+0100\n"
+"POT-Creation-Date: 2003-02-02 01:26+0100\n"
 "PO-Revision-Date: 2002-07-12 11:49+0100\n"
 "Last-Translator: Arkadiusz Lipiec <alipiec@elka.pw.edu.pl>\n"
 "Language-Team: polish <pl@li.org>\n"
@@ -14,12 +14,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
-#: src/libvlc.c:256
+#: src/libvlc.c:253
 msgid "C"
 msgstr "pl"
 
 #. Usage
-#: src/libvlc.c:286 src/libvlc.c:1274
+#: src/libvlc.c:296 src/libvlc.c:1291
 #, fuzzy, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
@@ -28,27 +28,27 @@ msgstr ""
 "U¿ycie: %s [opcje] [parametry] [plik]...\n"
 "\n"
 
-#: src/libvlc.c:1131 src/misc/configuration.c:916
+#: src/libvlc.c:1148 src/misc/configuration.c:916
 msgid "string"
 msgstr "napis"
 
-#: src/libvlc.c:1149 src/misc/configuration.c:901
+#: src/libvlc.c:1166 src/misc/configuration.c:901
 msgid "integer"
 msgstr "liczba ca³kowita"
 
-#: src/libvlc.c:1152 src/misc/configuration.c:908
+#: src/libvlc.c:1169 src/misc/configuration.c:908
 msgid "float"
 msgstr "liczba zmiennoprz."
 
-#: src/libvlc.c:1158
+#: src/libvlc.c:1175
 msgid " (default enabled)"
 msgstr " (domy¶lnie w³±czone)"
 
-#: src/libvlc.c:1159
+#: src/libvlc.c:1176
 msgid " (default disabled)"
 msgstr " (domy¶lnie wy³±czone)"
 
-#: src/libvlc.c:1249 src/libvlc.c:1304 src/libvlc.c:1328
+#: src/libvlc.c:1266 src/libvlc.c:1321 src/libvlc.c:1345
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -56,11 +56,11 @@ msgstr ""
 "\n"
 "Naci¶nij klawisz ENTER aby kontynuowaæ...\n"
 
-#: src/libvlc.c:1277
+#: src/libvlc.c:1294
 msgid "[module]              [description]\n"
 msgstr "[modu³]               [opis]\n"
 
-#: src/libvlc.c:1322
+#: src/libvlc.c:1339
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -84,10 +84,10 @@ msgstr "modu³ interfejsu"
 
 #: src/libvlc.h:39
 msgid ""
-"This option allows you to select the interface used by vlc. The default "
+"This option allows you to select the interface used by VLC. The default "
 "behavior is to automatically select the best module available."
 msgstr ""
-"Ta opcja umo¿liwia wybranie interfejsu u¿ywanego przez vlc. Domy¶lnym "
+"Ta opcja umo¿liwia wybranie interfejsu u¿ywanego przez VLC. Domy¶lnym "
 "zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
 
 #: src/libvlc.h:43
@@ -98,11 +98,11 @@ msgstr "modu³ interfejsu Qt"
 #: src/libvlc.h:45
 #, fuzzy
 msgid ""
-"This option allows you to select additional interfaces used by vlc. They "
+"This option allows you to select additional interfaces used by VLC. They "
 "will be launched in the background in addition to the default interface. Use "
 "a comma separated list of interface modules."
 msgstr ""
-"Ta opcja umo¿liwia wybranie interfejsu u¿ywanego przez vlc. Domy¶lnym "
+"Ta opcja umo¿liwia wybranie interfejsu u¿ywanego przez VLC. Domy¶lnym "
 "zachowaniem jest automatyczny wybór najlepszego dostêpnego modu³u."
 
 #: src/libvlc.h:49
@@ -154,10 +154,10 @@ msgstr "¶cie¿ka wyszukiwania wtyczek"
 #: src/libvlc.h:70
 #, fuzzy
 msgid ""
-"This option allows you to specify an additional path for vlc to look for its "
+"This option allows you to specify an additional path for VLC to look for its "
 "plugins."
 msgstr ""
-"Ta opcja umo¿liwia ustawienie dodatkowej ¶cie¿ki dla vlc, wykorzystywanej "
+"Ta opcja umo¿liwia ustawienie dodatkowej ¶cie¿ki dla VLC, wykorzystywanej "
 "przy wyszukiwaniu wtyczek programu."
 
 #: src/libvlc.h:73
@@ -166,10 +166,10 @@ msgstr "modu³ wyj¶ciowy d¼wiêku"
 
 #: src/libvlc.h:75
 msgid ""
-"This option allows you to select the audio output method used by vlc. The "
+"This option allows you to select the audio output method used by VLC. The "
 "default behavior is to automatically select the best method available."
 msgstr ""
-"Ta opcja umo¿liwia wybranie metody wyj¶ciowej d¼wiêku u¿ywanej przez vlc. "
+"Ta opcja umo¿liwia wybranie metody wyj¶ciowej d¼wiêku u¿ywanej przez VLC. "
 "Domy¶lnym zachowaniem jest automatyczne wybranie najlepszej dostêpnej metody."
 
 #: src/libvlc.h:79
@@ -256,10 +256,10 @@ msgstr "modu³ wyj¶ciowy obrazu"
 
 #: src/libvlc.h:118
 msgid ""
-"This option allows you to select the video output method used by vlc. The "
+"This option allows you to select the video output method used by VLC. The "
 "default behavior is to automatically select the best method available."
 msgstr ""
-"Ta opcja umo¿liwia wybranie metody wyj¶ciowej obrazu u¿ywanej przez vlc. "
+"Ta opcja umo¿liwia wybranie metody wyj¶ciowej obrazu u¿ywanej przez VLC. "
 "Domy¶lnym zachowaniem jest automatyczny wybór najlepszej dostêpnej metody."
 
 #: src/libvlc.h:122
@@ -291,10 +291,10 @@ msgstr "szeroko¶æ obrazu"
 
 #: src/libvlc.h:134
 msgid ""
-"You can enforce the video width here. By default vlc will adapt to the video "
+"You can enforce the video width here. By default VLC will adapt to the video "
 "characteristics."
 msgstr ""
-"Mo¿na wymusiæ w tym miejscu szeroko¶æ obrazu. Domy¶lnie vlc zaadoptuje "
+"Mo¿na wymusiæ w tym miejscu szeroko¶æ obrazu. Domy¶lnie VLC zaadoptuje "
 "charakterystyki obrazu."
 
 #: src/libvlc.h:137
@@ -303,10 +303,10 @@ msgstr "wysoko¶æ obrazu"
 
 #: src/libvlc.h:139
 msgid ""
-"You can enforce the video height here. By default vlc will adapt to the "
+"You can enforce the video height here. By default VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"Mo¿na wymusiæ w tym miejscu wysoko¶æ obrazu. Domy¶lnie vlc zaadoptuje "
+"Mo¿na wymusiæ w tym miejscu wysoko¶æ obrazu. Domy¶lnie VLC zaadoptuje "
 "charakterystyki obrazu."
 
 #: src/libvlc.h:142
@@ -335,9 +335,9 @@ msgstr "wyj¶cie pe³noekranowe obrazu"
 
 #: src/libvlc.h:153
 msgid ""
-"If this option is enabled, vlc will always start a video in fullscreen mode."
+"If this option is enabled, VLC will always start a video in fullscreen mode."
 msgstr ""
-"Po w³±czeniu tej opcji, vlc zawsze wy¶wietli obraz w trybie pe³noekranowym."
+"Po w³±czeniu tej opcji, VLC zawsze wy¶wietli obraz w trybie pe³noekranowym."
 
 #: src/libvlc.h:156
 msgid "overlay video output"
@@ -346,10 +346,10 @@ msgstr "wyj¶cie obrazu w trybie overlay"
 #: src/libvlc.h:158
 #, fuzzy
 msgid ""
-"If enabled, vlc will try to take advantage of the overlay capabilities of "
+"If enabled, VLC will try to take advantage of the overlay capabilities of "
 "your graphic card."
 msgstr ""
-"Po w³±czeniu, vlc bêdzie próbowa³ skorzystaæ z w³a¶ciwo¶ci overlay karty "
+"Po w³±czeniu, VLC bêdzie próbowa³ skorzystaæ z w³a¶ciwo¶ci overlay karty "
 "graficznej."
 
 #: src/libvlc.h:161
@@ -566,9 +566,9 @@ msgstr ""
 
 #: src/libvlc.h:267
 msgid ""
-"This allows you to select the order in which vlc will choose its codecs. For "
+"This allows you to select the order in which VLC will choose its codecs. For "
 "instance, 'a52old,a52,any' will try the old a52 codec before the new one. "
-"Please be aware that vlc does not make any difference between audio or video "
+"Please be aware that VLC does not make any difference between audio or video "
 "codecs, so you should always specify 'any' at the end of the list to make "
 "sure there is a fallback for the types you didn't specify."
 msgstr ""
@@ -579,7 +579,7 @@ msgstr ""
 
 #: src/libvlc.h:276 src/libvlc.h:280
 msgid ""
-"This allows you to select the order in which vlc will choose its codecs. "
+"This allows you to select the order in which VLC will choose its codecs. "
 msgstr ""
 
 #: src/libvlc.h:278
@@ -634,7 +634,7 @@ msgstr ""
 
 #: src/libvlc.h:307
 msgid ""
-"This allows you to select the order in which vlc will choose its packetizers."
+"This allows you to select the order in which VLC will choose its packetizers."
 msgstr ""
 
 #: src/libvlc.h:310
@@ -663,7 +663,7 @@ msgstr "w³±czona obs³uga MMX procesora"
 
 #: src/libvlc.h:321
 msgid ""
-"If your processor supports the MMX instructions set, vlc can take advantage "
+"If your processor supports the MMX instructions set, VLC can take advantage "
 "of them."
 msgstr "Je¶li procesor obs³uguje zbiór istrukcji MMX, mo¿na z nich skorzystaæ."
 
@@ -673,7 +673,7 @@ msgstr "w³±czona obs³uga 3D Now!"
 
 #: src/libvlc.h:326
 msgid ""
-"If your processor supports the 3D Now! instructions set, vlc can take "
+"If your processor supports the 3D Now! instructions set, VLC can take "
 "advantage of them."
 msgstr ""
 "Je¶li procesor obs³uguje zbiór istrukcji 3D Now!, mo¿na z nich skorzystaæ."
@@ -684,7 +684,7 @@ msgstr "w³±czona obs³uga MMX EXT"
 
 #: src/libvlc.h:331
 msgid ""
-"If your processor supports the MMX EXT instructions set, vlc can take "
+"If your processor supports the MMX EXT instructions set, VLC can take "
 "advantage of them."
 msgstr ""
 "Je¶li procesor obs³uguje rozszerzony zbiór istrukcji MMX, mo¿na z nich "
@@ -697,7 +697,7 @@ msgstr "w³±czona obs³uga SSE"
 #: src/libvlc.h:336
 #, fuzzy
 msgid ""
-"If your processor supports the SSE instructions set, vlc can take advantage "
+"If your processor supports the SSE instructions set, VLC can take advantage "
 "of them."
 msgstr "Je¶li procesor obs³uguje zbiór istrukcji MMX, mo¿na z nich skorzystaæ."
 
@@ -707,7 +707,7 @@ msgstr "w³±czona obs³uga AltiVec"
 
 #: src/libvlc.h:341
 msgid ""
-"If your processor supports the AltiVec instructions set, vlc can take "
+"If your processor supports the AltiVec instructions set, VLC can take "
 "advantage of them."
 msgstr ""
 "Je¶li procesor obs³uguje zbiór istrukcji AltiVec, mo¿na z nich skorzystaæ."
@@ -718,7 +718,7 @@ msgstr ""
 
 #: src/libvlc.h:346
 msgid ""
-"When selected, vlc will randomly play files in the playlist until "
+"When selected, VLC will randomly play files in the playlist until "
 "interrupted."
 msgstr ""
 
@@ -727,9 +727,9 @@ msgid "launch playlist on startup"
 msgstr "w³±czanie listy odtwarzania przy uruchamianiu"
 
 #: src/libvlc.h:351
-msgid "If you want vlc to start playing on startup, then enable this option."
+msgid "If you want VLC to start playing on startup, then enable this option."
 msgstr ""
-"Je¶li vlc ma w³±czaæ odtwarzanie po uruchomieniu wówczas nale¿y zaznaczyæ t± "
+"Je¶li VLC ma w³±czaæ odtwarzanie po uruchomieniu wówczas nale¿y zaznaczyæ t± "
 "opcjê."
 
 #: src/libvlc.h:353
@@ -738,10 +738,10 @@ msgstr "kolejkowanie obiektów listy odtwarzania"
 
 #: src/libvlc.h:355
 msgid ""
-"If you want vlc to add items to the playlist as you open them, then enable "
+"If you want VLC to add items to the playlist as you open them, then enable "
 "this option."
 msgstr ""
-"Je¶li vlc ma dodawaæ pliki do listy odtwarzania po ich otwarciu wówczas "
+"Je¶li VLC ma dodawaæ pliki do listy odtwarzania po ich otwarciu wówczas "
 "nale¿y zaznaczyæ t± opcjê."
 
 #: src/libvlc.h:358
@@ -750,10 +750,10 @@ msgstr "zapêtlanie listy odtwarzania"
 
 #: src/libvlc.h:360
 msgid ""
-"If you want vlc to keep playing the playlist indefinitely then enable this "
+"If you want VLC to keep playing the playlist indefinitely then enable this "
 "option."
 msgstr ""
-"Je¶li vlc ma odtwarzaæ w nieskoñczono¶æ listê odtwarzania wówczas nale¿y "
+"Je¶li VLC ma odtwarzaæ w nieskoñczono¶æ listê odtwarzania wówczas nale¿y "
 "zaznaczyæ t± opcjê."
 
 #: src/libvlc.h:363
@@ -763,11 +763,11 @@ msgstr "modu³ kopiowania pamiêci"
 #: src/libvlc.h:365
 #, fuzzy
 msgid ""
-"You can select which memory copy module you want to use. By defaultvlc will "
+"You can select which memory copy module you want to use. By default VLC will "
 "select the fastest one supported by your hardware."
 msgstr ""
 "Mo¿na wybraæ który z modu³ów kopiowania pamiêci ma byæ u¿ywany. Domy¶lnie "
-"vlc wybierze najszybszy obs³ugiwany przez sprzêt modu³."
+"VLC wybierze najszybszy obs³ugiwany przez sprzêt modu³."
 
 #: src/libvlc.h:368
 msgid "access module"
@@ -857,7 +857,7 @@ msgstr "D¼wiêk"
 #. Video options
 #: src/libvlc.h:449 modules/gui/gtk/gnome_interface.c:1140
 #: modules/gui/gtk/gtk_interface.c:1337 modules/gui/macosx/intf.m:310
-#: modules/misc/dummy/dummy.c:64 modules/video_output/directx/directx.c:111
+#: modules/misc/dummy/dummy.c:64 modules/video_output/directx/directx.c:107
 msgid "Video"
 msgstr "Obraz"
 
@@ -2909,7 +2909,7 @@ msgid "Open Recent"
 msgstr "Otwórz strumieñ"
 
 #. Recent Items Menu
-#: modules/gui/macosx/intf.m:280 modules/gui/macosx/intf.m:1420
+#: modules/gui/macosx/intf.m:280 modules/gui/macosx/intf.m:1419
 msgid "Clear Menu"
 msgstr ""
 
@@ -3027,6 +3027,11 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:1168
 msgid "Load from file.."
+msgstr ""
+
+#: modules/gui/macosx/intf.m:1195
+#, c-format
+msgid "Language 0x%x"
 msgstr ""
 
 #: modules/gui/macosx/open.m:165
@@ -3881,21 +3886,7 @@ msgstr ""
 "akceleracji sprzêtowej (jak przeskalowywanie lub konwersje YUV->RGB). Ta "
 "opcja nie przynosi ¿adnych efektów w trybie overlay."
 
-#: modules/video_output/directx/directx.c:105
-#, fuzzy
-msgid "specify an existing window"
-msgstr "Otwiera okno listy odtwarzania"
-
-#: modules/video_output/directx/directx.c:107
-#, fuzzy
-msgid ""
-"Specify a window to use instead of opening a new one. This option is "
-"DANGEROUS, use with care."
-msgstr ""
-"Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta "
-"opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
-
-#: modules/video_output/directx/directx.c:116
+#: modules/video_output/directx/directx.c:111
 #, fuzzy
 msgid "DirectX video module"
 msgstr "modu³ odwracania obrazu"
@@ -4017,30 +4008,18 @@ msgid "SVGAlib module"
 msgstr "modu³ 3dfx Glide"
 
 #: modules/video_output/x11/x11.c:57 modules/video_output/x11/xvideo.c:68
-msgid "X11 drawable"
-msgstr "obiekt rysunkowy X11"
-
-#: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
-msgid ""
-"Specify a X11 drawable to use instead of opening a new window. This option "
-"is DANGEROUS, use with care."
-msgstr ""
-"Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta "
-"opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
-
-#: modules/video_output/x11/x11.c:62 modules/video_output/x11/xvideo.c:73
 msgid "use shared memory"
 msgstr "u¿ywanie pamiêci wspó³dzielonej"
 
-#: modules/video_output/x11/x11.c:64 modules/video_output/x11/xvideo.c:75
+#: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
 msgid "Use shared memory to communicate between vlc and the X server."
 msgstr "U¿ywa pamiêæ wspó³dzielon± do komunikacji pomiêdzy vlc a serwerem X"
 
-#: modules/video_output/x11/x11.c:67
+#: modules/video_output/x11/x11.c:62
 msgid "X11"
 msgstr ""
 
-#: modules/video_output/x11/x11.c:74
+#: modules/video_output/x11/x11.c:68
 msgid "X11 module"
 msgstr "modu³ X11"
 
@@ -4072,12 +4051,12 @@ msgstr ""
 "próbowania polepszenia wydajno¶ci przez u¿ycie najbardziej wydajnego "
 "formatu. "
 
-#: modules/video_output/x11/xvideo.c:78
+#: modules/video_output/x11/xvideo.c:73
 #, fuzzy
 msgid "XVideo"
 msgstr "Obraz"
 
-#: modules/video_output/x11/xvideo.c:87
+#: modules/video_output/x11/xvideo.c:81
 msgid "XVideo extension module"
 msgstr "modu³ rozszerzenia XVideo"
 
@@ -4133,6 +4112,28 @@ msgstr "modu³ QNX RTOS"
 #, fuzzy
 msgid "xosd interface module"
 msgstr "modu³ interfejsu"
+
+#, fuzzy
+#~ msgid "specify an existing window"
+#~ msgstr "Otwiera okno listy odtwarzania"
+
+#, fuzzy
+#~ msgid ""
+#~ "Specify a window to use instead of opening a new one. This option is "
+#~ "DANGEROUS, use with care."
+#~ msgstr ""
+#~ "Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta "
+#~ "opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
+
+#~ msgid "X11 drawable"
+#~ msgstr "obiekt rysunkowy X11"
+
+#~ msgid ""
+#~ "Specify a X11 drawable to use instead of opening a new window. This "
+#~ "option is DANGEROUS, use with care."
+#~ msgstr ""
+#~ "Okre¶la obiekt rysunkowy X11 u¿ywany zamiast otwierania nowego okna. Ta "
+#~ "opcja jest NIEBEZPIECZNA, nale¿y j± u¿ywaæ z ostro¿no¶ci±."
 
 #~ msgid "A_udio"
 #~ msgstr "A_udio"

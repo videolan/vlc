@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.39 2003/01/28 16:57:28 sam Exp $
+ * $Id: libvlc.h,v 1.40 2003/02/02 00:29:29 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -36,13 +36,13 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
  *****************************************************************************/
 #define INTF_TEXT N_("interface module")
 #define INTF_LONGTEXT N_( \
-    "This option allows you to select the interface used by vlc. " \
+    "This option allows you to select the interface used by VLC. " \
     "The default behavior is to automatically select the best module " \
     "available.")
 
 #define EXTRAINTF_TEXT N_("extra interface modules")
 #define EXTRAINTF_LONGTEXT N_( \
-    "This option allows you to select additional interfaces used by vlc. " \
+    "This option allows you to select additional interfaces used by VLC. " \
     "They will be launched in the background in addition to the default " \
     "interface. Use a comma separated list of interface modules.")
 
@@ -67,12 +67,12 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 #define PLUGIN_PATH_TEXT N_("plugin search path")
 #define PLUGIN_PATH_LONGTEXT N_( \
-    "This option allows you to specify an additional path for vlc to look " \
+    "This option allows you to specify an additional path for VLC to look " \
     "for its plugins.")
 
 #define AOUT_TEXT N_("audio output module")
 #define AOUT_LONGTEXT N_( \
-    "This option allows you to select the audio output method used by vlc. " \
+    "This option allows you to select the audio output method used by VLC. " \
     "The default behavior is to automatically select the best method " \
     "available.")
 
@@ -115,7 +115,7 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 #define VOUT_TEXT N_("video output module")
 #define VOUT_LONGTEXT N_( \
-    "This option allows you to select the video output method used by vlc. " \
+    "This option allows you to select the video output method used by VLC. " \
     "The default behavior is to automatically select the best " \
     "method available.")
 
@@ -131,12 +131,12 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 #define WIDTH_TEXT N_("video width")
 #define WIDTH_LONGTEXT N_( \
-    "You can enforce the video width here. By default vlc will " \
+    "You can enforce the video width here. By default VLC will " \
     "adapt to the video characteristics.")
 
 #define HEIGHT_TEXT N_("video height")
 #define HEIGHT_LONGTEXT N_( \
-    "You can enforce the video height here. By default vlc will " \
+    "You can enforce the video height here. By default VLC will " \
     "adapt to the video characteristics.")
 
 #define ZOOM_TEXT N_("zoom video")
@@ -150,12 +150,12 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 #define FULLSCREEN_TEXT N_("fullscreen video output")
 #define FULLSCREEN_LONGTEXT N_( \
-    "If this option is enabled, vlc will always start a video in fullscreen " \
+    "If this option is enabled, VLC will always start a video in fullscreen " \
     "mode.")
 
 #define OVERLAY_TEXT N_("overlay video output")
 #define OVERLAY_LONGTEXT N_( \
-    "If enabled, vlc will try to take advantage of the overlay capabilities " \
+    "If enabled, VLC will try to take advantage of the overlay capabilities " \
     "of your graphic card.")
 
 #define SPUMARGIN_TEXT N_("force SPU position")
@@ -264,20 +264,20 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 #define CODEC_TEXT N_("choose preferred codec list")
 #define CODEC_LONGTEXT N_( \
-    "This allows you to select the order in which vlc will choose its " \
+    "This allows you to select the order in which VLC will choose its " \
     "codecs. For instance, 'a52old,a52,any' will try the old a52 codec " \
-    "before the new one. Please be aware that vlc does not make any " \
+    "before the new one. Please be aware that VLC does not make any " \
     "difference between audio or video codecs, so you should always specify " \
     "'any' at the end of the list to make sure there is a fallback for the " \
     "types you didn't specify.")
 
 #define ENCODER_VIDEO_TEXT N_("choose preferred video encoder list")
 #define ENCODER_VIDEO_LONGTEXT N_( \
-    "This allows you to select the order in which vlc will choose its " \
+    "This allows you to select the order in which VLC will choose its " \
     "codecs. " )
 #define ENCODER_AUDIO_TEXT N_("choose preferred audio encoder list")
 #define ENCODER_AUDIO_LONGTEXT N_( \
-    "This allows you to select the order in which vlc will choose its " \
+    "This allows you to select the order in which VLC will choose its " \
     "codecs. " )
 
 #define SOUT_TEXT N_("choose a stream output")
@@ -304,7 +304,7 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 #define PACKETIZER_TEXT N_("choose preferred packetizer list")
 #define PACKETIZER_LONGTEXT N_( \
-    "This allows you to select the order in which vlc will choose its " \
+    "This allows you to select the order in which VLC will choose its " \
     "packetizers."  )
 
 #define MUX_TEXT N_("mux module")
@@ -318,52 +318,52 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 #define MMX_TEXT N_("enable CPU MMX support")
 #define MMX_LONGTEXT N_( \
-    "If your processor supports the MMX instructions set, vlc can take " \
+    "If your processor supports the MMX instructions set, VLC can take " \
     "advantage of them.")
 
 #define THREE_DN_TEXT N_("enable CPU 3D Now! support")
 #define THREE_DN_LONGTEXT N_( \
-    "If your processor supports the 3D Now! instructions set, vlc can take "\
+    "If your processor supports the 3D Now! instructions set, VLC can take "\
     "advantage of them.")
 
 #define MMXEXT_TEXT N_("enable CPU MMX EXT support")
 #define MMXEXT_LONGTEXT N_( \
-    "If your processor supports the MMX EXT instructions set, vlc can take "\
+    "If your processor supports the MMX EXT instructions set, VLC can take "\
     "advantage of them.")
 
 #define SSE_TEXT N_("enable CPU SSE support")
 #define SSE_LONGTEXT N_( \
-    "If your processor supports the SSE instructions set, vlc can take " \
+    "If your processor supports the SSE instructions set, VLC can take " \
     "advantage of them.")
 
 #define ALTIVEC_TEXT N_("enable CPU AltiVec support")
 #define ALTIVEC_LONGTEXT N_( \
-    "If your processor supports the AltiVec instructions set, vlc can take "\
+    "If your processor supports the AltiVec instructions set, VLC can take "\
     "advantage of them.")
 
 #define RANDOM_TEXT N_("play files randomly forever")
 #define RANDOM_LONGTEXT N_( \
-    "When selected, vlc will randomly play files in the playlist until " \
+    "When selected, VLC will randomly play files in the playlist until " \
     "interrupted.")
 
 #define LAUNCH_TEXT N_("launch playlist on startup")
 #define LAUNCH_LONGTEXT N_( \
-    "If you want vlc to start playing on startup, then enable this option.")
+    "If you want VLC to start playing on startup, then enable this option.")
 
 #define ENQUEUE_TEXT N_("enqueue items in playlist")
 #define ENQUEUE_LONGTEXT N_( \
-    "If you want vlc to add items to the playlist as you open them, then " \
+    "If you want VLC to add items to the playlist as you open them, then " \
     "enable this option.")
 
 #define LOOP_TEXT N_("loop playlist on end")
 #define LOOP_LONGTEXT N_( \
-    "If you want vlc to keep playing the playlist indefinitely then enable " \
+    "If you want VLC to keep playing the playlist indefinitely then enable " \
     "this option.")
 
 #define MEMCPY_TEXT N_("memory copy module")
 #define MEMCPY_LONGTEXT N_( \
-    "You can select which memory copy module you want to use. By default" \
-    "vlc will select the fastest one supported by your hardware.")
+    "You can select which memory copy module you want to use. By default " \
+    "VLC will select the fastest one supported by your hardware.")
 
 #define ACCESS_TEXT N_("access module")
 #define ACCESS_LONGTEXT N_( \

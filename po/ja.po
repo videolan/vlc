@@ -1,10 +1,10 @@
-# vlc ja.po
+# Japanese translation for VLC
 # Copyright (C) 2002 VideoLAN project
 # Fumio Nakayama <endymion@ca2.so-net.ne.jp>, 2002.
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-01-31 12:35+0100\n"
+"POT-Creation-Date: 2003-02-02 01:26+0100\n"
 "PO-Revision-Date: 2003-01-09 02:37+0900\n"
 "Last-Translator: Fumio Nakayama <endymion@ca2.so-net.ne.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -13,39 +13,39 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
-#: src/libvlc.c:256
+#: src/libvlc.c:253
 msgid "C"
 msgstr "ja"
 
 #. Usage
-#: src/libvlc.c:286 src/libvlc.c:1274
+#: src/libvlc.c:296 src/libvlc.c:1291
 #, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
 "\n"
 msgstr ""
 
-#: src/libvlc.c:1131 src/misc/configuration.c:916
+#: src/libvlc.c:1148 src/misc/configuration.c:916
 msgid "string"
 msgstr "文字列"
 
-#: src/libvlc.c:1149 src/misc/configuration.c:901
+#: src/libvlc.c:1166 src/misc/configuration.c:901
 msgid "integer"
 msgstr "整数"
 
-#: src/libvlc.c:1152 src/misc/configuration.c:908
+#: src/libvlc.c:1169 src/misc/configuration.c:908
 msgid "float"
 msgstr "浮動小数点"
 
-#: src/libvlc.c:1158
+#: src/libvlc.c:1175
 msgid " (default enabled)"
 msgstr " (デフォルト：有効)"
 
-#: src/libvlc.c:1159
+#: src/libvlc.c:1176
 msgid " (default disabled)"
 msgstr " (デフォルト：無効)"
 
-#: src/libvlc.c:1249 src/libvlc.c:1304 src/libvlc.c:1328
+#: src/libvlc.c:1266 src/libvlc.c:1321 src/libvlc.c:1345
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -53,11 +53,11 @@ msgstr ""
 "\n"
 "続けるにはEnterキーを押してください。\n"
 
-#: src/libvlc.c:1277
+#: src/libvlc.c:1294
 msgid "[module]              [description]\n"
 msgstr "[モジュール]          [説明]\n"
 
-#: src/libvlc.c:1322
+#: src/libvlc.c:1339
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -81,7 +81,7 @@ msgstr "インタフェース・モジュール"
 
 #: src/libvlc.h:39
 msgid ""
-"This option allows you to select the interface used by vlc. The default "
+"This option allows you to select the interface used by VLC. The default "
 "behavior is to automatically select the best module available."
 msgstr ""
 "使用するインタフェースが選択可能です。デフォルトで自動的に最適なモジュールが"
@@ -95,7 +95,7 @@ msgstr "Qtインタフェース・モジュール"
 #: src/libvlc.h:45
 #, fuzzy
 msgid ""
-"This option allows you to select additional interfaces used by vlc. They "
+"This option allows you to select additional interfaces used by VLC. They "
 "will be launched in the background in addition to the default interface. Use "
 "a comma separated list of interface modules."
 msgstr ""
@@ -152,9 +152,9 @@ msgstr "プラグインの検索パス"
 #: src/libvlc.h:70
 #, fuzzy
 msgid ""
-"This option allows you to specify an additional path for vlc to look for its "
+"This option allows you to specify an additional path for VLC to look for its "
 "plugins."
-msgstr "vlcがプラグインを見つけるときに検索される追加のパスを設定します。"
+msgstr "VLCがプラグインを見つけるときに検索される追加のパスを設定します。"
 
 #: src/libvlc.h:73
 msgid "audio output module"
@@ -162,7 +162,7 @@ msgstr "オーディオ出力モジュール"
 
 #: src/libvlc.h:75
 msgid ""
-"This option allows you to select the audio output method used by vlc. The "
+"This option allows you to select the audio output method used by VLC. The "
 "default behavior is to automatically select the best method available."
 msgstr ""
 "オーディオ出力方法が選択可能です。デフォルトで自動的に最適な方法が選択されま"
@@ -257,7 +257,7 @@ msgstr "ビデオ出力モジュール"
 
 #: src/libvlc.h:118
 msgid ""
-"This option allows you to select the video output method used by vlc. The "
+"This option allows you to select the video output method used by VLC. The "
 "default behavior is to automatically select the best method available."
 msgstr ""
 "このオプションは使用するビデオ出力方法が選択できます。デフォルトで自動的に最"
@@ -293,11 +293,11 @@ msgstr "ビデオの幅"
 
 #: src/libvlc.h:134
 msgid ""
-"You can enforce the video width here. By default vlc will adapt to the video "
+"You can enforce the video width here. By default VLC will adapt to the video "
 "characteristics."
 msgstr ""
 "ビデオの幅を強制的に指定することができます。\n"
-"※vlcはデフォルトでビデオの特性に合わせます。"
+"※VLCはデフォルトでビデオの特性に合わせます。"
 
 #: src/libvlc.h:137
 msgid "video height"
@@ -305,11 +305,11 @@ msgstr "ビデオの高さ"
 
 #: src/libvlc.h:139
 msgid ""
-"You can enforce the video height here. By default vlc will adapt to the "
+"You can enforce the video height here. By default VLC will adapt to the "
 "video characteristics."
 msgstr ""
 "ビデオの高さを強制的に指定することができます。\n"
-"※vlcはデフォルトでビデオの特性に合わせます。"
+"※VLCはデフォルトでビデオの特性に合わせます。"
 
 #: src/libvlc.h:142
 msgid "zoom video"
@@ -328,7 +328,7 @@ msgid ""
 "When enabled, the color information from the video won't be decoded (this "
 "can also allow you to save some processing power)."
 msgstr ""
-"このオプションを使用すると、vlcはカラー情報をデコードしません。(これにより、"
+"このオプションを使用すると、VLCはカラー情報をデコードしません。(これにより、"
 "いくらかの処理パワーをセーブすることができます。)"
 
 #: src/libvlc.h:151
@@ -337,9 +337,9 @@ msgstr "フルスクリーン出力"
 
 #: src/libvlc.h:153
 msgid ""
-"If this option is enabled, vlc will always start a video in fullscreen mode."
+"If this option is enabled, VLC will always start a video in fullscreen mode."
 msgstr ""
-"このオプションを指定すると、vlcは常にビデオをフルスクリーン・モードにします。"
+"このオプションを指定すると、VLCは常にビデオをフルスクリーン・モードにします。"
 
 #: src/libvlc.h:156
 msgid "overlay video output"
@@ -347,9 +347,9 @@ msgstr "オーバーレイ"
 
 #: src/libvlc.h:158
 msgid ""
-"If enabled, vlc will try to take advantage of the overlay capabilities of "
+"If enabled, VLC will try to take advantage of the overlay capabilities of "
 "your graphic card."
-msgstr "vlcはデフォルトでグラフィックカードのオーバレイ機能の使用を試みます。"
+msgstr "VLCはデフォルトでグラフィックカードのオーバレイ機能の使用を試みます。"
 
 #: src/libvlc.h:161
 msgid "force SPU position"
@@ -405,7 +405,7 @@ msgid ""
 "Accepted format is a float value (1, 1.25, 1.3333, etc.) expressing pixel "
 "squareness."
 msgstr ""
-"強制的に送信先のピクセル・サイズを指定します。vlcのデフォルトでは使用している"
+"強制的に送信先のピクセル・サイズを指定します。VLCのデフォルトでは使用している"
 "ハードウェアが別の方法を持っていない限り、ピクセルは矩形を示す情報として扱わ"
 "れます。このオプションは、TVのようにVLC信号が他のデバイスに送信されないように"
 "するために使用される可能性があります。指定できるフォーマットは、浮動小数点値 "
@@ -574,14 +574,14 @@ msgstr "準備されているコーデックの一覧の選択"
 
 #: src/libvlc.h:267
 msgid ""
-"This allows you to select the order in which vlc will choose its codecs. For "
+"This allows you to select the order in which VLC will choose its codecs. For "
 "instance, 'a52old,a52,any' will try the old a52 codec before the new one. "
-"Please be aware that vlc does not make any difference between audio or video "
+"Please be aware that VLC does not make any difference between audio or video "
 "codecs, so you should always specify 'any' at the end of the list to make "
 "sure there is a fallback for the types you didn't specify."
 msgstr ""
-"vlcが使用するコーデックの順序を選択することができます。'a52old,a52,any'はより"
-"新しいコーデックよりも、古いa52コーデックの使用を優先的に試みます。vlcはオー"
+"VLCが使用するコーデックの順序を選択することができます。'a52old,a52,any'はより"
+"新しいコーデックよりも、古いa52コーデックの使用を優先的に試みます。VLCはオー"
 "ディオとビデオのコーデックでいかなる差も持たないことに注意してください。タイ"
 "プが指定されなかった場合のフォールバックのために、リストの最後に常に'any'を指"
 "定しなければなりません。"
@@ -594,8 +594,8 @@ msgstr "準備されているコーデックの一覧の選択"
 #: src/libvlc.h:276 src/libvlc.h:280
 #, fuzzy
 msgid ""
-"This allows you to select the order in which vlc will choose its codecs. "
-msgstr "vlcが選択するパケッタライザーの順序を選択します。"
+"This allows you to select the order in which VLC will choose its codecs. "
+msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: src/libvlc.h:278
 #, fuzzy
@@ -650,8 +650,8 @@ msgstr "準備されているパケッタライザー一覧の選択"
 
 #: src/libvlc.h:307
 msgid ""
-"This allows you to select the order in which vlc will choose its packetizers."
-msgstr "vlcが選択するパケッタライザーの順序を選択します。"
+"This allows you to select the order in which VLC will choose its packetizers."
+msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: src/libvlc.h:310
 msgid "mux module"
@@ -675,10 +675,10 @@ msgstr "CPUのMMXサポートを無効にする"
 
 #: src/libvlc.h:321
 msgid ""
-"If your processor supports the MMX instructions set, vlc can take advantage "
+"If your processor supports the MMX instructions set, VLC can take advantage "
 "of them."
 msgstr ""
-"プロセッサがMMXの機能セットをサポートしている場合には、vlcはそのアドバンテー"
+"プロセッサがMMXの機能セットをサポートしている場合には、VLCはそのアドバンテー"
 "ジを利用できます。"
 
 #: src/libvlc.h:324
@@ -687,10 +687,10 @@ msgstr "CPUの3D Now!サポートを無効にする"
 
 #: src/libvlc.h:326
 msgid ""
-"If your processor supports the 3D Now! instructions set, vlc can take "
+"If your processor supports the 3D Now! instructions set, VLC can take "
 "advantage of them."
 msgstr ""
-"プロセッサが3D Now!機能をサポートしている場合には、vlcはそのアドバンテージを"
+"プロセッサが3D Now!機能をサポートしている場合には、VLCはそのアドバンテージを"
 "利用できます。"
 
 #: src/libvlc.h:329
@@ -699,10 +699,10 @@ msgstr "CPUのMMX拡張機能サポートを無効にする"
 
 #: src/libvlc.h:331
 msgid ""
-"If your processor supports the MMX EXT instructions set, vlc can take "
+"If your processor supports the MMX EXT instructions set, VLC can take "
 "advantage of them."
 msgstr ""
-"プロセッサがMMXの拡張機能セットをサポートしている場合には、vlcはそのアドバン"
+"プロセッサがMMXの拡張機能セットをサポートしている場合には、VLCはそのアドバン"
 "テージを利用することができます。"
 
 #: src/libvlc.h:334
@@ -711,10 +711,10 @@ msgstr "CPUのSSEサポートを無効にする"
 
 #: src/libvlc.h:336
 msgid ""
-"If your processor supports the SSE instructions set, vlc can take advantage "
+"If your processor supports the SSE instructions set, VLC can take advantage "
 "of them."
 msgstr ""
-"プロセッサがSSEの機能セットをサポートしている場合には、vlcはそのアドバンテー"
+"プロセッサがSSEの機能セットをサポートしている場合には、VLCはそのアドバンテー"
 "ジを利用することができます。"
 
 #: src/libvlc.h:339
@@ -723,7 +723,7 @@ msgstr "CPUのAltiVecサポートを無効にする"
 
 #: src/libvlc.h:341
 msgid ""
-"If your processor supports the AltiVec instructions set, vlc can take "
+"If your processor supports the AltiVec instructions set, VLC can take "
 "advantage of them."
 msgstr ""
 "プロセッサがAltiVecの機能セットをサポートしている場合には、そのアドバンテージ"
@@ -735,10 +735,10 @@ msgstr "ファイルをランダムに再生"
 
 #: src/libvlc.h:346
 msgid ""
-"When selected, vlc will randomly play files in the playlist until "
+"When selected, VLC will randomly play files in the playlist until "
 "interrupted."
 msgstr ""
-"このオプションが選択されるとvlcはプレイリストのファイルをランダムに再生しま"
+"このオプションが選択されるとVLCはプレイリストのファイルをランダムに再生しま"
 "す。"
 
 #: src/libvlc.h:349
@@ -746,9 +746,9 @@ msgid "launch playlist on startup"
 msgstr "起動時にプレイリストを開く"
 
 #: src/libvlc.h:351
-msgid "If you want vlc to start playing on startup, then enable this option."
+msgid "If you want VLC to start playing on startup, then enable this option."
 msgstr ""
-"vlcの起動時にプレイリストを起動したい場合には、このオプションを選択します。"
+"VLCの起動時にプレイリストを起動したい場合には、このオプションを選択します。"
 
 #: src/libvlc.h:353
 msgid "enqueue items in playlist"
@@ -756,7 +756,7 @@ msgstr "デフォルトでプレイリストに追加"
 
 #: src/libvlc.h:355
 msgid ""
-"If you want vlc to add items to the playlist as you open them, then enable "
+"If you want VLC to add items to the playlist as you open them, then enable "
 "this option."
 msgstr ""
 "プレイリストにオープンしている項目を追加したい場合には、このオプションを選択"
@@ -768,7 +768,7 @@ msgstr "プレイリストの最後でループ"
 
 #: src/libvlc.h:360
 msgid ""
-"If you want vlc to keep playing the playlist indefinitely then enable this "
+"If you want VLC to keep playing the playlist indefinitely then enable this "
 "option."
 msgstr ""
 "プレイリストの再生を繰り返して行いたい場合には、このオプションを選択します。"
@@ -779,10 +779,10 @@ msgstr "メモリー・コピー・モジュール"
 
 #: src/libvlc.h:365
 msgid ""
-"You can select which memory copy module you want to use. By defaultvlc will "
+"You can select which memory copy module you want to use. By default VLC will "
 "select the fastest one supported by your hardware."
 msgstr ""
-"使用したいメモリー・コピー・モジュールを選択します。vlcはデフォルトでハード"
+"使用したいメモリー・コピー・モジュールを選択します。VLCはデフォルトでハード"
 "ウェアがサポートしている最も速いものを選択します。"
 
 #: src/libvlc.h:368
@@ -872,7 +872,7 @@ msgstr "オーディオ"
 #. Video options
 #: src/libvlc.h:449 modules/gui/gtk/gnome_interface.c:1140
 #: modules/gui/gtk/gtk_interface.c:1337 modules/gui/macosx/intf.m:310
-#: modules/misc/dummy/dummy.c:64 modules/video_output/directx/directx.c:111
+#: modules/misc/dummy/dummy.c:64 modules/video_output/directx/directx.c:107
 msgid "Video"
 msgstr "ビデオ"
 
@@ -2891,7 +2891,7 @@ msgid "Open Recent"
 msgstr "最近使った項目を開く"
 
 #. Recent Items Menu
-#: modules/gui/macosx/intf.m:280 modules/gui/macosx/intf.m:1420
+#: modules/gui/macosx/intf.m:280 modules/gui/macosx/intf.m:1419
 msgid "Clear Menu"
 msgstr "メニューをクリアする"
 
@@ -3006,6 +3006,11 @@ msgstr "やり直し"
 #: modules/gui/macosx/intf.m:1168
 msgid "Load from file.."
 msgstr ""
+
+#: modules/gui/macosx/intf.m:1195
+#, c-format
+msgid "Language 0x%x"
+msgstr "言語 0x%x"
 
 #: modules/gui/macosx/open.m:165
 msgid "Open Source"
@@ -3838,19 +3843,7 @@ msgstr ""
 "オプションは推奨しません。(リスケーリングやYUV->RGB変換)オーバレイを使用する"
 "場合には何の効果もありません。"
 
-#: modules/video_output/directx/directx.c:105
-msgid "specify an existing window"
-msgstr "既存のウィンドウを指定"
-
-#: modules/video_output/directx/directx.c:107
-msgid ""
-"Specify a window to use instead of opening a new one. This option is "
-"DANGEROUS, use with care."
-msgstr ""
-"新しいウィンドウを開く代わりに使用するウィンドウを指定します。このオプション"
-"は危険ですので、注意が必要です。"
-
-#: modules/video_output/directx/directx.c:116
+#: modules/video_output/directx/directx.c:111
 msgid "DirectX video module"
 msgstr "DirectXビデオ・モジュール"
 
@@ -3965,30 +3958,18 @@ msgid "SVGAlib module"
 msgstr "SVGAlibモジュール"
 
 #: modules/video_output/x11/x11.c:57 modules/video_output/x11/xvideo.c:68
-msgid "X11 drawable"
-msgstr "X11 drawable"
-
-#: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
-msgid ""
-"Specify a X11 drawable to use instead of opening a new window. This option "
-"is DANGEROUS, use with care."
-msgstr ""
-"新しいウィンドウを開くかわりに使用するX11 drawableを指定します。このオプショ"
-"ンは危険なため、利用には注意が必要です。"
-
-#: modules/video_output/x11/x11.c:62 modules/video_output/x11/xvideo.c:73
 msgid "use shared memory"
 msgstr "共有メモリの使用"
 
-#: modules/video_output/x11/x11.c:64 modules/video_output/x11/xvideo.c:75
+#: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
 msgid "Use shared memory to communicate between vlc and the X server."
 msgstr "共有メモリをvlcとXサーバの通信のために使用します。"
 
-#: modules/video_output/x11/x11.c:67
+#: modules/video_output/x11/x11.c:62
 msgid "X11"
 msgstr ""
 
-#: modules/video_output/x11/x11.c:74
+#: modules/video_output/x11/x11.c:68
 msgid "X11 module"
 msgstr "X11モジュール"
 
@@ -4019,11 +4000,11 @@ msgstr ""
 "最も効果的なものを使ってパフォーマンスを改善するかわりに、特定の色彩フォー"
 "マットを使用するためのXVideoレンダラを強制的に指定します。"
 
-#: modules/video_output/x11/xvideo.c:78
+#: modules/video_output/x11/xvideo.c:73
 msgid "XVideo"
 msgstr ""
 
-#: modules/video_output/x11/xvideo.c:87
+#: modules/video_output/x11/xvideo.c:81
 msgid "XVideo extension module"
 msgstr "XVideoエクステンション・モジュール"
 
@@ -4073,6 +4054,26 @@ msgstr "XOSDモジュール"
 #: modules/visualization/xosd/xosd.c:83
 msgid "xosd interface module"
 msgstr "xosdインタフェース・モジュール"
+
+#~ msgid "specify an existing window"
+#~ msgstr "既存のウィンドウを指定"
+
+#~ msgid ""
+#~ "Specify a window to use instead of opening a new one. This option is "
+#~ "DANGEROUS, use with care."
+#~ msgstr ""
+#~ "新しいウィンドウを開く代わりに使用するウィンドウを指定します。このオプショ"
+#~ "ンは危険ですので、注意が必要です。"
+
+#~ msgid "X11 drawable"
+#~ msgstr "X11 drawable"
+
+#~ msgid ""
+#~ "Specify a X11 drawable to use instead of opening a new window. This "
+#~ "option is DANGEROUS, use with care."
+#~ msgstr ""
+#~ "新しいウィンドウを開くかわりに使用するX11 drawableを指定します。このオプ"
+#~ "ションは危険なため、利用には注意が必要です。"
 
 #~ msgid "A_udio"
 #~ msgstr "オーディオ(_u)"

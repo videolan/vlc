@@ -1,11 +1,12 @@
-# SOME DESCRIPTIVE TITLE.
+# Dutch translation for VLC.
+#
 # Copyright (C) YEAR Free Software Foundation, Inc.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-01-31 12:35+0100\n"
+"POT-Creation-Date: 2003-02-02 01:26+0100\n"
 "PO-Revision-Date: 2002-04-20 16:58GMT\n"
 "Last-Translator: Derk-Jan Hartman <thedj@users.sourceforge.net>\n"
 "Language-Team: Nederlands <nl@li.org>\n"
@@ -15,12 +16,12 @@ msgstr ""
 "X-Generator: KBabel 0.8\n"
 
 #. Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
-#: src/libvlc.c:256
+#: src/libvlc.c:253
 msgid "C"
 msgstr "nl"
 
 #. Usage
-#: src/libvlc.c:286 src/libvlc.c:1274
+#: src/libvlc.c:296 src/libvlc.c:1291
 #, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
@@ -29,27 +30,27 @@ msgstr ""
 "Gebruik: %s [opties] [parameters] ...\n"
 "\n"
 
-#: src/libvlc.c:1131 src/misc/configuration.c:916
+#: src/libvlc.c:1148 src/misc/configuration.c:916
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:1149 src/misc/configuration.c:901
+#: src/libvlc.c:1166 src/misc/configuration.c:901
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:1152 src/misc/configuration.c:908
+#: src/libvlc.c:1169 src/misc/configuration.c:908
 msgid "float"
 msgstr ""
 
-#: src/libvlc.c:1158
+#: src/libvlc.c:1175
 msgid " (default enabled)"
 msgstr "(standaard)"
 
-#: src/libvlc.c:1159
+#: src/libvlc.c:1176
 msgid " (default disabled)"
 msgstr "(niet standaard)"
 
-#: src/libvlc.c:1249 src/libvlc.c:1304 src/libvlc.c:1328
+#: src/libvlc.c:1266 src/libvlc.c:1321 src/libvlc.c:1345
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -57,11 +58,11 @@ msgstr ""
 "\n"
 "Druk op RETURN om verder te gaan...\n"
 
-#: src/libvlc.c:1277
+#: src/libvlc.c:1294
 msgid "[module]              [description]\n"
 msgstr "[module]              [beschrijving]\n"
 
-#: src/libvlc.c:1322
+#: src/libvlc.c:1339
 #, fuzzy
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
@@ -88,10 +89,10 @@ msgstr "interface module"
 
 #: src/libvlc.h:39
 msgid ""
-"This option allows you to select the interface used by vlc. The default "
+"This option allows you to select the interface used by VLC. The default "
 "behavior is to automatically select the best module available."
 msgstr ""
-"Via deze optie kan de interface die vlc gebruikt geselecteerd worden.\n"
+"Via deze optie kan de interface die VLC gebruikt geselecteerd worden.\n"
 "Noot: Standaard wordt automatisch de beste beschikbare methode gekozen."
 
 #: src/libvlc.h:43
@@ -100,7 +101,7 @@ msgstr "extra interface modules"
 
 #: src/libvlc.h:45
 msgid ""
-"This option allows you to select additional interfaces used by vlc. They "
+"This option allows you to select additional interfaces used by VLC. They "
 "will be launched in the background in addition to the default interface. Use "
 "a comma separated list of interface modules."
 msgstr ""
@@ -158,10 +159,10 @@ msgstr "plugin zoekpad"
 
 #: src/libvlc.h:70
 msgid ""
-"This option allows you to specify an additional path for vlc to look for its "
+"This option allows you to specify an additional path for VLC to look for its "
 "plugins."
 msgstr ""
-"Met deze optie kunt u een extra zoekpad aangeven, waar vlc plugins kan "
+"Met deze optie kunt u een extra zoekpad aangeven, waar VLC plugins kan "
 "vinden."
 
 #: src/libvlc.h:73
@@ -170,10 +171,10 @@ msgstr "audio output module"
 
 #: src/libvlc.h:75
 msgid ""
-"This option allows you to select the audio output method used by vlc. The "
+"This option allows you to select the audio output method used by VLC. The "
 "default behavior is to automatically select the best method available."
 msgstr ""
-"Deze optie selecteert de audio output methode, die gebruikt wordt door vlc. "
+"Deze optie selecteert de audio output methode, die gebruikt wordt door VLC. "
 "Standaard wordt automatisch de best beschikbare methode gekozen."
 
 #: src/libvlc.h:79
@@ -266,10 +267,10 @@ msgstr "video output module"
 
 #: src/libvlc.h:118
 msgid ""
-"This option allows you to select the video output method used by vlc. The "
+"This option allows you to select the video output method used by VLC. The "
 "default behavior is to automatically select the best method available."
 msgstr ""
-"Selecteer de video output methode die vlc gebruikt.\n"
+"Selecteer de video output methode die VLC gebruikt.\n"
 "Noot: Standaard wordt automatisch de best beschikbare methode gekozen."
 
 #: src/libvlc.h:122
@@ -303,10 +304,10 @@ msgstr "video breedte"
 
 #: src/libvlc.h:134
 msgid ""
-"You can enforce the video width here. By default vlc will adapt to the video "
+"You can enforce the video width here. By default VLC will adapt to the video "
 "characteristics."
 msgstr ""
-"Forceer de breedte van de video. Standaard probeert vlc zich aan de "
+"Forceer de breedte van de video. Standaard probeert VLC zich aan de "
 "karakteristieken van de video aan te passen."
 
 #: src/libvlc.h:137
@@ -315,10 +316,10 @@ msgstr "video hoogte"
 
 #: src/libvlc.h:139
 msgid ""
-"You can enforce the video height here. By default vlc will adapt to the "
+"You can enforce the video height here. By default VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"Forceer de hoogte van de video hier. Standaard zal vlc zich aan de "
+"Forceer de hoogte van de video hier. Standaard zal VLC zich aan de "
 "karakteristieken van de video aan te passen."
 
 #: src/libvlc.h:142
@@ -347,9 +348,9 @@ msgstr "volledig scherm"
 
 #: src/libvlc.h:153
 msgid ""
-"If this option is enabled, vlc will always start a video in fullscreen mode."
+"If this option is enabled, VLC will always start a video in fullscreen mode."
 msgstr ""
-"Als deze optie gebruikt wordt, dan zal vlc een video altijd op volledige "
+"Als deze optie gebruikt wordt, dan zal VLC een video altijd op volledige "
 "scherm grootte afspelen."
 
 #: src/libvlc.h:156
@@ -359,10 +360,10 @@ msgstr "overlay video uitvoer"
 
 #: src/libvlc.h:158
 msgid ""
-"If enabled, vlc will try to take advantage of the overlay capabilities of "
+"If enabled, VLC will try to take advantage of the overlay capabilities of "
 "your graphic card."
 msgstr ""
-"Standaard probeert vlc snelheidswinst te halen uit het gebruik van de "
+"Standaard probeert VLC snelheidswinst te halen uit het gebruik van de "
 "overlay mogelijkheden van de aanwezige grafische kaart."
 
 #: src/libvlc.h:161
@@ -592,15 +593,15 @@ msgstr "selecteer de voorkeurscodec"
 
 #: src/libvlc.h:267
 msgid ""
-"This allows you to select the order in which vlc will choose its codecs. For "
+"This allows you to select the order in which VLC will choose its codecs. For "
 "instance, 'a52old,a52,any' will try the old a52 codec before the new one. "
-"Please be aware that vlc does not make any difference between audio or video "
+"Please be aware that VLC does not make any difference between audio or video "
 "codecs, so you should always specify 'any' at the end of the list to make "
 "sure there is a fallback for the types you didn't specify."
 msgstr ""
-"Deze optie stelt de gebruiker in staat om de volgorde waarin vlc een codec "
-"kiest te beinvloeden. Bijvoorbeeld: 'a52old,a52,any' verteld vlc eerst de "
-"oude a52 codec te proberen voordat de nieuwe gekozen wordt. Let op: vlc "
+"Deze optie stelt de gebruiker in staat om de volgorde waarin VLC een codec "
+"kiest te beinvloeden. Bijvoorbeeld: 'a52old,a52,any' verteld VLC eerst de "
+"oude a52 codec te proberen voordat de nieuwe gekozen wordt. Let op: VLC "
 "maakt geen verschil tussen audio en video codecs, dus specificeer altijd "
 "'any' aan het einde van de lijst, zodat er een backup is voor de types die "
 "niet gespecificeerd zijn."
@@ -611,8 +612,8 @@ msgstr "selecteer de voorkeurscodec voor video"
 
 #: src/libvlc.h:276 src/libvlc.h:280
 msgid ""
-"This allows you to select the order in which vlc will choose its codecs. "
-msgstr "Stel de volgorde in waarin vlc zijn codecs zal kiezen. "
+"This allows you to select the order in which VLC will choose its codecs. "
+msgstr "Stel de volgorde in waarin VLC zijn codecs zal kiezen. "
 
 #: src/libvlc.h:278
 msgid "choose preferred audio encoder list"
@@ -664,8 +665,8 @@ msgstr "kies de voorkeurspacketizer"
 
 #: src/libvlc.h:307
 msgid ""
-"This allows you to select the order in which vlc will choose its packetizers."
-msgstr "Stel de volgorde in waarin vlc packetizers zal kiezen. "
+"This allows you to select the order in which VLC will choose its packetizers."
+msgstr "Stel de volgorde in waarin VLC packetizers zal kiezen. "
 
 #: src/libvlc.h:310
 msgid "mux module"
@@ -694,10 +695,10 @@ msgstr "schakel de CPU's MMX support in"
 
 #: src/libvlc.h:321
 msgid ""
-"If your processor supports the MMX instructions set, vlc can take advantage "
+"If your processor supports the MMX instructions set, VLC can take advantage "
 "of them."
 msgstr ""
-"Als de processor de MMX instructieset ondersteunt, dan kan vlc hier gebruik "
+"Als de processor de MMX instructieset ondersteunt, dan kan VLC hier gebruik "
 "van maken."
 
 #: src/libvlc.h:324
@@ -706,10 +707,10 @@ msgstr "schakel de CPU's 3D Now! support in"
 
 #: src/libvlc.h:326
 msgid ""
-"If your processor supports the 3D Now! instructions set, vlc can take "
+"If your processor supports the 3D Now! instructions set, VLC can take "
 "advantage of them."
 msgstr ""
-"Als de processor de 3D Now! instructieset ondersteunt, dan kan vlc hier "
+"Als de processor de 3D Now! instructieset ondersteunt, dan kan VLC hier "
 "gebruik van maken."
 
 #: src/libvlc.h:329
@@ -718,10 +719,10 @@ msgstr "schakel de CPU's MMX EXT support in"
 
 #: src/libvlc.h:331
 msgid ""
-"If your processor supports the MMX EXT instructions set, vlc can take "
+"If your processor supports the MMX EXT instructions set, VLC can take "
 "advantage of them."
 msgstr ""
-"Als de processor de MMX EXT instructieset ondersteunt, dan kan vlc hier "
+"Als de processor de MMX EXT instructieset ondersteunt, dan kan VLC hier "
 "gebruik van maken."
 
 #: src/libvlc.h:334
@@ -730,10 +731,10 @@ msgstr "schakel de CPU's SSE support in"
 
 #: src/libvlc.h:336
 msgid ""
-"If your processor supports the SSE instructions set, vlc can take advantage "
+"If your processor supports the SSE instructions set, VLC can take advantage "
 "of them."
 msgstr ""
-"Als de processor de SSE instructieset ondersteunt, dan kan vlc hier gebruik "
+"Als de processor de SSE instructieset ondersteunt, dan kan VLC hier gebruik "
 "van maken."
 
 #: src/libvlc.h:339
@@ -742,10 +743,10 @@ msgstr "schakel de CPU's AltiVec support in"
 
 #: src/libvlc.h:341
 msgid ""
-"If your processor supports the AltiVec instructions set, vlc can take "
+"If your processor supports the AltiVec instructions set, VLC can take "
 "advantage of them."
 msgstr ""
-"Als de processor de AltiVec instructieset ondersteunt, dan kan vlc hier "
+"Als de processor de AltiVec instructieset ondersteunt, dan kan VLC hier "
 "gebruik van maken."
 
 #: src/libvlc.h:344
@@ -754,7 +755,7 @@ msgstr "speel continue bestanden in willekeurige volgorde af"
 
 #: src/libvlc.h:346
 msgid ""
-"When selected, vlc will randomly play files in the playlist until "
+"When selected, VLC will randomly play files in the playlist until "
 "interrupted."
 msgstr ""
 "Speel in willekeurige volgorde bestanden uit de speellijst af, totdat "
@@ -765,8 +766,8 @@ msgid "launch playlist on startup"
 msgstr "start speellijst bij opstarten"
 
 #: src/libvlc.h:351
-msgid "If you want vlc to start playing on startup, then enable this option."
-msgstr "Na het starten zal vlc meteen de speelijst gaan afspelen."
+msgid "If you want VLC to start playing on startup, then enable this option."
+msgstr "Na het starten zal VLC meteen de speelijst gaan afspelen."
 
 #: src/libvlc.h:353
 #, fuzzy
@@ -775,10 +776,10 @@ msgstr "standaard in de speellijst plaatsen"
 
 #: src/libvlc.h:355
 msgid ""
-"If you want vlc to add items to the playlist as you open them, then enable "
+"If you want VLC to add items to the playlist as you open them, then enable "
 "this option."
 msgstr ""
-"Deze optie vertelt vlc de bestanden automatisch in de speellijst te zetten "
+"Deze optie vertelt VLC de bestanden automatisch in de speellijst te zetten "
 "wanneer ze geopend worden."
 
 #: src/libvlc.h:358
@@ -787,9 +788,9 @@ msgstr "begin opnieuw, na einde speellijst"
 
 #: src/libvlc.h:360
 msgid ""
-"If you want vlc to keep playing the playlist indefinitely then enable this "
+"If you want VLC to keep playing the playlist indefinitely then enable this "
 "option."
-msgstr "Schakel deze optie in als vlc oneindig de speellijst moet herhalen."
+msgstr "Schakel deze optie in als VLC oneindig de speellijst moet herhalen."
 
 #: src/libvlc.h:363
 msgid "memory copy module"
@@ -797,11 +798,11 @@ msgstr "geheugen kopieer module"
 
 #: src/libvlc.h:365
 msgid ""
-"You can select which memory copy module you want to use. By defaultvlc will "
+"You can select which memory copy module you want to use. By default VLC will "
 "select the fastest one supported by your hardware."
 msgstr ""
-"Selecteer een geheugen kopieer module die door vlc moet worden gebruikt. "
-"Standaard selecteert vlc de snelste versie die ondersteund wordt door de "
+"Selecteer een geheugen kopieer module die door VLC moet worden gebruikt. "
+"Standaard selecteert VLC de snelste versie die ondersteund wordt door de "
 "computer hardware."
 
 #: src/libvlc.h:368
@@ -852,7 +853,7 @@ msgid ""
 "be more robust. Currently you can choose between implementation 0 (which is "
 "the default and the fastest), 1 and 2."
 msgstr ""
-"Op Windows 9x/Me gebruikt vlc een snelle maar correcte implementatie van "
+"Op Windows 9x/Me gebruikt VLC een snelle maar correcte implementatie van "
 "conditionele variabelen (in theorie is er nog een mogelijkheid voor een race "
 "conditie). Echter het is mogelijk een tragere alternatief te gebruiken, De "
 "toegestane mogelijke implementaties zijn 0 (standaard waarde en de snelste "
@@ -899,7 +900,7 @@ msgstr "Audio"
 #. Video options
 #: src/libvlc.h:449 modules/gui/gtk/gnome_interface.c:1140
 #: modules/gui/gtk/gtk_interface.c:1337 modules/gui/macosx/intf.m:310
-#: modules/misc/dummy/dummy.c:64 modules/video_output/directx/directx.c:111
+#: modules/misc/dummy/dummy.c:64 modules/video_output/directx/directx.c:107
 msgid "Video"
 msgstr "Video"
 
@@ -2917,7 +2918,7 @@ msgid "Open Recent"
 msgstr "Open laatste"
 
 #. Recent Items Menu
-#: modules/gui/macosx/intf.m:280 modules/gui/macosx/intf.m:1420
+#: modules/gui/macosx/intf.m:280 modules/gui/macosx/intf.m:1419
 msgid "Clear Menu"
 msgstr "Maak menu leeg"
 
@@ -3032,6 +3033,11 @@ msgstr ""
 #: modules/gui/macosx/intf.m:1168
 msgid "Load from file.."
 msgstr "Gebruik bestand..."
+
+#: modules/gui/macosx/intf.m:1195
+#, c-format
+msgid "Language 0x%x"
+msgstr "Taal 0x%x"
 
 #: modules/gui/macosx/open.m:165
 msgid "Open Source"
@@ -3801,20 +3807,7 @@ msgstr ""
 "is dan het speciale video geheugen op de grafische kaart. De optie heeft "
 "geen effect als overlays gebruikt worden."
 
-#: modules/video_output/directx/directx.c:105
-msgid "specify an existing window"
-msgstr "specificeer een bestaand scherm"
-
-#: modules/video_output/directx/directx.c:107
-msgid ""
-"Specify a window to use instead of opening a new one. This option is "
-"DANGEROUS, use with care."
-msgstr ""
-"Specificeer een scherm om te gebruiken in plaats van telkens weer een nieuwe "
-"te openen. Deze optie is GEVAARLIJK, gebruik dit alleen met grote "
-"voorzichtigheid."
-
-#: modules/video_output/directx/directx.c:116
+#: modules/video_output/directx/directx.c:111
 msgid "DirectX video module"
 msgstr "DirectX video module"
 
@@ -3929,32 +3922,19 @@ msgid "SVGAlib module"
 msgstr "SVGAlib module"
 
 #: modules/video_output/x11/x11.c:57 modules/video_output/x11/xvideo.c:68
-msgid "X11 drawable"
-msgstr "X11 drawable"
-
-#: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
-msgid ""
-"Specify a X11 drawable to use instead of opening a new window. This option "
-"is DANGEROUS, use with care."
-msgstr ""
-"Specificeer een X11 tekenmethode om te gebruiken in plaats van het openen "
-"van een nieuw scherm. Voorzichtigheid is geboden bij het gebruiken van deze "
-"optie."
-
-#: modules/video_output/x11/x11.c:62 modules/video_output/x11/xvideo.c:73
 msgid "use shared memory"
 msgstr "gebruik gedeeld geheugen"
 
-#: modules/video_output/x11/x11.c:64 modules/video_output/x11/xvideo.c:75
+#: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
 msgid "Use shared memory to communicate between vlc and the X server."
 msgstr ""
 "Gebruik gedeeld geheugen voor het communiceren tussen vlc en de X server"
 
-#: modules/video_output/x11/x11.c:67
+#: modules/video_output/x11/x11.c:62
 msgid "X11"
 msgstr "X11"
 
-#: modules/video_output/x11/x11.c:74
+#: modules/video_output/x11/x11.c:68
 msgid "X11 module"
 msgstr "X11 module"
 
@@ -3985,11 +3965,11 @@ msgstr ""
 "Forceer de XVideo renderer om een specifiek chroma formaat te gebruiken in "
 "plaats van de snelste en meest efficiente te gebruiken."
 
-#: modules/video_output/x11/xvideo.c:78
+#: modules/video_output/x11/xvideo.c:73
 msgid "XVideo"
 msgstr "XVideo"
 
-#: modules/video_output/x11/xvideo.c:87
+#: modules/video_output/x11/xvideo.c:81
 msgid "XVideo extension module"
 msgstr "XVideo extensie module"
 
@@ -4039,6 +4019,28 @@ msgstr "XOSD module"
 #: modules/visualization/xosd/xosd.c:83
 msgid "xosd interface module"
 msgstr "xosd interface module"
+
+#~ msgid "specify an existing window"
+#~ msgstr "specificeer een bestaand scherm"
+
+#~ msgid ""
+#~ "Specify a window to use instead of opening a new one. This option is "
+#~ "DANGEROUS, use with care."
+#~ msgstr ""
+#~ "Specificeer een scherm om te gebruiken in plaats van telkens weer een "
+#~ "nieuwe te openen. Deze optie is GEVAARLIJK, gebruik dit alleen met grote "
+#~ "voorzichtigheid."
+
+#~ msgid "X11 drawable"
+#~ msgstr "X11 drawable"
+
+#~ msgid ""
+#~ "Specify a X11 drawable to use instead of opening a new window. This "
+#~ "option is DANGEROUS, use with care."
+#~ msgstr ""
+#~ "Specificeer een X11 tekenmethode om te gebruiken in plaats van het openen "
+#~ "van een nieuw scherm. Voorzichtigheid is geboden bij het gebruiken van "
+#~ "deze optie."
 
 #~ msgid "A_udio"
 #~ msgstr "A_udio"
