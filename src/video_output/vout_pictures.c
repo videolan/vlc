@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.24 2002/05/20 19:02:22 sam Exp $
+ * $Id: vout_pictures.c,v 1.25 2002/05/20 19:34:58 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -489,9 +489,10 @@ void vout_AllocatePicture( picture_t *p_pic,
             p_pic->p->i_pitch = i_width * 2;
             p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
             p_pic->p->i_pixel_bytes = 2;
+/* FIXME: p_heap isn't always reachable
             p_pic->p_heap->i_rmask = 0x001f;
             p_pic->p_heap->i_gmask = 0x03e0;
-            p_pic->p_heap->i_bmask = 0x7c00;
+            p_pic->p_heap->i_bmask = 0x7c00; */
             p_pic->i_planes = 1;
             break;
 
@@ -500,9 +501,10 @@ void vout_AllocatePicture( picture_t *p_pic,
             p_pic->p->i_pitch = i_width * 2;
             p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
             p_pic->p->i_pixel_bytes = 2;
+/* FIXME: p_heap isn't always reachable
             p_pic->p_heap->i_rmask = 0x001f;
             p_pic->p_heap->i_gmask = 0x07e0;
-            p_pic->p_heap->i_bmask = 0xf800;
+            p_pic->p_heap->i_bmask = 0xf800; */
             p_pic->i_planes = 1;
             break;
 
@@ -511,9 +513,10 @@ void vout_AllocatePicture( picture_t *p_pic,
             p_pic->p->i_pitch = i_width * 4;
             p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
             p_pic->p->i_pixel_bytes = 4;
+/* FIXME: p_heap isn't always reachable
             p_pic->p_heap->i_rmask = 0xff0000;
             p_pic->p_heap->i_gmask = 0x00ff00;
-            p_pic->p_heap->i_bmask = 0x0000ff;
+            p_pic->p_heap->i_bmask = 0x0000ff; */
             p_pic->i_planes = 1;
             break;
 
