@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.106 2003/05/05 22:23:42 gbazin Exp $
+ * $Id: input_programs.c,v 1.107 2003/05/05 22:48:23 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -56,7 +56,7 @@ static int ESCallback( vlc_object_t *, char const *,
  *****************************************************************************/
 int input_InitStream( input_thread_t * p_input, size_t i_data_len )
 {
-    vlc_value_t text;
+    vlc_value_t val, text;
 
     p_input->stream.i_stream_id = 0;
 
@@ -107,6 +107,11 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     var_Create( p_input, "spu-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Subtitle track");
     var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text, NULL );
+
+    val.i_int = -1; text.psz_string = _("Disable");
+    var_Change( p_input, "video-es", VLC_VAR_ADDCHOICE, &val, &text );
+    var_Change( p_input, "audio-es", VLC_VAR_ADDCHOICE, &val, &text );
+    var_Change( p_input, "spu-es", VLC_VAR_ADDCHOICE, &val, &text );
 
     var_AddCallback( p_input, "program", ProgramCallback, NULL );
     var_AddCallback( p_input, "title", TitleCallback, NULL );
