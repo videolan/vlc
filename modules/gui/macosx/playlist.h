@@ -74,5 +74,7 @@
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 
+- (playlist_item_t *)selectedPlaylistItem;
+
 @end
 

@@ -41,16 +41,9 @@
 
     if( self != nil )
     {
-        i_item = -1;
-        o_selected = NULL;
+        p_item = NULL;
     }
     return( self );
-}
-
-- (void)dealloc
-{
-    [o_selected release];
-    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -73,9 +66,7 @@
     }
     else
     {
-        i_item = [[[VLCMain sharedInstance] getPlaylist] selectedPlaylistItem];
-        o_selected = [[[VLCMain sharedInstance] getPlaylist] selectedPlaylistItemsList];
-        [o_selected retain];
+        p_item = [[[VLCMain sharedInstance] getPlaylist] selectedPlaylistItem];
         [self initPanel:sender];
     }
 }
@@ -94,10 +85,7 @@
 
         if (p_playlist)
         {
-            i_item = p_playlist->i_index;
-            o_selected = [NSMutableArray arrayWithObject:
-                            [NSNumber numberWithInt:i_item]];
-            [o_selected retain];
+            p_item = p_playlist->status.p_item;
             vlc_object_release(p_playlist);
         }
         [self initPanel:sender];
@@ -106,43 +94,41 @@
 
 - (void)initPanel:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist;
-
-    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
+    char *psz_temp;
+    vlc_mutex_lock(&p_item->input.lock);
 
 
-    if( p_playlist )
+    /*fill uri / title / author info */
+    if (p_item->input.psz_uri)
     {
-        char *psz_temp;
-
-        /*fill uri / title / author info */
         [o_uri_txt setStringValue:
-            ([NSString stringWithUTF8String:p_playlist->
-               pp_items[i_item]->input.psz_uri] == nil ) ?
-            [NSString stringWithCString:p_playlist->
-                pp_items[i_item]->input.psz_uri] :
-            [NSString stringWithUTF8String:p_playlist->
-                pp_items[i_item]->input.psz_uri]];
-
-        [o_title_txt setStringValue:
-            ([NSString stringWithUTF8String:p_playlist->
-                pp_items[i_item]->input.psz_name] == nil ) ?
-            [NSString stringWithCString:p_playlist->
-                pp_items[i_item]->input.psz_name] :
-            [NSString stringWithUTF8String:p_playlist->
-                pp_items[i_item]->input.psz_name]];
-
-        psz_temp = playlist_GetInfo( p_playlist, i_item ,_("General"),_("Author") );
-        [o_author_txt setStringValue: [NSString stringWithUTF8String: psz_temp]];
-        free( psz_temp );
-
-        [[VLCInfoTreeItem rootItem] refresh];
-        [o_outline_view reloadData];
-
-        vlc_object_release( p_playlist );
+            ([NSString stringWithUTF8String:p_item->input.psz_uri] == nil ) ?
+            [NSString stringWithCString:p_item->input.psz_uri] :
+            [NSString stringWithUTF8String:p_item->input.psz_uri]];
     }
+
+    if (p_item->input.psz_name)
+    {
+        [o_title_txt setStringValue:
+            ([NSString stringWithUTF8String:p_item->input.psz_name] == nil ) ?
+            [NSString stringWithCString:p_item->input.psz_name] :
+            [NSString stringWithUTF8String:p_item->input.psz_name]];
+    }
+
+    psz_temp = playlist_ItemGetInfo( p_item ,_("General"),_("Author") );
+
+    if (psz_temp)
+    {
+        [o_author_txt setStringValue: [NSString stringWithUTF8String: psz_temp]];
+    }
+
+    free( psz_temp );
+
+    vlc_mutex_unlock(&p_item->input.lock);
+
+    [[VLCInfoTreeItem rootItem] refresh];
+    [o_outline_view reloadData];
+
     [o_info_window makeKeyAndOrderFront: sender];
 }
 
@@ -154,34 +140,54 @@
 
 - (IBAction)infoOk:(id)sender
 {
-    int c;
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
     vlc_value_t val;
 
-    if (p_playlist)
+    if ([self isItemInPlaylist: p_item])
     {
-        vlc_mutex_lock(&p_playlist->pp_items[i_item]->input.lock);
+        vlc_mutex_lock(&p_item->input.lock);
 
-        p_playlist->pp_items[i_item]->input.psz_uri =
-            strdup([[o_uri_txt stringValue] cString]);
-        p_playlist->pp_items[i_item]->input.psz_name =
-            strdup([[o_title_txt stringValue] cString]);
-        playlist_ItemAddInfo(p_playlist->pp_items[i_item],_("General"),_("Author"), [[o_author_txt stringValue] cString]);
+        p_item->input.psz_uri = strdup([[o_uri_txt stringValue] cString]);
+        p_item->input.psz_name = strdup([[o_title_txt stringValue] cString]);
+        playlist_ItemAddInfo(p_item,_("General"),_("Author"), [[o_author_txt stringValue] cString]);
 
-        c = (int)[o_selected count];
-        vlc_mutex_unlock(&p_playlist->pp_items[i_item]->input.lock);
+        vlc_mutex_unlock(&p_item->input.lock);
         val.b_bool = VLC_TRUE;
         var_Set( p_playlist,"intf-change",val );
-        vlc_object_release ( p_playlist );
     }
+
     [o_info_window orderOut: self];
 }
 
-- (int)getItem
+- (playlist_item_t *)getItem
 {
-    return i_item;
+    return p_item;
+}
+
+- (bool)isItemInPlaylist:(playlist_item_t *)p_local_item
+{
+    intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    int i;
+
+    if (p_playlist == NULL)
+    {
+        return NO;
+    }
+
+    for (i = 0 ; i < p_playlist->i_size ; i++)
+    {
+        if (p_playlist->pp_items[i] == p_local_item)
+        {
+            vlc_object_release(p_playlist);
+            return YES;
+        }
+    }
+    vlc_object_release(p_playlist);
+    return NO;
 }
 
 @end
@@ -257,7 +263,7 @@ static VLCInfoTreeItem *o_root_item = nil;
         o_value = [o_item_value copy];
         i_object_id = i_id;
         o_parent = o_parent_item;
-        i_item = [[[VLCMain sharedInstance] getInfo] getItem];
+        p_item = [[[VLCMain sharedInstance] getInfo] getItem];
     }
     return( self );
 }
@@ -280,56 +286,50 @@ static VLCInfoTreeItem *o_root_item = nil;
 {
     if (o_children == NULL)
     {
-        intf_thread_t * p_intf = VLCIntf;
-        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
         int i;
 
-        if (p_playlist)
+        if ([[[VLCMain sharedInstance] getInfo] isItemInPlaylist: p_item])
         {
-            if (i_item > -1)
+            if (self == o_root_item)
             {
-                if (self == o_root_item)
+                vlc_mutex_lock(&p_item->input.lock);
+                o_children = [[NSMutableArray alloc] initWithCapacity:
+                                                p_item->input.i_categories];
+                for (i = 0 ; i<p_item->input.i_categories ; i++)
                 {
-                    o_children = [[NSMutableArray alloc] initWithCapacity:p_playlist->pp_items[i_item]->input.i_categories];
-                    for (i = 0 ; i<p_playlist->pp_items[i_item]->input.i_categories ; i++)
-                    {
-                        [o_children addObject:[[VLCInfoTreeItem alloc]
-                            initWithName: [NSString stringWithUTF8String:
-                                p_playlist->pp_items[i_item]->input.
-                                pp_categories[i]->psz_name]
-                            value: @""
-                            ID: i
-                            parent: self]];
-                    }
-                }
-                else if (o_parent == o_root_item)
-                {
-                    o_children = [[NSMutableArray alloc] initWithCapacity:
-                        p_playlist->pp_items[i_item]->input.
-                        pp_categories[i_object_id]->i_infos];
-                    for (i = 0 ; i<p_playlist->pp_items[i_item]->input.
-                           pp_categories[i_object_id]->i_infos ; i++)
-                    {
-                        [o_children addObject:[[VLCInfoTreeItem alloc]
+                    [o_children addObject:[[VLCInfoTreeItem alloc]
                         initWithName: [NSString stringWithUTF8String:
-                                p_playlist->pp_items[i_item]->input.
-                                pp_categories[i_object_id]->
-                                pp_infos[i]->psz_name]
-                            value: [NSString stringWithUTF8String:
-                                p_playlist->pp_items[i_item]->input.
-                                pp_categories[i_object_id]->
-                                pp_infos[i]->psz_value]
-                            ID: i
-                            parent: self]];
-                    }
+                            p_item->input.pp_categories[i]->psz_name]
+                        value: @""
+                        ID: i
+                        parent: self]];
                 }
-                else
-                {
-                    o_children = IsALeafNode;
-                }
+                vlc_mutex_unlock(&p_item->input.lock);
             }
-            vlc_object_release(p_playlist);
+            else if (o_parent == o_root_item)
+            {
+                vlc_mutex_lock(&p_item->input.lock);
+                o_children = [[NSMutableArray alloc] initWithCapacity:
+                    p_item->input.pp_categories[i_object_id]->i_infos];
+                for (i = 0 ; i<p_item->input.pp_categories[i_object_id]
+                                                                ->i_infos ; i++)
+                {
+                    [o_children addObject:[[VLCInfoTreeItem alloc]
+                    initWithName: [NSString stringWithUTF8String:
+                            p_item->input.pp_categories[i_object_id]->
+                            pp_infos[i]->psz_name]
+                        value: [NSString stringWithUTF8String:
+                            p_item->input.pp_categories[i_object_id]->
+                            pp_infos[i]->psz_value]
+                        ID: i
+                        parent: self]];
+                }
+                vlc_mutex_unlock(&p_item->input.lock);
+            }
+            else
+            {
+                o_children = IsALeafNode;
+            }
         }
     }
     return o_children;
@@ -361,7 +361,7 @@ static VLCInfoTreeItem *o_root_item = nil;
 */
 - (void)refresh
 {
-    i_item = [[[VLCMain sharedInstance] getInfo] getItem];
+    p_item = [[[VLCMain sharedInstance] getInfo] getItem];
     if (o_children != NULL)
     {
         [o_children release];

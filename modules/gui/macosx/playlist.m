@@ -593,6 +593,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     return( o_ctx_menu );
 }
 
+- (playlist_item_t *)selectedPlaylistItem
+{
+    return [[o_outline_view itemAtRow: [o_outline_view selectedRow]]
+                                                                pointerValue];
+}
+
 @end
 
 @implementation VLCPlaylist (NSOutlineViewDataSource)

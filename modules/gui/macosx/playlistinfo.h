@@ -41,8 +41,7 @@
     IBOutlet id o_btn_add_group;
     IBOutlet id o_outline_view;
 
-    int i_item;
-    NSMutableArray * o_selected;
+    playlist_item_t * p_item;
 }
 
 - (IBAction)togglePlaylistInfoPanel:(id)sender;
@@ -50,7 +49,8 @@
 - (void)initPanel:(id)sender;
 - (IBAction)infoCancel:(id)sender;
 - (IBAction)infoOk:(id)sender;
-- (int)getItem;
+- (playlist_item_t *)getItem;
+- (bool)isItemInPlaylist:(playlist_item_t *)p_item;
 
 @end
 
@@ -59,7 +59,7 @@
     NSString *o_name;
     NSString *o_value;
     int i_object_id;
-    int i_item;
+    playlist_item_t * p_item;
     VLCInfoTreeItem *o_parent;
     NSMutableArray *o_children;
 }
