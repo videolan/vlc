@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.17 2003/04/17 14:00:44 anil Exp $
+ * $Id: wxwindows.h,v 1.18 2003/04/21 16:55:53 anil Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -413,6 +413,7 @@ private:
     intf_thread_t *p_intf;
     wxTreeCtrl *fileinfo_tree;
     wxTreeItemId fileinfo_root;
+    wxString fileinfo_root_label;
 
 };
 

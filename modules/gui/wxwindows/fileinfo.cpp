@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.9 2003/04/21 00:54:26 ipkiss Exp $
+ * $Id: fileinfo.cpp,v 1.10 2003/04/21 16:55:53 anil Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -92,6 +92,8 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
         new wxTreeCtrl( panel, -1, wxDefaultPosition, wxSize( 350, 350 ),
                         wxTR_HAS_BUTTONS | wxTR_HIDE_ROOT | wxSUNKEN_BORDER );
 
+    fileinfo_root_label = "";
+
     /* Create the OK button */
     wxButton *ok_button = new wxButton( panel, wxID_OK, _("OK") );
     ok_button->SetDefault();
@@ -121,17 +123,21 @@ void FileInfo::UpdateFileInfo()
     {
         if( fileinfo_root )
         {
-            fileinfo_tree->SetItemText ( fileinfo_root , "" );
+            fileinfo_tree->SetItemText ( fileinfo_root , "");
+            fileinfo_root_label = "";
             fileinfo_tree->DeleteChildren ( fileinfo_root );
         }
         return;
     }
 
+    wxString inputinfo = p_input->psz_name;
+
     if( !fileinfo_root )
     {
         fileinfo_root = fileinfo_tree->AddRoot( p_input->psz_name );
+        fileinfo_root_label = p_input->psz_name;
     }
-    else if( fileinfo_tree->GetItemText( fileinfo_root ) == p_input->psz_name )
+    else if( fileinfo_root_label == inputinfo )
     {
         return;
     }
@@ -141,6 +147,8 @@ void FileInfo::UpdateFileInfo()
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     fileinfo_tree->SetItemText( fileinfo_root , p_input->psz_name );
+    fileinfo_root_label = p_input->psz_name;
+
     input_info_category_t *p_cat = p_input->stream.p_info;
 
     while ( p_cat )
