@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.26 2003/08/27 11:53:26 gbazin Exp $
+ * $Id: preferences.cpp,v 1.27 2003/09/21 17:52:43 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -65,6 +65,8 @@ public:
 private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnSelectTreeItem( wxTreeEvent& event );
+    void OnAdvanced( wxCommandEvent& event );
+
     ConfigTreeData *FindModuleConfig( ConfigTreeData *config_data );
 
     DECLARE_EVENT_TABLE()
@@ -73,6 +75,7 @@ private:
     PrefsDialog *p_prefs_dialog;
     wxBoxSizer *p_sizer;
     wxWindow *p_parent;
+    vlc_bool_t b_advanced;
 
     wxTreeItemId root_item;
     wxTreeItemId plugins_item;
@@ -115,11 +118,9 @@ public:
     virtual ~PrefsPanel() {}
 
     void ApplyChanges();
+    void SwitchAdvanced( vlc_bool_t );
 
 private:
-    void OnAdvanced( wxCommandEvent& WXUNUSED(event) );
-    DECLARE_EVENT_TABLE()
-
     intf_thread_t *p_intf;
     PrefsDialog *p_prefs_dialog;
 
@@ -181,6 +182,7 @@ BEGIN_EVENT_TABLE(PrefsDialog, wxFrame)
     EVT_BUTTON(wxID_CANCEL, PrefsDialog::OnCancel)
     EVT_BUTTON(wxID_SAVE, PrefsDialog::OnSave)
     EVT_BUTTON(ResetAll_Event, PrefsDialog::OnResetAll)
+    EVT_CHECKBOX(Advanced_Event, PrefsDialog::OnAdvanced)
 
     /* Don't destroy the window when the user closes it */
     EVT_CLOSE(PrefsDialog::OnCancel)
@@ -194,12 +196,7 @@ enum
 
 BEGIN_EVENT_TABLE(PrefsTreeCtrl, wxTreeCtrl)
     EVT_TREE_SEL_CHANGED(PrefsTree_Ctrl, PrefsTreeCtrl::OnSelectTreeItem)
-END_EVENT_TABLE()
-
-BEGIN_EVENT_TABLE(PrefsPanel, wxPanel)
-    /* Button events */
-    EVT_CHECKBOX(Advanced_Event, PrefsPanel::OnAdvanced)
-
+    EVT_COMMAND(Advanced_Event, wxEVT_USER_FIRST, PrefsTreeCtrl::OnAdvanced)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(ConfigEvtHandler, wxEvtHandler)
@@ -241,12 +238,27 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, wxWindow *p_parent)
     wxButton *reset_button = new wxButton( panel, ResetAll_Event,
                                            wxU(_("Reset All")) );
 
+    wxPanel *dummy_panel = new wxPanel( this, -1 );
+    wxCheckBox *advanced_checkbox =
+        new wxCheckBox( panel, Advanced_Event, wxU(_("Advanced options")) );
+
+    if( config_GetInt( p_intf, "advanced" ) )
+    {
+        advanced_checkbox->SetValue(TRUE);
+        wxCommandEvent dummy_event;
+        dummy_event.SetInt(TRUE);
+        OnAdvanced( dummy_event );
+    }
+
     /* Place everything in sizers */
     wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
     button_sizer->Add( ok_button, 0, wxALL, 5 );
     button_sizer->Add( cancel_button, 0, wxALL, 5 );
     button_sizer->Add( save_button, 0, wxALL, 5 );
     button_sizer->Add( reset_button, 0, wxALL, 5 );
+    button_sizer->Add( dummy_panel, 1, wxALL, 5 );
+    button_sizer->Add( advanced_checkbox, 0, wxALL | wxALIGN_RIGHT |
+                       wxALIGN_CENTER_VERTICAL, 0 );
     button_sizer->Layout();
 
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
@@ -254,7 +266,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, wxWindow *p_parent)
     panel_sizer->Add( controls_sizer, 1, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( button_sizer, 0, wxALIGN_LEFT | wxALIGN_BOTTOM |
-                      wxALL, 5 );
+                      wxALL | wxEXPAND, 5 );
     panel_sizer->Layout();
     panel->SetSizer( panel_sizer );
     main_sizer->Add( panel, 1, wxEXPAND, 0 );
@@ -309,6 +321,14 @@ void PrefsDialog::OnResetAll( wxCommandEvent& WXUNUSED(event) )
     }
 }
 
+void PrefsDialog::OnAdvanced( wxCommandEvent& event )
+{
+    wxCommandEvent newevent( wxEVT_USER_FIRST, Advanced_Event );
+    newevent.SetInt( event.GetInt() );
+
+    prefs_tree->AddPendingEvent( newevent );
+}
+
 /*****************************************************************************
  * PrefsTreeCtrl class definition.
  *****************************************************************************/
@@ -330,6 +350,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     p_prefs_dialog = _p_prefs_dialog;
     p_sizer = _p_sizer;
     p_parent = _p_parent;
+    b_advanced = VLC_FALSE;
 
     root_item = AddRoot( wxT("") );
 
@@ -633,14 +654,35 @@ void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
                 new PrefsPanel( p_parent, p_intf, p_prefs_dialog,
                                 config_data->i_object_id,
                                 config_data->psz_section );
+            config_data->panel->SwitchAdvanced( b_advanced );
         }
         else
         {
+            config_data->panel->SwitchAdvanced( b_advanced );
             config_data->panel->Show();
         }
 
         p_sizer->Add( config_data->panel, 2, wxEXPAND | wxALL, 0 );
         p_sizer->Layout();
+    }
+}
+
+void PrefsTreeCtrl::OnAdvanced( wxCommandEvent& event )
+{
+    b_advanced = event.GetInt();
+
+    ConfigTreeData *config_data = !GetSelection() ? NULL :
+        FindModuleConfig( (ConfigTreeData *)GetItemData( GetSelection() ) );
+    if( config_data  )
+    {
+        config_data->panel->Hide();
+        p_sizer->Remove( config_data->panel );
+    }
+
+    if( GetSelection() )
+    {
+        wxTreeEvent event;
+        OnSelectTreeItem( event );
     }
 }
 
@@ -663,8 +705,6 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     wxTextCtrl *textctrl;
     wxButton *button;
     wxArrayString array;
-
-    vlc_bool_t b_has_advanced = VLC_FALSE;
 
     /* Initializations */
     p_intf = _p_intf;
@@ -712,7 +752,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                               p_module->psz_longname) );
 
     box_sizer->Add( label, 1, wxALL, 5 );
-    sizer->Add( box_sizer, 0, wxEXPAND | wxALL, 5 );
+    sizer->Add( box_sizer, 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
 
     /* Now put all the config options into a scrolled window */
     config_sizer = new wxBoxSizer( wxVERTICAL );
@@ -769,7 +809,6 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             config_data->control.combobox = combo;
             panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
             panel_sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-            if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
             break;
 
         case CONFIG_ITEM_STRING:
@@ -816,7 +855,6 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                 panel_sizer->Add( button, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
                 button->SetClientData((void *)config_data);
             }
-            if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
             break;
 
         case CONFIG_ITEM_INTEGER:
@@ -832,8 +870,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             panel_sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
 
             spin->SetClientData((void *)config_data);
-            if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
             break;
+
         case CONFIG_ITEM_KEY:
         {
             label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
@@ -843,20 +881,24 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             ctrl->SetValue( p_item->i_value & KEY_MODIFIER_CTRL );
             wxCheckBox *shift = new wxCheckBox( panel, -1, wxU(_("Shift")) );
             shift->SetValue( p_item->i_value & KEY_MODIFIER_SHIFT );
-            combo = new wxComboBox( panel, -1, wxU("f"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY | wxCB_SORT );            
+            combo = new wxComboBox( panel, -1, wxU("f"), wxDefaultPosition,
+                wxDefaultSize, 0, NULL, wxCB_READONLY | wxCB_SORT );
             for( int i = 0; i < sizeof(keys)/sizeof(key_descriptor_s); i++ )
             {
-                combo->Append( wxU(_(keys[i].psz_key_string)), (void*)&keys[i].i_key_code );
+                combo->Append( wxU(_(keys[i].psz_key_string)),
+                               (void*)&keys[i].i_key_code );
             }
-            combo->SetValue( wxU( KeyToString( p_item->i_value&~KEY_MODIFIER )));
+            combo->SetValue( wxU( KeyToString( p_item->i_value &
+                                               ~KEY_MODIFIER ) ) );
             config_data->control.combobox = combo;
             panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
             panel_sizer->Add( alt, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
             panel_sizer->Add( ctrl, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
             panel_sizer->Add( shift, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
             panel_sizer->Add( combo, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-        }
             break;
+        }
+
         case CONFIG_ITEM_FLOAT:
             label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
             textctrl = new wxTextCtrl( panel, -1,
@@ -867,7 +909,6 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             config_data->control.textctrl = textctrl;
             panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
             panel_sizer->Add( textctrl, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
-            if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
             break;
 
         case CONFIG_ITEM_BOOL:
@@ -876,7 +917,6 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             checkbox->SetToolTip( wxU(p_item->psz_longtext) );
             config_data->control.checkbox = checkbox;
             panel_sizer->Add( checkbox, 0, wxALL, 5 );
-            if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
             break;
 
         default:
@@ -899,36 +939,13 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     }
     while( p_item->i_type != CONFIG_HINT_END && p_item++ );
 
-    /* Display a nice message if no configuration options are available */
-    if( !config_array.GetCount() )
-    {
-        config_sizer->Add( new wxStaticText( config_window, -1,
-                           wxU(_("No configuration options available")) ), 1,
-                           wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER, 2 );
-    }
-
     config_sizer->Layout();
     config_window->SetSizer( config_sizer );
-    sizer->Add( config_window, 1, wxEXPAND | wxALL, 5 );
+    sizer->Add( config_window, 1, wxEXPAND | wxLEFT | wxRIGHT, 5 );
 
     /* Intercept all menu events in our custom event handler */
     config_window->PushEventHandler(
         new ConfigEvtHandler( p_intf, p_prefs_dialog ) );
-
-    /* Update panel */
-    wxCommandEvent dummy_event;
-    b_advanced = !config_GetInt( p_intf, "advanced" );
-    OnAdvanced( dummy_event );
-
-    /* Create advanced checkbox if needed */
-    if( config_array.GetCount() && b_has_advanced )
-    {
-        wxCheckBox *advanced_checkbox =
-           new wxCheckBox( this, Advanced_Event, wxU(_("Advanced options")) );
-
-        if( b_advanced ) advanced_checkbox->SetValue(TRUE);
-        sizer->Add( advanced_checkbox, 0, wxALL|wxALIGN_RIGHT, 0 );
-    }
 
     sizer->Layout();
     SetSizer( sizer );
@@ -978,9 +995,11 @@ void PrefsPanel::ApplyChanges()
     }
 }
 
-void PrefsPanel::OnAdvanced( wxCommandEvent& WXUNUSED(event) )
+void PrefsPanel::SwitchAdvanced( vlc_bool_t b_new_advanced )
 {
-    b_advanced = !b_advanced;
+    if( b_advanced == b_new_advanced ) return;
+
+    b_advanced = b_new_advanced;
 
     for( size_t i = 0; i < config_array.GetCount(); i++ )
     {
