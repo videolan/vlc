@@ -2,7 +2,7 @@
 # src/packages.mak : Archives locations
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN   
-# $Id: packages.mak,v 1.6 2003/12/16 23:01:41 massiot Exp $
+# $Id: packages.mak,v 1.7 2004/01/05 14:50:42 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -41,6 +41,7 @@ FRIBIDI_VERSION=0.10.4
 FRIBIDI_URL=$(SF)/fribidi/fribidi-$(FRIBIDI_VERSION).tar.gz
 A52DEC_VERSION=0.7.4
 A52DEC_URL=http://liba52.sourceforge.net/files/a52dec-$(A52DEC_VERSION).tar.gz
+MPEG2DEC_VERSION=0.4.0
 MPEG2DEC_CVSROOT=:pserver:anonymous@cvs.libmpeg2.sourceforge.net:/cvsroot/libmpeg2
 MPEG2DEC_SNAPSHOT=http://libmpeg2.sourceforge.net/files/mpeg2dec-snapshot.tar.gz
 LIBID3TAG_VERSION=0.15.0b

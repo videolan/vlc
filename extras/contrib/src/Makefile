@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.9 2003/12/16 23:01:41 massiot Exp $
+# $Id: Makefile,v 1.10 2004/01/05 14:50:42 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -261,11 +261,11 @@ DISTCLEAN_PKG += a52dec-$(A52DEC_VERSION).tar.gz
 #	(cd $@; ./bootstrap)
 
 # It is easier to use bootstrapped versions...
-mpeg2dec-0.3.2-cvs.tar.gz:
+mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
 	$(WGET) $(MPEG2DEC_SNAPSHOT)
 	mv mpeg2dec-snapshot.tar.gz $@
 
-mpeg2dec: mpeg2dec-0.3.2-cvs.tar.gz
+mpeg2dec: mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .mpeg2: mpeg2dec
@@ -274,7 +274,7 @@ mpeg2dec: mpeg2dec-0.3.2-cvs.tar.gz
 
 CLEAN_FILE += .mpeg2
 CLEAN_PKG += mpeg2dec
-DISTCLEAN_PKG += mpeg2dec-0.3.2-cvs.tar.gz
+DISTCLEAN_PKG += mpeg2dec-$(MPEG2_DEC_VERSION).tar.gz
 
 # ***************************************************************************
 # libid3tag
