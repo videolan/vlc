@@ -417,7 +417,6 @@
 - (void)updateTitle
 {
     NSMutableString * o_title,* o_mrl;
-    vlc_bool_t b_file = VLC_FALSE;
     input_thread_t * p_input;
     
     if( p_vout == NULL )
@@ -433,8 +432,6 @@
         return;
     }
 
-    if( ! strcmp( p_input->input.p_access->p_module->psz_shortname, "File" ) )
-        b_file = VLC_TRUE;
     if( p_input->input.p_item->psz_name != NULL )
         o_title = [NSMutableString stringWithUTF8String:
             p_input->input.p_item->psz_name];
@@ -447,7 +444,7 @@
     vlc_object_release( p_input );
     if( o_mrl != nil )
     {
-        if( b_file == VLC_TRUE )
+        if( p_input->input.p_access && !strcmp( p_input->input.p_access->p_module->psz_shortname, "File" ) )
         {
             NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
             if( prefix_range.location != NSNotFound )
