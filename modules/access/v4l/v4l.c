@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.23 2003/08/30 11:59:44 gbazin Exp $
+ * $Id: v4l.c,v 1.24 2003/09/07 22:49:05 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -1399,6 +1399,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     }
 
     p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
     return VLC_SUCCESS;
 }
 

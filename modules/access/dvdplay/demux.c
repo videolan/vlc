@@ -2,7 +2,7 @@
  * demux.c: demux functions for dvdplay.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: demux.c,v 1.6 2003/02/07 00:29:53 sam Exp $
+ * $Id: demux.c,v 1.7 2003/09/07 22:49:05 fenrir Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -102,6 +102,7 @@ int E_(InitDVD) ( vlc_object_t *p_this )
     p_input->p_demux_data->p_dvd = p_dvd;
 
     p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
     p_input->pf_rewind = NULL;
 
     p_dvd->p_intf = intf_Create( p_input, "dvdplay" );

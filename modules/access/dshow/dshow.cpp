@@ -2,7 +2,7 @@
  * dshow.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.7 2003/08/31 22:06:17 gbazin Exp $
+ * $Id: dshow.cpp,v 1.8 2003/09/07 22:49:05 fenrir Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1123,6 +1123,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     }
 
     p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
     return VLC_SUCCESS;
 }
 

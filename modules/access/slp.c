@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.14 2003/08/10 12:45:52 zorglub Exp $
+ * $Id: slp.c,v 1.15 2003/09/07 22:49:05 fenrir Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -415,6 +415,7 @@ static int Init ( vlc_object_t *p_this )
     }
 
     p_input->pf_demux  = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
     p_input->pf_rewind = NULL;
 
     return VLC_SUCCESS;

@@ -2,7 +2,7 @@
  * cdda.c : CD digital audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: cdda.c,v 1.5 2003/06/17 20:03:50 hartman Exp $
+ * $Id: cdda.c,v 1.6 2003/09/07 22:49:05 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -401,6 +401,7 @@ static int  CDDAOpenDemux    ( vlc_object_t * p_this)
     p_demux->p_es = NULL;
 
     p_input->pf_demux  = CDDADemux;
+    p_input->pf_demux_control = demux_vaControlDefault;
     p_input->pf_rewind = NULL;
     p_input->p_demux_data = p_demux;
 

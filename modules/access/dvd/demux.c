@@ -1,7 +1,7 @@
 /* demux.c: DVD demux functions.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: demux.c,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: demux.c,v 1.3 2003/09/07 22:49:05 fenrir Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -93,6 +93,7 @@ int E_(DVDInit) ( vlc_object_t *p_this )
     }
 
     p_input->pf_demux = DVDDemux;
+    p_input->pf_demux_control = demux_vaControlDefault;
     p_input->pf_rewind = NULL;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
