@@ -152,6 +152,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_delete setTitle: _NS("Delete")];
     [o_mi_selectall setTitle: _NS("Select All")];
     [o_mi_info setTitle: _NS("Properties")];
+    [o_mi_sort_name setTitle: _NS("Sort Node by Name")];
+    [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
@@ -316,6 +318,65 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         }
         [self playlistUpdated];
     }
+}
+
+- (IBAction)sortNodeByName:(id)sender
+{
+    [self sortNode: SORT_TITLE];
+}
+
+- (IBAction)sortNodeByAuthor:(id)sender
+{
+    [self sortNode: SORT_AUTHOR];
+}
+
+- (void)sortNode:(int)i_mode
+{
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    playlist_item_t * p_item;
+
+    if (p_playlist == NULL)
+    {
+        return;
+    }
+
+    if ([o_outline_view selectedRow] > -1)
+    {
+        p_item = [[o_outline_view itemAtRow: [o_outline_view selectedRow]]
+                                                                pointerValue];
+    }
+    else
+    /*If no item is selected, sort the whole playlist*/
+    {
+        playlist_view_t * p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
+        p_item = p_view->p_root;
+    }
+
+    if (p_item->i_children > -1)
+    {
+        vlc_mutex_lock(&p_playlist->object_lock );
+        playlist_RecursiveNodeSort( p_playlist, p_item, i_mode, ORDER_NORMAL );
+        vlc_mutex_unlock(&p_playlist->object_lock );
+    }
+    else
+    {
+        int i;
+
+        for (i = 0 ; i < p_item->i_parents ; i++)
+        {
+            if (p_item->pp_parents[i]->i_view == VIEW_SIMPLE)
+            {
+                vlc_mutex_lock(&p_playlist->object_lock );
+                playlist_RecursiveNodeSort( p_playlist,
+                        p_item->pp_parents[i]->p_parent, i_mode, ORDER_NORMAL );
+                vlc_mutex_unlock(&p_playlist->object_lock );
+                break;
+            }
+        }
+    }
+    vlc_object_release(p_playlist);
+    [self playlistUpdated];
 }
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue

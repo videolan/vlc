@@ -52,6 +52,8 @@
     IBOutlet id o_mi_delete;
     IBOutlet id o_mi_info;
     IBOutlet id o_mi_selectall;
+    IBOutlet id o_mi_sort_name;
+    IBOutlet id o_mi_sort_author;
 
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
@@ -68,10 +70,13 @@
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
 
 - (void)playlistUpdated;
+- (void)sortNode:(int)i_mode;
 
 - (IBAction)playItem:(id)sender;
 - (IBAction)deleteItem:(id)sender;
 - (IBAction)selectAll:(id)sender;
+- (IBAction)sortNodeByName:(id)sender;
+- (IBAction)sortNodeByAuthor:(id)sender;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 

@@ -395,6 +395,8 @@
                 playItem = id; 
                 searchItem = id; 
                 selectAll = id; 
+                sortNodeByAuthor = id; 
+                sortNodeByName = id; 
             }; 
             CLASS = VLCPlaylist; 
             LANGUAGE = ObjC; 
@@ -407,6 +409,8 @@
                 "o_mi_play" = id; 
                 "o_mi_save_playlist" = id; 
                 "o_mi_selectall" = id; 
+                "o_mi_sort_author" = id; 
+                "o_mi_sort_name" = id; 
                 "o_outline_view" = id; 
                 "o_random_ckb" = id; 
                 "o_search_field" = id; 
