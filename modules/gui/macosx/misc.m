@@ -207,167 +207,63 @@
 /*****************************************************************************
  * MPSlider
  *****************************************************************************/
-
 @implementation MPSlider
 
-+ (Class)cellClass
+void _drawKnobInRect(NSRect knobRect)
 {
-    return( [MPSliderCell class] );
+    // Center knob in given rect
+    knobRect.origin.x += (int)((float)(knobRect.size.width - 7)/2.0);
+    knobRect.origin.y += (int)((float)(knobRect.size.height - 7)/2.0);
+    
+    // Draw diamond
+    NSRectFillUsingOperation(NSMakeRect(knobRect.origin.x + 3, knobRect.origin.y + 6, 1, 1), NSCompositeSourceOver);
+    NSRectFillUsingOperation(NSMakeRect(knobRect.origin.x + 2, knobRect.origin.y + 5, 3, 1), NSCompositeSourceOver);
+    NSRectFillUsingOperation(NSMakeRect(knobRect.origin.x + 1, knobRect.origin.y + 4, 5, 1), NSCompositeSourceOver);
+    NSRectFillUsingOperation(NSMakeRect(knobRect.origin.x + 0, knobRect.origin.y + 3, 7, 1), NSCompositeSourceOver);
+    NSRectFillUsingOperation(NSMakeRect(knobRect.origin.x + 1, knobRect.origin.y + 2, 5, 1), NSCompositeSourceOver);
+    NSRectFillUsingOperation(NSMakeRect(knobRect.origin.x + 2, knobRect.origin.y + 1, 3, 1), NSCompositeSourceOver);
+    NSRectFillUsingOperation(NSMakeRect(knobRect.origin.x + 3, knobRect.origin.y + 0, 1, 1), NSCompositeSourceOver);
 }
 
-@end
-
-/*****************************************************************************
- * MPSliderCell
- *****************************************************************************/
-
-@implementation MPSliderCell
-
-- (id)init
+void _drawFrameInRect(NSRect frameRect)
 {
-    self = [super init];
-
-    if( self != nil )
-    {
-        _bgColor = [[NSColor colorWithDeviceRed: 0.8627451
-                                                green: 0.8784314
-                                                blue: 0.7725490
-                                                alpha: 1.0] retain];
-        _knobColor = [[NSColor blackColor] retain];
-    }
-        NSLog(@"boe");
-    return( self );
+    // Draw frame
+    NSRectFillUsingOperation(NSMakeRect(frameRect.origin.x, frameRect.origin.y, frameRect.size.width, 1), NSCompositeSourceOver);
+    NSRectFillUsingOperation(NSMakeRect(frameRect.origin.x, frameRect.origin.y + frameRect.size.height-1, frameRect.size.width, 1), NSCompositeSourceOver);
+    NSRectFillUsingOperation(NSMakeRect(frameRect.origin.x, frameRect.origin.y, 1, frameRect.size.height), NSCompositeSourceOver);
+    NSRectFillUsingOperation(NSMakeRect(frameRect.origin.x+frameRect.size.width-1, frameRect.origin.y, 1, frameRect.size.height), NSCompositeSourceOver);
 }
 
-- (void)dealloc
+- (void)drawRect:(NSRect)rect
 {
-    [_bgColor release];
-    [_knobColor release];
-    [super dealloc];
-}
-
-- (void)setBackgroundColor:(NSColor *)newColor
-{
-    [_bgColor release];  
-    _bgColor = [newColor retain];
-}
-
-- (NSColor *)backgroundColor
-{
-    return( _bgColor );
-}
-
-- (void)setKnobColor:(NSColor *)newColor
-{
-    [_knobColor release];  
-    _knobColor = [newColor retain];
-}
-
-- (NSColor *)knobColor
-{
-    return( _knobColor );
-}
-
-- (void)setKnobThickness:(float)f_value
-{
-    _knobThickness = f_value;
-}
-
-- (float)knobThickness
-{
-    return( _knobThickness );
-}
-
-- (NSSize)cellSizeForBounds:(NSRect)s_rc
-{
-    return( s_rc.size );
-}
-
-- (void)drawWithFrame:(NSRect)s_rc inView:(NSView *)o_view
-{
-    if( _scFlags.weAreVertical )
-    {
-        s_rc.origin.x = 1; s_rc.size.width -= 3;
-        s_rc.origin.y = 2; s_rc.size.height -= 5;    
-    }
-    else
-    {
-        s_rc.origin.x = 2; s_rc.size.width -= 5;
-        s_rc.origin.y = 1; s_rc.size.height -= 3;
-    }
-
-    [super drawWithFrame: s_rc inView: o_view]; 
-}
-
-- (void)drawBarInside:(NSRect)s_rc flipped:(BOOL)b_flipped
-{
-    NSRect s_arc;
- 
-    s_rc.size.width += (s_rc.origin.x * 2) + 1;
-    s_rc.size.height += (s_rc.origin.y * 2) + 1;
-    s_rc.origin.x = s_rc.origin.y = 0;
-
-    [[NSGraphicsContext currentContext] setShouldAntialias: NO];
-
-    [_bgColor set];
-    NSRectFill( s_rc );
-
-    s_arc = s_rc;
-    s_arc.origin.x += 1.5;
-    s_arc.origin.y += 1.5;
-    s_arc.size.width -= s_arc.origin.x;
-    s_arc.size.height -= s_arc.origin.y;
-    [[_bgColor shadowWithLevel: 0.1] set];
-    [NSBezierPath strokeRect: s_arc];
-
-    s_arc.origin = s_rc.origin;
-    [[NSColor blackColor] set];
-    [NSBezierPath strokeRect: s_arc];
-
-    [[NSGraphicsContext currentContext] setShouldAntialias: YES];
-}
-
-- (NSRect)knobRectFlipped:(BOOL)b_flipped
-{
-    NSSize s_size;
-    NSPoint s_pto;
-    float floatValue;
-
-    floatValue = [self floatValue];
-
-    if( _scFlags.weAreVertical && b_flipped )
-    {
-        floatValue = _maxValue + _minValue - floatValue;
-    }
-
-    floatValue = (floatValue - _minValue) / (_maxValue - _minValue);
-
-    if( _scFlags.weAreVertical )
-    {   
-        s_size = NSMakeSize( _trackRect.size.width, _knobThickness ?
-                             _knobThickness : _trackRect.size.width );
-        s_pto = _trackRect.origin;
-        s_pto.y += (_trackRect.size.height - s_size.height) * floatValue;
-    }
-    else
-    {   
-        s_size = NSMakeSize( _knobThickness ? _knobThickness :
-                             _trackRect.size.height, _trackRect.size.height );
-        s_pto = _trackRect.origin;
-        s_pto.x += (_trackRect.size.width - s_size.width) * floatValue;
-    }
-
-    return NSMakeRect( s_pto.x, s_pto.y, s_size.width, s_size.height );
-}
-
-- (void)drawKnob:(NSRect)s_rc
-{
-    [[NSGraphicsContext currentContext] setShouldAntialias: NO];
-
-    [_knobColor set];
-    NSRectFill( s_rc );
-
-    [[NSGraphicsContext currentContext] setShouldAntialias: YES];
+    // Draw default to make sure the slider behaves correctly
+    [[NSGraphicsContext currentContext] saveGraphicsState];
+    NSRectClip(NSZeroRect);
+    [super drawRect:rect];
+    [[NSGraphicsContext currentContext] restoreGraphicsState];
+    
+    // Full size
+    rect = [self bounds];
+    int diff = (int)(([[self cell] knobThickness] - 7.0)/2.0) - 1;
+    rect.origin.x += diff-1;
+    rect.origin.y += diff;
+    rect.size.width -= 2*diff-2;
+    rect.size.height -= 2*diff;
+    
+    // Draw dark
+    NSRect knobRect = [[self cell] knobRectFlipped:NO];
+    [[[NSColor blackColor] colorWithAlphaComponent:0.6] set];
+    _drawFrameInRect(rect);
+    _drawKnobInRect(knobRect);
+    
+    // Draw shadow
+    [[[NSColor blackColor] colorWithAlphaComponent:0.1] set];
+    rect.origin.x++;
+    rect.origin.y++;
+    knobRect.origin.x++;
+    knobRect.origin.y++;
+    _drawFrameInRect(rect);
+    _drawKnobInRect(knobRect);
 }
 
 @end

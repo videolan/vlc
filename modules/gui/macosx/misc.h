@@ -63,22 +63,3 @@
 }
 
 @end
-
-/*****************************************************************************
- * MPSliderCell
- *****************************************************************************/
-
-@interface MPSliderCell : NSSliderCell
-{
-    NSColor * _bgColor;
-    NSColor * _knobColor;
-    float _knobThickness;
-}
-
-- (void)setBackgroundColor:(NSColor *)newColor;
-- (NSColor *)backgroundColor;
-
-- (void)setKnobColor:(NSColor *)newColor;
-- (NSColor *)knobColor;
-
-@end
