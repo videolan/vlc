@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: cdda.c,v 1.12 2003/12/11 13:20:20 rocky Exp $
+ * $Id: cdda.c,v 1.13 2003/12/13 12:56:59 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -124,6 +124,11 @@ vlc_module_begin();
 		 DEFAULT_PTS_DELAY / 1000, NULL, 
 		 N_("Caching value in ms"), 
 		 CACHING_LONGTEXT, VLC_TRUE );
+
+    add_string( MODULE_STRING "-author-format", 
+		"%A - %a %C %I", NULL, 
+		N_("Format to use in playlist 'author' field"),
+                TITLE_FMT_LONGTEXT, VLC_TRUE );
 
     add_string( MODULE_STRING "-title-format", 
 		"%T %M", NULL, 

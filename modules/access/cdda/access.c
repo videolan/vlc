@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.14 2003/12/11 12:56:25 rocky Exp $
+ * $Id: access.c,v 1.15 2003/12/13 12:56:59 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -630,6 +630,7 @@ CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
   mtime_t i_duration = 
     (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1]) 
     / CDIO_CD_FRAMES_PER_SEC;
+  char *p_author;
   char *p_title;
   char *config_varname = MODULE_STRING "-title-format";
 
@@ -642,14 +643,28 @@ CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
   snprintf(psz_mrl, psz_mrl_max, "%s%s@T%u", 
 	   CDDA_MRL_PREFIX, psz_source, i_track);
 
-  p_title = CDDAFormatStr(p_input, p_cdda, 
+  p_title = CDDAFormatStr(p_input, p_cdda,
 			  config_GetPsz( p_input, config_varname ), 
 			  psz_mrl, i_track);
 
   dbg_print( INPUT_DBG_META, "mrl: %s, title: %s, duration, %ld, pos %d",
 	     psz_mrl, p_title, (long int) i_duration, i_pos );
+
   playlist_AddExt( p_playlist, psz_mrl, p_title, i_duration * 1000000, 
 		   0, 0, playlist_operation, i_pos );
+
+  p_author = 
+    CDDAFormatStr( p_input, p_cdda,
+		   config_GetPsz( p_input, MODULE_STRING "-author-format" ),
+		   psz_mrl, i_track );
+
+  /* FIXME: This is horrible, but until the playlist interface is fixed up
+     something like this has to be done for the "Author" field.
+   */
+  if( i_pos == PLAYLIST_END ) i_pos = p_playlist->i_size - 1;
+  free(p_playlist->pp_items[i_pos]->psz_author);
+  p_playlist->pp_items[i_pos]->psz_author = strdup(p_author);
+
 }
 
 static int
