@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.8 2003/11/04 02:23:11 fenrir Exp $
+ * $Id: hotkeys.c,v 1.9 2003/12/08 13:04:58 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -278,37 +278,37 @@ static void Run( intf_thread_t *p_intf )
             else if( i_action == ACTIONID_JUMP_BACKWARD_10SEC )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump -10 seconds" ) );
-                val.i_time = -10000000LL;
+                val.i_time = -10000000;
                 var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_10SEC )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump +10 seconds" ) );
-                val.i_time = 10000000LL;
+                val.i_time = 10000000;
                 var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_1MIN )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump -1 minute" ) );
-                val.i_time = -60000000LL;
+                val.i_time = -60000000;
                 var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_1MIN )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump +1 minute" ) );
-                val.i_time = 60000000LL;
+                val.i_time = 60000000;
                 var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_5MIN )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump -5 minutes" ) );
-                val.i_time = -300000000LL;
+                val.i_time = -300000000;
                 var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_5MIN )
             {
                 vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump +5 minutes" ) );
-                val.i_time = 300000000LL;
+                val.i_time = 300000000;
                 var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_NEXT )
