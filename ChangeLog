@@ -5,6 +5,9 @@
 0.4.3
 Fri, 26 Jul 2002 00:03:13 +0200
 
+  * ./README.MacOSX.rtf : updated README.
+  * ./plugins/macosx/vout_macosx.c : additional QuickTime fix, thanks to
+    David Eldred <*******@apple.com>.
   * ./include/threads_funcs.h: Win32 compilation fix.
   * ./plugins/macosx/vout_macosx.m : fixed _the_ bug with QuickTime 6.
   * ./plugins/access/http.c: we are now parsing the http return code and
