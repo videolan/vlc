@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.92 2003/10/02 13:31:00 hartman Exp $
+ * $Id: libvlc.h,v 1.93 2003/10/03 23:31:43 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -37,7 +37,9 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
  *****************************************************************************/
 
 #define INTF_CAT_LONGTEXT N_( \
-    "These options allow you to configure the interfaces used by VLC. You can select the main interface, additional\ninterface modules, and define various related options." )
+    "These options allow you to configure the interfaces used by VLC.\n" \
+    "You can select the main interface, additional\n" \
+    "interface modules, and define various related options." )
 
 #define INTF_TEXT N_("Interface module")
 #define INTF_LONGTEXT N_( \

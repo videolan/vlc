@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.30 2003/09/24 21:31:55 gbazin Exp $
+ * $Id: preferences.cpp,v 1.31 2003/10/03 23:31:43 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -738,7 +738,7 @@ void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
             config_data->panel->Show();
         }
 
-        p_sizer->Add( config_data->panel, 2, wxEXPAND | wxALL, 0 );
+        p_sizer->Add( config_data->panel, 3, wxEXPAND | wxALL, 0 );
         p_sizer->Layout();
     }
 }
@@ -838,34 +838,13 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         }
 
         /* Add a head title to the panel */
-        wxStaticBox *static_box = new wxStaticBox( this, -1, wxT("") );
-        wxStaticBoxSizer *box_sizer = new wxStaticBoxSizer( static_box,
-                                                            wxVERTICAL );
-
-        wxStaticBox *help_box = NULL;
-        wxStaticBoxSizer *help_sizer = NULL; 
-
         label = new wxStaticText( this, -1,
                                   wxU(_(psz_section ? p_item->psz_text :
                                   p_module->psz_longname )));
 
-        box_sizer->Add( label, 1,  wxEXPAND | wxLEFT | wxRIGHT, 5 );
-
-        sizer->Add( box_sizer, 0, wxEXPAND | wxLEFT | wxRIGHT , 5 );
-
-        /* Check that we have at least something */
-        if( psz_help && psz_help[1] ) 
-        {
-            help_box   = new wxStaticBox( this, -1, wxT("") );
-            help_sizer = new wxStaticBoxSizer( help_box, wxHORIZONTAL ) ;
-            help = new wxStaticText( this, -1, wxU(_(psz_help)),
-                                     wxDefaultPosition, wxDefaultSize,
-                                     wxST_NO_AUTORESIZE | wxALIGN_LEFT,
-                                     wxT("") );
-
-            help_sizer->Add( help, 1,  wxALL | wxEXPAND , 5 );
-            sizer->Add( help_sizer ,0 ,wxEXPAND | wxALL, 5 );
-        }
+        sizer->Add( label, 0, wxEXPAND | wxLEFT | wxTOP, 10 );
+        sizer->Add( new wxStaticLine( this, 0 ), 0,
+                    wxEXPAND | wxLEFT | wxRIGHT | wxTOP, 2 );
 
         /* Now put all the config options into a scrolled window */
         config_sizer = new wxBoxSizer( wxVERTICAL );
@@ -920,7 +899,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
                 combo->SetToolTip( wxU(p_item->psz_longtext) );
                 config_data->control.combobox = combo;
-                panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL
+                panel_sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL
                                   | wxALL, 5 );
                 panel_sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL 
                                   | wxALL, 5 );
@@ -930,7 +909,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             case CONFIG_ITEM_FILE:
             case CONFIG_ITEM_DIRECTORY:
                 label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
-                panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL 
+                panel_sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL 
                                   | wxALL, 5 );
 
                 if( !p_item->ppsz_list )
@@ -989,9 +968,9 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                                        -16000, 16000, p_item->i_value);
                 spin->SetToolTip( wxU(p_item->psz_longtext) );
                 config_data->control.spinctrl = spin;
-                panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL 
+                panel_sizer->Add( label, 3, wxALIGN_CENTER_VERTICAL 
                                   | wxALL, 5 );
-                panel_sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL 
+                panel_sizer->Add( spin, 1, wxALIGN_CENTER_VERTICAL 
                                   | wxALL, 5 );
 
                 spin->SetClientData((void *)config_data);
@@ -1019,12 +998,12 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                 combo->SetValue( wxU( KeyToString( 
                                  p_item->i_value&~KEY_MODIFIER )));
                 config_data->control.combobox = combo;
-                panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL 
-                                  | wxALL, 5 );
-                panel_sizer->Add( alt, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-                panel_sizer->Add( ctrl, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
-                panel_sizer->Add( shift, 0, wxALIGN_CENTER_VERTICAL |wxALL, 5);
-                panel_sizer->Add( combo, 0, wxALIGN_CENTER_VERTICAL |wxALL, 5);
+                panel_sizer->Add( label, 2, wxALIGN_CENTER_VERTICAL 
+                                  | wxALL | wxEXPAND, 5 );
+                panel_sizer->Add( alt, 1, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 5 );
+                panel_sizer->Add( ctrl, 1, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 5);
+                panel_sizer->Add( shift, 1, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 5);
+                panel_sizer->Add( combo, 2, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 5);
                 break;
             }
 
@@ -1037,9 +1016,9 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                                            wxTE_PROCESS_ENTER );
                 textctrl->SetToolTip( wxU(p_item->psz_longtext) );
                 config_data->control.textctrl = textctrl;
-                panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL 
-                                  | wxALL, 5 );
-                panel_sizer->Add( textctrl, 0, wxALIGN_CENTER_VERTICAL 
+                panel_sizer->Add( label, 3, wxALIGN_CENTER_VERTICAL 
+                                  | wxALL | wxEXPAND, 5 );
+                panel_sizer->Add( textctrl, 1, wxALIGN_CENTER_VERTICAL 
                                   | wxALL, 5);
                 if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
                 break;
@@ -1076,6 +1055,19 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         config_sizer->Layout();
         config_window->SetSizer( config_sizer );
         sizer->Add( config_window, 1, wxEXPAND | wxALL, 5 );
+
+        /* And at last put a useful help string if available */
+        if( psz_help && psz_help[1] ) 
+        {
+            sizer->Add( new wxStaticLine( this, 0 ), 0,
+                        wxEXPAND | wxLEFT | wxRIGHT, 2 );
+            help = new wxStaticText( this, -1, wxU(_(psz_help)),
+                                     wxDefaultPosition, wxDefaultSize,
+                                     wxALIGN_LEFT,
+                                     wxT("") );
+            sizer->Add( help ,0 ,wxEXPAND | wxALL, 5 );
+        }
+
 
         /* Intercept all menu events in our custom event handler */
         config_window->PushEventHandler(
