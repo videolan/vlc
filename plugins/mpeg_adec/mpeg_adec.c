@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.16 2002/01/22 23:14:26 massiot Exp $
+ * $Id: mpeg_adec.c,v 1.17 2002/01/23 12:02:12 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -175,7 +175,13 @@ static void DecodeThread( adec_thread_t * p_adec )
             int fifo_type;
             int channels;
             
-            if( sync_info.b_stereo )
+            if( main_GetIntVariable( AOUT_STEREO_VAR, 0 ) )
+            {
+                intf_WarnMsg( 4, "adec info: setting stereo output" );
+                fifo_type = AOUT_ADEC_STEREO_FIFO;
+                channels = 2;
+            }
+            else if( sync_info.b_stereo )
             {
                 fifo_type = AOUT_ADEC_STEREO_FIFO;
                 channels = 2;
