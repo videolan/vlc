@@ -1,7 +1,7 @@
 Package: vlc
 Section: graphics
 Priority: optional
-Version: 0.4.1
+Version: 0.4.2
 Release: 1
 Architecture: arm
 Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>,  Christophe Massiot <massiot@via.ecp.fr>

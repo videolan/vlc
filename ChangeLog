@@ -4,6 +4,16 @@
 
 HEAD
 
+  * Nothing yet.
+
+0.4.2
+Mon, 20 Jun 2002 00:41:26 +0200
+
+  * ./plugins/macosx: new controls for audio output, and deinterlacing
+    support.
+  * ./plugins/macosx: fixed a bug with language and subtitle menus.
+  * ./plugins/access/http.c: should be more tolerant with old servers and
+    non-seekable streams.
   * ./plugins/filter/deinterlace.c: backported new deinterlacing routines.
   * ./include/threads.h, ./include/threads_funcs.h: backported the new Win32
     cond_wait implementation from MAIN.
