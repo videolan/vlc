@@ -1,4 +1,4 @@
-%define mozver 1.2,1
+%define mozver 1.2.1
 
 Summary: The VideoLAN client, also a very good standalone video player.
 Name: vlc
