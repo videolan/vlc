@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.19 2003/06/22 00:00:28 asmax Exp $
+ * $Id: win32_run.cpp,v 1.20 2003/06/22 12:46:49 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -81,8 +81,8 @@ void OSRun( intf_thread_t *p_intf )
     while( GetMessage( &msg, NULL, 0, 0 ) )
     {
 
-        for( win = SkinWindowList::Instance()->Begin();
-             win != SkinWindowList::Instance()->End(); win++ )
+        for( win = p_intf->p_sys->p_theme->WindowList.begin();
+             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
         {
             if( msg.hwnd == NULL ||
                 msg.hwnd == ((Win32Window*)(*win))->GetHandle() )
@@ -90,7 +90,7 @@ void OSRun( intf_thread_t *p_intf )
                 break;
             }
         }
-        if( win == SkinWindowList::Instance()->End() )
+        if( win == p_intf->p_sys->p_theme->WindowList.end() )
         {
 //            DispatchMessage( &msg );
 //            DefWindowProc( msg.hwnd, msg.message, msg.wParam, msg.lParam );
@@ -163,8 +163,8 @@ void OSRun( intf_thread_t *p_intf )
         **********************/
         else if( msg.hwnd == NULL )
         {
-            for( win = SkinWindowList::Instance()->Begin();
-                 win != SkinWindowList::Instance()->End(); win++ )
+            for( win = p_intf->p_sys->p_theme->WindowList.begin();
+                 win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
             {
                 (*win)->ProcessEvent( ProcessEvent );
             }

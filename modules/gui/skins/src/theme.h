@@ -2,7 +2,7 @@
  * theme.h: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.h,v 1.4 2003/06/22 00:00:28 asmax Exp $
+ * $Id: theme.h,v 1.5 2003/06/22 12:46:49 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -79,6 +79,9 @@ class Theme
         EventBank  *EvtBank;
         FontBank   *FntBank;
         OffSetBank *OffBank;
+
+        // List of the windows of the skin
+        list<SkinWindow *> WindowList;
 
         // Magetism
         void HangToAnchors( SkinWindow *wnd, int &x, int &y, bool init = false );

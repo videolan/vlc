@@ -2,7 +2,7 @@
  * event.h: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.h,v 1.11 2003/06/22 00:00:28 asmax Exp $
+ * $Id: event.h,v 1.12 2003/06/22 12:46:49 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -52,7 +52,8 @@ using namespace std;
 
 // VLC messages
 #define VLC_NOTHING         (VLC_MESSAGE + 1)
-#define VLC_HIDE            (VLC_MESSAGE + 2)
+#define VLC_SHOW            (VLC_MESSAGE + 2)
+#define VLC_HIDE            (VLC_MESSAGE + 3)
 
 #define VLC_QUIT            (VLC_MESSAGE + 4)
 #define VLC_OPEN            (VLC_MESSAGE + 5)

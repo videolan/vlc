@@ -2,7 +2,7 @@
  * x11_theme.cpp: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.cpp,v 1.14 2003/06/22 00:00:28 asmax Exp $
+ * $Id: x11_theme.cpp,v 1.15 2003/06/22 12:46:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -126,8 +126,8 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
     XStoreName( display, wnd, name.c_str() );
     XUNLOCK;
 
-    SkinWindowList::Instance()->Add( (SkinWindow *)new OSWindow( p_intf, wnd,
-        x, y, visible, fadetime, alpha, movealpha, dragdrop, name ) ) ;
+    WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, wnd, x, y, 
+        visible, fadetime, alpha, movealpha, dragdrop, name ) ) ;
 }
 //---------------------------------------------------------------------------
 void X11Theme::ChangeTray()

@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.37 2003/06/22 00:00:28 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.38 2003/06/22 12:46:49 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -71,13 +71,24 @@ bool VlcProc::EventProc( Event *evt )
 
         case VLC_HIDE:
             for( list<SkinWindow *>::const_iterator win =
-                    SkinWindowList::Instance()->Begin();
-                 win != SkinWindowList::Instance()->End(); win++ )
+                    p_intf->p_sys->p_theme->WindowList.begin();
+                 win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
             {
                 (*win)->OnStartThemeVisible = !(*win)->IsHidden();
             }
             p_intf->p_sys->i_close_status = (int)evt->GetParam1();
             OSAPI_PostMessage( NULL, WINDOW_CLOSE, 1, 0 );
+            return true;
+
+        case VLC_SHOW:
+            for( list<SkinWindow *>::const_iterator win =
+                    p_intf->p_sys->p_theme->WindowList.begin();
+                 win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
+            {
+                if( (*win)->OnStartThemeVisible )
+                    OSAPI_PostMessage( (*win), WINDOW_OPEN, 1, 0 );
+            }
+            p_intf->p_sys->b_all_win_closed = false;
             return true;
 
         case VLC_OPEN:
@@ -168,8 +179,8 @@ bool VlcProc::EventProcEnd()
     list<SkinWindow *>::const_iterator win;
 
     // If a window has been closed, test if all are closed !
-    for( win = SkinWindowList::Instance()->Begin();
-         win != SkinWindowList::Instance()->End(); win++ )
+    for( win = p_intf->p_sys->p_theme->WindowList.begin();
+         win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
     {
         if( !(*win)->IsHidden() )   // Not all windows closed
         {
@@ -350,7 +361,7 @@ void VlcProc::LoadSkin()
         delete Loader;
 
         // Uninitialize new theme
-        delete (char *)p_intf->p_sys->p_new_theme_file;
+        delete[] p_intf->p_sys->p_new_theme_file;
         p_intf->p_sys->p_new_theme_file = NULL;
     }
 }

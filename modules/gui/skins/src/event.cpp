@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.18 2003/06/22 00:00:28 asmax Exp $
+ * $Id: event.cpp,v 1.19 2003/06/22 12:46:49 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -344,8 +344,8 @@ GenericControl * Event::FindControl( string id )
     list<SkinWindow *>::const_iterator win;
     unsigned int i;
 
-    for( win = SkinWindowList::Instance()->Begin();
-         win != SkinWindowList::Instance()->End(); win++ )
+    for( win = p_intf->p_sys->p_theme->WindowList.begin();
+         win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
     {
         for( i = 0; i < (*win)->ControlList.size(); i++ )
         {

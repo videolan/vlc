@@ -2,11 +2,10 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.31 2003/06/22 00:00:28 asmax Exp $
+ * $Id: window.cpp,v 1.32 2003/06/22 12:46:49 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
- *          Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -545,42 +544,5 @@ void SkinWindow::GetPos( int &x, int &y )
     x = Left;
     y = Top;
 }
+//---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
-// List of all the Skin Windows (singleton)
-//---------------------------------------------------------------------------
-SkinWindowList *SkinWindowList::_instance = NULL;
-//---------------------------------------------------------------------------
-SkinWindowList::SkinWindowList()
-{
-}
-//---------------------------------------------------------------------------
-SkinWindowList *SkinWindowList::Instance()
-{
-    if( _instance == NULL )
-    {
-        _instance = new SkinWindowList;
-    }
-    return _instance;
-}
-//---------------------------------------------------------------------------
-void SkinWindowList::Add( SkinWindow *win )
-{
-    _list.push_back( win );
-}
-//---------------------------------------------------------------------------
-SkinWindow *SkinWindowList::Back()
-{
-    return _list.back();
-}
-//---------------------------------------------------------------------------
-list<SkinWindow*>::const_iterator SkinWindowList::Begin()
-{
-    return _list.begin();
-}
-//---------------------------------------------------------------------------
-list<SkinWindow*>::const_iterator SkinWindowList::End()
-{
-    return _list.end();
-}
-//---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.22 2003/06/22 00:00:28 asmax Exp $
+ * $Id: x11_run.cpp,v 1.23 2003/06/22 12:46:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -113,8 +113,8 @@ int ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
     else if( wnd == p_intf->p_sys->mainWin )
     {
         // Broadcast event
-        for( win = SkinWindowList::Instance()->Begin();
-             win != SkinWindowList::Instance()->End(); win++ )
+        for( win = p_intf->p_sys->p_theme->WindowList.begin();
+             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
         {
             (*win)->ProcessEvent( evt );
         }
@@ -122,8 +122,8 @@ int ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
     else
     {
         // Find window matching with gwnd
-        for( win = SkinWindowList::Instance()->Begin();
-             win != SkinWindowList::Instance()->End(); win++ )
+        for( win = p_intf->p_sys->p_theme->WindowList.begin();
+             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
         {
             // If it is the correct window
             if( wnd == ( (X11Window *)(*win) )->GetHandle() )
