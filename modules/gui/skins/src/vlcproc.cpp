@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.48 2003/10/17 18:17:28 ipkiss Exp $
+ * $Id: vlcproc.cpp,v 1.49 2003/10/19 12:37:03 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -419,7 +419,7 @@ void VlcProc::LoadSkin()
         delete Loader;
 
         // Uninitialize new theme
-        delete[] p_intf->p_sys->p_new_theme_file;
+        free( p_intf->p_sys->p_new_theme_file );
         p_intf->p_sys->p_new_theme_file = NULL;
     }
 }
