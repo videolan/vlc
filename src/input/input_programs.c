@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_programs.c,v 1.130 2004/01/26 21:37:58 hartman Exp $
+ * $Id: input_programs.c,v 1.131 2004/01/29 15:10:17 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -617,6 +617,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
 
     /* Init its values */
     p_es->i_id = i_es_id;
+    p_es->i_stream_id = 0;
     p_es->p_pes = NULL;
     p_es->p_dec = NULL;
     p_es->i_cat = i_category;
