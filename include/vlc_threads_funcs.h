@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.2 2002/08/30 12:23:23 sam Exp $
+ * $Id: vlc_threads_funcs.h,v 1.3 2002/08/30 19:16:05 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -355,6 +355,8 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
     i_result = st_cond_broadcast( p_condvar->cond );
 
 #elif defined( WIN32 )
+    int i;
+
     /* Release all waiting threads. */
     if( !p_condvar->semaphore )
     {

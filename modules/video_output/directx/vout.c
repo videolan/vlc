@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout.c,v 1.3 2002/08/29 23:53:22 massiot Exp $
+ * $Id: vout.c,v 1.4 2002/08/30 19:16:05 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -141,7 +141,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     p_vout->p_sys->p_event->p_vout = p_vout;
     if( vlc_thread_create( p_vout->p_sys->p_event,
                            "DirectX Events Thread", DirectXEventThread,
-                           VLC_THREAD_PRIORITY_LOW 1 ) )
+                           VLC_THREAD_PRIORITY_LOW, 1 ) )
     {
         msg_Err( p_vout, "cannot create DirectXEventThread" );
         vlc_object_destroy( p_vout->p_sys->p_event );
