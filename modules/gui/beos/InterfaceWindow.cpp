@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.3 2002/10/10 23:11:52 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.4 2002/10/28 16:55:05 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -46,6 +46,7 @@
 #include "MsgVals.h"
 #include "MediaControlView.h"
 #include "PlayListWindow.h"
+#include "PreferencesWindow.h"
 #include "VlcWrapper.h"
 #include "InterfaceWindow.h"
 
@@ -71,11 +72,14 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
                                                        FIND_ANYWHERE );
     fPlaylistIsEmpty = (p_playlist->i_size < 0);
     
-    fPlaylistWindow = new PlayListWindow( BRect( 20.0, 20.0, 170.0, 320.0 ),
+    fPlaylistWindow = new PlayListWindow( BRect( 100.0, 100.0, 400.0, 350.0 ),
 	  									  "Playlist",
 	  									  p_playlist,
 	  									  this,
 	  									  p_intf );
+	fPreferencesWindow = new PreferencesWindow( BRect( 100, 400, 500, 595 ),
+	                                            "Preferences",
+	                                            p_intf );
     
 	// set the title bar
 	SetName( "interface" );
@@ -160,7 +164,12 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 	fSpeedMenu->SetTargetForItems( this );
 	fMenuBar->AddItem( fSpeedMenu );
 
-										
+    /* Add the Settings menu */
+    fSettingsMenu = new BMenu( "Settings" );
+    fSettingsMenu->AddItem( fPreferencesMI =
+        new BMenuItem( "Preferences", new BMessage( OPEN_PREFERENCES ) ) );
+	fMenuBar->AddItem( fSettingsMenu );
+	
 	/* Add the Config menu */
 //	BMenu* configMenu = new BMenu( "Config" );
 //	menu_bar->AddItem( configMenu );
@@ -467,7 +476,14 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				_UpdatePlaylist();
 			}
 			break;
-	
+
+		case OPEN_PREFERENCES:
+			if (fPreferencesWindow->IsHidden())
+				fPreferencesWindow->Show();
+			else
+				fPreferencesWindow->Activate();
+			break;
+				
 		default:
 			BWindow::MessageReceived( p_message );
 			break;

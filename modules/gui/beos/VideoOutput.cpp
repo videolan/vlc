@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.2 2002/09/30 18:30:27 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.3 2002/10/28 16:55:05 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -150,7 +150,8 @@ class BackgroundView : public BView
 /*****************************************************************************
  * VideoWindow constructor and destructor
  *****************************************************************************/
-VideoWindow::VideoWindow(int v_width, int v_height, BRect frame)
+VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
+                         vout_thread_t *p_videoout)
 	: BWindow(frame, NULL, B_TITLED_WINDOW, B_NOT_CLOSABLE | B_NOT_MINIMIZABLE),
 	  i_width(frame.IntegerWidth()),
 	  i_height(frame.IntegerHeight()),
@@ -165,6 +166,8 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame)
 	  fInterfaceShowing(false),
 	  fInitStatus(B_ERROR)
 {
+    p_vout = p_videoout;
+    
     // create the view to do the display
     view = new VLCView( Bounds() );
 
@@ -477,8 +480,7 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
 
 	BRect bitmapFrame( 0, 0, width, height );
 	// read from config, if we are supposed to use overlay at all
-	int noOverlay = 0;
-    /* noOverlay = !config_GetInt( , "overlay" ); */
+    int noOverlay = !config_GetInt( p_vout, "overlay" );
 	// test for overlay capability
     for (int i = 0; i < COLOR_COUNT; i++)
     {
@@ -1262,7 +1264,8 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
                                                p_vout->p_sys->i_height - 1,
                                                BRect( 20, 50,
                                                       20 + p_vout->i_window_width - 1, 
-                                                      50 + p_vout->i_window_height - 1 ));
+                                                      50 + p_vout->i_window_height - 1 ),
+                                               p_vout );
     if( p_vout->p_sys->p_window == NULL )
     {
         msg_Err( p_vout, "cannot allocate VideoWindow" );

@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.2 2002/09/30 18:30:27 titer Exp $
+ * $Id: VideoWindow.h,v 1.3 2002/10/28 16:55:05 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -83,7 +83,8 @@ class VideoWindow : public BWindow
 public:
 							VideoWindow(int v_width, 
 										int v_height,
-										BRect frame); 
+										BRect frame,
+										vout_thread_t *p_vout); 
 	virtual					~VideoWindow();
 
 							// BWindow    
@@ -145,14 +146,14 @@ private:
 		int32		height;
 	};
 
-    struct vout_thread_s   *p_vout;
+    vout_thread_t   *p_vout;
 
-			int32			fTrueWidth;     // incomming bitmap size 
-			int32			fTrueHeight;
-			bool			fCorrectAspect;
-			window_feel		fCachedFeel;
-			bool			fInterfaceShowing;
-			status_t		fInitStatus;
+	int32			fTrueWidth;     // incomming bitmap size 
+	int32			fTrueHeight;
+	bool			fCorrectAspect;
+	window_feel		fCachedFeel;
+	bool			fInterfaceShowing;
+	status_t		fInitStatus;
 };
 
 #endif	// BEOS_VIDEO_WINDOW_H

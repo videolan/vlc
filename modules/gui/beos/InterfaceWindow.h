@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.2 2002/09/30 18:30:27 titer Exp $
+ * $Id: InterfaceWindow.h,v 1.3 2002/10/28 16:55:05 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -34,6 +34,7 @@ class BMenuBar;
 class MediaControlView;
 class PlayListWindow;
 class BFilePanel;
+class PreferencesWindow;
 
 class CDMenu : public BMenu
 {
@@ -130,6 +131,7 @@ class InterfaceWindow : public BWindow
 	bool					fPlaylistIsEmpty;
 	BFilePanel*				fFilePanel;
 	PlayListWindow*			fPlaylistWindow;
+	PreferencesWindow*		fPreferencesWindow;
 	BMenuBar*				fMenuBar;
 	BMenuItem*				fNextTitleMI;
 	BMenuItem*				fPrevTitleMI;
@@ -139,6 +141,7 @@ class InterfaceWindow : public BWindow
 	BMenuItem*				fSlowerMI;
 	BMenuItem*				fNormalMI;
 	BMenuItem*				fFasterMI;
+	BMenuItem*				fPreferencesMI;
 	BMenu*					fAudioMenu;
 	BMenu*					fNavigationMenu;
 	BMenu*					fTitleMenu;
@@ -146,6 +149,7 @@ class InterfaceWindow : public BWindow
 	BMenu*					fLanguageMenu;
 	BMenu*					fSubtitlesMenu;
 	BMenu*					fSpeedMenu;
+	BMenu*					fSettingsMenu;
 	bigtime_t				fLastUpdateTime;
 	BMessage*				fSettings;	// we keep the message arround
 										// for forward compatibility
