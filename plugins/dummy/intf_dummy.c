@@ -2,7 +2,7 @@
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: intf_dummy.c,v 1.13 2001/12/30 07:09:55 sam Exp $
+ * $Id: intf_dummy.c,v 1.14 2002/01/29 20:11:18 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,7 +29,6 @@
 
 #include <videolan/vlc.h>
 
-#include "intf_msg.h"
 #include "interface.h"
 
 /*****************************************************************************

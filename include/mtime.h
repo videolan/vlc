@@ -9,7 +9,7 @@
  * Functions prototyped are implemented in interface/mtime.c.
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
- * $Id: mtime.h,v 1.9 2001/12/30 07:09:54 sam Exp $
+ * $Id: mtime.h,v 1.10 2002/01/29 20:11:18 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -56,7 +56,8 @@ mtime_t mdate    ( void );
 void    mwait    ( mtime_t date );
 void    msleep   ( mtime_t delay );
 #else
-#   define msleep p_symbols->msleep
-#   define mdate  p_symbols->mdate
+#   define msleep    p_symbols->msleep
+#   define mdate     p_symbols->mdate
+#   define mstrtime  p_symbols->mstrtime
 #endif
 

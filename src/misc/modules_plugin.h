@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.7 2002/01/24 13:32:53 sam Exp $
+ * $Id: modules_plugin.h,v 1.8 2002/01/29 20:11:18 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -177,6 +177,7 @@ module_error( void )
     (p_symbols)->intf_Eject = intf_Eject; \
     (p_symbols)->msleep = msleep; \
     (p_symbols)->mdate = mdate; \
+    (p_symbols)->mstrtime = mstrtime; \
     (p_symbols)->network_ChannelCreate = network_ChannelCreate; \
     (p_symbols)->network_ChannelJoin = network_ChannelJoin; \
     (p_symbols)->input_SetProgram = input_SetProgram; \
