@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: distort.c,v 1.12 2003/11/05 00:39:17 gbazin Exp $
+ * $Id: distort.c,v 1.13 2004/01/25 03:28:41 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -67,7 +67,7 @@ vlc_module_begin();
     add_string( "distort-mode", "wave", NULL, MODE_TEXT, MODE_LONGTEXT,
                 VLC_FALSE );
         change_string_list( mode_list, mode_list_text, 0 );
-    set_description( _("miscellaneous distort video effects filter") );
+    set_description( _("Distort video filter") );
     set_capability( "video filter", 0 );
     add_shortcut( "distort" );
     set_callbacks( Create, Destroy );
@@ -114,53 +114,30 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_display = NULL;
 
     p_vout->p_sys->i_mode = 0;
-    /* Look what method was requested from command line*/
-    if( !(psz_method = psz_method_tmp = config_GetPsz( p_vout, "filter" )) )
-    {
-        msg_Err( p_vout, "configuration variable %s empty", "filter" );
-        return VLC_EGENERIC;
-    }
-    while( *psz_method && *psz_method != ':' )
-    {
-        psz_method++;
-    }
 
-    if( !strcmp( psz_method, ":wave" ) )
+    if( !(psz_method = psz_method_tmp
+          = config_GetPsz( p_vout, "distort-mode" )) )
     {
+        msg_Err( p_vout, "configuration variable %s empty, using 'wave'",
+                         "distort-mode" );
         p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
     }
-    else if( !strcmp( psz_method, ":ripple" ) )
+    else
     {
-        p_vout->p_sys->i_mode = DISTORT_MODE_RIPPLE;
-    }
-    free( psz_method_tmp );
-    if( !p_vout->p_sys->i_mode )
-    {
-        /* No method given in commandline. Look what method was
-         requested in configuration system */
-        if( !(psz_method = psz_method_tmp
-              = config_GetPsz( p_vout, "distort-mode" )) )
+
+        if( !strcmp( psz_method, "wave" ) )
         {
-            msg_Err( p_vout, "configuration variable %s empty, using 'wave'",
-                             "distort-mode" );
             p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
         }
-        else {
-
-            if( !strcmp( psz_method, "wave" ) )
-            {
-                p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
-            }
-            else if( !strcmp( psz_method, "ripple" ) )
-            {
-                p_vout->p_sys->i_mode = DISTORT_MODE_RIPPLE;
-            }
-            else
-            {
-                msg_Err( p_vout, "no valid distort mode provided, "
-                                 "using wave" );
-                p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
-            }
+        else if( !strcmp( psz_method, "ripple" ) )
+        {
+            p_vout->p_sys->i_mode = DISTORT_MODE_RIPPLE;
+        }
+        else
+        {
+            msg_Err( p_vout, "no valid distort mode provided, "
+                             "using wave" );
+            p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
         }
     }
     free( psz_method_tmp );

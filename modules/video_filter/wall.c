@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: wall.c,v 1.11 2003/10/15 22:49:48 gbazin Exp $
+ * $Id: wall.c,v 1.12 2004/01/25 03:28:41 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -59,7 +59,7 @@ static int  SendEvents( vlc_object_t *, char const *,
     "which to split the video")
 
 #define ACTIVE_TEXT N_("Active windows")
-#define ACTIVE_LONGTEXT N_("comma separated list of active windows, " \
+#define ACTIVE_LONGTEXT N_("Comma separated list of active windows, " \
     "defaults to all")
 
 vlc_module_begin();

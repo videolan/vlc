@@ -1,8 +1,8 @@
 /*****************************************************************************
  * logo.c : logo video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: logo.c,v 1.6 2003/12/22 02:24:53 sam Exp $
+ * Copyright (C) 2003-2004 VideoLAN
+ * $Id: logo.c,v 1.7 2004/01/25 03:28:41 hartman Exp $
  *
  * Authors: Simon Latapie <garf@videolan.org>
  *
@@ -61,7 +61,7 @@ static int MouseEvent( vlc_object_t *, char const *,
 #define POSX_LONGTEXT N_("You can move the logo by left-clicking on it" )
 #define POSY_TEXT N_("Y coordinate of the logo")
 #define POSY_LONGTEXT N_("You can move the logo by left-clicking on it" )
-#define TRANS_TEXT N_("transparency of the logo")
+#define TRANS_TEXT N_("Transparency of the logo (255-0)")
 #define TRANS_LONGTEXT N_("You can change it by middle-clicking and moving mouse left or right")
 
 vlc_module_begin();
@@ -69,8 +69,8 @@ vlc_module_begin();
     add_file( "logo_file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, VLC_FALSE );
     add_integer( "logo_x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
     add_integer( "logo_y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
-    add_float( "logo_transparency", 1, NULL, TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
-    set_description( _("logo video filter") );
+    add_int_with_range( "logo_transparency", 255, 0, 255, NULL, TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
+    set_description( _("Logo video filter") );
     set_capability( "video filter", 0 );
     add_shortcut( "logo" );
     set_callbacks( Create, Destroy );
@@ -281,7 +281,7 @@ static int Init( vout_thread_t *p_vout )
 
     p_vout->p_sys->posx = config_GetInt( p_vout, "logo_x" );
     p_vout->p_sys->posy = config_GetInt( p_vout, "logo_y" );
-    p_vout->p_sys->trans = (int)(config_GetFloat( p_vout, "logo_transparency" ) * 255);
+    p_vout->p_sys->trans = config_GetInt( p_vout, "logo_transparency");
 
     return VLC_SUCCESS;
 }
@@ -309,7 +309,6 @@ static void End( vout_thread_t *p_vout )
 
     config_PutInt( p_vout, "logo_x", p_vout->p_sys->posx );
     config_PutInt( p_vout, "logo_y", p_vout->p_sys->posy );
-    config_PutFloat( p_vout, "logo_transparency", (float)(p_vout->p_sys->trans) / 255.0 );
 
     if (p_vout->p_sys->error == 0)
     {
@@ -391,7 +390,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             } else
             {
                 p_out  = p_outpic->p[i_index].p_pixels +
-                         (p_vout->p_sys->posy/2)* p_outpic->p[i_index].i_pitch +
+                         ( p_vout->p_sys->posy  2 )* p_outpic->p[i_index].i_pitch +
                          p_vout->p_sys->posx / 2;
                 i_max = p_vout->p_sys->height / 2;
                 j_max = p_vout->p_sys->width / 2;
@@ -406,7 +405,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             {
                 for( j = 0 ; j < j_max ; j++)
                 {
-                    *p_out = ( *p_out * ( 65025 - *p_in_a * tr) + *p_in * *p_in_a * tr) >> 16;
+                    *p_out = ( *p_out * ( 65025 - *p_in_a * tr) + *p_in * *p_in_a * tr ) >> 16;
                     p_out++;
                     p_in++;
                     p_in_a++;

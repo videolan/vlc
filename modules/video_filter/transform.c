@@ -1,8 +1,8 @@
 /*****************************************************************************
- * transform.c : transform image plugin for vlc
+ * transform.c : transform image module for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: transform.c,v 1.16 2003/11/13 21:15:43 gbazin Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: transform.c,v 1.17 2004/01/25 03:28:41 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -67,7 +67,7 @@ vlc_module_begin();
     add_string( "transform-type", "90", NULL,
                           TYPE_TEXT, TYPE_LONGTEXT, VLC_FALSE);
         change_string_list( type_list, type_list_text, 0);
-    set_description( _("video transformation filter") );
+    set_description( _("Video transformation filter") );
     set_capability( "video filter", 0 );
     add_shortcut( "transform" );
     set_callbacks( Create, Destroy );
