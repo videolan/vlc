@@ -72,7 +72,10 @@ struct access_sys_t
     int           i_titles;
     input_title_t *title[99];         /* No more that 99 track in a cd-audio */
 
-    /* */
+    int i_title_start;
+    int i_title_end;
+
+    /* Current position */
     int         i_sector;                                  /* Current Sector */
     int *       p_sectors;                                  /* Track sectors */
 
@@ -87,39 +90,42 @@ static int      Control( access_t *, int, va_list );
 
 /*****************************************************************************
  * Open: open cdda
+ * MRL syntax: [dev_path][@[title-start][-[title-end]]]
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
 
-    char *psz_dup = strdup( p_access->psz_path );
-    char *psz;
-    int  i;
-    int  i_title = 0;
+    char *psz_dup, *psz;
+    int  i, i_title_start = -1, i_title_end = -1;
     vcddev_t *vcddev;
 
-    /* Command line: cdda://[dev_path][@title] */
-    if( ( psz = strchr( psz_dup, '@' ) ) )
+    /* Command line: [dev_path][@[title-start][-[title-end]]] */
+    psz_dup = p_access->psz_path? strdup( p_access->psz_path ) : 0;
+    if( psz_dup && ( psz = strchr( psz_dup, '@' ) ) )
     {
-        *psz++ = '\0';
+        *psz++ = 0;
+        i_title_start = i_title_end = strtol( psz, NULL, 0 );
 
-        i_title = strtol( psz, NULL, 0 );
+        if( ( psz = strchr( psz, '-' ) ) )
+        {
+            *psz++;
+            i_title_end = strtol( psz, NULL, 0 );
+        }
     }
 
-    if( *psz_dup == '\0' )
+    if( !psz_dup || !*psz_dup )
     {
-        free( psz_dup );
+        if( psz_dup ) free( psz_dup );
 
         /* Only when selected */
-        if( strcmp( p_access->psz_access, "cdda" ) )
-            return VLC_EGENERIC;
-
+        if( !p_access->b_force ) return VLC_EGENERIC;
 
         psz_dup = var_CreateGetString( p_access, "cd-audio" );
-        if( *psz_dup == '\0' )
+        if( !psz_dup || !*psz_dup )
         {
-            free( psz_dup );
+            if( psz_dup ) free( psz_dup );
             return VLC_EGENERIC;
         }
     }
@@ -171,6 +177,7 @@ static int Open( vlc_object_t *p_this )
         msg_Dbg( p_access, "title[%d] start=%d", i, p_sys->p_sectors[i] );
         msg_Dbg( p_access, "title[%d] end=%d", i, p_sys->p_sectors[i+1] );
 
+        asprintf( &t->psz_name, _("Track %i"), i + 1 );
         t->i_size = ( p_sys->p_sectors[i+1] - p_sys->p_sectors[i] ) *
                     (int64_t)CDDA_DATA_SIZE;
 
@@ -178,10 +185,16 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Starting title and sector */
-    if( i_title >= p_sys->i_titles ) i_title = 0;
-    p_sys->i_sector = p_sys->p_sectors[i_title];
-    p_access->info.i_title = i_title;
-    p_access->info.i_size = p_sys->title[i_title]->i_size;
+    if( i_title_start < 1 || i_title_start > p_sys->i_titles )
+        p_sys->i_title_start = 1;
+    else p_sys->i_title_start = i_title_start;
+    if( i_title_end < 1 || i_title_end > p_sys->i_titles )
+        p_sys->i_title_end = -1;
+    else p_sys->i_title_end = i_title_end;
+
+    p_sys->i_sector = p_sys->p_sectors[p_sys->i_title_start-1];
+    p_access->info.i_title = p_sys->i_title_start-1;
+    p_access->info.i_size = p_sys->title[p_sys->i_title_start-1]->i_size;
 
     /* Build a WAV header for the output data */
     memset( &p_sys->waveheader, 0, sizeof(WAVEHEADER) );
@@ -246,23 +259,25 @@ static block_t *Block( access_t *p_access )
         /* Return only the header */
         p_block = block_New( p_access, sizeof( WAVEHEADER ) );
         memcpy( p_block->p_buffer, &p_sys->waveheader, sizeof(WAVEHEADER) );
-	p_sys->b_header = VLC_TRUE;
+        p_sys->b_header = VLC_TRUE;
         return p_block;
     }
 
     /* Check end of title */
     while( p_sys->i_sector >= p_sys->p_sectors[p_access->info.i_title + 1] )
     {
-        if( p_access->info.i_title + 1 >= p_sys->i_titles )
-	{
-	    p_access->info.b_eof = VLC_TRUE;
-	    return NULL;
-	}
+        if( p_access->info.i_title + 1 >= p_sys->i_titles ||
+            ( p_sys->i_title_end > 0 &&
+              p_access->info.i_title + 1 >= p_sys->i_title_end ) )
+        {
+            p_access->info.b_eof = VLC_TRUE;
+            return NULL;
+        }
 
-	p_access->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SIZE;
-	p_access->info.i_title++;
-	p_access->info.i_size = p_sys->title[p_access->info.i_title]->i_size;
-	p_access->info.i_pos = 0;
+        p_access->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SIZE;
+        p_access->info.i_title++;
+        p_access->info.i_size = p_sys->title[p_access->info.i_title]->i_size;
+        p_access->info.i_pos = 0;
     }
 
     /* Don't read after the end of a title */
@@ -277,7 +292,7 @@ static block_t *Block( access_t *p_access )
     if( !( p_block = block_New( p_access, i_blocks * CDDA_DATA_SIZE ) ) )
     {
         msg_Err( p_access, "cannot get a new block of size: %i",
-		 i_blocks * CDDA_DATA_SIZE );
+                 i_blocks * CDDA_DATA_SIZE );
         return NULL;
     }
 
@@ -287,9 +302,9 @@ static block_t *Block( access_t *p_access )
         msg_Err( p_access, "cannot read sector %i", p_sys->i_sector );
         block_Release( p_block );
 
-	/* Try to skip one sector (in case of bad sectors) */
-	p_sys->i_sector++;
-	p_access->info.i_pos += CDDA_DATA_SIZE;
+        /* Try to skip one sector (in case of bad sectors) */
+        p_sys->i_sector++;
+        p_access->info.i_pos += CDDA_DATA_SIZE;
         return NULL;
     }
 
@@ -379,6 +394,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
                 /* Next sector to read */
                 p_sys->i_sector = p_sys->p_sectors[i];
+
+                /* User tries to access another title so better reset
+                 * the end title */
+                p_sys->i_title_end = -1;
             }
             break;
 
