@@ -46,18 +46,23 @@ typedef struct video_synchro_s
     /* tells whether we accumulated delay */
     mtime_t i_delay;
     /* dates */
-    mtime_t i_last_pts;
+    mtime_t i_last_display_pts;
+    mtime_t i_last_decode_pts;
     mtime_t i_last_i_pts;
     unsigned int i_images_since_pts;
+    /* last pts of non-dropped I image */
+    mtime_t i_last_nondropped_i_pts;
     
     /* il manquait un compteur */
     unsigned int modulo;
 
     /* P images since the last I */
     unsigned int current_p_count;
+    unsigned int nondropped_p_count;
     double p_count_predict;
     /* B images since the last I */
     unsigned int current_b_count;
+    unsigned int nondropped_b_count;
     double b_count_predict;
 
     /* 1 for linear count, 2 for binary count, 3 for ternary count */

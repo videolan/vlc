@@ -245,9 +245,14 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Initialize the synchro properties
      */
+    p_vpar->synchro.i_last_decode_pts = 0;
+    p_vpar->synchro.i_last_display_pts = 0;
+    p_vpar->synchro.i_images_since_pts = 0;
+    /* for i frames */
     p_vpar->synchro.i_last_i_pts = 0;
-    p_vpar->synchro.theorical_fps = 30;
-    p_vpar->synchro.actual_fps = 25;
+    p_vpar->synchro.theorical_fps = 25;
+    p_vpar->synchro.i_last_nondropped_i_pts = 0;
+    p_vpar->synchro.actual_fps = 20;
     /* the fifo */
     p_vpar->synchro.i_fifo_start = 0;
     p_vpar->synchro.i_fifo_stop = 0;
@@ -259,8 +264,10 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->synchro.i_delay = 0;
     /* assume there were about 3 P and 6 B images between I's */
     p_vpar->synchro.current_p_count = 1;
+    p_vpar->synchro.nondropped_p_count = 1;
     p_vpar->synchro.p_count_predict = 3;
     p_vpar->synchro.current_b_count = 1;
+    p_vpar->synchro.nondropped_b_count = 1;
     p_vpar->synchro.b_count_predict = 6;
     for( i_dummy = 0; i_dummy < 6; i_dummy++)
     {
