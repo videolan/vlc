@@ -385,9 +385,9 @@ static int Open( vlc_object_t *p_this )
     if( !strcmp( p_sys->psz_protocol, "ICY" ) || p_sys->b_icecast )
     {
         if( p_sys->psz_mime && strcasecmp( p_sys->psz_mime, "application/ogg" ) )
-        { 
+        {
             if( !strcasecmp( p_sys->psz_mime, "video/nsv" ) ||
-                   !strcasecmp( p_sys->psz_mime, "video/nsa") )
+                !strcasecmp( p_sys->psz_mime, "video/nsa" ) )
                 p_access->psz_demux = strdup( "nsv" );
             else if( !strcasecmp( p_sys->psz_mime, "audio/aac" ) ||
                      !strcasecmp( p_sys->psz_mime, "audio/aacp" ) )
@@ -410,6 +410,13 @@ static int Open( vlc_object_t *p_this )
              p_access->psz_demux = strdup( "mp3" );
         }
         /* else probably Ogg Vorbis */
+    }
+    else if( !strcasecmp( p_access->psz_access, "unsv" ) &&
+             p_sys->psz_mime &&
+             !strcasecmp( p_sys->psz_mime, "misc/ultravox" ) )
+    {
+        /* Grrrr! detect ultravox server and force NSV demuxer */
+        p_access->psz_demux = strdup( "nsv" );
     }
 
     if( p_sys->b_reconnect ) msg_Dbg( p_access, "auto re-connect enabled" );
