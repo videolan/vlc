@@ -132,9 +132,8 @@ modules/access/dshow/dshow.cpp
 modules/access/dshow/filter.cpp
 modules/access/dshow/filter.h
 modules/access/dvb/access.c
-modules/access/dvb/dvb.c
 modules/access/dvb/dvb.h
-modules/access/dvb/qpsk.c
+modules/access/dvb/linux_dvb.c
 modules/access/dvd/access.c
 modules/access/dvd/demux.c
 modules/access/dvd/dvd.c
