@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.8.2.2 2002/09/30 22:01:43 jpsaman Exp $
+ * $Id: familiar.c,v 1.8.2.3 2002/10/01 19:13:14 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -48,53 +48,6 @@
 #include "familiar.h"
 
 /*****************************************************************************
- * Local variables (mutex-protected).
- *****************************************************************************/
-static void ** pp_global_data = NULL;
-
-/*****************************************************************************
- * g_atexit: kludge to avoid the Gtk+ thread to segfault at exit
- *****************************************************************************
- * gtk_init() makes several calls to g_atexit() which calls atexit() to
- * register tidying callbacks to be called at program exit. Since the Gtk+
- * plugin is likely to be unloaded at program exit, we have to export this
- * symbol to intercept the g_atexit() calls. Talk about crude hack.
- *****************************************************************************/
-void g_atexit( GVoidFunc func )
-{
-    intf_thread_t *p_intf = p_main->p_intf;
-    int i_dummy;
-
-    if( pp_global_data == NULL )
-    {
-        atexit( func );
-        return;
-    }
-
-    p_intf = (intf_thread_t *)*pp_global_data;
-    if( p_intf == NULL )
-    {
-        return;
-    }
-
-    for( i_dummy = 0;
-         i_dummy < MAX_ATEXIT && p_intf->p_sys->pf_callback[i_dummy] != NULL;
-         i_dummy++ )
-    {
-        ;
-    }
-
-    if( i_dummy >= MAX_ATEXIT - 1 )
-    {
-        intf_ErrMsg( "too many atexit() callbacks to register" );
-        return;
-    }
-
-    p_intf->p_sys->pf_callback[i_dummy]     = func;
-    p_intf->p_sys->pf_callback[i_dummy + 1] = NULL;
-}
-
-/*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
 static void intf_getfunctions ( function_list_t * p_function_list );
@@ -102,6 +55,7 @@ static int  Open         ( intf_thread_t *p_intf );
 static void Close        ( intf_thread_t *p_intf );
 static void Run          ( intf_thread_t * );
 
+static gint GtkManage         ( gpointer p_data );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -131,6 +85,36 @@ MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
 
 /*****************************************************************************
+ * g_atexit: kludge to avoid the Gtk+ thread to segfault at exit
+ *****************************************************************************
+ * gtk_init() makes several calls to g_atexit() which calls atexit() to
+ * register tidying callbacks to be called at program exit. Since the Gtk+
+ * plugin is likely to be unloaded at program exit, we have to export this
+ * symbol to intercept the g_atexit() calls. Talk about crude hack.
+ *****************************************************************************/
+void g_atexit( GVoidFunc func )
+{
+    intf_thread_t *p_intf = p_main->p_intf;
+    int i_dummy;
+
+    for( i_dummy = 0;
+         i_dummy < MAX_ATEXIT && p_intf->p_sys->pf_callback[i_dummy] != NULL;
+         i_dummy++ )
+    {
+        ;
+    }
+
+    if( i_dummy >= MAX_ATEXIT - 1 )
+    {
+        intf_ErrMsg( "too many atexit() callbacks to register" );
+        return;
+    }
+
+    p_intf->p_sys->pf_callback[i_dummy]     = func;
+    p_intf->p_sys->pf_callback[i_dummy + 1] = NULL;
+}
+
+/*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
@@ -150,12 +134,13 @@ static int Open( intf_thread_t *p_intf )
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
-        intf_ErrMsg( "out of memory" );
+        intf_ErrMsg("error: %s", strerror(ENOMEM));
         return (1);
     }
 
     /* Initialize Gtk+ thread */
     p_intf->p_sys->b_autoplayfile = 1;
+    p_intf->p_sys->pf_callback[0] = NULL;
 
     /* Initialize Gtk+ thread */
     p_intf->p_sys->p_input = NULL;
@@ -238,16 +223,13 @@ static void Run( intf_thread_t *p_intf )
 
     /* Sleep to avoid using all CPU - since some interfaces needs to access
      * keyboard events, a 100ms delay is a good compromise */
-//  i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, GtkManage, p_intf );
+    i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, GtkManage, p_intf );
 
     /* Enter Gtk mode */
     gtk_main();
 
-    intf_ErrMsg( "@@@ Run exiting interface" );
-
     /* Remove the timeout */
     gtk_timeout_remove( i_dummy );
-    gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_window) );
 
     /* Launch stored callbacks */
     for( i_dummy = 0;
@@ -258,3 +240,36 @@ static void Run( intf_thread_t *p_intf )
     }
 }
 
+/* following functions are local */
+
+/*****************************************************************************
+ * GtkManage: manage main thread messages
+ *****************************************************************************
+ * In this function, called approx. 10 times a second, we check what the
+ * main program wanted to tell us.
+ *****************************************************************************/
+static gint GtkManage( gpointer p_data )
+{
+#define p_intf ((intf_thread_t *)p_data)
+    vlc_mutex_lock( &p_intf->change_lock );
+
+    /* Manage core vlc functions through the callback */
+    p_intf->pf_manage( p_intf );
+
+    if( p_intf->b_die )
+    {
+        vlc_mutex_unlock( &p_intf->change_lock );
+
+        /* Prepare to die, young Skywalker */
+        gtk_main_quit();
+
+        /* Just in case */
+        return( FALSE );
+    }
+
+    vlc_mutex_unlock( &p_intf->change_lock );
+
+    return( TRUE );
+
+#undef p_intf
+}
