@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: interface.cpp,v 1.80 2003/12/22 02:24:52 sam Exp $
+ * $Id: interface.cpp,v 1.81 2003/12/31 10:30:44 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -554,7 +554,7 @@ void Interface::CreateOurExtraPanel()
 
     extra_sizer->Add(adjust_sizer,1,wxBOTTOM,5);
 
-
+#if 0
     /* Create sizer to surround the other controls */
     wxBoxSizer *other_sizer = new wxBoxSizer( wxVERTICAL );
 
@@ -611,6 +611,7 @@ void Interface::CreateOurExtraPanel()
     other_sizer->Layout();
 
     extra_sizer->Add(other_sizer,0,wxBOTTOM,5);
+#endif
 
     extra_frame->SetSizer( extra_sizer );
 
@@ -620,13 +621,14 @@ void Interface::CreateOurExtraPanel()
     extra_sizer->SetSizeHints(extra_frame);
 
     /* Write down initial values */
+#if 0
     psz_filters = config_GetPsz( p_intf, "audio-filter" );
     if( psz_filters && strstr( psz_filters, "visual" ) )
     {
         visual_checkbox->SetValue(1);
     }
     if( psz_filters ) free( psz_filters );
-
+#endif
     psz_filters = config_GetPsz( p_intf, "filter" );
     if( psz_filters && strstr( psz_filters, "adjust" ) )
     {
