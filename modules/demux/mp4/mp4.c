@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.18 2003/02/27 13:19:43 gbazin Exp $
+ * $Id: mp4.c,v 1.19 2003/03/11 18:57:50 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -59,18 +59,26 @@ vlc_module_end();
  * Declaration of local function
  *****************************************************************************/
 
-static int MP4_TrackSynchro( input_thread_t *p_input, track_data_mp4_t *p_track );
+static void MP4_TrackCreate ( input_thread_t *,
+                              track_data_mp4_t *,
+                              MP4_Box_t  * );
+static void MP4_TrackDestroy( input_thread_t *,
+                              track_data_mp4_t * );
 
-static void MP4_ParseTrack();
+static int  MP4_TrackSelect ( input_thread_t *,
+                              track_data_mp4_t *,
+                              mtime_t );
+static void MP4_TrackUnselect(input_thread_t *,
+                              track_data_mp4_t * );
 
-static int MP4_CreateChunksIndex();
-static int MP4_CreateSamplesIndex();
+static int  MP4_TrackSeek   ( input_thread_t *,
+                              track_data_mp4_t *,
+                              mtime_t );
 
-static void MP4_StartDecoder();
-static void MP4_StopDecoder();
-
-static int  MP4_ReadSample();
-static int  MP4_DecodeSample();
+static uint64_t MP4_GetTrackPos( track_data_mp4_t * );
+static int  MP4_TrackSampleSize( track_data_mp4_t * );
+static int  MP4_TrackNextSample( input_thread_t *,
+                                 track_data_mp4_t * );
 
 #define MP4_Set4BytesLE( p, dw ) \
     *((uint8_t*)p)   = ( (dw)&0xff ); \
@@ -82,6 +90,8 @@ static int  MP4_DecodeSample();
     *((uint8_t*)p) = ( (dw)&0xff ); \
     *((uint8_t*)p+1) = ( ((dw)>> 8)&0xff )
 
+#define FREE( p ) \
+    if( p ) { free( p ); (p) = NULL;}
 
 /*****************************************************************************
  * MP4Init: check file and initializes MP4 structures
@@ -214,6 +224,38 @@ static int MP4Init( vlc_object_t * p_this )
                         p_demux->i_tracks,
                         p_demux->i_tracks ? 's':' ' );
 
+    /*  create one program */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    if( input_InitStream( p_input, 0 ) == -1)
+    {
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        msg_Err( p_input, "cannot init stream" );
+        MP4End( p_input );
+        return( -1 );
+    }
+    /* Needed to create program _before_ MP4_TrackCreate */
+    if( input_AddProgram( p_input, 0, 0) == NULL )
+    {
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        msg_Err( p_input, "cannot add program" );
+        MP4End( p_input );
+        return( -1 );
+    }
+    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
+    /* XXX beurk and beurk, see MP4Demux and MP4Seek */
+    if( p_demux->i_duration/p_demux->i_timescale > 0 )
+    {
+        p_input->stream.i_mux_rate =
+            p_input->stream.p_selected_area->i_size / 50 /
+            ( p_demux->i_duration / p_demux->i_timescale );
+    }
+    else
+    {
+        p_input->stream.i_mux_rate = 0;
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+
     /* allocate memory */
     p_demux->track = calloc( p_demux->i_tracks, sizeof( track_data_mp4_t ) );
 
@@ -221,7 +263,7 @@ static int MP4Init( vlc_object_t * p_this )
     for( i = 0; i < p_demux->i_tracks; i++ )
     {
         p_trak = MP4_BoxGet( &p_demux->box_root, "/moov/trak[%d]", i );
-        MP4_ParseTrack( p_input, &p_demux->track[i], p_trak );
+        MP4_TrackCreate( p_input, &p_demux->track[i], p_trak );
 
         if( p_demux->track[i].b_ok )
         {
@@ -254,43 +296,12 @@ static int MP4Init( vlc_object_t * p_this )
 
     }
 
-    /*  create one program */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_InitStream( p_input, 0 ) == -1)
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot init stream" );
-        MP4End( p_input );
-        return( -1 );
-    }
-    if( input_AddProgram( p_input, 0, 0) == NULL )
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot add program" );
-        MP4End( p_input );
-        return( -1 );
-    }
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-    /* XXX beurk and beurk, see MP4Demux and MP4Seek */
-    if( p_demux->i_duration/p_demux->i_timescale > 0 )
-    {
-        p_input->stream.i_mux_rate =
-            p_input->stream.p_selected_area->i_size / 50 /
-            ( p_demux->i_duration / p_demux->i_timescale );
-    }
-    else
-    {
-        p_input->stream.i_mux_rate = 0;
-    }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-
     for( i = 0; i < p_demux->i_tracks; i++ )
     {
         /* start decoder for this track if enable by default*/
-        if( p_demux->track[i].b_enable )
+        if( p_demux->track[i].b_ok && p_demux->track[i].b_enable )
         {
-            MP4_StartDecoder( p_input, &p_demux->track[i] );
+            MP4_TrackSelect( p_input, &p_demux->track[i], 0 );
         }
     }
 
@@ -311,6 +322,52 @@ static int MP4Demux( input_thread_t *p_input )
 {
     demux_sys_t *p_demux = p_input->p_demux_data;
     unsigned int i_track;
+
+
+    unsigned int i_track_selected;
+    vlc_bool_t   b_video;
+    vlc_bool_t   b_play_audio;
+
+    /* check for newly selected/unselected track */
+    for( i_track = 0, i_track_selected = 0, b_video = VLC_FALSE;
+            i_track <  p_demux->i_tracks; i_track++ )
+    {
+#define track   p_demux->track[i_track]
+        if( track.b_selected && track.i_sample >= track.i_sample_count )
+        {
+            msg_Warn( p_input, "track[0x%x] will be disabled", track.i_track_ID );
+            MP4_TrackUnselect( p_input, &track );
+        }
+        else if( track.b_ok )
+        {
+            if( track.b_selected && track.p_es->p_decoder_fifo == NULL )
+            {
+                MP4_TrackUnselect( p_input, &track );
+            }
+            else if( !track.b_selected && track.p_es->p_decoder_fifo != NULL )
+            {
+                MP4_TrackSelect( p_input, &track, MP4_GetMoviePTS( p_demux ) );
+            }
+
+            if( track.b_selected )
+            {
+                i_track_selected++;
+
+                if( track.i_cat == VIDEO_ES )
+                {
+                    b_video = VLC_TRUE;
+                }
+            }
+        }
+#undef  track
+    }
+
+    if( i_track_selected <= 0 )
+    {
+        msg_Warn( p_input, "no track selected, exiting..." );
+        return( 0 );
+    }
+
 
     /* XXX beurk, beuRK and BEURK,
        but only way I've found to detect seek from interface */
@@ -344,53 +401,111 @@ static int MP4Demux( input_thread_t *p_input )
     p_demux->i_time += __MAX( p_demux->i_timescale / 10 , 1 );
 
 
+    /* *** send audio data to decoder if rate == DEFAULT_RATE or no video *** */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    if( p_input->stream.control.i_rate == DEFAULT_RATE || !b_video )
+    {
+        b_play_audio = VLC_TRUE;
+    }
+    else
+    {
+        b_play_audio = VLC_FALSE;
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
     for( i_track = 0; i_track < p_demux->i_tracks; i_track++ )
     {
-        if( ( !p_demux->track[i_track].b_ok )||
-            ( !p_demux->track[i_track].p_es )||
-            ( !p_demux->track[i_track].p_es->p_decoder_fifo )||
-            ( MP4_GetTrackPTS( &p_demux->track[i_track] ) >=
-                        MP4_GetMoviePTS( p_demux ) ) )
+#define track p_demux->track[i_track]
+        if( !track.b_ok ||
+            !track.b_selected ||
+            MP4_GetTrackPTS( &track ) >= MP4_GetMoviePTS( p_demux ) )
         {
-            continue; /* no need to read something */
+            continue;
         }
-        while( MP4_GetTrackPTS( &p_demux->track[i_track] ) <
-                        MP4_GetMoviePTS( p_demux ) )
+        while( MP4_GetTrackPTS( &track ) < MP4_GetMoviePTS( p_demux ) )
         {
 
-            pes_packet_t *p_pes;
-
-            /* read a sample */
-            if( !MP4_ReadSample( p_input ,
-                                 &p_demux->track[i_track],
-                                 &p_pes ) )
+            if( !b_play_audio && track.i_cat == AUDIO_ES )
             {
-                break;
+                if( MP4_TrackNextSample( p_input, &track ) )
+                {
+                    break;
+                }
             }
+            else
+            {
+                size_t i_size;
+                off_t i_pos;
 
-            /* send it to decoder and update time of this track
-                 it also launch a new decoder if needed */
-            MP4_DecodeSample( p_input ,
-                              &p_demux->track[i_track],
-                              p_pes );
+                data_packet_t *p_data;
+                pes_packet_t *p_pes;
+
+                /* caculate size and position for this sample */
+                i_size = MP4_TrackSampleSize( &track );
+
+                i_pos  = MP4_GetTrackPos( &track );
+
+                /* go,go go ! */
+                if( ! MP4_SeekAbsolute( p_input, i_pos ) )
+                {
+                    msg_Warn( p_input, "track[0x%x] will be disabled (eof?)", track.i_track_ID );
+                    MP4_TrackUnselect( p_input, &track );
+                    break;
+                }
+
+
+                /* now create a pes */
+                if( !(p_pes = input_NewPES( p_input->p_method_data ) ) )
+                {
+                    break;
+                }
+                /* and a data packet for the data */
+                if( !(p_data = input_NewPacket( p_input->p_method_data, i_size ) ) )
+                {
+                    input_DeletePES( p_input->p_method_data, p_pes );
+                    break;
+                }
+                /* initialisation of all the field */
+                p_pes->i_dts = p_pes->i_pts = 0;
+                p_pes->p_first = p_pes->p_last  = p_data;
+                p_pes->i_nb_data = 1;
+                p_pes->i_pes_size = i_size;
+                if( i_size > 0 )
+                {
+                    if( !MP4_ReadData( p_input, p_data->p_payload_start, i_size ) )
+                    {
+                        input_DeletePES( p_input->p_method_data, p_pes );
+
+                        msg_Warn( p_input, "track[0x%x] will be disabled (eof?)", track.i_track_ID );
+                        MP4_TrackUnselect( p_input, &track );
+                        break;
+                    }
+                }
+
+                p_pes->i_dts =
+                    p_pes->i_pts = input_ClockGetTS( p_input,
+                                                     p_input->stream.p_selected_program,
+                                                     MP4_GetTrackPTS( &track ) * 9/100);
+
+                if( track.p_es->p_decoder_fifo )
+                {
+                    input_DecodePES( track.p_es->p_decoder_fifo, p_pes );
+                }
+                else
+                {
+                    input_DeletePES( p_input->p_method_data, p_pes );
+                }
+
+                if( MP4_TrackNextSample( p_input, &track ) )
+                {
+                    break;
+                }
+            }
         }
-
+#undef track
     }
 
-    /* now check if all tracks are finished or unhandled*/
-
-    for( i_track = 0; i_track < p_demux->i_tracks; i_track++ )
-    {
-        if( ( p_demux->track[i_track].b_ok )&&
-            ( p_demux->track[i_track].i_sample < p_demux->track[i_track].i_sample_count )&&
-            ( p_demux->track[i_track].p_es )&&
-            ( p_demux->track[i_track].p_es->p_decoder_fifo ) )
-        {
-            return( 1 );
-        }
-    }
-
-    return( 0 ); /* EOF */
+    return( 1 );
 }
 /*****************************************************************************
  * MP4Seek: Got to i_date
@@ -399,16 +514,19 @@ static int   MP4Seek     ( input_thread_t *p_input, mtime_t i_date )
 {
     demux_sys_t *p_demux = p_input->p_demux_data;
     unsigned int i_track;
-
     /* First update update global time */
     p_demux->i_time = i_date * p_demux->i_timescale / 1000000;
-    p_demux->i_pcr = __MAX( MP4_GetMoviePTS( p_demux ) - DEFAULT_PTS_DELAY,
-                            0 ) * 9 / 100;
+    p_demux->i_pcr  = i_date* 9 / 100;
 
     /* Now for each stream try to go to this time */
     for( i_track = 0; i_track < p_demux->i_tracks; i_track++ )
     {
-        MP4_TrackSynchro( p_input, &p_demux->track[i_track] );
+#define track p_demux->track[i_track]
+        if( track.b_ok && track.b_selected )
+        {
+            MP4_TrackSeek( p_input, &track, i_date );
+        }
+#undef  track
     }
     return( 1 );
 }
@@ -418,8 +536,6 @@ static int   MP4Seek     ( input_thread_t *p_input, mtime_t i_date )
  *****************************************************************************/
 static void __MP4End ( vlc_object_t * p_this )
 {
-#define FREE( p ) \
-    if( p ) { free( p ); }
     unsigned int i_track;
     input_thread_t *  p_input = (input_thread_t *)p_this;
     demux_sys_t *p_demux = p_input->p_demux_data;
@@ -428,27 +544,11 @@ static void __MP4End ( vlc_object_t * p_this )
     MP4_BoxFree( p_input, &p_demux->box_root );
     for( i_track = 0; i_track < p_demux->i_tracks; i_track++ )
     {
-        unsigned int i_chunk;
-        for( i_chunk = 0;
-                i_chunk < p_demux->track[i_track].i_chunk_count; i_chunk++ )
-        {
-            if( p_demux->track[i_track].chunk )
-            {
-               FREE(p_demux->track[i_track].chunk[i_chunk].p_sample_count_dts);
-               FREE(p_demux->track[i_track].chunk[i_chunk].p_sample_delta_dts );
-            }
-        }
-        FREE( p_demux->track[i_track].chunk );
-
-        if( !p_demux->track[i_track].i_sample_size )
-        {
-            FREE( p_demux->track[i_track].p_sample_size );
-        }
+        MP4_TrackDestroy( p_input, &p_demux->track[i_track] );
     }
     FREE( p_demux->track );
 
     FREE( p_input->p_demux_data );
-#undef FREE
 }
 
 
@@ -456,235 +556,8 @@ static void __MP4End ( vlc_object_t * p_this )
  * Local functions, specific to vlc
  ****************************************************************************/
 
-/****************************************************************************
- * MP4_TrackSynchro : synchronize a track with movie time after seek or
- *                    for newly selected track
- *****************************************************************************
- * TODO add support of Edit List (edts/elts) and Shadow Sync Sample(stsh)
- ****************************************************************************/
-static int MP4_TrackSynchro( input_thread_t *p_input, track_data_mp4_t *p_track )
-{
-    demux_sys_t *p_demux = p_input->p_demux_data;
-    unsigned int i_chunk_last;
-    MP4_Box_t   *p_stss;
-
-    if( !p_track->b_ok ||
-        !p_track->p_es ||
-        !p_track->p_es->p_decoder_fifo )
-    {
-        return( 0 );
-    }
-    p_track->i_sample = 0;
-    i_chunk_last = p_track->i_chunk;
-    p_track->i_chunk = 0;
-    for( ;; )
-    {
-        if( p_track->i_sample >= p_track->i_sample_count )
-        {
-            msg_Warn( p_input,
-                        "track[Id 0x%x] will be disabled (seeking too far)",
-                        p_track->i_track_ID );
-            MP4_StopDecoder( p_input, p_track );
-            break;
-        }
-        if( MP4_GetTrackPTS( p_track ) >= MP4_GetMoviePTS( p_demux ) )
-        {
-            break;
-        }
-        /* go one sample after */
-        p_track->i_sample++;
-        if( p_track->i_sample >= p_track->chunk[p_track->i_chunk].i_sample_first +
-                p_track->chunk[p_track->i_chunk].i_sample_count )
-        {
-            p_track->i_chunk++;
-        }
-    }
-    if( p_track->i_sample >= p_track->i_sample_count )
-    {
-        return( 0 );
-    }
-
-    /* *** Try to find nearest sync points *** */
-    if( ( p_stss = MP4_BoxGet( p_track->p_stbl, "stss" ) ) )
-    {
-        unsigned int i_index;
-        msg_Dbg( p_input,
-                    "track[Id 0x%x] using Sync Sample Box (stss)",
-                    p_track->i_track_ID );
-        for( i_index = 0; i_index < p_stss->data.p_stss->i_entry_count; i_index++ )
-        {
-            if( p_stss->data.p_stss->i_sample_number[i_index] >= p_track->i_sample )
-            {
-                if( i_index > 0 )
-                {
-                    msg_Dbg( p_input, "stts gives %d --> %d (sample number)",
-                            p_track->i_sample,
-                            p_stss->data.p_stss->i_sample_number[i_index-1] );
-                    p_track->i_sample = p_stss->data.p_stss->i_sample_number[i_index-1];
-                    /* new track.i_sample is less than old so i_chunk can only decreased */
-                    while( p_track->i_chunk > 0 &&
-                            p_track->i_sample < p_track->chunk[p_track->i_chunk].i_sample_first )
-                    {
-                        p_track->i_chunk--;
-                    }
-                }
-                else
-                {
-                    msg_Dbg( p_input, "stts gives %d --> %d (sample number)",
-                            p_track->i_sample,
-                            p_stss->data.p_stss->i_sample_number[i_index-1] );
-                    p_track->i_sample = p_stss->data.p_stss->i_sample_number[i_index];
-                    /* new track.i_sample is more than old so i_chunk can only increased */
-                    while( p_track->i_chunk < p_track->i_chunk_count - 1 &&
-                           p_track->i_sample >= p_track->chunk[p_track->i_chunk].i_sample_first +
-                                                p_track->chunk[p_track->i_chunk].i_sample_count )
-                    {
-                        p_track->i_chunk++;
-                    }
-                }
-                break;
-            }
-        }
-    }
-    else
-    {
-        msg_Dbg( p_input,
-                    "track[Id 0x%x] does not provide Sync Sample Box (stss)",
-                    p_track->i_track_ID );
-    }
-
-    /* *** If i_sample_description_index has changed restart decoder *** */
-    if( p_track->chunk[i_chunk_last].i_sample_description_index !=
-            p_track->chunk[p_track->i_chunk].i_sample_description_index )
-    {
-        msg_Warn( p_input,
-                "SampleEntry has changed, restarting decoder" );
-        MP4_StopDecoder( p_input, p_track );
-        MP4_StartDecoder( p_input, p_track );
-    }
-    return( 1 );
-}
-
-/****************************************************************************
- * Parse track information and create all needed data to run a track
- * If it succeed b_ok is set to 1 else to 0
- ****************************************************************************/
-static void MP4_ParseTrack( input_thread_t *p_input,
-                     track_data_mp4_t *p_demux_track,
-                     MP4_Box_t  * p_trak )
-{
-    unsigned int i;
-
-    MP4_Box_t *p_tkhd = MP4_BoxGet( p_trak, "tkhd" );
-    MP4_Box_t *p_tref = MP4_BoxGet( p_trak, "tref" );
-    MP4_Box_t *p_elst;
-
-    MP4_Box_t *p_mdhd;
-    MP4_Box_t *p_hdlr;
-
-    MP4_Box_t *p_vmhd;
-    MP4_Box_t *p_smhd;
-
-    /* hint track unsuported */
-
-    /* by default, track isn't usable */
-    p_demux_track->b_ok = 0;
-
-    /* by default, we don't known the categorie */
-    p_demux_track->i_cat = UNKNOWN_ES;
-
-    if( !p_tkhd )
-    {
-        return;
-    }
-
-    /* do we launch this track by default ? */
-    p_demux_track->b_enable =
-        ( ( p_tkhd->data.p_tkhd->i_flags&MP4_TRACK_ENABLED ) != 0 );
-
-    p_demux_track->i_track_ID = p_tkhd->data.p_tkhd->i_track_ID;
-    p_demux_track->i_width = p_tkhd->data.p_tkhd->i_width / 65536;
-    p_demux_track->i_height = p_tkhd->data.p_tkhd->i_height / 65536;
-
-    if( ( p_elst = MP4_BoxGet( p_trak, "edts/elst" ) ) )
-    {
-/*        msg_Warn( p_input, "unhandled box: edts --> FIXME" ); */
-    }
-
-    if( p_tref )
-    {
-/*        msg_Warn( p_input, "unhandled box: tref --> FIXME" ); */
-    }
-
-    p_mdhd = MP4_BoxGet( p_trak, "mdia/mdhd" );
-    p_hdlr = MP4_BoxGet( p_trak, "mdia/hdlr" );
-
-    if( ( !p_mdhd )||( !p_hdlr ) )
-    {
-        return;
-    }
-
-    p_demux_track->i_timescale = p_mdhd->data.p_mdhd->i_timescale;
-
-    for( i = 0; i < 3; i++ )
-    {
-        p_demux_track->i_language[i] = p_mdhd->data.p_mdhd->i_language[i];
-    }
-    p_mdhd->data.p_mdhd->i_language[3] = 0;
-
-    switch( p_hdlr->data.p_hdlr->i_handler_type )
-    {
-        case( FOURCC_soun ):
-            if( !( p_smhd = MP4_BoxGet( p_trak, "mdia/minf/smhd" ) ) )
-            {
-                return;
-            }
-            p_demux_track->i_cat = AUDIO_ES;
-            break;
-
-        case( FOURCC_vide ):
-            if( !( p_vmhd = MP4_BoxGet( p_trak, "mdia/minf/vmhd" ) ) )
-            {
-                return;
-            }
-            p_demux_track->i_cat = VIDEO_ES;
-            break;
-
-        default:
-            return;
-    }
-/*  TODO
-    add support for:
-    p_dinf = MP4_BoxGet( p_minf, "dinf" );
-*/
-    if( !( p_demux_track->p_stbl = MP4_BoxGet( p_trak,"mdia/minf/stbl" ) ) )
-    {
-        return;
-    }
-
-    if( !( p_demux_track->p_stsd = MP4_BoxGet( p_trak,"mdia/minf/stbl/stsd") ) )
-    {
-        return;
-    }
-
-    /* Create chunk  index table */
-    if( !MP4_CreateChunksIndex( p_input,p_demux_track  ) )
-    {
-        return; /* cannot create chunks index */
-    }
-
-    /* create sample index table needed for reading and seeking */
-    if( !MP4_CreateSamplesIndex( p_input, p_demux_track ) )
-    {
-        return; /* cannot create samples index */
-    }
-
-    p_demux_track->b_ok = 1;
-}
-
-
 /* now create basic chunk data, the rest will be filled by MP4_CreateSamplesIndex */
-static int MP4_CreateChunksIndex( input_thread_t *p_input,
+static int TrackCreateChunksIndex( input_thread_t *p_input,
                                    track_data_mp4_t *p_demux_track )
 {
     MP4_Box_t *p_co64; /* give offset for each chunk, same for stco and co64 */
@@ -697,14 +570,14 @@ static int MP4_CreateChunksIndex( input_thread_t *p_input,
           !(p_co64 = MP4_BoxGet( p_demux_track->p_stbl, "co64" ) ) )||
         ( !(p_stsc = MP4_BoxGet( p_demux_track->p_stbl, "stsc" ) ) ))
     {
-        return( 0 );
+        return( VLC_EGENERIC );
     }
 
     p_demux_track->i_chunk_count = p_co64->data.p_co64->i_entry_count;
     if( !p_demux_track->i_chunk_count )
     {
         msg_Warn( p_input, "no chunk defined" );
-        return( 0 );
+        return( VLC_EGENERIC );
     }
     p_demux_track->chunk = calloc( p_demux_track->i_chunk_count,
                                    sizeof( chunk_data_mp4_t ) );
@@ -724,7 +597,7 @@ static int MP4_CreateChunksIndex( input_thread_t *p_input,
     if( !i_index )
     {
         msg_Warn( p_input, "cannot read chunk table or table empty" );
-        return( 0 );
+        return( VLC_EGENERIC );
     }
 
     while( i_index )
@@ -753,14 +626,11 @@ static int MP4_CreateChunksIndex( input_thread_t *p_input,
              "track[Id 0x%x] read %d chunk",
              p_demux_track->i_track_ID,
             p_demux_track->i_chunk_count );
-    return( 1 );
 
+    return( VLC_SUCCESS );
 }
-
-
-
-static int MP4_CreateSamplesIndex( input_thread_t *p_input,
-                                   track_data_mp4_t *p_demux_track )
+static int TrackCreateSamplesIndex( input_thread_t *p_input,
+                                    track_data_mp4_t *p_demux_track )
 {
     MP4_Box_t *p_stts; /* makes mapping between sample and decoding time,
                           ctts make same mapping but for composition time,
@@ -784,7 +654,7 @@ static int MP4_CreateSamplesIndex( input_thread_t *p_input,
     if( ( !p_stts )||( !p_stsz ) )
     {
         msg_Warn( p_input, "cannot read sample table" );
-        return( 0 );
+        return( VLC_EGENERIC );
     }
 
     p_demux_track->i_sample_count = p_stsz->data.p_stsz->i_sample_count;
@@ -889,19 +759,27 @@ static int MP4_CreateSamplesIndex( input_thread_t *p_input,
              p_demux_track->i_sample_count,
              i_last_dts / p_demux_track->i_timescale );
 
-    return( 1 );
+    return( VLC_SUCCESS );
 }
 
-static void MP4_StartDecoder( input_thread_t *p_input,
-                                 track_data_mp4_t *p_demux_track )
+/*
+ * TrackCreateES:
+ *  Create ES and PES to init decoder if needed, for a track starting at i_chunk
+ */
+static int  TrackCreateES   ( input_thread_t   *p_input,
+                              track_data_mp4_t *p_track,
+                              unsigned int     i_chunk,
+                              es_descriptor_t  **pp_es,
+                              pes_packet_t     **pp_pes )
 {
     MP4_Box_t *  p_sample;
     unsigned int i;
-    unsigned int i_chunk;
 
     unsigned int i_decoder_specific_info_len;
     uint8_t *    p_decoder_specific_info;
-    pes_packet_t *p_pes_init;
+
+    es_descriptor_t *p_es;
+    pes_packet_t    *p_pes_init;
 
     uint8_t             *p_init;
     BITMAPINFOHEADER    *p_bih;
@@ -909,65 +787,83 @@ static void MP4_StartDecoder( input_thread_t *p_input,
 
     MP4_Box_t   *p_esds;
 
-
-    if( (!p_demux_track->b_ok )||( p_demux_track->i_cat == UNKNOWN_ES ) )
-    {
-        return;
-    }
-
-    msg_Dbg( p_input, "starting decoder for track[Id 0x%x]",
-                      p_demux_track->i_track_ID );
-
-    /* launch decoder according in chunk we are */
-    i_chunk = p_demux_track->i_chunk;
-
-    if( !p_demux_track->chunk[i_chunk].i_sample_description_index )
+    if( !p_track->chunk[i_chunk].i_sample_description_index )
     {
         msg_Warn( p_input,
                   "invalid SampleEntry index (track[Id 0x%x])",
-                  p_demux_track->i_track_ID );
-        return;
+                  p_track->i_track_ID );
+        return( VLC_EGENERIC );
     }
-    p_sample = MP4_BoxGet(  p_demux_track->p_stsd,
-                            "[%d]",
-                p_demux_track->chunk[i_chunk].i_sample_description_index - 1 );
 
-    if( ( !p_sample )||( !p_sample->data.p_data ) )
+    p_sample = MP4_BoxGet(  p_track->p_stsd,
+                            "[%d]",
+                p_track->chunk[i_chunk].i_sample_description_index - 1 );
+
+    if( !p_sample || !p_sample->data.p_data )
     {
         msg_Warn( p_input,
                   "cannot find SampleEntry (track[Id 0x%x])",
-                  p_demux_track->i_track_ID );
-        return;
+                  p_track->i_track_ID );
+        return( VLC_EGENERIC );
     }
 
+    p_track->p_sample = p_sample;
+
+    if( p_track->i_sample_size == 1 )
+    {
+        MP4_Box_data_sample_soun_t *p_soun;
+
+        p_soun = p_sample->data.p_sample_soun;
+
+        if( p_soun->i_qt_version == 0 )
+        {
+            switch( p_sample->i_type )
+            {
+                case VLC_FOURCC( 'i', 'm', 'a', '4' ):
+                    p_soun->i_qt_version = 1;
+                    p_soun->i_sample_per_packet = 64;
+                    p_soun->i_bytes_per_packet  = 34;
+                    p_soun->i_bytes_per_frame   = 34 * p_soun->i_channelcount;
+                    p_soun->i_bytes_per_sample  = 2;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_demux_track->p_es = input_AddES( p_input,
-                                       p_input->stream.p_selected_program,
-                                       p_demux_track->i_track_ID,
-                                       0 );
+    p_es = input_AddES( p_input,
+                        p_input->stream.p_selected_program,
+                        p_track->i_track_ID,
+                        0 );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     /* Initialise ES, first language as description */
     for( i = 0; i < 3; i++ )
     {
-        p_demux_track->p_es->psz_desc[i] = p_demux_track->i_language[i];
+        p_es->psz_desc[i] = p_track->i_language[i];
     }
-    p_demux_track->p_es->psz_desc[3] = '\0';
+    p_es->psz_desc[3] = '\0';
 
-    p_demux_track->p_es->i_stream_id = p_demux_track->i_track_ID;
+    p_es->i_stream_id = p_track->i_track_ID;
 
     /* It's a little ugly but .. there are special cases */
     switch( p_sample->i_type )
     {
         case( VLC_FOURCC( '.', 'm', 'p', '3' ) ):
         case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
-            p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'a' );
+            p_es->i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'a' );
+            break;
+        case( VLC_FOURCC( 'r', 'a', 'w', ' ' ) ):
+            p_es->i_fourcc = VLC_FOURCC( 'a', 'r', 'a', 'w' );
             break;
         default:
-            p_demux_track->p_es->i_fourcc = p_sample->i_type;
+            p_es->i_fourcc = p_sample->i_type;
             break;
     }
 
-    p_demux_track->p_es->i_cat = p_demux_track->i_cat;
+    p_es->i_cat = p_track->i_cat;
 
     i_decoder_specific_info_len = 0;
     p_decoder_specific_info = NULL;
@@ -984,10 +880,10 @@ static void MP4_StartDecoder( input_thread_t *p_input,
         switch( p_decconfig->i_objectTypeIndication )
         {
             case( 0x20 ): /* MPEG4 VIDEO */
-                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','4','v' );
+                p_es->i_fourcc = VLC_FOURCC( 'm','p','4','v' );
                 break;
             case( 0x40):
-                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','4','a' );
+                p_es->i_fourcc = VLC_FOURCC( 'm','p','4','a' );
                 break;
             case( 0x60):
             case( 0x61):
@@ -995,33 +891,33 @@ static void MP4_StartDecoder( input_thread_t *p_input,
             case( 0x63):
             case( 0x64):
             case( 0x65): /* MPEG2 video */
-                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','g','v' );
+                p_es->i_fourcc = VLC_FOURCC( 'm','p','g','v' );
                 break;
             /* Theses are MPEG2-AAC */
             case( 0x66): /* main profile */
             case( 0x67): /* Low complexity profile */
             case( 0x68): /* Scaleable Sampling rate profile */
-                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','4','a' );
+                p_es->i_fourcc = VLC_FOURCC( 'm','p','4','a' );
                 break;
             /* true MPEG 2 audio */
             case( 0x69):
-                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','g','a' );
+                p_es->i_fourcc = VLC_FOURCC( 'm','p','g','a' );
                 break;
             case( 0x6a): /* MPEG1 video */
-                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','g','v' );
+                p_es->i_fourcc = VLC_FOURCC( 'm','p','g','v' );
                 break;
             case( 0x6b): /* MPEG1 audio */
-                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'm','p','g','a' );
+                p_es->i_fourcc = VLC_FOURCC( 'm','p','g','a' );
                 break;
             case( 0x6c ): /* jpeg */
-                p_demux_track->p_es->i_fourcc = VLC_FOURCC( 'j','p','e','g' );
+                p_es->i_fourcc = VLC_FOURCC( 'j','p','e','g' );
                 break;
             default:
                 /* Unknown entry, but don't touch i_fourcc */
                 msg_Warn( p_input,
                           "unknown objectTypeIndication(0x%x) (Track[ID 0x%x])",
                           p_decconfig->i_objectTypeIndication,
-                          p_demux_track->i_track_ID );
+                          p_track->i_track_ID );
                 break;
         }
         i_decoder_specific_info_len =
@@ -1047,7 +943,7 @@ static void MP4_StartDecoder( input_thread_t *p_input,
 
      */
 
-    switch( p_demux_track->i_cat )
+    switch( p_track->i_cat )
     {
         case( VIDEO_ES ):
             /* now create a bitmapinfoheader_t for decoder and
@@ -1071,12 +967,12 @@ static void MP4_StartDecoder( input_thread_t *p_input,
             if( p_bih->biWidth == 0 )
             {
                 // fall on display size
-                p_bih->biWidth = p_demux_track->i_width;
+                p_bih->biWidth = p_track->i_width;
             }
             if( p_bih->biHeight == 0 )
             {
                 // fall on display size
-                p_bih->biHeight = p_demux_track->i_height;
+                p_bih->biHeight = p_track->i_height;
             }
 
             if( i_decoder_specific_info_len )
@@ -1089,7 +985,7 @@ static void MP4_StartDecoder( input_thread_t *p_input,
 
                 /* If stream is mpeg4 video we send specific_info,
                    as it's needed to decode it (vol) */
-                switch( p_demux_track->p_es->i_fourcc )
+                switch( p_es->i_fourcc )
                 {
                     case VLC_FOURCC( 'm','p','4','v' ):
                     case VLC_FOURCC( 'D','I','V','X' ):
@@ -1116,7 +1012,7 @@ static void MP4_StartDecoder( input_thread_t *p_input,
             p_init = malloc( sizeof( WAVEFORMATEX ) + i_decoder_specific_info_len + 16 );
             p_wf = (WAVEFORMATEX*)p_init;
 
-            p_wf->wFormatTag = 0;
+            p_wf->wFormatTag = 1;
             p_wf->nChannels = p_sample->data.p_sample_soun->i_channelcount;
             p_wf->nSamplesPerSec = p_sample->data.p_sample_soun->i_sampleratehi;
             p_wf->nAvgBytesPerSec = p_sample->data.p_sample_soun->i_channelcount *
@@ -1139,165 +1035,635 @@ static void MP4_StartDecoder( input_thread_t *p_input,
             p_init = NULL;
             break;
     }
-    if( p_demux_track->i_cat == AUDIO_ES )
+    if( p_es->i_cat == AUDIO_ES )
     {
-        p_demux_track->p_es->p_waveformatex = (void*)p_init;
+        p_es->p_bitmapinfoheader = NULL;
+        p_es->p_waveformatex     = (void*)p_init;
     }
-    else if( p_demux_track->i_cat == VIDEO_ES )
+    else if( p_es->i_cat == VIDEO_ES )
     {
-        p_demux_track->p_es->p_bitmapinfoheader = (void*)p_init;
+        p_es->p_bitmapinfoheader = (void*)p_init;
+        p_es->p_waveformatex     = NULL;
     }
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    input_SelectES( p_input, p_demux_track->p_es );
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    if( !p_demux_track->p_es->p_decoder_fifo )
+    *pp_es = p_es;
+    *pp_pes = p_pes_init;
+    return( VLC_SUCCESS );
+}
+
+/* given a time it return sample/chunk */
+static int  TrackTimeToSampleChunk( input_thread_t *p_input,
+                                    track_data_mp4_t *p_track,
+                                    uint64_t i_start,
+                                    uint32_t *pi_chunk,
+                                    uint32_t *pi_sample )
+{
+    MP4_Box_t    *p_stss;
+    uint64_t     i_dts;
+    unsigned int i_sample;
+    unsigned int i_chunk;
+    int          i_index;
+
+    /* convert absolute time to in timescale unit */
+    i_start = i_start * (mtime_t)p_track->i_timescale / (mtime_t)1000000;
+
+    /* FIXME see if it's needed to check p_track->i_chunk_count */
+    if( !p_track->b_ok || p_track->i_chunk_count == 0 )
     {
-        msg_Warn( p_input, "cannot start decoder" );
-        if( p_pes_init )
+        return( VLC_EGENERIC );
+    }
+
+    /* we start from sample 0/chunk 0, hope it won't take too much time */
+    /* *** find good chunk *** */
+    for( i_chunk = 0; ; i_chunk++ )
+    {
+        if( i_chunk + 1 >= p_track->i_chunk_count )
         {
-            input_DeletePES( p_input->p_method_data, p_pes_init );
+            /* at the end and can't check if i_start in this chunk,
+               it will be check while searching i_sample */
+            i_chunk = p_track->i_chunk_count - 1;
+            break;
         }
+
+        if( i_start >= p_track->chunk[i_chunk].i_first_dts &&
+            i_start <  p_track->chunk[i_chunk + 1].i_first_dts )
+        {
+            break;
+        }
+    }
+
+    /* *** find sample in the chunk *** */
+    i_sample = p_track->chunk[i_chunk].i_sample_first;
+    i_dts    = p_track->chunk[i_chunk].i_first_dts;
+    for( i_index = 0; i_sample < p_track->chunk[i_chunk].i_sample_count; )
+    {
+        if( i_dts +
+            p_track->chunk[i_chunk].p_sample_count_dts[i_index] *
+            p_track->chunk[i_chunk].p_sample_delta_dts[i_index] < i_start )
+        {
+            i_dts    +=
+                p_track->chunk[i_chunk].p_sample_count_dts[i_index] *
+                p_track->chunk[i_chunk].p_sample_delta_dts[i_index];
+
+            i_sample += p_track->chunk[i_chunk].p_sample_count_dts[i_index];
+            i_index++;
+        }
+        else
+        {
+            if( p_track->chunk[i_chunk].p_sample_delta_dts[i_index] <= 0 )
+            {
+                break;
+            }
+            i_sample += ( i_start - i_dts ) / p_track->chunk[i_chunk].p_sample_delta_dts[i_index];
+            break;
+        }
+    }
+
+    if( i_sample >= p_track->i_sample_count )
+    {
+        msg_Warn( p_input,
+                  "track[Id 0x%x] will be disabled (seeking too far) chunk=%d sample=%d",
+                  p_track->i_track_ID, i_chunk, i_sample );
+        return( VLC_EGENERIC );
+    }
+
+
+    /* *** Try to find nearest sync points *** */
+    if( ( p_stss = MP4_BoxGet( p_track->p_stbl, "stss" ) ) )
+    {
+        unsigned int i_index;
+        msg_Dbg( p_input,
+                    "track[Id 0x%x] using Sync Sample Box (stss)",
+                    p_track->i_track_ID );
+        for( i_index = 0; i_index < p_stss->data.p_stss->i_entry_count; i_index++ )
+        {
+            if( p_stss->data.p_stss->i_sample_number[i_index] >= i_sample )
+            {
+                if( i_index > 0 )
+                {
+                    msg_Dbg( p_input, "stts gives %d --> %d (sample number)",
+                            i_sample,
+                            p_stss->data.p_stss->i_sample_number[i_index-1] );
+                    i_sample = p_stss->data.p_stss->i_sample_number[i_index-1];
+                    /* new i_sample is less than old so i_chunk can only decreased */
+                    while( i_chunk > 0 &&
+                            i_sample < p_track->chunk[i_chunk].i_sample_first )
+                    {
+                        i_chunk--;
+                    }
+                }
+                else
+                {
+                    msg_Dbg( p_input, "stts gives %d --> %d (sample number)",
+                            i_sample,
+                            p_stss->data.p_stss->i_sample_number[i_index-1] );
+                    i_sample = p_stss->data.p_stss->i_sample_number[i_index];
+                    /* new i_sample is more than old so i_chunk can only increased */
+                    while( i_chunk < p_track->i_chunk_count - 1 &&
+                           i_sample >= p_track->chunk[i_chunk].i_sample_first +
+                                                p_track->chunk[i_chunk].i_sample_count )
+                    {
+                        i_chunk++;
+                    }
+                }
+                break;
+            }
+        }
+    }
+    else
+    {
+        msg_Dbg( p_input,
+                    "track[Id 0x%x] does not provide Sync Sample Box (stss)",
+                    p_track->i_track_ID );
+    }
+
+    if( pi_chunk  ) *pi_chunk  = i_chunk;
+    if( pi_sample ) *pi_sample = i_sample;
+    return( VLC_SUCCESS );
+}
+
+static int  TrackGotoChunkSample( input_thread_t   *p_input,
+                                  track_data_mp4_t *p_track,
+                                  unsigned int     i_chunk,
+                                  unsigned int     i_sample )
+{
+    /* now see if actual es is ok */
+    if( p_track->i_chunk < 0 ||
+        p_track->i_chunk >= p_track->i_chunk_count ||
+        p_track->chunk[p_track->i_chunk].i_sample_description_index !=
+            p_track->chunk[i_chunk].i_sample_description_index )
+    {
+        msg_Warn( p_input, "Recreate ES" );
+
+        /* no :( recreate es */
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        input_DelES( p_input, p_track->p_es );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        if( p_track->p_pes_init )
+        {
+            input_DeletePES( p_input->p_method_data, p_track->p_pes_init );
+        }
+
+        if( TrackCreateES( p_input,
+                           p_track, i_chunk,
+                           &p_track->p_es,
+                           &p_track->p_pes_init ) )
+        {
+            msg_Err( p_input, "cannot create es for track[Id 0x%x]",
+                     p_track->i_track_ID );
+
+            p_track->b_ok       = VLC_FALSE;
+            p_track->b_selected = VLC_FALSE;
+            return( VLC_EGENERIC );
+        }
+    }
+
+    /* select again the new decoder */
+    if( p_track->b_selected && p_track->p_es && p_track->p_es->p_decoder_fifo == NULL )
+    {
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        input_SelectES( p_input, p_track->p_es );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        if( p_track->p_es->p_decoder_fifo )
+        {
+            if( p_track->p_pes_init != NULL )
+            {
+                input_DecodePES( p_track->p_es->p_decoder_fifo, p_track->p_pes_init );
+                p_track->p_pes_init = NULL;
+            }
+            p_track->b_selected = VLC_TRUE;
+        }
+        else
+        {
+            msg_Dbg( p_input, "Argg cannot select this stream" );
+            if( p_track->p_pes_init != NULL )
+            {
+                input_DeletePES( p_input->p_method_data, p_track->p_pes_init );
+                p_track->p_pes_init = NULL;
+            }
+            p_track->b_selected = VLC_FALSE;
+        }
+    }
+
+    p_track->i_chunk    = i_chunk;
+    p_track->i_sample   = i_sample;
+
+    return( VLC_SUCCESS );
+}
+
+/****************************************************************************
+ * MP4_TrackCreate:
+ ****************************************************************************
+ * Parse track information and create all needed data to run a track
+ * If it succeed b_ok is set to 1 else to 0
+ ****************************************************************************/
+static void MP4_TrackCreate( input_thread_t *p_input,
+                             track_data_mp4_t *p_track,
+                             MP4_Box_t  * p_box_trak )
+{
+    unsigned int i;
+
+    MP4_Box_t *p_tkhd = MP4_BoxGet( p_box_trak, "tkhd" );
+    MP4_Box_t *p_tref = MP4_BoxGet( p_box_trak, "tref" );
+    MP4_Box_t *p_elst;
+
+    MP4_Box_t *p_mdhd;
+    MP4_Box_t *p_hdlr;
+
+    MP4_Box_t *p_vmhd;
+    MP4_Box_t *p_smhd;
+
+    /* hint track unsuported */
+
+    /* set default value (-> track unusable) */
+    p_track->b_ok       = VLC_FALSE;
+    p_track->b_enable   = VLC_FALSE;
+    p_track->b_selected = VLC_FALSE;
+
+    p_track->i_cat = UNKNOWN_ES;
+
+    if( !p_tkhd )
+    {
         return;
     }
 
-    if( p_pes_init != NULL )
+    /* do we launch this track by default ? */
+    p_track->b_enable =
+        ( ( p_tkhd->data.p_tkhd->i_flags&MP4_TRACK_ENABLED ) != 0 );
+
+    p_track->i_track_ID = p_tkhd->data.p_tkhd->i_track_ID;
+    p_track->i_width = p_tkhd->data.p_tkhd->i_width / 65536;
+    p_track->i_height = p_tkhd->data.p_tkhd->i_height / 65536;
+
+    if( ( p_elst = MP4_BoxGet( p_box_trak, "edts/elst" ) ) )
     {
-        input_DecodePES( p_demux_track->p_es->p_decoder_fifo, p_pes_init );
+/*        msg_Warn( p_input, "unhandled box: edts --> FIXME" ); */
     }
-    p_demux_track->b_ok = 1;
-    p_demux_track->b_selected = 1;
+
+    if( p_tref )
+    {
+/*        msg_Warn( p_input, "unhandled box: tref --> FIXME" ); */
+    }
+
+    p_mdhd = MP4_BoxGet( p_box_trak, "mdia/mdhd" );
+    p_hdlr = MP4_BoxGet( p_box_trak, "mdia/hdlr" );
+
+    if( ( !p_mdhd )||( !p_hdlr ) )
+    {
+        return;
+    }
+
+    p_track->i_timescale = p_mdhd->data.p_mdhd->i_timescale;
+
+    for( i = 0; i < 3; i++ )
+    {
+        p_track->i_language[i] = p_mdhd->data.p_mdhd->i_language[i];
+    }
+    p_mdhd->data.p_mdhd->i_language[3] = 0;
+
+    switch( p_hdlr->data.p_hdlr->i_handler_type )
+    {
+        case( FOURCC_soun ):
+            if( !( p_smhd = MP4_BoxGet( p_box_trak, "mdia/minf/smhd" ) ) )
+            {
+                return;
+            }
+            p_track->i_cat = AUDIO_ES;
+            break;
+
+        case( FOURCC_vide ):
+            if( !( p_vmhd = MP4_BoxGet( p_box_trak, "mdia/minf/vmhd" ) ) )
+            {
+                return;
+            }
+            p_track->i_cat = VIDEO_ES;
+            break;
+
+        default:
+            return;
+    }
+/*  TODO
+    add support for:
+    p_dinf = MP4_BoxGet( p_minf, "dinf" );
+*/
+    if( !( p_track->p_stbl = MP4_BoxGet( p_box_trak,"mdia/minf/stbl" ) ) )
+    {
+        return;
+    }
+
+    if( !( p_track->p_stsd = MP4_BoxGet( p_box_trak,"mdia/minf/stbl/stsd") ) )
+    {
+        return;
+    }
+
+    /* Create chunk  index table */
+    if( TrackCreateChunksIndex( p_input,p_track  ) )
+    {
+        return; /* cannot create chunks index */
+    }
+
+    /* create sample index table needed for reading and seeking */
+    if( TrackCreateSamplesIndex( p_input, p_track ) )
+    {
+        return; /* cannot create samples index */
+    }
+
+    p_track->i_chunk  = 0;
+    p_track->i_sample = 0;
+    /* now create es but does not select it */
+    /* XXX needed else vlc won't know this track exist */
+    if( TrackCreateES( p_input,
+                       p_track, p_track->i_chunk,
+                       &p_track->p_es,
+                       &p_track->p_pes_init ) )
+    {
+        msg_Err( p_input, "cannot create es for track[Id 0x%x]",
+                 p_track->i_track_ID );
+        return;
+    }
+#if 0
+    {
+        int i;
+
+        for( i = 0; i < p_track->i_chunk_count; i++ )
+        {
+            fprintf( stderr, "%-5d sample_count=%d pts=%lld\n", i, p_track->chunk[i].i_sample_count, p_track->chunk[i].i_first_dts );
+
+        }
+    }
+#endif
+    p_track->b_ok = VLC_TRUE;
 }
 
-static void MP4_StopDecoder( input_thread_t *p_input,
-                             track_data_mp4_t *p_demux_track )
+/****************************************************************************
+ * MP4_TrackDestroy:
+ ****************************************************************************
+ * Destroy a track created by MP4_TrackCreate.
+ ****************************************************************************/
+static void MP4_TrackDestroy( input_thread_t *p_input,
+                              track_data_mp4_t *p_track )
 {
-    msg_Dbg( p_input, "stopping decoder (track[Id 0x%x])",
-                      p_demux_track->i_track_ID );
+    unsigned int i_chunk;
 
-    input_UnselectES( p_input, p_demux_track->p_es );
-    p_demux_track->p_es = NULL;
+    p_track->b_ok = VLC_FALSE;
+    p_track->b_enable   = VLC_FALSE;
+    p_track->b_selected = VLC_FALSE;
 
-    p_demux_track->b_selected = 0;
+    p_track->i_cat = UNKNOWN_ES;
+
+    if( p_track->p_pes_init )
+    {
+        input_DeletePES( p_input->p_method_data, p_track->p_pes_init );
+    }
+
+    for( i_chunk = 0; i_chunk < p_track->i_chunk_count; i_chunk++ )
+    {
+        if( p_track->chunk )
+        {
+           FREE(p_track->chunk[i_chunk].p_sample_count_dts);
+           FREE(p_track->chunk[i_chunk].p_sample_delta_dts );
+        }
+    }
+    FREE( p_track->chunk );
+
+    if( !p_track->i_sample_size )
+    {
+        FREE( p_track->p_sample_size );
+    }
 }
 
-static int  MP4_ReadSample( input_thread_t *p_input,
-                            track_data_mp4_t *p_demux_track,
-                            pes_packet_t **pp_pes )
+static int  MP4_TrackSelect ( input_thread_t    *p_input,
+                              track_data_mp4_t  *p_track,
+                              mtime_t           i_start )
 {
-    size_t i_size;
-    off_t i_pos;
+    uint32_t i_chunk;
+    uint32_t i_sample;
 
-    data_packet_t *p_data;
-
-
-    /* this track have already reach the end */
-    if( p_demux_track->i_sample >= p_demux_track->i_sample_count )
+    if( !p_track->b_ok )
     {
-        *pp_pes = NULL;
-        return( 0 );
-    }
-    /* caculate size and position for this sample */
-    i_size = p_demux_track->i_sample_size ?
-                    p_demux_track->i_sample_size :
-                    p_demux_track->p_sample_size[p_demux_track->i_sample];
-
-    i_pos  = MP4_GetTrackPos( p_demux_track );
-
-    /* go,go go ! */
-    if( ! MP4_SeekAbsolute( p_input, i_pos ) )
-    {
-        return( 0 );
+        return( VLC_EGENERIC );
     }
 
-    /* now create a pes */
-    if( !(*pp_pes = input_NewPES( p_input->p_method_data ) ) )
+    if( p_track->b_selected )
     {
-        return( 0 );
-    }
-    /* and a data packet for the data */
-    if( !(p_data = input_NewPacket( p_input->p_method_data, i_size ) ) )
-    {
-        input_DeletePES( p_input->p_method_data, *pp_pes );
-        *pp_pes = NULL;
-        return( 0 );
+        msg_Warn( p_input,
+                  "track[Id 0x%x] already selected",
+                  p_track->i_track_ID );
+        return( VLC_SUCCESS );
     }
 
-    /* initialisation of all the field */
-    (*pp_pes)->i_dts =
-        (*pp_pes)->i_pts = MP4_GetTrackPTS( p_demux_track );
-    (*pp_pes)->p_first = (*pp_pes)->p_last  = p_data;
-    (*pp_pes)->i_nb_data = 1;
-    (*pp_pes)->i_pes_size = i_size;
-
-    if( !i_size )
+    if( TrackTimeToSampleChunk( p_input,
+                                p_track, i_start,
+                                &i_chunk, &i_sample ) )
     {
-        return( 1 );
+        msg_Warn( p_input,
+                  "cannot select track[Id 0x%x]",
+                  p_track->i_track_ID );
+        return( VLC_EGENERIC );
     }
 
-/*    msg_Dbg( p_input, "will read %d bytes", i_size ); */
-    if( !MP4_ReadData( p_input, p_data->p_payload_start, i_size ) )
+    p_track->b_selected = VLC_TRUE;
+
+    if( TrackGotoChunkSample( p_input, p_track, i_chunk, i_sample ) )
     {
-        input_DeletePES( p_input->p_method_data, *pp_pes );
-        return( 0 );
+        p_track->b_selected = VLC_FALSE;
     }
 
-    return( 1 );
+    return( p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC );
+}
+
+static void MP4_TrackUnselect(input_thread_t    *p_input,
+                              track_data_mp4_t  *p_track )
+{
+    if( !p_track->b_ok )
+    {
+        return;
+    }
+
+    if( !p_track->b_selected )
+    {
+        msg_Warn( p_input,
+                  "track[Id 0x%x] already unselected",
+                  p_track->i_track_ID );
+        return;
+    }
+
+    if( p_track->p_es->p_decoder_fifo )
+    {
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        input_UnselectES( p_input, p_track->p_es );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+    }
+
+    p_track->b_selected = VLC_FALSE;
+}
+
+static int  MP4_TrackSeek   ( input_thread_t    *p_input,
+                              track_data_mp4_t  *p_track,
+                              mtime_t           i_start )
+{
+    uint32_t i_chunk;
+    uint32_t i_sample;
+
+    if( !p_track->b_ok )
+    {
+        return( VLC_EGENERIC );
+    }
+
+    if( TrackTimeToSampleChunk( p_input,
+                                p_track, i_start,
+                                &i_chunk, &i_sample ) )
+    {
+        msg_Warn( p_input,
+                  "cannot select track[Id 0x%x]",
+                  p_track->i_track_ID );
+        return( VLC_EGENERIC );
+    }
+
+    p_track->b_selected = VLC_TRUE;
+
+    TrackGotoChunkSample( p_input, p_track, i_chunk, i_sample );
+
+    return( p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC );
 }
 
 
-static int  MP4_DecodeSample( input_thread_t *p_input,
-                              track_data_mp4_t *p_demux_track,
-                              pes_packet_t *p_pes )
+
+
+
+/*
+ * 3 types: for audio
+ * 
+ */
+
+static int  MP4_TrackSampleSize( track_data_mp4_t   *p_track )
+{
+    int i_size;
+    MP4_Box_data_sample_soun_t *p_soun;
+
+    if( p_track->i_sample_size == 0 )
+    {
+        /* most simple case */
+        return( p_track->p_sample_size[p_track->i_sample] );
+    }
+    if( p_track->i_cat != AUDIO_ES )
+    {
+        return( p_track->i_sample_size );
+    }
+
+    if( p_track->i_sample_size != 1 )
+    {
+        //msg_Warn( p_input, "SampleSize != 1" );
+        return( p_track->i_sample_size );
+    }
+
+    p_soun = p_track->p_sample->data.p_sample_soun;
+
+    if( p_soun->i_qt_version == 1 )
+    {
+        i_size = p_track->chunk[p_track->i_chunk].i_sample_count / p_soun->i_sample_per_packet * p_soun->i_bytes_per_frame;
+    }
+    else
+    {
+        //msg_Warn( p_input, "i_qt_version == 0" );
+        /* FIXME */
+
+        i_size = p_track->chunk[p_track->i_chunk].i_sample_count * p_soun->i_channelcount * p_soun->i_samplesize / 8;
+    }
+
+    //fprintf( stderr, "size=%d\n", i_size );
+    return( i_size );
+}
+
+
+static uint64_t MP4_GetTrackPos( track_data_mp4_t *p_track )
+{
+    unsigned int i_sample;
+    uint64_t i_pos;
+
+
+    i_pos = p_track->chunk[p_track->i_chunk].i_offset;
+
+    if( p_track->i_sample_size )
+    {
+#if 0
+        i_pos += ( p_track->i_sample -
+                        p_track->chunk[p_track->i_chunk].i_sample_first ) *
+                                MP4_TrackSampleSize( p_track );
+#endif
+        /* we read chunk by chunk */
+        i_pos += 0;
+    }
+    else
+    {
+        for( i_sample = p_track->chunk[p_track->i_chunk].i_sample_first;
+                i_sample < p_track->i_sample; i_sample++ )
+        {
+            i_pos += p_track->p_sample_size[i_sample];
+        }
+
+    }
+    return( i_pos );
+}
+
+static int  MP4_TrackNextSample( input_thread_t     *p_input,
+                                 track_data_mp4_t   *p_track )
 {
 
-    if( !p_pes )
+    if( p_track->i_cat == AUDIO_ES &&
+        p_track->i_sample_size != 0 )
     {
-        return( 0 );
-    }
+        MP4_Box_data_sample_soun_t *p_soun;
 
-    /* don't forget to convert in mpeg clock */
-    /* FIXME correct ffmpeg to use dts instead of pts that it incorrect
-       and, set it here ( and correct avi demux ) */
-    p_pes->i_dts =
-        p_pes->i_pts = input_ClockGetTS( p_input,
-                                         p_input->stream.p_selected_program,
-                                         p_pes->i_pts * 9/100);
+        p_soun = p_track->p_sample->data.p_sample_soun;
 
-
-    input_DecodePES( p_demux_track->p_es->p_decoder_fifo, p_pes );
-
-    /* now update sample position */
-    p_demux_track->i_sample++; /* easy ;) */
-    if( p_demux_track->i_sample >= p_demux_track->i_sample_count )
-    {
-        /* we have reach end of the track so free decoder stuff */
-        MP4_StopDecoder( p_input, p_demux_track );
-        return( 1 );
-    }
-    /* Have we changed chunk ? */
-    if( p_demux_track->i_sample >=
-            p_demux_track->chunk[p_demux_track->i_chunk].i_sample_first +
-                p_demux_track->chunk[p_demux_track->i_chunk].i_sample_count )
-    {
-        /* we haven't reached the end of the track, so see if we
-           have to change the decoder for the next frame because
-           i_sample_description_index has changed */
-
-        p_demux_track->i_chunk++;
-        if( p_demux_track->chunk[p_demux_track->i_chunk-1].i_sample_description_index
-              != p_demux_track->chunk[p_demux_track->i_chunk].i_sample_description_index  )
+        if( p_soun->i_qt_version == 1 )
+        {
+            /* chunk by chunk */
+            p_track->i_sample =
+                p_track->chunk[p_track->i_chunk].i_sample_first +
+                p_track->chunk[p_track->i_chunk].i_sample_count;
+        }
+        else
         {
             /* FIXME */
-            msg_Warn( p_input,
-                      "SampleEntry has changed, starting a new decoder" );
-            MP4_StopDecoder( p_input, p_demux_track );
-            MP4_StartDecoder( p_input, p_demux_track );
+            p_track->i_sample =
+                p_track->chunk[p_track->i_chunk].i_sample_first +
+                p_track->chunk[p_track->i_chunk].i_sample_count;
+        }
+    }
+    else
+    {
+        p_track->i_sample++;
+    }
+
+    if( p_track->i_sample >= p_track->i_sample_count )
+    {
+        /* we have reach end of the track so free decoder stuff */
+        msg_Warn( p_input, "track[0x%x] will be disabled", p_track->i_track_ID );
+        MP4_TrackUnselect( p_input, p_track );
+        return( VLC_EGENERIC );
+    }
+
+    /* Have we changed chunk ? */
+    if( p_track->i_sample >=
+            p_track->chunk[p_track->i_chunk].i_sample_first +
+            p_track->chunk[p_track->i_chunk].i_sample_count )
+    {
+        if( TrackGotoChunkSample( p_input,
+                                  p_track,
+                                  p_track->i_chunk + 1,
+                                  p_track->i_sample ) )
+        {
+            msg_Warn( p_input, "track[0x%x] will be disabled (cannot restart decoder)", p_track->i_track_ID );
+            MP4_TrackUnselect( p_input, p_track );
+            return( VLC_EGENERIC );
         }
     }
 
-    return( 1 );
+    return( VLC_SUCCESS );
 }
-
 
 

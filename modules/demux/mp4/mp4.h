@@ -2,7 +2,7 @@
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.5 2002/12/06 16:34:06 sam Exp $
+ * $Id: mp4.h,v 1.6 2003/03/11 18:57:51 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -81,8 +81,9 @@ typedef struct chunk_data_mp4_s
  *****************************************************************************/
 typedef struct track_data_mp4_s
 {
-    int b_ok;           /* The track is usable */
     int i_track_ID;     /* this should be unique */
+
+    int b_ok;           /* The track is usable */
     int b_enable;       /* is the trak enable by default */
     int b_selected;     /* is the trak being played */
     int i_cat;          /* Type of the track, VIDEO_ES, AUDIO_ES, UNKNOWN_ES  ... */
@@ -111,12 +112,13 @@ typedef struct track_data_mp4_s
     uint32_t         *p_sample_size; /* XXX perhaps add file offset if take
                                     too much time to do sumations each time*/
 
-    es_descriptor_t *p_es; /* vlc es for this track */
-
     MP4_Box_t *p_stbl;  /* will contain all timing information */
     MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
+    MP4_Box_t *p_sample;/* point on actual sdsd */
 
-    MP4_Box_t *p_sample; /* actual SampleEntry to make life simpler */
+    es_descriptor_t *p_es;       /* vlc es for this track */
+    pes_packet_t    *p_pes_init; /* to be send when p_es is selected */
+
 } track_data_mp4_t;
 
 
@@ -137,6 +139,7 @@ struct demux_sys_t
     track_data_mp4_t *track;    /* array of track */
 };
 
+#if 0
 static inline uint64_t MP4_GetTrackPos( track_data_mp4_t *p_track )
 {
     unsigned int i_sample;
@@ -162,6 +165,7 @@ static inline uint64_t MP4_GetTrackPos( track_data_mp4_t *p_track )
     }
     return( i_pos );
 }
+#endif
 
 /* Return time in µs of a track */
 static inline mtime_t MP4_GetTrackPTS( track_data_mp4_t *p_track )

@@ -2,7 +2,7 @@
  * libmp4.h : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.h,v 1.7 2003/03/09 16:22:35 fenrir Exp $
+ * $Id: libmp4.h,v 1.8 2003/03/11 18:57:50 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -92,10 +92,25 @@
 #define FOURCC_isom VLC_FOURCC( 'i', 's', 'o', 'm' )
 #define FOURCC_esds VLC_FOURCC( 'e', 's', 'd', 's' )
 
+#define FOURCC__mp3 VLC_FOURCC( '.', 'm', 'p', '3' )
+#define FOURCC_ms02 VLC_FOURCC( 'm', 's', 0x0, 0x02 )
+#define FOURCC_ms11 VLC_FOURCC( 'm', 's', 0x0, 0x11 )
+#define FOURCC_ms55 VLC_FOURCC( 'm', 's', 0x0, 0x55 )
+#define FOURCC_twos VLC_FOURCC( 't', 'w', 'o', 's' )
+#define FOURCC_sowt VLC_FOURCC( 's', 'o', 'w', 't' )
+#define FOURCC_QDMC VLC_FOURCC( 'Q', 'D', 'M', 'C' )
+#define FOURCC_QDM2 VLC_FOURCC( 'Q', 'D', 'M', '2' )
+#define FOURCC_ima4 VLC_FOURCC( 'i', 'm', 'a', '4' )
+#define FOURCC_IMA4 VLC_FOURCC( 'I', 'M', 'A', '4' )
+#define FOURCC_dvi  VLC_FOURCC( 'd', 'v', 'i', ' ' )
+#define FOURCC_MAC3 VLC_FOURCC( 'M', 'A', 'C', '3' )
+#define FOURCC_MAC6 VLC_FOURCC( 'M', 'A', 'C', '6' )
+#define FOURCC_alaw VLC_FOURCC( 'a', 'l', 'a', 'w' )
+#define FOURCC_ulaw VLC_FOURCC( 'u', 'l', 'a', 'w' )
+
 #define FOURCC_zlib VLC_FOURCC( 'z', 'l', 'i', 'b' )
 #define FOURCC_SVQ1 VLC_FOURCC( 'S', 'V', 'Q', '1' )
-#define FOURCC__mp3 VLC_FOURCC( '.', 'm', 'p', '3' )
-#define FOURCC_ms55 VLC_FOURCC( 'm', 's', 0x0, 0x55 )
+#define FOURCC_SVQ3 VLC_FOURCC( 'S', 'V', 'Q', '3' )
 #define FOURCC_3IV1 VLC_FOURCC( '3', 'I', 'V', '1' )
 #define FOURCC_3IV2 VLC_FOURCC( '3', 'I', 'V', '2' )
 #define FOURCC_h263 VLC_FOURCC( 'h', '2', '6', '3' )
@@ -105,10 +120,9 @@
 #define FOURCC_mjpb VLC_FOURCC( 'm', 'j', 'q', 't' )
 #define FOURCC_mjqt VLC_FOURCC( 'm', 'j', 'h', 't' )
 #define FOURCC_mjht VLC_FOURCC( 'm', 'j', 'p', 'b' )
+
 #define FOURCC_dvc  VLC_FOURCC( 'd', 'v', 'c', ' ' )
 #define FOURCC_dvp  VLC_FOURCC( 'd', 'v', 'p', ' ' )
-#define FOURCC_twos VLC_FOURCC( 't', 'w', 'o', 's' )
-#define FOURCC_QDMC VLC_FOURCC( 'Q', 'D', 'M', 'C' )
 #define FOURCC_raw  VLC_FOURCC( 'r', 'a', 'w', ' ' )
 
 #define FOURCC_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' )

@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.16 2003/03/09 16:22:35 fenrir Exp $
+ * $Id: libmp4.c,v 1.17 2003/03/11 18:57:50 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1152,6 +1152,7 @@ int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
     if( i_type != 0x04)/* MP4DecConfigDescrTag */
     {
+        es_descriptor.p_decConfigDescr = NULL;
         MP4_READBOX_EXIT( 1 ); /* rest isn't interesting up to now */
     }
 
@@ -1169,6 +1170,8 @@ int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET1BYTE( i_type );
     if( i_type !=  0x05 )/* MP4DecSpecificDescrTag */
     {
+        es_descriptor.p_decConfigDescr->i_decoder_specific_info_len = 0;
+        es_descriptor.p_decConfigDescr->p_decoder_specific_info  = NULL;
         MP4_READBOX_EXIT( 1 );
     }
 
@@ -2083,16 +2086,28 @@ static struct
 
     /* for codecs */
     { FOURCC_soun,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
-    { FOURCC__mp3,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_ms02,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_ms11,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC_ms55,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC__mp3,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC_mp4a,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC_twos,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_sowt,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC_QDMC,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_QDM2,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_ima4,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_IMA4,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_dvi,   MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_alaw,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_ulaw,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
     { FOURCC_raw,   MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_MAC3,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_MAC6,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
 
     { FOURCC_vide,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_mp4v,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_SVQ1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_SVQ3,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_DIVX,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_h263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_cvid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
