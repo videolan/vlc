@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -194,6 +194,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
+    [o_status_field setStringValue: [NSString stringWithFormat:
+                        _NS("0 items in playlist")]];
+
     [o_random_ckb setTitle: _NS("Random")];
 #if 0
     [o_search_button setTitle: _NS("Search")];
@@ -547,17 +550,16 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         }
     }
 
+    [o_status_field setStringValue: [NSString stringWithFormat:
+                        _NS("%i items in playlist"), p_playlist->i_size]];
+
     vlc_object_release( p_playlist );
     msg_Dbg( p_playlist, "childitem with index %d", index );
 
     o_value = [NSValue valueWithPointer: p_return];
 
     [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p",                                                                      p_return]];
-//    [o_status_field setStringValue: [NSString stringWithFormat:
-//                        _NS("%i items in playlist"), [o_outline_dict count]]];
-
     return o_value;
-
 }
 
 /* is the item expandable */
