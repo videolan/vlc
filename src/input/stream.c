@@ -422,6 +422,7 @@ static void UStreamDestroy( stream_t *s )
 {
     access_t *p_access = (access_t*)vlc_object_find( s, VLC_OBJECT_ACCESS, FIND_PARENT );
     AStreamDestroy( s );
+    vlc_object_release( p_access );
     access2_Delete( p_access );
 }
 
