@@ -39,6 +39,7 @@
 #include <string.h>                                            /* strerror() */
 
 #include "config.h"
+#include "debug.h"
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
@@ -159,7 +160,8 @@ static void Usage                   ( int i_fashion );
 static void Version                 ( void );
 
 static void InitSignalHandler       ( void );
-static void SignalHandler           ( int i_signal );
+static void SimpleSignalHandler     ( int i_signal );
+static void FatalSignalHandler      ( int i_signal );
 #ifdef HAVE_MMX
        int  TestMMX                 ( void );
 #endif
@@ -209,6 +211,11 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
                 strerror(errno) );
         return( errno );
     }
+
+    /*
+     * Set signal handling policy up for all the threads that will be created
+     */
+    InitSignalHandler();                 /* prepare signals for interception */
 
     /*
      * Read configuration
@@ -278,8 +285,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->p_intf = intf_Create();
     if( p_main->p_intf != NULL )
     {
-        InitSignalHandler();             /* prepare signals for interception */
-
         /*
          * This is the main loop
          */
@@ -721,18 +726,35 @@ static void Version( void )
 static void InitSignalHandler( void )
 {
     /* Termination signals */
-    signal( SIGHUP,  SignalHandler );
-    signal( SIGINT,  SignalHandler );
-    signal( SIGQUIT, SignalHandler );
+    signal( SIGHUP,  FatalSignalHandler );
+    signal( SIGINT,  FatalSignalHandler );
+    signal( SIGQUIT, FatalSignalHandler );
+
+    /* Other signals */
+    signal( SIGALRM, SimpleSignalHandler );
+    signal( SIGPIPE, SimpleSignalHandler );
 }
 
+
 /*****************************************************************************
- * SignalHandler: system signal handler
+ * SimpleSignalHandler: system signal handler
  *****************************************************************************
- * This function is called when a signal is received by the program. It tries to
- * end the program in a clean way.
+ * This function is called when a non fatal signal is received by the program.
  *****************************************************************************/
-static void SignalHandler( int i_signal )
+static void SimpleSignalHandler( int i_signal )
+{
+    /* Acknowledge the signal received */
+    intf_WarnMsg(0, "intf: ignoring signal %d\n", i_signal );
+}
+
+
+/*****************************************************************************
+ * FatalSignalHandler: system signal handler
+ *****************************************************************************
+ * This function is called when a fatal signal is received by the program.
+ * It tries to end the program in a clean way.
+ *****************************************************************************/
+static void FatalSignalHandler( int i_signal )
 {
     /* Once a signal has been trapped, the termination sequence will be armed and
      * following signals will be ignored to avoid sending messages to an interface
@@ -742,7 +764,7 @@ static void SignalHandler( int i_signal )
     signal( SIGQUIT, SIG_IGN );
 
     /* Acknowledge the signal received */
-    intf_ErrMsgImm("intf: signal %d received\n", i_signal );
+    intf_ErrMsgImm("intf: signal %d received, exiting\n", i_signal );
 
     /* Try to terminate everything - this is done by requesting the end of the
      * interface thread */
