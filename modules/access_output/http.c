@@ -2,7 +2,7 @@
  * http.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: http.c,v 1.6 2003/08/24 16:24:52 fenrir Exp $
+ * $Id: http.c,v 1.7 2003/08/25 01:33:25 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -54,6 +54,7 @@ vlc_module_begin();
     set_description( _("HTTP stream ouput") );
     set_capability( "sout access", 0 );
     add_shortcut( "http" );
+    add_shortcut( "mmsh" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -135,6 +136,8 @@ static int Open( vlc_object_t *p_this )
     int                 i_bind_port;
     char                *psz_file_name;
 
+    char                *psz_mime;
+
     if( !( p_sys = p_access->p_sys =
                 malloc( sizeof( sout_access_out_sys_t ) ) ) )
     {
@@ -142,7 +145,6 @@ static int Open( vlc_object_t *p_this )
         return( VLC_EGENERIC );
     }
 
-    /* *** parse p_access->psz_name to extract bind address, port and file name *** */
     /* p_access->psz_name host.name:port/filename */
     psz_name = psz_parser = strdup( p_access->psz_name );
 
@@ -216,10 +218,18 @@ static int Open( vlc_object_t *p_this )
         return( VLC_EGENERIC );
     }
 
+    if( p_access->psz_access && !strcmp( p_access->psz_access, "mmsh" ) )
+    {
+        psz_mime = "video/x-ms-asf-stream";
+    }
+    else
+    {
+        psz_mime = GetMime( psz_file_name );
+    }
     p_sys->p_httpd_stream =
         p_sys->p_httpd->pf_register_stream( p_sys->p_httpd,
                                             psz_file_name,
-                                            GetMime( psz_file_name ),
+                                            psz_mime,
                                             sout_cfg_find_value( p_access->p_cfg, "user" ),
                                             sout_cfg_find_value( p_access->p_cfg, "pwd" ) );
 
