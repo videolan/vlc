@@ -39,6 +39,15 @@ int  E_(CDDBEnabledCB)( vlc_object_t *p_this, const char *psz_name,
                         void *p_data );
 
 
+int  E_(CDTextEnabledCB)( vlc_object_t *p_this, const char *psz_name,
+			  vlc_value_t oldval, vlc_value_t val,
+			  void *p_data );
+
+int  E_(CDTextPreferCB)( vlc_object_t *p_this, const char *psz_name,
+			 vlc_value_t oldval, vlc_value_t val,
+			 void *p_data );
+
+
 int E_(CDDABlocksPerReadCB) ( vlc_object_t *p_this, const char *psz_name,
 			      vlc_value_t oldval, vlc_value_t val, 
 			      void *p_data );

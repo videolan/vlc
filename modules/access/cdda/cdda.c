@@ -5,8 +5,6 @@
  * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
- *          Laurent Aimar <fenrir@via.ecp.fr>
- *          Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -153,12 +151,12 @@ vlc_module_begin();
                 N_("email address reported to CDDB server"),
 		VLC_TRUE );
 
-    add_bool( MODULE_STRING "-cddb-enable-cache", 1, NULL,
+    add_bool( MODULE_STRING "-cddb-enable-cache", VLC_TRUE, NULL,
               N_("Cache CDDB lookups?"),
               N_("If set cache CDDB information about this CD"),
               VLC_FALSE );
 
-    add_bool( MODULE_STRING "-cddb-httpd", 0, NULL,
+    add_bool( MODULE_STRING "-cddb-httpd", VLC_FALSE, NULL,
               N_("Contact CDDB via the HTTP protocol?"),
               N_("If set, the CDDB server gets information via the CDDB HTTP "
                  "protocol"),
@@ -175,6 +173,17 @@ vlc_module_begin();
                 N_("Directory to cache CDDB requests"),
 		VLC_TRUE );
 
+    add_bool( MODULE_STRING "-cdtext-prefer", VLC_TRUE, E_(CDTextPreferCB),
+              N_("Prefer CD-Text info to CDDB info?"),
+              N_("If set, CD-Text information will be preferred "
+		 "to CDDB information when both are available"),
+              VLC_FALSE );
+
 #endif
+
+    add_bool( MODULE_STRING "-cdtext-enabled", VLC_TRUE, E_(CDTextEnabledCB),
+              N_("Do CD-Text lookups?"),
+              N_("If set, get CD-Text information"),
+              VLC_FALSE );
 
 vlc_module_end();

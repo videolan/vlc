@@ -31,6 +31,9 @@
 #include <cddb/cddb.h>
 #endif
 
+/* Frequency of sample in bits per second. */
+#define CDDA_FREQUENCY_SAMPLE 44100
+
 /*****************************************************************************
  * Debugging
  *****************************************************************************/
@@ -59,13 +62,17 @@
 typedef struct cdda_data_s
 {
   CdIo          *p_cdio;                   /* libcdio CD device */
-  track_t        i_tracks;                 /* # of tracks (titles) */
+  track_t        i_tracks;                 /* # of tracks */
   track_t        i_first_track;            /* # of first track */
+  track_t        i_titles;                 /* # of titles in playlist */
   
   /* Current position */
   track_t        i_track;                  /* Current track */
   lsn_t          i_lsn;                    /* Current Logical Sector Number */
-  lsn_t *        p_lsns;                   /* Track LSNs */
+  lsn_t          lsn[CDIO_CD_MAX_TRACKS];  /* Track LSNs. Origin is NOT 
+					      0 origin but origin of track
+					      number (usually 1).
+					    */
   
   int            i_blocks_per_read;        /* # blocks to get in a read */
   int            i_debug;                  /* Debugging mask */
@@ -73,12 +80,12 @@ typedef struct cdda_data_s
   /* Information about CD */
   vlc_meta_t    *p_meta;
   char *         psz_mcn;                  /* Media Catalog Number */
-  cdtext_t      *cdtext;                   /* CD-Text info */
-  input_title_t *p_title[CDIO_CD_MAX_TRACKS]; 
+  input_title_t *p_title[CDIO_CD_MAX_TRACKS]; /* This *is* 0 origin, not
+					         track number origin */
   
   
 #ifdef HAVE_LIBCDDB
-  int            i_cddb_enabled;
+  vlc_bool_t     b_cddb_enabled;      /* Use CDDB at all? */
   struct  {
     vlc_bool_t   have_info;           /* True if we have any info */
     cddb_disc_t *disc;                /* libcdio uses this to get disc
@@ -88,11 +95,22 @@ typedef struct cdda_data_s
   } cddb;
 #endif
 
-    WAVEHEADER   waveheader;           /* Wave header for the output data */
-    vlc_bool_t   b_header;
+  vlc_bool_t   b_cdtext_enabled;      /* Use CD-Text at all? If not,
+					 cdtext_preferred is meaningless. */
+  vlc_bool_t   b_cdtext_prefer;       /* Prefer CD-Text info over
+					 CDDB? If no CDDB, the issue
+					 is moot. */
 
-    input_thread_t *p_input;
+  const cdtext_t *p_cdtext[CDIO_CD_MAX_TRACKS]; /* CD-Text info. Origin is NOT 
+						   0 origin but origin of track
+						   number (usually 1).
+						 */
 
+  WAVEHEADER   waveheader;            /* Wave header for the output data  */
+  vlc_bool_t   b_header;
+  
+  input_thread_t *p_input;
+  
 } cdda_data_t;
 
 /* FIXME: This variable is a hack. Would be nice to eliminate. */
