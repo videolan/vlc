@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.17 2003/01/01 11:14:50 jlj Exp $
+ * $Id: aout.m,v 1.18 2003/01/02 22:49:19 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -48,7 +48,8 @@ enum AudioDeviceClass
 {
     AudioDeviceClassA52     = 1 << 0,
     AudioDeviceClassPCM2    = 1 << 1,
-    AudioDeviceClassPCM6    = 1 << 2
+    AudioDeviceClassPCM4    = 1 << 2,
+    AudioDeviceClassPCM6    = 1 << 3 
 };
 
 static struct aout_class_t
@@ -79,6 +80,13 @@ aout_classes[] =
         2, 
         AudioDeviceClassPCM2, 
         "Stereo PCM"
+    },
+
+    {
+        kAudioFormatLinearPCM,
+        4,
+        AudioDeviceClassPCM4,
+        "4 Channel PCM"
     },
 
     {
@@ -288,17 +296,23 @@ int E_(OpenAudio)( vlc_object_t * p_this )
     case kAudioFormatLinearPCM:
         p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
 
-        if( p_sys->stream_format.mChannelsPerFrame < 6 )
-        {
-            p_aout->output.output.i_physical_channels =
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-        }
-        else
+        if( p_sys->stream_format.mChannelsPerFrame == 6 )
         {
             p_aout->output.output.i_physical_channels =
                 AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
                 AOUT_CHAN_CENTER | AOUT_CHAN_REARRIGHT |
                 AOUT_CHAN_REARLEFT | AOUT_CHAN_LFE;
+        }
+        else if( p_sys->stream_format.mChannelsPerFrame == 4 )
+        {
+            p_aout->output.output.i_physical_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+        }
+        else
+        {
+            p_aout->output.output.i_physical_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
         }
 
         p_aout->output.i_nb_samples = (int)( p_sys->i_buffer_size /
