@@ -225,6 +225,8 @@ static inline void BufferChainClean( sout_instance_t *p_sout, sout_buffer_chain_
 typedef struct ts_stream_t
 {
     int             i_pid;
+    vlc_fourcc_t    i_codec;
+
     int             i_stream_type;
     int             i_stream_id;
     int             i_continuity_counter;
@@ -525,6 +527,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     /* Init this new stream */
     p_stream->i_pid = AllocatePID( p_sys, p_input->p_fmt->i_cat );
+    p_stream->i_codec = p_input->p_fmt->i_codec;
     p_stream->i_continuity_counter    = 0;
     p_stream->i_decoder_specific_info = 0;
     p_stream->p_decoder_specific_info = NULL;
@@ -615,6 +618,12 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     p_stream->i_stream_type = 0x82;
                     p_stream->i_stream_id = 0xbd;
                     break;
+                case VLC_FOURCC( 's', 'u','b', 't' ):
+                    p_stream->i_stream_type = 0x12;
+                    p_stream->i_stream_id = 0xfa;
+                    p_sys->i_mpeg4_streams++;
+                    p_stream->i_es_id = p_stream->i_pid;
+                    break;
                 default:
                     free( p_stream );
                     return VLC_EGENERIC;
@@ -669,6 +678,53 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         memcpy( p_stream->p_decoder_specific_info,
                 p_input->p_fmt->p_extra,
                 p_input->p_fmt->i_extra );
+    }
+
+    /* Create decoder specific info for subt */
+    if( p_stream->i_codec == VLC_FOURCC( 's', 'u','b', 't' ) )
+    {
+        uint8_t *p;
+
+        p_stream->i_decoder_specific_info = 55;
+        p_stream->p_decoder_specific_info = p = malloc( p_stream->i_decoder_specific_info );
+
+        p[0] = 0x10;    /* textFormat, 0x10 for 3GPP TS 26.245 */
+        p[1] = 0x00;    /* flags: 1b: associated video info flag
+                                  3b: reserved
+                                  1b: duration flag
+                                  3b: reserved */
+        p[2] = 52;      /* remaining size */
+
+        p += 3;
+
+        p[0] = p[1] = p[2] = p[3] = 0; p+=4;    /* display flags */
+        *p++ = 0;                       /* horizontal justification (-1: left, 0 center, 1 right) */
+        *p++ = 1;                       /* vertical   justification (-1: top, 0 center, 1 bottom) */
+
+        p[0] = p[1] = p[2] = 0x00; p+=3;/* background rgb */
+        *p++ = 0xff;                    /* background a */
+
+        p[0] = p[1] = 0; p += 2;        /* text box top */
+        p[0] = p[1] = 0; p += 2;        /* text box left */
+        p[0] = p[1] = 0; p += 2;        /* text box bottom */
+        p[0] = p[1] = 0; p += 2;        /* text box right */
+
+        p[0] = p[1] = 0; p += 2;        /* start char */
+        p[0] = p[1] = 0; p += 2;        /* end char */
+        p[0] = p[1] = 0; p += 2;        /* default font id */
+
+        *p++ = 0;                       /* font style flags */
+        *p++ = 12;                      /* font size */
+
+        p[0] = p[1] = p[2] = 0x00; p+=3;/* foreground rgb */
+        *p++ = 0x00;                    /* foreground a */
+
+        p[0] = p[1] = p[2] = 0; p[3] = 22; p += 4;
+        memcpy( p, "ftab", 4 ); p += 4;
+        *p++ = 0; *p++ = 1;             /* entry count */
+        p[0] = p[1] = 0; p += 2;        /* font id */
+        *p++ = 9;                       /* font name length */
+        memcpy( p, "Helvetica", 9 );    /* font name */
     }
 
     /* Init pes chain */
@@ -755,7 +811,9 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         free( p_stream->p_decoder_specific_info );
     }
-    if( p_stream->i_stream_id == 0xfa || p_stream->i_stream_id == 0xfb )
+    if( p_stream->i_stream_id == 0xfa ||
+        p_stream->i_stream_id == 0xfb ||
+        p_stream->i_stream_id == 0xfe )
     {
         p_sys->i_mpeg4_streams--;
     }
@@ -837,14 +895,17 @@ static int Mux( sout_mux_t *p_mux )
             {
                 sout_input_t *p_input = p_mux->pp_inputs[i];
                 ts_stream_t *p_stream = (ts_stream_t*)p_input->p_sys;
+                int64_t i_spu_length = 0;
+                int64_t i_spu_dts    = 0;
+
 
                 if( ( p_stream == p_pcr_stream
                             && p_stream->i_pes_length < i_shaping_delay ) ||
-                    p_stream->i_pes_dts + p_stream->i_pes_length 
+                    p_stream->i_pes_dts + p_stream->i_pes_length
                         < p_pcr_stream->i_pes_dts + p_pcr_stream->i_pes_length )
                 {
                     /* Need more data */
-                    if( p_input->p_fifo->i_depth <= 1 )
+                    if( p_input->p_fifo->i_depth <= 50 )
                     {
                         if( p_input->p_fmt->i_cat == AUDIO_ES ||
                             p_input->p_fmt->i_cat == VIDEO_ES )
@@ -861,6 +922,11 @@ static int Mux( sout_mux_t *p_mux )
                     b_ok = VLC_FALSE;
 
                     p_data = block_FifoGet( p_input->p_fifo );
+                    if( p_input->p_fmt->i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) )
+                    {
+                        i_spu_length = p_data->i_length;    /* save info for SPU */
+                        i_spu_dts    = p_data->i_dts;
+                    }
                     if( p_input->p_fifo->i_depth > 0 )
                     {
                         block_t *p_next = block_FifoShow( p_input->p_fifo );
@@ -870,7 +936,7 @@ static int Mux( sout_mux_t *p_mux )
 
                     if( ( p_pcr_stream->i_pes_dts > 0 && p_data->i_dts - 2000000 > p_pcr_stream->i_pes_dts + p_pcr_stream->i_pes_length ) ||
                         p_data->i_dts < p_stream->i_pes_dts ||
-                        ( p_stream->i_pes_dts > 0 && p_data->i_dts - 2000000 > p_stream->i_pes_dts + p_stream->i_pes_length ) )
+                        ( p_stream->i_pes_dts > 0 && p_input->p_fmt->i_cat != SPU_ES && p_data->i_dts - 2000000 > p_stream->i_pes_dts + p_stream->i_pes_length ) )
                     {
                         msg_Warn( p_mux, "packet with too strange dts (dts=%lld,old=%lld,pcr=%lld)",
                                   p_data->i_dts,
@@ -891,12 +957,29 @@ static int Mux( sout_mux_t *p_mux )
                     }
                     else
                     {
-                        if( p_data->i_length < 0 || p_data->i_length > 2000000 )
+                        if( p_input->p_fmt->i_cat == SPU_ES )
+                        {
+                            /* Arbitrary */
+                            p_data->i_length = 1000;
+                            if( p_input->p_fmt->i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) )
+                            {
+                                /* Prepend header */
+                                p_data = block_Realloc( p_data, 2, p_data->i_buffer );
+                                p_data->p_buffer[0] = ( (p_data->i_buffer - 2) >> 8)&0xff;
+                                p_data->p_buffer[1] = ( (p_data->i_buffer - 2)     )&0xff;
+
+                                /* remove trailling \0 if any */
+                                if( p_data->i_buffer > 2 && p_data->p_buffer[p_data->i_buffer -1] == '\0' )
+                                    p_data->i_buffer--;
+                            }
+                        }
+                        else if( p_data->i_length < 0 || p_data->i_length > 2000000 )
                         {
                             /* FIXME choose a better value, but anyway we should never
                              * have to do that */
                             p_data->i_length = 1000;
                         }
+
                         p_stream->i_pes_length += p_data->i_length;
                         if( p_stream->i_pes_dts == 0 )
                         {
@@ -919,6 +1002,23 @@ static int Mux( sout_mux_t *p_mux )
                         {
                             i_shaping_delay = p_stream->i_pes_length;
                             p_stream->b_key_frame = 1;
+                        }
+
+                        /* Append a empty sub (sub text only) */
+                        if( i_spu_length > 0 )
+                        {
+                            block_t *p_spu = block_New( p_mux, 3 );
+
+                            p_spu->i_dts = p_spu->i_pts = i_spu_dts + i_spu_length;
+                            p_spu->i_length = 1000;
+
+                            p_spu->p_buffer[0] = 0;
+                            p_spu->p_buffer[1] = 1;
+                            p_spu->p_buffer[2] = ' ';
+
+                            p_stream->i_pes_length += p_spu->i_length;
+                            E_( EStoPES )( p_mux->p_sout, &p_spu, p_spu, p_stream->i_stream_id, 1 );
+                            BufferChainAppend( &p_stream->chain_pes, p_spu );
                         }
                     }
                 }
@@ -1000,7 +1100,7 @@ static int Mux( sout_mux_t *p_mux )
                     i_dts = p_stream->i_pes_dts;
                 }
             }
-            if( i_stream == -1 )
+            if( i_stream == -1 || i_dts > i_pcr_dts + i_pcr_length )
             {
                 break;
             }
@@ -1749,7 +1849,9 @@ static void GetPMT( sout_mux_t *p_mux,
             ts_stream_t *p_stream;
             p_stream = (ts_stream_t*)p_mux->pp_inputs[i_stream]->p_sys;
 
-            if( p_stream->i_stream_id == 0xfa || p_stream->i_stream_id == 0xfb )
+            if( p_stream->i_stream_id == 0xfa ||
+                p_stream->i_stream_id == 0xfb ||
+                p_stream->i_stream_id == 0xfe )
             {
                 bits_buffer_t bits_fix_ESDescr, bits_fix_Decoder;
                 /* ES descriptor */
@@ -1777,6 +1879,11 @@ static void GetPMT( sout_mux_t *p_mux,
                 {
                     bits_write( &bits, 8, 0x40 );   // Audio 14496-3
                     bits_write( &bits, 6, 0x05 );   // AudioStream
+                }
+                else if( p_stream->i_stream_type == 0x12 && p_stream->i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) )
+                {
+                    bits_write( &bits, 8, 0x0B );   // Text Stream
+                    bits_write( &bits, 6, 0x04 );   // VisualStream
                 }
                 else
                 {
