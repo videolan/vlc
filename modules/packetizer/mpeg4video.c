@@ -2,7 +2,7 @@
  * mpeg4video.c: mpeg 4 video packetizer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.24 2004/01/25 17:58:30 murray Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -65,6 +65,7 @@ struct decoder_sys_t
     int         i_buffer;
     int         i_buffer_size;
     uint8_t     *p_buffer;
+    unsigned int i_flags;
 };
 
 static int m4v_FindStartCode( uint8_t **pp_start, uint8_t *p_end );
@@ -131,6 +132,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_buffer = 0;
     p_sys->i_buffer_size = 0;
     p_sys->p_buffer = 0;
+    p_sys->i_flags = 0;
 
     /* Setup properties */
     p_dec->fmt_out = p_dec->fmt_in;
@@ -247,6 +249,8 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_buffer -= i_out;
             p_start -= i_out;
 
+            p_out->i_flags = p_sys->i_flags;
+
             /* FIXME do proper dts/pts */
             p_out->i_pts = p_sys->i_pts;
             p_out->i_dts = p_sys->i_dts;
@@ -282,6 +286,21 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         else if( p_start[3] == 0xb6 )
         {
             p_sys->b_vop = VLC_TRUE;
+            switch( p_start[4] >> 6 )
+            {
+                case 0:
+                    p_sys->i_flags = BLOCK_FLAG_TYPE_I;
+                    break;
+                case 1:
+                    p_sys->i_flags = BLOCK_FLAG_TYPE_P;
+                    break;
+                case 2:
+                    p_sys->i_flags = BLOCK_FLAG_TYPE_P;
+                    break;
+                case 3: /* gni ? */
+                    p_sys->i_flags = BLOCK_FLAG_TYPE_PB;
+                    break;
+            }
 
             /* The pts information is not available in all the containers.
              * FIXME: calculate the pts correctly */
@@ -306,7 +325,8 @@ static int m4v_FindStartCode( uint8_t **pp_start, uint8_t *p_end )
 {
     uint8_t *p = *pp_start;
 
-    for( p = *pp_start; p < p_end - 4; p++ )
+    /* We wait for 4+1 bytes */
+    for( p = *pp_start; p < p_end - 5; p++ )
     {
         if( p[0] == 0 && p[1] == 0 && p[2] == 1 )
         {
