@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.90 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: interface.c,v 1.91 2002/03/06 03:27:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -130,7 +130,6 @@ static void intf_Manage( intf_thread_t *p_intf )
             
             if( p_input->i_status == THREAD_OVER )
             {
-                /* XXX: completely stupid ! */
                 input_DestroyThread( p_input );
                 p_input_bank->pp_input[i_input] = NULL;
                 p_input_bank->i_count--;
@@ -141,8 +140,9 @@ static void intf_Manage( intf_thread_t *p_intf )
             {
                 input_StopThread( p_input, NULL );
             }
-
         }
+
+        vlc_mutex_unlock( &p_input_bank->lock );
     }
     /* If no stream is being played, try to find one */
     else
@@ -175,9 +175,13 @@ static void intf_Manage( intf_thread_t *p_intf )
                     p_input_bank->i_count++;
                 }
             }
+
+            vlc_mutex_unlock( &p_input_bank->lock );
         }
         else
         {
+            vlc_mutex_unlock( &p_input_bank->lock );
+
             /* playing has been stopped: we no longer need outputs */
             if( p_aout_bank->i_count )
             {
@@ -194,8 +198,6 @@ static void intf_Manage( intf_thread_t *p_intf )
 
 //        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
     }
-
-    vlc_mutex_unlock( &p_input_bank->lock );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * ac3_parse.c: ac3 parsing procedures
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_parse.c,v 1.7 2002/02/19 00:50:19 sam Exp $
+ * $Id: ac3_parse.c,v 1.8 2002/03/06 03:27:17 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -808,6 +808,7 @@ void parse_auxdata (ac3dec_t * p_ac3dec)
 
 static void parse_bsi_stats (ac3dec_t * p_ac3dec) /* Some stats */
 {  
+#if 0
     struct mixlev_s
     {
         float clev;
@@ -848,13 +849,14 @@ static void parse_bsi_stats (ac3dec_t * p_ac3dec) /* Some stats */
     
     if ( i > 100 )
         i = 0;
+#endif
 }
 
 static void parse_audblk_stats (ac3dec_t * p_ac3dec)
 {
+#if 0
     char *exp_strat_tbl[4] = {"R   ","D15 ","D25 ","D45 "};
     u32 i;
-
     intf_ErrMsg ("(ac3dec_parseaudblk) ");
     intf_ErrMsg ("%s ",p_ac3dec->audblk.cplinu ? "cpl on" : "cpl off");
     intf_ErrMsg ("%s ",p_ac3dec->audblk.baie? "bai" : " ");
@@ -868,5 +870,6 @@ static void parse_audblk_stats (ac3dec_t * p_ac3dec)
     for(i=0;i<p_ac3dec->bsi.nfchans;i++)
             intf_ErrMsg ("%1d",p_ac3dec->audblk.blksw[i]);
     intf_ErrMsg ("]");
+#endif
 }
 
