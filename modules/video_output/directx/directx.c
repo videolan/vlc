@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.5 2002/10/25 18:17:59 sam Exp $
+ * $Id: directx.c,v 1.6 2002/10/28 22:25:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -180,7 +180,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->p_event->p_vout = p_vout;
     if( vlc_thread_create( p_vout->p_sys->p_event,
                            "DirectX Events Thread", DirectXEventThread,
-                           VLC_THREAD_PRIORITY_LOW, 1 ) )
+                           0, 1 ) )
     {
         msg_Err( p_vout, "cannot create DirectXEventThread" );
         vlc_object_destroy( p_vout->p_sys->p_event );
@@ -1258,7 +1258,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width *
+            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width / 2 *
               p_pic->p[V_PLANE].i_pixel_pitch;
 
             p_pic->U_PIXELS = p_pic->V_PIXELS
@@ -1266,7 +1266,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width *
+            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width / 2 *
               p_pic->p[U_PLANE].i_pixel_pitch;
 
             p_pic->i_planes = 3;
@@ -1286,7 +1286,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width *
+            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width / 2 *
               p_pic->p[U_PLANE].i_pixel_pitch;
 
             p_pic->V_PIXELS =  p_pic->U_PIXELS
@@ -1294,7 +1294,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width *
+            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width / 2 *
               p_pic->p[V_PLANE].i_pixel_pitch;
 
             p_pic->i_planes = 3;
