@@ -344,7 +344,7 @@
 	<key>CFBundleExecutable</key>
 	<string>VLC</string>
 	<key>CFBundleGetInfoString</key>
-	<string>VLC media player 0.5.2-test2, Copyright (c) 1996-2003 VideoLAN.</string>
+	<string>VLC media player 0.5.2-test3, Copyright (c) 1996-2003 VideoLAN.</string>
 	<key>CFBundleIconFile</key>
 	<string>vlc.icns</string>
 	<key>CFBundleIdentifier</key>
