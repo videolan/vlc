@@ -199,7 +199,7 @@ VLC_EXPORT( void,      stream_DemuxDelete,( stream_t *s ) );
 #define stream_MemoryNew( a, b, c, d ) __stream_MemoryNew( VLC_OBJECT(a), b, c, d )
 VLC_EXPORT( stream_t *,__stream_MemoryNew, (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i_size, vlc_bool_t i_preserve_memory ) );
 #define stream_UrlNew( a, b ) __stream_UrlNew( VLC_OBJECT(a), b )
-VLC_EXPORT( stream_t *,__stream_UrlNew, (vlc_object_t *p_this, char *psz_url ) );
+VLC_EXPORT( stream_t *,__stream_UrlNew, (vlc_object_t *p_this, const char *psz_url ) );
 
 /**
  * @}

@@ -188,33 +188,38 @@ static int  ASeek( stream_t *s, int64_t i_pos );
 /****************************************************************************
  * stream_AccessNew: create a stream from a access
  ****************************************************************************/
-stream_t *__stream_UrlNew( vlc_object_t *p_parent, char *psz_url )
+stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
 {
-    char *psz_access, *psz_demux, *psz_path;
+    char *psz_access, *psz_demux, *psz_path, *psz_dup;
     access_t *p_access;
     stream_t *p_res;
-    
-    MRLSplit( p_parent, psz_url, &psz_access, &psz_demux, &psz_path );
+
+    psz_dup = strdup( psz_url );
+    MRLSplit( p_parent, psz_dup, &psz_access, &psz_demux, &psz_path );
     
     /* Now try a real access */
     p_access = access2_New( p_parent, psz_access, NULL,
-                            psz_path, VLC_TRUE );
+                            psz_path, VLC_FALSE );
 
     if( p_access == NULL )
     {
         msg_Err( p_parent, "no suitable access module for `%s'", psz_url );
+        free( psz_dup );
         return NULL;
     }
     p_res = stream_AccessNew( p_access, VLC_TRUE );
     if( p_res )
     {
         p_res->pf_destroy = UStreamDestroy;
+        free( psz_dup );
         return p_res;
     }
     else
     {
         access2_Delete( p_access );
     }
+    free( psz_dup );
+    return NULL;
 }
 
 stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
