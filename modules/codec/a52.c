@@ -2,7 +2,7 @@
  * a52.c: parse A/52 audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.32 2003/12/22 14:32:55 sam Exp $
+ * $Id: a52.c,v 1.33 2004/02/13 21:48:32 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -246,6 +246,14 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 /* Need more data */
                 return NULL;
+            }
+
+            if( p_sys->b_packetizer &&
+                p_header[0] == 0 && p_header[1] == 0 )
+            {
+                /* A52 wav files and audio CD's use stuffing */
+                p_sys->i_state = STATE_GET_DATA;
+                break;
             }
 
             if( p_header[0] != 0x0b || p_header[1] != 0x77 )
