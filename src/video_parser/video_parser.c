@@ -96,27 +96,6 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     p_vpar->bit_stream.fifo.buffer = 0;
     p_vpar->bit_stream.fifo.i_available = 0;
 
-    /*
-     * Initialize the synchro properties
-     */
-    p_vpar->synchro.modulo = 0;
-    /* assume there were about 3 P and 6 B images between I's */
-    p_vpar->synchro.current_p_count = 1;
-    p_vpar->synchro.p_count_predict = 3;
-    p_vpar->synchro.current_b_count = 1;
-    p_vpar->synchro.b_count_predict = 6;
-    {
-        int i;
-        for( i=0; i<6; i++)
-        {
-            p_vpar->synchro.tab_p[i].mean = 3;
-            p_vpar->synchro.tab_p[i].deviation = .5;
-
-            p_vpar->synchro.tab_b[i].mean = 6;
-            p_vpar->synchro.tab_b[i].deviation = .5;
-        }
-    }
-
 /* FIXME !!!! */
 p_vpar->p_vout = p_main->p_intf->p_vout;
 
@@ -203,6 +182,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->sequence.nonintra_quant.b_allocated = 0;
     p_vpar->sequence.chroma_intra_quant.b_allocated = 0;
     p_vpar->sequence.chroma_nonintra_quant.b_allocated = 0;
+
     /* Initialize copyright information */
     p_vpar->sequence.b_copyright_flag = 0;
     p_vpar->sequence.b_original = 0;
@@ -251,6 +231,24 @@ static int InitThread( vpar_thread_t *p_vpar )
     vpar_InitBMBType( p_vpar );
     vpar_InitCodedPattern( p_vpar );
     vpar_InitDCTTables( p_vpar );
+
+    /*
+     * Initialize the synchro properties
+     */
+    p_vpar->synchro.modulo = 0;
+    /* assume there were about 3 P and 6 B images between I's */
+    p_vpar->synchro.current_p_count = 1;
+    p_vpar->synchro.p_count_predict = 3;
+    p_vpar->synchro.current_b_count = 1;
+    p_vpar->synchro.b_count_predict = 6;
+    for( i_dummy = 0; i_dummy < 6; i_dummy++)
+    {
+        p_vpar->synchro.tab_p[i_dummy].mean = 3;
+        p_vpar->synchro.tab_p[i_dummy].deviation = .5;
+
+        p_vpar->synchro.tab_b[i_dummy].mean = 6;
+        p_vpar->synchro.tab_b[i_dummy].deviation = .5;
+    }
 
     /* Mark thread as running and return */
     intf_DbgMsg("vpar debug: InitThread(%p) succeeded\n", p_vpar);
@@ -364,6 +362,24 @@ static void EndThread( vpar_thread_t *p_vpar )
     /* Destroy thread structures allocated by InitThread */
 //    vout_DestroyStream( p_vpar->p_vout, p_vpar->i_stream );
     /* ?? */
+
+    /* Dispose of matrices if they have been allocated. */
+    if( p_vpar->sequence.intra_quant.b_allocated )
+    {
+        free( p_vpar->sequence.intra_quant.pi_matrix );
+    }
+    if( p_vpar->sequence.nonintra_quant.b_allocated )
+    {
+        free( p_vpar->sequence.nonintra_quant.pi_matrix) ;
+    }
+    if( p_vpar->sequence.chroma_intra_quant.b_allocated )
+    {
+        free( p_vpar->sequence.chroma_intra_quant.pi_matrix );
+    }
+    if( p_vpar->sequence.chroma_nonintra_quant.b_allocated )
+    {
+        free( p_vpar->sequence.chroma_nonintra_quant.pi_matrix );
+    }
 
     /* Destroy vdec threads */
     for( i_dummy = 0; i_dummy < NB_VDEC; i_dummy++ )

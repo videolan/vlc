@@ -221,7 +221,12 @@ static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_ma
     if( !p_matrix->b_allocated )
     {
         /* Allocate a piece of memory to load the matrix. */
-        p_matrix->pi_matrix = (int *)malloc( 64*sizeof(int) );
+        if( (p_matrix->pi_matrix = (int *)malloc( 64*sizeof(int) )) == NULL )
+        {
+            intf_ErrMsg("vpar error: allocation error in LoadMatrix()\n");
+            p_vpar->b_error = 1;
+            return;
+        }
         p_matrix->b_allocated = 1;
     }
     
@@ -608,7 +613,7 @@ fprintf( stderr, "coding type: %d\n", p_vpar->picture.i_coding_type );
                       p_vpar->picture.i_coding_type,
                       NULL );
 
-            for( i_mb = 0; i_mb < p_vpar->sequence.i_mb_size >> 1; i_mb++ )
+            for( i_mb = 0; p_vpar->picture.pp_mb[i_mb] != NULL; i_mb++ )
             {
                 vpar_DestroyMacroblock( &p_vpar->vfifo,
                                         p_vpar->picture.pp_mb[i_mb] );
@@ -634,7 +639,7 @@ fprintf( stderr, "coding type: %d\n", p_vpar->picture.i_coding_type );
         if( p_vpar->picture.i_current_structure )
         {
             /* Second field of a frame. We will decode it if, and only if we
-            * have decoded the first frame. */
+            * have decoded the first field. */
             b_parsable = (p_vpar->picture.p_picture != NULL);
         }
         else
@@ -674,8 +679,8 @@ fprintf( stderr, "coding type: %d\n", p_vpar->picture.i_coding_type );
                                         p_vpar->sequence.i_height ) )
              == NULL )
         {
-            intf_ErrMsg("vpar debug: allocation error in vout_CreatePicture\n");
-            if( p_vpar->b_die )
+            intf_DbgMsg("vpar debug: allocation error in vout_CreatePicture\n");
+            if( p_vpar->b_die || p_vpar->b_error )
             {
                 return;
             }
@@ -700,6 +705,7 @@ fprintf( stderr, "coding type: %d\n", p_vpar->picture.i_coding_type );
         P_picture->i_deccount = p_vpar->sequence.i_mb_size;
         vlc_mutex_init( &p_vpar->picture.p_picture->lock_deccount );
         memset( p_vpar->picture.pp_mb, 0, MAX_MB );
+/* FIXME ! remove asap */
 memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
 
         /* Update the reference pointers. */
@@ -767,7 +773,7 @@ fprintf(stderr, "Image trashee\n");
     {
 fprintf(stderr, "Image parsee (%d)\n", p_vpar->picture.i_coding_type);
         /* Frame completely parsed. */
-        for( i_mb = 1; p_vpar->picture.pp_mb[i_mb]; i_mb++ )
+        for( i_mb = 1; p_vpar->picture.pp_mb[i_mb] != NULL; i_mb++ )
         {
             vpar_DecodeMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
         }
@@ -1046,15 +1052,19 @@ static void SequenceScalableExtension( vpar_thread_t * p_vpar )
 static void PictureDisplayExtension( vpar_thread_t * p_vpar )
 {
     /* Number of frame center offset */
-    int nb;
+    int i_nb, i_dummy;
     /* I am not sure it works but it should
         (fewer tests than shown in §6.3.12) */
-    nb = p_vpar->sequence.b_progressive ? p_vpar->sequence.b_progressive +
-                                          p_vpar->picture.b_repeat_first_field +
-                                          p_vpar->picture.b_top_field_first
-                         : ( p_vpar->picture.b_frame_structure + 1 ) +
-                           p_vpar->picture.b_repeat_first_field;
-    RemoveBits( &p_vpar->bit_stream, 34 * nb );
+    i_nb = p_vpar->sequence.b_progressive ? p_vpar->sequence.b_progressive +
+                                            p_vpar->picture.b_repeat_first_field +
+                                            p_vpar->picture.b_top_field_first
+                           : ( p_vpar->picture.b_frame_structure + 1 ) +
+                             p_vpar->picture.b_repeat_first_field;
+    for( i_dummy = 0; i_dummy < i_nb; i_dummy++ )
+    {
+        RemoveBits( &p_vpar->bit_stream, 17 );
+        RemoveBits( &p_vpar->bit_stream, 17 );
+    }
 }
 
 
@@ -1103,7 +1113,7 @@ static void CopyrightExtension( vpar_thread_t * p_vpar )
     i_copyright_nb_2 = GetBits( &p_vpar->bit_stream, 22 );
     RemoveBits( &p_vpar->bit_stream, 1 );
         /* third part and sum */
-    p_vpar->sequence.i_copyright_nb = ( (u64)i_copyright_nb_1 << 44 ) +
-                                      ( (u64)i_copyright_nb_2 << 22 ) +
+    p_vpar->sequence.i_copyright_nb = ( (u64)i_copyright_nb_1 << 44 ) |
+                                      ( (u64)i_copyright_nb_2 << 22 ) |
                                       ( (u64)GetBits( &p_vpar->bit_stream, 22 ) );
 }
