@@ -334,6 +334,8 @@
         {
             ACTIONS = {
                 deleteItems = id; 
+                disableGroup = id; 
+                enableGroup = id; 
                 handlePopUp = id; 
                 playItem = id; 
                 savePlaylist = id; 
@@ -349,6 +351,8 @@
                 "o_ctx_menu" = id; 
                 "o_loop_popup" = id; 
                 "o_mi_delete" = id; 
+                "o_mi_disableGroup" = id; 
+                "o_mi_enableGroup" = id; 
                 "o_mi_info" = id; 
                 "o_mi_play" = id; 
                 "o_mi_save_playlist" = id; 

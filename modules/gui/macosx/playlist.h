@@ -57,6 +57,8 @@
     IBOutlet id o_mi_delete;
     IBOutlet id o_mi_selectall;
     IBOutlet id o_mi_toggleItemsEnabled;
+    IBOutlet id o_mi_enableGroup;
+    IBOutlet id o_mi_disableGroup;
 
     IBOutlet id o_random_ckb;
 
@@ -90,6 +92,8 @@
 - (IBAction)playItem:(id)sender;
 - (IBAction)deleteItems:(id)sender;
 - (IBAction)toggleItemsEnabled:(id)sender;
+- (IBAction)enableGroup:(id)sender;
+- (IBAction)disableGroup:(id)sender;
 - (IBAction)selectAll:(id)sender;
 - (IBAction)searchItem:(id)sender;
 - (IBAction)handlePopUp:(id)sender;

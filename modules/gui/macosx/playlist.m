@@ -137,7 +137,6 @@
     [o_table_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
     [o_window setExcludedFromWindowsMenu: TRUE];
 
-    [o_mi_toggleItemsEnabled setTarget:self];
 
 //    [o_tbv_info setDataSource: [VLCInfoDataSource init]];
 
@@ -174,6 +173,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_delete setTitle: _NS("Delete")];
     [o_mi_selectall setTitle: _NS("Select All")];
     [o_mi_toggleItemsEnabled setTitle: _NS("Item Enabled")];
+    [o_mi_enableGroup setTitle: _NS("Enable all group items")];
+    [o_mi_disableGroup setTitle: _NS("Disable all group items")];
     [o_mi_info setTitle: _NS("Properties")];
 
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
@@ -267,7 +268,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                             FIND_ANYWHERE );
 
-    bool b_state = FALSE;
+    bool b_itemstate = FALSE;
 
     NSPoint pt;
     vlc_bool_t b_rows;
@@ -284,16 +285,17 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_selectall setEnabled: b_rows];
     [o_mi_info setEnabled: b_item_sel];
     [o_mi_toggleItemsEnabled setEnabled: b_item_sel];
-
+    [o_mi_enableGroup setEnabled: b_item_sel];
+    [o_mi_disableGroup setEnabled: b_item_sel];
 
     if (p_playlist)
     {
-        b_state = ([o_table_view selectedRow] > -1) ?
+        b_itemstate = ([o_table_view selectedRow] > -1) ?
             p_playlist->pp_items[[o_table_view selectedRow]]->b_enabled : FALSE;
         vlc_object_release(p_playlist);
     }
 
-    [o_mi_toggleItemsEnabled setState: b_state];
+    [o_mi_toggleItemsEnabled setState: b_itemstate];
 
     return( o_ctx_menu );
 }
@@ -428,6 +430,34 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
     vlc_object_release( p_playlist );
     [self playlistUpdated];
+}
+
+- (IBAction)enableGroup:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+
+    if (p_playlist)
+    {
+        playlist_EnableGroup(p_playlist,
+                p_playlist->pp_items[[o_table_view selectedRow]]->i_group);
+        vlc_object_release(p_playlist);
+    }
+}
+
+- (IBAction)disableGroup:(id)sender 
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+
+    if (p_playlist)
+    {
+        playlist_DisableGroup(p_playlist,
+                p_playlist->pp_items[[o_table_view selectedRow]]->i_group);
+        vlc_object_release(p_playlist);
+    }
 }
 
 - (IBAction)selectAll:(id)sender
