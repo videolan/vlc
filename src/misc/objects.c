@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.16 2002/08/12 09:34:15 sam Exp $
+ * $Id: objects.c,v 1.17 2002/08/14 08:17:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -507,28 +507,8 @@ static void set_attachment_flag( vlc_object_t *p_this, vlc_bool_t b_attached )
     p_this->b_attached = b_attached;
 }
 
-/*****************************************************************************
- * vlc_dumpstructure: print the current vlc structure
- *****************************************************************************
- * This function prints an ASCII tree showing the connections between vlc
- * objects, and additional information such as their refcount, thread ID,
- * address, etc.
- *****************************************************************************/
-void __vlc_dumpstructure( vlc_object_t *p_this )
+static void vlc_print_object( vlc_object_t *p_this, const char *psz_prefix )
 {
-    char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
-
-    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
-    psz_foo[0] = '|';
-    vlc_dumpstructure_inner( p_this, 0, psz_foo );
-    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
-}
-
-static void vlc_dumpstructure_inner( vlc_object_t *p_this,
-                                     int i_level, char *psz_foo )
-{
-    int i;
-    char i_back = psz_foo[i_level];
     char psz_children[20], psz_refcount[20], psz_thread[20], psz_name[50];
 
     psz_name[0] = '\0';
@@ -568,9 +548,71 @@ static void vlc_dumpstructure_inner( vlc_object_t *p_this,
         psz_thread[19] = '\0';
     }
 
+    msg_Info( p_this->p_vlc, "%so %.6x %s%s%s%s%s", psz_prefix,
+              p_this->i_object_id, p_this->psz_object_type,
+              psz_name, psz_thread, psz_refcount, psz_children );
+}
+
+/*****************************************************************************
+ * vlc_liststructure: print the current vlc objects
+ *****************************************************************************
+ * This function prints an ASCII tree showing the connections between vlc
+ * objects, and additional information such as their refcount, thread ID,
+ * address, etc.
+ *****************************************************************************/
+void __vlc_liststructure( vlc_object_t *p_this )
+{
+    vlc_object_t ** p_all;
+    vlc_object_t *  p_current;
+    int             i_total;
+
+    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
+
+    i_total = p_this->p_vlc->i_objects;
+    p_all = p_this->p_vlc->pp_objects;
+
+    for( p_current = p_all[0] ; p_current < p_all[i_total] ; p_current++ )
+    {
+        if( p_current->b_attached )
+        {
+            vlc_print_object( p_current, "" );
+        }
+        else
+        {
+            msg_Info( p_this->p_vlc, "o %.6x %s (not attached)",
+                      p_current->i_object_id, p_current->psz_object_type );
+        }
+    }
+
+    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
+}
+
+/*****************************************************************************
+ * vlc_dumpstructure: print the current vlc structure
+ *****************************************************************************
+ * This function prints an ASCII tree showing the connections between vlc
+ * objects, and additional information such as their refcount, thread ID,
+ * address, etc.
+ *****************************************************************************/
+void __vlc_dumpstructure( vlc_object_t *p_this )
+{
+    char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
+
+    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
+    psz_foo[0] = '|';
+    vlc_dumpstructure_inner( p_this, 0, psz_foo );
+    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
+}
+
+static void vlc_dumpstructure_inner( vlc_object_t *p_this,
+                                     int i_level, char *psz_foo )
+{
+    int i;
+    char i_back = psz_foo[i_level];
     psz_foo[i_level] = '\0';
-    msg_Info( p_this, "%so %s %p%s%s%s%s", psz_foo, p_this->psz_object_type,
-              p_this, psz_name, psz_thread, psz_refcount, psz_children );
+
+    vlc_print_object( p_this, psz_foo );
+
     psz_foo[i_level] = i_back;
 
     if( i_level / 2 >= MAX_DUMPSTRUCTURE_DEPTH )

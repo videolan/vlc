@@ -92,6 +92,7 @@ struct module_symbols_t
     void (* __msg_Unsubscribe_inner) ( vlc_object_t *, msg_subscription_t * ) ;
     void (* __msg_Warn_inner) ( void *, const char *, ... ) ;
     void (* __vlc_dumpstructure_inner) ( vlc_object_t * ) ;
+    void (* __vlc_liststructure_inner) ( vlc_object_t * ) ;
     void (* __vlc_object_attach_inner) ( vlc_object_t *, vlc_object_t * ) ;
     void (* __vlc_object_destroy_inner) ( vlc_object_t * ) ;
     void (* __vlc_object_detach_inner) ( vlc_object_t * ) ;
@@ -187,6 +188,7 @@ struct module_symbols_t
 #   define __vlc_cond_destroy p_symbols->__vlc_cond_destroy_inner
 #   define __vlc_cond_init p_symbols->__vlc_cond_init_inner
 #   define __vlc_dumpstructure p_symbols->__vlc_dumpstructure_inner
+#   define __vlc_liststructure p_symbols->__vlc_liststructure_inner
 #   define __vlc_mutex_destroy p_symbols->__vlc_mutex_destroy_inner
 #   define __vlc_mutex_init p_symbols->__vlc_mutex_init_inner
 #   define __vlc_object_attach p_symbols->__vlc_object_attach_inner
