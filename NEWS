@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.27 2003/03/04 22:08:33 gbazin Exp $
+$Id: NEWS,v 1.28 2003/03/05 00:05:23 sigmunau Exp $
 
 Changes between 0.5.1a and 0.5.2:
 --------------------------------
@@ -32,6 +32,7 @@ Linupy port:
 Miscellaneous:
  * improved ID3 tag detection.
  * changed several errors into warnings. the frequently reported "this is not a PS stream, continuing" is one of these.
+ * mouse gestures work on windows and osx, but there still isn't any useful gestures
 
 Changes between 0.5.1 and 0.5.1a:
 --------------------------------
