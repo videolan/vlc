@@ -43,7 +43,7 @@ typedef struct sequence_s
     u32                 i_height, i_width, i_size;
     u32                 i_mb_height, i_mb_width, i_mb_size;
     unsigned int        i_aspect_ratio;
-    double              d_frame_rate;
+    float               r_frame_rate;
     boolean_t           b_mpeg2;
     boolean_t           b_progressive;
     unsigned int        i_scalable_mode;

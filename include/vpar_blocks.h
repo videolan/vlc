@@ -84,9 +84,9 @@ typedef struct lookup_s
 
 typedef struct dct_lookup_s
 {
-    int    i_run;
-    int    i_level;
-    int    i_length;
+    char   i_run;
+    char   i_level;
+    char   i_length;
 } dct_lookup_t;
 
 /*****************************************************************************

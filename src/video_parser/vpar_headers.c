@@ -166,7 +166,7 @@ static __inline__ void NextStartCode( vpar_thread_t * p_vpar )
 
     while( ShowBits( &p_vpar->bit_stream, 24 ) != 0x01L && !p_vpar->b_die )
     {
-        DumpBits( &p_vpar->bit_stream, 8 );
+        RemoveBits( &p_vpar->bit_stream, 8 );
     }
 }
 
@@ -264,7 +264,7 @@ int vpar_NextSequenceHeader( vpar_thread_t * p_vpar )
         NextStartCode( p_vpar );
         if( ShowBits( &p_vpar->bit_stream, 32 ) == SEQUENCE_HEADER_CODE )
             return 0;
-        DumpBits( &p_vpar->bit_stream, 8 );
+        RemoveBits( &p_vpar->bit_stream, 8 );
     }
     return 1;
 }
@@ -320,7 +320,7 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
 static void SequenceHeader( vpar_thread_t * p_vpar )
 {
 #define RESERVED    -1 
-    static double d_frame_rate_table[16] =
+    static float r_frame_rate_table[16] =
     {
         0.0,
         ((23.0*1000.0)/1001.0),
@@ -340,15 +340,15 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     i_height_save = p_vpar->sequence.i_height;
     i_width_save = p_vpar->sequence.i_width;
 
-    p_vpar->sequence.i_height = GetBits( &p_vpar->bit_stream, 12 );
     p_vpar->sequence.i_width = GetBits( &p_vpar->bit_stream, 12 );
+    p_vpar->sequence.i_height = GetBits( &p_vpar->bit_stream, 12 );
     p_vpar->sequence.i_aspect_ratio = GetBits( &p_vpar->bit_stream, 4 );
-    p_vpar->sequence.d_frame_rate =
-            d_frame_rate_table[ GetBits( &p_vpar->bit_stream, 4 ) ];
+    p_vpar->sequence.r_frame_rate =
+            r_frame_rate_table[ GetBits( &p_vpar->bit_stream, 4 ) ];
 
     /* We don't need bit_rate_value, marker_bit, vbv_buffer_size,
      * constrained_parameters_flag */
-    DumpBits( &p_vpar->bit_stream, 30 );
+    RemoveBits( &p_vpar->bit_stream, 30 );
     
     /*
      * Quantization matrices
@@ -395,9 +395,9 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         p_vpar->sequence.b_mpeg2 = 1;
     
         /* Parse sequence_extension */
-        DumpBits32( &p_vpar->bit_stream );
+        RemoveBits32( &p_vpar->bit_stream );
         /* extension_start_code_identifier, profile_and_level_indication */
-        DumpBits( &p_vpar->bit_stream, 12 );
+        RemoveBits( &p_vpar->bit_stream, 12 );
         p_vpar->sequence.b_progressive = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->sequence.i_chroma_format = GetBits( &p_vpar->bit_stream, 2 );
         p_vpar->sequence.pf_decode_pattern = ppf_chroma_pattern
@@ -405,11 +405,11 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         p_vpar->sequence.i_width |= GetBits( &p_vpar->bit_stream, 2 ) << 12;
         p_vpar->sequence.i_height |= GetBits( &p_vpar->bit_stream, 2 ) << 12;
         /* bit_rate_extension, marker_bit, vbv_buffer_size_extension, low_delay */
-        DumpBits( &p_vpar->bit_stream, 22 );
+        RemoveBits( &p_vpar->bit_stream, 22 );
         /* frame_rate_extension_n */
         i_dummy = GetBits( &p_vpar->bit_stream, 2 );
         /* frame_rate_extension_d */
-        p_vpar->sequence.d_frame_rate *= (i_dummy + 1)
+        p_vpar->sequence.r_frame_rate *= (i_dummy + 1)
                                   / (GetBits( &p_vpar->bit_stream, 5 ) + 1);
 
         p_vpar->sequence.pf_decode_mv = vpar_MPEG2MotionVector;
@@ -502,7 +502,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 static void GroupHeader( vpar_thread_t * p_vpar )
 {
     /* Nothing to do, we don't care. */
-    DumpBits( &p_vpar->bit_stream, 27 );
+    RemoveBits( &p_vpar->bit_stream, 27 );
     ExtensionAndUserData( p_vpar );
 }
 
@@ -521,35 +521,39 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     boolean_t           b_parsable;
     u32                 i_dummy;
     
-    DumpBits( &p_vpar->bit_stream, 10 ); /* temporal_reference */
+    RemoveBits( &p_vpar->bit_stream, 10 ); /* temporal_reference */
     p_vpar->picture.i_coding_type = GetBits( &p_vpar->bit_stream, 3 );
     p_vpar->picture.pf_macroblock_type = ppf_macroblock_type
                                          [p_vpar->picture.i_coding_type];
-    
-    DumpBits( &p_vpar->bit_stream, 16 ); /* vbv_delay */
-    
-    p_vpar->picture.pb_full_pel_vector[0] = GetBits( &p_vpar->bit_stream, 1 );
-    p_vpar->picture.i_forward_f_code = GetBits( &p_vpar->bit_stream, 3 );
-    p_vpar->picture.pb_full_pel_vector[1] = GetBits( &p_vpar->bit_stream, 1 );
-    p_vpar->picture.i_backward_f_code = GetBits( &p_vpar->bit_stream, 3 );
+    RemoveBits( &p_vpar->bit_stream, 16 ); /* vbv_delay */
+ 
+    if( p_vpar->picture.i_coding_type == P_CODING_TYPE || p_vpar->picture.i_coding_type == B_CODING_TYPE )
+    {
+        p_vpar->picture.pb_full_pel_vector[0] = GetBits( &p_vpar->bit_stream, 1 );
+        p_vpar->picture.i_forward_f_code = GetBits( &p_vpar->bit_stream, 3 );
+    }
+    if( p_vpar->picture.i_coding_type == B_CODING_TYPE )
+    {
+        p_vpar->picture.pb_full_pel_vector[1] = GetBits( &p_vpar->bit_stream, 1 );
+        p_vpar->picture.i_backward_f_code = GetBits( &p_vpar->bit_stream, 3 );
+    }
 
     /* extra_information_picture */
     while( GetBits( &p_vpar->bit_stream, 1 ) )
     {
-        DumpBits( &p_vpar->bit_stream, 8 );
+        RemoveBits( &p_vpar->bit_stream, 8 );
     }
 
     /* 
      * Picture Coding Extension
      */
-
     NextStartCode( p_vpar );
-    if( ShowBits( &p_vpar->bit_stream, 16 ) == EXTENSION_START_CODE )
+    if( ShowBits( &p_vpar->bit_stream, 32 ) == EXTENSION_START_CODE )
     {
         /* Parse picture_coding_extension */
-        DumpBits32( &p_vpar->bit_stream );
+        RemoveBits32( &p_vpar->bit_stream );
         /* extension_start_code_identifier */
-        DumpBits( &p_vpar->bit_stream, 4 );
+        RemoveBits( &p_vpar->bit_stream, 4 );
         
         p_vpar->picture.ppi_f_code[0][0] = GetBits( &p_vpar->bit_stream, 4 );
         p_vpar->picture.ppi_f_code[0][1] = GetBits( &p_vpar->bit_stream, 4 );
@@ -568,7 +572,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         /* repeat_first_field (ISO/IEC 13818-2 6.3.10 is necessary to know
          * the length of the picture_display_extension structure.
          * chroma_420_type (obsolete) */
-        DumpBits( &p_vpar->bit_stream, 1 );
+        RemoveBits( &p_vpar->bit_stream, 1 );
         p_vpar->picture.b_progressive_frame = GetBits( &p_vpar->bit_stream, 1 );
         
         /* composite_display_flag */
@@ -576,7 +580,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         {
             /* v_axis, field_sequence, sub_carrier, burst_amplitude,
              * sub_carrier_phase */
-            DumpBits( &p_vpar->bit_stream, 20 );
+            RemoveBits( &p_vpar->bit_stream, 20 );
         }
     }
     else
@@ -708,7 +712,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     /* Picture data (ISO/IEC 13818-2 6.2.3.7). */
     NextStartCode( p_vpar );
     while( i_mb_address+i_mb_base < p_vpar->sequence.i_mb_size
-           && !p_vpar->picture.b_error)
+           && !p_vpar->picture.b_error && !p_vpar->b_die )
     {
         if( ((i_dummy = ShowBits( &p_vpar->bit_stream, 32 ))
                  < SLICE_START_CODE_MIN) ||
@@ -718,23 +722,12 @@ static void PictureHeader( vpar_thread_t * p_vpar )
             p_vpar->picture.b_error = 1;
             break;
         }
-        DumpBits32( &p_vpar->bit_stream );
+        RemoveBits32( &p_vpar->bit_stream );
         
         /* Decode slice data. */
         p_vpar->sequence.pf_slice_header( p_vpar, &i_mb_address, i_mb_base, i_dummy & 255 );
     }
-
-    /* Link referenced pictures for the decoder 
-     * They are unlinked in vpar_ReleaseMacroblock() & vpar_DestroyMacroblock() */
-    if( p_vpar->sequence.p_forward != NULL )
-    {
-	    vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
-    }
-    if( p_vpar->sequence.p_backward != NULL )
-    {
-        vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
-    }
-    
+  
     if( p_vpar->picture.b_error )
     {
         /* Trash picture. */
@@ -746,16 +739,6 @@ fprintf(stderr, "Image trashee\n");
 
         ReferenceReplace( p_vpar, p_vpar->picture.i_coding_type, NULL );
         vout_DestroyPicture( p_vpar->p_vout, P_picture );
-
-        /* Unlink referenced pictures */
-        if(  p_vpar->sequence.p_forward != NULL  )
-        {
-	        vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
-        }
-        if( p_vpar->sequence.p_backward != NULL )
-        {
-            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
-        }
 
         /* Prepare context for the next picture. */
         P_picture = NULL;
@@ -772,9 +755,20 @@ fprintf(stderr, "Image decodee\n");
             vpar_DecodeMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
         }
 
+        /* Link referenced pictures for the decoder 
+         * They are unlinked in vpar_ReleaseMacroblock() & vpar_DestroyMacroblock() */
+        if( p_vpar->sequence.p_forward != NULL )
+        {
+	        vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+        }
+        if( p_vpar->sequence.p_backward != NULL )
+        {
+            vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+        } 
+        
         /* Prepare context for the next picture. */
         P_picture = NULL;
-    p_vpar->picture.i_current_structure = 0;
+        p_vpar->picture.i_current_structure = 0;
     }
 #undef P_picture
 }
@@ -797,16 +791,15 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
     if( GetBits( &p_vpar->bit_stream, 1 ) )
     {
         /* intra_slice, slice_id */
-        DumpBits( &p_vpar->bit_stream, 8 );
+        RemoveBits( &p_vpar->bit_stream, 8 );
         /* extra_information_slice */
         while( GetBits( &p_vpar->bit_stream, 1 ) )
         {
-            DumpBits( &p_vpar->bit_stream, 8 );
+            RemoveBits( &p_vpar->bit_stream, 8 );
         }
     }
-
     *pi_mb_address = (i_vert_code - 1)*p_vpar->sequence.i_mb_width;
-
+    
     /* Reset DC coefficients predictors (ISO/IEC 13818-2 7.2.1). Why
      * does the reference decoder put 0 instead of the normative values ? */
     p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
@@ -822,7 +815,7 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
                               i_mb_base );
         i_mb_address_save = *pi_mb_address;
     }
-    while( ShowBits( &p_vpar->bit_stream, 23 ) );
+    while( ShowBits( &p_vpar->bit_stream, 23 ) && !p_vpar->b_die );
     NextStartCode( p_vpar );
 }
 
@@ -843,7 +836,7 @@ static void SliceHeader01( vpar_thread_t * p_vpar,
                            int * pi_mb_address, int i_mb_base,
                            u32 i_vert_code )
 {
-    DumpBits( &p_vpar->bit_stream, 7 ); /* priority_breakpoint */
+    RemoveBits( &p_vpar->bit_stream, 7 ); /* priority_breakpoint */
     SliceHeader( p_vpar, pi_mb_address, i_mb_base, i_vert_code );
 }
 
@@ -860,7 +853,7 @@ static void SliceHeader11( vpar_thread_t * p_vpar,
                            u32 i_vert_code )
 {
     i_vert_code += GetBits( &p_vpar->bit_stream, 3 ) << 7;
-    DumpBits( &p_vpar->bit_stream, 7 ); /* priority_breakpoint */
+    RemoveBits( &p_vpar->bit_stream, 7 ); /* priority_breakpoint */
     SliceHeader( p_vpar, pi_mb_address, i_mb_base, i_vert_code );
 }
 
@@ -875,7 +868,7 @@ static void ExtensionAndUserData( vpar_thread_t * p_vpar )
         switch( ShowBits( &p_vpar->bit_stream, 32 ) )
         {
         case EXTENSION_START_CODE:
-            DumpBits32( &p_vpar->bit_stream );
+            RemoveBits32( &p_vpar->bit_stream );
             switch( GetBits( &p_vpar->bit_stream, 4 ) )
             {
             case SEQUENCE_DISPLAY_EXTENSION_ID:
@@ -904,7 +897,7 @@ static void ExtensionAndUserData( vpar_thread_t * p_vpar )
             break;
 
         case USER_DATA_START_CODE:
-            DumpBits32( &p_vpar->bit_stream );
+            RemoveBits32( &p_vpar->bit_stream );
             /* Wait for the next start code */
             break;
 
@@ -923,14 +916,14 @@ static void SequenceDisplayExtension( vpar_thread_t * p_vpar )
 {
     /* We don't care sequence_display_extension. */
     /* video_format */
-    DumpBits( &p_vpar->bit_stream, 3 );
+    RemoveBits( &p_vpar->bit_stream, 3 );
     if( GetBits( &p_vpar->bit_stream, 1 ) )
     {
         /* Three bytes for color_desciption */
-        DumpBits( &p_vpar->bit_stream, 24 );
+        RemoveBits( &p_vpar->bit_stream, 24 );
     }
     /* display_horizontal and vertical_size and a marker_bit */
-    DumpBits( &p_vpar->bit_stream, 29 );
+    RemoveBits( &p_vpar->bit_stream, 29 );
 }
 
 
@@ -1011,14 +1004,14 @@ static void SequenceScalableExtension( vpar_thread_t * p_vpar )
     /* The length of the structure depends on the value of the scalable_mode */
     {
         case 1:
-            DumpBits32( &p_vpar->bit_stream );
-            DumpBits( &p_vpar->bit_stream, 21 );
+            RemoveBits32( &p_vpar->bit_stream );
+            RemoveBits( &p_vpar->bit_stream, 21 );
             break;
         case 2:
-            DumpBits( &p_vpar->bit_stream, 12 );
+            RemoveBits( &p_vpar->bit_stream, 12 );
             break;
         default:
-            DumpBits( &p_vpar->bit_stream, 4 );
+            RemoveBits( &p_vpar->bit_stream, 4 );
     }
 
 }
@@ -1037,7 +1030,7 @@ static void PictureDisplayExtension( vpar_thread_t * p_vpar )
                                           p_vpar->picture.b_top_field_first
                          : ( p_vpar->picture.b_frame_structure + 1 ) +
                            p_vpar->picture.b_repeat_first_field;
-    DumpBits( &p_vpar->bit_stream, 34 * nb );
+    RemoveBits( &p_vpar->bit_stream, 34 * nb );
 }
 
 
@@ -1048,8 +1041,8 @@ static void PictureDisplayExtension( vpar_thread_t * p_vpar )
 static void PictureSpatialScalableExtension( vpar_thread_t * p_vpar )
 {
     /* That's scalable, so we trash it */
-    DumpBits32( &p_vpar->bit_stream );
-    DumpBits( &p_vpar->bit_stream, 16 );
+    RemoveBits32( &p_vpar->bit_stream );
+    RemoveBits( &p_vpar->bit_stream, 16 );
 }
 
 
@@ -1060,7 +1053,7 @@ static void PictureSpatialScalableExtension( vpar_thread_t * p_vpar )
 static void PictureTemporalScalableExtension( vpar_thread_t * p_vpar )
 {
     /* Scalable again, trashed again */
-    DumpBits( &p_vpar->bit_stream, 23 );
+    RemoveBits( &p_vpar->bit_stream, 23 );
 }
 
 
@@ -1077,14 +1070,14 @@ static void CopyrightExtension( vpar_thread_t * p_vpar )
         /* An identifier compliant with ISO/CEI JTC 1/SC 29 */
     p_vpar->sequence.b_original = GetBits( &p_vpar->bit_stream, 1 );
         /* Reserved bits */
-    DumpBits( &p_vpar->bit_stream, 8 );
+    RemoveBits( &p_vpar->bit_stream, 8 );
         /* The copyright_number is split in three parts */
         /* first part */
     i_copyright_nb_1 = GetBits( &p_vpar->bit_stream, 20 );
-    DumpBits( &p_vpar->bit_stream, 1 );
+    RemoveBits( &p_vpar->bit_stream, 1 );
         /* second part */
     i_copyright_nb_2 = GetBits( &p_vpar->bit_stream, 22 );
-    DumpBits( &p_vpar->bit_stream, 1 );
+    RemoveBits( &p_vpar->bit_stream, 1 );
         /* third part and sum */
     p_vpar->sequence.i_copyright_nb = ( (u64)i_copyright_nb_1 << 44 ) +
                                       ( (u64)i_copyright_nb_2 << 22 ) +

@@ -231,12 +231,12 @@ static int InitThread( vpar_thread_t *p_vpar )
 #if defined(MPEG2_COMPLIANT) && !defined(VDEC_DFT)
     vpar_InitCrop( p_vpar );
 #endif
-    InitMbAddrInc( p_vpar );
-    InitDCTTables( p_vpar );
-    InitPMBType( p_vpar );
-    InitBMBType( p_vpar );
-    InitCodedPattern( p_vpar );
-    InitDCTTables( p_vpar );
+    vpar_InitMbAddrInc( p_vpar );
+    vpar_InitDCTTables( p_vpar );
+    vpar_InitPMBType( p_vpar );
+    vpar_InitBMBType( p_vpar );
+    vpar_InitCodedPattern( p_vpar );
+    vpar_InitDCTTables( p_vpar );
 
     /* Mark thread as running and return */
     intf_DbgMsg("vpar debug: InitThread(%p) succeeded\n", p_vpar);

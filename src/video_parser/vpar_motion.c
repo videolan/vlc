@@ -73,14 +73,14 @@ static __inline__ int vpar_MotionCode( vpar_thread_t * p_vpar )
    if( (i_code = ShowBits(&p_vpar->bit_stream, 9)) >= 64 )
    {
        i_code >>= 6;
-       DumpBits( &p_vpar->bit_stream, p_mv_tab0[0].i_len );
+       RemoveBits( &p_vpar->bit_stream, p_mv_tab0[0].i_len );
        return( GetBits(&p_vpar->bit_stream, 1) ? -p_mv_tab0[i_code].i_val : p_mv_tab0[i_code].i_val );
    }
 
    if( i_code >= 24 )
    {
        i_code >>= 3;
-       DumpBits( &p_vpar->bit_stream, p_mv_tab1[0].i_len );
+       RemoveBits( &p_vpar->bit_stream, p_mv_tab1[0].i_len );
        return( GetBits(&p_vpar->bit_stream, 1) ? -p_mv_tab1[i_code].i_val : p_mv_tab1[i_code].i_val );
    }
 
@@ -91,7 +91,7 @@ static __inline__ int vpar_MotionCode( vpar_thread_t * p_vpar )
        return 0;
    }
 
-   DumpBits( &p_vpar->bit_stream, p_mv_tab2[0].i_len );
+   RemoveBits( &p_vpar->bit_stream, p_mv_tab2[0].i_len );
    return( GetBits(&p_vpar->bit_stream, 1) ? -p_mv_tab2[i_code].i_val : p_mv_tab2[i_code].i_val );            
 }
 

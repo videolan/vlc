@@ -164,7 +164,7 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
 
 /******************************************************************************
  * NeedBits : reads i_bits new bits in the bit stream and stores them in the
- *  <F4>          bit buffer
+ *            bit buffer
  ******************************************************************************
  * - i_bits must be less or equal 32 !
  * - There is something important to notice with that function : if the number
@@ -213,6 +213,24 @@ static __inline__ void DumpBits32( bit_stream_t * p_bit_stream )
  * on an 8-bit boundary, or you will get curious results (that is, you
  * need to call RealignBits() before).
  */
+
+/******************************************************************************
+ * RemoveBits : removes i_bits bits from the bit buffer
+ ******************************************************************************/
+static __inline__ void RemoveBits( bit_stream_t * p_bit_stream, int i_bits )
+{
+    NeedBits( p_bit_stream, i_bits );
+    DumpBits( p_bit_stream, i_bits );
+}
+
+/******************************************************************************
+ * RemoveBits32 : removes 32 bits from the bit buffer
+ ******************************************************************************/
+static __inline__ void RemoveBits32( bit_stream_t * p_bit_stream )
+{
+    NeedBits( p_bit_stream, 32 );
+    DumpBits32( p_bit_stream );
+}
 
 /******************************************************************************
  * ShowBits : return i_bits bits from the bit stream

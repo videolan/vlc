@@ -276,7 +276,7 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
     }
 
     /* chrominance */
-    for( i_b = 4; i_b < 4 + 2*p_mb->i_chroma_nb_blocks; i_b++ )
+    for( i_b = 4; i_b < 4 + p_mb->i_chroma_nb_blocks; i_b++ )
     {
         /*
          * Inverse DCT (ISO/IEC 13818-2 section Annex A)
