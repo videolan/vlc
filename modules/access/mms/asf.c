@@ -113,10 +113,63 @@ void E_( asf_HeaderParse )( asf_header_t *hdr,
 
             var_buffer_getmemory( &buffer, NULL, i_size - 24 - 16 - 8 - 8 - 8 - 8-8-8-4 - 4);
         }
+        else if( CmpGuid( &guid, &asf_object_header_extension_guid ) )
+        {
+            /* Enter it */
+            var_buffer_getmemory( &buffer, NULL, 46 - 24 );
+        }
+        else if( CmpGuid( &guid, &asf_object_extended_stream_properties_guid ) )
+        {
+            /* Grrrrrr */
+            int16_t i_count1, i_count2;
+            int i_subsize;
+            int i;
+
+            //fprintf( stderr, "extended stream properties\n" );
+
+            var_buffer_getmemory( &buffer, NULL, 84 - 24 );
+
+            i_count1 = var_buffer_get16( &buffer );
+            i_count2 = var_buffer_get16( &buffer );
+
+            i_subsize = 88;
+            for( i = 0; i < i_count1; i++ )
+            {
+                int i_len;
+
+                var_buffer_get16( &buffer );
+                i_len = var_buffer_get16( &buffer );
+                var_buffer_getmemory( &buffer, NULL, i_len );
+
+                i_subsize = 4 + i_len;
+            }
+
+            for( i = 0; i < i_count2; i++ )
+            {
+                int i_len;
+                var_buffer_getmemory( &buffer, NULL, 16 + 2 );
+                i_len = var_buffer_get32( &buffer );
+                var_buffer_getmemory( &buffer, NULL, i_len );
+
+                i_subsize += 16 + 6 + i_len;
+            }
+
+            //fprintf( stderr, "extended stream properties left=%d\n",
+            //         i_size - i_subsize );
+
+            if( i_size - i_subsize <= 24 )
+            {
+                var_buffer_getmemory( &buffer, NULL, i_size - i_subsize );
+            }
+            /* It's a hack we just skip the first part of the object until
+             * the embed stream properties if any (ugly, but whose fault ?) */
+        }
         else if( CmpGuid( &guid, &asf_object_stream_properties_guid ) )
         {
             int     i_stream_id;
             guid_t  stream_type;
+
+            //fprintf( stderr, "stream properties\n" );
 
             var_buffer_getguid( &buffer, &stream_type );
             var_buffer_getmemory( &buffer, NULL, 32 );
@@ -145,6 +198,8 @@ void E_( asf_HeaderParse )( asf_header_t *hdr,
             int     i_count;
             uint8_t i_stream_id;
 
+            //fprintf( stderr, "bitrate properties\n" );
+
             i_count = var_buffer_get16( &buffer );
             i_size -= 2;
             while( i_count > 0 )
@@ -159,6 +214,7 @@ void E_( asf_HeaderParse )( asf_header_t *hdr,
         }
         else
         {
+            //fprintf( stderr, "unknown\n" );
             //fprintf( stderr, " 3---------------------skip:%lld\n", i_size - 24);
             // skip unknown guid
             var_buffer_getmemory( &buffer, NULL, i_size - 24 );
