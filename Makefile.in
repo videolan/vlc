@@ -369,6 +369,7 @@ PLUGIN_KDE =	plugins/kde/kde.o \
 
 PLUGIN_MACOSX =	plugins/macosx/macosx.o \
 		plugins/macosx/intf_macosx.o \
+		plugins/macosx/aout_macosx.o \
 		plugins/macosx/vout_macosx.o
 
 PLUGIN_MGA =	plugins/mga/mga.o \
