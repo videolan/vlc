@@ -193,7 +193,7 @@ static int Demux( demux_t *p_demux )
             psz_mrl = ProcessMRL( psz_line, p_demux->p_sys->psz_prefix );
             playlist_AddExt( p_playlist, psz_mrl, psz_name,
                           PLAYLIST_INSERT, i_position, i_duration,
-                          p_demux->p_sys->ppsz_options,
+                          (const char **)p_demux->p_sys->ppsz_options,
                           p_demux->p_sys->i_options );
             for( i = 0 ; i < p_demux->p_sys->i_options ; i++)
             {
