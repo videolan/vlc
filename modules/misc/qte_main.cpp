@@ -116,6 +116,9 @@ static int Open( vlc_object_t *p_this )
     i_refcount++;
     vlc_mutex_unlock( (vlc_mutex_t *) lockval.p_address );
 
+    vlc_object_attach( p_qte_main, p_this );
+    msg_Dbg( p_this, "qte_main running" );
+
     return VLC_SUCCESS;
 }
 
@@ -142,6 +145,9 @@ static void Close( vlc_object_t *p_this )
     /* Cleanup allocated classes. */
     delete p_qte_main->p_qte_widget;
     delete p_qte_main->p_qte_application;
+
+    msg_Dbg( p_this, "Detaching qte_main" );
+    vlc_object_detach( p_qte_main );
 
     vlc_object_destroy( p_qte_main );
     p_qte_main = NULL;
@@ -175,15 +181,12 @@ static void QteMain( qte_thread_t *p_this )
         p_this->p_qte_application = pApp;
     }
 
-    QWidget* pWidget = new QWidget();
+    QWidget* pWidget = new QWidget(0, _("video") );
     if(pWidget)
     {
         p_this->p_qte_widget = pWidget;
     }
 
-    if (p_this->b_gui_server) {
-        p_this->p_qte_application->desktop()->setFixedSize(240, 320);
-    }
     /* signal the creation of the window */
     p_this->p_qte_application->setMainWidget(p_this->p_qte_widget);
     p_this->p_qte_widget->show();
