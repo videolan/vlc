@@ -997,13 +997,15 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
              * to update the p_extra data */
             es_format_t *p_fmt = (es_format_t*) va_arg( args, es_format_t * );
             es = (es_out_id_t*) va_arg( args, es_out_id_t * );
-            if( es == NULL || !es->p_dec ) return VLC_EGENERIC;
+            if( es == NULL ) return VLC_EGENERIC;
 
             if( p_fmt->i_extra )
             {
                 es->fmt.i_extra = p_fmt->i_extra;
                 es->fmt.p_extra = realloc( es->fmt.p_extra, p_fmt->i_extra );
                 memcpy( es->fmt.p_extra, p_fmt->p_extra, p_fmt->i_extra );
+
+                if( !es->p_dec ) return VLC_SUCCESS;
 
                 es->p_dec->fmt_in.i_extra = p_fmt->i_extra;
                 es->p_dec->fmt_in.p_extra =
