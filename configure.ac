@@ -2526,7 +2526,7 @@ AC_CHECK_HEADERS(png.h, [
     VLC_ADD_PLUGINS([logo])
     VLC_ADD_LDFLAGS([svcdsub],[-lpng -lz])
     VLC_ADD_LDFLAGS([cvdsub],[-lpng -lz -lm])
-    AC_DEFINE(HAVE_LIBPNG, [], [Define if you have the PNG library: libpng])]
+    AC_DEFINE(HAVE_LIBPNG, [], [Define if you have the PNG library: libpng])],
     [],[-lz])
   ])
   LDFLAGS="${LDFLAGS_save}"
