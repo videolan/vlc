@@ -2,7 +2,7 @@
  * hotkeys.h: keycode defines
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_keys.h,v 1.2 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: vlc_keys.h,v 1.3 2003/10/28 14:51:50 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -139,7 +139,7 @@ static const struct key_descriptor_s keys[] =
     { ">", '>' }
 };
 
-static char *KeyToString( int i_key )
+static inline char *KeyToString( int i_key )
 {
     unsigned int i = 0;
     for ( i = 0; i < sizeof(keys) / sizeof(key_descriptor_t); i++ )
@@ -151,3 +151,4 @@ static char *KeyToString( int i_key )
     }
     return NULL;
 }
+
