@@ -98,6 +98,7 @@ PLUGINS_TARGETS := a52/a52 \
 		filter/filter_invert \
 		filter/filter_distort \
 		filter/filter_wall \
+		filter/filter_clone \
 		fx/fx_scope \
 		ggi/ggi \
 		glide/glide \
