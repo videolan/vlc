@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.28 2003/08/14 23:37:54 fenrir Exp $
+ * $Id: ts.c,v 1.29 2003/08/18 17:25:51 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -215,7 +215,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c );
 
 static int  TSFill   ( sout_mux_t *, sout_input_t * );
 static void PEStoTS  ( sout_instance_t *, sout_buffer_chain_t *, sout_buffer_t *, ts_stream_t *, vlc_bool_t );
-static void TSSetDate( sout_buffer_chain_t *, mtime_t, mtime_t );
+static void TSSetDate( sout_buffer_chain_t *, mtime_t, mtime_t, mtime_t );
 static void TSSetConstraints( sout_mux_t*, sout_buffer_chain_t *,
                               mtime_t i_length, int i_bitrate_min, int i_bitrate_max );
 
@@ -671,8 +671,10 @@ static int Mux( sout_mux_t *p_mux )
 
                 /* Send all data */
                 TSSetDate( &p_sys->chain_ts,
-                           p_sys->i_dts + 3  * p_sys->i_pcr_delay / 2,    /* latency is equal to i_pcr_delay, 3/2 is for security */
-                           p_sys->i_length );
+                           p_sys->i_dts,
+                           p_sys->i_length,
+                           3 * p_sys->i_pcr_delay/2 );  /* latency is equal to i_pcr_delay
+                                                           3/2 is for security */
                 sout_AccessOutWrite( p_mux->p_access, p_ts );
 
                 /* Reset the ts chain */
@@ -778,7 +780,7 @@ static int TSFill( sout_mux_t *p_mux, sout_input_t *p_input )
     BufferChainInit( &p_stream->chain_ts );
     PEStoTS( p_mux->p_sout, &p_stream->chain_ts, p_data, p_stream, b_pcr );
 
-    TSSetDate( &p_stream->chain_ts, i_dts, i_length );
+    TSSetDate( &p_stream->chain_ts, i_dts, i_length, 0 );
 
     if( b_pcr_soft && p_stream->chain_ts.p_first )
     {
@@ -872,7 +874,8 @@ static void TSSetConstraints( sout_mux_t *p_mux, sout_buffer_chain_t *c, mtime_t
     }
 }
 
-static void TSSetDate( sout_buffer_chain_t *c, mtime_t i_dts, mtime_t i_length )
+static void TSSetDate( sout_buffer_chain_t *c,
+                       mtime_t i_dts, mtime_t i_length, mtime_t i_send_offset )
 {
     sout_buffer_t *p_ts;
     mtime_t       i_delta = i_length / c->i_depth;
@@ -893,6 +896,7 @@ static void TSSetDate( sout_buffer_chain_t *c, mtime_t i_dts, mtime_t i_length )
             p_ts->p_buffer[9] = ( i_pcr >> 1  )&0xff;
             p_ts->p_buffer[10]= ( i_pcr << 7  )&0x80;
         }
+        p_ts->i_dts += i_send_offset;
 
         i_packet++;
     }
