@@ -334,3 +334,9 @@ D: skins module (core and win32 port)
 D: skins2 module (core and win32 port)
 S: France
 
+N: Rémi Denis-Courmont
+E: rem@videolan.org
+C: courmisch
+D: SSL/TLS support (core, HTTP server, HTTP input)
+S: France
+
