@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.18 2002/07/31 20:56:52 sam Exp $
+ * $Id: input_ext-plugins.c,v 1.19 2002/10/26 15:24:19 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -613,6 +613,11 @@ ssize_t input_SplitBuffer( input_thread_t * p_input,
 
     p_input->p_current_data += i_size;
 
+    /* Update stream position */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.p_selected_area->i_tell += i_size;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+ 
     return( i_size );
 }
 
@@ -705,13 +710,6 @@ ssize_t input_FDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len 
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
  
     ssize_t i_ret = read( p_access_data->i_handle, p_buffer, i_len );
- 
-    if( i_ret > 0 )
-    {
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.p_selected_area->i_tell += i_ret;
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-    }
  
     if( i_ret < 0 )
     {

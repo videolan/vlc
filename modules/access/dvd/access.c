@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: access.c,v 1.3 2002/10/26 15:24:19 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -555,14 +555,13 @@ static ssize_t DVDRead( input_thread_t * p_input,
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    p_input->stream.p_selected_area->i_tell += LB2OFF( i_read );
     if( p_dvd->b_new_chapter )
     {
         p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
         p_dvd->b_new_chapter                    = 0;
     }
 
-    if( ( p_input->stream.p_selected_area->i_tell
+    if( ( p_input->stream.p_selected_area->i_tell + LB2OFF( i_read )
             >= p_input->stream.p_selected_area->i_size )
        || ( i_block_once  <= 0 ) )
     {

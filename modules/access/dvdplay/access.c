@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.3 2002/08/29 23:53:22 massiot Exp $
+ * $Id: access.c,v 1.4 2002/10/26 15:24:19 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -304,19 +304,13 @@ static int dvdplay_Read( input_thread_t * p_input,
 {
     dvd_data_t *    p_dvd;
     off_t           i_read;
-    
+
     p_dvd = (dvd_data_t *)p_input->p_access_data;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-
     i_read = LB2OFF( dvdplay_read( p_dvd->vmg, p_buffer, OFF2LB( i_count ) ) );
-    
-    p_input->stream.p_selected_area->i_tell  =
-        LB2OFF( dvdplay_position( p_dvd->vmg ) ) -
-        p_input->stream.p_selected_area->i_start;
-
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-    
+
     return i_read;
 }
 
@@ -334,8 +328,12 @@ static void dvdplay_Seek( input_thread_t * p_input, off_t i_off )
     p_dvd = (dvd_data_t *)p_input->p_access_data;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    
+
     dvdplay_seek( p_dvd->vmg, OFF2LB( i_off ) );
+
+    p_input->stream.p_selected_area->i_tell  =
+        LB2OFF( dvdplay_position( p_dvd->vmg ) ) -
+        p_input->stream.p_selected_area->i_start;
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -477,6 +475,7 @@ static int dvdNewPGC( input_thread_t * p_input )
     p_input->stream.p_selected_area->i_size  =
         LB2OFF( dvdplay_title_end ( p_dvd->vmg ) ) -
         p_input->stream.p_selected_area->i_start;
+    p_input->stream.p_selected_area->i_tell = 0;
 
     if( p_input->stream.p_selected_area->i_size > 0 )
     {
