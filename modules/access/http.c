@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.36 2003/06/02 16:01:21 sigmunau Exp $
+ * $Id: http.c,v 1.37 2003/07/16 15:32:40 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -120,6 +120,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     _input_socket_t * p_access_data;
     module_t * p_network;
     char * psz_parser, * psz_value, * psz_answer;
+    byte_t * p_bytes;
     int i_code, i_ret, i, i_size;
 
     enum { HTTP_PROTOCOL, ICY_PROTOCOL } i_protocol;
@@ -188,7 +189,8 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     }
 
     /* Get the HTTP returncode */
-    i_size = input_Peek( p_input, (byte_t**)&psz_parser, MAX_ANSWER_SIZE );
+    i_size = input_Peek( p_input, &p_bytes, MAX_ANSWER_SIZE );
+    psz_parser = (char *)p_bytes;
 
     if( i_size <= 0 )
     {
@@ -260,7 +262,8 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     {
         char psz_line[MAX_ANSWER_SIZE];
 
-        i_size = input_Peek( p_input, (byte_t**)&psz_parser, MAX_ANSWER_SIZE );
+        i_size = input_Peek( p_input, &p_bytes, MAX_ANSWER_SIZE );
+        psz_parser = (char *)p_bytes;
 
         if( i_size <= 0 )
         {

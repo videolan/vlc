@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmstu.c,v 1.4 2003/07/10 23:55:14 fenrir Exp $
+ * $Id: mmstu.c,v 1.5 2003/07/16 15:32:41 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -722,7 +722,7 @@ static int MMSOpen( input_thread_t  *p_input,
     var_buffer_add32( &buffer, 0x00 );
     var_buffer_add32( &buffer, 0x00 );
     var_buffer_add32( &buffer, 0x00 );
-    var_buffer_add64( &buffer, 0x40ac200000000000 );
+    var_buffer_add64( &buffer, (((uint64_t)0x40ac2000)<<32) );
     var_buffer_add32( &buffer, p_sys->i_header_packet_id_type );
     var_buffer_add32( &buffer, 0x00 );
     mms_CommandSend( p_input, 0x15, p_sys->i_command_level, 0x00,
