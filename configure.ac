@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.167 2004/01/29 18:48:40 gbazin Exp $
+dnl $Id: configure.ac,v 1.168 2004/01/31 16:44:58 rocky Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -154,6 +154,9 @@ case "${target_os}" in
     ;;
   solaris*)
     SYS=solaris
+    # _POSIX_PTHREAD_SEMANTICS is needed to get the POSIX ctime_r
+    # Perhaps it is useful other places as well? 
+    CFLAGS_save="${CFLAGS_save} -D_POSIX_PTHREAD_SEMANTICS"; CFLAGS="${CFLAGS_save}"
     ;;
   hpux*)
     SYS=hpux
