@@ -476,13 +476,13 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-13:53 <Xtophe> is there any centralien alive ?
-13:54 <thedj> i hope so. haven't heard a thing about a nuke explosion in Paris
+<Xtophe> is there any centralien alive ?
+<thedj> i hope so. haven't heard a thing about a nuke explosion in Paris
 
   -- #videolan
 %
-00:12 <thedj> i don't trust ffmpeg's make process ;)
-00:13 <gibalou> their make mess you mean ?
+<thedj> i don't trust ffmpeg's make process ;)
+<gibalou> their make mess you mean ?
 
   -- #videolan
 %
@@ -491,9 +491,9 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-17:07 <JediMaster> sh-2.03# reboot
-17:07 <JediMaster> Segmentation fault
-17:07 <JediMaster> that's not good
+<JediMaster> sh-2.03# reboot
+<JediMaster> Segmentation fault
+<JediMaster> that's not good
 
   -- #videolan
 %
@@ -506,6 +506,10 @@ the Boston strangler is to the woman home alone.
 %
 <Purge> im going to open a vlc fan club
 <Purge> and we'll go on riots and kill all mplayer and wmp users
+
+  -- #videolan
+%
+<maleki> any girls here with a webcam
 
   -- #videolan
 %
