@@ -1,4 +1,4 @@
-List of known vlc bugs $Id: BUGS,v 1.12 2002/05/19 16:01:26 massiot Exp $
+List of known vlc bugs $Id: BUGS,v 1.13 2002/05/20 22:30:19 sam Exp $
 
    Please try to keep this file up to date. Also, grep for FIXME in the
 source files for more and more bugs to fix.
@@ -35,9 +35,6 @@ Video output:
 
   * On-the-fly resizing when using a chroma transformation doesn't work for
   all plugins. Currently it is only implemented for x11 and SDL.
-
-  * The alternate_fullscreen method of the x11 and xvideo plugins will
-  sometimes not switch to fullscreen.
 
 Chroma transformations:
 

@@ -9,6 +9,8 @@ HEAD
 0.4.0
 Mon, 20 May 2002 22:53:48 +0200
 
+  * ./configure.in: tried to fix the -lavcodec detection.
+  * ./plugins/x11/xcommon.c: fixed x11 and xvideo alternate fullscreen.
   * ./plugins/network/ipv6.c: experimental support for Windows IPv6
   * ./plugins/a52/a52.c: added an option to disable the dynamic range
     compression.

@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.33 2002/05/18 17:47:47 sam Exp $
+ * $Id: xcommon.c,v 1.34 2002/05/20 22:30:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1415,7 +1415,6 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     Atom prop;
     mwmhints_t mwmhints;
     int i_xpos, i_ypos, i_width, i_height;
-    XEvent xevent;
     XSetWindowAttributes attributes;
 
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
@@ -1543,35 +1542,18 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
 
     /* We need to unmap and remap the window if we want the window 
      * manager to take our changes into effect */
-    XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window);
-
-    XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                  StructureNotifyMask, &xevent );
-    while( xevent.type != UnmapNotify )
-        XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                      StructureNotifyMask, &xevent );
-
-    XMapRaised( p_vout->p_sys->p_display, p_vout->p_sys->window);
-
-    while( xevent.type != MapNotify )
-        XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                      StructureNotifyMask, &xevent );
-
+    XReparentWindow( p_vout->p_sys->p_display,
+                     p_vout->p_sys->window,
+                     DefaultRootWindow( p_vout->p_sys->p_display ),
+                     0, 0 );
+    XSync( p_vout->p_sys->p_display, True );
     XMoveResizeWindow( p_vout->p_sys->p_display,
                        p_vout->p_sys->window,
                        i_xpos,
                        i_ypos,
                        i_width,
                        i_height );
-
-    /* Purge all ConfigureNotify events, this is needed to fix a bug where we
-     * would lose the original size of the window */
-    while( xevent.type != ConfigureNotify )
-        XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                      StructureNotifyMask, &xevent );
-    while( XCheckWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                              StructureNotifyMask, &xevent ) );
-
+    XSync( p_vout->p_sys->p_display, True );
 
     /* We need to check that the window was really restored where we wanted */
     if( !p_vout->b_fullscreen )
@@ -1598,16 +1580,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                          p_vout->p_sys->i_xpos_backup_2,
                          p_vout->p_sys->i_ypos_backup_2 );
 
-            /* Purge all ConfigureNotify events, this is needed to fix a bug
-             * where we would lose the original size of the window */
-            XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                          StructureNotifyMask, &xevent );
-            while( xevent.type != ConfigureNotify )
-                XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                              StructureNotifyMask, &xevent );
-            while( XCheckWindowEvent( p_vout->p_sys->p_display,
-                                      p_vout->p_sys->window,
-                                      StructureNotifyMask, &xevent ) );
+            XSync( p_vout->p_sys->p_display, True );
         }
 
         /* Check the size */
@@ -1630,20 +1603,11 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                          p_vout->p_sys->i_width_backup_2,
                          p_vout->p_sys->i_height_backup_2 );
 
-            /* Purge all ConfigureNotify events, this is needed to fix a bug
-             * where we would lose the original size of the window */
-            XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                          StructureNotifyMask, &xevent );
-            while( xevent.type != ConfigureNotify )
-                XWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                              StructureNotifyMask, &xevent );
-            while( XCheckWindowEvent( p_vout->p_sys->p_display,
-                                      p_vout->p_sys->window,
-                                      StructureNotifyMask, &xevent ) );
+            XSync( p_vout->p_sys->p_display, True );
         }
     }
 
-    if( p_vout->p_sys->b_altfullscreen )
+    if( p_vout->p_sys->b_altfullscreen && p_vout->b_fullscreen )
         XSetInputFocus(p_vout->p_sys->p_display,
                        p_vout->p_sys->window,
                        RevertToParent,
