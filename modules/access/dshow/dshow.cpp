@@ -1,8 +1,8 @@
 /*****************************************************************************
- * dshow.c : DirectShow access module for vlc
+ * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.8 2003/09/07 22:49:05 fenrir Exp $
+ * $Id: dshow.cpp,v 1.9 2003/09/21 10:23:59 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -37,9 +37,9 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  AccessOpen  ( vlc_object_t * );
-static void AccessClose ( vlc_object_t * );
-static int  Read        ( input_thread_t *, byte_t *, size_t );
+static int     AccessOpen  ( vlc_object_t * );
+static void    AccessClose ( vlc_object_t * );
+static ssize_t Read        ( input_thread_t *, byte_t *, size_t );
 
 static int  DemuxOpen  ( vlc_object_t * );
 static void DemuxClose ( vlc_object_t * );
@@ -821,7 +821,8 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
  * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
  * bytes.
  *****************************************************************************/
-static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
+static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
+                     size_t i_len )
 {
     access_sys_t   *p_sys = p_input->p_access_data;
     dshow_stream_t *p_stream = p_sys->pp_streams[p_sys->i_current_stream];

@@ -2,7 +2,7 @@
  * vlcpeer.cpp: scriptable peer descriptor
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcpeer.cpp,v 1.7 2003/08/19 14:07:51 garf Exp $
+ * $Id: vlcpeer.cpp,v 1.8 2003/09/21 10:23:59 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -25,6 +25,11 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
+
+#ifdef DEBUG
+/* We do not want to use nsDebug.h */
+#   undef DEBUG
+#endif
 
 #include <nsISupports.h>
 #include <nsMemory.h>

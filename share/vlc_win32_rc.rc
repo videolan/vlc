@@ -6,6 +6,9 @@ VLC_ICON ICON "vlc48x48.ico"
 #define VERSION 0.0.0
 #endif
 
+#define STRINGIFY( z ) UGLY_KLUDGE( z )
+#define UGLY_KLUDGE( z ) #z
+
 1 VERSIONINFO
 FILETYPE 1
 FILEOS 4
@@ -16,8 +19,8 @@ BEGIN
   BEGIN
     BLOCK "040904E4"
     BEGIN
-      VALUE "CompanyName", "VideoLAN"
-      VALUE "FileVersion", "0.6.2"
+      VALUE "CompanyName", "VideoLAN Team"
+      VALUE "FileVersion", STRINGIFY( VERSION )
       VALUE "FileDescription", "VLC media player"
       VALUE "LegalCopyright", "(c) 1996-2003 VideoLAN"
     END

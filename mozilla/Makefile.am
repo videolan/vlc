@@ -82,7 +82,7 @@ DATA_npvlc_rc = $(noinst_npvlc_rc_DATA)
 noinst_npvlc_rc_DATA = npvlc_rc.$(OBJEXT)
 noinst_npvlc_rcdir = $(libdir)
 npvlc_rc.$(OBJEXT): npvlc_rc.rc
-	$(WINDRES) --include-dir $(srcdir) -i $< -o $@
+	$(WINDRES) -DVERSION=$(VERSION) -DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` --include-dir $(srcdir) -i $< -o $@
 endif
 if HAVE_DARWIN
 VLC\ Plugin.plugin:
