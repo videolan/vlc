@@ -62,17 +62,19 @@ static void Close( vlc_object_t * );
 #define ANALYSE_TEXT N_("Analyse mode")
 #define ANALYSE_LONGTEXT N_( "This selects the analysing mode.")
 
-#define KEYINT_TEXT N_("Sets maximum interval between I frames")
+#define KEYINT_TEXT N_("Sets maximum interval between IDR-frames")
 #define KEYINT_LONGTEXT N_( "Larger values save bits, thus improve quality "\
     "for a given bitrate, at the cost of seeking precision." )
 
-#define IDRINT_TEXT N_("IDR frames")
-#define IDRINT_LONGTEXT N_("In H.264, I-Frames do not necessarily bound a " \
-    "closed GOP because it is allowable for a P-frame to be predicted from " \
+#define KEYINT_MIN_TEXT N_("Sets minimum interval between IDR-frames")
+#define KEYINT_MIN_LONGTEXT N_("In H.264, I-Frames do not necessarily bound " \
+    "a closed GOP because it is allowable for a P-frame to be predicted from "\
     "more frames than just the one frame before it (also see frameref). " \
     "Therefore, I-frames are not necessarily seekable. " \
     "IDR-Frames restrict subsequent P-frames from referring to any frame " \
-    "prior to the IDR-Frame." )
+    "prior to the IDR-Frame. \n" \
+    "If scenecuts appear within this interval, they are still encoded as " \
+    "I-frames, but do not start a new GOP. Default value is keyint * 0.4." )
 
 #define BFRAMES_TEXT N_("B frames")
 #define BFRAMES_LONGTEXT N_( "Number of consecutive B-Frames between I and " \
@@ -127,8 +129,8 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "keyint", 250, NULL, KEYINT_TEXT,
                  KEYINT_LONGTEXT, VLC_FALSE );
 
-    add_integer( SOUT_CFG_PREFIX "idrint", 2, NULL, IDRINT_TEXT,
-                 IDRINT_LONGTEXT, VLC_FALSE );
+    add_integer( SOUT_CFG_PREFIX "keyint-min", 0, NULL, KEYINT_MIN_TEXT,
+                 KEYINT_MIN_LONGTEXT, VLC_FALSE );
 
     add_integer( SOUT_CFG_PREFIX "bframes", 0, NULL, BFRAMES_TEXT,
                  BFRAMES_LONGTEXT, VLC_FALSE );
@@ -149,7 +151,7 @@ vlc_module_end();
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
     "qp", "qp-min", "qp-max", "cabac", "loopfilter", "analyse",
-    "keyint", "idrint", "bframes", "frameref", "scenecut", NULL
+    "keyint", "keyint-min", "bframes", "frameref", "scenecut", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -238,10 +240,19 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->param.b_deblocking_filter = val.b_bool;
 
     var_Get( p_enc, SOUT_CFG_PREFIX "keyint", &val );
+#if X264_BUILD >= 0x000e
+    if( val.i_int > 0 ) p_sys->param.i_keyint_max = val.i_int;
+    if( val.i_int > 0 ) p_sys->param.i_keyint_min = val.i_int * 0.4;
+#else
     if( val.i_int > 0 ) p_sys->param.i_iframe = val.i_int;
+#endif
 
-    var_Get( p_enc, SOUT_CFG_PREFIX "idrint", &val );
+    var_Get( p_enc, SOUT_CFG_PREFIX "keyint-min", &val );
+#if X264_BUILD >= 0x000e
+    if( val.i_int > 0 ) p_sys->param.i_keyint_min = val.i_int;
+#else
     if( val.i_int > 0 ) p_sys->param.i_idrframe = val.i_int;
+#endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "bframes", &val );
     if( val.i_int >= 0 && val.i_int <= 16 ) p_sys->param.i_bframe = val.i_int;
