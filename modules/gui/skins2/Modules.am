@@ -73,6 +73,8 @@ SOURCES_skins2 = \
 	parser/parser_context.hpp \
 	parser/skin.c \
 	parser/skin.h \
+	parser/xmlparser.cpp \
+	parser/xmlparser.hpp \
 	parser/wrappers.cpp \
 	parser/wrappers.h \
 	\

@@ -2,7 +2,7 @@
  * var_manager.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_manager.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: var_manager.hpp,v 1.3 2004/01/24 13:08:12 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -26,6 +26,7 @@
 #define VAR_MANAGER_HPP
 
 #include "../utils/var_text.hpp"
+#include <list>
 #include <map>
 
 
@@ -60,10 +61,12 @@ class VarManager: public SkinObject
         VarText m_helpText;
         /// Map of registerd variables
         map<string, VariablePtr> m_varMap;
+        /// List of registed variables
+        list<string> m_varList;
 
         /// Private because it is a singleton
         VarManager( intf_thread_t *pIntf );
-        virtual ~VarManager() {}
+        virtual ~VarManager();
 };
 
 

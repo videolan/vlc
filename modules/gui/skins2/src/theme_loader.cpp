@@ -2,7 +2,7 @@
  * theme_loader.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme_loader.cpp,v 1.4 2004/01/18 00:25:02 asmax Exp $
+ * $Id: theme_loader.cpp,v 1.5 2004/01/24 13:08:12 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -26,6 +26,7 @@
 #include "theme.hpp"
 #include "../parser/builder.hpp"
 #include "../parser/parser_context.hpp"
+#include "../parser/xmlparser.hpp"
 #include "../src/os_factory.hpp"
 #include "../src/window_manager.hpp"
 
@@ -206,6 +207,9 @@ bool ThemeLoader::parse( const string &xmlFile )
         msg_Warn( getIntf(), "yylex failed: %i", lex );
         return false;
     }
+
+    XMLParser parser( getIntf(), xmlFile );
+    parser.parse();
 
     // Build and store the theme
     Builder builder( getIntf(), context.m_data );

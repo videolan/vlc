@@ -1,0 +1,61 @@
+/*****************************************************************************
+ * xmlparser.hpp
+ *****************************************************************************
+ * Copyright (C) 2004 VideoLAN
+ * $Id: xmlparser.hpp,v 1.1 2004/01/24 13:08:12 asmax Exp $
+ *
+ * Authors: Cyril Deguet     <asmax@via.ecp.fr>
+ *          Olivier Teulière <ipkiss@via.ecp.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+#ifndef XMLPARSER_HPP
+#define XMLPARSER_HPP
+
+#include "../src/skin_common.hpp"
+#include <libxml/xmlreader.h>
+#include <map>
+#include <string>
+
+
+/// XML parser using libxml2 text reader API
+class XMLParser: public SkinObject
+{
+    public:
+        XMLParser( intf_thread_t *pIntf, const string &rFileName );
+        virtual ~XMLParser();
+
+        int parse();
+
+    private:
+        // Key comparison function for type "const char*"
+        struct ltstr
+        {
+            bool operator()(const char* s1, const char* s2) const
+            {
+                return strcmp(s1, s2) < 0;
+            }
+        };
+        /// Type for attribute lists
+        typedef map<const char*, const char*, ltstr> AttrList_t;
+
+        /// Reader context
+        xmlTextReaderPtr m_pReader;
+
+        void handleBeginElement( const string &rName, AttrList_t &attributes );
+};
+
+#endif
