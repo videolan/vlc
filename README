@@ -1,11 +1,10 @@
-$Id: README,v 1.12 2002/11/26 14:08:01 sam Exp $
+$Id: README,v 1.13 2002/11/26 15:03:28 sam Exp $
 
 README for vlc, the VideoLAN Client
 ===================================
 
 ABOUT-NLS          - Notes on the Free Translation Project.
 AUTHORS            - All the people who worked on vlc.
-BUGS               - List of known, unresolved bugs.
 COPYING            - The GPL license.
 ChangeLog          - The vlc ChangeLog.
 FAQ                - Commonly asked questions.

@@ -8,7 +8,7 @@
 SUBDIRS = po intl m4 share
 DIST_SUBDIRS = $(SUBDIRS) modules src debian doc ipkg lib
 
-EXTRA_DIST = BUGS FAQ HACKING MAINTAINERS STATUS src/extras/COPYING \
+EXTRA_DIST = FAQ HACKING MAINTAINERS STATUS src/extras/COPYING \
              INSTALL.win32 README.MacOSX.rtf vlc.spec install-win32 \
              Modules.am macosx-dmg \
              configure.ac.in mkinstalldirs bootstrap
