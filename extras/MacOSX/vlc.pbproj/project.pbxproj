@@ -7,7 +7,7 @@
 	objects = {
 		014CEA410018CDE011CA2923 = {
 			isa = PBXBundleReference;
-			path = vlc.bundle;
+			path = VLC.bundle;
 			refType = 3;
 		};
 		014CEA420018CDE011CA2923 = {
@@ -88,11 +88,11 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
-				LIBRARY_SEARCH_PATHS = "/Volumes/Users/pjotr/Development/vlc-old/vlc/lib /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/access/dvd /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/access /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/access/mms /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/access/vcd /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/access_output /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/audio_filter/channel_mixer /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/audio_filter/converter /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/audio_filter/resampler /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/audio_mixer /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/audio_output /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/codec/cinepak /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/codec /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/codec/mpeg_audio /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/codec/mpeg_video/idct /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/codec/mpeg_video /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/codec/mpeg_video/motion /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/codec/spudec /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/control/rc /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/demux/aac /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/demux/asf /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/demux/avi /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/demux /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/demux/mp4 /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/demux/mpeg /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/demux/util /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/demux/wav /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/gui/macosx /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/misc/dummy /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/misc /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/misc/logger /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/misc/memcpy /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/misc/network /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/mux /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/mux/mpeg /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/packetizer /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/video_chroma /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/video_filter/deinterlace /Volumes/Users/pjotr/Development/vlc-old/vlc/modules/video_filter";
+				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = vlc;
+				PRODUCT_NAME = VLC;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 				WRAPPER_EXTENSION = bundle;
@@ -342,7 +342,7 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>vlc</string>
+	<string>VLC</string>
 	<key>CFBundleIconFile</key>
 	<string>vlc.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -352,7 +352,7 @@
 	<key>CFBundleName</key>
 	<string>VLC media player</string>
 	<key>CFBundlePackageType</key>
-	<string>BNDL</string>
+	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>VLC#</string>
 	<key>CFBundleURLTypes</key>

@@ -474,26 +474,26 @@ install-exec-local:
 
 if HAVE_DARWIN
 # Create the MacOS X app
-vlc_app_DATA = vlc.app
+vlc_app_DATA = VLC.app
 vlc_appdir = $(bindir)
-vlc.app: vlc $(PLUGIN_FILES)
-	rm -Rf vlc.app
+VLC.app: vlc $(PLUGIN_FILES)
+	rm -Rf VLC.app
 	cd extras/MacOSX ; pbxbuild | grep -v '^[ \t]' | grep -v "^$$"
-	cp -r extras/MacOSX/build/vlc.bundle ./vlc.app
-	$(INSTALL) -d vlc.app/Contents/MacOS
-	$(INSTALL) vlc vlc.app/Contents/MacOS/
-	$(INSTALL) -d vlc.app/Contents/MacOS/modules
+	cp -r extras/MacOSX/build/vlc.bundle ./VLC.app
+	$(INSTALL) -d VLC.app/Contents/MacOS
+	$(INSTALL) vlc VLC.app/Contents/MacOS/VLC
+	$(INSTALL) -d VLC.app/Contents/MacOS/modules
 	for i in dummy $(PLUGIN_FILES) ; do if test "x$$i" != "xdummy" ; then \
-		$(INSTALL) $$i vlc.app/Contents/MacOS/modules/ ; \
+		$(INSTALL) $$i VLC.app/Contents/MacOS/modules/ ; \
 	fi ; done
-	$(INSTALL) -d vlc.app/Contents/MacOS/share
-	$(INSTALL) -m 644 share/*.psf share/*.rle vlc.app/Contents/MacOS/share
-	$(INSTALL) -d vlc.app/Contents/MacOS/locale
+	$(INSTALL) -d VLC.app/Contents/MacOS/share
+	$(INSTALL) -m 644 share/*.psf share/*.rle VLC.app/Contents/MacOS/share
+	$(INSTALL) -d VLC.app/Contents/MacOS/locale
 	for i in $(CATALOGS); do \
-		mkdir -p vlc.app/Contents/MacOS/locale/$${i%.gmo}/LC_MESSAGES ; \
-		cp po/$$i vlc.app/Contents/MacOS/locale/$${i%.gmo}/LC_MESSAGES/vlc.mo || true ; \
+		mkdir -p VLC.app/Contents/MacOS/locale/$${i%.gmo}/LC_MESSAGES ; \
+		cp po/$$i VLC.app/Contents/MacOS/locale/$${i%.gmo}/LC_MESSAGES/vlc.mo || true ; \
 	done
-	echo -n "APPLVLC#" >| vlc.app/Contents/PkgInfo
+	echo -n "APPLVLC#" >| VLC.app/Contents/PkgInfo
 endif
 
 if HAVE_WIN32
@@ -581,7 +581,7 @@ package-macosx:
 	fi
 
 # Copy relevant files 
-	cp -R vlc.app tmp/
+	cp -R VLC.app tmp/
 	cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS tmp/
 
 # Create disk image 

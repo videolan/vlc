@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.53 2003/02/09 19:28:43 massiot Exp $
+ * $Id: intf.m,v 1.54 2003/02/11 15:35:29 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -1406,7 +1406,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
 - (IBAction)openCrashLog:(id)sender
 {
-    NSString * o_path = [@"~/Library/Logs/CrashReporter/vlc.crash.log"
+    NSString * o_path = [@"~/Library/Logs/CrashReporter/VLC.crash.log"
                                     stringByExpandingTildeInPath]; 
 
     
