@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.30 2002/02/15 20:02:21 gbazin Exp $
+ * $Id: gtk_playlist.c,v 1.31 2002/05/22 14:20:41 gbazin Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -689,29 +689,15 @@ void GtkRebuildCList( GtkCList * p_clist, playlist_t * p_playlist )
     gtk_clist_freeze( p_clist );
     gtk_clist_clear( p_clist );
    
-    for( i_dummy = 0; i_dummy < p_playlist->i_size ; i_dummy++ )
+    vlc_mutex_lock( &p_playlist->change_lock );
+    for( i_dummy = p_playlist->i_size ; i_dummy-- ; )
     {
-#ifdef WIN32 /* WIN32 HACK */
-        ppsz_text[0] = "";
-#else
-        ppsz_text[0] = rindex( p_playlist->p_item[
-                p_playlist->i_size - 1 - i_dummy].psz_name, '/' );
-        if ( ppsz_text[0] == NULL )
-        {
-            ppsz_text[0] =
-              p_playlist->p_item[ p_playlist->i_size - 1 - i_dummy ].psz_name;
-        }
-        else
-        {
-            /* Skip leading '/' */
-            ppsz_text[0]++;
-        }
-#endif
+        ppsz_text[0] = p_playlist->p_item[i_dummy].psz_name;
         ppsz_text[1] = "no info";
-        
         gtk_clist_insert( p_clist, 0, ppsz_text );
     }
+    vlc_mutex_unlock( &p_playlist->change_lock );
+
     gtk_clist_set_background( p_clist, p_playlist->i_index, &red);
     gtk_clist_thaw( p_clist );
 }
-

@@ -2,7 +2,7 @@
  * logger.c : file logging plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: logger.c,v 1.8 2002/05/01 21:31:53 gbazin Exp $
+ * $Id: logger.c,v 1.9 2002/05/22 14:20:41 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -93,6 +93,15 @@ static void intf_getfunctions( function_list_t * p_function_list )
 static int intf_Open( intf_thread_t *p_intf )
 {
     char *psz_filename_tmp, *psz_filename;
+
+#ifdef WIN32
+    AllocConsole();
+    freopen( "CONOUT$", "w", stdout );
+    freopen( "CONOUT$", "w", stderr );
+    freopen( "CONIN$", "r", stdin );
+    intf_Msg( VERSION_MESSAGE );
+    intf_Msg( _("\nUsing the logger interface plugin...") );
+#endif
 
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
