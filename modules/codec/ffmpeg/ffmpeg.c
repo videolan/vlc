@@ -350,7 +350,9 @@ static struct
 
     /* Packed YUV formats */
     { VLC_FOURCC('Y','U','Y','2'), PIX_FMT_YUV422 },
-    { VLC_FOURCC('U','Y','V','Y'), PIX_FMT_YUV422 },
+#if LIBAVCODEC_BUILD >= 4720
+    { VLC_FOURCC('U','Y','V','Y'), PIX_FMT_UYVY422 },
+#endif
 
     /* Packed RGB formats */
     { VLC_FOURCC('R','V','1','5'), PIX_FMT_RGB555 },
