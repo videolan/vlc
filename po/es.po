@@ -5037,8 +5037,8 @@ msgid ""
 "value between 0.5 and 10 seems sensible."
 msgstr ""
 "Si la potencia media sobre los últimos N buffers es mayor que este valor, el "
-"volumen se normalizará. Este valor es un número positivo de punto flotante. Un "
-valor entre 0.5 y 10 parece sensible."
+"volumen se normalizará. Este valor es un número positivo de punto flotante."
+"Un valor entre 0.5 y 10 parece sensible."
 
 #: modules/audio_filter/normvol.c:81
 msgid "Volume normalizer"
