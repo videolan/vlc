@@ -121,7 +121,7 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
     }
 
     return( 0 );
- }
+}
 
 /*****************************************************************************
  * vout_SDLInit: initialize SDL video thread output method
@@ -305,7 +305,6 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         intf_ErrMsg( "error: can't open DISPLAY default display\n" );
         return( 1 );
     }
-    SDL_LockSurface(p_vout->p_sys->p_display);
     SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);	/* ignore keys up */
 
