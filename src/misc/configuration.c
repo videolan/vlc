@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.5 2002/03/16 23:03:19 sam Exp $
+ * $Id: configuration.c,v 1.6 2002/03/17 11:12:08 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -578,10 +578,10 @@ int config_SaveConfigFile( const char *psz_module_name )
         intf_WarnMsg( 5, "config: saving config for module <%s>",
                          p_module->psz_name );
 
+        fprintf( file, "[%s]\n", p_module->psz_name );
+
         if( p_module->psz_longname )
             fprintf( file, "###\n###  %s\n###\n", p_module->psz_longname );
-
-        fprintf( file, "[%s]\n", p_module->psz_name );
 
         for( i = 0; i < p_module->i_config_lines; i++ )
         {
