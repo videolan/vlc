@@ -96,7 +96,7 @@ int aout_DspOpen( aout_thread_t *p_aout )
     p_aout->l_rate     = main_GetIntVariable( AOUT_RATE_VAR, AOUT_RATE_DEFAULT );
 
     /* Open the sound device */
-    if ( (p_aout->i_fd = open( p_aout->psz_device, O_WRONLY )) < 0 )
+    if ( (p_aout->i_fd = open( p_aout->psz_device, O_WRONLY|O_NONBLOCK )) < 0 )
     {
         intf_ErrMsg( "aout error: can't open audio device (%s)\n", p_aout->psz_device );
         return( -1 );
