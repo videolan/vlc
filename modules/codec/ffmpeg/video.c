@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.66 2004/02/08 22:37:37 gbazin Exp $
+ * $Id: video.c,v 1.67 2004/02/25 17:48:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -373,7 +373,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 
     p_block = *pp_block;
 
-    if( p_block->b_discontinuity )
+    if( p_block->i_flags&BLOCK_FLAG_DISCONTINUITY )
     {
         p_sys->i_buffer = 0;
         p_sys->i_pts = 0; /* To make sure we recover properly */

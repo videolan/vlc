@@ -2,7 +2,7 @@
  * flac.c: flac decoder/packetizer/encoder module making use of libflac
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: flac.c,v 1.8 2004/02/07 00:16:34 gbazin Exp $
+ * $Id: flac.c,v 1.9 2004/02/25 17:48:52 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -258,7 +258,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( (*pp_block)->b_discontinuity )
+    if( (*pp_block)->i_flags&BLOCK_FLAG_DISCONTINUITY )
     {
         p_sys->i_state = STATE_NOSYNC;
     }

@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.42 2004/01/16 09:39:57 sam Exp $
+ * $Id: libmpeg2.c,v 1.43 2004/02/25 17:48:52 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -29,6 +29,7 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
+#define PIC_FLAG_PTS
 #include <mpeg2dec/mpeg2.h>
 
 #include "vout_synchro.h"
@@ -210,7 +211,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 return NULL;
             }
 
-            if( p_block->b_discontinuity && p_sys->p_synchro &&
+            if( (p_block->i_flags&BLOCK_FLAG_DISCONTINUITY) &&
+                p_sys->p_synchro &&
                 p_sys->p_info->sequence &&
                 p_sys->p_info->sequence->width != (unsigned)-1 )
             {

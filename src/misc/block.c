@@ -2,7 +2,7 @@
  * block.c: Data blocks management functions
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: block.c,v 1.6 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: block.c,v 1.7 2004/02/25 17:48:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -70,11 +70,9 @@ static block_t *__BlockDupContent( block_t *p_block )
 
     p_dup = block_New( p_block->p_manager, p_block->i_buffer );
     memcpy( p_dup->p_buffer, p_block->p_buffer, p_block->i_buffer );
-    p_dup->b_frame_display = p_block->b_frame_display;
-    p_dup->b_frame_start   = p_block->b_frame_start;
+    p_dup->i_flags         = p_block->i_flags;
     p_dup->i_pts           = p_block->i_pts;
     p_dup->i_dts           = p_block->i_dts;
-    p_dup->b_discontinuity = p_block->b_discontinuity;
 
     return p_dup;
 }
@@ -192,13 +190,10 @@ block_t *block_NewEmpty( void )
     memset( p_block, 0, sizeof( block_t ) );
 
     p_block->p_next         = NULL;
-    p_block->b_frame_display= VLC_TRUE;
-    p_block->b_frame_start  = VLC_FALSE;
+    p_block->i_flags        = 0;
     p_block->i_pts          = 0;
     p_block->i_dts          = 0;
     p_block->i_length       = 0;
-
-    p_block->b_discontinuity= VLC_FALSE;
 
     p_block->i_buffer       = 0;
     p_block->p_buffer       = NULL;
@@ -320,10 +315,9 @@ block_t *block_ChainGather( block_t *p_list )
     g = block_New( p_list->p_manager, i_total );
     block_ChainExtract( p_list, g->p_buffer, g->i_buffer );
 
-    g->b_frame_display = p_list->b_frame_display;
-    g->b_frame_start   = p_list->b_frame_start;
-    g->i_pts           = p_list->i_pts;
-    g->i_dts           = p_list->i_dts;
+    g->i_flags = p_list->i_flags;
+    g->i_pts   = p_list->i_pts;
+    g->i_dts   = p_list->i_dts;
 
     /* free p_list */
     block_ChainRelease( p_list );
@@ -445,20 +439,3 @@ block_t *block_FifoShow( block_fifo_t *p_fifo )
 
 }
 
-block_t *block_FifoGetFrame( block_fifo_t *p_fifo )
-{
-    block_t *b = NULL;
-
-    for( ;; )
-    {
-        block_t *p_next;
-        block_ChainAppend( &b, block_FifoGet( p_fifo ) );
-        p_next = block_FifoShow( p_fifo );
-        if( p_next == NULL || p_next->b_frame_start )
-        {
-            break;
-        }
-    }
-
-    return b;
-}

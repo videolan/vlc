@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.25 2004/01/25 18:20:12 bigben Exp $
+ * $Id: mpeg_audio.c,v 1.26 2004/02/25 17:48:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -189,7 +189,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( (*pp_block)->b_discontinuity )
+    if( (*pp_block)->i_flags&BLOCK_FLAG_DISCONTINUITY )
     {
         p_sys->i_state = STATE_NOSYNC;
     }

@@ -2,7 +2,7 @@
  * dts.c: parse DTS audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dts.c,v 1.17 2004/02/07 00:56:44 gbazin Exp $
+ * $Id: dts.c,v 1.18 2004/02/25 17:48:52 fenrir Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -172,7 +172,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( (*pp_block)->b_discontinuity )
+    if( (*pp_block)->i_flags&BLOCK_FLAG_DISCONTINUITY )
     {
         p_sys->i_state = STATE_NOSYNC;
     }

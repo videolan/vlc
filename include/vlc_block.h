@@ -2,7 +2,7 @@
  * vlc_block.h: Data blocks management functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_block.h,v 1.5 2003/12/24 09:46:08 gbazin Exp $
+ * $Id: vlc_block.h,v 1.6 2004/02/25 17:48:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -29,17 +29,27 @@
  */
 typedef struct block_sys_t block_sys_t;
 
+/* BLOCK_FLAG_DISCONTINUITY: the content doesn't follow the last block, or is probably broken */
+#define BLOCK_FLAG_DISCONTINUITY 0x0001
+/* BLOCK_FLAG_TYPE_I: Intra frame */
+#define BLOCK_FLAG_TYPE_I        0x0002
+/* BLOCK_FLAG_TYPE_P: inter frame with backward reference only */
+#define BLOCK_FLAG_TYPE_P        0x0004
+/* BLOCK_FLAG_TYPE_B: inter frame with backward and forward reference */
+#define BLOCK_FLAG_TYPE_B        0x0008
+/* BLOCK_FLAG_TYPE_PB: for inter frame when you don't know the real type */
+#define BLOCK_FLAG_TYPE_PB       0x0010
+
 struct block_t
 {
     block_t     *p_next;
 
-    vlc_bool_t  b_frame_display;
-    vlc_bool_t  b_frame_start;
+    uint32_t    i_flags;
+
     mtime_t     i_pts;
     mtime_t     i_dts;
     mtime_t     i_length;
 
-    vlc_bool_t  b_discontinuity; /* only temporary */
     int         i_rate;
 
     int         i_buffer;
@@ -108,7 +118,6 @@ VLC_EXPORT( void,           block_FifoRelease,  ( block_fifo_t * ) );
 VLC_EXPORT( void,           block_FifoEmpty,    ( block_fifo_t * ) );
 VLC_EXPORT( int,            block_FifoPut,      ( block_fifo_t *, block_t * ) );
 VLC_EXPORT( block_t *,      block_FifoGet,      ( block_fifo_t * ) );
-VLC_EXPORT( block_t *,      block_FifoGetFrame, ( block_fifo_t * ) );
 VLC_EXPORT( block_t *,      block_FifoShow,     ( block_fifo_t * ) );
 
 #endif /* VLC_BLOCK_H */

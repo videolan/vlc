@@ -2,7 +2,7 @@
  * flac.c : FLAC demux module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: flac.c,v 1.10 2004/01/25 20:05:28 hartman Exp $
+ * $Id: flac.c,v 1.11 2004/02/25 17:48:52 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -222,7 +222,6 @@ static int Demux( input_thread_t * p_input )
                                   p_input->stream.p_selected_program,
                                   p_block_out->i_pts * 9 / 100 );
 
-            p_block_in->b_discontinuity = 0;
             p_block_out->i_dts = p_block_out->i_pts =
                 input_ClockGetTS( p_input, p_input->stream.p_selected_program,
                                   p_block_out->i_pts * 9 / 100 );
