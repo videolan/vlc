@@ -2,7 +2,7 @@
  * intf_macosx.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf_macosx.m,v 1.8 2002/07/16 20:41:48 jlj Exp $
+ * $Id: intf_macosx.m,v 1.9 2002/07/23 20:50:05 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -817,10 +817,10 @@ static void intf_Run( intf_thread_t *p_intf )
 - (void)handlePortMessage:(NSPortMessage *)o_msg
 {
     NSData * o_req;
-    struct vout_req_s * p_req;
+    vout_req_t * p_req;
 
     o_req = [[o_msg components] lastObject];
-    p_req = *((struct vout_req_s **)[o_req bytes]);
+    p_req = *((vout_req_t **)[o_req bytes]);
 
     [p_req->o_lock lock];
 
