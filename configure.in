@@ -9,6 +9,9 @@ AC_SUBST(VLC_VERSION)
 VLC_CODENAME=Ourumov
 AC_SUBST(VLC_CODENAME)
 
+dnl Save CFLAGS
+save_CFLAGS="${CFLAGS}"
+
 dnl Check for tools
 AC_PROG_MAKE_SET
 AC_PROG_CC
@@ -91,9 +94,6 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
             Define if <strings.h> defines strncasecmp.)
 ])
 
-dnl Do a series of bizarre compilation tests
-save_CFLAGS=$CFLAGS
-
 dnl Check for ntohl, etc.
 CFLAGS="${CFLAGS} -Wall -Werror"
 AC_MSG_CHECKING([for ntohl in sys/param.h])
@@ -110,7 +110,7 @@ AC_TRY_COMPILE([],,
  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl End of the bizarre compilation tests
-CFLAGS=$save_CFLAGS
+CFLAGS="${save_CFLAGS}"
 
 dnl Check for boolean_t
 AC_MSG_CHECKING([for boolean_t in sys/types.h])
@@ -521,6 +521,7 @@ AC_SUBST(LIB_X11)
 AC_SUBST(LIB_XVIDEO)
 AC_SUBST(LIB_YUV)
 
+AC_SUBST(CFLAGS_VLC)
 AC_SUBST(CFLAGS_GTK)
 AC_SUBST(CFLAGS_X11)
 
