@@ -278,8 +278,8 @@ binary-arch: build install
 	dh_installman doc/vlc.1 -p vlc
 	dh_installman doc/vlc-config.1 -p libvlc0-dev
 #	dh_installchangelogs ChangeLog -p vlc
-	cp ChangeLog debian/tmp/usr/share/doc/vlc/changelog
-	cp debian/changelog debian/tmp/usr/share/doc/vlc/changelog.Debian
+	cp ChangeLog debian/vlc/usr/share/doc/vlc/changelog
+	cp debian/changelog debian/vlc/usr/share/doc/vlc/changelog.Debian
 	dh_link
 	dh_strip
 	dh_compress

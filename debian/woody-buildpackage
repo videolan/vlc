@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# $Id: woody-buildpackage,v 1.3 2003/02/03 01:32:37 sam Exp $
+# $Id: woody-buildpackage,v 1.4 2003/02/03 02:26:28 sam Exp $
 # Build VLC for a Woody Debian system
 
 if test ! -d debian
@@ -9,22 +9,23 @@ then
   exit 1
 fi
 
-# replace (1.2.3-4) with (1.2.3-0woody.4)
+# changelog: replace (1.2.3-4) with (1.2.3-0woody.4)
 sed -e 's/^vlc (\([^)]*\)-\([^-)]*\))/vlc (\1-0woody.\2)/' \
     < debian/changelog > debian/changelog.woody
 
-# replace liba52-*-dev with a52dec-dev (>=0.7.3)
-#         libdv*-dev with libdv-dev
-#         libwxgtk2.4-dev with (nil)
+# control: replace liba52-*-dev with a52dec-dev (>=0.7.3)
+#                  libdv*-dev with libdv-dev
+#          remove libwxgtk2.4-dev
 sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
     -e 's/libdv[0-9]*-dev/libdv-dev/' \
     -e 's/, libwx[^,]*//' \
     -e '/Package: wxvlc/,/^ *$/d' \
     < debian/control > debian/control.woody
 
-# remove wxwindows stuff, change changelog path
+# rules: remove wxwindows stuff
+#        change changelog path
 sed -e '/# Package: wxvlc/,/^ *$/d' \
-    -e '/--enable-wxwindows/d' \
+    -e 's,--enable-wxwindows,--disable-wxwindows,' \
     -e 's, debian/changelog , debian/changelog.woody ,' \
     -e 's,dh_gencontrol[^#]*,& -- -ldebian/changelog.woody,' \
     < debian/rules > debian/rules.woody
