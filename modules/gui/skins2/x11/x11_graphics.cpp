@@ -44,6 +44,14 @@ X11Graphics::X11Graphics( intf_thread_t *pIntf, X11Display &rDisplay,
     int screen = DefaultScreen( XDISPLAY );
     int depth = DefaultDepth( XDISPLAY, screen );
 
+    // X11 doesn't accept that !
+    if( width == 0 || height == 0 )
+    {
+        // Avoid a X11 Bad Value error
+        width = height = 1;
+        msg_Err( getIntf(), "Invalid image size (null width or height)" );
+    }
+
     // Create a pixmap
     m_pixmap = XCreatePixmap( XDISPLAY, DefaultRootWindow( XDISPLAY ),
                               width, height, depth);
