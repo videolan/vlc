@@ -1,8 +1,8 @@
 /*****************************************************************************
- * m3u.c: a meta demux to parse m3u and asx playlists
+ * m3u.c: a meta demux to parse pls, m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.14 2003/03/06 00:10:33 sigmunau Exp $
+ * $Id: m3u.c,v 1.15 2003/03/06 15:30:42 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -40,9 +40,11 @@
  *****************************************************************************/
 #define MAX_LINE 1024
 
+#define TYPE_UNKNOWN 0
 #define TYPE_M3U 1
 #define TYPE_ASX 2
 #define TYPE_HTML 3
+#define TYPE_PLS 4
 
 struct demux_sys_t
 {
@@ -60,12 +62,13 @@ static int  Demux ( input_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("m3u/asx metademux") );
+    set_description( _("playlist metademux") );
     set_capability( "demux", 10 );
     set_callbacks( Activate, Deactivate );
     add_shortcut( "m3u" );
     add_shortcut( "asx" );
     add_shortcut( "html" );
+    add_shortcut( "pls" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -107,6 +110,11 @@ static int Activate( vlc_object_t * p_this )
         {
             i_type = TYPE_HTML;
         }
+        else if( !strcasecmp( psz_ext, ".pls") ||
+                 ( p_input->psz_demux && !strncmp(p_input->psz_demux, "pls", 3) ) )
+        {
+            i_type = TYPE_PLS;
+        }
     }
 
     /* we had no luck looking at the file extention, so we have a look
@@ -117,9 +125,10 @@ static int Activate( vlc_object_t * p_this )
     {
         byte_t *p_peek;
         int i_size = input_Peek( p_input, &p_peek, MAX_LINE );
-        i_size -= sizeof("<html>") - 1;
+        i_size -= sizeof("[playlist]") - 1;
         if ( i_size > 0 ) {
             while ( i_size
+                    && strncasecmp( p_peek, "[playlist]", sizeof("[playlist]") - 1 )
                     && strncasecmp( p_peek, "<html>", sizeof("<html>") - 1 )
                     && strncasecmp( p_peek, "<asx", sizeof("<asx") - 1 ) )
             {
@@ -129,6 +138,10 @@ static int Activate( vlc_object_t * p_this )
             if ( !i_size )
             {
                 return -1;
+            }
+            else if ( !strncasecmp( p_peek, "[playlist]", sizeof("[playlist]") -1 ) )
+            {
+                i_type = TYPE_PLS;
             }
             else if ( !strncasecmp( p_peek, "<html>", sizeof("<html>") -1 ) )
             {
@@ -172,7 +185,6 @@ static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
         , playlist_t *p_playlist , char psz_line[MAX_LINE], int i_position )
 {
     char          *psz_bol, *psz_name;
-
     psz_bol = psz_line;
 
     /* Remove unnecessary tabs or spaces at the beginning of line */
@@ -186,6 +198,22 @@ static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
         if( *psz_bol == '#' )
             /*line is comment or extended info, ignored for now */
             return 0;
+    }
+    else if ( p_m3u->i_type == TYPE_PLS )
+    {
+        /* We are dealing with .pls files from shoutcast
+         * We are looking for lines like "File1=http://..." */
+        if( !strncasecmp( psz_bol, "File", sizeof("File") - 1 ) )
+        {
+            psz_bol += sizeof("File") - 1;
+            psz_bol = strchr( psz_bol, '=' );
+            if ( !psz_bol ) return 0;
+            psz_bol++;
+        }
+        else
+        {
+            return 0;
+        }
     }
     else if ( p_m3u->i_type == TYPE_ASX )
     {
@@ -223,7 +251,7 @@ static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
 
         *psz_eol = '\0';
     }
-    else
+    else if ( p_m3u->i_type == TYPE_HTML )
     {
         /* We are dealing with a html file with embedded
          * video.  We are looking for "<param name="filename"
@@ -255,6 +283,11 @@ static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
 
         *psz_eol = '\0';
 
+    }
+    else
+    {
+        msg_Warn( p_input, "unknown file type" );
+        return 0;
     }
 
     /* empty line */
