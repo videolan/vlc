@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.5 2001/10/29 11:07:09 tcastley Exp $
+ * $Id: InterfaceWindow.cpp,v 1.6 2001/11/01 03:17:49 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -595,32 +595,35 @@ int CDMenu::GetCD( const char *directory )
 	{
 	    mounted = vol->GetName(name);	
 	    if ((mounted == B_OK) && /* Disk is currently Mounted */
-	        (vol->IsReadOnly()) && /* Disk is a readonly medium */
-	        (vol->IsPersistent()) ) /* not a volitile device */
+	        (vol->IsReadOnly()) ) /* Disk is read-only */
 	    {
 	        dev = vol->Device();
             fs_stat_dev(dev, &info);
-            BMessage *msg;
-            msg = new BMessage( OPEN_DVD );
-            intf_Msg(name);
-            intf_Msg(info.device_name);
-            msg->AddString( "device", info.device_name );
-            BMenuItem *menu_item;
-            menu_item = new BMenuItem( name, msg );
-            AddItem( menu_item );
+            
+            device_geometry g;
+            int i_dev;
+            i_dev = open( info.device_name, O_RDONLY );
+           
+            if( i_dev >= 0 )
+            {
+                if( ioctl(i_dev, B_GET_GEOMETRY, &g, sizeof(g)) >= 0 )
+                {
+                    if( g.device_type == B_CD ) //ensure the drive is a CD-ROM
+                    {
+                        BMessage *msg;
+                        msg = new BMessage( OPEN_DVD );
+                        msg->AddString( "device", info.device_name );
+                        BMenuItem *menu_item;
+                        menu_item = new BMenuItem( name, msg );
+                        AddItem( menu_item );
+                    }
+                    close(i_dev);
+                }
+            }
  	    }
  	    vol->Unset();
 	    status = volRoster->GetNextVolume(vol);
 	}
-	
-
-/* The Old way.
-      int i_dev;
-      device_geometry g;
-      status_t m;
-      if( ioctl(i_dev, B_GET_GEOMETRY, &g, sizeof(g)) >= 0 )
-      if( g.device_type == B_CD ) //ensure the drive is a CD-ROM
-*/
 }
 
 /*****************************************************************************
