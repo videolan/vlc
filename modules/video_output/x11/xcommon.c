@@ -518,17 +518,11 @@ static int ManageVideo( vout_thread_t *p_vout )
             /* ConfigureNotify event: prepare  */
             if( xevent.type == ConfigureNotify )
             {
-                if( (unsigned int)xevent.xconfigure.width
-                    != p_vout->p_sys->p_win->i_width ||
-                    (unsigned int)xevent.xconfigure.height
-                    != p_vout->p_sys->p_win->i_height )
-                {
-                    /* Update dimensions */
-                    XResizeWindow( p_vout->p_sys->p_display,
-                                   p_vout->p_sys->p_win->base_window,
-                                   xevent.xconfigure.width,
-                                   xevent.xconfigure.height );
-                }
+                /* Update dimensions */
+                XResizeWindow( p_vout->p_sys->p_display,
+                               p_vout->p_sys->p_win->base_window,
+                               xevent.xconfigure.width,
+                               xevent.xconfigure.height );
             }
         }
     }
