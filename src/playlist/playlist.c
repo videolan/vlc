@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.33 2003/03/17 17:10:21 hartman Exp $
+ * $Id: playlist.c,v 1.34 2003/03/18 00:49:14 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -314,6 +314,8 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
     if( i_pos >= 0 && i_newpos >=0 && i_pos <= p_playlist->i_size 
                      && i_newpos <= p_playlist->i_size )
     {
+        playlist_item_t * temp;
+
         msg_Dbg( p_playlist, "moving playlist item « %s »",
                              p_playlist->pp_items[i_pos]->psz_name );
 
@@ -329,11 +331,9 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
         {
             p_playlist->i_index--;
         }
-        
-        playlist_item_t * temp;
+
         if ( i_pos < i_newpos )
         {
-             
             temp = p_playlist->pp_items[i_pos];
             while ( i_pos < i_newpos )
             {
