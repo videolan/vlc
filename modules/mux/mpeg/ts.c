@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.4 2003/01/08 10:34:58 fenrir Exp $
+ * $Id: ts.c,v 1.5 2003/01/11 14:09:22 ipkiss Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -48,12 +48,19 @@
 #include "pes.h"
 
 #if defined MODULE_NAME_IS_mux_ts_dvbpsi
+#   ifdef HAVE_DVBPSI_DR_H
 #       include <dvbpsi/dvbpsi.h>
 #       include <dvbpsi/descriptor.h>
 #       include <dvbpsi/pat.h>
 #       include <dvbpsi/pmt.h>
-#       include <dvbpsi/psi.h>
 #       include <dvbpsi/dr.h>
+#   else
+#       include "dvbpsi.h"
+#       include "descriptor.h"
+#       include "tables/pat.h"
+#       include "tables/pmt.h"
+#       include "descriptors/dr.h"
+#   endif
 #endif
 
 typedef struct ts_stream_s
