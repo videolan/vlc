@@ -657,8 +657,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->f_dst.i_group = id->f_src.i_group;
         if( id->f_src.psz_language )
             id->f_dst.psz_language = strdup( id->f_src.psz_language );
-        id->f_dst.i_extra  = 0;
-        id->f_dst.p_extra  = NULL;
+        id->f_dst.i_extra = 0;
+        id->f_dst.p_extra = NULL;
 
         /* build decoder -> filter -> encoder */
         if( transcode_spu_new( p_stream, id ) )
@@ -2188,6 +2188,11 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
             msg_Err( p_stream, "cannot find encoder" );
             return VLC_EGENERIC;
         }
+
+        id->f_dst.i_extra = id->p_encoder->fmt_out.i_extra;
+        id->f_dst.p_extra = id->p_encoder->fmt_out.p_extra;
+        id->f_dst.i_codec = id->p_encoder->fmt_out.i_codec;
+        id->f_dst.subs    = id->p_encoder->fmt_out.subs;
     }
     else
     {
@@ -2241,6 +2246,7 @@ static int transcode_spu_process( sout_stream_t *p_stream,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     subpicture_t *p_subpic;
+    *out = NULL;
 
     p_subpic = id->p_decoder->pf_decode_sub( id->p_decoder, &in );
     if( p_subpic && p_sys->b_soverlay )
@@ -2262,12 +2268,18 @@ static int transcode_spu_process( sout_stream_t *p_stream,
         }
     }
 
-    if( !p_sys->b_soverlay && p_subpic )
+    if(  p_subpic && !p_sys->b_soverlay )
     {
         block_t *p_block;
+
         p_block = id->p_encoder->pf_encode_sub( id->p_encoder, p_subpic );
-        if( p_block ) block_ChainAppend( out, p_block );
-        return VLC_SUCCESS;
+        spu_del_buffer( id->p_decoder, p_subpic );
+
+        if( p_block )
+        {
+            block_ChainAppend( out, p_block );
+            return VLC_SUCCESS;
+        }
     }
 
     return VLC_EGENERIC;

@@ -910,9 +910,7 @@ static int Mux( sout_mux_t *p_mux )
             {
                 sout_input_t *p_input = p_mux->pp_inputs[i];
                 ts_stream_t *p_stream = (ts_stream_t*)p_input->p_sys;
-                int64_t i_spu_length = 0;
-                int64_t i_spu_dts    = 0;
-
+                int64_t i_spu_delay = 0;
 
                 if( ( p_stream == p_pcr_stream &&
                       p_stream->i_pes_length < i_shaping_delay ) ||
@@ -933,19 +931,25 @@ static int Mux( sout_mux_t *p_mux )
                             /* spu, only one packet is needed */
                             continue;
                         }
+                        else
+                        {
+                            /* Don't mux the SPU yet if it is too early */
+                            block_t *p_spu = block_FifoShow( p_input->p_fifo );
+
+                            i_spu_delay =
+                                p_spu->i_dts - p_pcr_stream->i_pes_dts;
+
+                            if( i_spu_delay > 100000 &&
+                                i_spu_delay < I64C(100000000) ) continue;
+                        }
                     }
                     b_ok = VLC_FALSE;
 
                     p_data = block_FifoGet( p_input->p_fifo );
-                    if( p_input->p_fmt->i_codec == VLC_FOURCC('s','u','b','t'))
-                    {
-                        i_spu_length = p_data->i_length;/* save info for SPU */
-                        i_spu_dts    = p_data->i_dts;
-                    }
-                    if( p_input->p_fifo->i_depth > 0 )
+                    if( p_input->p_fifo->i_depth > 0 &&
+                        p_input->p_fmt->i_cat != SPU_ES )
                     {
                         block_t *p_next = block_FifoShow( p_input->p_fifo );
-
                         p_data->i_length = p_next->i_dts - p_data->i_dts;
                     }
 
@@ -970,19 +974,19 @@ static int Mux( sout_mux_t *p_mux )
                         p_stream->i_pes_used = 0;
                         p_stream->i_pes_length = 0;
 
-                        BufferChainClean( p_mux->p_sout,
-                                          &p_pcr_stream->chain_pes );
-                        p_pcr_stream->i_pes_dts = 0;
-                        p_pcr_stream->i_pes_used = 0;
-                        p_pcr_stream->i_pes_length = 0;
-
+                        if( p_input->p_fmt->i_cat != SPU_ES )
+                        {
+                            BufferChainClean( p_mux->p_sout,
+                                              &p_pcr_stream->chain_pes );
+                            p_pcr_stream->i_pes_dts = 0;
+                            p_pcr_stream->i_pes_used = 0;
+                            p_pcr_stream->i_pes_length = 0;
+                        }
                     }
                     else
                     {
                         if( p_input->p_fmt->i_cat == SPU_ES )
                         {
-                            /* Arbitrary */
-                            p_data->i_length = 1000;
                             if( p_input->p_fmt->i_codec ==
                                 VLC_FOURCC('s','u','b','t') )
                             {
@@ -999,7 +1003,29 @@ static int Mux( sout_mux_t *p_mux )
                                     p_data->p_buffer[p_data->i_buffer -1] ==
                                     '\0' )
                                     p_data->i_buffer--;
+
+                                /* Append a empty sub (sub text only) */
+                                if( p_data->i_length > 0 &&
+                                    !( p_data->i_buffer == 1 &&
+                                       *p_data->p_buffer == ' ' ) )
+                                {
+                                    block_t *p_spu = block_New( p_mux, 3 );
+
+                                    p_spu->i_dts = p_spu->i_pts =
+                                        p_data->i_dts + p_data->i_length;
+                                    p_spu->i_length = 1000;
+
+                                    p_spu->p_buffer[0] = 0;
+                                    p_spu->p_buffer[1] = 1;
+                                    p_spu->p_buffer[2] = ' ';
+
+                                    E_(EStoPES)( p_mux->p_sout, &p_spu, p_spu,
+                                                 p_stream->i_stream_id, 1 );
+                                    p_data->p_next = p_spu;
+                                }
                             }
+
+                            p_data->i_length = i_spu_delay;
                         }
                         else if( p_data->i_length < 0 ||
                                  p_data->i_length > 2000000 )
@@ -1034,25 +1060,6 @@ static int Mux( sout_mux_t *p_mux )
                         {
                             i_shaping_delay = p_stream->i_pes_length;
                             p_stream->b_key_frame = 1;
-                        }
-
-                        /* Append a empty sub (sub text only) */
-                        if( i_spu_length > 0 )
-                        {
-                            block_t *p_spu = block_New( p_mux, 3 );
-
-                            p_spu->i_dts = p_spu->i_pts = i_spu_dts +
-                                i_spu_length;
-                            p_spu->i_length = 1000;
-
-                            p_spu->p_buffer[0] = 0;
-                            p_spu->p_buffer[1] = 1;
-                            p_spu->p_buffer[2] = ' ';
-
-                            p_stream->i_pes_length += p_spu->i_length;
-                            E_( EStoPES )( p_mux->p_sout, &p_spu, p_spu,
-                                           p_stream->i_stream_id, 1 );
-                            BufferChainAppend( &p_stream->chain_pes, p_spu );
                         }
                     }
                 }
