@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder_thread.c,v 1.17 2001/09/06 04:28:36 henri Exp $
+ * $Id: lpcm_decoder_thread.c,v 1.18 2001/11/06 18:13:21 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -108,24 +108,6 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
     intf_DbgMsg ( "lpcm Debug: initializing lpcm decoder thread %p", 
                    p_lpcmdec );
 
-    /* Our first job is to initialize the bit stream structure with the
-     * beginning of the input stream */
-    vlc_mutex_lock (&p_lpcmdec->p_fifo->data_lock);
-    
-    while (DECODER_FIFO_ISEMPTY(*p_lpcmdec->p_fifo)) 
-    {
-        if (p_lpcmdec->p_fifo->b_die) 
-        {
-            vlc_mutex_unlock (&p_lpcmdec->p_fifo->data_lock);
-            return -1;
-        }
-        vlc_cond_wait (&p_lpcmdec->p_fifo->data_wait, 
-                       &p_lpcmdec->p_fifo->data_lock);
-    }
-  
-    p_lpcmdec->p_data = DECODER_FIFO_START (*p_lpcmdec->p_fifo)->p_first;
-    
-    vlc_mutex_unlock (&p_lpcmdec->p_fifo->data_lock);
     /* Init the BitStream */
     p_lpcmdec->p_config->decoder_config.pf_init_bit_stream(
             &p_lpcmdec->bit_stream,
@@ -139,6 +121,7 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
     {
         return -1;
     }
+
     intf_DbgMsg( "LPCM Debug: lpcm decoder thread %p initialized\n", 
                  p_lpcmdec );
     return( 0 );
