@@ -368,7 +368,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                 for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
                 {
                     pi_left_skip[i_plane] +=
-                        p_vout->p_sys->pp_vout[ i_vout ].i_width
+		     p_vout->p_sys->pp_vout[ i_col == p_vout->p_sys->i_col-1?i_vout-1:i_vout ].i_width
                          * p_pic->p[i_plane].i_pitch / p_vout->output.i_width;
                 }
                 i_vout++;
