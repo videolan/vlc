@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.12 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: wxwindows.cpp,v 1.13 2003/03/29 17:10:31 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -145,7 +145,7 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Run: wxWindows thread
  *****************************************************************************/
-#if defined( WIN32 )
+#if !defined(__BUILTIN__) && defined( WIN32 )
 HINSTANCE hInstance = 0;
 extern "C" BOOL WINAPI
 DllMain (HANDLE hModule, DWORD fdwReason, LPVOID lpReserved)
@@ -165,7 +165,11 @@ static void Run( intf_thread_t *p_intf )
     wxTheApp = new Instance( p_intf );
 
 #if defined( WIN32 )
+#if !defined(__BUILTIN__)
     wxEntry( hInstance/*GetModuleHandle(NULL)*/, NULL, NULL, SW_SHOW, TRUE );
+#else
+    wxEntry( GetModuleHandle(NULL), NULL, NULL, SW_SHOW, TRUE );
+#endif
 #else
     wxEntry( 1, p_args );
 #endif

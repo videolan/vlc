@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.8 2003/03/29 11:15:14 gbazin Exp $
+ * $Id: open.cpp,v 1.9 2003/03/29 17:10:31 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -170,19 +170,6 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
         _("Alternatively, you can build an MRL using one of the "
           "following predefined targets:") );
 
-    /* Create notebook */
-    wxNotebook *notebook = new wxNotebook( panel, Notebook_Event );
-    wxNotebookSizer *notebook_sizer = new wxNotebookSizer( notebook );
-
-    notebook->AddPage( FilePanel( notebook ), _("File"),
-                       i_access_method == FILE_ACCESS );
-    notebook->AddPage( DiscPanel( notebook ), _("Disc"),
-                       i_access_method == DISC_ACCESS );
-    notebook->AddPage( NetPanel( notebook ), _("Network"),
-                       i_access_method == NET_ACCESS );
-    notebook->AddPage( SatPanel( notebook ), _("Satellite"),
-                       i_access_method == SAT_ACCESS );
-
     /* Create Stream Output checkox */
     wxFlexGridSizer *sout_sizer = new wxFlexGridSizer( 2, 1, 20 );
     sout_checkbox = new wxCheckBox( panel, SoutEnable_Event,
@@ -238,6 +225,18 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
     ok_button->SetDefault();
     wxButton *cancel_button = new wxButton( panel, wxID_CANCEL, _("Cancel") );
 
+    /* Create notebook */
+    wxNotebook *notebook = new wxNotebook( panel, Notebook_Event );
+    wxNotebookSizer *notebook_sizer = new wxNotebookSizer( notebook );
+
+    notebook->AddPage( FilePanel( notebook ), _("File"),
+                       i_access_method == FILE_ACCESS );
+    notebook->AddPage( DiscPanel( notebook ), _("Disc"),
+                       i_access_method == DISC_ACCESS );
+    notebook->AddPage( NetPanel( notebook ), _("Network"),
+                       i_access_method == NET_ACCESS );
+    notebook->AddPage( SatPanel( notebook ), _("Satellite"),
+                       i_access_method == SAT_ACCESS );
 
     /* Update Disc panel */
     wxCommandEvent dummy_event;
