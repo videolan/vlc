@@ -36,7 +36,7 @@ Description: Embedded video outputs
 Status: Assigned to gibalou
 
 Task
-Difficulty: Hard
+Difficulty: Easy
 Urgency: Normal
 Platform: any
 Description: Multichannel downmixing
@@ -161,7 +161,6 @@ Urgency: Normal
 Platform: any
 Description: Rework spu decoder
  The spu decoder needs some serious work
-  - Support color
   - Split/merge for dvd menu highlighting
   - Downscaling for divx/mkv etc
   - Chroma independence
@@ -333,6 +332,3 @@ Status: Todo
 
 # Do not remove me
 Task
-
-
-

@@ -2,7 +2,7 @@
  * render.c : SPU renderer
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: render.c,v 1.8 2003/11/22 23:39:14 fenrir Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -92,12 +92,12 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
     /* Common variables */
-    uint8_t *p_dest;
+    uint8_t *p_dest, *p_dest_u, *p_dest_v;
     uint8_t *p_destptr;
     uint16_t *p_source = (uint16_t *)p_spu->p_sys->p_data;
 
-    int i_x, i_y;
-    int i_len, i_color;
+    int i_x, i_y, i_y_u, i_y_v;
+    int i_len, i_color, i_subsample;
     uint16_t i_colprecomp, i_destalpha;
 
     /* Crop-specific */
@@ -105,6 +105,22 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
 
     p_dest = p_pic->Y_PIXELS + p_spu->i_x + p_spu->i_width
               + p_pic->Y_PITCH * ( p_spu->i_y + p_spu->i_height );
+    p_dest_u = p_pic->U_PIXELS + p_spu->i_x / 2 + p_spu->i_width / 2
+                + p_pic->U_PITCH * ( p_spu->i_y + p_spu->i_height ) / 2;
+    p_dest_v = p_pic->V_PIXELS + p_spu->i_x / 2 + p_spu->i_width / 2
+                + p_pic->V_PITCH * ( p_spu->i_y + p_spu->i_height ) / 2;
+
+#if 0 /* Fix vouts to handle YV12 properly */
+    if( p_vout->output.i_chroma == VLC_FOURCC('Y','V','1','2') )
+    {
+        /* Assumes U_PITCH == V_PITCH */
+        uint8_t *p_tmp = p_dest_u;
+        p_dest_u = p_dest_v;
+        p_dest_v = p_tmp;
+    }
+#endif
+
+    i_subsample = (p_spu->i_y + p_spu->i_height) & 0x1 ? 0 : 1;
 
     i_x_start = p_spu->i_width - p_spu->p_sys->i_x_end;
     i_y_start = p_pic->Y_PITCH * (p_spu->i_height - p_spu->p_sys->i_y_end );
@@ -112,9 +128,13 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
     i_y_end = p_pic->Y_PITCH * (p_spu->i_height - p_spu->p_sys->i_y_start );
 
     /* Draw until we reach the bottom of the subtitle */
-    for( i_y = p_spu->i_height * p_pic->Y_PITCH ;
+    for( i_y = p_spu->i_height * p_pic->Y_PITCH,
+         i_y_u = (p_spu->i_height + i_subsample) * p_pic->U_PITCH / 2,
+         i_y_v = (p_spu->i_height + i_subsample) * p_pic->V_PITCH / 2 ;
          i_y ;
-         i_y -= p_pic->Y_PITCH )
+         i_y -= p_pic->Y_PITCH,
+         i_y_u -= (p_pic->U_PITCH / 2),
+         i_y_v -= (p_pic->V_PITCH / 2), i_subsample++ )
     {
         /* Draw until we reach the end of the line */
         for( i_x = p_spu->i_width ; i_x ; i_x -= i_len )
@@ -138,6 +158,14 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                 case 0x0f:
                     memset( p_dest - i_x - i_y,
                             p_spu->p_sys->pi_yuv[i_color][0], i_len );
+
+                    if ( i_subsample & 0x1 ) break;
+
+                    /* U and V */
+                    memset( p_dest_u - i_x/2 - i_y_u,
+                            p_spu->p_sys->pi_yuv[i_color][1], (i_len+1)/2 );
+                    memset( p_dest_v - i_x/2 - i_y_v,
+                            p_spu->p_sys->pi_yuv[i_color][2], (i_len+1)/2 );
                     break;
 
                 default:
@@ -155,6 +183,34 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                         *p_destptr = ( i_colprecomp +
                                         (uint16_t)*p_destptr * i_destalpha ) >> 4;
                     }
+
+                    if ( i_subsample & 0x1 ) break;
+
+                    /* U and V */
+                    i_colprecomp = (uint16_t)p_spu->p_sys->pi_yuv[i_color][1]
+                                 * (uint16_t)(p_spu->p_sys->pi_alpha[i_color] + 1);
+                    i_destalpha = 15 - p_spu->p_sys->pi_alpha[i_color];
+
+                    for ( p_destptr = p_dest_u - i_x/2 - i_y_u;
+                          p_destptr < p_dest_u - i_x/2 - i_y_u + (i_len+1)/2;
+                          p_destptr++ )
+                    {
+                        *p_destptr = ( i_colprecomp +
+                                        (uint16_t)*p_destptr * i_destalpha ) >> 4;
+                    }
+
+                    i_colprecomp = (uint16_t)p_spu->p_sys->pi_yuv[i_color][2]
+                                 * (uint16_t)(p_spu->p_sys->pi_alpha[i_color] + 1);
+                    i_destalpha = 15 - p_spu->p_sys->pi_alpha[i_color];
+
+                    for ( p_destptr = p_dest_v - i_x/2 - i_y_v;
+                          p_destptr < p_dest_v - i_x/2 - i_y_v + (i_len+1)/2;
+                          p_destptr++ )
+                    {
+                        *p_destptr = ( i_colprecomp +
+                                        (uint16_t)*p_destptr * i_destalpha ) >> 4;
+                    }
+
                     break;
             }
         }
