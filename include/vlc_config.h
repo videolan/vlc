@@ -51,7 +51,7 @@
 #ifdef SYS_BEOS
 #  define CONFIG_DIR                    "config/settings"
 #elif defined( WIN32 ) || defined( UNDER_CE )
-#  define CONFIG_DIR			"vlc"
+#  define CONFIG_DIR                    "vlc"
 #else
 #  define CONFIG_DIR                    ".vlc"
 #endif
@@ -77,6 +77,10 @@
 
 /* Time to wait in case of read error */
 #define INPUT_ERROR_SLEEP               ((mtime_t)(0.10*CLOCK_FREQ))
+
+/* Number of read() calls needed until we check the file size through
+ * fstat() */
+#define INPUT_FSTAT_NB_READS            10
 
 /*
  * General limitations
@@ -104,7 +108,7 @@
 
 /* Delay between channel changes - this is required to avoid flooding the 
  * channel server */
-#define INPUT_CHANNEL_CHANGE_DELAY         (mtime_t)(5*CLOCK_FREQ)
+#define INPUT_CHANNEL_CHANGE_DELAY      (mtime_t)(5*CLOCK_FREQ)
 
 /* Duration between the time we receive the data packet, and the time we will
  * mark it to be presented */

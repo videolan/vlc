@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.7 2002/12/31 01:54:35 massiot Exp $
+ * $Id: file.c,v 1.8 2003/01/03 13:07:17 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -76,6 +76,17 @@ vlc_module_begin();
 vlc_module_end();
  
 /*****************************************************************************
+ * _input_socket_t: private access plug-in data, modified to add private
+ *                  fields
+ *****************************************************************************/
+typedef struct _input_socket_s
+{
+    input_socket_t      _socket;
+
+    unsigned int        i_nb_reads;
+} _input_socket_t;
+
+/*****************************************************************************
  * Open: open the file
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
@@ -86,7 +97,7 @@ static int Open( vlc_object_t *p_this )
     int                 i_stat;
     struct stat         stat_info;                                              
 #endif
-    input_socket_t *    p_access_data;
+    _input_socket_t *   p_access_data;
     vlc_bool_t          b_stdin;
 
     p_input->i_mtu = 0;
@@ -167,7 +178,7 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
  
     msg_Dbg( p_input, "opening file `%s'", psz_name );
-    p_access_data = malloc( sizeof(input_socket_t) );
+    p_access_data = malloc( sizeof(_input_socket_t) );
     p_input->p_access_data = (void *)p_access_data;
     if( p_access_data == NULL )
     {
@@ -175,9 +186,10 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
+    p_access_data->i_nb_reads = 0;
     if( b_stdin )
     {
-        p_access_data->i_handle = 0;
+        p_access_data->_socket.i_handle = 0;
     }
     else
     {
@@ -185,22 +197,22 @@ static int Open( vlc_object_t *p_this )
         wchar_t psz_filename[MAX_PATH];
         MultiByteToWideChar( CP_ACP, 0, psz_name, -1, psz_filename, MAX_PATH );
 
-        p_access_data->i_handle = (int)CreateFile( psz_filename,
+        p_access_data->_socket.i_handle = (int)CreateFile( psz_filename,
             GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 
             FILE_ATTRIBUTE_NORMAL, NULL );
 
-        if( (HANDLE)p_access_data->i_handle == INVALID_HANDLE_VALUE )
+        if( (HANDLE)p_access_data->_socket.i_handle == INVALID_HANDLE_VALUE )
         {
             msg_Err( p_input, "cannot open file %s", psz_name );
             free( p_access_data );
             return VLC_EGENERIC;
         }
         p_input->stream.p_selected_area->i_size =
-                        GetFileSize( (HANDLE)p_access_data->i_handle, NULL );
+                GetFileSize( (HANDLE)p_access_data->_socket.i_handle, NULL );
 #else
-        p_access_data->i_handle = open( psz_name,
-                                        O_NONBLOCK /*| O_LARGEFILE*/ );
-        if( p_access_data->i_handle == -1 )
+        p_access_data->_socket.i_handle = open( psz_name,
+                                                O_NONBLOCK /*| O_LARGEFILE*/ );
+        if( p_access_data->_socket.i_handle == -1 )
         {
 #   ifdef HAVE_ERRNO_H
             msg_Err( p_input, "cannot open file %s (%s)", psz_name,
@@ -253,33 +265,56 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 {
-    input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
+    _input_socket_t * p_access_data = (_input_socket_t *)p_input->p_access_data;
     ssize_t i_ret;
  
 #ifdef UNDER_CE
-    if( !ReadFile( (HANDLE)p_access_data->i_handle, p_buffer, i_len,
+    if( !ReadFile( (HANDLE)p_access_data->_socket.i_handle, p_buffer, i_len,
                    (LPDWORD)&i_ret, NULL ) )
     {
         i_ret = -1;
     }
 #else
-    i_ret = read( p_access_data->i_handle, p_buffer, i_len );
+    i_ret = read( p_access_data->_socket.i_handle, p_buffer, i_len );
 #endif
 
     if( i_ret < 0 )
     {
-#   ifdef HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
         if ( errno != EINTR && errno != EAGAIN )
             msg_Err( p_input, "read failed (%s)", strerror(errno) );
-#   else
+#else
         msg_Err( p_input, "read failed" );
-#   endif
+#endif
 
         /* Delay a bit to avoid consuming all the CPU. This is particularly
          * useful when reading from an unconnected FIFO. */
         msleep( INPUT_ERROR_SLEEP );
     }
  
+    p_access_data->i_nb_reads++;
+#ifdef HAVE_SYS_STAT_H
+    if ( p_input->stream.p_selected_area->i_size != 0
+            && (p_access_data->i_nb_reads % INPUT_FSTAT_NB_READS) == 0 )
+    {
+        struct stat stat_info;
+        if ( fstat( p_access_data->_socket.i_handle, &stat_info ) == -1 )
+        {
+#   ifdef HAVE_ERRNO_H
+            msg_Warn( p_input, "couldn't stat again the file (%s)",
+                      strerror(errno) );
+#   else
+            msg_Warn( p_input, "couldn't stat again the file" );
+#   endif
+        }
+        else
+        {
+            p_input->stream.p_selected_area->i_size = stat_info.st_size;
+            p_input->stream.b_changed = 1;
+        }
+    }
+#endif
+
     return i_ret;
 }
 
