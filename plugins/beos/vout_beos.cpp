@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.28 2001/08/14 12:09:03 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.29 2001/09/12 01:30:07 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -123,15 +123,14 @@ BWindow *beos_GetAppWindow(char *name)
 
 int32 Draw(void *data)
 {
-  VideoWindow *w;
-  w = (VideoWindow*) data;
-	  if (w->LockLooper())
+  VideoWindow *p_win;
+  p_win = (VideoWindow*) data;
+	  if (p_win->LockLooper())
       {
-        w->view->DrawBitmap( w->bitmap[w->i_buffer_index],
-                              w->bitmap[w->i_buffer_index]->Bounds(),
-                              w->Bounds());
-//	    w->view->Sync();
-        w->UnlockLooper();
+        p_win->view->DrawBitmap( p_win->bitmap[p_win->i_buffer_index],
+                              p_win->bitmap[p_win->i_buffer_index]->Bounds(),
+                              p_win->Bounds());  
+        p_win->UnlockLooper();
       }
   return B_OK;
 }
@@ -149,7 +148,6 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
     is_zoomed = false;
 	fUsingOverlay = false;
 	p_video_output->b_YCbr = false;
-	i_screen_depth = 16;
 	
 	/* create the view to do the display */
     view = new VLCView(Bounds());
@@ -158,6 +156,7 @@ VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_o
     /* Bitmap mode overlay not available */
 	bitmap[0] = new BBitmap(Bounds(), B_RGB32);
 	bitmap[1] = new BBitmap(Bounds(), B_RGB32);
+
 	i_screen_depth = 32;
  	SetTitle(VOUT_TITLE " (BBitmap output)");
 
@@ -332,7 +331,6 @@ static int vout_Probe( probedata_t *p_data )
     {
         return( 999 );
     }
-
     return( 100 );
 }
 
@@ -356,6 +354,11 @@ int vout_Create( vout_thread_t *p_vout )
                                             VOUT_WIDTH_DEFAULT );
     p_vout->i_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
                                             VOUT_HEIGHT_DEFAULT );
+	p_vout->b_scale = true;
+	                                            
+    intf_Msg("Initial Width: %d Height: %d", 
+    		p_vout->i_width,
+    		p_vout->i_height);
 
     /* Open and initialize device */
     if( BeosOpenDisplay( p_vout ) )
@@ -375,10 +378,7 @@ int vout_Init( vout_thread_t *p_vout )
 {
     VideoWindow * p_win = p_vout->p_sys->p_window;
     u32 i_page_size;
-
-
     i_page_size =   p_vout->i_width * p_vout->i_height * p_vout->i_bytes_per_pixel;
-    
     if((p_win->bitmap[0] != NULL) && (p_win->bitmap[1] != NULL))
    	{
     	p_vout->pf_setbuffers( p_vout,
@@ -403,7 +403,6 @@ void vout_End( vout_thread_t *p_vout )
 void vout_Destroy( vout_thread_t *p_vout )
 {
     BeosCloseDisplay( p_vout );
-    
     free( p_vout->p_sys );
 }
 
@@ -415,6 +414,26 @@ void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_Manage( vout_thread_t *p_vout )
 {
+    VideoWindow * p_win = p_vout->p_sys->p_window;
+    
+    if ((p_vout->p_buffer[p_vout->i_buffer_index].i_pic_width != p_win->i_width + 1) &&
+        (p_vout->p_buffer[p_vout->i_buffer_index].i_pic_height != p_win->i_height + 1) &&
+        (p_vout->p_buffer[p_vout->i_buffer_index].i_pic_width != 0 ))
+    {
+        if (p_win->Lock())
+        {
+            p_win->view->ClearViewBitmap();
+            intf_Msg("Starting Change");
+            intf_Msg("New width: %d Height: %d", 
+                p_vout->p_buffer[p_vout->i_buffer_index ].i_pic_width,
+                p_vout->p_buffer[p_vout->i_buffer_index ].i_pic_height);
+
+            p_win->i_width = p_vout->p_buffer[p_vout->i_buffer_index].i_pic_width - 1;
+            p_win->i_height = p_vout->p_buffer[p_vout->i_buffer_index].i_pic_height -1;
+            p_win->ResizeTo((float) p_win->i_width, (float) p_win->i_height); 
+            p_win->Unlock();
+        }
+    }
 	return( 0 );
 }
 
@@ -436,6 +455,7 @@ void vout_Display( vout_thread_t *p_vout )
    	p_win->fDrawThreadID = spawn_thread(Draw, "drawing_thread",
               B_DISPLAY_PRIORITY, (void*) p_win);
     wait_for_thread(p_win->fDrawThreadID, &status);
+
 	
 }
 
@@ -469,29 +489,9 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
     p_vout->i_height = 				 p_win->i_height + 1;
     p_vout->i_bytes_per_line =       p_vout->i_width*p_win->i_bytes_per_pixel;
 
-    switch( p_vout->i_screen_depth )
-    {
-    case 8:
-        intf_ErrMsg( "vout error: 8 bit mode not fully supported" );
-        break;
-    case 15:
-        p_vout->i_red_mask =        0x7c00;
-        p_vout->i_green_mask =      0x03e0;
-        p_vout->i_blue_mask =       0x001f;
-        break;
-    case 16:
-        p_vout->i_red_mask =        0xf800;
-        p_vout->i_green_mask =      0x07e0;
-        p_vout->i_blue_mask =       0x001f;
-        break;
-    case 24:
-    case 32:
-    default:
-        p_vout->i_red_mask =        0xff0000;
-        p_vout->i_green_mask =      0x00ff00;
-        p_vout->i_blue_mask =       0x0000ff;
-        break;
-    }
+    p_vout->i_red_mask =        0xff0000;
+    p_vout->i_green_mask =      0x00ff00;
+    p_vout->i_blue_mask =       0x0000ff;
     return( 0 );
 }
 

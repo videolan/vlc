@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.5 2001/08/14 12:09:03 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.6 2001/09/12 01:30:07 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -65,6 +65,7 @@ public:
     bool            fDirty;
     thread_id       fDrawThreadID;
     BBitmap			*bitmap[2];
+    BBitmap			*drawthis;
     VLCView			*view;
     bool			teardownwindow;
     bool			is_zoomed;

@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.2 2001/06/15 09:07:10 tcastley Exp $
+ * $Id: InterfaceWindow.cpp,v 1.3 2001/09/12 01:30:07 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -216,6 +216,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             p_main->p_playlist->b_stopped = 1;
             vlc_mutex_unlock( &p_main->p_playlist->change_lock );
         }
+        p_mediaControl->SetStatus(NOT_STARTED_S,DEFAULT_RATE);
         break;
 
     case START_PLAYBACK:
@@ -435,23 +436,21 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
  *****************************************************************************/
 void InterfaceWindow::updateInterface()
 {
-    float progress;
-    
 	if ( p_intf->p_input )
 	{
         if ( acquire_sem(p_mediaControl->fScrubSem) == B_OK )
         {
-            uint32 seekTo = (p_mediaControl->GetSeekTo() *
+            uint64 seekTo = (p_mediaControl->GetSeekTo() *
                         p_intf->p_input->stream.p_selected_area->i_size) / 100;
-            input_Seek( p_intf->p_input, seekTo );
+            intf_Msg("Move to: %u", seekTo);
+            input_Seek( p_intf->p_input, seekTo);
         }
         else if( Lock() )
         {
-            progress = (100. * p_intf->p_input->stream.p_selected_area->i_tell) /
-                        p_intf->p_input->stream.p_selected_area->i_size;
             p_mediaControl->SetStatus(p_intf->p_input->stream.control.i_status, 
                                       p_intf->p_input->stream.control.i_rate);
-            p_mediaControl->SetProgress(progress);
+            p_mediaControl->SetProgress(p_intf->p_input->stream.p_selected_area->i_tell,
+                                        p_intf->p_input->stream.p_selected_area->i_size);
             Unlock();
         }
     }
