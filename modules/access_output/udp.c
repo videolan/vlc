@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.2 2003/01/23 15:52:04 sam Exp $
+ * $Id: udp.c,v 1.3 2003/02/16 14:03:56 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -129,8 +129,9 @@ static int Open( vlc_object_t *p_this )
     if( p_sout->psz_access != NULL &&
         !strcmp( p_sout->psz_access, "rtp" ) )
     {
-         if( p_sout->psz_mux != NULL &&
-            strcmp( p_sout->psz_mux, "ts" ) )
+         if( p_sout->psz_mux != NULL && *p_sout->psz_mux &&
+             strcmp( p_sout->psz_mux, "ts" ) &&
+             strcmp( p_sout->psz_mux, "ts_dvbpsi" ))
         {
             msg_Err( p_sout, "rtp ouput work only with ts payload" );
             free( p_access );
