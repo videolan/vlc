@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.37 2003/09/07 22:53:09 fenrir Exp $
+ * $Id: VlcWrapper.cpp,v 1.38 2003/10/21 01:48:02 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -96,15 +96,21 @@ bool VlcWrapper::HasInput()
 int VlcWrapper::InputStatus()
 {
     if( !p_input )
+    {
         return UNDEF_S;
+    }
     
-    return p_input->stream.control.i_status;
+    vlc_value_t state;
+    var_Get( p_input, "state", &state );
+    return state.i_int;
 }
 
 int VlcWrapper::InputRate()
 {
     if( !p_input )
+    {
         return DEFAULT_RATE;
+    }
     
     return p_input->stream.control.i_rate;
 }
@@ -112,7 +118,9 @@ int VlcWrapper::InputRate()
 void VlcWrapper::InputSetRate( int rate )
 {
     if( !p_input )
+    {
         return;
+    }
 
     input_SetRate( p_input, rate );
 }
@@ -262,54 +270,55 @@ void VlcWrapper::ToggleSubtitle( int i_subtitle )
 
 const char * VlcWrapper::GetTimeAsString()
 {
-    static char psz_currenttime[ OFFSETTOTIME_MAX_SIZE ];
+    static char psz_time[ OFFSETTOTIME_MAX_SIZE ];
         
-    if( p_input == NULL )
+    if( !p_input )
     {
         return ("-:--:--");
     }     
    
-    input_OffsetToTime( p_input, 
-                        psz_currenttime, 
-                        p_input->stream.p_selected_area->i_tell );        
+    vlc_value_t time;
+    var_Get( p_input, "time", &time );
+    
+    mtime_t seconds = time.i_time / 1000000;
+    sprintf( psz_time, "%d:%02d:%02d",
+             (int) ( seconds / (60 * 60 ) ),
+             (int) ( ( seconds / 60 ) % 60 ),
+             (int) ( seconds % 60 ) );
 
-    return(psz_currenttime);
+    return psz_time;
 }
 
 float VlcWrapper::GetTimeAsFloat()
 {
-    float f_time = 0.0;
-
-    if( p_input != NULL )
+    if( !p_input )
     {
-        f_time = (float)p_input->stream.p_selected_area->i_tell / 
-                 (float)p_input->stream.p_selected_area->i_size;
-    }    
-    else
-    {
-        f_time = 0.0;
+        return 0.0;
     }
-    return( f_time );
+    
+    vlc_value_t pos;
+    var_Get( p_input, "position", &pos );
+    return pos.f_float;
 }
 
 void VlcWrapper::SetTimeAsFloat( float f_position )
 {
-    if( p_input != NULL )
+    if( !p_input )
     {
-        input_Seek( p_input, 
-                   (long long)(p_input->stream.p_selected_area->i_size
-                       * f_position / SEEKSLIDER_RANGE ), 
-                   INPUT_SEEK_SET );
+        return;
     }
+    
+    vlc_value_t pos;
+    pos.f_float = f_position / SEEKSLIDER_RANGE;
+    var_Set( p_input, "position", pos );
 }
 
 bool VlcWrapper::IsPlaying()
 {
-
 	bool playing = false;
-	if ( p_input )
+	if( p_input )
 	{
-		switch ( p_input->stream.control.i_status )
+		switch( p_input->stream.control.i_status )
 		{
 			case PLAYING_S:
 			case FORWARD_S:
