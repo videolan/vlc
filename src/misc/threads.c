@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.32 2003/01/06 22:57:47 massiot Exp $
+ * $Id: threads.c,v 1.33 2003/01/09 23:43:07 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -618,6 +618,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
                       psz_file, i_line, strerror(i_error) );
             i_priority = 0;
         }
+
     }
 
 #elif defined( HAVE_CTHREADS_H )
@@ -690,19 +691,19 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     if ( i_priority )
     {
+        int i_error;
         struct sched_param param;
         memset( &param, 0, sizeof(struct sched_param) );
         param.sched_priority = i_priority;
-        if ( pthread_setschedparam( pthread_self(), SCHED_RR, &param ) )
+        if ( (i_error = pthread_setschedparam( pthread_self(),
+                                               SCHED_RR, &param )) )
         {
-            msg_Warn( p_this, "couldn't go to real-time priority (%s:%d)",
-                      psz_file, i_line );
-            return 1;
+            msg_Warn( p_this, "couldn't go to real-time priority (%s:%d): %s",
+                      psz_file, i_line, strerror(i_error) );
+            i_priority = 0;
         }
     }
 
-#else
-    return 1;
 #endif
 
     return 0;

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * intf.m: MacOS X interface plugin
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.20 2003/01/06 22:07:47 massiot Exp $
+ * Copyright (C) 2002-2003 VideoLAN
+ * $Id: intf.m,v 1.21 2003/01/09 23:43:07 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -135,6 +135,7 @@ static void Run( intf_thread_t *p_intf )
 
 - (NSString *)localizedString:(char *)psz
 {
+    if ( psz == NULL ) return NULL;
     UInt32 uiLength = (UInt32)strlen( psz );
     NSData * o_data = [NSData dataWithBytes: psz length: uiLength];
     NSString *o_str = [[NSString alloc] initWithData: o_data

@@ -2,7 +2,7 @@
  * vlc_config.h: limits and configuration
  * Defines all compilation-time configuration constants and size limits
  *****************************************************************************
- * Copyright (C) 1999-2002 VideoLAN
+ * Copyright (C) 1999-2003 VideoLAN
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -45,7 +45,7 @@
 
 /* When a thread waits on a condition in debug mode, delay to wait before
  * outputting an error message (in second) */
-#define THREAD_COND_TIMEOUT             5
+#define THREAD_COND_TIMEOUT             15
 
 /* The configuration file and directory */
 #ifdef SYS_BEOS

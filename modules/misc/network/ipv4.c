@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.11 2003/01/02 23:50:55 massiot Exp $
+ * $Id: ipv4.c,v 1.12 2003/01/09 23:43:07 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -190,7 +190,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
                     (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
 #ifdef HAVE_ERRNO_H
-        msg_Warn( p_this, "cannot configure socket (SO_RCVBUF: %s)",
+        msg_Dbg( p_this, "cannot configure socket (SO_RCVBUF: %s)",
                           strerror(errno));
 #else
         msg_Warn( p_this, "cannot configure socket (SO_RCVBUF)" );
@@ -218,8 +218,8 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
     else if( i_opt < 0x80000 )
     {
-        msg_Warn( p_this, "socket buffer size is 0x%x instead of 0x%x",
-                          i_opt, 0x80000 );
+        msg_Dbg( p_this, "socket buffer size is 0x%x instead of 0x%x",
+                         i_opt, 0x80000 );
     }
 
 
