@@ -725,8 +725,8 @@ then
   x|xyes)
     if test "x$with_dvbpsi_tree" = x
     then
-      AC_CHECK_HEADERS(src/descriptors/dr.h,
-        [ PLUGINS="${PLUGINS} dvbpsi"
+      AC_CHECK_HEADERS(dvbpsi/dr.h,
+        [ PLUGINS="${PLUGINS} mpeg_ts_dvbpsi"
           mpeg_ts_dvbpsi_LDFLAGS="${mpeg_ts_dvbpsi_LDFLAGS} -ldvbpsi" ], [],
         [  AC_MSG_ERROR([cannot find libdvbpsi headers]) ])
     else

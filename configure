@@ -6087,7 +6087,7 @@ fi
   x|xyes)
     if test "x$with_dvbpsi_tree" = x
     then
-      for ac_hdr in src/descriptors/dr.h
+      for ac_hdr in dvbpsi/dr.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
@@ -6121,7 +6121,7 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   cat >> confdefs.h <<EOF
 #define $ac_tr_hdr 1
 EOF
-  PLUGINS="${PLUGINS} dvbpsi"
+  PLUGINS="${PLUGINS} mpeg_ts_dvbpsi"
           mpeg_ts_dvbpsi_LDFLAGS="${mpeg_ts_dvbpsi_LDFLAGS} -ldvbpsi" 
 else
   echo "$ac_t""no" 1>&6

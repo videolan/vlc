@@ -190,6 +190,9 @@
 /* Define if you have the <dlfcn.h> header file.  */
 #undef HAVE_DLFCN_H
 
+/* Define if you have the <dvbpsi/dr.h> header file.  */
+#undef HAVE_DVBPSI_DR_H
+
 /* Define if you have the <dvdcss/dvdcss.h> header file.  */
 #undef HAVE_DVDCSS_DVDCSS_H
 
@@ -267,9 +270,6 @@
 
 /* Define if you have the <soundcard.h> header file.  */
 #undef HAVE_SOUNDCARD_H
-
-/* Define if you have the <src/descriptors/dr.h> header file.  */
-#undef HAVE_SRC_DESCRIPTORS_DR_H
 
 /* Define if you have the <stddef.h> header file.  */
 #undef HAVE_STDDEF_H
