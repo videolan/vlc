@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.12 2004/02/21 23:15:52 gbazin Exp $
+ * $Id: ts.c,v 1.13 2004/03/03 01:26:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -234,6 +234,8 @@ static inline int PIDGet( block_t *p )
 }
 
 static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk );
+
+static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
 
 static iod_descriptor_t *IODNew( int , uint8_t * );
 static void              IODFree( iod_descriptor_t * );
@@ -625,6 +627,8 @@ static int Demux( demux_t *p_demux )
             {
                 msg_Dbg( p_demux, "pid[0x%x] unknown", p_pid->i_pid );
             }
+            /* We have to handle PCR if present */
+            PCRHandle( p_demux, p_pid, p_pkt );
             block_Release( p_pkt );
         }
         p_pid->b_seen = VLC_TRUE;
@@ -934,6 +938,37 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
     }
 }
 
+static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
+{
+    demux_sys_t   *p_sys = p_demux->p_sys;
+    const uint8_t *p = p_bk->p_buffer;
+
+    if( ( p[3]&0x20 ) && /* adaptation */
+        ( p[5]&0x10 ) &&
+        ( p[4] >= 7 ) )
+    {
+        int i;
+        mtime_t i_pcr;  /* 33 bits */
+
+        i_pcr = ( (mtime_t)p[6] << 25 ) |
+                ( (mtime_t)p[7] << 17 ) |
+                ( (mtime_t)p[8] << 9 ) |
+                ( (mtime_t)p[9] << 1 ) |
+                ( (mtime_t)p[10] >> 7 );
+
+        /* Search program and set the PCR */
+        for( i = 0; i < p_sys->i_pmt; i++ )
+        {
+            if( pid->i_pid == p_sys->pmt[i]->psi->i_pid_pcr )
+            {
+                es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
+                                (int)p_sys->pmt[i]->psi->i_number,
+                                (int64_t)(i_pcr * 100 / 9) );
+            }
+        }
+    }
+}
+
 static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 {
     const uint8_t    *p = p_bk->p_buffer;
@@ -1009,20 +1044,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         }
     }
 
-    if( b_adaptation &&
-        (p[5] & 0x10) && p[4]>=7 && pid->p_owner && pid->p_owner->i_pid_pcr == pid->i_pid )
-    {
-        mtime_t i_pcr;  /* 33 bits */
-
-        i_pcr = ( (mtime_t)p[6] << 25 ) |
-                ( (mtime_t)p[7] << 17 ) |
-                ( (mtime_t)p[8] << 9 ) |
-                ( (mtime_t)p[9] << 1 ) |
-                ( (mtime_t)p[10] >> 7 );
-
-        es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR, (int)pid->p_owner->i_number, (int64_t)(i_pcr * 100 / 9) );
-    }
-
+    PCRHandle( p_demux, pid, p_bk );
 
     if( i_skip >= 188 || pid->es->id == NULL || p_demux->p_sys->b_udp_out )
     {
@@ -1545,9 +1567,13 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         if( p_dr->i_tag == 0x1d )
         {
             /* We have found an IOD descriptor */
-            msg_Warn( p_demux, "found IOD descriptor" );
+            msg_Warn( p_demux, " * descriptor : IOD (0x1d)" );
 
             pmt->psi->iod = IODNew( p_dr->i_length, p_dr->p_data );
+        }
+        else
+        {
+            msg_Dbg( p_demux, " * descriptor : unknown (0x%x)", p_dr->i_tag );
         }
     }
 
@@ -1673,6 +1699,9 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
             for( p_dr = p_es->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
             {
+                msg_Dbg( p_demux, "  * es pid=0x%x type=0x%x dr->i_tag=0x%x",
+                         p_es->i_pid, p_es->i_type, p_dr->i_tag );
+
                 if( p_dr->i_tag == 0x6a )
                 {
                     pid->es->fmt.i_cat = AUDIO_ES;
