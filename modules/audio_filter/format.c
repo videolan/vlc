@@ -40,6 +40,7 @@ static int  Open ( vlc_object_t * );
 static block_t *Float32toS16( filter_t *, block_t * );
 static block_t *Float32toU16( filter_t *, block_t * );
 static block_t *S16toFloat32( filter_t *, block_t * );
+static block_t *S16Invert   ( filter_t *, block_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -62,15 +63,22 @@ static int Open( vlc_object_t *p_this )
     {
         p_filter->pf_audio_filter = Float32toS16;
     }
-    else if ( p_filter->fmt_in.i_codec == VLC_FOURCC('f','l','3','2') &&
-              p_filter->fmt_out.i_codec == AUDIO_FMT_U16_NE )
+    else if( p_filter->fmt_in.i_codec == VLC_FOURCC('f','l','3','2') &&
+             p_filter->fmt_out.i_codec == AUDIO_FMT_U16_NE )
     {
         p_filter->pf_audio_filter = Float32toU16;
     }
-    else if ( p_filter->fmt_in.i_codec == AUDIO_FMT_S16_NE &&
-              p_filter->fmt_out.i_codec == VLC_FOURCC('f','l','3','2') )
+    else if( p_filter->fmt_in.i_codec == AUDIO_FMT_S16_NE &&
+             p_filter->fmt_out.i_codec == VLC_FOURCC('f','l','3','2') )
     {
         p_filter->pf_audio_filter = S16toFloat32;
+    }
+    else if( ( p_filter->fmt_in.i_codec == VLC_FOURCC('s','1','6','l') &&
+               p_filter->fmt_out.i_codec == VLC_FOURCC('s','1','6','b') ) ||
+             ( p_filter->fmt_in.i_codec == VLC_FOURCC('s','1','6','b') &&
+               p_filter->fmt_out.i_codec == VLC_FOURCC('s','1','6','l') ) )
+    {
+        p_filter->pf_audio_filter = S16Invert;
     }
     else return VLC_EGENERIC;
     
@@ -91,7 +99,7 @@ static block_t *Float32toS16( filter_t *p_filter, block_t *p_block )
     float *p_in = (float *)p_block->p_buffer;
     int16_t *p_out = (int16_t *)p_in;
 
-    for( i = p_block->i_buffer/ p_filter->fmt_in.audio.i_bitspersample; i-- ; )
+    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
     {
 #if 0
         /* Slow version. */
@@ -119,7 +127,7 @@ static block_t *Float32toU16( filter_t *p_filter, block_t *p_block )
     float *p_in = (float *)p_block->p_buffer;
     uint16_t *p_out = (uint16_t *)p_in;
 
-    for( i = p_block->i_buffer/ p_filter->fmt_in.audio.i_bitspersample; i-- ; )
+    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
     {
         if ( *p_in >= 1.0 ) *p_out = 65535;
         else if ( *p_in < -1.0 ) *p_out = 0;
@@ -146,10 +154,10 @@ static block_t *S16toFloat32( filter_t *p_filter, block_t *p_block )
         return NULL;
     }
 
-    p_in = (int16_t *)(p_block->p_buffer + p_block->i_buffer) - 1;
-    p_out = (float *)(p_block_out->p_buffer + p_block_out->i_buffer) - 1;
+    p_in = (int16_t *)p_block->p_buffer;
+    p_out = (float *)p_block_out->p_buffer;
 
-    for( i = p_block->i_buffer/ p_filter->fmt_in.audio.i_bitspersample; i-- ; )
+    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
     {
 #if 0
         /* Slow version */
@@ -163,7 +171,7 @@ static block_t *S16toFloat32( filter_t *p_filter, block_t *p_block )
         *p_out = u.f - 384.0;
 #endif
 
-        p_in--; p_out--;
+        p_in++; p_out++;
     }
 
     p_block_out->i_samples = p_block->i_samples;
@@ -172,5 +180,23 @@ static block_t *S16toFloat32( filter_t *p_filter, block_t *p_block )
     p_block_out->i_length = p_block->i_length;
     p_block_out->i_rate = p_block->i_rate;
 
+    p_block->pf_release( p_block );
     return p_block_out;
+}
+
+static block_t *S16Invert( filter_t *p_filter, block_t *p_block )
+{
+    int i;
+    uint8_t *p_in = (uint8_t *)p_block->p_buffer;
+    uint8_t tmp;
+
+    for( i = 0; i < p_block->i_buffer / 2; i++ )
+    {
+        tmp = p_in[0];
+        p_in[0] = p_in[1];
+        p_in[1] = tmp;
+        p_in += 2;
+    }
+
+    return p_block;
 }

@@ -818,17 +818,30 @@ int audio_BitsPerSample( vlc_fourcc_t i_format )
     {
     case VLC_FOURCC('u','8',' ',' '):
     case VLC_FOURCC('s','8',' ',' '):
-        return 1;
+        return 8;
 
     case VLC_FOURCC('u','1','6','l'):
     case VLC_FOURCC('s','1','6','l'):
     case VLC_FOURCC('u','1','6','b'):
     case VLC_FOURCC('s','1','6','b'):
-        return 2;
+        return 16;
 
+    case VLC_FOURCC('u','2','4','l'):
+    case VLC_FOURCC('s','2','4','l'):
+    case VLC_FOURCC('u','2','4','b'):
+    case VLC_FOURCC('s','2','4','b'):
+        return 24;
+
+    case VLC_FOURCC('u','3','2','l'):
+    case VLC_FOURCC('s','3','2','l'):
+    case VLC_FOURCC('u','3','2','b'):
+    case VLC_FOURCC('s','3','2','b'):
     case VLC_FOURCC('f','l','3','2'):
     case VLC_FOURCC('f','i','3','2'):
-        return 4;
+        return 32;
+
+    case VLC_FOURCC('f','l','6','4'):
+        return 64;
     }
 
     return 0;
@@ -892,7 +905,8 @@ static int transcode_audio_new( sout_stream_t *p_stream,
             id->p_encoder->fmt_out.audio.i_physical_channels;
     id->p_encoder->fmt_in.audio.i_channels =
         id->p_encoder->fmt_out.audio.i_channels;
-    id->p_encoder->fmt_in.audio.i_bitspersample = 16;
+    id->p_encoder->fmt_in.audio.i_bitspersample =
+        audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
     id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
 
@@ -906,6 +920,8 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         return VLC_EGENERIC;
     }
     id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
+    id->p_encoder->fmt_in.audio.i_bitspersample =
+        audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
     /* Check if we need a filter for chroma conversion or resizing */
     if( id->p_decoder->fmt_out.i_codec !=
@@ -933,6 +949,9 @@ static int transcode_audio_new( sout_stream_t *p_stream,
             id->p_encoder->p_module = 0;
             return VLC_EGENERIC;
         }
+
+        id->pp_filter[0]->fmt_out.audio.i_bitspersample = 
+            audio_BitsPerSample( id->pp_filter[0]->fmt_out.i_codec );
 
         /* Try a 2 stage conversion */
         if( id->pp_filter[0]->fmt_out.i_codec !=
@@ -1067,7 +1086,7 @@ static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
 
     if( p_dec->fmt_out.audio.i_bitspersample )
     {
-        i_size = i_samples * p_dec->fmt_out.audio.i_bitspersample *
+        i_size = i_samples * p_dec->fmt_out.audio.i_bitspersample / 8 *
             p_dec->fmt_out.audio.i_channels;
     }
     else if( p_dec->fmt_out.audio.i_bytes_per_frame &&
