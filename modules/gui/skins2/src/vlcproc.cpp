@@ -76,6 +76,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
                               "playlist.slider" );
     REGISTER_VAR( m_cVarRandom, VarBoolImpl, "playlist.isRandom" )
     REGISTER_VAR( m_cVarLoop, VarBoolImpl, "playlist.isLoop" )
+    REGISTER_VAR( m_cVarRepeat, VarBoolImpl, "playlist.isRepeat" )
     REGISTER_VAR( m_cVarTime, StreamTime, "time" )
     REGISTER_VAR( m_cVarVolume, Volume, "volume" )
     REGISTER_VAR( m_cVarStream, Stream, "stream" )
@@ -167,6 +168,7 @@ void VlcProc::manage()
     VarBoolImpl *pVarMute = (VarBoolImpl*)m_cVarMute.get();
     VarBoolImpl *pVarRandom = (VarBoolImpl*)m_cVarRandom.get();
     VarBoolImpl *pVarLoop = (VarBoolImpl*)m_cVarLoop.get();
+    VarBoolImpl *pVarRepeat = (VarBoolImpl*)m_cVarRepeat.get();
 
     // Refresh sound volume
     audio_volume_t volume;
@@ -222,6 +224,10 @@ void VlcProc::manage()
     // Refresh the loop variable
     var_Get( getIntf()->p_sys->p_playlist, "loop", &val );
     pVarLoop->set( val.b_bool );
+
+    // Refresh the repeat variable
+    var_Get( getIntf()->p_sys->p_playlist, "repeat", &val );
+    pVarRepeat->set( val.b_bool );
 }
 
 

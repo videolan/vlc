@@ -87,6 +87,7 @@ class VlcProc: public SkinObject
         VariablePtr m_cPlaylist;
         VariablePtr m_cVarRandom;
         VariablePtr m_cVarLoop;
+        VariablePtr m_cVarRepeat;
         /// Variable for current position of the stream
         VariablePtr m_cVarTime;
         /// Variable for audio volume
