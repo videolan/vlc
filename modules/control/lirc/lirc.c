@@ -2,7 +2,7 @@
  * lirc.c : lirc module for vlc
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: lirc.c,v 1.10 2004/01/25 16:17:03 anil Exp $
+ * $Id: lirc.c,v 1.11 2004/02/15 19:40:41 sigmunau Exp $
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -55,7 +55,6 @@ struct intf_sys_t
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
-static void Feedback( intf_thread_t *, char * );
 
 /*****************************************************************************
  * Module descriptor
@@ -190,24 +189,33 @@ static void Run( intf_thread_t *p_intf )
             if( !strcmp( c, "QUIT" ) )
             {
                 p_intf->p_vlc->b_die = VLC_TRUE;
-                Feedback( p_intf, _("Quit" ) );
+                vout_OSDMessage( p_intf, _("Quit" ) );
                 continue;
             }
-            if( !strcmp( c, "VOL_UP" ) )
+            else if( !strcmp( c, "VOL_UP" ) )
             {
                 audio_volume_t i_newvol;
-                char string[9];
                 aout_VolumeUp( p_intf, 1, &i_newvol );
-                sprintf( string, "Vol %%%d", i_newvol*100/AOUT_VOLUME_MAX );
-                Feedback( p_intf, string );
+                vout_OSDMessage( p_intf, _("Vol %%%d"), i_newvol*100/AOUT_VOLUME_MAX );
             }
-            if( !strcmp( c, "VOL_DOWN" ) )
+            else if( !strcmp( c, "VOL_DOWN" ) )
             {
                 audio_volume_t i_newvol;
-                char string[9];
                 aout_VolumeDown( p_intf, 1, &i_newvol );
-                sprintf( string, "Vol %%%d", i_newvol*100/AOUT_VOLUME_MAX );
-                Feedback( p_intf, string );
+                vout_OSDMessage( p_intf, _("Vol %%%d"), i_newvol*100/AOUT_VOLUME_MAX );
+            }
+            else if( !strcmp( c, "MUTE" ) )
+            {
+                audio_volume_t i_newvol = -1;
+                aout_VolumeMute( p_intf, &i_newvol );
+                if( i_newvol == 0 )
+                {
+                    vout_OSDMessage( p_intf, _( "Mute" ) );
+                }
+                else
+                {
+                    vout_OSDMessage( p_intf, _("Vol %d%%"), i_newvol*100/AOUT_VOLUME_MAX );
+                }
             }
             if( p_vout )
             {
@@ -291,11 +299,17 @@ static void Run( intf_thread_t *p_intf )
 
             if( !strcmp( c, "PLAYPAUSE" ) )
             {
-                if( p_input &&
-                    p_input->stream.control.i_status != PAUSE_S )
+                vlc_value_t val;
+                val.i_int = PLAYING_S;
+                if( p_input )
                 {
-                    Feedback( p_intf, _( "Pause" ) );
-                    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+                    var_Get( p_input, "state", &val );
+                }
+                if( p_input && val.i_int != PAUSE_S )
+                {
+                    vout_OSDMessage( VLC_OBJECT(p_intf), _( "Pause" ) );
+                    val.i_int = PAUSE_S;
+                    var_Set( p_input, "state", val );
                 }
                 else
                 {
@@ -307,7 +321,7 @@ static void Run( intf_thread_t *p_intf )
                         if( p_playlist->i_size )
                         {
                             vlc_mutex_unlock( &p_playlist->object_lock );
-                            Feedback( p_intf, _( "Play" ) );
+                            vout_OSDMessage( p_intf, _( "Play" ) );
                             playlist_Play( p_playlist );
                             vlc_object_release( p_playlist );
                         }
@@ -318,10 +332,78 @@ static void Run( intf_thread_t *p_intf )
 
             else if( p_input )
             {
-                if( !strcmp( c, "PAUSE" ) )
+                if( !strcmp( c, "AUDIO_TRACK" ) )
                 {
-                    Feedback( p_intf, _( "Pause" ) );
-                    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+                    vlc_value_t val,list,list2;
+                    int i_count, i;
+                    var_Get( p_input, "audio-es", &val );
+                    var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES, &list, &list2 );
+                    i_count = list.p_list->i_count;
+                    for( i = 0; i < i_count; i++ )
+                    {
+                        if( val.i_int == list.p_list->p_values[i].i_int )
+                        {
+                            break;
+                        }
+                    }
+                    /* value of audio-es was not in choices list */
+                    if( i == i_count )
+                    {
+                        msg_Warn( p_input, "invalid current audio track, selecting 0" );
+                        var_Set( p_input, "audio-es", list.p_list->p_values[0] );
+                        i = 0;
+                    }
+                    else if( i == i_count - 1 )
+                    {
+                        var_Set( p_input, "audio-es", list.p_list->p_values[0] );
+                        i = 0;
+                    }
+                    else
+                    {
+                        var_Set( p_input, "audio-es", list.p_list->p_values[i+1] );
+                        i = i + 1;
+                    }
+                    vout_OSDMessage( VLC_OBJECT(p_input), _("Audio track: %s"), list2.p_list->p_values[i].psz_string );
+                }
+                else if( !strcmp( c, "SUBTITLE_TRACK" ) )
+                {
+                    vlc_value_t val,list,list2;
+                    int i_count, i;
+                    var_Get( p_input, "spu-es", &val );
+                    var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES, &list, &list2 );
+                    i_count = list.p_list->i_count;
+                    for( i = 0; i < i_count; i++ )
+                    {
+                        if( val.i_int == list.p_list->p_values[i].i_int )
+                        {
+                            break;
+                        }
+                    }
+                    /* value of audio-es was not in choices list */
+                    if( i == i_count )
+                    {
+                        msg_Warn( p_input, "invalid current subtitle track, selecting 0" );
+                        var_Set( p_input, "spu-es", list.p_list->p_values[0] );
+                        i = 0;
+                    }
+                    else if( i == i_count - 1 )
+                    {
+                        var_Set( p_input, "spu-es", list.p_list->p_values[0] );
+                        i = 0;
+                    }
+                    else
+                    {
+                        var_Set( p_input, "spu-es", list.p_list->p_values[i+1] );
+                        i = i + 1;
+                    }
+                    vout_OSDMessage( VLC_OBJECT(p_input), _("Subtitle track: %s"), list2.p_list->p_values[i].psz_string );
+                }
+                else if( !strcmp( c, "PAUSE" ) )
+                {
+                    vlc_value_t val;
+                    vout_OSDMessage( p_intf, _( "Pause" ) );
+                    val.i_int = PAUSE_S;
+                    var_Set( p_input, "state", val );
                 }
                 else if( !strcmp( c, "NEXT" ) )
                 {
@@ -355,11 +437,13 @@ static void Run( intf_thread_t *p_intf )
                 }
                 else if( !strcmp( c, "FAST" ) )
                 {
-                    input_SetStatus( p_input, INPUT_STATUS_FASTER );
+                    vlc_value_t val; val.b_bool = VLC_TRUE;
+                    var_Set( p_input, "rate-faster", val );
                 }
                 else if( !strcmp( c, "SLOW" ) )
                 {
-                    input_SetStatus( p_input, INPUT_STATUS_SLOWER );
+                    vlc_value_t val; val.b_bool = VLC_TRUE;
+                    var_Set( p_input, "rate-slower", val );
                 }
 /* beginning of modifications by stephane Thu Jun 19 15:29:49 CEST 2003 */
                 else if ( !strcmp(c, "CHAPTER_N" ) ||
@@ -398,14 +482,5 @@ static void Run( intf_thread_t *p_intf )
         }
 
         free( code );
-    }
-}
-
-static void Feedback( intf_thread_t *p_intf, char *psz_string )
-{
-    if ( p_intf->p_sys->p_vout )
-    {
-        vout_ShowTextRelative( p_intf->p_sys->p_vout, psz_string, NULL,
-                                 OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,400000 );
     }
 }

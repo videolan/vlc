@@ -74,3 +74,15 @@ begin
   button = VOLUME_UP_DOWN
   config = VOL_UP
 end
+
+begin
+  prog = vlc
+  button = SOMEBUTTON
+  config = AUDIO_TRACK
+end
+
+begin
+  prog = vlc
+  button = MUTE_UP
+  config = MUTE
+end
