@@ -93,8 +93,8 @@
 
 #define SOUT_ACCESS_TITLE N_("Stream output access modules settings")
 #define SOUT_ACCESS_HELP N_( \
-    "In this section you can set the caching value for the UDP stream " \
-    "output access module.")
+    "In this section you can set the caching value for the stream " \
+    "output access modules.")
 
 #define SOUT_MUX_TITLE N_("Stream output muxer modules settings")
 #define SOUT_MUX_HELP N_(" ")
