@@ -725,7 +725,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     p_fmt->i_height;
 
            p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
-                p_pic_src, &p_region->picture, i_x_offset, i_y_offset );
+                p_pic_src, &p_region->picture, i_x_offset, i_y_offset, 255 );
 
             p_region = p_region->p_next;
         }
