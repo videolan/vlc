@@ -226,7 +226,7 @@ struct vout_sys_t
     picture_t *p_pic;
 
     int i_width, i_height;
-    int posx, posy;
+    int pos, posx, posy;
 };
 
 /*****************************************************************************
@@ -253,12 +253,15 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_display = NULL;
     p_vout->pf_control = Control;
 
+    var_Create( p_this, "logo-position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "logo-position", &val );
+    p_sys->pos = val.i_int;
     var_Create( p_this, "logo-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, "logo-x", &val );
-    p_sys->posx = val.i_int >= 0 ? val.i_int : 0;
+    p_sys->posx = val.i_int;
     var_Create( p_this, "logo-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, "logo-y", &val );
-    p_sys->posy = val.i_int >= 0 ? val.i_int : 0;
+    p_sys->posy = val.i_int;
 
     p_sys->p_pic = LoadPNG( p_this );
     if( !p_sys->p_pic )
@@ -322,6 +325,29 @@ static int Init( vout_thread_t *p_vout )
         vlc_object_detach( p_sys->p_blend );
         vlc_object_destroy( p_sys->p_blend );
         return VLC_EGENERIC;
+    }
+
+    if( p_sys->posx < 0 || p_sys->posy < 0 )
+    {
+        p_sys->posx = 0; p_sys->posy = 0;
+
+        if( p_sys->pos & SUBPICTURE_ALIGN_BOTTOM )
+        {
+            p_sys->posy = p_vout->render.i_height - p_sys->i_height;
+        }
+        else if ( !(p_sys->pos & SUBPICTURE_ALIGN_TOP) )
+        {
+            p_sys->posy = p_vout->render.i_height / 2 - p_sys->i_height / 2;
+        }
+
+        if( p_sys->pos & SUBPICTURE_ALIGN_RIGHT )
+        {
+            p_sys->posx = p_vout->render.i_width - p_sys->i_width;
+        }
+        else if ( !(p_sys->pos & SUBPICTURE_ALIGN_LEFT) )
+        {
+            p_sys->posx = p_vout->render.i_width / 2 - p_sys->i_width / 2;
+        }
     }
 
     /* Try to open the real video output */
