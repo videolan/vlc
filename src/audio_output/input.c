@@ -454,11 +454,11 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
         if( p_input->i_resampling_type == AOUT_RESAMPLING_UP )
         {
-            p_input->pp_resamplers[0]->input.i_rate += 10; /* Hz */
+            p_input->pp_resamplers[0]->input.i_rate += 1; /* Hz */
         }
         else
         {
-            p_input->pp_resamplers[0]->input.i_rate -= 10; /* Hz */
+            p_input->pp_resamplers[0]->input.i_rate -= 1; /* Hz */
         }
 
         /* Check if everything is back to normal, in which case we can stop the
@@ -467,8 +467,10 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
               p_input->input.i_rate )
         {
             p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
-            msg_Warn( p_aout, "resampling stopped after "I64Fi" usec",
-                      mdate() - p_input->i_resamp_start_date );
+            msg_Warn( p_aout, "resampling stopped after "I64Fi" usec "
+                      "(drift: "I64Fi")",
+                      mdate() - p_input->i_resamp_start_date,
+                      p_buffer->start_date - start_date);
         }
         else if( abs( (int)(p_buffer->start_date - start_date) ) <
                  abs( p_input->i_resamp_start_drift ) / 2 )
