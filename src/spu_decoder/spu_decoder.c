@@ -71,6 +71,11 @@ spudec_thread_t * spudec_CreateThread( input_thread_t * p_input )
     vlc_cond_init( &p_spudec->fifo.data_wait );
     p_spudec->fifo.i_start = 0;
     p_spudec->fifo.i_end = 0;
+    /* Initialize the bit stream structure */
+    p_spudec->bit_stream.p_input = p_input;
+    p_spudec->bit_stream.p_decoder_fifo = &p_spudec->fifo;
+    p_spudec->bit_stream.fifo.buffer = 0;
+    p_spudec->bit_stream.fifo.i_available = 0;
 
     /* Spawn the spu decoder thread */
     if ( vlc_thread_create(&p_spudec->thread_id, "spu decoder",
@@ -95,13 +100,14 @@ spudec_thread_t * spudec_CreateThread( input_thread_t * p_input )
 void spudec_DestroyThread( spudec_thread_t *p_spudec )
 {
     intf_DbgMsg("spudec debug: requesting termination of spu decoder thread %p\n", p_spudec);
-//    fprintf(stderr, "spudec debug: requesting termination of spu decoder thread %p\n", p_spudec);
 
     /* Ask thread to kill itself */
     p_spudec->b_die = 1;
 
     /* Warn the decoder that we're quitting */
+    vlc_mutex_lock( &p_spudec->fifo.data_lock );
     vlc_cond_signal( &p_spudec->fifo.data_wait );
+    vlc_mutex_unlock( &p_spudec->fifo.data_lock );
 
     /* Waiting for the decoder thread to exit */
     /* Remove this as soon as the "status" flag is implemented */
@@ -124,24 +130,23 @@ static int InitThread( spudec_thread_t *p_spudec )
     /* Our first job is to initialize the bit stream structure with the
      * beginning of the input stream */
     vlc_mutex_lock( &p_spudec->fifo.data_lock );
-    while ( DECODER_FIFO_ISEMPTY(p_spudec->fifo) && !p_spudec->b_die )
+    while ( DECODER_FIFO_ISEMPTY(p_spudec->fifo) )
     {
+        if ( p_spudec->b_die )
+        {
+            vlc_mutex_unlock( &p_spudec->fifo.data_lock );
+            return( 1 );
+        }
         vlc_cond_wait( &p_spudec->fifo.data_wait, &p_spudec->fifo.data_lock );
     }
 
-    if( p_spudec->b_die )
-    {
-        vlc_mutex_unlock( &p_spudec->fifo.data_lock );
-        return( 0 );
-    }
-    
     p_spudec->bit_stream.p_ts = DECODER_FIFO_START( p_spudec->fifo )->p_first_ts;
     p_spudec->bit_stream.i_byte = p_spudec->bit_stream.p_ts->i_payload_start;
     vlc_mutex_unlock( &p_spudec->fifo.data_lock );
-			
+
     /* Mark thread as running and return */
-    intf_DbgMsg("spudec debug: InitThread(%p) succeeded\n", p_spudec);    
-    return( 0 );    
+    intf_DbgMsg( "spudec debug: InitThread(%p) succeeded\n", p_spudec );
+    return( 0 );
 }
 
 /*******************************************************************************
@@ -153,41 +158,45 @@ static int InitThread( spudec_thread_t *p_spudec )
 static void RunThread( spudec_thread_t *p_spudec )
 {
     intf_DbgMsg("spudec debug: running spu decoder thread (%p) (pid == %i)\n",
-                p_spudec, getpid());
+        p_spudec, getpid());
 
-    /* 
-     * Initialize thread and free configuration 
+    /*
+     * Initialize thread and free configuration
      */
     p_spudec->b_error = InitThread( p_spudec );
-    if( p_spudec->b_error )
-    {
-        return;
-    }
+
     p_spudec->b_run = 1;
 
     /*
      * Main loop - it is not executed if an error occured during
      * initialization
      */
+    vlc_mutex_lock( &p_spudec->fifo.data_lock );
     while( (!p_spudec->b_die) && (!p_spudec->b_error) )
     {
-
-
-//        fprintf(stderr, "I'm in the spu decoder main loop !\n");
-	sleep(1);
-    } 
+        /* Trash all received PES packets */
+        while( !DECODER_FIFO_ISEMPTY(p_spudec->fifo) )
+        {
+            input_NetlistFreePES( p_spudec->bit_stream.p_input, DECODER_FIFO_START(p_spudec->fifo) );
+            DECODER_FIFO_INCSTART( p_spudec->fifo );
+        }
+        /* Waiting for the input thread to put new PES packets in the fifo */
+        vlc_cond_wait( &p_spudec->fifo.data_wait, &p_spudec->fifo.data_lock );
+    }
+    vlc_mutex_unlock( &p_spudec->fifo.data_lock );
 
     /*
      * Error loop
      */
     if( p_spudec->b_error )
     {
-        ErrorThread( p_spudec );        
+        ErrorThread( p_spudec );
     }
+
+    p_spudec->b_run = 0;
 
     /* End of thread */
     EndThread( p_spudec );
-    p_spudec->b_run = 0;
 }
 
 /*******************************************************************************
@@ -199,11 +208,26 @@ static void RunThread( spudec_thread_t *p_spudec )
  *******************************************************************************/
 static void ErrorThread( spudec_thread_t *p_spudec )
 {
-    /* Wait until a `die' order */
+    /* We take the lock, because we are going to read/write the start/end
+     * indexes of the decoder fifo */
+    vlc_mutex_lock( &p_spudec->fifo.data_lock );
+
+    /* Wait until a `die' order is sent */
     while( !p_spudec->b_die )
     {
-        // foo();
+        /* Trash all received PES packets */
+        while( !DECODER_FIFO_ISEMPTY(p_spudec->fifo) )
+        {
+            input_NetlistFreePES( p_spudec->bit_stream.p_input, DECODER_FIFO_START(p_spudec->fifo) );
+            DECODER_FIFO_INCSTART( p_spudec->fifo );
+        }
+
+        /* Waiting for the input thread to put new PES packets in the fifo */
+        vlc_cond_wait( &p_spudec->fifo.data_wait, &p_spudec->fifo.data_lock );
     }
+
+    /* We can release the lock before leaving */
+    vlc_mutex_unlock( &p_spudec->fifo.data_lock );
 }
 
 /*******************************************************************************
@@ -214,6 +238,7 @@ static void ErrorThread( spudec_thread_t *p_spudec )
  *******************************************************************************/
 static void EndThread( spudec_thread_t *p_spudec )
 {
-    intf_DbgMsg("spudec debug: EndThread(%p)\n", p_spudec);
+    intf_DbgMsg( "spudec debug: destroying spu decoder thread %p\n", p_spudec );
+    free( p_spudec );
+    intf_DbgMsg( "spudec debug: spu decoder thread %p destroyed\n", p_spudec);
 }
-
