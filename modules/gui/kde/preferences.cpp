@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.9 2002/12/13 01:56:29 gbazin Exp $
+ * $Id: preferences.cpp,v 1.10 2002/12/17 09:54:32 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -52,7 +52,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
     KDialogBase ( Tabbed, caption, Ok| Apply|Cancel|User1, Ok, parent,
                   "vlc preferences", true, false, "Save")
 {
-    module_t *p_parser;
+    module_t *p_parser = NULL;
     vlc_list_t list;
     module_config_t *p_item;
     int i_index;
@@ -78,7 +78,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
 
     if( !p_parser || i_index == list.i_count )
     {
-        vlc_list_release( list );
+        vlc_list_release( &list );
         return;
     }
 
@@ -114,7 +114,6 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
         case CONFIG_ITEM_MODULE:
 
         {
-                
             vlc_mutex_lock( p_item->p_lock );
             KPluginsBox *item_frame =
                 new KPluginsBox( p_intf, p_item->psz_text,
@@ -155,7 +154,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
             new QLabel(p_item->psz_text, hb);
             /* add input box with default value */
             vlc_mutex_lock( p_item->p_lock );
-            
+
             KLineEdit *kl = new KLineEdit( p_item->psz_value ?
                                            p_item->psz_value : "", hb);
             QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
@@ -166,9 +165,8 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                     ci, SLOT(setValue( const QString &)));
             QToolTip::add(kl, p_item->psz_longtext);
             kl->setMaxLength(40);
-            
+
             vlc_mutex_unlock( p_item->p_lock );
-            
         }
         break;
 
@@ -179,7 +177,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
             new QLabel(p_item->psz_text, hb);
             /* add input box with default value */
             vlc_mutex_lock( p_item->p_lock );
-            
+
 //            KLineEdit *kl = new KLineEdit( p_item->psz_value ?
 //                                           p_item->psz_value : "", hb);
             QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
@@ -192,18 +190,17 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                                                       hb );
             connect(kfile, SIGNAL(textChanged ( const QString & )),
                     ci, SLOT(setValue( const QString &)));
-            QToolTip::add(kfile, p_item->psz_longtext);            
+            QToolTip::add(kfile, p_item->psz_longtext);
             vlc_mutex_unlock( p_item->p_lock );
-            
         }
         break;
-        
+
         case CONFIG_ITEM_INTEGER:
             /* add input box with default value */
         {
             QHBox *hb = new QHBox(category_table);
             hb->setSpacing(spacingHint());
-            new QLabel(p_item->psz_text, hb);                
+            new QLabel(p_item->psz_text, hb);
             QSpinBox *item_adj = new QSpinBox(-1, 99999, 1, hb);
             QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
                                               p_item->i_type,
@@ -214,12 +211,12 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
             QToolTip::add(item_adj, p_item->psz_longtext);
         }
         break;
-        
+
         case CONFIG_ITEM_FLOAT:
         {
             QHBox *hb = new QHBox(category_table);
             hb->setSpacing(spacingHint());
-            new QLabel(p_item->psz_text, hb);                
+            new QLabel(p_item->psz_text, hb);
             KDoubleNumInput *kdi= new KDoubleNumInput(p_item->f_value, hb);
             kdi->setRange(-1, 99999, 0.01, false);
             QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
@@ -228,11 +225,9 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
             connect(kdi, SIGNAL(valueChanged(double)),
                     ci, SLOT(setValue(double)));
             QToolTip::add(kdi, p_item->psz_longtext);
-                
         }
         break;
-                                                  
-                
+
         case CONFIG_ITEM_BOOL:
 
             /* add check button */
