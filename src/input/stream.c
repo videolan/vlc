@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: stream.c,v 1.1 2003/08/01 00:00:12 fenrir Exp $
+ * $Id: stream.c,v 1.2 2003/08/14 11:25:56 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -33,14 +33,21 @@
  *
  ****************************************************************************/
 
+/**
+ * Handle to a stream.
+ */
 struct stream_t
 {
     VLC_COMMON_MEMBERS
 
+    /** pointer to the input thread */
     input_thread_t *p_input;
 
 };
 
+/**
+ * Create a "stream_t *" from an "input_thread_t *".
+ */
 stream_t    *stream_OpenInput( input_thread_t *p_input )
 {
     stream_t *s;
@@ -54,11 +61,17 @@ stream_t    *stream_OpenInput( input_thread_t *p_input )
     return s;
 }
 
+/**
+ * Destroy a previously created "stream_t *" instance.
+ */
 void        stream_Release( stream_t *s )
 {
     vlc_object_destroy( s );
 }
 
+/**
+ * Similar to #stream_Control(), but takes a va_list and not variable arguments.
+ */
 int         stream_vaControl( stream_t *s, int i_query, va_list args )
 {
     vlc_bool_t *p_b;
@@ -161,6 +174,11 @@ int         stream_vaControl( stream_t *s, int i_query, va_list args )
     }
 }
 
+/**
+ * Use to control the "stream_t *". Look at #stream_query_e for
+ * possible "i_query" value and format arguments.  Return VLC_SUCCESS
+ * if ... succeed ;) and VLC_EGENERIC if failed or unimplemented
+ */
 int         stream_Control( stream_t *s, int i_query, ... )
 {
     va_list args;
@@ -173,6 +191,12 @@ int         stream_Control( stream_t *s, int i_query, ... )
     return i_result;
 }
 
+/**
+ * Try to read "i_read" bytes into a buffer pointed by "p_read".  If
+ * "p_read" is NULL then data are skipped instead of read.  The return
+ * value is the real numbers of bytes read/skip. If this value is less
+ * than i_read that means that it's the end of the stream.
+ */
 int         stream_Read( stream_t *s, void *p_data, int i_data )
 {
     uint8_t       *p = (uint8_t*)p_data;
@@ -219,12 +243,27 @@ int         stream_Read( stream_t *s, void *p_data, int i_data )
     return i_read;
 }
 
+/**
+ * Store in pp_peek a pointer to the next "i_peek" bytes in the stream
+ * The return value is the real numbers of valid bytes, if it's less
+ * or equal to 0, *pp_peek is invalid.  XXX: it's a pointer to
+ * internal buffer and it will be invalid as soons as other stream_*
+ * functions are called.  be 0 (then *pp_peek isn't valid).  XXX: due
+ * to input limitation, it could be less than i_peek without meaning
+ * the end of the stream (but only when you have i_peek >=
+ * p_input->i_bufsize)
+ */
 int         stream_Peek( stream_t *s, uint8_t **pp_peek, int i_data )
 {
     return input_Peek( s->p_input, pp_peek, i_data );
 }
 
-
+/**
+ * Read "i_size" bytes and store them in a pes_packet_t.  Only fields
+ * p_first, p_last, i_nb_data, and i_pes_size are set.  (Of course,
+ * you need to fill i_dts, i_pts, ... ) If only less than "i_size"
+ * bytes are available NULL is returned.
+ */
 pes_packet_t    *stream_PesPacket( stream_t *s, int i_data )
 {
     pes_packet_t  *p_pes;
