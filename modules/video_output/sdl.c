@@ -2,7 +2,7 @@
  * sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: sdl.c,v 1.3 2002/09/30 11:05:40 sam Exp $
+ * $Id: sdl.c,v 1.4 2002/10/17 16:48:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -307,6 +307,8 @@ static void Close ( vlc_object_t *p_this )
 static int Manage( vout_thread_t *p_vout )
 {
     SDL_Event event;                                            /* SDL event */
+    vlc_value_t val;
+    int i_width, i_height, i_x, i_y;
 
     /* Process events */
     while( SDL_PollEvent(&event) )
@@ -321,6 +323,20 @@ static int Manage( vout_thread_t *p_vout )
             break;
 
         case SDL_MOUSEMOTION:
+            vout_PlacePicture( p_vout, p_vout->p_sys->i_width,
+                               p_vout->p_sys->i_height,
+                               &i_x, &i_y, &i_width, &i_height );
+
+            val.i_int = ( event.motion.x - i_x )
+                         * p_vout->render.i_width / i_width;
+            var_Set( p_vout, "mouse-x", val );
+            val.i_int = ( event.motion.y - i_y )
+                         * p_vout->render.i_height / i_height;
+            var_Set( p_vout, "mouse-y", val );
+
+            val.b_bool = VLC_TRUE;
+            var_Set( p_vout, "mouse-moved", val );
+
             if( p_vout->p_sys->b_cursor &&
                 (abs(event.motion.xrel) > 2 || abs(event.motion.yrel) > 2) )
             {
@@ -339,6 +355,11 @@ static int Manage( vout_thread_t *p_vout )
         case SDL_MOUSEBUTTONUP:
             switch( event.button.button )
             {
+            case SDL_BUTTON_LEFT:
+                val.b_bool = VLC_TRUE;
+                var_Set( p_vout, "mouse-clicked", val );
+                break;
+
             case SDL_BUTTON_RIGHT:
                 {
                     intf_thread_t *p_intf;

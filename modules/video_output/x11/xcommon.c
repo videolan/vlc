@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.5 2002/10/17 16:03:18 sam Exp $
+ * $Id: xcommon.c,v 1.6 2002/10/17 16:48:41 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -480,6 +480,7 @@ static int ManageVideo( vout_thread_t *p_vout )
     XEvent      xevent;                                         /* X11 event */
     char        i_key;                                    /* ISO Latin-1 key */
     KeySym      x_key_symbol;
+    vlc_value_t val;
 
     /* Handle X11 events: ConfigureNotify events are parsed to know if the
      * output window's size changed, MapNotify and UnmapNotify to know if the
@@ -606,28 +607,9 @@ static int ManageVideo( vout_thread_t *p_vout )
         /* Mouse click */
         else if( xevent.type == ButtonPress )
         {
-            int i_width, i_height, i_x, i_y;
-            vlc_value_t val;
-
-            vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
-                               p_vout->p_sys->p_win->i_height,
-                               &i_x, &i_y, &i_width, &i_height );
-
-            val.i_int = ( xevent.xmotion.x - i_x )
-                         * p_vout->render.i_width / i_width;
-            var_Set( p_vout, "mouse-x", val );
-            val.i_int = ( xevent.xmotion.y - i_y )
-                         * p_vout->render.i_height / i_height;
-            var_Set( p_vout, "mouse-y", val );
-
-            val.b_bool = VLC_TRUE;
-            var_Set( p_vout, "mouse-clicked", val );
-
             switch( ((XButtonEvent *)&xevent)->button )
             {
                 case Button1:
-                    /* In this part we will eventually manage
-                     * clicks for DVD navigation for instance. */
 
                     /* detect double-clicks */
                     if( ( ((XButtonEvent *)&xevent)->time -
@@ -654,6 +636,11 @@ static int ManageVideo( vout_thread_t *p_vout )
         {
             switch( ((XButtonEvent *)&xevent)->button )
             {
+                case Button1:
+                    val.b_bool = VLC_TRUE;
+                    var_Set( p_vout, "mouse-clicked", val );
+                    break;
+
                 case Button3:
                     {
                         intf_thread_t *p_intf;
