@@ -555,7 +555,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         if ( [o_device isEqualToString:
                 [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
             o_device = @"";
-        o_mrl_string = [NSString stringWithFormat: @"vcd://%@@%i,%i",
+        o_mrl_string = [NSString stringWithFormat: @"vcd://%@@%i:%i",
                         o_device, i_title, i_chapter]; 
     }
     else if ( [o_type isEqualToString: _NS("Audio CD")] )
@@ -575,7 +575,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
             o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
                             o_device]; 
         else
-            o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i,%i",
+            o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i",
                             o_device, i_title, i_chapter]; 
     }
     else /* VIDEO_TS folder */
@@ -584,7 +584,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
             o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
                             o_videots]; 
         else
-            o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i,%i",
+            o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i",
                             o_videots, i_title, i_chapter]; 
     }
 
