@@ -5129,12 +5129,12 @@ if test x"$ac_cv_c_omit_frame_pointer" != x"no"; then
     CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
 fi
 
-echo $ac_n "checking if \$CC accepts -bundle -undefined error""... $ac_c" 1>&6
-echo "configure:5134: checking if \$CC accepts -bundle -undefined error" >&5
+echo $ac_n "checking if \$CC accepts -bundle -undefined error -lcc_dynamic""... $ac_c" 1>&6
+echo "configure:5134: checking if \$CC accepts -bundle -undefined error -lcc_dynamic" >&5
 if eval "test \"`echo '$''{'ac_cv_ld_darwin'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-  CFLAGS="${save_CFLAGS} -bundle -undefined error"
+  CFLAGS="${save_CFLAGS} -bundle -undefined error -lcc_dynamic"
      cat > conftest.$ac_ext <<EOF
 #line 5140 "configure"
 #include "confdefs.h"
@@ -5157,7 +5157,7 @@ fi
 
 echo "$ac_t""$ac_cv_ld_darwin" 1>&6
 if test x"$ac_cv_ld_darwin" != x"no"; then
-    PLDFLAGS="${PLDFLAGS} -bundle -undefined error"
+    PLDFLAGS="${PLDFLAGS} -bundle -undefined error -lcc_dynamic"
 fi
 
 echo $ac_n "checking if \$CC accepts -shared""... $ac_c" 1>&6
@@ -6390,7 +6390,7 @@ rm -f conftest*
   if test "x${SYS}" = "xdarwin"
   then
     PLUGINS="${PLUGINS} vcd"
-    LIB_VCD="${LIB_VCD} -framework IOKit" 
+    LIB_VCD="${LIB_VCD} -framework IOKit -framework CoreFoundation" 
   fi
 fi
 
