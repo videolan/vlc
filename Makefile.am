@@ -547,7 +547,7 @@ package-win32:
 	done
 
 	cd doc/faq ; $(MAKE) html ; cd ../.. ;
-	cp doc/faq/index.html tmp/faq.htm ;
+	cp doc/faq/index.html tmp/FAQ.htm ;
 
 # Create package 
 	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} tmp/nsi
