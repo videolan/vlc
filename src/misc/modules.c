@@ -500,6 +500,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
 
         /* Special case: test if we requested a particular intf plugin */
         if( !i_shortcuts && p_module->psz_program
+             && !strcmp( psz_capability, "interface" )
              && !strcmp( p_module->psz_program,
                          p_this->p_vlc->psz_object_name ) )
         {
