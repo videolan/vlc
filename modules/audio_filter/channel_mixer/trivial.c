@@ -2,7 +2,7 @@
  * trivial.c : trivial channel mixer plug-in (drops unwanted channels)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.8 2002/12/04 21:48:02 gbazin Exp $
+ * $Id: trivial.c,v 1.9 2003/01/14 14:51:02 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -113,7 +113,10 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     s32 * p_dest = (s32 *)p_out_buf->p_buffer;
     s32 * p_src = (s32 *)p_in_buf->p_buffer;
 
-    if ( p_filter->output.i_original_channels & AOUT_CHAN_DUALMONO )
+    if ( (p_filter->output.i_original_channels & AOUT_CHAN_PHYSMASK)
+                != (p_filter->input.i_original_channels & AOUT_CHAN_PHYSMASK)
+           && (p_filter->input.i_original_channels & AOUT_CHAN_PHYSMASK)
+                == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
     { 
         int i;
         /* This is a bit special. */

@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.18 2003/01/14 01:30:09 sigmunau Exp $
+ * $Id: rc.c,v 1.19 2003/01/14 14:51:02 massiot Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -435,8 +435,8 @@ static void Run( intf_thread_t *p_intf )
     }
 }
 
-static int Input(  vlc_object_t *p_this, char const *psz_cmd,
-                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int Input( vlc_object_t *p_this, char const *psz_cmd,
+                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t * p_input;
 
@@ -555,12 +555,12 @@ static int Input(  vlc_object_t *p_this, char const *psz_cmd,
         if( ( i_title > 0 ) && ( i_title <=
             p_input->stream.p_selected_area->i_part_nb ) )
         {
-          p_input->stream.p_selected_area->i_part = i_title;
-          vlc_mutex_unlock( &p_input->stream.stream_lock );
-          input_ChangeArea( p_input,
-                            (input_area_t*)p_input->stream.pp_areas[i_title] );
-          input_SetStatus( p_input, INPUT_STATUS_PLAY );
-          vlc_mutex_lock( &p_input->stream.stream_lock );
+            p_input->stream.p_selected_area->i_part = i_title;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            input_ChangeArea( p_input,
+                     (input_area_t*)p_input->stream.pp_areas[i_title] );
+            input_SetStatus( p_input, INPUT_STATUS_PLAY );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -568,6 +568,8 @@ static int Input(  vlc_object_t *p_this, char const *psz_cmd,
         return VLC_SUCCESS;
     }
 
+    /* Never reached. */
+    return VLC_EGENERIC;
 }
 
 static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
