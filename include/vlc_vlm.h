@@ -69,6 +69,7 @@ typedef struct
 
     /* only for vod */
     vod_media_t *vod_media;
+    char *psz_vod_output;
 
     /* actual input instances */
     int                  i_instance;

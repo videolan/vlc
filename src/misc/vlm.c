@@ -62,6 +62,8 @@ static void            vlm_ScheduleDelete( vlm_t *, vlm_schedule_t *, char *);
 static int             vlm_ScheduleSetup( vlm_schedule_t *, char *, char *);
 static vlm_schedule_t *vlm_ScheduleSearch( vlm_t *, char *);
 
+static int vlm_MediaVodControl( void *, vod_media_t *, char *, int, va_list );
+
 static int ExecuteCommand( vlm_t *, char *, vlm_message_t **);
 static int Manage( vlc_object_t* );
 
@@ -755,6 +757,9 @@ static vlm_media_t *vlm_MediaNew( vlm_t *vlm, char *psz_name, int i_type )
             free( media );
             return NULL;
         }
+
+        vlm->vod->p_data = vlm;
+        vlm->vod->pf_media_control = vlm_MediaVodControl;
     }
     if( i_type == VOD_TYPE ) vlm->i_vod++;
 
@@ -762,6 +767,7 @@ static vlm_media_t *vlm_MediaNew( vlm_t *vlm, char *psz_name, int i_type )
     media->b_enabled = VLC_FALSE;
     media->b_loop = VLC_FALSE;
     media->vod_media = NULL;
+    media->psz_vod_output = NULL;
     media->i_input = 0;
     media->input = NULL;
     media->psz_output = NULL;
@@ -960,11 +966,14 @@ static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_id,
             vlc_input_item_Init( VLC_OBJECT(vlm), &p_instance->item );
             p_instance->p_input = 0;
 
-            if( media->psz_output != NULL )
+            if( media->psz_output != NULL || media->psz_vod_output != NULL )
             {
                 p_instance->item.ppsz_options = malloc( sizeof( char* ) );
-                asprintf( &p_instance->item.ppsz_options[0], "sout=%s",
-                          media->psz_output );
+                asprintf( &p_instance->item.ppsz_options[0], "sout=%s%s%s",
+                          media->psz_output ? media->psz_output : "",
+                          (media->psz_output && media->psz_vod_output) ?
+                          ":" : media->psz_vod_output ? "#" : "",
+                          media->psz_vod_output ? media->psz_vod_output : "" );
                 p_instance->item.i_options = 1;
             }
 
@@ -1955,6 +1964,56 @@ static char *vlm_Save( vlm_t *vlm )
     }
 
     return save;
+}
+
+/*****************************************************************************
+ * Manage:
+ *****************************************************************************/
+static int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
+                                char *psz_id, int i_query, va_list args )
+{
+    vlm_t *vlm = (vlm_t *)p_private;
+    int i, i_ret = VLC_EGENERIC;
+
+    if( !p_private || !p_vod_media ) return VLC_EGENERIC;
+
+    vlc_mutex_lock( &vlm->lock );
+
+    /* Find media */
+    for( i = 0; i < vlm->i_media; i++ )
+    {
+        if( p_vod_media == vlm->media[i]->vod_media ) break;
+    }
+
+    if( i == vlm->i_media )
+    {
+        vlc_mutex_unlock( &vlm->lock );
+        return VLC_EGENERIC;
+    }
+
+    switch( i_query )
+    {
+    case VOD_MEDIA_PLAY:
+        vlm->media[i]->psz_vod_output = (char *)va_arg( args, char * );
+        i_ret = vlm_MediaControl( vlm, vlm->media[i], psz_id, "play", 0 );
+        vlm->media[i]->psz_vod_output = 0;
+        break;
+
+    case VOD_MEDIA_PAUSE:
+        i_ret = vlm_MediaControl( vlm, vlm->media[i], psz_id, "pause", 0 );
+        break;
+
+    case VOD_MEDIA_STOP:
+        i_ret = vlm_MediaControl( vlm, vlm->media[i], psz_id, "stop", 0 );
+        break;
+
+    default:
+        break;
+    }
+
+    vlc_mutex_unlock( &vlm->lock );
+
+    return i_ret;
 }
 
 /*****************************************************************************

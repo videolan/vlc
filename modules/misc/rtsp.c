@@ -577,6 +577,8 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
         case HTTPD_MSG_PLAY:
         {
             rtsp_client_t *rtsp;
+            char *psz_output, *ip;
+            int i, i_port_audio = 0, i_port_video = 0;
 
             /* for now only multicast so easy */
             answer->i_status = 200;
@@ -588,17 +590,34 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             msg_Dbg( p_vod, "HTTPD_MSG_PLAY for session: %s", psz_session );
 
             rtsp = RtspClientGet( p_media, psz_session );
-            if( rtsp && !rtsp->b_playing )
+            if( !rtsp || rtsp->b_playing ) break;
+            if( !(ip = httpd_ClientIP( cl )) ) break;
+
+            rtsp->b_playing = VLC_TRUE;
+
+            /* FIXME for != 1 video and 1 audio */
+            for( i = 0; i < p_media->i_es; i++ )
             {
-                rtsp->b_playing = VLC_TRUE;
-                /* TODO: do something useful */
+                if( p_media->es[i]->fmt.i_cat == AUDIO_ES )
+                    i_port_audio = p_media->es[i]->i_port;
+                if( p_media->es[i]->fmt.i_cat == VIDEO_ES )
+                    i_port_video = p_media->es[i]->i_port;
             }
+
+            asprintf( &psz_output, "rtp{dst=%s,port-video=%i,port-audio=%i}",
+                      ip, i_port_video, i_port_audio );
+            vod_MediaControl( p_vod, p_media, psz_session, VOD_MEDIA_PLAY,
+                              psz_output );
+            free( psz_output );
+            free( ip );
             break;
         }
 
         case HTTPD_MSG_PAUSE:
             psz_session = httpd_MsgGet( query, "Session" );
             msg_Dbg( p_vod, "HTTPD_MSG_PAUSE for session: %s", psz_session );
+
+            vod_MediaControl( p_vod, p_media, psz_session, VOD_MEDIA_PAUSE );
             /* TODO: do something useful */
             return VLC_EGENERIC;
 
@@ -616,11 +635,10 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             msg_Dbg( p_vod, "HTTPD_MSG_TEARDOWN for session: %s", psz_session);
 
             rtsp = RtspClientGet( p_media, psz_session );
-            if( rtsp )
-            {
-                /* TODO: do something useful */
-                RtspClientDel( p_media, rtsp );
-            }
+            if( !rtsp ) break;
+
+            vod_MediaControl( p_vod, p_media, psz_session, VOD_MEDIA_STOP );
+            RtspClientDel( p_media, rtsp );
             break;
         }
 
