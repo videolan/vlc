@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.42 2003/10/27 01:04:38 gbazin Exp $
+ * $Id: video.c,v 1.43 2003/10/28 14:17:52 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -257,6 +257,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     }
 
 #ifdef LIBAVCODEC_PP
+    p_sys->p_pp = NULL;
     if( E_(OpenPostproc)( p_dec, &p_sys->p_pp ) == VLC_SUCCESS )
     {
         /* for now we cannot do postproc and dr */
@@ -329,7 +330,6 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->i_late_frames = 0;
     p_sys->i_buffer = 1;
     p_sys->p_buffer = malloc( p_sys->i_buffer );
-    p_sys->p_pp = NULL;
 
     return VLC_SUCCESS;
 }
@@ -399,7 +399,8 @@ int E_(DecodeVideo)( decoder_t *p_dec, block_t *p_block )
     if( i_buffer + FF_INPUT_BUFFER_PADDING_SIZE > p_sys->i_buffer )
     {
         free( p_sys->p_buffer );
-        p_sys->p_buffer = malloc( i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
+        p_sys->i_buffer = i_buffer + FF_INPUT_BUFFER_PADDING_SIZE;
+        p_sys->p_buffer = malloc( p_sys->i_buffer );
     }
     p_buffer = p_sys->p_buffer;
     p_dec->p_vlc->pf_memcpy( p_buffer, p_block->p_buffer, p_block->i_buffer );
@@ -543,14 +544,15 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
 
     if( ffmpeg_PixFmtToChroma( p_sys->p_context->pix_fmt ) )
     {
-#ifdef LIBAVCODEC_PP
-        if( p_sys->p_pp )
-            E_(PostprocPict)( p_dec, p_sys->p_pp, p_pic, p_ff_pic );
-#else
         int i_plane, i_size, i_line;
         uint8_t *p_dst, *p_src;
         int i_src_stride, i_dst_stride;
 
+#ifdef LIBAVCODEC_PP
+        if( p_sys->p_pp )
+            E_(PostprocPict)( p_dec, p_sys->p_pp, p_pic, p_ff_pic );
+        else
+#endif
         for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
             p_src  = p_ff_pic->data[i_plane];
@@ -566,7 +568,6 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
                 p_dst += i_dst_stride;
             }
         }
-#endif
     }
     else
     {
