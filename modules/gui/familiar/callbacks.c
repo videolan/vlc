@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.9 2002/09/04 21:18:29 jpsaman Exp $
+ * $Id: callbacks.c,v 1.10 2002/09/30 11:05:38 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -222,8 +222,8 @@ static char* get_file_perm(const char *path)
  * Main interface callbacks
  */
 
-gboolean GtkExit( GtkWidget       *widget,
-                  gpointer         user_data )
+gboolean FamiliarExit( GtkWidget       *widget,
+                       gpointer         user_data )
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
 
@@ -452,7 +452,7 @@ on_familiar_delete_event               (GtkWidget       *widget,
                                         GdkEvent        *event,
                                         gpointer         user_data)
 {
-    GtkExit( GTK_WIDGET( widget ), user_data );
+    FamiliarExit( GTK_WIDGET( widget ), user_data );
     return TRUE;
 }
 

@@ -2,7 +2,7 @@
  * vlcplugin.h: a VideoLAN plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.h,v 1.3 2002/09/17 08:18:24 sam Exp $
+ * $Id: vlcplugin.h,v 1.4 2002/09/30 11:05:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -32,13 +32,9 @@ public:
 
     void     SetInstance( NPP );
     NPP      GetInstance();
+    VlcIntf* GetPeer();
 
     void     SetFileName( const char* );
-    void     Play();
-    void     Pause();
-    void     Stop();
-
-    VlcIntf* getScriptable();
 
     /* Window settings */
     NPWindow* fWindow;
@@ -53,6 +49,7 @@ public:
     /* vlc data members */
     vlc_t *  p_vlc;
     int      b_stream;
+    int      b_autoplay;
     char *   psz_target;
 
 private:

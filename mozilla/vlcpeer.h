@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vlcpeer.h: a VideoLAN plugin for Mozilla
+ * vlcpeer.h: scriptable peer descriptor
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcpeer.h,v 1.1 2002/09/17 08:18:24 sam Exp $
+ * $Id: vlcpeer.h,v 1.2 2002/09/30 11:05:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,8 +24,6 @@
 #include "vlcintf.h"
 #include "classinfo.h"
 
-#include "nsMemory.h"
-
 class VlcPlugin;
 
 class VlcPeer : public VlcIntf, public ClassInfo
@@ -34,13 +32,11 @@ public:
     NS_DECL_ISUPPORTS
     NS_DECL_VLCINTF
 
-    VlcPeer();
-    VlcPeer( VlcPlugin * );
-
-    void Disable() { p_plugin = NULL; }
-          
+             VlcPeer();
+             VlcPeer( VlcPlugin * );
     virtual ~VlcPeer();
-    /* additional members */
+
+    void     Disable();
 
 private:
     VlcPlugin * p_plugin;

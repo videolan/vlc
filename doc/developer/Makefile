@@ -25,12 +25,12 @@ all: manual
 
 manual: manual.txt manual.ps manual.html
 
-manual.tex: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
+manual.tex: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml hacking.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
 	$(JADE) -t tex -V %section-autolabel% -d $(PRINT_SS) $(XML_DECL) manual.xml
 	perl -i.bak -pe 's/\000//g' $@ && rm $*.tex.bak
 # No it's not a joke
 
-manual.html: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
+manual.html: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml hacking.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
 	$(JADE) -t sgml -V %section-autolabel% -V nochunks \
          -d $(HTML_SS) $(XML_DECL) manual.xml > $@
 
@@ -42,7 +42,7 @@ manual.dvi: manual.tex modules.eps ps.eps stream.eps ts.eps
 manual.ps: manual.dvi
 	dvips -f $< > $@
 
-manual.txt: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
+manual.txt: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml hacking.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
 	$(JADE) -t sgml -V nochunks -d $(HTML_SS) $(XML_DECL) manual.xml > dump.html
 	lynx -force_html -dump dump.html > $@
 	-rm -f dump.html

@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.2 2002/08/08 22:28:22 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.3 2002/09/30 11:05:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -50,7 +50,7 @@
 /*****************************************************************************
  * Useful function to retrieve p_intf
  ****************************************************************************/
-void * __GtkGetIntf( GtkWidget * widget )
+void * E_(__GtkGetIntf)( GtkWidget * widget )
 {
     void *p_data;
 
@@ -89,7 +89,13 @@ void * __GtkGetIntf( GtkWidget * widget )
  * Main interface callbacks
  */
 
-gboolean GtkExit( GtkWidget       *widget,
+#ifdef MODULE_NAME_IS_gtk
+#   define GTKEXIT GtkExit
+#else
+#   define GTKEXIT GnomeExit
+#endif
+
+gboolean GTKEXIT( GtkWidget       *widget,
                   gpointer         user_data )
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
@@ -112,7 +118,7 @@ gboolean GtkWindowDelete( GtkWidget       *widget,
                           GdkEvent        *event,
                           gpointer         user_data )
 {
-    GtkExit( GTK_WIDGET( widget ), user_data );
+    GTKEXIT( GTK_WIDGET( widget ), user_data );
 
     return TRUE;
 }

@@ -2,7 +2,7 @@
  * display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: display.c,v 1.3 2002/08/20 21:10:48 sam Exp $
+ * $Id: display.c,v 1.4 2002/09/30 11:05:38 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -54,7 +54,7 @@
  * the stream. It is called whenever the slider changes its value.
  * The lock has to be taken before you call the function.
  *****************************************************************************/
-void GtkDisplayDate( GtkAdjustment *p_adj )
+void E_(GtkDisplayDate)( GtkAdjustment *p_adj )
 {
     intf_thread_t *p_intf;
 
@@ -74,12 +74,12 @@ void GtkDisplayDate( GtkAdjustment *p_adj )
 
 
 /*****************************************************************************
- * GtkModeManage: actualise the aspect of the interface whenever the input
+ * GtkModeManage: actualize the aspect of the interface whenever the input
  *                changes.
  *****************************************************************************
  * The lock has to be taken before you call the function.
  *****************************************************************************/
-gint GtkModeManage( intf_thread_t * p_intf )
+gint E_(GtkModeManage)( intf_thread_t * p_intf )
 {
     GtkWidget *     p_dvd_box;
     GtkWidget *     p_file_box;
@@ -235,7 +235,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
  * GtkHideTooltips: show or hide the tooltips depending on the configuration
  *                  option gnome-tooltips
  *****************************************************************************/
-void GtkHideTooltips( vlc_object_t *p_this )
+void E_(GtkHideTooltips)( vlc_object_t *p_this )
 {
     intf_thread_t **pp_intf;
     vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_INTF,

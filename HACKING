@@ -1,12 +1,17 @@
-$Id: HACKING,v 1.4 2002/08/27 14:15:24 sam Exp $
+$Id: HACKING,v 1.5 2002/09/30 11:05:32 sam Exp $
 
 Hacking vlc
 ===========
 
+Requirements
+------------
+
 You will need the following tools if you plan to use the CVS version of vlc:
 
  - autoconf version 2.50 or later
- - automake version 1.5 (but 1.6 is recommended)
+
+ - automake version 1.5 (but 1.6 or later is recommended)
+
  - gettext version 0.10.40 (but 0.11.3 or later is recommended)
 
 After retrieving the CVS tree, you need to run the bootstrap script to
@@ -17,4 +22,38 @@ simply not available for the operating system you plan to develop on,
 you can check out a CVS tree on an OS that provides these tools (such
 as a recent Linux distribution), run bootstrap, and then copy the whole
 tree to your retarded OS.
+
+
+The bootstrap sequence
+----------------------
+
+The bootstrap script does the following actions:
+
+ - browse the modules/ directory for all available modules. A module "foo"
+   exists if there is a Modules.am file in the modules/ directory which
+   defines SOURCES_foo.
+
+ - create a top-level Modules.am file (which will be included by Makefile.am)
+   which contains additional build rules for modules, and includes all the
+   Modules.am files that were found in modules/
+
+ - create a top-level configure.ac file from configure.ac.in, generating
+   the AC_SUBST and AM_CONDITIONAL rules that will be needed.
+
+ - run autopoint (previously gettextize) to create an intl/ directory,
+   needed when libgettext is not available.
+
+ - run the usual aclocal, autoheader, automake and autoconf, which create
+   the various Makefile.in files from the corresponding Makefile.am and the
+   configure script from configure.ac.
+
+ - fix a few files in the vlc repository that may have been altered.
+
+
+How to add a module
+-------------------
+
+To add a module to the repository, just add its sources to a Modules.am
+file. If you create a new Modules.am, do not forget to add a corresponding
+line to modules/Makefile.am.
 

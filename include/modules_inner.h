@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.31 2002/08/21 17:31:58 sam Exp $
+ * $Id: modules_inner.h,v 1.32 2002/09/30 11:05:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,7 +26,6 @@
  *****************************************************************************/
 #if !defined( __PLUGIN__ ) && !defined( __BUILTIN__ )
 #   define MODULE_NAME main
-#   define MODULE_PATH main
 #endif
 
 /*****************************************************************************
@@ -54,8 +53,8 @@
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
 #if defined( __BUILTIN__ )
-#   define E_( function )          CONCATENATE( function, MODULE_PATH )
-#   define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_PATH )
+#   define E_( function )          CONCATENATE( function, MODULE_NAME )
+#   define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_NAME )
 #   define DECLARE_SYMBOLS         struct _u_n_u_s_e_d_
 #   define STORE_SYMBOLS           struct _u_n_u_s_e_d_
 #elif defined( __PLUGIN__ )
@@ -162,37 +161,4 @@
 
 #define linked_with_a_crap_library_which_uses_atexit( )                       \
     p_module->b_unloadable = VLC_FALSE
-
-/*
- * module_activate: this function is called before functions can be accessed,
- * we do allocation tasks here, and maybe additional stuff such as large
- * table allocation. Once ActivateModule is called we are almost sure the
- * module will be used.
- */
-#define module_activate( prototype )                                          \
-    __module_activate( prototype );                                           \
-    int __VLC_SYMBOL( module_activate ) ( module_t *p_module )                \
-    {                                                                         \
-        STORE_SYMBOLS;                                                        \
-        config_SetCallbacks( p_module->p_config, p_config );                  \
-        return __module_activate( p_module );                                 \
-    }                                                                         \
-                                                                              \
-    static int __module_activate( prototype )
-
-/*
- * DeactivateModule: this function is called after we are finished with the
- * module. Everything that has been done in ActivateModule needs to be undone
- * here.
- */
-#define module_deactivate( prototype )                                        \
-    __module_deactivate( prototype );                                         \
-    int __VLC_SYMBOL( module_deactivate )( module_t *p_module )               \
-    {                                                                         \
-        int i_ret = __module_deactivate( p_module );                          \
-        config_UnsetCallbacks( p_module->p_config );                          \
-        return i_ret;                                                         \
-    }                                                                         \
-                                                                              \
-    static int __module_deactivate( prototype )
 

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.92 2002/08/21 17:31:58 sam Exp $
+ * $Id: modules.c,v 1.93 2002/09/30 11:05:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -588,7 +588,6 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
                                int i_maxdepth )
 {
-#define PLUGIN_EXT ".so"
     int    i_dirlen;
     DIR *  dir;
     char * psz_file;
@@ -613,13 +612,15 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
     while( (file = readdir( dir )) )
     {
         struct stat statbuf;
-        int i_len = strlen( file->d_name );
+        int i_len;
 
         /* Skip ".", ".." and anything starting with "." */
         if( !*file->d_name || *file->d_name == '.' )
         {
             continue;
         }
+
+        i_len = strlen( file->d_name );
 
         psz_file = malloc( i_dirlen + 1 /* / */ + i_len + 1 /* \0 */ );
         sprintf( psz_file, "%s/%s", psz_dir, file->d_name );
@@ -628,10 +629,10 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
         {
             AllocatePluginDir( p_this, psz_file, i_maxdepth - 1 );
         }
-        else if( i_len > strlen( PLUGIN_EXT )
-                  /* We only load files ending with ".so" */
-                  && !strncmp( file->d_name + i_len - strlen( PLUGIN_EXT ),
-                               PLUGIN_EXT, strlen( PLUGIN_EXT ) ) )
+        else if( i_len > strlen( LIBEXT )
+                  /* We only load files ending with LIBEXT */
+                  && !strncmp( file->d_name + i_len - strlen( LIBEXT ),
+                               LIBEXT, strlen( LIBEXT ) ) )
         {
             AllocatePluginFile( p_this, psz_file );
         }

@@ -2,7 +2,7 @@
  * vlcplugin.cpp: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.cpp,v 1.1 2002/09/17 08:18:24 sam Exp $
+ * $Id: vlcplugin.cpp,v 1.2 2002/09/30 11:05:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,15 +24,15 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <npapi.h>
-
 #include <vlc/vlc.h>
+
+#include <npapi.h>
 
 #include "vlcpeer.h"
 #include "vlcplugin.h"
 
 /*****************************************************************************
- * VlcPlugin methods
+ * VlcPlugin constructor and destructor
  *****************************************************************************/
 VlcPlugin::VlcPlugin( NPP instance )
 {
@@ -51,6 +51,9 @@ VlcPlugin::~VlcPlugin()
 }
 
 
+/*****************************************************************************
+ * VlcPlugin methods
+ *****************************************************************************/
 void VlcPlugin::SetInstance( NPP instance )
 {
     p_instance = instance;
@@ -63,9 +66,25 @@ NPP VlcPlugin::GetInstance()
 }
 
 
+VlcIntf* VlcPlugin::GetPeer()
+{
+    if( !p_peer )
+    {
+        p_peer = new VlcPeer( this );
+        if( p_peer == NULL ) 
+        {
+            return NULL;
+        }
+        
+        NS_ADDREF( p_peer );
+    }
+
+    NS_ADDREF( p_peer );
+    return p_peer;
+}
+
 void VlcPlugin::SetFileName(const char * filename)
 {
-fprintf(stderr, "VlcPlugin::SetFilename %s\n", filename);
 #if 0
     FILE * fh;
     fh = fopen(filename, "rb");
@@ -95,37 +114,5 @@ fprintf(stderr, "VlcPlugin::SetFilename %s\n", filename);
     fprintf(stderr, "File loaded\n");
 #endif
     return; 
-}
-
-void VlcPlugin::Play()
-{
-fprintf(stderr, "VlcPlugin::Play\n");
-}
-
-void VlcPlugin::Pause()
-{
-fprintf(stderr, "VlcPlugin::Pause\n");
-}
-
-void VlcPlugin::Stop()
-{
-fprintf(stderr, "VlcPlugin::Stop\n");
-}
-
-VlcIntf* VlcPlugin::getScriptable()
-{
-    if( !p_peer )
-    {
-        p_peer = new VlcPeer( this );
-        if( p_peer == NULL ) 
-        {
-            return NULL;
-        }
-        
-        NS_ADDREF( p_peer );
-    }
-    // a getter should addref for its caller.
-    NS_ADDREF( p_peer );
-    return p_peer;
 }
 

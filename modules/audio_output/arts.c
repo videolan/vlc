@@ -2,7 +2,7 @@
  * arts.c : aRts module
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: arts.c,v 1.11 2002/09/18 21:21:23 massiot Exp $
+ * $Id: arts.c,v 1.12 2002/09/30 11:05:35 sam Exp $
  *
  * Authors: Emmanuel Blindauer <manu@agat.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -106,7 +106,7 @@ static int Open( vlc_object_t *p_this )
         arts_close_stream( p_sys->stream );
     }
 
-    /* open a socket for playing a stream */
+    /* Open a socket for playing a stream, set format to 16 bits */
     p_sys->stream = arts_play_stream( p_aout->output.output.i_rate, 16,
                                       p_aout->output.output.i_channels, "vlc" );
     if( p_sys->stream == NULL )
@@ -116,16 +116,22 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Try not to bufferize more than 200 ms */
-    arts_stream_set( p_sys->stream, ARTS_P_BUFFER_TIME, 200 );
+    arts_stream_set( p_sys->stream, ARTS_P_BUFFER_TIME, 50 );
 
     /* Estimate latency with a half full buffer */
     p_sys->latency = (mtime_t)1000
-       * (mtime_t)( arts_stream_get( p_sys->stream, ARTS_P_SERVER_LATENCY )
-                  + arts_stream_get( p_sys->stream, ARTS_P_BUFFER_TIME ) / 2 );
+       * (mtime_t)arts_stream_get( p_sys->stream, ARTS_P_SERVER_LATENCY );
     p_sys->i_size = arts_stream_get( p_sys->stream, ARTS_P_PACKET_SIZE );
 
+    msg_Dbg( p_aout, "aRts initialized, latency %i000, %i packets of size %i\n",
+                     arts_stream_get( p_sys->stream, ARTS_P_SERVER_LATENCY ),
+                     arts_stream_get( p_sys->stream, ARTS_P_PACKET_COUNT ),
+                     arts_stream_get( p_sys->stream, ARTS_P_PACKET_SIZE ) );
+
     p_aout->output.output.i_format = AOUT_FMT_S16_NE;
-    p_aout->output.i_nb_samples = p_sys->i_size;
+    p_aout->output.i_nb_samples = p_sys->i_size
+                                   / sizeof(u16)
+                                   / p_aout->output.output.i_channels;
 
     /* Create aRts thread and wait for its readiness. */
     if( vlc_thread_create( p_aout, "aout", aRtsThread,
@@ -173,6 +179,7 @@ static void Close( vlc_object_t *p_this )
 static int aRtsThread( aout_instance_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
+mtime_t calldate = mdate();
 
     while ( !p_aout->b_die )
     {
@@ -180,25 +187,37 @@ static int aRtsThread( aout_instance_t * p_aout )
         int i_tmp, i_size;
         byte_t * p_bytes;
 
+fprintf(stderr, "can write %i\n", arts_stream_get( p_sys->stream, ARTS_P_BUFFER_SPACE ) );
+while( arts_stream_get( p_sys->stream, ARTS_P_BUFFER_SPACE ) < 16384*3/2 )
+{
+fprintf(stderr, "sleep\n");
+    msleep( 10000 );
+}
+fprintf(stderr, "after sleep: can write %i\n", arts_stream_get( p_sys->stream, ARTS_P_BUFFER_SPACE ) );
+
         /* Get the presentation date of the next write() operation. It
          * is equal to the current date + latency */
-        p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency,
-                                                  VLC_FALSE );
+        p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency / 4,
+                                                  VLC_TRUE );
 
         if ( p_buffer != NULL )
         {
+fprintf(stderr, "buffer duration %lld, bytes %i\n", p_buffer->end_date - p_buffer->start_date, p_buffer->i_nb_bytes);
             p_bytes = p_buffer->p_buffer;
             i_size = p_buffer->i_nb_bytes;
         }
         else
         {
-            i_size = p_sys->i_size / p_aout->output.output.i_frame_length
-                      * p_aout->output.output.i_bytes_per_frame;
-            p_bytes = alloca( i_size );
+            i_size = p_sys->i_size;
+            p_bytes = malloc( i_size );
             memset( p_bytes, 0, i_size );
         }
 
+fprintf(stderr, "WRITING %i bytes\n", i_size);
         i_tmp = arts_write( p_sys->stream, p_bytes, i_size );
+fprintf(stderr, "mdate: %lld\n", mdate() - calldate);
+calldate = mdate();
+fprintf(stderr, "can write %i\n", arts_stream_get( p_sys->stream, ARTS_P_BUFFER_SPACE ) );
 
         if( i_tmp < 0 )
         {
@@ -208,6 +227,10 @@ static int aRtsThread( aout_instance_t * p_aout )
         if ( p_buffer != NULL )
         {
             aout_BufferFree( p_buffer );
+        }
+        else
+        {
+            free( p_bytes );
         }
     }
 

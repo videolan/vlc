@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.1 2002/08/04 17:23:41 sam Exp $
+ * $Id: file.c,v 1.2 2002/09/30 11:05:34 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -145,6 +145,7 @@ static int Open( vlc_object_t *p_this )
 vlc_module_begin();
     set_description( _("Standard filesystem file reading") );
     set_capability( "access", 50 );
+    add_shortcut( "file" );
     add_shortcut( "stream" );
     set_callbacks( Open, __input_FDClose );
 vlc_module_end();

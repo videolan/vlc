@@ -1,3 +1,5 @@
+Makefile
+Makefile.in
 tmp
 vlc
 vlc-plugin-*

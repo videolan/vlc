@@ -241,3 +241,83 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<Dnumgis> what does vout_CreatePicture do?
+<sam> asks for a picture to the video output thread
+<Dnumgis> so it just returns the next picture to be displayed?
+<sam> not necessarily the next
+<sam> it's your duty to set its display date, afterwards
+<Meuuh> I'd even say, it is your destiny, Luke, to set its display date
+
+  -- #videolan
+%
+<hh> When the first picture of the coded frame is a I-field picture, then the
+     second picture of the frame shall be either an I-field picture or a
+     P-field picture. If the second picture is a P-field picture then certain
+     restrictions apply, see 7.6.3.5.
+<Meuuh> yeah
+<Dnumgis> Meuuh: not sure if you sound more like an mpeg guru or a blues
+          artist
+<Meuuh> like a cow, maybe ?
+<Dnumgis> or something
+
+  -- #videolan
+%
+<deepmind> a52old & wi11y?
+
+  -- #videolan
+%
+<sam> bah oui tu peux faire de la doc sur n'importe quoi hein
+<Meuuh> je fais bien une doc développeur vlc
+<Meuuh> comme si y'avait des développeurs vlc à part sam et moi !
+
+  -- #videolan
+%
+<deepmind> pis comme ca je me tiens au courant de où va vlc :)
+<Meuuh> dans le mur ?
+<Meuuh> y'a sam qui rajoute du charbon, moi je m'agrippe au frein
+
+  -- #videolan
+%
+<tooney> $grut Dnumgis 
+<gally> Dnumgis: tiår ditt og nødhavn klikk ?
+<Dnumgis> gally: og hva skulle det bety?
+<Dnumgis> gally: what was that supposed to mean?
+
+  -- #videolan
+%
+<sam> $grut
+<gally> vekt yrer gøten øke utgjøre kan 
+<Dnumgis> sam: you're insane
+<Dnumgis> someone have too much spare time
+<sam> definitely
+<Dnumgis> maybe they should do something useful instead
+<gally> grunt grunt snort grumpf grumpf gra grunt uiigrumpf uiihiiii snort !!
+
+  -- #videolan
+%
+<Meuuh> mais putain de bordel de chiottes de bite à cul de merde de sa race
+<Dnumgis> I think it may be a good thing that i don't understand that
+          sentence fully
+
+  -- #videolan
+%
+<Dnumgis> I just burned an amb duron trying to compile vlc :(
+<Meuuh> is it my fault ?
+<Dnumgis> no
+<Dnumgis> unless you wrote blocks.c :)
+<Meuuh> actually, I did...
+
+  -- #videolan
+%
+<Meuuh> pleasehelp : are you trying with a dolby trailer ?
+<pleasehelp> no... using windows
+
+  -- #videolan
+%
+<henrisson> hal_3k: don't worry, I'll soon be replaced by a lib
+<hal_3k> henri: you'll be replaced by a lib? does the lib know how to
+         program? ;)
+<Meuuh> do you think henri knows ? :p
+
+  -- #videolan
+%

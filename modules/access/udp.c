@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: udp.c,v 1.3 2002/09/30 11:05:34 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -53,6 +53,7 @@ static int  Open       ( vlc_object_t * );
 vlc_module_begin();
     set_description( _("raw UDP access module") );
     set_capability( "access", 0 );
+    add_shortcut( "udp" );
     add_shortcut( "udpstream" );
     add_shortcut( "udp4" );
     add_shortcut( "udp6" );

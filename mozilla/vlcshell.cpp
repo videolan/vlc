@@ -2,7 +2,7 @@
  * vlcshell.c: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.1 2002/09/17 08:18:24 sam Exp $
+ * $Id: vlcshell.cpp,v 1.2 2002/09/30 11:05:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,29 +27,33 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Mozilla stuff */
-#include <plugin/npapi.h>
-
-/* X11 stuff */
-#include <X11/Xlib.h>
-#include <X11/Intrinsic.h>
-#include <X11/StringDefs.h>
-
 /* vlc stuff */
 #include <vlc/vlc.h>
 #include "config.h"
 
+/* Mozilla stuff */
+#include <npapi.h>
+
+#ifdef WIN32
+
+#else
+    /* X11 stuff */
+#   include <X11/Xlib.h>
+#   include <X11/Intrinsic.h>
+#   include <X11/StringDefs.h>
+#endif
+
 #include "vlcpeer.h"
 #include "vlcplugin.h"
 
-/******************************************************************************
+/*****************************************************************************
  * Unix-only declarations
- ******************************************************************************/
+******************************************************************************/
 #ifndef WIN32
 static void Redraw( Widget w, XtPointer closure, XEvent *event );
 #endif
 
-/******************************************************************************
+/*****************************************************************************
  * Windows-only declarations
  *****************************************************************************/
 #ifdef WIN32
@@ -106,7 +110,7 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
     switch( variable )
     {
         case NPPVpluginScriptableInstance:
-            *(nsISupports**)value = p_plugin->getScriptable();
+            *(nsISupports**)value = p_plugin->GetPeer();
             if( *(nsISupports**)value == NULL )
             {
                 return NPERR_OUT_OF_MEMORY_ERROR;
@@ -158,11 +162,11 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         "vlc"
         /*, "--plugin-path", "/home/sam/videolan/vlc_MAIN/plugins"*/
         , "--vout", "xvideo,x11,dummy"
-        /*, "--aout", "none"*/
+        , "--aout", "dsp"
         , "--intf", "dummy"
         /*, "--noaudio"*/
-        , "-q"
-        /*, "-v"*/
+        /*, "-q"*/
+        , "-v"
     };
 
     if( instance == NULL )
@@ -203,33 +207,36 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
 
     vlc_set_r( p_plugin->p_vlc, "vout", "xvideo,x11,dummy" );
     vlc_set_r( p_plugin->p_vlc, "intf", "dummy" );
-    vlc_set_r( p_plugin->p_vlc, "audio", "0" );
-
-    i_ret = vlc_run_r( p_plugin->p_vlc );
-    if( i_ret )
-    {
-        vlc_destroy_r( p_plugin->p_vlc );
-        p_plugin->p_vlc = NULL;
-        delete p_plugin;
-        p_plugin = NULL;
-        return NPERR_GENERIC_ERROR;
-    }
 
     p_plugin->b_stream = 0;
+    p_plugin->b_autoplay = 0;
     p_plugin->psz_target = NULL;
 
     for( i = 0; i < argc ; i++ )
     {
-        fprintf(stderr, "arg %i: '%s' = '%s'\n", i, argn[i], argv[i]);
-        if( !strcmp(argn[i],"target") )
+        if( !strcmp( argn[i], "target" ) )
         {
-            fprintf(stderr, "target specified: %s\n", argv[i]);
-            p_plugin->psz_target = strdup( argv[i] );
+            p_plugin->psz_target = argv[i];
         }
-        else
+        else if( !strcmp( argn[i], "autoplay" ) )
         {
-            /*vlc_set_r( p_plugin->psz_target, argn[i], argv[i] );*/
+            if( !strcmp( argv[i], "yes" ) )
+            {
+                p_plugin->b_autoplay = 1;
+            }
         }
+        else if( !strcmp( argn[i], "loop" ) )
+        {
+            if( !strcmp( argv[i], "yes" ) )
+            {
+                vlc_set_r( p_plugin->p_vlc, "loop", "1" );
+            }
+        }
+    }
+
+    if( p_plugin->psz_target )
+    {
+        p_plugin->psz_target = strdup( p_plugin->psz_target );
     }
 
     return NPERR_NO_ERROR;
@@ -248,6 +255,7 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
     {
         if( p_plugin->p_vlc != NULL )
         {
+            vlc_stop_r( p_plugin->p_vlc );
             vlc_destroy_r( p_plugin->p_vlc );
             p_plugin->p_vlc = NULL;
         }
@@ -308,13 +316,18 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 #if 1
     if( !p_plugin->b_stream )
     {
-        p_plugin->b_stream = 1;
+        int i_mode = PLAYLIST_APPEND;
+
+        if( p_plugin->b_autoplay )
+        {
+            i_mode |= PLAYLIST_GO;
+        }
+
         if( p_plugin->psz_target )
         {
             vlc_add_target_r( p_plugin->p_vlc, p_plugin->psz_target,
-                              PLAYLIST_APPEND, PLAYLIST_END );
-            vlc_add_target_r( p_plugin->p_vlc, "vlc:loop",
-                              PLAYLIST_APPEND, PLAYLIST_END );
+                              i_mode, PLAYLIST_END );
+            p_plugin->b_stream = 1;
         }
     }
 #endif
@@ -330,7 +343,9 @@ NPError NPP_NewStream( NPP instance, NPMIMEType type, NPStream *stream,
         return NPERR_INVALID_INSTANCE_ERROR;
     }
 
+#if 0
     VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
+#endif
 
     fprintf(stderr, "NPP_NewStream - FILE mode !!\n");
 
@@ -379,7 +394,7 @@ int32 NPP_Write( NPP instance, NPStream *stream, int32 offset,
 {
     fprintf(stderr, "NPP_Write %i\n", len);
 
-    if (instance != NULL)
+    if( instance != NULL )
     {
         /*VlcPlugin* p_plugin = (VlcPlugin*) instance->pdata;*/
     }
@@ -395,8 +410,6 @@ NPError NPP_DestroyStream( NPP instance, NPStream *stream, NPError reason )
         return NPERR_INVALID_INSTANCE_ERROR;
     }
 
-    VlcPlugin* p_plugin = (VlcPlugin*) instance->pdata;
-
     return NPERR_NO_ERROR;
 }
 
@@ -411,9 +424,8 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
     VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
 
     fprintf(stderr, "NPP_StreamAsFile\n");
-    vlc_add_target_r( p_plugin->p_vlc, fname, PLAYLIST_APPEND, PLAYLIST_END );
-    vlc_add_target_r( p_plugin->p_vlc, "vlc:loop", 
-                      PLAYLIST_APPEND, PLAYLIST_END );
+    vlc_add_target_r( p_plugin->p_vlc, fname,
+                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 }
 
 #if 0
@@ -440,15 +452,19 @@ void NPP_URLNotify( NPP instance, const char* url,
 
 void NPP_Print( NPP instance, NPPrint* printInfo )
 {
-    if(printInfo == NULL)
+    if( printInfo == NULL )
+    {
         return;
+    }
 
-    if (instance != NULL) {
-    /***** Insert NPP_Print code here *****\
+    if( instance != NULL )
+    {
+        /***** Insert NPP_Print code here *****\
         PluginInstance* p_plugin = (PluginInstance*) instance->pdata;
-    \**************************************/
+        \**************************************/
 
-        if (printInfo->mode == NP_FULL) {
+        if( printInfo->mode == NP_FULL )
+        {
             /*
              * PLUGIN DEVELOPERS:
              *  If your plugin would like to take over
@@ -466,17 +482,19 @@ void NPP_Print( NPP instance, NPPrint* printInfo )
              *  etc.
              */
 
-    /***** Insert NPP_Print code here *****\
+            /***** Insert NPP_Print code here *****\
             void* platformPrint =
                 printInfo->print.fullPrint.platformPrint;
             NPBool printOne =
                 printInfo->print.fullPrint.printOne;
-    \**************************************/
+            \**************************************/
 
             /* Do the default*/
             printInfo->print.fullPrint.pluginPrinted = FALSE;
         }
-        else {  /* If not fullscreen, we must be embedded */
+        else
+        {
+            /* If not fullscreen, we must be embedded */
             /*
              * PLUGIN DEVELOPERS:
              *  If your plugin is embedded, or is full-screen
@@ -489,12 +507,12 @@ void NPP_Print( NPP instance, NPPrint* printInfo )
              *  device context.
              */
 
-    /***** Insert NPP_Print code here *****\
+            /***** Insert NPP_Print code here *****\
             NPWindow* printWindow =
                 &(printInfo->print.embedPrint.window);
             void* platformPrint =
                 printInfo->print.embedPrint.platformPrint;
-    \**************************************/
+            \**************************************/
         }
     }
 }
@@ -508,18 +526,22 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
     VlcPlugin* p_plugin = (VlcPlugin*)closure;
     GC gc;
     XGCValues gcv;
-    const char* text = "hello d00dZ, I'm in void Redraw()";
+    const char * psz_text = "(no picture)";
 
-    XtVaGetValues(w, XtNbackground, &gcv.background,
-                  XtNforeground, &gcv.foreground, 0);
-    gc = XCreateGC(p_plugin->display, p_plugin->window,
-                   GCForeground|GCBackground, &gcv);
-    XDrawRectangle(p_plugin->display, p_plugin->window, gc,
-                   0, 0, p_plugin->width-1, p_plugin->height-1);
-    XDrawString(p_plugin->display, p_plugin->window, gc,
-                p_plugin->width/2 - 100, p_plugin->height/2,
-                text, strlen(text));
-    return;
+    gcv.foreground = BlackPixel( p_plugin->display, 0 );
+    gc = XCreateGC( p_plugin->display, p_plugin->window, GCForeground, &gcv );
+
+    XFillRectangle( p_plugin->display, p_plugin->window, gc,
+                    0, 0, p_plugin->width, p_plugin->height );
+
+    gcv.foreground = WhitePixel( p_plugin->display, 0 );
+    XChangeGC( p_plugin->display, gc, GCForeground, &gcv );
+
+    XDrawString( p_plugin->display, p_plugin->window, gc,
+                 p_plugin->width / 2 - 40, p_plugin->height / 2,
+                 psz_text, strlen(psz_text) );
+
+    XFreeGC( p_plugin->display, gc );
 }
 #endif
 

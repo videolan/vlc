@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: open.c,v 1.2 2002/08/24 11:57:07 sam Exp $
+ * $Id: open.c,v 1.3 2002/09/30 11:05:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -64,7 +64,8 @@ void GtkFileShow( GtkButton * button, gpointer user_data )
 {
     GtkWidget * p_file = create_intf_file();
 
-    gtk_object_set_data( GTK_OBJECT(p_file), "p_intf", GtkGetIntf( button ) );
+    gtk_object_set_data( GTK_OBJECT(p_file), "p_intf",
+                         GtkGetIntf( button ) );
 
     gtk_widget_show( p_file );
     gdk_window_raise( p_file->window );

@@ -5,6 +5,7 @@ ABOUT-NLS
 core
 core.*
 gmon.out
+configure.ac
 configure
 config.h
 config.h.*
@@ -20,12 +21,15 @@ Makefile.in
 Makefile.opts
 Makefile.modules
 Makefile.config
+Modules.am
 build-stamp
 stamp-h*
 aclocal.m4
 install-sh
 missing
 mkinstalldirs
+compile
+depcomp
 vlc-debug.*
 vlc-log.*
 vlc-config

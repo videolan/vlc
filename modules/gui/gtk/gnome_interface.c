@@ -46,7 +46,7 @@ static GnomeUIInfo menubar_file_menu_uiinfo[] =
   },
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_MENU_CLOSE_ITEM (GtkClose, NULL),
-  GNOMEUIINFO_MENU_EXIT_ITEM (GtkExit, NULL),
+  GNOMEUIINFO_MENU_EXIT_ITEM (GnomeExit, NULL),
   GNOMEUIINFO_END
 };
 
@@ -952,7 +952,7 @@ static GnomeUIInfo intf_popup_uiinfo[] =
   },
   GNOMEUIINFO_MENU_PREFERENCES_ITEM (GtkPreferencesShow, NULL),
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_MENU_EXIT_ITEM (GtkExit, NULL),
+  GNOMEUIINFO_MENU_EXIT_ITEM (GnomeExit, NULL),
   GNOMEUIINFO_END
 };
 

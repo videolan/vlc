@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.4 2002/08/20 18:08:51 sam Exp $
+ * $Id: rc.c,v 1.5 2002/09/30 11:05:37 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -63,9 +63,13 @@ static void Run          ( intf_thread_t *p_intf );
 #define POS_TEXT N_("show stream position")
 #define POS_LONGTEXT N_("Show the current position in seconds within the stream from time to time.")
 
+#define TTY_TEXT N_("fake TTY")
+#define TTY_LONGTEXT N_("Force the rc plugin to use stdin as if it was a TTY.")
+
 vlc_module_begin();
     add_category_hint( N_("Remote control"), NULL );
     add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT );
+    add_bool( "fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT );
     set_description( _("remote control interface module") );
     set_capability( "interface", 20 );
     set_callbacks( Activate, NULL );
@@ -80,7 +84,7 @@ static int Activate( vlc_object_t *p_this )
 
 #ifdef HAVE_ISATTY
     /* Check that stdin is a TTY */
-    if( !isatty( 0 ) )
+    if( !config_GetInt( p_intf, "fake-tty" ) && !isatty( 0 ) )
     {
         msg_Warn( p_intf, "fd 0 is not a TTY" );
         return 1;
@@ -177,7 +181,7 @@ static void Run( intf_thread_t *p_intf )
             {
                 p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                    FIND_ANYWHERE );
-                if( p_input )
+                //if( p_input )
                 {
                     p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
                                                            FIND_PARENT );
@@ -215,7 +219,7 @@ static void Run( intf_thread_t *p_intf )
         if( b_complete == 1 )
         {
             char *p_cmd = p_buffer;
-            //char *p_tmp;
+            char *p_tmp;
 
             if( !strcmp( p_cmd, "quit" ) )
             {
@@ -255,13 +259,11 @@ static void Run( intf_thread_t *p_intf )
             }
             else if( !strncmp( p_cmd, "set ", 4 ) )
             {
-#if 0
 //                vlc_set_r( p_intf->p_vlc, p_cmd + 4, strstr( p_cmd + 4, " " ) );
                 p_tmp = strstr( p_cmd + 4, " " );
                 p_tmp[0] = '\0';
                 config_PutPsz( p_intf->p_vlc, p_cmd + 4, p_tmp + 1 );
                 config_PutInt( p_intf->p_vlc, p_cmd + 4, atoi(p_tmp + 1) );
-#endif
             }
             else if( !strncmp( p_cmd, "intf ", 5 ) )
             {
@@ -403,12 +405,12 @@ static void Run( intf_thread_t *p_intf )
     {
         vlc_object_release( p_input );
         p_input = NULL;
+    }
 
-        if( p_playlist )
-        {
-            vlc_object_release( p_playlist );
-            p_playlist = NULL;
-        }
+    if( p_playlist )
+    {
+        vlc_object_release( p_playlist );
+        p_playlist = NULL;
     }
 }
 

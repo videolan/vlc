@@ -168,7 +168,7 @@
 	      <name>menubar_exit</name>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkExit</handler>
+		<handler>GnomeExit</handler>
 		<last_modification_time>Sat, 19 May 2001 16:27:52 GMT</last_modification_time>
 	      </signal>
 	      <stock_item>GNOMEUIINFO_MENU_EXIT_ITEM</stock_item>
@@ -1306,7 +1306,7 @@
     <name>popup_exit</name>
     <signal>
       <name>activate</name>
-      <handler>GtkExit</handler>
+      <handler>GnomeExit</handler>
       <last_modification_time>Sat, 19 May 2001 16:21:45 GMT</last_modification_time>
     </signal>
     <stock_item>GNOMEUIINFO_MENU_EXIT_ITEM</stock_item>

@@ -8,5 +8,7 @@ interface VlcIntf : nsISupports
     void play();
     void pause();
     void stop();
+
+    void fullscreen();
 };
 

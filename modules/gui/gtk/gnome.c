@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.2 2002/08/20 18:08:51 sam Exp $
+ * $Id: gnome.c,v 1.3 2002/09/30 11:05:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -70,7 +70,7 @@ vlc_module_begin();
     int i = getenv( "DISPLAY" ) == NULL ? 15 : 100;
 #endif
     add_category_hint( N_("GNOME"), NULL );
-    add_bool( "gnome-tooltips", 1, GtkHideTooltips,
+    add_bool( "gnome-tooltips", 1, E_(GtkHideTooltips),
               TOOLTIPS_TEXT, TOOLTIPS_LONGTEXT );
     add_bool( "gnome-toolbartext", 1, GtkHideToolbarText, TOOLBAR_TEXT,
               TOOLBAR_LONGTEXT );
@@ -208,7 +208,7 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_adj = gtk_range_get_adjustment( P_SLIDER );
 
     gtk_signal_connect ( GTK_OBJECT( p_intf->p_sys->p_adj ), "value_changed",
-                         GTK_SIGNAL_FUNC( GtkDisplayDate ), NULL );
+                         GTK_SIGNAL_FUNC( E_(GtkDisplayDate) ), NULL );
     p_intf->p_sys->f_adj_oldvalue = 0;
     #undef P_SLIDER
 
@@ -375,7 +375,7 @@ static void Manage( intf_thread_t *p_intf )
             /* New input or stream map change */
             if( p_input->stream.b_changed )
             {
-                GtkModeManage( p_intf );
+                E_(GtkModeManage)( p_intf );
                 GtkSetupMenus( p_intf );
                 p_intf->p_sys->b_playing = 1;
             }
@@ -429,7 +429,7 @@ static void Manage( intf_thread_t *p_intf )
     }
     else if( p_intf->p_sys->b_playing && !p_intf->b_die )
     {
-        GtkModeManage( p_intf );
+        E_(GtkModeManage)( p_intf );
         p_intf->p_sys->b_playing = 0;
     }
 

@@ -2,7 +2,7 @@
  * gtk_callbacks.h : Callbacks for the gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: gtk_callbacks.h,v 1.2 2002/09/30 11:05:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -42,7 +42,11 @@
  * main window callbacks: specific prototypes are in headers listed before
  *****************************************************************************/
 
+#ifdef MODULE_NAME_IS_gtk
 gboolean GtkExit                ( GtkWidget *, gpointer );
+#else
+gboolean GnomeExit              ( GtkWidget *, gpointer );
+#endif
 gboolean GtkWindowToggle        ( GtkWidget *, gpointer );
 gboolean GtkFullscreen          ( GtkWidget *, gpointer );
 gboolean GtkSliderRelease       ( GtkWidget *, GdkEventButton *, gpointer );

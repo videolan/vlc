@@ -2,7 +2,7 @@
  * aout.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout.c,v 1.10 2002/09/18 21:21:24 massiot Exp $
+ * $Id: aout.c,v 1.11 2002/09/30 11:05:40 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -91,6 +91,9 @@ struct aout_sys_t
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+int  E_(OpenAudio)  ( vlc_object_t * );
+void E_(CloseAudio) ( vlc_object_t * );
+
 static void Play      ( aout_instance_t * );
 
 /* local functions */

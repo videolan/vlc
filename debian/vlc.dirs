@@ -1,5 +1,5 @@
 usr/bin
-usr/lib/vlc/acess
+usr/lib/vlc/access
 usr/lib/vlc/audio_filter
 usr/lib/vlc/audio_mixer
 usr/lib/vlc/audio_output

@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.3 2002/08/08 00:35:10 sam Exp $
+ * $Id: http.c,v 1.4 2002/09/30 11:05:34 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -67,6 +67,7 @@ static void Seek       ( input_thread_t *, off_t );
 vlc_module_begin();
     set_description( _("HTTP access module") );
     set_capability( "access", 0 );
+    add_shortcut( "http" );
     add_shortcut( "http4" );
     add_shortcut( "http6" );
     set_callbacks( Open, Close );

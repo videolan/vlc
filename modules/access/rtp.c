@@ -1,8 +1,8 @@
 /*****************************************************************************
- * udp.c: raw UDP access plug-in
+ * rtp.c: RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rtp.c,v 1.1 2002/08/14 08:50:33 tooney Exp $
+ * $Id: rtp.c,v 1.2 2002/09/30 11:05:34 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -54,6 +54,7 @@ static int  RTPNetworkRead( input_thread_t *, byte_t *, size_t );
 vlc_module_begin();
     set_description( _("RTP access module") );
     set_capability( "access", 0 );
+    add_shortcut( "rtp" );
     add_shortcut( "rtpstream" );
     add_shortcut( "rtp4" );
     add_shortcut( "rtp6" );

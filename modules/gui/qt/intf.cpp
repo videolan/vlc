@@ -2,7 +2,7 @@
  * intf.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf.cpp,v 1.2 2002/08/08 22:28:22 sam Exp $
+ * $Id: intf.cpp,v 1.3 2002/09/30 11:05:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,94 +29,7 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-
-#include <qapplication.h>
-#include <qmainwindow.h>
-#include <qtoolbar.h>
-#include <qtoolbutton.h>
-#include <qwhatsthis.h>
-#include <qpushbutton.h>
-#include <qfiledialog.h>
-#include <qslider.h>
-#include <qlcdnumber.h>
-#include <qmenubar.h>
-#include <qstatusbar.h>
-#include <qmessagebox.h>
-#include <qlabel.h> 
-#include <qtimer.h> 
-#include <qiconset.h> 
-
-#include <qvbox.h>
-#include <qhbox.h>
-
-/*****************************************************************************
- * Local Qt slider class
- *****************************************************************************/
-class IntfSlider : public QSlider
-{
-    Q_OBJECT
-
-public:
-    IntfSlider( intf_thread_t *, QWidget * );  /* Constructor and destructor */
-    ~IntfSlider();
-
-    bool b_free;                                     /* Is the slider free ? */
-
-    int  oldvalue   ( void ) { return i_oldvalue; };
-    void setOldValue( int i_value ) { i_oldvalue = i_value; };
-
-private slots:
-    void SlideStart ( void ) { b_free = FALSE; };
-    void SlideStop  ( void ) { b_free = TRUE; };
-
-private:
-    intf_thread_t *p_intf;
-    int  i_oldvalue;
-};
-
-/*****************************************************************************
- * Local Qt interface window class
- *****************************************************************************/
-class IntfWindow : public QMainWindow
-{
-    Q_OBJECT
-
-public:
-    IntfWindow( intf_thread_t * );
-    ~IntfWindow();
-
-private slots:
-    void Manage ( void );
-
-    void FileOpen  ( void );
-    void FileQuit  ( void );
-
-    void PlaybackPlay  ( void );
-    void PlaybackPause ( void );
-    void PlaybackSlow  ( void );
-    void PlaybackFast  ( void );
-
-    void PlaylistPrev  ( void );
-    void PlaylistNext  ( void );
-
-    void DateDisplay  ( int );
-    void About ( void );
-
-    void Unimplemented( void ) { msg_Warn( p_intf, "unimplemented" ); };
-
-private:
-    intf_thread_t *p_intf;
-
-    IntfSlider *p_slider;
-
-    QToolBar   *p_toolbar;
-    QPopupMenu *p_popup;
-    QLabel     *p_date;
-};
-
-#include "intf.moc"
+#include "intf.h"
 
 #define SLIDER_MIN    0x00000
 #define SLIDER_MAX    0x10000

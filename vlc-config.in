@@ -56,7 +56,7 @@ while test $# -gt 0; do
       ;;
     --cflags)
       if test "@includedir@" != /usr/include ; then
-        includes="-I@includedir@ @vlc_CFLAGS@"
+        includes="-I@includedir@"
       fi
       echo_cflags=yes
       ;;
@@ -80,5 +80,5 @@ if test "$echo_cflags" = "yes"; then
 	echo -I@INCLUDE@ $includes
 fi
 if test "$echo_libs" = "yes"; then
-	echo "-L@libdir@ -lvlc @libvlc_LDFLAGS@"
+	echo "-L@libdir@ -lvlc @LDFLAGS_libvlc@"
 fi

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vlcpeer.cpp: a VideoLAN Client plugin for Mozilla
+ * vlcpeer.cpp: scriptable peer descriptor
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcpeer.cpp,v 1.1 2002/09/17 08:18:24 sam Exp $
+ * $Id: vlcpeer.cpp,v 1.2 2002/09/30 11:05:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -32,9 +32,11 @@
 
 #include "nsMemory.h"
 
-
 NS_IMPL_ISUPPORTS2( VlcPeer, VlcIntf, nsIClassInfo )
 
+/*****************************************************************************
+ * Scriptable peer constructor and destructor
+ *****************************************************************************/
 VlcPeer::VlcPeer()
 {
     NS_INIT_ISUPPORTS();
@@ -51,11 +53,29 @@ VlcPeer::~VlcPeer()
     ;
 }
 
+/*****************************************************************************
+ * Scriptable peer methods
+ *****************************************************************************/
+void VlcPeer::Disable()
+{
+    p_plugin = NULL;
+}
+
+/*****************************************************************************
+ * Scriptable peer plugin methods
+ *****************************************************************************/
 NS_IMETHODIMP VlcPeer::Play()
 {
     if( p_plugin )
     {
-        p_plugin->Play();
+        if( !p_plugin->b_stream && p_plugin->psz_target )
+        {
+            vlc_add_target_r( p_plugin->p_vlc, p_plugin->psz_target,
+                              PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+            p_plugin->b_stream = 1;
+        }
+
+        vlc_play_r( p_plugin->p_vlc );
     }
     return NS_OK;
 }
@@ -64,7 +84,7 @@ NS_IMETHODIMP VlcPeer::Pause()
 {
     if( p_plugin )
     {
-        p_plugin->Pause();
+        vlc_pause_r( p_plugin->p_vlc );
     }
     return NS_OK;
 }
@@ -73,7 +93,17 @@ NS_IMETHODIMP VlcPeer::Stop()
 {
     if( p_plugin )
     {
-        p_plugin->Stop();
+        vlc_stop_r( p_plugin->p_vlc );
+        p_plugin->b_stream = 0;
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Fullscreen()
+{
+    if( p_plugin )
+    {
+        vlc_fullscreen_r( p_plugin->p_vlc );
     }
     return NS_OK;
 }

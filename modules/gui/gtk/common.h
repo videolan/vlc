@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: common.h,v 1.2 2002/08/20 18:08:51 sam Exp $
+ * $Id: common.h,v 1.3 2002/09/30 11:05:38 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -90,12 +90,12 @@ struct intf_sys_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-gint GtkModeManage   ( intf_thread_t * p_intf );
-void GtkDisplayDate  ( GtkAdjustment *p_adj );
+gint E_(GtkModeManage)   ( intf_thread_t * p_intf );
+void E_(GtkDisplayDate)  ( GtkAdjustment *p_adj );
 
 /*****************************************************************************
  * Useful macro
  ****************************************************************************/
-#define  GtkGetIntf( widget ) __GtkGetIntf( GTK_WIDGET( widget ) )
-void * __GtkGetIntf( GtkWidget * );
+#define  GtkGetIntf( widget ) E_(__GtkGetIntf)( GTK_WIDGET( widget ) )
+void * E_(__GtkGetIntf)( GtkWidget * );
 

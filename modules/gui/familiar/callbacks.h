@@ -2,7 +2,7 @@
  * callbacks.h : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: callbacks.h,v 1.6 2002/08/21 19:30:03 jpsaman Exp $
+ * $Id: callbacks.h,v 1.7 2002/09/30 11:05:38 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -23,7 +23,7 @@
 
 #include <gtk/gtk.h>
 
-gboolean GtkExit                ( GtkWidget *, gpointer );
+gboolean FamiliarExit           ( GtkWidget *, gpointer );
 
 void ReadDirectory(GtkCList *clist, char *psz_dir);
 
