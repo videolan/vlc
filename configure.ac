@@ -2448,9 +2448,9 @@ if test "${enable_dirac}" = "yes"; then
   AC_CHECK_HEADERS(libdirac_decoder/dirac_parser.h, [
     AC_CHECK_LIB(dirac_decoder, dirac_decoder_init, [
       VLC_ADD_PLUGINS([dirac])
-      VLC_ADD_LDFLAGS([dirac],[-ldirac_decoder -ldirac_encoder -ldirac_motionest -ldirac_common]) ],[
+      VLC_ADD_LDFLAGS([dirac],[-ldirac_decoder -ldirac_encoder -lstdc++]) ],[
       AC_MSG_ERROR([libdirac doesn't appear to be installed on you system.])],
-      [-ldirac_common])
+      [-lstdc++])
   ])
 fi
 
