@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.21 2004/02/13 10:09:46 jpsaman Exp $
+ * $Id: pda.c,v 1.22 2004/02/29 22:59:59 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -63,7 +63,7 @@ gint E_(GtkModeManage)   ( intf_thread_t * p_intf );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("PDA Linux Gtk2+ interface") );
+    set_description( N_("PDA Linux Gtk2+ interface") );
 //    add_bool( "pda-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT, VLC_TRUE );
     set_capability( "interface", 70 );
     set_callbacks( Open, Close );
@@ -214,31 +214,31 @@ static void Run( intf_thread_t *p_intf )
 
     /* Insert columns 0 */
     p_renderer = gtk_cell_renderer_text_new ();
-    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 0, _("Filename"), p_renderer, NULL);
+    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 0, (gchar *) N_("Filename"), p_renderer, NULL);
     p_column = gtk_tree_view_get_column(p_intf->p_sys->p_tvfile, 0 );
     gtk_tree_view_column_add_attribute(p_column, p_renderer, "text", 0 );
     gtk_tree_view_column_set_sort_column_id(p_column, 0);
     /* Insert columns 1 */
     p_renderer = gtk_cell_renderer_text_new ();
-    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 1, _("Permissions"), p_renderer, NULL);
+    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 1, (gchar *) N_("Permissions"), p_renderer, NULL);
     p_column = gtk_tree_view_get_column(p_intf->p_sys->p_tvfile, 1 );
     gtk_tree_view_column_add_attribute(p_column, p_renderer, "text", 1 );
     gtk_tree_view_column_set_sort_column_id(p_column, 1);
     /* Insert columns 2 */
     p_renderer = gtk_cell_renderer_text_new ();
-    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 2, _("Size"), p_renderer, NULL);
+    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 2, (gchar *) N_("Size"), p_renderer, NULL);
     p_column = gtk_tree_view_get_column(p_intf->p_sys->p_tvfile, 2 );
     gtk_tree_view_column_add_attribute(p_column, p_renderer, "text", 2 );
     gtk_tree_view_column_set_sort_column_id(p_column, 2);
     /* Insert columns 3 */
     p_renderer = gtk_cell_renderer_text_new ();
-    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 3, _("Owner"), p_renderer, NULL);
+    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 3, (gchar *) N_("Owner"), p_renderer, NULL);
     p_column = gtk_tree_view_get_column(p_intf->p_sys->p_tvfile, 3 );
     gtk_tree_view_column_add_attribute(p_column, p_renderer, "text", 3 );
     gtk_tree_view_column_set_sort_column_id(p_column, 3);
     /* Insert columns 4 */
     p_renderer = gtk_cell_renderer_text_new ();
-    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 4, _("Group"), p_renderer, NULL);
+    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 4, (gchar *) N_("Group"), p_renderer, NULL);
     p_column = gtk_tree_view_get_column(p_intf->p_sys->p_tvfile, 4 );
     gtk_tree_view_column_add_attribute(p_column, p_renderer, "text", 4 );
     gtk_tree_view_column_set_sort_column_id(p_column, 4);
@@ -269,20 +269,20 @@ static void Run( intf_thread_t *p_intf )
 
     /* Columns 1 */
     p_renderer = gtk_cell_renderer_text_new ();
-    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvplaylist, 0, _("Filename"), p_renderer, NULL);
+    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvplaylist, 0, (gchar *) N_("Filename"), p_renderer, NULL);
     p_column = gtk_tree_view_get_column(p_intf->p_sys->p_tvplaylist, 0 );
     gtk_tree_view_column_add_attribute(p_column, p_renderer, "text", 0 );
     gtk_tree_view_column_set_sort_column_id(p_column, 0);
     /* Column 2 */
     p_renderer = gtk_cell_renderer_text_new ();
-    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvplaylist, 1, _("Time"), p_renderer, NULL);
+    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvplaylist, 1, (gchar *) N_("Time"), p_renderer, NULL);
     p_column = gtk_tree_view_get_column(p_intf->p_sys->p_tvplaylist, 1 );
     gtk_tree_view_column_add_attribute(p_column, p_renderer, "text", 1 );
     gtk_tree_view_column_set_sort_column_id(p_column, 1);
 #if 0
     /* Column 3 - is a hidden column used for reliable deleting items from the underlying playlist */
     p_renderer = gtk_cell_renderer_text_new ();
-    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvplaylist, 2, _("Index"), p_renderer, NULL);
+    gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvplaylist, 2, (gchar *) N_("Index"), p_renderer, NULL);
     p_column = gtk_tree_view_get_column(p_intf->p_sys->p_tvplaylist, 2 );
     gtk_tree_view_column_add_attribute(p_column, p_renderer, "text", 2 );
     gtk_tree_view_column_set_sort_column_id(p_column, 2);

@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.28 2004/02/13 10:09:46 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.29 2004/02/29 22:59:59 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -110,7 +110,7 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options, int i_
         GtkTreeIter   p_play_iter;
 
         p_play_model = gtk_tree_view_get_model(p_tvplaylist);
-
+        
         if (p_play_model)
         {
             int i;
@@ -321,7 +321,7 @@ static char *get_file_perms(const struct stat st)
         psz_perm[8]= 'w';
     if (st.st_mode & S_IXOTH)
     {
-        // 'sticky' bit
+        /* 'sticky' bit */
         if (st.st_mode &S_ISVTX)
             psz_perm[9] = 't';
         else
@@ -424,7 +424,7 @@ void onAbout(GtkButton *button, gpointer user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET(button) );
 
-    // Toggle notebook
+    /* Toggle notebook */
     if (p_intf->p_sys->p_notebook)
     {
         gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
@@ -588,17 +588,27 @@ void NetworkBuildMRL(GtkEditable *editable, gpointer user_data)
 
 void onAddNetworkPlaylist(GtkButton *button, gpointer user_data)
 {
-    GtkEntry     *p_mrl = NULL;
-    const gchar  *psz_mrl_name;
+    intf_thread_t  *p_intf = GtkGetIntf( button );
+
+    GtkEntry       *p_mrl = NULL;
+    GtkCheckButton *p_network_transcode = NULL;
+    gboolean        b_network_transcode;
+    const gchar    *psz_mrl_name;
 
     p_mrl = (GtkEntry*) lookup_widget(GTK_WIDGET(button),"entryMRL" );
-    if (p_mrl)
+    psz_mrl_name = gtk_entry_get_text(p_mrl);
+
+    p_network_transcode = (GtkCheckButton*) lookup_widget(GTK_WIDGET(button), "checkNetworkTranscode" );
+    b_network_transcode = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(p_network_transcode));
+    if (b_network_transcode)
     {
-        psz_mrl_name = gtk_entry_get_text(p_mrl);
-        if (psz_mrl_name != NULL)
-        {
-            PlaylistAddItem(GTK_WIDGET(button), (gchar *)psz_mrl_name, 0, 0);
-        }
+        msg_Dbg( p_intf, "Network transcode option selected." );
+        onAddTranscodeToPlaylist(GTK_WIDGET(button), (gchar *)psz_mrl_name);
+    }
+    else
+    {
+        msg_Dbg( p_intf, "Network receiving selected." );
+        PlaylistAddItem(GTK_WIDGET(button), (gchar *)psz_mrl_name, 0, 0);
     }
 }
 
@@ -636,6 +646,9 @@ void onAddCameraToPlaylist(GtkButton *button, gpointer user_data)
     gint            i_v4l_decimation;
     /* end MJPEG only */
 
+    GtkCheckButton  *p_check_v4l_transcode = NULL;
+    gboolean         b_v4l_transcode;
+    
     char **ppsz_options = NULL; /* list of options */
     int  i_options=0;
     char v4l_mrl[6];
@@ -723,7 +736,18 @@ void onAddCameraToPlaylist(GtkButton *button, gpointer user_data)
     }
     /* end MJPEG only */
 
-    PlaylistAddItem(GTK_WIDGET(button), (gchar*) &v4l_mrl, ppsz_options, i_options);
+    p_check_v4l_transcode = (GtkCheckButton*) lookup_widget(GTK_WIDGET(button), "checkV4LTranscode" );
+    b_v4l_transcode = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(p_check_v4l_transcode));
+    if (b_v4l_transcode)
+    {
+        msg_Dbg( p_intf, "Camera transcode option selected." );
+        onAddTranscodeToPlaylist(GTK_WIDGET(button), (gchar *)v4l_mrl);
+    }
+    else
+    {
+        msg_Dbg( p_intf, "Camera reception option selected." );
+        PlaylistAddItem(GTK_WIDGET(button), (gchar*) &v4l_mrl, ppsz_options, i_options);
+    }
 }
 
 
@@ -1018,6 +1042,11 @@ void onAddTranscodeToPlaylist(GtkButton *button, gpointer user_data)
         }
     }
 
+    /* Update the playlist */
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist == NULL ) return;
+
+    /* Get all the options. */
     i_pos = snprintf( &mrl[0], VLC_MAX_MRL, "sout");
     mrl[6] = '\0';
     /* option 1 */
@@ -1065,7 +1094,7 @@ void onAddTranscodeToPlaylist(GtkButton *button, gpointer user_data)
 
     /* option 2 */
     i_pos = 0;
-    i_pos = snprintf( &ppsz_options[i_options++][i_pos], VLC_MAX_MRL - i_pos, "dst=" );
+    i_pos = snprintf( &ppsz_options[i_options++][i_pos], VLC_MAX_MRL - i_pos, "#" );
     if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
 
     p_entryStdAccess = (GtkEntry*) lookup_widget( GTK_WIDGET(button), "entryStdAccess" );
@@ -1081,46 +1110,42 @@ void onAddTranscodeToPlaylist(GtkButton *button, gpointer user_data)
     b_sap_announce = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(p_checkSAP));
     b_slp_announce = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(p_checkSLP));
 
-    if ( strncasecmp( (const char*)p_std_access, "display", 7 ) == 0)
+    i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "std{access=%s,", (char*)p_std_access);
+    if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
+    i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "mux=%s,", (char*)p_std_muxer);
+    if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
+    i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "url=%s", (char*)p_std_url);
+    if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
+
+    if (strncasecmp( (const char*)p_std_access, "udp", 3)==0)
     {
-        i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "%s,", (char*)p_std_access);
-        if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
+        if (b_sap_announce)
+        {
+            i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "sap=%s", (char*)p_std_announce);
+            if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
+        }
+        if (b_slp_announce)
+        {
+            i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "slp=%s", (char*)p_std_announce);
+            if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
+        }
+    }
+
+    i_std_ttl = gtk_spin_button_get_value_as_int(p_entryStdTTL);
+
+    i_pos += snprintf( &ppsz_options[i_options++][i_pos], VLC_MAX_MRL - i_pos, "ttl=%d}", (int)i_std_ttl);
+    if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
+
+    if (user_data != NULL)
+    {
+      msg_Dbg(p_intf, "Adding transcoding options to playlist item." );
     }
     else
     {
-        i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "std{access=%s,", (char*)p_std_access);
-        if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
-        i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "mux=%s,", (char*)p_std_muxer);
-        if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
-        i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "url=%s", (char*)p_std_url);
-        if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
-
-        if (strncasecmp( (const char*)p_std_access, "udp", 3)==0)
-        {
-            if (b_sap_announce)
-            {
-                i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "sap=%s", (char*)p_std_announce);
-                if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
-            }
-            if (b_slp_announce)
-            {
-                i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "slp=%s", (char*)p_std_announce);
-                if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
-            }
-        }
-        i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "}");
-        if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
-
-        i_std_ttl = gtk_spin_button_get_value_as_int(p_entryStdTTL);
-
-        i_pos = snprintf( &ppsz_options[i_options++][0], VLC_MAX_MRL, "ttl=%d", (int)i_std_ttl);
-        if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
+      msg_Dbg(p_intf, "Adding --sout to playlist." );
+      PlaylistAddItem(GTK_WIDGET(button), (gchar*) &mrl, ppsz_options, i_options);
     }
-
-    PlaylistAddItem(GTK_WIDGET(button), (gchar*) &mrl, ppsz_options, i_options);
 }
-
-
 
 void onEntryStdAccessChanged(GtkEditable *editable, gpointer user_data)
 {

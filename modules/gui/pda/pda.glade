@@ -308,7 +308,7 @@
 		      <property name="width_request">35</property>
 		      <property name="height_request">16</property>
 		      <property name="visible">True</property>
-		      <property name="label">MRL:</property>
+		      <property name="label" translatable="yes">MRL:</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
 		      <property name="justify">GTK_JUSTIFY_CENTER</property>
@@ -344,9 +344,9 @@
 			  <property name="editable">True</property>
 			  <property name="visibility">True</property>
 			  <property name="max_length">0</property>
-			  <property name="text"></property>
+			  <property name="text" translatable="yes"></property>
 			  <property name="has_frame">True</property>
-			  <property name="invisible_char">*</property>
+			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">True</property>
 			</widget>
 		      </child>
@@ -360,7 +360,7 @@
 			    <widget class="GtkListItem" id="listitem340">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">udp://@:1234</property>
+			      <property name="label" translatable="yes">udp://@:1234</property>
 			    </widget>
 			  </child>
 
@@ -368,7 +368,7 @@
 			    <widget class="GtkListItem" id="listitem341">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">udp6://@:1234</property>
+			      <property name="label" translatable="yes">udp6://@:1234</property>
 			    </widget>
 			  </child>
 
@@ -376,7 +376,7 @@
 			    <widget class="GtkListItem" id="listitem342">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">rtp://</property>
+			      <property name="label" translatable="yes">rtp://</property>
 			    </widget>
 			  </child>
 
@@ -384,7 +384,7 @@
 			    <widget class="GtkListItem" id="listitem343">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">rtp6://</property>
+			      <property name="label" translatable="yes">rtp6://</property>
 			    </widget>
 			  </child>
 
@@ -392,7 +392,7 @@
 			    <widget class="GtkListItem" id="listitem344">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">ftp://</property>
+			      <property name="label" translatable="yes">ftp://</property>
 			    </widget>
 			  </child>
 
@@ -400,7 +400,7 @@
 			    <widget class="GtkListItem" id="listitem345">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">http://</property>
+			      <property name="label" translatable="yes">http://</property>
 			    </widget>
 			  </child>
 
@@ -408,7 +408,7 @@
 			    <widget class="GtkListItem" id="listitem346">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">mms://</property>
+			      <property name="label" translatable="yes">mms://</property>
 			    </widget>
 			  </child>
 			</widget>
@@ -535,9 +535,9 @@
 			  <property name="editable">True</property>
 			  <property name="visibility">True</property>
 			  <property name="max_length">0</property>
-			  <property name="text"></property>
+			  <property name="text" translatable="yes"></property>
 			  <property name="has_frame">True</property>
-			  <property name="invisible_char">*</property>
+			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">False</property>
 			  <signal name="changed" handler="NetworkBuildMRL" last_modification_time="Sat, 08 Nov 2003 13:34:30 GMT"/>
 			</widget>
@@ -575,9 +575,9 @@
 			  <property name="editable">True</property>
 			  <property name="visibility">True</property>
 			  <property name="max_length">0</property>
-			  <property name="text"></property>
+			  <property name="text" translatable="yes"></property>
 			  <property name="has_frame">True</property>
-			  <property name="invisible_char">*</property>
+			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">True</property>
 			  <signal name="changed" handler="NetworkBuildMRL" last_modification_time="Sat, 08 Nov 2003 13:34:45 GMT"/>
 			</widget>
@@ -655,9 +655,9 @@
 			  <property name="editable">True</property>
 			  <property name="visibility">True</property>
 			  <property name="max_length">0</property>
-			  <property name="text"></property>
+			  <property name="text" translatable="yes"></property>
 			  <property name="has_frame">True</property>
-			  <property name="invisible_char">*</property>
+			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">False</property>
 			  <signal name="changed" handler="NetworkBuildMRL" last_modification_time="Sat, 08 Nov 2003 13:35:01 GMT"/>
 			</widget>
@@ -672,7 +672,7 @@
 			    <widget class="GtkListItem" id="listitem1101">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">udp</property>
+			      <property name="label" translatable="yes">udp</property>
 			    </widget>
 			  </child>
 
@@ -680,7 +680,7 @@
 			    <widget class="GtkListItem" id="listitem1102">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">udp6</property>
+			      <property name="label" translatable="yes">udp6</property>
 			    </widget>
 			  </child>
 
@@ -688,7 +688,7 @@
 			    <widget class="GtkListItem" id="listitem1103">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">rtp</property>
+			      <property name="label" translatable="yes">rtp</property>
 			    </widget>
 			  </child>
 
@@ -696,7 +696,7 @@
 			    <widget class="GtkListItem" id="listitem1104">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">rtp4</property>
+			      <property name="label" translatable="yes">rtp4</property>
 			    </widget>
 			  </child>
 
@@ -704,7 +704,7 @@
 			    <widget class="GtkListItem" id="listitem1105">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">ftp</property>
+			      <property name="label" translatable="yes">ftp</property>
 			    </widget>
 			  </child>
 
@@ -712,7 +712,7 @@
 			    <widget class="GtkListItem" id="listitem1106">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">http</property>
+			      <property name="label" translatable="yes">http</property>
 			    </widget>
 			  </child>
 
@@ -720,7 +720,7 @@
 			    <widget class="GtkListItem" id="listitem1107">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">sout</property>
+			      <property name="label" translatable="yes">sout</property>
 			    </widget>
 			  </child>
 
@@ -728,7 +728,7 @@
 			    <widget class="GtkListItem" id="listitem1108">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label">mms</property>
+			      <property name="label" translatable="yes">mms</property>
 			    </widget>
 			  </child>
 			</widget>
@@ -762,6 +762,51 @@
 		      <property name="right_attach">1</property>
 		      <property name="top_attach">3</property>
 		      <property name="bottom_attach">4</property>
+		      <property name="x_options">fill</property>
+		      <property name="y_options"></property>
+		    </packing>
+		  </child>
+
+		  <child>
+		    <widget class="GtkLabel" id="labelNetworkTranscode">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Transcode:</property>
+		      <property name="use_underline">False</property>
+		      <property name="use_markup">False</property>
+		      <property name="justify">GTK_JUSTIFY_LEFT</property>
+		      <property name="wrap">False</property>
+		      <property name="selectable">False</property>
+		      <property name="xalign">0</property>
+		      <property name="yalign">0.5</property>
+		      <property name="xpad">0</property>
+		      <property name="ypad">0</property>
+		    </widget>
+		    <packing>
+		      <property name="left_attach">0</property>
+		      <property name="right_attach">1</property>
+		      <property name="top_attach">4</property>
+		      <property name="bottom_attach">5</property>
+		      <property name="x_options">fill</property>
+		      <property name="y_options"></property>
+		    </packing>
+		  </child>
+
+		  <child>
+		    <widget class="GtkCheckButton" id="checkNetworkTranscode">
+		      <property name="visible">True</property>
+		      <property name="can_focus">True</property>
+		      <property name="label" translatable="yes">enable</property>
+		      <property name="use_underline">True</property>
+		      <property name="relief">GTK_RELIEF_NORMAL</property>
+		      <property name="active">False</property>
+		      <property name="inconsistent">False</property>
+		      <property name="draw_indicator">True</property>
+		    </widget>
+		    <packing>
+		      <property name="left_attach">1</property>
+		      <property name="right_attach">2</property>
+		      <property name="top_attach">4</property>
+		      <property name="bottom_attach">5</property>
 		      <property name="x_options">fill</property>
 		      <property name="y_options"></property>
 		    </packing>
@@ -859,7 +904,7 @@
 		      <child>
 			<widget class="GtkTable" id="tableV4L">
 			  <property name="visible">True</property>
-			  <property name="n_rows">12</property>
+			  <property name="n_rows">13</property>
 			  <property name="n_columns">2</property>
 			  <property name="homogeneous">False</property>
 			  <property name="row_spacing">0</property>
@@ -1169,9 +1214,9 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text"></property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
+				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
 				</widget>
 			      </child>
@@ -1233,9 +1278,9 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text"></property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
+				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
 				</widget>
 			      </child>
@@ -1327,9 +1372,9 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text"></property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
+				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
 				</widget>
 			      </child>
@@ -1399,9 +1444,9 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text"></property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
+				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
 				</widget>
 			      </child>
@@ -1563,9 +1608,9 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text"></property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
+				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
 				</widget>
 			      </child>
@@ -1664,6 +1709,51 @@
 			      <property name="top_attach">11</property>
 			      <property name="bottom_attach">12</property>
 			      <property name="x_options">expand|shrink|fill</property>
+			      <property name="y_options"></property>
+			    </packing>
+			  </child>
+
+			  <child>
+			    <widget class="GtkLabel" id="labelV4LTranscode">
+			      <property name="visible">True</property>
+			      <property name="label" translatable="yes">Transcode:</property>
+			      <property name="use_underline">False</property>
+			      <property name="use_markup">False</property>
+			      <property name="justify">GTK_JUSTIFY_LEFT</property>
+			      <property name="wrap">False</property>
+			      <property name="selectable">False</property>
+			      <property name="xalign">0</property>
+			      <property name="yalign">0.5</property>
+			      <property name="xpad">0</property>
+			      <property name="ypad">0</property>
+			    </widget>
+			    <packing>
+			      <property name="left_attach">0</property>
+			      <property name="right_attach">1</property>
+			      <property name="top_attach">12</property>
+			      <property name="bottom_attach">13</property>
+			      <property name="x_options">fill</property>
+			      <property name="y_options"></property>
+			    </packing>
+			  </child>
+
+			  <child>
+			    <widget class="GtkCheckButton" id="checkV4LTranscode">
+			      <property name="visible">True</property>
+			      <property name="can_focus">True</property>
+			      <property name="label" translatable="yes">enable</property>
+			      <property name="use_underline">True</property>
+			      <property name="relief">GTK_RELIEF_NORMAL</property>
+			      <property name="active">False</property>
+			      <property name="inconsistent">False</property>
+			      <property name="draw_indicator">True</property>
+			    </widget>
+			    <packing>
+			      <property name="left_attach">1</property>
+			      <property name="right_attach">2</property>
+			      <property name="top_attach">12</property>
+			      <property name="bottom_attach">13</property>
+			      <property name="x_options">fill</property>
 			      <property name="y_options"></property>
 			    </packing>
 			  </child>
@@ -1810,9 +1900,9 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text"></property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
+				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
 				</widget>
 			      </child>
@@ -2151,9 +2241,9 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text"></property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
+				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
 				</widget>
 			      </child>
@@ -2222,9 +2312,9 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text"></property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
+				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
 				</widget>
 			      </child>
@@ -2347,9 +2437,9 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text"></property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
+				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
 				</widget>
 			      </child>
@@ -2544,9 +2634,9 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text"></property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
+				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
 				  <signal name="changed" handler="onEntryStdAccessChanged" last_modification_time="Sun, 30 Nov 2003 22:35:14 GMT"/>
 				</widget>
@@ -2569,7 +2659,10 @@
 				    <widget class="GtkListItem" id="listitem2386">
 				      <property name="visible">True</property>
 				      <property name="can_focus">True</property>
-				      <property name="label" translatable="yes">display</property>
+
+				      <child>
+					<placeholder/>
+				      </child>
 				    </widget>
 				  </child>
 
@@ -2762,9 +2855,9 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text"></property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
+				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">False</property>
 				</widget>
 			      </child>
