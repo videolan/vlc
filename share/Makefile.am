@@ -22,6 +22,9 @@ DIST_fonts = \
 
 DIST_rsrc = \
 	vlc.icns \
+	newres.h \
+	resource.h \
+	vlc_wince_rc.rc \
 	vlc_beos.rsrc \
 	vlc_win32_rc.rc \
 	vlc-icons.xcf \

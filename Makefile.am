@@ -17,6 +17,7 @@ DIST_SUBDIRS = $(SUBDIRS) src debian ipkg lib autotools
 EXTRA_DIST = \
 	HACKING \
 	INSTALL.win32 \
+	vlc.exe.manifest \
 	MAINTAINERS \
 	README.MacOSX.rtf \
 	bootstrap \
