@@ -839,14 +839,12 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         if( psz_eof )
         {
             *psz_eof = 0;
-            psz_uri = strdup( psz_parse );
         }
-
         else
         {
-            msg_Warn( p_obj, "unable to parse c field (3)");
-            return VLC_EGENERIC;
+            msg_Dbg( p_obj, "incorrect c field");
         }
+        psz_uri = strdup( psz_parse );
 
     }
 
@@ -906,20 +904,23 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         if( psz_eof )
         {
             *psz_eof = '\0';
-
-            psz_proto = strdup( psz_parse );
         }
         else
         {
-            msg_Warn( p_obj, "unable to parse m field (3)");
-            return VLC_EGENERIC;
+            msg_Dbg( p_obj, "incorrect m field");
         }
+        psz_proto = strdup( psz_parse );
     }
 
     if( psz_proto && !strncmp( psz_proto, "RTP/AVP", 7 ) )
     {
         free( psz_proto );
         psz_proto = strdup( "rtp" );
+    }
+    if( psz_proto && !strncmp( psz_proto, "UDP", 3 ) )
+    {
+        free( psz_proto );
+        psz_proto = strdup( "udp" );
     }
                     
 
@@ -954,7 +955,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
 
     if( psz_sdp == NULL )
     {
-        return VLC_EGENERIC;
+        return NULL;
     }
 
     if( psz_sdp[0] != 'v' || psz_sdp[1] != '=' )
