@@ -551,7 +551,7 @@ void sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
         }
 
         if( p_mux->i_add_stream_start >= 0 &&
-            p_mux->i_add_stream_start + I64C(15000000) < p_buffer->i_dts )
+            p_mux->i_add_stream_start + I64C(1500000) < p_buffer->i_dts )
         {
             /* Wait until we have more than 1.5 seconds worth of data
              * before start muxing */
