@@ -2,7 +2,7 @@
  * libasf.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.16 2003/08/22 20:32:27 fenrir Exp $
+ * $Id: libasf.c,v 1.17 2003/08/24 15:05:27 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -753,6 +753,12 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
             default:
                 msg_Warn( (vlc_object_t*)s, "Unknow Object found" );
                 break;
+        }
+        if( p_obj->common.i_type == ASF_OBJECT_TYPE_DATA &&
+            p_obj->common.i_object_size <= 50 )
+        {
+            /* probably a dump of broadcasted asf */
+            break;
         }
         if( !b_seekable && p_root->p_hdr && p_root->p_data )
         {
