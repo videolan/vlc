@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.19 2003/05/04 22:42:15 gbazin Exp $
+ * $Id: directx.c,v 1.20 2003/05/21 15:54:08 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -251,11 +251,6 @@ static int OpenAudio( vlc_object_t *p_this )
         goto error;
     }
 
-    /* Now we need to setup our DirectSound play notification structure */
-    p_aout->output.p_sys->p_notif =
-        vlc_object_create( p_aout, sizeof(notification_thread_t) );
-    p_aout->output.p_sys->p_notif->p_aout = p_aout;
-
     if( var_Type( p_aout, "audio-device" ) == 0 )
     {
         Probe( p_aout );
@@ -266,6 +261,11 @@ static int OpenAudio( vlc_object_t *p_this )
         /* Probe() has failed. */
         goto error;
     }
+
+    /* Now we need to setup our DirectSound play notification structure */
+    p_aout->output.p_sys->p_notif =
+        vlc_object_create( p_aout, sizeof(notification_thread_t) );
+    p_aout->output.p_sys->p_notif->p_aout = p_aout;
 
     /* Then create the notification events */
     for( i = 0; i < FRAMES_NUM; i++ )
@@ -481,6 +481,14 @@ static void Probe( aout_instance_t * p_aout )
             if( config_GetInt( p_aout, "spdif" ) )
                 var_Set( p_aout, "audio-device", val );
         }
+    }
+
+    var_Change( p_aout, "audio-device", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    if( val.i_int <= 0 )
+    {
+        /* Probe() has failed. */
+        var_Destroy( p_aout, "audio-device" );
+        return;
     }
 
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );

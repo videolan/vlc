@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.24 2003/05/04 22:42:15 gbazin Exp $
+ * $Id: waveout.c,v 1.25 2003/05/21 15:54:08 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -390,6 +390,14 @@ static void Probe( aout_instance_t * p_aout )
             if( config_GetInt( p_aout, "spdif" ) )
                 var_Set( p_aout, "audio-device", val );
         }
+    }
+
+    var_Change( p_aout, "audio-device", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    if( val.i_int <= 0 )
+    {
+        /* Probe() has failed. */
+        var_Destroy( p_aout, "audio-device" );
+        return;
     }
 
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
