@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.21 2003/02/27 13:19:43 gbazin Exp $
+ * $Id: asf.c,v 1.22 2003/03/02 17:13:33 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -103,6 +103,8 @@ static int Activate( vlc_object_t * p_this )
         return( -1 );
     }
     memset( p_demux, 0, sizeof( demux_sys_t ) );
+    p_demux->i_pcr  = -1;
+    p_demux->i_time = -1;
 
     /* Now load all object ( except raw data ) */
     if( !ASF_ReadObjectRoot( p_input, &p_demux->root, p_input->stream.b_seekable ) )
@@ -188,6 +190,8 @@ static int Activate( vlc_object_t * p_this )
             p_demux->stream[p_sp->i_stream_number] =
                 malloc( sizeof( asf_stream_t ) );
         memset( p_stream, 0, sizeof( asf_stream_t ) );
+
+        p_stream->i_time = -1;
         p_stream->p_sp = p_sp;
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -411,7 +415,6 @@ static int Activate( vlc_object_t * p_this )
 
     p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
 
     return( 0 );
 }
@@ -701,6 +704,7 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
                                           p_input->stream.p_selected_program,
                                           p_stream->i_time * 9 /100 );
 
+                //msg_Err( p_input, "stream[0x%2x] pts=%lld", i_stream_number, p_stream->p_pes->i_pts );
                 p_stream->p_pes->p_next = NULL;
                 p_stream->p_pes->i_nb_data = 0;
                 p_stream->p_pes->i_pes_size = 0;
