@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.187 2004/03/03 12:21:57 sam Exp $
+dnl $Id: configure.ac,v 1.188 2004/03/03 13:24:31 fenrir Exp $
 
 AC_INIT(vlc,0.7.1)
 
@@ -146,7 +146,7 @@ case "${target_os}" in
         # add ws2_32 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
         AX_ADD_LDFLAGS([vlc],[-lws2_32 -lnetapi32 -lwinmm -mwindows])
-        AX_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap slp http httpd stream_out_standard],[-lws2_32])
+        AX_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap slp http stream_out_standard],[-lws2_32])
     fi
     ;;
   *nto*)
@@ -317,16 +317,16 @@ AC_CHECK_FUNCS(connect,,[
 
 AC_CHECK_FUNCS(send,,[
   AC_CHECK_LIB(socket,send,[
-    AX_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp sap httpd access_output_udp stream_out_standard],[-lsocket])
+    AX_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp sap access_output_udp stream_out_standard],[-lsocket])
   ])
 ])
 
 AC_CHECK_FUNCS(gethostbyname,,[
   AC_CHECK_LIB(nsl,gethostbyname,[
-    AX_ADD_LDFLAGS([cddax ipv4 httpd vlc],[-lnsl])
+    AX_ADD_LDFLAGS([cddax ipv4 vlc],[-lnsl])
   ],[
     AC_CHECK_LIB(bind,gethostbyname,[
-      AX_ADD_LDFLAGS([ipv4 access_mms httpd],[-lbind])
+      AX_ADD_LDFLAGS([ipv4 access_mms],[-lbind])
     ])
   ])
 ])
@@ -365,7 +365,7 @@ fi
 
 AC_CHECK_FUNCS(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,[
-    AX_ADD_LDFLAGS([ipv4 httpd],[-lresolv])
+    AX_ADD_LDFLAGS([ipv4 vlc],[-lresolv])
   ])
 ])
 
@@ -896,7 +896,7 @@ AX_ADD_PLUGINS([id3 m3u playlist export])
 AX_ADD_PLUGINS([rawvideo])
 AX_ADD_PLUGINS([wav araw demuxdump demuxsub adpcm a52sys dtssys au])
 AX_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms])
-AX_ADD_PLUGINS([access_ftp access_directory sap httpd http])
+AX_ADD_PLUGINS([access_ftp access_directory sap http])
 
 dnl
 dnl  Switch to enable a version of VLC where most modules will be builtin

@@ -77,7 +77,7 @@ HEADERS_include = \
 	include/input_ext-plugins.h \
 	include/intf_eject.h \
 	include/iso_lang.h \
-	include/httpd.h \
+	include/vlc_httpd.h \
 	include/main.h \
 	include/mmx.h \
 	include/modules.h \
@@ -346,6 +346,7 @@ SOURCES_libvlc_common = \
 	src/audio_output/intf.c \
 	src/stream_output/stream_output.c \
 	src/misc/charset.c \
+	src/misc/httpd.c \
 	src/misc/mtime.c \
 	src/misc/block.c \
 	src/misc/modules.c \
