@@ -422,6 +422,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 {
     unsigned int i_key = 0;
     intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t *p_playlist;
     vlc_value_t val;
 
     [self initStrings];
@@ -481,27 +482,24 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     [o_mi_fullscreen setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
     [o_mi_fullscreen setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
 
-    var_Create (p_intf, "fullscreen", VLC_VAR_BOOL );
-    var_Change (p_intf, "fullscreen", VLC_VAR_INHERITVALUE, &val, NULL );
-    [o_btn_fullscreen setState: val.b_bool];
-
-    var_Create(p_intf,"intf-change",VLC_VAR_BOOL );
+    var_Create( p_intf, "intf-change", VLC_VAR_BOOL );
 
     [self setSubmenusEnabled: FALSE];
     [self manageVolumeSlider];
     
-    /* Check if we need to start playing */
-    if( p_intf->b_play )
+    p_playlist = (playlist_t *) vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    
+    if( p_playlist )
     {
-        playlist_t *p_playlist =
-            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
-        if( p_playlist )
+        /* Check if we need to start playing */
+        if( p_intf->b_play )
         {
             playlist_Play( p_playlist );
-            vlc_object_release( p_playlist );
         }
-        
+
+        var_Get( p_playlist, "fullscreen", &val );
+        [o_btn_fullscreen setState: val.b_bool];
+        vlc_object_release( p_playlist );
     }
 }
 
@@ -864,11 +862,11 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         p_intf->p_sys->b_intf_update = VLC_FALSE;
     }
 
-    if (p_intf->p_sys->b_fullscreen_update )
+    if( p_intf->p_sys->b_fullscreen_update )
     {
         vout_thread_t * p_vout;
         vlc_value_t val;
-        if (var_Change (p_intf, "fullscreen", VLC_VAR_INHERITVALUE, &val, NULL)>=0 &&  val.b_bool )
+        if( var_Get( p_playlist, "fullscreen", &val )>=0 && val.b_bool )
         {
             [o_btn_fullscreen setState:VLC_TRUE];
         }
@@ -876,11 +874,11 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         {
             [o_btn_fullscreen setState:VLC_FALSE];
         }
-        p_vout = vlc_object_find(p_intf,VLC_OBJECT_VOUT,FIND_ANYWHERE);
-        if (p_vout != NULL)
+        p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+        if( p_vout != NULL )
         {
             [o_btn_fullscreen setEnabled: VLC_TRUE];
-            vlc_object_release(p_vout);
+            vlc_object_release( p_vout );
         }
         else
         {

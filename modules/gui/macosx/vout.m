@@ -959,8 +959,9 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void)toggleFullscreen
 {
-    config_PutInt(p_vout, "fullscreen", !p_vout->b_fullscreen);
-    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+    vlc_value_t val;
+    val.b_bool = !p_vout->b_fullscreen;
+    var_Set( p_vout, "fullscreen", val );
 }
 
 - (BOOL)isFullscreen
@@ -1499,7 +1500,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     initDone = 1;
 }
 
-- (void) reloadTexture
+- (void)reloadTexture
 {
     if( !initDone )
     {
@@ -1519,7 +1520,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             PP_OUTPUTPICTURE[0]->p_data );
 }
 
-- (void) goFullScreen
+- (void)goFullScreen
 {
     /* Create the new pixel format */
     NSOpenGLPixelFormatAttribute attribs[] =
@@ -1598,7 +1599,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     isFullScreen = 1;
 }
 
-- (void) exitFullScreen
+- (void)exitFullScreen
 {
     /* Free current OpenGL context */
     [NSOpenGLContext clearCurrentContext];
