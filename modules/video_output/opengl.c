@@ -73,6 +73,9 @@ static int  Control      ( vout_thread_t *, int, va_list );
 
 static inline int GetAlignedSize( int );
 
+static int SendEvents( vlc_object_t *, char const *,
+                       vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -169,6 +172,12 @@ static int CreateVout( vlc_object_t *p_this )
     p_vout->pf_render = Render;
     p_vout->pf_display = DisplayVideo;
     p_vout->pf_control = Control;
+
+    /* Forward events from the opengl provider */
+    var_AddCallback( p_sys->p_vout, "mouse-x", SendEvents, p_vout );
+    var_AddCallback( p_sys->p_vout, "mouse-y", SendEvents, p_vout );
+    var_AddCallback( p_sys->p_vout, "mouse-moved", SendEvents, p_vout );
+    var_AddCallback( p_sys->p_vout, "mouse-clicked", SendEvents, p_vout );
 
     return VLC_SUCCESS;
 }
@@ -446,4 +455,13 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
         return p_sys->p_vout->pf_control( p_sys->p_vout, i_query, args );
     else
         return vout_vaControlDefault( p_vout, i_query, args );
+}
+
+/*****************************************************************************
+ * SendEvents: forward mouse and keyboard events to the parent p_vout
+ *****************************************************************************/
+static int SendEvents( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
+{
+    return var_Set( (vlc_object_t *)_p_vout, psz_var, newval );
 }

@@ -290,17 +290,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     p_vout->pf_control = 0;
     p_vout->p_parent_intf = 0;
 
-    /* Mouse coordinates */
-    var_Create( p_vout, "mouse-x", VLC_VAR_INTEGER );
-    var_Create( p_vout, "mouse-y", VLC_VAR_INTEGER );
-    var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
-    var_Create( p_vout, "mouse-moved", VLC_VAR_BOOL );
-    var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
-
-    var_Create( p_vout, "intf-change", VLC_VAR_BOOL );
-    val.b_bool = VLC_TRUE;
-    var_Set( p_vout, "intf-change", val );
-
     /* Initialize locks */
     vlc_mutex_init( p_vout, &p_vout->picture_lock );
     vlc_mutex_init( p_vout, &p_vout->subpicture_lock );

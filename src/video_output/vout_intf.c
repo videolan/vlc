@@ -222,6 +222,17 @@ void vout_IntfInit( vout_thread_t *p_vout )
         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
     }
     var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
+
+    /* Mouse coordinates */
+    var_Create( p_vout, "mouse-x", VLC_VAR_INTEGER );
+    var_Create( p_vout, "mouse-y", VLC_VAR_INTEGER );
+    var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
+    var_Create( p_vout, "mouse-moved", VLC_VAR_BOOL );
+    var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
+
+    var_Create( p_vout, "intf-change", VLC_VAR_BOOL );
+    val.b_bool = VLC_TRUE;
+    var_Set( p_vout, "intf-change", val );
 }
 
 /*****************************************************************************
