@@ -648,9 +648,12 @@ static int  DemuxOpen ( vlc_object_t *p_this )
 
         if( tk->p_es || tk->b_quicktime || tk->b_muxed )
         {
-            TAB_APPEND( p_sys->i_track, p_sys->track, tk );
             tk->readSource = sub->readSource();
             tk->rtpSource  = sub->rtpSource();
+
+            /* Append */
+            p_sys->track = (live_track_t**)realloc( p_sys->track, sizeof( live_track_t ) * ( p_sys->i_track + 1 ) );
+            p_sys->track[p_sys->i_track++] = tk;
         }
         else
         {

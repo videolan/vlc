@@ -2240,7 +2240,9 @@ static void InformationsCreate( input_thread_t *p_input )
         mkv_track_t *tk = &p_sys->track[i_track];
         vlc_meta_t *mtk = vlc_meta_New();
 
-        TAB_APPEND( p_sys->meta->i_track, p_sys->meta->track, mtk );
+        p_sys->meta->track = (vlc_meta_t**)realloc( p_sys->meta->track,
+                                                    sizeof( vlc_meta_t * ) * ( p_sys->meta->i_track + 1 ) );
+        p_sys->meta->track[p_sys->meta->i_track++] = mtk;
 
         if( tk->fmt.psz_description )
         {
