@@ -2,7 +2,7 @@
  * motion_blur.c : motion blur filter for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: motionblur.c,v 1.3 2002/11/23 02:40:30 sam Exp $
+ * $Id: motionblur.c,v 1.4 2002/11/28 17:35:00 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -144,10 +144,9 @@ static int Init( vout_thread_t *p_vout )
     case VLC_FOURCC('I','4','2','0'):
     case VLC_FOURCC('I','Y','U','V'):
     case VLC_FOURCC('Y','V','1','2'):
-        p_vout->p_sys->p_vout =
-            vout_CreateThread( p_vout,
-                               p_vout->output.i_width, p_vout->output.i_height,
-                               p_vout->output.i_chroma, p_vout->output.i_aspect );
+        p_vout->p_sys->p_vout = vout_Create( p_vout,
+                           p_vout->output.i_width, p_vout->output.i_height,
+                           p_vout->output.i_chroma, p_vout->output.i_aspect );
         break;
     default:
         break;
@@ -190,7 +189,7 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    vout_DestroyThread( p_vout->p_sys->p_vout );
+    vout_Destroy( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
 }

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.201 2002/11/28 14:34:39 sam Exp $
+ * $Id: video_output.c,v 1.202 2002/11/28 17:35:00 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -57,16 +57,83 @@ static void     MaskToShift       ( int *, int *, uint32_t );
 static void     InitWindowSize    ( vout_thread_t *, int *, int * );
 
 /*****************************************************************************
- * vout_CreateThread: creates a new video output thread
+ * vout_Request: find a video output thread, create one, or destroy one.
+ *****************************************************************************
+ * This function looks for a video output thread matching the current
+ * properties. If not found, it spawns a new one.
+ *****************************************************************************/
+vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
+                                 unsigned int i_width, unsigned int i_height,
+                                 vlc_fourcc_t i_chroma, unsigned int i_aspect )
+{
+    if( !i_width || !i_height || !i_chroma )
+    {
+        /* Reattach video output to p_vlc before bailing out */
+        if( p_vout )
+        {
+            vlc_object_detach( p_vout );
+            vlc_object_attach( p_vout, p_this->p_vlc );
+        }
+
+        return NULL;
+    }
+
+    /* If a video output was provided, lock it, otherwise look for one. */
+    if( p_vout )
+    {
+        vlc_object_yield( p_vout );
+    }
+    else
+    {
+        p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT, FIND_CHILD );
+
+        if( !p_vout )
+        {
+            p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+        }
+    }
+
+    /* If we now have a video output, check it has the right properties */
+    if( p_vout )
+    {
+        if( ( p_vout->render.i_width != i_width ) ||
+            ( p_vout->render.i_height != i_height ) ||
+            ( p_vout->render.i_chroma != i_chroma ) )
+        {
+            /* We are not interested in this format, close this vout */
+            vlc_object_detach( p_vout );
+            vlc_object_release( p_vout );
+            vout_Destroy( p_vout );
+            p_vout = NULL;
+        }
+        else
+        {
+            /* This video output is cool! Hijack it. */
+            vlc_object_detach( p_vout );
+            vlc_object_attach( p_vout, p_this );
+            vlc_object_release( p_vout );
+        }
+    }
+
+    if( !p_vout )
+    {
+        msg_Dbg( p_this, "no usable vout present, spawning one" );
+
+        p_vout = vout_Create( p_this, i_width, i_height, i_chroma, i_aspect );
+    }
+
+    return p_vout;
+}
+
+/*****************************************************************************
+ * vout_Create: creates a new video output thread
  *****************************************************************************
  * This function creates a new video output thread, and returns a pointer
  * to its description. On error, it returns NULL.
  *****************************************************************************/
-vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
-                                      unsigned int i_width,
-                                      unsigned int i_height,
-                                      vlc_fourcc_t i_chroma,
-                                      unsigned int i_aspect )
+vout_thread_t * __vout_Create( vlc_object_t *p_parent,
+                               unsigned int i_width, unsigned int i_height,
+                               vlc_fourcc_t i_chroma, unsigned int i_aspect )
 {
     vout_thread_t * p_vout;                             /* thread descriptor */
     int             i_index;                                /* loop variable */
@@ -253,17 +320,17 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
 }
 
 /*****************************************************************************
- * vout_DestroyThread: destroys a previously created thread
+ * vout_Destroy: destroys a previously created video output
  *****************************************************************************
  * Destroy a terminated thread.
  * The function will request a destruction of the specified thread. If pi_error
  * is NULL, it will return once the thread is destroyed. Else, it will be
  * update using one of the THREAD_* constants.
  *****************************************************************************/
-void vout_DestroyThread( vout_thread_t *p_vout )
+void vout_Destroy( vout_thread_t *p_vout )
 {
     /* Request thread destruction */
-    p_vout->b_die = 1;
+    p_vout->b_die = VLC_TRUE;
     vlc_thread_join( p_vout );
 
     /* Free structure */
@@ -314,6 +381,7 @@ static int InitThread( vout_thread_t *p_vout )
 
     msg_Dbg( p_vout, "got %i direct buffer(s)", I_OUTPUTPICTURES );
 
+#if 0
     if( !p_vout->psz_filter_chain )
     {
         char *psz_aspect = config_GetPsz( p_vout, "pixel-ratio" );
@@ -334,6 +402,7 @@ static int InitThread( vout_thread_t *p_vout )
             }
         }
     }
+#endif
 
     i_pgcd = ReduceHeight( p_vout->render.i_aspect );
     msg_Dbg( p_vout,

@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.3 2002/11/23 02:40:30 sam Exp $
+ * $Id: wall.c,v 1.4 2002/11/28 17:35:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -248,11 +248,11 @@ static int Init( vout_thread_t *p_vout )
             }
 
             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout =
-                vout_CreateThread( p_vout, i_width, i_height,
-                                   p_vout->render.i_chroma,
-                                   p_vout->render.i_aspect
-                                    * p_vout->render.i_height / i_height
-                                    * i_width / p_vout->render.i_width );
+                vout_Create( p_vout, i_width, i_height,
+                             p_vout->render.i_chroma,
+                             p_vout->render.i_aspect
+                              * p_vout->render.i_height / i_height
+                              * i_width / p_vout->render.i_width );
             if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout == NULL )
             {
                 msg_Err( p_vout, "failed to get %ix%i vout threads",
@@ -413,7 +413,7 @@ static void RemoveAllVout( vout_thread_t *p_vout )
          --p_vout->p_sys->i_vout;
          if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active )
          {
-             vout_DestroyThread(
+             vout_Destroy(
                p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
          }
     }

@@ -2,15 +2,15 @@
  * dv.c: a decoder for DV video
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dv.c,v 1.2 2002/11/06 09:26:25 sam Exp $
+ * $Id: dv.c,v 1.3 2002/11/28 17:34:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -39,7 +39,7 @@
 static int RunDecoder  ( decoder_fifo_t * );
 static int OpenDecoder ( vlc_object_t * );
 
-static u32 GetFourCC   ( dv_sample_t );
+static vlc_fourcc_t GetFourCC   ( dv_sample_t );
 
 /*****************************************************************************
  * Module descriptor
@@ -73,7 +73,7 @@ static int OpenDecoder ( vlc_object_t *p_this )
  *****************************************************************************/
 static int RunDecoder ( decoder_fifo_t *p_fifo )
 {
-    u8 *p_buffer;
+    uint8_t *p_buffer;
     pes_packet_t *p_pes = NULL;
     int i_data = 120000;
     int i_aspect;
@@ -81,7 +81,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
     bit_stream_t    bit_stream;
     dv_decoder_t *  p_decoder;
     vout_thread_t * p_vout;
-    
+
     p_buffer = malloc( i_data );
     if( !p_buffer )
     {
@@ -149,7 +149,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
         {
             p_buffer = realloc( p_buffer, p_decoder->frame_size );
         }
-    
+
         /* Don't trust the sucker */
         //p_decoder->quality = p_decoder->video->quality;
         p_decoder->quality = DV_QUALITY_BEST;
@@ -157,43 +157,9 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
 
         /* Spawn a video output if there is none. First we look amongst our
          * children, then we look for any other vout that might be available */
-        p_vout = vlc_object_find( p_fifo, VLC_OBJECT_VOUT, FIND_CHILD );
-        if( !p_vout ) 
-        {
-            p_vout = vlc_object_find( p_fifo, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-        }
-
-        if( p_vout )
-        {
-            if( p_vout->render.i_width != p_decoder->width
-             || p_vout->render.i_height != p_decoder->height
-             || p_vout->render.i_chroma != GetFourCC( p_decoder->sampling )
-             || p_vout->render.i_aspect != i_aspect )
-            {
-                /* We are not interested in this format, close this vout */
-                vlc_object_detach( p_vout );
-                vlc_object_release( p_vout );
-                vout_DestroyThread( p_vout );
-                p_vout = NULL;
-            }
-            else
-            {
-                /* This video output is cool! Hijack it. */
-                vlc_object_detach( p_vout );
-                vlc_object_attach( p_vout, p_fifo );
-                vlc_object_release( p_vout );
-            }
-        }
-
-        if( !p_vout )
-        {
-            msg_Dbg( p_fifo, "no vout present, spawning one" );
-
-            p_vout = vout_CreateThread( p_fifo,
-                                        p_decoder->width, p_decoder->height,
-                                        GetFourCC( p_decoder->sampling ),
-                                        i_aspect );
-        }
+        p_vout = vout_Request( p_fifo, NULL,
+                               p_decoder->width, p_decoder->height,
+                               GetFourCC( p_decoder->sampling ), i_aspect );
 
         /* Main loop */
         while( !p_fifo->b_die && !p_fifo->b_error )
@@ -231,7 +197,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
                              || dv_frame_changed( p_decoder ) ) )
             {
                 picture_t *p_pic;
-                u8 *pixels[3];
+                uint8_t *pixels[3];
                 int pitches[3], i;
 
                 while( !(p_pic = vout_CreatePicture( p_vout, 0, 0, 0 ) ) )
@@ -239,7 +205,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
                     if( p_fifo->b_die || p_fifo->b_error )
                     {
                         break;
-                    } 
+                    }
                     msleep( VOUT_OUTMEM_SLEEP );
                 }
 
@@ -265,11 +231,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
             i_data = 0;
         }
 
-        if( p_vout )
-        {
-            vlc_object_detach( p_vout );
-            vout_DestroyThread( p_vout );
-        }
+        vout_Request( p_fifo, p_vout, 0, 0, 0, 0 );
     }
 
     if( p_pes )
@@ -289,7 +251,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
     return 0;
 }
 
-static u32 GetFourCC( dv_sample_t x )
+static vlc_fourcc_t GetFourCC( dv_sample_t x )
 {
     switch( x )
     {

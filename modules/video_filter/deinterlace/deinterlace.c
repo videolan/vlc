@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.4 2002/10/16 11:35:52 sam Exp $
+ * $Id: deinterlace.c,v 1.5 2002/11/28 17:35:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -210,7 +210,7 @@ static int Init( vout_thread_t *p_vout )
         case DEINTERLACE_MEAN:
         case DEINTERLACE_DISCARD:
             p_vout->p_sys->p_vout =
-                vout_CreateThread( p_vout,
+                vout_Create( p_vout,
                        p_vout->output.i_width, p_vout->output.i_height / 2,
                        p_vout->output.i_chroma, p_vout->output.i_aspect );
             break;
@@ -219,7 +219,7 @@ static int Init( vout_thread_t *p_vout )
         case DEINTERLACE_BLEND:
         case DEINTERLACE_LINEAR:
             p_vout->p_sys->p_vout =
-                vout_CreateThread( p_vout,
+                vout_Create( p_vout,
                        p_vout->output.i_width, p_vout->output.i_height,
                        p_vout->output.i_chroma, p_vout->output.i_aspect );
             break;
@@ -228,7 +228,7 @@ static int Init( vout_thread_t *p_vout )
 
     case VLC_FOURCC('I','4','2','2'):
         p_vout->p_sys->p_vout =
-            vout_CreateThread( p_vout,
+            vout_Create( p_vout,
                        p_vout->output.i_width, p_vout->output.i_height,
                        VLC_FOURCC('I','4','2','0'), p_vout->output.i_aspect );
         break;
@@ -274,7 +274,7 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    vout_DestroyThread( p_vout->p_sys->p_vout );
+    vout_Destroy( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
 }

@@ -2,15 +2,15 @@
  * xvid.c: a decoder for libxvidcore, the Xvid video codec
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: xvid.c,v 1.2 2002/11/06 09:26:25 sam Exp $
+ * $Id: xvid.c,v 1.3 2002/11/28 17:34:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -48,7 +48,7 @@ vlc_module_begin();
     set_description( _("Xvid video decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );
-    add_bool( "xvid-direct-render", 0, NULL, "direct rendering", 
+    add_bool( "xvid-direct-render", 0, NULL, "direct rendering",
               "Use libxvidcore's direct rendering feature." );
 vlc_module_end();
 
@@ -147,51 +147,18 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
 
     /* Spawn a video output if there is none. First we look amongst our
      * children, then we look for any other vout that might be available */
-    p_vout = vlc_object_find( p_fifo, VLC_OBJECT_VOUT, FIND_CHILD );
-    if( !p_vout ) 
-    {
-        p_vout = vlc_object_find( p_fifo, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    }
-
-    if( p_vout )
-    {
-        if( p_vout->render.i_width != i_width
-         || p_vout->render.i_height != i_height
-         || p_vout->render.i_chroma != i_chroma
-         || p_vout->render.i_aspect != i_aspect )
-        {
-            /* We are not interested in this format, close this vout */
-            vlc_object_detach( p_vout );
-            vlc_object_release( p_vout );
-            vout_DestroyThread( p_vout );
-            p_vout = NULL;
-        }
-        else
-        {
-            /* This video output is cool! Hijack it. */
-            vlc_object_detach( p_vout );
-            vlc_object_attach( p_vout, p_fifo );
-            vlc_object_release( p_vout );
-        }
-    }
+    p_vout = vout_Request( p_fifo, NULL,
+                           i_width, i_height, i_chroma, i_aspect );
 
     if( !p_vout )
     {
-        msg_Dbg( p_fifo, "no vout present, spawning one" );
-
-        p_vout = vout_CreateThread( p_fifo,
-                                    i_width, i_height,
-                                    i_chroma, i_aspect );
-        if( !p_vout )
-        {
-            msg_Err( p_fifo, "could not spawn vout" );
-            p_fifo->b_error = VLC_TRUE;
-            xvid_decore( p_xvid, XVID_DEC_DESTROY, NULL, NULL );
-            free( p_buffer );
-            CloseBitstream( &bit_stream );
-            DecoderError( p_fifo );
-            return VLC_EGENERIC;
-        }
+        msg_Err( p_fifo, "could not spawn vout" );
+        p_fifo->b_error = VLC_TRUE;
+        xvid_decore( p_xvid, XVID_DEC_DESTROY, NULL, NULL );
+        free( p_buffer );
+        CloseBitstream( &bit_stream );
+        DecoderError( p_fifo );
+        return VLC_EGENERIC;
     }
 
     /* Main loop */
@@ -278,8 +245,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
     }
 
     /* Clean up everything */
-    vlc_object_detach( p_vout );
-    vout_DestroyThread( p_vout );
+    vout_Request( p_fifo, p_vout, 0, 0, 0, 0 );
 
     xvid_decore( p_xvid, XVID_DEC_DESTROY, NULL, NULL );
 

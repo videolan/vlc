@@ -2,7 +2,7 @@
  * clone.c : Clone video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: clone.c,v 1.2 2002/11/23 02:40:30 sam Exp $
+ * $Id: clone.c,v 1.3 2002/11/28 17:35:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -135,8 +135,7 @@ static int Init( vout_thread_t *p_vout )
 
     for( i_vout = 0; i_vout < p_vout->p_sys->i_clones; i_vout++ )
     {
-        p_vout->p_sys->pp_vout[ i_vout ] =
-                vout_CreateThread( p_vout,
+        p_vout->p_sys->pp_vout[ i_vout ] = vout_Create( p_vout,
                             p_vout->render.i_width, p_vout->render.i_height,
                             p_vout->render.i_chroma, p_vout->render.i_aspect );
         if( p_vout->p_sys->pp_vout[ i_vout ] == NULL )
@@ -250,7 +249,7 @@ static void RemoveAllVout( vout_thread_t *p_vout )
     while( p_vout->p_sys->i_clones )
     {
          --p_vout->p_sys->i_clones;
-         vout_DestroyThread( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones] );
+         vout_Destroy( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones] );
     }
 }
 

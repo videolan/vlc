@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.47 2002/11/14 15:07:49 sigmunau Exp $
+ * $Id: libvlc.c,v 1.48 2002/11/28 17:35:00 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -830,7 +830,7 @@ int VLC_Stop( int i_object )
     {
         vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
-        vout_DestroyThread( p_vout );
+        vout_Destroy( p_vout );
     }
 
     /*

@@ -2,7 +2,7 @@
  * crop.c : Crop video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: crop.c,v 1.3 2002/11/23 02:40:30 sam Exp $
+ * $Id: crop.c,v 1.4 2002/11/28 17:35:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -232,8 +232,7 @@ static int Init( vout_thread_t *p_vout )
                             * p_vout->p_sys->i_width / p_vout->output.i_width;
 
     /* Try to open the real video output */
-    p_vout->p_sys->p_vout =
-        vout_CreateThread( p_vout,
+    p_vout->p_sys->p_vout = vout_Create( p_vout,
                     p_vout->p_sys->i_width, p_vout->p_sys->i_height,
                     p_vout->render.i_chroma, p_vout->p_sys->i_aspect );
     if( p_vout->p_sys->p_vout == NULL )
@@ -271,7 +270,7 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    vout_DestroyThread( p_vout->p_sys->p_vout );
+    vout_Destroy( p_vout->p_sys->p_vout );
     free( p_vout->p_sys );
 }
 
@@ -288,10 +287,9 @@ static int Manage( vout_thread_t *p_vout )
         return 0;
     }
 
-    vout_DestroyThread( p_vout->p_sys->p_vout );
+    vout_Destroy( p_vout->p_sys->p_vout );
 
-    p_vout->p_sys->p_vout =
-        vout_CreateThread( p_vout,
+    p_vout->p_sys->p_vout = vout_Create( p_vout,
                     p_vout->p_sys->i_width, p_vout->p_sys->i_height,
                     p_vout->render.i_chroma, p_vout->p_sys->i_aspect );
     if( p_vout->p_sys->p_vout == NULL )

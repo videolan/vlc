@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: headers.c,v 1.5 2002/11/20 13:37:35 sam Exp $
+ * $Id: headers.c,v 1.6 2002/11/28 17:35:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -311,8 +311,6 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 
     int i_aspect;
 
-    vout_thread_t *p_vout;
-
     p_vpar->sequence.i_width = GetBits( &p_vpar->bit_stream, 12 );
     p_vpar->sequence.i_height = GetBits( &p_vpar->bit_stream, 12 );
     i_aspect = GetBits( &p_vpar->bit_stream, 4 );
@@ -479,39 +477,11 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 
     /* Spawn a video output if there is none. First we look for our children,
      * then we look for any other vout that might be available. */
-    p_vout = vlc_object_find( p_vpar->p_fifo, VLC_OBJECT_VOUT, FIND_CHILD );
-    if( p_vout == NULL )
-    {
-        p_vout = vlc_object_find( p_vpar->p_fifo, VLC_OBJECT_VOUT,
-                                                  FIND_ANYWHERE );
-    }
-    
-    if( p_vout )
-    {
-        if( p_vout->render.i_width != p_vpar->sequence.i_width
-             || p_vout->render.i_height != p_vpar->sequence.i_height
-             || p_vout->render.i_chroma != ChromaToFourCC( p_vpar->sequence.i_chroma_format )
-             || p_vout->render.i_aspect != p_vpar->sequence.i_aspect )
-        {
-            /* We are not interested in this format, close this vout */
-            vlc_object_detach( p_vout );
-            vlc_object_release( p_vout );
-            vout_DestroyThread( p_vout );
-            p_vout = NULL;
-        }
-        else
-        {
-            /* This video output is cool! Hijack it. */
-            if( p_vout != p_vpar->p_vout )
-            {
-                vlc_object_detach( p_vout );
-                vlc_object_attach( p_vout, p_vpar->p_fifo );
-            }
-            vlc_object_release( p_vout );
-        }
-    }
-
-    p_vpar->p_vout = p_vout;
+    p_vpar->p_vout =
+           vout_Request( p_vpar->p_fifo, p_vpar->p_vout,
+                         p_vpar->sequence.i_width, p_vpar->sequence.i_height,
+                         ChromaToFourCC( p_vpar->sequence.i_chroma_format ),
+                         p_vpar->sequence.i_aspect );
 
     if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
     {
@@ -520,21 +490,9 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 
     if( p_vpar->p_vout == NULL )
     {
-        msg_Dbg( p_vpar->p_fifo, "no vout present, spawning one" );
-
-        p_vpar->p_vout = vout_CreateThread( p_vpar->p_fifo,
-                           p_vpar->sequence.i_width,
-                           p_vpar->sequence.i_height,
-                           ChromaToFourCC( p_vpar->sequence.i_chroma_format ),
-                           p_vpar->sequence.i_aspect );
-
-        /* Everything failed */
-        if( p_vpar->p_vout == NULL )
-        {
-            msg_Err( p_vpar->p_fifo, "cannot open vout, aborting" );
-            p_vpar->p_fifo->b_error = 1;
-            return;
-        }
+        msg_Err( p_vpar->p_fifo, "cannot open vout, aborting" );
+        p_vpar->p_fifo->b_error = 1;
+        return;
     }
 }
 

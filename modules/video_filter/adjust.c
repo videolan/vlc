@@ -2,7 +2,7 @@
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: adjust.c,v 1.1 2002/11/23 00:11:17 garf Exp $
+ * $Id: adjust.c,v 1.2 2002/11/28 17:35:00 sam Exp $
  *
  * Authors: Simon Latapie <garf@via.ecp.fr>, Samuel Hocevar <sam@zoy.org>
  *
@@ -137,10 +137,9 @@ static int Init( vout_thread_t *p_vout )
     /* Try to open the real video output */
     msg_Dbg( p_vout, "spawning the real video output" );
 
-    p_vout->p_sys->p_vout =
-        vout_CreateThread( p_vout,
-                           p_vout->render.i_width, p_vout->render.i_height,
-                           p_vout->render.i_chroma, p_vout->render.i_aspect );
+    p_vout->p_sys->p_vout = vout_Create( p_vout,
+                     p_vout->render.i_width, p_vout->render.i_height,
+                     p_vout->render.i_chroma, p_vout->render.i_aspect );
 
     /* Everything failed */
     if( p_vout->p_sys->p_vout == NULL )
@@ -179,7 +178,7 @@ static void Destroy( vlc_object_t *p_this )
 {   
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    vout_DestroyThread( p_vout->p_sys->p_vout );
+    vout_Destroy( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
 }

@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.8 2002/11/27 15:18:24 sam Exp $
+ * $Id: cinepak.c,v 1.9 2002/11/28 17:34:59 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -189,83 +189,6 @@ static void GetPESData( u8 *p_buf, int i_max, pes_packet_t *p_pes )
     }
 }
 
-static int cinepak_CheckVout( vout_thread_t *p_vout,
-                              int i_width,
-                              int i_height )
-{
-    if( !p_vout )
-    {
-        return( 0 );
-    }
-    
-    if( ( p_vout->render.i_width != i_width )||
-        ( p_vout->render.i_height != i_height )||
-        ( p_vout->render.i_chroma != VLC_FOURCC('I','4','2','0') )||
-        ( p_vout->render.i_aspect != VOUT_ASPECT_FACTOR * i_width / i_height) )
-    {
-        return( 0 );
-    }
-    else
-    {
-        return( 1 );
-    }
-}
-
-/* Return a Vout */
-
-static vout_thread_t *cinepak_CreateVout( videodec_thread_t *p_vdec,
-                                         int i_width,
-                                         int i_height )
-{
-    vout_thread_t *p_vout;
-
-    if( (!i_width)||(!i_height) )
-    {
-        return( NULL ); /* Can't create a new vout without display size */
-    }
-
-    /* Spawn a video output if there is none. First we look for our children,
-     * then we look for any other vout that might be available. */
-    p_vout = vlc_object_find( p_vdec->p_fifo, VLC_OBJECT_VOUT,
-                                              FIND_CHILD );
-    if( !p_vout )
-    {
-        p_vout = vlc_object_find( p_vdec->p_fifo, VLC_OBJECT_VOUT,
-                                                  FIND_ANYWHERE );
-    }
-
-    if( p_vout )
-    {
-        if( !cinepak_CheckVout( p_vout, i_width, i_height ) )
-        {
-            /* We are not interested in this format, close this vout */
-            vlc_object_detach( p_vout );
-            vlc_object_release( p_vout );
-            vout_DestroyThread( p_vout );
-            p_vout = NULL;
-        }
-        else
-        {
-            /* This video output is cool! Hijack it. */
-            vlc_object_detach( p_vout );
-            vlc_object_attach( p_vout, p_vdec->p_fifo );
-            vlc_object_release( p_vout );
-        }
-    }
-
-    if( p_vout == NULL )
-    {
-        msg_Dbg( p_vdec->p_fifo, "no vout present, spawning one" );
-    
-        p_vout = vout_CreateThread( p_vdec->p_fifo,
-                                    i_width,
-                                    i_height,
-                                    VLC_FOURCC('I','4','2','0'),
-                                    VOUT_ASPECT_FACTOR * i_width / i_height );
-    }
-
-    return( p_vout );
-}
 
 void cinepak_LoadCodebook( cinepak_codebook_t *p_codebook,
                            u8 *p_data,
@@ -840,23 +763,21 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
                                   i_frame_size );
         return;
     }
-    
-    /* Check our vout */
-    if( !cinepak_CheckVout( p_vdec->p_vout,
-                            p_vdec->p_context->i_width,
-                            p_vdec->p_context->i_height ) )
-    {
-        p_vdec->p_vout = 
-          cinepak_CreateVout( p_vdec,
-                              p_vdec->p_context->i_width,
-                              p_vdec->p_context->i_height );
 
-        if( !p_vdec->p_vout )
-        {
-            msg_Err( p_vdec->p_fifo, "cannot create vout" );
-            p_vdec->p_fifo->b_error = 1; /* abort */
-            return;
-        }
+    /* Check our vout */
+    p_vdec->p_vout = vout_Request( p_vdec->p_fifo, p_vdec->p_vout,
+                                   p_vdec->p_context->i_width,
+                                   p_vdec->p_context->i_height,
+                                   VLC_FOURCC('I','4','2','0'),
+                                   p_vdec->p_context->i_width
+                                    * VOUT_ASPECT_FACTOR
+                                    / p_vdec->p_context->i_height );
+
+    if( !p_vdec->p_vout )
+    {
+        msg_Err( p_vdec->p_fifo, "cannot create vout" );
+        p_vdec->p_fifo->b_error = VLC_TRUE; /* abort */
+        return;
     }
 
     /* Send decoded frame to vout */
@@ -905,7 +826,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
 static void EndThread( videodec_thread_t *p_vdec )
 {
     int i;
-    
+
     if( !p_vdec )
     {
         return;
@@ -916,16 +837,12 @@ static void EndThread( videodec_thread_t *p_vdec )
     {
         FREE( p_vdec->p_context->p_pix[i] );
     }
-    
+
     free( p_vdec->p_context );
-    
-    if( p_vdec->p_vout != NULL )
-    {
-        /* We are about to die. Reattach video output to p_vlc. */
-        vlc_object_detach( p_vdec->p_vout );
-        vlc_object_attach( p_vdec->p_vout, p_vdec->p_fifo->p_vlc );
-    }
-    
+
+    /* Get rid of our video output if we have one. */
+    vout_Request( p_vdec->p_fifo, p_vdec->p_vout, 0, 0, 0, 0 );
+
     free( p_vdec );
 }
 

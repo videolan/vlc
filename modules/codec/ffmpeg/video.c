@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.7 2002/11/28 16:44:05 fenrir Exp $
+ * $Id: video.c,v 1.8 2002/11/28 17:35:00 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -99,34 +99,6 @@ static inline int ffmpeg_FfAspect( int i_width, int i_height, int i_ffaspect )
     }
 }
 
-/* Check if we have a Vout with good parameters */
-static int ffmpeg_CheckVout( vout_thread_t *p_vout,
-                             int i_width,
-                             int i_height,
-                             int i_chroma )
-{
-    if( !p_vout )
-    {
-        return( 0 );
-    }
-    if( !i_chroma )
-    {
-        /* we will try to make conversion */
-        i_chroma = VLC_FOURCC('I','4','2','0');
-    } 
-
-    if( ( p_vout->render.i_width != i_width )||
-        ( p_vout->render.i_height != i_height )||
-        ( p_vout->render.i_chroma != i_chroma ) )
-    {
-        return( 0 );
-    }
-    else
-    {
-        return( 1 );
-    }
-}
-
 /* Return a Vout */
 static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
                                          AVCodecContext *p_context )
@@ -149,7 +121,7 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
         msg_Warn( p_vdec->p_fifo, "Internal chroma conversion (FIXME)");
         /* It's mainly for I410 -> I420 conversion that I've made,
            it's buggy and very slow */
-    } 
+    }
 
 #if LIBAVCODEC_BUILD >= 4640
     i_aspect = (int) ( VOUT_ASPECT_FACTOR * p_vdec->p_context->aspect_ratio );
@@ -178,43 +150,10 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
 #endif
     /* Spawn a video output if there is none. First we look for our children,
      * then we look for any other vout that might be available. */
-    p_vout = vlc_object_find( p_vdec->p_fifo, VLC_OBJECT_VOUT,
-                                              FIND_CHILD );
-    if( !p_vout )
-    {
-        p_vout = vlc_object_find( p_vdec->p_fifo, VLC_OBJECT_VOUT,
-                                                  FIND_ANYWHERE );
-    }
+    p_vout = vout_Request( p_vdec->p_fifo, NULL,
+                           i_width, i_height, i_chroma, i_aspect );
 
-    if( p_vout )
-    {
-        if( !ffmpeg_CheckVout( p_vout, i_width, i_height, i_chroma ) )
-        {
-            /* We are not interested in this format, close this vout */
-            vlc_object_detach( p_vout );
-            vlc_object_release( p_vout );
-            vout_DestroyThread( p_vout );
-            p_vout = NULL;
-        }
-        else
-        {
-            /* This video output is cool! Hijack it. */
-            vlc_object_detach( p_vout );
-            vlc_object_attach( p_vout, p_vdec->p_fifo );
-            vlc_object_release( p_vout );
-        }
-    }
-
-    if( p_vout == NULL )
-    {
-        msg_Dbg( p_vdec->p_fifo, "no vout present, spawning one" );
-
-        p_vout = vout_CreateThread( p_vdec->p_fifo,
-                                    i_width, i_height,
-                                    i_chroma, i_aspect );
-    }
-
-    return( p_vout );
+    return p_vout;
 }
 
 /* FIXME FIXME FIXME this is a big shit
@@ -722,19 +661,12 @@ usenextdata:
 
     if( !p_vdec->b_direct_rendering )
     {
-        /* Check our vout */
-        if( !ffmpeg_CheckVout( p_vdec->p_vout, 
-                           p_vdec->p_context->width,
-                           p_vdec->p_context->height,
-                           ffmpeg_PixFmtToChroma(p_vdec->p_context->pix_fmt)) )
+        p_vdec->p_vout = ffmpeg_CreateVout( p_vdec, p_vdec->p_context );
+        if( !p_vdec->p_vout )
         {
-            p_vdec->p_vout = ffmpeg_CreateVout( p_vdec, p_vdec->p_context );
-            if( !p_vdec->p_vout )
-            {
-                msg_Err( p_vdec->p_fifo, "cannot create vout" );
-                p_vdec->p_fifo->b_error = 1; /* abort */
-                return;
-            }
+            msg_Err( p_vdec->p_fifo, "cannot create vout" );
+            p_vdec->p_fifo->b_error = 1; /* abort */
+            return;
         }
 
         /* Get a new picture */
@@ -811,12 +743,8 @@ void E_( EndThread_Video )( vdec_thread_t *p_vdec )
         p_vdec->p_pp = NULL;
     }
 
-    if( p_vdec->p_vout != NULL )
-    {
-        /* We are about to die. Reattach video output to p_vlc. */
-        vlc_object_detach( p_vdec->p_vout );
-        vlc_object_attach( p_vdec->p_vout, p_vdec->p_fifo->p_vlc );
-    }
+    /* We are about to die. Reattach video output to p_vlc. */
+    vout_Request( p_vdec->p_fifo, p_vdec->p_vout, 0, 0, 0, 0 );
 }
 
 /*****************************************************************************
@@ -904,18 +832,12 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *avctx, int width,
     picture_t *p_pic;
 
     /* Check our vout */
-    if( !ffmpeg_CheckVout( p_vdec->p_vout,
-                           p_vdec->p_context->width,
-                           p_vdec->p_context->height,
-                           ffmpeg_PixFmtToChroma(p_vdec->p_context->pix_fmt)) )
+    p_vdec->p_vout = ffmpeg_CreateVout( p_vdec, p_vdec->p_context );
+    if( !p_vdec->p_vout )
     {
-        p_vdec->p_vout = ffmpeg_CreateVout( p_vdec, p_vdec->p_context );
-        if( !p_vdec->p_vout )
-        {
-            msg_Err( p_vdec->p_fifo, "cannot create vout" );
-            p_vdec->p_fifo->b_error = 1; /* abort */
-            return -1;
-        }
+        msg_Err( p_vdec->p_fifo, "cannot create vout" );
+        p_vdec->p_fifo->b_error = 1; /* abort */
+        return -1;
     }
 
     /* Get a new picture */

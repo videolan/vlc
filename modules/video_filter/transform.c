@@ -2,7 +2,7 @@
  * transform.c : transform image plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: transform.c,v 1.3 2002/11/23 02:40:30 sam Exp $
+ * $Id: transform.c,v 1.4 2002/11/28 17:35:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -174,8 +174,7 @@ static int Init( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->b_rotation )
     {
-        p_vout->p_sys->p_vout =
-            vout_CreateThread( p_vout,
+        p_vout->p_sys->p_vout = vout_Create( p_vout,
                            p_vout->render.i_height, p_vout->render.i_width,
                            p_vout->render.i_chroma,
                            (u64)VOUT_ASPECT_FACTOR * (u64)VOUT_ASPECT_FACTOR
@@ -183,8 +182,7 @@ static int Init( vout_thread_t *p_vout )
     }
     else
     {
-        p_vout->p_sys->p_vout =
-            vout_CreateThread( p_vout,
+        p_vout->p_sys->p_vout = vout_Create( p_vout,
                            p_vout->render.i_width, p_vout->render.i_height,
                            p_vout->render.i_chroma, p_vout->render.i_aspect );
     }
@@ -225,7 +223,7 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    vout_DestroyThread( p_vout->p_sys->p_vout );
+    vout_Destroy( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
 }

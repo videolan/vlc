@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.7 2002/11/20 13:37:35 sam Exp $
+ * $Id: parser.c,v 1.8 2002/11/28 17:35:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -299,28 +299,23 @@ static void EndThread( vpar_thread_t *p_vpar )
     times( &cpu_usage );
 #endif
 
-    if( p_vpar->p_vout != NULL )
+    /* Release used video buffers. */
+    if( p_vpar->sequence.p_forward != NULL )
     {
-        /* Release used video buffers. */
-        if( p_vpar->sequence.p_forward != NULL )
-        {
-            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
-        }
-        if( p_vpar->sequence.p_backward != NULL )
-        {
-            vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
-                              vpar_SynchroDate( p_vpar ) );
-            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
-        }
-        if( p_vpar->picture.p_picture != NULL )
-        {
-            vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
-        }
-
-        /* We are about to die. Reattach video output to p_vlc. */
-        vlc_object_detach( p_vpar->p_vout );
-        vlc_object_attach( p_vpar->p_vout, p_vpar->p_fifo->p_vlc );
+        vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
     }
+    if( p_vpar->sequence.p_backward != NULL )
+    {
+        vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
+                          vpar_SynchroDate( p_vpar ) );
+        vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+    }
+    if( p_vpar->picture.p_picture != NULL )
+    {
+        vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
+    }
+
+    vout_Request( p_vpar->p_fifo, p_vpar->p_vout, 0, 0, 0, 0 );
 
     msg_Dbg( p_vpar->p_fifo, "%d loops among %d sequence(s)",
              p_vpar->c_loops, p_vpar->c_sequences );

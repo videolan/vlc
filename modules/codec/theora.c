@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.1 2002/11/20 14:09:57 gbazin Exp $
+ * $Id: theora.c,v 1.2 2002/11/28 17:34:59 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -76,7 +76,7 @@ static void DecodePacket ( dec_thread_t * );
 static int  GetOggPacket ( dec_thread_t *, ogg_packet *, mtime_t * );
 
 static void theora_CopyPicture( dec_thread_t *, picture_t *, yuv_buffer * );
-static vout_thread_t *theora_SpawnVout( dec_thread_t *, int, int, int, int );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -124,6 +124,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     memset( p_dec, 0, sizeof(dec_thread_t) );
     p_dec->p_fifo = p_fifo;
     p_dec->p_pes  = NULL;
+    p_dec->p_vout = NULL;
 
     /* Take care of the initial Theora header */
     if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
@@ -152,8 +153,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
     i_chroma = VLC_FOURCC('Y','V','1','2');
 
-    p_dec->p_vout = theora_SpawnVout( p_dec, p_dec->ti.width, p_dec->ti.height,
-                                      i_aspect, i_chroma );
+    p_dec->p_vout = vout_Request( p_dec->p_fifo, p_dec->p_vout,
+                                  p_dec->ti.width, p_dec->ti.height,
+                                  i_aspect, i_chroma );
 
     /* theora decoder thread's main loop */
     while( (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error) )
@@ -263,75 +265,10 @@ static void CloseDecoder( dec_thread_t * p_dec )
         if( p_dec->p_pes )
             input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_dec->p_pes );
 
-        if( p_dec->p_vout )
-        {
-            vlc_object_detach( p_dec->p_vout );
-            vout_DestroyThread( p_dec->p_vout );
-        }
+        vout_Request( p_dec->p_fifo, p_dec->p_vout, 0, 0, 0, 0 );
 
         free( p_dec );
     }
-}
-
-/*****************************************************************************
- * theora_SpawnVout: creates a new video output
- *****************************************************************************/
-static vout_thread_t *theora_SpawnVout( dec_thread_t *p_dec,
-                                        int i_width,
-                                        int i_height,
-                                        int i_aspect,
-                                        int i_chroma )
-{
-    vout_thread_t *p_vout;
-
-    if( !i_width || !i_height )
-        return NULL;
-
-    if( !i_chroma )
-        return NULL;
-
-    /* Spawn a video output if there is none. First we look for our children,
-     * then we look for any other vout that might be available. */
-    p_vout = vlc_object_find( p_dec->p_fifo, VLC_OBJECT_VOUT,
-                                              FIND_CHILD );
-    if( !p_vout )
-    {
-        p_vout = vlc_object_find( p_dec->p_fifo, VLC_OBJECT_VOUT,
-                                                  FIND_ANYWHERE );
-    }
-
-    if( p_vout )
-    {
-        if( p_vout->render.i_width != i_width
-            || p_vout->render.i_height != i_height
-            || p_vout->render.i_chroma != i_chroma
-            || p_vout->render.i_aspect != i_aspect )
-        {
-            /* We are not interested in this format, close this vout */
-            vlc_object_detach( p_vout );
-            vlc_object_release( p_vout );
-            vout_DestroyThread( p_vout );
-            p_vout = NULL;
-        }
-        else
-        {
-            /* This video output is cool! Hijack it. */
-            vlc_object_detach( p_vout );
-            vlc_object_attach( p_vout, p_dec->p_fifo );
-            vlc_object_release( p_vout );
-        }
-    }
-
-    if( p_vout == NULL )
-    {
-        msg_Dbg( p_dec->p_fifo, "no vout present, spawning one" );
-
-        p_vout = vout_CreateThread( p_dec->p_fifo,
-                                    i_width, i_height,
-                                    i_chroma, i_aspect );
-    }
-
-    return( p_vout );
 }
 
 /*****************************************************************************

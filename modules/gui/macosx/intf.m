@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.4 2002/11/05 03:57:16 jlj Exp $
+ * $Id: intf.m,v 1.5 2002/11/28 17:35:01 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -434,7 +434,7 @@ static void Run( intf_thread_t *p_intf )
     {
         vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
-        vout_DestroyThread( p_vout );
+        vout_Destroy( p_vout );
     }
 
     if( o_prefs != nil )
