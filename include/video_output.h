@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppenned video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.58 2001/05/01 04:18:17 sam Exp $
+ * $Id: video_output.h,v 1.59 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -23,6 +23,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/*****************************************************************************
+ * vout_bank_t, p_vout_bank (global variable)
+ *****************************************************************************
+ * This global variable is accessed by any function using the video output.
+ *****************************************************************************/
+typedef struct
+{
+    /* Array to all the video outputs */
+    struct vout_thread_s *pp_vout[ VOUT_MAX_THREADS ];
+
+    int                   i_count;
+    vlc_mutex_t           lock;                               /* Global lock */
+
+} vout_bank_t;
+
+extern vout_bank_t *p_vout_bank;
 
 /*****************************************************************************
  * vout_yuv_convert_t: YUV conversion function
@@ -256,6 +273,9 @@ typedef struct vout_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+void            vout_InitBank           ( void );
+void            vout_EndBank            ( void );
+
 vout_thread_t * vout_CreateThread   ( int *pi_status );
 void            vout_DestroyThread  ( vout_thread_t *p_vout, int *pi_status );
 

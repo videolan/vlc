@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.33 2001/05/01 04:18:17 sam Exp $
+ * $Id: audio_output.h,v 1.34 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -20,6 +20,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/*****************************************************************************
+ * aout_bank_t, p_aout_bank (global variable)
+ *****************************************************************************
+ * This global variable is accessed by any function using the audio output.
+ *****************************************************************************/
+typedef struct
+{
+    /* Array to all the audio outputs */
+    struct aout_thread_s *pp_aout[ AOUT_MAX_THREADS ];
+
+    int                    i_count;
+    vlc_mutex_t            lock;  /* Global lock */
+
+} aout_bank_t;
+
+extern aout_bank_t *p_aout_bank;
 
 /*****************************************************************************
  * aout_increment_t
@@ -143,7 +160,8 @@ typedef struct aout_thread_s
     int                 i_fd;
 
     /* The current volume */
-    int                 i_vol;
+    int                 i_volume;
+    int                 i_savedvolume;
     /* Format of the audio output samples */
     int                 i_format;
     /* Number of channels */
@@ -180,6 +198,9 @@ typedef struct aout_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+void            aout_InitBank           ( void );
+void            aout_EndBank            ( void );
+
 aout_thread_t * aout_CreateThread       ( int *pi_status );
 void            aout_DestroyThread      ( aout_thread_t *, int * );
 

@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: audio_output.c,v 1.59 2001/05/01 04:18:18 sam Exp $
+ * $Id: audio_output.c,v 1.60 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -63,6 +63,34 @@
  * Local prototypes
  *****************************************************************************/
 static int aout_SpawnThread( aout_thread_t * p_aout );
+
+/*****************************************************************************
+ * aout_InitBank: initialize the audio output bank.
+ *****************************************************************************/
+void aout_InitBank ( void )
+{
+    p_aout_bank->i_count = 0;
+
+    vlc_mutex_init( &p_aout_bank->lock );
+}
+
+/*****************************************************************************
+ * aout_EndBank: empty the audio output bank.
+ *****************************************************************************
+ * This function ends all unused audio outputs and empties the bank in
+ * case of success.
+ *****************************************************************************/
+void aout_EndBank ( void )
+{
+    /* Ask all remaining audio outputs to die */
+    while( p_aout_bank->i_count )
+    {
+        aout_DestroyThread(
+                p_aout_bank->pp_aout[ --p_aout_bank->i_count ], NULL );
+    }
+
+    vlc_mutex_destroy( &p_aout_bank->lock );
+}
 
 /*****************************************************************************
  * aout_CreateThread: initialize audio thread
@@ -138,7 +166,8 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     }
 
     /* Initialize the volume level */
-    p_aout->i_vol = VOLUME_DEFAULT;
+    p_aout->i_volume = VOLUME_DEFAULT;
+    p_aout->i_savedvolume = 0;
     
     /* FIXME: maybe it would be cleaner to change SpawnThread prototype
      * see vout to handle status correctly ?? however, it is not critical since
@@ -311,7 +340,6 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
  *****************************************************************************/
 void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
 {
-
     int i_fifo;
     
     /* FIXME: pi_status is not handled correctly: check vout how to do!?? */

@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.22 2001/05/01 04:18:17 sam Exp $
+ * $Id: modules.h,v 1.23 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,7 +26,7 @@
 #endif
 
 /*****************************************************************************
- * bank_t, p_bank (global variable)
+ * module_bank_t, p_module_bank (global variable)
  *****************************************************************************
  * This global variable is accessed by any function using modules.
  *****************************************************************************/
@@ -36,9 +36,9 @@ typedef struct
 
     vlc_mutex_t         lock;  /* Global lock -- you can't imagine how awful it
                                   is to design thread-safe linked lists. */
-} bank_t;
+} module_bank_t;
 
-extern bank_t *p_bank;
+extern module_bank_t *p_module_bank;
 
 /*****************************************************************************
  * Module #defines.
@@ -168,12 +168,18 @@ typedef struct function_list_s
         /* IDCT plugin */
         struct
         {
-            void ( * pf_init )         ( struct vdec_thread_s * );
+            void ( * pf_idct_init )    ( struct vdec_thread_s * );
             void ( * pf_sparse_idct )  ( struct vdec_thread_s *,
                                          dctelem_t *, int );
             void ( * pf_idct )         ( struct vdec_thread_s *,
                                          dctelem_t *, int );
             void ( * pf_norm_scan )    ( u8 ppi_scan[2][64] );
+
+            void ( * pf_vdec_init )    ( struct vdec_thread_s * );
+            void ( * pf_decode_mb_c )  ( struct vdec_thread_s *,
+                                         struct macroblock_s * );
+            void ( * pf_decode_mb_bw ) ( struct vdec_thread_s *,
+                                         struct macroblock_s * );
         } idct;
 
         /* YUV transformation plugin */

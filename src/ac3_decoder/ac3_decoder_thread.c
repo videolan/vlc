@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.31 2001/05/01 04:18:18 sam Exp $
+ * $Id: ac3_decoder_thread.c,v 1.32 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -39,6 +39,7 @@
 
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>                                              /* memset() */
 
 #include "config.h"
 #include "common.h"

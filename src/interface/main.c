@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.91 2001/05/01 04:18:18 sam Exp $
+ * $Id: main.c,v 1.92 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -185,8 +185,10 @@ static const char *psz_shortopts = "hHvgt:T:u:a:s:c:I:A:V:";
  * Global variable program_data - these are the only ones, see main.h and
  * modules.h
  *****************************************************************************/
-main_t *p_main;
-bank_t *p_bank;
+main_t        *p_main;
+module_bank_t *p_module_bank;
+aout_bank_t   *p_aout_bank;
+vout_bank_t   *p_vout_bank;
 
 /*****************************************************************************
  * Local prototypes
@@ -215,30 +217,21 @@ static int  CPUCapabilities         ( void );
  *****************************************************************************/
 int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
-    main_t  main_data;                      /* root of all data - see main.h */
-    bank_t  module_bank;
+    main_t        main_data;                /* root of all data - see main.h */
+    module_bank_t module_bank;
+    aout_bank_t   aout_bank;
+    vout_bank_t   vout_bank;
 
-    p_main = &main_data;                      /* set up the global variables */
-    p_bank = &module_bank;
-
-    /*
-     * Initialize the main structure
-     */
-    p_main->i_cpu_capabilities = CPUCapabilities();
-    
-    p_main->p_aout = NULL;
-    p_main->p_vout = NULL;
-
-    /*
-     * System specific initialization code
-     */
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
-    system_Create( &i_argc, ppsz_argv, ppsz_env );
-#endif
+    p_main        = &main_data;               /* set up the global variables */
+    p_module_bank = &module_bank;
+    p_aout_bank   = &aout_bank;
+    p_vout_bank   = &vout_bank;
 
     /*
      * Test if our code is likely to run on this CPU 
      */
+    p_main->i_cpu_capabilities = CPUCapabilities();
+    
 #if defined( __pentium__ ) || defined( __pentiumpro__ )
     if( ! TestCPU( CPU_CAPABILITY_586 ) )
     {
@@ -248,13 +241,11 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 #endif
 
-#ifdef HAVE_MMX
-    if( ! TestCPU( CPU_CAPABILITY_MMX ) )
-    {
-        fprintf( stderr, "error: this program needs MMX extensions,\n"
-                         "please try a version without MMX support\n" );
-        return( 1 );
-    }
+    /*
+     * System specific initialization code
+     */
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
+    system_Init( &i_argc, ppsz_argv, ppsz_env );
 #endif
 
     /*
@@ -297,9 +288,11 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     GetFilenames( i_argc, ppsz_argv );
 
     /*
-     * Initialize module bank
+     * Initialize module, aout and vout banks
      */
     module_InitBank();
+    aout_InitBank();
+    vout_InitBank();
 
     /*
      * Initialize shared resources and libraries
@@ -313,60 +306,44 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 
     /*
-     * Run interface
+     * Try to run the interface
      */
     p_main->p_intf = intf_Create();
-    if( !p_main->p_intf )
+    if( p_main->p_intf == NULL )
     {
         intf_ErrMsg( "intf error: interface initialization failed" );
-        module_EndBank();
-        intf_PlaylistDestroy( p_main->p_playlist );
-        intf_MsgDestroy();
-        return( errno );
     }
-
-    /*
-     * Set signal handling policy for all threads
-     */
-    InitSignalHandler();
-
-    /*
-     * This is the main loop
-     */
-    p_main->p_intf->pf_run( p_main->p_intf );
-
-    /*
-     * Finished, destroy the interface
-     */
-    intf_Destroy( p_main->p_intf );
-
-    /*
-     * Close all video devices
-     */
-    if( p_main->p_vout != NULL )
+    else
     {
-        vout_DestroyThread( p_main->p_vout, NULL );
+        /*
+         * Set signal handling policy for all threads
+         */
+        InitSignalHandler();
+
+        /*
+         * This is the main loop
+         */
+        p_main->p_intf->pf_run( p_main->p_intf );
+
+        /*
+         * Finished, destroy the interface
+         */
+        intf_Destroy( p_main->p_intf );
+
+        /*
+         * Go back into channel 0 which is the network
+         */
+        if( p_main->b_channels )
+        {
+            network_ChannelJoin( COMMON_CHANNEL );
+        }
     }
 
     /*
-     * Close all audio devices
+     * Free module, aout and vout banks
      */
-    if( p_main->p_aout != NULL )
-    {
-        aout_DestroyThread( p_main->p_aout, NULL );
-    }
-
-    /*
-     * Go back into channel 0 which is the network
-     */
-    if( p_main->b_channels )
-    {
-        network_ChannelJoin( COMMON_CHANNEL );
-    }
-
-    /*
-     * Free module bank
-     */
+    vout_EndBank();
+    aout_EndBank();
     module_EndBank();
 
     /*
@@ -378,7 +355,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
      * System specific cleaning code
      */
 #if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
-    system_Destroy();
+    system_End();
 #endif
 
     /*
@@ -387,7 +364,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     intf_Msg( "intf: program terminated" );
     intf_MsgDestroy();
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * beos_specific.h: BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: beos_specific.h,v 1.5 2001/04/12 01:52:45 sam Exp $
+ * $Id: beos_specific.h,v 1.6 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -29,8 +29,8 @@
 extern "C" {
 #endif
 
-void    system_Create ( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] );
-void    system_Destroy( void );
+void    system_Init ( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] );
+void    system_End  ( void );
 char  * system_GetProgramPath( void );
 
 #ifdef __cplusplus

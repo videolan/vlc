@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.2 2001/05/01 04:18:18 sam Exp $
+ * $Id: ac3_spdif.c,v 1.3 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -21,15 +21,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
- ****************************************************************************/
+ *****************************************************************************/
 
-/****************************************************************************
+/*****************************************************************************
  * Preamble
- ****************************************************************************/
+ *****************************************************************************/
 #include "defs.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>                                              /* memcpy() */
 #include <fcntl.h>
 #include <unistd.h>
 

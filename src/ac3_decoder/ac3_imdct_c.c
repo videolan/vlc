@@ -2,7 +2,7 @@
  * ac3_imdct_c.c: ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_c.c,v 1.1 2001/04/30 21:04:20 reno Exp $
+ * $Id: ac3_imdct_c.c,v 1.2 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -24,6 +24,8 @@
 
 #include "defs.h"
 
+#include <string.h>                                              /* memcpy() */
+
 #include <math.h>
 #include <stdio.h>
 
@@ -37,6 +39,10 @@
 
 #include "ac3_decoder.h"
 #include "ac3_internal.h"
+
+#ifndef M_PI
+#   define M_PI 3.14159265358979323846
+#endif
 
 void fft_64p_c (complex_t *x);
 void fft_128p_c (complex_t *x);

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * idct_common.c : common IDCT functions
+ * vdec_idct.c : common IDCT functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct_common.c,v 1.5 2001/04/15 04:19:57 sam Exp $
+ * $Id: vdec_idct.c,v 1.1 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -47,7 +47,7 @@
 
 #include "modules.h"
 
-#include "idct.h"
+#include "vdec_idct.h"
 
 /*****************************************************************************
  * vdec_InitIDCT : initialize datas for vdec_SparseIDCT

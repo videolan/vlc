@@ -2,7 +2,7 @@
  * ac3_downmix_c.c: ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_c.c,v 1.6 2001/04/30 21:04:20 reno Exp $
+ * $Id: ac3_downmix_c.c,v 1.7 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -23,6 +23,8 @@
  *****************************************************************************/
 
 #include "defs.h"
+
+#include <string.h>                                              /* memcpy() */
 
 #include "config.h"
 #include "common.h"

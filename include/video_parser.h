@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.8 2001/01/24 19:05:55 massiot Exp $
+ * $Id: video_parser.h,v 1.34 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -136,11 +136,14 @@ typedef struct vpar_thread_s
     void ( * ppf_motion_skipped[4][4] ) ( struct macroblock_s * );
 
     /* IDCT plugin used and shortcuts to access its capabilities */
-    struct module_s *       p_idct_module;
-    idct_init_t             pf_init;
-    f_idct_t                pf_sparse_idct;
-    f_idct_t                pf_idct;
-    norm_scan_t             pf_norm_scan;
+    struct module_s *           p_idct_module;
+    void ( * pf_idct_init )   ( struct vdec_thread_s * );
+    void ( * pf_sparse_idct ) ( struct vdec_thread_s *, dctelem_t*, int );
+    void ( * pf_idct )        ( struct vdec_thread_s *, dctelem_t*, int );
+    void ( * pf_norm_scan )   ( u8 ppi_scan[2][64] );
+    void ( * pf_vdec_init )   ( struct vdec_thread_s * );
+    void ( * pf_decode_mb_c ) ( struct vdec_thread_s *, struct macroblock_s * );
+    void ( * pf_decode_mb_bw )( struct vdec_thread_s *, struct macroblock_s * );
 
 #ifdef STATS
     /* Statistics */

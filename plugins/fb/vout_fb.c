@@ -2,7 +2,7 @@
  * vout_fb.c: framebuffer video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_fb.c,v 1.10 2001/03/21 13:42:33 sam Exp $
+ * $Id: vout_fb.c,v 1.11 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -608,26 +608,33 @@ static void FBCloseDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void FBSwitchDisplay(int i_signal)
 {
-    if( p_main->p_vout != NULL )
+    vout_thread_t *p_vout;
+
+    vlc_mutex_lock( &p_vout_bank->lock );
+
+    /* XXX: only test the first video output */
+    if( p_vout_bank->i_count )
     {
+        p_vout = p_vout_bank->pp_vout[0];
+
         switch( i_signal )
         {
         case SIGUSR1:                                /* vt has been released */
-            p_main->p_vout->b_active = 0;
-            ioctl( ((vout_sys_t *)p_main->p_vout->p_sys)->i_tty_dev,
-                   VT_RELDISP, 1 );
+            p_vout->b_active = 0;
+            ioctl( p_vout->p_sys->i_tty_dev, VT_RELDISP, 1 );
             break;
         case SIGUSR2:                                /* vt has been acquired */
-            p_main->p_vout->b_active = 1;
-            ioctl( ((vout_sys_t *)p_main->p_vout->p_sys)->i_tty_dev,
-                   VT_RELDISP, VT_ACTIVATE );
+            p_vout->b_active = 1;
+            ioctl( p_vout->p_sys->i_tty_dev, VT_RELDISP, VT_ACTIVATE );
             /* handle blanking */
-            vlc_mutex_lock( &p_main->p_vout->change_lock );
-            p_main->p_vout->i_changes |= VOUT_SIZE_CHANGE;
-            vlc_mutex_unlock( &p_main->p_vout->change_lock );
+            vlc_mutex_lock( &p_vout->change_lock );
+            p_vout->i_changes |= VOUT_SIZE_CHANGE;
+            vlc_mutex_unlock( &p_vout->change_lock );
             break;
         }
     }
+
+    vlc_mutex_unlock( &p_vout_bank->lock );
 }
 
 /*****************************************************************************

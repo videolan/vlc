@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: interface.c,v 1.75 2001/05/01 04:18:18 sam Exp $
+ * $Id: interface.c,v 1.76 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -317,7 +317,7 @@ void intf_AssignNormalKeys( intf_thread_t *p_intf)
  *****************************************************************************/
 int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
 {
-    static int i_volbackup;
+    int i_index;
     keyparm k_reply;
     
     k_reply = intf_GetKey( p_intf, g_key); 
@@ -326,6 +326,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
     case INTF_KEY_QUIT:                                        /* quit order */
         p_intf->b_die = 1;
         break;
+
     case INTF_KEY_SET_CHANNEL:
         /* Change channel - return code is ignored since SelectChannel displays
          * its own error messages */
@@ -334,23 +335,62 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
 /* FIXME : keyboard event is for the time being half handled by the interface
  * half handled directly by the plugins. We should decide what to do. */        
         break;
+
     case INTF_KEY_INC_VOLUME:                                    /* volume + */
-        if( (p_main->p_aout != NULL) && (p_main->p_aout->i_vol < VOLUME_MAX) )
-            p_main->p_aout->i_vol += VOLUME_STEP;
-        break;
-    case INTF_KEY_DEC_VOLUME:                                    /* volume - */
-        if( (p_main->p_aout != NULL) && (p_main->p_aout->i_vol > VOLUME_STEP) )
-            p_main->p_aout->i_vol -= VOLUME_STEP;
-        break;
-    case INTF_KEY_TOGGLE_VOLUME:                              /* toggle mute */
-        if( (p_main->p_aout != NULL) && (p_main->p_aout->i_vol))
+        vlc_mutex_lock( &p_aout_bank->lock );
+        for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
         {
-            i_volbackup = p_main->p_aout->i_vol;
-            p_main->p_aout->i_vol = 0;
+            if( p_aout_bank->pp_aout[i_index]->i_volume
+                                                   < VOLUME_MAX - VOLUME_STEP )
+            {
+                p_aout_bank->pp_aout[i_index]->i_volume += VOLUME_STEP;
+            }
+            else
+            {
+                p_aout_bank->pp_aout[i_index]->i_volume = VOLUME_MAX;
+            }
         }
-        else if( (p_main->p_aout != NULL) && (!p_main->p_aout->i_vol))
-            p_main->p_aout->i_vol = i_volbackup;
+        vlc_mutex_unlock( &p_aout_bank->lock );
         break;
+
+    case INTF_KEY_DEC_VOLUME:                                    /* volume - */
+        vlc_mutex_lock( &p_aout_bank->lock );
+        for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
+        {
+            if( p_aout_bank->pp_aout[i_index]->i_volume > VOLUME_STEP )
+            {
+                p_aout_bank->pp_aout[i_index]->i_volume -= VOLUME_STEP;
+            }
+            else
+            {
+                p_aout_bank->pp_aout[i_index]->i_volume = 0;
+            }
+        }
+        vlc_mutex_unlock( &p_aout_bank->lock );
+        break;
+
+    case INTF_KEY_TOGGLE_VOLUME:                              /* toggle mute */
+        vlc_mutex_lock( &p_aout_bank->lock );
+        for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
+        {
+            if( p_aout_bank->pp_aout[i_index]->i_savedvolume )
+            {
+                p_aout_bank->pp_aout[i_index]->i_volume =
+                                p_aout_bank->pp_aout[i_index]->i_savedvolume;
+                p_aout_bank->pp_aout[i_index]->i_savedvolume = 0;
+            }
+            else
+            {
+                p_aout_bank->pp_aout[i_index]->i_savedvolume =
+                                p_aout_bank->pp_aout[i_index]->i_volume;
+                p_aout_bank->pp_aout[i_index]->i_volume = 0;
+            }
+        }
+        vlc_mutex_unlock( &p_aout_bank->lock );
+        break;
+
+/* XXX: fix this later */
+#if 0
     case INTF_KEY_DEC_GAMMA:                                      /* gamma - */
         if( (p_main->p_vout != NULL) && (p_main->p_vout->f_gamma > -INTF_GAMMA_LIMIT) )
         {
@@ -367,6 +407,8 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             p_main->p_vout->i_changes |= VOUT_GAMMA_CHANGE;
         }
         break;
+#endif
+
    case INTF_KEY_DUMP_STREAM:
         if( p_intf->p_input != NULL )
         {
@@ -375,9 +417,11 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
         }
         break;
-   default:                                                   /* unknown key */
+
+    default:                                                  /* unknown key */
         return( 1 );
     }
 
     return( 0 );
 }
+

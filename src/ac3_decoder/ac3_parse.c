@@ -2,7 +2,7 @@
  * ac3_parse.c: ac3 parsing procedures
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_parse.c,v 1.19 2001/04/26 00:12:19 reno Exp $
+ * $Id: ac3_parse.c,v 1.20 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -24,6 +24,8 @@
  *****************************************************************************/
 
 #include "defs.h"
+
+#include <string.h>                                              /* memset() */
 
 #include "config.h"
 #include "common.h"

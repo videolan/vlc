@@ -1,8 +1,8 @@
 /*****************************************************************************
- * idct.h : macros for the inverse discrete cosine transform
+ * vdec_idct.h : macros for the inverse discrete cosine transform
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct.h,v 1.3 2001/04/15 04:19:57 sam Exp $
+ * $Id: vdec_idct.h,v 1.1 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>

@@ -82,7 +82,7 @@ void aout_S16StereoThread( aout_thread_t * p_aout )
         {
             ((s16 *)p_aout->buffer)[l_buffer] =
                      (s16)( ( p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS )
-                            * p_aout->i_vol / 256 ) ;
+                            * p_aout->i_volume / 256 ) ;
             p_aout->s32_buffer[l_buffer] = 0;
         }
 

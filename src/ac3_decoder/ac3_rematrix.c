@@ -2,7 +2,7 @@
  * ac3_rematrix.c: ac3 audio rematrixing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_rematrix.c,v 1.15 2001/04/30 21:04:20 reno Exp $
+ * $Id: ac3_rematrix.c,v 1.16 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -22,6 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 #include "defs.h"
+
+#include <string.h>                                              /* memcpy() */
 
 #include "config.h"
 #include "common.h"

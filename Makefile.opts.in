@@ -200,11 +200,6 @@ endif
 #end of optimisations
 endif
 
-# Optional MMX optimizations for x86
-ifneq (,$(findstring mmx,$(ARCH)))
-CFLAGS += -DHAVE_MMX
-endif
-
 #
 # C compiler flags: dependancies
 #

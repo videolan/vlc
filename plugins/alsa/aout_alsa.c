@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: aout_alsa.c,v 1.13 2001/04/06 09:15:47 sam Exp $
+ * $Id: aout_alsa.c,v 1.14 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  * 
@@ -36,7 +36,6 @@
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 
 #include <sys/asoundlib.h>
-#include <linux/asound.h>
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */

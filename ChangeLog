@@ -3,6 +3,13 @@
 #===================#
 
 HEAD
+  * Fixed a few warnings with gcc 3.0.
+  * aout and vout are now allocated in banks, making it possible to have
+    several of them at the same time.
+  * configure now checks for MMX and MMX EXT support in the assembler.
+  * Removed all MMX code from the main program and moved it to the
+    existing idct modules (Closes: Debian bug #96036).
+  * KDE interface.
   * FreeBSD CSS decryption support.
   * Fixed a segfault in TS input (psi packets with adaptation field).
   * Corrected vlc-howto.sgml thanks to Arnaud Gomes-do-Vale

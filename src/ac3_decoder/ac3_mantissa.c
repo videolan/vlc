@@ -2,7 +2,7 @@
  * ac3_mantissa.c: ac3 mantissa computation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_mantissa.c,v 1.25 2001/04/30 21:04:20 reno Exp $
+ * $Id: ac3_mantissa.c,v 1.26 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -24,6 +24,8 @@
  *****************************************************************************/
 
 #include "defs.h"
+
+#include <string.h>                                              /* memcpy() */
 
 #include "config.h"
 #include "common.h"

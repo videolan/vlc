@@ -2,7 +2,7 @@
  * idctmmxext.c : MMX EXT IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmxext.c,v 1.6 2001/04/15 04:19:57 sam Exp $
+ * $Id: idctmmxext.c,v 1.7 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -48,7 +48,8 @@
 #include "modules.h"
 #include "modules_inner.h"
 
-#include "idct.h"
+#include "vdec_block.h"
+#include "vdec_idct.h"
 
 #include "attributes.h"
 #include "mmx.h"
@@ -134,10 +135,15 @@ MODULE_DEACTIVATE
 static void idct_getfunctions( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = idct_Probe;
-    p_function_list->functions.idct.pf_init = _M( vdec_InitIDCT );
-    p_function_list->functions.idct.pf_sparse_idct = _M( vdec_SparseIDCT );
-    p_function_list->functions.idct.pf_idct = _M( vdec_IDCT );
-    p_function_list->functions.idct.pf_norm_scan = vdec_NormScan;
+#define F p_function_list->functions.idct
+    F.pf_idct_init = _M( vdec_InitIDCT );
+    F.pf_sparse_idct = _M( vdec_SparseIDCT );
+    F.pf_idct = _M( vdec_IDCT );
+    F.pf_norm_scan = vdec_NormScan;
+    F.pf_vdec_init = _M( vdec_Init );
+    F.pf_decode_mb_c = _M( vdec_DecodeMacroblockC );
+    F.pf_decode_mb_bw = _M( vdec_DecodeMacroblockBW );
+#undef F
 }
 
 /*****************************************************************************

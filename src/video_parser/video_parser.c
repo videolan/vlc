@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.84 2001/05/01 15:12:22 sam Exp $
+ * $Id: video_parser.c,v 1.85 2001/05/06 04:32:03 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -52,13 +52,12 @@
 
 #include "video_decoder.h"
 #include "vdec_motion.h"
-#include "../video_decoder/vdec_idct.h"
 
 #include "vpar_blocks.h"
-#include "../video_decoder/vpar_headers.h"
-#include "../video_decoder/vpar_synchro.h"
-#include "../video_decoder/video_parser.h"
-#include "../video_decoder/video_fifo.h"
+#include "vpar_headers.h"
+#include "vpar_synchro.h"
+#include "video_parser.h"
+#include "video_fifo.h"
 
 /*
  * Local prototypes
@@ -175,10 +174,13 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
     }
 
 #define f p_vpar->p_idct_module->p_functions->idct.functions.idct
-    p_vpar->pf_init         = f.pf_init;
+    p_vpar->pf_idct_init    = f.pf_idct_init;
     p_vpar->pf_sparse_idct  = f.pf_sparse_idct;
     p_vpar->pf_idct         = f.pf_idct;
     p_vpar->pf_norm_scan    = f.pf_norm_scan;
+    p_vpar->pf_vdec_init    = f.pf_vdec_init;
+    p_vpar->pf_decode_mb_c  = f.pf_decode_mb_c;
+    p_vpar->pf_decode_mb_bw = f.pf_decode_mb_bw;
 #undef f
 
     /* Spawn the video parser thread */
@@ -264,14 +266,21 @@ static int InitThread( vpar_thread_t *p_vpar )
     }
 #else
     /* Fake a video_decoder thread */
-    if( (p_vpar->pp_vdec[0] = (vdec_thread_t *)malloc(sizeof( vdec_thread_t )))
-         == NULL || vdec_InitThread( p_vpar->pp_vdec[0] ) )
+    p_vpar->pp_vdec[0] = (vdec_thread_t *)malloc(sizeof( vdec_thread_t ));
+
+    if( p_vpar->pp_vdec[0] == NULL )
     {
         return( 1 );
     }
+
     p_vpar->pp_vdec[0]->b_die = 0;
     p_vpar->pp_vdec[0]->b_error = 0;
     p_vpar->pp_vdec[0]->p_vpar = p_vpar;
+
+    if( vdec_InitThread( p_vpar->pp_vdec[0] ) )
+    {
+        return( 1 );
+    }
 
 #   if !defined(SYS_BEOS) && !defined(WIN32)
 #       if VDEC_NICE

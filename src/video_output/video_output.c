@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.122 2001/05/01 04:18:18 sam Exp $
+ * $Id: video_output.c,v 1.123 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -84,6 +84,34 @@ static int      Align             ( vout_thread_t *p_vout, int *pi_x,
                                     int i_h_align, int i_v_align );
 static void     SetPalette        ( p_vout_thread_t p_vout, u16 *red,
                                     u16 *green, u16 *blue, u16 *transp );
+
+/*****************************************************************************
+ * vout_InitBank: initialize the video output bank.
+ *****************************************************************************/
+void vout_InitBank ( void )
+{
+    p_vout_bank->i_count = 0;
+
+    vlc_mutex_init( &p_vout_bank->lock );
+}
+
+/*****************************************************************************
+ * vout_EndBank: empty the video output bank.
+ *****************************************************************************
+ * This function ends all unused video outputs and empties the bank in
+ * case of success.
+ *****************************************************************************/
+void vout_EndBank ( void )
+{
+    /* Ask all remaining video outputs to die */
+    while( p_vout_bank->i_count )
+    {
+        vout_DestroyThread(
+                p_vout_bank->pp_vout[ --p_vout_bank->i_count ], NULL );
+    }                       
+
+    vlc_mutex_destroy( &p_vout_bank->lock );
+}
 
 /*****************************************************************************
  * vout_CreateThread: creates a new video output thread

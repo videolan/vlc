@@ -2,7 +2,7 @@
  * ac3_srfft.c: ac3 FFT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_srfft.c,v 1.2 2001/04/30 21:10:25 reno Exp $
+ * $Id: ac3_srfft.c,v 1.3 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -23,6 +23,8 @@
  *****************************************************************************/
 
 #include "defs.h"
+
+#include <string.h>                                              /* memcpy() */
 
 #include <math.h>
 #include <stdio.h>

@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.28 2001/05/01 04:18:18 sam Exp $
+ * $Id: modules.c,v 1.29 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -85,7 +85,7 @@ static int CallSymbol   ( module_t *, char * );
  * This function creates a module bank structure and fills it with the
  * built-in modules, as well as all the plugin modules it can find.
  *****************************************************************************/
-void module_InitBank( )
+void module_InitBank( void )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
     static char * path[] = { ".", "lib", PLUGIN_PATH, NULL, NULL };
@@ -102,13 +102,19 @@ void module_InitBank( )
     struct dirent * file;
 #endif /* HAVE_DYNAMIC_PLUGINS */
 
-    p_bank->first = NULL;
-    vlc_mutex_init( &p_bank->lock );
+    p_module_bank->first = NULL;
+    vlc_mutex_init( &p_module_bank->lock );
 
+    /*
+     * Check all the built-in modules
+     */
     intf_WarnMsg( 2, "module: checking built-in modules" );
 
     ALLOCATE_ALL_BUILTINS();
 
+    /*
+     * Check all the plugin modules we can find
+     */
 #ifdef HAVE_DYNAMIC_PLUGINS
     intf_WarnMsg( 2, "module: checking plugin modules" );
 
@@ -187,32 +193,32 @@ void module_InitBank( )
 }
 
 /*****************************************************************************
- * module_EndBank: destroy the module bank.
+ * module_EndBank: empty the module bank.
  *****************************************************************************
- * This function unloads all unused plugin modules and removes the module
+ * This function unloads all unused plugin modules and empties the module
  * bank in case of success.
  *****************************************************************************/
-void module_EndBank( )
+void module_EndBank( void )
 {
     module_t * p_next;
 
-    while( p_bank->first != NULL )
+    while( p_module_bank->first != NULL )
     {
-        if( DeleteModule( p_bank->first ) )
+        if( DeleteModule( p_module_bank->first ) )
         {
             /* Module deletion failed */
             intf_ErrMsg( "module error: `%s' can't be removed. trying harder.",
-                         p_bank->first->psz_name );
+                         p_module_bank->first->psz_name );
 
             /* We just free the module by hand. Niahahahahaha. */
-            p_next = p_bank->first->next;
-            free(p_bank->first);
-            p_bank->first = p_next;
+            p_next = p_module_bank->first->next;
+            free(p_module_bank->first);
+            p_module_bank->first = p_next;
         }
     }
 
     /* Destroy the lock */
-    vlc_mutex_destroy( &p_bank->lock );
+    vlc_mutex_destroy( &p_module_bank->lock );
 
     return;
 }
@@ -223,7 +229,7 @@ void module_EndBank( )
  * This function resets the module bank by unloading all unused plugin
  * modules.
  *****************************************************************************/
-void module_ResetBank( )
+void module_ResetBank( void )
 {
     intf_ErrMsg( "FIXME: module_ResetBank unimplemented" );
     return;
@@ -235,16 +241,16 @@ void module_ResetBank( )
  * This function parses the module bank and hides modules that have been
  * unused for a while.
  *****************************************************************************/
-void module_ManageBank( )
+void module_ManageBank( void )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
     module_t * p_module;
 
     /* We take the global lock */
-    vlc_mutex_lock( &p_bank->lock );
+    vlc_mutex_lock( &p_module_bank->lock );
 
     /* Parse the module list to see if any modules need to be unloaded */
-    for( p_module = p_bank->first ;
+    for( p_module = p_module_bank->first ;
          p_module != NULL ;
          p_module = p_module->next )
     {
@@ -268,7 +274,7 @@ void module_ManageBank( )
     }
 
     /* We release the global lock */
-    vlc_mutex_unlock( &p_bank->lock );
+    vlc_mutex_unlock( &p_module_bank->lock );
 #endif /* HAVE_DYNAMIC_PLUGINS */
 
     return;
@@ -287,10 +293,10 @@ module_t * module_Need( int i_capabilities, void *p_data )
     int i_index;
 
     /* We take the global lock */
-    vlc_mutex_lock( &p_bank->lock );
+    vlc_mutex_lock( &p_module_bank->lock );
 
     /* Parse the module list for capabilities and probe each of them */
-    for( p_module = p_bank->first ;
+    for( p_module = p_module_bank->first ;
          p_module != NULL ;
          p_module = p_module->next )
     {
@@ -342,7 +348,7 @@ module_t * module_Need( int i_capabilities, void *p_data )
     }
 
     /* We can release the global lock, module refcount was incremented */
-    vlc_mutex_unlock( &p_bank->lock );
+    vlc_mutex_unlock( &p_module_bank->lock );
 
     if( p_bestmodule != NULL )
     {
@@ -363,7 +369,7 @@ module_t * module_Need( int i_capabilities, void *p_data )
 void module_Unneed( module_t * p_module )
 {
     /* We take the global lock */
-    vlc_mutex_lock( &p_bank->lock );
+    vlc_mutex_lock( &p_module_bank->lock );
 
     /* Just unlock the module - we can't do anything if it fails,
      * so there is no need to check the return value. */
@@ -372,7 +378,7 @@ void module_Unneed( module_t * p_module )
     intf_WarnMsg( 3, "module: unlocking module `%s'", p_module->psz_name );
 
     /* We release the global lock */
-    vlc_mutex_unlock( &p_bank->lock );
+    vlc_mutex_unlock( &p_module_bank->lock );
 
     return;
 }
@@ -435,7 +441,7 @@ static int AllocatePluginModule( char * psz_filename )
     }
 
     /* Check that we don't already have a module with this name */
-    for( p_othermodule = p_bank->first ;
+    for( p_othermodule = p_module_bank->first ;
          p_othermodule != NULL ;
          p_othermodule = p_othermodule->next )
     {
@@ -485,13 +491,13 @@ static int AllocatePluginModule( char * psz_filename )
     p_module->b_builtin = 0;
 
     /* Link module into the linked list */
-    if( p_bank->first != NULL )
+    if( p_module_bank->first != NULL )
     {
-        p_bank->first->prev = p_module;
+        p_module_bank->first->prev = p_module;
     }
-    p_module->next = p_bank->first;
+    p_module->next = p_module_bank->first;
     p_module->prev = NULL;
-    p_bank->first = p_module;
+    p_module_bank->first = p_module;
 
     /* Immediate message so that a slow module doesn't make the user wait */
     intf_WarnMsgImm( 2, "module: plugin module `%s', %s",
@@ -541,7 +547,7 @@ static int AllocateBuiltinModule( int ( *pf_init ) ( module_t * ),
     }
 
     /* Check that we don't already have a module with this name */
-    for( p_othermodule = p_bank->first ;
+    for( p_othermodule = p_module_bank->first ;
          p_othermodule != NULL ;
          p_othermodule = p_othermodule->next )
     {
@@ -587,13 +593,13 @@ static int AllocateBuiltinModule( int ( *pf_init ) ( module_t * ),
     p_module->is.builtin.pf_deactivate = pf_deactivate;
 
     /* Link module into the linked list */
-    if( p_bank->first != NULL )
+    if( p_module_bank->first != NULL )
     {
-        p_bank->first->prev = p_module;
+        p_module_bank->first->prev = p_module;
     }
-    p_module->next = p_bank->first;
+    p_module->next = p_module_bank->first;
     p_module->prev = NULL;
-    p_bank->first = p_module;
+    p_module_bank->first = p_module;
 
     /* Immediate message so that a slow module doesn't make the user wait */
     intf_WarnMsgImm( 2, "module: builtin module `%s', %s",
@@ -650,9 +656,9 @@ static int DeleteModule( module_t * p_module )
 #endif
 
     /* Unlink the module from the linked list. */
-    if( p_module == p_bank->first )
+    if( p_module == p_module_bank->first )
     {
-        p_bank->first = p_module->next;
+        p_module_bank->first = p_module->next;
     }
 
     if( p_module->prev != NULL )

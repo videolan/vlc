@@ -22,13 +22,13 @@ $(PLUGIN_QT): %.o: .dep/%.dpp
 $(PLUGIN_QT): %.o: %.moc
 	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/qt -I${QTDIR}/include -c -o $@ $(<:%.moc=%.cpp)
 $(PLUGIN_QT:%.o=%.moc): %.moc: %.cpp
-	$(MOC) -i $< -o $@
+	grep -q Q_OBJECT $< && $(MOC) -i $< -o $@ || true
 
 $(BUILTIN_QT): BUILTIN_%.o: .dep/%.dpp
 $(BUILTIN_QT): %.o: %.moc
 	$(CC) $(CFLAGS) -DBUILTIN -I/usr/include/qt -I${QTDIR}/include -c -o $@ $(<:BUILTIN_%.moc=%.cpp)
 $(BUILTIN_QT:%.o=%.moc): BUILTIN_%.moc: %.cpp
-	$(MOC) -i $< -o $@
+	grep -q Q_OBJECT $< && $(MOC) -i $< -o $@ || true
 
 #
 # Real targets

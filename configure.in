@@ -105,10 +105,10 @@ void foo() { int meuh; ntohl(meuh); }],,
 
 dnl Check for -rdynamic flag
 CFLAGS="${CFLAGS} -rdynamic -Wall -Werror"
-AC_MSG_CHECKING([if \$CC groks -rdynamic without complaining too much])
+AC_MSG_CHECKING([if \$CC miserably fails with the -rdynamic flag])
 AC_TRY_COMPILE([],,
  LCFLAGS="${LCFLAGS} -rdynamic"
- AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+ AC_MSG_RESULT(no), AC_MSG_RESULT(yes))
 
 dnl End of the bizarre compilation tests
 CFLAGS="${save_CFLAGS}"
@@ -136,17 +136,28 @@ dnl
 dnl  default modules
 dnl
 BUILTINS="${BUILTINS} es ps ts yuv idct idctclassic motion"
+
+dnl
+dnl  Accelerated modules
+dnl
 case x$host_os in
-  xbeos|xnto-qnx)
-    ACCEL_PLUGINS="yuvmmx idctmmx motionmmx"
-    ;;
   xmingw32msvc)
-    ACCEL_PLUGINS="idctmmx idctmmxext motionmmx motionmmxext"
+    MMX_PLUGINS="idctmmx motionmmx"
     ;;
   *)
-    ACCEL_PLUGINS="yuvmmx idctmmx idctmmxext motionmmx motionmmxext"
+    MMX_PLUGINS="yuvmmx idctmmx motionmmx"
     ;;
 esac
+
+AC_MSG_CHECKING([if \$CC groks MMX inline assembly])
+AC_TRY_COMPILE([void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],,
+  ACCEL_PLUGINS="${ACCEL_PLUGINS} ${MMX_PLUGINS}"
+  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING([if \$CC groks MMX EXT (SSE) inline assembly])
+AC_TRY_COMPILE([void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],,
+  ACCEL_PLUGINS="${ACCEL_PLUGINS} idctmmxext motionmmxext"
+  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl
 dnl  DVD module: check for DVD ioctls

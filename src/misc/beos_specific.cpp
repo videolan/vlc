@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: beos_specific.cpp,v 1.10 2001/04/29 17:03:20 sam Exp $
+ * $Id: beos_specific.cpp,v 1.11 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -69,9 +69,9 @@ extern "C"
 static void system_AppThread( void * args );
 
 /*****************************************************************************
- * system_Create: create a BApplication object and fill in program path.
+ * system_Init: create a BApplication object and fill in program path.
  *****************************************************************************/
-void system_Create( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
+void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
     /* Prepare the lock/wait before launching the BApplication thread */
     vlc_mutex_init( &app_lock );
@@ -92,9 +92,9 @@ void system_Create( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 }
 
 /*****************************************************************************
- * system_Destroy: destroy the BApplication object.
+ * system_End: destroy the BApplication object.
  *****************************************************************************/
-void system_Destroy( void )
+void system_End( void )
 {
     free( psz_program_path );
 

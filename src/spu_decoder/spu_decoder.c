@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.39 2001/05/01 12:22:18 sam Exp $
+ * $Id: spu_decoder.c,v 1.40 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -89,16 +89,36 @@ vlc_thread_t spudec_CreateThread( vdec_config_t * p_config )
     p_spudec->p_fifo = p_config->decoder_config.p_decoder_fifo;
 
     /* XXX: The vout request and fifo opening will eventually be here */
-    if( p_spudec->p_vout == NULL )
+
+    /* Spawn an audio output if there is none */
+    vlc_mutex_lock( &p_vout_bank->lock );
+
+    if( p_vout_bank->i_count == 0 )
     {
-        if( p_main->p_vout == NULL )
+        intf_Msg( "spudec: no vout present, spawning one" );
+
+        p_spudec->p_vout = vout_CreateThread( NULL );
+
+        /* Everything failed */
+        if( p_spudec->p_vout == NULL )
         {
-            intf_Msg( "vpar: no vout present, spawning one" );
-            p_main->p_vout = vout_CreateThread( NULL );
+            intf_Msg( "spudec: can't open vout, aborting" );
+            vlc_mutex_unlock( &p_vout_bank->lock );
+            free( p_spudec );
+
+            return 0;
         }
 
-        p_spudec->p_vout = p_main->p_vout;
+        p_vout_bank->pp_vout[ p_vout_bank->i_count ] = p_spudec->p_vout;
+        p_vout_bank->i_count++;
     }
+    else
+    {
+        /* Take the first video output FIXME: take the best one */
+        p_spudec->p_vout = p_vout_bank->pp_vout[ 0 ];
+    }
+
+    vlc_mutex_unlock( &p_vout_bank->lock );
 
     /* Spawn the spu decoder thread */
     if ( vlc_thread_create(&p_spudec->thread_id, "spu decoder",
@@ -106,7 +126,7 @@ vlc_thread_t spudec_CreateThread( vdec_config_t * p_config )
     {
         intf_ErrMsg( "spudec error: can't spawn spu decoder thread" );
         free( p_spudec );
-        return( 0 );
+        return 0;
     }
 
     return( p_spudec->thread_id );

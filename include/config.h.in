@@ -218,6 +218,9 @@
  * Audio configuration
  *****************************************************************************/
 
+/* Maximum number of audio output threads */
+#define AOUT_MAX_THREADS                10
+
 /* Environment variable containing the audio output method */
 #define AOUT_METHOD_VAR                 "vlc_aout"
 
@@ -271,6 +274,9 @@
 /*****************************************************************************
  * Video configuration
  *****************************************************************************/
+
+/* Maximum number of video output threads */
+#define VOUT_MAX_THREADS                10
 
 /*
  * Default settings for video output threads

@@ -2,7 +2,7 @@
  * aout_u8.c: 8 bit unsigned audio output functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_u8.c,v 1.3 2001/05/01 04:18:18 sam Exp $
+ * $Id: aout_u8.c,v 1.4 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -77,7 +77,7 @@ void aout_U8MonoThread( aout_thread_t * p_aout )
 
         for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )
         {
-            ((u8 *)p_aout->buffer)[l_buffer] = (u8)( ( (p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS / 256 ) + 128 ) * p_aout->i_vol / 256 );
+            ((u8 *)p_aout->buffer)[l_buffer] = (u8)( ( (p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS / 256 ) + 128 ) * p_aout->i_volume / 256 );
             p_aout->s32_buffer[l_buffer] = 0;
         }
 
@@ -131,7 +131,7 @@ void aout_U8StereoThread( aout_thread_t * p_aout )
 
         for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )
         {
-            ((u8 *)p_aout->buffer)[l_buffer] = (u8)( ( (p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS / 256) + 128 ) * p_aout->i_vol / 256 );
+            ((u8 *)p_aout->buffer)[l_buffer] = (u8)( ( (p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS / 256) + 128 ) * p_aout->i_volume / 256 );
             p_aout->s32_buffer[l_buffer] = 0;
         }
         l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );

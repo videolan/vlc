@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.35 2001/04/28 23:19:19 henri Exp $
+ * $Id: input_netlist.c,v 1.36 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -29,10 +29,17 @@
 #include <stdlib.h>
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>
-#ifndef WIN32
-#include <sys/uio.h>                                         /* struct iovec */
-#endif
 #include <unistd.h>
+
+#ifndef WIN32 
+#   include <sys/uio.h>                                      /* struct iovec */
+#else
+    struct iovec
+    {
+        void *iov_base; /* Pointer to data.  */
+        size_t iov_len; /* Length of data.  */
+    };
+#endif
 
 #include "config.h"
 #include "common.h"
@@ -46,17 +53,6 @@
 
 #include "input.h"
 #include "input_netlist.h"
-
-#ifdef WIN32 
-struct iovec
-  {
-    void *iov_base;     /* Pointer to data.  */
-    size_t iov_len;     /* Length of data.  */
-  };
-#endif
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
 
 /*****************************************************************************
  * input_NetlistInit: allocates netlist buffers and init indexes
@@ -253,7 +249,7 @@ void input_NetlistMviovec( void * p_method_data, size_t i_nb_iovec,
 
 
     /* Fills a table of pointers to packets associated with the io_vec's */
-while (i_loop < i_nb_iovec )
+    while (i_loop < i_nb_iovec )
     {
         if( i_current >= p_netlist->i_nb_data ) 
             i_current-=p_netlist->i_nb_data;
@@ -304,7 +300,7 @@ struct data_packet_s * input_NetlistNewPacket( void * p_method_data,
         return ( NULL );
     }
     
-    p_return = (p_netlist->pp_free_data[p_netlist->i_data_start]);
+    p_return = p_netlist->pp_free_data[p_netlist->i_data_start];
     p_netlist->i_data_start++;
     p_netlist->i_data_start &= ( p_netlist->i_nb_data - 1 );
 
@@ -387,7 +383,7 @@ void input_NetlistDeletePacket( void * p_method_data, data_packet_t * p_data )
     p_data->p_next = NULL;
  
     /* unlock */
-    vlc_mutex_unlock (&p_netlist->lock);
+    vlc_mutex_unlock( &p_netlist->lock );
 }
 
 /*****************************************************************************
@@ -432,7 +428,7 @@ void input_NetlistDeletePES( void * p_method_data, pes_packet_t * p_pes )
     p_netlist->pp_free_pes[p_netlist->i_pes_end] = p_pes;
     
     /* unlock */
-    vlc_mutex_unlock (&p_netlist->lock);
+    vlc_mutex_unlock( &p_netlist->lock );
 
 }
 
@@ -450,12 +446,13 @@ void input_NetlistEnd( input_thread_t * p_input)
     vlc_mutex_destroy (&p_netlist->lock);
     
     /* free the FIFO, the buffer, and the netlist structure */
-    free (p_netlist->pp_free_data);
-    free (p_netlist->pp_free_pes);
-    free (p_netlist->p_pes);
-    free (p_netlist->p_data);
-    free (p_netlist->p_buffers);
+    free( p_netlist->pp_free_data );
+    free( p_netlist->pp_free_pes );
+    free( p_netlist->p_pes );
+    free( p_netlist->p_data );
+    free( p_netlist->p_buffers );
 
     /* free the netlist */
-    free (p_netlist);
+    free( p_netlist );
 }
+

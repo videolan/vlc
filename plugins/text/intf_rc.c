@@ -55,9 +55,6 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "main.h"
-
-
 /*****************************************************************************
  * intf_sys_t: description and status of rc interface
  *****************************************************************************/
@@ -212,7 +209,14 @@ static void intf_Run( intf_thread_t *p_intf )
 
                 case 'f':
                 case 'F':
-                    p_main->p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                    vlc_mutex_lock( &p_vout_bank->lock );
+                    /* XXX: only fullscreen the first video output */
+                    if( p_vout_bank->i_count )
+                    {
+                        p_vout_bank->pp_vout[0]->i_changes
+                                          |= VOUT_FULLSCREEN_CHANGE;
+                    }
+                    vlc_mutex_unlock( &p_vout_bank->lock );
                     break;
 
                 case 'm':

@@ -2,7 +2,7 @@
  * ac3_decoder.c: core ac3 decoder
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder.c,v 1.30 2001/04/30 21:04:20 reno Exp $
+ * $Id: ac3_decoder.c,v 1.31 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -25,6 +25,8 @@
 
 #include "defs.h"
 
+#include <string.h>                                              /* memcpy() */
+
 #include "config.h"
 #include "common.h"
 #include "threads.h"
@@ -34,12 +36,11 @@
 
 #include "stream_control.h"
 #include "input_ext-dec.h"
-#include "audio_output.h"
 
+#include "audio_output.h"
 
 #include "ac3_decoder.h"
 #include "ac3_decoder_thread.h"
-
 #include "ac3_internal.h"
 
 #include <stdio.h>

@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.80 2001/04/28 03:36:25 sam Exp $
+ * $Id: vpar_blocks.c,v 1.81 2001/05/06 04:32:03 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -45,13 +45,12 @@
 
 #include "video_decoder.h"
 #include "vdec_motion.h"
-#include "../video_decoder/vdec_idct.h"
 
 #include "vpar_blocks.h"
-#include "../video_decoder/vpar_headers.h"
-#include "../video_decoder/vpar_synchro.h"
-#include "../video_decoder/video_parser.h"
-#include "../video_decoder/video_fifo.h"
+#include "vpar_headers.h"
+#include "vpar_synchro.h"
+#include "video_parser.h"
+#include "video_fifo.h"
 
 /*
  * Welcome to vpar_blocks.c ! Here's where the heavy processor-critical parsing

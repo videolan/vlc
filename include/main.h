@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: main.h,v 1.17 2001/05/01 04:18:17 sam Exp $
+ * $Id: main.h,v 1.18 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -50,8 +50,6 @@ typedef struct
     boolean_t              b_channels;    /* is channel changing supported ? */
 
     /* Unique threads */
-    p_vout_thread_t        p_vout;                    /* video output thread */
-    p_aout_thread_t        p_aout;                    /* audio output thread */
     p_intf_thread_t        p_intf;                  /* main interface thread */
 
     /* Shared data - these structures are accessed directly from p_main by

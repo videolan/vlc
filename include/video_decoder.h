@@ -2,7 +2,7 @@
  * video_decoder.h : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.h,v 1.22 2001/01/13 12:57:19 sam Exp $
+ * $Id: video_decoder.h,v 1.23 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -54,14 +54,14 @@ typedef struct vdec_thread_s
     /* idct iformations */
     dctelem_t              p_pre_idct[64*64];
 
+    /* Macroblock copy functions */
+    void ( * pf_vdec_init )   ( struct vdec_thread_s * );
+    void ( * pf_decode_mb_c ) ( struct vdec_thread_s *, struct macroblock_s * );
+    void ( * pf_decode_mb_bw )( struct vdec_thread_s *, struct macroblock_s * );
+
     /* Input properties */
     struct vpar_thread_s * p_vpar;                    /* video_parser thread */
 
-#ifndef HAVE_MMX
-    /* Lookup tables */
-    u8              pi_crop_buf[VDEC_CROPRANGE];
-    u8 *            pi_crop;
-#endif
 } vdec_thread_t;
 
 /*****************************************************************************

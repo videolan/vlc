@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.48 2001/04/06 09:15:48 sam Exp $
+ * $Id: video_decoder.c,v 1.49 2001/05/06 04:32:02 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -47,7 +47,6 @@
 #include "video_output.h"
 
 #include "vdec_motion.h"
-#include "vdec_idct.h"
 #include "video_decoder.h"
 
 #include "vpar_blocks.h"
@@ -152,28 +151,13 @@ static int vdec_InitThread( vdec_thread_t *p_vdec )
 int vdec_InitThread( vdec_thread_t *p_vdec )
 #endif
 {
-#ifndef HAVE_MMX
-    int i_dummy;
-#endif
-
     intf_DbgMsg("vdec debug: initializing video decoder thread %p", p_vdec);
 
-#ifndef HAVE_MMX
-    /* Init crop table */
-    p_vdec->pi_crop = p_vdec->pi_crop_buf + (VDEC_CROPRANGE >> 1);
-    for( i_dummy = -(VDEC_CROPRANGE >> 1); i_dummy < 0; i_dummy++ )
-    {
-        p_vdec->pi_crop[i_dummy] = 0;
-    }
-    for( ; i_dummy < 255; i_dummy ++ )
-    {
-        p_vdec->pi_crop[i_dummy] = i_dummy;
-    }
-    for( ; i_dummy < (VDEC_CROPRANGE >> 1) -1; i_dummy++ )
-    {
-        p_vdec->pi_crop[i_dummy] = 255;
-    }
-#endif
+    p_vdec->pf_vdec_init    = p_vdec->p_vpar->pf_vdec_init;
+    p_vdec->pf_decode_mb_c  = p_vdec->p_vpar->pf_decode_mb_c;
+    p_vdec->pf_decode_mb_bw = p_vdec->p_vpar->pf_decode_mb_bw;
+
+    p_vdec->pf_vdec_init( p_vdec );
 
 #ifdef VDEC_SMP
     /* Re-nice ourself */
@@ -220,327 +204,6 @@ static void EndThread( vdec_thread_t *p_vdec )
 }
 
 /*****************************************************************************
- * AddBlock : add a block
- *****************************************************************************/
-#ifndef HAVE_MMX
-static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                                 yuv_data_t * p_data, int i_incr )
-{
-    int i_x, i_y;
-
-    for( i_y = 0; i_y < 8; i_y++ )
-    {
-        for( i_x = 0; i_x < 8; i_x++ )
-        {
-            *p_data = p_vdec->pi_crop[*p_data + *p_block++];
-            p_data++;
-        }
-        p_data += i_incr;
-    }
-}
-#else
-static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                                 yuv_data_t * p_data, int i_incr )
-{
-    asm __volatile__ ( 
-            "pxor       %%mm7,%%mm7\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      (%2),%%mm2\n\t"
-            "paddw      8(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      16(%2),%%mm2\n\t"
-            "paddw      24(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      32(%2),%%mm2\n\t"
-            "paddw      40(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      48(%2),%%mm2\n\t"
-            "paddw      56(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      64(%2),%%mm2\n\t"
-            "paddw      72(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      80(%2),%%mm2\n\t"
-            "paddw      88(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      96(%2),%%mm2\n\t"
-            "paddw      104(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-            "addl       %3,%0\n\t"
-
-            "movq       (%0),%%mm1\n\t"
-            "movq       %%mm1,%%mm2\n\t"
-            "punpckhbw  %%mm7,%%mm1\n\t"
-            "punpcklbw  %%mm7,%%mm2\n\t"
-            "paddw      112(%2),%%mm2\n\t"
-            "paddw      120(%2),%%mm1\n\t"
-            "packuswb   %%mm1,%%mm2\n\t"
-            "movq       %%mm2,(%0)\n\t"
-
-            //"emms"
-            : "=r" (p_data)
-            : "0" (p_data), "r" (p_block), "r" (i_incr + 8) );
-}
-#endif
-
-
-/*****************************************************************************
- * CopyBlock : copy a block
- *****************************************************************************/
-#ifndef HAVE_MMX
-static __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                                  yuv_data_t * p_data, int i_incr )
-{
-    int i_x, i_y;
-
-    for( i_y = 0; i_y < 8; i_y++ )
-    {
-        for( i_x = 0; i_x < 8; i_x++ )
-        {
-            *p_data++ = p_vdec->pi_crop[*p_block++];
-        }
-        p_data += i_incr;
-    }
-}
-#else
-static  __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                                   yuv_data_t * p_data, int i_incr )
-{
-    asm __volatile__ (
-            "movq         (%2),%%mm0\n\t"
-            "packuswb   8(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        16(%2),%%mm0\n\t"
-            "packuswb   24(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        32(%2),%%mm0\n\t"
-            "packuswb   40(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        48(%2),%%mm0\n\t"
-            "packuswb   56(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        64(%2),%%mm0\n\t"
-            "packuswb   72(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        80(%2),%%mm0\n\t"
-            "packuswb   88(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        96(%2),%%mm0\n\t"
-            "packuswb   104(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-            "addl           %3,%0\n\t"
-
-            "movq        112(%2),%%mm0\n\t"
-            "packuswb   120(%2),%%mm0\n\t"
-            "movq        %%mm0,(%0)\n\t"
-
-            //"emms"
-            : "=r" (p_data)
-            : "0" (p_data), "r" (p_block), "r" (i_incr + 8) );
-}
-#endif
-
-
-/*****************************************************************************
- * vdec_DecodeMacroblock : decode a macroblock of a picture
- *****************************************************************************/
-#define DECODEBLOCKSC( OPBLOCK )                                        \
-{                                                                       \
-    int             i_b, i_mask;                                        \
-                                                                        \
-    i_mask = 1 << (3 + p_mb->i_chroma_nb_blocks);                       \
-                                                                        \
-    /* luminance */                                                     \
-    for( i_b = 0; i_b < 4; i_b++, i_mask >>= 1 )                        \
-    {                                                                   \
-        if( p_mb->i_coded_block_pattern & i_mask )                      \
-        {                                                               \
-            /*                                                          \
-             * Inverse DCT (ISO/IEC 13818-2 section Annex A)            \
-             */                                                         \
-            (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],        \
-                                  p_mb->pi_sparse_pos[i_b] );           \
-                                                                        \
-            /*                                                          \
-             * Adding prediction and coefficient data (ISO/IEC 13818-2  \
-             * section 7.6.8)                                           \
-             */                                                         \
-            OPBLOCK( p_vdec, p_mb->ppi_blocks[i_b],                     \
-                     p_mb->p_data[i_b], p_mb->i_addb_l_stride );        \
-        }                                                               \
-    }                                                                   \
-                                                                        \
-    /* chrominance */                                                   \
-    for( i_b = 4; i_b < 4 + p_mb->i_chroma_nb_blocks;                   \
-         i_b++, i_mask >>= 1 )                                          \
-    {                                                                   \
-        if( p_mb->i_coded_block_pattern & i_mask )                      \
-        {                                                               \
-            /*                                                          \
-             * Inverse DCT (ISO/IEC 13818-2 section Annex A)            \
-             */                                                         \
-            (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],        \
-                                  p_mb->pi_sparse_pos[i_b] );           \
-                                                                        \
-            /*                                                          \
-             * Adding prediction and coefficient data (ISO/IEC 13818-2  \
-             * section 7.6.8)                                           \
-             */                                                         \
-            OPBLOCK( p_vdec, p_mb->ppi_blocks[i_b],                     \
-                     p_mb->p_data[i_b], p_mb->i_addb_c_stride );        \
-        }                                                               \
-    }                                                                   \
-}
-
-#define DECODEBLOCKSBW( OPBLOCK )                                       \
-{                                                                       \
-    int             i_b, i_mask;                                        \
-                                                                        \
-    i_mask = 1 << (3 + p_mb->i_chroma_nb_blocks);                       \
-                                                                        \
-    /* luminance */                                                     \
-    for( i_b = 0; i_b < 4; i_b++, i_mask >>= 1 )                        \
-    {                                                                   \
-        if( p_mb->i_coded_block_pattern & i_mask )                      \
-        {                                                               \
-            /*                                                          \
-             * Inverse DCT (ISO/IEC 13818-2 section Annex A)            \
-             */                                                         \
-            (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],        \
-                                  p_mb->pi_sparse_pos[i_b] );           \
-                                                                        \
-            /*                                                          \
-             * Adding prediction and coefficient data (ISO/IEC 13818-2  \
-             * section 7.6.8)                                           \
-             */                                                         \
-            OPBLOCK( p_vdec, p_mb->ppi_blocks[i_b],                     \
-                     p_mb->p_data[i_b], p_mb->i_addb_l_stride );        \
-        }                                                               \
-    }                                                                   \
-}
-
-void vdec_DecodeMacroblockC ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
-{
-    if( !(p_mb->i_mb_type & MB_INTRA) )
-    {
-        /*
-         * Motion Compensation (ISO/IEC 13818-2 section 7.6)
-         */
-        if( p_mb->pf_motion == 0 )
-        {
-            intf_WarnMsg( 2, "pf_motion set to NULL" );
-        }
-        else
-        {
-            p_mb->pf_motion( p_mb );
-        }
-
-        DECODEBLOCKSC( AddBlock )
-    }
-    else
-    {
-        DECODEBLOCKSC( CopyBlock )
-    }
-
-    /*
-     * Decoding is finished, release the macroblock and free
-     * unneeded memory.
-     */
-    vpar_ReleaseMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
-}
-
-void vdec_DecodeMacroblockBW ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
-{
-    if( !(p_mb->i_mb_type & MB_INTRA) )
-    {
-        /*
-         * Motion Compensation (ISO/IEC 13818-2 section 7.6)
-         */
-        if( p_mb->pf_motion == 0 )
-        {
-            intf_WarnMsg( 2, "pf_motion set to NULL" );
-        }
-        else
-        {
-            p_mb->pf_motion( p_mb );
-        }
-
-        DECODEBLOCKSBW( AddBlock )
-    }
-    else
-    {
-        DECODEBLOCKSBW( CopyBlock )
-    }
-
-    /*
-     * Decoding is finished, release the macroblock and free
-     * unneeded memory.
-     */
-    vpar_ReleaseMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
-}
-
-
-
-/*****************************************************************************
  * RunThread: video decoder thread
  *****************************************************************************
  * Video decoder thread. This function does only return when the thread is
@@ -571,7 +234,7 @@ static void RunThread( vdec_thread_t *p_vdec )
 
         if( (p_mb = vpar_GetMacroblock( &p_vdec->p_vpar->vfifo )) != NULL )
         {
-            vdec_DecodeMacroblockC ( p_vdec, p_mb );
+            p_vdec->pf_decode_mb_c( p_vdec, p_mb );
         }
     }
 
@@ -587,3 +250,4 @@ static void RunThread( vdec_thread_t *p_vdec )
     EndThread( p_vdec );
     p_vdec->b_run = 0;
 }
+
