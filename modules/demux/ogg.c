@@ -278,21 +278,21 @@ static int Demux( demux_t * p_demux )
             /* Read info from any secondary header packets, if there are any */
             if( p_stream->secondary_header_packets > 0 )
             {
-                if( p_stream->fmt.i_codec == VLC_FOURCC( 't','h','e','o' ) &&
+                if( p_stream->fmt.i_codec == VLC_FOURCC('t','h','e','o') &&
                         oggpacket.bytes >= 7 &&
                         ! strncmp( &oggpacket.packet[1], "theora", 6 ) )
                 {
                     Ogg_ReadTheoraHeader( p_stream, &oggpacket );
                     p_stream->secondary_header_packets = 0;
                 }
-                else if( p_stream->fmt.i_codec == VLC_FOURCC( 'v','o','r','b' ) &&
+                else if( p_stream->fmt.i_codec == VLC_FOURCC('v','o','r','b') &&
                         oggpacket.bytes >= 7 &&
                         ! strncmp( &oggpacket.packet[1], "vorbis", 6 ) )
                 {
                     Ogg_ReadVorbisHeader( p_stream, &oggpacket );
                     p_stream->secondary_header_packets = 0;
                 }
-                else if ( p_stream->fmt.i_codec == VLC_FOURCC( 'c','m','m','l' ) )
+                else if ( p_stream->fmt.i_codec == VLC_FOURCC('c','m','m','l') )
                 {
                     p_stream->secondary_header_packets = 0;
                 }
@@ -979,30 +979,12 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_stream->fmt.audio.i_bitspersample =
                             GetWLE((oggpacket.packet+138));
 
-                        switch( i_format_tag )
+                        wf_tag_to_fourcc( i_format_tag,
+                                          &p_stream->fmt.i_codec, 0 );
+
+                        if( p_stream->fmt.i_codec ==
+                            VLC_FOURCC('u','n','d','f') )
                         {
-                        case WAVE_FORMAT_PCM:
-                            p_stream->fmt.i_codec =
-                                VLC_FOURCC( 'a', 'r', 'a', 'w' );
-                            break;
-                        case WAVE_FORMAT_MPEG:
-                        case WAVE_FORMAT_MPEGLAYER3:
-                            p_stream->fmt.i_codec =
-                                VLC_FOURCC( 'm', 'p', 'g', 'a' );
-                            break;
-                        case WAVE_FORMAT_A52:
-                            p_stream->fmt.i_codec =
-                                VLC_FOURCC( 'a', '5', '2', ' ' );
-                            break;
-                        case WAVE_FORMAT_WMA1:
-                            p_stream->fmt.i_codec =
-                                VLC_FOURCC( 'w', 'm', 'a', '1' );
-                            break;
-                        case WAVE_FORMAT_WMA2:
-                            p_stream->fmt.i_codec =
-                                VLC_FOURCC( 'w', 'm', 'a', '2' );
-                            break;
-                        default:
                             p_stream->fmt.i_codec = VLC_FOURCC( 'm', 's',
                                 ( i_format_tag >> 8 ) & 0xff,
                                 i_format_tag & 0xff );
@@ -1074,6 +1056,16 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         /* We need to get rid of the header packet */
                         ogg_stream_packetout( &p_stream->os, &oggpacket );
 
+                        p_stream->fmt.i_extra = GetQWLE(&st->size) -
+                            sizeof(stream_header);
+                        if( p_stream->fmt.i_extra )
+                        {
+                            p_stream->fmt.p_extra =
+                                malloc( p_stream->fmt.i_extra );
+                            memcpy( p_stream->fmt.p_extra, st + 1,
+                                    p_stream->fmt.i_extra );
+                        }
+
                         memcpy( p_buffer, st->subtype, 4 );
                         p_buffer[4] = '\0';
                         i_format_tag = strtol(p_buffer,NULL,16);
@@ -1088,30 +1080,12 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_stream->fmt.audio.i_bitspersample =
                             GetWLE(&st->bits_per_sample);
 
-                        switch( i_format_tag )
+                        wf_tag_to_fourcc( i_format_tag,
+                                          &p_stream->fmt.i_codec, 0 );
+
+                        if( p_stream->fmt.i_codec ==
+                            VLC_FOURCC('u','n','d','f') )
                         {
-                        case WAVE_FORMAT_PCM:
-                            p_stream->fmt.i_codec =
-                                VLC_FOURCC( 'a', 'r', 'a', 'w' );
-                            break;
-                        case WAVE_FORMAT_MPEG:
-                        case WAVE_FORMAT_MPEGLAYER3:
-                            p_stream->fmt.i_codec =
-                                VLC_FOURCC( 'm', 'p', 'g', 'a' );
-                            break;
-                        case WAVE_FORMAT_A52:
-                            p_stream->fmt.i_codec =
-                                VLC_FOURCC( 'a', '5', '2', ' ' );
-                            break;
-                        case WAVE_FORMAT_WMA1:
-                            p_stream->fmt.i_codec =
-                                VLC_FOURCC( 'w', 'm', 'a', '1' );
-                            break;
-                        case WAVE_FORMAT_WMA2:
-                            p_stream->fmt.i_codec =
-                                VLC_FOURCC( 'w', 'm', 'a', '2' );
-                            break;
-                        default:
                             p_stream->fmt.i_codec = VLC_FOURCC( 'm', 's',
                                 ( i_format_tag >> 8 ) & 0xff,
                                 i_format_tag & 0xff );
