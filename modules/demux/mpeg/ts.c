@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.33 2003/08/13 14:06:37 fenrir Exp $
+ * $Id: ts.c,v 1.34 2003/08/14 23:32:51 fenrir Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -1388,9 +1388,15 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     i_stream_id = 0xfa;
                     break;
                 case MSCODEC_VIDEO_ES:
-                    i_fourcc = VLC_FOURCC(0,0,0,0);   // fixed later
+                    i_fourcc = VLC_FOURCC(0,0,0,0);   /* fixed later */
                     i_cat = VIDEO_ES;
                     i_stream_id = 0xa0;
+                    break;
+                case PES_PRIVATE_ES:
+                    /* We need to check a descriptor to find the real codec */
+                    i_fourcc = VLC_FOURCC(0,0,0,0);   /* fixed later */
+                    i_cat = UNKNOWN_ES;
+                    i_stream_id = 0xbd;
                     break;
                 default:
                     i_fourcc = 0;
@@ -1549,8 +1555,8 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                 if( p_dr && p_dr->i_length >= 8 )
                 {
                     int i_bih_size;
-                    /* i_fourcc = (p_dr->p_data[0] << 24)|(p_dr->p_data[1]<<16)|(p_dr->p_data[2]<<8)|p_dr->p_data[3]; */
-                    i_fourcc = VLC_FOURCC( p_dr->p_data[0], p_dr->p_data[1], p_dr->p_data[2], p_dr->p_data[3] );
+                    i_fourcc = VLC_FOURCC( p_dr->p_data[0], p_dr->p_data[1],
+                                           p_dr->p_data[2], p_dr->p_data[3] );
 
                     i_bih_size = (p_dr->p_data[8] << 8) | p_dr->p_data[9];
                     i_size = sizeof( BITMAPINFOHEADER ) + i_bih_size;
@@ -1575,6 +1581,32 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                               "private sl_descriptor" );
                     i_fourcc = 0;
                     i_cat = UNKNOWN_ES;
+                }
+            }
+            else if( p_es->i_type == PES_PRIVATE_ES )
+            {
+                dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;
+                /* We have to find a descriptor giving the right codec */
+
+                for(p_dr = p_es->p_first_descriptor; p_dr; p_dr = p_dr->p_next)
+                {
+                    if( p_dr->i_tag == 0x6a )
+                    {
+                        /* A52 */
+                        i_fourcc = VLC_FOURCC( 'a', '5', '2', ' ' );
+                        i_cat    = AUDIO_ES;
+                    }
+                    else if( p_dr->i_tag == 0x59 )
+                    {
+                        /* DVB subtitle */
+                        i_fourcc = VLC_FOURCC( 'd', 'v', 'b', 's' );
+                        i_cat    = SPU_ES;
+                    }
+                }
+                if( i_fourcc == VLC_FOURCC(0,0,0,0) )
+                {
+                    msg_Warn( p_input,
+                              "Unknown codec/type for Private PES stream" );
                 }
             }
 

@@ -2,7 +2,7 @@
  * system.h: MPEG demultiplexing.
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: system.h,v 1.8 2003/07/13 12:35:13 massiot Exp $
+ * $Id: system.h,v 1.9 2003/08/14 23:32:51 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -46,9 +46,9 @@
 #define MPEG2_VIDEO_ES      0x02
 #define MPEG1_AUDIO_ES      0x03
 #define MPEG2_AUDIO_ES      0x04
-/* This one is "private PES". It may carry teletext and DVB, and we ought
- * to check for the presence of a descriptor, but we don't. */
-#define PESDVB_AUDIO_ES     0x06
+/* This one is "private PES". It may carry teletext, DVD subtitles, A52
+ * We have to check for the presence of a descriptor to have the codec */
+#define PES_PRIVATE_ES      0x06
 
 #define MPEG4_VIDEO_ES      0x10
 #define MPEG4_AUDIO_ES      0x11
