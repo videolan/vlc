@@ -1479,8 +1479,9 @@ dnl
 dnl   libid3tag support
 dnl
 AC_CHECK_HEADERS(id3tag.h, [
-  LDFLAGS_id3tag="${LDFLAGS_id3tag} -lz -lid3tag"
-  PLUGINS="${PLUGINS} id3tag"])
+  AC_CHECK_HEADERS(zlib.h, [
+    LDFLAGS_id3tag="${LDFLAGS_id3tag} -lid3tag -lz"
+    PLUGINS="${PLUGINS} id3tag"]) ])
 
 dnl
 dnl  ffmpeg decoder plugin
