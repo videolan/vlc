@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.210 2003/01/28 22:03:21 sam Exp $
+ * $Id: video_output.c,v 1.211 2003/01/30 19:14:17 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -930,7 +930,8 @@ static void EndThread( vout_thread_t *p_vout )
     {
         if( p_vout->p_subpicture[i_index].i_status != FREE_SUBPICTURE )
         {
-            free( p_vout->p_subpicture[i_index].p_sys );
+            vout_DestroySubPicture( p_vout,
+                                    &p_vout->p_subpicture[i_index] );
         }
     }
 
