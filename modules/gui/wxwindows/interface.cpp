@@ -43,6 +43,7 @@
 #include "bitmaps/fast.xpm"
 #include "bitmaps/playlist.xpm"
 #include "bitmaps/speaker.xpm"
+#include "bitmaps/speaker_mute.xpm"
 
 #define TOOLBAR_BMP_WIDTH 16
 #define TOOLBAR_BMP_HEIGHT 16
@@ -142,6 +143,7 @@ enum
     NextStream_Event,
     SlowStream_Event,
     FastStream_Event,
+    Mute_Event,
 
     DiscMenu_Event,
     DiscPrev_Event,
@@ -192,6 +194,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(NextStream_Event, Interface::OnNextStream)
     EVT_MENU(SlowStream_Event, Interface::OnSlowStream)
     EVT_MENU(FastStream_Event, Interface::OnFastStream)
+    EVT_MENU(Mute_Event, Interface::OnMute)
 
     /* Disc Buttons events */
     EVT_BUTTON(DiscMenu_Event, Interface::OnDiscMenu)
@@ -433,15 +436,12 @@ public:
     VLCVolCtrl( intf_thread_t *p_intf, wxWindow *p_parent, wxGauge ** );
     virtual ~VLCVolCtrl() {};
 
-    virtual void OnPaint( wxPaintEvent &event );
-
   private:
     DECLARE_EVENT_TABLE()
     int i_y_offset;
 };
 
 BEGIN_EVENT_TABLE(VLCVolCtrl, wxControl)
-   EVT_PAINT(VLCVolCtrl::OnPaint)
 END_EVENT_TABLE()
 
 #if defined(__WXGTK__)
@@ -459,13 +459,6 @@ VLCVolCtrl::VLCVolCtrl( intf_thread_t *p_intf, wxWindow *p_parent,
                                  wxSize( 44, TOOLBAR_BMP_HEIGHT ) );
 }
 
-void VLCVolCtrl::OnPaint( wxPaintEvent &evt )
-{
-    wxPaintDC dc( this );
-    wxBitmap mPlayBitmap( speaker_xpm );
-    dc.DrawBitmap( mPlayBitmap, 0, i_y_offset, TRUE );
-}
-
 void Interface::CreateOurToolBar()
 {
 #define HELP_OPEN N_("Open")
@@ -477,6 +470,7 @@ void Interface::CreateOurToolBar()
 #define HELP_PLN N_("Next playlist item")
 #define HELP_SLOW N_("Play slower")
 #define HELP_FAST N_("Play faster")
+#define HELP_MUTE N_("Toggle mute")
 
     wxLogNull LogDummy; /* Hack to suppress annoying log message on the win32
                          * version because we don't include wx.rc */
@@ -515,6 +509,8 @@ void Interface::CreateOurToolBar()
 
     toolbar->AddControl( p_dummy_ctrl );
 
+    toolbar->AddTool( Mute_Event, wxT(""), wxBitmap( speaker_xpm ),
+                      wxU(_(HELP_MUTE)) );
     VLCVolCtrl *sound_control = new VLCVolCtrl( p_intf, toolbar, &volctrl );
     toolbar->AddControl( sound_control );
 
@@ -1199,6 +1195,31 @@ void Interface::OnDiscNext( wxCommandEvent& WXUNUSED(event) )
 
         vlc_object_release( p_input );
     }
+}
+
+void Interface::OnMute( wxCommandEvent& WXUNUSED(event) )
+{
+    int i_volume = 1;
+    aout_VolumeMute( p_intf, (audio_volume_t *)&i_volume );
+
+    wxToolBarToolBase *p_tool = (wxToolBarToolBase *)
+        GetToolBar()->GetToolClientData( Mute_Event );
+    if( !p_tool ) return;
+
+    if( i_volume >= 0 )
+    {
+        p_tool->SetNormalBitmap( wxBitmap( speaker_xpm ) );
+        p_tool->SetLabel( wxU(_("")) );
+        p_tool->SetShortHelp( wxU(_(HELP_MUTE)) );
+    }
+    else
+    {
+        p_tool->SetNormalBitmap( wxBitmap( speaker_mute_xpm ) );
+        p_tool->SetLabel( wxU(_("")) );
+        p_tool->SetShortHelp( wxU(_(HELP_MUTE)) );
+    }
+
+    GetToolBar()->Realize();
 }
 
 #if wxUSE_DRAG_AND_DROP

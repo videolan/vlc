@@ -376,6 +376,7 @@ private:
     void OnNextStream( wxCommandEvent& event );
     void OnSlowStream( wxCommandEvent& event );
     void OnFastStream( wxCommandEvent& event );
+    void OnMute( wxCommandEvent& event );
 
     void OnDiscMenu( wxCommandEvent& event );
     void OnDiscPrev( wxCommandEvent& event );
