@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.33 2003/03/04 03:27:40 gbazin Exp $
+ * $Id: input.c,v 1.34 2003/04/06 23:44:53 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -60,7 +60,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     memcpy( &headphone_intermediate_format, &p_aout->mixer.mixer,
             sizeof(audio_sample_format_t) );
     headphone_intermediate_format.i_rate = p_input->input.i_rate;
-    if ( config_GetInt( p_aout , "headphone" ) )
+    if ( config_GetInt( p_aout , "headphone-opt" ) )
     {
         /* Do we use heaphone filter ? */
         if ( intermediate_format.i_physical_channels
