@@ -2,7 +2,7 @@
  * intf.c: Video CD interface to handle user interaction and still time
  *****************************************************************************
  * Copyright (C) 2002,2003 VideoLAN
- * $Id: intf.c,v 1.6 2003/11/25 03:55:12 rocky Exp $
+ * $Id: intf.c,v 1.7 2003/11/26 01:28:52 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *   from DVD code by Stéphane Borel <stef@via.ecp.fr>
@@ -25,10 +25,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>
-#include <unistd.h>
-
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 

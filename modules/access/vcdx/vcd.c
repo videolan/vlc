@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: vcd.c,v 1.8 2003/11/23 17:18:00 rocky Exp $
+ * $Id: vcd.c,v 1.9 2003/11/26 01:28:52 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -34,10 +34,10 @@
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-int  E_(VCDOpen)      ( vlc_object_t * );
-void E_(VCDClose)     ( vlc_object_t * );
-int  E_(VCDOpenIntf)  ( vlc_object_t * );
-void E_(VCDCloseIntf) ( vlc_object_t * );
+int  E_(Open)         ( vlc_object_t * );
+void E_(Close)        ( vlc_object_t * );
+int  E_(OpenIntf)     ( vlc_object_t * );
+void E_(CloseIntf)    ( vlc_object_t * );
 int  E_(InitVCD)      ( vlc_object_t * );
 void E_(EndVCD)       ( vlc_object_t * );
 
@@ -76,10 +76,10 @@ int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
  *****************************************************************************/
 
 vlc_module_begin();
-    add_usage_hint( N_("vcdx:[device-or-file][@{P,S,T}num]") );
+    add_usage_hint( N_("vcdx://[device-or-file][@{P,S,T}num]") );
     set_description( _("Video CD (VCD 1.0, 1.1, 2.0, SVCD, HQVCD) input") );
     set_capability( "access", 85 /* slightly higher than vcd */ );
-    set_callbacks( E_(VCDOpen), E_(VCDClose) );
+    set_callbacks( E_(Open), E_(Close) );
     add_shortcut( "vcd" );
     add_shortcut( "vcdx" );
 
@@ -106,6 +106,6 @@ vlc_module_begin();
 
     add_submodule();
         set_capability( "interface", 0 );
-        set_callbacks( E_(VCDOpenIntf), E_(VCDCloseIntf) );
+        set_callbacks( E_(OpenIntf), E_(CloseIntf) );
 vlc_module_end();
 

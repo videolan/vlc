@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.4 2003/11/23 14:34:19 rocky Exp $
+ * $Id: access.c,v 1.5 2003/11/26 01:28:52 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -161,7 +161,7 @@ vcd_log_handler (vcd_log_level_t level, const char message[])
  */
 
 /*****************************************************************************
-  VCDOpen: open VCD.
+  Open: open VCD.
   read in meta-information about VCD: the number of tracks, segments, 
   entries, size and starting information. Then set up state variables so
   that we read/seek starting at the location specified.
@@ -170,7 +170,7 @@ vcd_log_handler (vcd_log_level_t level, const char message[])
   and VLC_EGENERIC for some other error.
  *****************************************************************************/
 int 
-E_(VCDOpen) ( vlc_object_t *p_this )
+E_(Open) ( vlc_object_t *p_this )
 {
     input_thread_t *        p_input = (input_thread_t *)p_this;
     thread_vcd_data_t *     p_vcd;
@@ -300,10 +300,10 @@ E_(VCDOpen) ( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * VCDClose: closes VCD releasing allocated memory.
+ * Close: closes VCD releasing allocated memory.
  *****************************************************************************/
 void 
-E_(VCDClose) ( vlc_object_t *p_this )
+E_(Close) ( vlc_object_t *p_this )
 {
     input_thread_t *   p_input = (input_thread_t *)p_this;
     thread_vcd_data_t *p_vcd = (thread_vcd_data_t *)p_input->p_access_data;

@@ -1,9 +1,9 @@
 /*****************************************************************************
- * vcd.h : VCD input module for vlc
+ * vcd.h : VCD input module header for vlc
  *          using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vcd.h,v 1.2 2003/11/20 02:17:33 rocky Exp $
+ * $Id: vcd.h,v 1.3 2003/11/26 01:28:52 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
