@@ -51,8 +51,9 @@ typedef struct
 
     /* Shared data - these structures are accessed directly from p_main by
      * several modules */
+    struct module_bank_s * p_module_bank;                     /* module bank */
     p_plugin_bank_t        p_bank;                            /* plugin bank */
-    p_playlist_t           p_playlist;                        /* plugin bank */
+    p_playlist_t           p_playlist;                           /* playlist */
     p_intf_msg_t           p_msg;                 /* messages interface data */
     p_input_vlan_t         p_vlan;                      /* vlan library data */
 } main_t;

@@ -45,6 +45,7 @@
 #include "mtime.h"
 #include "tests.h"                                              /* TestMMX() */
 #include "plugins.h"
+#include "modules.h"
 #include "playlist.h"
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -252,6 +253,20 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     bank_Init( p_main->p_bank );
 
     /*
+     * Initialize module bank
+     */
+    p_main->p_module_bank = module_CreateBank( );
+    if( !p_main->p_module_bank )
+    {
+        intf_Msg( "Module bank initialization failed" );
+        bank_Destroy( p_main->p_bank );
+        playlist_Destroy( p_main->p_playlist );
+        intf_MsgDestroy();
+        return( errno );
+    }
+    module_InitBank( p_main->p_module_bank );
+
+    /*
      * Initialize shared resources and libraries
      */
     /* FIXME: no VLANs */
@@ -311,6 +326,11 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         input_VlanDestroy();
     }
 #endif
+
+    /*
+     * Free module bank
+     */
+    module_DestroyBank( p_main->p_module_bank );
 
     /*
      * Free plugin bank

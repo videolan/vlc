@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 /* Number of tries before we unload an unused module */
-#define MODULE_HIDE_DELAY 10
+#define MODULE_HIDE_DELAY 50
 
 /* The module handle type. */
 #ifdef SYS_BEOS
@@ -82,9 +82,10 @@ typedef struct module_bank_s
 /*****************************************************************************
  * Exported functions.
  *****************************************************************************/
-module_bank_t * module_InitBank     ( void );
-int             module_DestroyBank  ( module_bank_t * p_bank );
-int             module_ResetBank    ( module_bank_t * p_bank );
+module_bank_t * module_CreateBank   ( void );
+void            module_InitBank     ( module_bank_t * p_bank );
+void            module_DestroyBank  ( module_bank_t * p_bank );
+void            module_ResetBank    ( module_bank_t * p_bank );
 void            module_ManageBank   ( module_bank_t * p_bank );
 
 int module_Need    ( module_t * p_module );

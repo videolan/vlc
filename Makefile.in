@@ -245,6 +245,7 @@ VIDEO_DECODER =	src/video_decoder/video_decoder.o \
 MISC =		src/misc/mtime.o \
 		src/misc/tests.o \
 		src/misc/rsc_files.o \
+		src/misc/modules.o \
 		src/misc/netutils.o \
 		src/misc/playlist.o \
 		src/misc/plugins.o

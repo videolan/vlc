@@ -4,6 +4,7 @@
  * Copyright (C) 2001 VideoLAN
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,12 +26,8 @@
 
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
-#include <string.h>                                            /* strerror() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <sys/types.h>                                               /* open */
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>                                                 /* close */
+#include <string.h>                                              /* strdup() */
+#include <dirent.h>
 
 #if defined(HAVE_DLFCN_H)                                /* Linux, BSD, Hurd */
 #include <dlfcn.h>                           /* dlopen(), dlsym(), dlclose() */
@@ -61,19 +58,93 @@ static int FreeModule( module_bank_t * p_bank, module_t * p_module );
 static int CallSymbol( module_t * p_module, char * psz_name );
 
 /*****************************************************************************
+ * module_CreateBank: create the module bank.
+ *****************************************************************************
+ * This function creates a module bank structure.
+ *****************************************************************************/
+module_bank_t * module_CreateBank( void )
+{
+    module_bank_t * p_bank;
+
+    p_bank = malloc( sizeof( module_bank_t ) );
+
+    return( p_bank );
+}
+
+/*****************************************************************************
  * module_InitBank: create the module bank.
  *****************************************************************************
  * This function creates a module bank structure and fills it with the
  * built-in modules, as well as all the dynamic modules it can find.
  *****************************************************************************/
-module_bank_t * module_InitBank( void )
+void module_InitBank( module_bank_t * p_bank )
 {
-    module_bank_t * p_bank;
+    static char * path[] = { ".", "lib", PLUGIN_PATH, NULL } ;
 
-    intf_ErrMsg( "FIXME: module_InitBank unimplemented" );
-    p_bank = malloc( sizeof( module_bank_t ) );
+    char **         ppsz_path = path;
+    char *          psz_file;
+#ifdef SYS_BEOS
+    char *          psz_program_path = beos_GetProgramPath();
+    int             i_programlen = strlen( psz_program_path );
+#endif
+    DIR *           dir;
+    struct dirent * file;
 
-    return( p_bank );
+    p_bank->first = NULL;
+    vlc_mutex_init( &p_bank->lock );
+
+    intf_Msg( "module: module bank initialized" );
+
+    for( ; *ppsz_path != NULL ; ppsz_path++ )
+    {
+        if( (dir = opendir( *ppsz_path )) )
+        {
+            /* Store strlen(*ppsz_path) for later use. */
+            int i_dirlen = strlen( *ppsz_path );
+
+            /* Parse the directory and try to load all files it contains. */
+            while( (file = readdir( dir )) )
+            {
+                if( memcmp( file->d_name, ".", 1 ) )
+                {
+#ifdef SYS_BEOS
+                    /* Under BeOS, we need to add beos_GetProgramPath() to
+                     * access files under the current directory */
+                    if( memcmp( file->d_name, "/", 1 ) )
+                    {
+                        psz_file = malloc( i_programlen + i_dirlen
+                                               + strlen( file->d_name ) + 3 );
+                        if( psz_file == NULL )
+                        {
+                            continue;
+                        }
+                        sprintf( psz_file, "%s/%s/%s", psz_programlen,
+                                 *ppsz_path, file->d_name );
+                    }
+                    else
+#endif
+                    {
+                        psz_file = malloc( i_dirlen
+                                               + strlen( file->d_name ) + 2 );
+                        if( psz_file == NULL )
+                        {
+                            continue;
+                        }
+                        sprintf( psz_file, "%s/%s", *ppsz_path, file->d_name );
+                    }
+
+                    /* We created a nice filename -- now we just try to load
+                     * it as a dynamic module. */
+                    AllocateDynModule( p_bank, psz_file );
+
+                    /* We don't care if the allocation succeeded */
+                    free( psz_file );
+                }
+            }
+        }
+    }
+
+    return;
 }
 
 /*****************************************************************************
@@ -82,22 +153,41 @@ module_bank_t * module_InitBank( void )
  * This function unloads all unused dynamic modules and removes the module
  * bank in case of success.
  *****************************************************************************/
-int module_DestroyBank( module_bank_t * p_bank )
+void module_DestroyBank( module_bank_t * p_bank )
 {
-    intf_ErrMsg( "FIXME: module_DestroyBank unimplemented" );
-    return( -1 );
+    module_t * p_next;
+
+    while( p_bank->first != NULL )
+    {
+        if( FreeModule( p_bank, p_bank->first ) )
+        {
+            /* Module deletion failed */
+            intf_ErrMsg( "module error: `%s' can't be removed. trying harder.",
+                         p_bank->first->psz_name );
+
+            /* We just free the module by hand. Niahahahahaha. */
+            p_next = p_bank->first->next;
+            free(p_bank->first);
+            p_bank->first = p_next;
+        }
+    }
+
+    /* We can free the module bank */
+    free( p_bank );
+
+    return;
 }
 
 /*****************************************************************************
  * module_ResetBank: reset the module bank.
  *****************************************************************************
- * This function resets the plugin bank by unloading all unused dynamic
+ * This function resets the module bank by unloading all unused dynamic
  * modules.
  *****************************************************************************/
-int module_ResetBank( module_bank_t * p_bank )
+void module_ResetBank( module_bank_t * p_bank )
 {
     intf_ErrMsg( "FIXME: module_ResetBank unimplemented" );
-    return( -1 );
+    return;
 }
 
 /*****************************************************************************
@@ -127,14 +217,15 @@ void module_ManageBank( module_bank_t * p_bank )
             }
             else
             {
-                intf_Msg( "hiding unused module %s", p_module->psz_name );
+                intf_Msg( "module: hiding unused module `%s'",
+                          p_module->psz_name );
                 HideModule( p_module );
             }
         }
     }
 
     /* We release the global lock */
-    vlc_mutex_lock( &p_bank->lock );
+    vlc_mutex_unlock( &p_bank->lock );
 
     return;
 }
@@ -160,7 +251,7 @@ int module_Need( module_t * p_module )
     if( p_module->b_builtin )
     {
         /* A built-in module should always have a refcount >= 0 ! */
-        intf_ErrMsg( "module error: built-in module %s has refcount %i",
+        intf_ErrMsg( "module error: built-in module `%s' has refcount %i",
                      p_module->psz_name, p_module->i_usage );
         return( -1 );
     }
@@ -168,7 +259,7 @@ int module_Need( module_t * p_module )
     if( p_module->i_usage != -1 )
     {
         /* This shouldn't happen. Ever. We have serious problems here. */
-        intf_ErrMsg( "module error: dynamic module %s has refcount %i",
+        intf_ErrMsg( "module error: dynamic module `%s' has refcount %i",
                      p_module->psz_name, p_module->i_usage );
         return( -1 );
     }
@@ -211,7 +302,7 @@ int module_Unneed( module_t * p_module )
     if( p_module->i_usage <= 0 )
     {
         /* This shouldn't happen. Ever. We have serious problems here. */
-        intf_ErrMsg( "module error: trying to call module_Unneed() on %s"
+        intf_ErrMsg( "module error: trying to call module_Unneed() on `%s'"
                      " which isn't even in use", p_module->psz_name );
         return( -1 );
     }
@@ -243,7 +334,7 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
     if( ! module_load( psz_filename, &handle ) )
     {
         /* The dynamic module couldn't be opened */
-        intf_ErrMsg( "module error: cannot open %s (%s)",
+        intf_DbgMsg( "module error: cannot open %s (%s)",
                      psz_filename, module_error() );
         return( -1 );
     }
@@ -305,13 +396,17 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
 
     p_module->b_builtin = 0;
 
-    /* Link module across linked list */
+    /* Link module into the linked list */
     if( p_bank->first != NULL )
     {
         p_bank->first->prev = p_module;
     }
     p_module->next = p_bank->first;
+    p_module->prev = NULL;
     p_bank->first = p_module;
+
+    intf_Msg( "module: dynamic module `%s', %s",
+              p_module->psz_name, p_module->psz_longname );
 
     return( 0 );
 }
@@ -328,21 +423,21 @@ static int HideModule( module_t * p_module )
     if( p_module->b_builtin )
     {
         /* A built-in module should never be hidden. */
-        intf_ErrMsg( "module error: trying to hide built-in module %s",
+        intf_ErrMsg( "module error: trying to hide built-in module `%s'",
                      p_module->psz_name );
         return( -1 );
     }
 
     if( p_module->i_usage >= 1 )
     {
-        intf_ErrMsg( "module error: trying to hide module %s which is still"
+        intf_ErrMsg( "module error: trying to hide module `%s' which is still"
                      " in use", p_module->psz_name );
         return( -1 );
     }
 
     if( p_module->i_usage <= -1 )
     {
-        intf_ErrMsg( "module error: trying to hide module %s which is already"
+        intf_ErrMsg( "module error: trying to hide module `%s' which is already"
                      " hidden", p_module->psz_name );
         return( -1 );
     }
@@ -377,7 +472,7 @@ static int FreeModule( module_bank_t * p_bank, module_t * p_module )
     {
         if( p_module->i_usage != 0 )
         {
-            intf_ErrMsg( "module error: trying to free builtin module %s with"
+            intf_ErrMsg( "module error: trying to free builtin module `%s' with"
                          " usage %i", p_module->psz_name, p_module->i_usage );
             return( -1 );
         }
@@ -386,7 +481,7 @@ static int FreeModule( module_bank_t * p_bank, module_t * p_module )
     {
         if( p_module->i_usage >= 1 )
         {
-            intf_ErrMsg( "module error: trying to free module %s which is"
+            intf_ErrMsg( "module error: trying to free module `%s' which is"
                          " still in use", p_module->psz_name );
             return( -1 );
         }
@@ -448,7 +543,7 @@ static int CallSymbol( module_t * p_module, char * psz_name )
     if( !p_symbol )
     {
         /* We couldn't load the symbol */
-        intf_ErrMsg( "module error: cannot find %s in module %s (%s)",
+        intf_DbgMsg( "module warning: cannot find symbol %s in module %s (%s)",
                      psz_name, p_module->psz_filename, module_error() );
         return( -1 );
     }
@@ -458,7 +553,7 @@ static int CallSymbol( module_t * p_module, char * psz_name )
     {
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */
-        intf_ErrMsg( "module error: failed calling %s in module %s",
+        intf_ErrMsg( "module error: failed calling symbol %s in module %s",
                      psz_name, p_module->psz_filename );
         return( -1 );
     }

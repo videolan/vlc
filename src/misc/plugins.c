@@ -115,7 +115,6 @@ void bank_Init( plugin_bank_t * p_bank )
     
     /* Dummy plugin */
     SEEK_PLUGIN( "dummy" );
-    SEEK_PLUGIN( "null" );
 
 #undef SEEK_PLUGIN
 }

@@ -37,6 +37,7 @@
 #include "threads.h"
 #include "mtime.h"
 #include "plugins.h"
+#include "modules.h"
 #include "playlist.h"
 
 #include "stream_control.h"
@@ -234,6 +235,9 @@ void intf_Run( intf_thread_t *p_intf )
 
         /* Manage specific interface */
         p_intf->p_sys_manage( p_intf );
+
+        /* Manage module bank */
+        module_ManageBank( p_main->p_module_bank );
 
         /* Check attached threads status */
         if( (p_intf->p_vout != NULL) && p_intf->p_vout->b_error )
