@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.m,v 1.9 2002/12/25 02:23:36 massiot Exp $
+ * $Id: vout.m,v 1.10 2003/01/05 01:55:07 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -316,6 +316,9 @@ void E_(CloseVideo) ( vlc_object_t *p_this )
     {
         msg_Err( p_vout, "unable to destroy window" );
     }
+
+    if ( p_vout->p_sys->p_fullscreen_state != NULL )
+        EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
 
     ExitMovies();
 
@@ -858,6 +861,24 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 }
 
+/* This is actually the same as VLCControls::stop. */
+- (BOOL)windowShouldClose:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )      
+    {
+        return NO;
+    }
+
+    playlist_Stop( p_playlist );
+    vlc_object_release( p_playlist );
+
+    /* The window will be closed by the intf later. */
+    return NO;
+}
+
 @end
 
 /*****************************************************************************
@@ -1016,6 +1037,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
         unsigned int i_stylemask = NSTitledWindowMask |
                                    NSMiniaturizableWindowMask |
+                                   NSClosableWindowMask |
                                    NSResizableWindowMask;
 
         [p_vout->p_sys->o_window 

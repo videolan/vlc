@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.17 2003/01/04 04:11:08 jlj Exp $
+ * $Id: intf.m,v 1.18 2003/01/05 01:55:07 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -249,7 +249,8 @@ static void Run( intf_thread_t *p_intf )
     [o_mi_subtitle setTitle: _NS("Subtitles")];
 
     [o_mu_window setTitle: _NS("Window")];
-    [o_mi_minimize setTitle: _NS("Minimize")];
+    [o_mi_minimize setTitle: _NS("Minimize Window")];
+    [o_mi_close_window setTitle: _NS("Close Window")];
     [o_mi_bring_atf setTitle: _NS("Bring All to Front")];
 
     /* dock menu */
@@ -304,8 +305,17 @@ static void Run( intf_thread_t *p_intf )
         }
         else if( p_intf->p_sys->p_input->b_dead )
         {
+            vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                                      FIND_ANYWHERE );
             vlc_object_release( p_intf->p_sys->p_input );
             p_intf->p_sys->p_input = NULL;
+
+            if ( p_vout != NULL )
+            {
+                vlc_object_detach( p_vout );
+                vlc_object_release( p_vout );
+                vout_Destroy( p_vout );
+            }
         }
 
         if( p_intf->p_sys->p_input != NULL )
@@ -461,6 +471,12 @@ static void Run( intf_thread_t *p_intf )
         p_intf->p_sys->p_input = NULL;
     }
 
+    if( o_prefs != nil )
+    {
+        [o_prefs release];
+        o_prefs = nil;
+    }
+
     /*
      * Free playlists
      */
@@ -542,6 +558,7 @@ static void Run( intf_thread_t *p_intf )
         [o_mi_channels setEnabled: FALSE];
         [o_mi_device setEnabled: FALSE];
         [o_mi_screen setEnabled: FALSE];
+        [o_mi_close_window setEnabled: FALSE];
     }
 
     p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, 
@@ -801,6 +818,8 @@ static void Run( intf_thread_t *p_intf )
                 var: "video-device" selector: @selector(toggleVar:)];
 
             vlc_object_release( (vlc_object_t *)p_vout );
+
+            [o_mi_close_window setEnabled: TRUE];
         }
 
         p_intf->p_sys->b_vout_update = 0;

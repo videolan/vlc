@@ -2,7 +2,7 @@
  * vout.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.h,v 1.3 2002/12/24 23:00:51 massiot Exp $
+ * $Id: vout.h,v 1.4 2003/01/05 01:55:07 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -36,6 +36,8 @@
 
 - (void)toggleFullscreen;
 - (BOOL)isFullscreen;
+
+- (BOOL)windowShouldClose:(id)sender;
 
 @end
 

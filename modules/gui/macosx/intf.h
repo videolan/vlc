@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.9 2003/01/04 04:11:08 jlj Exp $
+ * $Id: intf.h,v 1.10 2003/01/05 01:55:07 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -163,6 +163,7 @@ struct intf_sys_t
 
     IBOutlet id o_mu_window;
     IBOutlet id o_mi_minimize;
+    IBOutlet id o_mi_close_window;
     IBOutlet id o_mi_bring_atf;
 
     /* dock menu */
