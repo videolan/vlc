@@ -2,7 +2,7 @@
  * trivial.c : trivial channel mixer plug-in (drops unwanted channels)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.2 2002/08/28 22:25:38 massiot Exp $
+ * $Id: trivial.c,v 1.3 2002/09/02 23:21:40 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -105,12 +105,13 @@ static void SparseCopy( s32 * p_dest, const s32 * p_src, size_t i_len,
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
+    int i_input_nb = aout_FormatNbChannels( &p_filter->input );
+    int i_output_nb = aout_FormatNbChannels( &p_filter->output );
+
     SparseCopy( (s32 *)p_out_buf->p_buffer, (s32 *)p_in_buf->p_buffer,
-                p_in_buf->i_nb_samples, p_filter->output.i_channels,
-                p_filter->input.i_channels );
+                p_in_buf->i_nb_samples, i_output_nb, i_input_nb );
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * p_filter->output.i_channels
-                             / p_filter->input.i_channels;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * i_output_nb / i_input_nb;
 }
 
