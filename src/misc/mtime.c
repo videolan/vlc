@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.30 2002/05/17 16:38:41 sam Exp $
+ * $Id: mtime.c,v 1.31 2002/05/18 13:33:44 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -55,8 +55,8 @@
 #if defined(HAVE_NANOSLEEP) && !defined(HAVE_STRUCT_TIMESPEC)
 struct timespec
 {
-    time_t tv_sec;
-    long tv_sec;
+    time_t  tv_sec;
+    int32_t tv_nsec;
 };
 #endif
 

@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.2 2002/05/14 20:13:04 massiot Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.3 2002/05/18 13:33:44 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -240,6 +240,20 @@ static Intf_VLCWrapper *o_intf = nil;
         p_aout_bank->pp_aout[0]->i_volume = 0;
     }
     p_main->p_intf->p_sys->b_mute = !p_main->p_intf->p_sys->b_mute;
+}
+
+- (void)maxvolume
+{
+    if( p_aout_bank->pp_aout[0] == NULL ) return;
+
+    if( p_main->p_intf->p_sys->b_mute )
+    {
+        p_main->p_intf->p_sys->i_saved_volume = VOLUME_MAX;
+    }
+    else
+    {
+        p_aout_bank->pp_aout[0]->i_volume = VOLUME_MAX;
+    }
 }
 
 - (void)fullscreen

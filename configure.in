@@ -196,12 +196,16 @@ AC_CHECK_HEADERS(linux/version.h)
 AC_HEADER_TIME
 
 dnl Mac OS X and other OSes don't have declaration for nanosleep
-dnl This only works with autoconf 2.52
-AC_CHECK_DECLS(nanosleep)
+AC_EGREP_HEADER(nanosleep,time.h,[
+  AC_DEFINE(HAVE_DECL_NANOSLEEP, 1,
+            Define if <time.h> defines nanosleep.)
+])
 
 dnl Make sure we have timespecs
-dnl This only works with autoconf 2.52
-AC_CHECK_TYPES(struct timespec)
+AC_EGREP_HEADER(timespec,sys/time.h,[
+  AC_DEFINE(HAVE_STRUCT_TIMESPEC, 1,
+            Define if <sys/time.h> defines struct timespec.)
+])
 
 dnl Check for threads library
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
