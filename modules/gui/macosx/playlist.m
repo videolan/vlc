@@ -404,7 +404,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
         vlc_mutex_lock( &p_playlist->object_lock );
         o_current_name = [NSString stringWithUTF8String: 
-            p_playlist->pp_items[i_current]->psz_name];
+            p_playlist->pp_items[i_current]->input.psz_name];
         o_current_author = [NSString stringWithUTF8String: 
             playlist_GetInfo(p_playlist, i_current ,_("General"),_("Author") )];
         vlc_mutex_unlock( &p_playlist->object_lock );
@@ -665,10 +665,10 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         vlc_mutex_lock( &p_playlist->object_lock );
         o_value = [NSString stringWithUTF8String: 
-            p_playlist->pp_items[i_row]->psz_name];
+            p_playlist->pp_items[i_row]->input.psz_name];
         if( o_value == NULL )
             o_value = [NSString stringWithCString: 
-                p_playlist->pp_items[i_row]->psz_name];
+                p_playlist->pp_items[i_row]->input.psz_name];
         vlc_mutex_unlock( &p_playlist->object_lock );
     }
     else if( [[o_tc identifier] isEqualToString:@"2"] )

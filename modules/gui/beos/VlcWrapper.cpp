@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.42 2004/01/17 12:28:57 gbazin Exp $
+ * $Id$
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -402,7 +402,7 @@ int VlcWrapper::PlaylistSize()
 
 char * VlcWrapper::PlaylistItemName( int i )
 {
-   return p_playlist->pp_items[i]->psz_name;
+   return p_playlist->pp_items[i]->input.psz_name;
 }
 
 int VlcWrapper::PlaylistCurrent()
@@ -707,8 +707,8 @@ VlcWrapper::PlaylistCloneItem( void* castToItem ) const
 		{
 			// make a copy of the item at index
                         *copy = *item;
-			copy->psz_name = strdup( item->psz_name );
-			copy->psz_uri  = strdup( item->psz_uri );
+			copy->input.psz_name = strdup( item->input.psz_name );
+			copy->input.psz_uri  = strdup( item->input.psz_uri );
 		}
 	}
 	return (void*)copy;
@@ -786,7 +786,7 @@ bool VlcWrapper::IsUsingMenus()
         return false;
     }
     
-    char * psz_name = p_playlist->pp_items[p_playlist->i_index]->psz_name;
+    char * psz_name = p_playlist->pp_items[p_playlist->i_index]->input.psz_name;
     if( !strncmp( psz_name, "dvdplay:", 8 ) )
     {
         vlc_mutex_unlock( &p_playlist->object_lock );

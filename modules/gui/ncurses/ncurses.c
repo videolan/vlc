@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: ncurses.c,v 1.15 2004/02/22 15:57:41 fenrir Exp $
+ * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -933,20 +933,21 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
             {
                 attrset( A_REVERSE );
             }
-            if( !strcmp( p_playlist->pp_items[i_item]->psz_name, p_playlist->pp_items[i_item]->psz_uri ) )
+            if( !strcmp( p_playlist->pp_items[i_item]->input.psz_name,
+                         p_playlist->pp_items[i_item]->input.psz_uri ) )
             {
                 mvnprintw( y++, 1, COLS - 2, "%c %d - '%s'",
                            c,
                            i_item,
-                           p_playlist->pp_items[i_item]->psz_uri );
+                           p_playlist->pp_items[i_item]->input.psz_uri );
             }
             else
             {
                 mvnprintw( y++, 1, COLS - 2, "%c %d - '%s' (%s)",
                           c,
                           i_item,
-                          p_playlist->pp_items[i_item]->psz_uri,
-                          p_playlist->pp_items[i_item]->psz_name );
+                          p_playlist->pp_items[i_item]->input.psz_uri,
+                          p_playlist->pp_items[i_item]->input.psz_name );
             }
             if( b_selected )
             {
@@ -996,7 +997,7 @@ static void Eject ( intf_thread_t *p_intf )
         return;
     }
 
-    psz_name = p_playlist->pp_items[ p_playlist->i_index ]->psz_name;
+    psz_name = p_playlist->pp_items[ p_playlist->i_index ]->input.psz_name;
 
     if( psz_name )
     {

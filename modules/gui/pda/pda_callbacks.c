@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.29 2004/02/29 22:59:59 jpsaman Exp $
+ * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -163,7 +163,7 @@ void PlaylistRebuildListStore( GtkListStore * p_list, playlist_t * p_playlist )
     vlc_mutex_lock( &p_playlist->object_lock );
     for( i_dummy = 0; i_dummy < p_playlist->i_size ; i_dummy++ )
     {
-        ppsz_text[0] = p_playlist->pp_items[i_dummy]->psz_name;
+        ppsz_text[0] = p_playlist->pp_items[i_dummy]->input.psz_name;
         ppsz_text[1] = "no info";
         gtk_list_store_append (p_list, &iter);
         gtk_list_store_set (p_list, &iter,
