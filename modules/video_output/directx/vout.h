@@ -100,6 +100,10 @@ struct vout_sys_t
     /* Misc */
     vlc_bool_t      b_on_top_change;
 
+    vlc_bool_t      b_wallpaper;
+    COLORREF        color_bkg;
+    COLORREF        color_bkgtxt;
+
     event_thread_t *p_event;
     vlc_mutex_t    lock;
 };
@@ -137,3 +141,4 @@ void DirectXUpdateRects ( vout_thread_t *p_vout, vlc_bool_t b_force );
 #define WM_VLC_CHANGE_TEXT WM_APP + 3
 #define IDM_TOGGLE_ON_TOP WM_USER + 1
 #define DX_POSITION_CHANGE 0x1000
+#define DX_WALLPAPER_CHANGE 0x2000

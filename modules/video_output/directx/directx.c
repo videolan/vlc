@@ -44,6 +44,7 @@
 
 #include <windows.h>
 #include <ddraw.h>
+#include <commctrl.h>
 
 #include <multimon.h>
 #undef GetSystemMetrics
@@ -93,9 +94,13 @@ static int  DirectXUnlockSurface  ( vout_thread_t *p_vout, picture_t *p_pic );
 
 static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t i_color );
 
+void SwitchWallpaperMode( vout_thread_t *, vlc_bool_t );
+
 /* Object variables callbacks */
 static int FindDevicesCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
+static int WallpaperCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -123,6 +128,12 @@ static int FindDevicesCallback( vlc_object_t *, char const *,
     "window to open on. For example, \"\\\\.\\DISPLAY1\" or " \
     "\"\\\\.\\DISPLAY2\"." )
 
+#define WALLPAPER_TEXT N_("Enable wallpaper mode ")
+#define WALLPAPER_LONGTEXT N_( \
+    "The wallpaper mode allows you to display the video as the desktop " \
+    "background. Note that this feature only works in overlay mode and " \
+    "the desktop must not already have a wallpaper." )
+
 static char *ppsz_dev[] = { "" };
 static char *ppsz_dev_text[] = { N_("Default") };
 
@@ -138,6 +149,9 @@ vlc_module_begin();
                 VLC_TRUE );
         change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback );
         change_action_add( FindDevicesCallback, N_("Refresh list") );
+
+    add_bool( "directx-wallpaper", 0, NULL, WALLPAPER_TEXT, WALLPAPER_LONGTEXT,
+              VLC_TRUE );
 
     set_description( _("DirectX video output") );
     set_capability( "video output", 100 );
@@ -187,6 +201,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->hwnd = p_vout->p_sys->hvideownd = NULL;
     p_vout->p_sys->hparent = NULL;
     p_vout->p_sys->i_changes = 0;
+    p_vout->p_sys->b_wallpaper = 0;
     vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
     SetRectEmpty( &p_vout->p_sys->rect_display );
     SetRectEmpty( &p_vout->p_sys->rect_parent );
@@ -266,6 +281,15 @@ static int OpenVideo( vlc_object_t *p_this )
     /* Trigger a callback right now */
     var_Get( p_vout, "video-on-top", &val );
     var_Set( p_vout, "video-on-top", val );
+
+    /* Variable to indicate if the window should be on top of others */
+    /* Trigger a callback right now */
+    var_Create( p_vout, "directx-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    val.psz_string = _("Wallpaper");
+    var_Change( p_vout, "directx-wallpaper", VLC_VAR_SETTEXT, &val, NULL );
+    var_AddCallback( p_vout, "directx-wallpaper", WallpaperCallback, NULL );
+    var_Get( p_vout, "directx-wallpaper", &val );
+    var_Set( p_vout, "directx-wallpaper", val );
 
     return VLC_SUCCESS;
 
@@ -426,6 +450,9 @@ static void CloseVideo( vlc_object_t *p_this )
 
     vlc_mutex_destroy( &p_vout->p_sys->lock );
 
+    /* Make sure the wallpaper is restored */
+    SwitchWallpaperMode( p_vout, VLC_FALSE );
+
     if( p_vout->p_sys )
     {
         free( p_vout->p_sys );
@@ -500,6 +527,13 @@ static int Manage( vout_thread_t *p_vout )
      * messages. But since window can stay blocked into this function for a
      * long time (for example when you move your window on the screen), I
      * decided to isolate PeekMessage in another thread. */
+
+    if( p_vout->p_sys->i_changes & DX_WALLPAPER_CHANGE )
+    {
+        SwitchWallpaperMode( p_vout, !p_vout->p_sys->b_wallpaper );
+        p_vout->p_sys->i_changes &= ~DX_WALLPAPER_CHANGE;
+        DirectXUpdateOverlay( p_vout );
+    }
 
     /*
      * Fullscreen change
@@ -1154,6 +1188,24 @@ int DirectXUpdateOverlay( vout_thread_t *p_vout )
     RECT            rect_dest = p_vout->p_sys->rect_dest_clipped;
 
     if( !p_vout->p_sys->b_using_overlay ) return VLC_EGENERIC;
+
+    if( p_vout->p_sys->b_wallpaper )
+    {
+        int i_x, i_y, i_width, i_height;
+
+        rect_src.left = rect_src.top = 0;
+        rect_src.right = p_vout->render.i_width;
+        rect_src.bottom = p_vout->render.i_height;
+
+        rect_dest = p_vout->p_sys->rect_display;
+        vout_PlacePicture( p_vout, rect_dest.right, rect_dest.bottom,
+                           &i_x, &i_y, &i_width, &i_height );
+
+        rect_dest.left += i_x;
+        rect_dest.right = rect_dest.left + i_width;
+        rect_dest.top += i_y;
+        rect_dest.bottom = rect_dest.top + i_height;
+    }
 
     vlc_mutex_lock( &p_vout->p_sys->lock );
     if( p_vout->p_sys->p_current_surface == NULL )
@@ -1859,6 +1911,48 @@ static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t i_color )
 }
 
 /*****************************************************************************
+ * A few toolbox functions
+ *****************************************************************************/
+void SwitchWallpaperMode( vout_thread_t *p_vout, vlc_bool_t b_on )
+{
+    HWND hwnd;
+
+    if( p_vout->p_sys->b_wallpaper == b_on ) return; /* Nothing to do */
+
+    hwnd = FindWindow( "Progman", NULL );
+    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, "SHELLDLL_DefView", NULL );
+    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, "SysListView32", NULL );
+    if( !hwnd )
+    {
+        msg_Warn( p_vout, "couldn't find \"SysListView32\" window, "
+                  "wallpaper mode not supported" );
+        return;
+    }
+
+    p_vout->p_sys->b_wallpaper = b_on;
+
+    msg_Dbg( p_vout, "wallpaper mode %s", b_on ? "enabled" : "disabled" );
+
+    if( p_vout->p_sys->b_wallpaper )
+    {
+        p_vout->p_sys->color_bkg = ListView_GetBkColor( hwnd );
+        p_vout->p_sys->color_bkgtxt = ListView_GetTextBkColor( hwnd );
+
+        ListView_SetBkColor( hwnd, p_vout->p_sys->i_rgb_colorkey );
+        ListView_SetTextBkColor( hwnd, p_vout->p_sys->i_rgb_colorkey );
+    }
+    else if( hwnd )
+    {
+        ListView_SetBkColor( hwnd, p_vout->p_sys->color_bkg );
+        ListView_SetTextBkColor( hwnd, p_vout->p_sys->color_bkgtxt );
+    }
+
+    /* Update desktop */
+    InvalidateRect( hwnd, NULL, TRUE );            
+    UpdateWindow( hwnd );
+}
+
+/*****************************************************************************
  * config variable callback
  *****************************************************************************/
 BOOL WINAPI DirectXEnumCallback2( GUID* p_guid, LPTSTR psz_desc,
@@ -1929,6 +2023,36 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 
     /* Signal change to the interface */
     p_item->b_dirty = VLC_TRUE;
+
+    return VLC_SUCCESS;
+}
+
+static int WallpaperCallback( vlc_object_t *p_this, char const *psz_cmd,
+                              vlc_value_t oldval, vlc_value_t newval,
+                              void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
+    if( (newval.b_bool && !p_vout->p_sys->b_wallpaper) ||
+        (!newval.b_bool && p_vout->p_sys->b_wallpaper) )
+    {
+        playlist_t *p_playlist;
+
+        p_playlist =
+            (playlist_t *)vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
+                                           FIND_PARENT );
+        if( p_playlist )
+        {
+            /* Modify playlist as well because the vout might have to be
+             * restarted */
+            var_Create( p_playlist, "directx-wallpaper", VLC_VAR_BOOL );
+            var_Set( p_playlist, "directx-wallpaper", newval );
+
+            vlc_object_release( p_playlist );
+        }
+
+        p_vout->p_sys->i_changes |= DX_WALLPAPER_CHANGE;
+    }
 
     return VLC_SUCCESS;
 }
