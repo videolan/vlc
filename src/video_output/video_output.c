@@ -174,7 +174,7 @@ static void     RenderPicture           ( vout_thread_t *p_vout, picture_t *p_pi
 static void     RenderYUVGrayPicture    ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderYUV16Picture      ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderYUV32Picture      ( vout_thread_t *p_vout, picture_t *p_pic );
-static void     RenderInfo              ( vout_thread_t *p_vout );
+static void     RenderPictureInfo       ( vout_thread_t *p_vout, picture_t *p_pic );
 static int      RenderIdle              ( vout_thread_t *p_vout, int i_level );
 
 /*******************************************************************************
@@ -684,6 +684,10 @@ static void RunThread( vout_thread_t *p_vout)
                 if( p_vout->b_active )
                 {                    
                     RenderPicture( p_vout, p_pic );
+                    if( p_vout->b_info )
+                    {
+                        RenderPictureInfo( p_vout, p_pic );                        
+                    }                    
                 }                
                 vlc_mutex_lock( &p_vout->lock );
                 p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
@@ -719,12 +723,6 @@ static void RunThread( vout_thread_t *p_vout)
                 last_date =     pic_date;
                 i_idle_level =  0;
                 b_display =     1;                
-                
-                /* Render additionnal informations */
-                if( p_vout->b_active && p_vout->b_info )
-                {
-                    RenderInfo( p_vout );    
-                }                
                 
                 /* Sleep until its display date */
 		mwait( pic_date );
@@ -853,7 +851,6 @@ static void BuildTables( vout_thread_t *p_vout )
     /* Build gamma table */     
     for( i_index = 0; i_index < 256; i_index++ )
     {
-        //?? add contrast and brightness
         i_gamma[i_index] = 255. * pow( (double)i_index / 255., p_vout->f_gamma );        
     }
         
@@ -926,6 +923,24 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_vout->picture_render_time = mdate();    
 #endif
 
+    /* Change aspect ratio or resize frame to fit frame */
+    if( (p_pic->i_width > p_vout->i_width) || (p_pic->i_height > p_vout->i_height) )
+    {
+#ifdef VIDEO_X11
+        /* X11: window can be resized, so resize it - the picture won't be 
+         * rendered since any alteration of the window size means recreating the
+         * XImages */
+        p_vout->i_new_width =   p_pic->i_width;
+        p_vout->i_new_height =  p_pic->i_height;
+        return;        
+#else
+        /* Other drivers: the video output thread can't change its size, so
+         * we need to change the aspect ratio */
+        //????
+#endif
+    }    
+
+    /* Choose appropriate rendering function */
     switch( p_pic->i_type )
     {
     case YUV_420_PICTURE:                   /* YUV picture: YUV transformation */        
@@ -1155,11 +1170,11 @@ static void RenderYUV32Picture( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*******************************************************************************
- * RenderInfo: print additionnal informations on a picture
+ * RenderPictureInfo: print additionnal informations on a picture
  *******************************************************************************
  * This function will add informations such as fps and buffer size on a picture
  *******************************************************************************/
-static void RenderInfo( vout_thread_t *p_vout )
+static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
 {
     char        psz_buffer[256];                              /* string buffer */
 #ifdef DEBUG
@@ -1169,7 +1184,9 @@ static void RenderInfo( vout_thread_t *p_vout )
 #endif
 
 #ifdef STATS
-    /* Print FPS rate in upper right corner */
+    /* 
+     * Print FPS rate in upper right corner 
+     */
     if( p_vout->c_fps_samples > VOUT_FPS_SAMPLES )
     {        
         sprintf( psz_buffer, "%.2f fps", (double) VOUT_FPS_SAMPLES * 1000000 /
@@ -1178,7 +1195,9 @@ static void RenderInfo( vout_thread_t *p_vout )
         vout_SysPrint( p_vout, p_vout->i_width, 0, 1, -1, psz_buffer );
     }
 
-    /* Print statistics in upper left corner */
+    /* 
+     * Print statistics in upper left corner 
+     */
     sprintf( psz_buffer, "gamma=%.2f   %ld frames (%.1f %% idle)", 
              p_vout->f_gamma, p_vout->c_fps_samples, p_vout->c_loops ? 
              (double ) p_vout->c_idle_loops * 100 / p_vout->c_loops : 100. );    
@@ -1186,7 +1205,9 @@ static void RenderInfo( vout_thread_t *p_vout )
 #endif
     
 #ifdef DEBUG
-    /* Print heap state in lower left corner  */
+    /* 
+     * Print heap state in lower left corner  
+     */
     for( i_picture = 0; i_picture < VOUT_MAX_PICTURES; i_picture++ )
     {
         switch( p_vout->p_picture[i_picture].i_status )
@@ -1205,9 +1226,28 @@ static void RenderInfo( vout_thread_t *p_vout )
 #endif
 
 #ifdef DEBUG_VIDEO
-    /* Print rendering statistics in lower right corner */
-    sprintf( psz_buffer, "picture rendering time: %lu us", 
-             (unsigned long) p_vout->picture_render_time );    
+    /* 
+     * Print picture info in lower right corner 
+     */
+    switch( p_pic->i_type )
+    {
+    case YUV_420_PICTURE:
+        sprintf( psz_buffer, "YUV 4:2:0 picture, rendering time: %lu us", 
+                 (unsigned long) p_vout->picture_render_time );
+        break;        
+    case YUV_422_PICTURE:
+        sprintf( psz_buffer, "YUV 4:2:2 picture, rendering time: %lu us", 
+                 (unsigned long) p_vout->picture_render_time );
+        break;        
+    case YUV_444_PICTURE:
+        sprintf( psz_buffer, "YUV 4:4:4 picture, rendering time: %lu us", 
+                 (unsigned long) p_vout->picture_render_time );
+        break;
+    default:
+        sprintf( psz_buffer, "unknown picture, rendering time: %lu us", 
+                 (unsigned long) p_vout->picture_render_time );    
+        break;        
+    }    
     vout_SysPrint( p_vout, p_vout->i_width, p_vout->i_height, 1, 1, psz_buffer );    
 #endif
 }

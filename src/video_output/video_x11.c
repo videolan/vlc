@@ -216,6 +216,8 @@ int vout_SysManage( vout_thread_t *p_vout )
     if( (p_vout->i_width != p_vout->i_new_width) || 
         (p_vout->i_height != p_vout->i_new_height) )
     {
+        intf_DbgMsg("resizing window\n");        
+
         /* Resize window */
         XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window, 
                        p_vout->i_new_width, p_vout->i_new_height );
@@ -224,11 +226,10 @@ int vout_SysManage( vout_thread_t *p_vout )
         vout_SysEnd( p_vout );
         p_vout->i_width = p_vout->i_new_width;
         p_vout->i_height = p_vout->i_new_height;
-        // ?? bpl
-        vout_SysInit( p_vout );        
 
-        /* Cancel current display */
-        return( 1 );        
+        /* If SysInit failed, the thread can't go on. Otherwise, it won't display
+         * the rendered image, but can continue */
+        return( vout_SysInit( p_vout ) ? -1 : 1);
     }
     
     return 0;

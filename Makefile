@@ -14,10 +14,10 @@
 #SHELL = /bin/sh
 
 # Video output settings
-#VIDEO=X11
+VIDEO=X11
 #VIDEO=DGA (not yet supported)
 #VIDEO=FB
-VIDEO=GGI
+#VIDEO=GGI
 #VIDEO=BEOS (not yet supported)
 
 # Target architecture and optimization
