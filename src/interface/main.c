@@ -140,6 +140,8 @@ static const struct option longopts[] =
     {   "overlay",          0,          0,      OPT_OVERLAY },
 
     /* DVD options */
+    {   "dvdtitle",         1,          0,      't' },
+    {   "dvdchapter",       1,          0,      'T' },
     {   "dvdaudio",         1,          0,      'a' },
     {   "dvdchannel",       1,          0,      'c' },
     {   "dvdsubtitle",      1,          0,      's' },
@@ -157,7 +159,7 @@ static const struct option longopts[] =
 };
 
 /* Short options */
-static const char *psz_shortopts = "hHvga:s:c:";
+static const char *psz_shortopts = "hHvgt:T:a:s:c:";
 #endif
 
 
@@ -624,6 +626,12 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
 
         /* DVD options */
+        case 't':
+            main_PutIntVariable( INPUT_TITLE_VAR, atoi(optarg) );
+            break;
+        case 'T':
+            main_PutIntVariable( INPUT_CHAPTER_VAR, atoi(optarg) );
+            break;
         case 'a':
             if ( ! strcmp(optarg, "ac3") )
                 main_PutIntVariable( INPUT_AUDIO_VAR, REQUESTED_AC3 );
@@ -734,6 +742,8 @@ static void Usage( int i_fashion )
           "\n      --yuv <module>             \tYUV method"
           "\n      --synchro <type>           \tforce synchro algorithm"
           "\n"
+          "\n  -t, --dvdtitle <num>           \tchoose DVD title"
+          "\n  -T, --dvdchapter <num>         \tchoose DVD chapter"
           "\n  -a, --dvdaudio <type>          \tchoose DVD audio type"
           "\n  -c, --dvdchannel <channel>     \tchoose DVD audio channel"
           "\n  -s, --dvdsubtitle <channel>    \tchoose DVD subtitle channel"
@@ -783,6 +793,8 @@ static void Usage( int i_fashion )
     /* DVD parameters */
     intf_MsgImm( "\nDVD parameters:"
         "\n  " INPUT_DVD_DEVICE_VAR "=<device>           \tDVD device"
+        "\n  " INPUT_TITLE_VAR "=<title>                 \ttitle number"
+        "\n  " INPUT_CHAPTER_VAR "=<chapter>             \tchapter number"
         "\n  " INPUT_AUDIO_VAR "={ac3|lpcm|mpeg|off}     \taudio type"
         "\n  " INPUT_CHANNEL_VAR "=[0-15]                \taudio channel"
         "\n  " INPUT_SUBTITLE_VAR "=[0-31]               \tsubtitle channel" );

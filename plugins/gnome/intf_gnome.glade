@@ -163,6 +163,38 @@
 	    <name>menubar_settings_menu</name>
 
 	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_audio</name>
+	      <tooltip>Select audio channel</tooltip>
+	      <signal>
+		<name>activate</name>
+		<handler>on_menubar_audio_activate</handler>
+		<last_modification_time>Thu, 22 Feb 2001 05:42:43 GMT</last_modification_time>
+	      </signal>
+	      <label>_Audio</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menubar_subtitles</name>
+	      <tooltip>Select subtitle unit</tooltip>
+	      <signal>
+		<name>activate</name>
+		<handler>on_menubar_subtitles_activate</handler>
+		<last_modification_time>Thu, 22 Feb 2001 05:42:43 GMT</last_modification_time>
+	      </signal>
+	      <label>_Subtitles</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>separator5</name>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
 	      <class>GtkPixmapMenuItem</class>
 	      <name>menubar_preferences</name>
 	      <sensitive>False</sensitive>
@@ -556,6 +588,67 @@
   <widget>
     <class>GtkMenuItem</class>
     <name>separator3</name>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_title</name>
+    <tooltip>Select Title</tooltip>
+    <signal>
+      <name>activate</name>
+      <handler>on_popup_title_activate</handler>
+      <last_modification_time>Thu, 22 Feb 2001 05:35:57 GMT</last_modification_time>
+    </signal>
+    <label>_Title</label>
+    <right_justify>False</right_justify>
+
+    <widget>
+      <class>GtkMenu</class>
+      <name>popup_title_menu</name>
+
+      <widget>
+	<class>GtkMenuItem</class>
+	<name>popup_chapter</name>
+	<signal>
+	  <name>activate</name>
+	  <handler>on_popup_chapter_activate</handler>
+	  <last_modification_time>Thu, 22 Feb 2001 05:48:48 GMT</last_modification_time>
+	</signal>
+	<label>_Chapter</label>
+	<right_justify>False</right_justify>
+      </widget>
+    </widget>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_audio</name>
+    <tooltip>Select audio channel</tooltip>
+    <signal>
+      <name>activate</name>
+      <handler>on_popup_audio_activate</handler>
+      <last_modification_time>Thu, 22 Feb 2001 05:35:57 GMT</last_modification_time>
+    </signal>
+    <label>Audio</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>popup_subtitle</name>
+    <signal>
+      <name>activate</name>
+      <handler>on_popup_subtitle_activate</handler>
+      <last_modification_time>Thu, 22 Feb 2001 05:35:57 GMT</last_modification_time>
+    </signal>
+    <label>_Subtitle</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>separator4</name>
     <right_justify>False</right_justify>
   </widget>
 

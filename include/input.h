@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.30 2001/02/20 02:53:13 stef Exp $
+ * $Id: input.h,v 1.31 2001/02/22 08:44:45 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -66,6 +66,7 @@ struct es_descriptor_s * input_AddES ( struct input_thread_s *,
                                        size_t );
 void input_DelES     ( struct input_thread_s *, struct es_descriptor_s * );
 int  input_SelectES  ( struct input_thread_s *, struct es_descriptor_s * );
+int  input_UnSelectES( struct input_thread_s *, struct es_descriptor_s * );
 
 /*****************************************************************************
  * Prototypes from input_dec.c

@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.13 2001/02/20 07:49:12 sam Exp $
+ * $Id: dvd_ifo.c,v 1.14 2001/02/22 08:44:45 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -528,6 +528,7 @@ static vobu_admap_t ReadMap( ifo_t* p_ifo )
 static vmgi_mat_t ReadVMGInfMat( ifo_t* p_ifo )
 {
     vmgi_mat_t  mat;
+    u64         i_temp;
     int         i;
 //    off_t     i_start = p_ifo->i_pos;
 
@@ -561,20 +562,21 @@ static vmgi_mat_t ReadVMGInfMat( ifo_t* p_ifo )
     GETL( &mat.i_c_adt_ssector );
     GETL( &mat.i_vobu_admap_ssector );
     FLUSH( 32 );
-    GETS( &mat.i_video_atrt );
+//    GETS( &mat.video_atrt );
+FLUSH(2);
     FLUSH( 1 );
     GETC( &mat.i_audio_nb );
 //fprintf( stderr, "vmgi audio nb : %d\n", mat.i_audio_nb );
     for( i=0 ; i < 8 ; i++ )
     {
-        GETLL( &mat.pi_audio_atrt[i] );
+        GETLL( &i_temp );
     }
     FLUSH( 17 );
     GETC( &mat.i_subpic_nb );
 //fprintf( stderr, "vmgi subpic nb : %d\n", mat.i_subpic_nb );
     for( i=0 ; i < mat.i_subpic_nb ; i++ )
     {
-        GET( &mat.pi_subpic_atrt[i], 6 );
+        GET( &i_temp, 6 );
         /* FIXME : take care of endianness */
     }
 
@@ -685,6 +687,7 @@ static vmg_vts_atrt_t ReadVTSAttr( ifo_t* p_ifo )
 {
     vmg_vts_atrt_t  atrt;
     int             i, j;
+    u64             i_temp;
     off_t           i_start = p_ifo->i_pos;
 
 //fprintf( stderr, "VTS ATTR\n" );
@@ -718,37 +721,39 @@ static vmg_vts_atrt_t ReadVTSAttr( ifo_t* p_ifo )
                                 SEEK_SET );
         GETL( &atrt.p_vts_atrt[i].i_ebyte );
         GETL( &atrt.p_vts_atrt[i].i_cat_app_type );
-        GETS( &atrt.p_vts_atrt[i].i_vtsm_video_atrt );
+//        GETS( &atrt.p_vts_atrt[i].vtsm_video_atrt );
+FLUSH(2);
         FLUSH( 1 );
         GETC( &atrt.p_vts_atrt[i].i_vtsm_audio_nb );
 //fprintf( stderr, "m audio nb : %d\n", atrt.p_vts_atrt[i].i_vtsm_audio_nb );
         for( j=0 ; j<8 ; j++ )
         {
-            GETLL( &atrt.p_vts_atrt[i].pi_vtsm_audio_atrt[j] );
+            GETLL( &i_temp );
         }
         FLUSH( 17 );
         GETC( &atrt.p_vts_atrt[i].i_vtsm_subpic_nb );
 //fprintf( stderr, "m subp nb : %d\n", atrt.p_vts_atrt[i].i_vtsm_subpic_nb );
         for( j=0 ; j<28 ; j++ )
         {
-            GET( &atrt.p_vts_atrt[i].pi_vtsm_subpic_atrt[j], 6 );
+            GET( &i_temp, 6 );
             /* FIXME : Fix endianness issue here */
         }
         FLUSH( 2 );
-        GETS( &atrt.p_vts_atrt[i].i_vtstt_video_atrt );
+//        GETS( &atrt.p_vts_atrt[i].vtstt_video_atrt );
+FLUSH(2);
         FLUSH( 1 );
         GETL( &atrt.p_vts_atrt[i].i_vtstt_audio_nb );
 //fprintf( stderr, "tt audio nb : %d\n", atrt.p_vts_atrt[i].i_vtstt_audio_nb );
         for( j=0 ; j<8 ; j++ )
         {
-            GETLL( &atrt.p_vts_atrt[i].pi_vtstt_audio_atrt[j] );
+            GETLL( &i_temp );
         }
         FLUSH( 17 );
         GETC( &atrt.p_vts_atrt[i].i_vtstt_subpic_nb );
 //fprintf( stderr, "tt subp nb : %d\n", atrt.p_vts_atrt[i].i_vtstt_subpic_nb );
         for( j=0 ; j<28/*atrt.p_vts_atrt[i].i_vtstt_subpic_nb*/ ; j++ )
         {
-            GET( &atrt.p_vts_atrt[i].pi_vtstt_subpic_atrt[j], 6 );
+            GET( &i_temp, 6 );
             /* FIXME : Fix endianness issue here */
         }
     }
@@ -825,6 +830,7 @@ static vtsi_mat_t ReadVTSInfMat( ifo_t* p_ifo )
 {
     vtsi_mat_t  mat;
     int         i;
+    u64         i_temp;
 //    off_t       i_start = p_ifo->i_pos;
 
 //fprintf( stderr, "VTSI\n" );
@@ -851,36 +857,61 @@ static vtsi_mat_t ReadVTSInfMat( ifo_t* p_ifo )
     GETL( &mat.i_c_adt_ssector );
     GETL( &mat.i_vobu_admap_ssector );
     FLUSH( 24 );
-    GETS( &mat.i_m_video_atrt );
+//    GETS( &mat.m_video_atrt );
+FLUSH(2);
     FLUSH( 1 );
     GETC( &mat.i_m_audio_nb );
     for( i=0 ; i<8 ; i++ )
     {
-        GETLL( &mat.pi_m_audio_atrt[i] );
+        GETLL( &i_temp );
     }
     FLUSH( 17 );
     GETC( &mat.i_m_subpic_nb );
     for( i=0 ; i<28 ; i++ )
     {
-        GET( &mat.pi_m_subpic_atrt[i], 6 );
+        GET( &i_temp, 6 );
         /* FIXME : take care of endianness */
     }
     FLUSH( 2 );
-    GETS( &mat.i_video_atrt );
+//    GETS( &mat.video_atrt );
+FLUSH(2);
     FLUSH( 1 );
     GETC( &mat.i_audio_nb );
 //fprintf( stderr, "vtsi audio nb : %d\n", mat.i_audio_nb );
     for( i=0 ; i<8 ; i++ )
     {
-        GETLL( &mat.pi_audio_atrt[i] );
+        GETLL( &i_temp );
+//fprintf( stderr, "Audio %d: %llx\n", i, i_temp );
+        i_temp >>= 32;
+        mat.p_audio_atrt[i].i_lang_code = i_temp & 0xffff;
+        i_temp >>= 16;
+        mat.p_audio_atrt[i].i_num_channels = i_temp & 0x7;
+        i_temp >>= 4;
+        mat.p_audio_atrt[i].i_sample_freq = i_temp & 0x3;
+        i_temp >>= 2;
+        mat.p_audio_atrt[i].i_quantization = i_temp & 0x3;
+        i_temp >>= 2;
+        mat.p_audio_atrt[i].i_appl_mode = i_temp & 0x3;
+        i_temp >>= 2;
+        mat.p_audio_atrt[i].i_type = i_temp & 0x3;
+        i_temp >>= 2;
+        mat.p_audio_atrt[i].i_multichannel_extension = i_temp & 0x1;
+        i_temp >>= 1;
+        mat.p_audio_atrt[i].i_coding_mode = i_temp & 0x7;
     }
     FLUSH( 17 );
     GETC( &mat.i_subpic_nb );
 //fprintf( stderr, "vtsi subpic nb : %d\n", mat.i_subpic_nb );
     for( i=0 ; i<mat.i_subpic_nb ; i++ )
     {
-        GET( &mat.pi_subpic_atrt[i], 6 );
-        /* FIXME : take care of endianness */
+        GET( &i_temp, 6 );
+        i_temp = hton64( i_temp ) >> 16;
+//fprintf( stderr, "Subpic %d: %llx\n", i, i_temp );
+        mat.p_subpic_atrt[i].i_caption = i_temp & 0xff;
+        i_temp >>= 16;
+        mat.p_subpic_atrt[i].i_lang_code = i_temp & 0xffff;
+        i_temp >>= 16;
+        mat.p_subpic_atrt[i].i_prefix = i_temp & 0xffff;
     }
 
     return mat;
@@ -999,7 +1030,8 @@ int IfoReadVTS( ifo_t* p_ifo )
     intf_WarnMsg( 2, "ifo: initializing VTS %d", p_ifo->i_title );
 
     i_title = p_ifo->i_title;
-    i_off = (off_t)( p_ifo->vmg.ptt_srpt.p_tts[i_title].i_ssector ) *DVD_LB_SIZE
+    i_off = (off_t)( p_ifo->vmg.ptt_srpt.p_tts[i_title-1].i_ssector )
+                   * DVD_LB_SIZE
                    + p_ifo->i_off;
 
     p_ifo->i_pos = lseek( p_ifo->i_fd, i_off, SEEK_SET );

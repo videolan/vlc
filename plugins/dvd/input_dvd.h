@@ -35,9 +35,9 @@ typedef struct thread_dvd_data_s
     boolean_t               b_encrypted;        // CSS encryption
     int                     i_read_once;        // NB of bytes read by DVDRead
 
-    int                     i_start_byte;
-    int                     i_start_cell;
-    int                     i_end_cell;
+    int                     i_chapter_nb;
+    off_t                   i_start;
+    off_t                   i_size;
 
     /* Scrambling Information */
     struct css_s            css;

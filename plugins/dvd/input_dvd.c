@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.18 2001/02/20 23:30:15 sam Exp $
+ * $Id: input_dvd.c,v 1.19 2001/02/22 08:44:45 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -278,11 +278,12 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * Language: gives the long language name from the two-letters ISO-639 code
  *****************************************************************************/
-static char * Language( char * p_code )
+static char * Language( u16 i_code )
 {
     int     i = 0;
 
-    while( !memcmp( lang_tbl[i].p_code, p_code, 2 ) && lang_tbl[i].p_lang_long )
+    while( memcmp( lang_tbl[i].p_code, &i_code, 2 ) &&
+           lang_tbl[i].p_lang_long[0] )
     {
         i++;
     }
@@ -336,291 +337,316 @@ static int DVDCheckCSS( input_thread_t * p_input )
 }
 
 /*****************************************************************************
+ * DVDChapterSelect: find the cell corresponding to requested chapter
+ *****************************************************************************/
+static int DVDChapterSelect( thread_dvd_data_t * p_dvd, int i_chapter )
+{
+    pgc_t *              p_pgc;
+    int                  i_start_cell;
+    int                  i_end_cell;
+    int                  i_index;
+    int                  i_cell;
+
+    p_pgc = &p_dvd->ifo.vts.pgci_ti.p_srp[0].pgc;
+
+    /* Find cell index in Program chain for current chapter */
+    i_index = p_pgc->prg_map.pi_entry_cell[i_chapter-1] - 1;
+
+    /* Search for cell_index in cell adress_table */
+    i_cell = 0;
+    while( p_pgc->p_cell_pos_inf[i_index].i_vob_id >
+           p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_vob_id )
+    {
+        i_cell++;
+    }
+    while( p_pgc->p_cell_pos_inf[i_index].i_cell_id >
+           p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_cell_id )
+    {
+        i_cell++;
+    }
+
+    i_start_cell = i_cell;
+
+    p_dvd->i_start = p_dvd->ifo.vts.i_pos + DVD_LB_SIZE *
+            (off_t)( p_dvd->ifo.vts.mat.i_tt_vobs_ssector +
+                     p_dvd->ifo.vts.c_adt.p_cell_inf[i_start_cell].i_ssector );
+
+    if( i_chapter == 1 )
+    {
+        i_end_cell = i_start_cell + p_pgc->i_cell_nb - 1;
+        p_dvd->i_size = (off_t)DVD_LB_SIZE *
+            ( p_dvd->ifo.vts.c_adt.p_cell_inf[i_end_cell].i_esector -
+              p_dvd->ifo.vts.c_adt.p_cell_inf[i_start_cell].i_ssector + 1 );
+        p_dvd->i_chapter_nb = p_pgc->i_cell_nb;
+        intf_WarnMsg( 3, "DVD: Start cell: %d End Cell: %d",
+                                            i_start_cell, i_end_cell );
+    }
+
+    return 0;
+}
+
+/*****************************************************************************
  * DVDSetArea: initialize input data for title x, chapter y.
  * It should be called for each user navigation request, and to change
  * audio or sub-picture streams.
  * ---
- * Take care that i_title and i_chapter start from 0.
+ * Take care that i_title starts from 0 (vmg) and i_chapter start from 1.
+ * i_audio, i_spu start from 1 ; 0 means off.
+ * A negative value for an argument means it does not change
  *****************************************************************************/
 static int DVDSetArea( input_thread_t * p_input,
                        int i_title, int i_chapter,
                        int i_audio, int i_spu )
 {
     thread_dvd_data_t *  p_method;
-//    es_descriptor_t *    p_es;
-    off_t                i_start;
-    off_t                i_size;
-    pgc_t *              p_pgc;
-    int                  i_start_cell;
-    int                  i_end_cell;
+    es_descriptor_t *    p_es;
     int                  i_index;
-    int                  i_cell;
-//    int                  i_nb;
-//    int                  i_id;
-//    int                  i;
+    int                  i_nb;
+    u16                  i_id;
+    u8                   i_ac3;
+    u8                   i_mpeg;
+    u8                   i_sub_pic;
+    u8                   i;
+    boolean_t            b_last;
     
     p_method = (thread_dvd_data_t*)p_input->p_plugin_data;
 
-    /* Ifo structures reading */
-    p_method->ifo.i_title = i_title;
-    IfoReadVTS( &(p_method->ifo) );
-    intf_WarnMsg( 2, "Ifo: VTS initialized" );
-
-    if( p_method->b_encrypted )
-    {
-        p_method->css.i_title = i_title;
-        p_method->css.i_title_pos =
-                p_method->ifo.vts.i_pos +
-                p_method->ifo.vts.mat.i_tt_vobs_ssector * DVD_LB_SIZE;
-        CSSGetKey( &(p_method->css) );
-        intf_WarnMsg( 2, "CSS: VTS key initialized" );
-    }
-
-    /* Set selected title start and size */
-    p_pgc = &p_method->ifo.vts.pgci_ti.p_srp[0].pgc;
-
-    /* Find cell index in Program chain */
-    i_index = p_pgc->prg_map.pi_entry_cell[i_chapter] - 1;
-
-    /* Search for cell_index in cell adress_table */
-    i_cell = 0;
-    while( p_pgc->p_cell_pos_inf[i_index].i_vob_id >
-           p_method->ifo.vts.c_adt.p_cell_inf[i_cell].i_vob_id )
-    {
-        i_cell++;
-    }
-    while( p_pgc->p_cell_pos_inf[i_index].i_cell_id >
-           p_method->ifo.vts.c_adt.p_cell_inf[i_cell].i_cell_id )
-    {
-        i_cell++;
-    }
-    i_start_cell = i_cell;
-    i_end_cell = i_start_cell + p_pgc->i_cell_nb - 1;
-
-    intf_WarnMsg( 3, "DVD: Start cell: %d End Cell: %d",
-                                            i_start_cell, i_end_cell );
-
-    p_method->i_start_cell = i_start_cell;
-    p_method->i_end_cell = i_end_cell;
-
-    /* start is : beginning of vts + offset to vobs + offset to vob x */
-    i_start = p_method->ifo.vts.i_pos + DVD_LB_SIZE *
-            ( p_method->ifo.vts.mat.i_tt_vobs_ssector +
-              p_method->ifo.vts.c_adt.p_cell_inf[i_start_cell].i_ssector );
-
-    i_start = lseek( p_input->i_handle, i_start, SEEK_SET );
-    intf_WarnMsg( 2, "DVD: VOBstart at: %lld", i_start );
-
-    i_size = (off_t)
-        ( p_method->ifo.vts.c_adt.p_cell_inf[i_end_cell].i_esector -
-          p_method->ifo.vts.c_adt.p_cell_inf[i_start_cell].i_ssector + 1 )
-        *DVD_LB_SIZE;
-    intf_WarnMsg( 2, "DVD: stream size: %lld", i_size );
-
-#if 0
-    p_es = NULL;
-
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    /* ES 0 -> video MPEG2 */
-    intf_WarnMsg( 1, "DVD: Video MPEG2 stream" );
-    p_es = input_AddES( p_input, p_input->stream.pp_programs[0], 0xe0, 0 );
-    p_es->i_stream_id = 0xe0;
-    p_es->i_type = MPEG2_VIDEO_ES;
-    input_SelectES( p_input, p_es );
-
-    /* Audio ES, in the order they appear in .ifo */
-    i_nb = p_method->ifo.vts.mat.i_audio_nb;
-    intf_WarnMsg( 1, "DVD: Audio streams %d", i_nb );
-    for( i = 0 ; i < i_nb ; i++ )
+    if( i_title >= 0 )
     {
-        i_id = ( ( 0x80 + i ) << 8 ) | 0xbd;
-        p_es = input_AddES( p_input,
-                           p_input->stream.pp_programs[0], i_id, 0 );
-        p_es->i_stream_id = 0xbd;
-        p_es->i_type = AC3_AUDIO_ES;
-        p_es->b_audio = 1;
-//        p_es->psz_desc = p_method->ifo.vts.mat.pi_audio_attr[i];
-        if( i == 0 )
+        /*
+         *  We have to load all title information
+         */
+
+        /* Change the default area */
+        p_input->stream.p_selected_area = p_input->stream.pp_areas[i_title];
+
+        /* Ifo VTS, and CSS reading */
+        p_method->ifo.i_title = i_title;
+        IfoReadVTS( &(p_method->ifo) );
+        intf_WarnMsg( 2, "Ifo: VTS initialized" );
+    
+        if( p_method->b_encrypted )
         {
-            input_SelectES( p_input, p_es );
+            p_method->css.i_title = i_title;
+            p_method->css.i_title_pos =
+                    p_method->ifo.vts.i_pos +
+                    p_method->ifo.vts.mat.i_tt_vobs_ssector * DVD_LB_SIZE;
+            CSSGetKey( &(p_method->css) );
+            intf_WarnMsg( 2, "CSS: VTS key initialized" );
         }
-    }
+    
+        /*
+         * Set selected title start and size
+         */
+        DVDChapterSelect( p_method, 1 );
+    
+        /* start is : beginning of vts + offset to vobs + offset to vob x */
+            
+        p_method->i_start =
+                    lseek( p_input->i_handle, p_method->i_start, SEEK_SET );
 
-    /* Sub Picture ES */
-    i_nb = p_method->ifo.vts.mat.i_subpic_nb;
-    intf_WarnMsg( 1, "DVD: Subpic streams %d", i_nb );
-    for( i = 0 ; i < i_nb ; i++ )
-    {
-        i_id = ( ( 0x20 + i ) << 8 ) | 0xbd;
-        p_es = input_AddES( p_input,
-                           p_input->stream.pp_programs[0], i_id, 0 );
-        p_es->i_stream_id = 0xbd;
-        p_es->i_type = DVD_SPU_ES;
-//        p_es->psz_desc = p_method->ifo.vts.mat.pi_subpic_attr[i];
-        if( i == 12 )
+        intf_WarnMsg( 2, "DVD: vobstart at: %lld", p_method->i_start );
+        intf_WarnMsg( 2, "DVD: stream size: %lld", p_method->i_size );
+        intf_WarnMsg( 2, "DVD: number of chapters: %lld",
+                                                   p_method->i_chapter_nb );
+
+        /* Area definition */
+        p_input->stream.p_selected_area->i_start = p_method->i_start;
+        p_input->stream.p_selected_area->i_size = p_method->i_size;
+        p_input->stream.p_selected_area->i_part_nb = p_method->i_chapter_nb;
+
+        /*
+         * Destroy obsolete ES by reinitializing program 0
+         * and find all ES in title with ifo data
+         */
+        if( p_input->stream.pp_programs != NULL )
         {
-            input_SelectES( p_input, p_es );
+            input_DelProgram( p_input, p_input->stream.pp_programs[0] );
         }
 
-    }
+        input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
 
-    /* area definition */
-    p_input->stream.pp_areas[i_title]->i_start = i_start;
-    p_input->stream.pp_areas[i_title]->i_size = i_size;
+        p_es = NULL;
 
-    /* No PSM to read in DVD mode */
-    p_input->stream.pp_programs[0]->b_is_ok = 1;
+        /* ES 0 -> video MPEG2 */
+        p_es = input_AddES( p_input, p_input->stream.pp_programs[0], 0xe0, 0 );
+        p_es->i_stream_id = 0xe0;
+        p_es->i_type = MPEG2_VIDEO_ES;
+        input_SelectES( p_input, p_es );
+        intf_WarnMsg( 1, "DVD: Video MPEG2 stream" );
+    
+        /* Audio ES, in the order they appear in .ifo */
+        i_nb = p_method->ifo.vts.mat.i_audio_nb;
+    
+        i_ac3 = 0x80;
+        i_mpeg = 0xc0;
 
-    /* Init has been successfull ; change the default area */
-    p_input->stream.p_selected_area = p_input->stream.pp_areas[i_title];
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-#else
-    p_input->stream.p_selected_area = p_input->stream.pp_areas[0]; 
-
-    if( p_input->stream.b_seekable )
-    {
-        stream_ps_data_t * p_demux_data =
-             (stream_ps_data_t *)p_input->stream.pp_programs[0]->p_demux_data;
-
-        /* Pre-parse the stream to gather stream_descriptor_t. */
-        p_input->stream.pp_programs[0]->b_is_ok = 0;
-        p_demux_data->i_PSM_version = EMPTY_PSM_VERSION;
-
-        while( !p_input->b_die && !p_input->b_error
-                && !p_demux_data->b_has_PSM )
+        for( i = 1 ; i <= i_nb ; i++ )
         {
-            int                 i_result, i;
-            data_packet_t *     pp_packets[INPUT_READ_ONCE];
 
-            i_result = DVDRead( p_input, pp_packets );
-            if( i_result == 1 )
+#if 0
+    fprintf( stderr, "Audio %d: %x %x %x %x %x %x\n", i,
+            p_method->ifo.vts.mat.p_audio_atrt[i].i_coding_mode,
+            p_method->ifo.vts.mat.p_audio_atrt[i].i_multichannel_extension,
+            p_method->ifo.vts.mat.p_audio_atrt[i].i_type,
+            p_method->ifo.vts.mat.p_audio_atrt[i].i_appl_mode,
+            p_method->ifo.vts.mat.p_audio_atrt[i].i_foo,
+            p_method->ifo.vts.mat.p_audio_atrt[i].i_bar );
+#endif
+
+            switch( p_method->ifo.vts.mat.p_audio_atrt[i].i_coding_mode )
             {
-                /* EOF */
-                vlc_mutex_lock( &p_input->stream.stream_lock );
-                p_input->stream.pp_programs[0]->b_is_ok = 1;
-                vlc_mutex_unlock( &p_input->stream.stream_lock );
+            case 0x00:              /* AC3 */
+                i_id = ( ( 0x7f + i ) << 8 ) | 0xbd;
+                p_es = input_AddES( p_input,
+                                    p_input->stream.pp_programs[0], i_id, 0 );
+                p_es->i_stream_id = 0xbd;
+                p_es->i_type = AC3_AUDIO_ES;
+                p_es->b_audio = 1;
+                strcpy( p_es->psz_desc, Language( hton16(
+                    p_method->ifo.vts.mat.p_audio_atrt[i-1].i_lang_code ) ) ); 
+
+                break;
+            case 0x02:
+            case 0x03:              /* MPEG audio */
+                i_id = 0xbf + i;
+                p_es = input_AddES( p_input,
+                                    p_input->stream.pp_programs[0], i_id, 0 );
+                p_es->i_stream_id = i_id;
+                p_es->i_type = MPEG2_AUDIO_ES;
+                p_es->b_audio = 1;
+                strcpy( p_es->psz_desc, Language( hton16(
+                    p_method->ifo.vts.mat.p_audio_atrt[i-1].i_lang_code ) ) ); 
+
+                break;
+            case 0x04:              /* LPCM */
+                i_id = 0;
+                intf_ErrMsg( "DVD: LPCM audio not handled yet" );
+                break;
+            case 0x06:              /* DTS */
+                i_id = 0;
+                intf_ErrMsg( "DVD: DTS audio not handled yet" );
+                break;
+            default:
+                i_id = 0;
+                intf_ErrMsg( "DVD: unkown audio" );
+            }
+        
+            intf_WarnMsg( 1, "DVD: Audio stream %d %s\t(0x%x)",
+                          i, p_es->psz_desc, i_id );
+        }
+    
+        /* Sub Picture ES */
+        i_nb = p_method->ifo.vts.mat.i_subpic_nb;
+    
+        b_last = 0;
+        i_sub_pic = 0x20;
+        for( i = 1 ; i <= i_nb ; i++ )
+        {
+            if( !b_last )
+            {
+                i_id = ( i_sub_pic++ << 8 ) | 0xbd;
+                p_es = input_AddES( p_input,
+                                    p_input->stream.pp_programs[0], i_id, 0 );
+                p_es->i_stream_id = 0xbd;
+                p_es->i_type = DVD_SPU_ES;
+                strcpy( p_es->psz_desc, Language( hton16(
+                    p_method->ifo.vts.mat.p_subpic_atrt[i-1].i_lang_code ) ) ); 
+                intf_WarnMsg( 1, "DVD: SPU stream %d %s\t(0x%x)",
+                              i, p_es->psz_desc, i_id );
+    
+                /* The before the last spu has a 0x0 prefix */
+                b_last =
+                    ( p_method->ifo.vts.mat.p_subpic_atrt[i].i_prefix == 0 ); 
+            }
+        }
+
+    } // i_title >= 0
+
+    /*
+     * Select requested ES
+     */
+    if( ( i_audio >= 0 ) || ( i_title >= 0 ) )
+    {
+
+        /* Audio: we check it is in the range and
+         * default it to the first if not */
+        if( i_audio > p_method->ifo.vts.mat.i_audio_nb )
+        {
+            i_audio = 1;
+        }
+
+        p_es = p_input->stream.pp_programs[0]->pp_es[i_audio];
+
+        /* We can only have one audio channel */
+        /* Look for a preselected one */
+        i_index = -1;
+        for( i = 0 ; i < p_input->stream.i_selected_es_number ; i++ )
+        {
+            if( p_input->stream.pp_selected_es[i]->b_audio )
+            {
+                i_index = i;
                 break;
             }
-            if( i_result == -1 )
-            {
-                p_input->b_error = 1;
-                break;
-            }
-
-            for( i = 0; i < INPUT_READ_ONCE && pp_packets[i] != NULL; i++ )
-            {
-                /* FIXME: use i_p_config_t */
-                input_ParsePS( p_input, pp_packets[i] );
-                input_NetlistDeletePacket( p_input->p_method_data,
-                                           pp_packets[i] );
-            }
-
-            /* File too big. */
-            if( p_input->stream.p_selected_area->i_tell >
-                                                    INPUT_PREPARSE_LENGTH )
-            {
-                break;
-            }
         }
-        lseek( p_input->i_handle, i_start, SEEK_SET );
-        vlc_mutex_lock( &p_input->stream.stream_lock );
 
-        /* i_tell is an indicator from the beginning of the stream,
-         * not of the DVD */
-        p_input->stream.p_selected_area->i_tell = 0;
-
-        if( p_demux_data->b_has_PSM )
+        if( i_index != -1 )
         {
-            /* (The PSM decoder will care about spawning the decoders) */
-            p_input->stream.pp_programs[0]->b_is_ok = 1;
+            
+            if( p_input->stream.pp_selected_es[i_index] != p_es )
+            {
+                input_UnSelectES( p_input,
+                                  p_input->stream.pp_selected_es[i_index] );
+                input_SelectES( p_input, p_es );
+                intf_WarnMsg( 1, "DVD: Audio %d selected -> %s (0x%x)",
+                              i_audio, p_es->psz_desc, p_es->i_id );
+            }
         }
-#ifdef AUTO_SPAWN
         else
         {
-            /* (We have to do it ourselves) */
-            int                 i_es;
-
-            /* FIXME: we should do multiple passes in case an audio type
-             * is not present */
-            for( i_es = 0;
-                 i_es < p_input->stream.pp_programs[0]->i_es_number;
-                 i_es++ )
-            {
-#define p_es p_input->stream.pp_programs[0]->pp_es[i_es]
-                switch( p_es->i_type )
-                {
-                    case MPEG1_VIDEO_ES:
-                    case MPEG2_VIDEO_ES:
-                        input_SelectES( p_input, p_es );
-                        break;
-
-                    case MPEG1_AUDIO_ES:
-                    case MPEG2_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
-                                == (p_es->i_id & 0x1F) )
-                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
-                        {
-                        case 0:
-                            main_PutIntVariable( INPUT_AUDIO_VAR,
-                                                 REQUESTED_MPEG );
-                        case REQUESTED_MPEG:
-                            input_SelectES( p_input, p_es );
-                        }
-                        break;
-
-                    case AC3_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
-                                == ((p_es->i_id & 0xF00) >> 8) )
-                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
-                        {
-                        case 0:
-                            main_PutIntVariable( INPUT_AUDIO_VAR,
-                                                 REQUESTED_AC3 );
-                        case REQUESTED_AC3:
-                            input_SelectES( p_input, p_es );
-                        }
-                        break;
-
-                    case DVD_SPU_ES:
-                        if( main_GetIntVariable( INPUT_SUBTITLE_VAR, -1 )
-                                == ((p_es->i_id & 0x1F00) >> 8) )
-                        {
-                            input_SelectES( p_input, p_es );
-                        }
-                        break;
-
-                    case LPCM_AUDIO_ES:
-                        /* FIXME ! */
-                        break;
-                }
-            }
-                    
+            input_SelectES( p_input, p_es );
+            intf_WarnMsg( 1, "DVD: Audio %d selected -> %s (0x%x)",
+                          i_audio, p_es->psz_desc, p_es->i_id );
         }
-#endif
-#ifdef STATS
-        input_DumpStream( p_input );
-#endif
-
-        /* FIXME : ugly kludge */
-        p_input->stream.p_selected_area->i_size = i_size;
-
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
-    else
+
+    if( ( i_spu >= 0 ) || ( i_title >= 0 ) )
     {
-        /* The programs will be added when we read them. */
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.pp_programs[0]->b_is_ok = 0;
-
-        /* FIXME : ugly kludge */
-        p_input->stream.p_selected_area->i_size = i_size;
-
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        /* For spu: no one if none or a not existed one requested */
+        if( ( i_spu <= p_method->ifo.vts.mat.i_subpic_nb ) && ( i_spu > 0 ) )
+        {
+            input_SelectES( p_input, ( p_es = p_input->stream.pp_programs[0]->
+                pp_es[ i_spu + p_method->ifo.vts.mat.i_audio_nb ] ) );
+    
+            intf_WarnMsg( 1, "DVD: SPU   %d selected -> %s (0x%x)",
+                          i_spu, p_es->psz_desc, p_es->i_id );
+        }
     }
-#endif  
+
+    /*
+     * Chapter selection
+     */
+
+    if( ( i_chapter > 0 ) &&
+        ( i_chapter <= p_input->stream.p_selected_area->i_part_nb ) )
+    {
+        DVDChapterSelect( p_method, i_chapter );
+
+        p_input->stream.p_selected_area->i_part = i_chapter; 
+
+        DVDSeek( p_input, p_method->i_start -
+                          p_input->stream.p_selected_area->i_start );
+
+        intf_WarnMsg( 2, "DVD: Chapter %d start at: %lld", i_chapter,
+                                    p_input->stream.p_selected_area->i_tell );
+    }
+
+    /* No PSM to read in DVD mode, we already have all information */
+    p_input->stream.pp_programs[0]->b_is_ok = 1;
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return 0;
 }
@@ -631,6 +657,10 @@ static int DVDSetArea( input_thread_t * p_input,
 static void DVDInit( input_thread_t * p_input )
 {
     thread_dvd_data_t *  p_method;
+    int                  i_title;
+    int                  i_chapter;
+    int                  i_audio;
+    int                  i_spu;
     int                  i;
 
     if( (p_method = malloc( sizeof(thread_dvd_data_t) )) == NULL )
@@ -674,7 +704,6 @@ static void DVDInit( input_thread_t * p_input )
 
     /* Initialize ES structures */
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
-    input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
 
     /* Set stream and area data */
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -682,9 +711,12 @@ static void DVDInit( input_thread_t * p_input )
     /* FIXME: We consider here that one title is one title set
      * it is not true !!! */
 
+    intf_WarnMsg( 2, "DVD: Number of titles: %d\n",
+                  p_method->ifo.vmg.mat.i_tts_nb );
+
 #define area p_input->stream.pp_areas
     /* We start from 1 here since area 0 is reserved for video_ts.vob */
-    for( i = 1 ; i < p_method->ifo.vmg.mat.i_tts_nb ; i++ )
+    for( i = 1 ; i <= p_method->ifo.vmg.mat.i_tts_nb ; i++ )
     {
         input_AddArea( p_input );
 
@@ -709,10 +741,32 @@ static void DVDInit( input_thread_t * p_input )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    /* By default, set all parameters to 0 */
-    /* FIXME: wrong kludge to get first title number */
-    DVDSetArea( p_input, p_method->ifo.vmg.ptt_srpt.p_tts[0].i_tts_nb - 1,
-                0, 0, 0 );
+    /* Get requested title - if none try to find one where is the movie */
+    i_title = main_GetIntVariable( INPUT_TITLE_VAR,
+                              p_method->ifo.vmg.ptt_srpt.p_tts[0].i_tts_nb );
+    if( i_title <= 0 || i_title >= p_method->ifo.vmg.mat.i_tts_nb )
+    {
+        i_title = p_method->ifo.vmg.ptt_srpt.p_tts[0].i_tts_nb;
+    }
+
+    /* Get requested chapter - if none defaults to first one */
+    i_chapter = main_GetIntVariable( INPUT_CHAPTER_VAR, 1 );
+    if( i_chapter <= 0 )
+    {
+        i_chapter = 1;
+    }
+
+    /* For audio: first one if none or a not existing one specified */
+    i_audio = main_GetIntVariable( INPUT_CHANNEL_VAR, 1 );
+    if( i_audio <= 0 )
+    {
+        main_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
+        i_audio = 1;
+    }
+
+    i_spu = main_GetIntVariable( INPUT_SUBTITLE_VAR, 0 );
+
+    DVDSetArea( p_input, i_title, i_chapter, i_audio, i_spu );
 
     return;
 }
@@ -739,102 +793,120 @@ static void DVDEnd( input_thread_t * p_input )
 static int DVDRead( input_thread_t * p_input,
                    data_packet_t ** pp_packets )
 {
-    thread_dvd_data_t *     p_method;
-    netlist_t *             p_netlist;
-    struct iovec *          p_vec;
-    struct data_packet_s *  p_data;
-    u8 *                    pi_cur;
-    int                     i_packet_size;
-    int                     i_packet;
-    int                     i_pos;
-    int                     i;
-    boolean_t               b_first_packet;
+    byte_t              p_header[6];
+    data_packet_t *     p_data;
+    size_t              i_packet_size;
+    int                 i_packet, i_error;
+    thread_dvd_data_t * p_method;
 
-    p_method = ( thread_dvd_data_t * ) p_input->p_plugin_data;
-    p_netlist = ( netlist_t * ) p_input->p_method_data;
+    p_method = (thread_dvd_data_t *)p_input->p_plugin_data;
 
-    /* Get an iovec pointer */
-    if( ( p_vec = input_NetlistGetiovec( p_netlist ) ) == NULL )
+    memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
+    for( i_packet = 0; i_packet < INPUT_READ_ONCE; i_packet++ )
     {
-        intf_ErrMsg( "DVD: read error" );
-        return -1;
-    }
-
-    /* Reads from DVD */
-    readv( p_input->i_handle, p_vec, p_method->i_read_once );
-
-    if( p_method->b_encrypted )
-    {
-        for( i=0 ; i<p_method->i_read_once ; i++ )
+        /* Read what we believe to be a packet header. */
+        if( (i_error = SafeRead( p_input, p_header, 6 )) )
         {
-            CSSDescrambleSector( p_method->css.pi_title_key, 
-                                 p_vec[i].iov_base );
-            ((u8*)(p_vec[i].iov_base))[0x14] &= 0x8F;
+            return( i_error );
         }
-    }
 
-    /* Update netlist indexes */
-    input_NetlistMviovec( p_netlist, p_method->i_read_once, &p_data );
-
-    i_packet = 0;
-    /* Read headers to compute payload length */
-    for( i = 0 ; i < p_method->i_read_once ; i++ )
-    {
-        i_pos = 0;
-        b_first_packet = 1;
-        while( i_pos < p_netlist->i_buffer_size )
+        if( (U32_AT(p_header) & 0xFFFFFF00) != 0x100L )
         {
-            pi_cur = (u8*)(p_vec[i].iov_base + i_pos);
-            /*default header */
-            if( U32_AT( pi_cur ) != 0x1BA )
+            /* This is not the startcode of a packet. Read the stream
+             * until we find one. */
+            u32         i_startcode = U32_AT(p_header);
+            int         i_nb;
+            byte_t      i_dummy;
+
+            if( i_startcode )
             {
-                /* That's the case for all packets, except pack header. */
-                i_packet_size = U16_AT( pi_cur + 4 );
+                /* It is common for MPEG-1 streams to pad with zeros
+                 * (although it is forbidden by the recommendation), so
+                 * don't bother everybody in this case. */
+                intf_WarnMsg( 1, "Garbage at input (%x)", i_startcode );
             }
-            else
+
+            while( (i_startcode & 0xFFFFFF00) != 0x100L )
             {
-                /* Pack header. */
-                if( ( pi_cur[4] & 0xC0 ) == 0x40 )
+                i_startcode <<= 8;
+                if( (i_nb = SafeRead( p_input, &i_dummy, 1 )) != 0 )
                 {
-                    /* MPEG-2 */
-                    i_packet_size = 8;
-                }
-                else if( ( pi_cur[4] & 0xF0 ) == 0x20 )
-                {
-                    /* MPEG-1 */
-                    i_packet_size = 6;
+                    i_startcode |= i_dummy;
                 }
                 else
                 {
-                    intf_ErrMsg( "Unable to determine stream type" );
-                    return( -1 );
+                    return( 1 );
                 }
             }
-            if( b_first_packet )
+
+            /* Packet found. */
+            *(u32 *)p_header = U32_AT(&i_startcode);
+            if( (i_error = SafeRead( p_input, p_header + 4, 2 )) )
             {
-                p_data->b_discard_payload = 0;
-                b_first_packet = 0;
+                return( i_error );
+            }
+        }
+
+        if( U32_AT(p_header) != 0x1BA )
+        {
+            /* That's the case for all packets, except pack header. */
+            i_packet_size = U16_AT(&p_header[4]);
+        }
+        else
+        {
+            /* Pack header. */
+            if( (p_header[4] & 0xC0) == 0x40 )
+            {
+                /* MPEG-2 */
+                i_packet_size = 8;
+            }
+            else if( (p_header[4] & 0xF0) == 0x20 )
+            {
+                /* MPEG-1 */
+                i_packet_size = 6;
             }
             else
-            { 
-                p_data = input_NetlistNewPacket( p_netlist ,
-                                                 i_packet_size + 6 );
-                memcpy( p_data->p_buffer,
-                        p_vec[i].iov_base + i_pos , i_packet_size + 6 );
+            {
+                intf_ErrMsg( "Unable to determine stream type" );
+                return( -1 );
             }
-
-            p_data->p_payload_end = p_data->p_payload_start + i_packet_size + 6;
-            pp_packets[i_packet] = p_data;
-            i_packet++;
-            i_pos += i_packet_size + 6;
         }
-    }
-    pp_packets[i_packet] = NULL;
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.p_selected_area->i_tell +=
-                                        p_method->i_read_once *DVD_LB_SIZE;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+        /* Fetch a packet of the appropriate size. */
+        if( (p_data = NewPacket( p_input, i_packet_size + 6 )) == NULL )
+        {
+            intf_ErrMsg( "Out of memory" );
+            return( -1 );
+        }
+
+        /* Copy the header we already read. */
+        memcpy( p_data->p_buffer, p_header, 6 );
+
+        /* Read the remaining of the packet. */
+        if( i_packet_size && (i_error =
+                SafeRead( p_input, p_data->p_buffer + 6, i_packet_size )) )
+        {
+            return( i_error );
+        }
+
+        /* In MPEG-2 pack headers we still have to read stuffing bytes. */
+        if( U32_AT(p_header) == 0x1BA )
+        {
+            if( i_packet_size == 8 && (p_data->p_buffer[13] & 0x7) != 0 )
+            {
+                /* MPEG-2 stuffing bytes */
+                byte_t      p_garbage[8];
+                if( (i_error = SafeRead( p_input, p_garbage,
+                                         p_data->p_buffer[13] & 0x7)) )
+                {
+                    return( i_error );
+                }
+            }
+        }
+
+        /* Give the packet to the other input stages. */
+        pp_packets[i_packet] = p_data;
+    }
 
     return( 0 );
 }

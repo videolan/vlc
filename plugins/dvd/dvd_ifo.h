@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.7 2001/02/20 02:53:13 stef Exp $
+ * $Id: dvd_ifo.h,v 1.8 2001/02/22 08:44:45 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -33,6 +33,47 @@
 /*
  * Program Chain structures
  */
+typedef struct ifo_video_s
+{
+    u8      i_compression         ;// 2;
+    u8      i_system              ;// 2;
+    u8      i_ratio               ;// 2;
+    u8      i_perm_displ          ;// 2;
+
+    u8      i_line21_1            ;// 1;
+    u8      i_line21_2            ;// 1;
+    u8      i_source_res          ;// 2;
+    u8      i_letterboxed         ;// 1;
+    u8      i_mode                ;// 1;
+} ifo_video_t;
+
+/* Audio type information */
+typedef struct ifo_audio_s
+{
+    u8      i_coding_mode         ;// 3;
+    u8      i_multichannel_extension  ;// 1;
+    u8      i_type                ;// 2;
+    u8      i_appl_mode           ;// 2;
+
+    u8      i_quantization        ;// 2;
+    u8      i_sample_freq         ;// 2;
+//    u8                            ;// 1;
+    u8      i_num_channels        ;// 3;
+    u16     i_lang_code           ;// 16;   // <char> description
+    u8      i_foo                 ;// 8;    // 0x00000000 ?
+    u8      i_caption             ;// 8;
+    u8      i_bar                 ;// 8;    // 0x00000000 ?
+} ifo_audio_t;
+
+typedef struct ifo_spu_t
+{
+    u16     i_prefix              ;// 16;   // 0x0100 ?
+    u16     i_lang_code           ;// 16;   // <char> description
+    u8      i_foo                 ;// 8;    // dont know
+    u8      i_caption             ;// 8;    // 0x00 ?
+} ifo_spu_t;
+
+
 
 /* Ifo vitual machine Commands */
 typedef struct ifo_command_s
@@ -241,13 +282,13 @@ typedef struct vmgi_mat_s
     u32             i_c_adt_ssector;            // 4 bytes
     u32             i_vobu_admap_ssector;       // 4 bytes
 //    char[2]         ???
-    u16             i_video_atrt;               // 2 bytes
+    ifo_video_t     video_atrt;                 // 2 bytes
 //    char            ???
     u8              i_audio_nb;                 // 1 byte
-    u64             pi_audio_atrt[8];           // i_vmgm_audio_nb * 8 bytes
+    ifo_audio_t     p_audio_atrt[8];            // i_vmgm_audio_nb * 8 bytes
 //    char[16]        ???
     u8              i_subpic_nb;                // 1 byte
-    u64             pi_subpic_atrt[32];         // i_subpic_nb * 6 bytes
+    ifo_spu_t       p_subpic_atrt[32];          // i_subpic_nb * 6 bytes
 } vmgi_mat_t;
 
 
@@ -315,21 +356,21 @@ typedef struct vts_atrt_s
 {
     u32             i_ebyte;                    // 4 bytes
     u32             i_cat_app_type;             // 4 bytes
-    u16             i_vtsm_video_atrt;          // 2 bytes
+    ifo_video_t     vtsm_video_atrt;          // 2 bytes
 //    char            ???
     u8              i_vtsm_audio_nb;            // 1 byte
-    u64             pi_vtsm_audio_atrt[8];      // 8 * 8 bytes
+    ifo_audio_t     p_vtsm_audio_atrt[8];       // 8 * 8 bytes
 //    char[17]        ???
     u8              i_vtsm_subpic_nb;           // 1 byte
-    u64             pi_vtsm_subpic_atrt[28];    // i_vtsm_subpic_nb * 6 bytes
+    ifo_spu_t       p_vtsm_subpic_atrt[28];     // i_vtsm_subpic_nb * 6 bytes
 //    char[2]         ???
-    u16             i_vtstt_video_atrt;         // 2 bytes
+    ifo_video_t     vtstt_video_atrt;         // 2 bytes
 //    char            ???
     u8              i_vtstt_audio_nb;           // 1 byte
-    u64             pi_vtstt_audio_atrt[8];     // 8 * 8 bytes
+    ifo_audio_t     p_vtstt_audio_atrt[8];      // 8 * 8 bytes
 //    char[17]        ???
     u8              i_vtstt_subpic_nb;          // 1 byte
-    u64             pi_vtstt_subpic_atrt[28];   // i_vtstt_subpic_nb * 6 bytes
+    ifo_spu_t       p_vtstt_subpic_atrt[28];    // i_vtstt_subpic_nb * 6 bytes
 } vts_atrt_t;
 
 /* Main struct for vts attributes
@@ -388,22 +429,22 @@ typedef struct vtsi_mat_s
     u32             i_c_adt_ssector;            // 4 bytes
     u32             i_vobu_admap_ssector;       // 4 bytes
 //    char[24]        ???
-    u16             i_m_video_atrt;             // 2 bytes
+    ifo_video_t     m_video_atrt;               // 2 bytes
 //    char            ???
     u8              i_m_audio_nb;               // 1 byte
-    u64             pi_m_audio_atrt[8];         // i_vmgm_audio_nb * 8 bytes
+    ifo_audio_t     p_m_audio_atrt[8];          // i_vmgm_audio_nb * 8 bytes
 //    char[16]        ???
     u8              i_m_subpic_nb;              // 1 byte
-    u64             pi_m_subpic_atrt[32];       // i_subpic_nb * 6 bytes
+    ifo_spu_t       p_m_subpic_atrt[32];        // i_subpic_nb * 6 bytes
                                                 // !!! only 28 subpics ???
 //    char[2]         ???
-    u16             i_video_atrt;               // 2 bytes
+    ifo_video_t     video_atrt;                 // 2 bytes
 //    char            ???
     u8              i_audio_nb;                 // 1 byte
-    u64             pi_audio_atrt[8];           // i_vmgm_audio_nb * 8 bytes
+    ifo_audio_t     p_audio_atrt[8];            // i_vmgm_audio_nb * 8 bytes
 //    char[16]        ???
     u8              i_subpic_nb;                // 1 byte
-    u64             pi_subpic_atrt[32];         // i_subpic_nb * 6 bytes
+    ifo_spu_t       p_subpic_atrt[32];          // i_subpic_nb * 6 bytes
 } vtsi_mat_t;
 
 /* 

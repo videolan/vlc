@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.14 2001/02/20 23:30:15 sam Exp $
+ * $Id: dvd_css.c,v 1.15 2001/02/22 08:44:45 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -1199,7 +1199,7 @@ int CSSGetKey( css_t * p_css )
      * produces multiple keys (RT)
      */
     intf_WarnMsg( 3, "CSS: Title %d key: %02X %02X %02X %02X %02X",
-                i_title + 1,
+                i_title,
                 p_title_key[i_highest].pi_key[0],
                 p_title_key[i_highest].pi_key[1],
                 p_title_key[i_highest].pi_key[2],

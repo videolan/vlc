@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.33 2001/02/20 08:47:25 stef Exp $
+ * $Id: input_programs.c,v 1.34 2001/02/22 08:44:45 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -263,7 +263,7 @@ input_area_t * input_AddArea( input_thread_t * p_input )
     p_input->stream.pp_areas[i_area_index]->i_start = 0;
     p_input->stream.pp_areas[i_area_index]->i_size = 0;
     p_input->stream.pp_areas[i_area_index]->i_tell = 0;
-    p_input->stream.pp_areas[i_area_index]->i_seek = 0;
+    p_input->stream.pp_areas[i_area_index]->i_seek = NO_SEEK;
     p_input->stream.pp_areas[i_area_index]->i_part_nb = 0;
     p_input->stream.pp_areas[i_area_index]->i_part= 0;
 
@@ -281,7 +281,7 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
 
     ASSERT( p_area );
 
-    intf_DbgMsg("Deleting description for area %d", p_area->i_number);
+    intf_DbgMsg("Deleting description for area %d", p_area->i_nb );
 
     /* Find the area in the areas table */
     for( i_area_index = 0; i_area_index < p_input->stream.i_area_nb;
@@ -303,7 +303,7 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
     if( p_input->stream.i_area_nb && p_input->stream.pp_areas == NULL)
     {
         intf_ErrMsg( "input error: unable to realloc area list"
-                     " in input_Delarea" );
+                     " in input_DelArea" );
     }
 
     /* Free the description of this area */
@@ -677,6 +677,52 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         }
         p_input->stream.pp_selected_es[p_input->stream.i_selected_es_number - 1]
                 = p_es;
+    }
+    return( 0 );
+}
+
+/*****************************************************************************
+ * input_UnSelectES: removes an ES from the list of selected ES
+ *****************************************************************************/
+int input_UnSelectES( input_thread_t * p_input, es_descriptor_t * p_es )
+{
+
+    int     i_index = 0;
+
+#ifdef DEBUG_INPUT
+    intf_DbgMsg( "UnSelecting ES 0x%x", p_es->i_id );
+#endif
+
+    if( p_es->p_decoder_fifo == NULL )
+    {
+        intf_ErrMsg( "ES %d is not selected", p_es->i_id );
+        return( -1 );
+    }
+
+    input_EndDecoder( p_input, p_es );
+
+    if( p_es->p_decoder_fifo == NULL )
+    {
+        p_input->stream.i_selected_es_number--;
+
+        while( ( i_index < p_input->stream.i_selected_es_number ) &&
+               ( p_input->stream.pp_selected_es[i_index] != p_es ) )
+        {
+            i_index++;
+        }
+
+        p_input->stream.pp_selected_es[i_index] = 
+          p_input->stream.pp_selected_es[p_input->stream.i_selected_es_number];
+
+        p_input->stream.pp_selected_es = realloc(
+                                           p_input->stream.pp_selected_es,
+                                           p_input->stream.i_selected_es_number
+                                            * sizeof(es_descriptor_t *) );
+        if( p_input->stream.pp_selected_es == NULL )
+        {
+            intf_ErrMsg( "Unable to realloc memory in input_SelectES" );
+            return(-1);
+        }
     }
     return( 0 );
 }

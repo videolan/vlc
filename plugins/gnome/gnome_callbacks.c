@@ -584,3 +584,51 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
     }
 }
 
+
+void
+on_menubar_audio_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+
+}
+
+
+void
+on_menubar_subtitles_activate          (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+
+}
+
+
+void
+on_popup_title_activate                (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+
+}
+
+
+void
+on_popup_chapter_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+
+}
+
+
+void
+on_popup_audio_activate                (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+
+}
+
+
+void
+on_popup_subtitle_activate             (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+
+}
+
