@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.15 2003/01/08 02:09:15 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.16 2003/01/11 19:33:09 stippi Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -105,7 +105,8 @@ bool VlcWrapper::UpdateInputAndAOut()
 
 bool VlcWrapper::HasInput()
 {
-    return( p_input != NULL );
+    return ( p_input != NULL );
+//    return ( PlaylistSize() > 0 );
 }
 
 /* status (UNDEF_S, PLAYING_S, PAUSE_S, FORWARD_S, BACKWARD_S,

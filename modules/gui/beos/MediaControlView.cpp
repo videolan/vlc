@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.8 2002/11/27 05:36:41 titer Exp $
+ * $Id: MediaControlView.cpp,v 1.9 2003/01/11 19:33:09 stippi Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -325,15 +325,19 @@ MediaControlView::SetStatus(int status, int rate)
 void
 MediaControlView::SetEnabled(bool enabled)
 {
-	fSkipBack->SetEnabled(enabled);
-	fPlayPause->SetEnabled(enabled);
-	fSkipForward->SetEnabled(enabled);
-	fStop->SetEnabled(enabled);
-	fMute->SetEnabled(enabled);
-	fVolumeSlider->SetEnabled(enabled);
-	fSeekSlider->SetEnabled(enabled);
-	fRewind->SetEnabled(enabled);
-	fForward->SetEnabled(enabled);
+	if ( LockLooper() )
+	{
+		fSkipBack->SetEnabled( enabled );
+		fPlayPause->SetEnabled( enabled );
+		fSkipForward->SetEnabled( enabled );
+		fStop->SetEnabled( enabled );
+		fMute->SetEnabled( enabled );
+		fVolumeSlider->SetEnabled( enabled );
+		fSeekSlider->SetEnabled( enabled );
+		fRewind->SetEnabled( enabled );
+		fForward->SetEnabled( enabled );
+		UnlockLooper();
+	}
 }
 
 // SetAudioEnabled

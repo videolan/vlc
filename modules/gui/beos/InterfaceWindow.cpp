@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.13 2003/01/08 02:09:15 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.14 2003/01/11 19:33:09 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -178,7 +178,8 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 	fMenuBar->AddItem( fSettingsMenu );							
 
 	// prepare fow showing
-	_SetMenusEnabled(false);
+	_SetMenusEnabled( false );
+	p_mediaControl->SetEnabled( false );
 
 	_RestoreSettings();
 
@@ -481,6 +482,7 @@ void InterfaceWindow::updateInterface()
 		}
 		else if ( Lock() )
 		{
+//			p_mediaControl->SetEnabled( true );
 			bool hasTitles = p_wrapper->HasTitles();
 			bool hasChapters = p_wrapper->HasChapters();
 			p_mediaControl->SetStatus( p_wrapper->InputStatus(), 
@@ -513,15 +515,11 @@ void InterfaceWindow::updateInterface()
 			fPlaylistWindow->Unlock();
 		}
 	}
-
     else
-    	_SetMenusEnabled(false);
-
-	if ( Lock() )
-	{
-		p_mediaControl->SetEnabled( p_wrapper->PlaylistSize() );
-		Unlock();
-	}
+    {
+    	_SetMenusEnabled( false );
+//		p_mediaControl->SetEnabled( false );
+    }
 
     /* always force the user-specified volume */
     /* FIXME : I'm quite sure there is a cleaner way to do this */
