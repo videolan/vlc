@@ -39,6 +39,7 @@ CONFIG_FLAGS += \
 	--enable-satellite \
 	--enable-ogg \
 	--enable-vorbis \
+	--enable-wxwindows \
 	$(NULL)
 
 # These ones are currently shipped with VLC
@@ -55,6 +56,7 @@ endif
 # Remove --without-dvdcss in non-totalitarian countries
 CONFIG_FLAGS += --enable-dvd --without-dvdcss
 
+# A few shortcuts
 VIDDIR = usr/share/vlc
 PIXDIR = usr/share/pixmaps
 GNOMEDIR = usr/share/gnome/apps/Multimedia
@@ -69,11 +71,11 @@ build-stamp:
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
-	if test "$(PRESERVE_EXTRAS)" = ""; then cd extras/ffmpeg && ./configure && make; fi
+	if test ! -d CVS; then cd extras/ffmpeg && ./configure && make; fi
 
 	# Check that we have an faad tree in here (can be a symlink)
 	test -d extras/faad
-	if test "$(PRESERVE_EXTRAS)" = ""; then cd extras/faad && ./configure --disable-shared && cd libfaad && make; fi
+	if test ! -d CVS; then cd extras/faad && ./configure --disable-shared && cd libfaad && make; fi
 
 	# Configure VLC and build it
 	./configure --mandir=$${prefix}/share/man \
@@ -89,10 +91,10 @@ clean:
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
-	-if test "$(PRESERVE_EXTRAS)" = ""; then cd extras/ffmpeg && make distclean; fi
+	-if test ! -d CVS; then cd extras/ffmpeg && make distclean; fi
 	# Check that we have an faad tree in here (can be a symlink)
 	test -d extras/faad
-	-if test "$(PRESERVE_EXTRAS)" = ""; then cd extras/faad && make distclean; fi
+	-if test ! -d CVS; then cd extras/faad && make distclean; fi
 
 	-$(MAKE) distclean
 
@@ -184,8 +186,8 @@ endif
 
 	# Package: vlc-plugin-mad
 	ln -s vlc debian/vlc-plugin-mad/usr/share/doc/vlc-plugin-mad
-	mv debian/vlc/usr/lib/vlc/codec/libmad_plugin.so \
-		debian/vlc-plugin-mad/usr/lib/vlc/codec/
+	mv debian/vlc/usr/lib/vlc/audio_filter/libmpgatofixed32_plugin.so \
+		debian/vlc-plugin-mad/usr/lib/vlc/audio_filter/
 
 	# Package: vlc-plugin-arts
 	ln -s vlc debian/vlc-plugin-arts/usr/share/doc/vlc-plugin-arts
@@ -234,8 +236,8 @@ endif
 
 	# Package: vlc-plugin-a52
 	ln -s vlc debian/vlc-plugin-a52/usr/share/doc/vlc-plugin-a52
-	mv debian/vlc/usr/lib/vlc/codec/liba52_plugin.so \
-		debian/vlc-plugin-a52/usr/lib/vlc/codec
+	mv debian/vlc/usr/lib/vlc/audio_filter/liba52tofloat32_plugin.so \
+		debian/vlc-plugin-a52/usr/lib/vlc/audio_filter
 
 	# Package: vlc-plugin-dvb
 	ln -s vlc debian/vlc-plugin-dvb/usr/share/doc/vlc-plugin-dvb
@@ -248,6 +250,13 @@ endif
 		debian/vlc-plugin-ogg/usr/lib/vlc/demux
 	mv debian/vlc/usr/lib/vlc/codec/libvorbis_plugin.so \
 		debian/vlc-plugin-ogg/usr/lib/vlc/codec
+
+	# Package: wxvlc
+	mv debian/vlc/usr/bin/wxvlc debian/wxvlc/usr/bin/
+	ln -s vlc debian/wxvlc/usr/share/doc/wxvlc
+	mv debian/vlc/usr/lib/vlc/gui/libwxwindows_plugin.so \
+		debian/wxvlc/usr/lib/vlc/gui/
+	ln -s vlc.1.gz debian/wxvlc/usr/share/man/man1/wxvlc.1.gz
 
 	# Clean up
 	rm -f debian/vlc/$(VIDDIR)/*.png

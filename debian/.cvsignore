@@ -8,6 +8,7 @@ gvlc
 gnome-vlc
 qvlc
 kvlc
+wxvlc
 delete
 files
 *debhelper

@@ -1,22 +1,41 @@
-EXTRA_DIST = changelog control rules \
-             vlc.copyright vlc.desktop vlc.dirs vlc.docs vlc.menu \
-             gnome-vlc.desktop gnome-vlc.dirs gnome-vlc.menu \
-             gvlc.desktop gvlc.dirs gvlc.menu \
-             kvlc.dirs kvlc.menu \
-             libvlc0-dev.dirs \
-             mozilla-plugin-vlc.dirs \
-             qvlc.dirs qvlc.menu \
-             vlc-plugin-a52.dirs \
-             vlc-plugin-aa.dirs \
-             vlc-plugin-alsa.dirs \
-             vlc-plugin-arts.dirs \
-             vlc-plugin-dv.dirs \
-             vlc-plugin-dvb.dirs \
-             vlc-plugin-esd.dirs \
-             vlc-plugin-ggi.dirs \
-             vlc-plugin-glide.dirs \
-             vlc-plugin-lirc.dirs \
-             vlc-plugin-mad.dirs \
-             vlc-plugin-sdl.dirs \
-             vlc-plugin-svgalib.dirs \
-             vlc-plugin-xosd.dirs
+NULL =
+
+EXTRA_DIST = \
+	changelog \
+	control \
+	rules \
+	vlc.copyright \
+	vlc.desktop \
+	vlc.dirs \
+	vlc.docs \
+	vlc.menu \
+	gnome-vlc.desktop \
+	gnome-vlc.dirs \
+	gnome-vlc.menu \
+	gvlc.desktop \
+	gvlc.dirs \
+	gvlc.menu \
+	kvlc.dirs \
+	kvlc.menu \
+	libvlc0-dev.dirs \
+	mozilla-plugin-vlc.dirs \
+	qvlc.dirs \
+	qvlc.menu \
+	vlc-plugin-a52.dirs \
+	vlc-plugin-aa.dirs \
+	vlc-plugin-alsa.dirs \
+	vlc-plugin-arts.dirs \
+	vlc-plugin-dv.dirs \
+	vlc-plugin-dvb.dirs \
+	vlc-plugin-esd.dirs \
+	vlc-plugin-ggi.dirs \
+	vlc-plugin-glide.dirs \
+	vlc-plugin-lirc.dirs \
+	vlc-plugin-mad.dirs \
+	vlc-plugin-ogg.dirs \
+	vlc-plugin-sdl.dirs \
+	vlc-plugin-svgalib.dirs \
+	vlc-plugin-xosd.dirs \
+	wxvlc.dirs \
+	wxvlc.menu \
+	$(NULL)

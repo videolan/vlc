@@ -1,0 +1,3 @@
+?package(wxvlc):command="/usr/bin/wxvlc" hotkey="V" needs="X11" \
+                section="Apps/Viewers" title="VideoLAN Client for wxWindows" \
+                icon="/usr/share/vlc/vlc.xpm" hints="Video"
