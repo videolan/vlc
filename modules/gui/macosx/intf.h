@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.31 2003/03/06 11:43:07 hartman Exp $
+ * $Id: intf.h,v 1.32 2003/03/06 12:05:05 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -123,7 +123,6 @@ struct intf_sys_t
 
     IBOutlet id o_messages;     /* messages tv    */
     IBOutlet id o_msgs_panel;   /* messages panel */
-    IBOutlet id o_msgs_btn_ok;  /* messages btn   */
     NSMutableArray * o_msg_arr; /* messages array */
     NSLock * o_msg_lock;        /* messages lock  */
     IBOutlet id o_msgs_btn_crashlog;	/* messages open crashlog */

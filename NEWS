@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.28 2003/03/05 00:05:23 sigmunau Exp $
+$Id: NEWS,v 1.29 2003/03/06 12:05:05 hartman Exp $
 
 Changes between 0.5.1a and 0.5.2:
 --------------------------------
@@ -12,6 +12,7 @@ Core support:
 Codecs:
  * support for DV audio through the ffmpeg library.
  * new but basic MPEG video decoder based on libmpeg2.
+ * fixed a major bug in LPCM code ( fixes a problem with iDVD disks )
 
 UNIX ports:
  * fixed the GNU-pth support.
@@ -23,8 +24,9 @@ Win32 port:
  * fixed the MSVC project files generation.
 
 Mac OS X port:
- * several fixes for multi channel audio devices. AC3 over SPDIF with M-Audio Sonica Theater still does not work. this is most likely a driver bug and has been reported to M-Audio. ( Delta, Griffin iMate and MOTU firewire devices should work).
+ * several fixes for multi channel audio devices. AC3 over SPDIF with M-Audio Sonica Theater still does not work. this is most likely a driver bug and has been reported to M-Audio. ( Sonica, Revolution, Delta, Griffin iMate and MOTU firewire devices should work).
  * new info panel.
+ * very prelimenary support for VLC control via applescript.
 
 Linupy port:
  * there is a whole new port for the linupy distribution used by o.a. the YOPY PDA. It is still experimental, please test it.

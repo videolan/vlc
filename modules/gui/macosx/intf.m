@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.66 2003/03/06 11:43:07 hartman Exp $
+ * $Id: intf.m,v 1.67 2003/03/06 12:05:05 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -293,7 +293,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_msgs_panel setDelegate: self];
     [o_msgs_panel setTitle: _NS("Messages")];
     [o_msgs_panel setExcludedFromWindowsMenu: TRUE];
-    [o_msgs_btn_ok setTitle: _NS("Close")];
     [o_msgs_btn_crashlog setTitle: _NS("Open CrashLog")];
 
     /* main menu */

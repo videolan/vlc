@@ -134,7 +134,6 @@
                 "o_mi_vol_up" = id; 
                 "o_mi_website" = id; 
                 "o_msgs_btn_crashlog" = id; 
-                "o_msgs_btn_ok" = id; 
                 "o_msgs_panel" = id; 
                 "o_mu_audio" = id; 
                 "o_mu_controls" = id; 
