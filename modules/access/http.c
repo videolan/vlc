@@ -2,7 +2,7 @@
  * http.c: HTTP input module
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.58 2004/02/02 11:14:32 fenrir Exp $
+ * $Id: http.c,v 1.59 2004/02/24 16:31:46 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -106,6 +106,8 @@ struct access_sys_t
     char       *psz_mime;
     char       *psz_location;
 
+    vlc_bool_t b_chunked;
+    int64_t    i_chunk;
     int64_t    i_tell;
     int64_t    i_size;
 };
@@ -398,11 +400,57 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
             return 0;
         }
     }
+    if( p_sys->b_chunked )
+    {
+        if( p_sys->i_chunk < 0 )
+        {
+            return 0;
+        }
+
+        if( p_sys->i_chunk <= 0 )
+        {
+            char *psz = net_Gets( VLC_OBJECT(p_input), p_sys->fd );
+            /* read the chunk header */
+            if( psz == NULL )
+            {
+                msg_Dbg( p_input, "failed reading chunk-header line" );
+                return -1;
+            }
+            p_sys->i_chunk = strtoll( psz, NULL, 16 );
+            free( psz );
+
+            if( p_sys->i_chunk <= 0 )   /* eof */
+            {
+                p_sys->i_chunk = -1;
+                return 0;
+            }
+        }
+
+        if( i_len > p_sys->i_chunk )
+        {
+            i_len = p_sys->i_chunk;
+        }
+    }
+
 
     i_read = net_Read( p_input, p_sys->fd, p_buffer, i_len, VLC_FALSE );
     if( i_read > 0 )
     {
         p_sys->i_tell += i_read;
+
+        if( p_sys->b_chunked )
+        {
+            p_sys->i_chunk -= i_read;
+            if( p_sys->i_chunk <= 0 )
+            {
+                /* read the empty line */
+                char *psz = net_Gets( VLC_OBJECT(p_input), p_sys->fd );
+                if( psz )
+                {
+                    free( psz );
+                }
+            }
+        }
     }
     return i_read;
 }
@@ -471,6 +519,8 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable,
 
     p_sys->psz_location = NULL;
     p_sys->psz_mime = NULL;
+    p_sys->b_chunked = VLC_FALSE;
+    p_sys->i_chunk = 0;
     p_sys->i_size = -1;
     p_sys->i_tell = i_tell;
 
@@ -621,6 +671,14 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable,
             if( p_sys->psz_mime ) free( p_sys->psz_mime );
             p_sys->psz_mime = strdup( p );
             msg_Dbg( p_input, "Content-Type: %s", p_sys->psz_mime );
+        }
+        else if( !strcasecmp( psz, "Transfer-Encoding" ) )
+        {
+            msg_Dbg( p_input, "Transfer-Encoding: %s", p );
+            if( !strncasecmp( p, "chunked", 7 ) )
+            {
+                p_sys->b_chunked = VLC_TRUE;
+            }
         }
 
         free( psz );
