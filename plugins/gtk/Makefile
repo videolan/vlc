@@ -50,18 +50,18 @@ $(BUILTIN_GNOME): BUILTIN_GNOME_%.o: %.c
 # Real targets
 #
 
-../../lib/gtk.so: $(PLUGIN_GTK) $(PLUGIN_GTKCOMMON)
+../../plugins/gtk.so: $(PLUGIN_GTK) $(PLUGIN_GTKCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GTK)
 
-../../lib/gtk.a: $(BUILTIN_GTK)
+../../plugins/gtk.a: $(BUILTIN_GTK)
 	ar r $@ $^
 	$(RANLIB) $@
 
 
-../../lib/gnome.so: $(PLUGIN_GNOME) $(PLUGIN_GTKCOMMON)
+../../plugins/gnome.so: $(PLUGIN_GNOME) $(PLUGIN_GTKCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GNOME)
 
-../../lib/gnome.a: $(BUILTIN_GNOME)
+../../plugins/gnome.a: $(BUILTIN_GNOME)
 	ar r $@ $^
 	$(RANLIB) $@
 

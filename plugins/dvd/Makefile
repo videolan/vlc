@@ -31,17 +31,17 @@ $(BUILTIN_DVD): BUILTIN_%.o: %.c
 #
 
 ifeq (1,$(LOCAL_LIBDVDCSS))
-../../lib/dvd.so: libdvdcss $(PLUGIN_DVD)
+../../plugins/dvd.so: libdvdcss $(PLUGIN_DVD)
 	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) ../../lib/libdvdcss.a $(LIB_DVD)
 
-../../lib/dvd.a: libdvdcss $(BUILTIN_DVD)
+../../plugins/dvd.a: libdvdcss $(BUILTIN_DVD)
 	ar r $@ $(BUILTIN_DVD)
 	$(RANLIB) $@
 else
-../../lib/dvd.so: $(PLUGIN_DVD)
+../../plugins/dvd.so: $(PLUGIN_DVD)
 	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD)
 
-../../lib/dvd.a: $(BUILTIN_DVD)
+../../plugins/dvd.a: $(BUILTIN_DVD)
 	ar r $@ $(BUILTIN_DVD)
 	$(RANLIB) $@
 endif

@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.37 2001/06/25 11:34:08 sam Exp $
+ * $Id: modules.c,v 1.38 2001/07/11 02:01:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -120,7 +120,7 @@ static module_symbols_t symbols;
 void module_InitBank( void )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
-    static char * path[] = { ".", "lib", PLUGIN_PATH, NULL, NULL };
+    static char * path[] = { ".", "plugins", PLUGIN_PATH, NULL, NULL };
 
     char **         ppsz_path = path;
     char *          psz_fullpath;
@@ -302,7 +302,7 @@ void module_ManageBank( void )
             }
             else
             {
-                intf_WarnMsg( 1, "module: hiding unused plugin module `%s'",
+                intf_WarnMsg( 3, "module: hiding unused plugin module `%s'",
                               p_module->psz_name );
                 HideModule( p_module );
 
@@ -557,7 +557,7 @@ static int AllocatePluginModule( char * psz_filename )
     p_module_bank->first = p_module;
 
     /* Immediate message so that a slow module doesn't make the user wait */
-    intf_WarnMsgImm( 2, "module: plugin module `%s', %s",
+    intf_WarnMsgImm( 2, "module: new plugin module `%s', %s",
                      p_module->psz_name, p_module->psz_longname );
 
     return( 0 );
@@ -673,7 +673,7 @@ static int AllocateBuiltinModule( int ( *pf_init ) ( module_t * ),
     p_module_bank->first = p_module;
 
     /* Immediate message so that a slow module doesn't make the user wait */
-    intf_WarnMsgImm( 2, "module: builtin module `%s', %s",
+    intf_WarnMsgImm( 2, "module: new builtin module `%s', %s",
                      p_module->psz_name, p_module->psz_longname );
 
     return( 0 );

@@ -69,38 +69,38 @@ $(BUILTIN_IDCTALTIVEC): BUILTIN_IDCTALTIVEC_%.o: %.c
 # Real targets
 #
 
-../../lib/idct.so: $(PLUGIN_IDCT) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_C)
+../../plugins/idct.so: $(PLUGIN_IDCT) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../lib/idct.a: $(BUILTIN_IDCT)
+../../plugins/idct.a: $(BUILTIN_IDCT)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_C)
+../../plugins/idctclassic.so: $(PLUGIN_IDCTCLASSIC) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../lib/idctclassic.a: $(BUILTIN_IDCTCLASSIC)
+../../plugins/idctclassic.a: $(BUILTIN_IDCTCLASSIC)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../lib/idctmmx.so: $(PLUGIN_IDCTMMX) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_MMX)
+../../plugins/idctmmx.so: $(PLUGIN_IDCTMMX) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_MMX)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../lib/idctmmx.a: $(BUILTIN_IDCTMMX)
+../../plugins/idctmmx.a: $(BUILTIN_IDCTMMX)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_MMX)
+../../plugins/idctmmxext.so: $(PLUGIN_IDCTMMXEXT) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_MMX)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../lib/idctmmxext.a: $(BUILTIN_IDCTMMXEXT)
+../../plugins/idctmmxext.a: $(BUILTIN_IDCTMMXEXT)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../lib/idctaltivec.so: $(PLUGIN_IDCTALTIVEC) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_C)
+../../plugins/idctaltivec.so: $(PLUGIN_IDCTALTIVEC) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_IDCTALTIVEC)
 
-../../lib/idctaltivec.a: $(BUILTIN_IDCTALTIVEC)
+../../plugins/idctaltivec.a: $(BUILTIN_IDCTALTIVEC)
 	ar r $@ $^
 	$(RANLIB) $@
 

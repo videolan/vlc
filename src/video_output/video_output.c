@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.133 2001/07/10 06:07:53 gbazin Exp $
+ * $Id: video_output.c,v 1.134 2001/07/11 02:01:05 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -196,7 +196,7 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
     p_vout->b_fullscreen          = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
                                                      VOUT_FULLSCREEN_DEFAULT );
 
-    intf_WarnMsg( 3, "wished configuration: %dx%d, %d/%d bpp (%d Bpl)",
+    intf_WarnMsg( 3, "vout info: asking for %dx%d, %d/%d bpp (%d Bpl)",
                   p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                   p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line );
 
@@ -889,7 +889,7 @@ static int InitThread( vout_thread_t *p_vout )
               p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
               p_vout->i_bytes_per_pixel * 8 );
 
-    intf_WarnMsg( 3, "actual configuration: %dx%d, %d/%d bpp (%d Bpl), "
+    intf_WarnMsg( 3, "vout info: got %dx%d, %d/%d bpp (%d Bpl), "
                   "masks: 0x%x/0x%x/0x%x",
                   p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                   p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line,
@@ -1041,7 +1041,7 @@ static void RunThread( vout_thread_t *p_vout)
                     p_vout->i_pictures--;
                 }
                 intf_WarnMsg( 1,
-                        "warning: late picture skipped (%p)", p_pic );
+                        "vout warning: late picture skipped (%p)", p_pic );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
                 continue;

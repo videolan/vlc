@@ -26,17 +26,17 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../lib/ncurses.so: $(PLUGIN_NCURSES)
+../../plugins/ncurses.so: $(PLUGIN_NCURSES)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_NCURSES)
 
-../../lib/ncurses.a: $(BUILTIN_NCURSES)
+../../plugins/ncurses.a: $(BUILTIN_NCURSES)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../lib/rc.so: $(PLUGIN_RC)
+../../plugins/rc.so: $(PLUGIN_RC)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS)
 
-../../lib/rc.a: $(BUILTIN_RC)
+../../plugins/rc.a: $(BUILTIN_RC)
 	ar r $@ $^
 	$(RANLIB) $@
 

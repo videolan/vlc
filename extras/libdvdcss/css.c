@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.4 2001/07/07 21:10:58 gbazin Exp $
+ * $Id: css.c,v 1.5 2001/07/11 02:01:03 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -56,7 +56,7 @@
 #ifdef HAVE_CSS
 static int  CSSGetASF    ( dvdcss_handle dvdcss );
 static void CSSCryptKey  ( int i_key_type, int i_varient,
-                           u8 const * pi_challenge, u8* pi_key );
+                           u8 const * p_challenge, u8* p_key );
 static int  CSSCracker   ( int i_start, unsigned char * p_crypted,
                            unsigned char * p_decrypted,
                            dvd_key_t * p_sector_key, dvd_key_t * p_key );
@@ -94,7 +94,7 @@ int CSSInit( dvdcss_handle dvdcss )
 {
 #ifdef HAVE_CSS
     /* structures defined in cdrom.h or dvdio.h */
-    char p_buffer[2048 + 4 + 1];
+    unsigned char p_buffer[2048 + 4 + 1];
     char psz_warning[32];
     int  i_agid = 0;
     int  i_ret = -1;
@@ -143,13 +143,13 @@ int CSSInit( dvdcss_handle dvdcss )
 
     for( i = 0 ; i < 10; ++i )
     {
-        dvdcss->css.disc.pi_challenge[i] = i;
+        dvdcss->css.disc.p_challenge[i] = i;
     }
 
     /* Get challenge from host */
     for( i = 0 ; i < 10 ; ++i )
     {
-        p_buffer[9-i] = dvdcss->css.disc.pi_challenge[i];
+        p_buffer[9-i] = dvdcss->css.disc.p_challenge[i];
     }
 
     /* Send challenge to LU */
@@ -169,16 +169,16 @@ int CSSInit( dvdcss_handle dvdcss )
     /* Send key1 to host */
     for( i = 0 ; i < KEY_SIZE ; i++ )
     {
-        dvdcss->css.disc.pi_key1[i] = p_buffer[4-i];
+        dvdcss->css.disc.p_key1[i] = p_buffer[4-i];
     }
 
     for( i = 0 ; i < 32 ; ++i )
     {
-        CSSCryptKey( 0, i, dvdcss->css.disc.pi_challenge,
-                           dvdcss->css.disc.pi_key_check );
+        CSSCryptKey( 0, i, dvdcss->css.disc.p_challenge,
+                           dvdcss->css.disc.p_key_check );
 
-        if( memcmp( dvdcss->css.disc.pi_key_check,
-                    dvdcss->css.disc.pi_key1, KEY_SIZE ) == 0 )
+        if( memcmp( dvdcss->css.disc.p_key_check,
+                    dvdcss->css.disc.p_key1, KEY_SIZE ) == 0 )
         {
             sprintf( psz_warning, "drive authentic, using variant %d", i );
             _dvdcss_debug( dvdcss, psz_warning );
@@ -203,17 +203,17 @@ int CSSInit( dvdcss_handle dvdcss )
     /* Send challenge to host */
     for( i = 0 ; i < 10 ; ++i )
     {
-        dvdcss->css.disc.pi_challenge[i] = p_buffer[9-i];
+        dvdcss->css.disc.p_challenge[i] = p_buffer[9-i];
     }
 
     CSSCryptKey( 1, dvdcss->css.disc.i_varient,
-                    dvdcss->css.disc.pi_challenge,
-                    dvdcss->css.disc.pi_key2 );
+                    dvdcss->css.disc.p_challenge,
+                    dvdcss->css.disc.p_key2 );
 
     /* Get key2 from host */
     for( i = 0 ; i < KEY_SIZE ; ++i )
     {
-        p_buffer[4-i] = dvdcss->css.disc.pi_key2[i];
+        p_buffer[4-i] = dvdcss->css.disc.p_key2[i];
     }
 
     /* Send key2 to LU */
@@ -225,14 +225,14 @@ int CSSInit( dvdcss_handle dvdcss )
 
     _dvdcss_debug( dvdcss, "authentication established" );
 
-    memcpy( dvdcss->css.disc.pi_challenge,
-            dvdcss->css.disc.pi_key1, KEY_SIZE );
-    memcpy( dvdcss->css.disc.pi_challenge+KEY_SIZE,
-            dvdcss->css.disc.pi_key2, KEY_SIZE );
+    memcpy( dvdcss->css.disc.p_challenge,
+            dvdcss->css.disc.p_key1, KEY_SIZE );
+    memcpy( dvdcss->css.disc.p_challenge+KEY_SIZE,
+            dvdcss->css.disc.p_key2, KEY_SIZE );
 
     CSSCryptKey( 2, dvdcss->css.disc.i_varient,
-                    dvdcss->css.disc.pi_challenge,
-                    dvdcss->css.disc.pi_key_check );
+                    dvdcss->css.disc.p_challenge,
+                    dvdcss->css.disc.p_key_check );
 
     _dvdcss_debug( dvdcss, "received session key" );
 
@@ -267,15 +267,9 @@ fprintf( stderr, "DISK KEY: %02x %02x %02x %02x %02x\n", p_buffer[0], p_buffer[1
     /* Unencrypt disc key using bus key */
     for( i = 0 ; i < 2048 ; i++ )
     {
-        p_buffer[ i ] ^= dvdcss->css.disc.pi_key_check[ 4 - (i % KEY_SIZE) ];
+        p_buffer[ i ] ^= dvdcss->css.disc.p_key_check[ 4 - (i % KEY_SIZE) ];
     }
-    memcpy( dvdcss->css.disc.pi_key_check, p_buffer, 2048 );
-
-    /* initialize title key to know it empty */
-    for( i = 0 ; i < KEY_SIZE ; i++ )
-    {
-        dvdcss->css.pi_title_key[i] = 0;
-    }
+    memcpy( dvdcss->css.disc.p_key_check, p_buffer, 2048 );
 
     /* Test authentication success */
     switch( CSSGetASF( dvdcss ) )
@@ -305,7 +299,7 @@ fprintf( stderr, "DISK KEY: %02x %02x %02x %02x %02x\n", p_buffer[0], p_buffer[1
  *****************************************************************************
  * The DVD should have been opened and authenticated before.
  *****************************************************************************/
-int CSSGetKey( dvdcss_handle dvdcss )
+int CSSGetKey( dvdcss_handle dvdcss, int i_pos, dvd_key_t p_titlekey )
 {
 #ifdef HAVE_CSS
     /*
@@ -313,9 +307,8 @@ int CSSGetKey( dvdcss_handle dvdcss )
      * with Frank A. Stevenson algorithm.
      * Does not use any player key table and ioctls.
      */
-    u8          pi_buf[0x800];
-    dvd_key_t   pi_key;
-    int         i_pos;
+    u8          p_buf[0x800];
+    dvd_key_t   p_key;
     boolean_t   b_encrypted;
     boolean_t   b_stop_scanning;
     int         i_blocks_read;
@@ -325,63 +318,62 @@ int CSSGetKey( dvdcss_handle dvdcss )
 
     for( i = 0 ; i < KEY_SIZE ; i++ )
     {
-        pi_key[i] = 0;
+        p_key[i] = 0;
     }
 
     b_encrypted = 0;
     b_stop_scanning = 0;
 
-    /* Position of the title on the disc */
-    i_pos = dvdcss->css.i_title_pos;
-
-    do {
-    i_pos = dvdcss_seek( dvdcss, i_pos );
-    i_blocks_read = dvdcss_read( dvdcss, pi_buf, 1, DVDCSS_NOFLAGS );
-
-    /* PES_scrambling_control */
-    if( pi_buf[0x14] & 0x30 )
+    do
     {
-        b_encrypted = 1;
-        i_best_plen = 0;
-        i_best_p = 0;
+        i_pos = dvdcss_seek( dvdcss, i_pos );
+        i_blocks_read = dvdcss_read( dvdcss, p_buf, 1, DVDCSS_NOFLAGS );
 
-        for( i = 2 ; i < 0x30 ; i++ )
+        /* PES_scrambling_control */
+        if( p_buf[0x14] & 0x30 )
         {
-            for( j = i+1 ; ( j < 0x80 ) &&
-                   ( pi_buf[0x7F - (j%i)] == pi_buf[0x7F-j] ) ; j++ );
+            b_encrypted = 1;
+            i_best_plen = 0;
+            i_best_p = 0;
+
+            for( i = 2 ; i < 0x30 ; i++ )
             {
-                if( j > i_best_plen )
+                for( j = i+1 ;
+                     j < 0x80 && ( p_buf[0x7F - (j%i)] == p_buf[0x7F-j] );
+                     j++ );
                 {
-                    i_best_plen = j;
-                    i_best_p = i;
+                    if( j > i_best_plen )
+                    {
+                        i_best_plen = j;
+                        i_best_p = i;
+                    }
                 }
+            }
+
+            if( ( i_best_plen > 20 ) && ( i_best_plen / i_best_p >= 2) )
+            {
+                i = CSSCracker( 0,  &p_buf[0x80],
+                        &p_buf[0x80 - ( i_best_plen / i_best_p) *i_best_p],
+                        (dvd_key_t*)&p_buf[0x54],
+                        &p_key );
+                b_stop_scanning = ( i >= 0 );
             }
         }
 
-        if( ( i_best_plen > 20 ) && ( i_best_plen / i_best_p >= 2) )
-        {
-            i = CSSCracker( 0,  &pi_buf[0x80],
-                    &pi_buf[0x80 - ( i_best_plen / i_best_p) *i_best_p],
-                    (dvd_key_t*)&pi_buf[0x54],
-                    &pi_key );
-            b_stop_scanning = ( i >= 0 );
-        }
-    }
+        i_pos += i_blocks_read;
 
-    i_pos += i_blocks_read;
-    } while( i_blocks_read == 0x1 && !b_stop_scanning);
+    } while( i_blocks_read == 0x1 && !b_stop_scanning );
 
-    if( b_stop_scanning)
+    if( b_stop_scanning )
     {
-            memcpy( dvdcss->css.pi_title_key,
-                    &pi_key, sizeof(dvd_key_t) );
+        memcpy( p_titlekey, &p_key, sizeof(dvd_key_t) );
         _dvdcss_debug( dvdcss, "vts key initialized" );
         return 0;
     }
 
     if( !b_encrypted )
     {
-        _dvdcss_debug( dvdcss, "this file was _NOT_ encrypted!" );
+        _dvdcss_debug( dvdcss, "file was unscrambled" );
         return 0;
     }
 
@@ -400,38 +392,38 @@ int CSSGetKey( dvdcss_handle dvdcss )
  * sec : sector to descramble
  * key : title key for this sector
  *****************************************************************************/
-int CSSDescrambleSector( dvd_key_t pi_key, u8* pi_sec )
+int CSSDescrambleSector( dvd_key_t p_key, u8* p_sec )
 {
 #ifdef HAVE_CSS
     unsigned int    i_t1, i_t2, i_t3, i_t4, i_t5, i_t6;
-    u8*             pi_end = pi_sec + 0x800;
+    u8*             p_end = p_sec + 0x800;
 
     /* PES_scrambling_control */
-    if( pi_sec[0x14] & 0x30)
+    if( p_sec[0x14] & 0x30)
     {
-        i_t1 = ((pi_key)[0] ^ pi_sec[0x54]) | 0x100;
-        i_t2 = (pi_key)[1] ^ pi_sec[0x55];
-        i_t3 = (((pi_key)[2]) | ((pi_key)[3] << 8) |
-               ((pi_key)[4] << 16)) ^ ((pi_sec[0x56]) |
-               (pi_sec[0x57] << 8) | (pi_sec[0x58] << 16));
+        i_t1 = ((p_key)[0] ^ p_sec[0x54]) | 0x100;
+        i_t2 = (p_key)[1] ^ p_sec[0x55];
+        i_t3 = (((p_key)[2]) | ((p_key)[3] << 8) |
+               ((p_key)[4] << 16)) ^ ((p_sec[0x56]) |
+               (p_sec[0x57] << 8) | (p_sec[0x58] << 16));
         i_t4 = i_t3 & 7;
         i_t3 = i_t3 * 2 + 8 - i_t4;
-        pi_sec += 0x80;
+        p_sec += 0x80;
         i_t5 = 0;
 
-        while( pi_sec != pi_end )
+        while( p_sec != p_end )
         {
-            i_t4 = pi_css_tab2[i_t2] ^ pi_css_tab3[i_t1];
+            i_t4 = p_css_tab2[i_t2] ^ p_css_tab3[i_t1];
             i_t2 = i_t1>>1;
             i_t1 = ( ( i_t1 & 1 ) << 8 ) ^ i_t4;
-            i_t4 = pi_css_tab5[i_t4];
+            i_t4 = p_css_tab5[i_t4];
             i_t6 = ((((((( i_t3 >> 3 ) ^ i_t3 ) >> 1 ) ^
                                          i_t3 ) >> 8 ) ^ i_t3 ) >> 5) & 0xff;
             i_t3 = (i_t3 << 8 ) | i_t6;
-            i_t6 = pi_css_tab4[i_t6];
+            i_t6 = p_css_tab4[i_t6];
             i_t5 += i_t6 + i_t4;
-            *pi_sec = pi_css_tab1[*pi_sec] ^( i_t5 & 0xff );
-            pi_sec++;
+            *p_sec = p_css_tab1[*p_sec] ^( i_t5 & 0xff );
+            p_sec++;
             i_t5 >>= 8;
         }
     }
@@ -491,16 +483,16 @@ static int CSSGetASF( dvdcss_handle dvdcss )
  * i_varient : between 0 and 31.
  *****************************************************************************/
 static void CSSCryptKey( int i_key_type, int i_varient,
-                         u8 const * pi_challenge, u8* pi_key )
+                         u8 const * p_challenge, u8* p_key )
 {
     /* Permutation table for challenge */
-    u8      ppi_perm_challenge[3][10] =
+    u8      pp_perm_challenge[3][10] =
             { { 1, 3, 0, 7, 5, 2, 9, 6, 4, 8 },
               { 6, 1, 9, 3, 8, 5, 7, 4, 0, 2 },
               { 4, 0, 3, 5, 7, 2, 8, 6, 1, 9 } };
 
     /* Permutation table for varient table for key2 and buskey */
-    u8      ppi_perm_varient[2][32] =
+    u8      pp_perm_varient[2][32] =
             { { 0x0a, 0x08, 0x0e, 0x0c, 0x0b, 0x09, 0x0f, 0x0d,
                 0x1a, 0x18, 0x1e, 0x1c, 0x1b, 0x19, 0x1f, 0x1d,
                 0x02, 0x00, 0x06, 0x04, 0x03, 0x01, 0x07, 0x05,
@@ -510,19 +502,19 @@ static void CSSCryptKey( int i_key_type, int i_varient,
                 0x13, 0x1b, 0x17, 0x1f, 0x03, 0x0b, 0x07, 0x0f,
                 0x11, 0x19, 0x15, 0x1d, 0x01, 0x09, 0x05, 0x0d } };
 
-    u8      pi_varients[32] =
+    u8      p_varients[32] =
             {   0xB7, 0x74, 0x85, 0xD0, 0xCC, 0xDB, 0xCA, 0x73,
                 0x03, 0xFE, 0x31, 0x03, 0x52, 0xE0, 0xB7, 0x42,
                 0x63, 0x16, 0xF2, 0x2A, 0x79, 0x52, 0xFF, 0x1B,
                 0x7A, 0x11, 0xCA, 0x1A, 0x9B, 0x40, 0xAD, 0x01 };
 
     /* The "secret" key */
-    u8      pi_secret[5] = { 0x55, 0xD6, 0xC4, 0xC5, 0x28 };
+    u8      p_secret[5] = { 0x55, 0xD6, 0xC4, 0xC5, 0x28 };
 
-    u8      pi_bits[30];
-    u8      pi_scratch[10];
-    u8      pi_tmp1[5];
-    u8      pi_tmp2[5];
+    u8      p_bits[30];
+    u8      p_scratch[10];
+    u8      p_tmp1[5];
+    u8      p_tmp2[5];
     u8      i_lfsr0_o;  /* 1 bit used */
     u8      i_lfsr1_o;  /* 1 bit used */
     u32     i_lfsr0;
@@ -538,10 +530,10 @@ static void CSSCryptKey( int i_key_type, int i_varient,
     int     i;
 
     for (i = 9; i >= 0; --i)
-        pi_scratch[i] = pi_challenge[ppi_perm_challenge[i_key_type][i]];
+        p_scratch[i] = p_challenge[pp_perm_challenge[i_key_type][i]];
 
     i_css_varient = ( i_key_type == 0 ) ? i_varient :
-                    ppi_perm_varient[i_key_type-1][i_varient];
+                    pp_perm_varient[i_key_type-1][i_varient];
 
     /*
      * This encryption engine implements one of 32 variations
@@ -562,7 +554,7 @@ static void CSSCryptKey( int i_key_type, int i_varient,
      */
     for( i = 5 ; --i >= 0 ; )
     {
-        pi_tmp1[i] = pi_scratch[5 + i] ^ pi_secret[i] ^ pi_crypt_tab2[i];
+        p_tmp1[i] = p_scratch[5 + i] ^ p_secret[i] ^ p_crypt_tab2[i];
     }
 
     /*
@@ -592,11 +584,11 @@ static void CSSCryptKey( int i_key_type, int i_varient,
      * initial values are non-zero.  Thus when we initialise them from
      * the seed,  we ensure that a bit is set.
      */
-    i_lfsr0 = ( pi_tmp1[0] << 17 ) | ( pi_tmp1[1] << 9 ) |
-              (( pi_tmp1[2] & ~7 ) << 1 ) | 8 | ( pi_tmp1[2] & 7 );
-    i_lfsr1 = ( pi_tmp1[3] << 9 ) | 0x100 | pi_tmp1[4];
+    i_lfsr0 = ( p_tmp1[0] << 17 ) | ( p_tmp1[1] << 9 ) |
+              (( p_tmp1[2] & ~7 ) << 1 ) | 8 | ( p_tmp1[2] & 7 );
+    i_lfsr1 = ( p_tmp1[3] << 9 ) | 0x100 | p_tmp1[4];
 
-    i_index = sizeof(pi_bits);
+    i_index = sizeof(p_bits);
     i_carry = 0;
 
     do
@@ -617,74 +609,74 @@ static void CSSCryptKey( int i_key_type, int i_varient,
             i_val |= ( i_combined & 1 ) << i_bit;
         }
     
-        pi_bits[--i_index] = i_val;
+        p_bits[--i_index] = i_val;
     } while( i_index > 0 );
 
     /* This term is used throughout the following to
      * select one of 32 different variations on the
      * algorithm.
      */
-    i_cse = pi_varients[i_css_varient] ^ pi_crypt_tab2[i_css_varient];
+    i_cse = p_varients[i_css_varient] ^ p_crypt_tab2[i_css_varient];
 
     /* Now the actual blocks doing the encryption.  Each
      * of these works on 40 bits at a time and are quite
      * similar.
      */
     i_index = 0;
-    for( i = 5, i_term = 0 ; --i >= 0 ; i_term = pi_scratch[i] )
+    for( i = 5, i_term = 0 ; --i >= 0 ; i_term = p_scratch[i] )
     {
-        i_index = pi_bits[25 + i] ^ pi_scratch[i];
-        i_index = pi_crypt_tab1[i_index] ^ ~pi_crypt_tab2[i_index] ^ i_cse;
+        i_index = p_bits[25 + i] ^ p_scratch[i];
+        i_index = p_crypt_tab1[i_index] ^ ~p_crypt_tab2[i_index] ^ i_cse;
 
-        pi_tmp1[i] = pi_crypt_tab2[i_index] ^ pi_crypt_tab3[i_index] ^ i_term;
+        p_tmp1[i] = p_crypt_tab2[i_index] ^ p_crypt_tab3[i_index] ^ i_term;
     }
-    pi_tmp1[4] ^= pi_tmp1[0];
+    p_tmp1[4] ^= p_tmp1[0];
 
-    for( i = 5, i_term = 0 ; --i >= 0 ; i_term = pi_tmp1[i] )
+    for( i = 5, i_term = 0 ; --i >= 0 ; i_term = p_tmp1[i] )
     {
-        i_index = pi_bits[20 + i] ^ pi_tmp1[i];
-        i_index = pi_crypt_tab1[i_index] ^ ~pi_crypt_tab2[i_index] ^ i_cse;
+        i_index = p_bits[20 + i] ^ p_tmp1[i];
+        i_index = p_crypt_tab1[i_index] ^ ~p_crypt_tab2[i_index] ^ i_cse;
 
-        pi_tmp2[i] = pi_crypt_tab2[i_index] ^ pi_crypt_tab3[i_index] ^ i_term;
+        p_tmp2[i] = p_crypt_tab2[i_index] ^ p_crypt_tab3[i_index] ^ i_term;
     }
-    pi_tmp2[4] ^= pi_tmp2[0];
+    p_tmp2[4] ^= p_tmp2[0];
 
-    for( i = 5, i_term = 0 ; --i >= 0 ; i_term = pi_tmp2[i] )
+    for( i = 5, i_term = 0 ; --i >= 0 ; i_term = p_tmp2[i] )
     {
-        i_index = pi_bits[15 + i] ^ pi_tmp2[i];
-        i_index = pi_crypt_tab1[i_index] ^ ~pi_crypt_tab2[i_index] ^ i_cse;
-        i_index = pi_crypt_tab2[i_index] ^ pi_crypt_tab3[i_index] ^ i_term;
+        i_index = p_bits[15 + i] ^ p_tmp2[i];
+        i_index = p_crypt_tab1[i_index] ^ ~p_crypt_tab2[i_index] ^ i_cse;
+        i_index = p_crypt_tab2[i_index] ^ p_crypt_tab3[i_index] ^ i_term;
 
-        pi_tmp1[i] = pi_crypt_tab0[i_index] ^ pi_crypt_tab2[i_index];
+        p_tmp1[i] = p_crypt_tab0[i_index] ^ p_crypt_tab2[i_index];
     }
-    pi_tmp1[4] ^= pi_tmp1[0];
+    p_tmp1[4] ^= p_tmp1[0];
 
-    for( i = 5, i_term = 0 ; --i >= 0 ; i_term = pi_tmp1[i] )
+    for( i = 5, i_term = 0 ; --i >= 0 ; i_term = p_tmp1[i] )
     {
-        i_index = pi_bits[10 + i] ^ pi_tmp1[i];
-        i_index = pi_crypt_tab1[i_index] ^ ~pi_crypt_tab2[i_index] ^ i_cse;
+        i_index = p_bits[10 + i] ^ p_tmp1[i];
+        i_index = p_crypt_tab1[i_index] ^ ~p_crypt_tab2[i_index] ^ i_cse;
 
-        i_index = pi_crypt_tab2[i_index] ^ pi_crypt_tab3[i_index] ^ i_term;
+        i_index = p_crypt_tab2[i_index] ^ p_crypt_tab3[i_index] ^ i_term;
 
-        pi_tmp2[i] = pi_crypt_tab0[i_index] ^ pi_crypt_tab2[i_index];
+        p_tmp2[i] = p_crypt_tab0[i_index] ^ p_crypt_tab2[i_index];
     }
-    pi_tmp2[4] ^= pi_tmp2[0];
+    p_tmp2[4] ^= p_tmp2[0];
 
-    for( i = 5, i_term = 0 ; --i >= 0 ; i_term = pi_tmp2[i] )
+    for( i = 5, i_term = 0 ; --i >= 0 ; i_term = p_tmp2[i] )
     {
-        i_index = pi_bits[5 + i] ^ pi_tmp2[i];
-        i_index = pi_crypt_tab1[i_index] ^ ~pi_crypt_tab2[i_index] ^ i_cse;
+        i_index = p_bits[5 + i] ^ p_tmp2[i];
+        i_index = p_crypt_tab1[i_index] ^ ~p_crypt_tab2[i_index] ^ i_cse;
 
-        pi_tmp1[i] = pi_crypt_tab2[i_index] ^ pi_crypt_tab3[i_index] ^ i_term;
+        p_tmp1[i] = p_crypt_tab2[i_index] ^ p_crypt_tab3[i_index] ^ i_term;
     }
-    pi_tmp1[4] ^= pi_tmp1[0];
+    p_tmp1[4] ^= p_tmp1[0];
 
-    for(i = 5, i_term = 0 ; --i >= 0 ; i_term = pi_tmp1[i] )
+    for(i = 5, i_term = 0 ; --i >= 0 ; i_term = p_tmp1[i] )
     {
-        i_index = pi_bits[i] ^ pi_tmp1[i];
-        i_index = pi_crypt_tab1[i_index] ^ ~pi_crypt_tab2[i_index] ^ i_cse;
+        i_index = p_bits[i] ^ p_tmp1[i];
+        i_index = p_crypt_tab1[i_index] ^ ~p_crypt_tab2[i_index] ^ i_cse;
 
-        pi_key[i] = pi_crypt_tab2[i_index] ^ pi_crypt_tab3[i_index] ^ i_term;
+        p_key[i] = p_crypt_tab2[i_index] ^ p_crypt_tab3[i_index] ^ i_term;
     }
 
     return;
@@ -701,7 +693,7 @@ static int CSSCracker( int i_start,
                        dvd_key_t * p_sector_key,
                        dvd_key_t * p_key )
 {
-    unsigned char pi_buffer[10];
+    unsigned char p_buffer[10];
     unsigned int i_t1, i_t2, i_t3, i_t4, i_t5, i_t6;
     unsigned int i_try;
     unsigned int i_candidate;
@@ -711,7 +703,7 @@ static int CSSCracker( int i_start,
 
     for( i = 0 ; i < 10 ; i++ )
     {
-        pi_buffer[i] = pi_css_tab1[p_crypted[i]] ^ p_decrypted[i];
+        p_buffer[i] = p_css_tab1[p_crypted[i]] ^ p_decrypted[i];
     }
 
     for( i_try = i_start ; i_try < 0x10000 ; i_try++ )
@@ -725,12 +717,12 @@ static int CSSCracker( int i_start,
         for( i = 0 ; i < 4 ; i++ )
         {
             /* advance LFSR1 normaly */
-            i_t4 = pi_css_tab2[i_t2] ^ pi_css_tab3[i_t1];
+            i_t4 = p_css_tab2[i_t2] ^ p_css_tab3[i_t1];
             i_t2 = i_t1 >> 1;
             i_t1 = ( ( i_t1 & 1 ) << 8 ) ^ i_t4;
-            i_t4 = pi_css_tab5[i_t4];
+            i_t4 = p_css_tab5[i_t4];
             /* deduce i_t6 & i_t5 */
-            i_t6 = pi_buffer[i];
+            i_t6 = p_buffer[i];
             if( i_t5 )
             {
                 i_t6 = ( i_t6 + 0xff ) & 0x0ff;
@@ -741,7 +733,7 @@ static int CSSCracker( int i_start,
             }
             i_t6 -= i_t4;
             i_t5 += i_t6 + i_t4;
-            i_t6 = pi_css_tab4[ i_t6 ];
+            i_t6 = p_css_tab4[ i_t6 ];
             /* feed / advance i_t3 / i_t5 */
             i_t3 = ( i_t3 << 8 ) | i_t6;
             i_t5 >>= 8;
@@ -752,16 +744,16 @@ static int CSSCracker( int i_start,
         /* iterate 6 more times to validate candidate key */
         for( ; i < 10 ; i++ )
         {
-            i_t4 = pi_css_tab2[i_t2] ^ pi_css_tab3[i_t1];
+            i_t4 = p_css_tab2[i_t2] ^ p_css_tab3[i_t1];
             i_t2 = i_t1 >> 1;
             i_t1 = ( ( i_t1 & 1 ) << 8 ) ^ i_t4;
-            i_t4 = pi_css_tab5[i_t4];
+            i_t4 = p_css_tab5[i_t4];
             i_t6 = ((((((( i_t3 >> 3 ) ^ i_t3 ) >> 1 ) ^
                                          i_t3 ) >> 8 ) ^ i_t3 ) >> 5 ) & 0xff;
             i_t3 = ( i_t3 << 8 ) | i_t6;
-            i_t6 = pi_css_tab4[i_t6];
+            i_t6 = p_css_tab4[i_t6];
             i_t5 += i_t6 + i_t4;
-            if( ( i_t5 & 0xff ) != pi_buffer[i] )
+            if( ( i_t5 & 0xff ) != p_buffer[i] )
             {
                 break;
             }

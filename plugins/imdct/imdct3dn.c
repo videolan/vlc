@@ -2,7 +2,7 @@
  * imdct3dn.c : accelerated 3D Now! IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdct3dn.c,v 1.5 2001/06/12 00:30:41 reno Exp $
+ * $Id: imdct3dn.c,v 1.6 2001/07/11 02:01:04 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -98,7 +98,8 @@ static int imdct_Probe( probedata_t *p_data )
         return( 0 );
     }
 
-    if( TestMethod( IMDCT_METHOD_VAR, "imdct3dn" ) )
+    if( TestMethod( IMDCT_METHOD_VAR, "imdct3dn" )
+         || TestMethod( IMDCT_METHOD_VAR, "3dn" ) )
     {
         return( 999 );
     }

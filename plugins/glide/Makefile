@@ -30,10 +30,10 @@ $(BUILTIN_GLIDE): BUILTIN_%.o: %.c
 # Real targets
 #
 
-../../lib/glide.so: $(PLUGIN_GLIDE)
+../../plugins/glide.so: $(PLUGIN_GLIDE)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GLIDE)
 
-../../lib/glide.a: $(BUILTIN_GLIDE)
+../../plugins/glide.a: $(BUILTIN_GLIDE)
 	ar r $@ $^
 	$(RANLIB) $@
 

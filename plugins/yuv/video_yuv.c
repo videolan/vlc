@@ -5,7 +5,7 @@
  * case by optimized functions.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_yuv.c,v 1.14 2001/06/03 12:47:21 sam Exp $
+ * $Id: video_yuv.c,v 1.15 2001/07/11 02:01:05 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -82,7 +82,8 @@ void _M( yuv_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int yuv_Probe( probedata_t *p_data )
 {
-    if( TestMethod( YUV_METHOD_VAR, "yuv" ) )
+    if( TestMethod( YUV_METHOD_VAR, "yuv" )
+         || TestMethod( YUV_METHOD_VAR, "c" ) )
     {
         return( 999 );
     }

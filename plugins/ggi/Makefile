@@ -22,10 +22,10 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../lib/ggi.so: $(PLUGIN_C)
+../../plugins/ggi.so: $(PLUGIN_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_GGI)
 
-../../lib/ggi.a: $(BUILTIN_C)
+../../plugins/ggi.a: $(BUILTIN_C)
 	ar r $@ $^
 	$(RANLIB) $@
 

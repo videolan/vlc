@@ -22,10 +22,10 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../lib/dsp.so: $(PLUGIN_C)
+../../plugins/dsp.so: $(PLUGIN_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../../lib/dsp.a: $(BUILTIN_C)
+../../plugins/dsp.a: $(BUILTIN_C)
 	ar r $@ $^
 	$(RANLIB) $@
 

@@ -2,7 +2,7 @@
  * motion.c : C motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: motion.c,v 1.7 2001/06/07 15:27:44 sam Exp $
+ * $Id: motion.c,v 1.8 2001/07/11 02:01:05 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -73,7 +73,8 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 int _M( motion_Probe )( probedata_t *p_data )
 {
-    if( TestMethod( MOTION_METHOD_VAR, "motion" ) )
+    if( TestMethod( MOTION_METHOD_VAR, "motion" )
+         || TestMethod( MOTION_METHOD_VAR, "c" ) )
     {
         return( 999 );
     }

@@ -33,25 +33,25 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../lib/x11.so: $(PLUGIN_X11)
+../../plugins/x11.so: $(PLUGIN_X11)
 ifeq ($(SYS),nto-qnx)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_X11) -lsocket
 else
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_X11)
 endif
 
-../../lib/x11.a: $(BUILTIN_X11)
+../../plugins/x11.a: $(BUILTIN_X11)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../lib/xvideo.so: $(PLUGIN_XVIDEO)
+../../plugins/xvideo.so: $(PLUGIN_XVIDEO)
 ifeq ($(SYS),nto-qnx)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_XVIDEO) -lsocket
 else
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_XVIDEO)
 endif
 
-../../lib/xvideo.a: $(BUILTIN_XVIDEO)
+../../plugins/xvideo.a: $(BUILTIN_XVIDEO)
 	ar r $@ $^
 	$(RANLIB) $@
 

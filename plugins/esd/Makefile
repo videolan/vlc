@@ -22,10 +22,10 @@ include ../../Makefile.modules
 # Real targets
 #
 
-../../lib/esd.so: $(PLUGIN_C)
+../../plugins/esd.so: $(PLUGIN_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_ESD)
 
-../../lib/esd.a: $(BUILTIN_C)
+../../plugins/esd.a: $(BUILTIN_C)
 	ar r $@ $^
 	$(RANLIB) $@
 

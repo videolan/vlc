@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.78 2001/06/29 11:34:28 stef Exp $
+ * $Id: input_dvd.c,v 1.79 2001/07/11 02:01:04 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -334,13 +334,11 @@ static void DVDOpen( struct input_thread_s *p_input )
     if( strlen( p_input->p_source ) > 4
          && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
     {
-        dvdhandle = dvdcss_open( p_input->p_source + 4,
-                                        DVDCSS_INIT_QUIET );
+        dvdhandle = dvdcss_open( p_input->p_source + 4, DVDCSS_INIT_QUIET );
     }
     else
     {
-        dvdhandle = dvdcss_open( p_input->p_source,
-                                        DVDCSS_INIT_QUIET );
+        dvdhandle = dvdcss_open( p_input->p_source, DVDCSS_INIT_QUIET );
     }
 
     if( dvdhandle == NULL )
@@ -442,7 +440,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
          * CSS cracking has to be done again
          */
         dvdcss_crack( p_dvd->dvdhandle,
-                      vmg.title_inf.p_attr[p_dvd->i_title-1].i_title_set_num,
                       vts.i_pos + vts.manager_inf.i_title_vob_start_sector );
 
         /*
@@ -927,10 +924,9 @@ intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_o
                   < p_input->stream.p_selected_area->i_size );
     b_eof = b_eot && ( ( p_dvd->i_title + 1 ) >= p_input->stream.i_area_nb );
 
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
     if( b_eof )
     {
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
         return 1;
     }
 
@@ -938,11 +934,12 @@ intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_o
     {
         intf_WarnMsg( 4, "dvd info: new title" );
         p_dvd->i_title++;
-        vlc_mutex_lock( &p_input->stream.stream_lock );
         DVDSetArea( p_input, p_input->stream.pp_areas[p_dvd->i_title] );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         return 0;
     }
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     if( i_read_blocks == i_block_once )
     {

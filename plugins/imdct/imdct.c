@@ -2,7 +2,7 @@
  * imdct.c : IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdct.c,v 1.3 2001/06/03 12:47:21 sam Exp $
+ * $Id: imdct.c,v 1.4 2001/07/11 02:01:04 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -93,7 +93,8 @@ static void imdct_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int imdct_Probe( probedata_t *p_data )
 {
-    if( TestMethod( IMDCT_METHOD_VAR, "imdct" ) )
+    if( TestMethod( IMDCT_METHOD_VAR, "imdct" )
+         || TestMethod( IMDCT_METHOD_VAR, "c" ) )
     {
         return( 999 );
     }

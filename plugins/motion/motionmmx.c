@@ -2,7 +2,7 @@
  * motionmmx.c : MMX motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: motionmmx.c,v 1.8 2001/06/07 15:27:44 sam Exp $
+ * $Id: motionmmx.c,v 1.9 2001/07/11 02:01:05 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -78,7 +78,8 @@ int _M( motion_Probe )( probedata_t *p_data )
         return( 0 );
     }
 
-    if( TestMethod( MOTION_METHOD_VAR, "motionmmx" ) )
+    if( TestMethod( MOTION_METHOD_VAR, "motionmmx" )
+         || TestMethod( MOTION_METHOD_VAR, "mmx" ) )
     {
         return( 999 );
     }

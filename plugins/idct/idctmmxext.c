@@ -2,7 +2,7 @@
  * idctmmxext.c : MMX EXT IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmxext.c,v 1.10 2001/06/03 12:47:21 sam Exp $
+ * $Id: idctmmxext.c,v 1.11 2001/07/11 02:01:04 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -113,7 +113,8 @@ static int idct_Probe( probedata_t *p_data )
         return( 0 );
     }
 
-    if( TestMethod( IDCT_METHOD_VAR, "idctmmxext" ) )
+    if( TestMethod( IDCT_METHOD_VAR, "idctmmxext" )
+         || TestMethod( IDCT_METHOD_VAR, "mmxext" ) )
     {
         return( 999 );
     }

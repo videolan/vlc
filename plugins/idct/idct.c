@@ -2,7 +2,7 @@
  * idct.c : IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct.c,v 1.11 2001/06/03 12:47:21 sam Exp $
+ * $Id: idct.c,v 1.12 2001/07/11 02:01:04 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -101,7 +101,8 @@ static void idct_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int idct_Probe( probedata_t *p_data )
 {
-    if( TestMethod( IDCT_METHOD_VAR, "idct" ) )
+    if( TestMethod( IDCT_METHOD_VAR, "idct" )
+         || TestMethod( IDCT_METHOD_VAR, "c" ))
     {
         return( 999 );
     }

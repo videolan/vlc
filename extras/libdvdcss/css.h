@@ -2,7 +2,7 @@
  * css.h: Structures for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.h,v 1.3 2001/07/07 21:10:58 gbazin Exp $
+ * $Id: css.h,v 1.4 2001/07/11 02:01:03 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -32,27 +32,25 @@ typedef u8 dvd_key_t[KEY_SIZE];
 
 typedef struct disc_s
 {
-    u8              pi_challenge[2*KEY_SIZE];
-    dvd_key_t       pi_key1;
-    dvd_key_t       pi_key2;
-    dvd_key_t       pi_key_check;
+    u8              p_challenge[2*KEY_SIZE];
+    dvd_key_t       p_key1;
+    dvd_key_t       p_key2;
+    dvd_key_t       p_key_check;
     u8              i_varient;
 } disc_t;
 
 typedef struct title_key_s
 {
-    int             i_occ;
-    dvd_key_t       pi_key;
+    int                 i_startlb;
+    dvd_key_t           p_key;
+    struct title_key_s *p_next;
 } title_key_t;
 
 typedef struct css_s
 {
     int             i_agid;
     disc_t          disc;
-    u8              pi_disc_key[2048];
-    int             i_title;
-    int             i_title_pos;
-    dvd_key_t       pi_title_key;
+    u8              p_disc_key[2048];
 } css_t;
 
 /*****************************************************************************
@@ -62,6 +60,6 @@ struct css_s;
 
 int   CSSTest             ( dvdcss_handle );
 int   CSSInit             ( dvdcss_handle );
-int   CSSGetKey           ( dvdcss_handle );
+int   CSSGetKey           ( dvdcss_handle, int, dvd_key_t );
 int   CSSDescrambleSector ( u8 * , u8 * );
 

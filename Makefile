@@ -11,12 +11,12 @@
 # 
 # All possible plugin directories, needed for make clean
 #
-PLUGINS_DIR :=	alsa beos darwin directx dsp dummy dvd esd fb ggi glide gtk downmix idct imdct macosx mga motion mpeg qt sdl text x11 yuv
+PLUGINS_DIR :=	alsa beos darwin directx dsp dummy dvd esd fb ggi glide gtk downmix idct imdct kde macosx mga motion mpeg qt sdl text x11 yuv
 
 #
 # All possible plugin objects
 #
-PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin directx/directx dsp/dsp dummy/dummy dummy/null dvd/dvd esd/esd fb/fb ggi/ggi glide/glide gtk/gnome gtk/gtk downmix/downmix downmix/downmixsse downmix/downmix3dn idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext imdct/imdct imdct/imdct3dn imdct/imdctsse macosx/macosx mga/mga motion/motion motion/motionmmx motion/motionmmxext mpeg/es mpeg/ps mpeg/ts qt/qt sdl/sdl text/ncurses text/rc x11/x11 x11/xvideo yuv/yuv yuv/yuvmmx
+PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin directx/directx dsp/dsp dummy/dummy dummy/null dvd/dvd esd/esd fb/fb ggi/ggi glide/glide gtk/gnome gtk/gtk downmix/downmix downmix/downmixsse downmix/downmix3dn idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext imdct/imdct imdct/imdct3dn imdct/imdctsse kde/kde macosx/macosx mga/mga motion/motion motion/motionmmx motion/motionmmxext mpeg/es mpeg/ps mpeg/ts qt/qt sdl/sdl text/ncurses text/rc x11/x11 x11/xvideo yuv/yuv yuv/yuvmmx
 
 #
 # C Objects
@@ -83,10 +83,10 @@ CPP_DEP := $(CPP_OBJ:%.o=.dep/%.dpp)
 # Translate plugin names
 #
 ifneq (,$(PLUGINS))
-PLUGIN_OBJ := $(shell for i in $(PLUGINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@lib/\1.so@' -e 's@^ .*@@' ; done)
+PLUGIN_OBJ := $(shell for i in $(PLUGINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@plugins/\1.so@' -e 's@^ .*@@' ; done)
 endif
 ifneq (,$(BUILTINS))
-BUILTIN_OBJ := $(shell for i in $(BUILTINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@lib/\1.a@' -e 's@^ .*@@' ; done)
+BUILTIN_OBJ := $(shell for i in $(BUILTINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@plugins/\1.a@' -e 's@^ .*@@' ; done)
 endif
 
 # All symbols must be exported
@@ -104,6 +104,7 @@ all: vlc ${ALIASES} plugins vlc.app
 clean: libdvdcss-clean plugins-clean vlc-clean
 	rm -f src/*/*.o extras/*/*.o
 	rm -f lib/*.so lib/*.so.* lib/*.a
+	rm -f plugins/*.so plugins/*.so.* plugins/*.a
 
 libdvdcss-clean:
 	cd extras/libdvdcss && $(MAKE) clean
@@ -144,7 +145,7 @@ endif
 plugins-install:
 	mkdir -p $(DESTDIR)$(libdir)/videolan/vlc
 ifneq (,$(PLUGINS))
-	$(INSTALL) -m 644 $(PLUGINS:%=lib/%.so) $(DESTDIR)$(libdir)/videolan/vlc
+	$(INSTALL) -m 644 $(PLUGINS:%=plugins/%.so) $(DESTDIR)$(libdir)/videolan/vlc
 endif
 
 libdvdcss-install:
@@ -270,7 +271,7 @@ ifneq (,$(findstring darwin,$(SYS)))
 	$(INSTALL) vlc vlc.app/Contents/MacOS/
 	$(INSTALL) share/vlc.icns vlc.app/Contents/Resources/
 ifneq (,$(PLUGINS))
-	$(INSTALL) $(PLUGINS:%=lib/%.so) vlc.app/Contents/MacOS/lib
+	$(INSTALL) $(PLUGINS:%=plugins/%.so) vlc.app/Contents/MacOS/plugins
 endif
 	$(INSTALL) -m 644 share/*.psf vlc.app/Contents/MacOS/share
 endif
@@ -343,14 +344,14 @@ endif
 #
 plugins: Makefile.modules Makefile.opts Makefile.dep Makefile $(PLUGIN_OBJ)
 $(PLUGIN_OBJ): FORCE
-	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:lib/%.so=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:%=../../%)
+	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.so=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:%=../../%)
 
 #
 # Built-in modules target
 #
 builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
 $(BUILTIN_OBJ): FORCE
-	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:lib/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:%=../../%)
+	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:%=../../%)
 
 #
 # libdvdcss target

@@ -3,7 +3,7 @@
  * Provides functions to perform the YUV conversion.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_yuvmmx.c,v 1.10 2001/06/03 12:47:21 sam Exp $
+ * $Id: video_yuvmmx.c,v 1.11 2001/07/11 02:01:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -85,7 +85,8 @@ static int yuv_Probe( probedata_t *p_data )
         return( 0 );
     }
 
-    if( TestMethod( YUV_METHOD_VAR, "yuvmmx" ) )
+    if( TestMethod( YUV_METHOD_VAR, "yuvmmx" )
+         || TestMethod( YUV_METHOD_VAR, "mmx" ) )
     {
         return( 999 );
     }

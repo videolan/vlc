@@ -24,7 +24,6 @@ extern "C"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "modules.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -34,6 +33,9 @@ extern "C"
 #include "interface.h"
 
 #include "main.h"
+
+#include "modules.h"
+#include "modules_export.h"
 }
 
 #endif /* _INTF_PLUGIN_H_ */

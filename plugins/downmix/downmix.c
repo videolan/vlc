@@ -2,7 +2,7 @@
  * downmix.c : AC3 downmix module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: downmix.c,v 1.2 2001/05/30 17:03:12 sam Exp $
+ * $Id: downmix.c,v 1.3 2001/07/11 02:01:04 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -95,7 +95,8 @@ static void downmix_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int downmix_Probe( probedata_t *p_data )
 {
-    if( TestMethod( DOWNMIX_METHOD_VAR, "downmix" ) )
+    if( TestMethod( DOWNMIX_METHOD_VAR, "downmix" )
+         || TestMethod( DOWNMIX_METHOD_VAR, "c" ) )
     {
         return( 999 );
     }

@@ -2,7 +2,7 @@
  * downmix3dn.c : accelerated 3D Now! AC3 downmix module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: downmix3dn.c,v 1.3 2001/06/03 12:47:21 sam Exp $
+ * $Id: downmix3dn.c,v 1.4 2001/07/11 02:01:04 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -100,7 +100,8 @@ static int downmix_Probe( probedata_t *p_data )
         return( 0 );
     }
 
-    if( TestMethod( DOWNMIX_METHOD_VAR, "downmix3dn" ) )
+    if( TestMethod( DOWNMIX_METHOD_VAR, "downmix3dn" )
+         || TestMethod( DOWNMIX_METHOD_VAR, "3dn" ) )
     {
         return( 999 );
     }

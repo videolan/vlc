@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.56 2001/07/06 08:43:31 sam Exp $
+ * $Id: vout_sdl.c,v 1.57 2001/07/11 02:01:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -559,8 +559,14 @@ static void vout_Display( vout_thread_t *p_vout )
                                              p_vout->p_rendered_pic->i_width, 
                                              p_vout->p_rendered_pic->i_height,
                                              SDL_YV12_OVERLAY, 
-                                             p_vout->p_sys->p_display
-                                           );
+                                             p_vout->p_sys->p_display );
+
+                if( p_vout->p_sys->p_overlay != NULL )
+                {
+                    intf_WarnMsg( 2, "vout: YUV acceleration %s",
+                                  p_vout->p_sys->p_overlay->hw_overlay
+                                   ? "activated" : "unavailable !" ); 
+                }
             }
 
             if( p_vout->p_sys->p_overlay == NULL )
@@ -571,28 +577,23 @@ static void vout_Display( vout_thread_t *p_vout )
             }
             else
             {
-
-                intf_WarnMsg( 2, "vout: YUV acceleration %s",
-                              p_vout->p_sys->p_overlay->hw_overlay
-                               ? "activated" : "unavailable !" ); 
-    
-                SDL_LockYUVOverlay(p_vout->p_sys->p_overlay);
+                SDL_LockYUVOverlay( p_vout->p_sys->p_overlay );
                 /* copy the data into video buffers */
                 /* Y first */
-                memcpy(p_vout->p_sys->p_overlay->pixels[0],
-                       p_vout->p_rendered_pic->p_y,
-                       p_vout->p_sys->p_overlay->h *
-                       p_vout->p_sys->p_overlay->pitches[0]);
+                memcpy( p_vout->p_sys->p_overlay->pixels[0],
+                        p_vout->p_rendered_pic->p_y,
+                        p_vout->p_sys->p_overlay->h *
+                        p_vout->p_sys->p_overlay->pitches[0] );
                 /* then V */
-                memcpy(p_vout->p_sys->p_overlay->pixels[1],
-                       p_vout->p_rendered_pic->p_v,
-                       p_vout->p_sys->p_overlay->h *
-                       p_vout->p_sys->p_overlay->pitches[1] / 2);
+                memcpy( p_vout->p_sys->p_overlay->pixels[1],
+                        p_vout->p_rendered_pic->p_v,
+                        p_vout->p_sys->p_overlay->h *
+                        p_vout->p_sys->p_overlay->pitches[1] / 2 );
                 /* and U */
-                memcpy(p_vout->p_sys->p_overlay->pixels[2],
-                       p_vout->p_rendered_pic->p_u,
-                       p_vout->p_sys->p_overlay->h *
-                       p_vout->p_sys->p_overlay->pitches[2] / 2);
+                memcpy( p_vout->p_sys->p_overlay->pixels[2],
+                        p_vout->p_rendered_pic->p_u,
+                        p_vout->p_sys->p_overlay->h *
+                        p_vout->p_sys->p_overlay->pitches[2] / 2 );
     
 #define BUFFER (&p_vout->p_buffer[p_vout->i_buffer_index])
                 disp.w = BUFFER->i_pic_width;

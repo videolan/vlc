@@ -20,13 +20,13 @@ include ../../Makefile.modules
 
 $(PLUGIN_QT): %.o: .dep/%.dpp
 $(PLUGIN_QT): %.o: %.moc
-	$(CC) $(CFLAGS) -DPLUGIN $(PCFLAGS) -I/usr/include/qt -I${QTDIR}/include -c -o $@ $(<:%.moc=%.cpp)
+	$(CC) $(CFLAGS) -DPLUGIN $(PCFLAGS) -I/usr/include/qt -I${QTDIR}/include -DPLUGIN -DMODULE_NAME=qt -c -o $@ $(<:%.moc=%.cpp)
 $(PLUGIN_QT:%.o=%.moc): %.moc: %.cpp
 	grep -q Q_OBJECT $< && $(MOC) -i $< -o $@ || true
 
 $(BUILTIN_QT): BUILTIN_%.o: .dep/%.dpp
 $(BUILTIN_QT): %.o: %.moc
-	$(CC) $(CFLAGS) -DBUILTIN -I/usr/include/qt -I${QTDIR}/include -c -o $@ $(<:BUILTIN_%.moc=%.cpp)
+	$(CC) $(CFLAGS) -DBUILTIN -I/usr/include/qt -I${QTDIR}/include -DBUILTIN -DMODULE_NAME=qt -c -o $@ $(<:BUILTIN_%.moc=%.cpp)
 $(BUILTIN_QT:%.o=%.moc): BUILTIN_%.moc: %.cpp
 	grep -q Q_OBJECT $< && $(MOC) -i $< -o $@ || true
 
@@ -34,10 +34,10 @@ $(BUILTIN_QT:%.o=%.moc): BUILTIN_%.moc: %.cpp
 # Real targets
 #
 
-../../lib/qt.so: $(PLUGIN_QT)
+../../plugins/qt.so: $(PLUGIN_QT)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_QT)
 
-../../lib/qt.a: $(BUILTIN_QT)
+../../plugins/qt.a: $(BUILTIN_QT)
 	ar r $@ $^
 	$(RANLIB) $@
 

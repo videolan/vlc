@@ -21,8 +21,13 @@ D: directory browsing code in modules.c
 
 N: Gildas Bazin
 E: gbazin@netcourrier.com
+C: gbazin
 D: mingw32 port, various win32 fixes
 D: DirectX audio and video output
+
+N: Billy Biggs 
+E: vektor@dumbterm.net
+D: libdvdcss enhancements
 
 N: Stéphane Borel
 E: stef@via.ecp.fr

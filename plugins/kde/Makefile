@@ -7,6 +7,12 @@
 # Objects
 #
  
+MOCFILES =	kinterfacemain.moc.cpp \
+		kvlcslider.moc.cpp \
+		kdiskdialog.moc.cpp \
+		knetdialog.moc.cpp \
+		ktitlemenu.moc.cpp
+
 PLUGIN_KDE =	kde.o \
 		kdeinterface.o \
 		kinterfacemain.o \
@@ -15,14 +21,10 @@ PLUGIN_KDE =	kde.o \
 		knetdialog.o \
 		ktitlemenu.o
 
-PLUGIN_KDE_MOC =	kinterfacemain.moc.o \
-			kvlcslider.moc.o \
-			kdiskdialog.moc.o \
-			knetdialog.moc.o \
-			ktitlemenu.moc.o
+PLUGIN_KDE_MOC = $(MOCFILES:%.cpp=%.o)
 
-#BUILTIN_KDE = $(PLUGIN_KDE:%.o=BUILTIN_%.o)
-#BUILTIN_KDE_MOC = $(PLUGIN_KDE_MOC:%.o=BUILTIN_%.o)
+BUILTIN_KDE = $(PLUGIN_KDE:%.o=BUILTIN_%.o)
+BUILTIN_KDE_MOC = $(MOCFILES:%.cpp=BUILTIN_%.o)
 
 ALL_OBJ = $(PLUGIN_KDE) $(PLUGIN_KDE_MOC) $(BUILTIN_KDE) $(BUILTIN_KDE_MOC)
 
@@ -32,34 +34,33 @@ ALL_OBJ = $(PLUGIN_KDE) $(PLUGIN_KDE_MOC) $(BUILTIN_KDE) $(BUILTIN_KDE_MOC)
 
 include ../../Makefile.modules
 
+$(MOCFILES): %.moc.cpp: %.h
+	$(MOC) $< -o $@
+
 $(PLUGIN_KDE): %.o: .dep/%.dpp
 $(PLUGIN_KDE): %.o: %.cpp
-	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/kde -I/usr/include/qt -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/kde -I/usr/include/qt -DPLUGIN -DMODULE_NAME=kde -c -o $@ $<
 
 $(PLUGIN_KDE_MOC): %.o: .dep/%.dpp
 $(PLUGIN_KDE_MOC): %.o: %.cpp
-	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/kde -I/usr/include/qt -c -o $@ $<
-$(PLUGIN_KDE_MOC:%.moc.o=%.moc.cpp): %.moc.cpp: %.h
-	moc $< -o $@
+	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/kde -I/usr/include/qt -DPLUGIN -DMODULE_NAME=kde -c -o $@ $<
 
-#$(BUILTIN_KDE): BUILTIN_%.o: .dep/%.dpp
-#$(BUILTIN_KDE): BUILTIN_%.o: %.cpp
-#	$(CC) $(CFLAGS) -DBUILTIN -I/usr/include/kde -I/usr/include/qt -c -o $@ $<
+$(BUILTIN_KDE): BUILTIN_%.o: .dep/%.dpp
+$(BUILTIN_KDE): BUILTIN_%.o: %.cpp
+	$(CC) $(CFLAGS) -DBUILTIN -I/usr/include/kde -I/usr/include/qt -DBUILTIN -DMODULE_NAME=kde -c -o $@ $<
 
-#$(BUILTIN_KDE_MOC): BUILTIN_%.o: dep/%.dpp
-#$(BUILTIN_KDE_MOC): BUILTIN_%.o: %.cpp
-#	$(CC) $(CFLAGS) -DBUILTIN -I/usr/include/kde -I/usr/include/qt -c -o $@ $<
-#$(BUILTIN_KDE_MOC: %.moc.o=%.cpp): %.moc.cpp: %.h
-#	$(MOC) $< -o $@
+$(BUILTIN_KDE_MOC): BUILTIN_%.o: .dep/%.dpp
+$(BUILTIN_KDE_MOC): BUILTIN_%.o: %.cpp
+	$(CC) $(CFLAGS) -DBUILTIN -I/usr/include/kde -I/usr/include/qt -DBUILTIN -DMODULE_NAME=kde -c -o $@ $<
 
 #
 # Real targets
 #
 
-../../lib/kde.so: $(PLUGIN_KDE) $(PLUGIN_KDE_MOC)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_KDE) -lkfile
+../../plugins/kde.so: $(PLUGIN_KDE) $(PLUGIN_KDE_MOC)
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_KDE)
 
-#../../lib/kde.a: $(BUILTIN_KDE)
-#	ar r $@ $^
-#	$(RANLIB) $@
+../../plugins/kde.a: $(BUILTIN_KDE) $(BUILTIN_KDE_MOC)
+	ar r $@ $^
+	$(RANLIB) $@
 

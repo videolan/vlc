@@ -2,7 +2,7 @@
  * idctmmx.c : MMX IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmx.c,v 1.13 2001/06/03 12:47:21 sam Exp $
+ * $Id: idctmmx.c,v 1.14 2001/07/11 02:01:04 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -113,7 +113,8 @@ static int idct_Probe( probedata_t *p_data )
         return( 0 );
     }
 
-    if( TestMethod( IDCT_METHOD_VAR, "idctmmx" ) )
+    if( TestMethod( IDCT_METHOD_VAR, "idctmmx" )
+         || TestMethod( IDCT_METHOD_VAR, "mmx" ) )
     {
         return( 999 );
     }
