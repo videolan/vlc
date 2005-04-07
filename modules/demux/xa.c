@@ -107,10 +107,9 @@ static int Open( vlc_object_t * p_this )
     /* skip XA header -- cannot fail */
     stream_Read( p_demux->s, NULL, sizeof( p_xa ) );
 
-    es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
+    es_format_Init( &p_sys->fmt, AUDIO_ES, VLC_FOURCC('X','A','J',0) );
 
-    msg_Dbg( p_demux, "assuming EA ADPCM audio format" );
-    p_sys->fmt.i_codec = VLC_FOURCC('X','A','J',0);
+    msg_Dbg( p_demux, "assuming EA ADPCM audio codec" );
     p_sys->fmt.audio.i_rate = GetDWLE( &p_xa.nSamplesPerSec );
     p_sys->fmt.audio.i_bytes_per_frame = 15 * GetWLE( &p_xa.nChannels );
     p_sys->fmt.audio.i_frame_length = 28; /* 28 samples of 4 bits each */
