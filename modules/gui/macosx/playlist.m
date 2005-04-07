@@ -384,6 +384,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     i_current_view = VIEW_CATEGORY;
     playlist_ViewUpdate( p_playlist, i_current_view );
+    vlc_object_release( p_playlist );
     [self playlistUpdated];
     return;
 }
