@@ -966,8 +966,7 @@ libcdio: libcdio-$(CDIO_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .cdio: libcdio
-	(cd $<; ./configure --prefix=$(PREFIX) --without-vcdinfo && make && make install)
-	$(INSTALL_NAME)
+	(cd $<; ./configure --prefix=$(PREFIX) --without-vcdinfo --disable-shared && make && make install)
 	touch $@
 
 CLEAN_FILE += .cdio
@@ -1078,6 +1077,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.gz
 
 .gcrypt: libgcrypt
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install )
+	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .gcrypt
